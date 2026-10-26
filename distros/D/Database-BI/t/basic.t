@@ -10,6 +10,15 @@ use Mojo::Util qw(url_escape);
 
 my $t = Test::Mojo->new('Database::BI');
 
+# Uploads land in a directory this file owns: the default staging directory is
+# shared by every test file, and a parallel run's POST /uploads/clear could
+# empty it between an upload and the /open that reads it.
+$t->app->config->{uploads_dir} = File::Temp::tempdir(CLEANUP => 1);
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = File::Temp::tempdir(CLEANUP => 1);
+
 # ---------------------------------------------------------------------------
 subtest 'Home page' => sub {
 	$t->get_ok('/')->status_is(200)->content_like(qr/Choose a Database/i);
@@ -99,6 +108,32 @@ subtest 'Join' => sub {
         $t->get_ok('/join?l=' . url_escape('table:sales') . '&j=' . $jspec)
           ->status_is(200)->content_like(qr/sales/i);
     }
+};
+
+subtest 'Join warns when a shared column has different types' => sub {
+	# The join always prefixes the right table's columns, so Database::Join's own
+	# mismatch warning stays quiet; the banner is the controller's comparison of
+	# the two declared types, and this is the check that it still reaches a page.
+	my $dir = File::Temp->newdir;
+	my $a   = File::Spec->catfile("$dir", 'a.db');
+	my $b   = File::Spec->catfile("$dir", 'b.db');
+
+	require DBI;
+	for my $fixture ([ $a, 'INTEGER' ], [ $b, 'TEXT' ]) {
+		my ($path, $type) = @$fixture;
+		my $dbh = DBI->connect("dbi:SQLite:dbname=$path", '', '', { RaiseError => 1 });
+		$dbh->do("CREATE TABLE t (id INTEGER PRIMARY KEY, amount $type)");
+		$dbh->do("INSERT INTO t VALUES (1, '10')");
+		$dbh->disconnect;
+	}
+
+	$t->get_ok('/join?l=' . url_escape("path:$a") . '&j=' . url_escape("path:$b|id|id"))
+		->status_is(200)
+		->content_like(qr/class="schema-warnings"/, 'the warnings banner is rendered')
+		->content_like(
+			qr/Column &quot;amount&quot; has type INTEGER in a\.db but TEXT in b\.db/,
+			'the warning names the column, both types and both files')
+		->content_unlike(qr/Column &quot;id&quot;/, 'the join key is not reported');
 };
 
 # ---------------------------------------------------------------------------

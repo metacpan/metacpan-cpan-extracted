@@ -1,3 +1,0 @@
-
-docker run -it -v $(PWD):/usr/src/app -w /usr/src/app perl:5.16-buster /bin/bash
-

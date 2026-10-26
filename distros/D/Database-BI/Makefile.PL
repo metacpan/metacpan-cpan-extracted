@@ -89,9 +89,13 @@ WriteMakefile(
 				recommends => {
 					# Geocoding a dataset's location column (Phase 6.2).  Loaded with a
 					# runtime require, never a hard prerequisite: 0.46 added
-					# valid_location() and 0.47 added geocode_many(), and the app
+					# valid_location() and 0.47 added geocode_many(), 0.48 added the
+					# per-lookup read counts the app reports as lookups, and the app
 					# installs, starts and tests without the module, hiding the
-					# location option and saying which version is needed.
+					# location option and saying which version is needed.  The floor
+					# is named once, in Database::BI::Model::Geocode's
+					# $MIN_GEOCODER_VERSION and in the messages that quote it;
+					# t/recommended-versions.t holds all three to this entry.
 					'Geo::Coder::Free' => '0.48',
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.

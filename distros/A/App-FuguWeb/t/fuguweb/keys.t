@@ -328,6 +328,7 @@ sub project (%args)
 	my $rc = $args{rc} // $KEYS_BLOCK;
 	spew( "$root/.fuguwebrc", <<"RC" );
 site       = Example
+url        = https://example.org/
 source_dir = web
 out_dir    = out
 
@@ -360,6 +361,7 @@ sub keyless ()
 	spew( "$root/web/index.body.html", "<h1>Home</h1>\n" );
 	spew( "$root/.fuguwebrc", <<'RC' );
 site       = Example
+url        = https://example.org/
 source_dir = web
 out_dir    = out
 
@@ -847,8 +849,8 @@ subtest 'one address orders the keys of every directory' => sub {
 		0, 'and the address serves no file' );
 };
 
-# WEB-KEYS-14. The policy file names the site, and every key
-# directory writes the same bytes there.
+# WEB-KEYS-14. The policy file names the site in the default language,
+# and every key directory writes the same bytes there.
 subtest 'the policy file names the site' => sub {
 	my ( $config, $reason ) = load( two() );
 	ok( $config, 'the description loads' ) or diag $reason;
@@ -866,7 +868,9 @@ subtest 'the policy file names the site' => sub {
 	# The site name is free-form, and the file carries comment
 	# lines alone. A description cannot write a newline into that
 	# name: Fugu::Config reads one value from one line, so the
-	# value stops at the end of its line.
+	# value stops at the end of its line. The second line is then a
+	# setting of its own, and fuguweb(1) documents no such setting,
+	# per WEB-SITE-4.
 	my $root = project();
 	my $rc   = slurp("$root/.fuguwebrc");
 	$rc =~ s/^site(\s+)= Example$/site$1= "Example\nnot a comment"/m
@@ -874,16 +878,59 @@ subtest 'the policy file names the site' => sub {
 	spew( "$root/.fuguwebrc", $rc );
 
 	( $config, $reason ) = load($root);
-	ok( $config, 'a site name of two lines loads' ) or diag $reason;
-	unlike( $config->site, qr/\n/, 'and the name holds no newline' );
+	is( $config, undef, 'a site name of two lines fails the load' );
+	like( $reason, qr/the description names the unknown setting not\z/,
+		'and the second line is an unknown setting' );
+
+	# A site name outside ASCII reaches the policy file and the
+	# human page as its UTF-8 bytes, per WEB-SITE-5.
+	$root = project();
+	$rc   = slurp("$root/.fuguwebrc");
+	$rc =~ s/^site(\s+)= Example$/site$1= voil\xc3\xa0/m
+	    or die 'the fixture writes no site name';
+	spew( "$root/.fuguwebrc", $rc );
+
+	( $config, $reason ) = load($root);
+	ok( $config, 'a site name outside ASCII loads' ) or diag $reason;
 
 	( $generated, $why ) = App::FuguWeb::Keys->site_generated($config);
 	ok( $generated, 'the site generates' ) or diag $why;
+	is(
+		$generated->{'.well-known/openpgpkey/policy'},
+		"# The Web Key Directory of voil\xc3\xa0. It sets no policy"
+		    . " flag.\n",
+		'the policy file holds the bytes of the site name'
+	);
+	like(
+		$generated->{'keys/index.html'},
+		qr{<header>\n<a href="\.\./en/index\.html">voil\xc3\xa0</a>\n</header>},
+		'and so does the human page'
+	);
 
-	my @line = grep { length } split /\n/,
-	    $generated->{'.well-known/openpgpkey/policy'} // '';
-	is( scalar( grep { /\A\#/ } @line ),
-		scalar(@line), 'and every line of the policy file is a comment'
+	# WEB-LANGUAGE-3. The block of the default language can name a
+	# site of its own. The pages of the default tree show that name,
+	# so the policy file names it too.
+	$root = project();
+	spew( "$root/.fuguwebrc",
+		    slurp("$root/.fuguwebrc")
+		  . qq{\nlanguage en {\n\tname = English\n\tsite = Exemplo\n}\n} );
+
+	( $config, $reason ) = load($root);
+	ok( $config, 'a site name of the default language loads' )
+	    or diag $reason;
+
+	( $generated, $why ) = App::FuguWeb::Keys->site_generated($config);
+	ok( $generated, 'the site generates' ) or diag $why;
+	is(
+		$generated->{'.well-known/openpgpkey/policy'},
+		"# The Web Key Directory of Exemplo. It sets no policy"
+		    . " flag.\n",
+		'the policy file names the site of the default language'
+	);
+	like(
+		$generated->{'keys/index.html'},
+		qr{<header>\n<a href="\.\./en/index\.html">Exemplo</a>\n</header>},
+		'as the human page does'
 	);
 };
 
@@ -1112,10 +1159,11 @@ subtest 'the generated files' => sub {
 		'and an OpenPGP row holds its fingerprint'
 	);
 
-	like( $page, qr{<title>Keys },     'the index page has a title' );
+	like( $page, qr{<title>Keys</title>},
+		'the index page has the English title alone' );
 	like( $page, qr{href="\.\./style\.css"},
 		'and it steps back to the stylesheet of the root' );
-	like( $page, qr{<header><a href="\.\./en/index\.html">},
+	like( $page, qr{<header>\n<a href="\.\./en/index\.html">},
 		'and into the entry page of the default tree' );
 	like( $page, qr{<html lang="en">}, 'it is a page of en' );
 	unlike( $page, qr{<footer>}, 'and it carries no footer' );
@@ -1192,6 +1240,7 @@ subtest 'a description with no keys block' => sub {
 	spew( "$root/web/index.body.html", "<h1>Home</h1>\n" );
 	spew( "$root/.fuguwebrc", <<'RC' );
 site = Example
+url  = https://example.org/
 
 page "index.html" {
 	title = Home
@@ -2237,6 +2286,25 @@ key "fugubsd-1-release" {
 }
 RC
 		],
+
+		# WEB-OUTPUT-17. A file system without case keeps two
+		# names of one fold as one entry.
+		'two keys blocks of one directory in two cases' => [
+			qr{keys "KEYS" is declared twice, and one directory takes one block},
+			<<'RC'
+keys "keys" {
+	org = fugubsd
+}
+
+keys "KEYS" {
+	org = other
+}
+
+key "fugubsd-1-release" {
+	status = current
+}
+RC
+		],
 		'a second block that names a contact' => [
 			qr{keys "other" names contact, and keys "keys" names one already},
 			<<'RC'
@@ -2350,12 +2418,21 @@ subtest 'a keys name that names no directory of its own' => sub {
 		'the staging directory' =>
 		    [ '.man', qr{is the staging directory of the build} ],
 
-		# WEB-KEYS-34. A language tree takes a name of this
-		# shape in the output.
-		'a language code' =>
-		    [ 'en', qr{has the shape of a language code} ],
-		'a code of no language of the site' =>
-		    [ 'de', qr{has the shape of a language code} ],
+		# WEB-KEYS-34. The tree of a declared language takes
+		# its path in the output.
+		'the tree of the one language' => [
+			'en',
+qr{keys "en" is the path of the tree of the language en, which takes that name}
+		],
+
+		# WEB-OUTPUT-17. A file system without case keeps two
+		# names of one fold as one entry.
+		'the staging directory in another case' =>
+		    [ '.MAN', qr{is the staging directory of the build} ],
+		'the tree of the one language in another case' => [
+			'EN',
+qr{keys "EN" is the path of the tree of the language en, which takes that name}
+		],
 	);
 
 	for my $name ( sort keys %case ) {
@@ -2377,12 +2454,50 @@ RC
 		ok( !$config, "$name is refused" );
 		like( $reason, $pattern, 'and the reason names it' );
 	}
+
+	# WEB-KEYS-34. The path of a tree is the tag in lowercase, and
+	# a name of no declared tree is a name like any other.
+	my %rc = (
+		'zh-hans' => [
+			qq{language en {\n\tname = English\n}\n\n}
+			    . qq{language zh-Hans {\n\tname = Chinese\n}\n},
+qr{keys "zh-hans" is the path of the tree of the language zh-Hans, which takes that name}
+		],
+		'de' => [ '', undef ],
+	);
+	for my $word ( sort keys %rc ) {
+		my ( $languages, $pattern ) = @{ $rc{$word} };
+		my $root = project(
+			keys => { 'fugubsd-1-release.pub' => $SIGNIFY },
+			rc   => <<"RC"
+$languages
+keys "$word" {
+	org = fugubsd
+}
+
+key "fugubsd-1-release" {
+	status = current
+}
+RC
+		);
+		rename "$root/web/keys", "$root/web/$word"
+		    or die "Cannot rename: $!";
+
+		my ( $config, $reason ) = load($root);
+		if ( defined $pattern ) {
+			ok( !$config, "the tree $word of a declared language is refused" );
+			like( $reason, $pattern, 'and the reason names the tag' );
+		}
+		else {
+			ok( $config, "$word, which is no tree of the site, loads" )
+			    or diag $reason;
+		}
+	}
 };
 
 subtest 'a key directory that collides with a page of the top level' => sub {
-	# The forward of the top level takes index.html, per
-	# WEB-LANG-8, and a key directory of that name would take its
-	# place.
+	# The forward of the top level takes index.html, and a key
+	# directory of that name would take its place.
 	my $root = project( rc => <<'RC' );
 keys "index.html" {
 	org = fugubsd
@@ -2461,6 +2576,33 @@ RC
 	ok( !$config, 'the description is refused' );
 	like( $reason, qr{both become the same name in the output},
 		'because the stylesheet takes that name' );
+
+	# WEB-OUTPUT-17. A file system without case keeps two names of
+	# one fold as one entry, so the guard folds each name.
+	$root = project( rc => <<'RC' );
+keys "STYLE.CSS" {
+	org = fugubsd
+}
+
+key "fugubsd-1-release" {
+	status = current
+}
+
+key "fugubsd-1-contact" {
+	status = current
+}
+RC
+
+	rename "$root/web/keys", "$root/web/STYLE.CSS"
+	    or die "Cannot rename: $!";
+
+	( $config, $reason ) = load($root);
+	ok( !$config, 'the name in another case is refused' );
+	like(
+		$reason,
+qr{keys "STYLE\.CSS" and style\.css of the site both become the same name},
+		'and the reason names the stylesheet'
+	);
 };
 
 subtest 'an email that is not a local part and a domain' => sub {
@@ -2557,6 +2699,8 @@ subtest 'a reference that climbs above the site root' => sub {
 	my $root = project();
 	spew( "$root/web/footer.body.html",
 		qq{<p><a href="../../secret.txt">Up</a></p>\n} );
+	spew( "$root/.fuguwebrc",
+		"footer = footer.body.html\n" . slurp("$root/.fuguwebrc") );
 
 	my ( $config, $reason ) = load($root);
 	ok( $config, 'the description loads' ) or diag $reason;
@@ -2823,6 +2967,7 @@ subtest 'the build prunes a key that the description dropped' => sub {
 	# then holds a signify key alone.
 	spew( "$root/.fuguwebrc", <<'RC' );
 site       = Example
+url        = https://example.org/
 source_dir = web
 out_dir    = out
 
@@ -2948,7 +3093,7 @@ RC
 
 	# An absolute navigation entry names a place of its own, so
 	# the step into the default tree must not stand in front of
-	# it, per WEB-LANG-15.
+	# it.
 	my $rc = slurp("$root/.fuguwebrc");
 	$rc =~ s{nav "index\.html" \{\n\tlabel = Home\n\}}{$&\n\nnav "https://example.org/" {\n\tlabel = Elsewhere\n}};
 	spew( "$root/.fuguwebrc", $rc );
@@ -2964,7 +3109,7 @@ RC
 		'an absolute navigation href keeps its own form' );
 	unlike( $page, qr{href="\.\./(?:en/)?https://},
 		'and takes no step in front of it' );
-	like( $page, qr{<a href="\.\./en/index\.html">Home</a>},
+	like( $page, qr{<li><a href="\.\./en/index\.html">Home</a></li>},
 		'a relative one takes the step into the default tree' );
 	like( $page, qr{<link rel="stylesheet" href="\.\./style\.css">},
 		'and the stylesheet takes the step back to the top level' );
@@ -2991,6 +3136,93 @@ RC
 		'the checks hold the generated page' );
 };
 
+subtest 'the key page of a site of three languages' => sub {
+	# WEB-CHROME-8. The key page takes the chrome of the default
+	# tree, and each link of it comes from its own path. The keys are
+	# signify keys alone, so the whole check runs with no gpg(1).
+	my $root = project(
+		keys => {
+			'fugubsd-1-root.pub'                       => $ROOT,
+			'fugubsd-1-release.pub'                    => $SIGNIFY,
+			'fugubsd-1-root.pub.fugubsd-1-release.sig' => $BINDING,
+		},
+		rc => <<"RC",
+language en {
+	name = English
+}
+
+language zh-Hans {
+	name = \xe7\xae\x80\xe4\xbd\x93\xe4\xb8\xad\xe6\x96\x87
+}
+
+language ar {
+	name = Arabic
+	dir  = rtl
+}
+
+keys "keys" {
+	org = fugubsd
+}
+
+key "fugubsd-1-root" {
+	status = current
+	since  = 2026-09-07
+}
+
+key "fugubsd-1-release" {
+	status = current
+	since  = 2026-09-07
+}
+RC
+	);
+
+	my ( $config, $reason ) = load($root);
+	ok( $config, 'the description loads' ) or diag $reason;
+
+	my $out = tempdir( CLEANUP => 1 ) . '/out';
+	ok( site( $config, $out )->build, 'the build succeeds' );
+
+	my @problems =
+	    App::FuguWeb::Check->new( config => $config, out => $out )->run;
+	is( scalar @problems, 0, 'and the check finds no problem' )
+	    or diag join "\n", @problems;
+
+	my $page = slurp("$out/keys/index.html");
+	like( $page, qr{<html lang="en">\n}, 'the key page is a page of en' );
+	like(
+		$page,
+		qr{<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keys</title>
+<link rel="stylesheet" href="\.\./style\.css">
+</head>},
+		'its head holds four parts, and names no page'
+	);
+	like(
+		$page,
+		qr{<header>
+<a href="\.\./en/index\.html">Example</a>
+</header>
+<nav>
+<ul>
+<li><a href="\.\./en/index\.html">Home</a></li>
+</ul>
+</nav>
+<main>},
+		'its header holds the site link alone, and its nav the default tree'
+	);
+	unlike( $page, qr{hreflang|aria-current|<footer},
+		'it lists no language, marks no entry, and carries no footer' );
+
+	# A tree page of the same site lists each language.
+	like(
+		slurp("$out/zh-hans/index.html"),
+		qr{<li><a href="index\.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">},
+		'a tree page of the site lists its own language as the current one'
+	);
+};
+
 subtest 'the generated page carries no footer' => sub {
 	my $root = project();
 
@@ -3006,7 +3238,7 @@ subtest 'the generated page carries no footer' => sub {
 	my $rc = slurp("$root/.fuguwebrc");
 	$rc =~ s{^keys "keys"}{page "about.html" {\n\ttitle    = About\n\tbody     = about.body.html\n\tunlinked = yes\n}\n\nkeys "keys"}m
 	    or die 'the fixture adds no page';
-	spew( "$root/.fuguwebrc", $rc );
+	spew( "$root/.fuguwebrc", "footer = footer.body.html\n$rc" );
 
 	my ( $config, $reason ) = load($root);
 	ok( $config, 'the description loads' ) or diag $reason;
@@ -3338,7 +3570,7 @@ subtest 'the clean command still refuses a tree that no build made' => sub {
 	# A description that does not load must not stop the clean.
 	# It is the command an operator reaches for when a description
 	# is broken.
-	spew( "$root/.fuguwebrc", "site = Example\nkeys \"keys\" {\n" );
+	spew( "$root/.fuguwebrc", "site = Example\nurl = https://example.org/\nkeys \"keys\" {\n" );
 
 	my $victim = "$root/victim";
 	spew( "$victim/deep/keep.txt", "important\n" );
@@ -3515,10 +3747,19 @@ subtest 'the clean refuses a directory of the source' => sub {
 	my ( $config, $reason ) = load($root);
 	ok( $config, 'the description loads' ) or diag $reason;
 
-	for my $target (qw(web web/keys web/keys/deep)) {
+	# The source directory holds a body, the key directory is a
+	# source, and a directory of it lies inside the source
+	# directory, per WEB-OUTPUT-13 and WEB-OUTPUT-18.
+	my %reason = (
+		'web'           => qr{ holds the source \S+/web/\S+$}m,
+		'web/keys'      => qr{ is the source \S+/web/keys$}m,
+		'web/keys/deep' => qr{ is inside the source \S+/web$}m,
+	);
+
+	for my $target ( sort keys %reason ) {
 		my ( $exit, $err ) = cli( $root, 'clean', '--out', $target );
 		isnt( $exit, 0, "the clean refuses $target" );
-		like( $err, qr{is the (?:source|key) directory},
+		like( $err, $reason{$target},
 			"and the target guard is the reason for $target" );
 	}
 
@@ -3554,7 +3795,7 @@ subtest 'a source that holds its own stylesheet' => sub {
 	# target guard is the rule that refuses it.
 	my $root = project();
 	spew( "$root/web/style.css", "body{}\n" );
-	spew( "$root/.fuguwebrc", "site = Example\nnav \"index.html\" {\n" );
+	spew( "$root/.fuguwebrc", "site = Example\nurl = https://example.org/\nnav \"index.html\" {\n" );
 
 	my ( $config, $reason ) = load($root);
 	ok( !$config, 'the description does not load' );
@@ -3567,7 +3808,7 @@ subtest 'a source that holds its own stylesheet' => sub {
 	# A source of plain files and no directory. Every other guard
 	# takes this one, so the target guard is the only rule left.
 	my $flat = project();
-	spew( "$flat/.fuguwebrc", "site = Example\nnav \"index.html\" {\n" );
+	spew( "$flat/.fuguwebrc", "site = Example\nurl = https://example.org/\nnav \"index.html\" {\n" );
 	spew( "$flat/web/style.css", "body{}\n" );
 	remove_tree("$flat/web/keys");
 
@@ -3580,7 +3821,7 @@ subtest 'the clean refuses a foreign target with no stylesheet' => sub {
 	# Outside the project the target guard says nothing, so the
 	# stylesheet is the whole rule. Every build writes it.
 	my $root = project();
-	spew( "$root/.fuguwebrc", "site = Example\nnav \"index.html\" {\n" );
+	spew( "$root/.fuguwebrc", "site = Example\nurl = https://example.org/\nnav \"index.html\" {\n" );
 
 	my $victim = tempdir( CLEANUP => 1 ) . '/victim';
 	spew( "$victim/notes.txt",  "mine\n" );
@@ -3625,7 +3866,7 @@ subtest 'a broken description guards its own directories' => sub {
 	for my $target (qw(web/keys web)) {
 		my ( $exit, $err ) = cli( $root, 'clean', '--out', $target );
 		isnt( $exit, 0, "the clean refuses $target" );
-		like( $err, qr{is the source directory},
+		like( $err, qr{ is the source \S+/\Q$target\E$}m,
 			"and the target guard is the reason for $target" );
 	}
 
@@ -3647,6 +3888,7 @@ subtest 'a broken description reads its own directory names' => sub {
 	spew( "$root/site/pubkeys/SHA256.sig", $SIGNATURE );
 	spew( "$root/.fuguwebrc", <<'RC' );
 site       = Example
+url        = https://example.org/
 source_dir = site
 out_dir    = site/build
 
@@ -3688,7 +3930,7 @@ RC
 	for my $target (qw(site site/pubkeys)) {
 		my ( $exit, $err ) = cli( $root, 'clean', '--out', $target );
 		isnt( $exit, 0, "the clean refuses $target" );
-		like( $err, qr{is the source directory},
+		like( $err, qr{ is the source \S+/\Q$target\E$}m,
 			"and the target guard is the reason for $target" );
 	}
 	ok( -e "$root/site/pubkeys/fugubsd-1-release.pub", 'the key survives' );
@@ -3764,6 +4006,7 @@ subtest 'a broken description of the default layout' => sub {
 	my $root = project( rc => $KEYS_BLOCK, files => {} );
 	spew( "$root/.fuguwebrc", <<"RC" );
 site = Example
+url  = https://example.org/
 
 nav "index.html" {
 	label = Home
@@ -4237,6 +4480,7 @@ subtest 'a description that drops its keys block' => sub {
 	# reads the site and never a guess.
 	spew( "$root/.fuguwebrc", <<'RC' );
 site       = Example
+url        = https://example.org/
 source_dir = web
 out_dir    = out
 
@@ -4310,6 +4554,32 @@ subtest 'the build refuses a symlink in the output' => sub {
 	is_deeply( App::FuguWeb::list_tree($elsewhere), [],
 		'and it writes no key through the link' );
 	ok( -l "$out/.well-known", 'and it keeps the link' );
+};
+
+subtest 'the build refuses a symlink of a name in another case' => sub {
+	# The skip comes before the first assertion. A plan that
+	# arrives after one turns a failed assertion into a pass.
+	my $probe = tempdir( CLEANUP => 1 );
+	plan skip_all => 'cannot make a symlink here'
+	    unless symlink '/nonexistent', "$probe/link";
+
+	# WEB-OUTPUT-17. On a file system without case, a link at
+	# INDEX.HTML is the page index.html. The link dangles, so the
+	# write would follow it, as in the test above.
+	my $root = project();
+	my ( $config, $reason ) = load($root);
+	ok( $config, 'the description loads' ) or diag $reason;
+
+	my $out = "$root/out";
+	ok( site( $config, $out )->build, 'the build succeeds' );
+
+	my $outside = tempdir( CLEANUP => 1 ) . '/pwned.html';
+	unlink "$out/index.html";
+	symlink $outside, "$out/INDEX.HTML" or die "Cannot link: $!";
+
+	ok( !site( $config, $out )->build, 'a second build refuses' );
+	ok( !-e $outside, 'and it writes nothing through the link' );
+	ok( -l "$out/INDEX.HTML", 'and it keeps the link' );
 };
 
 subtest 'the build refuses a symlink at the staging directory' => sub {

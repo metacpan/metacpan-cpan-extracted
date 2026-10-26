@@ -78,9 +78,25 @@ subtest 'a placeholder that is not one is rejected in linear time' => sub {
 subtest 'a long expression is tokenized in linear time' => sub {
 	local $Sub::Private::BYPASS = 1;
 
-	my $text = join ' && ', ('a.b == 1.5e3') x 40_000;
-	my $tokens;
-	ok(quick(sub { $tokens = App::Actions::Expression->new->_tokenize($text) }), '40,000 comparisons are tokenized quickly');
+	# Four times the input takes about four times as long when linear and
+	# sixteen when quadratic, so the ratio is held to eight rather than the
+	# time to a fixed limit, which a slow or busy machine went past.  The
+	# best of a few runs is taken, so a pause in one of them does not count.
+	my $best = sub {
+		my ($count, $runs) = @_;
+		my $text = join ' && ', ('a.b == 1.5e3') x $count;
+		my ($fastest, $tokens);
+		for (1 .. $runs) {
+			my $start = time;
+			$tokens = App::Actions::Expression->new->_tokenize($text);
+			my $taken = time - $start;
+			$fastest = $taken if !defined $fastest || $taken < $fastest;
+		}
+		return ($fastest, $tokens);
+	};
+	my ($small) = $best->(10_000, 3);
+	my ($large, $tokens) = $best->(40_000, 2);
+	cmp_ok($large, '<', 8 * $small, '40,000 comparisons take less than eight times as long as 10,000');
 	is(scalar @{$tokens}, 40_000 * 5 + 39_999 + 1, 'five tokens a comparison, the && between them, and the end');
 	is_deeply([ map { $_->{value} } @{$tokens}[ 0 .. 5 ] ], [ 'a', '.', 'b', '==', 1500, '&&' ],
 		'identifiers, numbers and operators are told apart');

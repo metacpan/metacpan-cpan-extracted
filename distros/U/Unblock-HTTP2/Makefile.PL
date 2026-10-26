@@ -72,6 +72,7 @@ WriteMakefile(
 
     XS      => { 'nghttp2.xs' => 'nghttp2.c' },
     OBJECT  => '$(O_FILES)',
+    depend  => { 'nghttp2$(OBJ_EXT)' => 'h2_receive_guard.h' },
     CCFLAGS => "$Config{ccflags} $nghttp2_cflags$nghttp2_define",
     INC     => qq(-I"$uniform_include" -I"$native_abi_include"),
     LIBS    => [ $nghttp2_libs ],

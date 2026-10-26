@@ -17,6 +17,11 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "package" : [
+         "Unblock::HTTP1::_Engine",
+         "Unblock::HTTP1::_Native",
+         "Unblock::HTTP1::_Wire"
       ]
    },
    "prereqs" : {
@@ -64,6 +69,6 @@
          "web" : "https://github.com/haxmeister/perl-Unblock-HTTP1"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

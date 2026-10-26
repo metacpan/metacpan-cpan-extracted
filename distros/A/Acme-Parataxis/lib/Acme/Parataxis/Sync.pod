@@ -1,0 +1,419 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Sync - Shared base class for the fiber synchronization primitives
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis::Sync::Mutex;
+    use Acme::Parataxis::Sync::WaitGroup;
+    my $cache = {};
+    my $lock  = Acme::Parataxis::Sync::Mutex->new;
+    my $group = Acme::Parataxis::Sync::WaitGroup->new;
+    async {
+        $group->add(1) for 1 .. 4;
+        for my $id ( 1 .. 4 ) {
+            fiber {
+                my $guard = $lock->guard;             # released when $guard goes out of scope
+                $cache->{"job $id"} = "by fiber " . Acme::Parataxis->current_fid;
+                $group->done;
+            };
+        }
+        $group->wait;                                 # parks until the last worker is through
+        say 'cached ', scalar keys %$cache, ' entries: ', join ', ', sort keys %$cache;
+    };
+
+=head1 DESCRIPTION
+
+C<Acme::Parataxis::Sync> is the parent of the five synchronization primitives. It holds no state and has nothing to
+construct: it exists so that every primitive waits the same way, which in turn is what makes a timeout or a
+cancellation behave identically whichever one you reach for.
+
+The family:
+
+=over
+
+=item *
+
+L<Acme::Parataxis::Sync::Mutex> - a non-reentrant lock with owner tracking. C<lock> parks until the lock is handed
+over, C<try_lock> returns false instead, and C<guard> releases on destruction.
+
+=item *
+
+L<Acme::Parataxis::Sync::RwLock> - a writer-preferring read/write lock. Any number of readers, or one writer, with
+C<read_lock> and C<write_lock> and a guard for each. Once a writer is queued no new reader is admitted, so a steady
+stream of readers cannot starve it.
+
+=item *
+
+L<Acme::Parataxis::Sync::WaitGroup> - a job counter. C<add> and C<done> move it, C<wait> parks until it reaches zero.
+
+=item *
+
+L<Acme::Parataxis::Sync::Barrier> - C<parties> fibers meeting at a phase boundary. Everyone proceeds on the last
+arrival, and the barrier re-arms for the next round.
+
+=item *
+
+L<Acme::Parataxis::Sync::Once> - an initializer run exactly once across racing fibers. Late callers park until the
+runner finishes rather than running it again.
+
+=back
+
+Three things every member shares:
+
+=over
+
+=item *
+
+B<Every wait is a scheduled park.> Nothing here blocks the thread or the scheduler; a fiber that cannot make progress
+parks and the run continues with whatever else is live. A primitive that nobody will ever release is indistinguishable
+from a deadlock, and the run says C<FATAL: deadlock detected>.
+
+=item *
+
+B<Every method that acts on behalf of a fiber resolves that fiber first.> C<_fid> croaks when there is no current
+fiber, so calling a primitive outside C<async> or C<fiber> is a clear error rather than a silently broken wait. The one
+exception is L<Acme::Parataxis::Sync::WaitGroup>'s C<add> and C<done>, which are plain counter arithmetic and never
+park.
+
+=item *
+
+B<Every wait is cancellable, and unregisters itself before unwinding.> A wait inside C<with_timeout> or an
+L<Acme::Parataxis::CancellationToken> scope is interrupted at the park site, and the primitive drops the parked fiber
+from its queue on the way out. That is not tidiness: fiber ids are recycled, so a queue entry left behind by an
+interrupted wait would be woken later against a fiber that is not the one that parked. See L</"How It Works">.
+
+=back
+
+The primitives know nothing about each other. Nesting a C<write_lock> inside a C<read_lock>, or a C<Once> whose action
+takes a lock the caller already holds, is your bug to avoid, and it is a deadlock rather than a diagnostic.
+
+=head1 METHODS
+
+There is no public API here. This class is a parent, not a product: what you instantiate is one of the five primitives.
+The three methods below are the entire inheritance contract, and they are documented because a subclass is the only
+caller. That contract is small enough to write a primitive from:
+
+    use v5.40;
+    use blib;
+    no warnings 'experimental::class';
+    use feature 'class';
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync;
+    class MyGate : isa(Acme::Parataxis::Sync) {
+        field $owner;                 # undef while the gate is open
+        field @waiters;               # fiber ids parked in take(), FIFO
+        method take {
+            my $fid = $self->_fid('MyGate takes must occur inside a scheduled fiber');
+            if ( !defined $owner ) { $owner = $fid; return 1 }
+            push @waiters, $fid;
+            $self->_park( 'MyGate take', sub { $self->_remove($fid) } );
+            return 1;
+        }
+        method give {
+            my $next = shift @waiters;
+            return 0 if !defined $next;
+            $owner = $next;           # hand over before waking, never after
+            $self->_wake($next);
+            return 1;
+        }
+        method _remove ($fid) { @waiters = grep { $_ != $fid } @waiters }
+        method waiters     { scalar @waiters }
+    }
+    my $gate = MyGate->new;
+    async {
+        $gate->take;
+        fiber { $gate->take; say 'the second fiber got it' };
+        await_sleep(1);
+        say 'the gate is held, with ', $gate->waiters, ' waiter(s) queued';
+        $gate->give;
+        await_sleep(1);
+        say 'once handed over: ', $gate->waiters, ' waiter(s) queued';
+    };
+    say 'off a fiber, take() croaks: ', ( eval { $gate->take; 1 } ? 'no' : 'yes' );
+
+=over
+
+=item C<_fid( $what )>
+
+Returns the current fiber's id, or croaks with C<$what> when there is no current fiber. Every primitive calls this
+first, passing the message its caller should see, so the family fails with a message naming the method you called
+rather than something generic - C<Mutex E<gt> lock> and C<Mutex E<gt> unlock> say different things, and so on down the
+family.
+
+=item C<_park( $reason, $dereg =E<gt> undef )>
+
+Parks the current fiber, labelled C<$reason>, and hands C<$dereg> to the scheduler to run if the wait is interrupted.
+The base class passes a level of 2 to L<Acme::Parataxis>'s own C<_park>, so a diagnostic attributes the wait to the
+subclass method that called it rather than to this method.
+
+The five primitives use six wait reasons between them: C<Mutex lock>, C<RwLock read lock>, C<RwLock write lock>,
+C<WaitGroup wait>, C<Barrier arrive> and C<Once init>. They surface in a C<PARATAXIS_TRACE> diagnostic and in the
+C<wait_reason> of an L<Acme::Parataxis::Error::Timeout>.
+
+C<$dereg> is the deregistration half of the contract, and every park in the family supplies one - see L</"How It
+Works">.
+
+=item C<_wake( $waiter )>
+
+Enqueues a parked fiber through the scheduler, doing nothing at all if no live fiber owns that id. That guard is what
+makes a queued waiter harmless after it has been interrupted, or after it has simply gone away: the id is skipped
+rather than fired at whatever fiber now holds it.
+
+=back
+
+=head1 How It Works
+
+A contended wait is a four-step cycle, and all five of the family's waits are the same cycle with different
+bookkeeping.
+
+=over
+
+=item 1 4
+
+B<Resolve the fiber.> C<_fid> gives the id the wait will be recorded under, or croaks if there is no current fiber.
+
+=item 2 4
+
+B<Check whether it can proceed now.> A free mutex, an uncontended read lock, or the last arrival at a barrier all
+return immediately without touching the scheduler. Nothing parks that does not have to.
+
+=item 3 4
+
+B<Otherwise queue the id and park.> The id goes on the primitive's own FIFO list together with a deregistration
+callback, and then the fiber parks. If the park is interrupted - by a C<with_timeout> deadline, by a cancellation
+token, or by a scope that has already fired - the scheduler runs the callback and the fiber unwinds with nothing behind
+it.
+
+=item 4 4
+
+B<Hand over atomically, then wake.</B> The releasing side records the new owner B<before> it enqueues the waiter, so
+there is no window in which a third fiber could take the lock, and the woken fiber only ever has to collect what is
+already its own.
+
+=back
+
+Two consequences of step 3 are worth stating plainly.
+
+First, a lock can be left held by a fiber that has already finished. A releasing side runs in the dying fiber's own
+teardown as often as not, and a fiber may simply end while holding a lock. The primitive has no way to know the
+difference between "this fiber is between statements" and "this fiber is gone", and it does not guess - so the lock
+stays exactly where it was. See L</"A lock outlives the fiber that took it">.
+
+Second, the deregistration callback for a contended lock does more than dequeue. Because hand-off is atomic, a release
+may have granted the lock to a fiber an instant before an interrupt fired at its park site, and that grant is never
+collected: the fiber is already unwinding. The callback therefore hands the lock straight on to the next waiter rather
+than leaving it on an id that is about to be reused.
+
+=head1 Recipes
+
+=head2 Fan out and join
+
+The shape almost every program wants: some number of fibers, a WaitGroup to know when they are done, and a lock around
+whatever they share. Note that the WaitGroup counter is raised B<before> the fibers are spawned - C<wait> on a counter
+of zero returns immediately, and the group would be over before the work began.
+
+    my $cache = {};
+    my $lock  = Acme::Parataxis::Sync::Mutex->new;
+    my $group = Acme::Parataxis::Sync::WaitGroup->new;
+    async {
+        $group->add(1) for 1 .. 4;
+        for my $id ( 1 .. 4 ) {
+            fiber {
+                my $guard = $lock->guard;             # one holder at a time
+                $cache->{"job $id"} = "by fiber " . Acme::Parataxis->current_fid;
+                $group->done;
+            };
+        }
+        $group->wait;
+        say 'cached ', scalar keys %$cache, ' entries: ', join ', ', sort keys %$cache;
+    };
+
+The guard is the whole reason to prefer it over C<lock> and a matching C<unlock>: the release is attached to the
+variable, so an exception partway through the body still frees the lock. Keep the guard in a C<my> in the fiber that
+took the lock, though - a guard that is returned to another fiber releases from the wrong one, and the lock is
+stranded. See L</"A guard must not outlive its fiber">.
+
+=head2 Initialise on first use
+
+A L<Acme::Parataxis::Sync::Once> is how a lazily-built shared value is made without holding a lock across the check and
+the build. Only the fiber that actually ran the action gets a return value from it - everyone else parks and then
+returns nothing - so read the variable the action assigned, or C<done>, rather than C<do>'s result.
+
+    my $dbh;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        for my $query ( 'select 1', 'select 2', 'select 3' ) {
+            fiber {
+                $once->do( sub { $dbh = connect_to_the_database() } );
+                say $query, ' -> ', $dbh ? 'ok' : 'never initialised';
+            };
+        }
+    };
+    sub connect_to_the_database { bless {}, 'Database' }
+
+The action runs in whichever fiber won the race, so it cannot assume anything about the caller. It must also not block
+on a primitive that caller is holding: an action that cannot complete is still marked done, and nothing ever retries
+it.
+
+=head2 A barrier between pipeline stages
+
+A L<Acme::Parataxis::Sync::Barrier> is a phase boundary - every worker stops at the line and no one proceeds until the
+whole stage has arrived. Useful when a stage's output is meant to be visible to every reader at once, rather than
+trickling out as each worker finishes.
+
+    my $stage = Acme::Parataxis::Sync::Barrier->new( parties => 3 );
+    my @rows;
+    async {
+        fiber { $stage->arrive_and_wait; push @rows, 'worker 1'; $stage->arrive_and_wait };
+        fiber { $stage->arrive_and_wait; push @rows, 'worker 2'; $stage->arrive_and_wait };
+        $stage->arrive_and_wait;                  # this fiber is the third party
+        push @rows, 'the driver';
+        $stage->arrive_and_wait;                  # and the barrier re-arms behind it
+        say 'through both phases: ', join ', ', sort @rows;
+    };
+
+One C<arrive_and_wait> per phase, and the barrier re-arms the instant the last worker of a phase arrives, so the
+arrivals counted for the next round never mix with this one. The last arrival is also the one that does not park: it
+releases everyone else, bumps the phase and walks straight on, so nobody is left waiting on a barrier that has already
+opened.
+
+=head2 Bounding a wait
+
+Every wait in the family is a park, so a C<with_timeout( $ms, ... )> deadline bounds it and a cancellation token aborts
+it. Catching the timeout is the point - an uncaught one takes the run down - and after a catch the primitive is exactly
+as it was, because the interrupted fiber was dequeued on its way out.
+
+    my $lock = Acme::Parataxis::Sync::Mutex->new;
+    async {
+        $lock->lock;                                # this fiber now holds it
+        fiber {
+            my $got = eval { Acme::Parataxis::with_timeout( 50, sub { $lock->lock } ) };
+            say 'the waiter gave up: ', ( $got ? 'no' : 'yes' );
+            say 'the lock is still held:  ', ( defined $lock->owner ? 'yes' : 'no' );
+            say 'and nobody is queued:    ', $lock->waiters;
+        };
+        await_sleep(200);
+    };
+
+The equivalent with a token is C<Acme::Parataxis::with_cancel(token =E<gt> sub { ... })>, which raises
+L<Acme::Parataxis::Error::Cancelled> in the parked fiber instead. Retry loops are safe because of the deregistration: a
+fiber that times out does not leave itself in the queue, so a second attempt starts clean.
+
+=head1 Behavior Notes
+
+=head2 A lock outlives the fiber that took it
+
+There is no owner-death cleanup anywhere in the family. A fiber that ends while holding a
+L<Acme::Parataxis::Sync::Mutex> or a L<Acme::Parataxis::Sync::RwLock> write lock leaves it held, and the next fiber to
+ask parks on a lock nobody will ever release.
+
+It is worse than a plain deadlock, because fiber ids are recycled. In a probe, the fiber that took a write lock
+finished, and the four fibers spawned after it were all handed that same id - so the first of them was told it already
+held the lock.
+
+    my $lock = Acme::Parataxis::Sync::Mutex->new;
+    async {
+        fiber { $lock->lock };                     # takes the lock, then finishes
+        fiber {
+            my $got = eval { Acme::Parataxis::with_timeout( 50, sub { $lock->lock } ) };
+            say 'a later lock attempt: ', ( $got ? 'got it' : $@ =~ s/ at .*//sr );
+            say 'and the mutex is stuck: ', $lock->waiters, ' queued, owner still set';
+        };
+    };
+    # a later lock attempt: The operation timed out
+    # and the mutex is stuck: 0 queued, owner still set
+
+The defensive habit is a guard held in a lexical in the acquiring fiber, taken at the top of the body and released by
+scope exit whatever happens - including the fiber dying, provided the fiber unwinds rather than being abandoned. There
+is no API to steal a lock back, so the recovery is to stop using that primitive.
+
+=head2 A guard must not outlive its fiber
+
+A C<guard>, C<read_guard> or C<write_guard> releases the lock from whichever fiber destroys it, and every release
+checks that the releasing fiber is the one that took it. A guard handed out of its fiber therefore cannot release: the
+release croaks, the croak is swallowed along with the handle that carried the guard, and the lock is stranded. The only
+symptom is a lock that is permanently busy.
+
+Keep the guard in the fiber that acquired the lock. If the work has to be handed to another fiber, hand over the lock
+explicitly, from inside the acquiring fiber, rather than the guard.
+
+    my $lock = Acme::Parataxis::Sync::Mutex->new;
+    async {
+        my $handle = fiber { $lock->guard };         # taken in the fiber that made it
+        my $guard  = $handle->await;                # ... and handed to this one
+        say 'while this fiber holds the guard: ', ( defined $lock->owner ? 'still locked' : 'released' );
+        undef $guard;                               # released from the wrong fiber: a croak, swallowed
+        say 'after undef: ', ( defined $lock->owner ? 'still locked' : 'released' );
+    };
+    # while this fiber holds the guard: still locked
+    # after undef: still locked
+
+A guard taken and dropped inside one fiber - even a nested one, or one whose fiber has just finished - releases
+perfectly well. It is only the hand-off that breaks.
+
+Guards also skip their release during global destruction, so a guard still in scope at C<DESTRUCT> - or one that has
+escaped into a global - leaks its lock without a word. This only matters at shutdown, where the whole process is going
+away anyway, but it is why a lock can look busy in a program that is merely exiting.
+
+=head2 The primitives do not check each other
+
+Two shapes fail without the primitives themselves pointing at the cause.
+
+=over
+
+=item *
+
+Upgrading a read hold to a write hold. C<write_lock> croaks rather than park, and so does C<try_write_lock>. This is
+the one case in the family that names the mistake, and it is a deliberate choice: parking would deadlock, because the
+queued writer this fiber is waiting for is itself.
+
+=item *
+
+Running a L<Acme::Parataxis::Sync::Once>'s action while holding a lock the caller needs released. The action croaks,
+C<do> propagates it to the runner, and - because a C<Once> is marked done whether its action succeeded or not - the
+initializer is never retried. The same is true of any action that fails for an ordinary reason, which is the intended
+behaviour and matches C<sync.Once>: an initializer is not retried just because it blew up.
+
+=back
+
+=head2 Not every method needs a fiber
+
+C<WaitGroup E<gt> add> and C<done> are arithmetic and work anywhere, which is what lets you raise a counter at
+construction time or in a handler that has not been scheduled yet. C<wait> parks, so it needs a fiber. Every other
+method in the family croaks off-fiber, each with a message naming itself.
+
+    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
+    say 'add(2) off a fiber: ', $wg->add(2);      # 1
+    say 'count is now:       ', $wg->count;       # 2
+    say 'wait off a fiber:    ', ( eval { $wg->wait; 1 } ? 'returned' : 'croaks' );
+
+=head2 The base class constructs, but there is nothing to construct
+
+C<< Acme::Parataxis::Sync->new >> is legal and returns an object with the three methods above and no state. There is no
+reason to do it, and a subclass that forgot to declare its own fields would inherit this silently.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::Sync::RwLock>, L<Acme::Parataxis::Sync::WaitGroup>,
+L<Acme::Parataxis::Sync::Barrier>, L<Acme::Parataxis::Sync::Once>, L<Acme::Parataxis>, L<Acme::Parataxis::Future>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut
+

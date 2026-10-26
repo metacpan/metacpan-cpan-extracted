@@ -10,8 +10,8 @@ use Dist::Zilla::PluginBundle::Author::GETTY;
 
 sub _write_git_config {
   my ($dir, $remote_url) = @_;
-  mkdir "$dir/.git" or die "mkdir $dir/.git: $!";
-  open my $fh, '>', "$dir/.git/config" or die "open: $!";
+  system('git', 'init', '-q', $dir) == 0 or die "git init $dir failed";
+  open my $fh, '>>', "$dir/.git/config" or die "open: $!";
   if (defined $remote_url) {
     print $fh "[remote \"origin\"]\n";
     print $fh "\turl = $remote_url\n";

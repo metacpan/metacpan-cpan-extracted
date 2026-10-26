@@ -3,8 +3,10 @@ package App::GHGen::Fixer;
 use v5.36;
 use strict;
 use warnings;
-use YAML::XS qw(LoadFile DumpFile);
+
+use Readonly;
 use Path::Tiny;
+use YAML::XS qw(LoadFile DumpFile);
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -14,7 +16,9 @@ our @EXPORT_OK = qw(
 	%ACTION_UPDATES
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
+
+Readonly my $DEFAULT_TIMEOUT_MINUTES => 60;
 
 =head1 PACKAGE DATA
 
@@ -478,8 +482,8 @@ sub add_trigger_filters($workflow) {
 }
 
 sub add_missing_timeout($workflow) {
-    my $jobs = $workflow->{jobs} or return 0;
-    my $modified = 0;
+	my $jobs = $workflow->{jobs} or return 0;
+	my $modified = 0;
 
     for my $job_name (keys %$jobs) {
         my $job = $jobs->{$job_name};
@@ -488,7 +492,7 @@ sub add_missing_timeout($workflow) {
         next if exists $job->{'timeout-minutes'};
 
         # Insert default timeout
-        $job->{'timeout-minutes'} = 30;
+        $job->{'timeout-minutes'} = $DEFAULT_TIMEOUT_MINUTES;
         $modified++;
     }
 

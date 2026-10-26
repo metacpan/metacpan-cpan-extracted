@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-GatherAgentContext,
-version 0.001:
+version 0.002:
 
   Snapshot the agent context (.claude/.codex/CLAUDE.md/AGENTS.md/...) into the build for provenance
 

@@ -13,16 +13,25 @@ WriteMakefile(
         'Carp'             => 0,
         'parent'           => 0,
         'URI'              => 0,
-        'Unblock::HTTP1'   => '0.12',
-        'Unblock::HTTP2'   => '0.12',
-        'Unblock::HTTP3'   => '0.13',
+        'Unblock::HTTP1'   => '0.13',
         'Uniform::HTTP'   => '0.06',
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
+        'CPAN::Meta' => 0,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        optional_features => {
+            http2 => {
+                description => 'HTTP/2 protocol support',
+                prereqs => { runtime => { requires => { 'Unblock::HTTP2' => '0.13' } } },
+            },
+            http3 => {
+                description => 'HTTP/3 protocol support',
+                prereqs => { runtime => { requires => { 'Unblock::HTTP3' => '0.14' } } },
+            },
+        },
         no_index => {
             package => [qw(
                 Unblock::HTTP::_AltSvc

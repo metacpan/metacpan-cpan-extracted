@@ -11,6 +11,9 @@
 #   2. the stored analysis kept that kind and encoding, and the chart's title;
 #   3. the opened canvas has one card, titled as the chart was, whose body
 #      carries the chart's own element (vis-0 for D3, map-0 for Leaflet).
+#      A map needs HTML::OSM 0.12 or later on the server, so where it is not
+#      installed the map case checks the note the card carries instead - one
+#      assertion either way, so the route is proved on every machine.
 #
 # The drawing itself needs D3 or Leaflet from a CDN, which the test browser may
 # not reach; the card markup and its init script are server-rendered, so they
@@ -35,6 +38,13 @@ BI::Test::Browser->plan_browser_tests(required_files => ['data/sales.csv']);
 my $browser = BI::Test::Browser->new;
 my $BASE    = $browser->base;
 my $ua      = $browser->ua;
+
+# A map card carries its Leaflet element only when the server has HTML::OSM 0.12
+# or later: without it the card is the note saying so, which is a state of this
+# page rather than a failure of it.  The map case below is asserted in whichever
+# state the machine is in, so this file proves every route on the keyboard job's
+# runner too.
+my $have_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
 
 # A map needs coordinates; every other route uses the fixture table.
 my $dir    = tempdir(CLEANUP => 1);
@@ -197,9 +207,34 @@ for my $case (@cases) {
 			. "return t ? t.textContent : '';"
 		), $offered->{title}, "$case->{label}: the card is titled as the chart was";
 
-		is $browser->js("return document.getElementById('$case->{body}') ? 1 : 0;"), 1,
-			"$case->{label}: the card body is the chart's own element";
+		if ($case->{kind} eq 'map' && !$have_renderer) {
+			# The map card is the map's card, and its body is the note saying
+			# what is missing rather than a Leaflet element.  Checked rather
+			# than skipped, so the map route still proves it made a map card
+			# on a machine with no renderer; t/browser-canvas-map-degraded.t
+			# is the page test for what the note says and how it looks.
+			is $browser->js(
+				"var notes = document.querySelectorAll('#visual-0 .map-note');"
+				. "for (var i = 0; i < notes.length; i++) {"
+				. "  if ((notes[i].getAttribute('data-key') || '').indexOf('error_map_renderer_') === 0) return 1;"
+				. "}"
+				. "return 0;"
+			), 1, "$case->{label}: without HTML::OSM 0.12 the card carries the note instead of the map";
+		} else {
+			is $browser->js("return document.getElementById('$case->{body}') ? 1 : 0;"), 1,
+				"$case->{label}: the card body is the chart's own element";
+		}
 	};
 }
+
+# What this run established, for the job summary: the routes are named, because
+# a green run of this file is otherwise indistinguishable from one that drove a
+# single chart page.
+$browser->proved(
+	'New canvas driven from each chart route (' . join(', ', map { $_->{label} } @cases) . '):'
+	. ' the panel saved the kind and encoding the page offered, and the canvas it'
+	. ' opened has one card, titled as the chart, carrying the chart\'s own element'
+	. ($have_renderer ? '' : ' - with the map case carrying the note that says HTML::OSM 0.12 is needed, this machine having none')
+);
 
 done_testing();

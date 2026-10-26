@@ -1,5 +1,13 @@
 Revision history for Perl module Locale::Unicode::RBNF
 
+v0.1.1 2026-10-26T08:32:45+0900
+    - On a perl with long double or __float128 numbers, non-integral parse results are
+      now rounded to double, as the C engine and ICU return them. The pure-Perl engine
+      previously computed them with the wider precision, so t/05.xs.t failed on such
+      perls (CPAN Testers, reported by Slaven Rezić, issue #1).
+    - Makefile.PL now stops with "OS unsupported" on a perl with 32-bit integers, which
+      the int64 arithmetic does not support (CPAN Testers armv6l and i686 reports).
+
 v0.1.0 2026-10-23T21:10:33+0900
     - Initial release: port from ICU4C 79.1 RuleBasedNumberFormat (rbnf.cpp, nfrs.cpp,
       nfrule.cpp, nfsubs.cpp), with a loader for the CLDR RBNF, number symbols, numbering

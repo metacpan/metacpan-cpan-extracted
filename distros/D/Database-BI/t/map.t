@@ -166,8 +166,14 @@ $t->app->config->{geocoder} = $stub;
 
 # HTML::OSM is a recommends dep; skip when absent so CI does not fail just
 # because the optional renderer is not installed.
-plan skip_all => 'HTML::OSM not installed; map rendering tests need it'
-	unless eval { require HTML::OSM; 1 };
+#
+# 0.12 is the floor, not just installation: below it the application reports
+# the renderer in the page and draws nothing, so every assertion here about
+# markers, popups and Leaflet assets would fail for a reason the file cannot
+# test.  The degraded page is covered by the in-process stand-in instead.
+my $have_map_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
+plan skip_all => 'HTML::OSM 0.12 or later is needed to draw a map'
+	unless $have_map_renderer;
 
 # ===========================================================================
 # loc=<column> -- a dataset with places but no coordinates
@@ -738,6 +744,161 @@ subtest 'Map panel colour-by select includes categorical columns' => sub {
 		my ($color_fn) = ($tpl =~ /(function buildColorSelect.*?^  \})/ms);
 		unlike($color_fn // '', qr/isNaN.*parseAccounting/,
 			'buildColorSelect no longer has the numeric-only filter');
+	}
+};
+
+subtest 'size= draws circle markers with a radius scaled from the column' => sub {
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', size => 'amount'))
+		->status_is(200)
+		->content_like(qr/L\.circleMarker\(/, 'bubble map uses L.circleMarker')
+		->content_unlike(qr/data:image\/svg/, 'pins are not also drawn')
+		->content_like(qr/radius:\s*30\b/, 'largest amount gets the largest radius')
+		->content_like(qr/radius:\s*6\b/,  'smallest amount gets the smallest radius');
+};
+
+subtest 'size= with an unknown column is a 400' => sub {
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', size => 'nope'))
+		->status_is(400)
+		->content_like(qr/Column not found: nope/);
+};
+
+subtest 'series= colours markers by category from the named scheme' => sub {
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon',
+		series => 'place', scheme => 'set2'))
+		->status_is(200)
+		->content_like(qr/data:image\/svg/, 'per-marker coloured icons are emitted')
+		->content_like(qr/map-legend/, 'a colour legend is shown')
+		->content_like(qr/Ramsgate/, 'the legend names a category')
+		->content_like(qr/#66c2a5/, 'the first set2 colour is used');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon',
+		series => 'place', scheme => 'not-a-scheme'))
+		->status_is(400)
+		->content_like(qr/Unknown colour scheme/);
+};
+
+subtest 'color= and series= are mutually exclusive' => sub {
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon',
+		color => 'place', series => 'place'))
+		->status_is(400)
+		->content_like(qr/color= or series=/);
+};
+
+subtest 'color rules colour the markers' => sub {
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon',
+		color => 'amount', color_rule => 'gt:6:#ff0000', color_default => '#00ff00'))
+		->status_is(200)
+		->content_like(qr/data:image\/svg/, 'coloured marker icons are emitted')
+		->content_like(qr/%23ff0000/, 'the matching rule colour is used');
+};
+
+subtest 'an absolute data_dir still resolves table: specs' => sub {
+	my $dd = tempdir(CLEANUP => 1);
+	_write_file(File::Spec->catfile($dd, 'places.csv'),
+		"id,place,lat,lon\n1,Ramsgate,51.33,1.42\n");
+
+	local $t->app->config->{data_dir} = $dd;
+
+	$t->get_ok(_url(l => 'table:places', lat => 'lat', lon => 'lon'))
+		->status_is(200)
+		->content_like(qr/L\.marker\(/, 'the table is found under an absolute data_dir');
+};
+
+# The renderer probe is a method so both states can be produced here without
+# installing or removing HTML::OSM: (0, undef) is "not installed" and
+# (0, '0.11') is "installed but too old".  Hiding the module does not work -
+# Test::Without::Module's @INC hook is bypassed during in-process dispatch, so
+# the installed copy is still found, and the missing branch would go untested.
+sub _with_renderer {
+	my ($ok, $version, $code) = @_;
+	no warnings 'redefine';
+	local *Database::BI::Controller::Dashboard::_map_renderer_version =
+		sub { $ok, $version };
+	return $code->();
+}
+
+sub _fake_renderer {
+	my ($ok, $version) = @_;
+	return _with_renderer($ok, $version, sub {
+		$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'));
+	});
+}
+
+subtest 'a missing HTML::OSM degrades instead of returning 500' => sub {
+	_fake_renderer(0, undef)
+		->status_is(200, 'the map page still renders')
+		->content_like(qr/HTML::OSM 0\.12 or later/,
+			'the warning names the version that is required')
+		->content_like(qr/and it is not installed/,
+			'the warning says the module is not installed')
+		->content_like(qr/data-key="error_map_renderer_missing"/,
+			'the warning is the missing-module message')
+		->content_unlike(qr/L\.marker\(/, 'no map script is emitted')
+		->content_like(qr/Plotting 2 markers/, 'the markers are still counted')
+		->content_like(qr/Plotting 2 markers for 3 of 5 rows/,
+			'and the rows without a coordinate are still counted');
+};
+
+subtest 'an HTML::OSM older than 0.12 degrades instead of returning 500' => sub {
+	_fake_renderer(0, '0.11')
+		->status_is(200, 'the map page still renders')
+		->content_like(qr/HTML::OSM 0\.12 or later/,
+			'the warning names the version that is required')
+		->content_like(qr/installed HTML::OSM is 0\.11/,
+			'the warning names the version that is installed')
+		->content_like(qr/data-key="error_map_renderer_old"/,
+			'the warning is the older-install message, not the missing-module one')
+		->content_unlike(qr/L\.marker\(/, 'no map script is emitted')
+		->content_like(qr/Plotting 2 markers/, 'the markers are still counted');
+};
+
+subtest 'a canvas map card degrades the same way' => sub {
+	# A canvas draws its map cards through the same _map_data, so a card has to
+	# carry the warning and the marker count too, and the page has to survive
+	# with its other cards - the /map route is not the only entry point.
+	$t->post_ok('/api/analyses' => json => {
+		name     => 'Map degradation',
+		datasets => [ { spec => $places_spec, alias => 'left' } ],
+		visuals  => [
+			{
+				kind   => 'map',
+				encode => { lat => 'lat', lon => 'lon' },
+				title  => 'Map card',
+			},
+			# A second card, so a degrading map card is shown not to take the
+			# rest of the page with it.
+			{ kind => 'table', encode => {}, title => 'Table card' },
+		],
+	})->status_is(201, 'the canvas was saved');
+
+	my $id = $t->tx->res->json->{id};
+	ok $id, 'the canvas has an id' or return;
+
+	# Control: with a usable renderer the same card draws markers, so the
+	# assertions below cannot pass on a page that never draws a map.
+	$t->get_ok("/a/$id")->status_is(200, 'the canvas renders with a usable renderer')
+		->content_like(qr/L\.marker\(/, 'and its map card draws markers')
+		->content_like(qr/Table card/, 'and the table card is there as well');
+
+	for my $case (
+		[ 'missing', 0, undef,  'error_map_renderer_missing', qr/and it is not installed/ ],
+		[ 'too old', 0, '0.11', 'error_map_renderer_old',     qr/installed HTML::OSM is 0\.11/ ],
+	) {
+		my ($label, $ok, $version, $key, $text) = @$case;
+
+		my $body = _with_renderer($ok, $version, sub {
+			$t->get_ok("/a/$id")->status_is(200, "the canvas renders with $label HTML::OSM");
+			return $t->tx->res->body // '';
+		});
+
+		like $body, qr/data-key="\Q$key\E"/, "$label: the card carries the $key note";
+		like $body, $text, "$label: the note says which problem it is";
+		unlike $body, qr/L\.marker\(/, "$label: no map is drawn on the card";
+		like $body, qr/Plotting 2 markers/, "$label: the card still counts its markers";
+		like $body, qr/Table card/,
+			"$label: the other card on the canvas is untouched";
+		like $body, qr/<td>Ramsgate<\/td>/,
+			"$label: and still shows the data rows";
 	}
 };
 

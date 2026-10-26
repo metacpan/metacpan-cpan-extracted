@@ -1,0 +1,575 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Supervisor - OTP-style restart supervision for actors and nested supervisors
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Actor;
+    use Acme::Parataxis::Supervisor;
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new(
+            strategy     => 'OneForOne',    # OneForOne | OneForAll | RestForOne
+            max_restarts => 5,
+            within       => 60,
+        );
+        # A factory, so every restart builds a brand new actor. supervised => 1 is what lets a
+        # dying handler kill the actor, and so reach the supervisor at all.
+        $sup->supervise(
+            sub {
+                Acme::Parataxis::Actor->spawn(
+                    sub ( $self, $msg ) { $msg eq 'ping' ? 'pong' : die "cannot handle $msg\n" },
+                    16,
+                    supervised => 1
+                );
+            },
+            name => 'worker',
+        );
+        fiber {                                       # any fiber may stop the tree
+            await_sleep(30);
+            say $sup->child('worker')->ask('ping')->await, ' from the worker';
+            $sup->stop;
+        };
+        $sup->run;    # restarts 'worker' whenever it dies, until stop() or the budget
+    };
+
+=head1 DESCRIPTION
+
+Fail-fast is what L<Acme::Parataxis::Nursery> does: the first child dies and the whole group comes down with it. A
+long-running application usually wants the opposite - I<heal-fast>, where a child dies and a fresh copy is running
+again before anyone has to intervene.
+
+A supervisor owns a set of children and runs one supervision fiber. Children are L<Acme::Parataxis::Actor>s or nested
+supervisors, registered with C<supervise>. Whenever a child dies, the supervision fiber learns about it through that
+child's own teardown - an actor's C<on_death> hook, or a wrapper fiber around a nested supervisor's C<run> - and
+applies the restart strategy:
+
+=over
+
+=item *
+
+B<OneForOne> (the default): only the child that died is restarted. Siblings are never touched.
+
+=item *
+
+B<OneForAll>: every child is stopped and restarted, because they share whatever state the death just broke.
+
+=item *
+
+B<RestForOne>: the dead child and everything started after it are restarted; children that started earlier are left
+alone.
+
+=back
+
+Restarts are budgeted. Every death is charged against C<max_restarts> restarts per C<within> seconds; when a death
+lands in a window that already holds that many, the budget is exhausted, the whole tree is torn down, and C<run> dies
+with L<Acme::Parataxis::Error::Supervisor>. Its C<< ->failures >> lists every death that counted, in the order it
+happened, C<< ->primary >> is the one that blew the budget, and C<< ->child >> names that child.
+
+The supervision fiber parks on a L<Acme::Parataxis::Channel> of death reports, and dying instances report into it
+through their own teardown. No C, no OS threads, nothing but the scheduler's ordinary park and wake.
+
+=head1 METHODS
+
+=head2 C<new( strategy =E<gt> $name, max_restarts =E<gt> $n, within =E<gt> $seconds )>
+
+    my $sup = Acme::Parataxis::Supervisor->new(
+        strategy     => 'OneForOne',    # default
+        max_restarts => 5,              # default
+        within       => 60,             # default, in seconds
+    );
+
+Creates a supervisor. All three options are optional, and all three are readable afterwards - see L</"Configuration
+readers">.
+
+=over
+
+=item *
+
+C<strategy>: C<'OneForOne'> (default), C<'OneForAll'>, or C<'RestForOne'>. Case-sensitive; anything else croaks.
+
+=item *
+
+C<max_restarts>: how many restarts fit inside the window before the supervisor gives up (default C<5>). Must be a
+non-negative integer, so C<0> is a legal choice and means "never restart anything".
+
+=item *
+
+C<within>: the window length in seconds (default C<60>). A death older than the window no longer counts against the
+budget, and C<0> keeps nothing in the window at all, so the budget never trips.
+
+=back
+
+=head2 C<supervise( $thing, name =E<gt> $name )>
+
+    my $sup = Acme::Parataxis::Supervisor->new;
+    $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 16, supervised => 1 ) }, name => 'worker' );
+
+Registers a child and returns C<$self>, so registrations chain. C<$thing> may be:
+
+=over
+
+=item *
+
+a C<CODE> ref factory returning either an L<Acme::Parataxis::Actor> or an C<Acme::Parataxis::Supervisor>. The factory
+runs for every start, which is what makes a restart a fresh instance rather than a second run of a dead one. This is
+the form to reach for by default: an actor cannot be built outside a run, so a factory is what lets a child exist only
+once the tree starts. An exception from the factory counts as that child's death.
+
+=item *
+
+an L<Acme::Parataxis::Actor>, adopted as-is for the first run and replaced by a fresh C<respawn> on every restart. It
+must already be built, which means inside a run.
+
+=item *
+
+an C<Acme::Parataxis::Supervisor>, adopted for the first run and rebuilt from its configuration on every restart.
+
+=back
+
+C<name> is optional, must be a unique non-empty string, and defaults to C<child_1>, C<child_2>, ... in registration
+order. Unknown options, a duplicate name, a C<name> that is a reference, something that is none of the three shapes
+above, and adding children once C<run> has started all croak.
+
+=head2 C<run( )>
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new;
+        $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 16, supervised => 1 ) }, name => 'worker' );
+        fiber { await_sleep(30); $sup->stop };
+        $sup->run;                     # returns $sup once the tree has stopped
+    };
+
+Starts the tree and supervises it until L</"stop( )"> is called or the restart budget runs out, then returns C<$self>.
+Either way every child is stopped and drained before this returns, so no fiber of the tree outlives it.
+
+Must be called from inside a scheduled fiber, with at least one registered child, and only once. Each of those
+violations croaks. When the budget is exhausted this dies with L<Acme::Parataxis::Error::Supervisor> after the tree has
+already been torn down.
+
+=head2 C<stop( )>
+
+    $sup->stop;    # from any fiber, including from inside a child
+
+Asks the tree to shut down and returns C<$self>. It never parks, so it cannot re-enter the scheduler halfway through
+tearing the tree down, which is what makes it safe to call from inside a child's own handler. Idempotent.
+
+=head2 C<children( )>
+
+    my $sup = Acme::Parataxis::Supervisor->new;
+    my $factory = sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) };
+    $sup->supervise( $factory, name => $_ ) for qw[worker metrics];
+    my @names = $sup->children;      # ('worker', 'metrics')
+
+The registered child names, in registration order. Registration order is the order they are started in, and it is what
+C<RestForOne> and C<OneForAll> work from.
+
+=head2 C<child( $name )>
+
+    my $sup = Acme::Parataxis::Supervisor->new;
+    $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) }, name => 'worker' );
+    my $actor = $sup->child('worker');    # undef until run() has started it
+
+The instance a named child is running right now - the current actor or nested supervisor object. Croaks if no child has
+that name. Returns C<undef> before C<run> has started anything; see L</"child is undef before run">.
+
+=head2 C<restarts( [ $name ] )>
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new;
+        $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) }, name => 'worker' );
+        fiber { await_sleep(30); $sup->stop };
+        $sup->run;
+        $sup->restarts('worker');      # this child
+        $sup->restarts;                # the whole tree, added up
+    };
+
+With a name, how often that child has been replaced; without one, the total across the tree. Croaks on an unknown name.
+The count is not the number of crashes - see L</"restarts counts replacements, not deaths">.
+
+=head2 C<running( )>
+
+    $sup->running;     # true only while run() is on the stack
+
+=head2 C<stopping( )>
+
+    $sup->stopping;    # true once stop(), or the shutdown at the end of run(), was asked for
+
+=head2 C<started( )>
+
+    $sup->started;     # run() has begun at least once
+
+Distinguishes "never ran" from "ran and has finished". C<running> is true only while C<run> is on the stack; C<started>
+stays true.
+
+=head2 Configuration readers
+
+    $sup->strategy;      # 'OneForOne'
+    $sup->max_restarts;  # 5
+    $sup->within;        # 60
+
+The three constructor options are plain readers, so a supervisor can report or re-check its own configuration.
+
+=head1 Recipes
+
+=head2 One worker that heals
+
+The base case: a factory, a supervised actor, and something to stop the tree. Note the two halves of the shape - the
+C<fiber> drives, C<run> supervises, and C<stop> is how the driver finishes.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( max_restarts => 5, within => 60 );
+        $sup->supervise(
+            sub {
+                Acme::Parataxis::Actor->spawn(
+                    sub ( $self, $msg ) { $msg eq 'ping' ? 'pong' : die "cannot handle $msg\n" },
+                    16,
+                    supervised => 1
+                );
+            },
+            name => 'worker',
+        );
+        fiber {
+            await_sleep(30);
+            say 'before:  ', $sup->child('worker')->ask('ping')->await;
+            $sup->child('worker')->send('kill');          # the handler dies
+            await_sleep(10) until $sup->restarts('worker');   # the old handle is stale by then
+            say 'restarts: ', $sup->restarts('worker');
+            say 'after:   ', $sup->child('worker')->ask('ping')->await;
+            $sup->stop;
+        };
+        $sup->run;
+    };
+
+A restarted actor is a genuinely new one, with a new mailbox. Anything still in flight against the dead instance is
+failed there rather than hanging, so a caller waiting on a worker that crashed finds out instead of blocking forever.
+
+=head2 Choosing a strategy
+
+The strategy is a claim about what a death invalidates. C<OneForOne> when children are independent, which is the common
+case. C<OneForAll> when they share the state the death just corrupted. C<RestForOne> when they share it but only
+downstream, which is how you ask for "this one and everything that came after".
+
+    # independent workers: only the casualty is replaced
+    my $sup = Acme::Parataxis::Supervisor->new( strategy => 'OneForOne' );
+
+A connection pool and the workers holding connections from it share whatever the death corrupts:
+
+    my $sup = Acme::Parataxis::Supervisor->new( strategy => 'OneForAll' );
+
+A cache, and the readers started after it, share it only downstream:
+
+    my $sup = Acme::Parataxis::Supervisor->new( strategy => 'RestForOne' );
+
+With C<OneForAll> and C<RestForOne> the siblings that did not die are still counted as restarted, which matters when
+you read the counters; see L</"restarts counts replacements, not deaths">.
+
+=head2 A two-level tree
+
+Supervisors nest by being supervised themselves. The inner tree is a child like any other, and it keeps its own budget.
+
+    async {
+        my $database = Acme::Parataxis::Supervisor->new( max_restarts => 3, within => 30 );
+        $database->supervise(
+            sub {
+                Acme::Parataxis::Actor->spawn( sub ( $self, $msg ) { $msg eq 'ping' ? 'pong' : die "no route\n" },
+                    4, supervised => 1 );
+            },
+            name => 'pg',
+        );
+        my $top = Acme::Parataxis::Supervisor->new( max_restarts => 5, within => 60 );
+        $top->supervise( $database, name => 'storage' );
+        $top->supervise(
+            sub {
+                Acme::Parataxis::Actor->spawn( sub ( $self, $msg ) { $msg eq 'ping' ? 'pong' : die "bad request\n" },
+                    8, supervised => 1 );
+            },
+            name => 'api',
+        );
+        fiber {
+            await_sleep(30);
+            say 'the leaf says ', $top->child('storage')->child('pg')->ask('ping')->await;
+            $top->child('storage')->child('pg')->send('kill');
+            await_sleep(10) until $top->child('storage')->restarts('pg');
+            say 'the inner tree restarted its leaf: ', $top->child('storage')->restarts('pg');
+            say 'the outer tree noticed:         ', $top->restarts('storage');
+            $top->stop;    # one stop unwinds the whole tree
+        };
+        $top->run;
+    };
+
+=head2 Stopping on purpose
+
+A supervisor is for work that should not finish, so something has to end it. C<stop> unwinds every child, and C<run>
+returns C<$self> once the tree is down - with the live fiber count back to where it started, which
+C<get_live_fiber_count> (exported by L<Acme::Parataxis>) will confirm.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new;
+        $sup->supervise(
+            sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) },
+            name => 'w',
+        );
+        my $before = Acme::Parataxis::get_live_fiber_count();
+        fiber { await_sleep(30); $sup->stop };
+        $sup->run;     # returns $sup
+        say 'still running:', $sup->running ? 'yes' : 'no';
+        say 'stopping:     ', $sup->stopping ? 'yes' : 'no';
+        say 'leaked:       ', Acme::Parataxis::get_live_fiber_count() - $before, ' fibers';
+    };
+
+To stop a single child without stopping the tree, do B<not> call C<< $sup->child('w')->stop >> - the supervisor treats
+that as a crash and restarts it, spending budget. See L</"A clean stop is a crash">.
+
+=head2 Giving up loudly
+
+The budget is what stops a supervisor from crash-looping forever. Exhausting it tears the tree down and dies with a
+L<Acme::Parataxis::Error::Supervisor> naming the child, so the failure arrives somewhere you can handle it. The factory
+here hands back an already-broken actor, which is the shape of a dependency that is down.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( max_restarts => 2, within => 60 );
+        $sup->supervise(
+            sub {
+                my $actor = Acme::Parataxis::Actor->spawn(
+                    sub ( $self, $msg ) { die "cannot connect\n" },
+                    4,
+                    supervised => 1
+                );
+                $actor->send('connect');    # fails the moment it is handled
+                return $actor;
+            },
+            name => 'flaky',
+        );
+        my $ok   = eval { $sup->run; 1 };
+        my $fail = $ok ? undef : $@;
+        say ref $fail;                                 # Acme::Parataxis::Error::Supervisor
+        say 'child:    ', $fail->child;
+        say 'tripped by:', $fail->primary;
+        say 'counted:   ', scalar( () = $fail->failures ), ' deaths';
+    };
+
+Two restarts were attempted and the third death tripped the budget, so C<failures> holds C<max_restarts + 1> entries
+and the factory ran three times.
+
+=head1 Behavior Notes
+
+=head2 A clean stop is a crash
+
+The supervisor learns that a child died, not why. A child you stop deliberately - C<< $actor->stop >> on the instance
+C<child> handed you - is reported through the same C<on_death> hook as a crash, so it is B<restarted> and charged
+against the budget.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( max_restarts => 2, within => 60 );
+        $sup->supervise(
+            sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) },
+            name => 'w',
+        );
+        my $over = 0;
+        my $fail;
+        fiber {
+            await_sleep(30);
+            for my $n ( 1 .. 3 ) {
+                $sup->child('w')->stop;                    # a clean, deliberate stop
+                await_sleep(10) while !$over && $sup->restarts('w') < $n;
+            }
+        };
+        eval { $sup->run };
+        $over = 1;
+        $fail = $@;
+        say ref $fail;                                     # Acme::Parataxis::Error::Supervisor
+        say 'the reason: ', $fail->primary;               # child 'w' exited cleanly
+    };
+
+The message is the tell: C<child 'w' exited cleanly> is a death report with no error attached. If a supervised child is
+meant to finish and stay finished, it does not belong under a supervisor.
+
+=head2 supervised =E<gt> 1 is what makes supervision work
+
+An actor only dies when its handler dies if it was spawned with C<supervised =E<gt> 1>. Forget it and nothing is
+raised: the handler's exception is swallowed with a warning, the actor carries on with the same mailbox, and the
+supervisor never learns anything happened.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( max_restarts => 1, within => 60 );
+        $sup->supervise(
+            sub { Acme::Parataxis::Actor->spawn( sub ( $self, $msg ) { die "boom\n" }, 4 ) },   # no supervised => 1
+            name => 'w',
+        );
+        fiber {
+            await_sleep(30);
+            $sup->child('w')->send('go');
+            await_sleep(100);
+            say 'restarts:   ', $sup->restarts('w');
+            say 'still alive:', $sup->child('w')->is_alive;
+            $sup->stop;
+        };
+        $sup->run;
+        # ... preceded by a warning: Acme::Parataxis::Actor: handler died: boom
+    };
+
+A supervised actor's crash kills the whole actor, which is usually what you want - the mailbox state is suspect - but
+it means the exception is not delivered to whoever sent the message. An C<ask> against a supervised actor that then
+dies is failed, not answered.
+
+=head2 A nested tree heals at its own level
+
+A crash inside a subtree is the inner supervisor's business. It restarts what died and the outer supervisor sees no
+death at all, so C<restarts> on the outer tree stays at zero and the outer budget is untouched. The outer supervisor
+rebuilds the subtree only when the subtree as a whole fails - in practice when the inner supervisor exhausts its own
+budget and its C<run> throws.
+
+    async {
+        my $inner = Acme::Parataxis::Supervisor->new( max_restarts => 0, within => 60 );   # cannot heal anything
+        $inner->supervise(
+            sub { Acme::Parataxis::Actor->spawn( sub ( $self, $msg ) { die "no route\n" }, 4, supervised => 1 ) },
+            name => 'leaf',
+        );
+        my $top = Acme::Parataxis::Supervisor->new( max_restarts => 5, within => 60 );
+        $top->supervise( $inner, name => 'storage' );
+        $top->supervise(
+            sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) },
+            name => 'api',
+        );
+        fiber {
+            await_sleep(30);
+            my $before = $top->child('storage');
+            say 'the subtree is running: ', $before->running;
+            $before->child('leaf')->send('kill');
+            await_sleep(10) until $top->restarts('storage');
+            my $after = $top->child('storage');
+            say 'a new supervisor object: ', ( $after != $before ? 'yes' : 'no' );
+            say 'its own counters reset:   ', $after->restarts('leaf');
+            say 'the sibling was spared:   ', $top->restarts('api');
+            say 'and it works:             ', $after->child('leaf')->is_alive;
+            $top->stop;
+        };
+        $top->run;
+    };
+
+Give each level a budget that fits its role. A level that can heal nothing is a boundary: it escalates to the level
+above, which is a reasonable way to make an unrecoverable dependency fatal rather than endlessly retried.
+
+=head2 restarts counts replacements, not deaths
+
+C<restarts> is a count of children the strategy replaced, which is not a count of crashes. Under C<OneForAll> every
+child is replaced, so one death moves every counter at once.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( strategy => 'OneForAll', max_restarts => 5, within => 60 );
+        $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { die "boom\n" }, 4, supervised => 1 ) },
+            name => $_ ) for qw[a b c];
+        fiber {
+            await_sleep(30);
+            say 'before: ', $sup->restarts;
+            $sup->child('b')->send('kill');            # only b dies
+            await_sleep(10) until $sup->restarts;
+            say 'after:  ', $sup->restarts, ' replacements, from one crash';
+            say 'a b c:  ', join ' ', map { $sup->restarts($_) } qw[a b c];
+            $sup->stop;
+        };
+        $sup->run;
+    };
+
+C<RestForOne> counts the dead child plus its suffix. Use the per-child form to find out what died, and the total as a
+rough health signal rather than a crash count.
+
+=head2 Both ends of the budget
+
+C<max_restarts =E<gt> 0> and C<within =E<gt> 0> are both legal, and pull the budget in opposite directions. Zero
+restarts means the first death ends the tree, which is a reasonable way to fail fast on something that must not be
+retried.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( max_restarts => 0, within => 60 );
+        $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { die "boom\n" }, 4, supervised => 1 ) },
+            name => 'w' );
+        fiber { await_sleep(30); $sup->child('w')->send('kill') };
+        my $ok   = eval { $sup->run; 1 };
+        my $fail = $ok ? undef : $@;
+        say 'after one death:', ref $fail;
+        say 'restarts:        ', $sup->restarts('w');
+    };
+
+Zero B<window> is the opposite: nothing is ever kept in the window, so the budget never trips and the supervisor
+restarts forever.
+
+    async {
+        my $sup = Acme::Parataxis::Supervisor->new( max_restarts => 1, within => 0 );
+        $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { die "boom\n" }, 4, supervised => 1 ) },
+            name => 'w' );
+        fiber {
+            await_sleep(30);
+            for my $n ( 1 .. 5 ) {
+                $sup->child('w')->send('kill');
+                await_sleep(10) while $sup->restarts('w') < $n;
+            }
+            say 'survived ', $sup->restarts('w'), ' deaths on a budget of one';
+            $sup->stop;
+        };
+        $sup->run;
+    };
+
+=head2 stop before run spends the run
+
+C<stop> before C<run> is not an error and not a no-op: the tree still starts, every factory runs, and the children are
+torn straight back down. C<run> returns normally, and the one permitted call has been used.
+
+    my $sup   = Acme::Parataxis::Supervisor->new;
+    my $built = 0;
+    $sup->supervise( sub { $built++; Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) }, name => 'w' );
+    $sup->stop;
+    say 'asked to stop, started yet: ', $sup->started ? 'yes' : 'no';
+    async {
+        $sup->run;
+        say 'children built: ', $built, ', started: ', $sup->started ? 'yes' : 'no';
+        say 'a second run:   ', ( eval { $sup->run; 1 } ? 'allowed' : 'refused' );
+    };
+
+If you are holding supervisors you may or may not want, keep them local and stop only the one you started.
+
+=head2 A bad factory is a programming error, not a failure
+
+A factory that B<dies> is handled like any other death: charged, restarted, and eventually fatal with a supervisor
+error. A factory that returns the wrong thing is a bug in your code, and it croaks straight out of C<run>.
+
+    my $sup = Acme::Parataxis::Supervisor->new;
+    $sup->supervise( sub { 'not an actor' }, name => 'bad' );
+    async { eval { $sup->run }; say $@ };
+
+Only the first of those two is a supervision failure you should catch and retry; the other wants a fix.
+
+=head2 child is undef before run
+
+C<child> reports the live instance, and there is none until the tree has started, so it returns C<undef> rather than
+croaking. Asking for a name that was never registered does croak, which makes the two easy to confuse.
+
+    my $sup = Acme::Parataxis::Supervisor->new;
+    $sup->supervise( sub { Acme::Parataxis::Actor->spawn( sub { 1 }, 4, supervised => 1 ) }, name => 'w' );
+    say 'registered but not built: ', ( defined $sup->child('w') ? 'built' : 'undef' );
+    say 'an unknown name:          ', ( eval { $sup->child('nope'); 1 } ? 'accepted' : 'croaks' );
+
+Read C<children> if you need the registered names before the tree starts.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Actor>, L<Acme::Parataxis::Nursery>, L<Acme::Parataxis::Error>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

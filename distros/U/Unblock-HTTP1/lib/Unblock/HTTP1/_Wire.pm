@@ -6,6 +6,7 @@ use Carp qw(croak);
 use Config ();
 use utf8 ();
 use Uniform::HTTP::FastPath ();
+use Unblock::HTTP1::_Native ();
 
 my $MAX_CONTENT_LENGTH = $Config::Config{uvsize} >= 8
     ? '18446744073709551615'
@@ -1427,6 +1428,19 @@ sub response_receive_plan {
 
 sub response_plan {
     my ($request, $response, %option) = @_;
+    if (!$option{stream_body}) {
+        my $wire = Unblock::HTTP1::_Native::_simple_response_wire(
+            $request, $response, \%REASON,
+        );
+        if (defined $wire) {
+            return {
+                wire => $wire, version => '1.1', mode => 'content-length',
+                remaining => 0, stream_body => 0, trailers => [],
+                keep_alive => 1, close_after => 0, switch => 0,
+                body_finalized => 1,
+            };
+        }
+    }
     my $request_view = _fast_request_view($request);
     my $response_view = _fast_response_view($response);
 

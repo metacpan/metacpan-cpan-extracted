@@ -1,6 +1,17 @@
+use Config;
 use ExtUtils::MakeMaker;
 use strict;
 use warnings;
+
+# The rule engine reproduces the int64_t arithmetic of ICU with native perl integers and
+# uses the pack formats q and Q, so a perl with 32-bit integers is not supported. The
+# message and the exit status follow the CPAN Testers convention, which reports such a
+# platform as NA, not FAIL.
+if( ( $Config{ivsize} // 0 ) < 8 )
+{
+    print( "OS unsupported: Locale::Unicode::RBNF requires a perl with 64-bit integers (ivsize is $Config{ivsize}); rebuild perl with -Duse64bitint.\n" );
+    exit(0);
+}
 
 sub MY::distsignature
 {

@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-Docker-API,
-version 0.104:
+version 0.105:
 
   Build and publish Docker images as Dist::Zilla release artifacts
 

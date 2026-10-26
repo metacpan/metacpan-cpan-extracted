@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	list_workflow_types
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 

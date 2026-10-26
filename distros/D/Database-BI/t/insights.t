@@ -14,6 +14,7 @@ use warnings;
 use Test::Most;
 use Test::Mojo;
 use File::Spec ();
+use File::Temp qw(tempdir);
 use Mojo::Util qw(url_escape);
 use Readonly;
 
@@ -21,6 +22,10 @@ use Readonly;
 # Bootstrap
 # ---------------------------------------------------------------------------
 my $t = Test::Mojo->new('Database::BI');
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
 
 Readonly my $FIXTURE => File::Spec->rel2abs('data/insights_fixture.csv');
 plan skip_all => 'data/insights_fixture.csv not found' unless -f $FIXTURE;

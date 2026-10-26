@@ -1,5 +1,8 @@
 Revision history for perl module CPAN::MetaPackager.
 
+1.05  2026-10-25
+	- Remove 'use 5.044.0' from all *.pm & *.pl files.
+
 1.04  2026-06-26
 	- Update the instructions in MetaPackager.pm
 	- Download a new 02packages.details.txt.gz & rebuild the db.

@@ -20,11 +20,11 @@ App::GHGen - GitHub Actions workflow generator, analyzer, and optimizer
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -601,7 +601,7 @@ B<Generated workflow step order:>
 
 =item 1. C<actions/checkout@v6>
 
-=item 2. Setup Perl — C<shogo82148/actions-setup-perl@v1.44.0>
+=item 2. Setup Perl — C<shogo82148/actions-setup-perl@v1.44.2>
 
 =item 3. Cache CPAN modules — C<actions/cache@v5>
 

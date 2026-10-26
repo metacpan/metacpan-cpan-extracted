@@ -33,7 +33,7 @@ use App::Actions::Runner::Support qw(
 use App::Actions::Schema;
 use App::Actions::Util ();
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The shape of the preflight JSON document, which is the check document with
 # an images array and the pull concurrency added.  It is versioned separately
@@ -1536,16 +1536,21 @@ sub _parallel {
 		quiet => $self->{quiet},
 		logger => $self->{logger},
 		# In the child: its own runner directory and base environment, and
-		# the images it pulled, so the parent can remove them if it must.
+		# the images it pulled and used, so the parent can remove them if it
+		# must and the record of kept images hears of both.
 		run_job => sub {
 			my ($entry) = @_;
 			$weak->_prepare_temp($entry->{temp});
 			$weak->_build_base_env;
 			my $result = $weak->_run_instance($entry->{plan}{instance}, $entry->{plan}{context});
 			$result->{pulled} = $weak->{images}->pulled;
+			$result->{used} = $weak->{images}->used;
 			return $result;
 		},
-		on_result => sub { $weak->{images}->note_pulled(@{ $_[0]{pulled} || [] }) },
+		on_result => sub {
+			$weak->{images}->note_pulled(@{ $_[0]{pulled} || [] });
+			$weak->{images}->note_used(@{ $_[0]{used} || [] });
+		},
 	);
 }
 

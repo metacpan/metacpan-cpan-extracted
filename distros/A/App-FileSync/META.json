@@ -36,7 +36,7 @@
          "requires" : {
             "Carp" : "0",
             "Compress::Raw::Zlib" : "0",
-            "Config::Abstraction" : "0",
+            "Config::Abstraction" : "0.41",
             "Cwd" : "0",
             "Digest::SHA" : "0",
             "Exporter" : "0",
@@ -53,7 +53,7 @@
             "IPC::System::Simple" : "1.30",
             "JSON::PP" : "0",
             "List::Util" : "1.54",
-            "Log::Abstraction" : "0",
+            "Log::Abstraction" : "0.36",
             "Object::Configure" : "0",
             "Params::Get" : "0.17",
             "Params::Validate::Strict" : "0.41",
@@ -91,6 +91,6 @@
          "web" : "https://github.com/nigelhorne/App-FileSync"
       }
    },
-   "version" : "0.001.2",
+   "version" : "0.001.5",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -6,7 +6,6 @@ use utf8;
 use autodie qw(:all);
 
 use File::Basename qw(basename);
-use Storable qw(dclone);
 use Readonly;
 
 use App::Actions::Expression;
@@ -17,7 +16,7 @@ use Sub::Private ();
 
 use App::Actions::Access;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # An error in a workflow is reported where the workflow was asked for, which
 # is usually the App::Actions or Runner call the user made, not a line here.
@@ -391,7 +390,7 @@ sub expand_jobs {
 			# Each instance is a copy of its own, so a change to one instance's
 			# steps or environment reaches neither the job nor its siblings.
 			push @instances, {
-				%{ dclone($job) },
+				%{ _copy($job) },
 				base_id => $job->{id},
 				matrix => $values,
 				matrix_index => $index,
@@ -841,6 +840,24 @@ sub _defaults {
 	}
 
 	return $copy;
+}
+
+# _copy
+# Purpose:     A deep copy of a parsed job, for one matrix instance.  Storable
+#              3.26, the version in Perl 5.36, copies a core boolean as a
+#              plain empty string, which turned if: false and fail-fast: false
+#              into empty values, so a job that should not run did; here every
+#              value that is not a hash or an array is kept as it is.
+# Entry:       $value - a value YAML::PP loaded: hashes, arrays and scalars.
+# Exit status: Returns the copy.
+# Side effects: None.
+sub _copy {
+	my ($value) = @_;
+
+	return { map { $_ => _copy($value->{$_}) } keys %{$value} } if ref $value eq 'HASH';
+	return [ map { _copy($_) } @{$value} ] if ref $value eq 'ARRAY';
+
+	return $value;
 }
 
 # _expand_matrix

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Fill in the gaps between integer ranges",
+   "author" : [
+      "James E Keenan (jkeenan@pobox.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Set-Integer-Gapfillers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/Set-Integer-Gapfillers/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/Set-Integer-Gapfillers/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/Set-Integer-Gapfillers.git",
+         "web" : "https://github.com/jkeenan/Set-Integer-Gapfillers"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

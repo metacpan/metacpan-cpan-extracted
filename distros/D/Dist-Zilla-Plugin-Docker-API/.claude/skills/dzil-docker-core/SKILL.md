@@ -167,11 +167,10 @@ Consequences worth stating before writing a test:
 - `t/30-tag-attribute.t` uses `Test::Warnings` to assert the deprecation
   warnings; other files silence them with `local $SIG{__WARN__} = sub {}`.
 
-## Known holes — ticketed, do not fix in passing
+## The registry check behind `fail_if_tag_exists`
 
-- **`remote_tag_exists` returns a hard `0`**, so `fail_if_tag_exists` never
-  fires. Both the POD and `README.md` now say so explicitly, so this is a
-  documented no-op rather than a broken promise. Implementing it needs a
-  *registry* lookup — `GET /distribution/{name}/json` — which `API::Docker`
-  does not expose; that is filed on its board, and this repo's karr #6 is
-  blocked on it. Do not try to answer the question from the local daemon.
+`remote_tag_exists` asks the *registry* — `GET /distribution/{name}/json` through
+`API::Docker`'s `distribution->exists` — not the local daemon, and it is real
+since `API::Docker` 0.004. Before that it was a stub that always answered "no".
+An engine without a `/distribution` route (rootless Podman) croaks there and the
+release stops. The background is in `dzil-docker-hazards`.

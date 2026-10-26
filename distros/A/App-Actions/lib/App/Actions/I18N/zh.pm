@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The Chinese catalogue: message key to text, or to a hash that chooses a
 # text by gender or plural category; see App::Actions::I18N for the shape.

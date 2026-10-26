@@ -1,3 +1,11 @@
+0.25 2026-10-25T21:44:29+01:00
+ - Add new error for detection of bad hyphen in 080a.
+ - Add new error for detection of bad year in time auxiliary.
+ - Add new error for detection of extra dash in 080a.
+ - Add new error for detection of extra dot in 080a.
+ - Add new error for detection of missing operator in 080a.
+ - Fix position in one test.
+
 0.24 2026-10-19T08:22:58+02:00
  - Add position to error parameters in 080 plugin.
  - Add support for extra opening parenthesis in 080a.

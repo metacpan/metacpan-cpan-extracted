@@ -30,6 +30,7 @@ use Carp;
 use Data::Dumper;
 use IO::Handle;
 use Term::ReadKey;
+use POSIX qw(tcgetpgrp);
 
 use Getopt::EX::termcolor;
 
@@ -110,6 +111,16 @@ sub ask {
 	    uncntrl $request;
     }
     open my $tty, "+<", "/dev/tty" or return;
+    # A process outside the foreground process group must not touch
+    # the terminal: tcsetattr(3) and read(2) would stop it with
+    # SIGTTOU/SIGTTIN, as happens inside a process substitution.
+    # Ignore the signals as well, so that a race with the shell
+    # handing over the terminal ends in a failed read, not a stop.
+    if (tcgetpgrp(fileno $tty) != getpgrp()) {
+	warn sprintf("[%s] Not in foreground: skip\n", __PACKAGE__) if $debug;
+	return;
+    }
+    local $SIG{TTOU} = local $SIG{TTIN} = q(IGNORE);
     ReadMode "cbreak", $tty;
     printflush $tty $request;
     my $timeout = $TIMEOUT;

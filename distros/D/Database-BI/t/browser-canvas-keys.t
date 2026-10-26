@@ -338,4 +338,15 @@ is $reloaded->{summary}, 'Third width, 3 rows high',
 	'and the menu summary names both saved dimensions';
 is $browser->patch_count, 4, 'and rendering it back does not PATCH it';
 
+# What this run established, for the job summary: the three ways a card is
+# sized, each driven by real key presses rather than by an event made up in the
+# page.
+$browser->proved(
+	'canvas card size and position: the header handle\'s arrows move the card one'
+	. ' cell at a time and Shift goes to the edge, the corner grip resizes it with'
+	. ' the arrows and Home/End for the extremes, and the Size menu sets both'
+	. ' dimensions - each read back from the grid, the announcement and the layout'
+	. ' the server stored'
+);
+
 done_testing();

@@ -578,4 +578,14 @@ JS
 is $pie_after->{w}, $pie->{w}, 'and the pie goes back to the width the server sent';
 is $pie_after->{h}, $pie->{h}, 'and the height';
 
+# What this run established, for the job summary: the chart controls are
+# reachable and operable from the keyboard alone, from asking for a chart to
+# exporting it.
+$browser->proved(
+	'GET /view/sales: Enter on the toolbar button opens the chart panel and its'
+	. ' category select takes typeahead, submitting through the browser; GET /bar'
+	. ' and /pie: the grip resizes with the arrow keys and Enter exports - each'
+	. ' step read back from the page'
+);
+
 done_testing();

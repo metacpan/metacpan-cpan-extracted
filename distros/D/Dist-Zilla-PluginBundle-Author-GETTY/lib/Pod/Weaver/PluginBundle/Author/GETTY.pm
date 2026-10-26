@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::Author::GETTY;
 # ABSTRACT: GETTY's default Pod::Weaver config
-our $VERSION = '0.326';
+our $VERSION = '0.327';
 use strict;
 use warnings;
 
@@ -27,9 +27,9 @@ sub mvp_bundle_config {
 {{
   my @parts;
 
-  # GitHub Issues first
+  # Issue tracker first
   if ($bugtracker_web) {
-    push @parts, "=head2 Issues\n\nPlease report bugs and feature requests on GitHub at\nL<$bugtracker_web>.";
+    push @parts, "=head2 Issues\n\nPlease report bugs and feature requests at\nL<$bugtracker_web>.";
   }
 
   # IRC support
@@ -66,7 +66,7 @@ END_TEMPLATE
       text => 'Contributions are welcome! Please fork the repository and submit a pull request.',
     } ],
     [ '@GETTY/Authors',   _exp('Authors'),      {} ],
-    [ '@GETTY/Legal',     _exp('Legal'),        {} ],
+    [ '@GETTY/Legal',     _exp('Author::GETTY::Legal'), {} ],
     [ '@GETTY/List',      _exp('-Transformer'), { 'transformer' => 'List' } ],
     [ '@GETTY/GETTY',     _exp('-Transformer'), { 'transformer' => 'Author::GETTY' } ],
   );
@@ -88,7 +88,7 @@ Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.326
+version 0.327
 
 =head1 SYNOPSIS
 
@@ -232,9 +232,17 @@ Documents usage examples.
 
 Documents related modules or links.
 
-  =seealso L<Some::Other::Module>
+  =seealso
 
-  Related functionality for X.
+  L<Some::Other::Module> - related functionality for X.
+
+C<=seealso> takes no argument: the command line is replaced by the fixed
+heading C<SEE ALSO>, so put the links in the paragraphs below it.
+
+=head2 =synopsis and =description
+
+C<=synopsis> and C<=description> become C<=head1 SYNOPSIS> and
+C<=head1 DESCRIPTION>; like C<=seealso> they take no argument.
 
 =head1 STANDARD SECTIONS
 
@@ -314,7 +322,7 @@ L<Dist::Zilla::PluginBundle::Author::GETTY>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
 
 =head1 CONTRIBUTING
@@ -327,9 +335,11 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

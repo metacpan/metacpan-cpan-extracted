@@ -1,0 +1,121 @@
+=head1 NAME
+
+App::FuguWeb::Language - one declared language of a site
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Language;
+
+    App::FuguWeb::Language::is_tag('zh-Hans');      # 1
+
+    my $language = $config->language('zh-Hans');
+
+    $language->path;                # zh-hans
+    $language->attributes;          # lang="zh-Hans"
+    $language->marks($config->language('en'));     # lang="en"
+
+=head1 DESCRIPTION
+
+A C<language> block of the description declares one language of the
+site, per WEB-LANGUAGE. The object holds what the build needs of it:
+the tag, the name, the direction, the path of its tree, the site name
+and the footer. L<App::FuguWeb::Config> makes each object, and every
+other module reads it.
+
+The site name and the footer of a language come from its own block, or
+from the description when its block names none, per WEB-LANGUAGE-3.
+The description holds the words of the default language. The object
+holds each value with the tag of the language that it comes from, so a
+page can mark it, per WEB-LANGUAGE-11.
+
+=head1 FUNCTIONS
+
+=head2 is_tag
+
+    App::FuguWeb::Language::is_tag($tag)
+
+Report whether a word is a tag of WEB-LANGUAGE-1: a BCP 47 tag of RFC
+5646, in its canonical case. The tag holds a language subtag of two or
+three lowercase letters, then an optional script subtag of four letters
+with the first in uppercase, then an optional region subtag of two
+uppercase letters or three digits. C<en>, C<zh-Hans>, C<pt-BR> and
+C<es-419> are tags. C<zh-hans> and C<de-1996> are not.
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Language->new(
+        tag         => 'zh-Hans',   # required
+        name        => $text,       # the name of the language in itself
+        dir         => 'ltr',       # ltr or rtl (default: ltr)
+        site        => $text,       # the site name in this language
+        site_lang   => $tag,        # the language of the site name
+        footer      => $path,       # the footer, below the source directory
+        footer_lang => $tag,        # the language of the footer
+    )
+
+L<App::FuguWeb::Config> holds each value to WEB-LANGUAGE before it
+makes the object. A tag or a direction of another shape is therefore a
+programming error, and the constructor dies. C<site_lang> and
+C<footer_lang> default to the tag.
+
+=head2 tag, name, dir
+
+The tag, the name of the language in itself, and its direction:
+C<ltr> or C<rtl>.
+
+=head2 path
+
+The path of the tree of the language below the output: the tag in
+lowercase, per WEB-LANGUAGE-5. The tree of C<zh-Hans> is F<zh-hans/>.
+
+=head2 site, site_lang
+
+The site name in this language, as characters, and the tag of the
+language that it comes from.
+
+=head2 footer, footer_lang
+
+The footer fragment of this language, as a path below the source
+directory, or C<undef> for a site with no footer. The tag of the
+language that it comes from.
+
+=head2 attributes
+
+The attributes of the C<< <html> >> element of a page of this language,
+per WEB-LANGUAGE-10: the tag as C<lang>, and C<dir="rtl"> when the
+language is right to left. Each attribute has a space in front of it.
+
+=head2 marks
+
+    my $marks = $page_language->marks($other);
+
+The attributes that an element carries on a page of this language when
+its text comes from the other language, per WEB-LANGUAGE-11: the tag of
+the other language as C<lang>, and its direction as C<dir> when the two
+directions differ. Each attribute has a space in front of it. Text of
+the language of the page takes no mark, because the C<< <html> >>
+element carries that language.
+
+=head1 CONSTANTS
+
+=head2 ENGLISH
+
+The tag C<en>. A description that declares no language has this one
+language, per WEB-LANGUAGE-4. The human page of a key directory is a
+page of it, per WEB-CHROME-8.
+
+=head2 LEFT_TO_RIGHT, RIGHT_TO_LEFT
+
+The two directions of WEB-LANGUAGE-2, C<ltr> and C<rtl>. The first one
+is the default.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Page>,
+L<fuguweb(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

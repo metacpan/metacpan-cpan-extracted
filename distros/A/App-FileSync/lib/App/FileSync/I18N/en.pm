@@ -7,7 +7,7 @@ package App::FileSync::I18N::en;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 our %MESSAGES = (
 	# ---------------------------------------------------------- i18n itself
@@ -273,6 +273,40 @@ port and host_key_checking exist per repo only and are marked [repo only].
 
 Exit codes: 0 ok, 1 fatal, 2 another run holds the lock, 3 completed with
 warnings, 4 verification found drift.
+
+"filesync init --help" explains the options init takes.
+USAGE
+	'cli.help.init' => <<'USAGE',
+filesync init - register a directory in this client's configuration
+
+    filesync init --repo NAME --root DIR --server USER@HOST [options]
+    filesync init --repo NAME --root DIR --transport local --server-root DIR
+
+  --repo NAME            the repo name, as the server knows it
+  --root DIR             the local directory to keep in step (created if needed)
+  --server HOST          the ssh server, as host or user@host
+  --server-root DIR      the server root, for --transport local
+  --remote-repo NAME     the repo name on the server, if it differs from --repo
+  --id ID                the id the server knows this client by
+
+  The id defaults to this machine's host name.  That is the name the server
+  keeps this client's base, journal entries and conflict copies under, and the
+  name "filesync-admin client allow" must list.  Pass --id only to override it
+  - for two machines with the same host name, say.  It is not a login, and it
+  does not divide the repo: every client of a repo syncs the whole tree.
+
+  --transport ssh|local  how the server is reached; the default is ssh, or
+                         local when --server-root is given
+  --role client|replica  what this client may do; default client
+  --identity FILE        ssh identity file
+  --known-hosts FILE     ssh known_hosts file
+  --port N               ssh port
+  --accept-host-key      trust an unknown host key on first use
+  --server-command PATH  the server program to run over ssh
+  --snapshot-mode MODE   hardlink or copy, for "filesync snapshot"
+  --config FILE          the client configuration file to write
+
+Exit codes: 0 ok, 1 fatal.
 USAGE
 	'cli.help.admin' => <<'USAGE',
 filesync-admin --root DIR <command>

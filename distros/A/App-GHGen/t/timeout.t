@@ -66,8 +66,8 @@ subtest 'Fix missing timeout-minutes' => sub {
 	ok($modified > 0, 'Fixer reports modification');
 	is(
 		$workflow_missing->{jobs}{test}{'timeout-minutes'},
-		30,
-		'Fixer inserts default timeout-minutes = 30'
+		60,
+		'Fixer inserts default timeout-minutes = 60'
 	);
 };
 

@@ -13,6 +13,20 @@
 # Leaflet pane and asks the configured tile URL through its asset, so both
 # pages have to have loaded their files and run, not merely referenced them.
 #
+# The vendored run is the one that draws the chart with the library a deployment
+# serves, so there it also asserts the bars are that library's - the stand-in has
+# no version to report and the real bundle does - and checks the page around the
+# generated chart for its <html lang>.  Both charts get that treatment: the /bar
+# page, whose svg HTML::D3 names after the kind, and the canvas chart card, whose
+# svg is named for its visual index.  t/browser-language.t owns that attribute,
+# but its fixture has no network, so none of its chart pages draw.
+#
+# The run writes down what it proved - which chart was drawn by which D3, and
+# the language attribute that came with it - to the file BI_OFFLINE_ASSET_REPORT
+# names, because a green run otherwise says only that the file passed: in a
+# stand-in run the same assertions pass without the real library.  The workflow
+# publishes that file to the job summary.
+#
 # The fixture already sends external hosts through a closed proxy.  On top of
 # that, this test checks the finished page references only same-origin scripts,
 # stylesheets and tiles, and that the browser recorded no external resource.
@@ -296,6 +310,17 @@ if (@missing) {
 	diag "Using vendored D3/Leaflet from $vendored_root";
 }
 
+# Which of the two runs this is.  It matters to the chart: the stand-in is a
+# stub written in this file, so bars drawn through it say the page ran, while
+# only the vendored files say the real library draws the chart HTML::D3
+# generated.  The assertions that claim the real thing are skipped otherwise.
+my $vendored_run = @missing ? 0 : 1;
+
+# What the real-D3 assertions below establish, one line each, for the report
+# this file writes at the end.  In a stand-in run nothing is added, and the
+# report says so rather than leaving the reader to infer it from the skips.
+my @proved;
+
 my $browser = BI::Test::Browser->new(
 	data_dir     => $data_dir,
 	static_paths => [$tmp],
@@ -377,26 +402,50 @@ is $browser->js(q{return document.querySelector('script[src*="self-hosted/d3.js"
 unlike $browser->js('return document.documentElement.outerHTML;'),
 	qr{cdnjs\.cloudflare\.com|unpkg\.com}, 'and names no CDN in its markup';
 
+# Bars are drawn only where a D3 loads, and the bars above are the stand-in's
+# when this checkout has no vendored files.  The vendored run is the one that
+# draws them with the library a deployment serves, so it also says which
+# library that was - the stand-in has no version, the real bundle reports its
+# own - and checks the page around the generated chart at the same time.  The
+# chart's SVG and its drawing script come from HTML::D3 rather than from the
+# template, and the layout writes <html lang> before either exists;
+# t/browser-language.t owns that attribute but its fixture has no network for
+# D3, so its chart page never draws and cannot check the two together.
+SKIP: {
+	skip 'the self-hosted files are this test\'s stand-ins, so the bars above are not real D3\'s', 3
+		unless $vendored_run;
+
+	my $d3_version = $browser->js('return typeof d3.version === "string" ? d3.version : "";');
+	like $d3_version, qr/\A\d+\.\d+/,
+		'the chart loaded the real D3 bundle, which reports its version';
+
+	my $drawn = $browser->js(q{return document.querySelectorAll('svg#bar_chart rect.bc-bar').length;});
+	is $drawn, 2, 'and real D3 drew the generated chart: a bar per category inside its SVG';
+
+	my $lang = $browser->js('return document.documentElement.lang || "";');
+	is $lang, 'en',
+		'and the page that generated that chart declares its language in <html lang>';
+
+	push @proved, "/bar chart page: $drawn bars in svg#bar_chart, D3 $d3_version, <html lang>=$lang";
+}
+
 local_assets_only('the chart page');
 
 # ---------------------------------------------------------------------------
 # A map: the local Leaflet loads, creates the pane, and the page asks the
 # configured tile URL for its tiles.  The cluster plugin comes from the same
 # origin too.
+#
+# The map itself is drawn by the optional HTML::OSM.  Without it the page says
+# so and draws nothing, which is the documented degradation rather than a
+# failure of the assets: there is no Leaflet markup for the self-hosted files to
+# be served into, so those assertions are N/A here, not failing.  The page's own
+# summary and its freedom from CDN references are still checked, because they do
+# not depend on the renderer.
 # ---------------------------------------------------------------------------
-$browser->navigate('/map?l=' . url_escape($spec) . '&lat=lat&lon=lon');
+my $have_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
 
-ok $browser->wait_for(sub {
-	$browser->js("return document.querySelector('#map .leaflet-pane') ? 1 : 0;")
-}, timeout => 10), 'the map page drew its Leaflet pane';
-
-is $browser->js('
-	return typeof L === "object" && typeof L.map === "function" ? 1 : 0;
-'), 1, 'the map loaded Leaflet from the app origin';
-is $browser->js('
-	return typeof L === "object" && typeof L.markerClusterGroup === "function" ? 1 : 0;
-'), 1, 'and loaded the cluster plugin from the app origin';
-is $browser->js(<<'JS'),
+my $TILE_URL_JS = <<'JS';
 return (function () {
 	if (window.__tileUrls && window.__tileUrls.length) return window.__tileUrls[0];
 
@@ -412,15 +461,36 @@ return (function () {
 	return '';
 }());
 JS
-	'/self-hosted/tiles/{z}/{x}/{y}.png',
-	'and asked the configured tile URL for tiles';
+
+$browser->navigate('/map?l=' . url_escape($spec) . '&lat=lat&lon=lon');
+
+SKIP: {
+	skip 'HTML::OSM 0.12 is not installed here, so the map page has no Leaflet markup to serve offline', 5
+		unless $have_renderer;
+
+	ok $browser->wait_for(sub {
+		$browser->js("return document.querySelector('#map .leaflet-pane') ? 1 : 0;")
+	}, timeout => 10), 'the map page drew its Leaflet pane';
+
+	is $browser->js('
+		return typeof L === "object" && typeof L.map === "function" ? 1 : 0;
+	'), 1, 'the map loaded Leaflet from the app origin';
+	is $browser->js('
+		return typeof L === "object" && typeof L.markerClusterGroup === "function" ? 1 : 0;
+	'), 1, 'and loaded the cluster plugin from the app origin';
+	is $browser->js($TILE_URL_JS),
+		'/self-hosted/tiles/{z}/{x}/{y}.png',
+		'and asked the configured tile URL for tiles';
+
+	# The page's only script and stylesheet are the map's, so there is nothing
+	# self-hosted to account for until a map is drawn.
+	local_assets_only('the map page');
+}
 
 like $browser->js("return document.querySelector('.map-summary').textContent;"),
 	qr/Plotting 2 markers/, 'the map plotted the coordinate rows';
 unlike $browser->js('return document.documentElement.outerHTML;'),
 	qr{unpkg\.com|tile\.openstreetmap\.org}, 'and names no CDN or OSM tile host in its markup';
-
-local_assets_only('the map page');
 
 # ---------------------------------------------------------------------------
 # A canvas with both kinds of card.  The canvas loads D3 before the grid and
@@ -464,20 +534,86 @@ my $canvas_bars = $browser->wait_for(sub {
 }, timeout => 10);
 is($canvas_bars, 2, 'the canvas chart drew through the local D3');
 
-ok $browser->wait_for(sub {
-	$browser->js("return document.querySelector('#map-1 .leaflet-pane') ? 1 : 0;")
-}, timeout => 10), 'the canvas map drew its Leaflet pane';
+# The same proof the chart page gets, on the card instead of the page: this is a
+# second document, a second svg, and HTML::D3 names each card's chart after its
+# visual index (#vis-0) rather than after the chart kind, so the id the bars are
+# found under is the canvas's own arrangement and not the chart page's.  As
+# there, the stand-in reports no version, so only a vendored run can say the
+# card was drawn by the library a deployment serves.
+SKIP: {
+	skip 'the self-hosted files are this test\'s stand-ins, so the canvas chart was not drawn by real D3', 3
+		unless $vendored_run;
 
-is $browser->js(q{return typeof L === 'object' && typeof L.markerClusterGroup === 'function' ? 1 : 0;}),
-	1, 'the canvas loaded Leaflet and the cluster plugin from the app origin';
-like $browser->js("var s = document.querySelector('#visual-1 .visual-card-body script'); return s ? s.textContent : '';"),
-	qr!L\.tileLayer\('/self-hosted/tiles/\{z\}/\{x\}/\{y\}\.png'!,
-	'and the canvas map asks the configured tile URL for tiles';
+	my $d3_version = $browser->js('return typeof d3.version === "string" ? d3.version : "";');
+	like $d3_version, qr/\A\d+\.\d+/,
+		'the canvas loaded the real D3 bundle, which reports its version';
+
+	my $drawn = $browser->js(q{return document.querySelectorAll('svg#vis-0 rect.bc-bar').length;});
+	is $drawn, 2,
+		'and real D3 drew that card: a bar per category inside the svg named for its index';
+
+	my $lang = $browser->js('return document.documentElement.lang || "";');
+	is $lang, 'en',
+		'and the canvas carrying that card declares its language in <html lang>';
+
+	push @proved, "canvas chart card: $drawn bars in svg#vis-0, D3 $d3_version, <html lang>=$lang";
+}
+
+# The map card is drawn by the same optional renderer, so the same rule: with
+# no HTML::OSM the card reports it and draws nothing, and there is no Leaflet
+# markup to check the self-hosted files against.  The chart card above and the
+# canvas page itself are still checked.
+SKIP: {
+	skip 'HTML::OSM 0.12 is not installed here, so the canvas map card has no Leaflet markup to serve offline', 3
+		unless $have_renderer;
+
+	ok $browser->wait_for(sub {
+		$browser->js("return document.querySelector('#map-1 .leaflet-pane') ? 1 : 0;")
+	}, timeout => 10), 'the canvas map drew its Leaflet pane';
+
+	is $browser->js(q{return typeof L === 'object' && typeof L.markerClusterGroup === 'function' ? 1 : 0;}),
+		1, 'the canvas loaded Leaflet and the cluster plugin from the app origin';
+	like $browser->js("var s = document.querySelector('#visual-1 .visual-card-body script'); return s ? s.textContent : '';"),
+		qr!L\.tileLayer\('/self-hosted/tiles/\{z\}/\{x\}/\{y\}\.png'!,
+		'and the canvas map asks the configured tile URL for tiles';
+}
 unlike $browser->js('return document.documentElement.outerHTML;'),
 	qr{unpkg\.com|cdnjs\.cloudflare\.com|tile\.openstreetmap\.org},
 	'and names no CDN or OSM tile host in its markup';
 
 local_assets_only('the canvas');
+
+# What this run established, for the job summary.  A green run of this file on
+# its own says only that it passed: in a stand-in run the drawn-bar assertions
+# pass too, and nothing in the log says which library drew them.  The lines are
+# Markdown because the CI job appends them to $GITHUB_STEP_SUMMARY unchanged,
+# and they are diag'd so a local run says the same thing.
+my @report = (
+	'## Offline-asset charts',
+	'',
+	$vendored_run
+		? "- libraries: vendored, from `$vendored_root`"
+		: "- libraries: the stand-ins in t/browser-offline-assets.t (nothing vendored under `$vendored_root`)",
+);
+push @report, @proved
+	? map { "- $_" } @proved
+	: '- charts proved: none - the stand-in drew them, so the real-D3 assertions were skipped';
+
+diag($_) for @report;
+
+# The keyboard job runs this file too, and reads the fixture's report rather
+# than the one above, which belongs to the job that pins the library versions.
+$browser->proved(
+	'GET /bar and a canvas holding a chart card and a map card, with every'
+	. ' external host refused: each page names only same-origin scripts, stylesheets'
+	. ' and tiles, and the browser fetched nothing from outside'
+);
+
+if (defined(my $report_path = $ENV{BI_OFFLINE_ASSET_REPORT})) {
+	open(my $fh, '>', $report_path) or die "Cannot write $report_path: $!";
+	print {$fh} map { "$_\n" } @report;
+	close($fh) or die "Cannot close $report_path: $!";
+}
 
 $browser->stop;
 

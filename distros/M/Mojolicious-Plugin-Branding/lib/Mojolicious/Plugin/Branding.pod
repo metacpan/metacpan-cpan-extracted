@@ -12,7 +12,7 @@ Mojolicious::Plugin::Branding - Global and per-request branding of templates and
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::Branding version 0.002.
+This document describes Mojolicious::Plugin::Branding version 0.004.
 
 =begin html
 
@@ -39,15 +39,14 @@ This document describes Mojolicious::Plugin::Branding version 0.002.
    # Mojolicious::Lite
 
    # individual branding: the application decides the brand of each
-   # request and puts it in the stash, before the plugin is loaded
+   # request and puts it in the stash
    my %brand_for = (
       'acme.example.com'     => 'acme',
       'umbrella.example.com' => 'umbrella',
    );
    hook before_dispatch => sub {
       my $c = shift;
-      my $brand = $brand_for{$c->req->url->to_abs->host // ''};
-      $c->stash(variant => $brand) if defined $brand;
+      $c->brand($brand_for{$c->req->url->to_abs->host // ''});
    };
 
    plugin Branding => {
@@ -56,9 +55,12 @@ This document describes Mojolicious::Plugin::Branding version 0.002.
       # own templates/ and public/, first listed wins
       global => [ '/etc/myapp/look-and-feel' ],
 
-      # individual branding: one directory per brand, named after it
+      # individual branding: the directories of each brand
       individual => {
-         paths => [ 'brands/acme', 'brands/umbrella' ],
+         brands => {
+            acme     => 'brands/acme',
+            umbrella => [ 'brands/umbrella', '/srv/shared/umbrella' ],
+         },
       },
    };
 
@@ -89,7 +91,7 @@ else falls back to the application. See L</global>.
 
 In a multi-tenant setup the brand is decided for each request, e.g.
 from the C<Host> header, and each brand keeps its own files in one or
-more directories named after it:
+more directories:
 
    brands/acme/templates/index.html.ep
    brands/acme/public/css/site.css
@@ -111,120 +113,207 @@ automatically. This includes layouts and partial templates.
 =head1 CONFIGURATION
 
 The plugin accepts a hash reference with the following keys, both
-optional.
+optional. Any other key makes the plugin croak.
 
 =head2 global
 
    global => '/path/to/dir',
    global => [ 'dir1', $mojo_file, ... ],
+   global => {
+      paths  => '/etc/myapp/look-and-feel',
+      public => '/srv/myapp/static',
+   },
 
-One directory or an array of directories, as strings or L<Mojo::File>
-objects. Relative paths are resolved from the application home.
+A specification as for a brand (see L</brands>), except that
+L</ignore_app_paths> is not allowed: e.g. one directory or an array of
+directories, each with C<templates> and C<public> sub-directories (if
+present). The resulting directories are put in front of the
+application's renderer and static paths; the order among them, and the
+handling of C<undef> items and missing directories, are the same as
+for a brand. This allows using the same configuration across
+environments, e.g. C<< global => [ $ENV{MYAPP_LOOK} ] >> (an empty
+variable makes the plugin croak, see L</brands>).
 
-For each directory, its C<templates> and C<public> sub-directories (if
-present) are put in front of the application's renderer and static
-paths. When the same file exists in more than one directory, the first
-directory in the list wins.
-
-Directories that do not exist, or that have neither a C<templates> nor
-a C<public> sub-directory, are silently skipped, and so are C<undef>
-items: this allows using the same configuration across environments,
-e.g. C<< global => [ $ENV{MYAPP_LOOK} ] >>. Anything else that is not a
-non-empty string or a L<Mojo::File> object makes the plugin croak.
+When the plugin is registered more than once with C<global>, the
+directories of each registration are put in front of those of the
+earlier ones (last in, first out): a later C<global> wins, while the
+earlier ones are still used for the files it does not have.
 
 =head2 individual
 
-A hash reference with the following keys, both optional:
+A hash reference with the following keys, both optional (any other
+key makes the plugin croak):
+
+=over
+
+=item brands
+
+   brands => {
+      acme     => 'brands/acme',
+      umbrella => [ 'brands/umbrella', '/srv/shared/umbrella' ],
+      special  => {
+         paths     => 'brands/special',
+         templates => { paths => '/srv/special/views', ignore_app_paths => 1 },
+         public    => '/srv/special/static',
+      },
+   },
+
+A hash reference from brand names to their specification. The name is
+what the application puts in the stash (see L</stash_key>) and does
+not need to match any directory name. A specification is either:
+
+=over
+
+=item *
+
+one directory or an array of directories, short for C<< { paths => ... } >>;
+
+=item *
+
+a hash reference with the following keys, all optional:
 
 =over
 
 =item paths
 
-   paths => 'brands/acme',
-   paths => [ 'brands/acme', '/srv/more/umbrella', $mojo_file, ... ],
-
-One directory or an array of directories, accepted as in L</global>,
-each holding the files of one brand in its C<templates> and C<public>
-sub-directories:
+One directory or an array of directories, each holding the files of
+the brand in its C<templates> and C<public> sub-directories (both
+optional):
 
    <dir>/templates/...
    <dir>/public/...
 
-The name of the brand is the last component of the directory's path,
-e.g. C<acme> for C<brands/acme>. Several directories may have the same
-name, e.g. C<brands/acme> and C<shared/acme>: their files are merged
-into the same brand and, when the same file exists in more than one of
-them, the first directory in the list wins.
+=item templates
 
-Directories are skipped as in L</global>; without any usable directory,
-individual branding has no effect.
+=item public
+
+Further directories of templates or public files, used I<directly>
+(i.e. they are not expected to have C<templates> or C<public>
+sub-directories). Either one directory, an array of directories, or a
+hash reference with keys:
+
+=over
+
+=item paths
+
+one directory or an array of directories;
+
+=item ignore_app_paths
+
+if true, the application's own directories (including the L</global>
+ones) are not used for this brand, e.g. a template or public file that
+the brand does not have is not found, instead of falling back to the
+application's one. Files embedded in C<__DATA__> sections and the
+files bundled with Mojolicious are still found. If the brand ends up
+with no directories of that kind, e.g. because they are missing on
+this installation, a warning is logged at startup: the brand would
+have no templates or public files at all.
+
+=back
+
+=back
+
+=back
+
+For each brand, templates and public files are searched in this order:
+the directories in L</templates> or L</public>, then the matching
+sub-directories of the directories in L</paths>, then the
+application's directories (unless L</ignore_app_paths>). In each
+list, the first directory wins.
+
+Directories are given as strings or L<Mojo::File> objects; relative
+paths are resolved from the application home. C<undef> items and
+directories that do not exist are silently skipped. A brand whose
+specification is C<undef> is not configured, and is removed if an
+earlier registration configured it: this allows e.g.
+C<< acme => $ENV{ACME_LOOK} >> when the variable is not set (an empty
+one makes the plugin croak). A brand whose directories are all
+skipped is still a valid brand, it just has no files of its own.
+
+The plugin croaks on empty strings, on references other than
+L<Mojo::File> objects where a directory is expected, and on unknown
+keys in a specification, so that a typo like C<ignore_app_path> does
+not go unnoticed.
 
 =item stash_key
 
    stash_key => 'tenant',
 
 The stash key where the application puts the brand of the request,
-C<variant> by default. See L</How the brand is applied>.
+C<branding.brand> by default. See L</How the brand is applied>.
 
 =back
 
-The plugin can be registered more than once: brands from all
-registrations are merged, earlier registrations winning for files
-that exist in more than one directory.
+The plugin can be registered more than once. Brands from all
+registrations are collected; when a brand is configured again, the
+later specification replaces the earlier one entirely (unlike
+L</global>, see there).
+
+Individual branding is set up by the first registration whose
+C<individual> has a L</stash_key> or names at least one brand in
+L</brands>, even with an C<undef> specification: this applies roles to
+the application's renderer and static file server and adds the
+L</brand> helper. Registrations without C<individual>, or whose
+C<individual> is empty or has only an empty L</brands>, leave them
+alone. L</stash_key>
+is set by the registration that sets up individual branding (to
+C<branding.brand> if not given); later registrations can omit it or
+repeat the same value, any other value makes the plugin croak.
 
 
 =head1 How the brand is applied
 
 The plugin does not decide the brand of a request: the application
-puts it in the stash key L</stash_key> (C<variant> by default), from a
-C<before_dispatch> hook registered I<before> loading the plugin. The
+puts it in the stash key L</stash_key> (C<branding.brand> by default),
+e.g. with the L</brand> helper from a C<before_dispatch> hook. The
 brand can come from anywhere: the C<Host> header (as in the
-L</SYNOPSIS>), a header set by a reverse proxy, a cookie, a database...
+L</SYNOPSIS>), a header set by a reverse proxy, a cookie, a
+database...
 
-The plugin registers its own C<before_dispatch> hook which, for each
-request:
+Each brand gets its own L<Mojolicious::Renderer> and
+L<Mojolicious::Static>, created the first time they are needed (a
+brand with no directories of its own, and not ignoring the
+application's ones, just uses the application's). Their
+directories are those of the brand followed by the application's ones
+(see L</brands>), the other settings are copied from the
+application's renderer and static file server at that moment: the
+handlers and the helpers are shared, and each brand gets its own
+template cache, of the same class and size as the application's.
+Roles already applied to the application's renderer or static file
+server apply to the brand ones too, but attributes added by those
+roles are not copied and start from their defaults. When a
+request has a brand, the application's renderer and static file server
+just hand the work over to the brand ones, which then follow the usual
+Mojolicious rules.
 
-=over
+Public files are served by Mojolicious itself, at the usual point of
+the request: after all C<before_dispatch> hooks, whatever the order in
+which they and the plugin were registered, and only if none of them
+has already rendered a response or called C<render_later>. The static
+C<prefix>, C<after_static> hooks and C<< reply->static >> all work as
+for the application's files. Hence, the brand must be in the stash by
+the end of the C<before_dispatch> hooks for public files to be
+branded.
 
-=item *
+Templates are rendered according to the brand in the stash at the time
+of rendering. This covers layouts, partial templates (C<include>) and
+the pages for exceptions and missing resources too, e.g. a brand can
+override just C<layouts/default.html.ep> and keep the application's
+pages. The brand can also be set later than for public files, e.g. by
+a route with C<< $c->brand('acme') >>; this changes the brand of the
+templates, but not of the public files, which are served before
+routing. Brand templates can use any handler (e.g. C<.ep> or C<.epl>),
+independently of the application's template with the same name.
 
-does nothing if an earlier hook has already rendered a response (e.g.
-a redirect, or a C<401> from an authentication hook);
+The brand and C<variant> are independent: the application can keep
+using variants (e.g. C<phone>) and brands can provide their own
+variant templates (e.g. C<index.html+phone.ep>). As usual in
+Mojolicious, a variant template found in I<any> directory wins over a
+plain template, so a variant template of the application is preferred
+over a plain template of the brand: a brand overriding a page should
+also override its variants.
 
-=item *
-
-does nothing if there is no brand in the stash key;
-
-=item *
-
-copies the brand to the stash value C<variant>, if L</stash_key> is a
-different key;
-
-=item *
-
-serves the file from the brand's C<public> directories if there is
-one, otherwise lets Mojolicious serve the application's public files
-as usual. C<after_static> hooks run for branded files too.
-
-=back
-
-Templates are rendered according to the stash value C<variant>: the
-renderer looks for C<< <dir>/templates/<name> >> in the brand's
-directories first, then falls back to the usual templates. Brand
-templates can use any handler (e.g. C<.ep> or C<.epl>), independently
-of the application's template with the same name.
-
-Because the brand travels in C<variant>, standard Mojolicious variants
-work too: C<templates/index.html+acme.ep> is used for brand C<acme> if
-the brand has no C<index.html.ep>. Note that a variant file in the
-application templates takes precedence over a plain template in the
-brand directories, so avoid having both.
-
-A route can also set C<variant> itself; this changes the brand of the
-templates rendered by that route, but not of the public files, which
-are served before routing.
-
-Only brands listed in L</paths> are ever used: any other value in the
+Only brands listed in L</brands> are ever used: any other value in the
 stash, including one coming straight from the request, just means "no
 branding". There is no need to validate the brand against path
 traversal, although the application should still make sure that it is
@@ -232,6 +321,18 @@ I<allowed> for the request.
 
 
 =head1 INTERFACE
+
+=head2 brand
+
+   my $brand = $c->brand;
+   $c->brand('acme');
+   $c->brand('acme')->render(template => 'index');
+
+Helper to get or set the brand of the request, i.e. the stash value at
+L</stash_key>. Setting C<undef>, or a brand that is not in
+L</brands>, means no branding. When setting, it returns the controller,
+so that calls can be chained. The helper is only available once
+individual branding is set up (see L</individual>).
 
 =head2 register
 
@@ -249,8 +350,8 @@ Minimum perl version 5.24, minimum Mojolicious version 9.34.
 
 =item *
 
-C<url_for_asset> and C<< reply->static >> use the application's static
-files and ignore the brand.
+C<url_for_asset> uses the application's static files and ignores the
+brand.
 
 =item *
 
@@ -261,20 +362,61 @@ the previous brand. In that case, put the brand in the URL.
 
 =item *
 
-The plugin's C<before_dispatch> hook must run after the hook that sets
-the brand, and after any hook that rewrites the request path or base
-URL (e.g. for a reverse proxy): register the plugin after those hooks.
+Directories, both global and of brands, are checked at startup: adding
+a new directory, or a C<templates> or C<public> sub-directory to an
+existing one, requires a restart.
 
 =item *
 
-Directories are scanned at startup: adding a new brand directory, or a
-C<templates> or C<public> sub-directory to an existing one, requires a
-restart. Files inside existing sub-directories are picked up as usual.
+The renderer and static file server of a brand copy the application's
+directories and settings (e.g. the static C<prefix>) when they are
+created, i.e. at the first request for that brand in each process.
+Later changes to the application's directories and to settings like
+the static C<prefix> are not seen by the brand, while handlers,
+helpers and classes are shared, so additions to them are. Attributes
+added by roles are not copied at all: a role that needs
+configuration on the application's renderer or static file server
+gets its defaults in the brand ones.
+
+=item *
+
+As Mojolicious does for the application at startup, the renderer of a
+brand indexes its templates when it is created: new templates with a
+handler other than the default one, and new variant templates, need a
+restart. Changes to existing files and new public files are picked up
+as usual. Note that C<morbo> only watches C<lib> and C<templates> by
+default: use e.g. C<morbo -w brands> during development.
+
+=item *
+
+Each brand compiles and caches the templates it renders, including the
+application's ones, separately from the application and from other
+brands. This happens once per brand and process, at the first
+rendering of each template, and the cache of each brand is limited
+like the application's one.
+
+=item *
+
+Only rendering and serving files are branded: calling methods of the
+application's renderer or static file server directly (e.g.
+C<< $app->renderer->template_path(...) >>) ignores the brand, and so
+would a template handler that uses C<< $app->renderer >> instead of the
+renderer it is given.
+
+=item *
+
+Setting up individual branding applies roles to the application's
+renderer and static file server, which changes their class. Applying
+further roles to them later with the C<+Name> shorthand of
+L<Mojo::Base/with_roles> then looks for the role under the new class
+name and fails: apply such roles before registering the plugin, or use
+the full role name.
 
 =item *
 
 As in plain Mojolicious, a leading C</> in a template name is ignored,
-i.e. template names are always relative to the template directories.
+but only for templates with the default handler: e.g.
+C<< render(template => '/page') >> does not find C<page.html.epl>.
 
 =back
 

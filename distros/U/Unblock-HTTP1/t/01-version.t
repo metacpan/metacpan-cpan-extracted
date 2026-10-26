@@ -11,7 +11,7 @@ use Unblock::HTTP1::Transaction;
 
 my $version = $Unblock::HTTP1::VERSION;
 
-is $version, '0.12', 'distribution version is 0.12';
+is $version, '0.13', 'distribution version is 0.13';
 is Unblock::HTTP1::NativeABI::ABI_VERSION(), 1,
     'native input ABI remains version 1';
 

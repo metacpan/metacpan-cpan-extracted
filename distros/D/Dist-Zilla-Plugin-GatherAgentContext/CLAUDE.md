@@ -7,7 +7,8 @@ A Dist::Zilla `FileGatherer` plugin that snapshots a distribution's agent contex
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/gatheragentcontext-rules.md`.
+the principle is a shared house rule (skilletor bundle `getty-cpan-dist@getty`); the lane is
+in `.claude/rules/gatheragentcontext-rules.md`.
 
 | Task | Agent |
 |---|---|

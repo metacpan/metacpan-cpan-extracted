@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 use App::Actions::Docker;
 use App::Actions::Schema;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The shape of the JSON document this module prints.  Bump it whenever a key,
 # a value type or an enum changes, and update the schema below and the examples

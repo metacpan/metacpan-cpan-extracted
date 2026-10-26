@@ -10,7 +10,7 @@ use POSIX ();
 
 use App::Actions::I18N qw(i18n);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # Turn Perl's $? into an exit code.  Windows reports $? in the same
 # POSIX-compatible form as Unix, so no platform check is needed.

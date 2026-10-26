@@ -9,7 +9,7 @@ use parent 'Unblock::HTTP2::_Connection';
 use Unblock::HTTP2::_Headers;
 use Unblock::HTTP2::Transaction;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use constant {
     H2_DATA              => 0,
@@ -793,6 +793,10 @@ The Server exposes the common connection methods:
     transport_error
     resume_output
     close
+
+C<drain()> sends a graceful GOAWAY so no new streams are admitted while
+existing Transactions may finish. The framework must flush accepted output
+and manage transport shutdown. See L<Unblock::HTTP2::Integration>.
 
 The server can also observe RFC 9218 priority updates with C<on_priority>.
 

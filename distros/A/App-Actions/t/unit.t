@@ -153,7 +153,6 @@ Readonly::Array my @DOCUMENTED => (
 	'text Schema: WHAT: FIRST (and N more)',
 	"text Docker: Docker executable 'BIN' was not found or is not usable",
 	'text Docker: Cannot connect to the Docker daemon',
-	"text Docker: Failed to pull Docker image 'IMAGE' (exit N)",
 	'text Docker: No images given',
 	(map { "text Expression: $_" }
 		'Cannot evaluate an undefined expression', 'Cannot evaluate an empty expression', 'Unterminated string',
@@ -1166,8 +1165,8 @@ subtest 'App::Actions::Docker' => sub {
 		with_docker([ [ '^pull', 3 ] ], sub {
 			throws_ok { docker()->pull('nope') } qr/\AFailed to pull Docker image 'nope' \(exit 3\)\n\z/,
 				'a failed pull dies with advice, not a line number';
+			ok($@->is('runner.image.pull_failed'), 'as runner.image.pull_failed');
 		});
-		settle("text Docker: Failed to pull Docker image 'IMAGE' (exit N)");
 
 		my $results;
 		$log = with_docker([ [ 'pull bad', 2 ] ], sub {
@@ -2000,6 +1999,16 @@ subtest 'App::Actions::Cache' => sub {
 		is($again->remember(), 0, 'nothing to remember');
 		is($again->forget(), 0, 'or to forget');
 		ok(!-e $cache->file, 'and nothing is written');
+		my $kept = $cache_at->({ x => { pulls => 2, last_used => 1 } });
+		returns_ok($kept->touch('x', 'mine', undef, ''), { type => 'integer', min => 0 }, 'touch: a count');
+		is($kept->touch('x', 'mine'), 1, 'of the names the record holds');
+		my $touched = App::Actions::Cache->new(file => $kept->file)->entries;
+		is_deeply([ map { [ $_->{image}, $_->{pulls} ] } @{$touched} ], [ [ 'x', 2 ] ],
+			'which keep their count, and no other name is added');
+		cmp_ok(abs($touched->[0]{last_used} - time), '<=', $config{time_limit}, 'and saves their last use as now');
+		my $untouched = $cache_at->();
+		is($untouched->touch('mine'), 0, 'touching a name the record lacks is nothing');
+		ok(!-e $untouched->file, 'and writes nothing');
 		my $older = $cache_at->({ x => { pulls => 1 } });
 		is_deeply($older->entries, [ { image => 'x', pulls => 1, last_used => undef } ], 'an unknown last use is undef');
 		keeps_globals(sub { $cache_at->({ x => { pulls => 1 } })->save }, 'save', io => 1);
@@ -3057,7 +3066,10 @@ subtest 'App::Actions::Runner::Parallel' => sub {
 			like(ref $error && $error->message, qr/\AUnable to read '.+job-\d\.json': \S/, 'and names the file');
 		}
 		{
-			local $FAIL{open} = sub { $_[1] eq '>' && defined $_[2] && $_[2] =~ /job-\d+\.json\z/ };
+			# Only a's result is unwritable: the first job reaped without one is
+			# the one named, and when both failed that was whichever finished
+			# first.
+			local $FAIL{open} = sub { $_[1] eq '>' && defined $_[2] && $_[2] =~ /job-1\.json\z/ };
 			my $object = $parallel->();
 			my $error;
 			output_of(stdout => sub { $error = caught { $object->run([ $plan->('a'), $plan->('b') ]) } });
@@ -3377,6 +3389,20 @@ subtest 'App::Actions::Runner::Images' => sub {
 		$images->()->remember($other);
 		$images->(dry_run => 1)->note_pulled('x')->remember($other);
 		ok(!-e $other, 'nothing pulled, or a dry run, writes nothing');
+
+		my $using = $images->();
+		is_returned($using->used, { type => 'arrayref' }, [], 'nothing used yet');
+		is($using->note_used('b', undef, '', 'mine'), $using, 'note_used returns the object');
+		is_deeply($using->used, [ 'b', 'mine' ], 'used lists what was noted, sorted, nothing empty');
+		my $reused = App::Actions::Cache->new(file => File::Spec->catfile(tempdir(CLEANUP => 1), 'cache.json'));
+		$reused->remember('b');
+		$reused->load->{images}{b}{last_used} = 1;
+		$reused->save;
+		$using->remember($reused->file);
+		my $after = App::Actions::Cache->new(file => $reused->file)->entries;
+		is_deeply([ map { [ $_->{image}, $_->{pulls} ] } @{$after} ], [ [ 'b', 1 ] ],
+			'remember: a recorded image used again keeps its count, and an unrecorded one stays out');
+		cmp_ok(abs($after->[0]{last_used} - time), '<=', $config{time_limit}, 'but its last use is now');
 
 		my $blocked = write_file('file', '');
 		my $bad = File::Spec->catfile($blocked, 'cache.json');

@@ -1,6 +1,6 @@
 use v5.40;
 use blib;
-use Acme::Parataxis;
+use Acme::Parataxis qw[:all];
 $|++;
 
 # Set threshold to 100 opcodes (very low for demo)
@@ -18,7 +18,7 @@ Acme::Parataxis::run(
                     # busy loop
                     for ( 1 .. 50 ) {
                         my $x = $_ * 2;
-                        Acme::Parataxis->maybe_yield();
+                        maybe_yield();
                     }
                 }
                 say '  [A] finished';
@@ -31,7 +31,7 @@ Acme::Parataxis::run(
                     say '  [B] iteration ' . ++$count;
                     for ( 1 .. 50 ) {
                         my $x = $_ * 2;
-                        Acme::Parataxis->maybe_yield();
+                        maybe_yield();
                     }
                 }
                 say '  [B] finished';

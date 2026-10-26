@@ -43,7 +43,9 @@ Readonly::Scalar my $CONTINUATION => qr/\A\t  \S/;
 open my $fh, '<', $FILE or BAIL_OUT("Unable to read '$FILE': $!");
 my @lines = <$fh>;
 close $fh;
-chomp @lines;
+# A CRLF checkout (git with core.autocrlf, as on Windows) ends each line in
+# \r\n; chomp would leave the \r behind.
+s/\r?\n\z// for @lines;
 
 like($lines[0], $HEADER, 'Changes starts with its header');
 

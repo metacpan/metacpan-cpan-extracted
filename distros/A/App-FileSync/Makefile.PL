@@ -27,7 +27,7 @@ WriteMakefile(
 		'autodie'        => '2.37',
 		'Carp'           => 0,
 		'Compress::Raw::Zlib' => 0,
-		'Config::Abstraction' => 0,
+		'Config::Abstraction' => '0.41',	# explain_sources()
 		'Cwd'            => 0,
 		'Digest::SHA'    => 0,
 		'Exporter'       => 0,
@@ -44,7 +44,7 @@ WriteMakefile(
 		'IPC::System::Simple' => '1.30',
 		'JSON::PP'       => 0,
 		'List::Util'     => '1.54',
-		'Log::Abstraction' => 0,
+		'Log::Abstraction' => '0.36',	# structured fields
 		'Object::Configure' => 0,
 		'Params::Get'    => '0.17',
 		'Params::Validate::Strict' => '0.41',

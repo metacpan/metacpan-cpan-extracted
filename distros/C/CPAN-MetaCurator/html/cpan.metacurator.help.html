@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<head lang="en">
+    <title>Perl Wiki Edit Help</title>
+    <meta http-equiv = 'Content-Type'	content = 'text/html; charset=utf-8' />
+	<meta name = 'language'				content = 'en-au'>
+	<meta property = 'og:url'			content = 'http://savage.net.au/misc/html/cpan.metacurator.help.html'>
+	<meta property = 'og:type'			content = 'website'>
+	<meta property = 'og:title	'		content = 'CPAN::MetaCurator'>
+	<meta property = 'og:description'	content = 'Help for editing Perl.Wiki.html'>
+	<meta property = 'og:image'			content = '/assets/images/local/rons.logo.png'>
+	<link rel = 'stylesheet'			type = 'text/css' href = '/assets/css/local/default.css'>
+	<link rel = 'stylesheet'			type = 'text/css' href = '/assets/css/dist/themes/default/style.min.css'>
+</head>
+<body>
+	<h1>Help for CPAN::MetaPackager & CPAN::MetaCurator</h1>
+	<h2>Part 1: Ron's Environment:</h2>
+	<ul>
+		<li>My web host and I use case-sensitive file systems. I use Debian.</li>
+		<li>The distro CPAN::MetaPackager ships with data/cpan.metapackager.sqlite (15Mb),</li>
+		<li>which is the output of running scripts/build.db.sh.</li>
+		<li>You will need your own copy of MetaCPAN's 02packages.details.txt.gz to re-run scripts/build.db.sh.</li>
+		<li>02packages.details.txt.gz contains 9 header lines & about 270,458 records.</li>
+		<li>The distro CPAN::MetaCurator ships with data/cpan.metacurator.sqlite,</li>
+		<li>I am running SQLite V 3.46.1.</li>
+	</ul>
+	<h2>Part 2: CPAN::MetaPackager</h2>
+	<p>Note: To minimise the load on CPAN, be really sure you wish to update cpan.metapackager.sqlite.</p>
+	<p>Specific steps:</p>
+	<ul>
+		<li>Choose a download directory: cd ~/backup</li>
+		<li>Download it: wget https://www.cpan.org/modules/02packages.details.txt.gz</li>
+		<li>Unpack it: gunzip 02packages.details.txt.gz</li>
+		<li>Put it somewhere central: cp 02packages.details.txt /tmp</li>
+	</ul>
+	<p>Q & A:</p>
+	<ul>
+		<li>Q: Why did I download it into ~/backup before copying it to /tmp?</li>
+		<li>A: Because in ~/backup it will be preserved across a re-boot, whereas...</li>
+		<li>in /tmp it may not be. And yet CPAN::MetaPackager needs to be able to find...</li>
+		<li>the file on each user's machine. And for that a common directory name, /tmp, helps.</li>
+	</ul>
+	<h2>Part 3: Run CPAN::MetaPackager's build.db.sh.</h2>
+	<p>Specific steps:</p>
+	<ul>
+		<li>Choose a download directory: cd ~/Downloads</li>
+		<li>Download CPAN-MetaPackager from MetaCPAN @ https://metacpan.org/dist/CPAN-MetaPackager</li>
+		<li>Unpack it: tar xvf CPAN-MetaPackager-1.04.tgz (or whatever the latest version is)</li>
+		<li>Move into the directory: cd CPAN-MetaPackager-1.04</li>
+		<li>The next command will take 190 minutes for 262,145 records on my Levono M70Q 'Tiny' desktop</li>
+		<li>Rebuild the db: time scripts/build.db.sh</li>
+		<li>This script looks for /tmp/02packages.details.txt, as mentioned above</li>
+		<li>The output is data/cpan.metapackager.sqlite</li>
+		<li>Run: git commit -am"Recreate data/cpan.metapackager.sqlite"</li>
+		<li>git push</li>
+	</ul>
+	<h2>Part 4: Perl.Wiki.html</h2>
+	<p>Edit Perl.Wiki.html as desired, including updating para ChangeLog2.</p>
+	<p>Specific steps:</p>
+	<ul>
+		<li>Choose a download directory: cd ~/Downloads</li>
+		<li>Download CPAN-MetaCurator from MetaCPAN @ https://metacpan.org/dist/CPAN-MetaCurator</li>
+		<li>Unpack it: tar xvf CPAN-MetaCrator-1.33.tgz (or whatever the latest version is)</li>
+		<li>Move into the directory: cd CPAN-MetaCurator-1.33</li>
+		<li>Visit https://metacpan.org/recent</li>
+		<li>Save page as /tmp/2026-10-24.html (using the most recent date displayed)</li>
+		<li>Run: scripts/zap.log.sh; scripts/parse.metacpan.recent.pl  -in /tmp/2026-10-24.html -out /tmp/2026-10-24.csv</li>
+		<li>Run: scripts/zap.log.sh ; scripts/check.module.names.pl -names /tmp/2026-10-24.csv -log debug</li>
+		<li>Load Perl.Wiki.html into your web client: /home/ron/savage.net.au/misc/Perl.Wiki.html</li>
+		<li>Load into your editor the output files from the last 2 runs: log/development.log & /tmp/2026-10-24.csv</li>
+		<li>Now use the 'Not found:' list in the former to transfer their details from the latter into Perl.Wiki.html</li>
+		<li>Save Perl.Wiki.html by clicking on the red bullseye at the top right. This will save it in ~/Downloads</li>
+		<li>Export it as tiddlers.json thus:</li>
+		<li>In the 'Tools' tab click 'export all'</li>
+		<li>In the export menu click 'JSON format'. This exports to ~/Downloads/tiddlers.json</li>
+	</ul>
+	<h2>Part 5: Tasks for Ron</h2>
+	<p>Proof-read the patches to Perl.Wiki.html</p>
+	<ul>
+		<li>cd ~/savage.net.au</li>
+		<li>cp ~/Downloads/Perl.Wiki.html to misc/</li>
+		<li>git commit -am"Update Perl.Wiki V 1.57 (using the most recent version)"</li>
+		<li>cp misc/Perl.Wiki.html $DH/misc (/dev/shm/html/misc on my machine) for eye-ball check via FF</li>
+	</ul>
+	<h2>Part 6: CPAN::MetaCurator</h2>
+	<p>Run CPAN::MetaCurator's build.db.sh.</p>
+	<p>Specific steps:</p>
+	<ul>
+		<li>If you wish, tell build.db.sh to use ~/Downloads/tiddlers.json via the env var INCLUDE_PACKAGES:</li>
+		<li>If you have /tmp/cpan.metapackager.sqlite available use INCLUDE_PACKAGES=1</li>
+		<li>Type: INCLUDE_PACKAGES=1</li>
+		<li>Type: echo $INCLUDE_PACKAGES</li>
+		<li>Type: export INCLUDE_PACKAGES</li>
+
+		<li>mv ~/Downloads/tiddlers.json data/</li>
+		<li>Rebuild the db: scripts/build.db.sh</li>
+		<li>The output is data/cpan.metacurator.sqlite</li>
+		<li>Export the db as a JS Tree: scripts/export.tree.sh</li>
+		<li>The output is html/cpan.metacurator.tree.html</li>
+		<li>Run: git commit -am"Recreate data/cpan.metacurator.sqlite etc"</li>
+		<li>git push</li>
+	</ul>
+	<h2>Part 7: Tasks for Ron - Patching index.html etc</h2>
+	<p>Specific steps:</p>
+	<ul>
+		<li>Check if any other wikis need to be uploaded</li>
+		<li>In particular, check whether or not the version date is today's or 'Unreleased'</li>
+		<li>cd ~/perl.modules/Local-Website</li>
+		<li>Edit Local::Website's data/patches.csv to specify the entries in index.html to be updated</li>
+		<li>Typically this would include at least cpan.metacurator.tree.html & Perl.Wiki.html</li>
+		<li>Run: scripts/parse.index.sh (to patch ~/savage.net.au/index.html)</li>
+		<li>Edit index.html re any other additions, eg to add a News Flash</li>
+		<li>Run: bu5.sh savage.net.au (backup dir to flash drive)</li>
+		<li>Run: bu5.sh perl.modules (backup dir to flash drive)</li>
+	</ul>
+	<h2>Part 8: Tasks for Ron - Uploading distro, etc</h2>
+	<p>Specific steps:</p>
+	<ul>
+		<li>Upload CPAN::MetaPackager to PAUSE</li>
+		<li>Upload CPAN::MetaCurator to PAUSE</li>
+		<li>Upload Perl.Wiki.html, cpan.metacurator.tree.html, etc to savage.net.au/misc</li>
+		<li>Upload index.html</li>
+		<li>Log in to blogs.perl.org</li>
+		<li>Post details of the uploads</li>
+		<li>Wait ... Check how it appears on blogs.perl.org. Takes about 1 min</li>
+	</ul>
+</body>

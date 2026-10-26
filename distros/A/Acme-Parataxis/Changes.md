@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.1] - 2026-10-25
+
+Borrowing patterns from Rust, Erlang, Java, etc. to bring more familiar concurrency primitives to Parataxis. No real changes to the core this time.
+
+### Added
+
+- `Acme::Parataxis::Blocking`: CPU offloading onto a bounded pool of cloned interpreters via `spawn_blocking` (lazily loads threads/shared modules on first use).
+- `spawn_blocking_fork`: Process-based CPU offloading for non-ithreads Perls with IPC via `Storable`, bounded worker pools, and signal-based cancellation via `kill_blocking_fork`.
+- `Acme::Parataxis::Actor`: Mailbox-driven actors with bounded queues, backpressure, `ask` (returning a `Future`), `send`, and graceful teardown.
+- `Acme::Parataxis::Supervisor`: OTP-style supervision trees supporting `OneForOne`, `OneForAll`, and `RestForOne` restart strategies with configurable restart budgets.
+- Synchronization primitives:
+  - `Acme::Parataxis::Sync::Mutex`: Non-reentrant lock with strict FIFO hand-off and ownership tracking.
+  - `Acme::Parataxis::Sync::RwLock`: Writer-preferring, reentrant read/write lock.
+  - `Acme::Parataxis::Sync::WaitGroup`: Fiber job counter (`add`, `done`, `wait`).
+  - `Acme::Parataxis::Sync::Barrier`: Reusable phase rendezvous point.
+  - `Acme::Parataxis::Sync::Once`: Race-safe, single-execution initializer.
+- Structured concurrency & flow control:
+  - `nursery( sub ($n) { ... } )`: Structured fiber scopes where child errors cancel siblings and propagate outward.
+  - `pmap( { concurrency => $n, }, sub ( $item ) { ... }, @items )`: Parallel list mapping over a bounded fiber pool.
+  - `with_timeout( $ms, [ $token, ] $code )` and `with_cancel( $code )`: Cooperative deadline and cancellation scopes.
+  - `Acme::Parataxis::CancellationToken`: Cooperative park-interrupt token.
+  - `Acme::Parataxis::Local`: Fiber-local ambient storage.
+  - `Acme::Parataxis::Generator`: Stackful, lazy pull iterator.
+  - `Acme::Parataxis::Monitor`: Non-owning fiber observer.
+- Channels & Streams:
+  - `Acme::Parataxis::Channel::select`: CSP-style waiting across multiple channels with random case selection to prevent starvation.
+  - `try_get` / `try_put` non-blocking channel operations and per-channel timeout configurations.
+  - `Acme::Parataxis::Stream`: Backpressure-driven channel pipelines (`map`, `filter`, `batch`, `batch_time`, `throttle`).
+  - `Acme::Parataxis::Ticker`: Drift-free interval timer.
+  - `Acme::Parataxis::RateLimiter`: Token bucket limiter driven by `Ticker`.
+- Software Transactional Memory (STM): `Acme::Parataxis::TVar` cells and `atomically` transactions with conflict detection and `retry()`.
+- Future combinators: `wait_all` and `wait_any`.
+- Event loop & OS integration:
+  - Event loop drivers: `Acme::Parataxis::Driver::Mojo` and `Acme::Parataxis::Driver::IOAsync`.
+  - Transparent unblocking (`Acme::Parataxis::Compat`): Opt-in cooperative `CORE::GLOBAL` overrides for `sleep`, `read`, and `sysread`.
+  - Deterministic virtual clock via `run( virtual => 1 )` and `advance( $ms )`.
+  - Graceful shutdown handlers via `run( on_shutdown => ... )` for `SIGINT`/`SIGTERM`.
+  - `fd_setsize()` introspection helper.
+- Diagnostics & Introspection:
+  - `dump_fibers()` and backtrace-rich deadlock diagnostics.
+  - New exceptions: `Acme::Parataxis::Error`, `Error::Cancelled`, and `Error::Timeout`.
+  - Verified Perl `defer` compatibility within fiber scopes.
+
+### Fixed
+
+- Event loop drivers now key watches by handle identity rather than recycled file descriptor numbers, eliminating lost wakeups and orphaned slots.
+- Fixed non-numeric string values being silently accepted in `Supervisor->new( within => ... )`.
+- Fiber jump environments (`PL_top_env`) are now preserved across context switches, preventing crashes (`0xC0000005`) when completion callbacks throw.
+- Blessed exceptions stringifying to empty strings (e.g. `Error::Timeout`) are no longer misidentified as clean exits.
+- Fixed bare `Died at ...` rethrows in `run()` and `Channel->get` when evaluated blocks or messages return falsey values (`0`, `''`).
+- Deadlock detection now resets scheduler run queues and state so subsequent runs remain usable.
+- Awaited fiber crashes are now caught and rethrown by `await` rather than killing the entire scheduler loop.
+- `await_sleep` now uses native condition variable timed waits (`pthread_cond_timedwait`, `SleepConditionVariableCS`) instead of 4ms polling.
+- Context switches now strictly maintain canonical `AvREIFY_only` state on argument pads, fixing `Perl_pp_entersub` assertions on `DEBUGGING` builds.
+- Fiber-parking primitives now clean up `@_` landing pads before parking to avoid cross-fiber pad pollution.
+- `submit_c_job` now broadcasts condition variables to prevent queued jobs from stalling behind unrelated worker sleeps.
+- Enforced platform `FD_SETSIZE` bounds checks on worker pool read/write jobs and event-loop watches to prevent stack buffer overflows.
+- Prevented uninitialized memory bugs in BSD `get_cpu_count` sysctl lookups.
+- `exit()` from inside yielded fibers is now safely trapped and re-raised across all platforms.
+- Fixed pad argument and buffer truncation when multiple fibers park inside the same shared subroutine.
+- Resolved `Can't undef active subroutine` when disabling `Acme::Parataxis::Compat` by correctly cleaning up fabricated `CvDEPTH` frames.
+- Corrected C function signature for `para_release_cv_depth` under Affix on Windows.
+- Fixed `Can't undef active subroutine during global destruction` when multiple fibers park concurrently in the same CV (Pass 1c depth settlement).
+- Traversed nested runlevels (`si_prev`/`si_next`) during depth settlement to prevent `cx_popsub_args` assertion failures inside test subtest blocks.
+
+### Changed
+
+- Maximum fiber limits are now dynamic: configurable via `max_fibers()` and `set_max_fibers()`.
+- Increased default fiber limit from 1,024 to 65,536.
+
 ## [v0.1.0] - 2026-09-21
 
 This started as a silly little diversion in February but I'm using this in actual projects now. I've even used it to shake out bugs in Affix.
@@ -131,7 +201,8 @@ Another dist targetting a specific CPAN smoker. I cannot replicate the failure i
 ### Changes
   - It exists! It shouldn't but it does.
 
-[Unreleased]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.1...HEAD
+[v0.1.1]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.1.0...v0.1.1
 [v0.1.0]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.0.10...v0.1.0
 [v0.0.10]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.0.9...v0.0.10
 [v0.0.9]: https://github.com/sanko/Acme-Parataxis.pm/compare/v0.0.8...v0.0.9

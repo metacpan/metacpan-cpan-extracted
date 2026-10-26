@@ -4,6 +4,10 @@ use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 
+# These tests drive the real build path. A DZIL_DOCKER_API_SKIP=1 left in
+# the shell (it is set when building dists with an image) must not turn it off.
+BEGIN { delete $ENV{DZIL_DOCKER_API_SKIP} }
+
 BEGIN {
     plan skip_all => "Dist::Zilla::Tester not installed"
         unless eval { require Dist::Zilla::Tester; require Dist::Zilla::Chrome::Term; 1 };

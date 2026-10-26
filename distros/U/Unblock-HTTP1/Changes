@@ -1,5 +1,20 @@
 Revision history for Unblock-HTTP1
 
+0.13  2026-10-25
+    - Add Server->drain() for framework-neutral graceful HTTP/1 service
+      shutdown: complete an admitted request, reject pipelined successors,
+      and preserve queued output/backpressure until transport completion.
+    - Add a canonical simple-response native serializer fast path without
+      changing the Uniform::HTTP object contract or public input ABI.
+      Preserve general serialization for complex framing and subclasses.
+    - Transfer accepted wire output into the engine queue without retaining
+      duplicate serialized response buffers on completed Transactions.
+    - Avoid redundant completion and freeze work for validated bodyless
+      Requests; keep body-bearing/streamed lifecycle semantics unchanged.
+    - Add targeted regressions for drain, native response parity,
+      output ownership, and bodyless request completion. Retain
+      event-loop independence and public native input ABI version 1.
+
 0.12  2026-10-21
     - Add coordinated buffered/streamed receive selection while retaining
       the canonical Uniform::HTTP message and native engine Transaction.

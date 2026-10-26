@@ -5,7 +5,7 @@ use Dist::Zilla::App -command;
 use Dist::Zilla::Plugin::LicenseFile;
 use Path::Tiny;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 sub abstract { 'write the LICENSE file into the repository' }
@@ -47,7 +47,7 @@ Dist::Zilla::App::Command::genlicense - write the LICENSE file into the reposito
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ L<Dist::Zilla::Plugin::LicenseFile> — the build-time check this command satisf
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-licensefile/issues>.
 
 =head1 CONTRIBUTING

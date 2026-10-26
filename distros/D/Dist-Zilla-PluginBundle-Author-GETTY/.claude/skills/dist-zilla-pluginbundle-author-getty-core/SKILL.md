@@ -70,6 +70,13 @@ one that must force GitHub plugins on without a detected remote sets
 `.git/config` in a tempdir (`t/github_autodetect.t`, `t/gitea_autodetect.t`) —
 detection is filesystem I/O, so it is testable without a real remote.
 
+**Both attributes read `.git/config` relative to the *current* working
+directory, and both are `lazy` — they compute once and cache.** A test that
+fabricates the config in a tempdir and `chdir`s away before touching
+`_has_github_remote` or `_remote_host` therefore measures the wrong directory:
+the attribute remembers whatever the cwd was at the moment it was first read.
+Force the attributes while you are still inside the fabricated tempdir.
+
 ## Subsections read defaults through a package global
 
 `[@Author::GETTY::Docker / name]` subsections

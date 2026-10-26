@@ -1,4 +1,11 @@
 Revision history for Time-Keeper-Recurrence
 
+0.03    2026-10-26
+        - t/41-ical.t runs on perls before 5.14 (no s///r)
+
+0.02    2026-10-20
+        - describe: a rule in English words
+        - between dies at its cap before making any value (OOM on smokers)
+
 0.01    2026-10-19
         - First release

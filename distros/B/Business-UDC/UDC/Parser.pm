@@ -13,7 +13,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(parse);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 sub parse {
 	my $input = shift;
@@ -35,7 +35,7 @@ sub parse {
 		_check_apos_aux_tokens(\%parse_tok);
 		_check_aux_time_tokens(\%parse_tok);
 		_check_number_token(\%parse_tok);
-		_check_aux_group_token(\%parse_tok);
+		_check_aux_group_token(\%parse_tok, 0, $has_alpha_spec);
 		_normalize_alpha_spec_token(\%parse_tok);
 		push @{$normalized_tokens_ar}, \%parse_tok;
 	}
@@ -63,7 +63,7 @@ sub _check_parentheses {
 	my ($tokens_ar, $input_length) = @_;
 
 	my (@left, $previous, $has_operator_after_left, $operator_position,
-		$has_alpha_after_left, $has_time_after_alpha, $time_position);
+		$has_alpha_after_left, $has_time_after_left, $time_position);
 	foreach my $tok (@{$tokens_ar}) {
 		if ($tok->{'type'} eq 'LPAREN') {
 			push @left, $tok;
@@ -71,7 +71,7 @@ sub _check_parentheses {
 			$has_operator_after_left = 0;
 			$operator_position = undef;
 			$has_alpha_after_left = 0;
-			$has_time_after_alpha = 0;
+			$has_time_after_left = 0;
 			$time_position = undef;
 			next;
 		}
@@ -103,16 +103,16 @@ sub _check_parentheses {
 				if ! defined $operator_position;
 		}
 		$has_alpha_after_left = 1 if @left && $tok->{'type'} eq 'ALPHA_SPEC';
-		$has_time_after_alpha = 1
-			if @left && $has_alpha_after_left && $tok->{'type'} eq 'AUX_TIME';
+		$has_time_after_left = 1
+			if @left && $tok->{'type'} eq 'AUX_TIME';
 		$time_position = $tok->{'pos'}
-			if $has_time_after_alpha && ! defined $time_position;
+			if $has_time_after_left && ! defined $time_position;
 		$previous = $tok;
 	}
 
 	if (@left) {
 		my $left = $left[-1];
-		my $missing_closing = $has_operator_after_left || $has_time_after_alpha;
+		my $missing_closing = $has_operator_after_left || $has_time_after_left;
 		my $extra_opening = @left > 1
 			|| ! $missing_closing
 			&& $previous && $previous->{'type'} eq 'AUX_GROUP';
@@ -162,7 +162,7 @@ sub _has_alpha_spec {
 }
 
 sub _check_aux_group_token {
-	my ($tok, $position_offset) = @_;
+	my ($tok, $position_offset, $has_alpha_spec) = @_;
 
 	$position_offset //= 0;
 
@@ -172,7 +172,7 @@ sub _check_aux_group_token {
 
 	my $inner_tokens = $tok->{'tokens'};
 	my $inner_position_offset = 0;
-	my $has_alpha_spec = _has_alpha_spec($inner_tokens);
+	$has_alpha_spec ||= _has_alpha_spec($inner_tokens);
 
 	foreach my $inner_tok (@{$inner_tokens}) {
 		if ($inner_tok->{'type'} eq 'WHITESPACE') {
@@ -180,7 +180,7 @@ sub _check_aux_group_token {
 			next;
 		}
 		if ($inner_tok->{'type'} eq 'AUX_GROUP') {
-			_check_aux_group_token($inner_tok, $inner_position_offset);
+			_check_aux_group_token($inner_tok, $inner_position_offset, $has_alpha_spec);
 			next;
 		}
 
@@ -243,7 +243,7 @@ sub _check_number_token {
 
 	$position_offset //= 0;
 
-	if ($tok->{'type'} ne 'NUMBER') {
+	if ($tok->{'type'} ne 'NUMBER' && $tok->{'type'} ne 'FORM') {
 		return;
 	}
 	if ($tok->{'value'} !~ /,/) {
@@ -304,6 +304,13 @@ sub _parse_expression {
 	my $left = _parse_term($state_hr);
 	while (my $tok = _peek($state_hr)) {
 		if (! is_operator_token($tok->{'type'})) {
+			if ($tok->{'type'} eq 'NUMBER') {
+				if (_time_ended_notation($left)) {
+					err 'Missing operator.',
+					'position' => $tok->{'pos'},
+				;
+				}
+			}
 			last;
 		}
 		if (! is_valid_operator($tok->{'value'})) {
@@ -328,12 +335,22 @@ sub _parse_expression {
 				;
 			}
 
-			$left = {
+			my $range = {
 				type => 'APOS_RANGE',
 				base => $base,
 				from => $from->{'value'},
 				to => $right->{'value'},
 			};
+			if (my $modifier = _peek($state_hr)) {
+				if ($modifier->{'type'} eq 'FORM') {
+					_consume($state_hr);
+					$range->{'modifiers'} = [{
+						type => $modifier->{'type'},
+						value => $modifier->{'value'},
+					}];
+				}
+			}
+			$left = $range;
 
 			next;
 		}
@@ -381,6 +398,19 @@ sub _parse_expression {
 	}
 
 	return $left;
+}
+
+sub _time_ended_notation {
+	my $node = shift;
+
+	while ($node && $node->{'type'} eq 'BINARY_OP') {
+		$node = $node->{'right'};
+	}
+	return if ! $node || $node->{'type'} ne 'TERM';
+	return if ! $node->{'modifiers'} || ! @{$node->{'modifiers'}}
+		|| $node->{'modifiers'}[-1]{'type'} ne 'AUX_TIME';
+
+	return 1;
 }
 
 sub _parse_primary {

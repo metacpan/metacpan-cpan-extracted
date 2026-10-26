@@ -73,6 +73,7 @@ t/fixtures/preflight.json
 t/function.t
 t/hooks.t
 t/i18n.t
+t/integration.t
 t/lib/App/Actions/FakeDocker.pm
 t/lib/self_test.yml
 t/lib/self_test_cli.yml

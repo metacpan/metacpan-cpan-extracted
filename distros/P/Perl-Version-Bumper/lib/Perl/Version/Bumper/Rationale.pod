@@ -1,0 +1,250 @@
+=encoding utf8
+
+=pod
+
+=head1 NAME
+
+Perl::Version::Bumper::Rationale - or: How I Learned to Stop Worrying and Love the Bump
+
+=head1 TL;DR:
+
+Forget about C<use strict; use warnings;>, just C<use VERSION;>!
+
+=head1 C<use VERSION>
+
+C<L<use VERSION|perlfunc/use>> lexically enables all features available
+in the requested version as defined by the L<feature> pragma, disabling
+any features not in the requested version's feature bundle.
+
+Feature bundles:
+
+=over 4
+
+=item *
+
+enable new, stable features;
+
+=item *
+
+disable old, deprecated features;
+
+=item *
+
+have a lexical effect.
+
+(Meaning that a C<use VERSION> at the top of the file will apply to the
+I<entire> file)
+
+=back
+
+=head2 Line 0 vs. Line 1
+
+Perl has an I<extreme> focus on backwards compatibility. A
+sensibly-written Perl script produced in the year 2001 should work just
+fine on a Perl published in 2026.
+
+When reading a file, starting from line 0, B<perl> starts in
+"compatibility-mode" (this is the C<:default> feature bundle). This is
+roughly equivalent to Perl as it was in version 5.008.
+
+Contrary to many other programming languages, Perl requires the
+developer to opt in to the new features of the languague.
+
+You can do this on line 1, simply by writing (for example):
+
+    use v5.36;
+
+Which is equivalent to:
+
+    require v5.36;
+    use strict;
+    use warnings;
+    use feature 'say';
+    use feature 'state';
+    use feature 'current_sub';
+    use feature 'fc';
+    use feature 'lexical_subs';
+    use feature 'signatures';
+    use feature 'isa';
+    use feature 'bareword_filehandles';
+    use feature 'bitwise';
+    use feature 'evalbytes';
+    use feature 'postderef_qq';
+    use feature 'unicode_eval';
+    use feature 'unicode_strings';
+    no feature 'indirect';
+    no feature 'multidimensional';
+
+As time passes, and more features are added to the language, picking a
+more recent version gets you a better Perl.
+
+=head2 Unfeatures
+
+The C<:default> feature bundle only enables backwards-compatibility
+features. These are ancient Perl features that were eventually deemed
+undesirable, and that can be disabled (via the C<no feature> pragma).
+These are also called "unfeatures".
+
+They started to appear in Perl v5.32 (C<indirect>), and started being
+disabled in the v5.36 feature bundle. As time went on, more unfeatures
+were added (or removed, depending on how you look at it).
+
+As soon as a new unfeature is created, the C<:default> bundle implicitly
+includes it.
+
+=head1 Three Steps Summary
+
+=over 4
+
+=item 1.
+
+Pick a version of the Perl language that is the most suited for
+your use case.
+
+=item 2.
+
+Add the appropriate C<use VERSION> line at the I<top> of all of your
+Perl programs and modules.
+
+(Starting with version 1.154 (October 2024), L<Perl::Critic> won't count
+this as a violation of
+L<Perl::Critic::Policy::Modules::RequireExplicitPackage>.)
+
+=item 3.
+
+Profit!
+
+=back
+
+=head1 Picking a Perl version
+
+There are different use cases, which can lead to choosing a different
+feature bundle for your project.
+
+=head2 Personal code
+
+For personal code, you can basically pick whatever version the operating
+system you plan to run your code on provides. Or whichever version
+supports your pet feature.
+
+=head2 Company code
+
+Private or company code is only limited by the version of Perl used
+internally. It might be the stock C<perl> from the operating system
+selected by the organization. It might be a C<perl> compiled
+specifically for that purpose.
+
+Given how easy it is to compile your own Perl, internal company or
+personal code can actually run on the bleeding edge!
+
+=head2 Open source Perl application
+
+Know your target. Pick a version of Perl that is packaged by
+default with the currently supported releases of the operating
+system you target.
+
+Given that the last two versions of Perl are officially maintained, you
+can expect the current version of you operating system to ship with a
+fairly recent version of Perl (that is, either the latest stable
+release, or the one before that).
+
+For Windows, that's basically the latest version of Strawberry Perl
+(L<https://strawberryperl.com/>).
+
+=head2 CPAN modules
+
+Again, know your target. As explained above, any recent operating system
+will be at most two versions behind.
+
+At the Perl Toolchain Summit 2023 in Lyon, the toolchain authors agreed
+that: "No new release of a distribution in the Perl toolchain will
+specify a minimum perl prerequisite version (whether configure, build,
+runtime, or test) that has been available for less than ten years."
+
+Most CPAN modules do not need to be more extreme than toolchain ones.
+
+There are valid exceptions, though: L<Perl::Version::Bumper>, for
+example, is written in the v5.10 dialect of Perl, for maximal utility.
+The point is to help developers make the jump from really ancient
+versions of Perl to more modern ones.
+
+=head1 REFERENCES
+
+=over 4
+
+=item *
+
+L<https://perladvent.org/2024/2024-12-22.html>
+
+My first attempt at writing this down was published in the L<Perl Advent
+Calendar 2024|https://perladvent.org/2024/> entry for December 22, 2024.
+
+This was far longer than the average for Advent Calendar entries,
+however some deemed it an L<"excellent
+read"|https://www.reddit.com/r/perl/comments/1hjp60t/perl_advent_calendar_2024_day_22_a_yearly/>.
+Thanks!
+
+=item *
+
+L<https://blogs.perl.org/users/psc/2022/05/what-happened-to-perl-7.html>
+
+I<What happened to Perl 7?> is the 2021-2022 Perl Steering Council blog
+post that recommends C<use v5.36> as a good baseline for Perl code, and
+also introduced the notion of "line 0".
+
+=item *
+
+L<https://sheet.shiar.nl/perl>
+
+This I<Perl release summary> page records the most significant features
+introduced for each version of Perl since v5.6.
+
+=item *
+
+L<Syntax::Construct>
+
+This module provides a simple way of specifying syntactic constructs
+that are not implemented via the feature pragma, but are still not
+compatible with older versions of Perl.
+
+More relevant here, its list of L<recognized
+constructs|https://metacpan.org/pod/Syntax::Construct#RECOGNISED-CONSTRUCTS>
+is a good complement to the I<Perl release summary> linked above.
+
+=item *
+
+L<perlexperiment>
+
+This document lists the current and past experimental features in the
+perl core. This succinct listing gives an overview and basic facts about
+their status.
+
+=item *
+
+L<perlhist>
+
+This document lists all Perl versions ever released.
+
+=item *
+
+L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lyon-amendment.md>
+
+The Lyon amendment to the Lancaster concensus, which records the 10
+years limit decision.
+
+=back
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2024-2026 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

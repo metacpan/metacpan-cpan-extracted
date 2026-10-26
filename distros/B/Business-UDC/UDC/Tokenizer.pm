@@ -10,7 +10,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Array our @EXPORT_OK => qw(tokenize);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 sub tokenize {
 	my ($input, $position_offset) = @_;
@@ -46,6 +46,13 @@ sub tokenize {
 			next;
 		}
 
+		if (substr($input, $start, 2) eq './') {
+			err "Extra dot '.'.",
+				'position' => $position_offset + $start,
+				'character' => '.',
+			;
+		}
+
 		if ($input =~ /\G(\.)(?=\s)/gc) {
 			_push_token(\@tokens, 'AUX_DOT', $1, $start, 1);
 			next;
@@ -71,12 +78,22 @@ sub tokenize {
 			next;
 		}
 
+		if (substr($input, $start, 2) eq '--'
+			|| substr($input, $start, 1) eq '-'
+			&& $start + 1 >= length($input)) {
+			err "Extra dash '-'.",
+				'position' => $position_offset + $start
+					+ (substr($input, $start, 2) eq '--' ? 1 : 0),
+				'character' => '-',
+			;
+		}
+
 		if ($input =~ /\G(-)(?=\s)/gc) {
 			_push_token(\@tokens, 'FORM', $1, $start, 1);
 			next;
 		}
 
-		if ($input =~ /\G(-\d+(?:\.\d+)*)/gc) {
+		if ($input =~ /\G(-\d+(?:[\.,]\d+)*)/gc) {
 			_push_token(\@tokens, 'FORM', $1, $start);
 			next;
 		}
@@ -109,8 +126,16 @@ sub tokenize {
 			&& index($input, '"', $start + 1) < 0
 			&& index($input, "''", $start + 1) < 0
 			&& index($input, $right_double_quote, $start + 1) < 0) {
+			my $invalid_year_position = _invalid_time_year_position($input, $start);
+			if (defined $invalid_year_position) {
+				err 'Invalid year in time auxiliary.',
+					'position' => $position_offset + $invalid_year_position,
+					'character' => substr($input, $invalid_year_position, 1),
+				;
+			}
+
 			err "Missing closing quotation mark '\"'.",
-				'position' => $position_offset + $start,
+				'position' => $position_offset + _missing_quote_position($input, $start),
 				'character' => '"',
 			;
 		}
@@ -152,6 +177,14 @@ sub tokenize {
 			next;
 		}
 
+		my $nonbreaking_hyphen = decode_utf8('‑');
+		if (substr($input, $start, 1) eq $nonbreaking_hyphen) {
+			err 'Bad hyphen character.',
+				'position' => $position_offset + $start,
+				'character' => $nonbreaking_hyphen,
+			;
+		}
+
 		my $bad = substr($input, $start, 20);
 		err "Unrecognized input near '$bad'.",
 			'position' => $position_offset + $start,
@@ -159,6 +192,34 @@ sub tokenize {
 	}
 
 	return _merge_bracketed_alpha_specs(\@tokens);
+}
+
+sub _invalid_time_year_position {
+	my ($input, $start) = @_;
+
+	my $value = substr($input, $start + 1);
+	if ($value =~ /^\d{4}\/(\d{1,3})(?=\D|$)/) {
+		return $start + 1 + 5;
+	}
+
+	return;
+}
+
+sub _missing_quote_position {
+	my ($input, $start) = @_;
+
+	my $value = substr($input, $start + 1);
+	my ($time) = $value =~ /^(\d{4}(?:\.\d+)*)/;
+	$time //= '';
+	my $rest = substr($value, length($time));
+	if (substr($rest, 0, 1) eq '/') {
+		my ($end_year) = $rest =~ m{^/(\d+)};
+		if (defined $end_year) {
+			$time .= '/' . $end_year;
+		}
+	}
+
+	return $start + 1 + length($time);
 }
 
 sub _find_parenthesis_end {

@@ -13,9 +13,11 @@ lib/Mojolicious/Plugin/Branding.pod
 t/00-load.t
 t/10-global.t
 t/11-individual.t
+t/12-individual-static.t
 t/20-global-dirs.t
 t/30-untrusted-brand.t
 t/40-bad-config.t
+t/50-app-objects.t
 t/author-pod-syntax.t
 t/author-pod-version.t
 t/lib/BrandingTest.pm

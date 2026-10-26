@@ -11,7 +11,7 @@ use Unblock::HTTP::_EngineFactory;
 use Unblock::HTTP::_ClientOperation;
 use Unblock::HTTP::_AltSvc;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my ($class, @args) = @_;
@@ -132,6 +132,11 @@ sub shutdown {
     $self->{shutdown} = 1;
     $self->{alt_svc}->clear;
     for my $pool (values %{ $self->{pools} }) {
+        # A recovered H3 stream may have taken its request away from a
+        # speculative factory. Cancel the outstanding connector even if
+        # no request is left in the pending queue.
+        $self->_abandon_connect($pool, $pool->{attempt}{op})
+            if $pool->{attempt};
         local $pool->{callback_depth} =
             ($pool->{callback_depth} || 0) + 1;
         for my $op (@{ [ @{ $pool->{pending} } ] }) {
@@ -335,7 +340,7 @@ sub request {
 
     my %callbacks;
     for my $name (qw(
-        on_response on_data on_end on_error on_finish on_informational on_drain
+        on_response on_data on_end on_error on_finish on_informational on_drain on_transaction on_handoff
     )) {
         next unless exists $field{$name};
         my $cb = delete $field{$name};
@@ -353,6 +358,13 @@ sub request {
     my $stream_body = delete($field{stream_body}) ? 1 : 0;
     croak 'request(): on_drain requires stream_body'
         if $callbacks{on_drain} && !$stream_body;
+    croak 'request(): on_handoff requires explicit http_version'
+        if $callbacks{on_handoff} && !$strict_version;
+    croak 'request(): multiplexed on_handoff requires CONNECT'
+        if $callbacks{on_handoff} && $version ne 'http/1.1'
+            && (($field{method} || 'GET') ne 'CONNECT');
+    croak 'request(): on_handoff cannot be combined with WebSocket'
+        if $callbacks{on_handoff} && $ws_spec;
     croak 'request(): pending queue is full'
         if $self->{pending_count} >= $self->{limit}{max_pending_requests};
     croak 'request(): do not pass scheme, authority or target with url'
@@ -389,7 +401,7 @@ sub request {
     my $op = Unblock::HTTP::_ClientOperation->new(
         $self, $request, \%callbacks, $version, $origin,
     );
-    $op->{stream_body} = $ws_spec
+    $op->{stream_body} = ($ws_spec || $callbacks{on_handoff})
         && ($version eq 'h2' || $version eq 'h3') ? 1 : $stream_body;
     $op->{websocket_connect} = $ws_spec if $ws_spec;
     if (!$strict_version && $scheme eq 'https'
@@ -470,7 +482,8 @@ sub _usable {
     return 0 unless _compatible($version, $conn->{protocol});
     return 0 if $conn->{released} || _closed($conn) || _retired($conn)
         || $conn->{credit_blocked};
-    if ($op && $op->{websocket_connect}) {
+    if ($op && ($op->{websocket_connect}
+            || ($op->{callbacks}{on_handoff} && $version ne 'http/1.1'))) {
         return 0 if $version eq 'h2'
             && (!$conn->{h2_settings_seen}
                 || $conn->{engine}->peer_setting('enable_connect_protocol') != 1);
@@ -617,7 +630,8 @@ sub _pump {
         # Wait on an existing protocol connection without opening more
         # sockets. If its peer explicitly disables Extended CONNECT,
         # reject this unsent operation rather than downgrading/replaying.
-        if ($op->{websocket_connect}
+        if (($op->{websocket_connect}
+                || $op->{callbacks}{on_handoff})
             && ($op->{version} eq 'h2' || $op->{version} eq 'h3')) {
             my $version = $op->{version};
             my @existing = grep {
@@ -643,7 +657,9 @@ sub _pump {
                 $self->_fail_pending(
                     $pool, $op, 'peer has not enabled HTTP/'
                         . ($version eq 'h2' ? '2' : '3')
-                        . ' WebSocket Extended CONNECT',
+                        . ($op->{websocket_connect}
+                            ? ' WebSocket Extended CONNECT'
+                            : ' generic Extended CONNECT'),
                 );
                 next;
             }
@@ -651,6 +667,11 @@ sub _pump {
         my ($conn) = grep { $self->_usable($_, $op->{version}, $op) }
             @{ $pool->{connections} };
         if ($conn) {
+            # Existing stream credit can recover while another connector
+            # is still negotiating for this same queued request. Release
+            # the now-unneeded factory before dispatching the request.
+            $self->_abandon_connect($pool, $op)
+                if $pool->{attempt} && $pool->{attempt}{op} == $op;
             shift @{ $pool->{pending} };
             $self->{pending_count}--;
             last unless $self->_dispatch($pool, $conn, $op);
@@ -839,12 +860,20 @@ sub _connected {
             $weak_conn->{credit_blocked} = 0;
             $weak_self->_schedule($weak_pool);
         };
-        if ($self->{policy}->websocket_enabled('h3')) {
-            # This hook fires after the CURRENT H3 peer SETTINGS frame,
-            # including when it contains no extension settings. Never
-            # submit CONNECT inline from the native receive callback.
+        {
+            # All H3 Clients can submit protocol-neutral CONNECT requests.
+            # Notify queued operations after peer SETTINGS arrives, even
+            # without WebSocket policy. Do not enter the native callback.
             $options->{on_extension_settings} = sub {
                 return unless $weak_self && $weak_pool && $weak_conn;
+                # SETTINGS matters to CONNECT admission only. Do not
+                # spuriously pump ordinary H3 operations or launch an
+                # additional speculative connection during stream-credit
+                # recovery.
+                return unless grep {
+                    $_->{websocket_connect}
+                        || $_->{callbacks}{on_handoff}
+                } @{ $weak_pool->{pending} };
                 $weak_self->_schedule($weak_pool);
             };
         }
@@ -1055,6 +1084,93 @@ sub _dispatch {
             $ws->input($tail) if length $tail;
         };
     }
+    if ($callbacks->{on_handoff} && !$ws_spec
+        && ($conn->{protocol} eq 'h2' || $conn->{protocol} eq 'h3')) {
+        $engine_callback{on_response} = sub {
+            my ($tx, $response) = @_;
+            if ($response->status < 200 || $response->status >= 300) {
+                $callbacks->{on_response}->($tx, $response)
+                    if $callbacks->{on_response};
+                # This request has an open producer for successful
+                # full-duplex CONNECT. When the peer rejects it, send
+                # request FIN on a later turn so the HTTP response can
+                # complete normally. Never write from a receive callback.
+                my $active_self = $weak_self or return;
+                $active_self->{factory}{defer}->(sub {
+                    $tx->end unless $tx->is_terminal;
+                });
+                return;
+            }
+            my $active_op = $weak_op or return;
+            my $active_self = $weak_self or return;
+            require Unblock::HTTP::_WebSocketH2Body;
+            my $bridge = Unblock::HTTP::_WebSocketH2Body->new(
+                transaction => $tx, defer => $active_self->{factory}{defer},
+            );
+            my $consumer = $callbacks->{on_handoff}->(
+                $tx, $response, $bridge,
+            );
+            croak 'on_handoff must return a stream consumer'
+                unless blessed($consumer);
+            for my $method (qw(input input_eof transport_error resume_output)) {
+                croak "on_handoff stream consumer must implement $method()"
+                    unless $consumer->can($method);
+            }
+            $bridge->consumer($consumer);
+            $active_op->{handoff_consumer} = $consumer;
+            $active_op->{handoff_bridge} = $bridge;
+        };
+        $engine_callback{on_data} = sub {
+            my $active_op = $weak_op or return;
+            my $consumer = $active_op->{handoff_consumer} or return;
+            $consumer->input($_[1]);
+        };
+        $engine_callback{on_drain} = sub {
+            my $active_op = $weak_op or return;
+            my $bridge = $active_op->{handoff_bridge} or return;
+            $bridge->resume;
+        };
+        $engine_callback{on_complete} = sub {
+            my $active_op = $weak_op or return;
+            my $consumer = $active_op->{handoff_consumer};
+            $consumer->input_eof if $consumer;
+            $callbacks->{on_end}->($_[0]) if $callbacks->{on_end};
+        };
+    }
+    if ($callbacks->{on_handoff} && !$ws_spec
+        && $conn->{protocol} eq 'http/1.1') {
+        # A generic H1 101/CONNECT transfer retires the entire socket from
+        # the HTTP pool. The successor inherits the transport and remainder.
+        $engine_callback{on_switch} = sub {
+            my ($tx, $response) = @_;
+            my $active_self = $weak_self or return;
+            my $active_pool = $weak_pool or return;
+            my $active_conn = $weak_conn or return;
+            my $active_op = $weak_op or return;
+            local $active_pool->{callback_depth} =
+                ($active_pool->{callback_depth} || 0) + 1;
+            my $host = $active_conn->{host};
+            croak 'request(): on_handoff requires unblock_upgrade()'
+                unless $host->can('unblock_upgrade');
+            my $successor = $callbacks->{on_handoff}->($tx, $response, $host);
+            croak 'request(): on_handoff must return a successor consumer'
+                unless blessed($successor);
+            for my $method (qw(input input_eof transport_error resume_output)) {
+                croak "request(): on_handoff successor must implement $method()"
+                    unless $successor->can($method);
+            }
+            $host->unblock_upgrade($successor);
+            $active_op->{upgrade_retirement} = [$active_pool, $active_conn];
+            $active_conn->{released} = 1;
+            $active_self->_cancel_idle($active_conn)
+                if $active_conn->{idle_cancel};
+            $active_pool->{connections} = [
+                grep { $_ != $active_conn } @{ $active_pool->{connections} }
+            ];
+            my $tail = $active_conn->{engine}->take_remainder;
+            $successor->input($tail) if length $tail;
+        };
+    }
     $engine_callback{on_finish} = sub {
         my ($tx) = @_;
         my $active_op = $weak_op or return;
@@ -1071,16 +1187,22 @@ sub _dispatch {
         if (my $bridge = delete $active_op->{websocket_bridge}) {
             $bridge->detach;
         }
-        $active_op->{state} = ($active_op->{timeout_error}
+        if (my $bridge = delete $active_op->{handoff_bridge}) {
+            my $consumer = delete $active_op->{handoff_consumer};
+            $consumer->transport_error($tx->error || 'CONNECT stream ended')
+                if $consumer && !$tx->is_complete;
+            $bridge->detach;
+        }
+        $active_op->{state} = ($active_op->{admission_error} || $active_op->{timeout_error}
             || $active_op->{websocket_handshake_error}) ? 'error'
             : $tx->is_cancelled ? 'cancelled'
             : $tx->is_error ? 'error' : 'complete';
-        $active_op->{error} = $active_op->{timeout_error}
+        $active_op->{error} = $active_op->{admission_error} || $active_op->{timeout_error}
             || $active_op->{websocket_handshake_error}
             || ($tx->is_error ? $tx->error : undef);
         $active_op->_cancel_timer;
         $active_conn->{active}--;
-        if (($active_op->{timeout_error}
+        if (($active_op->{admission_error} || $active_op->{timeout_error}
              || $active_op->{websocket_handshake_error})
             && $callbacks->{on_error}) {
             eval { $callbacks->{on_error}->($tx, $active_op->{error}); 1 }
@@ -1138,6 +1260,17 @@ sub _dispatch {
         unshift @{ $pool->{pending} }, $op;
         $self->{pending_count}++;
         return 0;
+    }
+    if ($ok && !$op->is_terminal && $callbacks->{on_transaction}) {
+        # Admission is a one-shot boundary, outside engine request(). The
+        # operation already exposes the real transaction, so callers may
+        # write/end a streamed body or cancel without a provisional buffer.
+        local $pool->{callback_depth} = ($pool->{callback_depth} || 0) + 1;
+        my $admitted = eval { $callbacks->{on_transaction}->($op->{transaction}); 1 };
+        if (!$admitted && !$op->is_terminal) {
+            $op->{admission_error} = "$@" || 'on_transaction callback failed';
+            $op->{transaction}->cancel;
+        }
     }
     unless ($ok) {
         delete $self->{active_operations}{$op_id};
@@ -1438,6 +1571,27 @@ error has been invented. An intentional user C<cancel()> remains distinct:
 it does not manufacture an on_error callback. No timed-out request is
 automatically replayed.
 
+=head1 REQUEST ADMISSION CALLBACK
+
+C<request()> accepts C<on_transaction =E<gt> sub { my ($tx) = @_; ... }>.
+It runs once after the real engine Transaction is assigned to the operation,
+outside the engine's request constructor. Use it to call C<write()> and
+C<end()> for C<stream_body =E<gt> 1>, or to cancel the operation. It may run
+synchronously when a reusable connection is already available; use its
+Transaction argument rather than assuming the returned operation variable
+has been assigned.
+
+Queued cancellation, connection failure, temporary HTTP/3 stream-credit
+exhaustion, and operations that become terminal during engine admission do
+not invoke this callback. When credit becomes available the same queued
+operation receives one notification with its actual admitted Transaction.
+
+An exception cancels the admitted Transaction, marks the operation as an
+error, and invokes C<on_error> and C<on_finish> once with that Transaction.
+As with timeout cancellation, the Transaction reports cancellation while
+the operation retains the callback error. An exception after the callback
+has already made the operation terminal does not produce a second finish.
+
 =head1 HTTP/1.1 WEBSOCKETS
 
 C<connect_websocket()> is an opt-in HTTP/1.1 client upgrade, available only
@@ -1501,6 +1655,35 @@ Other HTTP work for the same origin opens/reuses a different HTTP stream.
 Rejected or malformed handshakes fail the original operation; there is
 no automatic request replay. Calling C<cancel()> before establishment
 uses the usual queued/connecting/active operation cancellation semantics.
+
+=head1 GENERIC HTTP/1.1 PROTOCOL HANDOFF
+
+Pass C<on_handoff> to C<request()> with C<http_version =E<gt> '1.1'>
+to transfer a successful HTTP1 101 Upgrade or CONNECT response to a
+framework-independent protocol consumer. C<on_handoff($tx, $response,
+$transport)> returns an object supporting C<input>, C<input_eof>,
+C<transport_error> and C<resume_output>. The transport must implement
+C<unblock_upgrade($consumer)>; on success the socket leaves the HTTP
+connection pool, the original write queue stays in order, and any
+post-switch HTTP remainder is delivered once to the successor. For a
+native input provider, the framework also transfers its own retained
+unconsumed window to the successor.
+
+With explicit C<http_version =E<gt> '2'> or C<'3'>,
+C<request(method =E<gt> 'CONNECT', on_handoff =E<gt> sub { ... })>
+returns a consumer for just one multiplexed stream. Its callback receives
+C<($tx, $response, $bridge)> after a successful 2xx response, and the
+bridge supports C<unblock_send>, C<unblock_finish>, C<unblock_abort>.
+Incoming DATA, EOF and errors go to the same consumer contract.
+The parent TCP/TLS or QUIC connection remains in the Client pool and
+continues handling sibling HTTP streams. Stream output is scheduled by
+the configured C<defer> callback, never reentrant with receive parsing.
+
+The HTTP request operation finishes at the handshake boundary, not
+when the successor protocol later closes. The caller owns the upgraded
+consumer's lifetime, including its socket. This option does not select
+HTTP2 or HTTP3 Extended CONNECT, and it cannot be combined with the
+specialized C<connect_websocket()> API.
 
 =head1 HTTP/2 WEBSOCKET EXTENDED CONNECT
 

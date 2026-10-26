@@ -58,6 +58,123 @@ sub gathered { my $t = shift; sort map { $_->name } grep { index($_->name,'misc/
   ok !( grep { m{/worktrees/} } @got ),        'worktrees/ dropped';
 }
 
+# --- Local state and secrets below a harness directory never reach the build.
+# The harness and the user park session logs, todos, caches and login tokens in
+# .claude/ and .codex/. Nothing of that may be gathered -- including names no
+# list anticipated (history.jsonl, a stray backup, a new cache dir): below a
+# harness directory only known agent content is taken.
+{
+  my %state = (
+    # what the fleet .gitignore calls "never track"
+    'source/.claude/.credentials.json'          => "{\"token\":\"s3cret\"}\n",
+    'source/.claude/projects/-home-x/abc.jsonl' => "session log\n",
+    'source/.claude/todos/a.json'               => "[]\n",
+    'source/.claude/statsig/cache.json'         => "{}\n",
+    'source/.claude/local/notes.md'             => "private\n",
+    'source/.claude/settings.local.json'        => "{}\n",
+    'source/.claude/settings.local.json.bak'    => "{}\n",
+    'source/.claude/CLAUDE.local.md'            => "private memory\n",
+    'source/.codex/auth.json'                   => "{\"token\":\"s3cret\"}\n",
+    # names nobody put on a list
+    'source/.claude/history.jsonl'              => "prompt history\n",
+    'source/.claude/shell-snapshots/s.sh'       => "export TOKEN=s3cret\n",
+    'source/.claude/notes.txt'                  => "scratch\n",
+    'source/.codex/config.toml'                 => "[mcp_servers.x]\n",
+    'source/.codex/sessions/2026/s.jsonl'       => "session log\n",
+    # a content name of the wrong kind is not content
+    'source/.codex/rules'                       => "a file, not the rules dir\n",
+    # tokens and local overrides tucked into otherwise gathered directories
+    'source/.claude/skills/foo/auth.json'         => "{}\n",
+    'source/.claude/skills/foo/.credentials.json' => "{}\n",
+    'source/.claude/agents/reviewer.local.md'     => "local override\n",
+    'source/.agents/skills/bar/auth.json'         => "{}\n",
+  );
+  my %content = (
+    'source/CLAUDE.md'                                 => "c\n",
+    'source/AGENTS.md'                                 => "a\n",
+    'source/.claude/CLAUDE.md'                         => "c\n",
+    'source/.claude/agents/worker.md'                  => "agent\n",
+    'source/.claude/agents/.local.karr-coordinator.md' => "agent\n",
+    'source/.claude/skills/foo/SKILL.md'               => "body\n",
+    'source/.claude/skills/foo/references/projects/p.md' => "ref\n",
+    'source/.claude/rules/house.md'                    => "rule\n",
+    'source/.claude/hooks/pre.sh'                      => "#!/bin/sh\n",
+    'source/.claude/commands/ship.md'                  => "cmd\n",
+    'source/.claude/skilletor.json'                    => "{}\n",
+    'source/.claude/skilletor.lock.json'               => "{}\n",
+    'source/.codex/agents/.local.x.toml'               => "x\n",
+    'source/.codex/skills/baz/SKILL.md'                => "s\n",
+    'source/.codex/skilletor-rules.md'                 => "rules\n",
+    'source/.agents/skills/bar/SKILL.md'               => "b\n",
+  );
+  my $tzil = build_tzil( files => { %state, %content } );
+  plugin($tzil)->gather_files;
+  my @got  = gathered($tzil);
+  my %have = map { $_ => 1 } @got;
+
+  for my $src (sort keys %state) {
+    (my $rel = $src) =~ s{^source/}{};
+    ok !$have{"misc/agent-context/$rel"}, "$rel stays out of the build";
+  }
+  is_deeply \@got,
+    [ sort map { (my $rel = $_) =~ s{^source/}{misc/agent-context/}; $rel } keys %content ],
+    'exactly the agent content is gathered, nothing else';
+}
+
+# --- An explicitly configured harness directory is filtered the same way:
+# `dir = .claude` means "the agent content of .claude", not "all of .claude".
+{
+  my $tzil = build_tzil(
+    ini   => [ 'dir = .claude' ],
+    files => {
+      'source/.claude/skills/foo/SKILL.md'  => "body\n",
+      'source/.claude/.credentials.json'    => "{}\n",
+      'source/.claude/projects/p/abc.jsonl' => "session log\n",
+    },
+  );
+  plugin($tzil)->gather_files;
+  is_deeply [ gathered($tzil) ],
+    [ 'misc/agent-context/.claude/skills/foo/SKILL.md' ],
+    'explicit dir = .claude still takes agent content only';
+}
+
+# --- A harness directory met deeper in a configured tree is filtered too.
+{
+  my $tzil = build_tzil(
+    ini   => [ 'dir = sub' ],
+    files => {
+      'source/sub/notes.md'                     => "n\n",
+      'source/sub/.claude/skills/foo/SKILL.md'  => "body\n",
+      'source/sub/.claude/todos/a.json'         => "[]\n",
+      'source/sub/.codex/auth.json'             => "{}\n",
+    },
+  );
+  plugin($tzil)->gather_files;
+  is_deeply [ gathered($tzil) ],
+    [ 'misc/agent-context/sub/.claude/skills/foo/SKILL.md',
+      'misc/agent-context/sub/notes.md' ],
+    'nested harness directories take agent content only';
+}
+
+# --- The way to take more: name the subdirectory itself. It is then walked in
+# full (built-in excludes still apply).
+{
+  my $tzil = build_tzil(
+    ini   => [ 'dir = .claude', 'dir = .claude/output-styles' ],
+    files => {
+      'source/.claude/skills/foo/SKILL.md'        => "body\n",
+      'source/.claude/output-styles/terse.md'     => "style\n",
+      'source/.claude/output-styles/x.local.json' => "{}\n",
+      'source/.claude/todos/a.json'               => "[]\n",
+    },
+  );
+  plugin($tzil)->gather_files;
+  is_deeply [ gathered($tzil) ],
+    [ 'misc/agent-context/.claude/output-styles/terse.md',
+      'misc/agent-context/.claude/skills/foo/SKILL.md' ],
+    'a subdirectory outside the content set is gathered when configured by name';
+}
+
 # --- Binär-/Nicht-UTF-8-Datei -> fataler Abbruch, der die Datei benennt ---
 {
   my $tzil = build_tzil( files => {

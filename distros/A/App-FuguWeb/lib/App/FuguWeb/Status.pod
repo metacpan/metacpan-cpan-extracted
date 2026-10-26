@@ -1,0 +1,166 @@
+=head1 NAME
+
+App::FuguWeb::Status - the translation status of a site
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Status;
+
+    my $status = App::FuguWeb::Status->new( config => $config );
+
+    my $lines = $status->report or die $status->error, "\n";
+    say for @$lines;            # zh-Hans<TAB>stale<TAB>page<TAB>index.html
+
+    $status->record('web/zh-hans/index.body.html')
+        or die $status->error, "\n";
+
+=head1 DESCRIPTION
+
+A translation follows its source, and a source changes. The record of
+the site names the version of the default source that each translated
+file follows, per WEB-STATUS. The class reads the description and the
+record. It gives each part of a language other than the default that
+does not follow its source, and it writes the line of a translated
+file into the record.
+
+The record is the file F<TRANSLATIONS> at the project root, beside
+F<.fuguwebrc>, per WEB-STATUS-1. It holds one line for each translated
+file, in the SHA256 manifest form:
+
+    SHA256 (web/zh-hans/index.body.html) = 9f86d0...
+
+The path names the translated file from the project root, in UTF-8
+bytes, in the form of L<App::FuguWeb/canonical_path>: no C<.> step, no
+empty step, and no final solidus. A path setting of C<./web> or
+C<web/> thus gives the path C<web/zh-hans/index.body.html>. The digest
+is the SHA-256 of its default source at the time of the translation.
+L<Fugu::Signify> reads and writes the form, and its writer sorts the
+lines by path. The description refuses a source path of ASCII white
+space or a parenthesis, per WEB-SITE-6, so each path fits the form. A
+record that is absent or empty holds no line.
+
+The record holds one digest for each file. Two parts that name one
+translated file over two default sources are therefore a fault of the
+description, per WEB-STATUS-7, and each method refuses it.
+
+The build and the check do not read the record, per WEB-STATUS-6. The
+C<status> and C<translated> verbs of L<App::FuguWeb::CLI> are the one
+caller of the class.
+
+=head2 Parts
+
+A part is one thing of a language that can come from the default
+language, per WEB-STATUS-3. Each part has a kind and a name. The name
+is the name of the block that takes its translation, or the page of a
+manual:
+
+    kind      the part                    the name
+    site      the site name               the tag of the language
+    label     the label of a nav entry    the href of the entry
+    title     the title of a page         the name of the page
+    page      the source of a page        the name of the page
+    heading   the heading of a group      the name of the group
+    manual    the source of a manual      the page of the manual
+    footer    the footer fragment         the tag of the language
+
+The site name, a label, a title and a heading are values of the
+description, per WEB-LANGUAGE-8. The other parts are files. A file
+part whose default language names no source follows no source. Thus
+the index page of a language can take a body that opens it, when the
+default index page takes none, and that body takes no state.
+
+=head2 States
+
+The states are those of WEB-STATUS-4:
+
+=over 4
+
+=item C<fallback>
+
+The part comes from the default language. A value takes this state
+alone.
+
+=item C<unrecorded>
+
+The language translates the file, and the record holds no line for it.
+
+=item C<stale>
+
+The line of the file names a digest other than the one that its default
+source has now.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+    App::FuguWeb::Status->new( config => $config )
+
+The status of the site of one loaded L<App::FuguWeb::Config>. The
+object reads each default source once, so a caller makes a new object
+for each question.
+
+=head2 report
+
+    my $lines = $status->report;
+
+The lines of WEB-STATUS-3 as an array reference, or C<undef> with the
+reason in L</error>. A line holds the tag, the state, the kind of the
+part and its name, with one tab between two fields. The lines follow
+the order of the languages, and then the order of the description:
+the site name, each nav label, the title and the source of each page,
+the heading and the manuals of each group, and the footer. An empty
+list means that each part follows its source.
+
+The method fails when the record does not parse, when it cannot read
+the default source of a recorded file, and when the description names
+one translated file over two default sources. Each such failure is a
+L</fault>.
+
+=head2 record
+
+    $status->record(@files) or die $status->error;
+
+Write the line of each file into the record, with the digest that its
+default source has now, per WEB-STATUS-2. Each file is a path from the
+project root, and the method changes it to the form of a path of the
+record. Thus C<./web/a.html> and C<web/a.html> name one file. The
+method keeps each other line of the record.
+
+The method refuses a file that translates no source of the
+description: a default source, a file of no part, or a file whose
+default part names no source. One file that it refuses fails the
+whole call, and a failure writes nothing. The method returns 1, or
+C<undef> with the reason in L</error>. It fails with a L</fault> as
+L</report> does.
+
+=head2 error
+
+The reason of the most recent failure, or C<undef>.
+
+=head2 fault
+
+True when the most recent failure is a fault of the project files: a
+record or a source that does not read, or a description that
+WEB-STATUS-7 refuses. The CLI gives such a failure the code of a
+description that does not load, C<EXIT_CONFIG_ERROR>. A file that
+translates no source is no fault.
+
+=head1 CONSTANTS
+
+=head2 RECORD
+
+The name of the record, F<TRANSLATIONS>. It sits at the project root,
+because the build publishes each plain file of the source directory.
+The description refuses a source directory that is the project root,
+per WEB-SITE-7.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::CLI>, L<App::FuguWeb::Config>,
+L<Fugu::Signify>, L<fuguweb(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

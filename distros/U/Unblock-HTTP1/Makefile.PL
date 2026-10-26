@@ -46,6 +46,13 @@ my %makefile = (
     clean => { FILES => 'HTTP1.c' },
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        no_index => {
+            package => [qw(
+                Unblock::HTTP1::_Engine
+                Unblock::HTTP1::_Native
+                Unblock::HTTP1::_Wire
+            )],
+        },
         resources => {
             homepage => 'https://github.com/haxmeister/perl-Unblock-HTTP1',
             repository => {

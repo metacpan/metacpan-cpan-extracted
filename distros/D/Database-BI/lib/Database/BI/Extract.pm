@@ -18,8 +18,10 @@ use Mojo::File;
 # It is a pure cache: deleting the extracts/ directory at any time leaves
 # the application fully functional.  No file under data_dir is created.
 #
-# The caller (Dashboard._get_or_build_extract) is responsible for deciding
-# whether to build a new extract; Extract only stores and retrieves bytes.
+# This is a standalone cache class: the web application does not call it (the
+# routes read their sources directly), and the tests cover the class itself.
+# A caller decides whether to build a new extract; Extract only stores and
+# retrieves bytes.
 # ---------------------------------------------------------------------------
 
 # new( model_dir => $dir ) -> $self

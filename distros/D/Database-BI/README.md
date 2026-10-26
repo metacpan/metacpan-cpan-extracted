@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.017.0
+0.017.1
 
 ## Description
 
@@ -135,8 +135,13 @@ application.
 **Start the development server (restarts automatically when you edit a file):**
 
 ```
-morbo script/database-bi
+script/database-bi
 ```
+
+`morbo script/database-bi` does the same thing, and
+`script/database-bi daemon` starts a plain server with no file watcher; any
+other Mojolicious command word (`routes`, `get`, ...) is passed to the
+application.
 
 **Start the production server:**
 
@@ -487,18 +492,35 @@ perl Makefile.PL
     names it) or from coordinate columns (`lat=` and `lon=`).  Rows sharing a
     position become one marker.  Markers are clustered with
     Leaflet.markercluster, so a dense map draws a count at low zoom and splits it
-    as it is zoomed in.  Parameters:
+    as it is zoomed in.  Clustering is always on.  Parameters:
 
     ```
-    l=<spec>      left table (required)
-    loc=<col>     column of places to geocode (required unless lat= and lon= are)
-    lat=<col>     latitude column, -90..90
-    lon=<col>     longitude column, -180..180
-    popup=<col>   column shown in the marker popup (repeatable)
-    max=N         markers to draw (default map_max_markers, 2000)
+    l=<spec>       left table (required)
+    loc=<col>      column of places to geocode (required unless lat= and lon= are)
+    lat=<col>      latitude column, -90..90
+    lon=<col>      longitude column, -180..180
+    popup=<col>    column shown in the marker popup (repeatable)
+    max=N          markers to draw (default map_max_markers, 2000)
+    zoom=N         initial zoom 0..19 (default: fit the markers)
+    max_zoom=N     tile layer maxZoom 0..28 (default: map_max_zoom, if set)
+    tiles=<name>   named tile source from the tile_sources config key
+    heat=1         add a heatmap layer over the markers
+    weight=<col>   numeric heatmap intensity column (normalised to 0..1)
+    size=<col>     numeric bubble-radius column; markers become circles
+    color=<col>    colour markers from a column
+    color_rule=<op>:<value>:<colour>  repeatable; op is gt, ge, lt, le, eq or ne
+    color_default=<colour>  fallback colour (default #3388ff)
+    series=<col>   colour markers by category (not with color=)
+    scheme=<name>  palette for series=: tableau10, category10, set2, set3, paired
     back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
     f=            result filters (repeatable)
     ```
+
+    An unknown `tiles=` or `scheme=` is a 400, as is an unknown column, `color=`
+    together with `series=`, or a transposed lat/lon pair.  The page never shows
+    the [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) Nominatim search box (`search => 0` is always passed), so
+    nothing typed on the map is sent anywhere.  [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) 0.12 or later is the
+    renderer; an older optional install still returns the page with a warning.
 
 - `GET /line`
 
@@ -682,6 +704,7 @@ defaults:
 ```perl
 {
     data_dir => 'data',   # directory scanned for data files on the home page
+    uploads_dir => '.uploads',  # staging directory for uploaded files
     platform => 'web',    # VWF template dimension
     language => 'en',     # VWF template dimension
 
@@ -691,6 +714,16 @@ defaults:
     # below.
     d3_url => 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js',
 }
+```
+
+`uploads_dir` is where `POST /upload` stages the files a user drags onto the
+page, and the directory `POST /uploads/clear` empties.  It defaults to
+`.uploads` under the application home.  A relative value resolves against the
+application home, an absolute one is used as given, so a deployment whose
+application directory is read-only can stage uploads somewhere writable:
+
+```perl
+{ uploads_dir => '/var/tmp/database-bi-uploads' }
 ```
 
 ### Self-Hosting D3 and Leaflet
@@ -722,10 +755,80 @@ ones the defaults name: D3 7.9.0, Leaflet 1.9.4, and leaflet.markercluster 1.5.3
 OpenStreetMap.  It keeps Leaflet's `{z}`, `{x}` and `{y}` placeholders, and
 `{s}` too if the server uses subdomains.  Set it and every request needed to
 draw a map can stay on the local network.  The OpenStreetMap attribution stays
-on the map, since it is the usual credit for OSM-derived tiles.  The in-page
-place search still calls Nominatim if a reader uses it.
+on the map, since it is the usual credit for OSM-derived tiles.  There is no
+in-page place search: [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) is always constructed with `search => 0`,
+so nothing typed on a map page is sent anywhere.
+
+Map-specific config keys: `map_geocode_max` (new geocoder lookups per request,
+default 500), `map_max_markers` (markers per request, default 2000),
+`map_region` (a two-letter country hint for ambiguous places), `map_max_zoom`
+(the default tile-layer maxZoom) and `tile_sources` (a hashref of named tile
+sources, each `{ url => ... }`, selected with `tiles=`).
+
+**Map colour rules.**  `color=` names the column and `color_rule=` supplies
+`<op>:<value>:<colour>` rules; they are tried in
+the order given and the first match wins.  The operators are `gt`, `ge`,
+`lt`, `le`, `eq` and `ne`; a comparison is numeric when both the cell and
+the rule's value look like numbers, and otherwise only `eq`/`ne` are
+meaningful (case-insensitive).  A colour is `#rgb`, `#rrggbb` or a CSS name
+such as `red` or `teal`.  A value that matches no rule gets `color_default=`,
+which the legend shows as "Other".  `series=` is the categorical
+alternative: each distinct value takes the next colour from `scheme=`,
+cycling through the palette, and the legend lists the categories.  `color=`
+and `series=` are mutually exclusive.
+
+## Command-Line Tools
+
+Two maintenance scripts ship in `script/`; both use the same data and model
+directories as the web application and are safe to run from cron.
+
+### Script/Bi-Geocode
+
+Warms the shared geocode cache for one column, so later map requests make no
+lookups:
+
+```
+./script/bi-geocode --spec table:customers --col city \
+                    [--data-dir DIR] [--model-dir DIR] \
+                    [--openaddr PATH] [--region CC] [--dry-run] [--verbose]
+```
+
+It is idempotent: a second run against a warm cache resolves nothing and says
+so.  Exit status is 0 on success, 1 when the column is missing or no rows load,
+and 2 on bad arguments or an unopenable source.
+
+### Script/Bi-Alert
+
+Reports one saved analysis, and turns a crossed threshold into a non-zero exit
+status so cron can act on it:
+
+```
+./script/bi-alert --analysis ID [--threshold MEASURE:OP:VALUE] \
+                  [--data-dir DIR] [--model-dir DIR] [--dry-run]
+```
+
+The digest goes to STDOUT and nothing is sent: pipe it into mail, a webhook or
+a ticket creator if the alert has to leave the machine.  Exit status is 0 when
+no threshold is crossed, 1 when one is, and 2 on error.  There is no delivery to
+suppress, so `--dry-run` is accepted for compatibility only and changes neither
+the output nor the exit status.  The script keeps no state.
+
+`script/database-bi` is the web application launcher: run with no arguments it
+starts the reloading development server, with a command word it runs that
+command, and `hypnotoad script/database-bi` starts a preforking server (see
+["SYNOPSIS"](#synopsis)).
 
 ## Common Pitfalls
+
+- **The launcher's shebang must name perl, not morbo**
+
+    morbo starts the application as `perl script/database-bi daemon`, and perl
+    hands a script whose `#!` line does not mention perl to the interpreter that
+    line names.  With a `morbo` shebang every worker therefore started another
+    morbo: the chain grew a process a second, kept the listening port, and only
+    stopped when the environment copied to each child was too large for `exec`
+    (`Argument list too long`).  The shebang is perl and the script starts the
+    server itself when it is given no arguments.
 
 - **The configuration file is optional but must be valid Perl if present**
 
@@ -769,9 +872,11 @@ place search still calls Nominatim if a reader uses it.
 
     Setting `language => 'de'` in `database_bi.conf` tells the controller
     to look for templates in `templates/web/de/`.  If that directory does not
-    exist, the controller automatically falls back to the default language.  To
-    add German support: (1) create `templates/web/de/`, (2) copy and translate
-    the `.html.tt` files from `templates/web/en/`, then (3) set the config.
+    exist, the controller automatically falls back to the default language, and
+    the same fallback applies when a browser asks for a language no directory
+    serves.  To add German support: (1) create `templates/web/de/`, (2) copy and
+    translate the `.html.tt` files from `templates/web/en/`, then (3) set the
+    config.
 
 - **Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx**
 
@@ -840,13 +945,11 @@ works correctly in production without any special workarounds.
 
 ## Roadmap
 
-Features planned for future releases (post-0.013.0).  Items are ordered by
-priority.
+Features planned for future releases (post-0.018.0).  Items are ordered by
+priority.  Items shipped before this release (XLSX export, the copy-link
+button, the column statistics panel, folder filter/join propagation and the
+aggregate/measure layer) are no longer listed.
 
-- **Folder view filter/join propagation** (Medium) -- The folder view
-panel does not carry forward active `j=` and `f=` params when building
-the `/folder` URL.  Users who have filtered or joined a table and then
-click "Folder view" silently lose their filter context.
 - **Multi-sheet XLSX** (Medium) -- `_detect_file_info` reads only the
 first worksheet.  A `?sheet=` URL param with a sheet-name picker would
 expose the full workbook.
@@ -856,6 +959,11 @@ reduce multi-filter chains for common range and set queries.
 blocks the HTTP response until all rows are assembled.  Mojolicious supports
 server-sent events, which could progressively stream rows to a JS table
 renderer, giving visible progress on slow joins.
+- **Boundary overlay on maps** (Low) -- `HTML::OSM` can draw GeoJSON and
+choropleth layers.  A `gj=<path>` parameter would overlay a local
+GeoJSON file, optionally shaded by an aggregated measure.  This is the one
+Phase 6 item not implemented: it is optional in the phase spec, and no boundary
+data is shipped or downloaded.
 
 ## See Also
 

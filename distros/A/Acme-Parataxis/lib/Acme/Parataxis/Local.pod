@@ -1,0 +1,215 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Local - Per-fiber Storage Slot
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis::Local;
+
+    my $request_id = Acme::Parataxis::Local->new;
+    my $trace_id   = Acme::Parataxis::Local->new( inherit => 1 );    # copied into spawned children
+
+    async {
+        $request_id->set(42);
+        $trace_id->set('span-1');
+
+        fiber { $request_id->set(99); say $request_id->get };        # 99
+        fiber { say $trace_id->get };                                # span-1
+        say $request_id->get;                                        # 42
+    };
+
+C<$request_id> is walled off: the child writes 99 and the parent still reads 42. C<$trace_id> was inherited, so the
+child starts from the parent's value without being handed one. The three lines print in that order, because a C<fiber>
+body begins running at the C<fiber> call rather than after it.
+
+=head1 DESCRIPTION
+
+A C<Local> is one named variable that reads differently depending on which fiber asks. Parent, children and siblings
+each get a private cell, so no fiber can read or overwrite another's value:
+
+    my $depth = Acme::Parataxis::Local->new( default => 0 );
+
+    async {
+        $depth->set(1);
+        fiber { say $depth->get };        # 0 - the child starts from the default
+        say $depth->get;                  # 1
+    };
+
+This is the opposite of C<local>: the value follows the fiber rather than the dynamic call stack, and it survives any
+number of C<await>s and C<yield>s in between without being passed down by hand.
+
+Create one C<Local> per logical variable - a trace id, a request id, a per-fiber database handle, a re-entrancy flag -
+and none of it needs cooperation from the scheduler or the C core. Each fiber's cell is dropped when that fiber
+finishes and is reaped, so a long-running program does not accumulate stale values.
+
+=head1 Inheritance
+
+A slot created with C<inherit =E<gt> 1> opts into trace propagation: at the moment a child fiber is spawned, each such
+slot's current value is copied out of the spawning fiber into the child's own cell, before the child's body runs its
+first statement. That is how a request id or a logging context reaches work you would rather not thread arguments
+through.
+
+    my $trace = Acme::Parataxis::Local->new( inherit => 1 );
+
+    async {
+        $trace->set('span-1');
+        fiber { say $trace->get };    # span-1
+    };
+
+The copy is shallow, and the child owns it outright from that moment. Later C<set>s in the child never reach the
+parent, and later C<set>s in the parent never reach the child.
+
+Propagation happens at the three spawn points that go through C<spawn>: C<fiber> and C<spawn>, a C<nursery> child, and
+an actor's own fiber. It does B<not> happen for an C<async> or C<run> block - see L</"Behavior Notes">.
+
+=head1 METHODS
+
+=head2 C<new( [ default =E<gt> $default, inherit =E<gt> 0 ] )>
+
+    my $plain  = Acme::Parataxis::Local->new;
+    my $seeded = Acme::Parataxis::Local->new( default => 'unset' );
+    my $traced = Acme::Parataxis::Local->new( inherit => 1 );
+
+Creates a slot. Both arguments are named and optional; C<default> is C<undef> and C<inherit> is false unless you say
+otherwise. C<default> is what C<get> returns in a fiber that has not written to the slot yet, and C<inherit> opts the
+slot into L</"Inheritance">. Any true value works for C<inherit>.
+
+Arguments are keyword only. C<< Acme::Parataxis::Local->new('x') >> is rejected with C<Unrecognized parameters for
+"Acme::Parataxis::Local" constructor: x>, as is any key that is not C<default> or C<inherit>.
+
+=head2 C<get( )>
+
+    fiber { say $request_id->get };    # 99
+
+Returns the calling fiber's value, or the slot's C<default> if that fiber has never written to it. Never exposes
+another fiber's value, in either direction.
+
+Croaks with C<Local->get must be called from inside a scheduled fiber> when called outside a fiber, so a missing
+C<async> is a loud error rather than a silent C<undef>.
+
+=head2 C<set( $value )>
+
+    $request_id->set(42);
+
+Writes C<$value> into the calling fiber's cell and returns it. The write is private to this fiber and is never visible
+to its parent or its siblings.
+
+Croaks with C<Local->set must be called from inside a scheduled fiber> when called outside a fiber.
+
+=head1 Recipes
+
+=head2 Carry a request id into work you cannot pass arguments to
+
+    my $request_id = Acme::Parataxis::Local->new;
+
+    async {
+        my $id = $request_id->get // 'anonymous';
+
+        fiber {
+            # ... a deep call chain that never mentions $id, but every line of it can log it
+            log_line( request => $id );
+        };
+    };
+
+=head2 Give each fiber its own connection handle
+
+    my $dbh = Acme::Parataxis::Local->new;
+
+    fiber {
+        my $handle = connect();
+        $dbh->set($handle);
+
+        # any helper reached from here can reach for the handle without it being passed along
+        $dbh->get->do_something;
+    };
+
+Because the cell is private, two fibers working at once never share a handle, and nothing has to be locked.
+
+=head2 Assert isolation in a test
+
+    my $slot = Acme::Parataxis::Local->new( default => 'empty' );
+
+    my $ok = eval {
+        async {
+            $slot->set('mine');
+            fiber { die 'a child saw ' . $slot->get if $slot->get ne 'empty' };
+        };
+        1;
+    };
+
+    die $@ unless $ok;
+
+=head1 Behavior Notes
+
+=head2 C<async> does not propagate inherited values
+
+An C<async> block (or C<run>) does run its block in a fiber of its own, so an ordinary C<Local> is isolated from it as
+usual. But C<async> builds that fiber directly rather than through C<spawn>, and the inheritance seed lives in
+C<spawn>. That produces the one asymmetry in this class:
+
+    my $trace = Acme::Parataxis::Local->new( inherit => 1 );
+
+    async {
+        $trace->set('root');
+        async { say $trace->get };     # undef - not inherited
+        fiber  { say $trace->get };     # root
+    };
+
+To carry a value across an C<async> boundary, pass it in explicitly or move the work into a C<fiber>.
+
+=head2 C<default> is only a fallback for an unwritten cell
+
+A fiber that has written anything gets exactly what it wrote, and C<undef> counts as a write:
+
+    my $slot = Acme::Parataxis::Local->new( default => 'dflt' );
+
+    async {
+        say $slot->get;        # dflt
+        $slot->set(undef);
+        say $slot->get;        # undef, not dflt
+    };
+
+=head2 A value lives exactly as long as its fiber
+
+A cell belongs to a fiber, not to the slot. When that fiber finishes and is reaped, its stash is deleted and the value
+goes with it, whether or not a C<Local> object is still in scope. Holding the object alive does not resurrect it. A new
+fiber starts from C<default> again.
+
+=head2 Each object is a separate variable
+
+Two C<Local> objects never share a value, whatever their arguments; there is no name to collide on and no identifier
+exposed to compare. Create as many as the program needs.
+
+=head1 How It Works
+
+Each C<Local> takes a process-wide monotonic id at construction, so two slots never collide and a recycled memory
+address cannot alias a newer slot. C<get> and C<set> look up the calling fiber's stash - a plain hash addressed by the
+fiber object's C<refaddr> - and index it by that id, falling back to C<default> when the key is absent.
+
+An C<inherit =E<gt> 1> slot pushes its id onto C<@Acme::Parataxis::INHERIT_LOCAL_IDS> at construction and removes it
+again when the C<Local> is destroyed. C<spawn> reads that list, snapshots the parent's matching cells before the child
+body gets control, and wraps the child so the snapshot lands in the child's own stash on its first instruction. When
+nothing is set, the snapshot is empty and no wrapper is built, so the ordinary spawn path costs nothing extra.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Actor>, L<Acme::Parataxis::Nursery>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

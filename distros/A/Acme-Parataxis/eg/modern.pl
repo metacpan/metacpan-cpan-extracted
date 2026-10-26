@@ -4,17 +4,13 @@ use Acme::Parataxis qw[:all];
 #
 async {
     say 'Main fiber started';
-
-    # 'fiber' is the modern alias for 'spawn'
-    my $f1 = fiber {
+    my $f1 = fiber {    # spawn a new OS fiber
         say '  Fiber 1: Sleeping...';
         await_sleep(1000);
         say '  Fiber 1: Woke up!';
         return 42;
     };
-
-    # 'await' is the modern way to wait for results
-    my $res1 = await $f1;
+    my $res1 = await $f1;    # wait for results
     say 'Main: Fiber 1 returned ' . $res1;
     say 'Creating a manual fiber for bidirectional communication...';
 

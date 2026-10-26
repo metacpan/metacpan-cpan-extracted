@@ -501,40 +501,40 @@ Nigel Horne, C<njh@nigelhorne.com>
 
 What one run of C<action-run-smoke> does:
 
-	 action-run-smoke [options]
-	        |
-	        v
-	+---------------------+  bad option -> usage; exit 2
-	| PARSE OPTIONS       |  --help / --version -> print; exit 0
-	+---------------------+
-	        |
-	        v
-	+---------------------+  Docker missing, not running, Windows
-	| ENVIRONMENT CHECK   |  containers, mount fails
-	| (as action-run      |  -> report with remedies; exit 2
-	|  check)             |
-	+---------------------+
-	        |
-	        v
-	+---------------------+  one line per image: pulled / present /
-	| PREPARE IMAGES      |  failed / skipped / deferred
-	|                     |  an image fails -> exit 2
-	+---------------------+
-	        |
-	        v
-	+---------------------+  smoke: 4 steps check GITHUB_ENV,
-	| RUN THE WORKFLOW    |  GITHUB_OUTPUT and that it is Linux
-	| in a temporary      |  deferred: the step names its image; it
-	| project             |  must have been reported as deferred
-	+---------------------+
-	        |
-	        v
-	+---------------------+  temporary project, containers, networks
-	| CLEAN UP            |  and pulled images removed
-	+---------------------+
-	        |
-	        v
-	  exit 0 = ready and passed, 1 = ready but the workflow failed
+     action-run-smoke [options]
+            |
+            v
+    +---------------------+  bad option -> usage; exit 2
+    | PARSE OPTIONS       |  --help / --version -> print; exit 0
+    +---------------------+
+            |
+            v
+    +---------------------+  Docker missing, not running, Windows
+    | ENVIRONMENT CHECK   |  containers, mount fails
+    | (as action-run      |  -> report with remedies; exit 2
+    |  check)             |
+    +---------------------+
+            |
+            v
+    +---------------------+  one line per image: pulled / present /
+    | PREPARE IMAGES      |  failed / skipped / deferred
+    |                     |  an image fails -> exit 2
+    +---------------------+
+            |
+            v
+    +---------------------+  smoke: 4 steps check GITHUB_ENV,
+    | RUN THE WORKFLOW    |  GITHUB_OUTPUT and that it is Linux
+    | in a temporary      |  deferred: the step names its image; it
+    | project             |  must have been reported as deferred
+    +---------------------+
+            |
+            v
+    +---------------------+  temporary project, containers, networks
+    | CLEAN UP            |  and pulled images removed
+    +---------------------+
+            |
+            v
+      exit 0 = ready and passed, 1 = ready but the workflow failed
 
 =head1 LICENSE AND COPYRIGHT
 

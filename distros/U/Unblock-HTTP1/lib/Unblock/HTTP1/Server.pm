@@ -11,7 +11,7 @@ use Unblock::HTTP1::_Native ();
 use Unblock::HTTP1::_Wire ();
 use Unblock::HTTP1::Transaction;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %option) = @_;
@@ -33,6 +33,27 @@ sub new {
 }
 
 sub transaction { $_[0]{active} }
+
+sub drain {
+    my ($self) = @_;
+    return $self if $self->{closed} || $self->{switched} || $self->{draining};
+    $self->{draining} = 1;
+    if (!$self->{active}) {
+        $self->{closed} = 1;
+        $self->_input_clear;
+    } elsif ($self->{active}{remote_done}) {
+        $self->_input_clear;
+    }
+    $self->_transport_sync if $self->{transport_attached};
+    return $self;
+}
+
+sub want_read {
+    my ($self) = @_;
+    return 0 if $self->{draining}
+        && (!$self->{active} || $self->{active}{remote_done});
+    return $self->SUPER::want_read;
+}
 
 sub _input_native_head {
     my ($self, $head, $request) = @_;
@@ -66,6 +87,11 @@ sub _drive {
         my $rx = $self->{rx};
 
         if (!$tx) {
+            if ($self->{draining}) {
+                $self->{closed} = 1;
+                $self->_input_clear;
+                return;
+            }
             return unless $self->{borrowed_head} || $self->_input_length;
             my $head = delete $self->{borrowed_head};
             my $request = delete $self->{borrowed_message};
@@ -165,7 +191,10 @@ sub _drive {
 
         $tx = $self->{active} or next;
         $rx = $self->{rx};
-        return unless $rx;
+        if (!$rx) {
+            $self->_input_clear if $self->{draining};
+            return;
+        }
 
         if ($rx->{mode} eq 'content-length') {
             return unless $self->_input_length;
@@ -258,8 +287,15 @@ sub _finish_request {
 sub _complete_request {
     my ($self, $tx, $request) = @_;
     return if $tx->is_terminal;
-    $tx->_finish_receive($request);
-    $request->mark_complete->freeze;
+    if ($tx->{request_body_mode} eq 'none') {
+        # Both trusted head builders (portable FastPath and native ABI)
+        # already deliver a complete, frozen, empty-body Uniform Request.
+        # There can be no receive chunks to materialize in this case.
+        $tx->{receive_done} = 1;
+    } else {
+        $tx->_finish_receive($request);
+        $request->mark_complete->freeze;
+    }
     $tx->_mark_remote_done;
     my $cb;
     {
@@ -295,7 +331,9 @@ sub _transaction_respond {
     $tx->{send_plan} = $plan;
     $tx->{stream_body} = $stream_body;
     $tx->{callbacks}{on_drain} = $on_drain if $on_drain;
-    $self->_queue_output($plan->{wire});
+    # The queue now owns these bytes. A retained Transaction must not keep
+    # a second serialized copy of its canonical response body alive.
+    $self->_queue_output(delete $plan->{wire});
 
     if ($plan->{switch}) {
         $tx->_mark_local_done;
@@ -373,7 +411,23 @@ sub _transaction_write {
 # complete until its complete output was accepted by the attached host.
 sub _transport_sync {
     my ($self) = @_;
+    return if $self->{driving} || $self->{transport_syncing};
     $self->SUPER::_transport_sync;
+    $self->_finish_accepted_output;
+    return;
+}
+
+sub _transport_finish {
+    my ($self, $host) = @_;
+    # A host may synchronously close on finish (e.g. peer already at EOF).
+    # Commit accepted response completion before that terminal notification.
+    $self->_finish_accepted_output;
+    $self->SUPER::_transport_finish($host) unless $self->{transport_aborted};
+    return;
+}
+
+sub _finish_accepted_output {
+    my ($self) = @_;
     return if $self->{transport_aborted} || length($self->{output});
     my $pending = delete $self->{pending_host_finishes} or return;
     for my $tx (@$pending) {
@@ -412,9 +466,12 @@ sub _retire_if_done {
     my $keep = $tx->{keep_alive};
     $keep = $tx->{request_keep_alive} unless defined $keep;
     $self->{active} = undef;
-    $tx->_notify_finish unless $await_host;
-    if (!$keep || $self->{eof}) {
+    if (!$keep || $self->{eof} || $self->{draining}) {
         $self->{closed} = 1;
+        $self->_input_clear;
+    }
+    $tx->_notify_finish unless $await_host;
+    if ($self->{closed}) {
         $self->_transport_sync if $self->{transport_attached};
         return;
     }
@@ -622,6 +679,27 @@ C<output()>.
 The Server supports persistent HTTP/1 connections and safely handles
 pipelined request bytes. Only one transaction is active at a time; bytes for a
 later request remain buffered until the prior transaction retires.
+
+=head1 GRACEFUL CONNECTION DRAINING
+
+=head2 drain
+
+    $server->drain;
+
+Stop admitting requests and finish the currently admitted request body and
+response. A request is admitted when its header callback starts. Partial
+headers and pipelined requests that have not reached that callback are not
+admitted. Idle connections finish immediately. Repeated calls are harmless.
+
+Attached transports receive C<unblock_finish()> only after all response bytes
+have been accepted by C<unblock_send()>. A false send result still means
+accepted but congested; pending bytes wait for C<resume_output()>. Application
+C<on_finish> callbacks remain unchanged. Manual-output hosts must continue
+draining C<output()> after C<is_closed> becomes true. A switched connection is
+already owned by its next protocol and is not affected by C<drain>.
+
+This engine owns no timer. The host may enforce a grace deadline by reporting
+C<transport_error()> and closing its transport if completion takes too long.
 
 =head1 RECEIVE BODY OPTIONS
 

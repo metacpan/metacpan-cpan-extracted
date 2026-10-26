@@ -40,9 +40,15 @@ use Params::Validate::Strict	qw(validate_strict);
 our $VERSION = '0.017.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
-# and on_error => 'undef', 0.47 added geocode_many(), and this module asks for both
-# rather than reimplementing the rule or the batch loop it exists to use.
-Readonly my $MIN_GEOCODER_VERSION => '0.47';
+# and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
+# per-lookup read counts the lookups figure below reports.  This module asks for
+# all three rather than reimplementing the rule, the batch loop or the count it
+# exists to use.  The messages that name the floor are given this number rather
+# than spelling it out, so there is one place to change; a caller that pins
+# min_geocoder_version for a test gets its own number quoted back, which is the
+# floor it asked for.  t/recommended-versions.t holds the constant and the
+# Makefile.PL recommends entry to each other.
+Readonly my $MIN_GEOCODER_VERSION => '0.48';
 
 # The default for map_geocode_max (section 6.2): new lookups allowed in one
 # request.  A crafted URL must not be able to turn one request into unbounded CPU.
@@ -295,7 +301,7 @@ are handled by C<Params::Get>.
 
     geocoder             => object,   # optional; duck-typed: must provide valid_location() and geocode_many()
     openaddr             => string,   # optional; path to OpenAddresses data (default: $ENV{OPENADDR_HOME})
-    min_geocoder_version => string,   # optional; minimum version to accept (default: '0.47')
+    min_geocoder_version => string,   # optional; minimum version to accept (default: '0.48')
     i18n                 => object,   # optional; must implement maketext($key, @args)
 
 C<geocoder> is the injection seam for tests.  An injected geocoder is used
@@ -1384,7 +1390,8 @@ All user-visible messages are keyed in C<%Database::BI::Model::Geocode::MESSAGES
 
 The geocoder module is not installed (the second C<%s> is "it is not
 installed") or is too old (the second C<%s> is the installed version number).
-Install or upgrade C<Geo::Coder::Free>.
+The first C<%s> is the floor this module checks for - C<0.48> unless the caller
+pinned C<min_geocoder_version>.  Install or upgrade C<Geo::Coder::Free>.
 
 =item C<error_map_loc_column>
 

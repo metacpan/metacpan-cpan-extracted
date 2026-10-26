@@ -109,6 +109,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.017.0",
+   "version" : "0.017.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -71,6 +71,13 @@ Read EOF after a complete request means the peer will send no more request
 bytes. The server may still send the delayed response and then close
 gracefully. An incomplete request at EOF is an HTTP error.
 
+## Graceful shutdown
+
+Stop the framework listener first, then call `$server->drain` on each
+HTTP/1 server connection. The active request and response may finish, but
+later pipelined requests are not admitted. The host must send all accepted
+output before closing and enforce any grace-period deadline itself.
+
 ## Upgrade and CONNECT
 
 The engine stops parsing HTTP on 101 Upgrade or successful CONNECT. Any bytes

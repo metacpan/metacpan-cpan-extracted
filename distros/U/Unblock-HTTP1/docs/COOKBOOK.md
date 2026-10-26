@@ -164,6 +164,17 @@ If the peer cleanly shuts down its sending side after a complete request, the
 Transaction can still reply. No new request can use the connection after that
 read-side EOF.
 
+## Graceful shutdown
+
+After the framework stops accepting connections, drain each HTTP/1 server
+connection:
+
+    $server->drain;
+
+The admitted request and its response can finish. Later pipelined requests
+are not admitted. The host flushes queued output before closing the socket
+and owns any grace-period timeout. No event-loop timer is created by Unblock.
+
 ## Upgrade and CONNECT
 
 A valid 101 response or successful CONNECT stops HTTP parsing. The on_switch

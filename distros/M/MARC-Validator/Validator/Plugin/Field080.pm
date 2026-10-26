@@ -4,11 +4,11 @@ use base qw(MARC::Validator::Abstract);
 use strict;
 use warnings;
 
-use Business::UDC 0.10;
+use Business::UDC 0.11;
 use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 sub module_name {
 	my $self = shift;
@@ -112,6 +112,46 @@ sub process {
 			} elsif ($udc_error eq "Extra opening parenthesis '('.") {
 				push @record_errors, Data::MARC::Validator::Report::Error->new(
 					'error' => "Field 080a has extra opening parenthesis '('.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'position' => $udc_error_params{'position'},
+					},
+				);
+			} elsif ($udc_error eq "Invalid year in time auxiliary.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has invalid year in time auxiliary.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'position' => $udc_error_params{'position'},
+					},
+				);
+			} elsif ($udc_error eq "Bad hyphen character.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has bad hyphen character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'position' => $udc_error_params{'position'},
+					},
+				);
+			} elsif ($udc_error eq "Extra dash '-'.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has extra dash character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'position' => $udc_error_params{'position'},
+					},
+				);
+			} elsif ($udc_error eq "Extra dot '.'.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has extra dot character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'position' => $udc_error_params{'position'},
+					},
+				);
+			} elsif ($udc_error eq "Missing operator.") {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has missing operator.",
 					'params' => {
 						'field_080_a' => $field_080a,
 						'position' => $udc_error_params{'position'},

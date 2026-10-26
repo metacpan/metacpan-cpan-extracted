@@ -32,40 +32,40 @@ no_index:
 provides:
   Unblock::HTTP3:
     file: lib/Unblock/HTTP3.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Body::Reader:
     file: lib/Unblock/HTTP3/Body/Reader.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Body::Stream:
     file: lib/Unblock/HTTP3/Body/Stream.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Capsule:
     file: lib/Unblock/HTTP3/Capsule.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Capsule::Parser:
     file: lib/Unblock/HTTP3/Capsule/Parser.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Capsule::Stream:
     file: lib/Unblock/HTTP3/Capsule/Stream.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Client:
     file: lib/Unblock/HTTP3/Client.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Extension::Stream:
     file: lib/Unblock/HTTP3/Extension/Stream.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Integration:
     file: lib/Unblock/HTTP3/Integration.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::NativeABI:
     file: lib/Unblock/HTTP3/NativeABI.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Server:
     file: lib/Unblock/HTTP3/Server.pm
-    version: '0.13'
+    version: '0.14'
   Unblock::HTTP3::Transaction:
     file: lib/Unblock/HTTP3/Transaction.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Alien::nghttp3: '0.01'
   Carp: '0'
@@ -82,5 +82,5 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP3/issues
   homepage: https://github.com/haxmeister/perl-Unblock-HTTP3
   repository: https://github.com/haxmeister/perl-Unblock-HTTP3.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

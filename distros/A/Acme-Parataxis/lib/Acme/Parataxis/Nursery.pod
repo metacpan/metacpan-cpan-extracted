@@ -1,0 +1,176 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Nursery - Structured Concurrency Container for Spawned Children that are all Joined, or all Cancelled
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async nursery];
+
+    async {
+        my ($profile, $orders) = (undef, undef);
+
+        my $ok = eval {
+            nursery( sub ($n) {
+                $n->spawn( sub { $profile = fetch_user_profile() } );
+                $n->spawn( sub { $orders  = fetch_user_orders()  } );
+            } );
+            1;
+        };
+        die $@ unless $ok;
+
+        say $profile->name;    # both children finished before the nursery returned
+    };
+
+=head1 DESCRIPTION
+
+C<Acme::Parataxis::Nursery> is the runtime behind C<nursery( )> (exported by L<Acme::Parataxis>). It gives you the
+Go-structured-concurrency pattern in Perl:
+
+=over
+
+=item * Any child you spawn with C<< $n->spawn >> is guaranteed to be finished before C<nursery( )> returns.
+
+=item * The first child to fail cancels all of its siblings. The whole group is drained, then the failure is rethrown
+      in the calling fiber as an L<Acme::Parataxis::Error::Nursery> aggregate.
+
+=item * The block value comes back when every child succeeded.
+
+=back
+
+A bare C<fiber>/C<spawn> inside the block creates an I<independent> fiber the block owns - it is B<not> adopted by the
+nursery and does B<not> delay the join. The L<Acme::Parataxis::CancellationToken> that the nursery hands you via C<<
+$n->token >> is public, so you can cancel the whole group yourself, or hand it to a C<with_timeout> deadline.
+
+=head1 CONSTRUCTOR
+
+=head2 C<new( [ token =E<gt> $token ] )>
+
+    my $n = Acme::Parataxis::Nursery->new( token => $tok );
+
+Normally you never call this: C<nursery( )> builds the object, runs your block in the calling fiber, joins every child,
+and throws the aggregate. C<new> is the lower-level entry point for embedding, and accepts a C<token> (default: a fresh
+L<Acme::Parataxis::CancellationToken>). Note that C<new> alone does not join - a child you C<spawn> through it still
+runs, but nothing aggregates its error or cancels its siblings; that is the private C<_join> that C<nursery( )> calls
+on your behalf.
+
+=head1 METHODS
+
+=head2 C<spawn( sub { ... } )>
+
+    $n->spawn( sub { ... } );
+
+Register a child fiber for this nursery and return the child fiber object. The child runs on its own fiber; the nursery
+guarantees it is reaped before C<nursery( )> returns.
+
+The child parks once at birth, so a failure in its very first statement surfaces through the scheduler (where the
+nursery can observe and aggregate it) rather than being thrown into your block.
+
+Croaks with C<Nursery::spawn() requires a CODE ref> if the argument is not a code ref, and with C<Nursery::spawn() must
+be called from inside a scheduled fiber> if you are not inside a fiber.
+
+=head2 C<token( )>
+
+    my $tok = $n->token;
+
+The nursery's public cancellation token. Cancelling it cancels and drains every child, exactly as if a sibling had
+failed. Passing it to a C<with_timeout> deadline lets the timeout cancel the group as well. A clean nursery leaves the
+token uncancelled.
+
+=head1 Recipes
+
+=head2 Fan out and collect
+
+    my (@rows, $err);
+
+    eval {
+        nursery( sub ($n) {
+            for my $id (@ids) {
+                $n->spawn( sub { push @rows, load_row($id) } );
+            }
+        } );
+        1;
+    } or $err = $@;
+
+    die $err if $err;
+
+=head2 Bound the group with a deadline
+
+    async {
+        eval {
+            nursery( sub ($n) {
+                $n->spawn( sub { await_sleep(5_000) } );
+                $n->spawn( sub { await_sleep(5_000) } );
+                with_timeout( 500, $n->token, sub { await_sleep(10_000) } );
+            } );
+            1;
+        } or warn "the group was cut short: $@";
+    };
+
+The deadline cancels the nursery's own token, which cancels both children.
+
+=head1 ERRORS
+
+=head2 Acme::Parataxis::Error::Nursery
+
+Thrown by C<nursery( )> when one or more children died. It is an L<Acme::Parataxis::Error> subclass, so C<< $@->message
+>>, C<< $@->kind >> (C<nursery>), and the usual accessors work. Stringifying it gives C<nursery failure: ...> built
+from the primary failure.
+
+C<< $err->failures >> returns every child error in spawn order, including the L<Acme::Parataxis::Error::Cancelled>
+objects that the cancelled siblings threw as they unwound. C<< $err->primary >> is the first B<natural> (non-cancelled)
+failure, so it points at the error that actually broke something rather than at a consequence:
+
+    my $err = eval { nursery( sub ($n) {
+        $n->spawn( sub { die "real failure\n" } );
+        $n->spawn( sub { await_sleep(5_000) } );
+    } ); 1 } ? undef : $@;
+
+    $err->primary;                 # "real failure\n"
+    my @all = $err->failures;      # 2 - the failure plus the cancelled sibling
+
+=head1 Behavior Notes
+
+=head2 A child sets a lexical; returning from the block does not deliver a value
+
+The block cannot return early to hand a child its result: the runtime joins every spawned child, so a child's result
+must be expressed by setting a lexically-scoped variable, as in the SYNOPSIS. The block's own C<return> value is the
+value of C<nursery( )>, and it is only delivered when every child succeeded.
+
+=head2 A child's death cancels its siblings, so most siblings never finish
+
+The first child to die cancels the rest. A sibling that had not yet completed by then throws
+L<Acme::Parataxis::Error::Cancelled> instead of its own result, and the group is drained before the aggregate is
+rethrown. In other words, a nursery is all-or-nothing, not best-effort: on failure you learn about the first real error
+plus the cancellations it caused, not the output of the children that were still in flight.
+
+=head2 The block's own death wins over its children's
+
+If your block C<die>s, the runtime cancels and drains the children so none are orphaned, then rethrows I<your> error
+verbatim - not wrapped in an C<Error::Nursery>. Only child failures produce the aggregate.
+
+=head2 Nested nurseries are independent
+
+An inner C<nursery( )> that fails cancels only its own children. Catch it (as in the outer-failure recipe) and the
+outer block and its siblings carry on.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::CancellationToken>, L<Acme::Parataxis::Error>, L<Acme::Parataxis::Future>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) 2026 Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

@@ -26,7 +26,7 @@ use App::FileSync qw(json_encode json_decode);
 use App::FileSync::Args qw(named);
 use App::FileSync::I18N qw(os_error strip_location);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Payloads are raw-deflated when that makes them smaller.  Small payloads and
 # already-compressed data are left alone, so the flag costs more than it saves.

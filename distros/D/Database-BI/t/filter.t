@@ -29,6 +29,15 @@ use Mojo::Util  qw(url_escape);
 
 my $t = Test::Mojo->new('Database::BI');
 
+# The join test below uploads two files and then opens both, so the staging
+# directory has to be this file's own: the default one is shared by every test
+# file, and a parallel run's POST /uploads/clear could delete them in between.
+$t->app->config->{uploads_dir} = File::Temp::tempdir(CLEANUP => 1);
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = File::Temp::tempdir(CLEANUP => 1);
+
 # ---------------------------------------------------------------------------
 # Guard: all filter proofs depend on data/sales.csv being present.
 # ---------------------------------------------------------------------------

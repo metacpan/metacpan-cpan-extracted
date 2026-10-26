@@ -10,7 +10,7 @@ use Data::Dumper::Concise; # For Dumper().
 use File::Slurper 'read_lines';
 use File::Spec;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 # -----------------------------------------------
 

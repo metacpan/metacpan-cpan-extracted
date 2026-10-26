@@ -1,12 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Unicode Rule-Based Number Format - ~/lib/Locale/Unicode/RBNF.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/10/22
-## Modified 2026/10/22
+## Modified 2026/10/26
 ## All rights reserved
-##
+## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -18,8 +18,8 @@ BEGIN
     use warnings;
     use warnings::register;
     use vars qw(
-        $VERSION $ERROR $FATAL_EXCEPTIONS $IsPurePerl $K_MAX_DOUBLE %GROUPINGS
-        %ROUNDING_MODES %CAPITALIZATION %DEFAULT_SYMBOLS
+        $VERSION $ERROR $FATAL_EXCEPTIONS $IsPurePerl $K_MAX_DOUBLE $NV_IS_WIDE
+        %GROUPINGS %ROUNDING_MODES %CAPITALIZATION %DEFAULT_SYMBOLS
     );
     use Locale::Unicode v0.4.4;
     use Locale::Unicode::RBNF::CLDR;
@@ -29,10 +29,15 @@ BEGIN
     use Locale::Unicode::RBNF::Rule;
     use Locale::Unicode::RBNF::RuleSet;
     use Locale::Unicode::RBNF::Util qw( :all );
+    use Config;
     use Scalar::Util ();
     use Wanted;
     # kMaxDouble in rbnf.cpp: (1 << 22) * (1 << 22)
     $K_MAX_DOUBLE = 4194304.0 * 4194304.0;
+    # True when perl uses a long double or a __float128 for its NVs.
+    # Parsed results, which are doubles in ICU, must then be rounded to double so that
+    # both engines return the same values.
+    $NV_IS_WIDE = ( $Config{nvsize} > 8 ) ? 1 : 0;
     %GROUPINGS = (
         spellout            => 'SpelloutRules',
         ordinal             => 'OrdinalRules',
@@ -54,7 +59,7 @@ BEGIN
         digits              => [0..9],
         numbering_system    => 'latn',
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 # Load XS; fall back to pure-Perl implementations if unavailable.
@@ -771,6 +776,11 @@ sub _normalise_result
 {
     my $v = shift( @_ );
     return( $v ) if( is_nan( $v ) || is_infinite( $v ) );
+    # The C engine computes with doubles, whereas the pure-Perl engine uses the
+    # precision of the perl numbers (NVs). A non-integral value is therefore rounded to
+    # the nearest double. Integral values are kept as they are, since beyond 2^53 the
+    # pure-Perl engine may hold them as integers.
+    $v = unpack( 'd', pack( 'd', $v ) ) if( $NV_IS_WIDE && $v != int( $v ) );
     return( int( $v ) ) if( $v == int( $v ) && abs( $v ) < 9007199254740992 );
     return( $v );
 }
@@ -1444,7 +1454,7 @@ Locale::Unicode::RBNF - Unicode CLDR Rule-Based Number Format, ported from ICU4C
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -1725,6 +1735,11 @@ The C engine is the internal class C<Locale::Unicode::RBNF::XS>, created by the 
 =item * Contextual capitalisation titlecases the first character, without a sentence break iterator.
 
 =item * Parse results are computed with doubles, as ICU does. Beyond 2^53, the pure Perl engine may keep integer precision where ICU and the C engine round.
+
+On a perl whose numbers are long doubles or C<__float128> (C<nvsize> greater than 8), a non-integral parsed result is rounded to the nearest double, whichever engine is in use, so that both return the same value.
+Such a perl prints that value with more digits: C<3,2> parsed in French gives C<3.20000000000000017763568394002505>, which is exactly the double ICU returns.
+
+=item * A perl with 64-bit integers (C<ivsize> of 8) is required, since the C<int64_t> arithmetic of ICU is reproduced with native perl integers.
 
 =item * Where ICU converts an out of range double to an C<int32_t> to select a plural form, which is undefined behaviour in C++, the saturating semantics of Java and aarch64 are used.
 

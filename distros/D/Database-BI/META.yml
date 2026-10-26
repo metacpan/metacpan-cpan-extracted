@@ -76,5 +76,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-BI/issues
   repository: https://github.com/nigelhorne/Database-BI.git
-version: 0.017.0
+version: 0.017.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -25,7 +25,7 @@
 	--highlight: #ffffff;
 	--term-bg: var(--fg);
 	--term-fg: var(--bg);
-	--serif: "Times New Roman", Times, serif;
+	--latin: "Times New Roman", Times;
 	--mono: Courier, "Courier New", monospace;
 }
 
@@ -48,21 +48,87 @@ html {
 	text-size-adjust: 100%;
 }
 
+/* An element that names its language takes the face and the line
+   height of that language, and its children inherit them. The html
+   element names the language of the page. A rule in :where() has no
+   weight, so the rule of an element wins: the code face, and the line
+   height of a heading and of a pre block. No other rule sets a face or
+   a line height. */
+
+:where([lang]) {
+	font-family: var(--latin), serif;
+	line-height: 1.55;
+}
+
+/* Han text takes its stack after the Latin face, so Latin text keeps
+   its face. Each tag of zh takes the simplified form, and the next rule
+   gives the traditional form to the script Hant, and to the regions TW,
+   HK and MO. A Han face has no italic, and the browser must not slant
+   it. */
+
+:where([lang]:lang(zh)) {
+	font-family: var(--latin), "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+	font-synthesis-style: none;
+	line-height: 1.8;
+}
+
+:where([lang]:lang(zh-Hant), [lang]:lang(zh-TW), [lang]:lang(zh-HK),
+    [lang]:lang(zh-MO)) {
+	font-family: var(--latin), "Songti TC", "Noto Serif CJK TC", PMingLiU, serif;
+}
+
+/* Selectors 4 matches a :lang() range by extended filtering, so zh-TW
+   also matches zh-Hans-TW and zh-Latn-TW in WebKit and Firefox. The
+   script Hans names the simplified form, so the next rule gives it
+   back. The script Latn names Latin text, so the last rule gives it
+   the Latin face and line height in each region. */
+
+:where([lang]:lang(zh-Hans)) {
+	font-family: var(--latin), "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+}
+
+:where([lang]:lang(zh-Latn)) {
+	font-family: var(--latin), serif;
+	line-height: 1.55;
+}
+
+/* Han text marks its emphasis with dots below, not with an italic.
+   mandoc(1) writes the Em macro of mdoc(7) as an i of the class Em.
+   The script Latn names Latin text, so each filtering gives it the
+   italic and no dots. */
+
+em:lang(zh):not(:lang(zh-Latn)),
+.Em:lang(zh):not(:lang(zh-Latn)) {
+	font-style: normal;
+	text-emphasis: dot;
+	text-emphasis-position: under right;
+}
+
+/* mandoc(1) writes \fI of man(7) as a bare i, and pod2man(1) writes
+   I<> as \fI. A bare i marks what the reader substitutes, so it keeps
+   its italic and takes the dots. Han text in it stays upright, because
+   the rule of zh above stops a synthetic italic. */
+
+i:lang(zh):not(:lang(zh-Latn)) {
+	text-emphasis: dot;
+	text-emphasis-position: under right;
+}
+
 body {
 	background: var(--bg);
 	color: var(--fg);
-	font-family: var(--serif);
 	font-size: 17px;
-	line-height: 1.55;
-	margin: 1.75em 1.5em;
+	margin-block: 1.75em;
+	margin-inline: 1.5em;
 	max-width: 42em;
 }
 
 hr {
 	border: 0;
-	border-top: 1px solid var(--shadow);
-	border-bottom: 1px solid var(--highlight);
-	margin: 1.25em 0;
+	border-block-start: 1px solid var(--shadow);
+	border-block-end: 1px solid var(--highlight);
+	margin-block: 1.25em;
+	margin-inline: 0;
 }
 
 a:link,
@@ -80,27 +146,63 @@ a:visited {
 /* The chrome carries no class, so the selector names the element */
 
 body > header {
+	margin-block-end: 0.2em;
+}
+
+body > header > a {
 	font-size: 2em;
 	font-weight: bold;
 	letter-spacing: 0.05em;
-	margin: 0 0 0.2em 0;
 }
 
-body > header a:link,
-body > header a:visited {
+body > header > a:link,
+body > header > a:visited {
 	color: var(--fg);
 	text-decoration: none;
 }
 
-nav {
+/* The list of the languages and the nav list, each on one line */
+
+body > header ul,
+nav ul {
 	font-size: 0.95em;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
-h1, h2, h3, h4 {
-	font-family: var(--serif);
+body > header li,
+nav li {
+	display: inline;
+}
+
+body > header li + li::before,
+nav li + li::before {
+	content: "\00b7";
+	margin-inline: 0.5em;
+}
+
+a[aria-current="page"]:link,
+a[aria-current="page"]:visited {
+	color: var(--fg);
+	font-weight: bold;
+	text-decoration: none;
+}
+
+/* The rule of 1994 above the main part and above the footer */
+
+main,
+footer {
+	border-block-start: 1px solid var(--shadow);
+	box-shadow: inset 0 1px var(--highlight);
+	margin-block-start: 1.25em;
+	padding-block-start: 0.6em;
+}
+
+h1, h2, h3, h4, h5, h6 {
 	font-weight: bold;
 	line-height: 1.2;
-	margin: 1.5em 0 0.6em 0;
+	margin-block: 1.5em 0.6em;
 }
 
 h1 {
@@ -110,22 +212,21 @@ h1 {
 /* The rule of a 1994 hr: a dark line over a light line */
 
 h2 {
-	border-top: 1px solid var(--shadow);
+	border-block-start: 1px solid var(--shadow);
 	box-shadow: inset 0 1px var(--highlight);
 	font-size: 1.35em;
-	padding-top: 0.6em;
+	padding-block-start: 0.6em;
 }
 
 h3 { font-size: 1.1em; }
 h4 { font-size: 1em; }
 
 p, li, dd, dt {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	margin-block: 0.5em;
 }
 
 dt { font-weight: bold; }
-dd { margin-left: 2em; }
+dd { margin-inline-start: 2em; }
 
 table { border-collapse: collapse; }
 
@@ -134,16 +235,19 @@ code, pre, tt, kbd, samp, var {
 	font-size: 0.92em;
 }
 
-/* A 1994 X11 terminal in a sunken Motif well */
+/* A 1994 X11 terminal in a sunken Motif well: the dark sides are the
+   start sides, so the well mirrors on a page of rtl */
 
 pre {
 	background: var(--term-bg);
 	border: 2px solid;
-	border-color: var(--shadow) var(--highlight) var(--highlight) var(--shadow);
+	border-block-color: var(--shadow) var(--highlight);
+	border-inline-color: var(--shadow) var(--highlight);
 	color: var(--term-fg);
 	line-height: 1.4;
 	overflow-x: auto;
-	padding: 0.7em 0.9em;
+	padding-block: 0.7em;
+	padding-inline: 0.9em;
 }
 
 pre code {
@@ -157,58 +261,21 @@ footer {
 }
 
 
-/* Manual pages: mandoc(1) emits its own class names. */
+/* Manual pages: mandoc(1) emits its own class names. A section
+   heading takes no rule, and it sits flush with the banner. */
 
-table.head,
-table.foot {
-	font-size: 0.85em;
-	width: 100%;
-	color: var(--muted);
-}
-
-table.head {
-	margin-bottom: 1em;
-}
-
-table.foot {
-	margin-top: 1.5em;
-}
-
-table.head td {
-	border-bottom: 1px solid var(--highlight);
-	box-shadow: inset 0 -1px var(--shadow);
-}
-
-table.foot td {
-	border-top: 1px solid var(--shadow);
-	box-shadow: inset 0 1px var(--highlight);
-}
-
-td.head-vol,
-td.foot-date {
-	text-align: center;
-}
-
-td.head-rtitle,
-td.foot-os {
-	text-align: right;
-}
-
-h2.Ss {
+h2.Sh {
 	border: 0;
 	box-shadow: none;
+	font-size: 1.2em;
+	margin-block-start: 1.6em;
+	margin-inline-start: calc(-3.5em / 1.2);
 	padding: 0;
 }
 
-h1.Sh {
-	font-size: 1.2em;
-	margin-left: calc(-3.5em / 1.2);
-	margin-top: 1.6em;
-}
-
-h2.Ss {
+h3.Ss {
 	font-size: 1.05em;
-	margin-left: calc(-1.75em / 1.05);
+	margin-inline-start: calc(-1.75em / 1.05);
 }
 
 a.permalink:link,
@@ -218,7 +285,7 @@ a.permalink:visited {
 }
 
 .manual-text {
-	margin-left: 3.5em;
+	margin-inline-start: 3.5em;
 }
 
 .manual-text > br:first-child {
@@ -230,12 +297,12 @@ table.Nm td {
 }
 
 table.Nm td:first-child {
-	padding-right: 0.4em;
+	padding-inline-end: 0.4em;
 	white-space: nowrap;
 }
 
 .Bd-indent {
-	margin-left: 2em;
+	margin-inline-start: 2em;
 }
 
 .Nm, .Cm, .Fl, .Ic, .Fn, .Dv, .Er, .Ev {
@@ -252,6 +319,6 @@ table.Nm td:first-child {
 }
 
 @media (max-width: 40em) {
-	.manual-text { margin-left: 0; }
-	h1.Sh, h2.Ss { margin-left: 0; }
+	.manual-text { margin-inline-start: 0; }
+	h2.Sh, h3.Ss { margin-inline-start: 0; }
 }

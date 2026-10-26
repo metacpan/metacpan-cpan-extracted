@@ -15,7 +15,7 @@ use File::Basename qw(dirname);
 use App::FileSync::Args qw(named);
 use App::FileSync::IO qw(ensure_dir open_file);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 =encoding utf8
 

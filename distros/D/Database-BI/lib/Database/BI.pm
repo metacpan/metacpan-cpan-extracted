@@ -13,7 +13,7 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-use version; our $VERSION = version->declare('0.017.0');
+use version; our $VERSION = version->declare('0.017.1');
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -40,7 +40,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.017.0
+0.017.1
 
 =head1 DESCRIPTION
 
@@ -221,7 +221,12 @@ application.
 
 B<Start the development server (restarts automatically when you edit a file):>
 
-    morbo script/database-bi
+    script/database-bi
+
+C<morbo script/database-bi> does the same thing, and
+C<script/database-bi daemon> starts a plain server with no file watcher; any
+other Mojolicious command word (C<routes>, C<get>, ...) is passed to the
+application.
 
 B<Start the production server:>
 
@@ -534,16 +539,33 @@ value, remembered once in the model store and shared with every dataset that
 names it) or from coordinate columns (C<lat=> and C<lon=>).  Rows sharing a
 position become one marker.  Markers are clustered with
 Leaflet.markercluster, so a dense map draws a count at low zoom and splits it
-as it is zoomed in.  Parameters:
+as it is zoomed in.  Clustering is always on.  Parameters:
 
-  l=<spec>      left table (required)
-  loc=<col>     column of places to geocode (required unless lat= and lon= are)
-  lat=<col>     latitude column, -90..90
-  lon=<col>     longitude column, -180..180
-  popup=<col>   column shown in the marker popup (repeatable)
-  max=N         markers to draw (default map_max_markers, 2000)
+  l=<spec>       left table (required)
+  loc=<col>      column of places to geocode (required unless lat= and lon= are)
+  lat=<col>      latitude column, -90..90
+  lon=<col>      longitude column, -180..180
+  popup=<col>    column shown in the marker popup (repeatable)
+  max=N          markers to draw (default map_max_markers, 2000)
+  zoom=N         initial zoom 0..19 (default: fit the markers)
+  max_zoom=N     tile layer maxZoom 0..28 (default: map_max_zoom, if set)
+  tiles=<name>   named tile source from the tile_sources config key
+  heat=1         add a heatmap layer over the markers
+  weight=<col>   numeric heatmap intensity column (normalised to 0..1)
+  size=<col>     numeric bubble-radius column; markers become circles
+  color=<col>    colour markers from a column
+  color_rule=<op>:<value>:<colour>  repeatable; op is gt, ge, lt, le, eq or ne
+  color_default=<colour>  fallback colour (default #3388ff)
+  series=<col>   colour markers by category (not with color=)
+  scheme=<name>  palette for series=: tableau10, category10, set2, set3, paired
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=            result filters (repeatable)
+
+An unknown C<tiles=> or C<scheme=> is a 400, as is an unknown column, C<color=>
+together with C<series=>, or a transposed lat/lon pair.  The page never shows
+the L<HTML::OSM> Nominatim search box (C<search =E<gt> 0> is always passed), so
+nothing typed on the map is sent anywhere.  L<HTML::OSM> 0.12 or later is the
+renderer; an older optional install still returns the page with a warning.
 
 =item C<GET /line>
 
@@ -728,6 +750,7 @@ defaults:
 
     {
         data_dir => 'data',   # directory scanned for data files on the home page
+        uploads_dir => '.uploads',  # staging directory for uploaded files
         platform => 'web',    # VWF template dimension
         language => 'en',     # VWF template dimension
 
@@ -737,6 +760,14 @@ defaults:
         # below.
         d3_url => 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js',
     }
+
+C<uploads_dir> is where C<POST /upload> stages the files a user drags onto the
+page, and the directory C<POST /uploads/clear> empties.  It defaults to
+C<.uploads> under the application home.  A relative value resolves against the
+application home, an absolute one is used as given, so a deployment whose
+application directory is read-only can stage uploads somewhere writable:
+
+    { uploads_dir => '/var/tmp/database-bi-uploads' }
 
 =head2 Self-hosting D3 and Leaflet
 
@@ -765,12 +796,78 @@ C<tile_url> points the map layer at a self-hosted tile server instead of
 OpenStreetMap.  It keeps Leaflet's C<{z}>, C<{x}> and C<{y}> placeholders, and
 C<{s}> too if the server uses subdomains.  Set it and every request needed to
 draw a map can stay on the local network.  The OpenStreetMap attribution stays
-on the map, since it is the usual credit for OSM-derived tiles.  The in-page
-place search still calls Nominatim if a reader uses it.
+on the map, since it is the usual credit for OSM-derived tiles.  There is no
+in-page place search: L<HTML::OSM> is always constructed with C<search =E<gt> 0>,
+so nothing typed on a map page is sent anywhere.
+
+Map-specific config keys: C<map_geocode_max> (new geocoder lookups per request,
+default 500), C<map_max_markers> (markers per request, default 2000),
+C<map_region> (a two-letter country hint for ambiguous places), C<map_max_zoom>
+(the default tile-layer maxZoom) and C<tile_sources> (a hashref of named tile
+sources, each C<< { url =E<gt> ... } >>, selected with C<tiles=>).
+
+B<Map colour rules.>  C<color=> names the column and C<color_rule=> supplies
+C<< E<lt>opE<gt>:E<lt>valueE<gt>:E<lt>colourE<gt> >> rules; they are tried in
+the order given and the first match wins.  The operators are C<gt>, C<ge>,
+C<lt>, C<le>, C<eq> and C<ne>; a comparison is numeric when both the cell and
+the rule's value look like numbers, and otherwise only C<eq>/C<ne> are
+meaningful (case-insensitive).  A colour is C<#rgb>, C<#rrggbb> or a CSS name
+such as C<red> or C<teal>.  A value that matches no rule gets C<color_default=>,
+which the legend shows as "Other".  C<series=> is the categorical
+alternative: each distinct value takes the next colour from C<scheme=>,
+cycling through the palette, and the legend lists the categories.  C<color=>
+and C<series=> are mutually exclusive.
+
+=head1 COMMAND-LINE TOOLS
+
+Two maintenance scripts ship in C<script/>; both use the same data and model
+directories as the web application and are safe to run from cron.
+
+=head2 script/bi-geocode
+
+Warms the shared geocode cache for one column, so later map requests make no
+lookups:
+
+    ./script/bi-geocode --spec table:customers --col city \
+                        [--data-dir DIR] [--model-dir DIR] \
+                        [--openaddr PATH] [--region CC] [--dry-run] [--verbose]
+
+It is idempotent: a second run against a warm cache resolves nothing and says
+so.  Exit status is 0 on success, 1 when the column is missing or no rows load,
+and 2 on bad arguments or an unopenable source.
+
+=head2 script/bi-alert
+
+Reports one saved analysis, and turns a crossed threshold into a non-zero exit
+status so cron can act on it:
+
+    ./script/bi-alert --analysis ID [--threshold MEASURE:OP:VALUE] \
+                      [--data-dir DIR] [--model-dir DIR] [--dry-run]
+
+The digest goes to STDOUT and nothing is sent: pipe it into mail, a webhook or
+a ticket creator if the alert has to leave the machine.  Exit status is 0 when
+no threshold is crossed, 1 when one is, and 2 on error.  There is no delivery to
+suppress, so C<--dry-run> is accepted for compatibility only and changes neither
+the output nor the exit status.  The script keeps no state.
+
+C<script/database-bi> is the web application launcher: run with no arguments it
+starts the reloading development server, with a command word it runs that
+command, and C<hypnotoad script/database-bi> starts a preforking server (see
+L</SYNOPSIS>).
 
 =head1 COMMON PITFALLS
 
 =over 4
+
+=item B<The launcher's shebang must name perl, not morbo>
+
+morbo starts the application as C<perl script/database-bi daemon>, and perl
+hands a script whose C<#!> line does not mention perl to the interpreter that
+line names.  With a C<morbo> shebang every worker therefore started another
+morbo: the chain grew a process a second, kept the listening port, and only
+stopped when the environment copied to each child was too large for C<exec>
+(F<Argument list too long>).  The shebang is perl and the script starts the
+server itself when it is given no arguments.
 
 =item B<The configuration file is optional but must be valid Perl if present>
 
@@ -808,9 +905,11 @@ default, set it before starting:
 
 Setting C<language =E<gt> 'de'> in C<database_bi.conf> tells the controller
 to look for templates in C<templates/web/de/>.  If that directory does not
-exist, the controller automatically falls back to the default language.  To
-add German support: (1) create C<templates/web/de/>, (2) copy and translate
-the C<.html.tt> files from C<templates/web/en/>, then (3) set the config.
+exist, the controller automatically falls back to the default language, and
+the same fallback applies when a browser asks for a language no directory
+serves.  To add German support: (1) create C<templates/web/de/>, (2) copy and
+translate the C<.html.tt> files from C<templates/web/en/>, then (3) set the
+config.
 
 =item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx>
 
@@ -892,15 +991,12 @@ works correctly in production without any special workarounds.
 
 =head1 ROADMAP
 
-Features planned for future releases (post-0.013.0).  Items are ordered by
-priority.
+Features planned for future releases (post-0.018.0).  Items are ordered by
+priority.  Items shipped before this release (XLSX export, the copy-link
+button, the column statistics panel, folder filter/join propagation and the
+aggregate/measure layer) are no longer listed.
 
 =over 4
-
-=item * B<Folder view filter/join propagation> (Medium) -- The folder view
-panel does not carry forward active C<j=> and C<f=> params when building
-the C</folder> URL.  Users who have filtered or joined a table and then
-click "Folder view" silently lose their filter context.
 
 =item * B<Multi-sheet XLSX> (Medium) -- C<_detect_file_info> reads only the
 first worksheet.  A C<?sheet=> URL param with a sheet-name picker would
@@ -913,6 +1009,12 @@ reduce multi-filter chains for common range and set queries.
 blocks the HTTP response until all rows are assembled.  Mojolicious supports
 server-sent events, which could progressively stream rows to a JS table
 renderer, giving visible progress on slow joins.
+
+=item * B<Boundary overlay on maps> (Low) -- C<HTML::OSM> can draw GeoJSON and
+choropleth layers.  A C<gj=E<lt>pathE<gt>> parameter would overlay a local
+GeoJSON file, optionally shaded by an aggregated measure.  This is the one
+Phase 6 item not implemented: it is optional in the phase spec, and no boundary
+data is shipped or downloaded.
 
 =back
 
@@ -930,37 +1032,24 @@ renderer, giving visible progress on slow joins.
 #   3. order_by delegation -- done: ?sort=col&dir=asc|desc on /join and /combine.
 #   4. Filter pushdown -- done: _filter_specs_to_criteria translates f= specs to
 #      SQL criteria for SQLite sources; _grouped_totals and _fetch_page both use it.
-#   5. Schema warnings UI -- partial: join_tables captures and passes schema_warnings;
-#      BI-side type-mismatch detection is still open.
+#   5. Schema warnings UI -- done: every route that builds a join compares the
+#      declared types at each step (DataSource::schema, _schema_type_warnings),
+#      and the join page shows a banner.  The chart/export pipeline records the
+#      same warnings; /export returns them in the X-BI-Warnings header.
+#      Database::Join's own warn_schema_type_mismatch cannot fire here, because
+#      these joins always pass a collision_prefix for the right table.
 #   6. updated() in DataSource -- done: DataSource::updated() delegates to inner DA.
 #
 # ---- POST-RELEASE FEATURE ROADMAP ----
 #
-# B. [NEW 0.010.0] XLSX export (High priority)
-#    /export supports CSV, SQLite, and JSON but not XLSX output.
-#    Excel::Writer::XLSX would close the round-trip for users whose source
-#    data is XLSX.  The read side already uses Spreadsheet::ParseXLSX.
-#
-# C. [NEW 0.010.0] Copy-link button on chart pages (Medium priority)
-#    /graph, /pie, /heatmap, and /bar have fully parameterised URLs but no
-#    copy-link button.  The mechanism already exists in dashboard.html.tt;
-#    it is a template refactor to share the component.
-#
-# D. [NEW 0.010.0] Column statistics panel (Medium priority)
-#    Per-column popover showing min, max, mean, median, and null-count.
-#    List::Util is already in PREREQ_PM; only Statistics::Descriptive (or
-#    inline computation) is needed.
+# Completed since 0.010.0, so no longer listed here: XLSX export (B), the
+# copy-link button on chart pages (C), the column statistics panel (D), and
+# folder-view filter/join propagation (F).  The same list lives in the POD
+# ROADMAP above; keep the two in step.
 #
 # E. [NEW 0.010.0] Multi-sheet XLSX (Medium priority)
 #    _detect_file_info reads only worksheet index 0.  A ?sheet= URL param
 #    with a sheet-name picker would expose the full workbook.
-#
-# F. [NEW 0.010.0] Folder view: propagate active filters and joins (Medium)
-#    _run_export_pipeline already handles j= and f= params so /folder works
-#    on joined/filtered data when the URL is crafted manually.  The folder
-#    panel JS in dashboard.html.tt must carry forward the current j= and f=
-#    params when building the base_url so users do not lose their filter
-#    context on click.
 #
 # G. [NEW 0.010.0] between / in(a,b,c) filter operators (Low priority)
 #    Would reduce multi-f= chains for common range and set queries.  The
@@ -1082,7 +1171,17 @@ sub startup ($self) {
 	#
 	# Joins are handled by Database::Join in the controller pipeline;
 	# open_table returns a single DataSource per table.
-	my $data_dir = $self->home->child($self->config->{data_dir})->to_string;
+	#
+	# Resolved with the rule the controller's _data_dir_for applies: a relative
+	# value is relative to the application home, an absolute one is used as
+	# given.  Mojo::File->child appends an absolute path instead of replacing
+	# the base, so home->child($absolute) named a directory that cannot exist,
+	# and /view - which opens its table without a directory of its own - read
+	# from it and served an empty page.
+	my $configured = $self->config->{data_dir} // 'data';
+	my $data_path  = Mojo::File->new($configured);
+	$data_path = $self->home->child($configured) unless $data_path->is_abs;
+	my $data_dir = $data_path->to_string;
 
 	# In-process CHI cache: shared across all requests in the same worker process.
 	# The Memory driver needs no external services and works out of the box.
@@ -1203,7 +1302,29 @@ sub startup ($self) {
 	# grow unboundedly across server restarts.  Only entries whose mtime is
 	# older than $UPLOAD_MAX_AGE_S seconds are removed; recent uploads that
 	# were made while the previous server process was running are preserved.
-	_evict_old_uploads($self->home->child('.uploads'), $UPLOAD_MAX_AGE_S);
+	_evict_old_uploads($self->_uploads_dir, $UPLOAD_MAX_AGE_S);
+}
+
+# _uploads_dir() -> Mojo::File
+#
+# Purpose: The one place that decides where POST /upload stages its files.
+# Entry:   $self->config->{uploads_dir} may be unset (the default), a path
+#          relative to the application home, or an absolute path.
+# Exit:    A Mojo::File; the directory may not exist yet.
+#
+# upload_file, clear_uploads and the startup eviction all resolve the
+# directory through here, so a configured staging directory is written to and
+# purged as one.  Resolving it per call rather than once in startup() is what
+# lets a caller - a test in particular - point one application instance at its
+# own directory without touching the shared <home>/.uploads that another
+# process may be clearing at the same moment.
+sub _uploads_dir ($self) {
+	my $dir = $self->config->{uploads_dir};
+	return $self->home->child('.uploads')
+		unless defined $dir && !ref $dir && length $dir;
+
+	my $path = Mojo::File->new($dir);
+	return $path->is_abs ? $path : $self->home->child($dir);
 }
 
 # _evict_old_uploads( $uploads_dir, $max_age_s ) -> void

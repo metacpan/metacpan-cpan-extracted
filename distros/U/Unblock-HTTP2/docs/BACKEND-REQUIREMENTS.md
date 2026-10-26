@@ -132,3 +132,11 @@ not allowed.
 
 Connection or provider cleanup requested from inside a native callback is
 deferred until the nghttp2 call unwinds.
+
+## Retired stream validation
+
+The private h2_receive_guard.h supplements facts libnghttp2 discards under
+RFC 9218. Both input APIs use it. It preserves reset races, tracks coalesced
+closed/skipped stream ranges with a 1024-range bound, validates unnegotiated
+legacy PRIORITY fields and keeps send-window overflow stream-local across
+nghttp2 versions. See docs/H2SPEC.md for the conformance gate and limits.

@@ -1,5 +1,6 @@
 ^\.git/
 ^\.github/
+^\.ci-deps/
 ^Handoff\.md$
 ^blib/
 ^_build/

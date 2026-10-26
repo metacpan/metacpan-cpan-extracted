@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::Author::GETTY::GiteaMeta;
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider';
 
-our $VERSION = '0.326';
+our $VERSION = '0.327';
 
 
 
@@ -146,7 +146,7 @@ Dist::Zilla::Plugin::Author::GETTY::GiteaMeta - Add Gitea/Forgejo (incl. Codeber
 
 =head1 VERSION
 
-version 0.326
+version 0.327
 
 =head1 DESCRIPTION
 
@@ -200,7 +200,7 @@ the default), C<metacpan> (the metacpan.org release page), or C<none>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
 
 =head1 CONTRIBUTING
@@ -213,9 +213,11 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

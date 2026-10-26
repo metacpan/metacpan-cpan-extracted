@@ -85,6 +85,11 @@ The low-level API remains for callers that do not attach a host:
         $framework->write($bytes);
     }
 
+After draining protocol output, if both want_read() and want_write() are
+false, flush the transport's queued bytes and close the socket. Do not leave
+it open waiting for more peer input. In particular, a final GOAWAY must be
+sent before closing. The same rule applies to native output sinks.
+
 Do not call output() when a transport is attached.
 
 ## Native input and output

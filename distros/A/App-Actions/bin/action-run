@@ -1353,45 +1353,45 @@ Nigel Horne, C<njh@nigelhorne.com>
 What happens when you run C<action-run WORKFLOW [DIR]> (the other commands
 are shown on the left):
 
-	 action-run [options] ARGS
-	        |
-	        v
-	+-------------------+  bad option or value  -> message; exit 2
-	| PARSE OPTIONS     |  --help / --version   -> print; exit 0
-	+-------------------+
-	        |
-	        +-- check [DIR] ----------> App::Actions::Check: report; exit 0 / 2
-	        +-- schema KIND ----------> print the JSON schema; exit 0
-	        +-- validate KIND FILE ---> check a saved document; exit 0 / 70
-	        +-- cache [--prune] ------> App::Actions::Cache; exit 0 / 1 (/ 70)
-	        +-- logs [--prune] -------> App::Actions::Logs;  exit 0 / 1 (/ 70)
-	        +-- preflight WF [DIR] ---> checks and pulls only; exit 0 / 2 (/ 70)
-	        +-- --list WF ------------> one line per job; exit 0
-	        |
-	        v  (run)
-	+-------------------+  workflow missing or invalid -> message; exit 2
-	| LOAD WORKFLOW     |
-	+-------------------+
-	        |
-	        v
-	+-------------------+  not ready (unless --skip-check) -> report; exit 2
-	| CHECK DOCKER      |
-	+-------------------+
-	        |
-	        v
-	+-------------------+  an image cannot be pulled -> message; exit 2
-	| PULL IMAGES       |
-	+-------------------+
-	        |
-	        v
-	+-------------------+  for each job: network, services, container,
-	| RUN JOBS          |  steps, clean-up (see App::Actions::Runner)
-	+-------------------+  Ctrl-C: clean up, then exit 2
-	        |
-	        v
-	+-------------------+
-	| SUMMARY           |  exit 0 = all passed, 1 = a job failed
-	+-------------------+
+     action-run [options] ARGS
+            |
+            v
+    +-------------------+  bad option or value  -> message; exit 2
+    | PARSE OPTIONS     |  --help / --version   -> print; exit 0
+    +-------------------+
+            |
+            +-- check [DIR] ----------> App::Actions::Check: report; exit 0 / 2
+            +-- schema KIND ----------> print the JSON schema; exit 0
+            +-- validate KIND FILE ---> check a saved document; exit 0 / 70
+            +-- cache [--prune] ------> App::Actions::Cache; exit 0 / 1 (/ 70)
+            +-- logs [--prune] -------> App::Actions::Logs;  exit 0 / 1 (/ 70)
+            +-- preflight WF [DIR] ---> checks and pulls only; exit 0 / 2 (/ 70)
+            +-- --list WF ------------> one line per job; exit 0
+            |
+            v  (run)
+    +-------------------+  workflow missing or invalid -> message; exit 2
+    | LOAD WORKFLOW     |
+    +-------------------+
+            |
+            v
+    +-------------------+  not ready (unless --skip-check) -> report; exit 2
+    | CHECK DOCKER      |
+    +-------------------+
+            |
+            v
+    +-------------------+  an image cannot be pulled -> message; exit 2
+    | PULL IMAGES       |
+    +-------------------+
+            |
+            v
+    +-------------------+  for each job: network, services, container,
+    | RUN JOBS          |  steps, clean-up (see App::Actions::Runner)
+    +-------------------+  Ctrl-C: clean up, then exit 2
+            |
+            v
+    +-------------------+
+    | SUMMARY           |  exit 0 = all passed, 1 = a job failed
+    +-------------------+
 
 =head1 LICENSE AND COPYRIGHT
 

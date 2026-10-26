@@ -11,3 +11,11 @@ no strict;
 ---
 use VERSION;
 no strict;
+########## strict and use v
+use strict;
+use v5.12;
+---
+use strict;
+use v5.12;
+--- v5.12
+use VERSION;

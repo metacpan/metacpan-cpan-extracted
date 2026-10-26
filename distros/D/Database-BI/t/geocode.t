@@ -549,7 +549,7 @@ subtest 'without the module there is a sentence, not an exception' => sub {
 
 	my ($available, $reason) = $geocode->geocoder_available();
 	is($available, 0, 'the geocoder is not available');
-	like($reason, qr/Geo::Coder::Free 0\.47 or later/, 'and the reason names the version this module needs');
+	like($reason, qr/Geo::Coder::Free 0\.48 or later/, 'and the reason names the version this module needs');
 	like($reason, qr/not installed/, 'and says that it is not installed');
 
 	my $result = $geocode->resolve_column(dirty_column(), 'place');

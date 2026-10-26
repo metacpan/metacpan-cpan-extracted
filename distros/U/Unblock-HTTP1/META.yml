@@ -20,6 +20,10 @@ no_index:
   directory:
     - t
     - inc
+  package:
+    - Unblock::HTTP1::_Engine
+    - Unblock::HTTP1::_Native
+    - Unblock::HTTP1::_Wire
 requires:
   Carp: '0'
   Config: '0'
@@ -35,5 +39,5 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP1/issues
   homepage: https://github.com/haxmeister/perl-Unblock-HTTP1
   repository: https://github.com/haxmeister/perl-Unblock-HTTP1.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -55,6 +55,13 @@ my $t = Test::Mojo->new('Database::BI');
 my $TEST_MODEL_DIR = tempdir(CLEANUP => 1);
 $t->app->config->{model_dir} = $TEST_MODEL_DIR;
 
+# And uploads to a directory this file owns.  The staging directory is shared
+# by every test file, so under a parallel harness (HARNESS_OPTIONS=j...) a
+# POST /uploads/clear in another file deleted this file's upload between its
+# POST /upload and its GET /open, which returned 404 about one run in four.
+my $TEST_UPLOAD_DIR = tempdir(CLEANUP => 1);
+$t->app->config->{uploads_dir} = $TEST_UPLOAD_DIR;
+
 # Guard: most integration subtests depend on the sample data files.
 plan skip_all => 'data/sales.csv not found'    unless -f $SALES_CSV;
 plan skip_all => 'data/products.psv not found' unless -f $PRODUCTS_PSV;
@@ -1885,7 +1892,8 @@ subtest '/map loc= path: geocoder called, markers + counts correct' => sub {
 	# Both distinct non-skipped places appear in map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM } or skip 'HTML::OSM not available (no marker HTML)', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
+			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 2;
 		like $body, qr/Ramsgate/i, 'Ramsgate marker present in response';
 		like $body, qr/Margate/i,  'Margate marker present in response';
 	}
@@ -2056,7 +2064,8 @@ subtest '/map lat/lon path: duplicate coordinates collapse to one marker' => sub
 	# Rows 1+2 share a coordinate -> one marker; row 3 is separate; row 4 is unusable.
 	# The lat values appear inside the Leaflet JS in map_body, which requires HTML::OSM.
 	SKIP: {
-		eval { require HTML::OSM } or skip 'HTML::OSM not available (no marker HTML)', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
+			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 2;
 		like $body, qr/$RAMSGATE_LAT/, 'Ramsgate lat present in response';
 		like $body, qr/$MARGATE_LAT/,  'Margate lat present in response';
 	}
@@ -2075,7 +2084,8 @@ subtest '/map lat/lon path: f= filter applied before marker construction' => sub
 	# Only row 1 (name=A) survives the filter.
 	# Lat values appear in the Leaflet JS inside map_body, which requires HTML::OSM.
 	SKIP: {
-		eval { require HTML::OSM } or skip 'HTML::OSM not available (no marker HTML)', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
+			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 2;
 		like   $body, qr/$RAMSGATE_LAT/, 'Ramsgate lat in response after filter';
 		unlike $body, qr/$MARGATE_LAT/,  'Margate lat absent after name:eq:A filter';
 	}
@@ -2188,7 +2198,8 @@ subtest '/map popup= column appears in marker label HTML' => sub {
 	# Popup column names appear inside map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM } or skip 'HTML::OSM not available (no marker HTML)', 1;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
+			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 1;
 		like $body, qr/amount/i, 'amount column referenced in map output (popup)';
 	}
 
@@ -2273,32 +2284,57 @@ subtest 'Geocode resolve_column: skipped and unusable counts add up correctly' =
 # ===========================================================================
 # SECTION 54: /map → HTML::OSM graceful degradation
 #
-# When HTML::OSM is absent, map_view must still return 200 with the
-# error_map_renderer_missing message visible in the response, and the
-# marker_count / row_count stash values must still be correct.
+# When HTML::OSM is missing, or older than the floor the controller passes
+# options for, map_view must still return 200 with the matching warning in the
+# response.  The two states are produced by replacing the renderer probe,
+# which is the only way to reach the missing one in-process: Test::Without::Module
+# removes HTML/OSM.pm from %INC but its @INC hook is bypassed during dispatch,
+# so the installed copy is found again (and recompiled, printing "Subroutine ...
+# redefined" for every sub in it).
 # ===========================================================================
 
-subtest '/map: HTML::OSM absent => 200 with error_map_renderer_missing warning' => sub {
+sub _map_body_with_renderer {
+	my ($ok, $version) = @_;
+
 	my $stub = _stub_geocoder();
 	$t->app->config->{geocoder}  = $stub;
 	$t->app->config->{openaddr}  = 'test';
 	$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
 
-	my $l = url_escape($PLACE_SPEC);
-
-	# Test::Without::Module intercepts the runtime require inside map_view.
-	Test::Without::Module->import('HTML::OSM');
-	my $body = eval {
-		$t->get_ok("/map?l=$l&loc=city")->status_is(200)->tx->res->body;
-	};
-	Test::Without::Module->unimport('HTML::OSM');
-	die $@ if $@;
-
-	like $body // '', qr/HTML::OSM|renderer|map/i,
-		'response references renderer or map (renderer-missing message or map template)';
+	my $l    = url_escape($PLACE_SPEC);
+	my $body;
+	{
+		no warnings 'redefine';
+		local *Database::BI::Controller::Dashboard::_map_renderer_version =
+			sub { $ok, $version };
+		$body = $t->get_ok("/map?l=$l&loc=city")->status_is(200)->tx->res->body;
+	}
 
 	delete $t->app->config->{geocoder};
 	delete $t->app->config->{openaddr};
+
+	return $body // '';
+}
+
+subtest '/map: an older HTML::OSM => 200 with the older-renderer warning' => sub {
+	my $body = _map_body_with_renderer(0, '0.11');
+
+	like $body, qr/data-key="error_map_renderer_old"/,
+		'the older install is reported as such, not as a missing module';
+	like $body, qr/installed HTML::OSM is 0\.11/,
+		'the warning names the version that is installed';
+	like $body, qr/HTML::OSM 0\.12 or later/,
+		'and the version that is needed';
+};
+
+subtest '/map: a missing HTML::OSM => 200 with the not-installed warning' => sub {
+	my $body = _map_body_with_renderer(0, undef);
+
+	like $body, qr/data-key="error_map_renderer_missing"/,
+		'the missing renderer is reported as not installed';
+	like $body, qr/and it is not installed/, 'the warning says so';
+	like $body, qr/HTML::OSM 0\.12 or later/, 'and names the version that is needed';
+	unlike $body, qr/installed HTML::OSM is/, 'it does not claim a version is installed';
 };
 
 # ===========================================================================
@@ -2341,7 +2377,8 @@ subtest '/map: ?c= calculated field applied before geocoding' => sub {
 	# City names appear inside map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM } or skip 'HTML::OSM not available (no marker HTML)', 1;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
+			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 1;
 		like $body, qr/ramsgate/i, 'ramsgate appears in the map output';
 	}
 

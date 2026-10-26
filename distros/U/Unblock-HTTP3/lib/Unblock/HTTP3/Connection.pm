@@ -13,7 +13,7 @@ use Unblock::HTTP3::_Native ();
 use Unblock::HTTP3::Transaction ();
 use Net::QUIC::Connection ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my $H3_DATAGRAM_ERROR = 0x33;
 my $H3_CLOSED_CRITICAL_STREAM = 0x0104;
@@ -4816,8 +4816,10 @@ Useful request options include:
     on_informational
     on_response
     on_body
+    on_data
     on_complete
     on_error
+    on_finish
     on_drain
 
 C<stream_body =E<gt> 1> enables the common C<write()> and C<end()> Transaction

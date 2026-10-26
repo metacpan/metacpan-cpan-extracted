@@ -1,20 +1,27 @@
---- #YAML:1.0
-name:               Set-Integer-Gapfillers
-version:            0.08
-abstract:           Fill in the gaps between integer ranges
+---
+abstract: 'Fill in the gaps between integer ranges'
 author:
-    - James E Keenan (jkeenan@cpan.org)
-license:            unknown
-distribution_type:  module
+  - 'James E Keenan (jkeenan@pobox.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0.44'
 configure_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Test::Simple:  0.44
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.48
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Set-Integer-Gapfillers
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/jkeenan/Set-Integer-Gapfillers/issues
+  homepage: http://thenceforward.net/perl/modules/Set-Integer-Gapfillers/
+  repository: https://github.com/jkeenan/Set-Integer-Gapfillers.git
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,15 @@
 Revision history for Dist-Zilla-Plugin-LicenseFile
 
+0.002     2026-10-25 18:16:38Z
+  - When only the copyright line of LICENSE differs from copyright_holder
+    and copyright_year, the failure says so and shows both lines, instead
+    of pointing at the license setting.
+  - Warn on every build when the licence embeds the year (Perl_5 does) and
+    dist.ini has no copyright_year: the year then follows the clock and
+    the check would start failing on 1 January.
+  - Document that holder and year are part of the compared text for
+    licences that embed them.
+
 0.001     2026-08-19 17:02:08Z
   - Initial release.
   - New plugin `[LicenseFile]`: on every build, compare the `LICENSE`

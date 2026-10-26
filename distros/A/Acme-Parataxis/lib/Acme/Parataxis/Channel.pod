@@ -4,75 +4,274 @@
 
 =head1 NAME
 
-Acme::Parataxis::Channel - A simple message queue for inter-fiber communication
+Acme::Parataxis::Channel - A Simple Message Queue for Inter-Fiber Communication
 
 =head1 SYNOPSIS
 
-    use Acme::Parataxis;
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
     use Acme::Parataxis::Channel;
 
-    my $q = Acme::Parataxis::Channel->new( 4 );
+    my $log = Acme::Parataxis::Channel->new( capacity => 1024 );
 
     async {
-        fiber { $q->put( $_ ) for 1 .. 8 };      # producers
-        say $q->get for 1 .. 8;                  # consumer
+        fiber { $log->put($_) for 1 .. 8 };    # a producer: parks while the channel is full
+
+        say $log->get for 1 .. 8;              # a consumer: parks while it is empty
     };
 
 =head1 DESCRIPTION
 
-A simple message queue that allows you to send and receive data between fibers. If the channel is full, writers block;
-if it is empty, readers block. Both ends can be used by as many fibers as you want concurrently.
+A channel is a buffer with two ends and a capacity. C<put> appends to the tail, C<get> takes from the head, and both
+ends are open to as many fibers as you like. The capacity is the point: when the buffer is full a producer parks, and
+when it is empty a consumer parks, so a slow reader pushes back on a fast writer instead of letting a queue grow
+without bound. C<capacity =E<gt> 1> is a rendezvous - a C<put> only completes when a C<get> is waiting for it - and
+every extra slot is one buffered value.
 
-A channel of size C<1> is a rendezvous point (no buffering: C<put> waits for a matching C<get>); to buffer one element
-use size C<2>, and so on.
+Every park here is an ordinary fiber wait, so L<with_timeout|Acme::Parataxis::with_timeout> and
+L<Acme::Parataxis::CancellationToken> bound a C<get> or a C<put> like any other wait, and the interruption leaves the
+channel as it found it: a value that was on its way to a C<get> that got cut short still reaches the next reader, and a
+C<put> that got cut short never happened at all.
 
-Channels are internally implemented using two L<Acme::Parataxis::Semaphore> instances to coordinate producers and
-consumers.
+C<shutdown> is the other half of the story. It opens the read side for good, so the values already buffered still come
+out and C<get> then returns C<undef> - EOF - instead of parking. That is how a producer tells its consumers that no
+more work is coming, and how a L<Stream|Acme::Parataxis::Stream> chain unwinds one stage at a time.
 
-=head1 CONSTRUCTOR
-
-=head2 C<new( [...] )>
-
-    my $ch = Acme::Parataxis::Channel->new;
-    my $ch = Acme::Parataxis::Channel->new(capacity => 10);
-
-Creates a new channel. The optional C<capacity> parameter sets the maximum number of items the channel can hold and
-defaults to C<2_000_000_000>.
+A channel is also the substrate under much of the rest of the distribution: an L<Actor|Acme::Parataxis::Actor> mailbox
+is one, a L<Ticker|Acme::Parataxis::Ticker> publishes its ticks through a capacity-1 channel, a
+L<Supervisor|Acme::Parataxis::Supervisor> collects child deaths through one, and every
+L<Stream|Acme::Parataxis::Stream> stage is a bounded channel plus a fiber.
 
 =head1 METHODS
 
-=head2 C<put( $value )>
+=head2 C<new( [ ... ] )>
 
-    $ch->put($value);
+    my $q = Acme::Parataxis::Channel->new;                           # effectively unbounded
+    my $q = Acme::Parataxis::Channel->new( capacity => 1024 );       # then put parks
+    my $q = Acme::Parataxis::Channel->new( capacity => 8, timeout => 200 );
 
-Append a value to the channel. Blocks the current fiber if the channel is at capacity, waiting until space becomes
-available.
+Named arguments only. C<capacity> is how many values the buffer holds before C<put> parks, and must be at least 1; it
+defaults to 2_000_000_000, which in practice means unbounded, so ask for a capacity when you want backpressure rather
+than assuming you got one. C<timeout> is a default wait bound in milliseconds for a C<get> or C<put> that would park:
+that wait gives up with L<Acme::Parataxis::Error::Timeout> instead, and C<0> (the default) or C<undef> means no bound.
+Dies on a C<capacity> below 1 and on a negative C<timeout>. Both read back with L</"capacity( )"> and L</"timeout( )">.
 
 =head2 C<get( )>
 
-    my $value = $ch->get;
+    my $line = $q->get;
 
-Remove and return the next value from the channel. Blocks the current fiber if the channel is empty, waiting until a
-value is available.
+Removes and returns the oldest value, parking the calling fiber while the channel is empty. Returns C<undef> forever
+once a shut-down channel has been drained (see L</"shutdown( )">). Honours the channel's C<timeout> if it has one.
+
+=head2 C<put( $value )>
+
+    $q->put($msg);
+
+Appends C<$value> to the tail, parking the calling fiber while the channel is full, and honouring the channel's
+C<timeout>. A C<put> that a deadline or a token cuts short does not happen: the value is not queued and no room is
+consumed.
+
+=head2 C<try_get( )>
+
+    my ( $ok, $value ) = $q->try_get;
+
+Takes a value if one is there and returns C<(1, $value)>, or returns C<(0, undef)> if not. Never parks, so it never
+waits on the channel's C<timeout> either - this is the polling form of C<get>.
+
+=head2 C<try_put( $value )>
+
+    $q->try_put($msg) or next;    # true when it fitted
+
+Appends C<$value> and returns true if there was room, or returns false without parking if the channel was full. The
+non-blocking C<put>.
+
+=head2 C<put_priority( $value )>
+
+    $q->put_priority($msg);    # returns immediately, full channel or not
+
+Enqueues C<$value> without ever parking, which is what makes it usable from a destructor or anywhere else that may not
+yield - an L<Actor|Acme::Parataxis::Actor>'s C<stop> marker is queued this way. It ignores the channel's C<timeout> and
+does not wait for room: on a full channel it pushes past C<capacity>, and the channel stays over capacity from then on
+(C<adjust> is the way back). For "put if there is room", use C<try_put>.
 
 =head2 C<size( )>
 
-    my $n = $ch->size;
+    my $n = $q->size;
 
-Returns the number of items currently in the channel.
-
-=head2 C<adjust( $diff )>
-
-    $ch->adjust( $diff );
-
-Adjust the channel capacity by C<$diff>. This can be used to grow or shrink the effective capacity at runtime.
+How many values are buffered right now.
 
 =head2 C<shutdown( )>
 
-    $ch->shutdown;
+    $q->shutdown;    # returns true
 
-Shut down the channel by releasing a large number of permits on the internal get semaphore. This unblocks any fibers
-waiting on C<get( )>, allowing them to drain remaining items.
+Opens the read side for good: the values already buffered still come out of C<get>, and once they are gone C<get>
+returns C<undef> instead of parking, and keeps doing so. Idempotent, and the only way to end a consumer loop. It does
+not stop producers: a C<put> is still accepted, and on a full channel it can still park.
+
+=head2 C<adjust( $diff )>
+
+    $q->adjust( 1_024 );    # more room
+    $q->adjust( -512 );       # less
+
+Moves the room available to C<put> by C<$diff> and returns true. Shrinking below what is already buffered is allowed -
+it just means C<put> waits for the buffer to drain first - so capacity is a budget you can move at runtime rather than
+a promise.
+
+=head2 C<capacity( )>
+
+    my $slots = $q->capacity;
+
+The capacity C<new> was given, read back unchanged - C<adjust> moves the room without touching it, so the room a C<put>
+actually sees is this minus C<size> plus everything you have adjusted.
+
+=head2 C<timeout( )>
+
+    my $ms = $q->timeout;    # 0 when there is no bound
+
+The channel's default wait bound in milliseconds, C<0> when it has none. C<new> is the only thing that sets it, and
+L<select|/"select( %args )"> reads it to pick its own deadline.
+
+=head2 C<select_waiters( )>
+
+    my $n = $q->select_waiters;
+
+How many fibers are parked in L<select|/"select( %args )"> on this channel. Introspection; mostly for tests.
+
+=head2 C<remove_waiter( $fid )>
+
+    $q->remove_waiter($fid);
+
+Unregisters a fiber id from this channel's get, put and select queues, returning how many entries that removed (0, 1 or
+2). A removed waiter is never woken by a later C<put>, C<get> or C<shutdown>, so the caller owns what happens to that
+fiber next. The same contract as C<remove_waiter> on a L<Semaphore|Acme::Parataxis::Semaphore> or a
+L<Signal|Acme::Parataxis::Signal>, and it is what an interrupted park uses to clean up after itself.
+
+=head2 C<select( %args )>
+
+    my ( $ch, $value ) = Acme::Parataxis::Channel->select(
+        [ $inbox,  'get'      ],
+        [ $outbox, 'put', $msg ],
+        timeout    => 1_000,
+        default    => sub { undef }
+    );
+
+A class method that waits until one of several channels can move, and then performs that move. Each case is an array
+reference: C<[ $channel, 'get' ]> to take a value out, or C<[ $channel, 'put', $value ]> to put one in, where the value
+is required. Give it at least one case and call it from inside a scheduled fiber.
+
+It returns C<( $channel, $value )> for whichever case committed: the channel that fired, and the value read from it or
+written to it. Cases are probed in random order, so a case that is always ready cannot starve the others, and a ready
+case commits without yielding at all - a select on ready channels is a non-blocking poll.
+
+=over
+
+=item * C<< timeout =E<gt> $ms >>
+
+Bounds the wait. If it fires before any case is ready, C<select> returns C<( undef, undef )> rather than throwing. An
+explicit C<timeout> always wins over the channels' own bounds; without one, the smallest positive bound among the cases
+applies, and with no bound anywhere C<select> parks until a case is ready (or until the run's deadlock detector has
+something to say about it).
+
+=item * C<< default =E<gt> sub { ... } >>
+
+Run only when no case is ready, and it never parks, so its return value is what C<select> hands back as C<( undef,
+$value )>. That is the "nothing was waiting, so ..." branch.
+
+=back
+
+The park is an ordinary fiber wait, so an enclosing L<with_timeout|Acme::Parataxis::with_timeout> or cancellation token
+still throws straight through it - only C<select>'s own deadline gives you C<( undef, undef )>. Only the channels in
+the cases are registered, so a C<put> or C<get> anywhere else is unaffected by a fiber waiting here.
+
+Croaks on a case that is not a channel, an C<op> that is not C<'get'> or C<'put'>, a C<'put'> case with no value, a
+negative C<timeout>, a C<default> that is not a code ref, no cases at all, and a call outside a scheduled fiber.
+
+=head1 Recipes
+
+These are very brief demos that should inspire your work.
+
+=head2 Draining a channel to the end
+
+    my $q = Acme::Parataxis::Channel->new( capacity => 64 );
+
+    fiber {                       # the consumer
+        while ( defined( my $line = $q->get ) ) {
+            handle($line);       # parks on an empty channel, stops at EOF
+        }
+        say 'no more work';
+    };
+
+    produce_into($q);            # the producer: puts everything it has
+    $q->shutdown;                # ... then says so
+
+The loop tests C<defined> because that is how EOF arrives, which means a channel that legitimately carries C<undef> as
+a value ends the loop early - send such a message as an array ref or an exception object instead.
+
+=head2 A request and its one reply
+
+    my ( $jobs, $results ) = (
+        Acme::Parataxis::Channel->new( capacity => 1 ),
+        Acme::Parataxis::Channel->new( capacity => 1 )
+    );
+
+    fiber {                            # the worker
+        my $job = $jobs->get;
+        $results->put( do_work($job) );
+        $results->shutdown;            # one reply, then EOF
+    };
+
+    $jobs->put($work);
+    my ( $ch, $result ) = Acme::Parataxis::Channel->select( [ $results => 'get' ] );
+
+With no C<timeout>, that select parks until the reply lands - and a cancellation token or an enclosing
+L<with_timeout|Acme::Parataxis::with_timeout> still interrupts it.
+
+=head2 Two queues, whichever moves first
+
+    my ( $ch, $what ) = Acme::Parataxis::Channel->select(
+        [ $jobs,  'get' ],    # work arriving
+        [ $ticks, 'get' ],    # ...or a clock tick
+        timeout => 2_000
+    );
+
+    return 'nothing happened' if !$ch;
+
+That is C<select>'s reason to exist: one wait, several channels, one bound, and C<( undef, undef )> as the answer when
+nothing won.
+
+=head1 Behavior Notes
+
+=over
+
+=item * EOF is a value
+
+A drained, shut-down channel makes C<get> return C<undef> forever, but C<try_get> returns C<(1, undef)> and a C<get>
+case in C<select> returns C<( $channel, undef )>. All three are the same end-of-stream, so every drain loop has to test
+the value it got.
+
+=item * Backpressure is a park
+
+A full channel parks producers rather than growing the buffer, and that park is interruptible: a C<put> cut short by a
+deadline or a token leaves the channel exactly as it was. A slow consumer therefore throttles its producers all the way
+upstream, which is what makes a L<Stream|Acme::Parataxis::Stream> pipeline bound in memory for free.
+
+=item * The bound is per wait
+
+C<timeout> applies to a C<get> or C<put> that would actually park, and to C<select> when you do not pass it a
+C<timeout> of its own. A get that finds a value waiting never arms a timer, and neither C<try_get> nor C<try_put> ever
+waits on the bound.
+
+=item * No introspection beyond the buffer
+
+C<capacity> and C<timeout> read back what you asked for, C<size> is the buffered count, and C<select_waiters> counts
+selectors only - there is no C<waiters> to ask how many fibers are parked in a get or a put.
+
+=back
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis> (C<with_timeout>, C<with_cancel>), L<Acme::Parataxis::Error>, L<Acme::Parataxis::Stream>,
+L<Acme::Parataxis::Actor>, L<Acme::Parataxis::Semaphore>, L<Acme::Parataxis::Signal>
 
 =head1 AUTHOR
 

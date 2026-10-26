@@ -1,5 +1,5 @@
 package Linode::API;
-$Linode::API::VERSION = '0.002';
+$Linode::API::VERSION = '0.003';
 #ABSTRACT: A client for the Linode API, generated from Linode's own OpenAPI specification
 
 use 5.016;
@@ -13,9 +13,10 @@ use parent qw{OpenAPI::Client};
 
 use Carp             qw{croak};
 use Cpanel::JSON::XS qw{decode_json};
-use File::ShareDir   qw{dist_file};
-use File::Slurper    qw{read_binary};
-use Mojo::Util       qw{monkey_patch};
+use Data::Validate::IP();
+use File::ShareDir qw{dist_file};
+use File::Slurper  qw{read_binary};
+use Mojo::Util     qw{monkey_patch};
 
 
 sub new {
@@ -25,8 +26,10 @@ sub new {
     my $api_version   = delete $options{api_version}   // 'v4';
     my $specification = delete $options{specification} // dist_file( 'Linode-API', 'openapi.json' );
 
-    my $self = $class->SUPER::new( _specification( $specification, $api_version ), %options );
+    my $spec = _specification( $specification, $api_version );
+    my $self = $class->SUPER::new( $spec, %options );
     _alias_operations( ref $self, $self->validator->routes );
+    _add_formats( $self->validator->formats, $spec );
     $self->on( after_build_tx => \&_unescape_slashes );
     if ( defined $token ) {
         $self->on( after_build_tx => sub { $_[1]->req->headers->authorization("Bearer $token") } );
@@ -131,6 +134,42 @@ sub _is_closed {
     return defined $additional && ref $additional ne 'HASH' && !$additional;
 }
 
+# JSON::Validator warns about a format that it has no rule for, on every value
+# of it, and lets the value through.  Linode names formats of its own.
+sub _add_formats {
+    my ( $formats, $spec ) = @_;
+
+    $formats->{ip} //= sub { return Data::Validate::IP::is_ip( $_[0] ) ? undef : 'Does not match ip format.' };
+    $formats->{$_} //= sub { return }
+      foreach _formats_in($spec);
+
+    return $formats;
+}
+
+# Every format that the specification names, which does not change while it is loaded.
+sub _formats_in {
+    my ($spec) = @_;
+
+    state %found;
+    return @{
+        $found{$spec} //= do {
+            my ( %formats, @nodes );
+            @nodes = ($spec);
+            while (@nodes) {
+                my $node = shift @nodes;
+                if ( ref $node eq 'ARRAY' ) {
+                    push @nodes, @$node;
+                }
+                elsif ( ref $node eq 'HASH' ) {
+                    $formats{ $node->{format} } = 1 if defined $node->{format} && !ref $node->{format};
+                    push @nodes, values %$node;
+                }
+            }
+            [ sort keys %formats ];
+        }
+    };
+}
+
 # Give each kebab-case operation a snake_case name a caller can write as a
 # bareword, never replacing a method the class already has.
 sub _alias_operations {
@@ -163,7 +202,7 @@ Linode::API - A client for the Linode API, generated from Linode's own OpenAPI s
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -238,6 +277,13 @@ as C<%2F>, and Linode's own examples send it unescaped.
 closes one member of several, which forbids everything the other members
 declare: C<post_linode_instance> would refuse C<region> and C<type>, which it
 also requires.  Linode still checks the body when it gets it.
+
+=item * A value in a format that L<JSON::Validator> does not know is sent
+without a check and without a warning.  Linode names formats of its own, such
+as C<ssh-key> and C<ipv4|ipv6/prefix_length>, and its examples do not always
+match their names, so a check here could refuse what Linode takes.  Linode
+checks them when it gets them.  The exception is C<ip>, an IPv4 or IPv6
+address, which is checked.
 
 =back
 
@@ -356,6 +402,12 @@ Current Maintainers:
 George S. Baugh <george@troglodyne.net>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords troglodyne-bot
+
+troglodyne-bot <morpheus@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 

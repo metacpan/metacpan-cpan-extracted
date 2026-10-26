@@ -62,11 +62,10 @@ sub new {
                         && !$config->{settings}{8};
                 $config->{enable_connect_protocol} = 1;
             } else {
-                croak 'http2 enable_connect_protocol conflicts with disabled WebSocket support'
-                    if $config->{enable_connect_protocol};
-                croak 'http2 SETTINGS_ENABLE_CONNECT_PROTOCOL conflicts with disabled WebSocket support'
-                    if exists($config->{settings}) && $config->{settings}{8};
-                $config->{enable_connect_protocol} = 0;
+                # Generic Extended CONNECT is valid without WebSocket.
+                # Caller must opt into SETTINGS_ENABLE_CONNECT_PROTOCOL.
+                $config->{enable_connect_protocol} = 0
+                    unless exists $config->{enable_connect_protocol};
             }
         }
         if ($protocol eq 'h3') {
@@ -76,9 +75,9 @@ sub new {
                         && !$config->{enable_extended_connect};
                 $config->{enable_extended_connect} = 1;
             } else {
-                croak 'http3 enable_extended_connect conflicts with disabled WebSocket support'
-                    if $config->{enable_extended_connect};
-                $config->{enable_extended_connect} = 0;
+                # RFC 9220 WebSocket is only one Extended CONNECT use.
+                $config->{enable_extended_connect} = 0
+                    unless exists $config->{enable_extended_connect};
             }
         }
         $engines{$protocol} = $config;

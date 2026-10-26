@@ -24,8 +24,14 @@ my $server_bin = File::Spec->catfile($Bin, '..', 'bin', 'filesync-server');
 
 # A stand-in for ssh: parse the options the transport builds, record the argv,
 # then run the real filesync-server in place of the remote command.
-my $script = <<'FAKE';
-#!/usr/bin/env perl
+#
+# The transport starts this file as a program, so the kernel reads its first
+# line to choose the interpreter.  That line has to name the perl running the
+# tests: "#!/usr/bin/env perl" on a smoke tester is the system perl, which
+# cannot see the modules the build installed, and the filesync-server started
+# below then dies with "Can't locate Params/Validate/Strict.pm" against a
+# build that never lacked it (CPAN issue #4).
+my $script = "#!$perl\n" . <<'FAKE';
 use strict;
 use warnings;
 
@@ -94,6 +100,22 @@ if ($^O eq 'MSWin32') {
 	rename $fake_script, $fake
 		or die "Cannot rename $fake_script to $fake: $!";
 	chmod 0755, $fake or die $!;
+}
+
+# Guard for CPAN issue #4: whichever way it is built, the stand-in is started
+# by the perl running the tests and never by whatever "perl" PATH offers.  On
+# Windows the interpreter is named by the wrapper's second line, after the
+# cmd prologue.
+{
+	open my $probe, '<', $fake or die "Cannot read $fake: $!";
+	my @head = map { scalar <$probe> } 1 .. 2;
+	close $probe;
+
+	my $interpreter = $^O eq 'MSWin32' ? ($head[1] // '') : ($head[0] // '');
+	unlike $interpreter, qr{env\s+perl},
+		'the stand-in does not defer to PATH for its perl';
+	like $interpreter, qr/\Q$perl\E/,
+		'the stand-in is started by the perl running the tests';
 }
 
 $ENV{FAKE_SSH_LOG}        = $log;

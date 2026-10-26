@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my $MAX_VARINT = '4611686018427387903';
 

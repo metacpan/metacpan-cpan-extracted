@@ -277,7 +277,13 @@ sub _queue_output {
     return unless defined $bytes && length $bytes;
     croak '_queue_output(): host send callback must not re-enter the engine'
         if $self->{transport_syncing};
-    $self->{output} .= $bytes;
+    # Preserve Perl's copy-on-write buffer when starting a new batch. Only
+    # coalescing an existing batch requires appending the serialized bytes.
+    if (length $self->{output}) {
+        $self->{output} .= $bytes;
+    } else {
+        $self->{output} = $bytes;
+    }
     $self->_transport_sync if $self->{transport_attached} && !$self->{driving};
     return;
 }
@@ -317,9 +323,15 @@ sub _transport_sync {
     return if $self->{transport_aborted};
     if ($self->{closed} && !length($self->{output}) && !$self->{switched}) {
         $self->{transport_finished} = 1;
-        my $ok = eval { $host->unblock_finish(); 1 };
+        my $ok = eval { $self->_transport_finish($host); 1 };
         $self->_transport_abort("$@" || 'unblock_finish() failed') unless $ok;
     }
+    return;
+}
+
+sub _transport_finish {
+    my ($self, $host) = @_;
+    $host->unblock_finish;
     return;
 }
 

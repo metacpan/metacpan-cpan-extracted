@@ -339,4 +339,11 @@ SKIP: {
 		'and the page announces that the drawing has finished');
 }
 
+# What this run established, for the job summary.
+$browser->proved(
+	'New canvas driven from GET /view/sales and from GET /pie: the table and its'
+	. ' columns travel with the canvas, the stored analysis keeps them, and the'
+	. ' page it opens has a card titled for the table that draws and announces it'
+);
+
 done_testing();

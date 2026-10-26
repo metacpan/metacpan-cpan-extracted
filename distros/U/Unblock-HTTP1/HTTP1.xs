@@ -12,6 +12,13 @@
 #define UB_BODY_CONTENT_LENGTH 1
 #define UB_BODY_CHUNKED 2
 
+typedef struct {
+    uhttp_native_api uniform_api;
+    int initialized;
+    int compatible;
+} my_cxt_t;
+START_MY_CXT
+
 static int
 ascii_equal_ci(const char *left, size_t left_len, const char *right, size_t right_len)
 {
@@ -1413,6 +1420,102 @@ static const ub_http1_input_ops_v1 ub_http1_input_ops = {
 
 MODULE = Unblock::HTTP1    PACKAGE = Unblock::HTTP1::_Native
 PROTOTYPES: DISABLE
+
+BOOT:
+    MY_CXT_INIT;
+
+void
+CLONE(...)
+  CODE:
+#ifdef USE_ITHREADS
+    MY_CXT_CLONE;
+    Zero(&MY_CXT, 1, my_cxt_t);
+#endif
+
+SV *
+_simple_response_wire(request, response, reasons)
+    SV *request
+    SV *response
+    HV *reasons
+  PREINIT:
+    dMY_CXT;
+    uhttp_native_view req, res;
+    Size_t i, count;
+    SV *name, *value, **reason;
+    STRLEN len, body_len = 0;
+    const char *bytes, *body = "";
+    IV status;
+    char code[4];
+    SV *wire;
+  CODE:
+    RETVAL = &PL_sv_undef;
+    if (!MY_CXT.initialized) {
+        MY_CXT.compatible = uhttp_native_init(aTHX_ &MY_CXT.uniform_api,
+            UHTTP_NATIVE_ABI_VERSION);
+        MY_CXT.initialized = 1;
+    }
+    if (!MY_CXT.compatible
+        || !uhttp_native_inspect(aTHX_ &MY_CXT.uniform_api, request, &req)
+        || !uhttp_native_inspect(aTHX_ &MY_CXT.uniform_api, response, &res)
+        || req.kind != UHTTP_KIND_REQUEST || res.kind != UHTTP_KIND_RESPONSE)
+        XSRETURN_UNDEF;
+    if (SvOK(req.version)) {
+        bytes = SvPV(req.version, len);
+        if (!ascii_equal_cs(bytes, len, "1.1", 3)) XSRETURN_UNDEF;
+    }
+    if (SvOK(res.version)) {
+        bytes = SvPV(res.version, len);
+        if (!ascii_equal_cs(bytes, len, "1.1", 3)) XSRETURN_UNDEF;
+    }
+    bytes = SvPV(req.method, len);
+    if (ascii_equal_cs(bytes, len, "HEAD", 4)
+        || ascii_equal_cs(bytes, len, "CONNECT", 7)) XSRETURN_UNDEF;
+    count = uhttp_native_field_count(aTHX_ &req.headers);
+    for (i = 0; i < count; ++i) {
+        uhttp_native_field_at(aTHX_ &req.headers, i, &name, &value);
+        bytes = SvPV(name, len);
+        if (ascii_equal_ci(bytes, len, "Connection", 10)) XSRETURN_UNDEF;
+    }
+    status = SvIV(res.status);
+    if (status < 200 || status > 599 || status == 204 || status == 205
+        || status == 304 || uhttp_native_field_count(aTHX_ &res.trailers))
+        XSRETURN_UNDEF;
+    /* Uniform validates canonical fields. Framing fields still require the
+     * general HTTP/1 checks; never bypass them based on their spelling. */
+    count = uhttp_native_field_count(aTHX_ &res.headers);
+    for (i = 0; i < count; ++i) {
+        uhttp_native_field_at(aTHX_ &res.headers, i, &name, &value);
+        if (SvUTF8(name) || SvUTF8(value)) XSRETURN_UNDEF;
+        bytes = SvPV(name, len);
+        if (ascii_equal_ci(bytes, len, "Content-Length", 14)
+            || ascii_equal_ci(bytes, len, "Transfer-Encoding", 17)
+            || ascii_equal_ci(bytes, len, "Connection", 10)) XSRETURN_UNDEF;
+    }
+    if (SvUTF8(res.body) || SvUTF8(res.reason)) XSRETURN_UNDEF;
+    if (res.flags & UHTTP_HAS_BUFFERED_BODY) body = SvPV(res.body, body_len);
+    wire = sv_2mortal(newSVpvs("HTTP/1.1 "));
+    code[0] = '0' + status / 100;
+    code[1] = '0' + (status / 10) % 10;
+    code[2] = '0' + status % 10;
+    code[3] = '\0';
+    sv_catpvn(wire, code, 3);
+    sv_catpvs(wire, " ");
+    if (SvOK(res.reason)) sv_catsv(wire, res.reason);
+    else if ((reason = hv_fetch(reasons, code, 3, 0)) && SvOK(*reason))
+        sv_catsv(wire, *reason);
+    sv_catpvs(wire, "\r\n");
+    for (i = 0; i < count; ++i) {
+        uhttp_native_field_at(aTHX_ &res.headers, i, &name, &value);
+        sv_catsv(wire, name);
+        sv_catpvs(wire, ": ");
+        sv_catsv(wire, value);
+        sv_catpvs(wire, "\r\n");
+    }
+    sv_catpvf(wire, "Content-Length: %" UVuf "\r\n\r\n", (UV)body_len);
+    sv_catpvn(wire, body, body_len);
+    RETVAL = SvREFCNT_inc(wire);
+  OUTPUT:
+    RETVAL
 
 UV
 _borrowed_input_operations_address()

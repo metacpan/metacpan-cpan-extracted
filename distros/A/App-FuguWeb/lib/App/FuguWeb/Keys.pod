@@ -92,9 +92,15 @@ alone names the C<contact> and the C<expires> of the site.
     .well-known/openpgpkey/policy
     .well-known/security.txt            RFC 9116
 
-The human page is a page of the default language. Its chrome links the
-tree of C<en> as F<< ../en/<page> >>, it links the stylesheet as
-F<../style.css>, and it carries no footer.
+The human page is a page of C<en>, because its own words are English,
+per WEB-CHROME-8. L<App::FuguWeb::Page> writes it at its own path, so
+each link of its chrome steps out of the key directory, as in
+F<../en/index.html> and F<../style.css>. The chrome takes the site name
+and the navigation of the default language, and its header holds the
+site link alone. When the default language is not C<en>, the site link
+and each navigation link carry the marks of that language, per
+WEB-LANGUAGE-11. The title is the English page title alone, and the
+head names no other page. The page carries no footer, per WEB-KEYS-32.
 
 The two well-known paths sit at the site root, because a reader asks
 for the registered path and never for one below the key directory.

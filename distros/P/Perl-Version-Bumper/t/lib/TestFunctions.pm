@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use Test2::V0;
 use Path::Tiny;
-use Perl::Version::Bumper qw(
+use Perl::Version::Bumper;
+use Perl::Version::Bumper::Helper::Version qw(
   version_fmt
   stable_version
   stable_version_inc

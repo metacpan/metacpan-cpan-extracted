@@ -4,9 +4,10 @@ package Dist::Zilla::Plugin::LicenseFile;
 use Moose;
 with 'Dist::Zilla::Role::FileMunger';
 
+use Path::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 has required => (
@@ -43,15 +44,62 @@ sub munge_files {
 
   my $wanted = $self->wanted_text($self->zilla);
 
-  unless ($self->comparable($file->content) eq $self->comparable($wanted)) {
+  my $have = $self->comparable($file->content);
+  $wanted  = $self->comparable($wanted);
+
+  unless ($have eq $wanted) {
+    my $differs = $self->_copyright_difference($have, $wanted)
+      // "it no longer matches the license in dist.ini";
     return $self->_complain(
-      "$filename is out of date: it no longer matches the license in "
-      . "dist.ini. Run 'dzil genlicense' and commit the file"
+      "$filename is out of date: $differs. Run 'dzil genlicense' and commit the file"
     );
   }
 
+  $self->_warn_floating_year($wanted);
+
   $self->log_debug("$filename matches the declared license");
 
+  return;
+}
+
+# When the two texts differ on the copyright line(s) alone - same line count,
+# every differing line mentions "copyright" - name both lines, so the reader is
+# sent to copyright_holder / copyright_year rather than to the license setting.
+sub _copyright_difference {
+  my ($self, $have, $wanted) = @_;
+
+  my @have   = split /\n/, $have;
+  my @wanted = split /\n/, $wanted;
+  return unless @have == @wanted;
+
+  my @diff = grep { $have[$_] ne $wanted[$_] } 0 .. $#have;
+  return if grep { $have[$_] !~ /copyright/i || $wanted[$_] !~ /copyright/i } @diff;
+
+  my $at = $diff[0];
+  return "only the copyright line differs from copyright_holder/copyright_year "
+    . "in dist.ini (LICENSE says '$have[$at]', dist.ini says '$wanted[$at]')";
+}
+
+# A licence that embeds the year, with no copyright_year in dist.ini, is
+# checked against the year Dist::Zilla takes from the clock: the check starts
+# failing on 1 January.
+sub _warn_floating_year {
+  my ($self, $wanted) = @_;
+
+  my $zilla = $self->zilla;
+  my $year  = $zilla->_copyright_year;
+  return unless $wanted =~ /\Q$year\E/;
+
+  my $rights = $zilla->stash_named('%Rights');
+  return if $rights && defined $rights->copyright_year;
+
+  my $ini = path($zilla->root)->child('dist.ini');
+  return if $ini->exists && $ini->slurp_utf8 =~ /^\s*copyright_year\s*=/m;
+
+  $self->log(
+    "copyright_year is not set in dist.ini: the year in the license floats with "
+    . "the clock, and the check will fail on 1 January. Set copyright_year"
+  );
   return;
 }
 
@@ -75,7 +123,7 @@ Dist::Zilla::Plugin::LicenseFile - Ship the repository's committed LICENSE, and 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -130,6 +178,20 @@ Nothing is lost: the copyright notice still reaches the tarball through the
 C<LICENSE AND COPYRIGHT> section L<Pod::Weaver> writes into the POD, and the
 holder and year still reach F<META.json>.
 
+"Bare" does not mean free of holder and year, though: some licences embed the
+copyright line in their own text. Perl 5's does, twice (C<This software is
+Copyright (c) YYYY by H.>), while the Artistic License 2.0 does not. For such a
+licence C<copyright_holder> and C<copyright_year> are part of the compared
+text, and changing either makes the check fail until C<dzil genlicense> has
+rewritten the file. The message then says that only the copyright line differs
+and shows both lines, instead of blaming the C<license> setting.
+
+That has one trap: a F<dist.ini> without C<copyright_year> gets the current
+year from L<Dist::Zilla>, so the committed file goes out of date on 1 January
+and every build stops until the file is regenerated and committed. The plugin
+warns on every build when it sees that combination; set C<copyright_year> to
+make the year stay put.
+
 =head2 required
 
 Whether a failing check aborts the build. Defaults to true.
@@ -180,7 +242,7 @@ L<Dist::Zilla::Plugin::License> — the default plugin, which generates C<LICENS
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-licensefile/issues>.
 
 =head1 CONTRIBUTING

@@ -1,5 +1,14 @@
 Revision history for Data-MoneyCurrency
 
+0.32    Mo. 26 Okt. 2026 09:36:17 CET
+        - use Ex::Op instead of Exporter
+          https://lnation.org/blog/ex-op-a-drop-in-replacement-for-exporter
+        - get_currencies_for_country is now an Ex::Op op, roughly 10-20%
+          faster per call; get_currency is unchanged
+        - get_currencies_for_country now ignores extra arguments instead
+          of croaking
+        - minimum perl is now 5.014 (needed for the Ex::Op op keyword)
+
 0.31    Do 12 Feb 2026 16:53:57 CET
         - speed tweaks
 

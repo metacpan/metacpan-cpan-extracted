@@ -1,6 +1,7 @@
 Changes
 docs/COOKBOOK.md
 docs/INTEGRATION.md
+docs/RELEASE-0.13.md
 docs/PROTOCOL_STATUS.md
 examples/anyevent-client.pl
 examples/anyevent-server.pl
@@ -64,5 +65,9 @@ vendor/picohttpparser/UPSTREAM
 t/51-embedding-native.t
 t/52-receive-lifecycle.t
 t/53-attached-output-completion.t
+t/54-server-drain.t
+t/55-native-response.t
+t/56-output-ownership.t
+t/57-bodyless-completion.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'Fugu',
-	VERSION          => '0.5.3',
+	VERSION          => '0.5.6',
 	ABSTRACT         => 'OpenBSD-style daemon utilities for Perl',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.034',

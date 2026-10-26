@@ -4,87 +4,313 @@
 
 =head1 NAME
 
-Acme::Parataxis::Semaphore - A counting semaphore for fiber synchronization
+Acme::Parataxis::Semaphore - Counting semaphore for fiber synchronization
 
 =head1 SYNOPSIS
 
     use Acme::Parataxis;
     use Acme::Parataxis::Semaphore;
 
-    my $sem = Acme::Parataxis::Semaphore->new;   # unlocked by default
+    my $sem = Acme::Parataxis::Semaphore->new( count => 3 );
 
     async {
-        fiber { $sem->down };   # wait for a signal
-        $sem->up;
+        fiber { $sem->down; ... };    # waits for a permit
+        $sem->up;                     # and hands one back
     };
 
 =head1 DESCRIPTION
 
-A simple integer counter that optionally blocks fibers when it reaches zero. There is no owner associated with a
-semaphore, so one fiber can C<down> it while another can C<up> it, C<up> may be called before C<down>, and so on.
+A counting semaphore: an integer that hands out permits, and parks any fiber that asks for one when there are none
+left. There is no owner, so one fiber can C<down> while another C<up>s, C<up> may be called before any C<down>, and the
+two halves need not live in the same place.
 
-Blocked fibers are parked (they do not busy-wait) and are resumed in FIFO order as permits become available, exactly
-like the futures used by C<await>.
+Waiters park rather than spin, and are resumed in the order they parked. A parked fiber is an ordinary
+L<Acme::Parataxis> wait, so C<with_timeout> and cancellation tokens interrupt it like anything else, and an interrupted
+waiter removes itself from the queue rather than being woken later by a permit it no longer wants.
 
-=head1 CONSTRUCTOR
-
-=head2 C<new( [...] )>
-
-    my $sem = Acme::Parataxis::Semaphore->new;
-    my $sem = Acme::Parataxis::Semaphore->new(count => 3);
-
-Creates a new semaphore. The optional C<count> parameter sets the initial number of permits and defaults to C<1>.
+This is the primitive the rest of the library is built from. A L<Acme::Parataxis::Channel> keeps one behind each of its
+ends, L<Acme::Parataxis::RateLimiter> keeps one as its token bucket, and L<Acme::Parataxis::Sync::Mutex> is a semaphore
+with an owner. Reach for it directly when you want to cap concurrency or make one fiber wait for another's permission.
 
 =head1 METHODS
 
+=head2 C<new( [ count =E<gt> $n ] )>
+
+    my $sem = Acme::Parataxis::Semaphore->new;             # one permit
+    my $sem = Acme::Parataxis::Semaphore->new( count => 3 );
+
+Creates a semaphore holding C<count> permits, defaulting to 1. Keyword-only, and C<count> is not validated: see
+L</"Nothing checks the count">.
+
 =head2 C<down( )>
 
-    $sem->down;
+    $sem->down;        # take a permit, waiting if there is none
 
-Acquire a permit. If the count is zero, the current fiber is suspended until a permit becomes available. Decrements the
-count upon success.
+Takes a permit and decrements the count, parking the calling fiber first if the count is zero. Returns true.
+
+Waiters are released in the order they parked, one per C<up>. A fiber that is woken but finds the count at zero again
+re-parks rather than stealing the permit from someone else.
+
+Must run inside a scheduled fiber only if it would actually have to wait. See L</"Usable as a plain counter
+off-fiber">.
 
 =head2 C<up( )>
 
-    $sem->up;
+    $sem->up;          # hand back a permit, releasing one waiter
 
-Release a permit. Increments the count and wakes one blocked waiter if any are queued.
+Returns a permit and wakes exactly one waiter, if any are queued. Returns true.
 
 =head2 C<try( )>
 
-    my $acquired = $sem->try;
+    if ( $sem->try ) {
+        ...            # took a permit
+    }
 
-Attempt to acquire a permit without blocking. Returns true and decrements the count if a permit is available; returns
-false immediately otherwise. This is useful when you want to opportunistically grab a permit but don't want to stall
-the fiber.
+Takes a permit and returns true if one was available, or returns false immediately if not. Never parks, so it is safe
+off-fiber and safe to call when you would rather do something else than wait.
 
 =head2 C<adjust( $diff )>
 
-    $sem->adjust($diff);
+    $sem->adjust(5);       # add five permits at once
+    $sem->adjust(-2);      # take two away
 
-Adjust the permit count by C<$diff> (which may be negative). Wakes up to C<$diff> blocked waiters if the new count is
-positive. This is useful for bulk-release scenarios, such as unblocking a channel.
+Adds C<$diff> to the count, which may be negative, and then releases up to the new count worth of waiters. Returns
+true.
+
+This is the bulk-release you want at shutdown, or when a producer knows exactly how much it is about to hand over. Note
+that each waiter it releases goes on to take a permit of its own, so C<< adjust(5) >> on an empty semaphore with four
+waiters leaves the count at 1, not 5. A negative C<$diff> releases nobody; see L</"What adjust really releases">.
 
 =head2 C<wait( )>
 
-    $sem->wait;
+    $sem->wait;        # block until a permit exists -- does not take one
 
-Block until a permit is available. This is equivalent to C<down> but is named for consistency with other
-C<Acme::Parataxis> synchronization primitives.
+Blocks until the count is greater than zero and returns true B<without decrementing>. It is a wait for the semaphore to
+become non-empty, not an acquire, and it is the one method here whose name will mislead you; see L</"wait does not take
+a permit">.
 
-=head2 C<guard>
-
-    my $guard = $sem->guard( );
-
-Acquire a permit and return an L<Acme::Parataxis::Semaphore::Guard> object. The permit is automatically released when
-the guard object goes out of scope (unless the interpreter is in global destruction). This is a convenient way to
-ensure cleanup.
+=head2 C<guard( )>
 
     {
-        my $guard = $sem->guard;
-        # permits are held here
+        my $permit = $sem->guard;
+        my $held   = $sem->count;    # the permit is held for exactly this scope
     }
-    # $sem->up called automatically
+    # released here, including if the scope is left by an exception
+
+Takes a permit the way C<down> does, blocking if it has to, and returns an L<Acme::Parataxis::Semaphore::Guard> object
+that hands the permit back when it is destroyed. Use it when a permit should be held for the length of a scope, so an
+early return or a C<die> cannot leak it.
+
+The guard is a plain destructor-based object with no other methods, and it is not idempotent: calling C<< ->DESTROY >>
+on it yourself and then letting it go out of scope releases the permit twice.
+
+=head2 C<count( )>
+
+    $sem->count;       # permits currently available
+
+=head2 C<waiters( )>
+
+    my $n   = $sem->waiters;       # how many fibers are parked
+    my @ids = $sem->waiters;       # their fiber ids
+
+In scalar context, the number of fibers currently parked. In list context, their fiber ids, in the order they will be
+released. Those are the scheduler's own ids, which get recycled once a fiber is reaped, so treat them as a debugging
+aid rather than as handles to keep.
+
+=head2 C<remove_waiter( $fid )>
+
+    my $removed = $sem->remove_waiter($fid);
+
+Drops a fiber id from the wait queue and returns how many entries went away, so 0 or 1. A removed waiter is never woken
+by a later C<up> or C<adjust>.
+
+You rarely call this yourself. It is the deregistration hook that the park installs on the fiber's behalf, and every
+Parataxis primitive that can park implements it - a L<Acme::Parataxis::Channel> sums it across both of its internal
+semaphores, and L<Acme::Parataxis::Future>, L<Acme::Parataxis::Signal> and the L<Acme::Parataxis::Sync> classes each
+have their own.
+
+Note that it edits the queue and nothing else. Removing a waiter does B<not> wake that fiber; it only guarantees that
+this semaphore never will. You still have to release the fiber some other way, or it stays parked.
+
+=head1 Recipes
+
+=head2 Capping concurrency
+
+The ordinary use: a pool of C<count> permits, and every unit of work takes one before it starts. Nothing here counts
+anything, because the semaphore does.
+
+    async {
+        my $pool = Acme::Parataxis::Semaphore->new( count => 4 );   # four at a time
+
+        my @work = map {
+            my $item = $_;
+            fiber {
+                $pool->down;                    # park here while all four are busy
+                my $result = process($item);
+                $pool->up;                      # ... and hand the permit straight back
+                $result;
+            };
+        } @items;
+
+        my @results = map { $_->await } @work;
+    };
+
+The permits are returned explicitly rather than through a guard, because the fiber spans more than one lexical scope
+and the C<up> sits next to the work it releases.
+
+=head2 A gate everyone waits on
+
+A semaphore with no permits is a one-way door: every fiber that arrives parks, and each C<up> admits exactly one. Set
+it to 0 and C<up> it N times to let an N-fiber group through together.
+
+    async {
+        my $gate = Acme::Parataxis::Semaphore->new( count => 0 );
+        my @ready = map { fiber { $gate->down; go() } } 1 .. 3;
+        await_sleep(50);
+
+        is scalar $gate->waiters, 3, 'all three are parked';
+        $gate->adjust(3);                        # open it for all three at once
+
+        $_->await for @ready;
+    };
+
+=head2 Doing the work if there is room, and skipping it if not
+
+C<try> never parks, so it turns a semaphore into a "is there capacity right now" test. That is what you want for
+optional work that is not worth queueing for.
+
+    async {
+        my $pool = Acme::Parataxis::Semaphore->new( count => 2 );
+
+        for my $task (@nice_to_have) {
+            next unless $pool->try;      # skip it if both permits are taken
+            fiber {
+                my $r = process($task);
+                $pool->up;
+                $r;
+            };
+        }
+    };
+
+=head2 Letting everyone go at shutdown
+
+C<adjust> releases a whole group in one call. Release exactly as many as are waiting, so you neither strand a fiber nor
+hand out permits nobody will take.
+
+    async {
+        my $gate = Acme::Parataxis::Semaphore->new( count => 0 );
+        my @waiters = map { my $id = $_; fiber { $gate->down; $id } } @ids;
+
+        # ... shutdown is signalled ...
+
+        $gate->adjust( scalar $gate->waiters );   # let them all through
+        my @results = map { $_->await } @waiters;
+    };
+
+=head2 Holding a permit for a scope
+
+When the permit belongs to a block rather than to one operation, C<guard> releases it on every way out of that block,
+including an exception.
+
+    my $exclusive = Acme::Parataxis::Semaphore->new( count => 1 );
+
+    sub with_exclusive {
+        my ( $sem, $body ) = @_;
+        my $permit = $sem->guard;           # blocks until we have it
+        return $body->();
+    }                                       # released here, die or not
+
+    with_exclusive( $exclusive, sub { do_the_exclusive_thing() } );
+
+=head1 Behavior Notes
+
+=head2 wait does not take a permit
+
+C<wait> is not an acquire. It blocks until the count is above zero and then returns having left the count alone, so two
+fibers can both C<wait> on a one-permit semaphore and both return.
+
+    async {
+        my $s = Acme::Parataxis::Semaphore->new( count => 1 );
+        $s->wait;
+        $s->wait;
+        is $s->count, 1, 'still one: wait never consumed anything';
+    };
+
+The trap is a loop. Because C<wait> does not decrement, C<< while ( $s->wait ) { ... } >> against a semaphore that
+already has a permit never parks and never blocks; it is a busy loop that the scheduler will happily run forever. If
+you want a permit, you want C<down>.
+
+Nothing in the library calls C<wait> itself. It is there for "tell me when this becomes non-empty", and even that is
+racy on its own, since nothing is claimed on your behalf.
+
+=head2 Usable as a plain counter off-fiber
+
+C<down> only insists on being in a fiber when it would actually have to wait, so a semaphore with permits to spare
+works fine from the mainline, and C<up>, C<try> and C<adjust> never need a fiber at all.
+
+    my $s = Acme::Parataxis::Semaphore->new( count => 1 );
+    $s->down;                              # fine: a permit was available
+    $s->down;                              # Semaphore waits must occur inside a scheduled fiber
+
+That makes a semaphore usable as a shared counter between a fiber and the outside world, but it also means the croak is
+conditional: the same call site works until the moment it would block, and then starts dying. Do not rely on C<down>
+being safe off-fiber.
+
+=head2 An interrupted waiter deregisters
+
+A C<down> cut short by C<with_timeout> or a cancellation token takes itself out of the queue, so a later C<up> does not
+wake a fiber that has already moved on. The permit that C<up> adds is not lost, but nothing takes it either.
+
+    async {
+        my $s = Acme::Parataxis::Semaphore->new( count => 0 );
+        fiber { eval { with_timeout( 60, sub { $s->down } ); 1 } };
+        await_sleep(120);                   # past the deadline
+
+        is scalar $s->waiters, 0, 'the cancelled waiter removed itself';
+        $s->up;
+        is $s->count, 1, 'so the permit just sits there';
+    };
+
+=head2 What adjust really releases
+
+C<adjust> releases up to the new count, not up to C<$diff>, and a negative C<$diff> releases nobody at all.
+
+    async {
+        my $s = Acme::Parataxis::Semaphore->new( count => 0 );
+        my @w = map { fiber { $s->down; 1 } } 1 .. 4;
+        await_sleep(30);
+
+        $s->adjust(2);                       # releases exactly 2
+        await_sleep(20);
+        is scalar $s->waiters, 2, 'two still waiting';
+        is $s->count, 0, 'and the count is back to zero';
+
+        $s->adjust(-1);                      # releases nobody, and the count goes negative
+        await_sleep(20);
+        is scalar $s->waiters, 2, 'still two waiting';
+        is $s->count, -1;
+
+        $s->adjust(9);                       # releases the rest; each takes a permit of its own
+        await_sleep(20);
+        is scalar $s->waiters, 0, 'and the last two are through';
+        is $s->count, 6, 'which is -1 + 9 - 2';
+    };
+
+=head2 Nothing checks the count
+
+There is no validation on the C<count> argument. Negative and fractional values are both accepted, and C<< count =>
+undef >> quietly becomes 1.
+
+    my $neg  = Acme::Parataxis::Semaphore->new( count => -5 );
+    my $frac = Acme::Parataxis::Semaphore->new( count => 2.5 );
+
+A negative count is not an error, it is a semaphore that can never be taken from without an C<adjust> or C<up> first,
+so every C<down> parks forever. A fractional one works, since C<down> only cares whether the count is above zero, but
+there is no reason to want it.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Channel>, L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::RateLimiter>
 
 =head1 AUTHOR
 

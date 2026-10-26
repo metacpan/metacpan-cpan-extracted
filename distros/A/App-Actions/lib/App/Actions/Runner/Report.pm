@@ -16,7 +16,7 @@ use App::Actions::Access;
 use App::Actions::I18N qw(i18n validate_args);
 use App::Actions::Runner::Support qw(default_logger redact);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The width of the job-name column of the summary.
 Readonly::Scalar my $NAME_WIDTH => 50;

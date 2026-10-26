@@ -5,6 +5,7 @@ use warnings;
 use experimental 'signatures';
 no feature qw(indirect multidimensional bareword_filehandles);
 use Test::More;
+use Cwd        qw(getcwd);
 use FindBin    qw($RealBin);
 use lib "$RealBin/../../lib";
 use File::Temp qw(tempdir);
@@ -238,6 +239,33 @@ subtest 'share_path finds a shipped file' => sub {
 		"$inc/auto/share/dist/App-Thing/data",
 		'dist resolves the installed share tree'
 	);
+};
+
+subtest 'share_path ignores the working directory' => sub {
+	# An installed tool can run inside a checkout of a different
+	# version. The file of the working directory must not win.
+	my $tree = tempdir( CLEANUP => 1 );
+	mkdir "$tree/share";
+	Fugu::File->write( "$tree/share/thing", 'checkout' );
+
+	my $inc = tempdir( CLEANUP => 1 );
+	Fugu::File->ensure_dir("$inc/auto/share/dist/App-Thing");
+	Fugu::File->write( "$inc/auto/share/dist/App-Thing/thing",
+		'installed' );
+	local @INC = ( @INC, $inc );
+
+	my $cwd = getcwd();
+	chdir $tree or die "chdir $tree: $!";
+	my $installed = Fugu::File->share_path( 'share/thing',
+		from => "$inc/App/Thing.pm", dist => 'App-Thing' );
+	my $absent =
+	    Fugu::File->share_path( 'share/thing', dist => 'App-None' );
+	chdir $cwd or die "chdir $cwd: $!";
+
+	is( $installed, "$inc/auto/share/dist/App-Thing/thing",
+		'the installed file wins over the working directory' );
+	is( $absent, undef,
+		'a file in the working directory alone resolves to undef' );
 };
 
 subtest 'atomic_dir publishes or leaves nothing' => sub {

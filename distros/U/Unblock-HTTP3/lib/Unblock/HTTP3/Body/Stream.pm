@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed weaken);
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub _new {
     my ($class, $transaction, $kind, %option) = @_;
@@ -147,6 +147,11 @@ sub complete {
 
     $self->{complete} = 1;
     $self->{flow_blocked} = 0;
+
+    # The final write may have flushed the QUIC FIN before complete became
+    # true. For CONNECT, the Client also waits for this producer flag,
+    # so the Connection must recheck completion after committing it.
+    $transaction->_outgoing_body_complete($self->{kind});
 
     return $self;
 }

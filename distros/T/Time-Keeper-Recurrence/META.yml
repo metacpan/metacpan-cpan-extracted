@@ -25,5 +25,5 @@ requires:
   Time::Keeper: '0.05'
   Time::Keeper::Zone: '0.04'
   perl: '5.010'
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

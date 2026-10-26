@@ -1,0 +1,341 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Stream - Chainable async streams over bounded channels
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async];
+    use Acme::Parataxis::Channel;
+    use Acme::Parataxis::Stream;
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 1024 );
+
+        Acme::Parataxis::Stream->from_channel($raw)
+            ->map(     sub ($line) { decode_json($line)    } )
+            ->filter(  sub ($msg)  { $msg->{status} >= 500 } )
+            ->throttle(100)                                # at most 100 a second
+            ->batch_time(1000)                             # ...in one-second batches
+            ->consume( sub (@batch) { db_bulk_insert(@batch) } );
+    };
+
+=head1 DESCRIPTION
+
+A Stream is a chain of processing stages over a L<Acme::Parataxis::Channel>. Every stage is a factory: C<map>,
+C<filter>, C<batch>, C<batch_time> and C<throttle> each allocate a fresh bounded output channel, spawn one background
+fiber that loops over the stage's input, and hand back a new Stream wrapping that output. Stages therefore compose left
+to right exactly as the method calls read, and C<consume> terminates the chain.
+
+Everything rides on the scheduler's ordinary channel parks, which is what makes the pipeline safe by construction:
+
+=over
+
+=item * Backpressure is free.
+
+A bounded output channel that fills parks the stage producing into it, and that park propagates all the way upstream,
+so a slow C<consume> throttles the raw producer instead of queueing unbounded memory. No stage needs to know about it.
+
+=item * A stream ends when its source channel shuts down.
+
+Each stage's fiber sees the shutdown as C<undef> from C<get> and shuts its own output down in turn, so a consumed chain
+unwinds fiber by fiber back to the source. No stage can park forever on a source that quit, and no fibers are orphaned.
+
+=item *
+
+Every stage parks through the same wait machinery as any other channel wait, so an enclosing C<with_timeout> or a
+cancellation token interrupts a stage mid-loop cleanly.
+
+=back
+
+=head1 METHODS
+
+=head2 C<from_channel( $ch, stage_capacity =E<gt> $n )>
+
+    my $stream = Acme::Parataxis::Stream->from_channel($raw);
+    my $small  = Acme::Parataxis::Stream->from_channel($raw, stage_capacity => 4);
+
+Wraps an existing channel as the head of a new pipeline. This is the entry point, and it is a class method rather than
+an instance method, in the same way L<Acme::Parataxis::Channel/select> is: it builds a new stream rather than
+transforming an existing one.
+
+C<stage_capacity> is the capacity of every bounded output channel the stages of B<this> pipeline allocate, and it
+defaults to 128. Pick it small to make backpressure bite early, large to let a burst through before any producer parks.
+It is fixed at the head and copied to every stage downstream; there is no per-stage capacity. The head never allocates
+a channel of its own - it reads C<$ch> directly, and C<$ch> is the handle that shuts the pipeline down.
+
+Other options are ignored. C<Stream-E<gt>new( src =E<gt> $ch, cap =E<gt> $n )> is the equivalent constructor, if you
+prefer the field names.
+
+=head2 C<map( sub ($item) { ... } )>
+
+    ->map( sub ($line) { decode_json($line) } )
+
+Applies the callback to every item and emits its result, so the return value replaces the item. A source that shuts
+down ends the stage cleanly.
+
+Watch out for what you return: an arrayref from C<map> is indistinguishable from a batch once it reaches C<consume>.
+See L</"An arrayref from map is spread by consume">.
+
+=head2 C<filter( sub ($item) { ... } )>
+
+    ->filter( sub ($msg) { $msg->{status} >= 500 } )
+
+Emits an item only when the callback returns true, and emits nothing at all if it never does. The rest of the chain
+simply sees a shorter stream, and shuts down normally when the source does.
+
+=head2 C<batch( $n )>
+
+    ->batch(100)      # groups of 100
+
+Groups items into arrayrefs of at most C<$n>. C<$n> must be at least 1, so C<batch(1)> is a legal way of saying "no
+grouping". A source that shuts down mid-batch emits the partial group as the final batch, so nothing buffered is lost.
+
+=head2 C<batch_time( $ms )>
+
+    ->batch_time(1000)   # groups flushed a second after the first item
+
+Groups items by deadline instead of by count. The first item of a batch arms a C<$ms> timer, and the batch is flushed
+when the deadline fires - which happens even if no further items arrive, because the stage waits with a deadline rather
+than on the next item. The next item re-arms. C<$ms> may be 0, which flushes every item as its own batch.
+
+A source that shuts down mid-batch emits the partial group, exactly as C<batch> does.
+
+=head2 C<throttle( $per_s )>
+
+    ->throttle(100)    # at most 100 items a second
+
+Paces the stream to at most C<$per_s> items a second. The first item is emitted immediately and each one after that is
+held back by the remainder of a C<1000 / $per_s> millisecond period, so the rate is an upper bound reached from below.
+
+A stage held up by downstream backpressure emits as soon as it can and does not try to catch up; the next period is
+measured from the actual emission. C<$per_s> must be at least 1, so this cannot be used to slow a stream below one item
+a second.
+
+=head2 C<consume( sub (@items) { ... } )>
+
+    my $sink = $stream->consume( sub (@batch) { db_bulk_insert(@batch) } );
+
+The terminal stage. Runs the callback on every item as it arrives, and returns the fiber handle, so you can C<await>
+the sink if you want to know the whole chain has finished. It ends when the source shuts down, at which point the
+pipeline is done.
+
+A batch - anything the stream is carrying as an arrayref - is spread into the callback's argument list; anything else
+is passed whole. That covers both single items and the groups built by C<batch> and C<batch_time>.
+
+=head2 C<shutdown( )>
+
+    $stream->shutdown;      # ends the chain, from here downstream
+
+Shuts this stage's source channel down, and walks the chain upstream doing the same. Everything downstream then ends by
+cascade, as each stage shuts its own output down in turn. Returns true, and is harmless to call more than once.
+
+This is a convenience: shutting down the original channel yourself has exactly the same effect, and is what you want if
+you want to stop producing as well as consuming.
+
+=head2 C<chain( )>
+
+    $stage->chain;     # the stream this one was built from
+
+The upstream Stream a stage was built from, or C<undef> at the head. Introspection, chiefly useful in tests.
+
+=head2 C<cap( )>
+
+    $stream->cap;      # 128 unless stage_capacity said otherwise
+
+The stage capacity this pipeline was built with, shared by every stage in it.
+
+=head1 Recipes
+
+=head2 Parse, filter, pace, batch, store
+
+The full shape. Note there is only B<one> batching stage: they do not compose, see L</"Stacked batch stages nest, they
+do not merge">.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 1024 );
+
+        my $sink = Acme::Parataxis::Stream->from_channel( $raw, stage_capacity => 256 )
+            ->map(     sub ($line) { decode_json($line)                 } )
+            ->filter(  sub ($msg)  { $msg->{status} >= 500              } )
+            ->throttle(100)          # no more than 100 requests a second
+            ->batch_time(1000)       # ...sent to the database once a second
+            ->consume( sub (@batch) { db_bulk_insert(@batch) } );
+
+        $sink->await;    # returns once the source has shut down
+    };
+
+=head2 Sizing the pipeline for backpressure
+
+C<stage_capacity> is the pipeline's only flow-control knob, and it is worth choosing deliberately. A small capacity
+with a slow consumer means the producer parks almost immediately; a large one lets a burst through before anything
+waits.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 1024 );
+        my @seen;
+
+        Acme::Parataxis::Stream->from_channel( $raw, stage_capacity => 1 )
+            ->consume( sub { push @seen, $_[0]; await_sleep(50) } );
+
+        $raw->put($_) for 1 .. 5;
+        await_sleep(100);
+        # only a couple of items have been through: the producer is parked, not buffering
+
+        $raw->shutdown;
+    };
+
+Capacity must be at least 1. C<stage_capacity =E<gt> 0> is accepted by C<from_channel> and then fails at the first
+stage you add, so a pipeline with no stages appears to work; see L</"A capacity of 0 fails late">.
+
+=head2 Batching by count, by time, or both
+
+C<batch> and C<batch_time> solve different problems, and you want one or the other.
+
+    # by count: best when items are uniform and the source never stops
+    ->batch(500)
+
+    # by time: best when the source goes quiet, and a partial batch must still be sent
+    ->batch_time(250)
+
+C<batch_time> is the one to reach for when the source is a live feed. A count-only batch can sit half full indefinitely
+if nothing else arrives, which for a feed means the data is simply late.
+
+=head2 Ending a stream early
+
+Shut the source down and the whole chain unwinds behind it. There is no need to unwind it by hand, and no need to keep
+the stage handles.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new;
+        my $sink = Acme::Parataxis::Stream->from_channel($raw)->map( sub { transform($_[0]) } )
+            ->consume( sub { store($_[0]) } );
+
+        produce_some();
+        $raw->shutdown;      # the pipeline finishes what is in flight and stops
+        $sink->await;
+    };
+
+=head1 Behavior Notes
+
+=head2 An arrayref from map is spread by consume
+
+C<consume> cannot tell a batch from any other arrayref, so a C<map> callback that returns an arrayref has its contents
+spread into the sink's argument list rather than passed as one value.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 16 );
+        my @got;
+
+        Acme::Parataxis::Stream->from_channel($raw)
+            ->map(    sub ($n) { [ $n, $n * 2 ] } )   # looks like one item...
+            ->consume( sub { @got = @_ } );            # ...arrives as two arguments
+
+        $raw->put(3);
+        $raw->shutdown;
+        await_sleep(50);
+
+        is_deeply \@got, [ 3, 6 ], 'the arrayref was spread, not passed whole';
+    };
+
+A hashref is not affected, and arrives intact. If you need an arrayref to survive the trip, wrap it - return a
+one-element arrayref holding a reference to it, or a blessed object.
+
+=head2 A callback that dies ends the run
+
+There is no error isolation between a stage and the rest of the program. An exception from a C<map>, C<filter> or
+C<consume> callback propagates out of the stage's fiber and aborts the run, so a stream is not a safe place to do work
+that can fail unless something above you handles it.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 16 );
+
+        Acme::Parataxis::Stream->from_channel($raw)
+            ->consume( sub { die "no such record: $_[0]\n" } );
+
+        $raw->put(1);
+        await_sleep(50);
+        # the run is gone before this point
+    };
+
+If the work in a stage can fail, catch inside the callback and route the failure somewhere deliberate.
+
+=head2 A capacity of 0 fails late
+
+C<from_channel> does not check C<stage_capacity>, because the head does not allocate a channel - it reads the one you
+gave it. The value is only used when a stage is added, so a bad capacity surfaces at that point, a long way from the
+call that set it.
+
+    my $stream = Acme::Parataxis::Stream->from_channel( $raw, stage_capacity => 0 );
+    # fine so far: no channel has been allocated
+    $stream->map( sub { $_[0] } );
+    # Channel capacity must be >= 1 (got 0)
+
+A pipeline built with no stages at all never finds out.
+
+=head2 Stacked batch stages nest, they do not merge
+
+Chaining C<batch_time> into C<batch> does not combine the two. The second stage batches the first stage's B<groups>, so
+C<consume> receives an outer group whose elements are inner groups.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 16 );
+        my @got;
+
+        Acme::Parataxis::Stream->from_channel($raw)
+            ->batch_time(1000)     # makes [1,2,3,4]
+            ->batch(2)             # ...then makes [ [1,2,3,4] ]
+            ->consume( sub { @got = @_ } );
+
+        $raw->put($_) for 1 .. 4;
+        $raw->shutdown;
+        await_sleep(50);
+
+        is scalar @got, 1, 'one argument';
+        is ref $got[0], 'ARRAY', 'holding the inner group';
+    };
+
+If you want batches capped by both count and time, flatten in a C<map> between them rather than stacking them.
+
+=head2 throttle has a floor, and no startup delay
+
+Two boundaries worth knowing. The first item is emitted immediately, so a throttled stream does not open with a period
+of silence, and the rate cannot be set below one item a second.
+
+    async {
+        my $raw = Acme::Parataxis::Channel->new( capacity => 16 );
+        my @at;
+        my $t0 = Acme::Parataxis::_now_ms();
+
+        Acme::Parataxis::Stream->from_channel($raw)
+            ->throttle(20)     # 50ms apart
+            ->consume( sub { push @at, int( Acme::Parataxis::_now_ms() - $t0 ) } );
+
+        $raw->put($_) for 1 .. 3;
+        await_sleep(300);
+
+        is_deeply \@at, [ 0, 50, 100 ], 'immediate, then one period apart';
+    };
+
+For anything slower than 1/s, add a C<batch_time> or pace with a L<Acme::Parataxis::RateLimiter> instead.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Channel>, L<Acme::Parataxis::Ticker>, L<Acme::Parataxis::RateLimiter>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

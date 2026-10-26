@@ -87,7 +87,7 @@ die "Could not find Python.h in include path. make will not work"
 
 substr($sel->{incpath}, 0, 0) = "-I";
 substr($sel->{libpath}, 0, 0) = "-L";
-$sel->{libpython} =~ s/lib(.*)(?:\.\Q$Config{dlext}\E|\Q$Config{_a}\E)/-l$1/;
+$sel->{libpython} =~ s/lib(.*)(?:\.\Q$Config{so}\E|\.\Q$Config{dlext}\E|\Q$Config{_a}\E)/-l$1/;
 
 my @flags;
 push @flags, debug_flag() if defined $gdb;
@@ -119,6 +119,7 @@ WriteMakefile(
               AUTHOR => 'Neil Watkiss <NEILW@cpan.org>',
               LICENSE => 'perl',
 	      VERSION_FROM => 'Python.pm',
+		  MIN_PERL_VERSION => '5.6.0',
 	      PREREQ_PM => {
                             'Inline'       => 0.46,
                             'Digest::MD5'  => 2.50,

@@ -1,16 +1,18 @@
 #!/usr/bin/env perl
 # bi-alert -- Phase 4.3 digest and threshold CLI for Database::BI
 #
-# Evaluates one saved analysis's measures and optionally mails a digest
-# when a threshold condition is crossed.  Scheduling is handled by cron;
-# this script is deliberately stateless.
+# Evaluates one saved analysis's measures, prints a digest to STDOUT, and
+# exits 1 when a threshold condition is crossed.  It makes no mail or network
+# call: delivery is the caller's job, which is what lets cron (or a wrapper
+# that pipes STDOUT into mail, a webhook or a ticket) decide what an alert is.
+# Scheduling is likewise cron's; this script is deliberately stateless.
 #
 # Usage:
 #   bi-alert --analysis <id> [--threshold <alias>:<op>:<value>]
 #             [--model-dir <dir>] [--data-dir <dir>] [--dry-run]
 #
 # Exit codes:  0 = ok / threshold not crossed
-#              1 = threshold crossed (or no threshold; digest printed)
+#              1 = threshold crossed
 #              2 = error (bad args, analysis not found, data unavailable)
 
 use strict;
@@ -244,10 +246,6 @@ if (defined $opt_threshold && length $opt_threshold) {
 	if ($ops{$op}->($actual, $tval)) {
 		$threshold_crossed = 1;
 		print "THRESHOLD CROSSED: $alias ($actual) $op $tval\n";
-		# TODO: send mail digest via configured mailer when --dry-run is not set.
-		if ($opt_dry_run) {
-			print "[dry-run] Would send digest mail here.\n";
-		}
 	} else {
 		print "Threshold not crossed: $alias ($actual) $op $tval\n";
 	}
@@ -266,12 +264,16 @@ Usage: bi-alert --analysis <id> [OPTIONS]
   --threshold, -t <m>:<op>:<v>  Threshold: measure alias, operator (gt|ge|lt|le|eq|ne), value
   --model-dir, -m <dir>         Model directory containing analyses.json (default: .bi)
   --data-dir,  -d <dir>         Data directory (default: data)
-  --dry-run,   -n               Print digest without sending mail
+  --dry-run,   -n               Accepted for compatibility; nothing is ever sent
   --help,      -h               Show this help
 
 Exit codes:
-  0  OK; threshold not crossed (or no threshold specified)
+  0  OK; threshold not crossed
   1  Threshold crossed
   2  Error
+
+The digest goes to STDOUT and nothing is sent anywhere, so --dry-run has no
+delivery to suppress.  Pipe STDOUT into mail, curl or a ticket creator if the
+alert has to leave the machine.
 USAGE
 }

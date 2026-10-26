@@ -32,8 +32,16 @@ A file holds top-level settings and blocks:
     }
 
 Both C<key value> and C<key = value> parse.
+A key ends at white space or at the C<=>.
 A double-quoted value loses its quotes.
 A C<#> starts a comment that runs to the end of the line.
+
+The parser reads bytes and does not decode the file.
+Only ASCII white space separates the parts of a line.
+A key and a block type hold ASCII word characters only.
+A value and a block argument keep each byte of the file, so a UTF-8
+value comes back as its UTF-8 bytes.
+The caller decodes it.
 
 A block header is a type, then one or more arguments, then an opening
 brace.
@@ -94,6 +102,13 @@ C<get($key, $default)> returns a top-level setting, or the default.
 =head2 setting_names
 
 C<setting_names()> returns the names of the top-level settings, sorted.
+
+=head2 block_types
+
+C<block_types()> returns the type of each block, sorted, each type one
+time.
+A caller that accepts a fixed set of types can use it to find a type
+outside that set.
 
 =head2 parse_bool
 
@@ -163,7 +178,7 @@ the grammar does not accept, with the reason in C<error()>.
 
 C<get()>, C<file()> and C<error()> return a string or C<undef>.
 C<parse_bool()> returns 1 or 0.
-C<blocks()> and C<setting_names()> return a list.
+C<blocks()>, C<setting_names()> and C<block_types()> return a list.
 C<block()> returns a hash reference or C<undef>.
 
 =head1 EXAMPLES

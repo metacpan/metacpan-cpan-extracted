@@ -4,95 +4,332 @@
 
 =head1 NAME
 
-Acme::Parataxis::Future - A placeholder for an eventual computation result
+Acme::Parataxis::Future - Placeholder for an Eventual Computation Result
 
 =head1 SYNOPSIS
 
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
     use Acme::Parataxis::Future;
 
-    my $future = Acme::Parataxis::Future->new;
+    # A promise for one value, resolved exactly once.
 
-    # Register a callback
-    $future->on_ready(sub ($f) {
-        say 'Result: ' . $f->result;
-    });
+    my $reply = Acme::Parataxis::Future->new;
 
-    # Set the result (from another fiber)
-    $future->set_result(42);
+    async {
+        fiber { $reply->set_result( fetch_user( 42 ) ) };    # some other fiber produces it
 
-    # Await in a fiber (suspends until ready)
-    my $value = $future->await;
+        my $user = $reply->await;                          # this one suspends until it lands
+        say $user->{name};
+    };
+
+The two halves are independent, and neither needs a fiber. A callback registered before the value exists fires when it
+does, right there in the setter:
+
+    my $reply2 = Acme::Parataxis::Future->new;
+
+    $reply2->on_ready( sub { my $f = shift; say 'landed: ' . $f->result->{name} } );
+    $reply2->set_result( $user );     # the callback runs here, before set_result returns
+
+A fresh future takes the failure path, and C<error> tells the two apart without dying:
+
+    my $reply3 = Acme::Parataxis::Future->new;
+
+    $reply3->set_error( $err );
+    if ( defined $reply3->error ) { warn 'failed: ' . $reply3->error }
+    ref $reply3->error;               # the error as stored - the same object you set, not a copy
 
 =head1 DESCRIPTION
 
-A common pattern for lightweight concurrency abstractions. A future represents a value that will be available at some
-point in the future. Futures are used to coordinate between fibers: one fiber produces a result via C<set_result> or
-C<set_error>, and one or more consumers retrieve it via C<result> or C<await>.
+A future is a one-shot slot for a value that does not exist yet. It has two halves that never need to meet: a producer
+calls C<set_result> or C<set_error> exactly once, and any number of consumers call C<await> to suspend until it
+happens, or register an C<on_ready> callback to be called when it does. Nothing is required to be a fiber to
+C<set_result>, so a value arriving on a callback, from a timer, or from plain mainline code resolves a future just as
+well as a fiber does.
 
-A future transitions from not-ready to ready exactly once. Attempting to set the result or error on an already-ready
-future throws an exception.
+A future transitions from not-ready to ready exactly once. C<set_result> and C<set_error> both refuse a second
+transition, and C<clear_result> is the only way back - which makes a future a genuine one-shot rather than a mutable
+box.
 
-=head1 CONSTRUCTOR
-
-=head2 C<new()>
-
-    my $future = Acme::Parataxis::Future->new();
-
-Creates a new, not-ready Future.
+Parataxis uses this class itself: L<Acme::Parataxis::Actor>'s C<ask> returns one, C<spawn_blocking> returns one,
+L<Acme::Parataxis::Monitor> hands one back, and C<wait_all> and C<wait_any> build one out of many.
 
 =head1 METHODS
 
-=head2 C<is_ready()>
+=head2 C<new( )>
 
-    my $ready = $future->is_ready;
+    my $future = Acme::Parataxis::Future->new;
 
-Returns true if the future has been resolved (via C<set_result> or C<set_error>).
+A new, not-ready future. The constructor takes B<no> parameters at all - there are no fields to initialise, and it is
+not a configuration object. Passing anything is a mistake and is reported as one; see L</"The constructor is strict">.
 
-=head2 C<result()>
+=head2 C<is_ready( )>
 
-    my $val = $future->result;
+    if ( $future->is_ready ) { ... }
 
-Returns the result value immediately. Croaks if the future is not yet ready. Use C<is_ready> to check first, or
-C<await> to suspend until the value is available. Dies with the stored error if the future was resolved via
-C<set_error>.
+Whether the future has been resolved, by either setter. A future resolved with C<undef> is ready, so this is the only
+way to tell a resolved-undef from an unresolved future.
+
+=head2 C<error( )>
+
+    my $err = $future->error;
+
+The stored error, raw: C<undef> unless C<set_error> was called, and afterwards exactly the value that was passed in.
+Read it to tell a failure from a result without dying, which is what C<on_ready> is for - C<result> croaks instead.
+
+Note that C<undef> is ambiguous. Both C<set_result(undef)> and C<set_error(undef)> leave C<error> C<undef>, and both
+leave C<result> returning C<undef>; see L</"set_error(undef) is indistinguishable from a successful undef">.
+
+=head2 C<result( )>
+
+    my $val = $future->result;         # croaks unless the future is resolved successfully
+
+The result, immediately, without suspending. Croaks C<Future not ready> if the future has not been resolved - use
+C<is_ready>, or C<await> to wait for it - and croaks the stored error if it was resolved with C<set_error>.
+
+The error croak stringifies. If you stored an object, C<$@> is a string, not that object; read C<error> when you need
+the object itself. See L</"A failed result croaks the error as a string, not as the object you stored">.
 
 =head2 C<set_result( $value )>
 
-    $future->set_result($val);
+    $future->set_result($value);       # fires every on_ready callback, then wakes every awaiter
 
-Resolve the future with a result value. Fires any registered C<on_ready> callbacks. Dies if the future is already
-ready.
+Resolve the future with a successful value. Any registered C<on_ready> callbacks run here, synchronously and in
+registration order, before any parked fiber is scheduled. Every parked C<await> is then woken, and returns this value.
+
+C<undef> is a perfectly good value. The second and later resolutions die with C<Future already ready>, whether the
+first was a result or an error. Returns C<undef>; the return value is not meaningful.
 
 =head2 C<set_error( $error )>
 
-    $future->set_error($err);
+    $future->set_error($err);          # same wakeup path, but await and result die with $err
 
-Resolve the future with an error. Fires any registered C<on_ready> callbacks. Dies if the future is already ready.
+Resolve the future with a failure. The wakeup path is identical to C<set_result> - callbacks fire, then waiters are
+woken - but C<await> and C<result> die with the stored error instead of returning it.
 
-=head2 C<clear_result()>
-
-    $future->clear_result();
-
-Clear the stored result and error, resetting the future to a not-ready state. Any registered callbacks and waiters are
-discarded, so the future may be resolved and awaited again (recycling).
+C<undef> is accepted, and a future resolved with C<set_error(undef)> is ready with no error and an undefined result:
+L</"set_error(undef) is indistinguishable from a successful undef">. Dies with C<Future already ready> on a second
+resolution. Returns C<undef>; the return value is not meaningful.
 
 =head2 C<on_ready( $callback )>
 
-    $future->on_ready(sub { my ($f) = @_; ... });
+    $future->on_ready( sub { my $f = shift; say $f->result } );
 
-Register a callback to be invoked when the future becomes ready. If the future is already ready, the callback fires
-immediately. The callback receives the future object as its argument.
+Register a callback, or pass one to a future that is already ready - in which case it runs immediately, before
+C<on_ready> returns. Callbacks receive the future, so one registered callback can read the result without closing over
+it.
 
-=head2 C<await()>
+Callbacks fire in registration order, synchronously, from inside the setter. They fire B<before> any parked fiber is
+resumed, because waking a fiber only makes it runnable; the callbacks have all returned by the time the first waiter is
+scheduled again.
 
-    my $val = $future->await;
+=head2 C<await( )>
 
-Suspend the current fiber until the future is ready. Returns the result on success; dies if the future was resolved
-with an error via C<set_error>. If the future is already ready, returns immediately without blocking.
+    my $val = $future->await;          # suspends the calling fiber
 
-Must be called from inside a running fiber (that is, while the C<Acme::Parataxis> scheduler is active); awaiting a
-not-yet-ready future from the mainline will croak. Multiple fibers may await the same future at once; each is resumed
-when it becomes ready.
+Suspend the current fiber until the future is ready, then return the result. If the future is already ready this
+returns without suspending, which is also the only case where it works outside a running fiber: from the mainline a
+pending future croaks C<await() must be called from inside a scheduled fiber>.
+
+If the future was resolved with C<set_error>, C<await> dies with the stored error, stringified in the same way
+C<result> does it. Multiple fibers may await the same future; each parks and each is woken. If a token is cancelled
+while a fiber is parked here, the wait re-enters and throws L<Acme::Parataxis::Error::Cancelled>, and the fiber
+deregisters itself, so a later resolution will not try to wake it.
+
+=head2 C<remove_waiter( $fid )>
+
+    my $removed = $future->remove_waiter($fid);
+
+Unregister a fiber that is parked in C<await>, so a later C<set_result> or C<set_error> will not wake it. Returns the
+number of entries removed, C<0> or C<1>. A fiber removed this way is not resumed by anything, so the caller owns it and
+has to reclaim it.
+
+You rarely need this by hand: an interrupted C<await> unregisters itself, which is what lets a cancelled fiber be
+collected while its future stays usable.
+
+=head2 C<clear_result( )>
+
+    $future->clear_result;             # back to not-ready, with no callbacks and no waiters
+
+Reset the future to not-ready, discarding the stored result, the stored error, every registered C<on_ready> callback,
+and every parked waiter. The future can then be resolved and awaited again, which is the supported way to reuse one.
+
+Clearing a future that has waiters parked in it is a deadlock, not a reset - see L</"clear_result drops parked waiters,
+and they are never resumed">.
+
+=head1 Recipes
+
+=head2 Resolve from a worker, consume from many
+
+    my $future = Acme::Parataxis::Future->new;
+
+    async {
+        my $worker = fiber { $future->set_result( expensive() ) };
+        my @consumers = map { fiber { $future->await } } 1 .. 3;    # three fibers, one slot
+
+        say join ', ', map { $_->await } @consumers;
+        $worker->await;
+    };
+
+Every waiter is woken from the same resolution, so a fan-out costs one producer and three cheap parks. The fiber
+returned by C<fiber> also answers C<await>, so C<< $_->await >> is the natural way to collect them.
+
+=head2 Give the producer a bound, so it cannot outlive its consumer
+
+    my $future = Acme::Parataxis::Future->new;
+
+    async {
+        my $worker = fiber {
+            my $ok = eval { with_timeout( 5_000, sub { $future->set_result( work() ) } ); 1 };
+            warn "producer gave up: $@" unless $ok;      # nobody ever resolved the future
+        };
+
+        # and so does the consumer
+        if ( my $err = do { eval { with_timeout( 250, sub { $future->await } ) }; $@ } ) {
+            warn "gave up: $err";
+        }
+        else {
+            say $future->result->{name};
+        }
+        $worker->await;        # returns once the producer has unwound at its own bound
+    };
+
+A fiber cannot be stopped from the outside. There is no C<stop> or C<cancel> method on one: C<stop> exists in
+L<Acme::Parataxis> but it is a function that ends the whole run, and it shares a package name with the fiber class, so
+C<< $fiber->can('stop') >> answers true and the call still fails. A producer that might outlive its consumer therefore
+needs a bound of its own, and a future nobody will ever resolve is a perfectly ordinary way to hang a fiber.
+
+L<Acme::Parataxis>'s C<with_cancel> is the on-demand alternative, and it has a sharp edge worth knowing before you
+reach for it. The scope token is the block's own argument, and it is also the return value - but the return value is
+only bound once the block has finished, which is exactly too late to cancel it. Publish the argument from inside the
+block instead:
+
+    use Acme::Parataxis qw[async fiber yield with_cancel with_timeout];    # both are in @EXPORT_OK
+
+    my ( $scope, $outcome ) = ( undef, undef );
+    async {
+        my $worker = fiber {
+            with_cancel( sub ($t) { $scope = $t; $future->set_result( work() ) } );
+        };
+        yield;                          # let the block publish its token
+        $scope->cancel;                 # interrupts whatever the producer is parked on
+        $outcome = eval { $worker->await; 1 } ? 'returned' : ( split /\n/, $@ )[0];
+    };
+
+    # $outcome is now "The operation was cancelled at await_sleep (...)"
+
+The block's argument is available from its first statement, so this works. Capturing the return value instead - C<< my
+$scope = with_cancel(sub {...}) >> - leaves C<$scope> empty for the whole life of the block, and hands you an inert
+token once it is over.
+
+Note the shape of the consumer's own C<await>: a timed-out or cancelled wait unregisters itself from the future on the
+way out, so a dead wait never leaves the future holding a reference to it. That is the wait's cleanup hook, and it is
+why you do not need C<remove_waiter> on the abandoned path.
+
+=head2 Report a failure without tripping over it
+
+    $future->on_ready( sub {
+        my $f = shift;
+        if ( defined $f->error ) { warn 'job failed: ' . $f->error; return }
+        warn "job returned: " . ( $f->result // '(undef)' );
+    } );
+
+C<on_ready> is the non-throwing way to observe a future. It fires for a failure as readily as for a result, and
+C<error> separates the two.
+
+=head1 Behavior Notes
+
+=head2 C<clear_result> drops parked waiters, and they are never resumed
+
+C<clear_result> empties the waiter list as well as the callback list. A fiber parked in C<await> is not woken, is not
+told anything, and is not re-registered when the future is resolved again - it is simply gone from the future's
+bookkeeping. The run then has a live fiber that nothing can ever resume:
+
+    my $future = Acme::Parataxis::Future->new;
+    my $w      = fiber { $future->await };
+    yield;                              # $w is parked
+    $future->clear_result;              # $w is dropped from the waiter list
+    $future->set_result('value');       # wakes an empty list
+    $w->await;                          # FATAL: deadlock detected
+
+Recycle a future with C<clear_result> only when nothing is parked on it. The same applies to C<on_ready>: a callback
+registered but not yet fired is discarded silently, so a callback you are still counting on can simply never run.
+
+=head2 A throwing C<on_ready> callback aborts the rest and escapes the setter
+
+Callbacks run in a plain loop inside the setter, so the first one to die takes the others with it and propagates out:
+
+    $future->on_ready( sub { die "callback exploded\n" } );
+    $future->on_ready( sub { say 'never reached' } );
+    $future->set_result(1);             # dies with "callback exploded", before the second callback
+
+The future is already marked ready by then, so the second registration cannot be retried and the second callback is
+simply lost. Keep C<on_ready> callbacks total: catch inside them, or wrap the body in an C<eval> that logs.
+
+=head2 A failed result croaks the error as a string, not as the object you stored
+
+C<result> and C<await> surface a failure with C<croak $error>. C<croak> stringifies its argument and appends the
+caller's location, so the object does not survive the trip:
+
+    my $real = Acme::Parataxis::Error::Timeout->new;
+    $future->set_error($real);
+    eval { $future->await };
+
+    ref $@;          # '' - a plain string like "The operation timed out at ... at t/job.pl line 31.\n"
+    ref $future->error;   # 'Acme::Parataxis::Error::Timeout' - the object is still there, if you want it
+
+Do not compare two errors with C<==>. They overload stringification, not numerics, so it compares the two messages and
+warns C<isn't numeric in numeric eq> on both sides; see L<Acme::Parataxis::Error/"The overload is a string, not a
+number">.
+
+Read C<error> rather than C<$@> whenever the error is an object you need to inspect. This matters for
+L<Acme::Parataxis::Error> subclasses specifically, because C<< ->kind >> and C<< ->wait_reason >> live on the object
+and are gone from the string.
+
+=head2 C<set_error(undef)> is indistinguishable from a successful undef
+
+C<set_error> does not reject C<undef>, and it does not reject it specially either. A future resolved that way is ready,
+has no error, and returns C<undef> from C<result> - exactly what C<set_result(undef)> gives you. Through the public API
+the two are the same object, so a future cannot be used to signal "failed, with nothing to report". If that distinction
+matters, resolve with a value that is not C<undef>.
+
+=head2 The constructor is strict
+
+C<new> has no parameters, and the generated constructor says so:
+
+    Acme::Parataxis::Future->new( name => 'job' );
+    # Warning: Odd number of arguments passed to "Acme::Parataxis::Future" constructor
+    # Unrecognized parameters for "Acme::Parataxis::Future" constructor: name
+
+There is no field to name and no option to set, so this is only worth knowing to the extent that it is a loud failure
+rather than a silently ignored argument.
+
+=head2 A fiber speaks a similar protocol, and it is not this one
+
+L<Acme::Parataxis> fiber objects carry their own C<result>, C<set_result>, C<set_error>, C<on_ready>, C<await>,
+C<is_ready> and C<error>, and they are a separate class - a fiber is not a C<Acme::Parataxis::Future>, and C<wait_all>
+and C<wait_any> reject one. The two are not interchangeable:
+
+=over
+
+=item * A fiber's C<set_result> on an already-ready fiber is silently ignored. A C<Future> dies with
+C<Future already ready>.
+
+=item * A fiber's C<result> on a failed fiber returns C<undef> without raising anything. A C<Future> croaks the
+stored error.
+
+=item * A fiber holds one waiter. A C<Future> holds any number, which is what makes fan-out and C<wait_all> possible;
+two fibers awaiting one fiber leave both of them parked.
+
+=item * A fiber has no C<clear_result> and no C<remove_waiter>.
+
+=back
+
+Prefer a C<Future> for a value you are coordinating; reach for the fiber itself when you want a running fiber.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Error>, L<Acme::Parataxis::Actor>, L<Acme::Parataxis::Monitor>
 
 =head1 AUTHOR
 

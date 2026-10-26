@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "h2_receive_guard.h"
 
 typedef struct unblock_h2_provider unblock_h2_provider;
 typedef struct unblock_h2_header_block unblock_h2_header_block;
@@ -44,6 +45,7 @@ struct unblock_h2_provider {
 
 typedef struct {
     nghttp2_session *session;
+    ub_h2_guard guard;
     uhttp_native_api uniform_api;
     SV *cb_begin_headers;
     SV *cb_frame_recv;
@@ -1617,6 +1619,16 @@ on_begin_headers_callback(nghttp2_session *session,
     AV *args;
     int result = 0;
 
+    if (ps->server && frame->hd.type == NGHTTP2_HEADERS
+        && frame->headers.cat == NGHTTP2_HCAT_REQUEST
+        && frame->hd.stream_id > ps->guard.last_peer_id) {
+        int32_t first = ps->guard.last_peer_id ? ps->guard.last_peer_id + 2 : 1;
+        result = ub_h2_remember(&ps->guard, session, first,
+                               frame->hd.stream_id - 2, UB_H2_SKIPPED);
+        if (result != 0) return result;
+        ps->guard.last_peer_id = frame->hd.stream_id;
+    }
+
     if (ps->cb_begin_headers) {
         args = newAV();
         av_push(args, newSViv(frame->hd.stream_id));
@@ -1688,6 +1700,15 @@ on_frame_recv_callback(nghttp2_session *session,
     HV *frame_hv;
     AV *args;
     int result;
+
+    if (frame->hd.type == NGHTTP2_SETTINGS
+        && !(frame->hd.flags & NGHTTP2_FLAG_ACK)) {
+        ps->guard.ready = 1;
+    }
+    if (frame->hd.type == NGHTTP2_RST_STREAM) {
+        result = ub_h2_peer_reset(&ps->guard, session, frame->hd.stream_id);
+        if (result != 0) return result;
+    }
 
     if (frame->hd.type == NGHTTP2_HEADERS) {
         block = take_header_block(ps, frame->hd.stream_id);
@@ -1761,6 +1782,15 @@ on_stream_close_callback(nghttp2_session *session,
     AV *args;
     int result = 0;
 
+    /* Retain the distinction between peer closure and a local reset: bytes
+     * already in flight after our RST_STREAM are not peer protocol errors. */
+    if (stream_id & 1) {
+        unsigned char kind = ps->guard.current_rst == stream_id
+            || nghttp2_session_get_stream_remote_close(session, stream_id) == 1
+            ? UB_H2_CLOSED : UB_H2_LOCAL_RESET;
+        result = ub_h2_remember(&ps->guard, session, stream_id, stream_id, kind);
+        if (result != 0) return result;
+    }
     remove_provider(aTHX_ ps, stream_id);
     remove_header_block(aTHX_ ps, stream_id);
 
@@ -1889,6 +1919,7 @@ new_session(pTHX_ HV *callbacks_hv, int server, size_t max_header_list_size)
     }
     ps->uniform_api = uniform_api;
     ps->server = server ? 1 : 0;
+    ps->guard.preface_left = server ? 24 : 0;
     ps->max_header_list_size = max_header_list_size;
 
     load_callbacks(aTHX_ ps, callbacks_hv);
@@ -1896,6 +1927,7 @@ new_session(pTHX_ HV *callbacks_hv, int server, size_t max_header_list_size)
     if (rv != 0) {
         free_header_blocks(aTHX_ ps);
         release_callbacks(aTHX_ ps);
+        free(ps->guard.history);
         free(ps);
         croak("nghttp2_session_callbacks_new failed (%d): %s",
             rv, nghttp2_strerror(rv));
@@ -1905,6 +1937,7 @@ new_session(pTHX_ HV *callbacks_hv, int server, size_t max_header_list_size)
     if (rv != 0) {
         nghttp2_session_callbacks_del(callbacks);
         release_callbacks(aTHX_ ps);
+        free(ps->guard.history);
         free(ps);
         croak("nghttp2_option_new failed (%d): %s",
             rv, nghttp2_strerror(rv));
@@ -1928,6 +1961,7 @@ new_session(pTHX_ HV *callbacks_hv, int server, size_t max_header_list_size)
 
     if (rv != 0) {
         release_callbacks(aTHX_ ps);
+        free(ps->guard.history);
         free(ps);
         croak("nghttp2 session creation failed (%d): %s",
             rv, nghttp2_strerror(rv));
@@ -2193,7 +2227,7 @@ ub_http2_native_input(
 
     JMPENV_PUSH(jump_status);
     if (jump_status == 0) {
-        rv = nghttp2_session_mem_recv(
+        rv = ub_h2_receive(&ps->guard,
             ps->session, (const uint8_t *)data, length);
         JMPENV_POP;
     }
@@ -2597,6 +2631,7 @@ DESTROY(self)
         }
         free_header_blocks(aTHX_ ps);
         release_callbacks(aTHX_ ps);
+        free(ps->guard.history);
         free(ps);
         sv_setiv(SvRV(self), 0);
 
@@ -2620,7 +2655,7 @@ mem_recv(self, data)
         ENTER;
         SAVEINT(ps->in_session_call);
         ps->in_session_call = 1;
-        rv = nghttp2_session_mem_recv(
+        rv = ub_h2_receive(&ps->guard,
             ps->session, (const uint8_t *)bytes, (size_t)len);
         LEAVE;
         drain_pending_free(aTHX_ ps);

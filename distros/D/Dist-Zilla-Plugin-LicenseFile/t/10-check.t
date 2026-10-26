@@ -15,9 +15,10 @@ use Software::License::Perl_5;
 # The text [LicenseFile] expects to find committed in the repository: the bare
 # licence, without the copyright notice ->fulltext puts above it.
 sub wanted_license {
+    my (%arg) = @_;
     Software::License::Perl_5->new({
-        holder => 'Test',
-        year   => 2026,
+        holder => $arg{holder} // 'Test',
+        year   => $arg{year}   // 2026,
     })->license;
 }
 
@@ -28,14 +29,14 @@ sub build_dist {
     $dist_dir->mkpath;
 
     my $plugin_config = $arg{plugin_config} // '';
+    my $year_line     = $arg{floating_year} ? '' : "copyright_year = 2026\n";
     $dist_dir->child('dist.ini')->spew_utf8(<<"DIST");
 name = Test-Dist
 version = 0.001
 author = Test <test\@test.de>
 license = Perl_5
 copyright_holder = Test
-copyright_year = 2026
-
+$year_line
 [GatherDir]
 
 [LicenseFile]
@@ -74,6 +75,41 @@ subtest 'a stale LICENSE aborts the build' => sub {
     ok($error, 'build aborted');
     like($error, qr/out of date/i, 'and the message says the file no longer matches');
     like($error, qr/dzil genlicense/, 'and how to fix it');
+};
+
+subtest 'a LICENSE with another year names the copyright line' => sub {
+    my ($tzil, $error) = build_dist(license => wanted_license(year => 2025));
+    ok($error, 'build aborted');
+    like($error, qr/copyright line/, 'and the message points at the copyright line');
+    like($error, qr/2025.*2026/s, 'naming the year in the file and the year in dist.ini');
+    unlike($error, qr/no longer matches the license/, 'not at the license setting');
+};
+
+subtest 'a LICENSE with another holder names the copyright line' => sub {
+    my ($tzil, $error) = build_dist(license => wanted_license(holder => 'Someone Else'));
+    ok($error, 'build aborted');
+    like($error, qr/copyright line.*Someone Else.*Test/s, 'and names both holders');
+};
+
+subtest 'without copyright_year the floating year is warned about' => sub {
+    my $year = (localtime)[5] + 1900;
+    my ($tzil, $error) = build_dist(
+        floating_year => 1,
+        license       => wanted_license(year => $year),
+    );
+    is($error, undef, 'the build passes while the year matches');
+    ok(
+        (grep { /copyright_year is not set/ } @{ $tzil->log_messages }),
+        'but warns that the year floats',
+    );
+};
+
+subtest 'with copyright_year there is no floating-year warning' => sub {
+    my ($tzil, $error) = build_dist(license => wanted_license());
+    ok(
+        !(grep { /copyright_year is not set/ } @{ $tzil->log_messages }),
+        'no warning',
+    );
 };
 
 subtest 'required = 0 downgrades both checks to a warning' => sub {

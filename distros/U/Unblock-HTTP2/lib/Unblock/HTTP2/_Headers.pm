@@ -9,7 +9,7 @@ use Uniform::HTTP::FastPath 0.06 ();
 use Uniform::HTTP::Request 0.06;
 use Uniform::HTTP::Response 0.06;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my %FORBIDDEN = map { $_ => 1 } qw(
     connection

@@ -13,8 +13,8 @@ use Dist::Zilla::PluginBundle::Author::GETTY;
 
 sub _write_git_config {
   my ($dir, $remote_url) = @_;
-  mkdir "$dir/.git" or die "mkdir $dir/.git: $!";
-  open my $fh, '>', "$dir/.git/config" or die "open: $!";
+  system('git', 'init', '-q', $dir) == 0 or die "git init $dir failed";
+  open my $fh, '>>', "$dir/.git/config" or die "open: $!";
   if (defined $remote_url) {
     print $fh "[remote \"origin\"]\n";
     print $fh "\turl = $remote_url\n";
@@ -87,6 +87,33 @@ subtest 'no remote at all -> not gitea (even with the flag)' => sub {
   my $r = _detect_in_dir($dir, { gitea => 1 });
   is $r->{host},     undef, 'no remote host';
   is $r->{is_gitea}, 0,     'nothing to build META from';
+};
+
+# Detection asks git, so it must see through a linked worktree (where .git is a
+# file) and must prefer origin to whatever remote happens to be listed first.
+sub _git { my ($dir, @cmd) = @_; system('git', '-C', $dir, @cmd) == 0 or die "git @cmd failed" }
+
+subtest 'linked worktree -> remote still found' => sub {
+  my $main = tempdir(CLEANUP => 1);
+  _git($main, 'init', '-q');
+  _git($main, qw(-c user.name=t -c user.email=t@t commit -q --allow-empty -m init));
+  _git($main, qw(remote add origin git@codeberg.org:getty/some-dist.git));
+  my $wt = "$main/wt";
+  _git($main, qw(worktree add -q), $wt);
+  ok -f "$wt/.git", 'the worktree has a .git file, not a directory';
+  my $r = _detect_in_dir($wt);
+  is $r->{host},     'codeberg.org', 'host found through the worktree';
+  is $r->{is_gitea}, 1,              'and gitea decided';
+};
+
+subtest 'origin wins over an earlier remote' => sub {
+  my $dir = tempdir(CLEANUP => 1);
+  _git($dir, 'init', '-q');
+  _git($dir, qw(remote add mirror git@gitlab.com:getty/some-dist.git));
+  _git($dir, qw(remote add origin git@codeberg.org:getty/some-dist.git));
+  my $r = _detect_in_dir($dir);
+  is $r->{host},     'codeberg.org', 'host is the one of origin, not of the first remote';
+  is $r->{is_gitea}, 1,              'so GiteaMeta gets a host it will accept';
 };
 
 done_testing;

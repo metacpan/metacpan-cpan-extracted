@@ -27,7 +27,7 @@ use App::FileSync::Constants qw($PROTOCOL_VERSION $ROLE_CLIENT @ROLES $SERVER_PR
 use App::FileSync::I18N qw(throw);
 use App::FileSync::IO qw(read_text);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Kept for compatibility: the protocol version sent as --proto.
 our $PROTO = $PROTOCOL_VERSION;

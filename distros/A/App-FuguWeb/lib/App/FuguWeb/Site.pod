@@ -41,10 +41,11 @@ output directory, and gives the same bytes for the same checkout.
 =head2 config, staging
 
     my $staging = $site->staging;
-    my $english = $site->staging('en');
+    my $chinese = $site->staging($config->language('zh-Hans'));
 
 The site description, and the mdoc staging directory, or the directory
-of one language inside it.
+of one L<App::FuguWeb::Language> inside it, under the path of its
+tree.
 
 =head2 missing_tool
 
@@ -66,45 +67,56 @@ not;
 
 =item 2.
 
-refuse an output directory that no build may own, and refuse a symlink
-on a path that the build writes;
+refuse an output directory that no build may own, or that holds a
+source;
 
 =item 3.
 
-lint every mdoc source of each language;
+hold each manual and each Markdown page of each language to UTF-8, per
+WEB-SITE-5, and name the source that is not;
 
 =item 4.
 
-create the output directory, the directory of each language tree, and
-the staging directory of each language;
+lint every mdoc source of each language;
 
 =item 5.
+
+refuse a symlink on a path that the build writes, with each name
+folded per WEB-OUTPUT-17, and create the output directory,
+the tree of each language below its path, and the staging directory of
+each language;
+
+=item 6.
 
 copy the mdoc source of each language into the staging directory of
 that language, under its staged name. A source of a translation takes
 the staged name of its namesake;
 
-=item 6.
+=item 7.
 
 copy the base stylesheet and every asset;
 
-=item 7.
+=item 8.
 
 write the key directory, when the description names one;
 
-=item 8.
-
-render each C<page> block into each language tree, from the values of
-that language, then the pages of the top level: the copy of
-F<404.html> when the description holds that page, and the forward
-F<index.html>;
-
 =item 9.
 
-render one page for each manual in each group, into each language
-tree, from the source of that language;
+render each C<page> block into each language tree, from the values of
+that language, then the pages of the top level: the top-level
+F<404.html> when the description holds that page, and the forward
+F<index.html>. The top-level F<404.html> holds the body of the
+F<404.html> of each tree, as L<App::FuguWeb::Fragment/not_found> fits
+it;
 
 =item 10.
+
+render one page for each manual in each group, into each language
+tree, from the source of that language. L<App::FuguWeb::Fragment/manual>
+removes the head and the foot of C<mandoc>, and opens the page with its
+title, per WEB-MANUALS-9;
+
+=item 11.
 
 remove the staging directory, every file that the site dropped, and
 every directory that is then empty.
@@ -116,19 +128,31 @@ right. A manual that was renamed leaves its old page behind, and a site
 that carried both would fail its own check. The build owns the output
 directory, so it owns the removal too.
 
+The build reads each body fragment and each footer through
+L<App::FuguWeb/decode>, and it writes each page through
+L<App::FuguWeb/encode>, per WEB-SITE-5.
+
+The default language comes first in the order of the languages, per
+D-05, so each page of the default tree renders before its namesakes.
+The build keeps the outline of each page of the default tree. Each page
+of another language must hold that outline, and it takes the id of each
+heading through L<App::FuguWeb::Fragment/follow>, per WEB-OUTLINE-1 and
+WEB-OUTLINE-2. Each link of the page to one of its headings then names
+the new id, per WEB-OUTLINE-4. A link of the class C<Sx> of mandoc(1)
+finds its heading by its text, and each other link by its old id. A
+page whose outline differs fails the build. The message
+names the page, the language and the position of the first heading that
+differs.
+
 The build owns a plain file at the top level of the output, and a plain
-file directly in a directory of the top level whose name has the shape
-of a language code. A page of an older flat layout, and the tree of a
-language that the description dropped, are therefore removed. Below the
+file directly in the tree of a declared language, per WEB-OUTPUT-1.
+The path of a tree is the tag of its language in lowercase. Below the
 root the build also owns a file that the site names, and one that takes
 a shape of the key directory. It keeps every other entry and reports
 it. An operator directory in the output therefore survives a build,
-empty or not, unless it sits at the top level and its name has the
-shape of a language code. The build takes such a directory for a
-language tree: it removes each plain file directly in it that the site
-does not name, and then the directory itself once it is empty. An
-operator directory of that name below the top level, such as
-F<img/de>, is no language tree, so it survives.
+empty or not. The tree of a language that the description dropped is
+no tree of the site, so the build keeps it and reports it, per
+WEB-OUTPUT-4.
 
 A description with no C<keys> block owns no shape of the key directory
 and no directory of the key tree. A site of another maker holds
@@ -136,8 +160,8 @@ F<.well-known/security.txt> too, and the clean must not delete that
 site.
 
 The build removes an empty directory that it owns: one that the site
-holds a name below, one of the key tree, and a language tree. The
-output directory itself always stays. The clean reads the same three
+holds a name below, one of the key tree, and the tree of a declared
+language. The output directory itself always stays. The clean reads the same three
 tests, so a build can never remove a directory that the clean refuses.
 C<rmdir> refuses a directory that still holds a name, so the walk needs
 no second test.
@@ -159,16 +183,19 @@ tree without asking, so the one thing it must never do is delete a tree
 that no build made.
 
 A plain file of the top level is one that a build writes, whatever the
-description names today. So is a plain file directly in a language
-tree: a renamed manual leaves its old page there. A file below the root
-must be one that the site names, or one of the shapes that the key
-directory takes. A directory must hold a name of the site, be a
-language tree, or be a directory of the key tree. A symlink is never a
+description names today. So is a plain file directly in the tree of a
+declared language: a renamed manual leaves its old page there. A file
+below the root must be one that the site names, or one of the shapes
+that the key directory takes. A directory must hold a name of the site,
+be the tree of a declared language, or be a directory of the key tree. A symlink is never a
 thing that a build wrote. The clean refuses every other entry, and it
 names it.
 
 The clean and the prune read one predicate, so a build can never remove
-a file that the clean refuses.
+a file that the clean refuses. The predicate reads each name as it
+stands, and it folds no name, per WEB-OUTPUT-17. On a file system with
+case, F<EN> is then no tree of the language C<en>, so each one owns
+less.
 
 The staging directory is a build detail, and the build writes one flat
 directory of sources into it for each language. A tree of another shape
@@ -176,20 +203,23 @@ belongs to whoever made it.
 
 With C<--out> the description still names the key directory, so
 C<clean> reads it when it can. A description that does not load names
-nothing. The files of the top level and the language trees, which the
-clean reads by shape, are then the whole site that C<clean> knows.
+no page. The files of the top level and of the declared language trees
+are then the whole site that C<clean> knows.
 
 That fallback is weak, so C<clean> asks for one more thing: the target
 must hold the stylesheet. Every build writes it, so a target without it
 is the output of no build. The target guard is the first line, and this
 is the second.
 
-A description that does not load still names three things: the source
-directory, the output directory, and the name and org of its C<keys>
-block. L<Fugu::Config> keeps every setting and block that it read
-before the fault, so each guard answers for the real directories of
-that project. A fault above the C<keys> block hides it, and C<clean>
-then refuses the key tree of its own output. Remove that tree by hand.
+A description that does not load still names four things: the source
+directory, the output directory, the tag of each C<language> block,
+and the name and org of its C<keys> block. L<Fugu::Config> keeps every
+setting and block that it read before the fault, so each guard answers
+for the real directories of that project. The source directory and the
+key directories are then the only sources that the target guard knows.
+A fault above the C<keys> block hides it, and C<clean> then refuses the
+key tree of its own output. Remove that tree by hand. A fault above a
+C<language> block hides that tree the same way.
 
 A description that drops its C<keys> block strands the published tree.
 The site names nothing there any more, so the build keeps it, C<clean>
@@ -203,7 +233,11 @@ refuse the root of the filesystem, the home directory, the project
 root, and any directory that holds the project. They refuse the source
 directory, and every directory of it. C<--out> reaches both commands,
 and the C<out_dir> setting it overrides is checked in the description,
-so the guard has to sit here as well.
+so the guard has to sit here as well. Each refusal folds each path, per
+WEB-OUTPUT-17. On a file system without case, the target F<WEB> is the
+source directory F<web>. The exception of the output directory of the
+description compares the paths as they stand, so the fold can only make
+the guard refuse more.
 
 A description that names neither directory takes the two defaults.
 
@@ -217,6 +251,19 @@ needs to be: the default output directory is F<web/build>, and it sits
 inside the default source directory F<web>. The description names that
 path, so a build owns it. Nothing else below the source is a build's.
 
+Both commands also refuse a target that holds a source, per
+WEB-OUTPUT-18. The prune removes each file of the top level that the
+site does not name, and C<clean> removes the whole target, so either
+one would remove the source. The list comes from C<sources> of
+L<App::FuguWeb::Config>: each body, footer, Markdown page, manual and
+POD sidecar of each language, and the C<stylesheet> that the
+description names. The source directory, each key directory and the
+C<dir> of each group in each language are sources too. A target inside
+a key directory or inside the C<dir> of a group is refused as well. The
+exception never covers these refusals. The message names the target
+and the first source that it meets, so a file comes before the
+directory that holds it.
+
 The rule is deliberately not "inside the project". The tests and the CI
 both build into a temporary directory outside it.
 
@@ -224,12 +271,6 @@ A C<..> in the target is resolved before the comparison.
 C<File::Spec-E<gt>canonpath> leaves it alone by design, and a guard that
 compared the uncollapsed form would let C<< <project>/.. >> through as a
 directory it had never seen.
-
-=head2 pod_date
-
-The date that every POD page carries: the date of the last commit, and
-today when git does not answer. git does not preserve file times, so a
-build that read one would give different bytes on every checkout.
 
 =head1 THE STAGING DIRECTORY
 
@@ -239,7 +280,8 @@ source is therefore copied into one directory for each language under
 its L<App::FuguWeb::Manual/staged_name>, and C<mandoc> runs there.
 
 The directory lives inside the output directory, under
-F<< .man/<code> >>, and the build removes it. A plain file directly in
+F<< .man/<path> >>, where the path is that of the tree of the language,
+and the build removes it. A plain file directly in
 F<.man>, or a directory there of another name, is somebody else's, and
 the build refuses it. Staging is a build detail: a published tree that
 carried it would serve the mdoc sources beside the pages made from them.
@@ -274,8 +316,10 @@ maintainers. Neither belongs in the output as it stands.
 
 The base stylesheet ships with the tool, at F<share/fuguweb/style.css>,
 and L<Fugu::File/share_path> finds it: in a checkout through this
-module's location, and under the share tree of an installed App-FuguWeb
-distribution. The C<stylesheet> setting overrides the search.
+module's location, or under the share tree of an installed App-FuguWeb
+distribution. The search never reads the working directory, so a
+F<share/fuguweb/style.css> of the project does not replace the sheet.
+The C<stylesheet> setting overrides the search.
 
 A stylesheet that is not found fails the build and names the path. A
 site with no stylesheet must not look like a success.
@@ -283,7 +327,7 @@ site with no stylesheet must not look like a success.
 =head1 SEE ALSO
 
 L<App::FuguWeb>, L<App::FuguWeb::Config>, L<App::FuguWeb::Keys>, L<App::FuguWeb::Render>,
-L<App::FuguWeb::Page>, L<App::FuguWeb::Index>, L<Fugu::File>
+L<App::FuguWeb::Fragment>, L<App::FuguWeb::Page>, L<App::FuguWeb::Index>, L<Fugu::File>
 
 =head1 AUTHOR
 

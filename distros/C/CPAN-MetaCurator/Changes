@@ -1,7 +1,13 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.34  2026-10-25
+	- Add data/cpan.metacurator.help.html as a distillation of POD from both
+		CPAN::MetaCurator & CPAN::MetaPackager.
+	- Remove 'use 5.044.0' from all *.pm & *.pl files.
+
 1.33  2026-10-11
 	- Patch Export.pm's build_dag_tree() to handle the 2 special topics, ChangeLog[12].
+	- Move authorship out of ChangeLog2 into new topic Author.
 
 1.32  2026-09-15
 	- New sub Search.fix_camel_case() to ensure all topics are embedded in [[...]]

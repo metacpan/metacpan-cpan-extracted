@@ -376,6 +376,15 @@ is $again->{colEnd},  'span 10', 'at the span the drag left it at';
 is $browser->patch_count, 3,
 	'and rendering that width back does not PATCH it either';
 
+# What this run established, for the job summary: the menu and the drag are
+# checked against the same reads - the card, the announcement, the PATCH and
+# what the server stored.
+$browser->proved(
+	'canvas card size: the Size menu sets the span from a key press, announces it'
+	. ' and PATCHes once, and a drag of the corner grip reports the width it leaves'
+	. ' and stores it; a reload renders the saved width without PATCHing again'
+);
+
 done_testing();
 
 # ---------------------------------------------------------------------------

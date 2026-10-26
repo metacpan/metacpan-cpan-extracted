@@ -51,7 +51,7 @@ sub run_smoke {
 
 my ($version_out, undef, $version_exit) = run_smoke('--version');
 is($version_exit, 0, '--version exits 0');
-like($version_out, qr/^action-run-smoke 0\.002\.0$/m, '--version prints the version');
+like($version_out, qr/^action-run-smoke 0\.002\.1$/m, '--version prints the version');
 
 my ($help_out, undef, $help_exit) = run_smoke('--help');
 is($help_exit, 0, '--help exits 0');

@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::Docker::API;
 # ABSTRACT: Build and publish Docker images as Dist::Zilla release artifacts
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 use Moose;
 with 'Dist::Zilla::Role::Plugin';
 with 'Dist::Zilla::Role::BeforeBuild';
@@ -71,22 +71,6 @@ has platform => (
     default => sub { [] },
 );
 
-# Build behavior
-has build_load => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 1,
-);
-
-# Deprecated reader; the constructor key is funneled into build_load.
-has load => (
-    is       => 'ro',
-    isa      => 'Bool',
-    lazy     => 1,
-    init_arg => undef,
-    default  => sub { shift->build_load },
-);
-
 # Release behavior
 has release_push => (
     is      => 'ro',
@@ -101,12 +85,6 @@ has push => (
     lazy     => 1,
     init_arg => undef,
     default  => sub { shift->release_push },
-);
-
-has release_load => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
 );
 
 # When false (default), the build log only echoes Dockerfile step headers
@@ -248,6 +226,17 @@ sub before_build {
         return;
     }
 
+    # The classic /build endpoint takes exactly one platform; a second value
+    # would otherwise be dropped without a word. This is configuration, not
+    # engine contact, so DZIL_DOCKER_API_SKIP_PRECHECK does not skip it.
+    my @platforms = @{ $self->platform };
+    if (@platforms > 1) {
+        $self->log_fatal('only one platform is supported, got '
+            .scalar(@platforms).': '.join(', ', @platforms)
+            .' - the /build endpoint takes exactly one platform, and this '
+            .'plugin is not built for multi-arch images');
+    }
+
     return if $ENV{DZIL_DOCKER_API_SKIP_PRECHECK};
 
     my $info = eval { $self->client->engine_info };
@@ -341,7 +330,6 @@ sub after_build {
     my $context_tar = {
         type       => 'dir',
         path       => $context_path->stringify,
-        dockerfile => $self->dockerfile,
     };
 
     my @platforms = @{ $self->platform };
@@ -574,12 +562,11 @@ sub _log_build_result {
 
 # Deprecated one-to-one spellings, old key => canonical key. These used to be
 # declared as lazy attributes reading *from* the canonical one, which meant
-# setting them in dist.ini changed nothing at all: 'load = 0' left build_load
-# at 1 and the code reads build_load. They are funneled here instead, like
+# setting them in dist.ini changed nothing at all: 'push = 0' left
+# release_push at 1 and the code reads release_push. They are funneled here instead, like
 # build_tag/release_tag, so they actually take effect.
 my %DEPRECATED_KEY = (
     file       => 'dockerfile',
-    load       => 'build_load',
     push       => 'release_push',
     repository => 'image',
 );
@@ -603,13 +590,13 @@ around BUILDARGS => sub {
         $args->{$new} = $value;
     }
 
-    # 'phase' has no canonical counterpart -- the build and release phases are
-    # implicit now. Drop it with a warning rather than letting an unknown key
-    # be silently ignored.
-    if (exists $args->{phase}) {
-        delete $args->{phase};
-        warn "[Docker::API] 'phase' is deprecated and has no effect; "
-           ."the build and release phases are implicit.\n";
+    # Keys that no longer mean anything -- there is no switch behind them.
+    # Drop them with a warning rather than letting an unknown key be silently
+    # ignored.
+    for my $removed (qw(build_load load phase release_load)) {
+        next unless exists $args->{$removed};
+        delete $args->{$removed};
+        warn "[Docker::API] '".$removed."' is no longer supported and has no effect.\n";
     }
 
     my @legacy = grep { exists $args->{$_} } qw(build_tag release_tag);
@@ -653,7 +640,7 @@ Dist::Zilla::Plugin::Docker::API - Build and publish Docker images as Dist::Zill
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SYNOPSIS
 
@@ -666,7 +653,6 @@ version 0.104
 
     dockerfile = Dockerfile
 
-    build_load   = 1
     release_push = 1
 
 Or via the L<@Author::GETTY|Dist::Zilla::PluginBundle::Author::GETTY> bundle:
@@ -684,8 +670,8 @@ the Dist::Zilla-built distribution.
 
 | Dzil command | Docker behavior |
 |---|---|
-| C<dzil build>   | Build image, apply every C<tag>, load into daemon (if C<build_load=1>), no push |
-| C<dzil release> | Re-tag the built image with every C<tag>, push (if C<release_push=1>), load (if C<release_load=1>) |
+| C<dzil build>   | Build image, apply every C<tag>, no push |
+| C<dzil release> | Re-tag the built image with every C<tag>, push (if C<release_push=1>) |
 
 The same C<tag> list is used in both phases — C<dzil build> produces local tags
 for verification, C<dzil release> re-applies them (against the already-built
@@ -757,14 +743,22 @@ a skipped build phase means there is no image to tag and push.
 
 The release push, the C<fail_if_tag_exists> lookup and the registry
 credential precheck above all resolve a credential for an image reference
-the same way, through C<auth_for_image_ref>: the C<auths> block of
-F<config.json> in the directory named by C<DOCKER_CONFIG>, or
-F<~/.docker/config.json> when that is unset. Nothing else is read --
-C<REGISTRY_AUTH_FILE> and Podman's own
-F<$XDG_RUNTIME_DIR/containers/auth.json> are not consulted, regardless of
-which engine is at the other end of C<DOCKER_HOST>.
+the same way, through C<auth_for_image_ref>, which walks an ordered list of
+candidate auth files rather than reading a single one. For the registry the
+image reference names, the first candidate file with a usable entry for it
+wins; a file with none falls through to the next, so a Docker config and a
+Podman auth file can each supply credentials for different registries in
+the same run. In order: C<REGISTRY_AUTH_FILE>, if set, names the file
+directly; then F<config.json> in the directory named by C<DOCKER_CONFIG>,
+if set; then F<$XDG_RUNTIME_DIR/containers/auth.json>, if
+C<XDG_RUNTIME_DIR> is set; then F<containers/auth.json> under
+C<XDG_CONFIG_HOME> (or under F<~/.config> when that is unset); and finally
+F<~/.docker/config.json>. F<~/.dockercfg>, Docker's legacy
+pre-C<config.json> format, is never read.
 
-Within the matching registry's entry, the first of these present wins: an
+All five files share the same C<auths> block, so once a file is chosen the
+selection within the matching registry's entry does not depend on which one
+supplied it. The first of these present wins: an
 C<identitytoken>; a base64 C<auth> field decoded to C<username:password>;
 plain C<username> / C<password> fields. Docker Hub is matched under any of
 C<https://index.docker.io/v1/> and C<v2/>, C<index.docker.io> or
@@ -773,13 +767,11 @@ secret to an external helper is not supported -- nothing in this plugin
 reads either key, so such a registry resolves to no credential and any
 request against it goes out anonymous rather than failing.
 
-C<docker login> is the usual way to populate the file. C<podman login>
-writes to its own auth file instead
-(F<$XDG_RUNTIME_DIR/containers/auth.json> by default, overridable with
-C<REGISTRY_AUTH_FILE>), which this plugin never reads; point it at the file
-that is read instead:
-
-    podman login --authfile ~/.docker/config.json registry.example.com
+A plain C<docker login> or C<podman login> is now picked up with no extra
+configuration: Podman's own default auth file is candidate three above. If
+C<podman login --authfile PATH> was used to write somewhere else, set
+C<REGISTRY_AUTH_FILE=PATH> in the environment C<dzil> runs in so candidate
+one finds it.
 
 Finding no credential for a registry is never an error by itself in this
 plugin -- both C<fail_if_tag_exists> and the release push treat it as "go
@@ -799,11 +791,7 @@ explicitly B<replaces> the default list, it does not append to it.
 
 =item C<dockerfile> - Dockerfile name (default: C<Dockerfile>)
 
-=item C<build_load> - Load built image into local Docker daemon (default: true)
-
 =item C<release_push> - Push to registry during release (default: true)
-
-=item C<release_load> - Load released image locally (default: false)
 
 =item C<build_verbose> - When false (default), the build log only echoes
 Dockerfile step headers — the legacy builder format C<Step N/M : ...>,
@@ -832,7 +820,10 @@ without the check.
 
 =item C<label> - OCI labels (can be repeated, template-enabled)
 
-=item C<platform> - Target platform (can be repeated)
+=item C<platform> - Target platform, exactly one (e.g. C<linux/arm64>). The key
+is repeatable only so that a second value is refused with a clear error: the
+/build endpoint takes one platform, and this plugin is not built for multi-arch
+images.
 
 =back
 
@@ -863,17 +854,27 @@ values are ignored.
 
 =item C<push> - Use C<release_push> instead.
 
-=item C<load> - Use C<build_load> instead.
-
-=item C<phase> - No longer needed; build and release phases are implicit. It is
-accepted, warned about and discarded; it has no canonical counterpart.
-
 =back
 
-Note that C<repository>, C<push> and C<load> did B<not> work as aliases before
+Note that C<repository> and C<push> did B<not> work as aliases before
 0.104: they were declared as readers taking their value I<from> the canonical
 attribute, so setting one in a F<dist.ini> had no effect whatsoever. They are
 funneled properly now.
+
+=head1 REMOVED
+
+These keys are no longer supported. Each is warned about and discarded; none
+has a replacement.
+
+=over 4
+
+=item C<phase> - The build and release phases are implicit.
+
+=item C<build_load>, C<release_load>, C<load> - The image is built through the
+engine API, where it lands in the engine's image store regardless, so there is
+nothing left to switch.
+
+=back
 
 =head1 SEE ALSO
 
@@ -885,7 +886,7 @@ L<Dist::Zilla::Plugin::Docker::API::Result>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-docker-api/issues>.
 
 =head1 CONTRIBUTING

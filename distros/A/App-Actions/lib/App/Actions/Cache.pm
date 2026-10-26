@@ -12,7 +12,7 @@ use JSON::PP ();
 use App::Actions::I18N qw(i18n);
 use App::Actions::Schema ();
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The images action-run keeps are a cache: a run records what it pulled, so a
 # later command can list the images and say how much disk they take, and
@@ -313,6 +313,29 @@ sub remember {
     return $count;
 }
 
+# A run that used a kept image without pulling it has still used it, so its
+# last use moves on and an --older-than prune keeps it; nothing was pulled,
+# so the count stays, and an image the record does not hold is not added
+# (the user may have pulled it, and a prune must not take it away).
+sub touch {
+    my ($self, @images) = @_;
+
+    my $data = $self->load;
+    my $now  = time;
+    my $count = 0;
+
+    for my $image (@images) {
+        next unless defined $image && length $image && $data->{images}{$image};
+
+        $data->{images}{$image}{last_used} = $now;
+        $count++;
+    }
+
+    $self->save if $count;
+
+    return $count;
+}
+
 sub entries {
     my ($self) = @_;
 
@@ -484,6 +507,23 @@ sub _stamp {
     );
 }
 
+# Purpose:     what the daemon says about one image: its size, and whether
+#              it has the image at all.  image_size is undef both for an
+#              absent image and for one whose size Docker could not give, so
+#              an undef size is asked about again; a present image is never
+#              reported missing, or forgotten by a prune, for want of a size.
+# Entry:       $docker - an App::Actions::Docker; $image - its name.
+# Exit:        ($size, $present): bytes or undef, and 1 or 0.
+# Side effects: runs docker image inspect, twice when there is no size.
+sub _presence {
+    my ($docker, $image) = @_;
+
+    my $size = $docker->image_size($image);
+    return ($size, 1) if defined $size;
+
+    return (undef, $docker->image_exists($image) ? 1 : 0);
+}
+
 # Purpose:     the first line of a listing or a prune, naming the record.
 # Entry:       $self - a Cache.
 # Exit:        the line, with its newline.
@@ -551,12 +591,12 @@ sub report {
     for my $entry (@$entries) {
         my $size_text = __PACKAGE__->i18n('cache.unknown');
         if ($docker) {
-            my $size = $docker->image_size($entry->{image});
+            my ($size, $present) = _presence($docker, $entry->{image});
             if (defined $size) {
                 $total += $size;
                 $sized++;
                 $size_text = format_size($size);
-            } else {
+            } elsif (!$present) {
                 $missing++;
                 $size_text = __PACKAGE__->i18n('cache.size_missing');
             }
@@ -624,12 +664,13 @@ sub prune {
 
     for my $entry (@$entries) {
         my $image = $entry->{image};
-        my $size  = $docker->image_size($image);
+        my ($size, $present) = _presence($docker, $image);
 
-        # A size means the image is there; no size means it is not, or the
-        # daemon is gone.  The check that precedes a prune tells the two
-        # apart, so a missing image is simply forgotten.
-        if (!defined $size) {
+        # An image the daemon does not have is gone, or the daemon is; the
+        # check that precedes a prune tells the two apart, so a missing image
+        # is simply forgotten.  One whose size could not be read is still
+        # there, and is removed like any other (it frees an unknown amount).
+        if (!$present) {
             push @forget, $image;
             $gone++;
             next;
@@ -638,7 +679,7 @@ sub prune {
         if ($docker->image_remove($image) == 0) {
             push @forget, $image;
             $removed++;
-            $freed += $size;
+            $freed += $size if defined $size;
         } else {
             push @failed, $image;
         }
@@ -692,9 +733,10 @@ sub document {
         my ($size, $is_present);
 
         if ($reachable && $docker) {
-            $size = $docker->image_size($entry->{image});
-            if (defined $size) {
-                $total += $size;
+            my $there;
+            ($size, $there) = _presence($docker, $entry->{image});
+            if ($there) {
+                $total += $size if defined $size;
                 $present++;
                 $is_present = JSON::PP::true();
             } else {
@@ -1038,6 +1080,51 @@ Saves the record file if the count is above 0.
 
 As for L</save>.
 
+=head2 touch
+
+    my $count = $cache->touch(@images);
+
+Records that a run used images it did not pull: sets the last use of each
+one the record already holds to now.  Its count of pulls is left alone, and
+an image the record does not hold is not added, because action-run did not
+download it and a prune must not remove it.  This is what keeps an image a
+run uses every day out of C<--prune --older-than>.
+
+=head3 ARGUMENTS
+
+=over 4
+
+=item * C<@images> - image names.  C<undef>, empty names and names the
+record does not hold are skipped.
+
+=back
+
+=head3 RETURNS
+
+How many images were touched.
+
+=head3 SIDE EFFECTS
+
+Saves the record file if the count is above 0.
+
+=head3 EXAMPLE
+
+    $cache->touch('perl:5.40');    # 0 unless a run pulled perl:5.40 before
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    { images => { type => 'array', element_type => 'string' } }
+
+=head4 OUTPUT
+
+    { type => 'integer', min => 0 }
+
+=head3 MESSAGES
+
+As for L</save>.
+
 =head2 entries
 
     my $entries = $cache->entries;
@@ -1125,7 +1212,9 @@ The text, ending with a newline.
 
 =head3 SIDE EFFECTS
 
-Asks Docker for each image's size, if C<docker> is given.
+Asks Docker for each image's size, if C<docker> is given, and whether it
+has an image it gives no size for: such an image is shown with an C<unknown>
+size, not as C<missing>.
 
 =head3 API SPECIFICATION
 
@@ -1176,7 +1265,9 @@ C<failed> (names).
 
 Runs C<docker image rm -f> for each selected image that Docker still has.
 Removes those images and the ones Docker no longer has from the record.  An
-image that could not be removed stays in the record.
+image that could not be removed stays in the record.  An image whose size
+Docker cannot give is still removed, not forgotten; it adds nothing to
+C<freed>.
 
 =head3 API SPECIFICATION
 
@@ -1241,7 +1332,8 @@ A hash reference, described in L</JSON OUTPUT>.
 
 =head3 SIDE EFFECTS
 
-Asks Docker for sizes, if reachable.  Checks the document against
+Asks Docker for sizes, if reachable, and whether it has an image it gives no
+size for: that image is C<present> with a C<null> size.  Checks the document against
 L</json_schema>.
 
 =head3 API SPECIFICATION
@@ -1631,6 +1723,21 @@ are always true when the routine returns.
     │ r! > 0 ⇒ persisted
     └───────────────────────────────────────────────────
 
+=head2 touch
+
+    ┌─ Touch ───────────────────────────────────────────
+    │ ΔCache
+    │ images? : seq IMAGE
+    │ r!      : ℕ
+    ├───────────────────────────────────────────────────
+    │ T = ran images? ∩ dom images
+    │ ∀ i ∈ T • images'(i).last_used = now ∧ images'(i).pulls = images(i).pulls
+    │ ∀ i ∈ dom images \ T • images'(i) = images(i)
+    │ dom images' = dom images
+    │ r! = #⟨ i in images? | i ∈ T ⟩
+    │ r! > 0 ⇒ persisted
+    └───────────────────────────────────────────────────
+
 =head2 entries
 
     ┌─ Entries ─────────────────────────────────────────
@@ -1672,7 +1779,7 @@ are always true when the routine returns.
     ├───────────────────────────────────────────────────
     │ docker? = ⊥ ⇒ raises NeedsDocker
     │ S = selected(older?, now)
-    │ gone = { i ∈ S | docker?.image_size(i) = ⊥ }
+    │ gone = { i ∈ S | docker?.image_size(i) = ⊥ ∧ ¬docker?.image_exists(i) }
     │ removed = { i ∈ S \ gone | docker?.image_remove(i) = 0 }
     │ failed = S \ (gone ∪ removed)
     │ images' = (gone ∪ removed) ⩤ images
@@ -1762,22 +1869,27 @@ image in the record goes through the states on the right:
 
     Object:
 
-        new()                 load / entries / remember / forget / report /
-    --------> +----------+    prune / document (first call)   +-----------+
-              | UNLOADED |----------------------------------->|  LOADED   |
-              +----------+   file read; missing or broken     | (in       |
-                             file = no images                 |  memory)  |
+        new()                 load / entries / remember / touch / forget /
+    --------> +----------+    report / prune / document (first call)
+              |          |----------------------------------->+-----------+
+              | UNLOADED |   file read; missing or broken     |  LOADED   |
+              +----------+   file = no images                 | (in       |
+                                                              |  memory)  |
                                                               +-----------+
                                                                 |  ^
-                                         remember / forget /    |  | no further
-                                         prune change images:   |  | file reads
-                                         save() writes the file +--+
+                                  remember / touch / forget /   |  | no further
+                                  prune change images:          |  | file reads
+                                  save() writes the file        +--+
 
     One image in the record:
 
      run pulls IMAGE          remember(IMAGE): pulls+1, last_used=now
     ----------------> +-------------+ <-----------------------------+
                       |  RECORDED   |-------------------------------+
+                      |             |  a run uses it, pulls nothing:
+                      |             |  touch(IMAGE): last_used=now
+                      |             | <-----------------------------+
+                      |             |-------------------------------+
                       +-------------+
                        |     |     |
      forget(IMAGE)     |     |     | prune: Docker no longer has it

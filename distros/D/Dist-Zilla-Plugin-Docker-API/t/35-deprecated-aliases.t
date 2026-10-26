@@ -13,7 +13,7 @@ use Dist::Zilla::Chrome::Term;
 use Path::Tiny;
 use File::Temp qw(tempdir);
 
-# The one-to-one deprecated spellings (file, load, push, repository) used to be
+# The one-to-one deprecated spellings (file, push, repository) used to be
 # declared as lazy attributes reading *from* the canonical attribute. Setting
 # them in dist.ini therefore changed nothing at all. These tests pin down that
 # they now actually take effect, and that the canonical key still wins when
@@ -57,7 +57,6 @@ subtest 'each deprecated key reaches its canonical attribute' => sub {
     my @case = (
         # deprecated key/value      canonical reader   expected
         [ 'file = Dockerfile.web',  'dockerfile', 'Dockerfile.web' ],
-        [ 'load = 0',               'build_load',   0 ],
         [ 'push = 0',               'release_push', 0 ],
     );
 
@@ -99,9 +98,20 @@ CFG
 subtest 'deprecated readers still mirror the canonical attributes' => sub {
     my $p = docker_plugin(build_dist('image = ghcr.io/example/app'));
     is($p->repository, 'ghcr.io/example/app', 'repository mirrors image');
-    is($p->load,  $p->build_load,   'load mirrors build_load');
     is($p->push,  $p->release_push, 'push mirrors release_push');
     is($p->file,  $p->dockerfile,   'file mirrors dockerfile');
+};
+
+subtest 'removed keys are warned about and discarded' => sub {
+    for my $key (qw(phase load build_load release_load)) {
+        my @warning = warnings {
+            my $p = docker_plugin(build_dist("image = ghcr.io/example/app\n$key = 0"));
+            ok($p, "'$key' does not stop the plugin from loading");
+            ok(!$p->can($key), "'$key' is no longer an attribute");
+        };
+        ok(scalar(grep { /'\Q$key\E' is no longer supported and has no effect/ } @warning),
+            "'$key' warns that it is no longer supported");
+    }
 };
 
 done_testing;

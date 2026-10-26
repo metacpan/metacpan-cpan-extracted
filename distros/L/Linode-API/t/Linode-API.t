@@ -120,6 +120,28 @@ subtest 'invalid requests are not sent' => sub {
     like( $tx->res->json->{errors}[0]{path}, qr/X-Filter/, 'it is refused, naming the header' ) or diag( $tx->res->body );
 };
 
+# Test2::Plugin::NoWarnings fails the file on the warning that JSON::Validator
+# gives for a format that it has no rule for.
+subtest '_add_formats' => sub {
+    my $linode = client( token => 'token-one' );
+
+    my $req = last_request( sub { $linode->put_ip( { address => '203.0.113.5' }, json => { rdns => 'vm.test.test' } ) } );
+    is( $req->url->path->to_string, '/v4/networking/ips/203.0.113.5', 'an IPv4 address in an ip parameter is sent' );
+
+    $req = last_request( sub { $linode->put_ip( { address => '2001:db8::5' }, json => { rdns => 'vm.test.test' } ) } );
+    is( $req->url->path->to_string, '/v4/networking/ips/2001:db8::5', 'and so is an IPv6 one' );
+
+    @requests = ();
+    my $tx = $linode->put_ip( { address => '203.0.113.5/24' }, json => { rdns => 'vm.test.test' } );
+    is( scalar @requests, 0, 'a network is not an address, and is not sent' );
+    like( $tx->res->json->{errors}[0]{message}, qr/ip[ ]format/, 'it is refused, naming the format' ) or diag( $tx->res->body );
+
+    $req = last_request( sub { $linode->post_linode_instance( {}, json => { region => 'bogus', type => 'bogus', authorized_keys => ['ssh-ed25519 AAAAbogus'] } ) } );
+    is( $req->json->{authorized_keys}, ['ssh-ed25519 AAAAbogus'], 'a value in a format of Linode\'s own is sent for Linode to check' );
+
+    ok( ( grep { $_ eq 'ssh-key' } Linode::API::_formats_in( Linode::API::_specification( File::ShareDir::dist_file( 'Linode-API', 'openapi.json' ), 'v4' ) ) ), 'the formats of the specification are found where they are nested' );
+};
+
 subtest '_specification' => sub {
     my $file = File::ShareDir::dist_file( 'Linode-API', 'openapi.json' );
 

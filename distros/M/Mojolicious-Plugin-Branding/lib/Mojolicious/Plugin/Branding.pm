@@ -1,122 +1,212 @@
 package Mojolicious::Plugin::Branding;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::File qw< path >;
-use Mojolicious::Static;
 use Carp qw< croak >;
+use Scalar::Util qw< blessed >;
 
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.004' }
 
-package Mojolicious::Plugin::Branding::IndividualRole;
+package Mojolicious::Plugin::Branding::IndividualBaseRole;
 use Mojo::Base -role;
-use Mojo::File qw< path >;
-has 'by_brand' => sub { return +{} };
+use Carp qw< croak >;
+requires qw< paths _create_from >;
+has '_brand_name';
+has _spec_for => sub { return +{} };
+has _cache_for => sub { return +{} };
+has '_stash_key';
 
-around template_name => sub {
-   my ($orig, $self, $options) = @_;
-   my $name = $self->$orig($options) // return undef;
-   
-   # turn into a relative file
-   if ((my $namepath = path($name))->is_abs) {
-      my @parts = grep { length($_ // '') } $namepath->to_array->@*;
-      return undef unless @parts;
-      $name = Mojo::File->new(@parts)->to_string;
-   }
-
-   if (defined(my $brand = $options->{variant})) {
-      if (defined(my $list = $self->by_brand->{$brand})) {
-         for my $templates_dir (@$list) {
-            my $path = $templates_dir->child($name);
-            return $path->to_abs->to_string if -r $path;
-         }
-      }
-   }
-   return $name;
-};
-
-sub add_brands {
-   my ($self, $href) = @_;
-   my $by_brand = $self->by_brand;
-   for my $brand (keys(%$href)) {
-      my $aref = $by_brand->{$brand} //= [];
-      my %present = map { $_ => 1 } @$aref;
-      for my $path (@{$href->{$brand}}) {
-         next if $present{$path}++;
-         push @$aref, $path;
-      }
-   }
+sub _add_brand {
+   my ($self, $name, $spec) = @_;
+   croak "invalid specification for brand '$name'"
+      if defined($spec) && ref($spec) ne 'HASH';
+   my $s4 = $self->_spec_for;
+   delete($s4->{$name});
+   $self->_spec_for->{$name} = $spec if defined($spec);
+   delete($self->_cache_for->{$name});
    return $self;
 }
 
-around template_path => sub {
-   my ($orig, $self, $options) = @_;
-   my $name = $self->template_name($options) // return undef;
-   return $name if path($name)->is_abs;
-   return $self->$orig($options);
+sub _add_brands {
+   my $self = shift;
+   my %brands = @_ == 1 ? %{$_[0]} : @_;
+   $self->_add_brand($_, $brands{$_}) for keys(%brands);
+   return $self;
+}
+
+sub _item_for {
+   my ($self, $c) = @_;
+
+   # do not allow sub-items inside sub-item
+   return if defined($self->_brand_name);
+
+   # cope with missing/non-existing brands
+   my $brand = $c->stash->{$self->_stash_key} // return;
+   my $spec = $self->_spec_for->{$brand} or return;
+
+   return unless @{$spec->{paths}} || $spec->{ignore_app_paths};
+   return $self->_cache_for->{$brand} //= do {
+      my @paths = @{$spec->{paths}};
+      push @paths, @{$self->paths} unless $spec->{ignore_app_paths};
+      $self->_create_from($brand, \@paths);
+   };
+}
+
+package Mojolicious::Plugin::Branding::IndividualStaticRole;
+use Mojo::Base -role;
+with 'Mojolicious::Plugin::Branding::IndividualBaseRole';
+
+around serve => sub {
+   my ($orig, $self, $c, $path) = @_;
+   my $static = $self->_item_for($c);
+   return $static->serve($c, $path) if defined($static);
+   return $self->$orig($c, $path);
 };
 
-around template_handler => sub {
-   my ($orig, $self, $options) = @_;
-   if (defined(my $brand = $options->{variant})) {
-      for my $handler (sort { $a cmp $b } keys %{$self->handlers}) {
-         my %options = ($options->%*, handler => $handler);
-         my $name = $self->template_name(\%options) // next;
-         return $handler if path($name)->is_abs;
-      }
-   }
-   return $self->$orig($options);
+sub _create_from {
+   my ($self, $brand, $paths) = @_;
+
+   return ref($self)->new(
+      (
+         map { $_ => $self->$_ } qw<
+            asset_dir
+            classes
+            extra
+            prefix
+         >
+      ),
+      paths      => $paths,
+      _brand_name => $brand,
+   );
+}
+
+package Mojolicious::Plugin::Branding::IndividualRendererRole;
+use Mojo::Base -role;
+use Mojo::Cache;
+with 'Mojolicious::Plugin::Branding::IndividualBaseRole';
+
+around render => sub {
+   my ($orig, $self, $c) = @_;
+   my $renderer = $self->_item_for($c);
+   return $renderer->render($c) if defined($renderer);
+   return $self->$orig($c);
 };
+
+sub _create_from {
+   my ($self, $brand, $paths) = @_;
+
+   return ref($self)->new(
+      (
+         map { $_ => $self->$_ } qw<
+            handlers
+            helpers
+            classes
+            default_format
+            default_handler
+            encoding
+         >
+      ),
+      paths      => $paths,
+      _brand_name => $brand,
+
+      # get a separate cache to avoid different brands to tread on
+      # one another
+      cache => ref($self->cache)->new(max_keys => $self->cache->max_keys),
+   );
+}
 
 package Mojolicious::Plugin::Branding;
 
-sub _resolve_path {
-   my ($self, $home, $path) = @_;
+sub __values_from_constrained_hash {
+   my $href = shift;
+   my $msg = shift;
+   my %hash = %$href;
+   my @retval;
+   for my $item (@_) {
+      my ($key, $default) = @$item;
+      push @retval, delete($hash{$key}) // $default;
+   }
+   croak "$msg: @{[ sort keys %hash ]}" if %hash;
+   return @retval;
+}
+
+sub __isa {
+   my ($target, $class) = @_;
+   return blessed($target) && $target->isa($class);
+}
+
+sub _resolve_dir {
+   my ($self, $home, $path, $msg) = @_;
    return unless defined($path);
-   if (! eval { $path->isa('Mojo::File') }) {
-      croak 'invalid path, either Mojo::File or plain string accepted'
-         if ref($path);
-      croak 'invalid empty path' unless length($path);
-      my $p = path($path);
-      $path = $p->is_abs ? $p : $home->rel_file($path);
-   }
-   return unless -d $path;
-
-   my %retval;
-   for my $key (qw< templates public >) {
-      my $sub_path = $path->child($key);
-      $retval{$key} = $sub_path if -d $sub_path;
-   }
-   return unless scalar(keys(%retval)); # at least one sub_path exists
-
-   $retval{brand} = $path->basename;
-   return \%retval;
+   croak "invalid empty path ($msg)" unless length($path);
+   croak "invalid path, either Mojo::File or plain string accepted ($msg)"
+      if ref($path) && ! __isa($path, 'Mojo::File');
+   my $candidate = path($path);
+   $candidate = $home->child($path) unless $candidate->is_abs;
+   return $candidate if -r $candidate && -d _;
+   return;
 }
 
-sub _resolve_paths {
-   my ($self, $home, $paths) = @_;
-
-   # some validation of $conf
-   return unless defined($paths);
-   $paths = [ $paths ] unless ref($paths) eq 'ARRAY';
-
-   return [
-      grep { defined($_) }
-      map { $self->_resolve_path($home, $_) } $paths->@*
-   ];
+sub _normalize_sub_spec {
+   my ($self, $title, $key, $src, $home) = @_;
+   $src //= {};
+   $src = { paths => $src } if ref($src) ne 'HASH';
+   my ($paths, $ignore) = __values_from_constrained_hash($src,
+      "unknown keys in $key for $title",
+      [ paths => []], [ignore_app_paths => 0]);
+   $paths = [ $paths ] if ref($paths) ne 'ARRAY';
+   return {
+      ignore_app_paths => !!$ignore,
+      paths => [ map { $self->_resolve_dir($home, $_, "$title, $key") } @$paths ],
+   };
 }
 
-sub _register_global {
+sub _normalize_brand_spec {
+   my ($self, $title, $spec, $home) = @_;
+   return undef unless defined($spec);
+   $spec = [ $spec ]
+      if (! ref($spec)) || __isa($spec, 'Mojo::File');
+   $spec = { paths => $spec } if ref($spec) eq 'ARRAY';
+
+   # here we demand that we have a hash reference
+   croak "invalid specification for $title" if ref($spec) ne 'HASH';
+
+   my ($common, $templates, $public) = __values_from_constrained_hash($spec,
+      "unknown keys in $title",
+      [paths => []], [templates => {}], [public => {}]);
+   $templates = $self->_normalize_sub_spec($title, templates => $templates, $home);
+   $public = $self->_normalize_sub_spec($title, public => $public, $home);
+
+   my %spec = (
+      templates => $templates,
+      public => $public,
+   );
+
+   $common = [ $common ] if ref($common) ne 'ARRAY';
+   for my $path ($common->@*) {
+      my $upper = $self->_resolve_dir($home, $path, $title) // next;
+      for my $key (qw< templates public >) {
+         my $child = $self->_resolve_dir($upper, $key, "$title, $key") // next;
+         push @{$spec{$key}{paths}}, $child;
+      }
+   }
+
+   return \%spec;
+}
+
+sub _normalize_global {
    my ($self, $app, $conf) = @_;
+   my $spec = $self->_normalize_brand_spec('global', $conf, $app->home) // return;
+   croak 'ignore_app_paths not allowed in the global context'
+      if $spec->{templates}{ignore_app_paths}
+      || $spec->{public}{ignore_app_paths};
+   return $spec;
+}
 
-   my $paths = $self->_resolve_paths($app->home, $conf);
-
-   my %dirs_for = (templates => [], public => []);
-   for my $spec (@$paths) {
-      push @{$dirs_for{$_}}, $spec->{$_} // () for keys(%dirs_for);
-   }
-
-   unshift @{$app->renderer->paths}, @{$dirs_for{templates}};
-   unshift @{$app->static->paths},   @{$dirs_for{public}};
-
+sub _register_normalized_global {
+   my ($self, $app, $spec) = @_;
+   return unless defined($spec);
+   unshift @{$app->renderer->paths}, @{$spec->{templates}{paths}};
+   unshift @{$app->static->paths},   @{$spec->{public}{paths}};
    return;
 }
 
@@ -127,69 +217,90 @@ sub _register_individual {
    croak 'individual requires a hash reference or nothing/undef'
       if ref($conf) ne 'HASH';
 
-   # the key indicating the brand inside the stash
-   my $key = $conf->{stash_key} // 'variant';
+   my ($brands, $key) = __values_from_constrained_hash($conf,
+      'unknown keys in individual', [brands => {}], [stash_key => undef]);
 
-   my $specs = $self->_resolve_paths($app->home, $conf->{paths});
-   my (%templates_for, %publics_for);
-   for my $spec (@$specs) {
-      if (defined($spec->{templates})) {
-         my $aref = $templates_for{$spec->{brand}} //= [];
-         push @$aref, $spec->{templates};
-      }
-      if (defined($spec->{public})) {
-         my $aref = $publics_for{$spec->{brand}} //= [];
-         push @$aref, $spec->{public};
+   croak 'invalid brands in individual' if ref($brands) ne 'HASH';
+   return unless defined($key) || scalar(keys(%$brands));
+
+   my $home = $app->home;
+   $brands = {
+      map { $_ => $self->_normalize_brand_spec("brand '$_'", $brands->{$_}, $home) }
+      keys(%$brands)
+   };
+
+   # an empty brand that ignores the application has no files at all,
+   # probably its directories are missing on this installation
+   for my $name (sort keys(%$brands)) {
+      next unless defined($brands->{$name});
+      for my $key (qw< templates public >) {
+         my $spec = $brands->{$name}{$key};
+         $app->log->warn(qq{Branding: brand "$name" has no $key }
+               . 'directories and ignores the application ones')
+            if $spec->{ignore_app_paths} && ! @{$spec->{paths}};
       }
    }
 
-   # take care of templates
-   if (scalar(keys(%templates_for))) {
-      my $renderer = $app->renderer;
-
-      # compose the $role, but only once. This makes sure that registering
-      # the plugin multiple times does not spoil everything.
-      my $role = 'Mojolicious::Plugin::Branding::IndividualRole';
-      $renderer->with_roles($role) unless Role::Tiny::does_role($renderer, $role);
-
-      # add_brands makes sure to merge the new items with the previous ones
-      $renderer->add_brands(\%templates_for);
-   }
-
-   # take care of static stuff
+   # this will be needed later, but we're going to make sure that the
+   # role is only composed once and this is also useful here to check that
+   # the stash_key is only set once or always to the same value.
    my $static = $app->static;
-   my $prefix = $static->prefix;
-   my $asset_dir = $static->asset_dir;
-   my %static_for =
-      map {
-         $_ => Mojolicious::Static->new(
-            paths     => $publics_for{$_},
-            classes   => [],
-            extra     => {},
-            prefix    => $prefix,
-            asset_dir => $asset_dir,
-         );
+   my $static_role = 'Mojolicious::Plugin::Branding::IndividualStaticRole';
+
+   if (Role::Tiny::does_role($static, $static_role)) {
+      my $registered_key = $static->_stash_key;
+      $key //= $registered_key;
+      croak "stash_key '$key' conflicts with '$registered_key', set previously"
+         if $key ne $registered_key;
+   }
+   else { # first time here
+      $static->with_roles($static_role);
+
+      $key //= 'branding.brand';
+      $static->_stash_key($key);
+
+      $app->helper(brand => sub {
+         my $c = shift;
+         return $c->stash($key) if @_ == 0;
+         $c->stash($key => shift);
+         return $c;
+      });
+
+      # this is another thing that we only want to do once
+      $app->renderer
+         ->with_roles('Mojolicious::Plugin::Branding::IndividualRendererRole')
+         ->_stash_key($key);
+   }
+
+   my %b4 = (templates => {}, public => {});
+   for my $name (keys(%$brands)) {
+      my $value = $brands->{$name};
+      for my $key (qw< templates public >) {
+         $b4{$key}{$name} = defined($value) ? $value->{$key} : undef;
       }
-      keys(%publics_for);
+   }
+   $app->renderer->_add_brands($b4{templates});
+   $static->_add_brands($b4{public});
 
-   $app->hook(before_dispatch => sub {
-      my $c = shift;
-      return if $c->res->code; # honor previous hooks' work
-
-      my $brand = $c->stash($key) // return;
-      $c->stash(variant => $brand) if $key ne 'variant';
-      my $static = $static_for{$brand} // return;
-      $c->app->plugins->emit_hook(after_static => $c)
-         if $static->dispatch($c);
-      return;
-   });
+   return;
 }
 
 sub register {
    my ($self, $app, $conf) = @_;
-   $self->_register_global($app, $conf->{global} // []);
-   $self->_register_individual($app, $conf->{individual} // {});
+   my ($global, $individual) = __values_from_constrained_hash($conf // {},
+      'unknown keys in configuration',
+      [global => undef], [individual => {}]);
+
+   # Validation and normalizations are needed before usage, so we do this
+   # in the following order:
+   # - validate/normalize global
+   # - validate/normalize individual
+   # - install individual
+   # - install global
+   my $global_spec = $self->_normalize_global($app, $global);
+   $self->_register_individual($app, $individual);
+   $self->_register_normalized_global($app, $global_spec);
    return $self;
-};
+}
 
 1;

@@ -39,6 +39,12 @@ $output = `$perl $filesync version 2>&1`;
 is($?, 0, 'version exits 0');
 like($output, qr/filesync \d/, 'version is printed');
 
+$output = `$perl $filesync init --help 2>&1`;
+is($?, 0, 'init --help exits 0');
+like($output, qr/--id ID/, 'init --help lists the options');
+like($output, qr/defaults to this machine's host name/, 'and says what the client id defaults to');
+like($output, qr/--id only to override it/, 'and when --id is needed');
+
 $output = `$perl $filesync status --json 2>&1`;
 is($?, 0, 'status exits 0');
 like($output, qr/"repo":"docs"/, 'status is valid JSON mentioning the repo');

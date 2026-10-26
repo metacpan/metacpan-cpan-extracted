@@ -152,13 +152,14 @@ behavior is only ever verified through the test suite.
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it
-yourself — principle and lane are in `.claude/rules/dzil-docker-rules.md`.
+yourself — the principle is a shared house rule (skilletor bundle
+`getty-cpan-dist@getty`); the lanes are in `.claude/rules/dzil-docker-rules.md`.
 
 | Task | Agent |
 |---|---|
 | Implement / refactor / debug the plugin, the client adapter, cpanfile | `dzil-docker-worker` (default) |
 | Write/extend tests | `dzil-docker-test-writer` |
-| Pre-release audit | `dzil-docker-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `dzil-docker-release-manager` |
 | POD and README | `dzil-docker-doc-writer` |
 
 What the Docker daemon itself accepts or answers is not this repo's question —

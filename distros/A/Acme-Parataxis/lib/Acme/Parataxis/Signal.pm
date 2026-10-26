@@ -1,8 +1,8 @@
 use v5.40;
-no warnings 'experimental::class', 'recursion';
+no warnings qw[experimental::class recursion];
 use feature 'class';
 #
-class Acme::Parataxis::Signal v0.1.0 {
+class Acme::Parataxis::Signal v0.1.1 {
     use Acme::Parataxis;
     use Carp qw[croak];
     field $count : reader : param //= true;    # true if a send is pending
@@ -44,10 +44,23 @@ class Acme::Parataxis::Signal v0.1.0 {
         my $fid = Acme::Parataxis->current_fid;
         croak 'Signal waits must occur inside a scheduled fiber' if $fid < 0;
         push @waiters, $fid;
-        Acme::Parataxis->yield('WAITING');
+        Acme::Parataxis::_park( 'Signal wait', 1, sub { $self->remove_waiter($fid) } );
         return;
     }
     method awaited { return scalar @waiters }    # 0 when nobody is waiting
+
+    method _same_waiter ( $a, $b ) {             # Identity comparison for fiber ids and callback coderefs
+        if ( ref $a eq 'CODE' || ref $b eq 'CODE' ) {
+            return ref $a eq ref $b && $a == $b;
+        }
+        return $a == $b;
+    }
+
+    method remove_waiter ($waiter) {             # Unregisters a fiber id or callback; consumes nothing and never calls a callback.
+        my $before = @waiters;
+        @waiters = grep { !$self->_same_waiter( $_, $waiter ) } @waiters;
+        return $before - @waiters;
+    }
 };
 #
 1;

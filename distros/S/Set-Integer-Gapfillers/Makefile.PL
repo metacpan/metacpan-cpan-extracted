@@ -1,14 +1,36 @@
-
-
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
+
+my $mm_ver = ExtUtils::MakeMaker->VERSION;
+
+my %WriteMakefileArgs = (
     NAME         => 'Set::Integer::Gapfillers',
-    VERSION_FROM => 'lib/Set/Integer/Gapfillers.pm', # finds \$VERSION
-    AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
+    VERSION_FROM => 'lib/Set/Integer/Gapfillers.pm',
+    AUTHOR       => 'James E Keenan (jkeenan@pobox.com)',
     ABSTRACT     => 'Fill in the gaps between integer ranges',
-    PREREQ_PM    => {
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+    },
+    PREREQ_PM    => { },
+    ( $mm_ver < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) => {
                      'Test::Simple' => 0.44,
-                    },
+    },
+    ($mm_ver < 6.46 ? () : (META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+            homepage => 'http://thenceforward.net/perl/modules/Set-Integer-Gapfillers/',
+            repository => {
+                url => 'https://github.com/jkeenan/Set-Integer-Gapfillers.git',
+                web => 'https://github.com/jkeenan/Set-Integer-Gapfillers',
+                type => 'git',
+            },
+            bugtracker => {
+                web         => 'https://github.com/jkeenan/Set-Integer-Gapfillers/issues',
+            },
+        },
+    })),
 );
+
+WriteMakefile(%WriteMakefileArgs);

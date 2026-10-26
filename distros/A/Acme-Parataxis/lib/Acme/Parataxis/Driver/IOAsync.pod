@@ -1,0 +1,159 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Driver::IOAsync - Drive Parataxis from an IO::Async::Loop
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[await_read await_sleep fiber];
+    use IO::Async::Loop;
+
+    # The usual way: attach the loop and let wrap() choose this driver.
+    Acme::Parataxis->attach_loop( IO::Async::Loop->new );
+
+    Acme::Parataxis::run( sub {
+        my $ponger = fiber { await_sleep 30; syswrite $socket, 'ping' };
+        await_read( $socket, 2000 );
+    } );
+
+    Acme::Parataxis->detach_loop;
+
+Building one by hand is the same call with the loop named:
+
+    my $driver = Acme::Parataxis::Driver::IOAsync->new( loop => IO::Async::Loop->new );
+
+=head1 DESCRIPTION
+
+The L<IO::Async::Loop|IO::Async::Loop> reference driver. With it attached, C<await_read>, C<await_write> and
+C<await_sleep> are serviced by IO::Async's loop instead of by an OS worker thread parked in C<select()>. What a caller
+sees does not change: readiness reports the same values, a deadline still resumes C<-1>, and an enclosing
+C<with_timeout> still throws. Only the backing mechanism differs.
+
+The loop and Parataxis never run each other's callbacks. IO::Async collects descriptor events, the readiness callback
+this driver installs only tells the scheduler which fiber to B<enqueue>, and the scheduler hands control back to the
+loop when every fiber is parked and C<pending> is still true. See L<Acme::Parataxis::Driver|Acme::Parataxis::Driver>
+for that division of labour.
+
+C<loop> is an C<IO::Async::Loop>, which is a factory class: C<< IO::Async::Loop->new >> returns a backend - here
+C<IO::Async::Loop::Epoll>, and C<IO::Async::Loop::Select> on a platform without C<epoll>, Windows among them. The
+driver holds whatever it is given and only ever calls C<watch_io>, C<unwatch_io>, C<watch_time>, C<unwatch_time> and
+C<loop_once> on it, so the backend choice stays IO::Async's.
+
+Unlike the Mojo driver, this one never touches the handle's blocking mode. IO::Async sets C<O_NONBLOCK> itself when a
+handle is first passed to C<watch_io>, so the end state is the same but the driver is not what did it.
+
+=head1 CONSTRUCTOR
+
+=head2 C<new( loop =E<gt> $loop )>
+
+    my $driver = Acme::Parataxis::Driver::IOAsync->new( loop => $loop );
+
+C<loop> is a required named parameter and must be a blessed C<IO::Async::Loop> - that is, something that C<isa> it, so
+a backend class such as C<IO::Async::Loop::Select> is accepted. It croaks otherwise, and the check is on the class
+rather than on a method list, so an object that merely answers C<watch_io> is not enough.
+
+=head1 METHODS
+
+=head2 C<watch_read( $fh, $cb )>, C<watch_write( $fh, $cb )>
+
+    $driver->watch_read( $fh, sub { $ready->push } );
+
+Register C<< $cb->() >> for readability or writability on C<$fh>, and return C<$fh> itself - not a boolean and not the
+descriptor. A closed handle croaks, because there is no descriptor to key the loop on.
+
+Each registration is one C<watch_io> call that re-supplies B<every> direction currently registered for that handle, so
+the second direction adds the parameter rather than creating a second watch. Registering the same direction twice
+B<replaces> that callback. A read watch and a write watch on one filehandle still count as a single watch in
+C<watch_count>, and C<unwatch> takes both down at once.
+
+=head2 C<unwatch( $fh )>
+
+    $driver->unwatch( $fh );    # true if it was being watched
+
+Drops both directional callbacks for C<$fh>, untracks it, and cancels the loop's watch in a single C<unwatch_io> call
+that reports B<both> directions - including a direction that was never requested, which IO::Async tolerates. That is
+what lets one call tear down a read-only or write-only watch, and it works: a read-only watch is fully gone afterwards,
+and a read event no longer reaches the callback. Returns false when nothing was being watched, so it is safe to call on
+a handle that was never registered or has already been dropped.
+
+=head2 C<timer( $ms, $cb )>
+
+    my $id = $driver->timer( 2000, sub { $expired = 1 } );
+
+Arms a loop timer for C<$ms> milliseconds - IO::Async counts in seconds, so the driver divides by 1000 - and returns an
+opaque id for L</"cancel_timer( $id )">. Treat that id as opaque: it is whatever C<watch_time> hands back, and in
+IO::Async 0.805 that is a reference.
+
+The id is untracked B<before> the callback runs, so a timer that has fired is no longer cancellable and C<cancel_timer>
+says so. A delay that is missing, zero, negative or non-numeric croaks.
+
+=head2 C<cancel_timer( $id )>
+
+    $driver->cancel_timer( $id );    # true if it was still pending
+
+Cancels a still-pending timer and returns true. Returns false when the id is unknown or the timer has already fired.
+
+=head2 C<drive( )>
+
+    $driver->drive;    # true
+
+Calls C<< $loop->loop_once(undef) >> and returns true: it blocks in the kernel until an event happens, either I/O
+readiness or the earliest due timer. This is what C<run()> calls when every fiber is parked and this driver still has
+something pending.
+
+=head2 C<poll_ready( )>
+
+    $driver->poll_ready;    # true
+
+Calls C<< $loop->loop_once(0) >> and returns true: a genuinely non-blocking readiness pass that still fires any timer
+which has already come due. This is the method the scheduler's polling path can call without stalling on, and it is the
+one place this driver is more predictable than the Mojo one. See
+L<Acme::Parataxis::Driver::Mojo|Acme::Parataxis::Driver::Mojo> for the contrast.
+
+=head1 Behavior Notes
+
+=head2 C<drive( )> on an idle loop never returns
+
+C<loop_once(undef)> with no watchers and no timers waits indefinitely - it does not notice that there is nothing to
+wait for and hand control back. Measured on an empty loop, repeatedly: C<drive> blocked past a 4-second alarm every
+time.
+
+This is safe in the shipped path and dangerous by hand. The scheduler only calls C<drive> while C<pending> is true, so
+it never asks an idle driver to tick. A caller that reaches for C<drive> on its own has no such guard, and will hang
+rather than get an answer. Reach for C<poll_ready> when you are not certain something is pending.
+
+=head2 A descriptor watched both ways reports the writable branch first
+
+A connected socket is always writable, so a C<loop_once> on a handle with both directions registered can report
+writability and leave the read event for the next pass. This is IO::Async's normal behaviour, not something the driver
+introduces, and it resolves because the scheduler keeps ticking. Measured on a handle watched both ways with unread
+data sitting on it: C<loop_once(0)> reported the write callback, and so did the next one.
+
+=head2 What was measured, and where
+
+Every timing and callback figure in this file was taken against IO::Async 0.805 on Linux with Perl 5.44.0, where C<<
+IO::Async::Loop->new >> returns C<IO::Async::Loop::Epoll>. Nothing here was measured on Windows, where the backend is
+C<IO::Async::Loop::Select> and the C<select> ceiling described in L<Acme::Parataxis::Driver|Acme::Parataxis::Driver>
+applies.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis::Driver|Acme::Parataxis::Driver>, L<Acme::Parataxis::Driver::Mojo|Acme::Parataxis::Driver::Mojo>,
+L<Acme::Parataxis|Acme::Parataxis>, L<IO::Async::Loop|IO::Async::Loop>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

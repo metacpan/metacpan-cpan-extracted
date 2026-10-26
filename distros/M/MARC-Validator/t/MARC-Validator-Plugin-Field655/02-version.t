@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Validator::Plugin::Field655::VERSION, 0.24, 'Version.');
+is($MARC::Validator::Plugin::Field655::VERSION, 0.25, 'Version.');

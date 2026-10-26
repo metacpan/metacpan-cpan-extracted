@@ -5,10 +5,10 @@ data/cpan.metacurator.conf
 data/cpan.metacurator.constants.csv
 data/cpan.metacurator.sqlite
 data/cpan.metapackager.conf
-data/new.tiddlers.json
 data/one.png
 data/special.topics.txt
 data/tiddlers.json
+html/cpan.metacurator.help.html
 html/cpan.metacurator.tree.html
 INDEX.txt
 lib/CPAN/MetaCurator.pm
@@ -27,6 +27,7 @@ MANIFEST			This list of files
 README
 scripts/build.db.sh
 scripts/check.module.names.pl
+scripts/check.module.names.sh
 scripts/create.tables.pl
 scripts/drop.tables.pl
 scripts/export.modules2csv.pl

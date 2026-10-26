@@ -56,5 +56,9 @@ t/44-attached-transport.t
 t/45-attached-host-errors.t
 t/lib/Test/UnblockHTTP2.pm
 t/46-receive-lifecycle.t
+h2_receive_guard.h
+t/47-h2spec-regressions.t
+docs/H2SPEC.md
+docs/RELEASE-0.13.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

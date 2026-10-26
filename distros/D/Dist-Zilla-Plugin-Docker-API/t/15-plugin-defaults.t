@@ -59,9 +59,7 @@ subtest 'default attribute values' => sub {
     is_deeply($p->build_arg,   [], 'no build_args by default');
     is_deeply($p->label,       [], 'no labels by default');
     is_deeply($p->platform,    [], 'no platforms by default');
-    is($p->build_load,           1, 'build_load default on');
     is($p->release_push,         1, 'release_push default on');
-    is($p->release_load,         0, 'release_load default off');
     is($p->release_enabled,      1, 'release_enabled default on');
     is($p->pull,                 0, 'pull default off');
     is($p->no_cache,             0, 'no_cache default off');
@@ -80,7 +78,6 @@ dockerfile = Dockerfile.multi
 build_arg = DIST_NAME=%n
 label = org.opencontainers.image.title=%n
 platform = linux/amd64
-build_load = 0
 release_push = 1
 pull = 1
 no_cache = 1
@@ -95,7 +92,6 @@ CFG
     is_deeply($p->build_arg,   ['DIST_NAME=%n']);
     is_deeply($p->label,       ['org.opencontainers.image.title=%n']);
     is_deeply($p->platform,    ['linux/amd64']);
-    is($p->build_load,         0);
     is($p->release_push,       1);
     is($p->pull,               1);
     is($p->no_cache,           1);

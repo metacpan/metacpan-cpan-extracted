@@ -68,6 +68,17 @@ Readonly my $REMOTE_HOST_RE => qr/\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9]
 # that release introduced search => 0, max_zoom, and tile_url (0.11).
 Readonly my $DEFAULT_TILE_URL => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
+# The language the distribution ships templates for.  It is what a request falls
+# back to when the language it resolved has no template directory of its own;
+# see _resolve_language.  Keep it equal to Database::BI's $DEFAULT_LANGUAGE.
+Readonly my $DEFAULT_LANGUAGE => 'en';
+
+# The floor this controller passes options for.  HTML::OSM validates its
+# constructor arguments strictly, so an older install does not ignore the new
+# keys - it croaks on them.  _map_data therefore checks the version before
+# building a map, and reports a missing or old renderer instead of a 500.
+Readonly my $MIN_HTML_OSM_VERSION => '0.12';
+
 # ---------------------------------------------------------------------------
 # I18N message dictionary for all user-visible strings in this controller.
 # To plug in a Locale::Maketext backend, extend _i18n() below.
@@ -119,7 +130,9 @@ Readonly my %MESSAGES => (
 	error_map_coordinate_range  => 'Column "%s" holds only values outside the range of %s; check that lat= and lon= are not swapped',
 	error_map_coordinate_numeric => 'Columns "%s" and "%s" hold no numeric coordinate pairs; a map needs numbers, or loc=<column> to geocode places',
 	error_map_no_markers        => 'No row has a location that could be plotted',
-	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.10 or later, and it could not be loaded',
+	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.12 or later, and it is not installed',
+	error_map_renderer_old      => 'Drawing a map needs HTML::OSM 0.12 or later, but the installed HTML::OSM is %s',
+	warn_join_schema_mismatch   => 'Column "%s" has type %s in %s but %s in %s; the join keeps both columns, so check which one a calculation uses',
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
 	warn_map_cache_unwritten    => 'The resolved places could not be remembered in the model store, so the next request will look them up again',
@@ -136,7 +149,6 @@ Readonly my %MESSAGES => (
 	summary_provider_error      => 'AI provider error; using template summary',
 	error_token_invalid         => 'Share token is invalid or has expired',
 	error_token_missing         => 'A share token is required to view this analysis',
-	error_extract_unwritable    => 'Extract store is not writable; using direct read',
 	freshness_stale_msg         => 'Source data has changed since this analysis was last saved',
 );
 
@@ -157,6 +169,36 @@ Readonly my $MAX_PREFIX_LEN        => 20;
 Readonly my $DEFAULT_PER_PAGE      => 200;
 Readonly my $MAX_PER_PAGE          => 2_000;
 Readonly my %SCATTER_SCHEMES       => map { $_ => 1 } qw(tableau10 category10 set2 set3 paired);
+
+# Categorical palettes for map series colouring, matching the D3 schemes the
+# chart pages offer.  The map draws per-marker icons rather than D3 marks, so
+# the hexes live here instead of in a template.
+Readonly my %CATEGORY_PALETTES => (
+	tableau10  => [ '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f',
+	                '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab' ],
+	category10 => [ '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+	                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf' ],
+	set2       => [ '#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854',
+	                '#ffd92f', '#e5c494', '#b3b3b3' ],
+	set3       => [ '#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3',
+	                '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd',
+	                '#ccebc5', '#ffed6f' ],
+	paired     => [ '#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99',
+	                '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a',
+	                '#ffff99', '#b15928' ],
+);
+
+# add_circle_marker() accepts only hex colours, while the icon path also takes
+# the named colours _parse_color() allows.  Map the names once, here.
+Readonly my %NAMED_COLOR_HEX => (
+	red     => '#ff0000', orange  => '#ffa500', yellow  => '#ffff00',
+	green   => '#008000', teal    => '#008080', cyan    => '#00ffff',
+	blue    => '#0000ff', navy    => '#000080', purple  => '#800080',
+	magenta => '#ff00ff', pink    => '#ffc0cb', brown   => '#a52a2a',
+	maroon  => '#800000', olive   => '#808000', silver  => '#c0c0c0',
+	gray    => '#808080', grey    => '#808080', gold    => '#ffd700',
+	lime    => '#00ff00', white   => '#ffffff', black   => '#000000',
+);
 
 # Valid aggregate function vocabulary shared by _measure, _grouped_totals,
 # and the /pivot measure-spec parser.  Do not add functions here
@@ -281,8 +323,9 @@ sub _safe_back_url {
 # _resolve_template($self) -> ($platform, $language)
 #
 # Purpose: Read platform and language from config, then resolve the Accept-Language
-#          header to a language code -- falling back to the config default when
-#          no template directory exists for the resolved language.
+#          header to a language code -- falling back to the config language, and
+#          then to the default language, when no template directory exists for
+#          the code that was resolved.
 # Exit:    Returns ($platform, $language) -- both guaranteed non-empty strings.
 sub _resolve_template :Protected ($self) {
 	my $conf         = $self->app->config();
@@ -329,9 +372,13 @@ sub _detect_platform ($user_agent, $fallback) {
 # Purpose: Determine the best ISO 639-1 language code for this request.
 #          When Accept-Language is present, CGI::Lingua selects the best
 #          match from the languages that have a template directory under
-#          templates/<platform>/.  Falls back to $default when the header
-#          is absent, no templates exist for the matched language, or
-#          CGI::Lingua is unavailable.
+#          templates/<platform>/.  $default answers when the header is absent,
+#          no templates exist for the matched language, or CGI::Lingua is
+#          unavailable.  The result has a template directory whenever one
+#          exists: a code without one - the configured language included -
+#          becomes the default language, and only when that has no directory
+#          either is the resolved code returned, so the missing template names
+#          what was asked for.
 # Entry:   $platform is the resolved VWF platform string.
 #          $default  is a non-empty fallback language code (e.g. 'en').
 # Exit:    Returns a two-letter ISO 639-1 language code string.
@@ -339,32 +386,79 @@ sub _detect_platform ($user_agent, $fallback) {
 #               temporarily sets $ENV{HTTP_ACCEPT_LANGUAGE} with local().
 sub _resolve_language :Protected ($self, $platform, $default) {
 	my $accept = $self->req->headers->accept_language() // '';
-	return $default unless $accept;
 
-	# Discover supported languages from template directories so CGI::Lingua
-	# only returns a code we can actually serve.
-	my $tmpl_base = $self->app->home->child("templates/$platform");
-	my @supported;
-	if (-d $tmpl_base) {
-		@supported = map  { Mojo::File->new($_)->basename }
-		             grep { -d $_ }
-		             @{ $tmpl_base->list({ dir => 1 }) };
+	my $language = $default;
+	if ($accept) {
+		# Discover supported languages from template directories so CGI::Lingua
+		# only returns a code we can actually serve.  The configured language is
+		# offered as well, so a request that asks for it gets it, whether or not
+		# it can be served - the check below decides that.
+		my @supported = _template_languages($self->app->home, $platform);
+		push @supported, $default unless grep { $_ eq $default } @supported;
+
+		my $chosen = eval {
+			local $ENV{HTTP_ACCEPT_LANGUAGE} = $accept;
+			my $lingua = CGI::Lingua->new(supported => \@supported);
+			$lingua->language_code_alpha2();
+		};
+		$language = $chosen if defined $chosen;
 	}
-	push @supported, $default unless grep { $_ eq $default } @supported;
 
-	my $lang = eval {
-		local $ENV{HTTP_ACCEPT_LANGUAGE} = $accept;
-		my $lingua = CGI::Lingua->new(supported => \@supported);
-		$lingua->language_code_alpha2();
-	};
-	$lang //= $default;
+	# Confirm a template directory exists for the language we are about to
+	# render from.  Naming a language does not give it templates, and rendering
+	# a directory that is not there is a 500 rather than a translation.  This
+	# covers the configured language itself and not just the one Accept-Language
+	# produced: the documented fallback used to happen only when the two
+	# differed, so the ordinary case - an operator setting language => 'de'
+	# before adding templates/web/de/ - reached the renderer unchecked.
+	my $home = $self->app->home;
+	return $language      if _has_templates($home, $platform, $language);
+	return $DEFAULT_LANGUAGE
+		if _has_templates($home, $platform, $DEFAULT_LANGUAGE);
 
-	# Confirm a template directory exists for the chosen language.
-	if ($lang ne $default) {
-		my $dir = $self->app->home->child("templates/$platform/$lang");
-		$lang   = $default unless -d $dir;
-	}
-	return $lang;
+	# Neither exists.  Keep what was resolved, so the missing template names the
+	# language the request asked for rather than one nobody configured.
+	return $language;
+}
+
+# _template_languages($home, $platform) -> @codes
+#
+# The languages that have a template directory for the platform, sorted so that
+# the answer does not depend on the order the filesystem returns entries in.
+# Plain functions taking the application home rather than methods: the tests
+# call _resolve_language with a mock controller, and a method call on it would
+# look for the helper in the mock's package rather than this one.
+sub _template_languages ($home, $platform) {
+	my $base = $home->child("templates/$platform");
+	return () unless -d $base;
+
+	return sort map { Mojo::File->new($_)->basename }
+		grep { -d $_ } @{ $base->list({ dir => 1 }) };
+}
+
+# _has_templates($home, $platform, $language) -> 1 | 0
+#
+# Whether the application can render a language: the controller builds template
+# names as "<platform>/<language>/<page>", so a language without a directory
+# under templates/<platform>/ cannot be served at all.
+sub _has_templates ($home, $platform, $language) {
+	return 0 unless defined $language && length $language;
+
+	return -d $home->child("templates/$platform/$language") ? 1 : 0;
+}
+
+# _data_dir_for($app) -> Mojo::File
+#
+# The configured data directory.  A relative value is resolved against the
+# application home, which is the historical behaviour; an absolute one is used
+# as given, because Mojo::File->child() appends an absolute path rather than
+# replacing the base.  It takes the app rather than $self because the unit
+# tests call the scanning helpers with a bare controller.
+sub _data_dir_for ($app) {
+	my $dir  = $app->config->{data_dir} // 'data';
+	my $file = Mojo::File->new($dir);
+	return $file if $file->is_abs;
+	return $app->home->child($dir);
 }
 
 # _scan_data_dir($self) -> \@table_list
@@ -381,7 +475,7 @@ sub _resolve_language :Protected ($self, $platform, $default) {
 # grep to check the extension and again in map to extract the stem).
 # ->to_array avoids the extra flat-list expansion that ->each produced.
 sub _scan_data_dir :Protected ($self) {
-	my $dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
+	my $dir = _data_dir_for($self->app);
 	return [] unless -d $dir;
 	return $dir->list->map(sub {
 		my $base = $_->basename;
@@ -402,7 +496,7 @@ sub _scan_data_dir :Protected ($self) {
 #          Every entry has a spec suitable for the panel's option value.
 # Side Effects: Reads data_dir and opens each SQLite file to list its tables.
 sub _scan_join_tables :Protected ($self) {
-	my $dir    = $self->app->home->child($self->app->config->{data_dir} // 'data');
+	my $dir    = _data_dir_for($self->app);
 	my $tables = $self->_scan_data_dir;
 	my @all;
 
@@ -446,7 +540,7 @@ sub _open_spec :Protected ($self, $spec) {
 	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)(?:/([A-Za-z0-9_]+))?\z}) {
 		my ($table, $internal) = ($1, $2);
 		$table = lc $table;
-		my $data_dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
+		my $data_dir = _data_dir_for($self->app);
 		return () unless grep { -f $data_dir->child("$table.$_") } @SUPPORTED_EXT;
 		my $src = eval {
 			$self->open_table($table, directory => $data_dir->to_string,
@@ -488,6 +582,62 @@ sub _open_spec :Protected ($self, $spec) {
 	return ();
 }
 
+# _schema_type_name($entry) -> $type
+#
+# Purpose: Normalise one schema() entry to an upper-case type name.
+# Entry:   A hashref such as { type => 'INTEGER' }, a plain string, or undef.
+# Exit:    The type name, or '' when the backend did not declare one.
+sub _schema_type_name {
+	my ($entry) = @_;
+	return '' unless defined $entry;
+
+	my $type = ref($entry) eq 'HASH' ? $entry->{type} : $entry;
+	return '' unless defined($type) && !ref($type) && length($type);
+
+	return uc $type;
+}
+
+# _schema_type_warnings($self, $left, $right, $left_label, $right_label,
+#                       $left_key, $right_key) -> @warning_text
+#
+# Purpose: Describe columns whose declared types disagree across one join step.
+# Entry:   $left and $right are open sources; the labels name them in the message.
+#          The two join keys are excluded: Database::Join itself treats their
+#          types as free to differ, because the key is not a data column.
+# Exit:    Zero or more formatted warning strings for the schema_warnings banner.
+#
+# Database::Join's warn_schema_type_mismatch cannot fire here: every join this
+# controller builds passes a collision_prefix for the right table, so the
+# mismatched columns are published under distinct names and the check correctly
+# stays quiet.  The difference still matters to a reader - a sum over a text
+# column yields nothing - so the comparison is made here, on the two sides as
+# the user sees them in the join panel.
+sub _schema_type_warnings :Protected ($self, $left, $right, $left_label, $right_label,
+	$left_key, $right_key) {
+	my $left_schema  = eval { $left->schema }  // {};
+	my $right_schema = eval { $right->schema } // {};
+	return () unless %{ $left_schema // {} } && %{ $right_schema // {} };
+
+	my %is_key = map { (defined($_) && length($_)) ? ($_ => 1) : () }
+		($left_key, $right_key);
+
+	my @warnings;
+	for my $col (sort keys %$right_schema) {
+		next if $is_key{$col};
+		next unless exists $left_schema->{$col};
+
+		my $left_type  = _schema_type_name($left_schema->{$col});
+		my $right_type = _schema_type_name($right_schema->{$col});
+		next unless length($left_type) && length($right_type);
+		next if $left_type eq $right_type;
+
+		push @warnings, $self->_i18n('warn_join_schema_mismatch',
+			$col, $left_type, $left_label, $right_type, $right_label);
+	}
+
+	return @warnings;
+}
+
 # _spec_to_url($self, $spec) -> $url_string
 #
 # Purpose: Convert a table/path spec back to a browseable URL (used for the
@@ -499,7 +649,7 @@ sub _spec_to_url :Protected ($self, $spec) {
 		my ($table, $internal) = ($1, $2);
 		return "/view/$table" unless defined $internal;
 
-		my $data_dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
+		my $data_dir = _data_dir_for($self->app);
 		for my $ext (@SUPPORTED_EXT) {
 			my $file = $data_dir->child("$table.$ext");
 			next unless -f $file;
@@ -1308,6 +1458,12 @@ sub _run_pipeline_source :Protected ($self) {
 		next unless $right_cols;
 		next unless +{ map { $_ => 1 } @$right_cols }->{$right_key};
 
+		# Types are compared while the two sides are still separate sources;
+		# after the join is built the mismatched columns are already published
+		# under different names.  See _schema_type_warnings.
+		push @schema_warnings, $self->_schema_type_warnings(
+			$src, $right_src, $left_label, $right_label, $left_key, $right_key);
+
 		require Database::Join;
 		local $SIG{__WARN__} = sub { push @schema_warnings, $_[0] };
 		$src = Database::Join->new(
@@ -1577,7 +1733,7 @@ sub _calc_models_path :Protected ($self) {
 	my $bi_dir   = Mojo::File->new($cfg_dir)->is_abs
 	                ? Mojo::File->new($cfg_dir)
 	                : $home->child($cfg_dir);
-	my $data_dir = $home->child($app->config('data_dir') // 'data');
+	my $data_dir = _data_dir_for($app);
 
 	# A store inside data_dir is refused, not created: the file would sit beside
 	# the user's data, in a directory they chose for something else.  The test is
@@ -2945,6 +3101,7 @@ sub canvas_render ($self) {
 				canvas_name => ($a->{name} // $id),
 				error_msg   => 'The data source for this canvas could not be opened.',
 				error_specs => \@specs,
+				language    => $language,
 			);
 		}
 
@@ -3176,6 +3333,7 @@ sub canvas_render ($self) {
 			freshness_stale  => $freshness_stale,
 			freshness_msg    => $freshness_msg,
 			freshness_source_mtime => $freshness_source_mtime,
+			language     => $language,
 		);
 	}
 
@@ -3364,12 +3522,17 @@ None produced by this action; any file-scan errors are silently ignored
 sub index ($self) {
 	my ($platform, $language) = $self->_resolve_template;
 
+	# The layout writes the resolved language into <html lang>, so every action
+	# that renders a template from $platform/$language hands it over; t/html-lang.t
+	# holds the controller to that.  A screen reader, a translation tool and
+	# anything that indexes the page read the attribute.
 	$self->render(
 		template => "$platform/$language/home",
 		handler  => 'tt',
 		format   => 'html',
 		tables   => $self->_scan_data_dir,
 		title    => 'Choose a Database',
+		language => $language,
 	);
 }
 
@@ -3497,6 +3660,7 @@ sub view ($self) {
 			tables   => [],
 			title    => 'Choose a Database',
 			error    => $self->_i18n('error_table_open', $table, $@),
+			language => $language,
 		);
 	}
 
@@ -3551,6 +3715,7 @@ sub view ($self) {
 		per_page         => $per_page,
 		has_next         => $has_next,
 		page_base_url    => $page_base_url,
+		language         => $language,
 	);
 }
 
@@ -3642,6 +3807,7 @@ sub browse ($self) {
 		crumbs       => \@crumbs,
 		dirs         => \@dirs,
 		files        => \@files,
+		language     => $language,
 	);
 }
 
@@ -3752,6 +3918,7 @@ sub open_file ($self) {
 				error      => $self->_i18n('error_file_open', $label, $@),
 				back_url   => '/',
 				back_label => 'Home',
+				language   => $language,
 			);
 		}
 		$records //= [];
@@ -3785,6 +3952,7 @@ sub open_file ($self) {
 			per_page         => $per_page,
 			has_next         => $has_next,
 			page_base_url    => $rpage_url->to_string,
+			language         => $language,
 		);
 	}
 
@@ -3812,6 +3980,7 @@ sub open_file ($self) {
 				error      => $self->_i18n('error_file_open', $filename, $@),
 				back_url   => '/',
 				back_label => 'Home',
+				language   => $language,
 			);
 		}
 		$records //= [];
@@ -3845,6 +4014,7 @@ sub open_file ($self) {
 			per_page         => $per_page,
 			has_next         => $has_next,
 			page_base_url    => $rpage_url->to_string,
+			language         => $language,
 		);
 	}
 
@@ -3864,7 +4034,7 @@ sub open_file ($self) {
 	# it as table:store/sales so the join, filter and export panels keep the
 	# chosen internal table instead of dropping back to the file's first table.
 	if (defined $it && $it =~ $TABLE_NAME_RE) {
-		my $data_dir = eval { $self->app->home->child($self->app->config->{data_dir} // 'data')->realpath };
+		my $data_dir = eval { _data_dir_for($self->app)->realpath };
 		my $file_dir = eval { $file->dirname->realpath };
 		$lspec = "table:$table/$it" if $data_dir && $file_dir && "$file_dir" eq "$data_dir";
 	}
@@ -3911,6 +4081,7 @@ sub open_file ($self) {
 			back_label  => $back_label_default,
 			back2_url   => _safe_back_url($self->param('back2')),
 			back2_label => $self->param('back2_label') // 'Back',
+			language    => $language,
 		);
 	}
 
@@ -3951,6 +4122,7 @@ sub open_file ($self) {
 		per_page         => $per_page,
 		has_next         => $has_next,
 		page_base_url    => $lpage_url->to_string,
+		language         => $language,
 	);
 }
 
@@ -4006,6 +4178,7 @@ sub import_url ($self) {
 			tables   => $self->_scan_data_dir,
 			title    => 'Choose a Database',
 			error    => $self->_i18n($key, @args),
+			language => $language,
 		);
 	};
 
@@ -4053,6 +4226,7 @@ sub import_url ($self) {
 		filters_json     => $filters_json,
 		dedup            => $dedup,
 		export_url       => $self->_build_export_url($lspec, [], $filter_specs, undef, $dedup),
+		language         => $language,
 	);
 }
 
@@ -4120,7 +4294,7 @@ sub columns_api ($self) {
 	my $source;
 	if (defined $table_name && $table_name =~ m{\A([A-Za-z_][A-Za-z0-9_]*)(?:/([A-Za-z_][A-Za-z0-9_]*))?\z}) {
 		my ($table, $internal) = ($1, $2);
-		my $data_dir = $self->app->home->child($self->app->config->{data_dir} // 'data');
+		my $data_dir = _data_dir_for($self->app);
 		return $self->render(json => { error => 'not found' }, status => 404)
 			unless grep { -f $data_dir->child(lc($table) . ".$_") } @SUPPORTED_EXT;
 		$source = eval {
@@ -4239,6 +4413,12 @@ sub join_tables ($self) {
 		next unless $right_cols;
 		next unless +{ map { $_ => 1 } @$right_cols }->{$right_key};
 
+		# Types are compared while the two sides are still separate sources;
+		# after the join is built the mismatched columns are already published
+		# under different names.  See _schema_type_warnings.
+		push @schema_warnings, $self->_schema_type_warnings(
+			$src, $right_src, $left_label, $right_label, $left_key, $right_key);
+
 		require Database::Join;
 		local $SIG{__WARN__} = sub { push @schema_warnings, $_[0] };
 		$src = Database::Join->new(
@@ -4273,6 +4453,7 @@ sub join_tables ($self) {
 			tables   => [],
 			title    => 'Error',
 			error    => $self->_i18n('error_table_open', $left_label, $@),
+			language => $language,
 		);
 	}
 	$records //= [];
@@ -4318,6 +4499,7 @@ sub join_tables ($self) {
 		per_page         => $per_page,
 		has_next         => $has_next,
 		page_base_url    => $page_url->to_string,
+		language         => $language,
 	);
 }
 
@@ -4388,6 +4570,7 @@ sub combine_tables ($self) {
 			tables   => [],
 			title    => 'Error',
 			error    => $self->_i18n('error_table_open', $left_label, $@),
+			language => $language,
 		);
 	}
 	$left_recs //= [];
@@ -4473,6 +4656,7 @@ sub combine_tables ($self) {
 		per_page         => $per_page,
 		has_next         => $has_next,
 		page_base_url    => $page_url->to_string,
+		language         => $language,
 	);
 }
 
@@ -4833,7 +5017,7 @@ sub stat_api ($self) {
 C<POST /upload> -- Accept a drag-and-dropped data file and return a redirect URL.
 
 The file is saved under its original filename in a managed subdirectory of
-C<< <app_home>/.uploads/ >>.  The subdirectory name is randomised so that
+C<< <uploads_dir>/ >>.  The subdirectory name is randomised so that
 concurrent uploads of files with the same name do not collide.
 
 =head3 API SPECIFICATION
@@ -4876,7 +5060,7 @@ C<$@> value.
     pre  upload /= undef /\ basename(upload.filename) =~ EXT_RE
          /\ NOT req->is_limit_exceeded
          /\ upload.size <= MAX_UPLOAD_BYTES
-    let dest = home/.uploads/<random>/<filename> in
+    let dest = uploads_dir/<random>/<filename> in
     let ok = eval { upload.move_to(dest); 1 } in
     pre  ok /\ -f dest
     post render_json({ url: '/open?path=' ++ url_escape(dest), path: dest })
@@ -4919,11 +5103,14 @@ sub upload_file ($self) {
 		);
 	}
 
-	# Store uploads in <app_home>/.uploads/<random_subdir>/<original_filename>.
+	# Store uploads in <uploads_dir>/<random_subdir>/<original_filename>.  The
+	# staging directory comes from the app (config uploads_dir, default
+	# <app_home>/.uploads) so a deployment can point it at a writable disc and
+	# a test can keep its uploads out of the directory another process clears.
 	# Using the original filename is essential: Database::Abstraction derives
 	# the table name from the file stem, so "sales.csv" must stay "sales.csv".
 	# The random subdirectory prevents collisions from concurrent same-name uploads.
-	my $uploads_base = $self->app->home->child('.uploads');
+	my $uploads_base = $self->app->_uploads_dir;
 	$uploads_base->make_path unless -d $uploads_base;
 	my $sub_dir = tempdir(DIR => $uploads_base->to_string, CLEANUP => 0);
 	my $dest    = Mojo::File->new($sub_dir)->child($filename)->to_string;
@@ -4950,7 +5137,7 @@ sub upload_file ($self) {
 }
 
 sub clear_uploads ($self) {
-	my $uploads_dir = $self->app->home->child('.uploads');
+	my $uploads_dir = $self->app->_uploads_dir;
 
 	return $self->render(json => { freed => 0, count => 0 })
 		unless -d $uploads_dir;
@@ -5081,6 +5268,7 @@ sub graph_view ($self) {
 			point_count     => scalar @series_order,
 			source_url      => $source_url,
 			source_accessed => $source_accessed,
+			language        => $language,
 		);
 	}
 
@@ -5169,6 +5357,7 @@ sub graph_view ($self) {
 		ref_avg_y        => sprintf('%.4g', $avg_y),
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
+		language         => $language,
 	);
 }
 
@@ -5301,6 +5490,7 @@ sub pie_view ($self) {
 		currency_symbol  => $currency_symbol,
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
+		language         => $language,
 	);
 }
 
@@ -5469,6 +5659,7 @@ sub heatmap_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
+		language         => $language,
 	);
 }
 
@@ -5644,6 +5835,7 @@ sub bar_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -5855,6 +6047,7 @@ sub folder_view ($self) {
 		back_url   => $back,
 		back_label => 'Back to table',
 		left_spec  => $left_spec,
+		language   => $language,
 	);
 }
 
@@ -5893,8 +6086,7 @@ sub tables_view ($self) {
 
 	if ($spec =~ /\Atable:([A-Za-z0-9_]+)\z/) {
 		my $table_name = lc $1;
-		my $data_dir   = $self->app->home->child(
-			$self->app->config->{data_dir} // 'data');
+		my $data_dir   = _data_dir_for($self->app);
 		for my $ext (qw(sql sqlite sqlite3 db)) {
 			my $p = $data_dir->child("$table_name.$ext");
 			if (-f $p) {
@@ -6006,6 +6198,7 @@ sub tables_view ($self) {
 		spec       => $spec,
 		back_url   => $back_url,
 		back_label => $back_label,
+		language   => $language,
 	);
 }
 
@@ -6420,6 +6613,7 @@ sub pivot_view ($self) {
 		has_next          => $piv_has_next,
 		page_base_url     => $piv_page_url->to_string,
 		total_row_groups  => $total_row_groups,
+		language      => $language,
 	);
 }
 
@@ -6521,6 +6715,7 @@ sub stats_view ($self) {
 		back_url       => ($back2 // $back),
 		back_label     => ($back2 ? ($back2_lbl || 'Back') : ($self->param('back_label') // 'Back to table')),
 		($back2 ? (back2_url => $back, back2_label => ($self->param('back_label') // 'Back to table')) : ()),
+		language   => $language,
 	);
 }
 
@@ -6843,6 +7038,7 @@ sub scatter_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -6946,6 +7142,7 @@ sub stacked_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -7058,6 +7255,7 @@ sub combo_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -7172,6 +7370,7 @@ sub treemap_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -7295,6 +7494,7 @@ sub histogram_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
+		language         => $language,
 	);
 }
 
@@ -7515,10 +7715,22 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	# body where the map should appear.
 	my ($map_head, $map_body);
 	if (@markers) {
-		# HTML::OSM is a recommended dependency, so its absence is a state the
-		# page reports and survives: the markers are still counted, nothing is
-		# drawn, and the rest of the application is untouched.
-		if (eval { require HTML::OSM; 1 }) {
+		# HTML::OSM is a recommended dependency, so its absence - or an install
+		# older than the options below - is a state the page reports and
+		# survives: the markers are still counted, nothing is drawn, and the
+		# rest of the application is untouched.  The version check is not
+		# optional: HTML::OSM rejects unknown constructor keys, so passing
+		# search/max_zoom to an older copy would croak and turn the page into a
+		# 500 rather than the warning this branch produces.
+		#
+		# The installed version comes back with the answer so the warning can
+		# say which problem it is: "not installed" and "installed but older than
+		# 0.12" have different fixes, and the old wording called both of them
+		# "could not be loaded".  The probe is a method (see
+		# _map_renderer_version) so the tests can produce either state without
+		# installing or removing the module.
+		my ($osm_ok, $osm_version) = $self->_map_renderer_version;
+		if ($osm_ok) {
 			# Markers go in a cluster group rather than straight onto the map.
 			# A card may plot up to map_max_markers (2000 by default), and at a
 			# low zoom that many pins overlap into noise; markercluster draws a
@@ -7568,16 +7780,36 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			my $color_col     = $options->{color_col} // '';
 			my $color_rules   = $options->{color_rules}   // [];
 			my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
+			my $size_col      = $options->{size} // '';
+
+			# Bubble maps: one radius per marker, scaled across the plotted
+			# values.  Circle markers keep their pixel size as the reader
+			# zooms, which is what makes them comparable.
+			my ($size_min, $size_max) = _map_size_range($records, \@markers, $size_col);
+
 			for my $marker (@markers) {
-				my @icon_arg;
+				my $row = $records->[ $marker->{first_row} ];
+				my $color;
 				if (length $color_col) {
-					my $row   = $records->[ $marker->{first_row} ];
-					my $cval  = (defined($row) ? $row->{$color_col} : undef) // '';
-					my $color = _apply_color_rule($cval, $color_rules, $color_default);
-					@icon_arg = (icon => _marker_icon($color));
+					my $cval = (defined($row) ? $row->{$color_col} : undef) // '';
+					$color = _apply_color_rule($cval, $color_rules, $color_default);
 				}
-				$map->add_marker([ $marker->{lat}, $marker->{lon} ],
-					html => $marker->{label}, @icon_arg);
+				if (length $size_col) {
+					my $sv = defined($row)
+						? _numeric_cell($row->{$size_col} // '') : undef;
+					$map->add_circle_marker(
+						[ $marker->{lat}, $marker->{lon} ],
+						html   => $marker->{label},
+						radius => _map_radius($sv, $size_min, $size_max),
+						(defined($color) ? (colour => _color_hex($color)) : ()),
+					);
+				} else {
+					$map->add_marker(
+						[ $marker->{lat}, $marker->{lon} ],
+						html => $marker->{label},
+						(defined($color) ? (icon => _marker_icon($color)) : ()),
+					);
+				}
 			}
 
 			# Heat map overlay: when heat=1 is requested, plot a density
@@ -7611,6 +7843,11 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			($map_head, $map_body) = $map->onload_render();
 			($map_head, $map_body) = _canvas_map_html($map_head, $map_body, $id_suffix)
 				if defined($id_suffix) && length($id_suffix);
+		} elsif (defined $osm_version) {
+			push @messages, {
+				key  => 'error_map_renderer_old',
+				text => $self->_i18n('error_map_renderer_old', $osm_version),
+			};
 		} else {
 			push @messages, {
 				key  => 'error_map_renderer_missing',
@@ -7632,8 +7869,12 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	$chart_spec{options}{heat}  = 1                 if $options->{heat};
 	$chart_spec{options}{weight} = $options->{weight}
 		if defined($options->{weight}) && length($options->{weight});
-	$chart_spec{options}{agg}   = $options->{agg}
-		if defined($options->{agg}) && $options->{agg} ne 'count';
+	if (defined($options->{size}) && length($options->{size})) {
+		$chart_spec{encode}{size} = $options->{size};
+	}
+	if (defined($options->{scheme}) && length($options->{scheme})) {
+		$chart_spec{options}{scheme} = $options->{scheme};
+	}
 	if (defined($options->{color_col}) && length($options->{color_col})) {
 		$chart_spec{encode}{color}         = $options->{color_col};
 		$chart_spec{options}{color_rules}  = $options->{color_rules}
@@ -7656,6 +7897,31 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		backend      => $backend,
 		chart        => \%chart_spec,
 	};
+}
+
+# _map_renderer_version() -> ($ok, $installed_version)
+#
+# Loads the optional HTML::OSM and says whether it is new enough for the options
+# _map_data passes.  $installed_version is undef when the module could not be
+# loaded at all; when it is defined but $ok is false the copy is too old.
+#
+# This is a method rather than an inline require so a test can replace it.
+# Test::Without::Module does not produce the missing case here: its @INC hook
+# is bypassed during Mojolicious' in-process dispatch, so the installed copy is
+# still found, and the branch an operator without the dependency is in cannot
+# be reached by hiding the module.  Replacing one method exercises the same
+# else branch, the same message and the same page.
+sub _map_renderer_version {
+	my $self = shift;
+
+	my $version = eval {
+		require HTML::OSM;
+		HTML::OSM->VERSION;
+	};
+	return (0, undef) unless defined($version) && length($version);
+
+	my $new_enough = eval { HTML::OSM->VERSION($MIN_HTML_OSM_VERSION); 1 };
+	return ($new_enough ? 1 : 0, $version);
 }
 
 # _canvas_map_html($head, $body, $id_suffix) -> ($head, $body)
@@ -7712,7 +7978,9 @@ sub map_view ($self) {
 	my $tiles_name   = $self->param('tiles')    // '';
 	my $heat         = $self->param('heat')     // 0;
 	my $weight_col   = $self->param('weight')   // '';
-	my $agg          = $self->param('agg')      // 'count';
+	my $size_col     = $self->param('size')     // '';
+	my $series_col   = $self->param('series')   // '';
+	my $scheme       = $self->param('scheme')   // 'tableau10';
 
 	# tiles= names a source from tile_sources in config; an arbitrary URL is
 	# never accepted so a crafted share link cannot redirect tiles fetches.
@@ -7771,7 +8039,9 @@ sub map_view ($self) {
 	my @popup = grep { length($_) && $_ ne $loc_col && $col_set{$_} }
 		@{ $self->every_param('popup') };
 
-	# Marker colour params
+	# Marker colour params.  color= applies explicit threshold rules;
+	# series= colours one value per distinct category from scheme=, which is the
+	# categorical form the other chart pages already offer.
 	my $color_col     = $self->param('color') // '';
 	my $color_def_raw = $self->param('color_default') // '';
 	my ($color_rules, $color_default) =
@@ -7780,12 +8050,50 @@ sub map_view ($self) {
 	if (length($color_col) && !$col_set{$color_col}) {
 		return $self->render(text => "Column not found: $color_col", status => 400);
 	}
+	return $self->render(text => 'Use either color= or series=, not both', status => 400)
+		if length($color_col) && length($series_col);
+	return $self->render(text => "Column not found: $size_col", status => 400)
+		if length($size_col) && !$col_set{$size_col};
+
+	my (@series_cats, $series_palette);
+	if (length $series_col) {
+		return $self->render(text => "Column not found: $series_col", status => 400)
+			unless $col_set{$series_col};
+		return $self->render(text => "Unknown colour scheme: $scheme", status => 400)
+			unless $SCATTER_SCHEMES{$scheme};
+
+		$series_palette = $CATEGORY_PALETTES{$scheme} // $CATEGORY_PALETTES{tableau10};
+		my %seen;
+		@series_cats = grep { !$seen{$_}++ } map {
+			my $value = $_->{$series_col};
+			defined($value) ? "$value" : '';
+		} @$records;
+
+		# A legend longer than two cycles of the palette helps nobody; the
+		# remaining values keep a palette colour but are not listed.
+		my $limit = @$series_palette * 2;
+		@series_cats = @series_cats[0 .. $limit - 1] if @series_cats > $limit;
+
+		$color_col   = $series_col;
+		$color_rules = [
+			map {
+				{
+					op    => 'eq',
+					val   => $series_cats[$_],
+					color => $series_palette->[ $_ % @$series_palette ],
+				}
+			} 0 .. $#series_cats
+		];
+		$color_default = $series_palette->[0];
+	}
 
 	my %options;
 	$options{popup}         = \@popup       if @popup;
 	$options{color_col}     = $color_col    if length $color_col;
 	$options{color_rules}   = $color_rules  if @$color_rules;
 	$options{color_default} = $color_default;
+	$options{size}          = $size_col     if length $size_col;
+	$options{scheme}        = $scheme       if length $series_col;
 	my $max = $self->param('max');
 	$options{max}      = $max            if defined($max) && $max =~ /\A\d+\z/ && $max > 0;
 	$options{zoom}     = $zoom_val       if defined $zoom_val;
@@ -7793,23 +8101,31 @@ sub map_view ($self) {
 	$options{tile_url} = $tile_url_override if defined $tile_url_override;
 	$options{heat}     = 1               if $heat;
 	$options{weight}   = $weight_col     if length($weight_col) && $col_set{$weight_col};
-	$options{agg}      = $agg            if length $agg;
 
 	# Build colour legend for the template
 	my @color_legend;
 	if (length $color_col) {
-		my %op_label = (
-			gt => '>', ge => '>=', lt => '<', le => '<=', eq => '=', ne => '!=',
-		);
-		for my $rule (@$color_rules) {
-			push @color_legend, {
-				color => $rule->{color},
-				label => $color_col . ' ' . ($op_label{ $rule->{op} } // $rule->{op})
-					. ' ' . $rule->{val},
-			};
+		if (@series_cats) {
+			for my $i (0 .. $#series_cats) {
+				push @color_legend, {
+					color => $series_palette->[ $i % @$series_palette ],
+					label => length($series_cats[$i]) ? $series_cats[$i] : '(blank)',
+				};
+			}
+		} else {
+			my %op_label = (
+				gt => '>', ge => '>=', lt => '<', le => '<=', eq => '=', ne => '!=',
+			);
+			for my $rule (@$color_rules) {
+				push @color_legend, {
+					color => $rule->{color},
+					label => $color_col . ' ' . ($op_label{ $rule->{op} } // $rule->{op})
+						. ' ' . $rule->{val},
+				};
+			}
+			push @color_legend, { color => $color_default, label => 'Other' }
+				if @color_legend;
 		}
-		push @color_legend, { color => $color_default, label => 'Other' }
-			if @color_legend;
 	}
 
 	my $result = $self->_map_data(
@@ -7850,6 +8166,7 @@ sub map_view ($self) {
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -7867,6 +8184,45 @@ sub _map_popup {
 		grep { defined($_->[1]) && length($_->[1]) } @{ $extras // [] };
 
 	return join('<br>', @lines);
+}
+
+# _map_size_range($records, \@markers, $col) -> ($min, $max)
+#
+# The numeric range of the bubble-size column across the markers that will be
+# drawn, or an empty list when the column is absent or has no numeric values.
+sub _map_size_range {
+	my ($records, $markers, $col) = @_;
+	return () unless defined($col) && length($col);
+
+	my ($min, $max);
+	for my $marker (@$markers) {
+		my $row = $records->[ $marker->{first_row} ];
+		next unless defined $row;
+		my $value = _numeric_cell($row->{$col} // '');
+		next unless defined $value;
+		$min = $value if !defined($min) || $value < $min;
+		$max = $value if !defined($max) || $value > $max;
+	}
+
+	return ($min, $max);
+}
+
+# _map_radius($value, $min, $max) -> $pixels
+#
+# A bubble radius for one marker: 6..30 px across the plotted range, and the
+# midpoint for a column that is constant or has no numeric value.  Pixels, not
+# metres: a circle over the same place must not grow as the reader zooms in.
+sub _map_radius {
+	my ($value, $min, $max) = @_;
+
+	return 10 unless defined $value;
+	return 10 unless defined($min) && defined($max) && $max > $min;
+
+	my $fraction = ($value - $min) / ($max - $min);
+	$fraction = 0 if $fraction < 0;
+	$fraction = 1 if $fraction > 1;
+
+	return int(6 + $fraction * 24 + 0.5);
 }
 
 # _map_limit($value, $default) -> $integer
@@ -7976,6 +8332,20 @@ sub _marker_icon {
 	return "data:image/svg+xml,$svg";
 }
 
+# _color_hex($color) -> $hex
+#
+# add_circle_marker() accepts hex colours only, while _parse_color() also
+# allows a fixed set of CSS names for the icon path.  Translate the names so a
+# colour rule means the same thing on a bubble map as on a pin map.
+sub _color_hex {
+	my ($color) = @_;
+
+	return $DEFAULT_MARKER_COLOR unless defined($color) && length($color);
+	return $color if $color =~ /\A#[0-9a-f]{3}(?:[0-9a-f]{3})?\z/;
+
+	return $NAMED_COLOR_HEX{$color} // $DEFAULT_MARKER_COLOR;
+}
+
 # _iso8601_utc() -> $string
 #
 # When a geocode cache was built, in the form the model store records.
@@ -7983,50 +8353,6 @@ sub _iso8601_utc {
 	require POSIX;
 
 	return POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime());
-}
-
-# _get_or_build_extract($self, $src, $records, $columns, $spec) -> $path | undef
-#
-# Returns a path to a cached SQLite extract for the current source fingerprint,
-# building one if the cache is cold.  Returns undef when:
-#   - model_dir is not configured or not writable
-#   - the source has no mtime (URL-backed, headerless cache, etc.)
-#   - writing the extract would fail
-# The caller continues with direct reads in all undef cases.
-sub _get_or_build_extract :Protected ($self, $src, $records, $columns, $spec) {
-	my $app    = $self->app;
-	my $mdcfg  = $app->config('model_dir') // '.bi';
-	my $mdir   = Mojo::File->new($app->home->child($mdcfg))->to_string;
-	return undef unless -d $mdir || eval { Mojo::File->new($mdir)->make_path; 1 };
-
-	my $mtime = eval { $src->can('updated') ? $src->updated : undef } // undef;
-	return undef unless defined $mtime;
-
-	my $fsize = 0;
-	if ($src->can('_file_path') && defined $src->{_file_path} && -f $src->{_file_path}) {
-		$fsize = -s $src->{_file_path};
-	}
-
-	require Database::BI::Extract;
-	my $cache = Database::BI::Extract->new(model_dir => $mdir);
-
-	my $path = $cache->get($spec, $mtime, $fsize);
-	return $path if $path;
-
-	# Build a new extract.
-	my $bytes = eval { $self->_write_sqlite_db($records, $columns) };
-	if ($@) {
-		carp $MESSAGES{error_extract_unwritable} . ": $@";
-		return undef;
-	}
-
-	$path = eval { $cache->put($spec, $mtime, $fsize, $bytes) };
-	if ($@) {
-		carp $MESSAGES{error_extract_unwritable} . ": $@";
-		return undef;
-	}
-
-	return $path;
 }
 
 # _catalog_entry($self, $mf, $analyses) -> \%entry
@@ -8088,8 +8414,7 @@ sub _catalog_entry :Protected ($self, $mf, $analyses) {
 
 # GET /catalog
 sub catalog_view ($self) {
-	my $data_dir  = $self->app->config('data_dir') // 'data';
-	my $dir       = Mojo::File->new($self->app->home->child($data_dir));
+	my $dir       = _data_dir_for($self->app);
 	my $analyses  = $self->_read_analyses;
 
 	my @entries;
@@ -8108,6 +8433,7 @@ sub catalog_view ($self) {
 		format         => 'html',
 		title          => 'Dataset catalog',
 		catalog_entries => \@entries,
+		language       => $language,
 	);
 }
 
@@ -8247,6 +8573,7 @@ sub embed_view ($self) {
 		canvas_id   => $id,
 		canvas_name => $a->{name},
 		visuals     => \@rendered,
+		language    => $language,
 	);
 }
 
@@ -8481,6 +8808,7 @@ sub insights_view ($self) {
 		back_url     => ($back2 // $back),
 		back_label   => ($back2 ? ($back2_lbl || 'Back') : ($self->param('back_label') // 'Back to table')),
 		($back2 ? (back2_url => $back, back2_label => ($self->param('back_label') // 'Back to table')) : ()),
+		language     => $language,
 	);
 }
 
@@ -8765,10 +9093,10 @@ With a donut hole:
 
 =head2 clear_uploads
 
-C<POST /uploads/clear> -- Delete every file from the C<.uploads/> staging
+C<POST /uploads/clear> -- Delete every file from the upload staging
 directory and return the total disk space recovered.
 
-The C<.uploads/> directory accumulates files from drag-and-drop uploads.
+The staging directory accumulates files from drag-and-drop uploads.
 It grows indefinitely; this action lets users reclaim that space without
 needing shell access.
 
@@ -8776,7 +9104,9 @@ needing shell access.
 
 =head4 INPUT
 
-No parameters.  The C<.uploads/> path is always the one under C<app->home>.
+No parameters.  The directory cleared is the one C<POST /upload> writes to:
+C<uploads_dir> from the configuration, or C<< <app_home>/.uploads >> when that
+key is not set.
 
 =head4 OUTPUT
 
@@ -9035,22 +9365,54 @@ coordinates.  Rows sharing a position become one marker whose popup says how
 many rows it stands for.  Markers are clustered with Leaflet.markercluster, so
 a dense map draws a count at low zoom and splits it into individual pins as it
 is zoomed in; a sparse map looks the same, because markers far enough apart are
-left on their own.
+left on their own.  Clustering is always on; there is no C<cluster=> switch.
+
+The map page never shows the L<HTML::OSM> Nominatim search box: C<search => 0>
+is always passed, so nothing typed on the page leaves the reader's machine.
+L<HTML::OSM> 0.12 or later is the renderer; with an older optional install (or
+none at all) the page still renders the marker count and a warning, rather than
+failing.
 
 Accepts the same C<l=>, C<j=>, C<c=> and C<f=> pipeline params as every other
 visual, so the map shows the filtered, calculated view.
 
-  loc=<col>      Location column to geocode (required unless lat= and lon= are given)
-  lat=<col>      Latitude column (numeric, -90..90)
-  lon=<col>      Longitude column (numeric, -180..180)
-  popup=<col>    Column shown in the marker popup (repeatable; default: all non-coordinate columns)
-  max=N          Markers to draw (default: map_max_markers, 2000)
-  back=<url>     URL for the "Back to table" breadcrumb link
+  loc=<col>       Location column to geocode (required unless lat= and lon= are given)
+  lat=<col>       Latitude column (numeric, -90..90)
+  lon=<col>       Longitude column (numeric, -180..180)
+  popup=<col>     Column shown in the marker popup (repeatable; default: all non-coordinate columns)
+  max=N           Markers to draw (default: map_max_markers, 2000)
+  zoom=N          Initial zoom, 0..19 (default: fit the markers)
+  max_zoom=N      Tile layer maxZoom, 0..28 (default: map_max_zoom config, if set)
+  tiles=<name>    Named tile source from the tile_sources config key
+  heat=1          Add a heatmap layer over the markers
+  weight=<col>    Numeric intensity column for the heatmap (normalised to 0..1)
+  size=<col>      Numeric bubble-radius column; markers become circles
+  color=<col>     Column whose value picks a marker colour
+  color_rule=<op>:<value>:<colour>  Repeatable colour rule; op is
+                  gt, ge, lt, le, eq or ne; first match wins
+  color_default=<colour>  Fallback when no rule matches (default #3388ff)
+  series=<col>    Colour markers by category; mutually exclusive with color=
+  scheme=<name>   Palette for series=: tableau10, category10, set2, set3, paired
+  back=<url>, back2=<url>, back2_label=<text>  Breadcrumb links
+  f=              Result filters (repeatable)
+
+A colour rule is C<< E<lt>opE<gt>:E<lt>valueE<gt>:E<lt>colourE<gt> >>; rules
+are tried in the order given and the first match wins.  The comparison is
+numeric when both the cell and the rule's value look like numbers, and
+otherwise only C<eq>/C<ne> are meaningful (case-insensitive).  A colour is
+C<#rgb>, C<#rrggbb> or a CSS name such as C<red>; names are mapped to hex for
+bubble markers, which C<add_circle_marker> accepts only as hex.  C<series=>
+cycles the chosen palette across distinct values instead, and its legend lists
+categories rather than rules.
 
 Config values: C<map_geocode_max> (new lookups per request, default 500),
 C<map_max_markers> (markers per request, default 2000), C<map_region> (a
-two-letter country hint for ambiguous place names) and C<geocoder> (an object to
-use instead of loading L<Geo::Coder::Free>; the seam the tests use).
+two-letter country hint for ambiguous place names), C<map_max_zoom> (the tile
+layer's default maxZoom), C<tile_sources> (a hashref of named tile sources,
+each C<< { url => ... } >>), C<tile_url> (the single default tile layer) and
+C<geocoder> (an object to use instead of loading L<Geo::Coder::Free>; the seam
+the tests use).  The C<leaflet_*>_url keys point Leaflet, markercluster and the
+heatmap plugin at self-hosted copies for an offline deployment.
 
 =head3 API SPECIFICATION
 
@@ -9062,6 +9424,17 @@ use instead of loading L<Geo::Coder::Free>; the seam the tests use).
   lon      string  Optional.  Numeric longitude column.
   popup    string  Optional, repeatable.  Columns shown in the popup.  Default: all non-coordinate columns.
   max      int     Optional.  Positive marker cap for this request.
+  zoom     int     Optional.  0..19; out-of-range values are clamped.
+  max_zoom int     Optional.  0..28; out-of-range values are clamped.
+  tiles    string  Optional.  A key of the tile_sources config hashref.
+  heat     bool    Optional.  Add the heatmap layer.
+  weight   string  Optional.  Numeric column for heatmap intensity.
+  size     string  Optional.  Numeric column for bubble radius.
+  color    string  Optional.  Column whose value selects a marker colour.
+  color_rule string Optional, repeatable.  <op>:<value>:<colour>.
+  color_default string Optional.  Fallback marker colour.
+  series   string  Optional.  Column to colour by category.
+  scheme   string  Optional.  Palette for series= (default tableau10).
   back     url     Optional.  Safe back-link URL (sanitised by _safe_back_url).
 
 =head4 OUTPUT
@@ -9070,6 +9443,9 @@ use instead of loading L<Geo::Coder::Free>; the seam the tests use).
   400 text/plain   No loc=, or lat= without lon=.
   400 text/plain   Column not found: <col>  (or the geocode message naming it).
   400 text/plain   Coordinate column wholly out of range, naming it.
+  400 text/plain   Unknown tile source "<name>".
+  400 text/plain   Unknown colour scheme: <name>.
+  400 text/plain   Use either color= or series=, not both.
   404 text/plain   "Could not open data source" when l= is absent/invalid.
 
 =head3 EXAMPLE
@@ -9078,6 +9454,175 @@ use instead of loading L<Geo::Coder::Free>; the seam the tests use).
     -> 200 HTML page containing Leaflet markers for the places that resolved
 
 =cut
+
+=head2 canvas_render
+
+C<GET /a/:id> -- Render a saved analysis (canvas).  The document holds its
+datasets, joins, calculated fields, parameters, layouts, bookmarks and
+hierarchies, so the page is the stored analysis plus the request's overlays.
+
+Cross-filtering:
+C<?cf=E<lt>colE<gt>:E<lt>opE<gt>:E<lt>valE<gt>> (repeatable), with C<cv=> as
+the selected value; drill-down uses C<?dd=E<lt>hierarchyE<gt>&dl=E<lt>levelE<gt>>
+where level 0 is the first level and one past the last means "drilled
+through"; parameter overrides are C<?p.E<lt>nameE<gt>=E<lt>valueE<gt>>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  id       path    Required.  Alphanumeric analysis id.
+  cf       string  Optional, repeatable.  col:op:val cross-filter.
+  cv       string  Optional.  Selected value for the cross-filter.
+  dd       string  Optional.  Named hierarchy to drill.
+  dl       int     Optional.  Current drill level (0-based).
+  p.<name> string  Optional.  Parameter override.
+
+=head4 OUTPUT
+
+  200 text/html    Rendered canvas.
+  400 text/plain   Invalid id or parameter.
+  404 text/plain   Unknown analysis.
+  422 text/plain   Stored document fails validation.
+
+=head2 analyses_list / analyses_create / analyses_get / analyses_update / analyses_patch / analyses_delete / analyses_import / analyses_export / analyses_add_visual / analyses_update_visual
+
+C</api/analyses> -- CRUD and import/export for saved analyses.  Documents are
+validated on write: unknown top-level keys are dropped and a document that is
+not a JSON object is refused.  Import accepts a document exported by
+C<GET /api/analyses/:id/export> and creates a new id.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT / OUTPUT
+
+  GET    /api/analyses                 -> 200 { analyses: [ { id, name, datasets, updated }, ... ] }
+  POST   /api/analyses                 <- JSON document; 201 { id } or 400 { error }
+  POST   /api/analyses/import          <- JSON document; 201 { id } or 400 { error }
+  GET    /api/analyses/:id             -> 200 document, 400 invalid id, 404 unknown
+  PUT    /api/analyses/:id             <- JSON document; 200 { saved: 1 }, 400, 404
+  PATCH  /api/analyses/:id             <- partial JSON document; 200 { saved: 1 }, 400, 404
+  DELETE /api/analyses/:id             -> 200 { deleted: 1 }, 400, 404
+  GET    /api/analyses/:id/export      -> 200 JSON document, 400, 404
+  POST   /api/analyses/:id/visuals     <- JSON visual; 201 { visual }, 400, 404
+  PATCH  /api/analyses/:id/visuals/:visual  <- partial JSON visual; 200, 400, 404
+
+Writes return 503 when the model store is not writable.
+
+=head2 analyses_share / share_view / embed_view / visual_download
+
+C<POST /api/analyses/:id/share> issues a signed, expiring read-only token;
+C<GET /share/:id?token=...> renders the canvas without edit controls, and
+C<GET /embed/:id?token=...> renders it without page chrome for an iframe.
+C<GET /a/:id/visual/:n/csv> downloads one visual's rows as CSV; the C<png>
+form is not rendered server-side and returns 501, because the chart pages
+rasterise their own SVG in the browser.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT / OUTPUT
+
+  POST /api/analyses/:id/share   <- expires=<seconds> (optional)
+                                 -> 200 { token, expires }, 400, 404
+  GET  /share/:id?token=...      -> 200 text/html, 400 missing token,
+                                    401/403 bad or expired token, 404 unknown
+  GET  /embed/:id?token=...      -> as /share/:id, plus 422 invalid document
+  GET  /a/:id/visual/:n/:fmt     -> 200 text/csv for fmt=csv; 501 for fmt=png;
+                                    400 bad visual index; 404 unknown analysis
+
+=head2 catalog_view
+
+C<GET /catalog> -- List every supported file in C<data_dir> with its type,
+size, modification time and the saved analyses that reference it.  Lineage is
+computed by scanning the analysis store; there is no second registry.
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+  200 text/html    Catalog page.
+
+=head2 insights_view
+
+C<GET /insights> -- Automatic statistical insights for a dataset: Tukey IQR
+outliers, period-over-period deltas, top movers, and seasonality from the
+lag-1 autocorrelation of monthly totals.  Pure arithmetic - no LLM and no
+network call.  Every insight links to a chart or stats view showing the data
+behind it.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l        spec    Required.  Left table spec.
+  f        string  Optional, repeatable.  Result filters.
+  back, back2, back2_label, back_label  Optional.  Breadcrumb links.
+
+=head4 OUTPUT
+
+  200 text/html    Insights page.
+  400 text/plain   Missing l= or an invalid pipeline parameter.
+  404 text/plain   "Could not open data source".
+
+=head2 ask_api
+
+C<POST /api/ask> -- Translate a plain-English question into an analysis spec.
+The model receives column names and inferred types only: no row data, no file
+paths.  The returned spec is validated (column names and kinds) before it is
+returned.  Absent when C<ai_api_key> is not configured.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l        spec    Required.  Left table spec.
+  q        string  Required.  The question.
+  f        string  Optional, repeatable.  Result filters.
+
+=head4 OUTPUT
+
+  200 application/json  { spec, url, valid => 1 }
+  400 application/json  { error }
+  404 application/json  { error } (unopenable source)
+  503 application/json  { error } (no ai_api_key)
+
+=head2 summary_api
+
+C<POST /api/summary> -- Narrative summary of an analysis.  The deterministic
+path builds template sentences offline; C<ai=1> additionally asks the
+configured LLM to polish them from aggregate facts only (no raw rows, no file
+paths).  Results are cached in-process for one hour.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l        spec    Required.  Left table spec.
+  f        string  Optional, repeatable.  Result filters.
+  ai       bool    Optional.  Use the LLM when ai_api_key is configured.
+
+=head4 OUTPUT
+
+  200 application/json  { summary, facts, ai => 0|1 }
+  400 application/json  { error }
+  404 application/json  { error }
+
+=head2 geo_list / geo_save / geo_delete
+
+C</geo/*> -- Coordinate-column preferences, stored per dataset spec under
+C<geo.E<lt>specE<gt>.columns> in the model store.  The Map panel reads them on
+open and pre-populates its column selects.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT / OUTPUT
+
+  GET  /geo/list?l=<spec>   -> 200 { columns: { <col>: { kind: lat|lon|location } } }
+                               400 { error }
+  POST /geo/save            <- l=, col=, kind=lat|lon|location
+                            -> 200 { saved: 1 }, 400 { error }
+  POST /geo/delete          <- l=, col= (omit col to clear the spec)
+                            -> 200 { deleted: 1 }, 400 { error }
 
 =head2 calc_list / calc_save / calc_delete
 
@@ -9289,9 +9834,10 @@ without breaking existing clients that read a wider response.
 
 =item B<Uploaded files are evicted automatically, but not immediately>
 
-Files uploaded via C<POST /upload> are stored in C<.uploads/> under the
-application home directory.  C<Database::BI> evicts upload subdirectories
-whose modification time is older than 24 hours B<on every server startup>.
+Files uploaded via C<POST /upload> are stored in C<uploads_dir>, which
+defaults to C<.uploads/> under the application home directory.  C<Database::BI>
+evicts upload subdirectories whose modification time is older than 24 hours
+B<on every server startup>.
 Between restarts, files accumulate.  For an immediate full purge (regardless
 of age), post to C<POST /uploads/clear> or click the "Clear upload cache"
 button in the UI.

@@ -33,7 +33,7 @@ use App::FileSync::Server;
 use App::FileSync::Settings;
 use App::FileSync::Transport::SSH;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # What the marker file says to anyone who finds it.  File content, not a
 # message: it must not change with the reader's language.
@@ -411,6 +411,13 @@ sub _client_version :Private {
 #              at init rather than as a refusal at the first sync.
 sub _client_init :Private {
 	my (@args) = @_;
+
+	# init has defaults that are not obvious, the client id above all, so
+	# --help prints them instead of failing as an unknown option.
+	if (grep { $_ eq '--help' || $_ eq '-h' } @args) {
+		print message('cli.help.init');
+		return $EXIT_OK;
+	}
 
 	my %opt;
 	_options(\@args, {

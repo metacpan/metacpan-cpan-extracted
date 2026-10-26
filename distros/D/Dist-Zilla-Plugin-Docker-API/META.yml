@@ -21,16 +21,16 @@ name: Dist-Zilla-Plugin-Docker-API
 provides:
   Dist::Zilla::Plugin::Docker::API:
     file: lib/Dist/Zilla/Plugin/Docker/API.pm
-    version: '0.104'
+    version: '0.105'
   Dist::Zilla::Plugin::Docker::API::Client:
     file: lib/Dist/Zilla/Plugin/Docker/API/Client.pm
-    version: '0.104'
+    version: '0.105'
   Dist::Zilla::Plugin::Docker::API::Result:
     file: lib/Dist/Zilla/Plugin/Docker/API/Result.pm
-    version: '0.104'
+    version: '0.105'
   Dist::Zilla::Plugin::Docker::API::TagTemplate:
     file: lib/Dist/Zilla/Plugin/Docker/API/TagTemplate.pm
-    version: '0.104'
+    version: '0.105'
 requires:
   API::Docker: '0.004'
   Archive::Tar: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-plugin-docker-api/issues
   homepage: https://github.com/Getty/p5-dist-zilla-plugin-docker-api
   repository: https://github.com/Getty/p5-dist-zilla-plugin-docker-api.git
-version: '0.104'
+version: '0.105'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -61,6 +61,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -71,6 +72,10 @@ x_Dist_Zilla:
           include_untracked: 0
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
@@ -253,9 +258,9 @@ x_Dist_Zilla:
               name: '@GETTY/Authors'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::Legal
+              class: Pod::Weaver::Section::Author::GETTY::Legal
               name: '@GETTY/Legal'
-              version: '4.020'
+              version: '0.327'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
@@ -280,8 +285,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -326,7 +331,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.104'
+          tag: '0.105'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -341,8 +346,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}

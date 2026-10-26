@@ -25,6 +25,56 @@ use Sub::Protected ();
 
 use App::Actions::Access;
 
+# TODO: Move the remaining hard-coded English messages into the catalogue, as
+#	App::Actions::Error codes: Docker's "executable not found" and "Cannot
+#	connect to the Docker daemon" first (what most new users see), then
+#	Check's report problems, Expression's parse errors, Cache and Logs'
+#	write and prune errors, and Schema's validation messages.  They are the
+#	"text ..." entries of @DOCUMENTED in t/unit.t; ACTION_RUN_LANG does not
+#	reach them, and bin/action-run cannot test them by code.
+# TODO: Warn, once per job and through the catalogue, about what is not
+#	emulated instead of dropping it silently: timeout-minutes is ignored,
+#	${{ needs.ID.outputs.NAME }} is an empty string, and concurrency,
+#	permissions and environment are never read.  A --strict mode could make
+#	the warnings failures.
+# TODO: Close the branch coverage gaps of the Linux-only coverage run:
+#	Process (15 branches, mostly Windows-only), bin/action-run (15),
+#	bin/action-run-smoke (16) and Runner::Steps' conditions (33%).  Cover
+#	from a Windows leg too, or test the Windows branches under local $^O.
+#
+# TODO (features, in order of value):
+#	- Job outputs and needs.*.outputs: map step outputs to job outputs and
+#	  pass a needs context from one group to the next.
+#	- timeout-minutes for jobs and steps, through the parallel runner's kill
+#	  path.
+#	- Remote actions: fetch uses: owner/repo@ref into a cache pinned by SHA,
+#	  composite and JavaScript first, opt-in (--fetch-actions) because it is
+#	  network access.
+#	- hashFiles(), as a restricted glob under the workspace.
+#	- Local docker actions: build the Dockerfile and run its entrypoint, with
+#	  pre-entrypoint and post-entrypoint.
+#	- Event payloads: --event push|pull_request --event-file payload.json, so
+#	  github.event.* and if: github.event_name == ... behave as on GitHub.
+#	- The object filter * in expressions (github.event.*.name).
+#	- ARM runners: --platform linux/arm64 for *-arm labels instead of the
+#	  host's architecture.
+#	- --secret-file and --secret-env NAME, so a secret is not on action-run's
+#	  own command line (the open --secret NAME=VALUE issue).
+#
+# TODO (technical debt):
+#	- The runner's parts are built from copies of its options, so a change
+#	  after construction is not seen; give them a shared read-only options
+#	  object, which also makes a runner reusable.
+#	- Make every remaining string error an App::Actions::Error, module by
+#	  module, until t/unit.t's @DOCUMENTED holds only statuses.
+#	- t/bin/fake-docker is 23% covered and the suite depends on it: make it a
+#	  small tested module, or measure what the suite exercises.
+#	- Windows pulls and runs jobs one at a time; Win32::Process or IPC::Open3
+#	  could give it parallel pulls and jobs instead of the serial fallback.
+#	- The timing tests (t/regex.t, the linear-time checks in t/function.t)
+#	  compare ratios now; counting operations instead of measuring time would
+#	  end their flakiness.
+
 # The options a run is configured with, and the Params::Validate::Strict rule
 # of each.  new() accepts them, run(), preflight() and list_jobs() accept them
 # again as overrides, and every one is handed to App::Actions::Runner under
@@ -61,11 +111,11 @@ App::Actions - run GitHub Actions workflows locally
 
 =head1 VERSION
 
-0.002.0
+0.002.1
 
 =cut
 
-our $VERSION = '0.002.0';
+use version; our $VERSION = version->declare('0.002.1');
 
 =head1 SYNOPSIS
 
@@ -683,10 +733,6 @@ The schemas live in L<App::Actions::Check>, L<App::Actions::Runner>,
 L<App::Actions::Cache> and L<App::Actions::Logs>, so the contract is
 available from an installed distribution.
 
-=head3 SIDE EFFECTS
-
-None.
-
 =head3 EXAMPLE
 
 	my $schema = App::Actions->json_schema('check');
@@ -862,7 +908,6 @@ sub _overrides {
 #              passed, or undef; $workflow_file - the workflow's absolute path.
 # Exit status: Returns the absolute project directory; throws when it cannot
 #              be inferred or does not exist.
-# Side effects: None.
 sub _project_dir {
 	my ($class, $given, $workflow_file) = @_;
 

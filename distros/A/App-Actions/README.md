@@ -4,7 +4,7 @@ App::Actions - run GitHub Actions workflows locally
 
 ## Version
 
-0.002.0
+0.002.1
 
 ## Synopsis
 
@@ -565,10 +565,6 @@ The schema as a hash reference, which is what `action-run schema` prints.
 The schemas live in [App::Actions::Check](https://metacpan.org/pod/App%3A%3AActions%3A%3ACheck), [App::Actions::Runner](https://metacpan.org/pod/App%3A%3AActions%3A%3ARunner),
 [App::Actions::Cache](https://metacpan.org/pod/App%3A%3AActions%3A%3ACache) and [App::Actions::Logs](https://metacpan.org/pod/App%3A%3AActions%3A%3ALogs), so the contract is
 available from an installed distribution.
-
-#### Side Effects
-
-None.
 
 #### Example
 

@@ -17,6 +17,7 @@
 #include "tkr/tkr_rule.h"
 #include "tkr/tkr_rrule.h"
 #include "tkr/tkr_cron.h"
+#include "tkr/tkr_describe.h"
 #include "tkr/tkr_obj.h"
 #include "tkr/tkr_zone.h"
 #include "tkr/tkr_walk.h"

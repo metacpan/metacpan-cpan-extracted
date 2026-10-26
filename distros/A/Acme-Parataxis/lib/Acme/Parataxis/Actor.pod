@@ -1,0 +1,256 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Actor - A Fiber with a Mailbox
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async];
+    use Acme::Parataxis::Actor;
+
+    async {
+        my $upper = Acme::Parataxis::Actor->spawn( sub ( $self, $msg ) {
+            return uc $msg->{text};
+        } );
+
+        # ask: queue a message and get a future for the handler's answer
+        say $upper->ask( { text => 'hello' } )->await;    # HELLO
+
+        # send: queue a message, expect no answer
+        $upper->send( { text => 'nobody is reading this' } );
+
+        # handle what is queued, then shutdown gracefully
+        $upper->stop;
+    };
+
+=head1 DESCRIPTION
+
+An actor is a fiber with a mailbox. C<spawn> starts one, hands it a handler, and returns immediately. The handler runs
+in the actor's own fiber, one message at a time, so no other fiber ever executes it and the state the actor owns needs
+no lock: keep the resource in a closure and reach it with messages.
+
+Two verbs do the talking. C<ask( $msg )> queues a message and returns a L<Future|Acme::Parataxis::Future> that resolves
+with the handler's return value; C<send( $msg )> queues one and moves on. C<stop> drains what is queued and ends the
+actor. Messages are handled in the order they were sent, so answers come back in the order they were asked for, however
+many fibers are asking at once.
+
+The handler is called as C<< sub ( $self, $msg ) { ... } >>, so it can use C<$self> to talk back. It is ordinary
+cooperative code - C<await_sleep>, futures, another actor's C<ask>, a mutex - and the actor waits for it to return
+before it takes the next message.
+
+The mailbox is a bounded L<Channel|Acme::Parataxis::Channel>, so a handler slower than its senders pushes back rather
+than growing a queue. A full mailbox parks the sender, and that is an ordinary fiber wait, so
+L<with_timeout|Acme::Parataxis::with_timeout> and cancellation tokens bound a round-trip like anything else.
+
+All of it belongs inside a scheduled fiber - an C<async> block, a C<fiber>, a nursery child - which is where C<spawn>
+has to be called from, and where an C<ask>/C<send> that finds the mailbox full parks.
+
+An actor can also be L<found by name|/"THE NAME REGISTRY">, have its handler replaced while it runs (C<swap>), and be
+restarted from scratch (C<respawn>, which is what a L<Supervisor|Acme::Parataxis::Supervisor> calls).
+
+=head1 METHODS
+
+=head2 C<spawn( sub ( $self, $msg ) { ... }, [ $capacity ], %opts )>
+
+    my $actor = Acme::Parataxis::Actor->spawn( $handler, 16, supervised => 1 );
+
+Starts an actor and returns immediately; it begins taking messages as soon as the scheduler next runs its fiber.
+Whatever the handler returns is the answer to an C<ask>, and is dropped for a C<send>. C<$capacity> is how many
+messages the mailbox holds before senders start parking (default 16).
+
+=over
+
+=item * C<supervised =E<gt> 1>
+
+A handler die kills the actor instead of only failing that one message - the failure a supervisor can notice and
+restart from. See L</"WHEN A HANDLER DIES">.
+
+=item * C<name =E<gt> $name>
+
+Registers the actor process-wide so L<Acme::Parataxis::actor( $name )|Acme::Parataxis::actor> can find it.
+
+=back
+
+Croaks outside a scheduled fiber, on a C<$capacity> below 1, on an unknown option, and on a name that another live
+actor already holds.
+
+=head2 C<ask( $msg )>
+
+    say $actor->ask( { cmd => 'ping' } )->await;    # 'pong'
+
+Queues C<$msg> and returns a L<Future|Acme::Parataxis::Future> that resolves with the handler's return value or fails
+with the handler's error (see L</"WHEN A HANDLER DIES">). Croaks if the actor is stopping or gone.
+
+=head2 C<send( $msg )>
+
+    $actor->send( { cmd => 'log' } );    # fire and forget
+
+Queues C<$msg> with no answer expected and returns true once it is queued, parking the calling fiber while the mailbox
+is full. Croaks if the actor is stopping or gone.
+
+=head2 C<stop( )>
+
+    $actor->stop;    # returns $self
+
+Queues a shutdown behind whatever is already in the mailbox, so that work drains, and then ends the actor's fiber. From
+the C<stop> on, C<ask> and C<send> croak. Idempotent. To wait for the drain to finish, await a
+L<Monitor|Acme::Parataxis::Monitor> on the actor:
+
+    Acme::Parataxis::Monitor->new($actor)->await;    # returns once the actor is really gone
+
+=head2 C<is_alive( )>
+
+False once the actor is gone. It stays true while a C<stop> drains, so it answers "is it still going", not "is it done"
+- see L</"stop( )"> for the way to wait.
+
+=head2 C<on_death( $cb )>
+
+    $actor->on_death( sub ( $actor, $error ) { warn "worker gone: $error" } );
+
+Registers C<$cb>, which must be a code ref, and returns C<$self>. C<$cb> fires exactly once, as C<< $cb->( $actor,
+$error ) >>, with C<$error> set to whatever killed the actor or C<undef> for a clean C<stop>. An actor that is already
+gone calls back immediately, so a watcher never has to check first. This is how a
+L<Supervisor|Acme::Parataxis::Supervisor> learns a child died; to watch an actor you do not own, use a
+L<Monitor|Acme::Parataxis::Monitor> instead.
+
+=head2 C<error( )>
+
+What killed the actor, or C<undef> while it runs and after a clean C<stop>.
+
+=head2 C<name( )>
+
+The name it was registered under, or C<undef> for an unnamed actor.
+
+=head2 C<fid( )>
+
+The fiber id of the actor's own fiber.
+
+=head2 C<swap( $code )>
+
+    $actor->swap( sub ( $self, $msg ) { ... } );    # returns $self
+
+Replaces the handler for every message dispatched from now on. The change lands at the next message boundary, with no
+drain and no restart of the actor: a message already being handled finishes with the old code. Croaks on a non-code
+ref, and on an actor that is already gone.
+
+=head2 C<respawn( )>
+
+    my $fresh = $actor->respawn;
+
+A new, already-running actor with the same handler, capacity, and options - C<supervised> and C<name> included, so a
+restarted actor keeps answering its registry key. It is a new object with a new mailbox rather than a restart of this
+one, so asks still outstanding against the dead actor fail there instead of being answered here. This is what a
+supervisor starts in place of a dead child.
+
+=head1 THE NAME REGISTRY
+
+=head2 C<Acme::Parataxis-E<gt>actor( $name )> / C<Acme::Parataxis-E<gt>whereis( $name )>
+
+    my $actor = Acme::Parataxis->actor('billing');    # or Acme::Parataxis::actor('billing')
+
+Returns the handle of the actor spawned with C<name =E<gt> $name>, or C<undef> when no live actor holds the name.
+C<whereis> is an alias. The table is process-wide, like Erlang's
+L<register|https://www.erlang.org/doc/system/design_principles.htm> table, and only actors given a C<name> are in it.
+The name is released when the actor stops, dies, or is destroyed, so a dead actor never answers a lookup and the name
+is reusable afterwards.
+
+A name is also a strong reference, which is the point of it: a named actor stays alive and keeps answering the lookup
+even after every caller drops its handle. Something has to stop it.
+
+=head1 RECIPES
+
+These are very brief demos that should inspire your work.
+
+=head2 A round-trip with a deadline
+
+    use Acme::Parataxis qw[async with_timeout];
+
+    async {
+        my $reply = $echo->ask( { text => 'hello' } );
+        my $text  = eval { with_timeout( 250, sub { $reply->await } ) } // 'timed out';
+    };
+
+The message keeps its place in the mailbox when the deadline kills the wait, so the actor is none the wiser.
+
+=head2 An actor a supervisor keeps alive
+
+    use Acme::Parataxis::Supervisor;
+
+    my $sup = Acme::Parataxis::Supervisor->new;
+    $sup->supervise(
+        sub { Acme::Parataxis::Actor->spawn( $handler, 16, supervised => 1 ) },
+        name => 'worker'
+    );
+    $sup->run;    # restarts 'worker' whenever it dies
+
+C<supervised =E<gt> 1> is what turns a handler die into a death the supervisor can see. A restart is a I<new> actor, so
+re-fetch the handle from C<< $sup->child('worker') >> or the registry afterwards rather than holding the old one.
+
+=head2 A long-lived worker you can find by name
+
+Spawn the long-lived actor once, with a name, and reach it from anywhere in the process - the name is the handle:
+
+    Acme::Parataxis::Actor->spawn( $handler, 16, name => 'indexer' );
+    ...
+    my $indexer = Acme::Parataxis->actor('indexer') or die 'the indexer is not up';
+    say $indexer->ask( { query => 'parataxis' } )->await;
+
+=head1 WHEN A HANDLER DIES
+
+On the default, unsupervised actor, the die is contained: it fails that one C<ask> and nothing else, or - for a
+C<send>, which has nobody to fail - is reported with C<warn>. Either way the actor carries on with the next message.
+
+With C<supervised =E<gt> 1> the die kills the actor instead. The in-flight ask fails with the handler's error, every
+ask still queued or parked behind it fails with that same error rather than hanging, C<on_death> hooks fire with it,
+and C<error> reports it. That is the failure a supervisor restarts from.
+
+=head1 BEHAVIOR NOTES
+
+=over
+
+=item * Backpressure
+
+A slow handler parks its senders instead of letting the queue grow, so the slowness lands on the senders rather than in
+memory. That park is an ordinary fiber wait, so C<with_timeout>, cancellation tokens, and nursery cancellation
+interrupt it cleanly and the interrupted ask leaves the actor untouched.
+
+=item * Stopping
+
+C<stop> queues its shutdown marker behind the messages already in the mailbox, so those are handled first. A sender
+that was parked on a full mailbox is not queued yet, though: its C<send> can return true with its message dropped, and
+an C<ask> in that position fails with C<'actor stopped before this message was handled!'> rather than hanging.
+
+=item * Talking to yourself
+
+An actor cannot C<ask> itself - the answer it would wait for can only come from the handler that is now waiting for it.
+C<send> to yourself, or ask a second actor.
+
+=item * State
+
+The handler closure handed to C<spawn> is the actor's state: whatever it captures lives as long as the actor does, and
+no other fiber can reach it unless you hand one a reference. A C<defer> written inside a handler runs at the end of
+that message, not at the end of the actor.
+
+=back
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Supervisor>, L<Acme::Parataxis::Channel>, L<Acme::Parataxis::Future>,
+L<Acme::Parataxis::Monitor>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

@@ -30,6 +30,11 @@ use_ok('Database::BI::Controller::Dashboard');
 # Full app used for controller-context tests.
 my $t = Test::Mojo->new('Database::BI');
 
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+# A block near the end redirects its own app; the rest of the file uses this one.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
 # ============================================================================
 # PART 1: Database::BI::Model::DataSource
 # ============================================================================
@@ -845,14 +850,23 @@ subtest 'Dashboard::_resolve_language -- uses config default when no header' => 
 	is $lang, 'en', 'falls back to config default when Accept-Language absent';
 };
 
-subtest 'Dashboard::_resolve_language -- valid header parsed, falls back when no templates' => sub {
+subtest 'Dashboard::_resolve_language -- header naming a language with no templates falls back' => sub {
 	my $tx = $t->ua->build_tx(GET => '/');
-	# 'fr' has no template directory in this installation; should fall back to 'en'.
-	$tx->req->headers->header('Accept-Language' => 'fr-FR,fr;q=0.9,en;q=0.8');
+	# The distribution ships templates/web/en only, so 'de' cannot be served
+	# whatever the header asks for: the default language is what can render.
+	$tx->req->headers->header('Accept-Language' => 'de-DE,de;q=0.9');
 	my $c    = $t->app->build_controller($tx);
 	my $lang = Database::BI::Controller::Dashboard::_resolve_language($c, 'web', 'en');
-	ok $lang eq 'fr' || $lang eq 'en',
-		"resolved language is 'fr' or 'en' (fallback when no fr templates)";
+	is $lang, 'en', 'a language with no template directory falls back to the default one';
+};
+
+subtest 'Dashboard::_resolve_language -- configured language with no templates falls back' => sub {
+	my $tx = $t->ua->build_tx(GET => '/');
+	$tx->req->headers->remove('Accept-Language');
+	my $c    = $t->app->build_controller($tx);
+	my $lang = Database::BI::Controller::Dashboard::_resolve_language($c, 'web', 'de');
+	is $lang, 'en',
+		'the configured code is checked like any other, not only the one the header produced';
 };
 
 subtest 'Dashboard::_resolve_language -- garbage header falls back to default' => sub {

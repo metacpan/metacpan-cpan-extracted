@@ -9,12 +9,8 @@ README.md
 bin/perl-version-bump
 dist.ini
 lib/Perl/Version/Bumper.pm
-mess/TODO
-mess/foo
-mess/mk_test_for.pl
-mess/mk_test_for2.pl
-mess/presentation.md
-mess/testing
+lib/Perl/Version/Bumper/Helper/Version.pm
+lib/Perl/Version/Bumper/Rationale.pod
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -63,6 +59,7 @@ t/bump/126_apostrophe_as_package_separator.data
 t/bump/127_smartmatch.data
 t/bump/128_keyword_all.data
 t/bump/129_keyword_any.data
+t/bump/130_enhanced_xx.data
 t/bump_safely.t
 t/bump_safely/001_die.data
 t/bump_safely/002_v585.data

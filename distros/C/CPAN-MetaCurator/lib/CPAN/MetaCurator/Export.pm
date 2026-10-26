@@ -28,7 +28,7 @@ has jstree_html_path => (Str, default => sub{return ''}, chained => 1);
 our $leaf_id;
 our %seen;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 # --------------------------------------------------
 
@@ -94,8 +94,7 @@ sub build_dag_tree
 
 		# If the topic is ChangeLog[12]:
 		# $token ne '':
-		# a. Author
-		# b. V 1.23 many times
+		# a. V 1.23 many times
 		# Else it's a normal topic:
 		# $token ne '':
 		# a. See also
@@ -106,7 +105,7 @@ sub build_dag_tree
 		# e. <pre>
 		# f. </pre>
 
-		if ($token =~ /Author|See also/)
+		if ($token =~ /See also/)
 		{
 			$inside{see_also}	= true;
 			$see_also_root		= Tree::DAG_Node -> new({name => '&#8853; See also', attributes => {id => ++$leaf_id, description => '', uri => ''} });
@@ -154,11 +153,11 @@ sub build_dag_tree
 
 				$see_also_root -> add_daughter($leaf);
 			}
-			elsif ( ($line_count == 1) && ($$topic{title} !~ /ChangeLog/) )
+			elsif ( ($line_count == 1) && ($$topic{title} !~ /Author|ChangeLog/) )
 			{
 				$$item{description} = $token;
 			}
-			elsif ( ($line_count == 2) && ($$topic{title} !~ /ChangeLog/) )
+			elsif ( ($line_count == 2) && ($$topic{title} !~ /Author|ChangeLog/) )
 			{
 				$$item{text}	= $token; # Module name.
 				$leaf			= Tree::DAG_Node -> new({name => $module, attributes => {id => ++$leaf_id, description => $$item{description}, uri => $$item{text}} });

@@ -11,7 +11,7 @@ use Unblock::HTTP1::_Native ();
 use Unblock::HTTP1::_Wire ();
 use Unblock::HTTP1::Transaction;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %option) = @_;
@@ -105,7 +105,8 @@ sub _start_next {
     $tx->{send_plan} = $plan;
     $tx->{local_done} = $plan->{body_finalized} ? 1 : 0;
     $self->{active} = $tx;
-    $self->_queue_output($plan->{wire});
+    # Keep framing state, but transfer serialized bytes to the output queue.
+    $self->_queue_output(delete $plan->{wire});
     return;
 }
 
@@ -721,8 +722,10 @@ passed to C<Uniform::HTTP::Request-E<gt>new()>:
     on_informational
     on_response
     on_body
+    on_data
     on_complete
     on_error
+    on_finish
     on_switch
     on_drain
 
@@ -776,6 +779,16 @@ Called zero or more times with response body bytes.
 HTTP transfer framing such as chunk boundaries has already been removed.
 Unblock does not automatically decode content codings such as gzip.
 
+=head2 on_data
+
+    on_data => sub {
+        my ($tx, $bytes) = @_;
+    }
+
+Receives decoded response body chunks without buffering the full body.
+Supplying C<on_data> to C<request()> selects streaming for that transaction.
+Do not combine C<on_data> with C<on_body>.
+
 =head2 on_complete
 
     on_complete => sub {
@@ -799,6 +812,16 @@ Protocol errors, unexpected EOF, callback failures, transport failure, or a
 non-reusable connection that invalidates queued work can lead here.
 
 The transaction state is C<error> when this callback is invoked.
+
+=head2 on_finish
+
+    on_finish => sub {
+        my ($tx) = @_;
+    }
+
+Called once after the transaction becomes complete, cancelled, or errored.
+Unlike C<on_complete>, it also covers unsuccessful terminal outcomes.
+See L<Unblock::HTTP1::Transaction/RECEIVE AND FINISH CALLBACKS>.
 
 =head2 on_switch
 

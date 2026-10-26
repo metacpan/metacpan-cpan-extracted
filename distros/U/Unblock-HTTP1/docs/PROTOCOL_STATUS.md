@@ -74,6 +74,7 @@ Implemented:
 - HTTP/1.0 keep-alive
 - serial client request queueing
 - server-side pipelined input boundary preservation
+- graceful per-connection drain without admitting later pipelined requests
 - cancellation
 - early final responses
 - connection reuse decisions

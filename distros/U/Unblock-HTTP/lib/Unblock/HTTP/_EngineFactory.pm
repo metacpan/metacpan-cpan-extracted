@@ -18,7 +18,8 @@ sub create {
     croak "unsupported HTTP protocol '$protocol'" unless exists $ENGINE{$protocol};
     my $module = $ENGINE{$protocol} . '::' . $role;
     (my $file = $module) =~ s{::}{/}g;
-    require "$file.pm";
+    my $loaded = eval { require "$file.pm"; 1 };
+    croak "enabled HTTP protocol '$protocol' requires $module: $@" unless $loaded;
     if ($role eq 'Server') {
         my $transaction = $ENGINE{$protocol} . '::Transaction';
         croak "$module needs the receive/lifecycle engine feature branch (on_data and on_finish)"

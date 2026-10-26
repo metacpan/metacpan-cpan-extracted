@@ -8,7 +8,7 @@ use JSON::PP ();
 use App::Actions::Error;
 use App::Actions::Schema::Invalid;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 our @EXPORT_OK = qw(validate assert_valid describe_errors invalid_exit);
 
@@ -516,86 +516,86 @@ declare the values it works with.  A name ending in C<?> is an input, and a
 name ending in C<!> is an output.  The lines below the rule are always true
 when the routine returns.  None of these routines has a state.
 
-	[VALUE, SCHEMA, PATH]
-	matches : VALUE × SCHEMA → 𝔹
-	problems : VALUE × SCHEMA × PATH → seq MESSAGE
+    [VALUE, SCHEMA, PATH]
+    matches : VALUE × SCHEMA → 𝔹
+    problems : VALUE × SCHEMA × PATH → seq MESSAGE
 
-	matches(v, s) ⇔ problems(v, s, "$") = ⟨⟩
+    matches(v, s) ⇔ problems(v, s, "$") = ⟨⟩
 
 =head2 validate
 
-	┌─ Validate ────────────────────────────────────────
-	│ value?  : VALUE
-	│ schema? : SCHEMA
-	│ path?   : optional PATH
-	│ errors! : seq MESSAGE
-	├───────────────────────────────────────────────────
-	│ errors! = problems(value?, schema?, if path? = ⊥ then "$" else path?)
-	│ oneOf ∈ dom schema? ⇒
-	│     (∃ a ∈ ran schema?.oneOf • problems(value?, a, path?) = ⟨⟩)
-	│         ⇔ errors! = ⟨⟩
-	│ value? ∈ OBJECT ∧ properties ∈ dom schema? ⇒
-	│     ∀ k ∈ dom value? \ dom schema?.properties • "path?.k: unexpected key" in errors!
-	│     ∀ k ∈ ran schema?.required \ dom value? • "path?.k: missing" in errors!
-	│ value? ∈ ARRAY ∧ items ∈ dom schema? ⇒
-	│     ∀ i ∈ dom value? • problems(value?(i), schema?.items, path?[i]) ⊆ errors!
-	└───────────────────────────────────────────────────
+    ┌─ Validate ────────────────────────────────────────
+    │ value?  : VALUE
+    │ schema? : SCHEMA
+    │ path?   : optional PATH
+    │ errors! : seq MESSAGE
+    ├───────────────────────────────────────────────────
+    │ errors! = problems(value?, schema?, if path? = ⊥ then "$" else path?)
+    │ oneOf ∈ dom schema? ⇒
+    │     (∃ a ∈ ran schema?.oneOf • problems(value?, a, path?) = ⟨⟩)
+    │         ⇔ errors! = ⟨⟩
+    │ value? ∈ OBJECT ∧ properties ∈ dom schema? ⇒
+    │     ∀ k ∈ dom value? \ dom schema?.properties • "path?.k: unexpected key" in errors!
+    │     ∀ k ∈ ran schema?.required \ dom value? • "path?.k: missing" in errors!
+    │ value? ∈ ARRAY ∧ items ∈ dom schema? ⇒
+    │     ∀ i ∈ dom value? • problems(value?(i), schema?.items, path?[i]) ⊆ errors!
+    └───────────────────────────────────────────────────
 
 =head2 assert_valid
 
-	┌─ AssertValid ─────────────────────────────────────
-	│ value?  : VALUE
-	│ schema? : SCHEMA
-	│ what?   : seq CHAR
-	│ r!      : ℕ
-	├───────────────────────────────────────────────────
-	│ problems(value?, schema?, "$") = ⟨⟩ ⇒ r! = 1
-	│ problems(value?, schema?, "$") = e ≠ ⟨⟩ ⇒
-	│     raises Invalid(what? ⁀ ": " ⁀ describe(e) ⁀ "\n")
-	└───────────────────────────────────────────────────
+    ┌─ AssertValid ─────────────────────────────────────
+    │ value?  : VALUE
+    │ schema? : SCHEMA
+    │ what?   : seq CHAR
+    │ r!      : ℕ
+    ├───────────────────────────────────────────────────
+    │ problems(value?, schema?, "$") = ⟨⟩ ⇒ r! = 1
+    │ problems(value?, schema?, "$") = e ≠ ⟨⟩ ⇒
+    │     raises Invalid(what? ⁀ ": " ⁀ describe(e) ⁀ "\n")
+    └───────────────────────────────────────────────────
 
 =head2 describe_errors
 
-	┌─ DescribeErrors ──────────────────────────────────
-	│ errors? : seq MESSAGE
-	│ text!   : seq CHAR
-	├───────────────────────────────────────────────────
-	│ errors? = ⟨⟩ ⇒ text! = ⟨⟩
-	│ #errors? = 1 ⇒ text! = head errors?
-	│ #errors? > 1 ⇒ text! = head errors? ⁀ " (and " ⁀ show(#errors? − 1) ⁀ " more)"
-	└───────────────────────────────────────────────────
+    ┌─ DescribeErrors ──────────────────────────────────
+    │ errors? : seq MESSAGE
+    │ text!   : seq CHAR
+    ├───────────────────────────────────────────────────
+    │ errors? = ⟨⟩ ⇒ text! = ⟨⟩
+    │ #errors? = 1 ⇒ text! = head errors?
+    │ #errors? > 1 ⇒ text! = head errors? ⁀ " (and " ⁀ show(#errors? − 1) ⁀ " more)"
+    └───────────────────────────────────────────────────
 
 =head2 invalid_exit
 
-	┌─ InvalidExit ─────────────────────────────────────
-	│ status! : ℕ
-	├───────────────────────────────────────────────────
-	│ status! = 70
-	└───────────────────────────────────────────────────
+    ┌─ InvalidExit ─────────────────────────────────────
+    │ status! : ℕ
+    ├───────────────────────────────────────────────────
+    │ status! = 70
+    └───────────────────────────────────────────────────
 
 =head1 STATE DIAGRAM
 
 The module keeps no state between calls.  A document goes through these
 steps when a command checks it:
 
-	  build document
-	        |
-	        v
-	+---------------+  validate / assert_valid   +-----------+
-	|   UNCHECKED   |--------------------------->| CHECKING  |
-	+---------------+                            +-----------+
-	                                              |         |
-	                         no problems          |         | one or more problems
-	                      (validate: ();          |         | (validate: list of messages;
-	                       assert_valid: 1)       |         |  assert_valid: throws
-	                                              v         v  App::Actions::Schema::Invalid)
-	                                        +-------+   +---------+
-	                                        | VALID |   | INVALID |
-	                                        +-------+   +---------+
-	                                            |            |
-	                         command prints it  |            | describe_errors; command
-	                                            v            v exits with invalid_exit() = 70
-	                                        printed       not printed
+      build document
+            |
+            v
+    +---------------+  validate / assert_valid   +-----------+
+    |   UNCHECKED   |--------------------------->| CHECKING  |
+    +---------------+                            +-----------+
+                                                  |         |
+                             no problems          |         | one or more problems
+                          (validate: ();          |         | (validate: list of messages;
+                           assert_valid: 1)       |         |  assert_valid: throws
+                                                  v         v  App::Actions::Schema::Invalid)
+                                            +-------+   +---------+
+                                            | VALID |   | INVALID |
+                                            +-------+   +---------+
+                                                |            |
+                             command prints it  |            | describe_errors; command
+                                                v            v exits with invalid_exit() = 70
+                                            printed       not printed
 
 =head1 LICENSE AND COPYRIGHT
 

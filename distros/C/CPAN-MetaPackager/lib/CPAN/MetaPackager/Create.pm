@@ -1,6 +1,5 @@
 package CPAN::MetaPackager::Create;
 
-use 5.36.0;
 use parent 'CPAN::MetaPackager::Database';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
@@ -8,7 +7,7 @@ use Moo;
 
 use Types::Standard qw/Object Str/;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # -----------------------------------------------
 

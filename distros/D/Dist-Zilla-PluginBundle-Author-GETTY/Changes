@@ -1,3 +1,74 @@
+0.327     2026-10-26 00:40:01Z
+
+  - The CI documentation says when the "v1" tag of the dzil-test action
+    moves, so it is clear that a dist pinned to "@main" gets every change at
+    once while "@v1" gets it when the maintainer moves the tag.
+
+  - A "no_cpan" dist gets [FakeRelease] in place of the removed
+    UploadToCPAN, so "dzil release" no longer aborts with "can't release
+    without any Releaser plugins" and still tags, bumps the version and
+    pushes. It is left out when the dist has a Releaser of its own (the
+    default Docker subsection or run_release).
+
+  - Test::ChangesHasContent is no longer added with "no_changes" or "task":
+    there is no version heading in Changes then, so its release test could
+    only fail.
+
+  - The documentation matches the code: the "equivalent to" listing shows
+    the plugins configure() really assembles, and the Docker subsection no
+    longer documents a "context" option that was never passed on. The
+    cpanfile requires Dist::Zilla::Plugin::Authority 1.009, the version the
+    bundle demands at build time.
+
+  - The documented POD commands =resource and =event now work (they were
+    passed through as unknown commands and broke POD on MetaCPAN), and the
+    docs say that =seealso, =synopsis and =description take no argument.
+
+  - The SUPPORT section no longer says bugs are reported "on GitHub": the
+    tracker URL may be a Codeberg or Forgejo one, so the sentence just names
+    the link.
+
+  - GitHub and Gitea/Forgejo detection asks git for the remotes instead of
+    parsing .git/config, so a dist checked out as a linked worktree or a
+    submodule keeps GithubMeta/GiteaMeta, the bugtracker metadata and
+    GitHub::CreateRelease. The host is taken from origin, as GiteaMeta does,
+    not from whichever remote is listed first.
+
+  - The link to https://raudssus.de/ is added to the COPYRIGHT AND LICENSE
+    section by the weaver bundle, so copyright_holder can stay plain text and
+    the generated README and LICENSE no longer print "L<...>" markup. A holder
+    that still carries the link is not given it twice.
+
+  - The option conflicts (weaver_config with task, author with no_cpan,
+    no_install with no_makemaker) now abort with their own message instead
+    of "Can't locate object method log_fatal".
+
+  - The Docker subsection no longer sets build_load or passes release_load
+    through: Docker::API has dropped both, as nothing ever read them, and
+    would warn on every build. The platform option documents that it takes
+    exactly one value.
+
+  - New "no_license" attribute: the bundle neither generates a LICENSE nor
+    demands a committed one. "no_cpan" now implies it, so a private dist no
+    longer aborts with "no LICENSE in the distribution". A LICENSE that is
+    committed anyway is still shipped, just no longer checked against
+    dist.ini. Set "no_license = 0" to keep the check, or
+    "generate_license = 1" to keep the generated file.
+
+  - The shared dzil-test CI action installs from https://cpan.metacpan.org
+    by default (same default as the SimpiCI provider). The runner needs an
+    https-capable cpanm (curl, wget or IO::Socket::SSL, plus CA
+    certificates); the official perl images have that. "cpanm-opts" still
+    overrides the default.
+
+  - The SimpiCI provider runs its dzil test jobs in prebuilt images,
+    ghcr.io/getty/dzil-perl:<ver> (perl:<ver> with Dist::Zilla, this bundle
+    and its author-test deps preinstalled), rebuilt weekly for every version
+    in perl-versions, so a job no longer installs ~200 CPAN modules first.
+    The job files are now named "ghcr.io+getty+dzil-perl+<ver>+test.sh": a
+    dist overriding one version's job ships that name, while a
+    "perl+<ver>+test.sh" of its own now runs in addition.
+
 0.326     2026-09-29 17:20:32Z
 
   - Every distribution built with [@Author::GETTY] now snapshots its agent

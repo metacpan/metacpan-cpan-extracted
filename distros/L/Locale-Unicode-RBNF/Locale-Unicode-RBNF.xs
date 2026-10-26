@@ -1,29 +1,32 @@
-/*----------------------------------------------------------------------------
-** Unicode Rule-Based Number Format - ~/Locale-Unicode-RBNF.xs
-** Version v0.1.0
-** Copyright(c) 2026 DEGUEST Pte. Ltd.
-** Author: Jacques Deguest <jack@deguest.jp>
-** Created 2026/10/22
-** Modified 2026/10/22
-** All rights reserved
-**
-** This program is free software; you can redistribute  it  and/or  modify  it
-** under the same terms as Perl itself.
-**----------------------------------------------------------------------------
-** Parsing engine of Locale::Unicode::RBNF in C. It is a port of the parse code paths of ICU4C
-** 79.1 (NFRuleSet::parse, NFRule::doParse, NFRule::matchToDelimiter, NFRule::findText,
-** NFRule::findTextLenient, NFRule::prefixLength, NFSubstitution::doParse and its overrides,
-** PluralFormat::parseType), mirroring line for line the pure Perl implementation of this
-** distribution, which remains the fallback. Formatting is not done here.
-**
-** The rules are compiled from the Perl objects into flat arrays by
-** Locale::Unicode::RBNF::_xs_engine(). Strings are held as arrays of code points, so that
-** positions are counted in characters, as in Perl.
-**
-** Unicode properties that are not trivial for ASCII (simple case folding, separators, NFC
-** boundaries, NFC normalisation and decimal digit values) are obtained from Perl callbacks,
-** and cached per code point.
-*/
+/*---------------------------------------------------------------------------
+ * Locale::Unicode::RBNF - ~/Locale-Unicode-RBNF.xs
+ * Version v0.1.0
+ * Copyright(c) 2026 DEGUEST Pte. Ltd.
+ * Author: Jacques Deguest <jack@deguest.jp>
+ * Created  2026/10/22
+ * Modified 2026/10/22
+ *
+ * XS implementations of keys functions for Locale-Unicode-RBNF.
+ *
+ * This program is free software; you can redistribute  it  and/or  modify  it
+ * under the same terms as Perl itself.
+ *---------------------------------------------------------------------------*/
+/*
+ * Parsing engine of Locale::Unicode::RBNF in C.
+ * This is a port of the parse code paths of ICU4C 79.1 (NFRuleSet::parse, NFRule::doParse, 
+ * NFRule::matchToDelimiter, NFRule::findText, NFRule::findTextLenient,
+ * NFRule::prefixLength, NFSubstitution::doParse and its overrides, 
+ * PluralFormat::parseType). It mirrors the pure-Perl implementation of this
+ * distribution, which remains the fallback. Formatting is not done here.
+ *
+ * The rules are compiled from the Perl objects into flat arrays by
+ * Locale::Unicode::RBNF::_xs_engine(). Strings are held as arrays of code points so that
+ * positions are counted in characters, as in Perl.
+ *
+ * Unicode properties that are not trivial for ASCII (simple case folding, separators, NFC
+ * boundaries, NFC normalisation and decimal digit values) are obtained from Perl callbacks
+ * and cached per code point.
+ */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -78,7 +81,7 @@ typedef struct
     int sub1;
     int sub2;
     int plural;
-    /* For a rule with a plural pattern: the position of "$(" and the one following ")$" */
+    /* For a rule with a plural pattern, the position of "$(" and the one following ")$" */
     IV pl_start;
     IV pl_suffix;
 } rule_t;
@@ -139,8 +142,9 @@ typedef struct
 } cpmap;
 
 /* Prepared rule text prefix for lenient matching: NFC characters, their folding, and whether
-** each one is a separator. Keyed by the address and length of the prefix, which always points
-** into the memory of the engine. */
+ * each one is a separator. Keyed by the address and length of the prefix, which always points
+ * into the memory of the engine.
+ */
 typedef struct
 {
     const U32 *key;

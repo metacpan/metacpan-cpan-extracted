@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +24,7 @@ requires:
   parent: '0.221'
 resources:
   repository: https://github.com/dankogai/p5-encode
-version: '3.24'
+version: '3.25'
 x_contributors:
   - 'Alex Davies <alex.davies@talktalk.net>'
   - 'Alex Kapranoff <alex@kapranoff.ru>'
@@ -109,4 +109,4 @@ x_contributors:
   - 'Ville Skyttä <ville.skytta@iki.fi>'
   - 'Vincent van Dam <vvandam@sandvine.com>'
   - 'Yitzchak Scott-Thoennes <sthoenna@efn.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -13,7 +13,7 @@ use App::Actions::Cache;
 use App::Actions::I18N qw(i18n throw validate_args);
 use App::Actions::Runner::Support qw(action_inputs chomp_error default_logger local_action_dir trim_error);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The image a job without a container or a known runner label runs in.
 Readonly::Scalar my $DEFAULT_IMAGE => 'ubuntu:latest';
@@ -483,6 +483,9 @@ sub prepare {
 	my $quiet = $params->{quiet} ? 1 : 0;
 
 	my @records = map { $self->_initial_record($_, $quiet) } @{ $self->required($params->{instances}) };
+	# What this run uses, whether it pulls it or not: a kept image it finds is
+	# used again, which the record of kept images is told at the end.
+	$self->{used}{ $_->{image} } = 1 for grep { $_->{status} eq 'present' } @records;
 	my @pending = grep { $_->{status} eq 'pending' } @records;
 
 	# --no-pull is advice, so it stops the run before any image is
@@ -510,6 +513,7 @@ sub prepare {
 		} else {
 			$self->{pulled}{ $record->{image} } = 1 unless $record->{present};
 			$self->{pulled_once}{ $record->{image} } = 1;
+			$self->{used}{ $record->{image} } = 1;
 			$record->{status} = 'pulled';
 		}
 	}
@@ -715,7 +719,10 @@ sub ensure {
 	return 1 if $self->{dry_run} || $self->{pulled_once}{$image};
 
 	my $exists = $self->{docker}->image_exists($image);
-	return 1 if $exists && !$self->{pull};
+	if ($exists && !$self->{pull}) {
+		$self->{used}{$image} = 1;
+		return 1;
+	}
 
 	# Advice rather than a fault in the code, so it names no source line.
 	$self->throw('runner.image.not_local', { image => $image, location => 0 }) if $self->{no_pull};
@@ -724,6 +731,7 @@ sub ensure {
 	$self->{docker}->pull($image);
 	$self->{pulled}{$image} = 1 unless $exists;
 	$self->{pulled_once}{$image} = 1;
+	$self->{used}{$image} = 1;
 
 	return 1;
 }
@@ -795,13 +803,83 @@ sub pulled {
 	return [ sort keys %{ $self->{pulled} } ];
 }
 
+=head2 used
+
+Returns a sorted array reference of the images this run made sure of: the
+ones it found already there as well as the ones it pulled.
+
+=head3 EXAMPLE
+
+	my %pulled = map { $_ => 1 } @{ $images->pulled };
+	my @reused = grep { !$pulled{$_} } @{ $images->used };
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{}
+
+=head4 OUTPUT
+
+	{ type => 'arrayref' }
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub used {
+	my ($self) = @_;
+
+	return [ sort keys %{ $self->{used} || {} } ];
+}
+
+=head2 note_used
+
+	$images->note_used(@images);
+
+Records images this run used in another process: a job that ran in a child
+of the parallel runner.  Returns the object.
+
+=head3 EXAMPLE
+
+	$images->note_used(@{ $result->{used} || [] });
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ images => { type => 'arrayref' } }
+
+=head4 OUTPUT
+
+	{ type => 'object', isa => 'App::Actions::Runner::Images' }
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub note_used {
+	my ($self, @images) = @_;
+
+	$self->{used}{$_} = 1 for grep { defined && length } @images;
+
+	return $self;
+}
+
 =head2 remember
 
 	$images->remember($cache_file);
 
 Records the images this run pulled in the cache file that
 C<action-run cache> reads, because the images a run keeps are the next run's
-cache.  A failure to write the record does not fail a run that otherwise
+cache.  The images it used without pulling them have their last use updated
+if the record already holds them (L<App::Actions::Cache/touch>), so a kept
+image that every run uses is not taken for an old one by
+C<action-run cache --prune --older-than>.  A failure to write the record does not fail a run that otherwise
 worked: the images are still on disk, and the next run records them again.
 
 =head3 ARGUMENTS
@@ -851,9 +929,18 @@ sub remember {
 	local $@;
 
 	my @images = @{ $self->pulled };
-	return $self if !@images || $self->{dry_run};
+	my %pulled = map { $_ => 1 } @images;
+	my @reused = grep { !$pulled{$_} } @{ $self->used };
+	return $self if (!@images && !@reused) || $self->{dry_run};
 
-	my $recorded = eval { App::Actions::Cache->new(file => $cache_file)->remember(@images); 1 };
+	# A kept image this run used without pulling it has been used again, so
+	# its last use moves on; one the record does not hold stays out of it.
+	my $recorded = eval {
+		my $cache = App::Actions::Cache->new(file => $cache_file);
+		$cache->remember(@images) if @images;
+		$cache->touch(@reused) if @reused;
+		1;
+	};
 	$self->{logger}->warn($self->i18n('runner.image.cache_failed', { error => chomp_error($@) }))
 		if !$recorded && $self->{verbose};
 
@@ -1135,8 +1222,9 @@ C<pull_concurrency> says.  L</concurrency> tells you the real number.
 =item * B<With C<pull>, each image is pulled once per run>, not once per
 job.  Call L</ensure> freely.
 
-=item * B<Images pulled in another process are not known> until you call
-L</note_pulled> with them (the parallel runner does this for its children).
+=item * B<Images pulled or used in another process are not known> until you
+call L</note_pulled> and L</note_used> with them (the parallel runner does
+this for its children).
 
 =item * B<L</remember> never fails the run.>  If the cache file cannot be
 written, the run goes on; with C<verbose> a warning is logged.
@@ -1287,14 +1375,33 @@ rule are the conditions that are always true when the routine returns.
 	│ ran images! = pulled ∧ images! is sorted
 	└───────────────────────────────────────────────────
 
+=head2 used
+
+	┌─ Used ────────────────────────────────────────────
+	│ ΞImages
+	│ images! : seq IMAGE
+	├───────────────────────────────────────────────────
+	│ ran images! = used ∧ images! is sorted
+	└───────────────────────────────────────────────────
+
+=head2 note_used
+
+	┌─ NoteUsed ────────────────────────────────────────
+	│ ΔImages
+	│ images? : ℙ IMAGE
+	├───────────────────────────────────────────────────
+	│ used' = used ∪ images?
+	└───────────────────────────────────────────────────
+
 =head2 remember
 
 	┌─ Remember ────────────────────────────────────────
 	│ ΞImages
 	│ ΔCacheFile
 	├───────────────────────────────────────────────────
-	│ pulled ≠ ∅ ∧ ¬ dryRun ⇒ cache' = cache ∪ pulled
-	│ pulled = ∅ ∨ dryRun ⇒ cache' = cache
+	│ reused = used \ pulled
+	│ ¬ dryRun ⇒ cache' = touch(cache ∪ pulled, reused ∩ dom cache)
+	│ dryRun ∨ (pulled = ∅ ∧ reused = ∅) ⇒ cache' = cache
 	└───────────────────────────────────────────────────
 
 =head2 failure_message
@@ -1348,6 +1455,7 @@ downloaded.  One image goes through these states during a run:
 	        | yes
 	        v
 	  remember($cache_file): pulled() recorded for "action-run cache"
+	                          and used() \ pulled() touched if recorded
 
 =head1 LICENSE AND COPYRIGHT
 

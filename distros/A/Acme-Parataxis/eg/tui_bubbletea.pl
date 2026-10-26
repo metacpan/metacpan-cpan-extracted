@@ -53,7 +53,7 @@ sub save_termios {
         my $out_handle = Acme::Parataxis::win32_get_osfhandle( fileno(STDOUT) );
         my $out_buf    = pack( "L", 0 );
         GetConsoleMode( $out_handle, $out_buf );
-        my $out_mode                           = unpack( "L", $out_buf );
+        my $out_mode = unpack 'L', $out_buf;
         my $ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
         SetConsoleMode( $out_handle, $out_mode | $ENABLE_VIRTUAL_TERMINAL_PROCESSING );
     }
@@ -116,7 +116,7 @@ sub disable_raw_mode {
     }
 }
 
-# Terminal size -- platform-aware
+# Terminal size platform-aware
 sub get_terminal_size {
     if ( $^O eq 'MSWin32' ) {
         return _win32_terminal_size();
@@ -128,7 +128,7 @@ sub get_terminal_size {
 
 sub _posix_terminal_size {
 
-    # ioctl(fd, TIOCGWINSZ, &winsize)  --  TIOCGWINSZ = 0x5413 on Linux
+    # ioctl(fd, TIOCGWINSZ, &winsize)   TIOCGWINSZ = 0x5413 on Linux
     my $TIOCGWINSZ = 0x5413;
 
     # struct winsize { unsigned short ws_row; ws_col; ws_xpixel; ws_ypixel; }
@@ -150,7 +150,7 @@ sub _win32_terminal_size {
     #   COORD dwSize           (0:  4 bytes)
     #   COORD dwCursorPosition (4:  4 bytes)
     #   WORD  wAttributes      (8:  2 bytes)
-    #   SMALL_RECT srWindow   (10: 8 bytes -- Left,Top,Right,Bottom as SHORTs)
+    #   SMALL_RECT srWindow   (10: 8 bytes Left,Top,Right,Bottom as SHORTs)
     #   COORD dwMaximumSize    (18: 4 bytes)
     my $handle = Acme::Parataxis::win32_get_osfhandle( fileno(STDOUT) );
     my $csbi   = "\0" x 22;
@@ -170,10 +170,11 @@ sub _win32_terminal_size {
 # ANSI helpers
 sub hide_cursor  { print "\e[?25l" }
 sub show_cursor  { print "\e[?25h" }
-sub clear_screen { print "\e[H\e[2J" }
+sub cls()        {"\e[H\e[2J"}
+sub clear_screen { print cls }
 sub move_to      { my ( $r, $c ) = @_; print "\e[${r};${c}H" }
 
-# Message types (plain hashrefs -- bubbletea-style)
+# Message types (plain hashrefs bubbletea-style)
 sub MsgKey    { { type => 'key',    key   => $_[0] } }
 sub MsgTick   { { type => 'tick',   count => $_[0] } }
 sub MsgResize { { type => 'resize', width => $_[0], height => $_[1] } }
@@ -214,13 +215,13 @@ sub View ($model) {
     my $buf  = '';
     my $list = '';
 
-    # -- title bar --
+    # title bar
     my $title = 'Parataxis TUI Demo (bubbletea-style)';
     $buf .= "\e[1;36m$title\e[0m\r\n";
     $buf .= "\e[2m${w}x${h}\e[0m\r\n";
     $buf .= "\r\n";
 
-    # -- list items --
+    # list items
     for my $i ( 0 .. $#{ $model->{items} } ) {
         my $item   = $model->{items}[$i];
         my $mark   = $model->{toggled}{$i}  ? "\e[32m[x]\e[0m" : "[ ]";
@@ -229,29 +230,29 @@ sub View ($model) {
     }
     $buf .= $list;
 
-    # -- status bar (pad to fill width) --
+    # status bar (pad to fill width)
     $buf .= "\r\n";
     my $status = sprintf 'ticks: %-5d | j/k move  space toggle  q quit', $model->{ticks};
     my $pad    = $w - length($status) - 2;
     $pad = 0 if $pad < 0;
     $buf .= "\e[7m ${status}\e[0m" . ( ' ' x $pad ) . "\r\n";
 
-    # -- center a box to prove we see the real terminal size --
+    # center a box to prove we see the real terminal size
     my $box_w = 32;
     my $box_h = 5;
-    my $bx    = int( ( $w - $box_w ) / 2 );
-    my $by    = int( ( $h - $box_h ) / 2 );
+    my $bx    = int( ( $w - $box_w ) / 2 ) - 2;
+    my $by    = int( ( $h - $box_h ) / 2 ) - 2;
     $bx = 1 if $bx < 1;
     $by = 4 if $by < 4;    # below the list
-    $buf .= "\e[${by};${bx}H\e[1;35m+\e[0m" . ( '-' x ( $box_w - 2 ) ) . "\e[1;35m+\e[0m\r\n";
+    $buf .= "\e[${by};${bx}H\e[1;35m+\e[0m" . ( '-' x ( $box_w - 2 ) ) . "\e[1;35m+\e[0m";
 
     for my $row ( 1 .. $box_h - 2 ) {
         my $inner = $row == 2 ? ' Resize the terminal! ' : '';
         my $pad2  = $box_w - 2 - length($inner);
         $pad2 = 1 if $pad2 < 1;
-        $buf .= "\e[" . ( $by + $row ) . ";${bx}H\e[1;35m|\e[0m${inner}" . ( ' ' x $pad2 ) . "\e[1;35m|\e[0m\r\n";
+        $buf .= "\e[" . ( $by + $row ) . ";${bx}H\e[1;35m|\e[0m${inner}" . ( ' ' x $pad2 ) . "\e[1;35m|\e[0m";
     }
-    $buf .= "\e[" . ( $by + $box_h - 1 ) . ";${bx}H\e[1;35m+\e[0m" . ( '-' x ( $box_w - 2 ) ) . "\e[1;35m+\e[0m\r\n";
+    $buf .= "\e[" . ( $by + $box_h - 1 ) . ";${bx}H\e[1;35m+\e[0m" . ( '-' x ( $box_w - 2 ) ) . "\e[1;35m+\e[0m";
     return $buf;
 }
 
@@ -315,7 +316,7 @@ sub input_fiber ( $ch, $quit ) {
         }
     }
     else {
-        # POSIX: await_read uses select() on a background thread -- fiber
+        # POSIX: await_read uses select() on a background thread fiber
         # suspends until data is ready or the timeout fires.
         my $STDIN = \*STDIN;
         while ( !$quit->count ) {
@@ -427,7 +428,7 @@ async {
     hide_cursor();
     my $messages = Acme::Parataxis::Channel->new( capacity => 64 );
 
-    # Shared quit signal -- broadcast() wakes all fibers checking it
+    # Shared quit signal broadcast() wakes all fibers checking it
     my $quit = Acme::Parataxis::Signal->new( count => 0 );
 
     # Query initial terminal size
@@ -451,7 +452,7 @@ async {
         ],
     };
 
-    # Spawn concurrent fibers (use `fiber` -- it has the & prototype)
+    # Spawn concurrent fibers (use `fiber` it has the & prototype)
     fiber { input_fiber( $messages, $quit ) };
     fiber { tick_fiber( $messages, $quit ) };
     fiber { resize_fiber( $messages, $quit, $init_w, $init_h ) };
@@ -460,24 +461,22 @@ async {
     clear_screen();
     while (1) {
         my $msg = $messages->get();
-        my $cmd;
-        ( $model, $cmd ) = Update( $model, $msg );
-        if ( $cmd && $cmd->{type} eq 'quit' ) {
-            last;
-        }
+        ( $model, my $cmd ) = Update( $model, $msg );
+        last if $cmd && $cmd->{type} eq 'quit';
+        state $prev //= '';
 
         # Render.
         # await_write(STDOUT) uses select() which doesn't work on Windows
-        # console handles -- skip it there.  stdout is always writable for
+        # console handles skip it there.  stdout is always writable for
         # a console anyway.
         my $view = View($model);
         Acme::Parataxis->await_write( \*STDOUT, 50 ) if $^O ne 'MSWin32';
-        clear_screen();
-        print $view;
+        print cls . $view                            if $prev ne $view;     # I shouldn't clear the terminal but... this is just a demo
+        $prev = $view;
     }
 
     # Cleanup: signal all fibers to exit, then restore terminal
-    $quit->send();    # sets $count = true so all fiber loops see it
+    $quit->send();                                                          # sets $count = true so all fiber loops see it
     $messages->shutdown();
     show_cursor();
     clear_screen();

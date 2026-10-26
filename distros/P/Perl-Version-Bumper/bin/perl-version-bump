@@ -103,4 +103,8 @@ of the I<--min-version> option, or C<v5.10>, whichever is the more recent.
 The environment in which the files are compiled can be setup using
 one or more I<--env> options.
 
+For more information about why you would want to use this program
+(or the associated module L<Perl::Version::Bumper>), please check
+L<Perl::Version::Bumper::Rationale>.
+
 =cut

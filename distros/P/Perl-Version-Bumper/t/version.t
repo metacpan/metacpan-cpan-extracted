@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test2::V0;
 use Test2::Tools::Exception qw( dies );
-use Perl::Version::Bumper qw(
+use Perl::Version::Bumper::Helper::Version qw(
     version_fmt
     version_use
     stable_version

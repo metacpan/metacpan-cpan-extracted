@@ -6,7 +6,7 @@ use warnings;
 
 use Time::Keeper::Recurrence;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use overload
     '""'     => sub { $_[0]->ical },
@@ -23,7 +23,7 @@ Time::Keeper::Recurrence::Set - rules with dates added and dates removed
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =head1 SYNOPSIS
 

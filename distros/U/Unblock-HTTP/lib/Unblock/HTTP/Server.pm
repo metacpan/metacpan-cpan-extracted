@@ -7,7 +7,7 @@ use Scalar::Util qw(blessed refaddr weaken);
 use Unblock::HTTP::_Policy;
 use Unblock::HTTP::_EngineFactory;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my ($class, @args) = @_;
@@ -17,7 +17,7 @@ sub new {
     for my $name (qw(http1 http2 http3)) {
         $protocols{$name} = delete $options{$name} if exists $options{$name};
     }
-    for my $name (qw(on_headers on_request on_error on_websocket)) {
+    for my $name (qw(on_headers on_request on_error on_websocket on_handoff)) {
         next unless exists $options{$name};
         my $callback = delete $options{$name};
         croak "new(): $name must be a coderef" unless ref($callback) eq 'CODE';
@@ -36,12 +36,14 @@ sub new {
         if $websocket_enabled && !$callbacks{on_websocket};
     croak 'new(): on_websocket requires an enabled websocket protocol'
         if !$websocket_enabled && $callbacks{on_websocket};
-    croak 'new(): HTTP2/HTTP3 WebSocket requires a defer callback'
+    croak 'new(): multiplexed stream handoff requires a defer callback'
         if ($policy->websocket_enabled('h2')
-            || $policy->websocket_enabled('h3')) && !$defer;
+            || $policy->websocket_enabled('h3')
+            || $callbacks{on_handoff}) && !$defer;
     return bless {
         policy => $policy,
         on_websocket => $callbacks{on_websocket},
+        on_handoff => $callbacks{on_handoff},
         defer => $defer,
         # Map once at definition time; no transaction or body wrapper.
         callbacks => {
@@ -67,6 +69,47 @@ sub _websocket_candidate {
         }
     }
     return 0;
+}
+
+# HTTP1 sends a complete 101 Upgrade or successful CONNECT response before
+# yielding the socket. The new consumer is framework-owned and implements
+# the generic input/EOF/error/output interface, NOT an HTTP or WS class.
+sub _generic_switch {
+    my ($self, $host, $engine, $tx, $response) = @_;
+    my $handler = $self->{on_handoff} or return;
+    my $successor = $handler->($tx, $tx->request, $response, $host);
+    croak 'on_handoff must return a successor protocol consumer'
+        unless blessed($successor);
+    for my $method (qw(input input_eof transport_error resume_output)) {
+        croak "on_handoff successor must implement $method()"
+            unless $successor->can($method);
+    }
+    $host->unblock_upgrade($successor);
+    my $tail = $engine->take_remainder;
+    $successor->input($tail) if length $tail;
+    return;
+}
+
+sub _attach_handoff_stream {
+    my ($self, $transport, $engine_options) = @_;
+    croak 'attach_stream(): HTTP1 handoff requires unblock_upgrade()'
+        unless $transport->can('unblock_upgrade');
+    my $host = $transport;
+    weaken($host);
+    my $engine;
+    my %callbacks = %{ $self->{callbacks} };
+    $callbacks{on_switch} = sub {
+        my ($tx, $response) = @_;
+        croak 'handoff transport no longer exists' unless $host;
+        $self->_generic_switch($host, $engine, $tx, $response);
+    };
+    my $attached = Unblock::HTTP::_EngineFactory->create(
+        'Server', 'http/1.1', %$engine_options,
+        %callbacks, transport => $transport,
+    );
+    $engine = $attached;
+    weaken($engine);
+    return $attached;
 }
 
 # HTTP1 switches the complete byte stream, not an individual transaction.
@@ -148,7 +191,12 @@ sub _attach_websocket_stream {
         my ($tx) = @_;
         # An ordinary CONNECT or unrelated protocol switch remains the
         # lower HTTP1 engine's responsibility, not an implicit WebSocket.
-        return unless $pending;
+        if (!$pending) {
+            croak 'handoff transport no longer exists' unless $host;
+            return $self->_generic_switch($host, $engine, $tx, $tx->response)
+                if $self->{on_handoff};
+            return;
+        }
         croak 'WebSocket switch transaction does not match the handshake'
             unless $pending->{transaction} == refaddr($tx);
         my $ready = $pending;
@@ -175,6 +223,51 @@ sub _attach_websocket_stream {
     return $attached;
 }
 
+# A generic CONNECT takes ownership of one multiplexed stream, not the
+# TCP/TLS/QUIC transport. Reuse the existing bounded deferred body bridge.
+# The caller supplies a byte consumer, never a new HTTP parser.
+sub _generic_multiplexed_handoff {
+    my ($self, $tx, $request, $sessions, $attempts) = @_;
+    my $id = $tx->stream_id;
+    $attempts->{$id} = 1;
+    require Unblock::HTTP::_WebSocketH2Body;
+    my $bridge = Unblock::HTTP::_WebSocketH2Body->new(
+        transaction => $tx, defer => $self->{defer},
+    );
+    my $consumer = $self->{on_handoff}->($tx, $request, $bridge);
+    unless (defined $consumer) {
+        $bridge->detach;
+        $tx->on_finish(sub { delete $attempts->{$id} });
+        $tx->respond(status => 403, body => 'CONNECT denied');
+        return;
+    }
+    croak 'on_handoff must return a stream consumer'
+        unless blessed($consumer);
+    for my $method (qw(input input_eof transport_error resume_output)) {
+        croak "on_handoff stream consumer must implement $method()"
+            unless $consumer->can($method);
+    }
+    $bridge->consumer($consumer);
+    $sessions->{$id} = {
+        bridge => $bridge, consumer => $consumer, generic => 1,
+    };
+    $tx->on_data(sub { $consumer->input($_[1]) });
+    $tx->on_finish(sub {
+        my ($finished_tx) = @_;
+        $consumer->transport_error(
+            $finished_tx->error || 'CONNECT stream ended',
+        ) unless $finished_tx->is_complete;
+        $bridge->detach;
+        delete $sessions->{$id};
+        delete $attempts->{$id};
+    });
+    $tx->respond(
+        status => 200, stream_body => 1,
+        on_drain => sub { $bridge->resume },
+    );
+    return;
+}
+
 # Extended CONNECT belongs to one H2 transaction; the HTTP/2 connection
 # remains able to serve independent ordinary HTTP and other WebSockets.
 # Outgoing WebSocket frames must NEVER re-enter nghttp2 from input callbacks.
@@ -185,15 +278,20 @@ sub _attach_h2_websocket_stream {
     my $defer = $self->{defer};
     my $on_headers = $self->{callbacks}{on_request};
     my $on_request_end = $self->{callbacks}{on_request_end};
-    my %sessions;
+    my (%sessions, %handled_generic);
 
     my $on_request = sub {
         my ($tx, $request) = @_;
         my $protocol = $request->protocol;
-        my $candidate = $request->method eq 'CONNECT'
+        my $candidate = $handler && $request->method eq 'CONNECT'
             && ((defined($protocol) && $protocol eq 'websocket')
                 || _websocket_candidate($request));
-        return $on_headers->(@_) unless $candidate;
+        unless ($candidate) {
+            return $self->_generic_multiplexed_handoff(
+                $tx, $request, \%sessions, \%handled_generic,
+            ) if $self->{on_handoff} && $request->method eq 'CONNECT';
+            return $on_headers->(@_);
+        }
 
         my $selected = $handler->($tx, $request);
         unless (defined $selected) {
@@ -255,10 +353,16 @@ sub _attach_h2_websocket_stream {
 
     my $on_request_complete = sub {
         my ($tx) = @_;
-        if (my $session = $sessions{$tx->stream_id}) {
-            $session->{websocket}->input_eof;
+        my $id = $tx->stream_id;
+        if (my $session = $sessions{$id}) {
+            if ($session->{generic}) {
+                $session->{consumer}->input_eof;
+            } else {
+                $session->{websocket}->input_eof;
+            }
             return;
         }
+        return if $handled_generic{$id};
         return $on_request_end->(@_);
     };
 
@@ -286,10 +390,15 @@ sub _attach_h3_websocket_connection {
     my $on_request = sub {
         my ($tx, $request) = @_;
         my $protocol = $request->protocol;
-        my $candidate = $request->method eq 'CONNECT'
+        my $candidate = $handler && $request->method eq 'CONNECT'
             && ((defined($protocol) && $protocol eq 'websocket')
                 || _websocket_candidate($request));
-        return $on_headers->(@_) unless $candidate;
+        unless ($candidate) {
+            return $self->_generic_multiplexed_handoff(
+                $tx, $request, \%sessions, \%websocket_attempts,
+            ) if $self->{on_handoff} && $request->method eq 'CONNECT';
+            return $on_headers->(@_);
+        }
 
         my $id = $tx->stream_id;
         $websocket_attempts{$id} = 1;
@@ -356,7 +465,11 @@ sub _attach_h3_websocket_connection {
         my $id = $tx->stream_id;
         if ($websocket_attempts{$id}) {
             if (my $session = $sessions{$id}) {
-                $session->{websocket}->input_eof;
+                if ($session->{generic}) {
+                    $session->{consumer}->input_eof;
+                } else {
+                    $session->{websocket}->input_eof;
+                }
             }
             # Even a 400/403 CONNECT belongs to on_websocket, not to
             # the ordinary request-end responder. Do not respond twice.
@@ -404,8 +517,12 @@ sub attach_stream {
     }
     return $self->_attach_websocket_stream($transport, $engine_options)
         if $protocol eq 'http/1.1' && $self->{policy}->websocket_enabled($protocol);
+    return $self->_attach_handoff_stream($transport, $engine_options)
+        if $protocol eq 'http/1.1' && $self->{on_handoff};
     return $self->_attach_h2_websocket_stream($transport, $engine_options)
-        if $protocol eq 'h2' && $self->{policy}->websocket_enabled($protocol);
+        if $protocol eq 'h2'
+            && ($self->{policy}->websocket_enabled($protocol)
+                || $self->{on_handoff});
     return Unblock::HTTP::_EngineFactory->create(
         'Server', $protocol, %$engine_options,
         %{ $self->{callbacks} }, transport => $transport,
@@ -424,7 +541,7 @@ sub attach_quic {
     croak 'attach_quic(): connection is closed' if $connection->closed;
     croak 'attach_quic(): connection is not ready' unless $connection->ready;
     return $self->_attach_h3_websocket_connection($connection, $engine_options)
-        if $self->{policy}->websocket_enabled('h3');
+        if $self->{policy}->websocket_enabled('h3') || $self->{on_handoff};
     my $engine = Unblock::HTTP::_EngineFactory->create(
         'Server', 'h3', %$engine_options,
         %{ $self->{callbacks} }, quic => $connection,
@@ -459,19 +576,14 @@ Unblock::HTTP::Server - Shared HTTP server policy and connection attachment
     );
     $engine->input($bytes);
 
-=head1 IMPLEMENTATION STATUS
+=head1 SUPPORTED PROTOCOLS
 
-This feature branch implements reusable attachment and ordinary buffered or
-streamed requests. It requires the receive/lifecycle feature branches of the
-three engines; released H1/H2 0.11 and H3 0.12 do not provide these methods.
-HTTP/1.1 Server Upgrade and HTTP/2 Server Extended CONNECT are verified
-opt-in paths using Unblock::WebSocket. HTTP/2 Client Extended CONNECT is
-also verified and documented in Unblock::HTTP::Client. HTTP/3 Server
-Extended CONNECT is verified by real QUIC/TLS loopback. HTTP/3 Client
-Extended CONNECT is also implemented and verified over real QUIC/TLS,
-including peer SETTINGS, stream-credit admission and cancellation.
-Initial Client factories and bounded pooling are implemented there.
-See docs/IMPLEMENTATION.md. This is not a release candidate.
+One Server definition attaches HTTP/1.1, HTTP/2 or HTTP/3 connections
+using the corresponding standalone engines. Unblock::HTTP1 0.13 is
+required; Unblock::HTTP2 0.13 and Unblock::HTTP3 0.14 are optional.
+Ordinary buffered and streamed requests, graceful shutdown, WebSocket
+transitions and generic CONNECT handoff are supported. The framework
+owns sockets, TLS, UDP, timers and deferred callback scheduling.
 
 =head1 CONSTRUCTOR
 
@@ -535,6 +647,41 @@ setting is advertised only when that protocol's WebSocket policy is
 enabled. HTTP/3 Client WebSocket is also supported. For H2/H3
 WebSocket CONNECT transactions, C<on_websocket> replaces ordinary
 C<on_headers>/C<on_request> delivery; other HTTP requests are unchanged.
+
+=head2 Generic HTTP/1.1 Upgrade and CONNECT handoff
+
+An optional C<on_handoff> callback handles a completed HTTP/1.1 protocol
+switch that is not claimed by the WebSocket handshake. It is called after
+the lower HTTP1 engine has accepted a final 101 Upgrade response or a
+successful CONNECT response into the existing transport queue.
+
+    on_handoff => sub {
+        my ($tx, $request, $response, $transport) = @_;
+        return MyProtocol->new(transport => $transport);
+    }
+
+C<on_request> remains responsible for selecting and sending the response.
+C<on_handoff> must return a successor object implementing C<input>,
+C<input_eof>, C<transport_error> and C<resume_output>. The framework
+transport implements C<unblock_upgrade($consumer)> to transfer the entire
+socket synchronously while preserving TLS and ordered writes. The HTTP1
+engine's buffered remainder is delivered once to the successor. For native
+borrowed input, the original native host retains and re-drives any
+unconsumed same-read tail after the transition.
+
+If WebSocket and generic handoff are both enabled, an accepted WebSocket
+handshake takes precedence. Unrelated 101/CONNECT switches use
+C<on_handoff>. The callback is not invoked for normal HTTP requests or
+for unsuccessful CONNECT responses.
+
+For enabled HTTP2/HTTP3, C<on_handoff($tx, $request, $bridge)>
+may return a generic stream consumer for CONNECT. The integration
+responds 200 and forwards DATA and EOF on that stream only, leaving
+ordinary sibling streams and the connection intact. The bridge accepts
+C<unblock_send>, C<unblock_finish> and C<unblock_abort>. Returning
+undef rejects CONNECT with 403. Configure C<enable_connect_protocol>
+for extended H2 CONNECT or C<enable_extended_connect> for H3.
+Multiplexed handoff requires a C<defer> scheduler.
 
 =head2 HTTP/1.1 WebSocket Upgrade
 

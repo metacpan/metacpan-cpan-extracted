@@ -17,7 +17,7 @@ requires 'App::Greple::tee', '1.04';
 requires 'Getopt::EX::Config', '1.0202';
 requires 'Command::Run', '1.04';
 
-requires 'Getopt::EX::termcolor';
+requires 'Getopt::EX::termcolor', '1.10';
 
 requires 'App::cat::v';
 

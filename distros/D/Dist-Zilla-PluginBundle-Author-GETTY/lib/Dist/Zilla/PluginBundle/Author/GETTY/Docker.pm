@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY::Docker;
 # ABSTRACT: Docker image subsection for @Author::GETTY
-our $VERSION = '0.326';
+our $VERSION = '0.327';
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
@@ -34,7 +34,6 @@ sub configure {
   my %plugin_args = (
     image        => $image,
     tag          => $tags,
-    build_load   => 1,
     release_push => $local ? 0 : 1,
   );
 
@@ -42,7 +41,7 @@ sub configure {
   $plugin_args{_network_mode} = $payload->{network_mode} if defined $payload->{network_mode};
 
   for my $k (qw(
-    dockerfile build_arg label platform release_load build_verbose
+    dockerfile build_arg label platform build_verbose
     pull no_cache rm force_rm fail_if_tag_exists skip_latest_on_trial
   )) {
     $plugin_args{$k} = $payload->{$k} if exists $payload->{$k};
@@ -75,7 +74,7 @@ Dist::Zilla::PluginBundle::Author::GETTY::Docker - Docker image subsection for @
 
 =head1 VERSION
 
-version 0.326
+version 0.327
 
 =head1 SYNOPSIS
 
@@ -132,10 +131,6 @@ Optional Docker C<--network> mode for the build.
 
 Path to the Dockerfile. Passed through to C<Docker::API> unchanged.
 
-=head2 context
-
-Build context path. Passed through to C<Docker::API> unchanged.
-
 =head2 build_arg
 
 Build-time argument (C<--build-arg>). Multi-value — repeat the key to set
@@ -147,9 +142,10 @@ Image label. Multi-value.
 
 =head2 platform
 
-Target platform (C<--platform>). Multi-value.
+Target platform (C<--platform>), exactly one. A second value is refused by
+C<Docker::API>: its build endpoint takes one platform.
 
-=head2 release_load, build_verbose, pull, no_cache, rm, force_rm, fail_if_tag_exists, skip_latest_on_trial
+=head2 build_verbose, pull, no_cache, rm, force_rm, fail_if_tag_exists, skip_latest_on_trial
 
 Passed through directly to L<Dist::Zilla::Plugin::Docker::API>.
 
@@ -157,7 +153,7 @@ Passed through directly to L<Dist::Zilla::Plugin::Docker::API>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
 
 =head1 CONTRIBUTING
@@ -170,9 +166,11 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

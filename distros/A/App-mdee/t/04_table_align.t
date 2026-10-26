@@ -97,4 +97,34 @@ SKIP: {
     }
 }
 
+# Escaped pipe (\|) inside a cell is not a column separator.  It is shown
+# as written for now; backslash escapes are not processed yet.
+{
+    use File::Temp qw(tempfile);
+    my($fh, $file) = tempfile(SUFFIX => '.md', UNLINK => 1);
+    binmode $fh, ':utf8';
+    print $fh "| A | B |\n|---|---|\n| x \\| y | z |\n| long cell text | w |\n";
+    close $fh;
+    my $strip = sub { local $_ = shift; s/\e\[[0-9;]*[mK]//g; $_ };
+    my $out = $strip->(run("'-Mmd::config(colorize=0,table=1,rule=1)' $file")->stdout);
+    my @lines = split /\n/, $out;
+    my $V = "\x{2502}";
+    like($lines[2], qr/x \\\| y\s*${V}\s*z/, "escaped pipe stays in the cell");
+    is(scalar(() = $lines[2] =~ /${V}/g), 1, "the row has a single column separator");
+    unlike($lines[1], qr/\x{2524}/, "separator row has no stray right border");
+
+    # the same with cell wrapping
+    my($fh2, $file2) = tempfile(SUFFIX => '.md', UNLINK => 1);
+    binmode $fh2, ':utf8';
+    print $fh2 "| A | B |\n|---|---|\n| x \\| y " . ("word " x 12) . "| z |\n| p | q |\n";
+    close $fh2;
+    my $wrapped = $strip->(run("'-Mmd::config(colorize=0,table=1,rule=1,table_width=40,table_cell_mark=\x{b7})' $file2")->stdout);
+    like($wrapped, qr/x \\\| y/, "escaped pipe stays in the cell of a wrapped table");
+    is(scalar(() = (split /\n/, $wrapped)[2] =~ /${V}/g), 1, "the wrapped row has a single column separator");
+
+    # and without trimming (-s is replaced by the same regex)
+    my $notrim = $strip->(run("'-Mmd::config(colorize=0,table=1,rule=1,table_trim=0)' $file")->stdout);
+    like((split /\n/, $notrim)[2], qr/^${V} x \\\| y\s*${V} z\s*${V}$/, "escaped pipe stays in the cell without trimming");
+}
+
 done_testing;

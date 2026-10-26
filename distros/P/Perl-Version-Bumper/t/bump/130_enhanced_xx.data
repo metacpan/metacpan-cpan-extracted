@@ -1,0 +1,22 @@
+########## use feature 'enhanced_xx'
+use feature 'enhanced_xx';
+no warnings 'experimental::enhanced_xx';
+---
+use VERSION;
+use feature 'enhanced_xx';
+no warnings 'experimental::enhanced_xx';
+########## no feature 'enhanced_xx'
+no feature 'enhanced_xx';
+---
+use VERSION;
+no feature 'enhanced_xx';
+########## use experimental 'enhanced_xx'
+use experimental 'enhanced_xx';
+---
+use VERSION;
+use experimental 'enhanced_xx';
+########## no experimental 'enhanced_xx'
+no experimental 'enhanced_xx';
+---
+use VERSION;
+no experimental 'enhanced_xx';

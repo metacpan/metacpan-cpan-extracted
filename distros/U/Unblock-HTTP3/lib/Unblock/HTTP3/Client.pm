@@ -7,7 +7,7 @@ use Uniform::HTTP::Request 0.06 ();
 
 use parent 'Unblock::HTTP3::Connection';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub new {
     my ($class, %option) = @_;
@@ -168,8 +168,10 @@ The following keys are request options, not Uniform message fields:
     on_informational
     on_response
     on_body
+    on_data
     on_complete
     on_error
+    on_finish
     on_drain
 
 C<stream_body =E<gt> 1> starts an outbound streaming request body. Do not
@@ -206,6 +208,11 @@ incomplete at that point.
 
 Called for incoming response body chunks in streaming mode.
 
+=item C<on_data($tx, $bytes)>
+
+Receives decoded response-body chunks without buffering the full body.
+Supplying C<on_data> selects streaming; do not combine it with C<on_body>.
+
 =item C<on_complete($tx)>
 
 Called when the HTTP/3 Transaction has completed.
@@ -214,6 +221,11 @@ Called when the HTTP/3 Transaction has completed.
 
 Called when a Transaction fails. The numeric code is an HTTP/3 or stream
 diagnostic when one is available.
+
+=item C<on_finish($tx)>
+
+Called once when the Transaction becomes complete, cancelled, or errored,
+after the applicable completion or error callback.
 
 =item C<on_drain($tx)>
 

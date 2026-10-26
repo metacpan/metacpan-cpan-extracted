@@ -1,3 +1,27 @@
+0.105     2026-10-25 18:39:55Z
+  - The build context sent to the engine now keeps what Dist::Zilla wrote
+    into the build root: file modes (an executable stays executable, so
+    "COPY entrypoint.sh" plus ENTRYPOINT no longer needs a "RUN chmod
+    +x"), symlinks as symlink entries (dangling ones no longer abort the
+    build), and empty directories. Top-level dotfiles such as
+    .dockerignore are no longer left out of the context.
+  - build_load, release_load and the deprecated load are removed: nothing
+    ever read them, as the image always lands in the engine's store when
+    built through the API. Setting one in a dist.ini now warns that it is
+    no longer supported and is discarded, like phase.
+  - A second "platform" value is now a fatal error instead of being
+    dropped silently, which built and pushed a single-platform image
+    from a multi-platform config. The /build endpoint takes exactly one
+    platform; multi-arch images are not what this plugin does.
+  - Registry credentials are now resolved from an ordered list of auth
+    files instead of only ~/.docker/config.json, so a plain "podman
+    login" (or "docker login") is picked up automatically. The order,
+    first file with a matching entry winning, is REGISTRY_AUTH_FILE,
+    then $DOCKER_CONFIG/config.json, then Podman's
+    $XDG_RUNTIME_DIR/containers/auth.json, then
+    ~/.config/containers/auth.json, then ~/.docker/config.json. The
+    per-registry entry selection is unchanged.
+
 0.104     2026-08-30 03:51:54Z
   - "dockerfile = ..." in a dist.ini now takes effect; the deprecated
     "file = ..." spelling still works and warns.

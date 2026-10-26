@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguWeb',
-	VERSION          => '0.10.1',
+	VERSION          => '0.11.0',
 	ABSTRACT         => 'build a documentation website for a Perl project',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.036',
@@ -23,10 +23,14 @@ WriteMakefile(
 		'lib/App/FuguWeb/Check.pod' => '$(INST_LIB)/App/FuguWeb/Check.pod',
 		'lib/App/FuguWeb/Config.pm' => '$(INST_LIB)/App/FuguWeb/Config.pm',
 		'lib/App/FuguWeb/Config.pod' => '$(INST_LIB)/App/FuguWeb/Config.pod',
+		'lib/App/FuguWeb/Fragment.pm' => '$(INST_LIB)/App/FuguWeb/Fragment.pm',
+		'lib/App/FuguWeb/Fragment.pod' => '$(INST_LIB)/App/FuguWeb/Fragment.pod',
 		'lib/App/FuguWeb/Index.pm' => '$(INST_LIB)/App/FuguWeb/Index.pm',
 		'lib/App/FuguWeb/Index.pod' => '$(INST_LIB)/App/FuguWeb/Index.pod',
 		'lib/App/FuguWeb/Keys.pm' => '$(INST_LIB)/App/FuguWeb/Keys.pm',
 		'lib/App/FuguWeb/Keys.pod' => '$(INST_LIB)/App/FuguWeb/Keys.pod',
+		'lib/App/FuguWeb/Language.pm' => '$(INST_LIB)/App/FuguWeb/Language.pm',
+		'lib/App/FuguWeb/Language.pod' => '$(INST_LIB)/App/FuguWeb/Language.pod',
 		'lib/App/FuguWeb/Manual.pm' => '$(INST_LIB)/App/FuguWeb/Manual.pm',
 		'lib/App/FuguWeb/Manual.pod' => '$(INST_LIB)/App/FuguWeb/Manual.pod',
 		'lib/App/FuguWeb/Page.pm' => '$(INST_LIB)/App/FuguWeb/Page.pm',
@@ -37,6 +41,8 @@ WriteMakefile(
 		'lib/App/FuguWeb/Rotate.pod' => '$(INST_LIB)/App/FuguWeb/Rotate.pod',
 		'lib/App/FuguWeb/Site.pm' => '$(INST_LIB)/App/FuguWeb/Site.pm',
 		'lib/App/FuguWeb/Site.pod' => '$(INST_LIB)/App/FuguWeb/Site.pod',
+		'lib/App/FuguWeb/Status.pm' => '$(INST_LIB)/App/FuguWeb/Status.pm',
+		'lib/App/FuguWeb/Status.pod' => '$(INST_LIB)/App/FuguWeb/Status.pod',
 		'share/fuguweb/style.css' => '$(INST_LIB)/auto/share/dist/App-FuguWeb/fuguweb/style.css'
 	},
 	test             => { TESTS => 't/fuguweb/*.t' },

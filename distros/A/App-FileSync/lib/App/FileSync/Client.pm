@@ -45,7 +45,7 @@ use App::FileSync::Transport::SSH;
 use App::FileSync::Trash;
 use App::FileSync::Verify;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Tunables, kept as package variables so tests can localise them.
 our $CHUNK          = 262_144;

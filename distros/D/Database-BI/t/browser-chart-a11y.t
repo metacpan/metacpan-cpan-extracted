@@ -235,4 +235,12 @@ like $edge->{hit}, qr/\bchart-resize-handle\b/,
 $browser->press('ArrowRight');
 resized_to($max, $h, 'and ArrowRight at that end leaves the announced value truthful');
 
+# What this run established, for the job summary: the tab order, the drawing and
+# the announcement are one thing, checked press by press.
+$browser->proved(
+	'GET /bar: Tab reaches the chart grip, and every arrow, Home and End press'
+	. ' draws the size it announces - aria-valuenow and aria-valuetext - with the'
+	. ' grip still inside the viewport and on top where it is clicked'
+);
+
 done_testing();

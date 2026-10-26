@@ -192,22 +192,26 @@ between(self, a, b)
         const char *what = "Time::Keeper::Recurrence::Set->between";
         const tkr_set *s;
         tkr_setiter it;
-        int64_t from, to, got, n = 0;
+        int64_t from, to, got, n = 0, i;
+        SV *held;
         int rc;
     PPCODE:
         s = tkr_set_of(aTHX_ self, what);
         from = tkr_instant_arg(aTHX_ a, what);
         to = tkr_instant_arg(aTHX_ b, what);
+        held = sv_2mortal(newSV(64 * sizeof(int64_t)));
         rc = tkr_setiter_init(aTHX_ &it, self, from, 1, 0);
         if (rc == TKR_W_GOT)
             while ((rc = tkr_setiter_next(aTHX_ &it, &got)) == TKR_W_GOT) {
                 if (got >= to)
                     break;
-                if (++n > TKR_BETWEEN_MAX) {
+                if (n >= TKR_BETWEEN_MAX) {
                     tkr_setiter_free(aTHX_ &it);
                     croak("%s: more than %d occurrences; use iterate", what, TKR_BETWEEN_MAX);
                 }
-                XPUSHs(sv_2mortal(tkr_set_value_sv(aTHX_ s, got, what)));
+                if ((STRLEN)(n + 1) * sizeof(int64_t) > SvLEN(held))
+                    SvGROW(held, SvLEN(held) * 2);
+                ((int64_t *)SvPVX(held))[n++] = got;
             }
         if (rc < 0) {
             int64_t detail = it.fail_wall;
@@ -215,6 +219,9 @@ between(self, a, b)
             tkr_set_rc_croak(aTHX_ rc, s, detail, what);
         }
         tkr_setiter_free(aTHX_ &it);
+        EXTEND(SP, n);
+        for (i = 0; i < n; i++)
+            PUSHs(sv_2mortal(tkr_set_value_sv(aTHX_ s, ((int64_t *)SvPVX(held))[i], what)));
 
 void
 first(self, n)

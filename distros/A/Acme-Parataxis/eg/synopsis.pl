@@ -8,6 +8,7 @@ use blib;
         my $f1 = fiber {
             say '  Task 1: Sleeping...';
             await_sleep(1000);
+            say '  Task 1: Waking up';
             return 'Coffee!';
         };
         my $f2 = fiber {
@@ -15,7 +16,7 @@ use blib;
             my $sum = 0;
             for ( 1 .. 100 ) {
                 $sum += $_;
-                maybe_yield();    # Be a good neighbor
+                yield;    # Be a good neighbor
             }
             say '  Task 2: Complete. Will return ' . $sum;
             return $sum;

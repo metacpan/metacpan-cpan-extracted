@@ -21,9 +21,12 @@ inputs:
     required: false
     default: ''
   cpanm-opts:
-    description: 'Extra options for cpanm, passed via PERL_CPANM_OPT.'
+    description: >-
+      Options for cpanm, passed via PERL_CPANM_OPT. The default pins an https
+      mirror: everything installed here is executed in the job, so the download
+      must be authenticated. Keep the mirror on https when overriding.
     required: false
-    default: '--mirror http://cpan.metacpan.org --mirror-only'
+    default: '--mirror https://cpan.metacpan.org --mirror-only'
 
 runs:
   using: composite

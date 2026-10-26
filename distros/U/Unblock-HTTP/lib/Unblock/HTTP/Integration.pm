@@ -3,7 +3,7 @@ package Unblock::HTTP::Integration;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
@@ -15,10 +15,10 @@ Unblock::HTTP::Integration - Attach framework transports to HTTP engines
 
 =head1 IMPLEMENTATION STATUS
 
-Unblock::HTTP 0.02 supplies reusable Server policy, direct engine
+Unblock::HTTP 0.03 supplies reusable Server policy, direct engine
 attachment, and the shared pooled Client with buffered or streamed callbacks.
-It requires Unblock::HTTP1 0.12, Unblock::HTTP2 0.12, and Unblock::HTTP3 0.13
-or newer. HTTP1 Upgrade and HTTP2/HTTP3 WebSocket Extended CONNECT are
+It requires Unblock::HTTP1 0.13, optional Unblock::HTTP2 0.13, and
+optional Unblock::HTTP3 0.14 or newer when their protocols are enabled. HTTP1 Upgrade and HTTP2/HTTP3 WebSocket Extended CONNECT are
 implemented for Client and Server; H3 exchanges are tested over real QUIC/TLS.
 Authenticated same-host Alt-Svc and unsent connection fallback are
 implemented. Cross-host Alt-Svc, post-dispatch retries and generic
@@ -280,7 +280,7 @@ Unblock::HTTP to distribute or support an event-loop-specific adapter.
 
 The receive-mode, terminal-notification and H1/H2/H3 WebSocket
 transition paths are included in the released engine versions required
-by Unblock::HTTP 0.02.
+by Unblock::HTTP 0.03.
 The whole-buffer transport contract remains in force. Adapter authors
 must still handle hard buffer limits, borrowed-input ownership across
 native H1 switches, and framework-specific shutdown semantics.

@@ -73,6 +73,21 @@ my @CHAPTERS = (
 		routes => [ '/browse', '/open', '/tables' ],
 	},
 	{
+		id    => 'remote-file',
+		part  => 'First steps',
+		title => 'Open a file on another computer',
+		lead  => 'You can open a data file on a remote server without copying it first.',
+		steps => [
+			'In the path box, type /../hostname/folder/file.csv where hostname is the server name.',
+			'To connect as a specific user, type /../user@hostname/folder/file.csv instead.',
+			'Click Open. The program downloads the file over SSH and shows it as a table.',
+			'The remote path also works in the Merge data panel and the column selector.',
+			'Files with unusual extensions such as .log are read and detected automatically.',
+		],
+		tip   => 'The remote host must run an SSH server. The program connects with SFTP and does not ask for a password here.',
+		routes => [ '/open' ],
+	},
+	{
 		id    => 'web-table',
 		part  => 'First steps',
 		title => 'Import a table from a web page',

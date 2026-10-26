@@ -111,4 +111,12 @@ $url = visit_new_tab($browser, $before);
 is $url, $browser->uri('/tutorial'),
 	'the header Tutorial link opened in a new tab';
 
+# What this run established, for the job summary: the side trip leaves the page
+# it was taken from.
+$browser->proved(
+	'GET /pie, /tutorial and /browse: F1 follows the Help link where there is one'
+	. ' and the Tutorial link otherwise, and both header links open in a new tab,'
+	. ' leaving the page behind them'
+);
+
 done_testing();

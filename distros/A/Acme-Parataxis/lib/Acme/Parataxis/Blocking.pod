@@ -1,0 +1,232 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Blocking - Run CPU-bound Perl closures on background interpreters (threads.pm) or forked children
+
+=head1 VERSION
+
+Version 0.001_001
+
+=head1 SYNOPSIS
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::Blocking qw[spawn_blocking];
+
+    my $f = Acme::Parataxis::Blocking->spawn_blocking( sub { heavy_parse($blob) } );
+    my $parsed = $f->await;    # your fibers kept running while $blob was parsed
+
+On a perl that cannot do CPU offload with threads, the same promise is available from a forked child instead. It is a
+separate entry point rather than a fallback, so the choice is visible at the call site:
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::Blocking qw[spawn_blocking_fork];
+
+    my $f = spawn_blocking_fork( sub { heavy_parse($blob) }, $blob );
+    my $parsed = $f->await;
+
+=head1 DESCRIPTION
+
+Runs CPU-bound Perl work on a dedicated background Perl interpreter (a real OS thread cloned with
+C<threads-E<gt>create>) and returns an C<Acme::Parataxis::Future> carrying its result, so a second of JSON/image-code
+work never stalls your cooperative fibers.
+
+This is the one part of the Acme::Parataxis project that uses C<threads.pm>, and it keeps that machinery lazy:
+C<threads>, C<threads::shared>, and C<Thread::Queue> are only C<require>d inside the first C<spawn_blocking> call, so
+loading any other part of this distribution never loads them and stays free of any threads associations:
+Acme::Parataxis is about cooperatively scheduling fibers in a single interpreter, and perl's native threads are only a
+means to get a second, isolated interpreter for work that the C pool cannot run.
+
+C<spawn_blocking> requires a Perl built with ithreads (C<useithreads>); on a non-threaded perl it croaks with a clear
+message, and loading this library never touches C<threads> (they are only C<require>d on the first call), so
+non-threaded perls keep using everything else unchanged. It must be called from inside a scheduled fiber and from a
+real-time run: it croaks under C<run( virtual E<gt>=E<gt> 1 )>, because real OS work cannot be fast-forwarded by the
+mock clock.
+
+C<spawn_blocking_fork> is the same promise for a perl that cannot clone interpreters. It runs the closure in a forked
+child process, so a non-ithreads perl still gets CPU offload, and it never requires C<threads> either.
+
+=head1 FUNCTIONS
+
+=head2 C<spawn_blocking( $code, @args )>
+
+Also callable as a plain function: C<spawn_blocking( sub { ... }, @args )>. The args arrive in the closure's C<@_>, and
+the result (or C<die>), is marshalled back through C<threads::shared>; unshareable results (a CODE ref, a resource)
+become the Future's error instead of crashing the caller. The future composes with C<await>, C<with_timeout>,
+C<with_cancel>, and C<wait_all> exactly like any other.
+
+Hard limits, like the C pool's: each call clones a fresh interpreter, so the closure sees only a copy-in copy-out
+snapshot - plain/structured values cross intact, in-place mutations never leak back, and the closure must not call back
+into C<Acme::Parataxis> scheduler objects or blocking APIs while it runs. At most C<set_max_blocking_threads()>
+interpreters run at once (default 4); a call past the cap parks the calling fiber until a slot frees. Cancelling the
+C<await> does not stop the closure (a real OS thread cannot be yanked); it withdraws the waiter, and the slot releases
+when the closure actually finishes.
+
+=head2 C<set_max_blocking_threads( $count )>
+
+Sets the concurrency cap for C<spawn_blocking> background interpreters (like C<set_max_threads> for the C pool). The
+default is 4, or whatever the C<PARATAXIS_SB_THREADS> environment variable holds, and this call must happen before the
+first C<spawn_blocking> - once the pool is in use its capacity is live and changing it croaks. Returns the new cap.
+
+    set_max_blocking_threads(8);    # up to 8 background interpreters at once
+
+=head2 C<max_blocking_threads()>
+
+Returns the configured C<spawn_blocking> capacity.
+
+=head2 C<spawn_blocking_fork( $code, @args )>
+
+Runs C<$code> in a forked child process and returns an C<Acme::Parataxis::Future> carrying its result. The args arrive
+in the closure's C<@_>, and the result (or C<die>) is marshalled back over a pipe with C<Storable>; unshareable results
+(a CODE ref, a resource) become the Future's error instead of crashing the caller. The future composes with C<await>,
+C<with_timeout>, C<with_cancel>, and C<wait_all> exactly like any other.
+
+    #!/usr/bin/env perl
+    use v5.40;
+    use Acme::Parataxis qw[run fiber await_sleep];
+    use Acme::Parataxis::Blocking qw[spawn_blocking_fork];
+    sub collatz_steps {
+        my ($n) = @_;
+        my $steps = 0;
+        while ( $n != 1 ) { $n = $n % 2 ? 3 * $n + 1 : $n / 2; $steps++ }
+        return $steps;
+    }
+    my $report = run(
+        sub {
+            my $f = spawn_blocking_fork( sub { collatz_steps(27) } );
+            fiber { await_sleep(20); print "your fibers kept running meanwhile\n" };
+            return $f->await;
+        }
+    );
+    print "27 takes $report steps\n";
+
+This is a separate entry point rather than a fallback inside C<spawn_blocking>, on purpose. The two have different
+honest limits - a child is a process and a cloned interpreter is not - and a caller should be able to see which one it
+asked for at the call site instead of inheriting a silent per-build difference. If C<spawn_blocking> quietly became
+C<spawn_blocking_fork> on a perl without ithreads, every copy-in copy-out detail, every error message, and every
+cancellation behaviour in a program would change under it with no edit and no diagnostic.
+
+The copy-in copy-out rules match C<spawn_blocking>'s, and the reasons differ. C<spawn_blocking> clones a fresh
+interpreter; this forks a copy of yours, so the closure sees the caller's world as it stood at the fork - its args, and
+whatever its captured lexicals held then. Either way the only thing that travels back is the frozen result, and
+in-place mutations in the child never come back to you.
+
+The differences that are real:
+
+=over 4
+
+=item *
+
+No C<threads> anywhere. C<threads>, C<threads::shared> and C<Thread::Queue> are never loaded, so this works on a perl
+built without ithreads and leaves the property that loading this distribution acquires no threads association intact.
+
+=item *
+
+Cancellation can actually stop the work. Cancelling the C<await> behaves exactly as it does for C<spawn_blocking> - it
+withdraws the waiter and changes nothing else - but a child is a process, so C<kill_blocking_fork> can signal it and
+end the work for real. See below.
+
+=item *
+
+The child inherits the parent's open descriptors, including any attached event loop's sockets. A closure that reads or
+writes through one of those would act on a copy of the descriptor rather than the original, and an inherited listening
+socket keeps its port reserved until the child exits. Keep closures away from inherited descriptors.
+
+=item *
+
+The closure must not call back into L<Acme::Parataxis>. The child's scheduler state is a copy and means nothing there.
+
+=back
+
+At most C<set_max_blocking_forks()> children run at once (default 4); a call past the cap parks the calling fiber until
+a slot frees. A separate cap from the thread one, because a forked child and a cloned interpreter are not the same
+resource and coupling them would let one starve the other silently.
+
+A harvester fiber is always scheduled, whether or not anyone awaits the future, so the pipe is drained and the child
+reaped even if you never look at the result - no zombies, and no deadlock when the payload is larger than the pipe
+buffer, because the child simply blocks in C<write> until the harvester's next chunk.
+
+Like C<spawn_blocking> this is wall-clock only and croaks under C<run( virtual E<gt>=E<gt> 1 )>. It also croaks unless
+the platform has a real C<fork(2)>: on MSWin32, where perl's C<fork> is a C<threads.pm> emulation, and on any build
+whose C<d_fork> is not C<define>.
+
+=head2 C<kill_blocking_fork( $future, $signal )>
+
+Signals a running C<spawn_blocking_fork> child - C<TERM> unless told otherwise - and returns true if a signal was
+delivered, or false if the child was already gone. It takes the future rather than a pid, because the future is what
+the caller holds and a pid it would have to be told separately is a pid it can get wrong.
+
+This is the one thing the thread pool cannot offer. A C<spawn_blocking> closure is a real OS thread and cannot be
+yanked; a child can be signalled, so runaway work genuinely stops instead of running to completion off the side of the
+program. The future then resolves with an error, never with a partial result.
+
+    #!/usr/bin/env perl
+    use v5.40;
+    use Acme::Parataxis qw[run fiber await_sleep];
+    use Acme::Parataxis::Blocking qw[spawn_blocking_fork kill_blocking_fork];
+    my $finished = run(
+        sub {
+            my $f = spawn_blocking_fork( sub { my $n = 0; $n++ while 1 } );
+            fiber { await_sleep(200); kill_blocking_fork($f) };
+            my $result = eval { $f->await };
+            return $@ ? "stopped: $@" : 'finished';
+        }
+    );
+    print "$finished\n";
+
+=head2 C<set_max_blocking_forks( $count )>
+
+Sets the concurrency cap for C<spawn_blocking_fork> children. The default is 4, or whatever the C<PARATAXIS_SBF_FORKS>
+environment variable holds, and this call must happen before the first C<spawn_blocking_fork> - once the pool is in use
+its capacity is live and changing it croaks. Returns the new cap.
+
+    set_max_blocking_forks(8);    # up to 8 forked children at once
+
+=head2 C<max_blocking_forks()>
+
+Returns the configured C<spawn_blocking_fork> capacity.
+
+=head1 PLATFORM WARNING
+
+threads' interpreter clone (C<perl_clone>) access-violates on some 5.42.x builds (notably Strawberry MSWin32) once
+certain things are loaded, crashing the whole process at the first C<threads-E<gt>create>. Two separate triggers are
+known. (1) A C<feature 'class'> file that declares a C<method DESTROY> on a second class block in the same file - the
+in-tree guard classes (C<Semaphore::Guard>, and the L<Acme::Parataxis::Sync> mutex/rwlock guards) are therefore classic
+blessed packages, not perlclasses. (2) Independently and content-independently, merely loading particular namespaces
+has the same crash - observed here for the whole C<Acme::Parataxis::Sync> family (C<Sync>, C<Sync<I>::Mutex> etc.),
+C<Acme::Parataxis::TVar>, and C<Acme::Parataxis::Driver>. On an affected perl there is no in-library workaround (the
+module's contents and even the guard classes are irrelevant to trigger (2)); if you load any of those namespaces and
+then intend to use C<spawn_blocking>, test on a short-lived process first, or arrange for the closures to run before
+such modules load.
+
+A second Windows-only behavior is a stall, not a crash. While any socket wait is in flight anywhere in the process - a
+fiber parked in C<await_read> or C<await_write>, or another thread blocked in a raw recv - the C<perl_clone> behind the
+first C<threads-E<gt>create> blocks until that wait returns: the clone duplicates every open descriptor
+(C<PerlIO_fdupopen>), and Windows holds the duplication while a socket has an outstanding operation. The stall tracks
+the wait's remaining time, not a fixed budget (measured: 4969 ms for a 5000 ms parked read; 493 ms when only 478 ms
+remained). It is identical with C<select()> and with C<WSAPoll>, so no Parataxis mechanism is involved - it is the
+known Windows behavior described at https://perlmonks.org/?node_id=1078634 - and Linux and the BSDs are unaffected. If
+the added latency matters, arrange C<spawn_blocking> calls before any fiber starts reading, or keep socket waits out of
+the picture during a spawn.
+
+C<spawn_blocking_fork> is not affected by any of the above. It never calls C<threads-E<gt>create> and so never reaches
+C<perl_clone>, which removes both the access violation and the Windows stall; in exchange it inherits a forked child's
+limitations, which are described under C<spawn_blocking_fork> above. It is, of course, still unavailable on MSWin32.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Future>, L<Acme::Parataxis::Semaphore>, L<threads>, L<Thread::Queue>
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

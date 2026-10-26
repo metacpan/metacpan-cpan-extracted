@@ -6,9 +6,11 @@ App::FuguWeb::Index - the body of the manual index
 
     use App::FuguWeb::Index;
 
-    my $index = App::FuguWeb::Index->new(config => $config, lang => 'de');
+    my $index = App::FuguWeb::Index->new(
+        config   => $config,
+        language => $config->language('de'));
 
-    print $index->body('Handbuch', $opening, body_lang => 'en');
+    my $html = $index->body('Handbuch', $opening, body_lang => 'en');
 
 =head1 DESCRIPTION
 
@@ -28,10 +30,11 @@ source.
 
 =head2 new
 
-    App::FuguWeb::Index->new(config => $config, lang => $code)
+    App::FuguWeb::Index->new(config => $config, language => $language)
 
-C<config> is an L<App::FuguWeb::Config> and is required. C<lang> is the
-code of the language of the page, and it defaults to C<en>.
+C<config> is an L<App::FuguWeb::Config> and is required. C<language>
+is the L<App::FuguWeb::Language> of the page, and it defaults to the
+default language of the site.
 
 =head2 body
 
@@ -39,8 +42,8 @@ code of the language of the page, and it defaults to C<en>.
         title_lang => 'en',
         body_lang  => 'en')
 
-The body fragment. L<App::FuguWeb::Page> wraps it, exactly as it wraps
-a body fragment that a project wrote by hand.
+The body fragment, as characters. L<App::FuguWeb::Page> wraps it,
+exactly as it wraps a body fragment that a project wrote by hand.
 
 The fragment opens with the title as its C<< <h1> >>, and then the
 opening as it stands. The caller passes the title and the C<body> of
@@ -65,15 +68,16 @@ would be read as the C<fugu:> protocol.
 
 The parts of the page come from the sources of more than one language:
 the title, the opening, each heading and each description. A part from
-a source of another language than the page carries that code as
-C<lang> on its own element, per WEB-LANG-6. That element is the
-C<< <h1> >> of the title, one C<< <div> >> around the opening, the
-C<< <h2> >> of a heading, or the C<< <dd> >> of a description. A part
-of the language of the page carries no C<lang>, because the
-C<< <html> >> element carries that code.
+a source of another language than the page carries the marks of that
+language on its own element, per WEB-LANGUAGE-11: the tag as C<lang>,
+and its direction as C<dir> when the two directions differ. That
+element is the C<< <h1> >> of the title, one C<< <div> >> around the
+opening, the C<< <h2> >> of a heading, or the C<< <dd> >> of a
+description. A part of the language of the page carries no mark,
+because the C<< <html> >> element carries that language.
 
-C<title_lang> and C<body_lang> are the languages of the title and of
-the opening. The caller passes the C<title_lang> and the C<lang> of the
+C<title_lang> and C<body_lang> are the tags of the languages of the
+title and of the opening. The caller passes the C<title_lang> and the C<lang> of the
 page, as L<App::FuguWeb::Config/pages> names them. Each one defaults to
 the language of the page. The group gives the language of each
 heading, and the manual the language of each description.

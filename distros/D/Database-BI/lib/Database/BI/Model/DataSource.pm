@@ -1707,6 +1707,48 @@ sub updated {
 	return undef;
 }
 
+=head2 schema
+
+Delegates to the inner C<Database::Abstraction> backend's C<schema()> method.
+
+The join routes compare the declared types of columns that appear in more than
+one joined table, and the panel keeps no schema of its own.  Without this
+delegation a DataSource was schema-less, so every comparison found nothing and
+a TEXT/INTEGER mismatch across a join went unreported; the controller's
+C<_schema_type_warnings> uses this method to fill the schema-warnings banner.
+
+Returns a hashref of C<< column => { type => ..., nullable => ..., ... } >>.
+File formats that C<Database::Abstraction> reads as text (CSV, TSV, PSV, XML,
+XLSX) report C<TEXT>; SQLite reports the declared column types.  Returns an
+empty hashref when the inner backend cannot provide a schema.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+    HASHREF    column name => schema metadata hashref (possibly empty)
+
+=head3 MESSAGES
+
+None.
+
+=cut
+
+sub schema {
+	my $self = shift;
+
+	return {} unless $self->{_db} && $self->{_db}->can('schema');
+
+	my $schema = eval { $self->{_db}->schema() };
+	return {} if $@ || ref($schema) ne 'HASH';
+
+	return $schema;
+}
+
 # ---------------------------------------------------------------------------
 # Public data-access methods
 # ---------------------------------------------------------------------------

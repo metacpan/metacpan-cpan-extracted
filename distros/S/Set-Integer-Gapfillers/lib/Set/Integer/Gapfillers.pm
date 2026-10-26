@@ -1,5 +1,5 @@
 package Set::Integer::Gapfillers;
-$VERSION = '0.08';
+$VERSION = '0.09';
 use strict;
 use Carp;
 
@@ -584,16 +584,11 @@ results look like this:
 
 None reported so far.
 
-=head1 SUPPORT
-
-Via e-mail to author at address below.
-
 =head1 AUTHOR
 
     James E Keenan
     CPAN ID: JKEENAN
-    jkeenan@cpan.org
-    http://search.cpan.org/~jkeenan/
+    jkeenan@pobox.com
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -607,7 +602,7 @@ bugs are my fault, not his!
 
 =head1 COPYRIGHT
 
-Copyright 2006.  James E. Keenan.  United States.
+Copyright 2006-2026.  James E. Keenan.  United States.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

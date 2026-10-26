@@ -147,7 +147,8 @@ sub unfold { my $s = shift; $s =~ s/\r\n[ \t]//g; $s }
         "DTSTART:20261020T090000Z\r\n" . join('', map { "RRULE:FREQ=DAILY;INTERVAL=$_\r\n" } 1 .. 17) => qr/more than 16 rules in a set/,
     );
     for my $text (sort keys %dies) {
-        ok(!eval { $R->parse_ical($text); 1 }, 'refused: ' . ($text =~ s/\r\n/|/gr || '(empty)'));
+        (my $shown = $text) =~ s/\r\n/|/g;
+        ok(!eval { $R->parse_ical($text); 1 }, 'refused: ' . ($shown || '(empty)'));
         like($@, $dies{$text}, '  with the right words');
     }
     my $vixie = $R->cron('0 9 1 * 1', zone => 'UTC');

@@ -1,0 +1,333 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Monitor - Observe Another Fiber's Death without Owning it
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Monitor;
+
+    async {
+        my $worker = fiber { await_sleep(100); die "boom\n" };
+        my $watch  = Acme::Parataxis::Monitor->new($worker);
+
+        if ( my $err = $watch->await ) {
+            say "worker died: $err";        # boom
+        }
+
+        say 'the run is still going';       # a monitored crash is a value, not a rethrow
+    };
+
+A bare C<< $worker->await >> on that same fiber would take the whole run down with C<boom>. Awaiting a monitor hands
+you the error instead, so you decide what a crash is worth.
+
+=head1 DESCRIPTION
+
+A monitor is pure observation, like an Erlang monitor. It resolves exactly once, when the target finishes, to C<undef>
+for a clean end or to the target's death error for a crash. Because the error is a I<value> rather than something
+thrown, one failing worker never propagates out of the run that is watching it.
+
+The target may be anything with an C<on_ready> method - a fiber or a L<Future|Acme::Parataxis::Future> - or an
+C<on_death> method, which is how an L<Actor|Acme::Parataxis::Actor> is watched. The monitor rides a slot the target
+already has, so no scheduler change is involved.
+
+A monitor never owns its target. There is no C<stop>, and while it holds the target strongly enough that it can never
+lose its subject, it cannot hold the target's fiber slot open: reaping is driven by the fiber's own completion, and a
+fiber is reaped on schedule with a monitor still alive. The edge back is weak, so dropping a monitor dissolves it
+instead of leaving a callback behind in the target.
+
+=head1 METHODS
+
+=head2 C<new( $target )>
+
+    my $watch  = Acme::Parataxis::Monitor->new($worker);
+    my $same   = Acme::Parataxis::Monitor->new( target => $worker );
+    my $by_id  = Acme::Parataxis::Monitor->new( fid => $worker->fid );
+
+Creates a monitor for C<$target>. The target may be passed as a single blessed object, as a single numeric fiber id, or
+as C<target =E<gt> ...> / C<fid =E<gt> ...>.
+
+Watching a target that has already finished resolves the monitor immediately, inside C<new>. A C<on_ready> callback
+registered afterwards still fires, so there is no race in attaching one late.
+
+C<new> croaks, rather than returning a monitor that can never fire, when:
+
+=over
+
+=item * no target is given
+
+    C<Monitor->new() requires a target to watch>
+
+=item * the single argument is neither a reference nor a number
+
+    C<Monitor->new() expects a fiber object or a numeric fiber id>
+
+=item * the argument list is a hash with a key other than C<target> or C<fid>
+
+    C<Monitor->new() got unknown arguments: ...>
+
+=item * both C<target> and C<fid> are given
+
+    C<Monitor->new() takes a target or a fid, not both>
+
+=item * C<fid> is not a number
+
+    C<Monitor->new() expects a numeric fiber id (got '...')>
+
+=item * C<fid> names no live fiber
+
+    C<Monitor->new() couldn't find a fiber with id ...>
+
+=item * the target is a bare reference
+
+    C<Monitor->new() requires a blessed target (fibers, futures, actors)>
+
+=item * the target has neither hook
+
+    C<Monitor->new() cannot watch this target: it has neither on_ready() (fibers, futures) nor
+    on_death() (actors)>
+
+=back
+
+A target that has both hooks is watched through C<on_ready>.
+
+=head2 C<await( )>
+
+    my $err = $watch->await;
+
+Parks the calling fiber until the target finishes, then returns the resolution value: C<undef> for a clean end, the
+death error for a crash. It returns rather than throws, so wrap it only if you also want to catch exceptions of your
+own. Safe to call again after the fact, and after a clean end.
+
+Like every blocking call here, C<await> needs a scheduled fiber; on the mainline it croaks with C<await() must be
+called from inside a scheduled fiber>.
+
+=head2 C<result( )>
+
+    say 'clean' unless defined $watch->result;
+
+The resolution value, without parking. Croaks with C<Future not ready> until the monitor has resolved - the message
+comes from the future the monitor is built on, so it names C<Future> rather than C<Monitor>. Never returns a successful
+value, because a monitor has no successful value: see L</"Behavior Notes">.
+
+=head2 C<error( )>
+
+    warn "it failed: $watch->error" if defined $watch->error;
+
+The resolution value, without parking and without croaking. C<undef> means the target ended cleanly I<or has not
+finished yet> - check C<is_ready> when the difference matters.
+
+=head2 C<is_ready( )> and C<is_done( )>
+
+    if ( $watch->is_ready ) { ... }
+
+True once the target has finished, in either direction. The two names are the same test; C<is_done> is there to match
+the fiber-side vocabulary.
+
+=head2 C<target( )>
+
+    $watch->target->is_done;
+
+The watched object itself, so you can reach your own fields on it without keeping a second reference.
+
+=head2 C<fid( )>
+
+    my $id = $watch->fid;
+
+The target's fiber id, captured when the monitor was created. C<undef> for a target that is not a fiber, such as a
+future, and C<-1> if the fiber had already been reaped - which is the common case, since a fiber with nothing to block
+on finishes before the next line runs.
+
+=head2 C<on_ready( $cb )>
+
+    $watch->on_ready( sub {
+        my $watch = shift;
+        warn 'background job ended: ' . ( $watch->result // 'clean' );
+    } );
+
+Registers C<$cb> to run when the monitor resolves, and returns the monitor so calls chain. The callback is handed the
+I<monitor>, not the future inside it, so it can read C<result>, C<error> and C<target> directly.
+
+Each registration fires once, so several callbacks on one monitor all run. A callback registered after the monitor has
+already resolved runs too, and a non-CODE argument croaks with C<on_ready() requires a CODE ref>.
+
+The monitor is captured weakly, so if you let the monitor go out of scope, its callbacks are simply never called rather
+than resurrecting it.
+
+=head1 Recipes
+
+=head2 Notice a crash without stopping the run
+
+    my $watch = Acme::Parataxis::Monitor->new( fiber {
+        my $response = $risky->fetch;      # parks on the socket; a death after this point is caught
+        $response;
+    } );
+
+    if ( my $err = $watch->await ) {
+        warn "fetch failed: $err";
+        return;
+    }
+
+    say 'fetched';
+
+The fiber's C<die> becomes an ordinary C<if>.
+
+=head2 Join fibers you did not create as a group
+
+A C<nursery> adopts only the children it spawned itself, so fibers that came from somewhere else have to be collected
+by hand. A monitor is the portable way to wait on all of them and then decide:
+
+    my @watch = map { Acme::Parataxis::Monitor->new($_) } @strays;
+
+    my @errors;
+    for my $w (@watch) {
+        my $err = $w->await;
+        push @errors, $err if defined $err;
+    }
+
+    die "one of them died: $errors[0]" if @errors;
+
+=head2 Notice that a background loop has stopped
+
+    my $running = 1;
+
+    my $loop  = fiber { while ($running) { refresh(); await_sleep 5 } };
+    my $watch = Acme::Parataxis::Monitor->new($loop);
+
+    $watch->on_ready( sub {
+        my $watch = shift;
+        warn 'the refresh loop stopped: ' . ( $watch->result // 'clean exit' ) . "\n";
+    } );
+
+    fiber { await_sleep(50); $running = 0 };    # retire it from somewhere else
+    $watch->await;                              # and reap it, so the report lands
+
+Nothing polls for the loop's death, and a loop that dies rather than retiring says why in C<< $watch->result >>.
+
+=head2 Test that a fiber fails the way you meant it to
+
+    my $err = eval {
+        async {
+            my $watch = Acme::Parataxis::Monitor->new( fiber { await_sleep(10); die "expected\n" } );
+            $watch->await;
+        };
+    };
+
+    is $err, "expected\n", 'the fiber reported its own error';
+
+The assertion is on the returned value, so the surrounding test keeps running.
+
+=head1 Behavior Notes
+
+=head2 The resolution value is always the error
+
+There is no successful result. A monitor stores the target's error in its future as a I<result>, never as a failure, so
+C<await>, C<result> and C<error> all return the same thing: C<undef> for a clean end, the death error otherwise. C<<
+$watch->result >> on a fiber that returned C<42> gives C<undef>, not C<42>. Use C<< $fiber->await >> when you want the
+value, and a monitor when you want to know how it ended.
+
+=head2 C<error> is C<undef> before the target ends
+
+C<error> never croaks, and before the monitor resolves it has nothing to report - so an unresolved monitor and a
+cleanly finished one both answer C<undef>. Gate on C<is_ready> before concluding that all is well:
+
+    if ( $watch->is_ready ) {
+        say defined $watch->error ? 'failed' : 'finished cleanly';
+    }
+    else {
+        say 'still running';
+    }
+
+=head2 The target has to reach its first park
+
+A C<fiber> body starts running at the C<fiber> call, not after it. If the body dies before it ever blocks, it dies
+before there is a monitor to catch it, and the error leaves the run by the usual route:
+
+    async {
+        my $watch = Acme::Parataxis::Monitor->new( fiber { die "instant death\n" } );   # too late
+        $watch->await;
+    };                                                            # the run dies with 'instant death'
+
+Putting anything that blocks first - a socket, a timer, a queue - moves the death into the window the monitor covers,
+which is the normal case for real work:
+
+    async {
+        my $watch = Acme::Parataxis::Monitor->new( fiber { await_sleep(10); die "late death\n" } );
+        say $watch->await;    # late death
+    };
+
+A C<nursery> child parks once at birth, so it is already inside that window by the time C<spawn> returns.
+
+=head2 A monitor on an actor watches its death, not its failures
+
+An L<Actor|Acme::Parataxis::Actor> survives a handler that dies: the C<ask> future fails with the handler's error and
+the actor goes back to its mailbox and serves the next message. Since the actor has not died, the monitor has nothing
+to resolve, so it stays parked. Only C<stop> - or something fatal to the fiber itself - resolves it. Awaiting the
+monitor of an actor that nobody stops is a deadlock.
+
+=head2 A monitor on a future tells you whether it failed, not what it returned
+
+A future's C<error> is C<undef> on success, so watching one resolves to C<undef> whether it was given a value or not.
+If you want the value, keep the future and ask it.
+
+=head2 A background fiber keeps its run alive, so make sure it can end
+
+A run does not finish just because the fiber that started it returned. It stays alive while any other fiber is still
+parked, and a monitor cannot shortcut that: a loop with no exit condition parks forever, and the run waits for it:
+
+    async {
+        my $loop = fiber { while (1) { refresh(); await_sleep 5 } };    # never stops
+        Acme::Parataxis::Monitor->new($loop)->on_ready( sub { ... } );
+    };                                    # this run does not return until something ends the loop
+
+That is what makes the monitor trustworthy - a C<while (1)> loop cannot be silently abandoned - but it means the loop
+needs a way out. Give it a condition, and reap it so the callback is delivered before the run ends:
+
+    async {
+        my $running = 1;
+        my $loop    = fiber { while ($running) { refresh(); await_sleep 5 } };
+        my $watch   = Acme::Parataxis::Monitor->new($loop);
+        $watch->on_ready( sub { warn 'the refresh loop stopped' . ( $watch->result // '' ) } );
+
+        fiber { await_sleep(50); $running = 0 };    # the way out
+        $watch->await;                             # reap it, so the report lands
+    };
+
+=head2 Never watch the fiber you are running in
+
+C<< Acme::Parataxis::Monitor->new( fid => 0 ) >> inside a run is accepted, and then C<await> parks the very fiber whose
+completion you are waiting for. The run reports a deadlock. Watch somebody else.
+
+=head1 How It Works
+
+A monitor is a thin wrapper around an internal L<Future|Acme::Parataxis::Future> plus the target, and it resolves at
+most once - C<_resolve> returns early if the future is already ready. Construction hooks the target: C<on_ready> for
+fibers and futures, C<on_death> for actors, and the callback captures a weak reference to the monitor. That is what
+makes the monitor dissolvable, and it is why a target that finishes between your C<new> and your C<on_ready> still
+notifies you - the underlying future is already ready, so it replays the registration.
+
+Nothing is weakened on the way to the target: the monitor holds it strongly, so a monitor can never lose its subject.
+Reaping is unaffected, because a fiber's slot is released by the fiber's own completion rather than by the monitor
+holding a reference.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Future>, L<Acme::Parataxis::Actor>, L<Acme::Parataxis::Nursery>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

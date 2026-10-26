@@ -23,7 +23,7 @@ use App::FileSync::Args qw(named);
 use App::FileSync::Constants qw($ROLE_CLIENT $SERVER_PROGRAM);
 use App::FileSync::I18N qw(throw);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # How far up from this file to look for a checkout's bin/filesync-server:
 # lib/App/FileSync/Transport is four levels, blib/lib/... five.

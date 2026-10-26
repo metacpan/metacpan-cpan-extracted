@@ -6,7 +6,7 @@ use warnings;
 
 use Time::Keeper;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Time::Keeper::Recurrence', $VERSION);
@@ -23,7 +23,7 @@ Time::Keeper::Recurrence - rules that say when something happens again
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -246,6 +246,23 @@ C<forward>); both undef for a rule with no RSCALE.
 The rule as an RRULE, in one canonical form: the RFC's order of parts,
 values ascending, C<INTERVAL=1> and C<WKST=MO> left out. Reading it back
 gives the same rule. An C<@every> cron has none and dies.
+
+=head2 describe
+
+    Time::Keeper::Recurrence->cron('*/15 9-17 * * 1-5')->describe;
+    # Every 15 minutes from 09:00 to 17:45, Monday to Friday
+    $r->describe;    # On the first Monday of every month, 10 times
+
+The rule in English words, one sentence without its full stop. It is read from
+the rule as compiled, so a cron, an RRULE and C<every> that say the same thing
+read the same: the time of day ("At 09:00", "Every 2 hours, on the hour", "Every
+hour from 08:00 to 18:00"), the days ("Monday to Friday", "the first Monday", "the
+last weekday", "the 1st and the 15th", cron's "on the 13th of the month, or on
+Friday"), the months ("from March to October"), the cycle ("of every month", "every
+2 weeks"), the end (", 10 times", ", until 2026-12-31") and an RSCALE rule's
+calendar (", in the Hebrew calendar", its months as numbers). A rule that takes its
+time of day from its start says no time. A part the words do not cover reads as
+its numbers, never as nothing.
 
 =head2 ical
 

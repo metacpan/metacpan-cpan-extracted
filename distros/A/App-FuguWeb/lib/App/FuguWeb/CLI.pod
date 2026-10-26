@@ -33,9 +33,11 @@ See L<fuguweb(1)> for the user documentation of the subcommands.
 The project root. Without it, the class walks up from the working
 directory to the first F<.fuguwebrc>.
 
-=item B<--quiet>
+=item B<-q>, B<--quiet>
 
-Suppress informational output.
+Set the level of the log to C<warning>. The log then stops each C<info>
+message, and it keeps each error and each warning. The option does not
+touch standard output.
 
 =back
 
@@ -44,6 +46,16 @@ Suppress informational output.
 C<build> and C<clean> take C<--out> I<dir>, which overrides the
 C<out_dir> setting. C<init> writes a starter description and is the one
 command that runs without one.
+
+C<status> and C<translated> read the record of the translations, and
+L<App::FuguWeb::Status> holds the work. C<status> prints one line for
+each part of a translation that does not follow its source, and it
+exits C<EXIT_ERROR> when it prints a line. C<translated> takes one path
+or more from the project root, and writes the line of each one into the
+record. It exits C<EXIT_ERROR> when it refuses a file. Each of the two
+exits C<EXIT_CONFIG_ERROR> when it cannot read the record or a source,
+and when two parts name one translated file over two default sources,
+per WEB-STATUS-7.
 
 C<mint-key>, C<import-key> and C<promote-key> write one key directory,
 and L<App::FuguWeb::Rotate> holds the work. Each one takes a
@@ -101,6 +113,9 @@ tool. The rest belong to a site build.
 
 A caller that builds in a container can thus tell a renderer that is
 not installed from a page that is malformed.
+
+C<status> gives C<EXIT_ERROR> when a part does not follow its source,
+as diff(1) gives 1 when two files differ, per WEB-STATUS-5.
 
 =head1 SEE ALSO
 

@@ -19,3 +19,5 @@ Changes for Set::Integer::Gapfillers
 0.08 Sun May 17 15:51:35 EDT 2009
     - improve test coverage and do subsequent refactoring; thanks to Isaac
       Miller for impetus to do so
+0.09 Sun Oct 25 08:34:22 AM EDT 2026
+    - no change in functionality; modernize Makefile.PL and metadata handling

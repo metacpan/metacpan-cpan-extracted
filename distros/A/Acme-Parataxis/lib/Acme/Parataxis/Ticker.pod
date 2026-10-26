@@ -1,0 +1,137 @@
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Ticker - Drift-free Interval Timer for Scheduled Fibers
+
+=head1 SYNOPSIS
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::Ticker;
+
+    my $tick = Acme::Parataxis::Ticker->new( interval => 1000 );
+
+    async {
+        for ( 1 .. 10 ) {
+            last unless my $t = $tick->wait_next;
+            do_work();      # every pass starts 1000ms after the last tick, whatever do_work costs
+        }
+        $tick->stop;
+    };
+
+=head1 DESCRIPTION
+
+A loop of the form C<while (1) { do_work(); await_sleep($ms) }> drifts. Each pass costs C<$ms> I<plus> however long
+C<do_work> took, so the loop slides later and later: at C<$ms = 1000> with a 200ms C<do_work> it runs every 1200ms, and
+after a minute it is two minutes behind schedule.
+
+A C<Ticker> measures every period against an absolute tick boundary instead of against whenever the last pass finished,
+and sleeps only the I<remainder> of the current interval. Ticks therefore land on the boundary no matter how long the
+consumer took to come back for the previous one.
+
+Under the hood a background fiber records the absolute time of the next boundary, sleeps until it, and C<try_put>s the
+tick time into a capacity-1 L<Acme::Parataxis::Channel>. Before publishing a tick it drains whatever the consumer has
+not collected yet, so exactly one tick can ever be outstanding and it is always the newest: a slow consumer silently
+loses whole periods rather than accumulating a stale backlog it would then have to work through. The value C<wait_next>
+hands back is the scheduled boundary, not the delivery time, so consecutive ticks stay exactly one interval apart even
+when a particular one arrived late.
+
+The sleep is an ordinary C<await_sleep>, so it uses the same timed-wait machinery as the rest of the library - the OS
+worker pool by default, or the current event loop while a driver is attached.
+
+C<stop> ends all of it at once: it releases any fiber parked in C<wait_next> (which gets C<undef>) and interrupts the
+background fiber's sleep so the fiber unwinds and the sleep job it armed is recalled. A stopped ticker therefore never
+keeps C<run> alive and never leaves a fiber behind.
+
+=head1 METHODS
+
+=head2 C<new( interval => $ms )>
+
+    my $tick = Acme::Parataxis::Ticker->new( interval => 1000 );
+
+Creates a ticker that fires every C<$ms> milliseconds, with the first tick one full interval later. C<$ms> must be
+defined and positive; anything else croaks.
+
+Construction starts the background fiber immediately, so you may build a ticker before C<run> and consume it inside
+one. That fiber runs until the ticker is stopped, so call C<stop> when you are finished with it.
+
+=head2 C<wait_next( )>
+
+    while ( my $t = $tick->wait_next ) {
+        do_work();
+    }
+
+Blocks the calling fiber until the next tick and returns that tick's scheduled time - a true value - or C<undef> once
+the ticker has been stopped, which is what ends the C<while> loop above. Must be called from inside a scheduled fiber;
+elsewhere it croaks.
+
+The ticker keeps ticking while nobody is waiting: a consumer that takes longer than one interval simply finds whole
+periods skipped when it comes back, never a queue of overdue ticks.
+
+=head2 C<stop( )>
+
+    $tick->stop;
+
+Halts the ticker: it stops publishing, releases every fiber parked in C<wait_next> with C<undef>, and interrupts the
+background fiber so it exits at once and its armed sleep job is recalled instead of sleeping out the rest of the
+interval. Idempotent - returns a true value the first time it does work and false on every later call. Safe to call
+whether the ticker has ticked or not, and from inside or outside a fiber.
+
+=head2 C<running( )>
+
+    $tick->running;     # true until stop()
+
+True while the ticker is still publishing.
+
+=head2 C<interval( )>
+
+    $tick->interval;    # the period in milliseconds
+
+The interval the ticker was constructed with.
+
+=head2 C<pending( )>
+
+    $tick->pending;     # 0 or 1
+
+How many ticks are waiting to be collected. Never exceeds C<1>: the newest tick replaces any unread one.
+
+=head2 C<fired( )>
+
+    $tick->fired;       # ticks produced
+
+Ticks the ticker has published since construction.
+
+=head2 C<dropped( )>
+
+    $tick->dropped;     # ticks discarded
+
+Ticks discarded because nobody collected them before the next one came due. The ticks actually handed to a consumer are
+C<fired - dropped - pending>.
+
+=head2 C<skipped( )>
+
+    $tick->skipped;     # boundaries never fired
+
+Tick boundaries leapfrogged after the ticker fiber woke far behind schedule: rather than burst-firing every missed
+period at once, each missed boundary is counted here. Skipped periods never produce a tick, so they do not count as
+fired or dropped.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Channel>, L<Acme::Parataxis::Semaphore>, L<Acme::Parataxis::CancellationToken>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

@@ -1,5 +1,13 @@
 Revision history for Perl-Version-Bumper
 
+0.277 2026-10-25 BOOK
+    - add support for the 5.044 feature bundle
+    - fix cases where the 'removed' information would be incorrect
+    - drop feature pragmas that are redundant in their lexical scope
+      (work in progress, only applies to the bitwise feature for now)
+    - add Perl::Version::Bumper::Rationale manual page
+    - move version the subs to Perl::Version::Bumper::Helper::Version
+
 0.256 2026-04-24 BOOK
     - improved support for detecting features enabled/disabled by
       lexical scope

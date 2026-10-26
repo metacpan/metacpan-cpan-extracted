@@ -106,9 +106,13 @@ F<~user> alone: this module does not resolve other users.
 
 C<share_path($relative, %args)> resolves a file that ships with a
 distribution. The search tries, in order: an explicit root, the
-checkout that holds the caller's module file, the working directory,
-and the installed share tree of the named distribution under C<@INC>.
-The method returns the first path that exists, or C<undef>.
+checkout that holds the caller's module file, and the installed share
+tree of the named distribution under C<@INC>. The method returns the
+first path that exists, or C<undef>.
+
+The working directory is not a root of the search. An installed tool
+must not take data from the directory where it runs. A run from a
+checkout finds its data through C<from>.
 
 These are the arguments:
 

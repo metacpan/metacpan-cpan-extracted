@@ -15,6 +15,15 @@ use Readonly;
 
 my $t = Test::Mojo->new('Database::BI');
 
+# A staging directory this file owns.  Transaction 16 counts exactly the files
+# it uploaded, and a parallel test file's uploads or clear calls in the shared
+# default directory would break both that count and its neighbours' opens.
+$t->app->config->{uploads_dir} = tempdir(CLEANUP => 1);
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
 # ======================================================================
 # CONSTANTS
 # ======================================================================
@@ -1117,7 +1126,7 @@ subtest 'Transaction 15: from=saved — bi:recent suppression contract' => sub {
 #
 # Verifies POST /uploads/clear across three phases:
 #
-#   Phase 1  POST /upload (two files)          -> uploads land in .uploads/
+#   Phase 1  POST /upload (two files)          -> uploads land in uploads_dir
 #   Phase 2  POST /uploads/clear (first call)  -> freed > 0, count >= 2
 #   Phase 3  POST /uploads/clear (second call) -> freed = 0, count = 0
 #                                                 (cache already empty)
@@ -1127,8 +1136,9 @@ subtest 'Transaction 15: from=saved — bi:recent suppression contract' => sub {
 # ======================================================================
 
 subtest 'Transaction 16: Clear upload cache — full lifecycle' => sub {
-	# Phase 0: drain any files left over from prior test runs or other test
-	# files so the lifecycle starts from a known-empty state.
+	# Phase 0: drain any files left over from a prior run in this process (the
+	# directory is this file's own temp dir) so the lifecycle starts from a
+	# known-empty state.
 	$t->post_ok('/uploads/clear')->status_is(200);
 
 	# Phase 1: upload two distinct CSV files so .uploads/ is non-empty.
@@ -2433,12 +2443,17 @@ subtest 'Transaction 39 -- Remote file path lifecycle' => sub {
 
 	Readonly my $CSV_BODY => "product,region,amount\nWidget,North,100\nGadget,South,200\n";
 
+	# Captures the 'user' option on each Net::SFTP::Foreign->new call so
+	# Phase 7 can verify it is forwarded from the user@host path component.
+	my $captured_sftp_user;
+
 	{
 		no strict 'refs';
 		no warnings 'redefine';
 		*{'Net::SFTP::Foreign::new'} = sub {
 			my ($class, $host, %opts) = @_;
 			return undef unless defined $host && $host eq 'mockhost';
+			$captured_sftp_user = $opts{user};
 			return bless { _stub_host => $host }, $class;
 		};
 		*{'Net::SFTP::Foreign::error'} = sub { '' };
@@ -2490,10 +2505,15 @@ subtest 'Transaction 39 -- Remote file path lifecycle' => sub {
 	  ->content_like(qr/product/i, 'Phase 6: column header present after sniff rename');
 
 	# Phase 7: user@hostname syntax passes credentials to Net::SFTP::Foreign.
+	# DataSource splits "testuser@mockhost" into user="testuser", host="mockhost"
+	# and forwards user => $user to Net::SFTP::Foreign->new.
+	$captured_sftp_user = undef;
 	my $user_path = '/../testuser@mockhost/tmp/remote_sales.csv';
 	$t->get_ok('/open?path=' . url_escape($user_path))
 	  ->status_is(200, 'Phase 7: user@hostname syntax opens correctly')
 	  ->content_like(qr/Widget/, 'Phase 7: data visible with user@hostname path');
+	is($captured_sftp_user, 'testuser',
+		'Phase 7: username extracted from user@hostname and forwarded to Net::SFTP::Foreign');
 
 	# Tear down: restore original Net::SFTP::Foreign methods.
 	{

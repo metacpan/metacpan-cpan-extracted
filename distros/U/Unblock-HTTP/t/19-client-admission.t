@@ -184,13 +184,15 @@ my $flush = sub {
             $_[1]->(connection => AdmissionTest::Quic->new);
         },
     );
-    my (@errors, @finishes);
+    my (@errors, @finishes, @admitted);
     my $op = $client->request(url => 'https://h3.test/', http_version => '3',
         on_error => sub { push @errors, [@_] },
         on_finish => sub { push @finishes, $_[0] },
+        on_transaction => sub { push @admitted, $_[0] },
     );
     is($op->state, 'queued', 'H3 no-stream result preserves unsent operation');
     ok(!defined($op->transaction), 'no phantom transaction created');
+    is(scalar(@admitted), 0, 'no admission callback without H3 credit');
     is($client->pending_count, 1, 'unsent H3 request is counted in queue');
     is(scalar(@errors), 0, 'lack of temporary bidi credit is not an HTTP error');
     is(scalar(@finishes), 0, 'temporary block does not finish operation');
@@ -211,6 +213,7 @@ my $flush = sub {
     is($op->state, 'queued', 'availability callback never dispatches inline');
     $flush->();
     is($op->state, 'active', 'deferred notification admits original operation');
+    is_deeply(\@admitted, [$op->transaction], 'one callback with actual H3 transaction');
     is($second->state, 'active', 'other queued H3 request also admitted within cap');
     is($connections, 1, 'H3 reuses original QUIC connection');
     is($client->pending_count, 0, 'queued H3 operations released at dispatch');

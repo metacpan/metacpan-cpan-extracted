@@ -1,0 +1,372 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Sync::Once - Run an action exactly once, however many fibers ask
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis::Sync::Once;
+    my $db_ready = Acme::Parataxis::Sync::Once->new;
+    my $ready    = 0;
+    async {
+        my @handles;
+        for my $id ( 1 .. 5 ) {
+            push @handles, fiber {
+                $db_ready->do( sub { $ready++; "connection $ready" } );
+            };
+        }
+        $_->await for @handles;
+        say 'the action ran ', $ready, ' time(s) for 5 callers';
+    };
+    # the action ran 1 time(s) for 5 callers
+
+=head1 DESCRIPTION
+
+A once-only initializer. The first fiber to call C<do> runs the action; every other caller parks until it finishes and
+then carries on. Once the action has finished - whether it returned, died, or was interrupted - the action never runs
+again, and later callers return immediately.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis::Sync::Once;
+    my $once  = Acme::Parataxis::Sync::Once->new;
+    my $times = 0;
+    async {
+        $once->do( sub { $times++ } );
+        $once->do( sub { $times++ } );
+        $once->do( sub { $times++ } );
+        say 'three calls, ', $times, ' run, and done is now ', ( $once->done ? 'true' : 'false' );
+    };
+    # three calls, 1 run, and done is now true
+
+The action runs on the calling fiber, not on a child of its own, so anything it parks on parks the caller too - and
+other fibers queue behind it meanwhile. That is what makes C<do> usable for a real connection handshake rather than
+only for a cheap memo.
+
+There is one asymmetry worth knowing before you write the call site: only the fiber that ran the action gets its return
+value. Waiters and later callers get nothing at all.
+
+=head1 METHODS
+
+=head2 C<new( )>
+
+    use v5.40;
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    say 'a fresh Once has run: ', ( $once->done ? 'yes' : 'no' ), ', with ', $once->waiters, ' waiting';
+    # a fresh Once has run: no, with 0 waiting
+
+Creates an unrun C<Once>. Takes no arguments: an unknown key croaks with C<Unrecognized parameters for
+"Acme::Parataxis::Sync::Once" constructor>.
+
+=head2 C<do( $code )>
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        my $first = fiber {
+            my $value = $once->do( sub { await_sleep( 20 ); 'the connection' } );
+            say 'the runner got: ', $value;
+        };
+        await_sleep( 5 );                           # the action is now running and parked
+        my $second = fiber { say 'a waiter got: ', ( $once->do( sub {'x'} ) // 'nothing' ) };
+        $first->await;
+        $second->await;
+    };
+    # the runner got: the connection
+    # a waiter got: nothing
+
+Runs C<$code> if it has not run before, and returns what it returned - to the fiber that ran it. If another fiber is
+already running the action this parks until that is finished, and returns nothing. Croaks off a fiber, and croaks if
+C<$code> is not a code reference.
+
+=over
+
+=item C<Once::do requires a CODE reference>
+
+=item C<Once actions must run inside a scheduled fiber>
+
+=item C<Once::do is not reentrant: this fiber is already running the action>
+
+=back
+
+The C<CODE reference> check comes first, so it is what you get off a fiber if you pass the wrong thing. The last of
+those three is a real mistake rather than a supported nesting: the action is already running on this fiber, so the
+inner C<do> has nothing to wait for. It also spends the C<Once> for good - see L<"A re-entrant do spends the Once">.
+
+C<$code> is always called in B<scalar context>, so an action that returns a list gives you its last element rather than
+the list. Return a reference or a join if you need more than one value.
+
+=head2 C<done>
+
+    use v5.40;
+    use Acme::Parataxis qw[async];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    say 'before: ', ( $once->done ? 'yes' : 'no' );
+    async { $once->do( sub {1} ) };
+    say 'after:  ', ( $once->done ? 'yes' : 'no' );
+    # before: no
+    # after:  yes
+
+Whether the action has finished. C<true> for an action that returned, and equally C<true> for one that died or was
+interrupted - there is no way back to C<false>. A reader, so it works off a fiber as well as on one.
+
+=head2 C<waiters>
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        my $runner = fiber { $once->do( sub { await_sleep( 100 ) } ) };
+        await_sleep( 5 );
+        say 'the action is running, so waiters is: ', $once->waiters;
+        my @handles;
+        for my $id ( 1 .. 3 ) { push @handles, fiber { $once->do( sub {1} ) } }
+        await_sleep( 5 );
+        say 'with three more asking: ', $once->waiters;
+        $runner->await;
+        $_->await for @handles;
+        say 'and once it is all over: ', $once->waiters;
+    };
+    # the action is running, so waiters is: 0
+    # with three more asking: 3
+    # and once it is all over: 0
+
+How many fibers are parked waiting for the action. Also a reader, so it works off a fiber.
+
+The count is B<not> a count of everyone interested - the fiber running the action is not in it, which is why the first
+line above is C<0> even though the action is under way. It is a count of the queue, and it drops to C<0> the moment the
+action ends, before the waiters have run.
+
+=head1 How It Works
+
+The whole primitive is three fields: C<$owner>, the fiber running the action or C<undef>; C<$done>, whether it has
+finished; and C<@waiters>, the queue of fiber ids. C<do> is one branch for each of the three states a caller can find
+it in - already finished, already running, or free to run - followed by the action and the release.
+
+Three things follow from that shape. Only the run path returns a value, so only the runner ever sees the action's
+result. The queue is drained in arrival order and cleared before the waiters are woken, so a fiber released from it
+cannot be released twice. And C<$done> is assigned B<after> the C<eval> that wraps the action, from the same frame, on
+every route out of it - return, C<die>, or an interrupt thrown in by a deadline or a cancellation.
+
+That last one is why a failed action still spends the C<Once>, and why a cancelled runner still releases everyone
+waiting on it. It is the one place in the family where a fiber's death cannot leave the primitive stuck: however the
+action ends, the frame that called it is still there to set the flag and drain the queue.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep with_cancel];
+    use Acme::Parataxis::Sync::Once;
+    my $once  = Acme::Parataxis::Sync::Once->new;
+    my $inner = {};
+    async {
+        my $runner = fiber {
+            my $value = eval {
+                $once->do( sub {
+                    with_cancel( sub ($t) { $inner->{token} = $t; await_sleep( 10_000 ) } );
+                    'never'
+                } );
+            };
+            say 'the runner was interrupted: ', ( $@ ? 'yes' : 'no' );
+        };
+        await_sleep( 20 );
+        my $waiter = fiber { say 'a waiter got: ', ( $once->do( sub {'x'} ) // 'nothing' ) };
+        await_sleep( 10 );
+        $inner->{token}->cancel;                            # pull the runner out of the action
+        $runner->await;
+        $waiter->await;
+        say 'and the Once is still spent: ', ( $once->done ? 'yes' : 'no' );
+    };
+    # the runner was interrupted: yes
+    # a waiter got: nothing
+    # and the Once is still spent: yes
+
+=head1 Recipes
+
+=head2 Initialising a shared resource
+
+The shape to reach for. Every fiber that needs the resource calls C<do>; whichever gets there first builds it and the
+rest wait, then find it ready. Nothing outside the action needs to know whether it won the race.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync::Once;
+    my $connect = Acme::Parataxis::Sync::Once->new;
+    my $handshakes = 0;
+    my $log     = '';
+    async {
+        my @handles;
+        for my $id ( 1 .. 5 ) {
+            push @handles, fiber {
+                $connect->do( sub { $handshakes++; await_sleep( 20 ); "connection $handshakes" } );
+                $log .= Acme::Parataxis->current_fid . ' ';
+            };
+        }
+        $_->await for @handles;
+        my $served = $log =~ tr/ //;
+        say "$handshakes handshake(s) for 5 fibers, and $served of them got through";
+    };
+    # 1 handshake(s) for 5 fibers, and 5 of them got through
+
+=head2 A value that only the winner needs
+
+Because only the runner is handed the action's return value, put the shared result somewhere the action can reach
+rather than relying on the return. A closure over an outer lexical is the simplest thing that works.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync::Once;
+    my $config = Acme::Parataxis::Sync::Once->new;
+    my %settings;
+    my $reads  = 0;
+    async {
+        my @handles;
+        for my $id ( 1 .. 4 ) {
+            push @handles, fiber {
+                $config->do( sub { %settings = ( threads => 4, name => 'pool' ); 1 } );
+                $reads++;                                      # safe: the action is finished by now
+            };
+        }
+        $_->await for @handles;
+        say "pool of $settings{threads} named $settings{name}, read by $reads fibers";
+    };
+    # pool of 4 named pool, read by 4 fibers
+
+=head2 Bounding the wait
+
+A fiber parked in C<do> is parked on an ordinary interruptible wait, so C<with_timeout( $ms, ... )> bounds it and a
+cancelled token aborts it. Either way the fiber leaves the queue, and - because the C<Once> is not spent by the
+interruption - the action still runs to completion for everyone else.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        my $runner = fiber { $once->do( sub { await_sleep( 200 ); 'built' } ) };
+        await_sleep( 5 );
+        my $impatient = fiber {
+            my $value = eval { Acme::Parataxis::with_timeout( 30, sub { $once->do( sub {'x'} ) } ) };
+            my $why = $@ ? ( $@->message =~ s/ at .*//sr ) : "got $value";
+            say 'the impatient waiter: ', $why;
+            say '  and the queue it left behind: ', $once->waiters;
+        };
+        $runner->await;
+        $impatient->await;
+        say 'the action still finished, so done is: ', ( $once->done ? 'yes' : 'no' );
+    };
+    # the impatient waiter: The operation timed out
+    #   and the queue it left behind: 0
+    # the action still finished, so done is: yes
+
+=head1 Behavior Notes
+
+=head2 A re-entrant do spends the Once
+
+The one mistake C<do> cannot survive is being called from inside its own action. The action is already running on this
+fiber, so there is nothing to wait for, and the method croaks - and because that croak leaves the action by way of
+C<die>, the C<Once> records it as finished. Every later caller sees a spent C<Once> and silently gets nothing.
+
+    use v5.40;
+    use Acme::Parataxis qw[async];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        eval { $once->do( sub { $once->do( sub {'inner'} ) } ) };
+        say 'the nested call: ', ( $@ ? ( $@ =~ s/ at .*//sr ) : 'allowed' );
+        say 'and the Once is now: ', ( $once->done ? 'spent' : 'unspent' );
+        my $later = $once->do( sub { 'never runs' } );
+        say 'a later caller gets: ', ( defined $later ? $later : 'nothing' );
+    };
+    # the nested call: Once::do is not reentrant: this fiber is already running the action
+    # and the Once is now: spent
+    # a later caller gets: nothing
+
+A nested C<do> is nearly always a design mistake rather than an oversight - the resource the action is building should
+not need the resource it is building. If it is genuinely the same value, check C<done> before calling and branch on
+that instead.
+
+=head2 Only the runner gets the value
+
+C<do> returns the action's value on the run path only. A fiber that waited gets nothing, and so does a fiber that
+arrives after the action has finished. Both return C<undef> in scalar context and the empty list in list context, so
+there is no way to tell the two apart from the return value.
+
+    use v5.40;
+    use Acme::Parataxis qw[async];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        my $ran    = $once->do( sub {'the value'} );
+        my $late   = $once->do( sub {'never'} );
+        my @inlist = $once->do( sub { ( 1, 2, 3 ) } );
+        say 'the runner saw: ', $ran;
+        say 'a later caller saw: ', ( defined $late ? $late : 'nothing' ), ' in scalar context';
+        say 'and in list context: ', ( @inlist ? join ',', @inlist : 'nothing' ), ' (never re-ran)';
+    };
+    # the runner saw: the value
+    # a later caller saw: nothing in scalar context
+    # and in list context: nothing (never re-ran)
+
+This bites hardest with a value that is a list. C<do> calls the action in scalar context, so even the B<runner> only
+gets the last element - C<< ( 1, 2, 3 ) >> comes back as C<3>. Return a reference if you need a collection.
+
+=head2 A failed action still spends the Once
+
+An action that dies - or one whose fiber is cancelled mid-action - leaves the C<Once> finished. The error reaches the
+runner and nobody else: waiters are released with nothing, and later callers get nothing. There is no retry.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep];
+    use Acme::Parataxis::Sync::Once;
+    my $once = Acme::Parataxis::Sync::Once->new;
+    async {
+        my $runner = fiber {
+            eval { $once->do( sub { await_sleep( 20 ); die "no connection\n" } ) };
+            say 'the runner saw: ', ( $@ ? ( $@ =~ s/ at .*//sr ) : 'no error' );
+        };
+        await_sleep( 5 );
+        my @waiters;
+        for my $id ( 1 .. 2 ) {
+            push @waiters, fiber { say "waiter $id got: ", ( $once->do( sub {'x'} ) // 'nothing' ) };
+        }
+        $runner->await;
+        $_->await for @waiters;
+        say 'and a later caller: ', ( $once->do( sub { 're-runs?' } ) // 'nothing' );
+    };
+    # the runner saw: no connection
+    # waiter 1 got: nothing
+    # waiter 2 got: nothing
+    # and a later caller: nothing
+
+That is the right default for an initializer - a half-built resource is not worth handing out - but it means a C<Once>
+whose action can fail has to build a replacement to try again. If the first attempt is allowed to fail, hold the
+C<Once> in a place you can replace it, rather than hoping a second C<do> will retry.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::Sync::RwLock>,
+L<Acme::Parataxis::Sync::WaitGroup>, L<Acme::Parataxis::Sync::Barrier>, L<Acme::Parataxis::Error::Timeout>,
+L<Acme::Parataxis::Error::Cancelled>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut
+

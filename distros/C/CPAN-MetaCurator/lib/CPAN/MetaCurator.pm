@@ -1,6 +1,6 @@
 package CPAN::MetaCurator;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 #-------------------------------------------------
 
@@ -12,79 +12,9 @@ our $VERSION = '1.33';
 
 CPAN::MetaCurator - Manage the cpan.metacurator.sqlite database
 
-=head1 How to convert a Perl.Wiki.html into a jsTree
+=head1 Operational Instructions
 
-Note: My web host and I use case-sensitive file systems.
-
-=head2 Prepare wikis
-
-=over
-=item cd ~/savage.net.au/
-=item Edit Perl.Wiki as desired. Includes updating the release date. Save to ~/Downloads/
-=item cp ~/Downloads/Perl.Wiki.html to misc/
-=item git commit -am"Update Perl.Wiki V 1.xx"
-=item cp misc/Perl.Wiki.html $DH/misc (/dev/shm/html/misc on my machine) for eye-ball check via FF
-=back
-
-=head2 Export Perl.Wiki.html
-
-=over
-=item In the 'Tools' tab click 'export all'
-=item In the export menu click 'JSON format'. This creates ~/Downloads/tiddlers.json
-=item cd ~/perl.modules/CPAN-MetaCurator
-=item mv ~/Downloads/tiddlers.json data/
-=back
-
-=head2 Restore cpan.metapackager.sqlite
-
-=over
-=item pushd ~/perl.modules/CPAN-MetaPackager
-=item cp data/cpan.metapackager.sqlite /tmp
-=item popd
-=back
-
-=head2 Rebuild Perl Wiki Tree
-
-=over
-=item 'Run' here means run from the bash command line
-=item Run: cd ~/backup
-=item Run: wget https://www.cpan.org/modules/02packages.details.txt.gz
-=item Run: gunzip 02packages.details.txt.gz
-=item Run: cp 02packages.details.txt /tmp
-=item Run: cd ~/perl.modules/CPAN-MetaCurator
-=item Next, set INCLUDE_PACKAGES thus:
-=item If you have /tmp/cpan.metapackager.sqlite available use INCLUDE_PACKAGES=1 or 0 (default) otherwise
-=item Run: INCLUDE_PACKAGES=1
-=item Run: echo $INCLUDE_PACKAGES
-=item Run: export INCLUDE_PACKAGES
-=item Run: scripts/build.db.sh - to import tiddlers.json file into database data/cpan.metacurator.sqlite
-=item Run: scripts/export.tree.sh - to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
-=item Run: git commit -am"Recreate html/cpan.metacurator.tree.html"
-=item Run: git push
-=back
-
-=head2 Patch ~/savage.net.au/index.html
-
-=over
-=item Check if CSS.and.JS.Wiki, Mojo.Wiki etc need to be uploaded
-=item In particular, check whether or not the version date is real and not 'Unreleased'
-=item cd ~/perl.modules/Local-Website
-=item Edit Local::Website's data/patches.csv
-=item Run: scripts/parse.index.sh - to patch ~/savage.net.au/index.html
-=item Edit index.html re any other additions, eg a News Flash
-=item Run: bu5.sh savage.net.au
-=item Run: bu5.sh perl.modules
-=back
-
-=head2 Upload
-
-=over
-=item Upload Perl.Wiki.html, cpan.metacurator.tree.html to savage.net.au/misc
-=item Upload index.html
-=item Log in to blogs.perl.org
-=item Post details of the uploads
-=item Wait ... Check how it appears on blogs.perl.org. Takes about 1 min
-=back
+L<http://savage.net.au/misc/cpan.metacurator.help.html>
 
 =head1 Machine-Readable Change Log
 
@@ -106,7 +36,7 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator>.
 
 =head1 Author
 
-Current maintainer: Ron Savage I<E<lt>ron@savage.net.auE<gt>>.
+Ron Savage I<E<lt>ron@savage.net.auE<gt>>.
 
 My homepage: L<https://savage.net.au/>.
 

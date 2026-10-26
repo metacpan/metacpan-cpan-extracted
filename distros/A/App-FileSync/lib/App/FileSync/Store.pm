@@ -28,7 +28,7 @@ use App::FileSync::Lock;
 use App::FileSync::Scan;
 use App::FileSync::Trash;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 =encoding utf8
 

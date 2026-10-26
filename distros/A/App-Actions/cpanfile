@@ -6,10 +6,13 @@ requires 'Carp';
 requires 'Config';
 requires 'Cwd';
 requires 'Exporter';
+requires 'Fcntl';
 requires 'File::Basename';
+requires 'File::Copy';
 requires 'File::Path';
 requires 'File::Spec';
 requires 'File::Temp';
+requires 'FindBin';
 requires 'Getopt::Long';
 requires 'IO::Handle';
 requires 'IPC::System::Simple';
@@ -28,11 +31,12 @@ requires 'Sub::Private', '0.07';
 requires 'Sub::Protected', '0.03';
 requires 'Text::ParseWords';
 requires 'Time::HiRes';
-requires 'YAML::PP';
+requires 'YAML::PP', '0.038';
 requires 'YAML::PP::Common';
 requires 'autodie';
 requires 'overload';
 requires 'utf8';
+requires 'version';
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';
@@ -40,17 +44,22 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'Capture::Tiny';
+	requires 'Data::Dumper';
 	requires 'Errno';
-	requires 'File::Copy';
 	requires 'File::Find';
+	requires 'File::Glob';
 	requires 'File::Temp';
-	requires 'FindBin';
 	requires 'JSON::PP';
+	requires 'Module::CoreList';
+	requires 'Symbol';
 	requires 'Test::Exception';
 	requires 'Test::Memory::Cycle', '1.06';
 	requires 'Test::Mockingbird', '0.14';
 	requires 'Test::Most';
+	requires 'Test::Permissions', '0.001.2';
 	requires 'Test::Returns', '0.05';
+	requires 'Test::Without::Module', '0.23';
+	requires 'Tie::Hash';
 };
 
 on 'develop' => sub {

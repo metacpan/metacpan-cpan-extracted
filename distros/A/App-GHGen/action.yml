@@ -49,7 +49,7 @@ runs:
   using: 'composite'
   steps:
     - name: Setup Perl
-      uses: shogo82148/actions-setup-perl@v1.44.0
+      uses: shogo82148/actions-setup-perl@v1.44.2
       with:
         perl-version: ${{ inputs.perl-version }}
     

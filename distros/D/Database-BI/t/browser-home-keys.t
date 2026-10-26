@@ -98,6 +98,13 @@ JS
 # A recent entry, written where the page reads it, so the section and its
 # button exist.  The path is never fetched: the tip is lazy and this test does
 # not hover the card.
+# The entry as JSON text, quoted as a JavaScript string literal by the
+# fixture's own quoter, so the page stores the array rather than a Perl array's
+# stringification.  The quoting cannot be left to encode_json(): given the text
+# it is serialising it is handed a bare scalar, which a backend without
+# allow_nonref refuses with "hash- or arrayref expected (not a simple scalar)" -
+# the keyboard job's failure - and given a reference to the text it refuses a
+# scalar reference.  t/browser-fixture.t checks the quoter's escaping.
 my $seed = encode_json([ {
 	name   => 'sales',
 	path   => 'data/sales.csv',
@@ -105,7 +112,8 @@ my $seed = encode_json([ {
 	opened => '2026-10-01 12:00:00',
 } ]);
 
-$browser->js("localStorage.setItem('bi:recent', " . encode_json($seed) . '); return 1;');
+$browser->js("localStorage.setItem('bi:recent', "
+	. BI::Test::Browser::_js_string($seed) . '); return 1;');
 $browser->navigate('/');
 
 ok $browser->wait_for(sub {
@@ -141,5 +149,13 @@ JS
 is $button->{tag},   'BUTTON', 'the remove control is a button';
 is $button->{type},  'button', 'which does not submit a form';
 like $button->{label}, qr/sales/, 'and is named for the entry it removes';
+
+# What this run established, for the job summary: the two things on the home
+# page that used to need a pointer.
+$browser->proved(
+	'GET /: Tab to a file card shows the tip carrying its size, Tab away takes it'
+	. ' down, and focusing anywhere inside a recent entry draws the remove button'
+	. ' that is otherwise hover-only - so both are reachable without a pointer'
+);
 
 done_testing;

@@ -16,7 +16,7 @@ use Text::CSV::Encoded;
 
 has -constants_csv_path => (Str, default => sub{return 'data/cpan.metacurator.constants.csv'}, chained => 1);
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 # -----------------------------------------------
 

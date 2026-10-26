@@ -4,9 +4,11 @@ use warnings;
 use Business::UDC::Parser qw(parse);
 use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
-use Test::More 'tests' => 61;
+use Test::More 'tests' => 95;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
+
+my $err_msg_hr;
 
 # Test.
 my $ret_hr = parse('0/9');
@@ -63,6 +65,44 @@ is($ret_hr->{'tokens'}[1]{'value'}, '((6-11)+(5-13)+(9-15))',
 	'Parse nested parentheses in parenthesized auxiliary.');
 
 # Test.
+$ret_hr = parse("81'36/'37-022.212");
+is($ret_hr->{'ast'}{'type'}, 'APOS_RANGE',
+	'Parse apostrophe auxiliary range.');
+is($ret_hr->{'ast'}{'modifiers'}[0]{'value'}, '-022.212',
+	'Parse form after apostrophe auxiliary range.');
+
+# Test.
+eval {
+	parse('578.82./.83');
+};
+is($EVAL_ERROR, "Extra dot '.'.\n",
+	"Extra dot '.' (578.82./.83).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 6, 'Get extra dot position (position = 6).');
+is($err_msg_hr->{'character'}, '.', "Get extra dot character (character = '.').");
+clean();
+
+# Test.
+eval {
+	parse(decode_utf8('92 Brežněv,L.I.:[329(47).15+327(47)(042 5)"1970/1972"(081)'));
+};
+is($EVAL_ERROR,
+	"Whitespace is not allowed in UDC string with alphabetical specification.\n",
+	'Whitespace with alphabetical specification in nested AUX_GROUP.');
+clean();
+
+# Test.
+eval {
+	parse('608.3(083.1"1962"');
+};
+is($EVAL_ERROR, "Missing closing parenthesis ')'.\n",
+	"Missing closing parenthesis ')' before time auxiliary.");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 11, 'Get missing closing parenthesis position (position = 11).');
+is($err_msg_hr->{'character'}, ')', "Get missing closing parenthesis character (character = ')').");
+clean();
+
+# Test.
 eval {
 	parse();
 };
@@ -92,6 +132,37 @@ eval {
 };
 is($EVAL_ERROR, "Bad dot character in number.\n",
 	"Bad dot character in number ((123,34)).");
+clean();
+
+# Test.
+eval {
+	parse('885-32-322,1');
+};
+is($EVAL_ERROR, "Bad dot character in number.\n",
+	"Bad dot character in number (885-32-322,1).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 10, 'Get bad dot position (position = 10).');
+is($err_msg_hr->{'character'}, ',', "Get bad dot character (character = ',').");
+clean();
+
+# Test.
+eval {
+	parse('323.22(437)"1939/1945":943.7"1939/1945"940.5:329.15(437)(082)');
+};
+is($EVAL_ERROR, "Missing operator.\n",
+	'Missing operator after time auxiliary.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 39, 'Get missing operator position (position = 39).');
+clean();
+
+# Test.
+eval {
+	parse('016:355.01(43:436)"1866"+943.7"1866"943.07+943.6.08+92 Simon, J.');
+};
+is($EVAL_ERROR, "Missing operator.\n",
+	'Missing operator in term sequence.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 36, 'Get missing operator position (position = 36).');
 clean();
 
 # Test.
@@ -149,6 +220,39 @@ eval {
 };
 is($EVAL_ERROR, "Missing closing quotation mark '\"'.\n",
 	'Missing closing quotation mark (94(436+560)"1716/1718).');
+clean();
+
+# Test.
+eval {
+	parse('92Gottwald,K.:323(437)"1948.02=4');
+};
+is($EVAL_ERROR, "Missing closing quotation mark '\"'.\n",
+	'Missing closing quotation mark before language auxiliary.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 30, 'Get missing quotation mark position (position = 30).');
+is($err_msg_hr->{'character'}, '"', "Get missing quotation mark character (character = '\"').");
+clean();
+
+# Test.
+eval {
+	parse('929.3:378.961(437.11)"1657/178.3=71');
+};
+is($EVAL_ERROR, "Invalid year in time auxiliary.\n",
+	'Invalid ending year in time auxiliary.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 27, 'Get invalid year position (position = 27).');
+is($err_msg_hr->{'character'}, '1', "Get invalid year character (character = '1').");
+clean();
+
+# Test.
+eval {
+	parse('323.272(5-15)+(6-17)"2011/...');
+};
+is($EVAL_ERROR, "Missing closing quotation mark '\"'.\n",
+	'Missing closing quotation mark before incomplete time auxiliary.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 25, 'Get missing quotation mark position (position = 25).');
+is($err_msg_hr->{'character'}, '"', "Get missing quotation mark character (character = '\"').");
 clean();
 
 # Test.
@@ -214,7 +318,7 @@ eval {
 };
 is($EVAL_ERROR, "Missing closing parenthesis ')'.\n",
 	'Missing closing parenthesis in geographical auxiliary before time auxiliary.');
-my $err_msg_hr = err_msg_hr();
+$err_msg_hr = err_msg_hr();
 is($err_msg_hr->{'position'}, 53, 'Get error (position = 53).');
 is($err_msg_hr->{'character'}, ')', "Get error (character = ')').");
 clean();
@@ -266,6 +370,39 @@ eval {
 };
 is($EVAL_ERROR, "Whitespace is not allowed in UDC string.\n",
 	'Whitespace is not allowed in UDC string (885-93-343.4 = 393).');
+clean();
+
+# Test.
+eval {
+	parse(decode_utf8('82‑343'));
+};
+is($EVAL_ERROR, "Bad hyphen character.\n",
+	'Bad hyphen character (82‑343).');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 2, 'Get bad hyphen position (position = 2).');
+is($err_msg_hr->{'character'}, decode_utf8('‑'), 'Get bad hyphen character.');
+clean();
+
+# Test.
+eval {
+	parse('27--243.37');
+};
+is($EVAL_ERROR, "Extra dash '-'.\n",
+	"Extra dash '-' (27--243.37).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 3, 'Get extra dash position (position = 3).');
+is($err_msg_hr->{'character'}, '-', "Get extra dash character (character = '-').");
+clean();
+
+# Test.
+eval {
+	parse('373/378-');
+};
+is($EVAL_ERROR, "Extra dash '-'.\n",
+	"Extra dash '-' (373/378-).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 7, 'Get trailing dash position (position = 7).');
+is($err_msg_hr->{'character'}, '-', "Get trailing dash character (character = '-').");
 clean();
 
 # Test.

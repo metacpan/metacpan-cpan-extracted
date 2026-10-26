@@ -18,13 +18,14 @@
 use v5.36;
 
 package App::FuguWeb::CLI;
-our $VERSION = '0.10.1';
+our $VERSION = '0.11.0';
 
 use App::FuguWeb;
 use App::FuguWeb::Check;
 use App::FuguWeb::Config;
 use App::FuguWeb::Rotate;
 use App::FuguWeb::Site;
+use App::FuguWeb::Status;
 use File::Spec;
 use Fugu::File;
 use Fugu::CLI;
@@ -173,15 +174,31 @@ my %COMMANDS = (
 		method  => 'cmd_init',
 		offline => 1,
 	},
+
+	# WEB-STATUS. The two verbs read the record of the
+	# translations, and the build and the check do not.
+	status => {
+		summary => 'Report each translation that does not follow '
+		    . 'its source',
+		method => 'cmd_status',
+	},
+	translated => {
+		summary => 'Record that each file follows its source now',
+		usage   => '<file> ...',
+		method  => 'cmd_translated',
+	},
 );
 
 # The description that 'fuguweb init' writes: the smallest site that
-# builds, once web/index.body.html exists. The other settings keep
-# their defaults, which App::FuguWeb::Config documents.
+# builds, once web/index.body.html and web/footer.body.html exist. The
+# other settings keep their defaults, which App::FuguWeb::Config
+# documents.
 my $STARTER = <<'RC';
 # The website, built by fuguweb(1).
 
-site = Example
+site   = Example
+url    = https://example.org/
+footer = footer.body.html
 
 nav "index.html" {
 	label = Home
@@ -238,7 +255,7 @@ sub run ( $class, @argv )
 		options  => {
 			'project=s' =>
 			    'the project root (default: auto-discover)',
-			'quiet|q' => 'suppress informational output',
+			'quiet|q' => 'do not print informational messages',
 		},
 		epilogue => <<'EOF',
 Examples:
@@ -259,12 +276,10 @@ sub _prepare ( $self, $cli, $entry )
 {
 	$self->{project} = $cli->option('project');
 
-	if ( $cli->option('quiet') ) {
-		$self->{log} = Fugu::Log->new(
-			mode  => Fugu::Log::MODE_QUIET,
-			ident => 'fuguweb',
-		);
-	}
+	# The quiet option stops the informational messages alone. An
+	# error, a warning and a problem of the check still reach
+	# standard error, because an exit code does not name the fault.
+	$self->{log}->set_level('warning') if $cli->option('quiet');
 
 	return if $entry->{offline};
 
@@ -372,6 +387,47 @@ sub cmd_init ( $self, $cli, @args )
 	$self->{log}->info( 'Wrote %s', $path );
 
 	return EXIT_SUCCESS;
+}
+
+# Report each translation that does not follow its source
+sub cmd_status ( $self, $cli, @args )
+{
+	my $status = App::FuguWeb::Status->new( config => $self->{config} );
+
+	# A record or a source that the command cannot read is a fault
+	# of the project files, as a description is, and so is the
+	# description of WEB-STATUS-7. Exit 1 is the answer of
+	# WEB-STATUS-5, so a failure must take another code. Each
+	# failure of the report is such a fault.
+	my $lines = $status->report;
+	unless ($lines) {
+		$self->{log}->error( '%s', $status->error );
+		return EXIT_CONFIG_ERROR;
+	}
+
+	say for @$lines;
+
+	# WEB-STATUS-5. A script reads the answer from the exit code,
+	# as it does from diff(1).
+	return @$lines ? EXIT_ERROR : EXIT_SUCCESS;
+}
+
+# Record that each file follows its source now
+sub cmd_translated ( $self, $cli, @files )
+{
+	unless (@files) {
+		$self->{log}->error('translated needs a file');
+		return EXIT_INVALID_ARGS;
+	}
+
+	my $status = App::FuguWeb::Status->new( config => $self->{config} );
+	return EXIT_SUCCESS if $status->record(@files);
+
+	$self->{log}->error( '%s', $status->error );
+
+	# WEB-STATUS-2. A fault of the project files takes the code of
+	# cmd_status, and a file that translates no source takes 1.
+	return $status->fault ? EXIT_CONFIG_ERROR : EXIT_ERROR;
 }
 
 # Mint the next key of a purpose

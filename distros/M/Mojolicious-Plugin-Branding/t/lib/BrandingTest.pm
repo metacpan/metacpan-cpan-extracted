@@ -9,6 +9,9 @@ use Mojolicious;
 
 our @EXPORT = qw< t_for write_files brand_hook %generic %foo %FOO %BAR >;
 
+# any warning is a test failure, they would go unnoticed otherwise
+$SIG{__WARN__} = sub { Test::More::fail("no warnings: $_[0]") };
+
 our %generic = (
    'templates/index.html.ep' => 'generic page',
    'public/site.css'         => 'generic css',
@@ -32,11 +35,12 @@ sub write_files {
 }
 
 # Return a setup sub for t_for that puts the brand in stash key $key
-# (default "variant") from a before_dispatch hook, as the application is
+# (default "branding.brand") from a before_dispatch hook, as the
+# application is
 # expected to do: query parameter "b" if present, else "foo" for %FOO.
 sub brand_hook {
    my ($key) = @_;
-   $key //= 'variant';
+   $key //= 'branding.brand';
    return sub {
       my ($app) = @_;
       $app->hook(before_dispatch => sub {

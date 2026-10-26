@@ -14,6 +14,7 @@ use warnings;
 
 use Test::Most;
 use Test::Returns;
+use File::Temp qw(tempdir);
 
 BEGIN {
 	plan skip_all => 'REDIS_SERVER not set (e.g. REDIS_SERVER=redis://localhost:6379)'
@@ -149,6 +150,10 @@ use Test::Mojo;
 my $t = Test::Mojo->new('Database::BI');
 require Database::BI::Model::DataSource;
 require Database::BI::Controller::Dashboard;
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
 
 # ---------------------------------------------------------------------------
 plan tests => 14;

@@ -40,7 +40,19 @@ Alien dist forcing a vendored build:
 |----------------|------------------------------------------------------|---------|
 | `command`      | `test`                                               | dzil command to run (`test`, `build`, …) |
 | `install-type` | *(empty)*                                            | `ALIEN_INSTALL_TYPE` value; `share` forces vendored build |
-| `cpanm-opts`   | `--mirror http://cpan.metacpan.org --mirror-only`    | extra `PERL_CPANM_OPT` |
+| `cpanm-opts`   | `--mirror https://cpan.metacpan.org --mirror-only`   | `PERL_CPANM_OPT` for all cpanm calls |
+
+The default mirror is **https** on purpose: every module the action installs is
+executed in your job, so the download has to be authenticated. `--mirror-only`
+keeps cpanm from falling back to any other index. If you override `cpanm-opts`
+(a private mirror, extra flags), keep the mirror URL on https.
+
+cpanm needs an https-capable fetcher for this — `curl` or `wget`, or the Perl
+modules `LWP::Protocol::https` or `IO::Socket::SSL` + `Net::SSLeay` — plus CA
+certificates. The official `perl:<version>` images (what this repository's own
+CI and the SimpiCI provider run in) and the GitHub-hosted runners are equipped
+for it; on a stripped-down image install `curl` and `ca-certificates` before
+this action.
 
 ## Using on Forgejo / self-hosted Gitea
 
@@ -87,5 +99,7 @@ local reference:
 - `dzil install` is intentionally **not** run here; if an Alien dist needs the
   artifact installed before tests, add that step in the caller.
 - `@v1` is the recommended pin: the tag tracks the action's stable major line,
-  so CI is reproducible and only moves forward for compatible changes. Use
-  `@main` instead if you want every change the moment it lands.
+  so CI is reproducible and only moves forward for compatible changes. The
+  maintainer moves the tag when the action changes; until then a change that
+  is on `main` is not yet in `@v1`. `@main` takes every change the moment it
+  lands, in all consuming CI runs at once, so prefer `@v1`.

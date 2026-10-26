@@ -9,7 +9,7 @@ use File::Spec ();
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Native ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use constant ABI_VERSION   => 1;
 use constant TX_ACTIVE     => 0;

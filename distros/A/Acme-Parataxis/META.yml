@@ -5,7 +5,7 @@ author:
 build_requires:
   Test2::V1: '0'
 configure_requires:
-  Affix: v1.0.7
+  Affix: v1.2.6
   Affix::Build: '0'
   CPAN::Meta: '2.150012'
   Exporter: '5.57'
@@ -22,7 +22,7 @@ configure_requires:
   Test2::V1: '0'
   perl: v5.40.0
 dynamic_config: 1
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150015'
 keywords: []
 license: artistic_2
 meta-spec:
@@ -37,23 +37,114 @@ no_index:
 provides:
   Acme::Parataxis:
     file: lib/Acme/Parataxis.pm
-    version: v0.1.0
+    version: v0.1.1
+  Acme::Parataxis::Actor:
+    file: lib/Acme/Parataxis/Actor.pm
+    version: v0.1.1
+  Acme::Parataxis::Blocking:
+    file: lib/Acme/Parataxis/Blocking.pm
+    version: v0.1.1
+  Acme::Parataxis::CancellationToken:
+    file: lib/Acme/Parataxis/CancellationToken.pm
+    version: v0.1.1
   Acme::Parataxis::Channel:
     file: lib/Acme/Parataxis/Channel.pm
-    version: v0.1.0
+    version: v0.1.1
+  Acme::Parataxis::Compat:
+    file: lib/Acme/Parataxis/Compat.pm
+    version: v0.1.1
+  Acme::Parataxis::Driver:
+    file: lib/Acme/Parataxis/Driver.pm
+    version: v0.1.1
+  Acme::Parataxis::Driver::IOAsync:
+    file: lib/Acme/Parataxis/Driver/IOAsync.pm
+    version: v0.1.1
+  Acme::Parataxis::Driver::Mojo:
+    file: lib/Acme/Parataxis/Driver/Mojo.pm
+    version: v0.1.1
+  Acme::Parataxis::Error:
+    file: lib/Acme/Parataxis/Error.pm
+    version: v0.1.1
+  Acme::Parataxis::Error::Cancelled:
+    file: lib/Acme/Parataxis/Error.pm
+    version: v0.1.1
+  Acme::Parataxis::Error::Nursery:
+    file: lib/Acme/Parataxis/Error.pm
+    version: v0.1.1
+  Acme::Parataxis::Error::STM_Retry:
+    file: lib/Acme/Parataxis/Error.pm
+    version: v0.1.1
+  Acme::Parataxis::Error::Supervisor:
+    file: lib/Acme/Parataxis/Error.pm
+    version: v0.1.1
+  Acme::Parataxis::Error::Timeout:
+    file: lib/Acme/Parataxis/Error.pm
+    version: v0.1.1
   Acme::Parataxis::Future:
     file: lib/Acme/Parataxis/Future.pm
-    version: v0.1.0
+    version: v0.1.1
+  Acme::Parataxis::Generator:
+    file: lib/Acme/Parataxis/Generator.pm
+    version: v0.1.1
+  Acme::Parataxis::Local:
+    file: lib/Acme/Parataxis/Local.pm
+    version: v0.1.1
+  Acme::Parataxis::Monitor:
+    file: lib/Acme/Parataxis/Monitor.pm
+    version: v0.1.1
+  Acme::Parataxis::Nursery:
+    file: lib/Acme/Parataxis/Nursery.pm
+    version: v0.1.1
+  Acme::Parataxis::RateLimiter:
+    file: lib/Acme/Parataxis/RateLimiter.pm
+    version: v0.1.1
   Acme::Parataxis::Semaphore:
     file: lib/Acme/Parataxis/Semaphore.pm
-    version: v0.1.0
+    version: v0.1.1
   Acme::Parataxis::Semaphore::Guard:
     file: lib/Acme/Parataxis/Semaphore.pm
+    version: v0.1.1
   Acme::Parataxis::Signal:
     file: lib/Acme/Parataxis/Signal.pm
-    version: v0.1.0
+    version: v0.1.1
+  Acme::Parataxis::Stream:
+    file: lib/Acme/Parataxis/Stream.pm
+    version: v0.1.1
+  Acme::Parataxis::Supervisor:
+    file: lib/Acme/Parataxis/Supervisor.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync:
+    file: lib/Acme/Parataxis/Sync.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::Barrier:
+    file: lib/Acme/Parataxis/Sync/Barrier.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::Mutex:
+    file: lib/Acme/Parataxis/Sync/Mutex.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::Mutex::Guard:
+    file: lib/Acme/Parataxis/Sync/Mutex.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::Once:
+    file: lib/Acme/Parataxis/Sync/Once.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::RwLock:
+    file: lib/Acme/Parataxis/Sync/RwLock.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::RwLock::Guard:
+    file: lib/Acme/Parataxis/Sync/RwLock.pm
+    version: v0.1.1
+  Acme::Parataxis::Sync::WaitGroup:
+    file: lib/Acme/Parataxis/Sync/WaitGroup.pm
+    version: v0.1.1
+  Acme::Parataxis::TVar:
+    file: lib/Acme/Parataxis/TVar.pm
+    version: v0.1.1
+  Acme::Parataxis::Ticker:
+    file: lib/Acme/Parataxis/Ticker.pm
+    version: v0.1.1
 requires:
-  Affix: v1.0.7
+  Affix: v1.2.6
   File::Basename: '0'
   File::Spec: '0'
 resources:
@@ -61,7 +152,7 @@ resources:
   homepage: https://github.com/sanko/Acme-Parataxis.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Acme-Parataxis.pm.git
-version: v0.1.0
+version: v0.1.1
 x_ignore:
   - .tidyallrc
   - .gitignore

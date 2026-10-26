@@ -1,5 +1,20 @@
 Revision history for Unblock-HTTP2
 
+0.13  2026-10-25
+    - Validate retired and skipped stream IDs through a bounded native
+      receive guard shared by Perl input and NativeABI input.
+    - Preserve legitimate DATA/trailer races after local RST_STREAM,
+      including HPACK updates and independent multiplexed streams.
+    - Validate legacy PRIORITY frames without disabling RFC 9218.
+    - Keep stream-window overflow isolated to its stream across nghttp2
+      versions, instead of terminating unrelated transactions.
+    - Bound retired-stream history to 1024 separate ranges; terminate
+      pathological fragmentation with ENHANCE_YOUR_CALM.
+    - Document final-output draining and transport shutdown requirements.
+      Public API, NativeABI version 1 and dependencies are unchanged.
+    - Add strict h2spec coverage for TCP/TLS, early/full responses and
+      both input paths, plus fragmented-input and resource-limit regressions.
+
 0.12  2026-10-21
     - Add coordinated receive-mode selection and bounded body buffering
       while preserving real HTTP/2 engine Transactions and Uniform objects.

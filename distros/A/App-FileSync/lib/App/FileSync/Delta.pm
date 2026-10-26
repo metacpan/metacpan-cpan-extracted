@@ -24,7 +24,7 @@ use Sub::Private { mode => 'enforce' };
 use App::FileSync::I18N qw(throw os_error);
 use App::FileSync::IO qw(open_file);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Tunables (package variables so tests can shrink them with "local").
 our $MIN_SIZE   = 65_536;

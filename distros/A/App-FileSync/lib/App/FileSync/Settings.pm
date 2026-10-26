@@ -13,11 +13,16 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-use Config::Abstraction;
+# 0.41 for explain_sources(), which the settings report uses; an older copy
+# autoloads that name as a config key and dies with "No such config key".
+use Config::Abstraction 0.41;
 use File::Basename qw(dirname);
 use File::Spec;
 use List::Util qw(any first);
-use Log::Abstraction;
+# 0.36 for the structured fields the client passes as a trailing hashref;
+# an older copy appends it to the message as "HASH(0x...)" in a log file and
+# records an empty entry in an array logger.
+use Log::Abstraction 0.36;
 use Object::Configure;
 use Readonly;
 use Sub::Private { mode => 'enforce' };
@@ -26,7 +31,7 @@ use App::FileSync::Args qw(named);
 use App::FileSync::I18N qw(throw);
 use App::FileSync::IO qw(ensure_dir);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # The hook predicates moved to App::FileSync::Platform, which must load before
 # this module's dependencies; these names are kept for existing callers.

@@ -10,7 +10,7 @@ use_ok('Unblock::HTTP::Server');
 use_ok('Unblock::HTTP::Integration');
 use_ok('Unblock::HTTP::QUIC');
 
-is($Unblock::HTTP::VERSION, '0.02', 'distribution version');
+is($Unblock::HTTP::VERSION, '0.03', 'distribution version');
 for my $module (qw(
     Unblock::HTTP::Client
     Unblock::HTTP::Server

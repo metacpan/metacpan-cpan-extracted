@@ -19,7 +19,7 @@ use App::Actions::Error;
 use App::Actions::I18N qw(throw);
 use App::Actions::Util ();
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 our @EXPORT_OK = qw(
 	action_inputs

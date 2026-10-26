@@ -1,5 +1,49 @@
 Revision history for App-Actions - run GitHub Actions workflows locally
 
+0.002.1	Sun Oct 25 07:56:17 PM EDT 2026
+	- t/regex.t checks that tokenizing four times the expression takes less
+	  than eight times as long, rather than holding it to two seconds,
+	  which a slower or busy machine went past.
+	- t/unit.t no longer depends on which of two parallel jobs finishes
+	  first when checking a result that cannot be written.
+	- t/function.t's test that _system on Windows runs a program given by
+	  its path no longer empties PATH for it, which kept Perl from starting
+	  on GitHub's Windows runners.
+	- action-run cache no longer reports an image as missing when Docker
+	  has it but gives no size for it, and --prune removes such an image
+	  instead of forgetting it (which left it on the daemon and out of the
+	  record).
+	- if: false and fail-fast: false work on Perl 5.36 again: each matrix
+	  instance's copy of its job was made with Storable, whose version in
+	  5.36 (3.26) turns a core boolean into an empty string, which ran the
+	  job.
+	- A run that uses a kept image without pulling it again updates the
+	  image's last use in the record (App::Actions::Cache->touch), so
+	  "action-run cache --prune --older-than" no longer removes an image
+	  that runs still use.  An image the record does not hold is still never
+	  added.  Jobs run in parallel report the images they used too.
+	- Added t/integration.t: end-to-end tests across the modules, with
+	  unwritable and unsearchable directories, an unreachable daemon, slow
+	  and failing pulls, and malformed answers and files.  It needs
+	  Test::Permissions and Test::Without::Module.
+	- YAML::PP 0.38 is required: older versions do not load true and false
+	  as Perl's own booleans, which if: false and fail-fast: false rely on
+	  from Perl 5.36.
+	- A pull that fails while a job runs is reported in the chosen language
+	  (App::Actions::Error runner.image.pull_failed), as the preflight's
+	  already was.
+	- The core modules the tool and its tests use are all declared as
+	  prerequisites.
+	- The tests pass from a checkout with CRLF line endings (t/changes.t,
+	  t/self_test.t), t/function.t no longer fails now and then when a
+	  second passes during the mount check, and its fork() tests no longer
+	  end the test on Windows, where Process and parallel jobs do not fork.
+	- t/self_test.t runs the fake daemon's steps with the Perl under test:
+	  where the first perl on PATH was another one, without the tool's
+	  dependencies, the second workflow fell back to cpanm and failed
+	  (a CPAN Testers report on Perl 5.44.0).
+	  Fixes https://matrix.perl-magpie.org/results/fbe62b68-cfbc-11f1-b73e-b510376a2ca8
+
 0.002.0	Fri Oct 23 02:52:55 PM EDT 2026
 	- Security: an environment value is interpolated only once, so ${{ }}
 	  text from a context value (a commit message, say) is no longer

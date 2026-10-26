@@ -154,6 +154,13 @@ take_remainder() returns already-received bytes belonging to the next
 protocol. An attached server invokes on_switch after the full outgoing
 HTTP handshake has been accepted into the framework's write queue.
 
+## Graceful shutdown
+
+After stopping a listener, call `$server->drain` on each active HTTP/1
+server connection. The admitted request can finish, but another pipelined
+request will not start. The host still flushes accepted output and enforces
+any shutdown deadline. See `perldoc Unblock::HTTP1::Server`.
+
 ## Manual and native integration
 
 For advanced consumers, the original low-level output interface remains:

@@ -8,6 +8,7 @@ use File::Spec;
 use Scalar::Util qw(blessed);
 
 use App::Actions::Docker::Variable;
+use App::Actions::I18N qw(throw);
 use App::Actions::Process;
 
 # The variables the docker client reads for itself.  A job variable with one
@@ -29,7 +30,7 @@ my $CLIENT_VARIABLE = qr/
 # them (INPUT_GITHUB-TOKEN), and such a value is often a secret.
 my $VARIABLE_NAME = qr/\A[A-Za-z_][A-Za-z0-9_.-]*\z/;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 sub new {
     my ($class, %args) = @_;
@@ -160,9 +161,8 @@ sub pull {
     push @args, $image;
 
     my $rc = $self->run(@args);
-    # die, not croak, and with a trailing newline: this is advice for the
-    # reader, not a place to point at source lines.
-    die "Failed to pull Docker image '$image' (exit $rc)\n" if $rc != 0;
+    # Advice for the reader, not a place to point at source lines.
+    throw($self, 'runner.image.pull_failed', { image => $image, status => $rc, location => 0 }) if $rc != 0;
     return 1;
 }
 
@@ -995,6 +995,10 @@ Runs C<docker pull>, with C<--platform> if one was given to L</new>.
     | Failed to pull Docker image 'IMAGE'      | docker pull failed  | check the name, your network  |
     | (exit N)                                 | with status N       | and "docker login"            |
     +------------------------------------------+---------------------+-------------------------------+
+
+The exception is an L<App::Actions::Error> with the code
+C<runner.image.pull_failed>, in the language of L<App::Actions::I18N>, and it
+names no source line.
 
 =head2 pull_many
 

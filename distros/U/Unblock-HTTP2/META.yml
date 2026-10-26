@@ -30,22 +30,22 @@ no_index:
 provides:
   Unblock::HTTP2:
     file: lib/Unblock/HTTP2.pm
-    version: '0.12'
+    version: '0.13'
   Unblock::HTTP2::Client:
     file: lib/Unblock/HTTP2/Client.pm
-    version: '0.12'
+    version: '0.13'
   Unblock::HTTP2::Integration:
     file: lib/Unblock/HTTP2/Integration.pm
-    version: '0.12'
+    version: '0.13'
   Unblock::HTTP2::NativeABI:
     file: lib/Unblock/HTTP2/NativeABI.pm
-    version: '0.12'
+    version: '0.13'
   Unblock::HTTP2::Server:
     file: lib/Unblock/HTTP2/Server.pm
-    version: '0.12'
+    version: '0.13'
   Unblock::HTTP2::Transaction:
     file: lib/Unblock/HTTP2/Transaction.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -58,5 +58,5 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP2/issues
   homepage: https://github.com/haxmeister/perl-Unblock-HTTP2
   repository: https://github.com/haxmeister/perl-Unblock-HTTP2.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -36,10 +36,13 @@
             "Config" : "0",
             "Cwd" : "0",
             "Exporter" : "0",
+            "Fcntl" : "0",
             "File::Basename" : "0",
+            "File::Copy" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "FindBin" : "0",
             "Getopt::Long" : "0",
             "IO::Handle" : "0",
             "IPC::System::Simple" : "0",
@@ -58,28 +61,34 @@
             "Sub::Protected" : "0.03",
             "Text::ParseWords" : "0",
             "Time::HiRes" : "0",
-            "YAML::PP" : "0",
+            "YAML::PP" : "0.038",
             "YAML::PP::Common" : "0",
             "autodie" : "0",
             "overload" : "0",
             "perl" : "5.014",
-            "utf8" : "0"
+            "utf8" : "0",
+            "version" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
             "Errno" : "0",
-            "File::Copy" : "0",
             "File::Find" : "0",
+            "File::Glob" : "0",
             "File::Temp" : "0",
-            "FindBin" : "0",
             "JSON::PP" : "0",
+            "Module::CoreList" : "0",
+            "Symbol" : "0",
             "Test::Exception" : "0",
             "Test::Memory::Cycle" : "1.06",
             "Test::Mockingbird" : "0.14",
             "Test::Most" : "0",
-            "Test::Returns" : "0.05"
+            "Test::Permissions" : "v0.1.2",
+            "Test::Returns" : "0.05",
+            "Test::Without::Module" : "0.23",
+            "Tie::Hash" : "0"
          }
       }
    },
@@ -96,6 +105,6 @@
          "web" : "https://github.com/nigelhorne/App-Actions"
       }
    },
-   "version" : "v0.002.0",
+   "version" : "0.002.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

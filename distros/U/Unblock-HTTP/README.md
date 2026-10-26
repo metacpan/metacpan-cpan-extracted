@@ -5,14 +5,17 @@ HTTP/2, HTTP/3, and WebSocket. Protocol parsing stays in the
 existing engines. WebSocket sessions use the separate Unblock::WebSocket
 distribution; this top layer adds no XS.
 
-Unblock::HTTP 0.02 provides reusable Server attachment, a shared Client
+Unblock::HTTP 0.03 provides reusable Server attachment, a shared Client
 with per-origin pools and bounded queues, and opt-in WebSocket handshakes
 over HTTP/1.1 Upgrade and HTTP/2/3 Extended CONNECT. Unblock::WebSocket
 is an optional dependency, loaded only when WebSockets are used.
 Cross-host Alt-Svc and post-dispatch request replay are intentionally not
 provided; optional framework-driven request deadlines are available.
-The required released engines are Unblock::HTTP1 0.12+, Unblock::HTTP2
-0.12+, Unblock::HTTP3 0.13+, and Uniform::HTTP 0.06+. The separate
+Base requirements are Unblock::HTTP1 0.13+ and Uniform::HTTP 0.06+.
+HTTP/2 requires optional Unblock::HTTP2 0.13+; HTTP/3 requires optional
+Unblock::HTTP3 0.14+. Enable the corresponding installation feature or
+install that engine explicitly before enabling the protocol. An unavailable
+enabled engine produces an explicit attachment error. The separate
 [implementation notes](docs/IMPLEMENTATION.md) record development history.
 
 ## One Server, many connections
@@ -51,8 +54,8 @@ still runs after successful body completion. Failed or cancelled bodies do
 not reach it. Register `$tx->on_finish(...)` before the transaction is terminal
 to observe completion, error, or cancellation exactly once.
 
-This requires Unblock::HTTP1 0.12+, Unblock::HTTP2 0.12+, and
-Unblock::HTTP3 0.13+. Attachment also checks required engine methods
+For enabled protocols this requires Unblock::HTTP1 0.13+, Unblock::HTTP2
+0.13+, or Unblock::HTTP3 0.14+. Attachment also checks required engine methods
 and gives an explicit error for an incompatible older engine.
 
 ## Framework attachment
@@ -117,7 +120,7 @@ my $op = $client->request(
     url => 'https://example.com/data',
     on_response => sub {
         my ($tx, $response) = @_;
-        print $response->status, "\\n";
+        print $response->status, "\n";
     },
 );
 ```
@@ -167,8 +170,8 @@ inspect queued, connecting, active, idle, and retiring connections.
 Fatal hard-limit output rejection is distinct from cooperative
 backpressure. The repository-only Linux::Event integration tests propagate
 max_pending_bytes violations as transport errors; it does not
-replay the rejected bytes. Unblock::HTTP1 0.12+ waits until attached output is accepted before reporting a
-successful server terminal callback. See docs/IMPLEMENTATION.md.
+replay the rejected bytes. Unblock::HTTP1 0.13+ waits until attached output is accepted before
+reporting a successful server terminal callback. See docs/IMPLEMENTATION.md.
 
 Idle connection eviction is opt-in with `idle_timeout => $seconds`.
 When enabled, the framework supplies `schedule_timer` and may supply

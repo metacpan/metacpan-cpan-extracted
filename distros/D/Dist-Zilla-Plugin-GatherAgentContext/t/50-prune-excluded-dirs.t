@@ -48,4 +48,29 @@ SKIP: {
     'sibling skills are still gathered while worktrees/ is pruned' );
 }
 
+# Same for harness state that is not agent content: .claude/projects/ holds
+# every session transcript of the checkout. It must not be opened at all.
+SKIP: {
+  skip 'running as root: 0000 dir is still readable', 2 if $> == 0;
+
+  my $tzil = build_tzil( files => {
+    'source/.claude/skills/foo/SKILL.md' => "keep\n",
+  });
+  my $locked = path($tzil->root)->child('.claude/projects');
+  $locked->mkpath;
+  $locked->child('session.jsonl')->spew_utf8("log\n");
+  skip 'cannot chmod on this filesystem', 2
+    unless eval { chmod 0000, "$locked"; 1 };
+
+  my $ok  = eval { plugin($tzil)->gather_files; 1 };
+  my $err = $@;
+  chmod 0700, "$locked";          # restore so the tempdir can be cleaned up
+
+  ok $ok, 'harness state dir is pruned, not descended (no permission error)'
+    or diag "gather_files died: $err";
+  is_deeply [ gathered($tzil) ],
+    [ 'misc/agent-context/.claude/skills/foo/SKILL.md' ],
+    'only the agent content next to it is gathered';
+}
+
 done_testing;

@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Path::Tiny;
+use Readonly;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -12,7 +13,9 @@ our @EXPORT_OK = qw(
 	generate_custom_perl_workflow
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
+
+Readonly my $DEFAULT_TIMEOUT_MINUTES => 60;
 
 =encoding utf-8
 
@@ -175,7 +178,7 @@ C<< max_perl_version => '5.44' >> or set C<perl_versions> explicitly:
 Operating systems for the build matrix.
 Default: C<['ubuntu-latest', 'macos-latest', 'windows-latest']>.
 
-=item C<timeout> (integer, default C<30>)
+=item C<timeout> (integer, default C<60>)
 
 Value written to C<timeout-minutes> on every matrix job.
 
@@ -267,7 +270,7 @@ B<Generated step order:>
                 min_perl_version     => { type => 'scalar',  default  => '5.36' },
                 max_perl_version     => { type => 'scalar',  default  => '5.42' },
                 os                   => { type => 'arrayref', optional => 1 },
-                timeout              => { type => 'scalar',  default  => 30 },
+                timeout              => { type => 'scalar',  default  => $DEFAULT_TIMEOUT_MINUTES },
                 enable_linter        => { type => 'scalar',  default  => 1 },
                 enable_linter_unused => { type => 'scalar',  default  => 1 },
                 enable_critic        => { type => 'scalar',  default  => 1 },
@@ -302,7 +305,7 @@ B<Generated step order:>
 sub generate_custom_perl_workflow($opts = {}) {
 	my $min_version = $opts->{min_perl_version} // '5.36';
 	my $max_version = $opts->{max_perl_version} // '5.42';
-	my $timeout = $opts->{timeout} // 30;
+	my $timeout = $opts->{timeout} // $DEFAULT_TIMEOUT_MINUTES;
 	my @os = @{$opts->{os} // ['ubuntu-latest', 'macos-latest', 'windows-latest']};
 	my $enable_linter = $opts->{enable_linter} // 1;
 	my $enable_linter_unused = $opts->{enable_linter_unused} // 1;
@@ -322,7 +325,7 @@ sub generate_custom_perl_workflow($opts = {}) {
 	$yaml .= '# Created by ' . __PACKAGE__ . "\n";
 
 	$yaml .= "name: Perl CI\n\n";
-	$yaml .= "'on':\n";
+	$yaml .= "\"on\":\n";
 	$yaml .= "  push:\n";
 	$yaml .= "    branches:\n";
 	$yaml .= "      - main\n";
@@ -352,7 +355,7 @@ sub generate_custom_perl_workflow($opts = {}) {
 	}
 	$yaml .= "        perl:\n";
 	for my $version (@perl_versions) {
-		$yaml .= "          - '$version'\n";
+		$yaml .= "          - \"$version\"\n";
 	}
 	# shogo82148/build-perl perl-5.40.4-thr-win32-x64.zip ships a perl.exe and a
 	# libperl540.a from two different builds.  Any XS module compiled against that
@@ -363,7 +366,7 @@ sub generate_custom_perl_workflow($opts = {}) {
 	if ((grep { $_ eq '5.40' } @perl_versions) && (grep { $_ eq 'windows-latest' } @os)) {
 		$yaml .= "        exclude:\n";
 		$yaml .= "          - os: windows-latest\n";
-		$yaml .= "            perl: '5.40'\n";
+		$yaml .= "            perl: \"5.40\"\n";
 	}
 	$yaml .= "    name: Perl \${{ matrix.perl }} on \${{ matrix.os }}\n";
 	$yaml .= "    env:\n";
@@ -375,7 +378,7 @@ sub generate_custom_perl_workflow($opts = {}) {
 
 	$yaml .= "      - name: Setup Perl\n";
 	$yaml .= "        id: setup-perl\n";
-	$yaml .= "        uses: shogo82148/actions-setup-perl\@v1.44.0\n";
+	$yaml .= "        uses: shogo82148/actions-setup-perl\@v1.44.2\n";
 	$yaml .= "        with:\n";
 	$yaml .= "          perl-version: \${{ matrix.perl }}\n\n";
 

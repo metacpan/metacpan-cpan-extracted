@@ -22,7 +22,7 @@ use App::FileSync::Constants qw($MODE_MASK $ROOT_MARKER $SNAPSHOT_DIR $STALE_TEM
 use App::FileSync::I18N qw(throw os_error);
 use App::FileSync::IO qw(copy_preserving ensure_dir list_dir);
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Kept for compatibility: the snapshot directory's name.
 our $DIR_NAME = $SNAPSHOT_DIR;

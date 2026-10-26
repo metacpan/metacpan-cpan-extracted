@@ -19,14 +19,43 @@ The class reads F<.fuguwebrc>, applies the defaults, and validates the
 result. The grammar, the quoting, and the yes/no spellings come from
 L<Fugu::Config>; this class holds what is true of a site.
 
+The description is UTF-8, per WEB-SITE-5. Each value that a reader
+sees is characters: the site name, the name of a language, a title, a
+label and a heading. Each other value names a file or an address, so it
+stays bytes.
+
+=head2 Languages
+
+A C<language> block declares one language. The block name is its tag,
+and the order of the blocks is the order of the languages. The first
+one is the default, per D-05. A description with no C<language> block
+has the one language C<en>.
+
+    language en {
+            name = English
+    }
+
+    language pt-BR {
+            name   = Portugues
+            site   = Exemplo
+            footer = pt-br/footer.body.html
+    }
+
+A tag is a BCP 47 tag in its canonical case, per WEB-LANGUAGE-1. The
+block takes a C<name>, and an optional C<dir> of C<ltr> or C<rtl>. It
+can take a C<site> and a C<footer>, which take the place of those of
+the description in that language. L<App::FuguWeb::Language> holds each
+language.
+
 The object is immutable once loaded, and the module keeps no package
 state. Two sites in one process therefore share nothing.
 
 =head2 Translations
 
 A block of one argument is the default. A block of two is a
-translation: the first argument is the code of its language, and the
-second names the default block that it translates.
+translation: the first argument is the tag of a declared language other
+than the default, and the second names the default block that it
+translates.
 
     page de "index.html" {
             title = Start
@@ -73,7 +102,23 @@ The description is rejected when:
 
 =item *
 
-there is no C<site> setting;
+the description is not UTF-8, per WEB-SITE-5;
+
+=item *
+
+it names a block type or a setting that fuguweb(1) does not document,
+per WEB-SITE-4. An old setting fails the same way;
+
+=item *
+
+there is no C<site> setting, or no C<url>. The C<url> is the absolute
+URL of the site root: it starts with C<https://> or C<http://>, and it
+ends in a solidus;
+
+=item *
+
+a C<language> block names no tag of WEB-LANGUAGE-1, a tag that a block
+declares once more, no C<name>, or a C<dir> of another word;
 
 =item *
 
@@ -82,8 +127,9 @@ can take a C<body> as well, which opens it;
 
 =item *
 
-two C<page> blocks name the same file, or two manuals would become the
-same page;
+two C<page> blocks name the same file, or two manuals, or a manual and a
+C<page> block, would become the same page. Each test folds each name,
+per WEB-OUTPUT-17;
 
 =item *
 
@@ -91,8 +137,8 @@ a C<nav> block has no label;
 
 =item *
 
-a translation names a language code that is not two lowercase
-letters, or names C<en>, the default language;
+a translation names a tag that no C<language> block declares, or the
+tag of the default language;
 
 =item *
 
@@ -105,17 +151,12 @@ a translation names a setting outside the set of its type;
 
 =item *
 
-a C<keys> block or a C<key> block takes a translation;
+a C<language>, a C<keys> or a C<key> block takes a translation;
 
 =item *
 
 a group block names no C<heading>, or its name is not one word of
 lowercase letters, digits and hyphens, or two groups share one name;
-
-=item *
-
-a group block sets C<anchor>, because the block name is the anchor. The
-message names the block to write in its place;
 
 =item *
 
@@ -125,6 +166,12 @@ default C<dir>;
 =item *
 
 a path setting steps out of the project with a C<..> component;
+
+=item *
+
+the C<source_dir> is the project root, per WEB-SITE-7. The record of
+the translations sits there, per WEB-STATUS-1, and the build publishes
+each plain file of the source directory;
 
 =item *
 
@@ -145,6 +192,12 @@ the module with no name to take but its whole path;
 
 =item *
 
+the path of a source from the project root holds ASCII white space or
+a parenthesis, per WEB-SITE-6. A source is a page source, a manual or a
+footer fragment, of any language;
+
+=item *
+
 a yes/no setting holds something that is neither;
 
 =item *
@@ -154,8 +207,8 @@ fragment that the build reads holds one. The rule holds for the file,
 and for each directory between the source directory and the file.
 Every file at the top level that the build does not render is copied
 into the site. The fragments are the body fragment of each page in each
-language, the footer, and the footer of each language. A symlink would
-publish whatever it points at, from anywhere on the machine.
+language, and the footer of each language. A symlink would publish
+whatever it points at, from anywhere on the machine.
 
 =back
 
@@ -176,9 +229,11 @@ hold;
 =item *
 
 the C<keys> name is not one segment below the source directory, names a
-directory of the path, names the staging directory of the build, takes
-the shape of a language code, or names a file that the site already
-holds;
+directory of the path, names the staging directory of the build, is the
+path of the tree of a declared language, or names a file that the site
+already holds. Each test of the name against another name, and the
+test of two C<keys> blocks of one directory, folds the two, per
+WEB-OUTPUT-17;
 
 =item *
 
@@ -231,44 +286,55 @@ The project root, and the F<.fuguwebrc> that this object read.
 
 The source directory, or one file in it.
 
-=head2 site, out_dir, source_dir, entry, module_root, mandoc_os, man_url, stylesheet
+=head2 site, url, out_dir, source_dir, entry, module_root, man_url, stylesheet
 
-The settings. C<site> is the only one a project must give.
+The settings. C<site> and C<url> are the ones a project must give.
 
-    site            (required)  the name in the title of every page,
-                                and the text of the header link
+    site            (required)  the site name of each language whose
+                                block names none, as characters
+    url             (required)  the absolute URL of the site root
+    footer          (none)      the footer fragment of each language
+                                whose block names none, below the
+                                source directory
     out_dir         web/build   where the build writes
     source_dir      web         the fragments and the assets
     entry           index.html  the front page of each tree, and the
                                 header link
     module_root     lib         the prefix a module name drops
                                 (a trailing slash is dropped)
-    mandoc_os       OpenBSD     the mandoc -I os=, which pins the footer
     man_url         https://man.openbsd.org/   where a remote .Xr goes
     stylesheet      (searched)  the base stylesheet
 
-C<stylesheet> overrides the search that L<Fugu::File/share_path> does.
-The search finds the sheet in a checkout and in an installed
-App-FuguWeb distribution alike, so most projects never set it.
+L<App::FuguWeb::Language/site> and L<App::FuguWeb::Language/footer>
+answer the site name and the footer of each language.
 
-The C<pod2man> C<--center> and C<--release> values are not settings.
-They are constants of L<App::FuguWeb::Render>: they pin the C<pod2man>
-output so the site does not vary with the build host.
+C<stylesheet> overrides the search that L<Fugu::File/share_path> does.
+The search finds the sheet that ships with the tool, so most projects
+never set it. L<App::FuguWeb::Site/THE STYLESHEET> states the search.
+
+=head2 url_path
+
+The path of the C<url>: the part after the host, which starts and ends
+with a solidus. A page of the top level carries it as its C<base>, per
+WEB-TOP-3, and the check takes that C<base> as the one root-absolute
+href, per WEB-LINKS-4.
 
 =head2 nav
 
     my @nav = $config->nav('de');
 
 The navigation of one language, in file order. Each entry is a hashref
-with C<href> and C<label>. The code defaults to C<en>, and an C<href> is
-the same in each language.
+with C<href>, C<label> and C<label_lang>. The tag defaults to that of
+the default language, and an C<href> is the same in each language. The
+C<label_lang> is the tag of the language of the label, per
+WEB-LANGUAGE-8.
 
 =head2 pages
 
     my @pages = $config->pages('de');
 
-The pages of one language, in file order. The code defaults to C<en>.
-Each entry is a hashref:
+The pages of one language, in file order. The tag defaults to that of
+the default language. Each entry is a hashref:
 
     file        the name of the page in each language tree
     title       the title, which defaults to the file name
@@ -276,9 +342,9 @@ Each entry is a hashref:
     value       what the source names; for index, the body
                 that opens the page, or undef
     unlinked    true when no other page links to it
-    lang        the language of the value: the code of the
+    lang        the language of the value: the tag of the
                 page when its translation names the value,
-                and en otherwise
+                and the default tag otherwise
     title_lang  the language of the title, by the same rule
 
 =head2 groups
@@ -287,13 +353,16 @@ The manual groups, in file order. Each entry is an
 C<App::FuguWeb::Config::Group>, and the two block types interleave as
 the description wrote them.
 
-=head2 languages
+=head2 languages, default_language, language
 
-    my @codes = $config->languages;
+    my @languages = $config->languages;
+    my $default   = $config->default_language;
+    my $chinese   = $config->language('zh-Hans');
 
-The code of each language of the site, the default first. Each one
-names a tree of the output. The list holds C<en>, and then each code
-that a translation names, in byte order.
+Each L<App::FuguWeb::Language> of the site, in the order of the
+declaration, the default first. Each one names a tree of the output,
+below the path of its tag. C<language> answers the declared language of
+a tag, or C<undef>.
 
 =head2 page_names
 
@@ -315,8 +384,8 @@ stylesheet, the assets, and each key directory. The build and the
 checks read the same list, so the two can never disagree about what
 the site holds.
 
-A page of a tree is C<< <code>/<page> >>, for example
-F<en/manuals.html>. The pages of the top level, the stylesheet and the
+A page of a tree is C<< <path>/<page> >>, for example
+F<zh-hans/manuals.html>. The pages of the top level, the stylesheet and the
 assets are file names. A key directory is one part below the root, so
 its entries hold a solidus.
 
@@ -414,6 +483,18 @@ The site holds one well-known tree, and each directory writes into it.
 The list therefore holds one entry for the policy file, and one for an
 address that two directories name.
 
+=head2 sources
+
+    my @paths = $config->sources;
+
+The path of each source that a build reads, below the project root,
+per WEB-OUTPUT-18. The files come first: each body, Markdown page,
+manual, POD sidecar and footer of each language, and the C<stylesheet>
+that the description names. The directories follow: the source
+directory, each key directory, and the C<dir> of each group in each
+language. L<App::FuguWeb::Site> refuses an output directory that holds
+one, and names the first one that it meets.
+
 =head1 GROUPS
 
 A C<manuals> or C<modules> block becomes one group. A group never holds
@@ -424,26 +505,30 @@ A group whose directory does not exist fails the load and names the
 directory. A silent empty group hides a typo in a path, and a rename
 that nothing catches is what this file exists to prevent.
 
-=head2 kind, name, namespace
+=head2 kind, name, namespace, lang
 
 C<kind> is C<manuals> or C<modules>. C<name> is the block name, which
-becomes the C<id> of the C<< <h2> >>. Every language shares it.
+becomes the C<id> of the C<< <h2> >>. Every language shares it. C<lang>
+is the tag of the default language, and a manual of the default
+C<dir> is of that language.
 
 =head2 heading
 
     my $text = $group->heading('de');
 
-The text of the C<< <h2> >> in one language: the heading of the
-translation, or the default heading. The code defaults to C<en>.
+The text of the C<< <h2> >> in one language, as characters: the
+heading of the translation, or the default heading. The tag defaults
+to that of the default language.
 
 =head2 heading_lang
 
-    my $code = $group->heading_lang('de');
+    my $tag = $group->heading_lang('de');
 
-The language of that text: the code when the translation names a
-heading, and C<en> when the group takes the default heading. The code
-defaults to C<en>. The index marks a heading of another language than
-the page, per L<App::FuguWeb::Index/body>.
+The language of that text: the tag when the translation names a
+heading, and the default tag when the group takes the default heading,
+per WEB-LANGUAGE-8. The tag defaults to that of the default language.
+The index marks a heading of another language than the page, per
+L<App::FuguWeb::Index/body>.
 
 =head2 translate
 
@@ -454,13 +539,22 @@ C<heading> of C<undef> keeps the default heading, and a C<dir> of
 C<undef> keeps the default sources for that language. The description
 calls it once for each translation of the block.
 
+=head2 dirs
+
+    my @dirs = $group->dirs;
+
+The directory of the group in each language: the default C<dir>, then
+the C<dir> of each translation that names one, in the order of the
+tags.
+
 =head2 manuals
 
     my @manuals = $group->manuals('de');
 
 The manuals of the group in one language, in the order the index shows
-them, as L<App::FuguWeb::Manual> objects. The code defaults to C<en>.
-The method reads each directory once and keeps the answer.
+them, as L<App::FuguWeb::Manual> objects. The tag defaults to that of
+the default language. The method reads each directory once and keeps
+the answer.
 
 A translation C<dir> mirrors the default C<dir>. The namesake of a
 source is the source of the same path below the other directory, and

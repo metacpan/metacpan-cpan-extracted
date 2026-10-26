@@ -9,7 +9,10 @@ App::FuguWeb - a static documentation site for a Perl project
 
     use App::FuguWeb;
 
-    my $safe = App::FuguWeb::escape_html($title);
+    my $text = App::FuguWeb::decode($bytes, $path, \my $reason)
+        // die "$reason\n";
+    my $safe = App::FuguWeb::escape_html($text);
+    my $page = App::FuguWeb::encode($safe);
     my $file = App::FuguWeb::CONFIG_FILE;      # .fuguwebrc
 
 =head1 DESCRIPTION
@@ -25,16 +28,27 @@ root, keeps its body fragments and its assets in one source directory,
 and runs C<fuguweb build>. See L<fuguweb(1)> for the subcommands and
 the exit codes.
 
-This file holds what more than one module in the namespace needs: two
-constants and four functions, documented below. The rest of the work
-is split by concern:
+This file holds what more than one module in the namespace needs: the
+constants and the functions documented below. The rest of the work is
+split by concern:
 
 =over 4
 
 =item L<App::FuguWeb::Config>
 
-The site description: the settings, the navigation, the pages, and the
-manual groups.
+The site description: the settings, the languages, the navigation, the
+pages, and the manual groups.
+
+=item L<App::FuguWeb::Language>
+
+One declared language: its tag, its name, its direction, and the path
+of its tree.
+
+=item L<App::FuguWeb::Fragment>
+
+The fit of a body fragment to its page: the outline, the heading ids of
+a translation and the links to them, and the fit of the fragment of each
+renderer.
 
 =item L<App::FuguWeb::Page>
 
@@ -60,6 +74,11 @@ The whole build.
 
 The checks over a built site.
 
+=item L<App::FuguWeb::Status>
+
+The record of the translations, and each part of a translation that
+does not follow its source.
+
 =item L<App::FuguWeb::CLI>
 
 Subcommand dispatch over L<Fugu::CLI>.
@@ -74,9 +93,19 @@ brace at the end of its header line. A C<#> starts a comment, and the
 grammar has no escape for it, so a value may not hold one.
 
     site       = OpenHAP
+    url        = https://openhap.example.org/
+    footer     = footer.body.html
     out_dir    = web/build
     source_dir = web
     entry      = index.html
+
+    language en {
+            name = English
+    }
+
+    language de {
+            name = Deutsch
+    }
 
     nav "fugu.html" {
             label = Fugu
@@ -110,10 +139,11 @@ opens it. C<unlinked = yes> marks a page that no other page links to,
 such as F<404.html>.
 
 The block name of a group is its anchor on the index page, and
-C<heading> holds the text. A block with a language code in front of its
-name is a translation into that language. Each language of the site
-takes one tree of the output, and L<App::FuguWeb::Config/Translations>
-states the rules.
+C<heading> holds the text. A C<language> block declares one language,
+and the first one is the default. A block with the tag of a declared
+language in front of its name is a translation into that language.
+Each language of the site takes one tree of the output, below the path
+of its tag, and L<App::FuguWeb::Config/Languages> states the rules.
 
 Three rules keep a list out of the file. A C<manuals> block reads its
 directory. A C<modules> block finds every F<.pod> file below its
@@ -129,13 +159,62 @@ L<App::FuguWeb::Config> documents every setting and every default.
 
 =head1 FUNCTIONS
 
+Text is UTF-8 at each edge, and characters inside, per WEB-SITE-5. The
+build decodes the description, each source and each output of a
+renderer, and it encodes each page that it writes. A name of a file
+stays bytes, because the file system reads bytes.
+
+=head2 decode
+
+    my $text = App::FuguWeb::decode($bytes, $name, \my $reason);
+
+The characters of UTF-8 bytes. The function returns C<undef> when the
+bytes are not UTF-8, with the reason in C<$reason>. The reason names
+C<$name>, the file or the output, and the offset of the first byte that
+is wrong. The decode is strict: it refuses an overlong form, a
+surrogate, a noncharacter and a code point above U+10FFFF.
+
+=head2 encode
+
+    my $bytes = App::FuguWeb::encode($text);
+
+The UTF-8 bytes of characters. Each page goes through it on its way to
+the disk.
+
+=head2 as_text
+
+    my $text = App::FuguWeb::as_text($name);
+
+The characters of a name or a field that a page shows: a name of the
+description, a name of a file, or a field of a key. The description is
+UTF-8, so each of its names decodes. A name of a file that is not
+UTF-8 takes U+FFFD for each wrong byte. Its link then names no file,
+and the check reports it.
+
+=head2 fold_name
+
+    App::FuguWeb::fold_name($name) eq App::FuguWeb::fold_name($other)
+
+The fold of a name or a path of the output, per WEB-OUTPUT-17: its
+characters in NFD, the canonical decomposition of Unicode, then the
+full case fold of C<fc>. A file system without case, such as APFS on
+Darwin, keeps two names of one fold as one entry. APFS joins an NFC
+name and its NFD form, two cases of a name, and the sharp s U+00DF and
+C<SS>. The fold joins each such pair.
+
+The fold reads the Unicode version of this Perl. A file system of an
+earlier version joins fewer pairs, and a guard then refuses more than
+it must, which is safe. A file system of a later version can fold a
+character that this Perl does not know, and a guard then misses that
+pair.
+
 =head2 escape_html
 
     my $safe = App::FuguWeb::escape_html($text);
 
-Escape C<&>, C<< < >> and C<< > >>, in that order. The function takes
-bytes and returns bytes: no file in the namespace carries C<use utf8>,
-so a multi-byte character passes through untouched.
+Escape C<&>, C<< < >> and C<< > >>, in that order. The function reads
+characters and returns characters, so a character outside ASCII passes
+through untouched.
 
 =head2 escape_attr
 
@@ -145,6 +224,35 @@ The same, plus the double quote. Use it for a value on its way into a
 double-quoted attribute: a value that holds a quote ends the attribute
 early, and everything after it becomes markup. L</escape_html> alone
 does not guard an attribute.
+
+=head2 edit_attributes
+
+    my $fitted = App::FuguWeb::edit_attributes($attributes,
+        sub ($attribute, $name, $value) { return $attribute });
+
+The attributes of a start tag, each one as the function returns it.
+The function takes the attribute as it stands, its name, and its value,
+or C<undef> when the attribute has none. A text after the last
+attribute, such as a slash, stays.
+
+This function and L</attribute> are the one reader of an attribute.
+L<App::FuguWeb::Fragment> and L<App::FuguWeb::Check> read each
+attribute here, so the two agree. An attribute can take its value in
+double quotes, in single quotes, or with no quotes. The reader reads
+the attributes of a tag in order, from the first one, and it steps over
+each value as a whole. So the text of a value, such as
+C<title="see id=x">, is no attribute, and a name such as C<data-id> is
+no C<id>. HTML separates two attributes with ASCII white space alone,
+so a character or a byte outside ASCII never ends a value.
+
+=head2 attribute
+
+    my $id = App::FuguWeb::attribute($attributes, 'id');
+
+The value of the first attribute of the name in a start tag, through
+L</edit_attributes>, or C<undef> when no attribute of the name has a
+value. The name is in lowercase, and the name of each attribute
+compares in lowercase.
 
 =head2 list_dir
 
@@ -186,6 +294,32 @@ Report whether C<$path> is C<$root> or lies below it. A trailing slash
 on either does not change the answer. Both paths must be of the same
 kind: both absolute, or both relative to the same directory.
 
+=head2 canonical_path
+
+    my $path = App::FuguWeb::canonical_path('./web//zh-hans/');  # web/zh-hans
+
+The one form of a path from the project root: no C<.> step, no empty
+step, and no final solidus. The record of the translations names each
+file in this form, per WEB-STATUS-1. The form of the project root is
+the empty string.
+
+=head2 ref_parts
+
+    my ($path, $fragment) = App::FuguWeb::ref_parts($ref);
+
+The path and the fragment of one reference. A query is no part of the
+name of a file, so the path holds none, per WEB-LINKS-3. The chrome
+and the check read each reference here, so the two agree.
+
+=head2 resolve_ref
+
+    my $path = App::FuguWeb::resolve_ref($dir, $ref);
+
+One relative reference, as a path below the site root. The reference
+is relative to C<$dir>, which is a path below the site root. The
+function returns C<undef> when the reference steps above the site root,
+or names the site root.
+
 =head1 CONSTANTS
 
 =head2 CONFIG_FILE
@@ -210,27 +344,16 @@ build writes it at the top level, outside every language tree. Each
 page but the forward F<index.html> links it with a relative path, and
 the forward loads nothing.
 
-=head2 DEFAULT_LANGUAGE
-
-The code of the default language, C<en>. Every page of the
-description renders in the tree of this language. The key page and
-the two pages of the top level are pages of it.
-
-=head2 LANGUAGE_CODE
-
-The shape of a language code, as a compiled pattern: two lowercase
-ASCII letters. A directory at the top level of the output whose name
-takes this shape holds a language tree.
-
 =head2 FORWARD_PAGE, NOT_FOUND_PAGE
 
 The two pages of the top level, F<index.html> and F<404.html>. The
-first forwards to the entry page of the default tree. The second is a
-copy of the 404 page of the default tree, for the host.
+first forwards to the entry page of the default tree. The second holds
+the body of the F<404.html> of each tree, for the host.
 
 =head1 SEE ALSO
 
-L<fuguweb(1)>, L<Fugu::Config>, mandoc(1), lowdown(1), L<pod2man>
+L<fuguweb(1)>, L<App::FuguWeb::Language>, L<Fugu::Config>, mandoc(1),
+lowdown(1), L<pod2man>
 
 =head1 AUTHOR
 

@@ -7,6 +7,7 @@ Makefile.PL
 README.md
 docs/BENCHMARKING.md
 docs/ENGINE-CONTRACTS.md
+docs/RELEASE-0.03.md
 docs/IMPLEMENTATION.md
 docs/PERFORMANCE-SWEEP-20261019.md
 docs/PERFORMANCE.md
@@ -53,5 +54,7 @@ t/34-client-websocket-h2-lifecycle.t
 t/35-server-websocket-h3.t
 t/36-client-websocket-h3.t
 t/37-client-h3-websocket-admission.t
+t/38-client-on-transaction.t
+t/39-http1-only.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

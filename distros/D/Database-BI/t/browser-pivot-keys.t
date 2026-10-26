@@ -232,4 +232,12 @@ is $twoAfter->[0]{sort}, 'ascending', 'but Enter still sorts, which is offered';
 is $browser->wait_for(sub { length live() ? 1 : undef }, timeout => 5),
 	1, 'and the sort is announced';
 
+# What this run established, for the job summary: the tab order, the key
+# handlers and the limit on moving a measure column beside a group label.
+$browser->proved(
+	'GET /pivot: a header takes focus from the browser, Enter and Space sort the'
+	. ' rows, Shift+Arrow moves a measure column with its announcement, and a'
+	. ' two-row header refuses the move while Enter still sorts'
+);
+
 done_testing;

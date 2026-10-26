@@ -1,0 +1,22 @@
+# dzil test image for [@Author::GETTY] distributions, one per Perl version:
+# ghcr.io/getty/dzil-perl:<ver>. The official perl:<ver> image (Debian, git,
+# curl, cpanm) plus Dist::Zilla, the bundle and its author-test deps, so a
+# SimpiCI job only installs what the tested dist adds on top.
+#
+#   docker build --build-arg PERL_VERSION=5.40 -t dzil-perl:5.40 .
+#
+# PERL_VERSION has no default on purpose: an image tagged for one perl but
+# built from another is worse than a failed build.
+ARG PERL_VERSION
+FROM perl:${PERL_VERSION}
+ARG PERL_VERSION
+
+LABEL org.opencontainers.image.source="https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty" \
+      org.opencontainers.image.description="perl:${PERL_VERSION} with Dist::Zilla, [@Author::GETTY] and its author-test deps for dzil test"
+
+# Same https CPAN mirror as the SimpiCI helper and the dzil-test action.
+# Build-time only: the image's runtime environment stays that of perl:<ver>.
+ARG PERL_CPANM_OPT="--mirror https://cpan.metacpan.org --mirror-only"
+
+COPY prime.sh /tmp/prime.sh
+RUN bash /tmp/prime.sh && rm -f /tmp/prime.sh

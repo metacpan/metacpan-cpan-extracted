@@ -1,5 +1,17 @@
 Revision history for Unblock-HTTP3
 
+0.14  2026-10-25
+    - Recheck HTTP/3 CONNECT Transaction completion after an outgoing
+      Body::Stream is marked complete, including when its final output
+      flushes synchronously during the writer's complete() call.
+    - Fix a lifecycle edge case where the HTTP/3 response, incoming
+      stream and outgoing request FIN had all completed but on_finish
+      never fired without another network event.
+    - Preserve protocol-layer callback ordering, stream ownership and
+      existing public APIs. No Linux::Event or other framework coupling.
+    - Add real Net::QUIC/TLS CONNECT completion regression coverage;
+      keep the HTTP/3 native consumer ABI at version 1.
+
 0.13  2026-10-18
     - Add bounded buffered HTTP/3 receive lifecycle and per-transaction
       on_data/on_finish callbacks for the unified Unblock::HTTP layer.

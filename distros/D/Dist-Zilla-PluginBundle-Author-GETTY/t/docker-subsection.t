@@ -285,4 +285,28 @@ CONF
   is_deeply($docker_plugins[0]->tag, ['latest', '%v'], "auto-default plugin uses docker_tags");
 }
 
+# The bundle passes nothing to Docker::API that the plugin no longer knows:
+# build_load and release_load are gone there and only warn.
+{
+  my $config = <<'CONF';
+name = Test-Dist
+author = Test <test@test.de>
+license = Perl_5
+copyright_holder = Test
+
+[@Author::GETTY]
+docker_image = myregistry/myapp
+docker_default = 0
+
+[@Author::GETTY::Docker / runtime]
+target = runtime
+CONF
+
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+  my $tzil = build_dist($config);
+  my @removed = grep { /no longer supported/ } @warnings;
+  is_deeply(\@removed, [], "no removed Docker::API key is passed by the subsection");
+}
+
 done_testing;

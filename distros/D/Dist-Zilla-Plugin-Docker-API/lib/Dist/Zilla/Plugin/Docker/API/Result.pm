@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::Docker::API::Result;
 # ABSTRACT: Result object from Docker image build/push operations
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 use Moo;
 use Types::Standard qw(Str ArrayRef);
 
@@ -46,13 +46,13 @@ Dist::Zilla::Plugin::Docker::API::Result - Result object from Docker image build
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-docker-api/issues>.
 
 =head1 CONTRIBUTING

@@ -10,7 +10,7 @@ use warnings;
 use Exporter qw(import);
 use Readonly;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Exit codes: the contract with cron, the Task Scheduler and "--exit N".
 Readonly our $EXIT_OK       => 0;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::Most;
 use Capture::Tiny qw(capture);
-use Fcntl qw(:flock);
+use Fcntl qw(:flock O_WRONLY O_CREAT O_EXCL);
 use File::Basename qw(dirname basename);
 use File::Find ();
 use File::Glob qw(bsd_glob);
@@ -87,6 +87,9 @@ BAIL_OUT("cannot find '$script'; the self test would have nothing to run it with
         or die "Unable to read '$cli_workflow': $!";
     my $text = do { local $/; <$handle> };
     close $handle;
+    # A CRLF checkout (git with core.autocrlf, as on Windows) would otherwise
+    # leave a \r before each line break the patterns below look for.
+    $text =~ s/\r\n/\n/g;
 
     my ($image) = $text =~ /^\s*image:\s*(\S+)\s*$/m;
     $image = '' unless defined $image;
@@ -197,6 +200,22 @@ if ($live) {
 
     ok(-f $docker, 'the fake daemon the self test runs against ships with the tests')
         or BAIL_OUT("cannot find '$docker'; the distribution is incomplete");
+
+    # The fake daemon runs the steps on this host, where "perl" is whatever
+    # PATH finds first: on a CPAN tester's machine that is often not the Perl
+    # under test, so it lacks the tool's dependencies and the second
+    # workflow's step falls back to cpanm.  A "perl" that runs this Perl,
+    # first on PATH, makes the steps use the Perl being tested.
+    if ($^O ne 'MSWin32') {
+        my $bin = tempdir(CLEANUP => 1);
+        my $perl = File::Spec->catfile($bin, 'perl');
+        (my $quoted = $^X) =~ s/'/'\\''/g;
+        sysopen my $wrapper, $perl, O_WRONLY | O_CREAT | O_EXCL, 0700
+            or die "Unable to create '$perl': $!";
+        print {$wrapper} "#!/bin/sh\nexec '$quoted' \"\$\@\"\n";
+        close $wrapper or die "Unable to write '$perl': $!";
+        $ENV{PATH} = join ':', $bin, (defined $ENV{PATH} ? $ENV{PATH} : ());
+    }
 }
 
 my $daemon = App::Actions::Docker->new(bin => $docker, quiet => 1);

@@ -33,7 +33,8 @@ sub write_source ( $relative, $text )
 }
 
 # A group is a plain object here. The test asks Manual about a manual,
-# not Config about a group.
+# not Config about a group. The group holds the default language of
+# the site.
 {
 
 	package TestGroup;
@@ -42,6 +43,7 @@ sub write_source ( $relative, $text )
 		return bless { namespace => $namespace }, $class;
 	}
 	sub namespace ($self) { return $self->{namespace}; }
+	sub lang      ($)     { return 'zh-Hans'; }
 }
 
 subtest 'an mdoc page takes its name and section from the file' => sub {
@@ -62,6 +64,7 @@ MDOC
 	is( $manual->page,        'hapctl.8.html',   'the page' );
 	is( $manual->staged_name, 'hapctl.8',        'the staged name' );
 	is( $manual->path,        $path,             'the path' );
+	is( $manual->lang, 'zh-Hans', 'the default language of the group' );
 	ok( !$manual->is_pod, 'an mdoc page is not a sidecar' );
 	is( $manual->description, 'control utility for openhapd',
 		'the .Nd description' );
@@ -110,6 +113,7 @@ POD
 	is( $manual->section, '3p', 'a sidecar is always 3p' );
 	is( $manual->page, 'App::OpenHAP::Tasmota::Heater.3p.html',
 		'the page' );
+	is( $manual->lang, 'zh-Hans', 'the default language of the group' );
 	ok( $manual->is_pod, 'a sidecar is a sidecar' );
 	is( $manual->description, 'a Tasmota heater',
 		'the =head1 NAME description' );
@@ -167,6 +171,17 @@ MDOC
 	is( App::FuguWeb::Manual->from_mdoc( $path, TestGroup->new )
 		    ->description,
 		'the first description', 'the first .Nd wins' );
+};
+
+subtest 'the description is characters' => sub {
+	# The index writes the description into a page of characters,
+	# and the encode of the page writes its bytes.
+	my $path = write_source( 'man/openhap/zh.1',
+		".Sh NAME\n.Nm zh\n.Nd \xe5\xb7\xa5\xe5\x85\xb7\n" );
+
+	is( App::FuguWeb::Manual->from_mdoc( $path, TestGroup->new )
+		    ->description,
+		"\x{5de5}\x{5177}", 'the description decodes' );
 };
 
 done_testing();

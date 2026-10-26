@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::Docker::API::TagTemplate;
 # ABSTRACT: Template expansion for Docker image tags
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 use Moo;
 
 has zilla => (
@@ -86,13 +86,13 @@ Dist::Zilla::Plugin::Docker::API::TagTemplate - Template expansion for Docker im
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-docker-api/issues>.
 
 =head1 CONTRIBUTING

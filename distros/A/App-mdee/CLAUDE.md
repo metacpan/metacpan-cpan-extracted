@@ -2,7 +2,9 @@
 
 ## Overview
 
-em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown viewer command implemented as a Bash script. It combines greple for syntax highlighting with nup for multi-column paged output.
+em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command implemented as a Bash script. It combines greple for syntax highlighting with nup for multi-column paged output.
+
+**Concept:** mdee shows a `.md` file as it is written, made easier on the eyes with color; it is not a Markdown renderer and does not interpret or reformat the text. Table alignment, list-item folding, hiding markup characters (default themes) and closing hashes on h3-h6 were added later for readability and are the only transformations. Keep new features within this idea: paragraphs are not reflowed, backslash escapes are shown as written, and `--no-theme` gives back the original text in color.
 
 ## Dependencies
 
@@ -127,7 +129,8 @@ The `default` associative array supports:
 | `default[mode]` | `--mode` | `dark` |
 | `default[theme]` | `--theme` | `custom` |
 | `default[style]` | `--style` | `pager` |
-| `default[width]` | `--width` | `100` |
+| `default[width]` | `--width` | `170` |
+| `default[fold_width]` | `--fold-width` | `80` |
 | `default[base_color]` | `--base-color` | `DarkCyan` |
 
 Priority: command-line option > config default > built-in default.
@@ -191,6 +194,12 @@ flowchart LR
 ```
 
 Each stage is controlled by `--style` and individual `--[no-]fold`, `--[no-]table`, `--[no-]trim`, `--[no-]rule`, `--[no-]nup` options. Fold and table processing are handled within the greple `-Mmd` module (not as separate pipeline stages).
+
+`--parallel` (`-V`) shows two or more files side by side: greple already separates files with `\f`, so `run_nup` invokes `nup -V --pane=$_cols - --pages` and ansicolumn lays the pages out as panes (one per file unless `--pane` is given; `_cols` is set to the file count so the fold width follows). With a single file the option is ignored.
+
+`--[no-]filename` controls the file name label that greple prints at the top of each file (`--filestyle=once`, format and color from the `FILE_FORMAT`/`FILE` theme keys): `--no-filename` passes `-h` to greple so that panes start with the text. The label is only printed for more than one file anyway.
+
+`--width` (`-w`) is the output width, as in ansicolumn: when given, it replaces `COLUMNS` in the pane-count and fold-width calculation (`_total`), and `run_nup`/`run_column` pass `--pane=$_cols` plus `-w N` after the file name `-` so nup agrees with mdee on the pane count. `--fold-width` sets the fold/table width directly (`fold_width`); its default is `_total / _cols - 5` with nup, or the output width without nup. Both have `default[...]` config keys.
 
 ### Style System
 
@@ -453,6 +462,8 @@ s{(^ {0,3}\|.+\|\n){3,}}{
     fix_separator($formatted, $sep);
 }mge;
 ```
+
+**Escaped pipes**: the split regex excludes a `|` preceded by a backslash (`(?<!\\)\|`, also in non-trim mode, which therefore uses `-rs` too), so `\|` stays inside its cell. It is displayed as written; backslash escapes in general (`\*`, `` \` ``, `\|` → `|`) are not processed by the md module yet.
 
 **Trim mode** (`table_trim=1`, default): Strips cell whitespace with `-rs '\s*\|\s*'`, adds padding with `--item-format=' %s '`, removes the leading/trailing empty columns created by `|` delimiters with `--table-remove=1,-0`, and uses `--padding` to pad the last column to full width.
 

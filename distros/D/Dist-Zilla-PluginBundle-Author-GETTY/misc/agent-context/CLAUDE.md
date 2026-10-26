@@ -6,7 +6,8 @@ other GETTY dist inherits, dogfooded on its own source via `[Bootstrap::lib]`.
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lanes are in `.claude/rules/dist-zilla-pluginbundle-author-getty-rules.md`.
+the principle is a shared house rule (skilletor bundle `getty-cpan-dist@getty`); lanes are
+in `.claude/rules/dist-zilla-pluginbundle-author-getty-rules.md`.
 
 | Task | Agent |
 |---|---|

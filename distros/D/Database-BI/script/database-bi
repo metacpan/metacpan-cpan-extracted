@@ -1,10 +1,37 @@
-#!/usr/bin/env morbo
+#!/usr/bin/env perl
+
+# The shebang has to name perl, and must not name a server.  morbo starts the
+# application as
+#
+#   perl <this script> daemon
+#
+# and perl hands a script whose #! line does not mention perl to the
+# interpreter that line names (see perlrun).  With "#!/usr/bin/env morbo" that
+# interpreter is morbo again, so every worker started another morbo; each
+# generation exported the whole of @INC as PERL5LIB, so the environment grew
+# with every step until exec failed with "Argument list too long", and every
+# generation kept the listening socket, leaving a chain of stale servers.
 
 use strict;
 use warnings;
 
+use File::Spec ();
 use FindBin;
 BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
 require Mojolicious::Commands;
-Mojolicious::Commands->start_app('Database::BI');
+
+# With no arguments this is the development server, restarting when a file
+# changes - what "morbo script/database-bi" does.  A command word (daemon,
+# routes, get, ...) goes to the application's command line interface, so the
+# script can still start a plain server or be used from a test.
+if (@ARGV) {
+	Mojolicious::Commands->start_app('Database::BI');
+}
+else {
+	require Mojo::Server::Morbo;
+	Mojo::Server::Morbo->new(silent => 1)
+		->run(File::Spec->catfile($FindBin::RealBin, $FindBin::Script));
+}
+
+1;

@@ -17,7 +17,7 @@ use Sub::Private ();
 
 use App::Actions::Access;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 our @EXPORT_OK = qw(load_yaml_mapping mapping normalize_step stringify trim);
 

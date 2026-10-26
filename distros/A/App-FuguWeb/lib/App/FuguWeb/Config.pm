@@ -18,14 +18,15 @@
 use v5.36;
 
 package App::FuguWeb::Config;
-our $VERSION = '0.10.1';
+our $VERSION = '0.11.0';
 
 use App::FuguWeb;
-use App::FuguWeb::Manual;
 use App::FuguWeb::Keys;
-use App::FuguWeb::Page ();
-use File::Find         ();
+use App::FuguWeb::Language;
+use App::FuguWeb::Manual;
+use File::Find ();
 use Fugu::Config;
+use Fugu::File;
 use Fugu::KeyDir;
 use Fugu::OpenPGP;
 
@@ -40,31 +41,57 @@ use Fugu::OpenPGP;
 # therefore share nothing.
 
 # The settings that a project may leave out, and what they mean when
-# it does. 'site' has no default: a site with no name is a mistake,
-# not a default.
+# it does. 'site' and 'url' have no default: a site with no name or no
+# address is a mistake, not a default.
 use constant {
 	DEFAULT_OUT_DIR     => 'web/build',
 	DEFAULT_SOURCE_DIR  => 'web',
 	DEFAULT_ENTRY       => 'index.html',
 	DEFAULT_MODULE_ROOT => 'lib',
-	DEFAULT_MANDOC_OS   => 'OpenBSD',
 	DEFAULT_MAN_URL     => 'https://man.openbsd.org/',
 };
 
 # The settings that name a path inside the project. Each one is
 # checked for a parent-directory step, because a build must write
 # inside the project and read inside it.
-my @PATH_SETTINGS = qw(out_dir source_dir module_root stylesheet);
+my @PATH_SETTINGS = qw(out_dir source_dir module_root stylesheet footer);
+
+# The settings of the description, per WEB-SITE-4. fuguweb(1)
+# documents each one. A setting that the list does not name is a
+# typo, and a typo that the parser swallows is a setting that
+# silently does not apply. An old setting fails the same way.
+my %SETTING = map { $_ => 1 } qw(
+    site url footer out_dir source_dir entry module_root man_url
+    stylesheet
+);
+
+# The block types of the description, and the settings of each
+# default block, per WEB-SITE-4. fuguweb(1) documents each one.
+my %BLOCK = (
+	language => [qw(name dir site footer)],
+	nav      => [qw(label)],
+	page     => [qw(title body markdown index unlinked)],
+	manuals  => [qw(heading dir namespace)],
+	modules  => [qw(heading dir)],
+	keys     => [qw(org contact expires url)],
+	key      => [qw(status since until email fingerprint)],
+);
+
+# The block types that take no translation. A language block names
+# one language, and a key directory and a key hold no prose. A
+# translation of either one would describe a second language, a
+# second directory or a second key.
+my @UNTRANSLATED = qw(language keys key);
 
 # The three ways a page block names its content. Exactly one of them
 # must appear. An index page can take a body as well, which opens it,
 # per WEB-MANUALS-8.
 my @PAGE_SOURCES = qw(body markdown index);
 
-# The block types that take a translation, per WEB-LANG-2, and the
-# settings that a translation of each one takes, per WEB-LANG-4. A
-# translation holds the words of one language. Any other setting is a
-# typo, or a value that no language can change.
+# The block types that take a translation, per WEB-LANGUAGE-6, and the
+# settings that a translation of each one takes, per WEB-LANGUAGE-7.
+# A translation holds the words of one language. Any other setting is
+# a typo, or a value that no language can change.
 my %TRANSLATION = (
 	page    => [qw(title body markdown)],
 	nav     => [qw(label)],
@@ -78,13 +105,6 @@ my %TRANSLATION = (
 my $GROUP_NAME = qr/\A[a-z0-9-]+\z/;
 my $GROUP_RULE =
     'a group name is one word of lowercase letters, digits and hyphens';
-
-# The settings that each block of the key directory takes. A setting
-# that neither list names is a typo, and a typo that the parser
-# swallows is a setting that silently does not apply.
-my %KEYS_SETTING = map { $_ => 1 } qw(org contact expires url);
-my %KEY_SETTING =
-    map { $_ => 1 } qw(status since until email fingerprint);
 
 # The statuses that a key block may name. Fugu::KeyDir holds the
 # vocabulary, so the two can never disagree.
@@ -161,6 +181,15 @@ sub load ( $class, %args )
 		return;
 	}
 
+	# WEB-SITE-5. The parse reads bytes, so the load holds the whole
+	# description to UTF-8 here. Each value of it then decodes.
+	my $bytes = Fugu::File->read($path);
+	unless ( defined $bytes ) {
+		$$reason = "Cannot read $path";
+		return;
+	}
+	App::FuguWeb::decode( $bytes, $path, $reason ) // return;
+
 	my $self = bless {
 		root        => $root,
 		path        => $path,
@@ -173,13 +202,16 @@ sub load ( $class, %args )
 		keys_block  => {},
 	}, $class;
 
-	$self->_apply_settings;
+	$self->_check_words($reason)       or return;
+	$self->_apply_settings($reason)    or return;
+	$self->_read_languages($reason)    or return;
 	$self->_read_translations($reason) or return;
 	$self->_read_nav($reason)          or return;
 	$self->_read_pages($reason)        or return;
 	$self->_read_groups($reason)       or return;
 	$self->_check_paths($reason)       or return;
 	$self->_check_pages($reason)       or return;
+	$self->_check_sources($reason)     or return;
 	$self->_read_keys($reason)         or return;
 
 	return $self;
@@ -196,23 +228,28 @@ sub anonymous ( $class, $root )
 {
 	# The object holds no page, no manual and no key block, so the
 	# inventory is empty. The clean then accepts the files of the
-	# top level and the language trees, which it reads by shape,
-	# and no more. A default of a content setting here would make a
-	# clean believe that a description named a directory.
+	# top level and of the declared language trees, which it reads
+	# by shape, and no more. A default of a content setting here
+	# would make a clean believe that a description named a
+	# directory.
 	#
 	# It does read the names of the file that did not load: the
-	# source directory, the output directory, and the name and org
-	# of each keys block. Fugu::Config keeps every setting and
-	# block that it parsed before the fault, and a broken block is
-	# usually the last one. Those names decide which target the
-	# guard refuses, and a guard that read a default instead would
-	# refuse the wrong directory of the project.
+	# source directory, the output directory, the tag of each
+	# language block, and the name and org of each keys block.
+	# Fugu::Config keeps every setting and block that it parsed
+	# before the fault, and a broken block is usually the last one.
+	# Those names decide which target the guard refuses, and which
+	# trees the clean takes. A guard that read a default instead
+	# would refuse the wrong directory of the project.
 	#
 	# A fault above a keys block hides it. The clean then refuses
 	# the key tree of its own output, which is the safe answer,
-	# and the operator removes that tree by hand.
+	# and the operator removes that tree by hand. A fault above a
+	# language block hides that tree the same way.
 	my $self = bless {
 		root       => $root,
+		languages  => [ _english() ],
+		group      => [],
 		keys_order => [],
 		keys_block => {},
 	}, $class;
@@ -225,6 +262,14 @@ sub anonymous ( $class, $root )
 
 	$self->{source_dir} = $file->get( 'source_dir', DEFAULT_SOURCE_DIR );
 	$self->{out_dir}    = $file->get( 'out_dir',    DEFAULT_OUT_DIR );
+
+	# WEB-LANGUAGE-4. A file that declares no language has the one
+	# language en, as a description that loads does.
+	my @tags = grep { App::FuguWeb::Language::is_tag($_) }
+	    map { $_->{name} } $file->blocks('language');
+	$self->{languages} =
+	    [ map { App::FuguWeb::Language->new( tag => $_ ) } @tags ]
+	    if @tags;
 
 	# The org as well as the name. The org pins a key file to this
 	# organization, so a guard without it would take the published
@@ -248,15 +293,27 @@ sub root ($self) { return $self->{root}; }
 sub path ($self) { return $self->{path}; }
 
 # The settings. Each one is a plain accessor over the merged value, so
-# a caller never repeats a default.
+# a caller never repeats a default. The site name is characters, and
+# every other setting is a name of a file or an address, so it stays
+# bytes.
 sub site        ($self) { return $self->{site}; }
+sub url         ($self) { return $self->{url}; }
 sub out_dir     ($self) { return $self->{out_dir}; }
 sub source_dir  ($self) { return $self->{source_dir}; }
 sub entry       ($self) { return $self->{entry}; }
 sub module_root ($self) { return $self->{module_root}; }
-sub mandoc_os   ($self) { return $self->{mandoc_os}; }
 sub man_url     ($self) { return $self->{man_url}; }
 sub stylesheet  ($self) { return $self->{stylesheet}; }
+
+# $self->url_path:
+#	The path of the url: the part after the host, which starts and
+#	ends with a solidus. It is the base href of a page of the top
+#	level, per WEB-TOP-3, so each relative link of that page
+#	resolves from the site root.
+sub url_path ($self)
+{
+	return $self->{url} =~ s{\Ahttps?://[^/]+}{}r;
+}
 
 # $self->keys_dirs:
 #	The name of each key directory, in file order. The list is
@@ -355,28 +412,35 @@ sub source_path ( $self, $name = undef )
 	return defined $name ? "$dir/$name" : $dir;
 }
 
-# $self->nav($code):
+# $self->nav($tag):
 #	The navigation of one language, in file order. Each entry is a
-#	hashref with href and label. The code defaults to that of the
-#	default language.
-sub nav ( $self, $code = App::FuguWeb::DEFAULT_LANGUAGE )
+#	hashref with href, label and label_lang. The label is
+#	characters, and the label_lang is the tag of the language that
+#	it comes from, per WEB-LANGUAGE-8. The tag defaults to that of
+#	the default language.
+sub nav ( $self, $tag = undef )
 {
-	return @{ $self->{nav}{$code} // [] };
+	$tag //= $self->default_language->tag;
+
+	return @{ $self->{nav}{$tag} // [] };
 }
 
-# $self->pages($code):
+# $self->pages($tag):
 #	The pages of one language, in file order. Each entry is a
 #	hashref with file, title, source, value, unlinked, lang and
 #	title_lang. The source is one of body, markdown or index. The
 #	value is what that source names, and the body that opens an
-#	index page. The lang is the language of that value: the code of
-#	the page when its translation names the value, and en when the
-#	page takes it from the default block. The title_lang is the
-#	language of the title, by the same rule. The code defaults to
-#	that of the default language.
-sub pages ( $self, $code = App::FuguWeb::DEFAULT_LANGUAGE )
+#	index page. The lang is the tag of the language of that value:
+#	the tag of the page when its translation names the value, and
+#	the default tag when the page takes it from the default block,
+#	per WEB-LANGUAGE-8. The title is characters, and the title_lang
+#	is the tag of its language, by the same rule. The tag defaults
+#	to that of the default language.
+sub pages ( $self, $tag = undef )
 {
-	return @{ $self->{page}{$code} // [] };
+	$tag //= $self->default_language->tag;
+
+	return @{ $self->{page}{$tag} // [] };
 }
 
 # $self->assets:
@@ -406,13 +470,28 @@ sub assets ($self)
 }
 
 # $self->languages:
-#	The code of each language of the site, the default first. Each
-#	one names a tree of the output, per WEB-LANG-3. The languages
-#	are en and each code that a translation block names, and the
-#	codes after en sort by byte.
+#	Each language of the site, as an App::FuguWeb::Language, in the
+#	order of the declaration. The first one is the default, per
+#	D-05. Each one names a tree of the output, per WEB-LANGUAGE-5.
 sub languages ($self)
 {
-	return @{ $self->{languages} // [App::FuguWeb::DEFAULT_LANGUAGE] };
+	return @{ $self->{languages} };
+}
+
+# $self->default_language:
+#	The first language of the declaration, per D-05.
+sub default_language ($self)
+{
+	return $self->{languages}[0];
+}
+
+# $self->language($tag):
+#	The declared language of the tag, or undef.
+sub language ( $self, $tag )
+{
+	my ($language) = grep { $_->tag eq $tag } $self->languages;
+
+	return $language;
 }
 
 # $self->page_names:
@@ -427,7 +506,7 @@ sub page_names ($self)
 
 # $self->top_pages:
 #	The pages of the top level, which a host serves: the forward
-#	to the default tree, and the copy of the 404 page when the
+#	to the default tree, and the top-level 404.html when the
 #	description holds that page.
 sub top_pages ($self)
 {
@@ -444,18 +523,18 @@ sub top_pages ($self)
 #	The build and the checks read the same list, so the two can
 #	never disagree about what the site holds.
 #
-#	A page of a tree is <code>/<page>. The pages of the top level,
-#	the stylesheet and the assets are one segment. Each key
-#	directory is one part below the root, so its entries hold a
-#	solidus.
+#	A page of a tree is <path>/<page>, where the path is that of the
+#	tree of its language. The pages of the top level, the
+#	stylesheet and the assets are one segment. Each key directory
+#	is one part below the root, so its entries hold a solidus.
 sub inventory ($self)
 {
 	my @names = $self->page_names;
 
 	return (
 		map {
-			my $code = $_;
-			map { "$code/$_" } @names
+			my $path = $_->path;
+			map { "$path/$_" } @names
 		} $self->languages
 	    ),
 	    $self->top_pages, App::FuguWeb::STYLESHEET, $self->assets,
@@ -489,41 +568,36 @@ sub groups ($self)
 	return @{ $self->{group} };
 }
 
-# $self->_apply_settings:
-#	Copy each setting out of the parse, with its default.
-sub _apply_settings ($self)
+# $self->_check_words($reason):
+#	Refuse each block type and each setting that fuguweb(1) does
+#	not document, per WEB-SITE-4. The message names the block and
+#	the word. A translation takes the settings of its own list, and
+#	_read_translations holds it to that list.
+sub _check_words ( $self, $reason )
 {
 	my $file = $self->{file};
 
-	$self->{site}        = $file->get('site');
-	$self->{out_dir}     = $file->get( 'out_dir',     DEFAULT_OUT_DIR );
-	$self->{source_dir}  = $file->get( 'source_dir',  DEFAULT_SOURCE_DIR );
-	$self->{entry}       = $file->get( 'entry',       DEFAULT_ENTRY );
-	$self->{module_root} = $file->get( 'module_root', DEFAULT_MODULE_ROOT );
+	for my $name ( $file->setting_names ) {
+		next if $SETTING{$name};
+		return $self->_fail( $reason,
+			"the description names the unknown setting $name" );
+	}
 
-	# A trailing slash would survive into the prefix that a module
-	# name drops, and the name would then keep the whole path.
-	$self->{module_root} =~ s{/+$}{};
-	$self->{mandoc_os}  = $file->get( 'mandoc_os', DEFAULT_MANDOC_OS );
-	$self->{man_url}    = $file->get( 'man_url',   DEFAULT_MAN_URL );
-	$self->{stylesheet} = $file->get('stylesheet');
+	# The first block of an unknown type in the file is the one that
+	# the message names.
+	my ($stranger) =
+	    sort { $a->{order} <=> $b->{order} }
+	    map  { $file->blocks($_) }
+	    grep { !$BLOCK{$_} } $file->block_types;
+	if ($stranger) {
+		return $self->_fail( $reason,
+			_label($stranger)
+			    . " names the unknown block type $stranger->{type}"
+		);
+	}
 
-	return $self;
-}
-
-# $self->_read_translations($reason):
-#	Sort the blocks into the defaults and the translations, per
-#	WEB-LANG-2. A block of one argument is the default. A block of
-#	two is a translation: the first argument is the code of its
-#	language, and the second names the default that it translates.
-#	The method keeps each translation by type, name and code, and
-#	the readers below read the defaults alone.
-sub _read_translations ( $self, $reason )
-{
-	# A key directory and a key hold no prose. A translation of
-	# either would describe a second directory, or a second key.
-	for my $type (qw(keys key)) {
-		for my $block ( $self->{file}->blocks($type) ) {
+	for my $type (@UNTRANSLATED) {
+		for my $block ( $file->blocks($type) ) {
 			next if @{ $block->{args} } == 1;
 
 			return $self->_fail( $reason,
@@ -533,7 +607,181 @@ sub _read_translations ( $self, $reason )
 		}
 	}
 
-	my %code;
+	for my $type ( sort keys %BLOCK ) {
+		my %takes = map { $_ => 1 } @{ $BLOCK{$type} };
+
+		for my $block ( $self->_defaults($type) ) {
+			for my $key ( sort keys %{ $block->{settings} } ) {
+				next if $takes{$key};
+				return $self->_fail( $reason,
+					_label($block)
+					    . " names the unknown setting $key"
+				);
+			}
+		}
+	}
+
+	return $self;
+}
+
+# $self->_apply_settings($reason):
+#	Copy each setting out of the parse, with its default. The site
+#	name is characters, and each other setting stays bytes.
+sub _apply_settings ( $self, $reason )
+{
+	my $file = $self->{file};
+
+	# WEB-SITE-2. The site name of each language whose block names
+	# none, per WEB-LANGUAGE-3.
+	my $site = $file->get('site');
+	unless ( defined $site && length $site ) {
+		return $self->_fail( $reason, 'no site setting' );
+	}
+	$self->{site} = App::FuguWeb::as_text($site);
+
+	# WEB-SITE-1. The absolute URL of the site root. A link of the
+	# head names a page as this URL and the path of the page, so
+	# the URL ends in a solidus.
+	my $url = $file->get('url');
+	unless ( defined $url ) {
+		return $self->_fail( $reason, 'no url setting' );
+	}
+	unless ( $url =~ m{\Ahttps?://[^/\s]+(?:/\S*)?\z} && $url =~ m{/\z} ) {
+		return $self->_fail( $reason,
+			      "url is $url, which is not an absolute URL of"
+			    . ' https or http that ends in a solidus' );
+	}
+	$self->{url} = $url;
+
+	# WEB-SITE-3. The footer fragment of each language whose block
+	# names none, per WEB-LANGUAGE-3, below the source directory.
+	$self->{footer} = $file->get('footer');
+
+	$self->{out_dir}     = $file->get( 'out_dir',     DEFAULT_OUT_DIR );
+	$self->{source_dir}  = $file->get( 'source_dir',  DEFAULT_SOURCE_DIR );
+	$self->{entry}       = $file->get( 'entry',       DEFAULT_ENTRY );
+	$self->{module_root} = $file->get( 'module_root', DEFAULT_MODULE_ROOT );
+
+	# A trailing slash would survive into the prefix that a module
+	# name drops, and the name would then keep the whole path.
+	$self->{module_root} =~ s{/+$}{};
+	$self->{man_url}    = $file->get( 'man_url', DEFAULT_MAN_URL );
+	$self->{stylesheet} = $file->get('stylesheet');
+
+	return $self;
+}
+
+# $self->_read_languages($reason):
+#	Read each language block, in file order, per WEB-LANGUAGE. The
+#	first one is the default, per D-05. A description with no
+#	language block has the one language en, per WEB-LANGUAGE-4.
+#
+#	A language takes the site and the footer of its own block, and
+#	those of the description where its block holds none, per
+#	WEB-LANGUAGE-3 and WEB-LANGUAGE-8. The description holds the
+#	words of the default language, so each value that a language
+#	takes from it is of that language.
+sub _read_languages ( $self, $reason )
+{
+	my @blocks = $self->{file}->blocks('language');
+	unless (@blocks) {
+		$self->{languages} = [
+			_english(
+				site   => $self->{site},
+				footer => $self->{footer} ) ];
+		return $self;
+	}
+
+	my ( @languages, %seen );
+	for my $block (@blocks) {
+		my $tag      = $block->{name};
+		my $settings = $block->{settings};
+		my $label    = _label($block);
+
+		# WEB-LANGUAGE-1. The tag names the language in the
+		# path, in lang and in hreflang, per D-05.
+		unless ( App::FuguWeb::Language::is_tag($tag) ) {
+			return $self->_fail( $reason,
+				      "$label names no BCP 47 tag in its"
+				    . ' canonical case, such as en, zh-Hans or'
+				    . ' pt-BR' );
+		}
+		if ( $seen{$tag}++ ) {
+			return $self->_fail( $reason,
+				"$label is declared twice" );
+		}
+
+		# WEB-LANGUAGE-2.
+		my $name = $settings->{name};
+		unless ( defined $name && length $name ) {
+			return $self->_fail( $reason, "$label has no name" );
+		}
+
+		my $dir = $settings->{dir}
+		    // App::FuguWeb::Language::LEFT_TO_RIGHT;
+		unless (   $dir eq App::FuguWeb::Language::LEFT_TO_RIGHT
+			|| $dir eq App::FuguWeb::Language::RIGHT_TO_LEFT )
+		{
+			return $self->_fail( $reason,
+				"$label sets dir to $dir; use ltr or rtl" );
+		}
+
+		my $footer = $settings->{footer};
+		if ( _has_parent_step($footer) ) {
+			return $self->_fail( $reason,
+"$label footer is $footer, which leaves the project"
+			);
+		}
+
+		# WEB-LANGUAGE-3. The value of the block, or the value of
+		# the description when the block names none. The
+		# description holds the words of the default language.
+		my $default = @languages ? $languages[0]->tag : $tag;
+		my $site    = $settings->{site};
+
+		push @languages,
+		    App::FuguWeb::Language->new(
+			tag  => $tag,
+			name => App::FuguWeb::as_text($name),
+			dir  => $dir,
+			site => defined $site
+			? App::FuguWeb::as_text($site)
+			: $self->{site},
+			site_lang   => defined $site ? $tag : $default,
+			footer      => $footer // $self->{footer},
+			footer_lang => defined $footer ? $tag : $default,
+		    );
+	}
+
+	$self->{languages} = \@languages;
+
+	return $self;
+}
+
+# _english(%values):
+#	The language en, which a description that declares none has,
+#	per WEB-LANGUAGE-4. It holds the site name and the footer of
+#	the description.
+sub _english (%values)
+{
+	return App::FuguWeb::Language->new(
+		tag => App::FuguWeb::Language::ENGLISH,
+		%values
+	);
+}
+
+# $self->_read_translations($reason):
+#	Sort the blocks into the defaults and the translations, per
+#	WEB-LANGUAGE-6. A block of one argument is the default. A block
+#	of two is a translation: the first argument is the tag of its
+#	language, and the second names the default that it translates.
+#	The method keeps each translation by type, name and tag, and
+#	the readers below read the defaults alone.
+sub _read_translations ( $self, $reason )
+{
+	my %declared = map { $_->tag => 1 } $self->languages;
+	my $default  = $self->default_language->tag;
+
 	for my $type ( sort keys %TRANSLATION ) {
 		my %default = map { $_->{name} => 1 } $self->_defaults($type);
 		my %takes   = map { $_         => 1 } @{ $TRANSLATION{$type} };
@@ -547,28 +795,28 @@ sub _read_translations ( $self, $reason )
 			next if @args == 1;
 
 			my $label = _label($block);
-			my ( $code, $name ) = @args;
+			my ( $tag, $name ) = @args;
 
 			if ( @args > 2 ) {
 				return $self->_fail( $reason,
 					      "$label takes "
 					    . scalar(@args)
 					    . ' arguments, and a translation takes'
-					    . ' a language code and a name' );
+					    . ' a language tag and a name' );
 			}
 
-			# WEB-LANG-1. The code names a directory of the
-			# output, and the shape of the code is the shape
-			# that the build prunes and the clean removes.
-			unless ( $code =~ App::FuguWeb::LANGUAGE_CODE ) {
+			# WEB-LANGUAGE-6. The tag names a declared language,
+			# and the default block holds the words of the
+			# default one.
+			unless ( $declared{$tag} ) {
 				return $self->_fail( $reason,
-					      "$label names the language $code,"
-					    . ' and a language code is two'
-					    . ' lowercase letters' );
+					      "$label names the language $tag,"
+					    . ' and no language block declares it'
+				);
 			}
-			if ( $code eq App::FuguWeb::DEFAULT_LANGUAGE ) {
+			if ( $tag eq $default ) {
 				return $self->_fail( $reason,
-					      "$label names $code, which is the"
+					      "$label names $tag, which is the"
 					    . ' default language; the default'
 					    . ' block holds it' );
 			}
@@ -579,7 +827,7 @@ sub _read_translations ( $self, $reason )
 					    . " because no $type \"$name\""
 					    . ' stands in the description' );
 			}
-			if ( $self->{translation}{$type}{$name}{$code} ) {
+			if ( $self->{translation}{$type}{$name}{$tag} ) {
 				return $self->_fail( $reason,
 					"$label is declared twice" );
 			}
@@ -593,14 +841,10 @@ sub _read_translations ( $self, $reason )
 					    . " takes $set" );
 			}
 
-			$self->{translation}{$type}{$name}{$code} =
+			$self->{translation}{$type}{$name}{$tag} =
 			    $block->{settings};
-			$code{$code} = 1;
 		}
 	}
-
-	$self->{languages} =
-	    [ App::FuguWeb::DEFAULT_LANGUAGE, sort keys %code ];
 
 	return $self;
 }
@@ -614,23 +858,33 @@ sub _defaults ( $self, $type )
 	return grep { @{ $_->{args} } == 1 } $self->{file}->blocks($type);
 }
 
-# $self->_merged($block, $code):
+# $self->_merged($block, $tag):
 #	The settings of a default block in one language, per
-#	WEB-LANG-5: each value of its translation, and the value of the
-#	default where the translation holds none. The method also
+#	WEB-LANGUAGE-8: each value of its translation, and the value of
+#	the default where the translation holds none. The method also
 #	returns the label that a message names, and the settings of the
 #	translation alone. Those are empty for the default language,
 #	and for a block that the language does not translate.
-sub _merged ( $self, $block, $code )
+sub _merged ( $self, $block, $tag )
 {
 	my $own =
-	    $self->{translation}{ $block->{type} }{ $block->{name} }{$code};
+	    $self->{translation}{ $block->{type} }{ $block->{name} }{$tag};
 
 	return ( $block->{settings}, _label($block), {} )
-	    if $code eq App::FuguWeb::DEFAULT_LANGUAGE || !$own;
+	    if $tag eq $self->default_language->tag || !$own;
 
 	return ( { %{ $block->{settings} }, %$own },
-		qq{$block->{type} $code "$block->{name}"}, $own );
+		qq{$block->{type} $tag "$block->{name}"}, $own );
+}
+
+# $self->_from($own, $key, $tag):
+#	The tag of the language of one value of a block in the language
+#	of the tag, per WEB-LANGUAGE-8: that tag when the translation
+#	names the value, and the default tag when the value comes from
+#	the default block.
+sub _from ( $self, $own, $key, $tag )
+{
+	return defined $own->{$key} ? $tag : $self->default_language->tag;
 }
 
 # $self->_read_nav($reason):
@@ -640,9 +894,9 @@ sub _read_nav ( $self, $reason )
 	for my $block ( $self->_defaults('nav') ) {
 		my $href = $block->{name};
 
-		for my $code ( $self->languages ) {
-			my ( $settings, $label ) =
-			    $self->_merged( $block, $code );
+		for my $tag ( map { $_->tag } $self->languages ) {
+			my ( $settings, $label, $own ) =
+			    $self->_merged( $block, $tag );
 
 			my $text = $settings->{label};
 			unless ( defined $text && length $text ) {
@@ -650,8 +904,13 @@ sub _read_nav ( $self, $reason )
 					"$label has no label" );
 			}
 
-			push @{ $self->{nav}{$code} },
-			    { href => $href, label => $text };
+			push @{ $self->{nav}{$tag} },
+			    {
+				href       => $href,
+				label      => App::FuguWeb::as_text($text),
+				label_lang =>
+				    $self->_from( $own, 'label', $tag ),
+			    };
 		}
 	}
 
@@ -661,7 +920,7 @@ sub _read_nav ( $self, $reason )
 # $self->_read_pages($reason):
 #	Collect the page blocks in file order, once for each language.
 #	No two blocks name the same output file, and each language
-#	holds the same files, per WEB-LANG-3.
+#	holds the same files, per WEB-LANGUAGE-5.
 sub _read_pages ( $self, $reason )
 {
 	my %seen;
@@ -686,31 +945,33 @@ sub _read_pages ( $self, $reason )
 				      "page \"$name\" holds a solidus, and a"
 				    . ' tree is one flat directory of pages' );
 		}
-		if ( $seen{$name}++ ) {
+
+		# Two names of one fold are one file on a file system
+		# without case, per WEB-OUTPUT-17.
+		if ( $seen{ App::FuguWeb::fold_name($name) }++ ) {
 			return $self->_fail( $reason,
 				"page \"$name\" is declared twice" );
 		}
 
-		for my $code ( $self->languages ) {
+		for my $tag ( map { $_->tag } $self->languages ) {
 			my ( $settings, $label, $own ) =
-			    $self->_merged( $block, $code );
+			    $self->_merged( $block, $tag );
 
 			my $entry =
 			    $self->_page( $reason, $label, $name, $settings )
 			    or return;
 
-			# WEB-LANG-6. A body or a title that the translation
-			# does not name comes from the default block.
+			# WEB-LANGUAGE-8. A body or a title that the
+			# translation does not name comes from the default
+			# block.
 			$entry->{lang} =
 			    ( grep { defined $own->{$_} } qw(body markdown) )
-			    ? $code
-			    : App::FuguWeb::DEFAULT_LANGUAGE;
+			    ? $tag
+			    : $self->default_language->tag;
 			$entry->{title_lang} =
-			    defined $own->{title}
-			    ? $code
-			    : App::FuguWeb::DEFAULT_LANGUAGE;
+			    $self->_from( $own, 'title', $tag );
 
-			push @{ $self->{page}{$code} }, $entry;
+			push @{ $self->{page}{$tag} }, $entry;
 		}
 	}
 
@@ -763,10 +1024,10 @@ sub _page ( $self, $reason, $label, $name, $settings )
 	}
 
 	return {
-		file     => $name,
-		title    => $settings->{title} // $name,
-		source   => $source,
-		value    => $value,
+		file   => $name,
+		title  => App::FuguWeb::as_text( $settings->{title} // $name ),
+		source => $source,
+		value  => $value,
 		unlinked => $unlinked,
 	};
 }
@@ -813,6 +1074,7 @@ sub _read_groups ( $self, $reason )
 		unless ( defined $heading && length $heading ) {
 			return $self->_fail( $reason, "$label has no heading" );
 		}
+		$heading = App::FuguWeb::as_text($heading);
 
 		my $dir = $settings->{dir};
 		$self->_group_dir( $reason, $label, $dir ) or return;
@@ -844,6 +1106,7 @@ sub _read_groups ( $self, $reason )
 			kind        => $kind,
 			name        => $name,
 			heading     => $heading,
+			lang        => $self->default_language->tag,
 			dir         => "$self->{root}/$dir",
 			namespace   => $namespace,
 			module_root => "$self->{root}/$self->{module_root}",
@@ -858,54 +1121,14 @@ sub _read_groups ( $self, $reason )
 
 # $self->_group_name($reason, $block):
 #	Hold the name of a default group block to WEB-MANUALS-7. The
-#	group block of an older description named its heading, and set
-#	its anchor. Each such block fails with the block to write in
-#	its place.
+#	name is the anchor of the heading of the group, so it is one
+#	word that every language shares.
 sub _group_name ( $self, $reason, $block )
 {
-	my $name     = $block->{name};
-	my $settings = $block->{settings};
-	my $text     = $settings->{heading} // $name;
-
-	# An anchor of the shape of a group name is the name to write.
-	# Any other anchor gives the word that _group_word makes of it,
-	# and the message states the shape. A message that proposed the
-	# anchor as it stands would name a block that fails again.
-	my $anchor = $settings->{anchor};
-	if ( defined $anchor ) {
-		my $fits = $anchor =~ $GROUP_NAME;
-		my $word = $fits ? $anchor : _group_word($anchor);
-
-		return $self->_fail( $reason,
-			      _label($block)
-			    . ' sets anchor, and a group takes its anchor from'
-			    . " the block name: write $block->{type} $word"
-			    . " with heading = $text, and no anchor"
-			    . ( $fits ? '' : "; $GROUP_RULE" ) );
-	}
-
-	return $self if $name =~ $GROUP_NAME;
+	return $self if $block->{name} =~ $GROUP_NAME;
 
 	return $self->_fail( $reason,
-		      _label($block)
-		    . " has no group name: $GROUP_RULE, and it is the"
-		    . ' anchor of the heading; write'
-		    . " $block->{type} "
-		    . _group_word($name)
-		    . " with heading = $text" );
-}
-
-# _group_word($text):
-#	The group name that a message proposes for a text: the text in
-#	lowercase, with each run of other characters as one hyphen.
-#	A text that holds no letter and no digit gives <name>.
-sub _group_word ($text)
-{
-	my $word = lc $text;
-	$word =~ s/[^a-z0-9]+/-/g;
-	$word =~ s/\A-+|-+\z//g;
-
-	return length $word ? $word : '<name>';
+		_label($block) . " has no group name: $GROUP_RULE" );
 }
 
 # $self->_group_dir($reason, $label, $dir):
@@ -932,12 +1155,11 @@ sub _group_dir ( $self, $reason, $label, $dir )
 # $self->_translate_group($reason, $block, $group):
 #	Give the group the heading and the dir of each translation of
 #	its block. A translation dir mirrors the default dir, so each
-#	source of it must have a namesake there, per WEB-LANG-5.
+#	source of it must have a namesake there, per WEB-LANGUAGE-9.
 sub _translate_group ( $self, $reason, $block, $group )
 {
-	for my $code ( $self->languages ) {
-		my ( $settings, $label, $own ) =
-		    $self->_merged( $block, $code );
+	for my $tag ( map { $_->tag } $self->languages ) {
+		my ( $settings, $label, $own ) = $self->_merged( $block, $tag );
 		next unless %$own;
 
 		unless ( length $settings->{heading} ) {
@@ -950,12 +1172,12 @@ sub _translate_group ( $self, $reason, $block, $group )
 		}
 
 		$group->translate(
-			$code,
-			heading => $own->{heading},
+			$tag,
+			heading => App::FuguWeb::as_text( $own->{heading} ),
 			dir     => defined $dir ? "$self->{root}/$dir" : undef,
 		);
 
-		my $orphan = $group->orphan($code);
+		my $orphan = $group->orphan($tag);
 		next unless defined $orphan;
 
 		my $mirror = $block->{settings}{dir};
@@ -1011,12 +1233,6 @@ sub _read_keys_block ( $self, $reason, $block )
 	my $name     = $block->{name};
 	my $settings = $block->{settings};
 
-	for my $key ( sort keys %$settings ) {
-		next if $KEYS_SETTING{$key};
-		return $self->_fail( $reason,
-			"keys \"$name\" names the unknown setting $key" );
-	}
-
 	# The block name becomes a directory in the source tree and in
 	# the output. It is a path, so it gets the guard that a page
 	# name gets. It is also one segment: the published prefix is
@@ -1043,27 +1259,34 @@ sub _read_keys_block ( $self, $reason, $block )
 
 	# The build makes its staging directory in the output under a
 	# fixed name, and it removes that directory at the end. A key
-	# directory of the same name would publish nothing.
-	if ( $name eq App::FuguWeb::STAGING_DIR ) {
+	# directory of the same name would publish nothing. Each test
+	# of a name against a name of the output folds the two, per
+	# WEB-OUTPUT-17.
+	my $fold = App::FuguWeb::fold_name($name);
+	if ( $fold eq App::FuguWeb::fold_name(App::FuguWeb::STAGING_DIR) ) {
 		return $self->_fail( $reason,
 			      "keys \"$name\" is the staging directory of"
 			    . ' the build, which the build removes' );
 	}
 
-	# WEB-KEYS-34. A language tree takes a name of the shape of a
-	# language code in the output. A key directory of that name
-	# would take the place of a tree, and the prune of the build
-	# would read its files as stale pages.
-	if ( $name =~ App::FuguWeb::LANGUAGE_CODE ) {
+	# WEB-KEYS-34. The tree of a declared language takes its path
+	# in the output. A key directory of that name would take the
+	# place of the tree, and the prune of the build would read its
+	# files as stale pages.
+	for my $language ( $self->languages ) {
+		next unless App::FuguWeb::fold_name( $language->path ) eq $fold;
+
 		return $self->_fail( $reason,
-			      "keys \"$name\" has the shape of a language"
-			    . ' code, and a language tree takes that name' );
+			      "keys \"$name\" is the path of the tree of the"
+			    . ' language '
+			    . $language->tag
+			    . ', which takes that name' );
 	}
 
 	# WEB-KEYS-1. Two blocks that name one directory would become
 	# one tree in the output, and no reader could say which block
 	# describes a file of it.
-	if ( $self->{keys_block}{$name} ) {
+	if ( grep { App::FuguWeb::fold_name($_) eq $fold } $self->keys_dirs ) {
 		return $self->_fail( $reason,
 			      "keys \"$name\" is declared twice, and one"
 			    . ' directory takes one block' );
@@ -1168,9 +1391,9 @@ sub _read_keys_block ( $self, $reason, $block )
 	# test never answers for a second keys block. The test above
 	# holds that one.
 	for my $held ( $self->inventory ) {
-		next unless $held eq $name;
+		next unless App::FuguWeb::fold_name($held) eq $fold;
 		return $self->_fail( $reason,
-			      "keys \"$name\" and $name of the site both"
+			      "keys \"$name\" and $held of the site both"
 			    . ' become the same name in the output' );
 	}
 
@@ -1233,13 +1456,6 @@ sub _read_key_blocks ( $self, $reason )
 	for my $block ( $self->{file}->blocks('key') ) {
 		my $stem     = $block->{name};
 		my $settings = $block->{settings};
-
-		for my $key ( sort keys %$settings ) {
-			next if $KEY_SETTING{$key};
-			return $self->_fail( $reason,
-				"key \"$stem\" names the unknown setting $key"
-			);
-		}
 
 		# One stem names one block of the whole description.
 		# The rotation rewrites a block by its stem, so two
@@ -1454,6 +1670,9 @@ sub _key_entry ( $self, $reason, $name, $parts, $settings )
 #	in the output, and the index would show two entries that lead
 #	to one page. A page block already gets this check; a manual
 #	needs it as much.
+#
+#	The test folds each name, per WEB-OUTPUT-17. Two names of one
+#	fold are one file on a file system without case.
 sub _check_pages ( $self, $reason )
 {
 	my %source;
@@ -1461,26 +1680,99 @@ sub _check_pages ( $self, $reason )
 	for my $group ( $self->groups ) {
 		for my $manual ( $group->manuals ) {
 			my $page  = $manual->page;
-			my $first = $source{$page};
+			my $fold  = App::FuguWeb::fold_name($page);
+			my $first = $source{$fold};
 			if ( defined $first ) {
 				return $self->_fail( $reason,
 					      "$first and "
 					    . $manual->path
 					    . " both become $page" );
 			}
-			$source{$page} = $manual->path;
+			$source{$fold} = $manual->path;
 		}
 	}
 
 	for my $page ( $self->pages ) {
-		next unless defined $source{ $page->{file} };
+		my $first = $source{ App::FuguWeb::fold_name( $page->{file} ) };
+		next unless defined $first;
 		return $self->_fail( $reason,
-			      "page \"$page->{file}\" and "
-			    . $source{ $page->{file} }
+			      "page \"$page->{file}\" and $first"
 			    . ' both become the same page' );
 	}
 
 	return $self;
+}
+
+# $self->_check_sources($reason):
+#	Refuse a source whose path from the project root holds ASCII
+#	white space or a parenthesis, per WEB-SITE-6. A source is a page
+#	source, a manual or a footer fragment, of any language. The
+#	record of the translations names each source in the manifest
+#	form of Fugu::Signify, which holds neither.
+sub _check_sources ( $self, $reason )
+{
+	for my $path ( $self->_source_files ) {
+		next unless $path =~ /[\s()]/a;
+
+		return $self->_fail( $reason,
+			      "the source $path holds ASCII white space or a"
+			    . ' parenthesis, and the record of the'
+			    . ' translations cannot name it' );
+	}
+
+	return $self;
+}
+
+# $self->_source_files:
+#	The path from the project root of each page source, each manual
+#	and each footer fragment, of each language.
+sub _source_files ($self)
+{
+	my $source = $self->{source_dir};
+
+	my @paths;
+	for my $language ( $self->languages ) {
+		my $tag = $language->tag;
+
+		push @paths, "$source/" . $language->footer
+		    if defined $language->footer;
+
+		for my $page ( grep { defined $_->{value} } $self->pages($tag) )
+		{
+			push @paths,
+			    $page->{source} eq 'markdown'
+			    ? $page->{value}
+			    : "$source/$page->{value}";
+		}
+
+		push @paths, map { substr $_->path, 1 + length $self->{root} }
+		    map { $_->manuals($tag) } $self->groups;
+	}
+
+	return @paths;
+}
+
+# $self->sources:
+#	The path of each source that a build reads, below the project
+#	root, per WEB-OUTPUT-18. The files come first: each page source,
+#	each manual and each footer of each language, and the
+#	stylesheet. The directories follow: the source directory, each
+#	key directory, and the directory of each group in each
+#	language. The guard of the output directory names the first
+#	source that a target holds, so a file comes before the
+#	directory that holds it.
+#
+#	A description that did not load names its source directory and
+#	its key directories alone.
+sub sources ($self)
+{
+	my @files = $self->_source_files;
+	push @files, $self->{stylesheet} if defined $self->{stylesheet};
+
+	return ( map { "$self->{root}/$_" } @files ),
+	    $self->source_path,
+	    ( map { $self->keys_path($_) } $self->keys_dirs ),
+	    ( map { $_->dirs } $self->groups );
 }
 
 # $self->_check_paths($reason):
@@ -1489,14 +1781,21 @@ sub _check_pages ( $self, $reason )
 #	checkout; a '..' in a setting breaks both promises at once.
 sub _check_paths ( $self, $reason )
 {
-	unless ( defined $self->{site} && length $self->{site} ) {
-		return $self->_fail( $reason, 'no site setting' );
-	}
-
 	for my $key (@PATH_SETTINGS) {
 		next unless _has_parent_step( $self->{$key} );
 		return $self->_fail( $reason,
 			"$key is $self->{$key}, which leaves the project" );
+	}
+
+	# WEB-SITE-7. The record of the translations sits at the
+	# project root, per WEB-STATUS-1, and the build publishes each
+	# plain file of the source directory. The source directory is
+	# therefore not the project root.
+	unless ( length App::FuguWeb::canonical_path( $self->{source_dir} ) ) {
+		return $self->_fail( $reason,
+			      "source_dir is $self->{source_dir}, which is the"
+			    . ' project root, where the record of the'
+			    . ' translations sits' );
 	}
 
 	$self->_check_source_dir($reason) or return;
@@ -1531,18 +1830,17 @@ sub _check_source_dir ( $self, $reason )
 # $self->_check_fragments($reason):
 #	Refuse a symlink on the path of each fragment that the build
 #	reads below the source directory: the body fragment of each
-#	page in each language, the footer, and the footer of each
-#	language. A fragment can sit below the top level, where the
-#	scan above does not reach.
+#	page in each language, and the footer of each language. A
+#	fragment can sit below the top level, where the scan above does
+#	not reach.
 sub _check_fragments ( $self, $reason )
 {
-	my $footer = App::FuguWeb::Page::FOOTER_FRAGMENT;
-	my @paths  = ( $footer, map { "$_/$footer" } $self->languages );
+	my @paths = grep { defined } map { $_->footer } $self->languages;
 
-	for my $code ( $self->languages ) {
+	for my $tag ( map { $_->tag } $self->languages ) {
 		push @paths, map { $_->{value} }
 		    grep { $_->{source} ne 'markdown' && defined $_->{value} }
-		    $self->pages($code);
+		    $self->pages($tag);
 	}
 
 	for my $path (@paths) {
@@ -1596,8 +1894,8 @@ sub _unsafe_output_name ($name)
 }
 
 # _label($block):
-#	The block as a message names it: the type, the language code
-#	of a translation, and the quoted name.
+#	The block as a message names it: the type, the language tag of
+#	a translation, and the quoted name.
 sub _label ($block)
 {
 	my @args = @{ $block->{args} };
@@ -1617,7 +1915,7 @@ sub _fail ( $self, $reason, $message )
 }
 
 package App::FuguWeb::Config::Group;
-our $VERSION = '0.10.1';
+our $VERSION = '0.11.0';
 
 # App::FuguWeb::Config::Group - one group of the manual index.
 #
@@ -1639,7 +1937,8 @@ my @SECTIONS = qw(1 3p 5 7 8);
 # App::FuguWeb::Config::Group->new(%args):
 #	kind        => 'manuals'|'modules'
 #	name        => $word	the id of the h2
-#	heading     => $string	the h2 of the group
+#	heading     => $text	the h2 of the group
+#	lang        => $tag	the default language
 #	dir         => $path	the directory it reads
 #	namespace   => $string	the prefix of a manuals name
 #	module_root => $path	the prefix a module name drops
@@ -1649,6 +1948,7 @@ sub new ( $class, %args )
 		kind        => $args{kind},
 		name        => $args{name},
 		heading     => $args{heading},
+		lang        => $args{lang},
 		dir         => $args{dir},
 		namespace   => $args{namespace},
 		module_root => $args{module_root},
@@ -1661,64 +1961,85 @@ sub kind      ($self) { return $self->{kind}; }
 sub name      ($self) { return $self->{name}; }
 sub namespace ($self) { return $self->{namespace}; }
 
-# $self->heading($code):
-#	The h2 of the group in one language: the heading of its
-#	translation, or the default heading. The code defaults to that
-#	of the default language.
-sub heading ( $self, $code = App::FuguWeb::DEFAULT_LANGUAGE )
-{
-	return $self->{translation}{$code}{heading} // $self->{heading};
-}
+# $self->lang:
+#	The tag of the default language. A manual of the default dir is
+#	of this language.
+sub lang ($self) { return $self->{lang}; }
 
-# $self->heading_lang($code):
-#	The language of the h2 of the group in one language: the code
-#	when its translation names a heading, and en when the group
-#	takes the default heading, per WEB-LANG-6. The code defaults to
+# $self->heading($tag):
+#	The h2 of the group in one language, as characters: the heading
+#	of its translation, or the default heading. The tag defaults to
 #	that of the default language.
-sub heading_lang ( $self, $code = App::FuguWeb::DEFAULT_LANGUAGE )
+sub heading ( $self, $tag = undef )
 {
-	return defined $self->{translation}{$code}{heading}
-	    ? $code
-	    : App::FuguWeb::DEFAULT_LANGUAGE;
+	$tag //= $self->{lang};
+
+	return $self->{translation}{$tag}{heading} // $self->{heading};
 }
 
-# $self->translate($code, heading => $string, dir => $path):
+# $self->heading_lang($tag):
+#	The language of the h2 of the group in one language: the tag
+#	when its translation names a heading, and the default tag when
+#	the group takes the default heading, per WEB-LANGUAGE-8. The tag
+#	defaults to that of the default language.
+sub heading_lang ( $self, $tag = undef )
+{
+	$tag //= $self->{lang};
+
+	return defined $self->{translation}{$tag}{heading}
+	    ? $tag
+	    : $self->{lang};
+}
+
+# $self->translate($tag, heading => $text, dir => $path):
 #	Give the group the heading and the dir of one language. A
 #	heading of undef keeps the default heading, and a dir of undef
 #	keeps the default sources for that language.
-sub translate ( $self, $code, %args )
+sub translate ( $self, $tag, %args )
 {
-	$self->{translation}{$code} = {
+	$self->{translation}{$tag} = {
 		heading => $args{heading},
 		dir     => $args{dir},
 	};
-	delete $self->{manuals}{$code};
+	delete $self->{manuals}{$tag};
 
 	return $self;
 }
 
-# $self->manuals($code):
-#	The manuals of the group in one language, in the order the
-#	index shows them, per WEB-LANG-5. A manual comes from the dir
-#	of the translation when that dir holds its namesake, and from
-#	the default dir otherwise. Each language holds the same pages,
-#	in the same order. The code defaults to that of the default
-#	language. The method reads each directory once and keeps the
-#	answer.
-sub manuals ( $self, $code = App::FuguWeb::DEFAULT_LANGUAGE )
+# $self->dirs:
+#	The directory of the group in each language: the default dir,
+#	then the dir of each translation that names one, by tag.
+sub dirs ($self)
 {
-	$self->{manuals}{$code} //= [ $self->_manuals_of($code) ];
+	my $translation = $self->{translation};
 
-	return @{ $self->{manuals}{$code} };
+	return $self->{dir}, grep { defined }
+	    map { $translation->{$_}{dir} } sort keys %$translation;
 }
 
-# $self->orphan($code):
+# $self->manuals($tag):
+#	The manuals of the group in one language, in the order the
+#	index shows them, per WEB-LANGUAGE-9. A manual comes from the
+#	dir of the translation when that dir holds its namesake, and
+#	from the default dir otherwise. Each language holds the same
+#	pages, in the same order. The tag defaults to that of the
+#	default language. The method reads each directory once and
+#	keeps the answer.
+sub manuals ( $self, $tag = undef )
+{
+	$tag //= $self->{lang};
+	$self->{manuals}{$tag} //= [ $self->_manuals_of($tag) ];
+
+	return @{ $self->{manuals}{$tag} };
+}
+
+# $self->orphan($tag):
 #	The first source of the translation dir of one language that
 #	has no namesake in the default dir, or undef. Such a source
 #	would be a page that no other language holds.
-sub orphan ( $self, $code )
+sub orphan ( $self, $tag )
 {
-	my $dir = $self->{translation}{$code}{dir} // return;
+	my $dir = $self->{translation}{$tag}{dir} // return;
 
 	my %default = map { $self->_relative( $_->path ) => 1 } $self->manuals;
 
@@ -1729,13 +2050,13 @@ sub orphan ( $self, $code )
 	return;
 }
 
-# $self->_manuals_of($code):
+# $self->_manuals_of($tag):
 #	The manuals of one language. A source of a translation keeps
 #	the name and the page of its namesake, so a module page is
 #	named after the module and not after the path of the source.
-sub _manuals_of ( $self, $code )
+sub _manuals_of ( $self, $tag )
 {
-	if ( $code eq App::FuguWeb::DEFAULT_LANGUAGE ) {
+	if ( $tag eq $self->{lang} ) {
 		return map {
 			$self->{kind} eq 'manuals'
 			    ? App::FuguWeb::Manual->from_mdoc( $_, $self )
@@ -1744,14 +2065,14 @@ sub _manuals_of ( $self, $code )
 		} $self->_sources( $self->{dir} );
 	}
 
-	my $dir = $self->{translation}{$code}{dir};
+	my $dir = $self->{translation}{$tag}{dir};
 	return $self->manuals unless defined $dir;
 
 	my %own = map { substr( $_, length $dir ) => $_ } $self->_sources($dir);
 
 	return map {
 		my $path = $own{ $self->_relative( $_->path ) };
-		defined $path ? $_->translated( $path, $code ) : $_
+		defined $path ? $_->translated( $path, $tag ) : $_
 	} $self->manuals;
 }
 

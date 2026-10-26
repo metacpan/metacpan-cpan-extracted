@@ -1,3 +1,58 @@
+0.004  2026-10-26 09:13:24 CET
+   - BREAKING: the "brand" helper returns the controller when setting
+     the brand, so that calls can be chained, e.g.
+     $c->brand('acme')->render(...).
+   - BREAKING: unknown keys in the configuration and in "individual"
+     make the plugin croak, e.g. "paths" from versions before 0.003.
+   - BREAKING: a brand set to undef removes the brand configured by an
+     earlier registration, instead of being skipped.
+   - Roles are applied to the application's renderer and static file
+     server, and the "brand" helper is added, only when "individual"
+     has a "stash_key" or names a brand; global-only configurations
+     leave them alone.
+   - A valid configuration no longer triggers $SIG{__DIE__} handlers.
+   - The template cache of each brand has the same class as the
+     application's one, instead of always being a Mojo::Cache.
+   - Errors about invalid paths say where they are, e.g.
+     "(brand 'acme', public)" or "(global)".
+   - An invalid configuration leaves the application untouched:
+     "global" directories are only added once the whole configuration
+     is valid.
+
+0.003  2026-10-26 00:32:17 CET
+   - BREAKING: individual brands are configured with "brands", a hash
+     from brand names to their directories, instead of "paths"; brand
+     names no longer come from directory names. A brand can also have
+     separate "templates" and "public" directories, and
+     "ignore_app_paths" to stop falling back to the application.
+   - BREAKING: "stash_key" defaults to "branding.brand" instead of
+     "variant". Brand and variant are now independent: application
+     variants keep working for branded requests, brands can have their
+     own variant templates, and templates/index.html+acme.ep is no
+     longer used for brand "acme".
+   - BREAKING: when a brand is configured again in a later
+     registration, its directories replace the earlier ones instead of
+     being merged.
+   - BREAKING: a leading "/" in a template name only works with the
+     default handler, as in plain Mojolicious.
+   - New "brand" helper to get or set the brand of the request.
+   - "global" accepts the same specification as a brand (existing
+     configurations keep working); several "global" registrations
+     stack, the last one winning.
+   - Branded public files are served by Mojolicious at the usual point
+     of the request: hooks are honored whatever their registration
+     order (including render_later), a static prefix set later is
+     followed, and reply->static is branded too.
+   - Each brand has its own renderer and static file server: templates
+     are branded in every rendering (any request method, layouts,
+     partials, exception and not_found pages), e.g. a brand can
+     override just the layout of the application's pages.
+   - Relative Mojo::File paths are resolved from the application home;
+     a missing absolute directory is skipped instead of being looked up
+     under the home; unknown configuration keys croak.
+   - A warning is logged at startup for a brand that ignores the
+     application but has no directories of its own.
+
 0.002  2026-10-25 00:38:32 CEST
    - BREAKING: individual branding is configured with "paths" (one
      directory per brand, named after it) instead of "bases"; options

@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Cpanel::JSON::XS" => 0,
+    "Data::Validate::IP" => 0,
     "File::ShareDir" => 0,
     "File::Slurper" => 0,
     "Mojo::Util" => 0,
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::File::ShareDir::Dist" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Cpanel::JSON::XS" => 0,
+  "Data::Validate::IP" => 0,
   "File::ShareDir" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,

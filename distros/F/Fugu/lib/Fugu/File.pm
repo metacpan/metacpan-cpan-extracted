@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package Fugu::File;
-our $VERSION = '0.5.3';
+our $VERSION = '0.5.6';
 
 use v5.34;
 use warnings;
@@ -230,8 +230,10 @@ sub expand_tilde ( $class, $path )
 # $class->share_path($relative, %args):
 #	Resolve a file that ships with a distribution. The search
 #	tries, in order: an explicit root, the checkout that holds the
-#	caller's module file, the working directory, and the installed
-#	share tree of the named distribution under @INC.
+#	caller's module file, and the installed share tree of the named
+#	distribution under @INC. The working directory is not a root:
+#	an installed tool must not take data from the directory where it
+#	runs.
 #
 #	%args:
 #		root => $dir	extra directory to search first
@@ -262,8 +264,6 @@ sub share_path ( $class, $relative, %args )
 			last;
 		}
 	}
-
-	push @roots, File::Spec->rel2abs('.');
 
 	for my $root (@roots) {
 		my $path = "$root/$relative";

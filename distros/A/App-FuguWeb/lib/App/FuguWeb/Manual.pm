@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Manual;
-our $VERSION = '0.10.1';
+our $VERSION = '0.11.0';
 
 use App::FuguWeb;
 use Fugu::File;
@@ -37,9 +37,10 @@ use Fugu::File;
 use constant POD_SECTION => '3p';
 
 # $class->from_mdoc($path, $group):
-#	One mdoc source. The file extension gives the section, and the
-#	group namespace prefixes the name: man/fugu/Daemon.3p is the
-#	source of Fugu::Daemon(3p).
+#	One mdoc source of the default dir of the group. The file
+#	extension gives the section, and the group namespace prefixes
+#	the name: man/fugu/Daemon.3p is the source of Fugu::Daemon(3p).
+#	The source is of the default language of the group.
 sub from_mdoc ( $class, $path, $group )
 {
 	my $base = $path =~ s{^.*/}{}r;
@@ -52,15 +53,16 @@ sub from_mdoc ( $class, $path, $group )
 		name    => ( $namespace // '' ) . ( $stem // $base ),
 		section => $section // '',
 		group   => $group,
-		lang    => App::FuguWeb::DEFAULT_LANGUAGE,
+		lang    => defined $group ? $group->lang : undef,
 	}, $class;
 }
 
 # $class->from_pod($path, $group, $module_root):
-#	One POD sidecar. The name is the path below the module root,
-#	with the separators turned into the Perl ones:
-#	lib/App/OpenHAP/Tasmota/Heater.pod is the source of
-#	App::OpenHAP::Tasmota::Heater(3p).
+#	One POD sidecar of the default dir of the group. The name is
+#	the path below the module root, with the separators turned into
+#	the Perl ones: lib/App/OpenHAP/Tasmota/Heater.pod is the source
+#	of App::OpenHAP::Tasmota::Heater(3p). The source is of the
+#	default language of the group.
 sub from_pod ( $class, $path, $group, $module_root )
 {
 	my $name = $path;
@@ -73,26 +75,26 @@ sub from_pod ( $class, $path, $group, $module_root )
 		name    => $name,
 		section => POD_SECTION,
 		group   => $group,
-		lang    => App::FuguWeb::DEFAULT_LANGUAGE,
+		lang    => defined $group ? $group->lang : undef,
 	}, $class;
 }
 
-# $self->translated($path, $code):
+# $self->translated($path, $tag):
 #	The manual of one language whose source is the namesake of
-#	this one, per WEB-LANG-5. The copy keeps the name, the section
-#	and the page, because a page name must not change with the
-#	language. It reads its description from its own source.
-sub translated ( $self, $path, $code )
+#	this one, per WEB-LANGUAGE-9. The copy keeps the name, the
+#	section and the page, because a page name must not change with
+#	the language. It reads its description from its own source.
+sub translated ( $self, $path, $tag )
 {
 	my %copy = %$self;
 	delete $copy{description};
 
-	return bless { %copy, path => $path, lang => $code }, ref $self;
+	return bless { %copy, path => $path, lang => $tag }, ref $self;
 }
 
 # $self->path, $self->name, $self->section, $self->lang:
-#	The source, the manual name, its section, and the language of
-#	the source.
+#	The source, the manual name, its section, and the tag of the
+#	language of the source.
 sub path    ($self) { return $self->{path}; }
 sub name    ($self) { return $self->{name}; }
 sub section ($self) { return $self->{section}; }
@@ -124,16 +126,20 @@ sub staged_name ($self)
 }
 
 # $self->description:
-#	The one-line description, read from the source. An mdoc page
-#	gives the argument of its first .Nd macro. A POD sidecar gives
-#	the text after "Module - " on the first non-blank line below
-#	=head1 NAME. The method returns undef when the source carries
-#	neither.
+#	The one-line description, read from the source, as characters.
+#	An mdoc page gives the argument of its first .Nd macro. A POD
+#	sidecar gives the text after "Module - " on the first non-blank
+#	line below =head1 NAME. The method returns undef when the source
+#	carries neither.
+#
+#	The build holds each source to UTF-8 before it renders one, per
+#	WEB-SITE-5, so the decode here has no fault to report.
 sub description ($self)
 {
 	return $self->{description} if exists $self->{description};
 
-	my $text = Fugu::File->read( $self->{path} );
+	my $bytes = Fugu::File->read( $self->{path} );
+	my $text  = defined $bytes ? App::FuguWeb::as_text($bytes) : undef;
 	$self->{description} =
 	      !defined $text ? undef
 	    : $self->is_pod  ? _pod_description($text)

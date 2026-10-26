@@ -6,7 +6,7 @@ use warnings;
 use App::Actions::Error;
 use App::Actions::I18N qw(throw);
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # The env context App::Actions::Runner::Support::resolve_env gives the
 # expression evaluator.  It looks like a hash of the variables being

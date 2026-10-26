@@ -6,11 +6,20 @@ use warnings;
 
 use Test::More;
 use Test::Mojo;
+use File::Temp qw(tempdir);
+use Mojo::JSON qw(encode_json);
+use Mojo::File;
 
 eval { require Database::BI } or plan skip_all => 'Database::BI not loadable';
 plan skip_all => 'data/sales.csv not found' unless -f 'data/sales.csv';
 
 my $t = Test::Mojo->new('Database::BI');
+
+# The model store (.bi/) is shared state in the checkout.  This file gets its
+# own directory before the first request: /catalog reads the saved analyses, so
+# redirecting later would create and read the shared store first.
+my $model_dir = tempdir(CLEANUP => 1);
+$t->app->config->{model_dir} = $model_dir;
 
 # ---------------------------------------------------------------------------
 # 1. GET /catalog returns 200
@@ -35,13 +44,6 @@ $t->content_like(qr/Used by/,       'catalog has Used by column header');
 # ---------------------------------------------------------------------------
 # 4. Catalog shows analysis name when an analysis references the dataset
 # ---------------------------------------------------------------------------
-
-use File::Temp qw(tempdir);
-use Mojo::JSON qw(encode_json);
-use Mojo::File;
-
-my $model_dir = tempdir(CLEANUP => 1);
-$t->app->config->{model_dir} = $model_dir;
 
 # Create a fake analyses.json referencing sales.csv.
 my $analyses_path = Mojo::File->new($model_dir)->child('analyses.json')->to_string;

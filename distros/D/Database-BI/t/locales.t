@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Test::Mojo;
 use POSIX qw(ENOENT);
+use File::Temp qw(tempdir);
 
 # ---------------------------------------------------------------------------
 # NOTE ON GEOIP
@@ -58,6 +59,10 @@ subtest 'Accept-Language mapping sanity' => sub {
 # ---------------------------------------------------------------------------
 
 my $t = Test::Mojo->new('Database::BI');
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
 
 subtest 'HTTP Accept-Language per country' => sub {
     for my $country (sort keys %COUNTRY_ACCEPT_LANGUAGE) {

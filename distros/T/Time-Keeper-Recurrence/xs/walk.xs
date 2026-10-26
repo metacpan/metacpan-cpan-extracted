@@ -34,7 +34,8 @@ between(self, a, b)
     PREINIT:
         const char *what = "Time::Keeper::Recurrence->between";
         const tkr_rule *r;
-        int64_t from, to, got, n = 0;
+        int64_t from, to, got, n = 0, i;
+        SV *held;
         tkr_walk w;
         int rc;
     PPCODE:
@@ -43,20 +44,26 @@ between(self, a, b)
         to = tkr_instant_arg(aTHX_ b, what);
         if (r->flags & TKR_F_EVERY)
             croak("%s: an @every cron has no occurrences of its own, only the next after a moment", what);
+        held = sv_2mortal(newSV(64 * sizeof(int64_t)));
         tkr_walk_init(aTHX_ &w, r, tkr_wall_of(aTHX_ r, from, NULL) - tkr_lookback(aTHX_ r, from), 0);
         while ((rc = tkr_walk_next(aTHX_ &w, &got)) == TKR_W_GOT) {
             if (got < from)
                 continue;
             if (got >= to)
                 break;
-            if (++n > TKR_BETWEEN_MAX) {
+            if (n >= TKR_BETWEEN_MAX) {
                 tkr_walk_free(&w);
                 croak("%s: more than %d occurrences; use iterate", what, TKR_BETWEEN_MAX);
             }
-            XPUSHs(sv_2mortal(tkr_occurrence_sv(aTHX_ r, got, what)));
+            if ((STRLEN)(n + 1) * sizeof(int64_t) > SvLEN(held))
+                SvGROW(held, SvLEN(held) * 2);
+            ((int64_t *)SvPVX(held))[n++] = got;
         }
         tkr_rc_croak(aTHX_ rc, r, w.fail_wall, what);
         tkr_walk_free(&w);
+        EXTEND(SP, n);
+        for (i = 0; i < n; i++)
+            PUSHs(sv_2mortal(tkr_occurrence_sv(aTHX_ r, ((int64_t *)SvPVX(held))[i], what)));
 
 void
 first(self, n)

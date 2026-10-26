@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.09";
+our $VERSION = "1.11";
 
 1;
 =encoding utf-8
@@ -29,9 +29,11 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]table       table formatting (default: on)
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
+     -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
-     -V  --cat-v            visualize whitespace via cat-v
-     -w  --width=#          fold width (default: 80)
+         --cat-v            visualize whitespace via cat-v
+     -w  --width=#          output width (default: terminal width)
+         --fold-width=#     fold width (default: pane width - 5)
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -47,11 +49,12 @@ mdee - em·dee, Markdown Easy on the Eyes
      -S  --pane-width=#     pane width (default: 85)
     --bs --border-style=#   border style
          --[no-]page-number page number on border (default: on)
+         --[no-]filename    file name label (default: on)
          --[no-]pager[=#]   pager command
 
 =head1 VERSION
 
-Version 1.09
+Version 1.11
 
 =cut
 =head1 DESCRIPTION
@@ -73,9 +76,21 @@ remain clickable.
 Use C<--no-theme> to display the original Markdown source with
 markup characters intact.
 
-B<em·dee> does not reflow paragraphs or convert Markdown into a
-different format.  For full Markdown rendering, many other viewers
-are available.  Combine them with L<nup(1)|App::nup> for similar paged output
+=head2 Concept
+
+B<em·dee> began as a viewer for Markdown I<text>, not as a Markdown
+renderer.  The idea was to show a C<.md> file as it is written, line
+for line, only made easier on the eyes with color: the Markdown is
+not interpreted or reformatted.  Some formatting has been added since
+because it made the text more readable: tables are aligned, long
+list items are folded, the default themes hide markup characters,
+and closing hashes are appended to lower-level headings.  Everything
+else is still the source text.  This is why paragraphs are not
+reflowed, why backslash escapes such as C<\*> are shown as written,
+and why C<--no-theme> gives back the original file, in color.
+
+For full Markdown rendering, many other viewers are available.
+Combine them with L<nup(1)|App::nup> for similar paged output
 (e.g., C<nup glow README.md>).
 
 The pipeline combines L<greple(1)|App::Greple> for colorization and
@@ -106,8 +121,8 @@ C<--fold> options, not by C<--show>.
 =head2 Multi-column Layout and Pagination
 
 By default, B<mdee> calculates the number of display columns by
-dividing the terminal width by the pane width (default 85
-characters).  This determines how the output is laid out and
+dividing the output width (the terminal width unless C<--width>
+is given) by the pane width (default 85 characters).  This determines how the output is laid out and
 paginated.
 
 When two or more columns fit, L<nup(1)|App::nup> arranges output
@@ -123,7 +138,15 @@ maintaining the same visual appearance.
 To force page-by-page pagination even in single-column layout,
 specify C<--nup> explicitly.  The C<--pane-width> (C<-S>) option
 adjusts the column width used for this calculation, and
-C<--pane> (C<-C>) sets the number of columns directly.
+C<--pane> (C<-C>) sets the number of columns directly.  The
+C<--width> (C<-w>) option replaces the terminal width in this
+calculation and limits the output to that width.
+
+With two or more files, C<--parallel> shows the files side by side,
+one pane per file, instead of one after another.  Each file is
+folded to its pane width, and the panes scroll together in the
+pager.  C<--pane> (C<-C>) still sets the number of panes when given;
+files that do not fit in one row continue on the next.
 
 Use C<-p> (C<--style=pager>) for a simpler view without nup
 formatting — highlighted output is piped directly through a
@@ -253,7 +276,7 @@ Column alignment specified in the separator line (C<:---> for left,
 C<:---:> for center, C<---:> for right) is respected.
 Default is enabled.
 
-When folding is enabled, a table wider than C<--width> is fit into
+When folding is enabled, a table wider than the fold width is fit into
 that width: columns that fit keep their width, and the cells of
 over-wide columns are wrapped.  A table that already fits is not
 changed.  Use C<--config table_width=0> to disable wrapping, or
@@ -294,7 +317,7 @@ Unicode box-drawing characters (C<│>, C<├>, C<┤>, C<┼>) and
 dashes (C<->) in separator lines are replaced with horizontal
 rules (C<─>).  Default is enabled.
 
-=item B<-V>, B<--cat-v>
+=item B<--cat-v>
 
 Pass the output through L<cat-v(1)|App::cat::v> to visualize
 whitespace and special characters.  Spaces are shown as C<·>
@@ -303,10 +326,24 @@ visualization is disabled by default.
 
 =item B<-w> I<N>, B<--width>=I<N>
 
-Set the fold width for text wrapping.  Default is calculated from
-C<--pane-width> minus 5 (margin for borders and padding), which
-gives 80 when pane-width is 85.  Only effective when C<--fold> is
-enabled.  The same width is used to fit tables (see C<--table>).
+Set the output width in characters.  Default is the terminal
+width.  With nup, this width is used in place of the terminal
+width to calculate the number of columns, and it is passed to
+L<ansicolumn(1)|App::ansicolumn> so that the panes fit into it:
+
+    mdee -w 170 file.md          # two 85-column panes on a wide terminal
+    mdee -V -w 170 a.md b.md     # two files in 85 columns each
+
+Without nup (C<--style=cat>, C<pager>, C<filter>, or C<--no-nup>),
+the text itself is the output, so this is the fold width.
+
+=item B<--fold-width>=I<N>
+
+Set the fold width for text wrapping directly.  Default is the
+pane width (output width divided by the number of columns) minus
+5 for borders and padding, which gives 80 when pane-width is 85.
+Only effective when C<--fold> is enabled.  The same width is used
+to fit tables (see C<--table>).
 
 =back
 
@@ -597,11 +634,17 @@ All controllable fields are enabled by default.
 
 =over 4
 
+=item B<-V>, B<--parallel>
+
+Show two or more files side by side, one pane per file, instead of
+one after another.  The number of panes is the number of files
+unless C<--pane> is given.  Ignored with a single file.
+
 =item B<-C> I<N>, B<--pane>=I<N>
 
 Set the number of columns (panes).  When not specified (or 0),
-the number of columns is calculated from the terminal width and
-C<--pane-width>.  If only 1 column fits, nup formatting (borders
+the number of columns is calculated from the output width
+(C<--width>, default terminal width) and C<--pane-width>.  If only 1 column fits, nup formatting (borders
 etc.) is preserved but pagination is handled by the pager instead.
 Use C<--nup> to force nup's native pagination even in single column.
 
@@ -620,8 +663,9 @@ Set the page height in lines.
 =item B<-S> I<N>, B<--pane-width>=I<N>
 
 Set the pane width in characters.  Default is 85.  This value is
-used to calculate the number of columns and the default fold
-width.
+used to calculate the number of columns from the output width,
+and the default fold width.  It has no effect when the number of
+columns is given by C<--pane> or C<--parallel>.
 
 =item B<--bs>=I<STYLE>, B<--border-style>=I<STYLE>
 
@@ -631,6 +675,14 @@ Set the border style.
 
 Show page number on the bottom border of each column.  Enabled by
 default.  Use C<--no-page-number> to disable.
+
+=item B<-->[B<no->]B<filename>
+
+Show the file name label at the top of each file.  Enabled by
+default.  Use C<--no-filename> to hide it, for example when files are
+shown side by side with C<--parallel> and the panes should start with
+the text.  The label format and color are set by the C<FILE_FORMAT>
+and C<FILE> theme keys (see C<--config>).
 
 =back
 
@@ -657,7 +709,8 @@ This is a shell script that can set defaults and override colors:
     default[mode]='dark'             # set default mode
     default[theme]='warm'            # set default theme(s)
     default[style]='pager'           # set default style
-    default[width]=100               # set default fold width
+    default[width]=170               # set default output width
+    default[fold_width]=80           # set default fold width
     default[base_color]='DarkCyan'   # set default base color
 
 The C<default> associative array supports the following keys:
@@ -670,7 +723,9 @@ The C<default> associative array supports the following keys:
 
 =item C<default[style]> - Corresponds to C<--style> (e.g., C<pager>, C<cat>)
 
-=item C<default[width]> - Corresponds to C<--width> (e.g., C<100>)
+=item C<default[width]> - Corresponds to C<--width> (e.g., C<170>)
+
+=item C<default[fold_width]> - Corresponds to C<--fold-width> (e.g., C<80>)
 
 =item C<default[pane_width]> - Corresponds to C<--pane-width> (e.g., C<100>)
 
@@ -715,7 +770,9 @@ The C<${base}> string is expanded to the base color value after loading.
     mdee README.md              # view markdown file
     mdee -C2 document.md        # 2-column view
     mdee -G2x2 manual.md        # 2x2 grid (4-up)
-    mdee -w60 narrow.md         # narrower text width
+    mdee -w170 file.md          # two 85-column panes on a wide terminal
+    mdee -V -w170 a.md b.md     # two files in 85 columns each
+    mdee --fold-width=60 a.md   # narrower text within the pane
     mdee --no-pager file.md     # without pager
     mdee --no-nup file.md       # output to stdout without nup
     mdee --no-fold file.md      # disable line folding
@@ -851,7 +908,7 @@ HTML comments, and tables are excluded from folding.
 Recognized list markers include C<*>, C<->, C<1.>, C<1)>, C<#.>,
 and C<#)>.  The C<#> marker is Pandoc's auto-numbered list syntax.
 
-The folding width is controlled by C<--width> option (default: 80).
+The folding width is controlled by C<--fold-width> option (default: 80).
 
 =head4 Table Formatting
 

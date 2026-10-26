@@ -55,4 +55,11 @@ subtest 'sunny: global as Mojo::File objects' => sub {
    }
 };
 
+# resolved from the application home, not from the current directory
+subtest 'sunny: global as a relative Mojo::File' => sub {
+   my $t = t_for({%generic, 'look/templates/index.html.ep' => 'global page'},
+      {global => path('look')});
+   $t->get_ok('/' => \%BAR)->content_is("global page\n");
+};
+
 done_testing();

@@ -65,8 +65,8 @@ The engine hands those outgoing bytes to the framework immediately.
     $client->request(
         method    => 'GET',
         target    => '/',
-        scheme    => 'https',
-        authority => 'example.test',
+        scheme    => 'http',
+        authority => '127.0.0.1:8080',
         on_response => sub {
             my ($tx, $response) = @_;
             print $response->status, "\n";
@@ -91,6 +91,16 @@ HTTP/2 also has receive flow control:
     $tx->consume($bytes_processed);
 
 These functions belong to the HTTP engine, not the framework stream.
+
+## Graceful shutdown
+
+Stop the listener, then drain each HTTP/2 server connection:
+
+    $server->drain;
+
+This sends GOAWAY without interrupting active streams. The framework
+flushes the final output and closes the transport when finished; it also
+owns any shutdown deadline.
 
 ## Adapter code
 

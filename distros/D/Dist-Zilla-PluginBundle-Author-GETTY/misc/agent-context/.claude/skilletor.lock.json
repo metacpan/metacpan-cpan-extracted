@@ -1,10 +1,60 @@
 {
+  "rules/engineering-discipline": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.engineering-discipline.md": "sha256:227e9dfd51f57c4232f4a06f726fa466115d98993cb7b4f51d1cae60d1f78aed"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-agent-delegation": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-agent-delegation.md": "sha256:f845dc54a1f0d7d8939b92188e9afa8a12cbf64f4ab711039ac0d5804ece7d1a"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-cpan-release": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-cpan-release.md": "sha256:75d7276cc52501c364ad7e05ac2d2f074ea4d4f140183f4fe912210a4c6705a5"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-publish-gate": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-publish-gate.md": "sha256:8a76ad23df25309f4e9a6d38976c855c8c4c7fa98d04e59f20d63f82af7f5a9b"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/karr-coordination": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.karr-coordination.md": "sha256:9340245e20b192afd627152566b7c09cf524abc805fb50867586e54ab1d17b72"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
   "skills/getty-git-commit-style": {
     "source": "getty",
     "version": "local",
     "files": {
       "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-git-commit-style/SKILL.md": "sha256:959bed63af658dcec1abc3010a2a262d347851a8aae87d833736d065c0f9f863"
+      "skills/getty-git-commit-style/SKILL.md": "sha256:d69e6b556e277975e08cdea82471ac0689dd3418791e9cccc9bbe54f04b73c4d"
     }
   },
   "skills/getty-git-usage": {
@@ -12,7 +62,7 @@
     "version": "local",
     "files": {
       "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-git-usage/SKILL.md": "sha256:9a4cdf50cc3991e16b2af8882175e8e9a4e27b40fd93605898348ed2db506630"
+      "skills/getty-git-usage/SKILL.md": "sha256:d822ec8cba6bd63bd9fd7c0e3bb0c73268f101f931d8fae82b3a553b64756989"
     }
   },
   "skills/getty-perl-moose": {
@@ -20,7 +70,7 @@
     "version": "local",
     "files": {
       "skills/getty-perl-moose/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-perl-moose/SKILL.md": "sha256:85a3574e4eb52f09f642b3bc69c4c5e2b2003d7b6ebcba52bca24e1f34aa3199"
+      "skills/getty-perl-moose/SKILL.md": "sha256:1b8f63c667e03d98eb676b2c9dc12f9997d1640dd784dcc0e6b64eda0605e7e0"
     }
   },
   "skills/getty-perl-pod": {
@@ -67,7 +117,7 @@
     "version": "local",
     "files": {
       "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/perl-release-dist-ini/SKILL.md": "sha256:968219fbff70237c642d39e5ece9cc619680a46c4493fee64138e9a9400a97bb"
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:f7d074d471499db86ecd33d92fdbea0e35f20e94b04aaaa4669b705fcfd01c3b"
     }
   }
 }

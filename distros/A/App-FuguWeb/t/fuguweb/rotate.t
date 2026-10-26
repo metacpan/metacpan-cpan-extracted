@@ -105,6 +105,7 @@ sub _site ()
 	Fugu::File->write( "$root/web/index.body.html", "<p>Hi</p>\n" );
 	Fugu::File->write( "$root/.fuguwebrc", <<'RC' );
 site = Example
+url  = https://example.org/
 
 nav "index.html" {
 	label = Home

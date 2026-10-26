@@ -17,7 +17,7 @@ use Sub::Private ();
 
 use App::Actions::Access;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # An error in an action's metadata is reported where the action was asked
 # for, which is the runner step that uses it.

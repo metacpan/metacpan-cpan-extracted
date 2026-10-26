@@ -145,10 +145,7 @@ for my $case (
     [ { http3 => { websocket => 1 } }, qr/on_websocket callback is required/ ],
     [ { http1 => { transport => $host1 } }, qr/managed/ ],
     [ { http2 => { on_request => $callback } }, qr/managed/ ],
-    [ { http2 => { enable_connect_protocol => 1 } }, qr/conflicts/ ],
-    [ { http2 => { settings => { 8 => 1 } } }, qr/conflicts/ ],
     [ { http2 => { settings => [] } }, qr/settings must be/ ],
-    [ { http3 => { enable_extended_connect => 1 } }, qr/conflicts/ ],
     [ { http1 => {}, transport => $host1 }, qr/unknown option/ ],
     [ { http1 => {}, on_body => $callback }, qr/unknown option/ ],
     [ { http1 => {}, on_request_end => $callback }, qr/unknown option/ ],
@@ -159,6 +156,26 @@ for my $case (
     ok(!eval { Unblock::HTTP::Server->new(on_request => $callback, %{ $case->[0] }); 1 }, 'invalid definition rejected');
     like($@, $case->[1], 'actionable definition error');
 }
+
+# Extended CONNECT is protocol-neutral, not inherently WebSocket-only.
+my $generic_h2 = Unblock::HTTP::Server->new(
+    http2 => { enable_connect_protocol => 1 },
+    on_request => $callback,
+);
+my $generic_h3 = Unblock::HTTP::Server->new(
+    http3 => { enable_extended_connect => 1 },
+    on_request => $callback,
+);
+ok($generic_h2->supports('h2'), 'generic H2 CONNECT policy enabled without WebSocket');
+ok($generic_h3->supports('h3'), 'generic H3 CONNECT policy enabled without WebSocket');
+my $h2_generic_engine = $generic_h2->attach_stream(
+    transport => TestTransport->new, protocol => 'h2',
+);
+is($h2_generic_engine->{options}{enable_connect_protocol}, 1,
+    'H2 generic CONNECT advertisement reaches underlying engine');
+my $h3_generic_engine = $generic_h3->attach_quic(connection => TestQuic->new);
+is($h3_generic_engine->{options}{enable_extended_connect}, 1,
+    'H3 generic CONNECT advertisement reaches underlying engine');
 
 delete $circular->{self};
 

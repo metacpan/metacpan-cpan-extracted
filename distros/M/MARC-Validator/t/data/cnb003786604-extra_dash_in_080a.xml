@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>03189nam a2200805 i 4500</leader>
+  <controlfield tag="001">nkc20263786604</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20261016114936.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">260916s2026    xr c   e      000 p cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003786604</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-87239-80-3</subfield>
+    <subfield code="q">(brožováno)</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">OLA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="k">eng</subfield>
+    <subfield code="h">fre</subfield>
+    <subfield code="h">lat</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">2-23/-27</subfield>
+    <subfield code="x">Bible. Biblistika</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">5</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27--243.37</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">26-23</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">2-276.64</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">2-474-256-277</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27-144.82</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27-184</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27-584.5</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27-583</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">13</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27-587</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">27-879-184.27-58</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(049)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-141)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Guyon, Jeanne-Marie,</subfield>
+    <subfield code="d">1648-1717</subfield>
+    <subfield code="7">mzk2003198828</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="240" ind1="1" ind2="0">
+    <subfield code="a">Cantique des cantiques de Salomon, interpreté selon le sens mistique &amp; la vraie representation des etats interieurs.</subfield>
+    <subfield code="l">Česky</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Píseň nevěsty :</subfield>
+    <subfield code="b">výklad Písně písní s důrazem na vnitřní život /</subfield>
+    <subfield code="c">Jeanne Guyonová ; překlad: Dan Drápal, Ivana Kultová</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">První vydání</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Mělník :</subfield>
+    <subfield code="b">Juda,</subfield>
+    <subfield code="c">2026</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">201 stran :</subfield>
+    <subfield code="b">portréty ;</subfield>
+    <subfield code="c">21 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Přeloženo z anglického překladu francouzského originálu, částečně přeloženo z latiny</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje bibliografické odkazy</subfield>
+  </datafield>
+  <datafield tag="630" ind1="0" ind2="7">
+    <subfield code="a">Bible.</subfield>
+    <subfield code="p">Píseň písní</subfield>
+    <subfield code="7">unn2006374760</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="630" ind1="0" ind2="9">
+    <subfield code="a">Bible.</subfield>
+    <subfield code="p">Song of Solomon</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">biblické texty</subfield>
+    <subfield code="7">ph118860</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">alegorie</subfield>
+    <subfield code="7">ph173216</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">biblická interpretace</subfield>
+    <subfield code="7">ph118847</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">Boží láska</subfield>
+    <subfield code="7">ph754609</subfield>
+    <subfield code="x">křesťanské pojetí</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">Bůh a člověk</subfield>
+    <subfield code="7">ph116953</subfield>
+    <subfield code="x">duchovní pojetí</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">duchovní cesta</subfield>
+    <subfield code="7">ph119626</subfield>
+    <subfield code="x">křesťanské pojetí</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">kontemplace</subfield>
+    <subfield code="7">ph121815</subfield>
+    <subfield code="x">křesťanské pojetí</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">křesťanská mystika</subfield>
+    <subfield code="7">ph138503</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">kvietismus</subfield>
+    <subfield code="7">ph122061</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Biblical texts</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">allegory</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Biblical interpretation</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">love of God</subfield>
+    <subfield code="x">Christian approach</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">relations between God and man</subfield>
+    <subfield code="x">spiritual approach</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">spiritual path</subfield>
+    <subfield code="x">Christian approach</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">contemplation</subfield>
+    <subfield code="x">Christian approach</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Christian mysticism</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Quietism</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">pojednání</subfield>
+    <subfield code="7">fd133056</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">náboženská poezie</subfield>
+    <subfield code="7">fd215979</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">essays</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">religious poetry</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Drápal, Dan,</subfield>
+    <subfield code="d">1949-</subfield>
+    <subfield code="7">jn19990209156</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Kultová, Ivana,</subfield>
+    <subfield code="d">1946-</subfield>
+    <subfield code="7">jx20120229017</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Vydavatelství Juda</subfield>
+    <subfield code="7">xx0256677</subfield>
+    <subfield code="4">pbl</subfield>
+  </datafield>
+  <datafield tag="765" ind1="0" ind2="8">
+    <subfield code="i">Název anglického překladu:</subfield>
+    <subfield code="t">Song of songs of Solomon with explanations and reflections having reference to the interior life</subfield>
+    <subfield code="9">Česky</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003786604</subfield>
+  </datafield>
+</record>
+
+</collection>

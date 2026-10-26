@@ -36,7 +36,7 @@ From CPAN:
 cpanm Unblock::HTTP3
 ```
 
-Unblock::HTTP3 0.13 requires:
+Unblock::HTTP3 requires:
 
 ```text
 Perl            5.20+
@@ -45,26 +45,10 @@ Net::QUIC       0.05+
 Uniform::HTTP   0.06+
 ```
 
-Version 0.13 adds bounded buffered reception and per-transaction
-`on_data` / `on_finish` lifecycle callbacks for the unified Unblock::HTTP
-layer while preserving standalone Client and Server use. It fixes retention
-of completed callback-delivered Transactions by keeping callback
-notifications weak, compacting expired weak slots without changing their
-ownership, and retaining strong references for pull-only notifications.
-Net::QUIC 0.05 remains the minimum dependency for credit-limited QUIC
-output and targeted shared-capacity wakeups. The native consumer ABI
-remains version 1.
-
-Version 0.12 fixed NativeABI version metadata for PAUSE indexing.
-
-Version 0.11 adds the same named-field Client request, Transaction response,
-and informational response forms as the HTTP1 and HTTP2 engines. Existing
-Uniform::HTTP objects remain fully supported.
-
-Version 0.10 intentionally broke the earlier 0.03 Perl API. Client and Server
-now use `new()`, final responses use `respond()`, and the old
-`Connection->client()`, `Connection->server()`, and `send_response()`
-entry points are removed. There are no compatibility aliases.
+Version 0.14 fixes CONNECT transaction completion when the outgoing request
+body finishes synchronously. Exactly-once terminal callbacks no longer
+depend on a later network event. The API and native ABI are unchanged.
+See [Changes](Changes) for earlier releases.
 
 ## Start here
 
@@ -171,8 +155,8 @@ replace the Driver or accept raw TCP-style input bytes.
 See [the installed integration guide](lib/Unblock/HTTP3/Integration.pm) and
 [the application API guide](docs/APPLICATION-API.md). Complete Linux::Event
 programs are in [server](examples/linux-event-server.pl) and
-[client](examples/linux-event-client.pl). The transport examples require
-Linux::Event 0.117 or later, but it is not a distribution dependency.
+[client](examples/linux-event-client.pl). The transport examples require Linux::Event 0.117 or later and Perl 5.36
+or later. Neither is a distribution dependency.
 
 ## Incoming body reception
 

@@ -1,8 +1,9 @@
 package Dist::Zilla::Plugin::Docker::API::Client;
 # ABSTRACT: Thin adapter around API::Docker
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 use Moo;
 use Archive::Tar;
+use Archive::Tar::Constant ();
 use Carp qw( croak );
 use Path::Tiny;
 use JSON::MaybeXS qw( decode_json );
@@ -29,29 +30,74 @@ has logger_fatal => (
     required => 1,
 );
 
+# A single explicit auth file. The historical seam: setting it overrides the
+# whole discovery list below with just this one file. The @Author::GETTY::Docker
+# bundle never sets it; the below-seam tests inject a fixture through it.
 has docker_config_path => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => sub {
-        $ENV{DOCKER_CONFIG}
-            ? Path::Tiny::path($ENV{DOCKER_CONFIG}, 'config.json')
-            : Path::Tiny::path($ENV{HOME} // '', '.docker', 'config.json');
-    },
+    is        => 'ro',
+    predicate => 'has_docker_config_path',
 );
 
-has _docker_config => (
+# The ordered list of auth files to consult, most specific first. Podman's
+# auth.json and Docker's config.json share the same {"auths":{...}} format, so
+# one list covers both engines. A set docker_config_path replaces the list;
+# an empty/unset env var simply drops its stage. ~/.dockercfg (legacy) is left
+# out on purpose.
+has auth_file_candidates => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
         my ($self) = @_;
-        my $path = $self->docker_config_path;
-        return {} unless $path && -r "$path";
-        my $data = eval { decode_json(Path::Tiny::path($path)->slurp_utf8) };
-        if ($@ || !$data) {
-            $self->logger->("Warning: cannot parse $path: $@") if $@;
-            return {};
+        return [ $self->docker_config_path ] if $self->has_docker_config_path;
+
+        my @candidates;
+
+        # 1. REGISTRY_AUTH_FILE points straight at the file (podman's override).
+        push @candidates, Path::Tiny::path($ENV{REGISTRY_AUTH_FILE})
+            if defined $ENV{REGISTRY_AUTH_FILE} && length $ENV{REGISTRY_AUTH_FILE};
+
+        # 2. $DOCKER_CONFIG/config.json
+        push @candidates, Path::Tiny::path($ENV{DOCKER_CONFIG}, 'config.json')
+            if defined $ENV{DOCKER_CONFIG} && length $ENV{DOCKER_CONFIG};
+
+        # 3. $XDG_RUNTIME_DIR/containers/auth.json (podman's live login store).
+        push @candidates, Path::Tiny::path($ENV{XDG_RUNTIME_DIR}, 'containers', 'auth.json')
+            if defined $ENV{XDG_RUNTIME_DIR} && length $ENV{XDG_RUNTIME_DIR};
+
+        # 4. $XDG_CONFIG_HOME/containers/auth.json, falling back to ~/.config.
+        my $config_home = (defined $ENV{XDG_CONFIG_HOME} && length $ENV{XDG_CONFIG_HOME})
+            ? $ENV{XDG_CONFIG_HOME}
+            : Path::Tiny::path($ENV{HOME} // '', '.config');
+        push @candidates, Path::Tiny::path($config_home, 'containers', 'auth.json');
+
+        # 5. ~/.docker/config.json (classic docker location).
+        push @candidates, Path::Tiny::path($ENV{HOME} // '', '.docker', 'config.json');
+
+        return \@candidates;
+    },
+);
+
+# Parsed auth files, in candidate order. Missing, unreadable or unparseable
+# files are skipped (a parse error warns, as before, then falls through), so
+# the list holds only the configs that actually yielded JSON.
+has _auth_configs => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => sub {
+        my ($self) = @_;
+        my @configs;
+        for my $path (@{ $self->auth_file_candidates }) {
+            next unless $path;
+            my $file = Path::Tiny::path($path);
+            next unless -r "$file";
+            my $data = eval { decode_json($file->slurp_utf8) };
+            if ($@ || !$data) {
+                $self->logger->("Warning: cannot parse $file: $@") if $@;
+                next;
+            }
+            push @configs, $data;
         }
-        return $data;
+        return \@configs;
     },
 );
 
@@ -159,7 +205,7 @@ sub build_image {
     my $tarball;
     if (ref($context) eq 'HASH') {
         if ($context->{type} eq 'dir') {
-            $tarball = $self->_create_tar($context->{path}, $context->{dockerfile});
+            $tarball = $self->_create_tar($context->{path});
         }
         elsif ($context->{type} eq 'archive') {
             $tarball = Path::Tiny::path($context->{path})->slurp_raw;
@@ -249,22 +295,31 @@ sub _is_build_step_header {
     return 0;
 }
 
+# The whole directory as a tar. Which file in it is the Dockerfile is the
+# engine's business: build_image passes that as its own dockerfile option.
 sub _create_tar {
-    my ($self, $dir, $dockerfile) = @_;
+    my ($self, $dir) = @_;
 
     my $root = Path::Tiny::path($dir);
-    my @entries = $self->_collect_files($root, $root);
-    my @files;
+    my $tar  = Archive::Tar->new;
 
-    for my $entry (@entries) {
+    for my $entry ($self->_collect_files($root, $root)) {
         my $name = $entry->relative($root)->stringify;
-        next if $name =~ /^\./;
-        push @files, $name => $entry->slurp_raw;
-    }
+        my @stat = lstat $entry->stringify;
+        my %opt  = ( mode => $stat[2] & 07777, mtime => $stat[9] );
 
-    my $tar = Archive::Tar->new;
-    for (my $i = 0; $i < @files; $i += 2) {
-        $tar->add_data($files[$i], $files[$i+1]);
+        if (-l $entry->stringify) {
+            $tar->add_data($name, '', {
+                %opt, type => Archive::Tar::Constant::SYMLINK(),
+                linkname => readlink($entry->stringify),
+            });
+        }
+        elsif (-d _) {
+            $tar->add_data($name, '', { %opt, type => Archive::Tar::Constant::DIR() });
+        }
+        else {
+            $tar->add_data($name, $entry->slurp_raw, \%opt);
+        }
     }
 
     my $tarball;
@@ -275,13 +330,18 @@ sub _create_tar {
     return \$tarball;
 }
 
+# Regular files, symlinks (never followed) and empty directories below $dir.
 sub _collect_files {
     my ($self, $root, $dir) = @_;
 
     my @files;
     for my $entry ($dir->children) {
-        if ($entry->is_dir) {
-            push @files, $self->_collect_files($root, $entry);
+        if (-l $entry->stringify) {
+            push @files, $entry;
+        }
+        elsif ($entry->is_dir) {
+            my @below = $self->_collect_files($root, $entry);
+            push @files, @below ? @below : $entry;
         }
         else {
             push @files, $entry;
@@ -293,7 +353,16 @@ sub _collect_files {
 sub auth_for_image_ref {
     my ($self, $image_ref) = @_;
     my $registry = $self->_registry_for_image_ref($image_ref);
-    return $self->_auth_for_registry($registry);
+    # Walk the parsed auth files in order and run the per-file registry
+    # selection against each. The first file with a usable entry for this
+    # registry wins; a file that has none falls through to the next, so a
+    # docker config.json and a podman auth.json can each supply credentials
+    # for different registries.
+    for my $config (@{ $self->_auth_configs }) {
+        my $auth = $self->_auth_for_registry($registry, $config);
+        return $auth if defined $auth;
+    }
+    return undef;
 }
 
 sub _registry_for_image_ref {
@@ -313,9 +382,8 @@ sub _registry_for_image_ref {
 }
 
 sub _auth_for_registry {
-    my ($self, $registry) = @_;
+    my ($self, $registry, $config) = @_;
 
-    my $config = $self->_docker_config;
     my $auths = $config->{auths} // {};
 
     my @candidates = ($registry);
@@ -473,13 +541,13 @@ Dist::Zilla::Plugin::Docker::API::Client - Thin adapter around API::Docker
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-docker-api/issues>.
 
 =head1 CONTRIBUTING

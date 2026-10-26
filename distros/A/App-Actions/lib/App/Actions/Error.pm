@@ -18,7 +18,7 @@ use overload
 	bool => sub { 1 },
 	fallback => 1;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # What Carp appends to a message: " at FILE line N.".  It is found in two
 # steps, the tail and then the " at " before it, because one pattern that

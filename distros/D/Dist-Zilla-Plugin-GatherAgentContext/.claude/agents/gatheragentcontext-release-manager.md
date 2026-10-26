@@ -6,6 +6,7 @@ briefing:
   skills:
     - getty-git-commit-style
     - getty-git-usage
+    - gatheragentcontext-core
 ---
 
 You are the gatheragentcontext-release-manager for **Dist::Zilla::Plugin::GatherAgentContext**.

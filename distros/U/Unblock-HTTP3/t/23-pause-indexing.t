@@ -9,7 +9,7 @@ use Test2::V0;
 # PAUSE reads VERSION without executing modules. A runtime-assigned VERSION
 # can therefore appear as zero despite a correct runtime value.
 my $version = MM->parse_version('lib/Unblock/HTTP3.pm');
-is($version, '0.13', 'main package has the expected release version');
+is($version, '0.14', 'main package has the expected release version');
 
 my @modules;
 File::Find::find(

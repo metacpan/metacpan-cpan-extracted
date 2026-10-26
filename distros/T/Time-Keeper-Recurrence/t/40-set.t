@@ -244,4 +244,13 @@ my $tuth = $R->new(rrule => 'FREQ=WEEKLY;BYDAY=TU,TH', start => $start);
     is($bad, 0, "first, between, next, previous and contains agree on 1,000 random sets (seed $seed)");
 }
 
+# ---- the between cap ------------------------------------------------------
+{
+    my $u = Time::Keeper->new(year => 2026, month => 1, day => 1, zone => 'UTC');
+    my $daily = $R->new(rrule => 'FREQ=DAILY', start => $u)->with(rdate => $u->plus(hours => 1));
+    my $ok = eval { $daily->between($u, $u->plus(years => 40000)); 1 };
+    ok(!$ok && $@ =~ /more than 10000000 occurrences; use iterate/, 'a set\'s between is capped') or diag($ok ? 'did not die' : $@);
+    is(scalar(() = $daily->between($u, $u->plus(days => 3))), 4, 'and below the cap gives them all');
+}
+
 done_testing;

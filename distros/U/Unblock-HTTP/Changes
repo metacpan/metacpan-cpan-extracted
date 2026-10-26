@@ -1,5 +1,22 @@
 Revision history for Unblock::HTTP
 
+0.03  2026-10-25
+    - Add Client request on_transaction callback when a queued request
+      is admitted to its real engine, supporting streaming uploads.
+    - Add framework-neutral generic socket-wide HTTP1 Upgrade and
+      CONNECT handoff for both Client and Server.
+    - Add HTTP2/HTTP3 stream-local Extended CONNECT handoff, including
+      peer SETTINGS admission, successful 2xx, 403 rejection, and
+      deferred bounded bidirectional DATA, FIN and output callbacks.
+    - Fix orphaned speculative HTTP3 connector ownership after peer
+      stream credit recovery and during Client shutdown.
+    - Make HTTP2/HTTP3 truly optional dependencies, with clear errors
+      only when an unavailable protocol is enabled.
+    - Require Unblock::HTTP1 0.13; optionally use Unblock::HTTP2 0.13
+      and Unblock::HTTP3 0.14 when enabled. Keep Uniform::HTTP 0.06.
+    - Retain framework-neutral protocol policy and canonical
+      Uniform::HTTP messages. Do not ship framework adapters.
+
 0.02  2026-10-21
     - Introduce the unified, event-loop-neutral Client and Server API for
       HTTP/1.1, HTTP/2, HTTP/3, and optional WebSockets.

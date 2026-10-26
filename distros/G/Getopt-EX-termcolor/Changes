@@ -1,5 +1,11 @@
 Revision history for Getopt-EX extension Getopt-EX-termcolor
 
+1.10 2026-10-25T16:25:59Z
+
+    - Skip the terminal query when the process is not in the foreground
+      process group (e.g. inside `cat <(cmd)`), so that the pipeline no
+      longer stops with SIGTTOU
+
 1.09 2026-03-12T02:24:15Z
 
     - Make Getopt::EX an optional dependency (not required for luminance/bgcolor)

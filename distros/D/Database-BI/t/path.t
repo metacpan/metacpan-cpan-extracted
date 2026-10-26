@@ -17,6 +17,10 @@ my $t = Test::Mojo->new('Database::BI');
 require Database::BI::Model::DataSource;
 require Database::BI::Controller::Dashboard;
 
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
+
 # Capture private function refs AFTER app is loaded (CHECK has passed).
 Readonly my $FMT		=> \&Database::BI::Model::DataSource::_fmt;
 Readonly my $MSG		=> \&Database::BI::Model::DataSource::_msg;
@@ -893,49 +897,74 @@ subtest '_csv_row path-E: undef field -> empty string in output' => sub {
 # ======================================================================
 # PATH COVERAGE: Dashboard::_resolve_language
 #
+# The controller renders templates/<platform>/<language>/<page>, so the only
+# languages that can be served are the ones with a directory.  Every path below
+# therefore ends at a code that has one, or at the default language, which is
+# what the POD promises; what differs is which code was tried first.
+#
 # CFG:
-#   A: no Accept-Language header     -> $lang = undef -> default
-#   B: header, code equals default   -> skip dir check -> return default
-#   C: header, code ne default, dir exists   -> return extracted code
-#   D: header, code ne default, dir missing  -> fall back to default
-#   E: header present but no 2-letter match  -> $lang undef -> default
+#   A: no Accept-Language header            -> default
+#   B: header, code equals default           -> default
+#   C: header, code ne default, dir exists   -> that code
+#   D: header, code ne default, dir missing  -> default language
+#   E: header present but no 2-letter match  -> default
+#   F: no header, configured code has no dir -> default language
+#   G: header names the configured code, no dir -> default language
 # ======================================================================
 
-subtest '_resolve_language path-A: no Accept-Language header -> default' => sub {
-	my $ctrl = mock_ctrl(undef);    # undef accept_language -> early return
-	my $lang = $RESOLVE_LANG->($ctrl, 'web', 'en');
-	is $lang, 'en', 'path A: absent header -> early return with default (en)';
+# An application home of this section's own, holding templates/web/en and
+# templates/web/fr and nothing else.  Statting the checkout's templates would
+# make these paths depend on whatever this machine has installed, and creating
+# templates/web/fr in the checkout - which this section used to do - races a
+# parallel run.
+Readonly my $LANG_HOME => do {
+	my $home = Mojo::File->new(tempdir(CLEANUP => 1));
+	$home->child('templates/web/en')->make_path;
+	$home->child('templates/web/fr')->make_path;
+	$home->to_string;
 };
 
-subtest '_resolve_language path-B: header code equals default -> return default (no dir check)' => sub {
-	my $ctrl = mock_ctrl('en-US,en;q=0.9');
-	my $lang = $RESOLVE_LANG->($ctrl, 'web', 'en');
-	is $lang, 'en', 'path B: code == default -> returns default without dir check';
+# A MockCtrl with the section's own home and a given Accept-Language value.
+sub lang_ctrl { MockCtrl->new($LANG_HOME, $APP_CFG, $_[0]) }
+
+subtest '_resolve_language path-A: no Accept-Language header -> default' => sub {
+	my $lang = $RESOLVE_LANG->(lang_ctrl(undef), 'web', 'en');
+	is $lang, 'en', 'path A: absent header -> the configured language';
+};
+
+subtest '_resolve_language path-B: header code equals default -> default' => sub {
+	my $lang = $RESOLVE_LANG->(lang_ctrl('en-US,en;q=0.9'), 'web', 'en');
+	is $lang, 'en', 'path B: header naming the configured language -> that language';
 };
 
 subtest '_resolve_language path-C: header code ne default, template dir exists -> use it' => sub {
-	# Create a temporary templates/web/fr directory so _resolve_language can
-	# confirm the template exists and return 'fr'.
-	my $fr_dir = Mojo::File->new($APP_HOME)->child('templates/web/fr');
-	my $created = !-d $fr_dir;
-	$fr_dir->make_path if $created;
-	my $ctrl = mock_ctrl('fr-FR,fr;q=0.9,en;q=0.8');
-	my $lang = $RESOLVE_LANG->($ctrl, 'web', 'en');
-	is $lang, 'fr', 'path C: template dir exists -> CGI::Lingua selects fr';
-	$fr_dir->remove_tree if $created;    # clean up temp dir
+	my $lang = $RESOLVE_LANG->(lang_ctrl('fr-FR,fr;q=0.9,en;q=0.8'), 'web', 'en');
+	is $lang, 'fr', 'path C: templates/web/fr exists -> CGI::Lingua selects fr';
 };
 
 subtest '_resolve_language path-D: no supported template for requested language -> default' => sub {
-	# 'de' templates do not exist; CGI::Lingua finds no match in supported list -> undef -> default.
-	my $ctrl = mock_ctrl('de,de-DE;q=0.9');
-	my $lang = $RESOLVE_LANG->($ctrl, 'web', 'en');
-	is $lang, 'en', 'path D: no templates/web/de -> CGI::Lingua returns undef -> default';
+	# 'de' has no directory and is not offered to CGI::Lingua, which returns
+	# undef; the configured language answers.
+	my $lang = $RESOLVE_LANG->(lang_ctrl('de,de-DE;q=0.9'), 'web', 'en');
+	is $lang, 'en', 'path D: no templates/web/de -> default';
 };
 
 subtest '_resolve_language path-E: no parseable language -> default' => sub {
-	my $ctrl = mock_ctrl('q=0.9');
-	my $lang = $RESOLVE_LANG->($ctrl, 'web', 'en');
+	my $lang = $RESOLVE_LANG->(lang_ctrl('q=0.9'), 'web', 'en');
 	is $lang, 'en', 'path E: unrecognised Accept-Language -> default';
+};
+
+subtest '_resolve_language path-F: configured language has no templates -> default language' => sub {
+	# The configured language is offered to CGI::Lingua and can come back from
+	# it, and it has no directory either way: the renderer cannot be handed
+	# templates/web/de/ just because the config named it.
+	my $lang = $RESOLVE_LANG->(lang_ctrl(undef), 'web', 'de');
+	is $lang, 'en', 'path F: no templates/web/de -> falls back to the default language';
+};
+
+subtest '_resolve_language path-G: header names the unservable language -> default language' => sub {
+	my $lang = $RESOLVE_LANG->(lang_ctrl('de-DE,de;q=0.9'), 'web', 'de');
+	is $lang, 'en', 'path G: the language cannot be served, whatever code selected it';
 };
 
 # ======================================================================

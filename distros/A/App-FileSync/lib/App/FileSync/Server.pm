@@ -35,7 +35,7 @@ use App::FileSync::Protocol;
 use App::FileSync::Settings;
 use App::FileSync::Store;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # Package variables for compatibility: the CLI checks $PROTO, and tests may
 # localise $CHUNK.

@@ -17,6 +17,9 @@
       "getty-perl-release-author-getty@karr",
       "kanban-issues-karr-coordination@karr",
       "kanban-issues-karr-ticket@karr"
+    ],
+    "bundles": [
+      "getty-cpan-dist@getty"
     ]
   },
   "targets": [

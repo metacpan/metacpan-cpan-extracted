@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - 'simpici-provider/**'
+      - '!simpici-provider/dzil-perl/**'
       - '.github/workflows/simpici-provider.yml'
   workflow_dispatch:
 

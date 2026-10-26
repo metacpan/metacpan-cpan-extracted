@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.326';
+our $VERSION = '0.327';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -137,26 +137,30 @@ has no_github_release => (
   },
 );
 
-# Look at .git/config (relative to the cwd, which dzil sets to the dist root)
-# and return true if any remote URL points at github.com. Used to auto-disable
-# the GitHub-specific plugins when the dist lives somewhere else (GitLab,
+# Remote URLs of the repository around the cwd (which dzil sets to the dist
+# root), origin first, as a list of [ name, url ]. Asks git instead of reading
+# .git/config, so linked worktrees and submodules (where .git is a file) work.
+# Empty when there is no repository, no git, or no remote.
+sub _remote_urls {
+  my @remotes;
+  my $out = `git config --get-regexp '^remote\\..*\\.url\$' 2>/dev/null`;
+  return () if $? != 0 or !defined $out;
+  for my $line (split /\n/, $out) {
+    my ($key, $url) = $line =~ m{^remote\.(.+)\.url\s+(\S+)} or next;
+    push @remotes, [ $key, $url ];
+  }
+  return ( (grep { $_->[0] eq 'origin' } @remotes), (grep { $_->[0] ne 'origin' } @remotes) );
+}
+
+# True if any remote URL points at github.com. Used to auto-disable the
+# GitHub-specific plugins when the dist lives somewhere else (GitLab,
 # Codeberg, a private Gitea, no remote at all, ...).
 has _has_github_remote => (
   is      => 'ro',
   isa     => 'Bool',
   lazy    => 1,
   default => sub {
-    my $config = '.git/config';
-    return 0 unless -e $config;
-    open my $fh, '<', $config or return 0;
-    while (my $line = <$fh>) {
-      if ($line =~ m{^\s*url\s*=.*\bgithub\.com\b}i) {
-        close $fh;
-        return 1;
-      }
-    }
-    close $fh;
-    return 0;
+    return (grep { $_->[1] =~ m{\bgithub\.com\b}i } _remote_urls()) ? 1 : 0;
   },
 );
 
@@ -171,23 +175,16 @@ has gitea => (
 # any per-dist flag: Codeberg (Forgejo) and the author's own instance.
 my @KNOWN_GITEA_HOSTS = qw( codeberg.org src.ci );
 
-# Host of the dist's first git remote (parsed from .git/config in the cwd,
-# which dzil sets to the dist root). Undef when there is no remote.
+# Host of the dist's origin remote, or of the first remote if there is no
+# origin (GiteaMeta reads remote.origin.url and wants the hosts to match).
+# Undef when there is no remote.
 has _remote_host => (
   is      => 'ro',
   isa     => 'Maybe[Str]',
   lazy    => 1,
   default => sub {
-    my $config = '.git/config';
-    return undef unless -e $config;
-    open my $fh, '<', $config or return undef;
-    my $url;
-    while (my $line = <$fh>) {
-      if ($line =~ m{^\s*url\s*=\s*(\S+)}) { $url = $1; last }
-    }
-    close $fh;
-    return undef unless defined $url;
-    my ($host) = $url =~ m{(?: ^\w+:// (?:[^/\@]+\@)? | ^[^/\@]+\@ ) ([^/:]+)}x;
+    my ($remote) = _remote_urls() or return undef;
+    my ($host) = $remote->[1] =~ m{(?: ^\w+:// (?:[^/\@]+\@)? | ^[^/\@]+\@ ) ([^/:]+)}x;
     return $host;
   },
 );
@@ -270,6 +267,17 @@ has generate_license => (
   isa     => 'Bool',
   lazy    => 1,
   default => sub { $_[0]->payload->{generate_license} },
+);
+
+has no_license => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub {
+    my $self = shift;
+    return $self->payload->{no_license} if defined $self->payload->{no_license};
+    return ($self->no_cpan && !$self->generate_license) ? 1 : 0;
+  },
 );
 
 has xs => (
@@ -450,17 +458,28 @@ sub effective_gather_exclude_filename {
   return [ grep { !$seen{$_}++ } @exclude ];
 }
 
+# True when docker_image makes the bundle add the default Docker subsection.
+sub _docker_default {
+  my ($self) = @_;
+  return defined $self->payload->{docker_image}
+    && length $self->payload->{docker_image}
+    && ($self->payload->{docker_default} // 1);
+}
+
 sub configure {
   my ($self) = @_;
 
-  $self->log_fatal("you must not specify both weaver_config and is_task")
+  die "[\@Author::GETTY] you must not specify both weaver_config and is_task\n"
     if $self->is_task and $self->weaver_config ne '@Author::GETTY';
 
-  $self->log_fatal("you must not specify both author and no_cpan")
+  die "[\@Author::GETTY] you must not specify both author and no_cpan\n"
     if $self->no_cpan and $self->author ne 'GETTY';
 
-  $self->log_fatal("no_install can't be used together with no_makemaker")
+  die "[\@Author::GETTY] no_install can't be used together with no_makemaker\n"
     if $self->no_install and $self->no_makemaker;
+
+  die "[\@Author::GETTY] you must not specify both no_license and generate_license\n"
+    if $self->no_license and $self->generate_license;
 
   $self->add_plugins([ 'Git::GatherDir' => {
     include_dotfiles => $self->gather_include_dotfiles,
@@ -481,14 +500,15 @@ sub configure {
   }
   # LICENSE is a committed repository file, gathered from git like any other
   # source file, so that the hosting platform detects the licence. @Basic's
-  # License plugin would generate a second one and abort the build.
+  # License plugin would generate a second one and abort the build. With
+  # no_license nothing generates a LICENSE and nothing demands one.
   push @removes, 'License' unless $self->generate_license;
   $self->add_bundle('Filter' => {
     -bundle => '@Basic',
     -remove => [@removes],
   });
 
-  $self->add_plugins('LicenseFile') unless $self->generate_license;
+  $self->add_plugins('LicenseFile') unless $self->generate_license || $self->no_license;
 
   if ($self->no_install) {
     $self->add_plugins('MakeMaker::SkipInstall');
@@ -572,8 +592,13 @@ sub configure {
     MetaConfig
     MetaJSON
     PodSyntaxTests
-    Test::ChangesHasContent
   ));
+
+  # The generated test looks for a heading of the version being released in
+  # Changes. NextRelease writes it, but not with no_changes (blank format) and
+  # not for a task (no NextRelease), so the test could only fail there.
+  $self->add_plugins('Test::ChangesHasContent')
+    unless $self->no_changes || $self->is_task;
 
   $self->add_plugins([
     'MetaProvides::Package' => {
@@ -664,6 +689,14 @@ sub configure {
     ]);
   }
 
+  # @Basic's UploadToCPAN is the Releaser that no_cpan removes, and
+  # Dist::Zilla refuses to release without any Releaser. Unless the dist
+  # brings its own (the Docker default, or run_release), fake one so the rest
+  # of the flow (changelog, tag, version bump, push) runs.
+  if ($self->no_cpan && !$self->_docker_default && !@{ $self->run_release }) {
+    $self->add_plugins('FakeRelease');
+  }
+
   $self->add_plugins([
     'Git::CheckFor::CorrectBranch' => {
       release_branch => $self->release_branch,
@@ -727,9 +760,7 @@ sub configure {
   # Releaser without any extra config. Users who want multiple targets via
   # explicit [@Author::GETTY::Docker / name] subsections can opt out with
   # docker_default = 0 to suppress the auto-default.
-  if (defined $self->payload->{docker_image}
-      && length $self->payload->{docker_image}
-      && ($self->payload->{docker_default} // 1)) {
+  if ($self->_docker_default) {
     $self->add_bundle('@Author::GETTY::Docker' => {});
   }
 }
@@ -750,7 +781,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.326
+version 0.327
 
 =head1 SYNOPSIS
 
@@ -778,6 +809,7 @@ are default):
   no_cpan = 0
   no_install = 0
   no_makemaker = 0
+  no_license = 0 ; 1 when no_cpan is set
   no_installrelease = 0
   no_changes = 0
   no_podweaver = 0
@@ -788,20 +820,32 @@ are default):
 
 In default configuration it is equivalent to:
 
+  [Git::GatherDir]
+  include_dotfiles = 0
+  exclude_filename = README.md ; unless include_readme
+  exclude_filename = .karr     ; unless no_cpan
+
+  [GatherAgentContext]
+
   [@Filter]
   -bundle = @Basic
   -remove = GatherDir
   -remove = PruneCruft
+  -remove = License ; LICENSE is committed, see generate_license
 
-  [PkgVersion]
+  [LicenseFile]     ; checks the committed LICENSE against dist.ini
+
   [MetaConfig]
   [MetaJSON]
+  [PodSyntaxTests]
+  [Test::ChangesHasContent]
   [MetaProvides::Package]
   inherit_version = 1
   inherit_missing = 1
   meta_noindex    = 1
-  [PodSyntaxTests]
-  [GithubMeta]
+
+  [GithubMeta]      ; with a GitHub remote; a Gitea/Forgejo remote gets
+                    ; [Author::GETTY::GiteaMeta], anything else [Repository]
 
   [InstallRelease]
   install_command = cpanm .
@@ -812,20 +856,23 @@ In default configuration it is equivalent to:
   do_munging = 0
   do_metadata = 1
 
-  [PodWeaver]
-  config_plugin = @Author::GETTY
-
-  [Repository]
-
   [Git::CheckFor::CorrectBranch]
   release_branch = main
 
+  [Prereqs::FromCPANfile]
+
+  [PodWeaver]
+  config_plugin = @Author::GETTY
+
   [@Git::VersionManager]
-  ; handles versioning, changelog (NextRelease), commits, tags, and push
+  ; handles versioning, changelog (NextRelease), commits, tags
   post-release commit.allow_dirty_match = ^bin/
   ; ... the bundle adds this on top of the ^lib/.*\.pm$ default
 
-  [GitHub::CreateRelease]
+  [Git::Push]
+  push_to = origin
+
+  [GitHub::CreateRelease]   ; with a GitHub remote
   branch     = main
   notes_from = ChangeLog
   ; notes_file defaults to "Changes" when notes_from = ChangeLog
@@ -979,7 +1026,7 @@ hosts. Has no effect when a GitHub remote is present (GitHub wins).
 
 If set to 1, L<Dist::Zilla::Plugin::GitHub::CreateRelease> will not be used
 even though GitHub integration is otherwise active. Like L</no_github>, this
-defaults to 1 when no GitHub remote is detected in F<.git/config>.
+defaults to 1 when no GitHub remote is detected in the repository's remotes.
 
 When this option is B<not> set (the default), C<dzil release> will create a
 GitHub Release for the new tag and attach the CPAN tarball. This requires a
@@ -993,12 +1040,22 @@ identity files).
 If set to 1, this attribute will disable L<Dist::Zilla::Plugin::UploadToCPAN>.
 By default a dzil release would release to L<CPAN|http://www.cpan.org/>.
 
+Dist::Zilla refuses to release without a Releaser plugin, so the bundle adds
+L<Dist::Zilla::Plugin::FakeRelease> in its place, which lets C<dzil release>
+run the rest of the flow (changelog, tag, version bump, push). It is left out
+when the dist brings a Releaser of its own: the default Docker subsection
+(L</docker_image>) or C<run_release>. A Releaser you add by hand to your
+F<dist.ini> is not seen by the bundle, so if you do that, you will have the
+fake one as well.
+
 It also makes B<version_finder> default to C<:MainModule>.
 
 =head2 no_changes
 
 If set to 1, then L<Dist::Zilla::Plugin::NextRelease> (from @Git::VersionManager)
-will not generate changes entries.
+will not generate changes entries. As the version heading is then blank,
+L<Dist::Zilla::Plugin::Test::ChangesHasContent> is left out as well; it is
+also left out for a C<task>, which has no NextRelease either.
 
 =head2 commit_files_after_release
 
@@ -1057,6 +1114,20 @@ there to be found. Write the file with C<dzil genlicense> and commit it.
 Set this attribute to 1 to go back to the generated file — C<@Basic> keeps its
 License plugin and no check is added. Use it for distributions that
 deliberately ship no committed F<LICENSE>.
+
+=head2 no_license
+
+If set to 1, the bundle does nothing about F<LICENSE>: none is generated and
+no committed one is demanded. A F<LICENSE> that is committed anyway is still
+gathered from git like any other file, just not checked. C<license> in
+F<dist.ini> stays required by L<Dist::Zilla> and still feeds the metadata and
+the POD.
+
+This is the default with C<no_cpan = 1> — a distribution that never reaches
+CPAN is usually private and has no licence to publish. Set C<no_license = 0>
+to keep the committed-file check there, or C<generate_license = 1> to have the
+file generated. C<no_license = 1> together with C<generate_license = 1> is an
+error.
 
 =head2 xs
 
@@ -1208,6 +1279,11 @@ L<Dist::Zilla::Plugin::PodSyntaxTests> (always active in this bundle) registers
 as a C<develop requires>.  Without it, author tests will fail with a missing
 module — do B<not> paper over this by adding C<Test::Pod> to the cpanfile's
 C<on test> block.
+
+Reference the action as C<...dzil-test@v1>, as in the examples below. The
+C<v1> tag is moved by the maintainer when the action changes, so a dist
+pinned to it gets a change only then, and not on the next CI run as with
+C<@main>, where every change lands in all consuming CI runs at once.
 
 =head2 Pure-Perl distributions
 
@@ -1406,7 +1482,7 @@ and don't want an extra plugin added behind your back.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
 
 =head1 CONTRIBUTING
@@ -1419,9 +1495,11 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

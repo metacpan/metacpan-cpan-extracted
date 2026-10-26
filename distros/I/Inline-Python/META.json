@@ -4,7 +4,7 @@
       "Neil Watkiss <NEILW@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,8 @@
             "Data::Dumper" : "0",
             "Digest::MD5" : "2.5",
             "File::Spec" : "0",
-            "Inline" : "0.46"
+            "Inline" : "0.46",
+            "perl" : "5.006000"
          }
       },
       "test" : {
@@ -56,6 +57,6 @@
          "web" : "http://github.com/niner/inline-python-pm"
       }
    },
-   "version" : "0.58",
+   "version" : "0.59",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

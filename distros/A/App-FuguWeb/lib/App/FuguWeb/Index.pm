@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Index;
-our $VERSION = '0.10.1';
+our $VERSION = '0.11.0';
 
 use App::FuguWeb;
 
@@ -30,12 +30,13 @@ use App::FuguWeb;
 #
 # The index never retypes a description either. It asks each
 # App::FuguWeb::Manual, and that reads the source. The index writes no
-# prose of its own, per WEB-LANG-13: the title, the opening and each
+# prose of its own, per WEB-MANUALS-8: the title, the opening and each
 # heading come from the description.
 
 # App::FuguWeb::Index->new(%args):
-#	config => $config	the site description (required)
-#	lang   => $code		the language of the page (default: en)
+#	config   => $config	the site description (required)
+#	language => $language	the language of the page
+#				(default: the default language)
 sub new ( $class, %args )
 {
 	my $config = $args{config};
@@ -43,37 +44,39 @@ sub new ( $class, %args )
 	    unless defined $config;
 
 	return bless {
-		config => $config,
-		lang   => $args{lang} // App::FuguWeb::DEFAULT_LANGUAGE,
+		config   => $config,
+		language => $args{language} // $config->default_language,
 	}, $class;
 }
 
 # $self->body($title, $opening, %from):
-#	title_lang => $code	the language of the title
-#	body_lang  => $code	the language of the opening
+#	title_lang => $tag	the language of the title
+#	body_lang  => $tag	the language of the opening
 #				(each defaults to the language of the page)
 #
-#	The body fragment of the index page: the title as its heading,
-#	then the opening, then each group, per WEB-MANUALS-8. The
-#	caller passes the title and the opening of the page block for
-#	the language of the page, so the heading and the browser tab
-#	always agree. A page with no opening passes undef.
+#	The body fragment of the index page, as characters: the title
+#	as its heading, then the opening, then each group, per
+#	WEB-MANUALS-8. The caller passes the title and the opening of
+#	the page block for the language of the page, so the heading and
+#	the browser tab always agree. A page with no opening passes
+#	undef.
 #
 #	The parts of the page come from the sources of more than one
 #	language. Each part from a source of another language than the
-#	page carries that language on its own element, per WEB-LANG-6:
-#	the title, the opening, each heading and each description.
+#	page carries the marks of that language on its own element, per
+#	WEB-LANGUAGE-11: the title, the opening, each heading and each
+#	description.
 sub body ( $self, $title, $opening = undef, %from )
 {
 	my $html =
 	      '<h1'
-	    . $self->_lang( $from{title_lang} ) . '>'
+	    . $self->_marks( $from{title_lang} ) . '>'
 	    . App::FuguWeb::escape_html($title)
 	    . "</h1>\n\n";
 
 	if ( defined $opening && length $opening ) {
-		my $lang = $self->_lang( $from{body_lang} );
-		$opening = "<div$lang>\n$opening</div>\n" if length $lang;
+		my $marks = $self->_marks( $from{body_lang} );
+		$opening = "<div$marks>\n$opening</div>\n" if length $marks;
 		$html .= "$opening\n";
 	}
 	$html .= $self->_group($_) for $self->{config}->groups;
@@ -86,15 +89,15 @@ sub body ( $self, $title, $opening = undef, %from )
 #	emits nothing, so an empty group leaves no heading behind.
 sub _group ( $self, $group )
 {
-	my $code    = $self->{lang};
-	my @manuals = $group->manuals($code);
+	my $tag     = $self->{language}->tag;
+	my @manuals = $group->manuals($tag);
 	return '' unless @manuals;
 
 	my $html =
 	      '<h2 id="'
 	    . App::FuguWeb::escape_attr( $group->name ) . '"'
-	    . $self->_lang( $group->heading_lang($code) ) . '>'
-	    . App::FuguWeb::escape_html( $group->heading($code) )
+	    . $self->_marks( $group->heading_lang($tag) ) . '>'
+	    . App::FuguWeb::escape_html( $group->heading($tag) )
 	    . "</h2>\n<dl>\n";
 	$html .= $self->_entry($_) for @manuals;
 	$html .= "</dl>\n\n";
@@ -110,26 +113,28 @@ sub _group ( $self, $group )
 #	definition the description of the source.
 sub _entry ( $self, $manual )
 {
-	my $name    = App::FuguWeb::escape_html( $manual->name );
-	my $section = $manual->section;
+	my $name =
+	    App::FuguWeb::escape_html( App::FuguWeb::as_text( $manual->name ) );
+	my $section = App::FuguWeb::escape_html(
+		App::FuguWeb::as_text( $manual->section ) );
 
 	return
 	    sprintf "<dt><a href=\"./%s\">%s(%s)</a></dt>\n"
 	    . "<dd%s>%s</dd>\n",
-	    App::FuguWeb::escape_attr( $manual->page ), $name, $section,
-	    $self->_lang( $manual->lang ),
+	    App::FuguWeb::escape_attr( App::FuguWeb::as_text( $manual->page ) ),
+	    $name, $section, $self->_marks( $manual->lang ),
 	    App::FuguWeb::escape_html( $manual->description );
 }
 
-# $self->_lang($code):
-#	The lang attribute of a part whose source is of the language,
-#	with the space in front of it. A part of the language of the
-#	page takes none, because the html element carries that code.
-sub _lang ( $self, $code )
+# $self->_marks($tag):
+#	The marks of a part whose source is of the language of the tag,
+#	per WEB-LANGUAGE-11. A part of the language of the page takes
+#	none, because the html element carries that language.
+sub _marks ( $self, $tag )
 {
-	return '' unless defined $code && $code ne $self->{lang};
+	return '' unless defined $tag;
 
-	return ' lang="' . App::FuguWeb::escape_attr($code) . '"';
+	return $self->{language}->marks( $self->{config}->language($tag) );
 }
 
 1;

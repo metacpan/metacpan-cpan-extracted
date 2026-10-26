@@ -6,7 +6,7 @@ use Encode ();
 use Dist::Zilla::File::InMemory;
 with 'Dist::Zilla::Role::FileGatherer';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # Per-harness default sets, used when neither `dir` nor `file` is given.
@@ -15,6 +15,17 @@ my %HARNESS = (
   codex  => { dir => ['.codex', '.agents/skills'], file => ['AGENTS.md'] },
 );
 my @HARNESS_ORDER = qw(claude codex);
+
+# A harness directory is also where the harness and the user park local state:
+# login tokens, session transcripts, todos, caches, backups. This plugin reads
+# from disk, so git-ignoring those does not keep them out of a tarball. Below
+# such a directory only these top-level entries are agent content; whatever
+# else is there is never read, no matter what it is called -- a list of things
+# to skip would publish every name nobody thought of.
+my %HARNESS_DIR  = map { $_ => 1 } qw(.claude .codex);
+my %CONTENT_DIR  = map { $_ => 1 } qw(agents skills rules hooks commands);
+my %CONTENT_FILE = map { $_ => 1 }
+  qw(CLAUDE.md skilletor.json skilletor.lock.json skilletor-rules.md);
 
 
 has harness         => (is => 'ro', isa => 'ArrayRef[Str]', lazy => 1, default => sub { [] });
@@ -61,7 +72,11 @@ sub _files {
 sub _exclude_res {
   my ($self) = @_;
   my @res = (
-    qr{(?:^|/)[^/]+\.local\.json$},   # settings.local.json, skilletor.local.json (config)
+    # <name>.local.<ext>: machine-local overrides (settings.local.json,
+    # skilletor.local.json, CLAUDE.local.md) and their backups (.local.json.bak).
+    # A leading-dot `.local.<name>.md` is skilletor-installed content and stays.
+    qr{(?:^|/)[^/]+\.local\.[^/]+$},
+    qr{(?:^|/)(?:\.credentials|auth)\.json$},   # harness login tokens
     qr{(?:^|/)settings\.json$},       # editor/permission config, not agent content
     qr{(?:^|/)worktrees/},
     qr{(?:^|/)\.DS_Store$},
@@ -125,9 +140,14 @@ sub gather_files {
 
 sub _gather_dir {
   my ($self, $dir, $base) = @_;
+  # Directly below a harness directory, take known agent content only.
+  my $content_only = $HARNESS_DIR{ $dir->basename };
   for my $child (sort { $a->basename cmp $b->basename } $dir->children) {
     next if -l $child;               # never follow symlinks (dir or file)
     if ($child->is_dir) {
+      # Not descended at all: session transcripts and caches are large, and
+      # nothing in there is ours to read.
+      next if $content_only && !$CONTENT_DIR{ $child->basename };
       my $rel = $child->relative($base);
       # Prune excluded directories before descending: e.g. .claude/worktrees/
       # holds full agent checkouts (thousands of files) that would otherwise be
@@ -136,6 +156,7 @@ sub _gather_dir {
       $self->_gather_dir($child, $base);
     }
     elsif ($child->is_file) {
+      next if $content_only && !$CONTENT_FILE{ $child->basename };
       $self->_snapshot($child, $base);
     }
   }
@@ -158,7 +179,7 @@ Dist::Zilla::Plugin::GatherAgentContext - Snapshot the agent context (.claude/.c
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -180,6 +201,10 @@ Unlike C<[Git::GatherDir]> this plugin reads from the working directory, not
 from git, so it also captures skilletor-installed (git-ignored) skills, agents
 and rules — exactly the content that is not committed in the repository.
 
+Because it reads from disk, it is strict about I<what> it reads there: below a
+harness directory only known agent content is taken, never the local state a
+harness keeps next to it. See L</WHAT IS SNAPSHOTTED>.
+
 =head2 harness
 
 Which harness default sets to snapshot: C<claude>, C<codex> (repeatable), or
@@ -188,7 +213,9 @@ C<all>. Unset means all. Ignored once C<dir>/C<file> are set explicitly.
 =head2 dir
 
 Directories (repo-relative) to snapshot recursively. Overrides the
-harness-derived directory defaults.
+harness-derived directory defaults. A harness directory (C<.claude>, C<.codex>)
+is reduced to its agent content even when named here; see
+L</WHAT IS SNAPSHOTTED> for how to take more.
 
 =head2 file
 
@@ -213,16 +240,65 @@ Skip C<.gitignore> files (skilletor's per-skill management marker). Default 1.
 Silently skip a configured dir/file that is absent. Default 1. Set to 0 to make
 an absent configured path fatal.
 
-=head1 BUILT-IN EXCLUDES
+=head1 WHAT IS SNAPSHOTTED
 
-These paths are always skipped, before any L</exclude_match> additions:
+A harness directory — any directory named C<.claude> or C<.codex> — is not only
+agent context. The harness and the user also keep local state there: login
+tokens, session transcripts, todo lists, caches, local overrides, backups. This
+plugin reads from disk, so a C<.gitignore> does not keep any of that out of the
+tarball. Directly below a harness directory the plugin therefore takes B<only>
+these entries and never opens anything else:
 
 =over 4
 
 =item *
 
-Any C<*.local.json> file (for example C<settings.local.json> or
-C<skilletor.local.json>) — local configuration, not agent content.
+the directories C<agents/>, C<skills/>, C<rules/>, C<hooks/> and C<commands/>,
+recursively;
+
+=item *
+
+the files C<CLAUDE.md>, C<skilletor.json>, C<skilletor.lock.json> and
+C<skilletor-rules.md>.
+
+=back
+
+So C<.claude/.credentials.json>, C<.claude/projects/>, C<.claude/todos/>,
+C<.claude/statsig/>, C<.claude/local/>, C<.codex/auth.json>,
+C<.codex/config.toml> and anything else a harness or a person drops there stay
+out, whatever the file is called. This holds for a harness directory named
+explicitly through L</dir> and for one met deeper inside a configured tree.
+
+Other directories (C<.agents/skills>, or your own L</dir> entries) are taken in
+full. To snapshot a further subdirectory of a harness directory, configure it by
+name — it is then an ordinary directory:
+
+  [GatherAgentContext]
+  dir = .claude
+  dir = .claude/output-styles
+  dir = .codex
+  dir = .agents/skills
+
+The L</BUILT-IN EXCLUDES> apply on top, everywhere.
+
+=head1 BUILT-IN EXCLUDES
+
+These paths are always skipped, wherever they are found and before any
+L</exclude_match> additions:
+
+=over 4
+
+=item *
+
+Any C<< <name>.local.<ext> >> file (for example C<settings.local.json>,
+C<skilletor.local.json>, C<CLAUDE.local.md>, or a backup such as
+C<settings.local.json.bak>) — machine-local overrides, not agent content.
+Skilletor-installed agents and rules named C<< .local.<name>.md >> (leading
+dot) are content and are kept.
+
+=item *
+
+C<.credentials.json> and C<auth.json> — harness login tokens.
 
 =item *
 
@@ -263,7 +339,7 @@ entry that is itself a symlink is still read.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-dist-zilla-plugin-gatheragentcontext/issues>.
 
 =head1 CONTRIBUTING

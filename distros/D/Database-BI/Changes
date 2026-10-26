@@ -1,5 +1,81 @@
 Revision history for Database-BI
 
+0.017.1	Sun Oct 25 09:23:34 PM EDT 2026
+	[ Bug Fixes ]
+	- script/database-bi: shebang is perl again; the script starts morbo
+	  itself when given no arguments.  0.017.0's morbo shebang caused each
+	  worker to spawn another morbo, growing PERL5LIB until exec failed with
+	  E2BIG.
+	- GET /map: HTML::OSM older than 0.12 now produces a warning page instead
+	  of a 500.  0.017.0 passed search => 0 and max_zoom unconditionally;
+	  older HTML::OSM rejected the unknown keys.
+	- GET /map: ?agg= removed (it was accepted and ignored).
+	- /join: schema-type mismatch warnings now fire correctly.  DataSource
+	  delegates schema() to its inner backend; the controller compares types
+	  across join steps and reports differing columns.
+	- data_dir may be absolute.  A relative value is still resolved against
+	  the application home; an absolute one was previously appended to it.
+	- Database::BI::Extract: removed unused _get_or_build_extract; corrected
+	  class docs (the web app does not materialise extracts).
+	- script/bi-alert: corrected docs -- it writes to STDOUT, not email.
+	  --dry-run is accepted for compatibility only.
+	- Parallel test runs (HARNESS_OPTIONS=j10) are now deterministic.  Upload
+	  staging moved to a per-deployment uploads_dir config key (.uploads by
+	  default); test files each use their own temp directory.
+	- Browser fixture: selector quoting no longer depends on the JSON
+	  backend's allow_nonref setting.
+	- t/integration.t: %INC restored after Test::Without::Module block,
+	  eliminating "Subroutine ... redefined" noise.
+	- Every page now sets <html lang> from the resolved language.  36 render
+	  calls were missing the stash key.
+	- Geo::Coder::Free minimum raised to 0.48 throughout (floor constant,
+	  error messages, docs).  The floor was 0.47, but 0.48 introduced the
+	  per-lookup read counts the application uses.
+	- _resolve_language now falls back to the default language when the
+	  resolved code has no template directory, as documented.
+	[ New Features ]
+	- GET /map: ?size=<col> draws bubble markers scaled 6-30 px.
+	- GET /map: ?series=<col>&scheme=<name> colours markers by category with
+	  a legend.  Mutually exclusive with ?color=.
+	[ Documentation ]
+	- Complete /map parameter reference; HTML::OSM 0.12 floor;
+	  Nominatim search always suppressed.
+	- "Command-line tools" section covering all three scripts.
+	- Canvas, analyses API, sharing/embedding, catalog, insights, ask,
+	  summary and geo endpoints (previously README-only).
+	[ Tests ]
+	- t/launcher.t: asserts perl shebang on every shipped script.
+	- t/map.t and t/integration.t: drive both renderer states via the
+	  controller's _map_renderer_version probe.
+	- t/edge_cases.t: covers uploads_dir resolution (absolute, relative, unset).
+	- t/map.t: covers the canvas in both renderer states.
+	- Every test file now gives the app its own model_dir temp directory.
+	- t/browser-canvas-map-degraded.t: browser test for the degraded map card.
+	- Map-rendering assertions in t/map.t, t/integration.t and t/unit.t now
+	  require HTML::OSM 0.12 (not merely installed).
+	- browser.yml: no-renderer, no-renderer-canvas, no-geocoder and renderer
+	  jobs added; each pins or verifies one optional module.
+	- BI::Test::Browser: config keys written before app startup; fixture
+	  builds a language home for non-shipped locales; app_setup coderef
+	  supported.
+	- t/browser-fixture.t: checks fixture behaviour without a browser.
+	- t/browser-map-page-renderer.t, t/browser-map-geocoder.t,
+	  t/browser-canvas-map-geocoder.t: browser coverage for optional-module
+	  degraded states.
+	- t/browser-offline-assets.t: skips map assertions below HTML::OSM 0.12;
+	  adds D3-drawn bar assertions.
+	- t/recommended-versions.t: asserts tests and application code gate
+	  recommended modules at the declared version floor.
+	- t/browser-language.t: browser coverage for configured, default and
+	  fallback languages.
+	- .github/workflows/actionlint.yml: lints all workflows on push/PR
+	  (pinned actionlint 1.7.12 + shellcheck 0.10.0); fixed 24 shellcheck
+	  findings in existing workflows.
+	- browser.yml: keyboard job handles missing HTML::OSM without failing;
+	  browser-map-panel.t no longer dies when a card has no script.
+	- Every browser job publishes a coverage report to the job summary.
+	- t/workflow-browser.t: guards the renderer job's file list.
+
 0.017.0	Sat Oct 24 06:12:53 PM EDT 2026
 	[ New Features ]
 	- GET /geo/list, POST /geo/save, POST /geo/delete: coordinate-column

@@ -1,0 +1,631 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::TVar - A versioned cell whose reads and writes commit all at once
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically retry];
+    use Acme::Parataxis::TVar;
+    my $account = Acme::Parataxis::TVar->new( value => 5 );
+    async {
+        my $taker = fiber {
+            atomically {
+                my $have = $account->get;
+                retry if $have < 10;              # not enough yet: park until there is
+                $account->set( $have - 10 );
+                return 'took 10';
+            }
+        };
+        await_sleep( 10 );
+        say 'parked, and the account reports ', $account->waiters, ' waiter(s)';
+        atomically { $account->set( $account->get + 20 ) };
+        say $taker->await, ', leaving ', $account->value;
+    };
+    # parked, and the account reports 1 waiter(s)
+    # took 10, leaving 15
+
+=head1 DESCRIPTION
+
+A TVar is a mutable cell with a version number. You do not read and write it directly; you open a B<transaction> around
+the work with C<atomically> and go through C<get> and C<set>. Nothing takes effect until the outermost transaction
+commits, and when it does, every write in it lands together or none of them does.
+
+That is the whole point. Two fibers cannot interleave halfway through a pair of writes, because the pair is not two
+writes - it is one commit. A transfer that reads two accounts and writes two accounts is atomic as a unit, so a second
+fiber working on the same accounts either sees it whole or not at all. There is no lock to take and nothing to release.
+
+The cost is that the block may not run once. It is re-run whenever a TVar it read was committed by someone else in the
+meantime, and it is abandoned and re-run from the top when it calls C<retry>. A transaction is therefore not a place
+for side effects you cannot repeat: no printing, no file handles, no C<put> on a channel. L</"The block may run many
+times"> is the habit that follows from that.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $a = Acme::Parataxis::TVar->new( value => 100 );
+    my $b = Acme::Parataxis::TVar->new( value => 0 );
+    async {
+        my @jobs = map {
+            fiber {
+                atomically {
+                    my $from = $a->get;
+                    my $to   = $b->get;
+                    await_sleep( 2 );
+                    $a->set( $from - 25 );
+                    $b->set( $to + 25 );
+                    return 1;
+                }
+            }
+        } 1 .. 4;
+        $_->await for @jobs;
+        say 'a = ', $a->value, ', b = ', $b->value;
+    };
+    # a = 0, b = 100
+
+Four fibers each moved 25 out of the same account, and every 25 arrived. No fiber saw a half-finished transfer, and the
+total is unchanged.
+
+=head1 METHODS
+
+=head2 C<new( value => $v )>
+
+    use v5.40;
+    use Acme::Parataxis::TVar;
+    my $count = Acme::Parataxis::TVar->new( value => 0 );
+    say 'starting at ', $count->value, ', version ', $count->version;
+    my $text = Acme::Parataxis::TVar->new( value => 'anything' );
+    say 'the value is not type-checked: ', $text->value;
+    # starting at 0, version 0
+    # the value is not type-checked: anything
+
+Creates a cell holding C<$v>. C<value> is required - there is no sensible default - and it is stored as given, so any
+scalar will do. A new cell is at version 0.
+
+C<version> is not a constructor parameter, and neither is anything else. The check for an unrecognised key never gets a
+chance to run when C<value> is missing, because that is reported first.
+
+    use v5.40;
+    use Acme::Parataxis::TVar;
+    for my $args ( [ 'value' => 1 ], [ 'version' => 3 ], [] ) {
+        my $label = @$args ? join ' ', @$args : 'nothing at all';
+        my $built = eval { Acme::Parataxis::TVar->new( @$args ); 'ok' };
+        say "new( $label ): ", ( $@ ? 'croaks' : $built );
+    }
+    # new( value 1 ): ok
+    # new( version 3 ): croaks
+    # new( nothing at all ): croaks
+
+=head2 C<get( )>
+
+    use v5.40;
+    use Acme::Parataxis qw[async atomically];
+    use Acme::Parataxis::TVar;
+    my $cell = Acme::Parataxis::TVar->new( value => 10 );
+    async {
+        say 'read: ', atomically { $cell->get };
+        say 'and the version is still ', $cell->version;
+        say 'read-your-writes: ', atomically { $cell->set( 5 ); $cell->get };
+        say 'once committed, the version is ', $cell->version;
+    };
+    # read: 10
+    # and the version is still 0
+    # read-your-writes: 5
+    # once committed, the version is 1
+
+Reads the cell and journals the read against the enclosing transaction. Off a scheduled fiber it croaks with C<TVar
+operations must occur inside a scheduled fiber>; on one but outside C<atomically> it croaks with C<TVar operations must
+occur inside an atomically block>.
+
+Two things make this different from C<value>. It reads your own writes, so a C<set> earlier in the same transaction is
+what a later C<get> returns. And the read is B<journaled>, which is what makes the transaction safe: if anyone commits
+this cell between your read and your commit, the whole block is re-run rather than allowed to write on top of a value
+it has not seen.
+
+=head2 C<set( $v )>
+
+    use v5.40;
+    use Acme::Parataxis qw[async atomically];
+    use Acme::Parataxis::TVar;
+    my $cell = Acme::Parataxis::TVar->new( value => 10 );
+    async {
+        my $given = atomically { $cell->set( 'replaced' ) };
+        say 'set returns the value it was given: ', $given;
+        say 'and the cell holds ', $cell->value;
+        for my $v ( 0, '', undef ) {
+            my $falsy = Acme::Parataxis::TVar->new( value => 1 );
+            atomically { $falsy->set($v) };
+            my $shown = defined $falsy->value ? "'" . $falsy->value . "'" : 'undef';
+            say 'a false value commits fine: ', $shown;
+        }
+    };
+    # set returns the value it was given: replaced
+    # and the cell holds replaced
+    # a false value commits fine: '0'
+    # a false value commits fine: ''
+    # a false value commits fine: undef
+
+Stages C<$v> as this transaction's new value and returns it. The committed value is untouched until the outermost
+transaction commits, so a C<set> inside the block is invisible to C<value> and to every other fiber until then.
+
+C<set> and C<get> have the same two guards, and neither is special about falsy values - C<0>, the empty string and
+C<undef> all commit as themselves.
+
+=head2 C<value> and C<version>
+
+    use v5.40;
+    use Acme::Parataxis qw[async atomically];
+    use Acme::Parataxis::TVar;
+    my $cell = Acme::Parataxis::TVar->new( value => 3 );
+    say 'before anything: ', $cell->value, ' at version ', $cell->version;
+    async {
+        atomically { $cell->set( 4 ) };
+        say 'after one commit: ', $cell->value, ' at version ', $cell->version;
+        atomically { $cell->set( 4 ) };
+        say 'and after setting the same value again: ', $cell->value, ' at version ', $cell->version;
+    };
+    # before anything: 3 at version 0
+    # after one commit: 4 at version 1
+    # and after setting the same value again: 4 at version 2
+
+C<value> is the committed value, readable from anywhere with no transaction and no fiber. It is for inspection - tests,
+logging, reporting - and it is B<not> a transactional read: it does not journal anything, so a C<set> computed from it
+can silently overwrite someone else's work. L</"value is not a transactional read"> has the demonstration, and it is
+the single easiest way to get this module wrong.
+
+C<version> is the conflict detector's input, bumped by every commit whether or not the value actually changed. Both are
+readers, so both work off a scheduled fiber as well as on one.
+
+=head2 C<waiters>
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically retry];
+    use Acme::Parataxis::TVar;
+    my $queue = Acme::Parataxis::TVar->new( value => 0 );
+    async {
+        my $hungry = fiber {
+            atomically {
+                my $have = $queue->get;
+                retry if $have == 0;         # park until the cell is written
+                return "woke up and found $have";
+            }
+        };
+        await_sleep( 10 );
+        say 'one fiber is parked in retry, so waiters is ', $queue->waiters;
+        atomically { $queue->set( 1 ) };
+        say $hungry->await;
+        say 'and after the commit that woke it, waiters is ', $queue->waiters;
+    };
+    # one fiber is parked in retry, so waiters is 1
+    # woke up and found 1
+    # and after the commit that woke it, waiters is 0
+
+How many fibers are parked in C<retry> with this cell in their read set. It is a plain method and works off a fiber,
+and like C<waiters> elsewhere in L<Acme::Parataxis::Sync> it drops the moment the queue is served rather than when the
+waiters run.
+
+=head1 Transactions
+
+C<atomically> and C<retry> are not TVar methods. They are exported from L<Acme::Parataxis> and a TVar is what they
+operate on, so they are documented here because you cannot use this class without them.
+
+=head2 C<atomically( sub { ... } )>
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $a = Acme::Parataxis::TVar->new( value => 0 );
+    my $b = Acme::Parataxis::TVar->new( value => 0 );
+    async {
+        atomically {
+            $a->set( 1 );
+            my $inner = atomically { $b->set( 2 ); 'the inner block ran' };
+            say $inner;
+            say 'but b is not committed yet: ' . $b->value . ' at version ' . $b->version;
+        };
+        say 'now it is: b = ' . $b->value . ' at version ' . $b->version;
+    };
+    # the inner block ran
+    # but b is not committed yet: 0 at version 0
+    # now it is: b = 2 at version 1
+
+Runs the block as one transaction on the calling fiber and returns whatever the block returns, in the caller's context.
+Off a scheduled fiber it croaks with C<atomically() must be called from inside a scheduled fiber>.
+
+A nested C<atomically> does not start a second transaction - it joins the one already running. The inner block's writes
+go into the same write set, and the two commit together at the outer boundary. There is no way to commit part of a
+transaction.
+
+The sub has a C<(&)> prototype, so C<< atomically { ... } >> and C<< atomically( sub { ... } ) >> are both fine and C<<
+Acme::Parataxis->atomically( sub { ... } ) >> works too. What you cannot do is pass a non-CODE: that is caught by the
+parser rather than at runtime. The prototype also means the block form needs a terminating semicolon if any statement
+follows it - L</"A block form needs its semicolon"> explains why.
+
+=head2 C<retry( )>
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically retry];
+    use Acme::Parataxis::TVar;
+    my $queue = Acme::Parataxis::TVar->new( value => 0 );
+    my $runs  = 0;
+    async {
+        my $worker = fiber {
+            atomically {
+                $runs++;
+                retry if $queue->get == 0;        # nothing to do: come back later
+                $queue->set( $queue->get - 1 );
+                return 'a worker took one';
+            }
+        };
+        await_sleep( 10 );
+        atomically { $queue->set( $queue->get + 1 ) };
+        say $worker->await, ', after ', $runs, ' run(s) of the block';
+    };
+    # a worker took one, after 2 run(s) of the block
+
+Abandons the current transaction, parks the fiber until one of the TVars it read is committed, and then re-runs the
+block from the top. It is how you wait for a condition without polling and without holding anything.
+
+There are three ways to get it wrong, and all three are checked. Off a scheduled fiber it croaks with C<retry() must be
+called from inside a scheduled fiber>. Outside a transaction it croaks with C<TVar operations must occur inside an
+atomically block>. And with nothing read it croaks with C<retry with an empty read set would never wake; read at least
+one TVar before retry()> - which is the useful one, because the cell it names as the reason is exactly the cell the
+caller has to read to have a condition to wait on.
+
+C<retry> inside a nested C<atomically> aborts the whole transaction, not just the inner block. See L</"A nested retry
+discards the outer block">.
+
+=head1 How It Works
+
+The state is two values and a list. C<value> is what everyone else sees, C<version> counts the commits, and C<waiters>
+is the fiber ids currently parked on this cell.
+
+The transaction itself is not on the TVar at all. It lives in a slot on the calling fiber's locals stash, keyed so it
+cannot collide with a L<Acme::Parataxis::Local> id, and it holds two maps and a list. The maps are keyed by the cell's
+reference address, so a transaction can span any number of cells; the list is the cells in the order they were first
+read, and it is what a C<retry> parks on.
+
+C<get> and C<set> are the only two methods that touch the log, and they are deliberately asymmetric:
+
+=over
+
+=item *
+
+C<set> writes into the write set and returns. It never journals a read, so a transaction that only writes cannot
+conflict. L</"value is not a transactional read"> is the same trap reached from the other side.
+
+=item *
+
+C<get> looks in the write set first, so a transaction reads its own writes. Failing that it records C<< [ $cell,
+$version ] >> - but only the first time, because a second C<get> of the same cell has nothing new to protect.
+
+=back
+
+Commit is the interesting part, and it is three steps under a single global mutex. Take the lock, check that every
+journaled read still carries the version it had when it was read, and only then flush the write set. Each flush
+publishes the value, bumps that cell's version, and wakes the fibers parked on it. The mutex is never contended in a
+cooperative scheduler because the commit never yields.
+
+All-or-nothing is what makes this deadlock-proof. Two transactions that want the same two cells cannot be half-applied
+and cannot wait for each other: one takes the commit lock, the other either finds a stale read and re-runs or waits for
+the lock and then finds a stale read. Either way somebody re-runs, and a re-run recomputes from committed values rather
+than resuming from a broken intermediate state.
+
+A failed check is not an error. C<_atomically> wipes the log and runs the block again, which is why the block has to be
+safe to repeat. C<retry> takes the other exit: it throws an internal control-flow exception, the transaction parks on
+its read set, and the loop starts over with a fresh log.
+
+=head1 Recipes
+
+=head2 Moving a value between two cells
+
+The shape the module exists for. Read both cells, do the work, write both back - and the pair is committed together, so
+no fiber ever sees one account debited without the other credited.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $wallet  = Acme::Parataxis::TVar->new( value => 100 );
+    my $savings = Acme::Parataxis::TVar->new( value => 0 );
+    async {
+        my @depositors = map {
+            fiber {
+                atomically {
+                    my $from = $wallet->get;
+                    my $to   = $savings->get;
+                    await_sleep( 2 );
+                    $wallet->set( $from - 20 );
+                    $savings->set( $to + 20 );
+                    return 1;
+                }
+            }
+        } 1 .. 3;
+        $_->await for @depositors;
+        say 'wallet = ', $wallet->value . ', savings = ', $savings->value
+            . ', total = ' . ( $wallet->value + $savings->value );
+    };
+    # wallet = 40, savings = 60, total = 100
+
+The C<await_sleep> is there on purpose: it opens the window in which the three transactions collide, so the run really
+does exercise the re-run path rather than getting lucky.
+
+=head2 A read-modify-write that cannot lose an update
+
+Incrementing a counter is the smallest thing that can go wrong, and the difference between doing it with C<get> and
+doing it with C<value> is the whole module.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $counter = Acme::Parataxis::TVar->new( value => 0 );
+    my $runs = 0;
+    async {
+        my @workers = map {
+            fiber {
+                atomically {
+                    $runs++;
+                    my $seen = $counter->get;      # the transactional read
+                    await_sleep( 5 );
+                    $counter->set( $seen + 1 );
+                    return 1;
+                }
+            }
+        } 1 .. 4;
+        $_->await for @workers;
+        say 'the counter is ', $counter->value, ', and the block ran ', $runs, ' time(s)';
+    };
+    # the counter is 4, and the block ran 10 time(s)
+
+Ten runs for four increments is normal, not a defect: every one of those fibers reads and writes the same cell, so each
+commit is checked against the one before it and the losers start again. The counter is right, which is the only thing
+that matters - but a cell that every fiber fights over is a contention point, and the retry count is the number you
+watch to find it.
+
+=head2 Taking work only when there is some
+
+A work queue as a single cell holding a count. A worker that finds it empty does not spin and does not block forever on
+a lock; it parks on the cell itself and is woken by the commit that makes work available.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically retry];
+    use Acme::Parataxis::TVar;
+    my $queue = Acme::Parataxis::TVar->new( value => 1 );     # one job waiting up front
+    my @log;
+    async {
+        my @workers = map {
+            my $id = $_;
+            fiber {
+                my $attempts = 0;
+                my $got = atomically {
+                    $attempts++;
+                    retry if $queue->get == 0;      # nothing to do: park on the cell
+                    $queue->set( $queue->get - 1 );
+                    return "worker $id took one, on attempt $attempts";
+                };
+                push @log, $got;
+            }
+        } 1 .. 2;
+        await_sleep( 10 );
+        push @log, 'one worker is parked, so the queue reports ' . $queue->waiters . ' waiter(s)';
+        atomically { $queue->set( $queue->get + 1 ) };
+        $_->await for @workers;
+        push @log, 'the queue is left holding ' . $queue->value;
+    };
+    say for @log;
+    # worker 1 took one, on attempt 1
+    # one worker is parked, so the queue reports 1 waiter(s)
+    # worker 2 took one, on attempt 2
+    # the queue is left holding 0
+
+Note where the C<retry> is: B<after> the C<get>, inside the same transaction. That is what puts the cell in the read
+set, and therefore what gives the park something to be woken by. A C<retry> before any read is the empty-read-set croak
+from L</"C<retry( )>">.
+
+=head1 Behavior Notes
+
+=head2 A block form needs its semicolon
+
+C<atomically { ... }> hands the braces to the sub as its block argument, and Perl then keeps collecting arguments after
+the closing brace until it reaches something that cannot be part of a call. A statement on the next line is exactly
+such a thing, so the block runs on as an argument list and the compile fails with a message that names the wrong
+culprit: C<Too many arguments for Acme::Parataxis::atomically>.
+
+    use v5.40;
+    use Acme::Parataxis qw[async atomically];
+    use Acme::Parataxis::TVar;
+    my $cell = Acme::Parataxis::TVar->new( value => 1 );
+    async {
+        atomically { $cell->set( 2 ) };
+        say 'committed, and the value is ', $cell->value;
+    };
+    # committed, and the value is 2
+
+The semicolon after the closing brace is what ends the call. Delete it and the next line is where the error is
+reported, whatever that line happens to be. This is a rule of the C<(&)> prototype rather than of this module - any sub
+taking a block behaves the same way - and it applies just as much to C<async> and C<fiber>. C<< atomically( sub { ... }
+) >> is immune, and so is any block that is the last thing in its enclosing block.
+
+=head2 value is not a transactional read
+
+C<value> is readable from anywhere, which makes it the natural thing to reach for. It does not journal the read, so
+nothing detects a conflict, and a C<set> computed from it overwrites whatever landed in between.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $counter = Acme::Parataxis::TVar->new( value => 0 );
+    async {
+        my @workers = map {
+            fiber {
+                atomically {
+                    my $seen = $counter->value;     # readable, but not journaled
+                    await_sleep( 5 );
+                    $counter->set( $seen + 1 );
+                    return 1;
+                }
+            }
+        } 1 .. 4;
+        $_->await for @workers;
+        say 'four increments, and the counter reads ', $counter->value;
+    };
+    # four increments, and the counter reads 1
+
+Every worker read 0, every worker wrote 1, and three of the four writes were thrown away - silently, with no
+diagnostic, because from the transaction's point of view nothing conflicted. There is no version of this that is merely
+unlucky: a write-only transaction has an empty read set, and an empty read set always validates.
+
+The rule is short. Inside a transaction, read with C<get>. Outside one, read with C<value> and do not write.
+
+=head2 The block may run many times
+
+A transaction is a candidate for re-execution, not a promise of one run. It re-runs on a commit conflict, and C<retry>
+abandons it and starts again from the first line. Anything the block does outside the cells is repeated with it:
+printing, logging, appending to an array, sending on a channel, spending real money.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $counter = Acme::Parataxis::TVar->new( value => 0 );
+    my @side_effects;
+    async {
+        my @workers = map {
+            fiber {
+                atomically {
+                    my $seen = $counter->get;
+                    await_sleep( 5 );
+                    $counter->set( $seen + 1 );
+                    push @side_effects, 'charged';      # once per run, not once per worker
+                    return 1;
+                }
+            }
+        } 1 .. 4;
+        $_->await for @workers;
+        say 'the counter is ', $counter->value, ' but ', scalar @side_effects, ' charges were made';
+    };
+    # the counter is 4 but 10 charges were made
+
+The cell is correct and the ledger is not, and the ledger is the one a customer sees. Compute the new value inside the
+transaction and perform the effect after it, from the committed state.
+
+=head2 A nested retry discards the outer block
+
+C<atomically> blocks nest into one transaction, and C<retry> aborts the transaction. A C<retry> therefore reaches
+further than the block it is written in: any write the enclosing code had staged is thrown away with it.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically retry];
+    use Acme::Parataxis::TVar;
+    my $gate = Acme::Parataxis::TVar->new( value => 0 );
+    my $side = Acme::Parataxis::TVar->new( value => 0 );
+    my $runs = 0;
+    async {
+        my $opener = fiber {
+            await_sleep( 10 );
+            atomically { $gate->set( 1 ) };
+        };
+        atomically {
+            $runs++;
+            unless ( $gate->get ) {
+                $side->set( $side->get + 1 );        # staged, then abandoned
+                atomically { retry() };
+            }
+            $side->set( $side->get + 1 );            # this one commits
+        };
+        $opener->await;
+        say 'the block ran ', $runs, ' time(s) and the side effect landed as ', $side->value;
+    };
+    # the block ran 2 time(s) and the side effect landed as 1
+
+That is usually what you want, and it is worth knowing deliberately rather than discovering. The re-run starts at the
+top of the B<outermost> C<atomically>, so the code before the nested C<retry> runs again from the beginning.
+
+=head2 Reading one cell twice is not a snapshot
+
+Only the first C<get> of a cell in a transaction journals its version, so a second C<get> returns whatever the cell
+holds at that moment - which may be a commit the transaction has not accounted for. The commit check still catches it,
+because the version it recorded has moved, so the block is re-run and the newer value is discarded rather than used.
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep atomically];
+    use Acme::Parataxis::TVar;
+    my $cell = Acme::Parataxis::TVar->new( value => 0 );
+    my $runs = 0;
+    async {
+        my $other = fiber {
+            await_sleep( 10 );
+            atomically { $cell->set( 99 ) };
+        };
+        my $seen = atomically {
+            $runs++;
+            my $first  = $cell->get;
+            $other->await;
+            my $second = $cell->get;
+            return "$first then $second";
+        };
+        say "the block saw $seen, ran $runs time(s), and committed ", $cell->value;
+    };
+    # the block saw 99 then 99, ran 2 time(s), and committed 99
+
+So this is not a correctness trap - the re-run is what makes it safe. It does mean a second C<get> is not a stable
+read, and that a transaction which reads a cell it has already read is doing more work than it looks.
+
+=head2 An error discards the write, and leaves the cell usable
+
+An exception inside a transaction propagates unchanged and takes the staged writes with it. Nothing is committed, no
+retry is attempted, and the cell is exactly as it was.
+
+    use v5.40;
+    use Acme::Parataxis qw[async atomically];
+    use Acme::Parataxis::TVar;
+    my $cell = Acme::Parataxis::TVar->new( value => 1 );
+    async {
+        eval {
+            atomically {
+                $cell->set( 2 );
+                die "the rule was rejected\n";
+            }
+        };
+        my $why = $@;
+        $why =~ s/ at .*//s;
+        say "the error came out intact: $why";
+        say 'nothing was committed: value ', $cell->value, ', version ', $cell->version;
+        say 'and the next transaction is clean: ', atomically { $cell->get };
+    };
+    # the error came out intact: the rule was rejected
+    # nothing was committed: value 1, version 0
+    # and the next transaction is clean: 1
+
+The same holds for a deadline. A C<with_timeout> that fires inside a transaction aborts it, and the log is cleared on
+the way out, so the next C<atomically> on that fiber starts fresh rather than inheriting a half-built transaction.
+
+=head2 A retry park is a real park
+
+C<retry> parks the fiber on an ordinary fiber wait, which means the scheduler's deadlock detection applies to it. A
+fiber waiting for work that will never be queued is indistinguishable from a deadlock, and is reported as one.
+
+That is the correct outcome, and it is a loud one: the alternative - a C<retry> loop that silently spins - is what you
+would be trying to avoid. But it does mean a worker pool needs a way to stop. Either bound the wait with
+C<with_timeout>, or publish a sentinel on the cell that every waiting worker can C<get> and act on.
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis>, L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::Sync::RwLock>,
+L<Acme::Parataxis::Error::Timeout>, L<Acme::Parataxis::Error::Cancelled>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut
+

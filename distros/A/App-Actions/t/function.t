@@ -40,11 +40,13 @@ use App::Actions::I18N qw(i18n throw validate_args);
 use App::Actions::Util qw(load_yaml_mapping mapping normalize_step stringify trim);
 
 # These are white-box tests: they call the _private helpers directly, which
-# Sub::Private forbids everywhere else.  prove bypasses the check through
+# Sub::Private forbids everywhere else, and App::Actions::_runner, which
+# Sub::Protected keeps to subclasses.  prove bypasses both checks through
 # HARNESS_ACTIVE; this makes "perl -Ilib t/function.t" behave the same.
 {
 	no warnings 'once';
 	$Sub::Private::BYPASS = 1;
+	$Sub::Protected::BYPASS = 1;
 }
 
 # Values the tests share, named so that a failure says what was meant.
@@ -894,15 +896,20 @@ subtest 'App::Actions::Process' => sub {
 		# shell sees its arguments; the result is a program that could not
 		# start, as everywhere else.
 		local $^O = 'MSWin32';
-		local $ENV{PATH} = tempdir(CLEANUP => 1);
 		local ($!, $?);
-		is(App::Actions::Process::_system([ 'missing', '& echo pwned' ]), -1, 'a missing program is -1');
-		is($?, -1, 'with $? saying it did not start');
-		is($! + 0, POSIX::ENOENT(), 'and $! saying why');
-		is(App::Actions::Process::exit_code($?), $STATUS{not_started}, 'which is status 255');
+		{
+			local $ENV{PATH} = tempdir(CLEANUP => 1);
+			is(App::Actions::Process::_system([ 'missing', '& echo pwned' ]), -1, 'a missing program is -1');
+			is($?, -1, 'with $? saying it did not start');
+			is($! + 0, POSIX::ENOENT(), 'and $! saying why');
+			is(App::Actions::Process::exit_code($?), $STATUS{not_started}, 'which is status 255');
+		}
 
 		# Windows adds an extension to a path that has none, so Perl must be
 		# named as perl.exe; where $^X has no extension, a link gives it one.
+		# PATH is the real one again: an empty PATH is what makes the program
+		# above missing, but Perl itself may need it to find its DLLs, and
+		# when Windows cannot start it Perl retries through cmd.exe.
 		my $perl = $^X;
 		if ($perl !~ /\.exe\z/i) {
 			$perl = File::Spec->catfile(tempdir(CLEANUP => 1), 'perl.EXE');
@@ -952,7 +959,11 @@ subtest 'App::Actions::Process' => sub {
 	};
 
 	subtest '_redirect_child' => sub {
-		# The routine is for a forked child, so it is tested in one.
+		# The routine is for a forked child, so it is tested in one.  Windows
+		# emulates fork() with a thread of this process, so the child's
+		# redirection would take this test's own standard output and error,
+		# and POSIX::_exit would end the whole test; Process never forks there.
+		return plan(skip_all => 'Process does not fork on Windows') if $^O eq 'MSWin32';
 		my $dir = tempdir(CLEANUP => 1);
 		my $out = File::Spec->catfile($dir, 'child.out');
 		my $pid = fork();
@@ -2019,6 +2030,21 @@ YAML
 			'workflow.defaults_run_invalid', "defaults of job 'j' run must be a mapping", 'the place is named');
 	};
 
+	subtest '_copy' => sub {
+		my $job = { if => !!0, strategy => { 'fail-fast' => !!0 }, steps => [ { run => 'x', env => { A => 1 } } ], name => undef };
+		my $copy = App::Actions::Workflow::_copy($job);
+		is_deeply($copy, $job, 'the same values');
+		$copy->{steps}[0]{env}{A} = 2;
+		push @{ $copy->{steps} }, {};
+		is_deeply($job->{steps}, [ { run => 'x', env => { A => 1 } } ], 'but none of the containers is shared');
+		SKIP: {
+			skip 'Perl has its own booleans from 5.36', 2 if $] < 5.036;
+			no warnings;
+			ok(builtin::is_bool($copy->{if}), 'a core boolean stays one (Storable 3.26, in Perl 5.36, made it a string)');
+			ok(builtin::is_bool($copy->{strategy}{'fail-fast'}), 'however deep it is');
+		}
+	};
+
 	subtest '_expand_matrix' => sub {
 		is_deeply(App::Actions::Workflow::_expand_matrix(undef), [ {} ], 'no matrix is one run');
 		is_deeply(App::Actions::Workflow::_expand_matrix({ b => [ 1, 2 ], a => 'x' }),
@@ -2296,6 +2322,36 @@ subtest 'App::Actions::Cache' => sub {
 		is(App::Actions::Cache::_stamp($_), '-', 'no stamp for ' . explain($_)) for (undef, 'x', -1, '1.5');
 	};
 
+	subtest 'touch' => sub {
+		my $cache = $fresh->();
+		$cache->load->{images} = { kept => { pulls => 3, last_used => 0 } };
+		my $saves = 0;
+		my $guard = mock_scoped('App::Actions::Cache::save' => sub { $saves++; 1 });
+		is($cache->touch('kept', 'kept', 'other', undef, ''), 2, 'each recorded name counts, others are skipped');
+		is_deeply([ sort keys %{ $cache->load->{images} } ], [ 'kept' ], 'nothing is added');
+		is($cache->load->{images}{kept}{pulls}, 3, 'the count stays');
+		cmp_ok($cache->load->{images}{kept}{last_used}, '>', 0, 'the last use moves on');
+		is($saves, 1, 'and it is saved once');
+		is($cache->touch('other'), 0, 'nothing recorded, nothing touched');
+		is($saves, 1, 'and nothing saved');
+	};
+
+	subtest '_presence' => sub {
+		my ($size, $exists, @asked) = (undef, 1);
+		my $docker = bless {}, 'App::Actions::Docker';
+		my $sized = mock_scoped('App::Actions::Docker::image_size' => sub { push @asked, 'size'; $size });
+		my $there = mock_scoped('App::Actions::Docker::image_exists' => sub { push @asked, 'exists'; $exists });
+
+		$size = 10;
+		is_deeply([ App::Actions::Cache::_presence($docker, 'i') ], [ 10, 1 ], 'a size means the image is there');
+		is_deeply(\@asked, [ 'size' ], 'without asking again');
+		($size, @asked) = (undef);
+		is_deeply([ App::Actions::Cache::_presence($docker, 'i') ], [ undef, 1 ], 'no size, but there: present, size unknown');
+		is_deeply(\@asked, [ 'size', 'exists' ], 'which is asked about');
+		$exists = 0;
+		is_deeply([ App::Actions::Cache::_presence($docker, 'i') ], [ undef, 0 ], 'no size and not there: missing');
+	};
+
 	subtest 'report' => sub {
 		my $cache = $fresh->();
 		like($cache->report, qr/No images have been cached yet\.\n\z/, 'an empty cache says so');
@@ -2503,11 +2559,30 @@ subtest 'App::Actions::Check' => sub {
 	my $daemon = sub {
 		@answers = @_;
 		@asked = ();
-		my $answer = sub { push @asked, [ @_[ 1 .. $#_ ] ]; return @{ shift(@answers) || [ '', 1 ] } };
+		my $answer = sub { 
+			push @asked, [ @_[ 1 .. $#_ ] ];
+			my ($output, $status) = @{ shift(@answers) || [ '', 1 ] };
+			return (ref $output eq 'CODE' ? $output->(@_[ 1 .. $#_ ]) : $output, $status);
+		};
 		return mock_scoped(
 			'App::Actions::Docker::capture_silent' => $answer,
 			'App::Actions::Docker::capture' => $answer,
 		);
+	};
+	# The probe container's answer: the token the check wrote, read back from
+	# the directory it mounts as a container would, then the rest.  The check
+	# makes its token as it runs, so one made beforehand differed whenever a
+	# second ticked over in between.
+	my $marker = sub {
+		my ($rest) = @_;
+		return sub {
+			my ($mount) = grep { m{:/action-run-check\z} } @_;
+			(my $host = $mount) =~ s{:/action-run-check\z}{};
+			open my $handle, '<', File::Spec->catfile($host, 'marker') or die "cannot read the marker: $!";
+			my $token = do { local $/; <$handle> };
+			close $handle;
+			return "$token\n$rest";
+		};
 	};
 	my $text = '';
 	my $check = sub {
@@ -2528,7 +2603,7 @@ subtest 'App::Actions::Check' => sub {
 	};
 
 	subtest 'run' => sub {
-		my $guard = $daemon->([ "27.0\n", 0 ], [ "27.0\n", 0 ], [ "linux\n", 0 ], [ (join '-', time, $$) . "\n", 0 ]);
+		my $guard = $daemon->([ "27.0\n", 0 ], [ "27.0\n", 0 ], [ "linux\n", 0 ], [ $marker->(''), 0 ]);
 		my $object = $check->();
 		is($object->run, 0, 'everything ready is 0');
 		like($text, qr/\Aaction-run check\n/, 'the report has a title');
@@ -2540,7 +2615,7 @@ subtest 'App::Actions::Check' => sub {
 		like($text, qr/^  problem   the Docker command 'docker' could not be run$/m, 'and is printed even when quiet');
 		like($text, qr/^Result: not ready \(1 problem\)$/m, 'with a count');
 
-		$guard = $daemon->([ "27.0\n", 0 ], [ "27.0\n", 0 ], [ "linux\n", 0 ], [ (join '-', time, $$) . "\n", 0 ]);
+		$guard = $daemon->([ "27.0\n", 0 ], [ "27.0\n", 0 ], [ "linux\n", 0 ], [ $marker->(''), 0 ]);
 		$object = $check->(quiet => 1);
 		is($object->run, 0, 'a quiet check that passes');
 		is($text, '', 'prints nothing');
@@ -2604,9 +2679,8 @@ subtest 'App::Actions::Check' => sub {
 
 	subtest '_check_mounts' => sub {
 		my $docker = App::Actions::Docker->new(bin => 'docker');
-		my $token = join '-', time, $$;
 		{
-			my $guard = $daemon->([ "$token\n0\n", 0 ]);
+			my $guard = $daemon->([ $marker->("0\n"), 0 ]);
 			is($check->()->_check_mounts($docker), 1, 'the marker comes back');
 			like($text, qr{^  mount     .+ -> /action-run-check: OK$}m, 'the mount is reported');
 			ok(grep({ $_ eq '--network' } @{ $asked[0] }), 'the probe has no network');
@@ -2625,19 +2699,19 @@ subtest 'App::Actions::Check' => sub {
 		my $project = tempdir(CLEANUP => 1);
 		write_file($_, 'x', $project) for qw(a b);
 		{
-			my $guard = $daemon->([ "$token\n2\n", 0 ]);
+			my $guard = $daemon->([ $marker->("2\n"), 0 ]);
 			is($check->(directory => $project)->_check_mounts($docker), 1, 'the project shows the same entries');
 			like($text, qr/OK \(2 entries\)/, 'and says how many');
 		}
 		{
-			my $guard = $daemon->([ "$token\n0\n", 0 ]);
+			my $guard = $daemon->([ $marker->("0\n"), 0 ]);
 			my $object = $check->(directory => $project);
 			is($object->_check_mounts($docker), 0, 'an empty project mount');
 			like($text, qr/sees 0 entries, the host has 2/, 'is a problem');
 			is($object->{data}{mounts}[-1]{ok}, JSON::PP::false(), 'and the mount is marked not OK');
 		}
 		{
-			my $guard = $daemon->([ "$token\nlots\n", 0 ]);
+			my $guard = $daemon->([ $marker->("lots\n"), 0 ]);
 			is($check->(directory => $project)->_check_mounts($docker), 0, 'a count that is not a number');
 			like($text, qr/could not count the entries/, 'is a problem');
 		}
@@ -3233,6 +3307,12 @@ subtest 'App::Actions::Runner::Parallel' => sub {
 		is($parallel->()->run($plans->(1)), undef, 'one job is run serially');
 		is($parallel->(capacity => 1)->run($plans->(1, 2)), undef, 'so is a capacity of one');
 		is($parallel->()->run([]), undef, 'and no jobs at all');
+		{
+			local $^O = 'MSWin32';
+			is($parallel->()->run($plans->(1 .. 3)), undef, 'and every group on Windows, which has no reliable fork()');
+		}
+		# Everything below forks.
+		return if $^O eq 'MSWin32';
 
 		my @seen;
 		my $object = $parallel->(
@@ -3570,6 +3650,7 @@ subtest 'App::Actions::Runner::Images' => sub {
 			'a present image is used, a missing one pulled');
 		is_deeply($result->{failures}, [], 'nothing failed');
 		is_deeply($object->pulled, [ 'postgres:16' ], 'and the pulled one is remembered');
+		is_deeply($object->used, [ 'postgres:16', 'ubuntu:latest' ], 'both are used, the present one too');
 		is_deeply($object->{docker}{many}, [ [ 'postgres:16' ], { concurrency => $object->concurrency } ], 'all at once, at the concurrency');
 		ok(!grep({ exists $_->{present} } @{ $result->{records} }), 'the working field is removed');
 
@@ -3635,9 +3716,11 @@ subtest 'App::Actions::Runner::Images' => sub {
 		$object = $images->(docker => Local::ImageDocker->new(present => { 'x:1' => 1 }));
 		is($object->ensure('x:1'), 1, 'a present image');
 		is_deeply($object->{docker}{pulls}, [], 'is not pulled');
+		is_deeply($object->used, [ 'x:1' ], 'but is used');
 		$object->ensure('y:1');
 		$object->ensure('y:1');
 		is_deeply($object->{docker}{pulls}, [ 'y:1' ], 'a missing one is pulled once per run');
+		is_deeply($object->used, [ 'x:1', 'y:1' ], 'and used');
 		$object = $images->(docker => Local::ImageDocker->new(present => { 'x:1' => 1 }), pull => 1);
 		$object->ensure('x:1');
 		is_deeply([ $object->{docker}{pulls}, $object->pulled ], [ [ 'x:1' ], [] ], '--pull refreshes, without marking it for removal');
@@ -3646,6 +3729,7 @@ subtest 'App::Actions::Runner::Images' => sub {
 		$object = $images->(dry_run => 1);
 		is($object->ensure('z:1'), 1, 'a dry run does nothing');
 		is_deeply($object->{docker}{pulls}, [], 'and pulls nothing');
+		is_deeply($object->used, [], 'or uses');
 	};
 
 	subtest 'probe' => sub {
@@ -3673,6 +3757,18 @@ subtest 'App::Actions::Runner::Images' => sub {
 		$images->()->remember($cache);
 		$images->(dry_run => 1)->note_pulled('c:1')->remember($cache);
 		is_deeply(\@remembered, [], 'nothing pulled, or a dry run, records nothing');
+
+		my @touched;
+		my $touch = mock_scoped('App::Actions::Cache::touch' => sub { shift; push @touched, @_; 1 });
+		$images->()->note_pulled('a:1')->note_used('a:1', 'c:1')->remember($cache);
+		is_deeply([ \@remembered, \@touched ], [ [ 'a:1' ], [ 'c:1' ] ], 'a pulled image is remembered, a reused one touched');
+		@remembered = @touched = ();
+		$images->()->note_used('c:1')->remember($cache);
+		is_deeply([ \@remembered, \@touched ], [ [], [ 'c:1' ] ], 'with nothing pulled, only touched');
+		@touched = ();
+		$images->(dry_run => 1)->note_used('c:1')->remember($cache);
+		is_deeply(\@touched, [], 'and not in a dry run');
+		undef $touch;
 		undef $guard;
 
 		$guard = mock_scoped('App::Actions::Cache::remember' => sub { die "disk full\n" });

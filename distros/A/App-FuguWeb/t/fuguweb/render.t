@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ex:ts=8 sw=4:
-# App::FuguWeb::Render: the probe, the lint, the mandoc options, and the
-# Markdown render.
+# App::FuguWeb::Render: the probe, the lint, the mandoc options, the
+# Markdown render, and the arguments of pod2man.
 #
 # The test builds its sources in a File::Temp directory. It never reads
 # the repository, so a change under man/ cannot break it.
@@ -34,7 +34,7 @@ sub quiet ()
 
 # config($rc):
 #	Load a description in a new temporary project.
-sub config ( $rc = "site = Example\n" )
+sub config ( $rc = "site = Example\nurl = https://example.org/\n" )
 {
 	my $root = tempdir( CLEANUP => 1 );
 	open my $fh, '>', "$root/.fuguwebrc"
@@ -75,25 +75,26 @@ subtest 'the probe names the first tool that is absent' => sub {
 	is( $render->probe, undef, 'three programs that exist pass' );
 };
 
-subtest 'the mandoc options carry the configured OS and manual URL' => sub {
+subtest 'the mandoc options carry the manual URL' => sub {
 	my $render = App::FuguWeb::Render->new( config => config( <<'RC' ) );
-site      = Example
-mandoc_os = Example OS
-man_url   = https://man.example.org/
+site    = Example
+url     = https://example.org/
+man_url = https://man.example.org/
 RC
 
-	my @options = $render->html_options;
-	my $joined  = join ' ', @options;
-
-	# -I os= pins the footer. Without it the page would name the
-	# operating system of the machine that built the site.
-	like( $joined, qr/\Qos=Example OS\E/, 'the OS is pinned' );
-
 	# The './' matters: a browser reads a relative URL whose first
-	# segment holds a colon as a scheme.
-	like( $joined, qr{\Qman=./%N.%S.html;https://man.example.org/%N.%S\E},
-		'a local link stays local and a remote one leaves' );
-	like( $joined, qr/fragment/, 'the output is a body fragment' );
+	# segment holds a colon as a scheme. The fit of
+	# App::FuguWeb::Fragment removes the foot, so no option names the
+	# operating system that the foot shows.
+	is_deeply(
+		[ $render->html_options ],
+		[
+			'-Thtml', '-O',
+			'fragment,man=./%N.%S.html;https://man.example.org/%N.%S'
+		],
+		'a body fragment, where a local link stays local and a remote'
+		    . ' one leaves'
+	);
 };
 
 SKIP: {
@@ -195,5 +196,85 @@ SKIP: {
 		like( $html, qr{<kbd>x</kbd>}, 'an HTML span stays' );
 	};
 }
+
+subtest 'each output decodes, and one that is not UTF-8 fails' => sub {
+	# WEB-SITE-5. A renderer writes UTF-8, and the build reads its
+	# output as characters. The message names the renderer and the
+	# source.
+	my $dir = tempdir( CLEANUP => 1 );
+	my %script = (
+		good => "printf 'voil\\303\\240\\n'",
+		bad  => "printf 'caf\\351\\n'",
+	);
+	for my $name ( sort keys %script ) {
+		open my $fh, '>', "$dir/$name" or die "Cannot write: $!";
+		print {$fh} "#!/bin/sh\n$script{$name}\n";
+		close $fh;
+		chmod 0755, "$dir/$name" or die "Cannot chmod: $!";
+	}
+
+	my $render = App::FuguWeb::Render->new(
+		config  => config(),
+		log     => quiet(),
+		lowdown => "$dir/good",
+	);
+	is( $render->markdown('page.md'), "voil\x{e0}\n",
+		'an output of UTF-8 reads as characters' );
+
+	my $said = '';
+	open my $saved, '>&', \*STDERR or die "Cannot save stderr: $!";
+	close STDERR;
+	open STDERR, '>', \$said or die 'Cannot capture stderr';
+
+	$render = App::FuguWeb::Render->new(
+		config  => config(),
+		log     => Fugu::Log->new,
+		lowdown => "$dir/bad",
+	);
+	my $html = $render->markdown('page.md');
+
+	close STDERR;
+	open STDERR, '>&', $saved or die "Cannot restore stderr: $!";
+
+	is( $html, undef, 'an output that is not UTF-8 fails' );
+	like( $said,
+		qr/the output of lowdown for page\.md is not valid UTF-8 at byte 3/,
+		'and the message names the renderer and the source' );
+};
+
+subtest 'pod2man takes --utf8 and the sidecar alone' => sub {
+	# WEB-SITE-5. Without --utf8, podlators 4.14 of perl 5.36 writes
+	# X or a roff escape for each character outside ASCII. The name,
+	# the section, the date, the center text and the release go to
+	# the head and the foot alone, which the fit removes, per D-07.
+	# A stub pod2man records its arguments, and a stub mandoc passes
+	# its input through.
+	my $dir = tempdir( CLEANUP => 1 );
+	my %script = (
+		pod2man => q{printf '%s\n' "$@" > "$0.args"; echo page},
+		mandoc  => 'cat',
+	);
+	for my $name ( sort keys %script ) {
+		open my $fh, '>', "$dir/$name" or die "Cannot write: $!";
+		print {$fh} "#!/bin/sh\n$script{$name}\n";
+		close $fh;
+		chmod 0755, "$dir/$name" or die "Cannot chmod: $!";
+	}
+
+	my $render = App::FuguWeb::Render->new(
+		config  => config(),
+		log     => quiet(),
+		mandoc  => "$dir/mandoc",
+		pod2man => "$dir/pod2man",
+	);
+	is( $render->pod('Foo.pod'), "page\n", 'the sidecar renders' );
+
+	open my $fh, '<', "$dir/pod2man.args" or die "Cannot read: $!";
+	my @args = <$fh>;
+	close $fh;
+	chomp @args;
+	is_deeply( \@args, [ '--utf8', 'Foo.pod' ],
+		'and pod2man takes --utf8 and the sidecar, and no other argument' );
+};
 
 done_testing();

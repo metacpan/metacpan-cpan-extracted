@@ -6,7 +6,11 @@
 # reader reaches it from the table they are looking at.  It opens a fixture
 # with latitude and longitude columns, opens the Map panel with the toolbar
 # button, watches the panel choose those columns, switches to the place-name
-# mode and back, and submits with Enter.  The assertions are on what the
+# mode and back, and submits with Enter.
+#
+# Drawing the card needs the optional HTML::OSM, so the checks that need a drawn
+# map are skipped where it is not installed rather than failed: the panel flow
+# they sit in is what this file is for, and it holds in either state.  The assertions are on what the
 # browser did: the panel's visibility, the controls' disabled state, and the
 # URL and page that followed the form.
 #
@@ -36,9 +40,19 @@ path($csv)->spurt(
 	. "Beta,51.92,0.75,53.5,-2.5,two\n"
 );
 
-my $browser = BI::Test::Browser->new;
-my $ua      = $browser->ua;
-my $BASE    = $browser->base;
+my $browser = new_ok('BI::Test::Browser');
+my $ua      = $browser->ua();
+my $BASE    = $browser->base();
+
+# Drawing a map card needs HTML::OSM 0.12 or later on the server.  Without it
+# the card carries the note saying so and no map element at all - which is a
+# different state from Leaflet's script not arriving, where the card has its
+# element and its own script and only the drawing is missing, and which is why
+# the checks below are guarded on this rather than on typeof L.
+# t/browser-canvas-map-degraded.t is the page test for the state without a
+# renderer; here it is skipped, so the panel flow is still proved on a machine
+# that has none - the keyboard job's runner is one.
+my $have_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
 
 $browser->navigate('/open?path=' . url_escape($csv));
 ok $browser->wait_for(sub { $browser->js("return !!document.getElementById('btn-map');") }),
@@ -120,8 +134,12 @@ unlike $query, qr/[?&]loc=/, 'and not the place column from the other mode';
 like $query, qr/[?&]l=path%3A/, 'for the table the panel was opened from';
 like $query, qr/[?&]back=/, 'with a way back to that table';
 
-my $summary = $browser->js("return document.querySelector('.map-summary') && document.querySelector('.map-summary').textContent;");
-like($summary // '', qr/Plotting 2 markers for 2 of 2 rows from columns latitude and longitude/,
+my $summary = $browser->wait_for(sub {
+	my $t = $browser->js("return document.querySelector('.map-summary') ? document.querySelector('.map-summary').textContent.trim() : '';");
+	return $t if defined $t && length $t;
+	return undef;
+}, timeout => 10) // '';
+like($summary, qr/Plotting 2 markers for 2 of 2 rows from columns latitude and longitude/,
 	'the map page plotted the two coordinate rows');
 
 # ---------------------------------------------------------------------------
@@ -154,8 +172,13 @@ is($visual->{title}, 'latitude and longitude', 'the card keeps the map title');
 is_deeply($visual->{encode}, { lat => 'latitude', lon => 'longitude' },
 	'the map keeps its coordinate columns');
 $browser->navigate("/a/$id");
-ok $browser->wait_for(sub { $browser->find('#map-0') }),
-	'the canvas renders the map card with its own Leaflet element';
+SKIP: {
+	skip 'HTML::OSM 0.12 or later is needed to draw the map card', 1
+		unless $have_renderer;
+
+	ok $browser->wait_for(sub { $browser->find('#map-0') }),
+		'the canvas renders the map card with its own Leaflet element';
+}
 
 is scalar @{ $analysis->{visuals} || [] }, 1, 'the canvas starts with one map visual';
 
@@ -226,8 +249,13 @@ my $outcome = $browser->wait_for(
 	timeout => 15,
 );
 
-ok $browser->js("return !!document.querySelector('#map-1');"),
-	'the appended map element is on the page';
+SKIP: {
+	skip 'HTML::OSM 0.12 or later is needed to draw the map card', 1
+		unless $have_renderer;
+
+	ok $browser->js("return !!document.querySelector('#map-1');"),
+		'the appended map element is on the page';
+}
 
 # Leaflet comes from a CDN.  With it the page can say the map has finished
 # drawing, and the panes are there to prove it; without it the page names the
@@ -256,8 +284,13 @@ is($updated->{visuals}[1]{kind}, 'map', 'the appended visual is a map');
 is_deeply($updated->{visuals}[1]{encode}, { lat => 'latitude', lon => 'longitude' },
 	'the appended map keeps its coordinate columns');
 
-ok $browser->wait_for(sub { $browser->find('#map-1') }),
-	'the appended map has its own Leaflet element';
+SKIP: {
+	skip 'HTML::OSM 0.12 or later is needed to draw the map card', 1
+		unless $have_renderer;
+
+	ok $browser->wait_for(sub { $browser->find('#map-1') }),
+		'the appended map has its own Leaflet element';
+}
 
 # ---------------------------------------------------------------------------
 # A saved map card's columns can be changed where it sits: no delete, no
@@ -324,13 +357,23 @@ is $browser->js("return document.querySelectorAll('.visual-card').length;"), 2,
 is $browser->js("return document.getElementById('visual-1').querySelector('.visual-card-title').textContent;"),
 	'Second map', 'the card keeps its title';
 
-ok $browser->js("return !!document.querySelector('#map-1');"),
-	'the map element was redrawn in place';
-like $browser->js("return document.querySelector('#visual-1 .visual-card-body script').textContent;"),
-	qr/L\.marker\(\[52\.5, -1\.5\]/,
-	'with a marker from the newly chosen columns';
-like $browser->js("return document.querySelector('#visual-1 .visual-card-body script').textContent;"),
-	qr/L\.markerClusterGroup\(\)/, 'and the redrawn map still clusters its markers';
+SKIP: {
+	skip 'HTML::OSM 0.12 or later is needed to draw the map card', 3
+		unless $have_renderer;
+
+	ok $browser->js("return !!document.querySelector('#map-1');"),
+		'the map element was redrawn in place';
+	# Read through a local: a card without its script is a failure to report,
+	# not an exception that ends the file before its plan is written.
+	my $redrawn_script = $browser->js(
+		"var s = document.querySelector('#visual-1 .visual-card-body script');"
+		. "return s ? s.textContent : '';"
+	);
+	like $redrawn_script, qr/L\.marker\(\[52\.5, -1\.5\]/,
+		'with a marker from the newly chosen columns';
+	like $redrawn_script, qr/L\.markerClusterGroup\(\)/,
+		'and the redrawn map still clusters its markers';
+}
 like $browser->js("return (window.__announcements || []).join('\\n');"),
 	qr/Map columns updated: latitude lat2 and longitude lon2\./,
 	'and the status region says what changed';
@@ -443,5 +486,13 @@ SKIP: {
 	like($drawn, qr/Map "Stub map" finished drawing\./,
 		'and the page announces that the map has finished drawing');
 }
+
+# What this run established, for the job summary: the route a reader takes to
+# the map from the table they are looking at, rather than the map page's URL.
+$browser->proved(
+	'GET /open on a table with coordinates: the toolbar\'s Map panel opens, chooses'
+	. ' the latitude and longitude columns, switches to the place-name mode and'
+	. ' back, and Enter submits to GET /map with the columns it named'
+);
 
 done_testing();

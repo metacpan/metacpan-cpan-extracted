@@ -1,0 +1,271 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::CancellationToken - A Cooperative Cancellation Token for Fibers
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Acme::Parataxis qw[async fiber await_sleep with_timeout];
+    use Acme::Parataxis::CancellationToken;
+
+    my $cancel = Acme::Parataxis::CancellationToken->new;    # nobody has cancelled it yet
+
+    async {
+        fiber { await_sleep(50); $cancel->cancel };           # ... until this fiber says so
+
+        my $done = eval { with_timeout( 10_000, $cancel, sub { await_sleep(10_000) } ) };
+        say $done // "gave up: $@";    # gave up: The operation was cancelled at await_sleep (...)
+    };
+
+=head1 DESCRIPTION
+
+A token is a flag plus a list of fiber ids. A fiber that wants to be interruptible registers itself; whoever wants that
+work stopped calls C<cancel>, and the wait each registered fiber is sitting in throws
+L<Acme::Parataxis::Error::Cancelled> instead of returning.
+
+Cancelling does not kill anything. It marks the registered fibers and wakes them, and the exception is thrown at the
+wait they are parked in, so each one unwinds from there: C<eval> guards, C<defer>s and destructors all run on the way
+out. An interrupted wait also drops itself from whatever it was waiting on, so the fiber is not left attached to a
+channel, a future or a semaphore that will never be read again.
+
+You rarely build one of these. L<with_cancel|Acme::Parataxis::with_cancel> hands one to its block,
+L<with_timeout|Acme::Parataxis::with_timeout> builds one per deadline, a L<nursery|Acme::Parataxis::nursery> has one,
+and L<run|Acme::Parataxis::run> takes one as C<on_shutdown> - see L</"Tokens You Get for Free">. Build your own when
+the work is not yours to wrap, or when more than one fiber has to be able to call it off.
+
+=head1 METHODS
+
+=head2 C<new( [ kind =E<gt> 'cancel' ] )>
+
+    my $cancel = Acme::Parataxis::CancellationToken->new;
+    my $deadline = Acme::Parataxis::CancellationToken->new( kind => 'timeout' );
+
+A fresh token, not cancelled. C<kind> picks the exception its cancelled waits throw: C<'cancel'> for
+L<Acme::Parataxis::Error::Cancelled>, C<'timeout'> for L<Acme::Parataxis::Error::Timeout>. Any string is accepted - the
+value is not checked, it is simply handed to the error the wait throws - so a typo gives you a token whose waits throw
+L<Acme::Parataxis::Error::Cancelled> anyway. That is how L<with_timeout|Acme::Parataxis::with_timeout> runs its
+deadlines through this class, and choosing C<'timeout'> by hand is the only other reason to pass anything.
+
+Arguments are keyword only: C<< new( 'timeout' ) >> warns about an odd argument list and then fails to recognise the
+string as a parameter.
+
+=head2 C<cancel( )>
+
+    $cancel->cancel;    # true the first time, and nothing on every one after
+
+Wakes every fiber registered with the token and marks the ones that are only running, so their next wait throws too.
+Idempotent, so the second and later calls are free and report C<undef> - false, so C<if ($token-E<gt>cancel) { ... }>
+fires exactly once. Call it from wherever you can reach the token - another fiber, a C<%SIG> handler, a health check -
+which is what makes it a shutdown switch as well as a cancellation.
+
+=head2 C<cancelled( )>
+
+    if ( $token->cancelled ) { ... }    # note: not ->is_cancelled
+
+True once C<cancel> has been called, and it stays true. There is no way back, so build a new token for the next round
+of work.
+
+=head2 C<register( )>
+
+    $token->register;    # returns this fiber's id
+
+Registers the calling fiber so that C<cancel> can interrupt it, and returns its fiber id. Registering twice from the
+same fiber does not add a second entry, so the count in C<< $token->waiters >> stays honest.
+
+Registering against a token that has already been cancelled does not queue anything: it marks the fiber so its very
+next wait throws immediately, which turns a lost race into an error rather than a hang. Croaks outside a scheduled
+fiber, and it is the fiber that calls it that gets registered, so a helper has to call it on the fiber you want
+interrupted.
+
+=head2 C<unregister( )>
+
+    $token->unregister;    # returns this fiber's id
+
+Removes the calling fiber, so a later C<cancel> leaves it alone. Worth doing once the work you wanted stopped is over
+but the fiber still has cleanup of its own to finish - and see the "A leaked registration arms the next fiber" note
+under L</"Behavior Notes"> for why leaving it out is worse than it looks. Safe to call any number of times, and it
+needs no fiber, so a destructor or an off-fiber cleanup can still call it. L</"Cancelling waits you cannot pass a token
+to"> has the tidy C<defer> form.
+
+=head2 C<waiters( )>
+
+    my $armed = $token->waiters;    # how many fibers are registered right now
+
+How many fibers are registered. C<cancel> empties the list as it fires, so a cancelled token reports 0 - and so does a
+token whose workers all unregistered, which is the state you want to see in a test.
+
+=head1 Recipes
+
+=head2 A shutdown that a signal or a health check can fire
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::CancellationToken;
+
+    my $shutdown = Acme::Parataxis::CancellationToken->new;
+
+    my $status = run(
+        on_shutdown => $shutdown,
+        code        => sub {
+            fiber { $health_port->on_unhealthy( sub { $shutdown->cancel } ) };
+            await_sleep(60_000);    # abandoned the moment the token fires
+        },
+    );
+
+    # $status is 130, the same value a SIGINT would produce
+
+Every wait in the run - that sleep, the health port's own, anything a fiber parks on - is interrupted and drained, and
+C<run> returns the interrupted status rather than dying, so an uncaught C<Error::Cancelled> inside C<code> still comes
+back to you as C<130> and not as an exception. The signal handlers are installed whether or not you pass
+C<on_shutdown>, so a C<SIGINT> or C<SIGTERM> fires exactly the same switch.
+
+=head2 Cancelling waits you cannot pass a token to
+
+When the wait is buried in someone else's call chain, with no token parameter to thread, register around it instead -
+and a nursery is a good home for work that all shares one fate:
+
+    use experimental 'defer';
+    use Acme::Parataxis qw[nursery];
+
+    sub load_into ( $token, $key ) {
+        $token->register;                 # every wait in here is now cancellable
+        defer { $token->unregister };     # ... and stops being the moment we are done, cancelled or not
+        return $cache->compute( $key )->await;
+    }
+
+    my $abort = Acme::Parataxis::CancellationToken->new;
+
+    nursery( sub ($n) {
+        $n->spawn( sub { eval { load_into( $abort, $_ ) } } ) for @keys;
+        $n->spawn( sub { await_sleep(10_000); $abort->cancel } );    # or a deadline, or a client hanging up
+    } );
+
+The C<defer> is not tidiness. Without it the fiber stays in the token's list after its work is done, and because fiber
+ids are recycled the next C<cancel> lands on whatever fiber has since been given that id - see L</"Behavior Notes">.
+
+=head2 A deadline you can move
+
+    my $deadline = Acme::Parataxis::CancellationToken->new( kind => 'timeout' );
+
+    my $job = fiber {
+        $deadline->register;                          # this wait is now interruptible
+        my $result = eval { $work->await };           # throws Error::Timeout, not Error::Cancelled
+        ...
+    };
+    fiber { await_sleep(250); $deadline->cancel };    # the deadline is just another fiber
+
+Anything that can C<cancel> a token can then push a deadline around: hand it to a supervisor, take it away again, or
+set it from a config reload. C<kind> is the whole difference - the mechanics are a cancellation's, only the exception
+arriving at the wait is L<Acme::Parataxis::Error::Timeout> instead.
+
+Catch it inside the fiber, as above, when the fiber itself has to survive and report; the timeout then stays local to
+it. Let it escape and the fiber dies with it, and the error travels on to whoever is awaiting that fiber - so the
+deadline still works, it just fails further up the stack than you wrote it.
+
+=head1 Tokens You Get for Free
+
+=over
+
+=item * L<with_cancel|Acme::Parataxis::with_cancel> - C<with_cancel( sub ( $token ) { ... } )>
+
+Runs the block under a fresh scope token and passes it in, so a fiber the block starts can cancel the block's waits.
+C<with_cancel> hands that token back as its return value - on its own in scalar or void context, prepended to the
+return list in list context - but that is for inspecting C<< ->cancelled >> afterwards, not for stopping the scope: see
+the "With with_cancel, the return is the token" note under L</"Behavior Notes">.
+
+=item * L<with_timeout|Acme::Parataxis::with_timeout> - C<with_timeout( $ms, $code )>,
+or C<with_timeout( $ms, $token, $code )>
+
+A token in second position cancels C<$code> exactly as its own deadline would, and whichever fires first ends the wait.
+A token that is already cancelled fails fast, without running C<$code> at all. The token is optional; the runtime picks
+the second argument apart by class, so anything that is not a token is taken as the code - which is why C<<
+with_timeout( 10, undef, sub { ... } ) >> reports C<with_timeout() requires a CODE ref>.
+
+=item * C<< $nursery-E<gt>token >>
+
+The group's own token. Cancel it and every child is cancelled and drained, as though a sibling had failed. A nursery
+that joins cleanly leaves it uncancelled, with no waiters.
+
+=item * L<run( on_shutdown =E<gt> $token )|Acme::Parataxis::run>
+
+Makes C<$token> the switch for the run's graceful shutdown, so a health check, a parent process, or a test can end the
+run in-process, with no OS signal involved.
+
+=back
+
+=head1 Behavior Notes
+
+=over
+
+=item * Where the exception lands
+
+At the wait, never at the C<cancel> call. If the cancel lands on a fiber that is parked, that wait throws as it
+resumes; if it lands on a fiber that is still running, the throw waits for its next wait and happens at that wait's
+entry, so a cancellation is never stranded until some unrelated event wakes the fiber.
+
+=item * After you catch it
+
+Inside a L<with_cancel|Acme::Parataxis::with_cancel> scope, every later wait in that scope fails fast as well, because
+the scope's token stays cancelled - so treat a caught cancellation as the end of that block rather than retrying inside
+it. A hand-rolled C<register> has no such scope: the mark is spent by the first throw, so a second wait parks for real.
+Either way, C<< $token-E<gt>cancelled >> is the thing to test, and the thing to get out on.
+
+=item * Which exception
+
+The default token throws L<Acme::Parataxis::Error::Cancelled>; a C<< kind =E<gt> 'timeout' >> token throws
+L<Acme::Parataxis::Error::Timeout>. They are siblings, both L<Acme::Parataxis::Error> subclasses - a timeout is B<not>
+a kind of cancellation, so C<< $err-E<gt>isa('...::Cancelled') >> is false for one and C<< $err-E<gt>kind >> is the
+reliable test: C<'cancelled'> or C<'timeout'>. Note that C<'cancelled'> is not the token's C<'cancel'>, so do not
+compare the two directly.
+
+C<< $err-E<gt>wait_reason >> is the C<[ reason, file, line, backtrace ]> the interrupted wait parked with, and its
+first element names the wait: C<'fiber await'>, C<'await_sleep'>, C<'Future await'>, C<'Channel select'>, C<'Signal
+wait'>, C<'STM retry'>, or C<'Semaphore down'> unless the caller passed a reason of its own. On the fail-fast path -
+where no park was ever entered - the first element is C<'cancel'> or C<'timeout'> instead, and the backtrace slot is
+left empty.
+
+=item * A leaked registration arms the next fiber
+
+Fiber ids are recycled once a fiber has been reaped, and an id still sitting in a token's list is indistinguishable
+from a live one. So a fiber that registers, finishes, and never unregisters leaves a loaded gun: the next C<cancel>
+interrupts whichever unrelated fiber is next handed that id, at whatever wait it happens to be parked in. The victim
+never touched the token and has no way to find out why it was interrupted. C<unregister> when the work is done - from a
+C<defer>, so it happens on the cancellation path too - is what closes this.
+
+=item * With with_cancel, the return is the token
+
+C<< with_cancel( sub ($t) { 'my result' } ) >> returns the token; the block's own return value is only reachable in
+list context, after the token. The ordering makes the token useless for stopping its own scope: it does not exist as a
+return value until the block has finished, so a caller that tried to cancel from outside would be cancelling a scope
+that is already over.
+
+Cancel from inside - hand C<$t> to a fiber the block starts - which is the shape the L</"Tokens You Get for Free">
+entry above is for.
+
+=item * Not a signal
+
+A L<Signal|Acme::Parataxis::Signal> wakes a waiter with a value; a token interrupts it with an exception. Use a signal
+for "there is news" and a token for "stop".
+
+=back
+
+=head1 SEE ALSO
+
+L<Acme::Parataxis> (C<with_timeout>, C<with_cancel>, C<run>, C<nursery>), L<Acme::Parataxis::Error>,
+L<Acme::Parataxis::Nursery>, L<Acme::Parataxis::Signal>
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

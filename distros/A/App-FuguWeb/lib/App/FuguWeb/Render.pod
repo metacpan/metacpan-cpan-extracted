@@ -13,18 +13,24 @@ App::FuguWeb::Render - the three external renderers
 
     my $html = $render->markdown('INSTALL.md');
     my $man  = $render->mdoc('Fugu::Daemon.3p', "$out/.man");
-    my $pod  = $render->pod($path, 'Fugu::Daemon', '2026-08-04');
+    my $pod  = $render->pod('lib/Fugu/Daemon.pod');
 
 =head1 DESCRIPTION
 
 The tool renders no format itself. C<mandoc> turns mdoc(7) into HTML,
-C<lowdown> turns Markdown into HTML, and C<pod2man> turns POD into mdoc
-for C<mandoc> to finish. Each one is a mature program that reads a
+C<lowdown> turns Markdown into HTML, and C<pod2man> turns POD into
+man(7) for C<mandoc> to finish. Each one is a mature program that reads a
 format this project already writes; a Perl reimplementation would be a
 second, worse one.
 
-Every method returns the output as bytes, or C<undef> with a message in
-the log.
+Every method returns the output as characters, or C<undef> with a
+message in the log. Each output goes through L<App::FuguWeb/decode>,
+per WEB-SITE-5. An output that is not UTF-8 fails, and the message
+names the renderer and the source.
+
+The output of C<mandoc> holds the head and the foot of the page.
+L<App::FuguWeb::Fragment/manual> removes both, per D-07, so no option
+of a renderer feeds them.
 
 =head1 METHODS
 
@@ -79,15 +85,19 @@ there.
 
 =head2 pod
 
-    $render->pod($path, $name, $date)
+    $render->pod($path)
 
 Render one POD sidecar into an HTML body fragment. C<pod2man> writes
-mdoc, and C<mandoc> finishes the job, so a module page carries the same
-chrome as a hand-written manual.
+man(7), and C<mandoc> finishes the job, so a module page carries the
+same chrome as a hand-written manual.
 
-C<$date> comes from the caller and never from the file time: git does not
-preserve file times, so a build that read one would give different bytes
-on every checkout. L<App::FuguWeb::Site/pod_date> supplies it.
+C<pod2man> writes the name, the section, the date, the center text and
+the release into the head and the foot of the page. The fit removes
+both, so the call gives none of them.
+
+C<--utf8> makes C<pod2man> write each character as UTF-8, per
+WEB-SITE-5. Without it, podlators 4.14 of perl 5.36 writes C<X> or a
+roff escape for each character outside ASCII.
 
 C<pod2man> reports a malformed directive on standard error and still
 writes the page. The page is what the site needs, so a diagnostic is a
@@ -98,19 +108,9 @@ as a link. POD pages therefore cross-reference as plain text while mdoc
 pages link. Making it work would mean post-processing the HTML of
 C<mandoc>.
 
-The C<--center> and C<--release> values are the C<POD_CENTER> and
-C<POD_RELEASE> constants. They are constants and not settings: they
-pin the C<pod2man> output so the site does not vary with the build
-host. Without them, C<pod2man> writes its own center text and the perl
-version of the machine that built the site.
-
 =head2 html_options
 
 The C<mandoc> options that every page shares.
-
-C<-I os=> pins the footer, which otherwise names the operating system of
-the build host, and the site would then vary with the machine that built
-it.
 
 The C<./> in the C<man=> template matters. A module page is named
 F<Fugu::Daemon.3p.html>, and a browser reads a relative URL whose first
@@ -118,8 +118,8 @@ segment holds a colon as a scheme.
 
 =head1 SEE ALSO
 
-L<App::FuguWeb>, L<App::FuguWeb::Site>, L<Fugu::Process>, mandoc(1),
-lowdown(1), L<pod2man>
+L<App::FuguWeb>, L<App::FuguWeb::Fragment>, L<App::FuguWeb::Site>,
+L<Fugu::Process>, mandoc(1), lowdown(1), L<pod2man>
 
 =head1 AUTHOR
 

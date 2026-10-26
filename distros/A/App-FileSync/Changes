@@ -1,5 +1,33 @@
 Revision history for App-FileSync
 
+0.001.5 Sun Oct 25 12:53:45 PM EDT 2026
+	[ Bug Fixes ]
+	- Log::Abstraction 0.36 is now required, because the client logs its
+	  run summary as structured fields in a trailing hashref.  An older
+	  copy, which the installer accepted, turned that into
+	  "sync finishedHASH(0x...)" in the log file and an empty entry in an
+	  array logger, so the counts were lost and t/settings.t failed its
+	  seven logger assertions.
+
+0.001.4	Sun Oct 25 09:31:17 AM EDT 2026
+	[ Bug Fixes ]
+	- t/ssh.t: the stand-in for ssh now names the perl running the tests on
+	  its first line instead of "#!/usr/bin/env perl".  The transport starts
+	  that file as a program, so the kernel picked whichever perl came first
+	  on PATH - on a smoke tester the system perl, which cannot see the
+	  modules the build installed - and the filesync-server it then ran died
+	  with "Can't locate Params/Validate/Strict.pm" against a build that never
+	  lacked it (GitHub issue #4).  The Windows wrapper already named $^X.
+	[ Tests ]
+	- t/ssh.t checks the interpreter line of the stand-in it writes, so the
+	  PATH-dependent first line cannot come back unnoticed.
+
+0.001.3	Sun Oct 25 07:25:08 AM EDT 2026
+	[ Documentation ]
+	- More improvements
+	[ Bug Fixes ]
+	- Bump minimim Config::Abstraction
+
 0.001.2	Sat Oct 24 09:02:12 PM EDT 2026
 	[ Bug Fixes ]
         - filesync-admin repo create names the server root and the directory

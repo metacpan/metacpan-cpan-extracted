@@ -3,7 +3,7 @@ package App::Actions::Docker::Variable;
 use strict;
 use warnings;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # A job variable on its way to docker: "-e" followed by one of these.  It
 # reads as NAME=VALUE wherever it is printed or compared, and lets

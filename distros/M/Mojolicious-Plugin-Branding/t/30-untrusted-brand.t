@@ -13,7 +13,7 @@ my %reachable = (%generic, %foo,
    'brands/bar/templates/index.html.ep' => 'bar page',
    'brands/bar/public/only-bar.css'     => 'bar only',
 );
-my %conf = (individual => {paths => ['brands/foo', 'brands/bar']});
+my %conf = (individual => {brands => {foo => 'brands/foo', bar => 'brands/bar'}});
 
 # a route that renders whatever template the request asks for: an
 # application bug, that the plugin must not make worse
@@ -37,16 +37,31 @@ subtest 'rainy: brands are only those configured' => sub {
    }
 };
 
-subtest 'rainy: bad variant set by a route' => sub {
+subtest 'rainy: bad brand set by a route' => sub {
    my $t = t_for({%reachable}, \%conf);
    $t->app->routes->get('/v' => sub {
       my $c = shift;
-      $c->render(template => 'index', variant => $c->param('b'));
+      $c->brand($c->param('b'));
+      $c->render(template => 'index');
    });
    $t->get_ok('/v?b=foo')->content_is("foo page\n");    # control
-   for my $variant ('..', '../secret', 'secret') {
-      $t->get_ok('/v' => form => {b => $variant})->status_is(200)
-         ->content_is("generic page\n", "page for variant <$variant>");
+   for my $brand ('..', '../secret', 'secret') {
+      $t->get_ok('/v' => form => {b => $brand})->status_is(200)
+         ->content_is("generic page\n", "page for brand <$brand>");
+   }
+};
+
+# the variant is looked up in brand dirs too, it must not escape them
+subtest 'rainy: bad variant with a brand' => sub {
+   my $t = t_for({%reachable}, \%conf, brand_hook());
+   $t->app->routes->get('/v' => sub {
+      my $c = shift;
+      $c->render(template => 'index', variant => $c->param('v'));
+   });
+   for my $variant ('..', '../secret', '/../../../secret/templates/index',
+         '/../../../../secret/templates/index') {
+      $t->get_ok('/v' => form => {b => 'foo', v => $variant})->status_is(200)
+         ->content_is("foo page\n", "page for variant <$variant>");
    }
 };
 
@@ -72,7 +87,7 @@ subtest 'rainy: absolute name of another brand template' => sub {
 };
 
 subtest 'rainy: earlier hook already rendered a response' => sub {
-   my $t = t_for({%generic, %foo}, {individual => {paths => ['brands/foo']}}, sub {
+   my $t = t_for({%generic, %foo}, {individual => {brands => {foo => 'brands/foo'}}}, sub {
       my ($app) = @_;
       brand_hook()->($app);
       $app->hook(before_dispatch => sub {

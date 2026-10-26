@@ -70,7 +70,7 @@ sub effective_concurrency {
 
 my ($version_out, $version_err, $version_exit) = run_cli('--version');
 is($version_exit, 0, '--version exits 0');
-like($version_out, qr/^action-run 0\.002\.0$/, '--version prints the version');
+like($version_out, qr/^action-run 0\.002\.1$/, '--version prints the version');
 
 my ($help_out, $help_err, $help_exit) = run_cli('--help');
 is($help_exit, 0, '--help exits 0');

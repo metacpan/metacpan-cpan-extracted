@@ -1,0 +1,142 @@
+=head1 NAME
+
+App::FuguWeb::Fragment - the fit of a body fragment to its page
+
+=head1 SYNOPSIS
+
+    use App::FuguWeb::Fragment;
+
+    my $outline = App::FuguWeb::Fragment::outline($default);
+
+    my $at;
+    my $fitted = App::FuguWeb::Fragment::follow($zh, $outline, \$at)
+        // die "the outline differs at heading $at\n";
+
+    my $manual = App::FuguWeb::Fragment::manual($mandoc, 'fuguweb(1)');
+
+    my $body = App::FuguWeb::Fragment::not_found($fragment, 'zh-hans');
+
+=head1 DESCRIPTION
+
+A renderer reduces each source to one body fragment. The build then
+fits the fragment to the page. It reads the outline, and it gives each
+heading of a translation the id of its counterpart in the default
+language, per D-06. It removes the frame that a renderer writes around
+the content, per D-07. The fit of each renderer stays in one function,
+so the renderer stays replaceable.
+
+Each function reads text and returns text, and holds no state.
+L<App::FuguWeb::Site> fits each fragment, and L<App::FuguWeb::Check>
+reads the outline through the same function, so the two agree.
+
+Each function reads an attribute through
+L<App::FuguWeb/edit_attributes>, the one reader of the namespace. So
+the text of a value, such as C<title="see id=x">, is no attribute. An
+id or a link that a function writes takes double quotes, and a double
+quote in the value becomes C<&quot;>.
+
+=head1 FUNCTIONS
+
+=head2 outline
+
+    my $outline = App::FuguWeb::Fragment::outline($html);
+
+The outline of a fragment, per WEB-OUTLINE: an array reference that
+holds one array reference for each heading, in order. Each one holds
+the level of the heading, from 1 to 6, and its id. The id is C<undef>
+when the heading carries none.
+
+=head2 follow
+
+    my $fitted = App::FuguWeb::Fragment::follow($html, $outline, \my $at);
+
+The fragment of a page of another language, held to the outline of its
+namesake in the default language. Each heading takes the id of the
+heading at the same position in the outline, per WEB-OUTLINE-2. It
+takes no id when that heading has none. The fit keeps each other
+attribute of a heading. The id takes the place of the id of the
+heading, and a heading with no id takes it at the end.
+
+Each link of the fragment to one of its headings then names the id that
+the heading takes, per WEB-OUTLINE-4. A link of the class C<Sx> names
+the heading of the same text. mandoc(1) makes that link from its text,
+and it can give the heading no id. The fit compares the two texts with
+no tag, and with each run of white space as one space. Each other link
+names the heading of its old id. A link to a heading that takes no id
+stays as it stands.
+
+WEB-OUTLINE-4 states the known limit of the fit.
+
+The function returns C<undef> when the two outlines differ, per
+WEB-OUTLINE-1. C<$at> then holds the position of the first heading that
+differs, from 1. A heading differs when its level is another one, when
+the outline does not hold it, or when the fragment does not hold the
+heading of the outline.
+
+=head2 manual
+
+    my $fitted = App::FuguWeb::Fragment::manual($html, $title);
+
+The fit of a fragment of mandoc(1) to a manual page, per WEB-MANUALS-9,
+WEB-MANUALS-10 and WEB-MANUALS-11. The title is the name and the section
+of the manual, as in C<fuguweb(1)>, as characters.
+
+=over 4
+
+=item *
+
+The fit removes the head and the foot of the page, per D-07. mandoc
+1.14.6 writes each one as a C<table>. The mandoc of OpenBSD writes each
+one as a C<div>, and a C<main> around the text. The fit replaces that
+C<main> with a C<div>, as in 1.14.6, so a page holds one C<main>, per
+WEB-MANUALS-9.
+
+=item *
+
+Each section heading becomes an C<h2>, and each subsection heading an
+C<h3>. The fit reads the class C<Sh> or C<Ss> of the heading, and not
+its level: mandoc 1.14.6 writes an C<h1> and an C<h2>, and the mandoc of
+OpenBSD an C<h2> and an C<h3>. A class in the text of another value is
+no class. A heading loses the link to itself, and it keeps its text and
+its id.
+
+=item *
+
+Each character reference to a character outside ASCII becomes the
+character. A reference to an ASCII character stays, because it can be
+markup, such as C<&#x3C;>.
+
+=item *
+
+The fragment then opens with the title in one C<h1>.
+
+=back
+
+=head2 not_found
+
+    my $body = App::FuguWeb::Fragment::not_found($html, $tree);
+
+The fit of the body of the F<404.html> of one tree to the top-level
+F<404.html>, per WEB-TOP-6. C<$tree> is the path of the tree below the
+site root, such as C<zh-hans>.
+
+Each start tag loses its id, so the page that holds the body of each
+language holds no duplicate id. Each relative link resolves against the
+F<404.html> of the tree, through L<App::FuguWeb/resolve_ref>, to a path
+below the site root. The top-level page resolves each link from the
+site root, per WEB-TOP-3, so the link then names the same file. A query
+and a fragment stay at the end of the link. In the body of C<zh-Hans>,
+C<index.html> becomes C<zh-hans/index.html>, and C<#x> becomes
+C<zh-hans/404.html#x>.
+
+A link with a scheme and a link from the root stay as they stand. So
+does a link that steps above the site root, and the check reports it.
+
+=head1 SEE ALSO
+
+L<App::FuguWeb>, L<App::FuguWeb::Site>, L<App::FuguWeb::Check>,
+mandoc(1), L<fuguweb(1)>
+
+=head1 AUTHOR
+
+Dick Olsson <hi@senzilla.io>

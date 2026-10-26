@@ -17,6 +17,8 @@ use Test::NoTabs;
 my @files = (
     'bin/perl-version-bump',
     'lib/Perl/Version/Bumper.pm',
+    'lib/Perl/Version/Bumper/Helper/Version.pm',
+    'lib/Perl/Version/Bumper/Rationale.pod',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
@@ -65,6 +67,7 @@ my @files = (
     't/bump/127_smartmatch.data',
     't/bump/128_keyword_all.data',
     't/bump/129_keyword_any.data',
+    't/bump/130_enhanced_xx.data',
     't/bump_safely.t',
     't/bump_safely/001_die.data',
     't/bump_safely/002_v585.data',

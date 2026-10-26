@@ -31,7 +31,7 @@ Readonly::Scalar my $NUMBER => qr/
 # An identifier: a letter or underscore, then letters, digits, _ and -.
 Readonly::Scalar my $IDENTIFIER => qr/\G([A-Za-z_][A-Za-z0-9_-]*+)/;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 sub new {
     my ($class) = @_;

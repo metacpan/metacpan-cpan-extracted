@@ -1,7 +1,7 @@
 use v5.10;
 
 package Perl::Version::Bumper;
-$Perl::Version::Bumper::VERSION = '0.256';
+$Perl::Version::Bumper::VERSION = '0.277';
 
 use strict;
 use warnings;
@@ -12,6 +12,13 @@ use PPI::Document;
 use PPI::Token::Operator;
 use PPI::Token::Attribute;
 use Carp qw( carp croak );
+
+use Perl::Version::Bumper::Helper::Version qw(
+    version_fmt
+    version_use
+    stable_version
+    stable_version_dec
+);
 
 # CLASS METHODS
 
@@ -36,7 +43,7 @@ sub feature_data {
         my $disabled = substr $_, 0, 9,  '';    # %-8s
         my $removed  = substr $_, 0, 9,  '';    # %-8s
         my @compat   = split ' ';               # %s
-        y/ //d for $feature, $known, $enabled, $disabled;
+        y/ //d for $feature, $known, $enabled, $disabled, $removed;
         $feature{$feature}{known}     = $known;
         $feature{$feature}{enabled}   = $enabled  if $enabled;
         $feature{$feature}{disabled}  = $disabled if $disabled;
@@ -48,60 +55,6 @@ sub feature_data {
 }
 
 my %feature = %{ feature_data() };
-
-# EXPORTABLE FUNCTIONS
-
-use Exporter 'import';
-
-our @EXPORT_OK = qw(
-    version_fmt
-    version_use
-    stable_version
-    stable_version_inc
-    stable_version_dec
-);
-
-# return a normalized version of a plausible Perl version number (or die)
-sub version_fmt {
-    my $o = shift // $];
-    $o = $] unless length $o;
-    my $v = version::->parse($o)->numify;    # accept everything
-    return $v < 5.010
-      ? croak "Unsupported Perl version: $o"
-      : sprintf "%.3f", $v;                  # Perl version bundle
-}
-
-# return a normalized version, suitable for "use VERSION"
-sub version_use {
-    my $o = shift // $];
-    $o = $] unless length $o;
-    my $v = version::->parse($o)->numify;    # accept everything
-    return $v < 5.010
-      ? croak "Unsupported Perl version: $o"
-      : sprintf 'v5.%d', substr( $v, 2, 3 );    # Perl version bundle
-}
-
-# return the closest stable version number lower than the parameter
-sub stable_version {
-    my $v = version_fmt(shift);
-    $v *= 1000;
-    return sprintf "%.3f", ( int($v) - $v % 2 ) / 1000;
-}
-
-# increment the version number to the next stable version
-sub stable_version_inc {
-    my $v = stable_version(shift);    # closest previous stable
-    return sprintf "%.3f", $v + 0.002;
-}
-
-# decrement the version number to the previous stable version
-sub stable_version_dec {
-    my $v = version_fmt(shift);    # format the version
-    my $s = stable_version($v);    # get the closest previous stable
-    return $v ne $s
-      ? $s                         # dev -> previous stable
-      : sprintf "%.3f", $s - 0.002 # previous stable
-}
 
 # CONSTRUCTOR
 
@@ -272,12 +225,20 @@ sub _drop_statement {
     if (  !$stmt->sprevious_sibling
         || $stmt->sprevious_sibling->location->[0] ne $stmt->location->[0] )
     {
+
         # collect non-significant elements until next newline (included)
-        my ( $next, @to_drop ) =  ( $stmt );
+        my ( $next, @to_drop ) = ($stmt);
         while ( $next = $next->next_sibling ) {
-            last if $next->significant;
+            if ( $next->significant ) {    # might be a compound statement
+                for my $child ( $next->children ) {
+                    last if $child->significant;
+                    push @to_drop, $child;
+                    last if $child =~ /\n\z/;
+                }
+                last;
+            }
             push @to_drop, $next;
-            last if $next eq "\n";
+            last if $next =~ /\n\z/;
         }
 
         # do not drop comments if asked to keep them
@@ -346,34 +307,71 @@ use constant {
     ENABLED  => 'enabled',
     DISABLED => 'disabled',
 };
+
 use Hash::Util::FieldHash;
 Hash::Util::FieldHash::fieldhash my %feature_by_scope;
+my %feature_votes;
+$feature_votes{+ENABLED} = {};
+$feature_votes{+DISABLED} = {};
+Hash::Util::FieldHash::fieldhashes values %feature_votes;
 
 # keep track of features explicitly enabled/disabled in each scope
+# this is keyed by scope and feature, and the value is status and statement
 sub _add_feature_to_scope {
     my ( $elem, $feature, $status ) = @_;
     croak "Invalid status value: '$status'"
       if $status ne ENABLED && $status ne DISABLED;
     my $scope = $elem;
-    while ( $scope->parent ) {
+    while ( $scope->parent ) {    # stop at the document root
         $scope = $scope->parent;
         last if $scope->isa('PPI::Structure::Block');
     }
-    $feature_by_scope{$scope}{$feature} = $status;
+    $feature_by_scope{$scope}{$feature} = [ $status, $elem ];
 }
 
 # return the status of the feature for the scope surrounding the element
 # the value is one of: ENABLED, DISABLED, '' (the first two are constants)
 sub _feature_status_in_scope {
-    my ( $feature, $doc, $elem ) = @_;
-    my $scope = $elem;
+    my ( $feature, $elem ) = @_;
+    my $scope = $elem->parent;
     my $status;
-    while ( $scope->parent ) {
-        $status = $feature_by_scope{$scope}{$feature}
+    while ( $scope ) {
+        $status = $feature_by_scope{$scope}{$feature}[0]
           and last;
         $scope = $scope->parent;
     }
-    return $status || $feature_by_scope{$doc}{$feature} // '';
+    return $status // '';
+}
+
+# return the stack of [ status, stmt ] up to the document root
+# of all scopes where the feature is enabled or disabled
+sub _feature_status_stack {
+    my ( $feature, $elem ) = @_;
+    my @stack;
+    my $scope = ( $elem->parent );
+    while ($scope) {
+        if ( my $status = $feature_by_scope{$scope}{$feature}[0] ) {
+            push @stack, [ $status, $feature_by_scope{$scope}{$feature}[1] ];
+        }
+        elsif ( !$scope->parent && !$status ) {    # document root
+            push @stack, [ '', $feature_by_scope{$scope}{$feature}[1] ];
+            last;
+        }
+        $scope = $scope->parent;
+    }
+    return @stack;
+}
+
+# replace a given PPI statement with the given code string
+# (if the code is undef, just remove the statement entirely)
+sub _replace_stmt {
+    my ( $old_stmt, $new_code, $keep_comments ) = @_;
+    if ( defined $new_code ) {
+        my $new_stmt = PPI::Document->new( \$new_code );
+        $old_stmt->insert_before( $_->remove ) for $new_stmt->elements;
+        $old_stmt->remove;
+    }
+    else { _drop_statement( $old_stmt, $keep_comments ); }
 }
 
 my %feature_shine = (
@@ -384,7 +382,14 @@ my %feature_shine = (
         bitwise => sub {
             my ($doc) = @_;
 
-            # this only matters for code using bitwise ops
+            # in the following code:
+            # - "safe ops" are the ones (binary and dotted binary) that
+            #   depend on the 'bitwise' feature being enabled, and for whom
+            #   an explicit enablement can be removed (because `use VERSION`
+            #   enables it globally)
+            # - "unsafe ops" are the regular binary ops that worked with
+            #   'bitwise' disabled (explicitly or not), and can't have it
+            #   enabled (or not disabled), for fear of breaking
             # (dotted bitwise operators are detected by PPI >= 1.285)
             my $bitwise_ops = $doc->find(
                 sub {
@@ -395,11 +400,47 @@ my %feature_shine = (
             );
             return unless $bitwise_ops;
 
-            # if any of the bitwise ops is not inside a scope
-            # where `no feature 'bitwise'` is active
-            my @unsafe_ops =
-              grep _feature_status_in_scope( bitwise => $doc, $_ ) ne
-              DISABLED, @$bitwise_ops;
+            # binary ops are safe when 'bitwise' is explicitly enabled,
+            # because they behave as expected, and unsafe it 'bitwise'
+            # wasn't explicitly disabled, because they're expected to
+            # have the old (before 'bitwise') behaviour
+            my ( @safe_ops, @unsafe_ops );
+            for my $op (@$bitwise_ops) {
+                my $status = _feature_status_in_scope( bitwise => $op );
+                if    ( $status eq ENABLED )  { push @safe_ops,   $op; }
+                elsif ( $status ne DISABLED ) { push @unsafe_ops, $op; }
+            }
+
+            # add dotted bitwise ops to the safe ops list,
+            # when under an explicitly enabled 'bitwise'
+            my $dotted_bitwise_ops = $doc->find(
+                sub {
+                    my ( $root, $elem ) = @_;
+                    $elem->isa('PPI::Token::Operator')
+                      && $elem =~ /\A[&|~^]\.=?\z/;
+                }
+            );
+            push @safe_ops,
+              grep _feature_status_in_scope( bitwise => $_ ) eq ENABLED,
+              @$dotted_bitwise_ops
+              if $dotted_bitwise_ops;
+
+            # safe ops: lnd the explicit `use feature 'bitwise'`
+            # in the enclosing scope and vote to remove it
+            for my $safe_op (@safe_ops) {
+                my @status_stack = _feature_status_stack( bitwise => $safe_op );
+                my $vote = $feature_votes{ +ENABLED }{ $status_stack[0][1] }{bitwise};
+
+                # by construction, the first scope in the stack is ENABLED
+                if ( @status_stack > 1 && $status_stack[1][0] eq DISABLED ) {
+                    $vote->[1]++;    # vote to keep
+                }
+                else {
+                    $vote->[0]++;    # vote to delete
+                }
+            }
+
+            # if there are no unsafe ops, we're done
             return unless @unsafe_ops;
 
             # the `use VERSION` inserted earlier is always the first in the doc
@@ -438,7 +479,7 @@ TODO_COMMENT
             # and turn them into prototype attributes
             for my $proto (@$prototypes) {
                 next
-                  if _feature_status_in_scope( signatures => $doc, $proto ) eq
+                  if _feature_status_in_scope( signatures => $proto ) eq
                   DISABLED;
                 $proto->insert_before( PPI::Token::Operator->new(':') );
                 $proto->insert_before(
@@ -465,7 +506,7 @@ TODO_COMMENT
             # and replace them by 'fc'
             # (only when not in scope of a `no feature 'fc'`)
             $_->replace( PPI::Token::Word->new('fc') )
-              for grep _feature_status_in_scope( fc => $doc, $_ ) ne DISABLED,
+              for grep _feature_status_in_scope( fc => $_ ) ne DISABLED,
               @$core_fc;
         },
     },
@@ -490,7 +531,7 @@ TODO_COMMENT
             for my $word (@$apostrophes) {
                 next
                   if ENABLED eq _feature_status_in_scope(
-                    apostrophe_as_package_separator => $doc => $word );
+                    apostrophe_as_package_separator => $word );
                 ( my $colon = "$word" ) =~ s/'/::/g;
                 $word->replace( bless { content => $colon },
                     'PPI::Token::Word' );
@@ -566,58 +607,82 @@ sub _handle_compat_modules {
     }
 }
 
+# given $old and $new lists ($new is a subset of $old)
+# return the items that are in $old and not in $new
+sub _missing_items {
+    my ($old, $new) = @_;
+    my %to_remove;
+    $to_remove{$_}++ for @$old;
+    $to_remove{$_}-- for @$new;
+    return grep $to_remove{$_} > 0, keys %to_remove;
+}
+
+# return $old without any of the $to_remove items
+sub _remove_items {
+    my ( $old, $to_remove ) = @_;
+    my %to_remove;
+    @to_remove{@$to_remove} = ();
+    return grep !exists $to_remove{$_}, @$old;
+}
+
 sub _cleanup_bundled_features {
     my ( $self, $doc, $old_num ) = @_;
     my $version_num       = $self->version_num;
     my $feature_in_bundle = $self->{feature_in_bundle};
 
-    # drop features enabled in this bundle
-    # (also if they were enabled with `use experimental`)
+    # `use feature` and `no feature` are "feature controllers" (or switches),
+    # that are used to enable or disable the feature in the current lexical
+    # scope.
+    #
+    # For every controller, there are several times when we can decide
+    # to remove a feature or not from the argument list of the controller
+    # statement.
+    #
+    # The decision is taken via a "vote": at different times in the
+    # algorithm a vote to remove or keep will be cast.  In the end,
+    # a specific feature will be removed from a specific controller
+    # statement when there are no keep votes and at least on remove vote.
+    #
+    # The votes are collected in the %feature_votes hash, which is keyed
+    # by the type of statement: ENABLED (use) or DISABLED (no).
+    # One level down, a FieldHash uses the actual PPI statement as the
+    # key and the values are the features.
+    #
+    # The list of original arguments is stored in the special '' key.
+
     for my $module (qw( feature experimental )) {
-        for my $use_line ( _find_include( $module => $doc, 'use' ) ) {
-            my @old_args = _ppi_list_to_perl_list( $use_line->arguments );
-            _add_feature_to_scope( $use_line, $_, ENABLED ) for @old_args;
+
+        # drop features enabled by this bundle
+        # (also if they were enabled with `use experimental`)
+        for my $stmt ( _find_include( $module => $doc, 'use' ) ) {
+            my @old_args = @{ $feature_votes{ +ENABLED }{$stmt}{''} };
             my @new_args =    # keep enabling features that
-              grep !exists $feature_in_bundle->{enabled}{$_}    # are not enabled yet
-                 || exists $feature{$_}{unfeature},             # or are unfeatures
-              grep exists $feature{$_},                         # and actually exist
+              grep !
+              exists $feature_in_bundle->{enabled}{$_}    # are not enabled yet
+              || exists $feature{$_}{unfeature},          # or are unfeatures
+              grep exists $feature{$_},                   # and actually exist
               @old_args;
-            next if @new_args == @old_args;    # nothing to change
-            if (@new_args) {    # replace old statement with a smaller one
-                my $new_use_line = PPI::Document->new(
-                    \"use $module @{[ join ', ', map qq{'$_'}, @new_args]};" );
-                $use_line->insert_before( $_->remove )
-                  for $new_use_line->elements;
-                $use_line->remove;
-            }
-            else { _drop_statement($use_line); }
+            next if @new_args == @old_args;               # nothing to change
+            $feature_votes{ +ENABLED }{$stmt}{$_}[0]++    # vote to delete
+              for _missing_items( \@old_args, \@new_args );
+        }
+
+        # drop disabled features that are disabled by this bundle
+        # (also if they were disabled with `no experimental`)
+        for my $stmt ( _find_include( $module => $doc, 'no' ) ) {
+            my @old_args = @{ $feature_votes{ +DISABLED }{$stmt}{''} };
+            my @new_args =                # keep disabling features
+              grep exists $feature{$_}    # that actually exist and are
+              && !exists $feature_in_bundle->{disabled}{$_},  # not disabled yet
+              @old_args;
+            next if @new_args == @old_args;                # nothing to change
+            $feature_votes{ +DISABLED }{$stmt}{$_}[0]++    # vote to delete
+              for _missing_items( \@old_args, \@new_args );
         }
     }
 
     # deal with compat modules
     $self->_handle_compat_modules($doc);
-
-    # drop disabled features that are not part of the bundle
-    # (also if they were disabled with `no experimental`)
-    for my $module (qw( feature experimental )) {
-        for my $no_feature ( _find_include( $module => $doc, 'no' ) ) {
-            my @old_args = _ppi_list_to_perl_list( $no_feature->arguments );
-            _add_feature_to_scope( $no_feature, $_, DISABLED ) for @old_args;
-            my @new_args =                # keep disabling features
-              grep exists $feature{$_}    # that actually exist and are
-              && !exists $feature_in_bundle->{disabled}{$_},    # not disabled yet
-              @old_args;
-            next if @new_args == @old_args;                     # nothing to change
-            if (@new_args) {    # replace old statement with a smaller one
-                my $new_no_feature = PPI::Document->new(
-                    \"no $module @{[ join ', ', map qq{'$_'}, @new_args]};" );
-                $no_feature->insert_before( $_->remove )
-                  for $new_no_feature->elements;
-                $no_feature->remove;
-            }
-            else { _drop_statement($no_feature); }
-        }
-    }
 
     # apply some feature shine when crossing the feature enablement boundary
     for my $feature ( sort keys %{ $feature_shine{when_enabled} }  ) {
@@ -647,15 +712,40 @@ sub _cleanup_bundled_features {
         my @keep_args = grep !/\Aexperimental::/, @old_args;
         next if @new_args == @old_args    # nothing to remove
           || @new_args + @keep_args == @old_args;
-        if ( @new_args || @keep_args ) {    # replace old statement
-            my $new_warn_line = PPI::Document->new(
-                \"no warnings @{[ join ', ', map qq{'$_'}, @new_args, @keep_args]};"
-            );
-            $warn_line->insert_before( $_->remove )
-              for $new_warn_line->elements;
-            $warn_line->remove;
+        _replace_stmt(
+            $warn_line,
+            @new_args || @keep_args    # replace old statement
+            ? "no warnings @{[ join ', ', map qq{'$_'}, @new_args, @keep_args]};"
+            : undef                    # or delete it entirely
+        );
+    }
+
+    # update statements according to the result of the vote
+    for my $status ( ENABLED, DISABLED ) {
+        for my $stmt (
+            map Hash::Util::FieldHash::id_2obj($_),
+            keys %{ $feature_votes{$status} }
+          )
+        {
+            my @remove;
+            my $votes = $feature_votes{$status}{$stmt};
+
+	    # check all features controlled by that statement
+            for my $feature ( grep $_, keys %$votes ) {
+                next
+                  if !$votes->{$feature}[0]    # no deletion vote
+                  || $votes->{$feature}[1];    # at least one keep vote
+                push @remove, $feature;
+            }
+            if (@remove) {
+                my $verb     = $status eq ENABLED ? 'use' : 'no';
+                my $module   = $stmt->module;
+                my $features = join ', ', map qq{'$_'},
+                  _remove_items( $feature_votes{$status}{$stmt}{''}, \@remove );
+                _replace_stmt( $stmt,
+                    $features ? "$verb $module $features;" : undef );
+            }
         }
-        else { _drop_statement($warn_line); }
     }
 
     # strict is automatically enabled with 5.12
@@ -683,6 +773,20 @@ sub _insert_version_stmt {
       if $insert_point->previous_sibling
       && $insert_point->previous_sibling->isa('PPI::Token::Whitespace')
       && !($insert_point->isa('PPI::Statement::Include') && $insert_point->version );
+
+    # record individual features being enabled/disabled
+    for my $module (qw( feature experimental )) {
+        for my $use_feature ( _find_include( $module => $doc, 'use' ) ) {
+            my @old_args = _ppi_list_to_perl_list( $use_feature->arguments );
+            _add_feature_to_scope( $use_feature, $_, ENABLED ) for @old_args;
+            $feature_votes{+ENABLED}{$use_feature}{''} = \@old_args;
+        }
+        for my $no_feature ( _find_include( $module => $doc, 'no' ) ) {
+            my @old_args = _ppi_list_to_perl_list( $no_feature->arguments );
+            _add_feature_to_scope( $no_feature, $_, DISABLED ) for @old_args;
+            $feature_votes{+DISABLED}{$no_feature}{''} = \@old_args;
+        }
+    }
 
     # put the use VERSION LINE at the top of the file
     if ( $insert_point->significant ) {
@@ -742,6 +846,14 @@ sub bump_ppi {
         else {
             my ($use_v) = _version_stmts($doc);    # there's only one
             my $old_num = version::->parse( $use_v->version )->numify;
+
+            # record the features enabled and disabled by the bundle
+            my $feature_in_old_bundle = _feature_in_bundle($old_num);
+            _add_feature_to_scope( $use_v, $_, ENABLED )
+              for keys %{ $feature_in_old_bundle->{enabled} };
+            _add_feature_to_scope( $use_v, $_, DISABLED )
+              for keys %{ $feature_in_old_bundle->{disabled} };
+
             if ( $old_num <= $self->version_num ) {
                 _insert_version_stmt( $self, $doc, $old_num );
                 _drop_statement( $use_v, !!1 );
@@ -885,6 +997,10 @@ Perl version.
 If the code already declares a Perl version, it can only be bumped
 to a higher version.
 
+For more information about why you would want to use this module
+(or the associated program L<perl-version-bump>), please check
+L<Perl::Version::Bumper::Rationale>.
+
 The module L<exports|/EXPORTS> a few helper functions. These are mostly used
 by support tools for this distribution, and are not meant for general use.
 
@@ -946,7 +1062,7 @@ The constructor will also silently drop any sub-version information
 Return the version (in numeric format) of the feature set recognized
 by this module. It is not possible to bump code over that version.
 
-The current value of C<feature_version> is: C<5.042>.
+The current value of C<feature_version> is: C<5.044>.
 
 =head2 feature_data
 
@@ -1093,50 +1209,6 @@ not be modified if the code can't be bumped safely.
 The return value is C<undef> if the original didn't compile, false
 if all attempts to bump the file failed, and the actual (numerical)
 version number the file was bumped to in case of success.
-
-=head1 EXPORTS
-
-The following I<functions> can be optionally exported. Be aware that they
-are mostly meant for internal use of the module and helper scripts.
-
-=head2 version_fmt
-
-    my $v = version_fmt( $version );
-
-Return the given version (in string, v-string or float format) as a number.
-
-This function will die if the given version is not a plausible Perl
-version number, i.e. is strictly lower than C<5.010>.
-
-Note that all the following functions start by normalizing their
-argument by calling L</version_fmt>, meaning they will die in the same
-circumstances.
-
-=head2 version_use
-
-    my $v = version_use( $version );
-
-Return the given version (in string, v-string or float format) as
-a string suitable for a C<use VERSION> line.
-
-=head2 stable_version
-
-    my $s = stable_version( $version );
-
-Return the closest stable version lower or equal to the given version,
-as a number.
-
-=head2 stable_version_inc
-
-    my $n = stable_version_inc( $version );
-
-Return the stable version following the given version, as a number.
-
-=head2 stable_version_dec
-
-    my $p = stable_version_dec( $version );
-
-Return the stable version preceding the given version, as a number.
 
 =head1 VERSION UPGRADE ALGORITHM
 
@@ -1359,7 +1431,7 @@ BEGIN {
 
 =pod
 
-                  5.042 features known    enabled  disabled removed  compat
+                  5.044 features known    enabled  disabled removed  compat
                              say   5.010    5.010                    Perl6::Say 1 Say::Compat 1
                            state   5.010    5.010
                           switch   5.010    5.010    5.036
@@ -1389,6 +1461,7 @@ BEGIN {
                       smartmatch   5.042    5.010    5.042
                      keyword_all   5.042
                      keyword_any   5.042
+                     enhanced_xx   5.044
 
 =cut
 

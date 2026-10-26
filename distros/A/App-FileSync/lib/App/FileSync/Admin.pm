@@ -29,7 +29,7 @@ use App::FileSync::Store;
 use App::FileSync::Trash;
 use App::FileSync::Verify;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # The per-repo metadata directories a new repo starts with.
 Readonly my @META_DIRS => qw(clients trash journal locks);

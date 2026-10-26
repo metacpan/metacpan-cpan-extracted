@@ -115,7 +115,7 @@ subtest 'Analyzer::analyze_workflow - job WITH timeout-minutes produces no timeo
 		jobs => {
 			build => {
 				'runs-on'        => 'ubuntu-latest',
-				'timeout-minutes' => 30,
+				'timeout-minutes' => 60,
 				steps            => [{ uses => "$CACHE_ACTION\@v5" }],
 			},
 		},
@@ -667,7 +667,7 @@ subtest 'Fixer::apply_fixes - performance/missing timeout fires add_missing_time
 	});
 	my $n = apply_fixes($wf, \@issues);
 	is($n, 1,  'timeout fix applied');
-	is($wf->{jobs}{build}{'timeout-minutes'}, 30, 'default 30-minute timeout inserted');
+	is($wf->{jobs}{build}{'timeout-minutes'}, 60, 'default 60-minute timeout inserted');
 };
 
 subtest 'Fixer::apply_fixes - unfixable issue type is skipped silently' => sub {
@@ -921,7 +921,7 @@ subtest 'PerlCustomizer::detect_perl_requirements - Makefile.PL MIN_PERL_VERSION
 		);
 		my $reqs = detect_perl_requirements();
 		is($reqs->{has_makefile_pl}, 1,       'has_makefile_pl set');
-		is($reqs->{min_version},     '5.030', 'min_version extracted from Makefile.PL');
+		is($reqs->{min_version},   '5.030', 'min_version extracted from Makefile.PL');
 	});
 };
 
@@ -961,9 +961,9 @@ subtest 'PerlCustomizer::generate_custom_perl_workflow - explicit perl_versions 
 	my $yaml = generate_custom_perl_workflow({
 		perl_versions => ['5.36', '5.38'],
 	});
-	like($yaml,   qr/'5\.36'/, '5.36 present');
-	like($yaml,   qr/'5\.38'/, '5.38 present');
-	unlike($yaml, qr/'5\.40'/, '5.40 absent when not in explicit list');
+	like($yaml,   qr/["']5\.36["']/, '5.36 present');
+	like($yaml,   qr/["']5\.38["']/, '5.38 present');
+	unlike($yaml, qr/["']5\.40["']/, '5.40 absent when not in explicit list');
 };
 
 subtest 'PerlCustomizer::generate_custom_perl_workflow - enable_perlimports=0 omits step' => sub {
@@ -1097,7 +1097,7 @@ subtest 'End-to-end: timeout missing → detected → auto-fixed' => sub {
 	# 2. Fix it.
 	my $n = apply_fixes($wf, \@timeout_issues);
 	is($n, 1, 'one fix applied');
-	is($wf->{jobs}{test}{'timeout-minutes'}, 30, 'timeout-minutes set to 30');
+	is($wf->{jobs}{test}{'timeout-minutes'}, 60, 'timeout-minutes set to 60');
 
 	# 3. Re-analyse: no more timeout issue.
 	my @after = analyze_workflow($wf, 'ci.yml');

@@ -12,7 +12,7 @@ use Uniform::HTTP::Response 0.06 ();
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Native ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 my $BUFFERED_BODY_RETAIN_BYTES = 16_384;
@@ -908,6 +908,18 @@ sub _consume_received_body {
         $amount,
     );
 
+    return;
+}
+
+# Complete may send FIN and drive native callbacks before the outbound
+# Body::Stream marks itself finished. Recheck only once that flag is set.
+# The Connection retains authority over terminal and callback-depth guards.
+sub _outgoing_body_complete {
+    my ($self, $kind) = @_;
+    return if $self->is_terminal;
+
+    my $connection = $self->{connection} or return;
+    $connection->_maybe_complete_transaction($self->{stream_id});
     return;
 }
 

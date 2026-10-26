@@ -1,8 +1,8 @@
-requires 'Affix', 'v1.0.7';
+requires 'Affix', 'v1.2.6';
 requires 'File::Basename';
 requires 'File::Spec';
 on configure => sub {
-    requires 'Affix', 'v1.0.7';
+    requires 'Affix', 'v1.2.6';
     requires 'Affix::Build';
     requires 'CPAN::Meta',        '2.150012';
     requires 'Exporter',          '5.57';

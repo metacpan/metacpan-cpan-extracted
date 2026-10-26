@@ -19,7 +19,7 @@ use App::FileSync::I18N qw(message throw);
 use App::FileSync::IO qw(sha256_file);
 use App::FileSync::Scan;
 
-use version; our $VERSION = version->declare('0.001.2');
+use version; our $VERSION = version->declare('0.001.5');
 
 # The type of a manifest entry; older entries without "t" are files.  Lexical
 # because it runs several times per path.

@@ -4,7 +4,7 @@ App::FileSync - cron-driven file synchronisation without a daemon
 
 ## Version
 
-0.001.2
+0.001.5
 
 ## Synopsis
 
@@ -18,10 +18,15 @@ App::FileSync - cron-driven file synchronisation without a daemon
 
 ## Description
 
-App::FileSync keeps one directory per client in step with a master copy on a server, and
-keeps a separate machine holding a replica of that master.  Every run is a short-lived CLI
-process suitable for cron or the Windows Task Scheduler: there is no daemon, no database
-and no web interface.
+App::FileSync keeps a directory on each client in step with one master copy on
+the server.  Clients never talk to each other: each pushes its changes to the
+master and pulls everyone else's from it, so a change made on one client - a
+new file, an edit or a deletion - reaches the others on their next run.  Any
+number of clients can share a repo this way.
+
+A separate machine can hold a replica of the master.  Every run is a
+short-lived CLI process suitable for cron or the Windows Task Scheduler: there
+is no daemon, no database and no web interface.
 
 Only files whose content changed are transferred.  Data frames are deflated when that
 makes them smaller, and files of at least 64 KiB are sent as rsync-style block deltas
@@ -622,7 +627,8 @@ the server which root to use: name the same `--root` on every server command.
 
 `repo create` makes the master directory and the metadata beside it, printing
 both paths.  `client allow` is optional, because a repo with no clients
-admits every client.
+admits every client, and it takes the client's id: the host name unless
+`--id` was given.
 
 The server also needs `--root` when `filesync-server` starts, and the client
 cannot pass one, so wrap it:
@@ -642,18 +648,24 @@ can see a shorter PATH than an interactive login shell.
 
 ### On Each Client
 
-Register the directory with the id the server knows it by - the one given to
-`client allow`; without `--id` the client uses its host name - and name the
-wrapper as the server program:
+Register the directory and name the wrapper as the server program:
 
 ```
     # on the client, once
     filesync init --repo documents --root /home/foo/Documents \
-            --server foo@srv --id laptop \
+            --server foo@srv \
             --server-command /home/foo/bin/filesync-server-home
     filesync sync --repo documents --dry-run
     filesync sync --repo documents
 ```
+
+Nothing needs naming: the client reports its host name, which is the id
+`client allow` lists and the name the server keeps this client's base, its
+journal entries and its conflict copies under.  Pass `--id` only when the
+host name is not the name you want, and allow that name on the server
+instead.  An id is not a login - the ssh key and the account do the
+authenticating - and it does not divide the repo: every client of a repo
+syncs the whole tree.
 
 ssh runs with `BatchMode=yes`, so the client's key must already be in the
 server account's `authorized_keys`, or loaded in `ssh-agent`: cron cannot
@@ -681,7 +693,7 @@ command prompt:
     REM on the client, once
     C:\Strawberry\perl\bin\perl.exe C:\filesync\bin\filesync init ^
       --repo documents --root C:\Users\foo\Documents --server foo@srv ^
-      --id laptop --server-command /home/foo/bin/filesync-server-home
+      --server-command /home/foo/bin/filesync-server-home
 
     REM then create the task; it runs every minute as the current user
     schtasks /Create /SC MINUTE /MO 1 /TN FileSync /F ^

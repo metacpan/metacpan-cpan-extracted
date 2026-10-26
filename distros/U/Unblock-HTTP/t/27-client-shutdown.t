@@ -181,4 +181,70 @@ my $flush = sub {
     is($a->state, 'complete', 'H3 finishes successfully');
     is($released[0][3], 'shutdown', 'H3 release reason');
 }
+
+# A peer can temporarily exhaust H3 bidi stream credit. Its existing QUIC
+# connection may regain credit after another factory has started for the
+# same queued operation. The unused factory must be cancelled exactly once.
+{
+    my (@ready, @cancel, @released);
+    my $client = Unblock::HTTP::Client->new(
+        http3 => {}, defer => $defer, max_connections_per_origin => 2,
+        connect_quic => sub {
+            push @ready, $_[1];
+            my $index = $#ready;
+            return sub { ++$cancel[$index] };
+        },
+        release_connection => sub { push @released, [@_] },
+    );
+    my $first = $client->request(
+        url => 'https://credit-recovered.test/first', http_version => '3',
+    );
+    is(scalar @ready, 1, 'first QUIC factory started');
+    $ready[0]->(connection => ShutdownTest::Host->new);
+    is($first->state, 'active', 'first request admitted');
+    my $pool = $first->{origin};
+    my $conn = $pool->{connections}[0];
+    $conn->{credit_blocked} = 1;
+    my $second = $client->request(
+        url => 'https://credit-recovered.test/second', http_version => '3',
+    );
+    is(scalar @ready, 2, 'speculative connection started while credit blocked');
+    is($pool->{connecting}, 1, 'speculative factory is live');
+    $conn->{credit_blocked} = 0;
+    $client->_pump($pool);
+    is($second->state, 'active', 'same queued request admitted after credit recovery');
+    is($cancel[1], 1, 'unused speculative connector cancelled exactly once');
+    is($pool->{connecting}, 0, 'no orphaned connecting attempt');
+    ok(!$pool->{attempt}, 'connection attempt bookkeeping cleared');
+    ok(!defined $ready[1]->(connection => ShutdownTest::Host->new),
+        'late factory readiness cannot add a phantom connection');
+    is(scalar @{ $pool->{connections} }, 1, 'recovered QUIC connection reused');
+    $first->transaction->finish;
+    $second->transaction->finish;
+    $client->shutdown;
+    is(scalar @released, 1, 'one pooled connection released at shutdown');
+    is($cancel[1], 1, 'speculative factory not cancelled twice');
+    $flush->();
+}
+
+# Shutdown must also clean up an orphaned in-progress factory if its
+# initiating operation is no longer in the pending list.
+{
+    my $cancels = 0;
+    my $client = Unblock::HTTP::Client->new(
+        http3 => {}, defer => $defer,
+        connect_quic => sub {},
+    );
+    my $op = $client->request(
+        url => 'https://orphan-connect.test/', http_version => '3',
+    );
+    my $pool = $op->{origin};
+    $pool->{attempt}{cancel} = sub { ++$cancels };
+    $pool->{pending} = [];
+    $pool->{connecting} = 1;
+    $client->shutdown;
+    is($cancels, 1, 'shutdown cancels a connector without a pending operation');
+    is($client->pool_stats->{connecting}, 0, 'shutdown clears orphaned factory state');
+    $flush->();
+}
 done_testing;

@@ -1,24 +1,25 @@
 use v5.40;
-no warnings 'experimental::class', 'recursion';
+no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Semaphore v0.1.0 {
+class Acme::Parataxis::Semaphore v0.1.1 {
     use Acme::Parataxis;
     use Carp qw[croak];
     field $count : reader : param //= 1;
     field @waiters : reader;    # fiber ids in FIFO order and re-enqueued via the scheduler when woken
 
-    method _block_until_available () {    # Park the current fiber until a permit is available then recheck the count
+    method _block_until_available ( $reason = 'Semaphore down', $level = 2 )
+    {                           # Park the current fiber until a permit is available then recheck the count
         while ( $count <= 0 ) {
             my $fid = Acme::Parataxis->current_fid;
             croak 'Semaphore waits must occur inside a scheduled fiber' if $fid < 0;
             push @waiters, $fid;
-            Acme::Parataxis->yield('WAITING');
+            Acme::Parataxis::_park( $reason, $level, sub { $self->remove_waiter($fid) } );
         }
         1;
     }
 
-    method down () {
-        $self->_block_until_available;
+    method down ( $reason = 'Semaphore down', $level = 2 ) {
+        $self->_block_until_available( $reason, $level );
         $count--;
         1;
     }
@@ -54,20 +55,33 @@ class Acme::Parataxis::Semaphore v0.1.0 {
         $self->_wake_waiters($n);
         1;
     }
-    method wait () { $self->_block_until_available }
+    method wait ( $reason = 'Semaphore down', $level = 2 ) { $self->_block_until_available( $reason, $level ) }
 
     method guard () {
-        $self->down;
+        $self->down( 'Semaphore down', 3 );
         Acme::Parataxis::Semaphore::Guard->new( semaphore => $self );
+    }
+
+    method remove_waiter ($fid) {    # Unregisters a parked fiber id so a later up()/adjust() will not wake it.
+        my $before = @waiters;
+        @waiters = grep { $_ != $fid } @waiters;
+        return $before - @waiters;
     }
 };
 
-class Acme::Parataxis::Semaphore::Guard {    # Util
-    field $semaphore : param;
+# Util. A classic package, not feature::class: a perlclass 'method DESTROY' on a second class
+# block in the same file crashes perl_clone on some perls (threads->create => access violation
+# in Perl_newPADNAMEouter), and keep()/sync primitives must remain loadable pre-thread-create.
+package Acme::Parataxis::Semaphore::Guard v0.1.1 {
 
-    method DESTROY {
+    sub new ( $class, %args ) {
+        return bless { semaphore => $args{semaphore} }, $class;
+    }
+
+    sub DESTROY {
+        my $self = shift;
         return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-        $semaphore->up;
+        $self->{semaphore}->up;
     }
 };
 #

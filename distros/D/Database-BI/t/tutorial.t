@@ -25,9 +25,14 @@ use Test::More;
 use Test::Mojo;
 use Mojo::DOM;
 use Mojo::File;
+use File::Temp qw(tempdir);
 use Database::BI::Tutorial;
 
 my $t = Test::Mojo->new('Database::BI');
+
+# The model store (.bi/) is shared state in the checkout: give this file its
+# own directory, so a parallel run cannot create, read or write it underneath.
+$t->app->config->{model_dir} = tempdir(CLEANUP => 1);
 
 my $chapters = Database::BI::Tutorial->chapters;
 my $parts    = Database::BI::Tutorial->parts;

@@ -52,7 +52,7 @@ absolute, or both relative to the same directory.
 
 =head2 translated
 
-    $manual->translated($path, $code)
+    $manual->translated($path, $tag)
 
 The manual of one language whose source is the namesake of this one.
 The copy keeps the name, the section and the page, because a page name
@@ -63,9 +63,9 @@ own source.
 
 =head2 path, name, section, lang
 
-The source, the manual name, its section, and the language of the
-source. A manual of a constructor holds C<en>, and a translated manual
-holds the code of its language.
+The source, the manual name, its section, and the tag of the language
+of the source. A manual of a constructor holds the default language of
+its group, and a translated manual holds the tag of its language.
 
 =head2 is_pod
 
@@ -87,7 +87,7 @@ stages as F<Fugu::Daemon.3p> and not under its own file name.
 
 =head2 description
 
-The one-line description, read from the source.
+The one-line description, read from the source, as characters.
 
 An mdoc page gives the argument of its first C<.Nd> macro. A POD sidecar
 gives the text after C<< Module - >> on the first non-blank line below

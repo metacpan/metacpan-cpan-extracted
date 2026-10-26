@@ -150,6 +150,18 @@ rrule(self)
         RETVAL
 
 SV *
+describe(self)
+        SV *self
+    PREINIT:
+        const tkr_rule *r;
+    CODE:
+        r = tkr_rule_of(aTHX_ self, "Time::Keeper::Recurrence->describe");
+        RETVAL = newSVpvs("");
+        tkr_describe(aTHX_ r, RETVAL);
+    OUTPUT:
+        RETVAL
+
+SV *
 freq(self)
         SV *self
     ALIAS:

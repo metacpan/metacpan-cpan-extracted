@@ -3,7 +3,7 @@ package Unblock::HTTP2;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use constant {
     NO_ERROR            => 0,
@@ -165,6 +165,17 @@ for borrowed input and native output sinks.
 
 For a complete description of callbacks, backpressure, EOF, and shutdown,
 see L<Unblock::HTTP2::Integration>.
+
+=head1 RECEIVE RESOURCE LIMIT
+
+The engine retains compact ranges of retired and skipped stream IDs to
+validate late frames while preserving legitimate local-reset races. A
+connection exceeding 1024 separate history ranges is terminated with
+C<ENHANCE_YOUR_CALM>. This limits history fragmentation, not the number of
+requests or concurrent streams; sequential completions coalesce.
+
+Both Perl input and NativeABI input enforce the same limit. See
+F<docs/H2SPEC.md> for conformance coverage and the receive resource policy.
 
 =head1 SEE ALSO
 

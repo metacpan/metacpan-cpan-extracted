@@ -19,9 +19,11 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]table       table formatting (default: on)
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
+     -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
-     -V  --cat-v            visualize whitespace via cat-v
-     -w  --width=#          fold width (default: 80)
+         --cat-v            visualize whitespace via cat-v
+     -w  --width=#          output width (default: terminal width)
+         --fold-width=#     fold width (default: pane width - 5)
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -37,11 +39,12 @@ mdee - em·dee, Markdown Easy on the Eyes
      -S  --pane-width=#     pane width (default: 85)
     --bs --border-style=#   border style
          --[no-]page-number page number on border (default: on)
+         --[no-]filename    file name label (default: on)
          --[no-]pager[=#]   pager command
 
 # VERSION
 
-Version 1.08
+Version 1.10
 
 # DESCRIPTION
 
@@ -62,9 +65,21 @@ remain clickable.
 Use `--no-theme` to display the original Markdown source with
 markup characters intact.
 
-**em·dee** does not reflow paragraphs or convert Markdown into a
-different format.  For full Markdown rendering, many other viewers
-are available.  Combine them with [nup(1)](https://metacpan.org/pod/App%3A%3Anup) for similar paged output
+## Concept
+
+**em·dee** began as a viewer for Markdown _text_, not as a Markdown
+renderer.  The idea was to show a `.md` file as it is written, line
+for line, only made easier on the eyes with color: the Markdown is
+not interpreted or reformatted.  Some formatting has been added since
+because it made the text more readable: tables are aligned, long
+list items are folded, the default themes hide markup characters,
+and closing hashes are appended to lower-level headings.  Everything
+else is still the source text.  This is why paragraphs are not
+reflowed, why backslash escapes such as `\*` are shown as written,
+and why `--no-theme` gives back the original file, in color.
+
+For full Markdown rendering, many other viewers are available.
+Combine them with [nup(1)](https://metacpan.org/pod/App%3A%3Anup) for similar paged output
 (e.g., `nup glow README.md`).
 
 The pipeline combines [greple(1)](https://metacpan.org/pod/App%3A%3AGreple) for colorization and
@@ -95,8 +110,8 @@ Tables and list item folding are controlled by `--table` and
 ## Multi-column Layout and Pagination
 
 By default, **mdee** calculates the number of display columns by
-dividing the terminal width by the pane width (default 85
-characters).  This determines how the output is laid out and
+dividing the output width (the terminal width unless `--width`
+is given) by the pane width (default 85 characters).  This determines how the output is laid out and
 paginated.
 
 When two or more columns fit, [nup(1)](https://metacpan.org/pod/App%3A%3Anup) arranges output
@@ -112,7 +127,15 @@ maintaining the same visual appearance.
 To force page-by-page pagination even in single-column layout,
 specify `--nup` explicitly.  The `--pane-width` (`-S`) option
 adjusts the column width used for this calculation, and
-`--pane` (`-C`) sets the number of columns directly.
+`--pane` (`-C`) sets the number of columns directly.  The
+`--width` (`-w`) option replaces the terminal width in this
+calculation and limits the output to that width.
+
+With two or more files, `--parallel` shows the files side by side,
+one pane per file, instead of one after another.  Each file is
+folded to its pane width, and the panes scroll together in the
+pager.  `--pane` (`-C`) still sets the number of panes when given;
+files that do not fit in one row continue on the next.
 
 Use `-p` (`--style=pager`) for a simpler view without nup
 formatting — highlighted output is piped directly through a
@@ -222,7 +245,7 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     `:---:` for center, `---:` for right) is respected.
     Default is enabled.
 
-    When folding is enabled, a table wider than `--width` is fit into
+    When folding is enabled, a table wider than the fold width is fit into
     that width: columns that fit keep their width, and the cells of
     over-wide columns are wrapped.  A table that already fits is not
     changed.  Use `--config table_width=0` to disable wrapping, or
@@ -263,7 +286,7 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     dashes (`-`) in separator lines are replaced with horizontal
     rules (`─`).  Default is enabled.
 
-- **-V**, **--cat-v**
+- **--cat-v**
 
     Pass the output through [cat-v(1)](https://metacpan.org/pod/App%3A%3Acat%3A%3Av) to visualize
     whitespace and special characters.  Spaces are shown as `·`
@@ -272,10 +295,24 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
 - **-w** _N_, **--width**=_N_
 
-    Set the fold width for text wrapping.  Default is calculated from
-    `--pane-width` minus 5 (margin for borders and padding), which
-    gives 80 when pane-width is 85.  Only effective when `--fold` is
-    enabled.  The same width is used to fit tables (see `--table`).
+    Set the output width in characters.  Default is the terminal
+    width.  With nup, this width is used in place of the terminal
+    width to calculate the number of columns, and it is passed to
+    [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) so that the panes fit into it:
+
+        mdee -w 170 file.md          # two 85-column panes on a wide terminal
+        mdee -V -w 170 a.md b.md     # two files in 85 columns each
+
+    Without nup (`--style=cat`, `pager`, `filter`, or `--no-nup`),
+    the text itself is the output, so this is the fold width.
+
+- **--fold-width**=_N_
+
+    Set the fold width for text wrapping directly.  Default is the
+    pane width (output width divided by the number of columns) minus
+    5 for borders and padding, which gives 80 when pane-width is 85.
+    Only effective when `--fold` is enabled.  The same width is used
+    to fit tables (see `--table`).
 
 ## Theme Options
 
@@ -534,11 +571,17 @@ bold text, etc.).
 
 ## Layout Options (passed to nup)
 
+- **-V**, **--parallel**
+
+    Show two or more files side by side, one pane per file, instead of
+    one after another.  The number of panes is the number of files
+    unless `--pane` is given.  Ignored with a single file.
+
 - **-C** _N_, **--pane**=_N_
 
     Set the number of columns (panes).  When not specified (or 0),
-    the number of columns is calculated from the terminal width and
-    `--pane-width`.  If only 1 column fits, nup formatting (borders
+    the number of columns is calculated from the output width
+    (`--width`, default terminal width) and `--pane-width`.  If only 1 column fits, nup formatting (borders
     etc.) is preserved but pagination is handled by the pager instead.
     Use `--nup` to force nup's native pagination even in single column.
 
@@ -557,8 +600,9 @@ bold text, etc.).
 - **-S** _N_, **--pane-width**=_N_
 
     Set the pane width in characters.  Default is 85.  This value is
-    used to calculate the number of columns and the default fold
-    width.
+    used to calculate the number of columns from the output width,
+    and the default fold width.  It has no effect when the number of
+    columns is given by `--pane` or `--parallel`.
 
 - **--bs**=_STYLE_, **--border-style**=_STYLE_
 
@@ -568,6 +612,14 @@ bold text, etc.).
 
     Show page number on the bottom border of each column.  Enabled by
     default.  Use `--no-page-number` to disable.
+
+- **--**\[**no-**\]**filename**
+
+    Show the file name label at the top of each file.  Enabled by
+    default.  Use `--no-filename` to hide it, for example when files are
+    shown side by side with `--parallel` and the panes should start with
+    the text.  The label format and color are set by the `FILE_FORMAT`
+    and `FILE` theme keys (see `--config`).
 
 ## Pager Options
 
@@ -588,7 +640,8 @@ This is a shell script that can set defaults and override colors:
     default[mode]='dark'             # set default mode
     default[theme]='warm'            # set default theme(s)
     default[style]='pager'           # set default style
-    default[width]=100               # set default fold width
+    default[width]=170               # set default output width
+    default[fold_width]=80           # set default fold width
     default[base_color]='DarkCyan'   # set default base color
 
 The `default` associative array supports the following keys:
@@ -596,7 +649,8 @@ The `default` associative array supports the following keys:
 - `default[mode]` - Corresponds to `--mode` (e.g., `dark`, `light`)
 - `default[theme]` - Corresponds to `--theme` (e.g., `warm`, `warm,hashed`)
 - `default[style]` - Corresponds to `--style` (e.g., `pager`, `cat`)
-- `default[width]` - Corresponds to `--width` (e.g., `100`)
+- `default[width]` - Corresponds to `--width` (e.g., `170`)
+- `default[fold_width]` - Corresponds to `--fold-width` (e.g., `80`)
 - `default[pane_width]` - Corresponds to `--pane-width` (e.g., `100`)
 - `default[pane]` - Corresponds to `--pane` (e.g., `2`)
 - `default[base_color]` - Corresponds to `--base-color` (e.g., `DarkCyan`)
@@ -636,7 +690,9 @@ The `${base}` string is expanded to the base color value after loading.
     mdee README.md              # view markdown file
     mdee -C2 document.md        # 2-column view
     mdee -G2x2 manual.md        # 2x2 grid (4-up)
-    mdee -w60 narrow.md         # narrower text width
+    mdee -w170 file.md          # two 85-column panes on a wide terminal
+    mdee -V -w170 a.md b.md     # two files in 85 columns each
+    mdee --fold-width=60 a.md   # narrower text within the pane
     mdee --no-pager file.md     # without pager
     mdee --no-nup file.md       # output to stdout without nup
     mdee --no-fold file.md      # disable line folding
@@ -746,7 +802,7 @@ HTML comments, and tables are excluded from folding.
 Recognized list markers include `*`, `-`, `1.`, `1)`, `#.`,
 and `#)`.  The `#` marker is Pandoc's auto-numbered list syntax.
 
-The folding width is controlled by `--width` option (default: 80).
+The folding width is controlled by `--fold-width` option (default: 80).
 
 #### Table Formatting
 

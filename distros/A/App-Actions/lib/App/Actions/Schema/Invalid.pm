@@ -9,7 +9,7 @@ use warnings;
 # message is the whole text, which keeps message and stringification equal.
 use parent 'App::Actions::Error';
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 sub new {
 	my ($class, $message) = @_;

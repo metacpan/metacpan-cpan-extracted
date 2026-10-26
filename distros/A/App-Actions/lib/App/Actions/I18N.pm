@@ -21,7 +21,7 @@ use App::Actions::I18N::en;
 use App::Actions::I18N::fr;
 use App::Actions::I18N::zh;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 our @EXPORT_OK = qw(i18n throw validate_args);
 

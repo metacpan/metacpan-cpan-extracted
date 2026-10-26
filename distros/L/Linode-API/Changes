@@ -1,5 +1,11 @@
 Revision history for Linode-API
 
+0.003 2026-10-25 TEODESIAN
+    - Send a value in a format that JSON::Validator does not know without a
+      warning.  Linode names formats of its own, and JSON::Validator warned on
+      every value of one, then sent it unchecked anyway.  An ip, such as the
+      address of put_ip, is now checked as an IPv4 or IPv6 address.
+
 0.002 2026-09-21 TEODESIAN
     - Send a path parameter that holds a slash with the slash as it is.  An id
       Linode hands out can hold one: a private image is private/123.
