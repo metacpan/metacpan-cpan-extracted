@@ -7,7 +7,7 @@ Attean::QueryPlanner - Query planner
 
 =head1 VERSION
 
-This document describes Attean::QueryPlanner version 0.039
+This document describes Attean::QueryPlanner version 0.040
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ use Attean::Algebra;
 use Attean::Plan;
 use Attean::Expression;
 
-package Attean::QueryPlanner 0.039 {
+package Attean::QueryPlanner 0.040 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -126,31 +126,31 @@ the supplied C<< $active_graph >>.
 		my @children	= @{ $algebra->children };
 		my ($child)		= $children[0];
 		if ($algebra->isa('Attean::Algebra::Query') or $algebra->isa('Attean::Algebra::Update')) {
-			return $self->plans_for_algebra($algebra->child, $model, $active_graphs, $default_graphs, %args);
+
+			my @active_graphs	= @$active_graphs;
+			my @default_graphs	= @$default_graphs;
+			
+			if ($algebra->can('dataset')) {
+				my $dataset	= $algebra->dataset;
+				my @default	= @{ $dataset->{'default'} || [] };
+				my $named	= $dataset->{'named'};
+				my @named	= (ref($named) eq 'ARRAY') ? @$named : (values %{ $named || {} });
+				
+				if (scalar(@default) or scalar(@named)) {
+					# change the available named graphs
+					# change the active graph(s)
+					@active_graphs	= @default;
+					@default_graphs	= @default;
+					$args{ available_graphs }	= [@named];
+				}
+			}
+
+			return $self->plans_for_algebra($algebra->child, $model, \@active_graphs, \@default_graphs, %args);
 		} elsif ($algebra->isa('Attean::Algebra::BGP')) {
 			my $triples	= $algebra->triples;
 			my @triples	= @$triples;
 			my %blanks;
-			foreach my $i (0 .. $#triples) {
-				my $t	= $triples[$i];
-				my @nodes	= $t->values;
-				my $changed	= 0;
-				foreach (@nodes) {
-					if ($_->does('Attean::API::Blank')) {
-						$changed++;
-						my $id	= $_->value;
-						unless (exists $blanks{$id}) {
-							$blanks{$id}	= Attean::Variable->new(value => $self->new_temporary('blank'));
-						}
-						$_	= $blanks{$id};
-					}
-				}
-				
-				if ($changed) {
-					my $new	= Attean::TriplePattern->new(@nodes);
-					$triples[$i]	= $new;
-				}
-			}
+			$self->replace_blanks_with_variables(\%blanks, \@triples);
 			my $bgp		= Attean::Algebra::BGP->new( triples => \@triples );
 			my @plans	= $self->bgp_join_plans($bgp, $model, $active_graphs, $default_graphs, $interesting, map {
 				[$self->access_plans($model, $active_graphs, $_)]
@@ -286,6 +286,7 @@ the supplied C<< $active_graph >>.
 			} else {
 				my $gvar	= $graph->value;
 				my $graphs	= $model->get_graphs;
+				
 				my @plans;
 				my %vars		= map { $_ => 1 } $child->in_scope_variables;
 				$vars{ $gvar }++;
@@ -300,7 +301,8 @@ the supplied C<< $active_graph >>.
 				}
 				
 				my @branches;
-				my %ignore	= map { $_->value => 1 } @$default_graphs;
+				# ignore default graphs unless they are listed as available named graphs
+				my %ignore	= map { $_->value => 1 } grep { not exists $available{ $_->value} } @$default_graphs;
 				while (my $graph = $graphs->next) {
 					next if $ignore{ $graph->value };
 					my %exprs	= ($gvar => Attean::ValueExpression->new(value => $graph));
@@ -447,7 +449,8 @@ the supplied C<< $active_graph >>.
 				my $a;
 				if ($s_var and not($o_var)) {
 					my $inv	= Attean::Algebra::InversePath->new( children => [$child] );
-					$a		= Attean::Algebra::Path->new( subject => $end, path => $inv, object => $begin );
+					$a		= Attean::Algebra::Path->new( subject => $begin, path => $inv, object => $end );
+					($s, $o)	= ($o, $s);
 				} else {
 					$a		= Attean::Algebra::Path->new( subject => $begin, path => $child, object => $end );
 				}
@@ -648,6 +651,41 @@ the supplied C<< $active_graph >>.
 			return @unfold;
 		}
 		die "Unimplemented algebra evaluation for: " . $algebra->as_string;
+	}
+	
+	sub replace_blanks_with_variables {
+		my $self	= shift;
+		my $blanks	= shift;
+		my $triples	= shift;
+		my $any_changed	= 0;
+		foreach my $i (0 .. $#{ $triples }) {
+			my $t	= $triples->[$i];
+			my @nodes	= $t->values;
+			my $changed	= 0;
+			foreach (@nodes) {
+				if ($_->does('Attean::API::Blank')) {
+					$changed++;
+					my $id	= $_->value;
+					unless (exists $blanks->{$id}) {
+						$blanks->{$id}	= Attean::Variable->new(value => $self->new_temporary('blank'));
+					}
+					$_	= $blanks->{$id};
+				} elsif ($_->does('Attean::API::TriplePattern')) {
+					my $tt	= [$_];
+					my $changed	= $self->replace_blanks_with_variables($blanks, $tt);
+					if ($changed) {
+						$_	= $tt->[0];
+					}
+				}
+			}
+			
+			if ($changed) {
+				$any_changed++;
+				my $new	= Attean::TriplePattern->new(@nodes);
+				$triples->[$i]	= $new;
+			}
+		}
+		return $any_changed;
 	}
 	
 # 	sub plans_for_unbounded_path {
@@ -1056,7 +1094,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

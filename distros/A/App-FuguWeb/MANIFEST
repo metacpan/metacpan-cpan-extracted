@@ -33,7 +33,10 @@ lib/App/FuguWeb/Site.pm
 lib/App/FuguWeb/Site.pod
 lib/App/FuguWeb/Status.pm
 lib/App/FuguWeb/Status.pod
+man/fuguweb/fuguweb-keys.7
+man/fuguweb/fuguweb-site.7
 man/fuguweb/fuguweb.1
+man/fuguweb/fuguwebrc.5
 share/fuguweb/style.css
 t/fuguweb/boundary.t
 t/fuguweb/check.t

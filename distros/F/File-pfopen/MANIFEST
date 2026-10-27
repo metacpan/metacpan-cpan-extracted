@@ -1,4 +1,5 @@
 Changes
+cpanfile
 ignore.txt
 lib/File/pfopen.pm
 LICENSE
@@ -7,12 +8,14 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md
+SECURITY.md
 t/00-load.t
 t/comment-spelling.t
 t/critic.t
 t/dist.t
 t/eof.t
 t/eol.t
+t/function.t
 t/manifest.t
 t/no404s.t
 t/pfopen.t
@@ -23,6 +26,9 @@ t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/separators.t
+t/taint.t
+t/unit.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,10 @@
+{
+   "body" : {
+      "error" : {
+         "code" : "InvalidKey",
+         "message" : "Authentication failed; invalid API key"
+      }
+   },
+   "request" : "convert-to-3wa?coordinates=1%2C2&format=json",
+   "status" : 401
+}

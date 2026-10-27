@@ -316,6 +316,8 @@ t/issues/gh-1621/views/redirect.tt
 t/issues/gh-1664/gh-1664.t
 t/issues/gh-1712/gh-1712.t
 t/issues/gh-1712/views/exec.tt
+t/issues/gh-1861.t
+t/issues/gh-1863.t
 t/issues/gh-596.t
 t/issues/gh-634.t
 t/issues/gh-639/fails/.dancer
@@ -418,6 +420,7 @@ t/request_upload.t
 t/response.t
 t/roles/hook.t
 t/route-pod-coverage/route-pod-coverage.t
+t/route_query.t
 t/scope_problems/config.yml
 t/scope_problems/dispatcher_internal_request.t
 t/scope_problems/keywords_before_template_hook.t

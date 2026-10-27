@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Constants - Constant definitions for use in parsing Tur
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Constants version 0.039
+This document describes AtteanX::Parser::Turtle::Constants version 0.040
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ This document describes AtteanX::Parser::Turtle::Constants version 0.039
 
 =cut
 
-package AtteanX::Parser::Turtle::Constants 0.039 {
+package AtteanX::Parser::Turtle::Constants 0.040 {
 	use v5.14;
 	use warnings;
 
@@ -27,6 +27,7 @@ package AtteanX::Parser::Turtle::Constants 0.039 {
 	BEGIN {
 		@EXPORT = qw(
 			A
+			ANON
 			BASE
 			BNODE
 			BOOLEAN
@@ -56,10 +57,15 @@ package AtteanX::Parser::Turtle::Constants 0.039 {
 			STRING3S
 			TURTLEBASE
 			TURTLEPREFIX
+			TURTLEVERSION
 			GTGT
+			PGTGT
 			LTLT
+			LTLTP
 			LANNOT
 			RANNOT
+			TILDE
+			VERSION
 			WS
 			decrypt_constant
 		)

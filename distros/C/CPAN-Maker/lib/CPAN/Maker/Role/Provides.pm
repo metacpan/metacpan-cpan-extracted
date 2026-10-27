@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Carp;
+use CLI::Simple::Utils qw(slurp);
+use CLI::Simple::Constants qw(:booleans);
 use English qw(-no_match_vars);
+use ExtUtils::MM;
 use File::Find;
 use File::Process qw(process_file);
 use Scalar::Util qw(reftype);
-
-use CLI::Simple::Utils qw(slurp);
-use CLI::Simple::Constants qw(:booleans);
 
 use Role::Tiny;
 
@@ -108,7 +108,22 @@ sub get_provides {
 
       my $provided_module = $module_version->{module} // $module;
 
-      if ( !$module_version->{file} ) {
+      # get_module_version() returns the *expected* filename even when
+      # that file does not exist. Moreover, a file with that name can
+      # declare a different package (e.g. Text::URLEncode in
+      # lib/Bedrock/Text/URLEncode.pm).
+      my $module_file     = $module_version->{file};
+      my $path            = $module_file ? "$include_path/$module_file" : q{};
+      my $matches_package = $FALSE;
+
+      if ( $path && -f $path ) {
+        my $text = slurp($path);
+        $text =~ s/^=pod(.*?)=cut//xsmg;
+        $matches_package = $TRUE
+          if $text =~ /^package\s+\Q$module\E\s*(?:;|\{)/xsm;
+      }
+
+      if ( !$matches_package ) {
         push @missing,
           {
           module  => $module,
@@ -158,29 +173,22 @@ sub get_provides {
         my $text = slurp($module_file);
 
         next
-          if $text !~ /^package\s+\Q$module\E;/xsm;
+          if $text !~ /^package\s+\Q$module\E\s*(?:;|\{)/xsm;
 
         # Remove POD before confirming the package declaration so a
         # documented package name does not produce a false positive.
         $text =~ s/^=pod(.*?)=cut//xsmg;
 
         next
-          if $text !~ /^package\s+\Q$module\E;/xsm;
+          if $text !~ /^package\s+\Q$module\E\s*(?:;|\{)/xsm;
 
         my $version = $provided_version;
 
         if ( !defined $version || $version eq 'undef' ) {
-          $version = eval {
-            local $SIG{__WARN__} = sub { };
+          $version = eval { return ExtUtils::MM->parse_version($module_file); };
 
-            require $module_file;
-
-            no strict 'refs'; ## no critic
-
-            return ${ $module . '::VERSION' };
-          };
-
-          $version //= 'undef';
+          $version = 'undef'
+            if !defined $version;
         }
 
         my $rel_path = $module_file;

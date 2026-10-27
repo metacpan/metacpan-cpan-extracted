@@ -36,7 +36,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-0.8.1
+1.0.0
 
 # DESCRIPTION
 

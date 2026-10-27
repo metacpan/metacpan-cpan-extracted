@@ -1,4 +1,4 @@
-package Trog::SQLite 0.004;
+package Trog::SQLite 0.005;
 
 # ABSTRACT: An SQLite handle with its schema applied, its updates run, and its pragmas set
 
@@ -20,24 +20,37 @@ use POSIX      qw{floor};
 use Sub::Retry qw{retry};
 
 
-# The handle cache, keyed by database file.  A forked child inherits it.
+# The handle cache, keyed by database file, and the process it belongs to.  A
+# forked child inherits both, and dbh empties the cache when the process differs.
 my $handles = {};
+my $owner   = $$;
 
 # How long a statement waits for a lock, in milliseconds, and how long wal
 # waits between its tries, in seconds.
 our $BUSY_TIMEOUT = 5000;
 our $WAL_DELAY    = 0.05;
 
+my %OPTIONS = ( integrity_check => 1 );
+
 sub dbh {
-    my ( $schema, $dbname ) = @_;
+    my ( $schema, $dbname, $options ) = @_;
+    $options //= {};
+    die "The options of dbh must be a HASH reference\n" unless ref $options eq 'HASH';
+    my @unknown = grep { !$OPTIONS{$_} } sort keys %$options;
+    die "dbh has no option(s) @unknown\n" if @unknown;
+
+    forget()                   if $owner != $$;
     return $handles->{$dbname} if $handles->{$dbname};
 
     # No touch first, because DBD::SQLite creates the file on connect.
-    my $db = DBI->connect( "dbi:SQLite:dbname=$dbname", q{}, q{}, { RaiseError => 1, PrintError => 0 } );
+    my $db = DBI->connect( "dbi:SQLite:dbname=$dbname", q{}, q{}, { RaiseError => 1, PrintError => 0, AutoInactiveDestroy => 1 } );
 
     # Before the schema, because a second process that opens a new database at
     # the same time must wait for the updates of the first one.
     $db->do("PRAGMA busy_timeout = $BUSY_TIMEOUT");
+
+    # Before the schema and the journal mode, so that a damaged file is not written to.
+    integrity_check($db) if $options->{integrity_check};
     wal($db);
     $db->do('PRAGMA synchronous = NORMAL');
 
@@ -69,6 +82,15 @@ sub wal {
     );
     die $error if $error;
     return 1;
+}
+
+
+sub integrity_check {
+    my ($db) = @_;
+
+    my @problems = map { $_->[0] } @{ $db->selectall_arrayref('PRAGMA integrity_check') };
+    return 1 if "@problems" eq 'ok';
+    die 'The integrity check of ' . $db->sqlite_db_filename() . " failed:\n" . join( "\n", @problems ) . "\n";
 }
 
 
@@ -187,6 +209,7 @@ sub update {
 
 sub forget {
     $handles = {};
+    $owner   = $$;
     return 1;
 }
 
@@ -254,7 +277,7 @@ Trog::SQLite - An SQLite handle with its schema applied, its updates run, and it
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -307,12 +330,25 @@ C<PRAGMA foreign_key_check> must report nothing, or the update is rolled back.
 
 =head1 FUNCTIONS
 
-=head2 dbh($schema, $dbname)
+=head2 dbh($schema, $dbname, \%options)
 
 Returns a handle to the database in the file C<$dbname>, which is made if it
 does not exist.  If you give C<$schema>, its DDL and its updates are applied
 first, as L</Schema updates> says.  Omit C<$schema> for a database that already
 has its schema.
+
+C<%options> is optional.  It has one key:
+
+=over 4
+
+=item * C<integrity_check>: when true, run C<integrity_check> on the database
+before the schema, and die if the check fails.  The check reads every page, so
+it takes as long as the database is large, and it is off unless you ask.
+
+=back
+
+Dies if C<\%options> is not a hash reference, or has a key that is not listed
+here.
 
 The handle has C<RaiseError> on, and these pragmas:
 
@@ -330,10 +366,19 @@ mode, so C<wal> tries again for as long as C<busy_timeout> waits.
 =back
 
 The handle is cached for the rest of the process.  A second call for the same
-C<$dbname> returns the cached handle, and does not apply C<$schema> again.
+C<$dbname> returns the cached handle, and does not apply C<$schema> again or
+check the database again.  A handle that fails its check is not cached.
 
-Do not call this during C<BEGIN> or outside a sub.  A handle must not outlive a
-fork, so a forked child calls C<forget> before it calls this.
+Do not call this during C<BEGIN> or outside a sub.
+
+A handle must not outlive a fork.  The cache remembers the process that it
+belongs to, so a forked child that calls this gets a new handle of its own,
+and the parent keeps its handle.  The child does not need to call C<forget>.
+
+The handle has C<AutoInactiveDestroy> on, so a forked child that drops it, or
+exits, does not close it.  Otherwise L<DBI> would roll back an open transaction of
+the parent from the child, and SQLite can lose the pages of that transaction
+that it already wrote to the WAL.
 
 =head2 wal($db)
 
@@ -342,6 +387,12 @@ connection holds a write lock, SQLite fails the change at once with
 C<SQLITE_BUSY> and does not wait for C<busy_timeout>.  So this tries again
 every C<$WAL_DELAY> seconds, for as long as C<$BUSY_TIMEOUT> says.  Dies with
 the last error when the lock outlasts that, and at once on any other error.
+
+=head2 integrity_check($db)
+
+Runs C<PRAGMA integrity_check> on the handle C<$db>, and returns 1 if it
+reports C<ok>.  Otherwise dies with the name of the file and every problem that
+the check reported, one on each line.
 
 =head2 apply($db, $file)
 
@@ -372,8 +423,8 @@ update then changes nothing.
 
 =head2 forget()
 
-Drops the cached handles and returns 1.  A forked child calls this so that it
-opens its own handle and does not use the handle of its parent.
+Drops the cached handles and returns 1, so that the next C<dbh> for each file
+opens a new handle.  C<dbh> calls this itself in a forked child.
 
 =head2 transaction($db, $work)
 

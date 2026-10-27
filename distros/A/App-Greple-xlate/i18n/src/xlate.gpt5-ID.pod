@@ -10,9 +10,15 @@ App::Greple::xlate - modul dukungan terjemahan untuk greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Untuk menggunakan GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Jika C<llm models> tidak mencantumkan C<gpt-6-astra>, lihat petunjuk pendaftaran model di L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ Saat ini, mesin berikut tersedia
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> untuk pendaftaran model)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Setel nilai ini ke 1 jika Anda ingin menerjemahkan satu baris setiap kali. Opsi 
 
 =item B<--xlate-prompt>=I<text>
 
-Tentukan prompt khusus untuk dikirim ke mesin penerjemahan. Opsi ini tersedia untuk mesin LLM (C<gpt3>, C<gpt4o>, C<gpt5>) tetapi tidak untuk DeepL. Anda dapat menyesuaikan perilaku penerjemahan dengan memberikan instruksi spesifik kepada model AI. Jika prompt berisi C<%s>, itu akan diganti dengan nama bahasa target. Untuk mesin C<gpt5> yang didukung llm, dokumen diberikan secara terpisah sebagai permintaan JSON yang anggota C<input>-nya adalah array yang akan diterjemahkan dan anggota C<context> opsionalnya berisi data referensi. Instruksi tetap yang memperlakukan anggota tersebut sebagai data dokumen, bukan perintah, ditambahkan bahkan ketika prompt khusus digunakan.
+Tentukan prompt khusus untuk dikirim ke mesin penerjemahan. Opsi ini tersedia untuk mesin LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) tetapi tidak untuk DeepL. Anda dapat menyesuaikan perilaku penerjemahan dengan memberikan instruksi spesifik kepada model AI. Jika prompt berisi C<%s>, itu akan diganti dengan nama bahasa target. Untuk mesin C<gpt5> dan C<gpt6> yang didukung llm, dokumen diberikan secara terpisah sebagai permintaan JSON yang anggota C<input>-nya adalah array yang akan diterjemahkan dan anggota C<context> opsionalnya berisi data referensi. Instruksi tetap yang memperlakukan anggota tersebut sebagai data dokumen, bukan perintah, ditambahkan bahkan ketika prompt khusus digunakan.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Tentukan informasi konteks tambahan yang akan dikirim ke mesin terjemahan. Opsi 
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Jumlah blok terjemahan di sekitarnya yang diteruskan sebagai konteks referensi saat menerjemahkan ulang blok yang berubah (default 2). Konteks juga mencakup teks sumber mentah di sekitar wilayah yang berubah (heading, struktur daftar, caption) dan, bila tersedia, versi sebelumnya dari teks yang berubah yang dipulihkan dari cache, sehingga susunan kata yang tidak berubah dipertahankan. Atur ke 0 untuk menonaktifkan terjemahan sadar konteks sepenuhnya. Perhatikan bahwa setiap wilayah yang berubah diterjemahkan dalam panggilan API-nya sendiri dan konteks dapat menambah hingga sekitar 8000 karakter ke permintaan pengguna JSON, sehingga terjemahan sadar konteks menukar sedikit biaya tambahan demi konsistensi. Konteks yang berasal dari dokumen tidak dimasukkan ke dalam prompt sistem.
 
 =item B<--xlate-cache-seed>=I<file>

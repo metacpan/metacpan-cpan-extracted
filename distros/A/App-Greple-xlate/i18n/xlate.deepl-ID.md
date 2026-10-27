@@ -8,9 +8,15 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Untuk menggunakan GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Jika  `llm models`tidak mencantumkan `gpt-6-astra`, lihat petunjuk pendaftaran model di [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Kecualikan blok embedz dari terjemahan jika dokumen mengandungnya:
 
     Pada saat ini, mesin berikut ini tersedia
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) (untuk pendaftaran model)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Kecualikan blok embedz dari terjemahan jika dokumen mengandungnya:
 
 - **--xlate-prompt**=_text_
 
-    Tentukan prompt khusus yang akan dikirim ke mesin terjemahan. Opsi ini tersedia untuk mesin LLM (`gpt3`, `gpt4o`, `gpt5`) tetapi tidak untuk DeepL. Anda dapat menyesuaikan perilaku terjemahan dengan memberikan instruksi spesifik kepada model AI. Jika prompt berisi `%s`, maka akan diganti dengan nama bahasa target. Untuk mesin `gpt5` yang didukung LLM, dokumen disediakan secara terpisah sebagai permintaan JSON yang anggota `input`-nya adalah array yang akan diterjemahkan dan anggota opsional `context`-nya berisi data referensi. Instruksi tetap yang memperlakukan anggota tersebut sebagai data dokumen, bukan perintah, ditambahkan bahkan saat prompt khusus digunakan.
+    Tentukan prompt khusus yang akan dikirim ke mesin terjemahan. Opsi ini tersedia untuk mesin LLM (`gpt3`, `gpt4o`, `gpt5`, `gpt6`) tetapi tidak untuk DeepL. Anda dapat menyesuaikan perilaku terjemahan dengan memberikan instruksi spesifik kepada model AI. Jika prompt berisi `%s`, maka akan diganti dengan nama bahasa target. Untuk `gpt6`mesin  dan`gpt5`  yang didukung LLM, dokumen disediakan secara terpisah sebagai permintaan JSON yang `input`anggota  -nya adalah array yang akan diterjemahkan dan `context`anggota  opsionalnya berisi data referensi. Instruksi tetap yang memperlakukan anggota-anggota tersebut sebagai data dokumen, bukan perintah, ditambahkan bahkan ketika prompt khusus digunakan.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Kecualikan blok embedz dari terjemahan jika dokumen mengandungnya:
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Jumlah blok terjemahan di sekitarnya yang diteruskan sebagai konteks referensi saat menerjemahkan ulang blok yang diubah (default 2). Konteks tersebut juga mencakup teks sumber mentah di sekitar wilayah yang diubah (judul, struktur daftar, keterangan) dan, jika tersedia, versi sebelumnya dari teks yang diubah yang diambil dari cache, sehingga susunan kata yang tidak berubah tetap dipertahankan. Atur ke 0 untuk menonaktifkan terjemahan berbasis konteks sepenuhnya. Perhatikan bahwa setiap wilayah yang diubah diterjemahkan dalam panggilan API tersendiri dan konteks dapat menambah sekitar 8000 karakter ke permintaan JSON pengguna, sehingga terjemahan berbasis konteks menukar biaya tambahan dengan konsistensi. Konteks yang berasal dari dokumen tidak dimasukkan ke dalam prompt sistem.
 
 - **--xlate-cache-seed**=_file_

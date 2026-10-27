@@ -10,9 +10,15 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra kasutamiseks:
+
+    xlate -e gpt6 -t JA file.txt
+
+Kui  C<llm models>ei näita C<gpt-6-astra>, vaadake mudeli registreerimise juhiseid L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ Praegu on saadaval järgmised mootorid
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> (mudeli registreerimiseks)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Määrake selle väärtuseks 1, kui soovite tõlkida ühe rea korraga. See valik
 
 =item B<--xlate-prompt>=I<text>
 
-Määrake tõlkemootorile saadetav kohandatud käsk. See valik on saadaval LLM-mootorite (C<gpt3>, C<gpt4o>, C<gpt5>) puhul, kuid mitte DeepL-i puhul. Võite kohandada tõlkimiskäitumist, andes AI-mudelile konkreetseid juhiseid. Kui käsk sisaldab C<%s>, asendatakse see sihtkeele nimega. LLM-põhise C<gpt5> mootori puhul esitatakse dokument eraldi JSON-päringuna, mille C<input> liige on tõlgitav massiiv ja mille valikuline C<context> liige sisaldab viiteandmeid. Isegi kui kasutatakse kohandatud käskluse teksti, lisatakse kindel juhis, mis käsitleb neid liikmeid dokumendi andmetena, mitte käskudena.
+Määrake tõlkemootorile saadetav kohandatud käsk. See valik on saadaval LLM-mootorite (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) puhul, kuid mitte DeepL-i puhul. Võite kohandada tõlkimiskäitumist, andes AI-mudelile konkreetseid juhiseid. Kui käsk sisaldab C<%s>, asendatakse see sihtkeele nimega. LLM-põhiste  jaC<gpt5>  C<gpt6>mootorite puhul esitatakse dokument eraldi JSON-päringuna, mille  C<input>liige on tõlgitav massiiv ja mille valikuline  C<context>liige sisaldab viiteandmeid. Isegi kohandatud käskluse kasutamisel lisatakse kindel juhis, mis käsitleb neid liikmeid dokumendi andmetena, mitte käskudena.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Määrake lisakonteksti teave, mis saadetakse tõlkemootorile. Seda valikut saab
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Muudetud plokkide uuesti tõlkimisel viitekontekstina edastatavate ümbritsevate tõlgitud plokkide arv (vaikimisi 2). Kontekst hõlmab ka muudetud piirkonna ümbruses olevat töötlemata allikateksti (pealkirjad, loendistruktuur, pildiallkirjad) ning, kui see on kättesaadav, vahemälust taastatud muudetud teksti eelmist versiooni, et säilitada muutmata sõnastus. Määrake väärtuseks 0, et kontekstipõhine tõlkimine täielikult välja lülitada. Pange tähele, et iga muudetud piirkond tõlgitakse omaette API-kõnes ning kontekst võib JSON-kasutaja päringule lisada kuni umbes 8000 tähemärki, seega kontekstipõhine tõlkimine toob järjepidevuse nimel kaasa mõningaid lisakulusid. Dokumendist tuletatud kontekst jäetakse süsteemi käsklusest välja.
 
 =item B<--xlate-cache-seed>=I<file>

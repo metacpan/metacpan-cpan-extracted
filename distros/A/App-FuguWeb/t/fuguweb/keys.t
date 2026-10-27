@@ -869,7 +869,7 @@ subtest 'the policy file names the site' => sub {
 	# lines alone. A description cannot write a newline into that
 	# name: Fugu::Config reads one value from one line, so the
 	# value stops at the end of its line. The second line is then a
-	# setting of its own, and fuguweb(1) documents no such setting,
+	# setting of its own, and fuguwebrc(5) documents no such setting,
 	# per WEB-SITE-4.
 	my $root = project();
 	my $rc   = slurp("$root/.fuguwebrc");

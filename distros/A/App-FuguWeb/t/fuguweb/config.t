@@ -1104,7 +1104,7 @@ subtest 'the url is the absolute URL of the site root' => sub {
 	}
 };
 
-subtest 'a word that fuguweb(1) does not document fails the load' => sub {
+subtest 'a word that the manuals do not document fails the load' => sub {
 	# WEB-SITE-4. The message names the block and the word. An old
 	# setting fails as an unknown setting, with no word of what to
 	# write in its place.

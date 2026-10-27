@@ -159,7 +159,7 @@ per WEB-SITE-7.
 =head1 SEE ALSO
 
 L<App::FuguWeb>, L<App::FuguWeb::CLI>, L<App::FuguWeb::Config>,
-L<Fugu::Signify>, L<fuguweb(1)>
+L<Fugu::Signify>, L<fuguweb(1)>, L<fuguwebrc(5)>
 
 =head1 AUTHOR
 

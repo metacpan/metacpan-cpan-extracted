@@ -4,6 +4,14 @@
       "App::Greple::xlate — модуль поддержки перевода для greple\n"
    ],
    [
+      "To use GPT-6 Astra:\n",
+      "Чтобы использовать GPT-6 Astra:\n"
+   ],
+   [
+      "If C<llm models> does not list C<gpt-6-astra>, see the model registration instructions in L<App::Greple::xlate::llm::gpt6>.\n",
+      "Если C<llm models> не содержит C<gpt-6-astra> в списке, см. инструкции по регистрации модели в L<App::Greple::xlate::llm::gpt6>.\n"
+   ],
+   [
       "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.6 Terra (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
       "B<Greple> B<xlate> модуль находит нужные текстовые блоки и заменяет их переведённым текстом. Основной движок — GPT-5.6 Terra (F<llm/gpt5.pm>), который вызывает команду L<llm|https://llm.datasette.io/>; DeepL (F<deepl.pm>) и устаревшие движки на основе B<gpty> также включены.\n"
    ],
@@ -144,6 +152,10 @@
       "В настоящее время доступны следующие движки\n"
    ],
    [
+      "L<App::Greple::xlate::llm::gpt6> for model registration)\n",
+      "L<App::Greple::xlate::llm::gpt6> для регистрации модели)\n"
+   ],
+   [
       "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
       "Модули движков сначала ищутся в пространствах имён backend (C<llm>, затем C<gpty>), затем непосредственно в C<App::Greple::xlate>. Поэтому C<gpt5> загружает C<App::Greple::xlate::llm::gpt5>, который вызывает команду C<llm>, тогда как C<gpt4o> откатывается к C<App::Greple::xlate::gpty::gpt4o>. Используйте C<--xlate-setopt backend=gpty>, чтобы принудительно задать конкретный backend.\n"
    ],
@@ -216,8 +228,8 @@
       "Установите значение 1, если хотите переводить по одной строке за раз. Этот параметр имеет приоритет над опцией C<--xlate-maxlen>.\n"
    ],
    [
-      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> engine, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
-      "Укажите пользовательский prompt, который будет отправлен движку перевода. Этот параметр доступен для движков LLM (C<gpt3>, C<gpt4o>, C<gpt5>), но не для DeepL. Вы можете настроить поведение перевода, предоставив конкретные инструкции AI-модели. Если prompt содержит C<%s>, он будет заменен названием целевого языка. Для движка C<gpt5> на базе LLM документ передается отдельно в виде JSON-запроса, член C<input> которого является массивом для перевода, а необязательный член C<context> содержит справочные данные. Фиксированная инструкция, предписывающая рассматривать эти члены как данные документа, а не команды, добавляется даже при использовании пользовательского prompt.\n"
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
+      "Укажите пользовательский prompt, который будет отправлен движку перевода. Этот параметр доступен для движков LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>), но не для DeepL. Вы можете настроить поведение перевода, предоставив конкретные инструкции AI-модели. Если prompt содержит C<%s>, он будет заменен названием целевого языка. Для движков C<gpt5> и C<gpt6> на базе LLM документ передается отдельно в виде JSON-запроса, член C<input> которого является массивом для перевода, а необязательный член C<context> содержит справочные данные. Фиксированная инструкция, предписывающая рассматривать эти члены как данные документа, а не команды, добавляется даже при использовании пользовательского prompt.\n"
    ],
    [
       "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",

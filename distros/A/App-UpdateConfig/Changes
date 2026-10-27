@@ -1,0 +1,7 @@
+Revision history for Perl distribution App-UpdateConfig
+
+1.01 - 2026-10-26
+ - Add support for a MERGE directive to handle structured formats.
+
+1.00 - 2026-10-26
+ - Initial release to the public repo.

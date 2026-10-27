@@ -23,6 +23,11 @@ is($r->{result}, 0, 'gpt5 loads successfully');
 like($r->{data}, qr{^App/Greple/xlate/llm/gpt5\.pm$}m,
      'gpt5 resolves to the llm backend');
 
+$r = probe('gpt6');
+is($r->{result}, 0, 'gpt6 loads successfully');
+like($r->{data}, qr{^App/Greple/xlate/llm/gpt6\.pm$}m,
+     'gpt6 resolves to the llm backend');
+
 $r = probe('gpt4o');
 like($r->{data}, qr{^App/Greple/xlate/gpty/gpt4o\.pm$}m,
      'gpt4o still resolves to the gpty backend');

@@ -1,0 +1,485 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: October 27 2026 $
+.Dt FUGUWEBRC 5
+.Os
+.Sh NAME
+.Nm fuguwebrc
+.Nd site description of fuguweb
+.Sh DESCRIPTION
+The description is
+.Pa .fuguwebrc
+at the project root.
+It is UTF-8, and a description that is not fails the load.
+A setting is one
+.Ar name No = Ar value
+line.
+A block opens with its type, a name, and a brace, and closes with a
+brace on a line of its own.
+A name that holds whitespace takes double quotes.
+A block with a language tag in front of its name is a translation, and
+.Sx LANGUAGES
+states its rules.
+A
+.Ql #
+starts a comment, and no value can hold one.
+The description holds the words of the default language.
+.Pp
+The settings are as follows:
+.Bl -tag -width "module_root" -offset indent
+.It Ic site
+The site name of each language whose block names none.
+It ends the title of each page of such a language, and it is the text
+of the banner link.
+This setting is required.
+.It Ic url
+The absolute URL of the site root.
+It starts with
+.Ql https://
+or
+.Ql http:// ,
+and it ends in a solidus.
+This setting is required.
+.It Ic footer
+The footer fragment of each language whose block names none, below the
+source directory.
+A description with no
+.Ic footer
+gives a site with no footer.
+.It Ic out_dir
+The output directory.
+The default is
+.Pa web/build .
+.It Ic source_dir
+The source directory.
+The default is
+.Pa web .
+It must not name the project root, such as
+.Pa \&.
+or
+.Pa ./ .
+The project root holds the record of
+.Sx TRANSLATION STATUS ,
+and the build publishes each plain file of the source directory.
+.It Ic entry
+The front page of each language tree, and the target of the banner
+link.
+The default is
+.Pa index.html .
+.It Ic module_root
+The prefix that a module name drops.
+The default is
+.Pa lib .
+.It Ic man_url
+The manual host for a cross-reference to a manual outside the site.
+The default is
+.Lk https://man.openbsd.org/ .
+.It Ic stylesheet
+The path of the base stylesheet.
+By default the build searches for the sheet that ships with the tool.
+.El
+.Pp
+A path setting must not step out of the project.
+.Pp
+The block types are as follows:
+.Bl -tag -width Ds
+.It Ic language Ar tag
+One language of the site.
+See
+.Sx LANGUAGES .
+.It Ic nav Qq Ar href
+One navigation entry, in file order.
+Every page carries it, except the forward
+.Pa index.html
+at the top level.
+A relative
+.Ar href
+names a page of each tree, such as
+.Pa manuals.html ,
+and an absolute URL stays as it stands.
+The block must set a
+.Ic label .
+.It Ic page Qq Ar file
+One page of each language tree, named by its file in the tree.
+The name must be one path segment.
+The block sets a
+.Ic title ,
+which defaults to the file name, and exactly one source:
+.Bl -tag -width "markdown" -offset indent
+.It Ic body
+An HTML body fragment in the source directory.
+.It Ic markdown
+A Markdown file, relative to the project root.
+.Xr lowdown 1
+renders it, and the HTML that it holds stays as written.
+.It Ic index No = Cm yes
+The generated manual index.
+The page can also set a
+.Ic body ,
+which opens the index below its heading.
+.El
+.Pp
+.Ic unlinked No = Cm yes
+marks a page that no other page links to, such as
+.Pa 404.html ,
+and the reachability check skips it.
+.It Ic manuals Ar name
+One group of
+.Xr mdoc 7
+manuals.
+The name is one word of lowercase letters, digits and hyphens, and it is
+the fragment identifier of the group on the index page.
+Two groups must not share a name.
+The block must set
+.Ic heading ,
+the text of the heading of the group, and
+.Ic dir ,
+the directory of the sources.
+An optional
+.Ic namespace
+prefixes each manual name, so
+.Pa man/fugu/Daemon.3p
+with the namespace
+.Ql Fugu:\&:
+becomes
+.Ql Fugu::Daemon(3p) .
+.It Ic modules Ar name
+One group of POD sidecars.
+The name follows the rules of a
+.Ic manuals
+name.
+The block must set
+.Ic heading
+and
+.Ic dir ,
+and
+.Ic dir
+must lie below
+.Ic module_root .
+.It Ic keys Qq Ar name
+One published key directory.
+A description can hold several, and two blocks must not name one
+directory.
+See
+.Xr fuguweb-keys 7 .
+.El
+.Pp
+The load fails for a block type or a setting that this manual and
+.Xr fuguweb-keys 7
+do not document, and the message names the block and the word.
+A setting of an older description fails the same way.
+The load fails when a block names no source or two sources, when two
+blocks name one page, or when a group directory does not exist.
+It fails when two manuals, or a manual and a
+.Ic page
+block, become one page.
+Each test of two names that become one page folds the two, as
+.Xr fuguweb-site 7
+states.
+It fails when the path of a source from the project root holds ASCII
+white space or a parenthesis.
+A source is a page source, a manual or a footer fragment, of any
+language.
+A symlink at the top level of the source directory fails the load.
+A symlink below the source directory on the path of a fragment that the
+build reads fails it too.
+A group block whose name is no group name fails the load.
+Every message names the file and the block at fault.
+.Sh LANGUAGES
+A
+.Ic language
+block declares one language of the site.
+The block name is the tag of the language, and the order of the blocks
+is the order of the languages.
+The first language is the default.
+A description with no
+.Ic language
+block has the one language
+.Ql en .
+.Pp
+A tag is a BCP 47 tag, in its canonical case: a language subtag of two
+or three lowercase letters, then an optional script subtag such as
+.Ql Hans ,
+then an optional region subtag such as
+.Ql BR
+or
+.Ql 419 .
+.Ql en ,
+.Ql zh-Hans
+and
+.Ql pt-BR
+are tags.
+.Pp
+The settings of a
+.Ic language
+block are as follows:
+.Bl -tag -width "footer" -offset indent
+.It Ic name
+The name of the language in that language, such as
+.Ql English .
+This setting is required.
+.It Ic dir
+The direction of the language:
+.Cm ltr
+or
+.Cm rtl .
+The default is
+.Cm ltr .
+.It Ic site
+The site name in this language.
+The default is the
+.Ic site
+of the description.
+.It Ic footer
+The footer fragment of this language, below the source directory.
+The default is the
+.Ic footer
+of the description.
+.El
+.Pp
+A translation is a block with the tag of a declared language in front
+of its name.
+The tag must not be the tag of the default language.
+The block translates the block of one argument of the same type and
+name:
+.Bd -literal -offset indent
+language en {
+	name = English
+}
+
+language de {
+	name   = Deutsch
+	footer = de/footer.body.html
+}
+
+page "index.html" {
+	title = Home
+	body  = index.body.html
+}
+
+page de "index.html" {
+	title = Start
+	body  = de/index.body.html
+}
+
+manuals commands {
+	heading = Commands
+	dir     = man/fuguweb
+}
+
+manuals de commands {
+	heading = Befehle
+	dir     = man/de/fuguweb
+}
+.Ed
+.Pp
+The build writes one tree for each language, below the tag in
+lowercase, and each tree holds the same pages.
+The tree of
+.Ql zh-Hans
+is
+.Pa zh-hans/ .
+A
+.Ic page ,
+a
+.Ic nav ,
+a
+.Ic manuals
+and a
+.Ic modules
+block can take a translation:
+.Bl -tag -width "manuals, modules" -offset indent
+.It Ic page
+.Ic title ,
+.Ic body
+and
+.Ic markdown .
+.It Ic nav
+.Ic label .
+.It Ic manuals , modules
+.Ic heading
+and
+.Ic dir .
+.El
+.Pp
+A page of a language takes each value of its translation, and the value
+of the default block where the translation holds none.
+The site name and the footer of a language follow the same rule.
+Each value records the language that it comes from, and the page
+layout of
+.Xr fuguweb-site 7
+marks a value of another language than the page.
+.Pp
+The
+.Ic dir
+of a group translation mirrors the default
+.Ic dir .
+A manual of a language comes from the file of the same relative path in
+that directory, and from the default source when the directory holds no
+such file.
+A
+.Ic modules
+translation mirrors the umbrella sidecar as well.
+A manual keeps the page name of its default source in every language.
+.Pp
+A page of another language than the default must hold the outline of
+its page in the default tree: the same count of headings, at the same
+levels, in the same order.
+Each heading then takes the id of the heading at the same position of
+that page, or no id when that heading has none.
+Each link of the page to one of its headings names the new id.
+A section reference of a manual,
+.Ql \&.Sx ,
+finds its heading by its text, and each other link by its old id.
+A link to a heading that takes no id stays as it stands.
+A link to a fragment of a page then works in each language.
+A page whose outline differs fails the build, and the message names the
+page, the language and the position of the first heading that differs.
+.Pp
+The load fails when a tag has another shape, or when two blocks declare
+one tag.
+It fails when a
+.Ic language
+block has no
+.Ic name ,
+or a
+.Ic dir
+of another word.
+It fails when a translation names a tag that no
+.Ic language
+block declares, or the tag of the default language.
+It fails when a translation names no default block of its type, when it
+comes twice for one name and one language, or when it sets a setting
+outside its list.
+It fails when a manual source of a translation
+.Ic dir
+has no source of the same path in the default
+.Ic dir .
+A
+.Ic language ,
+a
+.Ic keys
+and a
+.Ic key
+block take no translation.
+.Sh TRANSLATION STATUS
+A translation follows its source, and a source changes.
+The record
+.Pa TRANSLATIONS
+at the project root names the version of the default source that each
+translated file follows.
+The build and the check do not read the record.
+.Pp
+The record holds one line for each translated file, in the form of a
+SHA256 manifest:
+.Bd -literal -offset indent
+SHA256 (web/zh-hans/index.body.html) = <digest>
+.Ed
+.Pp
+The path names the translated file from the project root.
+It holds no
+.Pa \&./
+step, no empty step and no final solidus, so a path setting of
+.Pa ./web
+or
+.Pa web/
+gives the path
+.Pa web/zh-hans/index.body.html .
+The digest is the SHA-256 of its default source at the time of the
+translation.
+The lines sort by path.
+A record that is absent or empty holds no line.
+.Pp
+.Cm translated
+writes the line of each
+.Ar file ,
+with the digest that the default source of that file has now.
+It changes each
+.Ar file
+to the form of a path of the record, so
+.Pa ./web/a.html
+and
+.Pa web/a.html
+name one file.
+It keeps each other line of the record.
+It refuses a file that translates no source of the description, such as
+a default source, and then it writes nothing.
+.Pp
+Two parts that name one translated file must name one default source,
+because the record holds one digest for each file.
+.Cm status
+and
+.Cm translated
+refuse a description that does not obey this rule, and name the file
+and the two sources.
+.Pp
+.Cm status
+prints one line for each part of a language other than the default
+that does not follow its source.
+A line holds four fields, with one tab between two fields: the tag of
+the language, the state, the kind of the part, and its name.
+The lines follow the order of the languages, and then the order of the
+description.
+.Pp
+The states are as follows:
+.Bl -tag -width "unrecorded" -offset indent
+.It Cm fallback
+The part comes from the default language.
+.It Cm unrecorded
+The language translates the file, and the record holds no line for it.
+.It Cm stale
+The line of the file names a digest other than the one that its
+default source has now.
+.El
+.Pp
+The kinds of part, and the name of each, are as follows:
+.Bl -tag -width "heading" -offset indent
+.It Cm site
+The site name.
+Its name is the tag of the language.
+.It Cm label
+The label of a
+.Ic nav
+entry.
+Its name is the href of the entry.
+.It Cm title
+The title of a page.
+Its name is the name of the page.
+.It Cm page
+The source of a page.
+Its name is the name of the page.
+.It Cm heading
+The heading of a group.
+Its name is the name of the group.
+.It Cm manual
+The source of a manual.
+Its name is the page of the manual.
+.It Cm footer
+The footer fragment.
+Its name is the tag of the language.
+.El
+.Pp
+The site name, a label, a title and a heading are values of the
+description, and a value is
+.Cm fallback
+or follows its source.
+A file part follows no source when the default language names none for
+it, and it then takes no line.
+.Sh SEE ALSO
+.Xr fuguweb 1 ,
+.Xr fuguweb-keys 7 ,
+.Xr fuguweb-site 7

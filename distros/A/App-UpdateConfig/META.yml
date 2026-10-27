@@ -1,0 +1,49 @@
+---
+abstract: 'Deploy configuration fragments (dotfiles, etc.) locally or on remote hosts.'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.24.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - dotfiles
+  - configuration
+  - deployment
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-UpdateConfig
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+    - t
+recommends:
+  Config::Tiny: '0'
+  JSON::PP: '0'
+  Pod::Perldoc: '0'
+  TOML::Tiny: '0'
+  YAML::PP: '0'
+requires:
+  Data::Section::Simple: '0'
+  File::HomeDir: '0'
+  File::Slurp: '0'
+  File::Which: '0'
+  Text::Diff: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/mkende/update_config/issues
+  repository: https://github.com/mkende/update_config
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

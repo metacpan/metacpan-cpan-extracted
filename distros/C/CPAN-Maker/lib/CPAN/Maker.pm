@@ -38,9 +38,9 @@ with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 with 'CPAN::Maker::Role::Provides';
 
-our $VERSION   = '2.0.12';
-our $GIT_SHA   = '61a54cafa632f61811b2f1fd2d968664e3ae14bf';
-our $GIT_DIRTY = '61a54cafa632f61811b2f1fd2d968664e3ae14bf';
+our $VERSION   = '2.0.13';
+our $GIT_SHA   = '0371d076b863b3b1daec21ae56bb943399371645';
+our $GIT_DIRTY = '0371d076b863b3b1daec21ae56bb943399371645-dirty';
 
 __PACKAGE__->use_log4perl( level => 'info', color => $FALSE );
 
@@ -1402,6 +1402,16 @@ sub stage_distribution {
       file => $provides_file,
     );
 
+    # Explicit provides are additional package declarations, not replacements
+    # for the staged module inventory. Preserve them for write_makefile().
+    if ( my $declared = $buildspec->{provides} ) {
+      open my $out, '>>', $provides_file
+        or croak "could not append to '$provides_file': $OS_ERROR";
+      $self->_write_provides( $out, $declared );
+      close $out
+        or croak "could not close '$provides_file': $OS_ERROR";
+    }
+
     $params{provides_file_ref} = \$provides_file;
   }
 
@@ -1738,7 +1748,7 @@ Print the installed version of C<CPAN::Maker> and exit.
 C<CPAN::Maker> is a utility for creating CPAN distribution tarballs
 from a declarative YAML build specification. It handles dependency
 resolution, C<Makefile.PL> generation, file staging, and packaging
-entirely in Perl â no external bash scripts are required.
+entirely in Perl — no external bash scripts are required.
 
 The build pipeline, invoked via C<cpan-maker -b buildspec.yml>:
 
@@ -2172,7 +2182,7 @@ format.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.12
+This documentation refers to version 2.0.13
 
 =head1 AUTHOR
 

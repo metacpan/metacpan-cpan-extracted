@@ -20,6 +20,8 @@ qw
     canonpath
 );
 
+use FindBin::Bin    qw( canon_dir );
+
 ########################################################################
 # package variables and sanity checks 
 ########################################################################
@@ -57,15 +59,14 @@ sub dir_paths( $path, $assume_dir = 1 )
     = $path2dirz{ $path . $; . $assume_dir }
     ||= do
     {
-        # treat non-existant paths as dir's, mainly for testing.
+        # $assume_dir treats non-existant paths as dir's, 
+        # mainly for testing.
 
         my $is_dir  = $assume_dir || -d $path;
 
         my ( $vol, $dir ) = splitpath $path, $is_dir;
 
-        # ditch the starting directory.
-
-        my @dirz    = splitdir rel2abs canonpath $dir;
+        my @dirz    = splitdir canon_dir $dir;
 
         # fix for File::Spec::VMS missing the leading empty
         # string on a split. this can be removed once File::Spec
@@ -87,7 +88,9 @@ sub dir_paths( $path, $assume_dir = 1 )
             {
                 $tmp    = catdir $tmp, $_
             }
-            ( '' => @dirz )
+            (
+                '' => @dirz[0..$#dirz]
+            )
         ]
     };
 

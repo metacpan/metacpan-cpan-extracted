@@ -1,0 +1,20 @@
+Changes
+cpanfile
+lib/App/UpdateConfig.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+script/update_config
+t/000-load.t
+t/001-cpanfile.t
+t/001-podsyntax.t
+t/100-update.t
+t/200-directives.t
+t/300-pack.t
+t/400-config_dir.t
+t/500-version.t
+t/600-bootstrap.t
+t/700-merge.t
+t/lib/UpdateConfigTest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

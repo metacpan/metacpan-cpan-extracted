@@ -359,3 +359,20 @@ load test_helper.bash
     assert_line --index 2 "args:"
     assert_line --index 3 "argc:0"
 }
+
+# Test: embedded in a script, the code does not auto-initialize with the
+# script's own arguments, and init/parse/set work as usual
+@test "getoptlong: embedded - no auto initialization from script arguments" {
+    script=$(mktemp)
+    { cat ../script/getoptlong.sh
+      cat <<'EOF'
+declare -A OPTS=([verbose|v]=)
+getoptlong init OPTS && getoptlong parse "$@" && eval "$(getoptlong set)"
+echo "verbose:$verbose args:$*"
+EOF
+    } > "$script"
+    run $BASH "$script" BASH_CMDS -v
+    rm -f "$script"
+    assert_success
+    assert_output "verbose:1 args:BASH_CMDS"
+}

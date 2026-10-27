@@ -1,0 +1,258 @@
+{
+   "body" : {
+      "languages" : [
+         {
+            "code" : "de",
+            "name" : "German",
+            "nativeName" : "Deutsch"
+         },
+         {
+            "code" : "hi",
+            "name" : "Hindi",
+            "nativeName" : "हिन्दी"
+         },
+         {
+            "code" : "pt",
+            "name" : "Portuguese",
+            "nativeName" : "Português"
+         },
+         {
+            "code" : "hu",
+            "name" : "Hungarian",
+            "nativeName" : "Magyar"
+         },
+         {
+            "code" : "uk",
+            "name" : "Ukrainian",
+            "nativeName" : "Українська"
+         },
+         {
+            "code" : "id",
+            "name" : "Bahasa Indonesia",
+            "nativeName" : "Bahasa Indonesia"
+         },
+         {
+            "code" : "ur",
+            "name" : "Urdu",
+            "nativeName" : "اردو"
+         },
+         {
+            "code" : "ml",
+            "name" : "Malayalam",
+            "nativeName" : "മലയാളം"
+         },
+         {
+            "code" : "mn",
+            "name" : "Mongolian",
+            "nativeName" : "Mонгол"
+         },
+         {
+            "code" : "af",
+            "name" : "Afrikaans",
+            "nativeName" : "Afrikaans"
+         },
+         {
+            "code" : "mr",
+            "name" : "Marathi (Marāṭhī)",
+            "nativeName" : "मराठी"
+         },
+         {
+            "code" : "ms",
+            "name" : "Bahasa Malayia",
+            "nativeName" : "Bahasa Malaysia"
+         },
+         {
+            "code" : "el",
+            "name" : "Greek",
+            "nativeName" : "Ελληνικά"
+         },
+         {
+            "code" : "en",
+            "name" : "English",
+            "nativeName" : "English"
+         },
+         {
+            "code" : "it",
+            "name" : "Italian",
+            "nativeName" : "Italiano"
+         },
+         {
+            "code" : "am",
+            "name" : "Amharic",
+            "nativeName" : "አማርኛ"
+         },
+         {
+            "code" : "es",
+            "name" : "Spanish",
+            "nativeName" : "Español"
+         },
+         {
+            "code" : "zh",
+            "name" : "Chinese",
+            "nativeName" : "中文"
+         },
+         {
+            "code" : "ar",
+            "name" : "Arabic",
+            "nativeName" : "العربية"
+         },
+         {
+            "code" : "vi",
+            "name" : "Vietnamese",
+            "nativeName" : "Tiếng Việt"
+         },
+         {
+            "code" : "ja",
+            "name" : "Japanese",
+            "nativeName" : "日本語"
+         },
+         {
+            "code" : "ne",
+            "name" : "Nepali",
+            "nativeName" : "नेपाली"
+         },
+         {
+            "code" : "fa",
+            "name" : "Persian",
+            "nativeName" : "Persian"
+         },
+         {
+            "code" : "zu",
+            "name" : "Zulu",
+            "nativeName" : "isiZulu"
+         },
+         {
+            "code" : "ro",
+            "name" : "Romanian",
+            "nativeName" : "Română"
+         },
+         {
+            "code" : "nl",
+            "name" : "Dutch",
+            "nativeName" : "Nederlands"
+         },
+         {
+            "code" : "no",
+            "name" : "Norwegian",
+            "nativeName" : "Norsk"
+         },
+         {
+            "code" : "fi",
+            "name" : "Finnish",
+            "nativeName" : "Suomi"
+         },
+         {
+            "code" : "ru",
+            "name" : "Russian",
+            "nativeName" : "Русский"
+         },
+         {
+            "code" : "bg",
+            "name" : "Bulgarian",
+            "nativeName" : "български"
+         },
+         {
+            "code" : "bn",
+            "name" : "Bengali",
+            "nativeName" : "বাংলা"
+         },
+         {
+            "code" : "fr",
+            "name" : "French",
+            "nativeName" : "Français"
+         },
+         {
+            "code" : "sk",
+            "name" : "Slovak",
+            "nativeName" : "Slovenčina"
+         },
+         {
+            "code" : "kn",
+            "name" : "Kannada",
+            "nativeName" : "ಕನ್ನಡ"
+         },
+         {
+            "code" : "or",
+            "name" : "Oriya",
+            "nativeName" : "ଓଡ଼ିଆ"
+         },
+         {
+            "code" : "sv",
+            "name" : "Swedish",
+            "nativeName" : "Svenska"
+         },
+         {
+            "code" : "ko",
+            "name" : "Korean",
+            "nativeName" : "한국어"
+         },
+         {
+            "code" : "sw",
+            "name" : "Swahili",
+            "nativeName" : "Kiswahili"
+         },
+         {
+            "code" : "ta",
+            "name" : "Tamil",
+            "nativeName" : "தமிழ்"
+         },
+         {
+            "code" : "gu",
+            "name" : "Gujarati",
+            "nativeName" : "ગુજરાતી"
+         },
+         {
+            "code" : "cs",
+            "name" : "Czech",
+            "nativeName" : "Čeština"
+         },
+         {
+            "code" : "xh",
+            "name" : "Xhosa",
+            "nativeName" : "isiXhosa"
+         },
+         {
+            "code" : "pa",
+            "name" : "Panjabi, Punjabi",
+            "nativeName" : "ਪੰਜਾਬੀ"
+         },
+         {
+            "code" : "te",
+            "name" : "Telugu",
+            "nativeName" : "తెలుగు"
+         },
+         {
+            "code" : "th",
+            "name" : "Thai",
+            "nativeName" : "ไทย"
+         },
+         {
+            "code" : "cy",
+            "name" : "Welsh",
+            "nativeName" : "Cymraeg"
+         },
+         {
+            "code" : "pl",
+            "name" : "Polish",
+            "nativeName" : "Polski"
+         },
+         {
+            "code" : "da",
+            "name" : "Danish",
+            "nativeName" : "Dansk"
+         },
+         {
+            "code" : "he",
+            "name" : "Hebrew (modern)",
+            "nativeName" : "עברית"
+         },
+         {
+            "code" : "tr",
+            "name" : "Turkish",
+            "nativeName" : "Türkçe"
+         }
+      ]
+   },
+   "request" : "available-languages?format=json",
+   "status" : 200
+}

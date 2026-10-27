@@ -10,9 +10,15 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+So verwenden Sie GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Falls  nicht aufgeführt istC<llm models>C<gpt-6-astra>, lesen Sie die Anweisungen zur Modellregistrierung in L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ Zur Zeit sind die folgenden Engines verfügbar
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> (zur Modellregistrierung)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Setzen Sie diesen Wert auf 1, wenn Sie jeweils nur eine Zeile übersetzen wollen
 
 =item B<--xlate-prompt>=I<text>
 
-Geben Sie eine benutzerdefinierte Eingabe an, die an die Übersetzungs-Engine gesendet werden soll. Diese Option ist für die LLM-Engines (C<gpt3>, C<gpt4o>, C<gpt5>) verfügbar, nicht jedoch für DeepL. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung C<%s> enthält, wird diese durch den Namen der Zielsprache ersetzt. Bei der LLM-gestützten C<gpt5>-Engine wird das Dokument separat als JSON-Anfrage bereitgestellt, deren C<input>-Element das zu übersetzende Array ist und deren optionales C<context>-Element Referenzdaten enthält. Eine feste Anweisung, die diese Elemente als Dokumentdaten und nicht als Befehle behandelt, wird auch dann angehängt, wenn eine benutzerdefinierte Eingabeaufforderung verwendet wird.
+Geben Sie eine benutzerdefinierte Eingabeaufforderung an, die an die Übersetzungs-Engine gesendet werden soll. Diese Option ist für die LLM-Engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) verfügbar, jedoch nicht für DeepL. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung enthältC<%s>, wird diese durch den Namen der Zielsprache ersetzt. Bei den LLM-gestützten EnginesC<gpt6>  undC<gpt5>  wird das Dokument separat als JSON-Anfrage bereitgestellt, deren  C<input>-Element das zu übersetzende Array ist und deren optionales  C<context>-Element Referenzdaten enthält. Eine feste Anweisung, die diese Elemente als Dokumentdaten und nicht als Befehle behandelt, wird auch dann angehängt, wenn eine benutzerdefinierte Eingabe verwendet wird.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Geben Sie zusätzliche Kontextinformationen an, die an die Übersetzungsmaschine
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Anzahl der umgebenden übersetzten Blöcke, die bei der Neuübersetzung geänderter Blöcke als Referenzkontext übergeben werden (Standardwert 2). Der Kontext umfasst auch den rohen Quelltext rund um den geänderten Bereich (Überschriften, Listenstruktur, Bildunterschriften) sowie, sofern verfügbar, die aus dem Cache wiederhergestellte vorherige Version des geänderten Textes, damit unveränderte Formulierungen erhalten bleiben. Setzen Sie den Wert auf 0, um die kontextbezogene Übersetzung vollständig zu deaktivieren. Beachten Sie, dass jeder geänderte Bereich in einem eigenen API-Aufruf übersetzt wird und der Kontext die JSON-Benutzeranfrage um bis zu etwa 8.000 Zeichen erweitern kann; daher geht die kontextbezogene Übersetzung mit einem gewissen Mehraufwand zugunsten der Konsistenz einher. Aus dem Dokument abgeleiteter Kontext wird aus der System-Eingabeaufforderung ausgeklammert.
 
 =item B<--xlate-cache-seed>=I<file>

@@ -1,0 +1,25 @@
+{
+   "body" : {
+      "coordinates" : {
+         "lat" : 51.484463,
+         "lng" : -0.195405
+      },
+      "country" : "GB",
+      "language" : "en",
+      "map" : "https://w3w.co/prom.cape.pump",
+      "nearestPlace" : "Kensington, London",
+      "square" : {
+         "northeast" : {
+            "lat" : 51.484476,
+            "lng" : -0.195383
+         },
+         "southwest" : {
+            "lat" : 51.484449,
+            "lng" : -0.195426
+         }
+      },
+      "words" : "prom.cape.pump"
+   },
+   "request" : "convert-to-coordinates?format=json&words=prom.cape.pump",
+   "status" : 200
+}

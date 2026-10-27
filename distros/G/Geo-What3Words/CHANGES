@@ -1,6 +1,28 @@
 Revision history for Perl module Geo::What3Words.
 
-3.0.3   2026-02-13
+3.0.6   2026-10-26
+        - new error() method returns the HTTP status, error code and
+          message of the last failed request
+        - development tools (Code::TidyAll, Perl::Tidy, Test::Perl::Critic)
+          are no longer installed for users of the module, the code
+          style tests only run with AUTHOR_TESTING set
+        - tests use recorded API responses, no network access or API key
+          needed
+        - the API key is blanked out in warnings and log messages
+        - tests can use another server with W3W_API_ENDPOINT
+
+3.0.5   2026-10-26
+        - reject clearly invalid input before calling the API: 3 word
+          addresses that aren't three dot-separated words, coordinates
+          that aren't latitude,longitude within valid ranges
+        - Net::Ping and Net::Ping::External are only loaded by ping(),
+          Net::Ping::External is now an optional dependency
+        - no longer depends on URI
+        - remove unused Data::Dumper
+        - document reusing one instance to keep the connection open
+        - offline tests for request building and input checks
+
+3.0.4   2026-02-13
         - improved pod, no code changes
 
 3.0.3   2021-03-13

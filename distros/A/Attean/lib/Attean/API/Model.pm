@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.039
+This document describes Attean::API::Model version 0.040
 
 =head1 DESCRIPTION
 
@@ -166,7 +166,7 @@ in the model.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.039 {
+package Attean::API::Model 0.040 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -379,7 +379,7 @@ package Attean::API::Model 0.039 {
 }
 
 
-package Attean::API::MutableModel 0.039 {
+package Attean::API::MutableModel 0.040 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -400,31 +400,43 @@ package Attean::API::MutableModel 0.039 {
 	sub load_urls_into_graph {
 		my $self	= shift;
 		my $graph	= shift;
-		my @urls	= @_;
+		my $urls	= [@_];
+		return $self->load_urls_into_graph_with_base($graph, $urls);
+	}
+	
+	sub load_urls_into_graph_with_base {
+		my $self	= shift;
+		my $graph	= shift;
+		my $urls	= shift;
+		my @urls	= @$urls;
+		my $default_base	= shift;
 		my $ua		= LWP::UserAgent->new();
 		my $accept	= Attean->acceptable_parsers( handles => 'Attean::API::Triple' );
 		$ua->default_headers->push_header( 'Accept' => $accept );
 		
 		foreach my $u (@urls) {
+			my $mapper	= Attean::TermMap->uuid_blank_map;
+			my $bindings_mapper	= $mapper->binding_mapper;
 			my $url		= blessed($u) ? $u->value : $u;
 			my $resp	= $ua->get($url);
 			if ($resp->is_success) {
 				my $ct		= $resp->header('Content-Type');
 				my $pclass = Attean->get_parser( media_type => $ct, filename => $url ) // Attean->get_parser('ntriples');
 				if ($pclass) {
-					my $p		= $pclass->new(base => iri($url));
+					my $base	= $default_base || iri($url);
+					my $p		= $pclass->new(base => $base);
 					my $str		= $resp->decoded_content;
 					my $bytes	= encode('UTF-8', $str, Encode::FB_CROAK);
 					my $iter	= eval { $p->parse_iter_from_bytes( $bytes ) };
 					if ($@) {
 						die "Failed to parse URL $url: $@";
 					}
-					$self->add_iter($iter->as_quads($graph));
+					$self->add_iter($iter->map($bindings_mapper)->as_quads($graph));
 				} else {
 					die "No parser found for content type $ct: $url";
 				}
 			} else {
-				die $resp->status_line;
+				die "Failed to load URL <$url>: " . $resp->status_line;
 			}
 		}
 	}
@@ -488,21 +500,21 @@ package Attean::API::MutableModel 0.039 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.039 {
+package Attean::API::ETagCacheableModel 0.040 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.039 {
+package Attean::API::TimeCacheableModel 0.040 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.039 {
+package Attean::API::BulkUpdatableModel 0.040 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';
@@ -525,7 +537,7 @@ package Attean::API::BulkUpdatableModel 0.039 {
 	};
 }
 
-package Attean::API::RDFStarModel 0.039 {
+package Attean::API::RDFStarModel 0.040 {
 	use Moo::Role;
 
 	with 'Attean::API::Model';
@@ -554,7 +566,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

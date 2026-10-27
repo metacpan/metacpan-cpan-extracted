@@ -13,7 +13,7 @@ Dancer2::Manual::Keywords - Dancer2 DSL Keyword Reference
 
 =head1 VERSION
 
-version 2.2.2
+version 2.3.0
 
 =head1 Dancer2 Keyword Guide
 
@@ -91,6 +91,16 @@ resources.
 B<When to use>: Update existing resources in an idempotent way.
 
 B<Related Keywords>: L</get>, L</post>, L</del>, L</patch>, L</options>, L</any>
+
+=head2 L<query|Dancer2::Manual/query>
+
+Defines a route that responds to HTTP C<QUERY> requests, typically for body-based
+safe search or lookup requests.
+
+B<When to use>: Submit complex search parameters or queries with a request body
+without side effects.
+
+B<Related Keywords>: L</get>, L</post>, L</put>, L</del>, L</patch>, L</options>, L</any>
 
 =head2 L<splat|Dancer2::Manual/"Wildcard Route Parameters">
 

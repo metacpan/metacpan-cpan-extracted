@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Expensive page</title>
+  </head>
+  <body>
+    <h1>Expensive page</h1>
+    <p>This response is cached for ten minutes.</p>
+    <p>Built at <%= $built_at %>.</p>
+    <p><a href="/expensive">Reload</a></p>
+  </body>
+</html>

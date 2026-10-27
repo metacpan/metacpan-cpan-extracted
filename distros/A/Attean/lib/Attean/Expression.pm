@@ -7,7 +7,7 @@ Attean::Expression - SPARQL Expressions
 
 =head1 VERSION
 
-This document describes Attean::Expression version 0.039
+This document describes Attean::Expression version 0.040
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ use Attean::API::Expression;
 
 =cut
 
-package Attean::ValueExpression 0.039 {
+package Attean::ValueExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf);
 	use AtteanX::SPARQL::Constants;
@@ -101,7 +101,7 @@ package Attean::ValueExpression 0.039 {
 
 =cut
 
-package Attean::UnaryExpression 0.039 {
+package Attean::UnaryExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(Enum);
 	use namespace::clean;
@@ -138,7 +138,7 @@ package Attean::UnaryExpression 0.039 {
 
 =cut
 
-package Attean::BinaryExpression 0.039 {
+package Attean::BinaryExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(Enum);
 	use namespace::clean;
@@ -166,7 +166,7 @@ package Attean::BinaryExpression 0.039 {
 
 =cut
 
-package Attean::FunctionExpression 0.039 {
+package Attean::FunctionExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(Enum ConsumerOf HashRef);
 	use Types::Common::String qw(UpperCaseStr);
@@ -194,7 +194,7 @@ package Attean::FunctionExpression 0.039 {
 	
 	sub BUILD {
 		my $self	= shift;
-		state $type	= Enum[qw(INVOKE IN NOTIN STR LANG LANGMATCHES DATATYPE BOUND IRI URI BNODE RAND ABS CEIL FLOOR ROUND CONCAT SUBSTR STRLEN REPLACE UCASE LCASE ENCODE_FOR_URI CONTAINS STRSTARTS STRENDS STRBEFORE STRAFTER YEAR MONTH DAY HOURS MINUTES SECONDS TIMEZONE TZ NOW UUID STRUUID MD5 SHA1 SHA256 SHA384 SHA512 COALESCE IF STRLANG STRDT SAMETERM ISIRI ISBLANK ISLITERAL ISNUMERIC REGEX TRIPLE ISTRIPLE SUBJECT PREDICATE OBJECT)];
+		state $type	= Enum[qw(INVOKE IN NOTIN STR LANG LANGDIR LANGMATCHES DATATYPE BOUND IRI URI BNODE RAND ABS CEIL FLOOR ROUND CONCAT SUBSTR STRLEN REPLACE UCASE LCASE ENCODE_FOR_URI CONTAINS STRSTARTS STRENDS STRBEFORE STRAFTER YEAR MONTH DAY HOURS MINUTES SECONDS TIMEZONE TZ NOW UUID STRUUID MD5 SHA1 SHA256 SHA384 SHA512 COALESCE IF STRLANG STRLANGDIR STRDT SAMETERM ISIRI ISBLANK ISLITERAL ISNUMERIC REGEX TRIPLE ISTRIPLE SUBJECT PREDICATE OBJECT HASLANG HASLANGDIR)];
 		$type->assert_valid($self->operator);
 	}
 
@@ -238,7 +238,7 @@ package Attean::FunctionExpression 0.039 {
 	}
 }
 
-package Attean::AggregateExpression 0.039 {
+package Attean::AggregateExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(Bool Enum Str HashRef ConsumerOf Maybe ArrayRef);
 	use Types::Common::String qw(UpperCaseStr);
@@ -311,7 +311,7 @@ package Attean::AggregateExpression 0.039 {
 	}
 }
 
-package Attean::CastExpression 0.039 {
+package Attean::CastExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(Enum ConsumerOf);
 	use AtteanX::SPARQL::Constants;
@@ -363,7 +363,7 @@ package Attean::CastExpression 0.039 {
 	}
 }
 
-package Attean::ExistsExpression 0.039 {
+package Attean::ExistsExpression 0.040 {
 	use Moo;
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
@@ -415,7 +415,7 @@ package Attean::ExistsExpression 0.039 {
 	}
 }
 
-package Attean::ExistsPlanExpression 0.039 {
+package Attean::ExistsPlanExpression 0.040 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf);
 	use namespace::clean;
@@ -480,7 +480,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

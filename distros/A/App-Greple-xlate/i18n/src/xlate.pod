@@ -10,9 +10,16 @@ App::Greple::xlate - translation support module for greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+To use GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+If C<llm models> does not list C<gpt-6-astra>, see the model registration
+instructions in L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -241,6 +248,9 @@ At this time, the following engines are available
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> for model registration)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -378,11 +388,11 @@ option takes precedence over the C<--xlate-maxlen> option.
 =item B<--xlate-prompt>=I<text>
 
 Specify a custom prompt to be sent to the translation engine.  This
-option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>)
+option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>)
 but not for DeepL.  You can customize the translation behavior by
 providing specific instructions to the AI model.  If the prompt
 contains C<%s>, it will be replaced with the target language name.
-For the llm-backed C<gpt5> engine, the document is supplied separately
+For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately
 as a JSON request whose C<input> member is the array to translate and
 whose optional C<context> member contains reference data.  A fixed
 instruction that treats those members as document data, not commands,
@@ -397,7 +407,7 @@ understand the background and produce more accurate translations.
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Number of surrounding translated blocks passed as reference context
 when re-translating changed blocks (default 2).  The context also
 includes the raw source text around the changed region (headings,

@@ -5,7 +5,7 @@ use warnings;
 
 use Test::DescribeMe qw(author);
 use Test::Most;
-use Test::Needs 'Test::Pod::Snippets';
+use Test::Needs 'Test::Group', 'Test::Pod::Snippets';
 
 my @modules = qw/ File::pfopen /;
 Test::Pod::Snippets->import();

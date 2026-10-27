@@ -1,1 +1,6 @@
 severity = 4
+
+# use strict and warnings come before the package statement, so they are
+# also in effect for the $VERSION line Dist::Zilla [PkgVersion] adds after it
+[Modules::RequireExplicitPackage]
+allow_import_of = strict warnings

@@ -30,7 +30,7 @@ no_index:
 provides:
   Trog::SQLite:
     file: lib/Trog/SQLite.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   DBD::SQLite: '0'
   DBD::SQLite::Constants: '0'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite/issues
   homepage: https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite
   repository: https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite.git
-version: '0.004'
+version: '0.005'
 x_contributors:
   - 'troglodyne-bot <morpheus@troglodyne.net>'
 x_generated_by_perl: v5.44.0

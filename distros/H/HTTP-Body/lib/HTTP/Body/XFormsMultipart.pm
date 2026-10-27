@@ -1,5 +1,5 @@
 package HTTP::Body::XFormsMultipart;
-$HTTP::Body::XFormsMultipart::VERSION = '1.23';
+$HTTP::Body::XFormsMultipart::VERSION = '1.24';
 use strict;
 use base 'HTTP::Body::MultiPart';
 use bytes;

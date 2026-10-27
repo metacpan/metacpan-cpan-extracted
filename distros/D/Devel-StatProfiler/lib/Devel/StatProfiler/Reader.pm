@@ -92,7 +92,7 @@ Devel::StatProfiler::Reader - read profiler output
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 AUTHORS
 

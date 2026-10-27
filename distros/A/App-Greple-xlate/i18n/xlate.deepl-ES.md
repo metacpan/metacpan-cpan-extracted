@@ -8,9 +8,15 @@ App::Greple::xlate - módulo de traducción para greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Para utilizar GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Si  no `llm models`incluye `gpt-6-astra`, consulta las instrucciones de registro del modelo en [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Excluye los bloques «embedz» de la traducción cuando un documento los conteng
 
     En este momento, están disponibles los siguientes motores
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) (para el registro del modelo)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Excluye los bloques «embedz» de la traducción cuando un documento los conteng
 
 - **--xlate-prompt**=_text_
 
-    Especifica una indicación personalizada que se enviará al motor de traducción. Esta opción está disponible para los motores LLM (`gpt3`, `gpt4o`, `gpt5`), pero no para DeepL. Puedes personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si la indicación contiene `%s`, se sustituirá por el nombre del idioma de destino. En el caso del motor `gpt5` basado en LLM, el documento se proporciona por separado como una solicitud JSON cuyo miembro `input` es la matriz que se va a traducir y cuyo miembro opcional `context` contiene datos de referencia. Se añade una instrucción fija que trata esos miembros como datos del documento, y no como comandos, incluso cuando se utiliza una solicitud personalizada.
+    Especifica una indicación personalizada que se enviará al motor de traducción. Esta opción está disponible para los motores LLM (`gpt3`, `gpt4o`, `gpt5`, `gpt6`) pero no para DeepL. Puedes personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si la indicación contiene `%s`, se sustituirá por el nombre del idioma de destino. Para los motores`gpt6`  y`gpt5`  basados en LLM, el documento se proporciona por separado como una solicitud JSON cuyo `input`miembro  es la matriz que se va a traducir y cuyo `context`miembro opcional  contiene datos de referencia. Se añade una instrucción fija que trata esos miembros como datos del documento, no como comandos, incluso cuando se utiliza una indicación personalizada.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Excluye los bloques «embedz» de la traducción cuando un documento los conteng
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Número de bloques traducidos circundantes que se pasan como contexto de referencia al volver a traducir los bloques modificados (por defecto, 2). El contexto también incluye el texto fuente sin procesar que rodea la región modificada (encabezados, estructura de listas, pies de foto) y, cuando esté disponible, la versión anterior del texto modificado recuperada de la caché, de modo que se conserve la redacción no modificada. Establecer en 0 para desactivar por completo la traducción sensible al contexto. Ten en cuenta que cada región modificada se traduce en su propia llamada a la API y que el contexto puede sumar hasta unos 8000 caracteres a la solicitud JSON del usuario, por lo que la traducción sensible al contexto sacrifica algo de rendimiento a cambio de la coherencia. El contexto derivado del documento se mantiene fuera del mensaje del sistema.
 
 - **--xlate-cache-seed**=_file_

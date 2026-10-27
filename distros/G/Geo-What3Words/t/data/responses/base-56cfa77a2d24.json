@@ -1,0 +1,10 @@
+{
+   "body" : {
+      "error" : {
+         "code" : "BadWords",
+         "message" : "words must be a valid 3 word address, such as filled.count.soap or ///filled.count.soap"
+      }
+   },
+   "request" : "convert-to-coordinates?format=json&words=does.not.exist",
+   "status" : 400
+}

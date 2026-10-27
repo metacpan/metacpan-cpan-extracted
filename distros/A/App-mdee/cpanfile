@@ -6,7 +6,7 @@ requires 'URI::Escape';
 
 requires 'App::ansiecho';
 requires 'App::ansifold', '1.35';
-requires 'App::ansicolumn', '1.59';
+requires 'App::ansicolumn', '1.60';
 requires 'Term::ANSIColor::Concise', '3.02';
 
 requires 'App::nup', '1.07';

@@ -1,0 +1,416 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: October 27 2026 $
+.Dt FUGUWEB-SITE 7
+.Os
+.Sh NAME
+.Nm fuguweb-site
+.Nd pages and directories of a fuguweb site
+.Sh DESCRIPTION
+This manual describes the pages and the directories of a
+.Xr fuguweb 1
+site.
+.Sh THE PAGE LAYOUT
+Every source becomes one HTML body fragment, and the build wraps each
+fragment in one fixed layout: the head, a banner, the navigation, the
+fragment, and a footer.
+A project decides the site name, the languages, the navigation, and
+the footer prose.
+The layout carries no class, no
+.Ql <hr>
+and no text separator: the stylesheet draws each rule and each
+separator.
+.Pp
+Every page of the description sits in the tree of each language, below
+.Pa <tree>/
+of the output, where the tree is the tag of the language in lowercase.
+Each file of the site has one path below the site root, and each link
+of the layout goes from the directory of its page to that path.
+A page of
+.Pa en/
+links the entry page as
+.Pa index.html ,
+and the key page links it as
+.Pa ../en/index.html .
+The
+.Ql html
+element of a page carries the tag of its language as
+.Ql lang ,
+and
+.Ql dir="rtl"
+when that language is right to left.
+.Pp
+The head of a tree page holds the charset, the viewport, the title,
+the links to the page in each language, and the stylesheet link.
+The links are one
+.Ql rel="canonical"
+link to the page itself, one
+.Ql rel="alternate"
+link for each language with its tag as
+.Ql hreflang ,
+and one alternate link with
+.Ql hreflang="x-default"
+to the forward page.
+Each href is the
+.Ic url ,
+then the path of the page, such as
+.Lk https://example.org/en/index.html .
+The forward page is the bare
+.Ic url .
+.Pp
+The banner links the site name to the entry page of the tree.
+On a site of more than one language, the list of the languages follows
+the link.
+Each item links the same page in that language, with the
+.Ic name
+of the language as its text, and its tag as
+.Ql lang
+and
+.Ql hreflang .
+The navigation is one list of the
+.Ic nav
+blocks, in file order.
+The link of the language of the page and the navigation link of the
+page carry
+.Ql aria-current="page" .
+.Pp
+A part of a page whose text comes from another language than the page
+carries the tag of that language as
+.Ql lang .
+It carries
+.Ql dir
+too when the two directions differ.
+The part is the site link of the banner, the link of a navigation
+label, the
+.Ql main
+element of a body, the
+.Ql footer ,
+or a
+.Ql section
+of the top-level
+.Pa 404.html .
+The index page marks each part on its own element instead: the title,
+the
+.Ic body ,
+each group heading and each manual description.
+A page of
+.Pa ar/
+whose body comes from the source of
+.Ql en
+therefore carries
+.Ql <main lang="en" dir="ltr"> .
+.Pp
+The top level holds two pages for the host.
+Each one is a page of the default language.
+The forward
+.Pa index.html
+leads to the entry page of the default tree with a meta refresh.
+Its title is the site name of the default language alone.
+Its head names the bare
+.Ic url
+as its canonical link and as
+.Ql x-default ,
+and the entry page of each language as an alternate link.
+On a site of more than one language, its body lists each language, and
+each item links the entry page of that language.
+On a site of one language, its body holds one link to the entry page.
+The forward carries no banner, no navigation and no footer, and it
+loads no stylesheet.
+.Pp
+When the description holds the page
+.Pa 404.html ,
+the top level holds one more
+.Pa 404.html ,
+with a
+.Ql <base>
+whose href is the path of the
+.Ic url ,
+such as
+.Ql <base href="/"> .
+A host serves that page at each path that no file answers, and each
+relative link of the page resolves from the site root.
+Its banner and its navigation link the tree of the default language,
+as
+.Pa en/index.html .
+On a site of more than one language, the list of the languages follows
+the site link, and each item links the entry page of that language.
+Its head names no page in another language.
+Its
+.Ql <main>
+holds the body of
+.Pa 404.html
+of each language, each one in its own
+.Ql <section> ,
+in the order of the declaration.
+The build removes each id of a body, so the page holds no id twice.
+It resolves each relative link of a body against
+.Pa 404.html
+of its tree.
+In the body of
+.Ql zh-Hans ,
+.Pa index.html
+becomes
+.Pa zh-hans/index.html ,
+and
+.Ql #x
+becomes
+.Ql zh-hans/404.html#x .
+.Pp
+On a tree page and on the top-level
+.Pa 404.html ,
+the title is the title of the page, an em dash, and the site name.
+.Pp
+The fragment that the
+.Ic footer
+setting names becomes the footer prose of each tree page.
+A language takes the footer of its
+.Ic language
+block, and the one of the description when its block names none.
+The key page and the pages of the top level carry no footer.
+A project without one gets no footer element.
+.Pp
+The base stylesheet ships with the tool as
+.Pa share/fuguweb/style.css .
+The build copies it to
+.Pa style.css
+at the top level of the output, outside every tree.
+Each page but the forward links it from its own directory: a tree
+page and the key page as
+.Pa ../style.css ,
+and the top-level
+.Pa 404.html
+as
+.Pa style.css .
+The
+.Ic stylesheet
+setting names another sheet.
+A stylesheet that is not found fails the build.
+.Sh MANUALS
+A
+.Ic manuals
+group reads its directory for the plain files
+.Pa *.1 ,
+.Pa *.3p ,
+.Pa *.5 ,
+.Pa *.7
+and
+.Pa *.8 .
+It sorts them by section, in the order 1, 3p, 5, 7, 8, and then by
+file name.
+The build renders each source with
+.Xr mandoc 1
+and names the page
+.Ql <name>.<section>.html .
+A cross-reference to a manual of the site becomes a local link.
+Any other cross-reference links to the
+.Ic man_url
+host.
+.Pp
+The build removes the head and the foot that
+.Xr mandoc 1
+writes around a manual, so each word of the page comes from the
+source.
+The base
+.Xr mandoc 1
+of
+.Ox
+also writes a
+.Ql <main>
+element around the text, and the build replaces it with a
+.Ql <div> ,
+so a page holds one
+.Ql <main> .
+The page opens with one
+.Ql <h1>
+that holds the name and the section, such as
+.Ql fuguweb(1) .
+Each section heading is an
+.Ql <h2>
+and each subsection heading an
+.Ql <h3> ,
+and a heading holds no link to itself.
+The page holds each character outside ASCII as the character, and not
+as a character reference.
+.Pp
+A
+.Ic modules
+group finds every
+.Pa .pod
+file below its directory, and the sidecar that names the directory
+itself:
+.Pa lib/App/FuguWeb.pod
+is the umbrella of
+.Pa lib/App/FuguWeb/ .
+The manual name is the path below
+.Ic module_root
+with
+.Ql :\&:
+between the segments, and the section is
+.Ql 3p .
+The build renders each sidecar with
+.Xr pod2man 1
+and then
+.Xr mandoc 1 ,
+so a module page carries the same layout as a hand-written manual.
+A
+.Ql L<>
+reference renders as text, not as a link.
+.Pp
+The index page is the
+.Ic page
+block with
+.Ic index No = Cm yes .
+Its heading is the title of the page, and its
+.Ic body ,
+when it sets one, follows the heading.
+The index writes no prose of its own.
+Each group then adds one heading, with the group name as its fragment
+identifier and the
+.Ic heading
+of the language as its text, and one list of its manuals.
+Each entry links the page and shows the one-line description, from the
+first
+.Ic \&Nd
+macro of an mdoc source or the
+.Sy NAME
+section of a sidecar.
+A group with no manual adds nothing.
+.Sh THE SOURCE DIRECTORY
+The source directory holds the body fragments, the footer, and the
+assets.
+Every plain file directly in it that the build does not render is an
+asset, and the build copies it as it stands.
+A
+.Pa *.body.html
+fragment, a
+.Pa *.md
+file, and a dot file are not assets.
+.Pa robots.txt
+and
+.Pa CNAME
+therefore need no entry in the description, and notes for the
+maintainers are not published.
+.Pp
+The build copies each asset to the top level of the output, outside
+every language tree.
+A tree page sits one directory below the top level.
+A body fragment, a Markdown page and the footer of a tree page
+therefore link an asset as
+.Pa ../<asset> .
+.Pp
+The body of
+.Pa 404.html
+takes the same rule.
+The build resolves each relative link of it against its own tree, also
+in the top-level
+.Pa 404.html .
+.Pp
+The build rejects a symlink at the top level of the source directory.
+It also rejects a symlink on the path of each fragment that it reads.
+The rule holds for the file, and for each directory between the source
+directory and the file.
+These fragments are the body fragment of each page in each language,
+and the footer of each language.
+An asset or a fragment would publish the bytes of the target, from
+anywhere on the machine.
+.Sh THE OUTPUT DIRECTORY
+The top level of the output holds the two pages for the host, the
+stylesheet and the assets.
+Each language tree is one flat directory of pages below it.
+The key directory and the well-known tree are the other parts below the
+top level.
+.Pp
+The build writes plain files only.
+It refuses a symlink on any path that it writes, before it writes one
+file.
+The test folds each name, so it also refuses a link at
+.Pa INDEX.HTML .
+It owns a plain file at the top level, and a plain file directly in the
+tree of a declared language.
+It also owns a file that the site names, and a file that has a shape of
+the key directory.
+The build keeps every other entry, reports it, and never removes it.
+The tree of a language that the description dropped is therefore kept
+and reported.
+.Cm clean
+removes what the build owns, and a directory of the site, the tree of a
+declared language, or a directory of the key tree.
+It refuses every other entry, and names it, so it never removes a file
+that the build keeps.
+.Pp
+Both
+.Cm build
+and
+.Cm clean
+refuse a target that no build may own: the root of the filesystem, the
+home directory, the project root, and any directory that holds the
+project.
+They refuse the source directory and every directory below it.
+The output directory of the description is the one exception, because
+the default output directory sits inside the default source directory.
+.Pp
+Both commands also refuse a target that holds a source.
+The build removes each file of the top level that the site does not
+name, and
+.Cm clean
+removes the whole target, so either one would remove the source.
+A source is a body, a footer, a Markdown page, a manual or a POD
+sidecar of each language, or the
+.Ic stylesheet .
+The source directory, each key directory and the
+.Ic dir
+of each group in each language are sources too.
+Both commands also refuse a target inside a key directory or inside the
+.Ic dir
+of a group.
+The exception does not cover these refusals, and the message names the
+target and the source.
+A description that does not load names its source directory and its
+key directories alone.
+.Pp
+Each test that refuses a name, a target or a link because it meets
+another name compares the folds of the two: the NFD form of Unicode,
+then the full case fold.
+A file system without case, such as APFS, keeps two names of one fold
+as one entry.
+The symlink test, each refusal of the target, and each test of a page
+name or a key directory name against another name fold.
+Each other test compares the names as they stand, so a fold can only
+make a test refuse more.
+The exception of the output directory of the description is such a
+test.
+So is each test of the prune of the build and of
+.Cm clean
+that decides which entry the build owns.
+The fold reads the Unicode version of
+.Xr perl 1 .
+A file system of a later version can fold a character that
+.Xr perl 1
+does not know, and a test then misses that pair.
+.Pp
+The build stages every manual source in
+.Pa .man/<tree>
+inside the output directory, one directory for each language, so that
+.Xr mandoc 1
+resolves a cross-reference against the manuals of the site.
+The build removes the staging directory when it ends.
+It refuses a staging directory of another shape, and so does
+.Cm clean .
+.Sh SEE ALSO
+.Xr fuguweb 1 ,
+.Xr fuguwebrc 5 ,
+.Xr fuguweb-keys 7

@@ -63,19 +63,19 @@ WriteMakefile(
       'provides'=>{
                       'CPAN::Maker'=>{
                                          'file'=>'lib/CPAN/Maker.pm',
-                                         'version'=>'2.0.12'
+                                         'version'=>'2.0.13'
                                        },
                       'CPAN::Maker::Constants'=>{
                                                     'file'=>'lib/CPAN/Maker/Constants.pm',
-                                                    'version'=>'2.0.12'
+                                                    'version'=>'2.0.13'
                                                   },
                       'CPAN::Maker::Role::FileUtils'=>{
                                                           'file'=>'lib/CPAN/Maker/Role/FileUtils.pm',
-                                                          'version'=>'2.0.12'
+                                                          'version'=>'2.0.13'
                                                         },
                       'CPAN::Maker::Role::ModuleUtils'=>{
                                                             'file'=>'lib/CPAN/Maker/Role/ModuleUtils.pm',
-                                                            'version'=>'2.0.12'
+                                                            'version'=>'2.0.13'
                                                           },
                       'CPAN::Maker::Role::Provides'=>{
                                                          'file'=>'lib/CPAN/Maker/Role/Provides.pm',
@@ -83,7 +83,7 @@ WriteMakefile(
                                                        },
                       'CPAN::Maker::Utils'=>{
                                                 'file'=>'lib/CPAN/Maker/Utils.pm',
-                                                'version'=>'2.0.12'
+                                                'version'=>'2.0.13'
                                               }
                     },
       'resources'=>{

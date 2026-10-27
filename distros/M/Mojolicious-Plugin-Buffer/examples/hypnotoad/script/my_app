@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin ();
+use File::Path qw(make_path);
+use Mojo::Home ();
+
+use lib "$FindBin::Bin/../lib";	# MyApp
+use lib "$FindBin::Bin/../../../lib";	# Mojolicious::Plugin::Buffer, when run from the distribution
+
+my $home = "$FindBin::Bin/..";
+
+# Keep the example self-contained, while allowing a deployment-style
+# environment to point at /var/cache and /var/lib instead.
+$ENV{MYAPP_CACHE_DIR} //= "$home/var/cache";
+$ENV{MYAPP_LOCK_DIR}  //= "$home/var/locks";
+$ENV{MYAPP_PID_FILE}  //= "$home/var/hypnotoad.pid";
+
+make_path($ENV{MYAPP_CACHE_DIR}, $ENV{MYAPP_LOCK_DIR});
+
+require MyApp;
+
+my $app = MyApp->new;
+$app->home(Mojo::Home->new($home));
+$app->start;

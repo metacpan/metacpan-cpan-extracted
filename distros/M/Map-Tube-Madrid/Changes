@@ -1,142 +1,150 @@
 Revision history for Map::Tube::Madrid
 
-0.42  2025-04-20
-      - Removed broken link to source map.
+v1.0.0 2027-10-27
+        - Release prepared by Gisbert W. Selke.
+        - Added unit test: xt/provides.t
+        - Added more tests.
+        - Substantially expanded coverage.
+        - Changed to semantic versioning.
+        - Removed doc-only modules for lines.
 
-0.41  2025-04-20
-      - Re-structured map data link.
+0.42   2025-04-20
+       - Removed broken link to source map.
 
-0.40  2025-04-20
-      - Fixed map data as reported by new test framework.
-      - Updated dependency on Map::Tube v4.07.
-      - Updated copyright year information.
+0.41   2025-04-20
+       - Re-structured map data link.
 
-0.39  2019-09-02
-      - Moved author test scripts to xt/ subfolder.
+0.40   2025-04-20
+       - Fixed map data as reported by new test framework.
+       - Updated dependency on Map::Tube v4.07.
+       - Updated copyright year information.
 
-0.38  2019-07-10
-      - Updated dependency on Map::Tube v3.64.
+0.39   2019-09-02
+       - Moved author test scripts to xt/ subfolder.
 
-0.37  2019-06-23
-      - Updated dependency on Map::Tube v3.63.
+0.38   2019-07-10
+       - Updated dependency on Map::Tube v3.64.
 
-0.36  2019-05-16
-      - Updated dependency on Map::Tube v3.62.
+0.37   2019-06-23
+       - Updated dependency on Map::Tube v3.63.
 
-0.35  2019-04-22
-      - Updated dependency on Map::Tube v3.61.
+0.36   2019-05-16
+       - Updated dependency on Map::Tube v3.62.
 
-0.34  2019-04-14
-      - Added test for different routes.
+0.35   2019-04-22
+       - Updated dependency on Map::Tube v3.61.
 
-0.33  2019-04-13
-      - Updated Madrid map.
-      - Updated linked line maps.
-      - Linked Line L4 package to pod document.
+0.34   2019-04-14
+       - Added test for different routes.
 
-0.32  2019-04-12
-      - Updated map for Line L4 showing new connections.
-      - Added package Map::Tube::Madrid::Line::L4
-      - Added map image for Line L4.
+0.33   2019-04-13
+       - Updated Madrid map.
+       - Updated linked line maps.
+       - Linked Line L4 package to pod document.
 
-0.31  2019-04-11
-      - Updated MANIFEST file to remove map images.
+0.32   2019-04-12
+       - Updated map for Line L4 showing new connections.
+       - Added package Map::Tube::Madrid::Line::L4
+       - Added map image for Line L4.
 
-0.30  2019-03-02
-      - Updated dependency on Map::Tube v3.60.
+0.31   2019-04-11
+       - Updated MANIFEST file to remove map images.
 
-0.29  2019-02-11
-      - Updated dependency on Map::Tube v3.59.
+0.30   2019-03-02
+       - Updated dependency on Map::Tube v3.60.
 
-0.28  2018-12-25
-      - Updated dependency on Map::Tube v3.58.
+0.29   2019-02-11
+       - Updated dependency on Map::Tube v3.59.
 
-0.27  2018-10-19
-      - Updated section "NOTE" for Line L3.
-      - Updated map for Line L3 showing new connections.
+0.28   2018-12-25
+       - Updated dependency on Map::Tube v3.58.
 
-0.26  2018-09-30
-      - Updated dependency on Map::Tube v3.57.
+0.27   2018-10-19
+       - Updated section "NOTE" for Line L3.
+       - Updated map for Line L3 showing new connections.
 
-0.25  2018-09-25
-      - Updated section "NOTE" for Line L5.
-      - Updated map for Line L5 showing new connections.
+0.26   2018-09-30
+       - Updated dependency on Map::Tube v3.57.
 
-0.24  2018-09-24
-      - Updated section "NOTE" for Line L1.
-      - Updated map for Line L1 showing new connections.
+0.25   2018-09-25
+       - Updated section "NOTE" for Line L5.
+       - Updated map for Line L5 showing new connections.
 
-0.23  2018-09-23
-      - Fixed test script t/map.t.
+0.24   2018-09-24
+       - Updated section "NOTE" for Line L1.
+       - Updated map for Line L1 showing new connections.
 
-0.22  2018-09-22
-      - Added map route test.
+0.23   2018-09-23
+       - Fixed test script t/map.t.
 
-0.21  2018-09-20
-      - Added more load test.
+0.22   2018-09-22
+       - Added map route test.
 
-0.20  2018-09-19
-      - Added package Map::Tube::Madrid::Line::L2
-      - Added map image for Line L2.
+0.21   2018-09-20
+       - Added more load test.
 
-0.19  2018-09-18
-      - Added map source data for line L2.
-      - Updated map image to show line L2.
+0.20   2018-09-19
+       - Added package Map::Tube::Madrid::Line::L2
+       - Added map image for Line L2.
 
-0.18  2018-09-09
-      - Updated dependency on Map::Tube v3.56.
+0.19   2018-09-18
+       - Added map source data for line L2.
+       - Updated map image to show line L2.
 
-0.17  2018-08-30
-      - Added package Map::Tube::Madrid::Line::L11
-      - Added map image for Line L11.
+0.18   2018-09-09
+       - Updated dependency on Map::Tube v3.56.
 
-0.16  2018-08-29
-      - Added map source data for line L11.
-      - Updated map image to show line L11.
+0.17   2018-08-30
+       - Added package Map::Tube::Madrid::Line::L11
+       - Added map image for Line L11.
 
-0.15  2018-08-28
-      - Added link to the Line L1 specification page.
+0.16   2018-08-29
+       - Added map source data for line L11.
+       - Updated map image to show line L11.
 
-0.14  2018-08-16
-      - Updated dependency on Map::Tube v3.55.
+0.15   2018-08-28
+       - Added link to the Line L1 specification page.
 
-0.13  2018-07-17
-      - Added package Map::Tube::Madrid::Line::L1
-      - Added map image for Line L1.
+0.14   2018-08-16
+       - Updated dependency on Map::Tube v3.55.
 
-0.12  2018-07-14
-      - Added source data for line L1.
+0.13   2018-07-17
+       - Added package Map::Tube::Madrid::Line::L1
+       - Added map image for Line L1.
 
-0.11  2018-07-10
-      - Used File::ShareDir v1.114 instead of File::Share.
-      - Explicitly added configure prereq File::ShareDir::Install v0.13.
+0.12   2018-07-14
+       - Added source data for line L1.
 
-0.10  2018-07-01
-      - Updated dependency on Map::Tube v3.53.
+0.11   2018-07-10
+       - Used File::ShareDir v1.114 instead of File::Share.
+       - Explicitly added configure prereq File::ShareDir::Install v0.13.
 
-0.09  2018-06-18
-      - Used new_ok() in test script.
+0.10   2018-07-01
+       - Updated dependency on Map::Tube v3.53.
 
-0.08  2018-06-10
-      - Added test scripts (t/meta-json.t and t/meta-ymlt).
+0.09   2018-06-18
+       - Used new_ok() in test script.
 
-0.07  2018-06-07
-      - Added key 'provides' to the Makefile.PL script.
+0.08   2018-06-10
+       - Added test scripts (t/meta-json.t and t/meta-ymlt).
 
-0.06  2018-06-05
-      - Updated dependency on Map::Tube v3.51.
+0.07   2018-06-07
+       - Added key 'provides' to the Makefile.PL script.
 
-0.05  2018-05-10
-      - Updated dependency on Test::Map::Tube v0.44.
+0.06   2018-06-05
+       - Updated dependency on Map::Tube v3.51.
 
-0.04  2018-05-05
-      - Updated dependency on Map::Tube v3.50.
+0.05   2018-05-10
+       - Updated dependency on Test::Map::Tube v0.44.
 
-0.03  2018-04-19
-      - Added key 'resources' to the Makefile.PL script.
+0.04   2018-05-05
+       - Updated dependency on Map::Tube v3.50.
 
-0.02  2018-04-14
-      - Updated dependency on Map::Tube v3.49.
+0.03   2018-04-19
+       - Added key 'resources' to the Makefile.PL script.
 
-0.01  2018-04-05
-      - First version, released from German Perl Workshop 2018.
+0.02   2018-04-14
+       - Updated dependency on Map::Tube v3.49.
+
+0.01   2018-04-05
+       - First version, released from German Perl Workshop 2018.

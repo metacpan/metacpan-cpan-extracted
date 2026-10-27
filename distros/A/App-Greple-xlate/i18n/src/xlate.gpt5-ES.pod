@@ -10,9 +10,15 @@ App::Greple::xlate - módulo de soporte de traducción para greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Para usar GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Si C<llm models> no incluye C<gpt-6-astra>, consulte las instrucciones de registro del modelo en L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ En este momento, están disponibles los siguientes motores
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> para el registro del modelo)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Establezca este valor en 1 si desea traducir una línea a la vez. Esta opción t
 
 =item B<--xlate-prompt>=I<text>
 
-Especifique un prompt personalizado para enviarlo al motor de traducción. Esta opción está disponible para los motores LLM (C<gpt3>, C<gpt4o>, C<gpt5>), pero no para DeepL. Puede personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si el prompt contiene C<%s>, se reemplazará por el nombre del idioma de destino. Para el motor C<gpt5> respaldado por llm, el documento se proporciona por separado como una solicitud JSON cuyo miembro C<input> es la matriz que se va a traducir y cuyo miembro opcional C<context> contiene datos de referencia. Se añade una instrucción fija que trata esos miembros como datos del documento, no como comandos, incluso cuando se utiliza un prompt personalizado.
+Especifique un prompt personalizado para enviarlo al motor de traducción. Esta opción está disponible para los motores LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>), pero no para DeepL. Puede personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si el prompt contiene C<%s>, se reemplazará por el nombre del idioma de destino. Para los motores C<gpt5> y C<gpt6> respaldados por llm, el documento se proporciona por separado como una solicitud JSON cuyo miembro C<input> es la matriz que se va a traducir y cuyo miembro opcional C<context> contiene datos de referencia. Se añade una instrucción fija que trata esos miembros como datos del documento, no como comandos, incluso cuando se utiliza un prompt personalizado.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Especifique información de contexto adicional que se enviará al motor de tradu
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Número de bloques traducidos circundantes que se pasan como contexto de referencia al volver a traducir bloques modificados (predeterminado 2). El contexto también incluye el texto fuente sin procesar alrededor de la región modificada (encabezados, estructura de listas, leyendas) y, cuando está disponible, la versión anterior del texto modificado recuperada de la caché, de modo que se conserve la redacción sin cambios. Establézcalo en 0 para desactivar por completo la traducción con conocimiento del contexto. Tenga en cuenta que cada región modificada se traduce en su propia llamada a la API y que el contexto puede añadir hasta unos 8000 caracteres a la solicitud de usuario JSON, por lo que la traducción con conocimiento del contexto intercambia algo de coste adicional por coherencia. El contexto derivado del documento se mantiene fuera del prompt del sistema.
 
 =item B<--xlate-cache-seed>=I<file>

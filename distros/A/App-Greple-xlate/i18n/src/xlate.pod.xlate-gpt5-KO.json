@@ -4,6 +4,14 @@
       "App::Greple::xlate - greple용 번역 지원 모듈\n"
    ],
    [
+      "To use GPT-6 Astra:\n",
+      "GPT-6 Astra를 사용하려면:\n"
+   ],
+   [
+      "If C<llm models> does not list C<gpt-6-astra>, see the model registration instructions in L<App::Greple::xlate::llm::gpt6>.\n",
+      "C<llm models>에 C<gpt-6-astra>가 나열되지 않으면 L<App::Greple::xlate::llm::gpt6>의 모델 등록 지침을 참조하세요.\n"
+   ],
+   [
       "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.6 Terra (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
       "B<Greple> B<xlate> 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 기본 엔진은 L<llm|https://llm.datasette.io/> 명령을 호출하는 GPT-5.6 Terra(F<llm/gpt5.pm>)이며, DeepL(F<deepl.pm>) 및 레거시 B<gpty> 기반 엔진도 포함되어 있습니다.\n"
    ],
@@ -144,6 +152,10 @@
       "현재 다음 엔진들이 사용 가능합니다\n"
    ],
    [
+      "L<App::Greple::xlate::llm::gpt6> for model registration)\n",
+      "L<App::Greple::xlate::llm::gpt6> 모델 등록용)\n"
+   ],
+   [
       "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
       "엔진 모듈은 먼저 백엔드 네임스페이스(C<llm>, 그다음 C<gpty>)에서 검색한 다음, C<App::Greple::xlate> 바로 아래에서 검색합니다. 따라서 C<gpt5> 는 C<llm> 명령을 호출하는 C<App::Greple::xlate::llm::gpt5> 를 로드하는 반면, C<gpt4o> 는 C<App::Greple::xlate::gpty::gpt4o> 로 폴백합니다. 특정 백엔드를 강제로 사용하려면 C<--xlate-setopt backend=gpty> 를 사용하십시오.\n"
    ],
@@ -216,8 +228,8 @@
       "한 줄씩 번역하려면 이 값을 1로 설정하십시오. 이 옵션은 C<--xlate-maxlen> 옵션보다 우선합니다.\n"
    ],
    [
-      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> engine, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
-      "번역 엔진에 보낼 사용자 지정 프롬프트를 지정합니다. 이 옵션은 LLM 엔진(C<gpt3>, C<gpt4o>, C<gpt5>)에서 사용할 수 있지만 DeepL에서는 사용할 수 없습니다. AI 모델에 특정 지시사항을 제공하여 번역 동작을 사용자 지정할 수 있습니다. 프롬프트에 C<%s>가 포함되어 있으면 대상 언어 이름으로 대체됩니다. llm 백엔드 기반 C<gpt5> 엔진의 경우 문서는 별도의 JSON 요청으로 제공되며, 이 요청의 C<input> 멤버는 번역할 배열이고 선택적 C<context> 멤버에는 참조 데이터가 포함됩니다. 사용자 지정 프롬프트를 사용하는 경우에도 해당 멤버를 명령이 아닌 문서 데이터로 취급하는 고정 지시사항이 추가됩니다.\n"
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
+      "번역 엔진에 보낼 사용자 지정 프롬프트를 지정합니다. 이 옵션은 LLM 엔진(C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>)에서 사용할 수 있지만 DeepL에서는 사용할 수 없습니다. AI 모델에 특정 지시사항을 제공하여 번역 동작을 사용자 지정할 수 있습니다. 프롬프트에 C<%s>가 포함되어 있으면 대상 언어 이름으로 대체됩니다. llm 백엔드 기반 C<gpt5> 및 C<gpt6> 엔진의 경우 문서는 별도의 JSON 요청으로 제공되며, 이 요청의 C<input> 멤버는 번역할 배열이고 선택적 C<context> 멤버에는 참조 데이터가 포함됩니다. 사용자 지정 프롬프트를 사용하는 경우에도 해당 멤버를 명령이 아닌 문서 데이터로 취급하는 고정 지시사항이 추가됩니다.\n"
    ],
    [
       "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",

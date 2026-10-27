@@ -1,0 +1,38 @@
+
+This should work anyplace File::Spec can split directories, which 
+should be anywhere Perl runs.
+
+This may not do much good on Windows: the crazy directory structure 
+common to Windows systems do not seem very amenable to using 
+$FindBin::Bin as the starting point for locating libraries.
+
+Anyone with access to VMS warn me if this works at all -- through 
+judicious use of virtual devices should make it useful.
+
+The pod describes using the module in a few situations, any 
+suggestions appreciated. In particular, I toyed with several ways of 
+passing in switches. The one used here was chosen because it supports 
+qw( ... ) syntax with optional parameters (e.g., qw(export) and 
+qw(export=foo)).
+
+Note that the lookup can be for any basename, not just a directory.
+This makes the module useful for finding config files, named pipes,
+whatever you like. The test for returning content is "-e", not "-d",
+which means you may need some add'l tests in your code to validate
+what was found. 
+
+Older versions of the module support earlier versions of perl
+(see ./versions for list of Perl versions supported). Older
+versions of modules are left in the ./versions directory for 
+backwards compatibility for anyone stuck on those versions; they
+are unmaintained execpt for bugfixes specific to the version.
+
+Installation:
+
+    perl Makefile.PL;
+    make all test install;
+    perldoc FindBin::libs;
+
+also see ./examples for come common use cases.
+
+Zei gesund

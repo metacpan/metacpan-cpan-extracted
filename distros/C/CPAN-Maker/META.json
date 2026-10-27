@@ -57,19 +57,19 @@
    "provides" : {
       "CPAN::Maker" : {
          "file" : "lib/CPAN/Maker.pm",
-         "version" : "v2.0.12"
+         "version" : "v2.0.13"
       },
       "CPAN::Maker::Constants" : {
          "file" : "lib/CPAN/Maker/Constants.pm",
-         "version" : "v2.0.12"
+         "version" : "v2.0.13"
       },
       "CPAN::Maker::Role::FileUtils" : {
          "file" : "lib/CPAN/Maker/Role/FileUtils.pm",
-         "version" : "v2.0.12"
+         "version" : "v2.0.13"
       },
       "CPAN::Maker::Role::ModuleUtils" : {
          "file" : "lib/CPAN/Maker/Role/ModuleUtils.pm",
-         "version" : "v2.0.12"
+         "version" : "v2.0.13"
       },
       "CPAN::Maker::Role::Provides" : {
          "file" : "lib/CPAN/Maker/Role/Provides.pm",
@@ -77,7 +77,7 @@
       },
       "CPAN::Maker::Utils" : {
          "file" : "lib/CPAN/Maker/Utils.pm",
-         "version" : "v2.0.12"
+         "version" : "v2.0.13"
       }
    },
    "release_status" : "stable",
@@ -92,6 +92,6 @@
          "web" : "https://github.com/rlauer6/CPAN-Maker"
       }
    },
-   "version" : "v2.0.12",
+   "version" : "v2.0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

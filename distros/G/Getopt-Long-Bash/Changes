@@ -1,5 +1,12 @@
 Revision history for Getopt-Long-Bash
 
+1.1.0 2026-10-27T09:18:40Z
+
+    - Auto-initialize only when getoptlong.sh is sourced as a file, so
+      that the code embedded in a script does not take the script's
+      first argument for an options array, and document how to embed it
+    - Source the library with "-" in the multi-step examples
+
 1.0.0 2026-08-27T14:22:49Z
 
     - Require bash 4.4 or later, and report the required version when

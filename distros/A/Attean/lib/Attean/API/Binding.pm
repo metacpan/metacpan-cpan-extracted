@@ -7,7 +7,7 @@ Attean::API::Binding - Name to term bindings
 
 =head1 VERSION
 
-This document describes Attean::API::Binding version 0.039
+This document describes Attean::API::Binding version 0.040
 
 =head1 DESCRIPTION
 
@@ -71,7 +71,7 @@ otherwise.
 
 use Type::Tiny::Role;
 
-package Attean::API::Binding 0.039 {
+package Attean::API::Binding 0.040 {
 	use Scalar::Util qw(blessed);
 	use List::Util qw(mesh);
 
@@ -163,7 +163,8 @@ package Attean::API::Binding 0.039 {
 					return 0;
 				}
 			} else {
-				unless (0 == $value->compare($other_value)) {
+				my $cmp	= eval { $value->compare($other_value) };
+				unless (defined($cmp) and 0 == $cmp) {
 					return 0;
 				}
 			}
@@ -285,7 +286,7 @@ C<< $binding >>.
 	}
 }
 
-package Attean::API::TripleOrQuadPattern 0.039 {
+package Attean::API::TripleOrQuadPattern 0.040 {
 	use Encode qw(encode);
 	use List::Util qw(mesh);
 	use Scalar::Util qw(blessed);
@@ -379,7 +380,7 @@ package Attean::API::TripleOrQuadPattern 0.039 {
 
 	sub ground {
 		my $self	= shift;
-		my $result	= shift;
+		my $result	= shift || Attean::Result->new(bindings => {});
 		
 		my %bindings;
 		my @vars	= $self->variables();
@@ -395,9 +396,11 @@ package Attean::API::TripleOrQuadPattern 0.039 {
 			}
 		}
 		
-		return scalar(@vars) == 3
+		my $st	= scalar(@vars) == 3
 			? Attean::Triple->new( %bindings )
 			: Attean::Quad->new( %bindings );
+		$st->validate;
+		return $st;
 	}
 	
 	sub unify {
@@ -465,7 +468,7 @@ parsed from C<< $string >> in SPARQL syntax.
 	}
 }
 
-package Attean::API::TripleOrQuad 0.039 {
+package Attean::API::TripleOrQuad 0.040 {
 	use List::Util qw(any);
 	use Carp;
 
@@ -476,18 +479,19 @@ package Attean::API::TripleOrQuad 0.039 {
 	sub BUILD {
 		my $self = shift;
 		if (any { $_->does('Attean::API::Variable') } $self->values) {
-			croak 'Use a Pattern class to construct when using variables';
+			confess 'Use a Pattern class to construct when using variables';
 		}
 	}
 }
 
-package Attean::API::TriplePattern 0.039 {
+package Attean::API::TriplePattern 0.040 {
 	use List::Util qw(mesh);
 	use Scalar::Util qw(blessed);
 
 	use Moo::Role;
 	
-	sub variables { return qw(subject predicate object) }
+	my @vars	= qw(subject predicate object);
+	sub variables { return @vars }
 
 	sub value {
 		my $self	= shift;
@@ -510,7 +514,9 @@ package Attean::API::TriplePattern 0.039 {
 			die "Not a ground triple: " . $self->as_string;
 		}
 		my @terms	= map { $_->does('Attean::API::TriplePattern') ? $_->as_triple : $_ } $self->values;
-		return Attean::Triple->new(@terms);
+		my $t	= Attean::Triple->new(@terms);
+		$t->validate();
+		return $t;
 	}
 	
 	sub apply_triple {
@@ -518,14 +524,35 @@ package Attean::API::TriplePattern 0.039 {
 		return $self->apply_statement(@_);
 	}
 
+	sub matches {
+		my $self	= shift;
+		my $ground	= shift;
+		return 0 unless (ref($ground) eq 'Attean::Triple' or $ground->does('Attean::API::Triple'));
+		foreach my $method (@vars) {
+			my $term	= $self->$method();
+			unless (ref($term) eq 'Attean::Variable' or $term->does('Attean::API::Variable')) {
+				my $gterm	= $ground->$method();
+				my $eq;
+				if ($term->does('Attean::API::TripleOrQuadPattern')) {
+					$eq	= $term->matches($gterm);
+				} else {
+					$eq	= eval { $term->equals($gterm) };
+					warn $@ if ($@);
+				}
+				return 0 unless ($eq);
+			}
+		}
+		return 1;
+	}
+	
 	sub sparql_tokens {
 		my $self	= shift;
 		my @tokens;
 		foreach my $t ($self->values) {
 			if ($t->does('Attean::API::TriplePattern')) {
-				push(@tokens, AtteanX::SPARQL::Token->ltlt);
+				push(@tokens, AtteanX::SPARQL::Token->ltltp);
 				push(@tokens, $t->sparql_tokens->elements);
-				push(@tokens, AtteanX::SPARQL::Token->gtgt);
+				push(@tokens, AtteanX::SPARQL::Token->pgtgt);
 			} else {
 				push(@tokens, $t->sparql_tokens->elements);
 			}
@@ -540,18 +567,18 @@ package Attean::API::TriplePattern 0.039 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding', 'Attean::API::TermOrVariableOrTriplePattern';
 }
 
-package Attean::API::Triple 0.039 {
+package Attean::API::Triple 0.040 {
 	use Scalar::Util qw(blessed);
 	use Moo::Role;
 	
+	my %validation_map	= (
+		subject		=> 'Attean::API::BlankOrIRI',
+		predicate	=> 'Attean::API::IRI',
+		object		=> 'Attean::API::TermOrTriple'
+	);
 	if ($ENV{ATTEAN_TYPECHECK}) {
-		my %map	= (
-			subject		=> 'Attean::API::BlankOrIRIOrTriple',
-			predicate	=> 'Attean::API::IRI',
-			object		=> 'Attean::API::TermOrTriple'
-		);
-		foreach my $method (keys %map) {
-			my $role	= $map{$method};
+		foreach my $method (keys %validation_map) {
+			my $role	= $validation_map{$method};
 			around $method => sub {
 				my $orig	= shift;
 				my $self	= shift;
@@ -567,16 +594,30 @@ package Attean::API::Triple 0.039 {
 		}
 	}
 	
+	sub validate {
+		my $self	= shift;
+		my $class	= ref($self);
+		foreach my $method (keys %validation_map) {
+			my $role	= $validation_map{$method};
+			my $term	= $self->$method();
+			unless ($term->does($role)) {
+				die "${class}'s $method failed conformance check for role $role: " . $term->as_string . "\n";
+			}
+		}
+		return $self;
+	}
+	
 	sub as_quad {
 		my $self	= shift;
 		my $graph	= shift;
-		return Attean::Quad->new($self->values, $graph);
+		my @terms	= map { $_->does('Attean::API::TriplePattern') ? $_->as_triple : $_ } $self->values;
+		return Attean::Quad->new(@terms[0..2], $graph);
 	}
 
 	sub ntriples_string {
 		my $self	= shift;
 		my @values	= $self->values;
-		return join(' ', '<<', (map { $_->ntriples_string } @values), '>>');
+		return join(' ', '<<(', (map { $_->ntriples_string } @values), ')>>');
 	}
 
 	sub order {
@@ -631,13 +672,14 @@ package Attean::API::Triple 0.039 {
 	with 'Attean::API::TermOrTriple';
 }
 
-package Attean::API::QuadPattern 0.039 {
+package Attean::API::QuadPattern 0.040 {
 	use Scalar::Util qw(blessed);
 	use List::Util qw(mesh);
 
 	use Moo::Role;
 	
-	sub variables { return qw(subject predicate object graph) }
+	my @vars	= qw(subject predicate object graph);
+	sub variables { return @vars }
 	sub value {
 		my $self	= shift;
 		my $key		= shift;
@@ -650,7 +692,8 @@ package Attean::API::QuadPattern 0.039 {
 		unless ($self->is_ground) {
 			die "Not a ground quad: " . $self->as_string;
 		}
-		return Attean::Quad->new($self->values);
+		my @terms	= map { $_->does('Attean::API::TriplePattern') ? $_->as_triple : $_ } $self->values;
+		return Attean::Quad->new(@terms);
 	}
 	
 	sub apply_quad {
@@ -666,6 +709,27 @@ package Attean::API::QuadPattern 0.039 {
 		return Attean::TriplePattern->new(mesh \@keys, \@values);
 	}
 
+	sub matches {
+		my $self	= shift;
+		my $ground	= shift;
+		return 0 unless (ref($ground) eq 'Attean::Quad' or $ground->does('Attean::API::Quad'));
+		foreach my $method (@vars) {
+			my $term	= $self->$method();
+			unless (ref($term) eq 'Attean::Variable' or $term->does('Attean::API::Variable')) {
+				my $gterm	= $ground->$method();
+				my $eq;
+				if ($term->does('Attean::API::TripleOrQuadPattern')) {
+					$eq	= $term->matches($gterm);
+				} else {
+					$eq	= eval { $term->equals($gterm) };
+					warn $@ if ($@);
+				}
+				return 0 unless ($eq);
+			}
+		}
+		return 1;
+	}
+	
 	sub sparql_tokens {
 		my $self	= shift;
 		my @tokens;
@@ -688,9 +752,16 @@ package Attean::API::QuadPattern 0.039 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding';
 }
 
-package Attean::API::Quad 0.039 {
+package Attean::API::Quad 0.040 {
 	use Moo::Role;
 	
+	my %validation_map	= (
+		subject		=> 'Attean::API::BlankOrIRI',
+		predicate	=> 'Attean::API::IRI',
+		object		=> 'Attean::API::TermOrTriple',
+		graph		=> 'Attean::API::BlankOrIRI'
+	);
+
 	if ($ENV{ATTEAN_TYPECHECK}) {
 		my $type	= Type::Tiny::Role->new( role => 'Attean::API::BlankOrIRI' );
 		around 'graph' => sub {
@@ -704,10 +775,25 @@ package Attean::API::Quad 0.039 {
 		};
 	}
 
+	sub validate {
+		my $self	= shift;
+		my $class	= ref($self);
+		foreach my $method (keys %validation_map) {
+			my $role	= $validation_map{$method};
+			my $term	= $self->$method();
+			unless ($term->does($role)) {
+				Carp::confess "${class}'s $method failed conformance check for role $role: " . $term->as_string;
+			}
+		}
+		return $self;
+	}
+
 	sub as_triple {
 		my $self	= shift;
 		my @values	= $self->values;
-		return Attean::Triple->new(@values[0..2]);
+		my $t	= Attean::Triple->new(@values[0..2]);
+		$t->validate();
+		return $t;
 	}
 
 	with 'Attean::API::QuadPattern';
@@ -715,7 +801,7 @@ package Attean::API::Quad 0.039 {
 }
 
 
-package Attean::API::Result 0.039 {
+package Attean::API::Result 0.040 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(HashRef);
 
@@ -750,7 +836,7 @@ package Attean::API::Result 0.039 {
 		foreach my $key (@shared) {
 			my $val_a	= $self->value($key);
 			my $val_b	= $rowb->value($key);
-			my $equal	= (refaddr($val_a) == refaddr($val_b)) || $val_a->equals( $val_b );
+			my $equal	= (refaddr($val_a) == refaddr($val_b)) || eval { $val_a->equals( $val_b ) };
 			unless ($equal) {
 				return;
 			}
@@ -835,7 +921,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

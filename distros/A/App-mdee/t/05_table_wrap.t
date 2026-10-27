@@ -46,18 +46,21 @@ is($wm =~ s/\+/ /gr, $wrapped, 'the mark takes the place of one pad space');
 my $marked_fold = run("'-Mmd::config(colorize=0,table=1,rule=1,foldlist=1,foldwidth=40,table_width=40,table_wrap_mark=+)' $md")->stdout;
 is(join("\n", table_lines($marked_fold)), join("\n", @m), 'marked table rows are not re-folded by ansifold');
 
-# table_cell_mark marks the first line of every cell (default: none)
-unlike($wrapped, qr/^\+/m, 'no cell mark by default');
+# table_cell_mark marks the first line of the cells in a wrapped column,
+# on the body rows only (default: none)
+unlike($wrapped, qr/\+/, 'no cell mark by default');
 my $item = run("'-Mmd::config(colorize=0,table=1,rule=1,table_width=40,table_cell_mark=+)' $md")->stdout;
 my @i = table_lines($item);
-is(scalar(grep { /^\+/ } @i), scalar(grep { /^ \S/ } @w), 'every row start is marked');
-ok((grep { /^\+\S*\s*$V\+/ } @i), 'cells in the second column are marked too');
-ok(!(grep { /^\s/ && /\+/ } @i), 'continuation lines carry no cell mark');
+is(scalar(grep { /$V\+/ } @i), 4, 'every body row is marked in the wrapped column');
+unlike($item, qr/^\+/m, 'the first column, which did not wrap, is not marked');
+like($i[0], qr/^ key\s+$V description/, 'the header row is not marked');
+ok(!(grep { /^\s+$V/ && /\+/ } @i), 'continuation lines carry no cell mark');
 is($item =~ s/\+/ /gr, $wrapped, 'the cell mark takes the place of one pad space');
 my $item_fold = run("'-Mmd::config(colorize=0,table=1,rule=1,foldlist=1,foldwidth=40,table_width=40,table_cell_mark=+)' $md")->stdout;
 is(join("\n", table_lines($item_fold)), join("\n", @i), 'cell-marked table rows are not re-folded by ansifold');
 my $item_notrim = run("'-Mmd::config(colorize=0,table=1,rule=1,table_trim=0,table_width=40,table_cell_mark=+)' $md")->stdout;
-like($item_notrim, qr/^$V\+key/m, 'non-trim: the mark follows the left border');
+like($item_notrim, qr/^$V key\s+$V description/m, 'non-trim: the header row is not marked');
+like($item_notrim, qr/^$V k1\s+$V\+the quick/m, 'non-trim: the mark follows the column border');
 like($item_notrim, qr/^\x{251C}\x{2500}+\x{253C}\x{2500}+\x{2524}$/m, 'non-trim: the separator row is still converted to rules');
 is(scalar(grep { /\+\s*$/ } table_lines($item_notrim)), 0, 'non-trim: the empty border column is not marked');
 

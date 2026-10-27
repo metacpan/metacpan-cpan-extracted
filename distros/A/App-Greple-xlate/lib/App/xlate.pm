@@ -1,6 +1,6 @@
 package App::xlate;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 1;
 =encoding utf-8
@@ -26,7 +26,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
     -s, --silent      silent mode
     -t, --to-lang=#   target language (required, no default)
     -b, --from-lang=# base language (informational)
-    -e, --engine=#    translation engine (*gpt5, deepl, ...)
+    -e, --engine=#    translation engine (*gpt5, gpt6, deepl, ...)
     -p, --pattern=#   pattern string to determine translation area
     -f, --file=#      pattern file to determine translation area
     -o, --format=#    output format (*xtxt, cm, ifdef, space, space+, colon)
@@ -71,12 +71,12 @@ xlate [ options ] -t LANG FILE [ greple options ]
   Control Files:
     *.LANG    translation languages
     *.FORMAT  translation format (xtxt, cm, ifdef, colon, space)
-    *.ENGINE  translation engine (gpt5, deepl, ...)
+    *.ENGINE  translation engine (gpt5, gpt6, deepl, ...)
     *.ANONYMIZE  anonymization dictionary for the file
 
 =head1 VERSION
 
-    Version 2.02
+    Version 2.03
 
 =head1 INCOMPATIBLE CHANGES IN 2.0
 
@@ -141,7 +141,7 @@ specify the engine:
 
     xlate -e deepl -t JA example.txt
 
-Available engines: gpt5, deepl, ...
+Available engines: gpt5, gpt6, deepl, ...
 
 =head2 Output Formats
 

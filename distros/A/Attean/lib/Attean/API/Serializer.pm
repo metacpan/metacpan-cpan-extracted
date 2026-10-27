@@ -7,7 +7,7 @@ Attean::API::Serializer - Serializer role
 
 =head1 VERSION
 
-This document describes Attean::API::Serializer version 0.039
+This document describes Attean::API::Serializer version 0.040
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ UTF-8 encoded byte string.
 
 use Type::Tiny;
 
-package Attean::API::Serializer 0.039 {
+package Attean::API::Serializer 0.040 {
 	use Moo::Role;
 	use Carp qw(confess);
 	
@@ -114,7 +114,7 @@ package Attean::API::Serializer 0.039 {
 	sub file_extensions { return [] }
 }
 
-package Attean::API::AbbreviatingSerializer 0.039 {
+package Attean::API::AbbreviatingSerializer 0.040 {
 	# Serializer that can make use of a base IRI and/or prefix IRI mappings
 	use Types::Standard qw(InstanceOf ConsumerOf Maybe Bool);
 	use Types::Namespace qw( NamespaceMap );
@@ -128,13 +128,13 @@ package Attean::API::AbbreviatingSerializer 0.039 {
 	has omit_base => (is => 'ro', isa => Bool, default => 0);
 }
 
-package Attean::API::AppendableSerializer 0.039 {
+package Attean::API::AppendableSerializer 0.040 {
 	# Serializer for a format that allows multiple serialization calls to be appended and remain syntactically valid
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 }
 
-package Attean::API::TermSerializer 0.039 {
+package Attean::API::TermSerializer 0.040 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -143,7 +143,7 @@ package Attean::API::TermSerializer 0.039 {
 	}
 }
 
-package Attean::API::TripleSerializer 0.039 {
+package Attean::API::TripleSerializer 0.040 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -152,7 +152,7 @@ package Attean::API::TripleSerializer 0.039 {
 	}
 }
 
-package Attean::API::QuadSerializer 0.039 {
+package Attean::API::QuadSerializer 0.040 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -162,7 +162,7 @@ package Attean::API::QuadSerializer 0.039 {
 	}
 }
 
-package Attean::API::MixedStatementSerializer 0.039 {
+package Attean::API::MixedStatementSerializer 0.040 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -172,7 +172,7 @@ package Attean::API::MixedStatementSerializer 0.039 {
 	}
 }
 
-package Attean::API::ResultSerializer 0.039 {
+package Attean::API::ResultSerializer 0.040 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -209,6 +209,65 @@ package Attean::API::ResultSerializer 0.039 {
 
 __END__
 
+=head1 EXAMPLES
+
+=head2 Using L<Attean::TermMap> to use short blank node labels
+
+L<Attean::TermMap> may be used to modify the data being supplied to a serializer.
+This may be useful for producing more concise serializations:
+
+  my $ser = Attean->get_serializer('Turtle')->new();
+  my $iter = $model->get_quads()->as_triples();
+  my $short_iter = $iter->map( $bindings_mapper );
+  my $bytes = $ser->serialize_iter_to_bytes($short_iter);
+  my $turtle = decode_utf8($bytes);
+
+Instead of blank nodes using UUID-style labels like this:
+
+  _:b05968a01cb5011f1952eeac53c3f578c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+
+the output will shorten labels:
+
+  _:a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+
+=head2 Serializing with IRI prefixes
+
+If a serializer supports shorthand syntax for IRIs using namespaces (any serializer
+conforming to L<Attean::API::AbbreviatingSerializer>), it may be supplied to the
+serializer constructor:
+
+  my $map = URI::NamespaceMap->new( { foaf => iri('http://xmlns.com/foaf/0.1/') } );
+  my $ser = Attean->get_serializer('Turtle')->new(namespaces => $map);
+  my $iter = $model->get_quads()->as_triples();
+  my $bytes = $ser->serialize_iter_to_bytes($iter);
+  my $turtle = decode_utf8($bytes);
+
+Any namespace supplied in the namespace map, and appearing in the data being serialized
+will cause a PREFIX declaration to be used, and a shortened syntax to be used in the
+serialized content. Instead of:
+
+  _:b05968a01cb5011f1952eeac53c3f578c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+
+the output will be:
+
+  _:b05968a01cb5011f1952eeac53c3f578c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> foaf:Person .
+
+Note that in this case, because only foaf was supplied in the namespace map, the
+rdf:type predicate appears in full. Supplying a second definition in the namespace map
+declaration would allow the serialization:
+
+  _:b05968a01cb5011f1952eeac53c3f578c rdf:type foaf:Person .
+
+Namespace maps may be constructed manually, or be populated by parsing RDF.
+For example, supplying a L<URI::NamespaceMap> to a turtle parser will cause the
+map to be populated with any prefixes declared in the parsed data:
+
+  my $map = URI::NamespaceMap->new();
+  my $parser = Attean->get_parser('Turtle')->new( namespaces => $map );
+
+This works for with any L<Attean::API::AbbreviatingParser>, which includes data
+formats such as Turtle, TriG, and RDF/XML, as well as the SPARQL parser.
+
 =head1 BUGS
 
 Please report any bugs or feature requests to through the GitHub web interface
@@ -224,7 +283,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

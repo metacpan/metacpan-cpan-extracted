@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.11";
+our $VERSION = "1.12";
 
 1;
 =encoding utf-8
@@ -31,6 +31,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
+         --table-style=#    table style: pipe or simple (default: pipe)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 5)
@@ -54,7 +55,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =cut
 =head1 DESCRIPTION
@@ -89,9 +90,9 @@ else is still the source text.  This is why paragraphs are not
 reflowed, why backslash escapes such as C<\*> are shown as written,
 and why C<--no-theme> gives back the original file, in color.
 
-For full Markdown rendering, many other viewers are available.
-Combine them with L<nup(1)|App::nup> for similar paged output
-(e.g., C<nup glow README.md>).
+For full Markdown rendering, many other viewers are available, such
+as C<glow> and C<mdcat>.  Combine them with L<nup(1)|App::nup> for
+similar paged output (e.g., C<nup glow README.md>, C<nup mdcat README.md>).
 
 The pipeline combines L<greple(1)|App::Greple> for colorization and
 L<nup(1)|App::nup> for multi-column paged output.
@@ -287,8 +288,9 @@ is a colon-separated list passed to ansicolumn's C<--cell> option
 C<< '<30' >> caps every column at 30).  Marks can be put at the
 start of cell lines, in place of the cell's leading space so that
 column widths do not change.  C<--config table_cell_mark=STRING>
-marks the first line of every cell in a table that has a wrapped
-cell; the default theme C<markcell> sets it to C<·> (U+00B7).
+marks the first line of every body cell in a column that has a
+wrapped cell; the header row and columns that fit are left alone.
+The default theme C<markcell> sets it to C<‣> (U+2023).
 C<--config table_wrap_mark=STRING> marks the second and later
 lines of a wrapped cell, so that they are not read as new rows;
 the theme C<markwrap> sets it to C<›> (U+203A).  Without these
@@ -316,6 +318,25 @@ When enabled, ASCII pipe characters (C<|>) are replaced with
 Unicode box-drawing characters (C<│>, C<├>, C<┤>, C<┼>) and
 dashes (C<->) in separator lines are replaced with horizontal
 rules (C<─>).  Default is enabled.
+
+=item B<--table-style>=I<STYLE>
+
+Select how tables are drawn.  C<pipe> (default) keeps a separator
+between the columns, C<│> or C<|> depending on C<--rule>:
+
+     Left │ Center │ Right │ Default
+    ──────┼────────┼───────┼─────────
+     a    │   b    │     c │ d
+
+C<simple> draws tables like Pandoc's simple tables: the columns are
+separated by spaces only, the header is underlined per column, and a
+rule the width of the table is drawn above and below it.
+
+    ─────────────────────────────────
+     Left   Center   Right   Default
+    ────── ──────── ─────── ─────────
+     a        b          c   d
+    ─────────────────────────────────
 
 =item B<--cat-v>
 
@@ -431,8 +452,9 @@ original heading color.
 =item C<markcell> (default)
 
 In a table that has wrapped cells, mark the first line of every
-cell with C<·> (U+00B7), so that the rows read like a bulleted
-list and the continuation lines stand apart.  Tables that fit are
+body cell in the wrapped columns with C<‣> (U+2023), so that the
+rows read like a bulleted list and the continuation lines stand
+apart.  The header row, columns that fit, and tables that fit are
 not marked.  Sets C<table_cell_mark>; C<nomark> does not affect it.
 To use another character, set it in the configuration file or in a
 theme of your own:

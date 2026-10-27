@@ -1,5 +1,10 @@
 Revision history for Devel-StatProfiler
 
+0.57      2026-10-26 21:16:47 CET
+
+    - Fix initialization error on Aarch64 (and potentially other
+      architectures)
+
 0.56      2025-10-24 23:34:42 CEST
 
     - Add Module::Build::WithXSpp to configure_requires

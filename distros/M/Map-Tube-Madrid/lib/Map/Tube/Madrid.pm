@@ -1,7 +1,9 @@
 package Map::Tube::Madrid;
 
-$Map::Tube::Madrid::VERSION   = '0.42';
-$Map::Tube::Madrid::AUTHORITY = 'cpan:MANWAR';
+use version;
+
+our $VERSION   = qv('v1.0.0');;
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,11 +11,11 @@ Map::Tube::Madrid - Interface to the Madrid Metro Map.
 
 =head1 VERSION
 
-Version 0.42
+Version v1.0.0
 
 =cut
 
-use 5.006;
+use 5.014;
 use Data::Dumper;
 use File::ShareDir ':ALL';
 
@@ -25,43 +27,8 @@ with 'Map::Tube';
 
 =head1 DESCRIPTION
 
-Built and released while giving talk B<"Introduction to Map::Tube"> at B<German Perl Workshop 2018>.
-
-It currently only covers the following metro lines.
-
-=over 4
-
-=item * L<L1|Map::Tube::Madrid::Line::L1>
-
-=item * L<L2|Map::Tube::Madrid::Line::L2>
-
-=item * L<L3|Map::Tube::Madrid::Line::L3>
-
-=item * L<L4|Map::Tube::Madrid::Line::L4>
-
-=item * L<L5|Map::Tube::Madrid::Line::L5>
-
-=item * L<L11|Map::Tube::Madrid::Line::L11>
-
-=back
-
-=head1 TODO (Metro Lines)
-
-=over 4
-
-=item * L6
-
-=item * L7
-
-=item * L8
-
-=item * L9
-
-=item * L10
-
-=item * L12
-
-=back
+Built and released while giving he talk B<"Introduction to Map::Tube"> at B<German Perl Workshop 2018>.
+More lines were added later.
 
 =head1 MAP DATA
 
@@ -69,7 +36,7 @@ The map data collected from L<this website|https://en.wikipedia.org/wiki/Madrid_
 
 =head1 CONSTRUCTOR
 
-The constructor DO NOT expects parameters.This setup the default node definitions.
+The constructor DOES NOT expect parameters. This sets up the default node definitions.
 
     use strict; use warnings;
     use Map::Tube::Madrid;
@@ -140,8 +107,7 @@ Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 =head1 BUGS
 
 Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-Madrid/issues>.
-I will  be notified and then you'll automatically be notified of progress on your
-bug as I make changes.
+I will be notified and then you will automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -169,40 +135,40 @@ L<https://metacpan.org/dist/Map-Tube-Madrid/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2018 - 2026 Mohammad Sajid Anwar.
 
-This program  is free software; you can  redistribute it and / or modify it under
-the  terms  of the the Artistic License  (2.0). You may obtain a copy of the full
+This program is free software; you can redistribute it and/or modify it under
+the terms of the the Artistic License (2.0). You may obtain a copy of the full
 license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
-Any  use,  modification, and distribution of the Standard or Modified Versions is
-governed by this Artistic License.By using, modifying or distributing the Package,
+Any use, modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License. By using, modifying or distributing the Package,
 you accept this license. Do not use, modify, or distribute the Package, if you do
 not accept this license.
 
 If your Modified Version has been derived from a Modified Version made by someone
-other than you,you are nevertheless required to ensure that your Modified Version
- complies with the requirements of this license.
+other than you, you are nevertheless required to ensure that your Modified Version
+complies with the requirements of this license.
 
-This  license  does  not grant you the right to use any trademark,  service mark,
+This license does not grant you the right to use any trademark, service mark,
 tradename, or logo of the Copyright Holder.
 
 This license includes the non-exclusive, worldwide, free-of-charge patent license
-to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+to make, have made, use, offer to sell, sell, import and otherwise transfer the
 Package with respect to any patent claims licensable by the Copyright Holder that
-are  necessarily  infringed  by  the  Package. If you institute patent litigation
-(including  a  cross-claim  or  counterclaim) against any party alleging that the
-Package constitutes direct or contributory patent infringement,then this Artistic
+are necessarily infringed by the Package. If you institute patent litigation
+(including a cross-claim or counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement, then this Artistic
 License to you shall terminate on the date that such litigation is filed.
 
-Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
-CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
-WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+Disclaimer  of  Warranty: THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
 NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
 REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
 OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut

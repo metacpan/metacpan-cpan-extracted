@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Token - Token objects used for parsing of Turtle
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Token version 0.039
+This document describes AtteanX::Parser::Turtle::Token version 0.040
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ use AtteanX::Parser::Turtle::Constants;
 use Sub::Install;
 use namespace::clean;
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 has type => ( is => 'ro', );
 has start_line => ( is => 'ro', );
@@ -112,10 +112,15 @@ my %token_strings;
 		rparen		=> [RPAREN, ')'],
 		lbracket	=> [LBRACKET, '['],
 		rbracket	=> [RBRACKET, ']'],
+		ltlt		=> [LTLT, '<<'],
+		gtgt		=> [GTGT, '>>'],
+		ltltp		=> [LTLT, '<<('],
+		pgtgt		=> [GTGT, ')>>'],
 		dot			=> [DOT, '.'],
 		comma		=> [COMMA, ','],
 		semicolon	=> [SEMICOLON, ';'],
 		hathat		=> [HATHAT, '^^'],
+		tilde		=> [TILDE, '~'],
 	);
 	for my $name (keys %tokens) {
 		my ($type, $value)	= @{ $tokens{ $name } };
@@ -225,7 +230,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

@@ -320,7 +320,7 @@ subtest 'config file defaults' => sub {
         close $fh;
         my $md = File::Spec->rel2abs('t/table_wrap.md');
         my $out = `XDG_CONFIG_HOME=$tmpdir $mdee -s cat -w 40 $md 2>&1`;
-        like($out, qr/^\+k1 /m, 'md_config in config.sh overrides the default markcell theme');
+        like(decode_utf8($out), qr/\x{2502}\+the quick/m, 'md_config in config.sh overrides the default markcell theme');
         my $bold = `XDG_CONFIG_HOME=$tmpdir $mdee -s cat $test_md 2>&1`;
         like($bold, qr/@@/, 'pass_md in config.sh overrides the default nomark theme');
     }
@@ -476,17 +476,18 @@ subtest 'share themes markcell and markwrap' => sub {
     my $md = File::Spec->rel2abs('t/table_wrap.md');
     my $item = decode_utf8(scalar `$mdee -s cat -w 40 --no-theme --theme=markcell $md`);
     is($?, 0, 'markcell theme loads successfully');
-    like($item, qr/^\x{b7}k1\s+\x{2502}\x{b7}the quick/m, 'markcell marks the first line of every cell');
+    like($item, qr/^ k1\s+\x{2502}\x{2023}the quick/m, 'markcell marks the first line of the cells in the wrapped column');
+    like($item, qr/^ key\s+\x{2502} description/m, 'markcell leaves the header row alone');
     unlike($item, qr/\x{203A}/, 'markcell alone has no continuation mark');
     my $wrap = decode_utf8(scalar `$mdee -s cat -w 40 --no-theme --theme=markwrap $md`);
     is($?, 0, 'markwrap theme loads successfully');
     like($wrap, qr/\x{2502}\x{203A}\S/, 'markwrap marks continuation lines');
-    unlike($wrap, qr/\x{b7}/, 'markwrap alone has no first-line mark');
+    unlike($wrap, qr/\x{2023}/, 'markwrap alone has no first-line mark');
     my $both = decode_utf8(scalar `$mdee -s cat -w 40 --theme=markwrap $md`);
-    like($both, qr/^\x{b7}k1/m, 'default plus markwrap keeps the first-line mark');
+    like($both, qr/\x{2502}\x{2023}the quick/m, 'default plus markwrap keeps the first-line mark');
     like($both, qr/\x{2502}\x{203A}\S/, 'default plus markwrap adds the continuation mark');
     my $none = decode_utf8(scalar `$mdee -s cat -w 40 --no-theme $md`);
-    unlike($none, qr/\x{b7}|\x{203A}/, '--no-theme uses no mark');
+    unlike($none, qr/\x{2023}|\x{203A}/, '--no-theme uses no mark');
 };
 
 subtest 'table wrap' => sub {
@@ -533,6 +534,21 @@ subtest q(parallel option) => sub {
 };
 
 # Test: filename option (file name label from greple)
+# Test: table style option
+subtest q(table style option) => sub {
+    my $help = `$mdee --help 2>&1`;
+    like($help, qr/--table-style=/, q(--help shows --table-style option));
+
+    my $default = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
+    unlike($default, qr/table_style=/, q(no table_style parameter by default));
+
+    my $simple = `COLUMNS=200 $mdee -ddn --table-style=simple $test_md 2>&1`;
+    like($simple, qr/debug: greple .*table_style=simple/, q(--table-style=simple is passed to the md module));
+
+    my $bad = `$mdee -n --table-style=grid $test_md 2>&1`;
+    like($bad, qr/--table-style: pipe or simple expected/, q(an unknown table style is rejected));
+};
+
 subtest q(filename option) => sub {
     my $help = `$mdee --help 2>&1`;
     like($help, qr/--\[no-\]filename/, q(--help shows --filename option));

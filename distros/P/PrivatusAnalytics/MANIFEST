@@ -1,0 +1,22 @@
+CHANGELOG.md
+cpanfile
+lib/Dancer2/Plugin/PrivatusAnalytics.pm
+lib/Mojolicious/Plugin/PrivatusAnalytics.pm
+lib/Plack/Middleware/PrivatusAnalytics.pm
+lib/PrivatusAnalytics.pm
+lib/PrivatusAnalytics/Attributes.pm
+lib/PrivatusAnalytics/PageProps.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/attributes.t
+t/dancer2.t
+t/mojolicious.t
+t/page_props.t
+t/plack.t
+t/tag.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

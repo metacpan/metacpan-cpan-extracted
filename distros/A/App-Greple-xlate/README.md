@@ -9,9 +9,16 @@ App::Greple::xlate - translation support module for greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+To use GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+If `llm models` does not list `gpt-6-astra`, see the model registration
+instructions in [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -224,6 +231,8 @@ Exclude embedz blocks from translation when a document contains them:
 
     At this time, the following engines are available
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) for model registration)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -350,11 +359,11 @@ Exclude embedz blocks from translation when a document contains them:
 - **--xlate-prompt**=_text_
 
     Specify a custom prompt to be sent to the translation engine.  This
-    option is available for the LLM engines (`gpt3`, `gpt4o`, `gpt5`)
+    option is available for the LLM engines (`gpt3`, `gpt4o`, `gpt5`, `gpt6`)
     but not for DeepL.  You can customize the translation behavior by
     providing specific instructions to the AI model.  If the prompt
     contains `%s`, it will be replaced with the target language name.
-    For the llm-backed `gpt5` engine, the document is supplied separately
+    For the llm-backed `gpt5` and `gpt6` engines, the document is supplied separately
     as a JSON request whose `input` member is the array to translate and
     whose optional `context` member contains reference data.  A fixed
     instruction that treats those members as document data, not commands,
@@ -369,7 +378,7 @@ Exclude embedz blocks from translation when a document contains them:
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Number of surrounding translated blocks passed as reference context
     when re-translating changed blocks (default 2).  The context also
     includes the raw source text around the changed region (headings,

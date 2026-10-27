@@ -1,0 +1,497 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: October 27 2026 $
+.Dt FUGUWEB-KEYS 7
+.Os
+.Sh NAME
+.Nm fuguweb-keys
+.Nd key directory and key rotation of fuguweb
+.Sh DESCRIPTION
+This manual describes the key directory of a
+.Xr fuguweb 1
+site, and the rotation of its keys.
+.Sh THE KEY DIRECTORY
+An organization publishes its public keys under one prefix, so a
+consumer can fetch a key and verify a release with it.
+A
+.Ic keys
+block describes that directory, and the build publishes it.
+A description can hold several such blocks, and each one names one
+directory.
+Two blocks must not name one directory.
+.Pp
+Each directory holds its own root of trust, and a binding never
+crosses a directory.
+A publisher that keeps two trust domains therefore keeps two
+directories in one site.
+The site-level files stay single: one
+.Pa security.txt ,
+and one Web Key Directory that gathers every address.
+.Bd -literal -offset indent
+keys "keys" {
+	org     = fugubsd
+	contact = mailto:security@fugubsd.org
+	expires = 2027-09-07T00:00:00Z
+	url     = https://www.fugubsd.org/keys
+}
+
+key "fugubsd-1-release" {
+	status = current
+	since  = 2026-09-07
+}
+.Ed
+.Pp
+The block name is the directory, one path segment below the source
+directory.
+The tree of a declared language takes its path in the output, so a name
+of that path is refused.
+Each test of the name against another name of the output folds the
+two, as
+.Xr fuguweb-site 7
+states.
+The settings are as follows:
+.Bl -tag -width "contact" -offset indent
+.It Ic org
+The organization word, the first field of every key name.
+This setting is required.
+Two blocks must not name one word.
+A key name holds no directory name, and the serial of a purpose counts
+inside one directory, so a mint of the second block would write a name
+that the first block publishes.
+.It Ic contact
+The
+.Ql Contact
+field of
+.Pa security.txt .
+.It Ic expires
+The
+.Ql Expires
+field of
+.Pa security.txt ,
+an RFC 3339 timestamp.
+.Ic contact
+and
+.Ic expires
+stand or fall together.
+A site publishes one
+.Pa security.txt ,
+so one block alone names the two.
+.It Ic url
+The published prefix of the directory, an absolute URL.
+.El
+.Pp
+Each
+.Ic key
+block names the stem of one key file in the directory.
+The file extension gives the type:
+.Pa .pub
+is a
+.Xr signify 1
+key,
+.Pa .asc
+is an armored OpenPGP key, and
+.Pa .pem
+is one X.509 certificate.
+The block sets a
+.Ic status
+of
+.Cm current ,
+.Cm next
+or
+.Cm retired ,
+and optional
+.Ic since
+and
+.Ic until
+dates.
+An OpenPGP key can set an
+.Ic email
+and a
+.Ic fingerprint
+of 40 hexadecimal characters.
+A certificate can set a
+.Ic fingerprint
+of 64 hexadecimal characters, which is the SHA-256 of its DER form.
+.Pp
+One signify key of the directory is the root of trust, and its purpose
+word is
+.Cm root .
+The current root key signs the manifest, and every other key of the
+directory is a subordinate key.
+A binding is a detached signature by one key over the public key file
+of another key, and its name is
+.Pa <target file>.<signer stem>.<ext> .
+The extension is
+.Pa sig
+for a
+.Xr signify 1
+signer,
+.Pa asc
+for an OpenPGP signer, and
+.Pa p7s
+for an X.509 signer.
+A binding needs no
+.Ic key
+block: its name holds the target, the signer and the type.
+.Pp
+The directory must hold a
+.Pa SHA256
+manifest and its
+.Pa SHA256.sig
+signature.
+The build copies each key file, each binding file and the manifest
+pair byte for byte.
+It signs nothing, and it verifies no
+.Pa SHA256.sig .
+For the example above it generates these files:
+.Pp
+.Bl -tag -width ".well-known/openpgpkey/hu/<hash>" -offset indent -compact
+.It Pa keys/KEYS
+Every OpenPGP key, when the set holds one.
+.It Pa keys/index.html
+The human page, with the serial, purpose, type, status, fingerprint,
+dates and bindings of each key.
+The row of a certificate names its subject and its validity dates
+beside the fingerprint.
+The page is a page of
+.Ql en ,
+because its own words are English.
+Its title is
+.Ql Keys
+alone, and its head names no page in another language.
+Its banner holds the site link alone, and its navigation is that of the
+default language.
+Each of those links steps out of the key directory into the tree of
+the default language, as
+.Pa ../en/index.html .
+When the default language is not
+.Ql en ,
+each of those links carries the marks of the default language: its tag
+as
+.Ql lang ,
+and
+.Ql dir="rtl"
+when that language is right to left.
+The page carries no footer.
+.It Pa .well-known/openpgpkey/hu/<hash>
+The Web Key Directory file of each email address.
+The file holds the keys of that address of every directory, in
+publication order.
+.It Pa .well-known/openpgpkey/policy
+The Web Key Directory policy file.
+.It Pa .well-known/security.txt
+The RFC 9116 file, when a block sets a
+.Ic contact .
+The
+.Ic Encryption
+field names the current OpenPGP key of that block.
+.El
+.Pp
+.Cm check
+reads the source key directory, so the answer does not depend on a
+build.
+It checks that every key file has a block and every block has a file,
+that every name matches the key name pattern or the binding name
+pattern, that every purpose holds exactly one current key, that the
+directory holds one current signify key of the purpose
+.Cm root ,
+that each binding verifies against the public key of its signer and
+holds the retention rule, that the manifest names every key file and
+every binding file with the digest that it has and nothing else, that
+every declared fingerprint equals the computed one, and that the
+signature has the shape of a
+.Xr signify 1
+signature.
+.Pp
+One report reads the whole site.
+The block which names the contact and a
+.Ic url
+must hold a
+.Cm current
+OpenPGP key of its own, because the
+.Ic Encryption
+field names no key of another directory.
+The check reports that block when another key directory holds such a
+key.
+A site that publishes no OpenPGP key at all writes no such field, and
+that one is no problem.
+.Pp
+The retention rule holds each binding of the directory.
+A binding whose signer is
+.Cm current
+or
+.Cm next
+must target the current root key.
+A binding whose signer is
+.Cm retired
+must target a key of its own purpose with a higher serial.
+A signify binding verifies with no command.
+A binding of another type needs
+.Xr gpg 1
+or
+.Xr openssl 1 ,
+and an absent command is a problem.
+.Pp
+The check reads the validity of each
+.Cm current
+and
+.Cm next
+key that carries one.
+It reads the expiry of an OpenPGP key with
+.Xr gpg 1 ,
+and the
+.Ql notBefore
+and
+.Ql notAfter
+of a certificate from the certificate itself.
+An expiry that passed is a problem, and so is a certificate whose
+.Ql notBefore
+has not come.
+An expiry within 30 days of a
+.Cm current
+key is a problem when its purpose holds no
+.Cm next
+key, because one rotation runs in two steps.
+A signify key carries no date, and an OpenPGP key with no expiry
+reaches no rule.
+.Pp
+A key verb fails for none of these reports, so
+.Cm mint-key
+and
+.Cm import-key
+each run on a directory that
+.Cm check
+rejects for a date.
+An expired
+.Cm current
+key is still
+.Cm current
+when the verb reads its work back, so a step of that purpose could
+never be made.
+The 30-day report reads the whole directory, so it would fail a step
+of another purpose, which writes no
+.Cm next
+key of the purpose that the report names.
+.Pp
+.Cm promote-key
+fails when the key that retires is an OpenPGP key whose expiry
+passed.
+That key signs the chain binding, and
+.Xr gpg 1
+signs nothing with an expired key.
+Promote the successor before the current key expires.
+.Sh KEY ROTATION
+Every key verb writes one key directory.
+.Fl Fl dir
+names it.
+A description with one
+.Ic keys
+block needs no name, and one with several refuses a step without it.
+.Pp
+A consumer verifies a release against the copy of the public key that
+it holds.
+A release that a new key signs therefore fails in each consumer that
+holds the old copy.
+One rotation runs in two steps.
+.Pp
+One signify key of the directory is the root of trust, and its purpose
+word is
+.Cm root .
+The current root key signs the manifest, and every other key binds to
+it.
+.Cm mint-key
+and
+.Cm import-key
+refuse a key of another type for the
+.Cm root
+purpose, and the mint refuses before it generates one.
+Every step takes the private half of the current root as
+.Fl Fl signer ,
+with two exceptions below.
+.Pp
+.Cm mint-key
+generates the next key of the purpose, writes its public half into the
+key directory, and writes its private half to
+.Fl Fl secret
+with no group and no other permissions.
+The new key takes the status
+.Cm next ,
+or
+.Cm current
+when the purpose holds no current key.
+.Fl Fl secret
+must not name a file that exists, and must not name the signer.
+A mint refuses a purpose that already holds a
+.Cm next
+key.
+A mint of a subordinate purpose also writes the binding of the new key
+over the public key file of the current root.
+.Pp
+.Cm promote-key
+makes the
+.Cm next
+key of the purpose current, and retires the key that was current with
+an
+.Ic until
+date.
+.Fl Fl retiring
+names the private half of the key that retires, and that key signs the
+chain binding over the key which takes its place.
+A consumer that trusts the old key therefore reaches the new one.
+The promote removes the root binding of the retired key, and the chain
+binding stays published.
+A retired key keeps its file and its URL, so a release that it signed
+still verifies.
+.Ss The key types
+.Xr signify 1
+generates a
+.Cm signify
+key.
+The public half is one comment line and one key body.
+.Pp
+.Xr gpg 1
+generates an
+.Cm openpgp
+key: one Ed25519 primary key with one Curve25519 encryption subkey.
+.Fl Fl email
+names the address, which is the one user id of the key, and a
+correspondent encrypts to the subkey.
+Both halves are armored text.
+The
+.Ic key
+block of the new key takes that
+.Ic email
+and the
+.Ic fingerprint ,
+which the command reads from the key that it generated.
+.Pp
+.Fl Fl expires
+is a date of the form
+.Ar YYYY-MM-DD ,
+and the key expires at the start of that date, in UTC.
+The date must be after the day of the run.
+The day of the run and each earlier date fail the mint, and the reason
+names the date that you gave.
+A mint with no
+.Fl Fl expires
+makes a key with no expiry.
+A key directory retires a key with an
+.Ic until
+date, so a rotation needs no expiry on the key itself.
+.Pp
+An issuer makes an
+.Cm x509
+certificate, such as a code signing certificate of Apple Developer ID,
+so no verb mints one.
+.Cm import-key
+publishes it:
+.Fl Fl file
+names one PEM certificate, and
+.Fl Fl secret
+names its unencrypted PEM private key.
+The verbs take no passphrase, so convert a PKCS#12 file with
+.Ic openssl pkcs12
+first.
+The private key signs the binding of the new key, and
+.Xr openssl 1
+makes that detached CMS signature.
+The
+.Ic key
+block of the new key takes the
+.Ic fingerprint ,
+which the command reads from the certificate that it published.
+The renderer knows no issuer by name, and the root manifest vouches
+for the certificate.
+A renewal is a rotation: the new certificate enters as
+.Cm next ,
+and a promote retires the old one.
+.Ss The first root mint
+The first mint of the
+.Cm root
+purpose finds no root.
+That key is current at once, it signs its own manifest, and it takes
+no
+.Fl Fl signer .
+A directory that already holds keys takes one
+.Fl Fl bind Ar stem Ns = Ns Ar path
+for each current key and each next key of a subordinate purpose, and
+the step writes the binding of every one of them again.
+It refuses before it writes when one private half is absent.
+.Pp
+A directory with no
+.Ic keys
+block takes one from the command line:
+.Fl Fl bootstrap
+states the intent to make that directory,
+.Fl Fl dir
+names it, which defaults to
+.Pa keys ,
+.Fl Fl org
+names the organization word, and
+.Fl Fl url
+names the published prefix.
+A second key directory of a site arrives the same way.
+.Pp
+A step without
+.Fl Fl bootstrap
+refuses a
+.Fl Fl dir
+that no
+.Ic keys
+block names.
+Each key directory holds a root of trust of its own, so a mistyped
+name would otherwise publish a second root in silence.
+.Cm mint-key
+and
+.Cm import-key
+take the option, and
+.Cm promote-key
+makes no directory.
+.Ss The root promote
+A root promote signs the manifest with the key that it makes current,
+so it takes
+.Fl Fl secret
+and no
+.Fl Fl signer .
+It takes one
+.Fl Fl bind
+for each key in force, as the first root mint does, and it removes
+each binding of the retired root but the chain binding that names it.
+.Pp
+Each step verifies the new signature and each new binding against the
+published public key of the signer before one byte reaches the key
+directory, and a step that fails puts every file back.
+On success the command prints one
+.Ar name Ns = Ns Ar value
+line for each fact: the file name, the stem, the serial, the status,
+the retired name of a promote, and the digest and the URL of a new key
+file.
+.Pp
+The command reaches no network and holds no token.
+The caller stores the private key and commits the public one.
+.Sh SEE ALSO
+.Xr fuguweb 1 ,
+.Xr fuguwebrc 5 ,
+.Xr fuguweb-site 7
+.Sh STANDARDS
+.Rs
+.%A E. Foudil
+.%A Y. Shafranovich
+.%D April 2022
+.%R RFC 9116
+.%T A File Format to Aid in Security Vulnerability Disclosure
+.Re

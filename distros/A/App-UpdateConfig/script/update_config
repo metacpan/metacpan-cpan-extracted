@@ -1,0 +1,1071 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.024;
+use English;
+
+# Only modules that are in the standard distribution for 5.24. The rests should
+# be in the INIT block below.
+use File::Basename 'dirname';
+use File::Path 'make_path';
+use File::Spec::Functions 'catfile';
+use FindBin;
+use Getopt::Long 'GetOptions';
+use List::Util qw(all any);
+use Pod::Usage 'pod2usage';
+use Scalar::Util 'refaddr';
+
+# This must be kept in sync with the version in lib/App/UpdateConfig.pm (the
+# script cannot use that module as it must work as a standalone file).
+our $VERSION = '1.01';
+
+# With --help, prints the entire documentation, through perldoc when available.
+sub print_usage {
+  my ($is_help) = @_;
+  pod2usage({
+    -msg => "update_config: Automatic updates of a linux configuration.\n",
+    -verbose => $is_help ? 2 : 0,
+    -exitval => $is_help ? 0 : 2,
+    -output => $is_help ? \*STDOUT : \*STDERR,
+  });
+}
+
+my %flags;
+my @orig_argv;
+
+BEGIN {
+  @orig_argv = @ARGV;
+  GetOptions(
+    \%flags, 'silent', 'diff', 'help', 'test', 'list',
+    'root', 'no-root', 'export', 'dir=s', 'pack'
+  ) or print_usage(0);
+  print_usage(1) if $flags{help};
+  print_usage(0) if @ARGV;
+  if ($flags{pack} and $0 eq '-') {
+    print STDERR "Cannot use --pack if the script is read from the standard input\n";
+    exit 1;
+  }
+}
+
+my $need_sudo = 0;
+
+sub try_load {
+  my ($m, @args) = @_;
+  eval "require $m" or return 0;  ## no critic (ProhibitStringyEval)
+  $m->import(@args);
+  return 1;
+}
+
+my $has_local_lib = '';
+
+sub load_module {
+  my ($m, @args) = @_;
+  return 1 if try_load($m, @args);
+
+  # We try to load local::lib if we need to install a module.
+  # If we don’t have local::lib, we won’t install it as that might require a
+  # sudo and, at that point, that defeats the points of using local::lib in the
+  # first place.
+  if (!$has_local_lib) {
+    # local::lib prints some configuration and exit the program when $0 is '-' (meant for `perl -Mlocal::lib`).
+    local $0 = $0 eq '-' ? 'fakename.pl' : $0;
+    if (try_load('local::lib')) {
+      $has_local_lib = '-I';
+      print "Successfully loaded local::lib\n" unless $flags{silent};
+      # We try to load the module again, in case it was already installed locally.
+      return 1 if try_load($m, @args);
+    } else {
+      $has_local_lib = ' ';  # true but useless in the command line below.
+      print "Failed to load local::lib\n" unless $flags{silent};
+    }
+  }
+
+  # Now, if we have set-up local::lib these will be installed locally otherwise
+  # we try to install them system-wide, which might require the use of sudo.
+
+  local $ENV{PERL_MM_USE_DEFAULT} = 1;  # Used so that cpan don’t ask questions.
+  if (!$need_sudo) {
+    system "cpan ${has_local_lib} -i $m" and $need_sudo = 1;
+  }
+  if ($need_sudo) {
+    system "sudo cpan -i $m" and die "Cannot install module '$m'.\n";
+  }
+  try_load($m, @args) or die "Cannot load module '$m'.\n";
+  return 1;
+}
+
+# We try to load and, if necessary, install non-standard modules.
+INIT {
+  load_module 'Data::Section::Simple', 'get_data_section';
+  load_module 'File::HomeDir';
+  load_module 'File::Slurp', 'read_file', 'write_file';
+  load_module 'Text::Diff', 'diff';
+  load_module 'File::Which';  # Loaded so that config fragments can REQUIRE which('program')
+}
+
+use constant DEFAULT_COMMENTS_CHAR => '#';
+use constant DEFAULT_GUARD_STRING => 'AUTO-CONFIG';
+use constant COMMENTS_CHAR_COUNT => 3;  # In the guard markers.
+use constant ARRAYS_MARKER => 'update_config_arrays';  # In MERGE fragments.
+
+sub get_home_dir {
+  return File::HomeDir->my_home
+  # return `echo -n ~`;
+}
+
+# Returns the default directory of the configuration fragments: ~/.update_config
+# if it exists, otherwise $XDG_CONFIG_HOME/update_config.
+sub get_config_dir {
+  my $home_config = catfile(get_home_dir(), '.update_config');
+  return $home_config if -d $home_config;
+  return catfile($ENV{XDG_CONFIG_HOME} || catfile(get_home_dir(), '.config'), 'update_config');
+}
+
+# Remove part of a file name that we are ignoring when creating the
+# target file (for the moment, only a suffix within bracket).
+sub clean_output_path {
+  my ($name) = @_;
+  return $name =~ s/\s*(?:\[.*\]\s*)$//r;
+}
+# parse_file_name($file_name)
+# Returns a tuple (mode, input_spec, output_spec) where mode is one
+# of 'file' or 'pipe' specifying if the input and output spec will
+# be normal file name or a commands that should be executed.
+# If the file has a prefix in bracket, then it is ignored.
+sub parse_file_name {
+  # if more logic is added in this function, it may be needed to reverse
+  # it in the export block.
+  my ($raw_path) = @_;
+  $raw_path = clean_output_path($raw_path);
+  my @file_part = split /,/, $raw_path;
+  my $mode = @file_part == 1 ? 'file' : 'pipe';
+  die "Invalid file specification: '$raw_path'.\n" if @file_part < 1 || @file_part > 2;
+  if (@file_part == 1) {
+    my $path;
+    if ($file_part[0] =~ m{^/}) {
+      $path = $file_part[0];
+    } else {
+      $path = catfile(get_home_dir(), $file_part[0]);
+    }
+    return ('file', $path, $path);
+  } else {
+    return ('pipe', @file_part);
+  }
+}
+
+# Returns the current content of the target, split in three parts: the content
+# before the guard markers, between them, and after them.
+sub read_content {
+  my ($mode, $file, $conf) = @_;
+  if ($mode eq 'file' and not -e $file) {
+    return ('', '', '');
+  }
+  open(my $fh, ($mode eq 'file' ? '<' : '-|'), $file) or die "Cannot open '$file' for read: $!.\n";
+  my @lines = <$fh>;
+  # Closing a pipe fails if the command fails, which is expected for some of
+  # them (e.g. `crontab -l` when there is no crontab yet).
+  close $fh or $mode eq 'pipe' or die "Cannot close '$file': $!.\n";
+
+  return ('', join('', @lines), '') if $conf->{entire_file} or $conf->{merge};
+  my ($start) = grep { $lines[$_] eq $conf->{start_marker} } 0 .. $#lines;
+  if (not defined $start) {
+    return $conf->{is_prefix} ? ('', '', join('', @lines)) : (join('', @lines), '', '');
+  }
+  my ($end) = grep { $lines[$_] eq $conf->{end_marker} } $start + 1 .. $#lines;
+  die "Missing closing tag in '$file'.\n" if not defined $end;
+  return (
+    join('', @lines[0 .. $start - 1]),
+    join('', @lines[$start + 1 .. $end - 1]),
+    join('', @lines[$end + 1 .. $#lines]));
+}
+
+sub write_content {
+  my ($mode, $file, $content, $conf) = @_;
+  if ($mode eq 'file') {
+    my $dir = dirname($file);
+    if (not -e $dir) {
+      make_path($dir) or die "Cannot create directory '$dir': $!.\n";
+    }
+  }
+  open(my $fh, ($mode eq 'file' ? '>' : '|-'), $file) or die "Cannot open '$file' for write: $!\n";
+  print $fh $content;
+  if ($conf->{make_executable}) {
+    my $current_mode = (stat $fh)[2] & oct('7777');
+    chmod($current_mode | oct('111'), $fh);
+  }
+  close $fh or die "Error writing '$file': $!.\n";
+  chmod oct($conf->{perm}), $file if need_perm_update($file, $mode, $conf);
+  return;
+}
+
+sub need_perm_update {
+  my ($file, $mode, $conf) = @_;
+  return 0 if not exists $conf->{perm};
+  return 0 if $mode ne 'file';
+  my $current = (stat $file)[2] & oct('7777');
+  return $current != oct($conf->{perm});
+}
+
+# The directives that can appear at the beginning of a fragment. Each entry
+# gives the key of the fragment configuration where the directive is stored
+# (if any) and how: `flag` directives take no value and set their key to 1,
+# `multiple` directives can be repeated and store their values in a list, the
+# others store their value directly.
+my %DIRECTIVES = (
+  'COMMENTS CHAR' => {key => 'comments_char'},
+  'ENTIRE FILE' => {key => 'entire_file', flag => 1},
+  'FILENAME' => {key => 'filename'},
+  'GUARD SUFFIX' => {key => 'guard_suffix'},
+  'IS PREFIX' => {key => 'is_prefix', flag => 1},
+  'MAKE EXECUTABLE' => {key => 'make_executable', flag => 1},
+  'MERGE' => {key => 'merge'},
+  'MERGE ARRAYS' => {key => 'merge_arrays'},
+  'NEED ROOT' => {key => 'need_root', flag => 1},
+  # TODO: validate that the mode is a correct octal value.
+  'PERM' => {key => 'perm'},
+  'POST UPDATE' => {key => 'post_update'},
+  'REM' => {},
+  'REQUIRE' => {key => 'require', multiple => 1},
+);
+# Longest names first, so that a directive is not matched by its prefix (e.g.
+# MERGE ARRAYS by MERGE).
+my $DIRECTIVE_RE = join '|', map { quotemeta } sort { length $b <=> length $a } keys %DIRECTIVES;
+
+# Applies the directive in the given line to the fragment configuration.
+# Returns false if the line is not a valid directive.
+sub parse_directive {
+  my ($line, $conf) = @_;
+  my ($name, $value) = $line =~ m/^(${DIRECTIVE_RE}) (?: \s+ (\S.*?) )? \s*$/x or return 0;
+  my $directive = $DIRECTIVES{$name};
+  # Flag directives must not have a value and the other ones must have one.
+  return 0 if $directive->{flag} ? defined $value : not defined $value;
+  my $key = $directive->{key};
+  if (not defined $key) {
+    # Nothing to do, this is a comment.
+  } elsif ($directive->{flag}) {
+    $conf->{$key} = 1;
+  } elsif ($directive->{multiple}) {
+    push @{$conf->{$key}}, $value;
+  } else {
+    $conf->{$key} = $value;
+  }
+  return 1;
+}
+
+sub parse_file_conf {
+  my ($file) = @_;
+  my %conf;
+  $file =~ s/\n{2,}$/\n/;
+  $file =~ s/^\n+//;
+  # Each directive is on its own line, they can be followed by empty lines.
+  while ($file =~ m/\A ([^\n]*) \n+/x) {
+    my ($line, $end) = ($1, $LAST_MATCH_END[0]);
+    last if not parse_directive($line, \%conf);
+    substr $file, 0, $end, '';
+  }
+  my $comments_decorator = ($conf{comments_char} // DEFAULT_COMMENTS_CHAR) x COMMENTS_CHAR_COUNT;
+  my $guard = DEFAULT_GUARD_STRING.(exists $conf{guard_suffix} ? ':'.$conf{guard_suffix} : '');
+  $conf{start_marker} = $comments_decorator.$guard.' START'.$comments_decorator."\n";
+  $conf{end_marker} = $comments_decorator.$guard.' END'.$comments_decorator."\n";
+  $conf{content} = $file;
+  validate_merge_conf(\%conf) if exists $conf{merge} or exists $conf{merge_arrays};
+  return %conf;
+}
+
+# The formats supported by the MERGE directive. Each entry gives the module
+# needed to handle the format (if any, it is loaded only when used), a `parse`
+# function that takes a text and returns the corresponding data (dies on
+# error), and a `serialize` function that takes a data hash-ref and returns its
+# text representation (with sorted keys when possible).
+my %MERGE_FORMATS = (
+  ini => {
+    module => 'Config::Tiny',
+    parse => \&parse_ini,
+    serialize => sub { Config::Tiny->new($_[0])->write_string },
+  },
+  json => {
+    module => 'JSON::PP',
+    parse => sub { $_[0] =~ m/\S/ ? JSON::PP->new->relaxed->decode($_[0]) : {} },
+    serialize => sub {
+      my $json = JSON::PP->new->canonical->indent;
+      $json->space_after->indent_length(2);
+      return $json->encode($_[0]);
+    },
+  },
+  toml => {
+    module => 'TOML::Tiny',
+    parse => \&parse_toml,
+    serialize => sub { my $t = TOML::Tiny::to_toml($_[0]); $t eq '' ? '' : "${t}\n" },
+  },
+  yaml => {
+    module => 'YAML::PP',
+    parse => \&parse_yaml,
+    serialize => sub { YAML::PP->new(boolean => 'JSON::PP', header => 0)->dump_string($_[0]) },
+  },
+);
+
+# Dies if the MERGE directives of a fragment configuration are invalid and sets
+# the default value of MERGE ARRAYS.
+sub validate_merge_conf {
+  my ($conf) = @_;
+  die "MERGE ARRAYS requires the MERGE directive.\n" if not exists $conf->{merge};
+  die "Unsupported MERGE format: '$conf->{merge}'.\n" if not exists $MERGE_FORMATS{$conf->{merge}};
+  $conf->{merge_arrays} //= 'auto';
+  die "Invalid MERGE ARRAYS value: '$conf->{merge_arrays}'.\n"
+      if not any { $conf->{merge_arrays} eq $_ } qw(auto union replace);
+  for my $d ('COMMENTS CHAR', 'ENTIRE FILE', 'GUARD SUFFIX', 'IS PREFIX') {
+    die "MERGE cannot be used with ${d}.\n" if exists $conf->{$DIRECTIVES{$d}{key}};
+  }
+  return;
+}
+
+sub parse_toml {
+  my ($text) = @_;
+  my ($data, $error) = TOML::Tiny::from_toml($text);
+  die "${error}\n" if $error;
+  return $data;
+}
+
+sub parse_yaml {
+  my ($text) = @_;
+  my @docs = YAML::PP->new(boolean => 'JSON::PP')->load_string($text);
+  die "Multiple YAML documents are not supported.\n" if @docs > 1;
+  return $docs[0] // {};
+}
+
+# Returns the INI data as a plain hash-ref, where the keys outside of any
+# section are in the `_` section.
+sub parse_ini {
+  my ($text) = @_;
+  my $config = Config::Tiny->read_string($text) // die Config::Tiny->errstr."\n";
+  return {%{$config}};
+}
+
+# Returns the hash-ref parsed from the given text in the given MERGE format.
+# The $source is used in error messages.
+sub parse_merge_data {
+  my ($format, $text, $source) = @_;
+  my $data = eval { $MERGE_FORMATS{$format}{parse}->($text) };
+  if ($EVAL_ERROR) {
+    my $error = $EVAL_ERROR =~ s/\s+\z//r;
+    die "Cannot parse ${source} as ${format}: ${error}\n";
+  }
+  die "The content of ${source} is not a ${format} table.\n" if ref $data ne 'HASH';
+  return $data;
+}
+
+# Returns true if the two given data structures are equal. Scalar values are
+# compared as strings.
+sub data_equal {
+  my ($x, $y) = @_;
+  return 0 if ref $x ne ref $y;
+  if (ref $x eq 'HASH') {
+    return 0 if keys %{$x} != keys %{$y};
+    return all { exists $y->{$_} and data_equal($x->{$_}, $y->{$_}) } keys %{$x};
+  }
+  if (ref $x eq 'ARRAY') {
+    return 0 if @{$x} != @{$y};
+    return all { data_equal($x->[$_], $y->[$_]) } 0 .. $#{$x};
+  }
+  return !defined $y if !defined $x;
+  return defined $y && "$x" eq "$y";
+}
+
+# Removes recursively the ARRAYS_MARKER entries from the given fragment data and
+# records in %$modes the merge mode of the arrays that they name (see
+# parse_array_mode), indexed by the address of these arrays.
+sub extract_array_modes {
+  my ($data, $modes) = @_;
+  if (ref $data eq 'HASH') {
+    my $marker = delete $data->{+ARRAYS_MARKER} // {};
+    die ARRAYS_MARKER." must be a map.\n" if ref $marker ne 'HASH';
+    for my $k (keys %{$marker}) {
+      die ARRAYS_MARKER." names '${k}' which is not an array.\n" if ref $data->{$k} ne 'ARRAY';
+      $modes->{refaddr $data->{$k}} = parse_array_mode($marker->{$k});
+    }
+    extract_array_modes($_, $modes) for values %{$data};
+  } elsif (ref $data eq 'ARRAY') {
+    extract_array_modes($_, $modes) for @{$data};
+  }
+  return;
+}
+
+# Returns the merge mode described by the given text: `union`, `replace` or
+# an array-ref of the key fields given as `key:field1,field2`.
+sub parse_array_mode {
+  my ($text) = @_;
+  die "Invalid array merge mode: '${text}'.\n" if ref $text;
+  return $text if any { $text eq $_ } qw(union replace);
+  if ($text =~ m/^key:(.+)$/) {
+    return [split /,/, $1];
+  }
+  die "Invalid array merge mode: '${text}'.\n";
+}
+
+# Returns the merge mode of the given fragment $array, to be merged into the
+# $target array. Arrays without an explicit mode use the MERGE ARRAYS directive
+# and, by default, are replaced if they contain only scalars.
+sub get_array_mode {
+  my ($ctx, $array, $target) = @_;
+  my $mode = $ctx->{modes}{refaddr $array} // $ctx->{default};
+  return $mode if $mode ne 'auto';
+  return (any { ref } @{$array}, @{$target}) ? 'union' : 'replace';
+}
+
+# Merges in place the $new hash-ref (from a fragment) into the $target one
+# (from the target file). $old is the data of the previous version of the
+# fragment (or an empty hash-ref), its values that are no longer in $new are
+# removed from $target, unless they were modified there. Nested hashes are
+# merged recursively and arrays according to their mode (see get_array_mode).
+# $ctx has the `modes` from extract_array_modes and the `default` mode.
+sub merge_hash {
+  my ($target, $old, $new, $ctx) = @_;
+  for my $k (keys %{$new}) {
+    my ($t, $o, $n) = ($target->{$k}, $old->{$k}, $new->{$k});
+    my $mode;
+    if (ref $n eq 'HASH' and ref $t eq 'HASH') {
+      merge_hash($t, ref $o eq 'HASH' ? $o : {}, $n, $ctx);
+    } elsif (ref $n eq 'ARRAY'
+      and ref $t eq 'ARRAY'
+      and ($mode = get_array_mode($ctx, $n, $t)) ne 'replace') {
+      merge_array($t, ref $o eq 'ARRAY' ? $o : [], $n, $mode, $ctx);
+    } else {
+      $target->{$k} = $n;
+    }
+  }
+  for my $k (grep { !exists $new->{$_} && exists $target->{$_} } keys %{$old}) {
+    my ($t, $o) = ($target->{$k}, $old->{$k});
+    my $mode;
+    if (ref $o eq 'HASH' and ref $t eq 'HASH') {
+      merge_hash($t, $o, {}, $ctx);
+      delete $target->{$k} if not %{$t};
+    } elsif (ref $o eq 'ARRAY'
+      and ref $t eq 'ARRAY'
+      and ($mode = get_array_mode($ctx, $o, $t)) ne 'replace') {
+      merge_array($t, $o, [], $mode, $ctx);
+      delete $target->{$k} if not @{$t};
+    } elsif (data_equal($t, $o)) {
+      delete $target->{$k};
+    }
+  }
+  return;
+}
+
+# Merges in place the $new array-ref into $target, with the given mode (`union`
+# or the array-ref of key fields), see merge_hash.
+sub merge_array {
+  my ($target, $old, $new, $mode, $ctx) = @_;
+  return merge_keyed_array($target, $old, $new, $mode, $ctx) if ref $mode;
+  my @removed = grep {
+    my $o = $_;
+    !any { data_equal($o, $_) } @{$new}
+  } @{$old};
+  @{$target} = grep {
+    my $t = $_;
+    !any { data_equal($t, $_) } @removed
+  } @{$target};
+  push @{$target}, grep {
+    my $n = $_;
+    !any { data_equal($n, $_) } @{$target}
+  } @{$new};
+  return;
+}
+
+# Merges in place arrays of maps identified by the given key fields: the
+# entries of $target with the same key as an entry of $new are merged with it
+# (with merge_hash), the others from $new are appended. The values of the
+# entries removed since $old are removed, as well as these entries if only
+# their key remains.
+sub merge_keyed_array {
+  my ($target, $old, $new, $fields, $ctx) = @_;
+  # Returns the key of an entry or undef if it does not have all the fields.
+  my $key_of = sub {
+    my ($e) = @_;
+    return if ref $e ne 'HASH' or any { !defined $e->{$_} || ref $e->{$_} } @{$fields};
+    return join "\0", map { $e->{$_} } @{$fields};
+  };
+  my (%new, %old, %seen);
+  for my $n (@{$new}) {
+    my $k = $key_of->($n) // die "An array entry is missing the key fields: @{$fields}.\n";
+    die "Duplicate array entry for the key fields: @{$fields}.\n" if exists $new{$k};
+    $new{$k} = $n;
+  }
+  for my $o (@{$old}) {
+    my $k = $key_of->($o);
+    $old{$k} = {%{$o}} if defined $k;
+    delete @{$old{$k}}{@{$fields}} if defined $k;
+  }
+  my @result;
+  for my $t (@{$target}) {
+    my $k = $key_of->($t);
+    if (defined $k and exists $new{$k}) {
+      merge_hash($t, $old{$k} // {}, $new{$k}, $ctx);
+      $seen{$k} = 1;
+    } elsif (defined $k and exists $old{$k}) {
+      merge_hash($t, $old{$k}, {}, $ctx);
+      next if keys %{$t} == @{$fields};
+    }
+    push @result, $t;
+  }
+  push @result, grep { !$seen{$key_of->($_)} } @{$new};
+  @{$target} = @result;
+  return;
+}
+
+# Returns the path of the file where the last applied version of a MERGE
+# fragment is saved. The NEED ROOT fragments are saved in a system directory so
+# that the state of the user is never written by root.
+sub get_merge_state_path {
+  my ($name, $conf) = @_;
+  my $dir;
+  if ($conf->{need_root}) {
+    $dir = $ENV{UPDATE_CONFIG_ROOT_STATE_DIR} || '/var/lib/update_config';
+  } else {
+    $dir = catfile($ENV{XDG_STATE_HOME} || catfile(get_home_dir(), '.local', 'state'),
+      'update_config');
+  }
+  return catfile($dir, $name =~ s{/}{_}gr);
+}
+
+# Returns the data of the previous version of a MERGE fragment, if it was saved
+# and applied to the same target with the same format. Otherwise returns an
+# empty hash-ref.
+sub read_merge_state {
+  my ($name, $target, $conf) = @_;
+  my $path = get_merge_state_path($name, $conf);
+  return {} if not -f $path;
+  my %old = parse_file_conf(scalar read_file($path));
+  return {} if ($old{filename} // $name) ne $target or $old{merge} ne $conf->{merge};
+  return parse_merge_data($old{merge}, $old{content}, "the saved state '${path}'");
+}
+
+# Saves the content of a MERGE fragment (including its directives), so that it
+# can be passed to read_merge_state on the next run.
+sub save_merge_state {
+  my ($name, $content, $conf) = @_;
+  my $path = get_merge_state_path($name, $conf);
+  return if -f $path and read_file($path) eq $content;
+  my $dir = dirname($path);
+  make_path($dir) if not -d $dir;
+  write_file($path, $content) or die "Cannot write '${path}': $!\n";
+  return;
+}
+
+# Returns the current content of a MERGE target, re-serialized in its format,
+# and its content once the fragment is merged into it.
+sub merge_content {
+  my ($mode, $file, $conf, $old) = @_;
+  my (undef, $text) = read_content($mode, $file, $conf);
+  my $data = parse_merge_data($conf->{merge}, $text, "'${file}'");
+  my $new = parse_merge_data($conf->{merge}, $conf->{content}, 'the fragment');
+  my $ctx = {modes => {}, default => $conf->{merge_arrays}};
+  extract_array_modes($_, $ctx->{modes}) for $new, $old;
+  my $serialize = $MERGE_FORMATS{$conf->{merge}}{serialize};
+  my $old_content = $serialize->($data);
+  merge_hash($data, $old, $new, $ctx);
+  return ($old_content, $serialize->($data));
+}
+
+# Puts in %$content the content of the files in the given directory and
+# all its subdirectories. Ignores hidden files and directories. Ignores
+# multiple files with the same name.
+sub read_config_files {
+  my ($dir, $content) = @_;
+  opendir(my $dh, $dir) or die "Can't open dir '$dir': $!\n";
+  while (readdir $dh) {
+    next if m/^\./;
+    my $f = catfile($dir, $_);
+    read_config_files($f, $content) if -d $f;
+    $content->{$_} = read_file($f) if -f $f;
+  }
+  closedir $dh;
+  return;
+}
+
+# Writes in the current directory the fragments embedded in the script.
+sub export_fragments {
+  my $internal_files = get_data_section();
+  while (my ($file, $content) = each %{$internal_files}) {
+    my %conf = parse_file_conf($content);
+    if (not exists $conf{filename}) {
+      my $output = clean_output_path($file);
+      $content = "FILENAME $output\n$content";
+    }
+    $file =~ s/^\.//;
+    $file =~ s{/|,}{_}g;
+    print "Exporting: $file\n";
+    write_file($file, $content) or die "Cannot write file '$file': $!\n";
+  }
+  return;
+}
+
+# Prints on STDOUT our own script, followed by all the given fragments, so that
+# they are embedded in its __DATA__ section.
+sub pack_fragments {
+  my ($config_files) = @_;
+  print read_file(catfile($FindBin::RealBin, $FindBin::RealScript));
+  for my $file (sort { (lc $a) cmp (lc $b) } keys %{$config_files}) {
+    my $content = $config_files->{$file};
+    # The next "@@" header must start on its own line.
+    $content .= "\n" if $content ne '' and $content !~ m/\n\z/;
+    print "@@ ${file}\n${content}";
+  }
+  return;
+}
+
+# Returns true if all the REQUIRE guards of the fragment are verified.
+sub check_requirements {
+  my ($conf, $display_name) = @_;
+  for my $r (@{$conf->{require}}) {
+    my ($expr, $reason) = split /\s*#\s*/, $r, 2;
+    next if eval $expr;  ## no critic (ProhibitStringyEval)
+    die "Error while executing 'require' guard for ${display_name} '${expr}': $@.\n" if $@;
+    printf "Skipping %s due to require guard%s\n", $display_name, ($reason ? ': '.$reason : '')
+        unless $flags{silent};
+    return 0;
+  }
+  return 1;
+}
+
+# Writes the new content of the target file and executes the POST UPDATE
+# command if any.
+sub update_target {
+  my ($mode, $out_path, $before, $new_content, $after, $conf) = @_;
+  my $content;
+  if ($conf->{entire_file} or $conf->{merge}) {
+    $content = $new_content;
+  } else {
+    $content = $before.$conf->{start_marker}.$new_content.$conf->{end_marker}.$after;
+  }
+  write_content($mode, $out_path, $content, $conf);
+  if ($conf->{post_update}) {
+    my $cmd = $conf->{post_update} =~ s/\$@/$out_path/gr;
+    system $cmd;
+  }
+  return;
+}
+
+# Returns the current content of the target of a fragment, split in four parts:
+# the content before the managed part, the current and new versions of the
+# managed part, and the content after it.
+sub get_contents {
+  my ($mode, $in_path, $name, $target, $conf) = @_;
+  if (not $conf->{merge}) {
+    my ($before, $old_content, $after) = read_content($mode, $in_path, $conf);
+    return ($before, $old_content, $conf->{content}, $after);
+  }
+  my $module = $MERGE_FORMATS{$conf->{merge}}{module};
+  load_module($module) if $module;
+  my $old = read_merge_state($name, $target, $conf);
+  return ('', merge_content($mode, $in_path, $conf, $old), '');
+}
+
+# Applies the given fragment (depending on the command line flags). Returns
+# true if the fragment needs root and was not applied.
+sub apply_fragment {
+  my ($file, $content) = @_;
+  my %conf = parse_file_conf($content);
+  my $target = $conf{filename} // $file;
+  my $display_name = $target.($conf{guard_suffix} ? ' ('.$conf{guard_suffix}.')' : '');
+  return 0 if not check_requirements(\%conf, $display_name);
+  my ($mode, $in_path, $out_path) = parse_file_name($target);
+  if ($flags{list}) {
+    print "$in_path\n";
+    return 0;
+  }
+  my ($before, $old_content, $new_content, $after) =
+      get_contents($mode, $in_path, $file, $target, \%conf);
+  # Whether this run is the one that writes this fragment (as root or not).
+  my $can_write = !$flags{test} && !$conf{need_root} == !$flags{root};
+  if ($old_content eq $new_content and not need_perm_update($out_path, $mode, \%conf)) {
+    print "Nothing to do for: $display_name\n" unless $flags{silent};
+    save_merge_state($file, $content, \%conf) if $conf{merge} and $can_write;
+    return 0;
+  }
+  if ($flags{diff}) {
+    my $diff = diff(\$old_content, \$new_content, {CONTEXT => 0});
+    print "Diff for: $display_name\n$diff";
+  }
+  return 1 if $conf{need_root} and not $flags{root};
+  return 0 if $flags{root} and not $conf{need_root};
+  if ($can_write) {
+    update_target($mode, $out_path, $before, $new_content, $after, \%conf);
+    save_merge_state($file, $content, \%conf) if $conf{merge};
+  }
+  print "Updated: ${display_name}\n" unless $flags{silent};
+  return 0;
+}
+
+sub main {
+  if ($flags{export}) {
+    export_fragments();
+    return;
+  }
+
+  my $config_files = {};
+  $config_files = get_data_section() unless $flags{pack};  # We don’t read __DATA__ if we’re packing content anyway.
+  my $config_dir = $flags{dir} // get_config_dir();
+  print "Reading configuration from: ${config_dir}\n" unless $flags{silent} or $flags{pack};
+  read_config_files($config_dir, $config_files) if -d $config_dir;
+
+  if ($flags{pack}) {
+    pack_fragments($config_files);
+    return;
+  }
+
+  my $need_root = 0;
+  for my $file (sort { (lc $a) cmp (lc $b) } keys %{$config_files}) {
+    $need_root = 1 if apply_fragment($file, $config_files->{$file});
+  }
+
+  return if not $need_root or $flags{'no-root'};
+  if ($0 eq '-') {
+    print "Skipping NEED_ROOT fragments for an execution from stdin\n" unless $flags{silent};
+    return;
+  }
+  my $script = catfile(${FindBin::RealBin}, ${FindBin::RealScript});
+  system('sudo', $script, @orig_argv, '--root');
+  return;
+}
+
+main();
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+update_config - Deploy configuration fragments (dotfiles, etc.) locally or on
+remote hosts.
+
+=head1 SYNOPSIS
+
+update_config [--test] [--help] [--diff] [--silent] [--list] [--dir directory]
+[--root|--no-root] [--export] [--pack]
+
+=head1 DESCRIPTION
+
+The program reads configuration fragments from the F<~/.update_config>
+directory if it exists. Otherwise, it reads them from the
+F<$XDG_CONFIG_HOME/update_config> directory (F<~/.config/update_config> when
+C<XDG_CONFIG_HOME> is not set). In both cases, all the subdirectories are read
+too, as well as the fragments embedded in the script itself by the C<--pack>
+option. A fragment
+from the directory replaces an embedded fragment with the same name.
+
+=head1 OPTIONS
+
+The available options for the program are the following. They can all be
+abbreviated down to a single character.
+
+  --diff   Print the difference between the current configuration and what
+           will be written
+
+  --silent Do not print the status of the configuration files (except for
+           error messages).
+
+  --test   Do not modify the configuration files.
+
+  --list   Only print a list of the configuration files and exit.
+
+  --root   Install only the configuration fragments that are marked as
+           'NEED ROOT'.
+
+  --no-root  Do not attempt to install the 'NEED ROOT' fragments.
+
+  --export Export in the current directory all the files that are embedded
+           in the script.
+
+  --dir directory   Process only the configuration files in the given
+           directory and its subdirectories, instead of those from the
+           default path.
+
+  --pack  Write on the standard output a version of the script where all the
+          config fragments are embedded. To be used typically with:
+            update_config --pack | ssh user@host perl -- - --no-root
+          or just
+            update_config --pack | ssh host perl
+
+  --help   Print this help message.
+
+=head1 FRAGMENT FILES
+
+Each fragment file describes a piece of content that should be present in a
+target file. By default, the target is a file directly in your home directory,
+with the same name as the fragment. However, hidden files are ignored when the
+fragments are read, so most of the time you will set the target explicitly with
+the C<FILENAME> directive described below (e.g. to update your F<.bashrc>).
+
+You can organize the fragments in sub-directories, but these are not part of
+the target path. Only the base name of a fragment is used, so two fragments
+must not have the same name, even in different directories. To have several
+fragments for the same file, give them distinct names with a suffix between
+brackets (e.g. F<bashrc [linux]> and F<bashrc [macos]>, both with
+C<FILENAME .bashrc>). That suffix is ignored if the name of the fragment is used
+as the target. Hidden directories are ignored too and fragments are processed
+in alphabetical order, ignoring case.
+
+Unless the C<MERGE> directive is used (see L</Merged files>), the content of the
+fragment is written in the target file between two guard lines, which look
+like C<###AUTO-CONFIG START###> and C<###AUTO-CONFIG END###>. Everything outside of these guards is left untouched, so you can still edit the
+rest of the file by hand. If the guards are not already present, the content is
+added at the end of the file, which is created if needed. When the guarded
+content is already up to date, the file is not modified at all.
+
+=head2 Directives
+
+A fragment can start with a few directives, one per line, that control how it
+is applied. The content of the fragment starts at the first line that is not a
+directive, and the empty lines following the directives are skipped. The
+supported directives are the following:
+
+=over 4
+
+=item C<FILENAME> I<path>
+
+Sets the target file, instead of using the name of the fragment. The path is
+relative to your home directory, unless it is an absolute path. The path can
+also be made of two commands separated by a comma. In that case, the current
+content is read from the output of the first command and the new content is
+passed on the input of the second one (this is useful for C<crontab -l,
+crontab ->).
+
+=item C<COMMENTS CHAR> I<char>
+
+Sets the character that starts a comment in the target file, which is used in
+the guard lines (it is repeated three times). The default is C<#>.
+
+=item C<GUARD SUFFIX> I<suffix>
+
+Adds a suffix to the guard lines, which then look like
+C<###AUTO-CONFIG:suffix START###>. You need this if several fragments target
+the same file.
+
+=item C<IS PREFIX>
+
+Adds the content at the beginning of the file instead of at the end, when the
+guards are not already present.
+
+=item C<ENTIRE FILE>
+
+Replaces the entire target file with the content of the fragment, without any
+guard lines.
+
+=item C<MAKE EXECUTABLE>
+
+Makes the target file executable.
+
+=item C<MERGE> I<format>
+
+Merges the data of the fragment into the target file instead of using guard
+lines, see L</Merged files> below. The format is one of C<json>, C<toml>,
+C<yaml> or C<ini>. This directive cannot be used with C<COMMENTS CHAR>,
+C<ENTIRE FILE>, C<GUARD SUFFIX> or C<IS PREFIX>.
+
+=item C<MERGE ARRAYS> I<mode>
+
+With C<MERGE>, sets how the arrays without an explicit mode are merged (see
+L</Merged files>): C<union> or C<replace> for all of them, or C<auto> (the
+default) to use C<replace> for the arrays that contain only scalars and
+C<union> for the others.
+
+=item C<PERM> I<mode>
+
+Sets the permissions of the target file, given in octal (e.g. C<600>).
+
+=item C<NEED ROOT>
+
+Marks a fragment that must be written as root (typically a file under
+F</etc>). These fragments are applied at the end of the run, by executing the
+program again through C<sudo> with the C<--root> option.
+
+=item C<REQUIRE> I<expression> [C<#> I<reason>]
+
+Evaluates a Perl expression and skips the fragment if it is false. The optional
+reason is printed when the fragment is skipped. The expression can use the
+C<which> function from L<File::Which> as well as the variables from
+L<English>. This directive can be repeated, in which case all the expressions
+must be true.
+
+=item C<POST UPDATE> I<command>
+
+Executes a shell command after the target file has been updated. In the
+command, C<$@> is replaced by the path of the target file.
+
+=item C<REM> I<text>
+
+A comment, which is ignored.
+
+=back
+
+=head2 Merged files
+
+Some programs rewrite their own configuration file (re-ordering its entries,
+removing its comments, etc.), which would break the guard lines. For these
+files, the C<MERGE> directive merges the data of the fragment, written in the
+same format as the target file, into the existing data of that file:
+
+=over 4
+
+=item *
+
+Maps (TOML tables, JSON objects, YAML mappings or INI sections), starting with
+the root of the file, are merged recursively: each key of the fragment is
+added to the existing map. For other values, the value from the fragment
+replaces the existing one.
+
+=item *
+
+Arrays are merged according to their mode, which is given by an
+C<update_config_arrays> map placed next to them in the fragment (that is, in
+the map containing the arrays). Each key of that map is the name of an array
+and its value is one of:
+
+=over 4
+
+=item C<replace>
+
+The array from the fragment replaces the existing one.
+
+=item C<union>
+
+The elements of the fragment (which can be whole maps, e.g. TOML C<[[array]]>
+entries) are appended to the existing array, unless an equal element is
+already present.
+
+=item C<key:>I<field>[C<,>I<field>...]
+
+For arrays of maps, the entries of the fragment are matched with the existing
+entries having the same value for all the given fields. A matching entry is
+merged like any other map (so values added there by the program are kept) and
+the entries without a match are appended.
+
+=back
+
+The C<update_config_arrays> maps are not written in the target file. The
+arrays not listed in such a map use the mode given by the C<MERGE ARRAYS>
+directive (by default, C<replace> for arrays of scalars and C<union> for the
+others).
+
+=item *
+
+The target file is entirely rewritten, with sorted keys and without its
+comments. But it is not modified at all if it already contains the data of the
+fragment, whatever its formatting.
+
+=item *
+
+The last applied version of each fragment is saved in
+F<$XDG_STATE_HOME/update_config> (F<~/.local/state/update_config> by
+default), or in F</var/lib/update_config> for the C<NEED ROOT> fragments
+(this can be overridden with the C<UPDATE_CONFIG_ROOT_STATE_DIR> environment
+variable). On the next run, the values that were removed from the fragment are
+also removed from the target file, unless they were modified there. This also
+applies to the elements of arrays merged with C<union>, and to the values of
+the entries of arrays merged with a C<key> (such an entry is removed entirely
+if only its key fields remain). This is a best effort mechanism that does not
+cover the changes made before the state was saved.
+
+=back
+
+The C<ini> format supports C<key = value> lines, optionally in C<[section]>
+blocks, and comment lines starting with C<;> or C<#>. The values are kept as
+raw text. The C<json> format accepts trailing commas and C<#> comments but not
+C<//> comments.
+
+=head2 Examples
+
+This fragment adds some content to your F<~/.bashrc> file, but only on WSL
+hosts. The guard suffix allows to have another fragment for the same file:
+
+  FILENAME .bashrc
+  GUARD SUFFIX WSL
+  REQUIRE `uname -r` =~ /WSL/ # Not a WSL host
+
+  export BROWSER=wslview
+
+This one installs a full script in a system directory, and needs root to do so:
+
+  FILENAME /etc/network/if-pre-up.d/10-iptables-load
+  REQUIRE -d '/etc/network/if-pre-up.d' # No if-pre-up.d directory
+  NEED ROOT
+  ENTIRE FILE
+  MAKE EXECUTABLE
+
+  #!/bin/sh
+  iptables-restore < /etc/iptables.rules
+
+And this one updates a configuration file and then reloads it in the running
+program:
+
+  FILENAME .tmux.conf
+  REQUIRE which('tmux') # tmux is not installed
+  POST UPDATE tmux source-file $@
+
+  set -g prefix C-a
+
+The following fragments use the C<MERGE> directive, for files that are
+rewritten by their program. This one sets a theme and adds a server to a TOML
+file, while keeping the other servers configured there (by default, the
+C<[[server]]> entries are merged with C<union>):
+
+  FILENAME .config/app/config.toml
+  MERGE toml
+
+  [ui]
+  theme = "dark"
+
+  [[server]]
+  name = "home"
+  url = "https://home.example.com"
+
+This one configures some languages in the Helix editor. The entries of the
+C<language> array are matched by their C<name>: if a C<rust> entry already
+exists, its C<indent> is updated and its other values are kept. The marker for
+an array at the root of the file must be placed before any table header:
+
+  FILENAME .config/helix/languages.toml
+  MERGE toml
+
+  update_config_arrays = { language = "key:name" }
+
+  [[language]]
+  name = "rust"
+  indent = { tab-width = 4, unit = "    " }
+
+  [[language]]
+  name = "python"
+  auto-format = true
+
+This one adds a key binding to Alacritty, where the bindings are identified by
+both their C<key> and C<mods> fields. As the C<bindings> array is in the
+C<keyboard> table, the marker is placed in that table:
+
+  FILENAME .config/alacritty/alacritty.toml
+  MERGE toml
+
+  [keyboard]
+  update_config_arrays = { bindings = "key:key,mods" }
+
+  [[keyboard.bindings]]
+  key = "N"
+  mods = "Control|Shift"
+  action = "CreateNewWindow"
+
+And this one adds a list of excluded paths in a JSON file, without removing the
+ones that were already present (the array contains only scalars, so it would
+be replaced by default):
+
+  FILENAME .config/app/settings.json
+  MERGE json
+
+  {
+    "update_config_arrays": {"exclude": "union"},
+    "exclude": ["node_modules", ".cache"]
+  }
+
+=cut
+
+__DATA__

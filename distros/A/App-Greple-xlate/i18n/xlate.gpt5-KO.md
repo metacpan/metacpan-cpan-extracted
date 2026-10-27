@@ -8,9 +8,15 @@ App::Greple::xlate - greple용 번역 지원 모듈
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra를 사용하려면:
+
+    xlate -e gpt6 -t JA file.txt
+
+`llm models`에 `gpt-6-astra`가 나열되지 않으면 [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6)의 모델 등록 지침을 참조하세요.
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번�
 
     현재 다음 엔진들이 사용 가능합니다
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) 모델 등록용)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번�
 
 - **--xlate-prompt**=_text_
 
-    번역 엔진에 보낼 사용자 지정 프롬프트를 지정합니다. 이 옵션은 LLM 엔진(`gpt3`, `gpt4o`, `gpt5`)에서 사용할 수 있지만 DeepL에서는 사용할 수 없습니다. AI 모델에 특정 지시사항을 제공하여 번역 동작을 사용자 지정할 수 있습니다. 프롬프트에 `%s`가 포함되어 있으면 대상 언어 이름으로 대체됩니다. llm 백엔드 기반 `gpt5` 엔진의 경우 문서는 별도의 JSON 요청으로 제공되며, 이 요청의 `input` 멤버는 번역할 배열이고 선택적 `context` 멤버에는 참조 데이터가 포함됩니다. 사용자 지정 프롬프트를 사용하는 경우에도 해당 멤버를 명령이 아닌 문서 데이터로 취급하는 고정 지시사항이 추가됩니다.
+    번역 엔진에 보낼 사용자 지정 프롬프트를 지정합니다. 이 옵션은 LLM 엔진(`gpt3`, `gpt4o`, `gpt5`, `gpt6`)에서 사용할 수 있지만 DeepL에서는 사용할 수 없습니다. AI 모델에 특정 지시사항을 제공하여 번역 동작을 사용자 지정할 수 있습니다. 프롬프트에 `%s`가 포함되어 있으면 대상 언어 이름으로 대체됩니다. llm 백엔드 기반 `gpt5` 및 `gpt6` 엔진의 경우 문서는 별도의 JSON 요청으로 제공되며, 이 요청의 `input` 멤버는 번역할 배열이고 선택적 `context` 멤버에는 참조 데이터가 포함됩니다. 사용자 지정 프롬프트를 사용하는 경우에도 해당 멤버를 명령이 아닌 문서 데이터로 취급하는 고정 지시사항이 추가됩니다.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번�
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     변경된 블록을 다시 번역할 때 참조 컨텍스트로 전달할 주변 번역 블록 수(기본값 2)를 지정합니다. 컨텍스트에는 변경된 영역 주변의 원시 소스 텍스트(제목, 목록 구조, 캡션)도 포함되며, 사용 가능한 경우 캐시에서 복원한 변경된 텍스트의 이전 버전도 포함되어 변경되지 않은 표현이 보존됩니다. 컨텍스트 인식 번역을 완전히 비활성화하려면 0으로 설정합니다. 각 변경 영역은 자체 API 호출로 번역되며 컨텍스트는 JSON 사용자 요청에 최대 약 8000자를 추가할 수 있으므로, 컨텍스트 인식 번역은 일관성을 위해 약간의 추가 비용을 감수한다는 점에 유의하십시오. 문서에서 파생된 컨텍스트는 시스템 프롬프트에 포함되지 않습니다.
 
 - **--xlate-cache-seed**=_file_

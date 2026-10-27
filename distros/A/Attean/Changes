@@ -6,6 +6,45 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.040  2026-10-26
+
+ - (Addition) Add new trie-based Memory2 store implementation.
+ - (Addition) New RDF 1.2 and SPARQL 1.2 support.
+ - (Update) Add Attean::API::DateTimeLiteral->equals and add support for
+   special 24:00:00 xsd:dateTime format.
+ - (Update) Add Attean::API::QuadIterator->as_triples method.
+ - (Update) Add Attean::API::TermIterator->get_boolean and improve boolean
+   serialization tests.
+ - (Update) Add matches method to Attean::API::TriplePattern and
+   Attean::API::QuadPattern.
+ - (Update) Add tests for xsd:dateTime handling in
+   Attean::API::NumericLiteral.
+ - (Update) Fix Attean::API::MutableModel->load_urls_into_graph_with_base
+   to rename bnode labels per document.
+ - (Update) Fix SPARQL and Turtle parsing bug on perl 5.18.
+ - (Update) Fix SPARQL parser to allow multiple HAVING conditions.
+ - (Update) Fix TestIDPQueryPlanner to accurately mimic document-scoped
+   bnodes in federation tests.
+ - (Update) Fix bug in SimpleQueryEvaluator handling of empty aggregation
+   with grouping.
+ - (Update) Fix bug that was not allowing fourth flags argument to REPLACE
+   function.
+ - (Update) Fix bugs in string and casting expression function evaluation.
+ - (Update) Fix bugs relating to VALUES clauses.
+ - (Update) Fix dataset definition in queries using FROM NAMED.
+ - (Update) Fix handling of NPS with inverted predicates in
+   SimpleQueryEvaluator.
+ - (Update) Fix handling of VALUES in ASK and aggregation SELECT queries.
+ - (Update) Fix handling of fresh bnodes during CONSTRUCT template
+   instantiation in SimpleQueryEvaluator.
+ - (Update) Fix handling of solution modifiers in CONSTRUCT queries.
+ - (Update) Fix handling of zero-length property paths in both simple and
+   plan-based evaluation.
+ - (Update) Fix plan-based GROUP_CONCAT to drop language-tag data in
+   aggregate result.
+ - (Update) Fix plan-based evaluation of DISTINCT GROUP_CONCAT aggregation.
+ - (Update) Update copyright notice.
+
 0.039  2026-06-02
 
  - (Addition) Attean::DatasetModel.

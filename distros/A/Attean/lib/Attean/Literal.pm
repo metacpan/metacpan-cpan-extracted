@@ -7,7 +7,7 @@ Attean::Literal - RDF Literals
 
 =head1 VERSION
 
-This document describes Attean::Literal version 0.039
+This document describes Attean::Literal version 0.040
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,8 @@ The following attributes exist:
 
 =item C<< language >>
 
+=item C<< base_dir >>
+
 =item C<< datatype >>
 
 =back
@@ -46,9 +48,13 @@ The following attributes exist:
 
 Returns true if the literal has a language tag, false otherwise.
 
+=item C<< has_base_dir >>
+
+Returns true if the literal has a base diredction, false otherwise.
+
 =cut
 
-package Attean::Literal 0.039 {
+package Attean::Literal 0.040 {
 	use Moo;
 	use Types::Standard qw(Str Maybe InstanceOf);
 	use Attean::API::Term;
@@ -61,6 +67,7 @@ package Attean::Literal 0.039 {
 	my $XSD_STRING	= IRI->new(value => 'http://www.w3.org/2001/XMLSchema#string');
 	has 'value'				=> (is => 'ro', isa => Str, required => 1);
 	has 'language'			=> (is => 'ro', isa => Maybe[Str], predicate => 'has_language');
+	has 'base_dir'			=> (is => 'ro', isa => Maybe[Str]);
 	has 'datatype'			=> (
 		is => 'ro',
 		isa => InstanceOf['Attean::IRI'],
@@ -93,7 +100,9 @@ package Attean::Literal 0.039 {
 	around 'datatype'	=> sub {
 		my $orig	= shift;
 		my $self	= shift;
-		if ($self->has_language) {
+		if ($self->has_base_dir) {
+			return Attean::IRI->new(value => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#dirLangString');
+		} elsif ($self->has_language) {
 			return Attean::IRI->new(value => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
 		} else {
 			return $self->$orig(@_);
@@ -108,7 +117,11 @@ package Attean::Literal 0.039 {
 		$value		=~ s/\r/\\r/g;
 		$value		=~ s/"/\\"/g;
 		if ($self->has_language) {
-			return sprintf('"%s"@%s', $value, $self->language);
+			if (my $d = $self->base_dir) {
+				return sprintf('"%s"@%s--%s', $value, $self->language, $d);
+			} else {
+				return sprintf('"%s"@%s', $value, $self->language);
+			}
 		} else {
 			my $dt	= $self->datatype->as_string;
 			if ($dt eq 'http://www.w3.org/2001/XMLSchema#string') {
@@ -177,7 +190,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

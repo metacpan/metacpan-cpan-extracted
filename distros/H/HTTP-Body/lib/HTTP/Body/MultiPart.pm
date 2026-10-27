@@ -1,5 +1,5 @@
 package HTTP::Body::MultiPart;
-$HTTP::Body::MultiPart::VERSION = '1.23';
+$HTTP::Body::MultiPart::VERSION = '1.24';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -122,6 +122,9 @@ sub parse_preamble {
     my $index = index( $self->{buffer}, $self->boundary_begin );
 
     unless ( $index >= 0 ) {
+        # keep only what may be the start of a dash-boundary split across chunks
+        my $keep = length( $self->boundary_begin ) - 1;
+        substr( $self->{buffer}, 0, -$keep, '' ) if length( $self->{buffer} ) > $keep;
         return 0;
     }
 
@@ -137,10 +140,16 @@ sub parse_preamble {
 
 =cut
 
+our $max_parts = 1000;
+
 sub parse_boundary {
     my $self = shift;
 
     if ( index( $self->{buffer}, $self->delimiter_begin . $self->crlf ) == 0 ) {
+
+        if ( $max_parts && ++$self->{part_count} > $max_parts ) {
+            Carp::croak("Too many parts in multipart body (limit $max_parts)");
+        }
 
         substr( $self->{buffer}, 0, length( $self->delimiter_begin ) + 2, '' );
         $self->{part}  = {};
@@ -158,6 +167,16 @@ sub parse_boundary {
         return 0;
     }
 
+    if ( length( $self->{buffer} ) >= length( $self->delimiter_end ) + 2 ) {
+        # a close delimiter ends the body whatever follows it (padding, epilogue)
+        unless ( index( $self->{buffer}, $self->delimiter_end ) == 0 ) {
+            Carp::croak('Invalid multipart boundary delimiter');
+        }
+        substr( $self->{buffer}, 0, length( $self->delimiter_end ), '' );
+        $self->{part}  = {};
+        $self->{state} = 'done';
+    }
+
     return 0;
 }
 
@@ -165,17 +184,30 @@ sub parse_boundary {
 
 =cut
 
+our $max_header_size  = 32 * 1024;
+our $max_header_lines = 100;
+
 sub parse_header {
     my $self = shift;
 
     my $crlf  = $self->crlf;
     my $index = index( $self->{buffer}, $crlf . $crlf );
 
+    # Without the blank line yet, the last 3 bytes may be its start.
+    my $size = $index >= 0 ? $index : length( $self->{buffer} ) - 3;
+    if ( $max_header_size && $size > $max_header_size ) {
+        Carp::croak("Multipart part header exceeds $max_header_size bytes");
+    }
+
     unless ( $index >= 0 ) {
         return 0;
     }
 
     my $header = substr( $self->{buffer}, 0, $index );
+
+    if ( $max_header_lines && ( $header =~ tr/\n// ) >= $max_header_lines ) {
+        Carp::croak("Multipart part header exceeds $max_header_lines lines");
+    }
 
     substr( $self->{buffer}, 0, $index + 4, '' );
 
@@ -270,6 +302,10 @@ sub handler {
         my ($filename)  = $disposition =~ / filename="?([^\"]*)"?/;
         # Need to match empty filenames above, so this part is flagged as an upload type
 
+        # A NUL in the filename truncates the path for anything downstream that
+        # hands it to the C layer, so strip it before the name is used or stored.
+        $filename =~ s/\0//g if defined $filename;
+
         $part->{name} = $name;
 
         if ( defined $filename ) {
@@ -292,14 +328,19 @@ sub handler {
     }
 
     if ( $part->{fh} && ( my $length = length( $part->{data} ) ) ) {
-        $part->{fh}->write( substr( $part->{data}, 0, $length, '' ), $length );
+        $part->{fh}->write( substr( $part->{data}, 0, $length, '' ), $length )
+            or Carp::croak("Can't write to temporary file: $!");
     }
 
     if ( $part->{done} ) {
 
         if ( exists $part->{filename} ) {
             if ( $part->{filename} ne "" ) {
-                $part->{fh}->close if defined $part->{fh};
+                # A buffered write error often surfaces only here, at close.
+                if ( defined $part->{fh} ) {
+                    $part->{fh}->close
+                        or Carp::croak("Can't close temporary file: $!");
+                }
 
                 delete @{$part}{qw[ data done fh ]};
 

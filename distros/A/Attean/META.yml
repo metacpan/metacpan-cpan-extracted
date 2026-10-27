@@ -34,7 +34,7 @@ requires:
   Exporter::Tiny: 1
   File::Slurp: 0
   HTTP::Negotiate: 0
-  IRI: 0.005
+  IRI: 0.015
   JSON: 0
   LWP::UserAgent: 0
   List::Util: '1.56'
@@ -67,4 +67,4 @@ resources:
   homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/attean/
-version: '0.039'
+version: '0.040'

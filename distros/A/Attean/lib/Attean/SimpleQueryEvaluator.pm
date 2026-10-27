@@ -7,7 +7,7 @@ Attean::SimpleQueryEvaluator - Simple query evaluator
 
 =head1 VERSION
 
-This document describes Attean::SimpleQueryEvaluator version 0.039
+This document describes Attean::SimpleQueryEvaluator version 0.040
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ model, and returns a query result.
 use Attean::Algebra;
 use Attean::Expression;
 
-package Attean::SimpleQueryEvaluator 0.039 {
+package Attean::SimpleQueryEvaluator 0.040 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -105,6 +105,7 @@ supplied C<< $active_graph >>.
 		my $self			= shift;
 		my $algebra			= shift;
 		my $active_graph	= shift || Carp::confess "No active-graph passed to Attean::SimpleQueryEvaluator->evaluate";
+		my %args			= @_;
 		
 		Carp::confess "No algebra passed for evaluation" unless ($algebra);
 		
@@ -113,7 +114,18 @@ supplied C<< $active_graph >>.
 		my @children	= @{ $algebra->children };
 		my ($child)		= $children[0];
 		if ($algebra->isa('Attean::Algebra::Query') or $algebra->isa('Attean::Algebra::Update')) {
-			return $self->evaluate($algebra->child, $active_graph, @_);
+			my $dataset	= $algebra->dataset;
+			my $named	= $dataset->{'named'};
+			my @named	= (ref($named) eq 'ARRAY') ? @$named : (values %{ $named || {} });
+			
+			if (scalar(@named)) {
+				$args{ available_graphs }	= [@named];
+			} else {
+				# no custom dataset
+			}
+
+
+			return $self->evaluate( $algebra->child, $active_graph, %args ) ;
 		} elsif ($algebra->isa('Attean::Algebra::BGP')) {
 			my @triples	= @{ $algebra->triples };
 			if (scalar(@triples) == 0) {
@@ -134,7 +146,7 @@ supplied C<< $active_graph >>.
 			}
 		} elsif ($algebra->isa('Attean::Algebra::Distinct') or $algebra->isa('Attean::Algebra::Reduced')) {
 			my %seen;
-			my $iter	= $self->evaluate( $child, $active_graph );
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			return $iter->grep(sub {
 				my $r	= shift;
 				my $str	= $r->as_string;
@@ -153,7 +165,7 @@ supplied C<< $active_graph >>.
 				unshift(@extends, $var);
 				($child)			= @{ $child->children };
 			}
-			return $self->evaluate( $child, $active_graph )->map(sub {
+			return $self->evaluate( $child, $active_graph, %args ) ->map(sub {
 				my $r	= shift;
 				my %extension;
 				my %row_cache;
@@ -162,7 +174,10 @@ supplied C<< $active_graph >>.
 					my $val		= $expr_eval->evaluate_expression( $expr, $r, $active_graph, \%row_cache );
 					if (blessed($val) and $val->does('Attean::API::Binding')) {
 						# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
-						$val	= $val->ground($r);
+						$val	= eval { $val->ground($r) };
+						if ($@) {
+							$val	= undef;
+						}
 					}
 # 					warn "Extend error: $@" if ($@);
 					$r	= Attean::Result->new( bindings => { $var => $val } )->join($r) if ($val);
@@ -179,7 +194,7 @@ supplied C<< $active_graph >>.
 			}
 
 			my ($child)			= @{ $algebra->children };
-			my $iter				= $self->evaluate( $child, $active_graph );
+			my $iter				= $self->evaluate( $child, $active_graph, %args ) ;
 			my @results;
 			while (my $r = $iter->next) {
 				my %extension;
@@ -243,7 +258,7 @@ supplied C<< $active_graph >>.
 		} elsif ($algebra->isa('Attean::Algebra::Filter')) {
 			# TODO: Merge adjacent filter evaluation so that they can share a row_cache hash (as is done for Extend above)
 			my $expr	= $algebra->expression;
-			my $iter	= $self->evaluate( $child, $active_graph );
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			return $iter->grep(sub {
 				my $t	= $expr_eval->evaluate_expression( $expr, shift, $active_graph, {} );
 # 				if ($@) { warn "Filter evaluation: $@\n" };
@@ -251,7 +266,7 @@ supplied C<< $active_graph >>.
 			});
 		} elsif ($algebra->isa('Attean::Algebra::OrderBy')) {
 			local($Attean::API::Binding::ALLOW_IRI_COMPARISON)	= 1;
-			my $iter	= $self->evaluate( $child, $active_graph );
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			my @rows	= $iter->elements;
 			my @cmps	= @{ $algebra->comparators };
 			my @exprs	= map { $_->expression } @cmps;
@@ -287,16 +302,25 @@ supplied C<< $active_graph >>.
 			my $client		= $self->new_service_client($endpoint, $silent);
 			return $client->query($sparql);
 		} elsif ($algebra->isa('Attean::Algebra::Graph')) {
+			my $available_graphs	= $args{ available_graphs };
+			my @graphs				= ref($available_graphs) ? @$available_graphs : $self->model->get_graphs()->elements;
+			my %graphs				= map { $_->value => 1 } @graphs;
+
 			my $graph	= $algebra->graph;
-			return $self->evaluate($child, $graph) if ($graph->does('Attean::API::Term'));
+			if ($graph->does('Attean::API::Term')) {
+				unless (exists $graphs{ $graph->value }) {
+					# graph does not exist in the dataset
+					return Attean::ListIterator->new(variables => [], values => [], item_type => 'Attean::API::Result');
+				}
+				return $self->evaluate( $child, $graph, %args );
+			}
 			
 			my @iters;
-			my $graphs	= $self->model->get_graphs();
 			my %vars;
-			while (my $g = $graphs->next) {
+			while (my $g = shift(@graphs)) {
 				next if ($g->value eq $self->default_graph->value);
 				my $gr	= Attean::Result->new( bindings => { $graph->value => $g } );
-				my $iter	= $self->evaluate($child, $g)->map(sub { if (my $result = shift->join($gr)) { return $result } else { return } });
+				my $iter	= $self->evaluate( $child, $g, %args ) ->map(sub { if (my $result = shift->join($gr)) { return $result } else { return } });
 				foreach my $v (@{ $iter->variables }) {
 					$vars{$v}++;
 				}
@@ -305,7 +329,7 @@ supplied C<< $active_graph >>.
 			return Attean::IteratorSequence->new( variables => [keys %vars], iterators => \@iters, item_type => 'Attean::API::Result' );
 		} elsif ($algebra->isa('Attean::Algebra::Group')) {
 			my @groupby	= @{ $algebra->groupby };
-			my $iter	= $self->evaluate($child, $active_graph);
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			my %groups;
 			while (my $r = $iter->next) {
 				my %vars;
@@ -323,7 +347,7 @@ supplied C<< $active_graph >>.
 				push(@{ $groups{$key}[1] }, $r);
 			}
 			my @keys	= keys %groups;
-			$groups{''}	= [Attean::Result->new( bindings => {} ), []] if (scalar(@keys) == 0);
+			$groups{''}	= [Attean::Result->new( bindings => {} ), []] if (scalar(@groupby) == 0 and scalar(@keys) == 0);
 			my $aggs	= $algebra->aggregates;
 			my @results;
 			my %vars;
@@ -343,11 +367,11 @@ supplied C<< $active_graph >>.
 			}
 			return Attean::ListIterator->new(variables => [keys %vars], values => \@results, item_type => 'Attean::API::Result');
 		} elsif ($algebra->isa('Attean::Algebra::Join')) {
-			my ($lhs, $rhs)	= map { $self->evaluate($_, $active_graph) } @children;
+			my ($lhs, $rhs)	= map { $self->evaluate( $_, $active_graph, %args )  } @children;
 			return $lhs->join($rhs);
 		} elsif ($algebra->isa('Attean::Algebra::LeftJoin')) {
 			my $expr	= $algebra->expression;
-			my ($lhs_iter, $rhs_iter)	= map { $self->evaluate($_, $active_graph) } @children;
+			my ($lhs_iter, $rhs_iter)	= map { $self->evaluate( $_, $active_graph, %args )  } @children;
 			my @rhs		= $rhs_iter->elements;
 			my @results;
 			my %vars	= map { $_ => 1 } (@{ $lhs_iter->variables }, @{ $rhs_iter->variables });
@@ -365,7 +389,7 @@ supplied C<< $active_graph >>.
 			}
 			return Attean::ListIterator->new( variables => [keys %vars], values => \@results, item_type => 'Attean::API::Result');
 		} elsif ($algebra->isa('Attean::Algebra::Minus')) {
-			my ($lhsi, $rhs)	= map { $self->evaluate($_, $active_graph) } @children;
+			my ($lhsi, $rhs)	= map { $self->evaluate( $_, $active_graph, %args )  } @children;
 			my @rhs				= $rhs->elements;
 			my @results;
 			while (my $lhs = $lhsi->next) {
@@ -407,33 +431,45 @@ supplied C<< $active_graph >>.
 			return $self->model->get_bindings( $s, $path->predicate, $o, $active_graph ) if ($path->isa('Attean::Algebra::PredicatePath'));
 			if ($path->isa('Attean::Algebra::InversePath')) {
 				my $path	= Attean::Algebra::Path->new( subject => $o, path => $child, object => $s );
-				return $self->evaluate( $path, $active_graph );
+				return $self->evaluate( $path, $active_graph, %args ) ;
 			} elsif ($path->isa('Attean::Algebra::AlternativePath')) {
 				my @children	= @{ $path->children };
 				my @algebras	= map { Attean::Algebra::Path->new( subject => $s, path => $_, object => $o ) } @children;
-				my @iters		= map { $self->evaluate($_, $active_graph) } @algebras;
+				my @iters		= map { $self->evaluate( $_, $active_graph, %args )  } @algebras;
 				return Attean::IteratorSequence->new( iterators => \@iters, item_type => $iters[0]->item_type, variables => [$algebra->in_scope_variables] );
 			} elsif ($path->isa('Attean::Algebra::NegatedPropertySet')) {
 				my $preds	= $path->predicates;
 				my %preds	= map { $_->value => 1 } @$preds;
-				my $filter	= $self->model->get_quads($s, undef, $o, $active_graph)->grep(sub {
-					my $q	= shift;
-					my $p	= $q->predicate;
-					return not exists $preds{ $p->value };
-				});
-				my %vars;
-				$vars{subject}	= $s->value if ($s->does('Attean::API::Variable'));
-				$vars{object}	= $o->value if ($o->does('Attean::API::Variable'));
-				return $filter->map(sub {
-					my $q	= shift;
-					return unless $q;
-					my %bindings	= map { $vars{$_} => $q->$_() } (keys %vars);
-					return Attean::Result->new( bindings => \%bindings );
-				}, 'Attean::API::Result', variables => [values %vars]);
+				my $rev	= $path->reversed;
+				if (scalar(@$rev)) {
+					# deconstruct
+					my $nps_fwd		= Attean::Algebra::NegatedPropertySet->new( predicates => $preds );
+					my $nps_rev		= Attean::Algebra::NegatedPropertySet->new( predicates => $rev );
+					my $inv			= Attean::Algebra::InversePath->new( children => [$nps_rev] );
+					my $alt			= Attean::Algebra::AlternativePath->new( children => [ $nps_fwd, $inv ] );
+					my $pp			= scalar(@$preds) ? $alt : $inv;
+					my $path		= Attean::Algebra::Path->new( path => $pp, subject => $s, object => $o );
+					return $self->evaluate( $path, $active_graph, %args ) ;
+				} else {
+					my $filter_fwd	= $self->model->get_quads($s, undef, $o, $active_graph)->grep(sub {
+						my $q	= shift;
+						my $p	= $q->predicate;
+						return not exists $preds{ $p->value };
+					});
+					my %vars;
+					$vars{subject}	= $s->value if ($s->does('Attean::API::Variable'));
+					$vars{object}	= $o->value if ($o->does('Attean::API::Variable'));
+					return $filter_fwd->map(sub {
+						my $q	= shift;
+						return unless $q;
+						my %bindings	= map { $vars{$_} => $q->$_() } (keys %vars);
+						return Attean::Result->new( bindings => \%bindings );
+					}, 'Attean::API::Result', variables => [values %vars]);
+				}
 			} elsif ($path->isa('Attean::Algebra::SequencePath')) {
 				if (scalar(@children) == 1) {
 					my $path	= Attean::Algebra::Path->new( subject => $s, path => $children[0], object => $o );
-					return $self->evaluate($path, $active_graph);
+					return $self->evaluate( $path, $active_graph, %args ) ;
 				} else {
 					my @paths;
 					my $first		= shift(@children);
@@ -458,11 +494,11 @@ supplied C<< $active_graph >>.
 				if ($s->does('Attean::API::TermOrTriple') and $o->does('Attean::API::Variable')) {
 					my $v	= {};
 					if ($path->isa('Attean::Algebra::ZeroOrMorePath')) {
-						$self->_ALP($active_graph, $s, $child, $v);
+						$self->_ALP($active_graph, $s, $child, $v, %args);
 					} else {
-						my $iter	= $self->_eval($active_graph, $s, $child);
+						my $iter	= $self->_eval($active_graph, $s, $child, %args);
 						while (my $n = $iter->next) {
-							$self->_ALP($active_graph, $n, $child, $v);
+							$self->_ALP($active_graph, $n, $child, $v, %args);
 						}
 					}
 					my @results	= map { Attean::Result->new( bindings => { $o->value => $_ } ) } (values %$v);
@@ -473,7 +509,7 @@ supplied C<< $active_graph >>.
 					while (my $t = $nodes->next) {
 						my $tr		= Attean::Result->new( bindings => { $s->value => $t } );
 						my $p		= Attean::Algebra::Path->new( subject => $t, path => $path, object => $o );
-						my $iter	= $self->evaluate($p, $active_graph);
+						my $iter	= $self->evaluate( $p, $active_graph, %args ) ;
 						while (my $r = $iter->next) {
 							push(@results, $r->join($tr));
 						}
@@ -481,12 +517,13 @@ supplied C<< $active_graph >>.
 					my %vars	= map { $_ => 1 } ($s->value, $o->value);
 					return Attean::ListIterator->new(variables => [keys %vars], values => \@results, item_type => 'Attean::API::Result');
 				} elsif ($s->does('Attean::API::Variable') and $o->does('Attean::API::TermOrTriple')) {
-					my $pp	= Attean::Algebra::InversePath->new( children => [$child] );
-					my $p	= Attean::Algebra::Path->new( subject => $o, path => $pp, object => $s );
-					return $self->evaluate($p, $active_graph);
+					my $pclass	= ref($path);
+					my $pp		= $pclass->new( children => [ Attean::Algebra::InversePath->new( children => [$child] ) ] );
+					my $p		= Attean::Algebra::Path->new( subject => $o, path => $pp, object => $s );
+					return $self->evaluate( $p, $active_graph, %args ) ;
 				} else { # Term ZeroOrMorePath(path) Term
 					my $v	= {};
-					$self->_ALP($active_graph, $s, $child, $v);
+					$self->_ALP($active_graph, $s, $child, $v, %args);
 					my @results;
 					foreach my $v (values %$v) {
 						return Attean::ListIterator->new(variables => [], values => [Attean::Result->new()], item_type => 'Attean::API::Result')
@@ -498,7 +535,7 @@ supplied C<< $active_graph >>.
 				my $path	= Attean::Algebra::Path->new( subject => $s, path => $child, object => $o );
 				my @iters;
 				my %seen;
-				push(@iters, $self->evaluate( $path, $active_graph )->grep(sub { return not($seen{shift->as_string}++); }));
+				push(@iters, $self->evaluate( $path, $active_graph, %args ) ->grep(sub { return not($seen{shift->as_string}++); }));
 				push(@iters, $self->_zeroLengthPath($s, $o, $active_graph));
 				my %vars;
 				foreach my $iter (@iters) {
@@ -508,7 +545,7 @@ supplied C<< $active_graph >>.
 			}
 			die "Unimplemented path type: $path";
 		} elsif ($algebra->isa('Attean::Algebra::Project')) {
-			my $iter	= $self->evaluate( $child, $active_graph );
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			my @vars	= map { $_->value } @{ $algebra->variables };
 			return $iter->map(sub {
 				my $r	= shift;
@@ -516,28 +553,29 @@ supplied C<< $active_graph >>.
 				return Attean::Result->new( bindings => $b );
 			}, undef, variables => \@vars); #->debug('Project result');
 		} elsif ($algebra->isa('Attean::Algebra::Slice')) {
-			my $iter	= $self->evaluate( $child, $active_graph );
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			$iter		= $iter->offset($algebra->offset) if ($algebra->offset > 0);
 			$iter		= $iter->limit($algebra->limit) if ($algebra->limit >= 0);
 			return $iter;
 		} elsif ($algebra->isa('Attean::Algebra::Union')) {
-			my ($lhs, $rhs)	= map { $self->evaluate($_, $active_graph) } @children;
+			my ($lhs, $rhs)	= map { $self->evaluate( $_, $active_graph, %args )  } @children;
 			return Attean::IteratorSequence->new(
 				iterators => [$lhs, $rhs],
 				item_type => 'Attean::API::Result',
 				variables => [$algebra->in_scope_variables]
 			);
 		} elsif ($algebra->isa('Attean::Algebra::Ask')) {
-			my $iter	= $self->evaluate($child, $active_graph);
+			my $iter	= $self->evaluate( $child, $active_graph, %args ) ;
 			my $result	= $iter->next;
 			return Attean::ListIterator->new(values => [$result ? Attean::Literal->true : Attean::Literal->false], item_type => 'Attean::API::Term');
 		} elsif ($algebra->isa('Attean::Algebra::Construct')) {
-			my $iter		= $self->evaluate($child, $active_graph);
+			my $iter		= $self->evaluate( $child, $active_graph, %args ) ;
 			my $patterns	= $algebra->triples;
-			use Data::Dumper;
 			my %seen;
 			return Attean::CodeIterator->new(
 				generator => sub {
+					my $bnode_mapper			= Attean::TermMap->uuid_blank_map;
+
 					my $r	= $iter->next;
 					return unless ($r);
 					my %mapping	= map { my $t = $r->value($_); $t ? ("?$_" => $t) : (); } ($r->variables);
@@ -548,10 +586,11 @@ supplied C<< $active_graph >>.
 							($_->does('Attean::API::TriplePattern'))
 								? $_->as_triple
 								: $_
-						} $p->apply_map($mapper)->values;
+						} $p->apply_map($bnode_mapper)->apply_map($mapper)->values;
 						unless (all { $_->does('Attean::API::TermOrTriple') } @terms) {
 							next PATTERN;
 						}
+
 						push(@triples, Attean::Triple->new(@terms));
 					}
 					return @triples;
@@ -588,12 +627,23 @@ appended to C<< @new_vars >> as it is created.
 		my $q				= $t->as_quad_pattern($active_graph);
 		my @values;
 		foreach my $v ($q->values) {
-			if (not($self->ground_blanks) and $v->does('Attean::API::Blank')) {
-				unless (exists $blanks->{$v->value}) {
-					$blanks->{$v->value}	= Attean::Variable->new();
-					push(@$new_vars, $blanks->{$v->value}->value);
+			if (not($self->ground_blanks)) {
+				if ($v->does('Attean::API::Blank')) {
+					unless (exists $blanks->{$v->value}) {
+						$blanks->{$v->value}	= Attean::Variable->new();
+						push(@$new_vars, $blanks->{$v->value}->value);
+					}
+					push(@values, $blanks->{$v->value});
+				} elsif ($v->does('Attean::API::TriplePattern')) {
+					my $tt	= [$v];
+					# The replace_blanks_with_variables logic probably belongs somewhere more appropriate
+					# for shared use between the planner and this evaluator, but for now we just call into
+					# the planner.
+					my $changed	= Attean::QueryPlanner->replace_blanks_with_variables($blanks, $tt);
+					push(@values, $tt->[0]);
+				} else {
+					push(@values, $v);
 				}
-				push(@values, $blanks->{$v->value});
 			} else {
 				push(@values, $v);
 			}
@@ -607,12 +657,13 @@ appended to C<< @new_vars >> as it is created.
 		my $term	= shift;
 		my $path	= shift;
 		my $v		= shift;
+		my %args	= @_;
 		return if (exists $v->{ $term->as_string });
 		$v->{ $term->as_string }	= $term;
 		
-		my $iter	= $self->_eval($graph, $term, $path);
+		my $iter	= $self->_eval($graph, $term, $path, %args);
 		while (my $n = $iter->next) {
-			$self->_ALP($graph, $n, $path, $v);
+			$self->_ALP($graph, $n, $path, $v, %args);
 		}
 	}
 	
@@ -621,8 +672,9 @@ appended to C<< @new_vars >> as it is created.
 		my $graph	= shift;
 		my $term	= shift;
 		my $path	= shift;
+		my %args	= @_;
 		my $pp		= Attean::Algebra::Path->new( subject => $term, path => $path, object => variable('o') );
-		my $iter	= $self->evaluate($pp, $graph);
+		my $iter	= $self->evaluate( $pp, $graph, %args ) ;
 		my $terms	= $iter->map(sub { shift->value('o') }, 'Attean::API::Term');
 		my %seen;
 		return $terms->grep(sub { not $seen{ shift->as_string }++ });
@@ -682,10 +734,10 @@ the SPARQL Protocol against the given endpoint.
 	}
 }
 
-package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
+package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.040 {
 	use Moo;
 	use Attean::RDF;
-	use Scalar::Util qw(blessed);
+	use Scalar::Util qw(blessed looks_like_number);
 	use Types::Standard qw(InstanceOf);
 	use URI::Escape qw(uri_escape_utf8);
 	use Encode qw(encode);
@@ -895,6 +947,19 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 						} else {
 							return (I18N::LangTags::is_dialect_of( $lang, $match )) ? $true : $false;
 						}
+					} elsif ($func eq 'HASLANG') {
+						my ($string)	= @operands;
+						return $false unless ($string->does('Attean::API::Literal'));
+						return $string->has_language ? $true : $false;
+					} elsif ($func eq 'HASLANGDIR') {
+						my ($string)	= @operands;
+						return $false unless ($string->does('Attean::API::Literal'));
+						return $string->has_base_dir ? $true : $false;
+					} elsif ($func eq 'LANGDIR') {
+						my ($string)	= @operands;
+						die unless ($string->does('Attean::API::Literal'));
+						my $dir	= $string->base_dir // '';
+						return Attean::Literal->new(value => $dir);
 					} elsif ($func eq 'DATATYPE') {
 						return $operands[0]->datatype;
 					} elsif ($func eq 'BOUND') {
@@ -909,35 +974,32 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 					} elsif ($func eq 'ROUND') {
 						return Attean::Literal->new( value => sprintf('%.0f', (0.000000000000001 + $operands[0]->numeric_value)), $operands[0]->construct_args );
 					} elsif ($func eq 'CONCAT') {
-						my $all_lang	= 1;
-						my $all_str		= 1;
 						my $lang;
+						my $base_dir;
 						if (scalar(@operands) == 0) {
 							return Attean::Literal->new(value => '');
 						}
+						my $lang_key	= $operands[0]->lang_dir();
 						foreach my $n (@operands) {
 							die "CONCAT called with a non-literal argument" unless ($n->does('Attean::API::Literal'));
-							if ($n->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string') {
+							if ($n->language) {
+							} elsif ($n->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string') {
 								die "CONCAT called with a datatyped-literal other than xsd:string";
-							} elsif ($n->language) {
-								$all_str	= 0;
-								if (defined($lang) and $lang ne $n->language) {
-									$all_lang	= 0;
-								} else {
-									$lang	= $n->language;
-								}
-							} else {
-								$all_lang	= 0;
-								$all_str	= 0;
+							}
+							my $new_lang_key	= $n->lang_dir();
+							if ($new_lang_key ne $lang_key) {
+								$lang_key	= '';
 							}
 						}
-						my %strtype;
-						if ($all_lang and $lang) {
-							$strtype{language}	= $lang;
-						} elsif ($all_str) {
-							$strtype{datatype}	= 'http://www.w3.org/2001/XMLSchema#string'
+						my %args;
+						if ($lang_key) {
+							my ($lang, $dir)	= split('--', $lang_key);
+							$args{language}		= $lang;
+							if ($dir) {
+								$args{base_dir}	= $dir;
+							}
 						}
-						return Attean::Literal->new( value => join('', map { $_->value } @operands), %strtype );
+						return Attean::Literal->new( value => join('', map { $_->value } @operands), %args );
 					} elsif ($func eq 'SUBSTR') {
 						my $str		= shift(@operands);
 						my @args	= map { $_->numeric_value } @operands;
@@ -950,8 +1012,10 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 						die "TypeError: REPLACE called without a literal arg1 term" unless (blessed($node) and $node->does('Attean::API::Literal'));
 						die "TypeError: REPLACE called without a literal arg2 term" unless (blessed($pat) and $pat->does('Attean::API::Literal'));
 						die "TypeError: REPLACE called without a literal arg3 term" unless (blessed($rep) and $rep->does('Attean::API::Literal'));
-						die "TypeError: REPLACE called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string');
+						die "TypeError: REPLACE called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string' and $node->datatype->value ne 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
 						my ($value, $pattern, $replace)	= map { $_->value } @operands;
+						my $flags_term	= $operands[3];
+						my $flags		= blessed($flags_term) ? $flags_term->value : '';
 						die "EvaluationError: REPLACE called with unsafe ?{} match pattern" if (index($pattern, '(?{') != -1 or index($pattern, '(??{') != -1);
 						die "EvaluationError: REPLACE called with unsafe ?{} replace pattern" if (index($replace, '(?{') != -1 or index($replace, '(??{') != -1);
 	
@@ -960,6 +1024,11 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 						$replace	=~ s/"/\\"/g;
 						$replace	= qq["$replace"];
 						no warnings 'uninitialized';
+						
+						if ($flags eq 'i') {
+							$pattern	= '(?i)' . $pattern;
+						}
+						
 						$value	=~ s/$pattern/"$replace"/eeg;
 						return Attean::Literal->new(value => $value, $node->construct_args);
 					} elsif ($func =~ /^[UL]CASE$/) {
@@ -984,7 +1053,7 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 
 						die "$func called without a literal arg1 term" unless (blessed($node) and $node->does('Attean::API::Literal'));
 						die "$func called without a literal arg2 term" unless (blessed($substr) and $substr->does('Attean::API::Literal'));
-						die "$func called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string');
+						die "$func called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string' and $node->datatype->value ne 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
 
 						my $lhs_simple	= (not($node->language) and ($node->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string'));
 						my $rhs_simple	= (not($substr->language) and ($substr->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string'));
@@ -1074,7 +1143,18 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 						my @values	= map { $_->value } @operands;
 						die "TypeError: STRLANG must be called with two plain literals" unless (blessed($str) and $str->does('Attean::API::Literal') and blessed($lang) and $lang->does('Attean::API::Literal'));
 						die "TypeError: STRLANG not called with a simple literal" unless ($str->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string' and not($str->language));
+						die unless (length($lang->value));
 						return Attean::Literal->new( value => $values[0], language => $values[1] );
+					} elsif ($func eq 'STRLANGDIR') {
+						my ($term, $lang, $dir)	= @operands;
+						die unless ($term->does('Attean::API::Literal'));
+						die unless ($lang->does('Attean::API::Literal'));
+						die unless ($dir->does('Attean::API::Literal'));
+						die unless ($term->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#string>);
+						die unless ($lang->value);
+						die unless ($dir->value =~ /^(ltr|rtl)$/);
+						my $v	= Attean::Literal->new(value => $term->value, language => $lang->value, base_dir => $dir->value);
+						return $v;
 					} elsif ($func eq 'STRDT') {
 						die "TypeError: STRDT" unless ($operands[0]->does('Attean::API::Literal') and not($operands[0]->language));
 						if (my $dt = $operands[0]->datatype) {
@@ -1097,11 +1177,39 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 							my $ok	= ($a->value eq $b->value);
 							return $ok ? $true : $false;
 						}
+					} elsif ($func eq 'TRIPLE') {
+						my ($s, $p, $o)	= @operands;
+						unless ($s->does('Attean::API::BlankOrIRI')) {
+							die 'TRIPLE() constructor failed with bad subject type';
+						}
+						unless ($p->does('Attean::API::IRI')) {
+							die 'TRIPLE() constructor failed with bad predicate type';
+						}
+						unless ($o->does('Attean::API::TermOrTriple')) {
+							die 'TRIPLE() constructor failed with bad object type';
+						}
+						return Attean::Triple->new($s, $p, $o);
 					} elsif ($func =~ /^IS([UI]RI|BLANK|LITERAL|NUMERIC|TRIPLE)$/) {
 						return $operands[0]->does("Attean::API::$type_roles{$1}") ? $true : $false;
 					} elsif ($func eq 'REGEX') {
-						my ($value, $pattern)	= map { $_->value } @operands;
-						return ($value =~ /$pattern/) ? $true : $false;
+						my ($value, $pattern, $flags)	= map { $_->value } @operands;
+						unless ($operands[0]->does('Attean::API::Literal')) {
+							die 'REGEX called with non-literal value';
+						}
+						unless ($operands[1]->does('Attean::API::Literal')) {
+							die 'REGEX called with non-literal pattern';
+						}
+						my $flag_str	= '';
+						if (defined $flags) {
+							$flag_str	.= 'i' if ($flags =~ /i/);
+							$flag_str	.= 's' if ($flags =~ /s/);
+							$flag_str	.= 'm' if ($flags =~ /m/);
+							$flag_str	.= 'x' if ($flags =~ /x/);
+							if ($flags =~ /q/) {
+								$pattern	= quotemeta($pattern);
+							}
+						}
+						return ($value =~ /(?${flag_str}:$pattern)/) ? $true : $false;
 					}
 					die "Unimplemented FunctionExpression evaluation: " . $expr->operator;
 				}
@@ -1166,7 +1274,7 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 							}
 						}
 						if ($agg eq 'AVG') {
-							$sum	= not($count) ? undef : Attean::Literal->new( value => ($sum->numeric_value / $count), datatype => $sum->binary_promotion_type(Attean::Literal->integer($count), '/') );
+							$sum	= not($count) ? Attean::Literal->integer(0) : Attean::Literal->new( value => ($sum->numeric_value / $count), datatype => $sum->binary_promotion_type(Attean::Literal->integer($count), '/') );
 						}
 						return $sum;
 					};
@@ -1282,12 +1390,106 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.039 {
 			my ($child)	= @{ $expr->children };
 			my $impl	= $self->impl( $child, $active_graph );
 			my $type	= $expr->datatype;
+			my $datatype	= $expr->datatype->value;
 			return sub {
 				my ($r, %args)	= @_;
 				my $term	= $impl->($r, %args);
+
+				# TODO: the code below duplicates code in Attean::Plan::Extend. It should be refactored.
 				# TODO: reformat syntax for xsd:double
+				if ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#string$>) {
+					my $value	= $term->value;
+					if ($term->does('Attean::API::IRI')) {
+						return Attean::Literal->new(value => $term->value);
+					} elsif ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
+						my $v	= ($value eq 'true' or $value eq '1') ? 'true' : 'false';
+						return Attean::Literal->new(value => $v);
+					} elsif ($term->does('Attean::API::NumericLiteral')) {
+						my $v	= $term->numeric_value();
+						if ($v == int($v)) {
+							return Attean::Literal->new(value => int($v));
+						}
+					}
+					
+					return Attean::Literal->new(value => $value);
+				} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#(integer|float|double|decimal)>) {
+					my $value	= $term->value;
+					my $num;
+					if ($datatype eq 'http://www.w3.org/2001/XMLSchema#integer') {
+						if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
+							$value	= ($value eq 'true' or $value eq '1') ? '1' : '0';
+						} elsif ($term->does('Attean::API::NumericLiteral')) {
+							my $v	= $term->numeric_value();
+							$v		=~ s/[.].*$//;
+							$value	= int($v);
+						} elsif ($value =~ /^[-+]\d+$/) {
+							my ($v) = "$value";
+							$v		=~ s/[.].*$//;
+							$value	= int($v);
+						}
+						$num	= $value;
+					} elsif ($datatype eq 'http://www.w3.org/2001/XMLSchema#decimal') {
+						if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
+							$value	= ($value eq 'true') ? '1' : '0';
+						} elsif ($term->does('Attean::API::NumericLiteral')) {
+							$value	= $term->numeric_value;
+						} elsif (looks_like_number($value)) {
+							if ($value =~ /[eE]/) {	# double
+								die "cannot cast to xsd:decimal as precision would be lost";
+							}
+							$value = +$value;
+						}
+						$num	= "$value";
+						$num	=~ s/[.]0+$/.0/;
+						$num	=~ s/[.](\d+)0*$/.$1/;
+					} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#(float|double)$>) {
+						my $typename	= $1;
+						if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
+							$value	= ($value eq 'true') ? '1.0' : '0.0';
+						} elsif ($term->does('Attean::API::NumericLiteral')) {
+							# no-op
+						} elsif (looks_like_number($value)) {
+							$value	= +$value;
+						} elsif ($value =~ /^(.*)[eE][-+]?\d+$/) { #} and looks_like_number($1)) {
+							$value	= +$value;
+						} else {
+							die "cannot cast unrecognized value '$value' to xsd:$typename";
+						}
+						$num	= sprintf("%e", $value);
+					}
+					my $c	= Attean::Literal->new(value => $num, datatype => $expr->datatype);
+					if (my $term = $c->canonicalized_term_strict()) {
+						return $term;
+					} else {
+						die "Term value is not a valid lexical form for $datatype";
+					}
+				} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#boolean$>) {
+					if ($term->does('Attean::API::NumericLiteral')) {
+						my $value	= $term->numeric_value;
+						return ($value == 0) ? Attean::Literal->false : Attean::Literal->true;
+					} else {
+						my $value	= $term->value;
+						if ($value =~ m/^(true|false|0|1)$/) {
+							return ($value eq 'true' or $value eq '1') ? Attean::Literal->true : Attean::Literal->false;
+						} else {
+							die "Bad lexical form for xsd:boolean: '$value'";
+						}
+					}
+				} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#dateTime$>) {
+					my $value	= $term->value;
+					my $c	= Attean::Literal->new(value => $value, datatype => $expr->datatype);
+					if ($c->does('Attean::API::DateTimeLiteral') and $c->datetime) {
+						return $c;
+					} else {
+						die "Bad lexical form for xsd:dateTime: '$value'";
+					}
+				}
+
+
 				my $cast	= Attean::Literal->new( value => $term->value, datatype => $type );
-				return $cast->canonicalized_term_strict() if ($cast->does('Attean::API::CanonicalizingLiteral'));
+				if ($cast->does('Attean::API::CanonicalizingLiteral')) {
+					return $cast->canonicalized_term_strict();
+				}
 				return $cast;
 			}
 		} else {
@@ -1317,7 +1519,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

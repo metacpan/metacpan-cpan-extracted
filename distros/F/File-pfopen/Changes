@@ -1,5 +1,27 @@
 Revision history for File-pfopen
 
+0.04	Mon Oct 26 03:01:46 PM EDT 2026
+	Separate directories with the platform's path separator
+		($Config{path_sep}), so ';' on Windows, allowing drive letters
+	The directory list can now also be an array reference
+	Fixed cache key collisions between different arguments
+	Fixed the mode example in the documentation
+	Croak on a missing path or prefix, a path that is a non-array reference,
+		and on non-file modes such as '-|', which would run the found file
+	Never return a directory, either from a search or from the cache
+	Ignore undefined and empty directories, and names containing NUL,
+		instead of giving warnings
+	Doesn't change $!
+	Taint mode: a call with tainted arguments never uses or adds to the
+		remembered results, which could let a tainted write succeed,
+		or make an untainted one die
+	Rewrote the documentation: more examples, common pitfalls, encoding,
+		API and formal specifications, and a state diagram
+	Added t/function.t, t/unit.t and t/taint.t
+	t/function.t and t/unit.t are skipped if their test modules, which need
+		a newer Perl, aren't installed
+	Added SECURITY.md, the provides metadata and the develop prerequisites
+
 0.03	Wed Nov  6 08:17:35 EST 2024
 	Refactor
 	Use Test::DescribeMe to simplify tests

@@ -1,6 +1,6 @@
 package Dancer2::Serializer::JSON;
 # ABSTRACT: Serializer for handling JSON data
-$Dancer2::Serializer::JSON::VERSION = '2.2.2';
+$Dancer2::Serializer::JSON::VERSION = '2.3.0';
 use Moo;
 use Ref::Util qw< is_plain_arrayref is_plain_hashref >;
 use JSON::MaybeXS ();
@@ -71,7 +71,19 @@ sub deserialize {
     $options ||= {};
     $options->{utf8} = 1;
     delete $options->{strict_utf8};
-    JSON::MaybeXS->new($options)->decode($entity);
+    my $data;
+    eval {
+        $data = JSON::MaybeXS->new($options)->decode($entity);
+        1;
+    } or do {
+        my $error = $@ || 'Zombie Error';
+        # remove any "at our/source/code.pm line 67." from end of error
+        # and rethrow.
+        # Note the \S+ won't match against the heinous crime using paths with spaces
+        $error =~ s/ at \S+ line \d+\.$//;
+        die $error;
+    };
+    return $data;
 }
 
 my $HAS_UNICODE_UTF8 = eval { require Unicode::UTF8; 1; };
@@ -94,27 +106,19 @@ sub _ensure_characters {
     return $entity if !defined $entity;
     return _ensure_scalar( $entity, $strict_utf8, $self ) if !ref $entity;
 
+    # Build new containers rather than writing decoded values back into the
+    # caller's. The entity belongs to the application, which may well hold on
+    # to it and serialize it again. GH #1863.
     if ( is_plain_arrayref($entity) ) {
-        for my $i ( 0 .. $#{$entity} ) {
-            $entity->[$i] = _ensure_characters( $entity->[$i], $strict_utf8, $self );
-        }
-        return $entity;
+        return [ map { _ensure_characters( $_, $strict_utf8, $self ) }
+                 @{$entity} ];
     }
 
     if ( is_plain_hashref($entity) ) {
         my %ret;
         for my $key ( keys %{$entity} ) {
-            my $value = $entity->{$key};
-            my $decoded_key = _ensure_scalar( $key, $strict_utf8, $self );
-            my $decoded_value =
-              _ensure_characters( $value, $strict_utf8, $self );
-
-            if ( $decoded_key ne $key ) {
-                delete $entity->{$key};
-                $ret{$decoded_key} = $decoded_value;
-            } else {
-                $ret{$key} = $decoded_value;
-            }
+            $ret{ _ensure_scalar( $key, $strict_utf8, $self ) } =
+              _ensure_characters( $entity->{$key}, $strict_utf8, $self );
         }
         return \%ret;
     }
@@ -126,7 +130,14 @@ sub _ensure_scalar {
     my ( $value, $strict_utf8, $self ) = @_;
 
     return $value if utf8::is_utf8($value);
-    return $value if $value !~ /[\x80-\xFF]/;
+
+    # Probe a throwaway copy, not $value itself. Matching a regex against a
+    # number gives that SV a string form as well as its numeric one, and
+    # backends that decide "number or string?" by looking at the SV's flags
+    # -- JSON::XS, and JSON::PP before 2.97 -- then encode it as a string, so
+    # 42 comes back out as "42". GH #1861.
+    my $probe = $value;
+    return $value if $probe !~ /[\x80-\xFF]/;
     return _decode_utf8($value) if _valid_utf8($value);
 
     _invalid_utf8( $strict_utf8, $self );
@@ -161,7 +172,7 @@ Dancer2::Serializer::JSON - Serializer for handling JSON data
 
 =head1 VERSION
 
-version 2.2.2
+version 2.3.0
 
 =head1 DESCRIPTION
 

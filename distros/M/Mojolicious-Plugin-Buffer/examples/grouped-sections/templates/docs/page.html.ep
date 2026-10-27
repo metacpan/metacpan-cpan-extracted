@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><%= $title %></title>
+  </head>
+  <body>
+    <!-- This comment and the indentation are what optimise_content removes -->
+    <div class="card">
+      <h1>  <%= $title %>  </h1>
+      <p>
+        Every page in this section is static, so a single declaration on the
+        under route optimises the whole namespace.  There is nothing here that
+        has to survive byte for byte, so the white space can go.
+      </p>
+      <p>
+        <%= link_to 'Introduction' => 'docs_intro' %> |
+        <%= link_to 'Installation' => 'docs_install' %> |
+        <%= link_to 'app.css' => '/assets/app.css' %>
+      </p>
+    </div>
+  </body>
+</html>

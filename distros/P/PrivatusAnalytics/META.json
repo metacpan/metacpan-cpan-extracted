@@ -1,0 +1,109 @@
+{
+   "abstract" : "add the cookieless Privatus Analytics script to Perl web apps",
+   "author" : [
+      "Two Phase LLC <james@privatusanalytics.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PrivatusAnalytics",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Dancer2" : "0.400000",
+            "Mojolicious" : "9.0",
+            "Plack" : "1.0047"
+         },
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "JSON::PP" : "2.27",
+            "Scalar::Util" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Dancer2" : "0.400000",
+            "HTTP::Request::Common" : "0",
+            "Mojolicious" : "9.0",
+            "Plack" : "1.0047"
+         },
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::PrivatusAnalytics" : {
+         "file" : "lib/Dancer2/Plugin/PrivatusAnalytics.pm",
+         "version" : "v1.0.0"
+      },
+      "Mojolicious::Plugin::PrivatusAnalytics" : {
+         "file" : "lib/Mojolicious/Plugin/PrivatusAnalytics.pm",
+         "version" : "v1.0.0"
+      },
+      "Plack::Middleware::PrivatusAnalytics" : {
+         "file" : "lib/Plack/Middleware/PrivatusAnalytics.pm",
+         "version" : "v1.0.0"
+      },
+      "PrivatusAnalytics" : {
+         "file" : "lib/PrivatusAnalytics.pm",
+         "version" : "v1.0.0"
+      },
+      "PrivatusAnalytics::Attributes" : {
+         "file" : "lib/PrivatusAnalytics/Attributes.pm",
+         "version" : "v1.0.0"
+      },
+      "PrivatusAnalytics::PageProps" : {
+         "file" : "lib/PrivatusAnalytics/PageProps.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Privatus-Analytics/perl/issues"
+      },
+      "homepage" : "https://privatusanalytics.com",
+      "license" : [
+         "https://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Privatus-Analytics/perl.git",
+         "web" : "https://github.com/Privatus-Analytics/perl"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

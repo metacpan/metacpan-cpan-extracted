@@ -4,6 +4,14 @@
       "App::Greple::xlate - modul de suport pentru traducere pentru Greple\n"
    ],
    [
+      "To use GPT-6 Astra:\n",
+      "Pentru a utiliza GPT-6 Astra:\n"
+   ],
+   [
+      "If C<llm models> does not list C<gpt-6-astra>, see the model registration instructions in L<App::Greple::xlate::llm::gpt6>.\n",
+      "Dacă  nu menționeazăC<llm models> C<gpt-6-astra>, consultați instrucțiunile de înregistrare a modelului din L<App::Greple::xlate::llm::gpt6>.\n"
+   ],
+   [
       "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.6 Terra (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
       "B<Greple> B<xlate> modulul găsește blocurile de text dorite și le înlocuiește cu textul tradus. Motorul principal este GPT-5.6 Terra (F<llm/gpt5.pm>), care apelează comanda L<llm|https://llm.datasette.io/>; sunt incluse, de asemenea, DeepL (F<deepl.pm>) și motoarele vechi bazate pe B<gpty>.\n"
    ],
@@ -144,6 +152,10 @@
       "În acest moment, sunt disponibile următoarele motoare\n"
    ],
    [
+      "L<App::Greple::xlate::llm::gpt6> for model registration)\n",
+      "L<App::Greple::xlate::llm::gpt6> (pentru înregistrarea modelului)\n"
+   ],
+   [
       "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
       "Modulele motorului sunt căutate mai întâi în spațiile de nume din backend (C<llm>, apoi C<gpty>), apoi direct sub C<App::Greple::xlate>. Astfel, C<gpt5> încarcă C<App::Greple::xlate::llm::gpt5>, care apelează comanda C<llm>, în timp ce C<gpt4o> recurge la C<App::Greple::xlate::gpty::gpt4o>. Utilizați C<--xlate-setopt backend=gpty> pentru a forța un backend specific.\n"
    ],
@@ -216,8 +228,8 @@
       "Setați această valoare la 1 dacă doriți să traduceți un rând pe rând. Această opțiune are prioritate față de opțiunea C<--xlate-maxlen>.\n"
    ],
    [
-      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> engine, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
-      "Specificați o solicitare personalizată care să fie trimisă motorului de traducere. Această opțiune este disponibilă pentru motoarele LLM (C<gpt3>, C<gpt4o>, C<gpt5>), dar nu și pentru DeepL. Puteți personaliza comportamentul traducerii oferind instrucțiuni specifice modelului de IA. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă. Pentru motorul C<gpt5> bazat pe LLM, documentul este furnizat separat sub forma unei solicitări JSON al cărei element C<input> reprezintă matricea care urmează să fie tradusă, iar elementul opțional C<context> conține date de referință. O instrucțiune fixă care tratează acești membri ca date ale documentului, nu ca comenzi, este adăugată chiar și atunci când se utilizează o solicitare personalizată.\n"
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
+      "Specificați o solicitare personalizată care să fie trimisă motorului de traducere. Această opțiune este disponibilă pentru motoarele LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>), dar nu și pentru DeepL. Puteți personaliza comportamentul traducerii oferind instrucțiuni specifice modelului de IA. Dacă solicitarea conține C<%s>, acesta va fi înlocuit cu numele limbii țintă. Pentru motoarele  șiC<gpt5>  bazate pe LLMC<gpt6>, documentul este furnizat separat sub forma unei cereri JSON al cărei C<input>element  reprezintă matricea de tradus, iar C<context>elementul opțional  conține date de referință. O instrucțiune fixă care tratează acești membri ca date ale documentului, nu ca comenzi, este adăugată chiar și atunci când se utilizează o solicitare personalizată.\n"
    ],
    [
       "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",

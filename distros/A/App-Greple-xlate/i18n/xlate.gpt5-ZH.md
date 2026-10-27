@@ -8,9 +8,15 @@ App::Greple::xlate - greple 的翻译支持模块
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+使用 GPT-6 Astra：
+
+    xlate -e gpt6 -t JA file.txt
+
+如果 `llm models` 未列出 `gpt-6-astra`，请参阅 [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) 中的模型注册说明。
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Version 2.02
 
     目前可用的引擎如下所示
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) 用于模型注册）
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Version 2.02
 
 - **--xlate-prompt**=_text_
 
-    指定要发送给翻译引擎的自定义提示。此选项适用于 LLM 引擎（`gpt3`、`gpt4o`、`gpt5`），但不适用于 DeepL。你可以通过向 AI 模型提供特定指令来自定义翻译行为。如果提示包含 `%s`，它将被替换为目标语言名称。对于由 LLM 支持的 `gpt5` 引擎，文档会作为单独的 JSON 请求提供，其中的 `input` 成员是要翻译的数组，可选的 `context` 成员包含参考数据。即使使用自定义提示，也会附加一条固定指令，将这些成员视为文档数据而非命令。
+    指定要发送给翻译引擎的自定义提示。此选项适用于 LLM 引擎（`gpt3`、`gpt4o`、`gpt5`、`gpt6`），但不适用于 DeepL。你可以通过向 AI 模型提供特定指令来自定义翻译行为。如果提示包含 `%s`，它将被替换为目标语言名称。对于由 LLM 支持的 `gpt5` 和 `gpt6` 引擎，文档会作为单独的 JSON 请求提供，其中的 `input` 成员是要翻译的数组，可选的 `context` 成员包含参考数据。即使使用自定义提示，也会附加一条固定指令，将这些成员视为文档数据而非命令。
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Version 2.02
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     重新翻译已更改的块时，作为参考上下文传递的周边已翻译块数量（默认 2）。上下文还包括更改区域周围的原始源文本（标题、列表结构、图注），以及在可用时从缓存中恢复的更改文本的先前版本，以便保留未更改的措辞。设为 0 可完全禁用上下文感知翻译。请注意，每个更改区域都会在其自己的 API 调用中翻译，并且上下文可能会向 JSON 用户请求添加最多约 8000 个字符，因此上下文感知翻译会以一些额外成本换取一致性。源自文档的上下文不会放入系统提示中。
 
 - **--xlate-cache-seed**=_file_

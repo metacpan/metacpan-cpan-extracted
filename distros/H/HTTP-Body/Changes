@@ -1,6 +1,49 @@
 This file documents the revision history for Perl extension HTTP::Body.
 
+1.24      2026-10-26 18:28:01+01:00 Europe/Berlin
+	- SECURITY, CVE-2026-116131: urlencoded bodies are limited to
+	  $HTTP::Body::UrlEncoded::max_params fields and multipart bodies to
+	  $HTTP::Body::MultiPart::max_parts parts (1000 each); reported and
+	  patched by CPANSec
+	- SECURITY, CVE-2026-116132: the temporary file of an upload that is
+	  still incomplete at DESTROY-time is now always deleted; reported and
+	  patched by CPANSec (also fixes RT#84004)
+	- SECURITY, CVE-2026-116133: a multipart body without a boundary or with
+	  a malformed delimiter line no longer takes quadratic time; a malformed
+	  delimiter line now croaks, and padding or an epilogue after the close
+	  delimiter is accepted; reported and patched by CPANSec
+	- SECURITY, CVE-2026-116134: a multipart part's header block is limited
+	  to $HTTP::Body::MultiPart::max_header_size bytes (32768) and
+	  $HTTP::Body::MultiPart::max_header_lines lines (100); reported and
+	  patched by CPANSec
+	- SECURITY, CVE-2026-116135: mixed-case percent escapes (e.g. %aB) in
+	  urlencoded bodies are decoded instead of being dropped; reported and
+	  patched by CPANSec
+	- SECURITY, CVE-2026-116285: the chunk size line of a chunked body is
+	  matched in linear instead of quadratic time
+	- SECURITY, CVE-2026-116531: a chunked body is now framed independently
+	  of where the reads feeding add() fall; a read that split a chunk could
+	  leave the parser never reaching 'done', hanging a server that reads
+	  until done
+	- INCOMPATIBLE: add() now croaks when one of the new limits is exceeded.
+	  Raise the variable, or set it to 0 to disable that limit, if your
+	  forms need more. See NOTES in HTTP::Body.
+	- RT#105021: temp-file write errors in MultiPart and OctetStream now
+	  croak instead of silently truncating the stored body
+	- RT#123615: a NUL byte in a multipart filename is stripped so it cannot
+	  truncate a path handed on downstream
+	- Moved repository from Shadowcat git to GitHub (libwww-perl/HTTP-Body)
+	- Updated all metadata resources to point to GitHub
+	- Fixed prerequisites: moved Digest::MD5 to test deps, changed HTTP::Headers to HTTP::Message
+	- Added README.md for GitHub
+	- Updated support section in documentation
+	- Moved the POD, POD coverage and Perl::Critic tests to xt/release, so
+	  they run on every release instead of being skipped
+
 1.23      2024-03-30 04:27:56+01:00 Europe/Berlin
+	- Changing default behavior of upload handling to stop taking over the upload extension
+	- Adding configuration options for changing this behavior back or add custom File::Temp arguments
+	- Updating documentation.
 
 1.22      2015-01-29 04:51:51+01:00 Europe/Berlin
         - Fix for the fix..... don't ask

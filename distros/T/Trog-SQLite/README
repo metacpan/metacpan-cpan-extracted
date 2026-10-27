@@ -1,5 +1,5 @@
 This archive contains the distribution Trog-SQLite,
-version 0.004:
+version 0.005:
 
   An SQLite handle with its schema applied, its updates run, and its pragmas set
 

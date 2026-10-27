@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+########################################################################
+# install test symlinks for one group derived from tests.yaml.
+# group name is taken from $0 (e.g. 20-use.inst => group '20-use').
+########################################################################
+
+use v5.40;
+
+use File::Basename        qw( basename dirname );
+use File::Path            qw( make_path        );
+use File::Spec::Functions qw( abs2rel catfile rel2abs );
+use YAML::Tiny;
+
+########################################################################
+
+my $group   = basename $0, '.inst';
+my $unit_d  = rel2abs dirname $0;           # t/bin/install-tests.d/
+my $bin_d   = dirname $unit_d;              # t/bin/
+my $test_d  = dirname $bin_d;              # t/
+my $yaml_f  = catfile $test_d, 'etc', 'tests.yaml';
+my $stub    = catfile $unit_d, '_stub_t';
+
+my $all     = YAML::Tiny->read( $yaml_f )
+or die "Cannot read '$yaml_f': $!";
+
+my $tests   = $all->[0]{ $group }
+or die "No test group '$group' in '$yaml_f'";
+
+my $dest_d  = catfile $test_d, $group;
+
+make_path $dest_d;
+
+########################################################################
+# remove stale .t files
+########################################################################
+
+for my $old ( glob catfile( $dest_d, '*.t' ) )
+{
+    unlink $old
+    or die "unlink '$old': $!";
+
+    say "Removed: $old";
+}
+
+########################################################################
+# create relative symlinks for each test in this group
+########################################################################
+
+my $rel_stub = abs2rel $stub, $dest_d;
+
+for my $test ( sort keys %$tests )
+{
+    my $link = catfile $dest_d, "$test.t";
+
+    symlink $rel_stub, $link
+    or die "symlink '$rel_stub' -> '$link': $!";
+
+    say "$group/$test";
+}

@@ -10,9 +10,15 @@ App::Greple::xlate - modul de suport pentru traducere pentru greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Pentru a utiliza GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Dacă C<llm models> nu listează C<gpt-6-astra>, consultați instrucțiunile de înregistrare a modelului în L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ Specifică motorul de traducere care va fi utilizat.
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> pentru înregistrarea modelului)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Setați această valoare la 1 dacă doriți să traduceți câte o linie pe rân
 
 =item B<--xlate-prompt>=I<text>
 
-Specificați un prompt personalizat care să fie trimis motorului de traducere. Această opțiune este disponibilă pentru motoarele LLM (C<gpt3>, C<gpt4o>, C<gpt5>), dar nu pentru DeepL. Puteți personaliza comportamentul traducerii furnizând instrucțiuni specifice modelului AI. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă. Pentru motorul C<gpt5> bazat pe llm, documentul este furnizat separat ca o cerere JSON al cărei membru C<input> este matricea de tradus și al cărei membru opțional C<context> conține date de referință. O instrucțiune fixă care tratează acești membri ca date ale documentului, nu ca comenzi, este adăugată chiar și atunci când se utilizează un prompt personalizat.
+Specificați un prompt personalizat care să fie trimis motorului de traducere. Această opțiune este disponibilă pentru motoarele LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>), dar nu pentru DeepL. Puteți personaliza comportamentul traducerii furnizând instrucțiuni specifice modelului AI. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă. Pentru motoarele C<gpt5> și C<gpt6> bazate pe llm, documentul este furnizat separat ca o cerere JSON al cărei membru C<input> este matricea de tradus și al cărei membru opțional C<context> conține date de referință. O instrucțiune fixă care tratează acești membri ca date ale documentului, nu ca comenzi, este adăugată chiar și atunci când se utilizează un prompt personalizat.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Specificați informații contextuale suplimentare care să fie trimise motorului
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Numărul de blocuri traduse înconjurătoare transmise ca context de referință la retraducerea blocurilor modificate (implicit 2). Contextul include și textul sursă brut din jurul regiunii modificate (titluri, structura listelor, legende) și, când este disponibilă, versiunea anterioară a textului modificat recuperată din cache, astfel încât formulările neschimbate să fie păstrate. Setați la 0 pentru a dezactiva complet traducerea conștientă de context. Rețineți că fiecare regiune modificată este tradusă în propriul apel API, iar contextul poate adăuga până la aproximativ 8000 de caractere la cererea JSON a utilizatorului, astfel încât traducerea conștientă de context schimbă un cost suplimentar pentru consecvență. Contextul derivat din document este păstrat în afara promptului de sistem.
 
 =item B<--xlate-cache-seed>=I<file>

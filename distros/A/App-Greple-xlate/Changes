@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-xlate
 
+2.03 2026-10-27T02:28:17Z
+
+    - Add the gpt6 engine for GPT-6 Astra (via the llm command), sharing
+      the llm engine setup with gpt5.
+    - Install App::mdee (with nup) in the Docker image.
+
 2.02 2026-09-03T11:44:49Z
 
     - Update the llm-backed gpt5 engine to use gpt-5.6-terra with low

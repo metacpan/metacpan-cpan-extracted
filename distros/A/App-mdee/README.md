@@ -21,6 +21,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
+         --table-style=#    table style: pipe or simple (default: pipe)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 5)
@@ -44,7 +45,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.10
+Version 1.12
 
 # DESCRIPTION
 
@@ -78,9 +79,9 @@ else is still the source text.  This is why paragraphs are not
 reflowed, why backslash escapes such as `\*` are shown as written,
 and why `--no-theme` gives back the original file, in color.
 
-For full Markdown rendering, many other viewers are available.
-Combine them with [nup(1)](https://metacpan.org/pod/App%3A%3Anup) for similar paged output
-(e.g., `nup glow README.md`).
+For full Markdown rendering, many other viewers are available, such
+as `glow` and `mdcat`.  Combine them with [nup(1)](https://metacpan.org/pod/App%3A%3Anup) for
+similar paged output (e.g., `nup glow README.md`, `nup mdcat README.md`).
 
 The pipeline combines [greple(1)](https://metacpan.org/pod/App%3A%3AGreple) for colorization and
 [nup(1)](https://metacpan.org/pod/App%3A%3Anup) for multi-column paged output.
@@ -256,8 +257,9 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     `'<30'` caps every column at 30).  Marks can be put at the
     start of cell lines, in place of the cell's leading space so that
     column widths do not change.  `--config table_cell_mark=STRING`
-    marks the first line of every cell in a table that has a wrapped
-    cell; the default theme `markcell` sets it to `·` (U+00B7).
+    marks the first line of every body cell in a column that has a
+    wrapped cell; the header row and columns that fit are left alone.
+    The default theme `markcell` sets it to `‣` (U+2023).
     `--config table_wrap_mark=STRING` marks the second and later
     lines of a wrapped cell, so that they are not read as new rows;
     the theme `markwrap` sets it to `›` (U+203A).  Without these
@@ -285,6 +287,25 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     Unicode box-drawing characters (`│`, `├`, `┤`, `┼`) and
     dashes (`-`) in separator lines are replaced with horizontal
     rules (`─`).  Default is enabled.
+
+- **--table-style**=_STYLE_
+
+    Select how tables are drawn.  `pipe` (default) keeps a separator
+    between the columns, `│` or `|` depending on `--rule`:
+
+         Left │ Center │ Right │ Default
+        ──────┼────────┼───────┼─────────
+         a    │   b    │     c │ d
+
+    `simple` draws tables like Pandoc's simple tables: the columns are
+    separated by spaces only, the header is underlined per column, and a
+    rule the width of the table is drawn above and below it.
+
+        ─────────────────────────────────
+         Left   Center   Right   Default
+        ────── ──────── ─────── ─────────
+         a        b          c   d
+        ─────────────────────────────────
 
 - **--cat-v**
 
@@ -389,8 +410,9 @@ bold text, etc.).
     - `markcell` (default)
 
         In a table that has wrapped cells, mark the first line of every
-        cell with `·` (U+00B7), so that the rows read like a bulleted
-        list and the continuation lines stand apart.  Tables that fit are
+        body cell in the wrapped columns with `‣` (U+2023), so that the
+        rows read like a bulleted list and the continuation lines stand
+        apart.  The header row, columns that fit, and tables that fit are
         not marked.  Sets `table_cell_mark`; `nomark` does not affect it.
         To use another character, set it in the configuration file or in a
         theme of your own:

@@ -1282,7 +1282,7 @@ Devel::StatProfiler::Report - process profiler output to generate a report
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 AUTHORS
 

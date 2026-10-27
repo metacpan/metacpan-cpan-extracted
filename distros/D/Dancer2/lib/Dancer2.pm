@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '2.2.2';
+$Dancer2::VERSION = '2.3.0';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use 5.12.0;
@@ -128,7 +128,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 2.2.2
+version 2.3.0
 
 =head1 DESCRIPTION
 

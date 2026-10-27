@@ -122,6 +122,92 @@ subtest 'dbh: an error other than a lock is not tried again' => sub {
     cmp_ok( Time::HiRes::time() - $start, '<', 1, 'at once, not after the busy timeout' );
 };
 
+subtest 'dbh: a forked child that forgets its handles leaves the parent alone' => sub {
+    Trog::SQLite::forget();
+    my ( $schema, $file ) = schema_dir("$V0\nCREATE TABLE IF NOT EXISTS blobs (b BLOB);");
+    my $db = Trog::SQLite::dbh( $schema, $file );
+
+    # A cache this small makes the transaction write its pages to the WAL before
+    # the fork, which is when a rollback from the child can undo them.
+    $db->do('PRAGMA cache_size = 2');
+    $db->begin_work();
+    $db->do(q{INSERT INTO things (name) VALUES ('before the fork')});
+    $db->do('INSERT INTO blobs (b) VALUES (randomblob(4000))') for 1 .. 500;
+
+    my $pid = fork() // die "fork: $!";
+    if ( !$pid ) {
+
+        # Its last reference, so the handle is destroyed here, in the child.
+        Trog::SQLite::forget();
+        undef $db;
+        POSIX::_exit(0);
+    }
+    waitpid( $pid, 0 );
+
+    $db->do(q{INSERT INTO things (name) VALUES ('after the fork')});
+    $db->commit();
+    is( $db->selectrow_array('PRAGMA integrity_check'), 'ok', 'the database is intact' );
+    is(
+        $db->selectcol_arrayref('SELECT name FROM things ORDER BY name'),
+        [ 'after the fork', 'before the fork' ],
+        'and the parent commits all of its transaction'
+    );
+};
+
+subtest 'dbh: a forked child gets its own handle without calling forget' => sub {
+    Trog::SQLite::forget();
+    my ( $schema, $file ) = schema_dir($V0);
+    my $db = Trog::SQLite::dbh( $schema, $file );
+
+    pipe( my $said_r, my $said_w ) or die "pipe: $!";
+    my $pid = fork() // die "fork: $!";
+    if ( !$pid ) {
+        close($said_r) or POSIX::_exit(1);
+        my $own   = Trog::SQLite::dbh( $schema, $file );
+        my $ok    = eval { $own->do(q{INSERT INTO things (name) VALUES ('from the child')}); 1 };
+        my $again = Trog::SQLite::dbh( $schema, $file );
+        print {$said_w} ( $own == $db ? 'the parent handle' : 'a new handle' ), ( $again == $own ? ', cached' : ', not cached' ), ( $ok ? ', and wrote' : ", and failed: $@" ), "\n";
+        close($said_w) or POSIX::_exit(1);
+        POSIX::_exit(0);
+    }
+    close($said_w) or die "close: $!";
+    my $said = <$said_r> // 'nothing';
+    waitpid( $pid, 0 );
+    chomp $said;
+
+    is( $said,                                              'a new handle, cached, and wrote', 'the child opens its own handle, caches it, and writes with it' );
+    is( Trog::SQLite::dbh( $schema, $file ),                $db,                               'the parent keeps its own' );
+    is( $db->selectcol_arrayref('SELECT name FROM things'), ['from the child'],                'and sees what the child wrote' );
+    is( $db->selectrow_array('PRAGMA integrity_check'),     'ok',                              'in a database that is intact' );
+};
+
+subtest 'dbh: integrity_check refuses a damaged database' => sub {
+    Trog::SQLite::forget();
+    my ( $schema, $file ) = schema_dir($V0);
+    my $setup = DBI->connect( "dbi:SQLite:dbname=$file", q{}, q{}, { RaiseError => 1, PrintError => 0 } );
+    $setup->do($V0);
+    $setup->do('CREATE INDEX by_name ON things (name)');
+    $setup->do( 'INSERT INTO things (name) VALUES (?)', undef, "thing $_" ) for 1 .. 20;
+
+    # The index now claims an order that its entries are not in.
+    $setup->do('PRAGMA writable_schema = ON');
+    $setup->do(q{UPDATE sqlite_master SET sql = 'CREATE INDEX by_name ON things (name DESC)' WHERE name = 'by_name'});
+    $setup->disconnect();
+
+    ok( Trog::SQLite::dbh( $schema, $file ), 'without the option, dbh does not look' );
+    Trog::SQLite::forget();
+    my $error = dies { Trog::SQLite::dbh( $schema, $file, { integrity_check => 1 } ) };
+    like( $error, qr/integrity[ ]check[ ]of[ ]\Q$file\E[ ]failed/, 'with it, dbh dies, naming the file' );
+    like( $error, qr/missing[ ]from[ ]index[ ]by_name/,            'and what the check found' );
+    ok( dies { Trog::SQLite::dbh( $schema, $file, { integrity_check => 1 } ) }, 'and again, because a refused handle is not cached' );
+
+    my ( $good_schema, $good ) = schema_dir($V0);
+    ok( Trog::SQLite::dbh( $good_schema, $good, { integrity_check => 1 } ), 'and opens a database that passes' );
+
+    like( dies { Trog::SQLite::dbh( $good_schema, $good, { integrity_chek => 1 } ) }, qr/no[ ]option\(s\)[ ]integrity_chek/, 'an option it does not know is refused' );
+    like( dies { Trog::SQLite::dbh( $good_schema, $good, [] ) },                      qr/HASH[ ]reference/,                  'and so are options that are not a hash' );
+};
+
 subtest 'dbh: each update once, in order, on a new database and on an old one' => sub {
     Trog::SQLite::forget();
     my ( $schema, $file ) = schema_dir( $V0, 2 => $V2, 1 => $V1 );

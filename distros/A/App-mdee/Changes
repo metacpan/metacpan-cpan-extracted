@@ -1,5 +1,13 @@
 Revision history for Perl extension App-mdee
 
+1.12 2026-10-26T10:50:50Z
+
+    - Add --table-style=simple: tables drawn like Pandoc simple tables
+      (no column separators, header rule per column, rules above and below)
+    - The markcell theme marks cells with ‣ (U+2023, always one column
+      wide) instead of · (U+00B7, ambiguous width), only in the columns
+      that wrapped, and not on the header row (needs App::ansicolumn 1.60)
+
 1.11 2026-10-26T03:32:25Z
 
     - Add --[no-]filename to hide the file name label (greple -h)

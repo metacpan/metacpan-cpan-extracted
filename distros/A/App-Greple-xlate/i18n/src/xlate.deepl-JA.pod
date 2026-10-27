@@ -10,9 +10,15 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra を使用するには：
+
+    xlate -e gpt6 -t JA file.txt
+
+もし  に  が記載されていないC<llm models>場合はC<gpt-6-astra>、モデル登録の手順については  を参照してくださいL<App::Greple::xlate::llm::gpt6>（
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ B<--xlate-fold> オプションを指定すると、変換されたテキスト�
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6>モデル登録について）
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ APIに一度に送信するテキストの最大行数を指定します。
 
 =item B<--xlate-prompt>=I<text>
 
-翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>）で利用可能ですが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の挙動をカスタマイズできます。 プロンプトに C<%s> が含まれている場合、それは対象言語名に置き換えられます。 LLM ベースの C<gpt5> エンジンでは、ドキュメントは JSON リクエストとして別途提供されます。このリクエストの C<input> メンバーは翻訳対象の配列であり、オプションの C<context> メンバーには参照データが含まれます。 カスタムプロンプトが使用される場合でも、これらのメンバーをコマンドではなくドキュメントデータとして扱う固定の指示が追加されます。
+翻訳エンジンに送信するカスタムプロンプトを指定してください。このオプションは LLM エンジン（C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>）で利用可能ですが、DeepL では利用できません。AI モデルに具体的な指示を与えることで、翻訳の挙動をカスタマイズできます。プロンプトに が含まれている場合C<%s>、それは対象言語名に置き換えられます。 LLM ベースの  およびC<gpt5>  エンジンC<gpt6>では、ドキュメントは JSON リクエストとして別途提供されます。このリクエストの  メンバーC<input>は翻訳対象の配列であり、オプションの  メンバーC<context>には参照データが含まれます。カスタムプロンプトを使用する場合でも、これらのメンバーをコマンドではなくドキュメントデータとして扱う固定の指示が末尾に追加されます。
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ APIに一度に送信するテキストの最大行数を指定します。
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 変更されたブロックを再翻訳する際に、参照コンテキストとして渡されます、そのブロックを囲む翻訳済みブロックの数（デフォルトは 2）。このコンテキストには、変更された領域を囲む生のソーステキスト（見出し、リスト構造、キャプション）や、利用可能な場合はキャッシュから復元された変更前のテキストも含まれるため、変更されていない表現が保持されます。 コンテキストを意識した翻訳を完全に無効にするには、0 に設定してください。変更された各領域は個別の API 呼び出しで翻訳され、コンテキストによって JSON ユーザーリクエストに最大約 8000 文字が追加される可能性があるため、コンテキストを意識した翻訳は一貫性を確保するために多少の追加コストを伴います。ドキュメントから派生したコンテキストは、システムプロンプトには含まれません。
 
 =item B<--xlate-cache-seed>=I<file>

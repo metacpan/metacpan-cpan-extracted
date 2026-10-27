@@ -8,9 +8,15 @@ App::Greple::xlate - greple için çeviri destek modülü
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra'yı kullanmak için:
+
+    xlate -e gpt6 -t JA file.txt
+
+`llm models` içinde `gpt-6-astra` listelenmiyorsa, [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) içindeki model kaydı yönergelerine bakın.
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Bir belge embedz blokları içerdiğinde bunları çeviriden hariç tutun:
 
     Şu anda aşağıdaki motorlar mevcuttur
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) model kaydı için)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Bir belge embedz blokları içerdiğinde bunları çeviriden hariç tutun:
 
 - **--xlate-prompt**=_text_
 
-    Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek LLM motorları (`gpt3`, `gpt4o`, `gpt5`) için kullanılabilir, ancak DeepL için kullanılamaz. AI modeline belirli talimatlar sağlayarak çeviri davranışını özelleştirebilirsiniz. İstem `%s` içeriyorsa, hedef dil adıyla değiştirilecektir. llm destekli `gpt5` motoru için belge, `input` üyesi çevrilecek dizi olan ve isteğe bağlı `context` üyesi referans verilerini içeren bir JSON isteği olarak ayrı ayrı sağlanır. Bu üyeleri komutlar değil belge verileri olarak ele alan sabit bir talimat, özel bir istem kullanıldığında bile eklenir.
+    Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek LLM motorları (`gpt3`, `gpt4o`, `gpt5`, `gpt6`) için kullanılabilir, ancak DeepL için kullanılamaz. AI modeline belirli talimatlar sağlayarak çeviri davranışını özelleştirebilirsiniz. İstem `%s` içeriyorsa, hedef dil adıyla değiştirilecektir. llm destekli `gpt5` ve `gpt6` motorları için belge, `input` üyesi çevrilecek dizi olan ve isteğe bağlı `context` üyesi referans verilerini içeren bir JSON isteği olarak ayrı ayrı sağlanır. Bu üyeleri komutlar değil belge verileri olarak ele alan sabit bir talimat, özel bir istem kullanıldığında bile eklenir.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Bir belge embedz blokları içerdiğinde bunları çeviriden hariç tutun:
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Değişen bloklar yeniden çevrilirken referans bağlam olarak geçirilen çevredeki çevrilmiş blok sayısı (varsayılan 2). Bağlam ayrıca değişen bölgenin etrafındaki ham kaynak metni (başlıklar, liste yapısı, açıklamalar) ve kullanılabilir olduğunda, değişmemiş ifadelerin korunması için önbellekten kurtarılan değişen metnin önceki sürümünü içerir. Bağlama duyarlı çeviriyi tamamen devre dışı bırakmak için 0 olarak ayarlayın. Her değişen bölgenin kendi API çağrısında çevrildiğini ve bağlamın JSON kullanıcı isteğine yaklaşık 8000 karaktere kadar ekleyebileceğini unutmayın; bu nedenle bağlama duyarlı çeviri, tutarlılık için bir miktar ek maliyeti göze alır. Belgeden türetilen bağlam sistem isteminden ayrı tutulur.
 
 - **--xlate-cache-seed**=_file_

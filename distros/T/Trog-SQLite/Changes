@@ -1,5 +1,18 @@
 Revision history for Trog-SQLite
 
+0.005 2026-10-26 TEODESIAN
+    - dbh sets AutoInactiveDestroy, so a forked child that calls forget,
+      or exits, no longer closes the handle of its parent.  DBI rolled back
+      the parent's open transaction from the child, and the parent then
+      committed it without the pages that the transaction had already
+      written to the WAL, and with a damaged database.
+    - dbh takes an optional hash of options.  With integrity_check, it runs
+      PRAGMA integrity_check before the schema and dies if the check fails.
+      integrity_check, the function, runs the check on any handle.
+    - dbh notices that it runs in a forked child, and opens a new handle
+      for it.  A child that called dbh without calling forget first got
+      its parent's handle, and two processes then used one connection.
+
 0.004 2026-10-23 TEODESIAN
     - transaction runs a sub in one transaction, and rolls it back if the
       sub dies.  Inside a transaction that the caller began, it runs the

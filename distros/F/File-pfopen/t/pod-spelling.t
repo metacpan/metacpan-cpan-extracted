@@ -13,8 +13,10 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok();
 
 __END__
-AnnoCPAN
+Brannon
 CPAN
-CPANTS
 GPL
-MetaCPAN
+NUL
+schemas
+RT
+versa

@@ -8,9 +8,15 @@ App::Greple::xlate - modul de suport pentru traducere pentru greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Pentru a utiliza GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Dacă `llm models` nu listează `gpt-6-astra`, consultați instrucțiunile de înregistrare a modelului în [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Excludeți blocurile embedz de la traducere atunci când un document le conține
 
     În acest moment, sunt disponibile următoarele motoare
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) pentru înregistrarea modelului)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Excludeți blocurile embedz de la traducere atunci când un document le conține
 
 - **--xlate-prompt**=_text_
 
-    Specificați un prompt personalizat care să fie trimis motorului de traducere. Această opțiune este disponibilă pentru motoarele LLM (`gpt3`, `gpt4o`, `gpt5`), dar nu pentru DeepL. Puteți personaliza comportamentul traducerii furnizând instrucțiuni specifice modelului AI. Dacă promptul conține `%s`, acesta va fi înlocuit cu numele limbii țintă. Pentru motorul `gpt5` bazat pe llm, documentul este furnizat separat ca o cerere JSON al cărei membru `input` este matricea de tradus și al cărei membru opțional `context` conține date de referință. O instrucțiune fixă care tratează acești membri ca date ale documentului, nu ca comenzi, este adăugată chiar și atunci când se utilizează un prompt personalizat.
+    Specificați un prompt personalizat care să fie trimis motorului de traducere. Această opțiune este disponibilă pentru motoarele LLM (`gpt3`, `gpt4o`, `gpt5`, `gpt6`), dar nu pentru DeepL. Puteți personaliza comportamentul traducerii furnizând instrucțiuni specifice modelului AI. Dacă promptul conține `%s`, acesta va fi înlocuit cu numele limbii țintă. Pentru motoarele `gpt5` și `gpt6` bazate pe llm, documentul este furnizat separat ca o cerere JSON al cărei membru `input` este matricea de tradus și al cărei membru opțional `context` conține date de referință. O instrucțiune fixă care tratează acești membri ca date ale documentului, nu ca comenzi, este adăugată chiar și atunci când se utilizează un prompt personalizat.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Excludeți blocurile embedz de la traducere atunci când un document le conține
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Numărul de blocuri traduse înconjurătoare transmise ca context de referință la retraducerea blocurilor modificate (implicit 2). Contextul include și textul sursă brut din jurul regiunii modificate (titluri, structura listelor, legende) și, când este disponibilă, versiunea anterioară a textului modificat recuperată din cache, astfel încât formulările neschimbate să fie păstrate. Setați la 0 pentru a dezactiva complet traducerea conștientă de context. Rețineți că fiecare regiune modificată este tradusă în propriul apel API, iar contextul poate adăuga până la aproximativ 8000 de caractere la cererea JSON a utilizatorului, astfel încât traducerea conștientă de context schimbă un cost suplimentar pentru consecvență. Contextul derivat din document este păstrat în afara promptului de sistem.
 
 - **--xlate-cache-seed**=_file_

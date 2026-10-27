@@ -7,7 +7,7 @@ AtteanX::Parser::NQuads - N-Quads Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::NQuads version 0.039
+This document describes AtteanX::Parser::NQuads version 0.040
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ the UTF-8 encoded byte string C<< $data >>.
 
 =cut
 
-package AtteanX::Parser::NQuads 0.039 {
+package AtteanX::Parser::NQuads 0.040 {
 	use utf8;
 	
 	use Attean;
@@ -91,9 +91,9 @@ Returns a list of file extensions that may be parsed with the parser.
 		my $nodes	= shift;
 		my $lineno	= shift;
 		if (scalar(@$nodes) == 3) {
-			return Attean::Triple->new(@$nodes);
+			return Attean::Triple->new(@$nodes)->validate;
 		} elsif (scalar(@$nodes) == 4) {
-			return Attean::Quad->new(@$nodes);
+			return Attean::Quad->new(@$nodes)->validate;
 		} else {
 			die qq[Not valid N-Quads data at line $lineno];
 		}
@@ -117,7 +117,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams. This
+Copyright (c) 2014--2026 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

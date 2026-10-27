@@ -1,6 +1,6 @@
 package Dancer2::FileUtils;
 # ABSTRACT: File utility helpers
-$Dancer2::FileUtils::VERSION = '2.2.2';
+$Dancer2::FileUtils::VERSION = '2.3.0';
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ Dancer2::FileUtils - File utility helpers
 
 =head1 VERSION
 
-version 2.2.2
+version 2.3.0
 
 =head1 SYNOPSIS
 

@@ -4,6 +4,14 @@
       "App::Greple::xlate - μονάδα υποστήριξης μετάφρασης για το greple\n"
    ],
    [
+      "To use GPT-6 Astra:\n",
+      "Για να χρησιμοποιήσετε το GPT-6 Astra:\n"
+   ],
+   [
+      "If C<llm models> does not list C<gpt-6-astra>, see the model registration instructions in L<App::Greple::xlate::llm::gpt6>.\n",
+      "Αν το C<llm models> δεν παραθέτει το C<gpt-6-astra>, ανατρέξτε στις οδηγίες καταχώρισης μοντέλου στο L<App::Greple::xlate::llm::gpt6>.\n"
+   ],
+   [
       "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.6 Terra (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
       "B<Greple> B<xlate> το module βρίσκει τα επιθυμητά μπλοκ κειμένου και τα αντικαθιστά με το μεταφρασμένο κείμενο. Η κύρια μηχανή είναι το GPT-5.6 Terra (F<llm/gpt5.pm>), το οποίο καλεί την εντολή L<llm|https://llm.datasette.io/>· περιλαμβάνονται επίσης το DeepL (F<deepl.pm>) και παλαιότερες μηχανές βασισμένες σε B<gpty>.\n"
    ],
@@ -144,6 +152,10 @@
       "Αυτή τη στιγμή, οι ακόλουθες μηχανές είναι διαθέσιμες\n"
    ],
    [
+      "L<App::Greple::xlate::llm::gpt6> for model registration)\n",
+      "L<App::Greple::xlate::llm::gpt6> για την καταχώριση μοντέλου)\n"
+   ],
+   [
       "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
       "Οι μονάδες μηχανής αναζητούνται πρώτα στους χώρους ονομάτων backend (C<llm>, έπειτα C<gpty>), και στη συνέχεια απευθείας κάτω από το C<App::Greple::xlate>. Έτσι, το C<gpt5> φορτώνει το C<App::Greple::xlate::llm::gpt5> που καλεί την εντολή C<llm>, ενώ το C<gpt4o> επιστρέφει εφεδρικά στο C<App::Greple::xlate::gpty::gpt4o>. Χρησιμοποιήστε το C<--xlate-setopt backend=gpty> για να επιβάλετε ένα συγκεκριμένο backend.\n"
    ],
@@ -216,8 +228,8 @@
       "Ορίστε αυτήν την τιμή σε 1 αν θέλετε να μεταφράζετε μία γραμμή κάθε φορά. Αυτή η επιλογή υπερισχύει της επιλογής C<--xlate-maxlen>.\n"
    ],
    [
-      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> engine, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
-      "Καθορίστε μια προσαρμοσμένη προτροπή που θα σταλεί στη μηχανή μετάφρασης. Αυτή η επιλογή είναι διαθέσιμη για τις μηχανές LLM (C<gpt3>, C<gpt4o>, C<gpt5>) αλλά όχι για το DeepL. Μπορείτε να προσαρμόσετε τη συμπεριφορά μετάφρασης παρέχοντας συγκεκριμένες οδηγίες στο μοντέλο AI. Αν η προτροπή περιέχει C<%s>, θα αντικατασταθεί με το όνομα της γλώσσας-στόχου. Για τη μηχανή C<gpt5> που υποστηρίζεται από llm, το έγγραφο παρέχεται ξεχωριστά ως αίτημα JSON, του οποίου το μέλος C<input> είναι ο πίνακας προς μετάφραση και το προαιρετικό μέλος C<context> περιέχει δεδομένα αναφοράς. Μια σταθερή οδηγία που αντιμετωπίζει αυτά τα μέλη ως δεδομένα εγγράφου και όχι ως εντολές προστίθεται ακόμη και όταν χρησιμοποιείται προσαρμοσμένη προτροπή.\n"
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
+      "Καθορίστε μια προσαρμοσμένη προτροπή που θα σταλεί στη μηχανή μετάφρασης. Αυτή η επιλογή είναι διαθέσιμη για τις μηχανές LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) αλλά όχι για το DeepL. Μπορείτε να προσαρμόσετε τη συμπεριφορά μετάφρασης παρέχοντας συγκεκριμένες οδηγίες στο μοντέλο AI. Αν η προτροπή περιέχει C<%s>, θα αντικατασταθεί με το όνομα της γλώσσας-στόχου. Για τις μηχανές C<gpt5> και C<gpt6> που υποστηρίζονται από llm, το έγγραφο παρέχεται ξεχωριστά ως αίτημα JSON, του οποίου το μέλος C<input> είναι ο πίνακας προς μετάφραση και το προαιρετικό μέλος C<context> περιέχει δεδομένα αναφοράς. Μια σταθερή οδηγία που αντιμετωπίζει αυτά τα μέλη ως δεδομένα εγγράφου και όχι ως εντολές προστίθεται ακόμη και όταν χρησιμοποιείται προσαρμοσμένη προτροπή.\n"
    ],
    [
       "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",

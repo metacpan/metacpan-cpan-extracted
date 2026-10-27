@@ -21,12 +21,18 @@
 	--muted: #444444;
 	--link: #0000ee;
 	--visited: #551a8b;
+	--active: #ff0000;
 	--shadow: #6f6f6f;
 	--highlight: #ffffff;
-	--term-bg: var(--fg);
-	--term-fg: var(--bg);
+	--term-bg: var(--highlight);
+	--term-fg: var(--fg);
+	--wm-border: #708090;
+	--wm-title-bg: #22aa99;
+	--wm-title-fg: #d9d9d9;
 	--latin: "Times New Roman", Times;
 	--mono: Courier, "Courier New", monospace;
+	--term-face: Menlo, "Lucida Console", "DejaVu Sans Mono", monospace;
+	--wm-face: Helvetica, Arial, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,6 +42,7 @@
 		--muted: #a0a0aa;
 		--link: #8ab4f8;
 		--visited: #c58af9;
+		--active: #ff7b72;
 		--shadow: #0e0f10;
 		--highlight: #4a4f54;
 		--term-bg: #1a1c1e;
@@ -51,9 +58,10 @@ html {
 /* An element that names its language takes the face and the line
    height of that language, and its children inherit them. The html
    element names the language of the page. A rule in :where() has no
-   weight, so the rule of an element wins: the code face, and the line
-   height of a heading and of a pre block. No other rule sets a face or
-   a line height. */
+   weight, so the rule of an element wins: the code face, the face of
+   an xterm and of its title, and the line height of a heading and of
+   a pre block. A code element in another one inherits its face. No
+   other rule sets a face or a line height. */
 
 :where([lang]) {
 	font-family: var(--latin), serif;
@@ -114,10 +122,15 @@ i:lang(zh):not(:lang(zh-Latn)) {
 	text-emphasis-position: under right;
 }
 
+/* The bitmap fonts of X11 had no kerning and no ligatures. The
+   contextual forms stay, because some scripts need them. */
+
 body {
 	background: var(--bg);
 	color: var(--fg);
+	font-kerning: none;
 	font-size: 17px;
+	font-variant-ligatures: no-common-ligatures;
 	margin-block: 1.75em;
 	margin-inline: 1.5em;
 	max-width: 42em;
@@ -131,34 +144,54 @@ hr {
 	margin-inline: 0;
 }
 
+/* X11 drew an underline straight through the descenders */
+
 a:link,
 a:visited {
 	color: var(--link);
 	text-decoration: underline;
+	text-decoration-skip-ink: none;
 	text-decoration-thickness: 1px;
 	text-underline-offset: 0.15em;
+}
+
+/* Mosaic framed a linked image in the link color */
+
+a img {
+	border: 2px solid;
 }
 
 a:visited {
 	color: var(--visited);
 }
 
-/* The chrome carries no class, so the selector names the element */
+/* Netscape 1.x showed a pressed link in red, and Windows 3.1 drew
+   the keyboard focus as a dotted box */
+
+a:active {
+	color: var(--active);
+}
+
+:focus-visible {
+	outline: 1px dotted;
+}
+
+/* The chrome carries no class, so the selector names the element. The
+   banner link starts the line, and the list of the languages ends it,
+   on one baseline. A narrow viewport puts the list below the link. */
 
 body > header {
+	align-items: baseline;
+	column-gap: 1em;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
 	margin-block-end: 0.2em;
 }
 
 body > header > a {
 	font-size: 2em;
 	font-weight: bold;
-	letter-spacing: 0.05em;
-}
-
-body > header > a:link,
-body > header > a:visited {
-	color: var(--fg);
-	text-decoration: none;
 }
 
 /* The list of the languages and the nav list, each on one line */
@@ -176,16 +209,35 @@ nav li {
 	display: inline;
 }
 
-body > header li + li::before,
-nav li + li::before {
-	content: "\00b7";
-	margin-inline: 0.5em;
+/* Each separator and each bracket is text, with one word space. The
+   line break between two items of the markup gives the space before a
+   separator. A space after a hex escape is part of the escape, so the
+   escape \20 writes the space after the dot. */
+
+body > header li + li::before {
+	content: "\00b7\20";
 }
+
+/* The nav list in a pair of brackets, with a bar between two items */
+
+nav ul::before {
+	content: "[ ";
+}
+
+nav ul::after {
+	content: " ]";
+}
+
+nav li + li::before {
+	content: "| ";
+}
+
+/* The current link in the text color, with no underline and no bold */
 
 a[aria-current="page"]:link,
 a[aria-current="page"]:visited {
 	color: var(--fg);
-	font-weight: bold;
+	font-weight: normal;
 	text-decoration: none;
 }
 
@@ -230,28 +282,118 @@ dd { margin-inline-start: 2em; }
 
 table { border-collapse: collapse; }
 
-code, pre, tt, kbd, samp, var {
+/* Text looks as large as the area that its lowercase letters cover:
+   the x-height times the mean width of a letter. A monospace face is
+   wide, so each code face takes the size at which it covers the area
+   of Times New Roman. Courier takes 0.846em, and Menlo, the face of
+   an xterm below, takes 0.767em. mandoc(1) writes the Pa macro of
+   mdoc(7) as a span. A code element in another one keeps the face and
+   the size of its parent. A code element in an xterm then takes the
+   face of xterm, and the size does not shrink twice. */
+
+code, tt, kbd, samp, var, .Pa {
 	font-family: var(--mono);
-	font-size: 0.92em;
+	font-size: 0.846em;
 }
 
-/* A 1994 X11 terminal in a sunken Motif well: the dark sides are the
-   start sides, so the well mirrors on a page of rtl */
+:is(code, pre, tt, kbd, samp, var, .Pa) :is(code, tt, kbd, samp, var, .Pa) {
+	font-family: inherit;
+	font-size: 1em;
+}
+
+/* An xterm in the default frame of twm(1), the window manager of
+   X11R6: a slategrey border, and a teal title bar with the iconify
+   dot, the title, the stipple and the resize corners. The light
+   scheme shows the black on white of the default xterm. twm knows no
+   rtl, so the title bar keeps the order of X11 on each page. A long
+   line wraps at the edge, as in xterm, so the block never scrolls and
+   the title bar stays in view. The text takes a sans-serif monospace
+   as the default font fixed of xterm, with little leading. It sits
+   2px inside the frame, as the default internal border of xterm. The
+   title bar and its border take 22px above it. */
 
 pre {
 	background: var(--term-bg);
-	border: 2px solid;
-	border-block-color: var(--shadow) var(--highlight);
-	border-inline-color: var(--shadow) var(--highlight);
+	border: 2px solid var(--wm-border);
 	color: var(--term-fg);
-	line-height: 1.4;
-	overflow-x: auto;
-	padding-block: 0.7em;
-	padding-inline: 0.9em;
+	font-family: var(--term-face);
+	font-size: 0.767em;
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+	padding-block: calc(22px + 2px) 2px;
+	padding-inline: 2px;
+	position: relative;
+	white-space: pre-wrap;
 }
 
-pre code {
-	font-size: 1em;
+pre::before,
+pre::after {
+	border-block-end: 2px solid var(--wm-border);
+	direction: ltr;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	position: absolute;
+}
+
+/* The title, after the iconify button: a dot in a box with a border
+   of 1px. The second content hides the title from a screen reader. */
+
+pre::before {
+	align-items: center;
+	background:
+	    radial-gradient(circle, var(--wm-title-fg) 4.5px, transparent 4.5px)
+	    4px 4px / 12px 12px no-repeat,
+	    linear-gradient(var(--wm-title-bg), var(--wm-title-bg))
+	    4px 4px / 12px 12px no-repeat,
+	    linear-gradient(var(--wm-title-fg), var(--wm-title-fg))
+	    3px 3px / 14px 14px no-repeat,
+	    var(--wm-title-bg);
+	block-size: 20px;
+	color: var(--wm-title-fg);
+	content: "xterm";
+	content: "xterm" / "";
+	display: flex;
+	font-family: var(--wm-face);
+	font-size: 12px;
+	font-weight: bold;
+	padding-inline: 26px 8px;
+	z-index: 1;
+}
+
+/* The bar under the title: the even stipple of twm, then the resize
+   button, two nested corners in a box with a border of 1px */
+
+pre::after {
+	background:
+	    linear-gradient(var(--wm-title-fg), var(--wm-title-fg))
+	    right 11px top 4px / 1px 5px no-repeat,
+	    linear-gradient(var(--wm-title-fg), var(--wm-title-fg))
+	    right 11px top 8px / 5px 1px no-repeat,
+	    linear-gradient(var(--wm-title-fg), var(--wm-title-fg))
+	    right 7px top 4px / 1px 9px no-repeat,
+	    linear-gradient(var(--wm-title-fg), var(--wm-title-fg))
+	    right 7px top 12px / 9px 1px no-repeat,
+	    linear-gradient(var(--wm-title-bg), var(--wm-title-bg))
+	    right 4px top 4px / 12px 12px no-repeat,
+	    linear-gradient(var(--wm-title-fg), var(--wm-title-fg))
+	    right 3px top 3px / 14px 14px no-repeat,
+	    conic-gradient(var(--wm-title-fg) 25%, var(--wm-title-bg) 0 50%,
+	    var(--wm-title-fg) 0 75%, var(--wm-title-bg) 0)
+	    0 0 / 2px 2px content-box,
+	    linear-gradient(var(--wm-title-bg), var(--wm-title-bg)) padding-box;
+	block-size: 16px;
+	content: "";
+	inset-inline-end: 0;
+	padding-block: 2px;
+	padding-inline-end: 26px;
+}
+
+/* xterm shows a selection in reverse video */
+
+pre::selection,
+pre ::selection {
+	background-color: var(--term-fg);
+	color: var(--term-bg);
 }
 
 footer {
@@ -301,8 +443,19 @@ table.Nm td:first-child {
 	white-space: nowrap;
 }
 
+/* mandoc(1) writes the -offset indent of a display of mdoc(7) as the
+   class Bd-indent, beside the class Bd. The frame of an xterm marks a
+   pre block, so its display takes no indent, and a line of the block
+   holds more columns. mandoc writes an RS region of man(7) as the
+   class Bd-indent alone. Its prose can hold a pre block, and keeps
+   its indent. */
+
 .Bd-indent {
 	margin-inline-start: 2em;
+}
+
+.Bd.Bd-indent:has(> pre) {
+	margin-inline-start: 0;
 }
 
 .Nm, .Cm, .Fl, .Ic, .Fn, .Dv, .Er, .Ev {
@@ -310,7 +463,6 @@ table.Nm td:first-child {
 }
 
 .Ar, .Va, .Pa {
-	font-family: var(--mono);
 	font-style: italic;
 }
 

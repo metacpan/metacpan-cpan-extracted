@@ -106,8 +106,9 @@ the description is not UTF-8, per WEB-SITE-5;
 
 =item *
 
-it names a block type or a setting that fuguweb(1) does not document,
-per WEB-SITE-4. An old setting fails the same way;
+it names a block type or a setting that fuguwebrc(5) and
+fuguweb-keys(7) do not document, per WEB-SITE-4. An old setting fails
+the same way;
 
 =item *
 
@@ -596,7 +597,7 @@ group with an orphan.
 =head1 SEE ALSO
 
 L<App::FuguWeb>, L<App::FuguWeb::Keys>, L<App::FuguWeb::Manual>,
-L<Fugu::Config>, L<fuguweb(1)>
+L<Fugu::Config>, L<fuguweb(1)>, L<fuguwebrc(5)>, L<fuguweb-keys(7)>
 
 =head1 AUTHOR
 

@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Status;
-our $VERSION = '0.11.0';
+our $VERSION = '0.11.2';
 
 use App::FuguWeb ();
 use Digest::SHA  ();

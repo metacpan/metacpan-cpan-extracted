@@ -10,9 +10,15 @@ App::Greple::xlate - greple için çeviri destek modülü
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra'yı kullanmak için:
+
+    xlate -e gpt6 -t JA file.txt
+
+C<llm models> içinde C<gpt-6-astra> listelenmiyorsa, L<App::Greple::xlate::llm::gpt6> içindeki model kaydı yönergelerine bakın.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ Kullanılacak çeviri motorunu belirtir.
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> model kaydı için)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Her seferinde tek bir satırı çevirmek istiyorsanız bu değeri 1 olarak ayarl
 
 =item B<--xlate-prompt>=I<text>
 
-Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek LLM motorları (C<gpt3>, C<gpt4o>, C<gpt5>) için kullanılabilir, ancak DeepL için kullanılamaz. AI modeline belirli talimatlar sağlayarak çeviri davranışını özelleştirebilirsiniz. İstem C<%s> içeriyorsa, hedef dil adıyla değiştirilecektir. llm destekli C<gpt5> motoru için belge, C<input> üyesi çevrilecek dizi olan ve isteğe bağlı C<context> üyesi referans verilerini içeren bir JSON isteği olarak ayrı ayrı sağlanır. Bu üyeleri komutlar değil belge verileri olarak ele alan sabit bir talimat, özel bir istem kullanıldığında bile eklenir.
+Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek LLM motorları (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) için kullanılabilir, ancak DeepL için kullanılamaz. AI modeline belirli talimatlar sağlayarak çeviri davranışını özelleştirebilirsiniz. İstem C<%s> içeriyorsa, hedef dil adıyla değiştirilecektir. llm destekli C<gpt5> ve C<gpt6> motorları için belge, C<input> üyesi çevrilecek dizi olan ve isteğe bağlı C<context> üyesi referans verilerini içeren bir JSON isteği olarak ayrı ayrı sağlanır. Bu üyeleri komutlar değil belge verileri olarak ele alan sabit bir talimat, özel bir istem kullanıldığında bile eklenir.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Her seferinde tek bir satırı çevirmek istiyorsanız bu değeri 1 olarak ayarl
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Değişen bloklar yeniden çevrilirken referans bağlam olarak geçirilen çevredeki çevrilmiş blok sayısı (varsayılan 2). Bağlam ayrıca değişen bölgenin etrafındaki ham kaynak metni (başlıklar, liste yapısı, açıklamalar) ve kullanılabilir olduğunda, değişmemiş ifadelerin korunması için önbellekten kurtarılan değişen metnin önceki sürümünü içerir. Bağlama duyarlı çeviriyi tamamen devre dışı bırakmak için 0 olarak ayarlayın. Her değişen bölgenin kendi API çağrısında çevrildiğini ve bağlamın JSON kullanıcı isteğine yaklaşık 8000 karaktere kadar ekleyebileceğini unutmayın; bu nedenle bağlama duyarlı çeviri, tutarlılık için bir miktar ek maliyeti göze alır. Belgeden türetilen bağlam sistem isteminden ayrı tutulur.
 
 =item B<--xlate-cache-seed>=I<file>

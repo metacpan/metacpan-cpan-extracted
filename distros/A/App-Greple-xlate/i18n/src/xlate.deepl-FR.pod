@@ -10,9 +10,15 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Pour utiliser GPT-6 Astra :
+
+    xlate -e gpt6 -t JA file.txt
+
+Si  C<llm models>ne mentionne pas C<gpt-6-astra>, consultez les instructions d’enregistrement du modèle dans L<App::Greple::xlate::llm::gpt6>.
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ Spécifie le moteur de traduction à utiliser.
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6> (pour l’enregistrement du modèle)
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ Définissez cette valeur sur 1 si vous souhaitez traduire une ligne à la fois. 
 
 =item B<--xlate-prompt>=I<text>
 
-Spécifiez une invite personnalisée à envoyer au moteur de traduction. Cette option est disponible pour les moteurs LLM (C<gpt3>, C<gpt4o>, C<gpt5>), mais pas pour DeepL. Vous pouvez personnaliser le comportement de la traduction en fournissant des instructions spécifiques au modèle d’IA. Si la consigne contient C<%s>, celle-ci sera remplacée par le nom de la langue cible. Pour le moteur C<gpt5> basé sur un LLM, le document est fourni séparément sous la forme d’une requête JSON dont le membre C<input> correspond au tableau à traduire et dont le membre optionnel C<context> contient des données de référence. Une instruction fixe qui traite ces éléments comme des données du document, et non comme des commandes, est ajoutée même lorsqu’une invite personnalisée est utilisée.
+Spécifiez une invite personnalisée à envoyer au moteur de traduction. Cette option est disponible pour les moteurs LLM (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) mais pas pour DeepL. Vous pouvez personnaliser le comportement de traduction en fournissant des instructions spécifiques au modèle d’IA. Si l’invite contient C<%s>, celui-ci sera remplacé par le nom de la langue cible. Pour les moteursC<gpt6>  etC<gpt5>  basés sur un LLM, le document est fourni séparément sous la forme d’une requête JSON dont le C<input>membre  correspond au tableau à traduire et dont le membreC<context> optionnel  contient des données de référence. Une instruction fixe qui traite ces membres comme des données du document, et non comme des commandes, est ajoutée même lorsqu’une invite personnalisée est utilisée.
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ Spécifiez des informations contextuelles supplémentaires à envoyer au moteur 
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 Nombre de blocs traduits environnants transmis comme contexte de référence lors de la retraduction des blocs modifiés (valeur par défaut : 2). Le contexte inclut également le texte source brut entourant la région modifiée (titres, structure de liste, légendes) et, lorsqu’elle est disponible, la version précédente du texte modifié récupérée dans le cache, afin de préserver les formulations inchangées. Définissez cette valeur sur 0 pour désactiver complètement la traduction tenant compte du contexte. Notez que chaque zone modifiée est traduite via son propre appel d’API et que le contexte peut ajouter jusqu’à environ 8 000 caractères à la requête JSON de l’utilisateur ; la traduction tenant compte du contexte implique donc un surcoût en échange d’une meilleure cohérence. Le contexte dérivé du document est exclu de l’invite système.
 
 =item B<--xlate-cache-seed>=I<file>

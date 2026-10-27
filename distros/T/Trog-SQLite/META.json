@@ -83,7 +83,7 @@
    "provides" : {
       "Trog::SQLite" : {
          "file" : "lib/Trog/SQLite.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/Trog-SQLite"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "troglodyne-bot <morpheus@troglodyne.net>"
    ],

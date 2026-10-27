@@ -1,4 +1,7 @@
-File-pfopen Version 0.03
+File-pfopen Version 0.04
+
+File::pfopen looks in a list of directories for a file, optionally trying
+a list of suffixes, and opens the first one that it finds.
 
 INSTALLATION
 
@@ -14,21 +17,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc File::pfopen
+	perldoc File::pfopen
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen
+	MetaCPAN
+		https://metacpan.org/release/File-pfopen
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/File-pfopen
+	RT, CPAN's request tracker
+		https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen
 
-    Search CPAN
-        http://search.cpan.org/dist/File-pfopen/
+	GitHub
+		https://github.com/nigelhorne/File-pfopen
 
-LICENSE AND COPYRIGHT
+LICENCE AND COPYRIGHT
 
-Copyright (C) 2010-2024 Nigel Horne
+Copyright (C) 2017-2026 Nigel Horne
 
-This program is released under the following licence: GPL
+Usage is subject to the GPL2 licence terms.

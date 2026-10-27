@@ -1,7 +1,7 @@
 # ABSTRACT: Response object for Dancer2
 
 package Dancer2::Core::Response;
-$Dancer2::Core::Response::VERSION = '2.2.2';
+$Dancer2::Core::Response::VERSION = '2.3.0';
 use Moo;
 
 use Carp;
@@ -339,7 +339,7 @@ Dancer2::Core::Response - Response object for Dancer2
 
 =head1 VERSION
 
-version 2.2.2
+version 2.3.0
 
 =head1 ATTRIBUTES
 

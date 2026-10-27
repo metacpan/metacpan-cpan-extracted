@@ -1,11 +1,5 @@
 Changes
 lib/Map/Tube/Madrid.pm
-lib/Map/Tube/Madrid/Line/L1.pm
-lib/Map/Tube/Madrid/Line/L2.pm
-lib/Map/Tube/Madrid/Line/L3.pm
-lib/Map/Tube/Madrid/Line/L4.pm
-lib/Map/Tube/Madrid/Line/L5.pm
-lib/Map/Tube/Madrid/Line/L11.pm
 share/madrid-map.json
 Makefile.PL
 LICENSE
@@ -13,10 +7,13 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
-t/map.t
+t/01-map-data.t
+t/02-map.t
+t/03-nodes.t
+t/04-lines.t
 xt/manifest.t
 xt/pod.t
-xt/meta-json.t
-xt/meta-yml.t
+xt/provides.t
+xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

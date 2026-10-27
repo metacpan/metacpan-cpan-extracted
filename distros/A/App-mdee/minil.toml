@@ -11,6 +11,10 @@ branch = "main"
 hooks = [
     "perl -Ilib -MApp::mdee -i -pE 's/^\\s*Version \\K(\\d+(\\.\\d+)*)$/$App::mdee::VERSION/i' script/mdee",
     "sed -i '' '/^1;$/q' lib/App/mdee.pm && greple -Mperl -h --nocolor :pod script/mdee >> lib/App/mdee.pm",
+    # README.md is generated before the hooks run and the copy in the
+    # distribution keeps the old version line (tokuhirom/Minilla#342);
+    # regenerate it from the updated script/mdee
+    "minil build",
 ]
 
 [unsupported]

@@ -7,7 +7,7 @@ AtteanX::SPARQL::Token - Token objects used for parsing and serializing SPARQL
 
 =head1 VERSION
 
-This document describes AtteanX::SPARQL::Token version 0.039
+This document describes AtteanX::SPARQL::Token version 0.040
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ An array of values associated with the token (e.g. the integer value of an INT t
 
 =cut
 
-package AtteanX::SPARQL::Token 0.039;
+package AtteanX::SPARQL::Token 0.040;
 
 use Moo;
 use Types::Standard qw(ArrayRef Str);
@@ -137,7 +137,7 @@ sub fast_constructor {
 		gtgt		=> [GTGT, '>>'],
 		lannot		=> [LANNOT, '{|'],
 		rannot		=> [RANNOT, '|}'],
-		
+		tilde		=> [TILDE, '~'],
 	);
 	for my $name (keys %tokens) {
 		my ($type, $value)	= @{ $tokens{ $name } };
@@ -217,7 +217,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

@@ -4,7 +4,7 @@ use v5.40;
 
 use File::Basename        qw( basename dirname    );
 use File::Path            qw( make_path remove_tree );
-use File::Spec::Functions qw( catdir catfile rel2abs );
+use File::Spec::Functions qw( catdir catfile file_name_is_absolute rel2abs );
 use Symbol                qw( qualify_to_ref );
 use Test::More;
 use YAML::Tiny;
@@ -50,8 +50,14 @@ sub run
     {
         for my $e ( @expect )
         {
-            my @found = grep { m{/\Q$e\E$} } @INC;
-            ok scalar @found, "\@INC contains: $e";
+            my @found
+            = grep
+            {
+                file_name_is_absolute( $_ ) && m{/\Q$e\E$}
+            }
+            @INC;
+
+            ok scalar @found, "\@INC contains absolute path ending in: $e";
         }
     }
     elsif( $check eq 'export' )
@@ -66,8 +72,14 @@ sub run
 
         for my $e ( @expect )
         {
-            my @matches = grep { m{/\Q$e\E$} } @found;
-            ok scalar @matches, "\@$var contains: $e";
+            my @matches
+            = grep
+            {
+                file_name_is_absolute( $_ ) && m{/\Q$e\E$}
+            }
+            @found;
+
+            ok scalar @matches, "\@$var contains absolute path ending in: $e";
         }
     }
     elsif( $check eq 'env' )
@@ -77,8 +89,14 @@ sub run
 
         for my $e ( @expect )
         {
-            my @matches = grep { m{/\Q$e\E$} } @found;
-            ok scalar @matches, "\$ENV{$env_key} contains: $e";
+            my @matches
+            = grep
+            {
+                file_name_is_absolute( $_ ) && m{/\Q$e\E$}
+            }
+            @found;
+
+            ok scalar @matches, "\$ENV{$env_key} contains absolute path ending in: $e";
         }
     }
 

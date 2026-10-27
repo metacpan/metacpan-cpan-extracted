@@ -1,18 +1,10 @@
-#!perl
+#!usr/bin/env perl
 
-use 5.006;
+use v5.14.0;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 7;
+use Test::More tests => 1;
 
-BEGIN {
-    use_ok('Map::Tube::Madrid')            || print "Bail out!\n";
-    use_ok('Map::Tube::Madrid::Line::L1')  || print "Bail out!\n";
-    use_ok('Map::Tube::Madrid::Line::L2')  || print "Bail out!\n";
-    use_ok('Map::Tube::Madrid::Line::L3')  || print "Bail out!\n";
-    use_ok('Map::Tube::Madrid::Line::L4')  || print "Bail out!\n";
-    use_ok('Map::Tube::Madrid::Line::L5')  || print "Bail out!\n";
-    use_ok('Map::Tube::Madrid::Line::L11') || print "Bail out!\n";
-}
+use_ok($_) for qw(Map::Tube::Madrid);
 
 diag( "Testing Map::Tube::Madrid $Map::Tube::Madrid::VERSION, Perl $], $^X" );

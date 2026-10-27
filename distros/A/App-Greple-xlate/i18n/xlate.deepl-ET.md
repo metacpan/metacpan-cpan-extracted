@@ -8,9 +8,15 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra kasutamiseks:
+
+    xlate -e gpt6 -t JA file.txt
+
+Kui  `llm models`ei näita `gpt-6-astra`, vaadake mudeli registreerimise juhiseid [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Jäta embedz-plokid tõlkimisest välja, kui dokument neid sisaldab:
 
     Praegu on saadaval järgmised mootorid
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) (mudeli registreerimiseks)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Jäta embedz-plokid tõlkimisest välja, kui dokument neid sisaldab:
 
 - **--xlate-prompt**=_text_
 
-    Määrake tõlkemootorile saadetav kohandatud käsk. See valik on saadaval LLM-mootorite (`gpt3`, `gpt4o`, `gpt5`) puhul, kuid mitte DeepL-i puhul. Võite kohandada tõlkimiskäitumist, andes AI-mudelile konkreetseid juhiseid. Kui käsk sisaldab `%s`, asendatakse see sihtkeele nimega. LLM-põhise `gpt5` mootori puhul esitatakse dokument eraldi JSON-päringuna, mille `input` liige on tõlgitav massiiv ja mille valikuline `context` liige sisaldab viiteandmeid. Isegi kui kasutatakse kohandatud käskluse teksti, lisatakse kindel juhis, mis käsitleb neid liikmeid dokumendi andmetena, mitte käskudena.
+    Määrake tõlkemootorile saadetav kohandatud käsk. See valik on saadaval LLM-mootorite (`gpt3`, `gpt4o`, `gpt5`, `gpt6`) puhul, kuid mitte DeepL-i puhul. Võite kohandada tõlkimiskäitumist, andes AI-mudelile konkreetseid juhiseid. Kui käsk sisaldab `%s`, asendatakse see sihtkeele nimega. LLM-põhiste  ja`gpt5`  `gpt6`mootorite puhul esitatakse dokument eraldi JSON-päringuna, mille  `input`liige on tõlgitav massiiv ja mille valikuline  `context`liige sisaldab viiteandmeid. Isegi kohandatud käskluse kasutamisel lisatakse kindel juhis, mis käsitleb neid liikmeid dokumendi andmetena, mitte käskudena.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Jäta embedz-plokid tõlkimisest välja, kui dokument neid sisaldab:
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Muudetud plokkide uuesti tõlkimisel viitekontekstina edastatavate ümbritsevate tõlgitud plokkide arv (vaikimisi 2). Kontekst hõlmab ka muudetud piirkonna ümbruses olevat töötlemata allikateksti (pealkirjad, loendistruktuur, pildiallkirjad) ning, kui see on kättesaadav, vahemälust taastatud muudetud teksti eelmist versiooni, et säilitada muutmata sõnastus. Määrake väärtuseks 0, et kontekstipõhine tõlkimine täielikult välja lülitada. Pange tähele, et iga muudetud piirkond tõlgitakse omaette API-kõnes ning kontekst võib JSON-kasutaja päringule lisada kuni umbes 8000 tähemärki, seega kontekstipõhine tõlkimine toob järjepidevuse nimel kaasa mõningaid lisakulusid. Dokumendist tuletatud kontekst jäetakse süsteemi käsklusest välja.
 
 - **--xlate-cache-seed**=_file_

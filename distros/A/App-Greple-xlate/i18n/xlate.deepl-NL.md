@@ -8,9 +8,15 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+Om GPT-6 Astra te gebruiken:
+
+    xlate -e gpt6 -t JA file.txt
+
+Als  niet wordt`llm models` vermeld`gpt-6-astra`, raadpleeg dan de instructies voor modelregistratie in [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Sluit embedz-blokken uit van vertaling wanneer een document deze bevat:
 
     Op dit moment zijn de volgende engines beschikbaar
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) (voor modelregistratie)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Sluit embedz-blokken uit van vertaling wanneer een document deze bevat:
 
 - **--xlate-prompt**=_text_
 
-    Geef een aangepaste prompt op die naar de vertaalengine moet worden verzonden. Deze optie is beschikbaar voor de LLM-engines (`gpt3`, `gpt4o`, `gpt5`), maar niet voor DeepL. U kunt het vertaalgedrag aanpassen door specifieke instructies aan het AI-model te geven. Als de prompt `%s` bevat, wordt dit vervangen door de naam van de doeltaal. Voor de door llm ondersteunde `gpt5`-engine wordt het document afzonderlijk aangeleverd als een JSON-verzoek waarvan het `input`-element de te vertalen array is en waarvan het optionele `context`-element referentiegegevens bevat. Er wordt een vaste instructie toegevoegd die deze elementen als documentgegevens behandelt, niet als opdrachten, zelfs wanneer een aangepaste prompt wordt gebruikt.
+    Geef een aangepaste prompt op die naar de vertaalengine moet worden verzonden. Deze optie is beschikbaar voor de LLM-engines (`gpt3`, `gpt4o`, `gpt5`, `gpt6`), maar niet voor DeepL. U kunt het vertaalgedrag aanpassen door specifieke instructies aan het AI-model te geven. Als de prompt  bevat`%s`, wordt deze vervangen door de naam van de doeltaal. Voor de door LLM ondersteunde  en`gpt5`  `gpt6`engines wordt het document afzonderlijk aangeleverd als een JSON-verzoek waarvan het  -element`input` de te vertalen array is en waarvan het optionele  -element`context` referentiegegevens bevat. Er wordt een vaste instructie toegevoegd die deze elementen als documentgegevens behandelt, en niet als opdrachten, zelfs wanneer een aangepaste prompt wordt gebruikt.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Sluit embedz-blokken uit van vertaling wanneer een document deze bevat:
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Aantal omringende vertaalde blokken dat als referentiecontext wordt doorgegeven bij het opnieuw vertalen van gewijzigde blokken (standaard 2). De context omvat ook de onbewerkte brontekst rondom het gewijzigde gebied (koppen, lijststructuur, bijschriften) en, indien beschikbaar, de vorige versie van de gewijzigde tekst die uit de cache is opgehaald, zodat ongewijzigde bewoordingen behouden blijven. Stel deze waarde in op 0 om contextbewuste vertaling volledig uit te schakelen. Houd er rekening mee dat elk gewijzigd gebied in een eigen API-aanroep wordt vertaald en dat de context tot ongeveer 8000 tekens aan het JSON-gebruikersverzoek kan toevoegen; contextbewuste vertaling brengt dus enige extra kosten met zich mee in ruil voor consistentie. Uit het document afgeleide context wordt buiten de systeemprompt gehouden.
 
 - **--xlate-cache-seed**=_file_

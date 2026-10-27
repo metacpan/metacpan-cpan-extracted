@@ -127,4 +127,23 @@ SKIP: {
     like((split /\n/, $notrim)[2], qr/^${V} x \\\| y\s*${V} z\s*${V}$/, "escaped pipe stays in the cell without trimming");
 }
 
+# Simple table style: no column separators, per-column header rule,
+# full-width rules above and below
+{
+    my $strip = sub { local $_ = shift; s/\e\[[0-9;]*[mK]//g; $_ };
+    my $out = $strip->(run("'-Mmd::config(colorize=0,table=1,table_style=simple)' $test_md")->stdout);
+    my @lines = split /\n/, $out;
+    my($h) = grep { $lines[$_] =~ /Left.*Center.*Right.*Default/ } 0..$#lines;
+    ok(defined $h, "aligned table found in simple style");
+    SKIP: {
+        skip "table not found", 5 unless defined $h;
+        my $H = "\x{2500}";
+        like($lines[$h - 1], qr/^${H}+$/, "a full-width rule above the header");
+        like($lines[$h + 1], qr/^${H}+( ${H}+){3}\s*$/, "the header rule is drawn per column");
+        like($lines[$h + 4], qr/^${H}+$/, "a full-width rule below the table");
+        unlike(join("\n", @lines[$h .. $h + 3]), qr/[\x{2502}\x{253C}|]/, "no column separators");
+        like($lines[$h + 2], qr/\s+c\s+d/, "right alignment is kept");
+    }
+}
+
 done_testing;

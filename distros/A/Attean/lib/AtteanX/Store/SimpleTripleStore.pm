@@ -4,7 +4,7 @@ AtteanX::Store::SimpleTripleStore - SimpleTripleStore, unindexed, in-memory RDF 
 
 =head1 VERSION
 
-This document describes AtteanX::Store::SimpleTripleStore version 0.039
+This document describes AtteanX::Store::SimpleTripleStore version 0.040
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ AtteanX::Store::SimpleTripleStore provides an in-memory triple-store.
 use v5.14;
 use warnings;
 
-package AtteanX::Store::SimpleTripleStore 0.039 {
+package AtteanX::Store::SimpleTripleStore 0.040 {
 	use Moo;
 	use Type::Tiny::Role;
 	use Types::Standard qw(Int ArrayRef HashRef ConsumerOf InstanceOf);
@@ -77,7 +77,8 @@ predicate and objects. Any of the arguments may be undef to match any value.
 			my $q	= shift;
 			foreach my $key (keys %bound) {
 				my $term	= $q->$key();
-				unless ($term->equals( $bound{$key} )) {
+				my $eq		= eval { $term->equals( $bound{$key} ) } || 0;
+				unless ($eq) {
 					return 0;
 				}
 			}
@@ -135,7 +136,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams. This
+Copyright (c) 2014--2026 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

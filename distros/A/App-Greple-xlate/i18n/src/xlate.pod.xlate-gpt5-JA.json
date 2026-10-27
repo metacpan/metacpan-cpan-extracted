@@ -4,6 +4,14 @@
       "App::Greple::xlate - greple のための翻訳サポートモジュール\n"
    ],
    [
+      "To use GPT-6 Astra:\n",
+      "GPT-6 Astra を使用するには：\n"
+   ],
+   [
+      "If C<llm models> does not list C<gpt-6-astra>, see the model registration instructions in L<App::Greple::xlate::llm::gpt6>.\n",
+      "C<llm models> に C<gpt-6-astra> が表示されない場合は、L<App::Greple::xlate::llm::gpt6> のモデル登録手順を参照してください。\n"
+   ],
+   [
       "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.6 Terra (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
       "B<Greple> B<xlate> モジュールは目的のテキストブロックを見つけ、それらを翻訳されたテキストに置き換えます。主要なエンジンは GPT-5.6 Terra（F<llm/gpt5.pm>）で、L<llm|https://llm.datasette.io/> コマンドを呼び出します。DeepL（F<deepl.pm>）および従来の B<gpty> ベースのエンジンも含まれています。\n"
    ],
@@ -144,6 +152,10 @@
       "現時点では、以下のエンジンが利用可能です。\n"
    ],
    [
+      "L<App::Greple::xlate::llm::gpt6> for model registration)\n",
+      "L<App::Greple::xlate::llm::gpt6>（モデル登録用）\n"
+   ],
+   [
       "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
       "エンジンモジュールはまずバックエンド名前空間（C<llm>、次に C<gpty>）で検索され、その後 C<App::Greple::xlate> の直下で検索されます。したがって C<gpt5> は C<llm> コマンドを呼び出す C<App::Greple::xlate::llm::gpt5> をロードし、一方 C<gpt4o> は C<App::Greple::xlate::gpty::gpt4o> にフォールバックします。特定のバックエンドを強制するには C<--xlate-setopt backend=gpty> を使用してください。\n"
    ],
@@ -216,8 +228,8 @@
       "1行ずつ翻訳したい場合は、この値を 1 に設定します。このオプションは C<--xlate-maxlen> オプションより優先されます。\n"
    ],
    [
-      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> engine, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
-      "翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>）で利用できますが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の動作をカスタマイズできます。プロンプトにC<%s>が含まれている場合、それは対象言語名に置き換えられます。llmバックエンドのC<gpt5>エンジンでは、文書は別途JSONリクエストとして提供され、そのC<input>メンバーが翻訳対象の配列で、任意のC<context>メンバーには参照データが含まれます。これらのメンバーをコマンドではなく文書データとして扱う固定の指示は、カスタムプロンプトを使用する場合でも追加されます。\n"
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
+      "翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>、C<gpt6>）で利用できますが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の動作をカスタマイズできます。プロンプトにC<%s>が含まれている場合、それは対象言語名に置き換えられます。llmバックエンドのC<gpt5>およびC<gpt6>エンジンでは、文書は別途JSONリクエストとして提供され、そのC<input>メンバーが翻訳対象の配列で、任意のC<context>メンバーには参照データが含まれます。これらのメンバーをコマンドではなく文書データとして扱う固定の指示は、カスタムプロンプトを使用する場合でも追加されます。\n"
    ],
    [
       "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",

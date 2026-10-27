@@ -1,3 +1,19 @@
+1.15      2026-10-26 13:22:58-06:00 America/Denver
+
+- Accept a hashref in the constructor: new({ ... })
+- Support @ISA inheritance in the constructor, including compile-time
+  @ISA from `use parent` / `use base`
+- Use Perl MRO to resolve inherited attributes
+- Roll back the set when an _after_* hook returns false
+- Resolve intermediate role hook overrides in transitive composition
+- Handle new() called as an instance method
+- Validate strict constructor before setting any attribute
+- Fix re-entrancy guard key collision with attribute names
+- Cache hook resolution to avoid repeated MRO walks
+- Declare minimum Perl version 5.010 (needed for mro)
+- Add integration tests for multi-feature interactions
+- Add AI policy document
+
 1.14      2026-03-20 21:59:33-06:00 America/Denver
 
 - Support multiple `use Simple::Accessor` in the same package

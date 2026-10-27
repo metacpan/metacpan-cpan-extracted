@@ -1,5 +1,5 @@
 package HTTP::Body::OctetStream;
-$HTTP::Body::OctetStream::VERSION = '1.23';
+$HTTP::Body::OctetStream::VERSION = '1.24';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -34,7 +34,8 @@ sub spin {
     }
 
     if ( my $length = length( $self->{buffer} ) ) {
-        $self->body->write( substr( $self->{buffer}, 0, $length, '' ), $length );
+        $self->body->write( substr( $self->{buffer}, 0, $length, '' ), $length )
+            or Carp::croak("Can't write to temporary file: $!");
     }
 
     if ( $self->length == $self->content_length ) {

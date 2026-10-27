@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs   v4.2.0;
+package FindBin::libs   v5.0.0;
 use v5.40;
 
 use File::Basename;
@@ -21,7 +21,7 @@ qw
     rel2abs
 );
 
-use FindBin::Bin        qw( $Bin        );
+use FindBin::Bin        qw( $Bin $Bin_c );
 use FindBin::Parents    qw( dir_paths   );
 
 ########################################################################
@@ -36,6 +36,7 @@ my %defaultz =
     base    => 'lib'
   , use     => 1
   , subdir  => ''       # add this subdir also if found.
+  , abspath => 1        # default to old behavior
 
   , ignore => q{,usr}   # dir's to skip looking for ./lib
 );
@@ -61,8 +62,7 @@ my $append_dir
 {
     my $dir             = shift;
     my ( $vol, $dirs )  = splitpath $dir, 1;
-    my $subpath         = catdir $dirs, @_;
-    my $path            = catpath $vol, $subpath;
+    my $path            = catpath $vol, catdir $dirs, @_;
 
     $path
 };
@@ -77,13 +77,19 @@ my $find_libs
     my @found   = ();
     my $ignorz  = $argz->{ ignore };
 
-    say STDERR "\nSearching $Bin for '$base' ($subdir)..."
+    my $bin
+    = $argz->{ abspath }
+    ? $Bin
+    : $Bin_c
+    ;
+
+    say STDERR "\nSearching $bin for '$base' ($subdir)..."
     if $argz->{ verbose };
 
     my @search
     = do
     {
-        my @dirz    = dir_paths $Bin, 1;
+        my @dirz    = dir_paths $bin, 1;
 
         say STDERR join "\n\t" => 'Parent Dirs:', @dirz
         if $argz->{ verbose };
@@ -95,7 +101,7 @@ my $find_libs
             (
                 catpath
                 (
-                    $vol => $_->$append_dir( $base ) 
+                    $vol => catdir $_, $base 
                 ) => 1
             )
         }
@@ -208,13 +214,10 @@ my $handle_args
     $argz{ subonly }
     ||= $argz{ export } && $argz{ subdir } && $argz{ scalar };
 
-    # stuff "debug=1" into your arguments and perl -d will stop here.
+    # stuff "debug=1" into your arguments and perl -d stops here.
 
     $DB::single = 1 if defined $argz{ debug };
 
-    # default if nothing is supplied is use; 
-    # without an explicit export option default
-    # it to off with an undef, otherwise it's true.
 
     if( exists $argz{ use } )
     {
@@ -222,6 +225,10 @@ my $handle_args
     }
     elsif
     (
+        # default if nothing is supplied is use; 
+        # without an explicit export option default
+        # it to off with an undef, otherwise it's true.
+
         defined $argz{ export }
         or 
         defined $argz{ p5lib }
@@ -229,7 +236,7 @@ my $handle_args
         defined $argz{ ld_lib }
     )
     {
-        $argz{ use  } = undef;
+        $argz{ use  } = '';
     }
     else
     {

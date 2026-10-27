@@ -2,9 +2,9 @@
 # vim: filetype=bash :  -*- mode: sh; sh-shell: bash; -*-
 ###############################################################################
 # GetOptLong: Getopt Library for Bash Script
-# Copyright 2025 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
+# Copyright 2025-2026 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=1.0.0}
+: ${GOL_VERSION:=1.1.0}
 ###############################################################################
 # Check bash version (4.4+ for nameref and ${parameter@Q})
 ((BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4))) ||
@@ -333,7 +333,9 @@ getoptlong () {
 	*) _gol_die "unknown subcommand -- $1" ;;
     esac
 }
-# Auto-initialization if first argument is an associative array
-if [[ $(declare -p "${1-}" 2> /dev/null) =~ ^declare\ -A ]] ; then
+# Auto-initialization if first argument is an associative array, only
+# when sourced as a file: the code embedded in a script (BASH_SOURCE is
+# the script itself) leaves the script's arguments alone
+if [[ ${BASH_SOURCE[0]} != "$0" && $(declare -p "${1-}" 2> /dev/null) =~ ^declare\ -A ]] ; then
     gol_init "$1" && shift && gol_parse "$@" && eval "$(gol_set)"
 fi

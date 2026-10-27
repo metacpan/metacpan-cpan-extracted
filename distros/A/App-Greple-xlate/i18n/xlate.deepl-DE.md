@@ -8,9 +8,15 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+So verwenden Sie GPT-6 Astra:
+
+    xlate -e gpt6 -t JA file.txt
+
+Falls  nicht aufgeführt ist`llm models``gpt-6-astra`, lesen Sie die Anweisungen zur Modellregistrierung in [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6).
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Schließen Sie „embedz“-Blöcke von der Übersetzung aus, wenn ein Dokument 
 
     Zur Zeit sind die folgenden Engines verfügbar
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) (zur Modellregistrierung)
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Schließen Sie „embedz“-Blöcke von der Übersetzung aus, wenn ein Dokument 
 
 - **--xlate-prompt**=_text_
 
-    Geben Sie eine benutzerdefinierte Eingabe an, die an die Übersetzungs-Engine gesendet werden soll. Diese Option ist für die LLM-Engines (`gpt3`, `gpt4o`, `gpt5`) verfügbar, nicht jedoch für DeepL. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung `%s` enthält, wird diese durch den Namen der Zielsprache ersetzt. Bei der LLM-gestützten `gpt5`-Engine wird das Dokument separat als JSON-Anfrage bereitgestellt, deren `input`-Element das zu übersetzende Array ist und deren optionales `context`-Element Referenzdaten enthält. Eine feste Anweisung, die diese Elemente als Dokumentdaten und nicht als Befehle behandelt, wird auch dann angehängt, wenn eine benutzerdefinierte Eingabeaufforderung verwendet wird.
+    Geben Sie eine benutzerdefinierte Eingabeaufforderung an, die an die Übersetzungs-Engine gesendet werden soll. Diese Option ist für die LLM-Engines (`gpt3`, `gpt4o`, `gpt5`, `gpt6`) verfügbar, jedoch nicht für DeepL. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung enthält`%s`, wird diese durch den Namen der Zielsprache ersetzt. Bei den LLM-gestützten Engines`gpt6`  und`gpt5`  wird das Dokument separat als JSON-Anfrage bereitgestellt, deren  `input`-Element das zu übersetzende Array ist und deren optionales  `context`-Element Referenzdaten enthält. Eine feste Anweisung, die diese Elemente als Dokumentdaten und nicht als Befehle behandelt, wird auch dann angehängt, wenn eine benutzerdefinierte Eingabe verwendet wird.
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Schließen Sie „embedz“-Blöcke von der Übersetzung aus, wenn ein Dokument 
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     Anzahl der umgebenden übersetzten Blöcke, die bei der Neuübersetzung geänderter Blöcke als Referenzkontext übergeben werden (Standardwert 2). Der Kontext umfasst auch den rohen Quelltext rund um den geänderten Bereich (Überschriften, Listenstruktur, Bildunterschriften) sowie, sofern verfügbar, die aus dem Cache wiederhergestellte vorherige Version des geänderten Textes, damit unveränderte Formulierungen erhalten bleiben. Setzen Sie den Wert auf 0, um die kontextbezogene Übersetzung vollständig zu deaktivieren. Beachten Sie, dass jeder geänderte Bereich in einem eigenen API-Aufruf übersetzt wird und der Kontext die JSON-Benutzeranfrage um bis zu etwa 8.000 Zeichen erweitern kann; daher geht die kontextbezogene Übersetzung mit einem gewissen Mehraufwand zugunsten der Konsistenz einher. Aus dem Dokument abgeleiteter Kontext wird aus der System-Eingabeaufforderung ausgeklammert.
 
 - **--xlate-cache-seed**=_file_

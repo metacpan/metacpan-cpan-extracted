@@ -8,9 +8,15 @@ App::Greple::xlate - greple のための翻訳サポートモジュール
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra を使用するには：
+
+    xlate -e gpt6 -t JA file.txt
+
+`llm models` に `gpt-6-astra` が表示されない場合は、[App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6) のモデル登録手順を参照してください。
+
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # DESCRIPTION
 
@@ -142,6 +148,8 @@ Perlのpodスタイルで書かれた文書内の通常のテキストブロッ�
 
     現時点では、以下のエンジンが利用可能です。
 
+    - **gpt6**: gpt-6-astra (via the `llm` command; see
+    [App::Greple::xlate::llm::gpt6](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Allm%3A%3Agpt6)（モデル登録用）
     - **gpt5**: gpt-5.6-terra (via the `llm` command)
     - **deepl**: DeepL API (via the `deepl` command)
     - **gpt3**: gpt-3.5-turbo (legacy, via the `gpty` command)
@@ -240,7 +248,7 @@ Perlのpodスタイルで書かれた文書内の通常のテキストブロッ�
 
 - **--xlate-prompt**=_text_
 
-    翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（`gpt3`、`gpt4o`、`gpt5`）で利用できますが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の動作をカスタマイズできます。プロンプトに`%s`が含まれている場合、それは対象言語名に置き換えられます。llmバックエンドの`gpt5`エンジンでは、文書は別途JSONリクエストとして提供され、その`input`メンバーが翻訳対象の配列で、任意の`context`メンバーには参照データが含まれます。これらのメンバーをコマンドではなく文書データとして扱う固定の指示は、カスタムプロンプトを使用する場合でも追加されます。
+    翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（`gpt3`、`gpt4o`、`gpt5`、`gpt6`）で利用できますが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の動作をカスタマイズできます。プロンプトに`%s`が含まれている場合、それは対象言語名に置き換えられます。llmバックエンドの`gpt5`および`gpt6`エンジンでは、文書は別途JSONリクエストとして提供され、その`input`メンバーが翻訳対象の配列で、任意の`context`メンバーには参照データが含まれます。これらのメンバーをコマンドではなく文書データとして扱う固定の指示は、カスタムプロンプトを使用する場合でも追加されます。
 
 - **--xlate-context**=_text_
 
@@ -248,7 +256,7 @@ Perlのpodスタイルで書かれた文書内の通常のテキストブロッ�
 
 - **--xlate-context-window**=_n_
 
-    (Context-aware engines only, e.g. `gpt5` on the llm backend)
+    (Context-aware engines only, e.g. `gpt5` or `gpt6` on the llm backend)
     変更されたブロックを再翻訳する際に参照コンテキストとして渡される周辺の翻訳済みブロック数（デフォルトは2）です。このコンテキストには、変更領域の周囲にある生のソーステキスト（見出し、リスト構造、キャプション）も含まれ、利用可能な場合は、キャッシュから復元された変更テキストの以前のバージョンも含まれるため、変更されていない表現が保持されます。コンテキスト対応翻訳を完全に無効にするには0に設定します。各変更領域はそれぞれ独自のAPI呼び出しで翻訳され、コンテキストによりJSONユーザーリクエストへ最大約8000文字が追加される可能性があるため、コンテキスト対応翻訳は一貫性と引き換えに多少の追加コストを伴うことに注意してください。文書由来のコンテキストはシステムプロンプトには含められません。
 
 - **--xlate-cache-seed**=_file_

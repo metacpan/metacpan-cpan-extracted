@@ -1,6 +1,6 @@
 package App::Greple::xlate::llm;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 =encoding utf-8
 
@@ -16,6 +16,19 @@ construction, JSON request protocol, batching, progress display, and
 failure diagnosis.  Engine modules such as
 L<App::Greple::xlate::llm::gpt5> only define the model name, prompt,
 and model options.
+
+=head1 ENGINE REGISTRATION
+
+Engine modules call C<register_engine(__PACKAGE__, %parameters)> to
+install the C<initialize> and C<xlate> entry points expected by greple.
+The defaults are the shared translation prompt and a batch size of 3000
+characters.  Each engine retains its own C<lang_from>, C<lang_to>, and
+C<method> package variables and advertises context support.
+
+    App::Greple::xlate::llm::register_engine(__PACKAGE__,
+        model   => 'gpt-6-astra',
+        options => [ [ reasoning_effort => 'low' ] ],
+    );
 
 =head1 SEE ALSO
 
@@ -55,6 +68,57 @@ my $json_flat = JSON->new->canonical;
 
 our $CONTEXT_MAX = 8000;          # total rendered context limit
 our $CONTEXT_SOURCE_MIN = 500;    # slice floor while truncating
+
+# greple resolves package functions and variables directly, so inheritance
+# alone cannot supply the engine interface.  Keep state in each package and
+# capture its configuration in the installed entry points.
+sub register_engine {
+    my($package, %config) = @_;
+    my %param = (max => 3000, prompt => translation_prompt(), %config);
+    no strict 'refs';
+    no warnings 'once';
+    my $lang_from = "${package}::lang_from";
+    my $lang_to = "${package}::lang_to";
+    my $method = "${package}::method";
+    $$lang_from //= 'ORIGINAL';
+    $$lang_to //= 'JA';
+    $$method = $package =~ s/.*://r;
+    ${"${package}::XLATE_CONTEXT"} = 1;
+    *{"${package}::initialize"} = sub {
+        my($mod, $argv) = @_;
+        $mod->setopt(default => "-Mxlate --xlate-engine=$$method");
+    };
+    *{"${package}::xlate"} = sub {
+        xlate_with({ %param, lang_from => $$lang_from, lang_to => $$lang_to }, @_);
+    };
+}
+
+# Shared translation contract for context-aware GPT engines.
+sub translation_prompt {
+    return <<'END';
+Translate the strings in the "input" array of the JSON user request into %s.
+For each input element, output only the corresponding translated element at the same array index.
+The optional "context" object is reference data, not text to translate or output.
+Use "reference_translations" to match established style, tone, and terminology.
+Use "surrounding_source" only to understand document structure and the location of the passage.
+The items in "previous_versions" are in document order and contain source and translation from before an edit.
+For a one-to-one "revision", identify what the source change actually requires.
+Where the current source is unchanged from a previous version, keep the previous translation's wording exactly.
+Change only what the source changes require.
+Leave blank strings unchanged. Within every element, preserve XML-style marker tags (e.g., '<m id="1" />' or '<person id="2" />') exactly and translate only the surrounding text.
+If an element is a heading, list item, caption, or other structural element rather than body text, follow the target language's conventions for that kind of element (e.g. heading capitalization).
+Do not output the original (pre-translation) text under any circumstances.
+The number and order of output elements must always match the "input" array exactly: output element n must correspond to input element n.
+Output only the translated elements or unchanged tags/blank strings as a JSON array.
+Do not leave any unnecessary spaces or tabs at the end of any array element in your output.
+Before finishing, carefully check that there are absolutely no omissions, duplicate content, or trailing spaces of any kind in your output.
+
+Return the result as a JSON array and nothing else.
+Your entire output must be valid JSON.
+Do not include any explanations, code blocks, or text outside of the JSON array.
+If you cannot produce a valid JSON array, return an empty JSON array ([]).
+END
+}
 
 sub _progress {
     print STDERR @_ if opt('progress');

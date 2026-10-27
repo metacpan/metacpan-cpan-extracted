@@ -1,8 +1,12 @@
 package Testophile;
 use v5.40;
 
-# Test that FindBin::Bin sets $Bin to pwd() when $0 is '-e', '-', or
-# 'interactive' (eval / one-liner / interactive shell invocation).
+# Test that FindBin::Bin sets $Bin and $Bin_c correctly when $0 is '-e'
+# (Perl one-liner / eval).  Note: perl -E also sets $0 to '-e', so this
+# covers both -e and -E invocation styles.
+#
+# $Bin_c = pwd()             -- absolute, symlinks and '..' preserved as-is
+# $Bin   = rel2abs( pwd() )  -- canonpath of pwd (same for clean paths)
 
 BEGIN
 {
@@ -15,15 +19,21 @@ BEGIN
 
 BEGIN { $0 = '-e' }
 
-use File::Spec::Functions qw( file_name_is_absolute );
+use File::Spec::Functions qw( file_name_is_absolute rel2abs );
 use Test::More;
 
-use FindBin::Bin qw( $Bin );
+use FindBin::Bin qw( $Bin $Bin_c );
 
-ok file_name_is_absolute( $Bin ), "\$Bin is absolute for '-e' invocation";
-ok -d $Bin,                       "\$Bin names an existing directory for '-e'";
+my $pwd = FindBin::Bin::pwd();
 
-is $Bin, FindBin::Bin::pwd(),     "\$Bin eq pwd() for '-e' invocation";
+ok  file_name_is_absolute( $Bin ),   "\$Bin is absolute for '-e' invocation";
+ok  file_name_is_absolute( $Bin_c ), "\$Bin_c is absolute for '-e' invocation";
+
+ok  -d $Bin,                          "\$Bin names an existing directory for '-e'";
+ok  -d $Bin_c,                        "\$Bin_c names an existing directory for '-e'";
+
+is  $Bin_c, $pwd,                     "\$Bin_c eq pwd() for '-e' invocation";
+is  $Bin,   rel2abs( $pwd ),          "\$Bin eq rel2abs(pwd()) for '-e' invocation";
 
 done_testing;
 __END__

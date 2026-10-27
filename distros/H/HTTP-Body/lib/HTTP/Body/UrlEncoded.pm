@@ -1,10 +1,12 @@
 package HTTP::Body::UrlEncoded;
-$HTTP::Body::UrlEncoded::VERSION = '1.23';
+$HTTP::Body::UrlEncoded::VERSION = '1.24';
 use strict;
 use base 'HTTP::Body';
 use bytes;
 
 our $DECODE = qr/%([0-9a-fA-F]{2})/;
+
+our $max_params = 1000;
 
 our %hex_chr;
 
@@ -45,6 +47,10 @@ sub spin {
     # Note: s/// appears faster than tr///
     $self->{buffer} =~ s/\+/ /g;
 
+    if ( $max_params && ( $self->{buffer} =~ tr/&;// ) >= $max_params ) {
+        Carp::croak("Too many parameters in request body (limit $max_params)");
+    }
+
     for my $pair ( split( /[&;](?:\s+)?/, $self->{buffer} ) ) {
 
         my ( $name, $value ) = split( /=/, $pair , 2 );
@@ -52,8 +58,8 @@ sub spin {
         next unless defined $name;
         next unless defined $value;
         
-        $name  =~ s/$DECODE/$hex_chr{$1}/gs;
-        $value =~ s/$DECODE/$hex_chr{$1}/gs;
+        $name  =~ s/$DECODE/$hex_chr{ uc $1 }/gs;
+        $value =~ s/$DECODE/$hex_chr{ uc $1 }/gs;
 
         $self->param( $name, $value );
     }

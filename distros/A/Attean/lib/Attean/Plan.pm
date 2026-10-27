@@ -8,7 +8,7 @@ Attean::Plan - Representation of SPARQL query plan operators
 
 =head1 VERSION
 
-This document describes Attean::Plan version 0.039
+This document describes Attean::Plan version 0.040
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Evaluates a quad pattern against the model.
 
 =cut
 
-package Attean::Plan::Quad 0.039 {
+package Attean::Plan::Quad 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed reftype);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -83,6 +83,8 @@ package Attean::Plan::Quad 0.039 {
 					push(@strings, '[' . join(', ', @tstrings) . ']');
 				}
 			} elsif ($t->does('Attean::API::TermOrVariable')) {
+				push(@strings, $t->ntriples_string);
+			} elsif ($t->does('Attean::API::TriplePattern')) {
 				push(@strings, $t->ntriples_string);
 			} else {
 				use Data::Dumper;
@@ -139,7 +141,7 @@ Evaluates a join (natural-, anti-, or left-) using a nested loop.
 
 =cut
 
-package Attean::Plan::NestedLoopJoin 0.039 {
+package Attean::Plan::NestedLoopJoin 0.040 {
 	use Moo;
 	use List::Util qw(all);
 	use namespace::clean;
@@ -228,7 +230,7 @@ Evaluates a join (natural-, anti-, or left-) using a hash join.
 
 =cut
 
-package Attean::Plan::HashJoin 0.039 {
+package Attean::Plan::HashJoin 0.040 {
 	use Moo;
 	use List::Util qw(all);
 	use namespace::clean;
@@ -369,7 +371,7 @@ package Attean::Plan::HashJoin 0.039 {
 
 =cut
 
-package Attean::Plan::Construct 0.039 {
+package Attean::Plan::Construct 0.040 {
 	use Moo;
 	use List::Util qw(all);
 	use Types::Standard qw(Str ArrayRef ConsumerOf InstanceOf);
@@ -480,7 +482,7 @@ package Attean::Plan::Construct 0.039 {
 
 =cut
 
-package Attean::Plan::Describe 0.039 {
+package Attean::Plan::Describe 0.040 {
 	use Moo;
 	use Attean::RDF;
 	use List::Util qw(all);
@@ -566,7 +568,7 @@ named variable binding.
 
 =cut
 
-package Attean::Plan::EBVFilter 0.039 {
+package Attean::Plan::EBVFilter 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ConsumerOf);
@@ -612,7 +614,8 @@ package Attean::Plan::EBVFilter 0.039 {
 				my $r		= shift;
 				my $term	= $r->value($var);
 				return 0 unless (blessed($term) and $term->does('Attean::API::Term'));
-				return $term->ebv;
+				my $ok	= eval { $term->ebv } || 0;
+				return $ok;
 			});
 		};
 	}
@@ -625,7 +628,7 @@ ordering.
 
 =cut
 
-package Attean::Plan::Merge 0.039 {
+package Attean::Plan::Merge 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ArrayRef ConsumerOf);
@@ -654,7 +657,7 @@ Evaluates a set of sub-plans, returning the union of results.
 
 =cut
 
-package Attean::Plan::Union 0.039 {
+package Attean::Plan::Union 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use namespace::clean;
@@ -725,7 +728,7 @@ expressions, binding the produced values to new variables.
 
 =cut
 
-package Attean::Plan::Extend 0.039 {
+package Attean::Plan::Extend 0.040 {
 	use Moo;
 	use Encode;
 	use UUID::Tiny ':std';
@@ -784,6 +787,7 @@ package Attean::Plan::Extend 0.039 {
 			my ($child)	= @{ $expr->children };
 			my $term	= $self->evaluate_expression($model, $child, $r);
 
+			# TODO: the code below duplicates code in Attean::SimpleQueryEvaluator. It should be refactored.
 			if ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#string$>) {
 				my $value	= $term->value;
 				if ($term->does('Attean::API::IRI')) {
@@ -919,7 +923,8 @@ package Attean::Plan::Extend 0.039 {
 				return $eq ? $true : $false; # TODO: this may not be using value-space comparision for numerics...
 			} elsif ($op eq '!=') {
 				my ($lhs, $rhs)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
-				return not($lhs->equals($rhs)) ? $true : $false; # TODO: this may not be using value-space comparision for numerics...
+				my $neq	= not($lhs->equals($rhs));
+				return $neq ? $true : $false; # TODO: this may not be using value-space comparision for numerics...
 			} elsif ($op =~ m#[<>]=?#) {
 				my ($lhs, $rhs)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 				my $cmp	= $lhs->compare($rhs);
@@ -1010,13 +1015,23 @@ package Attean::Plan::Extend 0.039 {
 					my ($string, $pattern, $flags)	= @terms;
 	# 				my ($string, $pattern, $flags)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 					# TODO: ensure that $string is a literal
+					unless ($string->does('Attean::API::Literal')) {
+						die 'REGEX called with non-literal value';
+					}
+					unless ($pattern->does('Attean::API::Literal')) {
+						die 'REGEX called with non-literal pattern';
+					}
 					($string, $pattern, $flags)	= map { blessed($_) ? $_->value : '' } ($string, $pattern, $flags);
 					my $re;
-					if ($flags =~ /i/) {
-						$re	= qr/$pattern/i;
-					} else {
-						$re	= qr/$pattern/;
+					my $flag_str	= '';
+					$flag_str	.= 'i' if ($flags =~ /i/);
+					$flag_str	.= 's' if ($flags =~ /s/);
+					$flag_str	.= 'm' if ($flags =~ /m/);
+					$flag_str	.= 'x' if ($flags =~ /x/);
+					if ($flags =~ /q/) {
+						$pattern	= quotemeta($pattern);
 					}
+					$re	= qr/(?${flag_str}:$pattern)/;
 					return ($string =~ $re) ? $true : $false;
 				} elsif ($func =~ /^(NOT)?IN$/) {
 					my $ok			= ($func eq 'IN') ? $true : $false;
@@ -1027,7 +1042,7 @@ package Attean::Plan::Extend 0.039 {
 	# 				foreach my $child (@{ $expr->children }) {
 					foreach my $value (@children) {
 	# 					my $value	= $self->evaluate_expression($model, $child, $r);
-						if ($term->equals($value)) {
+						if (eval { $term->equals($value) }) {
 							return $ok;
 						}
 					}
@@ -1071,25 +1086,20 @@ package Attean::Plan::Extend 0.039 {
 					}
 	# 				die "CONCAT called with terms that are not argument compatible" unless ($strings[0]->argument_compatible(@strings));
 					my %args;
-					if (my $l = $strings[0]->language) {
-						$args{language}	= $l;
-					} else {
-						my $dt	= $strings[0]->datatype;
-						if ($dt->value eq '') {
-							$args{datatype}	= 'http://www.w3.org/2001/XMLSchema#string';
-						}
-					}
+					my $lang_key	= $strings[0]->lang_dir();
 					foreach my $s (@strings) {
 						die unless ($s->does('Attean::API::Literal'));
-						die if ($s->datatype and not($s->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>));
-						if (my $l2 = $s->language) {
-							if (my $l1 = $args{language}) {
-								if ($l1 ne $l2) {
-									delete $args{language};
-								}
-							}
-						} else {
-							delete $args{language};
+						die if ($s->datatype and not($s->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#(lang|dirLang)String|2001/XMLSchema#string)>));
+						my $new_lang_key	= $s->lang_dir();
+						if ($new_lang_key ne $lang_key) {
+							$lang_key	= '';
+						}
+					}
+					if ($lang_key) {
+						my ($lang, $dir)	= split('--', $lang_key);
+						$args{language}		= $lang;
+						if ($dir) {
+							$args{base_dir}	= $dir;
 						}
 					}
 					my $c	= Attean::Literal->new(value => join('', map { $_->value } @strings), %args);
@@ -1103,6 +1113,19 @@ package Attean::Plan::Extend 0.039 {
 					die unless ($string->does('Attean::API::Literal'));
 					my $value		= $string->language // '';
 					return Attean::Literal->new(value => $value);
+				} elsif ($func eq 'HASLANG') {
+					my ($string)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+					return $false unless ($string->does('Attean::API::Literal'));
+					return $string->has_language ? $true : $false;
+				} elsif ($func eq 'HASLANGDIR') {
+					my ($string)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+					return $false unless ($string->does('Attean::API::Literal'));
+					return $string->has_base_dir ? $true : $false;
+				} elsif ($func eq 'LANGDIR') {
+					my ($string)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+					die unless ($string->does('Attean::API::Literal'));
+					my $dir	= $string->base_dir // '';
+					return Attean::Literal->new(value => $dir);
 				} elsif ($func eq 'LANGMATCHES') {
 					my ($term, $pat)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 					my $lang	= $term->value;
@@ -1124,9 +1147,20 @@ package Attean::Plan::Extend 0.039 {
 				} elsif ($func eq 'STRLANG') {
 					my ($term, $lang)	= @terms;
 					die unless ($term->does('Attean::API::Literal'));
-					die unless ($term->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>);
+					die unless ($term->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#string>);
 					die if ($term->language);
+					die unless ($lang->value);
 					return Attean::Literal->new(value => $term->value, language => $lang->value);
+				} elsif ($func eq 'STRLANGDIR') {
+					my ($term, $lang, $dir)	= @terms;
+					die unless ($term->does('Attean::API::Literal'));
+					die unless ($lang->does('Attean::API::Literal'));
+					die unless ($dir->does('Attean::API::Literal'));
+					die unless ($term->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#string>);
+					die unless ($lang->value);
+					die unless ($dir->value =~ /^(ltr|rtl)$/);
+					my $v	= Attean::Literal->new(value => $term->value, language => $lang->value, base_dir => $dir->value);
+					return $v;
 				} elsif ($func eq 'STRDT') {
 					my ($term, $dt)	= @terms;
 					die unless ($term->does('Attean::API::Literal'));
@@ -1135,13 +1169,14 @@ package Attean::Plan::Extend 0.039 {
 	# 				my ($term, $dt)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 					return Attean::Literal->new(value => $term->value, datatype => $dt->value);
 				} elsif ($func eq 'REPLACE') {
-					my ($term, $pat, $rep)	= @terms;
+					my ($term, $pat, $rep, $flags_term)	= @terms;
 					die unless ($term->does('Attean::API::Literal'));
 					die unless ($term->language or $term->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>);
 	# 				my ($term, $pat, $rep)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 					my $value	= $term->value;
 					my $pattern	= $pat->value;
 					my $replace	= $rep->value;
+					my $flags	= blessed($flags_term) ? $flags_term->value : '';
 					die 'REPLACE() called with unsafe ?{} match pattern' if (index($pattern, '(?{') != -1 or index($pattern, '(??{') != -1);
 					die 'REPLACE() called with unsafe ?{} replace pattern' if (index($replace, '(?{') != -1 or index($replace, '(??{') != -1);
 
@@ -1150,6 +1185,11 @@ package Attean::Plan::Extend 0.039 {
 					$replace	=~ s/"/\\"/g;
 					$replace	= qq["$replace"];
 					no warnings 'uninitialized';
+
+					if ($flags eq 'i') {
+						$pattern	= '(?i)' . $pattern;
+					}
+
 					$value	=~ s/$pattern/"$replace"/eeg;
 				# 	warn "==> " . Dumper($value);
 					return Attean::Literal->new(value => $value, $term->construct_args);
@@ -1167,10 +1207,10 @@ package Attean::Plan::Extend 0.039 {
 					return Attean::Literal->new(value => $substring, $term->construct_args);
 				} elsif ($func eq 'CONTAINS') {
 					my ($term, $pattern)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
-					if ($term->has_language and $pattern->has_language) {
-						if ($term->literal_value_language ne $pattern->literal_value_language) {
-							die "CONTAINS called with literals of different languages";
-						}
+					my $t_key	= $term->lang_dir();
+					my $p_key	= $pattern->lang_dir();
+					if ($t_key ne $p_key and $p_key ne '') {
+						die "CONTAINS called with literals of different languages and/or base direction";
 					}
 					my ($string, $pat)	= map { $_->value } ($term, $pattern);
 					my $pos		= index($string, $pat);
@@ -1312,14 +1352,37 @@ package Attean::Plan::Extend 0.039 {
 						my $ok	= ($a->sameTerms($b));
 						return $ok ? $true : $false;
 					} else {
-						my $ok	= ($a->value eq $b->value);
-						return $ok ? $true : $false;
+						return $false unless ($a->value eq $b->value);
+						if ($a->does('Attean::API::Literal') and $b->does('Attean::API::Literal')) {
+							return $false unless ($a->lang_dir eq $b->lang_dir);
+							my $ad	= $a->datatype;
+							my $bd	= $b->datatype;
+							if ($ad and $bd) {
+								my $bd	= $b->datatype;
+								return $false unless ($ad->value eq $bd->value);
+							} elsif ($ad or $bd) {
+								return $false;
+							}
+						}
+						return $true;
 					}
 				} elsif ($func =~ /^(SUBJECT|PREDICATE|OBJECT)$/) {
 					my @operands	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 					my $pos	= lc($func);
 					my $term	= $operands[0]->$pos();
 					return $term;
+				} elsif ($func eq 'TRIPLE') {
+					my ($s, $p, $o)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
+					unless ($s->does('Attean::API::BlankOrIRI')) {
+						die 'TRIPLE() constructor failed with bad subject type';
+					}
+					unless ($p->does('Attean::API::IRI')) {
+						die 'TRIPLE() constructor failed with bad predicate type';
+					}
+					unless ($o->does('Attean::API::TermOrTriple')) {
+						die 'TRIPLE() constructor failed with bad object type';
+					}
+					return Attean::Triple->new($s, $p, $o);
 				} else {
 					warn "Expression evaluation unimplemented: " . $expr->as_string;
 					$self->log->warn("Expression evaluation unimplemented: " . $expr->as_string);
@@ -1393,7 +1456,11 @@ package Attean::Plan::Extend 0.039 {
 								
 								if ($term->does('Attean::API::Binding')) {
 									# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
-									$term	= $term->ground($r);
+									$term	= eval{ $term->ground($r) };
+									if ($@) {
+										# validation failed ; skip this variable
+										next;
+									}
 								}
 								
 								$row{ $var }	= $term;
@@ -1415,7 +1482,7 @@ hash of already-seen results.
 
 =cut
 
-package Attean::Plan::HashDistinct 0.039 {
+package Attean::Plan::HashDistinct 0.040 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1443,7 +1510,7 @@ filtering out sequential duplicates.
 
 =cut
 
-package Attean::Plan::Unique 0.039 {
+package Attean::Plan::Unique 0.040 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1478,7 +1545,7 @@ number of results ("offset") and limiting the total number of returned results
 
 =cut
 
-package Attean::Plan::Slice 0.039 {
+package Attean::Plan::Slice 0.040 {
 	use Moo;
 	use Types::Standard qw(Int);
 	use namespace::clean;
@@ -1519,7 +1586,7 @@ of variable bindings in each result.
 
 =cut
 
-package Attean::Plan::Project 0.039 {
+package Attean::Plan::Project 0.040 {
 	use Moo;
 	with 'Attean::API::BindingSubstitutionPlan', 'Attean::API::UnaryQueryTree';
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1596,7 +1663,7 @@ sorting is applied.
 
 =cut
 
-package Attean::Plan::OrderBy 0.039 {
+package Attean::Plan::OrderBy 0.040 {
 	use Moo;
 	use Types::Standard qw(HashRef ArrayRef InstanceOf Bool Str);
 	use Scalar::Util qw(blessed);
@@ -1679,7 +1746,7 @@ Evaluates a SPARQL query against a remote endpoint.
 
 =cut
 
-package Attean::Plan::Service 0.039 {
+package Attean::Plan::Service 0.040 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf Bool Str InstanceOf);
 	use Encode qw(encode);
@@ -1731,7 +1798,7 @@ Returns a constant set of results.
 
 =cut
 
-package Attean::Plan::Table 0.039 {
+package Attean::Plan::Table 0.040 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1796,7 +1863,7 @@ L<Attean::ListIterator>, the size of that iterator will be used.
 
 =cut
 
-package Attean::Plan::Iterator 0.039 {
+package Attean::Plan::Iterator 0.040 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf Int);
 	use namespace::clean;
@@ -1860,7 +1927,7 @@ package Attean::Plan::Iterator 0.039 {
 
 =cut
 
-package Attean::Plan::ALPPath 0.039 {
+package Attean::Plan::ALPPath 0.040 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -2012,7 +2079,7 @@ package Attean::Plan::ALPPath 0.039 {
 	}
 }
 
-package Attean::Plan::ZeroOrOnePath 0.039 {
+package Attean::Plan::ZeroOrOnePath 0.040 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -2111,7 +2178,7 @@ results were produced by evaluating the sub-plan.
 
 =cut
 
-package Attean::Plan::Exists 0.039 {
+package Attean::Plan::Exists 0.040 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -2145,7 +2212,7 @@ package Attean::Plan::Exists 0.039 {
 
 =cut
 
-package Attean::Plan::Aggregate 0.039 {
+package Attean::Plan::Aggregate 0.040 {
 	use Moo;
 	use Encode;
 	use UUID::Tiny ':std';
@@ -2271,33 +2338,20 @@ package Attean::Plan::Aggregate 0.039 {
 		} elsif ($op eq 'GROUP_CONCAT') {
 			my $sep	= $expr->scalar_vars->{seperator} // ' ';
 			my @values;
-			my $all_lang	= 1;
-			my $all_str		= 1;
-			my $lang;
+			my %seen;
 			foreach my $r (@$rows) {
 				my $term	= Attean::Plan::Extend->evaluate_expression($model, $e, $r);
 				die "GROUP_CONCAT called with a non-literal argument" unless ($term->does('Attean::API::Literal'));
-				if ($term->language) {
-					$all_str	= 0;
-					if (defined($lang) and $lang ne $term->language) {
-						$all_lang	= 0;
-					} else {
-						$lang	= $term->language;
+				if ($expr->distinct) {
+					unless ($seen{ $term->value }++) {
+						push(@values, $term->value);
 					}
 				} else {
-					$all_lang	= 0;
-					$all_str	= 0;
+					push(@values, $term->value);
 				}
-				push(@values, $term->value);
-			}
-			my %strtype;
-			if ($all_lang and $lang) {
-				$strtype{language}	= $lang;
-			} elsif ($all_str) {
-				$strtype{datatype}	= 'http://www.w3.org/2001/XMLSchema#string'
 			}
 			my $string	= join($sep, @values);
-			return Attean::Literal->new(value => $string, %strtype);
+			return Attean::Literal->new(value => $string);
 		} elsif ($op eq 'FOLD') {
 			my @arg_exprs	= @{ $expr->children };
 			my $order	= $expr->order || [];
@@ -2494,7 +2548,7 @@ package Attean::Plan::Aggregate 0.039 {
 	}
 }
 
-package Attean::Plan::Sequence 0.039 {
+package Attean::Plan::Sequence 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2519,7 +2573,7 @@ package Attean::Plan::Sequence 0.039 {
 	}
 }
 
-package Attean::Plan::Clear 0.039 {
+package Attean::Plan::Clear 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2556,7 +2610,7 @@ package Attean::Plan::Clear 0.039 {
 	}
 }
 
-package Attean::Plan::Drop 0.039 {
+package Attean::Plan::Drop 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2591,7 +2645,7 @@ package Attean::Plan::Drop 0.039 {
 	}
 }
 
-package Attean::Plan::TripleTemplateToModelQuadMethod 0.039 {
+package Attean::Plan::TripleTemplateToModelQuadMethod 0.040 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf Str ArrayRef HashRef);
@@ -2633,11 +2687,12 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.039 {
 			my $iter	= $child->();
 			my @results;
 			while (my $t = $iter->next) {
+				my $bnode_mapper	= Attean::TermMap->uuid_blank_map; # used to create fresh bnodes in the pattern for each input row
 				if (scalar(@order)) {
 					push(@results, $t);
 				}
 				foreach my $p (@$pattern) {
-					my $q		= $p->apply_bindings($t);
+					my $q		= $p->apply_map($bnode_mapper)->apply_bindings($t);
 					my $quad	= $q->does('Attean::API::QuadPattern') ? $q : $q->as_quad_pattern($graph);
 					if ($quad->is_ground) {
 						# warn "# $method: " . $quad->as_string . "\n";
@@ -2650,8 +2705,9 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.039 {
 			foreach my $method (@order) {
 				my $pattern	= $self->patterns->{ $method };
 				foreach my $t (@results) {
+					my $bnode_mapper	= Attean::TermMap->uuid_blank_map; # used to create fresh bnodes in the pattern for each input row
 					foreach my $p (@$pattern) {
-						my $q		= $p->apply_bindings($t);
+						my $q		= $p->apply_map($bnode_mapper)->apply_bindings($t);
 						my $quad	= $q->does('Attean::API::QuadPattern') ? $q : $q->as_quad_pattern($graph);
 						if ($quad->is_ground) {
 							# warn "# $method: " . $quad->as_string . "\n";
@@ -2667,7 +2723,7 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.039 {
 	}
 }
 
-package Attean::Plan::Load 0.039 {
+package Attean::Plan::Load 0.040 {
 	use Moo;
 	use Encode;
 	use LWP::UserAgent;
@@ -2894,7 +2950,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams.
+Copyright (c) 2014--2026 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

@@ -10,9 +10,15 @@ App::Greple::xlate - greple のための翻訳サポートモジュール
 
     greple -Mxlate --xlate-engine deepl --xlate pattern target-file
 
+GPT-6 Astra を使用するには：
+
+    xlate -e gpt6 -t JA file.txt
+
+C<llm models> に C<gpt-6-astra> が表示されない場合は、L<App::Greple::xlate::llm::gpt6> のモデル登録手順を参照してください。
+
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 DESCRIPTION
 
@@ -160,6 +166,9 @@ B<--xlate-fold> オプションを指定すると、変換後のテキストは�
 
 =over 2
 
+=item * B<gpt6>: gpt-6-astra (via the C<llm> command; see
+L<App::Greple::xlate::llm::gpt6>（モデル登録用）
+
 =item * B<gpt5>: gpt-5.6-terra (via the C<llm> command)
 
 =item * B<deepl>: DeepL API (via the C<deepl> command)
@@ -269,7 +278,7 @@ C<xtxt> 以外の以下の形式は、翻訳対象部分が行の集合である
 
 =item B<--xlate-prompt>=I<text>
 
-翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>）で利用できますが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の動作をカスタマイズできます。プロンプトにC<%s>が含まれている場合、それは対象言語名に置き換えられます。llmバックエンドのC<gpt5>エンジンでは、文書は別途JSONリクエストとして提供され、そのC<input>メンバーが翻訳対象の配列で、任意のC<context>メンバーには参照データが含まれます。これらのメンバーをコマンドではなく文書データとして扱う固定の指示は、カスタムプロンプトを使用する場合でも追加されます。
+翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはLLMエンジン（C<gpt3>、C<gpt4o>、C<gpt5>、C<gpt6>）で利用できますが、DeepLでは利用できません。AIモデルに具体的な指示を与えることで、翻訳の動作をカスタマイズできます。プロンプトにC<%s>が含まれている場合、それは対象言語名に置き換えられます。llmバックエンドのC<gpt5>およびC<gpt6>エンジンでは、文書は別途JSONリクエストとして提供され、そのC<input>メンバーが翻訳対象の配列で、任意のC<context>メンバーには参照データが含まれます。これらのメンバーをコマンドではなく文書データとして扱う固定の指示は、カスタムプロンプトを使用する場合でも追加されます。
 
 =item B<--xlate-context>=I<text>
 
@@ -277,7 +286,7 @@ C<xtxt> 以外の以下の形式は、翻訳対象部分が行の集合である
 
 =item B<--xlate-context-window>=I<n>
 
-(Context-aware engines only, e.g. C<gpt5> on the llm backend)
+(Context-aware engines only, e.g. C<gpt5> or C<gpt6> on the llm backend)
 変更されたブロックを再翻訳する際に参照コンテキストとして渡される周辺の翻訳済みブロック数（デフォルトは2）です。このコンテキストには、変更領域の周囲にある生のソーステキスト（見出し、リスト構造、キャプション）も含まれ、利用可能な場合は、キャッシュから復元された変更テキストの以前のバージョンも含まれるため、変更されていない表現が保持されます。コンテキスト対応翻訳を完全に無効にするには0に設定します。各変更領域はそれぞれ独自のAPI呼び出しで翻訳され、コンテキストによりJSONユーザーリクエストへ最大約8000文字が追加される可能性があるため、コンテキスト対応翻訳は一貫性と引き換えに多少の追加コストを伴うことに注意してください。文書由来のコンテキストはシステムプロンプトには含められません。
 
 =item B<--xlate-cache-seed>=I<file>

@@ -4,7 +4,7 @@ AtteanX::Parser::SPARQLJSON - SPARQL JSON Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLJSON version 0.039
+This document describes AtteanX::Parser::SPARQLJSON version 0.040
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ This document describes AtteanX::Parser::SPARQLJSON version 0.039
 use v5.14;
 use warnings;
 
-package AtteanX::Parser::SPARQLJSON 0.039 {
+package AtteanX::Parser::SPARQLJSON 0.040 {
 	use Attean;
 	use Moo;
 	use JSON;
@@ -73,8 +73,15 @@ package AtteanX::Parser::SPARQLJSON 0.039 {
 	sub parse_list_from_bytes {
 		my $self	= shift;
 		my $octets	= shift;
-		my $json	= decode('UTF-8', $octets, Encode::FB_CROAK);
-		my $data	= from_json($json, {utf8 => 1});
+		my $data	= from_json($octets, {utf8 => 1});
+		return $self->_parse_hash($data);
+	}
+	
+	sub _parse_hash {
+		my $self	= shift;
+		my $data	= shift;
+# 		use Data::Dumper;
+# 		warn Dumper($data);
 		my $head	= $data->{head};
 		my $vars	= $head->{vars};
 		my $res		= $data->{results};
@@ -112,7 +119,11 @@ package AtteanX::Parser::SPARQLJSON 0.039 {
 		} elsif ($type eq 'literal') {
 			my $data	= $value->{value};
 			if (my $lang = $value->{'xml:lang'}) {
-				return Attean::Literal->new( value => $data, language => $lang );
+				my %args	= (value => $data, language => $lang);
+				if (my $d = $value->{'its:dir'}) {
+					$args{'base_dir'}	= $d;
+				}
+				return Attean::Literal->new( %args );
 			} elsif (my $dt = $value->{'datatype'}) {
 				my $iri		= $self->new_iri(value => $dt);
 				return Attean::Literal->new( value => $data, datatype => $iri );
@@ -154,7 +165,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2022 Gregory Todd Williams. This
+Copyright (c) 2014--2026 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

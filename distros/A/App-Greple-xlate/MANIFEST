@@ -157,6 +157,7 @@ lib/App/Greple/xlate/gpty/gpt4o.pm
 lib/App/Greple/xlate/gpty/gpt5.pm
 lib/App/Greple/xlate/llm.pm
 lib/App/Greple/xlate/llm/gpt5.pm
+lib/App/Greple/xlate/llm/gpt6.pm
 lib/App/Greple/xlate/null.pm
 lib/App/xlate.pm
 minil.toml
@@ -171,7 +172,9 @@ t/05_translate.t
 t/06_llm_stub.t
 t/07_deepl_unit.t
 t/07_llm_unit.t
+t/08_llm_engines.t
 t/08_llm_gpt5.t
+t/08_llm_gpt6.t
 t/09_llm_loader.t
 t/10_llm_run.t
 t/11_llm_context.t

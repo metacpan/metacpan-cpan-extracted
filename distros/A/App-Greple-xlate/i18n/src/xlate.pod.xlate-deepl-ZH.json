@@ -4,6 +4,14 @@
       "App::Greple::xlate - greple的翻译支持模块\n"
    ],
    [
+      "To use GPT-6 Astra:\n",
+      "使用 GPT-6 Astra 的方法：\n"
+   ],
+   [
+      "If C<llm models> does not list C<gpt-6-astra>, see the model registration instructions in L<App::Greple::xlate::llm::gpt6>.\n",
+      "如果  未C<llm models>列出 C<gpt-6-astra>，请参阅  中的模型注册说明L<App::Greple::xlate::llm::gpt6>（\n"
+   ],
+   [
       "B<Greple> B<xlate> module find desired text blocks and replace them by the translated text. The primary engine is GPT-5.6 Terra (F<llm/gpt5.pm>), which calls the L<llm|https://llm.datasette.io/> command; DeepL (F<deepl.pm>) and legacy B<gpty>-based engines are also included.\n",
       "B<Greple> B<xlate>  模块会查找目标文本块并将其替换为翻译后的文本。主要引擎是 GPT-5.6 Terra (F<llm/gpt5.pm>)，它会调用  命令L<llm|https://llm.datasette.io/>；DeepL (F<deepl.pm>) 以及B<gpty>基于旧版模型的引擎也包含在内。\n"
    ],
@@ -144,6 +152,10 @@
       "目前有以下引擎\n"
    ],
    [
+      "L<App::Greple::xlate::llm::gpt6> for model registration)\n",
+      "L<App::Greple::xlate::llm::gpt6>用于模型注册）\n"
+   ],
+   [
       "Engine modules are searched in backend namespaces first (C<llm>, then C<gpty>), then directly under C<App::Greple::xlate>. So C<gpt5> loads C<App::Greple::xlate::llm::gpt5> which calls the C<llm> command, while C<gpt4o> falls back to C<App::Greple::xlate::gpty::gpt4o>. Use C<--xlate-setopt backend=gpty> to force a specific backend.\n",
       "引擎模块首先在后端命名空间中搜索（C<llm>，然后是 C<gpty>），然后直接在 C<App::Greple::xlate> 下搜索。 因此，C<gpt5> 会加载 C<App::Greple::xlate::llm::gpt5>，后者调用 C<llm> 命令，而 C<gpt4o> 则回退到 C<App::Greple::xlate::gpty::gpt4o>。使用 C<--xlate-setopt backend=gpty> 可强制指定特定后端。\n"
    ],
@@ -216,8 +228,8 @@
       "如果想一次翻译一行，则将该值设为 1。该选项优先于 C<--xlate-maxlen> 选项。\n"
    ],
    [
-      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> engine, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
-      "指定要发送给翻译引擎的自定义提示词。此选项适用于 LLM 引擎（C<gpt3>, C<gpt4o>, C<gpt5>），但不适用于 DeepL。您可以通过向 AI 模型提供具体指令来自定义翻译行为。如果提示词中包含 C<%s>，它将被替换为目标语言名称。 对于基于 LLM 的C<gpt5>引擎，文档将作为单独的 JSON 请求提供，其中 `content` C<input>成员为待翻译的数组，可选的 `reference` C<context>成员包含参考数据。即使使用自定义提示词，系统也会在请求末尾附加一条固定指令，将这些成员视为文档数据而非命令。\n"
+      "Specify a custom prompt to be sent to the translation engine. This option is available for the LLM engines (C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>) but not for DeepL. You can customize the translation behavior by providing specific instructions to the AI model. If the prompt contains C<%s>, it will be replaced with the target language name. For the llm-backed C<gpt5> and C<gpt6> engines, the document is supplied separately as a JSON request whose C<input> member is the array to translate and whose optional C<context> member contains reference data. A fixed instruction that treats those members as document data, not commands, is appended even when a custom prompt is used.\n",
+      "指定要发送给翻译引擎的自定义提示词。此选项适用于 LLM 引擎（C<gpt3>, C<gpt4o>, C<gpt5>, C<gpt6>），但不适用于 DeepL。您可以通过向 AI 模型提供具体指令来自定义翻译行为。如果提示词中包含 C<%s>，它将被替换为目标语言名称。 对于基于 LLM 的  和C<gpt5>  引擎C<gpt6>，文档将作为单独的 JSON 请求提供，其中  C<input>成员是待翻译的数组，而可选的  C<context>成员包含参考数据。即使使用自定义提示，系统也会附加一条固定指令，将这些成员视为文档数据而非命令。\n"
    ],
    [
       "Specify additional context information to be sent to the translation engine. This option can be used multiple times to provide multiple context strings. The context information helps the translation engine understand the background and produce more accurate translations.\n",
