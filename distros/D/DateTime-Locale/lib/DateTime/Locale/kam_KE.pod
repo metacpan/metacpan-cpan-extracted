@@ -435,6 +435,24 @@ Kamba Kenya locale.
    1995-12-22T09:05:02 = IY 1995 Ĩkl 22, Wtn
   -0010-09-15T04:44:23 = MY -10 Knd 15, Wth
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = IY 2008 Mwai wa kelĩ
+   1995-12-22T09:05:02 = IY 1995 Mwai wa ĩkumi na ilĩ
+  -0010-09-15T04:44:23 = MY -10 Mwai wa kenda
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = IY 2008 Mwai wa kelĩ 5, Wkl
+   1995-12-22T09:05:02 = IY 1995 Mwai wa ĩkumi na ilĩ 22, Wtn
+  -0010-09-15T04:44:23 = MY -10 Mwai wa kenda 15, Wth
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = IY 2008 Mwai wa kelĩ 5
+   1995-12-22T09:05:02 = IY 1995 Mwai wa ĩkumi na ilĩ 22
+  -0010-09-15T04:44:23 = MY -10 Mwai wa kenda 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = IY 2008 Kel 5

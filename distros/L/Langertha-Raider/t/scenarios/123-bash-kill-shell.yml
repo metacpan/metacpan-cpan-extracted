@@ -1,0 +1,22 @@
+# kill_shell stops a background shell (its whole process group); afterwards
+# bash_output reports it killed, a second kill_shell and an unknown ID are
+# errors with Claude Code's TaskStop texts.
+title: kill_shell stops a background server; the status is killed; wrong and repeated kills fail
+prompt: Start the server, then stop it again.
+script:
+  - tool_calls:
+      - [ bash, { command: 'echo listening; sleep 300', run_in_background: true } ]
+  - tool_calls:
+      - [ kill_shell, { shell_id: bash_1 } ]
+      - [ bash_output, { bash_id: bash_1 } ]
+      - [ kill_shell, { shell_id: bash_1 } ]
+      - [ kill_shell, { shell_id: bash_7 } ]
+  - text: stopped
+expect:
+  answer: stopped
+  tools:
+    - { name: bash, text: 'ID: bash_1\.' }
+    - { name: kill_shell, text: '\ASuccessfully stopped task: bash_1 \(echo listening; sleep 300\)\z' }
+    - { name: bash_output, text: '\A<status>killed</status>' }
+    - { name: kill_shell, error: true, text: '\ATask bash_1 is not running \(status: killed\)\z' }
+    - { name: kill_shell, error: true, text: '\ANo task found with ID: bash_7\z' }

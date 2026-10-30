@@ -1,0 +1,12 @@
+title: read_file of a PDF for a model whose engine takes no PDF in a tool result is refused with a message, not sent whole (tool_result_pdf)
+files:
+  doc.pdf: "%PDF-1.4\n%%EOF\n"
+prompt: Read the PDF.
+script:
+  - tool_calls:
+      - [ read_file, { path: doc.pdf } ]
+  - text: cannot read it
+expect:
+  answer: cannot read it
+  tools:
+    - { name: read_file, error: true, text: "\\A<tool_use_error>This model cannot see PDF files: /\\S+/doc\\.pdf was not read\\." }

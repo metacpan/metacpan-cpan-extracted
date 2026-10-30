@@ -1,5 +1,45 @@
 Revision history for Mail::DKIM2
 
+0.28    2026-10-28
+        draft-ietf-dkim-dkim2-spec-08. Changes what is hashed and what
+        verifies, so every signer and verifier must move together:
+        Auto-Submitted and VBR-Info are hashed now.
+
+        - Auto-Submitted and VBR-Info are no longer ignored (section 4).
+        - h= and s= are "," lists (all must pass) joined by "|" (any may
+          pass), and results combine as sections 14.6 and 14.7 say. An
+          algorithm this verifier does not implement is a PERMERROR
+          item, overridden only by a "|" alternative; an absent key no
+          longer just skips its item; the "more selectors than allowed"
+          limit is gone. Keys and signatures are checked together, one
+          signature at a time. fold_header may fold around "," and "|".
+        - Tag-names and JSON keys are case-sensitive and lowercase: an
+          uppercase tag is an unknown tag, an uppercase key invalid JSON.
+          Hash and algorithm names are case-sensitive too.
+        - Timestamp, Chain of Custody and From-Authentic errors are FAIL,
+          not PERMERROR (sections 14.3, 14.4, 14.8).
+        - New strings: "Recipe <path> is invalid" for one bad Recipe step
+          (b[<n>] or h.<name>[<n>]), "public key <s> is malformed" (an
+          Ed25519 key not exactly 32 octets, DER included; an RSA key
+          under 1024 bits), "selector <s> algorithm unknown", "algorithm
+          <name> unknown", "no group of signatures/hashes passed".
+          recipe_order_error is gone: parse checks copy-range order.
+        - Verifier::fully_verified: false for a pass over a null body
+          Recipe, whose lower body hashes cannot be checked (section 13);
+          Validate's report carries it.
+        - provisionally_verified follows section 13.2: it checks the top
+          d= against a non-null top mf=, and no longer the timestamps.
+        - DSN->may_generate takes Domain: a DSN's d= must match a
+          recipient in the reported message's top rt= (section 16.2).
+        - ML-DSA-44 ("mldsa44") is not implemented: algorithm unknown.
+        - Local policy, MAX_SIGNATURE_ITEMS: an s= of more than 8 items
+          is "has more than 8 signatures", before any key is fetched.
+        - Every s= and h= value must be a base64string, whatever its
+          algorithm. A Recipe's whole-document faults are reported before
+          any step's. provisionally_verified is false under InstancesOnly.
+          The validator reads i= and m= case-sensitively. fold_header no
+          longer folds between a header hash's padding and its ":".
+
 0.27    2026-10-21
         Fix a test failure on hosts without JSON::XS.
 

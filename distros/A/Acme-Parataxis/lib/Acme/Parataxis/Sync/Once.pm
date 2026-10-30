@@ -1,7 +1,7 @@
 use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Sync::Once v0.1.1 : isa(Acme::Parataxis::Sync) {
+class Acme::Parataxis::Sync::Once v0.1.3 : isa(Acme::Parataxis::Sync) {
     use Acme::Parataxis;
     use Carp qw[croak];
     field $owner;                    # fiber id running the action; undef when idle

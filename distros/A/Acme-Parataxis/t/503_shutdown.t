@@ -34,16 +34,14 @@ subtest 'on_shutdown option plumbing' => sub {
     is $r3,        1,      'plain run returns its value';
     is $SIG{INT},  $int0,  'a plain run without on_shutdown leaves SIGINT untouched';
     is $SIG{TERM}, $term0, 'a plain run without on_shutdown leaves SIGTERM untouched';
-    my $e1 = dies {
+    like dies {
         run( foo => 1, code => sub { } );
-    };
-    like( $e1, qr/unknown option/, 'an unknown run() option croaks' );
-    my $e2 = dies {
+    }, qr/unknown option/, 'an unknown run() option croaks';
+    like dies {
         run( code => sub { }, on_shutdown => [] );
-    };
-    like( $e2, qr/on_shutdown/, 'a non-code on_shutdown ref croaks' );
-    my $e3 = dies { run( on_shutdown => 1 ) };
-    like( $e3, qr/code/, 'on_shutdown without code croaks' );
+    }, qr/on_shutdown/, 'a non-code on_shutdown ref croaks';
+    like dies { run( on_shutdown => 1 ) }
+    , qr/code/, 'on_shutdown without code croaks';
     is $SIG{INT},  $int0,  'SIGINT untouched after the croaks';
     is $SIG{TERM}, $term0, 'SIGTERM untouched after the croaks';
     my $inner = run(
@@ -103,18 +101,16 @@ subtest 'shutdown via the on_shutdown token (portable)' => sub {
     is $r4,        5,      'the scheduler is reusable after a token-driven shutdown';
     is $SIG{INT},  $int0,  'SIGINT untouched after the reuse run';
     is $SIG{TERM}, $term0, 'SIGTERM untouched after the reuse run';
-    my $e4 = dies {
+    like dies {
         run( code => sub { }, on_shutdown => bless( {}, 'Nope::NotaToken' ) );
-    };
-    like( $e4, qr/on_shutdown/, 'an unrelated object as on_shutdown croaks' );
+    }, qr/on_shutdown/, 'an unrelated object as on_shutdown croaks';
 };
 
 # The rest is a subprocess harness: a child perl installs run()'s handlers, sleeps, and the parent delivers real OS
 # signals, reading the child's drain log through a pipe.
 sub deadline () { return time + 30 }
 
-sub pump {
-    my ( $r, $buf ) = @_;
+sub pump ( $r, $buf ) {
     return 0 unless my @rd = IO::Select->new($r)->can_read(0.1);
     my $n = sysread( $r, my $chunk, 4096 );
     return 0 unless defined $n && $n > 0;
@@ -122,8 +118,7 @@ sub pump {
     return 1;
 }
 
-sub wait_for {
-    my ( $r, $buf, $re, $limit ) = @_;
+sub wait_for( $r, $buf, $re, $limit ) {
     while ( time < $limit ) {
         return 1 if $$buf =~ $re;
         pump( $r, $buf );
@@ -131,8 +126,7 @@ sub wait_for {
     return 0;
 }
 
-sub spawn_child {
-    my ($body) = @_;
+sub spawn_child ($body) {
     $ENV{PERL_BADLANG} = 0;    # breaks a broken-locale perl (Haiku's SIGINT leg) no longer spams "Setting locale failed."
 
     # startup warnings into the drained pipe, which would break the exact-4-lines assertion
@@ -151,11 +145,10 @@ sub spawn_child {
     return ( $pid, $r );
 }
 
-sub reap {
-    my ( $pid, $r, $buf, $limit ) = @_;
+sub reap ( $pid, $r, $buf, $limit ) {
     my $status;
     while ( time < $limit ) {
-        my $kid = waitpid( $pid, &POSIX::WNOHANG );
+        my $kid = waitpid( $pid, POSIX::WNOHANG() );
         if ( $kid == $pid ) {
             $status = $?;
             last;
@@ -193,8 +186,8 @@ CHILD
         like $buf,   qr/READY.*DEFER_RAN.*DESTROY_RAN.*DRAINED:130/s, 'the drain log shows the defer and the DESTROY running before the status';
         unlike $buf, qr/UNREACHABLE/,                                 'the sleep did not complete';
         my ( $out, $status ) = reap( $pid, $r, \$buf, $lim );
-        is( $status,         0, 'the child exited cleanly (0) after reporting the drained shutdown' );
-        is( $out =~ tr/\n//, 4, 'the drain log is exactly the four expected lines' );
+        is $status,         0, 'the child exited cleanly (0) after reporting the drained shutdown';
+        is $out =~ tr/\n//, 4, 'the drain log is exactly the four expected lines';
     }
 
     # Child 2: SIGTERM maps to status 143, same drain.
@@ -214,7 +207,7 @@ CHILD
         kill 'TERM' => $pid;
         ok wait_for( $r, \$buf, qr/DRAINED:143/, $lim ), 'SIGTERM drained the run and run() returned 143';
         my ( $out, $status ) = reap( $pid, $r, \$buf, $lim );
-        is( $status, 0, 'the child exited cleanly (0) after the TERM shutdown' );
+        is $status, 0, 'the child exited cleanly (0) after the TERM shutdown';
     }
 
     # Child 3: a second SIGINT while the drain is still open (the fiber's cleanup sleeps) must deliver the default
@@ -239,4 +232,5 @@ CHILD
         unlike $out, qr/CLEANED/, 'the second SIGINT killed the process mid-cleanup';
     }
 };
+#
 done_testing();

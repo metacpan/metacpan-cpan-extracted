@@ -435,6 +435,24 @@ Lingala Angola locale.
    1995-12-22T09:05:02 = nsima ya Y 1995 dsb 22, mtn
   -0010-09-15T04:44:23 = libóso ya -10 stb 15, mps
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = nsima ya Y 2008 sánzá ya míbalé
+   1995-12-22T09:05:02 = nsima ya Y 1995 sánzá ya zómi na míbalé
+  -0010-09-15T04:44:23 = libóso ya -10 sánzá ya libwa
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = nsima ya Y 2008 sánzá ya míbalé 5, mbl
+   1995-12-22T09:05:02 = nsima ya Y 1995 sánzá ya zómi na míbalé 22, mtn
+  -0010-09-15T04:44:23 = libóso ya -10 sánzá ya libwa 15, mps
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = nsima ya Y 2008 sánzá ya míbalé 5
+   1995-12-22T09:05:02 = nsima ya Y 1995 sánzá ya zómi na míbalé 22
+  -0010-09-15T04:44:23 = libóso ya -10 sánzá ya libwa 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = nsima ya Y 2008 fbl 5
@@ -506,6 +524,12 @@ Lingala Angola locale.
    2008-02-05T18:30:30 = mbl 5 fbl
    1995-12-22T09:05:02 = mtn 22 dsb
   -0010-09-15T04:44:23 = mps 15 stb
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = sánzá ya míbalé 5, mbl
+   1995-12-22T09:05:02 = sánzá ya zómi na míbalé 22, mtn
+  -0010-09-15T04:44:23 = sánzá ya libwa 15, mps
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

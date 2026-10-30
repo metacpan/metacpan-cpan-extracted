@@ -1,0 +1,31 @@
+title: a PreToolUse hook matches a configured MCP tool by its mcp__ name (Claude layout, ~/.claude.json user server; ADR 0022, ADR 0029)
+files:
+  CLAUDE.md: "# project\n"
+  .claude/settings.json: |
+    { "hooks": { "PreToolUse": [
+      { "matcher": "mcp__t__.*", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/guard", "args": [] } ] }
+    ] } }
+  hooks/guard: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *'"tool_name":"mcp__t__fail"'*) echo "no failing on purpose" >&2; exit 2;; esac
+    exit 0
+executable: [ hooks/guard ]
+home:
+  .claude.json: |
+    { "mcpServers": { "t": { "command": "{{PERL}}", "args": [ "{{MCP_TEST_SERVER}}", "normal" ] } } }
+prompt: Use the test server.
+script:
+  - tool_calls:
+      - [ mcp__t__fail, {} ]
+      - [ mcp__t__with_dot, {} ]
+  - text: done
+expect:
+  tools:
+    - { name: mcp__t__fail, error: true, text: "\\APreToolUse:mcp__t__fail hook error: no failing on purpose\\z" }
+    - { name: mcp__t__with_dot, text: "\\Adotted\\z" }
+  events:
+    - { type: mcp.server, name: t, status: starting }
+    - { type: mcp.server, name: t, scope: user, status: connected }
+    - { type: hook.ran, hook_event: PreToolUse, outcome: block, exit: 2 }
+    - { type: hook.ran, hook_event: PreToolUse, outcome: success, exit: 0 }

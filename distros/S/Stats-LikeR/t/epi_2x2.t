@@ -62,8 +62,25 @@ dies_ok { epi_2x2(30, 70, 20) }              'epi_2x2: too few counts dies';
 dies_ok { epi_2x2(-1, 70, 20, 80) }          'epi_2x2: negative count dies';
 dies_ok { epi_2x2(30, 70, 20, 80, bogus=>1) }'epi_2x2: unknown option dies';
 dies_ok { epi_2x2(30, 70, 20, 80, conf_level=>1.5) } 'epi_2x2: bad conf_level dies';
+# a call-form error prints the help screen, with the error on its last line
+throws_ok { epi_2x2(30, 70, 20) }
+	qr/\Ausage: epi_2x2\(A, B, C, D \| TABLE .*^example:\n.*\n\nepi_2x2: error: need 4 cell counts a,b,c,d \(or a single 2x2 array ref\)\n\z/ms,
+	'epi_2x2: too few counts, under the help screen';
+throws_ok { epi_2x2() } qr/^epi_2x2: error: no table: give 4 cell counts, or one 2x2 array ref$/m,
+	'epi_2x2: no arguments';
+throws_ok { epi_2x2(30, 70, 20, 80, bogus => 1) } qr/^epi_2x2: error: unknown argument 'bogus'$/m,
+	'epi_2x2: unknown option names it';
+throws_ok { epi_2x2(30, 70, 20, 80, conf_level => 1.5) } qr/^epi_2x2: error: conf_level must be between 0 and 1$/m,
+	'epi_2x2: bad conf_level';
 dies_ok { cmh_test([[1,2,3]]) }              'cmh_test: malformed stratum dies';
 dies_ok { cmh_test("nope") }                 'cmh_test: non-arrayref dies';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('cmh_test');
+	like($screen, qr/\Ausage: cmh_test\(/, 'cmh_test has a help screen');
+	eval { cmh_test([[10,3,5,12]], conf_level => 2) };
+	is($@, $screen . "cmh_test: error: conf_level must be between 0 and 1\n",
+		'cmh_test: a call-form error is the screen, then the error on the last line');
+}
 
 # leak checks
 unless ($INC{'Devel/Cover.pm'}) {

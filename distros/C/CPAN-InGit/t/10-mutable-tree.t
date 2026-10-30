@@ -61,6 +61,9 @@ subtest in_workdir => sub {
        'get_path test.txt' );
    # the path should also exist in the filesystem now
    is( -s "$repodir/example/test.txt", 5, 'disk file created to match' );
+   is( Git::Raw::Repository->open("$repodir")->index->find('example/test.txt'),
+       object { call blob => object { call content => 'Hello'; }; },
+       'addition persisted to the index before committing' );
    
    #  build the tree to be committed
    ok( $mtree->update_tree(), 'update_tree' );
@@ -76,6 +79,36 @@ subtest in_workdir => sub {
       local $ENV{GIT_WORK_TREE}= $repodir;
       local $ENV{GIT_DIR}= "$repodir/.git";
       is( scalar `git status -sb`, "## www_cpan_org\n", 'on branch www_cpan_org, no changes in workdir' );
+   }
+
+   my $head_id= $git_repo->head->target->id;
+   # Preserve changes the user already staged while adding, modifying, and removing files.
+   mkfile("$repodir/unrelated.txt", 'Already staged');
+   $git_repo->index->add('unrelated.txt');
+   $git_repo->index->write;
+   $mtree->set_path('example/test.txt', \'Updated');
+   is( slurp("$repodir/example/test.txt"), 'Updated', 'working file updated' );
+   is( Git::Raw::Repository->open("$repodir")->index->find('example/test.txt'),
+       object { call blob => object { call content => 'Updated'; }; },
+       'modification persisted to the index before committing' );
+   $mtree->set_path('example/another.txt', \'Another');
+   $mtree->set_path('example/test.txt', undef);
+   ok( !-e "$repodir/example/test.txt", 'working file removed' );
+   my $reopened= Git::Raw::Repository->open("$repodir");
+   is( $reopened->index->find('example/test.txt'), undef, 'removal persisted to the index' );
+   is( $reopened->index->find('example/another.txt'),
+       object { call blob => object { call content => 'Another'; }; },
+       'another addition persisted to the index' );
+   is( $reopened->index->find('unrelated.txt'),
+       object { call blob => object { call content => 'Already staged'; }; },
+       'unrelated staged change preserved' );
+   is( $reopened->head->target->id, $head_id, 'staging leaves the branch commit unchanged' );
+   if ($have_git) {
+      local $ENV{GIT_WORK_TREE}= $repodir;
+      local $ENV{GIT_DIR}= "$repodir/.git";
+      is( scalar `git status --porcelain`,
+          "A  example/another.txt\nD  example/test.txt\nA  unrelated.txt\n",
+          'git sees additions and deletion staged for the user to commit' );
    }
 };
 

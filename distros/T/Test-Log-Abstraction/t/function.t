@@ -726,12 +726,14 @@ subtest 'count and _at_level' => sub {
 
 };
 
-subtest 'lang and flush' => sub {
+subtest 'lang, flush and reopen' => sub {
 	my $self = logger(lang => 'zh');
 	is($self->lang(), 'zh', 'lang');
 	returns_ok($self->lang(), { type => 'string', matches => qr/\A[a-z]{2,3}\z/ }, 'language code');
 	is($self->flush(), $self, 'flush returns the logger');
 	is($self->count(), 0, 'flush stores nothing');
+	is($self->reopen(), $self, 'reopen returns the logger');
+	is($self->count(), 0, 'reopen stores nothing');
 };
 
 subtest 'inspection methods: refuse non-logger invocants' => sub {
@@ -957,6 +959,16 @@ subtest 'i18n: always returns a string' => sub {
 	is($self->i18n('no_method', [method => 'x']), "$CLASS: no method 'undef'", 'array arguments ignored');
 	is($self->i18n('no_method', { method => 'x', class => 'Other' }), q{Other: no method 'x'}, 'class can be overridden');
 	returns_ok($self->i18n('no_method'), { type => 'string' }, 'string');
+	# Called as a function with no usable invocant: still a string, and the
+	# placeholder is filled
+	foreach my $invocant (undef, '') {
+		my $text = Test::Log::Abstraction::i18n($invocant, 'no_method', { method => 'm' });
+		like($text, qr/no method 'm'\z/, 'invocant ' . (defined($invocant) ? "''" : 'undef') . ': message still rendered');
+	}
+};
+
+subtest '_shown: undef' => sub {
+	is(Test::Log::Abstraction::_shown(undef), 'undef', 'undef is shown as the word undef');
 };
 
 subtest '_template: search order and missing tables' => sub {
@@ -1078,6 +1090,15 @@ subtest '_format and i18n: values whose text form dies' => sub {
 	is($error_after, $SENTINEL, '$@ untouched');
 	like(logger()->i18n('no_method', { method => bless({}, 'Local::Bomb') }), qr/no method 'Local::Bomb=HASH/, 'i18n still returns a string');
 	is(Test::Log::Abstraction::_format(undef, 's', bless({}, 'Local::Undef')), '', 'text form of undef is empty, without a warning');
+
+	# A number format shows an object as written, which once handed the
+	# object back for _interpolate's s///e to stringify outside any eval
+	foreach my $conversion (qw(d x .2f)) {
+		my $shown;
+		lives_ok { $shown = Test::Log::Abstraction::_format(undef, $conversion, bless({}, 'Local::Bomb')) } "%$conversion of the object: no exception";
+		like($shown, qr/\ALocal::Bomb=HASH\(0x[0-9a-f]+\)\z/, '... a plain-form string, not the object');
+	}
+	lives_ok { logger()->i18n('captured', { count => bless({}, 'Local::Bomb') }) } 'i18n with the object in a %d placeholder';
 };
 
 subtest '_croak: translated, at the caller' => sub {
@@ -1185,11 +1206,56 @@ subtest '_emit: hostile text and failing output' => sub {
 };
 
 subtest '_format: values that only look like numbers' => sub {
-	foreach my $odd ('Inf', '-Inf', 'NaN', '1e400', '-1e400') {
+	# 1e99999 is infinite with doubles, long doubles and quadmath alike;
+	# 1e400 is finite with long doubles, so %.2f rightly prints it in full
+	foreach my $odd ('Inf', '-Inf', 'NaN', '1e99999', '-1e99999') {
 		foreach my $conversion (qw(d x .2f)) {
 			is(Test::Log::Abstraction::_format(undef, $conversion, $odd), $odd, "%$conversion of '$odd' shown as written");
 		}
 	}
+};
+
+subtest '_format: numbers too big for an integer conversion' => sub {
+	# Finite on every perl, but sprintf would cut them to -1, ffff... or
+	# the most negative integer
+	foreach my $big ('1e30', '-1e30', '1e400', '-1e400', '9' x 40, '-' . ('9' x 40)) {
+		foreach my $conversion (qw(d i u x o)) {
+			is(Test::Log::Abstraction::_format(undef, $conversion, $big), $big, "%$conversion of '$big' shown as written");
+		}
+	}
+	is(Test::Log::Abstraction::_format(undef, 'd', '18446744073709551615'), '18446744073709551615', '%d of the largest unsigned integer shown as written');
+	is(Test::Log::Abstraction::_format(undef, 'd', '9223372036854775808'), '9223372036854775808', '%d of one more than the largest signed integer shown as written');
+};
+
+subtest '_format: integers at the limits are still formatted' => sub {
+	my %expected = (
+		'd 9223372036854775807' => '9223372036854775807',
+		'd -9223372036854775808' => '-9223372036854775808',
+		'x 9223372036854775807' => '7fffffffffffffff',
+		'u 18446744073709551615' => '18446744073709551615',
+		'x 18446744073709551615' => 'ffffffffffffffff',
+		'u 9223372036854775808' => '9223372036854775808',
+		'x -1' => 'ffffffffffffffff',
+		'd -1' => '-1',
+		'05d 42' => '00042',
+		'x 42' => '2a',
+		'd 3.7' => '3',
+		'd -3.7' => '-3',
+		'.2f 1e30' => sprintf('%.2f', 1e30),
+	);
+	SKIP: {
+		skip('integers are not 64 bits here', scalar(keys %expected)) if(length(sprintf('%x', ~0)) != 16);
+		foreach my $case (sort keys %expected) {
+			my ($conversion, $value) = split(/ /, $case);
+			is(Test::Log::Abstraction::_format(undef, $conversion, $value), $expected{$case}, "%$conversion of '$value'");
+		}
+	}
+};
+
+subtest 'i18n: an enormous count in a template is not turned into -1' => sub {
+	my $self = logger(i18n => { en => { n => { other => '%{count}d items, %{count}x in hex' } } });
+	is($self->i18n('n', { count => 1e30 }), '1e+30 items, 1e+30 in hex', 'a number beyond 64 bits is shown as written');
+	is($self->i18n('n', { count => 255 }), '255 items, ff in hex', 'an ordinary count is formatted');
 };
 
 subtest '_explain: hostile entries' => sub {
@@ -1210,6 +1276,267 @@ subtest '_build: keeps its own copy of the options' => sub {
 	is($self->{'options'}->{'lang'}, 'fr', 'later change to the caller hash ignored');
 	is($self->new()->lang(), 'fr', 'clones use the original options');
 	is_deeply($self->new()->{'diag_rule'}, {}, '... including diag');
+};
+
+# ===========================================================================
+# Shared helpers: _string, _shown, _copy_tree, _diag_level, _checked, _regex
+# ===========================================================================
+
+# An error that repeats a value cuts it here and marks the cut with this
+Readonly::Scalar my $ELLIPSIS => '...';
+# Every character _shown must escape: C0 controls and DEL
+Readonly::Array my @CONTROLS => ((0x00 .. 0x1F), 0x7F);
+# A pattern Perl compiles with a warning that it can never match
+Readonly::Scalar my $NEVER_MATCHES => 'a{2,1}';
+# A string pattern with code in it, which must never be run
+Readonly::Scalar my $CODE_PATTERN => '(?{ 1 })';
+# A schema shaped like has_level()'s, for driving _checked directly
+Readonly::Hash my %TEST_SCHEMA => (
+	level => { type => 'string' },
+	name => { type => 'string', optional => 1 },
+);
+
+# Strategy: _string is how every caller-supplied value becomes text, so a
+# well-behaved value must come out exactly as Perl would print it
+subtest '_string: plain values and well-behaved objects' => sub {
+	is(Test::Log::Abstraction::_string('text'), 'text', 'string unchanged');
+	is(Test::Log::Abstraction::_string(0), '0', 'false number is still text');
+	is(Test::Log::Abstraction::_string(''), '', 'empty string');
+	is(Test::Log::Abstraction::_string("\x{263A}"), "\x{263A}", 'characters above 255 kept');
+	is(Test::Log::Abstraction::_string(bless({}, 'Local::Text')), 'overloaded text', 'working overloading is honoured');
+	like(Test::Log::Abstraction::_string([]), qr/\AARRAY\(0x[0-9a-f]+\)\z/, 'plain reference in Perl\'s form');
+};
+
+# Strategy: the reason _string exists.  An object whose "" dies or gives
+# undef must never escape as an exception, a warning, or a changed $@
+subtest '_string: objects whose overloading dies or returns undef' => sub {
+	local $@ = $SENTINEL;
+	like(Test::Log::Abstraction::_string(bless({}, 'Local::Bomb')), qr/\ALocal::Bomb=HASH\(0x[0-9a-f]+\)\z/, 'dying overload: plain form');
+	is($@, $SENTINEL, '... and the caught error does not reach $@');
+	my $text = Test::Log::Abstraction::_string(bless({}, 'Local::Undef'));
+	ok(defined($text), 'overload returning undef still gives a string');
+	is($text, '', '... the empty string, without a warning');
+};
+
+# Strategy: _shown is the last line of defence for every error message;
+# attack it with each control character, sizes on either side of the cut,
+# escaping that grows the text past the cut, and objects that fight back
+subtest '_shown: hostile values' => sub {
+	foreach my $code (@CONTROLS) {
+		is(Test::Log::Abstraction::_shown('a' . chr($code) . 'b'), sprintf('a\\x%02Xb', $code), sprintf('control character 0x%02X escaped', $code));
+	}
+	is(Test::Log::Abstraction::_shown('x' x $MAX_REASON), 'x' x $MAX_REASON, "exactly $MAX_REASON characters: not cut");
+	is(Test::Log::Abstraction::_shown('x' x ($MAX_REASON + 1)), ('x' x $MAX_REASON) . $ELLIPSIS, 'one more: cut and marked');
+	# A newline becomes four characters, so the cut must apply after escaping
+	my $escaped = Test::Log::Abstraction::_shown("\n" x $MAX_REASON);
+	ok(length($escaped) == $MAX_REASON + length($ELLIPSIS), 'escaping cannot push the text past the cut');
+	ok($escaped !~ /\n/, '... and no newline survives');
+	my $huge = Test::Log::Abstraction::_shown('y' x $HUGE);
+	ok(length($huge) == $MAX_REASON + length($ELLIPSIS), "$HUGE characters cut to $MAX_REASON");
+	is(Test::Log::Abstraction::_shown("caf\x{e9} \x{263A}"), "caf\x{e9} \x{263A}", 'printable non-ASCII kept');
+
+	my $plain;
+	my $lived = lives_ok { $plain = Test::Log::Abstraction::_shown(bless({}, 'Local::Bomb')) } 'object whose overloading dies: no exception';
+	like($plain, qr/\ALocal::Bomb=HASH\(0x[0-9a-f]+\)\z/, '... shown in plain form');
+	# lives_ok() resets $@ itself, so look again with a direct call - only
+	# once it is known not to die, or a regression would end the whole file
+	if($lived) {
+		local $@ = $SENTINEL;
+		Test::Log::Abstraction::_shown(bless({}, 'Local::Bomb'));
+		is($@, $SENTINEL, '$@ untouched');
+	}
+};
+
+# Strategy: the copy must equal the original, share nothing that could be
+# changed through the original, and leave non-containers alone
+subtest '_copy_tree: copies plain data, keeps everything else' => sub {
+	my $code = sub { 'code' };
+	my $object = bless({ k => 'v' }, 'Local::Other');
+	my $source = { list => [1, { deep => 'x' }], code => $code, object => $object, text => 'plain' };
+	my $copy = Test::Log::Abstraction::_copy_tree($source, {});
+	state_diag(copy => $copy);
+
+	is_deeply($copy, $source, 'same content');
+	isnt($copy, $source, 'a new top-level hash');
+	isnt($copy->{'list'}, $source->{'list'}, 'a new nested array');
+	$source->{'list'}->[1]->{'deep'} = 'changed';
+	push @{$source->{'list'}}, 'added';
+	is($copy->{'list'}->[1]->{'deep'}, 'x', 'a later change deep in the original is not seen');
+	is(scalar(@{$copy->{'list'}}), 2, '... nor an added element');
+	is($copy->{'code'}, $code, 'code reference shared, not copied');
+	is($copy->{'object'}, $object, 'object shared: only plain hashes and arrays are data');
+	is(Test::Log::Abstraction::_copy_tree('scalar', {}), 'scalar', 'a plain value is returned as it is');
+	is(Test::Log::Abstraction::_copy_tree(undef, {}), undef, 'undef is returned as it is');
+};
+
+# Strategy: a caller's i18n tables can be cyclic, share parts, or be very
+# deep.  The copy must terminate, keep shared parts that are not cycles,
+# hold no cycles itself, and leave $_ and the path hash as they were
+subtest '_copy_tree: cycles, shared parts and great depth' => sub {
+	my $loop = { name => 'loop' };
+	$loop->{'self'} = $loop;
+	my $path = {};
+	local $_ = $SENTINEL;
+	my $copy = Test::Log::Abstraction::_copy_tree($loop, $path);
+	is_deeply($copy, { name => 'loop', self => undef }, 'a reference back up the path becomes undef');
+	memory_cycle_ok($copy, 'the copy has no cycle');
+	is_deeply($path, {}, 'the path hash is restored on return');
+	is($_, $SENTINEL, '$_ untouched');
+	delete $loop->{'self'};
+
+	my @pair = ([], []);
+	push @{$pair[0]}, $pair[1];
+	push @{$pair[1]}, $pair[0];
+	is_deeply(Test::Log::Abstraction::_copy_tree($pair[0], {}), [[undef]], 'two arrays that hold each other');
+	@{$pair[0]} = ();
+
+	my $shared = { shared => 1 };
+	my $diamond = Test::Log::Abstraction::_copy_tree({ left => $shared, right => $shared }, {});
+	is_deeply($diamond, { left => { shared => 1 }, right => { shared => 1 } }, 'a part used twice, but not a cycle, is copied both times');
+
+	my $deep = my $node = {};
+	$node = $node->{'next'} = {} for 1 .. $DEEP;
+	my $deep_copy = Test::Log::Abstraction::_copy_tree($deep, {});
+	my $depth = 0;
+	for(my $at = $deep_copy; $at->{'next'}; $at = $at->{'next'}) { $depth++ }
+	is($depth, $DEEP, "$DEEP levels deep: copied whole, without a recursion warning");
+};
+
+# Strategy: every level name, in any case, is accepted and lower-cased
+subtest '_diag_level: level names' => sub {
+	my $self = logger();
+	foreach my $level (sort keys %SEVERITY) {
+		is($self->_diag_level($level), $level, "'$level'");
+		is($self->_diag_level(uc($level)), $level, "'" . uc($level) . "' lower-cased");
+	}
+};
+
+# Strategy: anything else is refused through _croak, at the caller, in the
+# logger's language, with the bad value made safe; an object whose
+# overloading dies must be reported, not allowed to crash new()
+subtest '_diag_level: everything else is refused, safely' => sub {
+	my $self = logger();
+	my %refused = (
+		'' => q{''},
+		'all' => q{'all'},
+		'none' => q{'none'},
+		'undef' => q{'undef'},
+		' warn' => q{' warn'},
+		"warn\n" => q{'warn\\x0A'},
+		('w' x ($MAX_REASON + 1)) => "'" . ('w' x $MAX_REASON) . "$ELLIPSIS'",
+	);
+	foreach my $bad (sort keys %refused) {
+		throws_ok { $self->_diag_level($bad) } croaked("invalid diag level $refused{$bad}"), 'refused: ' . Test::Log::Abstraction::_shown($bad);
+	}
+	throws_ok { $self->_diag_level(undef) } croaked(q{invalid diag level 'undef'}), 'undef is reported as undef';
+	throws_ok { $self->_diag_level([]) } qr/\A\Q$CLASS: invalid diag level 'ARRAY(0x\E[0-9a-f]+\)'/, 'a reference is not a level name';
+	throws_ok { $self->_diag_level(bless({}, 'Local::Bomb')) } qr/\A\Q$CLASS: invalid diag level 'Local::Bomb=HASH(0x\E[0-9a-f]+\)'/, 'dying overloading: reported in plain form';
+	throws_ok { $CLASS->new(diag => [bless({}, 'Local::Bomb')]) } qr/\A\Q$CLASS: invalid diag level 'Local::Bomb=HASH(0x\E/, '... also through new()';
+	throws_ok { logger(lang => 'de')->_diag_level('loud') } croaked("ung\x{fc}ltige diag-Stufe 'loud'"), 'in the logger\'s language';
+};
+
+# Strategy: spy on _validate to see exactly what _checked hands it, and
+# prove a good call comes back as the logger for chaining
+subtest '_checked: passes a good call through' => sub {
+	my $self = logger();
+	my $validate = spy "${CLASS}::_validate";
+	is(Test::Log::Abstraction::_checked($self, 'has_level', 'needs_level', \%TEST_SCHEMA, level => 'info', undef), $self, 'returns the logger');
+	Test::Log::Abstraction::_checked($self, 'has_level', 'needs_level', \%TEST_SCHEMA, level => 'info', 'a test name');
+	my @calls = $validate->();
+	restore_all();
+	state_diag(calls => \@calls);
+
+	is(scalar(@calls), 2, '_validate called once per check');
+	is_deeply($calls[0]->[3], { level => 'info' }, 'no test name: no name key at all');
+	is_deeply($calls[1]->[3], { level => 'info', name => 'a test name' }, 'a test name is checked too');
+	is($calls[0]->[2], \%TEST_SCHEMA, 'the schema it was given');
+};
+
+# Strategy: the order of the checks is the contract - who is calling,
+# then is the argument there, then is it valid - and a failing check must
+# stop before the next one runs, or change anything
+subtest '_checked: refuses bad calls in a fixed order' => sub {
+	# Built before the spy, since building a logger validates its options
+	my $self = logger();
+	my $validate = spy "${CLASS}::_validate";
+	my %not_loggers = ('the class' => $CLASS, 'undef' => undef, 'a plain hash' => {}, 'another class' => Local::Other->new());
+	foreach my $who (sort keys %not_loggers) {
+		throws_ok { Test::Log::Abstraction::_checked($not_loggers{$who}, 'like', 'needs_pattern', \%TEST_SCHEMA, level => undef, undef) }
+			croaked('like() must be called on an object, not on the class'), "$who: the invocant is checked first, even with no argument";
+	}
+	throws_ok { Test::Log::Abstraction::_checked($self, 'like', 'needs_pattern', \%TEST_SCHEMA, level => undef, undef) }
+		croaked('like() needs a pattern'), 'a missing argument names the method';
+	is(scalar($validate->()), 0, 'nothing failing reached _validate');
+	restore_all();
+
+	throws_ok { Test::Log::Abstraction::_checked($self, 'has_level', 'needs_level', \%TEST_SCHEMA, level => {}, undef) }
+		croaked(q{invalid argument: Parameter 'level' must be a string}), 'an invalid argument is named';
+	throws_ok { Test::Log::Abstraction::_checked($self, 'has_level', 'needs_level', \%TEST_SCHEMA, level => 'info', []) }
+		qr/\A\Q$CLASS: invalid argument: \E.*name/, 'an invalid test name is named';
+
+	# The validator failing part way must not be swallowed or alter the logger
+	$self->info('kept');
+	mock_exception "${CLASS}::_validate" => 'validator broke';
+	throws_ok { Test::Log::Abstraction::_checked($self, 'has_level', 'needs_level', \%TEST_SCHEMA, level => 'info', undef) } qr/\Avalidator broke/, 'a failure inside the validator propagates';
+	restore_all();
+	is_deeply([map { $_->{'message'} } @{$self->messages()}], ['kept'], 'and nothing was changed');
+
+	local $@ = $SENTINEL;
+	Test::Log::Abstraction::_checked($self, 'has_level', 'needs_level', \%TEST_SCHEMA, level => 'info', undef);
+	is($@, $SENTINEL, 'a passing check leaves $@ alone');
+};
+
+# Strategy: _regex returns something that matches the way the caller meant
+subtest '_regex: strings are regular expressions, qr// keeps its flags' => sub {
+	my $self = logger();
+	isa_ok($self->_regex('a.c'), 'Regexp', 'a string');
+	ok('abc' =~ $self->_regex('a.c'), 'a string is a pattern, not literal text');
+	ok('ABC' =~ $self->_regex(qr/abc/i), 'qr//i stays case-insensitive');
+	ok("a\nb" !~ $self->_regex(qr/a.b/), 'qr// without /s keeps . off newlines');
+	local $@ = $SENTINEL;
+	$self->_regex('fine');
+	is($@, $SENTINEL, 'a good pattern leaves $@ alone');
+};
+
+# Strategy: the caller's own pragmas must not weaken the checks: under
+# "no warnings" a never-matching pattern still croaks, and under
+# "use re 'eval'" code in a string still cannot run
+subtest '_regex: hostile patterns, whatever the caller\'s pragmas' => sub {
+	my $self = logger();
+	my @warnings;
+	local $SIG{'__WARN__'} = sub { push @warnings, @_ };
+	{
+		no warnings;	## no critic (ProhibitNoWarnings)
+		throws_ok { $self->_regex($NEVER_MATCHES) } qr/\A\Q$CLASS: invalid argument: Quantifier {n,m} with n > m can't match in regex\E/, 'never-matching pattern croaks under no warnings';
+	}
+	{
+		use re 'eval';
+		throws_ok { $self->_regex($CODE_PATTERN) } qr/\A\Q$CLASS: invalid argument: Eval-group not allowed at runtime\E/, "code in a string is refused under use re 'eval'";
+	}
+	throws_ok { $self->_regex('(') } qr/ at \Q$FILE\E line \d+\.?\n\z/, 'the error points at the caller';
+	is_deeply(\@warnings, [], 'nothing was warned instead');
+};
+
+# Strategy: the public methods that took a caller's value straight into
+# lc() or a string used to die on an object whose overloading dies;
+# level() must warn and change nothing, i18n() must still return a string
+subtest 'level and i18n: an object whose overloading dies' => sub {
+	my $self = logger(level => 'error');
+	my $bomb = bless({}, 'Local::Bomb');
+	my $result = 'not called';
+	my @warnings;
+	{
+		local $SIG{'__WARN__'} = sub { push @warnings, @_ };
+		lives_ok { $result = $self->level($bomb) } 'level() does not die';
+	}
+	is($result, undef, '... returns undef');
+	is($self->level(), $SEVERITY{'error'}, '... changes nothing');
+	is(scalar(@warnings), 1, '... and warns once');
+	like($warnings[0], qr/\A\Q$CLASS: invalid syslog level 'Local::Bomb=HASH(0x\E/, '... naming the object in plain form');
+
+	my $text;
+	lives_ok { $text = $self->i18n($bomb) } 'i18n() does not die';
+	like($text, qr/\ALocal::Bomb=HASH\(0x[0-9a-f]+\)\z/, '... and returns the key in plain form');
 };
 
 # ===========================================================================

@@ -1,6 +1,6 @@
 ---
 name: perl-io-async-future
-description: "Use when writing async Perl — IO::Async, Future, Future::AsyncAwait, Net::Async::*, notifier lifecycle, futures lost to GC, cancellation, reconnect loops, HTTP requests that hang forever."
+description: "Use when writing async Perl — IO::Async, Future, Future::AsyncAwait, Net::Async::*, futures lost to GC, cancellation, requests that hang."
 ---
 
 # Perl IO::Async + Future — Patterns & Pitfalls

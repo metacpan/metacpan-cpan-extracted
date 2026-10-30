@@ -1,0 +1,20 @@
+# A redirect on the same host is followed; one to another host is not fetched
+# (so a WebFetch(domain:...) rule decides about the new host when the model asks
+# for it): the tool answers with Claude Code's REDIRECT DETECTED text, naming
+# raider's tool and repeating the prompt -- no error result.
+title: web_fetch follows a redirect on the same host and reports one to another host instead of fetching it
+http:
+  /old: { status: 301, location: "/new" }
+  /new: { body: "NEW-MARKER" }
+  /away: { status: 302, location: "{{HTTP_OTHER}}/new" }
+prompt: What is new?
+script:
+  - tool_calls:
+      - [ web_fetch, { url: "{{HTTP}}/old" } ]
+      - [ web_fetch, { url: "{{HTTP}}/away", prompt: "What is new?" } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: web_fetch, text: '^URL: http://127\.0\.0\.1:\d+/new\nStatus: 200 OK\n.*NEW-MARKER' }
+    - { name: web_fetch, text: '^REDIRECT DETECTED: The URL redirects to a location that was not fetched automatically\.\n\n    Original URL: http://127\.0\.0\.1:\d+/away\n    Redirect URL \(from the server.s Location header — server-supplied, not verified\): http://localhost:\d+/new\n    Status: 302 Found\n\n    To complete your request, I need to fetch content from the redirected URL\. Please use web_fetch again with these parameters:\n    - url: "http://localhost:\d+/new"\n    - prompt: "What is new\?"$' }

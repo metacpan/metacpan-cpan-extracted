@@ -1,0 +1,36 @@
+# Real pattern: session start carries the user memory, the project CLAUDE.md and
+# the local one; a Grep over the tree finds a file below a nested CLAUDE.md; the
+# first Read of a file in that subtree brings the nested rules along (once).
+title: user, project and local memory at the start; the nested CLAUDE.md arrives with the first read in its subtree
+home:
+  .claude/CLAUDE.md: "User memory: answer briefly. USER-MARKER\n"
+files:
+  CLAUDE.md: "Project memory: run tests before finishing. PROJECT-MARKER\n"
+  CLAUDE.local.md: "Local memory: my sandbox uses port 8081. LOCAL-MARKER\n"
+  services/api/CLAUDE.md: "API memory: handlers return JSON only. NESTED-MARKER\n"
+  services/api/handler.txt: "handler: render html\n"
+  services/web/page.txt: "page\n"
+prompt: Find the handler and tell me what it renders.
+script:
+  - tool_calls:
+      - [ grep, { pattern: handler, output_mode: files_with_matches } ]
+  - tool_calls:
+      - [ read_file, { path: services/api/handler.txt } ]
+  - tool_calls:
+      - [ read_file, { path: services/api/handler.txt } ]
+      - [ read_file, { path: services/web/page.txt } ]
+  - text: It renders html.
+expect:
+  answer: It renders html.
+  requests:
+    - { index: 0, contains: USER-MARKER }
+    - { index: 0, contains: PROJECT-MARKER }
+    - { index: 0, contains: LOCAL-MARKER }
+    - { index: 0, absent: NESTED-MARKER }
+    - { index: 1, absent: NESTED-MARKER }
+    - { index: 2, contains: NESTED-MARKER }
+  tools:
+    - { name: grep, text: 'services/api/handler\.txt' }
+    - { name: read_file, text: 'handler: render html.*Contents of \S+/services/api/CLAUDE\.md.*NESTED-MARKER' }
+    - { name: read_file, text: 'render html', not_text: NESTED-MARKER }
+    - { name: read_file, text: '^1\tpage', not_text: NESTED-MARKER }

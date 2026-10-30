@@ -7,7 +7,7 @@ $|++;
 # Regression: destroying a fiber while it is parked mid-yield. destroy_coro used to walk the parked fiber's live
 # context stack and free its activation slots in the shared PadLists / global CvDEPTH counters of the subroutines it
 # was inside (yield, the wait helpers, run). Those slots belong to every fiber activating the same sub at the same
-# depth, so the *next* fiber to enter one -- usually the very next round, once the freed id is reused -- died with a
+# depth, so the *next* fiber to enter one (usually the very next round, once the freed id is reused), died with a
 # 0xC0000005 in Perl_clear_defarray. The C fix only unwalks a fiber whose context stack has been unwound to
 # exhaustion (si_cxix < 0, i.e. reaped after finishing); a parked fiber's shared slots are left to normal reuse, and
 # its own closures release their pads with user_cv. Every round below destroys a parked fiber and then runs a fresh

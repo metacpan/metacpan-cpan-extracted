@@ -1,0 +1,19 @@
+title: a raider project (native layout) runs no Claude Code hooks, even with a .claude/settings.json (ADR 0022)
+run_prompt: true
+files:
+  .raider/instructions.md: "You are helpful.\n"
+  .claude/settings.json: |
+    { "hooks": {
+      "PreToolUse": [ { "hooks": [ { "type": "command", "command": "echo blocked >&2; exit 2" } ] } ],
+      "UserPromptSubmit": [ { "hooks": [ { "type": "command", "command": "echo blocked >&2; exit 2" } ] } ]
+    } }
+prompt: Say hi with bash.
+script:
+  - tool_calls:
+      - [ bash, { command: echo hi } ]
+  - text: done
+expect:
+  answer: done
+  outcome: { status: completed }
+  tools:
+    - { name: bash, text: hi }

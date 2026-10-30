@@ -123,18 +123,18 @@ Piedmontese locale.
 
 =head3 Narrow (format)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  g
+  f
+  m
+  a
+  m
+  g
+  l
+  a
+  s
+  u
+  n
+  d
 
 
 =head3 Wide (stand-alone)
@@ -435,6 +435,24 @@ Piedmontese locale.
    1995-12-22T09:05:02 = CE 1995 dzèmber 22, vënner
   -0010-09-15T04:44:23 = BCE -10 stèmber 15, saba
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 fërvé
+   1995-12-22T09:05:02 = CE 1995 dzèmber
+  -0010-09-15T04:44:23 = BCE -10 stèmber
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 fërvé 5, màrtes
+   1995-12-22T09:05:02 = CE 1995 dzèmber 22, vënner
+  -0010-09-15T04:44:23 = BCE -10 stèmber 15, saba
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 fërvé 5
+   1995-12-22T09:05:02 = CE 1995 dzèmber 22
+  -0010-09-15T04:44:23 = BCE -10 stèmber 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 fërvé 5
@@ -502,6 +520,12 @@ Piedmontese locale.
   -0010-09-15T04:44:23 = stèmber
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = fërvé 5, màrtes
+   1995-12-22T09:05:02 = dzèmber 22, vënner
+  -0010-09-15T04:44:23 = stèmber 15, saba
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = fërvé 5, màrtes
    1995-12-22T09:05:02 = dzèmber 22, vënner
@@ -614,6 +638,18 @@ Piedmontese locale.
    2008-02-05T18:30:30 = 2008 fërvé
    1995-12-22T09:05:02 = 1995 dzèmber
   -0010-09-15T04:44:23 = -10 stèmber
+
+=head3 yMMMMEd (d MMMM y, E)
+
+   2008-02-05T18:30:30 = 5 fërvé 2008, màrtes
+   1995-12-22T09:05:02 = 22 dzèmber 1995, vënner
+  -0010-09-15T04:44:23 = 15 stèmber -10, saba
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 fërvé 2008
+   1995-12-22T09:05:02 = 22 dzèmber 1995
+  -0010-09-15T04:44:23 = 15 stèmber -10
 
 =head3 yMMMd (d MMM y)
 

@@ -61,7 +61,7 @@ $cur->body_set($cur->body_raw . "footer line\r\n");
     ok($ok, 'recipe-less instance asserting no change is accepted') or diag($why);
 }
 
-# --- -07 §12.1: a first instance may carry Recipes (ruling 17) ---
+# --- -08 §12.1: a first instance may carry Recipes (ruling 17) ---
 # A list host that stamped an unsigned m=1 on arrival, then changed the post
 # (a From munge, a footer), sends it as ONE m=1: hashes of what it sends and
 # Recipes back to the message as it arrived.

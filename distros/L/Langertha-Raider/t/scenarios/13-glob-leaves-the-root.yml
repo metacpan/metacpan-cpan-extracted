@@ -1,0 +1,12 @@
+title: glob refuses a directory outside the root and a pattern that climbs out of it
+prompt: Look around outside.
+script:
+  - tool_calls:
+      - [ glob, { pattern: '*', path: '..' } ]
+      - [ glob, { pattern: '../*' } ]
+  - text: nicht erlaubt
+expect:
+  answer: nicht erlaubt
+  tools:
+    - { name: glob, error: true, text: 'path escapes root' }
+    - { name: glob, error: true, text: 'relative to the search directory' }

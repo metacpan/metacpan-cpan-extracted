@@ -122,7 +122,10 @@ subtest 'web tools: IO::Async::SSL cannot load' => sub {
   like( $res->{content}[0]{text}, qr/IO::Async::SSL/, 'web_search names the module' );
 
   # An http URL that redirects to https: the check of the URL itself passes,
-  # the redirect must not reach Net::Async::HTTP either (k109).
+  # the redirect must not reach Net::Async::HTTP either (k109). web_fetch
+  # follows a redirect only on the same scheme, host and port (as Claude
+  # Code, ADR 0026), so this one is not fetched at all: the model is told
+  # where it points.
   my $redirector = IO::Async::Listener->new(
     on_stream => sub {
       my ( undef, $stream ) = @_;
@@ -147,9 +150,9 @@ subtest 'web tools: IO::Async::SSL cannot load' => sub {
   for my $round (1, 2) {
     my $res = $call->( web_fetch => { url => "http://127.0.0.1:$http_port/" } );
     ok( !$res->{hung}, "redirected web_fetch $round ends instead of hanging" );
-    ok( $res->{isError}, "redirected web_fetch $round is a tool error" );
-    like( $res->{content}[0]{text}, qr/IO::Async::SSL/, "redirected web_fetch $round names the module" );
-    like( $res->{content}[0]{text}, qr{https://127\.0\.0\.1:$port}, "redirected web_fetch $round names the redirect target" );
+    ok( !$res->{isError}, "redirected web_fetch $round is not followed, as Claude Code (no error)" );
+    like( $res->{content}[0]{text}, qr/\AREDIRECT DETECTED: /, "redirected web_fetch $round says so" );
+    like( $res->{content}[0]{text}, qr{Redirect URL [^\n]*: https://127\.0\.0\.1:$port/\n}, "redirected web_fetch $round names the redirect target" );
   }
   $loop->remove($redirector);
 };

@@ -12,6 +12,7 @@
 ^Makefile.old$
 ^MANIFEST\.bak$
 ^MANIFEST\.SKIP$
+^MYMETA\..*$
 ^README(\..*)?$
 ^blib/
 ^build/

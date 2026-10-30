@@ -1,4 +1,4 @@
-package Affix::Platform::Unix v1.2.7 {
+package Affix::Platform::Unix v1.3.0 {
     use v5.40;
     use Path::Tiny qw[path];
     use Config     qw[%Config];
@@ -74,7 +74,7 @@ package Affix::Platform::Unix v1.2.7 {
         # The bare '-l' guess can come back empty on Solaris/Illumos: dl_findfile's
         # dirlist rarely holds the 64-bit subdir where the real libs live, and the
         # unversioned libc/libm there are symlinks. Probe the explicit dirs instead.
-        if ( $^O eq 'solaris' ) {
+        if ( $^O =~ /(?:solaris|sunos)/i ) {
             my $arch_dir = ( $Config{archname} =~ /^(?:sparc|sun4)/i ) ? 'sparcv9' : '64';
             my @dirs;
             for my $base ( split /[ \t]+/, $Config{libpth} // '' ) {
@@ -102,7 +102,9 @@ package Affix::Platform::Unix v1.2.7 {
         $name =~ s[^lib][];
         CORE::state $compiler;
         $compiler //= sub {
+            require ExtUtils::MakeMaker;
             for my $cc (qw[gcc cc]) {
+                next unless MM->maybe_command($cc) || grep { -x "$_/$cc" } split /:/, ( $ENV{PATH} // '' );
                 if ( open( my $fh, '-|', $cc, '--version' ) ) {
                     my $line = <$fh>;
                     close $fh;

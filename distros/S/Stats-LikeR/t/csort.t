@@ -349,4 +349,14 @@ SKIP: {
 	} 'no leaks: HoA column sort with undef cells';
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('csort');
+	like($screen, qr/\Ausage: csort\(/, 'csort has a help screen');
+	is(do { local $@; eval { csort([ { n => 1 } ], 'n', 'xyz'); 1 } ? '' : $@ },
+	   $screen . "csort: error: output type must be 'aoh', 'hoa', or 'aoa' (got 'xyz')\n",
+	   'csort: a bad output type prints the help screen');
+}
+
 done_testing();

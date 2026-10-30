@@ -1,6 +1,6 @@
 package Langertha::Raider::EngineResolver;
 # ABSTRACT: Internal choice of engine, model and API key for a raider
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Carp qw( croak );
@@ -74,6 +74,8 @@ my %ENV_VAR = (
   cerebras   => 'CEREBRAS_API_KEY',
   openrouter => 'OPENROUTER_API_KEY',
   ollama     => undef,
+  mock       => undef,
+  virtual    => undef,
 );
 
 my %ENGINE_CLASS = (
@@ -87,10 +89,13 @@ my %ENGINE_CLASS = (
   cerebras   => 'Langertha::Engine::Cerebras',
   openrouter => 'Langertha::Engine::OpenRouter',
   ollama     => 'Langertha::Engine::Ollama',
+  # The rule-driven test engine: no network, no key (-e mock -o rules_file=...).
+  mock       => 'Langertha::Engine::Virtual',
+  virtual    => 'Langertha::Engine::Virtual',
 );
 
 my @ENGINE_NAMES = qw(
-  anthropic openai deepseek groq mistral gemini minimax cerebras openrouter ollama
+  anthropic openai deepseek groq mistral gemini minimax cerebras openrouter ollama mock virtual
 );
 
 
@@ -218,9 +223,10 @@ sub engine_args {
 
 sub build_engine {
   my ( $self, %extra ) = @_;
+  my $model = delete $extra{model};
   my $class = $self->engine_class;
   Module::Runtime::require_module($class);
-  my $engine = $class->new($self->engine_args(%extra));
+  my $engine = $class->new($self->engine_args(%extra), defined $model ? ( model => $model ) : ());
   if ($self->has_provider && $engine->can('user_agent')) {
     # Not for the key (Langertha's agent strips it on another origin), and
     # no longer for another host (the pin refuses that hop, k141): for the
@@ -247,7 +253,7 @@ Langertha::Raider::EngineResolver - Internal choice of engine, model and API key
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -418,10 +424,13 @@ F<.raider.yml>, so an explicit C<-m> / C<-k> is never overwritten.
 =head2 build_engine
 
     my $engine = $resolver->build_engine(mcp_servers => \@clients);
+    my $other  = $resolver->build_engine(mcp_servers => \@clients, model => 'claude-haiku-5-5');
 
 Loads L</engine_class> and builds it with L</engine_args>; with
 L</provider> the engine connects to the checked address and its
-synchronous user agent follows no redirect.
+synchronous user agent follows no redirect. A C<model> given here
+replaces L</model> for this engine (a subagent's model, ADR 0020
+E<sect>5).
 
 =head1 SEE ALSO
 
@@ -437,7 +446,7 @@ synchronous user agent follows no redirect.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -458,5 +467,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

@@ -1,0 +1,17 @@
+# A project command (.claude/commands/greet.md) run as /greet: the body with
+# $ARGUMENTS and $0 replaced goes to the model in Claude Code's frame.
+title: a custom command /greet runs with its arguments in the Claude Code frame
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/commands/greet.md: "---\ndescription: Greets people.\n---\nSay hello to $ARGUMENTS (first: $0). GREET-CMD\n"
+prompt: /greet Alice Bob
+script:
+  - text: Hello Alice and Bob!
+expect:
+  answer: Hello Alice and Bob!
+  outcome: { status: completed }
+  requests:
+    - { index: 0, tail: [ { role: user, contains: "<command-message>greet is running" } ] }
+    - { index: 0, contains: "<command-name>/greet</command-name>\n<command-args>Alice Bob</command-args>\n\nSay hello to Alice Bob (first: Alice). GREET-CMD" }
+    - { index: 0, absent: "Base directory for this skill" }
+    - { index: 0, absent: "description:" }

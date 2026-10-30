@@ -1,0 +1,17 @@
+title: a PreToolUse hook that asks is refused when nobody can approve, even in bypassPermissions (ADR 0022)
+files:
+  .claude/settings.json: |
+    { "hooks": { "PreToolUse": [
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": "cat >/dev/null; printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"deploys need a human\"}}'" } ] }
+    ] } }
+prompt: Deploy.
+script:
+  - tool_calls:
+      - [ bash, { command: echo deploying > deployed.txt } ]
+  - text: ok
+expect:
+  absent: [ deployed.txt ]
+  tools:
+    - { name: bash, error: true, text: "PreToolUse hook: deploys need a human; nobody can approve it in this run\\. Do not retry" }
+  events:
+    - { type: permission.denied, tool: bash, by: noninteractive }

@@ -38,7 +38,7 @@ use CallBackery::Database;
 use CallBackery::User;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.61.3';
+our $VERSION = '0.62.0';
 
 =head2 config
 
@@ -160,7 +160,7 @@ sub startup {
         my $reqEnv = $c->req->env;
         my $uri = $reqEnv->{SCRIPT_URI} || $reqEnv->{REQUEST_URI};
         my $path_info = $reqEnv->{PATH_INFO};
-        $uri =~ s|/?${path_info}$|/| if $path_info and $uri;
+        $uri =~ s|/?\Q${path_info}\E$|/| if $path_info and $uri;
         $c->req->url->base(Mojo::URL->new($uri)) if $uri;
     });
 

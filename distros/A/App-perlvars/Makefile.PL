@@ -20,12 +20,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "App::perlvars",
   "PREREQ_PM" => {
+    "Encode" => 0,
     "File::Spec" => 0,
     "Getopt::Long::Descriptive" => 0,
     "Moo" => 0,
     "PPI::Document" => 0,
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
+    "Test::Builder" => 0,
     "Test::Vars" => 0,
     "autodie" => 0,
     "strict" => 0,
@@ -38,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Script" => "1.29",
     "lib" => 0
   },
-  "VERSION" => "0.000008",
+  "VERSION" => "0.000009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +48,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Long::Descriptive" => 0,
@@ -53,6 +56,7 @@ my %FallbackPrereqs = (
   "PPI::Document" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
+  "Test::Builder" => 0,
   "Test::More" => 0,
   "Test::Script" => "1.29",
   "Test::Vars" => 0,

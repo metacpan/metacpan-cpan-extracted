@@ -1,3 +1,13 @@
+Travel::Status::DE::DBRIS 0.37 - Thu Oct 29 2026
+
+    * Work around latest Akamai BMP TLS fingerprinting rules
+    * Update rolling stock models and train names (Lili Urban)
+
+Travel::Status::DE::DBRIS 0.36 - Fri Oct 09 2026
+
+    * Work around latest Akamai BMP TLS fingerprinting rules
+    * Update rolling stock models and train names (Lili Urban)
+
 Travel::Status::DE::DBRIS 0.35 - Sun Sep 27 2026
 
     * Adjust unbro call to be compatible with IO::Uncompress::Brotli 0.004_001,

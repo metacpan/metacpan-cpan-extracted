@@ -25,6 +25,7 @@ my %args = (
   no_pack_names     => ['caveman'],
   perl              => 1,
   detect            => 0,
+  claude            => 1,
   cli_skill_sources => [ { type => 'dir', path => 'sk' } ],
 );
 my $json = JSON::MaybeXS->new(canonical => 1, allow_blessed => 1);
@@ -43,6 +44,7 @@ subtest 'Application: constructor arguments by name' => sub {
   like($s, qr/\bpack_names\b/, 'pack_names');
   like($s, qr/\bno_pack_names\b/, 'no_pack_names');
   like($s, qr/\bcli_skill_sources\b/, 'the skill sources');
+  like($s, qr/\bclaude\b/, 'claude');
   is($app->perl_tools_grant->{reason}, 'perl', 'perl tools granted by perl');
   is([ $app->detection_state ], [ 0, 'no_detect' ], 'detection off by detect => 0');
   is(Langertha::Raider::Application->new(root => $root, mission => 'M')->mission_source, 'mission',
@@ -61,7 +63,8 @@ subtest 'CLI: its flags and its persona' => sub {
   like($s, qr/(?:\A|\s)-e\b.*\s-m\b.*\s-k\b/, '-e, -m, -k');
   like($s, qr/--pack\b/, '--pack');
   like($s, qr/--no-pack\b/, '--no-pack');
-  like($s, qr/--claude\/--openai\/--skills/, 'the skill flags');
+  like($s, qr/--openai\/--skills/, 'the skill flags');
+  like($s, qr/--claude\b/, '--claude');
   like($s, qr/(?:\A|\s)-o\b/, '-o');
   is($app->perl_tools_grant->{reason}, '--perl', 'perl tools by --perl');
   is([ $app->detection_state ], [ 0, '--no-detect' ], '--no-detect');

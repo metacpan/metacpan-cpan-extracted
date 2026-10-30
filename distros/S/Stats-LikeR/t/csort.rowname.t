@@ -96,10 +96,10 @@ sub fresh_hoh {
 }
 
 # usage / argument-validation croaks
-throws_ok { csort( fresh_hoh() ) } qr/Usage: csort/,
-	'too few args croaks with the new usage message';
-throws_ok { csort( fresh_hoh(), 'id', 'aoh', 'x', 'y' ) } qr/Usage: csort/,
-	'too many args croaks with the new usage message';
+throws_ok { csort( fresh_hoh() ) } qr/\Ausage: csort\(.*^csort: error: expected 2 to 4 arguments, got 1\n\z/ms,
+	'too few args croaks with the help screen';
+throws_ok { csort( fresh_hoh(), 'id', 'aoh', 'x', 'y' ) } qr/\Ausage: csort\(.*^csort: error: expected 2 to 4 arguments, got 5\n\z/ms,
+	'too many args croaks with the help screen';
 throws_ok { csort( 'not-a-ref', 'id' ) } qr/first argument/,
 	'non-ref data croaks';
 throws_ok { csort( fresh_hoh(), [] ) } qr/second argument/,

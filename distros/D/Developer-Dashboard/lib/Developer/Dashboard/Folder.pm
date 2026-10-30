@@ -3,9 +3,9 @@ package Developer::Dashboard::Folder;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use File::Basename qw(dirname);
 use File::Find ();
 use File::Path qw(make_path);
@@ -151,7 +151,7 @@ sub _load_configured_aliases {
 sub cd {
     my ( $class, $where, $code ) = @_;
     return if ref($code) ne 'CODE';
-    my $pwd = cwd();
+    my $pwd = current_working_directory();
     my $dir = $class->_resolve_path($where);
     return if !$dir || !-d $dir;
     chdir $dir or return;

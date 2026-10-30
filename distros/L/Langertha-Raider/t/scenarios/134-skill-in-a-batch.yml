@@ -1,0 +1,21 @@
+# A skill loaded in the same batch as another call: both tool results stay
+# together after the assistant's calls (strict providers want every tool_use
+# answered first), the skill follows them as a message of its own.
+title: a skill loaded beside another tool call follows both tool results
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/style/SKILL.md: "---\nname: style\ndescription: House writing style.\n---\n\nSTYLE-MARKER\n"
+  notes.txt: "NOTES-MARKER\n"
+prompt: Tidy the notes.
+script:
+  - tool_calls:
+      - [ skill, { skill: style } ]
+      - [ read_file, { path: notes.txt } ]
+  - text: tidied
+expect:
+  answer: tidied
+  requests:
+    - { index: 1, tail: [ { role: assistant }, { role: tool, contains: "Launching skill: style" }, { role: tool, contains: NOTES-MARKER }, { role: user, contains: STYLE-MARKER } ] }
+  tools:
+    - { name: skill, text: '^Launching skill: style$' }
+    - { name: read_file, text: NOTES-MARKER }

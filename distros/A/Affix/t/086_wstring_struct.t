@@ -83,7 +83,7 @@ subtest 'WString as a direct argument' => sub {
 };
 subtest 'WString as a return value' => sub {
 SKIP: {
-        skip 'WString returns resolve to a pin on non-Windows (wchar_t is 4 bytes)', 1 unless $^O eq 'MSWin32';
+        skip 'WString returns resolve to a pin on non-Windows (wchar_t is 4 bytes)', 1 unless ( $^O eq 'MSWin32' || $^O eq 'cygwin' );
         is wide_ret(), 'hello', 'wide string return roundtrips';
     }
 };

@@ -239,4 +239,17 @@ dies_ok { col2col( \%se, $boom, { 'bogus' => 1 } ) } 'an unknown option in the h
 	is_approx( $uh->{'ΔG'}{'temp'}, 1, 'HoH: non-ASCII key fetched from each row' );
 	no_leaks_ok { col2col( \%hoa, 'cor' ) } 'no leaks: non-ASCII column names' unless $INC{'Devel/Cover.pm'};
 }
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('col2col');
+	like($screen, qr/\Ausage: col2col\(/, 'col2col has a help screen');
+	is(do { local $@; eval { col2col({ x => [1] }); 1 } ? '' : $@ },
+	   $screen . "col2col: error: expected at least 2 arguments, got 1\n",
+	   'col2col: one argument prints the help screen');
+	is(do { local $@; eval { col2col({ x => [1, 2], y => [2, 3] }, 'cor', undef, na => 'bad'); 1 } ? '' : $@ },
+	   $screen . "col2col: error: na must be 'pairwise', 'omit' or 'keep'\n",
+	   'col2col: an unknown na prints the help screen');
+}
+
 done_testing();

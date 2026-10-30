@@ -1,0 +1,59 @@
+# Real pattern: TodoWrite at the start of a multi-step job with the first item in
+# progress, re-sent after each step with exactly one item moving
+# (pending -> in_progress -> completed), working in between with Read/Edit/Bash.
+title: the task list moves pending, in_progress, completed across a read-edit-verify job
+# A session of the TodoWrite era: todo_write instead of the task tools (ADR 0025).
+app: { task_tools: false }
+files:
+  greet.txt: "hello world\n"
+prompt: Rename the greeting to Moin and check the result.
+script:
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: Read greet.txt, status: in_progress, activeForm: Reading greet.txt }
+            - { content: Change the greeting, status: pending, activeForm: Changing the greeting }
+            - { content: Verify with cat, status: pending, activeForm: Verifying with cat }
+      - [ read_file, { path: greet.txt } ]
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: Read greet.txt, status: completed, activeForm: Reading greet.txt }
+            - { content: Change the greeting, status: in_progress, activeForm: Changing the greeting }
+            - { content: Verify with cat, status: pending, activeForm: Verifying with cat }
+      - [ edit_file, { path: greet.txt, old_string: hello, new_string: Moin } ]
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: Read greet.txt, status: completed, activeForm: Reading greet.txt }
+            - { content: Change the greeting, status: completed, activeForm: Changing the greeting }
+            - { content: Verify with cat, status: in_progress, activeForm: Verifying with cat }
+      - [ bash, { command: cat greet.txt } ]
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: Read greet.txt, status: completed, activeForm: Reading greet.txt }
+            - { content: Change the greeting, status: completed, activeForm: Changing the greeting }
+            - { content: Verify with cat, status: completed, activeForm: Verifying with cat }
+  - text: Done.
+expect:
+  answer: Done.
+  files:
+    greet.txt: "Moin world\n"
+  todos:
+    - { content: Read greet.txt, status: completed }
+    - { content: Change the greeting, status: completed }
+    - { content: Verify with cat, status: completed }
+  tools:
+    - { name: todo_write, text: '^Todo list updated: 0 completed, 1 in progress, 2 pending\n\[>\] Read greet\.txt' }
+    - { name: read_file, text: 'hello world' }
+    - { name: todo_write, text: '^Todo list updated: 1 completed, 1 in progress, 1 pending' }
+    - { name: edit_file, text: '^The file \S+ has been updated successfully\.' }
+    - { name: todo_write, text: '^Todo list updated: 2 completed, 1 in progress, 0 pending' }
+    - { name: bash, text: '\AMoin world\z' }
+    - { name: todo_write, text: '^Todo list updated: 3 completed, 0 in progress, 0 pending' }
+  events:
+    - { type: todo.updated, todos: [ { content: Read greet.txt, status: in_progress }, { content: Change the greeting, status: pending }, { content: Verify with cat, status: pending } ] }
+    - { type: todo.updated, todos: [ { content: Read greet.txt, status: completed }, { content: Change the greeting, status: in_progress }, { content: Verify with cat, status: pending } ] }
+    - { type: todo.updated, todos: [ { content: Read greet.txt, status: completed }, { content: Change the greeting, status: completed }, { content: Verify with cat, status: in_progress } ] }
+    - { type: todo.updated, todos: [ { content: Read greet.txt, status: completed }, { content: Change the greeting, status: completed }, { content: Verify with cat, status: completed } ] }

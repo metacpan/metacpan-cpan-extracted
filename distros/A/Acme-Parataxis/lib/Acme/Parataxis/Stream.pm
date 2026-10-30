@@ -13,7 +13,7 @@ use Time::HiRes qw[time];
 # the source. `shutdown` releases the parked get()ers (Channel.pm's shutdown adjusts the get semaphore by 1e9), so no
 # stage can park forever on a source that quit - the "zero leaked fibers" guarantee holds from the very
 # first from_channel.
-class Acme::Parataxis::Stream v0.1.1 {
+class Acme::Parataxis::Stream v0.1.3 {
     use Carp qw[croak];
     use Acme::Parataxis qw[fiber await_sleep];
     use Acme::Parataxis::Channel;

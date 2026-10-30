@@ -14,7 +14,7 @@ use InternetData::Database;
 use InternetData::Error;
 use InternetData::Oauth;
 
-our $VERSION = '1.11.3';
+our $VERSION = '1.11.4';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -245,6 +245,10 @@ sub _nonconforming {
     if ($kind eq 'string') {
         return InternetData::Oauth::_is_string($value) ? undef : $wrong->();
     }
+    if ($kind eq 'date' || $kind eq 'date-time') {
+        return InternetData::Oauth::_is_string($value) && _is_rfc3339($kind, $value) ? undef
+            : 'the API answered ' . join('.', @$at) . ' that is no RFC 3339 ' . $kind;
+    }
     if ($kind eq 'integer') {
         return defined $value && !ref $value && !InternetData::Oauth::_is_string($value)
             && $value =~ /\A-?[0-9]+\z/ ? undef : $wrong->();
@@ -282,6 +286,33 @@ sub _nonconforming {
         return $w if defined $w;
     }
     return undef;
+}
+
+# RFC 3339's `full-date`, or its `date-time` with the `T` and `Z` in either case,
+# an hour below 24, a minute and second below 60 and an offset of at most 23:59,
+# on a day its month has. ASCII digits and `\z`, since Perl's `\d` takes any
+# script's digits and `$` a trailing newline.
+my $FULL_DATE = qr/\A([0-9]{4})-([0-9]{2})-([0-9]{2})\z/;
+my $DATE_TIME = qr/\A([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.[0-9]+)?
+    (?:[Zz]|[+-]([0-9]{2}):([0-9]{2}))\z/x;
+
+sub _is_rfc3339 {
+    my ($kind, $value) = @_;
+    if ($kind eq 'date') {
+        my @date = $value =~ $FULL_DATE or return 0;
+        return _is_day(@date);
+    }
+    my ($year, $month, $day, $hour, $minute, $second, $off_hour, $off_minute) = $value =~ $DATE_TIME
+        or return 0;
+    return _is_day($year, $month, $day) && $hour < 24 && $minute < 60 && $second < 60
+        && (!defined $off_hour || ($off_hour < 24 && $off_minute < 60));
+}
+
+sub _is_day {
+    my ($year, $month, $day) = @_;
+    return 0 if $month < 1 || $month > 12 || $day < 1;
+    my $leap = ($year % 4 == 0 && $year % 100 != 0) || $year % 400 == 0;
+    return $day <= (31, $leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)[$month - 1];
 }
 
 sub _get_p {

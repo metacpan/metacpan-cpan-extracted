@@ -1,5 +1,5 @@
 ---
-abstract: 'Native HTTP/1.x and HTTP/2 support for Linux::Event'
+abstract: 'Linux-native integration of Unblock HTTP'
 author:
   - 'Joshua S. Day <hax@cpan.org>'
 build_requires:
@@ -7,6 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Unblock::HTTP1: '0.13'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
@@ -19,65 +20,46 @@ no_index:
     - t
     - inc
   package:
-    - Linux::Event::HTTP::_ClientAuth
-    - Linux::Event::HTTP::_ClientConnect
-    - Linux::Event::HTTP::_ClientUpgrade
-    - Linux::Event::HTTP::_HTTP1
-    - Linux::Event::HTTP::_HTTP1::Chunked
-    - Linux::Event::HTTP::_HTTP2
-    - Linux::Event::HTTP::_HTTP2::Client
-    - Linux::Event::HTTP::_HTTP2::ClientConnection
-    - Linux::Event::HTTP::_HTTP2::ClientSelector
-    - Linux::Event::HTTP::_HTTP2::ClientSelectorConnection
-    - Linux::Event::HTTP::_HTTP2::Server
-    - Linux::Event::HTTP::_HTTP2::ServerConnection
-    - Linux::Event::HTTP::_ServerConnect
-    - Linux::Event::HTTP::_Upgrade
+    - Linux::Event::HTTP::_Config
+    - Linux::Event::HTTP::_Stream
+    - Linux::Event::HTTP::_Transport
+    - Linux::Event::HTTP::_UpgradedStream
+    - Linux::Event::HTTP::_QUICSocket
+    - Linux::Event::HTTP::_NativeStream
+    - Linux::Event::HTTP::_NativeBridge
 optional_features:
   http2:
-    description: 'HTTP/2 support via Net::HTTP2::nghttp2'
+    description: 'HTTP/2 over TLS with ALPN'
     requires:
-      Net::HTTP2::nghttp2: '0.011'
+      Unblock::HTTP2: '0.13'
+  http3:
+    description: 'HTTP/3 over verified QUIC/TLS (optional)'
+    requires:
+      Net::QUIC: '0.06'
+      Unblock::HTTP3: '0.14'
+  websocket:
+    description: 'Optional WebSocket protocol transition'
+    requires:
+      Unblock::WebSocket: '0.02'
 provides:
   Linux::Event::HTTP:
     file: lib/Linux/Event/HTTP.pm
-    version: '0.003'
-  Linux::Event::HTTP::Body::Stream:
-    file: lib/Linux/Event/HTTP/Body/Stream.pm
-    version: '0.003'
+    version: '0.004'
   Linux::Event::HTTP::Client:
     file: lib/Linux/Event/HTTP/Client.pm
-    version: '0.003'
-  Linux::Event::HTTP::Client::Connection:
-    file: lib/Linux/Event/HTTP/Client/Connection.pm
-    version: '0.003'
-  Linux::Event::HTTP::Client::Operation:
-    file: lib/Linux/Event/HTTP/Client/Operation.pm
-    version: '0.003'
-  Linux::Event::HTTP::Request:
-    file: lib/Linux/Event/HTTP/Request.pm
-    version: '0.003'
-  Linux::Event::HTTP::Response:
-    file: lib/Linux/Event/HTTP/Response.pm
-    version: '0.003'
+    version: '0.004'
   Linux::Event::HTTP::Server:
     file: lib/Linux/Event/HTTP/Server.pm
-    version: '0.003'
-  Linux::Event::HTTP::Server::Connection:
-    file: lib/Linux/Event/HTTP/Server/Connection.pm
-    version: '0.003'
-  Linux::Event::HTTP::Transaction:
-    file: lib/Linux/Event/HTTP/Transaction.pm
-    version: '0.003'
+    version: '0.004'
 requires:
-  HTTP::CookieJar: '0.014'
   Linux::Event: '0.117'
-  URI: '0'
-  Uniform::HTTP::Auth: '0.02'
+  Unblock::HTTP: '0.03'
+  Unblock::HTTP1: '0.13'
+  Uniform::HTTP: '0.06'
   perl: '5.036000'
 resources:
   bugtracker: https://github.com/haxmeister/perl-Linux-Event-HTTP/issues
   homepage: https://github.com/haxmeister/perl-Linux-Event-HTTP
   repository: https://github.com/haxmeister/perl-Linux-Event-HTTP.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

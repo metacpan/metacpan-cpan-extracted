@@ -24,6 +24,14 @@
   .stats-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
   .stats-table td.na { text-align: center; color: #bbb; }
   .stats-meta { font-size: 0.82rem; color: #666; margin-bottom: 0.75rem; }
+  .stats-pctl {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+  .stats-pctl input[type="number"] { width: 4.5rem; }
   /* drill-down cells: link text matches cell style, hover shows teal underline */
   .stats-table td.drill a {
     color: inherit;
@@ -35,10 +43,35 @@
   }
 </style>
 
-<p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+[% PROCESS "web/en/layouts/view_context.html.tt" %]
 
 <h2 style="margin-bottom:0.5rem">[% title | html %]</h2>
 <p class="stats-meta">Source: [% left_label | html %] &mdash; [% row_count %] row[% IF row_count != 1 %]s[% END %]</p>
+
+<form class="stats-pctl" method="get" action="/stats" id="stats-pctl">
+  <input type="hidden" name="l" value="[% left_spec | html %]">
+  <label for="stats-pctl-p" title="The percentile shown in its own column, 1 to 100">Percentile column</label>
+  <input type="number" id="stats-pctl-p" name="p" min="1" max="100" step="1"
+         value="[% stats_percentile %]">
+  <button type="submit" class="btn-secondary">Apply</button>
+</form>
+<script>
+// The page can be opened from a filtered table, so keep the rest of the query
+// string: the level is the only thing this control changes.
+(function () {
+  var form = document.getElementById('stats-pctl');
+  if (!form) return;
+  var q = new URLSearchParams(window.location.search);
+  q.delete('p');
+  q.delete('l');
+  q.forEach(function (v, k) {
+    var i = document.createElement('input');
+    i.type = 'hidden'; i.name = k; i.value = v;
+    form.appendChild(i);
+  });
+}());
+</script>
 
 [%- IF stats.size == 0 -%]
 <p>No columns found.</p>
@@ -54,8 +87,13 @@
     <th>Distinct</th>
     <th title="Click to filter table to rows equal to this value">Min</th>
     <th title="Click to filter table to rows equal to this value">Max</th>
+    <th title="Largest value minus smallest">Range</th>
     <th>Mean</th>
-    <th>Median</th>
+    <th title="The middle value: p50, the same number the median measure reports">Median</th>
+    <th title="The percentile chosen with ?p= (default 95)">p[% stats_percentile %]</th>
+    <th title="Sample standard deviation, the n-1 denominator">Std dev</th>
+    <th title="The value this column holds in the first row that has one">First</th>
+    <th title="The value this column holds in the last row that has one">Last</th>
   </tr>
 </thead>
 <tbody>
@@ -78,12 +116,32 @@
     [%- IF s.min.defined -%]
       <td class="num drill"><a href="[% drill_back_url | html %][% drill_sep %]f=[% s.col | uri %]:eq:[% s.min | uri %]&amp;back2=[% stats_url | uri %]&amp;back2_label=Back%20to%20column%20stats" title="Show rows where [% s.col | html %] = [% s.min | html %]">[% s.min | html %]</a></td>
       <td class="num drill"><a href="[% drill_back_url | html %][% drill_sep %]f=[% s.col | uri %]:eq:[% s.max | uri %]&amp;back2=[% stats_url | uri %]&amp;back2_label=Back%20to%20column%20stats" title="Show rows where [% s.col | html %] = [% s.max | html %]">[% s.max | html %]</a></td>
+      <td class="num">[% s.range | html %]</td>
       <td class="num">[% s.avg | html %]</td>
       <td class="num">[% s.median | html %]</td>
+      <td class="num">[% s.pct | html %]</td>
+      [%- IF s.stdev.defined -%]
+      <td class="num">[% s.stdev | html %]</td>
+      [%- ELSE -%]
+      <td class="na" title="One value has no spread to measure">&mdash;</td>
+      [%- END -%]
     [%- ELSE -%]
       <td class="na">&mdash;</td>
       <td class="na">&mdash;</td>
       <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+      <td class="na">&mdash;</td>
+    [%- END -%]
+    [%- IF s.first.defined -%]
+      <td class="num">[% s.first | html %]</td>
+    [%- ELSE -%]
+      <td class="na">&mdash;</td>
+    [%- END -%]
+    [%- IF s.last.defined -%]
+      <td class="num">[% s.last | html %]</td>
+    [%- ELSE -%]
       <td class="na">&mdash;</td>
     [%- END -%]
   </tr>

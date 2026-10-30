@@ -1,0 +1,36 @@
+title: a foreign MCP tool asks in default mode; rules name it mcp__<server>__<tool> (ADR 0021, ADR 0029)
+permission_mode: null
+approve: [ once ]
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ mcp__t__with_dot ]
+      deny:  [ mcp__t__fail ]
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+prompt: Use the test server.
+script:
+  - tool_calls:
+      - [ mcp__t__with_dot, {} ]
+      - [ mcp__t__fail, {} ]
+      - [ mcp__t__echo_env, { name: HOME } ]
+      - [ mcp__t__echo_env, { name: HOME } ]
+  - text: done
+expect:
+  permissions:
+    - { tool: mcp__t__echo_env, rule: mcp__t__echo_env }
+    - { tool: mcp__t__echo_env, rule: mcp__t__echo_env }
+  tools:
+    - { name: mcp__t__with_dot, text: "\\Adotted\\z" }
+    - { name: mcp__t__fail, error: true, text: "mcp__t__fail" }
+    - { name: mcp__t__echo_env, text: "\\AHOME=" }
+    - { name: mcp__t__echo_env, error: true, text: "rejected" }
+  events:
+    - { type: permission.denied, tool: mcp__t__fail, by: rule }
+    - { type: permission.asked, tool: mcp__t__echo_env, suggested_rule: mcp__t__echo_env }
+    - { type: permission.granted, tool: mcp__t__echo_env, scope: once }
+    - { type: permission.denied, tool: mcp__t__echo_env, by: user }

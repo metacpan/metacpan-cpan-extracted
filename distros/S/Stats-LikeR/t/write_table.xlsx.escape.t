@@ -105,8 +105,14 @@ sub cell_a {
 			'_x0041_ and _x00ff_ and _X0041_ and _x00G1_ and _x0041',
 		);
 	}
+	# A sheet name holding one is refused: up to 0.341 it was dropped from
+	# workbook.xml (no reader decodes _xHHHH_ there), past the checks for an
+	# empty or duplicate name.
+	ok(!eval { write_table([['t']], $f, quiet => 1, xlsx_sheet => $sheet); 1 }
+		&& $@ =~ /'xlsx_sheet' may not contain U\+FFFF, which XML cannot hold/,
+		'a sheet name holding U+FFFF is refused');
 	write_table([['t'], map { [$_] } @cells], $f, quiet => 1,
-		xlsx_sheet => $sheet, xlsx_comment => $comment);
+		xlsx_sheet => 'Sh', xlsx_comment => $comment);
 	my $x = sheet($f);
 	my @want = (
 		'x_xFFFF_y_xFFFE_z',
@@ -120,7 +126,6 @@ sub cell_a {
 			"escaped as XlsxWriter does: row " . ($i + 2));
 		is(decode($want[$i]), $cells[$i], '... and decodes back to the cell: row ' . ($i + 2));
 	}
-	like(member($f, 'xl/workbook.xml'), qr{<sheet name="Sh"}, 'the sheet name loses U+FFFF (no reader decodes _xHHHH_ there)');
 	like(member($f, 'docProps/core.xml'), qr{\ncde</dc:description>}, 'the description loses the control and U+FFFE');
 	unlike($x, qr/[\x00-\x08\x0B\x0C\x0E-\x1F]|\xEF\xBF[\xBE\xBF]|\xED[\xA0-\xBF]/,
 		'no byte sequence XML 1.0 forbids is left in the worksheet');
@@ -219,9 +224,9 @@ sub cell_a {
 		'freezing 1048575 rows and 16383 columns is allowed';
 	like(sheet($f), qr{<pane xSplit="16383" ySplit="1048575" topLeftCell="XFD1048576"}, '... and anchored at XFD1048576');
 	throws_ok { write_table([['a']], xlsx_path(), quiet => 1, xlsx_freeze_rows => 2**20) }
-		qr/^write_table: 'xlsx_freeze_rows' must be a non-negative integer no larger than 1048575/, '2**20 frozen rows die';
+		qr/\nwrite_table: error: 'xlsx_freeze_rows' must be a non-negative integer no larger than 1048575/, '2**20 frozen rows die';
 	throws_ok { write_table([['a']], xlsx_path(), quiet => 1, xlsx_freeze_cols => 2**14) }
-		qr/^write_table: 'xlsx_freeze_cols' must be a non-negative integer no larger than 16383/, '2**14 frozen columns die';
+		qr/\nwrite_table: error: 'xlsx_freeze_cols' must be a non-negative integer no larger than 16383/, '2**14 frozen columns die';
 	throws_ok { write_table([['a']], xlsx_path(), quiet => 1, xlsx_freeze_rows => 2**32 + 1) }
 		qr/'xlsx_freeze_rows' must be a non-negative integer no larger than 1048575/,
 		'2**32 + 1 dies, rather than wrapping to 1';

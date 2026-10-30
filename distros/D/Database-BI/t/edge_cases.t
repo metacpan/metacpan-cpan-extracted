@@ -302,8 +302,8 @@ subtest 'GET /view/<letter-start> still works (normal tables)' => sub {
 	$t->get_ok('/view/sales')->status_is(200);
 
 	# Underscore-start is allowed by DataSource's regex; it doesn't exist on
-	# disk, so DataSource init fails gracefully and renders the error page (200).
-	$t->get_ok('/view/_phantom')->status_is(200);
+	# disk, so the action says so (404 naming the table).
+	$t->get_ok('/view/_phantom')->status_is(404)->content_like(qr/There is no table called/);
 };
 
 # ---------------------------------------------------------------------------
@@ -1214,11 +1214,11 @@ subtest 'GET /folder -- data column with no order-number values: no folders rend
 
 subtest 'GET /folder -- back URL auto-derived from table spec when back= absent' => sub {
 	# folder_view derives back_url from _spec_to_url($left_spec) when no back=
-	# param is supplied.  The rendered page must contain a "Back to table" link
-	# pointing at the source table.
+	# param is supplied.  The breadcrumb must link to the source table.
 	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC))
 	  ->status_is(200)
-	  ->content_like(qr/Back to table/, '"Back to table" link is present');
+	  ->content_like(qr{<nav class="back-link[^"]*" aria-label="Breadcrumb">.*?<a href="/view/sales">sales</a>}s,
+		'breadcrumb links to the table');
 };
 
 subtest 'GET /folder -- NUL byte in prefix: no crash' => sub {
@@ -1256,7 +1256,7 @@ subtest 'GET /folder -- drill into A prefix: shows A10 A11 items' => sub {
 	  ->status_is(200)
 	  ->content_like(qr/A10/, 'A10 item appears in folder A')
 	  ->content_like(qr/A11/, 'A11 item appears in folder A')
-	  ->content_unlike(qr/B1/, 'B1 item not shown inside folder A');
+	  ->content_unlike(qr/>B1</, 'B1 item not shown inside folder A');
 };
 
 subtest 'GET /folder -- prefix with multi-letter hierarchy: sub-folders rendered' => sub {

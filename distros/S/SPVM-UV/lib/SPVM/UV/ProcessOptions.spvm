@@ -1,0 +1,36 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::ProcessOptions {
+
+  use UV::StdioContainer;
+  use UV::Callback::Exit;
+  
+  # Fields
+  has file : rw string;
+  
+  has args : rw string[];
+  
+  has env : rw string[];
+  
+  has cwd : rw string;
+  
+  has flags : rw int;
+  
+  has stdios : rw UV::StdioContainer[];
+  
+  has exit_cb : rw UV::Callback::Exit;
+  
+  has uid : rw int;
+  
+  has gid : rw int;
+  
+  # Class Methods
+  static method new : UV::ProcessOptions () {
+    
+    my $self = new UV::ProcessOptions;
+    
+    return $self;
+  }
+  
+}

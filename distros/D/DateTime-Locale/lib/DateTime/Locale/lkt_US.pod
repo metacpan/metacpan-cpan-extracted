@@ -435,6 +435,24 @@ Lakota United States locale.
    1995-12-22T09:05:02 = CE 1995 Tȟahékapšuŋ Wí 22, Aŋpétuzaptaŋ
   -0010-09-15T04:44:23 = BCE -10 Čhaŋwápeǧi Wí 15, Owáŋgyužažapi
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 Thiyóȟeyuŋka Wí
+   1995-12-22T09:05:02 = CE 1995 Tȟahékapšuŋ Wí
+  -0010-09-15T04:44:23 = BCE -10 Čhaŋwápeǧi Wí
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 Thiyóȟeyuŋka Wí 5, Aŋpétunuŋpa
+   1995-12-22T09:05:02 = CE 1995 Tȟahékapšuŋ Wí 22, Aŋpétuzaptaŋ
+  -0010-09-15T04:44:23 = BCE -10 Čhaŋwápeǧi Wí 15, Owáŋgyužažapi
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 Thiyóȟeyuŋka Wí 5
+   1995-12-22T09:05:02 = CE 1995 Tȟahékapšuŋ Wí 22
+  -0010-09-15T04:44:23 = BCE -10 Čhaŋwápeǧi Wí 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 Thiyóȟeyuŋka Wí 5
@@ -502,6 +520,12 @@ Lakota United States locale.
   -0010-09-15T04:44:23 = Čhaŋwápeǧi Wí
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = Thiyóȟeyuŋka Wí 5, Aŋpétunuŋpa
+   1995-12-22T09:05:02 = Tȟahékapšuŋ Wí 22, Aŋpétuzaptaŋ
+  -0010-09-15T04:44:23 = Čhaŋwápeǧi Wí 15, Owáŋgyužažapi
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = Thiyóȟeyuŋka Wí 5, Aŋpétunuŋpa
    1995-12-22T09:05:02 = Tȟahékapšuŋ Wí 22, Aŋpétuzaptaŋ

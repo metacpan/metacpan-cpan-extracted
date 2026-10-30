@@ -435,6 +435,24 @@ Prussian Poland locale.
    1995-12-22T09:05:02 = CE 1995 sallaws 22, pēntniks
   -0010-09-15T04:44:23 = BCE -10 sillins 15, sabattika
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 wassarins
+   1995-12-22T09:05:02 = CE 1995 sallaws
+  -0010-09-15T04:44:23 = BCE -10 sillins
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 wassarins 5, wisasīdis
+   1995-12-22T09:05:02 = CE 1995 sallaws 22, pēntniks
+  -0010-09-15T04:44:23 = BCE -10 sillins 15, sabattika
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 wassarins 5
+   1995-12-22T09:05:02 = CE 1995 sallaws 22
+  -0010-09-15T04:44:23 = BCE -10 sillins 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 wassarins 5
@@ -502,6 +520,12 @@ Prussian Poland locale.
   -0010-09-15T04:44:23 = sillins
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = wassarins 5, wisasīdis
+   1995-12-22T09:05:02 = sallaws 22, pēntniks
+  -0010-09-15T04:44:23 = sillins 15, sabattika
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = wassarins 5, wisasīdis
    1995-12-22T09:05:02 = sallaws 22, pēntniks

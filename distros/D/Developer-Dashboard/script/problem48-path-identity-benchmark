@@ -1,0 +1,143 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Spec;
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib 'lib';
+
+use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::PathIdentity ();
+use Developer::Dashboard::PathRegistry;
+
+my $runs = 25;
+GetOptions( 'runs=i' => \$runs ) or die "Usage: $0 [--runs N]\n";
+die "Unexpected benchmark argument(s): @ARGV\nUsage: $0 [--runs N]\n" if @ARGV;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $temp_root = tempdir( 'problem48-path-identity-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home      = File::Spec->catdir( $temp_root, 'home' );
+my $state     = File::Spec->catdir( $temp_root, 'state' );
+mkdir $home or die "Unable to create isolated home '$home': $!";
+local $ENV{HOME}                           = $home;
+local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = $state;
+
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+my $uncached_expected = _without_scoped_identity_cache($paths);
+my $cached_expected   = $paths->all_paths;
+my $expected_json     = json_encode($uncached_expected);
+die 'Scoped and unscoped all_paths payloads differ' if json_encode($cached_expected) ne $expected_json;
+
+my ( @uncached, @cached );
+for ( 1 .. $runs ) {
+    push @uncached, _timed( sub { _without_scoped_identity_cache($paths) }, $expected_json );
+    push @cached,   _timed( sub { $paths->all_paths }, $expected_json );
+}
+
+my $uncached_median = _median(@uncached);
+my $cached_median   = _median(@cached);
+printf "all_paths: %d alternating paired runs; exact JSON parity (%d bytes).\n",
+  $runs, length $expected_json;
+printf "Uncached path identity median: %.3f ms.\n", 1000 * $uncached_median;
+printf "Aggregate-scoped identity median: %.3f ms (%.2fx).\n",
+  1000 * $cached_median, $uncached_median / $cached_median;
+
+exit 0;
+
+# _without_scoped_identity_cache($paths)
+# Runs the production aggregate with the pre-optimization path-normalization
+# behavior, using a localized method override only for this benchmark process.
+# Input: PathRegistry instance.
+# Output: ordinary all_paths payload produced without path-identity reuse.
+sub _without_scoped_identity_cache {
+    my ($paths) = @_;
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::_path_identity = sub {
+        my ( $self, $path ) = @_;
+        return Developer::Dashboard::PathIdentity::_path_identity( $path, empty_fallback => 1 );
+    };
+    return $paths->all_paths;
+}
+
+# _timed($code, $expected_json)
+# Measures one aggregate call and rejects any output change before recording it.
+# Input: code reference returning a path payload and expected canonical JSON.
+# Output: elapsed seconds.
+sub _timed {
+    my ( $code, $expected_json ) = @_;
+    my $started = time;
+    my $actual  = json_encode( $code->() );
+    my $elapsed = time - $started;
+    die 'all_paths output changed during benchmark' if $actual ne $expected_json;
+    return $elapsed;
+}
+
+# _median(@samples)
+# Returns the center sample after numeric sorting.
+# Input: odd, nonempty list of elapsed-second measurements.
+# Output: median elapsed seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die 'Cannot calculate a median without samples' if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-path-identity-benchmark - compare scoped path-identity reuse
+
+=head1 PURPOSE
+
+This benchmark compares the production C<all_paths> aggregate with
+per-inventory path-identity reuse against the same registry with that cache
+disabled. It refuses to report timings unless both implementations produce
+byte-identical JSON.
+
+=head1 WHY IT EXISTS
+
+Problem 48 uses Devel::NYTProf to identify repeated filesystem path
+normalization in Developer Dashboard. This benchmark measures the aggregate
+impact of one request-scoped optimization without adding state across calls or
+touching the user's home directory.
+
+=head1 WHEN TO USE
+
+Run this in the isolated Problem 48 Docker benchmark environment after
+changing C<Developer::Dashboard::PathRegistry::all_paths> or its path identity
+helper. It is a synthetic empty-home measurement, not a claim that every
+dashboard routine is 50 times faster.
+
+=head1 HOW TO USE
+
+  perl script/problem48-path-identity-benchmark
+  perl script/problem48-path-identity-benchmark --runs 51
+
+The run count must be odd and positive. Each pair uses the same temporary home
+and state directory; a fresh result is compared with the baseline on every
+iteration.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this script to decide whether
+aggregate-scoped path normalization is worth retaining. The application and
+release workflow do not invoke it.
+
+=head1 EXAMPLES
+
+Run the default comparison inside the scoped Docker benchmark project:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-path-identity-benchmark
+
+Increase the alternating sample count for a steadier median:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-path-identity-benchmark --runs 51
+
+=cut

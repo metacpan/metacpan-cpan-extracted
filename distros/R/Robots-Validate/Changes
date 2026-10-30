@@ -1,5 +1,17 @@
 Revision history for Robots-Validate:
 
+v0.4.13   2026-10-29 10:12:50+00:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - bnf.fr_bot
+    - IsonSearchBot (updated network)
+    - OmniscienteBot
+    - PlytikBot
+    - RiverBot
+    - SocialContext-Domains
+    - T2Bot
+    - Yahoo Japan (new agent strings)
+
 v0.4.12   2026-10-21 23:15:46+01:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:

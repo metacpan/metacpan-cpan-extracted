@@ -51,12 +51,15 @@ sub clear_engine_env {
 Points C<$ENV{HOME}> at a fresh temporary directory (removed at exit) and
 returns it, so nothing the test builds reads the developer's real
 F<~/.raider/> (packs in F<~/.raider/packs/>, see
-L<Langertha::Raider::Packs/build_packs>). Call it once at the top of any
-test that loads packs.
+L<Langertha::Raider::Packs/build_packs>) or real F<~/.claude/> (the Claude
+Code layout of ADR 0019): C<$ENV{CLAUDE_CONFIG_DIR}> is deleted, so the
+Claude directory is the one of the temporary home. Call it once at the top
+of any test that loads packs or builds an application.
 
 =cut
 
 sub isolate_home {
+  delete $ENV{CLAUDE_CONFIG_DIR};
   $ENV{HOME} = tempdir(CLEANUP => 1);
   return $ENV{HOME};
 }

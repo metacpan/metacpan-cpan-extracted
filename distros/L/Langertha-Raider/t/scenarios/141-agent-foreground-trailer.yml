@@ -1,0 +1,33 @@
+# Claude Code: a foreground subagent answers with its report, then an "agentId: ID (use
+# SendMessage with to: 'ID' ... to continue this agent)" line and a <usage> block with
+# subagent_tokens (size of the subagent's last response), tool_uses, duration_ms.
+# Checks ADR 0027 section 2.
+title: a foreground agent's result carries the agentId line and its usage (last response's tokens, tool uses)
+permission_mode: bypassPermissions
+files:
+  notes.txt: "x\n"
+prompt: Ask an agent to look around.
+script:
+  - tool_calls:
+      - [ agent, { description: Look, prompt: Look around and report. } ]
+    usage: { prompt_tokens: 100, completion_tokens: 10 }
+  - tool_calls:
+      - [ list_files, { path: . } ]
+    usage: { prompt_tokens: 50, completion_tokens: 5 }
+  - text: the agent report
+    usage: { prompt_tokens: 80, completion_tokens: 12 }
+  - text: The agent said so.
+    usage: { prompt_tokens: 200, completion_tokens: 8 }
+expect:
+  answer: The agent said so.
+  request_count: 4
+  tools:
+    - { name: list_files }
+    # 80 + 12 = 92: the last response of the agent only, not the sum of its calls; 1 tool use
+    - name: agent
+      text: '\Athe agent report\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: 92\ntool_uses: 1\nduration_ms: \d+</usage>\z'
+  requests:
+    # the caller sees the trailer
+    - { index: 3, contains: "agentId: agent_1 (use send_message with to: 'agent_1' to continue this agent)" }
+  # the ledger counts every call once: 100+50+80+200 in, 10+5+12+8 out
+  usage: { input_tokens: 430, output_tokens: 35, calls: 4 }

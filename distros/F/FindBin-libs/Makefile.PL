@@ -73,6 +73,7 @@ my @config_requires
                     File::Basename
                     List::Util
                     File::Spec::Functions
+                    YAML::Tiny
                 )
             ),
         }
@@ -231,18 +232,12 @@ else
 }
 
 # install-tests generates the t/20-*/ t/21-*/ etc. symlinks from
-# tests.yaml; run it now so the symlinks exist before make test.
+# tests.yaml; called from the test target after dependencies are installed.
 
 my $install_tests   = catfile curdir, 't', 'bin', 'install-tests';
 
 -f $install_tests
 and chmod 0755, $install_tests;
-
-if( -x $install_tests )
-{
-    0 == system( $install_tests )
-    or die "Failed: $install_tests ($?)";
-}
 
 ########################################################################
 # reasonable question as to whether all of the version/* files represent
@@ -295,8 +290,11 @@ say "\n# Note: t/10-Bin-path/foo/bar is a cyclic symlink (intentional test",
 
     # note that the VERSION_FROM path is handled *after* the 
     # copy from ./version/* is dealt with in the previous step.
+    #
+    # after three modules and examples the version has to float
+    # independent of just the modules.
 
-  , VERSION_FROM    => 'lib/FindBin/libs.pm'
+  , VERSION         => v5.0.4
   , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
   , PREREQ_PM       =>
     {
@@ -335,7 +333,16 @@ say "\n# Note: t/10-Bin-path/foo/bar is a cyclic symlink (intentional test",
 
     sub postamble
     {
-        "TEST_FILES = t/*.t t/*/*.t\n"
+        <<END
+TEST_FILES = t/*.t t/*/*.t
+
+test :: prepare_tests
+
+prepare_tests :
+\tt/bin/install-tests
+
+.PHONY : prepare_tests
+END
     }
 }
 

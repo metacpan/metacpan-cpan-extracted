@@ -3,11 +3,13 @@ package App::perlvars;
 use Moo;
 use autodie;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
+use Encode        ();
 use File::Spec    ();
 use Path::Tiny    qw( path );
 use PPI::Document ();
+use Test::Builder ();
 use Test::Vars import => [qw( test_vars )];
 
 my $SYNTHETIC_PACKAGE = 'PerlvarsSyntheticPackage';
@@ -56,18 +58,31 @@ sub validate_file {
         return ( 1, "$file is a dir" );
     }
 
-    my $doc = PPI::Document->new("$file");
-    return ( 1, "$file could not be parsed as Perl" ) unless $doc;
+    my $doc = _ppi_document($file);
+    unless ($doc) {
+
+        # A file we cannot parse is one we cannot analyze. Under lint_scripts
+        # that is a silent skip, consistent with the other unanalyzable files
+        # below, so a single bad file does not abort a batch run. Without the
+        # opt-in the old contract stands: report it as an error.
+        return ( 0, undef ) if $self->lint_scripts;
+        return ( 1, "$file could not be parsed as Perl" );
+    }
 
     my $package_stmt = $doc->find_first('PPI::Statement::Package');
     if ($package_stmt) {
-        my ( $exit_code, @msgs ) = test_vars(
+        my ( $analyzed, $exit_code, @msgs ) = _run_test_vars(
             "$file",
-            \&_result_handler,
             %{
                 $self->_ignore_for_package->{ $package_stmt->namespace } || {}
             },
         );
+
+        # A file that exits or dies at compile time (e.g. "use Test::More
+        # skip_all") leaves Test::Vars nothing to inspect and makes its parent
+        # die thawing an empty pipe. Treat it like the other unanalyzable files:
+        # skip silently so one such file does not abort a batch run.
+        return 0, undef unless $analyzed;
 
         return $exit_code, undef, @msgs;
     }
@@ -81,10 +96,31 @@ sub validate_file {
     return $self->_validate_package_less( $file, $doc );
 }
 
+sub _ppi_document {
+    my $file = shift;    # Path::Tiny
+
+    # PPI reads the file as raw bytes. That is fine for ASCII and for high
+    # bytes that only appear in comments or strings, but a file with UTF-8
+    # characters in code (e.g. a Unicode identifier) trips the lexer. When the
+    # raw parse fails, retry against UTF-8-decoded source (leading BOM
+    # stripped). We only need the tree to spot a package statement and the
+    # __END__/__DATA__ cut line, both of which are unaffected by decoding; the
+    # body is still copied as raw bytes when wrapping (see _code_before_data).
+    my $doc = PPI::Document->new("$file");
+    return $doc if $doc;
+
+    my $bytes = $file->slurp_raw;
+    $bytes =~ s/\A\x{EF}\x{BB}\x{BF}//;
+    my $text = eval { Encode::decode( 'UTF-8', $bytes, Encode::FB_CROAK() ) };
+    return undef unless defined $text;    # not UTF-8 (e.g. Latin-1)
+
+    return PPI::Document->new( \$text );
+}
+
 sub _validate_package_less {
     my $self = shift;
-    my $file = shift;    # Path::Tiny
-    my $doc  = shift;    # PPI::Document
+    my $file = shift;                     # Path::Tiny
+    my $doc  = shift;                     # PPI::Document
 
     # Hand Test::Vars a synthetic "package X; sub Y { ...body... }":
     #   * Wrapping in a sub means require only *compiles* the file, not runs it,
@@ -112,37 +148,23 @@ sub _validate_package_less {
 
     # Ignore rules are keyed on "main": that is where a script's findings are
     # reported (see _rewrite_message) and the namespace a user keys on.
-    #
-    # Compiling the file runs its compile-time code (use/BEGIN), which can print
-    # or exit/die -- neither is an unused-variable failure, so both degrade to a
-    # silent skip:
-    #   * STDOUT is redirected during analysis. (Test::Builder dup'd the real
-    #     STDOUT earlier, so a compile-time skip_all still prints its TAP plan --
-    #     but to STDOUT only, never STDERR, and the file is skipped anyway. We
-    #     don't repoint that shared singleton.)
-    #   * skip_all etc. call exit(), so Test::Vars' child dies before writing to
-    #     its pipe and the parent dies thawing an empty string; the eval traps it.
-    my ( $exit_code, @msgs );
+    my ( $analyzed, $exit_code, @msgs ) = _run_test_vars(
+        "$wrapped",
+        %{ $self->_ignore_for_package->{main} || {} },
+    );
 
-    open my $stdout_copy, '>&', \*STDOUT;
-    open STDOUT,          '>',  File::Spec->devnull;
-    my $analyzed = eval {
-        ( $exit_code, @msgs ) = test_vars(
-            "$wrapped",
-            \&_result_handler,
-            %{ $self->_ignore_for_package->{main} || {} },
-        );
-        1;
-    };
-    open STDOUT, '>&', $stdout_copy;
-
+    # Compiling the wrapper runs the file's compile-time code, which can exit or
+    # die (e.g. skip_all). That leaves nothing to inspect and is not an
+    # unused-variable finding, so skip the file silently (see _run_test_vars).
     return 0, undef unless $analyzed;
 
     # A wrapper that won't compile in isolation (a FindBin/"use lib" sibling, or
     # an uninstalled dep) makes Test::Vars inspect nothing and emit an "ignores
-    # ... because: $@" note at exit 0. Skip silently rather than report against
-    # code we never inspected (and avoid leaking the wrapper path).
-    if ( !$exit_code && grep { /^Test::Vars ignores / } @msgs ) {
+    # ... because: $@" note. Skip silently rather than report against code we
+    # never inspected (and avoid leaking the wrapper path). The exit code is not
+    # checked: a file can register an END block that runs as the analyzer child
+    # exits and sets a non-zero status, even though nothing was inspected.
+    if ( grep { /^Test::Vars ignores / } @msgs ) {
         return 0, undef;
     }
 
@@ -155,6 +177,64 @@ sub _validate_package_less {
     @msgs = map { _rewrite_message( $_, "$file", "$wrapped" ) } @msgs;
 
     return ( @msgs ? $exit_code : 0 ), undef, @msgs;
+}
+
+# Run Test::Vars against $target with all of the analyzed file's own output
+# suppressed, returning ( $analyzed_ok, $exit_code, @msgs ). Both the packaged
+# and the package-less paths funnel through here so suppression stays identical.
+#
+# Analyzing $target requires it, which runs its compile-time code (use/BEGIN).
+# That code can print or exit/die -- none of which is an unused-variable
+# finding -- so we contain all three:
+#   * STDOUT and STDERR are redirected to the null device, so the file's own
+#     output (warnings, stray TAP, messages naming a synthetic wrapper path)
+#     never leaks. Test::Vars forks a child that inherits these handles, so its
+#     output is captured too.
+#   * Test::Builder (loaded via Test::Vars) dup'd the real STDOUT/STDERR when it
+#     was first loaded -- before this redirect -- and writes TAP (the plan line,
+#     "not ok", diagnostics) to those private copies, bypassing the fd redirect.
+#     Point its handles at the null device too; the fork inherits the muted
+#     singleton. Test::Builder is a global singleton shared with whatever is
+#     running perlvars (its own test suite included), so its handles are saved
+#     and restored around the run rather than left muted.
+#   * skip_all and friends call exit(), so Test::Vars' child dies before writing
+#     to its pipe and the parent dies thawing an empty string; the eval traps
+#     that, reported as $analyzed_ok being false, so a single file that opts out
+#     at compile time does not abort a batch run.
+# The real findings come back through test_vars's return value, not any of these
+# handles.
+sub _run_test_vars {
+    my $target = shift;    # file to hand Test::Vars (string)
+    my %ignore = @_;
+
+    my ( $exit_code, @msgs );
+
+    open my $stdout_copy, '>&', \*STDOUT;
+    open my $stderr_copy, '>&', \*STDERR;
+    open STDOUT,          '>',  File::Spec->devnull;
+    open STDERR,          '>',  File::Spec->devnull;
+
+    my $builder    = Test::Builder->new;
+    my $tb_out     = $builder->output;
+    my $tb_failure = $builder->failure_output;
+    my $tb_todo    = $builder->todo_output;
+    $builder->output( File::Spec->devnull );
+    $builder->failure_output( File::Spec->devnull );
+    $builder->todo_output( File::Spec->devnull );
+
+    my $analyzed = eval {
+        ( $exit_code, @msgs )
+            = test_vars( $target, \&_result_handler, %ignore );
+        1;
+    };
+
+    $builder->output($tb_out);
+    $builder->failure_output($tb_failure);
+    $builder->todo_output($tb_todo);
+    open STDOUT, '>&', $stdout_copy;
+    open STDERR, '>&', $stderr_copy;
+
+    return ( $analyzed, $exit_code, @msgs );
 }
 
 sub _code_before_data {
@@ -268,7 +348,7 @@ App::perlvars - CLI tool to detect unused variables in Perl modules
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head1 DESCRIPTION
 
@@ -312,11 +392,24 @@ variable in a package-less file.
 
 Wrapping a file for analysis C<require>s it, which executes its compile-time
 code (C<use> statements and C<BEGIN> blocks) even though its runtime statements
-do not run. A package-less file that cannot be compiled in isolation -- because
-it finds a sibling library at runtime (e.g. L<FindBin>), depends on a module
-that is not installed, or contains a C<#line> directive that hides its
-subroutines from L<Test::Vars> -- is skipped silently and returns a success
-exit code with no notes.
+do not run. The analyzed file's own output on C<STDOUT> and C<STDERR> is
+suppressed during analysis so it does not leak through C<perlvars>; the real
+findings are returned, not printed. A package-less file that cannot be analyzed
+-- because it finds a sibling library at runtime (e.g. L<FindBin>), depends on
+a module that is not installed, contains a C<#line> directive that hides its
+subroutines from L<Test::Vars>, or cannot be parsed as Perl at all -- is
+skipped silently and returns a success exit code with no notes.
+
+Files whose source is UTF-8 (for example a file with a Unicode identifier under
+C<use utf8>) are handled: the file body is always copied verbatim as raw bytes,
+and when the tree cannot be built from those raw bytes it is rebuilt from the
+UTF-8-decoded source.
+
+A file that B<does> declare a package is analyzed directly rather than wrapped,
+but it is C<require>d in the same way, so the same protections apply: its
+compile-time output is suppressed, and if it exits or dies at compile time (for
+example C<use Test::More skip_all>) it is skipped silently with a success exit
+code rather than aborting the run.
 
 =head1 AUTHOR
 

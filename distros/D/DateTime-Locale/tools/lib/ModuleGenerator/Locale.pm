@@ -11,6 +11,7 @@ use namespace::autoclean;
 use Carp                   qw( confess );
 use DateTime::Locale::Util qw( parse_locale_code );
 use JSON::MaybeXS          qw( decode_json );
+use List::AllUtils         qw( any first );
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::Library::Perl 0.42;
@@ -257,7 +258,111 @@ sub _build_data_hash ($self) {
             $cal_root->{eras}{ 'era' . $era_length{$length} }->@{ 0, 1 } ];
     }
 
+    $data{day_of_month_format_abbreviated} = $self->_days_of_month(
+        $cal_root->{dayOfMonths}{format}{abbreviated} );
+
     return \%data;
+}
+
+# We compute all 31 strings here so that the runtime code doesn't need to know how to evaluate CLDR
+# plural rules. Most locales have no dayOfMonths data, in which case each day is just the number,
+# which is what the root locale's "{0}" pattern produces.
+sub _days_of_month ( $self, $patterns ) {
+    return [ 1 .. 31 ] unless $patterns;
+
+    my $rules = $self->_ordinal_rules;
+
+    my @days;
+    for my $day ( 1 .. 31 ) {
+        my $category = first { _plural_rule_matches( $rules->{$_}, $day ) }
+            grep { $_ ne 'other' && $patterns->{$_} } keys $rules->%*;
+        my $pattern = $patterns->{ $category // 'other' };
+        push @days, $pattern =~ s/\{0\}/$day/r;
+    }
+
+    return \@days;
+}
+
+sub _ordinal_rules ($self) {
+    my $all = $self->_all_ordinal_rules;
+
+    my $code = $self->code;
+    while (1) {
+        return $all->{$code} if $all->{$code};
+        last                 if $code eq 'und';
+        $code = $self->_parent_of_code($code);
+    }
+
+    confess 'Could not find ordinal plural rules for ' . $self->code;
+}
+
+sub _all_ordinal_rules ($self) {
+    state $all_ordinal_rules;
+    return $all_ordinal_rules if $all_ordinal_rules;
+
+    my $json
+        = $self->_json_from(
+        $self->_cldr_root->child(qw( cldr-core supplemental ordinals.json ))
+        );
+
+    my %rules;
+    my $raw = $json->{supplemental}{'plurals-type-ordinal'};
+    for my $code ( keys $raw->%* ) {
+        for my $key ( keys $raw->{$code}->%* ) {
+            my ($category) = $key =~ /^pluralRule-count-(.+)$/
+                or confess "Unexpected ordinal rule key: $key";
+
+            # The part after the "@" is just sample values.
+            my ($condition) = split /\@/, $raw->{$code}{$key};
+            $rules{$code}{$category} = $condition =~ s/^\s+|\s+$//gr;
+        }
+    }
+
+    return $all_ordinal_rules = \%rules;
+}
+
+# This only handles the subset of the plural rule syntax that applies to a positive integer, which
+# is all we need for days of the month. See
+# https://www.unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules for the full syntax.
+sub _plural_rule_matches ( $condition, $n ) {
+    return 1 unless length $condition;
+
+    # For an integer the visible fraction digits operands are all 0 and the integer digits operand
+    # is the number itself.
+    my %operands = (
+        n => $n,
+        i => $n,
+        map { $_ => 0 } qw( v w f t c e ),
+    );
+
+    for my $or ( split /\s+or\s+/, $condition ) {
+        my $all = 1;
+        for my $relation ( split /\s+and\s+/, $or ) {
+            my ( $operand, $mod, $op, $ranges )
+                = $relation
+                =~ /^([nivwftce])\s*(?:%\s*(\d+))?\s*(!?=)\s*([\d.,\s]+)$/
+                or confess "Cannot parse plural rule relation: $relation";
+
+            my $val = $operands{$operand};
+            $val %= $mod if defined $mod;
+
+            my $in_range = any {
+                my ( $min, $max ) = split /\.\./;
+                $max //= $min;
+                $val >= $min && $val <= $max;
+                }
+                map {s/\s+//gr} split /,/, $ranges;
+
+            if ( $op eq '=' ? !$in_range : $in_range ) {
+                $all = 0;
+                last;
+            }
+        }
+
+        return 1 if $all;
+    }
+
+    return 0;
 }
 
 sub _build_glibc_data ($self) {

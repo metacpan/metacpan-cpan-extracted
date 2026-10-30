@@ -119,11 +119,18 @@ is_approx($w21->{'p adj'}, 0.012006, 1e-4, 'wide: trt2-trt1 p adj matches R');
 my $hwl = TukeyHSD(aov(\%pw), data => \%pw, which => 'treatment');
 ok(exists $hwl->{treatment}, 'wide: which relabels the result key');
 
-# input validation
+# input validation: each is an error in the call, so the help screen, then the
+# error on the last line (matched there, since the screen names both too)
+my $screen = Stats::LikeR::_usage_text('TukeyHSD');
+like($screen, qr/\Ausage: TukeyHSD\(/, 'TukeyHSD has a help screen');
 eval { TukeyHSD($fit, response => 'weight') };
-like($@, qr/\bdata\b/, "croaks when 'data' missing");
+is($@, $screen . "TukeyHSD: error: 'data' (the data frame used to fit the model) is required\n",
+	"croaks when 'data' missing");
 eval { TukeyHSD($fit, data => \%pg) };
-like($@, qr/response/, 'croaks when response/formula missing');
+like($@, qr/^TukeyHSD: error: need the response variable/m, 'croaks when response/formula missing');
+eval { TukeyHSD($fit, 'data') };
+like($@, qr/^TukeyHSD: error: arguments after the fit must be name => value pairs$/m,
+	'an odd option list croaks in its own words');
 
 # Leak safety
 no_leaks_ok {
@@ -135,5 +142,13 @@ no_leaks_ok {
 	my $f = aov(\%pg, 'weight ~ group');
 	TukeyHSD($f, data => \%pg, response => 'weight');
 } 'TukeyHSD: no memory leaks' unless $INC{'Devel/Cover.pm'};
+
+# A call of the wrong form prints the function's help screen, then the error last.
+like(do { local $@; eval { ptukey(3.5) }; $@ },
+	qr/\Ausage: ptukey\(.*^example:\n.*\n\nptukey: error: \Qq, nmeans and df are all required\E\n\z/ms,
+	'ptukey: too few arguments prints the help screen, and the error last');
+like(do { local $@; eval { qtukey(0.95, 3, 12, bogus => 1) }; $@ },
+	qr/\Ausage: qtukey\(.*^example:\n.*\n\nqtukey: error: \Qunknown argument 'bogus'\E\n\z/ms,
+	'qtukey: an unknown argument prints the help screen, and the error last');
 
 done_testing();

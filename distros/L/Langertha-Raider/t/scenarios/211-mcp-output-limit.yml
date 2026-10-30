@@ -1,0 +1,18 @@
+title: a tool result over MAX_MCP_OUTPUT_TOKENS (default 25000) is cut with a note that says how to raise the limit (ADR 0029 Addendum 1)
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", rich ]
+prompt: Get a lot of text.
+script:
+  - tool_calls:
+      - [ mcp__t__big, { n: 120000 } ]
+      - [ mcp__t__big, { n: 500 } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: mcp__t__big, text: "\\A(?s:x{100000})\\n.*\\[MCP tool output truncated: about 30000 tokens, the limit is 25000 tokens \\(MAX_MCP_OUTPUT_TOKENS\\)" }
+    - { name: mcp__t__big, text: "\\A(?s:x{500})\\z" }

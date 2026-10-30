@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.08";
+our $VERSION = "1.09";
 
 =encoding utf-8
 
@@ -25,6 +25,10 @@ refers to printing multiple pages on a single sheet.
 
 The module automatically calculates the number of columns based on the
 terminal width divided by the pane width (default 85 characters).
+The terminal size is taken from the controlling terminal (C</dev/tty>);
+when it is not available, the C<COLUMNS> environment variable gives the
+width (default 80), and C<LINES> gives the height (default 24) used
+when the number of rows is set with C<-R> or C<-G>.
 
 Both stdout and stderr are merged and passed through the filter, so
 error messages are also displayed in the multi-column paged output.
@@ -160,6 +164,13 @@ Truncate long lines:
     optex -Mup --ls=truncate -- ps aux
 
 =head1 INSTALL
+
+=head2 Homebrew
+
+Use L<tecolicom/tap|https://github.com/tecolicom/homebrew-tap>:
+
+    brew tap tecolicom/tap
+    brew install app-nup
 
 =head2 CPANMINUS
 

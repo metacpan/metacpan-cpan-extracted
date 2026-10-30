@@ -435,6 +435,24 @@ Croatian Croatia locale.
    1995-12-22T09:05:02 = pet, 22. pro 1995. po. Kr.
   -0010-09-15T04:44:23 = sub, 15. ruj -10. pr. Kr.
 
+=head3 GyMMMM (LLLL y. G)
+
+   2008-02-05T18:30:30 = veljača 2008. po. Kr.
+   1995-12-22T09:05:02 = prosinac 1995. po. Kr.
+  -0010-09-15T04:44:23 = rujan -10. pr. Kr.
+
+=head3 GyMMMMEd (E, d. MMMM y. G)
+
+   2008-02-05T18:30:30 = uto, 5. veljače 2008. po. Kr.
+   1995-12-22T09:05:02 = pet, 22. prosinca 1995. po. Kr.
+  -0010-09-15T04:44:23 = sub, 15. rujna -10. pr. Kr.
+
+=head3 GyMMMMd (d. MMMM y. G)
+
+   2008-02-05T18:30:30 = 5. veljače 2008. po. Kr.
+   1995-12-22T09:05:02 = 22. prosinca 1995. po. Kr.
+  -0010-09-15T04:44:23 = 15. rujna -10. pr. Kr.
+
 =head3 GyMMMd (d. MMM y. G)
 
    2008-02-05T18:30:30 = 5. velj 2008. po. Kr.
@@ -644,6 +662,18 @@ Croatian Croatia locale.
    2008-02-05T18:30:30 = veljača 2008.
    1995-12-22T09:05:02 = prosinac 1995.
   -0010-09-15T04:44:23 = rujan -10.
+
+=head3 yMMMMEd (E, d. MMMM y.)
+
+   2008-02-05T18:30:30 = uto, 5. veljače 2008.
+   1995-12-22T09:05:02 = pet, 22. prosinca 1995.
+  -0010-09-15T04:44:23 = sub, 15. rujna -10.
+
+=head3 yMMMMd (d. MMMM y.)
+
+   2008-02-05T18:30:30 = 5. veljače 2008.
+   1995-12-22T09:05:02 = 22. prosinca 1995.
+  -0010-09-15T04:44:23 = 15. rujna -10.
 
 =head3 yMMMd (d. MMM y.)
 

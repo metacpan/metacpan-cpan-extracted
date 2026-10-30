@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -127,12 +127,16 @@ my @CHAPTERS = (
 		lead  => 'A filter hides rows that do not match a rule.',
 		steps => [
 			'Find the filter row below the toolbar.',
-			'Choose a column. Choose how to compare, such as equals or contains. Type a value.',
+			'Choose a column. The comparison options change to match the column type.',
+			'For a date column a date picker appears. For a number column a number box appears. For text, type a value.',
+			'To keep rows between two dates, choose Date range and pick a start and an end date.',
+			'To keep just a recent window instead, pick a Time range such as the last 30 days.',
+			'Choose the column that window applies to, then click Apply range.',
 			'Press Enter or click Apply filter.',
-			'Each filter is shown as a small label. Click the x on a label to remove that filter.',
+			'Each active filter is shown as a small label in the toolbar. Click the x on a label to remove it.',
 			'For more rules, click Merge / Filter... and use the Filter results section.',
 		],
-		tip   => 'A filter does not change your file. It only changes what you see and what you export.',
+		tip   => 'A filter does not change your file. It only changes what you see and what you export. A time range is worked out from today every time.',
 		routes => [ '/view/:table' ],
 	},
 	{
@@ -218,6 +222,34 @@ my @CHAPTERS = (
 		routes => [],
 	},
 	{
+		id    => 'cross-row',
+		part  => 'Work with a table',
+		title => 'Add a running total or a moving average',
+		lead  => 'A cross-row column is worked out from the rows around each row, not from the row alone.',
+		steps => [
+			'Open the table and click Cross-row...',
+			'Choose the number column to read, for example amount.',
+			'Choose what to work out, for example Running total.',
+			'Choose the column that says which order to read the rows in, for example the date.',
+			'Type a name for the new column and click Add column.',
+		],
+		tip   => 'The new column is in the table and in every chart list. The Cross-row chip removes it. Restart for each groups the rows before counting. On a canvas, a card can hold cross-row columns of its own. Choose Has a column of its own in Add current view, then Add this column once for each. Each one is listed there and can be taken out before the card is added.',
+		walkthrough => {
+			title => 'Walk through: a running total per region',
+			intro => 'This example adds a running total to the sales table.',
+			steps => [
+				{ do => 'Open the sales table and click Cross-row...', see => 'The panel asks for a number column, a function and a name.' },
+				{ do => 'Choose amount as the number column.', see => 'The new column will add up the amounts.' },
+				{ do => 'Choose Running total, and id as the column to read rows in order of.', see => 'A running total needs an order, so the order box is required.' },
+				{ do => 'Type running_amount as the name and click Add column.', see => 'The table gains a running_amount column and a Cross-row chip.' },
+				{ do => 'Choose region under Restart for each and add a second column.', see => 'Each region now starts again from its own first row.' },
+				{ do => 'Click Bar chart... and pick running_amount as the value.', see => 'A chart reads the new column like any other number column.' },
+			],
+			result => 'A running total is a column of the view, so the table, the charts and the export all show the same numbers.',
+		},
+		routes => [],
+	},
+	{
 		id    => 'groups',
 		part  => 'Work with a table',
 		title => 'Group values into your own labels',
@@ -241,6 +273,7 @@ my @CHAPTERS = (
 			'Click Date format...',
 			'Choose the date column.',
 			'Choose the format that matches your data, for example D/M/YYYY.',
+			'If the column also holds a time, set Clock time. Then hour() and time buckets work.',
 			'Click Save & apply.',
 		],
 		tip   => 'After you set the format, This year, This quarter and This month work in the date panel.',
@@ -299,9 +332,24 @@ my @CHAPTERS = (
 				[ 'Treemap',         'Big and small groups in boxes',      'A category and an optional number' ],
 				[ 'Histogram',       'How numbers are spread out',         'A number column and a bin count' ],
 				[ 'Map',             'Where the rows are in the world',    'Latitude and longitude, or a place column' ],
+				[ 'Word cloud',      'Which words a text column repeats',  'A text column' ],
 			],
 		},
 		tip   => 'A bar chart is a good first choice for most data.',
+		routes => [],
+	},
+	{
+		id    => 'time-bucket',
+		part  => 'Charts and summaries',
+		title => 'Group by hour, day or month',
+		lead  => 'A time bucket turns a column of dates into one group per hour, day, month or year.',
+		steps => [
+			'Open a table and click a chart button, for example Bar chart...',
+			'Choose the date or timestamp column for the category or X axis.',
+			'Set Time bucket to the period you want, such as 1 hour or 1 month.',
+			'Click Plot.',
+		],
+		tip   => 'The bucket is a new column, so the chart still has the original timestamp beside it. Use the pivot table to bucket a row group the same way.',
 		routes => [],
 	},
 	{
@@ -314,6 +362,7 @@ my @CHAPTERS = (
 			'Open the table and click Line graph...',
 			'Choose the X axis. A date column or a number column works well.',
 			'Choose the Y axis. This must be a number column.',
+			'For a total per period, set Time bucket and then set Aggregate to Sum.',
 			'Click Plot.',
 		],
 		tip   => 'Use Copy link to share the chart. Use Export SVG or Export PNG to save the picture.',
@@ -510,6 +559,25 @@ my @CHAPTERS = (
 		routes => [ '/map' ],
 	},
 	{
+		id    => 'wordcloud-chart',
+		part  => 'Charts and summaries',
+		title => 'Word cloud',
+		chart => 1,
+		lead  => 'A word cloud shows which words a text column repeats most.',
+		steps => [
+			'Open the table and click Word cloud...',
+			'Choose Text column. This column holds words, such as a product name or a note.',
+			'Set Words to show to the number of different words you want.',
+			'Set Shortest word to hide very short words such as "at".',
+			'Click Draw cloud.',
+			'To keep the cloud on a saved canvas, open the canvas and click Add current view, then choose Word cloud.',
+			'On a canvas, click a word to filter every other card to the rows that contain it.',
+		],
+		tip   => 'The biggest word appears in the most rows. Click a word to open the rows that contain it, or to cross-filter the canvas around it.',
+		try    => { href => '/wordcloud?l=table:sales&col=product', label => 'Try a word cloud of the sales table' },
+		routes => [ '/wordcloud' ],
+	},
+	{
 		id    => 'pivot',
 		part  => 'Charts and summaries',
 		title => 'Summarise with a pivot table',
@@ -518,6 +586,8 @@ my @CHAPTERS = (
 			'Click Pivot table...',
 			'Add a row group. For example, choose region.',
 			'Add a measure. For example, choose Sum of amount.',
+			'The measure can also be Median, Std dev, First, Last, Range or a percentile.',
+			'Set Time bucket to group a row group by hour, day, month or year.',
 			'Click Build pivot.',
 			'Click Show subtotals and grand total if you want totals.',
 		],
@@ -546,7 +616,11 @@ my @CHAPTERS = (
 			'Read one row for each column.',
 			'Rows is the number of rows. Non-null is the number of cells with a value. Null is the number of blank cells.',
 			'Distinct is the number of different values.',
-			'For a number column you also see Min, Max, Mean and Median. Mean is the average. Median is the middle value.',
+			'For a number column you also see Min, Max, Range, Mean, Median, Std dev and a percentile.',
+			'Mean is the average. Median is the middle value. Range is the largest value minus the smallest.',
+			'Std dev shows how widely the values spread.',
+			'First and Last are the values the column holds in the first and the last row that has one.',
+			'Change Percentile column to choose which percentile the extra column shows.',
 		],
 		tip   => 'Statistics use the rows that are visible after joins and filters.',
 		walkthrough => {
@@ -557,6 +631,7 @@ my @CHAPTERS = (
 				{ do => 'Find the population row.', see => 'Min is 2214 and Max is 1150309.' },
 				{ do => 'Look at the Distinct count for region.', see => 'There are 7 distinct regions.' },
 				{ do => 'Look at Mean and Median for population.', see => 'Mean is much higher than Median. A few large counties pull the average up.' },
+				{ do => 'Look at Range for population.', see => 'Min is 2214, so Range is 1148095.' },
 			],
 			result => 'Population is highly uneven. The maximum county is over 500 times larger than the minimum.',
 		},
@@ -625,7 +700,9 @@ my @CHAPTERS = (
 			'Type a name and click Save.',
 			'Click Open canvas. The current table or chart is the first card.',
 			'Click Add visual... to add another view from a data file.',
+			'In that panel, choose the Aggregate a chart works out: Sum, Average, Median, Std dev, or a percentile.',
 			'Drag a card by its header to move it. Use the Size menu to change its width and height.',
+			'Click Edit cross-row in a card header to see that card\'s cross-row columns, and to change or remove one.',
 		],
 		tip   => 'The home page lists your saved canvases under Saved canvases. A banner appears if a data file has changed since the canvas was saved.',
 		walkthrough => {
@@ -635,6 +712,7 @@ my @CHAPTERS = (
 				{ do => 'Click a bar or a slice in one chart.', see => 'The other cards show only rows for that value, and a chip names the filter.' },
 				{ do => 'Click Clear on the filter chip.', see => 'Every card returns to the full data set.' },
 				{ do => 'Open the Size menu in a card header and choose Half width.', see => 'The card takes half a row, and the cards beside it move to fit.' },
+				{ do => 'Click Edit cross-row in a card header and click one of its columns.', see => 'The chip puts its column, function and name back in the fields, ready to change.' },
 				{ do => 'Click Bookmarks, type a name and click Save.', see => 'A link to this exact view appears under the button.' },
 				{ do => 'Click Print.', see => 'The browser print window opens with the canvas ready for paper or PDF.' },
 			],
@@ -703,10 +781,17 @@ my @CHAPTERS = (
 			'Run bi-alert --help to see all options.',
 			'Pass --analysis with the canvas id and --threshold with the measure, comparison and value.',
 			'For example: bi-alert --analysis abc123 --threshold count:gt:0 exits with code 1 when count is above 0.',
+			'Pass --analysis or --threshold more than once to check several in the same run.',
+			'Prefix a threshold with an analysis id, such as abc123:count:gt:10, to check a second canvas.',
 			'Pass --dry-run to print what would be checked without running the check.',
+			'A threshold that stays crossed is only worth hearing about once, so pass --suppress 1h to be told at most hourly.',
+			'The script remembers the last alert in a small state file, and forgets it when the crossing ends.',
+			'Pass --recovery to be told when the crossing ends as well as when it starts.',
+			'The script can only see a crossing end when it remembers one starting, so --recovery keeps its state file.',
+			'Pass --notify-cmd with a command such as mail to have the script deliver the alert and the recovery itself.',
 			'Wire the script into a cron job or a monitoring system to get automatic alerts.',
 		],
-		tip   => 'Exit code 0 means the threshold was not crossed. Exit code 1 means it was. Exit code 2 means an error.',
+		tip   => 'Exit code 0 means no alert: the threshold was not crossed, or it was crossed and already reported in this period. Exit code 1 means it was crossed and reported now. Exit code 3 means a crossing that was reported has ended, which is what --recovery asks for. Exit code 2 means an error. When one run reports a crossing and a recovery together, exit code 1 wins.',
 		routes => [],
 	},
 	{
@@ -807,6 +892,7 @@ my %ACTION_CHAPTERS = (
 	combo_view     => 'combo-chart',
 	treemap_view   => 'treemap-chart',
 	histogram_view => 'histogram-chart',
+	wordcloud_view => 'wordcloud-chart',
 	map_view       => 'map-chart',
 	canvas_render  => 'canvas',
 	catalog_view   => 'catalog',
@@ -819,6 +905,7 @@ my %EXEMPT_ROUTES = (
 	'/api/analyses/:id/export' => 'JSON export of one saved canvas',
 	'/api/columns'             => 'JSON list of columns for the join and filter panels',
 	'/api/dirs'                => 'JSON folder list for the browse and export panels',
+	'/api/range'               => 'JSON min/max ISO dates for the filter date-picker constraints',
 	'/api/stat'                => 'JSON file details for the home-page tooltips',
 	'/calc/list'               => 'JSON list of calculated fields for the Calc panel',
 	'/dates/list'              => 'JSON list of date formats for the Date panel',
@@ -899,6 +986,17 @@ sub _slug {
 
 Database::BI::Tutorial - the chapters of the in-application tutorial
 
+=head1 SYNOPSIS
+
+  use Database::BI::Tutorial;
+
+  for my $part (@{ Database::BI::Tutorial->parts }) {
+      print $part->{name}, ": ", scalar @{ $part->{chapters} }, " chapters\n";
+  }
+
+  my $chapter = Database::BI::Tutorial->chapter_for_action('bar_view');
+  print $chapter->{title}, "\n" if $chapter;
+
 =head1 DESCRIPTION
 
 The tutorial that the application shows at C<GET /tutorial> is built from the
@@ -921,6 +1019,101 @@ that page.  The application calls it from a C<before_render> hook and the shared
 layout shows the result as a C<Help: ...> link beside the main Tutorial link.
 A new page action belongs in C<%ACTION_CHAPTERS>; the test fails until it is
 there.
+
+=head1 FUNCTIONS
+
+Each is called as a class method or a plain function; none takes arguments
+except C<chapter_for_action>.  The returned structures are the module's own
+data: read them, do not change them.
+
+=head2 intro
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	[ 'string', ... ]   # the introduction's sentences
+
+=head2 chapters
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	[ {
+	    id     => 'string',     # anchor, unique
+	    part   => 'string',     # the part the chapter belongs to
+	    title  => 'string',
+	    lead   => 'string',
+	    steps  => 'arrayref',   # sentences
+	    tip    => 'string',     # optional
+	    try    => 'hashref',    # optional; { href, label }
+	    routes => 'arrayref',   # the GET routes the chapter covers
+	    walkthrough => 'hashref', # optional; { title, intro, steps => [ { do, see } ], result }
+	}, ... ]
+
+In the order the page shows them.
+
+=head2 faq
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	[ { question => 'string', answer => 'string' }, ... ]
+
+=head2 glossary
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	[ { term => 'string', meaning => 'string' }, ... ]
+
+=head2 parts
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	[ { name => 'string', id => 'string', chapters => 'arrayref' }, ... ]
+
+The chapters grouped by C<part>, in order.  C<id> is the part name in lower
+case with each run of other characters replaced by C<->.  A new list is built
+on each call.
+
+=head2 covered_routes
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	{ '/route' => 'chapter-id', ... }
+
+A route named by two chapters maps to the later one.
+
+=head2 exempt_routes
+
+=head3 API SPECIFICATION
+
+=head4 OUTPUT
+
+	{ '/route' => 'reason', ... }   # a copy: GET pages with no chapter, and why
+
+=head2 chapter_for_action
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$action   # a controller action name, e.g. 'bar_view'
+
+=head4 OUTPUT
+
+	A chapter hashref (as C<chapters> returns), or an empty list
+
+An undefined or unknown action returns an empty list.  It must be called as a
+class method: the action is the second argument.
 
 =head1 AUTHOR
 

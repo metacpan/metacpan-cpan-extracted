@@ -435,6 +435,24 @@ Luxembourgish locale.
    1995-12-22T09:05:02 = Fre., 22. Dez. 1995 n. Chr.
   -0010-09-15T04:44:23 = Sam., 15. Sep. -10 v. Chr.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = n. Chr. 2008 Februar
+   1995-12-22T09:05:02 = n. Chr. 1995 Dezember
+  -0010-09-15T04:44:23 = v. Chr. -10 September
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = n. Chr. 2008 Februar 5, Dën.
+   1995-12-22T09:05:02 = n. Chr. 1995 Dezember 22, Fre.
+  -0010-09-15T04:44:23 = v. Chr. -10 September 15, Sam.
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = n. Chr. 2008 Februar 5
+   1995-12-22T09:05:02 = n. Chr. 1995 Dezember 22
+  -0010-09-15T04:44:23 = v. Chr. -10 September 15
+
 =head3 GyMMMd (d. MMM y G)
 
    2008-02-05T18:30:30 = 5. Feb. 2008 n. Chr.
@@ -506,6 +524,12 @@ Luxembourgish locale.
    2008-02-05T18:30:30 = Dën., 5. Feb.
    1995-12-22T09:05:02 = Fre., 22. Dez.
   -0010-09-15T04:44:23 = Sam., 15. Sep.
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Februar 5, Dën.
+   1995-12-22T09:05:02 = Dezember 22, Fre.
+  -0010-09-15T04:44:23 = September 15, Sam.
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

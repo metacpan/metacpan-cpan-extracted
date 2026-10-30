@@ -351,11 +351,11 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = Shukra
   -0010-09-15T04:44:23 = Shani
 
-=head3 EBh (E, B h)
+=head3 EBh (E h B)
 
-   2008-02-05T18:30:30 = Mangal, B 6
-   1995-12-22T09:05:02 = Shukra, B 9
-  -0010-09-15T04:44:23 = Shani, B 4
+   2008-02-05T18:30:30 = Mangal 6 B
+   1995-12-22T09:05:02 = Shukra 9 B
+  -0010-09-15T04:44:23 = Shani 4 B
 
 =head3 EBhm (E, h:mm B)
 
@@ -459,11 +459,53 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = Shukra, 22 Dec 1995 AD
   -0010-09-15T04:44:23 = Shani, 15 Sep -10 BC
 
+=head3 GyMMMEddd (E, ddd MMM y G)
+
+   2008-02-05T18:30:30 = Mangal, 5th Feb 2008 AD
+   1995-12-22T09:05:02 = Shukra, 22nd Dec 1995 AD
+  -0010-09-15T04:44:23 = Shani, 15th Sep -10 BC
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = February 2008 AD
+   1995-12-22T09:05:02 = December 1995 AD
+  -0010-09-15T04:44:23 = September -10 BC
+
+=head3 GyMMMMEd (E, d MMMM, y G)
+
+   2008-02-05T18:30:30 = Mangal, 5 February, 2008 AD
+   1995-12-22T09:05:02 = Shukra, 22 December, 1995 AD
+  -0010-09-15T04:44:23 = Shani, 15 September, -10 BC
+
+=head3 GyMMMMEddd (E, ddd MMMM y G)
+
+   2008-02-05T18:30:30 = Mangal, 5th February 2008 AD
+   1995-12-22T09:05:02 = Shukra, 22nd December 1995 AD
+  -0010-09-15T04:44:23 = Shani, 15th September -10 BC
+
+=head3 GyMMMMd (d MMMM, y G)
+
+   2008-02-05T18:30:30 = 5 February, 2008 AD
+   1995-12-22T09:05:02 = 22 December, 1995 AD
+  -0010-09-15T04:44:23 = 15 September, -10 BC
+
+=head3 GyMMMMddd (ddd MMMM y G)
+
+   2008-02-05T18:30:30 = 5th February 2008 AD
+   1995-12-22T09:05:02 = 22nd December 1995 AD
+  -0010-09-15T04:44:23 = 15th September -10 BC
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Feb 2008 AD
    1995-12-22T09:05:02 = 22 Dec 1995 AD
   -0010-09-15T04:44:23 = 15 Sep -10 BC
+
+=head3 GyMMMddd (ddd MMM y G)
+
+   2008-02-05T18:30:30 = 5th Feb 2008 AD
+   1995-12-22T09:05:02 = 22nd Dec 1995 AD
+  -0010-09-15T04:44:23 = 15th Sep -10 BC
 
 =head3 GyMd (dd/MM/y G)
 
@@ -513,11 +555,11 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (E, dd/MM)
+=head3 MEd (E, d/M)
 
-   2008-02-05T18:30:30 = Mangal, 05/02
+   2008-02-05T18:30:30 = Mangal, 5/2
    1995-12-22T09:05:02 = Shukra, 22/12
-  -0010-09-15T04:44:23 = Shani, 15/09
+  -0010-09-15T04:44:23 = Shani, 15/9
 
 =head3 MMM (LLL)
 
@@ -537,11 +579,29 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = Shukra, 22 Dec
   -0010-09-15T04:44:23 = Shani, 15 Sep
 
+=head3 MMMEddd (E, ddd MMM)
+
+   2008-02-05T18:30:30 = Mangal, 5th Feb
+   1995-12-22T09:05:02 = Shukra, 22nd Dec
+  -0010-09-15T04:44:23 = Shani, 15th Sep
+
 =head3 MMMMEEEEd (EEEE, d MMMM)
 
    2008-02-05T18:30:30 = Mangalwaar, 5 February
    1995-12-22T09:05:02 = Shukrawaar, 22 December
   -0010-09-15T04:44:23 = Shaniwaar, 15 September
+
+=head3 MMMMEd (E, d MMMM)
+
+   2008-02-05T18:30:30 = Mangal, 5 February
+   1995-12-22T09:05:02 = Shukra, 22 December
+  -0010-09-15T04:44:23 = Shani, 15 September
+
+=head3 MMMMEddd (E, ddd MMMM)
+
+   2008-02-05T18:30:30 = Mangal, 5th February
+   1995-12-22T09:05:02 = Shukra, 22nd December
+  -0010-09-15T04:44:23 = Shani, 15th September
 
 =head3 MMMMW-count-one (MMMM 'kaa' 'week' W)
 
@@ -561,11 +621,23 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = 22 December
   -0010-09-15T04:44:23 = 15 September
 
+=head3 MMMMddd (ddd MMMM)
+
+   2008-02-05T18:30:30 = 5th February
+   1995-12-22T09:05:02 = 22nd December
+  -0010-09-15T04:44:23 = 15th September
+
 =head3 MMMd (d MMM)
 
    2008-02-05T18:30:30 = 5 Feb
    1995-12-22T09:05:02 = 22 Dec
   -0010-09-15T04:44:23 = 15 Sep
+
+=head3 MMMddd (ddd MMM)
+
+   2008-02-05T18:30:30 = 5th Feb
+   1995-12-22T09:05:02 = 22nd Dec
+  -0010-09-15T04:44:23 = 15th Sep
 
 =head3 MMdd (dd/MM)
 
@@ -573,11 +645,11 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = 22/12
   -0010-09-15T04:44:23 = 15/09
 
-=head3 Md (dd/MM)
+=head3 Md (d/M)
 
-   2008-02-05T18:30:30 = 05/02
+   2008-02-05T18:30:30 = 5/2
    1995-12-22T09:05:02 = 22/12
-  -0010-09-15T04:44:23 = 15/09
+  -0010-09-15T04:44:23 = 15/9
 
 =head3 d (d)
 
@@ -693,11 +765,17 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = Shukrawaar, 22 Dec 1995
   -0010-09-15T04:44:23 = Shaniwaar, 15 Sep -10
 
-=head3 yMMMEd (E, d MMM, y)
+=head3 yMMMEd (E, d MMM y)
 
-   2008-02-05T18:30:30 = Mangal, 5 Feb, 2008
-   1995-12-22T09:05:02 = Shukra, 22 Dec, 1995
-  -0010-09-15T04:44:23 = Shani, 15 Sep, -10
+   2008-02-05T18:30:30 = Mangal, 5 Feb 2008
+   1995-12-22T09:05:02 = Shukra, 22 Dec 1995
+  -0010-09-15T04:44:23 = Shani, 15 Sep -10
+
+=head3 yMMMEddd (E, ddd MMM y)
+
+   2008-02-05T18:30:30 = Mangal, 5th Feb 2008
+   1995-12-22T09:05:02 = Shukra, 22nd Dec 1995
+  -0010-09-15T04:44:23 = Shani, 15th Sep -10
 
 =head3 yMMMM (MMMM y)
 
@@ -711,11 +789,41 @@ Hindi India Latin locale.
    1995-12-22T09:05:02 = Shukrawaar, 22 December 1995
   -0010-09-15T04:44:23 = Shaniwaar, 15 September -10
 
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = Mangal, 5 February 2008
+   1995-12-22T09:05:02 = Shukra, 22 December 1995
+  -0010-09-15T04:44:23 = Shani, 15 September -10
+
+=head3 yMMMMEddd (E, ddd MMMM y)
+
+   2008-02-05T18:30:30 = Mangal, 5th February 2008
+   1995-12-22T09:05:02 = Shukra, 22nd December 1995
+  -0010-09-15T04:44:23 = Shani, 15th September -10
+
+=head3 yMMMMd (d MMMM, y)
+
+   2008-02-05T18:30:30 = 5 February, 2008
+   1995-12-22T09:05:02 = 22 December, 1995
+  -0010-09-15T04:44:23 = 15 September, -10
+
+=head3 yMMMMddd (ddd MMMM y)
+
+   2008-02-05T18:30:30 = 5th February 2008
+   1995-12-22T09:05:02 = 22nd December 1995
+  -0010-09-15T04:44:23 = 15th September -10
+
 =head3 yMMMd (d MMM, y)
 
    2008-02-05T18:30:30 = 5 Feb, 2008
    1995-12-22T09:05:02 = 22 Dec, 1995
   -0010-09-15T04:44:23 = 15 Sep, -10
+
+=head3 yMMMddd (ddd MMM y)
+
+   2008-02-05T18:30:30 = 5th Feb 2008
+   1995-12-22T09:05:02 = 22nd Dec 1995
+  -0010-09-15T04:44:23 = 15th Sep -10
 
 =head3 yMd (d/M/y)
 
@@ -746,6 +854,24 @@ Hindi India Latin locale.
    2008-02-05T18:30:30 = 2008 kaa week 6
    1995-12-22T09:05:02 = 1995 kaa week 51
   -0010-09-15T04:44:23 = -10 kaa week 37
+
+=head3 yy (’yy)
+
+   2008-02-05T18:30:30 = ’08
+   1995-12-22T09:05:02 = ’95
+  -0010-09-15T04:44:23 = ’-10
+
+=head3 yyMMM (MMM ’yy)
+
+   2008-02-05T18:30:30 = Feb ’08
+   1995-12-22T09:05:02 = Dec ’95
+  -0010-09-15T04:44:23 = Sep ’-10
+
+=head3 yyMMMd (d MMM ’yy)
+
+   2008-02-05T18:30:30 = 5 Feb ’08
+   1995-12-22T09:05:02 = 22 Dec ’95
+  -0010-09-15T04:44:23 = 15 Sep ’-10
 
 
 =head2 Miscellaneous

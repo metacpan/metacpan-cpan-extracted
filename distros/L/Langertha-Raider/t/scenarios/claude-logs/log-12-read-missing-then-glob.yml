@@ -1,0 +1,34 @@
+# Real pattern: Read of a path that does not exist (the model guessed the name),
+# Glob for the real one, Read again; then Write over an existing file it has
+# not read: refused ("File has not been read yet"), so the model reads it and
+# writes again. Texts and error flags are Claude Code's (ADR 0023).
+title: read_file on a guessed name fails, glob finds the real one; write_file on an unread file needs a read first
+files:
+  docs/setup-guide.md: "Setup: run make.\n"
+  out.txt: "old content\n"
+prompt: Summarise the setup doc, then write the summary to out.txt.
+script:
+  - tool_calls:
+      - [ read_file, { path: docs/setup.md } ]
+  - tool_calls:
+      - [ glob, { pattern: "docs/*setup*" } ]
+  - tool_calls:
+      - [ read_file, { path: docs/setup-guide.md } ]
+  - tool_calls:
+      - [ write_file, { path: out.txt, content: "Setup: run make.\n" } ]
+  - tool_calls:
+      - [ read_file, { path: out.txt } ]
+  - tool_calls:
+      - [ write_file, { path: out.txt, content: "Setup: run make.\n" } ]
+  - text: Summary written.
+expect:
+  answer: Summary written.
+  files:
+    out.txt: "Setup: run make.\n"
+  tools:
+    - { name: read_file, error: true, text: '\AFile does not exist\. Note: your current working directory is /\S+\.\z' }
+    - { name: glob, text: '\Adocs/setup-guide\.md\z' }
+    - { name: read_file, text: '\A1\tSetup: run make\.' }
+    - { name: write_file, error: true, text: '\A<tool_use_error>File has not been read yet\. Read it first before writing to it\.</tool_use_error>\z' }
+    - { name: read_file, text: '\A1\told content' }
+    - { name: write_file, text: '\AThe file \S+/out\.txt has been updated successfully\. \(file state is current in your context' }

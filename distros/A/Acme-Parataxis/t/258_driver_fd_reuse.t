@@ -46,29 +46,29 @@ sub make_collision ($driver) {
 # t/256 and t/257, so this file is not a reason for the suite to go red on a box without Mojo or IO::Async.
 sub exercise ( $name, $build, $reusable ) {
 
-    # 1. A recycled number must not report as watched. This is the false positive that silently skipped registering
-    #    the new handle with the loop: has_watch() answered for the dead handle's slot because the number matched.
+    # A recycled number must not report as watched. This is the false positive that silently skipped registering
+    # the new handle with the loop: has_watch() answered for the dead handle's slot because the number matched.
     my $driver = $build->();
     my ( $fd, $b, $bw ) = make_collision($driver);
     if ( !defined $fd ) {
-        note("the OS did not recycle the descriptor within 64 pipes ($name), so there is nothing to assert here");
+        note "the OS did not recycle the descriptor within 64 pipes ($name), so there is nothing to assert here";
         return;
     }
-    ok( !$driver->has_watch($b), "$name: a recycled descriptor is not a live watch" );
+    ok !$driver->has_watch($b), "$name: a recycled descriptor is not a live watch";
 
-    # 2. Unwatching a handle that was never watched must not take down the stranger's slot. Before the fix this
-    #    returned 1 and deleted that slot, so a third handle could then be registered against an entry nobody owned.
-    is( $driver->unwatch($b), 0, "$name: unwatch on a never-watched handle is refused" );
+    # Unwatching a handle that was never watched must not take down the stranger's slot. Before the fix this
+    # returned 1 and deleted that slot, so a third handle could then be registered against an entry nobody owned.
+    is $driver->unwatch($b), 0, "$name: unwatch on a never-watched handle is refused";
 
-    # 3. Claiming the number for real, and having the loop take it. This step is only meaningful for Mojo, and the
-    #    reason is worth recording because it is not a Parataxis choice. Mojo keys its watcher table by descriptor
-    #    number, so handing it a recycled number replaces the entry and it recovers by itself. IO::Async's Epoll
-    #    backend keys the same table by descriptor but *also* remembers which handle it registered there: a re-watch
-    #    with an unchanged mask falls through every branch and is dropped without a word, and the later unwatch finds
-    #    a handle identity it no longer agrees with and croaks. It cannot be told to forget the old handle either,
-    #    because that handle is closed and there is no descriptor left to look it up by. So on IO::Async nothing
-    #    Parataxis does can be observed end to end here, and asserting it would either pass vacuously or report a
-    #    red test for somebody else's bug. What Parataxis does own -- the two assertions above -- is asserted for both.
+    # Claiming the number for real, and having the loop take it. This step is only meaningful for Mojo, and the
+    # reason is worth recording because it is not a Parataxis choice. Mojo keys its watcher table by descriptor
+    # number, so handing it a recycled number replaces the entry and it recovers by itself. IO::Async's Epoll
+    # backend keys the same table by descriptor but *also* remembers which handle it registered there: a re-watch
+    # with an unchanged mask falls through every branch and is dropped without a word, and the later unwatch finds
+    # a handle identity it no longer agrees with and croaks. It cannot be told to forget the old handle either,
+    # because that handle is closed and there is no descriptor left to look it up by. So on IO::Async nothing
+    # Parataxis does can be observed end to end here, and asserting it would either pass vacuously or report a
+    # red test for somebody else's bug. What Parataxis does own (the two assertions above) is asserted for both.
     if ($reusable) {
         my $registered = eval {
             $driver->watch_read( $b, sub { } );
@@ -77,25 +77,25 @@ sub exercise ( $name, $build, $reusable ) {
         if ( !$registered ) {
             my $err = $@;
             chomp $err;
-            diag("$name: the loop refused the recycled descriptor outright: $err");
-            skip( "$name: the loop cannot be handed a recycled descriptor it still holds under", 1 );
+            diag "$name: the loop refused the recycled descriptor outright: $err";
+            skip "$name: the loop cannot be handed a recycled descriptor it still holds under", 1;
         }
         else {
-            ok( $driver->has_watch($b), "$name: the new handle is watched once asked" );
-            is( $driver->watch_count, 1, "$name: exactly one slot is held for it" );
+            ok $driver->has_watch($b), "$name: the new handle is watched once asked";
+            is $driver->watch_count, 1, "$name: exactly one slot is held for it";
         }
     }
     else {
-        note( "$name: the loop has no end-to-end behaviour for a recycled descriptor to assert against, " .
-                'so the two loop-facing assertions below are made for Mojo only' );
+        note
+            "$name: the loop has no end-to-end behaviour for a recycled descriptor to assert against, so the two loop-facing assertions below are made for Mojo only";
     }
     $driver->reset;
     close $b;
 
-    # 4. A fresh slot must not inherit the previous owner's direction. Watching write-only, closing, then watching
-    #    the recycled number read-only used to leave the dead write callback in place, so the reactor polled for
-    #    writability the new handle never asked for and would fire a closure whose fiber is long gone. This asks the
-    #    Mojo reactor directly because that is where the mask lives; the bit is only read, never set.
+    # A fresh slot must not inherit the previous owner's direction. Watching write-only, closing, then watching
+    # the recycled number read-only used to leave the dead write callback in place, so the reactor polled for
+    # writability the new handle never asked for and would fire a closure whose fiber is long gone. This asks the
+    #  Mojo reactor directly because that is where the mask lives; the bit is only read, never set.
     if ( $name eq 'Mojo' ) {
         my $loop = Mojo::IOLoop->new;
         my $drv2 = Acme::Parataxis::Driver::Mojo->new( loop => $loop );
@@ -108,17 +108,17 @@ sub exercise ( $name, $build, $reusable ) {
             my ($r2) = @r;
             $drv2->watch_read( $r2, sub { } );
             my $mode = $loop->reactor->{io}{$wfd}{mode} // 0;
-            ok( !( $mode & 4 ), "Mojo: the recycled slot carries no stale writable interest (mode $mode)" );
+            ok !( $mode & 4 ), "Mojo: the recycled slot carries no stale writable interest (mode $mode)";
         }
-        else { note('the OS did not recycle the descriptor, so the mask cannot be read') }
+        else { note 'the OS did not recycle the descriptor, so the mask cannot be read' }
         $drv2->reset;
     }
 
-    # 5. A slot whose handle was closed while watched must not survive reset(). It cannot be reached by number any
-    #    more, so the walk over the table misses it, and pending() stays true forever -- which tells the scheduler's
-    #    idle branch that the loop has work when it does not, run after run. This is the base class's own table and
-    #    does not depend on the loop at all, so a loop that refuses to unwind is reported but not allowed to stand in
-    #    the way of the assertion.
+    # A slot whose handle was closed while watched must not survive reset(). It cannot be reached by number any
+    # more, so the walk over the table misses it, and pending() stays true forever which tells the scheduler's
+    # idle branch that the loop has work when it does not, run after run. This is the base class's own table and
+    # does not depend on the loop at all, so a loop that refuses to unwind is reported but not allowed to stand in
+    # the way of the assertion.
     my $drv3 = $build->();
     my ( $d3, $c, $cw ) = make_collision($drv3);
     if ( defined $d3 ) {
@@ -126,18 +126,19 @@ sub exercise ( $name, $build, $reusable ) {
         if ( !$unwound ) {
             my $err = $@;
             chomp $err;
-            diag("$name: the loop refused to unwind a handle that was closed under it: $err");
+            diag "$name: the loop refused to unwind a handle that was closed under it: $err";
         }
-        is( $drv3->pending, 0, "$name: reset clears a slot left by a handle closed while watched" );
+        is $drv3->pending, 0, "$name: reset clears a slot left by a handle closed while watched";
     }
-    else { note('the OS did not recycle the descriptor, so there is no stale slot to reset') }
+    else { note 'the OS did not recycle the descriptor, so there is no stale slot to reset' }
 }
 subtest 'Driver::Mojo' => sub {
-    plan skip_all => 'Mojo::IOLoop not installed' unless eval { require Mojo::IOLoop; 1 };
+    skip_all 1, 'Mojo::IOLoop not installed' unless eval { require Mojo::IOLoop; 1 };
     exercise( 'Mojo', sub { Acme::Parataxis::Driver::Mojo->new( loop => Mojo::IOLoop->new ) }, 1 );
 };
 subtest 'Driver::IOAsync' => sub {
-    plan skip_all => 'IO::Async::Loop not installed' unless eval { require IO::Async::Loop; 1 };
+    skip_all 1, 'IO::Async::Loop not installed' unless eval { require IO::Async::Loop; 1 };
     exercise( 'IOAsync', sub { Acme::Parataxis::Driver::IOAsync->new( loop => IO::Async::Loop->new ) }, 0 );
 };
+#
 done_testing;

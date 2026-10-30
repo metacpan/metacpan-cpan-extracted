@@ -24,7 +24,7 @@ sub workspace {
   $root->child('cpanfile')->spew_utf8("requires 'Moose';\n");
   $root->child('.raider.md')->spew_utf8("Custom persona.\n");
   $root->child('skills')->mkpath;
-  $root->child('skills', 'house.md')->spew_utf8("House skill body.\n");
+  $root->child('skills', 'house.md')->spew_utf8("---\ndescription: House rules.\n---\nHouse skill body.\n");
   return "$root";
 }
 
@@ -61,7 +61,8 @@ subtest 'default: persona, .raider.md, tools, skills, packs' => sub {
   like($m, $PERSONA, 'default persona');
   like($m, qr/Custom persona/, '.raider.md');
   like($m, $TOOLS, 'tool description');
-  like($m, qr/House skill body/, 'skill');
+  like($m, qr/^- house: House rules\.$/m, 'skill listed (ADR 0019)');
+  unlike($m, qr/House skill body/, 'skill body not glued in');
   like($m, qr/### Pack: perl/, 'detected pack');
   like($m, qr/### Pack: caveman/, 'default pack');
   is($app->mission_source, '.raider.md', 'instructions from .raider.md');
@@ -83,7 +84,7 @@ subtest '-M replaces only persona and .raider.md' => sub {
   unlike($m, $PERSONA, 'no default persona');
   unlike($m, qr/Custom persona/, 'no .raider.md');
   like($m, $TOOLS, 'tool description kept');
-  like($m, qr/House skill body/, 'skill kept');
+  like($m, qr/^- house: House rules\.$/m, 'skill listing kept');
   like($m, qr/### Pack: perl/, 'detected pack kept');
   like($m, qr/### Pack: caveman/, 'default pack kept');
   is($app->mission_source, '-M', 'instructions from -M');
@@ -116,7 +117,7 @@ subtest '--bare: default persona and tools, nothing else' => sub {
   like($m, $PERSONA, 'default persona');
   like($m, $TOOLS, 'tool description');
   unlike($m, qr/Custom persona/, 'no .raider.md');
-  unlike($m, qr/House skill body/, 'no skills');
+  unlike($m, qr/House rules|Skills:/, 'no skills');
   unlike($m, qr/### Pack:/, 'no packs');
   is($app->packs->active_pack_names, [], 'no pack active');
   is($app->packs->detections, {}, 'no detection ran');
@@ -132,7 +133,7 @@ subtest '-M TEXT --bare is TEXT plus the tool description' => sub {
   like($m, qr/\AYou are the flag mission\.\n\n---\nWorking directory: /, '-M text, then the tools');
   like($m, $TOOLS, 'tool description kept');
   unlike($m, $PERSONA, 'no default persona');
-  unlike($m, qr/Custom persona|House skill body|### Pack:/, 'nothing else');
+  unlike($m, qr/Custom persona|House rules|### Pack:/, 'nothing else');
   is($app->reload_mission, $m, 'same after reload');
 };
 

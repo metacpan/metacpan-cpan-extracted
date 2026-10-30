@@ -435,6 +435,24 @@ Mundang locale.
    1995-12-22T09:05:02 = PK 1995 FYU 22, Cga
   -0010-09-15T04:44:23 = KK -10 FDE 15, Cze
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = PK 2008 Cokcwaklaŋne
+   1995-12-22T09:05:02 = PK 1995 Fĩi Yuru
+  -0010-09-15T04:44:23 = KK -10 Fĩi Dǝɓlii
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = PK 2008 Cokcwaklaŋne 5, Czi
+   1995-12-22T09:05:02 = PK 1995 Fĩi Yuru 22, Cga
+  -0010-09-15T04:44:23 = KK -10 Fĩi Dǝɓlii 15, Cze
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = PK 2008 Cokcwaklaŋne 5
+   1995-12-22T09:05:02 = PK 1995 Fĩi Yuru 22
+  -0010-09-15T04:44:23 = KK -10 Fĩi Dǝɓlii 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = PK 2008 CLA 5
@@ -506,6 +524,12 @@ Mundang locale.
    2008-02-05T18:30:30 = Czi 5 CLA
    1995-12-22T09:05:02 = Cga 22 FYU
   -0010-09-15T04:44:23 = Cze 15 FDE
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Cokcwaklaŋne 5, Czi
+   1995-12-22T09:05:02 = Fĩi Yuru 22, Cga
+  -0010-09-15T04:44:23 = Fĩi Dǝɓlii 15, Cze
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

@@ -830,4 +830,12 @@ no_leaks_ok {
 	throws_ok { write_table( [ [] ], path('none2.tex'), quiet => 1 ) } qr/no columns/,
 		'LaTeX: an AoA whose header row is empty croaks too';
 }
+# A call-form error prints write_table's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { write_table([ { a => 1 } ]); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: write_table\(/, 'write_table: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('write_table') . "write_table: error: file name missing\n",
+		'write_table: the help screen, then the error on the last line');
+}
 done_testing();

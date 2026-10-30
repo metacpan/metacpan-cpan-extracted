@@ -248,9 +248,9 @@ Turkmen Turkmenistan locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 5 fewral 2008 sişenbe
-   1995-12-22T09:05:02 = 22 dekabr 1995 anna
-  -0010-09-15T04:44:23 = 15 sentýabr -10 şenbe
+   2008-02-05T18:30:30 = 5 fewral 2008, sişenbe
+   1995-12-22T09:05:02 = 22 dekabr 1995, anna
+  -0010-09-15T04:44:23 = 15 sentýabr -10, şenbe
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Turkmen Turkmenistan locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 5 fewral 2008 sişenbe 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 dekabr 1995 anna 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 sentýabr -10 şenbe 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 fewral 2008, sişenbe 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 dekabr 1995, anna 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 sentýabr -10, şenbe 04:44:23 UTC
 
 =head3 Long
 
@@ -357,17 +357,17 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = ann, 9 B
   -0010-09-15T04:44:23 = şen, 4 B
 
-=head3 EBhm (E h:mm B)
+=head3 EBhm (E, h:mm B)
 
-   2008-02-05T18:30:30 = siş 6:30 B
-   1995-12-22T09:05:02 = ann 9:05 B
-  -0010-09-15T04:44:23 = şen 4:44 B
+   2008-02-05T18:30:30 = siş, 6:30 B
+   1995-12-22T09:05:02 = ann, 9:05 B
+  -0010-09-15T04:44:23 = şen, 4:44 B
 
-=head3 EBhms (E h:mm:ss B)
+=head3 EBhms (E, h:mm:ss B)
 
-   2008-02-05T18:30:30 = siş 6:30:30 B
-   1995-12-22T09:05:02 = ann 9:05:02 B
-  -0010-09-15T04:44:23 = şen 4:44:23 B
+   2008-02-05T18:30:30 = siş, 6:30:30 B
+   1995-12-22T09:05:02 = ann, 9:05:02 B
+  -0010-09-15T04:44:23 = şen, 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -387,23 +387,23 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = 22 ann
   -0010-09-15T04:44:23 = 15 şen
 
-=head3 Eh (E h a)
+=head3 Eh (E, h a)
 
-   2008-02-05T18:30:30 = siş 6 go.soň
-   1995-12-22T09:05:02 = ann 9 go.öň
-  -0010-09-15T04:44:23 = şen 4 go.öň
+   2008-02-05T18:30:30 = siş, 6 go.soň
+   1995-12-22T09:05:02 = ann, 9 go.öň
+  -0010-09-15T04:44:23 = şen, 4 go.öň
 
-=head3 Ehm (E h:mm a)
+=head3 Ehm (E, h:mm a)
 
-   2008-02-05T18:30:30 = siş 6:30 go.soň
-   1995-12-22T09:05:02 = ann 9:05 go.öň
-  -0010-09-15T04:44:23 = şen 4:44 go.öň
+   2008-02-05T18:30:30 = siş, 6:30 go.soň
+   1995-12-22T09:05:02 = ann, 9:05 go.öň
+  -0010-09-15T04:44:23 = şen, 4:44 go.öň
 
-=head3 Ehms (E h:mm:ss a)
+=head3 Ehms (E, h:mm:ss a)
 
-   2008-02-05T18:30:30 = siş 6:30:30 go.soň
-   1995-12-22T09:05:02 = ann 9:05:02 go.öň
-  -0010-09-15T04:44:23 = şen 4:44:23 go.öň
+   2008-02-05T18:30:30 = siş, 6:30:30 go.soň
+   1995-12-22T09:05:02 = ann, 9:05:02 go.öň
+  -0010-09-15T04:44:23 = şen, 4:44:23 go.öň
 
 =head3 Gy (G y)
 
@@ -435,11 +435,53 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = B.e. 22 dek 1995, ann
   -0010-09-15T04:44:23 = B.e.öň 15 sen -10, şen
 
+=head3 GyMMMEddd (G ddd MMM y, E)
+
+   2008-02-05T18:30:30 = B.e. 5-nji few 2008, siş
+   1995-12-22T09:05:02 = B.e. 22-nji dek 1995, ann
+  -0010-09-15T04:44:23 = B.e.öň 15-nji sen -10, şen
+
+=head3 GyMMMM (G MMMM y)
+
+   2008-02-05T18:30:30 = B.e. fewral 2008
+   1995-12-22T09:05:02 = B.e. dekabr 1995
+  -0010-09-15T04:44:23 = B.e.öň sentýabr -10
+
+=head3 GyMMMMEd (G d MMMM y, E)
+
+   2008-02-05T18:30:30 = B.e. 5 fewral 2008, siş
+   1995-12-22T09:05:02 = B.e. 22 dekabr 1995, ann
+  -0010-09-15T04:44:23 = B.e.öň 15 sentýabr -10, şen
+
+=head3 GyMMMMEddd (G ddd MMMM y, E)
+
+   2008-02-05T18:30:30 = B.e. 5-nji fewral 2008, siş
+   1995-12-22T09:05:02 = B.e. 22-nji dekabr 1995, ann
+  -0010-09-15T04:44:23 = B.e.öň 15-nji sentýabr -10, şen
+
+=head3 GyMMMMd (G d MMMM y)
+
+   2008-02-05T18:30:30 = B.e. 5 fewral 2008
+   1995-12-22T09:05:02 = B.e. 22 dekabr 1995
+  -0010-09-15T04:44:23 = B.e.öň 15 sentýabr -10
+
+=head3 GyMMMMddd (G ddd MMMM y)
+
+   2008-02-05T18:30:30 = B.e. 5-nji fewral 2008
+   1995-12-22T09:05:02 = B.e. 22-nji dekabr 1995
+  -0010-09-15T04:44:23 = B.e.öň 15-nji sentýabr -10
+
 =head3 GyMMMd (G d MMM y)
 
    2008-02-05T18:30:30 = B.e. 5 few 2008
    1995-12-22T09:05:02 = B.e. 22 dek 1995
   -0010-09-15T04:44:23 = B.e.öň 15 sen -10
+
+=head3 GyMMMddd (G ddd MMM y)
+
+   2008-02-05T18:30:30 = B.e. 5-nji few 2008
+   1995-12-22T09:05:02 = B.e. 22-nji dek 1995
+  -0010-09-15T04:44:23 = B.e.öň 15-nji sen -10
 
 =head3 GyMd (G dd.MM.y)
 
@@ -489,11 +531,11 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (dd.MM E)
+=head3 MEd (dd.MM, E)
 
-   2008-02-05T18:30:30 = 05.02 siş
-   1995-12-22T09:05:02 = 22.12 ann
-  -0010-09-15T04:44:23 = 15.09 şen
+   2008-02-05T18:30:30 = 05.02, siş
+   1995-12-22T09:05:02 = 22.12, ann
+  -0010-09-15T04:44:23 = 15.09, şen
 
 =head3 MMM (LLL)
 
@@ -501,17 +543,29 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = Dek
   -0010-09-15T04:44:23 = Sen
 
-=head3 MMMEd (d MMM E)
+=head3 MMMEd (d MMM, E)
 
-   2008-02-05T18:30:30 = 5 few siş
-   1995-12-22T09:05:02 = 22 dek ann
-  -0010-09-15T04:44:23 = 15 sen şen
+   2008-02-05T18:30:30 = 5 few, siş
+   1995-12-22T09:05:02 = 22 dek, ann
+  -0010-09-15T04:44:23 = 15 sen, şen
 
-=head3 MMMMEd (d MMMM E)
+=head3 MMMEddd (ddd MMM, E)
 
-   2008-02-05T18:30:30 = 5 fewral siş
-   1995-12-22T09:05:02 = 22 dekabr ann
-  -0010-09-15T04:44:23 = 15 sentýabr şen
+   2008-02-05T18:30:30 = 5-nji few, siş
+   1995-12-22T09:05:02 = 22-nji dek, ann
+  -0010-09-15T04:44:23 = 15-nji sen, şen
+
+=head3 MMMMEd (d MMMM, E)
+
+   2008-02-05T18:30:30 = 5 fewral, siş
+   1995-12-22T09:05:02 = 22 dekabr, ann
+  -0010-09-15T04:44:23 = 15 sentýabr, şen
+
+=head3 MMMMEddd (ddd MMMM, E)
+
+   2008-02-05T18:30:30 = 5-nji fewral, siş
+   1995-12-22T09:05:02 = 22-nji dekabr, ann
+  -0010-09-15T04:44:23 = 15-nji sentýabr, şen
 
 =head3 MMMMW-count-one ('hepde' W, MMMM)
 
@@ -531,11 +585,23 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = 22 dekabr
   -0010-09-15T04:44:23 = 15 sentýabr
 
+=head3 MMMMddd (ddd MMMM)
+
+   2008-02-05T18:30:30 = 5-nji fewral
+   1995-12-22T09:05:02 = 22-nji dekabr
+  -0010-09-15T04:44:23 = 15-nji sentýabr
+
 =head3 MMMd (d MMM)
 
    2008-02-05T18:30:30 = 5 few
    1995-12-22T09:05:02 = 22 dek
   -0010-09-15T04:44:23 = 15 sen
+
+=head3 MMMddd (ddd MMM)
+
+   2008-02-05T18:30:30 = 5-nji few
+   1995-12-22T09:05:02 = 22-nji dek
+  -0010-09-15T04:44:23 = 15-nji sen
 
 =head3 Md (dd.MM)
 
@@ -609,11 +675,11 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = 12.1995
   -0010-09-15T04:44:23 = 09.-10
 
-=head3 yMEd (dd.MM.y E)
+=head3 yMEd (dd.MM.y, E)
 
-   2008-02-05T18:30:30 = 05.02.2008 siş
-   1995-12-22T09:05:02 = 22.12.1995 ann
-  -0010-09-15T04:44:23 = 15.09.-10 şen
+   2008-02-05T18:30:30 = 05.02.2008, siş
+   1995-12-22T09:05:02 = 22.12.1995, ann
+  -0010-09-15T04:44:23 = 15.09.-10, şen
 
 =head3 yMMM (MMM y)
 
@@ -621,11 +687,17 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = dek 1995
   -0010-09-15T04:44:23 = sen -10
 
-=head3 yMMMEd (d MMM y E)
+=head3 yMMMEd (d MMM y, E)
 
-   2008-02-05T18:30:30 = 5 few 2008 siş
-   1995-12-22T09:05:02 = 22 dek 1995 ann
-  -0010-09-15T04:44:23 = 15 sen -10 şen
+   2008-02-05T18:30:30 = 5 few 2008, siş
+   1995-12-22T09:05:02 = 22 dek 1995, ann
+  -0010-09-15T04:44:23 = 15 sen -10, şen
+
+=head3 yMMMEddd (ddd MMM y, E)
+
+   2008-02-05T18:30:30 = 5-nji few 2008, siş
+   1995-12-22T09:05:02 = 22-nji dek 1995, ann
+  -0010-09-15T04:44:23 = 15-nji sen -10, şen
 
 =head3 yMMMM (MMMM y)
 
@@ -633,11 +705,41 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = dekabr 1995
   -0010-09-15T04:44:23 = sentýabr -10
 
+=head3 yMMMMEd (d MMMM y, E)
+
+   2008-02-05T18:30:30 = 5 fewral 2008, siş
+   1995-12-22T09:05:02 = 22 dekabr 1995, ann
+  -0010-09-15T04:44:23 = 15 sentýabr -10, şen
+
+=head3 yMMMMEddd (ddd MMMM y, E)
+
+   2008-02-05T18:30:30 = 5-nji fewral 2008, siş
+   1995-12-22T09:05:02 = 22-nji dekabr 1995, ann
+  -0010-09-15T04:44:23 = 15-nji sentýabr -10, şen
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 fewral 2008
+   1995-12-22T09:05:02 = 22 dekabr 1995
+  -0010-09-15T04:44:23 = 15 sentýabr -10
+
+=head3 yMMMMddd (ddd MMMM y)
+
+   2008-02-05T18:30:30 = 5-nji fewral 2008
+   1995-12-22T09:05:02 = 22-nji dekabr 1995
+  -0010-09-15T04:44:23 = 15-nji sentýabr -10
+
 =head3 yMMMd (d MMM y)
 
    2008-02-05T18:30:30 = 5 few 2008
    1995-12-22T09:05:02 = 22 dek 1995
   -0010-09-15T04:44:23 = 15 sen -10
+
+=head3 yMMMddd (ddd MMM y)
+
+   2008-02-05T18:30:30 = 5-nji few 2008
+   1995-12-22T09:05:02 = 22-nji dek 1995
+  -0010-09-15T04:44:23 = 15-nji sen -10
 
 =head3 yMd (dd.MM.y)
 

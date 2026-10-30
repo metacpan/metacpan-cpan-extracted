@@ -1,6 +1,6 @@
 package Langertha::Raider::Provider::Activation;
 # ABSTRACT: Internal activation of a provider manifest's endpoint as the engine of one raider run
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Future::AsyncAwait;
@@ -85,8 +85,12 @@ async sub activate_f {
     return { status => 'failed', error => 'not a valid provider manifest: '.$error };
   }
   my $origin = $fetch->origin($report->{final_url} // $url);
+  if ( my $verify = $opt{verify} ) {
+    my $problem = $verify->($manifest, $origin);
+    return { status => 'refused', error => $problem } if defined $problem;
+  }
 
-  my ( $model, $refusal ) = $self->choose_model($manifest, $opt{model});
+  my ( $model, $refusal ) = $self->choose_model($manifest, $opt{model}, $opt{endpoint});
   return $refusal if $refusal;
   my $endpoint = $manifest->endpoint($model->endpoint_ref);
   my $what = "endpoint '".$endpoint->id."'";
@@ -116,7 +120,7 @@ async sub activate_f {
       ."', which this raider cannot supply" }
       unless $auth->is_known_type;
     return { status => 'usage', error => $what." needs an API key (auth '".$auth->id."', type "
-      .$auth->type.'); pass it with -k KEY' }
+      .$auth->type.'); pass it with '.( $opt{key_hint} // '-k KEY' ) }
       unless $opt{has_api_key};
   }
 
@@ -153,7 +157,7 @@ async sub activate_f {
 
 
 sub choose_model {
-  my ( $self, $manifest, $requested ) = @_;
+  my ( $self, $manifest, $requested, $endpoint_id ) = @_;
   my @models = @{ $manifest->models };
   my %seen;
   my @ids = grep { !$seen{$_}++ } map { $_->id } @models;
@@ -174,6 +178,12 @@ sub choose_model {
     ( $id ) = @ids;
   }
   my @candidates = grep { $_->id eq $id } @models;
+  if ( defined $endpoint_id && length $endpoint_id ) {
+    my @on = grep { $_->endpoint_ref eq $endpoint_id } @candidates;
+    return ( $on[0] ) if @on;
+    return ( undef, { status => 'usage', error => "model '".$id."' is not listed on endpoint '".$endpoint_id
+      ."' (it is on: ".join(', ', map { $_->endpoint_ref } @candidates).')' } );
+  }
   return ( $candidates[0] ) if @candidates == 1;
   my @usable = grep {
     my $endpoint = $manifest->endpoint($_->endpoint_ref);
@@ -183,7 +193,7 @@ sub choose_model {
   return ( $candidates[0] ) unless @usable;
   return ( undef, { status => 'failed', error => "model '".$id."' is offered on several endpoints ("
     .join(', ', map { $_->endpoint_ref.': '.$manifest->endpoint($_->endpoint_ref)->dialect } @usable)
-    .'); raider does not choose between them' } );
+    .'); raider does not choose between them: pick one with --provider-endpoint ID' } );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -202,7 +212,7 @@ Langertha::Raider::Provider::Activation - Internal activation of a provider mani
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -211,7 +221,7 @@ version 0.503
       fetch => Langertha::Raider::Provider::Fetch->new( allow_internal => 0 ),
     );
     my $got = $activation->activate_f('provider.example',
-      model => 'example-model', has_api_key => 1)->get;
+      model => 'example-model', has_api_key => 1)->get;   # endpoint => 'chat' picks one
     # { status => 'completed', engine_name => 'openai',
     #   engine_class => 'Langertha::Engine::OpenAI',
     #   url => 'https://provider.example/v1', model => 'example-model', ... }
@@ -236,7 +246,8 @@ manifest. Without one, the manifest must list exactly one model id.
 
 =item 3. B<The endpoint> is the one the model is listed on. A model listed
 on several endpoints takes the one whose dialect raider has an adapter
-for; when that is more than one, raider does not choose.
+for; when that is more than one, raider refuses and names the endpoints --
+the user chooses one with C<--provider-endpoint> (C<endpoint>).
 
 =item 4. B<The dialect> maps to a L<Langertha> engine class
 (L</engine_for_dialect>). An unknown dialect, or one raider cannot use
@@ -298,7 +309,14 @@ class.
 =head2 activate_f
 
     my $got = await $activation->activate_f($target,
-      model => $model_or_undef, has_api_key => $bool);
+      model => $model_or_undef, endpoint => $endpoint_id_or_undef, has_api_key => $bool,
+      verify => $code_or_undef, key_hint => $text_or_undef);
+
+C<verify>, when given, is called with the validated manifest and the origin
+it came from, before anything is chosen; a string it returns refuses the
+activation with that text (a stored binding that no longer matches,
+L<Langertha::Raider::Provider::Binding>). C<key_hint> replaces C<-k KEY> in
+the message for a missing key.
 
 Resolves to a hash. C<status> is C<completed>, C<usage> (the command line
 names a target that is none, a model the manifest does not list, no model
@@ -309,6 +327,9 @@ C<failed> (the fetch, an invalid manifest, a dialect or auth type raider
 cannot use, a manifest without models). Apart from C<completed>, C<error>
 says why.
 
+The C<endpoint> option is the endpoint id the model must be listed on
+(C<--provider-endpoint>).
+
 A C<completed> activation carries C<provider_id>, C<manifest_url>,
 C<endpoint> (its id), C<dialect>, C<engine_name>, C<engine_class>, C<url>
 (the endpoint's C<base_url>), C<model>, C<auth> (the auth id, or C<undef>),
@@ -318,10 +339,14 @@ credential.
 
 =head2 choose_model
 
-    my ( $model, $refusal ) = $activation->choose_model($manifest, $requested);
+    my ( $model, $refusal ) = $activation->choose_model($manifest, $requested, $endpoint_id);
 
 The L<Langertha::Manifest::Model> entry the run uses (see L</DESCRIPTION>),
-or C<undef> and the C<usage> or C<failed> result that says why not.
+or C<undef> and the result that says why not. C<$endpoint_id>,
+when given, is the endpoint the model must be listed on: the choice the
+user makes where a model is offered on several. A model on several usable
+endpoints without one is refused (C<failed>), the message naming each
+endpoint and the C<--provider-endpoint> that chooses.
 
 =head1 SEE ALSO
 
@@ -339,7 +364,7 @@ or C<undef> and the C<usage> or C<failed> result that says why not.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -360,5 +385,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

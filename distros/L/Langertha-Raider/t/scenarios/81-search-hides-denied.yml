@@ -1,0 +1,19 @@
+title: grep and glob over the root leave out what a Read deny rule names, and say how many; searching inside it is refused
+files:
+  .raider/config.yml: |
+    permissions:
+      deny: [ "Read(./secrets/**)" ]
+  secrets/key: "token=abc\n"
+  lib/a.txt: "token=public\n"
+prompt: Search.
+script:
+  - tool_calls:
+      - [ grep, { pattern: token, output_mode: content } ]
+      - [ glob, { pattern: "**/*" } ]
+      - [ grep, { pattern: token, path: secrets } ]
+  - text: done
+expect:
+  tools:
+    - { name: grep, text: "lib/a\\.txt:1:token=public\\n\\n\\(1 path hidden by permission rules\\)", not_text: abc }
+    - { name: glob, text: "\\(1 path hidden by permission rules\\)", not_text: "secrets/key" }
+    - { name: grep, error: true, text: "denied by rule 'Read\\(\\./secrets/\\*\\*\\)'" }

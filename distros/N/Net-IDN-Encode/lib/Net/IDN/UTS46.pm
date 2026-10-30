@@ -8,7 +8,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "2.502";
+our $VERSION = "2.600";
 $VERSION = eval $VERSION;
 
 our @ISA = ('Exporter');
@@ -36,6 +36,8 @@ sub uts46_to_ascii {
   splice @_, 1, 0, sub {
     local $_ = shift;
     if(m/\P{ASCII}/) {
+      ## punycode never shortens a label
+      croak "label too long [A4_2]" if length($_) > 63 - length($IDNA_PREFIX);
       eval { $_ = $IDNA_PREFIX . encode_punycode($_) };
       croak "$@ [A3]" if $@;
     }
@@ -60,6 +62,9 @@ sub _process {
 # 1. Map
 #   - disallowed
 #
+  ## reject a non code point before the mapping tables warn about it
+  $label =~ m/(\P{Any})/ and croak sprintf('contains disallowed character U+%04X [V6]', ord($1));
+
   if($param{'AllowUnassigned'}) {
     $label =~ m/(\p{Is_DisallowedAssigned})/ and croak sprintf('disallowed character U+%04X', ord($1));
   } else {
@@ -349,6 +354,10 @@ This function takes the following optional parameters (C<%param>):
 
 (boolean) If set to a true value, unassigned code points in the label are
 allowed. This is an extension over UTS #46.
+
+The function still rejects a code point that is not a Unicode scalar
+value, a surrogate or a value above U+10FFFF, since it cannot form a
+valid label.
 
 The default is false.
 

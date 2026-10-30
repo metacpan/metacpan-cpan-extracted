@@ -1,0 +1,25 @@
+title: the person approves one .mcp.json server and rejects another before the first prompt; only the approved one is offered, the answers are saved (ADR 0029 §7)
+files:
+  CLAUDE.md: "# project\n"
+  .mcp.json: |
+    { "mcpServers": {
+      "yes": { "command": "{{PERL}}", "args": [ "{{MCP_TEST_SERVER}}", "normal" ] },
+      "no":  { "command": "{{PERL}}", "args": [ "{{MCP_TEST_SERVER}}", "normal" ] },
+      "later": { "command": "{{PERL}}", "args": [ "{{MCP_TEST_SERVER}}", "normal" ] }
+    } }
+mcp_answers: { "yes": approve, "no": reject }
+prompt: Use the project servers.
+script:
+  - tool_calls:
+      - [ mcp__yes__with_dot, {} ]
+      - [ mcp__no__with_dot, {} ]
+  - text: done
+expect:
+  requests:
+    - { index: 0, lacks: [ mcp__no__with_dot, mcp__later__with_dot ] }
+  tools:
+    - { name: mcp__yes__with_dot, text: "\\Adotted\\z" }
+    - { name: mcp__no__with_dot, error: true, text: "No such tool available" }
+  events:
+    - { type: mcp.server, name: "yes", status: starting }
+    - { type: mcp.server, name: "yes", scope: project, status: connected }

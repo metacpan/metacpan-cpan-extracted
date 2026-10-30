@@ -1,17 +1,10 @@
 use v5.40;
-no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use blib;
 use Acme::Parataxis qw[async fiber await_sleep];
 use Test2::V1 -ipP;
-use Time::HiRes 'time';
+no warnings qw[recursion];    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
+use Time::HiRes qw[time];
 $|++;
-
-# Fibers run on separate heap stacks; Perl's C-stack-depth heuristic can misfire and falsely report "Deep recursion"
-# (it ignores lexical 'no warnings' once a framework such as Test2 is loaded). Genuine runaway recursion inside a fiber
-# surfaces as a hang, access violation, or croak the harness already catches, so filter the noise.
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ /^Deep recursion on subroutine/; warn @_ }
-}
 my $BASE = Acme::Parataxis::get_live_fiber_count();
 
 # init_threads seeds the pool with two workers and submit_c_job used to grow it only when jobs were ALREADY pending

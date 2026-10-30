@@ -435,7 +435,49 @@ French Central African Republic locale.
    1995-12-22T09:05:02 = ven. 22 déc. 1995 ap. J.-C.
   -0010-09-15T04:44:23 = sam. 15 sept. -10 av. J.-C.
 
+=head3 GyMMMEddd (E ddd MMM y G)
+
+   2008-02-05T18:30:30 = mar. 5 févr. 2008 ap. J.-C.
+   1995-12-22T09:05:02 = ven. 22 déc. 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = sam. 15 sept. -10 av. J.-C.
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = février 2008 ap. J.-C.
+   1995-12-22T09:05:02 = décembre 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = septembre -10 av. J.-C.
+
+=head3 GyMMMMEd (E d MMMM y G)
+
+   2008-02-05T18:30:30 = mar. 5 février 2008 ap. J.-C.
+   1995-12-22T09:05:02 = ven. 22 décembre 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = sam. 15 septembre -10 av. J.-C.
+
+=head3 GyMMMMEddd (E ddd MMMM y G)
+
+   2008-02-05T18:30:30 = mar. 5 février 2008 ap. J.-C.
+   1995-12-22T09:05:02 = ven. 22 décembre 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = sam. 15 septembre -10 av. J.-C.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 février 2008 ap. J.-C.
+   1995-12-22T09:05:02 = 22 décembre 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = 15 septembre -10 av. J.-C.
+
+=head3 GyMMMMddd (ddd MMMM y G)
+
+   2008-02-05T18:30:30 = 5 février 2008 ap. J.-C.
+   1995-12-22T09:05:02 = 22 décembre 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = 15 septembre -10 av. J.-C.
+
 =head3 GyMMMd (d MMM y G)
+
+   2008-02-05T18:30:30 = 5 févr. 2008 ap. J.-C.
+   1995-12-22T09:05:02 = 22 déc. 1995 ap. J.-C.
+  -0010-09-15T04:44:23 = 15 sept. -10 av. J.-C.
+
+=head3 GyMMMddd (ddd MMM y G)
 
    2008-02-05T18:30:30 = 5 févr. 2008 ap. J.-C.
    1995-12-22T09:05:02 = 22 déc. 1995 ap. J.-C.
@@ -447,11 +489,11 @@ French Central African Republic locale.
    1995-12-22T09:05:02 = 22/12/1995 ap. J.-C.
   -0010-09-15T04:44:23 = 15/09/-10 av. J.-C.
 
-=head3 H (HH 'h')
+=head3 H (HH)
 
-   2008-02-05T18:30:30 = 18 h
-   1995-12-22T09:05:02 = 09 h
-  -0010-09-15T04:44:23 = 04 h
+   2008-02-05T18:30:30 = 18
+   1995-12-22T09:05:02 = 09
+  -0010-09-15T04:44:23 = 04
 
 =head3 Hm (HH:mm)
 
@@ -477,11 +519,11 @@ French Central African Republic locale.
    1995-12-22T09:05:02 = 09:05 UTC
   -0010-09-15T04:44:23 = 04:44 UTC
 
-=head3 Hv (HH 'h' v)
+=head3 Hv (HH v)
 
-   2008-02-05T18:30:30 = 18 h UTC
-   1995-12-22T09:05:02 = 09 h UTC
-  -0010-09-15T04:44:23 = 04 h UTC
+   2008-02-05T18:30:30 = 18 UTC
+   1995-12-22T09:05:02 = 09 UTC
+  -0010-09-15T04:44:23 = 04 UTC
 
 =head3 M (L)
 
@@ -507,6 +549,24 @@ French Central African Republic locale.
    1995-12-22T09:05:02 = ven. 22 déc.
   -0010-09-15T04:44:23 = sam. 15 sept.
 
+=head3 MMMEddd (E ddd MMM)
+
+   2008-02-05T18:30:30 = mar. 5 févr.
+   1995-12-22T09:05:02 = ven. 22 déc.
+  -0010-09-15T04:44:23 = sam. 15 sept.
+
+=head3 MMMMEd (E d MMMM)
+
+   2008-02-05T18:30:30 = mar. 5 février
+   1995-12-22T09:05:02 = ven. 22 décembre
+  -0010-09-15T04:44:23 = sam. 15 septembre
+
+=head3 MMMMEddd (E ddd MMMM)
+
+   2008-02-05T18:30:30 = mar. 5 février
+   1995-12-22T09:05:02 = ven. 22 décembre
+  -0010-09-15T04:44:23 = sam. 15 septembre
+
 =head3 MMMMW-count-one ('semaine' W (MMMM))
 
    2008-02-05T18:30:30 = semaine 1 (février)
@@ -525,7 +585,19 @@ French Central African Republic locale.
    1995-12-22T09:05:02 = 22 décembre
   -0010-09-15T04:44:23 = 15 septembre
 
+=head3 MMMMddd (ddd MMMM)
+
+   2008-02-05T18:30:30 = 5 février
+   1995-12-22T09:05:02 = 22 décembre
+  -0010-09-15T04:44:23 = 15 septembre
+
 =head3 MMMd (d MMM)
+
+   2008-02-05T18:30:30 = 5 févr.
+   1995-12-22T09:05:02 = 22 déc.
+  -0010-09-15T04:44:23 = 15 sept.
+
+=head3 MMMddd (ddd MMM)
 
    2008-02-05T18:30:30 = 5 févr.
    1995-12-22T09:05:02 = 22 déc.
@@ -615,13 +687,49 @@ French Central African Republic locale.
    1995-12-22T09:05:02 = ven. 22 déc. 1995
   -0010-09-15T04:44:23 = sam. 15 sept. -10
 
+=head3 yMMMEddd (E ddd MMM y)
+
+   2008-02-05T18:30:30 = mar. 5 févr. 2008
+   1995-12-22T09:05:02 = ven. 22 déc. 1995
+  -0010-09-15T04:44:23 = sam. 15 sept. -10
+
 =head3 yMMMM (MMMM y)
 
    2008-02-05T18:30:30 = février 2008
    1995-12-22T09:05:02 = décembre 1995
   -0010-09-15T04:44:23 = septembre -10
 
+=head3 yMMMMEd (E d MMMM y)
+
+   2008-02-05T18:30:30 = mar. 5 février 2008
+   1995-12-22T09:05:02 = ven. 22 décembre 1995
+  -0010-09-15T04:44:23 = sam. 15 septembre -10
+
+=head3 yMMMMEddd (E ddd MMMM y)
+
+   2008-02-05T18:30:30 = mar. 5 février 2008
+   1995-12-22T09:05:02 = ven. 22 décembre 1995
+  -0010-09-15T04:44:23 = sam. 15 septembre -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 février 2008
+   1995-12-22T09:05:02 = 22 décembre 1995
+  -0010-09-15T04:44:23 = 15 septembre -10
+
+=head3 yMMMMddd (ddd MMMM y)
+
+   2008-02-05T18:30:30 = 5 février 2008
+   1995-12-22T09:05:02 = 22 décembre 1995
+  -0010-09-15T04:44:23 = 15 septembre -10
+
 =head3 yMMMd (d MMM y)
+
+   2008-02-05T18:30:30 = 5 févr. 2008
+   1995-12-22T09:05:02 = 22 déc. 1995
+  -0010-09-15T04:44:23 = 15 sept. -10
+
+=head3 yMMMddd (ddd MMM y)
 
    2008-02-05T18:30:30 = 5 févr. 2008
    1995-12-22T09:05:02 = 22 déc. 1995

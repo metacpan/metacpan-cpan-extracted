@@ -4,18 +4,24 @@ use strict;
 use warnings;
 use utf8;
 
-use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
-use File::Spec;
-use FindBin qw($Bin);
-use Getopt::Long qw(GetOptionsFromArray);
-use lib "$Bin/../lib";
+BEGIN {
+    require lib;
+    my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB};
+    if ( defined $repo_lib && $repo_lib ne '' && -d $repo_lib ) {
+        lib->import($repo_lib);
+    }
+    else {
+        require FindBin;
+        die 'FindBin did not resolve a helper directory' if !defined $FindBin::Bin || $FindBin::Bin eq '';
+        lib->import("$FindBin::Bin/../lib");
+    }
+}
 
 use Developer::Dashboard::Config;
-use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Prompt;
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
@@ -29,6 +35,7 @@ if ( !defined $ENV{HOME} || $ENV{HOME} eq '' ) {
         && defined $ENV{HOMEPATH} && $ENV{HOMEPATH} ne ''
       )
     {
+        require File::Spec;
         $ENV{HOME} = File::Spec->catdir( $ENV{HOMEDRIVE}, $ENV{HOMEPATH} );
     }
 }
@@ -48,10 +55,11 @@ sub _default_roots {
 # Output: ticket string or undef when tmux does not expose one.
 sub _tmux_ticket_ref {
     return if !defined $ENV{TMUX} || $ENV{TMUX} eq '';
-    my ( $stdout, undef, $exit_code ) = capture {
+    require Capture::Tiny;
+    my ( $stdout, undef, $exit_code ) = Capture::Tiny::capture( sub {
         system 'tmux', 'show-environment', 'TICKET_REF';
         return $? >> 8;
-    };
+    } );
     return if $exit_code != 0;
     return if !defined $stdout || $stdout eq '';
     for my $line ( split /\n/, $stdout ) {
@@ -83,27 +91,99 @@ sub _collectors_need_sync {
     return $indicator_store->collectors_need_sync($collector_jobs) ? 1 : 0;
 }
 
+# _parse_ps1_options_fast($args, %targets)
+# Parses the exact option spellings emitted by the generated shell prompt
+# bootstrap without initializing Getopt::Long; unsupported syntax is left
+# untouched for the compatibility parser.
+# Input: mutable argv array reference and option-name-to-scalar-reference map.
+# Output: true when every argument was parsed, false when compatibility parsing is required.
+sub _parse_ps1_options_fast {
+    my ( $args, %targets ) = @_;
+    return 0 if ref($args) ne 'ARRAY';
+
+    my %parsed;
+    my %string_options = map { $_ => 1 } qw(jobs cwd mode max-age width);
+    my %boolean_options = (
+        '--color'           => [ color          => 1 ],
+        '--no-color'        => [ color          => 0 ],
+        '--no-indicators'   => [ no_indicators  => 1 ],
+        '--no-no-indicators'=> [ no_indicators  => 0 ],
+    );
+
+    my @remaining = @{$args};
+    while (@remaining) {
+        my $option = shift @remaining;
+        if ( exists $boolean_options{$option} ) {
+            my ( $name, $value ) = @{ $boolean_options{$option} };
+            $parsed{$name} = $value;
+            next;
+        }
+
+        if ( $option =~ /^--([a-z][a-z-]*)=(.*)$/s && $string_options{$1} ) {
+            my ( $name, $value ) = ( $1, $2 );
+            if ( $name eq 'jobs' || $name eq 'max-age' || $name eq 'width' ) {
+                return 0 if $value !~ /^[+-]?\d+$/;
+            }
+            $parsed{$name} = $value;
+            next;
+        }
+
+        if ( $option =~ /^--([a-z][a-z-]*)$/ && $string_options{$1} ) {
+            return 0 if !@remaining;
+            my ( $name, $value ) = ( $1, shift @remaining );
+            if ( $name eq 'jobs' || $name eq 'max-age' || $name eq 'width' ) {
+                return 0 if $value !~ /^[+-]?\d+$/;
+            }
+            $parsed{$name} = $value;
+            next;
+        }
+
+        return 0;
+    }
+
+    for my $name ( keys %parsed ) {
+        return 0 if ref( $targets{$name} ) ne 'SCALAR';
+    }
+    ${ $targets{$_} } = $parsed{$_} for keys %parsed;
+    @{$args} = ();
+    return 1;
+}
+
 # main(@ARGV)
 # Runs the prompt renderer helper for Developer Dashboard.
 # Input: command-line arguments from @ARGV.
 # Output: prints one prompt string suitable for shell command substitution.
 my $jobs = 0;
-my $cwd  = cwd();
+my $cwd  = current_working_directory();
 my $mode = 'compact';
 my $color = 0;
 my $max_age = 300;
 my $no_indicators = 0;
 my $width = 0;
-GetOptionsFromArray(
-    \@ARGV,
-    'jobs=i'    => \$jobs,
-    'cwd=s'     => \$cwd,
-    'mode=s'    => \$mode,
-    'color!'    => \$color,
-    'max-age=i' => \$max_age,
-    'width=i'   => \$width,
-    'no-indicators!' => \$no_indicators,
-);
+if ( !_parse_ps1_options_fast(
+        \@ARGV,
+        jobs          => \$jobs,
+        cwd           => \$cwd,
+        mode          => \$mode,
+        color         => \$color,
+        'max-age'     => \$max_age,
+        width         => \$width,
+        no_indicators => \$no_indicators,
+    )
+  )
+{
+    require Getopt::Long;
+    Getopt::Long::GetOptionsFromArray(
+        \@ARGV,
+        'jobs=i'         => \$jobs,
+        'cwd=s'          => \$cwd,
+        'mode=s'         => \$mode,
+        'color!'         => \$color,
+        'max-age=i'      => \$max_age,
+        'width=i'        => \$width,
+        'no-indicators!' => \$no_indicators,
+    );
+}
 
 my @roots = _default_roots();
 my $paths = Developer::Dashboard::PathRegistry->new(
@@ -112,8 +192,7 @@ my $paths = Developer::Dashboard::PathRegistry->new(
     workspace_roots => \@roots,
     project_roots   => \@roots,
 );
-my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
-my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+my $config = Developer::Dashboard::Config->for_path_config($paths);
 my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
 my $prompt = Developer::Dashboard::Prompt->new(
     indicators => $indicators,
@@ -180,7 +259,15 @@ Use this file when changing prompt CLI flags, compact versus extended mode handl
 
 =head1 HOW TO USE
 
-Users or shell bootstrap functions run C<dashboard ps1 ...>. The staged helper forwards the request into the private runtime, which loads indicator and collector state and prints the rendered prompt fragment.
+Users or shell bootstrap functions run C<dashboard ps1 ...>. The staged helper
+uses C<DEVELOPER_DASHBOARD_REPO_LIB> from the public switchboard when that
+directory is available, avoiding a C<FindBin> startup import. Direct standalone
+invocation retains a C<FindBin> fallback to the helper-relative library
+directory. The helper forwards the request into the private runtime, which
+loads indicator and collector state and prints the rendered prompt fragment.
+Exact options emitted by generated prompts are parsed with a small local parser;
+unsupported or abbreviated forms continue through C<Getopt::Long> so its
+compatibility behavior remains available when needed.
 
 =head1 WHAT USES IT
 

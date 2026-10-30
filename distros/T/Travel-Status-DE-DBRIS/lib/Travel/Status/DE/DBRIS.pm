@@ -21,7 +21,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 # {{{ Constructors
 
@@ -32,6 +32,9 @@ sub new {
 
 	if ( not $ua ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 20 } };
+
+		# work around Akamai BMP TLS fingerprinting
+		$lwp_options{ssl_opts}{SSL_ciphersuites} = 'TLS_CHACHA20_POLY1305_SHA256';
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}
@@ -514,7 +517,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.35
+version 0.37
 
 =head1 DESCRIPTION
 

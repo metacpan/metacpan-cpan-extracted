@@ -1,0 +1,39 @@
+title: a SubagentStop hook that blocks sends its reason back to the subagent, which goes on; stop_hook_active the second time, and the caller gets the last answer (ADR 0020, ADR 0022)
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\n---\nSCRIBE-BODY\n"
+  .claude/settings.json: |
+    { "hooks": { "SubagentStop": [
+      { "matcher": "scribe", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/sources-first", "args": [] } ] }
+    ] } }
+  hooks/sources-first: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *'"stop_hook_active":true'*) exit 0;; esac
+    case "$input" in *'"agent_type":"scribe"'*'"last_assistant_message":"a draft"'*)
+      echo "name your sources" >&2
+      exit 2;;
+    esac
+    exit 0
+executable: [ hooks/sources-first ]
+prompt: Have the scribe write it up.
+script:
+  - tool_calls:
+      - [ agent, { description: Write up, prompt: Write it up., subagent_type: scribe } ]
+  - text: a draft
+  - text: a draft, sources named
+  - text: The scribe is done.
+expect:
+  answer: The scribe is done.
+  request_count: 4
+  requests:
+    - { index: 2, contains: "SubagentStop hook feedback:\nname your sources" }
+    - { index: 2, contains: "a draft" }
+  tools:
+    - { name: agent, text: '\Aa draft, sources named\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: agent.started, call: c1, agent: scribe }
+    - { type: hook.ran, hook_event: SubagentStop, outcome: block, exit: 2 }
+    - { type: hook.ran, hook_event: SubagentStop, outcome: success, exit: 0 }
+    - { type: agent.finished, call: c1, agent: scribe, status: completed }

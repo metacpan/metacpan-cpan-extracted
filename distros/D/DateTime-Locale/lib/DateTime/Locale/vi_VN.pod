@@ -435,6 +435,24 @@ Vietnamese Vietnam locale.
    1995-12-22T09:05:02 = Thứ 6, 22 thg 12, 1995 SCN
   -0010-09-15T04:44:23 = Thứ 7, 15 thg 9, -10 TCN
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = tháng 2 2008 SCN
+   1995-12-22T09:05:02 = tháng 12 1995 SCN
+  -0010-09-15T04:44:23 = tháng 9 -10 TCN
+
+=head3 GyMMMMEd (E, d MMMM y G)
+
+   2008-02-05T18:30:30 = Thứ 3, 5 tháng 2 2008 SCN
+   1995-12-22T09:05:02 = Thứ 6, 22 tháng 12 1995 SCN
+  -0010-09-15T04:44:23 = Thứ 7, 15 tháng 9 -10 TCN
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 tháng 2 2008 SCN
+   1995-12-22T09:05:02 = 22 tháng 12 1995 SCN
+  -0010-09-15T04:44:23 = 15 tháng 9 -10 TCN
+
 =head3 GyMMMd (d MMM, y G)
 
    2008-02-05T18:30:30 = 5 thg 2, 2008 SCN
@@ -638,6 +656,18 @@ Vietnamese Vietnam locale.
    2008-02-05T18:30:30 = tháng 2 năm 2008
    1995-12-22T09:05:02 = tháng 12 năm 1995
   -0010-09-15T04:44:23 = tháng 9 năm -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = Thứ 3, 5 tháng 2 2008
+   1995-12-22T09:05:02 = Thứ 6, 22 tháng 12 1995
+  -0010-09-15T04:44:23 = Thứ 7, 15 tháng 9 -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 tháng 2 2008
+   1995-12-22T09:05:02 = 22 tháng 12 1995
+  -0010-09-15T04:44:23 = 15 tháng 9 -10
 
 =head3 yMMMd (d MMM, y)
 

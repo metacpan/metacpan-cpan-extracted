@@ -435,6 +435,24 @@ Cornish United Kingdom locale.
    1995-12-22T09:05:02 = AD 1995 Kev 22, Gwe
   -0010-09-15T04:44:23 = RC -10 Gwn 15, Sad
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 mis Hwevrer
+   1995-12-22T09:05:02 = AD 1995 mis Kevardhu
+  -0010-09-15T04:44:23 = RC -10 mis Gwynngala
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 mis Hwevrer 5, Mth
+   1995-12-22T09:05:02 = AD 1995 mis Kevardhu 22, Gwe
+  -0010-09-15T04:44:23 = RC -10 mis Gwynngala 15, Sad
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 mis Hwevrer 5
+   1995-12-22T09:05:02 = AD 1995 mis Kevardhu 22
+  -0010-09-15T04:44:23 = RC -10 mis Gwynngala 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Hwe 5
@@ -506,6 +524,12 @@ Cornish United Kingdom locale.
    2008-02-05T18:30:30 = Hwe 5, Mth
    1995-12-22T09:05:02 = Kev 22, Gwe
   -0010-09-15T04:44:23 = Gwn 15, Sad
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = mis Hwevrer 5, Mth
+   1995-12-22T09:05:02 = mis Kevardhu 22, Gwe
+  -0010-09-15T04:44:23 = mis Gwynngala 15, Sad
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

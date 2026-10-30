@@ -435,6 +435,24 @@ Sango Central African Republic locale.
    1995-12-22T09:05:02 = NpK 1995 Kak 22, Lâp
   -0010-09-15T04:44:23 = KnK -10 Mvu 15, Lây
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = NpK 2008 Fulundïgi
+   1995-12-22T09:05:02 = NpK 1995 Kakauka
+  -0010-09-15T04:44:23 = KnK -10 Mvuka
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = NpK 2008 Fulundïgi 5, Bk3
+   1995-12-22T09:05:02 = NpK 1995 Kakauka 22, Lâp
+  -0010-09-15T04:44:23 = KnK -10 Mvuka 15, Lây
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = NpK 2008 Fulundïgi 5
+   1995-12-22T09:05:02 = NpK 1995 Kakauka 22
+  -0010-09-15T04:44:23 = KnK -10 Mvuka 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = NpK 2008 Ful 5

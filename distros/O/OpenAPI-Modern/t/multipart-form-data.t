@@ -645,30 +645,30 @@ components:
         --KJvXX
         Content-Disposition: form-data; name="yatta"
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
         Content-Disposition: form-data; name="yatta2"
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
         Content-Disposition: form-data; name="yatta2"
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
     serialized_example_with_charset:
       serializedValue: |
         --KJvXX
         Content-Disposition: form-data; name="yatta"
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
         Content-Disposition: form-data; name="yatta2"
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
         Content-Disposition: form-data; name="yatta2"
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
         Content-Disposition: form-data; name="_charset_"
 

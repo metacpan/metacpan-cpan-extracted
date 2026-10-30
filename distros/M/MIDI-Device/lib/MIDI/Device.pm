@@ -1,9 +1,9 @@
 package MIDI::Device;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: MIDI device access
+# ABSTRACT: MIDI device metadata
 
-our $VERSION = '0.0102';
+our $VERSION = '0.0300';
 
 use Moo;
 use strictures 2;
@@ -73,6 +73,12 @@ sub note_on {
 }
 
 
+sub pitch_bend {
+    my ($self) = @_;
+    return $self->_device->{pitch_wheel_change};
+}
+
+
 sub port_in {
     my ($self) = @_;
     return $self->_device->{port}{in};
@@ -84,6 +90,18 @@ sub port_out {
     return $self->_device->{port}{out};
 }
 
+
+sub find {
+    my ($self, $key, $value) = @_;
+    return unless exists $self->_device->{$key};
+    my @found;
+    for my $i (@{ $self->_device->{$key} }) {
+        push @found, $i if $i->{note} =~ /$value/i;
+    }
+    return \@found;
+}
+
+
 1;
 
 __END__
@@ -94,27 +112,33 @@ __END__
 
 =head1 NAME
 
-MIDI::Device - MIDI device access
+MIDI::Device - MIDI device metadata
 
 =head1 VERSION
 
-version 0.0102
+version 0.0300
 
 =head1 SYNOPSIS
 
   use MIDI::Device ();
   my $device = MIDI::Device->new(name => 'midi-device-name'); # e.g. 'hpd-15'
   print 'Device: ', join(", ", $device->name, $device->manufacturer), "\n";
-  my $ccs = $device->cc; # [ { number => 1, name => 'Modulation' }, ... ]
+  my $ccs = $device->cc; # [{ number => 1, name => 'Modulation' }, ...]
+  my $found = $device->find('control_change', 'pan'); # [{ note => "Panpot (PAN knob)", number => 10 }]
 
 =head1 DESCRIPTION
 
-Point of reference for C<MIDI::Device::*> modules. Contains device
-metadata and control change messages.
+This module is a point of reference for other C<MIDI::Device::*> modules. It
+contains device metadata. Currently, this is:
 
-It is my hope to add more useful metadata and methods...
+  name
+  manufacturer
+  note_on
+  control_change
+  program_change
+  pitch_wheel_change
 
-=head2 Extending
+=head1 EXTENDING
 
 Make a L<YAML> file named for the device (preferably in lower-case).
 Save it in the distribution F<share> directory. Make a package to
@@ -129,9 +153,9 @@ YAML file F<share/my-device.yml>:
       out: "My MIDI Port Out"
   control_change:
     - number: 0
-      name: "Bank Select"
+      note: "Bank Select"
     - number: 32
-      name: "Bank Select"
+      note: "Bank Select"
     ...
 
 Perl module F<lib/MIDI/Device/My_Device.pm>:
@@ -152,7 +176,7 @@ Perl module F<lib/MIDI/Device/My_Device.pm>:
     use MIDI::Device::My_Device ();
     my $device = MIDI::Device::My_Device->new;
     print "Device: ", join(", ", $device->name, $device->manufacturer), "\n";
-    my $ccs = $device->cc; # [ { number => 0, name => 'Bank Select' }, ... ]
+    my $ccs = $device->cc; # [ { number => 0, note => 'Bank Select' }, ... ]
 
   =head1 DESCRIPTION
 
@@ -206,12 +230,12 @@ Name of the device
 
 Known device names:
 
-  ez-ag
-  hpd-15
-  kaoss-pad-v
-  microkorg
-  se-02
-  volca-drum
+  ez-ag       # Yamaha
+  hpd-15      # Roland
+  kaoss-pad-v # Korg
+  microkorg   # Korg
+  se-02       # Roland
+  volca-drum  # Korg
 
 =head2 module
 
@@ -234,15 +258,15 @@ Name of the device shared directory
 
   $ccs = $device->cc;
 
-List of control change numbers and names
+List of control change numbers and notes.
 
 List entries are typically of the form:
 
-  { number => 1, name => 'Modulation' }
+  { number => 1, note => 'Modulation' }
 
 But these can also contain control value attributes:
 
-  { number => 42, name => 'Switch', off => 0, on => 127 }
+  { number => 42, note => 'Switch', off => 0, on => 127 }
 
 =head2 manufacturer
 
@@ -252,9 +276,9 @@ Manufacturer of the device
 
 =head2 new
 
-  $device = MIDI::Device->new($port_name)
+  $device = MIDI::Device->new(name => $port_name)
 
-Return a new C<MIDI::Device> object given a port name of an available
+Return a new C<MIDI::Device> object given a port B<name> of an available
 MIDI device on the system.
 
 =for Pod::Coverage BUILD
@@ -264,6 +288,12 @@ MIDI device on the system.
   $note_on = $device->note_on;
 
 The C<note_on> section of the device
+
+=head2 pitch_bend
+
+  $pitch_bend = $device->pitch_bend;
+
+The C<pitch_wheel_change> section of the device.
 
 =head2 port_in
 
@@ -276,6 +306,16 @@ Input port name of the device
   $port_out = $device->port_out;
 
 Output port name of the device
+
+=head2 find
+
+  $found = $device->find('control_change', 'pan');
+
+Search the device for an item.
+
+=head1 SEE ALSO
+
+L<MIDI::Device::DX7>
 
 =head1 AUTHOR
 

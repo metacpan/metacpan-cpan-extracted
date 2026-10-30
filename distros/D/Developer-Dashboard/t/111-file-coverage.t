@@ -88,6 +88,12 @@ use Developer::Dashboard::PathRegistry ();
     # Output: empty list.
     sub installed_skill_roots { return () }
 
+    # installed_skill_entries(%args)
+    # Reports that no skills are installed through the grouped inventory API.
+    # Input: optional inventory flags, ignored by this empty-registry fixture.
+    # Output: empty list.
+    sub installed_skill_entries { return () }
+
     # nested_skill_entries(%args)
     # Reports no nested skill-depth entries (DD-1004) - this mock predates
     # that discovery walker, and every top-level skill list it reports is

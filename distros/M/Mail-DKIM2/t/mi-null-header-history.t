@@ -165,11 +165,12 @@ sub malformed_body_below_null {
 {
     my ($ok, $why, $detail) = $MI->chain_verifies(malformed_body_below_null($m1));
     ok(!$ok, 'malformed body Recipe below a null body Recipe is caught');
-    like("$why: $detail", qr/^PERMERROR: Message-Instance m=2 contains invalid JSON: .*out of order/, 'reason names the malformed body Recipe') or diag $why;
+    is($why, 'PERMERROR: Message-Instance m=2 Recipe b[1] is invalid',
+        'reason names the out-of-order step (-08 D6)');
 }
 
-# The structure-only check below a null has no line count: a bad range must
-# read sensibly (no dangling "of ") and must not warn.
+# The structure-only check below a null has no line count: a bad range is
+# the step's error (-08 D6), and must not warn.
 for my $range ([0, 2], [3, 1]) {
     my @warn;
     local $SIG{__WARN__} = sub { push @warn, @_ };
@@ -179,13 +180,7 @@ for my $range ([0, 2], [3, 1]) {
     my ($ok, $why, $detail) = $MI->chain_verifies(list_hop(with_mi($mi2, $cur2), 'list'));
     my $r = "[@$range]";
     ok(!$ok, "body Recipe $r below a null is caught");
-    unlike($detail // '', qr/\bof\s*(?:$|\))/, "$r: no empty 'of' in the detail") or diag $detail;
-    like($detail // '', qr/\Q$range->[0]-$range->[1]\E/, "$r: the detail names the range")
-        if $range->[0];
-    # A copy from 0 is outside the -07 schema (minimum 1): invalid JSON.
-    like($why // '', $range->[0] ? qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/
-                                 : qr/m=2 contains invalid JSON/,
-        "$r: reason names the range") or diag $why;
+    is($why, 'PERMERROR: Message-Instance m=2 Recipe b[0] is invalid', "$r: reason names the step");
     is_deeply(\@warn, [], "$r: no warnings") or diag @warn;
 }
 

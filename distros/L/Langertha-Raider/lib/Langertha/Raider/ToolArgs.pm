@@ -1,6 +1,6 @@
 package Langertha::Raider::ToolArgs;
 # ABSTRACT: Internal check of a tool call's arguments against the tool's inputSchema
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ Langertha::Raider::ToolArgs - Internal check of a tool call's arguments against 
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -157,7 +157,7 @@ C<integer>, C<boolean>, C<object>, C<array>, C<null>, also as a list
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -178,5 +178,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

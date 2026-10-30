@@ -435,6 +435,24 @@ Somali locale.
    1995-12-22T09:05:02 = Jmc, Dis 22, 1995 AD
   -0010-09-15T04:44:23 = Sbti, Seb 15, -10 BC
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = Febraayo 2008 AD
+   1995-12-22T09:05:02 = Diseembar 1995 AD
+  -0010-09-15T04:44:23 = Sebtembar -10 BC
+
+=head3 GyMMMMEd (E, MMMM d, y G)
+
+   2008-02-05T18:30:30 = Tldo, Febraayo 5, 2008 AD
+   1995-12-22T09:05:02 = Jmc, Diseembar 22, 1995 AD
+  -0010-09-15T04:44:23 = Sbti, Sebtembar 15, -10 BC
+
+=head3 GyMMMMd (MMMM d, y G)
+
+   2008-02-05T18:30:30 = Febraayo 5, 2008 AD
+   1995-12-22T09:05:02 = Diseembar 22, 1995 AD
+  -0010-09-15T04:44:23 = Sebtembar 15, -10 BC
+
 =head3 GyMMMd (MMM d, y G)
 
    2008-02-05T18:30:30 = Feb 5, 2008 AD
@@ -626,6 +644,18 @@ Somali locale.
    2008-02-05T18:30:30 = Febraayo 2008
    1995-12-22T09:05:02 = Diseembar 1995
   -0010-09-15T04:44:23 = Sebtembar -10
+
+=head3 yMMMMEd (E, MMMM d, y)
+
+   2008-02-05T18:30:30 = Tldo, Febraayo 5, 2008
+   1995-12-22T09:05:02 = Jmc, Diseembar 22, 1995
+  -0010-09-15T04:44:23 = Sbti, Sebtembar 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Febraayo 5, 2008
+   1995-12-22T09:05:02 = Diseembar 22, 1995
+  -0010-09-15T04:44:23 = Sebtembar 15, -10
 
 =head3 yMMMd (MMM d, y)
 

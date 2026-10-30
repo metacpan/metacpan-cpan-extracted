@@ -435,6 +435,24 @@ Ewondo locale.
    1995-12-22T09:05:02 = ayk 1995 ngab 22, fúl
   -0010-09-15T04:44:23 = oyk -10 nge 15, sér
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = ayk 2008 ngɔn bɛ̌
+   1995-12-22T09:05:02 = ayk 1995 ngɔn awóm ai bɛ̌
+  -0010-09-15T04:44:23 = oyk -10 ngɔn ebulú
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = ayk 2008 ngɔn bɛ̌ 5, smb
+   1995-12-22T09:05:02 = ayk 1995 ngɔn awóm ai bɛ̌ 22, fúl
+  -0010-09-15T04:44:23 = oyk -10 ngɔn ebulú 15, sér
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = ayk 2008 ngɔn bɛ̌ 5
+   1995-12-22T09:05:02 = ayk 1995 ngɔn awóm ai bɛ̌ 22
+  -0010-09-15T04:44:23 = oyk -10 ngɔn ebulú 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = ayk 2008 ngb 5
@@ -506,6 +524,12 @@ Ewondo locale.
    2008-02-05T18:30:30 = smb 5 ngb
    1995-12-22T09:05:02 = fúl 22 ngab
   -0010-09-15T04:44:23 = sér 15 nge
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = ngɔn bɛ̌ 5, smb
+   1995-12-22T09:05:02 = ngɔn awóm ai bɛ̌ 22, fúl
+  -0010-09-15T04:44:23 = ngɔn ebulú 15, sér
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

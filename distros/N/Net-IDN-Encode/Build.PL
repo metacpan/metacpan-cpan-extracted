@@ -24,6 +24,20 @@ my $b = Module::Build->new(
 		'Test::More' => 0,
 		'Test::NoWarnings' => 0,
 	},
+	'meta_merge' => {
+		'meta-spec' => { 'version' => 2 },
+		'prereqs' => {
+			'test' => {
+				'requires' => {
+					'Test::More' => 0,
+					'Test::NoWarnings' => 0,
+				},
+				'recommends' => {
+					'Test::LeakTrace' => 0,
+				},
+			},
+		},
+	},
 	'needs_compiler' => undef,
 
 	'PL_Files' => {

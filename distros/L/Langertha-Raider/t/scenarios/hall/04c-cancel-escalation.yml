@@ -1,0 +1,30 @@
+title: a tool that ignores INT and TERM holds the cancel up; the hall escalates INT, TERM, KILL after cancel_grace
+# cancel_grace is 1: INT at once, TERM after 1 s, KILL after 2 s. The raider
+# waits for its tool, so it is the KILL that ends it: raider.done is `failed`
+# (no run.finished), signaled, and the ACP prompt still answers `cancelled`
+# because a signaled run counts as one.
+# The tool runs until its raider is gone, however late the cancel arrives
+# (the raider is the parent of `bash -c`): the hall kills only the raider,
+# the tool outlives it for a moment and then ends by itself (04d is that
+# finding); the end of the scenario waits for it. The raider's own cancel
+# would end the tool with KILL two seconds after the hall's TERM, the hall's
+# KILL comes one second after it.
+hall:
+  cancel_grace: 1
+model:
+  rules:
+    Sture Arbeit.:
+      tool_calls:
+        - [ bash, { command: "trap '' INT TERM; touch started; while kill -0 $PPID 2>/dev/null; do sleep 0.1; done" } ]
+  after:
+    bash: { answer: "Wurde nicht beendet." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_session: { as: s, raider: Testie }
+  - acp_prompt: { session: s, text: "Sture Arbeit.", as: p, wait: false }
+  - wait_file: { path: started }
+  - acp_cancel: { session: s }
+  - acp_wait: { prompt: p, timeout: 30 }
+  - expect_acp: { prompt: p, stop_reason: cancelled }
+  - expect_event: { type: raider.done, status: failed, signaled: 1, error_like: 'killed by signal 9' }
+  - idle: {}

@@ -24,16 +24,19 @@ Wed 24 Feb 2021 12:01:12 PM PST
 
  Usage: speak | say [-usa|ge] [-h|elp] [-v|erbose] [-de|bug]
               [-c|lipboard] [-f|ile <filename>] [-p|ersona <name>]
+              [-a|pp <name>] [-l|astmsg | -r|epeatmsg]
               [-o|utput <filename>] ["message"]
 
  Where:
-   -usa|ge:          Print this usage
-   -h|elp:           Detailed help
-   -c|lipboard:      Speak the contents of the clipboard
-   -f|ile <filename> Speak the contents of <filename>
-   -p|ersona <name>  Use a specific persona voice
-   -o|utput <file>   Save output speech to specified audio file
-   "message"         Speak the message
+   -usa|ge:                 Print this usage
+   -h|elp:                  Detailed help
+   -c|lipboard:             Speak the contents of the clipboard
+   -f|ile <filename>:       Speak the contents of <filename>
+   -p|ersona <name>:        Use a specific persona voice
+   -a|pp <name>:            Specify application name to tag in the log
+   -l|astmsg | -repeatmsg:  Repeat the last spoken message from the log
+   -o|utput <file>:         Save output speech to specified audio file
+   "message":               Speak the message
 
 =head1 DESCRIPTION
 
@@ -52,7 +55,7 @@ use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Speak qw(speak);
+use Speak qw(speak last_message);
 use Clipboard;
 
 sub error ($msg, $exit_code = 1) {
@@ -72,12 +75,30 @@ my %opts = (
 );
 
 ## Main
-GetOptions (\%opts, 'usage', 'help', 'verbose', 'debug', 'clipboard', 'file=s', 'persona=s', 'output=s')
-  || pod2usage;
+GetOptions (
+  \%opts,
+  'usage',
+  'help',
+  'verbose',
+  'debug',
+  'clipboard',
+  'file=s',
+  'persona=s',
+  'output=s',
+  'app=s',
+  'lastmsg|repeatmsg|repeat',
+) || pod2usage;
 
 my $msg = join ' ', @ARGV;
 
-if ($opts{clipboard}) {
+if ($opts{lastmsg}) {
+  if ($opts{clipboard} || $opts{file} || $msg) {
+    error 'Cannot specify -lastmsg/-repeatmsg with other message sources', 1;
+  }
+  my ($last, $tag) = last_message ();
+  error 'No previous spoken message found in log', 1 unless defined $last;
+  $msg = $last;
+} elsif ($opts{clipboard}) {
   if ($opts{file}) {
     error 'Cannot specify both -clipboard and -file', 1;
   } elsif ($msg) {
@@ -107,4 +128,4 @@ if ($opts{clipboard}) {
   }    # if
 }    # if
 
-speak ($msg, undef, undef, $opts{persona}, $opts{output});
+speak ($msg, undef, undef, $opts{persona}, $opts{output}, $opts{app});

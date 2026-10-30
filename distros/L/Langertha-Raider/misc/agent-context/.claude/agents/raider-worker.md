@@ -6,6 +6,7 @@ briefing:
   skills:
     - getty-perl-core
     - perl-ai-langertha
+    - raider-core
     - getty-perl-moose
     - perl-io-async-future
     - perl-mcp
@@ -51,11 +52,12 @@ Never `git commit`: leave the tree commit-ready and report what changed and why,
 ## Verification
 
 The installed Langertha is usually stale — run against the dev tree:
-`prove -I/home/getty/dev/langertha/lib -Ilib -r t` (same `-I` for `bin/raider`).
+`prove -I../langertha/lib -Ilib -r t` (same `-I` for `bin/raider`).
 Public vs internal API: ADR 0017.
 
 Anything that changes what the standalone binary carries — a new dependency,
-something loaded by name, code that starts perl or raider — load the
-`raider-single-binary` skill first and finish with `scripts/verify-binary.sh`.
+something loaded by name, code that starts perl or raider — say so in your
+report; the dispatcher hands the packing and `scripts/verify-binary.sh` to
+`raider-binary-worker`.
 
 Never run `dzil release` — release is the maintainer's call (see house rules).

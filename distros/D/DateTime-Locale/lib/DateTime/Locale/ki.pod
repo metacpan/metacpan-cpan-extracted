@@ -30,53 +30,53 @@ Kikuyu locale.
 
 =head3 Wide (format)
 
-  Njumatatũ
-  Njumaine
-  Njumatana
-  Aramithi
-  Njumaa
-  Njumamothi
+  Mwambĩrĩrio
+  Waĩrĩ
+  Wetatũ
+  Wena
+  Wetano
+  Njuuma
   Kiumia
 
 =head3 Abbreviated (format)
 
-  NTT
-  NMN
-  NMT
-  ART
-  NMA
-  NMM
+  MWA
+  WAĨ
+  WETŨ
+  WEN
+  WETO
+  NJU
   KMA
 
 =head3 Narrow (format)
 
-  N
-  N
-  N
-  A
-  N
-  N
+  MW
+  WA
+  WTŨ
+  WN
+  WTO
+  MŨT
   K
 
 
 =head3 Wide (stand-alone)
 
-  Njumatatũ
-  Njumaine
-  Njumatana
-  Aramithi
-  Njumaa
-  Njumamothi
+  Mwambĩrĩrio
+  Waĩrĩ
+  Wetatũ
+  Wena
+  Wetano
+  Njuuma
   Kiumia
 
 =head3 Abbreviated (stand-alone)
 
-  NTT
-  NMN
-  NMT
-  ART
-  NMA
-  NMM
+  MWA
+  WAĨ
+  WETŨ
+  WEN
+  WETO
+  MŨT
   KMA
 
 =head3 Narrow (stand-alone)
@@ -93,33 +93,33 @@ Kikuyu locale.
 
 =head3 Wide (format)
 
-  Njenuarĩ
-  Mwere wa kerĩ
-  Mwere wa gatatũ
-  Mwere wa kana
-  Mwere wa gatano
-  Mwere wa gatandatũ
-  Mwere wa mũgwanja
-  Mwere wa kanana
-  Mwere wa kenda
-  Mwere wa ikũmi
-  Mwere wa ikũmi na ũmwe
-  Ndithemba
+  Mũgaa
+  Mũgetho
+  Kĩhu
+  Mũthatũ
+  Mũgiranjara
+  Gathathanwa
+  Gathano
+  Mworia Nyoni
+  Mũgaa wa Kerĩ
+  Mwania Thenge
+  Kanyua Hũngũ
+  Gatumu
 
 =head3 Abbreviated (format)
 
-  JEN
-  WKR
-  WGT
-  WKN
-  WTN
-  WTD
-  WMJ
-  WNN
-  WKD
-  WIK
-  WMW
-  DIT
+  MGA
+  MGE
+  KH
+  MŨTH
+  MGNJ
+  GATH
+  GATHN
+  MWNY
+  MŨGK
+  MWTH
+  KNY
+  GAT
 
 =head3 Narrow (format)
 
@@ -139,33 +139,33 @@ Kikuyu locale.
 
 =head3 Wide (stand-alone)
 
-  Njenuarĩ
-  Mwere wa kerĩ
-  Mwere wa gatatũ
-  Mwere wa kana
-  Mwere wa gatano
-  Mwere wa gatandatũ
-  Mwere wa mũgwanja
-  Mwere wa kanana
-  Mwere wa kenda
-  Mwere wa ikũmi
-  Mwere wa ikũmi na ũmwe
-  Ndithemba
+  Mũgaa
+  Mũgetho
+  Kĩhu
+  Mũthatũ
+  Mũgĩranjara
+  Gathathanwa
+  Gathano
+  Mworia Nyoni
+  Mũgaa wa Kerĩ
+  Mwania Thenge
+  Kanyua Hũngũ
+  Gatumu
 
 =head3 Abbreviated (stand-alone)
 
-  JEN
-  WKR
-  WGT
-  WKN
-  WTN
-  WTD
-  WMJ
-  WNN
-  WKD
-  WIK
-  WMW
-  DIT
+  MGA
+  MGE
+  KH
+  MŨTH
+  MGNJ
+  GATH
+  GATHN
+  MWNY
+  MŨGK
+  MWTH
+  KNY
+  GAT
 
 =head3 Narrow (stand-alone)
 
@@ -231,8 +231,8 @@ Kikuyu locale.
 
 =head3 Wide (format)
 
-  Mbere ya Kristo
-  Thutha wa Kristo
+  Mbere ya Kristũ
+  Thutha wa Kristũ
 
 =head3 Abbreviated (format)
 
@@ -248,21 +248,21 @@ Kikuyu locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Njumaine, 5 Mwere wa kerĩ 2008
-   1995-12-22T09:05:02 = Njumaa, 22 Ndithemba 1995
-  -0010-09-15T04:44:23 = Njumamothi, 15 Mwere wa kenda -10
+   2008-02-05T18:30:30 = Waĩrĩ, 5 Mũgetho 2008
+   1995-12-22T09:05:02 = Wetano, 22 Gatumu 1995
+  -0010-09-15T04:44:23 = Njuuma, 15 Mũgaa wa Kerĩ -10
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 Mwere wa kerĩ 2008
-   1995-12-22T09:05:02 = 22 Ndithemba 1995
-  -0010-09-15T04:44:23 = 15 Mwere wa kenda -10
+   2008-02-05T18:30:30 = 5 Mũgetho 2008
+   1995-12-22T09:05:02 = 22 Gatumu 1995
+  -0010-09-15T04:44:23 = 15 Mũgaa wa Kerĩ -10
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 WKR 2008
-   1995-12-22T09:05:02 = 22 DIT 1995
-  -0010-09-15T04:44:23 = 15 WKD -10
+   2008-02-05T18:30:30 = 5 MGE 2008
+   1995-12-22T09:05:02 = 22 GAT 1995
+  -0010-09-15T04:44:23 = 15 MŨGK -10
 
 =head3 Short
 
@@ -302,21 +302,21 @@ Kikuyu locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Njumaine, 5 Mwere wa kerĩ 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = Njumaa, 22 Ndithemba 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = Njumamothi, 15 Mwere wa kenda -10 04:44:23 UTC
+   2008-02-05T18:30:30 = Waĩrĩ, 5 Mũgetho 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = Wetano, 22 Gatumu 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = Njuuma, 15 Mũgaa wa Kerĩ -10 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 Mwere wa kerĩ 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 Ndithemba 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 Mwere wa kenda -10 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 Mũgetho 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 Gatumu 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 Mũgaa wa Kerĩ -10 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 WKR 2008 18:30:30
-   1995-12-22T09:05:02 = 22 DIT 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 WKD -10 04:44:23
+   2008-02-05T18:30:30 = 5 MGE 2008 18:30:30
+   1995-12-22T09:05:02 = 22 GAT 1995 09:05:02
+  -0010-09-15T04:44:23 = 15 MŨGK -10 04:44:23
 
 =head3 Short
 
@@ -347,63 +347,63 @@ Kikuyu locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = NMN
-   1995-12-22T09:05:02 = NMA
-  -0010-09-15T04:44:23 = NMM
+   2008-02-05T18:30:30 = WAĨ
+   1995-12-22T09:05:02 = WETO
+  -0010-09-15T04:44:23 = MŨT
 
 =head3 EBh (E h B)
 
-   2008-02-05T18:30:30 = NMN 6 B
-   1995-12-22T09:05:02 = NMA 9 B
-  -0010-09-15T04:44:23 = NMM 4 B
+   2008-02-05T18:30:30 = WAĨ 6 B
+   1995-12-22T09:05:02 = WETO 9 B
+  -0010-09-15T04:44:23 = NJU 4 B
 
 =head3 EBhm (E h:mm B)
 
-   2008-02-05T18:30:30 = NMN 6:30 B
-   1995-12-22T09:05:02 = NMA 9:05 B
-  -0010-09-15T04:44:23 = NMM 4:44 B
+   2008-02-05T18:30:30 = WAĨ 6:30 B
+   1995-12-22T09:05:02 = WETO 9:05 B
+  -0010-09-15T04:44:23 = NJU 4:44 B
 
 =head3 EBhms (E h:mm:ss B)
 
-   2008-02-05T18:30:30 = NMN 6:30:30 B
-   1995-12-22T09:05:02 = NMA 9:05:02 B
-  -0010-09-15T04:44:23 = NMM 4:44:23 B
+   2008-02-05T18:30:30 = WAĨ 6:30:30 B
+   1995-12-22T09:05:02 = WETO 9:05:02 B
+  -0010-09-15T04:44:23 = NJU 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
-   2008-02-05T18:30:30 = NMN 18:30
-   1995-12-22T09:05:02 = NMA 09:05
-  -0010-09-15T04:44:23 = NMM 04:44
+   2008-02-05T18:30:30 = WAĨ 18:30
+   1995-12-22T09:05:02 = WETO 09:05
+  -0010-09-15T04:44:23 = NJU 04:44
 
 =head3 EHms (E HH:mm:ss)
 
-   2008-02-05T18:30:30 = NMN 18:30:30
-   1995-12-22T09:05:02 = NMA 09:05:02
-  -0010-09-15T04:44:23 = NMM 04:44:23
+   2008-02-05T18:30:30 = WAĨ 18:30:30
+   1995-12-22T09:05:02 = WETO 09:05:02
+  -0010-09-15T04:44:23 = NJU 04:44:23
 
 =head3 Ed (d, E)
 
-   2008-02-05T18:30:30 = 5, NMN
-   1995-12-22T09:05:02 = 22, NMA
-  -0010-09-15T04:44:23 = 15, NMM
+   2008-02-05T18:30:30 = 5, WAĨ
+   1995-12-22T09:05:02 = 22, WETO
+  -0010-09-15T04:44:23 = 15, NJU
 
 =head3 Eh (E h a)
 
-   2008-02-05T18:30:30 = NMN 6 Hwaĩ-inĩ
-   1995-12-22T09:05:02 = NMA 9 Kiroko
-  -0010-09-15T04:44:23 = NMM 4 Kiroko
+   2008-02-05T18:30:30 = WAĨ 6 Hwaĩ-inĩ
+   1995-12-22T09:05:02 = WETO 9 Kiroko
+  -0010-09-15T04:44:23 = NJU 4 Kiroko
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = NMN 6:30 Hwaĩ-inĩ
-   1995-12-22T09:05:02 = NMA 9:05 Kiroko
-  -0010-09-15T04:44:23 = NMM 4:44 Kiroko
+   2008-02-05T18:30:30 = WAĨ 6:30 Hwaĩ-inĩ
+   1995-12-22T09:05:02 = WETO 9:05 Kiroko
+  -0010-09-15T04:44:23 = NJU 4:44 Kiroko
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = NMN 6:30:30 Hwaĩ-inĩ
-   1995-12-22T09:05:02 = NMA 9:05:02 Kiroko
-  -0010-09-15T04:44:23 = NMM 4:44:23 Kiroko
+   2008-02-05T18:30:30 = WAĨ 6:30:30 Hwaĩ-inĩ
+   1995-12-22T09:05:02 = WETO 9:05:02 Kiroko
+  -0010-09-15T04:44:23 = NJU 4:44:23 Kiroko
 
 =head3 Gy (G y)
 
@@ -419,27 +419,45 @@ Kikuyu locale.
 
 =head3 GyMEd (G y-MM-dd, E)
 
-   2008-02-05T18:30:30 = TK 2008-02-05, NMN
-   1995-12-22T09:05:02 = TK 1995-12-22, NMA
-  -0010-09-15T04:44:23 = MK -10-09-15, NMM
+   2008-02-05T18:30:30 = TK 2008-02-05, WAĨ
+   1995-12-22T09:05:02 = TK 1995-12-22, WETO
+  -0010-09-15T04:44:23 = MK -10-09-15, NJU
 
 =head3 GyMMM (G y MMM)
 
-   2008-02-05T18:30:30 = TK 2008 WKR
-   1995-12-22T09:05:02 = TK 1995 DIT
-  -0010-09-15T04:44:23 = MK -10 WKD
+   2008-02-05T18:30:30 = TK 2008 MGE
+   1995-12-22T09:05:02 = TK 1995 GAT
+  -0010-09-15T04:44:23 = MK -10 MŨGK
 
 =head3 GyMMMEd (G y MMM d, E)
 
-   2008-02-05T18:30:30 = TK 2008 WKR 5, NMN
-   1995-12-22T09:05:02 = TK 1995 DIT 22, NMA
-  -0010-09-15T04:44:23 = MK -10 WKD 15, NMM
+   2008-02-05T18:30:30 = TK 2008 MGE 5, WAĨ
+   1995-12-22T09:05:02 = TK 1995 GAT 22, WETO
+  -0010-09-15T04:44:23 = MK -10 MŨGK 15, NJU
+
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = TK 2008 Mũgetho
+   1995-12-22T09:05:02 = TK 1995 Gatumu
+  -0010-09-15T04:44:23 = MK -10 Mũgaa wa Kerĩ
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = TK 2008 Mũgetho 5, WAĨ
+   1995-12-22T09:05:02 = TK 1995 Gatumu 22, WETO
+  -0010-09-15T04:44:23 = MK -10 Mũgaa wa Kerĩ 15, NJU
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = TK 2008 Mũgetho 5
+   1995-12-22T09:05:02 = TK 1995 Gatumu 22
+  -0010-09-15T04:44:23 = MK -10 Mũgaa wa Kerĩ 15
 
 =head3 GyMMMd (G y MMM d)
 
-   2008-02-05T18:30:30 = TK 2008 WKR 5
-   1995-12-22T09:05:02 = TK 1995 DIT 22
-  -0010-09-15T04:44:23 = MK -10 WKD 15
+   2008-02-05T18:30:30 = TK 2008 MGE 5
+   1995-12-22T09:05:02 = TK 1995 GAT 22
+  -0010-09-15T04:44:23 = MK -10 MŨGK 15
 
 =head3 GyMd (G y-MM-dd)
 
@@ -465,11 +483,11 @@ Kikuyu locale.
    1995-12-22T09:05:02 = 09:05:02
   -0010-09-15T04:44:23 = 04:44:23
 
-=head3 Hmsv (HH:mm:ss v)
+=head3 Hmsv (HH:mm:ss v)
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18:30:30 UTC
+   1995-12-22T09:05:02 = 09:05:02 UTC
+  -0010-09-15T04:44:23 = 04:44:23 UTC
 
 =head3 Hmv (HH:mm v)
 
@@ -491,45 +509,45 @@ Kikuyu locale.
 
 =head3 MEd (E, M/d)
 
-   2008-02-05T18:30:30 = NMN, 2/5
-   1995-12-22T09:05:02 = NMA, 12/22
-  -0010-09-15T04:44:23 = NMM, 9/15
+   2008-02-05T18:30:30 = WAĨ, 2/5
+   1995-12-22T09:05:02 = WETO, 12/22
+  -0010-09-15T04:44:23 = NJU, 9/15
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = WKR
-   1995-12-22T09:05:02 = DIT
-  -0010-09-15T04:44:23 = WKD
+   2008-02-05T18:30:30 = MGE
+   1995-12-22T09:05:02 = GAT
+  -0010-09-15T04:44:23 = MŨGK
 
 =head3 MMMEd (E, MMM d)
 
-   2008-02-05T18:30:30 = NMN, WKR 5
-   1995-12-22T09:05:02 = NMA, DIT 22
-  -0010-09-15T04:44:23 = NMM, WKD 15
+   2008-02-05T18:30:30 = WAĨ, MGE 5
+   1995-12-22T09:05:02 = WETO, GAT 22
+  -0010-09-15T04:44:23 = NJU, MŨGK 15
 
 =head3 MMMMEd (E, MMMM d)
 
-   2008-02-05T18:30:30 = NMN, Mwere wa kerĩ 5
-   1995-12-22T09:05:02 = NMA, Ndithemba 22
-  -0010-09-15T04:44:23 = NMM, Mwere wa kenda 15
+   2008-02-05T18:30:30 = WAĨ, Mũgetho 5
+   1995-12-22T09:05:02 = WETO, Gatumu 22
+  -0010-09-15T04:44:23 = NJU, Mũgaa wa Kerĩ 15
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Mwere wa kerĩ
-   1995-12-22T09:05:02 = week 3 of Ndithemba
-  -0010-09-15T04:44:23 = week 2 of Mwere wa kenda
+   2008-02-05T18:30:30 = week 1 of Mũgetho
+   1995-12-22T09:05:02 = week 3 of Gatumu
+  -0010-09-15T04:44:23 = week 2 of Mũgaa wa Kerĩ
 
 =head3 MMMMd (MMMM d)
 
-   2008-02-05T18:30:30 = Mwere wa kerĩ 5
-   1995-12-22T09:05:02 = Ndithemba 22
-  -0010-09-15T04:44:23 = Mwere wa kenda 15
+   2008-02-05T18:30:30 = Mũgetho 5
+   1995-12-22T09:05:02 = Gatumu 22
+  -0010-09-15T04:44:23 = Mũgaa wa Kerĩ 15
 
 =head3 MMMd (MMM d)
 
-   2008-02-05T18:30:30 = WKR 5
-   1995-12-22T09:05:02 = DIT 22
-  -0010-09-15T04:44:23 = WKD 15
+   2008-02-05T18:30:30 = MGE 5
+   1995-12-22T09:05:02 = GAT 22
+  -0010-09-15T04:44:23 = MŨGK 15
 
 =head3 Md (M/d)
 
@@ -555,17 +573,17 @@ Kikuyu locale.
    1995-12-22T09:05:02 = 9:05 Kiroko
   -0010-09-15T04:44:23 = 4:44 Kiroko
 
-=head3 hms (h:mm:ss a)
+=head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 Hwaĩ-inĩ
-   1995-12-22T09:05:02 = 9:05:02 Kiroko
-  -0010-09-15T04:44:23 = 4:44:23 Kiroko
+   2008-02-05T18:30:30 = 6:30:30 Hwaĩ-inĩ
+   1995-12-22T09:05:02 = 9:05:02 Kiroko
+  -0010-09-15T04:44:23 = 4:44:23 Kiroko
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 Hwaĩ-inĩ UTC
-   1995-12-22T09:05:02 = 9:05:02 Kiroko UTC
-  -0010-09-15T04:44:23 = 4:44:23 Kiroko UTC
+   2008-02-05T18:30:30 = 6:30:30 Hwaĩ-inĩ UTC
+   1995-12-22T09:05:02 = 9:05:02 Kiroko UTC
+  -0010-09-15T04:44:23 = 4:44:23 Kiroko UTC
 
 =head3 hmv (h:mm a v)
 
@@ -599,39 +617,51 @@ Kikuyu locale.
 
 =head3 yMEd (E, M/d/y)
 
-   2008-02-05T18:30:30 = NMN, 2/5/2008
-   1995-12-22T09:05:02 = NMA, 12/22/1995
-  -0010-09-15T04:44:23 = NMM, 9/15/-10
+   2008-02-05T18:30:30 = WAĨ, 2/5/2008
+   1995-12-22T09:05:02 = WETO, 12/22/1995
+  -0010-09-15T04:44:23 = NJU, 9/15/-10
 
 =head3 yMMM (MMM y)
 
-   2008-02-05T18:30:30 = WKR 2008
-   1995-12-22T09:05:02 = DIT 1995
-  -0010-09-15T04:44:23 = WKD -10
+   2008-02-05T18:30:30 = MGE 2008
+   1995-12-22T09:05:02 = GAT 1995
+  -0010-09-15T04:44:23 = MŨGK -10
 
 =head3 yMMMEd (E, MMM d, y)
 
-   2008-02-05T18:30:30 = NMN, WKR 5, 2008
-   1995-12-22T09:05:02 = NMA, DIT 22, 1995
-  -0010-09-15T04:44:23 = NMM, WKD 15, -10
+   2008-02-05T18:30:30 = WAĨ, MGE 5, 2008
+   1995-12-22T09:05:02 = WETO, GAT 22, 1995
+  -0010-09-15T04:44:23 = NJU, MŨGK 15, -10
 
 =head3 yMMMM (MMMM y)
 
-   2008-02-05T18:30:30 = Mwere wa kerĩ 2008
-   1995-12-22T09:05:02 = Ndithemba 1995
-  -0010-09-15T04:44:23 = Mwere wa kenda -10
+   2008-02-05T18:30:30 = Mũgetho 2008
+   1995-12-22T09:05:02 = Gatumu 1995
+  -0010-09-15T04:44:23 = Mũgaa wa Kerĩ -10
 
-=head3 yMMMd (y MMM d)
+=head3 yMMMMEd (dd-MM-YYYY E)
 
-   2008-02-05T18:30:30 = 2008 WKR 5
-   1995-12-22T09:05:02 = 1995 DIT 22
-  -0010-09-15T04:44:23 = -10 WKD 15
+   2008-02-05T18:30:30 = 05-02-2008 WAĨ
+   1995-12-22T09:05:02 = 22-12-1995 WETO
+  -0010-09-15T04:44:23 = 15-09--010 NJU
 
-=head3 yMd (y-MM-dd)
+=head3 yMMMMd (dd-MM-YYYY)
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 05-02-2008
+   1995-12-22T09:05:02 = 22-12-1995
+  -0010-09-15T04:44:23 = 15-09--010
+
+=head3 yMMMd (dd-MM-YYYY)
+
+   2008-02-05T18:30:30 = 05-02-2008
+   1995-12-22T09:05:02 = 22-12-1995
+  -0010-09-15T04:44:23 = 15-09--010
+
+=head3 yMd (dd-MM-y)
+
+   2008-02-05T18:30:30 = 05-02-2008
+   1995-12-22T09:05:02 = 22-12-1995
+  -0010-09-15T04:44:23 = 15-09--10
 
 =head3 yQQQ (QQQ y)
 
@@ -660,15 +690,15 @@ Yes
 
 =head3 Local first day of the week
 
-1 (Njumatatũ)
+1 (Mwambĩrĩrio)
 
 =head2 Strftime Patterns
 
 =head3 %c (%a %b %e %H:%M:%S %Y) - date time format
 
-   2008-02-05T18:30:30 = NMN WKR  5 18:30:30 2008
-   1995-12-22T09:05:02 = NMA DIT 22 09:05:02 1995
-  -0010-09-15T04:44:23 = NMM WKD 15 04:44:23 -10
+   2008-02-05T18:30:30 = WAĨ MGE  5 18:30:30 2008
+   1995-12-22T09:05:02 = WETO GAT 22 09:05:02 1995
+  -0010-09-15T04:44:23 = NJU MŨGK 15 04:44:23 -10
 
 =head3 %x (%m/%d/%y) - date format
 

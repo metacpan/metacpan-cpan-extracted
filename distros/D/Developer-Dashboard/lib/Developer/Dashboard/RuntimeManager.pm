@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -2230,7 +2230,7 @@ sub web_log {
     my $follow = $args{follow} ? 1 : 0;
     my $start_pos = 0;
     if ( defined $lines ) {
-        die 'Line count must be a positive integer' if $lines !~ /^\d+$/ || $lines < 1;
+        die 'Line count must be a non-negative integer' if $lines !~ /^\d+$/;
     }
     return '' if !$follow && !-f $file;
 
@@ -2258,12 +2258,13 @@ sub web_log {
 
 # _tail_text($text, $lines)
 # Returns the last N logical lines from a text buffer.
-# Input: text string and positive integer line count.
+# Input: text string and non-negative integer line count.
 # Output: tailed text string.
 sub _tail_text {
     my ( $self, $text, $lines ) = @_;
     return '' if !defined $text || $text eq '';
     return $text if !defined $lines;
+    return '' if $lines == 0;
     my @parts = split /\n/, $text, -1;
     my $had_trailing_newline = $parts[-1] eq '' ? 1 : 0;
     pop @parts if $had_trailing_newline;
@@ -3407,6 +3408,11 @@ For cron collectors, keep scheduler-loop heartbeat separate from job progress:
 an old execution timestamp is normal between scheduled runs, while a stale
 loop heartbeat still indicates that the scheduler may need recovery.
 
+The C<web_log> method reads the dashboard log, optionally returns only the last
+N lines, or follows appended data after printing that tail. A zero line count
+prints no existing lines before follow mode begins; line counts must be
+non-negative integers.
+
 =head1 HOW TO USE
 
 Construct it with the path registry and any required collaborators, then call the lifecycle methods from CLI helpers. Keep process orchestration here and let the command wrappers only parse arguments and print results.
@@ -3440,6 +3446,14 @@ Example 4:
   prove -lr t
 
 Put any module-level change back through the entire repository suite before release.
+
+Example 5:
+
+  dashboard serve logs -t --tail=0
+
+Read no current log lines with timestamps enabled. When combined with C<-f>,
+this starts following future log entries without first printing the existing
+content.
 
 
 =for comment FULL-POD-DOC END

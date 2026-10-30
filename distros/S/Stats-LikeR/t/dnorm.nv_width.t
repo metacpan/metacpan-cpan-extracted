@@ -134,4 +134,9 @@ is(dnorm(0, mean => 0, sd => 0), 9**9**9, 'sd = 0 at the mean is Inf');
 is(dnorm(1, mean => 0, sd => 0), 0,       'sd = 0 away from the mean is 0');
 is(dnorm(1, mean => 0, sd => 9**9**9), 0, 'an infinite sd gives 0');
 
+# A call of the wrong form prints dnorm's help screen, then the error last.
+like(do { local $@; eval { dnorm(1, foo => 2) }; $@ },
+	qr/\Ausage: dnorm\(.*^example:\n.*\n\ndnorm: error: \Qunknown argument 'foo'\E\n\z/ms,
+	'dnorm: an unknown argument prints the help screen, and the error last');
+
 done_testing();

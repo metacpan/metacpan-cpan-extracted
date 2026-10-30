@@ -1,0 +1,13 @@
+# The ledger is cumulative over the prompts of one application.
+title: two prompts add up in the ledger
+prompts:
+  - First.
+  - Second.
+script:
+  - text: One.
+    usage: { prompt_tokens: 10, completion_tokens: 2 }
+  - text: Two.
+    usage: { prompt_tokens: 25, completion_tokens: 3 }
+expect:
+  answer: Two.
+  usage: { input_tokens: 35, output_tokens: 5, calls: 2 }

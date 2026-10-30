@@ -15,7 +15,7 @@ my $cli      = _slurp('bin/dashboard');
 my $audit    = _slurp('script/cpan-audit-project');
 my $exclude  = _slurp('cpan-audit-exclusions.txt');
 
-like( $cli, qr/use\s+Pod::Usage\b/, 'the CLI has a Pod::Usage help-rendering surface' );
+like( $cli, qr/(?:use|require)\s+Pod::Usage\b/, 'the CLI has a Pod::Usage help-rendering surface' );
 like( $cpanfile, qr/requires\s+'Pod::Text'\s*,\s*'6\.1\.1'\s*;/,
     'cpanfile requires the fixed Pod::Text release' );
 like( $makefile, qr/'Pod::Text'\s*=>\s*'6\.1\.1'/,

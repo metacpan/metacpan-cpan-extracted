@@ -1,0 +1,309 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path getcwd);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Digest::SHA qw(sha256_hex);
+use Time::HiRes qw(time);
+
+our $SELECTED_LIB;
+BEGIN {
+    my $requested_lib = defined $ENV{P48_LIB}
+      ? $ENV{P48_LIB}
+      : File::Spec->catdir( $Bin, '..', 'lib' );
+    $SELECTED_LIB = abs_path($requested_lib)
+      or die "Unable to resolve selected source library '$requested_lib': $!\n";
+    die "Selected source library '$SELECTED_LIB' is not a directory\n" if !-d $SELECTED_LIB;
+    unshift @INC, $SELECTED_LIB;
+}
+
+use Developer::Dashboard::Auth;
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::PageRuntime;
+use Developer::Dashboard::PageStore;
+use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::Prompt;
+use Developer::Dashboard::SessionStore;
+use Developer::Dashboard::Web::App;
+
+my $indicator_count = 50;
+my $iterations = 100;
+my $runs = 21;
+my $profile = 0;
+my $no_collector_cache = 0;
+my $no_collector_signature_cache = 0;
+my $portable_config_cache = 0;
+my $help = 0;
+GetOptions(
+    'indicators=i' => \$indicator_count,
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'profile!'     => \$profile,
+    'no-collector-cache' => \$no_collector_cache,
+    'no-collector-signature-cache' => \$no_collector_signature_cache,
+    'portable-config-cache' => \$portable_config_cache,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--indicators must be a positive integer\n" if $indicator_count < 1;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be a positive odd integer\n" if $runs < 1 || $runs % 2 == 0;
+die "--profile requires perl -d:NYTProf\n" if $profile && !defined &DB::enable_profile;
+
+my ( $config_merge_calls, $watcher_checks, $watcher_hits, $collector_projection_calls, $collector_signature_encodes ) = ( 0, 0, 0, 0, 0 );
+{
+    no warnings qw(redefine once);
+    my $original_app_json_encode = \&Developer::Dashboard::Web::App::json_encode;
+    *Developer::Dashboard::Web::App::json_encode = sub {
+        my ($payload) = @_;
+        $collector_signature_encodes++
+          if ref($payload) eq 'ARRAY' && @{$payload}
+          && ref( $payload->[0] ) eq 'HASH' && exists $payload->[0]{indicator};
+        return $original_app_json_encode->(@_);
+    };
+    my $original_merged = Developer::Dashboard::Config->can('merged');
+    *Developer::Dashboard::Config::merged = sub {
+        $config_merge_calls++;
+        return $original_merged->(@_);
+    };
+    my $original_indicator_collectors = Developer::Dashboard::Config->can('indicator_collectors');
+    *Developer::Dashboard::Config::indicator_collectors = sub {
+        $collector_projection_calls++;
+        return $original_indicator_collectors->(@_);
+    };
+    my $watcher_module = File::Spec->catfile( $SELECTED_LIB, 'Developer', 'Dashboard', 'IndicatorStore', 'Watch.pm' );
+    if ( -f $watcher_module ) {
+        require Developer::Dashboard::IndicatorStore::Watch;
+        my $original_unchanged = Developer::Dashboard::IndicatorStore::Watch->can('unchanged');
+        *Developer::Dashboard::IndicatorStore::Watch::unchanged = sub {
+            $watcher_checks++;
+            my $unchanged = $original_unchanged->(@_);
+            $watcher_hits++ if $unchanged;
+            return $unchanged;
+        };
+    }
+}
+
+my $original_cwd = getcwd();
+END {
+    if ( defined $original_cwd && $original_cwd ne '' && getcwd() ne $original_cwd ) {
+        chdir $original_cwd or die "Unable to restore benchmark directory '$original_cwd': $!\n";
+    }
+}
+my $fixture_root = tempdir( 'problem48-status-route-XXXXXX', CLEANUP => 1 );
+my $home = File::Spec->catdir( $fixture_root, 'home' );
+make_path($home);
+local $ENV{HOME} = $home;
+chdir $home or die "Unable to enter benchmark HOME '$home': $!\n";
+
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+my $config = Developer::Dashboard::Config->new( paths => $paths, files => $files );
+my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
+my @jobs = map {
+    {
+        name      => sprintf( 'p48-status-%06d', $_ ),
+        cwd       => 'home',
+        code      => 'return 0;',
+        indicator => { name => sprintf( 'p48-status-%06d', $_ ), icon => 'x', priority => $_ },
+    }
+} 1 .. $indicator_count;
+$config->save_global( { collectors => \@jobs } );
+my $loaded_config = $config->load_global;
+die "Benchmark config did not reload the configured collector inventory\n"
+  if ref($loaded_config) ne 'HASH'
+  || ref( $loaded_config->{collectors} ) ne 'ARRAY'
+  || @{ $loaded_config->{collectors} } != $indicator_count;
+$indicators->sync_collectors( \@jobs, return_indicators => 1 );
+my @seeded_indicators = $indicators->list_indicators;
+die "Expected $indicator_count indicators, found " . scalar(@seeded_indicators) . "\n"
+  if @seeded_indicators != $indicator_count;
+
+my $app = Developer::Dashboard::Web::App->new(
+    auth     => Developer::Dashboard::Auth->new( paths => $paths, files => $files ),
+    config   => $config,
+    pages    => Developer::Dashboard::PageStore->new( paths => $paths ),
+    prompt   => Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators ),
+    runtime  => Developer::Dashboard::PageRuntime->new( paths => $paths ),
+    sessions => Developer::Dashboard::SessionStore->new( paths => $paths ),
+);
+
+my $first_response = _request_status($app);
+die "Status route returned HTTP $first_response->[0], expected 200\n"
+  if $first_response->[0] != 200;
+my $expected_body = $first_response->[2];
+die "Status route did not return a scalar response body\n" if !defined $expected_body || ref($expected_body);
+my $watcher_available = ref( $indicators->{_indicator_sync_watcher} )
+  eq 'Developer::Dashboard::IndicatorStore::Watch' ? 'yes' : 'no';
+my $config_snapshot_mode = $portable_config_cache ? 'portable' : 'automatic';
+for ( 1 .. 2 ) {
+    my $response = _request_status($app);
+    die "Status route returned HTTP $response->[0] during warmup\n" if $response->[0] != 200;
+    die "Status response changed during warmup\n" if $response->[2] ne $expected_body;
+}
+my @samples;
+DB::enable_profile() if $profile;
+for my $run ( 1 .. $runs ) {
+    my $started = time;
+    for ( 1 .. $iterations ) {
+        my $response = _request_status($app);
+        die "Status route returned HTTP $response->[0] in run $run\n" if $response->[0] != 200;
+        die "Status response changed in run $run\n" if $response->[2] ne $expected_body;
+    }
+    push @samples, time - $started;
+}
+DB::disable_profile() if $profile;
+
+my $median = _median(@samples);
+printf "source_lib=%s indicators=%d iterations=%d runs=%d config_snapshot=%s indicator_watcher=%s\n",
+  $SELECTED_LIB, $indicator_count, $iterations, $runs, $config_snapshot_mode, $watcher_available;
+printf "response_status=200 response_bytes=%d response_sha256=%s exact_response_parity=yes\n",
+  length($expected_body), sha256_hex($expected_body);
+printf "config_merges=%d watcher_checks=%d watcher_hits=%d collector_projections=%d collector_signature_encodes=%d\n",
+  $config_merge_calls, $watcher_checks, $watcher_hits, $collector_projection_calls, $collector_signature_encodes;
+printf "status_route_median_ms_per_request=%.6f profile=%s\n",
+  1000 * $median / $iterations, $profile ? 'yes' : 'no';
+
+chdir $original_cwd or die "Unable to restore benchmark directory '$original_cwd': $!\n";
+exit 0;
+
+# _request_status($app)
+# Executes one direct production Web::App status request with deterministic loopback inputs.
+# Input: a configured Developer::Dashboard::Web::App instance.
+# Output: the standard response array reference, or a clear exception on failure.
+sub _request_status {
+    my ($app) = @_;
+    if ( $no_collector_cache
+        && ref( $app->{_config_snapshot_cache} ) eq 'HASH'
+        && ref( $app->{_config_snapshot_cache}{snapshot} ) eq 'HASH' )
+    {
+        delete $app->{_config_snapshot_cache}{snapshot}{indicator_collectors};
+    }
+    if ( $no_collector_signature_cache
+        && ref( $app->{_config_snapshot_cache} ) eq 'HASH'
+        && ref( $app->{_config_snapshot_cache}{snapshot} ) eq 'HASH' )
+    {
+        delete $app->{_config_snapshot_cache}{snapshot}{indicator_collectors_signature};
+    }
+    my %request = (
+        path        => '/system/status',
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => { host => '127.0.0.1' },
+    );
+    if ($portable_config_cache) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_config_snapshot_watcher = sub { return };
+        return $app->handle(%request);
+    }
+    return $app->handle(%request);
+}
+
+# _median(@samples)
+# Returns the middle elapsed duration from an odd, non-empty sample set.
+# Input: elapsed wall-clock durations in seconds.
+# Output: median duration in seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _usage()
+# Describes workload, source-library, and NYTProf options.
+# Input: none.
+# Output: a command-line usage string.
+sub _usage {
+    return "Usage: P48_LIB=<lib> $0 [--indicators N] [--iterations N] [--runs ODD_N] [--profile|--no-profile] [--no-collector-cache] [--no-collector-signature-cache] [--portable-config-cache] [--help]\n"
+      . "Add --no-collector-cache for an exact-response control that recomputes configured indicator jobs each request.\n"
+      . "Add --no-collector-signature-cache to recompute the canonical signature for the validated collector projection each request.\n"
+      . "Add --portable-config-cache to bypass the config watcher and benchmark portable metadata/SHA-256 freshness checks.\n"
+      . "Measures the byte-identical production /system/status route using a private HOME.\n"
+      . "Set P48_LIB to select a checkout or v5.88 source tree; use --profile with perl -d:NYTProf and NYTPROF=start=no.\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-status-route-benchmark - profile and compare the production status route
+
+=head1 PURPOSE
+
+Measures the warmed C<Web::App-E<gt>handle('/system/status')> route with an
+isolated HOME, configurable synthetic collector inventory, exact response
+parity checks, and optional NYTProf profiling.
+
+=head1 WHY IT EXISTS
+
+Problem 48 requires evidence at real application boundaries as well as at
+individual helpers. This benchmark keeps the same route and request data while
+allowing C<P48_LIB> to select the v5.88 source tree or current checkout. It
+rejects non-200 responses and any body change instead of reporting a misleading
+timing comparison. Its report includes config-merge, filesystem-watch, and
+collector-projection and collector-signature counts to show whether
+cross-request cache reuse actually occurred. C<--no-collector-cache> removes
+the cached collector projection, and C<--no-collector-signature-cache>
+removes the cached canonical signature, before each request. Both controls
+preserve and compare exact output.
+C<--portable-config-cache> disables only the configuration snapshot watcher,
+leaving collector-sync behavior unchanged, so workflows can compare native and
+portable freshness paths on each supported platform.
+
+=head1 WHEN TO USE
+
+Use it after changing indicator synchronization, status response assembly,
+authorization settings lookup, or other code executed by C</system/status>.
+Use C<--profile> to collect NYTProf data around only the warmed request loop.
+
+=head1 HOW TO USE
+
+  d2 docker compose exec dev perl script/problem48-status-route-benchmark --indicators 50 --iterations 100 --runs 21
+  d2 docker compose exec dev perl script/problem48-status-route-benchmark --indicators 50 --iterations 100 --runs 21 --no-collector-cache
+  d2 docker compose exec dev perl script/problem48-status-route-benchmark --indicators 50 --iterations 100 --runs 21 --no-collector-signature-cache
+  d2 docker compose exec dev perl script/problem48-status-route-benchmark --indicators 50 --iterations 100 --runs 21 --portable-config-cache
+  d2 docker compose exec dev env P48_LIB=/work/nytprof/v588/lib NYTPROF=file=/work/nytprof/status-v588.out:start=no perl -d:NYTProf script/problem48-status-route-benchmark --indicators 50 --iterations 100 --runs 21 --profile
+  d2 docker compose exec dev env P48_LIB=/work/lib NYTPROF=file=/work/nytprof/status-current.out:start=no perl -d:NYTProf script/problem48-status-route-benchmark --indicators 50 --iterations 100 --runs 21 --profile
+
+The profile commands keep initialization and warmup outside the timed/profiled
+section. The benchmark creates and removes its synthetic HOME automatically.
+Its NYTProf output path is supplied through C<NYTPROF> and should remain in an
+isolated ignored working directory. C<config_merges>, C<watcher_checks>,
+C<watcher_hits>, and C<collector_projections> report real cache behavior
+alongside the route timing.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this script to determine whether
+micro-optimizations affect the actual status endpoint and to choose subsequent
+work from a production-route call tree.
+
+=head1 EXAMPLES
+
+Example 1: run the 50-indicator route comparison.
+
+  d2 docker compose exec dev perl script/problem48-status-route-benchmark
+
+Example 2: profile the currently selected library after warmup.
+
+  d2 docker compose exec dev env NYTPROF=file=/work/nytprof/status-route.out:start=no perl -d:NYTProf script/problem48-status-route-benchmark --profile
+
+Example 3: validate CLI documentation.
+
+  d2 docker compose exec dev perl script/problem48-status-route-benchmark --help
+
+=cut

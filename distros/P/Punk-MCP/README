@@ -1,0 +1,44 @@
+Punk-MCP
+
+Punk::MCP lets a Punk application answer the Model Context Protocol, so MCP
+clients can call its tools, read its resources and fetch its prompts. A tool
+call runs the same controller action a web route runs.
+
+The plugin is Punk::Plugin::MCP, and `punk mcp` serves an application over
+stdio.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+It needs a C compiler, Punk, File::Raw::JSON and JSON::Schema::Fast.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Punk::MCP
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Punk-MCP
+
+    Search CPAN
+        https://metacpan.org/release/Punk-MCP
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

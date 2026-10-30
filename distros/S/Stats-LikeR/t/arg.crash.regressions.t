@@ -179,10 +179,10 @@ sub child_result {
 		is(child_result($call), 'croak', "matrix: $call croaks, no signal");
 	}
 	like(do { local $@; eval { matrix([1..6], 0) }; $@ },
-	     qr/Dimensions must be greater than 0/,
-	     'matrix: a zero dimension keeps its old message');
+	     qr/\nmatrix: error: nrow and ncol must be greater than 0$/,
+	     'matrix: a zero dimension is refused as a call-form error, under the help screen');
 	like(do { local $@; eval { matrix([1..6], 'greater') }; $@ },
-	     qr/matrix: nrow must be a number/,
+	     qr/matrix: error: nrow must be a number/,
 	     'matrix: a non-numeric dimension names the argument');
 	# R truncates: matrix(1:6, nrow = 2.7) is a two-row matrix.
 	is(scalar @{ matrix([1..6], 2)   }, 2, 'matrix: nrow 2 still gives 2 rows');
@@ -220,22 +220,22 @@ sub child_result {
 
 # --- 3. scale: a matrix row that is a non-array reference (was SIGSEGV) -----
 {
-	# A row that is not an array-ref is treated as absent and reads as 0.0,
-	# which is what this function has always done with a plain string or an
-	# undef row (av_fetch() misses and the cell defaults).  The fix makes a
-	# reference to the wrong thing take that same path instead of being
-	# dereferenced as an AV; it deliberately does not start croaking, because
-	# that would change what the two already-tolerated rows do.
+	# A row that is not an array-ref used to be treated as absent and read as
+	# 0.0, which is what this function did with a plain string or an undef
+	# row.  Since 0.331 every such row croaks, as a short or long one does:
+	# a matrix has no row of zeros R would ever see.  What this section pins
+	# is still the crash: each call has to come back as a perl-level croak,
+	# not a signal.
 	for my $call ('scale([[1,2], sub { 1 }])',
 	              'scale([[1,2], \1])',
 	              'scale([[1,2], bless({}, q(Foo))])',
-	              'scale([[1,2], qr/x/])') {
-		is(child_result($call), 'ok', "$call completes without a signal");
+	              'scale([[1,2], qr/x/])',
+	              'scale([[1,2], undef])') {
+		is(child_result($call), 'croak', "$call croaks without a signal");
 	}
-	my @plain = scale([[1,2], undef]);
-	ok(scalar @plain, 'scale: an undef row still returns a result');
-	is_deeply([scale([[1,2], sub { 1 }])], [scale([[1,2], undef])],
-	          'scale: a code-ref row reads the same as an undef row');
+	like(eval { scale([[1,2], undef]); 1 } ? '' : $@,
+	     qr/^scale: row 1 of the matrix is not an array reference/,
+	     'scale: an undef row is named in the croak');
 	my @good = scale([[1,3],[2,4]]);
 	is(scalar @good, 1, 'scale: an ordinary matrix still returns one ref');
 }
@@ -248,7 +248,7 @@ sub child_result {
 		is(child_result($call), 'croak', "merge: $call croaks, no signal");
 	}
 	like(do { local $@; eval { merge(\1, [{a=>1}]) }; $@ },
-	     qr/merge: left frame must be AoH\/HoA\/HoH/,
+	     qr/merge: error: left frame must be AoH\/HoA\/HoH/,
 	     'merge: the frame check is the message the caller sees');
 	# The join itself is untouched.
 	my $j = merge([{id=>1, x=>10}], [{id=>1, y=>20}], on => 'id');
@@ -296,10 +296,10 @@ sub child_result {
 		is(child_result($call), 'croak', "$call croaks instead of aborting");
 	}
 	like(do { local $@; eval { rnorm(-1) }; $@ },
-	     qr/rnorm: n must be an integer >= 0, not -1/,
+	     qr/rnorm: error: n must be an integer >= 0, not -1/,
 	     'rnorm: the message names the function and the argument');
 	like(do { local $@; eval { hist([1,2,3], sub { 1 }) }; $@ },
-	     qr/hist: breaks must be a number/,
+	     qr/hist: error: breaks must be a number/,
 	     'hist: a reference in the breaks slot names the argument');
 	# runif already had this check; the shared one must not change it.
 	like(do { local $@; eval { runif(-1) }; $@ },
@@ -313,7 +313,7 @@ sub child_result {
 {
 	for my $bad (0, -5, -1) {
 		like(do { local $@; eval { hist([1,2,3,4,5], breaks => $bad) }; $@ },
-		     qr/hist: breaks must be an integer >= 1/,
+		     qr/hist: error: breaks must be an integer >= 1/,
 		     "hist: breaks => $bad is refused (R: invalid number of 'breaks')");
 	}
 	# R: hist(1:5, breaks = 2) and breaks = 2.7 both give 0 2 4 6, counts 2 2 1.
@@ -341,7 +341,7 @@ sub child_result {
 	     qr/sample: cannot take a sample of 5 from a population of 2/,
 	     'sample: the hash branch croaks the same way the array branch does');
 	like(do { local $@; eval { sample('not a ref', 1) }; $@ },
-	     qr/Usage: sample/,
+	     qr/\Ausage: sample\(.*\n\nsample: error: the first argument must be an array or hash reference\n\z/s,
 	     'sample: a non-reference is a usage error, not a silent undef');
 	# The ordinary draws are unchanged, and no element is ever undef.
 	my $a = sample([qw(a b c d e)], 3);

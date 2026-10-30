@@ -55,9 +55,16 @@ subtest 'flush() is a no-op that chains' => sub {
 	is($logger->count(), 0, 'flush is not captured');
 };
 
+subtest 'reopen() is a no-op that chains, as Log::Abstraction 0.41 has it' => sub {
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	my $out = capture_diag { is($logger->reopen(), $logger, 'reopen returns $self') };
+	is($logger->count(), 0, 'reopen is not captured');
+	is($out, '', 'and no "no method" notice is printed');
+};
+
 subtest 'class-method calls croak clearly' => sub {
 	my $class = 'Test::Log::Abstraction';
-	foreach my $method (qw(warn trace is_debug messages clear count empty verbose level lang flush)) {
+	foreach my $method (qw(warn trace is_debug messages clear count empty verbose level lang flush reopen)) {
 		throws_ok { $class->$method() } qr/\Q$method\E\(\) must be called on an object/, "$method on the class croaks";
 	}
 	throws_ok { $class->like(qr/x/) } qr/like\(\) must be called on an object/, 'like on the class croaks';

@@ -23,7 +23,7 @@ use IO::Interactive;
 use List::Util qw(none pairs any);
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.3.1';
+our $VERSION = '2.4.0';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -40,6 +40,7 @@ __PACKAGE__->mk_accessors(
     _commands
     _program
     _abbreviations
+    _options
   )
 );
 
@@ -70,19 +71,30 @@ sub import {
 ########################################################################
   my ( $class, @args ) = @_;
 
-  if ( any { $_ eq ':roles' } @args ) {
-    my $caller = caller;
+  my $caller = caller;
 
+  my @yaml_files = grep {/[.]ya?ml\z/xsm} @args;
+
+  @yaml_files = map { /[*?\[]/xsm ? glob($_) : $_ } @yaml_files;
+
+  if ( any { $_ eq ':roles' } @args ) {
     if ( !${^COMPILING} ) {
       ( my $dist = $caller ) =~ s/::/-/gxsm;
       my $yaml_file = lc($dist) . '.yml';
 
       require File::ShareDir;
       my $path = eval { File::ShareDir::dist_file( $dist, $yaml_file ) };
-      undef $path if $path && !-e $path;
 
-      $class->_load_manifest( $caller, $path ) if $path;
+      if ( $path && !-e $path ) {
+        undef $path;
+      }
+
+      unshift @yaml_files, $path if $path;
     }
+  }
+
+  if (@yaml_files) {
+    $class->_load_manifest( $caller, @yaml_files );
   }
 
   # preserve existing Exporter behaviour
@@ -92,14 +104,145 @@ sub import {
 }
 
 ########################################################################
+sub _validate_manifest {
+########################################################################
+  my ( $class, $manifest, $filename ) = @_;
+
+  my %section_types = (
+    commands        => 'HASH',
+    roles           => 'HASH',
+    options         => 'ARRAY',
+    default_options => 'HASH',
+    extra_options   => 'ARRAY',
+    alias           => 'HASH',
+    abbreviations   => 'SCALAR',
+    version         => 'SCALAR',
+    distribution    => 'SCALAR',
+  );
+
+  die sprintf "ERROR: manifest %s must contain a YAML mapping\n", $filename
+    if !ref $manifest || reftype($manifest) ne 'HASH';
+
+  foreach my $key ( keys %{$manifest} ) {
+    die sprintf "ERROR: unknown manifest key '%s' in %s\n", $key, $filename
+      if !exists $section_types{$key};
+
+    my $expected = $section_types{$key};
+    my $value    = $manifest->{$key};
+
+    if ( $expected eq 'SCALAR' ) {
+      die sprintf "ERROR: manifest key '%s' in %s must be a scalar\n", $key, $filename
+        if ref $value;
+
+      next;
+    }
+
+    die sprintf "ERROR: manifest key '%s' in %s must be a %s\n", $key, $filename, $expected
+      if !ref $value || reftype($value) ne $expected;
+  }
+
+  foreach my $section (qw(options extra_options)) {
+    foreach my $value ( @{ $manifest->{$section} // [] } ) {
+      die sprintf "ERROR: manifest key '%s' in %s must contain scalar values\n", $section, $filename
+        if ref $value;
+    }
+  }
+
+  return;
+}
+
+########################################################################
 sub _load_manifest {
 ########################################################################
-  my ( $class, $target, $yaml_file ) = @_;
+  my ( $class, $target, @yaml_files ) = @_;
 
   require YAML::Tiny;
 
-  my $manifest = YAML::Tiny::LoadFile($yaml_file)
-    or die "ERROR: could not load manifest: $yaml_file\n";
+  my $manifest = {};
+  my %option_owner;
+  my %default_owner;
+
+  foreach my $yaml_file (@yaml_files) {
+    my $additional = YAML::Tiny::LoadFile($yaml_file)
+      or die "ERROR: could not load manifest: $yaml_file\n";
+
+    $class->_validate_manifest( $additional, $yaml_file );
+
+    foreach my $section (qw(commands roles)) {
+      my $entries = $additional->{$section} // {};
+
+      foreach my $cmd ( keys %{$entries} ) {
+        die sprintf "ERROR: duplicate command '%s' in %s\n", $cmd, $yaml_file
+          if $yaml_file ne $yaml_files[0]
+          && ( exists $manifest->{commands}{$cmd}
+          || exists $manifest->{roles}{$cmd} );
+
+        $manifest->{$section}{$cmd} = $entries->{$cmd};
+      }
+    }
+
+    # Options belong to a single global namespace, including aliases.
+    foreach my $spec ( @{ $additional->{options} // [] } ) {
+      my ($names) = $spec =~ /\A([\w|-]+)/xsm;
+      die sprintf "ERROR: invalid option specification '%s' in %s\n", $spec, $yaml_file
+        if !$names;
+
+      foreach my $name ( split /[|]/xsm, $names ) {
+        ( my $accessor = $name ) =~ s/-/_/gxsm;
+        die sprintf "ERROR: duplicate option '%s' in %s (already declared in %s)\n", $name, $yaml_file, $option_owner{$accessor}
+          if exists $option_owner{$accessor};
+
+        $option_owner{$accessor} = $yaml_file;
+      }
+
+      push @{ $manifest->{options} }, $spec;
+    }
+
+    foreach my $name ( keys %{ $additional->{default_options} // {} } ) {
+      ( my $accessor = $name ) =~ s/-/_/gxsm;
+      die sprintf "ERROR: duplicate default option '%s' in %s (already declared in %s)\n",
+        $name, $yaml_file, $default_owner{$accessor}
+        if exists $default_owner{$accessor};
+
+      $default_owner{$accessor} = $yaml_file;
+      $manifest->{default_options}{$name} = $additional->{default_options}{$name};
+    }
+
+    # Accessor declarations may repeat; they do not introduce new switches.
+    my %extra_seen;
+
+    foreach my $name ( @{ $manifest->{extra_options} // [] } ) {
+      ( my $accessor = $name ) =~ s/-/_/gxsm;
+      $extra_seen{$accessor} = 1;
+    }
+
+    foreach my $name ( @{ $additional->{extra_options} // [] } ) {
+      ( my $accessor = $name ) =~ s/-/_/gxsm;
+      next if $extra_seen{$accessor}++;
+      push @{ $manifest->{extra_options} }, $name;
+    }
+
+    # Only the primary manifest controls application-wide metadata.
+    if ( $yaml_file eq $yaml_files[0] ) {
+      foreach my $key ( keys %{$additional} ) {
+        next if any { $key eq $_ } qw(commands roles options default_options extra_options);
+        $manifest->{$key} = $additional->{$key};
+      }
+    }
+  }
+
+  $class->_normalize_manifest($manifest);
+
+  no strict 'refs'; ## no critic
+  ${"${target}::_CLI_MANIFEST"} = $manifest;
+
+  return;
+}
+
+########################################################################
+sub _normalize_manifest {
+########################################################################
+  my ( $class, $manifest ) = @_;
 
   my $commands = $manifest->{commands} // {};
   my $roles    = $manifest->{roles}    // {};
@@ -135,10 +278,6 @@ sub _load_manifest {
   $manifest->{_commands} = $commands;
   $manifest->{_roles}    = \%selective_roles;
 
-  # store on the target class
-  no strict 'refs'; ## no critic
-  ${"${target}::_CLI_MANIFEST"} = $manifest;
-
   return;
 }
 
@@ -172,10 +311,63 @@ sub main {
   return $cli->run;
 }
 
+my %LOGGER_ENABLED;
+my %OPTION_PROVIDERS;
+my %OPTION_PROVIDER_ORDER;
+
 ########################################################################
 sub _use_logger {
 ########################################################################
-  return $USE_LOGGER;
+  my ($self) = @_;
+
+  my $class = ref $self || $self;
+
+  return $LOGGER_ENABLED{$class} // $FALSE;
+}
+
+########################################################################
+sub use_options {
+########################################################################
+
+  my ( $class, @providers ) = @_;
+
+  require Role::Tiny;
+
+  croak 'Odd number of arguments to use_options'
+    if @providers % 2;
+
+  while (@providers) {
+    my ( $name, $definition ) = splice @providers, 0, 2;
+
+    croak sprintf q{Invalid provider name: %s}, $name
+      if $name !~ /\A[a-z][a-z0-9_]*\z/;
+
+    croak sprintf q{Duplicate option provider: %s}, $name
+      if exists $OPTION_PROVIDERS{$class}{$name};
+
+    my ($role) = keys %{$definition};
+
+    croak sprintf q{Invalid provider definition: %s}, $name
+      if keys %{$definition} != 1;
+
+    my $options = $definition->{$role};
+
+    croak sprintf q{Invalid option list for provider: %s}, $name
+      if ref $options ne 'ARRAY';
+
+    Role::Tiny->apply_roles_to_package( $class, $role );
+
+    $OPTION_PROVIDER_ORDER{$class} //= [];
+
+    push @{ $OPTION_PROVIDER_ORDER{$class} }, $name;
+
+    $OPTION_PROVIDERS{$class}{$name} = {
+      role    => $role,
+      options => [ @{$options} ],
+    };
+  }
+
+  return $class;
 }
 
 ########################################################################
@@ -223,7 +415,7 @@ sub use_log4perl {
   }
 
   {
-    $USE_LOGGER = $TRUE;
+    $LOGGER_ENABLED{$class} = $TRUE;
 
     no strict 'refs'; ## no critic (ProhibitNoStrict)
     *{"${class}::get_log4perl_conf"}  = sub { return $log4perl_conf };
@@ -302,7 +494,8 @@ sub new {
 
   $default_options //= {};
 
-  my $options = { %{$default_options} };
+  # my $options = { %{$default_options} };
+  my $options = {};
 
   if ( $class->_use_logger && none { $_ eq 'log-level' } @{$option_specs} ) {
     push @{$option_specs}, 'log-level=s';
@@ -366,6 +559,7 @@ sub new {
     # genuine naming collision this check exists to catch. Track what
     # this class has already generated, per class, so a repeat
     # construction doesn't get mistaken for a hand-written conflict.
+
     if ( !$GENERATED_ACCESSOR{$class}{$_} ) {
       die "ERROR: accessor for $_ already exists!\n"
         if $class->can( 'get_' . $_ ) || $class->can( 'set_' . $_ );
@@ -426,6 +620,7 @@ sub new {
   }
 
   my $self = $class->SUPER::new( \%cli_options );
+  $self->set__options($options);
 
   if ( !$self->can('get_help_sections') ) {
     $self->mk_accessors('help_sections');
@@ -435,7 +630,7 @@ sub new {
     $help_sections //= $self->get_help_sections;
   }
 
-  $help_sections //= [@DEFAULT_HELP_SECTIONS];
+  $help_sections //= $default_options->{help_sections} // [@DEFAULT_HELP_SECTIONS];
 
   $self->set_help_sections($help_sections);
 
@@ -562,7 +757,84 @@ sub new {
 
   $self->init_logger;
 
+  my %resolved = map { $_ => 1 } keys %{$options};
+  $self->resolve_option_providers( \%resolved, \@accessors );
+  $self->init_defaults( $default_options, \%resolved );
+
   $self->can('init') && $self->init();
+
+  return $self;
+}
+
+########################################################################
+sub options {
+########################################################################
+  my ($self) = @_;
+
+  return $self->get__options;
+}
+
+########################################################################
+sub resolve_option_providers {
+########################################################################
+  my ( $self, $resolved, $eligible_names ) = @_;
+
+  my $class = ref $self || $self;
+  $resolved //= {};
+
+  my %eligible = map { $_ => 1 } @{ $eligible_names // [] };
+
+  foreach my $name ( @{ $OPTION_PROVIDER_ORDER{$class} // [] } ) {
+    my $provider  = $OPTION_PROVIDERS{$class}{$name};
+    my @requested = @{ $provider->{options} };
+    if ( !@requested ) {
+      @requested = keys %eligible;
+    }
+
+    my %seen;
+    my @unresolved = grep { !$seen{$_}++ && exists $eligible{$_} && !exists $resolved->{$_} } @requested;
+    next if !@unresolved;
+
+    my $init     = q{_} . $name . q{_init};
+    my $resolver = q{_} . $name . q{_resolve};
+
+    croak sprintf q{Option provider '%s' has no resolver '%s'}, $name, $resolver
+      if !$self->can($resolver);
+
+    if ( $self->can($init) ) {
+      $self->$init();
+    }
+
+    my $values = $self->$resolver(@unresolved);
+    croak sprintf q{Option provider '%s' must return a hash reference}, $name
+      if !ref $values || reftype($values) ne 'HASH';
+
+    my %allowed = map { $_ => 1 } @unresolved;
+    foreach my $option ( keys %{$values} ) {
+      croak sprintf q{Option provider '%s' returned unrequested option '%s'}, $name, $option
+        if !exists $allowed{$option};
+
+      $self->set( $option, $values->{$option} );
+      $resolved->{$option} = 1;
+    }
+  }
+
+  return $self;
+}
+
+########################################################################
+sub init_defaults {
+########################################################################
+  my ( $self, $default_options, $resolved ) = @_;
+  $resolved //= {};
+
+  foreach my $o ( keys %{$default_options} ) {
+    next if !$self->can( 'set_' . $o );
+    next if exists $resolved->{$o};
+    next if defined $self->get($o);
+
+    $self->set( $o, $default_options->{$o} );
+  }
 
   return $self;
 }
@@ -655,7 +927,6 @@ sub init_logger {
       Log::Log4perl->init( ref $config ? $config : \$config );
     }
     else {
-      Log::Log4perl->import(':easy');
       Log::Log4perl->easy_init( $LOG_LEVELS{error} );
     }
 
@@ -663,29 +934,24 @@ sub init_logger {
 
     $self->set_logger($logger);
 
-    my $level = $self->get_log_level // $self->get_log4perl_level;
-
-    $self->set_log_level($level);
-
-    if ($level) {
-      $logger->level( $LOG_LEVELS{$level} );
-    }
   }
+  return $self
+    if !$self->_use_logger || !$self->can('get_logger') || !$self->get_logger;
 
   my $commands = $self->commands;
   my $command  = $self->command;
 
-  return $self
-    if !$command || !$commands->{$command} || !ref( $commands->{command} ) || reftype( $commands->{$command} ) ne 'ARRAY';
+  my $command_level;
 
-  my ( $sub, $log_level ) = @{ $commands->{$command} };
+  if ( $command && ref( $commands->{$command} ) && reftype( $commands->{$command} ) eq 'ARRAY' ) {
+    ( undef, $command_level ) = @{ $commands->{$command} };
+  }
 
-  return $self
-    if !$self->get_logger;
+  my $level = $self->get_log_level // $command_level // $self->get_log4perl_level;
 
-  $log_level = $self->get_log_level // $log_level;
+  $self->set_log_level($level);
 
-  $self->get_logger->level( $LOG_LEVELS{$log_level} // $LOG_LEVELS{info} );
+  $self->get_logger->level( $LOG_LEVELS{$level} // $LOG_LEVELS{info} );
 
   return $self;
 }
@@ -753,6 +1019,11 @@ sub usage {
   my $wrapper = $ENV{MODULINO_WRAPPER} // q{};
 
   my $input = $wrapper eq 'cli-simple' ? $INC{'CLI/Simple/Shell.pm'} : $self->get__program;
+
+  if ( $wrapper && $wrapper ne 'cli-simple' && $ENV{MODULINO_MODULE_NAME} ) {
+    ( my $module_file = $ENV{MODULINO_MODULE_NAME} ) =~ s{::}{/}gxsm;
+    $input = $INC{"$module_file.pm"};
+  }
 
   if ( $PAGER && IO::Interactive::is_interactive ) {
     eval {
@@ -990,6 +1261,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 CLI::Simple - a minimalist object oriented base class for CLI applications
@@ -1003,44 +1276,39 @@ CLI::Simple - a minimalist object oriented base class for CLI applications
  use strict;
  use warnings;
 
- use CLI::Simple::Constants qw(:booleans :chars);
- use CLI::Simple qw($AUTO_HELP $AUTO_DEFAULT);
-
  use parent qw(CLI::Simple);
 
  caller or exit __PACKAGE__->main();
 
- sub execute {
-   my ($self) = @_;
-
-   # retrieve a CLI option   
-   my $file = $self->get_file;
-   ...
- }
-
- sub list { 
-   my ($self) = @_
-
-   # retrieve a command argument
-   my ($file) = $self->get_args();
-   ...
- }
-
  sub main {
-
-   # Disable auto-default for single commands, enable auto-help
-   $AUTO_DEFAULT = 0;
-   $AUTO_HELP = 1;
 
    my $cli = MyScript->new(
     option_specs    => [ qw( help format=s file=s) ],
     default_options => { format => 'json' }, # set some defaults
     extra_options   => [ qw( content ) ], # non-option, setter/getter
-    commands        => { execute => \&execute, list => \&list,  }
+    commands        => { execute => \&cmd_execute, list => \&cmd_list,  },
     alias           => { options => { fmt => 'format' }, commands => { ls => 'list' } },
    );
 
    return $cli->run();
+ }
+
+ sub cmd_execute {
+   my ($self) = @_;
+
+   # retrieve a CLI option   
+   my $file = $self->get_file;
+   ...
+   return 0;
+ }
+
+ sub cmd_list { 
+   my ($self) = @_;
+
+   # retrieve a command argument
+   my ($file) = $self->get_args();
+   ...
+   return 0;
  }
 
  1;
@@ -1130,9 +1398,23 @@ command. The original C<commands> form remains supported for backward
 compatibility and retains its original behavior of composing the complete
 set of command roles.
 
+Version 2.4.0 introduces pluggable option providers. CLI applications
+frequently obtain option values from multiple sources, including the
+command line, environment variables, configuration files, and credential
+stores. Traditionally, each application must implement its own logic
+for retrieving these values and determining their precedence, often
+duplicating much of the same code in its C<init()> method.
+
+Option providers move that responsibility into reusable L<Role::Tiny>
+roles. Applications register the providers they need, in precedence
+order, and C<CLI::Simple> coordinates resolution of options not supplied
+on the command line. This eliminates repetitive initialization logic
+while leaving each provider responsible for how and where it obtains
+its values.
+
 =head1 VERSION
 
-This documentation refers to version 2.3.1.
+This documentation refers to version 2.4.0.
 
 =head1 FEATURES
 
@@ -1162,7 +1444,103 @@ This documentation refers to version 2.3.1.
 
 =item * customizable help sections via C<help_sections>
 
+=item * pluggable option providers with ordered resolution and precedence
+
 =back
+
+=head1 QUICK START
+
+=head2 Single-Module Application
+
+The simplest way to use C<CLI::Simple> is to subclass it and define
+your commands as methods in the same module:
+
+  package My::Script;
+
+  use strict;
+  use warnings;
+
+  use CLI::Simple::Constants qw(:booleans);
+
+  use parent qw(CLI::Simple);
+
+  caller or exit __PACKAGE__->main;
+
+  sub cmd_frobnicate {
+    my ($self) = @_;
+    my $output = $self->get_output;
+    ...
+    return $SUCCESS;
+  }
+
+  sub main {
+    __PACKAGE__->new(
+      option_specs => [ qw( help|h verbose|v output|o=s ) ],
+      commands     => { frobnicate => \&cmd_frobnicate },
+    )->run;
+  }
+
+  1;
+
+=head2 Role-Based Application
+
+For larger applications, declare your commands and options in a YAML
+manifest and implement each command in a dedicated L<Role::Tiny> role.
+Your main module becomes a single declaration:
+
+  package My::Script;
+
+  use strict;
+  use warnings;
+
+  use CLI::Simple qw(:roles);
+  use parent qw(CLI::Simple);
+
+  our $VERSION = '1.0.0';
+
+  caller or exit __PACKAGE__->main;
+
+  1;
+
+B<Naming convention:> The YAML manifest filename is derived from your
+module name - C<My::Script> looks for C<my-script.yml> in the
+distribution share directory. You must package the spec file with your
+distribution.
+
+The manifest maps commands to roles:
+
+  ---
+  roles:
+    frobnicate: My::Script::Role::Frobnicate
+    list:       My::Script::Role::List
+  options:
+    - help|h
+    - verbose|v
+    - output|o=s
+
+Each role implements one or more commands:
+
+  package My::Script::Role::Frobnicate;
+
+  use Role::Tiny;
+  use CLI::Simple::Constants qw(:booleans);
+
+  sub cmd_frobnicate {
+    my ($self) = @_;
+    ...
+    return $SUCCESS;
+  }
+
+  1;
+
+To easily generate the directory structure, role stubs, and build
+files for this architecture, C<CLI::Simple> provides a built-in
+C<-scaffold> tool.
+
+See L</-scaffold> for detailed instructions on generating a role-based
+project tarball from a monolithic script or a YAML manifest. For a
+comprehensive guide on transitioning your application, see
+L</ROLE-BASED ARCHITECTURE>.
 
 =head1 MODULINOS
 
@@ -1268,100 +1646,6 @@ name from the module name by convention - C<My::Script> becomes
 C<my-script>. Set it explicitly when the wrapper name does not follow
 this convention.
 
-=head1 QUICK START
-
-=head2 Single-Module Application
-
-The simplest way to use C<CLI::Simple> is to subclass it and define
-your commands as methods in the same module:
-
-  package My::Script;
-
-  use strict;
-  use warnings;
-
-  use CLI::Simple::Constants qw(:booleans);
-
-  use parent qw(CLI::Simple);
-
-  caller or exit __PACKAGE__->main;
-
-  sub cmd_frobnicate {
-    my ($self) = @_;
-    my $output = $self->get_output;
-    ...
-    return $SUCCESS;
-  }
-
-  sub main {
-    __PACKAGE__->new(
-      option_specs => [ qw( help|h verbose|v output|o=s ) ],
-      commands     => { frobnicate => \&cmd_frobnicate },
-    )->run;
-  }
-
-  1;
-
-=head2 Role-Based Application
-
-For larger applications, declare your commands and options in a YAML
-manifest and implement each command in a dedicated L<Role::Tiny> role.
-Your main module becomes a single declaration:
-
-  package My::Script;
-
-  use strict;
-  use warnings;
-
-  use CLI::Simple qw(:roles);
-  use parent qw(CLI::Simple);
-
-  our $VERSION = '1.0.0';
-
-  caller or exit __PACKAGE__->main;
-
-  1;
-
-B<Naming convention:> The YAML manifest filename is derived from your
-module name - C<My::Script> looks for C<my-script.yml> in the
-distribution share directory. You must package the spec file with your
-distribution.
-
-The manifest maps commands to roles:
-
-  ---
-  roles:
-    frobnicate: My::Script::Role::Frobnicate
-    list:       My::Script::Role::List
-  options:
-    - help|h
-    - verbose|v
-    - output|o=s
-
-Each role implements one or more commands:
-
-  package My::Script::Role::Frobnicate;
-
-  use Role::Tiny;
-  use CLI::Simple::Constants qw(:booleans);
-
-  sub cmd_frobnicate {
-    my ($self) = @_;
-    ...
-    return $SUCCESS;
-  }
-
-  1;
-
-To easily generate the directory structure, role stubs, and build
-files for this architecture, C<CLI::Simple> provides a built-in
-C<-scaffold> tool.
-
-See L</-scaffold> for detailed instructions on generating a role-based
-project tarball from a monolithic script or a YAML manifest. For a
-comprehensive guide on transitioning your application, see
-L</ROLE-BASED ARCHITECTURE>.
-
 =head1 ROLE-BASED ARCHITECTURE
 
 C<CLI::Simple> 2.0.0 introduced an optional role-based architecture
@@ -1379,21 +1663,14 @@ its original behavior of composing the complete set of command roles.
 
 =head2 The YAML Manifest
 
-The manifest is a YAML file that declares your commands, options, and
-defaults. By convention the filename is derived from your module name:
+By default, C<CLI::Simple> locates the application's manifest via
+L<File::ShareDir> using the distribution name derived from the module
+name. The manifest must be installed as part of the distribution.
 
-  My::Script                 ->  my-script.yml
-  CPAN::Maker::Bootstrapper  ->  cpan-maker-bootstrapper.yml
-
-C<CLI::Simple> locates the manifest via L<File::ShareDir> using the
-distribution name derived from the module name. The manifest must be
-installed as part of the distribution - it cannot be loaded from an
-arbitrary location.
-
-I<Security note: The manifest is loaded exclusively from the
-distribution share directory via L<File::ShareDir>. A manifest that
-was not installed as part of the distribution cannot be loaded. This
-provides the same security model as Perl module loading itself.>
+Additional YAML manifests may be supplied as arguments to
+C<use CLI::Simple>. These may be explicit filenames or glob patterns,
+allowing applications to discover command registrations from
+project-local configuration files.
 
 I<Note: Version 2.3.0 introduces C<roles:> for selective role
 composition. The original C<commands:> form remains supported for
@@ -1410,7 +1687,8 @@ A minimal manifest:
     - verbose|v
     - output|o=s
 
-A complete manifest with all supported keys:
+A manifest defining commands, options, defaults, and additional
+accessors:
 
   ---
   roles:
@@ -1425,6 +1703,92 @@ A complete manifest with all supported keys:
   extra_options:
     - dbh
     - config_data
+
+Manifest section names use underscores, not hyphens. For example,
+C<default_options> and C<extra_options> are valid section names;
+C<default-options> and C<extra-options> are not.
+
+Unknown manifest keys and values that do not match the expected
+section types cause an error when the manifest is loaded.
+
+=head2 Loading Multiple Manifests
+
+C<CLI::Simple> supports loading multiple YAML manifests during import.
+This allows an application to extend its commands, roles, and options
+without modifying its primary manifest. Each additional manifest may
+contribute command definitions, option specifications, default values,
+and additional accessors.
+
+Additional manifests may be specified as filenames:
+
+  use CLI::Simple qw(
+    :roles
+    extensions/publish.yml
+    extensions/deploy.yml
+  );
+
+Glob patterns are also supported:
+
+  use CLI::Simple qw(
+    :roles
+    .roles/*/role.yml
+  );
+
+When C<:roles> is specified, C<CLI::Simple> first attempts to load the
+application's installed manifest through L<File::ShareDir>. Additional
+manifests are then loaded in the order supplied.
+
+All manifests contribute C<options>, C<default_options>, and
+C<extra_options> to the application's global option namespace. Duplicate
+option names (including aliases) and duplicate default keys are errors.
+Repeated C<extra_options> declarations are harmless, and an accessor may
+appear in both C<options> and C<extra_options>.
+
+The first manifest alone supplies application-wide C<alias> and
+C<abbreviations> metadata. Subsequent manifests also contribute
+C<roles:> and C<commands:> entries.
+
+Command names must be unique across all manifests. An attempt to
+register a command more than once causes an error.
+
+An unmatched glob pattern contributes no manifests and does not cause
+an error. An explicitly named YAML file that cannot be loaded causes
+an error.
+
+Explicit YAML filenames may also be supplied without C<:roles>:
+
+  use CLI::Simple qw(
+    config/application.yml
+    .roles/*/role.yml
+  );
+
+In this case, the first explicitly supplied manifest provides the
+application-wide configuration.
+
+Loading a manifest does not compose its roles. For commands declared
+under C<roles:>, only the roles associated with the selected command
+are composed during application startup.
+
+See L</roles: vs commands:> for the distinction between selective
+and legacy role composition.
+
+=head2 Option Initialization
+
+Option specifications and defaults from all manifests are registered
+globally, but only the B<roles> for the selected command are composed.
+
+Because option specifications and defaults are merged from all
+manifests, they are available regardless of which command is selected.
+Manifest defaults are equivalent to values supplied through the
+C<default_options> argument to C<new()>.
+
+Applications should use C<init()> when option values require
+additional initialization or resolution after command-line parsing.
+
+Manifest defaults are applied before C<init()>, but after command-line
+options have been parsed. Applications may inspect C<options()> to
+determine which options were explicitly supplied on the command line
+and override default values during C<init()>.
 
 =head2 Command Values
 
@@ -1467,7 +1831,7 @@ New applications should use C<roles:>. The original C<commands:>
 manifest key remains supported for backward compatibility.
 
 With C<commands:>, selecting a command causes all roles referenced
-by the manifest's command definitions to be composed into the
+by the loaded manifests' command definitions to be composed into the
 application, regardless of which command is being executed.
 
 This makes methods from every composed role available throughout
@@ -1581,30 +1945,41 @@ regardless of which command is selected.
 
 =head2 Activating Role-Based Architecture
 
-Add C<:roles> to your C<use CLI::Simple> statement:
+Role-based applications load their YAML manifests through
+C<use CLI::Simple>.
+
+To load the application's installed manifest, specify C<:roles>:
 
   use CLI::Simple qw(:roles);
 
-This causes C<CLI::Simple> to load the YAML manifest and retain its
-command, role, option, alias, and abbreviation metadata for the
-application.
+C<CLI::Simple> locates the manifest through L<File::ShareDir>
+and retains its command, role, option, alias, and abbreviation
+metadata for the application.
 
-Role composition does not occur while the manifest is being loaded.
+Alternatively, specify an explicit YAML manifest:
 
-When the application is started, C<CLI::Simple> first resolves the
-selected command, including aliases and abbreviations. It then composes
-the role or roles required by that command.
+  use CLI::Simple qw(config/application.yml);
 
-For commands declared beneath C<roles:>, only the associated role set
-is composed.
+Both forms may be combined with additional YAML manifests or
+glob patterns. See L</Loading Multiple Manifests>.
+
+Role composition does not occur while manifests are being loaded.
+
+When the application starts, C<CLI::Simple> resolves the selected
+command, including aliases and abbreviations, before composing
+the required roles.
+
+For commands declared beneath C<roles:>, only the associated
+role set is composed.
 
 For legacy commands declared beneath C<commands:>, the original
-all-role composition behavior is retained for backward compatibility.
+all-role composition behavior is retained for backward
+compatibility.
 
 =head2 The Inherited main()
 
-When using C<:roles>, your class inherits C<main()> from
-C<CLI::Simple>:
+When using a YAML manifest, your class can inherit C<main()>
+from C<CLI::Simple>:
 
   caller or exit __PACKAGE__->main;
 
@@ -1622,58 +1997,63 @@ C<init()>, or explicitly composed application roles.
 
 =head2 Distributing the Manifest
 
-The YAML manifest is part of the application's runtime configuration
-and must be installed with the distribution.
+When using C<:roles>, the application's primary YAML manifest must
+be installed in the distribution's share directory.
 
 C<CPAN::Maker> users can add it to C<extra-files> in
-F<buildspec.yml> so it is installed into the distribution's share
-directory:
+F<buildspec.yml>:
 
   extra-files:
     - share:
       - my-script.yml
 
-During development the manifest is found via C<%INC>. After
-installation it is found via L<File::ShareDir>. No code changes are
-required between the two environments.
+Additional manifests supplied as import arguments are loaded from
+the filesystem. They do not need to be installed in the
+distribution's share directory.
+
+For example:
+
+  use CLI::Simple qw(
+    :roles
+    .roles/*/role.yml
+  );
+
+This allows applications to maintain additional commands, roles,
+and options independently of their primary manifest.
+
+For example, an application may load optional extensions from
+F<.roles/>. Each extension can provide its own manifest and
+implementation without modifying the application's primary
+manifest. Extensions are available only when their manifests
+are present and loaded.
+
+See L</Loading Multiple Manifests> for manifest precedence and
+merging behavior.
 
 =head1 PHILOSOPHY AND DESIGN PRINCIPLES
 
-C<CLI::Simple> is intentionally minimalist. It provides just enough
-structure to build command-line tools with subcommands, option
-parsing, and help handling -- but without enforcing any particular
-framework or lifecycle.
+Getting started with C<CLI::Simple> is intentionally simple.
+It provides a structured, convention-based approach to building
+command-line applications, including option parsing, command
+dispatch, defaults, logging, and help handling, without requiring
+developers to adopt its optional role-based framework.
 
-=head2 Not a Framework
+For a single-module application, you register commands directly
+using the C<commands> constructor parameter. Command handlers
+can be implemented as methods or subroutines, allowing you to
+organize application logic according to your own conventions.
 
-This module is not L<App::Cmd>, L<MooseX::Getopt>, or a full
-application toolkit.  Instead, it offers:
+For applications that need greater modularity, C<CLI::Simple> also
+provides an optional role-based framework. YAML manifests
+declare commands, options, and the roles required to implement
+them. The framework manages manifest loading and role composition,
+including selective composition of the roles required by a
+particular command.
 
-=over 4
+You can use C<CLI::Simple> without adopting the role-based framework.
 
-=item *
-
-An object-oriented base class with a clean C<run()> dispatcher
-
-=item *
-
-Command-line parsing via C<Getopt::Long>
-
-=item *
-
-Built-in logging via C<Log::Log4perl>
-
-=item *
-
-Subclass hooks like C<init()> for setup and validation
-
-=item *
-
-Optional role-based architecture via YAML manifest for larger applications
-
-=back
-
-The philosophy is: provide just enough infrastructure, then get out of your way.
+The philosophy is: provide just enough infrastructure, then get out of
+your way.
 
 =head2 Validation, Defaults, and Configuration
 
@@ -1725,9 +2105,14 @@ L<App::Cmd> or L<CLI::Framework>.
 
 =item * B<Phase 0: Manifest Loading>
 
-For role-based applications using C<use CLI::Simple qw(:roles)>, the
-YAML manifest is loaded during C<import> and its command, role, option,
-alias, and abbreviation metadata is retained for the application.
+For role-based applications, YAML manifests are loaded during
+C<import>. The application's installed manifest may be loaded
+through C<:roles>, and additional manifests may be supplied as
+filenames or glob patterns.
+
+The manifests are merged and normalized before their command,
+role, option, alias, and abbreviation metadata is retained
+for the application.
 
 Roles are not composed during manifest loading.
 
@@ -1744,14 +2129,25 @@ Before anything else, C<CLI::Simple> checks C<@ARGV> for internal
 commands prefixed with C<->. If one is found it executes immediately
 and exits. See L</INTERNAL COMMANDS>.
 
+=item * B<Phase 2: Initialization (C<new>)>
 
-=item * B<Phase 2: Initialization (C<new> => C<init>)>
+The constructor parses command-line arguments using L<Getopt::Long>,
+normalizes option names, and creates accessors for the declared options.
+After completing command and logger initialization, C<CLI::Simple> resolves
+any remaining options through registered option providers, applies
+application defaults, and invokes the application's C<init()> method,
+if defined.
 
-The constructor parses command-line arguments via C<Getopt::Long>,
-creates accessors for all options, and calls your C<init()> method.
-Inside C<init()>, your application has full access to the parsed options 
-and arguments. This phase is the ideal hook for all final setup tasks, 
-such as:
+The order of initialization is significant. Command-line values take
+precedence over provider-supplied values, providers are consulted in
+registration order, and defaults are applied only to options that remain
+unresolved. By the time C<init()> is called, all available option values
+have been assigned to their respective accessors.
+
+The C<init()> method remains available for application-specific
+initialization, but applications no longer need to implement their own
+option-source resolution and precedence logic when using option
+providers. See L</OPTION PROVIDERS> for details.
 
 =over 4
 
@@ -1759,12 +2155,13 @@ such as:
 
 =item * Loading configuration files based on a C<--config> option.
 
-=item * Dynamically overriding the command (e.g, C<$self-E<gt>command('new_default')>).
+=item * Dynamically overriding the command (e.g., C<$self-E<gt>command('new_default')>).
+
+=item * Overriding default options
 
 =item * Performing any setup required B<before> a command is run.
 
 =back
-
 
 =item * B<Phase 3: Execution (C<run>)>
 
@@ -1808,20 +2205,20 @@ This provides an ideal hook for applications that need to perform
 by checking for a specific flag inside C<init()>, without also
 triggering an unwanted command.
 
-In role-based applications using a YAML manifest, a C<default> command
-that aliases another command should map to the sub name directly rather
-than a role class:
+In applications using a YAML manifest, a default command can be
+declared using C<commands:>. For applications using selective
+C<roles:> composition, the default command can be associated with
+a role directly:
 
-  commands:
-    default: cmd_install
-    install: My::Module::Role::Installer
+  roles:
+    default: My::Module::Role::Installer
 
 =head2 C<$AUTO_HELP> and C<$AUTO_DEFAULT>
 
 The following package variables control automatic command selection,
 help behavior, and output paging.
 
-By default, the framework provides no default command as explained in
+By default, the C<CLI::Simple> provides no default command as explained in
 the sections above. Some scripters may want default behaviors that
 assume a command or provide usage if no command is provided.
 
@@ -1837,11 +2234,8 @@ default: false
 =item C<$AUTO_DEFAULT>
 
 Set the package variable C<$AUTO_DEFAULT> to a true value if you want
-C<CLI::Simple> to automatically select a command if you have only 1
-command defined and no command is provided on the command line. When
-true, it will prepend the single command name to the argument list,
-allowing any subsequent arguments to be correctly parsed as args for
-that command.
+C<CLI::Simple> to automatically select a command when exactly one
+command is registered and no command is provided on the command line.
 
 default: false
 
@@ -1895,7 +2289,7 @@ To use them in your script:
 =head1 ADDING USAGE TO YOUR SCRIPTS
 
 To provide built-in usage/help output, include a C<=head1 SYNOPSIS>
-section in your script's POD:
+or C<=head1 USAGE> section in your script's POD:
 
   =head1 SYNOPSIS
 
@@ -1938,10 +2332,10 @@ to present help information that differs from the embedded POD.
 
 =head3 C<help_sections>
 
-By default C<CLI::Simple> renders the following POD sections when
-present, subject to the usage section selection described above:
+By default, C<CLI::Simple> renders the following POD sections when
+present:
 
-  SYNOPSIS
+  USAGE (or SYNOPSIS if USAGE is absent)
   DESCRIPTION/Commands
   DESCRIPTION/Options
   OPTIONS
@@ -1954,9 +2348,8 @@ section names during construction:
     ...
   );
 
-When C<help_sections> is supplied explicitly, C<CLI::Simple> honors the
-list exactly as provided. For example, an application may request both
-C<SYNOPSIS> and C<USAGE>:
+When C<help_sections> differs from the default selection,
+C<CLI::Simple> honors the list exactly as provided.
 
   help_sections => [qw(SYNOPSIS USAGE)]
 
@@ -1971,24 +2364,6 @@ C<CLI::Simple> reserves command names beginning with C<-> for its own
 use. These commands are intercepted before option parsing begins and
 execute immediately, bypassing the normal lifecycle entirely. See
 L</The init-run Lifecycle>.
-
-Internal commands are dispatched via the C<%INTERNAL_COMMANDS> package
-variable:
-
-  our %INTERNAL_COMMANDS = (
-    '-generate-completion' => \&_cmd_generate_completion,
-    '-dump-spec'           => \&_cmd_dump_spec,
-    '-scaffold'            => \&_cmd_scaffold,
-    '-migrate'             => \&_cmd_migrate,
-  );
-
-Subclasses can add their own internal commands by extending the hash
-before C<new()> is called:
-
-  our %INTERNAL_COMMANDS = (
-    %CLI::Simple::INTERNAL_COMMANDS,
-    '-my-command' => \&_cmd_my_command,
-  );
 
 =head2 -generate-completion
 
@@ -2022,10 +2397,8 @@ directory (requires root):
   my-script -generate-completion > \
     /etc/bash_completion.d/my-script
 
-The script name is taken from the first argument if provided, then
-C<MODULINO_WRAPPER> if set, then inferred from the module name. If the
-inferred name cannot be found in C<PATH>, a warning is issued but the
-completion script is still generated.
+The script name is taken from C<MODULINO_WRAPPER> when set,
+otherwise it is inferred from the module name.
 
 I<Note: If you created the modulino with the supplied
 C<create-modulino> tool C<MODULINO_WRAPPER> is already set inside the
@@ -2041,25 +2414,11 @@ The modulino script C<my-modulino> refers to My::Modulino
 
 =item Case 2: Your modulino wrapper was created using C<create-modulino>
 
-The modulino script C<my-alias> refers to My::Modulino. Although the wrapper name differs from the module name,
-C<MODULINO_WRAPPER> is set by the generated bash wrapper.
+The modulino script C<my-alias> refers to My::Modulino. Although the
+wrapper name differs from the module name, C<MODULINO_WRAPPER> is set
+by the generated bash wrapper.
 
  my-alias -generate-completion
-
-=item Case 3: Your modulino is an alias not created by C<create-modulino>
-
-Without C<MODULINO_WRAPPER>, the generated completion script may
-use the path to the Perl module rather than the wrapper's command
-name. The C<-generate-completion> script called by 
-your custom wrapper most likely only resolves the program name as the path to
-your Perl module:
-
- path-to-modules/My/Module.pm
-
-...in this case you need to supply the alias name or set
-C<MODULINO_WRAPPER> in the environment.
-
- my-alias -generate-completion my-alias
 
 =back
 
@@ -2101,10 +2460,11 @@ If you've turned your monolith's package into a modulino:
 
   cli-simple -scaffold my-script.yml         # scaffold from spec file
 
-The tarball will be named C<my-script-roles.tar.gz> by convention (the
-lower case snake cased version of the class name). The name is used to
-infer the class name. If your filename is different than the
-classes you want to scaffold, you will need to edit the files. 
+The generated tarball is named from the distribution identifier
+derived from the application class or supplied specification file,
+with a C<-roles.tar.gz> suffix. The name is used to infer the class
+name. If your filename is different than the classes you want to
+scaffold, you will need to edit the files.
 
 Extract the content to a directory and start editing. If you feed the tarball
 to L<CPAN::Maker::Bootstrapper> via the C<import-scaffold> command you can
@@ -2124,13 +2484,61 @@ separately.
 
 =head1 METHODS AND SUBROUTINES
 
+=head2 use_log4perl
+
+  __PACKAGE__->use_log4perl(
+    log_level => 'info',
+    color     => 1,
+  );
+
+Enables L<Log::Log4perl> integration for the application class.
+C<CLI::Simple> initializes logging during object construction, before
+invoking the application's C<init()> method.
+
+See L</LOGGING> for configuration and usage details.
+
+=head2 use_options
+
+  __PACKAGE__->use_options(
+    provider_name => {
+      'Provider::Role' => [qw(option1 option2)],
+    },
+  );
+
+Registers one or more option providers with the application class.
+Each provider is identified by a name and implemented as a
+L<Role::Tiny> role, which C<CLI::Simple> composes into the application
+class.
+
+Providers are registered in the order supplied. This order determines
+their precedence when multiple providers can resolve the same option.
+
+The array reference specifies which application options the provider
+may resolve. An empty array reference allows the provider to resolve
+any eligible application option declared through C<option_specs> or
+C<extra_options>.
+
+The provider must implement a resolver method named
+C<_provider_name_resolve()> and may optionally implement
+C<_provider_name_init()>.
+
+Returns the application class.
+
+See L</OPTION PROVIDERS> for the complete provider contract,
+examples, and resolution rules.
+
 =head2 new
 
   new( args )
 
-Instantiates a new C<CLI::Simple> instance, parses options, optionally
-initializes logging, and makes options available via dynamically
-generated accessors.
+Instantiates a new C<CLI::Simple> instance, parses command-line options,
+creates the corresponding accessors, and optionally initializes logging.
+Registered option providers are then consulted, application defaults
+are applied, and the application's C<init()> method is invoked, if
+defined.
+
+See L</OPTION PROVIDERS> for details on option resolution and
+precedence.
 
 I<Note: The C<new()> constructor uses L<Getopt::Long>'s C<GetOptions>,
 which directly modifies C<@ARGV> by removing any recognized
@@ -2145,10 +2553,8 @@ C<args> is a hash or hash reference containing the following keys:
 
 A boolean that determines whether abbreviated command names are allowed.
 
-When true, the C<run()> method will treat the provided command as a prefix
-and compare it to the keys in the command hash. If exactly one match is
-found, it will be used. If more than one match is found, or if no match is
-found, C<run()> will throw an exception.
+When true, C<validate_command()> treats the provided command as a
+prefix and compares it to the keys in the command hash.
 
 This allows for convenient shorthand like:
 
@@ -2191,7 +2597,8 @@ command.
 =item * default_options (optional)
 
 A hash reference providing default values for options. These values
-apply if the corresponding option is not given on the command line.
+are applied only when the corresponding option has not been resolved
+by the command line or a registered option provider.
 
 =item * extra_options (optional)
 
@@ -2228,25 +2635,16 @@ To do this you should follow this recipe:
 
   sub init {
     my ($self) = @_;
-
-    my @args = $self->get_args;
-
-    if ( ! @args ) {
-      $self->command_args($self->command()); # set the args to the command
-      $self->command('get'); # set the command to your default
+  
+    my $command = $self->command;
+  
+    if ( !exists $self->commands->{$command} ) {
+      $self->command_args($command, $self->get_args);
+      $self->command('get');
     }
-    else {
-      die "ERROR: unknown command\n"
-        if !$self->commands->{$self->command}; # validate the command
-    }
-    ...
+  
     return;
   }
-
-I<NOTE: This only works if your commands have a deterministic number
-of arguments. For example you might always require at least 1
-argument. If you have no arguments as in the above recipe you would
-assume command is the argument to your default command.>
 
 =back
 
@@ -2267,7 +2665,7 @@ command that will be executed when you call the C<run()> method.
 Gets or sets the argument list. Similar to C<get_args> when no
 arguments are passed except it returns an array reference.
 
-To replace or add to the argument list, pass an array or list.
+To replace the argument list, pass an array reference or a list.
 
   my $args = $self->command_args;
   $self->command_args(@{$args}, 'foo');
@@ -2288,9 +2686,9 @@ to the dispatch hash. C<handler> must be a code reference.
   __PACKAGE__->main;
 
 For role-based applications, C<main> is inherited from C<CLI::Simple>
-and reads the YAML manifest loaded during C<import>. It constructs the
-object with the manifest's options, default options, extra options, and
-dispatch table, then calls C<run()>.
+and uses the manifest configuration assembled during C<import>.
+It constructs the application with its options, defaults, and
+registered commands, then calls C<run()>.
 
 In a role-based modulino, the entire C<main> sub reduces to:
 
@@ -2299,6 +2697,18 @@ In a role-based modulino, the entire C<main> sub reduces to:
 For single-module applications, override C<main> in your subclass as
 usual.
 
+=head2 options
+
+Returns a hash reference containing the command-line options parsed
+by C<Getopt::Long>. Option names are normalized to snake_case.
+
+The hash contains only options explicitly supplied on the command
+line. It does not include values supplied by C<default_options> or
+subsequently initialized by C<init()>.
+
+Applications can use this hash to distinguish command-line options
+from default values when resolving configuration.
+
 =head2 run
 
 Executes the selected command using the parsed options and arguments.
@@ -2306,8 +2716,8 @@ The C<run> method dispatches control to the corresponding command
 subroutine.
 
 Command subroutines should return C<0> for success and a non-zero
-value for failure. The return value is used as the script's exit
-status.
+value for failure. C<run()> returns the command subroutine's return
+value, which can be used as the script's exit status.
 
 =head2 get_args
 
@@ -2367,14 +2777,28 @@ after command-line options and arguments have been processed and
 before command dispatch. Use this method to perform application-specific
 initialization and validation.
 
+The C<init()> method is invoked after command-line options have been
+parsed, registered option providers have resolved any remaining options,
+and application defaults have been applied. Consequently, all resolved
+option values are available through their corresponding accessors when
+C<init()> executes.
+
+Applications may use C<init()> to perform additional initialization,
+including validation of resolved values, establishing connections, or
+preparing resources needed by command handlers.
+
+See L</OPTION PROVIDERS> for details on option resolution and
+precedence.
+
 =head1 USING PACKAGE VARIABLES
 
-Constructor arguments may also be defined using package variables.
-This provides a declarative alternative to passing configuration
-directly to C<new()>.
+The C<default_options>, C<extra_options>, C<option_specs>, and
+C<commands> constructor arguments may also be defined using package
+variables. This provides a declarative alternative to passing these
+configuration values directly to C<new()>.
 
-Package variable names correspond to constructor argument names,
-converted to uppercase.
+The corresponding package variables are C<$DEFAULT_OPTIONS>,
+C<$EXTRA_OPTIONS>, C<$OPTION_SPECS>, and C<$COMMANDS>.
 
  our $OPTION_SPECS = [
    qw(
@@ -2402,7 +2826,7 @@ C<option_specs> parameter:
 Option values are accessible through automatically generated getter
 methods:
 
-  $cli->get_foo();
+  $cli->get_foo_bar();
   $cli->get_log_level();
 
 Option names that contain dashes (C<->) are automatically converted to
@@ -2464,21 +2888,22 @@ returns all remaining arguments as a list:
 
 I<Note: When called with names, C<get_args> returns a hash in list
 context and a hash reference in scalar context.>
+
 =head2 set_args
 
-Resets the positional arguments.
+Replaces the positional argument list with the supplied array
+reference.
 
- $self->set_args(qw(foo 1));
+  $self->set_args([qw(foo 1)]);
 
 This method overrides the positional arguments originally passed to
-the script. You can achieve the same behavior by calling the
-C<get_args> in scalar context and modifying the reference.
+the script. You can also modify individual arguments by retrieving
+the existing array reference using C<get_args()> in scalar context:
 
- my $args = $self->get_args;
- $args->[1] = '2';
+  my $args = $self->get_args;
+  $args->[1] = '2';
 
-Use this technique when you want to modify individual arguments
-without replacing the entire argument list.
+This avoids replacing the entire argument list.
 
 =head1 CUSTOM ERROR HANDLER
 
@@ -2513,6 +2938,12 @@ while a false value causes C<CLI::Simple> to exit immediately.
 
 =back
 
+When an C<error_handler> callback is supplied, its return value
+determines whether processing continues, regardless of the value
+of C<$CLI::Simple::GETOPT_EXIT_ON_ERROR>. Without a callback, the
+global variable controls whether an option-parsing failure causes
+an immediate exit.
+
 =head1 SETTING DEFAULT VALUES FOR OPTIONS
 
 To assign default values to your options, pass a hash reference as the
@@ -2532,6 +2963,183 @@ Example:
 
 Defaulted options are accessible through their corresponding getter
 methods, just like options set via the command line.
+
+Default values are applied after command-line arguments have been parsed
+and registered option providers have been consulted. A default is used
+only when the corresponding option remains unresolved. Consequently,
+values supplied by option providers take precedence over application
+defaults, just as command-line values take precedence over provider
+values.
+
+See L</OPTION PROVIDERS> for details on option resolution and
+precedence.
+
+=head1 OPTION PROVIDERS
+
+C<CLI::Simple> supports pluggable option providers that resolve application
+options from sources other than the command line. Providers are implemented
+as L<Role::Tiny> roles and registered using the C<use_options()> class
+method.
+
+Option providers separate the source of an option's value from its
+use within the application. Regardless of whether an option was supplied
+on the command line, retrieved from a configuration file, or resolved
+by another provider, application code accesses it through the same
+C<get_> and C<set_> accessors.
+
+This makes the accessors the application's consistent interface to
+option values, eliminating the need for application code to know
+where those values originated or how precedence was established.
+
+An application can register one or more providers:
+
+    __PACKAGE__->use_options(
+      environment => {
+        'CLI::Simple::Role::Environment' => [],
+      },
+      config => {
+        'MyApp::Role::Config' => [qw(host port database)],
+      },
+      secrets_manager => {
+        'CLI::Simple::Role::SecretsManager' => [qw(database_password api_key)],
+      },
+    );
+
+Each registration consists of a provider name, a role implementing the
+provider, and an array reference identifying the application options
+the provider may resolve.
+
+Providers are consulted in registration order. When multiple providers
+declare the same option, the first provider to successfully resolve it
+takes precedence. Subsequent providers are asked to resolve only those
+options that remain unresolved.
+
+An empty option list indicates that the provider may resolve any
+unresolved application option declared through C<option_specs> or
+C<extra_options>.
+
+The provider name determines the methods C<CLI::Simple> invokes. For
+example, a provider registered as C<config> implements
+C<_config_resolve()> and may optionally implement C<_config_init()>.
+
+=head2 Implementing an Option Provider
+
+An option provider is a L<Role::Tiny> role that implements a resolver
+method named C< _foo_config_resolve() >, where I<name> is the name used
+when registering the provider.
+
+For example, the following provider resolves options from a Perl hash:
+
+    package Foo::Config;
+
+    use strict;
+    use warnings;
+
+    use Role::Tiny;
+
+    our %FOO_CONFIG = (
+      foo => 'bar',
+    );
+
+    sub _foo_config_resolve {
+      my ( $self, @names ) = @_;
+
+      my %values;
+
+      foreach my $name (@names) {
+        next if !exists $FOO_CONFIG{$name};
+
+        $values{$name} = $FOO_CONFIG{$name};
+      }
+
+      return \%values;
+    }
+
+    1;
+
+The application registers the provider using C<use_options()>:
+
+    package Foo;
+
+    use parent qw(CLI::Simple);
+
+    __PACKAGE__->use_options(
+      foo_config => {
+        'Foo::Config' => [qw(foo)],
+      },
+    );
+
+    # In the application's main() method:
+    my $cli = __PACKAGE__->new(
+      option_specs => ['foo|f=s'],
+    );
+
+Once registered, C<CLI::Simple> composes the role into the application class
+and invokes C<_foo_config_resolve()> when C<foo> has not been supplied on
+the command line. The resolved value is available through the normal
+C<get_foo()> accessor.
+
+The resolver receives the names of the application options that remain
+unresolved and returns a hash reference containing the values it can
+supply. The returned keys must be the application option names, regardless
+of how the values are represented in the underlying source.
+
+For example, a provider might resolve the application option C<foo>
+from an environment variable or configuration entry named C<FOO_TASTIC>.
+Any such translation is the responsibility of the provider.
+
+An option is considered resolved when its name exists as a key in the
+returned hash reference. Values of C<undef>, C<0>, and the empty string
+are valid resolved values. Options omitted from the returned hash
+reference remain unresolved and may be supplied by subsequent providers
+or application defaults.
+
+A provider may also implement an optional initialization method named
+C< _I<name>_init() >. C<CLI::Simple> invokes this method before the
+provider's resolver, but only when the provider has eligible unresolved
+options to resolve. This allows providers to defer expensive operations,
+such as establishing database connections or initializing AWS clients,
+until they are actually needed.
+
+=head2 Option Resolution and Precedence
+
+CLI::Simple resolves option values during object construction, before
+invoking the application's C<init()> method.
+
+Options are resolved in the following order:
+
+=over 4
+
+=item 1. Command-line arguments
+
+Values supplied on the command line take precedence over all providers.
+Options already supplied on the command line are not passed to providers.
+
+=item 2. Registered option providers
+
+Providers are consulted in registration order. Each provider receives
+only the eligible option names that remain unresolved.
+
+A provider resolves an option by including its name in the hash reference
+returned by its resolver. Options omitted from that hash reference remain
+eligible for subsequent providers.
+
+When a provider has no eligible unresolved options, neither its optional
+initializer nor its resolver is invoked.
+
+=item 3. Application defaults
+
+Any remaining unresolved options may be initialized from the application's
+C<default_options>.
+
+=back
+
+After resolution and default initialization are complete, C<CLI::Simple>
+invokes the application's C<init()> method, if defined.
+
+Consequently, application initialization and command handlers can access
+resolved option values through their normal accessors without needing
+to know which source supplied them.
 
 =head1 ADDING ADDITIONAL ACCESSORS
 
@@ -2560,6 +3168,10 @@ Example:
 This will generate C<get_biz>, C<set_biz>, C<get_buz>, etc., for
 internal use.
 
+Unlike C<option_specs>, C<extra_options> does not register
+command-line options. It only creates accessors for values that
+can be initialized or modified programmatically.
+
 =head1 LOGGING
 
 C<CLI::Simple> integrates with L<Log::Log4perl> to provide structured
@@ -2574,7 +3186,7 @@ through C<use_log4perl()>.
   );
 
 If you do not explicitly include a C<log-level> option in your
-C<option_specs>, CLI::Simple will automatically add one for you.
+C<option_specs>, C<CLI::Simple> will automatically add one for you.
 
 Once enabled, you can access the logger instance via:
 
@@ -2613,12 +3225,13 @@ C<option_specs>:
     ...
   );
 
-This gives you C<--color> and C<--no-color> for free. Whichever way
-C<use_log4perl()> set the default, an explicit flag on the command
-line always wins; if neither C<--color> nor C<--no-color> is passed,
-your C<use_log4perl()> setting is left alone. Declaring C<color!> is
-therefore safe to add at any time - it only changes behavior for
-scripts whose users actually pass the flag.
+This gives you C<--color> and C<--no-color> for free.  When C<color!>
+is declared, C<--color> and C<--no-color> override the default color
+setting. These switches control C<CLI::Simple>'s built-in colorized
+configuration; they do not add coloring to a custom Log4perl
+configuration. Declaring C<color!> is therefore safe to add at any
+time - it only changes behavior for scripts whose users actually pass
+the flag.
 
 I<Note: C<color> and C<config> are mutually exclusive -
 C<use_log4perl()> dies if you pass both. C<color> is specifically for
@@ -2660,6 +3273,20 @@ Example:
     }
   )->run;
 
+Log levels are resolved in the following order of precedence:
+
+=over 4
+
+=item 1. An explicit C<--log-level> command-line option
+
+=item 2. The log level associated with the selected command
+
+=item 3. The application default supplied to C<use_log4perl()>
+
+=back
+
+The effective level is available through C<get_log_level()>.
+
 I<TIP: add other elements to the array for your command to process.>
 
 I<Note: Per-command log levels are not currently supported in the YAML
@@ -2681,10 +3308,15 @@ C<get_logger()> to emit messages.
 
 =item * Do I need to implement commands?
 
-No. If your script performs a single operation, you can register
-a default command:
+You do not need to define multiple named commands. For an application
+that performs a single operation, register a default command:
 
   commands => { default => \&main }
+
+If no command is selected and no default command is registered,
+C<run()> returns successfully without invoking a command handler.
+
+The application's C<init()> method still executes during construction.
 
 =item * Must I subclass C<CLI::Simple>?
 
@@ -2728,24 +3360,15 @@ See L</ROLE-BASED ARCHITECTURE> for the manifest format.
 
 =item * How do I enable bash completion for my script?
 
-Your script must be invoked via a bash modulino wrapper with
-C<MODULINO_WRAPPER> set. Then run:
+Run the built-in C<-generate-completion> command. The script name is
+taken from C<MODULINO_WRAPPER> when set, or derived from the module
+name otherwise.
 
   my-script -generate-completion > \
     ~/.local/share/bash-completion/completions/my-script
 
 Wrappers generated by L<CPAN::Maker::Bootstrapper> set
 C<MODULINO_WRAPPER> automatically.
-
-=item * How do I add my own internal commands?
-
-Add entries to C<%INTERNAL_COMMANDS> before calling C<new()>:
-
-  our %INTERNAL_COMMANDS = (
-    %CLI::Simple::INTERNAL_COMMANDS,
-    '-my-command' => \&_cmd_my_command,
-  );
-
 
 =item * My application dies with "use_log4perl() requires Log::Log4perl..."
 
@@ -2847,9 +3470,10 @@ After parsing, both C<get_config()> and C<get_cfg()> will return the
 same value. If the user passes both C<--config> and C<--cfg>, the value
 from C<--config> (the canonical version) is used.
 
-I<Note: In role-based applications using a YAML manifest, command
-aliases are expressed by mapping the alias command directly to the
-target sub name rather than a role class. See L</ROLE-BASED ARCHITECTURE>.>
+I<Note: Applications using YAML manifests may define command aliases
+through the C<alias:> section, just as applications using the
+C<alias> constructor parameter do. Aliases resolve to their canonical
+commands before role composition. See L</ROLE-BASED ARCHITECTURE>.>
 
 =head2 Recommendations
 
@@ -2879,8 +3503,9 @@ non-zero value to indicate failure.
 
 =head2 Exit Codes
 
-C<CLI::Simple> uses conventional exit codes so that calling scripts
-can distinguish between normal completion and error conditions.
+C<CLI::Simple> provides conventional success and failure exit codes
+for its own operations. Applications may return additional exit
+codes from their command handlers.
 
 =over 4
 
@@ -2900,6 +3525,10 @@ code, which C<run()> passes through to the caller. A handler that
 calls C<exit()> terminates the process directly.
 
 =back
+
+Some errors, including unknown commands, raise exceptions rather
+than returning an exit code. Unless caught by the application,
+these exceptions terminate the process with a non-zero status.
 
 =head1 LICENSE AND COPYRIGHT
 

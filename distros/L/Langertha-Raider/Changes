@@ -1,5 +1,1045 @@
 Revision history for Langertha-Raider
 
+0.504     2026-10-27 15:45:56Z
+
+  [Before you upgrade]
+    - INCOMPATIBLE: every tool call passes a permission policy, always on
+      (ADR 0021). In the default mode a run nobody can approve -- a one-shot
+      `raider "..."`, --json and the --stream-* flags, a Hall raider, ACP --
+      refuses writing files, bash, the network and messages unless a rule
+      allows them. See [Permissions] for the remedies.
+
+    - INCOMPATIBLE: bash refuses heavy commands (prove, make test, dzil
+      test|build|release, cpanm, docker build, ...) while the host is under
+      memory pressure or all heavy slots are taken -- the loadguard gate is
+      on by default (ADR 0018). LOADGUARD_THROTTLE=0 turns it off. See
+      [Tools].
+
+    - INCOMPATIBLE: a project with only CLAUDE.md, CLAUDE.local.md or
+      .claude/ is read in Claude mode (ADR 0019): the CLAUDE.md hierarchy,
+      the Claude settings (their permissions and env apply, their hooks
+      run), Claude skills and agents -- without --claude. Skills are no
+      longer glued into the system prompt in full: the prompt lists them,
+      the model loads one with the skill tool. See [Claude Code layout and
+      skills].
+
+    - INCOMPATIBLE: a prompt that starts with /NAME is a slash command, also
+      in a one-shot run (ADR 0030): `raider "/foo"` with no command or skill
+      foo is "unknown command" with exit 2 instead of a prompt to the model;
+      a path such as `/etc/hosts is broken` stays a prompt. In command
+      bodies $N counts from 0 as in Claude Code ($0 is the first argument).
+      See [Slash commands like Claude Code].
+
+    - INCOMPATIBLE: subagents nest up to three levels by default
+      (max_agent_depth 3, was 1; max_agent_depth: 1 restores it), the result
+      of an agent call ends with an agentId line and a <usage> block, and a
+      one-shot run waits for the background agents it started before it ends
+      (ADR 0027). See [Claude Code layout and skills].
+
+
+  [File tools]
+    - read_file asks the engine whether images and PDFs may go back as
+      content: supports('tool_result_images') and supports('tool_result_pdf')
+      (Langertha 0.504), replacing the guess from the wire name. Two separate
+      answers, so a model that takes images but no PDFs (or the reverse) gets
+      the one and a refusal for the other. FileTools::build_file_tools_server
+      has reads_pdf next to sees_images; neither falls back on the other.
+
+    - INCOMPATIBLE: read_file, write_file and edit_file answer like Claude
+      Code's Read, Write and Edit (ADR 0023): "File created successfully at:
+      P", "The file P has been updated successfully.", "String to replace
+      not found in file.", "Found N matches of the string to replace, but
+      replace_all is false. ...", "File does not exist. Note: your current
+      working directory is ROOT.", "EISDIR: ...", with Claude Code's error
+      flags and <tool_use_error> frame. The old "Wrote N bytes" / "Edited" /
+      "Error: not a file" texts are gone.
+
+    - INCOMPATIBLE: read before write. write_file, edit_file and multi_edit
+      refuse an existing file that was not read in the run ("File has not
+      been read yet. Read it first before writing to it.") or that changed
+      on disk since ("File has been modified since read, ..."). New files
+      need no read; what the tools wrote counts as read; a read with
+      offset/limit counts. The record is per run (begin_run empties it) and
+      holds in every layout. The CLAUDE.md / AGENTS.md files in the prompt
+      count as read, so they can be edited without a read_file first.
+
+    - INCOMPATIBLE: read_file returns cat -n lines ("N<TAB>line") and takes
+      offset (1-based) and limit; at most 2000 lines by default with a note
+      where the rest is, lines over 2000 characters cut, files over 256 KB
+      need offset/limit. Empty files and an offset behind the end give
+      Claude Code's system reminders. Binary files, devices and directories
+      are refused with a message. Images (PNG, JPEG, GIF, WebP) and PDFs go
+      back as image/document content when the model sees images and its wire
+      carries them in a tool result, else a clear refusal; Jupyter notebooks
+      come back as their cells with outputs. A read over 25000 tokens (bytes
+      / 4) is refused as in Claude Code; pages ("1-5", at most 20) reads
+      PDF pages as text through pdftotext (poppler, looked up on PATH; a
+      PDF of more than 10 pages needs it) (ADR 0023 addendum).
+
+    - New tool multi_edit(path, edits) like Claude Code's MultiEdit: edits
+      applied in order on the content in memory, atomic, the failing edit
+      named by its number. Edit/Write/MultiEdit rules, acceptEdits and the
+      plan-mode refusal cover it as they cover edit_file.
+
+    - INCOMPATIBLE: in the Claude layout the file and search tools are no
+      longer confined to the root and the additional directories: a path
+      outside them asks (refused with how to allow it when nobody can
+      answer), allow rules such as Read(//tmp/**) open it, acceptEdits does
+      not cover edits outside, bypassPermissions reaches it, deny rules hold.
+      A symbolic link out of the root counts as outside. Every other layout
+      stays confined ("Path escapes root"), also in bypassPermissions.
+      FileTools and SearchTools share one confinement
+      (Langertha::Raider::PathConfine).
+
+
+  [Shell tools]
+    - INCOMPATIBLE: bash answers like Claude Code's Bash (ADR 0024): on exit
+      0 only the output -- stdout and stderr as one stream in the order
+      written -- or "(Bash completed with no output)"; otherwise an error
+      result "Exit code N" followed by the output. The "Exit code: 0" line and
+      the === STDOUT === / === STDERR === blocks are gone, and so is MCP-Run's
+      `compress` argument. Output over 30000 characters keeps its start and
+      its end around "... [N characters truncated] ...".
+
+    - INCOMPATIBLE: a command still running after its timeout (seconds,
+      default 120, at most 600) is no longer killed: it is moved to the
+      background with an ID, as in Claude Code.
+
+    - run_in_background: true starts a command in the background and answers
+      at once with its ID (bash_1, bash_2, ...). New tools bash_output
+      (bash_id, filter, block, timeout: new output, status
+      running/completed/killed, exit code) and kill_shell (shell_id: SIGTERM
+      to the process group, SIGKILL after 2 s). Background shells are
+      supervised by the application's event loop, live across the runs of a
+      session, survive a cancelled turn and are stopped when raider ends.
+      bash_output is a read tool, kill_shell has no effect class; both run in
+      every permission mode. The loadguard gate and allowed_commands are asked
+      before a background command starts, too.
+
+    - bash runs through Langertha::Raider::BashTools instead of MCP::Run::Bash;
+      the MCP::Run::Bash requirement is dropped. A working_directory is entered
+      with chdir: with MCP-Run's "cd DIR && COMMAND", a command such as
+      `x & y` ran y in raider's own directory.
+
+
+  [Task tools, plan mode and Claude Code tool names]
+    - INCOMPATIBLE: the task list is kept with task_create, task_update,
+      task_list and task_get, shaped after Claude Code's TaskCreate,
+      TaskUpdate, TaskList and TaskGet (ADR 0025): one task per call, ids
+      "1", "2", ..., statuses pending/in_progress/completed/deleted, owner,
+      metadata, blocks/blockedBy, and Claude Code's answers ("Task #1 created
+      successfully: ...", "Updated task #1 status", "Task not found"). They
+      replace todo_write in the default tool set, as in Claude Code;
+      RAIDER_ENABLE_TASKS=0 mounts todo_write instead. The task list lasts for
+      the conversation (todo_write's stays run state); /clear empties it; both
+      report it as todo.updated.
+
+    - New tool enter_plan_mode (Claude Code's EnterPlanMode): switches the
+      session to plan mode and answers Claude Code's instructions. The
+      permission gate asks the person first in default, acceptEdits and auto
+      mode ("for this session" adds the rule EnterPlanMode); it runs without a
+      question in bypassPermissions and is refused when nobody can agree.
+
+    - INCOMPATIBLE: MultiEdit now means multi_edit, not edit_file, in rules,
+      agent files and hook matchers; a hook gets it as MultiEdit with an
+      absolute file_path. TaskStop, KillShell and KillBash mean kill_shell
+      (task_id <-> shell_id); TaskOutput and BashOutput mean bash_output
+      (task_id <-> bash_id, timeout ms <-> s, TaskOutput's default block
+      true written down); TaskCreate & co. and EnterPlanMode have their
+      raider tools. ADR 0025 lists every known Claude Code tool name and why
+      the others (NotebookEdit, ToolSearch, SendMessage, Monitor,
+      EnterWorktree, ...) stay unknown.
+
+    - TaskCreated and TaskCompleted hooks (Claude layout, ADR 0022
+      addendum): task_create and task_update run them before the change, with
+      task_id, task_subject and task_description; exit 2 undoes the change
+      and the model reads "TaskCreated hook error: STDERR". todo_write fires
+      none. A subagent's own task list fires them too, with its agent_id,
+      agent_type and permission_mode; their reports go to its journal.
+
+    - A resumed (--continue, --resume) or forked session gets its task list
+      back from the journal's last todo.updated (not after /clear; ids
+      continue). Only for the task tools.
+
+
+  [Refusals, web tools and skills like Claude Code]
+    - INCOMPATIBLE: a PreToolUse hook's denial reads as in Claude Code: exit
+      2 gives "PreToolUse:Bash hook error: STDERR" (tool in Claude's name), a
+      JSON permissionDecisionReason is handed through as it stands, no reason
+      "PreToolUse:Bash hook blocked the tool call". A call to a tool that is
+      not offered (never, or since /reload or a mode change) is answered
+      at once, before the hook, the permission gate and any approval, with
+      "<tool_use_error>Error: No such tool available: X</tool_use_error>"
+      and " Tool names are case-sensitive: call Y instead." when only the
+      case differs. The old "denied: PreToolUse hook: ..." and "unknown tool
+      X" are gone.
+
+    - INCOMPATIBLE: refusals read as in Claude Code (ADR 0026). The person's
+      no: "The user doesn't want to proceed with this tool use. The tool use
+      was rejected ... STOP what you are doing ..." or, with a reason, "... To
+      tell you how to proceed, the user said:\n<reason>". A deny rule, plan
+      mode and an ask nobody can approve: "Permission to use bash with command
+      CMD has been denied." (other tools by name), then raider's reason and,
+      for an ask, how to allow the call. "The user refused this call" and the
+      application's "Tool call 'X' was denied: ..." are gone; the events keep
+      their reasons. The gate's verdict may carry `message`, the whole text
+      the model gets (Langertha::Raider).
+
+    - INCOMPATIBLE: exit_plan_mode answers in Claude Code's words: "User has
+      approved your plan. You can now start coding. ...", the mode and
+      "## Approved Plan:" with the plan; a refused plan is an error result with
+      the rejection text and the feedback; with nobody to review it is an error
+      result ("Permission to use exit_plan_mode has been denied. ..."); outside
+      plan mode "<tool_use_error>You are not in plan mode. ...".
+
+    - INCOMPATIBLE: the skill tool answers "Launching skill: NAME"; the skill
+      itself (base directory, body, arguments) follows the tool results as a
+      user message of its own, as Claude Code adds it. It stays when in-raid
+      compaction drops its exchange, is kept in history (the next raid no
+      longer loads it again), and is journalled as a user message right after
+      its tool.result, so a resumed session has it in the same place. An
+      unknown name is "<tool_use_error>Unknown skill: NAME. Available skills:
+      ...</tool_use_error>".
+
+    - A tool result may hand the raid user messages under _meta
+      'raider/messages' (Langertha::Raider, TOOL RESULTS THAT ADD MESSAGES):
+      added after the batch's tool results, from raider's own tool sources
+      only -- a catalog MCP server's result loses the key.
+
+    - web_fetch takes prompt (Claude Code's WebFetch(url, prompt)): the page
+      text and the question go to a model call of its own, the tool returns
+      its answer; the page stays out of the conversation. The run's engine
+      answers, or the model web_fetch_model names (a new raider config key,
+      also -o web_fetch_model=). The call's tokens are the new journal event
+      model.usage (purpose web_fetch).
+
+    - INCOMPATIBLE: web_fetch follows a redirect only on the same host (www.
+      aside), scheme and port; one to another host is not fetched, the result
+      says where it points (Claude Code's "REDIRECT DETECTED" text), so domain
+      rules see the new host. A response that is not a success is "The server
+      returned HTTP <status>. ..." and, as in Claude Code, no error result.
+
+    - web_search takes allowed_domains and blocked_domains (subdomains
+      included): the results are filtered, site: / -site: go into the query,
+      both at once is an error.
+
+    - Token statistics like Claude Code's /cost: every model call of every
+      raider (the main one, subagents) and web_fetch's prompt is a
+      model.usage event (input, output, cache read/write tokens, model);
+      the application keeps them per model. /stats shows the total and one
+      line per model (also with --no-trace), the metrics of a run gain
+      "usage". ADR 0026 addendum.
+
+
+  [Slash commands like Claude Code]
+    - Custom commands (ADR 0030): .raider/commands and ~/.raider/commands;
+      in the Claude layout also ~/.claude/commands, .claude/commands and
+      the commands of enabled plugins (commands/ and the manifest's
+      "commands"). They join the skill catalogue: subdirectories make
+      namespaces (frontend/component.md is /frontend:component), plugin
+      entries are /plugin:name, a skill beats a command of the same name.
+      The model sees the commands it may invoke in the skill listing and
+      loads them with the skill tool, as skills.
+
+    - /NAME [ARGS] runs a skill or custom command in the REPL and in a
+      one-shot run; an entry of the catalogue replaces a built-in of the
+      same name, as in Claude Code. Frontmatter: description,
+      argument-hint, allowed-tools (extra allow rules for that run only;
+      deny and ask rules still win), model (that run only, not saved),
+      disable-model-invocation, user-invocable: false (not runnable as
+      /NAME); booleans take yes/no/on/off/1/0.
+
+    - Rendering like Claude Code (Langertha::Raider::SlashCommand, also
+      for the skill tool): $ARGUMENTS, $ARGUMENTS[N] and $N (0-based,
+      shell-style quoting), named `arguments`, ${CLAUDE_SKILL_DIR},
+      ${CLAUDE_PROJECT_DIR}, ${CLAUDE_SESSION_ID}, ${CLAUDE_PLUGIN_ROOT},
+      \$ for a literal dollar, "ARGUMENTS: ..." appended when no
+      placeholder takes them. !`cmd` and ```! blocks run before the text
+      goes to the model -- only when the permission policy allows them
+      (allowed-tools counts), never asked; deny, ask or a failing command
+      aborts the invocation and nothing is sent. The loadguard gate
+      applies; disableSkillShellExecution in the Claude settings turns it
+      off. @path in a /NAME command attaches the file (counted as read) or
+      directory listing.
+
+    - New -p / --print: a one-shot run even on a terminal, as claude -p.
+      Report commands (/help, /context, /skills, /agents, /hooks, /memory,
+      /permissions, /config, /stats, /metrics, /packs) print and exit 0,
+      /init and /compact run; the rest is a usage error in a one-shot run.
+
+    - New built-in commands: /skills, /compact [INSTRUCTIONS], /context,
+      /memory [N] (opens a memory file in $VISUAL / $EDITOR), /agents,
+      /hooks, /init (asks the model to write CLAUDE.md, or the native
+      instructions file), /reset and /new (aliases of /clear). /help lists
+      the skills and custom commands with their argument hints.
+
+    - Langertha::Raider compress_history(_f) takes focus instructions, and
+      forgets the last prompt size afterwards, so the next raid does not
+      compress the summary again. New Langertha::Raider override_engine:
+      an engine for one run, returns the code that puts the previous one
+      back (the `model:` of a /NAME run).
+
+    - Langertha::Raider::Permissions has run rules (add_run_rules,
+      clear_run_rules): allow rules for the current run, cleared when it
+      ends.
+
+
+  [MCP servers like Claude Code]
+    - ADR 0029 decides how raider connects to the MCP servers a person
+      configures, as Claude Code does: sources, precedence, ${VAR}
+      expansion, tool names mcp__<server>__<tool>, approval of a
+      repository's servers, timeouts, statuses.
+
+    - The configured servers run: stdio (own session, in the root, with the
+      entry's env and CLAUDE_PROJECT_DIR; stderr kept for the status, never
+      on the terminal) and streamable HTTP (session id, protocol header,
+      JSON and event-stream answers). All start in parallel before the
+      first raid, each within MCP_TIMEOUT (30 s); a server that fails,
+      hangs or exits is reported (mcp.server event) and never stops the
+      run. Tools reach the model as mcp__<server>__<tool>; calls are bounded
+      by the server's timeout or MCP_TOOL_TIMEOUT. Stopped when the
+      one-shot run or the REPL ends.
+
+    - Raider speaks the initialize handshake of the MCP revisions
+      2024-11-05 to 2025-11-25 itself (Langertha::Raider::MCP::Server,
+      ::Stdio, ::HTTP): the installed Net::Async::MCP 0.006 speaks only
+      2026-07-28 and cannot reach a server of an earlier revision.
+
+    - The tools of a configured server are foreign to the permission gate:
+      the mode asks, rules name them mcp__<server>__<tool> or mcp__<server>,
+      hooks match the mcp__ name. A result cannot hand raider user messages
+      (_meta raider/ keys are removed). Subagents use the same connections,
+      limited to the mcp__ tools their agent file allows.
+
+    - Sources, the first entry of a name winning whole: mcp: of
+      .raider/config.yml, mcp: of ~/.raider/config.yml, then in the Claude
+      layout the local servers of ~/.claude.json (projects.<dir>),
+      .mcp.json, the user servers of ~/.claude.json and the servers of
+      enabled plugins (plugin:<plugin>:<server>). --bare has none. The
+      entries are Claude Code's .mcp.json format (stdio command/args/env,
+      http url/headers, timeout); sse, ws, sdk, headersHelper and oauth are
+      reported as unsupported.
+
+    - .mcp.json servers and mcp: of a project config start only when
+      approved: enabledMcpjsonServers / enableAllProjectMcpServers /
+      disabledMcpjsonServers of the Claude settings -- a repository's own
+      .claude/settings.json only in a folder Claude Code trusts
+      (hasTrustDialogAccepted) -- or the new mcp_approvals: of
+      ~/.raider/config.yml. A disabled entry rejects from any file.
+
+    - Langertha::Raider::MCP::Config (internal);
+      Langertha::Raider::Config->mcp_servers / mcp_approvals,
+      Langertha::Raider::Context::Settings->mcpjson_approvals,
+      Langertha::Raider::Context::Plugins->mcp_servers. mcp: and
+      mcp_approvals: are raider keys, never engine options; inside a
+      section, or mcp_approvals: in a project file, they are reported by
+      config explain.
+
+    - The REPL asks once about every .mcp.json (or project mcp:) server that
+      waits for an approval, with Claude Code's three choices (use it / use
+      all project servers / continue without it), before the first prompt.
+      The answer holds at once and is saved where it counts next time:
+      .claude/settings.local.json in a folder Claude Code trusts (as Claude
+      Code saves it), else mcp_approvals of ~/.raider/config.yml. A run
+      nobody can ask in (one-shot, --json, Hall, ACP, piped REPL) keeps them
+      off and says so on stderr; machine output is unchanged.
+
+    - REPL /mcp shows every configured server: status, scope, transport,
+      source, reason, approval, tools, the last stderr lines of a failed
+      one; /mcp reconnect [NAME|all] restarts servers. /mcp connects the
+      servers first; a one-shot raider -p /mcp prints the same report and
+      exits 0 (/mcp reconnect is REPL-only). config explain and /config list
+      the servers too.
+
+    - /reload reads the MCP configuration again: an unchanged server keeps
+      running, changed and removed ones are stopped, new ones start with the
+      next prompt. A cancelled turn leaves the servers running; SIGTERM, the
+      end of the REPL and the end of a one-shot run stop them.
+
+
+  [MCP follow-ups: parent .mcp.json, list_changed, output limit, prompts, resources]
+    - ADR 0029 Addendum 1. A project's .mcp.json is read from the project
+      directory and every directory above it, nearest first (a server named
+      in several wins whole from the nearest): a ~/.mcp.json now serves
+      every project below the home directory, as in Claude Code. They are
+      all scope project and need the same approval.
+
+    - A session started in bypassPermissions (--permission-mode or
+      --dangerously-skip-permissions) with skipDangerousModePermissionPrompt
+      in ~/.claude/settings.json approves the project servers without
+      asking, as Claude Code does; disabledMcpjsonServers still blocks.
+
+    - notifications/tools/list_changed: the server's tools are listed again
+      and the next model request offers them.
+
+    - MAX_MCP_OUTPUT_TOKENS (default 25000): a tool result's text over the
+      limit is cut with a note that says how to raise it; an error text
+      over about 11000 characters keeps its first and last 5000. Claude
+      Code saves the whole result to a file instead; raider keeps none.
+
+    - MCP prompts are slash commands: /mcp__server__prompt ARGS (arguments
+      by the prompt's declared order), listed in /help, also in a one-shot
+      run.
+
+    - MCP resources: the tools list_mcp_resources and read_mcp_resource
+      (Claude Code's ListMcpResourcesTool / ReadMcpResourceTool) are
+      mounted when servers are configured, and @server:scheme://path in a
+      prompt attaches the resource.
+
+    - The session journal records mcp.server (starting, connected, failed,
+      stopped, with reason and tool count) and the new mcp.tools_changed;
+      a stop outside a run reaches only the event stream.
+
+
+  [Monitor and cron jobs like Claude Code]
+    - ADR 0031 decides how raider streams events and schedules prompts as
+      Claude Code does, on the task registry of ADR 0027.
+
+    - New tool monitor (Claude Code's Monitor; description, command,
+      timeout_ms): runs a command in the background and delivers every
+      stdout line as a <task-notification> ("Monitor event: ...", the lines
+      of one 0.2 s batch in one <event>). The end, the deadline (5 minutes,
+      at most 30, at most 10 in a run nobody can answer) and a stop each
+      send one notice; a monitor that sends more than 20 notifications in
+      10 seconds, or 500 in all, is stopped with a hint. kill_shell
+      (TaskStop) stops it, bash_output shows its status; it ends with the
+      subagent that started it, and a piped or -p run waits for its
+      monitors. IDs monitor_1, monitor_2, ...
+
+    - monitor is a shell tool: allowed_commands and the loadguard gate
+      apply, a Bash(...) permission rule covers it (Monitor(...) names it
+      alone), and its effect class is code.
+
+    - New tools cron_create, cron_delete and cron_list (CronCreate,
+      CronDelete, CronList) in the REPL: session-scoped jobs with a
+      five-field cron expression in local time, recurring or one-shot, at
+      most 50, run as a turn of their own when the REPL is idle -- never in
+      a turn in progress, once after a long turn (no catch-up) -- with
+      Claude Code's jitter and the 7-day expiry of recurring jobs (one last
+      fire). Jobs are not durable and not restored on resume; a run with a
+      single prompt, a Hall raider and ACP are not offered the tools.
+      CLAUDE_CODE_DISABLE_CRON turns them off.
+
+    - No ScheduleWakeup: it belongs to the self-paced /loop raider does not
+      have; a reminder is a one-shot cron_create.
+
+    - ToolNames maps Monitor, CronCreate, CronDelete and CronList.
+
+
+  [Engines]
+    - `-e mock` (alias `virtual`) selects Langertha::Engine::Virtual, the rule-driven
+      engine without network or key (`-o rules_file=rules.yml`), so raider can be run
+      by hand and in tests against a scripted "model". It gets the prompt as typed:
+      the [situation] line is left out, because rules match word for word.
+
+
+  [Distribution]
+    - The raudssus/raider image is built and pushed by the bundle's
+      Dist::Zilla::Plugin::Docker::API over the Engine HTTP API, so rootless
+      Podman works, and is tagged latest, <major> and <version>. Every dzil
+      build or dzil test builds the image unless DZIL_DOCKER_API_SKIP=1 is
+      set. runtime-root is the Dockerfile's last stage, so a docker build
+      without --target yields the published image; runtime-user stays
+      available by name.
+
+    - The GitHub release is published by the bundle's GitHub::CreateRelease
+      after the tag is pushed, with the Changes section as release notes.
+
+    - web_fetch has a request timeout (fetch_timeout, 60 s) and a stall
+      timeout (stall_timeout, 20 s), both tool errors, and stops reading and
+      cancels the request at max_fetch_bytes instead of buffering the whole
+      body first. Its User-Agent carries the dist version.
+
+    - web_search ends within fetch_timeout as a tool error when a search
+      provider never answers, and its default HTTP client stops requests at
+      fetch_timeout and stall_timeout like web_fetch.
+
+    - The Telegram hall adapter no longer polls in a tight loop against error
+      answers: a non-2xx or ok:false reply is a telegram.poll_error with the
+      status and description, retried after retry_after (429) or a growing
+      backoff; 401 stops the bot. A failing update is a telegram.update_error
+      and no longer stalls polling or holds back the offset.
+
+
+  [Standalone binary]
+    - The binary no longer packs MCP::Run, since bash runs through
+      Langertha::Raider::BashTools.
+
+
+  [Claude Code layout and skills]
+    - A .raider/ directory makes a raider project only when it holds
+      config.yml, instructions.md, skills/, agents/ or packs/. raider's own
+      .raider/sessions, .raider/lib and .gitignore turned a Claude Code
+      project native from its second run on (ADR 0019 addendum 2).
+      raiders/ is no marker: ADR 0020 replaced raiders/<name>.yml by
+      agents/<name>.md.
+
+    - Raider decides once per run which layout it reads (ADR 0019): a project
+      with .raider/ (or a legacy .raider.yml / .raider.md) is a raider
+      project; one with only CLAUDE.md, CLAUDE.local.md or .claude/ (in it or
+      up to the repository top) is in Claude mode and is read like Claude Code
+      reads it, without any flag; anything else is native, and so is the home
+      directory itself. --bare reads no layout. config explain and the REPL
+      banner show the mode and what decided it.
+
+    - In the Claude layout raider reads the CLAUDE.md hierarchy as Claude
+      Code does: ~/.claude/CLAUDE.md, then CLAUDE.md (or AGENTS.md where a
+      level has none) and CLAUDE.local.md of every directory from the
+      repository top down to the working directory, each file its own
+      prompt item; @path imports are expanded (5 levels, not in code). A
+      CLAUDE.md below the working directory is appended to the result of
+      the first file tool that touches its subtree, once per session. -M
+      replaces only the persona and the raider instructions file, never
+      the Claude memory.
+
+    - The Claude settings are read too (~/.claude/settings.json,
+      .claude/settings.json, .claude/settings.local.json): their env is set
+      for the tools and their subprocesses, enabledPlugins picks the
+      installed Claude Code plugins whose skills are offered; their
+      permissions apply (see [Permissions]) and their hooks run (see
+      below). A broken settings file
+      is reported, never fatal; config explain lists the files, rule counts,
+      env names (never values), hook events and unused keys.
+
+    - Changed: --claude is now the switch for the Claude layout (also in a
+      raider project) and is saved as claude: true in the project config,
+      not as skills: [claude] (which still means the same when read). In a
+      Claude-mode project nothing is saved any more, so no .raider.yml
+      appears there. --openai / --codex load AGENTS.md as an instructions
+      item.
+
+    - Changed: skills are no longer glued into the system prompt in full.
+      The prompt lists every skill as "name: description" (frontmatter), and
+      the model loads one with the new skill tool, which returns its body
+      with "Base directory for this skill: DIR" and $ARGUMENTS filled in.
+      Skills come from --skills DIR and skills: directories (*/SKILL.md and
+      flat *.md), .raider/skills, ~/.raider/skills and, in the Claude layout,
+      ~/.claude/skills, .claude/skills, .agents/skills and enabled plugins
+      (as plugin:skill; a plugin installed both for the user and for the
+      project is loaded once, the project install first); the first of a
+      name wins, the others are reported as shadowed.
+      disable-model-invocation: true hides a skill from the model. A
+      frontmatter YAML rejects but Claude Code reads (an unquoted ": " in a
+      description) is read line by line as key: value, so such a skill keeps
+      its description.
+
+    - Changed: in Claude mode (only Claude files, no .raider/) raider is
+      Claude Code, not Langertha: its default persona and the packs that are
+      on only by default (caveman) are off; the instructions are the
+      CLAUDE.md hierarchy plus a neutral base text. --pack, packs: and
+      detection still apply, -M still replaces the base text, and a raider
+      project with claude: true keeps its persona. config explain shows
+      "instructions: claude base" and the default packs as switched off by
+      the layout.
+
+    - /reload reads the Claude memory, settings (env included) and skills
+      again, and mounts or drops the skill tool as the skills change.
+
+    - Fixed: -o claude=false (and perl=, detect= with false/no/off/0, also from
+      a config file or the API) is false; the boolean words go through one
+      parser and anything else croaks.
+
+    - Fixed: a skills: entry of type file was silently dropped. It is a
+      skill now (one flat *.md file, also --skills FILE); a missing file is
+      shown by config explain, and an entry with an unknown type or no path
+      croaks.
+
+    - Skills can appear while working, like in Claude Code: the first file
+      tool that touches a subtree reads its .claude/skills, and a skill with
+      paths: in its frontmatter (globs, a list or comma separated) is listed
+      only once a matching file is touched. Both are announced in a
+      second system-reminder block of that tool result. In the Claude layout
+      the skill tool is always mounted.
+
+    - In the Claude layout raider runs Claude Code's hooks (ADR 0022):
+      PreToolUse before the schema check and the permission gate (exit 2 or
+      deny refuses the call with the hook's reason, updatedInput replaces the
+      arguments, an allow spares only the mode's question -- deny and ask
+      rules always hold, plan mode is unchanged -- and an ask asks even
+      where a rule allows), PostToolUse (context and feedback appended to the
+      tool result), UserPromptSubmit (a block keeps the prompt from the model
+      and the run fails with the reason; context goes with the prompt),
+      SessionStart (startup, resume after --continue/--resume, clear after
+      /clear) and Stop (a block sends its reason back and the run goes on,
+      at most 8 times). systemMessages and hook errors are shown; every hook
+      run is a hook.ran event in the session journal and the stream,
+      messages a hook.message. A native or raider project and --bare run no
+      hooks. transcript_path is the session journal (raider's JSONL).
+
+    - New Langertha::Raider::Hooks (internal): runs
+      the Claude Code hooks of the settings files and of the enabled plugins
+      (hooks/hooks.json and the manifest's hooks, with ${CLAUDE_PLUGIN_ROOT},
+      ${CLAUDE_PLUGIN_DATA} and ${CLAUDE_PROJECT_DIR}) as Claude Code does:
+      matchers on the Claude tool name, the session source or the agent
+      type; exec form with args, else sh -c; each hook in its own session,
+      all of an event in parallel on the run's loop; the same stdin JSON;
+      timeouts (600 s, 30 s on UserPromptSubmit), async hooks, onFailure;
+      stdout JSON, plain-text context, exit code 2. The answers of all hooks
+      of an event are merged into one Langertha::Raider::Hooks::Result
+      (deny > ask > allow, updatedInput back in raider form, context,
+      systemMessage, continue: false) with a report per hook. When raider
+      loads briefing.skills itself, the briefing plugin's briefing-preload
+      hook is skipped for Agent calls so skills are not loaded twice.
+      disableAllHooks in the settings turns them all off.
+
+    - Langertha::Raider gained an internal, constructor-only _tool_hook
+      beside _tool_gate (asked before the schema check; deny, replaced
+      arguments, an allow/ask for the gate); Langertha::Raider::Permissions
+      gained rule_matches (a hook's "if" rule).
+
+    - Langertha::Raider::ToolNames translates tool arguments too, both ways:
+      path <-> file_path for read_file, write_file and edit_file, the bash
+      timeout in seconds <-> milliseconds; every other key passes unchanged.
+
+    - Agent files (ADR 0020, first step): raider now reads Claude Code's
+      subagent definitions -- Markdown with frontmatter -- from
+      .raider/agents and ~/.raider/agents and, in the Claude layout, from
+      .claude/agents, ~/.claude/agents ($CLAUDE_CONFIG_DIR respected) and
+      enabled plugins (as plugin:agent), walked recursively, hidden files
+      skipped; the first agent of a name wins, a built-in general-purpose
+      agent comes last. tools / disallowedTools are mapped to raider tool
+      names (unknown ones such as NotebookEdit are ignored and reported),
+      skills and briefing.skills are both read, and model (sonnet, opus,
+      haiku, a claude-* id) maps to a Claude model only under the Anthropic
+      API engine -- elsewhere the agent inherits the caller's model. config
+      explain lists every agent with its tools, model, declared skills,
+      unused keys, shadowed agents and files that are not agents. New config
+      keys agent_models (model per alias) and max_agent_depth are read. The
+      lenient frontmatter reader
+      now keeps one level of nesting (briefing: / skills: / - item).
+
+    - The agent tool (ADR 0020, second step) starts a subagent in the same
+      process: its own context, its own filtered tool set (no ask_user, own
+      todo list), its own child session, and agent.started / agent.finished
+      in the caller's journal and stream.
+
+    - Subagents (ADR 0020, third step) run on the model their file names
+      when the caller uses the Anthropic API, and are briefed: their skills
+      are put in front of the task in the briefing plugin's format; an
+      unknown skill refuses the spawn, over 64 kB warns with agent.warning,
+      and config explain flags agents whose skills do not resolve.
+
+    - A subagent runs under its caller's permission policy (ADR 0021): the
+      same mode, rules and additional directories, session rules shared both
+      ways; its own exit_plan_mode never switches the caller's mode. Starting
+      an agent needs no approval unless an Agent(name) / Task(name) rule says
+      so; a call without subagent_type counts as general-purpose. /reload
+      re-reads agent files.
+
+    - A skill an agent declares that is not installed is read from the
+      sources of skilletor.json (Claude layout; new dependency Skilletor),
+      without installing it, a source fetched only when it has no cache yet;
+      a refused spawn and config explain give the reason per skill (e.g. a
+      template, which the Perl port does not render).
+
+    - Hooks and subagents (ADR 0020 section 7): SubagentStart (context in
+      front of the prompt) and SubagentStop (Stop-style continuation) fire
+      with agent_id and agent_type, a subagent's tool calls run PreToolUse
+      and PostToolUse.
+
+    - Subagents and the Claude Code tools (ADR 0023, ADR 0025): a subagent
+      reads a file itself before it writes it (a read state of its own, as
+      Claude Code gives a subagent with a fresh context), keeps a task list
+      of its own (task_create & co. or todo_write), and is never offered
+      enter_plan_mode -- only the main session enters plan mode. In an agent
+      file's tools / disallowedTools, TodoWrite and the Task* names are one
+      family, Edit and MultiEdit are one, and Bash brings bash_output and
+      kill_shell.
+
+    - Built-in Explore and Plan agents beside general-purpose (ADR 0027
+      section 6), with Claude Code's descriptions: read-only by their
+      instructions and without agent, send_message, write_file, edit_file,
+      multi_edit and exit_plan_mode; their mission has no CLAUDE.md,
+      AGENTS.md or packs, only their instructions, the tools and the skill
+      listing. A file agent of the same name replaces either, as for
+      general-purpose.
+
+    - Subagents nest up to three levels by default (max_agent_depth, ADR
+      0027 section 8). Without the config key,
+      CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH sets it in the Claude layout
+      (also from the settings env); config explain shows where the value
+      comes from and lists a value that does not fit as ignored.
+
+    - Background subagents (ADR 0027 sections 1-5): every subagent gets an
+      agent ID (agent_1, agent_2, ...) in the application's task registry,
+      and its result ends with Claude Code's trailer -- the agentId line and
+      <usage> with subagent_tokens, tool_uses and duration_ms; a failed or
+      cancelled call names the ID. agent takes run_in_background, model and
+      name: a background agent answers at once ("Async agent launched
+      successfully."), runs on the loop, cannot ask for permissions, and
+      its end comes back as a <task-notification> message -- before the
+      next model request, at the prompt as a turn of its own, or in front
+      of the next line typed. A run that would end waits for the background
+      agents it started (subagents, raider -p, the end of piped REPL input);
+      the first Ctrl-C leaves them running, leaving raider stops them.
+      agent.started gains agent_id and background, agent.finished agent_id,
+      session.created of a child session agent_id and name.
+
+    - New tool send_message (Claude Code's SendMessage) beside agent: a
+      running agent gets the message before its next request, a finished one
+      is resumed in the background with its history (also one of an earlier
+      process, found in the session's child sessions); Explore and Plan are
+      one-shot. The agent tool text follows Claude Code's current one.
+
+    - The REPL runs the event loop while it waits for input (with
+      Term::ReadLine::Gnu through its callback interface, else with a prompt
+      of its own instead of IO::Prompt::Tiny; Ctrl-D now leaves there too).
+
+    - The agent calls of one model turn run at the same time (ADR 0027
+      section 9), each through the gate, the hooks and the plugins, their
+      results in call order; any other call between them runs on its own.
+      agent and send_message no longer wait inside tool code: a foreground
+      agent is a Future the caller's raid awaits, so one started by a
+      background agent no longer holds up the main run. At most
+      max_concurrent_agents subagent runs at once (config key; without it
+      CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS in the Claude layout; default 20,
+      shown by config explain); a spawn or resume beyond it is an error
+      result telling the model not to retry now. A Ctrl-C cuts off the
+      agent calls and the run ends once their agents have.
+
+    - Langertha::Raider: new attribute async_tools -- a tool whose call is a
+      handler returning a Future instead of an MCP call, concurrent ones
+      dispatched together within a turn. plugin_before_tool_call and
+      plugin_after_tool_call get the call's context as a further argument
+      (the tool call id; plugins may record keys there), so the Events
+      plugin gives every tool.result the id of its own tool.call. An
+      async tool may carry applies, asked with the tool's source in the
+      raid, so it stands in for one server's tool only.
+
+    - kill_shell (Claude Code's TaskStop) and bash_output (TaskOutput) take
+      agent IDs and agent names too (ADR 0027 section 10): kill_shell stops
+      a running agent ("Successfully stopped task: agent_1 (DESCRIPTION)",
+      then its "was stopped" notification), bash_output answers with the
+      agent's status and, once it has ended, its report in <output>; with
+      block it waits for the agent's end on the loop.
+
+    - Background shells are entries of the task registry (bash_N) and notify
+      the run that started them -- the main conversation or a subagent --
+      when they end on their own or are stopped, in Claude Code's form
+      (<status> completed, failed or killed; "Background command "..."
+      completed (exit code N)", "failed with exit code N", "was stopped");
+      bash's texts say "You will be notified when it completes." Nothing
+      waits for a
+      background shell: a run, raider -p included, ends while one runs.
+      bash_output with block lets the loop run while it waits. A subagent's
+      background shells outlive its run.
+
+    - The first Ctrl-C does not end the foreground command of a
+      background subagent: it belongs to the session, like a background
+      shell (BashTools background_pids). Leaving raider still ends it.
+
+    - A background subagent takes its own copy of the run rules (a
+      /command's allowed-tools) when it starts: a later command's rules do
+      not reach it, the end of the one that started it does not take them
+      away. Foreground subagents share the run's. /clear, /reset and /new
+      stop the conversation's background subagents without a notification
+      and drop the notifications that wait; background shells go on and
+      still notify.
+
+    - Subagents in a worktree of their own (ADR 0032 section 2, ADR 0027
+      section 7): agent takes isolation: "worktree", and an agent file's
+      isolation: worktree isolates every spawn of it; any other value is an
+      error result, and outside a git repository nothing starts ("isolation
+      "worktree" needs a git repository; ROOT is not inside one."). The
+      agent works in .claude/worktrees/agent-N (Claude layout) or
+      .raider/worktrees/agent-N under the main checkout, on branch
+      worktree-agent-N, from origin/HEAD or else HEAD (worktree.baseRef of
+      the Claude settings, worktree_base_ref of the config: fresh or head),
+      with the gitignored files .worktreeinclude names copied in; a root in
+      a subdirectory works in the same subdirectory of the copy. Its file,
+      search and shell tools, its permission policy and the working
+      directory of its mission are the worktree's; a write_file, edit_file
+      or multi_edit into the main checkout is refused before any rule or
+      mode. The worktree is locked while the agent runs. After every run it
+      is unlocked, and removed with its branch when nothing changed;
+      otherwise the result gains worktreePath/worktreeBranch lines, the
+      notification a <worktree> element, the registry entry worktree and
+      branch. A failed git command keeps it ("worktree kept: REASON"), a
+      cancelled run nobody hears of names it in a meta line ("agent agent_1
+      left its worktree P on branch B"). send_message continues in the
+      same worktree, checks the branch out again or makes it anew.
+      agent.started gains worktree and branch, agent.finished worktree_kept.
+      New internal module Langertha::Raider::Worktree (git command line,
+      failures as values). Hook inputs of an isolated agent have its
+      worktree as cwd; its perl_eval, perl_check and perl_cpanm run there
+      too, with the private lib of the root.
+
+    - enter_worktree and exit_worktree, Claude Code's EnterWorktree and
+      ExitWorktree (ADR 0032 sections 3 to 6), in the main run only (never
+      in a subagent). enter_worktree makes a worktree under
+      .claude/worktrees/NAME (Claude layout) or .raider/worktrees/NAME on
+      branch worktree-NAME, from the same base as an isolated agent's
+      (worktree.baseRef / worktree_base_ref), and moves the session's
+      working root into it -- the same subdirectory when raider runs in
+      one. A name is segments of letters, digits, ".", "_" and "-" joined
+      by "/", at most 64 characters, no "." or ".." segment; without one it
+      is session-N; an existing directory or branch of that name is an
+      error ("Worktree NAME exists; pass path to enter it."). path enters
+      a worktree git worktree list knows instead (not the main checkout),
+      also from inside another one, which stays on disk untouched; a path
+      outside .claude/worktrees/ and .raider/worktrees/ is put to the
+      person every time, whatever rule or mode allows it -- only
+      bypassPermissions skips the question, and nobody to ask refuses it.
+      exit_worktree keep returns to the root; remove deletes worktree and
+      branch, but only one this session created, and with changes (git
+      status --porcelain lines, commits beyond the base) only with
+      discard_changes: true (git worktree remove --force); a removal git
+      refuses returns to the root anyway ("worktree kept: REASON").
+      Outside a worktree it is a no-op that says so. From the next call
+      on, the file, search and shell tools (and the Perl tools when
+      mounted) work in the working root, the permission policy is rooted
+      there and refuses edits into the main checkout, hook inputs carry it
+      as cwd (the hooks themselves still run at the root with
+      CLAUDE_PROJECT_DIR the root), subagents spawned meanwhile start in
+      it and the next run's mission names it as working directory.
+      Context, settings, instructions, skills and the session store stay
+      at the root. Both tools are write tools: asked in default, allowed
+      in acceptEdits and auto, refused in plan; rules and hook matchers
+      name them EnterWorktree and ExitWorktree. A new conversation (/clear,
+      /reset, /new) and the end of the session (leaving the REPL, SIGTERM,
+      the end of raider -p) close a worktree enter_worktree made: removed
+      with its branch when unchanged, kept otherwise with a meta line
+      ("worktree P kept on branch B (has changes)"); one entered by path
+      is only left. The journal records worktree.entered (path, branch,
+      created) and worktree.exited (path, branch, removed, reason
+      exit_worktree, clear or session_end). The main run's tool list grows
+      by the two tools. New internal module Langertha::Raider::WorktreeTools.
+
+
+  [Permissions]
+    - INCOMPATIBLE: every tool call of raider now passes a permission policy
+      (ADR 0021), and in the default mode a run nobody can approve -- a
+      one-shot `raider "..."`, --json and the --stream-* flags, a Hall
+      raider, ACP -- refuses writing files, bash, the network and messages
+      unless a rule allows them. The model gets the reason, the rule that
+      would allow the call and where to put it. Remedy: allow rules in
+      .raider/config.yml (`permissions: { allow: [...] }`) or
+      .claude/settings.json, `permissions.default_mode` /
+      `defaultMode`, --permission-mode acceptEdits|bypassPermissions or
+      --dangerously-skip-permissions, or `permission_mode` on a hall raider.
+      Langertha::Raider used as a library is unchanged: without a gate every
+      call runs.
+
+    - Permission modes like Claude Code: default (reading runs; writing,
+      code, network and messages ask), acceptEdits (also writes inside the
+      project and the additional directories), plan (read only; writing,
+      bash and messages are refused until the plan is accepted) and
+      bypassPermissions (everything runs -- except what a deny rule names,
+      unlike Claude Code). New options --permission-mode MODE and
+      --dangerously-skip-permissions. The mode comes from the flag, else
+      permissions.default_mode of .raider/config.yml / ~/.raider/config.yml,
+      else defaultMode of the Claude settings, else default.
+
+    - Permission rules in Claude Code syntax from the Claude settings and
+      from the new `permissions:` key of .raider/config.yml and
+      ~/.raider/config.yml (allow, ask, deny, default_mode,
+      additional_directories): Tool, Bash(cmd), Bash(prefix:*), Bash with *
+      globs, Read(path) / Edit(path) with gitignore-style globs (//abs, ~/,
+      relative to the project), WebFetch(domain:host), Agent(name),
+      Skill(name), mcp__server[__tool]. Deny before ask before allow across
+      all sources. An allow rule covers a shell command only when every part
+      of it (&&, ||, ;, |, newlines) is covered and it has no substitution or
+      redirection into a file; ../ and symbolic links do not get around a
+      path rule. Invalid rules are ignored and shown.
+
+    - The REPL asks before a call the policy asks about: yes once (an
+      approval of exactly that call), yes for this session (the rule it
+      adds is shown first) or no with an optional reason for the model.
+      The prompt builder asks the same way. /permissions shows the mode,
+      every rule with its source and the session rules; /permissions mode
+      NAME switches the mode. /reload reads the rules again and keeps the
+      session's.
+
+    - Plan mode: the new exit_plan_mode tool (after Claude Code's
+      ExitPlanMode) presents the plan; accepted in the REPL the mode becomes
+      default, refused the model gets the feedback, and with nobody to ask
+      it is refused.
+
+    - Additional directories (additionalDirectories / additional_directories)
+      can be read, searched and, as the mode allows, written by the file and
+      search tools. build_file_tools_server takes `extra_roots`.
+
+    - glob and grep leave out the files a Read deny or ask rule names and say
+      how many ("N paths hidden by permission rules"); a search inside such
+      a directory is refused.
+
+    - Events permission.asked, permission.granted, permission.denied and
+      permission.mode, recorded in the session journal and in --stream-json.
+      config explain has a permissions section (mode and source, rules per
+      kind and source, invalid rules and mode names, additional
+      directories).
+
+    - Hall: a raider entry may set permission_mode, passed as
+      --permission-mode.
+
+    - /reload now reaches the additional directories of the mounted file and
+      search tools: they read the roots from the policy on every call
+      (`extra_roots` of build_file_tools_server and SearchTools may be a
+      CodeRef), so a directory added is reachable and one removed is refused
+      from the next call on. Symlink escapes stay refused.
+
+    - New permission mode `auto`, the raider form of Claude Code's
+      `defaultMode: "auto"` (until now skipped as an unknown mode): acceptEdits
+      plus bash commands that only read, from a fixed list (ls, cat, grep, rg,
+      find without -exec/-delete, git status/diff/log/show/branch, ...) where
+      every part of the command must be on it and none may hold a
+      substitution or a redirection into a file; everything else asks. Deny
+      and ask rules hold, allow rules add. Also --permission-mode auto,
+      permissions.default_mode: auto and /permissions mode auto. config
+      explain and /permissions show "claude auto -> raider acceptEdits +
+      read-only bash allowlist".
+
+    - ACP: a tool call the policy asks about, in a run of an ACP session, is
+      put to the client as `session/request_permission` (options allow_once,
+      allow_always with the suggested rule as a session rule, reject_once).
+      The hall opens a private Unix socket per such run (hidden option
+      `--permission-channel PATH` of raider, set only by the hall). Reject,
+      cancelled, an unknown option, an error, no answer within
+      `permission_timeout` (hall config, default 120 s), a closed connection
+      or session/cancel all refuse the call; nothing allows by default. Runs
+      without an ACP session are refused as before. `raider acp connect` asks
+      at the terminal, `raider acp prompt` rejects; the ACP client no longer
+      mistakes an agent request for the response of its own call. ADR 0021
+      addendum P2.
+
+
+  [CLI and REPL]
+    - New raider provider add ALIAS HOST [--credential-env NAME]
+      [--allow-internal]: fetches and validates the manifest, shows its
+      endpoints, auth and what is pinned, asks on a terminal and stores the
+      alias under providers: in ~/.raider/config.yml (origin, issuer, auth
+      types, the name of the environment variable the credential comes
+      from, allow_internal, pinned_at, fingerprint -- never a secret).
+      Without a terminal nothing is fetched or stored. raider --provider
+      ALIAS runs on the stored binding: its origin and allow_internal, the
+      key from its credential_env (or -k); when origin, issuer, an
+      endpoint's origin or dialect, the auth types or the credential_env
+      changed since it was accepted, or the entry was edited, the run stops
+      until provider add is
+      run again. A model-list or capability change does not. API keys in the
+      environment never select an alias; providers: in a project file is
+      ignored.
+
+    - New raider provider list, provider show ALIAS and provider remove ALIAS
+      [--yes] manage the stored aliases: list and show print what is pinned
+      (never a secret) and fetch nothing, remove asks on a terminal and needs
+      --yes without one. The aliases also appear in raider config explain and
+      the REPL banner.
+
+    - A model offered on several usable endpoints of a provider manifest is
+      refused with the endpoints named; the new --provider-endpoint ID
+      chooses one.
+
+    - A raider --provider that cannot run is also a refused or failed
+      document on stdout with --json (exit status unchanged); every such
+      document carries elapsed to the millisecond.
+
+    - raider --provider NAME: a name without dot, port, [IPv6] or https:// is
+      always a provider alias; one that is not stored is a usage error (exit
+      2, the failed document with --json) pointing to raider provider add,
+      and nothing is fetched. provider inspect and provider add no longer
+      take a bare name as HOST: a host needs a dot, a port, brackets (an IPv6
+      literal such as [::1]) or https:// (ADR 0007).
+
+    - The REPL banner no longer says "no API key required" for a -k key under
+      --provider, and shows the provider alias.
+
+    - run.started names session, run, cwd, permission_mode, tools and
+      raider_version; run.finished and the --json document carry a reason
+      code whenever a run did not complete; permission.* and the tool
+      hooks' hook.ran name their call; a failed, refused or cancelled tool
+      call runs the PostToolUseFailure hooks;
+      bin/raider documents every
+      stream event type (ADR 0034).
+
+
+  [Tools]
+    - edit_file takes replace_all, as Claude Code's Edit: every occurrence
+      of old_string is replaced instead of an error when it is not unique.
+
+    - New tools, named and shaped after Claude Code's Glob, Grep, TodoWrite
+      and AskUserQuestion (ADR 0018). glob(pattern, [path]) lists files by
+      pattern ("**/*.pm", "*.{json,yml}"), newest first, as paths relative to
+      the root. grep(pattern, [path], [glob], [type], [output_mode], [-i],
+      [-n], [-A], [-B], [-C], [context], [multiline], [head_limit], [offset])
+      searches contents: files_with_matches (default), content with context,
+      or count. grep runs ripgrep when it is installed and plain Perl
+      otherwise, with the same output; both skip .git, symbolic links, binary
+      files and files over 10 MB, and neither reads .gitignore. todo_write
+      keeps the model's task list in the state of the run
+      (Application->todos) and reports every change as the event
+      todo.updated (session journal and --stream-json). ask_user puts a
+      question, optionally with choices, to the person at the REPL; in a run
+      nobody can answer (one-shot, Hall, cron, ACP) it is refused with an
+      error result that tells the model to decide itself. glob and grep are
+      confined to the root like the file tools. Effect classes: glob and
+      grep read, todo_write none, ask_user message.
+
+    - INCOMPATIBLE: bash is gated by a port of the loadguard plugin, on by
+      default. A heavy command (prove, make test, dzil test|build|release,
+      cpanm, perlbench, docker|podman build|run, cargo build|test, npm test,
+      claude -p|--bg, codex exec|review), found in command position, is
+      refused with the measured figures and the advice that fits while the
+      host is under memory pressure (PSI memory full avg10 >=
+      LOADGUARD_PSI_FULL, default 10 %; swap used >= LOADGUARD_SWAP_USED,
+      default 90 %) or all heavy slots (LOADGUARD_HEAVY_SLOTS, default max(1,
+      nproc/2)) are held by running commands of raider processes. Light
+      commands are never refused; without /proc/pressure or swap the signal is
+      "no pressure"; LOADGUARD_THROTTLE=0 turns the gate off.
+      LOADGUARD_CONFINE=1 (off by default) makes raider start itself again in
+      a transient systemd user scope with memory limits
+      (LOADGUARD_MEMORY_HIGH/MAX/SWAP_MAX in percent of RAM,
+      LOADGUARD_CPU_WEIGHT). New Langertha::Raider::Loadguard.
+
+    - New Langertha::Raider::ToolNames: the table of Claude Code tool names
+      and the raider tools they stand for (Read -> read_file, Edit ->
+      edit_file, MultiEdit -> multi_edit, Glob -> glob, Task and Agent ->
+      agent, ...;
+      mcp__* pass through) for the Claude-mode surfaces.
+
+
+  [Raid engine]
+    - The application no longer sends an embedding request per session-history
+      entry: it mounts no tool that reads them, and a provider without an
+      embeddings endpoint answered every one with a 404. Embeddings run only
+      when a history tool is mounted and the engine can embed (ADR 0028);
+      `raider config explain` shows `session embeddings`. Langertha::Raider
+      used directly is unchanged.
+
+    - A Langertha::Raider that goes away while session-history embeddings
+      are still in flight lets them finish instead of dropping them. Every
+      subagent run printed "Suspended async sub
+      Langertha::Role::Embedding::simple_embedding_f lost its returning
+      future". Cancelling them instead would leave a half-open
+      Net::Async::HTTP connection on the loop.
+
+
+  [Hall]
+    - A client that subscribed to the hall's events on the control socket no
+      longer makes the next event die: the hall asked its stream for ->handle,
+      which an IO::Async::Stream does not have, so spawn answered "command
+      failed" (the raider was started nevertheless) and no event reached the
+      subscriber.
+
+    - A hall raider entry takes provider: ALIAS (raider hall add-raider and
+      init --provider ALIAS) and is spawned with --provider ALIAS. A host or
+      origin, an alias that is not stored in ~/.raider/config.yml, and
+      provider together with engine are refused before writing and at spawn.
+
+    - The hall event bus is a versioned public wire format (ADR 0033): every
+      event carries version 1, seq and a float time (ts stays); events and
+      control-socket answers are canonical JSON; the hall POD lists every
+      type.
+
+    - A mission the hall refuses (provider entry) emits raider.refused with a
+      reason code; the spawn answer adds status/reason, the slot log line
+      reads "[hall] raider NAME refused: WHY; mission not run", Telegram gets
+      a short reply, cron reports binding cron:ID.
+
+    - Fix: an ACP session/prompt whose queued mission was refused when pulled
+      from the queue waited forever; it now ends with JSON-RPC error -32000.
+
+
 0.503     2026-10-01 21:25:19Z
 
   [Distribution]

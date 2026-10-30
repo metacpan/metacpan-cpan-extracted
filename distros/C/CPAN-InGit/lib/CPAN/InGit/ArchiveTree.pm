@@ -1,5 +1,5 @@
 package CPAN::InGit::ArchiveTree;
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: An object managing a CPAN file structure in a Git Tree
 
 
@@ -466,7 +466,8 @@ take precedence in the indexing.
 =head2 name
 
 A human-readable name for this ArchiveTree instance.  Defaults to the branch name, when loaded
-from a branch.
+from a branch.  When loaded by L<CPAN::InGit/get_archive_tree> it is set to tag or sha1 if a
+branch is not available.
 
 =head2 config
 
@@ -606,7 +607,7 @@ complete package collection.
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 AUTHOR
 

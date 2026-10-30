@@ -103,4 +103,5 @@ for my $spec ( [ A => 'wakeA2' ], [ B => 'wakeB' ], [ C => 'wakeC2' ], [ D => 'w
     is $r->[2], '',          "$name saw no error";
 }
 is Acme::Parataxis::get_live_fiber_count(), $base, 'and every fiber was reaped';
+#
 done_testing;

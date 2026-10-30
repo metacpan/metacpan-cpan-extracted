@@ -1,0 +1,40 @@
+title: a TaskCreated hook gets task_id, task_subject and task_description; exit 2 undoes the creation and the model reads the stderr (ADR 0022 addendum)
+files:
+  .claude/settings.json: |
+    { "hooks": { "TaskCreated": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/task-created", "args": [] } ] }
+    ] } }
+  hooks/task-created: |
+    #!/bin/sh
+    input=$(cat)
+    printf '%s\n' "$input" | grep -o '"hook_event_name":"[^"]*"\|"task_id":"[^"]*"\|"task_subject":"[^"]*"\|"task_description":"[^"]*"' | sort >> {{ROOT}}/created.log
+    case "$input" in *'"task_subject":"Do stuff"'*) echo "name the task after its outcome" >&2; exit 2;; esac
+    exit 0
+executable: [ hooks/task-created ]
+prompt: Plan the work.
+script:
+  - tool_calls:
+      - [ task_create, { subject: Do stuff, description: something } ]
+      - [ task_create, { subject: Write the tests, description: cover the parser } ]
+  - text: planned
+expect:
+  answer: planned
+  files:
+    created.log: |
+      "hook_event_name":"TaskCreated"
+      "task_description":"something"
+      "task_id":"1"
+      "task_subject":"Do stuff"
+      "hook_event_name":"TaskCreated"
+      "task_description":"cover the parser"
+      "task_id":"1"
+      "task_subject":"Write the tests"
+  todos:
+    - { content: Write the tests, status: pending }
+  tools:
+    - { name: task_create, error: true, text: '\ATaskCreated hook error: name the task after its outcome\z' }
+    - { name: task_create, text: '\ATask #1 created successfully: Write the tests\z' }
+  events:
+    - { type: hook.ran, hook_event: TaskCreated, outcome: block, exit: 2 }
+    - { type: hook.ran, hook_event: TaskCreated, outcome: success, exit: 0 }
+    - { type: todo.updated }

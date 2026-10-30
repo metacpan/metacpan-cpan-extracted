@@ -516,9 +516,9 @@ my @gg = map { ($_) x @{ $grp{$_} } } sort keys %grp;
 {
 	is_deeply binom_test( ta( [ 7, 3 ] ) ), binom_test( [ 7, 3 ] ), 'binom_test: a tied [successes, failures]';
 	eval { binom_test( ta( [ 7, undef ] ) ) };
-	like $@, qr/binom_test: failures is undef/, 'binom_test: a tied undef is still refused';
+	like $@, qr/binom_test: error: failures is undef/, 'binom_test: a tied undef is still refused';
 	eval { binom_test( ta( [ 7, 'z' ] ) ) };
-	like $@, qr/binom_test: failures is not a number/, 'binom_test: a tied non-number is still refused';
+	like $@, qr/binom_test: error: failures is not a number/, 'binom_test: a tied non-number is still refused';
 	is_deeply epi_2x2( ta( [ 10, 20, 30, 40 ] ) ), epi_2x2( [ 10, 20, 30, 40 ] ), 'epi_2x2: a tied vector';
 	is_deeply epi_2x2( [ ta( [ 10, 20 ] ), ta( [ 30, 40 ] ) ] ), epi_2x2( [ [ 10, 20 ], [ 30, 40 ] ] ),
 	          'epi_2x2: tied rows';

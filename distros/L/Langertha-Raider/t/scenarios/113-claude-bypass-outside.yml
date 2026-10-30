@@ -1,0 +1,21 @@
+title: in the Claude layout bypassPermissions reaches files outside the root, as Claude Code does; a deny rule still holds
+files:
+  CLAUDE.md: "Project notes.\n"
+  .claude/settings.json: |
+    { "permissions": { "deny": [ "Read(~/private/**)" ] } }
+home:
+  notes/todo.txt: "outside the project\n"
+  private/key: "secret\n"
+prompt: Read my notes.
+script:
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/notes/todo.txt" } ]
+      - [ write_file, { path: "{{HOME}}/notes/new.txt", content: "made\n" } ]
+      - [ read_file, { path: "{{HOME}}/private/key" } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: read_file, text: "\\A1\\toutside the project" }
+    - { name: write_file, text: "\\AFile created successfully at: /\\S+/notes/new\\.txt" }
+    - { name: read_file, error: true, text: "denied by rule 'Read\\(~/private/\\*\\*\\)'", not_text: secret }

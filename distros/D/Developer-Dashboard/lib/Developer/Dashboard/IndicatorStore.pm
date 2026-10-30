@@ -4,15 +4,16 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Fcntl qw(:flock);
 use File::Spec;
 use Time::HiRes qw(time);
+use Errno qw(ENOENT ENOTDIR);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::IndicatorStore::Watch;
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 
 my $STATUS_ICONS = {
@@ -71,7 +72,8 @@ sub new {
 # Writes indicator state to the file-backed indicator store.
 # Input: indicator name plus state fields such as label, icon, and status, and
 # optional internal preserve fields used when config sync must not clobber a
-# newer live status update.
+# newer live status update. During collector sync, a write invalidates the
+# matching request-local decoded-file entry.
 # Output: saved indicator hash reference.
 sub set_indicator {
     my ( $self, $name, %data ) = @_;
@@ -106,6 +108,10 @@ sub set_indicator {
     # secures that staging file's permissions BEFORE the rename, not after.
     my $tmp = $self->_pending_indicator_file($file);
     $self->{paths}->atomic_write_secure( $tmp, $file, json_encode( \%data ) );
+    delete $self->{_indicator_sync_read_cache}{$file}
+      if ref( $self->{_indicator_sync_read_cache} ) eq 'HASH';
+    delete $self->{_indicator_file_bytes_cache}{$file}
+      if ref( $self->{_indicator_file_bytes_cache} ) eq 'HASH';
 
     return \%data;
 }
@@ -134,7 +140,19 @@ sub _pending_indicator_file {
 # Output: indicator hash reference or undef when missing.
 sub get_indicator {
     my ( $self, $name ) = @_;
-    for my $file ( $self->_indicator_file_candidates($name) ) {
+    my @roots = $self->{paths}->indicators_roots;
+    return $self->_get_indicator_from_roots( $name, \@roots );
+}
+
+# _get_indicator_from_roots($name, $roots)
+# Loads one indicator from a caller's already-discovered ordered state roots.
+# Input: indicator name string and array reference of roots ordered deepest to home.
+# Output: decoded indicator hash reference or undef when no candidate exists.
+sub _get_indicator_from_roots {
+    my ( $self, $name, $roots ) = @_;
+    die "Indicator roots must be an array reference\n" if ref($roots) ne 'ARRAY';
+    for my $root ( @{$roots} ) {
+        my $file = File::Spec->catfile( $root, $name, 'status.json' );
         my $item = $self->_read_indicator_file($file);
         return $item if $item;
     }
@@ -143,35 +161,164 @@ sub get_indicator {
 
 # list_indicators()
 # Lists all valid stored indicators ordered by prompt priority.
-# Input: none.
+# Input: optional internal ordered roots array reference; when omitted, roots
+# are discovered from the live PathRegistry.
 # Output: sorted list of indicator hash references.
 sub list_indicators {
-    my ($self) = @_;
+    my ( $self, $roots ) = @_;
     my %items;
-    for my $root ( $self->{paths}->indicators_roots ) {
+    my @roots = ref($roots) eq 'ARRAY' ? @{$roots} : $self->{paths}->indicators_roots;
+    my @directory_inventory;
+    for my $root (@roots) {
         next if !-d $root;
         opendir my $dh, $root or next;
+        my @entries;
         while ( my $entry = readdir $dh ) {
             next if $entry eq '.' || $entry eq '..';
+            push @entries, $entry;
             next if $items{$entry};
-            my $item = eval { $self->get_indicator($entry) };
+            my $item = eval { $self->_get_indicator_from_roots( $entry, \@roots ) };
             $items{$entry} = $item if $item;
         }
         closedir $dh;
+        push @directory_inventory, [ $root, [ sort @entries ] ];
     }
+    $self->{_indicator_sync_directory_inventory_current} = json_encode( \@directory_inventory )
+      if exists $self->{_indicator_sync_directory_inventory_current};
 
-    return sort { $self->_indicator_sort_cmp( $a, $b ) } values %items;
+    return $self->_sort_indicators( values %items );
 }
 
-# sync_collectors($jobs)
+# _sort_indicators($items)
+# Sorts indicator records using the public prompt/page ordering contract. Small
+# lists use the shared comparator; larger lists precompute compare fields to
+# avoid repeated method dispatch and hash lookups inside Perl's sort loop.
+# Input: indicator hash references as a list.
+# Output: indicator hash references ordered by priority, collector order, name.
+sub _sort_indicators {
+    my ( $self, @items ) = @_;
+    return sort { $self->_indicator_sort_cmp( $a, $b ) } @items if @items < 32;
+
+    my @decorated = map {
+        my $item = $_;
+        [
+            $item,
+            ( defined $item->{priority} ? $item->{priority} : 999 ),
+            ( $item->{managed_by_collector} || 0 ) ? 1 : 0,
+            ( defined $item->{collector_order} ? $item->{collector_order} : 999 ),
+            ( $item->{name} || '' ),
+        ];
+    } @items;
+
+    return map { $_->[0] }
+      sort { _indicator_sort_order_cmp( $a, $b ) } @decorated;
+}
+
+# _indicator_sort_order_cmp($left, $right)
+# Compares decorated indicator tuples without object dispatch or hash access.
+# Input: two arrays [record, priority, collector flag, collector order, name].
+# Output: negative, zero, or positive integer suitable for Perl sort.
+sub _indicator_sort_order_cmp {
+    my ( $left, $right ) = @_;
+    my $priority_order = $left->[1] <=> $right->[1];
+    return $priority_order if $priority_order;
+
+    if ( $left->[2] && $right->[2] ) {
+        my $collector_order = $left->[3] <=> $right->[3];
+        return $collector_order if $collector_order;
+    }
+
+    return $left->[4] cmp $right->[4];
+}
+
+# sync_collectors($jobs, %opts)
 # Seeds or refreshes indicator records declared by collector config without
 # clobbering live status from previous collector runs.
-# Input: array reference of collector job hash references.
-# Output: array reference of indicator hashes that were written.
+# Callers may request the final inventory so it can be rendered without a
+# second read of the same status files.
+# Input: array reference of collector job hash references and optional
+# return_indicators, return_unchanged, and
+# skip_indicators_if_unchanged booleans, and an optional canonical
+# collector_jobs_signature from a config snapshot already validated by its
+# watcher.
+# Output: written indicator array reference, or a hash reference containing
+# written and indicators array references when return_indicators is true. Each
+# call shares one roots snapshot and decoded-file cache, discarded on return so
+# later calls observe filesystem changes. With return_unchanged, the inventory
+# result also reports whether it came from the validated stable-sync fast path.
 sub sync_collectors {
-    my ( $self, $jobs ) = @_;
-    return [] if ref($jobs) ne 'ARRAY';
-    return [] if !@{$jobs};
+    my ( $self, $jobs, %opts ) = @_;
+    my $return_indicators = $opts{return_indicators} ? 1 : 0;
+    my $return_unchanged = $opts{return_unchanged} ? 1 : 0;
+    my $skip_indicators_if_unchanged = $opts{skip_indicators_if_unchanged} ? 1 : 0;
+    if ( ref($jobs) ne 'ARRAY' || scalar(@$jobs) == 0 ) {
+        return [] if !$return_indicators;
+        return { written => [], indicators => [ $self->list_indicators ] };
+    }
+
+    # Decoded records live for one sync only. Raw JSON bytes may be reused across
+    # syncs only while high-resolution file metadata and the directory inventory agree.
+    local $self->{_indicator_sync_read_cache} = {};
+    local $self->{_indicator_sync_persistent_read} = 1;
+    local $self->{_indicator_sync_file_changed} = 0;
+    local $self->{_indicator_sync_directory_inventory_current};
+    my @indicator_roots = $self->{paths}->indicators_roots;
+    my $jobs_signature;
+    if ( exists $opts{collector_jobs_signature} ) {
+        die "collector_jobs_signature must be a non-empty scalar\n"
+          if !defined $opts{collector_jobs_signature}
+          || ref( $opts{collector_jobs_signature} )
+          || $opts{collector_jobs_signature} eq '';
+        $jobs_signature = $opts{collector_jobs_signature};
+    }
+    else {
+        $jobs_signature = json_encode($jobs);
+    }
+    my $config_signature = json_encode( { jobs_signature => $jobs_signature, roots => \@indicator_roots } );
+
+    if ( defined $self->{_collector_sync_config_signature}
+        && $self->{_collector_sync_config_signature} eq $config_signature )
+    {
+        if ( $return_indicators && $return_unchanged && $skip_indicators_if_unchanged ) {
+            if ( $self->_collector_sync_files_unchanged( \@indicator_roots, $jobs ) ) {
+                return { written => [], unchanged => 1 };
+            }
+        }
+        else {
+            my @cached_indicators = $self->list_indicators( \@indicator_roots );
+            my $inventory_matches = defined $self->{_indicator_sync_directory_inventory_current}
+              && defined $self->{_indicator_sync_directory_inventory_signature}
+              && $self->{_indicator_sync_directory_inventory_current}
+              eq $self->{_indicator_sync_directory_inventory_signature};
+            my %present = map { ( $_->{name} || '' ) => 1 } grep { ref($_) eq 'HASH' } @cached_indicators;
+            my $all_active_indicators_present = 1;
+            for my $job ( @{$jobs} ) {
+                next if ref($job) ne 'HASH';
+                next if ref( $job->{indicator} ) ne 'HASH';
+                next if !defined $job->{name} || $job->{name} eq '' || $job->{disable};
+                my $name = $job->{indicator}{name};
+                $name = $job->{name} if !$name;
+                if ( !$present{$name} ) {
+                    $all_active_indicators_present = 0;
+                    last;
+                }
+            }
+
+            if (
+                _collector_inventory_is_unchanged(
+                    $inventory_matches,
+                    $self->{_indicator_sync_file_changed},
+                    $all_active_indicators_present,
+                )
+              )
+            {
+                return [] if !$return_indicators;
+                my $result = { written => [], indicators => \@cached_indicators };
+                $result->{unchanged} = 1 if $return_unchanged;
+                return $result;
+            }
+        }
+    }
 
     my @written;
     my %active_collectors;
@@ -183,7 +330,11 @@ sub sync_collectors {
         next if $job->{disable};
 
         $active_collectors{ $job->{name} } = 1;
-        my $plan = $self->_collector_sync_plan( $job, collector_order => $collector_order );
+        my $plan = $self->_collector_sync_plan(
+            $job,
+            collector_order => $collector_order,
+            indicator_roots => \@indicator_roots,
+        );
         if ( $plan->{needs_write} ) {
             my $candidate = $plan->{candidate};
             push @written, $self->set_indicator(
@@ -195,17 +346,248 @@ sub sync_collectors {
         $collector_order++;
     }
 
-    for my $indicator ( $self->list_indicators ) {
+    my @current_indicators = $self->list_indicators( \@indicator_roots );
+    my $deleted_indicator  = 0;
+    for my $indicator (@current_indicators) {
         next if ref($indicator) ne 'HASH';
         next if !$indicator->{managed_by_collector};
         my $collector_name = $indicator->{collector_name} || '';
         next if $collector_name eq '';
         next if $active_collectors{$collector_name};
-        $self->delete_indicator( $indicator->{name} );
+        $self->delete_indicator( $indicator->{name}, \@indicator_roots );
+        $deleted_indicator = 1;
         push @written, { %{$indicator}, deleted => 1 };
     }
 
+    if ($return_indicators) {
+        @current_indicators = $self->list_indicators( \@indicator_roots ) if $deleted_indicator;
+        $self->{_collector_sync_config_signature} = $config_signature;
+        $self->{_indicator_sync_directory_inventory_signature}
+          = $self->{_indicator_sync_directory_inventory_current};
+        $self->_configure_indicator_sync_watcher( \@indicator_roots, $jobs );
+        my $result = { written => \@written, indicators => \@current_indicators };
+        $result->{unchanged} = 0 if $return_unchanged;
+        return $result;
+    }
+    $self->{_collector_sync_config_signature} = $config_signature;
+    $self->{_indicator_sync_directory_inventory_signature}
+      = $self->{_indicator_sync_directory_inventory_current};
+    $self->_configure_indicator_sync_watcher( \@indicator_roots, $jobs );
     return \@written;
+}
+
+# _collector_inventory_is_unchanged($inventory_matches, $file_changed, $all_active_present)
+# Decides whether the cached collector inventory is safe to return without a
+# reconciliation pass. Kept as a named predicate so each safety input can be
+# independently tested, including combinations that the filesystem makes rare.
+# Input: booleans describing directory inventory equality, status-file changes,
+#        and presence of every active collector indicator.
+# Output: true only when inventory matches, no file changed, and all active
+#         indicator records are present.
+sub _collector_inventory_is_unchanged {
+    my ( $inventory_matches, $file_changed, $all_active_present ) = @_;
+    return $inventory_matches && !$file_changed && $all_active_present ? 1 : 0;
+}
+
+# _collector_sync_files_unchanged($roots, $jobs)
+# Validates the previously listed indicator directories and chosen status files
+# using names and file signatures only, avoiding JSON decoding when an internal
+# caller already has a validated serialized response to reuse. It reuses path
+# strings only for an exact ordered-root and directory-inventory match. A
+# matching, event-free watcher can skip this portable revalidation.
+# Input: indicator roots in lookup order and the normalized collector jobs.
+# Optional named skip_watcher boolean forces portable validation while a new
+# watcher snapshot is being established.
+# Output: true only when directory inventory, cached file signatures, and every
+#        active collector's effective indicator file are unchanged.
+sub _collector_sync_files_unchanged {
+    my ( $self, $roots, $jobs, %opts ) = @_;
+    return 0 if ref($roots) ne 'ARRAY' || ref($jobs) ne 'ARRAY';
+    return 0 if !defined $self->{_indicator_sync_directory_inventory_signature};
+
+    if ( !$opts{skip_watcher} ) {
+        my $watcher = $self->_indicator_sync_watcher;
+        if ($watcher) {
+            my $root_signature = join "\0", @{$roots};
+            return 0
+              if !defined $self->{_indicator_sync_watcher_roots_signature}
+              || $self->{_indicator_sync_watcher_roots_signature} ne $root_signature;
+            return 1
+              if defined $self->{_indicator_sync_watcher_signature}
+              && $watcher->unchanged( $self->{_indicator_sync_watcher_signature} );
+            if ( defined $watcher->last_error ) {
+                $self->_disable_indicator_sync_watcher($watcher);
+            }
+        }
+    }
+
+    my @directory_inventory;
+    my %inventory_names;
+    for my $root ( @{$roots} ) {
+        next if !-d $root;
+        opendir my $dh, $root or return 0;
+        my @entries;
+        $! = 0;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            push @entries, $entry;
+            $inventory_names{$entry} = 1;
+        }
+        if ($!) {
+            closedir $dh or die "Unable to close indicator directory '$root': $!";
+            return 0;
+        }
+        closedir $dh or die "Unable to close indicator directory '$root': $!";
+        push @directory_inventory, [ $root, [ sort @entries ] ];
+    }
+
+    my $current_inventory_signature = json_encode( \@directory_inventory );
+    $self->{_indicator_sync_directory_inventory_current} = $current_inventory_signature
+      if exists $self->{_indicator_sync_directory_inventory_current};
+    return 0 if $current_inventory_signature ne $self->{_indicator_sync_directory_inventory_signature};
+
+    my $status_paths_signature = json_encode( { roots => $roots, inventory => $current_inventory_signature } );
+    my $status_paths_cache = $self->{_indicator_status_paths_cache};
+    if ( ref($status_paths_cache) ne 'HASH'
+        || !defined $status_paths_cache->{cache_signature}
+        || $status_paths_cache->{cache_signature} ne $status_paths_signature
+        || ref( $status_paths_cache->{paths_by_name} ) ne 'HASH' )
+    {
+        my %paths_by_name;
+        for my $name ( keys %inventory_names ) {
+            $paths_by_name{$name} = [ map { File::Spec->catfile( $_, $name, 'status.json' ) } @{$roots} ];
+        }
+        $status_paths_cache = {
+            cache_signature => $status_paths_signature,
+            paths_by_name   => \%paths_by_name,
+        };
+        $self->{_indicator_status_paths_cache} = $status_paths_cache;
+    }
+
+    my $persistent = $self->{_indicator_file_bytes_cache};
+    return 0 if ref($persistent) ne 'HASH';
+    for my $file ( keys %{$persistent} ) {
+        my $cached = $persistent->{$file};
+        return 0 if ref($cached) ne 'HASH' || !defined $cached->{signature};
+        my $current_signature = $self->_indicator_file_signature($file);
+        if ( $current_signature ne $cached->{signature} ) {
+            $self->{_indicator_sync_file_changed} = 1
+              if exists $self->{_indicator_sync_file_changed};
+            return 0;
+        }
+    }
+
+    my %status_file_exists_by_name;
+    for my $name ( keys %inventory_names ) {
+        my $files = $status_paths_cache->{paths_by_name}{$name};
+        return 0 if ref($files) ne 'ARRAY';
+        for my $file ( @{$files} ) {
+            return 0 if !exists $persistent->{$file};
+            if ( $persistent->{$file}{signature} ne 'missing' ) {
+                $status_file_exists_by_name{$name} = 1;
+                last;
+            }
+        }
+    }
+
+    for my $job ( @{$jobs} ) {
+        next if ref($job) ne 'HASH';
+        next if ref( $job->{indicator} ) ne 'HASH';
+        next if !defined $job->{name} || $job->{name} eq '' || $job->{disable};
+        my $name = $job->{indicator}{name};
+        $name = $job->{name} if !$name;
+        return 0 if !$status_file_exists_by_name{$name};
+    }
+
+    return 1;
+}
+
+# _indicator_sync_watcher()
+# Returns the store's optional native watcher, constructing it at most once.
+# Missing FFI or an unsupported platform is memoized as an unavailable backend.
+# Input: none.
+# Output: watcher object or undef when native filesystem events are unavailable.
+sub _indicator_sync_watcher {
+    my ($self) = @_;
+    return $self->{_indicator_sync_watcher}
+      if ref( $self->{_indicator_sync_watcher} );
+    return if $self->{_indicator_sync_watcher_unavailable};
+    my $watcher = Developer::Dashboard::IndicatorStore::Watch->new;
+    if ( !$watcher ) {
+        $self->{_indicator_sync_watcher_unavailable} = 1;
+        return;
+    }
+    $self->{_indicator_sync_watcher} = $watcher;
+    return $watcher;
+}
+
+# _configure_indicator_sync_watcher($roots, $jobs)
+# Establishes directory watches after a full reconciliation, then runs the
+# portable validator once to protect the scan-to-watch boundary from mutations.
+# Input: ordered indicator roots and normalized collector job array reference.
+# Output: true when a stable watch snapshot is ready, false when watching is
+#         unavailable or a new full scan is required.
+sub _configure_indicator_sync_watcher {
+    my ( $self, $roots, $jobs ) = @_;
+    return 0 if ref($roots) ne 'ARRAY' || ref($jobs) ne 'ARRAY';
+    return 0 if !defined $self->{_indicator_sync_directory_inventory_signature};
+    my $watcher = $self->_indicator_sync_watcher or return 0;
+    my $inventory = json_decode( $self->{_indicator_sync_directory_inventory_signature} );
+    die "Indicator directory inventory is not an array reference\n" if ref($inventory) ne 'ARRAY';
+
+    my @watch_paths;
+    for my $entry (@{$inventory}) {
+        next if ref($entry) ne 'ARRAY' || !defined $entry->[0] || ref( $entry->[1] ) ne 'ARRAY';
+        my ( $root, $names ) = @{$entry};
+        push @watch_paths, $root;
+        for my $name ( @{$names} ) {
+            next if !defined $name || ref($name) || $name eq '';
+            my $directory = File::Spec->catdir( $root, $name );
+            push @watch_paths, $directory if -d $directory;
+        }
+    }
+
+    my $watch_signature = json_encode(
+        {
+            roots     => $roots,
+            inventory => $self->{_indicator_sync_directory_inventory_signature},
+        }
+    );
+    if ( !$watcher->configure( $watch_signature, \@watch_paths ) ) {
+        my $reason = $watcher->last_error || 'watch backend rejected the inventory';
+        $self->_disable_indicator_sync_watcher( $watcher, $reason );
+        return 0;
+    }
+    $self->{_indicator_sync_watcher_signature} = $watch_signature;
+    $self->{_indicator_sync_watcher_roots_signature} = join "\0", @{$roots};
+
+    return 1 if $self->_collector_sync_files_unchanged( $roots, $jobs, skip_watcher => 1 );
+    $watcher->close;
+    delete $self->{_indicator_sync_watcher_signature};
+    delete $self->{_indicator_sync_watcher_roots_signature};
+    return 0;
+}
+
+# _disable_indicator_sync_watcher($watcher, $reason)
+# Emits a watcher failure before clearing the optional backend and returning all
+# future syncs to the already-tested portable metadata validator.
+# Input: watcher object and optional explicit failure reason.
+# Output: undef; the store memoizes that this optional backend was disabled.
+sub _disable_indicator_sync_watcher {
+    my ( $self, $watcher, $reason ) = @_;
+    if ( !$reason ) {
+        my $watch_error = $watcher->last_error;
+        $reason = defined $watch_error && $watch_error ne ''
+          ? $watch_error
+          : 'unknown filesystem watch error';
+    }
+    warn "IndicatorStore optional filesystem watcher disabled: $reason\n";
+    $watcher->close;
+    delete $self->{_indicator_sync_watcher};
+    delete $self->{_indicator_sync_watcher_signature};
+    delete $self->{_indicator_sync_watcher_roots_signature};
+    $self->{_indicator_sync_watcher_unavailable} = 1;
+    return;
 }
 
 # collectors_need_sync($jobs)
@@ -324,15 +706,21 @@ sub collector_indicator_candidate {
 
 # delete_indicator($name)
 # Removes one persisted indicator record and its directory when present.
-# Input: indicator name string.
-# Output: true when cleanup completes.
+# Input: indicator name string and optional ordered roots array reference.
+# Output: true when cleanup completes; invalidates matching request-local cache
+# entries when called during collector synchronization.
 sub delete_indicator {
-    my ( $self, $name ) = @_;
+    my ( $self, $name, $roots ) = @_;
     return 1 if !defined $name || $name eq '';
-    for my $dir ( map { File::Spec->catdir( $_, $name ) } $self->{paths}->indicators_roots ) {
+    my @roots = ref($roots) eq 'ARRAY' ? @{$roots} : $self->{paths}->indicators_roots;
+    for my $dir ( map { File::Spec->catdir( $_, $name ) } @roots ) {
         my $file = File::Spec->catfile( $dir, 'status.json' );
         unlink $file if -f $file;
         rmdir $dir if -d $dir;
+        delete $self->{_indicator_sync_read_cache}{$file}
+          if ref( $self->{_indicator_sync_read_cache} ) eq 'HASH';
+        delete $self->{_indicator_file_bytes_cache}{$file}
+          if ref( $self->{_indicator_file_bytes_cache} ) eq 'HASH';
     }
     return 1;
 }
@@ -340,11 +728,12 @@ sub delete_indicator {
 # _indicator_file_candidates($name)
 # Returns candidate indicator status files across every runtime layer in lookup
 # order from deepest to home.
-# Input: indicator name string.
+# Input: indicator name string and optional ordered roots array reference.
 # Output: ordered list of file path strings.
 sub _indicator_file_candidates {
-    my ( $self, $name ) = @_;
-    return map { File::Spec->catfile( $_, $name, 'status.json' ) } $self->{paths}->indicators_roots;
+    my ( $self, $name, $roots ) = @_;
+    my @roots = ref($roots) eq 'ARRAY' ? @{$roots} : $self->{paths}->indicators_roots;
+    return map { File::Spec->catfile( $_, $name, 'status.json' ) } @roots;
 }
 
 # mark_stale($name, %opts)
@@ -394,6 +783,7 @@ sub refresh_core_indicators {
     my $items = [];
     $self->_remove_legacy_core_docker_indicator;
     return $items if $prompt_only;
+    require Capture::Tiny;
 
     my $project = $self->{paths}->project_root_for($cwd);
     push @$items, $self->_set_indicator_if_changed(
@@ -407,7 +797,7 @@ sub refresh_core_indicators {
 
     my $git_status = 'none';
     if ($project) {
-        my $old = cwd();
+        my $old = current_working_directory();
         chdir $project or die "Unable to chdir to $project: $!";
         # DD-607: the git status probe runs inside an eval so a die anywhere
         # in it (including one raised by capture() itself) still restores cwd
@@ -416,17 +806,17 @@ sub refresh_core_indicators {
         # around chdir/restore pairs in CollectorRunner.pm's _run_command and
         # _run_code.
         my $status_result = eval {
-            my ( $stdout, $stderr, $inside_exit ) = capture {
+            my ( $stdout, $stderr, $inside_exit ) = Capture::Tiny::capture( sub {
                 system( 'git', 'rev-parse', '--is-inside-work-tree' );
                 return $? >> 8;
-            };
+            } );
             my $inside_work_tree = $inside_exit == 0 && $stdout =~ /^\s*true\s*$/m ? 1 : 0;
             my $status = 'none';
             if ($inside_work_tree) {
-                my ( undef, undef, $dirty_exit ) = capture {
+                my ( undef, undef, $dirty_exit ) = Capture::Tiny::capture( sub {
                     system( 'git', 'diff', '--quiet', '--ignore-submodules', 'HEAD', '--' );
                     return $? >> 8;
-                };
+                } );
                 # git diff --quiet exits 0 for a clean tree and 1 for a modified
                 # one; any other exit (for example 128) is a real git failure, not a
                 # dirty work tree, so surface it as an explicit error status.
@@ -521,14 +911,15 @@ sub _set_indicator_if_changed {
     return $self->set_indicator( $name, %data );
 }
 
-# page_header_items()
+# page_header_items($indicators)
 # Builds the older top-of-page status payload from stored indicators.
-# Input: none.
+# Input: optional array reference of already-loaded indicator records.
 # Output: list of hashes with prog, alias, and status fields.
 sub page_header_items {
-    my ($self) = @_;
+    my ( $self, $indicators ) = @_;
     my @items;
-    for my $indicator ( $self->list_indicators ) {
+    my @indicators = ref($indicators) eq 'ARRAY' ? @{$indicators} : $self->list_indicators;
+    for my $indicator (@indicators) {
         next if exists $indicator->{prompt_visible} && !$indicator->{prompt_visible};
         my $alias = defined $indicator->{alias} && $indicator->{alias} ne ''
           ? $indicator->{alias}
@@ -546,13 +937,13 @@ sub page_header_items {
     return @items;
 }
 
-# page_header_payload()
+# page_header_payload(%args)
 # Builds the older `/system/status` response payload shape.
-# Input: none.
+# Input: optional indicators array reference returned by sync_collectors.
 # Output: hash reference with array, hash, and status maps.
 sub page_header_payload {
-    my ($self) = @_;
-    my @array = $self->page_header_items;
+    my ( $self, %args ) = @_;
+    my @array = $self->page_header_items( $args{indicators} );
     my %hash  = map { $_->{prog} => { %$_ } } @array;
     return {
         array  => \@array,
@@ -608,15 +999,22 @@ sub _indicator_matches {
 sub _collector_sync_plan {
     my ( $self, $job, %opts ) = @_;
     my $indicator_name = $job->{indicator}{name} || $job->{name};
-    my $existing = eval { $self->get_indicator($indicator_name) } || {};
-    my $local_existing = $self->_local_indicator($indicator_name) || {};
+    my $roots = ref( $opts{indicator_roots} ) eq 'ARRAY' ? $opts{indicator_roots} : undef;
+    my $existing = $roots
+      ? eval { $self->_get_indicator_from_roots( $indicator_name, $roots ) } || {}
+      : eval { $self->get_indicator($indicator_name) } || {};
+    my $local_existing = $roots && @{$roots} == 1
+      ? $existing
+      : $self->_local_indicator( $indicator_name, $roots ) || {};
     my $effective_existing = $existing;
     my $healed_from_inherited = 0;
     if (
         %{ $local_existing }
         && $self->_is_placeholder_missing_indicator($local_existing)
     ) {
-        my $inherited = $self->_nearest_inherited_indicator($indicator_name);
+        my $inherited = $roots && @{$roots} < 2
+          ? undef
+          : $self->_nearest_inherited_indicator( $indicator_name, $roots );
         if (
             ref($inherited) eq 'HASH'
             && %{ $inherited }
@@ -726,22 +1124,22 @@ sub _indicator_sort_cmp {
 # _local_indicator($name)
 # Loads the indicator state stored in the deepest participating runtime layer
 # only, without falling back to inherited layers.
-# Input: indicator name string.
+# Input: indicator name string and optional ordered roots array reference.
 # Output: indicator hash reference or undef when the deepest layer has no file.
 sub _local_indicator {
-    my ( $self, $name ) = @_;
-    my ($file) = $self->_indicator_file_candidates($name);
+    my ( $self, $name, $roots ) = @_;
+    my ($file) = $self->_indicator_file_candidates( $name, $roots );
     return if !defined $file;
     return $self->_read_indicator_file($file);
 }
 
 # _nearest_inherited_indicator($name)
 # Loads the nearest inherited indicator state beneath the deepest local layer.
-# Input: indicator name string.
+# Input: indicator name string and optional ordered roots array reference.
 # Output: indicator hash reference or undef when no inherited layer stores it.
 sub _nearest_inherited_indicator {
-    my ( $self, $name ) = @_;
-    my @files = $self->_indicator_file_candidates($name);
+    my ( $self, $name, $roots ) = @_;
+    my @files = $self->_indicator_file_candidates( $name, $roots );
     shift @files;
     for my $file (@files) {
         my $item = $self->_read_indicator_file($file);
@@ -779,10 +1177,88 @@ sub _is_template_toolkit_text {
 # Output: indicator hash reference or undef when the file is missing.
 sub _read_indicator_file {
     my ( $self, $file ) = @_;
+    my $cache = $self->{_indicator_sync_read_cache};
+    return $cache->{$file} if ref($cache) eq 'HASH' && exists $cache->{$file};
+
+    my $item;
+    if ( $self->{_indicator_sync_persistent_read} ) {
+        my $signature = $self->_indicator_file_signature($file);
+        my $persistent = $self->{_indicator_file_bytes_cache} ||= {};
+        if ( exists $persistent->{$file} && $persistent->{$file}{signature} eq $signature ) {
+            $item = defined $persistent->{$file}{raw} ? json_decode( $persistent->{$file}{raw} ) : undef;
+        }
+        else {
+            $self->{_indicator_sync_file_changed} = 1
+              if exists $self->{_indicator_sync_file_changed};
+            my $raw = $self->_read_indicator_file_bytes_uncached($file);
+            my $after_signature = $self->_indicator_file_signature($file);
+            if ( $after_signature eq $signature ) {
+                $persistent->{$file} = { signature => $signature, raw => $raw };
+            }
+            else {
+                delete $persistent->{$file};
+            }
+            $item = defined $raw ? json_decode($raw) : undef;
+        }
+    }
+    else {
+        $item = $self->_read_indicator_file_uncached($file);
+    }
+
+    $cache->{$file} = $item if ref($cache) eq 'HASH';
+    return $item;
+}
+
+# _indicator_file_signature($file)
+# Returns a high-resolution identity for one status file so a collector sync can
+# reuse cached raw bytes only while the same file state remains on disk.
+# Input: absolute indicator status file path.
+# Output: stable stat-signature string, or the literal missing marker for ENOENT.
+sub _indicator_file_signature {
+    my ( $self, $file ) = @_;
+    $! = 0;
+    my @stat = Time::HiRes::stat($file);
+    if ( !@stat ) {
+        return 'missing' if $! == ENOENT || $! == ENOTDIR;
+        die "Unable to inspect indicator file $file: $!";
+    }
+    return join "\0", @stat[ 0, 1, 2, 3, 4, 5, 7, 9, 10 ];
+}
+
+# _read_indicator_file_uncached($file)
+# Reads and decodes one indicator status file without consulting the temporary
+# collector-sync cache.
+# Input: absolute indicator status file path.
+# Output: decoded indicator hash reference or undef when the file is missing.
+sub _read_indicator_file_uncached {
+    my ( $self, $file ) = @_;
+    my $raw = $self->_read_indicator_file_bytes_uncached($file);
+    return defined $raw ? json_decode($raw) : undef;
+}
+
+# _read_indicator_file_bytes_uncached($file)
+# Reads one indicator JSON file as raw bytes without consulting any decoded or
+# persistent sync cache.
+# Input: absolute indicator status file path.
+# Output: raw file contents, or undef when the file is missing.
+sub _read_indicator_file_bytes_uncached {
+    my ( $self, $file ) = @_;
     return if !-f $file;
     open my $fh, '<:raw', $file or die "Unable to read $file: $!";
     local $/;
-    return json_decode(<$fh>);
+    my $raw = <$fh>;
+    $self->_close_indicator_read_handle($fh) or die "Unable to close $file: $!";
+    return $raw;
+}
+
+# _close_indicator_read_handle($fh)
+# Closes a status-file read handle and returns the close result so I/O failure
+# remains visible to callers and can be tested without filesystem-specific tricks.
+# Input: open filehandle reference.
+# Output: true when the handle closes successfully, false on close failure.
+sub _close_indicator_read_handle {
+    my ( $self, $fh ) = @_;
+    return close $fh;
 }
 
 # _status_icon_for($indicator, $map)
@@ -819,9 +1295,31 @@ for core generic indicators.
 
 =head1 METHODS
 
-=head2 new, set_indicator, get_indicator, list_indicators, collector_indicator_candidate
+=head2 new, set_indicator, get_indicator, list_indicators, _sort_indicators, _indicator_sort_order_cmp, collector_indicator_candidate
 
 Construct and manage the indicator store.
+
+C<list_indicators> reads current records from the ordered runtime roots and
+returns them in priority/collector/name order. When at least 32 records are
+present, its private sorter decorates each item with those comparison fields
+once, then sorts the compact tuples to avoid repeated method calls and hash
+lookups in the comparator. The small-list path continues to use the shared
+comparison method. Both paths use the same field defaults and tie rules.
+C<_indicator_sort_order_cmp> compares decorated tuples without object method
+dispatch; direct tests pin each priority, collector-order, and name-fallback
+case.
+
+C<sync_collectors> discovers its ordered indicator roots once and shares them
+with all collector comparisons and the final inventory. It also decodes each
+status file at most once during that synchronization. The cache is local to the
+call; writes and deletions invalidate the affected file, and a later sync
+rereads disk so external edits remain visible. Docker regression coverage checks
+root discovery, physical file reads, next-sync freshness, and collector
+retirement. With 50 configured collectors, a byte-identical Docker comparison
+measured 9.203 ms/request before and 2.689 ms/request after (3.42x). NYTProf
+showed status-file reads dropping from 15,000 to 5,000 and root resolutions
+from 15,100 to 100 over 100 requests. This workload-specific gain does not
+establish Problem 48's 50x target for every routine.
 
 =head2 mark_stale, is_stale, refresh_core_indicators, page_header_items, page_header_payload
 

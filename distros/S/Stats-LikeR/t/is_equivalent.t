@@ -103,4 +103,12 @@ unless ($INC{'Devel/Cover.pm'}) {
 	} 'is_equivalent(): undef-value croak, no memory leaks';
 }
 
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { is_equivalent([1]); 1 } ? '' : $@;
+	like($err, qr/\Ausage: is_equivalent\(.*\n\nis_equivalent: error: \Qneeds >= 2 array refs (got 1)\E\n\z/s,
+		'is_equivalent: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing();

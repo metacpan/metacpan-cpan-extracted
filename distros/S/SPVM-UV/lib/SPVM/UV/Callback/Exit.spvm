@@ -1,0 +1,9 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Callback::Exit : interface_t {
+  
+  use UV::Handle::Process;
+  
+  required method : void ($uv_process : UV::Handle::Process, $exit_status : long, $term_signal : int);
+}

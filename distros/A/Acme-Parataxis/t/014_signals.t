@@ -53,4 +53,5 @@ subtest 'Signal during yield/resume' => sub {
     is $signaled, 1, 'Signal handled between yield and resume';
     diag "Signal count final: $signaled";
 };
+#
 done_testing();

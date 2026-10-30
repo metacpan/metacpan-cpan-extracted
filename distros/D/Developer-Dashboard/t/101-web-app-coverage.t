@@ -457,6 +457,28 @@ is( $app->handle( path => '/js/route-skill/fallback.js', remote_addr => '127.0.0
     );
     is_deeply( $noplp->_page_status_payload, { array => [], hash => {}, status => {} }, 'indicators without payload method -> default payload' );
 
+    my $sync_array = Developer::Dashboard::Web::App->new(
+        auth     => bless( {}, 'Local::AuthStub' ),
+        pages    => $store,
+        sessions => bless( {}, 'Local::SessionsStub' ),
+        config   => bless( {}, 'Local::ConfigCollectors' ),
+        prompt   => { indicators => bless( {}, 'Local::IndSyncArray' ) },
+        runtime  => $runtime,
+    );
+    is_deeply( $sync_array->_page_status_payload, { array => [], hash => {}, status => {} },
+        'collector sync without an inventory hash uses the ordinary payload path' );
+
+    my $sync_bad_inventory = Developer::Dashboard::Web::App->new(
+        auth     => bless( {}, 'Local::AuthStub' ),
+        pages    => $store,
+        sessions => bless( {}, 'Local::SessionsStub' ),
+        config   => bless( {}, 'Local::ConfigCollectors' ),
+        prompt   => { indicators => bless( {}, 'Local::IndSyncBadInventory' ) },
+        runtime  => $runtime,
+    );
+    is_deeply( $sync_bad_inventory->_page_status_payload, { array => [], hash => {}, status => {} },
+        'collector sync with a non-array inventory uses the ordinary payload path' );
+
     # indicators whose payload lacks an array key (2839 true side)
     my $emptyp = Developer::Dashboard::Web::App->new(
         auth     => bless( {}, 'Local::AuthStub' ),
@@ -873,6 +895,12 @@ is( $m->_missing_named_page_response('x')->[0], 200, 'missing page editor -> 200
 }
 {
     no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::command_in_path = sub { my ($n) = @_; return $n eq 'ipconfig' ? '/c/ipconfig' : undef; };
+    local *Developer::Dashboard::Web::App::capture = sub (&) { return ( '', '', 0 ); };
+    is_deeply( [ $m->_ip_pairs_from_ipconfig ], [], 'ipconfig with no address output produces an empty candidate list' );
+}
+{
+    no warnings 'redefine';
     local *Developer::Dashboard::Web::App::command_in_path = sub { return undef; };
     is_deeply( [ $m->_ip_pairs_from_ipconfig ], [], 'ipconfig parser skips when the command is absent' );
     is_deeply( [ $m->_ip_pairs_from_ifconfig ], [], 'ifconfig parser skips when the command is absent' );
@@ -884,6 +912,58 @@ is( $m->_missing_named_page_response('x')->[0], 200, 'missing page editor -> 200
         return ( "    inet 10.9.9.9 netmask\neth0: flags\n    inet 172.16.0.4 netmask\n    inet 127.0.0.1 netmask\n", '', 0 );
     };
     is_deeply( [ $m->_ip_pairs_from_ifconfig ], [ { iface => 'eth0', ip => '172.16.0.4' } ], 'ifconfig parser keeps non-loopback IPv4 after an adapter header' );
+}
+
+# Machine address cache contract: valid entries are reused; malformed and
+# expired entries are refreshed from the current interface inventory.
+{
+    my $ip_app = bless {}, 'Developer::Dashboard::Web::App';
+    my $discoveries = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_ip_candidates = sub {
+        $discoveries++;
+        return ('10.2.3.4');
+    };
+
+    $ip_app->{_machine_ip_cache} = {
+        candidates => ['10.9.8.7'],
+        expires_at => 4_000_000_000,
+    };
+    is( $ip_app->_machine_ip, '10.9.8.7', 'a fresh machine-IP cache returns its first candidate' );
+    is( $discoveries, 0, 'a fresh machine-IP cache avoids interface discovery' );
+
+    $ip_app->{_machine_ip_cache}{expires_at} = 0;
+    is( $ip_app->_machine_ip, '10.2.3.4', 'an expired machine-IP cache refreshes the interface candidates' );
+    is( $discoveries, 1, 'an expired machine-IP cache performs one discovery' );
+
+    $ip_app->{_machine_ip_cache}{expires_at} = undef;
+    is( $ip_app->_machine_ip, '10.2.3.4', 'a cache entry without an expiry is refreshed' );
+    is( $discoveries, 2, 'a missing expiry triggers a fresh discovery' );
+
+    $ip_app->{_machine_ip_cache} = { candidates => 'invalid', expires_at => 4_000_000_000 };
+    is( $ip_app->_machine_ip, '10.2.3.4', 'a cache entry with a non-array candidate list is refreshed' );
+    is( $discoveries, 3, 'a malformed candidate list triggers a fresh discovery' );
+
+    $ip_app->{_machine_ip_cache} = 'invalid';
+    is( $ip_app->_machine_ip, '10.2.3.4', 'a non-hash machine-IP cache is refreshed' );
+    is( $discoveries, 4, 'a non-hash cache triggers a fresh discovery' );
+
+    $ip_app->{_machine_ip_cache} = { candidates => [], expires_at => 4_000_000_000 };
+    is( $ip_app->_machine_ip, undef, 'a fresh empty candidate cache remains an unavailable address' );
+    is( $discoveries, 4, 'a fresh empty candidate cache is reused without rediscovery' );
+}
+
+# Windows with an empty ipconfig result falls through to ifconfig.
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::is_windows = sub { return 1; };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ip = sub { return; };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ipconfig = sub { return; };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ifconfig = sub {
+        return ( { iface => 'fallback0', ip => '10.4.5.6' } );
+    };
+    is_deeply( [ $m->_ip_interface_pairs ], [ { iface => 'fallback0', ip => '10.4.5.6' } ],
+        'Windows with no ipconfig addresses falls back to the final interface provider' );
 }
 {
     no warnings 'redefine';
@@ -1083,10 +1163,21 @@ sub web_settings { return {} }
 package Local::ConfigApiArray;    # api_keys returns a non-hash value
 sub api_keys { return [] }
 
+package Local::ConfigCollectors;
+sub collectors { return [] }
+
 package Local::IndNoPayload;    # indicators object without page_header_payload
 
 package Local::IndEmptyPayload;    # indicators whose payload lacks an array key
 sub page_header_payload { return {} }
+
+package Local::IndSyncArray;
+sub sync_collectors { return [] }
+sub page_header_payload { return { array => [], hash => {}, status => {} } }
+
+package Local::IndSyncBadInventory;
+sub sync_collectors { return { indicators => {} } }
+sub page_header_payload { return { array => [], hash => {}, status => {} } }
 
 package Local::NotAStore;    # a pages object that is not a PageStore
 
@@ -1143,7 +1234,9 @@ C<Developer::Dashboard::Web::App>. It drives the browser-facing route table,
 helper login, transient-token policy, saved-page render/source/edit/action
 flows, saved and skill-local Ajax endpoints, static asset serving, and the
 defensive fallback paths so every Devel::Cover branch and condition in the
-module is exercised on the Linux test host.
+module is exercised on the Linux test host. It also checks fresh, stale,
+malformed, and empty machine-address cache entries, plus the Windows interface
+fallback when ipconfig returns no addresses.
 
 =head1 WHY IT EXISTS
 

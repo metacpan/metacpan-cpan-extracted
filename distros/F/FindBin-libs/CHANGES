@@ -1,4 +1,26 @@
--   5.0.0 
+-   5.0.4 Thu Oct 29 22:55:12 EDT 2026
+
+    Version hardwired in Makefile.PL, not from libs.pm
+
+    version/v5.40/examples, documented templates for using the 
+    module for various tasks.
+
+-   5.0.3 Wed Oct 28 02:37:36 EDT 2026
+
+    Much overdue expansion of the ./example cases.
+
+-   5.0.2 Tue Oct 27 21:27:40 EDT 2026
+
+    install tests prior to running test target.
+
+-   5.0.1 Tue Oct 27 20:18:05 EDT 2026
+
+    Add YAML::Tiny used in testing to Makefile.PL CONFIGURE_REQUIRES.
+
+    Use a rel2abs of $^X in generated test files to avoid $PATH
+    issues in subshells used during testing.
+
+-   5.0.0 Mon Oct 26 20:17:52 EDT 2026
 
     v5.40 tests rewritten for complete coverage.
 

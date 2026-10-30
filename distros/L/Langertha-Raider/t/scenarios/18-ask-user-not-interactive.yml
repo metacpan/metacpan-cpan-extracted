@@ -1,0 +1,10 @@
+title: ask_user in a run nobody can answer is refused plainly and the model goes on by itself
+prompt: Pick a colour for me.
+script:
+  - tool_calls:
+      - [ ask_user, { question: 'Which colour?', options: [ red, blue ] } ]
+  - text: ich nehme blau
+expect:
+  answer: ich nehme blau
+  tools:
+    - { name: ask_user, error: true, text: 'not interactive.*Decide yourself.*state your assumption' }

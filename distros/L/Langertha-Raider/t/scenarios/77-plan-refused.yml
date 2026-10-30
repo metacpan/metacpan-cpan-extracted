@@ -1,0 +1,16 @@
+title: a plan the person does not accept keeps plan mode; the model gets an error result with the feedback
+permission_mode: plan
+review: [ "no: smaller steps please" ]
+prompt: Add a file.
+script:
+  - tool_calls:
+      - [ exit_plan_mode, { plan: "1. rewrite everything" } ]
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: x } ]
+  - text: revised plan
+expect:
+  absent: [ a.txt ]
+  plans: [ "1. rewrite everything" ]
+  tools:
+    - { name: exit_plan_mode, error: true, text: "^The user doesn't want to proceed with this tool use\\. The tool use was rejected \\(eg\\. if it was a file edit, the new_string was NOT written to the file\\)\\. To tell you how to proceed, the user said:\nsmaller steps please$" }
+    - { name: write_file, error: true, text: "plan mode" }

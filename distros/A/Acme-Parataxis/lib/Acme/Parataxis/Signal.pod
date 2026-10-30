@@ -4,322 +4,168 @@
 
 =head1 NAME
 
-Acme::Parataxis::Signal - One-shot flag with a FIFO queue of waiters
+Acme::Parataxis::Signal - One-Shot Event Flags with Waiter Queues
 
 =head1 SYNOPSIS
 
-    use Acme::Parataxis;
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
     use Acme::Parataxis::Signal;
 
+    # Initialize unsignalled (count => false):
     my $ready = Acme::Parataxis::Signal->new( count => false );
 
     async {
-        fiber { $ready->wait; say 'the work finished' };
-        $ready->send;                            # releases the fiber above
+        fiber {
+            say 'Worker: waiting for ready signal...';
+            $ready->wait;    # parks until signalled
+            say 'Worker: unblocked and running!';
+        };
+
+        say 'Main: completing setup...';
+        $ready->send;        # wakes the worker fiber
     };
 
 =head1 DESCRIPTION
 
-A signal is a flag and a queue. C<send> sets the flag or hands it straight to whoever is waiting, and C<wait> parks the
-calling fiber until it arrives. Waiters park rather than spin, and are released in the order they arrived.
+An C<Acme::Parataxis::Signal> represents a single notification flag accompanied by a FIFO queue of waiters. Calling
+C<send> signals the event, waking a parked fiber or saving the notification for the next fiber that arrives.
 
-The flag is what makes a signal safe to fire early. A C<send> that finds nobody waiting is remembered, so the next
-C<wait> returns immediately rather than blocking on something that already happened. That is the difference between a
-signal and a plain C<join>, and it is why you can signal before the fibers that care have even been spawned.
+A key design feature of signals is B<early firing safety>: if C<send> is called before any fiber has called C<wait>,
+the signal is remembered. When a fiber eventually calls C<wait>, it consumes the remembered signal and proceeds
+immediately without parking. This eliminates initialization race conditions where a notifier fires before its listeners
+are spawned.
 
-A signal releases B<one> waiter per C<send>, and C<broadcast> releases all of them. There is no reset: once the queue
-drains, the flag is not set again unless something sets it.
+=over
+
+=item *
+
+C<send()> releases B<one> waiter, or records the signal if no waiters exist.
+
+=item *
+
+C<broadcast()> wakes B<all> currently queued waiters simultaneously, clearing any remembered signal.
+
+=back
 
 =head1 METHODS
 
-=head2 C<new( [ count =E<gt> $bool ] )>
+=head2 C<new( [ count =E<gt> $bool = true ] )>
 
-    my $ready = Acme::Parataxis::Signal->new( count => false );   # starts unsignalled
-    my $done  = Acme::Parataxis::Signal->new;                     # starts signalled
+    my $ready = Acme::Parataxis::Signal->new( count => false );   # unsignalled (common case)
+    my $fired = Acme::Parataxis::Signal->new;                     # pre-signalled
 
-Creates a signal. C<count> is really a boolean and it defaults to true, so a plain C<new> is B<already signalled> and
-its first C<wait> will not block. Pass C<count =E<gt> false> for the usual case, where the signal is something still to
-happen.
+Constructs a new signal.
 
-The reader C<count> returns that boolean, so test it for truth rather than comparing it to a number.
+B<Important Default>: C<count> defaults to B<true> (pre-signalled). In this state, the first C<wait()> will not block.
+For the standard pattern where waiters must park until an event occurs, pass C<< count => false >>.
 
 =head2 C<send( )>
 
-    $ready->send;      # release one waiter, or remember the signal
+    $signal->send;
 
-Wakes the longest-waiting fiber, or invokes the longest-waiting callback, and returns true. If there is nobody waiting,
-the signal is remembered instead, so the next C<wait> does not block.
+Delivers the signal to the longest-waiting entity (waking a parked fiber or executing a registered callback). If no
+waiters are currently queued, the signal is stored (setting C<count> to true) so the next C<wait()> will return
+immediately. Returns true.
 
 =head2 C<broadcast( )>
 
-    $ready->broadcast;   # release every waiter that is queued right now
+    $signal->broadcast;
 
-Wakes every currently queued waiter and returns true. A waiter registered by a callback during the broadcast is not
-part of it - the wake budget is fixed when the broadcast starts.
+Wakes every currently queued waiter in a single pass. Unlike C<send()>, an unconsumed broadcast is not remembered: if
+no waiters are present, the notification is discarded, and any previously banked signal is cleared (resetting C<count>
+to false). Returns true.
 
-Unlike C<send>, a broadcast with nobody to wake does not remember anything. It also cancels a signal that was already
-remembered, so do not use it to clear a queue you have not drained; see L</"broadcast cancels a pending signal">.
+=head2 C<wait( [$callback] )>
 
-=head2 C<wait( )>
+    $signal->wait;            # parks the calling fiber until signalled
+    $signal->wait(\&on_done); # registers a callback without parking
 
-    $ready->wait;            # park until signalled
-    $ready->wait(\&callback);  # or register a callback instead of parking
+=over
 
-With no argument, consumes a remembered signal if there is one and returns, otherwise parks the current fiber until the
-signal arrives. Always returns C<undef>; use C<awaited> to ask how many are waiting.
+=item *
 
-Must run inside a scheduled fiber, unless a signal is already pending, in which case it returns without parking and
-needs no fiber at all.
+B<Without arguments>: If a signal is already pending, consumes it (resetting C<count> to false) and returns
+immediately. Otherwise, parks the calling fiber until a signal arrives. Always returns C<undef>. Must run inside a
+scheduled fiber unless a signal is already pending.
 
-With a coderef, registers that callback and returns immediately B<without> parking, so it is safe to call from
-anywhere, including off-fiber. If a signal is already pending the callback runs before C<wait> returns. See
-L</"Callbacks run where you send from">.
+=item *
 
-Only a real coderef is treated as a callback. C<undef> means the no-argument form, and any other value - including C<0>
-- is registered as if it were a fiber id; see L</"wait takes one optional argument">.
+B<With a CODE reference>: Registers C<$callback> to run when the signal fires, returning immediately without parking.
+If a signal is already pending, the callback executes inline before C<wait()> returns. Safe to call outside a fiber.
+
+=back
 
 =head2 C<awaited( )>
 
-    my $n = $ready->awaited;      # fibers plus callbacks
+    my $num_waiters = $signal->awaited;
 
-The number of waiters queued on this signal, counting both parked fibers and registered callbacks. Zero when nobody is
-waiting, which is the cheapest way to ask whether a C<send> is going to be remembered or delivered.
+Returns the total count of currently queued waiters (parked fibers plus registered callbacks). Returns 0 when no
+waiters are waiting.
+
+=head2 C<count( )>
+
+Returns true if a signal has been banked and is currently pending consumption; false otherwise.
 
 =head2 C<remove_waiter( $waiter )>
 
-    my $removed = $ready->remove_waiter(\&callback);
+    $signal->remove_waiter($cb_or_fid);
 
-Removes a callback or a fiber id from the queue and returns how many entries went away. Consumes nothing and never
-calls a callback. It does not wake anything either: a fiber you remove this way is simply never signalled again.
-
-You rarely need this. It is the hook the park installs to deregister an interrupted wait, and every Parataxis primitive
-that can park has one - a L<Acme::Parataxis::Semaphore>, a L<Acme::Parataxis::Channel>, a L<Acme::Parataxis::Future> or
-any of the L<Acme::Parataxis::Sync> classes.
+Removes a specific callback or fiber ID from the wait queue without triggering it. Used during cancellation and
+cleanup.
 
 =head1 Recipes
 
-=head2 A one-shot "the work finished" event
+=head2 Fan-out broadcast notification
 
-The ordinary use: something happens once, and a fiber is waiting for it. One C<send> releases one waiter, so this is
-the shape to reach for when there is a single consumer.
-
-    async {
-        my $finished = Acme::Parataxis::Signal->new( count => false );
-
-        my $consumer = fiber { $finished->wait; consume() };
-
-        build_everything();
-        $finished->send;             # the consumer was parked; this releases it
-
-        $consumer->await;
-    };
-
-=head2 One event, many waiters
-
-A single C<send> releases exactly one waiter, so a group that all need the same event wants C<broadcast>. This is the
-shape for a fan-out, and for shutdown: everyone queued at the moment of the broadcast goes at once, rather than being
-drained one permit at a time.
+Use C<broadcast()> to release multiple concurrent workers on a single event:
 
     async {
-        my $abort = Acme::Parataxis::Signal->new( count => false );
-        my @running = map { fiber { $abort->wait; rollback() } } @transactions;
+        my $start_signal = Acme::Parataxis::Signal->new( count => false );
 
-        # ... something has gone wrong ...
-
-        $abort->broadcast;           # every rollback starts now
-        $_->await for @running;
-    };
-
-B<One> C<send> in place of the broadcast would release a single transaction and leave the rest parked, which is the
-usual way this pattern deadlocks.
-
-=head2 Signalling before anyone is listening
-
-Because an unclaimed C<send> is remembered, a signal needs no coordination with its waiters. Fire it early and the
-fiber that arrives last still sees it.
-
-    my $shutdown = Acme::Parataxis::Signal->new( count => false );
-
-    async {
-        $shutdown->send;         # nobody is waiting yet -- this is remembered
-    };
-
-    async {
-        install_handler();        # however long this takes
-        $shutdown->wait;          # returns at once: the signal was already sent
-        shut_down();
-    };
-
-=head2 Not spawning a fiber just to be woken
-
-A callback is a waiter that runs at send time rather than when the scheduler next runs a fiber. That is cheaper than a
-fiber, and it is the right shape for bookkeeping.
-
-    async {
-        my $drained = Acme::Parataxis::Signal->new( count => false );
-
-        $drained->wait( sub { report_drained() } );    # returns immediately
-        if ( !@queue ) {
-            $drained->send;                            # the callback runs right here
+        for my $id ( 1 .. 3 ) {
+            fiber {
+                $start_signal->wait;
+                say "Worker $id running!";
+            };
         }
-    };
 
-Note the ordering: the callback is registered before the queue is measured, so a queue that empties in between is not
-missed.
-
-=head2 Asking whether anyone is listening
-
-C<awaited> turns C<send> from "remember or deliver" into something you can reason about, and it is the cleanest way to
-spot a leak of parked fibers.
-
-    async {
-        my $s = Acme::Parataxis::Signal->new( count => false );
-        fiber { $s->wait } for 1 .. 3;
         await_sleep(50);
-
-        is $s->awaited, 3, 'three fibers are parked';
-        $s->broadcast;
-        is $s->awaited, 0, 'and the broadcast drained them';
+        say "Starting all workers:";
+        $start_signal->broadcast;    # unblocks all 3 workers at once
     };
+
+=head2 Non-blocking callback triggers
+
+Register callbacks to execute immediately upon notification without spawning intermediate fibers:
+
+    my $done = Acme::Parataxis::Signal->new( count => false );
+
+    $done->wait( sub {
+        say "Cleanup callback executed inline on send()";
+    } );
+
+    # Later, in any fiber:
+    $done->send;
 
 =head1 Behavior Notes
 
-=head2 A new signal starts signalled
+=head2 C<broadcast( )> cancels banked signals
 
-The C<count> parameter defaults to true, so a signal built with a plain C<new> is already fired. Its first C<wait>
-returns immediately, and only the waiters after that one block.
+C<broadcast()> clears any pending signal flag even if no waiters were queued. If you need to clear the wait queue while
+preserving a banked signal, invoke C<send()> repeatedly for each waiter instead.
 
-    async {
-        my $done = Acme::Parataxis::Signal->new;      # already signalled!
-        my $fired = 0;
-        fiber { $done->wait; $fired++ };
-        await_sleep(30);
+=head2 Single wake-up per C<send( )>
 
-        is $fired, 1, 'the fiber never parked';
-    };
+Calling C<send()> multiple times while no fibers are waiting will only bank a single notification. The signal records
+I<that> it fired, not I<how many times> it fired. For event counting, use L<Acme::Parataxis::Semaphore> or
+L<Acme::Parataxis::Channel>.
 
-That default is right when the signal means "this already happened" - the first C<wait> is the answer, and there is
-nothing to wait for. It is wrong for anything else, and passing C<count =E<gt> false> costs one word.
+=head2 Inline callback execution
 
-=head2 One send releases one waiter
-
-A C<send> hands the signal to exactly one waiter, the longest-waiting one, and does nothing about the rest. If several
-fibers are waiting on the same event, one C<send> is not enough to release them, and the leftovers stay parked.
-
-    async {
-        my $s = Acme::Parataxis::Signal->new( count => false );
-        my @done;
-        my @w = map { my $i = $_; fiber { $s->wait; push @done, $i } } 1 .. 3;
-        await_sleep(30);
-
-        $s->send;                      # releases one
-        await_sleep(30);
-        is scalar @done, 1, 'one of the three';
-
-        $s->broadcast;                 # releases the rest
-        $_->await for @w;
-        is scalar @done, 3, 'now all three';
-    };
-
-Reach for C<broadcast> whenever the event is for a group, and for a L<Acme::Parataxis::Semaphore> or
-L<Acme::Parataxis::Channel> when you need a count of events rather than a flag.
-
-=head2 broadcast cancels a pending signal
-
-C<broadcast> clears the flag whether or not it had anything to wake, so a signal that was remembered is discarded
-rather than delivered. The next C<wait> parks as though nothing had happened.
-
-    async {
-        my $s = Acme::Parataxis::Signal->new( count => false );
-        $s->send;                      # remembered: nobody is waiting
-        $s->broadcast;                 # ... and thrown away
-        ok !$s->count, 'no signal left';
-
-        my $fired = 0;
-        fiber { $s->wait; $fired++ };
-        await_sleep(30);
-        is $fired, 0, 'so the next wait parks';
-        $s->send;
-    };
-
-If you want to clear the queue without losing a signal that is already banked, drain it with C<send> calls instead -
-one per waiter - because C<send> leaves the flag alone when it finds somebody to release.
-
-=head2 The flag is a flag, not a counter
-
-Several C<send>s with nobody waiting bank exactly one wake-up. The signal remembers that it fired; it does not remember
-how many times.
-
-    async {
-        my $s = Acme::Parataxis::Signal->new( count => false );
-        $s->send for 1 .. 5;
-
-        my @out;
-        fiber { $s->wait; push @out, 'first' };
-        fiber { $s->wait; push @out, 'second' };
-        await_sleep(40);
-
-        is_deeply \@out, ['first'], 'five sends bought one wake-up';
-        $s->send;
-    };
-
-Use a L<Acme::Parataxis::Semaphore> or a L<Acme::Parataxis::Channel> when the number of events matters.
-
-=head2 Callbacks run where you send from
-
-A callback registered with C<< wait(\&cb) >> is invoked inside C<send> or C<broadcast>, in the sending fiber, at the
-moment of the send. It is not deferred to the next scheduler pass. That is what makes it cheap, and it is also what
-makes it dangerous: it runs code you did not schedule, in a context you did not choose.
-
-The queue is strictly FIFO, but a callback and a fiber in the same queue look different from the outside, because a
-fiber only resumes when the scheduler gets to it.
-
-    async {
-        my $s = Acme::Parataxis::Signal->new( count => false );
-        my @order;
-        $s->wait( sub { push @order, 'callback' } );
-        fiber { $s->wait; push @order, 'fiber' };
-
-        $s->broadcast;
-        is_deeply \@order, ['callback'], 'the callback ran during the send';
-        await_sleep(30);
-        is_deeply \@order, [ 'callback', 'fiber' ], 'the fiber ran afterwards';
-    };
-
-A callback that throws takes the rest of the broadcast with it. The slot is consumed before the callback runs, so the
-signal is not left for the next waiter, and the exception propagates out of the C<send> or C<broadcast> that triggered
-it, stranding everyone still queued. Wrap a callback if it can fail.
-
-=head2 wait returns undef
-
-Every form of C<wait> returns C<undef>, both when it parks and when it returns immediately. It is a statement, not a
-predicate. To ask whether anyone is waiting, use C<awaited>; to ask whether a signal is pending, read C<count>.
-
-    my $already = Acme::Parataxis::Signal->new;          # signalled
-    is $already->wait, undef, 'a signalled signal returns at once, with no value';
-
-    async {
-        my $s = Acme::Parataxis::Signal->new( count => false );
-        my $parked = 'unset';
-        fiber { $parked = $s->wait };
-        await_sleep(30);
-        is $parked, 'unset', 'it parked, so it has not returned at all';
-        $s->send;
-        await_sleep(30);
-        is $parked, undef, 'and a released wait returns undef too';
-    };
-
-=head2 wait takes one optional argument
-
-C<wait> dispatches on whether its argument is defined, so a non-coderef argument is quietly treated as a fiber id.
-
-    my $s = Acme::Parataxis::Signal->new( count => false );
-    $s->wait(undef);      # the no-argument form: parks, or croaks off-fiber
-    $s->wait(0);          # registers fiber id 0 as a waiter, and does nothing else
-    $s->wait(sub { 1 });  # what you meant
-
-C<< wait(0) >> is accepted and increments C<awaited>, so a stray value can leave a queue that can never drain
-correctly. Pass a coderef or nothing.
+Callbacks registered with C<< wait(\&cb) >> run synchronously inside C<send()> or C<broadcast()>, in the context of the
+signaling fiber. If a registered callback dies, the exception propagates directly out of C<send()>, interrupting the
+broadcast loop and stranding any remaining queued waiters.
 
 =head1 SEE ALSO
 

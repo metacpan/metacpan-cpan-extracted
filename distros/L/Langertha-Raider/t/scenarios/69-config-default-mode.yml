@@ -1,0 +1,19 @@
+title: default_mode of .raider/config.yml sets the mode -- acceptEdits writes in the project, bash still asks
+permission_mode: null
+files:
+  .raider/config.yml: |
+    permissions:
+      default_mode: acceptEdits
+prompt: Go.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+      - [ write_file, { path: ../outside.txt, content: "o\n" } ]
+      - [ bash, { command: echo hi } ]
+  - text: done
+expect:
+  files: { a.txt: "a\n" }
+  tools:
+    - { name: write_file }
+    - { name: write_file, error: true, text: "acceptEdits mode asks before this call: write_file changes files" }
+    - { name: bash, error: true, text: "acceptEdits mode asks before this call: bash runs code; nobody can approve it.*--permission-mode bypassPermissions" }

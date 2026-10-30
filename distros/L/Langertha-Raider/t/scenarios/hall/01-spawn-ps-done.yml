@@ -1,0 +1,15 @@
+title: a spawn by plain name shows in ps, ends with raider.done and leaves logs and events
+model:
+  rules:
+    Sag Hallo.: { answer: "Hallo aus der Halle." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - spawn: { name: Testie, mission: "Sag Hallo.", as: a }
+  - ps: {}
+  - expect_ps: { count: 1, missions: ["Sag Hallo."] }
+  - done: { run: a, status: completed, response_like: 'Hallo aus der Halle\.' }
+  - expect_event: { type: raider.spawned, slot: Testie, base_name: Testie }
+  - logs: { run: a }
+  - expect_log: { run: a, like: 'raider Testie-\d+ completed: Hallo aus der Halle' }
+  - idle: {}
+  - expect_run_files: { run: a, events_like: 'Hallo aus der Halle' }

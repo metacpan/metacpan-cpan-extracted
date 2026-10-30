@@ -51,12 +51,12 @@ Welsh locale.
 =head3 Narrow (format)
 
   Ll
-  M
-  M
+  Ma
+  Me
   I
   G
-  S
-  S
+  Sa
+  Su
 
 
 =head3 Wide (stand-alone)
@@ -82,12 +82,12 @@ Welsh locale.
 =head3 Narrow (stand-alone)
 
   Ll
-  M
-  M
+  Ma
+  Me
   I
   G
-  S
-  S
+  Sa
+  Su
 
 =head2 Months
 
@@ -417,11 +417,11 @@ Welsh locale.
    1995-12-22T09:05:02 = 12/1995 OC
   -0010-09-15T04:44:23 = 9/-10 CC
 
-=head3 GyMEd (E, M/d/y G)
+=head3 GyMEd (E, d/M/y G)
 
-   2008-02-05T18:30:30 = Maw, 2/5/2008 OC
-   1995-12-22T09:05:02 = Gwen, 12/22/1995 OC
-  -0010-09-15T04:44:23 = Sad, 9/15/-10 CC
+   2008-02-05T18:30:30 = Maw, 5/2/2008 OC
+   1995-12-22T09:05:02 = Gwen, 22/12/1995 OC
+  -0010-09-15T04:44:23 = Sad, 15/9/-10 CC
 
 =head3 GyMMM (MMM y G)
 
@@ -435,17 +435,35 @@ Welsh locale.
    1995-12-22T09:05:02 = Gwen, 22 Rhag 1995 OC
   -0010-09-15T04:44:23 = Sad, 15 Medi -10 CC
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = Chwefror 2008 OC
+   1995-12-22T09:05:02 = Rhagfyr 1995 OC
+  -0010-09-15T04:44:23 = Medi -10 CC
+
+=head3 GyMMMMEd (E, d MMMM, y G)
+
+   2008-02-05T18:30:30 = Maw, 5 Chwefror, 2008 OC
+   1995-12-22T09:05:02 = Gwen, 22 Rhagfyr, 1995 OC
+  -0010-09-15T04:44:23 = Sad, 15 Medi, -10 CC
+
+=head3 GyMMMMd (d, MMMM, y G)
+
+   2008-02-05T18:30:30 = 5, Chwefror, 2008 OC
+   1995-12-22T09:05:02 = 22, Rhagfyr, 1995 OC
+  -0010-09-15T04:44:23 = 15, Medi, -10 CC
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Chwef 2008 OC
    1995-12-22T09:05:02 = 22 Rhag 1995 OC
   -0010-09-15T04:44:23 = 15 Medi -10 CC
 
-=head3 GyMd (M/d/y GGGGG)
+=head3 GyMd (d/M/y GGGGG)
 
-   2008-02-05T18:30:30 = 2/5/2008 O
-   1995-12-22T09:05:02 = 12/22/1995 O
-  -0010-09-15T04:44:23 = 9/15/-10 C
+   2008-02-05T18:30:30 = 5/2/2008 O
+   1995-12-22T09:05:02 = 22/12/1995 O
+  -0010-09-15T04:44:23 = 15/9/-10 C
 
 =head3 H (HH)
 
@@ -507,6 +525,12 @@ Welsh locale.
    1995-12-22T09:05:02 = Gwen, 22 Rhag
   -0010-09-15T04:44:23 = Sad, 15 Medi
 
+=head3 MMMMEd (E, d MMMM)
+
+   2008-02-05T18:30:30 = Maw, 5 Chwefror
+   1995-12-22T09:05:02 = Gwen, 22 Rhagfyr
+  -0010-09-15T04:44:23 = Sad, 15 Medi
+
 =head3 MMMMW-count-few ('wythnos' W 'o' MMMM)
 
    2008-02-05T18:30:30 = wythnos 1 o Chwefror
@@ -543,11 +567,11 @@ Welsh locale.
    1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
-=head3 MMMMd (MMMM d)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = Chwefror 5
-   1995-12-22T09:05:02 = Rhagfyr 22
-  -0010-09-15T04:44:23 = Medi 15
+   2008-02-05T18:30:30 = 5 Chwefror
+   1995-12-22T09:05:02 = 22 Rhagfyr
+  -0010-09-15T04:44:23 = 15 Medi
 
 =head3 MMMd (d MMM)
 
@@ -644,6 +668,18 @@ Welsh locale.
    2008-02-05T18:30:30 = Chwefror 2008
    1995-12-22T09:05:02 = Rhagfyr 1995
   -0010-09-15T04:44:23 = Medi -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = Maw, 5 Chwefror 2008
+   1995-12-22T09:05:02 = Gwen, 22 Rhagfyr 1995
+  -0010-09-15T04:44:23 = Sad, 15 Medi -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Chwefror 2008
+   1995-12-22T09:05:02 = 22 Rhagfyr 1995
+  -0010-09-15T04:44:23 = 15 Medi -10
 
 =head3 yMMMd (d MMM y)
 

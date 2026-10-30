@@ -435,6 +435,24 @@ Yangben Cameroon locale.
    1995-12-22T09:05:02 = +J.C. 1995 o.12 22, fl
   -0010-09-15T04:44:23 = k.Y. -10 o.9 15, ss
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = +J.C. 2008 siɛyɛ́, oóli ú kándíɛ
+   1995-12-22T09:05:02 = +J.C. 1995 pilɔndɔ́
+  -0010-09-15T04:44:23 = k.Y. -10 imɛŋ i puɔs
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = +J.C. 2008 siɛyɛ́, oóli ú kándíɛ 5, mw
+   1995-12-22T09:05:02 = +J.C. 1995 pilɔndɔ́ 22, fl
+  -0010-09-15T04:44:23 = k.Y. -10 imɛŋ i puɔs 15, ss
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = +J.C. 2008 siɛyɛ́, oóli ú kándíɛ 5
+   1995-12-22T09:05:02 = +J.C. 1995 pilɔndɔ́ 22
+  -0010-09-15T04:44:23 = k.Y. -10 imɛŋ i puɔs 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = +J.C. 2008 o.2 5
@@ -506,6 +524,12 @@ Yangben Cameroon locale.
    2008-02-05T18:30:30 = mw 5 o.2
    1995-12-22T09:05:02 = fl 22 o.12
   -0010-09-15T04:44:23 = ss 15 o.9
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = siɛyɛ́, oóli ú kándíɛ 5, mw
+   1995-12-22T09:05:02 = pilɔndɔ́ 22, fl
+  -0010-09-15T04:44:23 = imɛŋ i puɔs 15, ss
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

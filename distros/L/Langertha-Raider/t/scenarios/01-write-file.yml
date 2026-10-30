@@ -1,0 +1,12 @@
+title: write_file creates a file under the root and the model's answer comes back
+prompt: Write a note.
+script:
+  - tool_calls:
+      - [ write_file, { path: notes/a.txt, content: "hello\n" } ]
+  - text: Fertig.
+expect:
+  answer: Fertig.
+  files:
+    notes/a.txt: "hello\n"
+  tools:
+    - { name: write_file, text: '\AFile created successfully at: \S+/notes/a\.txt \(file state is current in your context' }

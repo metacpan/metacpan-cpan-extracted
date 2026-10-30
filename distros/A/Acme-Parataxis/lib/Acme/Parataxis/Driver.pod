@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Acme::Parataxis::Driver - Base Class for the Event Loops that Drive Parataxis
+Acme::Parataxis::Driver - Base Class for Event-Loop Adapters Driving Parataxis
 
 =head1 SYNOPSIS
 
@@ -12,254 +12,230 @@ Acme::Parataxis::Driver - Base Class for the Event Loops that Drive Parataxis
     use Acme::Parataxis qw[await_read await_sleep fiber];
     use Mojo::IOLoop;
 
-    # Attach a loop. Parataxis builds the reference driver that matches it.
+    # Attach an event loop. Parataxis wraps it in the matching reference driver:
     Acme::Parataxis->attach_loop( Mojo::IOLoop->new );
 
     Acme::Parataxis::run( sub {
-        my $reader = fiber { await_read( $fh, 2000 ) };    # a watch on the loop
-        my $napper = fiber { await_sleep 50 };              # a timer on the loop
+        my $reader = fiber { await_read( $socket, 2000 ) };    # an I/O watch on the loop
+        my $napper = fiber { await_sleep(50) };                # a timer on the loop
         ...
     } );
 
-    Acme::Parataxis->detach_loop;    # unwinds every watch and timer
-
-After the C<detach_loop> the next run is back on the worker pool.
-
-A loop Parataxis does not know gets its own driver - see L</"Writing a Driver">.
+    Acme::Parataxis->detach_loop;    # unwinds all watches/timers; reverts to C thread pool
 
 =head1 DESCRIPTION
 
-A driver is the adapter between Parataxis and an existing CPAN event loop. With a loop attached,
-L<Acme::Parataxis-E<gt>attach_loop|Acme::Parataxis> makes C<await_read>, C<await_write> and C<await_sleep> stop
-submitting a job to the OS worker pool per filehandle or sleep and instead register watches and timers on that loop.
-The benefit is readiness driven by C<epoll>, C<kqueue> or C<select> rather than a thread parked in C<select()> per
-watched socket - which also lifts the C<FD_SETSIZE> ceiling that a C<select()>-based path runs into. See L</"The
-descriptor-number ceiling is the platform's, not Parataxis's">.
+A driver is the adapter between Parataxis and an existing CPAN event loop. Attaching a loop via L<<
+Acme::Parataxis->attach_loop|Acme::Parataxis/attach_loop >> switches C<await_read>, C<await_write>, and C<await_sleep>
+away from submitting jobs to the background OS worker pool. Instead, readiness and timers are registered directly with
+the attached loop.
 
-The division of labour is deliberately narrow:
+The immediate benefit is multiplexing via C<epoll>, C<kqueue>, or reactor notification rather than dedicating a C
+thread parked in C<select()> per filehandle. This also lifts the traditional C<FD_SETSIZE> ceiling on platforms where
+the event loop supports modern poll interfaces.
+
+The division of labor is strictly isolated:
 
 =over
 
-=item * The B<driver> tells the loop which filehandles to watch and which timers to arm, and hands control to the loop
-when every fiber is parked.
+=item *
 
-=item * The B<scheduler> keeps its own park/wake machinery. A loop callback only ever B<enqueues> a fiber; it never runs
-one, so the scheduler cannot be re-entered from inside the loop.
+The B<driver> manages loop registrations: it tells the event loop which handles to watch and which timers to arm, and
+hands control to the loop when all fibers are parked.
 
-=item * The two never run each other's callbacks - they cooperate through the readiness callbacks alone.
+=item *
+
+The B<scheduler> retains complete ownership of fibers, parks, and resumes. Loop callbacks B<only enqueue fibers> back
+onto the run queue; they never execute user code directly. This prevents re-entrancy into the scheduler from inside
+third-party event loop ticks.
+
+=item *
+
+Parataxis and the event loop never invoke each other's user callbacks—they cooperate exclusively through readiness
+triggers.
 
 =back
 
-What a caller sees does not change when a driver is attached: readiness reports the same values the worker-pool path
-reports, a driver deadline still resumes C<-1>, and an enclosing C<with_timeout> or C<nursery> still throws. Only the
-backing mechanism differs.
+From the perspective of a running fiber, the API contract is unchanged: C<await_read> and C<await_write> return C<1> on
+readiness, C<-1> on timeout or unwatchable descriptor, and enclosing C<with_timeout> or nursery scopes abort cleanly.
 
-Two reference drivers ship with the distribution, and L</"Acme::Parataxis::Driver::wrap( $loop )"> picks between them
-by class: L<Acme::Parataxis::Driver::Mojo|Acme::Parataxis::Driver::Mojo> for C<Mojo::IOLoop> and
-L<Acme::Parataxis::Driver::IOAsync|Acme::Parataxis::Driver::IOAsync> for C<IO::Async::Loop>.
+Two reference drivers ship with the distribution: L<Acme::Parataxis::Driver::Mojo> (for C<Mojo::IOLoop> and
+C<Mojo::Reactor>) and L<Acme::Parataxis::Driver::IOAsync> (for C<IO::Async::Loop>). L<<
+Acme::Parataxis::Driver::wrap|/"Acme::Parataxis::Driver::wrap( $loop )" >> selects between them automatically.
 
 =head1 METHODS
 
 =head2 C<pending( )>
 
-How many watches and timers this driver still holds - C<watch_count> plus C<timer_count>.
+    my $driver = Acme::Parataxis->loop;    # undef unless attached
+    say $driver->pending;                  # watch_count + timer_count
 
-    my $driver = Acme::Parataxis->loop;    # undef unless a loop is attached
-    $driver->pending;                      # 2
-    $driver->watch_count;                  # 1
-    $driver->timer_count;                  # 1
-
-The scheduler's idle branch only hands control to the loop while this is true. With nothing pending a run would block
-forever inside the loop instead of reaching the deadlock detector.
+Returns the total number of watches and timers currently managed by this driver. The scheduler idle branch only yields
+control to the loop when C<pending> is greater than zero; if nothing is pending, the scheduler proceeds to deadlock
+detection rather than stalling indefinitely inside the loop.
 
 =head2 C<reset( )>
 
-Unwinds every watch and timer the driver registered, and returns true. C<run()> calls this when a run ends and
-L<Acme::Parataxis-E<gt>detach_loop|Acme::Parataxis> calls it before dropping the driver, so a stale listener socket or
-deadline timer left behind by an exited run can never leave the next run blocked inside the loop.
+    $driver->reset;
 
-    $driver->reset;         # everything unwound, still attached
-    $driver->pending;       # 0
+Unwinds and cancels every watch and timer registered with the loop, clearing internal tracking tables. Automatically
+invoked when C<run()> terminates and during C<detach_loop()>. This guarantees that leftover listeners or orphaned
+timers from an exited run cannot stall subsequent scheduler runs. Returns true.
 
 =head2 C<has_watch( $fh )>
 
-True when C<$fh> already has a live watch slot.
+    if ( $driver->has_watch($fh) ) { ... }
 
-    $driver->has_watch( $fh );     # true
+Returns true if C<$fh> is currently being watched for read or write readiness. Both directions share a single watch
+slot per handle.
 
-Both directions share one slot per filehandle, because every loop in support offers a single registration point per
-descriptor - asking to read and write the same C<$fh> leaves C<watch_count> at 1. A value that is not a filehandle is
-simply not watched, so this returns false rather than dying.
-
-The slot is keyed by descriptor number but matched by handle, which are not the same thing: the OS recycles a
-descriptor number the moment a handle is closed, so a slot left behind by a handle that was watched and then closed
-must not answer for whichever unrelated handle the number is handed to next. It does not, so this returns false for a
-new handle that happens to be sitting on a retired number, and C<unwatch> refuses it for the same reason.
+Slots are keyed by descriptor number but validated by handle identity (via C<builtin::refaddr>). Because operating
+systems eagerly recycle descriptor numbers when handles close, matching on filehandle identity prevents a newly opened
+handle from accidentally inheriting stale callbacks associated with a retired descriptor number.
 
 =head2 C<watch_count( )>
 
-How many filehandles are currently watched.
+Returns the number of filehandles currently registered for readiness monitoring.
 
 =head2 C<timer_count( )>
 
-How many timers are currently armed.
+Returns the number of timers currently armed on the loop.
 
-=head1 Writing a Driver
+=head1 Writing a Custom Driver
 
-A subclass supplies the loop-specific half. The base class keeps the bookkeeping - which watches and timers are still
-live - that C<pending> and C<reset> depend on, so call C<_track_watch>, C<_untrack_watch>, C<_track_timer> and
-C<_untrack_timer> whenever you register or deregister with the underlying loop. The four return the fileno or the timer
-id, and the two C<_untrack_*> return false when there was nothing to remove.
+Subclasses implement the loop-specific interactions. The base class manages the bookkeeping table (which handles and
+timer IDs are active) relied on by C<pending()> and C<reset()>.
 
-    package My::Loop::Driver {
+Custom drivers should inherit from C<Acme::Parataxis::Driver> and use the internal tracking helpers: C<_track_watch>,
+C<_untrack_watch>, C<_track_timer>, and C<_untrack_timer>.
+
+    package My::Driver {
+        use v5.40;
         use feature 'class';
         no warnings 'experimental::class';
 
-        class My::Loop::Driver : isa(Acme::Parataxis::Driver) {
+        class My::Driver : isa(Acme::Parataxis::Driver) {
+            field $loop : param;
+
             method watch_read ($fh, $cb) {
-                my $fd = fileno($fh);
-                defined $fd or croak 'cannot watch a closed filehandle';
-                $loop->on_readable( $fh, sub { $cb->() } );
+                my $fd = fileno($fh) // die 'Cannot watch a closed handle';
+                $loop->add_reader( $fh, sub { $cb->() } );
                 $self->_track_watch($fh);
             }
-            method watch_write($fh, $cb) { ... }    # same, with on_writable
-            method unwatch    ($fh)      { ... }    # deregister, then _untrack_watch
-            method timer      ($ms, $cb) { ... }    # arm, then _track_timer; returns an opaque id
-            method cancel_timer($id)      { ... }    # cancel, then _untrack_timer
-            method drive      ()          { ... }    # run the loop until an event fires
-            method poll_ready ()          { ... }    # one readiness pass
+            method watch_write  ($fh, $cb) { ... }
+            method unwatch      ($fh)      { ... }    # loop remove + _untrack_watch
+            method timer        ($ms, $cb) { ... }    # loop timer  + _track_timer
+            method cancel_timer ($id)      { ... }    # loop cancel + _untrack_timer
+            method drive        ()         { ... }    # run one blocking loop tick
+            method poll_ready   ()         { ... }    # run one non-blocking tick
         }
     };
 
-The seven methods a subclass has to provide, and what the scheduler expects of each:
+Subclasses must implement:
 
 =over
 
-=item * C<watch_read( $fh, $cb )> - call C<< $cb->() >> when C<$fh> becomes readable. Croaks on a closed handle.
+=item * C<watch_read( $fh, $cb )> - Fire C<< $cb->() >> when C<$fh> is readable. Croaks if closed.
 
-=item * C<watch_write( $fh, $cb )> - call C<< $cb->() >> when C<$fh> becomes writable. Croaks on a closed handle.
+=item * C<watch_write( $fh, $cb )> - Fire C<< $cb->() >> when C<$fh> is writable. Croaks if closed.
 
-=item * C<unwatch( $fh )> - stop watching C<$fh> in both directions; returns false when nothing was watched.
+=item * C<unwatch( $fh )> - Stop watching both directions on C<$fh>. Return false if unmonitored.
 
-=item * C<timer( $ms, $cb )> - call C<< $cb->() >> after C<$ms> milliseconds and return an opaque id. Croaks on a
-non-positive delay.
+=item * C<timer( $ms, $cb )> - Arm a timer to invoke C<< $cb->() >> after C<$ms> milliseconds. Returns an opaque ID.
 
-=item * C<cancel_timer( $id )> - cancel a pending timer; returns false when the id is unknown or the timer already
-fired.
+=item * C<cancel_timer( $id )> - Cancel an active timer. Returns false if already expired or unknown.
 
-=item * C<drive( )> - run the loop until at least one event fires. This may block, and the scheduler only calls it
-while C<pending> is true.
+=item * C<drive( )> - Execute the loop until at least one event fires (may block).
 
-=item * C<poll_ready( )> - one readiness pass, expected to come straight back. See
-L</"C<poll_ready( )> is best effort, and the two reference drivers differ"> before implementing it.
+=item * C<poll_ready( )> - Perform a single non-blocking readiness pass and return immediately.
 
 =back
-
-The base class does not stub these out: a subclass that leaves one out dies with C<Can't locate object method> the
-first time the scheduler reaches it.
 
 =head1 FUNCTIONS
 
 =head2 C<Acme::Parataxis::Driver::wrap( $loop )>
 
-Wraps an event-loop object in the matching reference driver and returns a
-L<Acme::Parataxis::Driver|Acme::Parataxis::Driver>. This is a plain function, not a method - call it with the full
-name. L<Acme::Parataxis-E<gt>attach_loop|Acme::Parataxis> routes everything through it, so callers can hand in a
-C<Mojo::IOLoop>, a C<Mojo::Reactor> or an C<IO::Async::Loop> and get the right driver for free. An object that already
-I<is> a driver is passed straight through, unchanged.
-
     my $driver = Acme::Parataxis::Driver::wrap( $loop );
 
-Dispatch is by class: anything in the C<Mojo::> namespace, or inheriting from C<Mojo::IOLoop> or C<Mojo::Reactor>,
-becomes L<Acme::Parataxis::Driver::Mojo|Acme::Parataxis::Driver::Mojo>; anything in the C<IO::Async::> namespace
-becomes L<Acme::Parataxis::Driver::IOAsync|Acme::Parataxis::Driver::IOAsync>. It croaks without a blessed object, and
-croaks for a blessed object whose class it does not know how to drive.
-
-=head1 Recipes
-
-=head2 Attach for one run, then hand the pool back
-
-A driver session is deliberately short. C<attach_loop> returns the driver it B<replaced>, so the first call returns
-C<undef>; C<detach_loop> returns the one it dropped, or C<undef> if nothing was attached.
-
-    my $previous = Acme::Parataxis->attach_loop( $loop );    # undef the first time
-    Acme::Parataxis::run( $body );
-    my $driver   = Acme::Parataxis->detach_loop;             # unwinds it; gives it back
-
-    Acme::Parataxis::run( $other_body );                     # back on the worker pool
-
-Neither call is allowed while a run is active - both croak rather than leave a run with a half-swapped driver. A run
-does not detach on your behalf: the driver is still attached when C<run> returns, already reset, and stays that way
-until you C<detach_loop>.
-
-=head2 Drive a Mojo::Reactor you already own
-
-Anything with the reactor API works, so a mini-loop inside a worker can be driven by Parataxis too.
-
-    Acme::Parataxis->attach_loop( $loop->reactor );    # Mojo::Reactor, not Mojo::IOLoop
-    Acme::Parataxis::run( sub { await_sleep 10 } );
-
-The Mojo driver installs one C<io> watcher per descriptor and flips the interest mask on each registration, because the
-reactor allows only one watcher per filehandle. That is also why both directions share a single watch slot.
-
-=head1 Behavior Notes
-
-=head2 The descriptor-number ceiling is the platform's, not Parataxis's
-
-Readiness under a driver comes from the attached loop, and that loop reaches the kernel through C<epoll>, C<kqueue> or
-- where neither is available - C<select()>. The C<select()> case is bounded by C<FD_SETSIZE>, which is a property of
-the platform's C library and bounds the descriptor B<number> being watched, not how many are being watched. It is worth
-measuring rather than assuming: C<getconf FD_SETSIZE> is not a valid symbol and answers C<20>, and
-C<Fcntl::FD_SETSIZE()> dies at runtime, so neither is a measurement.
-
-Measured on the platforms this runs on:
+Wraps an event-loop instance in the appropriate reference driver. Returns the driver object as-is if already blessed
+into an C<Acme::Parataxis::Driver> subclass.
 
 =over
 
-=item * Linux, macOS, FreeBSD: 1024, a 128-byte C<fd_set>
+=item * C<Mojo::IOLoop> or C<Mojo::Reactor> instances wrap as L<Acme::Parataxis::Driver::Mojo>.
 
-=item * NetBSD: 256, a 32-byte C<fd_set>
-
-=item * Win32: the C<winsock> C<fd_set> is a 64-entry bitmask
+=item * C<IO::Async::Loop> instances wrap as L<Acme::Parataxis::Driver::IOAsync>.
 
 =back
 
-So a program that opens descriptors past that ceiling gets different answers on different platforms, and sizing a
-workload by descriptor B<count> alone is not enough - twenty sockets opened early and three hundred opened late are the
-same count and not the same watch set. Size against the highest descriptor number, not the number of handles.
+Croaks if passed an unblessed value or an unsupported loop class.
 
-Parataxis refuses the read rather than registering a watch that can never fire, on both paths. The worker pool declines
-to hand an unrepresentable descriptor to C<select()> and reports not ready; a driver declines to register the watch,
-because the C<fd_set> in that case belongs to the loop library and Parataxis cannot widen it. Either way the answer is
-C<-1>, which is also what a deadline produces, so a caller already knows how to read it. The refusal warns once per
-process, naming the descriptor and the ceiling, because the limit belongs to the platform and a workload sized on a
-different OS can cross it without anyone noticing.
+=head1 Recipes
 
-=head2 C<poll_ready( )> is best effort, and the two reference drivers differ
+=head2 Attaching for a single scoped run
 
-The scheduler reaches C<poll_ready> only on the pass where it still has pool jobs in flight but nothing runnable, and
-it expects to come straight back. L<Acme::Parataxis::Driver::IOAsync|Acme::Parataxis::Driver::IOAsync> honours that:
-C<loop_once(0)> returns at once and still fires an already-due timer.
-L<Acme::Parataxis::Driver::Mojo|Acme::Parataxis::Driver::Mojo> cannot. Mojo's C<one_tick> discards its arguments
-entirely and always waits for the earliest registered timer, so a C<poll_ready> with a 500 ms timer pending measures
-500 ms, and C<one_tick(0)> is not the non-blocking variant it looks like. With nothing registered at all C<one_tick>
-returns immediately, having stopped the reactor.
+Keep driver attachments scoped: attach before running, and detach when finished:
 
-C<drive> is the mirror image, and the difference costs nothing in practice because the scheduler only calls it while
-C<pending> is true: the Mojo driver's C<drive> returns at once when nothing is registered, and the IO::Async driver's
-blocks in C<select()> until an event arrives.
+    my $old_driver = Acme::Parataxis->attach_loop( Mojo::IOLoop->new );
+    Acme::Parataxis::run( sub {
+        # driven via epoll/kqueue through Mojo
+    } );
+    Acme::Parataxis->detach_loop;    # reverts cleanly to native worker pool
 
-The consequence worth planning around, read off the scheduler rather than reproduced - nothing in this distribution's
-own API leaves a pool job in flight while a driver is attached - is that a program mixing pool work with an attached
-Mojo loop and arming a long timer waits out that timer on the polling pass before it notices a finished job. Short
-deadlines are invisible. A long one reads as a hang. Keep deadlines to a length you would be willing to wait for, or
-C<detach_loop> around the blocking work.
+Attaching or detaching while a scheduler run is active croaks to prevent corrupting in-flight watches.
+
+=head2 Driving an existing embedded Mojo::Reactor
+
+You do not need a full C<Mojo::IOLoop>; any object implementing the C<Mojo::Reactor> interface works:
+
+    my $reactor = $ioloop->reactor;
+    Acme::Parataxis->attach_loop($reactor);
+
+    Acme::Parataxis::run( sub {
+        await_sleep(50);
+    } );
+
+=head1 Behavior Notes
+
+=head2 Platform descriptor ceilings
+
+When a loop relies on C<select()>, descriptor limits are bound by the platform C library's C<FD_SETSIZE>:
+
+=over
+
+=item * Linux, macOS, FreeBSD: 1024 (128-byte bitmask)
+
+=item * NetBSD: 256 (32-byte bitmask)
+
+=item * Windows: 64-entry socket array
+
+=back
+
+Because C<FD_SETSIZE> bounds the numeric value of the descriptor rather than the total count of active handles, twenty
+descriptors opened early and three hundred opened late occupy different watch ranges.
+
+Parataxis inspects descriptors before registration. Descriptors at or exceeding C<FD_SETSIZE> are rejected immediately
+with C<-1> (simulating a timeout) rather than writing past the end of a C library bitmask.
+
+=head2 C<poll_ready( )> semantics vary by backend
+
+The scheduler calls C<poll_ready()> when background C pool tasks remain in flight and runnable fibers are temporarily
+exhausted.
+
+=over
+
+=item * L<Acme::Parataxis::Driver::IOAsync> executes C<< $loop->loop_once(0) >>, returning instantly while still
+firing due timers.
+
+=item * L<Acme::Parataxis::Driver::Mojo> uses C<< $reactor->one_tick >>, which ignores duration arguments and always
+waits for the earliest pending timer. A long timer combined with an active C worker task can cause C<poll_ready()> to
+wait for that timer before servicing the worker completion.
+
+=back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis|Acme::Parataxis> (C<attach_loop>, C<detach_loop>, C<loop>),
-L<Acme::Parataxis::Driver::Mojo|Acme::Parataxis::Driver::Mojo>,
-L<Acme::Parataxis::Driver::IOAsync|Acme::Parataxis::Driver::IOAsync>
+L<Acme::Parataxis>, L<Acme::Parataxis::Driver::Mojo>, L<Acme::Parataxis::Driver::IOAsync>
 
 =head1 AUTHOR
 

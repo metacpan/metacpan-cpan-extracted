@@ -12,7 +12,7 @@ use Spec07Fixture;
 # Contract C9 (interop docs/superpowers/specs/2026-10-18-dkim2-spec-07-design.md):
 # when a message has more than one fault, every verifier reports the same
 # primary error. Each case here has exactly two faults, and pins which one
-# is primary: within -07 section 14.2, structure (the fields' names and
+# is primary: within -08 section 14.2, structure (the fields' names and
 # m=/i= numbers) before content, in the contract's fixed sequence; within
 # section 14.7, every header hash before any body hash.
 
@@ -137,7 +137,7 @@ primary(edit(edit(one_hop(), $MI1, sub { s/;\s*\z/;;/ }),
         'PERMERROR: Message-Instance m=1 syntax error',
         'instances before signatures');
 
-# ---- section 14.7: every header hash before any body hash ----
+# ---- section 14.7: in a "," group, set by set, header before body (-08 D4) ----
 {
     my $text = Spec07Fixture::message();
     my $mi = Mail::DKIM2::MessageInstance->calculate(parse_mime($text), undef,
@@ -149,8 +149,8 @@ primary(edit(edit(one_hop(), $MI1, sub { s/;\s*\z/;;/ }),
     $value =~ s{sha512:([^:]+):([^,;]+)}{"sha512:" . $flip->($1) . ":$2"}e;
     my $signed = Spec07Fixture::add_sig("Message-Instance: $value\r\n$text",
         d => 'example.com', mf => '<a@example.com>', rt => ['<list@lists.example.org>']);
-    primary($signed, 'FAIL: Message-Instance m=1 header hash sha512 mismatch',
-        'header hashes (in h= order) before body hashes');
+    primary($signed, 'FAIL: Message-Instance m=1 body hash sha256 mismatch',
+        'the first failing set in h= order (its header hash, then its body hash)');
 }
 
 done_testing;

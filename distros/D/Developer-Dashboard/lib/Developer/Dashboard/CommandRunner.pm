@@ -1,11 +1,11 @@
 package Developer::Dashboard::CommandRunner;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use strict;
 use warnings;
 use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use File::Temp qw(tempfile);
 use Time::HiRes qw(sleep time);
 use Developer::Dashboard::PerlEnv ();
@@ -41,7 +41,7 @@ sub run_command {
     my $env        = ref( $args{env} ) eq 'HASH' ? $args{env} : {};
     my $timeout_ms = $args{timeout_ms} || 30_000;
 
-    my $old = cwd();
+    my $old = current_working_directory();
     chdir $cwd or die "Unable to chdir to $cwd: $!";
     local @ENV{ keys %$env } = values %$env if %$env;
     my %dashboard_env = %{ Developer::Dashboard::PerlEnv->dashboard_child_env() };

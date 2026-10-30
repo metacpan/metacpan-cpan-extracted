@@ -7,7 +7,7 @@ use Test::More;
 use Symbol      qw( qualify_to_ref );
 
 my $madness = 'FindBin::Bin';
-my @importz = qw( $Bin &Bin $Bin_c &Bin_c );
+my @importz = qw( $Bin &Bin $Bin_l &Bin_l );
 
 note "INC is:\n" => explain \@INC;
 
@@ -16,7 +16,7 @@ require_ok $madness;
 eval { $madness->import( @importz ) };
 $@ and fail "Import fails: $@";
 
-for my $name ( qw( Bin Bin_c ) )
+for my $name ( qw( Bin Bin_l ) )
 {
     my $ref     = qualify_to_ref $name;
 

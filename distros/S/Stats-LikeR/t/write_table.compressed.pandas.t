@@ -220,7 +220,7 @@ for my $ext (qw(gz bz2)) {
 		my ($name, @opt) = @$case;
 		my $f = path($name);
 		eval { write_table(\@d, $f, quiet => 1, @opt) };
-		is $@, "write_table: '$f' names a compressed file, and only delimited "
+		is $@, Stats::LikeR::_usage_text('write_table') . "write_table: error: '$f' names a compressed file, and only delimited "
 		     . "text is written compressed, not LaTeX or .xlsx\n",
 			"$name @opt: refused";
 		ok !-e $f, "$name @opt: and nothing is written";
@@ -228,7 +228,7 @@ for my $ext (qw(gz bz2)) {
 	for my $name (qw(x.tsv.bgz x.BGZ x.bgz.gz)) {
 		my $f = path($name);
 		eval { write_table(\@d, $f, quiet => 1) };
-		is $@, "write_table: '$f' names a bgzip (BGZF) file, which write_table "
+		is $@, Stats::LikeR::_usage_text('write_table') . "write_table: error: '$f' names a bgzip (BGZF) file, which write_table "
 		     . "does not write; name it .gz for gzip\n", "$name: refused";
 	}
 	# tex => 0 on a .tex.gz name is delimited, and so is compressed

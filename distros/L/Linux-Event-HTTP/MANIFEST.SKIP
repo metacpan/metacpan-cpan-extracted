@@ -1,0 +1,13 @@
+# Keep CI, internal handoff notes and historical profiling archives in Git,
+# not in the CPAN source distribution. Runtime modules, XS ABI headers,
+# public docs, tests and reproducible benchmark scripts remain packaged.
+^\.github/
+^\.ci-deps/
+^bench/benchmark-web-rebuild/
+^bench/results/
+^docs/NEXT-CHAT-PROMPT\.txt$
+^handoff\.md$
+^docs/UNBLOCK-REBUILD-PLAN\.md$
+^docs/UNBLOCK-REBUILD-STATUS\.md$
+^docs/HTTP3-EXTENDED-CONNECT-COMPLETION\.md$
+^docs/HTTP1-PUBLISHED-STACK-PERFORMANCE\.md$

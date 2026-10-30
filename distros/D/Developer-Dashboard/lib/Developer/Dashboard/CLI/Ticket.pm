@@ -3,10 +3,12 @@ package Developer::Dashboard::CLI::Ticket;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
+
+my $DOCKER_WORKSPACE_CONFIGS = '/dev/shm/developer-dashboard-workspace-config';
 
 use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Exporter 'import';
 use File::Basename qw(dirname);
 use File::Spec ();
@@ -35,23 +37,36 @@ our @EXPORT_OK = qw(
 );
 
 # split_workspace_change_dir_args($argv)
-# Separates the workspace -c change-directory flag from the remaining argv so
-# the flag can appear before or after the workspace name.
+# Separates workspace directory/build options from the remaining argv so the
+# options can appear before or after the workspace name. Uppercase -C means
+# change directory and build a stopped Docker workspace; lowercase -c does not.
 # Input: array reference of workspace command arguments.
-# Output: list of cleaned argv array reference and boolean change-directory flag.
+# Output: cleaned argv array reference, change-directory flag, Docker-mode flag,
+# and explicit Docker-build flag.
 sub split_workspace_change_dir_args {
     my ($argv) = @_;
     die 'Workspace args must be an array reference' if ref($argv) ne 'ARRAY';
     my $change_dir = 0;
+    my $docker = 0;
+    my $force_build = 0;
     my @clean;
     for my $arg ( @{$argv} ) {
         if ( defined $arg && $arg eq '-c' ) {
             $change_dir = 1;
             next;
         }
+        if ( defined $arg && $arg eq '-C' ) {
+            $change_dir = 1;
+            $force_build = 1;
+            next;
+        }
+        if ( defined $arg && ( $arg eq '-d' || $arg eq '--docker' ) ) {
+            $docker = 1;
+            next;
+        }
         push @clean, $arg;
     }
-    return ( \@clean, $change_dir );
+    return ( \@clean, $change_dir, $docker, $force_build );
 }
 
 # registered_workspace_dir($name)
@@ -68,7 +83,7 @@ sub registered_workspace_dir {
     my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
     my $paths = Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        cwd             => cwd(),
+        cwd             => current_working_directory(),
         workspace_roots => \@roots,
         project_roots   => \@roots,
     );
@@ -140,7 +155,7 @@ sub workspace_environment {
         DEVELOPER_DASHBOARD_TMUX_STATUS => 1,
     );
     my $cwd = $args{cwd};
-    $cwd = cwd() if !defined $cwd || $cwd eq '';
+    $cwd = current_working_directory() if !defined $cwd || $cwd eq '';
     my $layered = _workspace_layered_env( cwd => $cwd );
     @env{ keys %{$layered} } = values %{$layered} if %{$layered};
     $env{DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS} = join ':', sort keys %{$layered};
@@ -162,6 +177,34 @@ sub ticket_environment {
     return $env;
 }
 
+# _tmux_socket_directory(%args)
+# Selects the directory tmux should use for its server socket when /tmp is not
+# writable in a container or other restricted runtime.
+# Input: optional tmpdir, fallback, and is_writable callback for deterministic
+# tests; otherwise checks /tmp and /dev/shm directly and honors TMUX_TMPDIR.
+# Output: an explicit socket directory, or undef to keep tmux's /tmp default.
+sub _tmux_socket_directory {
+    my (%args) = @_;
+    return $ENV{TMUX_TMPDIR} if defined $ENV{TMUX_TMPDIR} && $ENV{TMUX_TMPDIR} ne '';
+
+    my $tmpdir      = $args{tmpdir}   || '/tmp';
+    my $fallback    = $args{fallback} || '/dev/shm';
+    my $is_writable = $args{is_writable};
+    if ( !defined $is_writable ) {
+        $is_writable = sub { return -w $_[0] };
+    }
+    elsif ( !$is_writable ) {
+        $is_writable = sub { return -w $_[0] };
+    }
+    die 'tmux socket directory writable check must be a code reference'
+      if ref($is_writable) ne 'CODE';
+
+    return if $is_writable->($tmpdir);
+    die "tmux cannot write its default socket directory '$tmpdir'; no writable socket directory is available\n"
+      if !-d $fallback || !$is_writable->($fallback);
+    return $fallback;
+}
+
 # tmux_command(%args)
 # Runs one tmux command and captures stdout, stderr, and exit status.
 # Input: args array reference for tmux.
@@ -176,6 +219,8 @@ sub tmux_command {
     local $?;
     my $argv = $args{args} || [];
     die 'tmux args must be an array reference' if ref($argv) ne 'ARRAY';
+    my $socket_directory = _tmux_socket_directory();
+    local $ENV{TMUX_TMPDIR} = $socket_directory if defined $socket_directory;
 
     my ( $stdout, $stderr, $exit_code ) = capture {
         system 'tmux', @{$argv};
@@ -204,6 +249,8 @@ sub exec_workspace_attach {
     my $argv = $args{args};
 
     die 'tmux args must be an array reference' if ref($argv) ne 'ARRAY';
+    my $socket_directory = _tmux_socket_directory();
+    local $ENV{TMUX_TMPDIR} = $socket_directory if defined $socket_directory;
 
     # The raw exec lives in _exec_tmux because Devel::Cover cannot attribute a
     # statement that follows a failed exec in the same sub; tests replace
@@ -266,6 +313,127 @@ sub _dashboard_command_path {
     return 'dashboard';
 }
 
+# _run_workspace_docker_compose(%args)
+# Runs the public dashboard Docker Compose helper without invoking a shell.
+# Input: Compose argv array reference, optional capture_stdout flag for internal
+# status probes, and optional interactive flag for terminal-attached commands.
+# Output: hash reference with stdout, stderr, and exit_code fields; interactive
+# commands pass output directly through and return empty stdout/stderr strings.
+sub _run_workspace_docker_compose {
+    my (%args) = @_;
+    local $?;
+    my $argv = $args{args} || [];
+    die 'Docker Compose args must be an array reference' if ref($argv) ne 'ARRAY';
+    my $entrypoint;
+    if ( defined $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} && $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} ne '' ) {
+        $entrypoint = $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT};
+    }
+    else {
+        $entrypoint = command_in_path('d2');
+        $entrypoint = _dashboard_command_path() if !defined $entrypoint;
+    }
+    my ( $stdout, $stderr, $status, $exec_error );
+    if ( $args{interactive} ) {
+        $status = system { $entrypoint } $entrypoint, 'docker', 'compose', @{$argv};
+        $exec_error = "$!" if $status == -1;
+        $stdout = '';
+        $stderr = '';
+    }
+    else {
+        ( $stdout, $stderr, $status ) = capture {
+            system { $entrypoint } $entrypoint, 'docker', 'compose', @{$argv};
+            $exec_error = "$!" if $? == -1;
+            return $?;
+        };
+    }
+    if ( !defined $status || $status == -1 ) {
+        my $detail = defined $exec_error ? $exec_error : 'process status was unavailable';
+        die "Unable to execute d2 Docker Compose command '$entrypoint': $detail\n";
+    }
+    my $signal = $status & 127;
+    my $exit_code = $signal ? 128 + $signal : $status >> 8;
+    if ( !$args{capture_stdout} && $exit_code == 0 ) {
+        print $stdout if defined $stdout && $stdout ne '';
+        print STDERR $stderr if defined $stderr && $stderr ne '';
+    }
+    return {
+        stdout    => $stdout,
+        stderr    => $stderr,
+        exit_code => $exit_code,
+    };
+}
+
+# _run_docker_workspace(%args)
+# Checks whether the Compose workspace service is already running; it starts a
+# stopped service without a build by default, or with cached `up --build` when
+# explicitly requested, registers the alias in a container-only config root,
+# then starts the normal workspace command using that root, an explicit
+# writable tmux socket directory, and a UTF-8 terminal locale.
+# Input: workspace alias, resolved host directory, optional force_build boolean,
+# and optional Compose runner.
+# Output: hash reference describing startup/reuse and the completed workspace flow.
+sub _run_docker_workspace {
+    my (%args) = @_;
+    my $workspace = $args{workspace} || die 'Missing workspace alias';
+    my $target = $args{target} || die 'Missing workspace target directory';
+    my $compose = $args{docker_compose} || \&_run_workspace_docker_compose;
+    my $force_build = $args{force_build} ? 1 : 0;
+    my $running = $compose->(
+        args          => [ 'ps', '--status', 'running', '--services', 'workspace' ],
+        stage         => 'check_running',
+        project_root  => $target,
+        capture_stdout => 1,
+    );
+    $running = { exit_code => $running } if !ref $running;
+    die "Docker Compose runner must return an exit code for 'check_running'\n"
+      if ref($running) ne 'HASH' || !defined $running->{exit_code};
+    if ( $running->{exit_code} != 0 ) {
+        my $detail = ( $running->{stderr} || '' ) . ( $running->{stdout} || '' );
+        die "Unable to determine whether Docker workspace service 'workspace' is running (exit $running->{exit_code}); configure a 'workspace' service before retrying. No rebuild or in-container workspace commands were run. $detail";
+    }
+    my $already_running = grep { $_ eq 'workspace' } split /\R/, ( $running->{stdout} || '' );
+    my @steps;
+    if ( !$already_running ) {
+        my @start_args = ('up', '-d');
+        push @start_args, $force_build ? '--build' : '--no-build';
+        push @start_args, 'workspace';
+        push @steps, [ start => \@start_args ];
+    }
+    push @steps,
+        [ register_alias => [ 'exec', '-e', "DEVELOPER_DASHBOARD_CONFIG_OVERLAY=$DOCKER_WORKSPACE_CONFIGS", 'workspace', 'd2', 'path', 'add', $workspace, '/workspace' ] ],
+        [ start_workspace => [ 'exec', '-it', '-e', "DEVELOPER_DASHBOARD_CONFIG_OVERLAY=$DOCKER_WORKSPACE_CONFIGS", '-e', 'TMUX_TMPDIR=/dev/shm', '-e', 'LC_CTYPE=C.UTF-8', 'workspace', 'd2', 'workspace', $workspace, '-c' ] ];
+
+    for my $step (@steps) {
+        my ( $stage, $argv ) = @{$step};
+        my $result = $compose->(
+            args         => $argv,
+            stage        => $stage,
+            project_root => $target,
+            interactive  => $stage eq 'start_workspace' || ( $stage eq 'start' && $force_build ) ? 1 : 0,
+        );
+        $result = { exit_code => $result } if !ref $result;
+        die "Docker Compose runner must return an exit code for '$stage'\n"
+          if ref($result) ne 'HASH' || !defined $result->{exit_code};
+        next if $result->{exit_code} == 0;
+
+        my $detail = ( $result->{stderr} || '' ) . ( $result->{stdout} || '' );
+        if ( $stage eq 'start' ) {
+            die "Unable to start Docker workspace service 'workspace' (exit $result->{exit_code}). Check the Compose output above; configure a 'workspace' service before retrying. No in-container workspace commands were run. $detail";
+        }
+        my $action = $stage eq 'register_alias' ? "register workspace alias '$workspace' inside Docker service 'workspace'" : "start workspace '$workspace' inside Docker service 'workspace'";
+        my $output_hint = $stage eq 'start_workspace' ? ' Check the Docker Compose output above.' : '';
+        die "Unable to $action (exit $result->{exit_code}).$output_hint $detail";
+    }
+
+    return {
+        docker    => 1,
+        workspace => $workspace,
+        cwd       => $target,
+        reused    => $already_running ? 1 : 0,
+        stages    => [ map { $_->[0] } @steps ],
+    };
+}
+
 # _workspace_env_files(%args)
 # Returns the ordered plain .env files that should seed one tmux workspace
 # session, from the highest ancestor down to the current directory.
@@ -274,7 +442,7 @@ sub _dashboard_command_path {
 sub _workspace_env_files {
     my (%args) = @_;
     my $cwd = $args{cwd};
-    $cwd = cwd() if !defined $cwd || $cwd eq '';
+    $cwd = current_working_directory() if !defined $cwd || $cwd eq '';
     my $dir = Developer::Dashboard::EnvLoader->_path_identity($cwd);
     return () if $dir eq '';
     my @files;
@@ -521,7 +689,7 @@ sub build_workspace_plan {
         env_ticket => $args{env_ticket},
     );
     my $plan_cwd = $args{cwd};
-    $plan_cwd = cwd() if !defined $plan_cwd || $plan_cwd eq '';
+    $plan_cwd = current_working_directory() if !defined $plan_cwd || $plan_cwd eq '';
 
     my $env = workspace_environment( $workspace, cwd => $plan_cwd );
     my $tmux_session = _tmux_session_name($workspace);
@@ -566,37 +734,51 @@ sub build_ticket_plan {
 }
 
 # run_workspace_command(%args)
-# Creates a tmux workspace session when needed and attaches to it; a registered
-# path alias also selects the starting directory when -c was not requested.
-# Input: args array reference plus optional cwd/env_ticket/env_workspace values
-# and optional tmux runner, attach runner, and directory resolver coderefs.
-# Output: plan hash reference after successful tmux create/attach operations.
+# Creates or attaches to a local tmux workspace; Docker mode can instead start
+# the configured Compose workspace service and launch that same command inside it.
+# Input: args array reference plus optional cwd/env_ticket/env_workspace values,
+#        tmux and attach runners, directory resolver, directory-change runner,
+#        and Docker Compose runner.
+# Output: local workspace plan or Docker-flow result hash reference.
 sub run_workspace_command {
     my (%args) = @_;
     my $tmux = $args{tmux} || \&tmux_command;
-    my ( $workspace_args, $change_dir ) = split_workspace_change_dir_args( $args{args} || [] );
+    my $change_directory = ref $args{change_directory} eq 'CODE' ? $args{change_directory} : sub { chdir $_[0] };
+    my ( $workspace_args, $change_dir, $docker, $force_build ) = split_workspace_change_dir_args( $args{args} || [] );
     my $workspace = resolve_workspace_request(
         args          => $workspace_args,
         env_workspace => $args{env_workspace},
         env_ticket    => $args{env_ticket},
     );
     my $resolver = $args{resolve_dir} || \&registered_workspace_dir;
+    die "-C requires -d/--docker and a registered directory alias\n" if $force_build && !$docker;
+    die "--docker requires -c or -C and a registered directory alias\n" if $docker && !$change_dir;
+    die "Docker workspaces require a registered directory alias, not an absolute path\n"
+      if $docker && File::Spec->file_name_is_absolute($workspace);
     my $target = $resolver->($workspace);
     if ($change_dir) {
         die "Workspace '$workspace' is not a registered dashboard path, so -c has no directory to change into\n"
           if !defined $target || $target eq '';
         die "Workspace '$workspace' resolves to '$target', which is not a directory\n"
           if !-d $target;
-        chdir $target
+        $change_directory->($target)
           or die "Unable to change directory to '$target' for workspace '$workspace': $!\n";
         $args{cwd} = $target;
     }
     elsif ( defined $target && $target ne '' ) {
         die "Workspace path alias '$workspace' resolves to '$target', which is not a directory\n"
           if !-d $target;
-        chdir $target
+        $change_directory->($target)
           or die "Unable to change directory to '$target' for workspace path alias '$workspace': $!\n";
         $args{cwd} = $target;
+    }
+    if ($docker) {
+        return _run_docker_workspace(
+            workspace      => $workspace,
+            target         => $target,
+            force_build    => $force_build,
+            docker_compose => $args{docker_compose},
+        );
     }
     my $plan = build_workspace_plan(
         %args,
@@ -712,6 +894,11 @@ a session/window target separator. Existing tagged sessions are checked against
 C<WORKSPACE_REF> to avoid reusing a name collision for another workspace.
 If concurrent callers race to create the same session, a duplicate-session
 response is accepted only after a second tmux query confirms the session exists.
+With C<-d> or C<--docker> plus C<-c> or C<-C> and a registered path alias, it
+instead starts or reuses the Compose C<workspace> service, adds the alias as
+C</workspace> inside the container, and invokes the same workspace helper
+there. Lowercase C<-c> does not build a stopped service; uppercase C<-C>
+requests a cached build with progress streamed to the terminal.
 
 =head1 WHY IT EXISTS
 
@@ -725,6 +912,10 @@ helpers from inventing different rules.
 Use this file when changing how C<dashboard ticket> chooses the ticket name,
 what tmux environment variables it seeds, or how create/attach failures are
 reported back to the user.
+Use the Docker workspace option when the alias is mounted at C</workspace> in a
+Compose service named C<workspace> and the interactive tmux session should run
+inside that container; use uppercase C<-C> when a stopped service must be
+built and the live build progress shown.
 
 =head1 HOW TO USE
 
@@ -753,6 +944,63 @@ If another command creates the session between the initial existence check and
 the create request, the helper rechecks the exact name and attaches only when
 that session is confirmed; other create errors remain visible.
 
+For C<dashboard workspace -c E<lt>aliasE<gt> --docker> (or the short C<-d>
+form), the module changes into the resolved host directory and checks whether
+the Compose C<workspace> service is already running. A stopped service starts
+without building by default, including when the configured image is missing:
+
+  d2 docker compose up -d --no-build workspace
+
+Use uppercase C<-C> to explicitly build a stopped service:
+
+  d2 workspace foobar -d -C
+  d2 docker compose up -d --build workspace
+
+Build output streams directly to the terminal. An already-running service is
+reused even with C<-C>, so in-container work is not interrupted. After the
+service is ready, both forms run these commands in order through the public
+Docker Compose helper:
+
+  d2 docker compose exec -e DEVELOPER_DASHBOARD_CONFIG_OVERLAY=/dev/shm/developer-dashboard-workspace-config workspace d2 path add <alias> /workspace
+  d2 docker compose exec -it -e DEVELOPER_DASHBOARD_CONFIG_OVERLAY=/dev/shm/developer-dashboard-workspace-config -e TMUX_TMPDIR=/dev/shm workspace d2 workspace <alias> -c
+
+The private config overlay under the container's C</dev/shm> tmpfs keeps the
+container path mapping away from bind-mounted host config and temporary
+directories. It is an additive config layer, so existing container settings
+remain available while this alias override takes precedence. The host
+alias continues to point at its original path (for example, C</tmp/foobar>);
+only the container-side alias resolves to C</workspace>. Both in-container
+commands use the same overlay so the workspace command can see the alias just
+registered.
+
+The final Compose exec also sets C<TMUX_TMPDIR=/dev/shm> and
+C<LC_CTYPE=C.UTF-8> for the inner workspace process. The socket setting makes
+the container use its writable tmpfs location even when the installed
+in-container command does not yet include the automatic unwritable-C</tmp>
+fallback. The UTF-8 character locale lets the attached tmux client render the
+non-ASCII prompt and status icons without overriding the user's broader
+C<LANG> formatting preferences; a POSIX character locale can render those
+characters as underscores. Newly started servers inherit the locale too;
+reattaching through C<d2 workspace> passes it to clients even when reusing an
+existing server. Tmux creates its per-user socket directory under C</dev/shm>;
+later clients use the same socket and locale settings. The outer
+workspace command must come from an installation containing this handoff; an
+older installed C<d2> that predates the fix will not pass these settings.
+
+The command stops immediately if the service fails to start or either in-container
+command fails. Startup errors ask the user to configure a Compose service named
+C<workspace>; no alias registration or inner workspace command is attempted
+after a failed start. C<-d> without C<-c> or C<-C>, C<-C> without Docker mode,
+and Docker mode with a raw absolute path instead of a registered alias are
+rejected. Without Docker mode the
+existing local tmux behavior is unchanged. The final Compose C<exec> allocates
+a TTY and directly inherits the caller's input/output so tmux can attach
+interactively. Before tmux commands run, the helper honors C<TMUX_TMPDIR>; if it
+is unset and C</tmp> is not writable, C</dev/shm> is selected for the server
+socket. Later workspace commands make the same selection, allowing them to
+reconnect to that container-local tmux server. A writable C</tmp> keeps tmux's
+default socket directory.
+
 =head1 WHAT USES IT
 
 It is used by the C<dashboard ticket> helper, by prompt/bootstrap flows that
@@ -767,6 +1015,9 @@ create/attach error handling.
   TICKET_REF=DD-123 dashboard ticket
   dashboard ticket feature-branch-42
   dashboard workspace parent.child.work -c
+  dashboard workspace -c foobar --docker
+  dashboard workspace foobar -c -d
+  dashboard workspace foobar -d -C
   perl -Ilib -MDeveloper::Dashboard::CLI::Ticket=list_sessions -e 'print join qq(\n), list_sessions()'
 
 =for comment FULL-POD-DOC END

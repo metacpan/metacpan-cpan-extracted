@@ -357,17 +357,17 @@ Albanian Albania locale.
    1995-12-22T09:05:02 = pre, 9 B
   -0010-09-15T04:44:23 = sht, 4 B
 
-=head3 EBhm (E h:mm B)
+=head3 EBhm (E, h:mm B)
 
-   2008-02-05T18:30:30 = mar 6:30 B
-   1995-12-22T09:05:02 = pre 9:05 B
-  -0010-09-15T04:44:23 = sht 4:44 B
+   2008-02-05T18:30:30 = mar, 6:30 B
+   1995-12-22T09:05:02 = pre, 9:05 B
+  -0010-09-15T04:44:23 = sht, 4:44 B
 
-=head3 EBhms (E h:mm:ss B)
+=head3 EBhms (E, h:mm:ss B)
 
-   2008-02-05T18:30:30 = mar 6:30:30 B
-   1995-12-22T09:05:02 = pre 9:05:02 B
-  -0010-09-15T04:44:23 = sht 4:44:23 B
+   2008-02-05T18:30:30 = mar, 6:30:30 B
+   1995-12-22T09:05:02 = pre, 9:05:02 B
+  -0010-09-15T04:44:23 = sht, 4:44:23 B
 
 =head3 EHm (E, HH:mm)
 
@@ -434,6 +434,24 @@ Albanian Albania locale.
    2008-02-05T18:30:30 = mar, 5 shk 2008 mb.K.
    1995-12-22T09:05:02 = pre, 22 dhj 1995 mb.K.
   -0010-09-15T04:44:23 = sht, 15 sht -10 p.K.
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = shkurt 2008 mb.K.
+   1995-12-22T09:05:02 = dhjetor 1995 mb.K.
+  -0010-09-15T04:44:23 = shtator -10 p.K.
+
+=head3 GyMMMMEd (E, d MMMM y G)
+
+   2008-02-05T18:30:30 = mar, 5 shkurt 2008 mb.K.
+   1995-12-22T09:05:02 = pre, 22 dhjetor 1995 mb.K.
+  -0010-09-15T04:44:23 = sht, 15 shtator -10 p.K.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 shkurt 2008 mb.K.
+   1995-12-22T09:05:02 = 22 dhjetor 1995 mb.K.
+  -0010-09-15T04:44:23 = 15 shtator -10 p.K.
 
 =head3 GyMMMd (d MMM y G)
 
@@ -632,6 +650,18 @@ Albanian Albania locale.
    2008-02-05T18:30:30 = shkurt 2008
    1995-12-22T09:05:02 = dhjetor 1995
   -0010-09-15T04:44:23 = shtator -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = mar, 5 shkurt 2008
+   1995-12-22T09:05:02 = pre, 22 dhjetor 1995
+  -0010-09-15T04:44:23 = sht, 15 shtator -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 shkurt 2008
+   1995-12-22T09:05:02 = 22 dhjetor 1995
+  -0010-09-15T04:44:23 = 15 shtator -10
 
 =head3 yMMMd (d MMM y)
 

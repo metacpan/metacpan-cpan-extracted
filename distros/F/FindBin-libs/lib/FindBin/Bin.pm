@@ -139,7 +139,7 @@ BEGIN
     #
     # note that $0 is initialized to a file path, not a dir. 
 
-    my ( $abs, $canon )
+    my ( $logical, $physical )
     = do
     {
         if( $0 =~ m{^ (?: -e | - | interactive ) }x )
@@ -147,8 +147,8 @@ BEGIN
             my $raw = pwd;
 
             (
-                rel2abs( $raw )
-              , $raw
+                $raw
+              , Cwd::abs_path( $raw ) // $raw
             )
         }
         else
@@ -162,29 +162,66 @@ BEGIN
             ;
 
             (
-                catpath( $v, rel2abs(    $raw ), '' )
-              , catpath( $v, canon_dir( $raw ), '' )
+                catpath( $v, canon_dir( $raw ),             '' )
+              , catpath( $v, Cwd::abs_path( $raw ) // $raw, '' )
             )
         }
     };
 
-    # initialize $Bin as a ref-to-const, Bin is a
-    # constant sub. absent further twiddling with
-    # Symbol these should remain stable throuout
-    # execution.
+    # $Bin_l — logical path (canon_dir, like "pwd -L")
+    eval qq| *{ qualify_to_ref 'Bin_l' } = \\'$logical'  |;
+    eval qq| sub Bin_l(){ '$logical'  } |;
 
-    eval qq| *{ qualify_to_ref 'Bin' } = \\'$abs' |;
-    eval qq| sub Bin(){ '$abs' } |;
+    # $Bin_p — physical path (abs_path, like "pwd -P", resolves symlinks)
+    eval qq| *{ qualify_to_ref 'Bin_p' } = \\'$physical' |;
+    eval qq| sub Bin_p(){ '$physical' } |;
 
-    eval qq| *{ qualify_to_ref 'Bin_c' } = \\'$canon' |;
-    eval qq| sub Bin_c(){ '$canon' } |;
+    # $Bin — module-level default = logical; import() may alias to physical
+    eval qq| *{ qualify_to_ref 'Bin' } = \\'$logical' |;
+    eval qq| sub Bin(){ '$logical' } |;
 }
 
 ########################################################################
 # package variables & sanity checks
 ########################################################################
 
-our @EXPORT_OK  = qw( $Bin Bin $Bin_c Bin_c pwd canon_dir );
+our @EXPORT    = qw( $Bin Bin );
+our @EXPORT_OK = qw( $Bin Bin $Bin_l Bin_l $Bin_p Bin_p pwd canon_dir );
+
+########################################################################
+# interface
+########################################################################
+
+sub import
+{
+    my $class    = shift;
+    my $use_phys = grep { $_ eq 'abspath' } @_;
+    my @want     = grep { $_ ne 'abspath' } @_;
+    my $caller   = caller;
+
+    # No explicit requests → use default @EXPORT list.
+    @want = @EXPORT
+    unless @want;
+
+    if( grep { m{ ^ [&\$]? Bin $ }x } @want )
+    {
+        my $flavor = $use_phys ? 'Bin_p' : 'Bin_l';
+        my $src    = qualify_to_ref $flavor => __PACKAGE__;
+        my $dst    = qualify_to_ref 'Bin'   => $caller;
+
+        # Alias $Bin (SCALAR slot) — preserves read-only constraint.
+        *{ $dst } = *{ $src }{ SCALAR };
+
+        # Alias Bin() (CODE slot) when the bare sub was requested.
+        *{ $dst } = *{ $src }{ CODE }
+        if grep { m{ ^ [&]? Bin $ }x } @want;
+
+        @want = grep { ! m{ ^ [&\$]? Bin $ }x } @want;
+    }
+
+    $class->export_to_level( 1, $class, @want )
+    if @want;
+}
 
 1
 __END__
@@ -197,45 +234,49 @@ normalization strategies for paths containing C<..> segments.
 =head1 SYNOPSIS
 
     # Exports two variables (and matching constant subs) for the
-    # directory containing the running script, plus two utilities:
+    # directory containing the running program, plus two utilities.
+    # $Bin defaults to the logical path; pass 'abspath' to get physical.
 
     use FindBin::Bin
     qw(
-        $Bin      # absolute path via File::Spec::canonpath
-        Bin       # constant sub returning $Bin
-        $Bin_c    # absolute path via canon_dir (stack-based '..' removal)
-        Bin_c     # constant sub returning $Bin_c
+        $Bin      # logical path by default; physical with 'abspath' (see below)
+        Bin       # constant sub returning same value as $Bin
+        $Bin_l    # logical path via canon_dir (stack-based '..' removal, like pwd -L)
+        Bin_l     # constant sub returning $Bin_l
+        $Bin_p    # physical path via Cwd::abs_path (resolves symlinks, like pwd -P)
+        Bin_p     # constant sub returning $Bin_p
         pwd       # absolute CWD, symlinks preserved (like "pwd -L")
         canon_dir # remove '..' and '.' without touching the filesystem
     );
 
-    # For paths with no '..' segments both variables are identical:
+    # $Bin defaults to the logical path (same as $Bin_l).
+    # Pass 'abspath' to get the physical path (same as $Bin_p):
+
+    use FindBin::Bin qw( $Bin );            # $Bin == $Bin_l  (logical, default)
+    use FindBin::Bin qw( $Bin abspath );    # $Bin == $Bin_p  (physical)
+
+    # For paths with no symlinks, all three variables are identical:
 
     say $Bin;    # /home/jowbloe/project/bin
-    say $Bin_c;  # /home/jowbloe/project/bin
+    say $Bin_l;  # /home/jowbloe/project/bin   (canon_dir, logical)
+    say $Bin_p;  # /home/jowbloe/project/bin   (abs_path,  physical)
 
-    # They differ when the resolved path contains intermediate '..'
-    # segments.  canonpath (used for $Bin) only removes a trailing
-    # '/..' and leading '/../'; canon_dir removes every '..':
+    # They differ when the program's directory path contains symlinks.
+    # If /home/jowbloe is a symlink to /real/home/jowbloe:
 
-    # $0 = 'goes/../../up/script.pl', pwd = /home/jowbloe/project
-    say $Bin;    # /home/jowbloe/project/goes/../../up  (canonpath)
-    say $Bin_c;  # /home/jowbloe/up                     (canon_dir)
-
-    # Both variables preserve symlinks -- neither calls Cwd::abs_path.
-    # If you need the physical (dereferenced) path, call abs_path()
-    # from Cwd yourself.
+    say $Bin_l;  # /home/jowbloe/project/bin   (symlinks preserved)
+    say $Bin_p;  # /real/home/jowbloe/project/bin  (symlinks resolved)
 
     # Interactive invocations (perl -e, perl -E, perl -, debugger):
-    # $Bin_c = pwd()          -- CWD as returned by pwd()
-    # $Bin   = rel2abs(pwd()) -- canonpath of pwd() (equal for clean paths)
+    # $Bin_l = pwd()          -- CWD as returned by pwd()
+    # $Bin_p = abs_path(pwd()) -- CWD with symlinks resolved
 
     perl -MFindBin::Bin=Bin -e 'say Bin';
 
     perl - < ../../foo/bar/bim;
 
-    # Named scripts: directory component of $0, with pwd() prepended
-    # when $0 is relative.  Both are absolute at program startup.
+    # Named programs: directory component of $0, with pwd() prepended
+    # when $0 is relative.  All variables are absolute at program startup.
 
     use FindBin::Bin qw( pwd );
     my $cwd = pwd;         # same as "pwd -L" on *NIX
@@ -250,37 +291,88 @@ normalization strategies for paths containing C<..> segments.
 
 =head1 DESCRIPTION
 
-This module computes two absolute-path forms of the directory that
-contains the running script (C<$0>) and exports them at compile time
-in a C<BEGIN> block.  Both forms preserve symbolic links; they differ
-only in how they handle C<..> segments in the path.
+This module computes three absolute-path forms of the directory that
+contains the running program (C<$0>) and exports them at compile time
+in a C<BEGIN> block.
 
 =head2 $Bin and Bin()
 
-C<$Bin> is computed via C<File::Spec::rel2abs>, which reduces to
-C<File::Spec::canonpath> for an already-absolute path.  C<canonpath>
-performs string-level normalisation: it collapses repeated slashes,
-removes C</./> sequences, and strips a leading C</../> or a trailing
-C</..>, but it does B<not> remove intermediate C</../> segments such
-as C</foo/bar/../baz>.
+C<$Bin> is a configurable alias.  By default it equals C<$Bin_l> (the
+logical path).  Passing C<'abspath'> in the import list makes C<$Bin>
+equal C<$Bin_p> (the physical path) in the calling package:
 
-For most scripts, where C<$0> contains no C<..>, C<$Bin> and C<$Bin_c>
-are identical.
+    use FindBin::Bin qw( $Bin );           # $Bin == $Bin_l  (default)
+    use FindBin::Bin qw( $Bin abspath );   # $Bin == $Bin_p
 
-=head2 $Bin_c and Bin_c()
+C<Bin()> follows the same logic: it is aliased to C<Bin_l()> or
+C<Bin_p()> depending on the C<abspath> flag.
 
-C<$Bin_c> is computed via C<canon_dir()>, which uses a stack algorithm
-to process every path component.  It removes B<all> C<..> and C<.>
-segments regardless of position, producing the shortest equivalent
-absolute path without touching the filesystem.
+=head2 $Bin_l and Bin_l()
+
+C<$Bin_l> ("logical", like C<pwd -L>) is computed via C<canon_dir()>,
+a stack algorithm that removes B<all> C<..> and C<.> segments without
+touching the filesystem.  Symbolic links in the path are B<preserved>.
+
+=head2 $Bin_p and Bin_p()
+
+C<$Bin_p> ("physical", like C<pwd -P>) is computed via C<Cwd::abs_path()>,
+which resolves all symbolic links.  If C<abs_path> fails, C<$Bin_l> is
+used as a fallback.
 
 =head2 Symlinks
 
-Neither C<$Bin> nor C<$Bin_c> resolves symbolic links.  Both are
-derived from C<pwd()> (which behaves like C<pwd -L>) and from C<$0>
-as Perl set it -- the path through which the script was invoked.  If
-you need the physical path with symlinks dereferenced, use
-C<Cwd::abs_path()> directly.
+C<$Bin_l> preserves directory symlinks in the path (logical, like
+C<pwd -L>).  C<$Bin_p> resolves them to the real on-disk location
+(physical, like C<pwd -P>).  They are identical when no symlinks appear
+in the directory path.
+
+=head3 Example: two lib trees, one symlink
+
+Consider a sandbox layout where C</home/user/app> is a directory
+symlink pointing to the real project under C</work/projects/app>:
+
+    /home/user/                       # logical subtree
+    +-- lib/
+    |   \-- UserLib.pm                # visible only via $Bin_l
+    \-- app -> /work/projects/app     # directory symlink
+
+    /work/projects/                   # physical subtree
+    +-- lib/
+    |   \-- WorkLib.pm                # visible only via $Bin_p
+    \-- app/
+        \-- bin/
+            \-- script                # $0 -- the running program
+
+When C<script> is invoked via the symlink path
+(C</home/user/app/bin/script>):
+
+    $Bin_l = /home/user/app/bin       # symlink path preserved
+    $Bin_p = /work/projects/app/bin   # symlink resolved
+
+C<FindBin::libs> (and any other code that walks up from C<$Bin>) finds
+different C<lib/> directories depending on which variable it uses as the
+starting point.
+
+B<Using C<$Bin_l>> (C<noabspath>):
+
+    walk: /home/user/app/bin  ->  /home/user/app  ->  /home/user
+    lib found: /home/user/lib
+    use lib '/home/user/lib'    # loads UserLib.pm
+
+B<Using C<$Bin_p>> (C<abspath>, the default):
+
+    walk: /work/projects/app/bin  ->  /work/projects/app  ->  /work/projects
+    lib found: /work/projects/lib
+    use lib '/work/projects/lib'  # loads WorkLib.pm
+
+This is the "regression testing via symlinks" pattern: place a directory
+symlink to the program's bin inside a test sandbox that has its own
+C<lib/> tree.  Toggle between the sandbox libraries (logical) and the
+source-tree libraries (physical) with the C<abspath> setting in
+C<FindBin::libs>, or by choosing which variable to use directly.
+
+The default C<$Bin> equals C<$Bin_l> unless the caller passes
+C<'abspath'> at import time (see L</"$Bin and Bin()">).
 
 =head2 Resolving the working directory
 
@@ -289,21 +381,20 @@ C<Cwd::abs_path()> directly.
 When C<$0> is C<-e>, C<->, or C<interactive> (one-liner, stdin, or
 debugger), the directory is taken from C<pwd()>:
 
-    $Bin_c = pwd()
-    $Bin   = rel2abs( pwd() )   # == canonpath( pwd() ) for clean paths
+    $Bin_l = pwd()
+    $Bin_p = Cwd::abs_path( pwd() )   # resolves symlinks in CWD
 
-=head3 Named script files
+=head3 Named program files
 
-When C<$0> holds a file path the directory component is extracted via
-C<splitpath>.  A relative directory has C<pwd()> prepended before
-normalisation:
+When C<$0> holds a file path:
 
-    $Bin   = catpath( $vol, rel2abs(  $raw ) )
-    $Bin_c = catpath( $vol, canon_dir( $raw ) )
+    $Bin_l = catpath( $vol, canon_dir( $raw ),   '' )  # logical, '..' removed
+    $Bin_p = catpath( $vol, abs_path( $raw ),    '' )  # physical, symlinks resolved
 
-where C<$raw> is the absolute directory string.
+where C<$raw> is the absolute directory string derived from the
+directory component of C<$0> (with C<pwd()> prepended for relative paths).
 
-Both variables are defined as read-only ref-to-constant scalars and
+All variables are defined as read-only ref-to-constant scalars and
 constant subs; they do not change after the C<BEGIN> block runs.
 
 =head2 pwd()

@@ -1,0 +1,251 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd ();
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::Config;
+use Developer::Dashboard::PathRegistry;
+
+my $skill_count = 1000;
+my $runs        = 7;
+my $workers     = 4;
+my $help        = 0;
+GetOptions(
+    'skills=i'  => \$skill_count,
+    'runs=i'    => \$runs,
+    'workers=i' => \$workers,
+    'help'      => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--skills must be a positive integer\n" if $skill_count < 1;
+die "--workers must be a positive integer\n" if $workers < 1;
+die "--runs must be an odd positive integer\n" . _usage() if $runs < 1 || $runs % 2 == 0;
+
+eval { require MCE::Map; 1 }
+  or die "MCE::Map is required for this benchmark: $@";
+MCE::Map->import();
+
+my $root = tempdir( 'problem48-config-alias-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home = File::Spec->catdir( $root, 'home' );
+make_path($home);
+local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_HOME} = undef;
+local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = undef;
+my $original_cwd = Cwd::getcwd();
+chdir $home or die "Unable to enter isolated benchmark home '$home': $!";
+
+my $skills_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills' );
+for my $index ( 1 .. $skill_count ) {
+    _write_skill_config( $skills_root, sprintf( 'skill-%06d', $index ), $index );
+}
+
+my $paths  = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+my $config = Developer::Dashboard::Config->for_path_config($paths);
+my @skills = $paths->installed_skill_entries;
+die "Expected $skill_count discovered skills, found " . scalar(@skills) . "\n"
+  if @skills != $skill_count;
+
+my $expected = $config->path_aliases;
+my $expected_json = _canonical_json($expected);
+MCE::Map->init( max_workers => $workers, chunk_size => 1, use_threads => 0 );
+my $cold_started = time;
+my $cold_entries = _parallel_skill_entries( $config, \@skills );
+my $candidate = _path_aliases_with_entries( $config, $cold_entries );
+my $cold_seconds = time - $cold_started;
+die "MCE cold output differs from Config::path_aliases\n"
+  if _canonical_json($candidate) ne $expected_json;
+
+my ( @serial_seconds, @parallel_seconds );
+for my $run ( 1 .. $runs ) {
+    if ( $run % 2 ) {
+        push @serial_seconds, _timed_aliases( sub { $config->path_aliases }, $expected_json );
+        push @parallel_seconds, _timed_aliases(
+            sub {
+                my $entries = _parallel_skill_entries( $config, \@skills );
+                return _path_aliases_with_entries( $config, $entries );
+            },
+            $expected_json,
+        );
+    }
+    else {
+        push @parallel_seconds, _timed_aliases(
+            sub {
+                my $entries = _parallel_skill_entries( $config, \@skills );
+                return _path_aliases_with_entries( $config, $entries );
+            },
+            $expected_json,
+        );
+        push @serial_seconds, _timed_aliases( sub { $config->path_aliases }, $expected_json );
+    }
+}
+MCE::Map->finish;
+chdir $original_cwd or die "Unable to restore working directory '$original_cwd': $!";
+
+my $serial_median   = _median(@serial_seconds);
+my $parallel_median = _median(@parallel_seconds);
+printf "skills=%d workers=%d runs=%d exact_alias_parity=yes\n", $skill_count, $workers, $runs;
+printf "serial_path_aliases_median_ms=%.3f mce_cold_ms=%.3f mce_warm_median_ms=%.3f cold_ratio=%.2fx warm_ratio=%.2fx\n",
+  1000 * $serial_median, 1000 * $cold_seconds, 1000 * $parallel_median,
+  $serial_median / $cold_seconds, $serial_median / $parallel_median;
+exit 0;
+
+# _usage()
+# Returns command usage and the synthetic dashboard config workload description.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--skills N] [--runs ODD_N] [--workers N] [--help]\n"
+      . "Compares real Config::path_aliases with ordered MCE skill-config reads.\n";
+}
+
+# _write_skill_config($skills_root, $name, $number)
+# Creates one installed-skill fixture with a path alias and unrelated config fields.
+# Input: skill root path, validated synthetic name, and numeric fixture suffix.
+# Output: written JSON config path.
+sub _write_skill_config {
+    my ( $skills, $name, $number ) = @_;
+    die "Invalid benchmark skill name '$name'\n" if $name !~ /\A[A-Za-z0-9_-]+\z/;
+    my $config_dir = File::Spec->catdir( $skills, $name, 'config' );
+    make_path($config_dir);
+    my %config = map { ( "unrelated_$_" => "value-$number-$_" ) } 1 .. 80;
+    $config{path_aliases} = { work => "/workspace/$name" };
+    my $file = File::Spec->catfile( $config_dir, 'config.json' );
+    open my $fh, '>:raw', $file or die "Unable to create '$file': $!";
+    print {$fh} _canonical_json(\%config) or die "Unable to write '$file': $!";
+    close $fh or die "Unable to close '$file': $!";
+    return $file;
+}
+
+# _parallel_skill_entries($config, $skills)
+# Loads each skill's effective layered path_aliases config in ordered MCE workers.
+# Input: Config object and ordered PathRegistry skill-entry array reference.
+# Output: ordered config-entry array reference consumed by Config alias expansion.
+sub _parallel_skill_entries {
+    my ( $config, $skills ) = @_;
+    return [ MCE::Map::run(
+        sub {
+            my $skill = $_;
+            my $name = $skill->{skill_name};
+            my $fragment = $config->_skill_config_hash(
+                $name,
+                layers   => $skill->{layers},
+                only_key => 'path_aliases',
+            );
+            return if !%{$fragment};
+            return {
+                skill_name => $name,
+                skill_root => $skill->{skill_root},
+                config     => $fragment,
+            };
+        },
+        @{$skills},
+    ) ];
+}
+
+# _path_aliases_with_entries($config, $entries)
+# Runs the production alias merge/qualification/expansion using supplied parallel skill config entries.
+# Input: Config object and ordered skill config-entry array reference.
+# Output: expanded path alias hash reference.
+sub _path_aliases_with_entries {
+    my ( $config, $entries ) = @_;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Config::_skill_path_alias_entries = sub { return @{$entries} };
+    return $config->path_aliases;
+}
+
+# _timed_aliases($code, $expected_json)
+# Times one complete alias result and aborts if output differs from serial baseline.
+# Input: result-producing code reference and canonical baseline JSON string.
+# Output: elapsed seconds.
+sub _timed_aliases {
+    my ( $code, $expected_json ) = @_;
+    my $started = time;
+    my $actual = _canonical_json( $code->() );
+    my $elapsed = time - $started;
+    die "Benchmark alias output mismatch\n" if $actual ne $expected_json;
+    return $elapsed;
+}
+
+# _canonical_json($value)
+# Encodes data deterministically for exact parity comparisons.
+# Input: JSON-compatible Perl value.
+# Output: canonical UTF-8 JSON string.
+sub _canonical_json {
+    my ($value) = @_;
+    return JSON::XS->new->canonical->utf8->encode($value);
+}
+
+# _median(@samples)
+# Returns the median of a non-empty elapsed-time sample set.
+# Input: elapsed-time numbers.
+# Output: median elapsed-time number.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot compute median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-config-alias-mce-benchmark - compare dashboard path aliases with MCE
+
+=head1 PURPOSE
+
+Builds a temporary home containing synthetic installed skills, then measures
+the actual C<Developer::Dashboard::Config::path_aliases> path against an MCE
+candidate that parallelizes only each skill's layered C<path_aliases> read.
+Both candidates continue to use the production merge, skill qualification,
+path expansion, and global/repository config logic. Every sample checks exact
+canonical JSON parity before reporting timings.
+
+=head1 WHY IT EXISTS
+
+Raw JSON microbenchmarks omit dashboard discovery and alias semantics. This
+tool tests whether MCE helps the real configuration API enough to justify any
+production design decision. It is a research helper, not a runtime command,
+and makes no changes to the user's actual dashboard configuration.
+
+=head1 WHEN TO USE
+
+Use it for Problem 48 performance research when considering parallel reads of
+many installed skill configs. Run it inside the isolated project Docker test
+environment with MCE on C<PERL5LIB>; fixture timings do not represent every
+dashboard operation or establish a universal speedup.
+
+=head1 HOW TO USE
+
+  perl script/problem48-config-alias-mce-benchmark --skills 1000 --runs 7 --workers 4
+
+Arguments require positive skill and worker counts, and an odd positive run
+count. MCE is required only after argument validation and help handling.
+
+=head1 WHAT USES IT
+
+The Problem 48 investigation uses its parity-checked measurements to evaluate
+MCE for the dashboard's real path-alias configuration API. No production code
+invokes this script.
+
+=head1 EXAMPLES
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench sh -lc 'export PERL5LIB=/bench-perl/lib/perl5:/bench-perl/lib/perl5/x86_64-linux-gnu-thread-multi:$PERL5LIB; cd /checkout && perl script/problem48-config-alias-mce-benchmark --skills 5000 --runs 7 --workers 4'
+
+=cut

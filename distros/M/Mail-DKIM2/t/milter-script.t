@@ -253,7 +253,7 @@ my $PLAIN = join($EOL,
     '');
 
 # The same post from an author at the list's own domain: a message the
-# outbound milter signs as i=1 must have a From in its domain (-07 section
+# outbound milter signs as i=1 must have a From in its domain (-08 section
 # 11), and an unsigned post keeps its From in the m=1 stamped on arrival.
 my $LOCAL = $PLAIN =~ s/<author\@test1\.dkim2\.com>/<author\@test2.dkim2.com>/r;
 
@@ -310,7 +310,7 @@ sub list_modified {
 }
 
 # --- 1a. No upstream chain, From in another domain: not ours to originate ---
-# (-07 section 11): the message goes on unsigned, with no instance of ours.
+# (-08 section 11): the message goes on unsigned, with no instance of ours.
 {
     my ($verdict, $mods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
@@ -358,7 +358,7 @@ sub list_modified {
     like($v->result_detail, qr/i=1\.\.2/, 'list: both signatures verified');
 }
 
-# --- 2b. The list changed From (-07 section 11) ---
+# --- 2b. The list changed From (-08 section 11) ---
 # To its own domain: signed, and it verifies. To one it cannot sign for: the
 # Signer refuses, and with the sender's i=1 on it the copy is rejected.
 {
@@ -381,7 +381,7 @@ sub list_modified {
     }
 }
 
-# --- 2a. The exploded flag (-07 section 12.5) ---
+# --- 2a. The exploded flag (-08 section 12.5) ---
 #
 # The list manager marks each distribution copy X-DKIM2-Exploded: yes; the
 # milter signs it with f=exploded and removes the hint. A copy with two
@@ -422,7 +422,7 @@ sub list_modified {
     my ($verdict, $mods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'],
         message => $list);
-    # -07 section 13: a message with DKIM2 header fields that is not Validly
+    # -08 section 13: a message with DKIM2 header fields that is not Validly
     # Signed is not sent on: 550 5.7.1, the reason in the reply.
     is($verdict, 'y', 'broken: rejected');
     like(reply_of($mods), qr/^550 5\.7\.1 not signing: upstream DKIM2 chain result=fail/, 'broken: 550 5.7.1 with the reason');
@@ -855,7 +855,7 @@ sub stock_decorate {
     my ($v2, $omods) = run_milter(
         from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $wire);
     my $out = apply_mods($wire, $omods);
-    is_deeply([mi_numbers($out)], [1], 'unsigned wrap: leaves with one Message-Instance, m=1 (-07 section 12.1)');
+    is_deeply([mi_numbers($out)], [1], 'unsigned wrap: leaves with one Message-Instance, m=1 (-08 section 12.1)');
     my $rv = verify($out);
     is($rv->result, 'pass', 'unsigned wrap: signed copy verifies') or diag($rv->result_detail);
     my $back = Mail::DKIM2::MessageInstance->undo(Email::MIME->new($out));
@@ -1030,7 +1030,7 @@ sub info_has { my ($mods, $re) = @_; scalar grep { $_->{value} =~ $re } inserted
     like(reply_of($mods), qr/^550 5\.7\.1 not signing: /, 'refused: 550 5.7.1');
 }
 
-# --- Stock route, unsigned post with a From munge: one m=1 (-07 section 12.1) ---
+# --- Stock route, unsigned post with a From munge: one m=1 (-08 section 12.1) ---
 # An unsigned post gets an unsigned m=1 on arrival; stock Mailman munges the
 # From (munge_from, dmarc_mitigate_unconditionally), tags the subject and adds
 # a footer. Sent as m=1 + m=2 + i=1, C5 would check the author's From at m=1

@@ -5,7 +5,7 @@ use File::Temp qw( tempdir );
 use Path::Tiny;
 use YAML::PP ();
 use lib 't/lib';
-use Test::Raider::Env qw( clear_engine_env );
+use Test::Raider::Env qw( clear_engine_env isolate_home );
 use Langertha::Raider::Config;
 use Langertha::Raider::EngineResolver;
 
@@ -55,7 +55,7 @@ subtest 'model and key' => sub {
 subtest 'engine names and key variables' => sub {
   my $class = 'Langertha::Raider::EngineResolver';
   is([ $class->engine_names ],
-    [qw( anthropic openai deepseek groq mistral gemini minimax cerebras openrouter ollama )],
+    [qw( anthropic openai deepseek groq mistral gemini minimax cerebras openrouter ollama mock virtual )],
     'every known engine, fixed order');
   is(dies { resolver(undef, engine => $_)->engine_class }, undef, 'engine class for '.$_)
     for $class->engine_names;
@@ -121,6 +121,32 @@ subtest 'default_model_for_engine shows the engine default the table lacks' => s
     'openrouter has no default -- it requires an explicit model');
   is($class->default_model_for_engine('anthropic'), 'claude-haiku-4-5',
     "anthropic keeps raider's cheap table default, not core's flagship");
+};
+
+# #78, decided 2026-10-15 (k23, k150): the API-key autoselection knows the
+# six providers it always knew and is never extended to discovery
+# providers or stored aliases; those are only ever chosen by --provider.
+subtest 'the key autoselection never considers aliases or engines outside its list' => sub {
+  my $home = isolate_home();
+  path( $home, '.raider' )->mkpath;
+  path( $home, '.raider', 'config.yml' )->spew_utf8(YAML::PP->new->dump_string({
+    providers => { acme => {
+      origin => 'https://provider.example:443', issuer => 'https://provider.example', auth => ['api_key'],
+      credential_env => 'ACME_API_KEY', allow_internal => 0, pinned_at => '2026-10-15T09:30:00Z',
+      fingerprint => 'a' x 64,
+    } },
+  }));
+  local @ENV{qw( ACME_API_KEY LANGERTHA_ACME_API_KEY MINIMAX_API_KEY CEREBRAS_API_KEY OPENROUTER_API_KEY )} = ('present') x 5;
+  my $r = resolver();
+  is($r->config->providers->{acme}{credential_env}, 'ACME_API_KEY', 'the alias is stored');
+  is($r->engine_name, 'anthropic', 'a key for the alias (or a non-listed engine) selects nothing');
+  is($r->api_key, '', 'and feeds no key');
+  ok(!(grep { $_ eq 'acme' } $r->engine_names), 'an alias is no engine name');
+  like(dies { resolver(undef, engine => 'acme')->engine_class }, qr/Unknown engine: acme/, 'the alias name is no -e value');
+  {
+    local $ENV{GROQ_API_KEY} = 'x';
+    is($r = resolver()->engine_name, 'groq', 'the six still select, as before');
+  }
 };
 
 done_testing;

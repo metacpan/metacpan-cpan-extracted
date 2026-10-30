@@ -4,6 +4,7 @@ use Acme::Parataxis qw[async fiber yield await_sleep with_timeout atomically ret
 use Acme::Parataxis::TVar;    # compile the STM class up front so ->new is available before any atomically runs
 use Test2::V1 -ipP;
 $|++;
+#
 subtest 'a single-writer transfer commits exactly once' => sub {
     my $a = Acme::Parataxis::TVar->new( value => 100 );
     my $b = Acme::Parataxis::TVar->new( value => 100 );

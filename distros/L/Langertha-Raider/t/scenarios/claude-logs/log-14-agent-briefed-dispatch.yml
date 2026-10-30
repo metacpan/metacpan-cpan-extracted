@@ -1,0 +1,51 @@
+# Real pattern: the main session hands a self-contained task to a custom agent
+# (Agent tool, subagent_type = the agent file's name). The harness starts the
+# agent with its briefing.skills pre-loaded in front of the task, the agent
+# reads the file it was pointed at and answers with one final text; that text is
+# the tool result in the parent, which carries on and writes the file itself.
+# Abweichung: Claude Code often launches such an agent asynchronously (result
+# "Async agent launched ... agentId ..." and a notification later) and appends
+# an agentId/usage trailer to a synchronous result; raider always runs it to the
+# end inside the call and returns the bare last text, no id, no usage.
+# Abweichung: the briefing frame is the same as the plugin's, but its <skill dir>
+# is the temp root of the scenario, not a real skills directory.
+title: a briefed agent sees the skill body before its task, reads a file, and its last text lets the caller write the result
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/changelog-style/SKILL.md: "---\nname: changelog-style\ndescription: How changelog lines are phrased.\n---\n\nCHANGELOG-STYLE-BODY: one English sentence per change, past tense, no ticket ids.\n"
+  .claude/agents/notes-writer.md: "---\nname: notes-writer\ndescription: Turns a list of changes into release-note sentences.\ntools: Read, Grep\nbriefing:\n  skills:\n    - changelog-style\n---\nNOTES-WRITER-BODY: you only produce the sentences.\n"
+  work/changes.txt: "parser: fixed crash on empty input\ncli: added --quiet flag\n"
+prompt: Draft the release notes for work/changes.txt.
+script:
+  - tool_calls:
+      - [ agent, { description: Draft release notes, prompt: "Read work/changes.txt and write one release-note sentence per line.", subagent_type: notes-writer } ]
+  - tool_calls:
+      - [ read_file, { path: work/changes.txt } ]
+  - text: "Fixed a crash on empty input in the parser. Added a --quiet flag to the CLI."
+  - tool_calls:
+      - [ write_file, { path: RELEASE-NOTES.md, content: "Fixed a crash on empty input in the parser. Added a --quiet flag to the CLI.\n" } ]
+  - text: Wrote RELEASE-NOTES.md from the agent's sentences.
+expect:
+  answer: Wrote RELEASE-NOTES.md from the agent's sentences.
+  request_count: 5
+  files:
+    RELEASE-NOTES.md: "Fixed a crash on empty input in the parser. Added a --quiet flag to the CLI.\n"
+  requests:
+    - { index: 0, tool_text: "- notes-writer: Turns a list of changes into release-note sentences. (Tools: read_file, grep)" }
+    - { index: 0, absent: "CHANGELOG-STYLE-BODY" }
+    - { index: 1, contains: "# Briefing" }
+    - { index: 1, contains: "<skill name=\"changelog-style\" dir=\"" }
+    - { index: 1, contains: "CHANGELOG-STYLE-BODY: one English sentence per change, past tense, no ticket ids.\n</skill>\n\n---\n\n# Original task\n\nRead work/changes.txt and write one release-note sentence per line." }
+    - { index: 1, contains: "NOTES-WRITER-BODY" }
+    - { index: 1, absent: "Draft the release notes for work/changes.txt." }
+    - { index: 1, offers: [ read_file, grep ] }
+    - { index: 2, contains: "cli: added --quiet flag" }
+    - { index: 3, contains: "Fixed a crash on empty input in the parser." }
+    - { index: 3, absent: "CHANGELOG-STYLE-BODY" }
+  tools:
+    - { name: read_file, text: '1\tparser: fixed crash on empty input' }
+    - { name: agent, text: '\AFixed a crash on empty input in the parser\. Added a --quiet flag to the CLI\.\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: 0\ntool_uses: 1\nduration_ms: \d+</usage>\z' }
+    - { name: write_file, text: '\AFile created successfully at: \S+/RELEASE-NOTES\.md' }
+  events:
+    - { type: agent.started, call: c1, agent: notes-writer }
+    - { type: agent.finished, call: c1, agent: notes-writer, status: completed }

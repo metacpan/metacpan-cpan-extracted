@@ -435,6 +435,18 @@ Slovak locale.
    1995-12-22T09:05:02 = pi 22. 12. 1995 po Kr.
   -0010-09-15T04:44:23 = so 15. 9. -10 pred Kr.
 
+=head3 GyMMMM (MMM y G)
+
+   2008-02-05T18:30:30 = feb 2008 po Kr.
+   1995-12-22T09:05:02 = dec 1995 po Kr.
+  -0010-09-15T04:44:23 = sep -10 pred Kr.
+
+=head3 GyMMMMEd (E, d. MMMM y G)
+
+   2008-02-05T18:30:30 = ut, 5. februára 2008 po Kr.
+   1995-12-22T09:05:02 = pi, 22. decembra 1995 po Kr.
+  -0010-09-15T04:44:23 = so, 15. septembra -10 pred Kr.
+
 =head3 GyMMMMd (d. M. y G)
 
    2008-02-05T18:30:30 = 5. 2. 2008 po Kr.
@@ -650,6 +662,12 @@ Slovak locale.
    2008-02-05T18:30:30 = február 2008
    1995-12-22T09:05:02 = december 1995
   -0010-09-15T04:44:23 = september -10
+
+=head3 yMMMMEd (E, d. MMMM y)
+
+   2008-02-05T18:30:30 = ut, 5. februára 2008
+   1995-12-22T09:05:02 = pi, 22. decembra 1995
+  -0010-09-15T04:44:23 = so, 15. septembra -10
 
 =head3 yMMMMd (d. MMMM y)
 

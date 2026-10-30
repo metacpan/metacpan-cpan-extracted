@@ -9,12 +9,16 @@
 #
 #   * R 4.6.1 (2026-06-24) stats::ks.test() -- the function ks_test() is
 #     modelled on.  ks_test()'s statistic is R's D / D^+ / D^-, its
-#     exact/asymptotic auto-gate is R's (n.x*n.y < 10000 two-sample, n < 100
-#     one-sample), its exact two-sample p-value is R's psmirnov_exact_uniq_upper
-#     lattice DP, and its asymptotic p-values are R's K2l series and
-#     exp(-2*n*q^2).  The @R_TWO and @R_ONE tables were generated from R at
-#     options(digits=17) by t/ks_test.R.scipy.R, which is committed next to
-#     this file; re-run it with `Rscript t/ks_test.R.scipy.R`.
+#     exact/asymptotic auto-gate is R's (n.x*n.y < 10000 two-sample,
+#     (n < 100) && !TIES one-sample), its exact two-sample p-value is R's
+#     psmirnov_exact_{uniq,ties}_upper lattice DP, its exact one-sided
+#     one-sample p-value is R's pkolmogorov_one_exact, and its asymptotic
+#     p-values are R's K2l series at R's tol = 1e-6 and exp(-2*n*q^2).  It
+#     gives R's two tie warnings where R gives them.  The @R_TWO and @R_ONE
+#     tables were generated from R at options(digits=17) by
+#     t/ks_test.R.scipy.R, which is committed next to this file; re-run it
+#     with `Rscript t/ks_test.R.scipy.R` (it also prints R's warnings, which
+#     are the tables' last column).
 #   * R's own suite: the Hollander & Wolfe (1999) Example 5.4 pair from
 #     tests/reg-tests-1a.R (PR#1004, "exact KS test gave incorrect results due
 #     to rounding errors", pinned there as D = 0.6 and p = 15/286), and
@@ -42,38 +46,36 @@
 # Nothing here runs R or Python: every number is a frozen literal.
 #
 # The references do not always agree with each other, and neither always
-# agrees with ks_test().  Every such case is in @DIVERGE at the end of the
-# file, asserted against *both* what ks_test() produces and what the reference
-# produces, so that changing one is a deliberate act.  In summary:
+# agrees with ks_test().  Every such case is asserted in the "Recorded
+# divergences" blocks at the end of the file, against *both* what ks_test()
+# produces and what the reference produces, so that changing one is a
+# deliberate act.  In summary:
 #
-#   1. Exact two-sample p-value with ties.  R 4.6 conditions the lattice DP on
-#      the observed tie pattern (psmirnov(z = w)); ks_test() does not, and
-#      instead warns and falls back to the asymptotic p-value.  This is a
-#      missing feature, not a wrong answer: the warning is part of the
-#      contract, and the fallback value is pinned.
-#   2. Exact one-sided one-sample p-value.  R uses the Birnbaum & Tingey
-#      (1951) formula; ks_test() warns, uses exp(-2*n*D^2), and reports the
-#      asymptotic method string, since that is the p-value the caller got.
-#   3. One-sample auto-gate with ties.  R's rule is (n < 100) && !TIES, so a
-#      tied one-sample input goes asymptotic; ks_test() only tests n < 100 and
-#      stays exact.  Its exact value matches R's exact=TRUE exactly.
-#   4. Asymptotic two-sided two-sample p-value.  R calls its K2l series with
-#      tol = 1e-6, which truncates the small-argument alternative series after
-#      a single term; ks_test() passes 1e-9.  mpmath says ks_test() is right
-#      to 8.9e-15 relative where R is off by up to 4.6e-6.  @MP_TWO therefore
-#      pins mpmath's value, not R's, for that one path.  (ks_test()'s
-#      *one-sample* two-sided asymptotic path does use 1e-6, matching R; that
-#      inconsistency is pinned as-is in @R_ONE.)
+#   1-4. Up to 0.33 ks_test() warned and went asymptotic on an exact
+#      two-sample request with ties, where R conditions the lattice DP on the
+#      tie pattern; warned and went asymptotic on an exact one-sided
+#      one-sample request, where R sums Birnbaum & Tingey (1951); stayed exact
+#      on a tied one-sample input, where R's gate is (n < 100) && !TIES; and
+#      summed K2l to tol = 1e-9 on the two-sample asymptotic path, where R's
+#      psmirnov_asymp passes 1e-6.  Since 0.331 all four are R's, and the
+#      rows that used to be divergences are ordinary rows of @R_TWO and
+#      @R_ONE.  The last one makes ks_test() as wrong as R is: for z < 1,
+#      tol = 1e-6 gives k_max = (int)sqrt(2 - log(tol)) = 3, so the k = 3
+#      term of the small-argument series is never added, and R is up to
+#      4.6e-6 relative from the true limiting distribution.  @MP_TWO records
+#      that gap against mpmath.
 #   5. R's psmirnov_asymp computes the upper tail as 1 - (1 - exp(-2*n*q^2)),
 #      which cancels to exactly 0 once exp() drops below the double epsilon.
 #      ks_test() evaluates exp() directly and keeps the value.
-#   6. R's pkolmogorov_one_exact returns NaN for D = 0, because the
-#      Birnbaum-Tingey sum takes log(q + j/n) at q = 0.
+#   6. R's pkolmogorov_one_exact returns NaN for norm.hw.greater, whose D is
+#      2.8e-17: n*(1-q) rounds to n, so the sum reaches j = n and takes
+#      log(1 - q - 1) of a negative number.  ks_test() leaves that term out,
+#      as it is outside the sum's true range, and gets 1.
 #   7. SciPy's ks_2samp ignores ties in exact mode, and its asymptotic mode is
 #      not asymptotic: two-sided it evaluates kstwo.sf at finite n, one-sided
 #      it applies Hodges' continuity correction.  So only SciPy's *exact*
 #      no-tie values are directly comparable, and those are what @SCIPY_TWO
-#      uses; the rest is in @DIVERGE.  SciPy's exact two-sided p-value also
+#      uses; the tied ones are in @SCIPY_TIED.  SciPy's exact two-sided p-value also
 #      floors at ~1e-15 (its own test file annotates the 10000x10001 case
 #      "2.7755575615628914e-15"), which is why testLarge's two-sided
 #      expectation is a divergence and its one-sided ones are not.
@@ -109,24 +111,27 @@ BEGIN {
 # $TOL_D is absolute, not relative, because D is a difference of two ECDFs and
 # so lives in [0, 1]: a relative limit would be meaningless for the many cases
 # where the true D is 0 and R reports -6.9e-17 out of its own -min(z)
-# cancellation.  Worst absolute disagreement over the 112 R-pinned rows -- 88 in
-# @R_TWO plus 24 in @R_ONE -- is 1.1e-16, so 1e-14 leaves two orders of headroom
+# cancellation.  Worst absolute disagreement over the 165 R-pinned rows -- 132
+# in @R_TWO plus 33 in @R_ONE -- is 1.1e-16, so 1e-14 leaves two orders of headroom
 # for long-double and quadmath builds, where the ECDF divisions round
 # differently.
 my $TOL_D = 1e-14;
 
-# $TOL_P is the relative p-value limit against R.  Worst observed over the
-# same rows is 1.0e-15 -- the exact two-sample rows are in fact bit-identical
-# to R, all 45 of them, because ks_test() runs the same lattice DP in the same
-# order.  1e-11 is four orders of headroom.  It is not widened anywhere; the
-# cases that need more than this are divergences, and they are in @DIVERGE.
+# $TOL_P is the relative p-value limit against R.  The exact two-sample rows,
+# tied ones included, are bit-identical to R on perl-5.44.0 (double), because
+# ks_test() runs the same lattice DP in the same order.  The worst row, leaving
+# out the 1 - K2x() ones that $TOL_P_ABS is for, is oz.greater.asymp at 4.8e-14:
+# R forms the one-sided asymptotic tail as 1 - (-expm1(-2*n*q^2)) and loses
+# ~1e-16 absolute to it (divergence 5), which at p = 5.3e-4 is that much
+# relative.  1e-11 is 200 times that.  It is not widened anywhere; the
+# cases that need more than this are divergences, recorded at the end.
 my $TOL_P = 1e-11;
 
-# $TOL_MP is the relative limit against mpmath for the asymptotic two-sided
-# two-sample path.  Worst observed is 8.9e-15, on the 10000x110 case whose
-# p-value is 2.7e-24, so the limit is dominated by the exp() underflow there
-# rather than by the series.
-my $TOL_MP = 1e-11;
+# $TOL_MP bounds how far R's -- and so ks_test()'s -- asymptotic two-sided
+# two-sample p-value may sit from mpmath's limiting distribution.  The worst
+# gap is 4.6e-6 relative (x2233.x3344, z = 0.884), all of it R's truncation of
+# the series at tol = 1e-6 (see divergences 1-4); 1e-5 is twice that.
+my $TOL_MP = 1e-5;
 
 # $TOL_SCIPY is the relative limit against SciPy's own frozen expectations.
 # Worst observed is 1.6e-13 for everything up to 100x110.  SciPy's own bar for
@@ -202,8 +207,8 @@ my @KS5_X = (1, 2, 3, 4, 5);
 my @KS5_Y = (2.5, 4.5);
 
 # Schroeer & Trenkler (1995), from R's ?ks.test.  Documented there as
-# D = 3/7 with exact p = 8/33; both are in @DIVERGE, since the exact value
-# needs the tie-conditional DP.
+# D = 3/7 with exact p = 8/33, which needs the tie-conditional DP; both are
+# asserted near the end of the file.
 my @ST_X = (1, 2, 2, 3, 3);
 my @ST_Y = (1, 2, 3, 3, 4, 5, 6);
 
@@ -376,9 +381,10 @@ my %METHOD = (
 	A1 => 'One-sample Kolmogorov-Smirnov test (asymptotic)',
 );
 
+# R's two tie warnings, word for word, and ks_test()'s own size cap.
 my %WARN_RE = (
-	ties => qr/cannot compute exact p-value with ties/,
-	one1 => qr/exact 1-sample 1-sided KS test not implemented/,
+	ties2 => qr/p-value will be approximate in the presence of ties/,
+	ties1 => qr/ties should not be present for the one-sample Kolmogorov-Smirnov test/,
 	big  => qr/sample sizes too large for an exact p-value/,
 );
 
@@ -456,153 +462,199 @@ sub run_row {
 #   label, x fixture, y fixture ('pnorm' for one-sample), alternative,
 #   exact argument, expected D, expected p, expected method, expected warning
 #
-# The asymptotic two-sided two-sample rows are NOT here; see @MP_TWO for why.
+# The warning column is R's: 'ties2' is "p-value will be approximate in the
+# presence of ties", 'ties1' is "ties should not be present for the one-sample
+# Kolmogorov-Smirnov test".  Left out, each for its own reason: large.*.exact
+# (asserted inline below), large.less.asymp (divergence 5) and
+# norm.hw.greater.exact (divergence 6).
 my @R_TWO = (
 	#  label                            x         y         alternative  ex   D                        p
-	[ '100.100m1.greater.asymp',         'X100',   'X100_M1', 'greater',    0, 0.02,                    0.96078943915232318,     'A2', '' ],
-	[ '100.100m1.greater.exact',         'X100',   'X100_M1', 'greater',    1, 0.02,                    0.96097845078625499,     'E2', '' ],
-	[ '100.100m1.less.asymp',            'X100',   'X100_M1', 'less',       0, 0,                       1,                       'A2', '' ],
-	[ '100.100m1.less.exact',            'X100',   'X100_M1', 'less',       1, 0,                       1,                       'E2', '' ],
-	[ '100.100m1.two.sided.exact',       'X100',   'X100_M1', 'two.sided',  1, 0.02,                    1,                       'E2', '' ],
-	[ '100.100p1.greater.asymp',         'X100',   'X100_P1', 'greater',    0, 0.029999999999999999,    0.91393118527122819,     'A2', '' ],
-	[ '100.100p1.greater.exact',         'X100',   'X100_P1', 'greater',    1, 0.029999999999999999,    0.91432901142769896,     'E2', '' ],
-	[ '100.100p1.less.asymp',            'X100',   'X100_P1', 'less',       0, 0,                       1,                       'A2', '' ],
-	[ '100.100p1.less.exact',            'X100',   'X100_P1', 'less',       1, 0,                       1,                       'E2', '' ],
-	[ '100.100p1.two.sided.exact',       'X100',   'X100_P1', 'two.sided',  1, 0.029999999999999999,    0.99999999999620548,     'E2', '' ],
-	[ '100.110m1.greater.asymp',         'X100',   'X110_M1', 'greater',    0, 0.20818181818181825,     0.010669710775667363,    'A2', '' ],
-	[ '100.110m1.greater.exact',         'X100',   'X110_M1', 'greater',    1, 0.20818181818181825,     0.0089019059582464404,   'E2', '' ],
-	[ '100.110m1.less.asymp',            'X100',   'X110_M1', 'less',       0, 0,                       1,                       'A2', '' ],
-	[ '100.110m1.less.exact',            'X100',   'X110_M1', 'less',       1, 0,                       1,                       'E2', '' ],
-	[ '100.110m1.two.sided.exact',       'X100',   'X110_M1', 'two.sided',  1, 0.20818181818181825,     0.017803803861025598,    'E2', '' ],
-	[ '100.110p1.greater.asymp',         'X100',   'X110_P1', 'greater',    0, 0.21090909090909091,     0.0094656428300557982,   'A2', '' ],
-	[ '100.110p1.greater.exact',         'X100',   'X110_P1', 'greater',    1, 0.21090909090909091,     0.0078695943190544276,   'E2', '' ],
-	[ '100.110p1.less.asymp',            'X100',   'X110_P1', 'less',       0, 0,                       1,                       'A2', '' ],
-	[ '100.110p1.less.exact',            'X100',   'X110_P1', 'less',       1, 0,                       1,                       'E2', '' ],
-	[ '100.110p1.two.sided.exact',       'X100',   'X110_P1', 'two.sided',  1, 0.21090909090909091,     0.015739183865606153,    'E2', '' ],
-	[ 'd1m.d2.greater.asymp',            'D1M',    'D2',     'greater',    0, 0.66666666666666674,     0.34415378686541231,     'A2', '' ],
-	[ 'd1m.d2.greater.exact',            'D1M',    'D2',     'greater',    1, 0.66666666666666674,     0.29999999999999999,     'E2', '' ],
-	[ 'd1m.d2.less.asymp',               'D1M',    'D2',     'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'd1m.d2.less.exact',               'D1M',    'D2',     'less',       1, 0,                       1,                       'E2', '' ],
-	[ 'd1m.d2.two.sided.exact',          'D1M',    'D2',     'two.sided',  1, 0.66666666666666674,     0.59999999999999998,     'E2', '' ],
-	[ 'd1m.d2f.greater.asymp',           'D1M',    'D2F',    'greater',    0, 0.75,                    0.22313016014842979,     'A2', '' ],
-	[ 'd1m.d2f.greater.exact',           'D1M',    'D2F',    'greater',    1, 0.75,                    0.19999999999999998,     'E2', '' ],
-	[ 'd1m.d2f.less.asymp',              'D1M',    'D2F',    'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'd1m.d2f.less.exact',              'D1M',    'D2F',    'less',       1, 0,                       1,                       'E2', '' ],
-	[ 'd1m.d2f.two.sided.exact',         'D1M',    'D2F',    'two.sided',  1, 0.75,                    0.40000000000000002,     'E2', '' ],
-	[ 'd1p.d2.greater.asymp',            'D1P',    'D2',     'greater',    0, 0.33333333333333337,     0.76592833836464869,     'A2', '' ],
-	[ 'd1p.d2.greater.exact',            'D1P',    'D2',     'greater',    1, 0.33333333333333337,     0.69999999999999996,     'E2', '' ],
-	[ 'd1p.d2.less.asymp',               'D1P',    'D2',     'less',       0, 0.33333333333333331,     0.76592833836464869,     'A2', '' ],
-	[ 'd1p.d2.less.exact',               'D1P',    'D2',     'less',       1, 0.33333333333333331,     0.69999999999999996,     'E2', '' ],
-	[ 'd1p.d2.two.sided.exact',          'D1P',    'D2',     'two.sided',  1, 0.33333333333333337,     1,                       'E2', '' ],
-	[ 'd1p.d2f.greater.asymp',           'D1P',    'D2F',    'greater',    0, 0.5,                     0.51341711903259202,     'A2', '' ],
-	[ 'd1p.d2f.greater.exact',           'D1P',    'D2F',    'greater',    1, 0.5,                     0.53333333333333333,     'E2', '' ],
-	[ 'd1p.d2f.less.asymp',              'D1P',    'D2F',    'less',       0, 0.25,                    0.84648172489061402,     'A2', '' ],
-	[ 'd1p.d2f.less.exact',              'D1P',    'D2F',    'less',       1, 0.25,                    0.79999999999999993,     'E2', '' ],
-	[ 'd1p.d2f.two.sided.exact',         'D1P',    'D2F',    'two.sided',  1, 0.5,                     0.93333333333333335,     'E2', '' ],
-	[ 'eq.m05.greater.asymp',            'D2',     'D2_M05', 'greater',    0, 0,                       1,                       'A2', '' ],
-	[ 'eq.m05.greater.exact',            'D2',     'D2_M05', 'greater',    1, 0,                       1,                       'E2', '' ],
-	[ 'eq.m05.less.asymp',               'D2',     'D2_M05', 'less',       0, 0.33333333333333331,     0.71653131057378927,     'A2', '' ],
-	[ 'eq.m05.less.exact',               'D2',     'D2_M05', 'less',       1, 0.33333333333333331,     0.75,                    'E2', '' ],
-	[ 'eq.m05.two.sided.exact',          'D2',     'D2_M05', 'two.sided',  1, 0.33333333333333331,     1,                       'E2', '' ],
-	[ 'eq.p05.greater.asymp',            'D2',     'D2_P05', 'greater',    0, 0.33333333333333331,     0.71653131057378927,     'A2', '' ],
-	[ 'eq.p05.greater.exact',            'D2',     'D2_P05', 'greater',    1, 0.33333333333333331,     0.75,                    'E2', '' ],
-	[ 'eq.p05.less.asymp',               'D2',     'D2_P05', 'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'eq.p05.less.exact',               'D2',     'D2_P05', 'less',       1, 0,                       1,                       'E2', '' ],
-	[ 'eq.p05.two.sided.exact',          'D2',     'D2_P05', 'two.sided',  1, 0.33333333333333331,     1,                       'E2', '' ],
-	[ 'eq.p1.greater.asymp',             'D2',     'D2_P1',  'greater',    0, 0.33333333333333331,     0.71653131057378927,     'A2', '' ],
-	[ 'eq.p1.less.asymp',                'D2',     'D2_P1',  'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'hw.greater.asymp',                'HW_X',   'HW_Y',   'greater',    0, 0.10000000000000001,     0.90483741803595952,     'A2', '' ],
-	[ 'hw.greater.exact',                'HW_X',   'HW_Y',   'greater',    1, 0.10000000000000001,     0.90909090909090906,     'E2', '' ],
-	[ 'hw.less.asymp',                   'HW_X',   'HW_Y',   'less',       0, 0.60000000000000009,     0.027323722447292531,    'A2', '' ],
-	[ 'hw.less.exact',                   'HW_X',   'HW_Y',   'less',       1, 0.60000000000000009,     0.026223776223776224,    'E2', '' ],
-	[ 'hw.two.sided.exact',              'HW_X',   'HW_Y',   'two.sided',  1, 0.60000000000000009,     0.052447552447552434,    'E2', '' ],
-	[ 'ks5.greater.asymp',               'KS5_X',  'KS5_Y',  'greater',    0, 0.40000000000000002,     0.63308989218918121,     'A2', '' ],
-	[ 'ks5.greater.exact',               'KS5_X',  'KS5_Y',  'greater',    1, 0.40000000000000002,     0.5714285714285714,      'E2', '' ],
-	[ 'ks5.less.asymp',                  'KS5_X',  'KS5_Y',  'less',       0, 0.19999999999999996,     0.89200306145309438,     'A2', '' ],
-	[ 'ks5.less.exact',                  'KS5_X',  'KS5_Y',  'less',       1, 0.19999999999999996,     0.80952380952380953,     'E2', '' ],
-	[ 'ks5.two.sided.exact',             'KS5_X',  'KS5_Y',  'two.sided',  1, 0.40000000000000002,     0.95238095238095244,     'E2', '' ],
-	[ 'large.greater.asymp',             'LG_X',   'LG_Y',   'greater',    0, 0.0051000000000000004,   0.99435604663469046,     'A2', '' ],
-	# large.less.asymp is deliberately absent: R returns exactly 0 for it out
-	# of its own 1 - (1 - exp()) cancellation.  It is asserted further down,
-	# under divergence 5.
-	[ 'one.01.greater.asymp',            'ONE0',   'ONE1',   'greater',    0, 1,                       0.36787944117144233,     'A2', '' ],
-	[ 'one.01.greater.exact',            'ONE0',   'ONE1',   'greater',    1, 1,                       0.5,                     'E2', '' ],
-	[ 'one.01.less.asymp',               'ONE0',   'ONE1',   'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'one.01.less.exact',               'ONE0',   'ONE1',   'less',       1, 0,                       1,                       'E2', '' ],
-	[ 'one.01.two.sided.exact',          'ONE0',   'ONE1',   'two.sided',  1, 1,                       1,                       'E2', '' ],
-	[ 'one.10.greater.asymp',            'ONE1',   'ONE0',   'greater',    0, 0,                       1,                       'A2', '' ],
-	[ 'one.10.greater.exact',            'ONE1',   'ONE0',   'greater',    1, 0,                       1,                       'E2', '' ],
-	[ 'one.10.less.asymp',               'ONE1',   'ONE0',   'less',       0, 1,                       0.36787944117144233,     'A2', '' ],
-	[ 'one.10.less.exact',               'ONE1',   'ONE0',   'less',       1, 1,                       0.5,                     'E2', '' ],
-	[ 'one.10.two.sided.exact',          'ONE1',   'ONE0',   'two.sided',  1, 1,                       1,                       'E2', '' ],
-	[ 'oz.greater.asymp',                'OZ5',    'OZ8',    'greater',    0, 0.53846153846153855,     0.0005322157857965415,   'A2', '' ],
-	[ 'oz.less.asymp',                   'OZ5',    'OZ8',    'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'qq.greater.asymp',                'QQ_X',   'QQ_Y',   'greater',    0, 0.23999999999999999,     0.056134762834133767,    'A2', '' ],
-	[ 'qq.greater.exact',                'QQ_X',   'QQ_Y',   'greater',    1, 0.23999999999999999,     0.056199558169967689,    'E2', '' ],
-	[ 'qq.less.asymp',                   'QQ_X',   'QQ_Y',   'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'qq.less.exact',                   'QQ_X',   'QQ_Y',   'less',       1, 0,                       1,                       'E2', '' ],
-	[ 'qq.two.sided.exact',              'QQ_X',   'QQ_Y',   'two.sided',  1, 0.23999999999999999,     0.11238524845512393,     'E2', '' ],
-	[ 'st.greater.asymp',                'ST_X',   'ST_Y',   'greater',    0, 0.42857142857142866,     0.34251885509304547,     'A2', '' ],
-	[ 'st.less.asymp',                   'ST_X',   'ST_Y',   'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'switzer.greater.asymp',           'SW_F',   'SW_M',   'greater',    0, 0.22500000000000001,     0.13199384318783014,     'A2', '' ],
-	[ 'switzer.less.asymp',              'SW_F',   'SW_M',   'less',       0, 0.075000000000000011,    0.79851621875937706,     'A2', '' ],
-	[ 'x2233.x3344.greater.asymp',       'X2233',  'X3344',  'greater',    0, 0.3125,                  0.20961138715109784,     'A2', '' ],
-	[ 'x2233.x3344.less.asymp',          'X2233',  'X3344',  'less',       0, 0,                       1,                       'A2', '' ],
-	[ 'x2356.x3467.greater.asymp',       'X2356',  'X3467',  'greater',    0, 0.34798534798534791,     0.059994729746314368,    'A2', '' ],
-	[ 'x2356.x3467.less.asymp',          'X2356',  'X3467',  'less',       0, 0.12820512820512825,     0.68257175908728751,     'A2', '' ],
+	[ '100.100m1.greater.asymp',         'X100',   'X100_M1', 'greater',   0, 0.02,                    0.96078943915232318,     'A2', ''       ],
+	[ '100.100m1.greater.exact',         'X100',   'X100_M1', 'greater',   1, 0.02,                    0.96097845078625499,     'E2', ''       ],
+	[ '100.100m1.less.asymp',            'X100',   'X100_M1', 'less',      0, -0,                      1,                       'A2', ''       ],
+	[ '100.100m1.less.exact',            'X100',   'X100_M1', 'less',      1, -0,                      1,                       'E2', ''       ],
+	[ '100.100m1.two.sided.asymp',       'X100',   'X100_M1', 'two.sided', 0, 0.02,                    1,                       'A2', ''       ],
+	[ '100.100m1.two.sided.exact',       'X100',   'X100_M1', 'two.sided', 1, 0.02,                    1,                       'E2', ''       ],
+	[ '100.100p1.greater.asymp',         'X100',   'X100_P1', 'greater',   0, 0.029999999999999999,    0.91393118527122819,     'A2', ''       ],
+	[ '100.100p1.greater.exact',         'X100',   'X100_P1', 'greater',   1, 0.029999999999999999,    0.91432901142769896,     'E2', ''       ],
+	[ '100.100p1.less.asymp',            'X100',   'X100_P1', 'less',      0, -0,                      1,                       'A2', ''       ],
+	[ '100.100p1.less.exact',            'X100',   'X100_P1', 'less',      1, -0,                      1,                       'E2', ''       ],
+	[ '100.100p1.two.sided.asymp',       'X100',   'X100_P1', 'two.sided', 0, 0.029999999999999999,    0.99999999998534272,     'A2', ''       ],
+	[ '100.100p1.two.sided.exact',       'X100',   'X100_P1', 'two.sided', 1, 0.029999999999999999,    0.99999999999620548,     'E2', ''       ],
+	[ '100.110m1.greater.asymp',         'X100',   'X110_M1', 'greater',   0, 0.20818181818181825,     0.010669710775667363,    'A2', ''       ],
+	[ '100.110m1.greater.exact',         'X100',   'X110_M1', 'greater',   1, 0.20818181818181825,     0.0089019059582464404,   'E2', ''       ],
+	[ '100.110m1.less.asymp',            'X100',   'X110_M1', 'less',      0, -6.9388939039072284e-17, 1,                       'A2', ''       ],
+	[ '100.110m1.less.exact',            'X100',   'X110_M1', 'less',      1, -6.9388939039072284e-17, 1,                       'E2', ''       ],
+	[ '100.110m1.two.sided.asymp',       'X100',   'X110_M1', 'two.sided', 0, 0.20818181818181825,     0.021339395631001231,    'A2', ''       ],
+	[ '100.110m1.two.sided.exact',       'X100',   'X110_M1', 'two.sided', 1, 0.20818181818181825,     0.017803803861025598,    'E2', ''       ],
+	[ '100.110p1.greater.asymp',         'X100',   'X110_P1', 'greater',   0, 0.21090909090909091,     0.0094656428300557982,   'A2', ''       ],
+	[ '100.110p1.greater.exact',         'X100',   'X110_P1', 'greater',   1, 0.21090909090909091,     0.0078695943190544276,   'E2', ''       ],
+	[ '100.110p1.less.asymp',            'X100',   'X110_P1', 'less',      0, -6.9388939039072284e-17, 1,                       'A2', ''       ],
+	[ '100.110p1.less.exact',            'X100',   'X110_P1', 'less',      1, -6.9388939039072284e-17, 1,                       'E2', ''       ],
+	[ '100.110p1.two.sided.asymp',       'X100',   'X110_P1', 'two.sided', 0, 0.21090909090909091,     0.018931269604367095,    'A2', ''       ],
+	[ '100.110p1.two.sided.exact',       'X100',   'X110_P1', 'two.sided', 1, 0.21090909090909091,     0.015739183865606153,    'E2', ''       ],
+	[ 'd1m.d2.greater.asymp',            'D1M',    'D2',     'greater',   0, 0.66666666666666674,     0.34415378686541231,     'A2', ''       ],
+	[ 'd1m.d2.greater.exact',            'D1M',    'D2',     'greater',   1, 0.66666666666666674,     0.29999999999999999,     'E2', ''       ],
+	[ 'd1m.d2.less.asymp',               'D1M',    'D2',     'less',      0, -5.5511151231257827e-17, 1,                       'A2', ''       ],
+	[ 'd1m.d2.less.exact',               'D1M',    'D2',     'less',      1, -5.5511151231257827e-17, 1,                       'E2', ''       ],
+	[ 'd1m.d2.two.sided.asymp',          'D1M',    'D2',     'two.sided', 0, 0.66666666666666674,     0.66038602314990347,     'A2', ''       ],
+	[ 'd1m.d2.two.sided.exact',          'D1M',    'D2',     'two.sided', 1, 0.66666666666666674,     0.59999999999999998,     'E2', ''       ],
+	[ 'd1m.d2f.greater.asymp',           'D1M',    'D2F',    'greater',   0, 0.75,                    0.22313016014842979,     'A2', ''       ],
+	[ 'd1m.d2f.greater.exact',           'D1M',    'D2F',    'greater',   1, 0.75,                    0.19999999999999998,     'E2', ''       ],
+	[ 'd1m.d2f.less.asymp',              'D1M',    'D2F',    'less',      0, -0,                      1,                       'A2', ''       ],
+	[ 'd1m.d2f.less.exact',              'D1M',    'D2F',    'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'd1m.d2f.two.sided.asymp',         'D1M',    'D2F',    'two.sided', 0, 0.75,                    0.44130663446758978,     'A2', ''       ],
+	[ 'd1m.d2f.two.sided.exact',         'D1M',    'D2F',    'two.sided', 1, 0.75,                    0.40000000000000002,     'E2', ''       ],
+	[ 'd1p.d2.greater.asymp',            'D1P',    'D2',     'greater',   0, 0.33333333333333337,     0.76592833836464869,     'A2', ''       ],
+	[ 'd1p.d2.greater.exact',            'D1P',    'D2',     'greater',   1, 0.33333333333333337,     0.69999999999999996,     'E2', ''       ],
+	[ 'd1p.d2.less.asymp',               'D1P',    'D2',     'less',      0, 0.33333333333333331,     0.76592833836464869,     'A2', ''       ],
+	[ 'd1p.d2.less.exact',               'D1P',    'D2',     'less',      1, 0.33333333333333331,     0.69999999999999996,     'E2', ''       ],
+	[ 'd1p.d2.two.sided.asymp',          'D1P',    'D2',     'two.sided', 0, 0.33333333333333337,     0.99934203846286229,     'A2', ''       ],
+	[ 'd1p.d2.two.sided.exact',          'D1P',    'D2',     'two.sided', 1, 0.33333333333333337,     1,                       'E2', ''       ],
+	[ 'd1p.d2f.greater.asymp',           'D1P',    'D2F',    'greater',   0, 0.5,                     0.51341711903259202,     'A2', ''       ],
+	[ 'd1p.d2f.greater.exact',           'D1P',    'D2F',    'greater',   1, 0.5,                     0.53333333333333333,     'E2', ''       ],
+	[ 'd1p.d2f.less.asymp',              'D1P',    'D2F',    'less',      0, 0.25,                    0.84648172489061402,     'A2', ''       ],
+	[ 'd1p.d2f.less.exact',              'D1P',    'D2F',    'less',      1, 0.25,                    0.79999999999999993,     'E2', ''       ],
+	[ 'd1p.d2f.two.sided.asymp',         'D1P',    'D2F',    'two.sided', 0, 0.5,                     0.89277833725012334,     'A2', ''       ],
+	[ 'd1p.d2f.two.sided.exact',         'D1P',    'D2F',    'two.sided', 1, 0.5,                     0.93333333333333335,     'E2', ''       ],
+	[ 'eq.m05.greater.asymp',            'D2',     'D2_M05', 'greater',   0, 0,                       1,                       'A2', ''       ],
+	[ 'eq.m05.greater.exact',            'D2',     'D2_M05', 'greater',   1, 0,                       1,                       'E2', ''       ],
+	[ 'eq.m05.less.asymp',               'D2',     'D2_M05', 'less',      0, 0.33333333333333331,     0.71653131057378927,     'A2', ''       ],
+	[ 'eq.m05.less.exact',               'D2',     'D2_M05', 'less',      1, 0.33333333333333331,     0.75,                    'E2', ''       ],
+	[ 'eq.m05.two.sided.asymp',          'D2',     'D2_M05', 'two.sided', 0, 0.33333333333333331,     0.99625519237939875,     'A2', ''       ],
+	[ 'eq.m05.two.sided.exact',          'D2',     'D2_M05', 'two.sided', 1, 0.33333333333333331,     1,                       'E2', ''       ],
+	[ 'eq.p05.greater.asymp',            'D2',     'D2_P05', 'greater',   0, 0.33333333333333331,     0.71653131057378927,     'A2', ''       ],
+	[ 'eq.p05.greater.exact',            'D2',     'D2_P05', 'greater',   1, 0.33333333333333331,     0.75,                    'E2', ''       ],
+	[ 'eq.p05.less.asymp',               'D2',     'D2_P05', 'less',      0, -0,                      1,                       'A2', ''       ],
+	[ 'eq.p05.less.exact',               'D2',     'D2_P05', 'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'eq.p05.two.sided.asymp',          'D2',     'D2_P05', 'two.sided', 0, 0.33333333333333331,     0.99625519237939875,     'A2', ''       ],
+	[ 'eq.p05.two.sided.exact',          'D2',     'D2_P05', 'two.sided', 1, 0.33333333333333331,     1,                       'E2', ''       ],
+	[ 'eq.p1.greater.asymp',             'D2',     'D2_P1',  'greater',   0, 0.33333333333333331,     0.71653131057378927,     'A2', 'ties2'  ],
+	[ 'eq.p1.greater.exact',             'D2',     'D2_P1',  'greater',   1, 0.33333333333333331,     0.75,                    'E2', ''       ],
+	[ 'eq.p1.less.asymp',                'D2',     'D2_P1',  'less',      0, -0,                      1,                       'A2', 'ties2'  ],
+	[ 'eq.p1.less.exact',                'D2',     'D2_P1',  'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'eq.p1.two.sided.asymp',           'D2',     'D2_P1',  'two.sided', 0, 0.33333333333333331,     0.99625519237939875,     'A2', 'ties2'  ],
+	[ 'eq.p1.two.sided.exact',           'D2',     'D2_P1',  'two.sided', 1, 0.33333333333333331,     1,                       'E2', ''       ],
+	[ 'hw.greater.asymp',                'HW_X',   'HW_Y',   'greater',   0, 0.10000000000000001,     0.90483741803595952,     'A2', ''       ],
+	[ 'hw.greater.exact',                'HW_X',   'HW_Y',   'greater',   1, 0.10000000000000001,     0.90909090909090906,     'E2', ''       ],
+	[ 'hw.less.asymp',                   'HW_X',   'HW_Y',   'less',      0, 0.60000000000000009,     0.027323722447292531,    'A2', ''       ],
+	[ 'hw.less.exact',                   'HW_X',   'HW_Y',   'less',      1, 0.60000000000000009,     0.026223776223776224,    'E2', ''       ],
+	[ 'hw.two.sided.asymp',              'HW_X',   'HW_Y',   'two.sided', 0, 0.60000000000000009,     0.054646330113863481,    'A2', ''       ],
+	[ 'hw.two.sided.exact',              'HW_X',   'HW_Y',   'two.sided', 1, 0.60000000000000009,     0.052447552447552434,    'E2', ''       ],
+	[ 'ks5.greater.asymp',               'KS5_X',  'KS5_Y',  'greater',   0, 0.40000000000000002,     0.63308989218918121,     'A2', ''       ],
+	[ 'ks5.greater.exact',               'KS5_X',  'KS5_Y',  'greater',   1, 0.40000000000000002,     0.5714285714285714,      'E2', ''       ],
+	[ 'ks5.less.asymp',                  'KS5_X',  'KS5_Y',  'less',      0, 0.19999999999999996,     0.89200306145309438,     'A2', ''       ],
+	[ 'ks5.less.exact',                  'KS5_X',  'KS5_Y',  'less',      1, 0.19999999999999996,     0.80952380952380953,     'E2', ''       ],
+	[ 'ks5.two.sided.asymp',             'KS5_X',  'KS5_Y',  'two.sided', 0, 0.40000000000000002,     0.97625891325135938,     'A2', ''       ],
+	[ 'ks5.two.sided.exact',             'KS5_X',  'KS5_Y',  'two.sided', 1, 0.40000000000000002,     0.95238095238095244,     'E2', ''       ],
+	[ 'large.greater.asymp',             'LG_X',   'LG_Y',   'greater',   0, 0.0051000000000000004,   0.99435604663469046,     'A2', ''       ],
+	[ 'large.two.sided.asymp',           'LG_X',   'LG_Y',   'two.sided', 0, 0.50249999999999995,     2.740748218160174e-24,   'A2', ''       ],
+	[ 'one.01.greater.asymp',            'ONE0',   'ONE1',   'greater',   0, 1,                       0.36787944117144233,     'A2', ''       ],
+	[ 'one.01.greater.exact',            'ONE0',   'ONE1',   'greater',   1, 1,                       0.5,                     'E2', ''       ],
+	[ 'one.01.less.asymp',               'ONE0',   'ONE1',   'less',      0, -0,                      1,                       'A2', ''       ],
+	[ 'one.01.less.exact',               'ONE0',   'ONE1',   'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'one.01.two.sided.asymp',          'ONE0',   'ONE1',   'two.sided', 0, 1,                       0.69937419993527605,     'A2', ''       ],
+	[ 'one.01.two.sided.exact',          'ONE0',   'ONE1',   'two.sided', 1, 1,                       1,                       'E2', ''       ],
+	[ 'one.10.greater.asymp',            'ONE1',   'ONE0',   'greater',   0, 0,                       1,                       'A2', ''       ],
+	[ 'one.10.greater.exact',            'ONE1',   'ONE0',   'greater',   1, 0,                       1,                       'E2', ''       ],
+	[ 'one.10.less.asymp',               'ONE1',   'ONE0',   'less',      0, 1,                       0.36787944117144233,     'A2', ''       ],
+	[ 'one.10.less.exact',               'ONE1',   'ONE0',   'less',      1, 1,                       0.5,                     'E2', ''       ],
+	[ 'one.10.two.sided.asymp',          'ONE1',   'ONE0',   'two.sided', 0, 1,                       0.69937419993527605,     'A2', ''       ],
+	[ 'one.10.two.sided.exact',          'ONE1',   'ONE0',   'two.sided', 1, 1,                       1,                       'E2', ''       ],
+	[ 'oz.greater.asymp',                'OZ5',    'OZ8',    'greater',   0, 0.53846153846153855,     0.0005322157857965415,   'A2', 'ties2'  ],
+	[ 'oz.greater.exact',                'OZ5',    'OZ8',    'greater',   1, 0.53846153846153855,     0.00034594252434190243,  'E2', ''       ],
+	[ 'oz.less.asymp',                   'OZ5',    'OZ8',    'less',      0, -0,                      1,                       'A2', 'ties2'  ],
+	[ 'oz.less.exact',                   'OZ5',    'OZ8',    'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'oz.two.sided.asymp',              'OZ5',    'OZ8',    'two.sided', 0, 0.53846153846153855,     0.0010644315714326686,   'A2', 'ties2'  ],
+	[ 'oz.two.sided.exact',              'OZ5',    'OZ8',    'two.sided', 1, 0.53846153846153855,     0.00069188504868380476,  'E2', ''       ],
+	[ 'qq.greater.asymp',                'QQ_X',   'QQ_Y',   'greater',   0, 0.23999999999999999,     0.056134762834133767,    'A2', ''       ],
+	[ 'qq.greater.exact',                'QQ_X',   'QQ_Y',   'greater',   1, 0.23999999999999999,     0.056199558169967689,    'E2', ''       ],
+	[ 'qq.less.asymp',                   'QQ_X',   'QQ_Y',   'less',      0, -0,                      1,                       'A2', ''       ],
+	[ 'qq.less.exact',                   'QQ_X',   'QQ_Y',   'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'qq.two.sided.asymp',              'QQ_X',   'QQ_Y',   'two.sided', 0, 0.23999999999999999,     0.11224966667072496,     'A2', ''       ],
+	[ 'qq.two.sided.exact',              'QQ_X',   'QQ_Y',   'two.sided', 1, 0.23999999999999999,     0.11238524845512393,     'E2', ''       ],
+	[ 'st.greater.asymp',                'ST_X',   'ST_Y',   'greater',   0, 0.42857142857142866,     0.34251885509304547,     'A2', 'ties2'  ],
+	[ 'st.greater.exact',                'ST_X',   'ST_Y',   'greater',   1, 0.42857142857142866,     0.17803030303030307,     'E2', ''       ],
+	[ 'st.less.asymp',                   'ST_X',   'ST_Y',   'less',      0, -1.1102230246251565e-16, 1,                       'A2', 'ties2'  ],
+	[ 'st.less.exact',                   'ST_X',   'ST_Y',   'less',      1, -1.1102230246251565e-16, 1,                       'E2', ''       ],
+	[ 'st.two.sided.asymp',              'ST_X',   'ST_Y',   'two.sided', 0, 0.42857142857142866,     0.65763984315718549,     'A2', 'ties2'  ],
+	[ 'st.two.sided.exact',              'ST_X',   'ST_Y',   'two.sided', 1, 0.42857142857142866,     0.24242424242424243,     'E2', ''       ],
+	[ 'switzer.greater.asymp',           'SW_F',   'SW_M',   'greater',   0, 0.22500000000000001,     0.13199384318783014,     'A2', 'ties2'  ],
+	[ 'switzer.greater.exact',           'SW_F',   'SW_M',   'greater',   1, 0.22500000000000001,     0.10610007481926112,     'E2', ''       ],
+	[ 'switzer.less.asymp',              'SW_F',   'SW_M',   'less',      0, 0.075000000000000011,    0.79851621875937706,     'A2', 'ties2'  ],
+	[ 'switzer.less.exact',              'SW_F',   'SW_M',   'less',      1, 0.075000000000000011,    0.76385045888189063,     'E2', ''       ],
+	[ 'switzer.two.sided.asymp',         'SW_F',   'SW_M',   'two.sided', 0, 0.22500000000000001,     0.26338063242227416,     'A2', 'ties2'  ],
+	[ 'switzer.two.sided.exact',         'SW_F',   'SW_M',   'two.sided', 1, 0.22500000000000001,     0.21198990394624936,     'E2', ''       ],
+	[ 'two.const.two.sided.asymp',       'ZERO5',  'ONE5',   'two.sided', 0, 1,                       0.013475889875863676,    'A2', 'ties2'  ],
+	[ 'two.const.two.sided.exact',       'ZERO5',  'ONE5',   'two.sided', 1, 1,                       0.0079365079365079361,   'E2', ''       ],
+	[ 'two.same.two.sided.asymp',        'ZERO5',  'ZERO5',  'two.sided', 0, 0,                       1,                       'A2', 'ties2'  ],
+	[ 'two.same.two.sided.exact',        'ZERO5',  'ZERO5',  'two.sided', 1, 0,                       1,                       'E2', ''       ],
+	[ 'x2233.x3344.greater.asymp',       'X2233',  'X3344',  'greater',   0, 0.3125,                  0.20961138715109784,     'A2', 'ties2'  ],
+	[ 'x2233.x3344.greater.exact',       'X2233',  'X3344',  'greater',   1, 0.3125,                  0.099104941686751741,    'E2', ''       ],
+	[ 'x2233.x3344.less.asymp',          'X2233',  'X3344',  'less',      0, -0,                      1,                       'A2', 'ties2'  ],
+	[ 'x2233.x3344.less.exact',          'X2233',  'X3344',  'less',      1, -0,                      1,                       'E2', ''       ],
+	[ 'x2233.x3344.two.sided.asymp',     'X2233',  'X3344',  'two.sided', 0, 0.3125,                  0.41536533552386656,     'A2', 'ties2'  ],
+	[ 'x2233.x3344.two.sided.exact',     'X2233',  'X3344',  'two.sided', 1, 0.3125,                  0.19820988337350354,     'E2', ''       ],
+	[ 'x2356.x3467.greater.asymp',       'X2356',  'X3467',  'greater',   0, 0.34798534798534791,     0.059994729746314368,    'A2', 'ties2'  ],
+	[ 'x2356.x3467.greater.exact',       'X2356',  'X3467',  'greater',   1, 0.34798534798534791,     0.023493029705930257,    'E2', ''       ],
+	[ 'x2356.x3467.less.asymp',          'X2356',  'X3467',  'less',      0, 0.12820512820512825,     0.68257175908728751,     'A2', 'ties2'  ],
+	[ 'x2356.x3467.less.exact',          'X2356',  'X3467',  'less',      1, 0.12820512820512825,     0.38140754084210976,     'E2', ''       ],
+	[ 'x2356.x3467.two.sided.asymp',     'X2356',  'X3467',  'two.sided', 0, 0.34798534798534791,     0.11996354861856673,     'A2', 'ties2'  ],
+	[ 'x2356.x3467.two.sided.exact',     'X2356',  'X3467',  'two.sided', 1, 0.34798534798534791,     0.035217727116839348,    'E2', ''       ],
 );
 
-# One-sample against pnorm.  Only two-sided uses R's exact path here; the
-# one-sided exact rows are divergences and live in @DIVERGE.  Note that
-# norm.inf is TestKSTest.test_pm_inf_gh20386's shape: with -Inf and +Inf both
-# in the sample, D and p must still be finite.
+# One-sample against pnorm, every alternative both ways.  Note that norm.inf is
+# TestKSTest.test_pm_inf_gh20386's shape: with -Inf and +Inf both in the
+# sample, D and p must still be finite.  norm.kn is
+# TestKSOneSample.test_known_examples' 100-point fixture: n = 100 puts its
+# exact rows past the auto-gate, so it exercises K2x at the largest matrix
+# the gate will ever build by itself (m = 2k-1 with k = floor(n*D)+1 = 13).
 my @R_ONE = (
 	#  label                            x         y         alternative  ex   D                        p
-	[ 'norm.a.greater.asymp',            'SP1_A',  'pnorm',  'greater',    0, 0.15865525393145702,     0.63566294755005637,     'A1', '' ],
-	[ 'norm.a.less.asymp',               'SP1_A',  'pnorm',  'less',       0, 0.15865525393145705,     0.63566294755005637,     'A1', '' ],
-	[ 'norm.a.two.sided.asymp',          'SP1_A',  'pnorm',  'two.sided',  0, 0.15865525393145705,     0.97727773578380417,     'A1', '' ],
-	[ 'norm.a.two.sided.exact',          'SP1_A',  'pnorm',  'two.sided',  1, 0.15865525393145705,     0.95164069201518386,     'E1', '' ],
-	[ 'norm.b.greater.asymp',            'SP1_B',  'pnorm',  'greater',    0, 0.44435602715924361,     0.028605936301374157,    'A1', '' ],
-	[ 'norm.b.less.asymp',               'SP1_B',  'pnorm',  'less',       0, 0.44435602715924361,     0.028605936301374157,    'A1', '' ],
-	[ 'norm.b.two.sided.asymp',          'SP1_B',  'pnorm',  'two.sided',  0, 0.44435602715924361,     0.057210533374330512,    'A1', '' ],
-	[ 'norm.b.two.sided.exact',          'SP1_B',  'pnorm',  'two.sided',  1, 0.44435602715924361,     0.038850140086788665,    'E1', '' ],
-	[ 'norm.c.greater.asymp',            'SP1_C',  'pnorm',  'greater',    0, 0.29358012680196055,     0.17838951784064153,     'A1', '' ],
-	[ 'norm.c.less.asymp',               'SP1_C',  'pnorm',  'less',       0, 0.10934855242569191,     0.78730298421893363,     'A1', '' ],
-	[ 'norm.c.two.sided.asymp',          'SP1_C',  'pnorm',  'two.sided',  0, 0.29358012680196055,     0.35476088185936661,     'A1', '' ],
-	[ 'norm.c.two.sided.exact',          'SP1_C',  'pnorm',  'two.sided',  1, 0.29358012680196055,     0.29340846368436124,     'E1', '' ],
-	[ 'norm.const.two.sided.exact',      'ZERO5',  'pnorm',  'two.sided',  1, 0.5,                     0.11199999999999988,     'E1', '' ],
-	[ 'norm.hw.greater.asymp',           'HW_X',   'pnorm',  'greater',    0, 2.7755575615628914e-17,  1,                       'A1', '' ],
-	[ 'norm.hw.less.asymp',              'HW_X',   'pnorm',  'less',       0, 0.79343088086445324,     3.4036871631738461e-06,  'A1', '' ],
-	# TestKSOneSample.test_known_examples' 100-point fixture, against R.  n =
-	# 100 puts the exact row on the far side of the auto-gate, so it exercises
-	# K2x at the largest matrix the gate will ever build by itself (m = 2k-1
-	# with k = floor(n*D)+1 = 13).
-	[ 'norm.kn.two.sided.exact',         'KN',     'pnorm',  'two.sided',  1, 0.12464329735846891,     0.0819733523354228,      'E1', '' ],
-	[ 'norm.kn.two.sided.asymp',         'KN',     'pnorm',  'two.sided',  0, 0.12464329735846891,     0.089444888711820825,    'A1', '' ],
-	[ 'norm.kn.greater.asymp',           'KN',     'pnorm',  'greater',    0, 0.0072115233216310994,   0.98965269184345384,     'A1', '' ],
-	[ 'norm.kn.less.asymp',              'KN',     'pnorm',  'less',       0, 0.12464329735846891,     0.044726446175351056,    'A1', '' ],
-	[ 'norm.hw.two.sided.asymp',         'HW_X',   'pnorm',  'two.sided',  0, 0.79343088086445324,     6.8073743263476923e-06,  'A1', '' ],
-	[ 'norm.hw.two.sided.exact',         'HW_X',   'pnorm',  'two.sided',  1, 0.79343088086445324,     3.1106659148516513e-07,  'E1', '' ],
-	[ 'norm.inf.two.sided.asymp',        'PMINF',  'pnorm',  'two.sided',  0, 0.34134474606854293,     0.73982570174480222,     'A1', '' ],
-	[ 'norm.inf.two.sided.exact',        'PMINF',  'pnorm',  'two.sided',  1, 0.34134474606854293,     0.63474755810657446,     'E1', '' ],
-	[ 'norm.n1.two.sided.exact',         'ONE0',   'pnorm',  'two.sided',  1, 0.5,                     1,                       'E1', '' ],
+	[ 'norm.a.greater.asymp',            'SP1_A',  'pnorm',  'greater',   0, 0.15865525393145702,     0.63566294755005637,     'A1', ''       ],
+	[ 'norm.a.greater.exact',            'SP1_A',  'pnorm',  'greater',   1, 0.15865525393145702,     0.57863894131082805,     'E1', ''       ],
+	[ 'norm.a.less.asymp',               'SP1_A',  'pnorm',  'less',      0, 0.15865525393145705,     0.63566294755005637,     'A1', ''       ],
+	[ 'norm.a.less.exact',               'SP1_A',  'pnorm',  'less',      1, 0.15865525393145705,     0.57863894131082749,     'E1', ''       ],
+	[ 'norm.a.two.sided.asymp',          'SP1_A',  'pnorm',  'two.sided', 0, 0.15865525393145705,     0.97727773578380417,     'A1', ''       ],
+	[ 'norm.a.two.sided.exact',          'SP1_A',  'pnorm',  'two.sided', 1, 0.15865525393145705,     0.95164069201518386,     'E1', ''       ],
+	[ 'norm.b.greater.asymp',            'SP1_B',  'pnorm',  'greater',   0, 0.44435602715924361,     0.028605936301374157,    'A1', ''       ],
+	[ 'norm.b.greater.exact',            'SP1_B',  'pnorm',  'greater',   1, 0.44435602715924361,     0.019425071352585584,    'E1', ''       ],
+	[ 'norm.b.less.asymp',               'SP1_B',  'pnorm',  'less',      0, 0.44435602715924361,     0.028605936301374157,    'A1', ''       ],
+	[ 'norm.b.less.exact',               'SP1_B',  'pnorm',  'less',      1, 0.44435602715924361,     0.019425071352585584,    'E1', ''       ],
+	[ 'norm.b.two.sided.asymp',          'SP1_B',  'pnorm',  'two.sided', 0, 0.44435602715924361,     0.057210533374330512,    'A1', ''       ],
+	[ 'norm.b.two.sided.exact',          'SP1_B',  'pnorm',  'two.sided', 1, 0.44435602715924361,     0.038850140086788665,    'E1', ''       ],
+	[ 'norm.c.greater.asymp',            'SP1_C',  'pnorm',  'greater',   0, 0.29358012680196055,     0.17838951784064153,     'A1', ''       ],
+	[ 'norm.c.greater.exact',            'SP1_C',  'pnorm',  'greater',   1, 0.29358012680196055,     0.14698883504237564,     'E1', ''       ],
+	[ 'norm.c.less.asymp',               'SP1_C',  'pnorm',  'less',      0, 0.10934855242569191,     0.78730298421893363,     'A1', ''       ],
+	[ 'norm.c.less.exact',               'SP1_C',  'pnorm',  'less',      1, 0.10934855242569191,     0.73276889247067534,     'E1', ''       ],
+	[ 'norm.c.two.sided.asymp',          'SP1_C',  'pnorm',  'two.sided', 0, 0.29358012680196055,     0.35476088185936661,     'A1', ''       ],
+	[ 'norm.c.two.sided.exact',          'SP1_C',  'pnorm',  'two.sided', 1, 0.29358012680196055,     0.29340846368436124,     'E1', ''       ],
+	[ 'norm.const.two.sided.exact',      'ZERO5',  'pnorm',  'two.sided', 1, 0.5,                     0.11199999999999988,     'E1', 'ties1'  ],
+	[ 'norm.hw.greater.asymp',           'HW_X',   'pnorm',  'greater',   0, 2.7755575615628914e-17,  1,                       'A1', ''       ],
+	[ 'norm.hw.less.asymp',              'HW_X',   'pnorm',  'less',      0, 0.79343088086445324,     3.4036871631738461e-06,  'A1', ''       ],
+	[ 'norm.hw.less.exact',              'HW_X',   'pnorm',  'less',      1, 0.79343088086445324,     1.5553329561954807e-07,  'E1', ''       ],
+	[ 'norm.hw.two.sided.asymp',         'HW_X',   'pnorm',  'two.sided', 0, 0.79343088086445324,     6.8073743263476923e-06,  'A1', ''       ],
+	[ 'norm.hw.two.sided.exact',         'HW_X',   'pnorm',  'two.sided', 1, 0.79343088086445324,     3.1106659148516513e-07,  'E1', ''       ],
+	[ 'norm.inf.two.sided.asymp',        'PMINF',  'pnorm',  'two.sided', 0, 0.34134474606854293,     0.73982570174480222,     'A1', ''       ],
+	[ 'norm.inf.two.sided.exact',        'PMINF',  'pnorm',  'two.sided', 1, 0.34134474606854293,     0.63474755810657446,     'E1', ''       ],
+	[ 'norm.kn.greater.asymp',           'KN',     'pnorm',  'greater',   0, 0.0072115233216310994,   0.98965269184345384,     'A1', ''       ],
+	[ 'norm.kn.greater.exact',           'KN',     'pnorm',  'greater',   1, 0.0072115233216310994,   0.98531158590396206,     'E1', ''       ],
+	[ 'norm.kn.less.asymp',              'KN',     'pnorm',  'less',      0, 0.12464329735846891,     0.044726446175351056,    'A1', ''       ],
+	[ 'norm.kn.less.exact',              'KN',     'pnorm',  'less',      1, 0.12464329735846891,     0.040989164077641756,    'E1', ''       ],
+	[ 'norm.kn.two.sided.asymp',         'KN',     'pnorm',  'two.sided', 0, 0.12464329735846891,     0.089444888711820825,    'A1', ''       ],
+	[ 'norm.kn.two.sided.exact',         'KN',     'pnorm',  'two.sided', 1, 0.12464329735846891,     0.0819733523354228,      'E1', ''       ],
+	[ 'norm.n1.two.sided.exact',         'ONE0',   'pnorm',  'two.sided', 1, 0.5,                     1,                       'E1', ''       ],
 );
 
-# Asymptotic two-sided two-sample: pinned against mpmath (mp.dps = 80), which
-# sums the defining alternating series
+# Asymptotic two-sided two-sample, against mpmath (mp.dps = 80) summing the
+# defining alternating series
 #
 #   1 - sum_{k=-inf}^{inf} (-1)^k exp(-2 k^2 z^2),   z = D * sqrt(n1 n2/(n1+n2))
 #
-# rather than calling any library routine, exactly as CLAUDE.md asks for when
-# the XS and a reference disagree.  ks_test() lands within 8.9e-15 of it on
-# every row; R is off by up to 4.6e-6 (x2233.x3344, z = 0.884) because
-# psmirnov_asymp passes tol = 1e-6 into K2l, and for z < 1 that makes
-# k_max = (int)sqrt(2 - log(tol)) = 3, so the k = 3 term of the
-# small-argument series -- worth 1.1e-6 at z = 0.866 -- is never added.  R's
-# own numbers are in @DIVERGE.
-#
-# Rows whose D is 0 (two.same) or whose z >= 1 agree with R to 1e-15 anyway;
-# they are kept here so the whole path is pinned to one authority.
+# These rows are R's own in @R_TWO, which ks_test() matches since 0.331.  They
+# are kept here to bound the error that R's tol = 1e-6 leaves in that path
+# (see $TOL_MP and divergences 1-4): before 0.331 ks_test() matched these to
+# 8.9e-15, and R did not.
 my @MP_TWO = (
 	#  label                            x         y         alternative  ex   D                        p
 	[ '100.100m1.two.sided.asymp',       'X100',   'X100_M1', 'two.sided',  0, 0.02,                    1,                       'A2', '' ],
@@ -635,7 +687,11 @@ my @MP_TWO = (
 
 run_row($_, $TOL_P) for @R_TWO;
 run_row($_, $TOL_P) for @R_ONE;
-run_row($_, $TOL_MP) for @MP_TWO;
+for my $row (@MP_TWO) {
+	my ($label, $xn, $yn, $alt, $exact, $d_want, $p_mp) = @$row;
+	my ($res) = call_ks($DATA{$xn}, $DATA{$yn}, alternative => $alt, exact => $exact);
+	p_ok($res->{'p_value'}, $p_mp, $TOL_MP, "$label vs mpmath (R's tol = 1e-6 truncation)");
+}
 
 # The two cases R's own regression suite pins as fractions rather than
 # decimals, restated as fractions so a change in either direction is visible.
@@ -653,11 +709,11 @@ run_row($_, $TOL_MP) for @MP_TWO;
 }
 
 # ?ks.test's and ?qqplot's printed output, to the digits R prints.  The Ozone
-# columns are tied, so only its statistic is reachable; its exact p-value
-# (0.0006919 as printed by R) is asserted under divergence 1.
+# columns are tied; R's exact p-value for them is the tie-conditional one.
 {
 	my ($oz) = call_ks(\@OZ5, \@OZ8);
 	is(sprintf('%.5f', $oz->{statistic}), '0.53846', 'ks.test.Rd: Ozone D = 0.53846');
+	is(sprintf('%.7f', $oz->{'p_value'}), '0.0006919', 'ks.test.Rd: Ozone p = 0.0006919');
 
 	my ($qq) = call_ks(\@QQ_X, \@QQ_Y);
 	is(sprintf('%.7f', $qq->{'p_value'}), '0.1123852', 'qqplot.Rd: p = 0.1123852');
@@ -669,7 +725,7 @@ run_row($_, $TOL_MP) for @MP_TWO;
 # every row below is called with exact => 1 to hit the same branch.  Only
 # tie-free pairs are here: SciPy's exact path ignores ties, so its tied rows
 # (testRepeatedValues, and the data2/data2+1 pair of testEqualSizes) contradict
-# R and are in @DIVERGE instead.
+# R and are in @SCIPY_TIED instead.
 #
 #   label, x, y, alternative, expected D, expected p, tolerance
 my @SCIPY_TWO = (
@@ -732,8 +788,8 @@ for my $row (@SCIPY_TWO) {
 
 # TestKSOneSample.test_agree_with_r and .test_known_examples.  SciPy's
 # ks_1samp calls special.ndtr as the CDF, which is ks_test()'s 'pnorm'.  Only
-# the two-sided rows are comparable: SciPy ignores `mode` for one-sided
-# alternatives (see @DIVERGE).
+# the two-sided rows are comparable here: SciPy ignores `mode` for one-sided
+# alternatives (see the block after this one).
 #
 #   label, x, exact argument, expected D, expected p
 my @SCIPY_ONE = (
@@ -754,6 +810,22 @@ for my $row (@SCIPY_ONE) {
 	p_ok($r->{'p_value'}, $p_want, $TOL_SCIPY, $label,
 		$exact ? $TOL_P_ABS : 0);
 	is(scalar(@$warns), 0, "$label: no warnings") or diag("warnings: @$warns");
+}
+
+# SciPy's ks_1samp ignores mode for one-sided alternatives and always returns
+# the exact ksone survival function, so its own test_known_examples
+# expectations for the one-sided cases -- 0.98531158590396228 (greater) and
+# 0.040989164077641749 (less) -- are exact values.  ks_test() reaches them with
+# exact => 1, by R's Birnbaum & Tingey sum; up to 0.33 it warned and gave
+# exp(-2*n*D^2) instead.  R agrees with SciPy to 1.3e-16 on both.
+for my $c ([ 'greater', 0.0072115233216310994, 0.98531158590396228 ],
+           [ 'less',    0.12464329735846891,   0.040989164077641749 ]) {
+	my ($alt, $d_want, $p_want) = @$c;
+	my ($r, $warns) = call_ks(\@KN, 'pnorm', alternative => $alt, exact => 1);
+	d_ok($r->{statistic}, $d_want, "scipy test_known_examples $alt");
+	p_ok($r->{'p_value'}, $p_want, $TOL_SCIPY, "scipy test_known_examples $alt exact");
+	is($r->{method}, $METHOD{E1}, "scipy test_known_examples $alt: exact method");
+	is(scalar(@$warns), 0, "scipy test_known_examples $alt: no warnings") or diag("warnings: @$warns");
 }
 
 # The exact/asymptotic auto-gate.  R's rule is exact <- (n.x * n.y < 10000)
@@ -854,13 +926,15 @@ for my $row (@SCIPY_ONE) {
 	p_ok($r5->{'p_value'}, 0.028571428571428571, $TOL_P,
 		'numeric strings are parsed, not dropped');
 
-	# R also warns "p-value will be approximate in the presence of ties" when
-	# ties meet the *asymptotic* path; ks_test does not, on the grounds that
-	# nothing was fallen back from.  Pinned so the silence is deliberate.
+	# R warns "p-value will be approximate in the presence of ties" when ties
+	# meet the asymptotic path, and only there; ks_test was silent up to 0.33.
 	my (undef, $tie_warns) = call_ks(\@ST_X, \@ST_Y, exact => 0);
-	is(scalar(@$tie_warns), 0,
-		'ties on the asymptotic path are silent (R warns here, ks_test does not)')
+	is(scalar(grep { $_ =~ $WARN_RE{ties2} } @$tie_warns), 1,
+		'ties on the asymptotic path warn, as R does')
 		or diag("warnings: @$tie_warns");
+	my (undef, $tie_warns_ex) = call_ks(\@ST_X, \@ST_Y, exact => 1);
+	is(scalar(@$tie_warns_ex), 0, 'ties on the exact path do not: the p-value is exact')
+		or diag("warnings: @$tie_warns_ex");
 }
 
 # The accepted call forms all reach the same code.  R's ks.test(x, y) is
@@ -899,30 +973,31 @@ for my $row (@SCIPY_ONE) {
 		'return hash has exactly the four documented keys');
 }
 
-# Argument validation.  Every croak path ks_test() has.
+# Argument validation.  Every croak path ks_test() has.  An error in the call
+# is the help screen, then the error on the last line.
 {
 	my @x = (1, 2, 3, 4);
 	my @y = (5, 6, 7, 8);
 	my $NAN = $INF - $INF;
 	my @croaks = (
 		[ 'no arguments at all', sub { ks_test() },
-		  qr/^ks_test: 'x' is a required argument and must be an ARRAY reference/ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: 'x' is a required argument and must be an ARRAY reference/ms ],
 		[ 'x is not a reference', sub { ks_test(x => 5, y => \@y) },
-		  qr/^ks_test: 'x' is a required argument and must be an ARRAY reference/ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: 'x' is a required argument and must be an ARRAY reference/ms ],
 		[ 'unknown alternative', sub { ks_test(\@x, \@y, alternative => 'up') },
-		  qr/^ks_test: alternative must be 'two\.sided', 'less', or 'greater'/ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: alternative must be 'two\.sided', 'less', or 'greater'/ms ],
 		# R accepts match.arg abbreviations ('gr', 'l'); ks_test does not, and
 		# says so rather than silently defaulting to two-sided.
 		[ 'abbreviated alternative', sub { ks_test(\@x, \@y, alternative => 'gr') },
-		  qr/^ks_test: alternative must be 'two\.sided', 'less', or 'greater'/ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: alternative must be 'two\.sided', 'less', or 'greater'/ms ],
 		[ 'unknown named argument', sub { ks_test(\@x, \@y, mode => 'exact') },
-		  qr/^ks_test: unknown argument 'mode'/ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: unknown argument 'mode'/ms ],
 		[ 'named argument with no value', sub { ks_test(\@x, \@y, 'exact') },
-		  qr/^ks_test: argument 'exact' is missing a value/ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: argument 'exact' is missing a value/ms ],
 		[ 'unsupported 1-sample distribution', sub { ks_test(\@x, 'punif') },
-		  qr/^ks_test: Unsupported 1-sample distribution 'punif'\. Use arrays for 2-sample\./ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: Unsupported 1-sample distribution 'punif'\. Use arrays for 2-sample\./ms ],
 		[ 'y neither array ref nor CDF name', sub { ks_test(\@x, exact => 1) },
-		  qr/^ks_test: Invalid arguments for 'y'\./ ],
+		  qr/\Ausage: ks_test\(.*^ks_test: error: Invalid arguments for 'y'\./ms ],
 		[ 'empty x', sub { ks_test([], \@y) },
 		  qr/^Not enough 'x' observations/ ],
 		[ 'x is all missing', sub { ks_test([undef, undef], \@y) },
@@ -949,7 +1024,7 @@ for my $row (@SCIPY_ONE) {
 	# The message stringifies the ref, so match loosely.
 	my $ok = eval { ks_test(\@x, {}); 1 };
 	ok(!$ok, 'croak: hashref y dies');
-	like("$@", qr/^ks_test: argument 'HASH\(0x[0-9a-f]+\)' is missing a value/,
+	like("$@", qr/\Ausage: ks_test\(.*^ks_test: error: argument 'HASH\(0x[0-9a-f]+\)' is missing a value/ms,
 		'croak: hashref y message');
 }
 
@@ -964,7 +1039,8 @@ SKIP: {
 		ks_test(\@HW_X, \@HW_Y);
 		ks_test(\@HW_X, \@HW_Y, exact => 0);
 		ks_test(\@HW_X, \@HW_Y, alternative => 'greater');
-		ks_test(\@ST_X, \@ST_Y, exact => 1);            # ties -> warn + fallback
+		ks_test(\@ST_X, \@ST_Y, exact => 1);            # ties: the conditional DP
+		ks_test(\@ST_X, \@ST_Y, exact => 0);            # ties: warns
 		ks_test(\@HW_X, 'pnorm');
 		ks_test(\@HW_X, 'pnorm', exact => 0);
 		ks_test(\@HW_X, 'pnorm', alternative => 'less', exact => 1);
@@ -978,131 +1054,41 @@ SKIP: {
 
 # Recorded divergences.
 #
-# Each row asserts BOTH sides: that ks_test() still produces what it produces
-# now, and that the reference still produces something different.  A change to
-# either therefore has to be made here on purpose.  Columns are
-#
-#   label, x fixture, y fixture, alternative, exact argument, expected D,
-#   what ks_test() gives, what the reference gives (undef if the reference
-#   returns NaN), which gap this is, and the reference's name.
-#
-# 'ties' rows: R 4.6's psmirnov() conditions the lattice DP on the observed tie
-# pattern, which is a strictly different (and correct) null distribution;
-# ks_test() warns and returns the asymptotic value instead.  The
-# ks_test()-side numbers for two-sided rows are mpmath's (see @MP_TWO), since
-# that is the path the fallback lands on.
-#
-# 'one1' rows: R uses pkolmogorov_one_exact, the Birnbaum & Tingey (1951)
-# series; ks_test() warns and returns exp(-2*n*D^2).  Note norm.hw.greater,
-# where R itself returns NaN: with D = 2.8e-17 the series evaluates
-# (j-1)*log(q + j/n) at j = 0, i.e. -log(q) times -1, and the j = 0 term
-# overwhelms the rest.  ks_test() returns 1, which is the right answer for a
-# statistic of 0.
-my @DIVERGE = (
-	[ 'eq.p1.greater.exact',             'D2',     'D2_P1',  'greater',    1, 0.33333333333333331,     0.71653131057378927,     0.75,                    'ties',  'R exact (tie-conditional)' ],
-	[ 'eq.p1.less.exact',                'D2',     'D2_P1',  'less',       1, 0,                       1,                       1,                       'ties',  'R exact (tie-conditional)' ],
-	[ 'eq.p1.two.sided.exact',           'D2',     'D2_P1',  'two.sided',  1, 0.33333333333333331,     0.99625519237939875,     1,                       'ties',  'R exact (tie-conditional)' ],
-	[ 'norm.a.greater.exact',            'SP1_A',  'pnorm',  'greater',    1, 0.15865525393145702,     0.63566294755005659,     0.57863894131082805,     'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.a.less.exact',               'SP1_A',  'pnorm',  'less',       1, 0.15865525393145705,     0.63566294755005637,     0.57863894131082749,     'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.b.greater.exact',            'SP1_B',  'pnorm',  'greater',    1, 0.44435602715924361,     0.028605936301374171,    0.019425071352585584,    'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.b.less.exact',               'SP1_B',  'pnorm',  'less',       1, 0.44435602715924361,     0.028605936301374171,    0.019425071352585584,    'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.c.greater.exact',            'SP1_C',  'pnorm',  'greater',    1, 0.29358012680196055,     0.17838951784064153,     0.14698883504237564,     'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.c.less.exact',               'SP1_C',  'pnorm',  'less',       1, 0.10934855242569191,     0.78730298421893363,     0.73276889247067534,     'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.hw.greater.exact',           'HW_X',   'pnorm',  'greater',    1, 2.7755575615628914e-17,  1,                       undef,                   'one1',  'R exact (Birnbaum-Tingey)' ],
-	[ 'norm.hw.less.exact',              'HW_X',   'pnorm',  'less',       1, 0.79343088086445324,     3.4036871631738461e-06,  1.5553329561954807e-07,  'one1',  'R exact (Birnbaum-Tingey)' ],
-	# SciPy's ks_1samp ignores mode entirely for one-sided alternatives and
-	# always returns the exact ksone survival function, so its own
-	# test_known_examples expectations for these two -- 0.98531158590396228
-	# (greater) and 0.040989164077641749 (less) -- are R's exact values, not
-	# its asymptotic ones.  R agrees with SciPy to 1.3e-16 on both.
-	[ 'norm.kn.greater.exact',           'KN',     'pnorm',  'greater',    1, 0.0072115233216310994,   0.98965269184345384,     0.98531158590396206,     'one1',  'R and SciPy exact (Birnbaum-Tingey / ksone)' ],
-	[ 'norm.kn.less.exact',              'KN',     'pnorm',  'less',       1, 0.12464329735846891,     0.044726446175351056,    0.040989164077641756,    'one1',  'R and SciPy exact (Birnbaum-Tingey / ksone)' ],
-	[ 'oz.greater.exact',                'OZ5',    'OZ8',    'greater',    1, 0.53846153846153855,     0.00053221578579656687,  0.00034594252434190243,  'ties',  'R exact (tie-conditional)' ],
-	[ 'oz.less.exact',                   'OZ5',    'OZ8',    'less',       1, 0,                       1,                       1,                       'ties',  'R exact (tie-conditional)' ],
-	[ 'oz.two.sided.exact',              'OZ5',    'OZ8',    'two.sided',  1, 0.53846153846153855,     0.0010644315714326675,   0.00069188504868380476,  'ties',  'R exact (tie-conditional)' ],
-	[ 'st.greater.exact',                'ST_X',   'ST_Y',   'greater',    1, 0.42857142857142866,     0.34251885509304564,     0.17803030303030307,     'ties',  'R exact (tie-conditional)' ],
-	[ 'st.less.exact',                   'ST_X',   'ST_Y',   'less',       1, 0,                       1,                       1,                       'ties',  'R exact (tie-conditional)' ],
-	[ 'st.two.sided.exact',              'ST_X',   'ST_Y',   'two.sided',  1, 0.42857142857142866,     0.65763983974240825,     0.24242424242424243,     'ties',  'R exact (tie-conditional)' ],
-	[ 'switzer.greater.exact',           'SW_F',   'SW_M',   'greater',    1, 0.22500000000000001,     0.13199384318783022,     0.10610007481926112,     'ties',  'R exact (tie-conditional)' ],
-	[ 'switzer.less.exact',              'SW_F',   'SW_M',   'less',       1, 0.075000000000000011,    0.79851621875937717,     0.76385045888189063,     'ties',  'R exact (tie-conditional)' ],
-	[ 'switzer.two.sided.exact',         'SW_F',   'SW_M',   'two.sided',  1, 0.22500000000000001,     0.26338063242225734,     0.21198990394624936,     'ties',  'R exact (tie-conditional)' ],
-	[ 'two.const.two.sided.exact',       'ZERO5',  'ONE5',   'two.sided',  1, 1,                       0.01347588987586369,     0.0079365079365079361,   'ties',  'R exact (tie-conditional)' ],
-	[ 'two.same.two.sided.exact',        'ZERO5',  'ZERO5',  'two.sided',  1, 0,                       1,                       1,                       'ties',  'R exact (tie-conditional)' ],
-	[ 'x2233.x3344.greater.exact',       'X2233',  'X3344',  'greater',    1, 0.3125,                  0.20961138715109778,     0.099104941686751741,    'ties',  'R exact (tie-conditional)' ],
-	[ 'x2233.x3344.less.exact',          'X2233',  'X3344',  'less',       1, 0,                       1,                       1,                       'ties',  'R exact (tie-conditional)' ],
-	[ 'x2233.x3344.two.sided.exact',     'X2233',  'X3344',  'two.sided',  1, 0.3125,                  0.41536342829984602,     0.19820988337350354,     'ties',  'R exact (tie-conditional)' ],
-	[ 'x2356.x3467.greater.exact',       'X2356',  'X3467',  'greater',    1, 0.34798534798534791,     0.059994729746314313,    0.023493029705930257,    'ties',  'R exact (tie-conditional)' ],
-	[ 'x2356.x3467.less.exact',          'X2356',  'X3467',  'less',       1, 0.12820512820512825,     0.68257175908728751,     0.38140754084210976,     'ties',  'R exact (tie-conditional)' ],
-	[ 'x2356.x3467.two.sided.exact',     'X2356',  'X3467',  'two.sided',  1, 0.34798534798534791,     0.11996354861856674,     0.035217727116839348,    'ties',  'R exact (tie-conditional)' ],
-);
-
-for my $row (@DIVERGE) {
-	my ($label, $xn, $yn, $alt, $exact, $d_want, $p_ours, $p_ref, $tag, $ref) = @$row;
-	my $x = $DATA{$xn} or die "no such fixture '$xn'";
-	my $y = $yn eq 'pnorm' ? 'pnorm' : ($DATA{$yn} or die "no such fixture '$yn'");
-	my ($r, $warns) = call_ks($x, $y, alternative => $alt, exact => $exact);
-
-	d_ok($r->{statistic}, $d_want, "diverge $label");
-	p_ok($r->{'p_value'}, $p_ours, $TOL_P, "diverge $label (ks_test's own value)");
-
-	# The warning is the contract: it is how a caller learns the p-value is
-	# not the exact one it asked for.
-	is(scalar(grep { $_ =~ $WARN_RE{$tag} } @$warns), 1,
-		"diverge $label: warns ($tag)") or diag("warnings: @$warns");
-
-	# ...and the fallback really is the asymptotic method, not a mislabelled
-	# exact one.
-	is($r->{method}, $yn eq 'pnorm' ? $METHOD{A1} : $METHOD{A2},
-		"diverge $label: method says asymptotic");
-
-	# Assert the divergence itself against the live value, so that closing the
-	# gap fails here loudly rather than passing silently.  A handful of rows
-	# agree with the reference anyway -- the D = 0 ones, where every
-	# distribution gives p = 1 -- and those are asserted as agreeing.
-	if (!defined $p_ref) {
-		# R returned NaN; there is nothing to compare to, only to record.
-		ok($r->{'p_value'} == $r->{'p_value'},
-			"diverge $label: $ref returns NaN, ks_test returns a number");
-	}
-	elsif (abs($p_ref - $p_ours) <= $TOL_P * abs($p_ref)) {
-		p_ok($r->{'p_value'}, $p_ref, $TOL_P,
-			"diverge $label: agrees with $ref at this D anyway");
-	}
-	else {
-		ok(abs($r->{'p_value'} - $p_ref) > $TOL_P * abs($p_ref),
-			sprintf('diverge %s: still differs from %s (%.17g vs %.17g)',
-				$label, $ref, $r->{'p_value'}, $p_ref));
-	}
+# Divergence 6: R's pkolmogorov_one_exact() takes the log of a negative number
+# when n*(1-q) rounds up to n (see the header), and returns NaN.  ks_test()
+# leaves the out-of-range term out and returns 1 by the exact method, with no
+# warning.  R: ks.test(hw.x, "pnorm", alternative = "greater", exact = TRUE)
+# gives D = 2.7755575615628914e-17 and p = NaN.
+{
+	my ($r, $warns) = call_ks(\@HW_X, 'pnorm', alternative => 'greater', exact => 1);
+	d_ok($r->{statistic}, 2.7755575615628914e-17, 'diverge norm.hw.greater.exact');
+	p_ok($r->{'p_value'}, 1, $TOL_P, 'diverge norm.hw.greater.exact: 1 where R gives NaN');
+	is($r->{method}, $METHOD{E1}, 'diverge norm.hw.greater.exact: exact method');
+	is(scalar(@$warns), 0, 'diverge norm.hw.greater.exact: no warnings') or diag("warnings: @$warns");
 }
 
-# One-sample auto-gate with ties (divergence 3).  R's rule is
-# (n < 100) && !TIES, so a tied one-sample input goes asymptotic there;
-# ks_test() only tests n < 100 and stays exact.  ks_test()'s value is exactly
-# R's exact=TRUE value, so the disagreement is entirely in which branch the
-# gate picks, not in the arithmetic.
+# One-sample auto-gate with ties.  R's rule is (n < 100) && !TIES, so a tied
+# one-sample input goes asymptotic, and R warns that ties should not be
+# present whichever path runs.  Up to 0.33 ks_test() stayed exact and was
+# silent; the values are R's:
+#   ks.test(c(1,1,2,2,3,3), "pnorm")               -> 0.00040924989417562329
+#   ks.test(c(1,1,2,2,3,3), "pnorm", exact = TRUE) -> 3.1897507389189172e-05
 {
 	my @tied = (1, 1, 2, 2, 3, 3);
-	my ($auto)  = call_ks(\@tied, 'pnorm');
-	my ($forced) = call_ks(\@tied, 'pnorm', exact => 1);
-	my ($asymp)  = call_ks(\@tied, 'pnorm', exact => 0);
-
-	is($auto->{method}, $METHOD{E1},
-		'diverge 1-sample tied auto-gate: ks_test stays exact where R goes asymptotic');
-	d_ok($auto->{statistic}, 0.84134474606854293, 'diverge 1-sample tied auto-gate');
-	# R: ks.test(c(1,1,2,2,3,3), "pnorm", exact = TRUE)  -> 3.1897507389189172e-05
+	my ($auto,   $wa) = call_ks(\@tied, 'pnorm');
+	my ($forced, $wf) = call_ks(\@tied, 'pnorm', exact => 1);
+	is($auto->{method}, $METHOD{A1}, '1-sample tied auto-gate: asymptotic, as R');
+	d_ok($auto->{statistic}, 0.84134474606854293, '1-sample tied auto-gate');
+	p_ok($auto->{'p_value'}, 0.00040924989417562329, $TOL_P, '1-sample tied auto-gate: R\'s value');
+	is(scalar(grep { $_ =~ $WARN_RE{ties1} } @$wa), 1, '1-sample tied auto-gate: warns as R does')
+		or diag("warnings: @$wa");
+	is($forced->{method}, $METHOD{E1}, '1-sample tied forced exact: exact');
 	# Another 1 - K2x() value, so it carries the absolute floor: K2x returns
-	# 0.999968 here and the subtraction leaves only ~11 significant digits, a
-	# 3e-12 relative error that a wider NV build would not make.
-	p_ok($auto->{'p_value'}, 3.1897507389189172e-05, $TOL_P,
-		'diverge 1-sample tied auto-gate: matches R exact=TRUE', $TOL_P_ABS);
-	p_ok($forced->{'p_value'}, $auto->{'p_value'}, 0,
-		'diverge 1-sample tied auto-gate: auto == forced exact');
-	# R: ks.test(c(1,1,2,2,3,3), "pnorm")               -> 0.00040924989417562329
-	# which is R's exact=FALSE value, i.e. what ks_test() gives only on request.
-	p_ok($asymp->{'p_value'}, 0.00040924989417562329, $TOL_P,
-		"diverge 1-sample tied auto-gate: R's auto value is ks_test's exact => 0");
-	isnt(sprintf('%.17g', $auto->{'p_value'}), sprintf('%.17g', $asymp->{'p_value'}),
-		'diverge 1-sample tied auto-gate: the two branches really differ');
+	# 0.999968 here and the subtraction leaves only ~11 significant digits.
+	p_ok($forced->{'p_value'}, 3.1897507389189172e-05, $TOL_P,
+		'1-sample tied forced exact: R\'s value', $TOL_P_ABS);
+	is(scalar(grep { $_ =~ $WARN_RE{ties1} } @$wf), 1, '1-sample tied forced exact: still warns')
+		or diag("warnings: @$wf");
 }
 
 # R's asymptotic one-sided upper tail underflows to exactly 0 (divergence 5).
@@ -1139,10 +1125,9 @@ for my $row (@DIVERGE) {
 
 # SciPy's tied exact rows (divergence 7, second half).  TestKSTwoSamples
 # .testRepeatedValues and the data2/data2+1 pair of .testEqualSizes are
-# reproduced here with SciPy's own expectations, purely to record that SciPy,
-# R and ks_test() give three different answers on the same input: SciPy runs
-# the no-tie formula, R conditions on the ties, ks_test() warns and goes
-# asymptotic.  The statistic, which nobody disagrees about, is still asserted.
+# reproduced here with SciPy's own expectations, to record that SciPy runs the
+# no-tie formula on tied data where R conditions on the ties.  ks_test() gives
+# R's value (its exact rows, from t/ks_test.R.scipy.R, are in @R_TWO too).
 #
 #   label, x, y, alternative, SciPy's D, SciPy's p, R's exact p
 my @SCIPY_TIED = (
@@ -1167,43 +1152,31 @@ for my $row (@SCIPY_TIED) {
 	my ($label, $x, $y, $alt, $d_want, $p_scipy, $p_r) = @$row;
 	my ($r, $warns) = call_ks($x, $y, alternative => $alt, exact => 1);
 	d_ok($r->{statistic}, $d_want, "diverge $label");
-	is(scalar(grep { $_ =~ $WARN_RE{ties} } @$warns), 1,
-		"diverge $label: warns about ties") or diag("warnings: @$warns");
-	# Where the true D is 0 every method agrees on p = 1; elsewhere all three
-	# differ, and that is the point being recorded.
-	if ($d_want == 0) {
-		p_ok($r->{'p_value'}, 1, $TOL_P, "diverge $label: D = 0 so p = 1 everywhere");
-	}
-	else {
-		ok($r->{'p_value'} != $p_scipy && $r->{'p_value'} != $p_r,
-			sprintf('diverge %s: ks_test %.17g, SciPy %.17g, R %.17g',
-				$label, $r->{'p_value'}, $p_scipy, $p_r));
+	is(scalar(@$warns), 0, "diverge $label: no warnings on the exact path")
+		or diag("warnings: @$warns");
+	p_ok($r->{'p_value'}, $p_r, $TOL_P, "diverge $label: R's tie-conditional p");
+	# Where the true D is 0, or the ties do not touch the boundary, SciPy and R
+	# agree; elsewhere they differ, and that is what is being recorded.
+	if ($p_scipy != $p_r) {
+		ok(abs($r->{'p_value'} - $p_scipy) > $TOL_P * $p_scipy,
+			sprintf('diverge %s: ks_test %.17g, SciPy %.17g', $label, $r->{'p_value'}, $p_scipy));
 	}
 }
 
-# R's documented tie examples, restated as the fractions R's man page prints,
-# so that the day the tie-conditional DP lands these two lines are the ones
-# that flip.  ?ks.test says of the Schroeer & Trenkler pair "D = 3/7,
-# p = 8/33 = 0.242424.."; ?qqplot's knee-angle example prints D = 0.225,
-# p-value = 0.212.
+# R's documented tie examples, as the fractions and digits R's man pages print.
+# ?ks.test says of the Schroeer & Trenkler pair "D = 3/7, p = 8/33 =
+# 0.242424.."; ?qqplot's knee-angle example prints D = 0.225, p-value = 0.212
+# (0.21198990394624936 at full precision from R).  Up to 0.33 neither was
+# reachable: ks_test() went asymptotic on ties.
 {
 	my ($st) = call_ks(\@ST_X, \@ST_Y);
 	d_ok($st->{statistic}, 3 / 7, 'ks.test.Rd: Schroeer & Trenkler D = 3/7');
-	ok(abs($st->{'p_value'} - 8 / 33) > 1e-6,
-		sprintf('ks.test.Rd: exact p = 8/33 not yet reachable (got %.17g)',
-			$st->{'p_value'}));
+	p_ok($st->{'p_value'}, 8 / 33, 1e-15, 'ks.test.Rd: Schroeer & Trenkler exact p = 8/33');
 
 	my ($sw) = call_ks(\@SW_F, \@SW_M);
 	d_ok($sw->{statistic}, 0.225, 'qqplot.Rd: Switzer knee-angle D = 0.225');
-	ok(abs($sw->{'p_value'} - 0.21198990394624936) > 1e-6,
-		sprintf('qqplot.Rd: exact p = 0.212 not yet reachable (got %.17g)',
-			$sw->{'p_value'}));
-
-	# ?ks.test prints "D = 0.53846, p-value = 0.0006919" for the Ozone
-	# columns; the statistic is asserted above, the p-value is not reachable.
-	my ($oz) = call_ks(\@OZ5, \@OZ8);
-	is(sprintf('%.7f', $oz->{'p_value'}), '0.0010644',
-		'ks.test.Rd: Ozone p-value is the asymptotic 0.0010644, not R\'s 0.0006919');
+	p_ok($sw->{'p_value'}, 0.21198990394624936, $TOL_P, 'qqplot.Rd: Switzer exact p = 0.212');
+	is(sprintf('%.3f', $sw->{'p_value'}), '0.212', 'qqplot.Rd: p-value = 0.212 as printed');
 }
 
 done_testing();

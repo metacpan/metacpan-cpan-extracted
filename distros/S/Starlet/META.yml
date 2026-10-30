@@ -31,4 +31,4 @@ resources:
   bugtracker: https://github.com/kazuho/Starlet/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kazuho/Starlet
-version: '0.32'
+version: '0.33'

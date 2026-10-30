@@ -1,0 +1,24 @@
+# A deny rule refuses a call in Claude Code's words ("Permission to use Bash
+# with command ... has been denied."), with raider's own tool name, then
+# raider's reason: which rule from which file.
+title: a deny rule refuses with Claude Code's sentence, then the rule and its file
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/settings.json: '{ "permissions": { "deny": [ "Bash(rm:*)", "Edit(secret.txt)" ] } }'
+  keep.txt: "x\n"
+prompt: Clean up.
+script:
+  - tool_calls:
+      - [ bash, { command: "rm keep.txt" } ]
+      - [ write_file, { path: secret.txt, content: "s\n" } ]
+  - text: kept
+expect:
+  answer: kept
+  files: { keep.txt: "x\n" }
+  absent: [ secret.txt ]
+  tools:
+    - { name: bash, error: true, text: "^Permission to use bash with command rm keep\\.txt has been denied\\. Reason: denied by rule 'Bash\\(rm:\\*\\)' from \\.claude/settings\\.json\\.$" }
+    - { name: write_file, error: true, text: "^Permission to use write_file has been denied\\. Reason: denied by rule 'Edit\\(secret\\.txt\\)' from \\.claude/settings\\.json\\.$" }
+  events:
+    - { type: permission.denied, tool: bash, by: rule }
+    - { type: permission.denied, tool: write_file, by: rule }

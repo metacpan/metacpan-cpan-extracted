@@ -219,4 +219,35 @@ $FIXTURE{'myhost:/data/explicit.csv'} =
 	is($calls, 1, 'filename: exactly one SSH call made (no extension probing)');
 }
 
+# ---------------------------------------------------------------------------
+# Section 6: user@host form — username is passed through to read_remote_file
+# ---------------------------------------------------------------------------
+# File::Slurp::Remote explicitly supports "user@host" as the first argument
+# to read_remote_file (documented: "A hostname, or user@host to log in as a
+# different user").  Verify that Database::Abstraction passes the complete
+# user@host string to the module rather than stripping the username.
+
+$FIXTURE{'njh@myhost:/data/remote.csv'} =
+	"entry!name!score\none!Alice!10\ntwo!Bob!20\nthree!Carol!30\n";
+
+{
+	my $user_dao = Database::remote->new(
+		host      => 'njh@myhost',
+		directory => '/data',
+	);
+
+	my $all = $user_dao->selectall_arrayref();
+	is(scalar @{$all}, 3, 'user@host: 3 rows fetched');
+
+	my %by_entry = map { $_->{'entry'} => $_ } @{$all};
+	is($by_entry{'one'}{'name'},    'Alice', 'user@host: row one name correct');
+	is($by_entry{'two'}{'score'},   20,      'user@host: row two score correct');
+	is($by_entry{'three'}{'name'}, 'Carol',  'user@host: row three name correct');
+
+	is($user_dao->count(), 3, 'user@host: count() returns 3');
+
+	my $row = $user_dao->fetchrow_hashref(entry => 'two');
+	is($row->{'name'}, 'Bob', 'user@host: fetchrow_hashref returns correct row');
+}
+
 done_testing();

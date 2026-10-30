@@ -4,623 +4,244 @@
 
 =head1 NAME
 
-Acme::Parataxis::Sync::RwLock - Reader-writer lock: many readers, or one writer
+Acme::Parataxis::Sync::RwLock - Writer-Preferring Reader-Writer Lock for Fibers
 
 =head1 SYNOPSIS
 
     use v5.40;
-    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis qw[async fiber await_sleep];
     use Acme::Parataxis::Sync::RwLock;
-    my $table = Acme::Parataxis::Sync::RwLock->new;
-    my %cache;
+
+    my $rwlock = Acme::Parataxis::Sync::RwLock->new;
+    my %cache  = ( a => 1, b => 2 );
+
     async {
-        my @handles;
-        for my $id ( 1 .. 3 ) {
-            push @handles, fiber {
-                my $guard = $table->read_guard;      # several readers may be inside at once
-                $cache{"row $id"} = $id * 10;
+        # Concurrent readers share the lock simultaneously:
+        my @readers = map {
+            my $id = $_;
+            fiber {
+                my $guard = $rwlock->read_guard;
+                say "Reader $id active; concurrent read holds: " . $rwlock->readers;
+                await_sleep(20);
             };
-        }
-        $_->await for @handles;
-        say 'read ', join ', ', map { $cache{$_} } sort keys %cache;
-        say 'and the lock is free again, ', $table->readers, ' holds left';
-        {
-            my $guard = $table->write_guard;         # now nobody else gets in
-            $cache{'row 4'} = 40;
-        }
-        say 'after the writer, the cache holds ', scalar keys %cache, ' rows';
+        } 1 .. 3;
+
+        # Writer claims exclusive access; queues behind current readers
+        # but blocks all subsequent readers from jumping ahead:
+        my $writer = fiber {
+            await_sleep(5);
+            my $guard = $rwlock->write_guard;
+            say "Writer active (exclusive); updating cache...";
+            $cache{c} = 3;
+        };
+
+        $_->await for @readers, $writer;
+        say "Cache updated safely: " . keys(%cache) . " items";
     };
-    # read 10, 20, 30
-    # and the lock is free again, 0 holds left
-    # after the writer, the cache holds 4 rows
 
 =head1 DESCRIPTION
 
-A lock with two modes. Any number of fibers may hold a B<read> hold at the same time; a B<write> hold is exclusive, and
-no read or write can be taken while it is held. A fiber that already holds a read hold may take another, and the lock
-keeps count rather than parking - which is what lets the same fiber read the same structure from inside a function it
-is already reading.
+C<Acme::Parataxis::Sync::RwLock> provides a shared-reader, exclusive-writer lock for coordinating fibers. Multiple
+fibers may acquire concurrent read holds, but a write lock is strictly exclusive: no other reader or writer may enter
+while a write hold is active.
 
-The interesting part is how the two queues interact. A waiting writer is served first, and a reader arriving while a
-writer is queued joins the queue behind it instead of going straight in. That is the difference from a naive
-readers-writer lock, and it is what stops a steady stream of readers from starving a writer indefinitely.
+=head2 Writer Preference
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    my @log;
-    async {
-        my $first = fiber {
-            $lock->read_lock;
-            await_sleep( 100 );
-            $lock->read_unlock;
-            push @log, 'first reader out';
-        };
-        await_sleep( 10 );
-        my $writer = fiber {
-            $lock->write_lock;
-            push @log, 'writer in';
-            await_sleep( 20 );
-            $lock->write_unlock;
-            push @log, 'writer out';
-        };
-        await_sleep( 10 );
-        my @others;
-        for my $id ( 1 .. 2 ) {
-            push @others, fiber {
-                $lock->read_lock;
-                push @log, "reader $id in";
-                await_sleep( 5 );
-                $lock->read_unlock;
-            };
-        }
-        $first->await;
-        $writer->await;
-        $_->await for @others;
-        push @log, 'both readers out';
-        say join ', ', @log;
-    };
-    # first reader out, writer in, writer out, reader 1 in, reader 2 in, both readers out
+In a naive reader-writer lock, a continuous stream of readers can starve a queued writer indefinitely.
+C<Acme::Parataxis::Sync::RwLock> enforces B<writer preference>:
 
-The two readers queued behind the writer are let in B<together>, by a single pass over the read queue, so they overlap
-rather than running one after the other - and neither of them got in early, even though the lock was readable for most
-of the writer's wait.
+=over
+
+=item *
+
+The moment a writer requests a lock (calling C<write_lock> or C<write_guard>), any subsequent reader arriving at the
+lock is placed in the wait queue behind that writer.
+
+=item *
+
+Existing active readers are allowed to drain naturally. Once the last reader finishes, the queued writer is granted the
+lock immediately.
+
+=item *
+
+When the writer releases, all readers queued behind it are unblocked together in a single pass to share the lock.
+
+=back
+
+=head2 Re-entrant Read Holds
+
+A fiber that already owns a read hold may take additional read holds (deepening the lock) without deadlocking. The lock
+tracks hold counts per fiber, allowing helper functions called within a read scope to acquire their own read guards
+safely.
 
 =head1 METHODS
 
 =head2 C<new( )>
 
-    use v5.40;
-    use Acme::Parataxis::Sync::RwLock;
     my $lock = Acme::Parataxis::Sync::RwLock->new;
-    say 'a fresh lock: writer ', ( defined $lock->writer ? 'set' : 'none' )
-        . ', readers ' . $lock->readers
-        . ', waiters ' . $lock->waiters;
-    # a fresh lock: writer none, readers 0, waiters 0
 
-Creates an unlocked lock. Takes no arguments: an unknown key croaks with C<Unrecognized parameters for
-"Acme::Parataxis::Sync::RwLock" constructor>.
+Constructs a new, unlocked reader-writer lock. Takes no parameters.
 
 =head2 C<read_lock( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        $lock->read_lock;
-        say 'outstanding holds: ', $lock->readers;
-        $lock->read_lock;                          # a second hold on the same fiber
-        say 'and after deepening: ', $lock->readers;
-        say 'but only one fiber is holding: ', $lock->read_holders;
-        $lock->read_unlock;
-        $lock->read_unlock;
-        say 'both released: ', $lock->readers;
-    };
-    # outstanding holds: 1
-    # and after deepening: 2
-    # but only one fiber is holding: 1
-    # both released: 0
+    $lock->read_lock;
 
-Takes a read hold, parking only while a writer holds the lock or is queued ahead of you, and returns true. Every call
-takes B<one> hold, so two calls need two C<read_unlock> calls.
+Acquires a shared read hold. Parks the calling fiber if an exclusive write lock is active or if a writer is currently
+queued ahead in line.
 
-If the calling fiber already holds a read hold the lock deepens in place rather than parking, and returns true. That is
-not a convenience - parking there would deadlock, because a queued writer is waiting for this fiber's first hold to
-drain while the second hold waits for the writer. The same applies when the calling fiber B<is> the writer: it may take
-a read hold, because it already has exclusive access.
+If the calling fiber already holds a read hold, the hold count is incremented in place without parking. If the calling
+fiber holds the exclusive write lock, it is granted a read hold immediately (since it already holds exclusive access).
+Returns true.
 
 =head2 C<read_unlock( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        say 'with no hold: ', ( eval { $lock->read_unlock; 'allowed' } || 'croaks' );
-        $lock->read_lock;
-        $lock->read_lock;
-        $lock->read_unlock;
-        say 'one hold left: ', $lock->readers;
-        $lock->read_unlock;
-        say 'none left: ', $lock->readers;
-    };
-    # with no hold: croaks
-    # one hold left: 1
-    # none left: 0
+    $lock->read_unlock;
 
-Releases exactly one read hold belonging to the calling fiber, and returns true. Croaks if this fiber holds none.
-
-Releasing one hold at a time is what lets nested C<read_guard>s unwind independently: an inner guard's destruction
-frees its own hold and cannot strand the outer one on a hold the fiber no longer has.
+Releases one read hold for the calling fiber. If this was the last active read hold, calls the internal scheduler pump
+to hand the lock to the next queued writer. Croaks if the calling fiber holds no active read holds. Returns true.
 
 =head2 C<try_read_lock( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        say 'on a free lock: ', ( $lock->try_read_lock ? 'taken' : 'refused' );
-        $lock->read_lock;
-        say 'while this fiber holds one: ', ( $lock->try_read_lock ? 'deepened' : 'refused' );
-        $lock->read_unlock;
-        $lock->read_unlock;
-    };
-    # on a free lock: taken
-    # while this fiber holds one: deepened
+    if ( $lock->try_read_lock ) {
+        # read hold acquired without parking
+    } else {
+        # writer active or writer queued ahead
+    }
 
-Takes a read hold only if it can be taken at once, returning true, and false without parking otherwise. False means a
-writer holds the lock B<or a writer is queued> - a queued writer is enough, so a reader never jumps the queue. The
-deepening rule from C<read_lock> applies here too, so this returns true rather than false when the calling fiber
-already holds a read hold.
+Attempts to acquire a read hold immediately without parking. Returns true on success. Returns false if an exclusive
+writer is active B<or if a writer is currently queued>. If the calling fiber already holds a read hold, deepens the
+hold and returns true.
 
 =head2 C<write_lock( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        $lock->read_lock;
-        say 'upgrading a read hold: ', ( eval { $lock->write_lock; 'allowed' } || 'croaks' );
-        $lock->read_unlock;
-        $lock->write_lock;
-        say 'now the writer is fiber: ', $lock->writer;
-        say 'and re-entering: ', ( eval { $lock->write_lock; 'allowed' } || 'croaks' );
-        $lock->write_unlock;
-    };
-    # upgrading a read hold: croaks
-    # now the writer is fiber: 0
-    # and re-entering: croaks
+    $lock->write_lock;
 
-Takes the exclusive write lock, parking until every reader has drained and no writer is queued ahead of you, and
-returns true. Croaks if the calling fiber already holds the write lock, and croaks if it holds a read hold.
+Acquires the exclusive write lock. Parks the calling fiber until all active read holds have drained and no earlier
+writers are queued ahead.
 
-That second croak is the one to design around: B<upgrading a read hold to a write hold is not supported>. There is no
-deadlock-prone retry in there, and no silent promotion either. A fiber that holds a read and needs to write has to drop
-the read and take the write, which means going back through the queue.
+=over
+
+=item * Croaks if the calling fiber already holds the write lock (non-reentrant).
+
+=item * Croaks if the calling fiber holds an active read hold (upgrades are not supported).
+
+=back
+
+Returns true once the write lock is granted.
 
 =head2 C<write_unlock( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        say 'with no writer: ', ( eval { $lock->write_unlock; 'allowed' } || 'croaks' );
-        $lock->write_lock;
-        my $rival = fiber {
-            await_sleep( 20 );
-            say 'from another fiber: ', ( eval { $lock->write_unlock; 'allowed' } || 'croaks' );
-        };
-        $rival->await;
-        $lock->write_unlock;
-    };
-    # with no writer: croaks
-    # from another fiber: croaks
+    $lock->write_unlock;
 
-Releases the write lock, handing it to the next queued writer if there is one, or letting the queued readers in
-otherwise, and returns true. Croaks if the lock is not write-held, and croaks if the calling fiber is not the writer.
+Releases the exclusive write lock. Hands the lock to the next queued writer, or unblocks all queued readers if no
+writers are waiting. Croaks if the lock is not write-held, or if the calling fiber is not the current writer. Returns
+true.
 
 =head2 C<try_write_lock( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        say 'on a free lock: ', ( $lock->try_write_lock ? 'taken' : 'refused' );
-        $lock->write_unlock;
-        my $reader = fiber { $lock->read_lock; await_sleep( 100 ); $lock->read_unlock };
-        await_sleep( 10 );
-        say 'while a reader holds it: ', ( $lock->try_write_lock ? 'taken' : 'refused' );
-        $reader->await;
-    };
-    # on a free lock: taken
-    # while a reader holds it: refused
+Attempts to acquire the write lock without parking. Returns true on success. Returns false if any reader is active, a
+writer is active, or an earlier writer is queued. Croaks on self-reentrancy or if the caller holds a read hold.
 
-Takes the write lock only if it is completely free, returning true, and false without parking otherwise. False means a
-writer holds it, any reader holds it, or a writer is queued. It croaks on the same two mistakes as C<write_lock> -
-re-entry, and trying to upgrade a read hold.
+=head2 C<read_guard( )>
 
-=head2 C<read_guard( )> and C<write_guard( )>
+    {
+        my $guard = $lock->read_guard;
+        # read-protected scope
+    }
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        {
-            my $guard = $lock->read_guard;         # takes a read hold, parking if it must
-            say 'inside, outstanding holds: ', $lock->readers;
-        }
-        say 'released at the end of the block: ', $lock->readers;
-        {
-            my $guard = $lock->write_guard;
-            say 'and in write mode, the writer is: ', $lock->writer;
-        }
-        say 'released, so the writer is: ', ( defined $lock->writer ? 'still set' : 'none' );
-    };
-    # inside, outstanding holds: 1
-    # released at the end of the block: 0
-    # and in write mode, the writer is: 0
-    # released, so the writer is: none
+Acquires a read hold via C<read_lock()> and returns an opaque guard object. When the guard goes out of scope (or is
+unwound by an exception), it invokes C<read_unlock()> automatically.
 
-Take the lock in the given mode and return an opaque guard that releases it when the guard is destroyed. Because the
-release is at destruction, an exception part-way through the block still gives the lock back.
+=head2 C<write_guard( )>
 
-Both return the same class, C<Acme::Parataxis::Sync::RwLock::Guard>, which has no methods of its own. It is not a lock
-and it does not expose the lock it wraps; its only job is to call C<read_unlock> or C<write_unlock> at destruction,
-depending on the mode it was made with.
+    {
+        my $guard = $lock->write_guard;
+        # write-protected scope
+    }
 
-=head2 C<writer> and C<owner>
+Acquires the exclusive write lock via C<write_lock()> and returns an opaque guard object. When the guard is destroyed,
+it invokes C<write_unlock()> automatically.
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    say 'before anything: ', ( defined $lock->writer ? 'set' : 'none' );
-    async {
-        $lock->write_lock;
-        say 'while held, by fiber: ', $lock->writer;
-        $lock->write_unlock;
-    };
-    # before anything: none
-    # while held, by fiber: 0
+=head2 C<readers( )>
 
-The id of the fiber holding the write lock, or C<undef> when there is none. C<owner> returns the same value - it is
-here for symmetry with L<Acme::Parataxis::Sync::Mutex>, whose C<owner> means the same thing. Neither says anything
-about read holds; for those see C<readers>. Both are readers, so they work off a fiber as well as on one.
+Returns the total count of outstanding read holds across all fibers (including deepened holds).
 
-=head2 C<readers> and C<read_holders>
+=head2 C<read_holders( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        say 'on a free lock: holds ', $lock->readers, ', holders ', $lock->read_holders;
-        my $deep = fiber {
-            $lock->read_lock;
-            $lock->read_lock;
-            await_sleep( 50 );
-            $lock->read_unlock;
-            $lock->read_unlock;
-        };
-        await_sleep( 10 );
-        say 'one fiber with two holds: holds ', $lock->readers, ', holders ', $lock->read_holders;
-        my $other = fiber { $lock->read_lock; await_sleep( 20 ); $lock->read_unlock };
-        await_sleep( 10 );
-        say 'and a second fiber: holds ', $lock->readers, ', holders ', $lock->read_holders;
-        $_->await for $deep, $other;
-        say 'once they are done: holds ', $lock->readers, ', holders ', $lock->read_holders;
-    };
-    # on a free lock: holds 0, holders 0
-    # one fiber with two holds: holds 2, holders 1
-    # and a second fiber: holds 3, holders 2
-    # once they are done: holds 0, holders 0
+Returns the count of distinct I<fibers> currently holding at least one read hold.
 
-C<readers> is the number of outstanding read B<holds>, counted one per C<read_lock> call, so deepening a hold shows up
-here. C<read_holders> is the number of B<fibers> that hold at least one, so it does not. Both are readers, so they work
-off a fiber as well as on one.
+=head2 C<writer( )> / C<owner( )>
 
-=head2 C<waiters>, C<read_waiters> and C<write_waiters>
+Returns the numeric fiber ID of the current exclusive writer, or C<undef> if not write-held. C<owner> is an alias.
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        my $reader = fiber { $lock->read_lock; await_sleep( 100 ); $lock->read_unlock };
-        await_sleep( 10 );
-        my $writer = fiber { $lock->write_lock; await_sleep( 20 ); $lock->write_unlock };
-        await_sleep( 10 );
-        my @late;
-        for my $id ( 1 .. 2 ) { push @late, fiber { $lock->read_lock; $lock->read_unlock } }
-        await_sleep( 10 );
-        say 'reading: ', scalar( $lock->read_waiters ), ', writing: ', scalar( $lock->write_waiters )
-            . ', total: ' . $lock->waiters;
-        $reader->await;
-        $writer->await;
-        $_->await for @late;
-        say 'once it is all over: ', $lock->waiters;
-    };
-    # reading: 2, writing: 1, total: 3
-    # once it is all over: 0
+=head2 C<waiters( )>
 
-How many fibers are queued: C<read_waiters> for a read hold, C<write_waiters> for the write lock, and C<waiters> for
-both together. They count the two queues, so a single reader queued behind a single writer is C<waiters> 2. A fiber
-running the action is not in any of them, and each count drops as its queue is served rather than when the waiter runs.
-All three are readers, so they work off a fiber as well as on one.
+Returns the total number of fibers currently parked waiting for either read or write access.
 
-Be careful how you call the two queue readers. They are readers on an B<array> field, so they follow the usual array
-rule: in scalar context you get the count, and in list context you get the queued fiber ids. C<say> takes a list, so
-asking it to print one of them directly splices the ids into your sentence instead of a number, and with nothing queued
-it splices in nothing at all.
+=head2 C<read_waiters( )> / C<write_waiters( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        my $holder = fiber { $lock->write_lock; await_sleep( 100 ); $lock->write_unlock };
-        await_sleep( 10 );
-        my @queued = map { fiber { $lock->read_lock; $lock->read_unlock } } 1 .. 2;
-        await_sleep( 10 );
-        my @ids = $lock->read_waiters;
-        say 'asked for a list: ', scalar @ids, ' items come back';
-        say 'asked for a count: ', scalar( $lock->read_waiters );
-        say 'joined into a string: ', length( join '', $lock->read_waiters ), ' characters';
-        $holder->await;
-        $_->await for @queued;
-        say 'with nothing queued, the same join: ', length( join '', $lock->read_waiters ), ' characters';
-    };
-    # asked for a list: 2 items come back
-    # asked for a count: 2
-    # joined into a string: 2 characters
-    # with nothing queued, the same join: 0 characters
+In scalar context, returns the count of fibers waiting for read or write access, respectively. In list context, returns
+their numeric fiber IDs. B<Wrap in C<scalar()> when interpolating into strings>:
 
-The two items and the two characters are the two fiber ids, not the number two - the count happens to agree here only
-because two fibers are queued. Wrap the call in C<scalar> whenever it goes straight into a string. C<waiters> is an
-ordinary method and always returns a count, so it needs no such care.
-
-=head1 How It Works
-
-Five pieces of state carry it: C<$writer>, the fiber holding the write lock or C<undef>; C<$readers>, the count of
-outstanding read holds; C<%read_holders>, fiber id to how many holds that fiber owns; and the two queues
-C<@read_waiters> and C<@write_waiters>.
-
-Everything funnels through one private method, C<_pump>, which runs on every release. It has exactly two rules: if a
-writer is queued, hand the lock to the first of them and return; otherwise grant a read hold to B<every> queued reader
-in a single pass. That is the whole of the fairness policy, and it is why writers cannot be starved and why waiting
-readers end up sharing rather than queuing.
-
-A release calls C<_pump> only when it could matter. C<read_unlock> calls it when the last hold drains, because a writer
-may be waiting for that; C<write_unlock> calls it unconditionally, because either queue may be waiting for the writer
-to leave. Grants are recorded before the woken fiber runs, so there is no instant at which the lock looks free and
-another fiber can take it - the same atomic hand-off the rest of the family uses.
+    say "Queued readers: " . scalar($lock->read_waiters);
 
 =head1 Recipes
 
-=head2 Protecting a structure that is read far more than it is written
+=head2 Nested read calls inside helpers
 
-The shape to reach for. Reads take the read guard, so they overlap freely; the occasional write takes the write guard
-and everyone else waits.
+    my $rwlock = Acme::Parataxis::Sync::RwLock->new;
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $index = Acme::Parataxis::Sync::RwLock->new;
-    my %table = ( alpha => 1, beta => 2 );
-    async {
-        my @readers = map {
-            fiber {
-                my $guard = $index->read_guard;            # the rest just read
-                say 'outstanding read holds, as this reader sees them: ', $index->readers;
-                await_sleep( 20 );
-                return;
-            }
-        } 1 .. 3;
-        await_sleep( 10 );
-        my $writer = fiber {
-            my $guard = $index->write_guard;              # one fiber rewrites
-            %table = ( alpha => 1, beta => 2, gamma => 3 );
-            return;
-        };
-        $_->await for @readers;
-        $writer->await;
-        say 'and the keys are now ', join ', ', ( sort keys %table );
-    };
-    # outstanding read holds, as this reader sees them: 1
-    # outstanding read holds, as this reader sees them: 2
-    # outstanding read holds, as this reader sees them: 3
-    # and the keys are now alpha, beta, gamma
-
-Each reader's guard is a separate hold, so the count climbs as they arrive: the last one to get in saw three readers
-holding at once. The writer queued behind all of them and was served once they had drained.
-
-=head2 Letting a fiber re-read what it is already reading
-
-C<read_lock> counts holds per fiber rather than parking, so a helper called from inside a critical section can take the
-read hold it needs and give it straight back.
-
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    my %seen;
-    sub lookup {
-        my $key = shift;
-        my $guard = $lock->read_guard;                # a second hold on the same fiber
-        return $seen{$key};
+    sub fetch_field ($key) {
+        my $guard = $rwlock->read_guard;    # deepens existing hold safely
+        return $data{$key};
     }
+
     async {
-        my $guard = $lock->read_guard;                # the outer hold
-        $seen{answer} = 42;
-        say 'from inside a read hold: ', lookup('answer');
-        say 'holds taken: ', $lock->readers, ' (the inner one is back already)';
-        $seen{answer} = 43;
-        say 'and the outer hold still protects the write: ', $lock->readers;
+        my $outer_guard = $rwlock->read_guard;
+        my $val1 = fetch_field('name');
+        my $val2 = fetch_field('role');
     };
-    # from inside a read hold: 42
-    # holds taken: 1 (the inner one is back already)
-    # and the outer hold still protects the write: 1
 
-=head2 Bounding a wait
+=head2 Deadlock prevention during writes
 
-A fiber parked for a read or a write hold is parked on an ordinary interruptible wait, so C<with_timeout( $ms, ... )>
-bounds it and a cancelled token aborts it. Either way the fiber leaves the queue, and a queued writer is not left
-waiting on a hold that will never arrive.
+Because upgrading a read hold to a write hold is forbidden, release read holds before requesting a write lock:
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        my $reader = fiber { $lock->read_lock; await_sleep( 200 ); $lock->read_unlock };
-        await_sleep( 10 );
-        my $impatient = fiber {
-            eval { Acme::Parataxis::with_timeout( 30, sub { $lock->write_lock } ) };
-            my $why = $@ ? ( $@->message =~ s/ at .*//sr ) : 'got it';
-            say 'the impatient writer: ', $why;
-            say '  and the write queue it left: ', scalar( $lock->write_waiters );
-        };
-        $impatient->await;
-        say 'the read hold is untouched: ', $lock->readers;
-        $reader->await;
-    };
-    # the impatient writer: The operation timed out
-    #   and the write queue it left: 0
-    # the read hold is untouched: 1
+    sub update_record ($id, $new_val) {
+        # Check current value under read lock:
+        my $needs_update = 0;
+        {
+            my $guard = $rwlock->read_guard;
+            $needs_update = 1 if $data{$id} ne $new_val;
+        }
+
+        # Drop read hold before requesting write lock:
+        if ($needs_update) {
+            my $guard = $rwlock->write_guard;
+            $data{$id} = $new_val;
+        }
+    }
 
 =head1 Behavior Notes
 
-=head2 There is no upgrade from read to write
+=over
 
-C<write_lock> and C<try_write_lock> both croak if the calling fiber holds a read hold, rather than taking the write
-lock and hoping the other holds drain. That is the safe choice - a silent upgrade that waited for its own holds would
-deadlock, because it is the fiber that has to release them - but it means the pattern is not available.
+=item * Upgrades from read to write are forbidden
 
-The way out is to release the read holds first and then take the write lock, accepting the gap. If the work between the
-two must be atomic, the structure has to be reachable another way: keep a separate mutex for the fields that actually
-need read-to-write promotion, and use this lock for the read-mostly ones.
+Attempting to call C<write_lock()> while holding a read hold croaks with C<RwLock write_lock: this fiber holds a read
+lock; upgrading read to write is not supported>. Upgrading cannot be supported safely without risking deadlocks when
+multiple readers attempt to upgrade concurrently. Release the read hold first.
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    my %seen;
-    async {
-        $lock->read_lock;
-        $lock->read_lock;
-        say 'holds before: ', $lock->readers;
-        $lock->read_unlock;
-        $lock->read_unlock;
-        say 'after dropping both: ', $lock->readers;
-        say 'now the write lock is: ', ( $lock->try_write_lock ? 'available' : 'refused' );
-        $lock->write_unlock;
-    };
-    # holds before: 2
-    # after dropping both: 0
-    # now the write lock is: available
+=item * Stranded holds brick the lock
 
-=head2 A queued writer turns every read lock into a wait
+If a fiber exits without unlocking (or without dropping a guard), its holds remain registered permanently. For write
+holds, this blocks all future access. For read holds, recycled fiber IDs can cause a newer fiber with the same ID to be
+falsely identified as holding a read hold. Always use guards.
 
-Writer preference is not a hint - a queued writer is enough to make C<read_lock> park, and enough to make
-C<try_read_lock> return false. A fiber that reads in a loop while writers are waiting can therefore find itself parking
-on reads it would previously have taken instantly, even though the lock was readable the whole time.
-
-That is the intended trade: without it a steady stream of readers can keep a writer waiting indefinitely, because each
-new reader is granted as soon as the current holds drain. If your workload really is read-mostly and you cannot accept
-occasional writer delays, this is the wrong lock for it.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        my $reader = fiber { $lock->read_lock; await_sleep( 100 ); $lock->read_unlock };
-        await_sleep( 10 );
-        my $first = $lock->try_read_lock;
-        say 'before any writer queues, a try_read: ', ( $first ? 'taken' : 'refused' );
-        $lock->read_unlock if $first;
-        my $writer = fiber { $lock->write_lock; await_sleep( 20 ); $lock->write_unlock };
-        await_sleep( 10 );
-        my $second = $lock->try_read_lock;
-        say 'once one has queued, the same call: ', ( $second ? 'taken' : 'refused' );
-        $lock->read_unlock if $second;
-        $reader->await;
-        $writer->await;
-    };
-    # before any writer queues, a try_read: taken
-    # once one has queued, the same call: refused
-
-The two calls are the same, made either side of one C<write_lock> and nothing else. Only the queue in between changed
-the answer, so it is the queue and not the hold that did it. Each C<read_unlock> is guarded because a refused
-C<try_read_lock> leaves nothing to release, and C<read_unlock> croaks on a fiber that holds no read.
-
-=head2 A stranded hold bricks the lock
-
-Nothing releases a read or a write hold on behalf of a fiber that ends holding one, and there is no API to take a hold
-back. A fiber that returns from inside a critical section leaves the holds outstanding, and for the write lock that is
-permanent: the lock is held by a fiber that no longer exists, so nothing can ever take it again.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        my $holder = fiber { $lock->write_lock; 1 };        # returns without unlocking
-        $holder->await;
-        await_sleep( 10 );
-        say 'the holder is gone and the lock is still held';
-        say '  a new fiber can take a read:  ', ( $lock->try_read_lock  ? 'yes' : 'no' );
-        say '  a new fiber can take a write: ', ( $lock->try_write_lock ? 'yes' : 'no' );
-    };
-    # the holder is gone and the lock is still held
-    #   a new fiber can take a read:  no
-    #   a new fiber can take a write: no
-
-A stranded read hold is less absolute but just as confusing, because of how fiber ids work. A fiber's id is recycled as
-soon as it finishes, so the next fiber to be created is handed the dead one's id - and the lock now believes B<it>
-holds the read. Asking for the write lock then fails with the upgrade croak from L</"write_lock( )">, naming a problem
-the caller does not have:
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::RwLock;
-    my $lock = Acme::Parataxis::Sync::RwLock->new;
-    async {
-        my $holder = fiber { $lock->read_lock; 1 };         # returns without unlocking
-        $holder->await;
-        await_sleep( 10 );
-        say 'the holder is gone, readers stranded at ', $lock->readers;
-        my $next = fiber {
-            my $why = eval { $lock->write_lock; 'it took the write lock' } || $@;
-            $why =~ s/\s+at .*//s;
-            $why =~ s/;.*//s;                              # just the reason, not the advice
-            say '  and a new fiber asking for the write: ', $why;
-        };
-        $next->await;
-    };
-    # the holder is gone, readers stranded at 1
-    #   and a new fiber asking for the write: RwLock write_lock: this fiber holds a read lock
-
-The same recycling explains the write-lock case from the other direction. The stranded writer is fid 1, the next fiber
-created is also fid 1, and C<write_lock> reports C<RwLock is not reentrant: this fiber already holds the write lock> -
-a reentrancy error for a lock the caller has never touched.
-
-What prevents all of this is the guard: take it into a lexical at the top of the body and let scope exit release it.
-That covers an exception and a fiber that returns early, which between them are nearly all of it. It does not cover a
-fiber torn down without unwinding its scopes.
+=back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::Sync::WaitGroup>,
-L<Acme::Parataxis::Sync::Barrier>, L<Acme::Parataxis::Sync::Once>, L<Acme::Parataxis::Error::Timeout>,
-L<Acme::Parataxis::Error::Cancelled>
+L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::Sync::WaitGroup>
 
 =head1 AUTHOR
 
@@ -634,4 +255,3 @@ This library is free software; you can redistribute it and/or modify it under th
 2.
 
 =cut
-

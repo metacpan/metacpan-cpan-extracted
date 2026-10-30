@@ -45,13 +45,27 @@
 #if (defined(__linux__) || defined(__gnu_linux__)) && !defined(_GNU_SOURCE)
 #define _GNU_SOURCE
 #endif
+#if !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif
+
+/**
+ * @details Solaris/Illumos system headers (`<sys/feature_tests.h>`),
+ * `__STRICT_ANSI__` suppresses non-ANSI definitions unless `__EXTENSIONS__` is
+ * explicitly defined. Without `__EXTENSIONS__`, Solaris headers do not expose `off64_t`,
+ * `sigjmp_buf`, `putenv`, or `fileno`.
+ */
+#if (defined(__sun) || defined(__sun__)) && !defined(__EXTENSIONS__)
+#define __EXTENSIONS__ 1
+#endif
+
 // Operating System Detection
 /**
  * @details This section defines `INFIX_OS_*` macros based on compiler-provided
  * preprocessor definitions. It also defines the broader `INFIX_ENV_POSIX` for systems
  * that follow POSIX conventions, which simplifies later `#ifdef` logic.
  */
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__CYGWIN__)
 #define INFIX_OS_WINDOWS
 #include <windows.h>  // Included early for common types like SYSTEM_INFO, HANDLE, etc.
 // Compatibility shim for POSIX types not present in Clang/MSVC headers.

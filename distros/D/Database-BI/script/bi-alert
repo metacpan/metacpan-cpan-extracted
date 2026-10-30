@@ -1,25 +1,63 @@
 #!/usr/bin/env perl
-# bi-alert -- Phase 4.3 digest and threshold CLI for Database::BI
+# bi-alert -- Digest and threshold CLI for Database::BI
 #
-# Evaluates one saved analysis's measures, prints a digest to STDOUT, and
-# exits 1 when a threshold condition is crossed.  It makes no mail or network
-# call: delivery is the caller's job, which is what lets cron (or a wrapper
-# that pipes STDOUT into mail, a webhook or a ticket) decide what an alert is.
-# Scheduling is likewise cron's; this script is deliberately stateless.
+# Evaluates the measures of one or more saved analyses, prints a digest to
+# STDOUT for each, and exits 1 when a threshold condition is crossed.  It makes
+# no mail or network call: delivery is the caller's job, which is what lets cron
+# (or a wrapper that pipes STDOUT into mail, a webhook or a ticket) decide what
+# an alert is.  Scheduling is likewise cron's.
+#
+# Several checks in one run are the normal case: --analysis may be repeated, and
+# --threshold may be repeated and may name its analysis, so one cron line can
+# watch several measures across several saved analyses.  Every (analysis,
+# threshold) pair is reported, throttled and recovered on its own -- the state
+# file is keyed by both -- and one run is one delivery, with all the
+# announcements in the text.
+#
+# A threshold that stays crossed is not news a second time, so --suppress gives
+# an (analysis, threshold) pair a throttle: the first crossing is announced, and
+# repeats inside the period are not.  The memory for that is one small JSON file
+# in the model directory, written only when --suppress is used (or once such a
+# file exists); with no --suppress the script behaves exactly as it always has
+# and writes nothing.  When the threshold clears, its entry is dropped, so the
+# next crossing alerts straight away rather than staying quiet about it.
+#
+# The end of a crossing is news as well, and --recovery announces it: the run
+# that sees the threshold clear prints THRESHOLD RECOVERED and exits 3, so a
+# wrapper that mails on a non-zero status mails the recovery too.  The state
+# file is what makes this possible, since an entry is the record of a crossing
+# that was announced: finding one is what tells this run that an incident has
+# ended rather than that a threshold was never crossed.  That is also why
+# --recovery keeps that file even with no --suppress to throttle, and why the
+# recovery is said once per crossing rather than on every run after it.
+#
+# Delivery is optional as well: --notify-cmd runs a command when, and only
+# when, something is announced, with the run's own text on STDIN and the
+# verdict in the environment.  That makes a cron line one command instead of a
+# shell wrapper around this one, and it keeps the rule the script has always
+# had -- nothing leaves the machine unless somebody asked it to.
 #
 # Usage:
-#   bi-alert --analysis <id> [--threshold <alias>:<op>:<value>]
+#   bi-alert --analysis <id> [--analysis <id> ...]
+#             [--threshold <alias>:<op>:<value>] [--threshold <analysis>:<alias>:<op>:<value> ...]
+#             [--suppress <duration>] [--state-file <path>] [--recovery]
+#             [--notify-cmd <command>]
 #             [--model-dir <dir>] [--data-dir <dir>] [--dry-run]
 #
-# Exit codes:  0 = ok / threshold not crossed
-#              1 = threshold crossed
+# Exit codes:  0 = ok / nothing announced (not crossed, or already announced)
+#              1 = a threshold crossed, and is announced
 #              2 = error (bad args, analysis not found, data unavailable)
+#              3 = a crossing that was announced has ended, and is announced
+#                  as a recovery (--recovery); 1 wins if a run announces both
 
 use strict;
 use warnings;
 
 use Getopt::Long qw(GetOptions :config no_ignore_case);
+use POSIX	qw(_exit);
 use File::Spec;
+use File::Temp qw(tempfile);
+use File::Path qw(make_path);
 use Mojo::JSON qw(decode_json encode_json);
 use Mojo::File;
 use List::Util qw(sum);
@@ -29,11 +67,16 @@ use Scalar::Util qw(looks_like_number);
 # Parse arguments
 # ---------------------------------------------------------------------------
 
-my ($opt_id, $opt_threshold, $opt_model_dir, $opt_data_dir, $opt_dry_run, $opt_help);
+my ($opt_analysis, $opt_thresholds, $opt_model_dir, $opt_data_dir, $opt_dry_run,
+    $opt_help, $opt_suppress, $opt_state_file, $opt_recovery, $opt_notify);
 
 GetOptions(
-	'analysis|a=s'    => \$opt_id,
-	'threshold|t=s'   => \$opt_threshold,
+	'analysis|a=s@'   => \$opt_analysis,
+	'threshold|t=s@'  => \$opt_thresholds,
+	'suppress|s=s'    => \$opt_suppress,
+	'state-file=s'    => \$opt_state_file,
+	'recovery|r'      => \$opt_recovery,
+	'notify-cmd=s'    => \$opt_notify,
 	'model-dir|m=s'   => \$opt_model_dir,
 	'data-dir|d=s'    => \$opt_data_dir,
 	'dry-run|n'       => \$opt_dry_run,
@@ -42,13 +85,64 @@ GetOptions(
 
 if ($opt_help) { usage(); exit 0 }
 
-unless (defined $opt_id && length $opt_id) {
+# Each --analysis is one saved analysis to check, so repeating it checks several
+# in one run.  A repeated id is one report rather than two, and the first one
+# given is the analysis a threshold without a prefix belongs to.
+my @analysis_ids;
+my %listed;
+for my $given (@{ $opt_analysis // [] }) {
+	my $id = defined $given ? $given : '';
+	$id =~ s/\A\s+//;
+	$id =~ s/\s+\z//;
+	next unless length $id;
+	push @analysis_ids, $id unless $listed{$id}++;
+}
+
+unless (@analysis_ids) {
 	warn "bi-alert: --analysis <id> is required\n";
 	exit 2;
 }
 
+# A delivery command is the one option whose absence is a decision of its own,
+# so an empty one is a mistake rather than a way to say "deliver nowhere".
+my $notify_cmd;
+if (defined $opt_notify) {
+	$notify_cmd = $opt_notify;
+	$notify_cmd =~ s/\A\s+|\s+\z//g;
+	unless (length $notify_cmd) {
+		warn "bi-alert: --notify-cmd must name a command to run\n";
+		exit 2;
+	}
+}
+
+# With a delivery command the run's output is collected rather than printed as
+# it is produced, so the command receives exactly what a wrapper would have
+# piped into it -- the digest and the verdict, in order.  The END block is what
+# prints it on a path that exits before delivery, such as a bad threshold.
+my $message   = '';
+my $buffering = 0;
+my $buffer_fh;
+start_buffering() if defined $notify_cmd;
+
 my $model_dir = $opt_model_dir // '.bi';
 my $data_dir  = $opt_data_dir  // 'data';
+
+# The throttle period, in seconds.  Absent or 0 means no throttling, which is
+# also when no state is kept at all.
+my $suppress = 0;
+if (defined $opt_suppress && length $opt_suppress) {
+	$suppress = parse_duration($opt_suppress);
+	unless (defined $suppress) {
+		warn "bi-alert: --suppress must be a duration such as 30m, 6h or 1d; got '$opt_suppress'\n";
+		exit 2;
+	}
+}
+
+# Where the throttle remembers what it has announced.  Model directory by
+# default, beside analyses.json, so a cron job and the web app share one home
+# for state; --state-file points it somewhere else, which is what a second
+# machine or a test wants.
+my $state_file = $opt_state_file // File::Spec->catfile($model_dir, 'alerts-state.json');
 
 # ---------------------------------------------------------------------------
 # Load analysis
@@ -72,208 +166,655 @@ if ($@ || !$analyses) {
 	exit 2;
 }
 
-my $a = $analyses->{$opt_id};
-unless (defined $a) {
-	warn "bi-alert: analysis '$opt_id' not found\n";
-	exit 2;
-}
-
 # ---------------------------------------------------------------------------
-# Open the primary dataset
+# Open each analysis's dataset and compute its measures
 # ---------------------------------------------------------------------------
 
-my @datasets = @{ $a->{datasets} // [] };
-unless (@datasets) {
-	warn "bi-alert: analysis '$opt_id' has no datasets\n";
-	exit 2;
-}
+# A group is one analysis: its digest, its rows, and the checks that name it.
+# Everything below works per group, so several analyses in one run are several
+# independent reports rather than one merged one.
+my @groups;
 
-my $spec = $datasets[0]{spec} // '';
-unless ($spec =~ /\A(?:table|path):/) {
-	warn "bi-alert: dataset spec '$spec' is not a local file spec\n";
-	exit 2;
-}
-
-my $file_path;
-if ($spec =~ /\Atable:(.+)\z/) {
-	my $table = $1;
-	for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db)) {
-		my $p = File::Spec->catfile($data_dir, "$table.$ext");
-		if (-f $p) { $file_path = $p; last }
+for my $id (@analysis_ids) {
+	my $a = $analyses->{$id};
+	unless (defined $a) {
+		warn "bi-alert: analysis '$id' not found\n";
+		exit 2;
 	}
-} elsif ($spec =~ /\Apath:(.+)\z/) {
-	$file_path = $1;
-}
 
-unless (defined $file_path && -f $file_path) {
-	warn "bi-alert: cannot locate data file for spec '$spec'\n";
-	exit 2;
-}
+	my @datasets = @{ $a->{datasets} // [] };
+	unless (@datasets) {
+		warn "bi-alert: analysis '$id' has no datasets\n";
+		exit 2;
+	}
 
-# Load records via Database::Abstraction through DataSource if available,
-# otherwise fall back to a simple CSV parse for the most common case.
-my ($records, $columns);
-eval {
-	require Database::BI::Model::DataSource;
-	my $src = Database::BI::Model::DataSource->new(
-		file   => $file_path,
-		table  => do { (my $t = $file_path) =~ s/.*\///; $t =~ s/\.[^.]+\z//; $t },
-		directory => do { (my $d = $file_path) =~ s|/[^/]+\z||; $d },
-	);
-	$records = $src->fetch_all // [];
-	$columns = $src->columns // [sort keys %{ $records->[0] // {} }];
-};
-if ($@) {
-	# Minimal CSV fallback so the script works even without the full stack.
-	eval { require Text::CSV_XS } or do { require Text::CSV };
-	my $csv_class = $INC{'Text/CSV_XS.pm'} ? 'Text::CSV_XS' : 'Text::CSV';
-	eval {
-		my $csv = $csv_class->new({ binary => 1, auto_diag => 1 });
-		open(my $fh, '<:utf8', $file_path) or die $!;
-		$columns = $csv->getline($fh);
-		$records = [];
-		while (my $row = $csv->getline($fh)) {
-			my %h;
-			@h{@$columns} = @$row;
-			push @$records, \%h;
+	my $spec = $datasets[0]{spec} // '';
+	unless ($spec =~ /\A(?:table|path):/) {
+		warn "bi-alert: dataset spec '$spec' is not a local file spec\n";
+		exit 2;
+	}
+
+	my $file_path;
+	if ($spec =~ /\Atable:(.+)\z/) {
+		my $table = $1;
+		for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db)) {
+			my $p = File::Spec->catfile($data_dir, "$table.$ext");
+			if (-f $p) { $file_path = $p; last }
 		}
-		close $fh;
+	}
+	elsif ($spec =~ /\Apath:(.+)\z/) {
+		$file_path = $1;
+	}
+
+	unless (defined $file_path && -f $file_path) {
+		warn "bi-alert: cannot locate data file for spec '$spec'\n";
+		exit 2;
+	}
+
+	# Load records via Database::Abstraction through DataSource if available,
+	# otherwise fall back to a simple CSV parse for the most common case.
+	my ($records, $columns);
+	eval {
+		require Database::BI::Model::DataSource;
+		my $src = Database::BI::Model::DataSource->new(
+			file   => $file_path,
+			table  => do { (my $t = $file_path) =~ s/.*\///; $t =~ s/\.[^.]+\z//; $t },
+			directory => do { (my $d = $file_path) =~ s|/[^/]+\z||; $d },
+		);
+		$records = $src->fetch_all // [];
+		$columns = $src->columns // [sort keys %{ $records->[0] // {} }];
 	};
 	if ($@) {
-		warn "bi-alert: cannot read data file '$file_path': $@\n";
-		exit 2;
-	}
-}
-
-my $row_count = scalar @$records;
-
-# ---------------------------------------------------------------------------
-# Evaluate measures (Phase 2 vocabulary: sum avg min max count count_distinct)
-# ---------------------------------------------------------------------------
-
-# Build a simple measure result hashref keyed by alias.
-my @measures = @{ $a->{measures} // [] };
-
-# Pull measures from visuals if not at top level.
-unless (@measures) {
-	for my $vis (@{ $a->{visuals} // [] }) {
-		push @measures, @{ $vis->{measures} // [] };
-	}
-}
-
-my %results;
-for my $m (@measures) {
-	my $col   = $m->{col}  // $m->{column} // '';
-	my $fn    = $m->{fn}   // $m->{func}   // 'count';
-	my $alias = $m->{as}   // $m->{alias}  // "${col}_${fn}";
-	next unless length $alias;
-
-	my @vals = map { $_->{$col} } @$records;
-
-	if ($fn eq 'count') {
-		$results{$alias} = scalar @$records;
-	} elsif ($fn eq 'count_distinct') {
-		my %seen;
-		$results{$alias} = scalar grep { !$seen{$_}++ } @vals;
-	} else {
-		my @nums = grep { defined $_ && looks_like_number($_) } @vals;
-		if ($fn eq 'sum') {
-			$results{$alias} = @nums ? sum(@nums) : 0;
-		} elsif ($fn eq 'avg') {
-			$results{$alias} = @nums ? sum(@nums) / scalar(@nums) : 0;
-		} elsif ($fn eq 'min') {
-			if (@nums) {
-				my $v = $nums[0]; $v = $_ < $v ? $_ : $v for @nums;
-				$results{$alias} = $v;
+		# Minimal CSV fallback so the script works even without the full stack.
+		eval { require Text::CSV_XS } or do { require Text::CSV };
+		my $csv_class = $INC{'Text/CSV_XS.pm'} ? 'Text::CSV_XS' : 'Text::CSV';
+		eval {
+			my $csv = $csv_class->new({ binary => 1, auto_diag => 1 });
+			open(my $fh, '<:utf8', $file_path) or die $!;
+			$columns = $csv->getline($fh);
+			$records = [];
+			while (my $row = $csv->getline($fh)) {
+				my %h;
+				@h{@$columns} = @$row;
+				push @$records, \%h;
 			}
-		} elsif ($fn eq 'max') {
-			if (@nums) {
-				my $v = $nums[0]; $v = $_ > $v ? $_ : $v for @nums;
-				$results{$alias} = $v;
+			close $fh;
+		};
+		if ($@) {
+			warn "bi-alert: cannot read data file '$file_path': $@";
+			exit 2;
+		}
+	}
+
+	my $row_count = scalar @$records;
+
+	# Evaluate measures (sum avg min max count count_distinct)
+	my @measures = @{ $a->{measures} // [] };
+
+	# Pull measures from visuals if not at top level.
+	unless (@measures) {
+		for my $vis (@{ $a->{visuals} // [] }) {
+			push @measures, @{ $vis->{measures} // [] };
+		}
+	}
+
+	my %results;
+	for my $m (@measures) {
+		my $col   = $m->{col}  // $m->{column} // '';
+		my $fn    = $m->{fn}   // $m->{func}   // 'count';
+		my $alias = $m->{as}   // $m->{alias}  // "${col}_${fn}";
+		next unless length $alias;
+
+		my @vals = map { $_->{$col} } @$records;
+
+		if ($fn eq 'count') {
+			$results{$alias} = scalar @$records;
+		} elsif ($fn eq 'count_distinct') {
+			my %seen;
+			$results{$alias} = scalar grep { !$seen{$_}++ } @vals;
+		} else {
+			my @nums = grep { defined $_ && looks_like_number($_) } @vals;
+			if ($fn eq 'sum') {
+				$results{$alias} = @nums ? sum(@nums) : 0;
+			} elsif ($fn eq 'avg') {
+				$results{$alias} = @nums ? sum(@nums) / scalar(@nums) : 0;
+			} elsif ($fn eq 'min') {
+				if (@nums) {
+					my $v = $nums[0]; $v = $_ < $v ? $_ : $v for @nums;
+					$results{$alias} = $v;
+				}
+			} elsif ($fn eq 'max') {
+				if (@nums) {
+					my $v = $nums[0]; $v = $_ > $v ? $_ : $v for @nums;
+					$results{$alias} = $v;
+				}
 			}
 		}
 	}
-}
 
-# Also add a 'count' shortcut for the total rows.
-$results{count} //= $row_count;
+	# Also add a 'count' shortcut for the total rows.
+	$results{count} //= $row_count;
 
-# ---------------------------------------------------------------------------
-# Print digest
-# ---------------------------------------------------------------------------
-
-print "Analysis: ${\$a->{name}}\n";
-print "Rows:     $row_count\n";
-if (%results) {
-	print "Measures:\n";
-	for my $k (sort keys %results) {
-		my $v = defined $results{$k} ? $results{$k} : '(null)';
-		print "  $k = $v\n";
-	}
-} else {
-	print "No measures configured.\n";
+	push @groups, {
+		id      => $id,
+		name    => $a->{name} // '',
+		rows    => $row_count,
+		results => \%results,
+		checks  => [],
+	};
 }
 
 # ---------------------------------------------------------------------------
-# Evaluate threshold
+# Pair every threshold with its analysis
 # ---------------------------------------------------------------------------
 
-my $threshold_crossed = 0;
+# One threshold is one (analysis, measure, comparison, value).  The analysis is
+# the prefix when the spec has one, otherwise the first --analysis, which is
+# what keeps a single-analysis command line exactly as it was.
+my %by_id = map { $_->{id} => $_ } @groups;
+my $multi = @groups > 1;
+my %seen_check;
 
-if (defined $opt_threshold && length $opt_threshold) {
-	unless ($opt_threshold =~ /\A([^:]+):([^:]+):(.+)\z/) {
-		warn "bi-alert: --threshold must be <measure>:<op>:<value> (e.g. count:gt:1000)\n";
+my %ops = (
+	gt => sub { $_[0] >  $_[1] },
+	ge => sub { $_[0] >= $_[1] },
+	lt => sub { $_[0] <  $_[1] },
+	le => sub { $_[0] <= $_[1] },
+	eq => sub { $_[0] == $_[1] },
+	ne => sub { $_[0] != $_[1] },
+);
+
+for my $given (@{ $opt_thresholds // [] }) {
+	my $text = defined $given ? $given : '';
+	$text =~ s/\A\s+//;
+	$text =~ s/\s+\z//;
+	next unless length $text;
+
+	my ($owner, $alias, $op, $tval);
+
+	# The four-field form names its analysis.  An alias that happens to read
+	# like a saved analysis id would be read as a prefix, which is why the
+	# prefix is the documented spelling and ids are not measures.
+	if ($text =~ /\A([^:]+):([^:]+):([^:]+):(.+)\z/ && $analyses->{$1}) {
+		($owner, $alias, $op, $tval) = ($1, $2, $3, $4);
+		unless ($by_id{$owner}) {
+			warn "bi-alert: threshold '$text' names analysis '$owner', which is not given with --analysis\n";
+			exit 2;
+		}
+	}
+	elsif ($text =~ /\A([^:]+):([^:]+):(.+)\z/) {
+		($owner, $alias, $op, $tval) = ($analysis_ids[0], $1, $2, $3);
+	}
+	else {
+		warn "bi-alert: --threshold must be <measure>:<op>:<value> (e.g. count:gt:1000)"
+			. ", or <analysis>:<measure>:<op>:<value>\n";
 		exit 2;
 	}
-	my ($alias, $op, $tval) = ($1, $2, $3);
-	my $actual = $results{$alias};
-	unless (defined $actual) {
-		warn "bi-alert: measure alias '$alias' not found in results\n";
-		exit 2;
-	}
-	my %ops = (
-		gt => sub { $_[0] >  $_[1] },
-		ge => sub { $_[0] >= $_[1] },
-		lt => sub { $_[0] <  $_[1] },
-		le => sub { $_[0] <= $_[1] },
-		eq => sub { $_[0] == $_[1] },
-		ne => sub { $_[0] != $_[1] },
-	);
+
 	unless (exists $ops{$op}) {
 		warn "bi-alert: unsupported operator '$op'; allowed: gt ge lt le eq ne\n";
 		exit 2;
 	}
-	if ($ops{$op}->($actual, $tval)) {
-		$threshold_crossed = 1;
-		print "THRESHOLD CROSSED: $alias ($actual) $op $tval\n";
-	} else {
-		print "Threshold not crossed: $alias ($actual) $op $tval\n";
+
+	my $group = $by_id{$owner};
+	unless (defined $group->{results}{$alias}) {
+		warn "bi-alert: measure alias '$alias' not found in analysis '$owner'\n";
+		exit 2;
+	}
+
+	# The same pair written twice is one check, not a request to be told
+	# twice: repeating the option is how a command line grows.
+	my $pair = "$owner|$alias:$op:$tval";
+	next if $seen_check{$pair}++;
+
+	push @{ $group->{checks} }, { alias => $alias, op => $op, value => $tval };
+}
+
+# ---------------------------------------------------------------------------
+# Report each analysis, then each of its thresholds
+# ---------------------------------------------------------------------------
+
+# BI_ALERT_NOW replaces the clock, so a test can step over a suppression period
+# without sleeping through it; unset, empty or unreadable means now.
+my $now = (defined $ENV{BI_ALERT_NOW} && $ENV{BI_ALERT_NOW} =~ /\A\d+\z/)
+	? $ENV{BI_ALERT_NOW} + 0
+	: time();
+
+# --recovery needs the state file with or without a period: the entry is the
+# record of a crossing that was announced, and so the only thing that can say an
+# incident has ended.
+my $in_use  = $suppress > 0 || $opt_recovery || -f $state_file;
+my $state   = $in_use ? load_state($state_file) : { version => 1, alerts => {} };
+my $changed = 0;
+my (@crossings, @recoveries);
+
+for my $group (@groups) {
+	my $id  = $group->{id};
+	my $who = $multi ? "[$id] " : '';
+	my $tag = $multi ? " ($id)" : '';
+
+	print "Analysis: $group->{name}$tag\n";
+	print "Rows:     $group->{rows}\n";
+	if (%{ $group->{results} }) {
+		print "Measures:\n";
+		for my $k (sort keys %{ $group->{results} }) {
+			my $v = defined $group->{results}{$k} ? $group->{results}{$k} : '(null)';
+			print "  $k = $v\n";
+		}
+	}
+	else {
+		print "No measures configured.\n";
+	}
+
+	for my $check (@{ $group->{checks} }) {
+		my ($alias, $op, $tval) = @{$check}{qw(alias op value)};
+		my $actual = $group->{results}{$alias};
+
+		# One alert is one (analysis, threshold) pair, so a second threshold on
+		# the same analysis -- and the same threshold on another one -- is
+		# throttled, recovered and delivered on a schedule of its own.
+		my $key   = join('|', $id, "$alias:$op:$tval");
+		my $entry = $state->{alerts}{$key};
+
+		if ($ops{$op}->($actual, $tval)) {
+			my $last_alert = $entry ? ($entry->{last_alert} // 0) : 0;
+
+			# Announced unless this crossing was already announced inside the
+			# period.  The comparison is on elapsed seconds, so a run a minute
+			# early is still a repeat and a run after the period is news again.
+			if (!$suppress || !$last_alert || $now - $last_alert >= $suppress) {
+				my $verdict = "THRESHOLD CROSSED: $who$alias ($actual) $op $tval";
+				print "$verdict\n";
+				push @crossings, $verdict;
+				print "Repeats of this threshold are suppressed for $opt_suppress.\n"
+					if $suppress;
+				if ($in_use) {
+					$state->{alerts}{$key} = {
+						since      => ($entry && ($entry->{since} // 0)) ? $entry->{since} : $now,
+						last_alert => $now,
+						value      => $actual,
+					};
+					$changed = 1;
+				}
+			}
+			else {
+				# Crossed, and already announced: say what is going on and stay
+				# quiet.  This is the run that must not send a mail, so it exits 0
+				# -- nothing is being announced -- and prints no CROSSED line for
+				# a wrapper to key on.
+				print "THRESHOLD SUPPRESSED: $who$alias ($actual) $op $tval; last alert "
+					. _iso($last_alert) . ', next alert after '
+					. _iso($last_alert + $suppress) . "\n";
+			}
+		}
+		else {
+			print "Threshold not crossed: $who$alias ($actual) $op $tval\n";
+
+			# Cleared.  Finding an entry is what makes this run the end of an
+			# incident rather than the first sight of a threshold that was never
+			# crossed, which is why the recovery is said once and only for a
+			# crossing somebody was told about.  The entry goes either way, so the
+			# next crossing alerts immediately instead of waiting out a period
+			# that belongs to an incident that is over.
+			if ($entry) {
+				my $since = $entry->{since} // 0;
+				if ($opt_recovery) {
+					my $verdict = "THRESHOLD RECOVERED: $who$alias ($actual) $op $tval";
+					print "$verdict; crossed since " . _iso($since)
+						. ', cleared ' . _iso($now) . "\n";
+					push @recoveries, $verdict;
+				}
+				else {
+					print "THRESHOLD CLEARED: $who$alias ($actual) $op $tval; crossed since "
+						. _iso($since) . "\n";
+				}
+				delete $state->{alerts}{$key};
+				$changed = 1;
+			}
+		}
 	}
 }
 
-my $exit_code = $threshold_crossed ? 1 : 0;
-exit $exit_code;
+# Delivery is the only thing that leaves the machine, so it runs once the words
+# are final and before the throttle is written: a crossing nobody was told
+# about is not one the throttle may forget.  One run is one delivery, however
+# many checks it announced, so a cron line that checks twenty thresholds does
+# not send twenty mails.
+my $delivery_failed = 0;
+my @announced       = (@crossings, @recoveries);
+if (defined $notify_cmd && @announced) {
+	if ($opt_dry_run) {
+		print "Notify: would run '$notify_cmd' (--dry-run)\n";
+	}
+	else {
+		# BI_ALERT_EVENT names the more urgent of the two: a crossing means
+		# something is wrong now, a recovery means something stopped being
+		# wrong, and a run that has both is a run with a problem in it.
+		my $event = @crossings ? 'crossed' : 'recovery';
+		my @parts;
+		push @parts, sprintf('%d threshold crossing%s',
+			scalar @crossings, @crossings == 1 ? '' : 's') if @crossings;
+		push @parts, sprintf('%d recover%s',
+			scalar @recoveries, @recoveries == 1 ? 'y' : 'ies') if @recoveries;
+		my $subject = @announced == 1 ? $announced[0] : join(', ', @parts);
+		$delivery_failed = 1
+			unless deliver($notify_cmd, $event, $subject);
+	}
+}
+
+# A dry run reports what would happen and leaves the throttle where it was, so
+# running one cannot use up the alert a later real run depends on.  A delivery
+# that failed is the same case in another form: the alert has not reached
+# anybody yet, so recording it would spend the period on nothing.
+save_state($state_file, $state)
+	if $changed && $in_use && !$opt_dry_run && !$delivery_failed;
+
+# A recovery is a third answer, not an error: 3 is what lets a wrapper send the
+# all-clear, which 0 cannot do -- a wrapper keyed on a non-zero status would
+# also fire on every suppressed repeat -- and it leaves 1 meaning exactly "a
+# crossing was announced just now".  When one run announces both, 1 wins: a
+# threshold that is still crossed is not outranked by an all-clear elsewhere.
+
+# Anything still buffered is printed here rather than by the END block, so the
+# output order is the one the run produced.
+flush_output();
+
+exit(@crossings ? 1 : @recoveries ? 3 : 0);
 
 # ---------------------------------------------------------------------------
 
 sub usage {
 	print <<'USAGE';
-Usage: bi-alert --analysis <id> [OPTIONS]
+Usage: bi-alert --analysis <id> [--analysis <id> ...] [OPTIONS]
 
-  --analysis, -a <id>           Analysis id (required)
-  --threshold, -t <m>:<op>:<v>  Threshold: measure alias, operator (gt|ge|lt|le|eq|ne), value
+  --analysis, -a <id>           Analysis id; required, and repeatable: each one
+                                is reported in full
+  --threshold, -t <m>:<op>:<v>  Threshold: measure alias, operator (gt|ge|lt|le|eq|ne), value.
+                                Repeatable; prefix it with <analysis>: to check
+                                an analysis other than the first
+  --suppress,  -s <duration>    Announce a threshold at most once per period
+                                (30, 30s, 15m, 6h, 2d, 1w; default: no throttling)
+  --state-file <path>           Where the throttle remembers its last alert
+                                (default: <model-dir>/alerts-state.json)
+  --recovery,  -r               Announce the end of a crossing as well as its
+                                start: THRESHOLD RECOVERED, exit 3
+  --notify-cmd <command>        Run this command when an alert or a recovery is
+                                announced, instead of a shell wrapper around
+                                this script; it gets the run's text on STDIN
   --model-dir, -m <dir>         Model directory containing analyses.json (default: .bi)
   --data-dir,  -d <dir>         Data directory (default: data)
-  --dry-run,   -n               Accepted for compatibility; nothing is ever sent
+  --dry-run,   -n               Report only: no digest is recorded against the
+                                throttle and --notify-cmd is not run
   --help,      -h               Show this help
 
 Exit codes:
-  0  OK; threshold not crossed
-  1  Threshold crossed
+  0  OK; nothing announced -- not crossed, or crossed and already announced
+  1  A threshold crossed, and is announced
   2  Error
+  3  A crossing that was announced has ended, and is announced as a recovery
 
-The digest goes to STDOUT and nothing is sent anywhere, so --dry-run has no
-delivery to suppress.  Pipe STDOUT into mail, curl or a ticket creator if the
-alert has to leave the machine.
+Both options may be given more than once, so one run can watch several saved
+analyses and several measures.  A threshold with no analysis prefix belongs to
+the first --analysis, and <analysis>:<measure>:<op>:<value> names another one of
+those listed.  Each (analysis, threshold) pair is a check of its own: it gets
+its own line in the report, its own entry in the state file, its own throttle
+period and its own recovery.  One crossing neither silences nor recovers
+another, so a run that watches twenty thresholds reports exactly what each of
+them is doing.
+
+  bi-alert --analysis abc123 --analysis def456 \
+           --threshold count:gt:1000 --threshold def456:sum:lt:50 \
+           --suppress 1h --recovery
+
+A run that announces both a crossing and a recovery exits 1: a threshold that
+is still crossed is the more urgent news, and 3 keeps meaning "an all-clear and
+nothing else".
+
+The digest goes to STDOUT and nothing leaves the machine until you say where.
+Pipe STDOUT into mail, curl or a ticket creator if the alert has to travel, or
+let --notify-cmd run that for you:
+
+  bi-alert --analysis abc123 --threshold count:gt:1000 --suppress 1h \
+           --notify-cmd 'mail -s "$BI_ALERT_SUBJECT" oncall@example.com'
+
+The command runs through the shell, exactly once per run, and only when
+something is announced: a crossing (exit 1), or a recovery with -r (exit 3).  A
+suppressed repeat, a threshold that is not crossed, an error and a --dry-run run
+it not at all, so it never says the same thing twice, and twenty checks still
+send one mail.  The whole run's text arrives on STDIN, and three variables say
+what it is:
+
+  BI_ALERT_EVENT         crossed if any crossing was announced, else recovery
+  BI_ALERT_SUBJECT       the verdict line when one thing was announced, else a
+                         count (2 threshold crossings, 1 recovery)
+  BI_ALERT_MESSAGE_FILE  the same text in a file, for a command that cannot
+                         read STDIN: curl -d @$BI_ALERT_MESSAGE_FILE ...
+
+A delivery that fails is reported on STDERR and the exit status stays what it
+would have been, but the crossing is not written to the state file: the alert
+has not reached anybody, so the next run announces it again rather than losing
+it for the whole period.
+
+Cron every five minutes, mailing only what is announced (exit 1) or an error
+(exit 2), with an hourly ceiling on repeats.  Add -r to that line and the same
+mail carries the recoveries (exit 3) when thresholds clear:
+
+  */5 * * * * cd /path/to/app && ./script/bi-alert --analysis abc123 \
+      --analysis def456 --threshold count:gt:1000 \
+      --threshold def456:sum:lt:50 --suppress 1h --recovery \
+      --notify-cmd 'mail -s "$BI_ALERT_SUBJECT" oncall@example.com'
+
+Without --notify-cmd the same line needs a wrapper to pipe STDOUT into mail:
+
+  */5 * * * * cd /path/to/app && out=$(./script/bi-alert --analysis abc123 \
+      --threshold count:gt:1000 --suppress 1h 2>&1) \
+      || printf '%s\n' "$out" | mail -s 'bi-alert' you
+
+A run inside the period says THRESHOLD SUPPRESSED and exits 0, so a wrapper
+keyed on the exit status stays quiet; THRESHOLD CLEARED, also exit 0, is said
+once when the crossing ends.  The state file is one small JSON object, keyed by
+analysis and threshold; delete it to make every threshold alert again.
+
+With --recovery that ending is announced instead of merely reported: the run
+prints THRESHOLD RECOVERED and exits 3, so the wrapper above -- which mails on
+any non-zero status -- mails the all-clear as well as the alert, and a wrapper
+that should not is a wrapper that does not pass --recovery.  It is said once per
+crossing, and only for a crossing that was announced, because the state file is
+what remembers it; that is also why --recovery keeps the state file even with no
+--suppress.
 USAGE
+}
+
+# start_buffering() -> $bool
+#
+# Sends everything the run prints into $message instead of STDOUT, so the
+# delivery command reads the digest and the verdict as one text.  Nothing is
+# lost when a run exits before delivery: flush_output() is called on the way
+# out, and the END block is there for the paths that exit without reaching it.
+sub start_buffering {
+	return 1 if $buffering;
+	open(my $fh, '>', \$message) or return 0;
+	$buffer_fh = $fh;
+	select($buffer_fh);
+	$buffering = 1;
+	return 1;
+}
+
+# flush_output() -> ()
+#
+# Puts STDOUT back and prints what was collected.  Safe to call when nothing
+# was collected, and safe to call twice, so every exit path can call it.
+sub flush_output {
+	return unless $buffering;
+	select(STDOUT);
+	$buffering = 0;
+	# STDOUT is a pipe under cron, so the buffer has to be pushed out here
+	# rather than at exit: a warning on STDERR must not arrive before the
+	# digest it belongs under, and a delivery command's own output must not
+	# arrive before the text it was handed.
+	$| = 1;
+	print $message;
+	return;
+}
+
+END { flush_output() }
+
+# deliver($command, $event, $verdict) -> $bool
+#
+# Runs the delivery command once, with the run's text as its STDIN, and returns
+# whether it succeeded.  The text is in a temporary file as well, because a
+# command that posts a body (curl -d @file) needs the file, not the stream; the
+# file's path, the event and the verdict are in the environment for the same
+# reason.  Failure is reported here and turned into "not delivered" by the
+# caller, which then leaves the throttle alone.
+sub deliver {
+	my ($command, $event, $verdict) = @_;
+
+	# The announcement is complete by the time this is called.  Printing it
+	# first keeps the run's own output in the order it was produced, and it
+	# means the command's own output cannot land in the message.
+	flush_output();
+
+	my ($fh, $file) = eval { tempfile(DIR => File::Spec->tmpdir, UNLINK => 0) };
+	unless ($fh) {
+		warn "bi-alert: cannot write a message file for --notify-cmd: " . ($@ // $!) . "\n";
+		return 0;
+	}
+
+	my $written = print {$fh} $message;
+	close $fh;
+	unless ($written) {
+		warn "bi-alert: cannot write the message to '$file': $!\n";
+		unlink $file;
+		return 0;
+	}
+
+	# The command is given a process of its own rather than a shell redirect
+	# appended to its text: a redirect written after "cmd1; cmd2" would land on
+	# cmd2 alone, and every command in the string has to see the same message.
+	# exec takes the shell only when the text needs one, exactly as system does.
+	my $status = -1;
+	{
+		local $ENV{BI_ALERT_EVENT}        = $event;
+		local $ENV{BI_ALERT_SUBJECT}      = $verdict;
+		local $ENV{BI_ALERT_MESSAGE_FILE} = $file;
+
+		my $pid = fork;
+		if (!defined $pid) {
+			warn "bi-alert: cannot fork for --notify-cmd: $!\n";
+		}
+		elsif ($pid == 0) {
+			open(STDIN, '<', $file) or _exit(127);
+			# Through a shell always, so the option means one thing: the command a
+			# cron line would have written in place of this script, builtins and
+			# all.  exec() as a list never re-parses its arguments.
+			if ($^O eq 'MSWin32') {
+				exec($ENV{COMSPEC} || 'cmd.exe', '/c', $command) or _exit(127);
+			}
+			exec('/bin/sh', '-c', $command) or _exit(127);
+		}
+		else {
+			waitpid($pid, 0);
+			$status = $?;
+		}
+	}
+	unlink $file;
+
+	return 1 if $status == 0;
+
+	my $why = $status == -1       ? 'cannot run it'
+		: ($status & 127)     ? 'killed by signal ' . ($status & 127)
+		: 'exit ' . ($status >> 8);
+	warn "bi-alert: --notify-cmd failed ($why); the alert is not recorded, so the next run announces it again\n";
+	return 0;
+}
+
+# parse_duration($text) -> $seconds | undef
+#
+# "30", "30s", "15m", "6h", "2d", "1w".  A bare number is seconds, so a cron
+# line can say --suppress 3600 without a unit.  Anything else is undef, which
+# the caller turns into an error rather than a silent default.
+sub parse_duration {
+	my $text = shift;
+	return undef unless defined $text && length $text;
+	my ($value, $unit) = $text =~ /\A\s*(\d+(?:\.\d+)?)\s*([smhdw]?)\s*\z/i;
+	return undef unless defined $value;
+	my %seconds = ('' => 1, s => 1, m => 60, h => 3_600, d => 86_400, w => 604_800);
+	return $value * $seconds{ lc $unit } + 0;
+}
+
+# _iso($epoch) -> 'YYYY-MM-DDTHH:MM:SSZ'
+#
+# UTC, so a state file written by a machine in one zone reads the same in
+# another, whatever TZ the cron job runs under.
+sub _iso {
+	my @t = gmtime($_[0] // 0);
+	return sprintf '%04d-%02d-%02dT%02d:%02d:%02dZ', $t[5] + 1900, $t[4] + 1, @t[3, 2, 1, 0];
+}
+
+# load_state($path) -> \%state
+#
+# The throttle's memory: which thresholds were announced, when, and since when
+# they have been crossed.  A file that cannot be read or parsed is reported on
+# STDERR and treated as empty, so a damaged state file costs one repeated alert
+# rather than a run that never alerts again.
+sub load_state {
+	my $path = shift;
+	my %empty = (version => 1, alerts => {});
+	return \%empty unless -f $path;
+
+	my $json = eval { Mojo::File->new($path)->slurp };
+	unless (defined $json && !$@) {
+		warn "bi-alert: cannot read state file '$path': " . ($@ // $!) . "\n";
+		return \%empty;
+	}
+
+	my $state = eval { decode_json($json) };
+	unless (ref $state eq 'HASH' && ref $state->{alerts} eq 'HASH') {
+		warn "bi-alert: state file '$path' is not a throttle state file; starting from nothing\n";
+		return \%empty;
+	}
+	return $state;
+}
+
+# save_state($path, \%state) -> $bool
+#
+# Written through a temporary file in the same directory and renamed into place,
+# as the web application writes its own state files: two cron runs that overlap,
+# or one that dies mid-write, cannot leave a half-written file for the next run
+# to read.  A write that fails is reported and returns false; the alert has
+# already been announced by then, and the next run repeats it rather than losing
+# it.
+sub save_state {
+	my ($path, $state) = @_;
+
+	my (undef, $dirs) = File::Spec->splitpath($path);
+	my $dir = length $dirs ? $dirs : '.';
+	unless (-d $dir) {
+		eval { make_path($dir) };
+		unless (-d $dir) {
+			warn "bi-alert: cannot create state directory '$dir': " . ($@ // $!) . "\n";
+			return 0;
+		}
+	}
+
+	my ($fh, $tmp) = eval { tempfile(DIR => $dir, UNLINK => 0) };
+	unless ($fh) {
+		warn "bi-alert: cannot write a state file in '$dir': " . ($@ // $!) . "\n";
+		return 0;
+	}
+
+	my $ok = eval {
+		print {$fh} encode_json($state);
+		close $fh;
+		rename($tmp, $path) or die "rename $tmp to $path: $!\n";
+		1;
+	};
+	unless ($ok) {
+		warn "bi-alert: cannot write state file '$path': " . ($@ // $!) . "\n";
+		close $fh if defined $fh;
+		unlink $tmp if defined $tmp;
+		return 0;
+	}
+	return 1;
 }

@@ -1,5 +1,15 @@
 Revision history for Perl extension App-nup
 
+1.09 2026-10-29T06:30:12Z
+
+    - Add --runin, --runout and --runlen, given to ansicolumn in place
+      of the values in ~/.ansicolumnrc
+    - Add mdcat --ansi to the default aliases, so that mdcat keeps its
+      colors in nup
+    - Document that options after the file names go to ansicolumn,
+      and that COLUMNS and LINES are used without a terminal
+    - Add Homebrew installation instructions
+
 1.08 2026-07-24T00:38:07Z
 
     - Add NUP_PAGE_PAGER environment variable, used in place of

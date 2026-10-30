@@ -1,0 +1,19 @@
+title: after a hall stop and start a numbered slot still has its session
+model:
+  rules:
+    Merke dir Birnenkuchen.: { answer: "Gemerkt." }
+    Was war es?: { answer: "Birnenkuchen." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - spawn: { name: 1testie, mission: "Merke dir Birnenkuchen.", as: before }
+  - done: { run: before, status: completed, binding: 'slot:1testie' }
+  - idle: {}
+  - expect_file: { path: .raider-hall/state/sessions.json, like: 'slot:1testie' }
+  - restart_hall: {}
+  - spawn: { name: 1testie, mission: "Was war es?", as: after }
+  - done: { run: after, status: completed, response_like: 'Birnenkuchen', binding: 'slot:1testie', session: { same_as: before } }
+  - idle: {}
+  - expect_journals:
+      count: 1
+      prompts:
+        - [ "Merke dir Birnenkuchen.", "Was war es?" ]

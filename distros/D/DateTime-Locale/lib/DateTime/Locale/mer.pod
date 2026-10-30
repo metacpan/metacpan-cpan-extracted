@@ -435,6 +435,24 @@ Meru locale.
    1995-12-22T09:05:02 = NK 1995 DEC 22, WTN
   -0010-09-15T04:44:23 = MK -10 SPT 15, JUM
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = NK 2008 Feburuarĩ
+   1995-12-22T09:05:02 = NK 1995 Dicemba
+  -0010-09-15T04:44:23 = MK -10 Septemba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = NK 2008 Feburuarĩ 5, WAI
+   1995-12-22T09:05:02 = NK 1995 Dicemba 22, WTN
+  -0010-09-15T04:44:23 = MK -10 Septemba 15, JUM
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = NK 2008 Feburuarĩ 5
+   1995-12-22T09:05:02 = NK 1995 Dicemba 22
+  -0010-09-15T04:44:23 = MK -10 Septemba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = NK 2008 FEB 5

@@ -31,18 +31,23 @@ for my $method (qw(pearson spearman kendall)) {
 	}
 }
 
-# an undef first argument is still positional x, so its message is unchanged
+# an undef first argument is still positional x, so its message is unchanged.
+# Each is an error in the call, so it is the help screen, then the error on the
+# last line.
+sub screen_then { my ($msg) = @_; qr/\Ausage: cor_test\(.*\n\ncor_test: error: \Q$msg\E\n\z/s }
 my %croak = (
-	'no arguments'           => [ [], qr/^cor_test: both x and y are required/ ],
-	'named, y missing'       => [ [ x => \@x ], qr/^cor_test: both x and y are required/ ],
-	'named, x missing'       => [ [ y => \@y, method => 'kendall' ], qr/^cor_test: both x and y are required/ ],
-	'positional, y missing'  => [ [ \@x ], qr/^Usage: cor_test/ ],
-	'named, odd pair count'  => [ [ x => \@x, y => \@y, 'method' ], qr/^Usage: cor_test/ ],
-	'positional, odd count'  => [ [ \@x, \@y, 'method' ], qr/^Usage: cor_test/ ],
-	'named, x not an array'  => [ [ x => 'abc', y => \@y ], qr/^cor_test: x and y must be array references/ ],
-	'undef x is positional'  => [ [ undef, \@y ], qr/^cor_test: x and y must be array references/ ],
-	'named, unknown key'     => [ [ x => \@x, y => \@y, z => 1 ], qr/^cor_test: unknown argument 'z'/ ],
-	'positional, x as a key' => [ [ \@x, \@y, x => \@x ], qr/^cor_test: unknown argument 'x'/ ],
+	'no arguments'           => [ [], screen_then('both x and y are required') ],
+	'named, y missing'       => [ [ x => \@x ], screen_then('both x and y are required') ],
+	'named, x missing'       => [ [ y => \@y, method => 'kendall' ], screen_then('both x and y are required') ],
+	'positional, y missing'  => [ [ \@x ], screen_then('both x and y are required') ],
+	'named, odd pair count'  => [ [ x => \@x, y => \@y, 'method' ], screen_then('options must be key => value pairs') ],
+	'positional, odd count'  => [ [ \@x, \@y, 'method' ], screen_then('options must be key => value pairs') ],
+	'named, x not an array'  => [ [ x => 'abc', y => \@y ], screen_then('x and y must be array references') ],
+	'undef x is positional'  => [ [ undef, \@y ], screen_then('x and y must be array references') ],
+	'named, unknown key'     => [ [ x => \@x, y => \@y, z => 1 ], screen_then("unknown argument 'z'") ],
+	'positional, x as a key' => [ [ \@x, \@y, x => \@x ], screen_then("unknown argument 'x'") ],
+	'unknown method'         => [ [ \@x, \@y, method => 'pearsn' ],
+		screen_then("unknown method 'pearsn': must be 'pearson', 'kendall', or 'spearman'") ],
 );
 for my $name (sort keys %croak) {
 	my ($args, $re) = @{ $croak{$name} };

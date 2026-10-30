@@ -63,7 +63,7 @@ my $result = eval {
         # Brand demo: if the sender delegated a key via a dkim2test._domainkey
         # CNAME, originate a two-signature message; otherwise fresh + error body.
         # brand-nd uses the nd= "imaginary hop" encoding on the i=1 brand hop
-        # instead of mf=/rt= (-07 §12.3).
+        # instead of mf=/rt= (-08 §12.3).
         my $bd = $sender; $bd =~ s/.*\@//;
         my $delegated = Mail::DKIM2::Reflector::_dkim2test_cname_ok($bd);
         my $msg = Mail::DKIM2::Reflector::generate_brand(
@@ -81,7 +81,7 @@ my $result = eval {
     } elsif ($mode eq 'dsn') {
         # Return a DKIM2-signed Delivery Status Notification to the sender --
         # only for a Provisionally Verified message whose top mf= is not <>
-        # (-07 section 16). Otherwise nothing is sent.
+        # (-08 section 16). Otherwise nothing is sent.
         my ($msg, $why) = Mail::DKIM2::Reflector::generate_dsn(
             sender   => $sender,
             message  => $message,

@@ -11,7 +11,8 @@ use Test::Exception;
 # write_table's .xlsx output is built entirely in XS (no CPAN deps): the table
 # is packed into a STORED ZIP of hand-written XML parts, and the provenance line
 # is stored in the workbook's document "comments" property (dc:description in
-# docProps/core.xml). We verify it two ways: by reading the workbook back with
+# docProps/core.xml), followed by the user, host, perl and Stats::LikeR version,
+# with the login name as the author (dc:creator, cp:lastModifiedBy). We verify it two ways: by reading the workbook back with
 # read_table (which is itself dependency-free), and by pulling docProps/core.xml
 # out with the core IO::Uncompress::Unzip to inspect the properties.
 
@@ -106,7 +107,7 @@ sub member {
 
 # provenance lands in the document "comments" property
 SKIP: {
-	skip 'IO::Uncompress::Unzip (core) not available', 4 unless $have_unzip;
+	skip 'IO::Uncompress::Unzip (core) not available', 9 unless $have_unzip;
 
 	my $f = xlsx_path();
 	write_table([{ a => 1, b => 2 }], $f, 'row_names' => 0,
@@ -118,6 +119,19 @@ SKIP: {
 		'the provenance line is stored as the document comments (dc:description)' );
 	like( $core, qr{batch 9}s,
 		'a user-supplied xlsx_comment is appended after the provenance' );
+
+	# user, host, perl and module version follow the "written by" line, in that
+	# order, and precede xlsx_comment; the author fields carry the login name
+	my ($user, $lines) = Stats::LikeR::_xlsx_provenance();
+	my $perl = sprintf 'v%vd', $^V;
+	like( $core, qr{<dc:description>written by [^\n]*\n\Q$lines\E\nbatch 9</dc:description>}s,
+		'user, host, perl and Stats::LikeR version sit between the provenance and xlsx_comment' );
+	like( $lines, qr{(?:^|\n)perl: \Q$perl\E\n}, 'the perl version is recorded as v5.x.y' );
+	like( $lines, qr{\nStats::LikeR: \Q$Stats::LikeR::VERSION\E\z}, 'the Stats::LikeR version is the last line' );
+	my $author = defined $user ? $user : 'Stats::LikeR';
+	like( $core, qr{<dc:creator>\Q$author\E</dc:creator>}, 'dc:creator (Author) is the login name' );
+	like( $core, qr{<cp:lastModifiedBy>\Q$author\E</cp:lastModifiedBy>},
+		'cp:lastModifiedBy is the login name' );
 
 	my $wb = member($f, 'xl/workbook.xml');
 	like( $wb, qr{name="Results"}, 'xlsx_sheet sets the worksheet name' );
@@ -176,10 +190,10 @@ SKIP: {
 	print {$keep} "precious\n";
 	close $keep;
 	throws_ok { write_table([{ a => 1 }], $f, 'xlsx_sheet' => '') }
-		qr/^write_table: 'xlsx_sheet' must have at least one character/, 'an empty sheet name dies';
+		qr/\nwrite_table: error: 'xlsx_sheet' must have at least one character/, 'an empty sheet name dies';
 	foreach my $c ('\\', '*', '?', ':', '/', '[', ']') {
 		throws_ok { write_table([{ a => 1 }], $f, 'xlsx_sheet' => "a${c}b") }
-			qr/^write_table: 'xlsx_sheet' may not contain '\Q$c\E'/, "a sheet name holding '$c' dies";
+			qr/\nwrite_table: error: 'xlsx_sheet' may not contain '\Q$c\E'/, "a sheet name holding '$c' dies";
 	}
 	open $keep, '<', $f or die "cannot read $f: $!";
 	is( scalar <$keep>, "precious\n", 'a refused sheet name leaves an existing file intact' );

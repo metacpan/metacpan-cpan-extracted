@@ -1,0 +1,15 @@
+title: an invalid rule is ignored -- it never allows anything
+permission_mode: default
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ "Bash(", Frobnicate ]
+prompt: Go.
+script:
+  - tool_calls:
+      - [ bash, { command: touch x } ]
+  - text: done
+expect:
+  absent: [ x ]
+  tools:
+    - { name: bash, error: true, text: "nobody can approve it" }

@@ -7,6 +7,7 @@ use Test::Mojo;
 use File::Temp qw(tempdir);
 use Mojo::File;
 use Mojo::JSON qw(decode_json encode_json);
+use Test::Permissions qw(skip_unless_can_revoke with_revoked);
 
 # Minimal valid analysis spec used throughout the test file.
 my %BASE_SPEC = (
@@ -607,27 +608,27 @@ subtest 'analyses.json is valid JSON after write' => sub {
 # ---------------------------------------------------------------------------
 
 SKIP: {
-	# Only run this test when we can actually chmod (root can always write)
-	skip 'Cannot test read-only dir as root', 2 if $> == 0;
-
 	my $ro_dir = tempdir(CLEANUP => 1);
 	# Create the analyses.json first so the app can read but not write
 	Mojo::File->new($ro_dir)->child('analyses.json')
 		->spurt(encode_json({}));
-	chmod 0555, $ro_dir;
 
-	my $ro_t = Test::Mojo->new('Database::BI');
-	$ro_t->app->config->{model_dir} = $ro_dir;
+	# Skips where chmod cannot stop a file being created: root, Cygwin and
+	# Windows ACLs, some network and container filesystems.
+	skip_unless_can_revoke('create', 4, $ro_dir);
 
-	$ro_t->post_ok('/api/analyses',
-		{ 'Content-Type' => 'application/json' },
-		encode_json(\%BASE_SPEC)
-	)->status_is(503, 'write to read-only dir returns 503');
+	with_revoked('create', $ro_dir, sub {
+		my $ro_t = Test::Mojo->new('Database::BI');
+		$ro_t->app->config->{model_dir} = $ro_dir;
 
-	$ro_t->get_ok('/api/analyses')
-	  ->status_is(200, 'read still works on read-only dir');
+		$ro_t->post_ok('/api/analyses',
+			{ 'Content-Type' => 'application/json' },
+			encode_json(\%BASE_SPEC)
+		)->status_is(503, 'write to read-only dir returns 503');
 
-	chmod 0755, $ro_dir;  # restore for CLEANUP
+		$ro_t->get_ok('/api/analyses')
+		  ->status_is(200, 'read still works on read-only dir');
+	});
 }
 
 # ---------------------------------------------------------------------------
@@ -797,6 +798,43 @@ subtest '3.4: drill-down breadcrumb from ?dd=/?dl= params' => sub {
 	like   $b2, qr/<a [^>]*href=[^>]*>All</,     'All linked at dl=2';
 	like   $b2, qr/<a [^>]*href=[^>]*>North</,   'North linked at dl=2';
 	like   $b2, qr/class="drill-cur"[^>]*>Widget A</, 'Widget A is current at dl=2';
+
+	# The marks stop filtering while a drill is in force, so the help they point
+	# at has to say so -- and name the column whose marks do the drilling.  A
+	# drill is in force from dl=0: the canvas is read through the hierarchy, and
+	# its marks drill rather than filter, so the help speaks of it there too.
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $b_plain = $t->tx->res->body;
+	unlike $b_plain, qr/This canvas is drilled/,
+		'a canvas that is not drilled says nothing about drilling';
+	like $b0, qr/This canvas is drilled/,
+		'and one opened on the hierarchy says so before a level is entered';
+	like $b0, qr/id="cf-help"[^<]*\bregion\b/s,
+		'and names the column the first level drills on';
+	like $b1, qr/id="cf-help"[^>]*>[^<]*This canvas is drilled/s,
+		'a drilled canvas says that its marks drill rather than filter';
+	like $b1, qr/id="cf-help"[^<]*\bproduct\b/s,
+		'and names the column the current level drills on';
+	like $b1, qr/id="cf-help"[^<]*marks and words on the other columns wait/s,
+		'and says the rest of the marks and words wait until it is cleared';
+	like $b1, qr/id="cf-help"[^<]*drill\s+path above the canvas says what the canvas\s+is\s+filtered\s+by/s,
+		'and points at the drill path, which is the chip a drilled canvas has';
+	unlike $b1, qr/id="cf-help"[^<]*chip above the canvas/s,
+		'and does not send a drilled reader to a chip the toolbar does not show';
+	unlike $b1, qr/id="cf-help"[^<]*to filter by its value/s,
+		'and does not tell a drilled reader that a mark filters, since it drills';
+
+	# A drill is a hierarchy the canvas has.  A bookmark can outlive the one it
+	# was saved on: the name is then in the URL and nothing else, and a page that
+	# believed it would stop making its marks controls and would have no column
+	# for the help to name.
+	$t->get_ok("/a/$cid?dd=NoSuchHierarchy&dl=1")->status_is(200);
+	my $b_stale = $t->tx->res->body;
+	unlike $b_stale, qr/data-drill-name=/, 'a hierarchy the canvas does not have drills nothing';
+	unlike $b_stale, qr/This canvas is drilled/,
+		'and the help does not claim a drill that is not there';
+	like $b_stale, qr/id="cf-help"[^<]*chip above the canvas/s,
+		'and still points the reader at the chip, which is what filters it';
 };
 
 subtest '3.3: _vis_cf_col selects correct dimension per kind' => sub {
@@ -824,6 +862,584 @@ subtest '3.3: _vis_cf_col selects correct dimension per kind' => sub {
 	like   $b, qr/data-cf-col="region"/,    'cat column exposed as data-cf-col';
 	like   $b, qr/data-cf-col="sale_date"/, 'x column exposed as data-cf-col';
 	unlike $b, qr/data-cf-col=""/, 'empty cf_col produces no data-cf-col attribute';
+};
+
+# ---------------------------------------------------------------------------
+# The marks of a chart card are the controls #cf-help describes
+#
+# A mark is in the tab order, labelled with the value it would filter by, and
+# described by the canvas help -- which is what the paragraph promises, and
+# what it is only worth promising if the code that writes the attributes reads
+# the datum.  d3 gives an attr() callback the datum first; an event listener is
+# called with the event first, and reading the datum from there left every mark
+# with the index instead, so no mark was focusable while a click still worked.
+# ---------------------------------------------------------------------------
+
+subtest '3.3: a mark is a labelled control, and the help lists what it is' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+	plan skip_all => 'HTML::D3 not available' unless eval { require HTML::D3; 1 };
+
+	my $spec = {
+		name     => 'MarkCanvas',
+		datasets => [ { spec => "path:$sales_path", alias => 'left' } ],
+		visuals  => [
+			{ kind => 'bar',      encode => { cat => 'region', value => 'amount' }, title => 'Bars' },
+			{ kind => 'pie',      encode => { cat => 'region', value => 'amount' }, title => 'Slices' },
+			{ kind => 'treemap',  encode => { cat => 'product', value => 'amount' }, title => 'Tiles' },
+			{ kind => 'heatmap',  encode => { x => 'region', y => 'product', value => 'amount' }, title => 'Cells' },
+			{ kind => 'stacked',  encode => { cat => 'region', series => 'product', value => 'amount' }, title => 'Stacked' },
+		],
+	};
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json($spec)
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $b = $t->tx->res->body;
+
+	# The help, in the words the page can keep: every kind of mark that answers a
+	# key is named, and so is what the chip and the source card do.
+	like $b, qr/id="cf-help"[^<]*bar,\s+tile,\s+cell,\s+slice or point/s,
+		'the help names the mark shapes a chart card draws';
+	like $b, qr/id="cf-help"[^<]*word-cloud/s, 'and the words of a word cloud';
+	like $b, qr/id="cf-help"[^<]*rows that contain it/s,
+		'and says a word filters by containment';
+	like $b, qr/id="cf-help"[^<]*stays\s+whole/s,
+		'and that the card whose mark was used is left whole';
+	like $b, qr/id="cf-help"[^<]*chip above the canvas/s,
+		'and points at the chip that clears the filter';
+
+	# The writes that make a mark a control: the datum first, and the shapes the
+	# snippets actually draw -- the pie puts its class on the group, and each
+	# point kind names its own.
+	like $b, qr/\.attr\('tabindex', function \(d\)/,
+		'the tab order is worked out from the datum, not from the index';
+	like $b, qr/\.attr\('aria-label', function \(d\)/, 'and so is the label';
+	like $b, qr/\.attr\('aria-describedby', function \(d\)/,
+		'and the reference to the help the label is read with';
+	like $b, qr/g\.arc > path/, 'a pie slice is a path inside its arc group';
+	like $b, qr/circle\.sc-circle/, 'a scatter point is a circle';
+	like $b, qr/circle\.cc-dot/, 'and so is a combo point';
+	unlike $b, qr/selectAll\('rect,\s*path/,
+		'nothing selects every path, which would make a line series a control';
+
+	# A drilled canvas answers one column, and the help says the others wait:
+	# a mark on one of them is drawn but not made a control, because the press
+	# it would offer is ignored, and a word is only ever a filter -- it never
+	# drills, and a drilled canvas shows no chip to clear it by.
+	like $b, qr/if \(drillName && cfCol !== drillCol\) return null/,
+		'a mark on another column is not a control while the canvas is drilled';
+	like $b, qr/if \(drillName\) \{\s*word\.removeAttribute\('href'\)/,
+		'and a word is left as the word it shows';
+	like $b, qr/word\.removeAttribute\('aria-describedby'\)/,
+		'with nothing to describe, since it does nothing';
+
+	# The value the label carries: a stacked segment's datum is a position in
+	# its group, so its category comes out of the data the segment kept.
+	like $b, qr/d\.data\.cat !== undefined/, 'a stacked segment filters by its category';
+	like $b, qr/\[\s*\d+\s*,\s*\d+\s*\]/, 'and not by the position it sits at';
+
+	# One encoding: the value goes into the query string as it is, because
+	# searchParams encodes what it is given.  Encoding it twice filtered by a
+	# value no row has (Gadget%2520Pro) and the chip showed the escaping.
+	like $b, qr/searchParams\.append\('cf', cfCol \+ ':' \+ op \+ ':' \+ val\)/,
+		'a filter value is encoded once';
+	unlike $b, qr/'cf', cfCol \+ ':' \+ op \+ ':' \+ encodeURIComponent/,
+		'not once before the query string encodes it again';
+};
+
+# ---------------------------------------------------------------------------
+# Each card's chart script has a scope of its own
+#
+# HTML::D3 writes a chart as an inline snippet that declares its SVG with
+# `const`, and a top-level const belongs to the page's shared lexical
+# environment rather than to the <script> that holds it.  Two such snippets on
+# one canvas therefore threw "Identifier 'svg' has already been declared" and
+# the second card drew an empty box, while either card on a page of its own was
+# fine.  Every card's script is closed over a function of its own, so the
+# collision is gone whatever names the snippets declare.
+# ---------------------------------------------------------------------------
+
+subtest '3.3: every card\'s chart script has a scope of its own' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+	plan skip_all => 'HTML::D3 not available' unless eval { require HTML::D3; 1 };
+
+	# A pie and a line: both are snippets that declare their SVG with const, so
+	# this is the canvas that used to lose its second card.
+	my $spec = {
+		name     => 'Two Scripts',
+		datasets => [ { spec => "path:$sales_path", alias => 'left' } ],
+		visuals  => [
+			{ kind => 'pie',  encode => { cat => 'region', value => 'amount' }, title => 'Slices' },
+			{ kind => 'line', encode => { x => 'sale_date', y => 'amount' },  title => 'Line' },
+		],
+	};
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json($spec)
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $body = $t->tx->res->body;
+
+	my @scripts = $body =~ /<script(?![^>]*\bsrc=)[^>]*>(.*?)<\/script>/sg;
+	my @svg     = grep { /\bconst\s+svg\b/ } @scripts;
+	is(scalar @svg, 2, 'both cards draw with a snippet that declares its SVG');
+
+	for my $i (0 .. $#svg) {
+		like $svg[$i], qr/\A\s*\(function \(\) \{\n/,
+			'card ' . ($i + 1) . '\'s script is a function of its own';
+		like $svg[$i], qr/\}\)\(\);\s*\z/, 'which closes where it was opened';
+		my $open  = index($svg[$i], '(function () {');
+		my $const = index($svg[$i], 'const svg');
+		ok($open >= 0 && $const > $open,
+			"so its const is in that scope, not the page's");
+	}
+
+	# The scope is put on once, where every card is rendered.  A card that also
+	# arrived wrapped would be wrapped again here, and a function inside a
+	# function is a second chance for the bug above rather than a fix for it.
+	unlike $body, qr/\(function \(\) \{\s*\n\s*\(function \(\) \{/,
+		'no card script on the page is wrapped inside another';
+
+	# The library the snippets draw with is loaded once, from its src: it is
+	# not a card's snippet and is left alone.
+	like $body, qr{<script[^>]*\bsrc=[^>]*>\s*</script>},
+		'the library is still loaded from its src';
+	unlike $body, qr{<script[^>]*\bsrc=[^>]*>\s*\(function},
+		'and is not closed over a function';
+
+	# The same seam serves a card added or repaired once the page is up, so a
+	# card that arrives later cannot collide with the cards already drawn.
+	my $added = $t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'pie', encode => { cat => 'region', value => 'amount' }, title => 'More slices' })
+	)->status_is(201)->tx->res->json->{html};
+	like $added, qr{<script>\s*\(function \(\) \{\n.*?\bconst\s+svg\b}s,
+		'a card added after the page is up is given a scope too';
+
+	my $repaired = $t->patch_ok("/api/analyses/$cid/visuals/0",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ cross_row => {} })
+	)->status_is(200)->tx->res->json->{html};
+	like $repaired, qr{<script>\s*\(function \(\) \{\n.*?\bconst\s+svg\b}s,
+		'as is one whose plan is repaired in place';
+};
+
+# ---------------------------------------------------------------------------
+# Reading the renderer as a program
+#
+# Three rules of the renderer cannot be seen on a page: a rule applied twice
+# still does the same thing once, a failure path is only reached by the
+# condition that produces it, and an exclusion is one comparison among many.
+# What they share is the source, so the source is what these guards read --
+# through the helpers below, which answer the small questions a rule asks
+# (which subs exist, what one is made of, which guard a line sits in), so that
+# a new invariant costs a few assertions rather than another scanner.
+# ---------------------------------------------------------------------------
+
+# A module's source, split into lines and with its prose removed: POD blocks
+# and comments talk about these subs by name with their arguments, and a
+# sentence must not be read as a call.
+sub _source {
+	my ($path) = @_;
+	my @lines = -f $path ? split(/\n/, $path->slurp) : ();
+	my (@code, $in_pod);
+	for my $line (@lines) {
+		if    ($line =~ /^=cut\b/) { $in_pod = 0; next }
+		elsif ($line =~ /^=\w/)    { $in_pod = 1; next }
+		push @code, $line unless $in_pod || $line =~ /^\s*#/;
+	}
+	return { file => $path, lines => \@lines, code => \@code };
+}
+
+my $src = _source($t->app->home->child('lib/Database/BI/Controller/Dashboard.pm'));
+my $tpl = _source($t->app->home->child('templates/web/en/canvas.html.tt'));
+
+# The code of one sub, comments removed: a sentence about a rule must not be
+# read as the rule.  Undef when the module has no such sub.
+sub _sub_code {
+	my ($src, $name) = @_;
+	my $lines = $src->{lines};
+	my ($from) = grep { $lines->[$_] =~ /^sub \Q$name\E\b/ } 0 .. $#$lines;
+	return undef unless defined $from;
+	my ($to) = grep { $lines->[$_] =~ /^sub / && $_ > $from } 0 .. $#$lines;
+	$to = $#$lines + 1 unless defined $to;
+	return [ grep { !/^\s*#/ } @$lines[$from .. $to - 1] ];
+}
+
+# The sub a line sits in: subs are declared at the left margin, and everything
+# inside one is indented.
+sub _sub_of {
+	my ($code, $at) = @_;
+	for (my $j = $at; $j >= 0; $j--) {
+		return $1 if $code->[$j] =~ /^sub (\w+)/;
+	}
+	return '';
+}
+
+# The indexes of the lines of $code matching $re.
+sub _lines_like {
+	my ($code, $re) = @_;
+	return [ grep { $code->[$_] =~ $re } 0 .. $#$code ];
+}
+
+# The guard a line sits in: the nearest "if (...) {" above it, which is how
+# "only when" is written in Perl.
+sub _guard_of {
+	my ($code, $at) = @_;
+	for (my $j = $at; $j >= 0; $j--) {
+		return $code->[$j] if $code->[$j] =~ /^\s*if\s*\(/;
+	}
+	return '';
+}
+
+# A rule that has to happen once: its line, and the sub it is in.  Returns the
+# line's index, for the callers that also check what the line says.
+sub _one_place {
+	my ($src, $pattern, $sub, $what) = @_;
+	my $code = $src->{code};
+	my @at   = @{ _lines_like($code, $pattern) };
+	return undef unless is(scalar @at, 1, "$what: one line");
+	is(_sub_of($code, $at[0]), $sub, "$what: in $sub");
+	return $at[0];
+}
+
+# A sub's statements: a ';' ends one only outside a string, and a comment runs
+# to the end of its line -- an error message may hold a ';', and a sentence
+# about a blank return must not be read as one.
+sub _statements {
+	my ($body) = @_;
+	my (@statements, $cur, $quote, $esc, $comment);
+	($cur, $esc) = ('', 0);
+	for my $ch (split //, $body) {
+		if ($comment) { undef $comment if $ch eq "\n"; next }
+		if (defined $quote) {
+			$cur .= $ch;
+			if    ($esc)          { $esc = 0 }
+			elsif ($ch eq '\\')   { $esc = 1 }
+			elsif ($ch eq $quote) { undef $quote }
+			next;
+		}
+		if ($ch eq q{'} || $ch eq q{"}) { $quote = $ch; $cur .= $ch; next }
+		if ($ch eq '#') { $comment = 1; next }
+		$cur .= $ch;
+		if ($ch eq ';') { push @statements, $cur; $cur = '' }
+	}
+	push @statements, $cur if $cur =~ /\S/;
+	return \@statements;
+}
+
+# ---------------------------------------------------------------------------
+# The renderer's card-level rules are each applied in one place
+#
+# The cards of a page share it: their scripts must not collide, Leaflet is one
+# library however many maps a canvas has, and one card's cross-row numbers must
+# not be written into the rows its neighbours draw from.  Each of those is a
+# line somewhere in the renderer, and each would go on working if a second
+# place applied it again -- scoping twice is scoping once, a map head handed
+# over twice is the same head -- while the two places drift apart.  Nothing
+# rendered can see that, so the source is what is read here: one line, in the
+# sub whose job it is.
+# ---------------------------------------------------------------------------
+
+subtest '3.3: each card-level rule of the renderer happens in one place' => sub {
+	plan skip_all => 'the controller source is not in this checkout'
+		unless -f $src->{file};
+	my $code = $src->{code};
+	ok(scalar @$code, 'the controller has code to read');
+
+	# A card's script is a program of its own, closed over a function by the
+	# renderer every card passes through -- not by a caller that renders one.
+	my $scope_at = _one_place($src, qr/_scope_card_scripts\(/, '_render_visual_html',
+		'card script scoping');
+	if (defined $scope_at) {
+		like($code->[$scope_at],
+			qr/\$rendered->\{html\} = _scope_card_scripts\(\$rendered->\{html\}\);/,
+			'which scopes the html the renderer just built');
+	}
+	_one_place($src, qr/_wrap_card_script\(/, '_scope_card_scripts',
+		'the wrapper around one script');
+
+	# A card is only ever built through that renderer: a caller reaching the
+	# builder directly would get a card nothing had scoped.
+	_one_place($src, qr/_render_visual_markup\(/, '_render_visual_html',
+		'building a card');
+
+	# Leaflet's stylesheet and script are the same for every map on a page, so
+	# the page is handed the first map card's head and no other.
+	_one_place($src, qr/\$canvas_map_head \|\|=/, 'canvas_render',
+		'taking the first map head of a canvas');
+	_one_place($src, qr/extra_head\s*=>\s*\$canvas_map_head/, 'canvas_render',
+		'and handing that one head to the page');
+
+	# A map card owns its map's size, so the page-wide #map rule is stripped
+	# from the head it carries -- where the card is assembled, once.
+	_one_place($src, qr/\$head =~ s\{<style>/, '_canvas_map_html',
+		"dropping the page's map style from a card's head");
+
+	# The pass writes its column onto the rows it is handed, and those rows are
+	# the same hashrefs every card draws from: it is given copies, never them.
+	_one_place($src, qr/my \$own\s*=.*\{ %\$_ \}/, '_render_visual_markup',
+		'copying the rows a card runs its plan over');
+	_one_place($src, qr/_apply_cross_row\(\$own\b/, '_render_visual_markup',
+		'and running the pass on those copies');
+	unlike(join("\n", @$code), qr/_apply_cross_row\(\$vis_recs\b/,
+		'never on the rows the other cards draw from');
+
+	# Every chart on a page needs an element id of its own, so the id is made
+	# here from the card's index rather than left to the library's default.
+	_one_place($src, qr/my \$svg_id = 'vis-'/, '_render_visual_markup',
+		"a card's own element id");
+
+	# A card's answer reaches the page: the error it reports is handed to the
+	# card that draws it, so a failed card says why where it stands instead of
+	# leaving a blank cell that looks like a card with no data.
+	_one_place($src, qr/error\s*=>\s*\$result->\{error\}/, 'canvas_render',
+		"handing a card's error to the page");
+	_one_place($src, qr/return \$rendered unless defined \$rendered->\{html\};/,
+		'_render_visual_html', 'letting a failed card pass through unscoped');
+};
+
+# ---------------------------------------------------------------------------
+# A card that cannot be drawn says why
+#
+# A card has two answers: the html it drew, or the reason it could not.  A
+# branch of the dispatcher that returns neither gives the page a card that
+# shows nothing and reports nothing, which reads exactly like a card with no
+# data; a branch that dies takes the whole canvas down for one card's sake.
+# Both look like ordinary code, and each is only reachable through the
+# condition that produces it, so the dispatcher is read as a program here:
+# its statements, and what each one answers with.
+# ---------------------------------------------------------------------------
+
+subtest '3.3: a card that cannot be drawn answers with an error' => sub {
+	plan skip_all => 'the controller source is not in this checkout'
+		unless -f $src->{file};
+	my $body = _sub_code($src, '_render_visual_markup');
+	plan skip_all => 'the card renderer is not in this controller'
+		unless defined $body;
+	$body = join "\n", @$body;
+	ok(length $body, 'the renderer has a body to read');
+
+	my $statements = _statements($body);
+	ok(scalar @$statements > 20, 'the renderer is read as the statements it is made of');
+
+	# Each return is one of the two answers.  An error answer also carries a
+	# message: an empty one is a blank card with an explanation-shaped hole.
+	my (@error, @drawn, @bare, @other);
+	for my $st (@$statements) {
+		next unless $st =~ /\breturn\b/;
+		if    ($st =~ /\breturn\s*;/) { push @bare,  $st }
+		elsif ($st =~ /\berror\s*=>/) { push @error, $st }
+		elsif ($st =~ /\bhtml\s*=>/)  { push @drawn, $st }
+		else                          { push @other, $st }
+	}
+
+	is scalar @bare, 0, 'no branch of the dispatcher returns nothing at all'
+		or diag explain \@bare;
+	ok(scalar @error, 'a card says why it could not be drawn');
+	ok(scalar @drawn, 'and hands back the html when it can');
+	is scalar @other, 0, 'every other return is one of those two answers'
+		or diag explain \@other;
+
+	my @empty = grep { /\berror\s*=>\s*(?:''|""|undef\b|0\b)/ } @error;
+	is scalar @empty, 0, 'and each of those answers carries a message'
+		or diag explain \@empty;
+
+	# A kind nobody implemented is a card's error like any other, not a card
+	# that draws nothing.
+	my @returns = grep { /\breturn\b/ } @$statements;
+	like($returns[-1], qr/\bUnknown visual kind\b/,
+		'as is a kind the renderer has no branch for');
+
+	# A card's failure is its own: the renderer answers rather than dying, which
+	# would take the page down for one card's sake.
+	unlike($body, qr/^\s*(?:die|exit)\b|\b(?:croak|confess)\b/m,
+		'and none of it dies');
+};
+
+# ---------------------------------------------------------------------------
+# A card is never filtered by its own cross-filter
+#
+# A click on a card marks it as the filter's source (?cv=), and every other
+# card is narrowed by what was clicked (?cf=).  The source is not narrowed: it
+# stays whole, which is what makes the click readable -- you see the thing you
+# clicked, beside everything it changed.  Two places draw a card -- the page's
+# loop, and the endpoint that adds or repairs one -- so both are read here, and
+# so is the context both share: the specs are handed out unapplied, because a
+# context that applied them could not know which card, if any, is the source.
+# ---------------------------------------------------------------------------
+
+subtest '3.3: a card is never filtered by its own cross-filter' => sub {
+	plan skip_all => 'the controller source is not in this checkout'
+		unless -f $src->{file};
+
+	# -- the page's loop ---------------------------------------------------
+	my $canvas = _sub_code($src, 'canvas_render');
+	ok($canvas, 'the canvas renderer is there to read');
+
+	my $applied =	_lines_like($canvas, qr/_apply_filter_spec\(\$vis_recs, \$cfs\)/);
+	is scalar @$applied, 1, 'a card is narrowed by the cross-filter on one line';
+	if (@$applied) {
+		like _guard_of($canvas, $applied->[0]),
+			qr/\$cf_active\s*&&\s*\$i\s*!=\s*\$cf_source\b/,
+			'and only inside a guard that says this card is not the source';
+	}
+
+	# The rows the pass is run on are the card's own copy: a cross-filter applied
+	# to $records would take the rows away from the source card and from every
+	# card after it, which is the same bug from the other end.  The page-wide
+	# time range is the one filter that does narrow those rows, because it is the
+	# page's range rather than a card's click.
+	is scalar @{	_lines_like($canvas, qr/_apply_filter_spec\(\$records, \$cfs/) }, 0,
+		'no cross-filter is applied to the rows the whole page draws from';
+	my $on_records =	_lines_like($canvas, qr/_apply_filter_spec\(\$records, /);
+	is scalar @$on_records, 1,
+		'whose one page-wide narrowing is the time range, applied once';
+	if (@$on_records) {
+		my ($in_loop) = grep { $_ < $on_records->[0] && $canvas->[$_] =~ /^\s*for\b/ }
+			reverse 0 .. $on_records->[0];
+		like((defined $in_loop ? $canvas->[$in_loop] : ''), qr/range_specs/,
+			'and it sits in the loop over the range the page named');
+	}
+	is scalar @{	_lines_like($canvas, qr/^\s*my \$vis_recs\s*=\s*\$records;/) }, 1,
+		'each card starts from those rows';
+
+	# The renderer is told its rows are narrowed by the same question, so it
+	# cannot decide for itself that a card wanted filtering.
+	my ($call_at) = @{	_lines_like($canvas, qr/_render_visual_html\(/) };
+	ok(defined $call_at, 'the card is drawn through the renderer');
+	my ($call_end) = defined $call_at
+		? grep { $_ > $call_at && $canvas->[$_] =~ /^\s*\);/ } 0 .. $#$canvas
+		: ();
+	if (defined $call_at && defined $call_end) {
+		my @asked = grep {
+			$canvas->[$_] =~ /\$cf_active\s*&&\s*\$i\s*!=\s*\$cf_source\s*\?\s*1\s*:\s*0/
+		} $call_at .. $call_end;
+		is scalar @asked, 1,
+			'and is told, by that same question, that its rows are already narrowed';
+	}
+	else {
+		fail('the renderer call has an argument list to read');
+	}
+
+	# The page still has to know which card made the filter: that is how the
+	# source is drawn as the source rather than as a card that failed to narrow.
+	is scalar @{	_lines_like($canvas, qr/cf_source\s*=>\s*\(\$i == \$cf_source \? 1 : 0\)/) },
+		1, 'the card that made the filter is marked as its source, once';
+
+	# -- the endpoint that draws one card ----------------------------------
+	my $patch = _sub_code($src, 'analyses_update_visual');
+	ok($patch, 'the endpoint that draws a single card is there to read');
+
+	my $patch_applied =	_lines_like($patch, qr/_apply_filter_spec\(\$records, \$spec\)/);
+	is scalar @$patch_applied, 1, 'it narrows a card in one place too';
+	my ($guard_at) = grep {$patch->[$_] =~ /\$ctx->\{cf_source\}\s*!=\s*\$index\b/}
+		0 .. $#$patch;
+	ok(defined $guard_at, 'and asks whether the card it is drawing is the source');
+	if (@$patch_applied && defined $guard_at) {
+		is(_guard_of($patch, $patch_applied->[0]), $patch->[$guard_at],
+			'narrowing it only on the branch where it is not');
+
+		# The flag handed to the renderer is set on that branch and no other:
+		# elsewhere it would tell the renderer to skip the SQL push-over for a
+		# card nothing had narrowed.
+		my ($indent) = $patch->[$guard_at] =~ /\A(\s*)/;
+		my ($block_end) = grep { $_ > $guard_at && $patch->[$_] =~ /\A\Q$indent\E\}/ }
+			0 .. $#$patch;
+		my ($flag_at) = @{	_lines_like($patch, qr/^\s*\$prefiltered = 1;/) };
+		ok(defined $block_end && defined $flag_at
+				&& $flag_at > $guard_at && $flag_at < $block_end,
+			'and only there is the renderer told the rows are narrowed');
+	}
+	else {
+		fail('the endpoint applies the cross-filter under a guard');
+	}
+
+	# -- the context both of them draw through -----------------------------
+	# cf_specs is returned unapplied on purpose: the caller is the only thing
+	# that knows which card is the source, so a context that narrowed the rows
+	# would narrow the source's too, with no way to put them back.
+	my $ctx = _sub_code($src, '_canvas_render_context');
+	ok($ctx, 'the context a card is drawn through is there to read');
+	is scalar @{	_lines_like($ctx, qr/_apply_filter_spec\(/) }, 0,
+		'and hands the cross-filters out unapplied, for the caller to place';
+};
+
+# ---------------------------------------------------------------------------
+# The page is told what each card is
+#
+# A renderer's answer only reaches a reader if the page is built for it: a
+# card's error is drawn in the card, the one card that needs to carry a head
+# carries it, a card's own plan fails as that card rather than as the page, and
+# a measure is refused before any kind is drawn.  Each of those is a line that
+# could be dropped without a healthy canvas noticing, so each is read here.
+# ---------------------------------------------------------------------------
+
+subtest '3.3: the page is told what each card is' => sub {
+	plan skip_all => 'the controller source is not in this checkout'
+		unless -f $src->{file};
+	plan skip_all => 'the canvas template is not in this checkout'
+		unless -f $tpl->{file};
+
+	# -- a card's error is drawn in the card -------------------------------
+	# Once by the page for the cards it already has, and once by the script for
+	# a card added while the page is up: both put the message where the reader
+	# is looking, and the message is escaped because it may quote a column name
+	# the reader typed.
+	my $in_card = _lines_like($tpl->{code}, qr/class="visual-error">\[\% v\.error/);
+	is scalar @$in_card, 1, "the template draws a card's error inside the card"
+		or diag explain $in_card;
+	if (@$in_card) {
+		like($tpl->{code}[ $in_card->[0] ] // '', qr/\| html %\]/,
+			'and escapes it rather than writing it as markup');
+	}
+	is scalar @{ _lines_like($tpl->{code},
+		qr/element\('div', \{ 'class': 'visual-error' \}, json\.error\)/) }, 1,
+		'as does a card added after the page is up';
+
+	# -- only a map card carries a head ------------------------------------
+	my $markup = _sub_code($src, '_render_visual_markup');
+	ok($markup, 'the card renderer is there to read');
+	my $heads = _lines_like($markup, qr/\bhead\s*=>/);
+	is scalar @$heads, 1, 'one kind of card hands the page a head';
+	if (@$heads) {
+		# The map branch, and no branch after it: a chart could otherwise put
+		# its stylesheet or its library on the page through a key nobody reads
+		# for it.
+		my ($map_at) = @{ _lines_like($markup, qr/^\s*if \(\$kind eq 'map'\)/) };
+		my ($next_kind) = grep { defined $map_at && $_ > $map_at
+				&& $markup->[$_] =~ /^\s*if \(\$kind eq / } 0 .. $#$markup;
+		ok(defined $map_at && $heads->[0] > $map_at
+				&& (!defined $next_kind || $heads->[0] < $next_kind),
+			'and that kind is the map');
+	}
+
+	# -- a card's own plan fails as that card ------------------------------
+	# The page's plan was validated when it was saved; a card's own is validated
+	# as the card is drawn, because the columns a canvas has are the columns its
+	# data file has today.  That fault is the card's error, not a 400 that takes
+	# every other card down with it.
+	my $plan_err = _lines_like($markup, qr/return \{ error => \$plan->\{error\} \}/);
+	is scalar @$plan_err, 1, "a card's own plan can fail on its own line";
+	if (@$plan_err) {
+		like(_guard_of($markup, $plan_err->[0]),
+			qr/ref \$vis->\{cross_row\} eq 'HASH'/,
+			'and only where the plan it checked is the card\'s own');
+	}
+
+	# -- a measure is refused before any kind is drawn ---------------------
+	# encode.agg names a function, and a misspelt one is this card's error
+	# whatever kind it is, rather than a chart drawn some other way.
+	my $checked = _lines_like($markup, qr/_measure_fn_ok\(/);
+	is scalar @$checked, 1, 'the card\'s measure is checked once';
+	my ($first_kind) = @{ _lines_like($markup, qr/^\s*if \(\$kind eq /) };
+	ok(@$checked && defined $first_kind && $checked->[0] < $first_kind,
+		'before the first kind gets a chance to draw itself another way');
 };
 
 subtest '3.2: card sizes survive a cross-filter and a drill-through visit' => sub {
@@ -1095,7 +1711,7 @@ subtest '3.6: save bookmark via PATCH then verify on canvas' => sub {
 	my $b = $t->tx->res->body;
 	like $b, qr/class="bm-item"/, 'saved bookmark item rendered';
 	like $b, qr/My view/, 'bookmark name visible';
-	like $b, qr{/a/[^"]+\?f=region}, 'bookmark href contains state';
+	like $b, qr{href="[^"]*\?f=region}, 'bookmark href contains state';
 	like $b, qr/class="bm-del-btn"/, 'delete button rendered on bookmark';
 	unlike $b, qr/id="bm-empty"/, 'empty-state message absent when bookmarks exist';
 };
@@ -1721,7 +2337,7 @@ subtest '3.2: each card has a size menu that sets its width without a drag' => s
 		'and the option that says what the card is is found by its own marker';
 	like $b, qr/id="size-help"[^>]*>[^<]*height to one, two, three or six rows/s,
 		'the help says the menu sets the height as well';
-	like $b, qr/badge\.textContent = st\.w \+ ' × ' \+ st\.h;/,
+	like $b, qr/badge\.textContent = st\.w \+ ' \\u00D7 ' \+ st\.h;/,
 		'as the two numbers the menu spells out in words';
 	like $b, qr/\? sizeSummary\(sel, st\.w, st\.h\)/,
 		'with the menu words for the presets as the title';
@@ -1753,7 +2369,7 @@ subtest '3.2: each card has a size menu that sets its width without a drag' => s
 		'and neither is the size on the card: the printed canvas is two columns';
 	like $b, qr/\.visual-size-select \{[^}]*max-width:\s*11\.5rem/s,
 		'and is wide enough to read the longest size it can report';
-	like $b, qr/Size menu in its header to set its width and height without a drag/,
+	like $b, qr/Size menu\s+in\s+its header to set its width and height without a drag/,
 		'and the first-visit tip names it too';
 	like $b, qr/same size is written on the card itself, beside the\s+menu/,
 		'and the size help says where the size is written';
@@ -1850,12 +2466,16 @@ subtest '3.2: the first-visit tip names both grips and is dismissed for good' =>
 
 	# What it points at: the header drag and the corner grip, in the words the
 	# reader can see on the card, and the keyboard route to both of them.
-	like $b, qr/handle in its header to move it/, 'the tip names the header drag';
+	like $b, qr/drag a visual by its header to move it/, 'the tip names the header drag';
 	like $b, qr/grip in the card's bottom right corner to resize it/,
 		'the tip names the corner grip';
-	like $b, qr/Both\s+work from the keyboard as well/, 'and says both answer the keyboard';
-	like $b, qr/focus the header to move the visual/,
+	like $b, qr/Both\s+work\s+from\s+the\s+keyboard\s+as\s+well/,
+		'and says both answer the keyboard';
+	# The grip is the control, not the header it sits in: the header takes no
+	# focus, and a tip that sends a keyboard reader to it sends them nowhere.
+	like $b, qr/focus the\s+<span[^>]*>::<\/span>\s+grip in the header to move the visual/s,
 		'including what to focus to use them without a pointer';
+	unlike $b, qr/focus the header to move/, 'and not the header, which takes no focus';
 
 	# Once dismissed, never again: one flag, written where the page can read it
 	# on the next visit, and read before the tip is uncovered.
@@ -2080,6 +2700,191 @@ subtest 'chart legends: a series is hidden from the keyboard too' => sub {
 		->status_is(200, 'a single-series chart renders');
 	unlike $t->tx->res->body, qr/id="line-legend-help"/,
 		'and is given no instructions for a legend it does not have';
+};
+
+# ---------------------------------------------------------------------------
+# Phase 3.2 -- a canvas card picks its own aggregate function
+# ---------------------------------------------------------------------------
+
+subtest 'a saved card aggregates with the function it picked' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+
+	# North holds 1250 and 1875, so one column gives four distinguishable
+	# answers: sum 3125, median 1562.5, range 625, count 2.  A card that picked a
+	# function can therefore not be mistaken for one that summed.
+	my $spec = {
+		name     => 'Measure picking',
+		datasets => [ { spec => "path:$sales_path" } ],
+		visuals  => [
+			{ kind => 'bar', encode => { cat => 'region', value => 'amount', agg => 'median' } },
+			{ kind => 'bar', encode => { cat => 'region', value => 'amount' } },
+		],
+	};
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json($spec)
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $body = $t->tx->res->body;
+
+	# The snippet writes each row as JSON from a hash, so its key order is not
+	# the test's to assume: the pair is asserted on the value alone, and the
+	# counts below say which card it belongs to.
+	like $body, qr/"value":1562\.5/,
+		'the card that picked a median draws the median';
+	like $body, qr/median\(amount\) by region/,
+		'and its own title says which function it used';
+
+	# Each card answers for North once, and differently: the median of 1250 and
+	# 1875 is 1562.5, the sum 3125.  One occurrence each is what says the card
+	# that picked a function did not fall back to the default.
+	my $medians = () = $body =~ /"value":1562\.5/g;
+	my $sums    = () = $body =~ /"value":3125/g;
+	is $medians, 1, 'only the card that picked the median drew one';
+	is $sums,    1, 'and only the card that summed drew the sum';
+
+	like $body, qr/amount by region/,
+		'the card that picked nothing keeps the title it has always had';
+
+	# first and last are the row order, which is not a sum of anything.
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'bar',
+			encode => { cat => 'region', value => 'amount', agg => 'range' } })
+	)->status_is(201)
+	 ->json_is('/title' => 'range(amount) by region');
+	like $t->tx->res->json->{html}, qr/"value":625/,
+		'a range card draws the spread it asked for';
+
+	# One card, one function: a combo aggregates both its series with it.
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'combo',
+			encode => { cat => 'region', bar_val => 'amount', line_val => 'amount',
+			            agg => 'median' } })
+	)->status_is(201)
+	 ->json_is('/title' => 'median of amount and amount by region');
+
+	# A saved card can change its function without losing its place: p50 is the
+	# median under the name a pivot uses for it.
+	$t->patch_ok("/api/analyses/$cid/visuals/1",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ encode => { cat => 'region', value => 'amount', agg => 'p50' } })
+	)->status_is(200)
+	 ->json_is('/title' => 'p50(amount) by region');
+	like $t->tx->res->json->{html}, qr/"value":1562\.5/,
+		'and p50 is the median it is meant to be';
+};
+
+subtest 'a card function that cannot be drawn is refused, not stored' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			name     => 'Refused measures',
+			datasets => [ { spec => "path:$sales_path" } ],
+			visuals  => [ { kind => 'table', encode => {}, title => 'All rows' } ],
+		})
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'bar',
+			encode => { cat => 'region', value => 'amount', agg => 'banana' } })
+	)->status_is(400)
+	 ->json_like('/error' => qr/Unknown aggregate function 'banana'/,
+		'a function the fold cannot compute is refused rather than summed');
+	like $t->tx->res->json->{error}, qr/median/,
+		'and the message carries the vocabulary, so the reader can pick one';
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'bar',
+			encode => { cat => 'region', value => '__count__', agg => 'median' } })
+	)->status_is(400)
+	 ->json_like('/error' => qr/needs a value column/,
+		'a function that needs a column is refused when the card counts rows');
+
+	$t->post_ok("/api/analyses/$cid/visuals",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({ kind => 'bar',
+			encode => { cat => 'region', value => 'amt', agg => 'median' } })
+	)->status_is(400)
+	 ->json_like('/error' => qr/Column not found: amt/,
+		'and a column that is not there is still the column\'s error');
+
+	$t->get_ok("/api/analyses/$cid")->status_is(200);
+	is scalar @{ $t->tx->res->json->{visuals} }, 1,
+		'none of the refused cards was appended';
+
+	# A card stored by a whole-document PUT is not rendered on the way in, so a
+	# function it names is reported by the card itself rather than a 500.
+	$t->put_ok("/api/analyses/$cid",
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			name     => 'Refused measures',
+			datasets => [ { spec => "path:$sales_path" } ],
+			visuals  => [ { kind => 'bar',
+				encode => { cat => 'region', value => 'amount', agg => 'nonsense' } } ],
+		})
+	)->status_is(200);
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $page = $t->tx->res->body;
+	# The card's error is written into the page, so the quotes in it arrive
+	# HTML-escaped; the message and the name it refused are what matter.
+	like $page, qr/Unknown aggregate function/, 
+		'the canvas says so in the card rather than failing the page';
+	like $page, qr/nonsense/, 'and names the function it could not compute';
+};
+
+subtest 'the Add current view panel offers the functions a card may pick' => sub {
+	my $sales_path = $t->app->home->child('data/sales.csv')->to_string;
+	plan skip_all => 'data/sales.csv not found' unless -f $sales_path;
+
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			name     => 'Panel vocabulary',
+			datasets => [ { spec => "path:$sales_path" } ],
+			visuals  => [ { kind => 'table', encode => {}, title => 'All rows' } ],
+		})
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $page = $t->tx->res->body;
+
+	like $page, qr/<select id="ac-agg">/, 'the panel has an aggregate picker';
+
+	# The picker is written out by hand in the template, so the vocabulary it
+	# offers is asserted here against the one the server validates: a function
+	# added to the server's list and not to the panel (or the reverse) is what
+	# this catches.  Sum is the one function spelled by not naming it, which is
+	# how a card that picked the default has always carried it, so it is
+	# asserted as the default option rather than as a name.
+	like $page, qr/<option value="">Sum \(default\)<\/option>/,
+		'the picker starts at the sum a card gets by not choosing';
+	for my $fn (qw( avg min max count_distinct median stdev first last range )) {
+		like $page, qr/<option value="\Q$fn\E">/,
+			"and offers $fn, so a card can pick it without spelling it itself";
+	}
+	like $page, qr/<option value="p">/, 'and a percentile';
+	like $page, qr/<input id="ac-agg-p"/, 'whose level is a field of its own';
+	like $page, qr/data-agg-for="p"/, 'shown only while Percentile is chosen';
+
+	# Counting rows is the value column's job -- "Count (no column needed)" --
+	# so it is not a second way to say the same thing in the picker.
+	unlike $page, qr/<option value="count">/,
+		'counting rows stays with the value column rather than the picker';
+
+	like $page, qr/var AGG_KINDS = \{ bar: 1, pie: 1, stacked: 1, treemap: 1, heatmap: 1, combo: 1 \};/,
+		'the kinds that aggregate are exactly the kinds the picker is offered to';
+	like $page, qr/if \(agg\) encode\.agg = agg;/,
+		'and the choice travels with the card when it is added';
 };
 
 done_testing;

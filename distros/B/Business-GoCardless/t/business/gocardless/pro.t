@@ -145,6 +145,7 @@ sub test_payment {
         cmp_deeply(
             $Bill = $GoCardless->confirm_resource(
                 redirect_flow_id => 1,
+                session_token    => 'SESS_wSs0uGYMISxzqOBq',
                 type             => 'bill',
                 amount           => 100,
                 currency         => 'GBP',
@@ -324,6 +325,7 @@ sub test_pre_authorization {
     cmp_deeply(
         my $PreAuthorization = $GoCardless->confirm_resource(
             redirect_flow_id => 2,
+            session_token    => 'SESS_wSs0uGYMISxzqOBq',
             type             => 'pre_auth',
             amount           => 100,
             currency         => 'GBP',
@@ -412,6 +414,7 @@ sub test_subscription {
     cmp_deeply(
         my $Subscription = $GoCardless->confirm_resource(
             redirect_flow_id => 2,
+            session_token    => 'SESS_wSs0uGYMISxzqOBq',
             type             => 'subscription',
             amount           => 100,
             currency         => 'GBP',

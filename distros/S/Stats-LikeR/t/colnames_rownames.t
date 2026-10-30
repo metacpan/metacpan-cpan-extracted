@@ -66,16 +66,16 @@ is( scalar rownames([ [1],[2],[3] ]),              3, 'scalar rownames == nrow (
 
 # error paths -- clean dies with the caller-labelled message
 throws_ok { colnames(undef) }
-	qr/colnames: undefined data in first position/,
+	qr/colnames: error: undefined data in first position/,
 	'colnames(undef) dies';
 throws_ok { rownames(undef) }
-	qr/rownames: undefined data in first position/,
+	qr/rownames: error: undefined data in first position/,
 	'rownames(undef) dies';
 throws_ok { colnames(42) }
-	qr/colnames: data frame must be an ARRAY .*or HASH/,
+	qr/colnames: error: data frame must be an ARRAY .*or HASH/,
 	'colnames(non-ref) dies';
 throws_ok { rownames('frame') }
-	qr/rownames: data frame must be an ARRAY .*or HASH/,
+	qr/rownames: error: data frame must be an ARRAY .*or HASH/,
 	'rownames(non-ref) dies';
 throws_ok { colnames([ 'scalar', 'row' ]) }
 	qr/array elements must be ARRAY .*or HASH/,
@@ -102,4 +102,22 @@ unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { rownames({ r1=>{x=>1}, r2=>{x=>2} }) }       'rownames(): HoH, no leaks';
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('colnames');
+	like($screen, qr/\Ausage: colnames\(/, 'colnames has a help screen');
+	is(do { local $@; eval { colnames(undef); 1 } ? '' : $@ },
+	   $screen . "colnames: error: undefined data in first position\n",
+	   'colnames: undef prints the help screen');
+}
+
+# A call-form error prints rownames's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { rownames(undef); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: rownames\(/, 'rownames: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('rownames') . "rownames: error: undefined data in first position\n",
+		'rownames: the help screen, then the error on the last line');
+}
 done_testing();

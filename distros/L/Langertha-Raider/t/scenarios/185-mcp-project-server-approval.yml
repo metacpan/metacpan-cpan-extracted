@@ -1,0 +1,28 @@
+title: a .mcp.json server starts only when approved; the user settings approve one, the untrusted project file does not approve the other (ADR 0029 §7)
+files:
+  CLAUDE.md: "# project\n"
+  .mcp.json: |
+    { "mcpServers": {
+      "ok":   { "command": "{{PERL}}", "args": [ "{{MCP_TEST_SERVER}}", "normal" ] },
+      "wait": { "command": "{{PERL}}", "args": [ "{{MCP_TEST_SERVER}}", "normal" ] }
+    } }
+  .claude/settings.json: |
+    { "enabledMcpjsonServers": [ "wait" ] }
+home:
+  .claude/settings.json: |
+    { "enabledMcpjsonServers": [ "ok" ] }
+prompt: Use the project servers.
+script:
+  - tool_calls:
+      - [ mcp__ok__with_dot, {} ]
+      - [ mcp__wait__with_dot, {} ]
+  - text: done
+expect:
+  requests:
+    - { index: 0, lacks: [ mcp__wait__with_dot ] }
+  tools:
+    - { name: mcp__ok__with_dot, text: "\\Adotted\\z" }
+    - { name: mcp__wait__with_dot, error: true, text: "No such tool available" }
+  events:
+    - { type: mcp.server, name: ok, status: starting }
+    - { type: mcp.server, name: ok, scope: project, status: connected }

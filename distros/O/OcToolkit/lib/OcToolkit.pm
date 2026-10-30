@@ -14,7 +14,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.19";
+our $VERSION = "1.21";
 
 use JSON::PP;
 use Tie::IxHash;
@@ -290,35 +290,13 @@ sub revert{
 
 sub setParams{
     my ($self, $params) = @_;
-
-    if (@_ == 2) {
-        $self->{advanceFeatures}       = $params->{advanceFeatures}       if defined $params->{advanceFeatures};
-        $self->{clusterBaseAddress}    = $params->{clusterBaseAddress}    if defined $params->{clusterBaseAddress};
-        $self->{cluster}               = $params->{cluster}               if defined $params->{cluster};
-        $self->{octConfigFile}         = $params->{octConfigFile}         if defined $params->{octConfigFile};
-        $self->{gitRevertHash}         = $params->{gitRevertHash}         if defined $params->{gitRevertHash};
-        $self->{host}                  = $params->{host}                  if defined $params->{host};
-        $self->{resourceKinds}         = $params->{resourceKinds}         if defined $params->{resourceKinds};
-        $self->{components}            = $params->{components}            if defined $params->{components};
-        $self->{namespace}             = $params->{namespace}             if defined $params->{namespace};
-        $self->{projectName}           = $params->{projectName}           if defined $params->{projectName};
-        $self->{omit}                  = $params->{omit}                  if defined $params->{omit};
-        $self->{urlPrefix}             = $params->{urlPrefix}             if defined $params->{urlPrefix};
-        $self->{clusterIpRange}        = $params->{clusterIpRange}        if defined $params->{clusterIpRange};
-        $self->{secretsDir}            = $params->{secretsDir}            if defined $params->{secretsDir};
-        $self->{sortType}              = $params->{sortType}              if defined $params->{sortType};
-        $self->{templatesTTDir}        = $params->{templatesTTDir}        if defined $params->{templatesTTDir};
-        $self->{yamlToTTconvertDir}    = $params->{yamlToTTconvertDir}    if defined $params->{yamlToTTconvertDir};
-        $self->{specificYamlFile}      = $params->{specificYamlFile}      if defined $params->{specificYamlFile};
-        $self->{templatesYamlDir}      = $params->{templatesYamlDir}      if defined $params->{templatesYamlDir};
-        $self->{validationReportFile}  = $params->{validationReportFile}  if defined $params->{validationReportFile};
-        $self->{projectDir}            = $params->{projectDir}            if defined $params->{projectDir};
-        $self->{addFlagValuesToConfig} = $params->{addFlagValuesToConfig} if defined $params->{addFlagValuesToConfig};
-        $self->{componentIsAllowed}    = $params->{componentIsAllowed}    if defined $params->{componentIsAllowed};
-        $self->{generateUrl}           = $params->{generateUrl}           if defined $params->{generateUrl};
-        $self->{removeClutter}         = $params->{removeClutter}         if defined $params->{removeClutter};
-        $self->{removeClutterBackup}   = $params->{removeClutterBackup}   if defined $params->{removeClutterBackup};
+    
+    if(@_ == 2){
+        for my $key (keys %$params){
+             $self->{$key} = $params->{$key} if defined $params->{$key};
+        }
     }
+
     return;
 }
 

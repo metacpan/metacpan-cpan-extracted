@@ -1,0 +1,12 @@
+title: a tool the session does not have is answered in Claude Code's words, with the case hint when only the case differs (ADR 0026 addendum)
+prompt: Call things.
+script:
+  - tool_calls:
+      - [ nonesuch, { x: 1 } ]
+      - [ BASH, { command: echo hi } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: nonesuch, error: true, text: '\A<tool_use_error>Error: No such tool available: nonesuch</tool_use_error>\z' }
+    - { name: BASH, error: true, text: '\A<tool_use_error>Error: No such tool available: BASH\. Tool names are case-sensitive: call bash instead\.</tool_use_error>\z' }

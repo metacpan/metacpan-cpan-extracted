@@ -2,7 +2,7 @@
 # Chain of Custody forgery detection.
 #
 # A conformant DKIM2 verifier MUST reconstruct each lower Message-Instance from
-# the higher instance's Recipe and re-check its hashes (-07 §5, §13-14).
+# the higher instance's Recipe and re-check its hashes (-08 §5, §13-14).
 # These vectors each have a TOP instance (m=2) whose hashes are correct AND
 # whose signature is valid, but a Recipe that does NOT reconstruct the signed
 # m=1 state.  A verifier that only trusts the top instance accepts them; a

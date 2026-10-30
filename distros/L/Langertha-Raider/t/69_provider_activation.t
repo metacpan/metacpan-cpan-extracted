@@ -179,6 +179,24 @@ subtest 'a model on several endpoints' => sub {
     'names them' );
   like( activate( '/multi.json', model => 'z' )->{error}, qr/dialect 'carrier-pigeon' is unknown/,
     'only on an unknown dialect' );
+  like( activate( '/multi.json', model => 'y' )->{error}, qr/pick one with --provider-endpoint ID/,
+    'the refusal names the way to choose (k150)' );
+};
+
+subtest 'the user chooses the endpoint (k150)' => sub {
+  for my $case ( [ chat => 'openai-chat' ], [ msg => 'anthropic' ] ) {
+    my ( $id, $dialect ) = @$case;
+    my $got = activate( '/multi.json', model => 'y', endpoint => $id );
+    is( [ @$got{qw( status endpoint dialect )} ], [ 'completed', $id, $dialect ], "endpoint $id: its dialect's engine" )
+      or diag $got->{error};
+  }
+  my $got = activate( '/multi.json', model => 'y', endpoint => 'coo' );
+  is( $got->{status}, 'usage', 'an endpoint the model is not on: a command-line error' );
+  like( $got->{error}, qr/model 'y' is not listed on endpoint 'coo' \(it is on: chat, msg\)/, 'names where it is' );
+  $got = activate( '/multi.json', model => 'x', endpoint => 'chat' );
+  is( $got->{status}, 'completed', 'also where there was no choice to make' );
+  $got = activate( '/one.json', endpoint => 'chat' );
+  is( $got->{status}, 'completed', 'and for the single model' );
 };
 
 subtest 'dialect and auth refusals' => sub {

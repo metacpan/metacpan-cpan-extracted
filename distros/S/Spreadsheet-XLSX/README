@@ -14,22 +14,82 @@ To install this module type the following:
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
+Dependencies are listed in cpanfile. From the repository root, install the
+runtime and test dependencies with cpanminus:
 
-  Archive::Zip
-  Spreadsheet::ParseExcel
+   cpanm --installdeps .
+
+For development and release testing, include the develop dependencies:
+
+   cpanm --installdeps --with-develop .
+
+If cpanm is not installed, install it first:
+
+   cpan App::cpanminus
 
 BUILD AND RELEASE INSTRUCTIONS
 
-Note: Meta files (META.json and META.yml) have to be generated using ExtUtils::MakeMaker to satisfy the MANIFEST file. 
+Run the following commands from the root of the checked-out repository.
+On Windows with Strawberry Perl, use gmake instead of make throughout.
+Building the .tar.gz archive also requires tar and gzip on PATH.
 
-Use the commands:
+1. Prepare the release.
 
-   perl Makefile.PL
-   make distdir
-   make disttest
-   make dist
-   
+   Update the version in lib/Spreadsheet/XLSX.pm,
+   lib/Spreadsheet/XLSX/Fmt2007.pm and lib/Spreadsheet/XLSX/Utility2007.pm.
+   Update Changes with the release version and date, and add any new
+   distribution files to MANIFEST.
+
+2. Install dependencies and generate the Makefile.
+
+   Install all dependencies from cpanfile, including release test modules:
+
+      cpanm --installdeps --with-develop .
+      perl Makefile.PL
+
+   Test::Kwalitee and Test::Warnings are required to run the release-only
+   tests; those tests are skipped if the modules are missing.
+
+3. Run the regular tests from the checkout.
+
+      prove -lr t
+
+4. Build a distribution directory and run all tests there.
+
+   In a POSIX shell:
+
+      RELEASE_TESTING=1 make disttest
+
+   In PowerShell with Strawberry Perl:
+
+      $env:RELEASE_TESTING = '1'
+      make disttest
+      Remove-Item Env:RELEASE_TESTING
+
+   Check that all tests pass, including the release-only tests.
+   disttest creates the distribution directory and generates META.json and
+   META.yml before testing. These files need not exist in the checkout;
+   running the release-only tests directly there can therefore report a
+   missing META.yml. An initial Makefile.PL warning about missing META files
+   is expected in a fresh checkout.
+
+5. Create the release archive after the tests pass.
+
+      make dist
+
+   This creates Spreadsheet-XLSX-<version>.tar.gz, including META.json and
+   META.yml. Building the archive does not upload or publish the release.
+
+6. Remove temporary build files.
+
+      make realclean
+
+   realclean removes build files, blib, MYMETA.json, MYMETA.yml, the Makefile
+   and the generated distribution directory. The release .tar.gz archive
+   remains available for upload. make clean performs a partial cleanup
+   and leaves Makefile.old behind.
+
+   To build again after realclean, start with perl Makefile.PL.
 
 COPYRIGHT AND LICENCE
 

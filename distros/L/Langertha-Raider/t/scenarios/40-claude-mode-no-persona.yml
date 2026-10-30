@@ -1,0 +1,15 @@
+title: in Claude mode raider's own persona and the default packs are off; the model sees CLAUDE.md and a neutral base text
+files:
+  CLAUDE.md: "Project rule: MEMORY-MARKER\n"
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "MEMORY-MARKER" }
+    - { index: 0, contains: "You are an interactive agent that helps users with software engineering" }
+    - { index: 0, absent: "Langertha" }
+    - { index: 0, absent: "shield-maiden" }
+    - { index: 0, absent: "Caveman Mode" }
+    - { index: 0, absent: "Active packs" }

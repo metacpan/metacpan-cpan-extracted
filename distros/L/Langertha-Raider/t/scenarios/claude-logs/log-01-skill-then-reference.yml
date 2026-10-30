@@ -1,0 +1,34 @@
+# Real pattern: the model calls the Skill tool for a how-to skill, the skill body
+# points at a reference file in its own directory, the model reads it and acts
+# by that instruction (Skill -> Read -> Edit).
+title: skill loaded, then the reference file beside it is read and the work follows its rule
+files:
+  CLAUDE.md: "Project notes.\n"
+  .claude/skills/changelog/SKILL.md: "---\nname: changelog\ndescription: Adds an entry to the project changelog in house style.\n---\n\nRead references/format.md in this skill's directory first, then add the entry.\n"
+  .claude/skills/changelog/references/format.md: "Entries start with '- ' and a capital letter, one line, no full stop. FORMAT-MARKER\n"
+  CHANGES.md: "# Changes\n\n- Initial release\n"
+prompt: Add a changelog entry for the new parser.
+script:
+  - tool_calls:
+      - [ skill, { skill: changelog } ]
+  - tool_calls:
+      - [ read_file, { path: .claude/skills/changelog/references/format.md } ]
+      - [ read_file, { path: CHANGES.md } ]
+  - tool_calls:
+      - [ edit_file, { path: CHANGES.md, old_string: "# Changes\n\n", new_string: "# Changes\n\n- Add the new parser\n" } ]
+  - text: Eintrag ergänzt.
+expect:
+  answer: Eintrag ergänzt.
+  files:
+    CHANGES.md: "# Changes\n\n- Add the new parser\n- Initial release\n"
+  requests:
+    - { index: 0, contains: "- changelog: Adds an entry to the project changelog in house style." }
+    - { index: 0, absent: FORMAT-MARKER }
+    - { index: 1, contains: "Read references/format.md in this skill's directory first" }
+    - { index: 1, tail: [ { role: tool, contains: "Launching skill: changelog" }, { role: user, contains: "/.claude/skills/changelog\n\nRead references/format.md" } ] }
+    - { index: 2, contains: FORMAT-MARKER }
+  tools:
+    - { name: skill, text: '^Launching skill: changelog$' }
+    - { name: read_file, text: 'one line, no full stop\. FORMAT-MARKER' }
+    - { name: read_file, text: "\\A1\\t# Changes\\n" }
+    - { name: edit_file, text: '^The file \S+ has been updated successfully\.' }

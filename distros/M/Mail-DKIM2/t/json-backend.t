@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Recipe numbers must be JSON integers (-07 section 5) whichever backend
+# Recipe numbers must be JSON integers (-08 section 5) whichever backend
 # JSON.pm picks. JSON::PP decodes 1e0 as a plain integer where JSON::XS
 # gives a float, so Mail::DKIM2 0.25 accepted it on a box without JSON::XS
 # (a cpanm install failing t/recipe-order.t, 2026-10-20). Pin JSON::PP here

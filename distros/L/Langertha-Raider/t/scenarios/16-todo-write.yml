@@ -1,0 +1,38 @@
+title: todo_write keeps the list in the run state and reports every change as todo.updated
+# todo_write is mounted instead of the task tools (RAIDER_ENABLE_TASKS=0, ADR 0025)
+app: { task_tools: false }
+prompt: Do three things.
+script:
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: Read the code, status: in_progress, activeForm: Reading the code }
+            - { content: Write the fix, status: pending }
+            - { content: Run the tests, status: pending }
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: Read the code, status: completed }
+            - { content: Write the fix, status: in_progress }
+            - { content: Run the tests, status: pending }
+  - text: fertig
+expect:
+  answer: fertig
+  tools:
+    - { name: todo_write, text: '^Todo list updated: 0 completed, 1 in progress, 2 pending\n\[>\] Read the code\n\[ \] Write the fix\n\[ \] Run the tests$' }
+    - { name: todo_write, text: '^Todo list updated: 1 completed, 1 in progress, 1 pending' }
+  todos:
+    - { content: Read the code, status: completed }
+    - { content: Write the fix, status: in_progress }
+    - { content: Run the tests, status: pending }
+  events:
+    - type: todo.updated
+      todos:
+        - { content: Read the code, status: in_progress, activeForm: Reading the code }
+        - { content: Write the fix, status: pending, activeForm: Write the fix }
+        - { content: Run the tests, status: pending, activeForm: Run the tests }
+    - type: todo.updated
+      todos:
+        - { content: Read the code, status: completed }
+        - { content: Write the fix, status: in_progress }
+        - { content: Run the tests, status: pending }

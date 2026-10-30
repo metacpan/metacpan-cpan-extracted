@@ -435,6 +435,24 @@ Portuguese Macao SAR China locale.
    1995-12-22T09:05:02 = sexta, 22 de dez. de 1995 d.C.
   -0010-09-15T04:44:23 = sábado, 15 de set. de -10 a.C.
 
+=head3 GyMMMM (MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = fevereiro de 2008 d.C.
+   1995-12-22T09:05:02 = dezembro de 1995 d.C.
+  -0010-09-15T04:44:23 = setembro de -10 a.C.
+
+=head3 GyMMMMEd (ccc, d 'de' MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = terça, 5 de fevereiro de 2008 d.C.
+   1995-12-22T09:05:02 = sexta, 22 de dezembro de 1995 d.C.
+  -0010-09-15T04:44:23 = sábado, 15 de setembro de -10 a.C.
+
+=head3 GyMMMMd (d 'de' MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = 5 de fevereiro de 2008 d.C.
+   1995-12-22T09:05:02 = 22 de dezembro de 1995 d.C.
+  -0010-09-15T04:44:23 = 15 de setembro de -10 a.C.
+
 =head3 GyMMMd (d 'de' MMM 'de' y G)
 
    2008-02-05T18:30:30 = 5 de fev. de 2008 d.C.
@@ -477,17 +495,17 @@ Portuguese Macao SAR China locale.
    1995-12-22T09:05:02 = 09:05 UTC
   -0010-09-15T04:44:23 = 04:44 UTC
 
-=head3 Hv (HH v)
+=head3 Hv (HH'h', v)
 
-   2008-02-05T18:30:30 = 18 UTC
-   1995-12-22T09:05:02 = 09 UTC
-  -0010-09-15T04:44:23 = 04 UTC
+   2008-02-05T18:30:30 = 18h, UTC
+   1995-12-22T09:05:02 = 09h, UTC
+  -0010-09-15T04:44:23 = 04h, UTC
 
-=head3 M (L)
+=head3 M (MM)
 
-   2008-02-05T18:30:30 = 2
+   2008-02-05T18:30:30 = 02
    1995-12-22T09:05:02 = 12
-  -0010-09-15T04:44:23 = 9
+  -0010-09-15T04:44:23 = 09
 
 =head3 MEd (E, dd/MM)
 
@@ -507,7 +525,7 @@ Portuguese Macao SAR China locale.
    1995-12-22T09:05:02 = sexta, 22/12
   -0010-09-15T04:44:23 = sábado, 15/09
 
-=head3 MMMMEd (ccc, d 'de' MMMM)
+=head3 MMMMEd (E, d 'de' MMMM)
 
    2008-02-05T18:30:30 = terça, 5 de fevereiro
    1995-12-22T09:05:02 = sexta, 22 de dezembro
@@ -531,11 +549,11 @@ Portuguese Macao SAR China locale.
    1995-12-22T09:05:02 = 22 de dezembro
   -0010-09-15T04:44:23 = 15 de setembro
 
-=head3 MMMd (d/MM)
+=head3 MMMd (d 'de' MMM)
 
-   2008-02-05T18:30:30 = 5/02
-   1995-12-22T09:05:02 = 22/12
-  -0010-09-15T04:44:23 = 15/09
+   2008-02-05T18:30:30 = 5 de fev.
+   1995-12-22T09:05:02 = 22 de dez.
+  -0010-09-15T04:44:23 = 15 de set.
 
 =head3 MMdd (dd/MM)
 
@@ -621,11 +639,11 @@ Portuguese Macao SAR China locale.
    1995-12-22T09:05:02 = 12/1995
   -0010-09-15T04:44:23 = 09/-10
 
-=head3 yMMM (MM/y)
+=head3 yMMM (MMM 'de' y)
 
-   2008-02-05T18:30:30 = 02/2008
-   1995-12-22T09:05:02 = 12/1995
-  -0010-09-15T04:44:23 = 09/-10
+   2008-02-05T18:30:30 = fev. de 2008
+   1995-12-22T09:05:02 = dez. de 1995
+  -0010-09-15T04:44:23 = set. de -10
 
 =head3 yMMMEEEEd (EEEE, d/MM/y)
 
@@ -645,7 +663,7 @@ Portuguese Macao SAR China locale.
    1995-12-22T09:05:02 = dezembro de 1995
   -0010-09-15T04:44:23 = setembro de -10
 
-=head3 yMMMMEd (ccc, d 'de' MMMM 'de' y)
+=head3 yMMMMEd (E, d 'de' MMMM 'de' y)
 
    2008-02-05T18:30:30 = terça, 5 de fevereiro de 2008
    1995-12-22T09:05:02 = sexta, 22 de dezembro de 1995

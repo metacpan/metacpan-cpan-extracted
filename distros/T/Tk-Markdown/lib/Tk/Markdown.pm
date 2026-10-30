@@ -10,7 +10,7 @@ Tk::Markdown - display Markdown in a Text
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use base qw(Tk::Derived Tk::Text);
 use Tk::Font;
@@ -176,16 +176,19 @@ sub setStyles {
 
 This is called internally. It prettifies Markdown prior to insertion.
 
-<% Perl code here %> is interpreted here.
-So if you want to have Perl code that results in formatted Markdown, you'll need to put it inside C<<% %>> (as opposed to the C<<? ?>> that will get run by L<Tk::MarkdownTk>)
+Document content is treated as text, never as Perl code. Tags such as
+C<< <% ... %> >> and C<< <%= ... %> >> are preserved literally. Applications
+that generate Markdown dynamically should do so before calling this formatter.
+
+This guarantee applies to Tk::Markdown. The separate Tk::MarkdownTk module
+adds its own scripting features and must not be used with untrusted documents.
 
 =cut
 
 ### reformat the text of certain Markdown components to make them prettier...
 sub FormatMarkdown {
     my $markdown = shift;
-    $markdown =~ s/<\%=(.*?)\%>/ my $v=$1; eval("\$v = sub{ $v }"); &$v()/ges;
-    $markdown =~ s/<\%(.*?)\%>/ eval($1); ''/ges;
+
     my @lines = split /\n/, $markdown;
     my $i = 0;
     while($i < @lines) {

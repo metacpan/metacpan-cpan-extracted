@@ -1,0 +1,22 @@
+title: a deny rule in ~/.raider/config.yml beats an allow rule of the project
+permission_mode: default
+home:
+  .raider/config.yml: |
+    permissions:
+      deny: [ "Bash(rm:*)" ]
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ Bash ]
+  keep.txt: keep
+prompt: Go.
+script:
+  - tool_calls:
+      - [ bash, { command: rm keep.txt } ]
+      - [ bash, { command: echo still here } ]
+  - text: done
+expect:
+  files: { keep.txt: keep }
+  tools:
+    - { name: bash, error: true, text: "denied by rule 'Bash\\(rm:\\*\\)' from ~/\\.raider/config\\.yml" }
+    - { name: bash, text: still here }

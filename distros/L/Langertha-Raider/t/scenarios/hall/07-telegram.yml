@@ -1,0 +1,41 @@
+title: a message of an allowed chat gets an answer by telegram_reply, one of a stranger is ignored, routing '*' and per chat
+# The hall has no setting for the Bot API's base URL (api.telegram.org is
+# fixed in Hall/Telegram.pm). `fake_telegram: true` makes the test redirect
+# that one host to a local fake Bot API inside the hall's process, so the hall
+# and the raiders are the real thing and only the network edge is replaced.
+fake_telegram: true
+hall:
+  telegram:
+    bots:
+      ops:
+        token: TESTTOKEN
+        allowlist: [ 42 ]
+        allowed_chats: [ -1001 ]
+        routing: { '*': Testie, '-1001': testie }
+model:
+  rules:
+    Hallo Bot.:
+      tool_calls:
+        - [ telegram_reply, { text: "Hallo Mensch." } ]
+  after:
+    telegram_reply: { answer: "Beantwortet." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - telegram_say: { chat_id: 42, from_id: 42, text: "Hallo Bot." }
+  - wait_event: { type: telegram.in, chat_id: 42, text: "Hallo Bot." }
+  - wait_event: { type: raider.spawned, binding: 'telegram:ops:42', slot: Testie, as: private }
+  - done: { run: private, status: completed, response_like: 'Beantwortet' }
+  - expect_telegram_sent: { chat_id: 42, count: 1, text_like: 'Hallo Mensch\.' }
+  # a stranger: neither answered nor started
+  - telegram_say: { chat_id: 99, from_id: 99, text: "Hallo Bot." }
+  - wait_event: { type: telegram.rejected, chat_id: 99, reason: sender_not_allowed }
+  - sleep: 1
+  - expect_no_event: { type: raider.spawned, binding: 'telegram:ops:99' }
+  # an allowed user in an allowed group: the chat's own route
+  - telegram_say: { chat_id: -1001, from_id: 42, text: "Hallo Bot." }
+  - wait_event: { type: raider.spawned, binding: 'telegram:ops:-1001', slot: testie, as: group }
+  - done: { run: group, status: completed, response_like: 'Beantwortet' }
+  - expect_telegram_sent: { chat_id: -1001, count: 1, text_like: 'Hallo Mensch\.' }
+  # nothing went to the stranger
+  - expect_telegram_sent: { count: 2 }
+  - idle: {}

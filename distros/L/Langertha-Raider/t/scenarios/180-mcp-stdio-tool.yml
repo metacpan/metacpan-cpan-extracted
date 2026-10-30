@@ -1,0 +1,32 @@
+title: a stdio MCP server of ~/.raider/config.yml is started, its tools reach the model as mcp__<server>__<tool> and run in the root (ADR 0029)
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+        env: { RAIDER_SCENARIO: from-config }
+prompt: Ask the test server.
+script:
+  - tool_calls:
+      - [ mcp__t__echo_env, { name: RAIDER_SCENARIO } ]
+      - [ mcp__t__echo_env, { name: CLAUDE_PROJECT_DIR } ]
+      - [ mcp__t__with_dot, {} ]
+      - [ mcp__t__fail, {} ]
+      - [ mcp__t__meta, {} ]
+  - text: done
+expect:
+  answer: done
+  requests:
+    - { index: 0, tool_text: "Returns an environment variable" }
+  tools:
+    - { name: mcp__t__echo_env, text: "\\ARAIDER_SCENARIO=from-config cwd=/\\S+\\z" }
+    - { name: mcp__t__echo_env, text: "\\ACLAUDE_PROJECT_DIR=(/\\S+) cwd=\\1\\z" }
+    - { name: mcp__t__with_dot, text: "\\Adotted\\z" }
+    - { name: mcp__t__fail, error: true, text: "it failed on purpose" }
+    - { name: mcp__t__meta, text: "\\Ameta\\z" }
+  request_count: 2
+  events:
+    - { type: mcp.server, name: t, status: starting }
+    - { type: mcp.server, name: t, scope: raider-home, transport: stdio, status: connected, tools: 6 }
+    - { type: tool.call, name: mcp__t__echo_env }

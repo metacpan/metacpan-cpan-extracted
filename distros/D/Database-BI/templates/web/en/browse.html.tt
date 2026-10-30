@@ -1,6 +1,6 @@
 [%- WRAPPER 'web/en/layouts/default.html.tt' -%]
 
-<p class="back-link"><a href="/">&larr; Home</a></p>
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
 
 <nav class="breadcrumb" aria-label="Path">
   [%- FOREACH crumb IN crumbs -%]

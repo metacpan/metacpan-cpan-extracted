@@ -1,0 +1,25 @@
+title: a Bash prefix rule covers its command only -- not one chained, piped or redirected behind it
+permission_mode: default
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ "Bash(echo:*)" ]
+prompt: Say hi.
+script:
+  - tool_calls:
+      - [ bash, { command: echo hi } ]
+      - [ bash, { command: echo hi && touch pwned } ]
+      - [ bash, { command: echo hi; touch pwned2 } ]
+      - [ bash, { command: echo hi > out.txt } ]
+      - [ bash, { command: echo $(touch pwned3) } ]
+      - [ bash, { command: echoes } ]
+  - text: done
+expect:
+  absent: [ pwned, pwned2, pwned3, out.txt ]
+  tools:
+    - { name: bash, text: hi }
+    - { name: bash, error: true, text: "default mode asks before this call: bash runs code; nobody can approve it" }
+    - { name: bash, error: true, text: "nobody can approve it" }
+    - { name: bash, error: true, text: "nobody can approve it" }
+    - { name: bash, error: true, text: "nobody can approve it" }
+    - { name: bash, error: true, text: "nobody can approve it" }

@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::PageDocument ();
+
+my $code_count = 1001;
+my $runs       = 9;
+my $help       = 0;
+GetOptions(
+    'codes=i' => \$code_count,
+    'runs=i'  => \$runs,
+    'help'    => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "--codes must be between 1 and 5000\n" if $code_count < 1 || $code_count > 5000;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+
+my $separator = $Developer::Dashboard::PageDocument::LEGACY_SEP;
+my $input = join "\n$separator\n", map { sprintf 'CODE%d: body-%d', $_, $_ } 0 .. $code_count - 1;
+my %optimized_result = Developer::Dashboard::PageDocument::_parse_legacy_sections($input);
+my $optimized_expected = _canonical_json( \%optimized_result );
+my $legacy_expected = _canonical_json( _legacy_reference_parse($input) );
+die "Parser output mismatch before timing\n" if $optimized_expected ne $legacy_expected;
+
+my %samples = ( legacy => [], optimized => [] );
+for my $run ( 1 .. $runs ) {
+    my @order = $run % 2 ? qw(legacy optimized) : qw(optimized legacy);
+    for my $name (@order) {
+        my $start = time;
+        my $actual = $name eq 'legacy'
+          ? _legacy_reference_parse($input)
+          : do { my %parsed = Developer::Dashboard::PageDocument::_parse_legacy_sections($input); \%parsed };
+        my $elapsed = time - $start;
+        my $encoded = _canonical_json($actual);
+        die "$name parser output changed during run $run\n" if $encoded ne $optimized_expected;
+        push @{ $samples{$name} }, $elapsed;
+    }
+}
+
+my $legacy_median = _median( @{ $samples{legacy} } );
+my $optimized_median = _median( @{ $samples{optimized} } );
+printf "codes=%d runs=%d exact_parity=yes\n", $code_count, $runs;
+printf "legacy_median_ms=%.3f optimized_median_ms=%.3f speedup=%.2fx\n",
+  1000 * $legacy_median, 1000 * $optimized_median, $legacy_median / $optimized_median;
+exit 0;
+
+# _legacy_reference_parse($text)
+# Reconstructs the pre-optimization allowlist scan for a behavior- and timing
+# comparison against the production parser.
+# Input: legacy instruction text.
+# Output: section name to array-of-lines list, preserving current CODE behavior.
+sub _legacy_reference_parse {
+    my ($text) = @_;
+    my %sections;
+    my $markdown_sep = qr{^\s*---\s*$}m;
+    my @parts = split /(?:\Q$separator\E\s*\n?|$markdown_sep)/, $text;
+    for my $part (@parts) {
+        $part =~ s/\A[\r\n\s]+//;
+        $part =~ s/[\r\n\s]+\z//;
+        next if $part eq '';
+        next if $part !~ /^([A-Za-z][A-Za-z0-9.]*)\s*:\s*(.*)$/s;
+        my ( $name, $body ) = ( uc($1), $2 );
+        $body =~ s/\A\s+//;
+        next if !grep { $_ eq $name || ( $name =~ /^CODE\d+$/ && /^CODE\d+$/ ) }
+          @Developer::Dashboard::PageDocument::LEGACY_KEYS;
+        $sections{$name} = [ split /\n/, $body, -1 ];
+    }
+    return \%sections;
+}
+
+# _canonical_json($value)
+# Encodes a data structure with stable key ordering for benchmark parity.
+# Input: JSON-compatible value.
+# Output: canonical JSON text.
+sub _canonical_json {
+    my ($value) = @_;
+    return JSON::XS->new->canonical->encode($value);
+}
+
+# _median(@values)
+# Returns the median of a non-empty sample list.
+# Input: numeric samples.
+# Output: median numeric value.
+sub _median {
+    my @values = sort { $a <=> $b } @_;
+    return $values[ int( @values / 2 ) ];
+}
+
+# _usage()
+# Builds command-line usage text for the benchmark.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--codes N] [--runs ODD_N] [--help]\n"
+      . "Compares the former linear allowlist scan with the current legacy parser.\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-legacy-parser-benchmark - measure legacy bookmark section validation
+
+=head1 PURPOSE
+
+This developer benchmark compares the old linear C<@LEGACY_KEYS> validation
+with C<Developer::Dashboard::PageDocument::_parse_legacy_sections>. It also
+compares the returned section data before timing. It is research tooling for
+Problem 48, not a production command or a release gate.
+
+=head1 WHY IT EXISTS
+
+The dashboard test profile attributed substantial exclusive time to legacy
+section parsing. This tool isolates the key-validation path using generated
+CODE sections, with the count configurable to show how the former scan scaled.
+
+=head1 WHEN TO USE
+
+Run it when changing the legacy parser or comparing candidate key-validation
+strategies. A large CODE count is a stress workload; it should not be mistaken
+for a representative user dashboard without a separate workload profile.
+
+=head1 HOW TO USE
+
+From the repository root, run:
+
+  perl script/problem48-legacy-parser-benchmark
+  perl script/problem48-legacy-parser-benchmark --codes 10 --runs 9
+
+The default compares 1,001 sections in nine alternating runs and prints exact
+output-parity status and median parser times. C<--codes> accepts 1 through
+5,000. C<--runs> must be a positive odd number.
+
+=head1 USED BY
+
+Problem 48 performance investigations and contributors evaluating the legacy
+bookmark parser.
+
+=cut

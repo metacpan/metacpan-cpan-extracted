@@ -304,7 +304,7 @@ sub _new_redirect_flow_url {
 }
 
 sub _confirm_redirect_flow {
-    my ( $self,$redirect_flow_id ) = @_;
+    my ( $self,$redirect_flow_id,$session_token ) = @_;
 
     # first find the original session token
     my $RedirectFlow = Business::GoCardless::RedirectFlow->new(
@@ -313,6 +313,16 @@ sub _confirm_redirect_flow {
     );
 
     $RedirectFlow->find_with_client( 'redirect_flows' );
+
+    # only the session that started the redirect flow may confirm it
+    if (
+        ! length( $session_token // '' )
+        || ( $RedirectFlow->session_token // '' ) ne $session_token
+    ) {
+        Business::GoCardless::Exception->throw({
+            message => "session_token does not match redirect flow $redirect_flow_id",
+        });
+    }
 
     # redirect flows backed by a billing request are completed by gocardless
     # when the billing request is fulfilled, and trying to complete them again

@@ -72,6 +72,16 @@ subtest 'generated commands' => sub {
 
     $ns->ssubscribe('foo', 'bar');
     is_deeply last_call(), ['ssubscribe', 'ns:foo', 'ns:bar'], 'ssubscribe';
+
+    # false values are keys too
+    $ns->get('0');
+    is_deeply last_call(), ['get', 'ns:0'], 'get "0"';
+
+    $ns->set(0, 'value');
+    is_deeply last_call(), ['set', 'ns:0', 'value'], 'set 0';
+
+    $ns->del('', '0');
+    is_deeply last_call(), ['del', 'ns:', 'ns:0'], 'del the empty key';
 };
 
 subtest 'keyword' => sub {
@@ -86,6 +96,15 @@ subtest 'keyword' => sub {
 
     $ns->migrate('localhost', 6379, '', 0, 1000, 'AUTH', 'keys', 'KEYS', 'foo', 'keys', 'bar');
     is_deeply last_call(), ['migrate', 'localhost', 6379, '', 0, 1000, 'AUTH', 'keys', 'KEYS', 'ns:foo', 'ns:keys', 'ns:bar'], 'migrate with AUTH and KEYS';
+
+    $ns->migrate('localhost', 6379, '', 0, 1000, 'KEYS', '0', '');
+    is_deeply last_call(), ['migrate', 'localhost', 6379, '', 0, 1000, 'KEYS', 'ns:0', 'ns:'], 'migrate with false keys';
+
+    $ns->migrate('localhost', 6379, '', 0, 1000);
+    is_deeply last_call(), ['migrate', 'localhost', 6379, 'ns:', 0, 1000], 'migrate the empty key';
+
+    $ns->migrate('localhost', 6379, '0', 0, 1000, 'AUTH', 'keys');
+    is_deeply last_call(), ['migrate', 'localhost', 6379, 'ns:0', 0, 1000, 'AUTH', 'keys'], 'migrate the key "0"';
 
     $ns->xread('COUNT', 2, 'STREAMS', 'foo', 'bar', 0, 0);
     is_deeply last_call(), ['xread', 'COUNT', 2, 'STREAMS', 'ns:foo', 'ns:bar', 0, 0], 'xread';

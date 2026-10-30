@@ -9,6 +9,8 @@ use Langertha::Raider::WebTools qw( build_web_tools_server );
   package TestLoop;
   sub new { bless { awaited => 0 }, shift }
   sub add { }
+  # web_search bounds the whole search with a timer (k148); never fires here.
+  sub delay_future { Future->new }
   sub await {
     my ($self, $f) = @_;
     $self->{awaited}++;
@@ -45,6 +47,7 @@ use Langertha::Raider::WebTools qw( build_web_tools_server );
   package TestHTTPResponse;
   sub new { bless {}, shift }
   sub is_success { 1 }
+  sub is_redirect { 0 }
   sub status_line { '200 OK' }
   sub decoded_content { '<html><body><p>Hello</p><script>bad()</script></body></html>' }
   sub header { 'text/html' }

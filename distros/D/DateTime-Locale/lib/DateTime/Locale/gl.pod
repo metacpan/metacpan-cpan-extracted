@@ -435,6 +435,24 @@ Galician locale.
    1995-12-22T09:05:02 = ven., 22 de dec. de 1995 d.C.
   -0010-09-15T04:44:23 = sáb., 15 de set. de -10 a.C.
 
+=head3 GyMMMM (MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = febreiro de 2008 d.C.
+   1995-12-22T09:05:02 = decembro de 1995 d.C.
+  -0010-09-15T04:44:23 = setembro de -10 a.C.
+
+=head3 GyMMMMEd (E, d 'de' MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = mar., 5 de febreiro de 2008 d.C.
+   1995-12-22T09:05:02 = ven., 22 de decembro de 1995 d.C.
+  -0010-09-15T04:44:23 = sáb., 15 de setembro de -10 a.C.
+
+=head3 GyMMMMd (d 'de' MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = 5 de febreiro de 2008 d.C.
+   1995-12-22T09:05:02 = 22 de decembro de 1995 d.C.
+  -0010-09-15T04:44:23 = 15 de setembro de -10 a.C.
+
 =head3 GyMMMd (d 'de' MMM 'de' y G)
 
    2008-02-05T18:30:30 = 5 de feb. de 2008 d.C.
@@ -465,23 +483,23 @@ Galician locale.
    1995-12-22T09:05:02 = 09:05:02
   -0010-09-15T04:44:23 = 04:44:23
 
-=head3 Hmsv (HH:mm:ss v)
+=head3 Hmsv (HH:mm:ss, v)
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18:30:30, UTC
+   1995-12-22T09:05:02 = 09:05:02, UTC
+  -0010-09-15T04:44:23 = 04:44:23, UTC
 
-=head3 Hmv (HH:mm v)
+=head3 Hmv (HH:mm, v)
 
-   2008-02-05T18:30:30 = 18:30 UTC
-   1995-12-22T09:05:02 = 09:05 UTC
-  -0010-09-15T04:44:23 = 04:44 UTC
+   2008-02-05T18:30:30 = 18:30, UTC
+   1995-12-22T09:05:02 = 09:05, UTC
+  -0010-09-15T04:44:23 = 04:44, UTC
 
-=head3 Hv (HH v)
+=head3 Hv (HH, v)
 
-   2008-02-05T18:30:30 = 18 UTC
-   1995-12-22T09:05:02 = 09 UTC
-  -0010-09-15T04:44:23 = 04 UTC
+   2008-02-05T18:30:30 = 18, UTC
+   1995-12-22T09:05:02 = 09, UTC
+  -0010-09-15T04:44:23 = 04, UTC
 
 =head3 M (L)
 
@@ -638,6 +656,18 @@ Galician locale.
    2008-02-05T18:30:30 = febreiro de 2008
    1995-12-22T09:05:02 = decembro de 1995
   -0010-09-15T04:44:23 = setembro de -10
+
+=head3 yMMMMEd (E, d 'de' MMMM 'de' y)
+
+   2008-02-05T18:30:30 = mar., 5 de febreiro de 2008
+   1995-12-22T09:05:02 = ven., 22 de decembro de 1995
+  -0010-09-15T04:44:23 = sáb., 15 de setembro de -10
+
+=head3 yMMMMd (d 'de' MMMM 'de' y)
+
+   2008-02-05T18:30:30 = 5 de febreiro de 2008
+   1995-12-22T09:05:02 = 22 de decembro de 1995
+  -0010-09-15T04:44:23 = 15 de setembro de -10
 
 =head3 yMMMd (d 'de' MMM 'de' y)
 

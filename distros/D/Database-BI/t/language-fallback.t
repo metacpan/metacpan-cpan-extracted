@@ -26,12 +26,93 @@ use strict;
 use warnings;
 
 use Test::Most;
+use File::Copy ();
+use File::Path ();
+use File::Spec ();
 use File::Temp qw(tempdir);
+use Mojo::File qw(path);
 use Test::Mojo;
-use lib 't/lib';
-use BI::Test::Browser ();
 
-my $home = BI::Test::Browser::_home_for_language({
+sub _copy_tree {
+	my ($source, $target) = @_;
+
+	File::Path::make_path($target) unless -d $target;
+
+	opendir my $dh, $source or die "opendir $source: $!\n";
+	my @entries = sort grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+	closedir $dh;
+
+	for my $entry (@entries) {
+		my $from = File::Spec->catfile($source, $entry);
+		my $to   = File::Spec->catfile($target, $entry);
+
+		if (-d $from) {
+			_copy_tree($from, $to);
+			next;
+		}
+
+		File::Copy::copy($from, $to) or die "copy $from to $to: $!\n";
+	}
+
+	return $target;
+}
+
+sub _own_language_templates {
+	my ($dir, $platform, $language) = @_;
+
+	opendir my $dh, $dir or die "opendir $dir: $!\n";
+	my @entries = sort grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+	closedir $dh;
+
+	for my $entry (@entries) {
+		my $file = File::Spec->catfile($dir, $entry);
+
+		if (-d $file) {
+			_own_language_templates($file, $platform, $language);
+			next;
+		}
+		next unless $file =~ /\.tt\z/;
+
+		open my $in, '<', $file or die "read $file: $!\n";
+		my $source = do { local $/; <$in> };
+		close $in;
+
+		$source =~ s{(\Q$platform\E)/en/}{$1/$language/}g;
+		$source =~ s{<html\b}{<html data-language-dir="$language"}
+			if $file =~ m{layouts[\\/]default\.html\.tt\z};
+
+		open my $out, '>', $file or die "write $file: $!\n";
+		print {$out} $source;
+		close $out;
+	}
+}
+
+sub _home_for_language {
+	my ($args) = @_;
+
+	my $language  = $args->{language};
+	my $home      = File::Spec->catdir($args->{tmp}, 'home');
+	my $templates = File::Spec->catdir($home, 'templates');
+
+	_copy_tree('templates', $templates);
+
+	for my $platform_dir (glob "$templates/*") {
+		next unless -d $platform_dir;
+
+		my $default = File::Spec->catdir($platform_dir, 'en');
+		next unless -d $default;
+
+		my $platform = path($platform_dir)->basename;
+		my $target   = File::Spec->catdir($platform_dir, $language);
+
+		_copy_tree($default, $target);
+		_own_language_templates($target, $platform, $language);
+	}
+
+	return $home;
+}
+
+my $home = _home_for_language({
 	tmp      => tempdir(CLEANUP => 1),
 	language => 'fr',
 });

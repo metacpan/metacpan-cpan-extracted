@@ -1,0 +1,16 @@
+title: a skill in .raider/skills is listed and loadable without any Claude files
+files:
+  .raider/skills/notes/SKILL.md: "---\ndescription: Keeps meeting notes.\n---\nNOTES-BODY-MARKER\n"
+prompt: Take notes.
+script:
+  - tool_calls:
+      - [ skill, { skill: notes } ]
+  - text: ok
+expect:
+  requests:
+    - { index: 0, contains: "- notes: Keeps meeting notes." }
+    - { index: 0, absent: NOTES-BODY-MARKER }
+    - { index: 0, absent: "Codebase and user instructions" }
+    - { index: 1, tail: [ { role: tool }, { role: user, contains: NOTES-BODY-MARKER } ] }
+  tools:
+    - { name: skill, text: '^Launching skill: notes$' }

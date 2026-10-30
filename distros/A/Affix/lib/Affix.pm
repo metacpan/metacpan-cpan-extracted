@@ -1,4 +1,4 @@
-package Affix v1.2.7 {    # 'FFI' is my middle name!
+package Affix v1.3.0 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
@@ -24,9 +24,11 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
         my $platform
             = 'Affix::Platform::' .
             ( ( $^O eq 'MSWin32' ) ? 'Windows' :
-                $^O eq 'darwin'                                                                   ? 'MacOS' :
-                $^O eq 'haiku'                                                                    ? 'Haiku' :
-                ( $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' || $^O eq 'dragonfly' ) ? 'BSD' :
+                $^O eq 'cygwin'           ? 'Cygwin' :
+                $^O eq 'darwin'           ? 'MacOS' :
+                $^O eq 'haiku'            ? 'Haiku' :
+                $^O =~ /bsd/i             ? 'BSD' :
+                $^O =~ /(solaris|sunos)/i ? 'Solaris' :
                 'Unix' );
 
         #~ warn $platform;
@@ -50,6 +52,7 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
             Size_t SSize_t
             String WString
             Pointer Array Struct Union Enum Callback CodeRef Complex Vector
+            Bitfield
             ThisCall attach_destructor
             Const Packed VarArgs
             SV
@@ -188,7 +191,7 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
     }
 
     # Abstract
-    CORE::state $wchar_size = $Config{wcharsize} // ( $^O eq 'MSWin32' ? 2 : 4 );
+    CORE::state $wchar_size = $Config{wcharsize} // ( ( $^O eq 'MSWin32' || $^O eq 'cygwin' ) ? 2 : 4 );
     sub Void () { Affix::Type::Primitive->new( name => 'void' ) }
     sub Bool () { Affix::Type::Primitive->new( name => 'bool' ) }
     sub Char () { Affix::Type::Primitive->new( name => 'char' ) }
@@ -266,6 +269,11 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
         return Affix::Type::Array->new( type => $type, count => $size );
     }
 
+    sub Bitfield : prototype($) {
+        my ( $type, $width ) = @{ $_[0] };
+        return Affix::Type::Bitfield->new( type => $type, width => $width );
+    }
+
     # Callback[ [Int, Int] => Void ] -> (int,int)->void
     # Callback[ [String, VarArgs, Int] => Void ] -> (*char;int)->void
     sub Callback : prototype($) {
@@ -337,7 +345,11 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
     }
 
     # Special marker for Variadic functions
-    sub VarArgs () {';'}
+    sub VarArgs : prototype(;$) {
+        my $types = $_[0] // [];
+        $types = [$types] unless ref($types) eq 'ARRAY';
+        return Affix::Type::VarArgs->new( types => $types );
+    }
 
     # Semantic aliases and convienient types
     sub String ()     {'*char'}
@@ -446,6 +458,17 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
         Affix::Type::Bitfield {
         our @ISA = qw[Affix::Type];
         sub signature { my $self = shift; $self->{type}->signature . ':' . $self->{width} }
+    }
+    package    #
+        Affix::Type::VarArgs {
+        our @ISA = qw[Affix::Type];
+        sub types { shift->{types} // [] }
+
+        sub signature {
+            my $self = shift;
+            my @t    = map { builtin::blessed($_) ? $_->signature : $_ } @{ $self->types };
+            return @t ? ';' . join( ',', @t ) : ';';
+        }
     }
     package    #
         Affix::Type::Enum {
@@ -692,11 +715,27 @@ package Affix v1.2.7 {    # 'FFI' is my middle name!
 
         sub signature {
             my $self = shift;
-            my @args = map { builtin::blessed($_) ? $_->signature : $_ } @{ $self->{params} };
-            my $args = join( ',', @args );
-            $args =~ s/,\;,/;/g;
-            $args =~ s/,\;$/;/;
-            my $r = builtin::blessed( $self->{ret} ) ? $self->{ret}->signature : $self->{ret};
+            my ( @fixed, @variadic );
+            my $in_varargs = 0;
+            for my $p ( @{ $self->{params} } ) {
+                if ( builtin::blessed($p) && $p->isa('Affix::Type::VarArgs') ) {
+                    $in_varargs = 1;
+                    push @variadic, @{ $p->types };
+                }
+                elsif ( !ref($p) && $p eq ';' ) {
+                    $in_varargs = 1;
+                }
+                elsif ($in_varargs) {
+                    push @variadic, $p;
+                }
+                else {
+                    push @fixed, $p;
+                }
+            }
+            my $f_str = join( ',', map { builtin::blessed($_) ? $_->signature : $_ } @fixed );
+            my $v_str = join( ',', map { builtin::blessed($_) ? $_->signature : $_ } @variadic );
+            my $args  = $in_varargs                      ? "$f_str;$v_str"         : $f_str;
+            my $r     = builtin::blessed( $self->{ret} ) ? $self->{ret}->signature : $self->{ret};
             return "*(($args)->$r)";
         }
     }

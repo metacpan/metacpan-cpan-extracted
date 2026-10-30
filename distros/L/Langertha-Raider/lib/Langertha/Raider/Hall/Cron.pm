@@ -1,5 +1,5 @@
 package Langertha::Raider::Hall::Cron;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: Internal non-blocking cron scheduler for the raider hall
 
 
@@ -141,7 +141,7 @@ Langertha::Raider::Hall::Cron - Internal non-blocking cron scheduler for the rai
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -152,13 +152,15 @@ L<Langertha::Raider::Hall> and spawns the named raider when it fires.
 Every job runs in a session of its own, bound as C<cron:ID>, which each
 occurrence continues. An occurrence whose previous run has not ended yet
 waits for it in the hall's queues; with C<coalesce: true> it is dropped
-instead and the hall emits C<cron.coalesced>.
+instead and the hall emits C<cron.coalesced>. An occurrence whose raider
+entry the hall refuses runs nothing: the hall emits C<raider.refused> with
+the C<binding> C<cron:ID>, and C<cron.fired> names no C<raider_id>.
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -179,5 +181,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

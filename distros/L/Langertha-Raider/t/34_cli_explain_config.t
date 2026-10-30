@@ -47,6 +47,8 @@ subtest 'file layers only' => sub {
   like(entry($report, 'api_key'), { value => '(set)', source => 'env OPENAI_API_KEY' }, 'key source');
   like([ entry($report, 'skills') ], [ { value => ['claude'], source => '.raider.yml', merged => 1 } ],
     'skills layer');
+  like($report->{layout}, { mode => 'raider', reason => '.raider.yml in root', claude_layout => 1,
+    claude_layout_reason => 'claude: true in config' }, 'legacy skills: [claude] reads the Claude layout');
   like($report->{ignored}, [ { key => 'anthropic' } ], 'inactive section reported');
   unlike(YAML::PP->new->dump_string($report), qr/sk-secret/, 'no secret in the report');
 };
@@ -60,7 +62,8 @@ subtest 'flags as sources' => sub {
     perl              => 1,
     pack_names        => ['polite'],
     engine_options    => { seed => 4, temperature => 0.9 },
-    cli_skill_sources => [ { type => 'file', path => 'AGENTS.md' } ],
+    claude            => 1,
+    cli_skill_sources => [ 'openai' ],
   );
   my $report = $app->explain_config;
   like(entry($report, 'engine'), { source => '-e' }, '-e');
@@ -74,8 +77,13 @@ subtest 'flags as sources' => sub {
   like(entry($report, 'perl'), { value => 1, source => '--perl' }, '--perl');
   like([ entry($report, 'skills') ], [
     { source => '.raider.yml' },
-    { source => '--claude/--openai/--skills', value => [ { path => 'AGENTS.md' } ] },
+    { source => '--openai/--skills', value => [ 'openai' ] },
   ], 'skill flags listed after the file layers');
+  # ADR 0019: --claude is the layout switch, a value of its own; the legacy
+  # skills: [claude] of the file is what it overrides.
+  like(entry($report, 'claude'), { value => 1, source => '--claude', applies_to => 'raider' }, '--claude');
+  like($report->{layout}, { mode => 'raider', claude_layout => 1, claude_layout_reason => '--claude' },
+    'layout: a raider project, Claude layout by --claude');
   unlike(YAML::PP->new->dump_string($report), qr/sk-flag/, 'no secret in the report');
 };
 
@@ -103,6 +111,7 @@ subtest 'raider config explain' => sub {
   like($out, qr/ignored anthropic: section of an inactive engine/, 'ignored section shown');
   unlike($out, qr/sk-flag/, 'key not printed');
   is(path($root)->child('.raider.yml')->slurp_utf8, $before, '--claude not persisted');
+  like($out, qr/^layout: raider \(\.raider\.yml in root\); Claude layout on \(--claude\)$/m, 'layout line');
 
   my $bad = `'$^X' '-I@{[ $repo->child('lib') ]}' '@{[ $repo->child('bin', 'raider') ]}' config nope 2>&1`;
   isnt($?, 0, 'unknown config subcommand fails');

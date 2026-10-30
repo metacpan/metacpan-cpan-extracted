@@ -64,7 +64,7 @@ my @hops = (
         # brong-final.eml differs from brong-mm3.eml by a pile of prepended
         # MTA trace/spam headers (Received, ARC-*, Authentication-Results,
         # Received-SPF, X-*) plus a "[test5] " tag hand-added to the front
-        # of the Subject header's value. Under -07 §4, every one of
+        # of the Subject header's value. Under -08 §4, every one of
         # those prepended headers is unsigned (the last holdout,
         # Received-SPF, moved to unsigned when the `received-` prefix rule
         # landed) -- without the Subject tag, this hop's header+body hash

@@ -435,6 +435,24 @@ Maltese Malta locale.
    1995-12-22T09:05:02 = Ġim, 22 ta’ Diċ, 1995 WK
   -0010-09-15T04:44:23 = Sib, 15 ta’ Set, -10 QK
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = WK 2008 Frar
+   1995-12-22T09:05:02 = WK 1995 Diċembru
+  -0010-09-15T04:44:23 = QK -10 Settembru
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = WK 2008 Frar 5, Tli
+   1995-12-22T09:05:02 = WK 1995 Diċembru 22, Ġim
+  -0010-09-15T04:44:23 = QK -10 Settembru 15, Sib
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = WK 2008 Frar 5
+   1995-12-22T09:05:02 = WK 1995 Diċembru 22
+  -0010-09-15T04:44:23 = QK -10 Settembru 15
+
 =head3 GyMMMd (d MMM, y G)
 
    2008-02-05T18:30:30 = 5 Fra, 2008 WK
@@ -506,6 +524,12 @@ Maltese Malta locale.
    2008-02-05T18:30:30 = Tli, 5 ta’ Fra
    1995-12-22T09:05:02 = Ġim, 22 ta’ Diċ
   -0010-09-15T04:44:23 = Sib, 15 ta’ Set
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Frar 5, Tli
+   1995-12-22T09:05:02 = Diċembru 22, Ġim
+  -0010-09-15T04:44:23 = Settembru 15, Sib
 
 =head3 MMMMW-count-few (W 'ġimgħat' 'ta''' MMMM)
 

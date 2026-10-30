@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Help;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Developer::Dashboard::InternalCLI ();
 
@@ -132,11 +132,11 @@ my %COMMANDS = (
     init => { usage => 'dashboard init', description => 'Initialize the user runtime and stage managed helper assets.' },
     jq => { usage => 'dashboard jq [file] [query]', description => 'Query JSON input from a file or standard input.' },
     log => {
-        usage => 'dashboard log [web|collector [name]] [-n <lines>] [-f]',
-        description => 'Print dashboard or collector logs.',
+        usage => 'dashboard log [-t] [-f] [web|collector [name]] [--tail <lines>|--tail=<lines>] [-n <lines>]',
+        description => 'Print, timestamp, follow, and tail dashboard or collector logs.',
         actions => {
-            web       => [ 'dashboard log web [-n <lines>] [-f]', 'Read or follow the web service log.' ],
-            collector => [ 'dashboard log collector [name]', 'Read one or all collector logs.' ],
+            web       => [ 'dashboard log web [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail the web service log.' ],
+            collector => [ 'dashboard log collector [name] [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail one or all collector logs.' ],
         },
     },
     of => {
@@ -190,7 +190,7 @@ my %COMMANDS = (
         usage => 'dashboard serve [logs|workers] [arguments]',
         description => 'Start the web service or manage its logs and worker count.',
         actions => {
-            logs    => [ 'dashboard serve logs [-n <lines>] [-f]', 'Read or follow web-service logs.' ],
+            logs    => [ 'dashboard serve logs [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail web-service logs.' ],
             workers => [ 'dashboard serve workers <count> [--host <host>] [--port <port>]', 'Set the web worker count.' ],
         },
     },
@@ -231,7 +231,10 @@ my %COMMANDS = (
     upgrade => { usage => 'dashboard upgrade [--dry-run]', description => 'Download and run the canonical dashboard installer.' },
     version => { usage => 'dashboard version', description => 'Print the installed Developer Dashboard version.' },
     which => { usage => 'dashboard which [--edit] <cmd-or-skill-command>', description => 'Resolve a command and show its hook chain.' },
-    workspace => { usage => 'dashboard workspace <name> [options]', description => 'Create or attach to a tmux workspace session.' },
+    workspace => {
+        usage => 'dashboard workspace <name> [-c|-C] [-d|--docker]',
+        description => 'Create or attach to a tmux workspace session. Docker mode uses the Compose service named workspace, which must mount the alias at /workspace. A stopped service starts without building by default; uppercase -C requests a cached build with live progress. Running containers are reused.',
+    },
     xmlq => { usage => 'dashboard xmlq [file] [query]', description => 'Query XML input from a file or standard input.' },
     yq => { usage => 'dashboard yq [file] [query]', description => 'Query YAML input from a file or standard input.' },
 );
@@ -284,10 +287,10 @@ my %OPTIONS = (
     'stop web'                => [qw(--output -o --host --port --workers --ssl --no-ssl)],
     'stop collector'          => [qw(--output -o --host --port --workers --ssl --no-ssl)],
     stop                      => [qw(--output -o --host --port --workers --ssl --no-ssl)],
-    'log web'                 => [qw(-f -n)],
-    'log collector'           => [qw(-n)],
-    log                       => [qw(-f -n)],
-    'serve logs'              => [qw(-f -n)],
+    'log web'                 => [qw(-t -f -n --tail)],
+    'log collector'           => [qw(-t -f -n --tail)],
+    log                       => [qw(-t -f -n --tail)],
+    'serve logs'              => [qw(-t -f -n --tail)],
     'serve workers'           => [qw(--host --port)],
     serve                     => [qw(--host --port --workers --ssl --no-ssl --editor --no-editor --endit --no-endit --indicator --no-indicator --indicators --no-indicators --foreground --no-foreground)],
     'skills install'          => [qw(--ddfile --notest --branch -b --output -o)],
@@ -299,7 +302,7 @@ my %OPTIONS = (
     source                    => [qw(--files)],
     upgrade                   => [qw(--dry-run)],
     which                     => [qw(--edit --no-edit)],
-    workspace                 => [qw(-c)],
+    workspace                 => [qw(-c -C -d --docker)],
     of                        => [qw(--print --no-print --line --editor --online --no-online)],
     'open-file'               => [qw(--print --no-print --line --editor --online --no-online)],
     cpan                      => [],
@@ -613,6 +616,10 @@ without actionable help and valid actions out of TAB suggestions. This module
 holds one tested inventory for built-in helpers, the switchboard's direct
 C<version> command, compatibility aliases, nested actions, and concise synopsis
 text.
+The workspace catalog documents C<-c>, Docker flags C<-d> and C<--docker>,
+and uppercase C<-C> for an explicit build with streamed progress. Docker mode
+requires a registered path alias and runs through a Compose service named
+C<workspace>.
 
 =head1 WHEN TO USE
 
@@ -624,6 +631,7 @@ subcommand, a compatibility alias, or changing the public CLI syntax.
   my $help = Developer::Dashboard::CLI::Help::help_text('docker', 'compose');
   my @actions = Developer::Dashboard::CLI::Help::actions_for('path');
   my @options = Developer::Dashboard::CLI::Help::options_for('api', 'add');
+  my @workspace_options = Developer::Dashboard::CLI::Help::options_for('workspace');
   my @request = Developer::Dashboard::CLI::Help::help_request(
       command => 'api', args => ['--help'],
   );
@@ -655,6 +663,7 @@ actions, flags, and targets following global help.
   dashboard of --print grep --help
   dashboard docker compose config --help
   dashboard docker compose --service dev exec dev docker --help
+  d2 workspace --help
   dashboard of grep --help
   dashboard help docker development
   dashboard complete 3 dashboard api add -

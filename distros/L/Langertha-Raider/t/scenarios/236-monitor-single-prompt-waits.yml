@@ -1,0 +1,29 @@
+# Claude Code: in a non-interactive run (-p) the run waits for the background work it
+# started; a monitor is bounded by its deadline (at most 10 minutes there), so the run
+# goes on with its events until the monitor ends. Raider's wait_background run does the same.
+# Checks ADR 0031 section 1 (non-interactive runs) with ADR 0027 section 3.
+title: a run that answers while its monitor still runs goes on with the events until it ends
+permission_mode: bypassPermissions
+wait_background: true
+delay: 0.05
+prompt: Watch the job.
+script:
+  - tool_calls:
+      - [ monitor, { description: the job, command: "echo first; sleep 0.6; echo second" } ]
+  - text: watching now
+  - text: saw the events
+  - text: all done
+expect:
+  answer: all done
+  tools:
+    - { name: monitor, text: 'Monitor started \(task monitor_1' }
+  requests:
+    # the answer "watching now" would have ended the run: the events come first, as its next message
+    - index: 2
+      tail:
+        - { role: assistant, contains: watching now }
+        - role: user
+          contains: "<event>first</event>"
+    - index: 3
+      tail:
+        - { role: user, contains: "<event>second</event>\n</task-notification>\n<task-notification>\n<task-id>monitor_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<status>completed</status>\n<summary>Monitor \"the job\" ended (exit code 0)</summary>" }

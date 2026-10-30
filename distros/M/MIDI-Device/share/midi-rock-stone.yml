@@ -1,0 +1,64 @@
+name: "Stone"
+manufacturer: "MIDI Rock"
+port:
+    in: "MIDI ROCK Joystick"
+    out: "MIDI ROCK Joystick"
+pitch_wheel_change:
+  - min: -1892
+    max: 8192
+note_on:
+  - number: 85
+    note: "green"
+  - number: 86
+    note: "red"
+  - number: 87
+    note: "blue"
+  - number: 88
+    note: "yellow"
+  - number: 85
+    note: "green"
+  - number: 81
+    note: "encoder 1"
+  - number: 82
+    note: "encoder 2"
+  - number: 83
+    note: "encoder 3"
+  - number: 84
+    note: "encoder 4"
+control_change:
+  - number: 9
+    note: "potentiometer"
+  - number: 25
+    note: "encoder 1 absolute"
+  - number: 26
+    note: "encoder 2 absolute"
+  - number: 27
+    note: "encoder 3 absolute"
+  - number: 28
+    note: "encoder 4 absolute"
+  - number: 31
+    note: "encoder 3 relative"
+  - number: 32
+    note: "encoder 4 relative"
+  - number: 1
+    note: "x mode 1"
+  - number: 10
+    note: "twist mode 1"
+  - number: 16
+    note: "x mode 1 button"
+  - number: 17
+    note: "y mode 1 button"
+  - number: 18
+    note: "twist mode 1 button"
+  - number: 19
+    note: "x mode 2"
+  - number: 20
+    note: "y mode 2"
+  - number: 21
+    note: "twist mode 2"
+  - number: 22
+    note: "x mode 2 button"
+  - number: 23
+    note: "y mode 2 button"
+  - number: 24
+    note: "twist mode 2 button"

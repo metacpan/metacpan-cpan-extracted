@@ -1248,11 +1248,19 @@ subtest '_list_dir FD lifecycle -- no FD leak after listing a directory' => sub 
 		Mojo::File->new("$dir_path/alpha.csv")->spurt("id,v\n1,x\n");
 		Mojo::File->new("$dir_path/beta.csv")->spurt("id,v\n2,y\n");
 
+		# One request first, so the response held by the test client is the same
+		# size as the ones measured: a page large enough for Mojolicious to
+		# spool its body to a temp file costs one descriptor, and that
+		# descriptor is released when the next response replaces it.  Measured
+		# cold, that release lands inside the window and looks like a leak
+		# going the other way.
+		$t->get_ok('/browse?path=' . url_escape($dir_path));
+
 		my @before = glob('/proc/self/fd/*');
 		# Exercise the controller's /browse route which calls _list_dir.
 		$t->get_ok('/browse?path=' . url_escape($dir_path)) for 1..10;
 		my @after = glob('/proc/self/fd/*');
-		is scalar(@after), scalar(@before),
+		cmp_ok scalar(@after), '<=', scalar(@before),
 			'no FD accumulation after 10 /browse calls (_list_dir closedir called)';
 	}
 };

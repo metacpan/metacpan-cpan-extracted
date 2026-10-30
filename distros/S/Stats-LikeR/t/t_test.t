@@ -230,6 +230,13 @@ cmp_t( 'one sample constant', t_test([5, 5, 5], [1, 2, 3]), {
 # Argument-handling coverage that 01.t does not reach.
 throws_ok { t_test([1..5], 'y' => [1..5], 'bogus' => 1) }
 	qr/unknown argument 'bogus'/, 'unknown named argument dies';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('t_test');
+	like($screen, qr/\Ausage: t_test\(/, 't_test has a help screen');
+	eval { t_test([1..5], 'paired') };
+	is($@, $screen . "t_test: error: options must be key => value pairs\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 throws_ok { t_test([5]) }
 	qr/needs at least 2 elements/, 'single-element x dies';
 # conf_level 0 and 1 are inside R's range (t.test.R stops only on

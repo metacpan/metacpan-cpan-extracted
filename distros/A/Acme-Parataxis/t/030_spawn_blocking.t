@@ -184,4 +184,5 @@ subtest 'spawn_blocking under an attached event-loop driver' => sub {
     is $rv, 'loop-result', 'the result arrived with the harvester riding the loop timers';
     ok $did_run, 'fibers still cooperated under the driver while the closure ran';
 };
+#
 done_testing();

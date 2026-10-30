@@ -18,6 +18,8 @@ use Moo::Role;
 use MIME::Base64 qw/ encode_base64 /;
 use Digest::SHA qw/ hmac_sha256_hex /;
 
+our $max_legacy_params_size = 1024 * 1024;
+
 =head1 METHODS
 
 =head2 sign_params
@@ -45,6 +47,12 @@ Checks the signature is valid for the given params hash with the app secret
         # throw an error
     }
 
+A params hash that would flatten to more than
+C<$Business::GoCardless::Utils::max_legacy_params_size> bytes of keys and
+values (default 1 MiB, 0 for no limit) is not valid, as checking it would
+cost time and memory quadratic in its size. An undef or empty secret never
+validates a signature.
+
 =cut
 
 sub signature_valid {
@@ -61,12 +69,18 @@ sub signature_valid {
         return 0;
     }
 
+    # with no key anyone can compute the signature
+    return 0 if ! defined( $app_secret ) || ! length( $app_secret );
+
     if ( $sig ) { # version > 1 (since we don't have access to ->client here)
         return $sig eq hmac_sha256_hex( $params,$app_secret );
     } else {
         # delete local is 5.12+ only so need to copy hash here
         my $params_copy = { %{ $params } };
         $sig = delete( $params_copy->{signature} );
+        return 0 if $max_legacy_params_size
+            && _flattened_size( $params_copy,$max_legacy_params_size )
+                > $max_legacy_params_size;
         return $sig eq $self->sign_params( $params_copy,$app_secret );
     }
 }
@@ -146,6 +160,32 @@ sub _flatten_param {
     }
 
     return @r;
+}
+
+# the bytes of the keys (one per hash, array and leaf) and values that
+# flatten_params builds, counted until they pass $limit
+sub _flattened_size {
+    my ( $params,$limit ) = @_;
+
+    my $size = 0;
+    my @todo = map { [ length( $_ ),$params->{$_} ] } keys( %{ $params } );
+
+    while ( my $item = pop( @todo ) ) {
+        my ( $key_length,$value ) = @{ $item };
+
+        $size += $key_length;
+        return $size if $size > $limit;
+
+        if ( ref( $value ) eq 'HASH' ) {
+            push( @todo,map { [ $key_length + length( $_ ) + 2,$value->{$_} ] } keys( %{ $value } ) );
+        } elsif ( ref( $value ) eq 'ARRAY' ) {
+            push( @todo,map { [ $key_length + 2,$_ ] } @{ $value } );
+        } else {
+            $size += length( $value // '' );
+        }
+    }
+
+    return $size;
 }
 
 sub _rfc5849_encode {

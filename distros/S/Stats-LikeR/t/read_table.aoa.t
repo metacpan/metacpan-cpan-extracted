@@ -129,10 +129,10 @@ sub slurp_text {
 {
 	my $f = fixture("a,b\n1,2\n");
 	throws_ok { read_table($f, 'output_type' => 'aoa', 'row_names' => 'a') }
-		qr/^read_table: 'row_names' has no meaning for output_type "aoa"; the row names column is read as an ordinary column$/,
+		qr/\nread_table: error: 'row_names' has no meaning for output_type "aoa"; the row names column is read as an ordinary column$/,
 		'row_names with aoa dies';
 	throws_ok { read_table($f, 'output_type' => 'matrix') }
-		qr/^read_table: output_type "matrix" isn't allowed \(aoa, aoh, hoa, hoh\)$/,
+		qr/\nread_table: error: output_type "matrix" isn't allowed \(aoa, aoh, hoa, hoh\)$/,
 		'an unknown output_type lists aoa among the allowed ones';
 }
 

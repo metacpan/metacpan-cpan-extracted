@@ -1,6 +1,6 @@
 package Langertha::Raider::CLI;
 # ABSTRACT: Autonomous CLI agent that can browse directories, edit files, and run bash commands
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Path::Tiny;
@@ -35,16 +35,11 @@ has trace_out => (
   default => sub { \*STDOUT },
 );
 
-# Well-known per-tool files + source dirs. Used both for loading (when the
-# matching profile flag is set) and for the "ignored but present" notice.
+# The agent file in the root that each profile flag (--claude, --openai)
+# makes raider read, for the "seeing ..., ignoring" notice.
 our %AGENT_PROFILES = (
-  claude => [
-    { type => 'file',   path => 'CLAUDE.md' },
-    { type => 'claude', path => '.claude/skills' },
-  ],
-  openai => [
-    { type => 'file',   path => 'AGENTS.md' },
-  ],
+  claude => 'CLAUDE.md',
+  openai => 'AGENTS.md',
 );
 
 around _raider_plugins => sub {
@@ -72,7 +67,10 @@ sub source_labels {
     no_detect              => '--no-detect',
     bare                   => '--bare',
     mission                => '-M',
-    cli_skill_sources      => '--claude/--openai/--skills',
+    claude                 => '--claude',
+    cli_skill_sources      => '--openai/--skills',
+    permission_mode        => '--permission-mode',
+    skip_permissions       => '--dangerously-skip-permissions',
   };
 }
 
@@ -92,24 +90,14 @@ EOM
 sub ignored_agent_files {
   my ($self) = @_;
   return if $self->bare;
-
-  my %loaded;
-  for my $s (@{$self->skill_sources}) {
-    next unless ($s->{type} // '') eq 'file';
-    my $p = Path::Tiny::path($s->{path});
-    $p = Path::Tiny::path($self->root)->child($s->{path}) unless $p->is_absolute;
-    $loaded{ $p->canonpath }++;
-  }
-
+  my %loaded = map { $_->{file} => 1 } $self->context->instruction_items;
   my @out;
   for my $profile (sort keys %AGENT_PROFILES) {
-    for my $spec (@{$AGENT_PROFILES{$profile}}) {
-      next unless $spec->{type} eq 'file';
-      my $p = Path::Tiny::path($self->root)->child($spec->{path});
-      next unless -f $p;
-      next if $loaded{ $p->canonpath };
-      push @out, { path => $p->basename, profile => $profile };
-    }
+    my $p = Path::Tiny::path($self->root)->child($AGENT_PROFILES{$profile});
+    next unless -f $p;
+    my $real = eval { $p->realpath->stringify } // $p->absolute->stringify;
+    next if $loaded{$real};
+    push @out, { path => $p->basename, profile => $profile };
   }
   return @out;
 }
@@ -147,7 +135,7 @@ Langertha::Raider::CLI - Autonomous CLI agent that can browse directories, edit 
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -156,10 +144,8 @@ version 0.503
     my $app = Langertha::Raider::CLI->new(
         # engine/model/api_key auto-detected from *_API_KEY env vars
         root           => '/path/to/project',
-        skill_sources  => [
-            { type => 'file',   path => 'CLAUDE.md' },
-            { type => 'claude', path => '.claude/skills' },
-        ],
+        claude         => 1,                      # read the Claude Code layout
+        skill_sources  => [ { type => 'dir', path => 'my-skills' } ],
         engine_options => { temperature => 0.2 },
     );
 
@@ -176,8 +162,11 @@ working coding/system agent:
 =item * Local filesystem access, confined to L<Langertha::Raider::Application/root>
 (L<Langertha::Raider::FileTools>).
 
-=item * Full shell via L<MCP::Run::Bash> (the C<bash> tool), started in
-the root but not confined to it.
+=item * Full shell via L<Langertha::Raider::BashTools> (the C<bash> tool, with
+C<bash_output> and C<kill_shell> for background commands, and C<monitor> to
+stream the output of one as notifications), started in the root but not
+confined to it. In the REPL the model can also schedule prompts for later
+turns (C<cron_create>, L<Langertha::Raider::CronTools>).
 
 =item * Web search + fetch via L<Net::Async::WebSearch> and
 L<Net::Async::HTTP> (L<Langertha::Raider::WebTools>).
@@ -192,8 +181,14 @@ engine is offered (L<Langertha::Raider::Application/mission>).
 =item * Per-engine cheap-model defaults and automatic engine selection from
 the first C<*_API_KEY> env var found (L<Langertha::Raider::EngineResolver>).
 
-=item * Optional skill-loading from C<.claude/skills/*/SKILL.md>,
-C<AGENTS.md>, plain markdown directories, or any mix.
+=item * The Claude Code layout (ADR 0019): C<CLAUDE.md> memory with
+imports and nested files, C<.claude/settings*.json>, plugin skills --
+automatic in a project set up only for Claude Code, by C<--claude> or
+C<claude: true> elsewhere; C<AGENTS.md> by C<--openai>.
+
+=item * Skills from C<.raider/skills>, C<~/.raider/skills>, the Claude
+skill directories and C<--skills DIR>, listed in the prompt and loaded on
+demand with the C<skill> tool.
 
 =item * Engine-attribute config via C<.raider.yml> in the root plus
 C<engine_options> merge.
@@ -210,8 +205,16 @@ It is the command line's L<Langertha::Raider::Application>: all the
 attributes and methods documented there (C<root>, C<engine_name>,
 C<model>, C<mission>, C<packs>, C<raid_f>, C<run>, C<explain_config>, ...)
 apply here, and this class adds what belongs to the terminal -- the live
-L</trace>, the per-tool agent profiles of C<--claude> / C<--openai> and
-L</token_stats>. The command line itself is L<raider>.
+L</trace>, the agent files of C<--claude> / C<--openai> it reports as
+ignored (L</ignored_agent_files>) and L</token_stats>. The command line
+itself is L<raider>.
+
+Of the names the Application gained after the inventory of ADR 0017, only
+the constructor arguments that mirror an option or config key apply here
+as public: C<claude>, C<permission_mode>, C<skip_permissions>,
+C<max_agent_depth>, C<max_concurrent_agents> and C<agent_models>. The others (C<context>,
+C<permissions>, C<hooks>, C<tool_gate>, C<todos>, ...) are internal and may
+change without notice (ADR 0017, Addendum 1).
 
 =head2 default_model_for_engine
 
@@ -249,9 +252,16 @@ The CLI loops back to the user.
 
 =head2 ignored_agent_files
 
-Returns a list of per-tool agent files that exist in the working root but
-are NOT covered by the current L<Langertha::Raider::Application/skill_sources>. Intended to power the
-banner's "seeing AGENTS.md, ignoring" notice.
+    for my $ign ($app->ignored_agent_files) {
+      say 'seeing '.$ign->{path}.', ignoring (use --'.$ign->{profile}.' to load)';
+    }
+
+The agent files (F<CLAUDE.md>, F<AGENTS.md>) in the working root that the
+prompt does not hold (L<Langertha::Raider::Context/instruction_items>),
+each with C<path> and the C<profile> flag that would load it. In the
+Claude layout F<CLAUDE.md> is loaded, so never listed. Nothing with
+L<Langertha::Raider::Application/bare>. Powers the banner's "seeing
+AGENTS.md, ignoring" notice.
 
 =head2 trace_plugin
 
@@ -274,7 +284,7 @@ nothing otherwise.
 
 =item * L<Langertha::Raider::FileTools>
 
-=item * L<MCP::Run::Bash>
+=item * L<Langertha::Raider::BashTools>
 
 =item * L<raider> — the CLI entry point
 
@@ -284,7 +294,7 @@ nothing otherwise.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -305,5 +315,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

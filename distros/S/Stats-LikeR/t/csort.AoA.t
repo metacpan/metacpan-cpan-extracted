@@ -169,6 +169,28 @@ throws_ok { csort( fresh_aoa(), '1.5' ) } qr/non-negative integer/,
 	'fractional AoA index croaks';
 throws_ok { csort( fresh_aoa(), 99 ) } qr/not found/,
 	'AoA index beyond every row croaks (column not found)';
+# An index past what av_fetch() can address is refused as out of range. Up to
+# 0.33 the digits were accumulated unchecked: 2**64-1 wrapped to -1 and the
+# table came back sorted by its last column, and 2**63 went negative. SSize_t
+# is pointer-sized, so on a 32-bit perl 2**31 is already past it.
+{
+	require Config;
+	my $ssize_max = $Config::Config{sizesize} == 4 ? '2147483647' : '9223372036854775807';
+	for my $big ('18446744073709551615', '9223372036854775808', '99999999999999999999999') {
+		throws_ok { csort( fresh_aoa(), $big ) }
+			qr/AoA column index '$big' is out of range \(the largest is $ssize_max\)/,
+			"AoA index $big croaks as out of range";
+	}
+	if ($Config::Config{sizesize} == 4) {
+		throws_ok { csort( fresh_aoa(), '2147483648' ) } qr/out of range/,
+			'AoA index 2**31 is out of range on this 32-bit perl';
+	} else {
+		throws_ok { csort( fresh_aoa(), '2147483648' ) } qr/not found/,
+			'AoA index 2**31 is in range on this 64-bit perl, and not found';
+	}
+	throws_ok { csort( fresh_aoa(), $ssize_max ) } qr/not found/,
+		'the largest index is accepted, and not found';
+}
 throws_ok { csort( fresh_aoa(), 0, 'frame' ) } qr/output type must be/,
 	'bad output type croaks';
 throws_ok { csort( fresh_aoa(), [] ) } qr/second argument/,

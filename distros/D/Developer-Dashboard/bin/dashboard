@@ -4,17 +4,11 @@ use strict;
 use warnings;
 use utf8;
 
-use Config ();
-use Cwd qw(abs_path cwd);
+use Cwd qw(abs_path);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use Developer::Dashboard::PerlEnv ();
 use File::Spec;
-use IO::Handle ();
-use IO::Select ();
-use IPC::Open3 qw(open3);
-use Pod::Usage qw(pod2usage);
-use Symbol qw(gensym);
 
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
@@ -26,19 +20,13 @@ BEGIN {
     );
 }
 
-use Developer::Dashboard::Platform qw(
-  command_argv_for_path
-  is_windows
-  is_runnable_file
-  resolve_runnable_file
-);
-
 if ( (!defined $ENV{HOME} || $ENV{HOME} eq '') && defined $ENV{USERPROFILE} && $ENV{USERPROFILE} ne '' ) {
     $ENV{HOME} = $ENV{USERPROFILE};
 }
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
-my $switchboard_cwd = eval { cwd() };
+require Developer::Dashboard::PathIdentity;
+my $switchboard_cwd = eval { Developer::Dashboard::PathIdentity::current_working_directory() };
 my $switchboard_paths;
 
 my $cmd = shift @ARGV || '';
@@ -83,9 +71,22 @@ elsif ( $cmd eq '--help' || $cmd eq '-h' ) {
     print Developer::Dashboard::CLI::Help::overview_text();
     exit 0;
 }
+elsif ( $cmd eq 'version' ) {
+    if (@ARGV) {
+        require Developer::Dashboard::CLI::Help;
+        my @request = Developer::Dashboard::CLI::Help::help_request(
+            command => $cmd,
+            args    => \@ARGV,
+        );
+        if (@request) {
+            print Developer::Dashboard::CLI::Help::help_text(@request);
+            exit 0;
+        }
+    }
+}
 elsif ( $cmd ne '' ) {
     require Developer::Dashboard::InternalCLI;
-    if ( $cmd eq 'version' || Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
+    if ( Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
         require Developer::Dashboard::CLI::Help;
         my @request = Developer::Dashboard::CLI::Help::help_request(
             command => $cmd,
@@ -99,15 +100,16 @@ elsif ( $cmd ne '' ) {
 }
 
 if ( $cmd eq '' ) {
-    pod2usage(
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
         -exitval  => 1,
         -verbose  => 99,
         -sections => [qw(NAME SYNOPSIS)],
     );
 }
 if ( $cmd eq 'version' ) {
-    require Developer::Dashboard;
-    print $Developer::Dashboard::VERSION, "\n";
+    require Developer::Dashboard::Version;
+    print $Developer::Dashboard::Version::VERSION, "\n";
     exit 0;
 }
 
@@ -135,7 +137,8 @@ if ( $cmd ne '' ) {
     print STDERR Developer::Dashboard::CLI::Suggest->new()->unknown_command_message($cmd);
 }
 
-pod2usage(
+require Pod::Usage;
+Pod::Usage::pod2usage(
     -exitval  => 1,
     -verbose  => 99,
     -sections => [qw(NAME SYNOPSIS)],
@@ -162,13 +165,14 @@ sub _prime_command_result_env {
 
     my @hook_roots = _command_hook_roots($cmd);
     return 1 if !@hook_roots;
+    require Developer::Dashboard::Platform;
     my $stream = $cmd eq 'doctor' ? 0 : 1;
 
     for my $hook_root (@hook_roots) {
         opendir my $dh, $hook_root or next;
         for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
             my $path = File::Spec->catfile( $hook_root, $entry );
-            next if !is_runnable_file($path);
+            next if !Developer::Dashboard::Platform::is_runnable_file($path);
             next if $entry eq 'run';
 
             my $hook_result = _run_command_hook_streaming(
@@ -250,10 +254,15 @@ sub _run_command_hook_streaming {
     my $stream = exists $args{stream} ? $args{stream} : 1;
     my @argv = @{ $args{argv} || [] };
     open my $stdin, '<', File::Spec->devnull() or die "Unable to open " . File::Spec->devnull() . " for hook stdin: $!";
-    my $stderr = gensym();
+    require IO::Select;
+    require IPC::Open3;
+    require Symbol;
+    require IO::Handle;
+    my $stderr = Symbol::gensym();
     my $stdout;
-    my @command = command_argv_for_path($path);
-    my $pid = open3( $stdin, $stdout, $stderr, @command, @argv );
+    require Developer::Dashboard::Platform;
+    my @command = Developer::Dashboard::Platform::command_argv_for_path($path);
+    my $pid = IPC::Open3::open3( $stdin, $stdout, $stderr, @command, @argv );
     close $stdin;
 
     my $selector  = IO::Select->new( $stdout, $stderr );
@@ -333,6 +342,7 @@ sub _run_main_gate_hooks {
     my @hook_roots = _main_gate_hook_roots();
     return {} if !@hook_roots;
 
+    require Developer::Dashboard::Platform;
     require Developer::Dashboard::Runtime::Result;
     Developer::Dashboard::Runtime::Result::clear_current();
     Developer::Dashboard::Runtime::Result::clear_last_result();
@@ -343,7 +353,7 @@ sub _run_main_gate_hooks {
         opendir my $dh, $hook_root or next;
         for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
             my $path = File::Spec->catfile( $hook_root, $entry );
-            next if !is_runnable_file($path);
+            next if !Developer::Dashboard::Platform::is_runnable_file($path);
             next if $entry eq 'run';
             my $hook_result = _run_command_hook_streaming( $path, stream => 1, argv => \@hook_argv );
             my $result_key = exists $results{$entry} ? _command_hook_result_key($path) : $entry;
@@ -400,10 +410,11 @@ sub _command_hook_roots {
 sub _custom_command_path {
     my ($cmd) = @_;
     return '' if !defined $cmd || $cmd eq '';
+    require Developer::Dashboard::Platform;
     for my $root ( _cli_runtime_roots() ) {
         my $path = File::Spec->catfile( $root, $cmd );
         return $path if -d $path;
-        my $resolved = resolve_runnable_file($path);
+        my $resolved = Developer::Dashboard::Platform::resolve_runnable_file($path);
         return $resolved if defined $resolved && $resolved ne '';
     }
     return '';
@@ -432,8 +443,9 @@ sub _builtin_helper_command {
     require Developer::Dashboard::InternalCLI;
     my $helper = Developer::Dashboard::InternalCLI::canonical_helper_name($cmd);
     return () if $helper eq '';
+    require Developer::Dashboard::Platform;
     my $paths = _switchboard_paths();
-    if ( is_windows() && Developer::Dashboard::InternalCLI::_helper_uses_dashboard_core($helper) ) {
+    if ( Developer::Dashboard::Platform::is_windows() && Developer::Dashboard::InternalCLI::_helper_uses_dashboard_core($helper) ) {
         Developer::Dashboard::InternalCLI::ensure_dashboard_core(
             paths => $paths,
         );
@@ -487,17 +499,19 @@ sub _skill_bare_init_command_name {
     my ($cmd) = @_;
     return if !defined $cmd || $cmd eq '' || $cmd =~ /\./;
     require Developer::Dashboard::SkillManager;
+    require Developer::Dashboard::Platform;
     my $paths = _switchboard_paths();
     my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     my $skill_path = $manager->get_skill_path( $cmd, include_disabled => 1 );
     return if !$skill_path;
-    return if !resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', '__init__' ) );
+    return if !Developer::Dashboard::Platform::resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', '__init__' ) );
     return $cmd;
 }
 
 sub _exec_switchboard_command {
     my ( $path, @argv ) = @_;
     return 0 if !defined $path || $path eq '';
+    require Developer::Dashboard::Platform;
     # The public entrypoint for this invocation must win over any inherited
     # source-tree path so packaged helpers and shell bootstraps re-enter the
     # current dashboard tree instead of a stale parent environment.
@@ -507,8 +521,8 @@ sub _exec_switchboard_command {
     if ( -d $path ) {
         my $run = _resolve_directory_runner($path);
         if ($run) {
-            my @command = command_argv_for_path($run);
-            if (is_windows()) {
+            my @command = Developer::Dashboard::Platform::command_argv_for_path($run);
+            if (Developer::Dashboard::Platform::is_windows()) {
                 system @command, @argv;
                 my $status = $?;
                 my $exit_code = $status > 255 ? $status >> 8 : $status;
@@ -518,9 +532,9 @@ sub _exec_switchboard_command {
             die "Unable to exec $run: $!";
         }
     }
-    if ( my $command_path = resolve_runnable_file($path) ) {
-        my @command = command_argv_for_path($command_path);
-        if (is_windows()) {
+    if ( my $command_path = Developer::Dashboard::Platform::resolve_runnable_file($path) ) {
+        my @command = Developer::Dashboard::Platform::command_argv_for_path($command_path);
+        if (Developer::Dashboard::Platform::is_windows()) {
             system @command, @argv;
             my $status = $?;
             my $exit_code = $status > 255 ? $status >> 8 : $status;
@@ -569,9 +583,10 @@ sub _cli_runtime_roots {
 sub _resolve_directory_runner {
     my ($dir) = @_;
     return if !defined $dir || $dir eq '' || !-d $dir;
+    require Developer::Dashboard::Platform;
     for my $name (qw(run run.pl run.ps1 run.cmd run.bat run.sh run.bash)) {
         my $path = File::Spec->catfile( $dir, $name );
-        my $resolved = resolve_runnable_file($path);
+        my $resolved = Developer::Dashboard::Platform::resolve_runnable_file($path);
         return $resolved if $resolved;
     }
     return;
@@ -606,7 +621,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard file locate <term...>
   dashboard of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
   dashboard open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
-  dashboard workspace [workspace-ref]
+  dashboard workspace <workspace-ref> [-c] [-d|--docker]
   dashboard jq [path] [file]
   dashboard yq [path] [file]
   dashboard tomq [path] [file]
@@ -662,7 +677,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard docker enable <service> [service...]
   dashboard docker disable <service> [service...]
   dashboard docker development {enable|disable} <service> [service...]
-      dashboard serve [logs [-f] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground] [--no-editor|--no-endit] [--no-indicators|--no-indicator]
+      dashboard serve [logs [-t] [-f] [--tail N|--tail=N] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground] [--no-editor|--no-endit] [--no-indicators|--no-indicator]
   dashboard stop
   dashboard restart [--host HOST] [--port PORT] [--workers N]
   dashboard shell [bash|zsh|sh|ps|powershell|pwsh]
@@ -756,7 +771,10 @@ This is the one public executable users invoke. It bootstraps C<PERL5LIB>
 when running from a checkout, runs layered command hooks across
 C<DD-OOP-LAYERS>, stages dashboard-managed built-in helpers under
 F<~/.developer-dashboard/cli/dd/>, and then C<exec>s the final helper or
-custom command instead of owning the heavy implementation itself.
+custom command instead of owning the heavy implementation itself. The
+switchboard also leaves hook-process modules unloaded on commands that do not
+run executable hooks, and loads usage-rendering support only on usage-error
+paths.
 
 =head1 WHY IT EXISTS
 
@@ -809,6 +827,14 @@ command body.
 
 Example 5:
 
+  d2 workspace -c project --docker
+
+Use the public switchboard to reach the staged workspace helper; that helper
+executes Docker Compose from the registered alias directory and starts the
+interactive tmux workspace inside its configured C<workspace> service.
+
+Example 6:
+
   mkdir -p ~/.developer-dashboard/cli/update.d
   printf '#!/bin/sh\necho first\n' > ~/.developer-dashboard/cli/update.d/00-first
   printf '#!/bin/sh\necho stop >&2; echo "[[STOP]]" >&2\n' > ~/.developer-dashboard/cli/update.d/01-stop
@@ -818,7 +844,7 @@ Example 5:
 Exercise the explicit stop-marker hook path, where one hook ends the remaining
 hook chain but control still returns to the main command.
 
-Example 6:
+Example 7:
 
   mkdir -p ~/.developer-dashboard/hooks
   printf '#!/bin/sh\n[ -n "$DD_TICKET" ] && exit 0\necho "set DD_TICKET first" >&2\necho "[[STOP]]" >&2\n' > ~/.developer-dashboard/hooks/10-ticket
@@ -829,7 +855,7 @@ Example 6:
 Exercise the main gate: one hook under F<hooks/> runs before every command,
 through both entrypoints, and its C<[[STOP]]> refuses the command entirely.
 
-Example 7:
+Example 8:
 
   prove -lv t/30-dashboard-loader.t
 

@@ -171,8 +171,8 @@ throws_ok { smd([1, 2, 3], [4]) }
 	qr/^smd: each group needs at least two numeric observations$/m,
 	'a group of one value is refused';
 throws_ok { smd([1, 2, 3], { a => 1 }) }
-	qr/^smd: first two arguments must be array references$/m,
-	'a hash reference is refused';
+	qr/\Ausage: smd\(X, Y\).*^example:\n.*\n\nsmd: error: first two arguments must be array references\n\z/ms,
+	'a hash reference is refused, under the help screen';
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

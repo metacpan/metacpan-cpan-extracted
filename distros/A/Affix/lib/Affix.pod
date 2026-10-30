@@ -64,7 +64,8 @@ Control what gets imported:
     use Affix qw[:all];    # Import everything
     use Affix qw[:lib];    # Library helpers (libc, libm, load_library...)
     use Affix qw[:memory]; # malloc, free, memcpy, cast, dump, raw, snapshot, pin, unpin...
-    use Affix qw[:types];  # Types only (Int, Struct, Pointer...)
+    use Affix qw[:types];  # Types only (Int, Struct, Pointer, Bitfield...)
+    use Affix qw[:core];   # Core functions (affix, wrap, typedef, error, errno...)
 
 =head1 CORE API
 
@@ -382,10 +383,20 @@ A fixed-size C array. Maps to a Perl C<ArrayRef>.
 
 =head3 Bitfields
 
-Specify bit widths using the pipe (C<|>) operator within Structs/Unions. Affix handles all masking and shifting.
+Declare bitfields inside Structs or Unions using either C<Bitfield[ $type, $width ]> or the C<|> operator shorthand.
+Affix automatically handles masking, shifting, and boundary alignment.
 
-    # C: typedef struct { uint32_t a : 1; uint32_t b : 3; } Config;
-    typedef Config => Struct[ a => UInt32 | 1, b => UInt32 | 3 ];
+    # Using Bitfield[...]
+    typedef Config => Struct[
+        flag_a => Bitfield[ UInt32, 1 ],
+        flag_b => Bitfield[ UInt32, 3 ]
+    ];
+
+    # Using operator shorthand (C: uint32_t a : 1; uint32_t b : 3;)
+    typedef Config => Struct[
+        a => UInt32 | 1,
+        b => UInt32 | 3
+    ];
 
 =head2 Live Views (Zero-Copy Aggregates)
 
@@ -426,16 +437,20 @@ Magical C<Affix::Pointer> references allow direct field access (C<< $p->{field} 
 
 =head2 Variadic Functions (VarArgs)
 
-Affix supports C functions that take a variable number of arguments (e.g., C<printf>, C<ioctl>). When defining a
-signature, use the C<VarArgs> token at the end of the argument list.
+Affix supports C functions that take a variable number of arguments (e.g., C<printf>, C<ioctl>). Use the C<VarArgs>
+token in the argument list to mark where variadic arguments begin.
 
 =head3 Basic Usage
 
-    # C: int printf(const char* format, ...);
-    affix libc(), ['printf' => 'my_printf'], [ String, VarArgs ] => Int;
+For open variadic functions where argument types vary per call:
 
-    # Basic types are marshalled automatically based on Perl's internal state
-    my_printf("Integer: %d, String: %s\n", 42, "Hello");
+    # C: int printf(const char* format, ...);
+    affix libc(), 'printf', [ String, VarArgs ] => Int;
+
+For functions where the trailing arguments follow a known pattern, you can also define typed variadics:
+
+    # C: int ioctl(int fd, unsigned long request, ...);
+    affix libc(), 'ioctl', [ Int, ULong, VarArgs[ Pointer[Void] ] ] => Int;
 
 =head3 Explicit Type Control with C<coerce()>
 
@@ -946,6 +961,17 @@ Diagnose FFI issues with built-in error reporting, memory inspection, and hex du
 runtimes can lead to spectacular crashes if types or memory boundaries are mismatched.
 
 =head2 Error Handling
+
+=head3 C<error()>
+
+Returns a human-readable description of the most recent error from Affix or the operating system. If no error occurred,
+returns C<undef>.
+
+This is the recommended, unified error function. It checks both internal Infix JIT compiler/parser errors and
+system-level errors (such as missing libraries or failed symbol lookups).
+
+    my $lib = load_library('nonexistent');
+    die 'Failed to load library: ' . Affix::error() unless $lib;
 
 =head3 C<errno()>
 

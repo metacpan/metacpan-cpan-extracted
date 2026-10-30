@@ -1,0 +1,22 @@
+title: a deny rule Write from the config holds in the subagent, also in bypassPermissions; reading still runs
+permission_mode: bypassPermissions
+files:
+  .raider/config.yml: "permissions:\n  deny: [ Write ]\n"
+  notes.txt: "NOTE\n"
+prompt: Have an agent copy notes.txt to copy.txt.
+script:
+  - tool_calls:
+      - [ agent, { description: Copy, prompt: Copy notes.txt to copy.txt. } ]
+  - tool_calls:
+      - [ read_file, { path: notes.txt } ]
+  - tool_calls:
+      - [ write_file, { path: copy.txt, content: "NOTE\n" } ]
+  - text: writing is denied
+  - text: The agent may not write.
+expect:
+  answer: The agent may not write.
+  absent: [ copy.txt ]
+  tools:
+    - { name: read_file, text: NOTE }
+    - { name: write_file, error: true, text: "denied by rule 'Write' from \\.raider/config\\.yml" }
+    - { name: agent, text: '\Awriting is denied\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }

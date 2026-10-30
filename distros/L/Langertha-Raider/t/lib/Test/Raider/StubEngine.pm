@@ -16,13 +16,16 @@ our @EXPORT_OK = qw( stub_engine alive );
 
     my ( $pid, $url ) = stub_engine($tool, \%arguments);
     my ( $pid, $url ) = stub_engine($tool, \%arguments, delay => 30);
+    my ( $pid, $url ) = stub_engine($tool, \%arguments, seen => $file);
 
 Starts the stub engine endpoint in its own process: a chat completion
 answers with one call of C<$tool> with C<%arguments>, or with the text
 C<done> once the conversation holds a tool result; anything else (the
 session embedding request) gets a 404. Returns its pid (kill and reap it
 when done) and the base URL for C<-o url=...>. With C<delay>, the first
-chat completion is answered only after that many seconds.
+chat completion is answered only after that many seconds. With C<seen>,
+the stub creates that file when a chat completion request has arrived
+(before any C<delay>), so a test can wait for the request to be in flight.
 
 =cut
 
@@ -57,6 +60,7 @@ sub stub_engine {
       my ( $length ) = $head =~ /^Content-Length:\s*(\d+)/mi;
       sysread($conn, $rest, 65536, length $rest) or last while length($rest) < ($length // 0);
       my $reply = $rest =~ /"role"\s*:\s*"tool"/ ? $answer : $body;
+      path($o{seen})->touch if $o{seen} && $head =~ m{\APOST \S*/chat/completions };
       sleep delete $o{delay} if $o{delay} && $head =~ m{\APOST \S*/chat/completions };
       print {$conn} $head =~ m{\APOST \S*/chat/completions }
         ? "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: "

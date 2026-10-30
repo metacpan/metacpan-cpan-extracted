@@ -125,4 +125,22 @@ is( scalar(get_union(\@a, \@b)),
     scalar(intersection(\@a, \@b)) + scalar(Lonly(\@a, \@b)) + scalar(Ronly(\@a, \@b)),
     'identity: |union| == |intersection| + |Lonly| + |Ronly|');
 
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { get_union(); 1 } ? '' : $@;
+	like($err, qr/\Ausage: get_union\(.*\n\nget_union: error: \Qneeds >= 1 array ref\E\n\z/s,
+		'get_union: a call-form error prints the help screen, the error on its last line');
+}
+{
+	my $err = eval { Lonly(); 1 } ? '' : $@;
+	like($err, qr/\Ausage: Lonly\(.*\n\nLonly: error: \Qneeds >= 1 array ref\E\n\z/s,
+		'Lonly: a call-form error prints the help screen, the error on its last line');
+}
+{
+	my $err = eval { Ronly(); 1 } ? '' : $@;
+	like($err, qr/\Ausage: Ronly\(.*\n\nRonly: error: \Qneeds >= 1 array ref\E\n\z/s,
+		'Ronly: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing;

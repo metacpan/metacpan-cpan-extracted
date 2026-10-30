@@ -573,6 +573,7 @@ static infix_status prepare_forward_call_frame_sysv_x64(infix_arena_t * arena,
  * @return `INFIX_SUCCESS`.
  */
 static infix_status generate_forward_prologue_sysv_x64(code_buffer * buf, infix_call_frame_layout * layout) {
+    emit_endbr64(buf);
     // Standard Function Prologue
     emit_push_reg(buf, RBP_REG);              // push rbp
     emit_mov_reg_reg(buf, RBP_REG, RSP_REG);  // mov rbp, rsp
@@ -963,6 +964,7 @@ static infix_status prepare_reverse_call_frame_sysv_x64(infix_arena_t * arena,
  * @return `INFIX_SUCCESS`.
  */
 static infix_status generate_reverse_prologue_sysv_x64(code_buffer * buf, infix_reverse_call_frame_layout * layout) {
+    emit_endbr64(buf);
     emit_push_reg(buf, RBP_REG);              // push rbp
     emit_mov_reg_reg(buf, RBP_REG, RSP_REG);  // mov rbp, rsp
 
@@ -1369,6 +1371,7 @@ static infix_status prepare_direct_forward_call_frame_sysv_x64(infix_arena_t * a
  */
 static infix_status generate_direct_forward_prologue_sysv_x64(code_buffer * buf,
                                                               infix_direct_call_frame_layout * layout) {
+    emit_endbr64(buf);
     emit_push_reg(buf, RBP_REG);
     emit_mov_reg_reg(buf, RBP_REG, RSP_REG);
 

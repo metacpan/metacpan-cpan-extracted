@@ -41,6 +41,32 @@ The integration run covers these command families:
 - pages: `dashboard page new`, `save`, `list`, `show`, `encode`, `decode`, `urls`, `render`, `source`
 - actions: `dashboard action run system-status paths`
 - docker resolver: `dashboard docker compose --dry-run`
+- Docker workspace mode: `d2 workspace -c <registered-alias> --docker` (or
+  `-d`) starts or reuses the Compose `workspace` service from the alias
+  directory, whose configuration bind-mounts that target at `/workspace`. A
+  stopped service uses `up -d --no-build workspace`, preventing Compose from
+  implicitly building a missing image. Uppercase
+  `-C` explicitly requests `up -d --build workspace`, with build output streamed
+  live; it still reuses an already-running service to preserve container work.
+  Both in-container commands use a
+  private config overlay so registering `/workspace` cannot overwrite the
+  host's alias. The final exec must allocate and inherit a TTY so the tmux
+  client is interactive. If `/tmp` is not writable in the container, tmux must
+  consistently use writable `/dev/shm` for its socket via `TMUX_TMPDIR`; the
+  outer command explicitly passes `-e TMUX_TMPDIR=/dev/shm` into the container
+  so the initial attach and later `d2 workspace` calls reach the same server,
+  even when the image's installed d2 predates the fallback.
+  The workspace image must provide the `C.UTF-8` locale; the final exec passes
+  `LC_CTYPE=C.UTF-8` so tmux preserves Unicode prompt/status
+  icons instead of rendering them as underscores. Verify an emoji-bearing
+  `d2 ps1` value inside the tmux workspace.
+  To isolate this regression without rebuilding the image, keep a disposable
+  tmux server under `LC_CTYPE=C`, set an emoji in its status line, then capture
+  the attached pseudo-terminal once with a `C` client and once with a
+  `C.UTF-8` client: the first stream omits the emoji bytes and the second
+  preserves them. This confirms the missing locale belongs at the client
+  handoff, not in the Compose YAML or the indicator source.
+  A failed state query or startup must stop before either in-container command
 - web lifecycle: `dashboard serve`, `dashboard restart`, `dashboard stop`
 - browser checks: headless Chromium editor, saved fake-project bookmark page, outsider bootstrap DOM verification, and helper-login DOM verification after helper-user enablement
 - ajax streaming: installed long-running `/ajax/<file>` route timing, early-chunk verification, refresh-safe singleton replacement, `fetch_value()` / `stream_value()` DOM helper coverage, and browser pagehide cleanup coverage in unit tests
@@ -119,6 +145,10 @@ The integration run creates:
    into a CPAN lookup because the bind-mounted filename is generic.
 5. Create the fake-project `./.developer-dashboard` tree only after that install step succeeds so the tarball's own tests still run against a clean runtime.
 6. Extract the same tarball inside the container for the rest of the installed-command checks.
+   The runner reads the expected version from the extracted `META.yml`, the
+   distribution-level source of truth when the public module delegates
+   `$VERSION` to `Developer::Dashboard::Version`; it falls back to a literal
+   main-module version for older archives without metadata.
 7. Verify the installed CLI responds to `dashboard help`.
 8. Verify bare `dashboard` returns usage output.
 9. Verify `dashboard version` reports the installed runtime version.
@@ -133,6 +163,16 @@ The integration run creates:
 18. Exercise builtin action execution.
 19. For Windows-targeted changes, run `integration/windows/run-strawberry-smoke.ps1 -UseInstallBootstrap -BootstrapScript <checkout install.ps1>` so the guest validates the same streamed `Invoke-Expression` bootstrap shape that operators use with `irm .../install.ps1 | iex`, including successful `cpanm --notest .` checkout installation and a fresh PowerShell session that can load the generated profile without a `running scripts is disabled` failure, resolve `dashboard`, print `dashboard version`, and run `dashboard logs`.
 20. Exercise docker compose dry-run resolution against a temporary project.
+    For Docker workspace mode, use an isolated project with a named
+    `workspace` service that bind-mounts the project at `/workspace` and a
+    registered alias. With `-d -c` and a stopped service, verify `up -d
+    workspace` (no build) precedes alias-add and inner-workspace `exec`. With
+    `-d -C`, verify cached `up -d --build workspace` and confirm progress is
+    streamed live. With the service already running, verify no `up`/build
+    command occurs, including when `-C` was requested. Repeat without the
+    service and verify the setup error occurs with no `exec` calls. Also
+    verify `-d` without `-c` fails before Compose is invoked, and no `-d`
+    preserves the local tmux behavior.
 21. Start the installed web service.
 22. Confirm exact-loopback access reaches the editor page in Chromium.
 23. Confirm the browser can render a saved fake-project bookmark page from the fake project bookmark directory.
@@ -207,6 +247,9 @@ The integration run creates:
 - interactive `dashboard stop` and `dashboard restart` runs print the full lifecycle task board on `stderr` before work begins, so managed shutdown and startup waits stay visible instead of looking hung
 - `dashboard stop` and `dashboard restart` default to a final terminal table summary, while `-o json` keeps the machine-readable payload
 - `dashboard stop web`, `dashboard stop collector`, `dashboard stop collector <name>`, `dashboard restart web`, `dashboard restart collector`, `dashboard restart collector <name>`, `dashboard log`, `dashboard logs`, `dashboard log web`, `dashboard log collector`, and `dashboard log collector <name>` all behave as documented, with collector-name completion feeding the scoped collector commands
+- `dashboard logs -t`, `-f`, `--tail N`, and `--tail=N` work together across mixed web/collector output, web-only output, all collectors, and one named collector; tail limits the initial snapshot, follow streams only newly appended content from each selected source, and `-n N` remains a compatible tail alias
+- collector `-t` prefixes use each persisted run timestamp; raw web log lines have no stored per-line time, so their timestamp marks the time the log is read
+- `dashboard serve logs` accepts the same timestamp, follow, and tail flags for web-only output
 - runtime stop/restart behavior still works when listener ownership must be
   discovered through `/proc` instead of `ss`
 - Linux host lifecycle runs ignore web and collector pids that belong to a
@@ -306,6 +349,17 @@ the in-container browser verification can dump DOM output directly without a
 side-channel browser install step.
 
 ## Pass Criteria
+
+The separate Docker Hub image workflow builds from the master checkout, runs
+`install.sh`, builds the Dist::Zilla source archive, installs that exact
+archive into the runtime image with `cpanm --notest`, and publishes version
+and `latest` tags for Linux amd64 and arm64. Full test and coverage gates must
+pass before publication; rerunning the full suite under QEMU for each target
+architecture duplicated that work and caused the 120-minute workflow timeout.
+The exact tarball still receives a tested `cpanm` install in the blank Docker
+environment above. The workflow contract is covered by
+`t/228-dockerhub-image-workflow.t`; Docker Hub publication itself requires
+GitHub-managed credentials and is verified in the Actions run.
 
 The run passes when:
 

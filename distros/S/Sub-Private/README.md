@@ -4,7 +4,7 @@ Sub::Private - Private subroutines and methods
 
 ## Version
 
-Version 0.07
+Version 0.09
 
 ## Synopsis
 
@@ -333,6 +333,18 @@ Module-level configuration hash.  Supported keys:
     caller-aware `can()` override into each class that uses `enforce` mode,
     returning the coderef only when the caller is the owner package and `undef`
     for everyone else.
+
+- Windows Perl 5.42: an undefined declared sub only warns
+
+    On Windows with Perl 5.42 and later, Sub::Private makes
+    [B::Hooks::EndOfScope](https://metacpan.org/pod/B%3A%3AHooks%3A%3AEndOfScope) use its pure-Perl backend, because the XS one
+    ([Variable::Magic](https://metacpan.org/pod/Variable%3A%3AMagic)) crashes Perl there as soon as it loads.  The
+    pure-Perl backend cannot pass an exception out of a scope-end callback.
+    So when a package that is loaded at run time (after `CHECK`) names an
+    undefined sub in `use Sub::Private qw(...)`, the "is not defined"
+    error is printed as a warning and loading continues, instead of
+    `require` dying.  Everywhere else it still croaks.  Set
+    `B_HOOKS_ENDOFSCOPE_IMPLEMENTATION` yourself to choose the backend.
 
 - UNIVERSAL namespace pollution
 

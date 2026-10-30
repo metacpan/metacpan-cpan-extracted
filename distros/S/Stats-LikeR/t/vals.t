@@ -103,4 +103,12 @@ is_deeply($empty_aoh, [], 'vals on an empty AoH yields a clean empty arrayref');
 my $empty_hash = vals({}, 'col');
 is_deeply($empty_hash, [], 'vals on an empty HoA/HoH yields a clean empty arrayref');
 
+# A call-form error prints vals's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { vals([ { a => 1 } ], undef); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: vals\(/, 'vals: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('vals') . "vals: error: column name must be defined\n",
+		'vals: the help screen, then the error on the last line');
+}
 done_testing();

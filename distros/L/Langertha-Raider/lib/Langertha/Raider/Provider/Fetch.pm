@@ -1,6 +1,6 @@
 package Langertha::Raider::Provider::Fetch;
 # ABSTRACT: Internal bounded fetch of a provider manifest from /.well-known/langertha.json
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Carp qw( croak );
@@ -92,8 +92,9 @@ sub target_url {
   my ( $self, $target ) = @_;
   croak 'no provider given' unless defined $target && length $target;
   croak 'provider target contains spaces or control characters' if $target =~ /[\s\x00-\x1f\x7f]/;
-  my $uri;
+  my ( $uri, $has_scheme );
   if ( $target =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://} ) {
+    $has_scheme = 1;
     $uri = URI->new($target);
     croak 'only https is allowed for a provider manifest, not '.$uri->scheme.'://'
       unless lc $uri->scheme eq 'https';
@@ -107,6 +108,9 @@ sub target_url {
   croak 'provider target must not carry a fragment' if defined $uri->fragment;
   my $host = $uri->host;
   croak "provider target '".$target."' names no host" unless defined $host && length $host;
+  croak "provider target '".$target."' is no host: a host needs a dot (host.tld), a port (host:PORT), "
+    .'brackets ([IPv6]) or https://; a bare name is a provider alias (raider provider add)'
+    unless $has_scheme || $host =~ /\./ || $target =~ /:\d+\z/ || ( $target =~ /\A\[[^\]]+\]\z/ && $host =~ /:/ );
   croak "provider target '".$target."' has an invalid port" unless $uri->port =~ /\A\d+\z/ && $uri->port > 0 && $uri->port < 65536;
   my $path = $uri->path;
   croak 'the manifest lives at '.WELL_KNOWN_PATH.' of the origin; give the host or the origin, not '.$path
@@ -422,7 +426,7 @@ Langertha::Raider::Provider::Fetch - Internal bounded fetch of a provider manife
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -519,9 +523,13 @@ hostname check -- those are set after it.
     my $url = $fetch->target_url('https://provider.example/');
 
 The manifest URL a command-line target names: C<HOST>, C<HOST:PORT>,
-C<[IPv6]:PORT> or an C<https> URL whose path is empty, C</> or the
-well-known path itself. Croaks with the reason on anything else: another
-scheme (C<http> included), userinfo, a query, a fragment or another path.
+C<[IPv6]>, C<[IPv6]:PORT> or an C<https> URL whose path is empty, C</> or
+the well-known path itself. Without C<https://> a host needs a dot
+(C<host.tld>), a port (C<host:PORT>) or brackets (C<[::1]>, an IPv6
+literal): a bare name such as C<acme> is a provider alias, never a host
+(ADR 0007, update 2026-10-25). Croaks with the
+reason on anything else: another scheme (C<http> included), userinfo, a
+query, a fragment, another path or a bare name.
 
 =head2 address_kind
 
@@ -601,7 +609,7 @@ for a URL without a host.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -622,5 +630,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

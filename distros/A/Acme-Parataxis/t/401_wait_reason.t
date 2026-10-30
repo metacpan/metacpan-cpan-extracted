@@ -7,6 +7,7 @@ use Acme::Parataxis::Future;
 use Acme::Parataxis::Channel;
 use Test2::V1 -ipP;
 $|++;
+#
 subtest 'wait_reason is undef for a fiber that never parks' => sub {
     async {
         my $f = fiber { yield for 1 .. 3; return 5 };

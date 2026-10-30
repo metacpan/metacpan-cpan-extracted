@@ -9,6 +9,7 @@ use IO::Socket::INET;
 use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
+use Errno qw(EACCES EIO ENOTDIR);
 use URI::Escape qw(uri_escape);
 use Capture::Tiny qw(capture);
 
@@ -17,6 +18,7 @@ use lib 'lib';
 use Developer::Dashboard::Auth;
 use Developer::Dashboard::Codec qw(encode_payload);
 use Developer::Dashboard::Config;
+use Developer::Dashboard::IndicatorStore::Watch;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::JSON qw(json_decode json_encode);
@@ -92,6 +94,203 @@ my $app = Developer::Dashboard::Web::App->new(
     sessions => $sessions,
 );
 {
+    my $trim_calls = 0;
+    my $original_trim = \&Developer::Dashboard::Web::App::_trim;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_trim = sub {
+        $trim_calls++;
+        return $original_trim->(@_);
+    };
+
+    is( $app->_normalized_saved_page_id('welcome'), 'welcome',
+        'canonical saved-page ids are preserved' );
+    is( $trim_calls, 0,
+        'canonical saved-page ids bypass trim and prefix normalization work' );
+    is( $app->_normalized_saved_page_id('team-status_2.json'), 'team-status_2.json',
+        'canonical ids with the full supported ASCII filename alphabet are preserved' );
+    is( $trim_calls, 0,
+        'supported canonical ASCII ids all use the direct return path' );
+    is( $app->_normalized_saved_page_id(' /app//welcome/ '), 'welcome/',
+        'noncanonical saved-page ids retain whitespace and /app/ normalization' );
+    is( $trim_calls, 1,
+        'noncanonical saved-page ids continue through the established trim helper' );
+    is( $app->_normalized_saved_page_id('welcome/nested'), 'welcome/nested',
+        'nested ids remain unchanged by the general normalization path' );
+    is( $trim_calls, 2,
+        'nested ids do not enter the canonical flat-id fast path' );
+    is( $app->_normalized_saved_page_id("\x{00e9}quipe"), "\x{00e9}quipe",
+        'Unicode ids retain their established normalization behavior' );
+    is( $trim_calls, 3,
+        'Unicode ids continue through the established trim helper' );
+    my $undefined_id;
+    is( $app->_normalized_saved_page_id($undefined_id), '',
+        'undefined saved-page ids retain the established empty-string normalization' );
+    is( $trim_calls, 4,
+        'undefined ids take the general normalization path' );
+    my $reference_id = {};
+    is( $app->_normalized_saved_page_id($reference_id), "$reference_id",
+        'reference saved-page ids retain their established string normalization' );
+    is( $trim_calls, 5,
+        'reference ids take the general normalization path' );
+}
+{
+    my $saved_nav_root = File::Spec->catdir( $paths->dashboards_root, 'nav' );
+    make_path($saved_nav_root);
+    my $saved_nav_file = File::Spec->catfile( $saved_nav_root, 'snapshot.tt' );
+    open my $saved_nav_fh, '>:raw', $saved_nav_file or die "Unable to create saved nav fixture '$saved_nav_file': $!";
+    print {$saved_nav_fh} '<span>saved-nav-first</span>'
+      or die "Unable to write saved nav fixture '$saved_nav_file': $!";
+    close $saved_nav_fh or die "Unable to close saved nav fixture '$saved_nav_file': $!";
+
+    my $saved_nav_watch = Local::Problem48ConfigSnapshotWatch->new;
+    my $saved_nav_reads = 0;
+    my $saved_nav_loads = 0;
+    my $saved_nav_inventory_scans = 0;
+    my $original_read = Developer::Dashboard::PageStore->can('_read_saved_instruction');
+    my $original_nav_load = Developer::Dashboard::PageStore->can('load_nav_fragment');
+    my $original_nav_inventory = Developer::Dashboard::Web::App->can('_nav_ids_for_roots');
+    my $saved_nav_app = Developer::Dashboard::Web::App->new(
+        auth => $auth, config => $config, pages => $store, prompt => $prompt,
+        runtime => $runtime, sessions => $sessions,
+    );
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $saved_nav_watch };
+        local *Developer::Dashboard::Web::App::_skill_dispatcher = sub {
+            return bless {}, 'Local::Problem48EmptySkillDispatcher';
+        };
+        local *Developer::Dashboard::PageStore::_read_saved_instruction = sub {
+            $saved_nav_reads++;
+            return $original_read->(@_);
+        };
+        local *Developer::Dashboard::PageStore::load_nav_fragment = sub {
+            $saved_nav_loads++;
+            return $original_nav_load->(@_);
+        };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub {
+            $saved_nav_inventory_scans++;
+            return $original_nav_inventory->(@_);
+        };
+
+        my $nav_page = Developer::Dashboard::PageDocument->new( id => 'welcome' );
+        my $first_html = $saved_nav_app->_nav_items_html( page => $nav_page, runtime_context => {} );
+        is(
+            $first_html,
+            '<section class="dashboard-nav-items"><ul><li data-nav-id="nav/snapshot.tt"><span>saved-nav-first</span></li></ul></section>',
+            'saved and skill navigation keeps the exact ordered section markup'
+        );
+        is(
+            $saved_nav_app->{_saved_nav_items_snapshot}{html},
+            '<li data-nav-id="nav/snapshot.tt"><span>saved-nav-first</span></li>',
+            'saved navigation cache retains the exact fragment list without a wrapper'
+        );
+        like( $first_html, qr/saved-nav-first/, 'first saved-nav request renders its literal fragment' );
+        is( $saved_nav_reads, 1, 'first saved-nav request reads the fragment through the secure page store' );
+        is( $saved_nav_loads, 1, 'first saved-nav request resolves the fragment through the page store' );
+        is( $saved_nav_inventory_scans, 1, 'first saved-nav request inventories the layered nav roots' );
+        my $cached_html = $saved_nav_app->_nav_items_html( page => $nav_page, runtime_context => {} );
+        is( $cached_html, $first_html, 'unchanged saved-nav snapshot keeps exact rendered markup' );
+        is( $saved_nav_reads, 1, 'unchanged watcher snapshot skips repeated saved-nav file resolution and reads' );
+        is( $saved_nav_loads, 1, 'unchanged watcher snapshot skips repeated PageStore nav resolution' );
+        is( $saved_nav_inventory_scans, 1, 'unchanged watcher snapshot skips repeated layered nav inventory' );
+
+        open $saved_nav_fh, '>:raw', $saved_nav_file or die "Unable to update saved nav fixture '$saved_nav_file': $!";
+        print {$saved_nav_fh} '<span>saved-nav-second</span>'
+          or die "Unable to update saved nav fixture '$saved_nav_file': $!";
+        close $saved_nav_fh or die "Unable to close updated saved nav fixture '$saved_nav_file': $!";
+        $saved_nav_watch->invalidate;
+        my $updated_html = $saved_nav_app->_nav_items_html( page => $nav_page, runtime_context => {} );
+        like( $updated_html, qr/saved-nav-second/, 'saved-nav watcher event reloads an edited fragment' );
+        unlike( $updated_html, qr/saved-nav-first/, 'saved-nav watcher event removes the prior fragment body' );
+        is( $saved_nav_reads, 2, 'one saved-nav invalidation causes one secure fragment reread' );
+        is( $saved_nav_loads, 2, 'one saved-nav invalidation reloads the affected nav file once' );
+        is( $saved_nav_inventory_scans, 2, 'one saved-nav invalidation refreshes the nav inventory once' );
+
+        my $added_nav_file = File::Spec->catfile( $saved_nav_root, 'added.tt' );
+        open $saved_nav_fh, '>:raw', $added_nav_file or die "Unable to create added saved nav fixture '$added_nav_file': $!";
+        print {$saved_nav_fh} '<span>saved-nav-added</span>'
+          or die "Unable to write added saved nav fixture '$added_nav_file': $!";
+        close $saved_nav_fh or die "Unable to close added saved nav fixture '$added_nav_file': $!";
+        $saved_nav_watch->invalidate;
+        my $added_html = $saved_nav_app->_nav_items_html( page => $nav_page, runtime_context => {} );
+        like( $added_html, qr/saved-nav-added/, 'saved-nav watcher event discovers a newly added fragment' );
+
+    }
+    ok( grep( { $_ eq $saved_nav_root } @{ $saved_nav_watch->{paths} } ),
+        'saved-nav watcher includes the direct directory that receives fragment writes' );
+    undef $saved_nav_app;
+    is( $saved_nav_watch->{closed}, 1, 'web app destruction closes its saved-nav watcher' );
+    unlink $saved_nav_file or die "Unable to remove saved nav fixture '$saved_nav_file': $!";
+    unlink File::Spec->catfile( $saved_nav_root, 'added.tt' )
+      or die "Unable to remove added saved nav fixture: $!";
+}
+{
+    my $active_template_scope;
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::Web::App::_handle_request = sub {
+            $active_template_scope = $_[0]{runtime}{_template_processor_scope};
+            return [ 200, 'text/plain', 'request scope observed' ];
+        };
+        my $response = $app->_handle_request_with_template_scope;
+        is( $response->[0], 200, 'template scope wrapper returns the request response' );
+        is( ref($active_template_scope), 'HASH', 'a real PageRuntime receives a request-local template scope' );
+        ok( !exists $runtime->{_template_processor_scope}, 'template scope is discarded after the request' );
+
+        my ( $active_path_identity_scope, $active_layer_scope );
+        {
+            no warnings qw(redefine once);
+            local *Developer::Dashboard::Web::App::_handle_request = sub {
+                my ($request_app) = @_;
+                $active_path_identity_scope = $request_app->{pages}{paths}{_path_identity_scope};
+                $active_layer_scope = $request_app->{pages}{paths}{_runtime_layer_candidate_scope};
+                return [ 200, 'text/plain', 'request scope observed' ];
+            };
+            my $scoped_response = $app->handle;
+            is( $scoped_response->[0], 200, 'handle returns the scoped request response' );
+            is( ref($active_path_identity_scope), 'HASH', 'a real request receives a path identity scope' );
+            is( ref($active_layer_scope), 'HASH', 'path identity scope accompanies the runtime-layer scope' );
+            ok( !exists $paths->{_path_identity_scope}, 'path identity scope is discarded after the request' );
+        }
+
+        local $app->{runtime} = {};
+        my $fallback_response = $app->_handle_request_with_template_scope;
+        is( $fallback_response->[0], 200, 'non-PageRuntime providers still dispatch the request' );
+
+        my $other_runtime = bless {}, 'Local::Problem48OtherRuntime';
+        local $app->{runtime} = $other_runtime;
+        my $non_page_runtime_response = $app->_handle_request_with_template_scope;
+        is( $non_page_runtime_response->[0], 200, 'blessed non-PageRuntime providers still dispatch the request' );
+
+        my $observed_runtime_layer_scope = 'not observed';
+        local *Developer::Dashboard::Web::App::_handle_request = sub {
+            my ($request_app) = @_;
+            $observed_runtime_layer_scope = exists $request_app->{pages}{paths}{_runtime_layer_candidate_scope} ? 1 : 0;
+            return [ 200, 'text/plain', 'handle fallback observed' ];
+        };
+        local $store->{paths} = {};
+        my $non_registry_paths_response = $app->handle(path => '/test');
+        is( $non_registry_paths_response->[0], 200, 'PageStore with non-PathRegistry paths still dispatches' );
+        is( $observed_runtime_layer_scope, 0, 'non-PathRegistry paths do not receive a registry request scope' );
+
+        local $app->{pages} = {};
+        my $non_page_store_response = $app->handle(path => '/test');
+        is( $non_page_store_response->[0], 200, 'non-PageStore providers still dispatch through handle' );
+    }
+}
+{
+    local $app->{config} = {};
+    is_deeply( $app->_web_settings, {}, '_web_settings returns an empty view for a non-object config' );
+    local $app->{_request_config_snapshot};
+    is( $app->_request_config_snapshot, undef, '_request_config_snapshot skips a non-object config' );
+}
+{
+    local $app->{config} = $paths;
+    is_deeply( $app->_web_settings, {}, '_web_settings returns an empty view when the config has no web accessor' );
+    local $app->{_request_config_snapshot};
+    is( $app->_request_config_snapshot, undef, '_request_config_snapshot skips a config without merged()' );
+}
+{
     no warnings 'redefine';
     *Developer::Dashboard::Web::App::_machine_ip = sub { '10.20.30.40' };
 }
@@ -103,6 +302,845 @@ my $page = Developer::Dashboard::PageDocument->new(
     meta   => { head => '<meta name="x-bookmark" content="head-injected">' },
 );
 $store->save_page($page);
+
+my $web_settings_calls = 0;
+my $merged_config_calls = 0;
+my $runtime_layer_discovery_calls = 0;
+my $original_web_settings = Developer::Dashboard::Config->can('web_settings');
+my $original_merged_config = Developer::Dashboard::Config->can('merged');
+my $original_runtime_layer_discovery = Developer::Dashboard::PathRegistry->can('_ancestor_runtime_layers_for_scope');
+my ( $cached_settings_status, $cached_settings_type, $cached_settings_body );
+my ( $fresh_settings_status, $fresh_settings_type, $fresh_settings_body );
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Config::web_settings = sub {
+        $web_settings_calls++;
+        return $original_web_settings->(@_);
+    };
+    local *Developer::Dashboard::Config::merged = sub {
+        $merged_config_calls++;
+        return $original_merged_config->(@_);
+    };
+    local *Developer::Dashboard::PathRegistry::_ancestor_runtime_layers_for_scope = sub {
+        $runtime_layer_discovery_calls++;
+        return $original_runtime_layer_discovery->(@_);
+    };
+    ( $cached_settings_status, $cached_settings_type, $cached_settings_body ) = @{ $app->handle(
+        path        => '/app/welcome',
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => { host => '127.0.0.1' },
+    ) };
+    is( $web_settings_calls, 1, 'one request resolves web settings once across authorization and page chrome' );
+    is( $merged_config_calls, 1, 'web settings and status collectors share one merged config per request' );
+    cmp_ok( $runtime_layer_discovery_calls, '<=', 2, 'one request bounds runtime-layer ancestry scans despite nested permission checks' );
+    $web_settings_calls = 0;
+    $merged_config_calls = 0;
+    $runtime_layer_discovery_calls = 0;
+    $config->save_global_web_settings( no_editor => 1 );
+    ( $fresh_settings_status, $fresh_settings_type, $fresh_settings_body ) = @{ $app->handle(
+        path        => '/app/welcome/edit',
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => { host => '127.0.0.1' },
+    ) };
+    $config->save_global_web_settings( no_editor => 0 );
+    is( $web_settings_calls, 1, 'a later request resolves its own fresh web settings snapshot' );
+    is( $merged_config_calls, 1, 'a later request does not reuse the previous merged config snapshot' );
+}
+is( $cached_settings_status, 200, 'saved page renders while request settings are observed' );
+is( $fresh_settings_status, 403, 'the next request observes a changed no-editor setting' );
+like( $fresh_settings_body, qr/read-only no-editor mode/, 'the fresh request uses the changed setting in its denial response' );
+
+{
+    my $cache_app = Developer::Dashboard::Web::App->new(
+        auth     => $auth,
+        config   => $config,
+        pages    => $store,
+        prompt   => $prompt,
+        runtime  => $runtime,
+        sessions => $sessions,
+    );
+    my $fake_watch = Local::Problem48ConfigSnapshotWatch->new;
+    my $merged_calls = 0;
+    my $indicator_collector_calls = 0;
+    my $watch_creations = 0;
+    my $original_merged = Developer::Dashboard::Config->can('merged');
+    my $original_indicator_collectors = Developer::Dashboard::Config->can('indicator_collectors');
+    my $watch_config_file = File::Spec->catfile( $paths->config_root, 'config.json' );
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub {
+            $watch_creations++;
+            return $watch_creations == 1 ? $fake_watch : Local::Problem48ConfigSnapshotWatch->new;
+        };
+        local *Developer::Dashboard::Config::merged = sub {
+            $merged_calls++;
+            return $original_merged->(@_);
+        };
+        local *Developer::Dashboard::Config::indicator_collectors = sub {
+            $indicator_collector_calls++;
+            return $original_indicator_collectors->(@_);
+        };
+        my $first = $cache_app->handle(
+            path        => '/app/welcome',
+            query       => '',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        );
+        is( $first->[0], 200, 'the first configured request builds the shared snapshot' );
+        is( $merged_calls, 1, 'the first request reads merged config once' );
+        ok( ( grep { $_ eq $paths->config_root } @{ $fake_watch->{paths} } ),
+            'the snapshot watcher includes the active global config directory' );
+        my $watch_paths = $cache_app->_config_snapshot_watch_paths;
+        ok( !( grep { $_ eq File::Spec->rootdir || $_ eq File::Spec->tmpdir } @{$watch_paths} ),
+            'the snapshot watcher excludes unrelated filesystem ancestors above the home layer' );
+
+        my $second = $cache_app->handle(
+            path        => '/app/welcome',
+            query       => '',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        );
+        is( $second->[0], 200, 'an unchanged watched request still renders successfully' );
+        is( $merged_calls, 1, 'an event-free watcher reuses merged config across requests' );
+        is( $indicator_collector_calls, 1,
+            'an unchanged watched snapshot reuses its indicator collector projection across requests' );
+
+        $config->save_global_web_settings( no_editor => 1 );
+        $fake_watch->invalidate;
+        my $changed = $cache_app->handle(
+            path        => '/app/welcome/edit',
+            query       => '',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        );
+        is( $changed->[0], 403, 'a config-directory event invalidates the cached web settings' );
+        is( $merged_calls, 2, 'an invalidated snapshot is rebuilt exactly once' );
+
+        $config->save_global_web_settings( no_editor => 0 );
+        $fake_watch->invalidate;
+        my $restored = $cache_app->handle(
+            path        => '/app/welcome',
+            query       => '',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        );
+        is( $restored->[0], 200, 'a later config event is visible after the cache has been refreshed' );
+        is( $merged_calls, 3, 'each invalidation performs one fresh merge' );
+    }
+}
+
+{
+    my $signature_app = bless { pages => $store }, 'Developer::Dashboard::Web::App';
+    my $before = $signature_app->_config_snapshot_environment_signature;
+    like( $before, qr/\ADASHBOARD_CONFIG_SNAPSHOT\0v1\0/, 'snapshot environment signature uses versioned unambiguous framing' );
+    {
+        local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'problem48-filter-change';
+        isnt(
+            $signature_app->_config_snapshot_environment_signature,
+            $before,
+            'changing the checker filter changes the reusable config snapshot environment signature',
+        );
+    }
+
+    my $absent_filter;
+    {
+        local %ENV = %ENV;
+        delete $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+        $absent_filter = $signature_app->_config_snapshot_environment_signature;
+    }
+    my $empty_filter;
+    {
+        local %ENV = %ENV;
+        $ENV{DEVELOPER_DASHBOARD_CHECKERS} = '';
+        $empty_filter = $signature_app->_config_snapshot_environment_signature;
+    }
+    isnt( $absent_filter, $empty_filter, 'missing and explicitly empty environment selectors have distinct signatures' );
+
+    my $delimited_filter;
+    {
+        local %ENV = %ENV;
+        $ENV{DEVELOPER_DASHBOARD_CHECKERS} = "value:with;signature\\0markers";
+        $delimited_filter = $signature_app->_config_snapshot_environment_signature;
+    }
+    isnt( $delimited_filter, $empty_filter, 'length-prefixed values preserve arbitrary delimiter characters' );
+}
+
+{
+    my $root = tempdir( CLEANUP => 1 );
+    my $config_file = File::Spec->catfile( $root, 'config.json' );
+    open my $fh, '>:raw', $config_file or die "Unable to create portable snapshot fixture '$config_file': $!\n";
+    print {$fh} '{"value":"a"}';
+    close $fh or die "Unable to close portable snapshot fixture '$config_file': $!\n";
+    my $portable_config = bless {
+        paths => bless({ skills => [] }, 'Local::Problem48PortablePaths'),
+        file  => $config_file,
+    }, 'Local::Problem48PortableConfig';
+    my $portable_app = bless {
+        config                    => $portable_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    my $merge_count = 0;
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return undef };
+        local *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub { return 'portable-test' };
+        local *Developer::Dashboard::Web::App::_config_snapshot_watch_paths = sub { return [$root] };
+        local *Local::Problem48PortableConfig::merged = sub { return { merged => ++$merge_count } };
+        my $get_snapshot = sub {
+            local $portable_app->{_request_config_snapshot} = undef;
+            return $portable_app->_request_config_snapshot;
+        };
+        my $first = $get_snapshot->();
+        is( $first->{merged_config}{merged}, 1, 'portable snapshot builds its initial merged config' );
+        my $second = $get_snapshot->();
+        is( $second, $first, 'portable metadata-and-content signature reuses an unchanged snapshot without native events' );
+        is( $merge_count, 1, 'portable snapshot cache avoids a repeated merge on non-Linux platforms' );
+
+        open my $changed_fh, '>:raw', $config_file or die "Unable to update portable snapshot fixture '$config_file': $!\n";
+        print {$changed_fh} '{"value":"b"}';
+        close $changed_fh or die "Unable to close updated portable snapshot fixture '$config_file': $!\n";
+        my $third = $get_snapshot->();
+        is( $third->{merged_config}{merged}, 2, 'portable content hashing detects same-size in-place config edits' );
+        is( $merge_count, 2, 'a portable invalidation performs exactly one fresh config merge' );
+
+        my $skill_root = File::Spec->catdir( $root, 'skill-one' );
+        my $skill_config_dir = File::Spec->catdir( $skill_root, 'config' );
+        make_path($skill_config_dir);
+        push @{ $portable_config->{paths}{skills} }, {
+            skill_name => 'skill-one',
+            layers     => [$skill_root],
+        };
+        my $before_add = $portable_app->_config_snapshot_portable_signature( [$root, $skill_config_dir] );
+        my $skill_config_file = File::Spec->catfile( $skill_config_dir, 'config.json' );
+        open my $skill_fh, '>:raw', $skill_config_file or die "Unable to create skill config fixture '$skill_config_file': $!\n";
+        print {$skill_fh} '{"skill":true}';
+        close $skill_fh or die "Unable to close skill config fixture '$skill_config_file': $!\n";
+        my $after_add = $portable_app->_config_snapshot_portable_signature( [$root, $skill_config_dir] );
+        isnt( $after_add, $before_add, 'portable signature detects a newly created skill-layer config file' );
+        unlink $skill_config_file or die "Unable to remove skill config fixture '$skill_config_file': $!\n";
+        my $after_remove = $portable_app->_config_snapshot_portable_signature( [$root, $skill_config_dir] );
+        isnt( $after_remove, $after_add, 'portable signature detects a deleted skill-layer config file' );
+
+        my $project_root = File::Spec->catdir( $root, 'project' );
+        make_path($project_root);
+        my $repo_config = File::Spec->catfile( $project_root, '.developer-dashboard.json' );
+        open my $repo_fh, '>:raw', $repo_config or die "Unable to create project config fixture '$repo_config': $!\n";
+        print {$repo_fh} '{}';
+        close $repo_fh or die "Unable to close project config fixture '$repo_config': $!\n";
+        my $before_project = $portable_app->_config_snapshot_portable_signature( [$root, $project_root] );
+        $portable_config->{repo_root} = $project_root;
+        my $configured_repo = $portable_app->_config_snapshot_portable_signature( [$root, $project_root] );
+        isnt( $configured_repo, $before_project, 'portable signature includes the config loader project-root override' );
+        delete $portable_config->{repo_root};
+        $portable_config->{paths}{project_root} = $project_root;
+        my $path_project = $portable_app->_config_snapshot_portable_signature( [$root, $project_root] );
+        is( $path_project, $configured_repo, 'portable signature includes the PathRegistry project root when no loader override exists' );
+        $portable_config->{paths}{project_root} = '';
+        $portable_config->{repo_root} = '';
+        ok( defined $portable_app->_config_snapshot_portable_signature( [$root] ),
+            'portable signature tolerates an empty project root without adding a candidate' );
+        delete $portable_config->{repo_root};
+        delete $portable_config->{paths}{project_root};
+
+        my $invalid_entry_signature;
+        {
+            no warnings qw(redefine once);
+            local *Local::Problem48PortablePaths::installed_skill_entries = sub {
+                return ( 'not-an-entry', { layers => 'not-an-array' }, { layers => [] } );
+            };
+            local *Local::Problem48PortableConfig::_global_config_files = sub {
+                return ( undef, [], '', $config_file, $config_file );
+            };
+            $invalid_entry_signature = $portable_app->_config_snapshot_portable_signature( [$root] );
+        }
+        ok( defined $invalid_entry_signature, 'portable signature filters malformed config candidates and skill entries' );
+        {
+            no warnings qw(redefine once);
+            local *Local::Problem48PortableConfig::_global_config_files = sub { return ($root) };
+            ok( defined $portable_app->_config_snapshot_portable_signature( [$root] ),
+                'portable signature accepts a directory-shaped config candidate without hashing it as a file' );
+        }
+
+        my $missing_directory_error;
+        eval { $portable_app->_config_snapshot_portable_signature( [ File::Spec->catdir( $root, 'missing' ) ] ); 1 }
+          or $missing_directory_error = $@;
+        like( $missing_directory_error, qr/Unable to inspect config snapshot directory/, 'portable signature reports a missing watched directory' );
+
+        my $nonarray_error;
+        eval { $portable_app->_config_snapshot_portable_signature( undef ); 1 } or $nonarray_error = $@;
+        like( $nonarray_error, qr/watch paths must be an array reference/, 'portable signature rejects malformed directory inventories' );
+        ok(
+            !defined $portable_app->_config_snapshot_open( File::Spec->catfile( $root, 'missing-config.json' ) ),
+            'raw config open reports an unavailable file without hiding the error state',
+        );
+
+        for my $failure (qw(directory_stat file_lstat file_stat file_open file_close)) {
+            my $error;
+            {
+                no warnings qw(redefine once);
+                my $expected_file = $config_file;
+                local *Developer::Dashboard::Web::App::_config_snapshot_stat = sub {
+                    my ( $self, $path ) = @_;
+                    return if $failure eq 'directory_stat' && $path eq $root;
+                    return if $failure eq 'file_stat' && $path eq $expected_file;
+                    return CORE::stat($path);
+                };
+                local *Developer::Dashboard::Web::App::_config_snapshot_lstat = sub {
+                    my ( $self, $path ) = @_;
+                    if ( $failure eq 'file_lstat' && $path eq $expected_file ) {
+                        $! = EACCES;
+                        return;
+                    }
+                    return CORE::lstat($path);
+                };
+                local *Developer::Dashboard::Web::App::_config_snapshot_open = sub {
+                    my ( $self, $path ) = @_;
+                    if ( $failure eq 'file_open' && $path eq $expected_file ) {
+                        $! = EACCES;
+                        return;
+                    }
+                    open my $open_fh, '<:raw', $path or return;
+                    return $open_fh;
+                };
+                local *Developer::Dashboard::Web::App::_config_snapshot_close = sub {
+                    my ( $self, $close_fh ) = @_;
+                    if ( $failure eq 'file_close' ) {
+                        CORE::close($close_fh);
+                        $! = EIO;
+                        return 0;
+                    }
+                    return CORE::close($close_fh);
+                };
+                eval { $portable_app->_config_snapshot_portable_signature( [$root] ); 1 }
+                  or $error = $@;
+            }
+            like( $error, qr/Unable to .*config snapshot/, "portable signature reports the $failure filesystem failure" );
+        }
+
+        {
+            no warnings qw(redefine once);
+            local *Developer::Dashboard::Web::App::_config_snapshot_lstat = sub {
+                my ( $self, $path ) = @_;
+                if ( $path eq $config_file ) {
+                    $! = ENOTDIR;
+                    return;
+                }
+                return CORE::lstat($path);
+            };
+            ok(
+                defined $portable_app->_config_snapshot_portable_signature( [$root] ),
+                'portable signature treats an ENOTDIR config candidate as absent and continues',
+            );
+        }
+
+        my $missing_config_methods = bless {
+            paths => bless( {}, 'Local::Problem48NoPathMethods' ),
+        }, 'Local::Problem48NoConfigMethods';
+        my $bare_config_app = bless { config => $missing_config_methods }, 'Developer::Dashboard::Web::App';
+        ok( defined $bare_config_app->_config_snapshot_portable_signature( [$root] ),
+            'portable signature supports config objects without optional path/config accessors' );
+        my $unblessed_config_app = bless { config => {} }, 'Developer::Dashboard::Web::App';
+        ok( defined $unblessed_config_app->_config_snapshot_portable_signature( [$root] ),
+            'portable signature supports an unblessed config provider' );
+    }
+}
+
+{
+    my $root = tempdir( CLEANUP => 1 );
+    my $config_file = File::Spec->catfile( $root, 'config.json' );
+    open my $fh, '>:raw', $config_file or die "Unable to create shared-inventory config '$config_file': $!\n";
+    print {$fh} '{"value":"portable"}';
+    close $fh or die "Unable to close shared-inventory config '$config_file': $!\n";
+    my $skill_root = File::Spec->catdir( $root, 'skills', 'problem48-skill' );
+    my $skill_config_dir = File::Spec->catdir( $skill_root, 'config' );
+    make_path($skill_config_dir);
+    my $skill_config_file = File::Spec->catfile( $skill_config_dir, 'config.json' );
+    open my $skill_fh, '>:raw', $skill_config_file or die "Unable to create shared-inventory skill config '$skill_config_file': $!\n";
+    print {$skill_fh} '{"skill":"portable"}';
+    close $skill_fh or die "Unable to close shared-inventory skill config '$skill_config_file': $!\n";
+    my $layer_paths = bless {
+        runtime_roots => [$root],
+        config_roots  => [],
+        skills_roots  => [],
+        installed     => [ { layers => [$skill_root] } ],
+        nested        => [],
+    }, 'Local::Problem48SkillEntryPaths';
+    my $portable_config = bless { paths => $layer_paths, file => $config_file }, 'Local::Problem48PortableConfig';
+    my $portable_app = bless {
+        config                   => $portable_config,
+        pages                    => $layer_paths,
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    my $installed_skill_lookups = 0;
+    my $original_skill_entries = Local::Problem48SkillEntryPaths->can('installed_skill_entries');
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return undef };
+        local *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub { return 'shared-inventory' };
+        local *Local::Problem48SkillEntryPaths::installed_skill_entries = sub {
+            $installed_skill_lookups++;
+            return $original_skill_entries->(@_);
+        };
+        local *Local::Problem48PortableConfig::merged = sub { return { merged => 1 } };
+        {
+            local $portable_app->{_request_config_snapshot} = undef;
+            $portable_app->_request_config_snapshot;
+        }
+        is( $installed_skill_lookups, 2,
+            'portable config snapshot shares each discovered skill inventory between watch paths and file signature' );
+        {
+            local $portable_app->{_request_config_snapshot} = undef;
+            $portable_app->_request_config_snapshot;
+        }
+        is( $installed_skill_lookups, 3,
+            'each later portable cache hit performs one fresh skill-layer discovery to preserve filesystem freshness' );
+        my $bad_skill_entries_error;
+        eval { $portable_app->_config_snapshot_portable_signature( [], {} ); 1 }
+          or $bad_skill_entries_error = $@;
+        like( $bad_skill_entries_error, qr/skill entries must be an array reference/,
+            'portable signatures reject malformed shared skill inventories' );
+        my $bad_skill_output_error;
+        eval { $portable_app->_config_snapshot_watch_paths({}); 1 }
+          or $bad_skill_output_error = $@;
+        like( $bad_skill_output_error, qr/skill-entry output must be an array reference/,
+            'watch-path discovery rejects malformed skill-inventory output targets' );
+        ok(
+            defined $portable_app->_config_snapshot_portable_signature(
+                [$root], [ 'malformed-skill-entry', { layers => 'not-an-array' } ]
+            ),
+            'portable signature skips malformed shared skill entries without losing file freshness checks',
+        );
+    }
+}
+
+{
+    my $native_watcher = Developer::Dashboard::IndicatorStore::Watch->new;
+    SKIP: {
+        skip 'native filesystem watcher is unavailable on this platform', 3 if !$native_watcher;
+        my $config_override = $paths->config_root;
+        local $ENV{DEVELOPER_DASHBOARD_CONFIGS} = $config_override;
+        my $native_cache_app = Developer::Dashboard::Web::App->new(
+            auth     => $auth,
+            config   => $config,
+            pages    => $store,
+            prompt   => $prompt,
+            runtime  => $runtime,
+            sessions => $sessions,
+        );
+        my $merged_calls = 0;
+        my $original_merged = Developer::Dashboard::Config->can('merged');
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $native_watcher };
+            local *Developer::Dashboard::Config::merged = sub {
+                $merged_calls++;
+                return $original_merged->(@_);
+            };
+            for my $request_number ( 1 .. 2 ) {
+                my $response = $native_cache_app->handle(
+                    path        => '/system/status',
+                    query       => '',
+                    remote_addr => '127.0.0.1',
+                    headers     => { host => '127.0.0.1' },
+                );
+                is( $response->[0], 200, "native watcher status request $request_number succeeds" );
+            }
+            is( $merged_calls, 1,
+                'native watcher reuses config when repeated configured-root resolution is part of the request' );
+        }
+    }
+}
+
+{
+    my $merged_config = bless {}, 'Local::Problem48MergedConfig';
+    my $snapshot_app = bless {
+        config                    => $merged_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    my $merge_count = 0;
+    {
+        no warnings 'redefine';
+        local *Local::Problem48MergedConfig::merged = sub {
+            $merge_count++;
+            return { merged => $merge_count };
+        };
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return undef };
+        my $snapshot = $snapshot_app->_request_config_snapshot;
+        is( $snapshot->{merged_config}{merged}, 1, 'missing native watcher keeps fresh configuration loading available' );
+        ok( $snapshot_app->{_config_snapshot_watcher_unavailable}, 'missing native watcher is remembered for the application lifetime' );
+        local $snapshot_app->{_request_config_snapshot} = undef;
+        ok( !defined $snapshot_app->_config_snapshot_watcher, 'an unavailable watcher is not repeatedly reconstructed' );
+    }
+}
+
+{
+    my $merged_config = bless {}, 'Local::Problem48MergedConfig';
+    my $rejecting_watch = bless {}, 'Local::Problem48RejectingWatch';
+    my $snapshot_app = bless {
+        config                    => $merged_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    my $merge_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $rejecting_watch };
+        local *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub { return 'portable-after-reject' };
+        local *Developer::Dashboard::Web::App::_config_snapshot_watch_paths = sub { return [] };
+        local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub { return 'stable-portable-after-reject' };
+        local *Local::Problem48MergedConfig::merged = sub {
+            $merge_count++;
+            return { merged => $merge_count };
+        };
+        my ( $snapshot, $warning );
+        {
+            local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+            $snapshot = $snapshot_app->_request_config_snapshot;
+        }
+        is( $snapshot->{merged_config}{merged}, 1, 'a watcher setup rejection falls back to a fresh config merge' );
+        like( $warning, qr/watch backend rejected the configuration inventory/, 'a watcher setup rejection reports its fallback reason' );
+        is( $snapshot_app->{_config_snapshot_cache}{portable_signature}, 'stable-portable-after-reject',
+            'a rejected watcher seeds the portable freshness baseline after its fresh merge' );
+        local $snapshot_app->{_request_config_snapshot} = undef;
+        my $reused = $snapshot_app->_request_config_snapshot;
+        is( $reused->{merged_config}{merged}, 1, 'the portable fallback reuses an unchanged snapshot after watcher setup failure' );
+        is( $merge_count, 1, 'watcher setup failure does not disable cross-request config caching' );
+    }
+}
+
+{
+    my $merged_config = bless {}, 'Local::Problem48MergedConfig';
+    my $reported_watch = bless {}, 'Local::Problem48ReportedRejectingWatch';
+    my $snapshot_app = bless {
+        config                    => $merged_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $reported_watch };
+        local *Local::Problem48MergedConfig::merged = sub { return {} };
+        my $warning = '';
+        {
+            local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+            $snapshot_app->_request_config_snapshot;
+        }
+        like( $warning, qr/injected watcher setup failure/, 'a watcher-supplied setup error is reported without replacement' );
+    }
+}
+
+{
+    my $merged_config = bless {}, 'Local::Problem48MergedConfig';
+    my $empty_error_watch = bless {}, 'Local::Problem48EmptyErrorRejectingWatch';
+    my $snapshot_app = bless {
+        config                    => $merged_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $empty_error_watch };
+        local *Local::Problem48MergedConfig::merged = sub { return {} };
+        my $warning = '';
+        {
+            local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+            $snapshot_app->_request_config_snapshot;
+        }
+        like( $warning, qr/watch backend rejected the configuration inventory/, 'an empty watcher error uses the explicit generic diagnostic' );
+    }
+}
+
+for my $cache_case (qw(no_watcher portable_hit portable_stale_signature portable_missing_environment portable_changed_environment portable_missing_signature invalid_cache missing_environment changed_environment missing_watch_signature changed_watcher complete_hit)) {
+    my $merged_config = bless {}, 'Local::Problem48MergedConfig';
+    my $watch = bless { unchanged => $cache_case eq 'changed_watcher' ? 0 : 1 }, 'Local::Problem48FixedWatch';
+    my $cached_snapshot = { merged_config => { cached => $cache_case }, skill_config_entries => [] };
+    my $cached = $cache_case eq 'invalid_cache'
+      ? []
+      : {
+        environment_signature => 'current',
+        watch_signature       => 'stable-watch',
+        snapshot              => $cached_snapshot,
+      };
+    if ( $cache_case =~ /\Aportable_/ ) {
+        $cached->{portable_signature} = $cache_case eq 'portable_stale_signature' ? 'stale-portable' : 'stable-portable'
+          if $cache_case ne 'portable_missing_signature';
+        delete $cached->{environment_signature} if $cache_case eq 'portable_missing_environment';
+        $cached->{environment_signature} = 'stale' if $cache_case eq 'portable_changed_environment';
+        delete $cached->{watch_signature};
+    }
+    delete $cached->{environment_signature} if $cache_case eq 'missing_environment';
+    $cached->{environment_signature} = 'stale' if $cache_case eq 'changed_environment';
+    delete $cached->{watch_signature} if $cache_case eq 'missing_watch_signature';
+    my $snapshot_app = bless {
+        config                    => $merged_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+        _config_snapshot_cache   => $cached,
+        _config_snapshot_watcher => $cache_case eq 'no_watcher' || $cache_case =~ /\Aportable_/ ? undef : $watch,
+        _config_snapshot_watcher_unavailable => $cache_case eq 'no_watcher' || $cache_case =~ /\Aportable_/ ? 1 : 0,
+    }, 'Developer::Dashboard::Web::App';
+    my $merge_count = 0;
+    {
+        no warnings 'redefine';
+        local *Local::Problem48MergedConfig::merged = sub {
+            $merge_count++;
+            return { merged => 'fresh' };
+        };
+        local *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub { return 'current' };
+        if ( $cache_case =~ /\Aportable_/ ) {
+            local *Developer::Dashboard::Web::App::_config_snapshot_watch_paths = sub { return [] };
+            local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub { return 'stable-portable' };
+            if ( $cache_case eq 'portable_hit' ) {
+                my $snapshot = $snapshot_app->_request_config_snapshot;
+                is( $snapshot, $cached_snapshot, 'a matching portable signature returns its cached config snapshot' );
+                is( $merge_count, 0, 'a portable cache hit avoids another merged-config load' );
+                next;
+            }
+        }
+        my $snapshot = $snapshot_app->_request_config_snapshot;
+        if ( $cache_case eq 'complete_hit' ) {
+            is( $snapshot, $cached_snapshot, 'a complete matching cache entry is returned without rebuilding' );
+            is( $merge_count, 0, 'a complete matching cache entry avoids another config merge' );
+        }
+        else {
+            is( $snapshot->{merged_config}{merged}, 'fresh', "$cache_case cache state safely rebuilds merged config" );
+            is( $merge_count, 1, "$cache_case cache state performs exactly one config merge" );
+        }
+    }
+}
+
+{
+    my $config = bless {}, 'Local::Problem48MergedConfig';
+    my $snapshot_app = bless {
+        config                    => $config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    my ( $signature_calls, $merge_calls ) = ( 0, 0 );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return undef };
+        local *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub { return 'undefined-portable-signature' };
+        local *Developer::Dashboard::Web::App::_config_snapshot_watch_paths = sub { return [] };
+        local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub {
+            return ++$signature_calls == 1 ? undef : 'changed-during-merge';
+        };
+        local *Local::Problem48MergedConfig::merged = sub { $merge_calls++; return { fresh => 1 } };
+        my $snapshot = $snapshot_app->_request_config_snapshot;
+        is( $snapshot->{merged_config}{fresh}, 1,
+            'an unavailable initial portable signature still returns freshly merged configuration' );
+        ok( !exists $snapshot_app->{_config_snapshot_cache},
+            'a missing initial portable signature cannot seed a reusable config snapshot' );
+        is( $signature_calls, 2,
+            'portable freshness is checked again after the fresh merge even when its baseline is unavailable' );
+        is( $merge_calls, 1, 'a missing portable baseline does not suppress the current config merge' );
+    }
+}
+
+for my $unstable_mode (qw(path_changed watcher_changed portable_changed)) {
+    my $merged_config = bless {}, 'Local::Problem48MergedConfig';
+    my $unstable_watch = Local::Problem48ConfigSnapshotWatch->new;
+    my $snapshot_app = bless {
+        config                    => $merged_config,
+        pages                     => {},
+        _request_config_snapshot => undef,
+    }, 'Developer::Dashboard::Web::App';
+    my $path_call = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub {
+            return $unstable_mode eq 'portable_changed' ? undef : $unstable_watch;
+        };
+        local *Local::Problem48MergedConfig::merged = sub { return {} };
+        local *Developer::Dashboard::Web::App::_config_snapshot_watch_paths = sub {
+            $path_call++;
+            return $unstable_mode eq 'path_changed' && $path_call > 1 ? ['/changed'] : ['/initial'];
+        };
+        if ( $unstable_mode eq 'portable_changed' ) {
+            my $signature_call = 0;
+            local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub {
+                return ++$signature_call == 1 ? 'before-merge' : 'changed-during-merge';
+            };
+            $snapshot_app->_request_config_snapshot;
+        }
+        elsif ( $unstable_mode eq 'watcher_changed' ) {
+            local *Local::Problem48ConfigSnapshotWatch::unchanged = sub { return 0 };
+            $snapshot_app->_request_config_snapshot;
+        }
+        else {
+            $snapshot_app->_request_config_snapshot;
+        }
+        ok( !exists $snapshot_app->{_config_snapshot_cache}, "$unstable_mode does not cache a snapshot after the inventory changes" );
+    }
+}
+
+{
+    my $project_root = tempdir(CLEANUP => 1);
+    my $nested_dir = File::Spec->catdir( $project_root, 'nested' );
+    make_path($nested_dir);
+    my $boundary_paths = bless {
+        runtime_roots => [],
+        config_roots => [],
+        skills_roots => [],
+        cwd => $nested_dir,
+        home => File::Spec->catdir( File::Spec->tmpdir, 'outside-home-boundary' ),
+        project_root => $project_root,
+    }, 'Local::Problem48BoundaryPaths';
+    my $boundary_app = bless { pages => $boundary_paths }, 'Developer::Dashboard::Web::App';
+    my $watch_paths = $boundary_app->_config_snapshot_watch_paths;
+    ok( ( grep { $_ eq $project_root } @{$watch_paths} ), 'watch-path discovery includes the project boundary when cwd is outside home' );
+    ok( !( grep { $_ eq '/' } @{$watch_paths} ), 'watch-path discovery stops at the project boundary rather than watching filesystem root' );
+}
+
+{
+    my $nonexistent_root = '/problem48-missing-root/child';
+    my $partial_paths = bless {
+        runtime_roots => [ undef, $nonexistent_root ],
+        config_roots => [ undef, [], '' ],
+        skills_roots => [],
+    }, 'Local::Problem48PartialPaths';
+    my $partial_app = bless { pages => $partial_paths }, 'Developer::Dashboard::Web::App';
+    my $original_dirname = Developer::Dashboard::Web::App->can('dirname');
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::dirname = sub {
+            return $_[0] if $_[0] eq $nonexistent_root;
+            return $original_dirname->(@_);
+        };
+        is_deeply( $partial_app->_config_snapshot_watch_paths, [], 'partial path providers skip invalid targets and cannot escape a self-parenting missing path' );
+    }
+}
+
+{
+    my $entries_paths = bless {
+        runtime_roots => [],
+        config_roots => [ undef, [], '' ],
+        skills_roots => [],
+        installed => [ undef, 'not a record', {}, { layers => 'not a list' }, { layers => [ undef, [], '' ] }, { layers => ['/tmp'] } ],
+        nested => [ undef, 'not a record', {}, { dir => undef }, { dir => [] }, { dir => '/tmp' } ],
+    }, 'Local::Problem48SkillEntryPaths';
+    my $entries_app = bless { pages => $entries_paths }, 'Developer::Dashboard::Web::App';
+    my $watch_paths = $entries_app->_config_snapshot_watch_paths;
+    ok( ( grep { $_ eq '/tmp' } @{$watch_paths} ), 'watch-path discovery includes valid installed and nested skill roots' );
+    ok( !( grep { ref($_) } @{$watch_paths} ), 'watch-path discovery ignores malformed skill entry and path values' );
+}
+
+{
+    my $root_paths = bless {
+        runtime_roots => [],
+        config_roots => [],
+        skills_roots => [],
+        cwd => File::Spec->rootdir,
+        home => '/problem48-not-home',
+    }, 'Local::Problem48RootPaths';
+    my $root_app = bless { pages => $root_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $root_app->_config_snapshot_watch_paths, [ File::Spec->rootdir ], 'watch-path discovery terminates when the working directory parent is itself' );
+}
+
+{
+    my $no_home_paths = bless {}, 'Local::Problem48NoHomePaths';
+    my $signature_app = bless { pages => $no_home_paths }, 'Developer::Dashboard::Web::App';
+    like( $signature_app->_config_snapshot_environment_signature, qr/\ADASHBOARD_CONFIG_SNAPSHOT\0v1\0.*HU/s, 'environment signature records an unavailable home without requiring the accessor' );
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::Web::App::current_working_directory = sub { return undef };
+        like(
+            $signature_app->_config_snapshot_environment_signature,
+            qr/\ADASHBOARD_CONFIG_SNAPSHOT\0v1\0.*HUCU\z/s,
+            'environment signature represents an unavailable cwd without collapsing it to an empty path',
+        );
+    }
+    my $no_runtime_app = bless { pages => $no_home_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $no_runtime_app->_config_snapshot_watch_paths, [], 'watch-path discovery skips blessed path providers without runtime_roots' );
+}
+
+{
+    my $undefined_cwd_paths = bless {
+        runtime_roots => [],
+        config_roots => [],
+        skills_roots => [],
+        cwd => undef,
+        home => '/problem48/home',
+    }, 'Local::Problem48RootPaths';
+    my $undefined_cwd_app = bless { pages => $undefined_cwd_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $undefined_cwd_app->_config_snapshot_watch_paths, [], 'watch-path discovery skips ancestry walking when cwd is undefined' );
+}
+
+{
+    my $project_root = tempdir(CLEANUP => 1);
+    my $project_child = File::Spec->catdir( $project_root, 'child' );
+    make_path($project_child);
+    my $project_paths = bless {
+        runtime_roots => [],
+        config_roots => [],
+        skills_roots => [],
+        cwd => $project_child,
+        home => '',
+        project_root => $project_root,
+        inside => 1,
+    }, 'Local::Problem48ProjectPaths';
+    my $project_app = bless { pages => $project_paths }, 'Developer::Dashboard::Web::App';
+    ok( ( grep { $_ eq $project_root } @{ $project_app->_config_snapshot_watch_paths } ), 'an empty home path falls through to a valid project boundary' );
+}
+
+{
+    my $outside_cwd = tempdir(CLEANUP => 1);
+    my $no_same_paths = bless {
+        runtime_roots => [], config_roots => [], skills_roots => [],
+        cwd => $outside_cwd,
+        home => '/problem48/home',
+        project_root => '/problem48/project',
+    }, 'Local::Problem48NoSamePaths';
+    my $no_same_app = bless { pages => $no_same_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $no_same_app->_config_snapshot_watch_paths, [ File::Spec->rootdir ], 'watch-path discovery skips boundary checks when the path provider has no comparison method' );
+}
+
+{
+    my $empty_project_paths = bless {
+        runtime_roots => [], config_roots => [], skills_roots => [],
+        cwd => '/problem48/outside', home => '', project_root => '',
+    }, 'Local::Problem48ProjectPaths';
+    my $empty_project_app = bless { pages => $empty_project_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $empty_project_app->_config_snapshot_watch_paths, [], 'watch-path discovery skips empty home and project boundaries' );
+}
+
+{
+    my $outside_cwd = tempdir(CLEANUP => 1);
+    my $outside_paths = bless {
+        runtime_roots => [], config_roots => [], skills_roots => [],
+        cwd => $outside_cwd, home => '/problem48/home', project_root => '/problem48/project',
+    }, 'Local::Problem48OutsidePaths';
+    my $outside_app = bless { pages => $outside_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $outside_app->_config_snapshot_watch_paths, [ File::Spec->rootdir ], 'watch-path discovery does not climb when cwd lies outside home and project roots' );
+}
+
+{
+    my $empty_cwd_paths = bless {
+        runtime_roots => [],
+        config_roots => [],
+        skills_roots => [],
+        cwd => '',
+        home => '/problem48/home',
+    }, 'Local::Problem48RootPaths';
+    my $empty_cwd_app = bless { pages => $empty_cwd_paths }, 'Developer::Dashboard::Web::App';
+    is_deeply( $empty_cwd_app->_config_snapshot_watch_paths, [], 'watch-path discovery skips ancestry walking when cwd is empty' );
+}
+
+{
+    my $no_identity_paths = bless {
+        runtime_roots => [],
+        config_roots => [],
+        skills_roots => [],
+        cwd => File::Spec->catdir( File::Spec->tmpdir, 'problem48-no-identity', 'nested' ),
+        home => File::Spec->catdir( File::Spec->tmpdir, 'problem48-no-identity' ),
+    }, 'Local::Problem48NoIdentityPaths';
+    my $no_identity_app = bless { pages => $no_identity_paths }, 'Developer::Dashboard::Web::App';
+    ok( ref( $no_identity_app->_config_snapshot_watch_paths ) eq 'ARRAY', 'watch-path discovery remains bounded for path providers without identity comparisons' );
+}
 
 my $legacy_page = Developer::Dashboard::PageDocument->from_instruction(<<'PAGE');
 TITLE: Legacy Welcome
@@ -682,9 +1720,283 @@ like($body2, qr{<title>Welcome</title>}, 'page title is still rendered in the he
 like($body2, qr{<head>.*<meta name="x-bookmark" content="head-injected">.*</head>}s, 'saved bookmark HEAD content is injected inside the rendered document head');
 unlike($body2, qr/id="logout-url"/, 'admin route does not render logout link');
 
-my ($code2b, undef, $body2b) = @{ $app->handle(path => '/app/welcome', query => 'name=Michael', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+my $static_nav_root = File::Spec->catdir( $paths->dashboards_root, 'nav' );
+make_path($static_nav_root);
+my $static_nav_file = File::Spec->catfile( $static_nav_root, 'static-plain.tt' );
+open my $static_nav_fh, '>:raw', $static_nav_file
+  or die "Unable to create static nav fixture '$static_nav_file': $!";
+print {$static_nav_fh} '<span id="static-nav-fixture">Static navigation</span>'
+  or die "Unable to write static nav fixture '$static_nav_file': $!";
+close $static_nav_fh or die "Unable to close static nav fixture '$static_nav_file': $!";
+
+my $cache_invalidation_nav = File::Spec->catfile( $static_nav_root, 'cache-invalidation.tt' );
+my ( $nav_cache_before_code, undef, $nav_cache_before_body ) = @{ $app->handle(
+    path        => '/app/index',
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is( $nav_cache_before_code, 200, 'saved page renders before nav inventory changes' );
+open my $cache_nav_fh, '>:raw', $cache_invalidation_nav
+  or die "Unable to create nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+print {$cache_nav_fh} '<span id="nav-inventory-added">Added navigation</span>'
+  or die "Unable to write nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+close $cache_nav_fh or die "Unable to close nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+my ( $nav_cache_added_code, undef, $nav_cache_added_body ) = @{ $app->handle(
+    path        => '/app/index',
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is( $nav_cache_added_code, 200, 'saved page still renders after a nav addition' );
+like( $nav_cache_added_body, qr/id="nav-inventory-added"/, 'a new nav fragment appears immediately after the inventory changes' );
+open $cache_nav_fh, '>:raw', $cache_invalidation_nav
+  or die "Unable to update nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+print {$cache_nav_fh} '<span id="nav-inventory-updated">Updated navigation</span>'
+  or die "Unable to update nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+close $cache_nav_fh or die "Unable to close updated nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+my ( $nav_cache_updated_code, undef, $nav_cache_updated_body ) = @{ $app->handle(
+    path        => '/app/index',
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is( $nav_cache_updated_code, 200, 'saved page still renders after a nav content update' );
+like( $nav_cache_updated_body, qr/id="nav-inventory-updated"/, 'cached filename inventory still loads fresh nav content' );
+unlike( $nav_cache_updated_body, qr/id="nav-inventory-added"/, 'cached filename inventory does not cache stale nav content' );
+unlink $cache_invalidation_nav
+  or die "Unable to remove nav inventory invalidation fixture '$cache_invalidation_nav': $!";
+my ( $nav_cache_removed_code, undef, $nav_cache_removed_body ) = @{ $app->handle(
+    path        => '/app/index',
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is( $nav_cache_removed_code, 200, 'saved page still renders after a nav removal' );
+unlike( $nav_cache_removed_body, qr/nav-inventory-(?:added|updated)/, 'a removed nav fragment disappears immediately' );
+
+{
+    my $nav_fixture_root = tempdir( CLEANUP => 1 );
+    my $nav_fixture_dir  = File::Spec->catdir( $nav_fixture_root, 'nav' );
+    make_path($nav_fixture_dir);
+    my $alpha_nav = File::Spec->catfile( $nav_fixture_dir, 'alpha.tt' );
+    open my $alpha_fh, '>:raw', $alpha_nav or die "Unable to create nav fixture '$alpha_nav': $!";
+    print {$alpha_fh} 'alpha' or die "Unable to write nav fixture '$alpha_nav': $!";
+    close $alpha_fh or die "Unable to close nav fixture '$alpha_nav': $!";
+
+    my $scan = Developer::Dashboard::Web::App->can('_scan_nav_directory_ids');
+    ok( $scan, 'saved nav inventory has a separately testable directory-scan operation' );
+    my $nav_app = bless {}, 'Developer::Dashboard::Web::App';
+    ok( !defined $nav_app->_nav_root_for_id('nav/alpha.tt'), 'nav root provenance is absent before an inventory has been built' );
+    if ($scan) {
+        my $scan_calls = 0;
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_scan_nav_directory_ids = sub {
+            $scan_calls++;
+            return $scan->(@_);
+        };
+        my $first_nav_ids = $nav_app->_nav_ids_for_roots( [$nav_fixture_root] );
+        is_deeply( $first_nav_ids, ['nav/alpha.tt'], 'saved nav inventory includes the sorted nav id' );
+        is( $nav_app->_nav_root_for_id('nav/alpha.tt'), $nav_fixture_root,
+            'saved nav inventory retains the supplying layer for direct secure loads' );
+        ok( !defined $nav_app->_nav_root_for_id('nav/missing.tt'), 'unknown nav ids have no supplying layer' );
+        my $unchanged_nav_ids = $nav_app->_nav_ids_for_roots( [$nav_fixture_root] );
+        is_deeply( $unchanged_nav_ids, ['nav/alpha.tt'], 'unchanged nav inventory is returned from the validated cache' );
+        is( $scan_calls, 1, 'unchanged nav directory metadata avoids rescanning entries' );
+
+        my $beta_nav = File::Spec->catfile( $nav_fixture_dir, 'beta.tt' );
+        open my $beta_fh, '>:raw', $beta_nav or die "Unable to create nav fixture '$beta_nav': $!";
+        print {$beta_fh} 'beta' or die "Unable to write nav fixture '$beta_nav': $!";
+        close $beta_fh or die "Unable to close nav fixture '$beta_nav': $!";
+        is_deeply(
+            $nav_app->_nav_ids_for_roots( [$nav_fixture_root] ),
+            [ 'nav/alpha.tt', 'nav/beta.tt' ],
+            'adding a nav fragment invalidates and refreshes the cached inventory',
+        );
+        is( $scan_calls, 2, 'a nav addition triggers one directory rescan' );
+
+        my $second_nav_root = tempdir( CLEANUP => 1 );
+        make_path( File::Spec->catdir( $second_nav_root, 'nav' ) );
+        open my $shadow_beta_fh, '>:raw', File::Spec->catfile( $second_nav_root, 'nav', 'beta.tt' )
+          or die "Unable to create shadow nav fixture: $!";
+        print {$shadow_beta_fh} 'shadow beta' or die "Unable to write shadow nav fixture: $!";
+        close $shadow_beta_fh or die "Unable to close shadow nav fixture: $!";
+        $nav_app->_nav_ids_for_roots( [ $nav_fixture_root, $second_nav_root ] );
+        is( $nav_app->_nav_root_for_id('nav/beta.tt'), $second_nav_root,
+            'the deepest configured layer retains nav lookup precedence' );
+
+        unlink $alpha_nav or die "Unable to remove nav fixture '$alpha_nav': $!";
+        is_deeply(
+            $nav_app->_nav_ids_for_roots( [$nav_fixture_root] ),
+            ['nav/beta.tt'],
+            'removing a nav fragment invalidates and refreshes the cached inventory',
+        );
+        is( $scan_calls, 4, 'a nav removal triggers one directory rescan' );
+
+        $nav_app->{_nav_ids_cache} = {};
+        ok( !defined $nav_app->_nav_root_for_id('nav/beta.tt'), 'a cache without root provenance does not invent a layer' );
+        is_deeply(
+            $nav_app->_nav_ids_for_roots( [$nav_fixture_root] ),
+            ['nav/beta.tt'],
+            'a cache hash without a signature is treated as a miss',
+        );
+        is( $scan_calls, 5, 'a missing cached signature triggers a directory rescan' );
+        $nav_app->{_nav_ids_cache}{ids} = {};
+        is_deeply(
+            $nav_app->_nav_ids_for_roots( [$nav_fixture_root] ),
+            ['nav/beta.tt'],
+            'malformed cached nav ids are discarded and rebuilt',
+        );
+        is( $scan_calls, 6, 'malformed nav cache data triggers a directory rescan' );
+        is_deeply( $nav_app->_nav_ids_for_roots('not-an-array'), [], 'nav inventory rejects a non-array root list' );
+        is_deeply( $nav_app->_nav_ids_for_roots( [ undef, '' ] ), [], 'nav inventory skips undefined and empty root paths' );
+
+        my $missing_nav_root = File::Spec->catdir( $nav_fixture_root, 'missing-root' );
+        is_deeply( $nav_app->_nav_ids_for_roots( [$missing_nav_root] ), [], 'missing nav directories produce an empty inventory' );
+        is_deeply( $nav_app->_nav_ids_for_roots( [$missing_nav_root] ), [], 'an unchanged missing nav directory reuses the empty inventory' );
+    }
+    {
+        no warnings 'redefine';
+        local *Time::HiRes::stat = sub { $! = EIO; return; };
+        my $stat_error = eval { $nav_app->_nav_ids_for_roots( [$nav_fixture_root] ); 1 } ? '' : $@;
+        like( $stat_error, qr/Unable to inspect saved navigation directory/, 'nav inventory reports a high-resolution directory stat failure' );
+    }
+    {
+        no warnings 'redefine';
+        my $open_attempts = 0;
+        local *Developer::Dashboard::Web::App::_open_nav_directory = sub { $open_attempts++; return; };
+        my $open_app = bless {}, 'Developer::Dashboard::Web::App';
+        is_deeply( $open_app->_nav_ids_for_roots( [$nav_fixture_root] ), [], 'an unopenable nav directory preserves the established skip behavior' );
+        ok( !exists $open_app->{_nav_ids_cache}, 'an incomplete nav inventory is not cached' );
+        is_deeply( $open_app->_nav_ids_for_roots( [$nav_fixture_root] ), [], 'an unopenable directory is retried on the next request' );
+        is( $open_attempts, 2, 'each uncached incomplete inventory attempts the directory again' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_read_nav_directory_entries = sub { die "injected nav read failure\n" };
+        my $read_error = eval { bless( {}, 'Developer::Dashboard::Web::App' )->_nav_ids_for_roots( [$nav_fixture_root] ); 1 } ? '' : $@;
+        like( $read_error, qr/injected nav read failure/, 'nav inventory exposes directory-read failures' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_close_nav_directory = sub { die "injected nav close failure\n" };
+        my $close_error = eval { bless( {}, 'Developer::Dashboard::Web::App' )->_nav_ids_for_roots( [$nav_fixture_root] ); 1 } ? '' : $@;
+        like( $close_error, qr/injected nav close failure/, 'nav inventory exposes directory-close failures' );
+    }
+}
+
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+        body          => '<span>literal</span>',
+    ), 1, 'literal raw navigation without code blocks qualifies for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'instruction',
+        body          => '<span>literal</span>',
+    ), 0, 'non-raw navigation does not qualify for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        body => '<span>literal</span>',
+    ), 0, 'raw navigation without a source-format marker does not qualify for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+    ), 0, 'raw navigation without a body does not qualify for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+        body          => [ '<span>literal</span>' ],
+    ), 0, 'raw navigation with a reference body does not qualify for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+        body          => '[% title %]',
+    ), 0, 'raw navigation with a Template Toolkit opener does not qualify for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+        body          => '<span>literal</span>',
+        codes         => [ { id => 'CODE1', body => 'print 1' } ],
+    ), 0, 'raw navigation with code blocks does not qualify for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+        body          => '<span>literal</span>',
+        codes         => [],
+    ), 1, 'raw navigation with an empty code-block array qualifies for the preparation bypass' );
+is( $app->_is_literal_raw_nav(
+        source_format => 'raw-nav-tt',
+        body          => '<span>literal</span>',
+        codes         => {},
+    ), 1, 'raw navigation with no array of code blocks qualifies for the preparation bypass' );
+
+my @raw_nav_prepare_ids;
+my @raw_nav_canonical_ids;
+my @page_store_abs_path_inputs;
+my $original_prepare_page = Developer::Dashboard::PageRuntime->can('prepare_page');
+my $original_canonical_instruction = Developer::Dashboard::PageDocument->can('canonical_instruction');
+my $original_page_store_abs_path = Developer::Dashboard::PageStore->can('abs_path');
+my $original_dashboards_roots = Developer::Dashboard::PathRegistry->can('dashboards_roots');
+my $original_page_file_candidates = Developer::Dashboard::PageStore->can('_page_file_candidates');
+my $page_candidate_lookup_state = { active => 0 };
+my $candidate_roots_resolves = 0;
+my ( $code2b, undef, $body2b );
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::PageStore::abs_path = sub {
+        push @page_store_abs_path_inputs, $_[0];
+        return $original_page_store_abs_path->(@_);
+    };
+    local *Developer::Dashboard::PathRegistry::dashboards_roots = sub {
+        $candidate_roots_resolves++ if $page_candidate_lookup_state->{active};
+        return $original_dashboards_roots->(@_);
+    };
+    local *Developer::Dashboard::PageStore::_page_file_candidates = sub {
+        my ( $store, @args ) = @_;
+        local $page_candidate_lookup_state->{active} = 1;
+        return $original_page_file_candidates->( $store, @args );
+    };
+    {
+        local *Developer::Dashboard::PageRuntime::prepare_page = sub {
+            my ( $runtime_instance, %args ) = @_;
+            my $page = $args{page};
+            push @raw_nav_prepare_ids, $page->{id} || ''
+              if ref($page) eq 'Developer::Dashboard::PageDocument'
+              && ( $page->{meta}{source_format} || '' ) eq 'raw-nav-tt';
+            return $original_prepare_page->( $runtime_instance, %args );
+        };
+        local *Developer::Dashboard::PageDocument::canonical_instruction = sub {
+            my ($page) = @_;
+            push @raw_nav_canonical_ids, $page->{id} || ''
+              if ref($page) eq 'Developer::Dashboard::PageDocument'
+              && ( $page->{meta}{source_format} || '' ) eq 'raw-nav-tt';
+            return $original_canonical_instruction->(@_);
+        };
+        ( $code2b, undef, $body2b ) = @{ $app->handle(
+            path        => '/app/welcome',
+            query       => 'name=Michael',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        ) };
+    }
+    is( $candidate_roots_resolves, 1,
+        'saved-page route snapshots ordered page roots once despite loading its page and nav fragments' );
+    my @dashboard_roots = $paths->dashboards_roots;
+    my $root_resolve_counts = sub {
+        my %counts = map { $_ => 0 } @dashboard_roots;
+        $counts{$_}++ for grep { exists $counts{$_} } @page_store_abs_path_inputs;
+        return [ sort grep { $_ > 0 } values %counts ];
+    };
+    is_deeply( $root_resolve_counts->(), [1], 'saved-page and nav path checks resolve each dashboards root once per request' );
+
+    $candidate_roots_resolves = 0;
+    my $next_response = $app->handle(
+        path        => '/app/welcome',
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => { host => '127.0.0.1' },
+    );
+    is( $next_response->[0], 200, 'the next request still loads the saved page normally' );
+    is( $candidate_roots_resolves, 1, 'each saved-page request resolves its ordered page roots once' );
+    is_deeply( $root_resolve_counts->(), [2], 'unchanged saved-page snapshots avoid page-root candidate scans while revalidating dashboard roots' );
+}
 is($code2b, 200, 'saved page with query state route ok');
 like($body2b, qr/Michael/, 'query parameters are merged into page state during render');
+like( $body2b, qr/<span id="static-nav-fixture">Static navigation<\/span>/,
+    'static raw nav fragments preserve their literal HTML output' );
+is_deeply( \@raw_nav_prepare_ids, ['nav/here.tt'],
+    'literal static nav skips processing while dynamic raw nav remains processed' );
+is_deeply( \@raw_nav_canonical_ids, ['nav/here.tt'],
+    'literal static nav skips canonical-instruction serialization while dynamic raw nav retains it' );
 like($body2b, qr{<li data-nav-id="nav/alpha\.tt"><a href="/app/index">Home</a></li>}s, 'shared nav TT fragments render conditional output against non-index pages');
 like($body2b, qr/nav-current=\/app\/welcome nav-rt=\/app\/welcome/s, 'shared nav TT fragments receive the current page path on non-index pages');
 like($body2b, qr/\.dashboard-nav-items ul \{\s*list-style: none;\s*margin: 0;\s*padding: 0;\s*display: flex;\s*flex-wrap: wrap;/s, 'shared nav renderer styles nav items as a wrapping horizontal row');
@@ -742,6 +2054,21 @@ my ($status_icon_code, undef, $status_icon_body) = @{ $app->handle(path => '/sys
 is($status_icon_code, 200, 'legacy status endpoint still responds after syncing config-backed collector indicators');
 like(decode('UTF-8', $status_icon_body), qr/"alias"\s*:\s*"🔑"/, 'legacy status endpoint exposes configured collector indicator icons instead of collector names');
 like($app->_prompt_summary, qr/🔑/, 'page top-right prompt summary prefers the configured collector indicator icon');
+my $status_indicator_list_calls = 0;
+my $list_indicators = \&Developer::Dashboard::IndicatorStore::list_indicators;
+my ( $single_list_status_code, undef, $single_list_status_body );
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::IndicatorStore::list_indicators = sub {
+        $status_indicator_list_calls++;
+        return $list_indicators->(@_);
+    };
+    ( $single_list_status_code, undef, $single_list_status_body ) =
+      @{ $app->handle( path => '/system/status', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
+}
+is( $single_list_status_code, 200, 'status route remains successful when sharing its collector inventory' );
+is( $single_list_status_body, $status_icon_body, 'shared collector inventory preserves exact status response bytes' );
+is( $status_indicator_list_calls, 0, 'unchanged configured status response reuses its validated payload without listing indicators again' );
 $config->save_global_web_settings( no_editor => 1 );
 my ($readonly_render_code, undef, $readonly_render_body) = @{ $app->handle(path => '/app/welcome', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($readonly_render_code, 200, 'no-editor mode still renders saved pages');
@@ -1236,6 +2563,188 @@ is_deeply(
     '_serve_static_file_at_path returns an explicit 404 when the caller does not resolve a readable asset path',
 );
 
+{
+    package Local::Problem48ConfigSnapshotWatch;
+
+    sub new { return bless { stable => 0, paths => [], signature => undef }, $_[0] }
+
+    sub configure {
+        my ( $self, $signature, $paths ) = @_;
+        $self->{signature} = $signature;
+        $self->{paths} = [ @{$paths} ];
+        $self->{stable} = 1;
+        return 1;
+    }
+
+    sub unchanged {
+        my ( $self, $signature ) = @_;
+        return 0 if !defined $self->{signature} || $self->{signature} ne $signature;
+        return $self->{stable} ? 1 : 0;
+    }
+
+    sub invalidate { $_[0]->{stable} = 0; return 1 }
+
+    sub last_error { return }
+    sub close { $_[0]->{closed}++; return 1 }
+}
+
+{
+    package Local::Problem48EmptySkillDispatcher;
+
+    sub all_skill_nav_literal_items_html { return undef }
+    sub all_skill_nav_pages { return [] }
+}
+
+{
+    package Local::Problem48MergedConfig;
+}
+
+{
+    package Local::Problem48PortableConfig;
+
+    sub _global_config_files { return ( $_[0]->{file} ) }
+}
+
+{
+    package Local::Problem48PortablePaths;
+
+    sub installed_skill_entries { return @{ $_[0]->{skills} || [] } }
+    sub current_project_root { return $_[0]->{project_root} }
+}
+
+{
+    package Local::Problem48NoConfigMethods;
+}
+
+{
+    package Local::Problem48NoPathMethods;
+}
+
+{
+    package Local::Problem48RejectingWatch;
+
+    sub configure { return 0 }
+}
+
+{
+    package Local::Problem48ReportedRejectingWatch;
+
+    sub configure { return 0 }
+    sub last_error { return 'injected watcher setup failure' }
+}
+
+{
+    package Local::Problem48EmptyErrorRejectingWatch;
+
+    sub configure { return 0 }
+    sub last_error { return '' }
+}
+
+{
+    package Local::Problem48FixedWatch;
+
+    sub configure { return 1 }
+    sub unchanged { return $_[0]->{unchanged} }
+}
+
+{
+    package Local::Problem48BoundaryPaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub current_working_directory { return $_[0]->{cwd} }
+    sub home { return $_[0]->{home} }
+    sub current_project_root { return $_[0]->{project_root} }
+    sub _same_or_descendant_path { return $_[1] =~ m{\A\Q$_[2]\E(?:/|\z)} ? 1 : 0 }
+    sub _path_identity { return $_[1] }
+    sub installed_skill_entries { return }
+    sub nested_skill_entries { return }
+}
+
+{
+    package Local::Problem48PartialPaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+}
+
+{
+    package Local::Problem48SkillEntryPaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub installed_skill_entries { return @{ $_[0]->{installed} } }
+    sub nested_skill_entries { return @{ $_[0]->{nested} } }
+}
+
+{
+    package Local::Problem48RootPaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub current_working_directory { return $_[0]->{cwd} }
+    sub home { return $_[0]->{home} }
+    sub _same_or_descendant_path { return 1 }
+    sub _path_identity { return $_[1] }
+}
+
+{
+    package Local::Problem48NoHomePaths;
+}
+
+{
+    package Local::Problem48NoIdentityPaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub current_working_directory { return $_[0]->{cwd} }
+    sub home { return $_[0]->{home} }
+    sub _same_or_descendant_path { return 1 }
+}
+
+{
+    package Local::Problem48NoSamePaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub current_working_directory { return $_[0]->{cwd} }
+    sub home { return $_[0]->{home} }
+    sub current_project_root { return $_[0]->{project_root} }
+}
+
+{
+    package Local::Problem48OutsidePaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub current_working_directory { return $_[0]->{cwd} }
+    sub home { return $_[0]->{home} }
+    sub current_project_root { return $_[0]->{project_root} }
+    sub _same_or_descendant_path { return 0 }
+}
+
+{
+    package Local::Problem48ProjectPaths;
+
+    sub runtime_roots { return @{ $_[0]->{runtime_roots} } }
+    sub config_roots { return @{ $_[0]->{config_roots} } }
+    sub skills_roots { return @{ $_[0]->{skills_roots} } }
+    sub current_working_directory { return $_[0]->{cwd} }
+    sub home { return $_[0]->{home} }
+    sub current_project_root { return $_[0]->{project_root} }
+    sub _same_or_descendant_path { return $_[0]->{inside} }
+    sub _path_identity { return $_[1] }
+}
+
+package main;
+
 done_testing;
 
 __END__
@@ -1247,14 +2756,23 @@ __END__
 =head1 DESCRIPTION
 
 This test verifies the local web app home, saved bookmark rendering (including
-raw C<HEAD> content in the document head), editor syntax highlighting, and
-transient source routes.
+raw C<HEAD> content in the document head), editor syntax highlighting,
+transient source routes, and request-local runtime-layer, path-identity, and
+template-service scopes. It also covers the status configuration snapshot
+watcher's cache-hit, invalidation, setup-failure, and runtime/project-boundary
+cases, plus the portable validator's unchanged cache hit, same-size config
+edit, and skill config file creation/removal when the native backend is
+unavailable. It verifies that normalized indicator
+collectors are reused only for an unchanged watched configuration and that a
+checker-filter change alters the cache signature. It protects the static
+raw-nav fast path while confirming dynamic Template Toolkit nav fragments
+still receive request context.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for the local web application and server-facing routes. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for the local web application and server-facing routes. It verifies that one request shares one merged settings/config snapshot across authorization, page chrome, and collector assembly; that the optional native watcher safely reuses, invalidates, or declines to cache snapshots; that path discovery stays inside home/project boundaries; that canonical path identities are scoped to a request and discarded afterward; and that a later request observes changed settings. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
@@ -1266,7 +2784,9 @@ Use this file when changing the local web application and server-facing routes, 
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/03-web-app.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
+Run it in the Docker development service with
+C<d2 docker compose exec dev prove -lv t/03-web-app.t> while iterating, then
+keep it green under the full suite and coverage gate before release.
 
 =head1 WHAT USES IT
 
@@ -1276,19 +2796,19 @@ Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and th
 
 Example 1:
 
-  prove -lv t/03-web-app.t
+  d2 docker compose exec dev prove -lv t/03-web-app.t
 
 Run the focused regression test by itself while you are changing the behavior it owns.
 
 Example 2:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/03-web-app.t
+  d2 docker compose exec dev perl -e 'exec q{perl}, q{/work/script/coverage-gate}, q{t/03-web-app.t} or die $!'
 
-Exercise the same focused test while collecting coverage for the library code it reaches.
+Run the repository coverage gate for the app test's reached library code.
 
 Example 3:
 
-  prove -lr t
+  d2 docker compose exec dev perl -e 'exec q{perl}, q{/work/script/coverage-gate} or die $!'
 
 Put the focused fix back through the whole repository suite before calling the work finished.
 

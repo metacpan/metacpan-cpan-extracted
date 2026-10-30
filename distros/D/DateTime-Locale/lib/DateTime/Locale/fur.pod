@@ -435,6 +435,24 @@ Friulian locale.
    1995-12-22T09:05:02 = ddC 1995 Dic 22, vin
   -0010-09-15T04:44:23 = pdC -10 Set 15, sab
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = ddC 2008 Fevrâr
+   1995-12-22T09:05:02 = ddC 1995 Dicembar
+  -0010-09-15T04:44:23 = pdC -10 Setembar
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = ddC 2008 Fevrâr 5, mar
+   1995-12-22T09:05:02 = ddC 1995 Dicembar 22, vin
+  -0010-09-15T04:44:23 = pdC -10 Setembar 15, sab
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = ddC 2008 Fevrâr 5
+   1995-12-22T09:05:02 = ddC 1995 Dicembar 22
+  -0010-09-15T04:44:23 = pdC -10 Setembar 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = ddC 2008 Fev 5

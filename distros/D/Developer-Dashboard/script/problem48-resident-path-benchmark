@@ -1,0 +1,324 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Capture::Tiny qw(capture);
+use File::Path qw(make_path remove_tree);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Paths ();
+use Developer::Dashboard::Config;
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
+
+my $skill_count = 50;
+my $runs        = 9;
+my $help        = 0;
+GetOptions(
+    'skills=i' => \$skill_count,
+    'runs=i'   => \$runs,
+    'help'     => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--skills must be a positive integer\n" if $skill_count < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $root  = tempdir( 'problem48-resident-path-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home  = File::Spec->catdir( $root, 'home' );
+my $state = File::Spec->catdir( $root, 'state' );
+make_path($home);
+local $ENV{HOME}                           = $home;
+local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = $state;
+local $ENV{DEVELOPER_DASHBOARD_REPO_LIB}   = File::Spec->catdir( $Bin, '..', 'lib' );
+local $ENV{PROBLEM48_FOLDER_TARGET}        = File::Spec->catdir( $root, 'folder-target-a' );
+my $original_cwd = current_working_directory();
+make_path( $ENV{PROBLEM48_FOLDER_TARGET} );
+chdir $home or die "Unable to chdir to isolated home '$home': $!";
+
+my $skills_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills' );
+for my $index ( 1 .. $skill_count ) {
+    _write_skill( $skills_root, sprintf( 'skill-%04d', $index ), $index );
+}
+_write_folder_module( $skills_root, 'skill-0001' );
+
+my $context = _new_resident_context();
+my $fresh_expected = _fresh_helper_output();
+my $resident_expected = _resident_output(\$context);
+die "Resident output differs from fresh helper output before timing\n"
+  if $resident_expected ne $fresh_expected;
+
+my ( @fresh_seconds, @resident_seconds );
+for my $run ( 1 .. $runs ) {
+    if ( $run % 2 ) {
+        _timed( \@fresh_seconds, sub { _fresh_helper_output() }, $fresh_expected, 'fresh helper', $run );
+        _timed( \@resident_seconds, sub { _resident_output(\$context) }, $fresh_expected, 'resident handler', $run );
+    }
+    else {
+        _timed( \@resident_seconds, sub { _resident_output(\$context) }, $fresh_expected, 'resident handler', $run );
+        _timed( \@fresh_seconds, sub { _fresh_helper_output() }, $fresh_expected, 'fresh helper', $run );
+    }
+}
+
+my $config_file = File::Spec->catfile( $skills_root, 'skill-0001', 'config', 'config.json' );
+_write_skill_config( $config_file, 'skill-0001', 1, File::Spec->catdir( $root, 'config-target-b' ) );
+my $config_updated = _decoded_resident_output(\$context)->{'skill-0001.work'}
+  eq File::Spec->catdir( $root, 'config-target-b' );
+
+my $folder_target_b = File::Spec->catdir( $root, 'folder-target-b' );
+make_path($folder_target_b);
+$ENV{PROBLEM48_FOLDER_TARGET} = $folder_target_b;
+my $folder_updated = _decoded_resident_output(\$context)->{'skill-0001.runtime'}
+  eq $folder_target_b;
+
+my $new_skill = 'skill-created-between-requests';
+_write_skill( $skills_root, $new_skill, 9999 );
+my $new_skill_seen = exists _decoded_resident_output(\$context)->{"$new_skill.work"};
+
+my $removed_skill = sprintf 'skill-%04d', $skill_count;
+my $removed_path = File::Spec->catdir( $skills_root, $removed_skill );
+remove_tree($removed_path);
+my $removed_skill_gone = !exists _decoded_resident_output(\$context)->{"$removed_skill.work"};
+die "Resident context failed config/Folder/new-skill/deleted-skill freshness checks\n"
+  if !$config_updated || !$folder_updated || !$new_skill_seen || !$removed_skill_gone;
+chdir $original_cwd or die "Unable to restore benchmark cwd '$original_cwd': $!";
+
+my $fresh_median    = _median(@fresh_seconds);
+my $resident_median = _median(@resident_seconds);
+printf "skills=%d runs=%d exact_parity=yes mutation_refresh=yes\n", $skill_count, $runs;
+printf "fresh_helper_median_ms=%.3f resident_handler_median_ms=%.3f ratio=%.2fx\n",
+  1000 * $fresh_median, 1000 * $resident_median, $fresh_median / $resident_median;
+printf "config_refresh=yes Folder_pm_environment_refresh=yes new_skill=yes deleted_skill=yes\n";
+exit 0;
+
+# _usage()
+# Returns the CLI usage and workload argument constraints.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--skills N] [--runs ODD_N] [--help]\n"
+      . "Compares fresh helper processes with a resident path handler.\n";
+}
+
+# _write_skill($skills_root, $name, $number)
+# Creates one synthetic skill and writes a path alias config beneath it.
+# Input: skill inventory root, safe skill name, and numeric path suffix.
+# Output: config file path.
+sub _write_skill {
+    my ( $skills, $name, $number ) = @_;
+    die "Invalid synthetic skill name '$name'\n" if $name !~ /\A[A-Za-z0-9_-]+\z/;
+    my $config = File::Spec->catfile( $skills, $name, 'config', 'config.json' );
+    _write_skill_config( $config, $name, $number, File::Spec->catdir( $skills, "target-$number" ) );
+    return $config;
+}
+
+# _write_skill_config($file, $name, $number, $target)
+# Writes one canonical path-alias config for the benchmark inventory.
+# Input: destination JSON file, skill name, numeric alias suffix, and target path.
+# Output: destination file path.
+sub _write_skill_config {
+    my ( $file, $name, $number, $target ) = @_;
+    my ( $volume, $directories ) = File::Spec->splitpath($file);
+    make_path( File::Spec->catpath( $volume, $directories, '' ) );
+    open my $fh, '>:raw', $file or die "Unable to create benchmark config '$file': $!";
+    print {$fh} JSON::XS->new->canonical->encode( { path_aliases => { work => $target } } )
+      or die "Unable to write benchmark config '$file': $!";
+    close $fh or die "Unable to close benchmark config '$file': $!";
+    return $file;
+}
+
+# _write_folder_module($skills_root, $skill_name)
+# Creates a Folder.pm whose path result reads process environment on every call.
+# Input: synthetic skill inventory root and skill name.
+# Output: Folder.pm file path.
+sub _write_folder_module {
+    my ( $skills, $name ) = @_;
+    my $file = File::Spec->catfile( $skills, $name, 'lib', 'Folder.pm' );
+    my ( $volume, $directories ) = File::Spec->splitpath($file);
+    make_path( File::Spec->catpath( $volume, $directories, '' ) );
+    open my $fh, '>:raw', $file or die "Unable to create benchmark Folder.pm '$file': $!";
+    print {$fh} "package Folder;\nsub __list__ { return ('runtime') }\n"
+      . "sub runtime { return \$ENV{PROBLEM48_FOLDER_TARGET} }\n1;\n"
+      or die "Unable to write benchmark Folder.pm '$file': $!";
+    close $fh or die "Unable to close benchmark Folder.pm '$file': $!";
+    return $file;
+}
+
+# _new_resident_context()
+# Creates one registry/config context that will be reused between requests.
+# Input: current environment's HOME and cwd.
+# Output: hash reference containing path and config objects plus the home used.
+sub _new_resident_context {
+    my $paths = Developer::Dashboard::CLI::Paths::_build_paths();
+    return {
+        home   => $ENV{HOME},
+        paths  => $paths,
+        config => Developer::Dashboard::Config->for_path_config($paths),
+    };
+}
+
+# _resident_output($context_ref)
+# Runs the existing paths payload action with a reused registry/config context,
+# refreshing cwd, object memo, named aliases, skill inventory, and Folder.pm
+# methods at each request boundary.
+# Input: scalar reference to the resident context hash.
+# Output: exact `paths -o json` stdout for this request.
+sub _resident_output {
+    my ($context_ref) = @_;
+    my $context = $$context_ref;
+    if ( !defined $context || $context->{home} ne ( $ENV{HOME} || '' ) ) {
+        $context = _new_resident_context();
+        $$context_ref = $context;
+    }
+    my $paths  = $context->{paths};
+    my $config = $context->{config};
+    $paths->{cwd}        = current_working_directory();
+    $paths->{memo}       = {};
+    $paths->{named_paths} = {};
+    local $paths->{_runtime_layer_candidate_scope} = {};
+    local $paths->{_installed_skill_inventory_scope} = {};
+    my $nested_entries;
+    my $get_nested = sub {
+        $nested_entries = [ $paths->nested_skill_entries(
+            include_disabled              => 1,
+            include_config_write_location => 1,
+        ) ] if !defined $nested_entries;
+        return $nested_entries;
+    };
+    my $load_paths = sub {
+        $paths->register_named_paths(
+            $config->path_aliases( nested_skill_entries => $get_nested->() )
+        );
+        return 1;
+    };
+    my $load_folder_paths = sub {
+        $load_paths->();
+        my $configured = $paths->named_paths;
+        my $from_folder = Developer::Dashboard::CLI::Paths::_skill_folder_path_aliases(
+            paths   => $paths,
+            entries => $get_nested->(),
+        );
+        my %extra = map { exists $configured->{$_} ? () : ( $_ => $from_folder->{$_} ) } keys %{$from_folder};
+        $paths->register_named_paths(\%extra);
+        return 1;
+    };
+    my %action_context = (
+        paths             => $paths,
+        config            => $config,
+        load_paths        => $load_paths,
+        load_folder_paths => $load_folder_paths,
+    );
+    my ( $stdout, $stderr, $exit ) = capture {
+        Developer::Dashboard::CLI::Paths::_paths_action_paths(
+            %action_context,
+            argv => [ '-o', 'json' ],
+        );
+    };
+    die "Resident path action wrote diagnostics: $stderr" if $stderr ne '';
+    die "Resident path action returned failure status '$exit'\n" if !$exit;
+    return $stdout;
+}
+
+# _fresh_helper_output()
+# Runs the staged paths helper in a new Perl process to establish the exact
+# cold-process output and timing baseline.
+# Input: current environment and cwd, with repository library path set.
+# Output: helper stdout; nonzero status or stderr is fatal.
+sub _fresh_helper_output {
+    my $helper = File::Spec->catfile( $Bin, '..', 'share', 'private-cli', 'paths' );
+    my ( $stdout, $stderr, $exit ) = capture {
+        system $^X, $helper, '-o', 'json';
+    };
+    die "Fresh path helper failed with status '$exit': $stderr" if $exit || $stderr ne '';
+    return $stdout;
+}
+
+# _decoded_resident_output($context_ref)
+# Decodes one resident request payload for mutation assertions.
+# Input: resident context reference.
+# Output: decoded JSON hash reference.
+sub _decoded_resident_output {
+    my ($context_ref) = @_;
+    return JSON::XS->new->decode( _resident_output($context_ref) );
+}
+
+# _timed($samples, $code, $expected, $label, $run)
+# Measures one request and rejects any output difference before saving duration.
+# Input: timing array reference, request coderef, expected bytes, label, run number.
+# Output: true after an identical response was observed.
+sub _timed {
+    my ( $samples, $code, $expected, $label, $run ) = @_;
+    my $started = time;
+    my $actual = $code->();
+    push @{$samples}, time - $started;
+    die "$label output changed in run $run\n" if $actual ne $expected;
+    return 1;
+}
+
+# _median(@seconds)
+# Returns the middle timing from a nonempty odd sample set.
+# Input: elapsed seconds.
+# Output: median elapsed seconds.
+sub _median {
+    my @values = sort { $a <=> $b } @_;
+    die "Cannot compute an empty timing median\n" if !@values;
+    return $values[ int( @values / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-resident-path-benchmark - compare fresh helper and resident path requests
+
+=head1 PURPOSE
+
+Measures repeated C<paths -o json> requests in new helper processes and through
+a resident Perl path/config context. It verifies byte-identical responses and
+refreshes mutable state between requests.
+
+=head1 WHY IT EXISTS
+
+Problem 48's 50x request target is below the cold Perl startup floor for some
+commands. A resident process is the remaining architecture candidate, but it
+must re-read configuration and call user Folder.pm methods on each request so
+filesystem or environment changes do not return stale paths.
+
+=head1 WHEN TO USE
+
+Use only in the isolated Problem 48 Docker benchmark environment when
+evaluating a persistent path-command runtime. This is a benchmark prototype,
+not a production daemon and not evidence for all subroutines.
+
+=head1 HOW TO USE
+
+  perl script/problem48-resident-path-benchmark
+  perl script/problem48-resident-path-benchmark --skills 250 --runs 15
+
+The script creates an isolated temporary HOME and state root, verifies exact
+output parity, then checks config replacement, dynamic Folder.pm environment
+reads, and skill addition/removal across requests.
+
+=head1 WHAT USES IT
+
+Problem 48 research uses this script to determine whether retaining a safe
+request context makes a resident runtime viable. The dashboard does not invoke
+it.
+
+=head1 EXAMPLES
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-resident-path-benchmark --skills 50 --runs 9
+
+=cut

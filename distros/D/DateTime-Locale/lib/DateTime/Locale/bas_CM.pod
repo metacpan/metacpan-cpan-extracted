@@ -435,6 +435,24 @@ Basaa Cameroon locale.
    1995-12-22T09:05:02 = m.Y.K 1995 liɓ 22, kɔɔ
   -0010-09-15T04:44:23 = b.Y.K -10 dip 15, jon
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = m.Y.K 2008 Màcɛ̂l
+   1995-12-22T09:05:02 = m.Y.K 1995 Lìbuy li ńyèe
+  -0010-09-15T04:44:23 = b.Y.K -10 Dìpɔ̀s
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = m.Y.K 2008 Màcɛ̂l 5, uum
+   1995-12-22T09:05:02 = m.Y.K 1995 Lìbuy li ńyèe 22, kɔɔ
+  -0010-09-15T04:44:23 = b.Y.K -10 Dìpɔ̀s 15, jon
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = m.Y.K 2008 Màcɛ̂l 5
+   1995-12-22T09:05:02 = m.Y.K 1995 Lìbuy li ńyèe 22
+  -0010-09-15T04:44:23 = b.Y.K -10 Dìpɔ̀s 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = m.Y.K 2008 mac 5
@@ -506,6 +524,12 @@ Basaa Cameroon locale.
    2008-02-05T18:30:30 = uum 5 mac
    1995-12-22T09:05:02 = kɔɔ 22 liɓ
   -0010-09-15T04:44:23 = jon 15 dip
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Màcɛ̂l 5, uum
+   1995-12-22T09:05:02 = Lìbuy li ńyèe 22, kɔɔ
+  -0010-09-15T04:44:23 = Dìpɔ̀s 15, jon
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

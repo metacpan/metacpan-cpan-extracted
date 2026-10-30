@@ -435,6 +435,24 @@ Kalaallisut Greenland locale.
    1995-12-22T09:05:02 = CE 1995 dec 22, tal
   -0010-09-15T04:44:23 = BCE -10 sept 15, arf
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 februaarip
+   1995-12-22T09:05:02 = CE 1995 decembarip
+  -0010-09-15T04:44:23 = BCE -10 septembarip
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 februaarip 5, mar
+   1995-12-22T09:05:02 = CE 1995 decembarip 22, tal
+  -0010-09-15T04:44:23 = BCE -10 septembarip 15, arf
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 februaarip 5
+   1995-12-22T09:05:02 = CE 1995 decembarip 22
+  -0010-09-15T04:44:23 = BCE -10 septembarip 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 febr 5
@@ -506,6 +524,12 @@ Kalaallisut Greenland locale.
    2008-02-05T18:30:30 = febr 5, mar
    1995-12-22T09:05:02 = dec 22, tal
   -0010-09-15T04:44:23 = sept 15, arf
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = februaarip 5, mar
+   1995-12-22T09:05:02 = decembarip 22, tal
+  -0010-09-15T04:44:23 = septembarip 15, arf
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

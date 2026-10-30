@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.11.4 - 2026-10-29
+
+### Fixes
+
+- Refuse a date or date-time member that is not RFC 3339 ([`933a608`](https://github.com/internetdata/sdk-perl/commit/933a608dd7d59bef47720648b2c5e5aa39041247))
+
 ## 1.11.3 - 2026-10-24
 
 ### Fixes

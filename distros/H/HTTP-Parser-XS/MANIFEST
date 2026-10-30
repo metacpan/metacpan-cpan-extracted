@@ -16,13 +16,8 @@ lib/HTTP/Parser/XS/PP.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
-MYMETA.json
-MYMETA.yml
-picohttpparser/bench.c
-picohttpparser/Makefile
 picohttpparser/picohttpparser.c
 picohttpparser/picohttpparser.h
-picohttpparser/README.md
 picohttpparser/test.c
 ppport.h
 README
@@ -32,4 +27,5 @@ t/02response.t
 t/03response-error.t
 t/04response-format.t
 t/05too-much.t
+t/06path-info-nul.t
 XS.xs

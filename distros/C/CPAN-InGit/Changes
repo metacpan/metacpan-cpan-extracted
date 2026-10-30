@@ -1,3 +1,25 @@
+0.006 - 2026-10-29
+  - Server:
+     - Fix ability to run Mojo server mounted at a deeper path than '/'
+     - Fix ability to serve branch and tag names containing '/'
+     - Add canonical ~branch/, ~tag/, and ~commit/ paths
+     - Resolve friendly tree paths to these canonical paths before routing
+       so that Mojo's URL caching doesn't hide changes in available git refs.
+
+0.005 - 2026-10-29
+  - Declare missing dependency on Log::Any::Adapter::MojoLog
+  - Suppress ssl-related crash on FreeBSD from tests, since the bug
+    needs fixed upstream in Git::Raw.
+
+0.004 - 2026-10-28
+  - Fix ability for commands to update the index of the working branch
+  - Server:
+     - Serve an index page for the whole repository, optionally listing
+       available branches
+     - Serve an index page for each archive tree, browsing or filtering
+       the module list, and javascript feature to compare the list to the
+       CVE database.
+
 0.003 - 2026-01-14
   - cpangit-add can now process cpanfile or cpanfile.snapshot
   - New method ArchiveTree->import_cpanfile_snapshot

@@ -411,17 +411,17 @@ Serbian Serbia Latin locale.
    1995-12-22T09:05:02 = 1995. n. e.
   -0010-09-15T04:44:23 = -10. p. n. e.
 
-=head3 GyM (G y-MM)
+=head3 GyM (M. y. G)
 
-   2008-02-05T18:30:30 = n. e. 2008-02
-   1995-12-22T09:05:02 = n. e. 1995-12
-  -0010-09-15T04:44:23 = p. n. e. -10-09
+   2008-02-05T18:30:30 = 2. 2008. n. e.
+   1995-12-22T09:05:02 = 12. 1995. n. e.
+  -0010-09-15T04:44:23 = 9. -10. p. n. e.
 
-=head3 GyMEd (G y-MM-dd, E)
+=head3 GyMEd (E d.M.y. G)
 
-   2008-02-05T18:30:30 = n. e. 2008-02-05, uto
-   1995-12-22T09:05:02 = n. e. 1995-12-22, pet
-  -0010-09-15T04:44:23 = p. n. e. -10-09-15, sub
+   2008-02-05T18:30:30 = uto 5.2.2008. n. e.
+   1995-12-22T09:05:02 = pet 22.12.1995. n. e.
+  -0010-09-15T04:44:23 = sub 15.9.-10. p. n. e.
 
 =head3 GyMMM (MMM y. G)
 
@@ -429,11 +429,29 @@ Serbian Serbia Latin locale.
    1995-12-22T09:05:02 = dec 1995. n. e.
   -0010-09-15T04:44:23 = sep -10. p. n. e.
 
-=head3 GyMMMEd (E, d. MMM y. G)
+=head3 GyMMMEd (E d. MMM y. G)
 
-   2008-02-05T18:30:30 = uto, 5. feb 2008. n. e.
-   1995-12-22T09:05:02 = pet, 22. dec 1995. n. e.
-  -0010-09-15T04:44:23 = sub, 15. sep -10. p. n. e.
+   2008-02-05T18:30:30 = uto 5. feb 2008. n. e.
+   1995-12-22T09:05:02 = pet 22. dec 1995. n. e.
+  -0010-09-15T04:44:23 = sub 15. sep -10. p. n. e.
+
+=head3 GyMMMM (MMMM y. G)
+
+   2008-02-05T18:30:30 = februar 2008. n. e.
+   1995-12-22T09:05:02 = decembar 1995. n. e.
+  -0010-09-15T04:44:23 = septembar -10. p. n. e.
+
+=head3 GyMMMMEd (E d. MMMM y. G)
+
+   2008-02-05T18:30:30 = uto 5. februar 2008. n. e.
+   1995-12-22T09:05:02 = pet 22. decembar 1995. n. e.
+  -0010-09-15T04:44:23 = sub 15. septembar -10. p. n. e.
+
+=head3 GyMMMMd (d. MMMM y. G)
+
+   2008-02-05T18:30:30 = 5. februar 2008. n. e.
+   1995-12-22T09:05:02 = 22. decembar 1995. n. e.
+  -0010-09-15T04:44:23 = 15. septembar -10. p. n. e.
 
 =head3 GyMMMd (d. MMM y. G)
 
@@ -441,11 +459,11 @@ Serbian Serbia Latin locale.
    1995-12-22T09:05:02 = 22. dec 1995. n. e.
   -0010-09-15T04:44:23 = 15. sep -10. p. n. e.
 
-=head3 GyMd (d.MM.y. GGGGG)
+=head3 GyMd (d.M.y. GGGGG)
 
-   2008-02-05T18:30:30 = 5.02.2008. n.e.
+   2008-02-05T18:30:30 = 5.2.2008. n.e.
    1995-12-22T09:05:02 = 22.12.1995. n.e.
-  -0010-09-15T04:44:23 = 15.09.-10. p.n.e.
+  -0010-09-15T04:44:23 = 15.9.-10. p.n.e.
 
 =head3 H (HH)
 
@@ -483,17 +501,17 @@ Serbian Serbia Latin locale.
    1995-12-22T09:05:02 = 09 UTC
   -0010-09-15T04:44:23 = 04 UTC
 
-=head3 M (L)
+=head3 M (L.)
 
-   2008-02-05T18:30:30 = 2
-   1995-12-22T09:05:02 = 12
-  -0010-09-15T04:44:23 = 9
+   2008-02-05T18:30:30 = 2.
+   1995-12-22T09:05:02 = 12.
+  -0010-09-15T04:44:23 = 9.
 
-=head3 MEd (E, d. M.)
+=head3 MEd (E d. M.)
 
-   2008-02-05T18:30:30 = uto, 5. 2.
-   1995-12-22T09:05:02 = pet, 22. 12.
-  -0010-09-15T04:44:23 = sub, 15. 9.
+   2008-02-05T18:30:30 = uto 5. 2.
+   1995-12-22T09:05:02 = pet 22. 12.
+  -0010-09-15T04:44:23 = sub 15. 9.
 
 =head3 MMM (LLL)
 
@@ -507,11 +525,11 @@ Serbian Serbia Latin locale.
    1995-12-22T09:05:02 = pet 22. dec
   -0010-09-15T04:44:23 = sub 15. sep
 
-=head3 MMMMEd (E, d. MMMM)
+=head3 MMMMEd (E d. MMMM)
 
-   2008-02-05T18:30:30 = uto, 5. februar
-   1995-12-22T09:05:02 = pet, 22. decembar
-  -0010-09-15T04:44:23 = sub, 15. septembar
+   2008-02-05T18:30:30 = uto 5. februar
+   1995-12-22T09:05:02 = pet 22. decembar
+  -0010-09-15T04:44:23 = sub 15. septembar
 
 =head3 MMMMW-count-few (MMMM: W. 'nedelja')
 
@@ -543,17 +561,17 @@ Serbian Serbia Latin locale.
    1995-12-22T09:05:02 = 22. dec
   -0010-09-15T04:44:23 = 15. sep
 
-=head3 MMMdd (dd.MMM)
+=head3 MMMdd (d.MMM)
 
-   2008-02-05T18:30:30 = 05.feb
+   2008-02-05T18:30:30 = 5.feb
    1995-12-22T09:05:02 = 22.dec
   -0010-09-15T04:44:23 = 15.sep
 
-=head3 MMdd (dd.MM.)
+=head3 MMdd (d.M.)
 
-   2008-02-05T18:30:30 = 05.02.
+   2008-02-05T18:30:30 = 5.2.
    1995-12-22T09:05:02 = 22.12.
-  -0010-09-15T04:44:23 = 15.09.
+  -0010-09-15T04:44:23 = 15.9.
 
 =head3 Md (d. M.)
 
@@ -650,6 +668,18 @@ Serbian Serbia Latin locale.
    2008-02-05T18:30:30 = februar 2008.
    1995-12-22T09:05:02 = decembar 1995.
   -0010-09-15T04:44:23 = septembar -10.
+
+=head3 yMMMMEd (E d. MMMM y.)
+
+   2008-02-05T18:30:30 = uto 5. februar 2008.
+   1995-12-22T09:05:02 = pet 22. decembar 1995.
+  -0010-09-15T04:44:23 = sub 15. septembar -10.
+
+=head3 yMMMMd (d. MMM y.)
+
+   2008-02-05T18:30:30 = 5. feb 2008.
+   1995-12-22T09:05:02 = 22. dec 1995.
+  -0010-09-15T04:44:23 = 15. sep -10.
 
 =head3 yMMMd (d. MMM y.)
 

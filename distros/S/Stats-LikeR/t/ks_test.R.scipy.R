@@ -2,22 +2,30 @@
 #
 #   Rscript t/ks_test.R.scipy.R
 #
-# Prints one line per case:  <label> <TAB> <D> <TAB> <p> <TAB> <method>
-# at 17 significant digits. The .t file carries the numbers as frozen
-# literals and never runs this script.
+# Prints one line per case:
+#   <label> <TAB> <D> <TAB> <p> <TAB> <method> <TAB> <warnings>
+# at 17 significant digits, the last column being R's warning messages joined
+# with "|" (empty when there were none).  The .t file carries the numbers as
+# frozen literals and never runs this script.
 #
 # R 4.6.1 (2026-06-24) "Happy Hop".
 
 options(digits = 17, warn = 1)
 
-emit <- function(label, r) {
-    cat(sprintf("%s\t%.17g\t%.17g\t%s\n",
-                label, unname(r$statistic), r$p.value, r$method))
+emit <- function(label, r, w) {
+    cat(sprintf("%s\t%.17g\t%.17g\t%s\t%s\n",
+                label, unname(r$statistic), r$p.value, r$method,
+                paste(w, collapse = "|")))
 }
 
 case <- function(label, x, y, ...) {
-    r <- suppressWarnings(ks.test(x, y, ...))
-    emit(label, r)
+    w <- character(0)
+    r <- withCallingHandlers(ks.test(x, y, ...),
+        warning = function(c) {
+            w <<- c(w, conditionMessage(c))
+            invokeRestart("muffleWarning")
+        })
+    emit(label, r, w)
 }
 
 ## ---- datasets
@@ -183,8 +191,8 @@ case("form.1s.m101",       c(-1, 0, 1), "pnorm")
 case("form.1s.m101.asymp", c(-1, 0, 1), "pnorm", exact = FALSE)
 
 # One-sample auto-gate with ties: R's rule is (n < 100) && !TIES, so R's
-# automatic answer is its exact=FALSE one.  ks_test stays exact, and its value
-# is R's exact=TRUE one.
+# automatic answer is its exact=FALSE one, and ks_test's is the same since
+# 0.331; exact=TRUE is the forced value.
 case("ties1.exact", c(1, 1, 2, 2, 3, 3), "pnorm", exact = TRUE)
 case("ties1.asymp", c(1, 1, 2, 2, 3, 3), "pnorm", exact = FALSE)
 
@@ -195,7 +203,8 @@ for (alt in c("two.sided", "greater", "less"))
          alternative = alt, exact = TRUE)
 
 # TestKSOneSample.test_known_examples' fixture, read back from the dump
-# t/ks_test.R.scipy.py writes, so both sides pin the same 100 numbers.
+# t/ks_test.R.scipy.py writes, so both sides pin the same 100 numbers.  Run
+# this script from the directory kn.txt is in.
 if (file.exists("kn.txt")) {
     kn <- scan("kn.txt", quiet = TRUE)
     for (alt in c("two.sided", "greater", "less"))

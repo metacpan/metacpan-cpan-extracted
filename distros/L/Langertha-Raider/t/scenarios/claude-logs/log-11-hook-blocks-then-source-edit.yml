@@ -1,0 +1,47 @@
+# Real pattern: a PreToolUse hook on Edit|Write keeps the model out of generated
+# files (the hook script prints a reason on stderr, exit 2); the model reads the
+# reason, edits the generator input instead, and a Bash hook with exit 0 lets
+# harmless commands pass without a word.
+title: a PreToolUse hook blocks editing a generated file; the model edits the source it names
+files:
+  .claude/settings.json: |
+    { "hooks": { "PreToolUse": [
+      { "matcher": "Edit|Write", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/no-generated", "args": [] } ] },
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/pass", "args": [] } ] }
+    ] } }
+  hooks/no-generated: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *'/generated/'*) echo "generated/ is built from templates/; edit the template instead" >&2; exit 2;; esac
+    exit 0
+  hooks/pass: |
+    #!/bin/sh
+    cat >/dev/null
+    exit 0
+  templates/page.tpl: "title: OLD\n"
+  generated/page.out: "title: OLD\n"
+executable: [ hooks/no-generated, hooks/pass ]
+prompt: Change the page title to NEW.
+script:
+  - tool_calls:
+      - [ read_file, { path: generated/page.out } ]
+      - [ edit_file, { path: generated/page.out, old_string: OLD, new_string: NEW } ]
+  - tool_calls:
+      - [ read_file, { path: templates/page.tpl } ]
+      - [ edit_file, { path: templates/page.tpl, old_string: OLD, new_string: NEW } ]
+      - [ bash, { command: cat templates/page.tpl } ]
+  - text: Template changed; regenerate to update the output.
+expect:
+  answer: Template changed; regenerate to update the output.
+  files:
+    generated/page.out: "title: OLD\n"
+    templates/page.tpl: "title: NEW\n"
+  tools:
+    - { name: read_file, text: 'title: OLD' }
+    - { name: edit_file, error: true, text: '\APreToolUse:Edit hook error: generated/ is built from templates/; edit the template instead\z' }
+    - { name: read_file, text: "\\A1\\ttitle: OLD" }
+    - { name: edit_file, text: '^The file \S+ has been updated successfully\.' }
+    - { name: bash, text: '\Atitle: NEW\z' }
+  events:
+    - { type: hook.ran, hook_event: PreToolUse, outcome: block, exit: 2, source: .claude/settings.json }
+    - { type: hook.ran, hook_event: PreToolUse, outcome: success, exit: 0 }

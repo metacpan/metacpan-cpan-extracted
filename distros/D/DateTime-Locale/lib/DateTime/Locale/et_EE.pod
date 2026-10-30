@@ -435,6 +435,24 @@ Estonian Estonia locale.
    1995-12-22T09:05:02 = R, 22. detsember 1995 pKr
   -0010-09-15T04:44:23 = L, 15. september -10 eKr
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = veebruar 2008 pKr
+   1995-12-22T09:05:02 = detsember 1995 pKr
+  -0010-09-15T04:44:23 = september -10 eKr
+
+=head3 GyMMMMEd (E, d. MMMM y G)
+
+   2008-02-05T18:30:30 = T, 5. veebruar 2008 pKr
+   1995-12-22T09:05:02 = R, 22. detsember 1995 pKr
+  -0010-09-15T04:44:23 = L, 15. september -10 eKr
+
+=head3 GyMMMMd (d. MMMM y G)
+
+   2008-02-05T18:30:30 = 5. veebruar 2008 pKr
+   1995-12-22T09:05:02 = 22. detsember 1995 pKr
+  -0010-09-15T04:44:23 = 15. september -10 eKr
+
 =head3 GyMMMd (d. MMM y G)
 
    2008-02-05T18:30:30 = 5. veebr 2008 pKr
@@ -632,6 +650,18 @@ Estonian Estonia locale.
    2008-02-05T18:30:30 = veebruar 2008
    1995-12-22T09:05:02 = detsember 1995
   -0010-09-15T04:44:23 = september -10
+
+=head3 yMMMMEd (E, d. MMMM y)
+
+   2008-02-05T18:30:30 = T, 5. veebruar 2008
+   1995-12-22T09:05:02 = R, 22. detsember 1995
+  -0010-09-15T04:44:23 = L, 15. september -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 veebruar 2008
+   1995-12-22T09:05:02 = 22 detsember 1995
+  -0010-09-15T04:44:23 = 15 september -10
 
 =head3 yMMMd (d. MMM y)
 

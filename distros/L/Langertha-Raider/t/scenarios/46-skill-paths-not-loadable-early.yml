@@ -1,0 +1,15 @@
+title: the skill tool refuses a skill whose paths have not matched yet
+files:
+  CLAUDE.md: "Top rule.\n"
+  .claude/skills/ts-style/SKILL.md: "---\ndescription: House style for TypeScript.\npaths: \"**/*.ts\"\n---\n\nTS-BODY-MARKER\n"
+prompt: Use the style skill.
+script:
+  - tool_calls:
+      - [ skill, { skill: ts-style } ]
+  - text: nicht moeglich
+expect:
+  answer: nicht moeglich
+  requests:
+    - { index: 1, absent: TS-BODY-MARKER }
+  tools:
+    - { name: skill, error: true, text: '^<tool_use_error>Unknown skill: ts-style\.' }

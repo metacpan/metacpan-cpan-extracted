@@ -435,6 +435,24 @@ Wolof Senegal locale.
    1995-12-22T09:05:02 = Àjj, 22 Des, 1995 AD
   -0010-09-15T04:44:23 = Ase, 15 Sàt, -10 JC
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Fewriyee
+   1995-12-22T09:05:02 = AD 1995 Desàmbar
+  -0010-09-15T04:44:23 = JC -10 Sàttumbar
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Fewriyee 5, Tal
+   1995-12-22T09:05:02 = AD 1995 Desàmbar 22, Àjj
+  -0010-09-15T04:44:23 = JC -10 Sàttumbar 15, Ase
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Fewriyee 5
+   1995-12-22T09:05:02 = AD 1995 Desàmbar 22
+  -0010-09-15T04:44:23 = JC -10 Sàttumbar 15
+
 =head3 GyMMMd (d MMM, y G)
 
    2008-02-05T18:30:30 = 5 Few, 2008 AD
@@ -506,6 +524,12 @@ Wolof Senegal locale.
    2008-02-05T18:30:30 = Tal, 5 Few
    1995-12-22T09:05:02 = Àjj, 22 Des
   -0010-09-15T04:44:23 = Ase, 15 Sàt
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Fewriyee 5, Tal
+   1995-12-22T09:05:02 = Desàmbar 22, Àjj
+  -0010-09-15T04:44:23 = Sàttumbar 15, Ase
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
@@ -614,6 +638,18 @@ Wolof Senegal locale.
    2008-02-05T18:30:30 = Fewriyee 2008
    1995-12-22T09:05:02 = Desàmbar 1995
   -0010-09-15T04:44:23 = Sàttumbar -10
+
+=head3 yMMMMEd (EEE, d MMMM y)
+
+   2008-02-05T18:30:30 = Tal, 5 Fewriyee 2008
+   1995-12-22T09:05:02 = Àjj, 22 Desàmbar 1995
+  -0010-09-15T04:44:23 = Ase, 15 Sàttumbar -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Fewriyee 2008
+   1995-12-22T09:05:02 = 22 Desàmbar 1995
+  -0010-09-15T04:44:23 = 15 Sàttumbar -10
 
 =head3 yMMMd (d MMM y)
 

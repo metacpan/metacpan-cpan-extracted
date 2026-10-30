@@ -3,8 +3,18 @@
 use strict;
 use warnings;
 
-use FindBin qw($Bin);
-use lib "$Bin/../lib";
+BEGIN {
+    require lib;
+    my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB};
+    if ( defined $repo_lib && $repo_lib ne '' && -d $repo_lib ) {
+        lib->import($repo_lib);
+    }
+    else {
+        require FindBin;
+        die 'FindBin did not resolve a helper directory' if !defined $FindBin::Bin || $FindBin::Bin eq '';
+        lib->import("$FindBin::Bin/../lib");
+    }
+}
 
 use Developer::Dashboard::CLI::Paths ();
 
@@ -55,8 +65,11 @@ runtime roots from the shell.
 
 =head1 HOW TO USE
 
-Users run C<dashboard paths>. The staged helper forwards the request to the
-lightweight path runtime, which collects layered dashboard roots from
+Users run C<dashboard paths>. The staged helper uses the repository library
+path passed by the public switchboard when available. Direct standalone
+invocation retains a C<FindBin> fallback to the helper-relative library
+directory. The helper forwards the request to the lightweight path runtime,
+which collects layered dashboard roots from
 C<~/.developer-dashboard> down to the current project, computes the effective
 paths for helpers, config, dashboards, and related runtime assets, and prints
 that payload as JSON for human inspection or shell consumption.

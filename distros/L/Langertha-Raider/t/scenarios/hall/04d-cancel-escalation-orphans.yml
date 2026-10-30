@@ -1,0 +1,24 @@
+title: after the hall escalated to KILL no tool process of the run is left
+skip: >-
+  Known gap, not fixed here: the hall signals only the raider's pid. When the
+  cancel escalates to SIGKILL (a tool that ignores INT and TERM, 04c), the
+  raider cannot end its tool children, which are orphaned and run on
+  (`sleep 60` outlives the hall). Needs a decision: start raiders in their own
+  process group and signal the group on escalation (and on hall shutdown), or
+  let the raider hand its children a deadline of their own.
+hall:
+  cancel_grace: 1
+model:
+  rules:
+    Sture Arbeit.:
+      tool_calls:
+        - [ bash, { command: "trap '' INT TERM; touch started; sleep 60" } ]
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_session: { as: s, raider: Testie }
+  - acp_prompt: { session: s, text: "Sture Arbeit.", as: p, wait: false }
+  - wait_file: { path: started }
+  - acp_cancel: { session: s }
+  - acp_wait: { prompt: p, timeout: 30 }
+  - idle: {}
+  - expect_quiet: {}

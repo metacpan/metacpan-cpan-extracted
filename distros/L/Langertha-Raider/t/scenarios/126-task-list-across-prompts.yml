@@ -1,0 +1,30 @@
+title: the task list lasts for the conversation -- the next prompt goes on with it -- and a deleted id is not used again
+prompts:
+  - Plan two steps.
+  - Go on.
+script:
+  - tool_calls:
+      - [ task_create, { subject: Step one, description: the first } ]
+      - [ task_create, { subject: Step two, description: the second } ]
+      - [ task_create, { subject: Step three, description: not needed } ]
+      - [ task_update, { taskId: "3", status: deleted } ]
+  - text: planned
+  - tool_calls:
+      - [ task_list, {} ]
+      - [ task_update, { taskId: "1", status: completed } ]
+      - [ task_create, { subject: Step four, description: a new one } ]
+  - text: going on
+expect:
+  answer: going on
+  todos:
+    - { content: Step one, status: completed }
+    - { content: Step two, status: pending }
+    - { content: Step four, status: pending }
+  tools:
+    - { name: task_create }
+    - { name: task_create }
+    - { name: task_create }
+    - { name: task_update, text: '\AUpdated task #3 deleted\z' }
+    - { name: task_list, text: '\A#1 \[pending\] Step one\n#2 \[pending\] Step two\z' }
+    - { name: task_update, text: '\AUpdated task #1 status\z' }
+    - { name: task_create, text: '\ATask #4 created successfully: Step four\z' }

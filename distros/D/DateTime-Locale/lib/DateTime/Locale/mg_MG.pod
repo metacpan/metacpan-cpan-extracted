@@ -435,6 +435,24 @@ Malagasy Madagascar locale.
    1995-12-22T09:05:02 = AD 1995 Des 22, Zom
   -0010-09-15T04:44:23 = BC -10 Sep 15, Asab
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Febroary
+   1995-12-22T09:05:02 = AD 1995 Desambra
+  -0010-09-15T04:44:23 = BC -10 Septambra
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Febroary 5, Tal
+   1995-12-22T09:05:02 = AD 1995 Desambra 22, Zom
+  -0010-09-15T04:44:23 = BC -10 Septambra 15, Asab
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Febroary 5
+   1995-12-22T09:05:02 = AD 1995 Desambra 22
+  -0010-09-15T04:44:23 = BC -10 Septambra 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Feb 5

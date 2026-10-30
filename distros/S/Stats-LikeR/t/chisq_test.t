@@ -238,6 +238,14 @@ throws_ok { chisq_test([10, 20, 30], 'correct') } qr/odd number of named argumen
 	'Croaks on an odd number of named arguments';
 throws_ok { chisq_test([10, 20, 30], banana => 1) } qr/unknown argument 'banana'/,
 	'Croaks on an unknown named argument';
+# an error in the call prints the help screen, then the error on the last line
+{
+	my $screen = Stats::LikeR::_usage_text('chisq_test');
+	like($screen, qr/\Ausage: chisq_test\(/, 'chisq_test has a help screen');
+	eval { chisq_test(5) };
+	is($@, $screen . "chisq_test: error: the data must be a reference\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 
 # correct => 0 turns off Yates' continuity correction, as in R.
 {

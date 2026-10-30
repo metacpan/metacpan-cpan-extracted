@@ -14,6 +14,7 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::Verifier;
 use DKIM2TestKeys;
+use Crypt::Digest::SHA256 ();
 
 our $BODY = "From: a\@test1.dkim2.com\r\nTo: b\@test2.dkim2.com\r\n"
           . "Subject: test\r\n\r\nbody\r\n";
@@ -29,8 +30,14 @@ sub mi_value {
 #             each item is signed with test1.dkim2.com's sel1 RSA key, or
 #             given a literal value with [selector, algorithm, value]
 #   timestamp t= value (default now)
+#   s         an s= value instead of items, with -08's "," and "|" (D2):
+#             each value written SIG is signed with that selector's
+#             test1.dkim2.com key, by its algorithm; BAD is a signature by
+#             the same key over other input (so it is FAIL, not malformed);
+#             anything else is used as it stands
 sub signed {
     my (%o) = @_;
+    return _signed_s(%o) if defined $o{s};
     my $mi = $o{mi} // mi_value();
     my @items = @{ $o{items} // [['sel1', 'rsa-sha256']] };
     my $key = DKIM2TestKeys::private_key('test1.dkim2.com', 'sel1');
@@ -47,6 +54,34 @@ sub signed {
     $s->set_tag('s', join ',', map {
         "$_->[0]:$_->[1]:" . (@$_ > 2 ? $_->[2] : $sig)
     } @items);
+    return $s->as_folded_string . "\r\nMessage-Instance: $mi\r\n" . $BODY;
+}
+
+sub _sign_with {
+    my ($sel, $alg, $input) = @_;
+    my $key = DKIM2TestKeys::private_key('test1.dkim2.com', $sel);
+    return encode_base64($alg eq 'ed25519-sha256'
+        ? $key->sign_message(Crypt::Digest::SHA256::sha256($input))
+        : $key->sign_message($input, 'SHA256', 'v1.5'), '');
+}
+
+sub _signed_s {
+    my (%o) = @_;
+    my $mi = $o{mi} // mi_value();
+    (my $blank = $o{s}) =~ s/:[^:,|]*(?=[,|]|\z)/:/g;
+    my $s = Mail::DKIM2::Signature->new(
+        Sequence => 1, Version => 1, Timestamp => $o{timestamp} // time,
+        Domain => 'test1.dkim2.com', MailFrom => 'a@test1.dkim2.com',
+        RcptTo => ['b@test2.dkim2.com']);
+    $s->set_tag('s', $blank);
+    my $input = build_signing_input(
+        mi_headers => [{ v => 1, raw => "Message-Instance: $mi\r\n" }],
+        signing_i => 1, signature => $s,
+        signing_header => $s->as_folded_string_without_data);
+    (my $value = $o{s}) =~ s{([^:,|\s]+):([^:,|\s]+):(SIG|BAD)(?=\s*[,|]|\z)}{
+        "$1:$2:" . _sign_with($1, $2, $3 eq 'SIG' ? $input : "other $input")
+    }ge;
+    $s->set_tag('s', $value);
     return $s->as_folded_string . "\r\nMessage-Instance: $mi\r\n" . $BODY;
 }
 

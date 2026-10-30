@@ -435,6 +435,24 @@ Sangu locale.
    1995-12-22T09:05:02 = PK 1995 Muh 22, Iju
   -0010-09-15T04:44:23 = AK -10 Mye 15, Jmo
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = PK 2008 Mwitope
+   1995-12-22T09:05:02 = PK 1995 Muhaano
+  -0010-09-15T04:44:23 = AK -10 Munyense
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = PK 2008 Mwitope 5, Jnn
+   1995-12-22T09:05:02 = PK 1995 Muhaano 22, Iju
+  -0010-09-15T04:44:23 = AK -10 Munyense 15, Jmo
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = PK 2008 Mwitope 5
+   1995-12-22T09:05:02 = PK 1995 Muhaano 22
+  -0010-09-15T04:44:23 = AK -10 Munyense 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = PK 2008 Mwi 5
@@ -506,6 +524,12 @@ Sangu locale.
    2008-02-05T18:30:30 = Jnn, Mwi 5
    1995-12-22T09:05:02 = Iju, Muh 22
   -0010-09-15T04:44:23 = Jmo, Mye 15
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Mwitope 5, Jnn
+   1995-12-22T09:05:02 = Muhaano 22, Iju
+  -0010-09-15T04:44:23 = Munyense 15, Jmo
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

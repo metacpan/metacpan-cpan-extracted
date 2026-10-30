@@ -1,0 +1,14 @@
+# Raider offers the cron tools only where a scheduled prompt can run as a turn of its own
+# when the surface is idle (the REPL). A run with a single prompt (-p, a Hall raider, ACP)
+# has no such state, so the model is not told it can schedule one; the monitor is offered.
+# Checks ADR 0031 section 2 (where the tools are mounted).
+title: a run with a single prompt is not offered the cron tools, but the monitor
+permission_mode: bypassPermissions
+prompt: Say hi.
+script:
+  - text: hi
+expect:
+  answer: hi
+  requests:
+    - { index: 0, lacks: [ cron_create, cron_delete, cron_list ] }
+    - { index: 0, tool_text: 'Start a background monitor' }

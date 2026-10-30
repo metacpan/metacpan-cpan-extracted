@@ -1,7 +1,7 @@
 use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Future v0.1.1 {
+class Acme::Parataxis::Future v0.1.3 {
     use Carp qw[croak];
     field $is_ready : reader = 0;
     field $result;

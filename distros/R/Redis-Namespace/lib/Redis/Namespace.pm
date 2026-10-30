@@ -2,10 +2,11 @@ package Redis::Namespace;
 
 use strict;
 use warnings;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Redis;
 use Carp qw(carp croak);
+use Scalar::Util ();
 
 # the before filter that does nothing
 my $NOOP = sub {
@@ -16,12 +17,12 @@ my $NOOP = sub {
 sub add_namespace {
     my ($self, @args) = @_;
     my $namespace = $self->{namespace};
-    return @args unless $namespace;
+    return @args unless defined $namespace;
 
     my @result;
     for my $item(@args) {
         my $type = ref $item;
-        if($item && !$type) {
+        if(defined $item && !$type) {
             push @result, "$namespace:$item";
         } elsif($type eq 'SCALAR') {
             push @result, \"$namespace:$$item";
@@ -34,6 +35,9 @@ sub add_namespace {
                 $hash{$new_key} = $value;
             }
             push @result, \%hash;
+        } elsif(Scalar::Util::blessed($item)) {
+            # Redis.pm stringifies objects, so they are keys too.
+            push @result, "$namespace:$item";
         } else {
             push @result, $item;
         }
@@ -44,7 +48,7 @@ sub add_namespace {
 sub rem_namespace {
     my ($self, @args) = @_;
     my $namespace = $self->{namespace};
-    return @args unless $namespace;
+    return @args unless defined $namespace;
 
     my @result;
     for my $item(@args) {
@@ -78,7 +82,8 @@ sub new {
     my $self  = bless {}, $class;
 
     $self->{redis} = $args{redis} || Redis->new(%args);
-    $self->{namespace} = $args{namespace};
+    # an empty namespace means no namespace.
+    $self->{namespace} = defined $args{namespace} && length $args{namespace} ? $args{namespace} : undef;
     $self->{warning} = $args{warning};
     $self->{strict} = $args{strict};
     $self->{subscribers} = {};
@@ -95,8 +100,8 @@ sub new {
     $self->{movablekeys} = {};
 
     # escape for pattern
-    my $escaped = $args{namespace};
-    $escaped =~ s/([[?*\\])/"\\$1"/ge;
+    my $escaped = $self->{namespace};
+    $escaped =~ s/([[?*\\])/"\\$1"/ge if defined $escaped;
     $self->{namespace_escaped} = $escaped;
 
     return $self;
@@ -138,7 +143,10 @@ sub _guess {
     my $before = sub {
         my ($self, @args) = @_;
         if ($first > 0) {
-            for (my $i = $first; $i <= @args && ($last < 0 || $i <= $last); $i += $step) {
+            # a negative last key position counts from the end of the arguments.
+            # e.g. -1 is the last argument, -2 is the second last one (BLPOP key [key ...] timeout).
+            my $last_index = $last < 0 ? @args + 1 + $last : $last;
+            for (my $i = $first; $i <= @args && $i <= $last_index; $i += $step) {
                 ($args[$i-1]) = $self->add_namespace($args[$i-1]);
             }
         }
@@ -314,7 +322,7 @@ sub __psubscribe {
     my $redis = $self->{redis};
     my $callback = $self->__wrap_subcb($cb);
     my $namespace = $self->{namespace_escaped};
-    @args = map { "$namespace:$_" } @args;
+    @args = map { "$namespace:$_" } @args if defined $namespace;
     return $redis->$command(@args, $callback);
 }
 
@@ -2986,7 +2994,7 @@ sub keys {
     my ($self, @args) = @_;
     my $cb = @args && ref $args[-1] eq 'CODE' ? pop @args : undef;
 
-    if (defined $args[0]) {
+    if (defined $args[0] && defined $self->{namespace_escaped}) {
         $args[0] = "$self->{namespace_escaped}:$args[0]";
     }
 
@@ -3404,10 +3412,7 @@ sub migrate {
     my ($self, @args) = @_;
     my $cb = @args && ref $args[-1] eq 'CODE' ? pop @args : undef;
 
-    if (@args > 2) {
-        # add_namespace keeps the empty string for the KEYS option as is.
-        ($args[2]) = $self->add_namespace($args[2]);
-    }
+    my $has_keys;
     for (my $i = 5; $i < @args; $i++) {
         my $option = lc($args[$i] // '');
         if ($option eq 'auth') {
@@ -3416,8 +3421,13 @@ sub migrate {
             $i += 2;
         } elsif ($option eq 'keys') {
             @args[$i + 1 .. $#args] = $self->add_namespace(@args[$i + 1 .. $#args]);
+            $has_keys = 1;
             last;
         }
+    }
+    # keep the empty string for the KEYS option as is.
+    if (@args > 2 && !($has_keys && defined $args[2] && $args[2] eq '')) {
+        ($args[2]) = $self->add_namespace($args[2]);
     }
 
     push @args, $cb if $cb;
@@ -4040,7 +4050,7 @@ sub scan {
         my $option = lc shift @args;
         if ($option eq 'match') {
             my $pattern = shift @args;
-            push @res, $option, "$self->{namespace_escaped}:$pattern";
+            push @res, $option, defined $self->{namespace_escaped} ? "$self->{namespace_escaped}:$pattern" : $pattern;
             $has_pattern = 1;
         } elsif ($option eq 'count' || $option eq 'type') {
             push @res, $option, shift @args;
@@ -4050,7 +4060,7 @@ sub scan {
     }
 
     # add pattern option
-    unless ($has_pattern) {
+    if (!$has_pattern && defined $self->{namespace_escaped}) {
         push @res, 'match', "$self->{namespace_escaped}:*";
     }
     @args = @res;
@@ -5919,6 +5929,7 @@ An instance of L<Redis.pm|https://github.com/melo/perl-redis> or L<Redis::Fast|h
 =item namespace
 
 prefix of keys.
+If it is omitted or an empty string, the keys are not prefixed.
 
 =item guess
 

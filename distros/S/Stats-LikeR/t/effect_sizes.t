@@ -84,6 +84,10 @@ throws_ok { cramers_v([[1,2]]) }  qr/two rows/,     'cramers_v needs >=2 rows';
 throws_ok { cramers_v([[1,0],[0,0]]) } qr/^cramers_v: the table total must be more than 1$/m,
 	'cramers_v: a table total of 1 is refused by name';
 throws_ok { eta_squared(42) }     qr/expected/,     'eta_squared rejects bad input';
+# a call-form error prints the help screen, with the error on its last line
+throws_ok { cramers_v(42) }
+	qr/\Ausage: cramers_v\(TABLE \| X, Y\).*^example:\n.*\n\ncramers_v: error: expected a count table or two parallel vectors\n\z/ms,
+	'cramers_v: neither a table nor two vectors, under the help screen';
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

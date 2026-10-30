@@ -51,6 +51,6 @@
          "url" : "https://github.com/asb-capfan/Spreadsheet-XLSX"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

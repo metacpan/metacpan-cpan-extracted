@@ -1,0 +1,14 @@
+title: loadguard lets a heavy command run when the host has room
+proc:
+  memory_full: 0.1
+  swap: 10
+  cpus: 4
+prompt: Check the prove version.
+script:
+  - tool_calls:
+      - [ bash, { command: 'prove --version' } ]
+  - text: gesehen
+expect:
+  answer: gesehen
+  tools:
+    - { name: bash, text: '\ATAP::Harness', not_text: 'loadguard' }

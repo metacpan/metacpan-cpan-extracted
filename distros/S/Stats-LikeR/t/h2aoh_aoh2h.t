@@ -189,8 +189,8 @@ use Test::More;
 {
 	throws_ok { aoh2h(undef) } qr/first argument is undefined/,
 		'aoh2h: undef argument dies';
-	throws_ok { aoh2h({ a => 1 }) } qr/must be an arrayref of hashrefs/,
-		'aoh2h: hashref argument dies';
+	throws_ok { aoh2h({ a => 1 }) } qr/a flat hash, not a data frame/,
+		'aoh2h: a flat hash dies (0.33: a hash frame is taken; see t/df2h.t)';
 	throws_ok { aoh2h([ { variable => 'a', value => 1 } ], 'var_name') }
 		qr/name => value pairs/, 'aoh2h: an odd trailing argument list dies';
 	throws_ok { aoh2h([], colour => 'red') } qr/unknown argument\(s\): colour/,
@@ -262,10 +262,20 @@ use Test::More;
 {
 	ok(defined &main::h2aoh, 'h2aoh is exported into the caller');
 	ok(defined &main::aoh2h, 'aoh2h is exported into the caller');
-	for my $f (qw(h2aoh aoh2h)) {
+	ok(defined &main::df2h, 'df2h is exported into the caller');
+	ok(\&main::aoh2h == \&main::df2h, 'aoh2h and df2h are the same sub');
+	for my $f (qw(h2aoh aoh2h df2h)) {
 		ok(scalar(grep { $_ eq $f } @Stats::LikeR::EXPORT_OK),
 			"$f is in \@EXPORT_OK");
 	}
+}
+
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { h2aoh({ a => 1 }, sort => 'x'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: h2aoh\(.*\n\nh2aoh: error: \Qsort 'x' isn't allowed (key, value, none)\E\n\z/s,
+		'h2aoh: a call-form error prints the help screen, the error on its last line');
 }
 
 done_testing();

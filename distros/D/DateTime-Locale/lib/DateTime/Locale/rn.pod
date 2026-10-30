@@ -435,6 +435,24 @@ Rundi locale.
    1995-12-22T09:05:02 = Ny.Y 1995 Uku. 22, gnu.
   -0010-09-15T04:44:23 = Mb.Y. -10 Nze. 15, gnd.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = Ny.Y 2008 Ruhuhuma
+   1995-12-22T09:05:02 = Ny.Y 1995 Kigarama
+  -0010-09-15T04:44:23 = Mb.Y. -10 Nyakanga
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = Ny.Y 2008 Ruhuhuma 5, kab.
+   1995-12-22T09:05:02 = Ny.Y 1995 Kigarama 22, gnu.
+  -0010-09-15T04:44:23 = Mb.Y. -10 Nyakanga 15, gnd.
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = Ny.Y 2008 Ruhuhuma 5
+   1995-12-22T09:05:02 = Ny.Y 1995 Kigarama 22
+  -0010-09-15T04:44:23 = Mb.Y. -10 Nyakanga 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = Ny.Y 2008 Gas. 5
@@ -506,6 +524,12 @@ Rundi locale.
    2008-02-05T18:30:30 = kab. 5 Gas.
    1995-12-22T09:05:02 = gnu. 22 Uku.
   -0010-09-15T04:44:23 = gnd. 15 Nze.
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Ruhuhuma 5, kab.
+   1995-12-22T09:05:02 = Kigarama 22, gnu.
+  -0010-09-15T04:44:23 = Nyakanga 15, gnd.
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

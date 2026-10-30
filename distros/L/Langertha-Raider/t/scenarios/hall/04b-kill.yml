@@ -1,0 +1,15 @@
+title: kill on the control socket stops a long run (SIGTERM); raider.done says interrupted
+model:
+  rules:
+    Lange Arbeit.:
+      tool_calls:
+        - [ bash, { command: "touch started && sleep 60" } ]
+  after:
+    bash: { answer: "Wurde nicht beendet." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - spawn: { name: Testie, mission: "Lange Arbeit.", as: a }
+  - wait_file: { path: started }
+  - kill: { run: a }
+  - done: { run: a }
+  - idle: {}

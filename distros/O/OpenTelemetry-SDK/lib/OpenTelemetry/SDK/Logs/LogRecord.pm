@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Logs::LogRecord;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 class OpenTelemetry::SDK::Logs::LogRecord {
     use Ref::Util 'is_ref';

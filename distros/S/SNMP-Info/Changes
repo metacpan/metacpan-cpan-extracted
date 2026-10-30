@@ -1,3 +1,32 @@
+Version 3.984000 (2026-10-29)
+
+  [NEW FEATURES]
+
+  * #648 VRF: report VRF instances, membership and per-VRF neighbors,
+    addresses and subnets on IOS-XE, IOS XR, NX-OS, Junos, EOS, Comware,
+    EXOS and VOSS
+  * #649 Spanning tree: report RSTP edge port (PortFast) configured and
+    operational state from RSTP-MIB and vendor tables; Cisco's
+    i_faststart_enabled unchanged (#254)
+  * #651 LAG: add LAG, MLAG and ESI-LAG standard and vendor MIB support; add
+    aggregate port support for EXOS and Juniper
+
+  [BUG FIXES]
+
+  * #652 Spanning tree: report incomplete tree lists as incomplete on Cisco,
+    Extreme, RapidCity and H3C, and in a non-default context; document
+    trees, ports and completeness with field lists and usage examples
+  * #650 Foundry: use FastIron VLAN and IP tables when standard MIB tables
+    are empty (netdisco/netdisco#856, netdisco/netdisco#1138)
+  * #653 LAG: Foundry and RapidCity agg_ports fixes; lag_groups_complete
+    checks the tables agg_ports reads
+  * #654 ArubaCX: report the bridge MAC as the system MAC instead of port
+    1/1/1 (#567)
+  * #655 RapidCity: allow VLAN changes on phone (untagPvidOnly) ports and
+    report their untagged VLANs from the port tagging setting (#538)
+  * #656 LLDP: skip management address rows whose index has no address,
+    which logged warnings on Cisco Fabric Interconnects (#520)
+
 Version 3.983000 (2026-10-26)
 
   [NEW FEATURES]

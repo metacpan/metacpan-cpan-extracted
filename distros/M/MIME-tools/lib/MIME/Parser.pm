@@ -152,7 +152,7 @@ use MIME::Parser::Results;
 #------------------------------
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.520";
+$VERSION = "5.522";
 
 ### How to catenate:
 $CAT = '/bin/cat';
@@ -216,8 +216,8 @@ sub init {
     $self->{MP5_TmpToCore}       = 0;
     $self->{MP5_IgnoreErrors}    = 1;
     $self->{MP5_UUDecode}        = 0;
-    $self->{MP5_MaxParts}        = -1;
-    $self->{MP5_MaxDepth}        = -1;
+    $self->{MP5_MaxParts}        = 1000;
+    $self->{MP5_MaxDepth}        = 64;
     $self->{MP5_TmpDir}          = undef;
     $self->{MP5_AmbiguousContent} = 0;
 
@@ -699,7 +699,7 @@ sub process_multipart {
     my $part_rdr = $rdr->spawn->add_boundary($bound);
 
     if ($self->{MP5_MaxDepth} > 0 && $part_rdr->depth() > $self->{MP5_MaxDepth}) {
-        $self->error("MIME parts nested too deeply");
+        $self->whine("MIME parts nested too deeply");
         return undef;
     }
     ### Prepare to parse:
@@ -1018,8 +1018,7 @@ sub process_part {
     if ($self->{MP5_MaxParts} > 0) {
 	$self->{MP5_NumParts}++;
 	if ($self->{MP5_NumParts} > $self->{MP5_MaxParts}) {
-            $self->error("Too many MIME parts");
-	    # Return UNDEF if msg too complex
+            $self->whine("Too many MIME parts");
 	    return undef;
 	}
     }
@@ -1444,12 +1443,11 @@ sub evil_filename {
 I<Instance method.>
 Limits the number of MIME parts we will parse.
 
-Normally, instances of this class parse a message to the bitter end.
-Messages with many MIME parts can cause excessive memory consumption.
-If you invoke this method, parsing will abort and return undef if a
-message contains more than NUM parts.
+Messages with many MIME parts can cause excessive memory consumption,
+so parsing will abort and return undef if a message contains more
+than NUM parts.  The default is 1000.
 
-If NUM is set to -1 (the default), then no maximum limit is enforced.
+If NUM is set to -1, then no maximum limit is enforced.
 
 With no argument, returns the current setting as an integer
 
@@ -1468,12 +1466,13 @@ sub max_parts {
 I<Instance method.>
 Limits the depth of nested MIME parts we will parse.
 
-Normally, instances of this class parse a message to the bitter end.
 Messages with many nested MIME parts can cause excessive memory
-consumption.  If you invoke this method, parsing will abort and return
-undef if a message is nested to a level more than NUM lexels deep.
+consumption, so parsing will abort and return undef if a message is
+nested to a level more than NUM levels deep.  The default is 64.
+Only multipart nesting counts; message/rfc822 parts nest within the
+limit set by max_parts.
 
-If NUM is set to -1 (the default), then no maximum limit is enforced.
+If NUM is set to -1, then no maximum limit is enforced.
 
 With no argument, returns the current setting as an integer
 

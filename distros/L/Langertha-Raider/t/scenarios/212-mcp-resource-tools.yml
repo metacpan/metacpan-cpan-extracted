@@ -1,0 +1,24 @@
+title: list_mcp_resources and read_mcp_resource reach the model when MCP servers are configured; ui:// resources are left out (ADR 0029 Addendum 1)
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", rich ]
+prompt: What resources are there?
+script:
+  - tool_calls:
+      - [ list_mcp_resources, {} ]
+      - [ read_mcp_resource, { server: t, uri: "file:///b.txt" } ]
+      - [ read_mcp_resource, { server: nope, uri: "file:///b.txt" } ]
+      - [ list_mcp_resources, { server: nope } ]
+  - text: done
+expect:
+  answer: done
+  requests:
+    - { index: 0, tool_text: "Lists available resources from configured MCP servers" }
+  tools:
+    - { name: list_mcp_resources, text: "(?s)file:///a.txt.*file:///b.txt", not_text: "ui://" }
+    - { name: read_mcp_resource, text: "\\Acontents of b\\z" }
+    - { name: read_mcp_resource, error: true, text: "Server \"nope\" not found. Available servers: t" }
+    - { name: list_mcp_resources, error: true, text: "Server \"nope\" not found" }

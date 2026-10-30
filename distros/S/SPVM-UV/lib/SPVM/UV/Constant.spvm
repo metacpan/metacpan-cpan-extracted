@@ -223,4 +223,15 @@ class UV::Constant {
 
   native static method UV_LEAVE_GROUP : int ();
 
+  native static method UV_IGNORE : int ();
+
+  native static method UV_CREATE_PIPE : int ();
+
+  native static method UV_INHERIT_FD : int ();
+
+  native static method UV_INHERIT_STREAM : int ();
+
+  native static method UV_READABLE_PIPE : int ();
+
+  native static method UV_WRITABLE_PIPE : int ();
 }

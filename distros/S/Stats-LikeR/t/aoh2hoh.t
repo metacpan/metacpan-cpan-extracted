@@ -143,4 +143,14 @@ unless ($INC{'Devel/Cover.pm'}) {
 	} 'aoh2hoh(): no leaks when dying on a missing-key row';
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('aoh2hoh');
+	like($screen, qr/\Ausage: aoh2hoh\(/, 'aoh2hoh has a help screen');
+	is(do { local $@; eval { aoh2hoh([], undef); 1 } ? '' : $@ },
+	   $screen . "aoh2hoh: error: a row key must be defined\n",
+	   'aoh2hoh: an undefined key prints the help screen');
+}
+
 done_testing();

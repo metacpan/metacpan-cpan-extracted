@@ -22,6 +22,8 @@ isolate_home();
 my $repo = path(__FILE__)->absolute->parent->parent;
 my $bin  = $repo->child('bin', 'raider');
 my $q    = sub { join ' ', map { "'$_'" } @_ };
+# A root of its own: the checkout is a Claude Code project (ADR 0019).
+my $root = Path::Tiny->tempdir;
 
 subtest 'clear_engine_env scrubs every *_API_KEY plus the token/URL extras' => sub {
   local %ENV = %ENV;
@@ -44,13 +46,13 @@ subtest 'a raider subprocess never sees a dummy MINIMAX_API_KEY once clear_engin
   # Sanity: without clearing, the child inherits it like any other env var
   # -- this is the leak karr #52 is about, and it proves the detection
   # below (grepping the child's own report of its config sources) works.
-  my $leaked = `@{[ $q->($^X, '-I'.$repo->child('lib'), $bin, 'config', 'explain', '-e', 'minimax', '--no-color') ]} 2>&1 </dev/null`;
+  my $leaked = `@{[ $q->($^X, '-I'.$repo->child('lib'), $bin, 'config', 'explain', '-r', "$root", '-e', 'minimax', '--no-color') ]} 2>&1 </dev/null`;
   like($leaked, qr/env MINIMAX_API_KEY/, 'without clearing, the child does inherit it')
     or diag $leaked;
 
   clear_engine_env();
 
-  my $clean = `@{[ $q->($^X, '-I'.$repo->child('lib'), $bin, 'config', 'explain', '-e', 'minimax', '--no-color') ]} 2>&1 </dev/null`;
+  my $clean = `@{[ $q->($^X, '-I'.$repo->child('lib'), $bin, 'config', 'explain', '-r', "$root", '-e', 'minimax', '--no-color') ]} 2>&1 </dev/null`;
   unlike($clean, qr/MINIMAX_API_KEY/, 'after clear_engine_env, the child no longer sees it')
     or diag $clean;
 };

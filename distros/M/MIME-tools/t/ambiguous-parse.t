@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::Deep;
-use Test::More tests => 60;
+use Test::More tests => 63;
 
 use MIME::Entity;
 use MIME::Parser;
@@ -140,3 +140,9 @@ like(join('', @{ $entity->epilogue || [] }), qr/evil\.exe/,
 $entity->epilogue([]);
 $entity->head->mime_attr('Content-Type.boundary', $entity->head->multipart_boundary);
 ok(!$entity->ambiguous_content(), 'Sanitized message is no longer ambiguous');
+
+# Blank filenames should not raise ambiguous content warning
+$entity = $parser->parse_open('testmsgs/blank-filename.msg');
+ok($entity, 'Got an entity');
+ok(!$entity->ambiguous_content(), 'Blank filename parameter not a cause for indicating an ambiguous parse');
+is($entity->parts(1)->head->recommended_filename(), undef, 'Got no recommended filename as expected');

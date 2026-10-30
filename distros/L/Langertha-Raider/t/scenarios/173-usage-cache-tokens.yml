@@ -1,0 +1,15 @@
+# Cache reads and writes are reported beside the input, as the engine
+# reports them.
+title: cache tokens are kept apart from the plain counts
+prompt: Hello.
+script:
+  - text: Hi.
+    usage:
+      prompt_tokens: 1000
+      completion_tokens: 20
+      prompt_tokens_details: { cached_tokens: 800, cache_write_tokens: 50 }
+expect:
+  answer: Hi.
+  events:
+    - { type: model.usage, purpose: chat, input_tokens: 1000, output_tokens: 20, cache_read_tokens: 800, cache_write_tokens: 50 }
+  usage: { input_tokens: 1000, cache_read_tokens: 800, cache_write_tokens: 50, calls: 1 }

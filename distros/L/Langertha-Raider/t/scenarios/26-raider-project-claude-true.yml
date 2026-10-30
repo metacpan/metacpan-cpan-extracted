@@ -1,0 +1,13 @@
+title: "a raider project with claude: true reads CLAUDE.md next to its own instructions"
+files:
+  .raider/config.yml: "claude: true\n"
+  .raider/instructions.md: "Raider rule: be brief.\n"
+  CLAUDE.md: "Claude rule: be verbose.\n"
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "Raider rule: be brief." }
+    - { index: 0, contains: "Claude rule: be verbose." }

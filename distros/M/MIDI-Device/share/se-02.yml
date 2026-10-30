@@ -8,118 +8,118 @@ note_on:
     max: 127
 control_change:
   - number: 5
-    name: "Glide Time"
+    note: "Glide Time"
   - number: 9
-    name: "Glide Type"
+    note: "Glide Type"
   - number: 13
-    name: "Control Wheel / WHL Mix"
+    note: "Control Wheel / WHL Mix"
   - number: 80
-    name: "Modulation Sensitivity"
+    note: "Modulation Sensitivity"
   - number: 81
-    name: "Dynamics"
+    note: "Dynamics"
   - number: 84
-    name: "Aftertouch Sensitivity 1"
+    note: "Aftertouch Sensitivity 1"
   - number: 85
-    name: "Aftertouch Sensitivity 2"
+    note: "Aftertouch Sensitivity 2"
   - number: 87
-    name: "Pitch Bend Range"
+    note: "Pitch Bend Range"
   - number: 112
-    name: "Octave Shift"
+    note: "Octave Shift"
   - number: 113
-    name: "Transpose"
+    note: "Transpose"
   - number: 114
-    name: "Transpose Switch"
+    note: "Transpose Switch"
   - number: 115
-    name: "Patch Volume"
+    note: "Patch Volume"
   - number: 16
-    name: "XMOD O2 to Filter"
+    note: "XMOD O2 to Filter"
   - number: 17
-    name: "XMOD O3 to O2"
+    note: "XMOD O3 to O2"
   - number: 18
-    name: "XMOD O3 to Pulse Width"
+    note: "XMOD O3 to Pulse Width"
   - number: 19
-    name: "OSC 2 Range"
+    note: "OSC 2 Range"
   - number: 20
-    name: "OSC 2 Waveform"
+    note: "OSC 2 Waveform"
   - number: 21
-    name: "OSC Sync"
+    note: "OSC Sync"
   - number: 22
-    name: "OSC 1 Range"
+    note: "OSC 1 Range"
   - number: 24
-    name: "OSC 1 Waveform"
+    note: "OSC 1 Waveform"
   - number: 25
-    name: "OSC 3 Range"
+    note: "OSC 3 Range"
   - number: 26
-    name: "OSC 3 Waveform"
+    note: "OSC 3 Waveform"
   - number: 27
-    name: "OSC 1 Fine Tune"
+    note: "OSC 1 Fine Tune"
   - number: 28
-    name: "OSC 2 Fine Tune"
+    note: "OSC 2 Fine Tune"
   - number: 29
-    name: "OSC Envelope 1"
+    note: "OSC Envelope 1"
   - number: 30
-    name: "OSC Keyboard Track"
+    note: "OSC Keyboard Track"
   - number: 31
-    name: "OSC XMOD to Mod Wheel"
+    note: "OSC XMOD to Mod Wheel"
   - number: 41
-    name: "Noise Level"
+    note: "Noise Level"
   - number: 48
-    name: "OSC 1 Level"
+    note: "OSC 1 Level"
   - number: 49
-    name: "OSC 2 Level"
+    note: "OSC 2 Level"
   - number: 50
-    name: "OSC 3 Level"
+    note: "OSC 3 Level"
   - number: 51
-    name: "Feedback Level"
+    note: "Feedback Level"
   - number: 47
-    name: "Filter Attack 1"
+    note: "Filter Attack 1"
   - number: 52
-    name: "Filter Decay 1"
+    note: "Filter Decay 1"
   - number: 53
-    name: "Filter Sustain 1"
+    note: "Filter Sustain 1"
   - number: 56
-    name: "Filter Sustain 2"
+    note: "Filter Sustain 2"
   - number: 57
-    name: "Filter Key Track 1/3"
+    note: "Filter Key Track 1/3"
   - number: 58
-    name: "Filter Key Track 2/3"
+    note: "Filter Key Track 2/3"
   - number: 59
-    name: "Filter Contour"
+    note: "Filter Contour"
   - number: 60
-    name: "Filter Multiple Trigger"
+    note: "Filter Multiple Trigger"
   - number: 61
-    name: "Filter Norm/Invert"
+    note: "Filter Norm/Invert"
   - number: 62
-    name: "Filter Release"
+    note: "Filter Release"
   - number: 63
-    name: "Filter Gate/LFO"
+    note: "Filter Gate/LFO"
   - number: 71
-    name: "Filter Emphasis (Resonance)"
+    note: "Filter Emphasis (Resonance)"
   - number: 73
-    name: "Filter Attack 2"
+    note: "Filter Attack 2"
   - number: 74
-    name: "Filter Cutoff Frequency"
+    note: "Filter Cutoff Frequency"
   - number: 75
-    name: "Filter Decay 2"
+    note: "Filter Decay 2"
   - number: 102
-    name: "LFO Rate"
+    note: "LFO Rate"
   - number: 103
-    name: "LFO OSC Depth"
+    note: "LFO OSC Depth"
   - number: 104
-    name: "LFO Waveform"
+    note: "LFO Waveform"
   - number: 105
-    name: "LFO Filter Depth"
+    note: "LFO Filter Depth"
   - number: 106
-    name: "LFO MWHL OSC Switch"
+    note: "LFO MWHL OSC Switch"
   - number: 107
-    name: "LFO MWHL Filter Switch"
+    note: "LFO MWHL Filter Switch"
   - number: 108
-    name: "LFO Mode Switch"
+    note: "LFO Mode Switch"
   - number: 109
-    name: "LFO Sync Switch"
+    note: "LFO Sync Switch"
   - number: 82
-    name: "Delay Time"
+    note: "Delay Time"
   - number: 83
-    name: "Delay Regen"
+    note: "Delay Regen"
   - number: 91
-    name: "Delay Amount"
+    note: "Delay Amount"

@@ -3,7 +3,7 @@ use Object::Pad;
 
 package OpenTelemetry::SDK::Logs::Logger;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 class OpenTelemetry::SDK::Logs::Logger :isa(OpenTelemetry::Logs::Logger) {
     field $callback :param;

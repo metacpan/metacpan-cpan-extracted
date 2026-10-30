@@ -22,6 +22,7 @@ use Developer::Dashboard::CLI::Paths ();
 use Developer::Dashboard::CLI::TableHelpers ();
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::InternalCLI ();
+use Developer::Dashboard::Platform ();
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::DockerCompose;
@@ -725,7 +726,7 @@ ok(
     close $wrapper_fh or die "Unable to close $wrapper_target: $!";
 
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { return 1 };
 
     my $written = Developer::Dashboard::InternalCLI::ensure_helper(
         paths => $wrapper_paths,
@@ -952,7 +953,7 @@ ok(
     my @unlink_calls;
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+        local *Developer::Dashboard::Platform::is_windows = sub { return 1 };
         local *Developer::Dashboard::InternalCLI::_rename_path = sub {
             my ( $source, $target ) = @_;
             push @rename_calls, [ $source, $target ];
@@ -989,7 +990,7 @@ ok(
 
     local $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} = $defer_target;
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { return 1 };
 
     ok(
         !Developer::Dashboard::InternalCLI::_stage_managed_helper(
@@ -1014,7 +1015,7 @@ ok(
 
     local $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} = $defer_target;
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { return 1 };
 
     ok(
         !Developer::Dashboard::InternalCLI::_stage_managed_helper(
@@ -1859,7 +1860,7 @@ my $existing_ticket_plan = Developer::Dashboard::CLI::Ticket::build_ticket_plan(
 ok( !$existing_ticket_plan->{create}, 'build_ticket_plan skips creation for existing sessions' );
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::CLI::Ticket::cwd = sub { return '/tmp/default-ticket-cwd' };
+    local *Developer::Dashboard::CLI::Ticket::current_working_directory = sub { return '/tmp/default-ticket-cwd' };
     my $default_cwd_plan = Developer::Dashboard::CLI::Ticket::build_ticket_plan(
         args => ['DD-456'],
         tmux => sub { return { exit_code => 1, stdout => '', stderr => '' } },

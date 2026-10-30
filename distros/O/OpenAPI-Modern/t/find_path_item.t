@@ -1296,52 +1296,6 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
-servers:
-  - url: http://example.com
-  - url: http://example2.com/foo
-paths:
-  /:
-    get: {}
-YAML
-
-  @request = (method => 'GET', uri => 'http://example.com');
-  ok($openapi->find_path_item($options = { @request }), 'lookup succeeded');
-  cmp_result(
-    $options,
-    $expected = {
-      uri => isa('Mojo::URL'),
-      path_template => '/',
-      path_captures => {},
-      uri_captures => {},
-      method => 'GET',
-      _path_item => { get => ignore },
-      _operation => ignore,
-      _operation_path_suffix => '/get',
-      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths / get)))),
-      errors => [],
-    },
-    'path_template inferred from request uri; empty path maps to /',
-  );
-
-  ok($openapi->find_path_item($options = { @request, path_template => '/' }), 'lookup succeeded');
-  cmp_result(
-    $options,
-    $expected,
-    'provided path_template verified against request uri with empty path',
-  );
-
-  @request = (method => 'GET', uri => 'http://example2.com/foo');
-  ok($openapi->find_path_item($options = { @request }), 'lookup succeeded');
-  cmp_result(
-    $options,
-    $expected,
-    'path_template inferred from request uri; empty path (because server url swallows path) maps to /',
-  );
-
-
-  $openapi = OpenAPI::Modern->new(
-    openapi_uri => $doc_uri,
     openapi_schema => $lots_of_options = decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   pathItems:
@@ -1656,6 +1610,53 @@ YAML
       ],
     },
     'error locations are correct after multiple unanchored matches of uri against paths, with bad method',
+  );
+};
+
+subtest 'matching with server urls' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers:
+  - url: http://example.com
+  - url: http://example2.com/foo
+paths:
+  /:
+    get: {}
+YAML
+
+  my @request = (method => 'GET', uri => 'http://example.com');
+  ok($openapi->find_path_item(my $options = { @request }), 'lookup succeeded');
+  cmp_result(
+    $options,
+    my $expected = {
+      uri => isa('Mojo::URL'),
+      path_template => '/',
+      path_captures => {},
+      uri_captures => {},
+      method => 'GET',
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths / get)))),
+      errors => [],
+    },
+    'path_template inferred from request uri; empty path maps to /',
+  );
+
+  ok($openapi->find_path_item($options = { @request, path_template => '/' }), 'lookup succeeded');
+  cmp_result(
+    $options,
+    $expected,
+    'provided path_template verified against request uri with empty path',
+  );
+
+  @request = (method => 'GET', uri => 'http://example2.com/foo');
+  ok($openapi->find_path_item($options = { @request }), 'lookup succeeded');
+  cmp_result(
+    $options,
+    $expected,
+    'path_template inferred from request uri; empty path (because server url swallows path) maps to /',
   );
 
 
@@ -2745,6 +2746,408 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
+    # note: no retrieval uri
+    debug => 1,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers:
+  - url: /{subdir}
+    variables:
+      subdir:
+        default: x
+paths:
+  /foo:
+    get: {}
+YAML
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/x/foo') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/foo',
+      debug => {
+        uri_patterns => [
+          '\\/foo\\z',
+          '^http\\:\\/\\/example\\.com\\/([^/?#]*)',
+        ],
+      },
+      path_captures => {},
+      uri_captures => { subdir => 'x' },
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str('#'.jsonp(qw(/paths /foo get))), # note: no host for operation uri
+      errors => [],
+    },
+    'when retrieval uri is undefined, the server url is relative and is resolved against the request URI',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/z/foo') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      uri_captures => { subdir => 'z' },
+      debug => {
+        uri_patterns => [
+          '\\/foo\\z',
+          '^http\\:\\/\\/example2\\.com\\/([^/?#]*)',
+        ],
+      },
+    },
+    '..which also means the request URI can use an arbitrary host',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    debug => 1,
+    openapi_uri => 'http://example.com/main_api',
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers:
+  - url: /{host}
+    variables:
+      host:
+        default: zip
+        enum: [ zip ]
+paths:
+  /global:
+    $ref: 'http://example2.com/secondary_api#/components/pathItems/global_path'
+  /path_item:
+    $ref: 'http://example2.com/secondary_api#/components/pathItems/path_item_path'
+  /operation:
+    $ref: 'http://example2.com/secondary_api#/components/pathItems/operation_path'
+YAML
+
+  my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
+    evaluator => $openapi->evaluator,
+    canonical_uri => 'http://example2.com/secondary_api',
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers:    # global servers in secondary document are not used for paths originating in main document
+  - url: /zip
+components:
+  pathItems:
+    global_path:
+      # servers for this operation come from the entry document
+      get: {}
+    path_item_path:
+      servers:
+        - url: /{host}
+          variables:
+            host:
+              default: prod
+              enum: [dev, stg, prod]
+      get: {}
+    operation_path:
+      get:
+        servers:
+          - url: /{host}
+            variables:
+              host:
+                default: prod
+                enum: [dev, stg, prod]
+YAML
+
+  $openapi->evaluator->add_document($doc2);
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/zip/operation', path_template => '/operation') }),
+    to_str(@request).': lookup failed');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/operation',
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      debug => {
+        uri_patterns => [
+          '\\/operation\\z',
+          '^http\\:\\/\\/example2\\.com\\/([^/?#]*)',
+        ],
+      },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri',
+          keywordLocation => jsonp(qw(/paths /operation $ref get servers 0 variables host enum)),
+          absoluteKeywordLocation => 'http://example2.com/secondary_api#/components/pathItems/operation_path/get/servers/0/variables/host/enum',
+          error => 'server url value does not match any of the allowed values',
+        }),
+      ],
+    },
+    'server url error at operation level is correct after $ref to path-item in another document (failed)',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/dev/operation', path_template => '/operation') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      operation_uri => str('http://example2.com/secondary_api#/components/pathItems/operation_path/get'),
+      path_captures => {},
+      uri_captures => { host => 'dev' },
+      errors => [],
+    },
+    'server url error at operation level is correct after $ref to path-item in another document (success)',
+  );
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/zip/path_item', path_template => '/path_item') }),
+    to_str(@request).': lookup failed');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/path_item',
+      _path_item => { get => ignore, servers => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      debug => {
+        uri_patterns => [
+          '\\/path_item\\z',
+          '^http\\:\\/\\/example2\\.com\\/([^/?#]*)',
+        ],
+      },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri',
+          keywordLocation => jsonp(qw(/paths /path_item $ref servers 0 variables host enum)),
+          absoluteKeywordLocation => 'http://example2.com/secondary_api#/components/pathItems/path_item_path/servers/0/variables/host/enum',
+          error => 'server url value does not match any of the allowed values',
+        }),
+      ],
+    },
+    'server url error at path-item level is correct after $ref to path-item in another document (failed)',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/dev/path_item', path_template => '/path_item') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      operation_uri => str('http://example2.com/secondary_api#/components/pathItems/path_item_path/get'),
+      path_captures => {},
+      uri_captures => { host => 'dev' },
+      errors => [],
+    },
+    'server url error at path-item level is correct after $ref to path-item in another document (success)',
+  );
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/dev/global', path_template => '/global') }),
+    to_str(@request).': lookup failed');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/global',
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      debug => {
+        uri_patterns => [
+          '\\/global\\z',
+          '^http\\:\\/\\/example\\.com\\/([^/?#]*)',
+        ],
+      },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri',
+          keywordLocation => jsonp(qw(/servers 0 variables host enum)),
+          absoluteKeywordLocation => 'http://example.com/main_api#/servers/0/variables/host/enum',
+          error => 'server url value does not match any of the allowed values',
+        }),
+      ],
+    },
+    'server url at the global level uses the document containing the Server Object to determine the full request URI (failed)',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/zip/global', path_template => '/global') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      operation_uri => str('http://example2.com/secondary_api#/components/pathItems/global_path/get'),
+      path_captures => {},
+      uri_captures => { host => 'zip' },
+      errors => [],
+    },
+    'server url at the global level uses the document containing the Server Object to determine the full request URI (success)',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    debug => 1,
+    openapi_uri => 'http://example.com/main_api',
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers: []
+paths:
+  /global:
+    $ref: 'http://example2.com/secondary_api#/components/pathItems/global_path'
+  /path_item:
+    $ref: 'http://example2.com/secondary_api#/components/pathItems/path_item_path'
+  /operation:
+    $ref: 'http://example2.com/secondary_api#/components/pathItems/operation_path'
+YAML
+
+  $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
+    evaluator => $openapi->evaluator,
+    canonical_uri => 'http://example2.com/secondary_api',
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers: [] # global servers in secondary document are not used for paths originating in main document
+components:
+  pathItems:
+    global_path:
+      # servers for this operation come from the entry document
+      get: {}
+    path_item_path:
+      servers: []
+      get: {}
+    operation_path:
+      get:
+        servers: []
+YAML
+
+  $openapi->evaluator->add_document($doc2);
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/operation', path_template => '/operation') }),
+    to_str(@request).': lookup failed');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/operation',
+      debug => {
+        uri_patterns => [
+          '\\/operation\\z',
+          '^http\\:\\/\\/example2\\.com',
+        ],
+      },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri',
+          keywordLocation => jsonp(qw(/paths /operation)),
+          absoluteKeywordLocation => 'http://example.com/main_api#'.jsonp(qw(/paths /operation)),
+          error => 'provided path_template does not match request URI "http://example.com/operation"',
+        }),
+      ],
+    },
+    'server url is "/" for operation, resolving to the secondary document, which does not match the request',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/operation', path_template => '/operation') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str('http://example2.com/secondary_api#/components/pathItems/operation_path/get'),
+      path_captures => {},
+      uri_captures => {},
+      errors => [],
+    },
+    'server url is "/" for operation-, resolving to the secondary document, which matches the request',
+  );
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/path_item', path_template => '/path_item') }),
+    to_str(@request).': lookup failed');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/path_item',
+      debug => {
+        uri_patterns => [
+          '\\/path_item\\z',
+          '^http\\:\\/\\/example2\\.com',
+        ],
+      },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri',
+          keywordLocation => jsonp(qw(/paths /path_item)),
+          absoluteKeywordLocation => 'http://example.com/main_api#'.jsonp(qw(/paths /path_item)),
+          error => 'provided path_template does not match request URI "http://example.com/path_item"',
+        }),
+      ],
+    },
+    'server url is "/" for path-item, resolving to the secondary document, which does not match the request',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/path_item', path_template => '/path_item') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      _path_item => { get => ignore, servers => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str('http://example2.com/secondary_api#/components/pathItems/path_item_path/get'),
+      path_captures => {},
+      uri_captures => {},
+      errors => [],
+    },
+    'server url is "/" for path-item, resolving to the secondary document, which matches the request',
+  );
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/global', path_template => '/global') }),
+    to_str(@request).': lookup failed');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/global',
+      debug => {
+        uri_patterns => [
+          '\\/global\\z',
+          '^http\\:\\/\\/example\\.com',
+        ],
+      },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/uri',
+          keywordLocation => jsonp(qw(/paths /global)),
+          absoluteKeywordLocation => 'http://example.com/main_api#'.jsonp(qw(/paths /global)),
+          error => 'provided path_template does not match request URI "http://example2.com/global"',
+        }),
+      ],
+    },
+    'server url is "/" for the global object, resolving to the main document, which does not match the request',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/global', path_template => '/global') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      %$expected,
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str('http://example2.com/secondary_api#/components/pathItems/global_path/get'),
+      path_captures => {},
+      uri_captures => {},
+      errors => [],
+    },
+    'server url is "/" for the global object, resolving to the main document, which matches the request',
+  );
+};
+
+subtest 'some esoteric match cases' => sub {
+  my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
@@ -2774,7 +3177,8 @@ paths:
       operationId: ''
 YAML
 
-  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/user/1'), operation_id => 'user_get' }),
+  my @request = (method => 'GET', uri => 'http://example.com/user/1');
+  ok($openapi->find_path_item(my $options = { @request, operation_id => 'user_get' }),
     to_str(@request).': lookup succeeded');
   cmp_result(
     $options,

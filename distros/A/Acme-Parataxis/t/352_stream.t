@@ -6,6 +6,7 @@ use Acme::Parataxis::Channel;
 use Acme::Parataxis::Stream;
 use Test2::V1 -ipP;
 $|++;
+#
 sub now_ms { time() * 1000 }
 
 # How many live fibers name a parked Channel put (the backpressure bullet).
@@ -127,4 +128,5 @@ subtest 'batch_time groups on the deadline' => sub {
     is \@groups,                                [ [1], [ 2, 3 ] ], 'the deadline flushed the lone item; shutdown flushed 2 and 3 as one batch';
     is Acme::Parataxis::get_live_fiber_count(), $baseline,         'batch_time released its fiber on shutdown; zero leaked';
 };
+#
 done_testing;

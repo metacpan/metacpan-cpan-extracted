@@ -1,0 +1,19 @@
+title: bare reads no layout -- no memory, no skills, no skill tool
+app:
+  bare: 1
+files:
+  CLAUDE.md: "Claude rule: be verbose.\n"
+  .claude/skills/greet/SKILL.md: "---\ndescription: Greets people.\n---\nSay Moin.\n"
+  .raider/skills/notes/SKILL.md: "---\ndescription: Keeps meeting notes.\n---\nnotes\n"
+prompt: Greet.
+script:
+  - tool_calls:
+      - [ skill, { skill: greet } ]
+  - text: ok
+expect:
+  requests:
+    - { index: 0, absent: "Claude rule: be verbose." }
+    - { index: 0, absent: "Greets people." }
+    - { index: 0, absent: "Keeps meeting notes." }
+  tools:
+    - { name: skill, error: true }

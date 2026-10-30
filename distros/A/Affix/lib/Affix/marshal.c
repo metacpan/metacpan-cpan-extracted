@@ -1013,7 +1013,9 @@ int set_ptr(pTHX_ SV * sv, MAGIC * mg) {
                                                        : safemalloc((wlen + 1) * el_sz));
                 wchar_t * d = wbuf;
                 while (s < e) {
-                    UV uv = utf8_to_uvchr_buf(s, e, nullptr);
+                    STRLEN rlen;
+                    UV uv = utf8_to_uvchr_buf(s, e, &rlen);
+                    if (rlen == 0) break;
                     if (el_sz == 2 && uv > 0xFFFF) {
                         uv -= 0x10000;
                         *d++ = (wchar_t)((uv >> 10) + 0xD800);
@@ -1021,7 +1023,7 @@ int set_ptr(pTHX_ SV * sv, MAGIC * mg) {
                     }
                     else
                         *d++ = (wchar_t)uv;
-                    s += UTF8SKIP(s);
+                    s += rlen;
                 }
                 *d = 0;
                 new_addr = wbuf;
@@ -1864,7 +1866,7 @@ XS_INTERNAL(XS_main_offsetof_member) {
     XSRETURN(1);
 }
 
-XS_INTERNAL(XS_main_cast) {
+c23_maybe_unused XS_INTERNAL(XS_main_cast) {
     dVAR;
     dXSARGS;
     if (items != 2)

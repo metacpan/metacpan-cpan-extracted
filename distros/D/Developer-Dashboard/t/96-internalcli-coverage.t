@@ -13,6 +13,7 @@ use lib 'lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::InternalCLI;
+use Developer::Dashboard::Platform ();
 
 # Hermetic, cwd-isolated runtime. Config root resolution walks the cwd's
 # deepest .developer-dashboard layer, so we must chdir into the temp home.
@@ -150,7 +151,7 @@ is( _running_helper_matches_target(''),    0, '_running_helper_matches_target em
 is( _should_defer_windows_helper_refresh( 'jq', cf( $home, 'x' ) ), 0, '_should_defer_windows_helper_refresh returns 0 off Windows' );
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { 1 };
     my $t = cf( $home, 'defer-target' );
     is( _should_defer_windows_helper_refresh( '_dashboard-core', $t ), 1, '_should_defer_windows_helper_refresh always defers core' );
     {
@@ -280,7 +281,7 @@ like( ( eval { _write_helper_atomically( cf( $home, 'no-such-dir', 'file' ), 'x'
 like( ( eval { _replace_helper_file( cf( $home, 'r1-src' ), cf( $home, 'r1-tgt' ) ); 1 } ? '' : $@ ), qr/Unable to rename/, '_replace_helper_file dies when a plain rename fails' );
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { 1 };
 
     # 302 is_windows true but target absent -> skip the retry block.
     like( ( eval { _replace_helper_file( cf( $home, 'r2-src' ), cf( $home, 'r2-tgt' ) ); 1 } ? '' : $@ ), qr/Unable to rename/, '_replace_helper_file (Windows) dies when the target is absent and rename fails' );
@@ -417,7 +418,7 @@ like( ( eval { ensure_helper( paths => $paths, name => 'nonexistent-xyz' ); 1 } 
     ok( -f $logf, 'ensure_helper pre-stages the delegating helper' );
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::InternalCLI::is_windows = sub { 1 };
+        local *Developer::Dashboard::Platform::is_windows = sub { 1 };
         is( ref( ensure_helper( paths => $p, name => 'log' ) ), 'ARRAY', 'ensure_helper (Windows) short-circuits on an already-managed delegating helper' );
         wf( $logf, "hello\n" );
         is( ref( ensure_helper( paths => $p, name => 'log' ) ), 'ARRAY', 'ensure_helper (Windows) continues past the short-circuit for an unmanaged helper' );
@@ -426,13 +427,13 @@ like( ( eval { ensure_helper( paths => $paths, name => 'nonexistent-xyz' ); 1 } 
 {
     my $p = fresh('eh-win-jq');
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { 1 };
     is( ref( ensure_helper( paths => $p, name => 'jq' ) ), 'ARRAY', 'ensure_helper (Windows) skips the lock check for a non-delegating helper' );
 }
 {
     my $p = fresh('eh-win-fresh');
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { 1 };
     is( ref( ensure_helper( paths => $p, name => 'log' ) ), 'ARRAY', 'ensure_helper (Windows) skips the lock check when the target is absent' );
 }
 

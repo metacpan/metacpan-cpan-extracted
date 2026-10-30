@@ -38,7 +38,7 @@ sub interrupted_tool_run {
     open STDOUT, '>', "$out"                or die $!;
     open STDERR, '>', path($root)->child('err')->stringify or die $!;
     exec $^X, '-I'.$repo->child('lib'), "$bin", '-r', $root, '-e', 'openai', '-k', 'test',
-      '-m', 'stub-model', '-o', 'url='.$url, '--no-trace', '--json', @flags, 'run the tool';
+      '-m', 'stub-model', '-o', 'url='.$url, '--no-trace', '--dangerously-skip-permissions', '--json', @flags, 'run the tool';
     die 'exec: '.$!;
   }
   my $tool_pid;

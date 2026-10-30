@@ -374,7 +374,9 @@ subtest 'A saved map visual renders on a canvas with unique Leaflet ids' => sub 
 	$t->post_ok("/api/analyses/$cid/visuals",
 		{ 'Content-Type' => 'application/json' },
 		encode_json({ kind => 'map', encode => { lat => 'lat', lon => 'lon' }, title => 'Third map' }),
-	)->status_is(201)->json_is('/visual' => 2);
+	)->status_is(201)->json_is('/visual' => 2)
+	 ->json_like('/html' => qr{<script>\s*\(function \(\) \{},
+		'a map card returned to a page comes back scoped, like every other card');
 
 	$t->get_ok("/a/$cid")->status_is(200);
 	my $body = $t->tx->res->body;
@@ -385,6 +387,16 @@ subtest 'A saved map visual renders on a canvas with unique Leaflet ids' => sub 
 	like($body, qr/L\.map\('map-0'\)/, 'the first map initialises its own element');
 	like($body, qr/L\.map\('map-1'\)/, 'the second map initialises its own element');
 	like($body, qr/L\.map\('map-2'\)/, 'the appended map initialises its own element');
+
+	# A map card's script is scoped like every other card's -- two maps on one
+	# page are two scripts declaring the same names -- and it is scoped where
+	# every card is, by the renderer, so once rather than once per layer.
+	my ($script) = $body =~ m{(<script>(?:(?!</script>).)*L\.map\('map-0'\).*?</script>)}s;
+	ok($script, 'the first map\'s own script is found');
+	is(scalar(() = ($script // '') =~ /\(function \(\) \{/g), 1,
+		'and it is closed over one function of its own, not two');
+	like($script // '', qr{\A<script>\s*\(function \(\) \{},
+		'which is the outermost thing it does');
 	like($body, qr/class="canvas-map"/, 'the map element carries the card class');
 	unlike($body, qr/L\.map\('map'\)/, 'the shared HTML::OSM id is not left behind');
 	like($body, qr/Plotting 2 markers for 3 of 5 rows/, 'the card reports its plotted rows');

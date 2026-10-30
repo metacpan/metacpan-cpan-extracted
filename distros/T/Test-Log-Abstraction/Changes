@@ -1,5 +1,49 @@
 Revision history for Test-Log-Abstraction
 
+0.002.1	Tue Oct 27 02:56:03 PM EDT 2026
+	[ Enhancements ]
+	- The level names and severities now come from Readonly::Values::Syslog,
+		instead of a copy of the same table
+	- Added reopen(), which does nothing and returns the logger, as
+		Log::Abstraction 0.41 added it; before, a call was stored as a
+		message at level reopen and printed a "no method" notice
+	- more tests
+	[ Bug Fixes ]
+	- Bump the mininum version of Log::Abstraction, fixes GitHub#2
+	- A number too big for an integer conversion in a message template, such as
+		%{count}d of 1e30, is shown as written instead of as -1; this also
+		fixes t/function.t on perls built with -Duselongdouble, fixes GitHub#1
+		Fixes GitHub#1
+	- The "no method" notice escapes control characters in the method name and
+		cuts a long one, as errors already did
+	- An object whose overloaded "" dies, given as a diag level name, to
+		level() or as an i18n() key, no longer crashes with its own error:
+		new() croaks with "invalid diag level", level() warns and returns
+		undef, and i18n() returns the plain form, Class=HASH(0x...)
+	- i18n() no longer dies when such an object fills a number placeholder,
+		such as %{count}d: it is written in plain form, as the POD promises
+		("It never fails, for any key or arguments")
+	- new() reports an invalid level option as it was given ('LOUD'), not
+		lower-cased, as level() and every other error do
+	- An integer placeholder just outside the 64-bit range, such as %{v}d of
+		-9223372036854775809 or %{v}u of 18446744073709551616, is shown as
+		written instead of being rounded onto the limit
+	- Values repeated in errors and warnings also escape the C1 controls
+		(U+0080 to U+009F, which include the one-character CSI U+009B) when
+		they are character strings; byte strings keep those bytes, which are
+		usually part of UTF-8 text
+	- i18n() took quadratic time on a number placeholder value with many
+		leading zeros that is not all digits, such as '000...0.5' (2.3s for
+		20,000 zeros): the integer-fit check now reads the zeros atomically,
+		and t/regex.t proves the old and new forms agree and the new is
+		linear
+	- Logging no longer dies when the trailing fields hash is tied and dies
+		when it is read: the hash is kept in the message, in plain form
+	- _diag_rule() and _object() drop checks that earlier steps already
+		prove (a defined() before comparing with 'all' and 'none'; a
+		defined() and ref() before UNIVERSAL::isa()); t/logic.t proves each
+		premise the removal relies on
+
 0.002.0	Sat Oct 10 09:04:27 PM EDT 2026
 	Level methods called with no arguments now match Log::Abstraction:
 		warn() and more serious levels store nothing; trace() to notice()

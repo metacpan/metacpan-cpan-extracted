@@ -52,7 +52,7 @@ use base 'Exporter';
 
 use Clipboard;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 {
 
@@ -158,7 +158,21 @@ use File::Path qw(rmtree);
 use File::Basename;
 use Carp;
 
-our @EXPORT_OK = qw(speak say_persona);
+our @EXPORT_OK = qw(speak say_persona last_message %PERSONA_MAP);
+
+our %PERSONA_MAP = (
+  'Smith'              => 'Agent Smith',
+  'Picard'             => 'Captain Picard',
+  'Data'               => 'Commander Data',
+  'Trump'              => 'Donald Trump',
+  'Arnold'             => 'Arnold Schwarzenegger',
+  'Worf'               => 'Commander Worf',
+  'Sylvester'          => 'Sylvester Stallone',
+  'Lennon'             => 'John Lennon',
+  'Judy'               => 'Judy',
+  'Michael'            => 'Michael',
+  'Charles Clarke III' => 'Charles Clarke III',
+);
 
 # Config paths searched in order; override @Speak::CONFIG_PATHS before calling
 # speak() to redirect config loading (useful in tests).
@@ -186,6 +200,59 @@ sub _split_text ($text) {
 
   return @sentences;
 } ## end sub _split_text
+
+=head2 last_message($logfile)
+
+Retrieves the last spoken message from the log file (defaulting to
+C</var/log/speak.log>).
+
+Parameters:
+
+=over
+
+=item C<$logfile>
+
+Optional. Path to the speak log file. Defaults to C</var/log/speak.log>.
+
+=back
+
+Returns:
+
+In scalar context, returns the message text. In list context, returns
+C<($message, $tag)> where C<$tag> is the application or persona tag if present.
+
+=cut
+
+sub last_message ($logfile = '/var/log/speak.log') {
+  return unless -f $logfile && -r $logfile;
+
+  open my $fh, '<', $logfile or return;
+  my @lines = <$fh>;
+  close $fh;
+
+  for my $line (reverse @lines) {
+    chomp $line;
+    next if $line =~ /^\s*$/;
+    next if $line =~ /\[silent shh\]/;
+
+    # Strip timestamp: YYYY-MM-DD HH:MM:SS: 
+    $line =~ s/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}:\s*//;
+
+    # Extract tag if present: [tag] message
+    my ($tag, $text);
+    if ($line =~ /^\[(.*?)\]\s*(.*)$/) {
+      $tag  = $1;
+      $text = $2;
+    } else {
+      $text = $line;
+    }
+
+    next unless length $text;
+    return wantarray ? ($text, $tag) : $text;
+  }
+
+  return;
+}
 
 sub _fetch_mp3 ($ua, $text, $lang) {
 
@@ -239,11 +306,11 @@ sub _convert_mp3_to_wav ($mp3, $wav) {
 } ## end sub _convert_mp3_to_wav
 
 ## no critic (Subroutines::ProhibitExcessComplexity)
-sub speak ($msg, $log = undef, $lang = undef, $persona = undef, $output_file = undef) {
+sub speak ($msg, $log = undef, $lang = undef, $persona = undef, $output_file = undef, $app = undef) {
 
 =pod
 
-=head2 speak($msg, $log, $lang, $persona, $output_file)
+=head2 speak($msg, $log, $lang, $persona, $output_file, $app)
 
 Convert $msg to speech.
 
@@ -275,6 +342,10 @@ Optional. The persona name to use for the voice. If provided, the MCP server is 
 
 Optional. Path to save output speech audio file.
 
+=item $app
+
+Optional. Application name to tag in the log (e.g. 'announceEmail Gmail').
+
 =back
 
 
@@ -294,6 +365,23 @@ Returns:
 =for html </blockquote>
 
 =cut
+
+  # Support passing options as named key-value pairs or HASH ref
+  if (defined $log && !ref ($log) && ($log eq 'app' || $log eq 'persona' || $log eq 'lang' || $log eq 'output')) {
+    my %args = ($log => $lang, defined $persona ? ($persona => $output_file) : (), defined $app ? ($app => undef) : ());
+    $log         = $args{log};
+    $lang        = $args{lang};
+    $persona     = $args{persona};
+    $output_file = $args{output} || $args{output_file};
+    $app         = $args{app};
+  } elsif (defined $log && ref ($log) eq 'HASH') {
+    my $opts = $log;
+    $log         = $opts->{log};
+    $lang        = $opts->{lang};
+    $persona     = $opts->{persona};
+    $output_file = $opts->{output} || $opts->{output_file};
+    $app         = $opts->{app};
+  }
 
   $log = Speak::Logger->new (
     path        => '/var/log',
@@ -326,6 +414,8 @@ Returns:
   } ## end foreach my $conf_file (@CONFIG_PATHS)
 
   $persona ||= $ENV{SPEAK_PERSONA} || $sys_conf{persona};
+  $app     ||= $ENV{SPEAK_APP};
+
   my $server     = $ENV{SPEAK_SERVER}     || $sys_conf{server};
   my $port       = $ENV{SPEAK_PORT}       || $sys_conf{port};
   my $wan_server = $ENV{SPEAK_WAN_SERVER} || $sys_conf{wan_server};
@@ -347,18 +437,24 @@ Returns:
   $msg =~ s/\s+/ /g;
   $msg =~ s/^\s+|\s+$//g;
 
+  my $display_persona = ($persona && $PERSONA_MAP{$persona}) ? $PERSONA_MAP{$persona} : $persona;
+  my $tag = $app || $display_persona || basename ($0);
+  $tag =~ s/\.pl$// if $tag;
+
+  my $log_msg = (defined $tag && length $tag) ? "[$tag] $msg" : $msg;
+
   my @mute_paths =
     ($ENV{SPEAK_MUTE}, $ENV{HOME} . "/.speak/shh", "/etc/speak/shh");
 
   foreach my $path (@mute_paths) {
     if ($path && -f $path) {
-      $msg .= ' [silent shh]';
-      $log->log ($msg);
+      $log_msg .= ' [silent shh]';
+      $log->log ($log_msg);
       return;
     }
   } ## end foreach my $path (@mute_paths)
 
-  $log->log ($msg);
+  $log->log ($log_msg);
 
   if ($server && $port) {
     if (hostname () eq $server) {

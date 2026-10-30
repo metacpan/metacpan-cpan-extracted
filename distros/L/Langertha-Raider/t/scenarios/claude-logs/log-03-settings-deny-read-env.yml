@@ -1,0 +1,31 @@
+# Real pattern: permissions.deny in .claude/settings.json names Read(.env) and
+# Bash(rm:*); the model's first try is refused with the rule, it then reads the
+# example file and cleans up with an allowed command instead.
+title: settings deny refuses reading .env and rm; the model falls back to .env.example and an allowed command
+permission_mode: default
+files:
+  .claude/settings.json: '{ "permissions": { "allow": [ "Bash(cat:*)", "Bash(ls:*)", "Bash(mv:*)" ], "deny": [ "Read(.env)", "Bash(rm:*)" ] } }'
+  .env: "API_KEY=do-not-leak\n"
+  .env.example: "API_KEY=changeme\n"
+  scratch.tmp: "temp\n"
+prompt: Which variables does the app need? Then remove scratch.tmp.
+script:
+  - tool_calls:
+      - [ read_file, { path: .env } ]
+  - tool_calls:
+      - [ read_file, { path: .env.example } ]
+      - [ bash, { command: rm scratch.tmp } ]
+  - tool_calls:
+      - [ bash, { command: mv scratch.tmp /tmp/scratch.tmp.moved } ]
+  - text: API_KEY; scratch.tmp moved away.
+expect:
+  answer: "API_KEY; scratch.tmp moved away."
+  absent: [ scratch.tmp ]
+  tools:
+    - { name: read_file, error: true, text: "denied by rule 'Read\\(\\.env\\)' from \\.claude/settings\\.json", not_text: do-not-leak }
+    - { name: read_file, text: 'API_KEY=changeme' }
+    - { name: bash, error: true, text: "denied by rule 'Bash\\(rm:\\*\\)' from \\.claude/settings\\.json" }
+    - { name: bash, text: '\A\(Bash completed with no output\)\z' }
+  events:
+    - { type: permission.denied, tool: read_file, by: rule, rule: "Read(.env)", source: .claude/settings.json }
+    - { type: permission.denied, tool: bash, by: rule, rule: "Bash(rm:*)", source: .claude/settings.json }

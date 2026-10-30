@@ -1,5 +1,4 @@
 use v5.40;
-no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use blib;
 use Acme::Parataxis qw[async fiber yield stop await_sleep maybe_yield];
 use Acme::Parataxis::Semaphore;
@@ -7,14 +6,8 @@ use Acme::Parataxis::Signal;
 use Acme::Parataxis::Channel;
 use Acme::Parataxis::Future;
 use Test2::V1 -ipP;
+no warnings qw[recursion];    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 $|++;
-
-# Fibers run on separate heap stacks; Perl's C-stack-depth heuristic can misfire and falsely report "Deep recursion"
-# (it ignores lexical 'no warnings' once a framework such as Test2 is loaded). Genuine runaway recursion inside a fiber
-# surfaces as a hang, access violation, or croak the harness already catches, so filter the noise.
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ /^Deep recursion on subroutine/; warn @_ }
-}
 
 # Seeded randomized concurrency harness ("interleaving fuzzer").
 #
@@ -44,11 +37,11 @@ sub one_iteration ($seed) {
     # Random, but *balanced*, population: every fiber is guaranteed to be woken by the planned ops below. Randomness
     # breaks up interleavings, never the totals.
     my %plan = (
-        S => 4 + $rand->(16),                     # sleepers (never need waking)
-        G => 1 + $rand->(12),                     # semaphore guards (woken by the planned ups)
-        P => 1 + $rand->(3),                      # channel producer/consumer pairs (rendezvous)
-        W => 1 + $rand->(10),                     # signal waiters (woken by the planned sends)
-        A => $rand->(2) ? 4 + $rand->(10) : 0,    # future awaiters
+        S => 4 + $rand->(16),                    # sleepers (never need waking)
+        G => 1 + $rand->(12),                    # semaphore guards (woken by the planned ups)
+        P => 1 + $rand->(3),                     # channel producer/consumer pairs (rendezvous)
+        W => 1 + $rand->(10),                    # signal waiters (woken by the planned sends)
+        A => $rand->(2) ? 4 + $rand->(10) : 0    # future awaiters
     );
     my $fut  = Acme::Parataxis::Future->new;
     my $sem  = Acme::Parataxis::Semaphore->new( count => 2 );

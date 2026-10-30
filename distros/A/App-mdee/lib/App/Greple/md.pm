@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.12";
+our $VERSION = "1.13";
 
 =encoding utf-8
 
@@ -214,6 +214,11 @@ Available parameters:
     table_cell_mark string put at the start of the first line of
                     every body cell in a column that has a wrapped
                     cell (default: none)
+    table_runin     run-in width in wrapped cells (default: 2)
+    table_runout    run-out width in wrapped cells (default: 2)
+    table_boundary  fold boundary in wrapped cells (default: word)
+    table_linebreak line break mode in wrapped cells: none, runin,
+                    runout or all (default: all)
     table_style     pipe: column separators (default); simple: columns
                     separated by spaces, header rule per column, and a
                     rule above and below the table
@@ -376,6 +381,10 @@ my $config = Getopt::EX::Config->new(
     table_cell => '',  # per-column widths for ansicolumn --cell (colon separated)
     table_wrap_mark => '',  # mark for continuation lines of wrapped cells
     table_cell_mark => '',  # mark for the first line of cells in wrapped columns
+    table_runin     => 2,       # run-in width in wrapped cells
+    table_runout    => 2,       # run-out width in wrapped cells
+    table_boundary  => 'word',  # fold boundary in wrapped cells
+    table_linebreak => 'all',   # line break (kinsoku) mode in wrapped cells
     rule       => 1,   # box-drawing characters for tables
     table_style => 'pipe',  # pipe: column separators; simple: spaces and rules only
     nofork     => 1,   # use nofork+raw for code ref calls
@@ -462,6 +471,7 @@ sub finalize {
                        "mode|m=s", "base_color|B=s",
                        "colorize!", "nofork!", "foldlist!", "foldwidth=i", "table!", "table_trim!",
                        "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s",
+                       "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s",
                        "heading_markup|hm:s", "tick_open=s", "tick_close=s",
                        "hashed=s%",
                        "colormap|cm=s" => \@opt_cm,
@@ -647,8 +657,9 @@ sub Step {
 my %colorize = (
 
     code_blocks => Step(sub {
-        s{^( {0,3})(`{3,}|~{3,})(.*)\n((?s:.*?))^( {0,3})\2(\h*)$}{
-            my($oi, $fence, $lang, $body, $ci, $trail) = ($1, $2, $3, $4, $5, $6);
+        # closing fence: the same character, at least as long (CommonMark)
+        s{^( {0,3})((`|~)\3{2,})(.*)\n((?s:.*?))^( {0,3})(\2\3*)(\h*)$}{
+            my($oi, $fence, $lang, $body, $ci, $close, $trail) = ($1, $2, $4, $5, $6, $7, $8);
             my $result = md_color('code_mark', "$oi$fence");
             $result .= md_color('code_info', $lang) if length($lang);
             $result .= "\n";
@@ -656,7 +667,7 @@ my %colorize = (
                 $result .= join '', map { md_color('code_block', $_) }
                     split /(?<=\n)/, $body;
             }
-            $result .= md_color('code_mark', "$ci$fence") . $trail;
+            $result .= md_color('code_mark', "$ci$close") . $trail;
             protect($result)
         }mge;
     }),
@@ -702,7 +713,8 @@ my %colorize = (
         for my $n (reverse 1..6) {
             next unless active("h$n");
             my $hdr = '#' x $n;
-            s{^($hdr\h+.*)$}{
+            # up to 3 spaces of indentation; empty headings ("#") too (CommonMark)
+            s{^( {0,3}$hdr(?:\h+.*)?)$}{
                 my $line = $1;
                 $line .= " $hdr"
                     if $hashed->{"h$n"} && $line !~ /\#$/;
@@ -878,7 +890,10 @@ sub format_table {
             # "-" cells) are the two header rows and get no mark
             push @fit, '--table-cell-mark', $mark, '--table-head', 2;
         }
-        my $formatted = call_ansicolumn($block, @sep_opt, '-o', $sep, '-t', '--cu=1', @align, @fit);
+        # How cells are wrapped is given explicitly, so that it does not
+        # change with the user's ~/.ansicolumnrc
+        my @wrap = map { "--$_=" . $config->{"table_$_"} } qw(runin runout boundary linebreak);
+        my $formatted = call_ansicolumn($block, @sep_opt, '-o', $sep, '-t', '--cu=1', @align, @fit, @wrap);
         my $table = fix_separator($formatted, $sep);
         if ($simple) {
             # blank the column separators; add full-width rules above
@@ -949,7 +964,7 @@ option default \
     -G --filter --filestyle=once --color=always \
     --begin &__PACKAGE__::begin
 
-define {CODE_BLOCK}  ^ {0,3}(?<bt>`{3,}+|~{3,}+)(.*)\n((?s:.*?))^ {0,3}(\g{bt})
+define {CODE_BLOCK}  ^ {0,3}(?<bt>(?<fc>[`~])\g{fc}{2,}+)(.*)\n((?s:.*?))^ {0,3}\g{bt}\g{fc}*+\h*$
 define {COMMENT}     ^<!--(?![->])(?s:.+?)-->
 define {LIST_ITEM}   ^\h*(?:[*-]|(?:\d+|#)[.)])\h+.*\n
 define {DEFINITION}  (?:\A|\G\n|\n\n).+\n\n?(:\h+.*\n)

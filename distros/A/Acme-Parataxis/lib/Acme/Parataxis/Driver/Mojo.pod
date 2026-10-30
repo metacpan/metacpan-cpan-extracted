@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Acme::Parataxis::Driver::Mojo - Drive Parataxis from a Mojo::IOLoop or Mojo::Reactor
+Acme::Parataxis::Driver::Mojo - Mojo::IOLoop and Mojo::Reactor Driver for Parataxis
 
 =head1 SYNOPSIS
 
@@ -12,158 +12,105 @@ Acme::Parataxis::Driver::Mojo - Drive Parataxis from a Mojo::IOLoop or Mojo::Rea
     use Acme::Parataxis qw[await_read await_sleep fiber];
     use Mojo::IOLoop;
 
-    # The usual way: attach the loop and let wrap() choose this driver.
+    # Attach Mojo's loop:
     Acme::Parataxis->attach_loop( Mojo::IOLoop->new );
 
     Acme::Parataxis::run( sub {
-        my $ponger = fiber { await_sleep 30; syswrite $socket, 'ping' };
+        my $ponger = fiber {
+            await_sleep(30);
+            syswrite( $socket, "ping\n" );
+        };
+
         await_read( $socket, 2000 );
     } );
 
     Acme::Parataxis->detach_loop;
 
-Building one by hand is the same call with the loop named:
-
-    my $driver = Acme::Parataxis::Driver::Mojo->new( loop => $loop );
-
-A bare reactor works too, which is how a worker's own mini-loop gets driven:
-
-    Acme::Parataxis->attach_loop( $mojo_loop->reactor );
+    # Or drive a bare Mojo::Reactor directly:
+    Acme::Parataxis->attach_loop( $ioloop->reactor );
 
 =head1 DESCRIPTION
 
-The L<Mojo::IOLoop|Mojo::IOLoop> reference driver. With it attached, C<await_read>, C<await_write> and C<await_sleep>
-are serviced by Mojo's reactor instead of by an OS worker thread parked in C<select()>. What a caller sees does not
-change: readiness reports the same values, a deadline still resumes C<-1>, and an enclosing C<with_timeout> still
-throws. Only the backing mechanism differs.
+C<Acme::Parataxis::Driver::Mojo> connects Parataxis to Mojolicious event loops. It allows fibers executing
+C<await_read>, C<await_write>, and C<await_sleep> to be driven directly by a C<Mojo::IOLoop> or C<Mojo::Reactor>.
 
-The loop and Parataxis never run each other's callbacks. Mojo collects descriptor events, the readiness callback this
-driver installs only tells the scheduler which fiber to B<enqueue>, and the scheduler hands control back to the reactor
-when every fiber is parked and C<pending> is still true. See L<Acme::Parataxis::Driver|Acme::Parataxis::Driver> for
-that division of labour.
-
-Two things about the reactor shape the driver:
+Key implementation details:
 
 =over
 
-=item * Mojo allows exactly B<one> C<io()> watcher per filehandle, with directional interest declared separately
-through C<< $reactor->watch( $fh, $read, $write ) >>. So the C<io()> callback goes in once per filehandle and the
-interest mask is rewritten on every registration - which is why a read watch and a write watch on the same descriptor
-still count as one watch.
+=item *
 
-=item * The handle is switched to non-blocking the first time it is watched, and B<is left that way>. Parataxis reads
-through its own readiness path, so nothing restores the flag. Code that shares a handle with this driver should not
-assume a blocking C<sysread>.
+B<Single I/O watcher constraint>: Mojo reactors support exactly one C<io()> watcher callback per filehandle.
+Directional interest is updated via C<< $reactor->watch($fh, $read, $write) >>. The driver manages this automatically,
+allowing fibers to watch reading and writing concurrently on a single descriptor while sharing a single reactor slot.
+
+=item *
+
+B<Handle non-blocking persistence>: The driver sets filehandles non-blocking via C<< $fh->blocking(0) >> when first
+registered and leaves them non-blocking. Code sharing handles with this driver must expect non-blocking behavior.
+
+=item *
+
+B<Reactor duck-typing>: Accepts a full C<Mojo::IOLoop> or any object implementing the C<Mojo::Reactor> interface (such
+as an embedded worker reactor).
 
 =back
 
 =head1 CONSTRUCTOR
 
-=head2 C<new( loop =E<gt> $loop )>
+=head2 C<new( loop =E<gt> $loop_or_reactor )>
 
     my $driver = Acme::Parataxis::Driver::Mojo->new( loop => $loop );
 
-C<loop> is a required named parameter. Give it a C<Mojo::IOLoop> and its C<reactor> is used underneath; give it
-anything else that ultimately provides C<one_tick()> - a bare C<Mojo::Reactor> included - and that object is used
-directly. The duck-typed form is what lets a worker's own mini-loop be driven by Parataxis.
-
-It croaks without a blessed object, and croaks when the resolved object has no C<one_tick()> method. A blessed object
-of an unrelated class fails on that second check rather than at the first, so the message names the reactor, not the
-loop.
+Constructs a new driver instance. Accepts a C<Mojo::IOLoop> or any reactor providing a C<one_tick()> method.
 
 =head1 METHODS
 
-=head2 C<watch_read( $fh, $cb )>, C<watch_write( $fh, $cb )>
+=head2 C<watch_read( $fh, $cb )> / C<watch_write( $fh, $cb )>
 
-    $driver->watch_read( $fh, sub { $ready->push } );
-
-Register C<< $cb->() >> for readability or writability on C<$fh>, and return C<$fh> itself - not a boolean and not the
-descriptor. Both directions on one filehandle share a single watch slot and a single reactor registration.
-
-Registering the same direction twice B<replaces> the callback rather than adding a second one, so a re-registration is
-how you swap in a new callback for a live watch. A closed handle croaks, because there is no descriptor to key the
-reactor on. The first registration for a handle also flips it to non-blocking.
+Registers interest in read or write readiness on C<$fh>, installing the reactor C<io()> callback if not already present
+and updating the interest mask. Returns C<$fh>. Croaks if C<$fh> is closed.
 
 =head2 C<unwatch( $fh )>
 
-    $driver->unwatch( $fh );    # true if it was being watched
-
-Drops both directional callbacks for C<$fh>, untracks it, and removes it from the reactor. Returns false when nothing
-was being watched, so it is safe to call on a handle that was never registered or has already been dropped.
+Removes all I/O registrations for C<$fh> from the reactor. Returns true if the handle was monitored; false otherwise.
 
 =head2 C<timer( $ms, $cb )>
 
-    my $id = $driver->timer( 2000, sub { $expired = 1 } );
-
-Arms a reactor timer for C<$ms> milliseconds - Mojo counts in seconds, so the driver divides by 1000 - and returns an
-opaque id for L</"cancel_timer( $id )">. Treat that id as opaque: Mojo's is whatever its own timer bookkeeping returns.
-
-The id is untracked B<before> the callback runs, so a timer that has fired is no longer cancellable and C<cancel_timer>
-says so. A delay that is missing, zero, negative or non-numeric croaks.
+Arms a reactor timer for C<$ms> milliseconds. Returns an opaque timer ID.
 
 =head2 C<cancel_timer( $id )>
 
-    $driver->cancel_timer( $id );    # true if it was still pending
-
-Cancels a still-pending timer and returns true. Returns false when the id is unknown or the timer has already fired.
+Cancels an active timer via C<< $reactor->remove($id) >>. Returns true if cancelled; false if already fired or unknown.
 
 =head2 C<drive( )>
 
-    $driver->drive;    # true
-
-Runs one reactor tick and returns true. This is what C<run()> calls when every fiber is parked and this driver still
-has something pending. See L</"C<drive( )> and C<poll_ready( )> are the same call"> for how long a tick can take.
+Executes C<< $reactor->one_tick >>. Runs one iteration of the reactor (waiting for I/O or the earliest timer).
 
 =head2 C<poll_ready( )>
 
-    $driver->poll_ready;    # true
-
-Also runs one reactor tick and returns true. It is not a non-blocking pass, and the driver cannot make it one - see
-L</"C<drive( )> and C<poll_ready( )> are the same call"> before calling it directly.
+Also executes C<< $reactor->one_tick >>. See L</"Behavior Notes"> regarding Mojo polling characteristics.
 
 =head1 Behavior Notes
 
-=head2 C<drive( )> and C<poll_ready( )> are the same call
+=over
 
-The two methods are one line each and both call C<< $reactor->one_tick >>. Mojo's C<one_tick> discards its arguments
-entirely, so there is no timeout to pass and no non-blocking variant to reach for: C<one_tick(0)> behaves exactly like
-C<one_tick>. What a tick does is wait for the B<earliest registered timer>, because that is the only timeout it
-computes.
+=item * C<one_tick> always waits for the earliest timer
 
-Measured against C<Mojo::Reactor::Poll>:
+Mojo's C<one_tick()> method does not take a timeout argument; it always waits until an event occurs or the earliest
+registered timer fires. Because of this, C<poll_ready()> and C<drive()> execute the identical call. If long timers are
+armed, polling passes will wait out that duration before returning.
 
-                      nothing registered     5 ms timer      500 ms timer
-    drive             0 ms                   5 ms            500 ms
-    poll_ready        0 ms                   5 ms            500 ms
+=item * Reactor shutdown on idle tick
 
-L<Acme::Parataxis::Driver::IOAsync|Acme::Parataxis::Driver::IOAsync> returns in 0 ms in every one of those cells,
-because C<loop_once(0)> honours a zero timeout. That difference is what makes this worth documenting rather than
-discovering: the scheduler reaches C<poll_ready> only on the pass where it has pool jobs in flight and nothing
-runnable, so a program mixing pool work with an attached Mojo loop and arming a long timer waits out that timer on the
-polling pass. A short deadline is invisible; a long one reads as a hang.
+Calling C<one_tick> on a reactor with no active I/O watchers and no timers stops the reactor. Parataxis only calls
+C<drive()> while C<< $driver->pending >> is positive, avoiding this condition.
 
-A tick with B<nothing> registered is a different hazard: C<one_tick> calls C<stop> on the reactor when it finds neither
-timers nor I/O watchers, and leaves it stopped. The scheduler only ticks while C<pending> is true, and C<pending>
-mirrors what was registered with the reactor, so the shipped path does not reach it - but a hand-rolled caller that
-ticks an idle driver stops the user's loop.
-
-The backend matters. C<Mojo::IOLoop> picks its reactor from what is available - C<Mojo::Reactor::Poll> on an ordinary
-Linux box, C<Mojo::Reactor::EV> where libev is present - and C<one_tick> is a method of that backend, not of the base
-class. The figures above are C<Poll>. Nothing here was measured on Windows or on C<EV>.
-
-=head2 A descriptor watched both ways reports the writable branch first
-
-A connected socket is always writable, so a tick on a handle with both directions registered can report writability and
-leave the read event for the next tick. This is Mojo's normal behaviour for a C<watch($fh, 1, 1)> registration, not
-something the driver introduces, and it resolves because the scheduler keeps ticking: with nothing consuming the
-socket, successive ticks report the read branch every time. It only looks like a lost wakeup if something else assumes
-a single tick delivers every ready direction.
+=back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis::Driver|Acme::Parataxis::Driver>,
-L<Acme::Parataxis::Driver::IOAsync|Acme::Parataxis::Driver::IOAsync>, L<Acme::Parataxis|Acme::Parataxis>,
-L<Mojo::IOLoop|Mojo::IOLoop>
+L<Acme::Parataxis>, L<Acme::Parataxis::Driver>, L<Acme::Parataxis::Driver::IOAsync>, L<Mojo::IOLoop>
 
 =head1 AUTHOR
 

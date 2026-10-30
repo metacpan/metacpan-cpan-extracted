@@ -30,7 +30,9 @@ $local_lib_root ||= '.perl5';
 WriteMakefile(
     NAME         => 'Developer::Dashboard',
     MIN_PERL_VERSION => '5.038',
-    VERSION_FROM => 'lib/Developer/Dashboard.pm',
+    VERSION_FROM => 'lib/Developer/Dashboard/Version.pm',
+    XS           => { 'HtmlEscape.xs' => 'HtmlEscape.c' },
+    OBJECT       => 'HtmlEscape$(OBJ_EXT)',
     ABSTRACT     => 'Project-neutral local developer dashboard runtime',
     AUTHOR       => 'Developer Dashboard Contributors',
     EXE_FILES    => [
@@ -50,8 +52,8 @@ WriteMakefile(
         'Getopt::Long'          => 0,
         'HTML::Parser'          => '3.84',
         'HTTP::Date'            => '6.08',
+        'HTTP::Tiny'            => '0.096',
         'HTTP::Request'         => 0,
-        'HTTP::Tiny'            => '0.095',
         'JSON::XS'              => '4.04',
         'LWP::Protocol::https'  => '6.07',
         'LWP::UserAgent'        => '6.83',
@@ -97,6 +99,14 @@ WriteMakefile(
                 type => 'git',
                 url  => 'git@github.mf:manif3station/developer-dashboard.git',
                 web  => 'https://github.mf/manif3station/developer-dashboard',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'FFI::Platypus' => '2.12',
+                    'FFI::CheckLib' => '0.31',
+                },
             },
         },
     },

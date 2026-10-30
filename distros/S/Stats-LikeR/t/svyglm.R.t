@@ -25,6 +25,9 @@
 #                          nested in strata, with a covariate (acs.k3) whose
 #                          missing values drop rows while their PSUs stay in
 #                          the design's counts, and with a factor.
+#   strat_zero_w, strat_missing_zero_w
+#                          apistrat with the first row's weight set to 0,
+#                          the first row both models keep.
 #
 # TOLERANCE
 #
@@ -175,6 +178,28 @@ my %EXPECT = (
     deviance => 1536312.1619997695,
     ci => [752.3599803549974, 799.1013364186518, -121.44817850054949, -67.16000496059267, -91.02743891169283, -28.473100597003175, -4.639759844923757, -3.4191628588806036],
   },
+  strat_zero_w => {
+    names => ['Intercept', 'ell', 'meals', 'mobility'],
+    coef => [818.5649631818848, -0.5269448720391076, -3.1020751733202054, 0.25601652123970103],
+    se => [10.012266734694915, 0.3920933323493519, 0.28381039493746946, 0.3907072303035792],
+    t => [81.7562081466887, -1.3439271432690523, -10.930097095293744, 0.655264354951344],
+    p => [1.0268748922812803e-151, 0.18054968269425584, 5.909161346023229e-22, 0.5130778265452645],
+    df => 193,
+    dispersion => 5081.020255412613,
+    deviance => 1011097.4980620072,
+    ci => [798.8174523545299, 838.3124740092396, -1.3002829713000439, 0.24639322722182877, -3.6618434051754774, -2.5423069414649335, -0.5145877250504725, 1.0266207675298746],
+  },
+  strat_missing_zero_w => {
+    names => ['Intercept', 'acs.k3', 'ell'],
+    coef => [697.7105923513726, 3.87673047283592, -3.852734209453937],
+    se => [130.78505539569485, 6.871311135664927, 0.33181559887974343],
+    t => [5.334788368903651, 0.5641907921639724, -11.611070192182993],
+    p => [6.700288502747583e-07, 0.5739824380256303, 8.591299364732821e-20],
+    df => 93,
+    dispersion => 9994.112799545192,
+    deviance => 959330.7234146761,
+    ci => [437.99739205728287, 957.4237926454623, -9.768331647302146, 17.521792592973988, -4.511654227737577, -3.193814191170297],
+  },
 );
 
 # tests/domain.Rout.save: summary(svyglm(x ~ I(x > 4) + 0, design = dfpc))
@@ -252,6 +277,15 @@ check('strat_nest',    svyglm(formula => 'api00 ~ ell + meals', data => $D{strat
 check('strat_missing', svyglm(formula => 'api00 ~ acs.k3 + ell', %strat));
 check('strat_factor',  svyglm(formula => 'api00 ~ stype + ell', %strat));
 {
+	# a zero sampling weight on the first row the model keeps: dispersion
+	# was 0/0 until 0.331
+	my %d = %{ $D{strat} };
+	$d{pw0} = [ @{ $d{pw} } ]; $d{pw0}[0] = 0;
+	my %z = (data => \%d, strata => 'stype', weights => 'pw0', fpc => 'fpc');
+	check('strat_zero_w',         svyglm(formula => 'api00 ~ ell + meals + mobility', %z));
+	check('strat_missing_zero_w', svyglm(formula => 'api00 ~ acs.k3 + ell', %z));
+}
+{
 	# a sampling fraction in place of a population size gives the same fpc
 	my %d = %{ $D{strat} };
 	my %nh; $nh{$_}++ for @{ $d{stype} };
@@ -289,4 +323,12 @@ SKIP: {
 	}, 'no leaks: croak');
 }
 diag(sprintf('worst relative disagreement with survey: %.3g (%s)', $worst, $worst_at));
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { svyglm(data => { x => [1, 2], y => [1, 2] }); 1 } ? '' : $@;
+	like($err, qr/\Ausage: svyglm\(.*^example:\n.*\n\nsvyglm: error: \Qformula is required\E\n\z/ms,
+		'svyglm: formula is required, under the help screen');
+}
+
 done_testing();

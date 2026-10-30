@@ -1,0 +1,25 @@
+# Claude Code: Monitor runs a command in the background and every stdout line is
+# an event the model is notified of while it works; the end is a notification too.
+# Checks ADR 0031 section 1 (events, batching, the end) and the start message.
+title: a monitor streams its stdout lines as notifications and ends with one
+permission_mode: bypassPermissions
+prompt: Watch the job and wait for it.
+script:
+  - tool_calls:
+      - [ monitor, { description: the job, command: "echo one; echo two; sleep 0.8; echo three; echo oops >&2" } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: monitor_1, block: true, timeout: 20 } ]
+  - text: done
+expect:
+  answer: done
+  request_count: 3
+  tools:
+    - { name: monitor, text: '\AMonitor started \(task monitor_1, expires in 5m unless the source ends first; you get one notice at expiry .{1,3} re-arm if you still need the watch\)\. You will be notified on each event\. Keep working .{1,3} do not poll or sleep\. Events may arrive while you are waiting for the user .{1,3} an event is not their reply\. Stop it with kill_shell \(shell_id: monitor_1\)\.\z' }
+    - { name: bash_output, text: '\A<status>completed</status>\z' }
+  requests:
+    - { index: 0, tool_text: 'Start a background monitor' }
+    - index: 2
+      tail:
+        - { role: tool, contains: '<status>completed</status>' }
+        - role: user
+          contains: "<task-notification>\n<task-id>monitor_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<summary>Monitor event: \"the job\"</summary>\n<event>one\ntwo</event>\n</task-notification>\n<task-notification>\n<task-id>monitor_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<summary>Monitor event: \"the job\"</summary>\n<event>three</event>\n</task-notification>\n<task-notification>\n<task-id>monitor_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<status>completed</status>\n<summary>Monitor \"the job\" ended (exit code 0)</summary>\n</task-notification>"

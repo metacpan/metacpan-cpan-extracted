@@ -392,21 +392,21 @@ is_deeply read_table(fixture(qq{a b\n"1 2" 3\n}), sep => $ws, quote => '',
 		{ V1 => 1, V2 => 2 } ], "header => !!0 is header => 0";
 	for my $bad ([ 2, '2' ], [ undef, 'undef' ], [ 'no', "'no'" ], [ [], 'an ARRAY' ]) {
 		like error_of(sub { read_table($f, header => $bad->[0]) }),
-			qr/^read_table: 'header' must be 0 or 1$/, "header => $bad->[1] is refused";
+			qr/\nread_table: error: 'header' must be 0 or 1$/, "header => $bad->[1] is refused";
 	}
 	for my $bad ([ 'a', 'a string' ], [ [], 'an empty ARRAY' ], [ {}, 'a HASH' ]) {
 		like error_of(sub { read_table($f, 'col_names' => $bad->[0]) }),
-			qr/^read_table: 'col_names' must be an ARRAY reference of names$/,
+			qr/\nread_table: error: 'col_names' must be an ARRAY reference of names$/,
 			"col_names => $bad->[1] is refused";
 	}
 	for my $bad ([ [ 'a', undef ], 'an undef name' ], [ [ 'a', [] ], 'a reference' ]) {
 		like error_of(sub { read_table($f, 'col_names' => $bad->[0]) }),
-			qr/^read_table: 'col_names' may only hold defined, plain strings$/,
+			qr/\nread_table: error: 'col_names' may only hold defined, plain strings$/,
 			"col_names with $bad->[1] is refused";
 	}
 	for my $bad ([ "'", q{"'"} ], [ undef, 'undef' ], [ ['"'], 'an ARRAY' ], [ '""', q{'""'} ]) {
 		like error_of(sub { read_table($f, quote => $bad->[0]) }),
-			qr/^read_table: 'quote' must be '"' \(the default\) or '' \(no quoting\)$/,
+			qr/\nread_table: error: 'quote' must be '"' \(the default\) or '' \(no quoting\)$/,
 			"quote => $bad->[1] is refused";
 	}
 }

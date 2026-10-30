@@ -4,6 +4,15 @@
 #define DEBUG 0
 #endif
 
+#if defined(__sun) || defined(__sun__)
+#  ifndef __EXTENSIONS__
+#    define __EXTENSIONS__ 1
+#  endif
+#  ifndef _LARGEFILE64_SOURCE
+#    define _LARGEFILE64_SOURCE 1
+#  endif
+#endif
+
 // Disables the implicit 'pTHX_' context pointer argument, which is good practice for
 // modern Perl XS code that uses the 'aTHX_' macro explicitly.
 #define PERL_NO_GET_CONTEXT 1

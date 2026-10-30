@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Recipe copy ranges are JSON integers (-07 §5 schema: "c" items are
+# Recipe copy ranges are JSON integers (-08 §5 schema: "c" items are
 # {"type": "integer", "minimum": 1}).
 #
 # Regression: the header-recipe builder used each range index as a hash key

@@ -150,6 +150,14 @@ throws_ok { interpolate([ { a => 1 } ], limit_area => 'edge') }
 	qr/limit_area/, 'bad limit_area dies';
 
 # memory
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { interpolate({ v => [1] }, method => 'bogus'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: interpolate\(.*\n\ninterpolate: error: \Qunknown method 'bogus'\E\n\z/s,
+		'interpolate: a call-form error prints the help screen, the error on its last line');
+}
+
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok {
 	my $x = interpolate({ v => [ undef, 1, undef, undef, 4, undef ] });

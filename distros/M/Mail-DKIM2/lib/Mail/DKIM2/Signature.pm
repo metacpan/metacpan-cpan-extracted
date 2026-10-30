@@ -2,7 +2,7 @@ package Mail::DKIM2::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Carp;
@@ -31,7 +31,7 @@ sub new {
     $self->set_tag('m', $args{Version})   if defined $args{Version};
     $self->set_tag('t', $args{Timestamp}) if defined $args{Timestamp};
     $self->set_tag('d', $args{Domain})    if defined $args{Domain};
-    # nd= (-07 §10.7) replaces mf=/rt= for an imaginary forwarding hop.
+    # nd= (-08 §10.7) replaces mf=/rt= for an imaginary forwarding hop.
     $self->set_tag('nd', $args{NextDomain}) if defined $args{NextDomain};
     $self->set_tag('n', $args{Nonce})     if defined $args{Nonce};
 
@@ -63,7 +63,7 @@ sub new {
 }
 
 # An address as mf= or rt= records it: an RFC 5321 path in angle brackets
-# (-07 sections 10.5, 10.6), its domain written as A-labels (section 18).
+# (-08 sections 10.5, 10.6), its domain written as A-labels (section 18).
 sub _path {
     my ($addr) = @_;
     my $path = to_rfc5321_path($addr);
@@ -108,7 +108,7 @@ sub domain {
     return $self->get_tag('d');
 }
 
-# nd= the domain that signs the next DKIM2-Signature (-07 §10.7). Present
+# nd= the domain that signs the next DKIM2-Signature (-08 §10.7). Present
 # only for an imaginary forwarding hop, where it replaces mf=/rt=.
 sub next_domain {
     my $self = shift;
@@ -166,16 +166,27 @@ sub _parse_sig_item {
     return ([$sel, $alg, _strip_fws($val)], $ok);
 }
 
-# The s= items and whether they all parsed: (\@items, $ok).
+# The s= items and whether they all parsed: (\@items, $ok, \@groups). s= is
+# sig-all lists joined by "|" (-08 §10.9), each sig-set *("," sig-set); the
+# items are in s= order and @groups lists each group's item indices. An
+# empty member (a leading, trailing or doubled "|" or ",") is a syntax
+# error (the -08 contract, D2), and the items are then the ","-split ones.
 sub _parse_sig_items {
     my ($s) = @_;
-    my (@items, $bad);
-    for my $part (split /,/, $s, -1) {
-        my ($item, $ok) = _parse_sig_item($part);
-        $bad = 1 unless $ok;
-        push @items, $item;
+    my $split = Mail::DKIM2::Common::split_any_all($s);
+    my (@items, @groups, $bad);
+    for my $group ($split ? @$split : [ split /,/, $s, -1 ]) {
+        my @idx;
+        for my $part (@$group) {
+            my ($item, $ok) = _parse_sig_item($part);
+            $bad = 1 unless $ok;
+            push @idx, scalar @items;
+            push @items, $item;
+        }
+        push @groups, \@idx;
     }
-    return (\@items, !$bad);
+    $bad = 1 unless $split;
+    return (\@items, !$bad, \@groups);
 }
 
 sub signatures_data {
@@ -184,6 +195,16 @@ sub signatures_data {
     return unless defined $s && length $s;
     my ($items) = _parse_sig_items($s);
     return $items;
+}
+
+# The s= groups (-08 §10.9): an arrayref of the "|" groups, each an arrayref
+# of the indices of its ","-joined items, as selector() and friends take.
+sub sig_groups {
+    my $self = shift;
+    my $s = $self->get_tag('s');
+    return [] unless defined $s && length $s;
+    my (undef, undef, $groups) = _parse_sig_items($s);
+    return $groups;
 }
 
 # Malformed anywhere: the tag list itself (TagValueList), or an s= item.
@@ -203,7 +224,7 @@ sub syntax_error {
 # own. Setting either on an nd= signature is therefore a caller error.
 sub _croak_if_nd {
     my ($self, $tag) = @_;
-    croak "cannot set $tag= on a signature carrying nd= (-07 §10.7)"
+    croak "cannot set $tag= on a signature carrying nd= (-08 §10.7)"
         if defined $self->get_tag('nd');
 }
 
@@ -296,15 +317,15 @@ sub as_string_without_data {
     my ($self) = @_;
 
     # Rebuild from the parsed tags in their original order and case, blanking
-    # each s= item's signature value in place.  Done directly (not via
-    # set_tag/as_string) so a non-lowercase 's' tag name — e.g. "S=" in a
-    # mixed-case header — is not duplicated by a fresh lowercase 's' key.
+    # each s= item's signature value in place. Only "s=" itself: tag-names
+    # are case-sensitive (-08 §8), so an "S=" is an unknown tag, signed as is.
     my @parts;
     for my $t (@{$self->{order}}) {
         my $v = defined $self->{tags}{$t} ? $self->{tags}{$t} : '';
-        if (lc $t eq 's') {
-            # Replace each sel:alg:sig with sel:alg: (empty value per §10.5)
-            $v =~ s/([^,:]+:[^,:]+):[^,]*/$1:/g;
+        if ($t eq 's') {
+            # Replace each sel:alg:sig with sel:alg: (empty value, -08
+            # §12.8); selectors, names and the ":" "," "|" all stay.
+            $v =~ s/([^,|:]+:[^,|:]+):[^,|]*/$1:/g;
         }
         push @parts, "$t=$v";
     }
@@ -321,7 +342,7 @@ sub as_folded_string_without_data {
     # Replace each sel:alg:sig with sel:alg: (null/empty string per spec §10.5)
     my $saved = $self->get_tag('s');
     my $stripped = $saved;
-    $stripped =~ s/([^,:]+:[^,:]+):[^,]*/$1:/g;
+    $stripped =~ s/([^,|:]+:[^,|:]+):[^,|]*/$1:/g;
 
     my @parts;
     for my $t (@{$self->{order}}) {
@@ -358,18 +379,10 @@ sub sig_count {
     return scalar @$sigs;
 }
 
-# -07 §10.9 duplicate/limit rules for one DKIM2-Signature s= tag.
-#
-# A Selector MUST NOT appear more than once. The same signing algorithm MAY
-# appear a second time, but only with a distinct Selector -- three or more
-# occurrences of the same algorithm means "more selectors than allowed". The
-# two checks are independent: two items sharing both algorithm and Selector
-# are a duplicate-selector error, not a selector-count error (the count is 2,
-# not 3+).
-#
-# Matching is case-insensitive for both: hash/algorithm names are RFC 5234
-# ABNF quoted strings (case-insensitive), and a Selector is a Domain (§3.6),
-# and DNS names are case-insensitive.
+# -08 §10.9 duplicate rule for one DKIM2-Signature s= tag: a Selector MUST
+# NOT appear more than once, in any group. The same algorithm may appear any
+# number of times with distinct Selectors (-08 dropped -07's limit of two).
+# Selectors match without regard to case: a Selector is a Domain (§3.6).
 #
 # Returns a list of PERMERROR strings (empty if clean).
 sub check_duplicates {
@@ -377,21 +390,10 @@ sub check_duplicates {
     my $sigs = $self->_sig_items;
     return () unless $sigs && @$sigs;
 
-    my $i_val = $self->sequence;
-    my (%sel_count, %alg_count);
-    for my $item (@$sigs) {
-        $sel_count{lc($item->[SIG_SELECTOR]  // '')}++;
-        $alg_count{lc($item->[SIG_ALGORITHM] // '')}++;
-    }
-
-    my @errors;
-    if (grep { $_ > 1 } values %sel_count) {
-        push @errors, "PERMERROR: DKIM2-Signature i=$i_val has a duplicate selector";
-    }
-    if (grep { $_ > 2 } values %alg_count) {
-        push @errors, "PERMERROR: DKIM2-Signature i=$i_val has more selectors than allowed";
-    }
-    return @errors;
+    my %sel_count;
+    $sel_count{lc($_->[SIG_SELECTOR] // '')}++ for @$sigs;
+    return () unless grep { $_ > 1 } values %sel_count;
+    return "PERMERROR: DKIM2-Signature i=" . $self->sequence . " has a duplicate selector";
 }
 
 1;
@@ -429,7 +431,7 @@ Mail::DKIM2::Signature - One DKIM2-Signature header, parsed or under constructio
 
 =head1 DESCRIPTION
 
-A DKIM2-Signature header as defined in -07 section 10, as a
+A DKIM2-Signature header as defined in -08 section 10, as a
 L<Mail::DKIM2::TagValueList>. The tags:
 
 =over 4
@@ -454,12 +456,12 @@ Signing domain.
 =item C<mf=>, C<rt=>
 
 The envelope of this hop: MAIL FROM, and a comma-separated list of RCPT TO,
-each a base64-encoded RFC 5321 path with angle brackets (-07 section 10.5 and
+each a base64-encoded RFC 5321 path with angle brackets (-08 section 10.5 and
 10.6). C<< <> >> is the null sender.
 
 =item C<nd=>
 
-For an imaginary forwarding hop (-07 section 12.3), the C<d=> of the hop that
+For an imaginary forwarding hop (-08 section 12.3), the C<d=> of the hop that
 signs next. Replaces C<mf=> and C<rt=>.
 
 =item C<n=>
@@ -468,7 +470,7 @@ A nonce of at most 64 characters.
 
 =item C<f=>
 
-Comma-separated flags (-07 section 10.10): C<exploded>, C<feedback>,
+Comma-separated flags (-08 section 10.10): C<exploded>, C<feedback>,
 C<feedhere>, or any other; an unknown flag has no effect.
 
 =item C<s=>
@@ -478,7 +480,7 @@ A selector may appear once; an algorithm at most twice.
 
 =back
 
-This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-08; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.
@@ -534,14 +536,22 @@ An arrayref of flags, or undef.
 =head2 signatures_data()
 
 An arrayref of C<[selector, algorithm, value]> arrayrefs, one per C<s=>
-item: folding whitespace trimmed from around the selector and algorithm and
-removed from inside the base64 value, which is all section 8.9 allows.
+item in the order C<s=> gives them, whatever their groups: folding
+whitespace trimmed from around the selector and algorithm and removed from
+inside the base64 value, which is all -08 section 10.9 allows.
+
+=head2 sig_groups()
+
+The C<s=> groups (-08 section 10.9): an arrayref with one arrayref per
+C<|>-separated group, holding the indices of its C<,>-joined items. A
+group passes when all its items do, and the signature when any group does.
 
 =head2 syntax_error()
 
 True if the field is not a valid tag list (see
 L<Mail::DKIM2::TagValueList/syntax_error>) or an C<s=> item is malformed:
-missing a part, or whitespace inside its selector or algorithm name.
+missing a part, or whitespace inside its selector or algorithm name; or a
+member of C<s=> is empty (a leading, trailing or doubled C<|> or C<,>).
 
 =head2 selector([$index]), algorithm([$index]), signature_value([$index])
 
@@ -553,8 +563,8 @@ The number of items.
 
 =head2 check_duplicates()
 
-A list of PERMERROR strings for the section 8.9 rules: a selector used
-twice, or an algorithm used more than twice. Empty if clean.
+A list of PERMERROR strings for the -08 section 10.9 rule: a selector used
+twice, in any group. Empty if clean.
 
 =head1 SERIALIZATION
 

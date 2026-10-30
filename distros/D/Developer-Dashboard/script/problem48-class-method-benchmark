@@ -1,0 +1,134 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw(class signatures);
+no warnings qw(experimental::class experimental::signatures);
+
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+my $iterations = 2_000_000;
+my $runs       = 21;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+) or die _usage();
+die "Unexpected arguments: @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be positive\n" if $iterations < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+class NativeObject {
+    field $value :param;
+    method get() { return $value }
+}
+
+{
+    package HashObject;
+    sub new { return bless { value => $_[1] }, $_[0] }
+    sub get { return $_[0]->{value} }
+}
+{
+    package SignatureObject;
+    sub new { return bless { value => $_[1] }, $_[0] }
+    sub get ($self) { return $self->{value} }
+}
+
+my $native = NativeObject->new(value => 7);
+my $hash   = HashObject->new(7);
+my $signature = SignatureObject->new(7);
+my ( @hash_seconds, @signature_seconds, @native_seconds );
+for my $run ( 1 .. $runs ) {
+    my @samples = (
+        [ hash      => $hash,      \@hash_seconds ],
+        [ signature => $signature, \@signature_seconds ],
+        [ native    => $native,    \@native_seconds ],
+    );
+    my $offset = $run % @samples;
+    my @order = map { $samples[ ( $_ + $offset ) % @samples ] } 0 .. $#samples;
+    for my $sample (@order) {
+        my ( $label, $object, $samples ) = @{$sample};
+        my $sum = 0;
+        my $started = time;
+        $sum += $object->get for 1 .. $iterations;
+        push @{$samples}, time - $started;
+        die "$label method returned an unexpected field value\n" if $sum != 7 * $iterations;
+    }
+}
+
+my $hash_median   = _median(@hash_seconds);
+my $signature_median = _median(@signature_seconds);
+my $native_median = _median(@native_seconds);
+printf "Perl %vd; %d method calls per sample; %d alternating pairs; value parity=yes\n",
+  $^V, $iterations, $runs;
+printf "blessed_hash=%.3f ms hash_with_signature=%.3f ms builtin_class_field=%.3f ms\n",
+  1000 * $hash_median, 1000 * $signature_median, 1000 * $native_median;
+printf "relative_to_hash: signature=%.2fx builtin_class=%.2fx\n",
+  $hash_median / $signature_median, $hash_median / $native_median;
+exit 0;
+
+# _usage()
+# Returns the command-line usage and supported benchmark options.
+# Input: none.
+# Output: usage text string.
+sub _usage {
+    return "Usage: $0 [--iterations N] [--runs ODD_N]\n";
+}
+
+# _median(@seconds)
+# Returns the middle elapsed time from an odd, nonempty sample set.
+# Input: one or more elapsed-second values.
+# Output: median elapsed seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot compute a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-class-method-benchmark - compare builtin Perl classes with blessed hashes
+
+=head1 PURPOSE
+
+Measures repeated method dispatch and field reads on one object implemented
+with Perl's builtin C<class>/C<field>/C<method> syntax, compared with blessed
+hash objects using ordinary C<@_> access and a lexical subroutine signature.
+All three methods return the same scalar value on every iteration.
+
+=head1 WHY IT EXISTS
+
+Problem 48 explicitly evaluates builtin class syntax as a performance option.
+This benchmark determines whether its method and field access is faster before
+considering any production object migration.
+
+=head1 WHEN TO USE
+
+Run in the isolated Problem 48 Docker image with Perl 5.40 or newer, where the
+builtin class feature is available. This is a microbenchmark, not evidence for
+all Dashboard methods or routines.
+
+=head1 HOW TO USE
+
+  perl script/problem48-class-method-benchmark
+  perl script/problem48-class-method-benchmark --iterations 1000000 --runs 9
+
+The run count must be an odd positive integer. Each timed sample verifies that
+the accumulated field value matches the expected result. Sample start order
+rotates between the three implementations to reduce order bias.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this script to assess builtin class
+dispatch against the current blessed-hash object style. Application code and
+the release workflow do not invoke it.
+
+=head1 EXAMPLES
+
+  d2 docker compose --service bench -f /tmp/d2-problem48-bench.yml --project-name dd-problem48-profile-next run --rm bench perl script/problem48-class-method-benchmark
+
+=cut

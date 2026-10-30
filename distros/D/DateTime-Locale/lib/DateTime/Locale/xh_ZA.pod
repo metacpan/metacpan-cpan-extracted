@@ -435,6 +435,24 @@ Xhosa South Africa locale.
    1995-12-22T09:05:02 = AD 1995 Dis 22, Hla
   -0010-09-15T04:44:23 = BC -10 Sept 15, Mgq
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Februwari
+   1995-12-22T09:05:02 = AD 1995 Disemba
+  -0010-09-15T04:44:23 = BC -10 Septemba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Februwari 5, Lwesb
+   1995-12-22T09:05:02 = AD 1995 Disemba 22, Hla
+  -0010-09-15T04:44:23 = BC -10 Septemba 15, Mgq
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Februwari 5
+   1995-12-22T09:05:02 = AD 1995 Disemba 22
+  -0010-09-15T04:44:23 = BC -10 Septemba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Feb 5
@@ -506,6 +524,12 @@ Xhosa South Africa locale.
    2008-02-05T18:30:30 = Feb 5, Lwesb
    1995-12-22T09:05:02 = Dis 22, Hla
   -0010-09-15T04:44:23 = Sept 15, Mgq
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Februwari 5, Lwesb
+   1995-12-22T09:05:02 = Disemba 22, Hla
+  -0010-09-15T04:44:23 = Septemba 15, Mgq
 
 =head3 MMMMW-count-one ('iveki' W 'ka' MMMM)
 
@@ -620,6 +644,18 @@ Xhosa South Africa locale.
    2008-02-05T18:30:30 = Februwari 2008
    1995-12-22T09:05:02 = Disemba 1995
   -0010-09-15T04:44:23 = Septemba -10
+
+=head3 yMMMMEd (EEE, MMMM d, y)
+
+   2008-02-05T18:30:30 = Lwesb, Februwari 5, 2008
+   1995-12-22T09:05:02 = Hla, Disemba 22, 1995
+  -0010-09-15T04:44:23 = Mgq, Septemba 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Februwari 5, 2008
+   1995-12-22T09:05:02 = Disemba 22, 1995
+  -0010-09-15T04:44:23 = Septemba 15, -10
 
 =head3 yMMMd (MMM d, y)
 

@@ -1,5 +1,5 @@
 package Langertha::Raider::Hall::Telegram;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: Internal multi-bot Telegram long-poll adapter for the raider hall
 
 
@@ -134,28 +134,84 @@ sub _poll {
   $f->on_done(sub {
     my $self = $weak or return;
     delete $worker->{poll_future};
-    my ($resp) = @_;
-    my $updates = eval {
-      JSON::MaybeXS->new->decode($resp->decoded_content)->{result} // []
-    } // [];
-    for my $update (@$updates) {
-      $self->_handle_update($name, $update);
-      $worker->{offset} = $update->{update_id} + 1;
-    }
-    $self->hall->loop->later(sub { $self->_poll($name) });
+    $self->_poll_response($name, $_[0]);
   });
   $f->on_fail(sub {
     my $self = $weak or return;
     delete $worker->{poll_future};
     $self->hall->_emit('telegram.poll_error', { bot => $name, error => "$_[0]" });
-    # Back off a bit on failure so we don't hot-loop against a dead network.
-    my $timer = IO::Async::Timer::Countdown->new(
-      delay => 5,
-      on_expire => sub { $self->_poll($name) },
-    );
-    $self->hall->loop->add($timer);
-    $timer->start;
+    $self->_poll_later($name, $self->_backoff($worker));
   });
+}
+
+# Net::Async::HTTP hands 4xx/5xx back as a normal response, so the status
+# and the body's ok flag decide: an error answer is reported and retried
+# after a wait, never polled again at once.
+sub _poll_response {
+  my ($self, $name, $resp) = @_;
+  my $worker = $self->_workers->{$name} or return;
+  my $data = eval { JSON::MaybeXS->new->decode($resp->decoded_content) };
+  my $code = $resp->code;
+  my $ok = $resp->is_success && ref $data eq 'HASH' && $data->{ok};
+
+  unless ($ok) {
+    my $description = ref $data eq 'HASH' ? $data->{description} : undef;
+    $description //= $resp->is_success ? 'unreadable response' : ($resp->message // '');
+    my $token = $worker->{token};
+    $description =~ s/\Q$token\E/***/g if length $token;
+    my $error = 'HTTP '.($code // '?').': '.$description;
+    $self->hall->_emit('telegram.poll_error', {
+      bot => $name, status => $code, error => $error,
+    });
+    if ($code && $code == 401) {
+      # The token is wrong or revoked: retrying cannot help.
+      $worker->{active} = 0;
+      warn 'Telegram bot '.$name.': '.$error."\n";
+      return;
+    }
+    my $retry_after = ref $data eq 'HASH' && ref $data->{parameters} eq 'HASH'
+      ? $data->{parameters}{retry_after} : undef;
+    my $delay = $code && $code == 429 && $retry_after && $retry_after =~ /\A\d+\z/
+      ? $retry_after : $self->_backoff($worker);
+    $self->_poll_later($name, $delay);
+    return;
+  }
+
+  $worker->{failures} = 0;
+  for my $update (@{ $data->{result} // [] }) {
+    # One bad update must not stall the loop or leave the offset behind.
+    eval { $self->_handle_update($name, $update); 1 } or do {
+      my $err = $@ || 'unknown error';
+      $self->hall->_emit('telegram.update_error', {
+        bot => $name, update_id => $update->{update_id}, error => "$err",
+      });
+    };
+    $worker->{offset} = $update->{update_id} + 1;
+  }
+  $self->hall->loop->later(sub { $self->_poll($name) });
+}
+
+# Growing wait for consecutive failures: 5, 10, 20 ... capped at 300 s.
+sub _backoff {
+  my ($self, $worker) = @_;
+  my $n = ++$worker->{failures};
+  my $delay = 5 * 2 ** ($n > 6 ? 5 : $n - 1);
+  return $delay > 300 ? 300 : $delay;
+}
+
+sub _poll_later {
+  my ($self, $name, $delay) = @_;
+  weaken(my $weak = $self);
+  my $timer = IO::Async::Timer::Countdown->new(
+    delay => $delay,
+    on_expire => sub {
+      my $self = $weak or return;
+      $self->hall->loop->remove($_[0]);
+      $self->_poll($name);
+    },
+  );
+  $self->hall->loop->add($timer);
+  $timer->start;
 }
 
 sub _handle_update {
@@ -278,6 +334,15 @@ sub send_message {
   return { ok => 1, future => $f };
 }
 
+# A mission of a chat the hall refused (ADR 0033): a short reply without
+# the reason, which stays in raider.refused and the slot log, so alias
+# names and paths never reach a chat.
+sub send_refused {
+  my ($self, %target) = @_;
+  return $self->send_message(%target,
+    text => 'mission not started (configuration), see the hall log');
+}
+
 sub stop {
   my ($self) = @_;
   $_->{active} = 0 for values %{$self->_workers};
@@ -299,7 +364,7 @@ Langertha::Raider::Hall::Telegram - Internal multi-bot Telegram long-poll adapte
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -328,6 +393,12 @@ conversation continues across messages (see
 L<Langertha::Raider::Hall/session_bindings>). The raider's
 C<telegram_reply> answers into the same chat and forum topic.
 
+A mission the hall refuses (C<raider.refused>, see
+L<Langertha::Raider::Hall/EVENT BUS>) -- at once or when it is pulled from
+a queue -- is answered in its chat and topic with the short C<mission not
+started (configuration), see the hall log>; the reason stays in the event
+and the slot log.
+
 C</new> (or C</new@BOTNAME>) from an accepted sender is not a mission: the
 chat's (topic's) next message starts a new session, and the bot confirms
 with a short message. The old journal stays.
@@ -338,11 +409,42 @@ a bot does not poll: the hall warns and emits C<telegram.poll_error> with the
 module's name, and a reply is an C<error> result. Nothing is sent, so
 nothing waits for a connection that cannot open.
 
+B<Poll errors.> Every C<getUpdates> answer that is not a usable result emits
+C<telegram.poll_error> with the C<bot>, the HTTP C<status> (when there was
+an answer) and an C<error> of the form C<HTTP 409: description>, and the bot
+polls again only after a wait, never at once:
+
+=over
+
+=item * a non-2xx status, or C<ok: false> in the body, is an error answer;
+
+=item * a 2xx answer whose body cannot be read as the Bot API's JSON object
+(C<HTTP 200: unreadable response>) counts as an error answer as well, and no
+update of it is handled;
+
+=item * a failure of the request itself (network, TLS, timeout) emits the
+event without a C<status>;
+
+=item * C<429> waits the C<retry_after> seconds Telegram sent; every other
+failure waits 5 s, doubling with each consecutive one up to 300 s, and the
+wait starts over after an answer that was usable;
+
+=item * C<401> (the token is wrong or revoked) stops the bot with a warning
+instead of retrying;
+
+=item * the bot's token is masked (C<***>) in the reported C<error>.
+
+=back
+
+An update whose handling dies does not stop the loop: it emits
+C<telegram.update_error> with the C<bot>, the C<update_id> and the C<error>,
+and polling continues with the offset behind that update.
+
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -363,5 +465,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

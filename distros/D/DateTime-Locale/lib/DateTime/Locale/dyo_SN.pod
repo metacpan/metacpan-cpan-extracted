@@ -435,6 +435,24 @@ Jola-Fonyi Senegal locale.
    1995-12-22T09:05:02 = AtY 1995 De 22, Arj
   -0010-09-15T04:44:23 = ArY -10 Se 15, Sib
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AtY 2008 Fébirie
+   1995-12-22T09:05:02 = AtY 1995 Disambar
+  -0010-09-15T04:44:23 = ArY -10 Settembar
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AtY 2008 Fébirie 5, Tal
+   1995-12-22T09:05:02 = AtY 1995 Disambar 22, Arj
+  -0010-09-15T04:44:23 = ArY -10 Settembar 15, Sib
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AtY 2008 Fébirie 5
+   1995-12-22T09:05:02 = AtY 1995 Disambar 22
+  -0010-09-15T04:44:23 = ArY -10 Settembar 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AtY 2008 Fe 5
@@ -506,6 +524,12 @@ Jola-Fonyi Senegal locale.
    2008-02-05T18:30:30 = Tal 5 Fe
    1995-12-22T09:05:02 = Arj 22 De
   -0010-09-15T04:44:23 = Sib 15 Se
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Fébirie 5, Tal
+   1995-12-22T09:05:02 = Disambar 22, Arj
+  -0010-09-15T04:44:23 = Settembar 15, Sib
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

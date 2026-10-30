@@ -1,5 +1,13 @@
 Revision history for Perl extension App-dozo
 
+1.02 2026-10-27T09:57:53Z
+
+    - pass piped input to the command with -B (batch mode); -B now only
+      keeps the command from waiting for a terminal
+    - add --bundle to print a self-contained dozo that runs with only
+      bash and docker, and attach such a file to each GitHub release
+    - require Getopt::Long::Bash 1.1.0
+
 1.01 2026-08-28T08:24:38Z
 
     - require bash 4.4+ and Getopt::Long::Bash 1.0.0+ (incompatible change)

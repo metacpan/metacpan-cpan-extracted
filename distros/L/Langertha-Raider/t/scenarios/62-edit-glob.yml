@@ -1,0 +1,20 @@
+title: an Edit rule allows writing below its directory, nowhere else -- also not through ..
+permission_mode: default
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ "Edit(src/**)" ]
+prompt: Write two files.
+script:
+  - tool_calls:
+      - [ write_file, { path: src/deep/a.txt, content: "a\n" } ]
+      - [ write_file, { path: other.txt, content: "b\n" } ]
+      - [ write_file, { path: src/../escape.txt, content: "c\n" } ]
+  - text: done
+expect:
+  files: { src/deep/a.txt: "a\n" }
+  absent: [ other.txt, escape.txt ]
+  tools:
+    - { name: write_file }
+    - { name: write_file, error: true, text: "write_file changes files; nobody can approve it" }
+    - { name: write_file, error: true, text: "nobody can approve it" }

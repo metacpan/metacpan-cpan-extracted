@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Recipe literals that are not UTF-8 travel as {"u": ["<base64>", ...]}
-# steps (draft -07 section 5); UTF-8 literals, ASCII included, stay
+# steps (draft -08 section 5); UTF-8 literals, ASCII included, stay
 # {"d": [...]}.
 #
 # A Recipe literal is the raw octets of a header value or body line, and
@@ -9,9 +9,9 @@
 # text is UTF-8, so those octets cannot be written into a "d" step
 # unchanged; base64 carries them exactly. Verifiers reject a "u" item that
 # is not canonical base64 or that decodes to something containing CR or LF,
-# and a "d" item containing CR or LF, as "contains invalid JSON" (-07
+# and a "d" item containing CR or LF, as "contains invalid JSON" (-08
 # sections 5, 5.1, 5.2). The "b" step of our 0.13 to 0.22 releases, which
-# -07 adopted as "u", is now an unknown step key: invalid as well.
+# -08 adopted as "u", is now an unknown step key: invalid as well.
 
 use 5.020;
 use strict;
@@ -144,23 +144,24 @@ sub with_recipe {
         { c => [3, 4] },
         { d => ['tail'] },
     ], 'consecutive literals of one kind share a step; kinds alternate');
-    my $dec = Mail::DKIM2::MessageInstance::_decode_recipe_list($enc, "invalid\n");
+    my $dec = Mail::DKIM2::MessageInstance::_decode_recipe_list($enc, sub { "invalid $_[0]\n" }, "b");
     is_deeply($dec, $list, 'and the decoder gives the list back');
 }
 
 # --- parse accepts a hand-built "u" and gives back the octets ---
 {
     my $b64 = encode_base64('{"b":[{"u":["' . encode_base64("\xe9", '') . '"]}]}', '');
-    my $mi = Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:x:y; r=$b64;");
+    my $mi = Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:AAAA; r=$b64;");
     is_deeply($mi->get_tag('rb'), ["\xe9"], '"u" item decodes to the raw octets');
-    $b64 = encode_base64(qq({"b":[{"d":["na\xc3\xafve"]},{"D":["\\u00e9"]}]}), '');
-    $mi = Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:x:y; r=$b64;");
+    $b64 = encode_base64(qq({"b":[{"d":["na\xc3\xafve"]},{"d":["\\u00e9"]}]}), '');
+    $mi = Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:AAAA; r=$b64;");
     is_deeply($mi->get_tag('rb'), ["na\xc3\xafve", "\xc3\xa9"],
         '"d" text comes back as UTF-8 octets, escaped or not');
 }
 
 # --- reject: bad steps make the instance fail, never throw out of the Verifier ---
-my $INVALID = qr/\APERMERROR: Message-Instance m=2 contains invalid JSON\z/;
+# -08 §14.2, contract D6: one bad step is "Recipe <path> is invalid".
+sub invalid { my ($path) = @_; qr/\APERMERROR: Message-Instance m=2 Recipe \Q$path\E is invalid\z/ }
 my @bad = (
     [ { b => [ { u => ['not base64!'] } ] },              'characters outside the alphabet' ],
     [ { b => [ { u => ['QUJD='] } ] },                    'wrong padding' ],
@@ -174,7 +175,7 @@ my @bad = (
     [ { h => { comments => [ { u => [ encode_base64("x\ry", '') ] } ] } },
       'bare CR in a header literal' ],
     [ { b => [ { b => [ encode_base64("\xe9", '') ] } ] }, 'the old "b" step' ],
-    # -07 sections 5.1/5.2: "d" text MUST NOT contain CR or LF either
+    # -08 sections 5.1/5.2: "d" text MUST NOT contain CR or LF either
     [ { b => [ { d => [ "a\r\nb" ] } ] },                 'CRLF in a "d" body line' ],
     [ { b => [ { d => [ "a\nb" ] } ] },                   'bare LF in a "d" body line' ],
     [ { h => { comments => [ { d => [ "x\ry" ] } ] } },   'bare CR in a "d" header value' ],
@@ -193,6 +194,7 @@ my @bad = (
 
 for my $case (@bad) {
     my ($recipe, $name) = @$case;
+    my $INVALID = invalid(exists $recipe->{b} ? 'b[0]' : 'h.comments[0]');
     my ($current) = two_hops(sub { with_recipe($_[0], $recipe) });
     my $text = $current->as_string;
 

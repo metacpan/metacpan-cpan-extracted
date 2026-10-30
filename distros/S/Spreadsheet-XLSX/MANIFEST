@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Spreadsheet/XLSX.pm
 lib/Spreadsheet/XLSX/Fmt2007.pm
 lib/Spreadsheet/XLSX/Utility2007.pm
@@ -16,6 +17,11 @@ t/3_____invalid_formular.xlsx
 t/empty_v_tag.t
 t/empty_v_tag.xlsx
 t/formats.t
+t/format_conditions.t
+t/cell_references.t
+t/date_limits.t
+t/number_format_ids.t
+t/zip_limits.t
 t/formats.xlsx
 t/kwalitee.t
 t/missing_styles.t

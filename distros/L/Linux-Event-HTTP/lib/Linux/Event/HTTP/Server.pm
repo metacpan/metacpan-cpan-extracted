@@ -1,226 +1,225 @@
 package Linux::Event::HTTP::Server;
 use v5.36;
-use strict;
-use warnings;
-
 use Carp qw(croak);
-
+use Scalar::Util qw(weaken refaddr);
+use Unblock::HTTP::Server 0.03;
 use Linux::Event::IO::Sock::Listener;
-use Linux::Event::HTTP::Server::Connection;
+use Linux::Event::Kernel::Timer;
+use Linux::Event::HTTP::_Config;
+use Linux::Event::HTTP::_Stream;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
-sub _load_connection_class ($class) {
-    croak 'new(): connection_class must be a package name'
-        if !defined($class) || ref($class)
-        || $class !~ /\A[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*\z/;
-
-    if (!$class->can('new')) {
-        (my $file = "$class.pm") =~ s{::}{/}g;
-        require $file;
+sub new ($class, %option) {
+    my $loop = delete $option{loop};
+    Linux::Event::HTTP::_Config::loop($loop);
+    my $stream_class = Linux::Event::HTTP::_Config::stream_class(\%option);
+    my %protocols = Linux::Event::HTTP::_Config::protocols(\%option);
+    # Keep the capability check for mixed or incomplete installations.
+    # Check once at construction, before binding, never per request.
+    if ($protocols{http1}) {
+        require Unblock::HTTP1::Server;
+        croak 'new(): Unblock::HTTP1::Server lacks drain() required for HTTP/1 graceful shutdown; install a compatible Unblock::HTTP1 build'
+            unless Unblock::HTTP1::Server->can('drain');
     }
-
-    croak 'new(): connection_class must inherit Linux::Event::HTTP::Server::Connection'
-        if !$class->isa('Linux::Event::HTTP::Server::Connection');
-    return $class;
-}
-
-sub _take_callback ($name, $option) {
-    return undef if !exists $option->{$name};
-    my $callback = delete $option->{$name};
-    croak "new(): $name must be a coderef" if ref($callback) ne 'CODE';
-    return $callback;
-}
-
-sub _http2_available () {
-    return 0 if !eval {
-        require Net::HTTP2::nghttp2;
-        Net::HTTP2::nghttp2->VERSION('0.011');
-        require Linux::Event::HTTP::_HTTP2::Server;
-        require Linux::Event::HTTP::_HTTP2::ServerConnection;
-        1;
-    };
-    return Net::HTTP2::nghttp2->available ? 1 : 0;
-}
-
-sub _http2_ready ($conn, $user_ready, $max_header_list_size) {
-    if (($conn->selected_alpn // '') ne 'h2') {
-        $user_ready->($conn) if $user_ready;
-        return;
+    my $quic = delete($option{quic}) // {};
+    croak 'new(): quic must be a hash reference' unless ref($quic) eq 'HASH';
+    croak 'new(): quic requires http3 => 1' if %$quic && !$protocols{http3};
+    my %callbacks;
+    for my $name (qw(on_headers on_request on_error on_websocket on_handoff)) {
+        $callbacks{$name} = delete $option{$name} if exists $option{$name};
     }
-
-    $conn->pause_read;
-    $conn->loop->defer(sub {
-        return if $conn->is_closed;
-
-        my $executor = Linux::Event::HTTP::_HTTP2::Server->new(
-            stream         => $conn,
-            connection     => $conn,
-            autostart      => 0,
-            on_request     => $conn->{_http_on_request},
-            on_body        => $conn->{_http_on_body},
-            on_request_end => $conn->{_http_on_request_end},
-            max_header_list_size => $max_header_list_size,
+    # H2/H3 Extended CONNECT WebSocket output must be scheduled outside
+    # the native protocol receive stack. H1 Upgrade does not use this hook.
+    my $defer = sub ($callback) { $loop->defer($callback) };
+    my $definition = Unblock::HTTP::Server->new(
+        %protocols, %callbacks, defer => $defer,
+    );
+    my $self = bless { loop => $loop, definition => $definition,
+        connections => {} }, $class;
+    my $state = { server => $self };
+    weaken($state->{server});
+    my %stream = (class => $stream_class, data => $state);
+    for my $name (qw(tls tuning)) {
+        $stream{$name} = delete $option{$name} if exists $option{$name};
+    }
+    croak 'new(): HTTP/2 Server requires tls for ALPN negotiation'
+        if exists($protocols{http2}) && !exists($stream{tls});
+    if (exists $protocols{http3}) {
+        croak 'new(): HTTP3 requires a concrete host (not a wildcard)'
+            unless defined($option{host})
+                && $option{host} ne '0.0.0.0' && $option{host} ne '::';
+        croak 'new(): HTTP3 requires TLS cert_file and key_file'
+            unless ref($stream{tls}) eq 'HASH'
+                && $stream{tls}{cert_file} && $stream{tls}{key_file};
+        croak 'new(): HTTP3-only listeners are not implemented yet'
+            unless exists($protocols{http1}) || exists($protocols{http2});
+    }
+    if (exists $stream{tls}) {
+        croak 'new(): tls must be a hash reference' unless ref($stream{tls}) eq 'HASH';
+        croak 'new(): HTTP Server owns TLS alpn' if exists $stream{tls}{alpn};
+        $stream{tls} = { %{ $stream{tls} }, alpn => [$definition->alpn_protocols] };
+    }
+    my $on_error = delete $option{on_listener_error};
+    my %listen;
+    for my $name (qw(host port path fh backlog reuseaddr reuseport v6only unlink_on_close)) {
+        $listen{$name} = delete $option{$name} if exists $option{$name};
+    }
+    croak 'new(): unknown option: ' . join(', ', sort keys %option) if %option;
+    $self->{listener} = Linux::Event::IO::Sock::Listener->new(
+        loop => $loop, %listen, stream => \%stream,
+        on_accept => sub ($listener, $stream) {
+            my $server = $state->{server};
+            $server ? $server->_track($stream) : $stream->close;
+        },
+        (defined($on_error) ? (on_error => $on_error) : ()),
+    );
+    if (exists $protocols{http3}) {
+        require Unblock::HTTP::QUIC;
+        require Linux::Event::HTTP::_QUICSocket;
+        my $socket = Linux::Event::HTTP::_QUICSocket->new(
+            loop => $loop, host => $listen{host}, port => $self->port,
+            (defined($on_error) ? (on_error => $on_error) : ()),
+            on_progress => sub {
+                my $server = $state->{server} or return;
+                $server->_quic_progress;
+            },
         );
-        $conn->{_http2_executor} = $executor;
-
-        $conn->transition_to(
-            'Linux::Event::HTTP::_HTTP2::ServerConnection',
+        my $manager = Unblock::HTTP::QUIC->server(
+            server => $definition,
+            certificate_file => $stream{tls}{cert_file},
+            private_key_file => $stream{tls}{key_file},
+            %$quic,
+            send => $socket->send_callback,
+            set_timeout => $socket->set_timeout_callback,
+            on_ready => sub ($engine, $quic_manager) {
+                my $server = $state->{server} or return;
+                $server->_quic_ready($engine);
+            },
         );
-        $executor->start;
+        $self->{quic} = { socket => $socket, manager => $manager };
+        $socket->start($manager);
+    }
+    return $self;
+}
 
-        $user_ready->($conn) if $user_ready;
-        $conn->resume_read if $conn->is_read_paused;
-    });
+sub loop ($self) { $self->{loop} }
+sub listener ($self) { $self->{listener} }
+sub host ($self) { $self->{listener}->host }
+sub port ($self) { $self->{listener}->port }
+sub pause ($self) { $self->{listener}->pause; return $self }
+sub resume ($self) { $self->{listener}->resume; return $self }
+sub close ($self) {
+    $self->{listener}->close;
+    if ($self->{quic} && !$self->{quic_closing}++) {
+        for my $engine ($self->{quic}{manager}->sessions) {
+            $engine->shutdown_notice unless $engine->shutdown_notice_sent;
+            $engine->shutdown unless $engine->shutdown_started;
+        }
+        $self->_quic_progress;
+    }
+    return $self;
+}
+sub connection_count ($self) {
+    my $count = scalar keys %{ $self->{connections} };
+    $count += scalar($self->{quic}{manager}->sessions) if $self->{quic};
+    return $count;
+}
+
+sub shutdown ($self, %option) {
+    my $grace = delete($option{grace}) // 30;
+    my $complete = delete $option{on_complete};
+    croak 'shutdown(): grace must be a non-negative number of seconds'
+        unless !ref($grace) && $grace =~ /\A(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)\z/;
+    croak 'shutdown(): on_complete must be a coderef'
+        if defined($complete) && ref($complete) ne 'CODE';
+    croak 'shutdown(): unknown option: ' . join(', ', sort keys %option) if %option;
+    return $self if $self->{shutdown};
+    $self->{shutdown} = 1;
+    $self->{shutdown_complete} = $complete;
+    $self->close;
+    # A synchronous close can remove a stream while this snapshot is drained.
+    for my $stream (values %{ $self->{connections} }) {
+        $stream->_http_drain;
+    }
+    if ($self->connection_count) {
+        my $weak = $self;
+        weaken($weak);
+        $self->{shutdown_timer} = Linux::Event::Kernel::Timer->new(
+            loop => $self->{loop}, after => $grace,
+            on_timer => sub {
+                my $server = $weak or return;
+                $_->close for values %{ $server->{connections} };
+                if (my $quic = delete $server->{quic}) {
+                    $quic->{socket}->close;
+                }
+                $server->_shutdown_done;
+            },
+        );
+    }
+    $self->_quic_progress if $self->{quic};
+    $self->_shutdown_done;
+    return $self;
+}
+
+sub _shutdown_done ($self) {
+    return unless $self->{shutdown} && !$self->connection_count && !$self->{quic};
+    return if $self->{shutdown_notified}++;
+    my $timer = delete $self->{shutdown_timer};
+    $timer->cancel if $timer;
+    my $complete = delete $self->{shutdown_complete};
+    $complete->($self) if $complete;
     return;
 }
 
-sub new ($class, %option) {
-    croak 'new(): stream_class is internal; use connection_class'
-        if exists $option{stream_class};
-    croak 'new(): stream is internal; use connection_class, tuning, tls, and callbacks'
-        if exists $option{stream};
-    croak 'new(): HTTP Server owns on_data; use on_request/on_body callbacks'
-        if exists $option{on_data};
-    croak 'new(): HTTP Server cannot use message framing callbacks'
-        if exists($option{on_message}) || exists($option{on_messages});
-    croak 'new(): on_request_final was removed; use on_request and Response->body or Transaction->response_body'
-        if exists $option{on_request_final};
 
-    my $connection_class_option = delete $option{connection_class};
-    my $connection_class = _load_connection_class(
-        $connection_class_option
-            // 'Linux::Event::HTTP::Server::Connection',
-    );
-
-    my $http2 = exists($option{http2}) ? delete($option{http2}) : 0;
-    my $has_http2_max_header_list_size =
-        exists $option{http2_max_header_list_size};
-    my $http2_max_header_list_size =
-        $has_http2_max_header_list_size
-            ? delete($option{http2_max_header_list_size})
-            : 65_536;
-    croak 'new(): http2 must be zero or one'
-        if !defined($http2) || ref($http2)
-        || ("$http2" ne '0' && "$http2" ne '1');
-    $http2 = $http2 ? 1 : 0;
-    croak 'new(): http2_max_header_list_size must be a positive integer'
-        if ref($http2_max_header_list_size)
-        || "$http2_max_header_list_size" !~ /\A[0-9]+\z/
-        || $http2_max_header_list_size < 1;
-    croak 'new(): http2_max_header_list_size requires http2 => 1'
-        if !$http2 && $has_http2_max_header_list_size;
-
-    my %callbacks;
-    for my $name (qw(on_request on_body on_request_end)) {
-        my $callback = _take_callback($name, \%option);
-        $callbacks{$name} = $callback if $callback;
+sub _quic_ready ($self, $engine) {
+    if ($self->{quic_closing}) {
+        $engine->quic->close unless $engine->quic->closed;
     }
+    return;
+}
 
-    my %stream_callback;
-    for my $name (qw(
-        on_ready on_transport_ready on_drain on_eof on_error on_close
-    )) {
-        my $callback = _take_callback($name, \%option);
-        $stream_callback{$name} = $callback if $callback;
+sub _quic_progress ($self) {
+    my $quic = $self->{quic} or return;
+    return unless $self->{quic_closing};
+    my @sessions = $quic->{manager}->sessions;
+    for my $engine (@sessions) {
+        my $connection = $engine->quic;
+        next if $connection->closed;
+        if ($self->{shutdown} && ($engine->failed || $engine->drained)) {
+            $connection->close;
+        }
     }
-
-    my $listener_error = _take_callback('on_listener_error', \%option);
-
-    my $tuning = exists($option{tuning}) ? delete($option{tuning}) : {};
-    croak 'new(): tuning must be a hash reference'
-        if ref($tuning) ne 'HASH';
-
-    my $tls_enabled = exists $option{tls};
-    my $tls = delete $option{tls};
-    croak 'new(): tls must be a hash reference'
-        if $tls_enabled && ref($tls) ne 'HASH';
-    $tls = { %$tls } if $tls_enabled;
-
-    if ($http2) {
-        croak 'new(): http2 requires tls'
-            if !$tls_enabled;
-        croak 'new(): http2 currently requires the default connection_class'
-            if defined($connection_class_option);
-        croak 'new(): http2 owns TLS ALPN selection; do not supply tls => { alpn => ... }'
-            if exists $tls->{alpn};
-        croak 'new(): HTTP/2 support requires Net::HTTP2::nghttp2 0.011 or newer'
-            if !_http2_available();
-        $tls->{alpn} = [ 'h2', 'http/1.1' ];
-
-        my $user_on_ready = $stream_callback{on_ready};
-        $stream_callback{on_ready} = sub ($conn) {
-            _http2_ready(
-                $conn, $user_on_ready, 0 + $http2_max_header_list_size,
-            );
-        };
+    # If no sessions are admitted, a handshake in progress has no HTTP
+    # application transaction to preserve. Close the UDP listener.
+    if (!@sessions) {
+        delete $self->{quic};
+        $quic->{socket}->close;
+        $self->_shutdown_done if $self->{shutdown};
     }
+    return;
+}
 
-    croak 'new(): HTTP Server requires on_request callback or connection_class method'
-        if !$callbacks{on_request} && !$connection_class->can('on_request');
+sub _track ($self, $stream) {
+    return if $stream->is_closed;
+    return $stream->close if $self->{shutdown};
+    $self->{connections}{refaddr($stream)} = $stream;
+    return;
+}
 
-    my $data = delete $option{data};
-    my $state = bless {
-        callbacks => \%callbacks,
-        data      => $data,
-    }, 'Linux::Event::HTTP::Server::_ConnectionState';
-
-    my %stream = (
-        class  => $connection_class,
-        data   => $state,
-        tuning => $tuning,
-        %stream_callback,
+sub _attach ($self, $stream) {
+    if ($self->{shutdown}) { $stream->close; return }
+    $self->_track($stream);
+    return $self->{definition}->attach_stream(
+        transport => $stream, alpn => $stream->selected_alpn,
     );
-    $stream{tls} = $tls if $tls_enabled;
-
-    my $listener = Linux::Event::IO::Sock::Listener->new(
-        %option,
-        stream => \%stream,
-        (defined($listener_error) ? (on_error => $listener_error) : ()),
-    );
-
-    return bless {
-        listener         => $listener,
-        connection_class => $connection_class,
-        data             => $data,
-        state            => $state,
-        http2            => $http2,
-        http2_max_header_list_size => 0 + $http2_max_header_list_size,
-    }, $class;
 }
 
-sub listener         ($self) { $self->{listener} }
-sub connection_class ($self) { $self->{connection_class} }
-sub data             ($self) { $self->{data} }
-sub http2            ($self) { !!$self->{http2} }
-sub http2_max_header_list_size ($self) {
-    return $self->{http2_max_header_list_size};
-}
-sub loop             ($self) { $self->{listener}->loop }
-sub fh               ($self) { $self->{listener}->fh }
-sub fd               ($self) { $self->{listener}->fd }
-sub host             ($self) { $self->{listener}->host }
-sub port             ($self) { $self->{listener}->port }
-sub path             ($self) { $self->{listener}->path }
-sub family           ($self) { $self->{listener}->family }
-sub family_number    ($self) { $self->{listener}->family_number }
-sub is_tcp           ($self) { $self->{listener}->is_tcp }
-sub is_unix          ($self) { $self->{listener}->is_unix }
-sub state            ($self) { $self->{listener}->state }
-
-sub pause ($self) {
-    $self->{listener}->pause;
-    return $self;
-}
-
-sub resume ($self) {
-    $self->{listener}->resume;
-    return $self;
-}
-
-sub close ($self) {
-    $self->{listener}->close;
-    return $self;
+sub _closed ($self, $stream) {
+    delete $self->{connections}{refaddr($stream)};
+    $self->_shutdown_done if $self->{shutdown};
+    return;
 }
 
 1;
@@ -229,309 +228,85 @@ __END__
 
 =head1 NAME
 
-Linux::Event::HTTP::Server - HTTP/1.x and HTTP/2 server endpoint
+Linux::Event::HTTP::Server - Native Linux listener for Unblock HTTP
 
 =head1 SYNOPSIS
 
-    use v5.36;
-    use Linux::Event::Loop;
-    use Linux::Event::HTTP::Server;
-
-    my $loop = Linux::Event::Loop->new;
-
     my $server = Linux::Event::HTTP::Server->new(
-        loop => $loop,
-        host => '127.0.0.1',
-        port => 8080,
-
-        on_request => sub ($conn, $req, $res) {
-            $res->header('Content-Type', 'text/plain');
-            $res->body("hello\n");
-        },
-    );
-
-    $loop->run;
-
-For HTTPS with HTTP/2 negotiation:
-
-    my $server = Linux::Event::HTTP::Server->new(
-        loop  => $loop,
-        port  => 8443,
-        http2 => 1,
-
-        tls => {
-            cert_file => '/path/server-cert.pem',
-            key_file  => '/path/server-key.pem',
-        },
-
-        on_request => sub ($conn, $req, $res) {
-            $res->body("HTTP " . $req->version . "\n");
+        loop => $loop, port => 8080,
+        on_request => sub ($tx, $request) {
+            $tx->respond(status => 200, body => "Hello\n");
         },
     );
 
 =head1 DESCRIPTION
 
-C<Linux::Event::HTTP::Server> is the ordinary server entry point.
-
-The same C<on_request> callback model is used for HTTP/1 and HTTP/2. The
-callback receives:
-
-    ($conn, $req, $res)
-
-where C<$req> is the Request message, C<$res> is the Response message, and
-C<$conn> is the live HTTP connection.
-
-The active L<Linux::Event::HTTP::Transaction> is available through:
-
-    my $tx = $conn->transaction;
-
-Use the Transaction only when exchange lifecycle operations are needed, such as
-streaming output, delayed output, Upgrade, or CONNECT handoff.
-
-=head1 CONSTRUCTOR
-
-    my $server = Linux::Event::HTTP::Server->new(%options);
-
-Common options are:
-
-=over 4
-
-=item * C<loop>
-
-The L<Linux::Event::Loop>.
-
-=item * C<host>, C<port>, C<path>
-
-Listener address options passed to Linux::Event.
-
-=item * C<on_request>
-
-Required unless the configured connection class provides an C<on_request>
-method.
-
-=item * C<on_body>
-
-Receives request-body chunks:
-
-    on_body => sub ($conn, $req, $res, $bytes) { ... }
-
-If omitted, request-body bytes are drained instead of accumulated.
-
-=item * C<on_request_end>
-
-Runs after the complete request body boundary is reached.
-
-=item * C<tls>
-
-Enables Linux::Event TLS transport.
-
-=item * C<http2>
-
-When true, enables HTTP/2 negotiation for TLS connections. HTTP/2 requires
-L<Net::HTTP2::nghttp2> 0.011 or newer.
-
-=item * C<http2_max_header_list_size>
-
-Maximum decoded HTTP/2 request/trailer header-list size. Default: 65,536 bytes.
-
-=item * C<tuning>
-
-Linux::Event Stream tuning for accepted connections.
-
-=item * C<data>
-
-Application data available through C<< $server->data >> and connection state.
-
-=item * C<connection_class>
-
-Advanced HTTP/1 connection subclass. The default is
-L<Linux::Event::HTTP::Server::Connection>. HTTP/2 currently requires the
-default connection class.
-
-=back
-
-Listener and accepted-connection lifecycle callbacks supported by the
-constructor include C<on_ready>, C<on_transport_ready>, C<on_drain>, C<on_eof>,
-C<on_error>, C<on_close>, and C<on_listener_error>.
-
-=head1 RESPONSES
-
-For a complete response already in memory:
-
-    on_request => sub ($conn, $req, $res) {
-        $res->status(200);
-        $res->header('Content-Type', 'text/plain');
-        $res->body("hello\n");
-    }
-
-A scalar body configured during an HTTP callback is committed after that
-callback returns.
-
-Completing a response does not normally close the connection. HTTP persistence
-is handled by the selected protocol.
-
-=head1 STREAMING RESPONSES
-
-For incremental output, obtain a body producer from the Transaction:
-
-    on_request => sub ($conn, $req, $res) {
-        my $body = $conn->transaction->response_body(
-            on_drain  => sub ($body) { ... },
-            on_cancel => sub ($body) { ... },
-        );
-
-        $body->write($chunk);
-        $body->complete($final_chunk);
-    };
-
-C<write> follows Linux::Event backpressure semantics. A false return means the
-bytes were accepted but the producer should pause until C<on_drain> runs.
-
-=head1 REQUEST BODIES
-
-Request bodies are streaming-first:
-
-    my $server = Linux::Event::HTTP::Server->new(
-        loop => $loop,
-        port => 8080,
-
-        on_request => sub ($conn, $req, $res) {
-            $conn->data->{body} = '';
-        },
-
-        on_body => sub ($conn, $req, $res, $bytes) {
-            $conn->data->{body} .= $bytes;
-        },
-
-        on_request_end => sub ($conn, $req, $res) {
-            $res->body("received\n");
-        },
-    );
-
-If C<on_body> is omitted, body bytes are drained rather than stored in the
-Request.
-
-=head1 DELAYED RESPONSES
-
-A Response may be completed by another event later. Retain the Transaction and
-send the finished scalar response explicitly:
-
-    my $tx = $conn->transaction;
-
-    Linux::Event::Kernel::Timer->new(
-        loop  => $conn->loop,
-        after => 0.1,
-
-        on_timer => sub ($timer) {
-            $tx->response->body("later\n");
-            $tx->send_response;
-        },
-    );
-
-C<send_response> is explicit because Response is a message object, not a hidden
-transport handle.
-
-=head1 TLS AND HTTP/2
-
-TLS is enabled with the C<tls> constructor option.
-
-HTTP/2 is enabled with:
-
-    http2 => 1
-
-When enabled, the Server advertises C<h2> before C<http/1.1>. ALPN selects the
-protocol while applications continue using the same C<on_request> callback and
-Request/Response classes.
-
-The current production HTTP/2 server path is TLS + ALPN. Cleartext h2c is not
-provided.
-
-C<http2 =E<gt> 1> owns the TLS ALPN list and currently requires the default
-connection class.
-
-=head1 UPGRADE AND CONNECT
-
-HTTP/1.1 protocol handoff belongs to Transaction.
-
-Upgrade:
-
-    $res->header('Upgrade', 'my-protocol');
-    $conn->transaction->upgrade('MyProtocolConnection');
-
-CONNECT:
-
-    if ($req->method eq 'CONNECT') {
-        $conn->transaction->tunnel('MyTunnelConnection');
-    }
-
-Both operations transition the same live Linux::Event stream after the HTTP
-exchange reaches the correct boundary. Already-read post-HTTP bytes are
-preserved.
-
-These are HTTP/1 transport-handoff operations; they do not describe HTTP/2
-stream-level tunnels.
-
-=head1 MANAGED PRE-FORK
-
-For plain HTTP, the underlying Listener can be intentionally shared with
-L<Linux::Event> managed fork support:
-
-    my $pid = $loop->fork(
-        share => [ $server->listener ],
-    );
-
-Worker creation and supervision remain application policy. This documented
-sharing pattern is for plain HTTP; do not assume the same recipe for TLS
-Listeners without separate validation.
-
-=head1 METHODS
-
-=head2 listener
-
-Returns the underlying L<Linux::Event::IO::Sock::Listener>.
-
-=head2 loop
-
-Returns the Loop.
-
-=head2 connection_class
-
-Returns the configured HTTP/1 connection class.
-
-=head2 http2
-
-True when HTTP/2 support was enabled for this Server.
-
-=head2 http2_max_header_list_size
-
-Returns the configured HTTP/2 decoded header-list limit.
-
-=head2 data
-
-Returns the Server application data.
-
-=head2 fh, fd, host, port, path, family, family_number, is_tcp, is_unix, state
-
-Delegate to the underlying Listener.
-
-=head2 pause
-
-Pauses acceptance and returns the Server.
-
-=head2 resume
-
-Resumes acceptance and returns the Server.
-
-=head2 close
-
-Closes the listening endpoint and returns the Server. Existing accepted
-connections keep their own lifecycles.
-
-=head1 SEE ALSO
-
-L<Linux::Event::HTTP>, L<Linux::Event::HTTP::Client>,
-L<Linux::Event::HTTP::Server::Connection>,
-L<Linux::Event::HTTP::Transaction>, L<Linux::Event::HTTP::Request>,
-L<Linux::Event::HTTP::Response>, L<Linux::Event::HTTP::Body::Stream>.
+HTTP/1 is enabled by default. Callbacks receive real Unblock transactions
+and Uniform messages. C<on_headers> runs before the body; C<on_request> runs
+once after successful body completion. Set C<$tx-E<gt>on_data(...)> during
+C<on_headers> to stream a request. Otherwise Unblock buffers up to 1 MiB;
+configure C<http1 =E<gt> { max_buffered_body_bytes =E<gt> ... }> to change it.
+
+C<tls> and C<tuning> configure the Linux::Event listener's accepted streams.
+HTTP owns TLS ALPN selection; do not specify C<tls =E<gt> { alpn =E<gt> ... }>.
+C<native_input =E<gt> 0> selects the Perl input path for diagnostics.
+C<on_listener_error> receives listener failures; C<on_error> is the HTTP
+engine error callback. Unknown options are rejected.
+
+C<loop>, C<listener>, C<host>, C<port>, C<pause>, C<resume>, C<close> and
+C<connection_count> expose listener controls and live connection count.
+C<close> stops accepting connections; existing connections continue.
+
+C<shutdown(grace =E<gt> 30, on_complete =E<gt> sub ($server) { ... })>
+stops listening, drains admitted HTTP/1 requests, and closes remaining owned
+connections when the grace period expires. TLS handshakes without admitted
+requests close immediately. Completion runs once after owned connections
+and their transactions have finished; it can run synchronously if idle.
+Repeated shutdown calls have no effect. C<grace> is non-negative seconds.
+C<on_handoff> enables generic HTTP1 101 Upgrade and successful CONNECT
+handoff for non-WebSocket protocols. It runs after HTTP accepts the
+switch response into the existing write queue and receives
+C<($tx, $request, $response, $transport)>. Return a successor protocol
+object implementing C<input>, C<input_eof>, C<transport_error>
+and C<resume_output>. The Linux::Event stream transitions in place;
+any same-read native input tail is preserved without duplication.
+The successor owns the socket after handoff. WebSocket handshakes take
+precedence when both callbacks are enabled. For HTTP2/HTTP3, C<on_handoff($tx, $request, $bridge)> returns a
+stream-local consumer for a CONNECT request (not a whole socket).
+The Server responds with status 200, forwards DATA and EOF to the
+consumer, and preserves ordinary sibling streams. Return undef to
+reject with 403. Configure C<http2 =E<gt>
+{ enable_connect_protocol =E<gt> 1 }> or C<http3 =E<gt>
+{ enable_extended_connect =E<gt> 1 }> for Extended CONNECT; no
+WebSocket advertisement is required. The bridge accepts
+C<unblock_send>, C<unblock_finish>, and C<unblock_abort>, with
+deferred bounded output. It invokes C<resume_output> for flow
+control. Generic handoff never replaces the multiplexed transport.
+
+C<http2 =E<gt> 1> enables optional Unblock::HTTP2 (at least 0.13). Server
+HTTP/2 requires TLS and uses ALPN, with HTTP/1 fallback unless C<http1 =E<gt> 0>.
+A hashref supplies HTTP/2 engine tuning. Shutdown sends GOAWAY and drains
+admitted streams. Cleartext HTTP/2 remains unimplemented.
+HTTP/2 C<on_error> may include a third protocol error-code argument.
+Optional C<http3 =E<gt> 1> uses Unblock::HTTP3 0.14 and Net::QUIC 0.06 on UDP
+alongside the TCP listener at the same concrete host and port. Its
+credentials are taken from C<tls =E<gt> { cert_file, key_file }>.
+C<quic =E<gt> { ... }> configures Net::QUIC server transport policy.
+Wildcard-bound HTTP3 and H3-only listeners are not yet supported.
+C<close> stops H3 admission by sending GOAWAY to attached sessions;
+C<shutdown> also waits for draining sessions until the grace deadline.
+Forced expiry releases the UDP socket and timer. The supported concrete-address
+HTTP3 lifecycle passed the Stage D QUIC loopback and cleanup tests.
+
+Opt-in C<http1 =E<gt> { websocket =E<gt> 1 }> with C<on_websocket>
+uses Unblock's HTTP1 handshake and transitions the same Linux::Event
+socket to WebSocket without losing same-read bytes. Native and Perl
+input paths are tested. C<http2 =E<gt> { websocket =E<gt> 1 }> and
+C<http3 =E<gt> { websocket =E<gt> 1 }> enable Extended CONNECT on
+individual multiplexed streams. The H2 path passes real TLS loopback.
+H2 and H3 WebSocket Extended CONNECT are verified by real TLS and QUIC
+loopback with independent ordinary HTTP streams. Unblock::HTTP3 0.14
+includes the completion-order fix for WebSocket Close and stream FIN.
+WebSocket remains an optional dependency, loaded only when enabled.
 
 =cut

@@ -10,11 +10,25 @@
     margin: 0.4rem 0 0.6rem;
   }
   .dash-add-filter select,
-  .dash-add-filter input[type="text"] {
+  .dash-add-filter input[type="text"],
+  .dash-add-filter input[type="number"],
+  .dash-add-filter input[type="date"] {
     padding: 0.25rem 0.45rem;
-    border: 1px solid #bbb;
+    border: 1px solid var(--field-border);
     border-radius: 4px;
     font-size: 0.82rem;
+  }
+  /* Same height as the toolbar's controls (layouts/default.html.tt), so the
+     fields and their Apply buttons line up top and bottom. */
+  .dash-add-filter > select,
+  .dash-add-filter > input,
+  .dash-add-filter > button {
+    box-sizing: border-box;
+    height: 1.75rem;
+  }
+  .dash-f-range-sep {
+    font-size: 0.82rem;
+    color: #666;
   }
   .btn-dash-filter-apply {
     padding: 0.28rem 0.75rem;
@@ -139,15 +153,24 @@
   }
   .pivot-dim-row select,
   .pivot-measure-row select,
-  .pivot-measure-row input[type="text"] {
+  .pivot-measure-row input[type="text"],
+  .pivot-measure-row input[type="number"],
+  .pivot-options-row select,
+  .pivot-options-row input[type="text"],
+  .pivot-options-row input[type="number"] {
     padding: 0.28rem 0.45rem;
-    border: 1px solid #bbb;
+    border: 1px solid var(--field-border);
     border-radius: 4px;
     font-size: 0.83rem;
   }
   .pivot-measure-row input[type="text"] { width: 80px; }
+  .pivot-measure-row input[type="number"] { width: 58px; }
   .pivot-dim-list, .pivot-measure-list { display: flex; flex-direction: column; gap: 0.3rem; }
   .pivot-options-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.4rem;
     margin: 0.1rem 0 0.75rem;
     font-size: 0.88rem;
   }
@@ -165,29 +188,15 @@
   .pivot-alias-label { font-size: 0.75rem; color: #888; white-space: nowrap; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .pivot-section-head { color: #999; }
-    :root:not([data-theme="light"]) .pivot-dim-row select,
-    :root:not([data-theme="light"]) .pivot-measure-row select,
-    :root:not([data-theme="light"]) .pivot-measure-row input[type="text"] {
-      background: #222; color: #ddd; border-color: #555;
-    }
     :root:not([data-theme="light"]) .btn-remove-pivot { border-color: #555; color: #aaa; }
     :root:not([data-theme="light"]) .pivot-alias-label { color: #888; }
   }
   :root[data-theme="dark"] .pivot-section-head { color: #999; }
-  :root[data-theme="dark"] .pivot-dim-row select,
-  :root[data-theme="dark"] .pivot-measure-row select,
-  :root[data-theme="dark"] .pivot-measure-row input[type="text"] {
-    background: #222; color: #ddd; border-color: #555;
-  }
   :root[data-theme="dark"] .btn-remove-pivot { border-color: #555; color: #aaa; }
   :root[data-theme="dark"] .pivot-alias-label { color: #888; }
 </style>
 
-[%- IF back_url -%]
-<p class="back-link"><span><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</span>[%- IF left_spec -%]<span class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %][%- IF join_summaries.size -%]&ensp;[%- FOREACH s IN join_summaries -%]<span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>[%- END -%][%- END -%]</span>[%- END -%]</p>
-[%- ELSE -%]
-<p class="back-link"><span><a href="/">&larr; Choose another database</a></span>[%- IF left_spec -%]<span class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %][%- IF join_summaries.size -%]&ensp;[%- FOREACH s IN join_summaries -%]<span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>[%- END -%][%- END -%]</span>[%- END -%]</p>
-[%- END -%]
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %][%- IF left_spec -%]<span class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %][%- IF join_summaries.size -%]&ensp;[%- FOREACH s IN join_summaries -%]<span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>[%- END -%][%- END -%]</span>[%- END -%]</nav>
 [%- IF schema_warnings.size -%]
 <ul class="schema-warnings" role="alert">
   [%- FOREACH w IN schema_warnings -%]
@@ -196,12 +205,61 @@
 </ul>
 [%- END -%]
 
+[%- # A relative time range is part of this view, so every form that carries the
+    # view to another page has to carry it too.  The range travels as itself --
+    # ?range=<name>&rcol=<column> -- rather than as the dates it resolved to, so
+    # a link, a bookmark or a saved panel keeps meaning the same window.
+-%]
+[%- MACRO range_hidden BLOCK -%]
+[%- IF time_range -%]<input type="hidden" name="range" value="[% time_range.name | html %]"><input type="hidden" name="rcol" value="[% time_range.col | html %]">[%- END -%]
+[%- END -%]
+
+[%- # A cross-row column is part of the view a chart is drawn from: the chart
+    # route runs the same cs= pass over the same rows, so charting the column
+    # means what the table shows.  Nothing is rendered when the view has none,
+    # so a chart URL from any other page is unchanged.
+    #
+    # Named params rather than hidden: the panel below iterates the stash key
+    # of the same meaning (the rest of the view's query string), and a macro
+    # would shadow it.
+-%]
+[%- MACRO cross_row_params BLOCK -%]
+[%- FOREACH spec IN cross_row_specs -%]<input type="hidden" name="cs" value="[% spec | html %]">[%- END -%]
+[%- IF cross_row_by.length -%]<input type="hidden" name="by" value="[% cross_row_by | html %]">[%- END -%]
+[%- FOREACH ord IN cross_row_order -%]<input type="hidden" name="order" value="[% ord | html %]">[%- END -%]
+[%- END -%]
+
+[%- # The whole view a panel carries to the page it opens: source, joins and
+    # their type, combined files, filters, time range, cross-row columns and
+    # de-duplication.  Every chart, pivot, stats and insights form uses this one
+    # macro, so a chart is always drawn from the rows the table shows.
+-%]
+[%- MACRO view_hidden BLOCK -%]
+<input type="hidden" name="l" value="[% left_spec | html %]">
+[%- FOREACH jspec IN current_joins -%]<input type="hidden" name="j" value="[% jspec | html %]">[%- END -%]
+[%- IF current_joins.size && view_join_type.length -%]<input type="hidden" name="jtype" value="[% view_join_type | html %]">[%- END -%]
+[%- FOREACH cspec IN combine_specs -%]<input type="hidden" name="c" value="[% cspec | html %]">[%- END -%]
+[%- FOREACH fs IN filter_specs -%]<input type="hidden" name="f" value="[% fs | html %]">[%- END -%]
+[%- range_hidden -%]
+[%- cross_row_params -%]
+[%- IF dedup -%]<input type="hidden" name="d" value="1">[%- END -%]
+[%- END -%]
+
 [%- IF left_spec -%]
 <div class="toolbar">
-  [%- IF filter_specs.size -%]
+  [%- IF filter_specs.size || time_range || cross_row_specs.size -%]
   <span class="filter-chips" id="filter-chip-row">
+    [%- IF time_range -%]
+    <span class="filter-chip filter-chip-range" id="range-chip"
+          data-range="[% time_range.name | html %]"
+          title="Rows are limited to a window worked out from today's date; this stays relative wherever the view is carried to">[% time_range.label | html %] [% time_range.col | html %]<button class="chip-remove" id="chip-remove-range" title="Remove this time range" aria-label="Remove time range">&#x2715;</button></span>
+    [%- END -%]
     [%- FOREACH fs IN filter_specs -%]
     <span class="filter-chip" data-spec="[% fs | html %]">[% fs | html %]<button class="chip-remove" title="Remove this filter" aria-label="Remove filter">&#x2715;</button></span>
+    [%- END -%]
+    [%- FOREACH spec IN cross_row_specs -%]
+    <span class="filter-chip filter-chip-cs" data-cs="[% spec | html %]"
+          title="A column worked out from the rows next to each row; remove it to stop computing it">[% spec | html %]<button class="chip-remove chip-remove-cs" title="Remove this cross-row column" aria-label="Remove cross-row column">&#x2715;</button></span>
     [%- END -%]
   </span>
   <a class="btn-clear-filters" id="btn-clear-filters" href="#">&#x2715; Clear filters</a>
@@ -215,48 +273,52 @@
   <button class="btn-delete-sel" id="btn-delete-sel" type="button" hidden
           title="Remove the selected rows and/or columns from this view">&#x1F5D1; Delete selected</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
-  <button class="btn-graph" id="btn-graph" type="button"
+  <button class="btn-tool btn-graph" id="btn-graph" type="button"
           title="Plot the current data as a line chart - choose the X and Y axes">&#x1F4C8; Line graph&hellip;</button>
-  <button class="btn-pie" id="btn-pie" type="button"
+  <button class="btn-tool btn-pie" id="btn-pie" type="button"
           title="Plot the current data as a pie chart - choose the category and value columns">&#x25D4; Pie chart&hellip;</button>
-  <button class="btn-heatmap" id="btn-heatmap" type="button"
+  <button class="btn-tool btn-heatmap" id="btn-heatmap" type="button"
           title="Plot the current data as a heatmap - choose two categorical columns and an optional value column">&#x229F; Heatmap&hellip;</button>
-  <button class="btn-bar" id="btn-bar" type="button"
+  <button class="btn-tool btn-bar" id="btn-bar" type="button"
           title="Plot the current data as a bar chart - choose a category column and an optional value column">&#x1F4CA; Bar chart&hellip;</button>
-  <button class="btn-stacked" id="btn-stacked" type="button"
+  <button class="btn-tool btn-stacked" id="btn-stacked" type="button"
           title="Plot the current data as a stacked bar chart - choose category, segment, and optional value columns">&#x1F4CA; Stacked bar&hellip;</button>
-  <button class="btn-scatter" id="btn-scatter" type="button"
+  <button class="btn-tool btn-scatter" id="btn-scatter" type="button"
           title="Plot two numeric columns as a scatter plot - both axes must be numeric">&#x2B1C; Scatter&hellip;</button>
-  <button class="btn-combo" id="btn-combo" type="button"
+  <button class="btn-tool btn-combo" id="btn-combo" type="button"
           title="Plot two numeric series as a combo bar+line chart - choose the X axis and two numeric columns">&#x1F4C9; Combo chart&hellip;</button>
-  <button class="btn-treemap" id="btn-treemap" type="button"
+  <button class="btn-tool btn-treemap" id="btn-treemap" type="button"
           title="Plot the current data as a treemap - choose a category column and an optional value column">&#x25A0; Treemap&hellip;</button>
-  <button class="btn-histogram" id="btn-histogram" type="button"
+  <button class="btn-tool btn-histogram" id="btn-histogram" type="button"
           title="Plot the distribution of a numeric column as a histogram">&#x1F4CA; Histogram&hellip;</button>
-  <button class="btn-map" id="btn-map" type="button"
+  <button class="btn-tool btn-wordcloud" id="btn-wordcloud" type="button"
+          title="Show which words a text column repeats - choose a column that holds words, such as a product name or a note">&#x2601; Word cloud&hellip;</button>
+  <button class="btn-tool btn-map" id="btn-map" type="button"
           title="Plot the current rows on a map - use latitude and longitude columns, or geocode a place-name column">&#x1F5FA; Map&hellip;</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
-  <button class="btn-folder" id="btn-folder" type="button"
+  <button class="btn-tool btn-folder" id="btn-folder" type="button"
           title="Browse records grouped by the letter prefix of a code column (e.g. Order # A10, B3, CT4)">&#x1F4C1; Folder view&hellip;</button>
-  <button class="btn-pivot" id="btn-pivot" type="button"
+  <button class="btn-tool btn-pivot" id="btn-pivot" type="button"
           title="Summarise the data as a pivot table - group by row and column dimensions and compute aggregates">&#x25A6; Pivot table&hellip;</button>
-  <button class="btn-stats" id="btn-stats" type="button"
+  <button class="btn-tool btn-stats" id="btn-stats" type="button"
           title="Show column statistics: row count, nulls, distinct values, numeric min, max, mean and median">&#x03A3; Column stats</button>
-  <button class="btn-insights" id="btn-insights" type="button"
+  <button class="btn-tool btn-insights" id="btn-insights" type="button"
           title="Automatic statistical insights: outliers, period-over-period changes, top movers, and seasonality">&#x1F4A1; Insights</button>
   [%- IF ai_available -%]
-  <button class="btn-ask" id="btn-ask" type="button"
+  <button class="btn-tool btn-ask" id="btn-ask" type="button"
           title="Ask a question in plain English; the AI suggests a chart or analysis">&#x1F4AC; Ask&hellip;</button>
   [%- END -%]
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
-  <button class="btn-calc" id="btn-calc" type="button"
+  <button class="btn-tool btn-calc" id="btn-calc" type="button"
           title="Add virtual columns computed from expressions (e.g. revenue-cost). Saved fields are applied automatically whenever this data source is opened.">&fnof;(x) Calc fields&hellip;</button>
-  <button class="btn-groups" id="btn-groups" type="button"
+  <button class="btn-tool btn-cross-row" id="btn-cross-row" type="button"
+          title="Add a column worked out from the rows around each row: a running total, a moving average, a rank or a percent of total">&#x21C9; Cross-row&hellip;</button>
+  <button class="btn-tool btn-groups" id="btn-groups" type="button"
           title="Map column values to group labels (e.g. North+East = Northern). The virtual col_group column can then be used in charts and pivots.">&#x25BC; Group values&hellip;</button>
-  <button class="btn-dates" id="btn-dates" type="button"
+  <button class="btn-tool btn-dates" id="btn-dates" type="button"
           title="Tell the app how date columns are formatted so YEAR(), MONTH() and date sorting work correctly. Saved patterns apply automatically.">&#x1F4C5; Date format&hellip;</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
-  <button class="btn-save-analysis" id="btn-save-analysis" type="button"
+  <button class="btn-tool btn-save-analysis" id="btn-save-analysis" type="button"
           title="A canvas is a dashboard where you can arrange multiple charts and data views side by side. Click to create one and add the current view.">&#x1F4BE; New canvas&hellip;</button>
   [%- END -%]
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
@@ -270,7 +332,7 @@
 </div>
 
 [%- IF left_spec -%]
-<div class="dash-add-filter" id="dash-add-filter">
+<div class="dash-add-filter" id="dash-add-filter" data-spec="[% left_spec | html %]">
   <select id="dash-f-col" aria-label="Column to filter">
     <option value="">&#x2014; filter column &#x2014;</option>
     [%- FOREACH col IN columns -%]
@@ -279,18 +341,38 @@
   </select>
   <select id="dash-f-op" aria-label="Filter operator">
     <option value="eq">equals</option>
-    <option value="ne">not equals</option>
-    <option value="contains">contains</option>
+    <option value="ne">not equal to</option>
+    <option value="contains">matches</option>
     <option value="starts">starts with</option>
-    <option value="lt">less than</option>
-    <option value="le">less or equal</option>
-    <option value="gt">greater than</option>
-    <option value="ge">greater or equal</option>
     <option value="empty">is empty</option>
     <option value="notempty">is not empty</option>
   </select>
-  <input type="text" id="dash-f-val" placeholder="value" aria-label="Filter value">
+  <input type="text"   id="dash-f-val"  placeholder="value"  aria-label="Filter value">
+  <input type="number" id="dash-f-num"  placeholder="number" aria-label="Numeric value" style="display:none">
+  <input type="date"   id="dash-f-date" aria-label="Date"    style="display:none">
+  <input type="date"   id="dash-f-from" style="display:none" aria-label="From date">
+  <span id="dash-f-range-sep" class="dash-f-range-sep" style="display:none">&mdash;</span>
+  <input type="date"   id="dash-f-to"   style="display:none" aria-label="To date">
   <button id="dash-f-apply" class="btn-dash-filter-apply">Apply filter</button>
+
+
+  <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
+  <label for="dash-range-preset" class="dash-f-range-label">Time range</label>
+  <select id="dash-range-preset"
+          title="Show only the rows inside a window worked out from today's date, such as the last 30 days">
+    <option value="">&#x2014; no time range &#x2014;</option>
+    [%- FOREACH rp IN time_range_presets -%]
+    <option value="[% rp.name | html %]" data-lo="[% rp.lo | html %]" data-hi="[% rp.hi | html %]"[% IF time_range and time_range.name == rp.name %] selected[% END %]>[% rp.label | html %]</option>
+    [%- END -%]
+  </select>
+  <select id="dash-range-col" aria-label="Column the time range applies to">
+    <option value="">&#x2014; column &#x2014;</option>
+    [%- FOREACH col IN columns -%]
+    <option value="[% col | html %]"[% IF time_range and time_range.col == col %] selected[% END %]>[% col | html %]</option>
+    [%- END -%]
+  </select>
+  <button id="dash-range-apply" class="btn-dash-filter-apply" type="button"
+          title="Apply the time range to this view">Apply range</button>
 </div>
 [%- END -%]
 
@@ -355,9 +437,14 @@
     [%- FOREACH jspec IN current_joins -%]
     <input type="hidden" name="j" value="[% jspec | html %]">
     [%- END -%]
+    [%- FOREACH cspec IN combine_specs -%]
+    <input type="hidden" name="c" value="[% cspec | html %]">
+    [%- END -%]
     [%- FOREACH fs IN filter_specs -%]
     <input type="hidden" name="f" value="[% fs | html %]" class="f-preserved">
     [%- END -%]
+    [%- range_hidden -%]
+    [%- cross_row_params -%]
 
     <h3 class="join-panel-title">Merge data / Filter results</h3>
 
@@ -450,6 +537,8 @@
     [%- FOREACH fs IN filter_specs -%]
     <input type="hidden" name="f" value="[% fs | html %]">
     [%- END -%]
+    [%- range_hidden -%]
+    [%- cross_row_params -%]
 
     <h3 class="combine-panel-title">Combine data</h3>
 
@@ -499,19 +588,7 @@
 <div class="graph-panel" id="graph-panel" hidden>
   <form id="graph-form" method="get" action="/graph"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH cspec IN combine_specs -%]
-    <input type="hidden" name="c" value="[% cspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
-    [%- IF dedup -%]
-    <input type="hidden" name="d" value="1">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="graph-back-inp" value="">
     <input type="hidden" name="back2" id="graph-back2-inp" value="">
     <input type="hidden" name="back2_label" id="graph-back2-label-inp" value="">
@@ -540,6 +617,43 @@
         </select>
         <input type="text" id="graph-y-text" readonly hidden tabindex="-1">
       </div>
+      <div class="join-field">
+        <label for="graph-span-sel" title="Group the X axis by the hour, day, month or year it falls in">Time bucket</label>
+        <select id="graph-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="graph-agg-sel" title="Add the Y values up per bucket instead of plotting every row">Aggregate</label>
+        <select id="graph-agg-sel">
+          <option value="">None (one point per row)</option>
+          <option value="sum">Sum</option>
+          <option value="avg">Average</option>
+          <option value="min">Min</option>
+          <option value="max">Max</option>
+          <option value="count">Count</option>
+          <option value="count_distinct">Count distinct</option>
+          <option value="median">Median</option>
+          <option value="stdev">Std dev</option>
+          <option value="first">First</option>
+          <option value="last">Last</option>
+          <option value="range">Range</option>
+          <option value="p">Percentile&#x2026;</option>
+        </select>
+      </div>
+      <div class="join-field" id="graph-agg-p-field" hidden>
+        <label for="graph-agg-p" title="Percentile level, 1 to 100">Percentile</label>
+        <input type="number" id="graph-agg-p" min="1" max="100" step="1" value="95"
+               title="Percentile level, 1 to 100">
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -554,16 +668,7 @@
 <div class="graph-panel" id="pie-panel" hidden>
   <form id="pie-form" method="get" action="/pie"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
-    [%- IF dedup -%]
-    <input type="hidden" name="d" value="1">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="pie-back-inp" value="">
     <input type="hidden" name="back2" id="pie-back2-inp" value="">
     <input type="hidden" name="back2_label" id="pie-back2-label-inp" value="">
@@ -603,6 +708,20 @@
         <input type="number" id="pie-topn-inp" name="topn" min="1" placeholder="all"
                style="width:5rem" title="Show only the top N slices; the rest become Other">
       </div>
+      <div class="join-field">
+        <label for="pie-span-sel" title="Group the slices by the hour, day, month or year the column falls in">Time bucket</label>
+        <select id="pie-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -617,16 +736,7 @@
 <div class="graph-panel" id="heatmap-panel" hidden>
   <form id="heatmap-form" method="get" action="/heatmap"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
-    [%- IF dedup -%]
-    <input type="hidden" name="d" value="1">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="heatmap-back-inp" value="">
     <input type="hidden" name="back2" id="heatmap-back2-inp" value="">
     <input type="hidden" name="back2_label" id="heatmap-back2-label-inp" value="">
@@ -674,6 +784,20 @@
           <option value="YlGnBu">Yellow-Green-Blue</option>
         </select>
       </div>
+      <div class="join-field">
+        <label for="heatmap-span-sel" title="Group the X axis by the hour, day, month or year it falls in">Time bucket</label>
+        <select id="heatmap-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -688,16 +812,7 @@
 <div class="graph-panel" id="bar-panel" hidden>
   <form id="bar-form" method="get" action="/bar"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
-    [%- IF dedup -%]
-    <input type="hidden" name="d" value="1">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="bar-back-inp" value="">
     <input type="hidden" name="back2" id="bar-back2-inp" value="">
     <input type="hidden" name="back2_label" id="bar-back2-label-inp" value="">
@@ -745,6 +860,20 @@
         <input type="number" id="bar-topn-inp" name="topn" min="1" placeholder="all"
                style="width:5rem" title="Show only the top N categories; the rest become Other">
       </div>
+      <div class="join-field">
+        <label for="bar-span-sel" title="Group the category by the hour, day, month or year it falls in">Time bucket</label>
+        <select id="bar-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -759,13 +888,7 @@
 <div class="graph-panel" id="stacked-panel" hidden>
   <form id="stacked-form" method="get" action="/stacked"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="stacked-back-inp" value="">
     <input type="hidden" name="back2" id="stacked-back2-inp" value="">
     <input type="hidden" name="back2_label" id="stacked-back2-label-inp" value="">
@@ -808,6 +931,20 @@
           <option value="h">Horizontal</option>
         </select>
       </div>
+      <div class="join-field">
+        <label for="stacked-span-sel" title="Group the category by the hour, day, month or year it falls in">Time bucket</label>
+        <select id="stacked-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -822,13 +959,7 @@
 <div class="graph-panel" id="scatter-panel" hidden>
   <form id="scatter-form" method="get" action="/scatter"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="scatter-back-inp" value="">
     <input type="hidden" name="back2" id="scatter-back2-inp" value="">
     <input type="hidden" name="back2_label" id="scatter-back2-label-inp" value="">
@@ -899,13 +1030,7 @@
 <div class="graph-panel" id="combo-panel" hidden>
   <form id="combo-form" method="get" action="/combo"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="combo-back-inp" value="">
     <input type="hidden" name="back2" id="combo-back2-inp" value="">
     <input type="hidden" name="back2_label" id="combo-back2-label-inp" value="">
@@ -935,6 +1060,20 @@
           <option value="">&#x2014; select column &#x2014;</option>
         </select>
       </div>
+      <div class="join-field">
+        <label for="combo-span-sel" title="Group the X axis by the hour, day, month or year it falls in">Time bucket</label>
+        <select id="combo-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -949,13 +1088,7 @@
 <div class="graph-panel" id="treemap-panel" hidden>
   <form id="treemap-form" method="get" action="/treemap"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="treemap-back-inp" value="">
     <input type="hidden" name="back2" id="treemap-back2-inp" value="">
     <input type="hidden" name="back2_label" id="treemap-back2-label-inp" value="">
@@ -987,6 +1120,20 @@
         <input type="number" id="treemap-topn-inp" name="topn" min="1" placeholder="all"
                style="width:5rem" title="Show only the top N tiles; the rest become Other">
       </div>
+      <div class="join-field">
+        <label for="treemap-span-sel" title="Group the rectangles by the hour, day, month or year the column falls in">Time bucket</label>
+        <select id="treemap-span-sel" name="span">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <div class="graph-btn-row">
@@ -1001,13 +1148,7 @@
 <div class="graph-panel" id="histogram-panel" hidden>
   <form id="histogram-form" method="get" action="/histogram"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="histogram-back-inp" value="">
     <input type="hidden" name="back2" id="histogram-back2-inp" value="">
     <input type="hidden" name="back2_label" id="histogram-back2-label-inp" value="">
@@ -1038,22 +1179,135 @@
   </form>
 </div>
 
+<div class="graph-panel" id="wordcloud-panel" hidden>
+  <form id="wordcloud-form" method="get" action="/wordcloud"
+        data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
+    [%- view_hidden -%]
+    <input type="hidden" name="back" id="wordcloud-back-inp" value="">
+    <input type="hidden" name="back2" id="wordcloud-back2-inp" value="">
+    <input type="hidden" name="back2_label" id="wordcloud-back2-label-inp" value="">
+
+    <h3 class="graph-panel-title">&#x2601; Word cloud</h3>
+    <p class="graph-panel-desc">Choose a column that holds words, such as a product name or a note. The cloud shows which words appear in the most rows.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="wordcloud-col-sel">Text column</label>
+        <select id="wordcloud-col-sel" name="col" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="wordcloud-topn-inp">Words to show</label>
+        <input type="number" id="wordcloud-topn-inp" name="topn" min="1" max="500" value="50"
+               style="width:5rem">
+      </div>
+      <div class="join-field">
+        <label for="wordcloud-minlen-inp">Shortest word</label>
+        <input type="number" id="wordcloud-minlen-inp" name="minlen" min="1" max="64" value="3"
+               style="width:5rem">
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-wordcloud" class="btn-primary" disabled>Draw cloud</button>
+          <button type="button" id="btn-cancel-wordcloud" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="cross-row-panel" hidden>
+  [%- # No action attribute: the panel edits three parameters of the view it is
+      # open on, and the hidden inputs carry the rest, so submitting it changes
+      # only what it shows.  The cs= inputs are the columns already computed:
+      # adding a second one must not throw the first away.
+  -%]
+  <form id="cross-row-form" method="get">
+    [%- FOREACH h IN cross_row_hidden -%]
+    <input type="hidden" name="[% h.name | html %]" value="[% h.value | html %]">
+    [%- END -%]
+    [%- FOREACH spec IN cross_row_specs -%]
+    <input type="hidden" name="cs" value="[% spec | html %]">
+    [%- END -%]
+
+    <h3 class="graph-panel-title">&#x21C9; Cross-row columns</h3>
+    <p class="graph-panel-desc">A cross-row column is worked out from the rows around each row, not from the row alone. It is added to the table, and a chart can then use it like any other number column.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="cross-row-col-sel">Number column</label>
+        <select id="cross-row-col-sel">
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="cross-row-fn-sel">Work out</label>
+        <select id="cross-row-fn-sel">
+          [%- FOREACH fn IN cross_row_menu -%]
+          <option value="[% fn.name | html %]" data-arg="[% fn.arg %]" data-order="[% fn.order %]">[% fn.label | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field" id="cross-row-window-field" hidden>
+        <label for="cross-row-window-inp">Window (rows)</label>
+        <input type="number" id="cross-row-window-inp" min="1" max="100000" value="7"
+               style="width:6rem">
+      </div>
+      <div class="join-field">
+        <label for="cross-row-alias-inp">New column name</label>
+        <input type="text" id="cross-row-alias-inp" placeholder="e.g. running_total"
+               style="width:11rem">
+      </div>
+    </div>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="cross-row-order-sel">Read rows in order of</label>
+        <select id="cross-row-order-sel" data-current="[% IF cross_row_order.size %][% cross_row_order.0 | html %][% END %]">
+          <option value="">&#x2014; none &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="cross-row-dir-sel">Direction</label>
+        <select id="cross-row-dir-sel">
+          <option value="asc">Low to high</option>
+          <option value="desc">High to low</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="cross-row-by-sel">Restart for each</label>
+        <select id="cross-row-by-sel" name="by" data-current="[% cross_row_by | html %]">
+          <option value="">&#x2014; the whole table &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-cross-row" class="btn-primary" disabled>Add column</button>
+          <button type="button" id="btn-cancel-cross-row" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="graph-panel-desc">A running total, a moving average, a change and a percent change need an order. <em>Percent of total</em>, <em>Rank</em> and <em>Z-score</em> read the whole table and do not.</p>
+  </form>
+</div>
+
 <div class="graph-panel" id="map-panel" hidden>
   <form id="map-form" method="get" action="/map"
         data-parent-back="[% back_url | html %]" data-parent-back-label="[% back_label | html %]">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH cspec IN combine_specs -%]
-    <input type="hidden" name="c" value="[% cspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
-    [%- IF dedup -%]
-    <input type="hidden" name="d" value="1">
-    [%- END -%]
+    [%- view_hidden -%]
     <input type="hidden" name="back" id="map-back-inp" value="">
     <input type="hidden" name="back2" id="map-back2-inp" value="">
     <input type="hidden" name="back2_label" id="map-back2-label-inp" value="">
@@ -1207,13 +1461,7 @@
 
 <div class="graph-panel" id="pivot-panel" hidden>
   <form id="pivot-form" method="get" action="/pivot">
-    <input type="hidden" name="l" value="[% left_spec | html %]">
-    [%- FOREACH jspec IN current_joins -%]
-    <input type="hidden" name="j" value="[% jspec | html %]">
-    [%- END -%]
-    [%- FOREACH fs IN filter_specs -%]
-    <input type="hidden" name="f" value="[% fs | html %]">
-    [%- END -%]
+    [%- view_hidden -%]
 
     <h3 class="graph-panel-title">&#x25A6; Pivot table</h3>
     <p class="graph-panel-desc">Group and aggregate data into a crosstab. Dimensions become the row and column headers; measures compute a value for each cell.</p>
@@ -1251,6 +1499,24 @@
         <input type="text" id="pivot-topn-col-inp" name="topn_col" placeholder="measure alias"
                style="width:9rem;margin-left:0.3rem">
       </span>
+      <span style="margin-left:0.75rem;white-space:nowrap" title="Group a row dimension by the hour, day, month or year it falls in">
+        Time bucket
+        <select id="pivot-span-sel" name="span" style="margin-left:0.3rem">
+          <option value="">None</option>
+          <option value="15m">15 minutes</option>
+          <option value="1h">1 hour</option>
+          <option value="6h">6 hours</option>
+          <option value="1d">1 day</option>
+          <option value="1w">1 week</option>
+          <option value="1mon">1 month</option>
+          <option value="1q">1 quarter</option>
+          <option value="1y">1 year</option>
+        </select>
+      </span>
+      <span id="pivot-tcol-wrap" hidden style="margin-left:0.75rem;white-space:nowrap" title="Which row dimension the bucket replaces">
+        of column
+        <select id="pivot-tcol-sel" name="tcol" style="margin-left:0.3rem"></select>
+      </span>
     </div>
 
     <div class="join-actions">
@@ -1262,7 +1528,7 @@
 
 <div class="graph-panel" id="calc-panel" hidden>
   <h3 class="graph-panel-title">&fnof;(x) Calculated columns</h3>
-  <p class="graph-panel-desc">Define virtual columns from expressions. Column names are variables; supports +, -, *, /, IF(), YEAR(), MONTH(), bin(), and more. Saved fields are applied automatically when this data source is opened.</p>
+  <p class="graph-panel-desc">Define virtual columns from expressions. Column names are variables; supports +, -, *, /, IF(), YEAR(), MONTH(), bin(), hour(), epoch(), span() and more. span(at,'1h') groups a timestamp column by the hour it falls in, which is how a table gets a time bucket. Saved fields are applied automatically when this data source is opened.</p>
   <div id="calc-field-list" style="margin-bottom:0.5rem"></div>
   <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
     <div class="join-field" style="flex:0 0 auto;min-width:8rem">
@@ -1324,7 +1590,7 @@
 
 <div class="graph-panel" id="dates-panel" hidden>
   <h3 class="graph-panel-title">&#x1F4C5; Date column formats</h3>
-  <p class="graph-panel-desc">Tell the app how date columns are formatted so YEAR(), MONTH(), DAY(), QUARTER() and date sorting work correctly. Saved patterns are applied automatically when this data source is opened.</p>
+  <p class="graph-panel-desc">Tell the app how date columns are formatted so YEAR(), MONTH(), DAY(), QUARTER() and date sorting work correctly. A column that also holds a clock time becomes a timestamp, which hour() and a time bucket can then read. Saved patterns are applied automatically when this data source is opened.</p>
   <div id="dates-list" style="margin-bottom:0.5rem"></div>
   <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
     <div class="join-field" style="flex:0 0 auto;min-width:10rem">
@@ -1342,6 +1608,14 @@
         <option value="%m/%d/%Y">M/D/YYYY &mdash; US (12/31/2025)</option>
         <option value="%d/%m/%Y">D/M/YYYY &mdash; EU (31/12/2025)</option>
         <option value="%d-%b-%Y">D-Mon-YYYY (31-Dec-2025)</option>
+      </select>
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:11rem">
+      <label for="dates-time-sel" title="Set this when the column holds a clock time as well as a date">Clock time</label>
+      <select id="dates-time-sel">
+        <option value="">None (date only)</option>
+        <option value="%H:%M">HH:MM (14:05)</option>
+        <option value="%H:%M:%S">HH:MM:SS (14:05:09)</option>
       </select>
     </div>
     <div style="padding-bottom:0.2rem">
@@ -1362,18 +1636,12 @@
 </div>
 
 <form id="stats-form" method="get" action="/stats" style="display:none">
-  <input type="hidden" name="l" value="[% left_spec | html %]">
-  [%- FOREACH fs IN filter_specs -%]
-  <input type="hidden" name="f" value="[% fs | html %]">
-  [%- END -%]
+  [%- view_hidden -%]
   <input type="hidden" name="back" id="stats-form-back" value="">
   <input type="hidden" name="back_label" value="Back to table">
 </form>
 <form id="insights-form" method="get" action="/insights" style="display:none">
-  <input type="hidden" name="l" value="[% left_spec | html %]">
-  [%- FOREACH fs IN filter_specs -%]
-  <input type="hidden" name="f" value="[% fs | html %]">
-  [%- END -%]
+  [%- view_hidden -%]
   <input type="hidden" name="back" id="insights-form-back" value="">
   <input type="hidden" name="back_label" value="Back to table">
 </form>
@@ -1434,6 +1702,33 @@ dragging it moves it.</p>
 [% END %]
 
 <script>
+// One toolbar panel open at a time.  BI_PANELS is the only list of them:
+// opening a panel calls biClosePanels(itself), which hides every other one.
+// Merge, Combine and Export disable their own button while their panel is
+// open, so closing one of those from here hands its button back.
+var BI_PANELS = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel',
+  'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel',
+  'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel',
+  'cross-row-panel', 'wordcloud-panel', 'folder-panel', 'pivot-panel',
+  'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel',
+  'map-panel'];
+var BI_PANEL_OPENERS = { 'join-panel': 'btn-add-db', 'combine-panel': 'btn-combine',
+  'export-panel': 'btn-export-open' };
+function biClosePanels(keep) {
+  BI_PANELS.forEach(function (id) {
+    var p = document.getElementById(id);
+    if (!p || p === keep || p.hidden) return;
+    p.hidden = true;
+    var b = BI_PANEL_OPENERS[id] && document.getElementById(BI_PANEL_OPENERS[id]);
+    if (b) b.disabled = false;
+    // An open Combine panel takes over file drops; a closed one gives them back.
+    if (id === 'combine-panel') {
+      window.__biDropLabel    = null;
+      window.__biDropCallback = null;
+    }
+  });
+}
+
 // parseAccounting is defined at module scope (outside any IIFE) so it is
 // accessible from all script blocks on this page -- the sort block uses it for
 // numeric column detection, and the graph panel's isNumericVal delegates to it.
@@ -1444,6 +1739,93 @@ function parseAccounting(v) {
   s = s.replace(/[^\d.\-]/g, '');    // strip $, commas, parens, spaces, etc.
   var n = parseFloat(s);
   return isNaN(n) ? NaN : (neg ? -Math.abs(n) : n);
+}
+
+// Scan the rendered rows of a named column and return {min, max} ISO dates,
+// or null when the column has no parseable date values.
+// Used as an instant first estimate; /api/range supplies the full-dataset answer.
+function biDateRangeDOM(colName) {
+  var tbl = document.getElementById('bi-table');
+  if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return null;
+  var headers = Array.from(tbl.tHead.rows[0].cells);
+  var colIdx  = -1;
+  for (var i = 0; i < headers.length; i++) {
+    if (headers[i].textContent.trim() === colName) { colIdx = i; break; }
+  }
+  if (colIdx < 0) return null;
+  var isoRE = /^(\d{4})-(\d{2})-(\d{2})$/;
+  var mdyRE = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+  var dates = [];
+  Array.from(tbl.tBodies[0].rows).forEach(function (r) {
+    var cell = r.cells[colIdx];
+    if (!cell) return;
+    var v = cell.textContent.trim();
+    var m;
+    if (isoRE.test(v)) {
+      dates.push(v);
+    } else if ((m = mdyRE.exec(v))) {
+      dates.push(m[3] + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2));
+    }
+  });
+  if (!dates.length) return null;
+  dates.sort();
+  return { min: dates[0], max: dates[dates.length - 1] };
+}
+
+// Apply {min, max} to an array of date inputs.
+function biApplyRange(inputs, range) {
+  var lo = range ? range.min : '';
+  var hi = range ? range.max : '';
+  inputs.forEach(function (inp) { inp.min = lo; inp.max = hi; });
+}
+
+// Set min/max on date inputs for colName: disable inputs while fetching the
+// full-dataset range from /api/range so the calendar can't open with a
+// page-only estimate; re-enable (with correct min/max) when the response
+// arrives.  Falls back to the DOM estimate on fetch error.
+function biSetDateRange(colName, inputs) {
+  var domRange = biDateRangeDOM(colName);
+  var spec = (document.getElementById('dash-add-filter') || {}).dataset;
+  var lSpec = spec ? (spec.spec || '') : '';
+  if (!lSpec || !colName) {
+    biApplyRange(inputs, domRange);
+    return;
+  }
+  inputs.forEach(function (inp) { inp.disabled = true; inp.title = 'Loading date range\u2026'; });
+  fetch('/api/range?l=' + encodeURIComponent(lSpec) + '&col=' + encodeURIComponent(colName))
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      biApplyRange(inputs, (d && d.min && d.max) ? d : domRange);
+      inputs.forEach(function (inp) { inp.disabled = false; inp.title = ''; });
+    })
+    .catch(function () {
+      biApplyRange(inputs, domRange);
+      inputs.forEach(function (inp) { inp.disabled = false; inp.title = ''; });
+    });
+}
+
+// Detect the data type of a named column by sampling the rendered table rows.
+// Returns 'date', 'numeric', or 'string'.
+function biDetectColType(colName) {
+  var tbl = document.getElementById('bi-table');
+  if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return 'string';
+  var headers = Array.from(tbl.tHead.rows[0].cells);
+  var colIdx  = -1;
+  for (var i = 0; i < headers.length; i++) {
+    if (headers[i].textContent.trim() === colName) { colIdx = i; break; }
+  }
+  if (colIdx < 0) return 'string';
+  var rows = Array.from(tbl.tBodies[0].rows).slice(0, 30);
+  var vals = rows.map(function (r) {
+    return r.cells[colIdx] ? r.cells[colIdx].textContent.trim() : '';
+  }).filter(function (v) { return v !== ''; });
+  if (vals.length === 0) return 'string';
+  var dateRE  = /^\d{4}-\d{2}-\d{2}$|^\d{1,2}\/\d{1,2}\/\d{4}$|^\d{1,2}-[A-Za-z]{3}-\d{4}$/;
+  var dateCnt = vals.filter(function (v) { return dateRE.test(v); }).length;
+  if (dateCnt / vals.length >= 0.7) return 'date';
+  var numCnt  = vals.filter(function (v) { return !isNaN(parseAccounting(v)); }).length;
+  if (numCnt / vals.length >= 0.7) return 'numeric';
+  return 'string';
 }
 
 (function () {
@@ -1951,19 +2333,11 @@ function parseAccounting(v) {
   var rightLabel = '';
   var joinSpec   = '';
 
-  // Operator definitions.
-  var OPS = [
-    ['eq',       'equals'],
-    ['ne',       'not equals'],
-    ['contains', 'contains'],
-    ['starts',   'starts with'],
-    ['lt',       '<'],
-    ['le',       '<='],
-    ['gt',       '>'],
-    ['ge',       '>='],
-    ['empty',    'is empty'],
-    ['notempty', 'is not empty'],
-  ];
+  // Operator definitions -- three sets, chosen by column type.
+  var OPS_STRING  = [['eq','equals'],['ne','not equal to'],['contains','matches'],['starts','starts with'],['empty','is empty'],['notempty','is not empty']];
+  var OPS_NUMERIC = [['eq','equals'],['ne','not equals'],['lt','<'],['le','<='],['gt','>'],['ge','>='],['empty','is empty'],['notempty','is not empty']];
+  var OPS_DATE    = [['eq','on date'],['ne','not on date'],['lt','before'],['le','on or before'],['gt','after'],['ge','on or after'],['between','date range'],['empty','is empty'],['notempty','is not empty']];
+  var OPS = OPS_STRING; // default for join panel (kept for external callers)
 
   // --- Filter row management ---
 
@@ -1995,30 +2369,106 @@ function parseAccounting(v) {
     var colSel = document.createElement('select');
     colSel.className = 'filter-col-sel';
     populateColSelect(colSel, prefill.col || '');
-    colSel.addEventListener('change', checkApply);
 
     var opSel = document.createElement('select');
     opSel.className = 'filter-op-sel';
-    OPS.forEach(function (pair) {
-      var opt = document.createElement('option');
-      opt.value = pair[0]; opt.textContent = pair[1];
-      opSel.appendChild(opt);
-    });
-    opSel.value = prefill.op || 'eq';
+
+    var rowColType = 'string';
+
+    function rebuildRowOps(ops, keepOp) {
+      opSel.innerHTML = '';
+      ops.forEach(function (pair) {
+        var opt = document.createElement('option');
+        opt.value = pair[0]; opt.textContent = pair[1];
+        opSel.appendChild(opt);
+      });
+      opSel.value = keepOp || ops[0][0];
+    }
+
+    function applyRowDateRange(col) {
+      biSetDateRange(col, [dateInp, fromInp, toInp]);
+    }
+
+    // Pre-build ops with prefill column type if known, otherwise string.
+    var initialOps = OPS_STRING;
+    if (prefill.col) {
+      rowColType  = biDetectColType(prefill.col);
+      initialOps  = rowColType === 'date' ? OPS_DATE
+                  : rowColType === 'numeric' ? OPS_NUMERIC
+                  : OPS_STRING;
+      if (rowColType === 'date') applyRowDateRange(prefill.col);
+    }
+    rebuildRowOps(initialOps, prefill.op || 'eq');
 
     var valInp = document.createElement('input');
     valInp.type = 'text';
     valInp.className = 'filter-val-inp';
     valInp.placeholder = 'value';
-    valInp.value = prefill.val !== undefined ? prefill.val : '';
+    valInp.value = (prefill.op !== 'between' && rowColType !== 'date' && rowColType !== 'numeric' && prefill.val !== undefined) ? prefill.val : '';
+
+    var numInp = document.createElement('input');
+    numInp.type = 'number';
+    numInp.className = 'filter-num-inp';
+    numInp.placeholder = 'number';
+    numInp.style.display = 'none';
+    if (rowColType === 'numeric' && prefill.val !== undefined) numInp.value = prefill.val;
+
+    var dateInp = document.createElement('input');
+    dateInp.type = 'date';
+    dateInp.className = 'filter-date-inp';
+    dateInp.style.display = 'none';
+    if (rowColType === 'date' && prefill.op !== 'between' && prefill.val) dateInp.value = prefill.val;
+
+    var fromInp = document.createElement('input');
+    fromInp.type = 'date';
+    fromInp.className = 'filter-from-inp';
+    fromInp.style.display = 'none';
+
+    var sepSpan = document.createElement('span');
+    sepSpan.textContent = '\u2014';
+    sepSpan.className = 'filter-range-sep';
+    sepSpan.style.cssText = 'display:none;font-size:0.82rem;color:#666';
+
+    var toInp = document.createElement('input');
+    toInp.type = 'date';
+    toInp.className = 'filter-to-inp';
+    toInp.style.display = 'none';
+
+    if (prefill.op === 'between' && prefill.val) {
+      var bparts = prefill.val.split(':');
+      fromInp.value = bparts[0] || '';
+      toInp.value   = bparts[1] || '';
+    }
 
     function toggleValInp() {
-      var hide = opSel.value === 'empty' || opSel.value === 'notempty';
-      valInp.style.display = hide ? 'none' : '';
+      var op        = opSel.value;
+      var isBetween = op === 'between';
+      var isUnary   = op === 'empty' || op === 'notempty';
+      var isDate    = rowColType === 'date';
+      var isNumeric = rowColType === 'numeric';
+      valInp.style.display  = (!isDate && !isNumeric && !isUnary) ? '' : 'none';
+      numInp.style.display  = (isNumeric && !isUnary)             ? '' : 'none';
+      dateInp.style.display = (isDate && !isUnary && !isBetween)  ? '' : 'none';
+      fromInp.style.display = (isDate && isBetween)               ? '' : 'none';
+      sepSpan.style.display = (isDate && isBetween)               ? '' : 'none';
+      toInp.style.display   = (isDate && isBetween)               ? '' : 'none';
       checkApply();
     }
+
+    colSel.addEventListener('change', function () {
+      rowColType = colSel.value ? biDetectColType(colSel.value) : 'string';
+      var ops = rowColType === 'date' ? OPS_DATE
+              : rowColType === 'numeric' ? OPS_NUMERIC
+              : OPS_STRING;
+      rebuildRowOps(ops, opSel.value);
+      if (rowColType === 'date') applyRowDateRange(colSel.value);
+      toggleValInp();
+      checkApply();
+    });
     opSel.addEventListener('change', toggleValInp);
     toggleValInp();
+    fromInp.addEventListener('change', function () { if (fromInp.value) toInp.min   = fromInp.value; });
+    toInp.addEventListener('change',   function () { if (toInp.value)   fromInp.max = toInp.value;   });
 
     var rmBtn = document.createElement('button');
     rmBtn.type = 'button';
@@ -2029,6 +2479,11 @@ function parseAccounting(v) {
     row.appendChild(colSel);
     row.appendChild(opSel);
     row.appendChild(valInp);
+    row.appendChild(numInp);
+    row.appendChild(dateInp);
+    row.appendChild(fromInp);
+    row.appendChild(sepSpan);
+    row.appendChild(toInp);
     row.appendChild(rmBtn);
     filterRows.appendChild(row);
     checkApply();
@@ -2149,9 +2604,20 @@ function parseAccounting(v) {
     document.querySelectorAll('#filter-rows .filter-row').forEach(function (row) {
       var col = row.querySelector('.filter-col-sel').value;
       var op  = row.querySelector('.filter-op-sel').value;
-      var valEl = row.querySelector('.filter-val-inp');
-      var val = (valEl && valEl.style.display !== 'none') ? valEl.value : '';
       if (!col || !op) return;
+      var val;
+      if (op === 'between') {
+        var fromEl = row.querySelector('.filter-from-inp');
+        var toEl   = row.querySelector('.filter-to-inp');
+        val = (fromEl && toEl) ? fromEl.value + ':' + toEl.value : ':';
+      } else {
+        var numEl  = row.querySelector('.filter-num-inp');
+        var dateEl = row.querySelector('.filter-date-inp');
+        var txtEl  = row.querySelector('.filter-val-inp');
+        if (numEl && numEl.style.display !== 'none')  { val = numEl.value;  }
+        else if (dateEl && dateEl.style.display !== 'none') { val = dateEl.value; }
+        else { val = (txtEl && txtEl.style.display !== 'none') ? txtEl.value : ''; }
+      }
       var fInp = document.createElement('input');
       fInp.type = 'hidden'; fInp.name = 'f';
       fInp.setAttribute('data-dyn', '1');
@@ -2168,13 +2634,7 @@ function parseAccounting(v) {
   // --- Open/close ---
 
   btnAdd.addEventListener('click', function () {
-    // Close combine panel if open.
-    var combinePanel = document.getElementById('combine-panel');
-    var btnCombine   = document.getElementById('btn-combine');
-    if (combinePanel && !combinePanel.hidden) {
-      combinePanel.hidden      = true;
-      if (btnCombine) btnCombine.disabled = false;
-    }
+    biClosePanels(panel);
     panel.hidden    = false;
     btnAdd.disabled = true;
     // Pre-populate filter rows from server-rendered filter state.
@@ -2212,6 +2672,10 @@ function parseAccounting(v) {
       e.preventDefault();
       var u = new URL(location.href);
       u.searchParams.delete('f');
+      // A relative range is a filter of this view, so clearing the filters
+      // clears it too rather than leaving an invisible window in force.
+      u.searchParams.delete('range');
+      u.searchParams.delete('rcol');
       location.href = u.toString();
     });
   }
@@ -2282,22 +2746,210 @@ function parseAccounting(v) {
     });
   });
 
+  // Remove one cross-row column chip.  Its spec is not an f= filter, so it has
+  // a button of its own rather than being read by the loop above.  Removing the
+  // last one drops by=/order= with it: without a cs= they shape nothing, and
+  // leaving them would make the next column inherit a partition the reader
+  // thought they had removed.
+  document.querySelectorAll('.chip-remove-cs').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var chip = btn.closest('[data-cs]');
+      var spec = chip ? chip.getAttribute('data-cs') : '';
+      if (!spec) return;
+      var u = new URL(location.href);
+      var kept = u.searchParams.getAll('cs').filter(function (v) { return v !== spec; });
+      u.searchParams.delete('cs');
+      kept.forEach(function (v) { u.searchParams.append('cs', v); });
+      if (!kept.length) {
+        u.searchParams.delete('by');
+        u.searchParams.delete('order');
+      }
+      location.href = u.toString();
+    });
+  });
+
   // Apply a new filter condition from the quick-filter bar.
   var applyBtn = document.getElementById('dash-f-apply');
   if (applyBtn) {
+    var quickColSel = document.getElementById('dash-f-col');
+    var quickOpSel  = document.getElementById('dash-f-op');
+    var quickVal    = document.getElementById('dash-f-val');
+    var quickNum    = document.getElementById('dash-f-num');
+    var quickDate   = document.getElementById('dash-f-date');
+    var quickFrom   = document.getElementById('dash-f-from');
+    var quickSep    = document.getElementById('dash-f-range-sep');
+    var quickTo     = document.getElementById('dash-f-to');
+
+    var Q_OPS_STRING  = [['eq','equals'],['ne','not equal to'],['contains','matches'],['starts','starts with'],['empty','is empty'],['notempty','is not empty']];
+    var Q_OPS_NUMERIC = [['eq','equals'],['ne','not equals'],['lt','<'],['le','<='],['gt','>'],['ge','>='],['empty','is empty'],['notempty','is not empty']];
+    var Q_OPS_DATE    = [['eq','on date'],['ne','not on date'],['lt','before'],['le','on or before'],['gt','after'],['ge','on or after'],['between','date range'],['empty','is empty'],['notempty','is not empty']];
+
+    var quickColType = 'string';
+
+    function rebuildQuickOps(ops, keepOp) {
+      quickOpSel.innerHTML = '';
+      ops.forEach(function (pair) {
+        var opt = document.createElement('option');
+        opt.value = pair[0]; opt.textContent = pair[1];
+        quickOpSel.appendChild(opt);
+      });
+      quickOpSel.value = keepOp || ops[0][0];
+    }
+
+    function toggleQuickInputs() {
+      var op        = quickOpSel.value;
+      var isBetween = op === 'between';
+      var isUnary   = op === 'empty' || op === 'notempty';
+      var isDate    = quickColType === 'date';
+      var isNumeric = quickColType === 'numeric';
+      quickVal.style.display  = (!isDate && !isNumeric && !isUnary) ? '' : 'none';
+      quickNum.style.display  = (isNumeric && !isUnary)             ? '' : 'none';
+      quickDate.style.display = (isDate && !isUnary && !isBetween)  ? '' : 'none';
+      quickFrom.style.display = (isDate && isBetween)               ? '' : 'none';
+      quickSep.style.display  = (isDate && isBetween)               ? '' : 'none';
+      quickTo.style.display   = (isDate && isBetween)               ? '' : 'none';
+    }
+
+    function applyQuickDateRange(col) {
+      biSetDateRange(col, [quickDate, quickFrom, quickTo]);
+    }
+
+    quickColSel.addEventListener('change', function () {
+      var col = quickColSel.value;
+      quickColType = col ? biDetectColType(col) : 'string';
+      var ops = quickColType === 'date' ? Q_OPS_DATE
+              : quickColType === 'numeric' ? Q_OPS_NUMERIC
+              : Q_OPS_STRING;
+      rebuildQuickOps(ops, quickOpSel.value);
+      if (quickColType === 'date') applyQuickDateRange(col);
+      toggleQuickInputs();
+    });
+    quickOpSel.addEventListener('change', toggleQuickInputs);
+    toggleQuickInputs();
+    quickFrom.addEventListener('change', function () { if (quickFrom.value) quickTo.min = quickFrom.value; });
+    quickTo.addEventListener('change',   function () { if (quickTo.value)   quickFrom.max = quickTo.value; });
+
     applyBtn.addEventListener('click', function () {
-      var col = document.getElementById('dash-f-col').value;
-      var op  = document.getElementById('dash-f-op').value;
-      var val = document.getElementById('dash-f-val').value;
+      var col = quickColSel.value;
+      var op  = quickOpSel.value;
       if (!col || !op) return;
+      var val;
+      if (op === 'between') {
+        var from = quickFrom.value;
+        var to   = quickTo.value;
+        if (!from || !to) return;
+        val = from + ':' + to;
+      } else if (quickColType === 'date' && quickDate.style.display !== 'none') {
+        val = quickDate.value;
+      } else if (quickColType === 'numeric' && quickNum.style.display !== 'none') {
+        val = quickNum.value;
+      } else {
+        val = quickVal.value;
+      }
       var u = new URL(location.href);
       u.searchParams.append('f', col + ':' + op + ':' + val);
       location.href = u.toString();
     });
-    document.getElementById('dash-f-val').addEventListener('keydown', function (e) {
+    quickVal.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') applyBtn.click();
+    });
+    quickNum.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') applyBtn.click();
     });
   }
+}());
+
+// ---------------------------------------------------------------------------
+// Relative time range
+//
+// The named window travels in the URL as range= and rcol=, and the server
+// resolves it on every request, so the view stays relative wherever it is
+// carried to.  Nothing here computes a date: the resolved bounds are rendered
+// into each option, and they are used for one thing only -- telling the reader
+// which windows the data cannot answer, using the column's own earliest and
+// latest value from /api/range.
+// ---------------------------------------------------------------------------
+(function () {
+  var presetSel = document.getElementById('dash-range-preset');
+  var colSel    = document.getElementById('dash-range-col');
+  var applyBtn  = document.getElementById('dash-range-apply');
+  if (!presetSel || !colSel || !applyBtn) return;
+
+  var addPanel = document.getElementById('dash-add-filter');
+  var spec     = addPanel ? addPanel.getAttribute('data-spec') : '';
+
+  function go(name, col) {
+    var u = new URL(location.href);
+    if (name && col) {
+      u.searchParams.set('range', name);
+      u.searchParams.set('rcol', col);
+    } else {
+      u.searchParams.delete('range');
+      u.searchParams.delete('rcol');
+    }
+    location.href = u.toString();
+  }
+
+  function ask(name, col) {
+    if (!name)       { go('', '');  return; }
+    if (!col)        { colSel.focus(); return; }
+    go(name, col);
+  }
+
+  // A window that ends before the column's earliest value, or starts after its
+  // latest, has no rows to show.  /api/range answers from the whole dataset, so
+  // the menu can say so before the reader picks it rather than after.
+  function boundPresets() {
+    Array.from(presetSel.options).forEach(function (o) {
+      o.disabled = false;
+      o.removeAttribute('title');
+    });
+
+    var col = colSel.value;
+    if (!col || !spec) return;
+
+    fetch('/api/range?l=' + encodeURIComponent(spec) + '&col=' + encodeURIComponent(col))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.min || !d.max) return;
+        var min = String(d.min).slice(0, 10);
+        var max = String(d.max).slice(0, 10);
+        Array.from(presetSel.options).forEach(function (o) {
+          var lo = o.getAttribute('data-lo');
+          var hi = o.getAttribute('data-hi');
+          if (!lo || !hi) return;
+          if (hi.slice(0, 10) < min || lo.slice(0, 10) > max) {
+            o.disabled = true;
+            o.title = 'No rows in this window: ' + col + ' runs from ' + min + ' to ' + max;
+          }
+        });
+      })
+      .catch(function () {});
+  }
+
+  // A range needs a column.  Offer the first one that looks like a date, so
+  // the common case is one click rather than two.
+  if (!colSel.value) {
+    var dateCol = '';
+    for (var i = 0; i < colSel.options.length && !dateCol; i++) {
+      var v = colSel.options[i].value;
+      if (v && biDetectColType(v) === 'date') dateCol = v;
+    }
+    if (dateCol) colSel.value = dateCol;
+  }
+
+  presetSel.addEventListener('change', function () {
+    ask(presetSel.value, colSel.value);
+  });
+  colSel.addEventListener('change', boundPresets);
+  applyBtn.addEventListener('click', function () {
+    ask(presetSel.value, colSel.value);
+  });
+
+  var chip = document.getElementById('chip-remove-range');
+  if (chip) chip.addEventListener('click', function () { go('', ''); });
+
+  boundPresets();
 }());
 
 // Dedup button -- toggle d=1 in the URL and reload
@@ -2328,8 +2980,6 @@ function parseAccounting(v) {
   var tblSel      = document.getElementById('combine-table-sel');
   var pathInp     = document.getElementById('combine-path-inp');
   var combineForm = document.getElementById('combine-form');
-  var joinPanel   = document.getElementById('join-panel');
-  var btnMerge    = document.getElementById('btn-add-db');
 
   var combineSpec = '';
   var pathTimer;
@@ -2392,11 +3042,7 @@ function parseAccounting(v) {
   });
 
   btnCombine.addEventListener('click', function () {
-    // Close merge panel if open.
-    if (joinPanel && !joinPanel.hidden) {
-      joinPanel.hidden    = true;
-      if (btnMerge) btnMerge.disabled = false;
-    }
+    biClosePanels(panel);
     panel.hidden        = false;
     btnCombine.disabled = true;
     registerDropHooks();
@@ -2432,9 +3078,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('graph-back2-label-inp');
   var graphForm     = document.getElementById('graph-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkPlot() {
     btnDo.disabled = !(xSel.value && ySel.value);
@@ -2508,7 +3151,7 @@ function parseAccounting(v) {
   }());
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     // Propagate this page's back-link as back2 so the chart page can build a
     // three-level breadcrumb (e.g. Home > Store schema > Table view > Graph).
@@ -2525,6 +3168,43 @@ function parseAccounting(v) {
 
   btnCancel && btnCancel.addEventListener('click', function () {
     panel.hidden = true;
+  });
+
+  // A percentile is written into the function name -- p95 -- because agg= is
+  // one function, the way a pivot's measure spec is.  The level is read back
+  // clamped, so the panel cannot build a name the server would have to refuse.
+  var aggSel    = document.getElementById('graph-agg-sel');
+  var aggPField = document.getElementById('graph-agg-p-field');
+  var aggPInp   = document.getElementById('graph-agg-p');
+
+  function percentileLevel(input) {
+    var n = parseInt(input.value, 10);
+    if (!isFinite(n)) return 95;
+    return Math.min(100, Math.max(1, n));
+  }
+
+  function aggregateValue() {
+    if (!aggSel || !aggSel.value) return '';
+    if (aggSel.value === 'p') return 'p' + percentileLevel(aggPInp);
+    return aggSel.value;
+  }
+
+  function syncAggFields() {
+    if (aggPField) aggPField.hidden = !(aggSel && aggSel.value === 'p');
+  }
+
+  if (aggSel) aggSel.addEventListener('change', syncAggFields);
+
+  // The select carries no name: the value submitted is the function spec, and
+  // a percentile is only a function spec once its level is spelled into it.
+  graphForm && graphForm.addEventListener('submit', function () {
+    Array.from(graphForm.querySelectorAll('[data-graph-dyn]')).forEach(function (n) { n.remove(); });
+    var fn = aggregateValue();
+    if (!fn) return;
+    var inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = 'agg'; inp.value = fn;
+    inp.setAttribute('data-graph-dyn', '1');
+    graphForm.appendChild(inp);
   });
 
   xSel.addEventListener('change', checkPlot);
@@ -2550,9 +3230,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('pie-back2-label-inp');
   var pieForm       = document.getElementById('pie-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkPie() {
     btnDo.disabled = !(catSel.value && valSel.value);
@@ -2596,7 +3273,7 @@ function parseAccounting(v) {
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && pieForm) {
       var pb = pieForm.getAttribute('data-parent-back') || '';
@@ -2635,9 +3312,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('heatmap-back2-label-inp');
   var heatmapForm   = document.getElementById('heatmap-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   // Rebuild val select to show only numeric columns (plus the Count placeholder).
   function buildHeatmapValSelect() {
@@ -2671,7 +3345,7 @@ function parseAccounting(v) {
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && heatmapForm) {
       var pb = heatmapForm.getAttribute('data-parent-back') || '';
@@ -2706,9 +3380,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('bar-back2-label-inp');
   var barForm       = document.getElementById('bar-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   // Rebuild val select to show only numeric columns (plus the Count placeholder).
   function buildBarValSelect() {
@@ -2742,7 +3413,7 @@ function parseAccounting(v) {
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && barForm) {
       var pb = barForm.getAttribute('data-parent-back') || '';
@@ -2780,16 +3451,13 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('stacked-back2-label-inp');
   var stackedForm   = document.getElementById('stacked-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkStacked() {
     btnDo.disabled = !(catSel.value && segSel.value);
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && stackedForm) {
       var pb = stackedForm.getAttribute('data-parent-back') || '';
@@ -2834,9 +3502,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('scatter-back2-label-inp');
   var scatterForm   = document.getElementById('scatter-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkScatter() {
     btnDo.disabled = !(xSel.value && ySel.value);
@@ -2915,7 +3580,7 @@ function parseAccounting(v) {
   }());
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && scatterForm) {
       var pb = scatterForm.getAttribute('data-parent-back') || '';
@@ -2957,9 +3622,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('combo-back2-label-inp');
   var comboForm     = document.getElementById('combo-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkCombo() {
     btnDo.disabled = !(xSel.value && barSel.value && lineSel.value);
@@ -2997,7 +3659,7 @@ function parseAccounting(v) {
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && comboForm) {
       var pb = comboForm.getAttribute('data-parent-back') || '';
@@ -3036,16 +3698,13 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('treemap-back2-label-inp');
   var treemapForm   = document.getElementById('treemap-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkTreemap() {
     btnDo.disabled = !catSel.value;
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && treemapForm) {
       var pb = treemapForm.getAttribute('data-parent-back') || '';
@@ -3081,9 +3740,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('histogram-back2-label-inp');
   var histogramForm = document.getElementById('histogram-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkHistogram() {
     btnDo.disabled = !colSel.value;
@@ -3129,7 +3785,7 @@ function parseAccounting(v) {
   }());
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && histogramForm) {
       var pb = histogramForm.getAttribute('data-parent-back') || '';
@@ -3146,6 +3802,264 @@ function parseAccounting(v) {
   });
 
   colSel.addEventListener('change', checkHistogram);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Word cloud panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen = document.getElementById('btn-wordcloud');
+  var panel   = document.getElementById('wordcloud-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel     = document.getElementById('btn-cancel-wordcloud');
+  var btnDo         = document.getElementById('btn-do-wordcloud');
+  var colSel        = document.getElementById('wordcloud-col-sel');
+  var backInp       = document.getElementById('wordcloud-back-inp');
+  var back2Inp      = document.getElementById('wordcloud-back2-inp');
+  var back2LabelInp = document.getElementById('wordcloud-back2-label-inp');
+  var cloudForm     = document.getElementById('wordcloud-form');
+
+
+  function checkWordCloud() {
+    btnDo.disabled = !colSel.value;
+  }
+
+  function isDate(v) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+  }
+
+  // A cloud of a number column would be a cloud of "1", "2" and "3", so only
+  // columns that hold something to read are offered: not all-number and not
+  // all-date, and at least one value with a character that is not a digit or
+  // punctuation.
+  function buildWordCloudColSelect() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prev    = colSel.value;
+    while (colSel.options.length > 1) colSel.remove(1);
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(function (v) { return !isNaN(parseAccounting(v)); })) return;
+      if (vals.every(isDate)) return;
+      if (!vals.some(function (v) { return /[^\d\s.,%$()+\-]/.test(v); })) return;
+      var opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name === prev) opt.selected = true;
+      colSel.appendChild(opt);
+    });
+    var n = colSel.options.length - 1;
+    if (n === 0) {
+      btnOpen.disabled = true;
+      btnOpen.title    = 'Word cloud needs a text column';
+    }
+    return n;
+  }
+
+  (function initWordCloudBtn() {
+    var n = buildWordCloudColSelect();
+    if (!n) {
+      btnOpen.disabled = true;
+      btnOpen.title    = 'Word cloud needs a text column';
+    }
+  }());
+
+  btnOpen.addEventListener('click', function () {
+    biClosePanels(panel);
+    backInp.value = window.location.href;
+    if (back2Inp && cloudForm) {
+      var pb = cloudForm.getAttribute('data-parent-back') || '';
+      back2Inp.value = pb;
+      if (back2LabelInp) back2LabelInp.value = pb ? (cloudForm.getAttribute('data-parent-back-label') || '') : '';
+    }
+    buildWordCloudColSelect();
+    panel.hidden = !panel.hidden;
+    checkWordCloud();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  colSel.addEventListener('change', checkWordCloud);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Cross-row columns panel
+// ---------------------------------------------------------------------------
+//
+// The reader picks a number column, a function, a name and the order the rows
+// are read in; the script composes the one cs= spec the URL takes and submits
+// the view with it.  The columns already computed stay in the form as hidden
+// inputs, so adding a second one adds to the view rather than replacing it.
+(function () {
+  var btnOpen = document.getElementById('btn-cross-row');
+  var panel   = document.getElementById('cross-row-panel');
+  if (!btnOpen || !panel) return;
+
+  var form      = document.getElementById('cross-row-form');
+  var btnDo     = document.getElementById('btn-do-cross-row');
+  var btnCancel = document.getElementById('btn-cancel-cross-row');
+  var colSel    = document.getElementById('cross-row-col-sel');
+  var fnSel     = document.getElementById('cross-row-fn-sel');
+  var winField  = document.getElementById('cross-row-window-field');
+  var winInp    = document.getElementById('cross-row-window-inp');
+  var aliasInp  = document.getElementById('cross-row-alias-inp');
+  var orderSel  = document.getElementById('cross-row-order-sel');
+  var dirSel    = document.getElementById('cross-row-dir-sel');
+  var bySel     = document.getElementById('cross-row-by-sel');
+
+
+  var aliasTouched = false;
+
+  function fnMeta() {
+    var opt = fnSel.options[fnSel.selectedIndex];
+    return {
+      arg:   !!opt && opt.getAttribute('data-arg')   === '1',
+      order: !!opt && opt.getAttribute('data-order') === '1'
+    };
+  }
+
+  // A column name has to be usable in an expression and in a URL, and the
+  // column it comes from may hold anything at all ("Unit price ($)"), so the
+  // suggestion is reduced to letters, digits and underscores.
+  function slug(text) {
+    var s = String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    if (!s) return 'value';
+    if (/^[0-9]/.test(s)) s = 'c_' + s;
+    return s;
+  }
+
+  function check() {
+    var m = fnMeta();
+    winField.hidden = !m.arg;
+    winInp.required = m.arg;
+    if (!aliasTouched) aliasInp.value = colSel.value ? slug(colSel.value + '_' + fnSel.value) : '';
+    var ok = !!colSel.value
+          && /^[A-Za-z_][A-Za-z0-9_]*$/.test(aliasInp.value)
+          && (!m.arg || parseInt(winInp.value, 10) > 0)
+          && (!m.order || !!orderSel.value);
+    btnDo.disabled = !ok;
+    btnDo.title = ok ? '' : 'Choose a number column, a function and a column name';
+  }
+
+  // The pass reads numbers, so a column of names is offered but off.  The
+  // options are rendered by the server, which is what the panel has without
+  // this script; the table decides which of them can be read.
+  function markNumericColumns() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells).map(function (th) { return th.textContent.trim(); });
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var numeric = {};
+    headers.forEach(function (name, idx) {
+      if (!name) return;
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      numeric[name] = vals.length > 0 && vals.every(function (v) {
+        return !isNaN(parseAccounting(v));
+      });
+    });
+    Array.from(colSel.options).forEach(function (opt) {
+      if (opt.value) opt.disabled = !numeric[opt.value];
+    });
+  }
+
+  // The panel edits parameters of the view it is open on, so its controls start
+  // where the view already is: the partition and the read order it is using.
+  // A partition of several columns has no matching option, so it is shown as a
+  // value of its own rather than silently replaced by the first column.
+  function initFromView() {
+    var currentBy = bySel.getAttribute('data-current') || '';
+    if (currentBy) {
+      var known = Array.from(bySel.options).some(function (o) { return o.value === currentBy; });
+      if (!known) {
+        var extra = document.createElement('option');
+        extra.value = currentBy;
+        extra.textContent = currentBy + ' (current)';
+        bySel.appendChild(extra);
+      }
+      bySel.value = currentBy;
+    }
+
+    var currentOrder = orderSel.getAttribute('data-current') || '';
+    if (currentOrder) {
+      var parts   = currentOrder.split(':');
+      var column  = parts[0] || '';
+      var matches = Array.from(orderSel.options).some(function (o) { return o.value === column; });
+      // Same reason as by=: a view can be ordered by a column that is not in
+      // this list -- a calculated one, say -- and reopening the panel must not
+      // quietly reorder it.
+      if (!matches && column) {
+        var ord = document.createElement('option');
+        ord.value = column;
+        ord.textContent = column + ' (current)';
+        orderSel.appendChild(ord);
+        matches = true;
+      }
+      if (matches) {
+        orderSel.value = column;
+        dirSel.value = (parts[1] === 'desc') ? 'desc' : 'asc';
+      }
+    }
+  }
+
+  function addHidden(name, val) {
+    var inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.name = name;
+    inp.value = val;
+    inp.setAttribute('data-cross-row-dyn', '1');
+    form.appendChild(inp);
+  }
+
+  btnOpen.addEventListener('click', function () {
+    biClosePanels(panel);
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) {
+      markNumericColumns();
+      initFromView();
+      check();
+    }
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  colSel.addEventListener('change', check);
+  fnSel.addEventListener('change', check);
+  winInp.addEventListener('input', check);
+  orderSel.addEventListener('change', check);
+  aliasInp.addEventListener('input', function () { aliasTouched = true; check(); });
+
+  form.addEventListener('submit', function () {
+    Array.from(form.querySelectorAll('[data-cross-row-dyn]')).forEach(function (i) { i.remove(); });
+
+    var m    = fnMeta();
+    var spec = colSel.value + ':' + fnSel.value + ':' + aliasInp.value;
+    if (m.arg) spec += ':' + parseInt(winInp.value, 10);
+    addHidden('cs', spec);
+
+    if (orderSel.value) {
+      addHidden('order', orderSel.value + (dirSel.value === 'desc' ? ':desc' : ''));
+    }
+
+    // "The whole table" is the absence of a partition, not an empty one, and a
+    // disabled control submits nothing, so by= stays off the URL.
+    bySel.disabled = !bySel.value;
+  });
 }());
 </script>
 
@@ -3172,9 +4086,6 @@ function parseAccounting(v) {
   var back2LabelInp = document.getElementById('map-back2-label-inp');
   var mapForm       = document.getElementById('map-form');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function byLocation() {
     return modeSel.value === 'loc';
@@ -3246,7 +4157,7 @@ function parseAccounting(v) {
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     if (back2Inp && mapForm) {
       var pb = mapForm.getAttribute('data-parent-back') || '';
@@ -3459,16 +4370,13 @@ function parseAccounting(v) {
   var colSel    = document.getElementById('folder-col-sel');
   var backInp   = document.getElementById('folder-back-inp');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'pivot-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   function checkFolder() {
     btnDo.disabled = !colSel.value;
   }
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     backInp.value = window.location.href;
     panel.hidden = !panel.hidden;
     checkFolder();
@@ -3533,18 +4441,12 @@ function parseAccounting(v) {
   var saveMsg    = document.getElementById('ask-save-msg');
   var errDiv     = document.getElementById('ask-error');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel',
-    'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel',
-    'treemap-panel', 'histogram-panel', 'folder-panel', 'pivot-panel', 'calc-panel',
-    'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   var pendingSpec = null;
 
   btnOpen.addEventListener('click', function () {
     var isOpen = !panel.hidden;
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     panel.hidden = isOpen;
   });
 
@@ -3667,10 +4569,10 @@ function parseAccounting(v) {
   var colDimList    = document.getElementById('pivot-col-dims');
   var measureList   = document.getElementById('pivot-measures');
   var chkTotals     = document.getElementById('pivot-totals');
+  var spanSel       = document.getElementById('pivot-span-sel');
+  var tcolWrap      = document.getElementById('pivot-tcol-wrap');
+  var tcolSel       = document.getElementById('pivot-tcol-sel');
 
-  var otherPanels = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel', 'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel', 'folder-panel', 'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel', 'map-panel'].map(function (id) {
-    return document.getElementById(id);
-  }).filter(Boolean);
 
   // Collect column names from the rendered table header.
   function getColumns() {
@@ -3697,13 +4599,35 @@ function parseAccounting(v) {
     return sel;
   }
 
+  // span= buckets one dimension, and a pivot's dimensions are the row groups
+  // the reader has added.  With one row group the server takes it; with two it
+  // needs tcol= to know which, so the column picker appears -- and is only
+  // submitted -- when there is a choice to make.
+  function syncBucket() {
+    if (!spanSel || !tcolSel || !tcolWrap) return;
+    var rowVals = Array.from(rowDimList.querySelectorAll('select'))
+      .map(function (s) { return s.value; }).filter(Boolean);
+    var chosen = tcolSel.value;
+    tcolSel.textContent = '';
+    rowVals.forEach(function (v) {
+      var opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      if (v === chosen) opt.selected = true;
+      tcolSel.appendChild(opt);
+    });
+    var needed = !!spanSel.value && rowVals.length > 1;
+    tcolWrap.hidden  = !needed;
+    tcolSel.disabled = !needed;
+  }
+
   function addDimRow(container, label) {
     var row = document.createElement('div');
     row.className = 'pivot-dim-row';
     var sel = makeColSelect(label || '\u2014 column \u2014');
     var rm  = document.createElement('button');
     rm.type = 'button'; rm.className = 'btn-remove-pivot'; rm.textContent = '\u00d7';
-    rm.addEventListener('click', function () { row.remove(); checkPivot(); });
+    rm.addEventListener('click', function () { row.remove(); checkPivot(); syncBucket(); });
+    sel.addEventListener('change', syncBucket);
     row.appendChild(sel); row.appendChild(rm);
     container.appendChild(row);
     checkPivot();
@@ -3714,6 +4638,14 @@ function parseAccounting(v) {
     if (!col) return '';
     if (fn === 'count' || fn === 'count_distinct') return fn === 'count' ? 'count' : col + '_distinct';
     return col + '_' + fn;
+  }
+
+  // A percentile is written into the function name -- p95 -- because the
+  // measure spec is col:fn:as, with nowhere to put a level of its own.
+  function percentileLevel(input) {
+    var n = parseInt(input.value, 10);
+    if (!isFinite(n)) return 95;
+    return Math.min(100, Math.max(1, n));
   }
 
   function addMeasureRow() {
@@ -3727,11 +4659,29 @@ function parseAccounting(v) {
 
     var fnSel = document.createElement('select');
     [['sum','Sum'], ['count','Count'], ['avg','Average'], ['min','Min'],
-     ['max','Max'], ['count_distinct','Count distinct']].forEach(function (p) {
+     ['max','Max'], ['count_distinct','Count distinct'], ['median','Median'],
+     ['stdev','Std dev'], ['first','First'], ['last','Last'], ['range','Range'],
+     ['percentile','Percentile\u2026']].forEach(function (p) {
       var opt = document.createElement('option');
       opt.value = p[0]; opt.textContent = p[1];
       fnSel.appendChild(opt);
     });
+
+    // The level a Percentile measure is taken at, shown only while that
+    // function is selected.  Reading the value back clamps it, so the panel
+    // cannot build a spec the server would refuse.
+    var pctInp = document.createElement('input');
+    pctInp.type = 'number'; pctInp.value = '95';
+    pctInp.min = '1'; pctInp.max = '100';
+    pctInp.className = 'pivot-pct-input';
+    pctInp.title = 'Percentile level, 1 to 100';
+    pctInp.setAttribute('aria-label', 'Percentile level');
+    pctInp.style.display = 'none';
+
+    // The function as the measure spec spells it.
+    function fnValue() {
+      return fnSel.value === 'percentile' ? 'p' + percentileLevel(pctInp) : fnSel.value;
+    }
 
     var aliasInp = document.createElement('input');
     aliasInp.type = 'text'; aliasInp.placeholder = 'alias';
@@ -3741,23 +4691,27 @@ function parseAccounting(v) {
     aliasLabel.textContent = 'as';
 
     function refreshAlias() {
+      pctInp.style.display = (fnSel.value === 'percentile') ? '' : 'none';
       if (!aliasInp.dataset.userEdited) {
-        aliasInp.value = autoAlias(colSel.value, fnSel.value);
+        aliasInp.value = autoAlias(colSel.value, fnValue());
       }
       checkPivot();
     }
     colSel.addEventListener('change', refreshAlias);
     fnSel.addEventListener('change',  refreshAlias);
+    pctInp.addEventListener('input',  refreshAlias);
     aliasInp.addEventListener('input', function () {
       aliasInp.dataset.userEdited = aliasInp.value ? '1' : '';
       checkPivot();
     });
+    refreshAlias();
 
     var rm = document.createElement('button');
     rm.type = 'button'; rm.className = 'btn-remove-pivot'; rm.textContent = '\u00d7';
     rm.addEventListener('click', function () { row.remove(); checkPivot(); });
 
     row.appendChild(colSel); row.appendChild(fnSel);
+    row.appendChild(pctInp);
     row.appendChild(aliasLabel); row.appendChild(aliasInp);
     row.appendChild(rm);
     measureList.appendChild(row);
@@ -3813,7 +4767,10 @@ function parseAccounting(v) {
     Array.from(measureList.querySelectorAll('.pivot-measure-row')).forEach(function (row) {
       var sels  = row.querySelectorAll('select');
       var col   = sels[0].value;
-      var fn    = sels[1].value;
+      var fnSel = sels[1];
+      var fn    = fnSel.value === 'percentile'
+        ? 'p' + percentileLevel(row.querySelector('input[type="number"]'))
+        : fnSel.value;
       var alias = row.querySelector('input[type="text"]').value.trim();
       if (!alias) return;
       if (fn !== 'count' && !col) return;
@@ -3822,6 +4779,11 @@ function parseAccounting(v) {
 
     // totals=1
     if (chkTotals && chkTotals.checked) addHidden('totals', '1');
+
+    // The bucket column (tcol=) is only worth sending when more than one row
+    // group makes the choice real; syncBucket has already disabled it
+    // otherwise, so a hidden disabled select submits nothing.
+    syncBucket();
   });
 
   document.getElementById('btn-add-pivot-row').addEventListener('click', function () {
@@ -3833,12 +4795,13 @@ function parseAccounting(v) {
   document.getElementById('btn-add-pivot-measure').addEventListener('click', addMeasureRow);
 
   btnOpen.addEventListener('click', function () {
-    otherPanels.forEach(function (p) { p.hidden = true; });
+    biClosePanels(panel);
     panel.hidden = !panel.hidden;
     if (!panel.hidden && rowDimList.childElementCount === 0) {
       addDimRow(rowDimList, '\u2014 row \u2014');
       addMeasureRow();
     }
+    syncBucket();
   });
 
   btnCancel && btnCancel.addEventListener('click', function () {
@@ -3864,12 +4827,6 @@ function parseAccounting(v) {
 
   var lspec     = '[% left_spec | html %]';
 
-  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
-    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
-    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'groups-panel','dates-panel','save-analysis-panel','map-panel'].map(function(id){
-      return document.getElementById(id);
-    }).filter(Boolean);
 
   var NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
@@ -3933,7 +4890,7 @@ function parseAccounting(v) {
   });
 
   btnOpen.addEventListener('click', function() {
-    otherPanels.forEach(function(p){ p.hidden = true; });
+    biClosePanels(panel);
     panel.hidden = !panel.hidden;
     if (!panel.hidden) loadList();
   });
@@ -3963,12 +4920,6 @@ function parseAccounting(v) {
 
   var lspec = '[% left_spec | html %]';
 
-  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
-    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
-    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'calc-panel','dates-panel','save-analysis-panel','map-panel'].map(function(id){
-      return document.getElementById(id);
-    }).filter(Boolean);
 
   function getUniqueVals(col) {
     var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
@@ -4065,7 +5016,7 @@ function parseAccounting(v) {
   });
 
   btnOpen.addEventListener('click', function() {
-    otherPanels.forEach(function(p){ p.hidden = true; });
+    biClosePanels(panel);
     panel.hidden = !panel.hidden;
   });
 
@@ -4084,6 +5035,7 @@ function parseAccounting(v) {
 
   var colSel   = document.getElementById('dates-col-sel');
   var patSel   = document.getElementById('dates-pat-sel');
+  var timeSel  = document.getElementById('dates-time-sel');
   var btnSave  = document.getElementById('btn-save-date');
   var btnClose = document.getElementById('btn-cancel-dates');
   var listEl   = document.getElementById('dates-list');
@@ -4093,12 +5045,6 @@ function parseAccounting(v) {
 
   var lspec = '[% left_spec | html %]';
 
-  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
-    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
-    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'calc-panel','groups-panel','save-analysis-panel','map-panel'].map(function(id){
-      return document.getElementById(id);
-    }).filter(Boolean);
 
   function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
@@ -4146,10 +5092,18 @@ function parseAccounting(v) {
     });
   }
 
+  // A saved pattern is either the date string it has always been or, for a
+  // column with a clock time, { date, time } -- the shapes /dates/list reports.
+  function patternLabel(pat) {
+    if (!pat) return '';
+    if (typeof pat === 'string') return pat;
+    return (pat.date + ' ' + (pat.time || '')).trim();
+  }
+
   function renderList(dates) {
     listEl.innerHTML = '';
     if (!dates || !Object.keys(dates).length) {
-      listEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No date formats saved yet.</p>';
+      listEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No formats saved yet.</p>';
       return;
     }
     Object.keys(dates).sort().forEach(function(col) {
@@ -4157,7 +5111,7 @@ function parseAccounting(v) {
       row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;font-size:0.87rem';
       var badge = document.createElement('code');
       badge.style.cssText = 'flex:0 0 auto;background:var(--badge-bg,#e8eef5);padding:0.1rem 0.4rem;border-radius:3px';
-      badge.textContent = col + ' \u2192 ' + dates[col];
+      badge.textContent = col + ' \u2192 ' + patternLabel(dates[col]);
       var del = document.createElement('button');
       del.type = 'button'; del.className = 'btn-secondary'; del.textContent = '\u00d7';
       del.style.cssText = 'flex:0 0 auto;padding:0.1rem 0.5rem;font-size:0.8rem';
@@ -4181,7 +5135,7 @@ function parseAccounting(v) {
     if (!lspec) return;
     fetch('/dates/list?l=' + encodeURIComponent(lspec))
       .then(function(r){ return r.json(); })
-      .then(function(j){ renderList(j.dates || {}); })
+      .then(function(j){ renderList(j.patterns || {}); })
       .catch(function(){ renderList({}); });
   }
 
@@ -4189,10 +5143,15 @@ function parseAccounting(v) {
     var col = colSel.value;
     var pat = patSel.value;
     if (!col || !pat) return;
+    // time= is what makes the column a timestamp rather than a date; without it
+    // the saved value is the date pattern string it has always been.
+    var body = 'l=' + encodeURIComponent(lspec) + '&col=' + encodeURIComponent(col)
+             + '&pattern=' + encodeURIComponent(pat);
+    if (timeSel && timeSel.value) body += '&time=' + encodeURIComponent(timeSel.value);
     fetch('/dates/save', {
       method:'POST',
       headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:'l=' + encodeURIComponent(lspec) + '&col=' + encodeURIComponent(col) + '&pattern=' + encodeURIComponent(pat)
+      body: body
     }).then(function(r){ return r.json(); }).then(function(j){
       if (j.ok) { loadList(); location.reload(); }
       else alert('Error: ' + (j.error||'unknown'));
@@ -4200,7 +5159,7 @@ function parseAccounting(v) {
   });
 
   btnOpen.addEventListener('click', function() {
-    otherPanels.forEach(function(p){ p.hidden = true; });
+    biClosePanels(panel);
     panel.hidden = !panel.hidden;
     if (!panel.hidden) loadList();
   });
@@ -4224,12 +5183,6 @@ function parseAccounting(v) {
   var linkEl    = document.getElementById('save-analysis-link');
   var msgEl     = document.getElementById('save-analysis-msg');
 
-  var otherPanels = ['ask-panel', 'join-panel','combine-panel','export-panel','graph-panel',
-    'pie-panel','heatmap-panel','bar-panel','stacked-panel','scatter-panel',
-    'combo-panel','treemap-panel','histogram-panel','folder-panel','pivot-panel',
-    'calc-panel','groups-panel','dates-panel','map-panel'].map(function(id){
-      return document.getElementById(id);
-    }).filter(Boolean);
 
   // The table on this page is the first card of the new canvas.  Read its
   // headers so the card shows the columns the reader is looking at, not every
@@ -4276,7 +5229,7 @@ function parseAccounting(v) {
   });
 
   btnOpen.addEventListener('click', function() {
-    otherPanels.forEach(function(p) { p.hidden = true; });
+    biClosePanels(panel);
     panel.hidden = !panel.hidden;
     if (!panel.hidden) {
       nameInp.focus();
@@ -4443,6 +5396,7 @@ function parseAccounting(v) {
 
   // Open panel.
   btnOpen.addEventListener('click', function () {
+    biClosePanels(panel);
     panel.hidden     = false;
     btnOpen.disabled = true;
     resultEl.hidden  = true;
@@ -4453,7 +5407,6 @@ function parseAccounting(v) {
 
   // Close panel.
   btnCancel.addEventListener('click', function () {
-    panel.hidden     = false;
     panel.hidden     = true;
     btnOpen.disabled = false;
     resultEl.hidden  = true;
@@ -4481,9 +5434,26 @@ function parseAccounting(v) {
     // j=, c=, f=, and d= reflect the already-rendered view, so read from the URL.
     var urlP = new URLSearchParams(location.search);
     urlP.getAll('j').forEach(function (v) { params.append('j', v); });
+    if (urlP.get('jtype')) params.set('jtype', urlP.get('jtype'));
     urlP.getAll('c').forEach(function (v) { params.append('c', v); });
     urlP.getAll('f').forEach(function (v) { params.append('f', v); });
     if (urlP.get('d')) params.set('d', '1');
+    // A relative range travels as itself, so the file holds the same rows this
+    // view is showing rather than the ones a frozen date pair would match.
+    if (urlP.get('range')) params.set('range', urlP.get('range'));
+    if (urlP.get('rcol'))  params.set('rcol',  urlP.get('rcol'));
+    // The time bucket an aggregated view was showing travels the same way, so
+    // the saved file holds the bucket column the page drew rather than the raw
+    // timestamps behind it.
+    ['span', 'tcol', 'as'].forEach(function (k) {
+      if (urlP.get(k)) params.set(k, urlP.get(k));
+    });
+    // A cross-row column is part of the view too, so the file holds the column
+    // the table is showing rather than the rows it was worked out from.  All
+    // three repeat (several columns, one order each), so they travel as lists.
+    ['cs', 'order', 'by'].forEach(function (k) {
+      urlP.getAll(k).forEach(function (v) { params.append(k, v); });
+    });
 
     fetch('/export', {
       method: 'POST',

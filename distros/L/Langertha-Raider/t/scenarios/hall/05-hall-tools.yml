@@ -1,0 +1,20 @@
+title: a raider asks the hall for its status and spawns a second raider through the hall tools
+model:
+  rules:
+    Frag die Halle.:
+      tool_calls:
+        - [ hall_status, {} ]
+    Ich bin der zweite.: { answer: "Zweiter laeuft." }
+  after:
+    hall_status:
+      tool_calls:
+        - [ hall_spawn, { name: Testie, mission: "Ich bin der zweite." } ]
+    hall_spawn: { answer: "Zweiten gestartet." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - spawn: { name: Testie, mission: "Frag die Halle.", as: first }
+  - done: { run: first, status: completed, response_like: 'Zweiten gestartet' }
+  - expect_run_files: { run: first, events_like: 'running' }
+  - wait_event: { type: raider.spawned, slot: Testie, nth: 2, as: second }
+  - done: { run: second, status: completed, response_like: 'Zweiter laeuft' }
+  - idle: {}

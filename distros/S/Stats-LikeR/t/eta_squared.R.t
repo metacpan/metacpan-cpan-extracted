@@ -155,7 +155,9 @@ throws_ok { eta_squared(aov(\%WARPBREAKS, 'breaks ~ wool + tension')) }
 	'a two-factor aov() result is refused';
 
 throws_ok { eta_squared([1, 2, 3], [1, 2]) } qr/same length/, 'length mismatch';
-throws_ok { eta_squared(42) } qr/expected an aov\(\) result/, 'neither form';
+throws_ok { eta_squared(42) }
+	qr/\Ausage: eta_squared\(AOV \| VALUES, GROUPS\).*^example:\n.*\n\neta_squared: error: expected an aov\(\) result or \(\\\@values, \\\@groups\)\n\z/ms,
+	'neither form, under the help screen';
 throws_ok { eta_squared({ a => 1 }) } qr/no Residuals term/, 'a hash that is not an ANOVA';
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is

@@ -1,0 +1,32 @@
+title: a skill with paths is not listed until a matching file is touched; then listed once and loadable
+files:
+  CLAUDE.md: "Top rule.\n"
+  .claude/skills/ts-style/SKILL.md: "---\ndescription: House style for TypeScript.\npaths: \"src/**/*.{ts,tsx}\"\n---\n\nUse strict mode. TS-BODY-MARKER\n"
+  .claude/skills/always/SKILL.md: "---\ndescription: Always there.\n---\n\nAlways.\n"
+  src/deep/a.ts: "export const a = 1;\n"
+  src/deep/b.ts: "export const b = 2;\n"
+  docs/readme.md: "docs\n"
+prompt: Review the code.
+script:
+  - tool_calls:
+      - [ read_file, { path: docs/readme.md } ]
+  - tool_calls:
+      - [ read_file, { path: src/deep/a.ts } ]
+  - tool_calls:
+      - [ read_file, { path: src/deep/b.ts } ]
+  - tool_calls:
+      - [ skill, { skill: ts-style } ]
+  - text: geprueft
+expect:
+  answer: geprueft
+  requests:
+    - { index: 0, contains: "- always: Always there." }
+    - { index: 0, absent: ts-style }
+    - { index: 1, absent: ts-style }
+    - { index: 2, contains: "- ts-style: House style for TypeScript." }
+    - { index: 4, contains: TS-BODY-MARKER }
+  tools:
+    - { name: read_file, text: docs, not_text: 'skills are available' }
+    - { name: read_file, text: 'export const a.*The following skills are available for use with the Skill tool:\n\n- ts-style: House style for TypeScript\.\n</system-reminder>' }
+    - { name: read_file, text: 'export const b', not_text: 'skills are available' }
+    - { name: skill, text: '^Launching skill: ts-style$' }

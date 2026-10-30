@@ -23,14 +23,18 @@ use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
 use Config::Grammar::Dynamic;
 use Carp;
+use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 use autodie;
 use DBI;
+use DBD::SQLite::Constants qw(SQLITE_ATTACH SQLITE_FUNCTION SQLITE_PRAGMA SQLITE_DENY SQLITE_OK);
 use File::Spec;
 use Locale::PO;
 use Mojo::Promise;
 use Mojo::Loader qw(load_class);
 use Mojo::JSON qw(true false);
 use Mojo::Exception;
+use Mojo::Util qw(encode secure_compare);
+use Digest::SHA qw(hmac_sha256);
 use Scalar::Util qw(blessed);
 use Time::HiRes;
 # use Devel::Cycle;
@@ -45,15 +49,60 @@ has file => sub { croak "the file parameter is mandatory" };
 
 has secretFile => sub ($self) {
     my $secretFile = $self->file.'.secret';
-    if (not -f $secretFile){
-        open my $rand, '>', $secretFile;
-        chmod 0600,$secretFile;
-        print $rand sprintf('%x%x',int(rand()*1e14),int(rand()*1e14));
-        close $rand;
-        chmod 0400,$secretFile;
-    }
+    $self->_writeSecretFile($secretFile);
     return $secretFile;
 };
+
+sub _writeSecretFile ($self,$secretFile) {
+    if (-f $secretFile) {
+        # replace an empty secret or one made by the old rand() generator;
+        # a secret written by hand is kept
+        return if not -r _ or -s _ > 24;
+        open my $old, '<', $secretFile;
+        my $line = <$old> // '';
+        close $old;
+        return if $line ne '' and not $self->_isRandSecret($line);
+        no autodie;
+        if (not unlink $secretFile) {
+            croak "cannot replace the empty secret file $secretFile: $!" if $line eq '';
+            carp "cannot replace the weak secret in $secretFile: $!";
+            return;
+        }
+    }
+    my $secret = unpack('H*',$self->_randomBytes(32));
+    sysopen my $fh, $secretFile, O_WRONLY|O_CREAT|O_EXCL, 0600;
+    print $fh $secret;
+    close $fh;
+    chmod 0400,$secretFile;
+}
+
+# The old generator wrote sprintf('%x%x',int(rand()*1e14),int(rand()*1e14)).
+# Perl's rand() is drand48: the state x is 48 bits, rand() returns x/2**48
+# and the next state is (0x5DEECE66D*x + 0xB) mod 2**48. The first number
+# leaves about three possible states; a secret is from the old generator
+# when one of them gives the second number. A hand written secret matches
+# by chance about once in 10**13.
+sub _isRandSecret ($self,$secret) {
+    return 0 if $secret !~ /\A[0-9a-f]{2,24}\z/;
+    no warnings 'portable'; # hex() above 32 bits
+    for my $cut (1 .. length($secret) - 1) {
+        my ($first,$second) = (substr($secret,0,$cut),substr($secret,$cut));
+        next if grep { /\A0./ or length > 12 } $first, $second;
+        ($first,$second) = (hex $first,hex $second);
+        next if $first >= 1e14 or $second >= 1e14;
+        my $guess = int($first * 2**48 / 1e14);
+        for my $x ($guess - 2 .. $guess + 3) {
+            next if $x < 0 or $x >= 2**48 or int($x / 2**48 * 1e14) != $first;
+            # (0x5DEECE66D*x + 0xB) mod 2**48 in 24 bit halves, so it fits in 64 bits
+            my ($xh,$xl) = (int($x / 2**24),$x % 2**24);
+            my $lo = 0xECE66D * $xl + 0xB;
+            my $hi = (0x5DE * $xl + 0xECE66D * $xh + int($lo / 2**24)) % 2**24;
+            my $next = $hi * 2**24 + $lo % 2**24;
+            return 1 if int($next / 2**48 * 1e14) == $second;
+        }
+    }
+    return 0;
+}
 
 has app => sub { croak "the app parameter is mandatory" }, weak => 1;
 
@@ -185,7 +234,7 @@ has grammar => sub {
         _mandatory => [qw(BACKEND FRONTEND)],
         BACKEND => {
             _doc => 'BACKEND Settings',
-            _vars => [ qw(log_file cfg_db sesame_user sesame_pass) ],
+            _vars => [ qw(log_file cfg_db sesame_user sesame_pass max_session_age) ],
             _mandatory => [ qw(cfg_db sesame_user sesame_user) ],
             log_file => { _doc => 'write a log file to this location (unless in development mode)'},
             cfg_db => { _doc => 'file to store the config database'},
@@ -197,6 +246,15 @@ DOC
 Using sesame_user and sesame_pass, the system can always be accessed.
 In default configuration sesame_pass is NOT set.
 DOC
+            max_session_age => {
+                _doc => <<'DOC',
+End a session this many seconds after the login that started it; the user
+has to log in again. Logging out does not invalidate a session cookie that
+was already issued, so this limit is what ends it. Default: no limit.
+DOC
+                _re => '\d+',
+                _re_error => 'expected a number of seconds',
+            },
         },
         FRONTEND => {
             _doc => 'Settings for the Web FRONTEND',
@@ -478,6 +536,10 @@ sub instantiatePlugin {
 
 return the configuration state of the system as a blob
 
+The blob is encrypted with AES-256 and authenticated with HMAC-SHA256,
+both keyed from the password with PBKDF2 and a random salt. Releases
+before this format cannot restore it.
+
 =cut
 
 has configPlugins => sub {
@@ -519,6 +581,25 @@ sub unpack16 {
     return substr($string,16,hex($len));
 }
 
+# PBKDF2-HMAC-SHA256 rounds for the backup key; part of the CBK2 format
+my $BLOB_KDF_ROUNDS = 100_000;
+
+sub _randomBytes ($self,$n) {
+    open my $fh, '<:raw', '/dev/urandom';
+    read($fh, my $bytes, $n) == $n or croak "short read from /dev/urandom";
+    return $bytes;
+}
+
+sub _blobKeys ($self,$password,$salt) {
+    $password = encode('UTF-8',$password // '');
+    my $u = my $key = hmac_sha256($salt.pack('N',1),$password);
+    for (2..$BLOB_KDF_ROUNDS) {
+        $u = hmac_sha256($u,$password);
+        $key ^= $u;
+    }
+    return (hmac_sha256('encrypt',$key), hmac_sha256('authenticate',$key));
+}
+
 sub getConfigBlob {
     my $self = shift;
     my $password = shift;
@@ -526,17 +607,12 @@ sub getConfigBlob {
 
     my $zip = Archive::Zip->new();
     my $cfg = $self->cfgHash;
-    # flush all the changes in the database to the db file
-    my $dumpfile = '/tmp/cbdump'.$$;
-    unlink $dumpfile if -f $dumpfile;
-    open my $dump, '|-','/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db};
-    print $dump ".output $dumpfile\n";
-    print $dump ".dump\n";
+    # read the dump from a pipe; a file in /tmp would leave the secrets behind
+    open my $dump, '-|','/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db},'.dump';
+    my $sql = do { local $/; <$dump> };
     close $dump;
-    $zip->addFile({
-        filename => $dumpfile,
-        zipName => '{DATABASEDUMP}',
-    });
+    $zip->addString($sql,'{DATABASEDUMP}')
+        ->desiredCompressionMethod(Archive::Zip::COMPRESSION_DEFLATED());
     for my $obj (@{$self->configPlugins}){
         my $name = $obj->name;
         for my $file (@{$obj->stateFiles}) {
@@ -552,8 +628,14 @@ sub getConfigBlob {
     open(my $fh, ">", \$zipData);
     $zip->writeToFileHandle($fh,0);
 
-    my $crypt = $self->getCrypt($password);
-    return $crypt->encrypt($self->pack16($zipData));
+    require Crypt::Rijndael;
+    my $salt = $self->_randomBytes(16);
+    my $iv = $self->_randomBytes(16);
+    my ($encKey,$macKey) = $self->_blobKeys($password,$salt);
+    my $crypt = Crypt::Rijndael->new($encKey,Crypt::Rijndael::MODE_CBC());
+    $crypt->set_iv($iv);
+    my $blob = 'CBK2'.$salt.$iv.$crypt->encrypt($self->pack16($zipData));
+    return $blob.hmac_sha256($blob,$macKey);
 }
 
 # how long to keep trying when someone else holds a lock on the config
@@ -622,9 +704,22 @@ sub _stageAndRestoreDb ($self,$builder) {
     return;
 }
 
+# DBD::SQLite registers an FTS3/FTS4 tokenizer called "perl" on every
+# connection; a table using it calls the Perl sub named in its definition
+# whenever the table is used. A restored schema must not name it.
+sub _refusePerlTokenizer ($self,$dbh) {
+    my $schema = $dbh->selectcol_arrayref(q{SELECT sql FROM sqlite_master WHERE sql IS NOT NULL});
+    die mkerror(3846,trm("The backup contains a table with a Perl tokenizer"))
+        if grep { /tokeni[sz]e\W*perl/i } @$schema;
+    return;
+}
+
 =head2 $cfg->restoreConfigBlob(configBlob)
 
 retore the confguration state
+
+A blob in the format used before CBK2 has no authentication; it is still
+restored, with a warning, and should be replaced by a new backup.
 
 =cut
 
@@ -633,8 +728,22 @@ sub restoreConfigBlob {
     my $config = shift;
     my $password = shift;
     require Archive::Zip;
-    my $crypt = $self->getCrypt($password);
-    $config = $self->unpack16($crypt->decrypt($config));
+    if ($config =~ /^CBK2/ and length($config) % 16 == 4) {
+        require Crypt::Rijndael;
+        my ($salt,$iv) = (substr($config,4,16),substr($config,20,16));
+        my ($encKey,$macKey) = $self->_blobKeys($password,$salt);
+        my $mac = substr($config,-32,32,'');
+        die mkerror(3844,trm("Wrong password!"))
+            unless secure_compare($mac,hmac_sha256($config,$macKey));
+        my $crypt = Crypt::Rijndael->new($encKey,Crypt::Rijndael::MODE_CBC());
+        $crypt->set_iv($iv);
+        $config = $self->unpack16($crypt->decrypt(substr($config,36)));
+    }
+    else {
+        $self->log->warn("Restoring a backup in the old, unauthenticated format; take a new backup to replace it");
+        my $crypt = $self->getCrypt($password);
+        $config = $self->unpack16($crypt->decrypt($config));
+    }
 
     my $user = $self->app->userObject->new(app=>$self->app,userId=>'__CONFIG', log=>$self->log);
     open my $fh ,'<', \$config;
@@ -647,19 +756,40 @@ sub restoreConfigBlob {
                 $self->log->warn("Restoring Database!");
                 $self->_stageAndRestoreDb(sub ($staging) {
                     $member->extractToFileNamed($staging);
+                    my $dbh = DBI->connect("dbi:SQLite:dbname=$staging",'','',{RaiseError => 1, PrintError => 0});
+                    $self->_refusePerlTokenizer($dbh);
+                    $dbh->disconnect;
                 });
                 last;
             };
             /^\{DATABASEDUMP\}$/ && do {
                 $self->log->warn("Restoring Database Dump!");
                 $self->_stageAndRestoreDb(sub ($staging) {
-                    open my $sqlite, '|-', '/usr/bin/sqlite3',$staging;
                     my $sql = $member->contents();
                     $sql =~ s/0$//; # for some reason the dump ends in 0
-                    print $sqlite $sql;
-                    # autodie turns a non zero exit of sqlite3 into a die, so a
-                    # dump that does not replay never reaches the live database
-                    close $sqlite;
+                    # SQL only: the sqlite3 shell would also run .shell, fsdir() etc.
+                    my $dbh = DBI->connect("dbi:SQLite:dbname=$staging",'','',{
+                        RaiseError => 1,
+                        PrintError => 0,
+                        AutoCommit => 1,
+                        sqlite_allow_multiple_statements => 1,
+                    });
+                    # while the dump replays, "perl" is the plain tokenizer, so
+                    # no Perl sub named by a table in the dump can run
+                    $dbh->do(q{SELECT fts3_tokenizer('perl',fts3_tokenizer('simple'))});
+                    # no ATTACH or fts3_tokenizer(); the only pragmas are the
+                    # ones sqlite3 .dump writes (writable_schema adds FTS tables)
+                    $dbh->sqlite_set_authorizer(sub {
+                        my ($action,$arg1,$arg2) = @_;
+                        return SQLITE_DENY if $action == SQLITE_ATTACH
+                            or ($action == SQLITE_FUNCTION and lc($arg2 // '') eq 'fts3_tokenizer')
+                            or ($action == SQLITE_PRAGMA and lc($arg1 // '') !~ /^(?:foreign_keys|writable_schema)$/);
+                        return SQLITE_OK;
+                    });
+                    $dbh->do($sql);
+                    $dbh->sqlite_set_authorizer(undef);
+                    $self->_refusePerlTokenizer($dbh);
+                    $dbh->disconnect;
                 });
                 last;
             };
@@ -697,13 +827,7 @@ Regenerate all the template based configuration files using input from the datab
 sub reConfigure {
     my $self = shift;
     my $secretFile = $self->secretFile;
-    if (not -f $secretFile){
-        open my $rand, '>', $secretFile;
-        chmod 0600,$secretFile;
-        print $rand sprintf('%x%x',int(rand()*1e14),int(rand()*1e14));
-        close $rand;
-        chmod 0400,$secretFile;
-    }
+    $self->_writeSecretFile($secretFile);
     for my $obj (@{$self->configPlugins}){
         $obj->reConfigure;
     }

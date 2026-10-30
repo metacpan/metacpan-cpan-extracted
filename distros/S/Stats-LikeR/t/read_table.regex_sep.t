@@ -290,7 +290,7 @@ is_deeply read_table(fixture("% id v\n1 2\n"), sep => $ws, comment => '%'),
 {
 	my $f = fixture("a b\n1 2\n");
 	like error_of(sub { read_table($f, sep => qr/\s*/) }),
-		qr/^read_table: the sep regex \(\?\S*:\\s\*\) matches an empty string; it must match at least one character$/,
+		qr/\nread_table: error: the sep regex \(\?\S*:\\s\*\) matches an empty string; it must match at least one character$/,
 		'a pattern that matches an empty string is refused before reading';
 	like error_of(sub { read_table(fixture("a,b\n1,2\n"), sep => qr/(?=,)/) }),
 		qr/^read_table: the sep regex \S+ matched an empty string at \S+ line 1; it must match at least one character$/,
@@ -305,13 +305,13 @@ is_deeply read_table(fixture("% id v\n1 2\n"), sep => $ws, comment => '%'),
 		[ { a => '(q)', b => 2 } ],
 		'an empty match inside a quoted field is text, as a separator there is';
 	like error_of(sub { read_table($f, sep => [' ']) }),
-		qr/^read_table: 'sep' must be a string or a qr\/\/ regex, not a ARRAY reference$/,
+		qr/\nread_table: error: 'sep' must be a string or a qr\/\/ regex, not a ARRAY reference$/,
 		'an ARRAY sep is refused';
 	like error_of(sub { read_table($f, delim => {}) }),
-		qr/^read_table: 'sep' must be a string or a qr\/\/ regex, not a HASH reference$/,
+		qr/\nread_table: error: 'sep' must be a string or a qr\/\/ regex, not a HASH reference$/,
 		'a HASH delim is refused under the same name';
 	like error_of(sub { read_table($f, sep => $ws, delim => $ws) }),
-		qr/^read_table: pass either 'sep' or 'delim', not both$/,
+		qr/\nread_table: error: pass either 'sep' or 'delim', not both$/,
 		"'sep' and 'delim' together are still refused";
 	like error_of(sub { read_table(fixture("a b\n1 2 3\n"), sep => $ws) }),
 		qr/^Alignment error on \S+ data row 1 \(3 fields vs 2 headers\)\.$/,

@@ -116,6 +116,14 @@ sub is_approx {
 # leak checks (assignments hoisted out for Devel::Cover)
 # Test::LeakTrace flags Devel::Cover's instrumentation SVs as leaks, so skip
 # the leak checks (the last tests here) when running under coverage.
+# A call-form error prints qcut's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { qcut([1, 2], 0); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: qcut\(/, 'qcut: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('qcut') . "qcut: error: number of quantiles must be a positive integer\n",
+		'qcut: the help screen, then the error on the last line');
+}
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 {
 	my @data  = map { $_ / 7 } 1 .. 500;

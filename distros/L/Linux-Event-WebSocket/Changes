@@ -1,5 +1,26 @@
 Revision history for Linux::Event::WebSocket
 
+0.003  2026-10-27
+
+    - Restore compatibility with Linux::Event::HTTP 0.004 by removing
+      dependence on its deleted Request/Response and connection internals.
+    - Attach the published Unblock::HTTP1 0.13 engine directly to ordinary
+      Linux::Event streams for the WebSocket opening HTTP/1.1 handshake.
+      Use canonical Uniform::HTTP 0.06 request/response messages.
+    - Preserve the existing WebSocket Client/Server callbacks, Connection
+      subclasses, native bq framing engine, TLS, socket identity,
+      subprotocols, masking and close semantics. Replace the opening
+      HTTP-byte native consumer with the established WebSocket consumer
+      at 101 without losing same-read frames.
+    - Allow coexistence with Linux::Event::HTTP 0.004 without requiring
+      that distribution. Use Linux::Event::WebSocket for standalone
+      WebSocket applications and the HTTP distribution's WebSocket
+      callbacks for mixed HTTP/WebSocket applications.
+    - Require Linux::Event 0.117, Unblock::HTTP1 0.13 and
+      Uniform::HTTP 0.06. No upstream library API changes are needed.
+    - Retain http_server() as a compatibility accessor to the listener;
+      it no longer returns an HTTP::Server object.
+
 0.002  2026-09-21
 
     - Fix a native bq_websocket allocation leak when an invalid Close frame is

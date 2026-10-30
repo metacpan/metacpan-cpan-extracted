@@ -130,18 +130,36 @@ _write_perl_module(
     "package Developer::Dashboard::SeedSync;\ndie qq(lazy-loader-regression: seed sync loaded during dashboard ps1\\n);\n",
 );
 _write_perl_module(
+    File::Spec->catfile( $lazy_skill_dir, 'FileRegistry.pm' ),
+    "package Developer::Dashboard::FileRegistry;\ndie qq(lazy-loader-regression: FileRegistry loaded for path-only config\\n);\n",
+);
+_write_perl_module(
     File::Spec->catfile( $lazy_file_dir, 'ShareDir.pm' ),
     "package File::ShareDir;\ndie qq(lazy-loader-regression: File::ShareDir loaded during dashboard ps1\\n);\n",
+);
+my $lazy_capture_dir = File::Spec->catdir( $lazy_lib, 'Capture' );
+make_path($lazy_capture_dir);
+_write_perl_module(
+    File::Spec->catfile( $lazy_capture_dir, 'Tiny.pm' ),
+    "package Capture::Tiny;\ndie qq(lazy-loader-regression: Capture::Tiny loaded without a tmux ticket lookup\\n);\n",
 );
 
 {
     local $ENV{HOME} = $lazy_home;
     local $ENV{PERL5OPT} = '-I' . $lazy_lib;
+    local $ENV{TMUX} = '';
+    local $ENV{TICKET_REF} = undef;
     my $ps1_output = qx{$^X -I$lib $dashboard ps1 --cwd "$lazy_home" --mode compact --no-indicators 2>&1};
     my $ps1_exit = $? >> 8;
     is( $ps1_exit, 0, 'dashboard ps1 stays on the lightweight helper path once helpers are already staged' )
       or diag $ps1_output;
     unlike( $ps1_output, qr/lazy-loader-regression:/, 'dashboard ps1 does not load suggestion, skill, or helper-staging-only modules on the hot path' );
+
+    my $paths_output = qx{$^X -I$lib $dashboard paths -o json 2>&1};
+    my $paths_exit = $? >> 8;
+    is( $paths_exit, 0, 'dashboard paths lists runtime paths without requiring FileRegistry' )
+      or diag $paths_output;
+    unlike( $paths_output, qr/lazy-loader-regression:/, 'dashboard paths does not load FileRegistry for path-only config access' );
 }
 
 {
@@ -162,6 +180,7 @@ _write_perl_module(
         <<'PERL',
 package Developer::Dashboard::Config;
 sub new { bless {}, shift }
+sub for_path_config { bless {}, shift }
 sub collectors { return [] }
 1;
 PERL
@@ -455,6 +474,9 @@ the C</usr/bin/env perl> shebang for shipped Perl scripts. It also runs real
 switchboard and dotted skill commands under isolated homes to verify that
 caller-exported environment values take precedence while ordinary skill values
 still override home defaults.
+It also blocks FileRegistry with a failing stub to prove the prompt and
+C<dashboard paths -o json> paths do not load file-registry code for config
+operations that only require path resolution.
 
 =for comment FULL-POD-DOC START
 

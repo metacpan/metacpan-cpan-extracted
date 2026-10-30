@@ -435,6 +435,24 @@ Bena Tanzania locale.
    1995-12-22T09:05:02 = BM 1995 Kmb 22, Hih
   -0010-09-15T04:44:23 = KM -10 Tis 15, Lem
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = BM 2008 pa mwedzi gwa wuvili
+   1995-12-22T09:05:02 = BM 1995 pa mwedzi gwa kumi na mbili
+  -0010-09-15T04:44:23 = KM -10 pa mwedzi gwa tisa
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = BM 2008 pa mwedzi gwa wuvili 5, Hiv
+   1995-12-22T09:05:02 = BM 1995 pa mwedzi gwa kumi na mbili 22, Hih
+  -0010-09-15T04:44:23 = KM -10 pa mwedzi gwa tisa 15, Lem
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = BM 2008 pa mwedzi gwa wuvili 5
+   1995-12-22T09:05:02 = BM 1995 pa mwedzi gwa kumi na mbili 22
+  -0010-09-15T04:44:23 = KM -10 pa mwedzi gwa tisa 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = BM 2008 Vil 5

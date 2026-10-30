@@ -1,0 +1,13 @@
+title: the second prompt is sent together with the first one and its answer
+prompts:
+  - Merke dir das Wort Apfelkuchen.
+  - Welches Wort war das?
+script:
+  - text: gemerkt
+  - text: Apfelkuchen
+expect:
+  answer: Apfelkuchen
+  requests:
+    - { index: 0, contains: Apfelkuchen }
+    - { index: 1, contains: Apfelkuchen }
+    - { index: 1, contains: gemerkt }

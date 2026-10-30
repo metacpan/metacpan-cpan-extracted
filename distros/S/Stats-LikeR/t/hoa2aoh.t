@@ -84,4 +84,12 @@ no_leaks_ok {
 	eval { hoa2aoh({ a => [1], b => 5 }) }
 } 'hoa2aoh: no memory leaks on a die path' unless $INC{'Devel/Cover.pm'};
 
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { hoa2aoh(); 1 } ? '' : $@;
+	like($err, qr/\Ausage: hoa2aoh\(.*\n\nhoa2aoh: error: \Qexpected 1 argument, got 0\E\n\z/s,
+		'hoa2aoh: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing;

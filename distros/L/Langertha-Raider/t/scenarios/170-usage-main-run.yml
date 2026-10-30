@@ -1,0 +1,18 @@
+# Every model call of a run is a model.usage event and counts in the token
+# ledger (ADR 0026, addendum): two requests, summed.
+title: the tokens of every model call of a run are counted
+files:
+  note.txt: "hi\n"
+prompt: Show note.txt.
+script:
+  - tool_calls:
+      - [ bash, { command: "cat note.txt" } ]
+    usage: { prompt_tokens: 100, completion_tokens: 10 }
+  - text: It says hi.
+    usage: { prompt_tokens: 150, completion_tokens: 5 }
+expect:
+  answer: It says hi.
+  events:
+    - { type: model.usage, purpose: chat, input_tokens: 100, output_tokens: 10 }
+    - { type: model.usage, purpose: chat, input_tokens: 150, output_tokens: 5 }
+  usage: { input_tokens: 250, output_tokens: 15, calls: 2 }

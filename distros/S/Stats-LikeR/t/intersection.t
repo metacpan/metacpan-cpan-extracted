@@ -83,7 +83,7 @@ eval { intersection(); 1 } or $e_zero = $@;
 no_leaks_ok {
 	eval { intersection() }
 } 'intersection: empty croak no leaks' unless $INC{'Devel/Cover.pm'};
-like $e_zero, qr/intersection needs >= 1 array ref/, 'intersection croaks with no args';
+like $e_zero, qr/^intersection: error: needs >= 1 array ref\n\z/m, 'intersection croaks with no args';
 
 # croak: non-ref argument (real index, no stray %)
 my $e_nonref = '';
@@ -103,5 +103,13 @@ no_leaks_ok {
 } 'intersection: undef croak no leaks' unless $INC{'Devel/Cover.pm'};
 like   $e_undef, qr/array ref index 1 \(argument 0\)/, 'intersection croaks on an undef element with real indices';
 unlike $e_undef, qr/%/,                                'intersection undef croak leaves no literal % directive';
+
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { intersection([1], 2); 1 } ? '' : $@;
+	like($err, qr/\Ausage: intersection\(.*\n\nintersection: error: \Qargument index 1 of 2 total (max index 1) is not an array reference\E\n\z/s,
+		'intersection: a call-form error prints the help screen, the error on its last line');
+}
 
 done_testing();

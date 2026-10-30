@@ -157,6 +157,13 @@ dies_ok { wilcox_test([]) }                          'wilcox_test: empty x dies'
 dies_ok { wilcox_test(\@x, \@y, 'paired') }          'wilcox_test: odd trailing args die' ;
 dies_ok { wilcox_test(\@x, 'bogus' => 1) }           'wilcox_test: unknown named arg dies' ;
 dies_ok { wilcox_test([1,2,3], [1,2], paired => 1) } 'wilcox_test: paired length mismatch dies' ;
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('wilcox_test');
+	like( $screen, qr/\Ausage: wilcox_test\(/, 'wilcox_test: has a help screen' );
+	eval { wilcox_test(\@x, 'bogus' => 1) };
+	is( $@, $screen . "wilcox_test: error: unknown argument 'bogus'\n",
+		'wilcox_test: a call-form error is the screen, then the error on the last line' );
+}
 
 #		wilcox_test: output shape
 my $shape = wilcox_test(\@x, \@y);

@@ -1,0 +1,24 @@
+# Real pattern: under memory pressure a guard refuses the heavy test run
+# ("heavy command refused ..."); the model does not retry it, it looks at the
+# file and the directory instead (light commands).
+title: loadguard refuses dzil test under pressure; the model carries on with light commands
+proc:
+  memory_full: 41.5
+  swap: 12
+files:
+  lib.txt: "module\n"
+prompt: Run the full test suite for me.
+script:
+  - tool_calls:
+      - [ bash, { command: 'touch suite-ran && dzil test' } ]
+  - tool_calls:
+      - [ bash, { command: 'cat lib.txt' } ]
+      - [ bash, { command: 'ls' } ]
+  - text: Full suite skipped (host under memory pressure); the file looks fine.
+expect:
+  answer: "Full suite skipped (host under memory pressure); the file looks fine."
+  absent: [ suite-ran ]
+  tools:
+    - { name: bash, error: true, text: 'Command refused by loadguard: heavy command \(dzil test\): memory pressure full=41\.5% \(limit 10%\), swap 12% used' }
+    - { name: bash, text: '\Amodule\z' }
+    - { name: bash, text: '\Alib\.txt\z' }

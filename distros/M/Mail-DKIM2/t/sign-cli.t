@@ -239,7 +239,7 @@ isnt($rc4, 0, 'missing --selector is an error');
         or die 'no nd=';
     ($out, $rc) = $run->($ws, '--ignore-timestamps');
     is($rc, 0, 'gate: "nd = x" with whitespace around "=" is recognised and signed');
-    # Not a tampering hole: -07 §12.8 canonicalises a DKIM2-Signature field by
+    # Not a tampering hole: -08 §12.8 canonicalises a DKIM2-Signature field by
     # removing all whitespace before hashing it, so adding FWS around "=" does
     # not change what i=1's b= covers. The countersigned chain verifies, while
     # changing the domain really does break i=1 (next test).
@@ -255,7 +255,7 @@ isnt($rc4, 0, 'missing --selector is an error');
         $v2->PRINT($changed); $v2->CLOSE;
         # The custody check (section 14.4) now names it before the broken
         # i=1 signature (section 14.6) would: contract C9's order.
-        is($v2->details, 'PERMERROR: DKIM2-Signature i=1 nd= does not match',
+        is($v2->details, 'FAIL: DKIM2-Signature i=1 nd= does not match',
             'gate: changing the nd= domain does break the chain');
     }
     ($out, $rc) = $run->($nd_top->('TEST2.dkim2.com'));
@@ -277,7 +277,7 @@ isnt($rc4, 0, 'missing --selector is an error');
     is($rc, 0, 'gate: --ignore-timestamps accepted');
 }
 
-# --exploded (-07 section 12.5): f=exploded from i=2 on, never at i=1.
+# --exploded (-08 section 12.5): f=exploded from i=2 on, never at i=1.
 {
     my $f = sub { my ($sig) = Email::MIME->new($_[0])->header_raw('DKIM2-Signature');
                   $sig =~ /\bf=([^;]*)/ ? $1 =~ s/\s+//gr : '' };

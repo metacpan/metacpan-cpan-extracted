@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Recipe copy ranges must ascend: across the "c" steps of one Recipe, each
-# start is greater than the previous end (-07 section 5.1 says so for
+# start is greater than the previous end (-08 section 5.1 says so for
 # header Recipes; the agreed extension applies the same rule to body
 # Recipes). Together with 1 <= start <= end <= count, that is the whole
 # well-formedness rule for "c". A Recipe that breaks it is malformed and
@@ -112,52 +112,59 @@ sub with_recipe {
 # {"b":[{"c":[1,3]}]}. Each case below replaces it with a malformed one.
 my $append_footer = sub { $_[0]->body_set($_[0]->body_raw . "-- \r\nfooter\r\n") };
 
+# -08 §14.2 (contract D6): a bad step is "Recipe <path> is invalid"; a
+# fraction or exponent anywhere is the document's fault ("contains invalid
+# JSON"); a range past the end is found applying the Recipe, as before.
+my $JSON = 'PERMERROR: Message-Instance m=2 contains invalid JSON';
+sub step { "PERMERROR: Message-Instance m=2 Recipe $_[0] is invalid" }
 my @bad = (
-    [ '{"b":[{"c":[3,3]},{"c":[1,2]}]}',   qr/out of order/,        'descending ranges' ],
-    [ '{"b":[{"c":[1,2]},{"c":[2,3]}]}',   qr/copies lines 2-2 twice/, 'overlapping ranges' ],
-    [ '{"b":[{"c":[1,3]},{"c":[1,3]}]}',   qr/copies lines 1-3 twice/, 'the same range twice' ],
-    [ '{"b":[{"c":[2,2]},{"c":[2,2]}]}',   qr/copies lines 2-2 twice/, 'the same line twice' ],
-    [ '{"b":[{"c":[0,3]}]}',               qr/contains invalid JSON/, 'a range from line 0' ],
-    [ '{"b":[{"c":[1,6]}]}',               qr/copies lines 1-6 of 5/, 'a range past the end' ],
-    [ '{"b":[{"c":[3,1]}]}',               qr/(?:copies lines 3-1 of 5|invalid copy range 3-1)/, 'a range that runs backwards' ],
-    [ '{"b":[{"c":[1.5,3]}]}',             qr/contains invalid JSON/, 'a fractional bound' ],
-    [ '{"b":[{"c":["x",3]}]}',             qr/contains invalid JSON/, 'a non-numeric bound' ],
-    [ '{"b":[{"c":[true,3]}]}',            qr/contains invalid JSON/, 'a boolean bound' ],
-    [ '{"b":[{"c":[-1,3]}]}',              qr/contains invalid JSON/, 'a negative bound' ],
-    [ '{"b":[{"c":["1","3"]}]}',           qr/contains invalid JSON/, 'bounds that are JSON strings' ],
-    [ '{"b":[{"c":[1,"3"]}]}',             qr/contains invalid JSON/, 'one bound that is a JSON string' ],
-    [ '{"b":[{"c":[1.0,3]}]}',             qr/contains invalid JSON/, 'a bound with a fraction part of zero' ],
-    [ '{"b":[{"c":[1e0,3]}]}',             qr/contains invalid JSON/, 'a bound in exponent form' ],
-    [ '{"b":[{"c":[null,3]}]}',            qr/contains invalid JSON/, 'a null bound' ],
-    [ '{"b":[{"c":[1]}]}',                 qr/contains invalid JSON/, 'one bound' ],
-    [ '{"b":[{"c":[1,2,3]}]}',             qr/contains invalid JSON/, 'three bounds' ],
-    [ '{"b":[{"c":[]}]}',                  qr/contains invalid JSON/, 'no bounds' ],
-    [ '{"h":{"subject":[{"c":[1,1]},{"c":[1,1]}]}}', qr/copies lines 1-1 twice/,
+    [ '{"b":[{"c":[3,3]},{"c":[1,2]}]}',   step('b[1]'), 'descending ranges' ],
+    [ '{"b":[{"c":[1,2]},{"c":[2,3]}]}',   step('b[1]'), 'overlapping ranges' ],
+    [ '{"b":[{"c":[1,3]},{"c":[1,3]}]}',   step('b[1]'), 'the same range twice' ],
+    [ '{"b":[{"c":[2,2]},{"c":[2,2]}]}',   step('b[1]'), 'the same line twice' ],
+    [ '{"b":[{"c":[0,3]}]}',               step('b[0]'), 'a range from line 0' ],
+    [ '{"b":[{"c":[1,6]}]}',               $JSON, 'a range past the end', qr/copies lines 1-6 of 5/ ],
+    [ '{"b":[{"c":[3,1]}]}',               step('b[0]'), 'a range that runs backwards' ],
+    [ '{"b":[{"c":[1.5,3]}]}',             $JSON, 'a fractional bound' ],
+    [ '{"b":[{"c":["x",3]}]}',             step('b[0]'), 'a non-numeric bound' ],
+    [ '{"b":[{"c":[true,3]}]}',            step('b[0]'), 'a boolean bound' ],
+    [ '{"b":[{"c":[-1,3]}]}',              step('b[0]'), 'a negative bound' ],
+    [ '{"b":[{"c":["1","3"]}]}',           step('b[0]'), 'bounds that are JSON strings' ],
+    [ '{"b":[{"c":[1,"3"]}]}',             step('b[0]'), 'one bound that is a JSON string' ],
+    [ '{"b":[{"c":[1.0,3]}]}',             $JSON, 'a bound with a fraction part of zero' ],
+    [ '{"b":[{"c":[1e0,3]}]}',             $JSON, 'a bound in exponent form' ],
+    [ '{"b":[{"c":[null,3]}]}',            step('b[0]'), 'a null bound' ],
+    [ '{"b":[{"c":[1]}]}',                 step('b[0]'), 'one bound' ],
+    [ '{"b":[{"c":[1,2,3]}]}',             step('b[0]'), 'three bounds' ],
+    [ '{"b":[{"c":[]}]}',                  step('b[0]'), 'no bounds' ],
+    [ '{"h":{"subject":[{"c":[1,1]},{"c":[1,1]}]}}', step('h.subject[1]'),
       'a header range used twice' ],
-    [ '{"h":{"comments":[{"c":[2,2]},{"c":[1,1]}]}}', qr/out of order/,
+    [ '{"h":{"comments":[{"c":[2,2]},{"c":[1,1]}]}}', step('h.comments[1]'),
       'descending header ranges' ],
+    [ '{"h":{"comments":[{"c":[1,1]}],"b-side":[{"c":[2,1]}]}}', step('h.b-side[0]'),
+      'header names in byte order: b-side before comments' ],
+    [ '{"b":[{"c":[1,2]}],"h":{"comments":[{"x":1}]}}', step('h.comments[0]'),
+      'b is checked before h, and a good b passes on' ],
 );
 
 for my $case (@bad) {
-    my ($json, $error, $name) = @$case;
+    my ($json, $want, $name, $detail_re) = @$case;
     my ($current) = two_hops($append_footer, sub { with_recipe($_[0], $json) });
     my $text = $current->as_string;
 
     my $err = eval { Mail::DKIM2::MessageInstance->undo($text); 1 } ? '' : $@;
-    like($err, $error, "undo refuses $name");
+    like($err, $detail_re // qr/\A\Q$want\E\n?\z/, "undo refuses $name");
 
-    # Every Recipe error is "contains invalid JSON"; which one is detail.
-    my $invalid = 'PERMERROR: Message-Instance m=2 contains invalid JSON';
     my ($ok, $why, $detail) = Mail::DKIM2::MessageInstance->chain_verifies($text);
     ok(!$ok, "... chain_verifies does not pass");
-    is($why, $invalid, "... and says why");
-    like($detail // $why, $error, "... with the detail") unless $error =~ /invalid JSON/;
+    is($why, $want, "... and says why");
+    like($detail, $detail_re, "... with the detail") if $detail_re;
 
     my ($result, $details, $diag) = verify_result($text);
     isnt($result, 'died', "... the Verifier does not throw");
     isnt($result, 'pass', "... and does not accept the message") or diag($details);
-    is($details, $invalid, "... naming the problem");
-    like($diag // $details, $error, "... with the detail in diagnostic()") unless $error =~ /invalid JSON/;
+    is($details, $want, "... naming the problem");
+    like($diag, $detail_re, "... with the detail in diagnostic()") if $detail_re;
 }
 
 # The honest footer Recipe still passes, so the failures above are the

@@ -1,5 +1,38 @@
 Revision history for App-perlvars
 
+0.000009  2026-10-29 23:05:56Z
+    - When multiple files are passed, a file that cannot be found or parsed is
+      now reported and skipped instead of aborting the whole run (the exit code
+      is still non-zero). Previously the first such file ended the run early.
+      (GH#43) (Olaf Alders)
+    - Under --scripts, UTF-8 package-less files (e.g. a Unicode identifier under
+      "use utf8") are now analyzed instead of being reported as unparseable.
+      (GH#43) (Olaf Alders)
+    - Under --scripts, a package-less file that cannot be parsed as Perl at all
+      is now skipped silently, like other files that cannot be analyzed.
+      (GH#43) (Olaf Alders)
+    - The analyzed file's own STDOUT/STDERR output is now suppressed during
+      analysis, so compile-time noise and the synthetic wrapper path no longer
+      leak to the terminal. This now applies to files that declare a package as
+      well, not only to package-less files linted under --scripts.
+      (GH#43) (Olaf Alders)
+    - A file that declares a package but exits or dies at compile time (for
+      example "use Test::More skip_all => ...") is now skipped instead of
+      aborting the run with a Storable "Magic number checking" error. As with
+      other unanalyzable files, one such file no longer ends a batch early.
+      (GH#43) (Olaf Alders)
+    - A package-less file that cannot be analyzed (e.g. it uses a module that is
+      not installed) is now skipped even when it registers an END block that
+      exits non-zero as the file is compiled; previously such a file leaked a
+      "Test::Vars ignores ..." note and a non-zero exit code.
+      (GH#43) (Olaf Alders)
+    - Document a Test::Vars false-positive class in the perlvars CAVEATS: a
+      variable used only inside a block guarded by a compile-time constant that
+      is false in the current environment (e.g. an optional-XS fast path when
+      the XS module is not installed) is reported as "used once", because the
+      compiler folds the dead branch away before Test::Vars inspects the optree.
+      (GH#45) (Olaf Alders)
+
 0.000008  2026-09-19 02:00:35Z
     - Support linting package-less files, e.g. .t and .pl scripts, by wrapping
       them in a synthetic package. This is opt-in via the new --scripts flag

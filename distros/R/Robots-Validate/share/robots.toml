@@ -2408,6 +2408,11 @@ agents=["bl.uk_lddc_bot", "bl.uk_ldfc_bot"]
 domain=".bl.uk"
 network=["18.130.205.6", "13.42.180.60"]
 
+[bnf-fr_bot]
+## About: https://www.bnf.fr/fr/capture-de-votre-site-web-par-le-robot-de-la-bnf
+agents="bnf.fr_bot"
+domain=".bnf.fr"
+
 [brightbot]
 ## Date: 2026-08-14
 ## About: https://brightdata.com/brightbot
@@ -2448,7 +2453,7 @@ agents="Bytespider"
 domain=".crawl.bytedance.com"
 
 [ccbot]
-## Date: 2026-09-25
+## Date: 2026-10-23
 ## About: https://commoncrawl.org/ccbot
 ## Network: https://index.commoncrawl.org/ccbot.json
 
@@ -6502,14 +6507,14 @@ agents="IonCrawl"
 domain=".1and1.org"
 
 [isonsearchbot]
-## Date: 2026-10-01
+## Date: 2026-10-24
 ## About: https://search.isonai.com/bot
 ## Network: https://search.isonai.com/bot/ips.json
 
 agents="IsonSearchBot"
 network=[
   "103.121.17.220/32",
-  "103.156.115.103/32"
+  "103.150.197.169/32"
 ]
 
 [justsearchuk]
@@ -6868,6 +6873,17 @@ network=[
 agents="OI-Crawler/Nutch"
 network="130.89.144.160/26"
 
+[omniscientebot]
+## Date: 2026-10-26
+## About: https://omnisciente.dev/bot
+## Network: https://omnisciente.dev/bot/ips.json
+
+agents="OmniscienteBot"
+domain=".crawler.omnisciente.dev"
+network=[
+  "62.210.192.81", "191.218.162.253"
+]
+
 [openai-adsbot]
 ## Date: 2026-09-25
 ## About: https://platform.openai.com/docs/bots
@@ -7006,6 +7022,12 @@ network=[
 agents="PipericBot"
 domain=".piperic.com"
 
+[plytikbot]
+## About: https://www.plytik.com/bot
+
+agents="PlytikBot"
+domain=".plytik.com"
+
 [poweredbybot]
 ## Date: 2026-09-16
 ## About: https://poweredby.keywordseverywhere.com/bot
@@ -7048,6 +7070,26 @@ agents="Qwantbot"
 domain=".qwant.com"
 network=[
   "194.187.171.0/24",
+]
+
+[riverbot]
+## Date: 2026-10-24
+## About: https://river.ai/bot
+## Network: https://river.ai/riverbot.json
+agents="RiverBot"
+network=[
+  "3.212.178.146/32",
+  "18.207.140.132/32",
+  "44.198.80.144/32",
+  "44.198.239.141/32",
+  "52.2.2.171/32",
+  "54.208.50.39/32",
+  "54.243.195.85/32",
+  "98.86.145.131/32",
+  "98.89.8.122/32",
+  "98.95.144.232/32",
+  "184.194.19.199/32",
+  "184.195.225.180/32"
 ]
 
 [seekportbot]
@@ -8303,6 +8345,11 @@ network=[
   "52.199.41.160",
 ]
 
+[socialcontext]
+## About: https://socialcontext.ai/
+agents="SocialContext-Domains"
+domain=[ '/^socialcontextgpu[0-9]+\.colorado\.edu$/' ]
+
 [sofyabot]
 ## About: https://sofya.co/bot
 
@@ -8353,6 +8400,24 @@ network=[
 agents="SyntoraDataBot"
 domain=".syntoradata.com"
 network=[ "162.55.129.55" ]
+
+[t2bot]
+## About: https://t2ind.com/bot
+## Network: https://t2ind.com/t2bot-ips.json
+agents="T2Bot"
+domain=".t2ind.com"
+network=[
+  "198.251.100.70/32",
+  "198.251.100.71/32",
+  "198.251.100.72/32",
+  "198.251.100.73/32",
+  "198.251.100.74/32",
+  "198.251.100.75/32",
+  "198.251.100.76/32",
+  "198.251.100.77/32",
+  "198.251.100.78/32",
+  "198.251.100.79/32",
+]
 
 [taktikal]
 ## About: https://taktikal.fasttvltd.com/bot
@@ -8526,6 +8591,7 @@ domain=".crawl.yahoo.net"
 domain=".yahoo-net.jp"
 agents=[
   "Y!J-ASR",
+  "Y!J-DLC",
   "Y!J-WSC",
 ]
 network=[

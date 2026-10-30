@@ -2,7 +2,7 @@ package Test2::Util::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.002010';
+our $VERSION = '0.002011';
 
 use Carp qw/croak/;
 
@@ -89,7 +89,7 @@ sub _gen_uuid {
     }
 
     return {
-        gen_uuid => sub { uc(UUID::uuid7->()) },
+        gen_uuid => sub { uc(UUID::uuid7()) },
         bin2uuid => sub { my $out; UUID::unparse($_[0], $out); uc($out) },
         uuid2bin => sub { my $out; UUID::parse($_[0], $out); $out },
     };

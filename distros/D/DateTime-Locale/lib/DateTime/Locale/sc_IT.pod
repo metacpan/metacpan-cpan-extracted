@@ -435,6 +435,24 @@ Sardinian Italy locale.
    1995-12-22T09:05:02 = che 22 de nad de su 1995 p.C.
   -0010-09-15T04:44:23 = sàb 15 de cab de su -10 a.C.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = p.C. 2008 freàrgiu
+   1995-12-22T09:05:02 = p.C. 1995 nadale
+  -0010-09-15T04:44:23 = a.C. -10 cabudanni
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = p.C. 2008 freàrgiu 5, mar
+   1995-12-22T09:05:02 = p.C. 1995 nadale 22, che
+  -0010-09-15T04:44:23 = a.C. -10 cabudanni 15, sàb
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = p.C. 2008 freàrgiu 5
+   1995-12-22T09:05:02 = p.C. 1995 nadale 22
+  -0010-09-15T04:44:23 = a.C. -10 cabudanni 15
+
 =head3 GyMMMd (d 'de' MMM 'de' 'su' y G)
 
    2008-02-05T18:30:30 = 5 de fre de su 2008 p.C.
@@ -506,6 +524,12 @@ Sardinian Italy locale.
    2008-02-05T18:30:30 = mar 5 de fre
    1995-12-22T09:05:02 = che 22 de nad
   -0010-09-15T04:44:23 = sàb 15 de cab
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = freàrgiu 5, mar
+   1995-12-22T09:05:02 = nadale 22, che
+  -0010-09-15T04:44:23 = cabudanni 15, sàb
 
 =head3 MMMMW-count-one (W'a' 'chida' 'de' MMMM)
 

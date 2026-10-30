@@ -435,17 +435,35 @@ Hausa Ghana locale.
    1995-12-22T09:05:02 = BHAI 1995 Dis 22, Jum
   -0010-09-15T04:44:23 = K.H -10 Sat 15, Asa
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = BHAI 2008 Faburairu
+   1995-12-22T09:05:02 = BHAI 1995 Disamba
+  -0010-09-15T04:44:23 = K.H -10 Satumba
+
+=head3 GyMMMMEd (G y, MMMM d, E)
+
+   2008-02-05T18:30:30 = BHAI 2008, Faburairu 5, Tal
+   1995-12-22T09:05:02 = BHAI 1995, Disamba 22, Jum
+  -0010-09-15T04:44:23 = K.H -10, Satumba 15, Asa
+
+=head3 GyMMMMd (G y, MMMM d)
+
+   2008-02-05T18:30:30 = BHAI 2008, Faburairu 5
+   1995-12-22T09:05:02 = BHAI 1995, Disamba 22
+  -0010-09-15T04:44:23 = K.H -10, Satumba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = BHAI 2008 Fab 5
    1995-12-22T09:05:02 = BHAI 1995 Dis 22
   -0010-09-15T04:44:23 = K.H -10 Sat 15
 
-=head3 GyMd (G y-MM-dd)
+=head3 GyMd (d/M/y G)
 
-   2008-02-05T18:30:30 = BHAI 2008-02-05
-   1995-12-22T09:05:02 = BHAI 1995-12-22
-  -0010-09-15T04:44:23 = K.H -10-09-15
+   2008-02-05T18:30:30 = 5/2/2008 BHAI
+   1995-12-22T09:05:02 = 22/12/1995 BHAI
+  -0010-09-15T04:44:23 = 15/9/-10 K.H
 
 =head3 H (HH)
 
@@ -626,6 +644,18 @@ Hausa Ghana locale.
    2008-02-05T18:30:30 = Faburairu 2008
    1995-12-22T09:05:02 = Disamba 1995
   -0010-09-15T04:44:23 = Satumba -10
+
+=head3 yMMMMEd (y, MMMM d, E)
+
+   2008-02-05T18:30:30 = 2008, Faburairu 5, Tal
+   1995-12-22T09:05:02 = 1995, Disamba 22, Jum
+  -0010-09-15T04:44:23 = -10, Satumba 15, Asa
+
+=head3 yMMMMd (y, MMMM d)
+
+   2008-02-05T18:30:30 = 2008, Faburairu 5
+   1995-12-22T09:05:02 = 1995, Disamba 22
+  -0010-09-15T04:44:23 = -10, Satumba 15
 
 =head3 yMMMd (d MMM, y)
 

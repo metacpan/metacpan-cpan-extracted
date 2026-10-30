@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 1;
 
@@ -24,8 +24,8 @@ C<Linux::Event::WebSocket> provides callback-first WebSocket client and server
 support on top of Linux::Event.
 
 Linux::Event owns the live socket, TLS transport, ordered byte buffering,
-backpressure, and protocol transition. Linux::Event::HTTP owns the opening
-HTTP/1.1 Upgrade exchange. Private modules in this distribution own RFC 6455
+backpressure, and protocol transition. Unblock::HTTP1 owns the opening
+HTTP/1.1 Upgrade exchange, independently of Linux::Event::HTTP. Private modules in this distribution own RFC 6455
 handshake validation, framing, masking, fragmentation, text validation, and
 control semantics.
 
@@ -39,6 +39,8 @@ evolve without changing the public Linux::Event API.
 
 =head1 STATUS
 
-Version 0.002 fixes native allocation cleanup for rejected Close frames found by CPAN Testers.
+Version 0.003 uses the standalone Unblock::HTTP1 opening handshake
+and works alongside Linux::Event::HTTP 0.004 without its removed classes.
+Applications use the same public WebSocket client/server API.
 
 =cut

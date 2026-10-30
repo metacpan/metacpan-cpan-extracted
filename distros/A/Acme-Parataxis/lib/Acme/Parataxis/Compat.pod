@@ -4,22 +4,30 @@
 
 =head1 NAME
 
-Acme::Parataxis::Compat - Make Blocking Builtins Cooperate (transparent unblocking)
+Acme::Parataxis::Compat - Transparent Gevent-Style Cooperative Unblocking of Builtins
 
 =head1 SYNOPSIS
 
     use v5.40;
     use Acme::Parataxis qw[async fiber];
 
-    # Opt in, in a BEGIN block, above the code you want to change.
+    # Must be installed at compile time, in a BEGIN block, above affected code:
     BEGIN { Acme::Parataxis->enable_transparent_unblocking() }
 
     async {
-        my $fh = IO::Socket::INET->new( PeerAddr => 'example.com:80' ) or die $!;
+        my $sock = IO::Socket::INET->new( PeerAddr => 'example.com:80' ) or die $!;
 
-        # Plain blocking builtins. Inside a fiber, these are cooperative.
-        my $napper = fiber { sleep 0.05; say 'f1: slept' };              # no longer stalls the run
-        my $reader = fiber { my $buf = q{}; read( $fh, $buf, 4 ); say "f2: read '$buf'" };
+        # Standard blocking builtins are now cooperative inside fibers:
+        my $napper = fiber {
+            sleep 0.05;    # yields to the scheduler; does not block the OS thread
+            say 'f1: finished sleep';
+        };
+
+        my $reader = fiber {
+            my $buf = q{};
+            read( $sock, $buf, 64 );    # frames onto await_read; yields while waiting
+            say "f2: read ${\length($buf)} bytes";
+        };
 
         $napper->await;
         $reader->await;
@@ -27,193 +35,155 @@ Acme::Parataxis::Compat - Make Blocking Builtins Cooperate (transparent unblocki
 
 =head1 DESCRIPTION
 
-C<Compat> makes three blocking builtins cooperative inside a scheduled fiber, so ordinary synchronous code stops
-freezing everything around it:
+C<Acme::Parataxis::Compat> provides an opt-in, C<gevent>-style compatibility layer for legacy synchronous code. By
+installing C<CORE::GLOBAL> overrides for C<sleep>, C<read>, and C<sysread>, existing modules and synchronous loops run
+cooperatively inside fibers without freezing the entire process:
 
 =over
 
-=item * C<sleep> becomes L<await_sleep|Acme::Parataxis::await_sleep>
+=item * C<sleep> becomes L<await_sleep|Acme::Parataxis/await_sleep>
 
-The fiber yields for the time asked for and the other fibers run. Inside a fiber the call returns the duration you
-asked for, so C<sleep 0.05> returns C<0.05> - C<CORE::sleep> truncates that to nothing. Outside the scheduler it is
-C<CORE::sleep> unchanged, truncation and all. The C<$_> default works.
+The calling fiber yields for the requested duration while other fibers proceed. Fractional seconds are honored with
+millisecond precision (C<sleep 0.05> sleeps 50ms, whereas C<CORE::sleep> truncates this to 0). When called outside a
+fiber, it falls back immediately to C<CORE::sleep>. The C<$_> default argument is supported.
 
-=item * C<read> and C<sysread> become a read framed on L<await_read|Acme::Parataxis::await_read>
+=item * C<read> and C<sysread> become non-blocking reads framed on L<await_read|Acme::Parataxis/await_read>
 
-The fiber parks until the scheduler reports the handle readable, then performs one non-blocking read and writes the
-result back into your scalar. B<It can hand back fewer bytes than you asked for>, so loop when you need an exact count;
-see L</"Framing a read of a known length">. Waiting on a peer that has not spoken yet is an ordinary fiber wait, so
-L<with_timeout|Acme::Parataxis::with_timeout> and L<Acme::Parataxis::CancellationToken> interrupt it like any other.
+The fiber parks until the filehandle is reported readable, flips the handle non-blocking, reads available bytes, and
+restores the original handle mode. B<It can return fewer bytes than requested>, exactly like a non-blocking socket
+read; callers needing an exact byte count should loop.
 
-=item * Everything else is untouched
+=item * Everything else remains untouched
 
-C<select>, C<alarm>, C<time> and the rest still mean exactly what Perl means, and C<DBI> is C underneath and stays
-blocking. Use L<await_read|Acme::Parataxis::await_read> and L<await_write|Acme::Parataxis::await_write>, or a worker
-thread, for those.
+C<select>, C<alarm>, C<connect>, and C-level extensions like C<DBI> are not intercepted and remain blocking. Use
+L<await_read|Acme::Parataxis/await_read>, L<await_write|Acme::Parataxis/await_write>, or L<Acme::Parataxis::Blocking>
+for those.
 
 =back
 
-Nothing here happens unless you call C<< Acme::Parataxis-E<gt>enable_transparent_unblocking() >>, and even then only
-code I<compiled after> that call is affected. C<CORE::GLOBAL> overrides are resolved when each piece of code is
-compiled, so install from a C<BEGIN> block positioned above the code you want to change. Every override delegates to
-the raw C<CORE::> builtin outside a scheduled fiber, so top-level code, worker threads, and any region compiled before
-installation all behave exactly as they always did.
+Nothing is modified unless you explicitly invoke C<enable_transparent_unblocking()>, and only code I<compiled after>
+the call is affected. Perl resolves C<CORE::GLOBAL> overrides at parse time, so installation must take place within a
+C<BEGIN> block placed above the target code. Outside of a running fiber, all three overrides delegate directly to the
+native C<CORE::> builtins.
 
 =head1 METHODS
 
-=head2 C<< Acme::Parataxis-E<gt>enable_transparent_unblocking( ) >>
+=head2 C<< Acme::Parataxis->enable_transparent_unblocking( ) >>
 
     BEGIN { Acme::Parataxis->enable_transparent_unblocking() }
+    # or:
+    BEGIN { Acme::Parataxis::Compat->install() }
 
-Installs the overrides and returns C<1>. Idempotent, so a second call is not an error, and it takes no arguments. This
-is the opt-in: until it is called, nothing is patched.
+Installs the C<CORE::GLOBAL> overrides and returns C<1>. Idempotent.
 
-=head2 C<< Acme::Parataxis-E<gt>transparent_unblocking( ) >>
-
-    say 'installed' if Acme::Parataxis->transparent_unblocking();
-
-Returns C<1> while the overrides are installed and C<0> otherwise, including before C<Compat> has ever been loaded.
-Useful for asserting that a test is really running with them turned on.
-
-=head2 C<< Acme::Parataxis-E<gt>disable_transparent_unblocking( ) >>
+=head2 C<< Acme::Parataxis->disable_transparent_unblocking( ) >>
 
     Acme::Parataxis->disable_transparent_unblocking();
+    # or:
+    Acme::Parataxis::Compat->disable();
 
-Restores the saved globs and returns C<1>. Only code compiled I<after> the call observes the restore, since earlier
-call sites were already compiled against the override - the same rule that governs installing.
+Restores the global symbols to their pre-installation state. Safely clears internal subroutine depth tracking so Perl's
+subroutine finalization does not trigger "Can't undef active subroutine" errors. Only code compiled I<after> this call
+reverts to the builtins.
+
+=head2 C<< Acme::Parataxis->transparent_unblocking( ) >>
+
+    say 'Active' if Acme::Parataxis->transparent_unblocking();
+    # or:
+    say 'Active' if Acme::Parataxis::Compat->installed();
+
+Returns true if the transparent unblocking overrides are currently installed.
 
 =head1 Recipes
 
-=head2 Turning it on for one file
+=head2 Enabling unblocking for a single file or script
 
-    package My::App::Server;
+    package My::Worker;
     use v5.40;
     use Acme::Parataxis qw[async fiber];
-    use Acme::Parataxis::Compat;         # optional: enabling loads it for you
 
     BEGIN { Acme::Parataxis->enable_transparent_unblocking() }
 
-    sub run { ... }                      # every sleep and read compiled below here is cooperative
+    use Net::FTP;    # compiled AFTER the overrides; its internal reads and sleeps cooperate!
 
-A C<BEGIN> block runs at compile time, in file order, so it has to come after the C<use> lines it depends on and before
-the code that should be affected. Anything C<use>d I<below> the block is compiled after installation and is covered as
-well; anything already loaded above it is not.
+    async {
+        my $ftp = fiber { Net::FTP->new('ftp.example.com', Timeout => 10) };
+        $ftp->await;
+    };
 
-=head2 Framing a read of a known length
+=head2 Reading an exact number of bytes safely
 
-    sub read_exactly {
-        my ( $fh, $len ) = @_;
+Because non-blocking reads return as soon as data arrives, wrap reads in a loop when a fixed payload size is required:
+
+    sub read_exact ( $fh, $len ) {
         my $buf = q{};
         my $got = 0;
         while ( $got < $len ) {
-            my $n = read( $fh, $buf, $len - $got, $got ) or last;   # 0 at EOF, undef on error
+            my $n = read( $fh, $buf, $len - $got, $got );
+            last if !defined($n) || $n == 0;    # error or EOF
             $got += $n;
         }
         return $buf;
     }
 
-A single C<read> is free to return a short count, so a caller that needs an exact number of bytes keeps asking. The
-C<OFFSET> argument places each chunk at the right spot in the same buffer, and the loop stops on C<0> (EOF) or C<undef>
-(error) instead of spinning. This one is also safe to call from the top level, where C<read> is the raw builtin and the
-first call usually satisfies it outright.
+The C<OFFSET> parameter places each chunk at the correct offset in the buffer without extra string copies.
 
-=head2 Running a blocking CPAN module
+=head2 Scoped testing and cleanup
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber];
+    use Test2::V1;
+    use Acme::Parataxis;
 
-    BEGIN { Acme::Parataxis->enable_transparent_unblocking() }
-    use Net::FTP;                        # compiled after the install, so its reads and sleeps cooperate
-
-    async {
-        my $ftp = fiber { Net::FTP->new( 'ftp.example.com', Timeout => 30 ) };
-        say 'other fibers keep running while that works';
-        $ftp->await;
-    };
-
-The module cooperates because it was I<compiled> after installation, not because it knows anything about Parataxis.
-What this does not fix is a module that blocks somewhere the overrides cannot reach - a C<connect>, a C-level call like
-C<DBI>, or its own hand-rolled C<select> loop. Those still park the whole OS thread, and the answer there is
-L<await_read|Acme::Parataxis::await_read> or a worker thread.
-
-=head2 Turning it off for one test
-
-    subtest 'sleep truncates again without the overrides' => sub {
+    subtest 'sleep restores truncation outside overrides' => sub {
         Acme::Parataxis->disable_transparent_unblocking();
-        my $rc = eval 'sleep(0.05)';      # freshly compiled, so it sees the restore
-        ok $rc == int $rc, 'raw CORE::sleep truncated the fraction';
+        my $rc = eval 'sleep(0.05)';    # eval forces compilation after disable()
+        is $rc, 0, 'raw CORE::sleep truncated fractional seconds';
         Acme::Parataxis->enable_transparent_unblocking();
     };
-
-The restore only reaches code compiled after it, which is why the snippet has to be C<eval>ed rather than calling
-something already compiled above.
 
 =head1 Behavior Notes
 
 =over
 
-=item * A short read is not an error
+=item * Short reads are normal
 
-C<read> and C<sysread> return whatever has arrived, which on a socket is routinely less than the count you asked for. A
-raw blocking C<read> on a stream handle would have kept waiting for the remainder, but that wait belongs to the OS
-thread and not to the fiber, so nothing else in the program could run and no deadline or token could interrupt it. The
-count you get back is the honest one; looping for more is the caller's job.
+Perl's builtin C<read()> blocks the entire OS thread until the requested buffer is completely filled. C<Compat::read>
+cannot do this without freezing sibling fibers. Instead, it waits for readiness and returns whatever bytes have
+arrived. Always loop if your protocol requires a fixed frame length.
 
-=item * Waiting is still interruptible
+=item * Waiting remains fully cancellable
 
-A read parked on a handle with nothing to say parks in the scheduler, so L<with_timeout|Acme::Parataxis::with_timeout>,
-a L<CancellationToken|Acme::Parataxis::CancellationToken>, or a L<nursery|Acme::Parataxis::nursery> failure all cut it
-short. It is the read itself that can now come up short, never the wait in front of it.
+Waiting for a handle to become readable parks the fiber in the scheduler. Deadlines from
+L<with_timeout|Acme::Parataxis/with_timeout>, cancellations from L<Acme::Parataxis::CancellationToken>, and nursery
+abort signals will interrupt the wait cleanly.
 
-=item * Your handle is handed back as you gave it
+=item * Original handle modes are restored
 
-The override switches a handle to non-blocking for the duration of its own read and restores the flags before
-returning, so code compiled before installation - which still gets a raw blocking read from that same handle - does not
-start failing with C<EAGAIN>. A caller that set C<O_NONBLOCK> itself gets its handle back that way too, and a read at
-the top level never touches the mode at all.
+The override switches the filehandle to non-blocking mode (via C<< IO::Handle::blocking($fh, 0) >>) only for the
+duration of the read, and restores the original mode before returning. Code compiled before installation that shares
+the handle continues to observe standard blocking semantics.
 
-=item * Buffered and careful reads differ
+=item * Bareword filehandles stop compiling
 
-C<read> on a C<PerlIO>-buffered handle takes whatever the buffer already holds and only reaches for the descriptor if
-it has to, so it can return a short count drawn entirely from memory. C<sysread> always goes to the descriptor. Both
-are framed on readiness the same way.
+Because C<CORE::GLOBAL> overrides cannot reproduce the compiler's specialized grammar rules for bareword filehandles,
+code compiled under C<use strict> after installation will fail to compile bareword handles:
 
-=item * Only code compiled after you enable it is affected, and bareword handles stop parsing
-
-An override is installed, not compiled in, so it changes the parser's mind for every C<read> and C<sysread> that is
-compiled afterwards. What the parser loses is the builtin's special case for a bareword handle in first position, so
-under C<use strict> this stops compiling once the override is in place:
-
-    use strict;
-    use Acme::Parataxis;
     BEGIN { Acme::Parataxis->enable_transparent_unblocking() }
-    require Some::Module;        # dies: Bareword "FH" not allowed while "strict subs" in use
+    read( FILEHANDLE, $buf, 128 );    # syntax error under strict subs
 
-A lexical handle - C<open my $fh> - is unaffected, and so is any module already loaded, which is the other half of the
-same rule: C<require> a module that reads from a bareword handle before you enable. This is a compile-time failure, so
-C<no warnings> will not quiet it.
+Always use lexical filehandles (C<my $fh>) or indirect handles (C<\*STDIN>) in code compiled with unblocking enabled.
 
-Reading a regular file keeps working, with or without an attached loop: C<await_read> is a C<select()> on the built-in
-pool, and a reactor that cannot C<epoll_ctl> a file reports it as always ready instead, which is what
-L<IO::Async::Loop> does on C<EPERM>.
+=item * Windows non-socket fallback
 
-=item * Only three builtins
-
-There is no override for C<select>, C<alarm>, C<time>, C<connect>, or anything written in C - and nothing is stubbed to
-warn you at the call site either. An uncovered blocking call simply blocks, which is one reason the install is opt-in
-and off by default.
-
-=item * Nothing surprising when disabled
-
-C<disable_transparent_unblocking> restores the saved globs exactly. Only freshly compiled code observes the restore,
-since earlier call sites were already compiled against the override.
+Windows C<select()> only operates on network sockets; attempting to wait on a pipe or disk filehandle returns an
+immediate error. When C<Compat> detects a descriptor on Windows that completes its probe in less than 90% of the wait
+budget, it recognizes the handle as unwatchable and performs an immediate direct read. If a pipe has no data buffered,
+this direct read will block the host thread until data arrives.
 
 =back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis> (C<await_sleep>, C<await_read>, C<await_write>, C<with_timeout>), L<Acme::Parataxis::Error>,
-L<Acme::Parataxis::CancellationToken>, L<Acme::Parataxis::Nursery>
+L<Acme::Parataxis>, L<Acme::Parataxis::CancellationToken>, L<IO::Handle>
 
 =head1 AUTHOR
 

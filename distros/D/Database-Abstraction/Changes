@@ -1,5 +1,16 @@
 Revision history for Database-Abstraction
 
+0.53	Wed Oct 28 12:45:08 PM EDT 2026
+	[ Enhancements ]
+	- Added support for MariaDB via dbi:MariaDB: DSN (maps to mysql dialect)
+
+	[ Bug Fixes ]
+	- Fix Windows test (Windows path portability in t/domain.t)
+
+	[ Tests ]
+	- Added more domain tests
+	- Test user@host is supported as a username
+
 0.52	Fri Oct 23 12:19:45 PM EDT 2026
 	[ Bug Fixes ]
 	- use Sub::Private { mode => 'enforce' } instead of bare use Sub::Private.

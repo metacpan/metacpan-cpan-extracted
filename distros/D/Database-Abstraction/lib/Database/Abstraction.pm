@@ -105,11 +105,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.52
+Version 0.53
 
 =cut
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 =head1 DESCRIPTION
 
@@ -572,10 +572,12 @@ C<dsn> is given.
 
 =item * C<dsn>
 
-A DBI data-source string (e.g. C<dbi:SQLite:dbname=/path/to/db> or
-C<dbi:Pg:dbname=mydb;host=db.example.com>).  When present, file detection
-is skipped entirely and the DSN is used directly.  The SQL dialect is
-inferred from the DSN prefix (C<sqlite>, C<postgres>, C<mysql>).
+A DBI data-source string (e.g. C<dbi:SQLite:dbname=/path/to/db>,
+C<dbi:Pg:dbname=mydb;host=db.example.com>, or
+C<dbi:MariaDB:database=mydb;host=db.example.com>).  When present, file
+detection is skipped entirely and the DSN is used directly.  The SQL
+dialect is inferred from the DSN prefix (C<sqlite>, C<postgres>,
+C<mysql> — C<dbi:MariaDB:> maps to the C<mysql> dialect).
 
 =item * C<username>
 
@@ -989,9 +991,10 @@ sub _open :Protected
 	# DSN-based connection bypasses file detection entirely
 	if(my $dsn = $self->{'dsn'} || $defaults{'dsn'}) {
 		my $dialect = 'generic';
-		if    ($dsn =~ /\Adbi:SQLite:/i) { $dialect = 'sqlite'   }
-		elsif ($dsn =~ /\Adbi:Pg:/i)     { $dialect = 'postgres' }
-		elsif ($dsn =~ /\Adbi:mysql:/i)  { $dialect = 'mysql'    }
+		if    ($dsn =~ /\Adbi:SQLite:/i)   { $dialect = 'sqlite'   }
+		elsif ($dsn =~ /\Adbi:Pg:/i)       { $dialect = 'postgres' }
+		elsif ($dsn =~ /\Adbi:mysql:/i)    { $dialect = 'mysql'    }
+		elsif ($dsn =~ /\Adbi:MariaDB:/i)  { $dialect = 'mysql'    }
 		$self->{'_dialect'} = $dialect;
 
 		$dbh = DBI->connect(

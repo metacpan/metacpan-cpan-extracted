@@ -116,7 +116,7 @@ sub kind {
 	is_deeply([ map { kind(\$_) } @{ $r->{one} } ], [('NV') x 4], 'pandas dtype_per_column: one is float64');
 	is_deeply([ map { kind(\$_) } @{ $r->{two} } ], [('PV') x 4], 'pandas dtype_per_column: two is str');
 	eval { read_table($f, colClasses => { one => 'foo', two => 'integer' }) };
-	like($@, qr/^read_table: colClasses 'foo' is not one read_table reads/,
+	like($@, qr/\nread_table: error: colClasses 'foo' is not one read_table reads/,
 	     'pandas invalid_dtype_per_column: an unknown class is refused');
 }
 

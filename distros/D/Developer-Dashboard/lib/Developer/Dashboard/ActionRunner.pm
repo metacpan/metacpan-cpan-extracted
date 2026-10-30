@@ -3,10 +3,10 @@ package Developer::Dashboard::ActionRunner;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Digest::SHA qw(sha256_hex);
 use File::Spec;
 use POSIX qw(WNOHANG setsid);
@@ -158,7 +158,7 @@ sub run_command_action {
     my ( $self, %args ) = @_;
     my $cmd = $args{command} || die 'Missing command';
     my $cwd = $args{cwd};
-    $cwd = cwd() if !$cwd;
+    $cwd = current_working_directory() if !$cwd;
     if ( !File::Spec->file_name_is_absolute($cwd) && $RESOLVABLE_ACCESSOR{$cwd} ) {
         $cwd = $self->{paths}->$cwd();
     }
@@ -449,7 +449,7 @@ sub _run_command {
     my $env        = $args{env} || {};
     my $timeout_ms = $args{timeout_ms} || 30_000;
 
-    my $old = cwd();
+    my $old = current_working_directory();
     chdir $cwd or die "Unable to chdir to $cwd: $!";
     local @ENV{ keys %$env } = values %$env if %$env;
 

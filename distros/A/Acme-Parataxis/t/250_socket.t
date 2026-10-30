@@ -1,9 +1,10 @@
 use v5.40;
-use Test::More;
+use Test2::V1 -ipP;
 use blib;
-use Acme::Parataxis;
+use Acme::Parataxis qw[run];
 use IO::Socket::INET;
-Acme::Parataxis::run(
+#
+run(
     sub {
         my $listener = IO::Socket::INET->new( LocalAddr => '127.0.0.1', Listen => 5, Reuse => 1, Blocking => 0 );
         my $port     = $listener->sockport;
@@ -27,4 +28,5 @@ Acme::Parataxis::run(
         Acme::Parataxis::stop();
     }
 );
+#
 done_testing();

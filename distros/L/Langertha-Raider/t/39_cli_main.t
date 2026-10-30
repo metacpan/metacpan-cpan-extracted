@@ -92,7 +92,7 @@ subtest 'Runner: human and machine' => sub {
     output => Langertha::Raider::CLI::Output->new(out => $efh, color => 0))
       ->run_prompt('fail', machine => Langertha::Raider::CLI::Machine->new(format => 'json', out => $efh)),
     'failure');
-  is(JSON::MaybeXS->new->decode($eread->()), { version => 1, status => 'failed', error => 'boom', elapsed => E() },
+  is(JSON::MaybeXS->new->decode($eread->()), { version => 1, status => 'failed', reason => 'error', error => 'boom', elapsed => E() },
     'json error document');
 };
 
@@ -190,7 +190,7 @@ subtest 'success exits 0, a failed run 1' => sub {
     'only the JSON document on stdout');
   ( $exit, $out ) = main_run('', @base, '--json', 'fail');
   is($exit, 1, 'failed run');
-  is(JSON::MaybeXS->new->decode($out), { version => 1, status => 'failed', error => 'boom', elapsed => E(),
+  is(JSON::MaybeXS->new->decode($out), { version => 1, status => 'failed', reason => 'error', error => 'boom', elapsed => E(),
       session => { id => T(), path => T() } },
     'JSON error document');
   ( $exit, $out ) = main_run('', @base, 'fail');

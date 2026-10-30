@@ -8,12 +8,12 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.67';
+our $VERSION = '1.68';
 
 use Carp;
 use DateTime::Duration;
 use DateTime::Helpers;
-use DateTime::Locale 1.06;
+use DateTime::Locale 1.47;
 use DateTime::TimeZone 2.44;
 use DateTime::Types;
 use POSIX                           qw( floor fmod );
@@ -1285,6 +1285,17 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
             sub { $_[0]->_zero_padded_number( $1, $_[0]->week_number ) },
         qr/W/ => 'week_of_month',
 
+        # Locale objects that subclass DateTime::Locale::Base don't have this method, and locales
+        # registered with custom data may not have this data, so we fall back to the plain day
+        # number.
+        qr/ddd/ => sub {
+            my $days
+                = $_[0]->{locale}->can('day_of_month_format_abbreviated')
+                ? $_[0]->{locale}->day_of_month_format_abbreviated
+                : undef;
+            my $day = $days ? $days->[ $_[0]->day_of_month_0 ] : undef;
+            return defined $day ? $day : $_[0]->day_of_month;
+        },
         qr/(dd?)/ =>
             sub { $_[0]->_zero_padded_number( $1, $_[0]->day_of_month ) },
         qr/(D{1,3})/ =>
@@ -2375,7 +2386,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.67
+version 1.68
 
 =head1 SYNOPSIS
 
@@ -4175,6 +4186,17 @@ The week of the month, from C<< $dt->week_of_month >>.
 =item * d{1,2}
 
 The numeric day of the month.
+
+=item * ddd
+
+The ordinal day of the month, like "1st", "2nd", or "3rd" in English. This
+comes from C<< $locale->day_of_month_format_abbreviated >>. Many locales have
+no ordinal forms, so for them this is just the numeric day of the month. This
+is also used if the locale object does not provide this data at all. Longer
+runs, like "dddd", are treated the same as "ddd".
+
+CLDR considers this pattern a technical preview, so its output for a given
+locale may change in future releases of DateTime::Locale.
 
 =item * D{1,3}
 

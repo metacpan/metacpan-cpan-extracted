@@ -1,0 +1,42 @@
+class DeveloperDashboard::Bench::HmacChain {
+
+  use Digest::SHA;
+
+  # chain($data, $key, $count)
+  # Computes a repeated HMAC-SHA256 chain wholly inside SPVM so a benchmark
+  # crosses the Perl/SPVM boundary once rather than once per digest operation.
+  # Input: binary data and key strings plus a non-negative iteration count.
+  # Output: the final binary HMAC value; zero iterations return the input.
+  static method chain : string ($data : string, $key : string, $count : int) {
+    for (my $i = 0; $i < $count; $i++) {
+      $data = Digest::SHA->hmac_sha256($data, $key);
+    }
+
+    return $data;
+  }
+
+  # pbkdf2_sha256($password, $salt, $iterations)
+  # Derives one 32-byte PBKDF2-HMAC-SHA256 block inside SPVM for comparative
+  # profiling against the Dashboard's existing implementation.
+  # Input: password bytes, salt bytes, and a positive iteration count.
+  # Output: the binary 32-byte derived key.
+  static method pbkdf2_sha256 : string ($password : string, $salt : string, $iterations : int) {
+    if ($iterations < 1) {
+      die "iterations must be positive";
+    }
+
+    my $block : string = "\0\0\0\1";
+    my $u : string = Digest::SHA->hmac_sha256($salt . $block, $password);
+    my $result : byte[] = (byte[])$u;
+
+    for (my $i = 1; $i < $iterations; $i++) {
+      $u = Digest::SHA->hmac_sha256($u, $password);
+      my $u_bytes : byte[] = (byte[])$u;
+      for (my $j = 0; $j < 32; $j++) {
+        $result->[$j] = (byte)( $result->[$j] ^ $u_bytes->[$j] );
+      }
+    }
+
+    return (string)$result;
+  }
+}

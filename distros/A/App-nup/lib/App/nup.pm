@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.08";
+our $VERSION = "1.09";
 
 1;
 =encoding utf-8
@@ -32,6 +32,9 @@ nup - n-up, multi-column paged output for commands and files
      -S  --pane-width=#     pane width (default: 85)
     --bs --border-style=#   border style (default: heavy-box)
     --ls --line-style=#     line style (none/truncate/wrap/wordwrap)
+         --runin=#          run-in width for line breaking
+         --runout=#         run-out width for line breaking
+         --runlen=#         set both run-in and run-out
     --cm --colormap=#       color mapping (LABEL=COLOR)
          --[no-]page-number page number on border (default: on)
          --textconv[=EXT]   textconv for non-text files
@@ -44,7 +47,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =cut
 =head1 DESCRIPTION
@@ -63,6 +66,17 @@ C<nup> automatically detects the mode based on the first argument:
 if it is an existing file, n-up file view mode is used; if it is an
 executable command, n-up command mode is used.  Use C<-e> option to
 force command mode when needed.
+
+In file view mode, C<nup> stops parsing its own options at the first
+file name and hands the file names and everything after them to
+L<ansicolumn> unchanged.  Options of C<ansicolumn> that C<nup> does
+not provide can therefore be given after the file names:
+
+    nup -C2 file1.txt file2.txt -w 170
+
+Here C<-w 170> sets the output width for C<ansicolumn>.  To set the
+width when no terminal is available, the C<COLUMNS> environment
+variable works in both modes; see L</Terminal Size>.
 
 =head1 OPTIONS
 
@@ -102,6 +116,7 @@ Default aliases:
 
     bat     bat --style=plain --color=always
     batcat  batcat --style=plain --color=always
+    mdcat   mdcat --ansi
     rg      rg --color=always
     tree    tree -C
 
@@ -183,6 +198,14 @@ Set the border style. Default is C<heavy-box>.
 
 Set the line style. Available: C<none>, C<truncate>, C<wrap>, C<wordwrap>.
 
+=item B<--runin>=I<N>, B<--runout>=I<N>, B<--runlen>=I<N>
+
+Set the run-in and run-out widths that L<ansicolumn> uses for line
+breaking (kinsoku) when it folds long lines.  C<--runlen> sets both.
+They are given to ansicolumn after the values in F<~/.ansicolumnrc>,
+so they take precedence.  Without them, ansicolumn uses the values in
+F<~/.ansicolumnrc>, or 2.
+
 =item B<--cm>=I<SPEC>, B<--colormap>=I<SPEC>
 
 Set color mapping. Specify as C<LABEL=COLOR> (e.g., C<--cm=BORDER=R>).
@@ -239,6 +262,17 @@ Disable pager.
 
 =back
 
+=head2 Terminal Size
+
+The terminal size is taken from the controlling terminal
+(C</dev/tty>).  When it is not available, as when C<nup> is run
+without a terminal, the C<COLUMNS> environment variable gives the
+width (default 80), and C<LINES> gives the height (default 24) used
+to split the screen when the number of rows is set with C<-R> or
+C<-G>:
+
+    COLUMNS=170 nup -C2 file1.txt file2.txt
+
 =head2 Less Environment Variables
 
 C<nup> sets the following environment variables when they are not
@@ -266,6 +300,7 @@ Typical n-up usage:
     nup -G2x2 man perl         # 2x2 grid (4-up layout)
     nup -F man perl            # no pagination
     nup file1.txt file2.txt    # view files side by side
+    nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
     nup -e ./script.sh         # force command mode for a file
 
 Using C<nup> as a C<MANPAGER>:
@@ -273,6 +308,15 @@ Using C<nup> as a C<MANPAGER>:
     export MANPAGER="nup -A"
 
 =head1 INSTALLATION
+
+=head2 Homebrew
+
+Use L<tecolicom/tap|https://github.com/tecolicom/homebrew-tap>:
+
+    brew tap tecolicom/tap
+    brew install app-nup
+
+=head2 CPAN
 
 Using L<cpanminus|https://metacpan.org/pod/App::cpanminus>:
 

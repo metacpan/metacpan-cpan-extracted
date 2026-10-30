@@ -435,6 +435,24 @@ Hungarian locale.
    1995-12-22T09:05:02 = i. sz. 1995. dec. 22., P
   -0010-09-15T04:44:23 = i. e. -10. szept. 15., Szo
 
+=head3 GyMMMM (G y. MMMM)
+
+   2008-02-05T18:30:30 = i. sz. 2008. február
+   1995-12-22T09:05:02 = i. sz. 1995. december
+  -0010-09-15T04:44:23 = i. e. -10. szeptember
+
+=head3 GyMMMMEd (G y. MMMM d., E)
+
+   2008-02-05T18:30:30 = i. sz. 2008. február 5., K
+   1995-12-22T09:05:02 = i. sz. 1995. december 22., P
+  -0010-09-15T04:44:23 = i. e. -10. szeptember 15., Szo
+
+=head3 GyMMMMd (G y. MMMM d.)
+
+   2008-02-05T18:30:30 = i. sz. 2008. február 5.
+   1995-12-22T09:05:02 = i. sz. 1995. december 22.
+  -0010-09-15T04:44:23 = i. e. -10. szeptember 15.
+
 =head3 GyMMMd (G y. MMM d.)
 
    2008-02-05T18:30:30 = i. sz. 2008. febr. 5.
@@ -506,6 +524,12 @@ Hungarian locale.
    2008-02-05T18:30:30 = febr. 5., K
    1995-12-22T09:05:02 = dec. 22., P
   -0010-09-15T04:44:23 = szept. 15., Szo
+
+=head3 MMMMEd (MMMM d., E)
+
+   2008-02-05T18:30:30 = február 5., K
+   1995-12-22T09:05:02 = december 22., P
+  -0010-09-15T04:44:23 = szeptember 15., Szo
 
 =head3 MMMMW-count-one (MMMM W. 'hete')
 
@@ -626,6 +650,18 @@ Hungarian locale.
    2008-02-05T18:30:30 = 2008. február
    1995-12-22T09:05:02 = 1995. december
   -0010-09-15T04:44:23 = -10. szeptember
+
+=head3 yMMMMEd (y. MMMM d., E)
+
+   2008-02-05T18:30:30 = 2008. február 5., K
+   1995-12-22T09:05:02 = 1995. december 22., P
+  -0010-09-15T04:44:23 = -10. szeptember 15., Szo
+
+=head3 yMMMMd (y. MMMM d.)
+
+   2008-02-05T18:30:30 = 2008. február 5.
+   1995-12-22T09:05:02 = 1995. december 22.
+  -0010-09-15T04:44:23 = -10. szeptember 15.
 
 =head3 yMMMd (y. MMM d.)
 

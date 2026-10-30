@@ -2418,4 +2418,252 @@ subtest '/map: model_dir inside data_dir -> warn_map_cache_unwritten, still 200'
 	delete $t->app->config->{openaddr};
 };
 
+# ===========================================================================
+# SECTION 57: The measure vocabulary -- median, percentile, stdev, first, last,
+# range
+#
+# The pivot and the /stats page share one vocabulary, and the functions no
+# backend aggregate can express come from the same arithmetic.  The fixture is
+# chosen so that combining a group's cells would give the wrong total -- three
+# medians average to 44.67, and the three ranges add to 24, where the real
+# answers are 24 and 110 -- so each grand total below is a proof that the totals
+# row is computed over every row rather than added up out of the cells above it.
+#
+#   region     deal           sum  median  p90    p95    stdev  range  first  last
+#   North      2, 4, 6        12   4       5.6    5.8    2      4      2      6
+#   South      20, 24, 28     72   24      27.2   27.6   4      8      20     28
+#   East       100, 106, 112  318  106     110.8  111.4  6      12     100    112
+#   every row  402            402  24      107.2  109.6  46.9574275274956  110  2  112
+# ===========================================================================
+
+Readonly my $MEASURE_FIXTURE => 'region,deal,rep' . "\n"
+	. "North,2,Ann\nNorth,4,Ben\nNorth,6,Cid\n"
+	. "South,20,Dan\nSouth,24,Eve\nSouth,28,Fay\n"
+	. "East,100,Gus\nEast,106,Hal\nEast,112,Ivy\n";
+
+# The pivot grid as data: each body row is [row-dimension value, ...cells], and
+# the footer is the totals row's cells.  Reading the table rather than grepping
+# the page keeps an assertion on the number a cell holds, not on whether the
+# number appears somewhere in the HTML.
+sub _pivot_grid {
+	my $body = shift;
+	$body =~ s/\s+/ /g;
+	my ($tbody) = $body =~ m{<tbody>(.*?)</tbody>}s;
+	my ($tfoot) = $body =~ m{<tfoot>(.*?)</tfoot>}s;
+	my @rows;
+	for my $tr ($tbody =~ m{<tr>(.*?)</tr>}gs) {
+		push @rows, [ map { s/\A\s+|\s+\z//g; $_ } ($tr =~ m{<td[^>]*>(.*?)</td>}gs) ];
+	}
+	my @totals = $tfoot
+		? map { s/\A\s+|\s+\z//g; $_ } ($tfoot =~ m{<td[^>]*>(.*?)</td>}gs)
+		: ();
+	return (\@rows, \@totals);
+}
+
+# One column's row on the stats page, keyed by the header it sits under.  The em
+# dash the page uses for "not applicable" reads as the empty string, and a
+# drill-down link reads as the value it links to.
+sub _stats_row {
+	my ($body, $col) = @_;
+	$body =~ s/\s+/ /g;
+	my ($thead) = $body =~ m{<thead>(.*?)</thead>}s;
+	my @names   = $thead =~ m{<th[^>]*>(.*?)</th>}gs;
+	my ($tr)    = $body =~ m{<tr>\s*<td class="col-name">\Q$col\E</td>(.*?)</tr>}s;
+	return () unless defined $tr;
+	my @cells = ($col, map {
+		s{<a[^>]*>}{}g;
+		s{</a>}{}g;
+		s/\A\s+|\s+\z//g;
+		$_ eq '&mdash;' ? '' : $_;
+	} ($tr =~ m{<td[^>]*>(.*?)</td>}gs));
+	my %row;
+	for my $i (0 .. $#names) {
+		next unless defined $cells[$i];
+		(my $name = $names[$i]) =~ s/\A\s+|\s+\z//g;
+		$row{lc $name} = $cells[$i];
+	}
+	return %row;
+}
+
+subtest 'Pivot: the Perl-computed measures, per group and in total' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'measure_fixture.csv');
+	Mojo::File->new($csv)->spurt($MEASURE_FIXTURE);
+	my $l = url_escape("path:$csv");
+
+	# sum is the control: it is the one aggregate here the backend does compute,
+	# and it is the shape every other row has to match.
+	my %expected = (
+		'deal:sum:s'      => { East => '318',   North => '12',  South => '72',   total => '402'   },
+		'deal:median:med' => { East => '106',   North => '4',   South => '24',   total => '24'    },
+		'deal:p50:half'   => { East => '106',   North => '4',   South => '24',   total => '24'    },
+		'deal:p90:p90'    => { East => '110.8', North => '5.6', South => '27.2', total => '107.2' },
+		'deal:p95:p95'    => { East => '111.4', North => '5.8', South => '27.6', total => '109.6' },
+		'deal:p100:top'   => { East => '112',   North => '6',   South => '28',   total => '112'   },
+		'deal:stdev:sd'   => { East => '6',     North => '2',   South => '4',
+		                       total => '46.9574275274956' },
+		'deal:range:rg'   => { East => '12',    North => '4',   South => '8',    total => '110'   },
+		'deal:first:f'    => { East => '100',   North => '2',   South => '20',   total => '2'     },
+		'deal:last:l'     => { East => '112',   North => '6',   South => '28',   total => '112'   },
+	);
+
+	for my $spec (sort keys %expected) {
+		my $want = $expected{$spec};
+		$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape($spec) . '&totals=1')
+		  ->status_is(200);
+
+		my ($rows, $totals) = _pivot_grid($t->tx->res->body);
+		is scalar(@$rows), 3, "$spec: one row per region";
+		for my $row (@$rows) {
+			is $row->[1], $want->{ $row->[0] },
+				"$spec: the value for $row->[0]";
+		}
+
+		# The last cell of the totals row is the grand total; the cell before it
+		# belongs to the column dimension this pivot does not have.
+		is $totals->[-1], $want->{total},
+			"$spec: the grand total over every row, not the cells combined";
+	}
+
+	# The same request without totals= must not change a cell value.
+	$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape('deal:median:med'))
+	  ->status_is(200);
+	my ($plain) = _pivot_grid($t->tx->res->body);
+	is_deeply [ map { [ $_->[0], $_->[1] ] } @$plain ],
+		[ [ 'East', '106' ], [ 'North', '4' ], [ 'South', '24' ] ],
+		'median is the same with no subtotals shown';
+};
+
+subtest 'Pivot: first and last read a column of text as readily as one of numbers' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'measure_fixture.csv');
+	Mojo::File->new($csv)->spurt($MEASURE_FIXTURE);
+	my $l = url_escape("path:$csv");
+
+	my %expected = (
+		'rep:first:rf' => { East => 'Gus', North => 'Ann', South => 'Dan', total => 'Ann' },
+		'rep:last:rl'  => { East => 'Ivy', North => 'Cid', South => 'Fay', total => 'Ivy' },
+	);
+
+	for my $spec (sort keys %expected) {
+		my $want = $expected{$spec};
+		$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape($spec) . '&totals=1')
+		  ->status_is(200);
+		my ($rows, $totals) = _pivot_grid($t->tx->res->body);
+		for my $row (@$rows) {
+			is $row->[1], $want->{ $row->[0] }, "$spec: the value for $row->[0]";
+		}
+		is $totals->[-1], $want->{total}, "$spec: the grand total";
+	}
+};
+
+subtest 'Pivot: an unknown function is refused, and the message names the vocabulary' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'measure_fixture.csv');
+	Mojo::File->new($csv)->spurt($MEASURE_FIXTURE);
+	my $l = url_escape("path:$csv");
+
+	$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape('deal:mean:m'))
+	  ->status_is(400)
+	  ->content_like(qr/Invalid measure spec/, 'an unknown function is refused')
+	  ->content_like(qr/median/, 'and the message names the measures that were added')
+	  ->content_like(qr/stdev/, 'stdev included')
+	  ->content_like(qr/p1 to p100/, 'and says how a percentile is spelled');
+
+	# The level is part of the name, so the bare word carries no level and is
+	# refused rather than silently taken as a median.
+	$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape('deal:percentile:m'))
+	  ->status_is(400)
+	  ->content_like(qr/Invalid measure spec/, 'percentile with no level is refused');
+
+	$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape('deal:p0:m'))
+	  ->status_is(400)
+	  ->content_like(qr/p1 to p100/, 'a level below 1 is refused');
+};
+
+subtest '/stats: the same numbers, one row per column' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'measure_fixture.csv');
+	Mojo::File->new($csv)->spurt($MEASURE_FIXTURE);
+	my $l = url_escape("path:$csv");
+
+	my $body = $t->get_ok("/stats?l=$l&p=90")->status_is(200)->tx->res->body;
+	like $body, qr{<th[^>]*>p90</th>}, 'the percentile column is the level that was asked for';
+
+	my %deal = _stats_row($body, 'deal');
+	is $deal{rows},        '9',      'row count';
+	is $deal{'non-null'},  '9',      'non-null count';
+	is $deal{null},        '0',      'null count';
+	is $deal{distinct},    '9',      'distinct count';
+	is $deal{min},         '2',      'min';
+	is $deal{max},         '112',    'max';
+	is $deal{range},       '110',    'range is max minus min';
+	is $deal{mean},        '44.67',  'mean';
+	is $deal{median},      '24',      'median and the pivot grand total agree';
+	is $deal{p90},         '107.2',  'the percentile column';
+	is $deal{'std dev'},   '46.96',  'sample standard deviation, rounded for display';
+	is $deal{first},       '2',      'the first value the column holds';
+	is $deal{last},        '112',    'the last value the column holds';
+
+	# A column of text has a first and a last value and nothing to average.
+	my %rep = _stats_row($body, 'rep');
+	is $rep{first}, 'Ann', 'a text column has a first value';
+	is $rep{last},  'Ivy', 'a text column has a last value';
+	is $rep{min},   '',    'a text column has no minimum';
+	is $rep{median}, '',   'a text column has no median';
+	is $rep{'std dev'}, '', 'a text column has no standard deviation';
+
+	# The header names the level, so the page cannot claim a level it did not
+	# apply; 95 is the default and p=50 is the median by another name.
+	$t->get_ok("/stats?l=$l")->status_is(200)
+	  ->content_like(qr{<th[^>]*>p95</th>}, 'the default percentile column is p95');
+
+	my %fifty = _stats_row($t->get_ok("/stats?l=$l&p=50")->tx->res->body, 'deal');
+	is $fifty{p50}, $fifty{median}, 'p50 is the median, as it is in a pivot measure';
+};
+
+subtest '/stats: an unusable percentile level is refused, not ignored' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'measure_fixture.csv');
+	Mojo::File->new($csv)->spurt($MEASURE_FIXTURE);
+	my $l = url_escape("path:$csv");
+
+	for my $bad (qw(0 101 abc 95.5)) {
+		$t->get_ok("/stats?l=$l&p=$bad")
+		  ->status_is(400, "p=$bad is refused")
+		  ->content_like(qr/1 to 100/, "p=$bad is told the range it should be in");
+	}
+};
+
+subtest 'Pivot: the Perl-computed measures need no backend, so a SQL source works' => sub {
+	SKIP: {
+		my $dir = tempdir(CLEANUP => 1);
+		my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/measures.sql", '', '', { RaiseError => 1 }) };
+		skip 'DBD::SQLite not available', 4 unless $dbh;
+		$dbh->do('CREATE TABLE measures (region TEXT, deal INTEGER)');
+		for my $row ([North => 2], [North => 4], [North => 6],
+		             [South => 20], [South => 24], [South => 28]) {
+			$dbh->do('INSERT INTO measures VALUES (?, ?)', {}, @$row);
+		}
+		$dbh->disconnect;
+		my $l = url_escape("path:$dir/measures.sql");
+
+		# This source can aggregate(), so the push path is available to the
+		# measures that have one; the ones that do not are still computed here.
+		$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape('deal:median:med'))
+		  ->status_is(200);
+		my ($med) = _pivot_grid($t->tx->res->body);
+		is_deeply [ map { [ $_->[0], $_->[1] ] } @$med ],
+			[ [ 'North', '4' ], [ 'South', '24' ] ],
+			'a median over a SQL-backed source';
+
+		$t->get_ok("/pivot?l=$l&rows=region&m=" . url_escape('deal:p90:p90'))
+		  ->status_is(200);
+		my ($p90) = _pivot_grid($t->tx->res->body);
+		is_deeply [ map { [ $_->[0], $_->[1] ] } @$p90 ],
+			[ [ 'North', '5.6' ], [ 'South', '27.2' ] ],
+			'a percentile over a SQL-backed source';
+	}
+};
+
 done_testing();

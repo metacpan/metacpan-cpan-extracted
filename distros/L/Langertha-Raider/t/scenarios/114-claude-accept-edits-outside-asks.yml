@@ -1,0 +1,18 @@
+title: in the Claude layout acceptEdits takes writes inside the root without asking but asks before writing outside it
+permission_mode: acceptEdits
+approve: [ "no" ]
+files:
+  CLAUDE.md: "Project notes.\n"
+prompt: Write two files.
+script:
+  - tool_calls:
+      - [ write_file, { path: inside.txt, content: "in\n" } ]
+      - [ write_file, { path: "{{HOME}}/outside.txt", content: "out\n" } ]
+  - text: done
+expect:
+  files: { inside.txt: "in\n" }
+  permissions:
+    - { tool: write_file }
+  tools:
+    - { name: write_file }
+    - { name: write_file, error: true, text: "\\AThe user doesn't want to proceed with this tool use\\." }

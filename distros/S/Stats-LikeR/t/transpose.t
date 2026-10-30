@@ -316,4 +316,12 @@ no_leaks_ok {
 	                   b          => { "\x{e9}" => 3, z => 4 } }) };
 } 'transpose HoH: no leaks with utf8 keys' unless $INC{'Devel/Cover.pm'};
 
+# A call-form error prints transpose's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { transpose(1); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: transpose\(/, 'transpose: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('transpose') . "transpose: error: input must be a hash ref or array ref\n",
+		'transpose: the help screen, then the error on the last line');
+}
 done_testing();

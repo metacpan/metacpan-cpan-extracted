@@ -42,4 +42,5 @@ Acme::Parataxis::run(
         diag "Main: Task 2 result: $res2";
     }
 );
+#
 done_testing();

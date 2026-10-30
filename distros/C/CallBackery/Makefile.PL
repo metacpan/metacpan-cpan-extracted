@@ -16,6 +16,8 @@ WriteMakefile(
     'Mojolicious::Plugin::Qooxdoo' => '1.1.0',
     'Config::Grammar' => '1.13',
     'DBI' => 0,
+    'Crypt::ScryptKDF' => 0,
+    'DBD::SQLite' => '1.48',
     'XS::Parse::Keyword' => '0.38',
     'Future::AsyncAwait' => '0.65',
     'Syntax::Keyword::Try' => '0.29',

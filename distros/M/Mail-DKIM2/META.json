@@ -77,6 +77,6 @@
          "web" : "https://github.com/dkim2wg/interop"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

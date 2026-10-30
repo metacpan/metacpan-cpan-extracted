@@ -199,7 +199,7 @@ Each stage is controlled by `--style` and individual `--[no-]fold`, `--[no-]tabl
 
 `--[no-]filename` controls the file name label that greple prints at the top of each file (`--filestyle=once`, format and color from the `FILE_FORMAT`/`FILE` theme keys): `--no-filename` passes `-h` to greple so that panes start with the text. The label is only printed for more than one file anyway.
 
-`--width` (`-w`) is the output width, as in ansicolumn: when given, it replaces `COLUMNS` in the pane-count and fold-width calculation (`_total`), and `run_nup`/`run_column` pass `--pane=$_cols` plus `-w N` after the file name `-` so nup agrees with mdee on the pane count. `--fold-width` sets the fold/table width directly (`fold_width`); its default is `_total / _cols - 5` with nup, or the output width without nup. Both have `default[...]` config keys.
+`--width` (`-w`) is the output width, as in ansicolumn: when given, it replaces `COLUMNS` in the pane-count and fold-width calculation (`_total`), and `run_nup`/`run_column` pass `--pane=$_cols` plus `-w N` after the file name `-` so nup agrees with mdee on the pane count. `--fold-width` sets the fold/table width directly (`fold_width`); its default is `_total / _cols - 3 - runin` with nup, or the output width without nup. Both have `default[...]` config keys. The 3 is for borders and padding; the run-in width is kept free by ansicolumn when it folds the panes. `--runin`/`--runout` (default 2) and `--runlen` (`:!=i`, a callback that sets both, so the later option wins) are always given to nup in `pass_nup` (App::nup >= 1.09), which passes them to ansicolumn after `~/.ansicolumnrc`; otherwise a larger run-in in the rc file would make the outer fold break lines, such as table rules, that fill the fold width.
 
 ### Style System
 
@@ -283,12 +283,12 @@ export LESSANSIENDCHARS="${LESSANSIENDCHARS:-mK}"
 
 #### Command Invocation Wrapper
 
-All `run_XXX` functions use `invoke` to execute commands. When `debug > 1` (`-dd`), it prints the full command with quoted arguments to stderr. In dryrun mode, `invoke` skips execution:
+All `run_XXX` functions use `invoke` to execute commands. When `debug > 1` (`-dd`), it prints the full command to stderr. In dryrun mode, `invoke` prints the command line to stdout instead of running it, and the dryrun block captures each stage's line and joins them with ` \` + newline + `    | `, so that `mdee -n` shows a pipeline that can be pasted into a shell. `quote_args` leaves an argument as it is when it consists of safe characters (`[-A-Za-z0-9_./:=,+%@]`) and wraps it in `'...'` otherwise (more readable than `printf %q`):
 
 ```bash
 invoke() {
-    (( debug > 1 )) && echo "debug: $(printf '%q ' "$@")" >&2
-    [[ ${dryrun:-} ]] && return
+    (( debug > 1 )) && echo "debug: $(quote_args "$@")" >&2
+    [[ ${dryrun:-} ]] && { quote_args "$@"; return; }
     "$@"
 }
 ```
@@ -298,8 +298,15 @@ Debug levels:
 - `-dd` (`debug > 1`): above + full command lines for each pipeline stage
 
 Dryrun combinations:
-- `-dn`: show pipeline as function names (e.g., `run_greple "$@" | run_nup`)
-- `-ddn`: show expanded command lines for each stage without executing
+- `-n`: print the command lines of the pipeline (stdout), without executing
+- `-dn`: also the stage names (`debug: stages: run_greple run_nup`, stderr)
+- `-ddn`: also each command line as `debug: ...` on stderr (the tests match these lines)
+
+`-n` does not show the environment mdee sets (`LESS`, `LESSANSIENDCHARS`, and `PERL5LIB` when `./script/mdee` runs from the repository).
+
+A stage in `stages[]` is either a `run_*` function, which calls `invoke` itself, or a command line written as shell words (`"sed -e 's/a/b/'"`).  Each stage is turned into a call in `calls[]`: a function is called as it is, and a command line becomes `invoke COMMAND LINE`, so it also stops in dryrun mode and shows up in `-dd`.  The real run `eval`s the calls joined with `|`; dryrun `eval`s them one by one in `$(...)` and joins their output, so both use the same calls.
+
+In dryrun mode the stage functions really run, in a `$(...)` subshell each, up to their `invoke`, so what `-n` prints is the command the function builds, with all its branches.  A stage function must therefore not set variables that a later stage relies on: in dryrun mode the assignment stays in the subshell, and `-n` would show a pipeline different from the real one.  Prepare such values before the stages run, as `column_opts` is.
 
 ### App::Greple::md Module
 
@@ -399,8 +406,12 @@ Regex patterns used by the md module:
 
 Fenced code blocks ([CommonMark](https://spec.commonmark.org/0.31.2/#fenced-code-blocks)):
 ```
-^ {0,3}(?<bt>`{3,}+|~{3,}+)(.*)\n((?s:.*?))^ {0,3}(\g{bt})
+^ {0,3}(?<bt>(?<fc>[`~])\g{fc}{2,}+)(.*)\n((?s:.*?))^ {0,3}\g{bt}\g{fc}*+\h*$
 ```
+
+The closing fence is the same character as the opening one and at least as long, followed only by spaces or tabs; it is shown as written.  The `code_blocks` step uses the same rule with numbered captures.  A fence that is never closed is not treated as code (CommonMark would run it to the end of the document).
+
+ATX headings ([CommonMark](https://spec.commonmark.org/0.31.2/#atx-headings)), for each level `$hdr` from `######` down to `#`: `^( {0,3}$hdr(?:\h+.*)?)$`.  Up to 3 spaces of indentation are allowed, and a line of `#`s alone is an empty heading; `#foo` (no space) and seven `#`s are not headings.
 
 Inline code ([CommonMark Code Spans](https://spec.commonmark.org/0.31.2/#code-spans)) uses the `$CODE` pattern, which matches both single and multi-backtick spans. For multi-backtick (2+), optional leading/trailing spaces are stripped per CommonMark spec.
 
@@ -493,7 +504,7 @@ sub parse_separator {
    - Detects `:---:` (center) and `---:` (right) patterns; `:---` and `---` are left-aligned (default, no option needed)
    - Returns raw 1-based column numbers as `(\@right, \@center)` — caller applies offset and builds option strings
    - Minimizes dashes and strips colons (`s/:?-+:?/-/gr`) to prevent separator width from inflating column widths
-   - Requires App::ansicolumn >= 1.60 (1.55 for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`; 1.58 for `-w` table fitting and `--cell` in table mode; 1.5801 gives width that wrapped columns leave unused back to the other wrapped columns; 1.59 for `--table-wrap-mark` and `--table-cell-mark`; 1.60 for `--table-head` and cell marks limited to wrapped columns)
+   - Requires App::ansicolumn >= 1.61 (1.55 for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`; 1.58 for `-w` table fitting and `--cell` in table mode; 1.5801 gives width that wrapped columns leave unused back to the other wrapped columns; 1.59 for `--table-wrap-mark` and `--table-cell-mark`; 1.60 for `--table-head` and cell marks limited to wrapped columns; 1.61 for its own rc file when called from greple, with Getopt::EX 3.04)
 
 **Cell wrapping** (`table_width`, `table_cell`): when `table_width > 0`, `-w $table_width` is appended and ansicolumn fits the table into that width. Columns that fit are untouched; over-wide columns share the remaining width equally (water level, floor 4) and their cells are wrapped by `Text::ANSI::Fold` (word boundary, kinsoku, run-in margin). In trim mode each column costs `content + 2` (item format) plus 1 per separator, so the budget is `table_width - (n-1)`. `table_cell` is converted from `0:10:<20` to `0,10,<20` and passed as `--cell`; in non-trim mode `0,` is prepended for the phantom first column. `table_wrap_mark` (default empty; the `markwrap` theme sets `›` U+203A) is passed as `--table-wrap-mark`; ansicolumn puts it at the start of the second and later lines of a wrapped cell in place of the item-format pad, so column widths do not change. Empty disables it. `table_cell_mark` (default empty; the default theme `markcell` sets `‣` U+2023) is passed as `--table-cell-mark` together with `--table-head 2` (App::ansicolumn >= 1.60): ansicolumn marks the first line of every non-empty body cell in the columns that have a wrapped cell, and leaves the two header rows (the header and, to ansicolumn, the separator row of `-` cells) alone, so `format_table` has nothing to undo before `fix_separator`.
 
@@ -544,6 +555,7 @@ Config parameters from mdee:
 - `table_cell=SPEC`: Per-column widths for ansicolumn `--cell`, colon-separated (`0:10:<20`) because commas separate config parameters; md module converts to commas and prepends `0,` in non-trim mode for the phantom first column. Not passed by mdee; set via `--config`.
 - `table_wrap_mark=STRING`: Mark for continuation lines of wrapped cells (default none; the `markwrap` theme sets `›` U+203A).
 - `table_cell_mark=STRING`: Mark for the first line of every body cell in a column that has a wrapped cell (default none; the default theme `markcell` sets `‣` U+2023). Passed with `--table-head 2` so the header and separator rows are not marked.
+- `table_runin=2`, `table_runout=2`, `table_boundary=word`, `table_linebreak=all`: How wrapped cells are folded. Always passed to ansicolumn as `--runin`/`--runout`/`--boundary`/`--linebreak`, so the user's `~/.ansicolumnrc` (read by ansicolumn also when called from greple) does not change the table. In table mode these options are used only for the cells. Kept apart from mdee's `--runin`/`--runout`, which are for nup's pane folding. `t/05_table_wrap.t` sets `HOME` to an empty directory so that the user's rc does not affect the tests.
 - Color labels (e.g., `h1=RD`): Override default colors (pre-declared in `Config->new()` with `undef`, applied in `setup_colors()` before `${base}` expansion)
 
 ### Field Visibility with --show Option

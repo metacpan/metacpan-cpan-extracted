@@ -1,0 +1,33 @@
+# Real pattern: Glob for the files, Grep (files first, then content with line
+# context) to find the spot, Read the one file, Edit it, Grep again to confirm
+# nothing is left. Exploration before the first change.
+title: glob, grep, read, edit, grep -- explore the tree before changing one line and confirm after
+files:
+  src/alpha.txt: "name = alpha\nlegacy_call(1)\n"
+  src/beta.txt: "name = beta\nmodern_call(2)\n"
+  docs/notes.md: "legacy_call was removed\n"
+prompt: Replace legacy_call in the sources.
+script:
+  - tool_calls:
+      - [ glob, { pattern: "src/*.txt" } ]
+      - [ grep, { pattern: legacy_call, path: src, output_mode: files_with_matches } ]
+  - tool_calls:
+      - [ grep, { pattern: legacy_call, path: src, output_mode: content, '-n': true, '-B': 1 } ]
+  - tool_calls:
+      - [ read_file, { path: src/alpha.txt } ]
+  - tool_calls:
+      - [ edit_file, { path: src/alpha.txt, old_string: "legacy_call(1)", new_string: "modern_call(1)" } ]
+  - tool_calls:
+      - [ grep, { pattern: legacy_call, output_mode: count } ]
+  - text: Replaced in src/alpha.txt.
+expect:
+  answer: Replaced in src/alpha.txt.
+  files:
+    src/alpha.txt: "name = alpha\nmodern_call(1)\n"
+  tools:
+    - { name: glob, text: 'src/alpha\.txt\nsrc/beta\.txt' }
+    - { name: grep, text: '\Asrc/alpha\.txt\z' }
+    - { name: grep, text: 'src/alpha\.txt-1-name = alpha\nsrc/alpha\.txt:2:legacy_call\(1\)' }
+    - { name: read_file, text: 'legacy_call\(1\)' }
+    - { name: edit_file, text: '^The file \S+ has been updated successfully\.' }
+    - { name: grep, text: '\Adocs/notes\.md:1\z' }

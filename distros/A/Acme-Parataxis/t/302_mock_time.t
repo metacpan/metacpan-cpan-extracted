@@ -179,4 +179,5 @@ is $again, 'tick', 'another virtual run works after a plain one';
 ok !defined Acme::Parataxis->virtual_now, 'virtual clock restored to off after a virtual run';
 my $err = dies { Acme::Parataxis->advance(1) };
 ok $err && $err =~ /virtual/, 'advance() outside a virtual run croaks about the mode';
+#
 done_testing;

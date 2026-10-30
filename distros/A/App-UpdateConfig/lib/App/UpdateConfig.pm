@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # This must be kept in sync with the version in script/update_config.
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 1;
 

@@ -1326,7 +1326,7 @@ subtest 'Transaction 19: Line graph lifecycle' => sub {
 		$t->get_ok('/graph?l=table:sales&x=product&y=amount')
 			->status_is(200, 'Phase 3: /graph with valid params returns 200')
 			->content_like(qr/\Q$d3_url\E/, 'Phase 3: D3.js included in output')
-			->content_like(qr/Back to table/, 'Phase 3: back link present')
+			->content_like(qr{<a href="/view/sales">sales</a>}, 'Phase 3: breadcrumb links to the table')
 			->content_like(qr/Export SVG/,    'Phase 3: SVG export button present')
 			->content_like(qr/Export PNG/,    'Phase 3: PNG export button present')
 			->content_like(qr/"extra"\s*:/,
@@ -1377,8 +1377,8 @@ subtest 'Transaction 20: Graph UI polish, date-sort JS, and numeric Y-axis filte
 			->status_is(200, 'Phase 2: /graph with valid params returns 200')
 			->content_like(qr/class="back-link"/,
 				'Phase 2: back link uses standard back-link CSS class')
-			->content_like(qr/Back to table/,
-				'Phase 2: back link text is "Back to table"')
+			->content_like(qr{aria-current="page">Line graph: amount by product</span>},
+				'Phase 2: breadcrumb names the graph as the current page')
 			->content_like(qr/graph-container/,
 				'Phase 2: graph-container div present')
 			->content_like(qr/chart-resize-handle/,
@@ -2662,22 +2662,24 @@ subtest 'Transaction 42 -- import_url drill-down breadcrumb lifecycle' => sub {
 	my $import_url = 'http://example.com/test-results';
 	my $pie_back   = '/pie?l=' . url_escape("url:$import_url") . '&cat=tester&val=result';
 
-	# Phase 1: unfiltered import shows table name as the back label (not "Choose another database").
-	# Clicking that link returns to the same table without filters.
+	# Phase 1: unfiltered import is named after its host (not "Choose another
+	# database"), as the page the user is on.
 	$t->get_ok('/import?url=' . url_escape($import_url))
 	  ->status_is(200, 'Phase 1: import renders 200');
-	$t->content_like(qr{href="/import\?url=}, 'Phase 1: back_url is self-link to unfiltered import');
+	$t->content_like(qr{aria-current="page">example\.com</span>}, 'Phase 1: breadcrumb names the page after its host');
 
-	# Phase 2: import with back2 (pie drill-down) shows 3-level breadcrumb:
-	# Home > <table name> > Back to pie chart.
+	# Phase 2: import with back2 (pie drill-down) shows the whole trail:
+	# Home > example.com > Pie chart > example.com (result = PASS).  The
+	# back2_label is not needed any more: each crumb is named from its URL.
 	$t->get_ok('/import?url='       . url_escape($import_url)
 	         . '&f='                . url_escape('result:eq:PASS')
 	         . '&back2='            . url_escape($pie_back)
 	         . '&back2_label='      . url_escape('Back to pie chart'))
 	  ->status_is(200, 'Phase 2: drill-down import renders 200');
-	$t->content_like(qr/Back to pie chart/, 'Phase 2: breadcrumb shows Back to pie chart');
-	$t->content_like(qr/<a [^>]*>Back to pie chart<\/a>/,
-	                    'Phase 2: Back to pie chart is a rendered anchor link');
+	$t->content_like(qr{<a href="/pie\?[^"]*">Pie chart: result by tester</a>},
+	                    'Phase 2: breadcrumb links back to the pie chart');
+	$t->content_like(qr{aria-current="page">example\.com \(result = PASS\)</span>},
+	                    'Phase 2: the filtered rows are the current page');
 };
 
 # ======================================================================

@@ -252,6 +252,20 @@ for my $name ( sort keys %CASE ) {
 diag( sprintf 'NV_EPSILON %.3g; worst relative error: exact %.3g (limit %.3g), statistical %.3g (limit %.3g)',
 	$NV_EPS, $worst_exact, $TOL_EXACT, $worst_stat, $TOL_STAT );
 
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+for my $c ([ sd  => sub { sd() } ], [ var => sub { var() } ]) {
+	my ($fn, $code) = @$c;
+	is(eval { $code->(); 1 }, undef, "$fn() with no values dies");
+	like($@, qr/\Ausage: \Q$fn\E\(X \[, X \.\.\.\]\)\n.*^example:\n.*\n\n\Q$fn\E: error: no values given\n\z/ms,
+		'... with the help screen above the error');
+}
+is(eval { cov([1, 2]); 1 }, undef, 'cov() with one argument dies');
+like($@, qr/\Ausage: cov\(X, Y \[, METHOD\]\)\n.*\n\ncov: error: expected 2 or 3 arguments, got 1\n\z/ms,
+	'... with the help screen above the error');
+is(eval { cov([1, 2], [3, 4], 'bogus'); 1 }, undef, 'cov() with an unknown method dies');
+like($@, qr/\Ausage: cov\(.*^cov: error: unknown method 'bogus'/ms, '... with the help screen above the error');
+
 done_testing();
 
 __DATA__

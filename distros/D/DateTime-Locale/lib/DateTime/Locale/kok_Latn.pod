@@ -435,6 +435,24 @@ Konkani Latin locale.
    1995-12-22T09:05:02 = Suk, 22 Dez, 1995 AD
   -0010-09-15T04:44:23 = Son, 15 Set, -10 KA
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Febrer
+   1995-12-22T09:05:02 = AD 1995 Dezembr
+  -0010-09-15T04:44:23 = KA -10 Setembr
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Febrer 5, Mon
+   1995-12-22T09:05:02 = AD 1995 Dezembr 22, Suk
+  -0010-09-15T04:44:23 = KA -10 Setembr 15, Son
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Febrer 5
+   1995-12-22T09:05:02 = AD 1995 Dezembr 22
+  -0010-09-15T04:44:23 = KA -10 Setembr 15
+
 =head3 GyMMMd (d MMM, y G)
 
    2008-02-05T18:30:30 = 5 Feb, 2008 AD
@@ -506,6 +524,12 @@ Konkani Latin locale.
    2008-02-05T18:30:30 = Mon, 5 Feb
    1995-12-22T09:05:02 = Suk, 22 Dez
   -0010-09-15T04:44:23 = Son, 15 Set
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Febrer 5, Mon
+   1995-12-22T09:05:02 = Dezembr 22, Suk
+  -0010-09-15T04:44:23 = Setembr 15, Son
 
 =head3 MMMMW-count-one (MMMM -'acho' 'suman' W)
 
@@ -620,6 +644,18 @@ Konkani Latin locale.
    2008-02-05T18:30:30 = Febrer 2008
    1995-12-22T09:05:02 = Dezembr 1995
   -0010-09-15T04:44:23 = Setembr -10
+
+=head3 yMMMMEd (E, d MMMM, y)
+
+   2008-02-05T18:30:30 = Mon, 5 Febrer, 2008
+   1995-12-22T09:05:02 = Suk, 22 Dezembr, 1995
+  -0010-09-15T04:44:23 = Son, 15 Setembr, -10
+
+=head3 yMMMMd (d MMMM, y)
+
+   2008-02-05T18:30:30 = 5 Febrer, 2008
+   1995-12-22T09:05:02 = 22 Dezembr, 1995
+  -0010-09-15T04:44:23 = 15 Setembr, -10
 
 =head3 yMMMd (d MMM, y)
 

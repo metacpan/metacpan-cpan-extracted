@@ -5,14 +5,8 @@ use Test2::V1 -ipP;
 use Time::HiRes      qw[time];
 use IO::Socket::INET ();
 use Acme::Parataxis  qw[async fiber await_sleep await_read await_write with_timeout];
+no warnings qw[recursion];
 #
-# Fibers run on separate heap stacks; Perl's C-stack-depth heuristic can misfire and falsely report "Deep recursion"
-# once more than ~100 of them park inside the same sub (the high-volume subtest below does exactly that). Lexical
-# 'no warnings' is ignored once a framework such as Test2 is loaded, so filter it here as t/028/029/030 do. Genuine
-# runaway recursion inside a fiber surfaces as a hang or a croak the harness already catches.
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ /^Deep recursion on subroutine/; warn @_ }
-}
 plan skip_all => 'IO::Async::Loop not installed' unless eval { require IO::Async::Loop; 1 };
 #
 sub socket_pair {
@@ -194,4 +188,5 @@ subtest 'the pool-submission counter is live, not vacuous' => sub {
         *Acme::Parataxis::_submit_job = $orig_submit_job;
     }
 };
+#
 done_testing;

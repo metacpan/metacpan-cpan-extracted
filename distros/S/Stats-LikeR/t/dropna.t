@@ -129,4 +129,12 @@ no_leaks_ok {
 	eval { dropna({ A => [1] }, cols => ['Z']) };
 } 'dropna: no memory leaks (die path)' unless $INC{'Devel/Cover.pm'};
 
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { dropna({ A => [1] }); 1 } ? '' : $@;
+	like($err, qr/\Ausage: dropna\(.*\n\ndropna: error: \Qpass exactly one of 'cols' or 'rows'\E\n\z/s,
+		'dropna: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing;

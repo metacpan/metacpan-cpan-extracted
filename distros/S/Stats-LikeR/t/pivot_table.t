@@ -279,4 +279,12 @@ no_leaks_ok {
 	eval { pivot_table([ { a => 1 } ], columns => 'Z') };
 } 'pivot_table: no memory leaks (die path)' unless $INC{'Devel/Cover.pm'};
 
+# A call-form error prints pivot_table's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { pivot_table([ { a => 1 } ]); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: pivot_table\(/, 'pivot_table: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('pivot_table') . "pivot_table: error: 'columns' is required\n",
+		'pivot_table: the help screen, then the error on the last line');
+}
 done_testing;

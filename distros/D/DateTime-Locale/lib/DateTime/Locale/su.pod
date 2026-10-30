@@ -435,6 +435,24 @@ Sundanese locale.
    1995-12-22T09:05:02 = Jum, 22 Dés 1995 M
   -0010-09-15T04:44:23 = Sap, 15 Sép -10 SM
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = M 2008 Pébruari
+   1995-12-22T09:05:02 = M 1995 Désémber
+  -0010-09-15T04:44:23 = SM -10 Séptémber
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = M 2008 Pébruari 5, Sal
+   1995-12-22T09:05:02 = M 1995 Désémber 22, Jum
+  -0010-09-15T04:44:23 = SM -10 Séptémber 15, Sap
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = M 2008 Pébruari 5
+   1995-12-22T09:05:02 = M 1995 Désémber 22
+  -0010-09-15T04:44:23 = SM -10 Séptémber 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Péb 2008 M
@@ -506,6 +524,12 @@ Sundanese locale.
    2008-02-05T18:30:30 = Sal, 5 Péb
    1995-12-22T09:05:02 = Jum, 22 Dés
   -0010-09-15T04:44:23 = Sap, 15 Sép
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Pébruari 5, Sal
+   1995-12-22T09:05:02 = Désémber 22, Jum
+  -0010-09-15T04:44:23 = Séptémber 15, Sap
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
@@ -614,6 +638,18 @@ Sundanese locale.
    2008-02-05T18:30:30 = Pébruari 2008
    1995-12-22T09:05:02 = Désémber 1995
   -0010-09-15T04:44:23 = Séptémber -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = Sal, 5 Pébruari 2008
+   1995-12-22T09:05:02 = Jum, 22 Désémber 1995
+  -0010-09-15T04:44:23 = Sap, 15 Séptémber -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Pébruari 2008
+   1995-12-22T09:05:02 = 22 Désémber 1995
+  -0010-09-15T04:44:23 = 15 Séptémber -10
 
 =head3 yMMMd (d MMM, y)
 

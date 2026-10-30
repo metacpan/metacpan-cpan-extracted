@@ -435,6 +435,24 @@ Taita Kenya locale.
    1995-12-22T09:05:02 = BK 1995 Iwi 22, Kas
   -0010-09-15T04:44:23 = KK -10 Ike 15, Ngu
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = BK 2008 Mori ghwa kawi
+   1995-12-22T09:05:02 = BK 1995 Mori ghwa ikumi na iwi
+  -0010-09-15T04:44:23 = KK -10 Mori ghwa ikenda
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = BK 2008 Mori ghwa kawi 5, Kaw
+   1995-12-22T09:05:02 = BK 1995 Mori ghwa ikumi na iwi 22, Kas
+  -0010-09-15T04:44:23 = KK -10 Mori ghwa ikenda 15, Ngu
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = BK 2008 Mori ghwa kawi 5
+   1995-12-22T09:05:02 = BK 1995 Mori ghwa ikumi na iwi 22
+  -0010-09-15T04:44:23 = KK -10 Mori ghwa ikenda 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = BK 2008 Kaw 5

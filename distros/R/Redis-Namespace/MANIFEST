@@ -19,6 +19,7 @@ t/09_stream.t
 t/10_keys.t
 t/11_scan_callback.t
 t/12_filters.t
+t/13_empty_namespace.t
 t/97_subcommands.t
 t/98_guess.t
 xt/02_perlcritic.t

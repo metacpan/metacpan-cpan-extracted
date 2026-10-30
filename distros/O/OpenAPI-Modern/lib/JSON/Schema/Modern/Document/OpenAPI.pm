@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.150';
+our $VERSION = '0.151';
 
 use 5.020;
 use utf8;
@@ -128,7 +128,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     if keys %$config_override;
 
   my $state = {
-    initial_schema_uri => $self->canonical_uri,
+    initial_schema_uri => $self->canonical_uri, # for now, same as original_uri, retrieval_uri
     traversed_keyword_path => '',
     keyword_path => '',
     data_path => '',
@@ -828,7 +828,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.150
+version 0.151
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -949,7 +949,11 @@ Also available as L<JSON::Schema::Modern::Document/original_uri>, this is known 
 URI" in the OAS specification: the URL the document was originally sourced from, or the URI that
 was used to add the document to the L<OpenAPI::Modern> instance.
 
-In OpenAPI versions before 3.2.0, this is the same as L</canonical_uri>.
+It is used for resolving relative URIs and URI templates used with C<servers url> values for runtime
+request URI matching.
+
+In OpenAPI versions before 3.2.0, this is the same as L</canonical_uri>. (In 3.2.0+,
+C<canonical_uri> is the C<$self> value from the document resolved against the C<retrieval_uri>.)
 
 =head2 oas_version
 

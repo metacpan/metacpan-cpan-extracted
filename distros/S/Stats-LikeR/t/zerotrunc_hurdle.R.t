@@ -61,6 +61,16 @@
 # differences at ndeps = 1e-3 carry an O(1e-6) truncation error per Hessian
 # element, which the inverse amplifies).  The observed worst of each class is
 # printed at the end.  None of these is loosened to make a failure go away.
+#
+# %UNDER (the same generator, R 4.6.1, countreg 0.3-0) holds underdispersed
+# corpora, where the negative binomial's MLE is theta = Inf.  countreg stops
+# BFGS at theta = 1.0e5, 4.4e5 and 6.8e4, short of it, so its negbin answer
+# sits O(1/theta) from the Poisson-limit fit this module returns: coefficients
+# 1e-3 of their standard error from it (observed 2.0e-5) and
+# log-likelihoods 1e-5 relative (observed 2.8e-6, at theta 1.0e5).  Both
+# bounds are set by where BFGS happened to stop, not by this module; against
+# countreg's own Poisson fit of the same data the ordinary 'pkg' tolerances
+# hold.
 
 require 5.010;
 use strict;
@@ -358,6 +368,54 @@ my %PSCL_DOCVIS = (
 	loglik => -13612.9091771797,
 );
 
+# Frozen by the %UNDER block of t/zerotrunc_hurdle.R.R; see the header.
+my %UNDER = (
+  ud_zt_negbin => {
+    coef => [-0.4454418814094723, 0.10413971734738123],
+    se => [0.7726848676734613, 0.08945383431486434],
+    ll => -13.022817458548456,
+    theta => 103102.79197083968,
+  },
+  ud_zt_poisson => {
+    coef => [-0.4454338494029241, 0.10413938794033831],
+    se => [0.7726787962232052, 0.08945309814853362],
+    ll => -13.022781148079854,
+    theta => undef,
+  },
+  ud_h_negbin => {
+    count => [-0.44523885365684934, 0.05891601263187677],
+    zero => [0.4511583819149916, 0.08015312216013906],
+    count_se => [0.8769199927938223, 0.07953831492356091],
+    zero_se => [1.1509979270278767, 0.12939555415310355],
+    ll => -20.90185425856937,
+    theta => 437532.2933006879,
+  },
+  ud_h_poisson => {
+    count => [-0.44524046150525903, 0.05891603576568323],
+    zero => [0.4511583819149916, 0.08015312216013906],
+    count_se => [0.8769200216747786, 0.07953831554671015],
+    zero_se => [1.1509979270278767, 0.12939555415310355],
+    ll => -20.901848621153214,
+    theta => undef,
+  },
+  ud_hz_negbin => {
+    count => [0.20640179017919885, 0.02496991253585307],
+    zero => [-2.012699771527873, 0.15148460440105532],
+    count_se => [0.7302842485694917, 0.04773904597894722],
+    zero_se => [0.9637069313993691, 0.07490210473700938],
+    ll => -23.516290759390614,
+    theta => 68219.9775959785,
+  },
+  ud_hz_poisson => {
+    count => [0.20640179017919885, 0.02496991253585307],
+    zero => [-2.012697557606927, 0.15148313972472652],
+    count_se => [0.7302842485694917, 0.04773904597894722],
+    zero_se => [0.9637036252065792, 0.0749016372694947],
+    ll => -23.51628101535766,
+    theta => undef,
+  },
+);
+
 sub read_csv {
 	my $f = File::Spec->catfile('t', shift);
 	my %d;
@@ -605,6 +663,62 @@ for my $cd (qw(poisson negbin geometric)) {
 	is_deeply($o->{terms}{zero}, [qw(Intercept femWomen kid5)], 'the zero half has its own regressors after |');
 }
 
+# --------------------------------------------------- underdispersed counts
+# The negative binomial's MLE is theta = Inf, the Poisson fit; until 0.331
+# Newton walked log(theta) up until theta * theta overflowed and every output
+# was NaN.  The answer is the Poisson-limit fit, reported as theta = Inf.
+{
+	my %zt = (y => [1, 2, 1, 2, 1, 2, 3, 2, 1, 2, 2, 3], x => [1 .. 12]);
+	my $nb = zerotrunc(formula => 'y ~ x', data => \%zt, dist => 'negbin');
+	my $po = zerotrunc(formula => 'y ~ x', data => \%zt, dist => 'poisson');
+	my ($un, $up) = @UNDER{qw(ud_zt_negbin ud_zt_poisson)};
+	ok($nb->{converged}, 'underdispersed zerotrunc negbin: converged');
+	is($nb->{theta}, 9**9**9, 'underdispersed zerotrunc negbin: theta is Inf');
+	is($nb->{SE_logtheta}, 9**9**9, 'underdispersed zerotrunc negbin: SE_logtheta is Inf');
+	for my $j (0, 1) {
+		my $t = (qw(Intercept x))[$j];
+		is($nb->{coefficients}{$t}, $po->{coefficients}{$t}, "underdispersed zerotrunc negbin: $t is the Poisson fit's");
+		is($nb->{summary}{$t}{'Std. Error'}, $po->{summary}{$t}{'Std. Error'}, "underdispersed zerotrunc negbin: se $t is the Poisson fit's");
+		coef_ok($nb->{coefficients}{$t}, $up->{coef}[$j], $up->{se}[$j], 5e-3, 'pkg coef',
+		        "underdispersed zerotrunc negbin: $t near countreg's Poisson fit");
+		coef_ok($nb->{coefficients}{$t}, $un->{coef}[$j], $un->{se}[$j], 1e-3, 'theta 1e5 coef',
+		        "underdispersed zerotrunc negbin: $t near countreg's stop at theta 1e5");
+		rel_ok($nb->{summary}{$t}{'Std. Error'}, $un->{se}[$j], 5e-3, 'pkg se',
+		       "underdispersed zerotrunc negbin: se $t near countreg's");
+	}
+	rel_ok($nb->{loglik}, $up->{ll}, 1e-8, 'pkg ll', 'underdispersed zerotrunc negbin: loglik is the Poisson one');
+	rel_ok($nb->{loglik}, $un->{ll}, 1e-5, 'theta 1e5 ll', 'underdispersed zerotrunc negbin: loglik near countreg\'s');
+	ok($nb->{loglik} >= $un->{ll}, 'underdispersed zerotrunc negbin: countreg stops below the supremum');
+	is($nb->{df_residual}, 12 - 3, 'underdispersed zerotrunc negbin: df_residual still counts theta');
+	rel_ok($nb->{aic}, -2 * $nb->{loglik} + 6, 1e-14, 'identity', 'underdispersed zerotrunc negbin: aic counts theta, as countreg\'s df = 3');
+	ok(!grep({ $_ != $_ } values %{ $nb->{fitted_values} }), 'underdispersed zerotrunc negbin: no NaN fitted value');
+}
+for my $case (['ud_h', 'dist', [0, 1, 2, 0, 1, 2, 1, 2, 0, 1, 2, 3, 2, 1, 0, 2], 'theta', 'count'],
+              ['ud_hz', 'zero_dist', [2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 3, 0, 2, 2, 2, 3, 2, 2], 'theta_zero', 'zero']) {
+	my ($key, $arg, $y, $tk, $half) = @$case;
+	my %d = (y => $y, x => [1 .. scalar @$y]);
+	my $nb = hurdle(formula => 'y ~ x', data => \%d, $arg => 'negbin');
+	my $po = hurdle(formula => 'y ~ x', data => \%d, $arg => 'poisson');
+	my ($un, $up) = @UNDER{"${key}_negbin", "${key}_poisson"};
+	ok($nb->{converged}, "underdispersed hurdle $arg negbin: converged");
+	is($nb->{$tk}, 9**9**9, "underdispersed hurdle $arg negbin: $tk is Inf");
+	for my $j (0, 1) {
+		my $t = (qw(Intercept x))[$j];
+		is($nb->{coefficients}{$half}{$t}, $po->{coefficients}{$half}{$t},
+		   "underdispersed hurdle $arg negbin: $half $t is the Poisson fit's");
+		coef_ok($nb->{coefficients}{$half}{$t}, $up->{$half}[$j], $up->{"${half}_se"}[$j], 5e-3, 'pkg coef',
+		        "underdispersed hurdle $arg negbin: $half $t near pscl's Poisson fit");
+		coef_ok($nb->{coefficients}{$half}{$t}, $un->{$half}[$j], $un->{"${half}_se"}[$j], 1e-3, 'theta 1e5 coef',
+		        "underdispersed hurdle $arg negbin: $half $t near countreg's stop at theta $un->{theta}");
+		rel_ok($nb->{summary}{$half}{$t}{'Std. Error'}, $un->{"${half}_se"}[$j], 5e-3, 'pkg se',
+		       "underdispersed hurdle $arg negbin: se $half $t near countreg's");
+	}
+	rel_ok($nb->{loglik}, $up->{ll}, 1e-8, 'pkg ll', "underdispersed hurdle $arg negbin: loglik is the Poisson one");
+	rel_ok($nb->{loglik}, $un->{ll}, 1e-5, 'theta 1e5 ll', "underdispersed hurdle $arg negbin: loglik near countreg's");
+	ok($nb->{loglik} >= $un->{ll}, "underdispersed hurdle $arg negbin: countreg stops below the supremum");
+	ok(!grep({ $_ != $_ } values %{ $nb->{fitted_values} }), "underdispersed hurdle $arg negbin: no NaN fitted value");
+}
+
 # --------------------------------------------------- errors
 {
 	my %d = (y => [1, 2, 3, 1, 4, 2], x => [1, 2, 3, 4, 5, 6]);
@@ -646,4 +760,17 @@ SKIP: {
 }
 
 diag(sprintf('worst disagreement, %s: %.3g', $_, $worst{$_})) for sort keys %worst;
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { zerotrunc(formula => 'y ~ x', data => { x => [1, 2], y => [1, 2] }, dist => 'binomial'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: zerotrunc\(.*^example:\n.*\n\nzerotrunc: error: \Qdist must be 'poisson', 'negbin' or 'geometric'\E\n\z/ms,
+		'zerotrunc: dist must be \'poisson\', \'negbin\' or \'geometric\', under the help screen');
+}
+{
+	my $err = eval { hurdle(formula => 'y ~ x', 'data'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: hurdle\(.*^example:\n.*\n\nhurdle: error: \Qarguments must be name => value pairs\E\n\z/ms,
+		'hurdle: arguments must be name => value pairs, under the help screen');
+}
+
 done_testing();

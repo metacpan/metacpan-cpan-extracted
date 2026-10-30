@@ -100,6 +100,21 @@ like( $api_out, qr/--output/, 'API root help documents the implicit list output 
 unlike( $api_out, qr/^Key\s+Secret\s+Route/m, 'API help does not continue into the API listing action' );
 ok( !-e File::Spec->catfile( $home, '.developer-dashboard', 'config', 'api.json' ), 'help does not create or mutate the API registry' );
 
+my ( $logs_help_out, $logs_help_err, $logs_help_exit ) = run_cli( 'logs', '--help' );
+is( $logs_help_exit, 0, 'd2 logs --help exits successfully' );
+like( $logs_help_out, qr/Usage: dashboard log \[-t\] \[-f\].*--tail.*\[-n/m, 'd2 logs --help documents timestamps, follow, and both tail forms' );
+is( $logs_help_err, '', 'd2 logs --help emits no parser errors' );
+
+my ( $workspace_help_out, $workspace_help_err, $workspace_help_exit ) = run_cli( 'workspace', '--help' );
+is( $workspace_help_exit, 0, 'd2 workspace --help exits successfully' );
+like( $workspace_help_out, qr/Usage: dashboard workspace <name> \[-c\|-C\] \[-d\|--docker\]/,
+    'd2 workspace --help documents directory change, explicit build, and both Docker option forms' );
+like( $workspace_help_out, qr/uppercase -C requests a cached build with live progress/,
+    'd2 workspace --help explains opt-in builds and streamed progress' );
+like( $workspace_help_out, qr/Compose service named workspace/,
+    'd2 workspace --help explains the required Compose workspace service' );
+is( $workspace_help_err, '', 'd2 workspace --help emits no parser errors' );
+
 my ( $grep_help_out, $grep_help_err, $grep_help_exit ) = run_cli( 'of', 'grep', '--help' );
 is( $grep_help_exit, 0, 'delegated grep --help exits with grep success status' );
 like( $grep_help_out, qr/^Usage: grep/m, 'delegated grep --help prints the system grep usage' );
@@ -232,7 +247,8 @@ Verifies helper and direct-version help spellings reach the shared catalog
 before command execution, including nested actions, the global help form, and
 root API help for the implicit list action. It also checks native help
 passthrough for grep and Docker Compose using a fake Docker executable,
-including external help markers after Dashboard or Compose wrapper options.
+including external help markers after Dashboard or Compose wrapper options,
+and documents the local/Docker workspace command syntax and required service.
 
 =head1 WHY IT EXISTS
 

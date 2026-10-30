@@ -435,6 +435,24 @@ Baluchi Latin locale.
    1995-12-22T09:05:02 = AD 1995 Das 22, Jom
   -0010-09-15T04:44:23 = PM -10 Sat 15, Sha
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Parwari
+   1995-12-22T09:05:02 = AD 1995 Dasambar
+  -0010-09-15T04:44:23 = PM -10 Satambar
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Parwari 5, Say
+   1995-12-22T09:05:02 = AD 1995 Dasambar 22, Jom
+  -0010-09-15T04:44:23 = PM -10 Satambar 15, Sha
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Parwari 5
+   1995-12-22T09:05:02 = AD 1995 Dasambar 22
+  -0010-09-15T04:44:23 = PM -10 Satambar 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Par 5
@@ -506,6 +524,12 @@ Baluchi Latin locale.
    2008-02-05T18:30:30 = Par 5, Say
    1995-12-22T09:05:02 = Das 22, Jom
   -0010-09-15T04:44:23 = Sat 15, Sha
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Parwari 5, Say
+   1995-12-22T09:05:02 = Dasambar 22, Jom
+  -0010-09-15T04:44:23 = Satambar 15, Sha
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

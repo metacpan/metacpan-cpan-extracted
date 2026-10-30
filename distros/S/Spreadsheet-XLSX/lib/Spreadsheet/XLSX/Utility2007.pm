@@ -13,13 +13,28 @@ require Exporter;
 use vars qw(@ISA @EXPORT_OK);
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(ExcelFmt LocaltimeExcel ExcelLocaltime col2int int2col sheetRef xls2csv);
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 my $sNUMEXP = '(^[+-]?\d+(\.\d+)?$)|(^[+-]?\d+\.?(\d*)[eE][+-](\d+))$';
 
 #------------------------------------------------------------------------------
 # ExcelFmt (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
+# Treat format conditions as data. Invalid conditions select the fallback section.
+sub _matches_condition {
+    my ($value, $condition) = @_;
+    my $number = qr/[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?/;
+    return 0 unless defined($value) && $value =~ /\A\s*$number\s*\z/;
+    return 0 unless $condition =~ /\A\s*(>=|<=|<>|==|>|<|=)\s*($number)\s*\z/;
+    my ($operator, $operand) = ($1, $2);
+    return $value >  $operand if $operator eq '>';
+    return $value >= $operand if $operator eq '>=';
+    return $value <  $operand if $operator eq '<';
+    return $value <= $operand if $operator eq '<=';
+    return $value != $operand if $operator eq '<>';
+    return $value == $operand;
+}
+
 sub ExcelFmt {
     my ($sFmt, $iData, $i1904, $sType) = @_;
     my $sCond;
@@ -69,7 +84,7 @@ sub ExcelFmt {
     #Get FmtString
     if (scalar(@sFmtWk) > 1) {
         if ($sCond) {
-            $sFmtObj = $sFmtWk[((eval(qq/"$iData" $sCond/)) ? 0 : 1)];
+            $sFmtObj = $sFmtWk[(_matches_condition($iData, $sCond) ? 0 : 1)];
         } else {
             my $iWk = ($iData =~ /$sNUMEXP/) ? $iData : 0;
 
@@ -697,6 +712,14 @@ sub LocaltimeExcel {
 #------------------------------------------------------------------------------
 sub ExcelLocaltime {
     my ($dObj, $flg1904) = @_;
+    # Excel dates end on 9999-12-31; allow the fractional time on that day.
+    # Check before int() and the year loop, including numbers that overflow
+    # to infinity when converted from scientific notation.
+    my $limit = $flg1904 ? 2957004 : 2958466;
+    die "Invalid or out-of-range XLSX date value\n"
+        unless defined($dObj)
+        && $dObj =~ /\A[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?\z/
+        && $dObj >= 0 && $dObj < $limit;
     my ($iSec, $iMin, $iHour, $iDay, $iMon, $iYear, $iwDay, $iMSec);
     my ($iDt, $iTime, $iYDays);
 

@@ -718,6 +718,27 @@ subtest '_apply_filter_spec -- empty and notempty operators' => sub {
 	is $notempty->[0]{note}, 'has text', 'notempty returns the non-blank row';
 };
 
+subtest '_apply_filter_spec -- between operator (date range, string comparison)' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
+	my @rows = map { { date => $_ } } qw(2026-01-01 2026-06-15 2026-12-31 2027-01-01);
+
+	my $in = $fn->(\@rows, 'date:between:2026-01-01:2026-12-31');
+	is scalar(@$in), 3,                      'between includes lo, hi, and middle';
+	is $in->[0]{date}, '2026-01-01',         'lo boundary included';
+	is $in->[2]{date}, '2026-12-31',         'hi boundary included';
+
+	my $out = $fn->(\@rows, 'date:between:2026-03-01:2026-09-30');
+	is scalar(@$out), 1,                     'between narrows to matching rows';
+	is $out->[0]{date}, '2026-06-15',        'only mid-range row returned';
+
+	my $none = $fn->(\@rows, 'date:between:2028-01-01:2028-12-31');
+	is scalar(@$none), 0,                    'between with no matches returns empty';
+
+	# Degenerate: missing hi -- split gives lo only; hi is undef so length check fails
+	my $bad = $fn->(\@rows, 'date:between:2026-01-01');
+	is scalar(@$bad), 0,                     'between with no hi value returns empty';
+};
+
 subtest '_apply_filter_spec -- unknown operator passes all rows through' => sub {
 	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
 	my $records = [{ x => 1 }, { x => 2 }];
@@ -1497,6 +1518,176 @@ subtest '_apply_filters -- malformed spec (no colon) skipped from JSON, records 
 	my ($filtered, $specs, $json) = $fn->($c, $records);
 	is scalar(@$filtered), 2, 'malformed spec: both records pass through';
 	is $json, '[]',           'malformed spec is not added to the JSON array';
+};
+
+# ============================================================================
+# PART 6b: Dashboard -- _reduce_records, the shared filter stage
+#
+# _reduce_records is stage 5 of the pipeline (BI-Phase-7.md section 3) held in
+# one place: the reader's own f= params, then the two bounds a relative time
+# range resolves to, applied in order over the records, with the columns list
+# handed back so a later stage can extend it.  Every route that reads rows and
+# filters them calls it, so these subtests check the stage itself rather than
+# one route's copy of it -- and the last one checks that the copy is gone.
+# ============================================================================
+
+subtest '_reduce_records -- no filters: the records and the columns come back' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_reduce_records;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $records = [{ region => 'North' }, { region => 'South' }];
+	my ($out, $cols) = $fn->($c, $records, ['region', 'score']);
+
+	is $out, $records, 'the same list comes back, not a filtered copy';
+	is_deeply $cols, ['region', 'score'], 'and the columns list is handed back as it came';
+};
+
+subtest '_reduce_records -- an undef columns list is handed back as undef' => sub {
+	# _apply_filters, the entry point seven routes reach the stage through, has
+	# no column list in scope; the stage must not invent one.
+	my $fn = \&Database::BI::Controller::Dashboard::_reduce_records;
+	my $tx = $t->ua->build_tx(GET => '/?f=region:eq:North');
+	my $c  = $t->app->build_controller($tx);
+
+	my ($out, $cols) = $fn->($c, [{ region => 'North' }, { region => 'South' }], undef);
+
+	is scalar(@$out), 1, 'the filter still applies';
+	is $cols, undef, 'and no columns list is invented for the caller';
+};
+
+subtest "_reduce_records -- the reader's own f= filters narrow the rows" => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_reduce_records;
+	my $tx = $t->ua->build_tx(GET => '/?f=region:eq:North&f=score:ge:50');
+	my $c  = $t->app->build_controller($tx);
+
+	my $records = [
+		{ region => 'North', score => 80 },
+		{ region => 'North', score => 10 },
+		{ region => 'South', score => 90 },
+	];
+	my ($out) = $fn->($c, $records, ['region', 'score']);
+
+	is scalar(@$out), 1, 'both filters are applied';
+	is $out->[0]{score}, 80, 'the one row that passes both is the one left';
+	is scalar(@$records), 3, "the caller's list is not mutated in place";
+};
+
+subtest '_reduce_records -- the relative range is applied after the f= filters' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_reduce_records;
+	my $tx = $t->ua->build_tx(GET => '/?f=region:eq:North&f=score:gt:0');
+	my $c  = $t->app->build_controller($tx);
+
+	# What _time_range_request puts on the stash for a ?range= request: the two
+	# bounds, not two more entries in the reader's own filter list.
+	$c->stash(range_specs => ['score:ge:50', 'score:le:100']);
+
+	my $records = [
+		{ region => 'North', score => 80 },
+		{ region => 'North', score => 40 },
+		{ region => 'North', score => 500 },
+		{ region => 'South', score => 60 },
+	];
+	my ($out) = $fn->($c, $records, ['region', 'score']);
+
+	is_deeply [map { $_->{score} } @$out], [80],
+		"the window narrows what the reader's filters left";
+	is_deeply Database::BI::Controller::Dashboard::_filter_specs($c),
+		['region:eq:North', 'score:gt:0', 'score:ge:50', 'score:le:100'],
+		"the reader's filters come first, the range's two bounds after them";
+};
+
+subtest '_reduce_records -- a malformed spec leaves the rows alone' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_reduce_records;
+	my $tx = $t->ua->build_tx(GET => '/?f=notacolonspec');
+	my $c  = $t->app->build_controller($tx);
+
+	my ($out) = $fn->($c, [{ x => 1 }, { x => 2 }], ['x']);
+	is scalar(@$out), 2, 'a spec with no colon leaves every row in place';
+};
+
+subtest '_reduce_records -- the stage has one implementation, not seventeen' => sub {
+	# The point of the seam is that the loop was written out in seventeen actions
+	# and is now written once.  A test of the behaviour cannot see a copy come
+	# back -- a copy behaves the same, which is how the copies drifted apart in
+	# the first place -- so this reads the module and counts.
+	my $source = Mojo::File->new(
+		File::Spec->catfile('lib', 'Database', 'BI', 'Controller', 'Dashboard.pm')
+	)->slurp;
+
+	my $loops = () = $source =~ /for my \$s \(\@\{ _filter_specs/g;
+	is $loops, 1, 'the filter loop is written once, inside _reduce_records';
+
+	# The routes go through _reduce_or_render, which is the one caller of the
+	# seam that turns a cross-row spec it cannot honour into a 400 (the stage
+	# croaks, and a route has to answer with something).
+	my $calls = () = $source =~ /_reduce_or_render\(/g;
+	cmp_ok $calls, '>=', 16,
+		"every data route reduces through the seam ($calls call sites)";
+	my $seam = () = $source =~ /= eval \{ _reduce_records\(\$self/g;
+	is $seam, 1, 'and only that wrapper calls _reduce_records on a route\'s behalf';
+};
+
+# ============================================================================
+subtest '_reduce_records -- chips_only hands already-reduced rows straight back' => sub {
+	# The routes that filter inside _fetch_page before paginating come here for
+	# the chip list alone.  Without the option the stage would run a second time
+	# on a page that has already been through it -- harmless while every stage is
+	# idempotent, wrong the moment one is not, and wrong only on pages after the
+	# first.  Already-reduced is simulated by rows that no longer match the
+	# filters: a second pass would drop them.
+	my $fn = \&Database::BI::Controller::Dashboard::_reduce_records;
+	my $tx = $t->ua->build_tx(GET => '/?f=region:eq:North');
+	my $c  = $t->app->build_controller($tx);
+	$c->stash(range_specs => ['score:ge:50', 'score:le:100']);
+
+	my $records = [{ region => 'South', score => 10 }];
+	my $columns = ['region', 'score'];
+	my ($out, $cols) = $fn->($c, $records, $columns, { chips_only => 1 });
+
+	is $out, $records, 'the same rows come back, unfiltered';
+	is scalar(@$out), 1, 'nothing is dropped by the f= spec or the range bounds';
+	is $cols, $columns, 'and the columns list is untouched';
+};
+
+subtest '_apply_filters -- chips_only still builds the chips, but filters nothing' => sub {
+	my $fn      = \&Database::BI::Controller::Dashboard::_apply_filters;
+	my $tx      = $t->ua->build_tx(GET => '/?f=score:ge:50');
+	my $c       = $t->app->build_controller($tx);
+	my $records = [{ score => 10 }, { score => 20 }];
+
+	my ($filtered, $specs, $json) = $fn->($c, $records, { chips_only => 1 });
+
+	is $filtered, $records, 'the rows the caller passed in are what comes back';
+	is_deeply $specs, ['score:ge:50'], 'the raw spec is still returned for export URLs';
+	like $json, qr/"val"\s*:\s*"50"/, 'and the JSON is still built for the filter UI';
+
+	# The default is unchanged: without the option the same call does filter.
+	my ($default) = $fn->($c, $records);
+	is scalar(@$default), 0, 'without the option the spec still applies';
+};
+
+subtest '_apply_filters -- every caller that discards the reduced rows asks for chips only' => sub {
+	# _apply_filters returns the reduced rows, but most of its callers filter
+	# earlier and keep only the chip list.  This is the property that keeps them
+	# safe from a non-idempotent stage: if a call site throws the filtered rows
+	# away, it must say chips_only, or the stage runs twice on that page.
+	my $source = Mojo::File->new(
+		File::Spec->catfile('lib', 'Database', 'BI', 'Controller', 'Dashboard.pm')
+	)->slurp;
+
+	my @calls = grep { /_apply_filters\(\$records/ } split /\n/, $source;
+	is scalar(@calls), 7, 'seven call sites reach the entry point';
+
+	my @flagged = grep { /chips_only\s*=>\s*1/ } @calls;
+	is scalar(@flagged), 6, 'six of them are here for the chip list alone';
+
+	my @unmarked = grep { /my \(undef,/ && !/chips_only\s*=>\s*1/ } @calls;
+	is_deeply \@unmarked, [], 'no caller discards the reduced rows without the flag';
+
+	my @flagged_but_used = grep { /my \(\$filtered,/ && /chips_only\s*=>\s*1/ } @calls;
+	is_deeply \@flagged_but_used, [],
+		'and no caller that uses the reduced rows asks for the stage to be skipped';
 };
 
 # ============================================================================
@@ -4768,6 +4959,262 @@ subtest 'Ask::_build_spec -- result has no circular references' => sub {
 	};
 	my $spec = $BUILD_SPEC->($visual, 'sales', 'table:sales');
 	memory_cycle_ok($spec, '_build_spec result has no circular references');
+};
+
+# ============================================================================
+# PART: The measure vocabulary -- parser, arithmetic, and who computes what
+#
+# A measure spec (col:fn:as) reaches either the backend's aggregate() (the push
+# path) or the Perl fold in _grouped_totals.  Everything the fold computes for a
+# group of values lives in the four functions below, so proving them here is
+# what makes the pivot's and the stats page's numbers trustworthy -- and
+# _measure_pushable is what keeps the two layers from disagreeing.
+# ============================================================================
+
+Readonly my $PARSE_MEASURE => \&Database::BI::Controller::Dashboard::_parse_measure_param;
+Readonly my $FN_OK         => \&Database::BI::Controller::Dashboard::_measure_fn_ok;
+Readonly my $FN_PCT        => \&Database::BI::Controller::Dashboard::_measure_percentile;
+Readonly my $PERCENTILE    => \&Database::BI::Controller::Dashboard::_percentile_of;
+Readonly my $MEDIAN        => \&Database::BI::Controller::Dashboard::_median_of;
+Readonly my $STDEV         => \&Database::BI::Controller::Dashboard::_stdev_of;
+Readonly my $RANGE         => \&Database::BI::Controller::Dashboard::_range_of;
+Readonly my $MEASURE_VALUE => \&Database::BI::Controller::Dashboard::_measure_value;
+Readonly my $PUSHABLE      => \&Database::BI::Controller::Dashboard::_measure_pushable;
+
+# _measure_percentile -- which functions name a percentile level
+subtest '_measure_percentile -- reads the level out of the function name' => sub {
+	is $FN_PCT->('p95'),  95, 'p95 names the 95th percentile';
+	is $FN_PCT->('p50'),  50, 'p50 names the 50th, the median';
+	is $FN_PCT->('p1'),    1, 'p1 is the lowest accepted level';
+	is $FN_PCT->('p100'), 100, 'p100 is the highest accepted level';
+
+	is $FN_PCT->('p0'),   undef, 'p0 is not a percentile';
+	is $FN_PCT->('p101'), undef, 'p101 is not a percentile';
+	is $FN_PCT->('p999'), undef, 'three digits above 100 are not a percentile';
+	is $FN_PCT->('p'),    undef, 'p with no level names no percentile';
+	is $FN_PCT->('px9'),  undef, 'p followed by a non-number names no percentile';
+	is $FN_PCT->('median'),     undef, 'median is its own function, not a pN';
+	is $FN_PCT->('percentile'), undef, 'the bare word percentile carries no level';
+	is $FN_PCT->('p95x'), undef, 'a percentile is the whole function name';
+	is $FN_PCT->(''),     undef, 'the empty function names no percentile';
+	is $FN_PCT->(undef),  undef, 'undef names no percentile';
+};
+
+# _measure_fn_ok -- the vocabulary gate the parser uses
+subtest '_measure_fn_ok -- accepts the vocabulary and every percentile' => sub {
+	for my $fn (qw(sum avg min max count count_distinct median stdev first last range)) {
+		ok $FN_OK->($fn), "$fn is a measure function";
+	}
+	ok $FN_OK->('p1'),   'p1 is a measure function';
+	ok $FN_OK->('p90'),  'p90 is a measure function';
+	ok $FN_OK->('p100'), 'p100 is a measure function';
+
+	ok !$FN_OK->('percentile'), 'the bare word percentile is not a function';
+	ok !$FN_OK->('mean'),        'mean is not a function in this vocabulary';
+	ok !$FN_OK->('stddev'),      'stddev is not spelled this way';
+	ok !$FN_OK->('sums'),        'a near miss is not a function';
+	ok !$FN_OK->(''),            'the empty name is not a function';
+	ok !$FN_OK->(undef),         'undef is not a function';
+};
+
+# _parse_measure_param -- the spec dialect
+subtest '_parse_measure_param -- accepts every measure function, lower-cased' => sub {
+	for my $spec (qw(deal:median:med deal:p90:p90 deal:p100:top deal:stdev:sd
+	                 deal:first:f deal:last:l deal:range:rg)) {
+		my $m = $PARSE_MEASURE->($spec);
+		is ref($m), 'HASH', "$spec parses";
+		isnt $m->{col}, '', "$spec keeps its column";
+		isnt $m->{as},  '', "$spec keeps its alias";
+	}
+
+	is $PARSE_MEASURE->('deal:P90:x')->{fn},    'p90',    'a percentile is lower-cased';
+	is $PARSE_MEASURE->('deal:MEDIAN:x')->{fn}, 'median', 'a named function is lower-cased';
+	is $PARSE_MEASURE->('deal:p50:half')->{fn}, 'p50',    'p50 is accepted as written';
+	is $PARSE_MEASURE->(':count:orders')->{fn}, 'count',  'count still needs no column';
+};
+
+subtest '_parse_measure_param -- refuses what the fold cannot compute' => sub {
+	is $PARSE_MEASURE->('deal:percentile:pc'), undef,
+		'percentile with no level is refused (the level rides in the name as p90)';
+	is $PARSE_MEASURE->('deal:p0:z'),   undef, 'p0 is refused';
+	is $PARSE_MEASURE->('deal:p101:z'), undef, 'p101 is refused';
+	is $PARSE_MEASURE->('deal:mean:z'), undef, 'an unknown function is refused';
+	is $PARSE_MEASURE->('deal::z'),     undef, 'an empty function is refused';
+	is $PARSE_MEASURE->('deal:median'), undef, 'a spec with no alias is refused';
+};
+
+# _percentile_of -- the arithmetic, and its identity with the old median
+subtest '_percentile_of -- p50 is the median this page has always shown' => sub {
+	# The definition the column-stats view used before it moved here: the
+	# middle value when the count is odd, the mean of the two middle values when
+	# it is even.  Checked from the count up rather than at one size, because the
+	# even/odd boundary is the whole of the rule.
+	my @values = (10, 20, 30, 40, 50, 60, 70, 80);
+	for my $n (1 .. scalar @values) {
+		my @sorted = sort { $a <=> $b } @values[0 .. $n - 1];
+		my $mid    = int($n / 2);
+		my $want   = $n % 2 ? $sorted[$mid] : ($sorted[$mid - 1] + $sorted[$mid]) / 2;
+		is $PERCENTILE->(\@sorted, 50), $want, "p50 of $n values is the middle/average-of-middles";
+		is $MEDIAN->(\@sorted), $want, "_median_of of $n values agrees";
+	}
+};
+
+subtest '_percentile_of -- interpolation between closest ranks' => sub {
+	my @sorted = (1, 2, 3, 4);
+	is $PERCENTILE->(\@sorted, 25), 1.75, 'p25 of 1..4 interpolates between the first two';
+	is $PERCENTILE->(\@sorted, 50), 2.5,  'p50 of 1..4 is the middle pair';
+	is $PERCENTILE->(\@sorted, 100), 4,   'p100 of 1..4 is the largest value';
+
+	my @six = (60, 75, 80, 85, 90, 100);
+	is $PERCENTILE->(\@six, 95), 97.5, 'p95 of the six scores the stats page shows';
+	is $PERCENTILE->(\@six, 50), 82.5, 'p50 of the same six scores';
+
+	# Monotonic in the level, which is what makes a percentile meaningful.
+	my @levels = map { $PERCENTILE->(\@six, $_) } (1, 25, 50, 75, 95, 100);
+	my @sorted_levels = sort { $a <=> $b } @levels;
+	is_deeply \@levels, \@sorted_levels, 'a higher level never gives a smaller value';
+
+	is $PERCENTILE->([42], 90), 42, 'one value is every percentile of itself';
+	is $PERCENTILE->([], 50), undef, 'an empty list has no percentile';
+};
+
+# _stdev_of -- sample standard deviation
+subtest '_stdev_of -- sample standard deviation, n-1 denominator' => sub {
+	is $STDEV->([2, 4, 6]), 2, 'the spread of 2,4,6 is exactly 2';
+	is $STDEV->([2, 4, 4, 4, 5, 5, 7, 9]), sqrt(32 / 7),
+		'the textbook sample standard deviation';
+	is $STDEV->([5, 5]), 0, 'two equal values have no spread';
+	is $STDEV->([7]),    undef, 'one value has no spread to measure (undef, not 0)';
+	is $STDEV->([]),     undef, 'no values have no spread to measure';
+};
+
+# _range_of -- largest minus smallest
+subtest '_range_of -- spread of the sorted list' => sub {
+	is $RANGE->([1, 5, 9]), 8,  'the largest minus the smallest';
+	is $RANGE->([4]),       0,  'a single value spans nothing';
+	is $RANGE->([-3, 7]),   10, 'a negative minimum still measures the span';
+	is $RANGE->([]),        undef, 'an empty list has no range';
+};
+
+# _measure_value -- one dispatch for both callers
+subtest '_measure_value -- dispatch over the Perl-computed functions' => sub {
+	my @sorted = (1, 2, 3, 4);
+	is $MEASURE_VALUE->('median', \@sorted), 2.5,   'median is dispatched';
+	is $MEASURE_VALUE->('p25',    \@sorted), 1.75,  'a percentile is dispatched';
+	is $MEASURE_VALUE->('stdev',  \@sorted), sqrt(5 / 3), 'stdev is dispatched';
+	is $MEASURE_VALUE->('range',  \@sorted), 3,     'range is dispatched';
+	is $MEASURE_VALUE->('sum',    \@sorted), undef, 'a pushed function is not handled here';
+	is $MEASURE_VALUE->('first',  \@sorted), undef, 'first is order-dependent, not a spread';
+};
+
+# _measure_pushable -- the boundary between the two layers
+subtest '_measure_pushable -- the Perl-computed measures never go to the backend' => sub {
+	# _measure_pushable asks one thing of the source -- whether it can
+	# aggregate() -- so this is all the source has to answer.
+	{
+		package Local::AggregatingSource;
+		sub new       { bless {}, shift }
+		sub aggregate { return [] }
+	}
+	my $src     = Local::AggregatingSource->new;
+	my $records = [ { deal => '10' }, { deal => '20' } ];
+
+	ok $PUSHABLE->($src, 'sum',            'deal', $records), 'sum is pushed to the backend';
+	ok $PUSHABLE->($src, 'avg',            'deal', $records), 'avg is pushed to the backend';
+	ok $PUSHABLE->($src, 'count_distinct', 'deal', $records), 'count_distinct is pushed';
+
+	ok !$PUSHABLE->($src, 'median', 'deal', $records),
+		'median folds in Perl, so the backend cannot answer it its own way';
+	ok !$PUSHABLE->($src, 'p90', 'deal', $records),
+		'a percentile folds in Perl';
+	ok !$PUSHABLE->($src, 'stdev', 'deal', $records),
+		'stdev folds in Perl';
+	ok !$PUSHABLE->($src, 'range', 'deal', $records),
+		'range folds in Perl';
+	ok !$PUSHABLE->($src, 'first', 'deal', $records),
+		'first folds in Perl: which value is first is not the backend\'s to know';
+	ok !$PUSHABLE->($src, 'last', 'deal', $records),
+		'last folds in Perl';
+
+	# A source that cannot aggregate() takes everything through the fold.
+	my $plain = bless {}, 'Local::PlainSource';
+	ok !$PUSHABLE->($plain, 'sum', 'deal', $records),
+		'a source with no aggregate() is never pushed to';
+};
+
+# ============================================================================
+# PART 7: Dashboard -- _visual_measure
+#
+# The measure a canvas card aggregates its value column with.  A card that
+# names no function keeps the default it has always had -- count the rows when
+# it names no value column, sum it when it does -- and a card that names one
+# gets it, with a percentile riding in the name as a pivot's measure spells it.
+# ============================================================================
+
+subtest '_visual_measure -- the default a card has always had' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_visual_measure;
+
+	is_deeply $fn->(undef, undef), { fn => 'count', val => undef, label => 'Count' },
+		'no function and no column counts rows';
+	is_deeply $fn->(undef, ''), { fn => 'count', val => undef, label => 'Count' },
+		'an empty column name counts rows too';
+	is_deeply $fn->(undef, '__count__'), { fn => 'count', val => undef, label => 'Count' },
+		'the value menu\'s Count (no column needed) counts rows';
+	is_deeply $fn->('', 'amount'), { fn => 'sum', val => 'amount', label => 'amount' },
+		'an empty function name is no choice, so the column is summed';
+	is_deeply $fn->(undef, 'amount'), { fn => 'sum', val => 'amount', label => 'amount' },
+		'and a named column is summed, as every chart page does';
+};
+
+subtest '_visual_measure -- naming the default changes nothing' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_visual_measure;
+	is_deeply $fn->('sum', 'amount'), { fn => 'sum', val => 'amount', label => 'amount' },
+		'an explicit sum keeps the column\'s own name in the title';
+};
+
+subtest '_visual_measure -- the pivot vocabulary, and its percentile spelling' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_visual_measure;
+
+	for my $name (qw(avg min max count_distinct median stdev first last range)) {
+		my $m = $fn->($name, 'amount');
+		ok !$m->{error}, "$name is a measure a card can pick";
+		is $m->{fn},    $name,          "and is what the group is aggregated with";
+		is $m->{val},   'amount',       "over the column the card names";
+		is $m->{label}, "$name(amount)", "so the title says which function it was";
+	}
+
+	# A percentile rides in the name, as it does in a pivot's m= spec, so a card
+	# needs no second key to keep in step.
+	is_deeply $fn->('p95', 'amount'), { fn => 'p95', val => 'amount', label => 'p95(amount)' },
+		'a percentile is the function p95';
+	is $fn->('p1',   'amount')->{fn}, 'p1',   'the lowest percentile is allowed';
+	is $fn->('p100', 'amount')->{fn}, 'p100', 'and the highest';
+
+	# first and last read any column, not only a numeric one, as the pivot allows.
+	is $fn->('first', 'region')->{val}, 'region',
+		'first may name a column of text';
+};
+
+subtest '_visual_measure -- count ignores the column it is given' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_visual_measure;
+	is_deeply $fn->('count', 'amount'), { fn => 'count', val => undef, label => 'Count' },
+		'count counts rows, so the column it names is dropped';
+	is_deeply $fn->('count', undef), { fn => 'count', val => undef, label => 'Count' },
+		'and it needs no column at all';
+};
+
+subtest '_visual_measure -- a function that needs a column says so' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_visual_measure;
+
+	for my $case ([ undef, 'median' ], [ '', 'median' ],
+	              [ '__count__', 'median' ], [ undef, 'p95' ], [ '', 'stdev' ]) {
+		my ($val, $name) = @$case;
+		my $m = $fn->($name, $val);
+		ok $m->{error}, "$name with no value column is refused";
+		like $m->{error}, qr/\Q$name\E/,              'and the message names the function';
+		like $m->{error}, qr/needs a value column/,    'and says what is missing';
+		ok !defined $m->{fn}, 'with no measure to aggregate with';
+	}
 };
 
 done_testing();

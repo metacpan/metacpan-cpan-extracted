@@ -6,9 +6,7 @@ use Acme::Parataxis::Actor;
 use Test2::V1 -ipP;
 $|++;
 
-# Trace propagation. A Acme::Parataxis::Local created with inherit => 1 has its current
-# value copied from the spawning fiber into the child the moment the child is spawned (a shallow
-# copy; the child then owns it exclusively). Plain Locals keep strict per-fiber isolation.
+# Trace propagation. A Acme::Parataxis::Local created with inherit => 1 has its current value copied from the spawning fiber into the child the moment the child is spawned (a shallow copy; the child then owns it exclusively). Plain Locals keep strict per-fiber isolation.
 subtest 'an inherit Local seeds the child before its first read' => sub {
     async {
         my $trace = Acme::Parataxis::Local->new( inherit => 1 );
@@ -129,4 +127,5 @@ subtest 'the spawn wrapper does not disturb spawn-level croaks or results' => su
         like $bad, qr/boom/, 'with its own error, not a seeding artifact';
     };
 };
+#
 done_testing();

@@ -1,0 +1,27 @@
+title: reject_always, cancelled, an option that was not offered and no response at all (timeout) all refuse the call; the run goes on and ends
+hall:
+  permission_timeout: 1
+  raiders:
+    Frager: { engine: mock, packs: [], mcp: [], isolated: 0, permission_mode: default }
+model:
+  rules:
+    Schreibe vier.:
+      tool_calls:
+        - [ write_file, { path: a.txt, content: "a\n" } ]
+        - [ write_file, { path: b.txt, content: "b\n" } ]
+        - [ write_file, { path: c.txt, content: "c\n" } ]
+        - [ write_file, { path: d.txt, content: "d\n" } ]
+  after:
+    write_file: { answer: "fertig" }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_permissions: { answers: [ reject_always, cancelled, bogus, ignore ] }
+  - acp_session: { as: s, raider: Frager }
+  - acp_prompt: { session: s, text: "Schreibe vier.", as: p }
+  - expect_acp: { prompt: p, stop_reason: end_turn }
+  - expect_permission_requests: { count: 4 }
+  - expect_file: { path: a.txt, absent: true }
+  - expect_file: { path: b.txt, absent: true }
+  - expect_file: { path: c.txt, absent: true }
+  - expect_file: { path: d.txt, absent: true }
+  - idle: {}

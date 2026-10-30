@@ -5,6 +5,7 @@
 .perltidyrc
 Build.PL
 CHANGELOG.md
+CODEOWNERS
 CONTRIBUTING.md
 docker-compose.yml
 Dockerfile
@@ -65,6 +66,7 @@ examples/error_handling/handle_keyword_policy_violations.pl
 examples/error_handling/handle_partial_failure.pl
 examples/error_handling/handle_rate_exceeded_error.pl
 examples/error_handling/handle_responsive_search_ad_policy_violations.pl
+examples/experiments/create_asset_optimization_experiment.pl
 examples/incentives/apply_incentive.pl
 examples/incentives/fetch_incentives.pl
 examples/misc/campaign_report_to_csv.pl
@@ -6321,6 +6323,10 @@ lib/Google/Ads/GoogleAds/V26/Common/BookOnGoogleAsset.pm
 lib/Google/Ads/GoogleAds/V26/Common/BrandInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/BrandListInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/BudgetCampaignAssociationStatus.pm
+lib/Google/Ads/GoogleAds/V26/Common/BudgetCapConfig.pm
+lib/Google/Ads/GoogleAds/V26/Common/BudgetNetworkEligibility.pm
+lib/Google/Ads/GoogleAds/V26/Common/BudgetNetworkSetting.pm
+lib/Google/Ads/GoogleAds/V26/Common/BudgetNetworkSettings.pm
 lib/Google/Ads/GoogleAds/V26/Common/BudgetSimulationPoint.pm
 lib/Google/Ads/GoogleAds/V26/Common/BudgetSimulationPointList.pm
 lib/Google/Ads/GoogleAds/V26/Common/BusinessMessageAsset.pm
@@ -6350,6 +6356,7 @@ lib/Google/Ads/GoogleAds/V26/Common/CarrierInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/ChainFilter.pm
 lib/Google/Ads/GoogleAds/V26/Common/ChainLocationGroup.pm
 lib/Google/Ads/GoogleAds/V26/Common/ChainSet.pm
+lib/Google/Ads/GoogleAds/V26/Common/ChannelPriorityConfig.pm
 lib/Google/Ads/GoogleAds/V26/Common/ClickLocation.pm
 lib/Google/Ads/GoogleAds/V26/Common/CombinedAudienceInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/Commission.pm
@@ -6415,6 +6422,8 @@ lib/Google/Ads/GoogleAds/V26/Common/ExpandedDynamicSearchAdInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/ExpandedTextAdInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/ExplorerAutoOptimizerSetting.pm
 lib/Google/Ads/GoogleAds/V26/Common/ExtendedDemographicInfo.pm
+lib/Google/Ads/GoogleAds/V26/Common/ExternalPartnerId.pm
+lib/Google/Ads/GoogleAds/V26/Common/ExternalRedeemInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/FacebookMessengerBusinessMessageInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/FeedAttributeOperand.pm
 lib/Google/Ads/GoogleAds/V26/Common/FinalAppUrl.pm
@@ -6553,6 +6562,7 @@ lib/Google/Ads/GoogleAds/V26/Common/PromotionBarcodeInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/PromotionFeedItem.pm
 lib/Google/Ads/GoogleAds/V26/Common/PromotionQrCodeInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/ProximityInfo.pm
+lib/Google/Ads/GoogleAds/V26/Common/ReachMetricInfo.pm
 lib/Google/Ads/GoogleAds/V26/Common/RealTimeBiddingSetting.pm
 lib/Google/Ads/GoogleAds/V26/Common/RequestContextOperand.pm
 lib/Google/Ads/GoogleAds/V26/Common/ResellerConstraint.pm
@@ -6753,6 +6763,7 @@ lib/Google/Ads/GoogleAds/V26/Enums/BrandSafetySuitabilityEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/BrandStateEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/BudgetCampaignAssociationStatusEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/BudgetDeliveryMethodEnum.pm
+lib/Google/Ads/GoogleAds/V26/Enums/BudgetNetworkIneligibleReasonEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/BudgetPeriodEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/BudgetStatusEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/BudgetTypeEnum.pm
@@ -6779,6 +6790,7 @@ lib/Google/Ads/GoogleAds/V26/Enums/ChangeClientTypeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ChangeEventResourceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ChangeStatusOperationEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ChangeStatusResourceTypeEnum.pm
+lib/Google/Ads/GoogleAds/V26/Enums/ChannelPriorityTierEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ClickTypeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/CombinedAudienceStatusEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ConsentStatusEnum.pm
@@ -6969,10 +6981,13 @@ lib/Google/Ads/GoogleAds/V26/Enums/MultiPartyAuthOperationTypeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/MultiPartyAuthReviewStatusEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/MultiPartyAuthReviewTargetResourceEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/NegativeGeoTargetTypeEnum.pm
+lib/Google/Ads/GoogleAds/V26/Enums/NetworkChannelTypeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/NonSkippableMaxDurationEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/NonSkippableMinDurationEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/OfflineConversionDiagnosticStatusEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/OfflineEventUploadClientEnum.pm
+lib/Google/Ads/GoogleAds/V26/Enums/OfflinePromotionCodeSourceEnum.pm
+lib/Google/Ads/GoogleAds/V26/Enums/OfflinePromotionCodeTypeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/OfflineUserDataJobFailureReasonEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/OfflineUserDataJobMatchRateRangeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/OfflineUserDataJobStatusEnum.pm
@@ -7015,6 +7030,7 @@ lib/Google/Ads/GoogleAds/V26/Enums/PromotionExtensionOccasionEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/PromotionPlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ProximityRadiusUnitsEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/QualityScoreBucketEnum.pm
+lib/Google/Ads/GoogleAds/V26/Enums/ReachMetricStateEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ReachPlanAdLengthEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ReachPlanAgeRangeEnum.pm
 lib/Google/Ads/GoogleAds/V26/Enums/ReachPlanBuyingMethodEnum.pm
@@ -7276,6 +7292,7 @@ lib/Google/Ads/GoogleAds/V26/Resources/Customer.pm
 lib/Google/Ads/GoogleAds/V26/Resources/CustomerAgreementSetting.pm
 lib/Google/Ads/GoogleAds/V26/Resources/CustomerAsset.pm
 lib/Google/Ads/GoogleAds/V26/Resources/CustomerAssetSet.pm
+lib/Google/Ads/GoogleAds/V26/Resources/CustomerBudgetNetworkSetting.pm
 lib/Google/Ads/GoogleAds/V26/Resources/CustomerClient.pm
 lib/Google/Ads/GoogleAds/V26/Resources/CustomerClientLink.pm
 lib/Google/Ads/GoogleAds/V26/Resources/CustomerConversionGoal.pm
@@ -7318,6 +7335,7 @@ lib/Google/Ads/GoogleAds/V26/Resources/ExpandedLandingPageView.pm
 lib/Google/Ads/GoogleAds/V26/Resources/Experiment.pm
 lib/Google/Ads/GoogleAds/V26/Resources/ExperimentalPerformanceMaxCampaignSettings.pm
 lib/Google/Ads/GoogleAds/V26/Resources/ExperimentArm.pm
+lib/Google/Ads/GoogleAds/V26/Resources/ExternalPartnerMerchantId.pm
 lib/Google/Ads/GoogleAds/V26/Resources/Fellowship.pm
 lib/Google/Ads/GoogleAds/V26/Resources/FinalUrlExpansionAssetView.pm
 lib/Google/Ads/GoogleAds/V26/Resources/FineGrainedConversionValueMappings.pm
@@ -7475,6 +7493,7 @@ lib/Google/Ads/GoogleAds/V26/Resources/Recommendation.pm
 lib/Google/Ads/GoogleAds/V26/Resources/RecommendationImpact.pm
 lib/Google/Ads/GoogleAds/V26/Resources/RecommendationMetrics.pm
 lib/Google/Ads/GoogleAds/V26/Resources/RecommendationSubscription.pm
+lib/Google/Ads/GoogleAds/V26/Resources/RedemptionProviderInfo.pm
 lib/Google/Ads/GoogleAds/V26/Resources/RefreshCustomerMatchListRecommendation.pm
 lib/Google/Ads/GoogleAds/V26/Resources/RegulatoryCostSummary.pm
 lib/Google/Ads/GoogleAds/V26/Resources/RemarketingAction.pm
@@ -7955,6 +7974,11 @@ lib/Google/Ads/GoogleAds/V26/Services/CustomerAssetSetService/CustomerAssetSetOp
 lib/Google/Ads/GoogleAds/V26/Services/CustomerAssetSetService/MutateCustomerAssetSetResult.pm
 lib/Google/Ads/GoogleAds/V26/Services/CustomerAssetSetService/MutateCustomerAssetSetsRequest.pm
 lib/Google/Ads/GoogleAds/V26/Services/CustomerAssetSetService/MutateCustomerAssetSetsResponse.pm
+lib/Google/Ads/GoogleAds/V26/Services/CustomerBudgetNetworkSettingService.pm
+lib/Google/Ads/GoogleAds/V26/Services/CustomerBudgetNetworkSettingService/CustomerBudgetNetworkSettingOperation.pm
+lib/Google/Ads/GoogleAds/V26/Services/CustomerBudgetNetworkSettingService/MutateCustomerBudgetNetworkSettingRequest.pm
+lib/Google/Ads/GoogleAds/V26/Services/CustomerBudgetNetworkSettingService/MutateCustomerBudgetNetworkSettingResponse.pm
+lib/Google/Ads/GoogleAds/V26/Services/CustomerBudgetNetworkSettingService/MutateCustomerBudgetNetworkSettingResult.pm
 lib/Google/Ads/GoogleAds/V26/Services/CustomerClientLinkService.pm
 lib/Google/Ads/GoogleAds/V26/Services/CustomerClientLinkService/CustomerClientLinkOperation.pm
 lib/Google/Ads/GoogleAds/V26/Services/CustomerClientLinkService/MutateCustomerClientLinkRequest.pm
@@ -8152,6 +8176,12 @@ lib/Google/Ads/GoogleAds/V26/Services/LabelService/LabelOperation.pm
 lib/Google/Ads/GoogleAds/V26/Services/LabelService/MutateLabelResult.pm
 lib/Google/Ads/GoogleAds/V26/Services/LabelService/MutateLabelsRequest.pm
 lib/Google/Ads/GoogleAds/V26/Services/LabelService/MutateLabelsResponse.pm
+lib/Google/Ads/GoogleAds/V26/Services/LocalServicesEligibilityService.pm
+lib/Google/Ads/GoogleAds/V26/Services/LocalServicesEligibilityService/CheckLocalServicesEligibilityRequest.pm
+lib/Google/Ads/GoogleAds/V26/Services/LocalServicesEligibilityService/CheckLocalServicesEligibilityResponse.pm
+lib/Google/Ads/GoogleAds/V26/Services/LocalServicesEligibilityService/EligibleCategory.pm
+lib/Google/Ads/GoogleAds/V26/Services/LocalServicesEligibilityService/EligibleGoal.pm
+lib/Google/Ads/GoogleAds/V26/Services/LocalServicesEligibilityService/SuggestionReason.pm
 lib/Google/Ads/GoogleAds/V26/Services/LocalServicesLeadService.pm
 lib/Google/Ads/GoogleAds/V26/Services/LocalServicesLeadService/AppendLeadConversationRequest.pm
 lib/Google/Ads/GoogleAds/V26/Services/LocalServicesLeadService/AppendLeadConversationResponse.pm

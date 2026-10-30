@@ -1,0 +1,22 @@
+title: grep finds files, shows lines with context and counts matches
+files:
+  src/a.pl: "use strict;\nmy $x = 1;\n# TODO fix\nprint $x;\n"
+  src/b.pl: "print 'hi';\n"
+  notes.md: "TODO: later\n"
+prompt: Where are the TODOs?
+script:
+  - tool_calls:
+      - [ grep, { pattern: 'TODO', glob: '*.pl' } ]
+      - [ grep, { pattern: 'TODO', output_mode: content, '-C': 1 } ]
+      - [ grep, { pattern: 'print', output_mode: count, path: src } ]
+      - [ grep, { pattern: 'todo', '-i': true, type: perl } ]
+      - [ grep, { pattern: 'nothing like this' } ]
+  - text: gefunden
+expect:
+  answer: gefunden
+  tools:
+    - { name: grep, text: '\Asrc/a\.pl\z' }
+    - { name: grep, text: '\Anotes\.md:1:TODO: later\n--\nsrc/a\.pl-2-my \$x = 1;\nsrc/a\.pl:3:# TODO fix\nsrc/a\.pl-4-print \$x;\z' }
+    - { name: grep, text: '\Asrc/a\.pl:1\nsrc/b\.pl:1\z' }
+    - { name: grep, text: '\Asrc/a\.pl\z' }
+    - { name: grep, text: '\ANo matches found\z' }

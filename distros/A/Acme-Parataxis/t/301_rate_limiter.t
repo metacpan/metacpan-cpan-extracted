@@ -1,18 +1,12 @@
 use v5.40;
-no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use blib;
 use Acme::Parataxis qw[async fiber yield await_sleep with_timeout dump_fibers];
 use Acme::Parataxis::RateLimiter;
 use Test2::V1 -ipP;
-use Time::HiRes 'time';
+use Time::HiRes qw[time];
+no warnings qw[recursion];    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 $|++;
-
-# Fibers run on separate heap stacks; Perl's C-stack-depth heuristic can misfire and falsely report "Deep recursion"
-# (it ignores lexical 'no warnings' once a framework such as Test2 is loaded). Genuine runaway recursion inside a fiber
-# surfaces as a hang, access violation, or croak the harness already catches, so filter the noise.
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ /^Deep recursion on subroutine/; warn @_ }
-}
+#
 sub live_count { Acme::Parataxis::get_live_fiber_count() }
 my $BASE      = live_count();
 my $FIBER_CAP = Acme::Parataxis::get_max_fibers();    # platforms without MAP_NORESERVE (OpenBSD) clamp this to what fits under RLIMIT_DATA

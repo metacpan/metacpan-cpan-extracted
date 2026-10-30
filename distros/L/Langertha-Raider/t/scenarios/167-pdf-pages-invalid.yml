@@ -1,0 +1,14 @@
+title: read_file with a malformed pages value on a PDF is refused with Claude Code's words, before any program is started
+files:
+  doc.pdf: "%PDF-1.4\n"
+prompt: Read the PDF.
+script:
+  - tool_calls:
+      - [ read_file, { path: doc.pdf, pages: "first" } ]
+      - [ read_file, { path: doc.pdf, pages: "5-2" } ]
+  - text: bad range
+expect:
+  answer: bad range
+  tools:
+    - { name: read_file, error: true, text: "\\A<tool_use_error>Invalid pages parameter: \"first\"\\. Use formats like \"1-5\", \"3\", or \"10-20\"\\. Pages are 1-indexed\\.</tool_use_error>\\z" }
+    - { name: read_file, error: true, text: "Invalid pages parameter: \"5-2\"" }

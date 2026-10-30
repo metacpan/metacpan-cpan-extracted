@@ -435,6 +435,24 @@ Igbo Nigeria locale.
    1995-12-22T09:05:02 = Fraị, 22 Dis, AD 1995
   -0010-09-15T04:44:23 = Sat, 15 Sep, BC -10
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Febrụwarị
+   1995-12-22T09:05:02 = AD 1995 Disemba
+  -0010-09-15T04:44:23 = BC -10 Septemba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Febrụwarị 5, Tiu
+   1995-12-22T09:05:02 = AD 1995 Disemba 22, Fraị
+  -0010-09-15T04:44:23 = BC -10 Septemba 15, Sat
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Febrụwarị 5
+   1995-12-22T09:05:02 = AD 1995 Disemba 22
+  -0010-09-15T04:44:23 = BC -10 Septemba 15
+
 =head3 GyMMMd (d MMM, G y)
 
    2008-02-05T18:30:30 = 5 Feb, AD 2008
@@ -620,6 +638,18 @@ Igbo Nigeria locale.
    2008-02-05T18:30:30 = Febrụwarị 2008
    1995-12-22T09:05:02 = Disemba 1995
   -0010-09-15T04:44:23 = Septemba -10
+
+=head3 yMMMMEd (EEE, d MMMM y)
+
+   2008-02-05T18:30:30 = Tiu, 5 Febrụwarị 2008
+   1995-12-22T09:05:02 = Fraị, 22 Disemba 1995
+  -0010-09-15T04:44:23 = Sat, 15 Septemba -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Febrụwarị 2008
+   1995-12-22T09:05:02 = 22 Disemba 1995
+  -0010-09-15T04:44:23 = 15 Septemba -10
 
 =head3 yMMMd (d MMM y)
 

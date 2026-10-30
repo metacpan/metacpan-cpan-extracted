@@ -37,7 +37,7 @@ use Scalar::Util		qw(blessed);
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -1631,6 +1631,10 @@ Value-level state transitions within a single resolve_* call:
        |                                        +--[geocoder returns undef]-----> UNRESOLVED_NEW, CACHE==0
        |
        +--[beyond cap]-------------------> NOT_ATTEMPTED
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 

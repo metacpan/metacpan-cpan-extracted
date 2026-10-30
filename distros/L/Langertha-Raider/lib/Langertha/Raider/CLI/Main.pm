@@ -1,6 +1,6 @@
 package Langertha::Raider::CLI::Main;
 # ABSTRACT: Internal command-line entry point behind bin/raider
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use utf8;
@@ -12,6 +12,7 @@ use Langertha;
 use Langertha::Raider;
 use Langertha::Raider::ACP::CLI;
 use Langertha::Raider::CLI;
+use Langertha::Raider::CLI::Commands;
 use Langertha::Raider::CLI::Machine;
 use Langertha::Raider::CLI::Output;
 use Langertha::Raider::CLI::Provider;
@@ -20,7 +21,11 @@ use Langertha::Raider::CLI::Runner;
 use Langertha::Raider::CLI::Sessions;
 use Langertha::Raider::Config;
 use Langertha::Raider::Config::Migrate;
+use Langertha::Raider::Context::Layout;
 use Langertha::Raider::Hall::CLI;
+use Langertha::Raider::PermissionChannel;
+use Langertha::Raider::Permissions;
+use Langertha::Raider::Provider::Binding;
 use Langertha::Raider::SessionStore;
 use Langertha::Raider::Skill;
 
@@ -63,12 +68,16 @@ has in => (
 
 sub app_class     { 'Langertha::Raider::CLI' }
 sub config_class  { 'Langertha::Raider::Config' }
+sub layout_class  { 'Langertha::Raider::Context::Layout' }
 sub migrate_class { 'Langertha::Raider::Config::Migrate' }
 sub machine_class { 'Langertha::Raider::CLI::Machine' }
 sub provider_class { 'Langertha::Raider::CLI::Provider' }
+sub binding_class { 'Langertha::Raider::Provider::Binding' }
 sub repl_class    { 'Langertha::Raider::CLI::REPL' }
 sub runner_class  { 'Langertha::Raider::CLI::Runner' }
 sub session_store_class { 'Langertha::Raider::SessionStore' }
+sub permissions_class { 'Langertha::Raider::Permissions' }
+sub permission_channel_class { 'Langertha::Raider::PermissionChannel' }
 sub sessions_class { 'Langertha::Raider::CLI::Sessions' }
 sub skill_class   { 'Langertha::Raider::Skill' }
 
@@ -92,6 +101,13 @@ Usage: raider [options] [prompt...]
        raider provider inspect HOST [--json] [--allow-internal]
                                            fetch, validate and show a
                                            provider's manifest
+       raider provider add ALIAS HOST [--credential-env NAME] [--allow-internal]
+                                           bind ALIAS to a provider (asks
+                                           on a terminal); then --provider ALIAS
+       raider provider list [--json]       the stored provider aliases
+       raider provider show ALIAS [--json] one alias, every field
+       raider provider remove ALIAS [--yes]
+                                           delete an alias (asks, or --yes)
 
 Options:
   -e, --engine NAME        anthropic, openai, deepseek, groq, mistral, gemini,
@@ -100,13 +116,24 @@ Options:
                            env var — anthropic > openai > deepseek > ...)
   -m, --model NAME         Model identifier (engine-specific cheap default)
   -k, --api-key KEY        API key (overrides *_API_KEY env var)
-      --provider HOST[:PORT] | https://HOST[:PORT]
+      --provider HOST[:PORT] | https://HOST[:PORT] | ALIAS
                            Run on the model endpoint the provider's
                            manifest (/.well-known/langertha.json) declares;
                            nothing is stored. -m picks one of its models
                            (a must when it lists several); the key comes
                            only from -k, never from the config file or
                            the environment. Not with -e, -o engine= or -o url=
+                           An ALIAS (raider provider add) is the stored
+                           binding: its origin and allow-internal setting,
+                           its key from the environment variable it names
+                           (or -k); stops when the provider changed origin,
+                           issuer, endpoints or auth since you accepted it.
+                           A name without dot, port or https:// is always
+                           an ALIAS: one not stored is an error, nothing
+                           is fetched
+      --provider-endpoint ID
+                           With --provider: the manifest endpoint to use
+                           when the model is offered on several
       --allow-internal     With --provider: allow a loopback, private,
                            link-local or reserved provider address
   -o, --option KEY=VALUE   Engine attribute (repeatable), e.g.
@@ -127,6 +154,13 @@ Options:
                            and /pack NAME still work)
   -i, --interactive        REPL mode (default when stdin is a TTY with no
                            prompt argv and no pipe; forces it otherwise)
+  -p, --print              One-shot run, also on a terminal: the prompt
+                           from argv, else from stdin. Not with -i.
+                           A prompt /NAME runs a skill or custom command;
+                           /help, /context, /skills, /agents, /hooks,
+                           /memory, /permissions, /config, /stats,
+                           /metrics, /packs, /mcp print, /init and /compact run;
+                           other REPL commands are a usage error
       --json[=N]           Print one JSON document for the run and exit
                            (format version N; 1 is the only one)
       --msgpack[=N]        The same document as MessagePack
@@ -154,11 +188,32 @@ Options:
       --no-detect          Do not activate packs by workspace detection
                            (--detect forces it on over detect: false)
       --customize-prompt   Launch the prompt-builder at startup
-      --claude             Load Claude Code layout: CLAUDE.md +
-                           .claude/skills/*/SKILL.md.
+      --permission-mode MODE
+                           default (ask before writing, running code,
+                           the network), acceptEdits (also write files in
+                           the project), auto (that, and bash commands
+                           that only read), plan (read only; exit_plan_mode
+                           to go on) or bypassPermissions (run everything
+                           a deny rule allows). Wins over default_mode of
+                           .raider/config.yml and defaultMode of the
+                           Claude settings. Without anyone to ask (a
+                           one-shot run, --json, Hall) a call that asks
+                           is refused
+      --permission-channel PATH
+                           Internal, set by the hall for a run of an
+                           ACP session: asks go to the ACP client
+      --dangerously-skip-permissions
+                           The same as --permission-mode bypassPermissions
+      --claude             Read the Claude Code layout (CLAUDE.md memory,
+                           .claude/settings*.json, Claude skills) also in
+                           a raider project; saved as claude: true.
+                           A project with only Claude files reads it
+                           anyway.
       --openai / --codex   Load AGENTS.md (the OpenAI Codex / cross-tool
                            convention).
-      --skills DIR         Load *.md files from DIR as skills (repeatable).
+      --skills DIR         Offer the skills in DIR (*/SKILL.md or *.md;
+                           repeatable), loaded on demand by the skill
+                           tool.
       --export-skill [PATH]
                            Write a plain-markdown "how to use raider" doc
                            (default: ./RAIDER-SKILL.md) and exit.
@@ -203,6 +258,7 @@ sub parse_options {
     $parser->getoptionsfromarray(\@argv,
       'e|engine=s'            => \$opt{engine},
       'provider=s'            => \$opt{provider},
+      'provider-endpoint=s'   => \$opt{provider_endpoint},
       'allow-internal'        => \$opt{allow_internal},
       'm|model=s'             => \$opt{model},
       'r|root=s'              => \$opt{root},
@@ -211,6 +267,7 @@ sub parse_options {
       'k|api-key=s'           => \$opt{api_key},
       'o|option=s@'           => \@raw_engine_opts,
       'i|interactive'         => \$opt{interactive},
+      'p|print'               => \$opt{print},
       ( map { $_ => \$machine_flag{$_} } sort keys %MACHINE_FLAG ),
       'max-iterations=i'      => \$opt{max_iterations},
       'no-color'              => \$opt{no_color},
@@ -220,6 +277,9 @@ sub parse_options {
       'no-pack=s@'            => $opt{no_packs},
       'detect!'               => \$opt{detect},
       'customize-prompt'      => \$opt{customize_prompt},
+      'permission-mode=s'     => \$opt{permission_mode},
+      'permission-channel=s'  => \$opt{permission_channel},
+      'dangerously-skip-permissions' => \$opt{skip_permissions},
       'claude'                => \$opt{profile_claude},
       'openai|codex'          => \$opt{profile_openai},
       'skills=s@'             => $opt{skill_dirs},
@@ -245,6 +305,23 @@ sub parse_options {
     [ no_session => '--no-session' ];
   if (@session_flags > 1) {
     $self->_warn(join(', ', map { $_->[1] } @session_flags).": only one of them at a time\n");
+    return;
+  }
+
+  if (defined $opt{permission_mode}) {
+    unless ($self->permissions_class->is_mode($opt{permission_mode})) {
+      $self->_warn("--permission-mode: unknown mode '".$opt{permission_mode}."' (one of "
+        .join(', ', $self->permissions_class->modes).")\n");
+      return;
+    }
+    if ($opt{skip_permissions}) {
+      $self->_warn("--permission-mode, --dangerously-skip-permissions: only one of them at a time\n");
+      return;
+    }
+  }
+
+  if ($opt{print} && $opt{interactive}) {
+    $self->_warn("-p/--print, -i/--interactive: only one of them at a time\n");
     return;
   }
 
@@ -290,7 +367,7 @@ sub parse_options {
 sub app_args {
   my ( $self, $opt ) = @_;
   my %args;
-  for my $key (qw( engine model root mission api_key trace perl detect max_iterations bare )) {
+  for my $key (qw( engine model root mission api_key trace perl detect max_iterations bare permission_mode skip_permissions )) {
     $args{$key} = $opt->{$key} if defined $opt->{$key};
   }
   $args{trace}          = 0                        if $opt->{machine} && !defined $opt->{trace};
@@ -316,11 +393,11 @@ sub run {
     return EXIT_OK;
   }
 
-  # raider provider inspect TARGET [options]. Only these two words make the
-  # subcommand; "raider provider is down?" stays a prompt.
-  if (@argv >= 2 && $argv[0] eq 'provider' && $argv[1] eq 'inspect') {
-    splice @argv, 0, 2;
-    return $self->provider_command(inspect => @argv);
+  # raider provider inspect TARGET | add ALIAS TARGET | list | show ALIAS | remove ALIAS [options]. Only these
+  # words make the subcommand; "raider provider is down?" stays a prompt.
+  if (@argv >= 2 && $argv[0] eq 'provider' && $argv[1] =~ /\A(?:inspect|add|list|show|remove)\z/) {
+    my ( undef, $cmd ) = splice @argv, 0, 2;
+    return $self->provider_command($cmd => @argv);
   }
 
   # raider config explain [options]: prints where each setting comes from
@@ -386,11 +463,15 @@ sub run {
   }
   if (my $problem = $self->provider_usage_error($opt, $config_cmd)) {
     $self->_warn($problem."\n");
+    if ( $opt->{machine} && defined $opt->{provider} ) {
+      my $machine = $self->machine_class->new(%{ $opt->{machine} }, out => $self->output->out);
+      $self->_provider_failure($machine, failed => $problem, $opt->{provider}, Time::HiRes::time());
+    }
     return EXIT_USAGE;
   }
   if ($session_cmd) {
     # resume ID is the REPL on that session.
-    for my $flag (grep { $opt->{$_->[0]} } [ machine => 'a machine output format' ],
+    for my $flag (grep { $opt->{$_->[0]} } [ machine => 'a machine output format' ], [ print => '-p/--print' ],
         [ session => '--session' ], [ continue => '--continue' ], [ no_session => '--no-session' ]) {
       $self->_warn('raider session resume: not with '.$flag->[1]."\n");
       return EXIT_USAGE;
@@ -421,7 +502,7 @@ sub run {
   # in the message, and so does an invalid project_tools of the home file.
   # A legacy file next to the new one is not loaded, and said so (ADR 0011).
   my $config = $self->config_class->new(root => $opt->{root} // Path::Tiny->cwd->stringify);
-  unless (eval { $config->data; $config->home_data; $config->project_tools; 1 }) {
+  unless (eval { $config->data; $config->home_data; $config->project_tools; $config->providers; $config->permissions; 1 }) {
     $self->_warn($self->output->error_text($@)."\n");
     return EXIT_CONFIG;
   }
@@ -432,44 +513,97 @@ sub run {
   # is built or saved.
   if (defined $opt->{provider}) {
     my $cli_opts = $opt->{engine_options};
+    my $target = $opt->{provider};
+    my %binding;
+    # A bare name (no dot, port or scheme) is always an alias (ADR 0007,
+    # update 2026-10-25): one that is not stored is a usage error and
+    # nothing is fetched, so a typo never turns into a network request.
+    # Anything else is a HOST. The binding's origin and allow_internal are
+    # the stored ones -- never the command line's, and never an API key from
+    # the environment but its own credential_env (nothing is picked by what
+    # keys happen to be set).
+    if ( $self->binding_class->valid_alias($target) ) {
+      my $alias = $target;
+      unless ( exists $config->providers->{$alias} ) {
+        my $text = "raider --provider: provider alias '".$alias."' is not stored in "
+          .( $config->home_file // '~/.raider/config.yml' )
+          .'; bind it with: raider provider add '.$alias.' HOST (a host needs a dot, a port, [IPv6] or https://)';
+        $self->_warn($text."\n");
+        $self->_provider_failure($machine, failed => $text, $alias, $t0);
+        return EXIT_USAGE;
+      }
+      my $entry = $config->providers->{$alias};
+      if ( my $why = $self->binding_class->problem($entry) ) {
+        my $text = "raider --provider: alias '".$alias."' in ".$config->home_file.': '.$why
+          .'; accept it again with: raider provider add '.$alias.' HOST';
+        $self->_warn($text."\n");
+        $self->_provider_failure($machine, failed => $text, $alias, $t0);
+        return EXIT_CONFIG;
+      }
+      if ($opt->{allow_internal}) {
+        my $text = '--allow-internal: not with a stored alias; it is part of the binding, set by raider provider add';
+        $self->_warn($text."\n");
+        $self->_provider_failure($machine, failed => $text, $alias, $t0);
+        return EXIT_USAGE;
+      }
+      $target  = $entry->{origin};
+      %binding = ( binding => { alias => $alias, entry => $entry },
+                   allow_internal => $entry->{allow_internal} ? 1 : 0 );
+      if ( !defined $opt->{api_key} && !exists $cli_opts->{api_key} && defined $entry->{credential_env} ) {
+        my $key = $ENV{ $entry->{credential_env} };
+        $args{api_key} = $key if defined $key && length $key;
+      }
+    }
     my ( $exit, $activation ) = $self->provider_class->new(output => $self->output, err => $self->err)->activate(
-      $opt->{provider},
+      $target,
       allow_internal => $opt->{allow_internal},
       model          => $opt->{model} // $cli_opts->{model},
-      has_api_key    => length($opt->{api_key} // $cli_opts->{api_key} // '') ? 1 : 0,
+      endpoint       => $opt->{provider_endpoint},
+      machine        => $machine,
+      t0             => $t0,
+      has_api_key    => length($opt->{api_key} // $cli_opts->{api_key} // $args{api_key} // '') ? 1 : 0,
+      %binding,
     );
     return $exit if defined $exit;
+    $activation->{alias} = $binding{binding}{alias} if $binding{binding};
     $args{provider} = $activation;
   }
 
-  my ( @skill_specs, @cli_profiles );
+  # --claude is the layout switch (ADR 0019); --openai and --skills DIR are
+  # skills: items, as the config file holds them.
+  my ( @skill_items, @cli_profiles );
   if ($opt->{profile_claude}) {
-    push @skill_specs, @{ $Langertha::Raider::CLI::AGENT_PROFILES{claude} };
+    $args{claude} = 1;
     push @cli_profiles, 'claude';
   }
   if ($opt->{profile_openai}) {
-    push @skill_specs, @{ $Langertha::Raider::CLI::AGENT_PROFILES{openai} };
+    push @skill_items, 'openai';
     push @cli_profiles, 'openai';
   }
-  my @persist_skills = @cli_profiles;
+  my @persist_skills = @skill_items;
   for my $dir (@{ $opt->{skill_dirs} }) {
     my $spec = { type => 'dir', path => $dir };
-    push @skill_specs, $spec;
+    push @skill_items, $spec;
     # A directory named like a profile keyword is saved as a spec, so it is
     # not read back as that profile.
     push @persist_skills, ($dir =~ /\A(?:claude|openai|codex|agents)\z/ ? $spec : $dir);
   }
-  $args{cli_skill_sources} = \@skill_specs if @skill_specs;
+  $args{cli_skill_sources} = \@skill_items if @skill_items;
 
-  # Persist --claude / --openai / --skills to the config file so the user doesn't
-  # need to retype them every invocation. Track which profiles were freshly
-  # persisted this run for the banner "(saved)" hint.
-  my %saved_now = $config_cmd ? ()
-    : map { $_ => 1 } grep { !ref } $config->add_skills(@persist_skills);
+  # Persist --claude (as claude: true) / --openai / --skills to the config file
+  # so the user doesn't need to retype them every invocation. Track which
+  # profiles were freshly persisted this run for the banner "(saved)" hint.
+  # A project with only Claude files reads the Claude layout anyway; a raider
+  # file written there would turn it into a raider project, so nothing is.
+  my %saved_now;
+  if (!$config_cmd && $self->layout_class->new(root => $config->root)->mode ne 'claude') {
+    $saved_now{claude} = 1 if $opt->{profile_claude} && $config->enable_claude;
+    $saved_now{$_} = 1 for grep { !ref } $config->add_skills(@persist_skills);
+  }
 
   # Unknown engine or an invalid detection rule: stop before anything runs.
   my $app = $self->app_class->new(%args);
-  unless (eval { $app->_engine_class; $app->packs; 1 }) {
+  unless (eval { $app->_engine_class; $app->packs; $app->configured_mcp->config->servers; 1 }) {
     $self->_warn($self->output->error_text($@)."\n");
     return EXIT_CONFIG;
   }
@@ -504,8 +638,17 @@ sub run {
   # Default to interactive REPL when stdin is a terminal and no prompt was
   # given on argv / piped in / requested as one-shot machine output.
   my $in = $self->in;
-  my $interactive = $opt->{interactive} || (!$opt->{machine} && !@prompt && -t $in);
+  my $interactive = $opt->{interactive} || (!$opt->{print} && !$opt->{machine} && !@prompt && -t $in);
+  # Scheduled prompts (cron_create) run as turns of the REPL when it is idle (ADR 0031).
+  $app->scheduling(1) if $interactive;
   $runner = $self->runner_class->new(app => $app, output => $self->output, err => $self->err);
+  # --permission-channel (set by the hall for a run of an ACP session): a call
+  # the policy asks about is put to the hall, never answered yes by default.
+  $app->on_permission_request(
+    $self->permission_channel_class->new(
+      path => $opt->{permission_channel}, cancelled => sub { $app->run_cancelled },
+    )->callback,
+  ) if defined $opt->{permission_channel} && !$interactive;
   my $store = $opt->{no_session} ? undef : $app->session_store;
 
   # --session ID, --continue, session resume ID: the session is locked
@@ -524,7 +667,8 @@ sub run {
       in               => $in,
       runner           => $runner,
       $store ? ( session_store => $store ) : (),
-      active_profiles  => [ grep { !$seen{$_}++ } @cli_profiles, $config->profiles($app->engine_name) ],
+      active_profiles  => [ grep { !$seen{$_}++ } @cli_profiles,
+        ( $config->options($app->engine_name)->{claude} ? 'claude' : () ), $config->profiles($app->engine_name) ],
       saved_profiles   => \%saved_now,
       customize_prompt => $opt->{customize_prompt} ? 1 : 0,
       $session ? ( session => $session ) : (),
@@ -537,7 +681,7 @@ sub run {
   if (@prompt) {
     $text = join ' ', @prompt;
   }
-  elsif (-t $in) {
+  elsif (-t $in && !$opt->{print}) {
     # Interactive terminal but no -i and no argv: ask once.
     $text = prompt($self->output->c(prompt => 'raider>'));
   }
@@ -549,14 +693,81 @@ sub run {
     $self->_warn("No prompt given.\n");
     return EXIT_USAGE;
   }
-  if ($session) {
-    $self->_warn($_."\n") for @notes;
+  $self->_warn($_."\n") for $session ? @notes : ();
+  # A new session starts with the run -- not for a /command that only reports.
+  my $session_tried;
+  my $session_for = sub {
+    return $session if $session || $session_tried++ || !$store;
+    return $session = $self->new_session($app, $machine);
+  };
+  my %run;
+  if ($text =~ m{\A\s*/}) {
+    my ( $exit, $request ) = $self->oneshot_command($app, $text, session => $session_for);
+    if (defined $exit) {
+      $app->shutdown_mcp;   # /mcp started them (ADR 0029)
+      return $exit;
+    }
+    ( $text, %run ) = ( $request->{prompt}, map { $_ => $request->{$_} } $runner->run_options );
   }
-  elsif ($store) {
-    $session = $self->new_session($app, $machine);
+  # Nobody can approve a project MCP server here: it stays off (ADR 0029).
+  $self->_warn($_."\n") for $app->mcp_notes;
+  # A one-shot run waits for its background agents (ADR 0027 section 3).
+  my $ok = $runner->run_prompt($text, %run, machine => $machine, session => scalar $session_for->(), catch_signals => 1,
+    wait_background => 1);
+  # A worktree the run left the session in is closed (ADR 0032 §5).
+  $app->close_worktree_session('session_end');
+  $self->_warn($_."\n") for $app->take_meta_notes;
+  $app->shutdown_hooks;   # async hooks end with the run, as with claude -p
+  $app->shutdown_mcp;     # so do the configured MCP servers (ADR 0029)
+  return $ok ? EXIT_OK : EXIT_RUN_ERROR;
+}
+
+
+sub commands_class { 'Langertha::Raider::CLI::Commands' }
+
+sub oneshot_report_commands { qw( help context skills agents hooks memory permissions config stats metrics packs mcp ) }
+sub oneshot_run_commands    { qw( init compact ) }
+
+sub oneshot_command {
+  my ( $self, $app, $line, %o ) = @_;
+  my $commands = $self->commands_class->new(app => $app, output => $self->output, in => $self->in);
+  my $r = $commands->resolve($line);
+  return ( undef, { prompt => $line } ) if $r->{kind} eq 'prompt';
+  if ($r->{kind} eq 'entry') {
+    my $request = $app->slash_run_request($r->{entry}, $r->{arguments}, session => $o{session});
+    if (defined $request->{error}) {
+      $self->_warn('error: '.$request->{error}."\n");
+      return EXIT_RUN_ERROR;
+    }
+    return ( undef, $request );
   }
-  return $runner->run_prompt($text, machine => $machine, session => $session, catch_signals => 1)
-    ? EXIT_OK : EXIT_RUN_ERROR;
+  if ($r->{kind} eq 'mcp_prompt') {
+    my $request = $app->mcp_prompt_request($r->{name}, $r->{arguments});
+    unless ($request) {
+      $self->_warn('unknown command: /'.$r->{name}."\n");
+      return EXIT_USAGE;
+    }
+    if (defined $request->{error}) {
+      $self->_warn('error: '.$request->{error}."\n");
+      return EXIT_RUN_ERROR;
+    }
+    return ( undef, $request );
+  }
+  if ($r->{kind} eq 'unknown') {
+    $self->_warn('unknown command: /'.$r->{name}."\n");
+    $self->_warn('skills and custom commands not read: '.$r->{catalog_error}."\n") if defined $r->{catalog_error};
+    return EXIT_USAGE;
+  }
+  my $name = $r->{name};
+  # /mcp reports; /mcp reconnect would restart a server of a run that is ending.
+  my $words = $name eq 'mcp' && defined $r->{arguments} ? ' '.( split ' ', $r->{arguments} )[0] : '';
+  unless (!length $words && grep { $_ eq $name } $self->oneshot_report_commands, $self->oneshot_run_commands) {
+    $self->_warn('/'.$name.$words.": not in a one-shot run, only in the REPL\n");
+    return EXIT_USAGE;
+  }
+  my $result = $commands->dispatch($line);
+  return ( undef, $result ) if ref $result eq 'HASH';
+  return EXIT_OK;
 }
 
 
@@ -714,7 +925,9 @@ Usage: raider provider inspect HOST[:PORT] | https://HOST[:PORT] [options]
 
 Fetches https://HOST[:PORT]/.well-known/langertha.json, validates it as a
 provider manifest and shows provider id, issuer, endpoints, auth and
-models. Nothing is stored and no credential is sent or bound.
+models. Nothing is stored and no credential is sent or bound. A HOST has
+a dot (host.tld) or a port (host:PORT); a bare name is a provider alias,
+not a host.
 
 Options:
       --allow-internal     Allow a loopback, private, link-local or reserved
@@ -730,6 +943,41 @@ redirect to another origin is not followed.
 
 Exit status: 0 a valid manifest, 1 refused, not fetched or not valid,
 2 usage error.
+
+Usage: raider provider add ALIAS HOST[:PORT] | https://HOST[:PORT] [options]
+
+Fetches and validates the manifest like inspect, shows its endpoints and
+auth and what would be pinned (origin, issuer, auth types), asks on a
+terminal, and stores the binding under providers: in ~/.raider/config.yml.
+raider --provider ALIAS then runs on it, and stops when the provider's
+origin, issuer, endpoints or auth changed since you accepted it; run add
+again to accept. Without a terminal, add stores nothing.
+
+Options:
+      --credential-env NAME
+                           Environment variable the credential is read
+                           from at run time (a must when the endpoints
+                           ask for auth). Only its name is stored, never
+                           the value.
+      --allow-internal     Pin this alias to a loopback, private or
+                           link-local address; part of the binding, not
+                           a setting of the run
+
+Exit status: 0 stored, 1 not stored (no terminal, declined, refused, not
+fetched or not valid), 2 usage error.
+
+Usage: raider provider list [--json]
+       raider provider show ALIAS [--json]
+       raider provider remove ALIAS [--yes]
+
+list and show print the aliases stored in ~/.raider/config.yml (origin,
+issuer, auth types, the name of the credential variable, whether an
+internal address is allowed, when it was accepted); nothing is fetched.
+remove asks on a terminal; without one it needs --yes and is an error
+otherwise.
+
+Exit status: 0 done, 1 not done (declined, no terminal and no --yes),
+2 usage error or an alias that is not stored.
 USAGE
 
 
@@ -738,11 +986,24 @@ sub provider_command {
   # --allow-internal belongs to this subcommand only, so it is taken out
   # before the common options are parsed.
   my $allow_internal = 0;
+  my $yes = 0;
+  my $credential_env;
   my @rest;
   while (@argv) {
     my $arg = shift @argv;
     if ($arg eq '--') { push @rest, $arg, @argv; last }
-    if ($arg eq '--allow-internal') { $allow_internal = 1; next }
+    if ($cmd eq 'inspect' || $cmd eq 'add') {
+      if ($arg eq '--allow-internal') { $allow_internal = 1; next }
+    }
+    if ($cmd eq 'remove' && $arg eq '--yes') { $yes = 1; next }
+    if ($cmd eq 'add' && $arg =~ /\A--credential-env(?:=(.*))?\z/s) {
+      $credential_env = defined $1 ? $1 : shift @argv;
+      unless (defined $credential_env) {
+        $self->_warn("raider provider add: --credential-env needs a variable name\n");
+        return EXIT_USAGE;
+      }
+      next;
+    }
     push @rest, $arg;
   }
   my ( $opt, @words ) = $self->parse_options(@rest) or return EXIT_USAGE;
@@ -750,8 +1011,20 @@ sub provider_command {
     $self->output->emit($self->provider_usage);
     return EXIT_OK;
   }
-  if (@words != 1) {
-    $self->_warn("Usage: raider provider inspect HOST[:PORT] | https://HOST[:PORT] [--json] [--allow-internal]\n");
+  my %words = ( add => 2, list => 0 );
+  if ( @words != ( $words{$cmd} // 1 ) ) {
+    my %usage = (
+      add     => 'raider provider add ALIAS HOST[:PORT] | https://HOST[:PORT] [--credential-env NAME] [--allow-internal]',
+      list    => 'raider provider list [--json]',
+      show    => 'raider provider show ALIAS [--json]',
+      remove  => 'raider provider remove ALIAS [--yes]',
+      inspect => 'raider provider inspect HOST[:PORT] | https://HOST[:PORT] [--json] [--allow-internal]',
+    );
+    $self->_warn('Usage: '.$usage{$cmd}."\n");
+    return EXIT_USAGE;
+  }
+  if ( ( $cmd eq 'add' || $cmd eq 'remove' ) && $opt->{machine} ) {
+    $self->_warn('raider provider '.$cmd.": confirmed by a person on a terminal or by --yes; no document output\n");
     return EXIT_USAGE;
   }
   $ENV{ANSI_COLORS_DISABLED} = 1 if $opt->{no_color} || $opt->{machine};
@@ -763,15 +1036,38 @@ sub provider_command {
     }
     $machine = $self->machine_class->new(%$m, out => $self->output->out);
   }
-  return $self->provider_class->new(output => $self->output, err => $self->err)
-    ->inspect($words[0], allow_internal => $allow_internal, machine => $machine);
+  my $provider = $self->provider_class->new(output => $self->output, err => $self->err, in => $self->in);
+  # The home file only: the project's root plays no part in a binding.
+  my $config = $cmd =~ /\A(?:add|list|show|remove)\z/
+    ? $self->config_class->new(root => $opt->{root} // Path::Tiny->cwd->stringify) : undef;
+  if ($cmd eq 'add') {
+    return $provider->add($words[0], $words[1],
+      config => $config, allow_internal => $allow_internal, credential_env => $credential_env);
+  }
+  return $provider->list( config => $config, machine => $machine ) if $cmd eq 'list';
+  return $provider->describe( $words[0], config => $config, machine => $machine ) if $cmd eq 'show';
+  return $provider->remove( $words[0], config => $config, yes => $yes ) if $cmd eq 'remove';
+  return $provider->inspect($words[0], allow_internal => $allow_internal, machine => $machine);
+}
+
+# A failed --provider before the activation ran, as the failed document of
+# a machine format (nothing without one).
+sub _provider_failure {
+  my ( $self, $machine, $status, $error, $target, $t0 ) = @_;
+  return unless $machine;
+  $machine->finish($machine->document($status,
+    reason => 'provider', error => $error, provider => $target,
+    elapsed => $self->runner_class->elapsed_since($t0)));
+  return;
 }
 
 
 sub provider_usage_error {
   my ( $self, $opt, $config_cmd ) = @_;
   unless (defined $opt->{provider}) {
-    return $opt->{allow_internal} ? '--allow-internal: only with --provider' : undef;
+    return '--allow-internal: only with --provider' if $opt->{allow_internal};
+    return '--provider-endpoint: only with --provider' if defined $opt->{provider_endpoint};
+    return;
   }
   my $cli_opts = $opt->{engine_options} // {};
   my @conflicts = (
@@ -829,7 +1125,7 @@ Langertha::Raider::CLI::Main - Internal command-line entry point behind bin/raid
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -841,9 +1137,18 @@ version 0.503
 B<Internal module.> Its interface may change without notice.
 
 Everything F<raider> does with its command line: the C<hall>, C<acp>,
-C<config explain>, C<config migrate>, C<session> and C<provider inspect> subcommands, option parsing, the skill exports, and
+C<config explain>, C<config migrate>, C<session>, C<provider inspect>,
+C<provider add>, C<provider list>, C<provider show> and C<provider remove> subcommands, option parsing, the skill exports, and
 then either the REPL (L<Langertha::Raider::CLI::REPL>) or one prompt
-(L<Langertha::Raider::CLI::Runner>). L</run> returns the exit status.
+(L<Langertha::Raider::CLI::Runner>), which ends only once the background
+subagents it started have ended and their notifications have been answered
+(ADR 0027 E<sect>3). L</run> returns the exit status.
+
+C<-p> / C<--print> (ADR 0030 E<sect>4, as Claude Code) makes it one prompt
+even on a terminal: from the words given, else read from standard input to
+its end. A one-shot prompt -- with C<-p> or not -- that starts with C</>
+goes through L</oneshot_command>: a skill or custom command runs, a
+reporting built-in prints and exits C<0>, a REPL-only one is a usage error.
 
 =head2 Exit status
 
@@ -851,31 +1156,47 @@ then either the REPL (L<Langertha::Raider::CLI::REPL>) or one prompt
 
 =item C<0> -- success, including C<--help>, C<--version>, the exports, C<config explain>,
 C<config migrate> (also with nothing to migrate, and C<--dry-run>), C<session list>, C<session show>, C<session fork>, C<session rm>,
-C<provider inspect> of a valid manifest and leaving the REPL.
+C<provider inspect> of a valid manifest, C<provider add> that stored the
+binding, C<provider list>, C<provider show> and C<provider remove> that
+removed the alias, and leaving the REPL.
 
 =item C<1> -- the run failed: the engine, a tool or the network raised an
-error (with a machine format, the output is the C<failed> document); for
+error (with a machine format, the output is the C<failed> document); a
+one-shot C</NAME> whose render aborted (a C<!`cmd`> refused or failed, ADR
+0030 E<sect>2), with nothing sent; for
 C<config migrate>: the migration was refused (a new file or a backup
 already exists, F<.raider> is no directory, the home directory) or a step
 failed; for C<provider inspect>: the manifest was refused (address, redirect), could
 not be fetched or is not valid; for C<--provider> also: its endpoint is
 not usable (another origin, not https, a refused address, a dialect or
 auth type this raider has no adapter for, no models, a model on several
-endpoints).
+endpoints), or a stored alias that no longer matches what was accepted;
+for C<provider add>: no terminal, an answer other than C<y>, a manifest
+that was refused, not fetched or not valid; for C<provider remove>: no
+terminal and no C<--yes>, or an answer other than C<y>. With a machine
+format a failed C<--provider> is also the C<refused> or C<failed> document.
 
 =item C<2> -- usage error: unknown option, a C<-o> that is not
 C<KEY=VALUE>, an unknown C<config> subcommand, no prompt, more than one
-machine format, a machine format with C<-i>, or an unknown machine format
-version; for C<config migrate>: a word after it or a machine format;
+machine format, a machine format with C<-i>, C<-p> with C<-i>, or an unknown machine format
+version; a one-shot C</NAME> that is no command, or a REPL-only built-in
+(L</oneshot_command>); for C<config migrate>: a word after it or a machine format;
 for sessions: a C<--session> value that is no session id,
 more than one of C<--session>, C<--continue> and C<--no-session>, an unknown
 or ambiguous session, or C<--continue> without any session; for
 C<provider inspect>: no target or more than one, a target that is no
-host or https origin, or a C<--stream-*> flag; for C<--provider>: a
-target that is none, C<-e>, C<-o engine=>, C<-o url=> or C<config explain>
+host or https origin (also a bare name: no dot, no port, no C<https://>),
+or a C<--stream-*> flag; for C<--provider>: a
+target that is none, a bare name that is no stored alias (nothing is
+fetched), C<-e>, C<-o engine=>, C<-o url=> or C<config explain>
 with it, a model the manifest does not list, no C<-m> where it lists
 several models, or no C<-k> where the endpoint needs a key;
-C<--allow-internal> without C<--provider>.
+C<--allow-internal> without C<--provider>, or with a stored alias; for
+C<provider add>: not two words, an alias or variable name that is none,
+a HOST that is none (also a bare name), auth asked for and no
+C<--credential-env>, a machine format; for
+C<provider show> and C<provider remove>: not one word, or an alias that is
+not stored.
 
 =item C<3> -- configuration error: the config file (F<.raider/config.yml>,
 else F<.raider.yml>; for C<config migrate> the F<.raider.yml> to migrate)
@@ -945,6 +1266,53 @@ L</err>, so stdout carries only the machine output.
     my $exit = $main->run(@argv);
 
 Does what the command line says and returns the exit status.
+
+=head2 oneshot_command
+
+    my ( $exit, $request ) = $main->oneshot_command($app, '/review src/App.pm', session => $session_for);
+
+A one-shot prompt that starts with C</> (ADR 0030 E<sect>4), resolved by
+L<Langertha::Raider::CLI::Commands/resolve>. Returns the run request to send
+(L<Langertha::Raider::CLI::Commands/dispatch>) -- or, when nothing is to be
+sent, the exit status:
+
+=over
+
+=item * a path such as C</etc/hosts is broken>: the line as an ordinary prompt;
+
+=item * a user-invocable catalogue entry: its run request; a render that
+aborts is printed on L</err> and gives C<1>;
+
+=item * C</mcp__SERVER__PROMPT ARGS>, a prompt of a configured MCP server:
+its run request (the servers are started for it); an unknown one gives C<2>,
+a failing one C<1>;
+
+=item * a built-in that only reports (L</oneshot_report_commands>): its
+report on L</output>, then C<0> -- also with a machine format, where the
+report is the plain text and there is no document;
+
+=item * C</init> (its run request) and C</compact> (acts, then C<0>):
+L</oneshot_run_commands>;
+
+=item * any other built-in: C<2>, it needs the REPL;
+
+=item * an unknown command: C<2>.
+
+=back
+
+C<session> (a code reference) gives the session for
+C<${CLAUDE_SESSION_ID}>, asked only when an entry is rendered.
+
+=head2 oneshot_report_commands
+
+C<help context skills agents hooks memory permissions config stats metrics
+packs mcp>: the built-ins a one-shot run prints and leaves (C</mcp> connects
+the configured MCP servers first and stops them after; C</mcp reconnect> is
+REPL-only, ADR 0029).
+
+=head2 oneshot_run_commands
+
+C<init compact>: the built-ins a one-shot run runs.
 
 =head2 resume_session
 
@@ -1053,7 +1421,7 @@ C<run.finished>), then death by the signal, as for an interrupted run
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -1074,5 +1442,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

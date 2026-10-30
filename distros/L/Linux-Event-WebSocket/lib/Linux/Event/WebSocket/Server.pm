@@ -5,11 +5,11 @@ use warnings;
 
 use Carp qw(croak);
 
-use Linux::Event::HTTP::Server;
+use Linux::Event::IO::Sock::Listener;
 use Linux::Event::WebSocket::Server::Connection;
 use Linux::Event::WebSocket::Server::_HTTPConnection;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 my $DEFAULT_MAX_MESSAGE_SIZE = 16 * 1024 * 1024;
 
@@ -106,46 +106,43 @@ sub new ($class, %option) {
         secure            => $secure,
     }, 'Linux::Event::WebSocket::Server::_Config';
 
-    my $http = Linux::Event::HTTP::Server->new(
-        %option,
-        data             => $config,
-        connection_class => 'Linux::Event::WebSocket::Server::_HTTPConnection',
+    my %stream = (
+        class => 'Linux::Event::WebSocket::Server::_HTTPConnection',
+        data  => $config,
+    );
+    for my $name (qw(tls tuning)) {
+        $stream{$name} = delete $option{$name} if exists $option{$name};
+    }
+    my $listener = Linux::Event::IO::Sock::Listener->new(
+        %option, stream => \%stream,
         (defined($on_listener_error)
-            ? (on_listener_error => $on_listener_error) : ()),
+            ? (on_error => $on_listener_error) : ()),
     );
 
     return bless {
-        http             => $http,
+        listener         => $listener,
         config           => $config,
         data             => $data,
         connection_class => $connection_class,
     }, $class;
 }
 
-sub http_server      ($self) { $self->{http} }
-sub listener         ($self) { $self->{http}->listener }
+# Retain the old convenience accessor for source compatibility. With
+# standalone Unblock::HTTP1 owning only the opening handshake there is no
+# longer an HTTP Server object; listener() is the clear accessor.
+sub http_server      ($self) { $self->{listener} }
+sub listener         ($self) { $self->{listener} }
 sub connection_class ($self) { $self->{connection_class} }
 sub data             ($self) { $self->{data} }
-sub loop             ($self) { $self->{http}->loop }
-sub host             ($self) { $self->{http}->host }
-sub port             ($self) { $self->{http}->port }
-sub path             ($self) { $self->{http}->path }
-sub state            ($self) { $self->{http}->state }
+sub loop             ($self) { $self->{listener}->loop }
+sub host             ($self) { $self->{listener}->host }
+sub port             ($self) { $self->{listener}->port }
+sub path             ($self) { $self->{listener}->path }
+sub state            ($self) { $self->{listener}->state }
 
-sub pause ($self) {
-    $self->{http}->pause;
-    return $self;
-}
-
-sub resume ($self) {
-    $self->{http}->resume;
-    return $self;
-}
-
-sub close ($self) {
-    $self->{http}->close;
-    return $self;
-}
+sub pause ($self) { $self->{listener}->pause; return $self }
+sub resume ($self) { $self->{listener}->resume; return $self }
+sub close ($self) { $self->{listener}->close; return $self }
 
 1;
 
@@ -185,13 +182,18 @@ Linux::Event::WebSocket::Server - callback-first WebSocket server
 
 =head1 DESCRIPTION
 
-C<Linux::Event::WebSocket::Server> owns a
-L<Linux::Event::HTTP::Server> for the opening HTTP/1.1 Upgrade. A successful
+C<Linux::Event::WebSocket::Server> attaches the standalone
+L<Unblock::HTTP1> engine to a Linux::Event listener for the HTTP/1.1 Upgrade. A successful
 handshake transitions the same live Linux::Event stream in place to
 L<Linux::Event::WebSocket::Server::Connection>.
 
 The socket, TLS transport, queued output, backpressure state, and already-read
 post-HTTP bytes remain on that same connection object.
+
+C<listener> returns the native Linux::Event listener. The older
+C<http_server> accessor is retained as an alias to the listener; it no longer
+returns an HTTP Server object, because opening handshakes run directly through
+Unblock::HTTP1.
 
 =head1 CALLBACKS
 
@@ -227,7 +229,7 @@ C<< $ws->subprotocol >>.
 
 =head1 TLS
 
-Pass the normal Linux::Event::HTTP server C<tls> policy to serve C<wss://>.
+Pass Linux::Event listener C<tls> options to serve C<wss://>.
 TLS remains attached when the HTTP connection transitions to WebSocket.
 
 =head1 CONNECTION SUBCLASSES

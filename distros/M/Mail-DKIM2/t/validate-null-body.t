@@ -56,6 +56,8 @@ sub mi_lvl { my ($r, $m) = @_; (grep { $_->{kind} eq 'mi' && $_->{m} == $m } @{$
 {
     my $r = rep(list_hop($m1));
     is($r->{overall}, 'pass', 'null body over signed m=1: overall pass') or diag $r->{summary};
+    ok(!$r->{fully_verified}, '... but not fully verified (-08 section 13)');
+    like($r->{summary}, qr/not fully verified/, '... and the summary says so');
     my $l2 = mi_lvl($r, 2);
     is($l2->{body_recipe}, 'null', 'm=2 body recipe null');
     is($l2->{undo}, 'unrecoverable', 'm=2 undo unrecoverable');

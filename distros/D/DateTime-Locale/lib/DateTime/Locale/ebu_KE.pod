@@ -435,6 +435,24 @@ Embu Kenya locale.
    1995-12-22T09:05:02 = TK 1995 Igi 22, Maa
   -0010-09-15T04:44:23 = MK -10 Ken 15, NMM
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = TK 2008 Mweri wa kaĩri
+   1995-12-22T09:05:02 = TK 1995 Mweri wa ikũmi na Kaĩrĩ
+  -0010-09-15T04:44:23 = MK -10 Mweri wa kenda
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = TK 2008 Mweri wa kaĩri 5, Ine
+   1995-12-22T09:05:02 = TK 1995 Mweri wa ikũmi na Kaĩrĩ 22, Maa
+  -0010-09-15T04:44:23 = MK -10 Mweri wa kenda 15, NMM
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = TK 2008 Mweri wa kaĩri 5
+   1995-12-22T09:05:02 = TK 1995 Mweri wa ikũmi na Kaĩrĩ 22
+  -0010-09-15T04:44:23 = MK -10 Mweri wa kenda 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = TK 2008 Kai 5

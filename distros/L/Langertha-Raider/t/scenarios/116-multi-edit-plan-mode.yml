@@ -1,0 +1,15 @@
+title: plan mode refuses multi_edit like every tool that changes files
+permission_mode: plan
+files:
+  a.txt: "one\n"
+prompt: Change it.
+script:
+  - tool_calls:
+      - [ read_file, { path: a.txt } ]
+      - [ multi_edit, { path: a.txt, edits: [ { old_string: one, new_string: two } ] } ]
+  - text: planned
+expect:
+  files: { a.txt: "one\n" }
+  tools:
+    - { name: read_file }
+    - { name: multi_edit, error: true, text: "plan mode: multi_edit changes files, which plan mode does not allow" }

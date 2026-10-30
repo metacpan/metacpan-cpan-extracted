@@ -100,6 +100,7 @@ t/business/gocardless/payout.t
 t/business/gocardless/payoutitem.t
 t/business/gocardless/preauthorization.t
 t/business/gocardless/pro.t
+t/business/gocardless/pro_session_token.t
 t/business/gocardless/redirectflow.t
 t/business/gocardless/refund.t
 t/business/gocardless/resource.t
@@ -110,6 +111,8 @@ t/business/gocardless/taxrate.t
 t/business/gocardless/transferredmandate.t
 t/business/gocardless/user.t
 t/business/gocardless/utils.t
+t/business/gocardless/utils_empty_secret.t
+t/business/gocardless/utils_legacy_size.t
 t/business/gocardless/verificationdetail.t
 t/business/gocardless/webhook.t
 t/business/gocardless/webhook/event.t

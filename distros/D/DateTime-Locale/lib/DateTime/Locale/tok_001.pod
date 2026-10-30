@@ -435,6 +435,24 @@ Toki Pona world locale.
    1995-12-22T09:05:02 = CE 1995 tenpo mun #12 22, suno esun #5
   -0010-09-15T04:44:23 = BCE -10 tenpo mun #9 15, suno esun #6
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 tenpo mun #2
+   1995-12-22T09:05:02 = CE 1995 tenpo mun #12
+  -0010-09-15T04:44:23 = BCE -10 tenpo mun #9
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 tenpo mun #2 5, suno esun #2
+   1995-12-22T09:05:02 = CE 1995 tenpo mun #12 22, suno esun #5
+  -0010-09-15T04:44:23 = BCE -10 tenpo mun #9 15, suno esun #6
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 tenpo mun #2 5
+   1995-12-22T09:05:02 = CE 1995 tenpo mun #12 22
+  -0010-09-15T04:44:23 = BCE -10 tenpo mun #9 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 tenpo mun #2 5
@@ -502,6 +520,12 @@ Toki Pona world locale.
   -0010-09-15T04:44:23 = tenpo mun #9
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = tenpo mun #2 5, suno esun #2
+   1995-12-22T09:05:02 = tenpo mun #12 22, suno esun #5
+  -0010-09-15T04:44:23 = tenpo mun #9 15, suno esun #6
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = tenpo mun #2 5, suno esun #2
    1995-12-22T09:05:02 = tenpo mun #12 22, suno esun #5

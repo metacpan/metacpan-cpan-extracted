@@ -1,0 +1,27 @@
+title: a .claude/skills below the root is announced on the first file touch in its subtree, then loadable
+files:
+  CLAUDE.md: "Top rule.\n"
+  pkg/.claude/skills/pkgskill/SKILL.md: "---\ndescription: Builds the pkg module.\n---\n\nRun make in pkg. PKG-BODY-MARKER\n"
+  pkg/x.txt: "payload\n"
+  other/y.txt: "elsewhere\n"
+prompt: Look at pkg/x.txt.
+script:
+  - tool_calls:
+      - [ read_file, { path: other/y.txt } ]
+  - tool_calls:
+      - [ read_file, { path: pkg/x.txt } ]
+  - tool_calls:
+      - [ skill, { skill: pkgskill } ]
+  - text: gebaut
+expect:
+  answer: gebaut
+  requests:
+    - { index: 0, absent: pkgskill }
+    - { index: 1, absent: pkgskill }
+    - { index: 2, contains: "- pkgskill: Builds the pkg module." }
+    - { index: 3, contains: PKG-BODY-MARKER }
+    - { index: 3, tail: [ { role: tool }, { role: user, contains: "/pkg/.claude/skills/pkgskill\n\nRun make in pkg. PKG-BODY-MARKER" } ] }
+  tools:
+    - { name: read_file, text: elsewhere, not_text: 'skills are available' }
+    - { name: read_file, text: 'payload.*<system-reminder>\nThe following skills are available for use with the Skill tool:\n\n- pkgskill: Builds the pkg module\.\n</system-reminder>' }
+    - { name: skill, text: '^Launching skill: pkgskill$' }

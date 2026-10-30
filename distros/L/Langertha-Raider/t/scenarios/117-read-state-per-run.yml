@@ -1,0 +1,23 @@
+title: what was read counts for the run that read it; the next run reads the file again before it edits
+run_prompt: true
+files:
+  a.txt: "one\n"
+prompts: [ "Read a.txt.", "Now change it." ]
+script:
+  - tool_calls:
+      - [ read_file, { path: a.txt } ]
+  - text: read
+  - tool_calls:
+      - [ edit_file, { path: a.txt, old_string: one, new_string: two } ]
+  - tool_calls:
+      - [ read_file, { path: a.txt } ]
+      - [ edit_file, { path: a.txt, old_string: one, new_string: two } ]
+  - text: changed
+expect:
+  answer: changed
+  files: { a.txt: "two\n" }
+  tools:
+    - { name: read_file }
+    - { name: edit_file, error: true, text: "\\A<tool_use_error>File has not been read yet\\. Read it first before writing to it\\.</tool_use_error>\\z" }
+    - { name: read_file }
+    - { name: edit_file, text: "\\AThe file /\\S+/a\\.txt has been updated successfully\\." }

@@ -22,6 +22,19 @@
 #                 search -> TAP result -> explain             after it: exactly one result; the
 #                                                             stored messages never change
 #
+# Two more kinds of sequence:
+#
+#   rotation      log -> flush -> reopen -> log, repeated     one history, in order, nothing
+#                                                             lost or doubled
+#   hostile data  a log call whose data cannot be read        that entry is stored, in plain
+#                 (a tied hash that dies, an object whose     form; the entries either side are
+#                 text form dies, a cycle), between good ones untouched; nothing dies
+#
+# And one check of time-of-check to time-of-use: a value that changes each
+# time it is read (a tied scalar) is read exactly once, so the value used is
+# always the value that was checked.  The module has no files, so this is
+# its only check-then-use.
+#
 # Logging is deliberately not idempotent: logging the same message twice
 # stores it twice, as the code under test did log it twice.  Everything
 # else (clear, flush, the setters, assertions, cloning without changes,
@@ -47,7 +60,9 @@ Readonly::Scalar my $REPEATS => 3;	# runs of each repeated operation
 Readonly::Scalar my $INJECTED => "injected failure\n";
 Readonly::Scalar my $TRACE => 7;	# numeric level of 'trace', the default
 Readonly::Scalar my $WARNING => 4;	# numeric level of 'warning'
+Readonly::Hash my %LEVEL => (warn => $WARNING, notice => 5);
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
+Readonly::Scalar my $PLAIN_HASH => qr/HASH\(0x[0-9a-f]+\)/;
 
 Readonly::Hash my %ENTRY_SCHEMA => (
 	type => 'arrayref',
@@ -345,7 +360,7 @@ subtest 'idempotent: the same construction gives the same, separate logger' => s
 	is($_->count(), 0, 'the others are not affected') foreach(@loggers[1 .. $#loggers]);
 };
 
-subtest 'idempotent: clear, flush, level, verbose' => sub {
+subtest 'idempotent: clear, flush, reopen, level, verbose' => sub {
 	my $logger = quiet();
 	$logger->info('a')->error('b');
 
@@ -358,6 +373,7 @@ subtest 'idempotent: clear, flush, level, verbose' => sub {
 	my $before = snapshot($logger);
 	foreach my $run (1 .. $REPEATS) {
 		is($logger->flush(), $logger, "flush, run $run");
+		is($logger->reopen(), $logger, "reopen, run $run");
 		is($logger->level('warning'), $logger, "level, run $run");
 		is($logger->verbose(1), 1, "verbose, run $run");
 	}
@@ -407,4 +423,137 @@ subtest 'not idempotent, on purpose: logging twice stores twice' => sub {
 	is(scalar(grep { $_->{'message'} eq 'same' } @{$logger->messages()}), $REPEATS, 'all identical, none merged');
 };
 
+# ===========================================================================
+# Phase 7: log rotation - flush and reopen between writes
+# ===========================================================================
+
+subtest 'rotation: flush and reopen between writes keep one history' => sub {
+	# A program that rotates its logs calls flush() and reopen() between
+	# writes.  Here they do nothing, so the history must read as if they
+	# had never been called: every message once, in the order logged
+	my $logger = quiet();
+	my @expected;
+	foreach my $run (1 .. $REPEATS) {
+		$logger->info("before rotation $run");
+		returns_ok($logger->flush(), { type => 'object', isa => $CLASS }, "run $run: flush returns the logger");
+		returns_ok($logger->reopen(), { type => 'object', isa => $CLASS }, "run $run: reopen returns the logger");
+		$logger->warn("after rotation $run");
+		push @expected, "before rotation $run", "after rotation $run";
+		invariant_holds($logger, "after rotation $run");
+	}
+	is_deeply([map { $_->{'message'} } @{$logger->messages()}], \@expected, 'every message once, in order');
+	$logger->unlike(qr/\A(?:flush|reopen)\z/, 'neither was stored as a message');
+
+	# A clone taken after rotating carries the same history
+	is_deeply(snapshot($logger->new()), snapshot($logger), 'a clone after rotation is identical');
+};
+
+# ===========================================================================
+# Phase 8: hostile data part way through a run
+# ===========================================================================
+
+subtest 'hostile data: an entry that cannot be read is stored, the others untouched' => sub {
+	# Each of these log calls has data that dies or loops when it is read.
+	# None may stop the run: each is stored, in Perl's plain form where it
+	# cannot be read, and the good entries either side stay exactly as they
+	# were.  The logger prints every level, so the echo is tested too.
+	my $logger = $CLASS->new(diag => 'all', verbose => 0);
+	tie my %unreadable, 'Local::UnreadableHash';
+	my @cycle;
+	push @cycle, \@cycle;
+	my $error = 'caller error';
+	local $@ = $error;
+
+	my $out = printed {
+		$logger->info('first');
+		$logger->warn('fields', \%unreadable);
+		$logger->error('object ', bless({}, 'Local::DyingText'));
+		$logger->notice(\@cycle);
+		$logger->info('last');
+	};
+	is($@, $error, "the caller's \$\@ survived the run");
+	is($logger->count(), 5, 'five calls, five entries');
+	my @message = map { $_->{'message'} } @{$logger->messages()};
+	is($message[0], 'first', 'the entry before is untouched');
+	like($message[1], qr/\Afields$PLAIN_HASH\z/, 'unreadable fields: kept in the message, in plain form');
+	ok(!exists($logger->messages()->[1]->{'fields'}), '... and not stored as fields');
+	like($message[2], qr/\Aobject Local::DyingText=$PLAIN_HASH\z/, 'an object whose text form dies: plain form');
+	is($message[3], '[(cycle)]', 'a structure that contains itself: cut at the cycle');
+	is($message[4], 'last', 'the entry after is untouched');
+	is(scalar(() = $out =~ /^# /mg), 5, 'every entry was echoed');
+	invariant_holds($logger, 'after hostile data');
+
+	# The rest of the life goes on as normal
+	$logger->has_level('error', 'assertions still work');
+	my $clone = $logger->new();
+	is_deeply(snapshot($clone), snapshot($logger), 'a clone copies the hostile entries too');
+	$logger->clear();
+	ok($logger->empty('cleared'), 'and clear() removes them');
+	is($clone->count(), 5, 'from the original only');
+};
+
+# ===========================================================================
+# Phase 9: time of check to time of use
+# ===========================================================================
+
+subtest 'TOCTOU: a value that changes when read is read once, checked and used' => sub {
+	# A tied scalar returns the next value of its list each time it is
+	# read.  If a method read it once to check it and again to use it, a
+	# good first value could let a bad second one through.  Each method
+	# copies its arguments on entry, so the copy is what is checked and
+	# what is used: one read, and the result follows the first value
+	my $logger = quiet();
+	$logger->warn('w');
+	$logger->error('e');
+	my $tb = Test::Builder->new();
+	my %case = (
+		'count' => [sub { $logger->count($_[0]) }, ['warn', 'error', 'bogus'], 1],
+		'has_level' => [sub { $tb->todo_start('result is not under test'); my $r = $logger->has_level($_[0]); $tb->todo_end(); $r }, ['warn', 'nolevel'], 1],
+		'like' => [sub { $tb->todo_start('result is not under test'); my $r = $logger->like($_[0]); $tb->todo_end(); $r }, ['\Aw\z', '['], 1],
+		'level' => [sub { $logger->level($_[0]); $logger->level() }, ['notice', 'bogus'], $LEVEL{'notice'}],
+		'new: lang' => [sub { quiet(lang => $_[0])->lang() }, ['de', '!!!!', 'fr'], 'de'],
+		'new: level' => [sub { quiet(level => $_[0])->level() }, ['warn', 'bogus'], $LEVEL{'warn'}],
+		'new: country' => [sub { $CLASS->new(diag => 'none', verbose => 0, country => $_[0])->lang() }, ['FR', 'xyz'], 'fr'],
+	);
+	foreach my $name (sort keys %case) {
+		my ($code, $values, $want) = @{$case{$name}};
+		tie my $value, 'Local::Changing', @{$values};
+		my $got;
+		lives_ok { $got = $code->($value) } "$name: the changed value never reaches the use";
+		is($got, $want, "$name: the result follows the value that was checked");
+		is(tied($value)->{'reads'}, 1, "$name: read exactly once");
+	}
+	is($logger->count(), 2, 'the history was never changed');
+	invariant_holds($logger, 'after the TOCTOU checks');
+};
+
 done_testing();
+
+# A tied hash that dies as soon as it is read
+package Local::UnreadableHash;
+
+sub TIEHASH { return bless {}, shift }
+sub FIRSTKEY { die "unreadable\n" }
+sub SCALAR { die "unreadable\n" }
+
+# An object whose text form dies
+package Local::DyingText;
+
+use overload '""' => sub { die "no text\n" }, fallback => 1;
+
+# A scalar that returns the next of its values each time it is read, and
+# counts the reads; the last value repeats
+package Local::Changing;
+
+sub TIESCALAR {
+	my ($class, @values) = @_;
+
+	return bless { values => \@values, reads => 0 }, $class;
+}
+
+sub FETCH {
+	my $self = shift;
+
+	my $index = $self->{'reads'}++;
+	return $self->{'values'}->[($index > $#{$self->{'values'}}) ? -1 : $index];
+}

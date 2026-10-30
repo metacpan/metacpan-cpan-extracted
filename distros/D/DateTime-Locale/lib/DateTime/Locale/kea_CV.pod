@@ -435,6 +435,24 @@ Kabuverdianu Cape Verde locale.
    1995-12-22T09:05:02 = ses, 22 Diz 1995 DK
   -0010-09-15T04:44:23 = sab, 15 Set -10 AK
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = DK 2008 Febreru
+   1995-12-22T09:05:02 = DK 1995 Dizenbru
+  -0010-09-15T04:44:23 = AK -10 Setenbru
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = DK 2008 Febreru 5, ter
+   1995-12-22T09:05:02 = DK 1995 Dizenbru 22, ses
+  -0010-09-15T04:44:23 = AK -10 Setenbru 15, sab
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = DK 2008 Febreru 5
+   1995-12-22T09:05:02 = DK 1995 Dizenbru 22
+  -0010-09-15T04:44:23 = AK -10 Setenbru 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Feb 2008 DK

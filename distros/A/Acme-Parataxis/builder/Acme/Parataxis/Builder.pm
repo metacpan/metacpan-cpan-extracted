@@ -53,17 +53,23 @@ class    #
         require File::Spec;
         my $arch_dir = catdir(qw[blib arch auto Acme Parataxis]);
         mkpath( $arch_dir, $verbose );
+        my $extra_cflags = join( ' ', '-fno-lto', ( $^O eq 'openbsd' ? '-fno-ret-protector' : () ) );
+        my $extra_ldflags
+            = ( $^O eq 'MSWin32' ) ?
+            ( '-L' .
+                File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' ) . ' -l' .
+                ( $Config::Config{libperl} =~ s/^lib//r =~ s/\.a$//r =~ s/\.lib$//r ) .
+                ' -lws2_32' ) : ( $^O eq 'darwin' ? '-undefined dynamic_lookup' : ( $^O eq 'openbsd' ? '-Wl,-z,nobtcfi' : '' ) );
         my $build = Affix::Build->new(
             name  => 'parataxis',
             flags => {
-                cflags => join( ' ',
-                    ( $Config::Config{ccflags}, '-std=c11', map { '-I' . $_ } ( File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' ), 'src' ) )
+                cflags => join(
+                    ' ', (
+                        $Config::Config{ccflags}, '-std=c11',
+                        $extra_cflags,            map { '-I' . $_ } ( File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' ), 'src' )
+                    )
                 ),
-                ldflags => ( $^O eq 'MSWin32' ) ?
-                    ( '-L' .
-                        File::Spec->catdir( $Config::Config{archlibexp}, 'CORE' ) . ' -l' .
-                        ( $Config::Config{libperl} =~ s/^lib//r =~ s/\.a$//r =~ s/\.lib$//r ) .
-                        ' -lws2_32' ) : ( $^O eq 'darwin' ? '-undefined dynamic_lookup' : '' )
+                ldflags => $extra_ldflags
             },
             build_dir => $arch_dir,
             clean     => 0

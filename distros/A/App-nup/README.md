@@ -26,6 +26,9 @@ nup - n-up, multi-column paged output for commands and files
      -S  --pane-width=#     pane width (default: 85)
     --bs --border-style=#   border style (default: heavy-box)
     --ls --line-style=#     line style (none/truncate/wrap/wordwrap)
+         --runin=#          run-in width for line breaking
+         --runout=#         run-out width for line breaking
+         --runlen=#         set both run-in and run-out
     --cm --colormap=#       color mapping (LABEL=COLOR)
          --[no-]page-number page number on border (default: on)
          --textconv[=EXT]   textconv for non-text files
@@ -38,7 +41,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.07
+Version 1.08
 
 # DESCRIPTION
 
@@ -54,6 +57,17 @@ n-up layout using the [App::optex::up](https://metacpan.org/pod/App%3A%3Aoptex%3
 if it is an existing file, n-up file view mode is used; if it is an
 executable command, n-up command mode is used.  Use `-e` option to
 force command mode when needed.
+
+In file view mode, `nup` stops parsing its own options at the first
+file name and hands the file names and everything after them to
+[ansicolumn](https://metacpan.org/pod/ansicolumn) unchanged.  Options of `ansicolumn` that `nup` does
+not provide can therefore be given after the file names:
+
+    nup -C2 file1.txt file2.txt -w 170
+
+Here `-w 170` sets the output width for `ansicolumn`.  To set the
+width when no terminal is available, the `COLUMNS` environment
+variable works in both modes; see ["Terminal Size"](#terminal-size).
 
 # OPTIONS
 
@@ -91,6 +105,7 @@ force command mode when needed.
 
         bat     bat --style=plain --color=always
         batcat  batcat --style=plain --color=always
+        mdcat   mdcat --ansi
         rg      rg --color=always
         tree    tree -C
 
@@ -161,6 +176,14 @@ force command mode when needed.
 
     Set the line style. Available: `none`, `truncate`, `wrap`, `wordwrap`.
 
+- **--runin**=_N_, **--runout**=_N_, **--runlen**=_N_
+
+    Set the run-in and run-out widths that [ansicolumn](https://metacpan.org/pod/ansicolumn) uses for line
+    breaking (kinsoku) when it folds long lines.  `--runlen` sets both.
+    They are given to ansicolumn after the values in `~/.ansicolumnrc`,
+    so they take precedence.  Without them, ansicolumn uses the values in
+    `~/.ansicolumnrc`, or 2.
+
 - **--cm**=_SPEC_, **--colormap**=_SPEC_
 
     Set color mapping. Specify as `LABEL=COLOR` (e.g., `--cm=BORDER=R`).
@@ -207,6 +230,17 @@ force command mode when needed.
 
     Disable pager.
 
+## Terminal Size
+
+The terminal size is taken from the controlling terminal
+(`/dev/tty`).  When it is not available, as when `nup` is run
+without a terminal, the `COLUMNS` environment variable gives the
+width (default 80), and `LINES` gives the height (default 24) used
+to split the screen when the number of rows is set with `-R` or
+`-G`:
+
+    COLUMNS=170 nup -C2 file1.txt file2.txt
+
 ## Less Environment Variables
 
 `nup` sets the following environment variables when they are not
@@ -230,6 +264,7 @@ Typical n-up usage:
     nup -G2x2 man perl         # 2x2 grid (4-up layout)
     nup -F man perl            # no pagination
     nup file1.txt file2.txt    # view files side by side
+    nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
     nup -e ./script.sh         # force command mode for a file
 
 Using `nup` as a `MANPAGER`:
@@ -237,6 +272,15 @@ Using `nup` as a `MANPAGER`:
     export MANPAGER="nup -A"
 
 # INSTALLATION
+
+## Homebrew
+
+Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
+
+    brew tap tecolicom/tap
+    brew install app-nup
+
+## CPAN
 
 Using [cpanminus](https://metacpan.org/pod/App::cpanminus):
 

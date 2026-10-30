@@ -97,7 +97,7 @@ Tswana South Africa locale.
   Tlhakole
   Mopitlo
   Moranang
-  Motsheganang
+  Motsheganong
   Seetebosigo
   Phukwi
   Phatwe
@@ -143,7 +143,7 @@ Tswana South Africa locale.
   Tlhakole
   Mopitlo
   Moranang
-  Motsheganang
+  Motsheganong
   Seetebosigo
   Phukwi
   Phatwe
@@ -435,6 +435,24 @@ Tswana South Africa locale.
    1995-12-22T09:05:02 = AD 1995 Sed 22, Labt
   -0010-09-15T04:44:23 = BC -10 Lwe 15, Mat
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Tlhakole
+   1995-12-22T09:05:02 = AD 1995 Sedimonthole
+  -0010-09-15T04:44:23 = BC -10 Lwetse
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Tlhakole 5, Labb
+   1995-12-22T09:05:02 = AD 1995 Sedimonthole 22, Labt
+  -0010-09-15T04:44:23 = BC -10 Lwetse 15, Mat
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Tlhakole 5
+   1995-12-22T09:05:02 = AD 1995 Sedimonthole 22
+  -0010-09-15T04:44:23 = BC -10 Lwetse 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Tlh 5
@@ -506,6 +524,12 @@ Tswana South Africa locale.
    2008-02-05T18:30:30 = Tlh 5, Labb
    1995-12-22T09:05:02 = Sed 22, Labt
   -0010-09-15T04:44:23 = Lwe 15, Mat
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Tlhakole 5, Labb
+   1995-12-22T09:05:02 = Sedimonthole 22, Labt
+  -0010-09-15T04:44:23 = Lwetse 15, Mat
 
 =head3 MMMMW-count-one ('beke' 'ya' W 'ya' MMM)
 
@@ -620,6 +644,18 @@ Tswana South Africa locale.
    2008-02-05T18:30:30 = 2008 Tlhakole
    1995-12-22T09:05:02 = 1995 Sedimonthole
   -0010-09-15T04:44:23 = -10 Lwetse
+
+=head3 yMMMMEd (y MMMM d, EEE)
+
+   2008-02-05T18:30:30 = 2008 Tlhakole 5, Labb
+   1995-12-22T09:05:02 = 1995 Sedimonthole 22, Labt
+  -0010-09-15T04:44:23 = -10 Lwetse 15, Mat
+
+=head3 yMMMMd (y MMMM d)
+
+   2008-02-05T18:30:30 = 2008 Tlhakole 5
+   1995-12-22T09:05:02 = 1995 Sedimonthole 22
+  -0010-09-15T04:44:23 = -10 Lwetse 15
 
 =head3 yMMMd (y MMM d)
 

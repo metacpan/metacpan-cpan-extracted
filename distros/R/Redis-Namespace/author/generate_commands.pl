@@ -119,10 +119,7 @@ our %OVERRIDES = (
     # but it can match with passwords or key names.
     migrate => {
         before => <<'CODE',
-if (@args > 2) {
-    # add_namespace keeps the empty string for the KEYS option as is.
-    ($args[2]) = $self->add_namespace($args[2]);
-}
+my $has_keys;
 for (my $i = 5; $i < @args; $i++) {
     my $option = lc($args[$i] // '');
     if ($option eq 'auth') {
@@ -131,8 +128,13 @@ for (my $i = 5; $i < @args; $i++) {
         $i += 2;
     } elsif ($option eq 'keys') {
         @args[$i + 1 .. $#args] = $self->add_namespace(@args[$i + 1 .. $#args]);
+        $has_keys = 1;
         last;
     }
+}
+# keep the empty string for the KEYS option as is.
+if (@args > 2 && !($has_keys && defined $args[2] && $args[2] eq '')) {
+    ($args[2]) = $self->add_namespace($args[2]);
 }
 CODE
     },
@@ -140,7 +142,7 @@ CODE
     # the commands that take patterns
     keys => {
         before => <<'CODE',
-if (defined $args[0]) {
+if (defined $args[0] && defined $self->{namespace_escaped}) {
     $args[0] = "$self->{namespace_escaped}:$args[0]";
 }
 CODE
@@ -163,7 +165,7 @@ while (@args) {
     my $option = lc shift @args;
     if ($option eq 'match') {
         my $pattern = shift @args;
-        push @res, $option, "$self->{namespace_escaped}:$pattern";
+        push @res, $option, defined $self->{namespace_escaped} ? "$self->{namespace_escaped}:$pattern" : $pattern;
         $has_pattern = 1;
     } elsif ($option eq 'count' || $option eq 'type') {
         push @res, $option, shift @args;
@@ -173,7 +175,7 @@ while (@args) {
 }
 
 # add pattern option
-unless ($has_pattern) {
+if (!$has_pattern && defined $self->{namespace_escaped}) {
     push @res, 'match', "$self->{namespace_escaped}:*";
 }
 @args = @res;

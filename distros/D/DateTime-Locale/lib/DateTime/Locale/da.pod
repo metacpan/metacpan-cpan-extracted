@@ -435,6 +435,24 @@ Danish locale.
    1995-12-22T09:05:02 = fre. 22. dec. 1995 e.Kr.
   -0010-09-15T04:44:23 = lør. 15. sep. -10 f.Kr.
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = februar 2008 e.Kr.
+   1995-12-22T09:05:02 = december 1995 e.Kr.
+  -0010-09-15T04:44:23 = september -10 f.Kr.
+
+=head3 GyMMMMEd (E d. MMMM y G)
+
+   2008-02-05T18:30:30 = tirs. 5. februar 2008 e.Kr.
+   1995-12-22T09:05:02 = fre. 22. december 1995 e.Kr.
+  -0010-09-15T04:44:23 = lør. 15. september -10 f.Kr.
+
+=head3 GyMMMMd (d. MMMM y G)
+
+   2008-02-05T18:30:30 = 5. februar 2008 e.Kr.
+   1995-12-22T09:05:02 = 22. december 1995 e.Kr.
+  -0010-09-15T04:44:23 = 15. september -10 f.Kr.
+
 =head3 GyMMMd (d. MMM y G)
 
    2008-02-05T18:30:30 = 5. feb. 2008 e.Kr.
@@ -638,6 +656,18 @@ Danish locale.
    2008-02-05T18:30:30 = februar 2008
    1995-12-22T09:05:02 = december 1995
   -0010-09-15T04:44:23 = september -10
+
+=head3 yMMMMEd (E d. MMMM y)
+
+   2008-02-05T18:30:30 = tirs. 5. februar 2008
+   1995-12-22T09:05:02 = fre. 22. december 1995
+  -0010-09-15T04:44:23 = lør. 15. september -10
+
+=head3 yMMMMd (d. MMMM y)
+
+   2008-02-05T18:30:30 = 5. februar 2008
+   1995-12-22T09:05:02 = 22. december 1995
+  -0010-09-15T04:44:23 = 15. september -10
 
 =head3 yMMMd (d. MMM y)
 

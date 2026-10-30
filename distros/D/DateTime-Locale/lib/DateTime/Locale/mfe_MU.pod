@@ -435,6 +435,24 @@ Morisyen Mauritius locale.
    1995-12-22T09:05:02 = ap. Z-K 1995 des 22, van
   -0010-09-15T04:44:23 = av. Z-K -10 sep 15, sam
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = ap. Z-K 2008 fevriye
+   1995-12-22T09:05:02 = ap. Z-K 1995 desam
+  -0010-09-15T04:44:23 = av. Z-K -10 septam
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = ap. Z-K 2008 fevriye 5, mar
+   1995-12-22T09:05:02 = ap. Z-K 1995 desam 22, van
+  -0010-09-15T04:44:23 = av. Z-K -10 septam 15, sam
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = ap. Z-K 2008 fevriye 5
+   1995-12-22T09:05:02 = ap. Z-K 1995 desam 22
+  -0010-09-15T04:44:23 = av. Z-K -10 septam 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = ap. Z-K 2008 fev 5

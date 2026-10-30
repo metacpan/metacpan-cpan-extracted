@@ -24,6 +24,7 @@ BEGIN {
 }
 
 use Test::More;
+use Digest::SHA qw(hmac_sha256);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Socket qw(AF_INET6);
@@ -46,6 +47,32 @@ chdir $home or die "Unable to chdir to $home: $!";
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $auth  = Developer::Dashboard::Auth->new( paths => $paths, files => $files );
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Crypto::PBKDF2::derive_sha256 = sub { return; };
+    my $u = hmac_sha256( 'salt' . pack( 'N', 1 ), 'password123' );
+    my $expected = $u;
+    for ( 2 .. 3 ) {
+        $u = hmac_sha256( $u, 'password123' );
+        $expected ^= $u;
+    }
+    is(
+        Developer::Dashboard::Auth::_pbkdf2_hmac_sha256_hex( 'password123', 'salt', 3 ),
+        unpack( 'H*', $expected ),
+        'Auth retains the original Digest::SHA implementation when native derivation is unavailable',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Crypto::PBKDF2::derive_sha256 = sub { return 'native-digest'; };
+    is(
+        Developer::Dashboard::Auth::_pbkdf2_hmac_sha256_hex( 'password123', 'salt', 3 ),
+        'native-digest',
+        'Auth returns a defined native PBKDF2 result without running the Perl fallback',
+    );
+}
 
 isa_ok( $auth, 'Developer::Dashboard::Auth', 'constructed auth manager' );
 
@@ -239,6 +266,15 @@ isa_ok( $auth, 'Developer::Dashboard::Auth', 'constructed auth manager' );
     SKIP: {
         skip 'privilege-drop check requires root on a POSIX system', 1
           if $> != 0 || $^O eq 'MSWin32';
+
+        # The operation under test secures the runtime directory before it
+        # opens the user file. Make those directories writable by the dropped
+        # uid so the test reaches the intended unreadable-file boundary instead
+        # of failing early while chmodding a root-owned fixture.
+        my @fixture_paths = ( $dashboard_directory, $config_directory, $auth_directory, $user_directory, $locked );
+        my $chowned = chown 65534, 65534, @fixture_paths;
+        die "Unable to assign the unreadable auth fixture to the dropped uid: $!"
+          if $chowned != @fixture_paths;
 
         my $original_euid = $>;
         $> = 65534;
@@ -437,7 +473,7 @@ t/82-auth-coverage.t - branch and condition coverage closure for the auth manage
 This test drives Developer::Dashboard::Auth through the specific branch and
 condition sides that ordinary CLI and web flows never reach: the constructor and
 add_user validation dies, the record write- and read-failure paths, the PBKDF2
-default-work-factor fallback, list_users entry filtering, host/IP
+native-result and default-work-factor fallback paths, list_users entry filtering, host/IP
 canonicalisation edge cases, the loopback-admin trust rules, and the
 address-family handling inside hostname resolution. Its unreadable-record case
 temporarily changes its effective uid to an unprivileged identity, so the

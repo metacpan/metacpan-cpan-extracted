@@ -240,4 +240,17 @@ no_leaks_ok {
 		'predict: a reference-level row gets the suppOJ coefficient');
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { predict(); 1 } ? '' : $@;
+	like($err, qr/\Ausage: predict\(.*^example:\n.*\n\npredict: error: \Qa fitted model is required\E\n\z/ms,
+		'predict: a fitted model is required, under the help screen');
+}
+{
+	my $err = eval { predict({ coefficients => {} }, { x => [1] }, type => 'bogus'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: predict\(.*^example:\n.*\n\npredict: error: \Qtype must be 'response' or 'link'\E\n\z/ms,
+		'predict: type must be \'response\' or \'link\', under the help screen');
+}
+
 done_testing;

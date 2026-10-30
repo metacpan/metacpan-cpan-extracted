@@ -63,6 +63,13 @@ my @g = ((('A') x 5), (('B') x 5), (('C') x 5));
 # error handling
 throws_ok { dunn_test(\@x, [ ('A') x 14 ]) } qr/same length/, 'length mismatch rejected';
 throws_ok { dunn_test(\@x, \@g, method => 'bogus') } qr/unknown method/, 'bad method rejected';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('dunn_test');
+	like($screen, qr/\Ausage: dunn_test\(/, 'dunn_test has a help screen');
+	eval { dunn_test(\@x) };
+	is($@, $screen . "dunn_test: error: the values and the groups must be two array refs\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 # Method names fold case by ASCII rules, whatever LC_CTYPE says (up to 0.319
 # this was tolower(), which under a Turkish locale folds I outside ASCII).
 is_deeply(dunn_test(\@x, \@g, method => "BONFERRONI"),

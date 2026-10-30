@@ -2,7 +2,7 @@ package Mail::DKIM2::HeaderPlan;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Carp;
 use Scalar::Util qw(refaddr);
@@ -285,7 +285,7 @@ An arrayref of the values of the fields named C<$name> in the header as it
 was when instance C<$m> was the highest -- the header Recipes above it
 applied -- each as Email::Simple's C<header_raw> gives it, bottom up; undef
 if a header Recipe on the way down does not undo. The Verifier reads each
-version's From fields from it (-07 section 11). New in 0.23.
+version's From fields from it (-08 section 11). New in 0.23.
 
 =head2 rewrites_instances()
 

@@ -3,13 +3,13 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3218';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3413';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table zerotrunc hurdle svyglm ivreg lmer);
+our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density df2h dftype bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table zerotrunc hurdle svyglm ivreg lmer);
 our @EXPORT = @EXPORT_OK;
 
 # File operations: failure reporting
@@ -86,7 +86,8 @@ my %HELP_ALIAS = (
 	_hoa_assign       => 'assign',
 	col               => 'filter',
 	_rename_inplace   => 'rename_cols',
-	_aoh2h            => 'aoh2h',
+	aoh2h             => 'df2h',
+	_df2h             => 'df2h',
 	_cols_select      => 'select_cols',
 	_cols_drop        => 'drop_cols',
 	_cols_rename      => 'rename_cols',
@@ -777,7 +778,7 @@ sub _html_fold {
 
 sub colnames {
 	my ($df) = @_;
-	die "colnames: undefined data in first position\n" unless defined $df;
+	_usage_error('colnames', 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, 'colnames');
 	my @cols;
 	if ($shape eq 'AoA') {                       # widest row -> 0 .. m-1
@@ -813,7 +814,7 @@ sub colnames {
 
 sub rownames {
 	my ($df) = @_;
-	die "rownames: undefined data in first position\n" unless defined $df;
+	_usage_error('rownames', 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, 'rownames');
 	my @rows;
 	if ($shape eq 'HoH') {                        # outer keys ARE the rows
@@ -891,11 +892,11 @@ sub rownames {
 sub _cols_arg {                         # normalise + validate a column list
 	my ($fn, @a) = @_;
 	my @cols = (@a == 1 && ref $a[0] eq 'ARRAY') ? @{ $a[0] } : @a;
-	die "$fn: at least one column is required\n" unless @cols;
+	_usage_error($fn, 'at least one column is required') unless @cols;
 	my %seen;
 	for my $c (@cols) {
-		die "$fn: column identifier is undefined\n" unless defined $c;
-		die "$fn: duplicate column '$c' in the list\n" if $seen{$c}++;
+		_usage_error($fn, 'column identifier is undefined') unless defined $c;
+		_usage_error($fn, "duplicate column '$c' in the list") if $seen{$c}++;
 	}
 	return @cols;
 }
@@ -911,9 +912,9 @@ sub _aoa_int_cols { # validate integer positions in range
 	my ($fn, $df, @cols) = @_;
 	my $w = _aoa_width($df);
 	for my $c (@cols) {
-		die "$fn: AoA column '$c' is not a non-negative integer\n"
+		_usage_error($fn, "AoA column '$c' is not a non-negative integer")
 			unless $c =~ /^\d+$/;
-		die "$fn: AoA column index $c out of range (max index " . ($w - 1) . ")\n"
+		_usage_error($fn, "AoA column index $c out of range (max index " . ($w - 1) . ")")
 			if $c >= $w;
 	}
 	return $w;
@@ -958,7 +959,7 @@ sub _rename_inplace { # VOID-context rename: mutate the source
 
 sub select_cols {# shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
 	my $df = _untied(shift);
-	die "select_cols: undefined data in first position\n" unless defined $df;
+	_usage_error('select_cols', 'undefined data in first position') unless defined $df;
 	my @cols  = _cols_arg('select_cols', @_);
 	my $shape = _df_shape($df, 'select_cols');
 
@@ -983,7 +984,7 @@ sub select_cols {# shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
 
 sub drop_cols {
 	my $df = _untied(shift);
-	die "drop_cols: undefined data in first position\n" unless defined $df;
+	_usage_error('drop_cols', 'undefined data in first position') unless defined $df;
 	my @cols  = _cols_arg('drop_cols', @_);
 	my %drop  = map { $_ => 1 } @cols;
 	my $shape = _df_shape($df, 'drop_cols');
@@ -1011,18 +1012,18 @@ sub drop_cols {
 sub rename_cols {
 	my $df = shift;
 	$df = _untied($df) if defined wantarray;   # void context renames the frame itself
-	die "rename_cols: undefined data in first position\n" unless defined $df;
+	_usage_error('rename_cols', 'undefined data in first position') unless defined $df;
 	my %map;
 	if (@_ == 1 && ref $_[0] eq 'HASH') {
 		%map = %{ $_[0] };
 	} else {
-		die "rename_cols: arguments after the data frame must be old => new pairs (or one hashref)\n"
+		_usage_error('rename_cols', 'arguments after the data frame must be old => new pairs (or one hashref)')
 			if @_ % 2;
 		%map = @_;
 	}
-	die "rename_cols: at least one old => new mapping is required\n" unless %map;
+	_usage_error('rename_cols', 'at least one old => new mapping is required') unless %map;
 	for my $o (keys %map) {
-		die "rename_cols: new name for '$o' is undefined\n" unless defined $map{$o};
+		_usage_error('rename_cols', "new name for '$o' is undefined") unless defined $map{$o};
 	}
 	my $shape = _df_shape($df, 'rename_cols');
 	die "rename_cols: an AoA has no column names to rename (convert to AoH/HoA first)\n"
@@ -1061,10 +1062,10 @@ sub rename_cols {
 
 sub aoh2hoh {
 	my ($aoh, $key) = @_;
-	die 'aoh2hoh: first argument is undefined' unless defined $aoh;
-	die 'aoh2hoh: first argument must be an arrayref of hashrefs'
+	_usage_error('aoh2hoh', 'first argument is undefined') unless defined $aoh;
+	_usage_error('aoh2hoh', 'first argument must be an arrayref of hashrefs')
 	  unless ref($aoh) eq 'ARRAY';
-	die 'aoh2hoh: a row key must be defined' unless defined $key;
+	_usage_error('aoh2hoh', 'a row key must be defined') unless defined $key;
 	my %out;
 	my $i = 0;
 	for my $row (@$aoh) {
@@ -1079,13 +1080,15 @@ sub aoh2hoh {
 	return \%out;
 }
 
-# h2aoh / aoh2h  --  the flat hash as a two-column frame
+# h2aoh / df2h  --  the flat hash as a two-column frame
 #
 # A plain hash is a two-column table that has been folded shut: every pair is
 # one row, the key in one cell and the value in the other.  value_counts() and
 # table() hand one back, and none of the frame functions will take it, because
-# they all want nested data.  h2aoh unfolds the hash into a real AoH; aoh2h
-# folds an AoH back down.  R spells this pair enframe()/deframe() (tibble);
+# they all want nested data.  h2aoh unfolds the hash into a real AoH; df2h
+# folds any frame back down -- an AoH, and also an AoA, HoA or HoH.  It was
+# aoh2h, for an AoH alone, up to 0.3218, and aoh2h is still a name for it.
+# R spells this pair enframe()/deframe() (tibble);
 # pandas spells it pd.Series(d).rename_axis(..).reset_index(name => ..) and
 # Series.to_dict().
 #
@@ -1093,7 +1096,7 @@ sub aoh2hoh {
 # to name the columns it emits, since the shape they describe is the same.
 #
 # The pair are exact inverses under their defaults, so
-#     is_deeply( aoh2h( h2aoh(\%h) ), \%h )
+#     is_deeply( df2h( h2aoh(\%h) ), \%h )
 # holds for any flat hash whose keys are defined.
 
 # _kv_names($caller, \%arg) -- var_name / value_name, defaulted and checked.
@@ -1102,8 +1105,71 @@ sub _kv_names {
 	my ($caller, $arg) = @_;
 	my $var   = defined $arg->{var_name}   ? $arg->{var_name}   : 'variable';
 	my $value = defined $arg->{value_name} ? $arg->{value_name} : 'value';
-	die "$caller: var_name and value_name must differ\n" if $var eq $value;
+	_usage_error($caller, 'var_name and value_name must differ') if $var eq $value;
 	return ($var, $value);
+}
+
+# _usage_text($fn) -- $fn's argparse-style help screen, from
+# Stats::LikeR::Usage, which is compiled only here, on the way to an error.  A
+# name with no screen gets none, so that the error is still raised rather than
+# lost to a second one; t/usage.t keeps every exported name covered.
+sub _usage_text {
+	my ($fn) = @_;
+	require Stats::LikeR::Usage;
+	my $name = exists $Stats::LikeR::Usage::ALIAS{$fn} ? $Stats::LikeR::Usage::ALIAS{$fn} : $fn;
+	my $screen = $Stats::LikeR::Usage::SCREEN{$name};
+	return defined $screen ? $screen : '';
+}
+
+# _xlsx_provenance() -- ($user, $lines) for write_table's .xlsx document
+# properties (xlsx_written_by() in the XS).  $user is the login name, undef when
+# none can be found; $lines is "user: ...", "host: ...", "perl: ..." and
+# "Stats::LikeR: ..." joined by newlines, leaving out any that is unknown.
+# getpwuid() dies "unimplemented" on Windows, so getlogin() and the environment
+# are the fallbacks there; Sys::Hostname (core) croaks when it finds no name.
+# $@ is local: a successful eval clears it, and this runs inside the caller's
+# write_table(), whose $@ up to 0.341 came back empty.
+sub _xlsx_provenance {
+	local $@;
+	my $user = eval { scalar getpwuid($<) };
+	$user = getlogin() unless defined $user && length $user;
+	for my $k (qw(USER USERNAME LOGNAME)) {
+		last if defined $user && length $user;
+		$user = $ENV{$k};
+	}
+	$user = undef unless defined $user && length $user;
+	my $host = eval { require Sys::Hostname; Sys::Hostname::hostname() };
+	$host = undef unless defined $host && length $host;
+	my @lines;
+	push @lines, "user: $user" if defined $user;
+	push @lines, "host: $host" if defined $host;
+	push @lines, sprintf('perl: v%vd', $^V), "Stats::LikeR: $VERSION";
+	return ($user, join("\n", @lines));
+}
+
+# _sheet_name_clash(@names) -- the first two of a workbook's worksheet names
+# that are the same with case ignored, or nothing.  Excel cannot open a
+# workbook holding both; write_table's XS (wt_sheet_names_distinct()) calls this
+# because lc() folds every character of a UTF-8 string, which C cannot do
+# portably.  lc() is what Excel::Writer::XLSX 1.15 compares with too.
+sub _sheet_name_clash {
+	my %seen;
+	for my $name (@_) {
+		my $k = lc $name;
+		return ($seen{$k}, $name) if exists $seen{$k};
+		$seen{$k} = $name;
+	}
+	return;
+}
+
+# _usage_error($fn, $msg) -- die over an argument $fn was called with as
+# argparse does: the help screen, then "$fn: error: $msg" as the last line.
+# For the form of a call only (a missing or mistyped argument, an unknown
+# option, a value outside its choices); an error in the data keeps its own
+# one-line message.  The XS raises the same through usage_croak().
+sub _usage_error {
+	my ($fn, $msg) = @_;
+	die _usage_text($fn) . "$fn: error: $msg\n";
 }
 
 # _opt_names_defined($caller, @pairs) -- die, in the caller's name, on an undef
@@ -1114,21 +1180,21 @@ sub _kv_names {
 sub _opt_names_defined {
 	my $caller = shift;
 	for (my $j = 0; $j < @_; $j += 2) {
-		die "$caller: an option name is undefined\n" unless defined $_[$j];
+		_usage_error($caller, 'an option name is undefined') unless defined $_[$j];
 	}
 }
 
 sub h2aoh {
 	my $h = shift;
-	die "h2aoh: first argument is undefined\n" unless defined $h;
-	die "h2aoh: first argument must be a hashref\n" unless ref($h) eq 'HASH';
-	die "h2aoh: arguments after the hash must be name => value pairs\n"
+	_usage_error('h2aoh', 'first argument is undefined') unless defined $h;
+	_usage_error('h2aoh', 'first argument must be a hashref') unless ref($h) eq 'HASH';
+	_usage_error('h2aoh', 'arguments after the hash must be name => value pairs')
 		if @_ % 2;
 	_opt_names_defined('h2aoh', @_);
 	my %arg   = @_;
 	my %known = ( var_name => 1, value_name => 1, sort => 1 );
 	my @bad   = sort grep { !$known{$_} } keys %arg;
-	die "h2aoh: unknown argument(s): @bad\n" if @bad;
+	_usage_error('h2aoh', "unknown argument(s): @bad") if @bad;
 
 	my ($var_name, $value_name) = _kv_names('h2aoh', \%arg);
 
@@ -1167,37 +1233,123 @@ sub h2aoh {
 		} @keys;
 	}
 	elsif ($how ne 'none') {
-		die "h2aoh: sort '$how' isn't allowed (key, value, none)\n";
+		_usage_error('h2aoh', "sort '$how' isn't allowed (key, value, none)");
 	}
 
 	return [ map { { $var_name => $_, $value_name => $h->{$_} } } @keys ];
 }
 
-# The rows are read by the XSUB _aoh2h, which also makes every check on them;
-# only the options are read here.
-sub aoh2h {
-	my $aoh = shift;
-	die "aoh2h: first argument is undefined\n" unless defined $aoh;
-	# reftype, not ref: a blessed array of hashes is still one, as aoh2hoa
-	# already took it.  Up to 0.3217 a blessed frame or row was refused.
-	die "aoh2h: first argument must be an arrayref of hashrefs\n"
-		unless (reftype($aoh) || '') eq 'ARRAY';
-	die "aoh2h: arguments after the data frame must be name => value pairs\n"
+# The rows are read by the XSUB _df2h, which also makes every check on them;
+# the shape and the options are read here.
+#
+# aoh2h is the same sub under the name it had up to 0.3218, when it took an AoH
+# alone.  It is a glob alias, as rbind is of concat, so its messages say df2h.
+sub df2h {
+	my $df = shift;
+	_usage_error('df2h', 'first argument is undefined') unless defined $df;
+	# reftype, not ref: a blessed frame or row is still one, as aoh2hoa
+	# already took it.  Up to 0.3217 aoh2h refused them.
+	my $type = reftype($df) || '';
+	_usage_error('df2h', 'first argument must be a data frame (AoA, AoH, HoA or HoH)')
+		unless $type eq 'ARRAY' || $type eq 'HASH';
+	_usage_error('df2h', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
-	_opt_names_defined('aoh2h', @_);
+	_opt_names_defined('df2h', @_);
 	my %arg   = @_;
 	my %known = ( var_name => 1, value_name => 1, duplicates => 1 );
 	my @bad   = sort grep { !$known{$_} } keys %arg;
-	die "aoh2h: unknown argument(s): @bad\n" if @bad;
+	_usage_error('df2h', "unknown argument(s): @bad") if @bad;
 
-	my ($var_name, $value_name) = _kv_names('aoh2h', \%arg);
+	# A tied frame is copied once, as _untied() does, so that deciding its
+	# shape here does not FETCH a row the XS then FETCHes again.  _untied()
+	# itself is not used because it asks ref(), which a blessed frame fails.
+	if ($type eq 'ARRAY') { $df = [ @$df ] if tied @$df }
+	else                  { $df = { %$df } if tied %$df }
+
+	# The shape, by _df_shape()'s rules but with reftype().  An array is an
+	# AoA when its first defined element is an array, and is otherwise read as
+	# an AoH, so that the XS names the first row that is not a hash.
+	my $shape;	# 'AoA', 'AoH', 'HoA' or 'HoH'
+	if ($type eq 'ARRAY') {
+		$shape = 'AoH';
+		for my $r (@$df) {
+			next unless defined $r;
+			$shape = 'AoA' if (reftype($r) || '') eq 'ARRAY';
+			last;
+		}
+	} else {
+		return {} unless %$df;	# no rows, whichever of HoA or HoH it is
+		my ($saw_arr, $saw_hash) = (0, 0);
+		for my $v (values %$df) {
+			my $t = reftype($v) || next;
+			$saw_arr  = 1 if $t eq 'ARRAY';
+			$saw_hash = 1 if $t eq 'HASH';
+		}
+		die "df2h: hashref mixes array and hash values (ambiguous HoA/HoH)\n"
+			if $saw_arr && $saw_hash;
+		# most likely df2h's own output, handed back to it
+		die "df2h: first argument is a flat hash, not a data frame: none of "
+		  . "its values is an array or hash ref\n"
+			unless $saw_arr || $saw_hash;
+		$shape = $saw_hash ? 'HoH' : 'HoA';
+	}
+
+	my ($var_name, $value_name);
+	if ($shape eq 'AoA') {
+		# positions, Perl's own negative indexing as in agg(); the bound keeps
+		# the XS's SvIV() from saturating, which a 32-bit IV would at 2**31
+		($var_name, $value_name) = map {
+			my $c = $_;
+			die "df2h: an AoA's columns are integer positions, not '$c'\n"
+				unless $c =~ /\A-?[0-9]+\z/;
+			die "df2h: column position $c is past the end of any array\n"
+				if abs($c) > ~0 >> 1;
+			0 + $c;	# '01' and '-0' are the positions 1 and 0
+		} ( defined $arg{var_name}   ? $arg{var_name}   : 0,
+		    defined $arg{value_name} ? $arg{value_name} : 1 );
+		die "df2h: var_name and value_name must differ\n"
+			if $var_name == $value_name;
+	} else {
+		($var_name, $value_name) = _kv_names('df2h', \%arg);
+	}
+
 	my $dup = defined $arg{duplicates} ? lc $arg{duplicates} : 'die';
-	my %dup_code = ( die => 0, first => 1, last => 2 );	# _aoh2h's `dup`
-	die "aoh2h: duplicates '$dup' isn't allowed (die, first, last)\n"
+	my %dup_code = ( die => 0, first => 1, last => 2 );	# _df2h's `dup`
+	die "df2h: duplicates '$dup' isn't allowed (die, first, last)\n"
 		unless exists $dup_code{$dup};
+	# 'first' and 'last' mean an order, and a HoH has none: they would keep
+	# whichever row hash order reached first, which differs from run to run
+	die "df2h: duplicates '$dup' needs ordered rows, and a HoH's are not; "
+	  . "use 'die', or give an AoH, AoA or HoA\n"
+		if $shape eq 'HoH' && $dup ne 'die';
 
-	return _aoh2h($aoh, $var_name, $value_name, $dup_code{$dup});
+	# _df2h's `shape`: 1 = AoH, 2 = HoH, 3 = AoA, 4 = HoA
+	if ($shape eq 'HoA') {
+		for my $c ($var_name, $value_name) {
+			die "df2h: no '$c' column\n" unless exists $df->{$c};
+			die "df2h: column '$c' is not an arrayref\n"
+				unless (reftype($df->{$c}) || '') eq 'ARRAY';
+		}
+		my ($nk, $nv) = map { scalar @{ $df->{$_} } } $var_name, $value_name;
+		die "df2h: column '$var_name' has length $nk and '$value_name' has "
+		  . "length $nv; the two must be the same length\n" if $nk != $nv;
+		return _df2h([ $df->{$var_name}, $df->{$value_name} ], 4,
+			$var_name, $value_name, $dup_code{$dup}, undef);
+	}
+	if ($shape eq 'HoH') {
+		# Hash order first, which costs no sort.  Should that croak, the rows
+		# are read again in sorted order, the one deterministic order a HoH has,
+		# so that which bad row the message names is the same on every run.
+		my $h;
+		return $h if eval { $h = _df2h($df, 2, $var_name, $value_name, 0, [ keys %$df ]); 1 };
+		my $err = $@;
+		_df2h($df, 2, $var_name, $value_name, 0, [ sort keys %$df ]);
+		die $err;	# reached only if the second reading did not croak
+	}
+	return _df2h($df, $shape eq 'AoA' ? 3 : 1, $var_name, $value_name,
+		$dup_code{$dup}, undef);
 }
+{ no warnings 'once'; *aoh2h = \&df2h; }  # true synonym
 # agg / concat / rbind  --  additions to lib/Stats/LikeR.pm
 # Splice these in after the dropna sub. Also add  agg concat rbind  to
 # @EXPORT_OK. rbind is a true glob-alias synonym for concat.
@@ -1215,32 +1367,7 @@ sub _untied {
 	return $df;
 }
 
-sub _df_shape {
-	my ($df, $caller) = @_;
-	$caller = 'data frame' unless defined $caller;
-	die "$caller: data frame must be an ARRAY (AoA/AoH) or HASH (HoA/HoH) ref\n"
-		unless ref $df;
-	if (ref $df eq 'ARRAY') {
-		for my $e (@$df) {
-			next unless defined $e;
-			return 'AoA' if ref $e eq 'ARRAY';
-			return 'AoH' if ref $e eq 'HASH';
-			die "$caller: array elements must be ARRAY (AoA) or HASH (AoH) refs\n";
-		}
-		return 'AoH';                         # empty -> harmless default
-	}
-	# HASH: HoA vs HoH, rejecting a mix
-	my ($saw_arr, $saw_hash) = (0, 0);
-	for my $v (values %$df) {
-		next unless ref $v;
-		$saw_arr++  if ref $v eq 'ARRAY';
-		$saw_hash++ if ref $v eq 'HASH';
-	}
-	die "$caller: hashref mixes array and hash values (ambiguous HoA/HoH)\n"
-		if $saw_arr and $saw_hash;
-	return 'HoH' if $saw_hash;
-	return 'HoA';                             # arrays, or empty -> default
-}
+# _df_shape($df [, $caller]) is in LikeR.xs, where its rules are written out.
 
 # agg($df, agg => { col => 'mean' | [ 'mean', 'sd', .. ] | \&code, .. }, %opts)
 #
@@ -1340,29 +1467,29 @@ sub _df_shape {
 
 	sub agg {
 		my $df = _untied(shift);
-		die "agg: undefined data in first position\n" unless defined $df;
+		_usage_error('agg', 'undefined data in first position') unless defined $df;
 		my $shape = _df_shape($df, 'agg');
-		die "agg: arguments after the data frame must be name => value pairs\n"
+		_usage_error('agg', 'arguments after the data frame must be name => value pairs')
 			if @_ % 2;
 		my %arg = @_;
 		my %known = ( agg => 1, by => 1, skipna => 1, sort => 1, 'output_type' => 1 );
 		my @bad = sort grep { !$known{$_} } keys %arg;
-		die "agg: unknown argument(s): @bad\n" if @bad;
+		_usage_error('agg', "unknown argument(s): @bad") if @bad;
 
 		my $spec = $arg{agg};
-		die "agg: an 'agg' spec (hashref of column => aggregator) is required\n"
+		_usage_error('agg', "an 'agg' spec (hashref of column => aggregator) is required")
 			unless ref $spec eq 'HASH' and %$spec;
 
 		my @by = !defined $arg{by}          ? ()
 		       : ref $arg{by} eq 'ARRAY'    ? @{ $arg{by} }
 		       :                              ( $arg{by} );
-		die "agg: 'by' contains an undefined column\n" if grep { !defined } @by;
+		_usage_error('agg', "'by' contains an undefined column") if grep { !defined } @by;
 		my $skipna = exists $arg{skipna} ? ($arg{skipna} ? 1 : 0) : 1;
 		my $dosort = exists $arg{sort}   ? ($arg{sort}   ? 1 : 0) : 1;
 		my $otype  = defined $arg{'output_type'} ? lc $arg{'output_type'}
 		           : lc $shape;
 		my %ok_otype = ( aoa => 1, aoh => 1, hoa => 1, hoh => 1 );
-		die "agg: output_type '$otype' isn't allowed (aoa, aoh, hoa, hoh)\n"
+		_usage_error('agg', "output_type '$otype' isn't allowed (aoa, aoh, hoa, hoh)")
 			unless $ok_otype{$otype};
 
 		my @agg_cols = keys %$spec;
@@ -1372,7 +1499,7 @@ sub _df_shape {
 		}
 		if ($shape eq 'AoA') {           # positions; Perl's own negative indexing
 			for my $c (@by, @agg_cols) {
-				die "agg: AoA columns are integer positions, not '$c'\n"
+				_usage_error('agg', "AoA columns are integer positions, not '$c'")
 					unless $c =~ /\A-?[0-9]+\z/;
 			}
 		} elsif ($shape eq 'HoA') {
@@ -1392,12 +1519,12 @@ sub _df_shape {
 		for my $c (@agg_cols) {
 			my $s = $spec->{$c};
 			my @funcs = ref $s eq 'ARRAY' ? @$s : ($s);
-			die "agg: empty aggregator list for column '$c'\n" unless @funcs;
+			_usage_error('agg', "empty aggregator list for column '$c'") unless @funcs;
 			for my $f (@funcs) {
 				next if ref $f eq 'CODE';
-				die "agg: aggregator for column '$c' must be a name or a coderef\n"
+				_usage_error('agg', "aggregator for column '$c' must be a name or a coderef")
 					if !defined $f || ref $f;
-				die "agg: unknown aggregator '$f'\n"
+				_usage_error('agg', "unknown aggregator '$f'")
 					unless exists $AGG_MIN{$f} || $AGG_OTHER{$f};
 			}
 			my $ncode = grep { ref $_ eq 'CODE' } @funcs;
@@ -1537,7 +1664,7 @@ sub _df_shape {
 # cell stays missing rather than becoming ''.
 sub map_cell (&) {
 	my ($code) = @_;
-	die "map_cell: expects a code block, e.g. map_cell { s/x//g }\n"
+	_usage_error('map_cell', 'expects a code block')
 		unless ref $code eq 'CODE';
 	return bless { code => $code }, 'Stats::LikeR::map_cell';
 }
@@ -1545,10 +1672,10 @@ sub map_cell (&) {
 sub assign {
 	my $df = shift;
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
-	die "$current_sub: first argument is undefined" unless defined $df;
-	die "$current_sub: first argument must be a data frame (AoH arrayref or HoA/HoH hashref)"
+	_usage_error($current_sub, 'first argument is undefined') unless defined $df;
+	_usage_error($current_sub, 'first argument must be a data frame (AoH arrayref or HoA/HoH hashref)')
 		unless ref $df;
-	die "$current_sub: expected an even list of (name => value) pairs" if @_ % 2;
+	_usage_error($current_sub, 'expected an even list of (name => value) pairs') if @_ % 2;
 
 	my $r = ref $df;
 	my $shape;                                      # 'AoH', 'HoA' or 'HoH'
@@ -1581,7 +1708,7 @@ sub assign {
 			}
 		}
 	} else {
-		die "$current_sub: data frame must be an arrayref (AoH) or hashref (HoA/HoH)";
+		_usage_error($current_sub, 'data frame must be an arrayref (AoH) or hashref (HoA/HoH)');
 	}
 
 	# Row count. For a HoA it is the longest column; with no column at all yet
@@ -1614,7 +1741,7 @@ sub assign {
 				if $shape eq 'HoA' and not $hoa_col{$name};
 			next;
 		}
-		die "$current_sub: value for '$name' must be a CODE or ARRAY ref"
+		_usage_error($current_sub, "value for '$name' must be a CODE or ARRAY ref")
 			unless $sref eq 'CODE' or $sref eq 'ARRAY';
 		if ($sref eq 'ARRAY') {
 			$n = @$spec unless defined $n;
@@ -1816,18 +1943,18 @@ sub assign {
 
 sub chunk {
 	my ($aref, @rest) = @_;
-	die "chunk: first argument must be an ARRAY reference\n"
+	_usage_error('chunk', 'first argument must be an ARRAY reference')
 		unless ref $aref eq 'ARRAY';
 	# Own the message for an odd argument list.  Falling straight into a hash
 	# assignment left perl to report it, and under `warnings FATAL => 'all'`
 	# chunk($aref, 2) died as "Odd number of elements in hash assignment at
 	# LikeR.pm line 1686" -- naming neither chunk nor the option it wanted.
-	die "chunk: arguments after the array reference must be name => value "
-	  . "pairs; pass exactly one of size => N or parts => K\n"
+	_usage_error('chunk', 'arguments after the array reference must be name => value '
+	  . 'pairs; pass exactly one of size => N or parts => K')
 		if @rest % 2;
 	my %opt = @rest;
 
-	die "chunk: pass exactly one of size => N or parts => K\n"
+	_usage_error('chunk', 'pass exactly one of size => N or parts => K')
 		if  (defined $opt{size} && defined $opt{parts})
 		||  (!defined $opt{size} && !defined $opt{parts});
 
@@ -1837,7 +1964,7 @@ sub chunk {
 	my @groups;
 	if (defined $opt{size}) {
 		my $sz = $opt{size};
-		die "chunk: size must be a positive integer\n"
+		_usage_error('chunk', 'size must be a positive integer')
 			unless $sz =~ /\A[1-9][0-9]*\z/;
 		for (my $i = 0; $i < $n; $i += $sz) {
 			my $hi = $i + $sz - 1;
@@ -1846,7 +1973,7 @@ sub chunk {
 		}
 	} else {
 		my $k = $opt{parts};
-		die "chunk: parts must be a positive integer\n"
+		_usage_error('chunk', 'parts must be a positive integer')
 			unless $k =~ /\A[1-9][0-9]*\z/;
 		for my $i (0 .. $k - 1) {
 			my $lo = int( $i       * $n / $k );
@@ -1904,7 +2031,7 @@ sub col { Stats::LikeR::col::_new(@_) }
 
 	sub _new {
 		my ($name) = @_;
-		die "col(): expects a single column name\n" if !defined($name) || ref $name;
+		Stats::LikeR::_usage_error('col', 'expects a single column name') if !defined($name) || ref $name;
 		return bless { name => $name }, __PACKAGE__;
 	}
 
@@ -2062,14 +2189,14 @@ sub col { Stats::LikeR::col::_new(@_) }
 #        emitted noting that row names collided.
 sub concat {
 	my @frames = grep { defined } @_;
-	die "concat: needs at least one data frame\n" unless @frames;
+	_usage_error('concat', 'needs at least one data frame') unless @frames;
 
 	# reference shape = first non-empty frame; remember a fallback for all-empty
 	my $ref_shape;
 	for my $f (@frames) {
 		my $nonempty = ref $f eq 'ARRAY' ? scalar(@$f)
 		             : ref $f eq 'HASH'  ? scalar(keys %$f)
-		             : die "concat: every frame must be an ARRAY or HASH ref\n";
+		             : _usage_error('concat', 'every frame must be an ARRAY or HASH ref');
 		next unless $nonempty;
 		$ref_shape = _df_shape($f, 'concat');
 		last;
@@ -2170,28 +2297,28 @@ sub concat {
 #
 sub dropna {
 	my $df = shift;
-	die 'dropna: first argument is undefined' unless defined $df;
-	die "dropna: first argument must be a data frame (HoA/HoH hashref or AoH arrayref)\n"
+	_usage_error('dropna', 'first argument is undefined') unless defined $df;
+	_usage_error('dropna', 'first argument must be a data frame (HoA/HoH hashref or AoH arrayref)')
 		unless ref $df;
-	die "dropna: arguments after the data frame must be name => value pairs\n"
+	_usage_error('dropna', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 
 	my %known = ( cols => 1, rows => 1, how => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "dropna: unknown argument(s): @bad\n" if @bad;
+	_usage_error('dropna', "unknown argument(s): @bad") if @bad;
 
 	my $have_cols = exists $arg{cols};
 	my $have_rows = exists $arg{rows};
-	die "dropna: pass exactly one of 'cols' or 'rows'\n"
+	_usage_error('dropna', "pass exactly one of 'cols' or 'rows'")
 		unless $have_cols xor $have_rows;
 
 	my $sel = $have_cols ? $arg{cols} : $arg{rows};
-	die "dropna: '" . ($have_cols ? 'cols' : 'rows') . "' must be an arrayref\n"
+	_usage_error('dropna', "'" . ($have_cols ? 'cols' : 'rows') . "' must be an arrayref")
 		unless ref $sel eq 'ARRAY';
 
 	my $how = defined $arg{how} ? lc $arg{how} : 'any';
-	die "dropna: 'how' must be 'any' or 'all'\n"
+	_usage_error('dropna', "'how' must be 'any' or 'all'")
 		unless $how eq 'any' or $how eq 'all';
 
 	my $r = ref $df;
@@ -2280,7 +2407,7 @@ sub dropna {
 		return { map { $_ => [ @{ $df->{$_} }[@keep] ] } keys %$df };
 	}
 
-	die "dropna: data frame must be an arrayref (AoH) or hashref (HoA/HoH)\n";
+	_usage_error('dropna', 'data frame must be an arrayref (AoH) or hashref (HoA/HoH)');
 }
 
 # drop_duplicates($df, subset => $col | \@cols, keep => 'first' | 'last' | 0)
@@ -2306,27 +2433,27 @@ sub dropna {
 # survivor therefore reaches the input's cell.
 sub drop_duplicates {
 	my $df = _untied(shift);
-	die "drop_duplicates: undefined data in first position\n" unless defined $df;
-	die "drop_duplicates: arguments after the data frame must be name => value pairs\n"
+	_usage_error('drop_duplicates', 'undefined data in first position') unless defined $df;
+	_usage_error('drop_duplicates', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 	my %known = ( subset => 1, keep => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "drop_duplicates: unknown argument(s): @bad\n" if @bad;
+	_usage_error('drop_duplicates', "unknown argument(s): @bad") if @bad;
 
 	my $shape = _df_shape($df, 'drop_duplicates');
-	die "drop_duplicates: an HoH data frame is not supported (convert to AoH/HoA/AoA first)\n"
+	_usage_error('drop_duplicates', 'an HoH data frame is not supported (convert to AoH/HoA/AoA first)')
 		if $shape eq 'HoH';
 
 	# keep -> code: 1 = first, -1 = last, 0 = drop every duplicate
 	my $keep = exists $arg{keep} ? $arg{keep} : 'first';
-	die "drop_duplicates: 'keep' is undefined (use 'first', 'last', or 0)\n"
+	_usage_error('drop_duplicates', "'keep' is undefined (use 'first', 'last', or 0)")
 		unless defined $keep;
 	my $kc;
 	if    ($keep eq 'first') { $kc =  1 }
 	elsif ($keep eq 'last')  { $kc = -1 }
 	elsif ($keep eq 'none' || $keep eq '' || (looks_like_number($keep) && $keep == 0)) { $kc = 0 }
-	else  { die "drop_duplicates: 'keep' must be 'first', 'last', or 0 (got '$keep')\n" }
+	else  { _usage_error('drop_duplicates', "'keep' must be 'first', 'last', or 0 (got '$keep')") }
 
 	# subset -> ordered column list
 	my @sub;
@@ -2334,12 +2461,12 @@ sub drop_duplicates {
 		my $s = $arg{subset};
 		if    (ref $s eq 'ARRAY') { @sub = @$s }
 		elsif (!ref $s)           { @sub = ($s) }
-		else { die "drop_duplicates: 'subset' must be a column or an arrayref of columns\n" }
-		die "drop_duplicates: 'subset' is empty\n" unless @sub;
+		else { _usage_error('drop_duplicates', "'subset' must be a column or an arrayref of columns") }
+		_usage_error('drop_duplicates', "'subset' is empty") unless @sub;
 		my %seen;
 		for my $c (@sub) {
-			die "drop_duplicates: undefined column in 'subset'\n" unless defined $c;
-			die "drop_duplicates: duplicate column '$c' in 'subset'\n" if $seen{$c}++;
+			_usage_error('drop_duplicates', "undefined column in 'subset'") unless defined $c;
+			_usage_error('drop_duplicates', "duplicate column '$c' in 'subset'") if $seen{$c}++;
 		}
 	}
 
@@ -2378,8 +2505,8 @@ sub drop_duplicates {
 sub ncol {
 	my ($data) = @_;
 	my $type = reftype $data;
-	die 'ncol: expected an ARRAY or HASH ref (got '
-		. (defined $data ? (ref($data) || 'non-ref scalar') : 'undef') . ")\n"
+	_usage_error('ncol', 'expected an ARRAY or HASH ref (got '
+		. (defined $data ? (ref($data) || 'non-ref scalar') : 'undef') . ')')
 		unless defined $type && ($type eq 'ARRAY' || $type eq 'HASH');
 
 	if ($type eq 'ARRAY') {
@@ -2462,8 +2589,8 @@ sub ncol {
 sub nrow {
 	my ($data) = @_;
 	my $type = reftype $data;
-	die 'nrow: expected an ARRAY or HASH ref (got '
-		. (defined $data ? (ref($data) || 'non-ref scalar') : 'undef') . ')'
+	_usage_error('nrow', 'expected an ARRAY or HASH ref (got '
+		. (defined $data ? (ref($data) || 'non-ref scalar') : 'undef') . ')')
 		unless defined $type;
 
 	# AoH / AoA (and a plain vector): one top-level element per row.
@@ -2502,7 +2629,7 @@ sub nrow {
 sub qcut {
 	my ($data, $q, %opt) = @_;
 
-	die "qcut: first argument must be an ARRAY reference (try h('qcut'))\n"
+	_usage_error('qcut', 'first argument must be an ARRAY reference')
 		unless ref $data eq 'ARRAY';
 
 	# probability vector: q+1 evenly spaced points, or an explicit list
@@ -2510,7 +2637,7 @@ sub qcut {
 	if (ref $q eq 'ARRAY') {
 		$probs = [ sort { $a <=> $b } @$q ];
 	} else {
-		die "qcut: number of quantiles must be a positive integer\n"
+		_usage_error('qcut', 'number of quantiles must be a positive integer')
 			unless defined $q && $q =~ /\A[1-9][0-9]*\z/;
 		$probs = [ map { $_ / $q } 0 .. $q ];
 	}
@@ -2523,7 +2650,7 @@ sub qcut {
 	my $want_edges = exists $opt{edges}
 		? ($opt{edges} ? 1 : 0)
 		: ($want_codes ? 0 : 1);
-	die "qcut: nothing to return (set edges => 1 or codes => 1)\n"
+	_usage_error('qcut', 'nothing to return (set edges => 1 or codes => 1)')
 		unless $want_edges || $want_codes;
 
 	# does the column contain any NA?
@@ -2603,6 +2730,8 @@ sub summary {
 	if (@_ && ref $_[0]) {
 		# summary(\@arr, ...) / summary(\%h, ...)
 		$data = shift;
+		_usage_error($current_sub, 'arguments after the data must be name => value pairs')
+			if @_ % 2;
 		%args = @_;
 	} else {
 		# summary(@vector) / summary(@vector, nrows => N): peel recognised
@@ -2616,16 +2745,16 @@ sub summary {
 		$data = \@list;
 	}
 	my @bad = sort grep { !$opt_key{$_} } keys %args;
-	die "$current_sub: unknown argument(s): @bad\n" if @bad;
+	_usage_error($current_sub, "unknown argument(s): @bad") if @bad;
 	# row cap: nrows / nrow / n / rows are synonyms (default 10)
 	my $nrows = exists $args{nrows} ? $args{nrows} : exists $args{nrow} ? $args{nrow}
 			  : exists $args{n}     ? $args{n}     : exists $args{rows} ? $args{rows}
 			  :                       10;
-	die "$current_sub: 'nrows' must be a non-negative integer\n"
+	_usage_error($current_sub, "'nrows' must be a non-negative integer")
 		unless defined $nrows && $nrows =~ /^\d+$/;
 
 	my $rt = ref $data;
-	die "$current_sub: data must either be a hash or an array, not \"$rt\"\n"
+	_usage_error($current_sub, "data must either be a hash or an array, not \"$rt\"")
 		unless $rt eq 'ARRAY' or $rt eq 'HASH';
 
 	# resolve the data shape into (label, numeric-vector) series
@@ -3158,28 +3287,49 @@ sub _sniff_compression {
 # reads LF and CRLF only, and handed such a file back as one long header.
 #
 # The file is taken for one only when what is read of it holds a CR and no LF
-# at all, so an LF or CRLF file with a stray CR in its first line still reads
-# as it always has. A CR that ends the block may be the first half of a CRLF,
-# so the block is extended past it. 64 KB is one read; reading stops at 1 MB,
-# which bounds the cost for a file with no line end in its first megabyte, and
-# reads that one as LF, as it was read before.
+# outside a quoted field, so an LF or CRLF file with a stray CR in its first
+# line still reads as it always has. A line break inside quotes is part of a
+# cell, not a line end: up to 0.33 any LF counted, so a CR file with one quoted
+# cell holding an LF was split on LF, and 'a,b\r1,"x\ny"\r2,z\r' came back as
+# the one row a, b1, "x\ny2", z where R 4.6.1's read.csv() and pandas 3.0.4's
+# read_csv() both read a, b over (1, "x\ny") and (2, z). Quotes are counted
+# as _parse_csv_file() counts them -- every '"' opens or closes one, a doubled
+# '""' doing both -- unless $quote is false (quote => ''). A CR that ends the
+# block may be the first half of a CRLF, so the block is extended past it. 64
+# KB is one read; reading stops at 1 MB, which bounds the cost for a file with
+# no line end in its first megabyte, and reads that one as LF, as it was read
+# before.
 sub _eol_is_cr {
-	my ($file, $codec) = @_;
+	my ($file, $codec, $quote) = @_;
 	# not on a compressed handle: it is opened :raw already, and a bare binmode
 	# is :raw, which can pop the via layer that is doing the decompressing
 	my $fh = $codec ? _open_decompressed($file, $codec) : _open_read($file);
 	binmode $fh unless $codec;
 	my $buf = '';
 	my $eof = 0;
+	my $in_q = 0;	# the scan is inside a quoted field
+	my $cr = 0;	# a CR outside quotes has been seen
+	my $lf = 0;	# an LF outside quotes has been seen
+	my $class = $quote ? qr/["\r\n]/ : qr/[\r\n]/;
+	pos($buf) = 0;
 	while (length $buf < 1 << 20) {
+		my $at = pos($buf) // 0;	# where the scan resumes in the grown block
 		my $got = read $fh, $buf, 1 << 16, length $buf;
 		if (!$got) { $eof = 1; last }
-		last if index($buf, "\n") >= 0;
-		last if index($buf, "\r") >= 0 && substr($buf, -1) ne "\r";
+		pos($buf) = $at;
+		while ($buf =~ /$class/g) {
+			my $c = substr($buf, pos($buf) - 1, 1);
+			if ($c eq '"')   { $in_q = !$in_q }
+			elsif ($in_q)    { next }
+			elsif ($c eq "\n") { $lf = 1; last }
+			else             { $cr = 1 }
+		}
+		last if $lf;
+		last if $cr && substr($buf, -1) ne "\r";
+		pos($buf) = length $buf;
 	}
 	_close($fh);
-	return 0 if index($buf, "\n") >= 0;
-	return 0 if index($buf, "\r") < 0;
+	return 0 if $lf || !$cr;
 	return 1 if $eof || substr($buf, -1) ne "\r";
 	return 0;	# 1 MB ending in a CR whose partner was not read: as before
 }
@@ -3229,13 +3379,15 @@ sub _as_bytes {
 
 sub read_table {
 	my $file = shift;
+	# without a name, -f would die on the fatal "uninitialized" warning instead
+	_usage_error('read_table', 'file name missing') unless defined $file;
 	die "read_table: \"$file\" is not a file\n"   unless -f $file;
 	die "read_table: \"$file\" is not readable\n" unless -r $file;
 
 	my %input_args = @_;
 	if (exists $input_args{delim}) {
 		# FIX: sep + delim together used to silently prefer delim
-		die "read_table: pass either 'sep' or 'delim', not both\n"
+		_usage_error('read_table', "pass either 'sep' or 'delim', not both")
 			if exists $input_args{sep};
 		$input_args{sep} = delete $input_args{delim};
 	}
@@ -3249,8 +3401,8 @@ sub read_table {
 	{
 		my @given = grep { exists $input_args{$_} }
 			qw(na_strings na_values undef_val);
-		die "read_table: pass only one of 'na_strings', 'na_values' or "
-		  . "'undef_val'; got " . join(', ', map { "'$_'" } @given) . "\n"
+		_usage_error('read_table', "pass only one of 'na_strings', 'na_values' or "
+		  . "'undef_val'; got " . join(', ', map { "'$_'" } @given))
 			if @given > 1;
 		$input_args{'na_strings'} = delete $input_args{ $given[0] } if @given;
 	}
@@ -3265,7 +3417,10 @@ sub read_table {
 	die "read_table: \"$file\" is $codec-compressed, which read_table cannot "
 	  . "decompress; decompress it first, or recompress it with gzip or bzip2\n"
 		if $codec =~ /\A(?:xz|lzma|zstd|lzop)\z/;
-	my $cr_eol  = $is_xlsx ? 0  : _eol_is_cr($file, $codec);	# lines end in a bare CR
+	# quote => '' makes '"' text, so it opens no quoted field for the line-end
+	# scan either; the value itself is checked further down
+	my $cr_eol  = $is_xlsx ? 0  : _eol_is_cr($file, $codec,
+		!(defined $input_args{quote} && !ref $input_args{quote} && $input_args{quote} eq ''));	# lines end in a bare CR
 	my $eol     = $cr_eol ? "\r" : "\n";
 	# The extension only picks the default sep, and a compressed file's is
 	# that of the text inside it: x.tsv.gz is tab-separated.
@@ -3295,55 +3450,52 @@ sub read_table {
 		'_closure',
 	);
 	my @undef_args = sort grep { !$allowed_args{$_} } keys %args;
-	if (@undef_args) {
-		my $current_sub = ( split /::/, (caller(0))[3] )[-1];
-		die "the args \"@undef_args\" aren't defined for $current_sub\n";
-	}
+	_usage_error('read_table', "unknown argument(s): @undef_args") if @undef_args;
 	# explode => 1, the default for a VCF read with its header: every sample
 	# column is split on ':' into one column per FORMAT key, and the table is
 	# a hoh keyed by CHROM:POS:REF:ALT (see _vcf_explode). Without a header
 	# there is no FORMAT column to split by, so header => 0 reads it plain.
 	if (exists $args{explode}) {
-		die "read_table: 'explode' applies only to a VCF (.vcf, .vcf.gz or "
-		  . ".vcf.bgz), and \"$file\" is not named as one\n"
+		_usage_error('read_table', "'explode' applies only to a VCF (.vcf, .vcf.gz or "
+		  . ".vcf.bgz), and \"$file\" is not named as one")
 			unless $is_vcf;
-		die "read_table: 'explode' must be 0 or 1\n"
+		_usage_error('read_table', "'explode' must be 0 or 1")
 			unless defined $args{explode} && !ref $args{explode}
 				&& $args{explode} =~ /\A[01]?\z/;
 	}
 	my $explode = $is_vcf && ($args{explode} // 1)
 		&& !(exists $args{header} && defined $args{header} && !$args{header});
 	my $otype = $args{'output_type'} // ($explode ? 'hoh' : 'aoh');
-	die "read_table: output_type \"$otype\" isn't allowed (aoa, aoh, hoa, hoh)\n"
+	_usage_error('read_table', "output_type \"$otype\" isn't allowed (aoa, aoh, hoa, hoh)")
 		unless $otype =~ m/^(?:aoa|aoh|hoa|hoh)$/;
 	# Only a hoh is keyed by a column. An aoa is positional, and an aoh or hoa
 	# keeps every column as data, so a row_names column would only be a column
 	# like any other. Up to 0.3213 an aoh or hoa checked the name against the
 	# header and then ignored it, which read as though it had done something.
-	die "read_table: 'row_names' has no meaning for output_type \"$otype\"; "
-	  . "the row names column is read as an ordinary column\n"
+	_usage_error('read_table', "'row_names' has no meaning for output_type \"$otype\"; "
+	  . "the row names column is read as an ordinary column")
 		if $otype ne 'hoh' && defined $args{'row_names'};
 	# compared with the header's bytes, both here and in _vcf_explode()
 	$args{'row_names'} = _as_bytes($args{'row_names'}) if defined $args{'row_names'};
 	# 'sheet' picks a worksheet, which only an .xlsx has; it was ignored on
 	# any other file up to 0.3213, as 'explode' is refused on a non-VCF.
-	die "read_table: 'sheet' applies only to an .xlsx, and \"$file\" is not "
-	  . "named as one\n"
+	_usage_error('read_table', "'sheet' applies only to an .xlsx, and \"$file\" is not "
+	  . "named as one")
 		if defined $args{sheet} && !$is_xlsx;
 	# A qr// separator is found by perl's regex engine; any other sep is
 	# a literal string, as it has always been. A regex is not looked at for an
 	# .xlsx, where a literal sep is not either.
 	if (ref $args{sep} && ref $args{sep} ne 'Regexp') {
-		die "read_table: 'sep' must be a string or a qr// regex, not a "
-		  . ref($args{sep}) . " reference\n";
+		_usage_error('read_table', "'sep' must be a string or a qr// regex, not a "
+		  . ref($args{sep}) . " reference");
 	}
 	my $sep_re = (ref $args{sep} && !$is_xlsx) ? $args{sep} : undef;
 	# Refused before the file is read, so that qr/\s*/ fails the same way
 	# whatever the file holds. A pattern that matches nothing but an empty
 	# string -- a bare lookahead, say -- passes this, and is refused where it
 	# first matches one anywhere but at the start of a line.
-	die "read_table: the sep regex $sep_re matches an empty string; it must "
-	  . "match at least one character\n"
+	_usage_error('read_table', "the sep regex $sep_re matches an empty string; it must "
+	  . "match at least one character")
 		if $sep_re && '' =~ /\A(?:$sep_re)\z/;
 	# header => 0 is R's header = FALSE and pandas' header=None: the first line
 	# is data, and the columns are named by 'col_names' or, as R names them,
@@ -3352,17 +3504,17 @@ sub read_table {
 	# header => ($n > 0) must not be refused when it is false.
 	my $want_header = 1;
 	if (exists $args{header}) {
-		die "read_table: 'header' must be 0 or 1\n"
+		_usage_error('read_table', "'header' must be 0 or 1")
 			unless defined $args{header} && !ref $args{header}
 				&& $args{header} =~ /\A[01]?\z/;
 		$want_header = $args{header} ? 1 : 0;
 	}
 	my $col_names = $args{'col_names'};
 	if (defined $col_names) {
-		die "read_table: 'col_names' must be an ARRAY reference of names\n"
+		_usage_error('read_table', "'col_names' must be an ARRAY reference of names")
 			unless ref $col_names eq 'ARRAY' && @$col_names;
 		for my $n (@$col_names) {
-			die "read_table: 'col_names' may only hold defined, plain strings\n"
+			_usage_error('read_table', "'col_names' may only hold defined, plain strings")
 				if !defined $n || ref $n;
 		}
 	}
@@ -3371,7 +3523,7 @@ sub read_table {
 	# read.table would also take "'", which neither parser here knows.
 	my $quote = 1;
 	if (exists $args{quote}) {
-		die "read_table: 'quote' must be '\"' (the default) or '' (no quoting)\n"
+		_usage_error('read_table', "'quote' must be '\"' (the default) or '' (no quoting)")
 			unless defined $args{quote} && !ref $args{quote}
 				&& ($args{quote} eq '' || $args{quote} eq '"');
 		$quote = $args{quote} eq '"' ? 1 : 0;
@@ -3460,13 +3612,13 @@ sub read_table {
 	if (defined $filter && ref($filter) eq 'CODE') {
 		$filter = { 0 => $filter };
 	} elsif (defined $filter && ref($filter) ne 'HASH') {
-		die "'filter' must be a CODE or HASH reference\n";
+		_usage_error('read_table', "'filter' must be a CODE or HASH reference");
 	}
 	# The parser calls the subs itself (see $plan below), and it takes a code
 	# reference only. Asked up front, so a bad one is not first noticed on
 	# whichever row reaches it.
 	for my $k (sort keys %{ $filter || {} }) {
-		die "read_table: filter '$k' must be a CODE reference\n"
+		_usage_error('read_table', "filter '$k' must be a CODE reference")
 			unless (reftype($filter->{$k}) // '') eq 'CODE';
 	}
 
@@ -3485,17 +3637,17 @@ sub read_table {
 	my $cls_of = sub {
 		my ($c) = @_;
 		return 0 unless defined $c;
-		die "read_table: colClasses '$c' is not one read_table reads: it takes "
-		  . "'numeric' (or 'double' or 'real'), 'integer', 'character' or undef\n"
+		_usage_error('read_table', "colClasses '$c' is not one read_table reads: it takes "
+		  . "'numeric' (or 'double' or 'real'), 'integer', 'character' or undef")
 			unless exists $cls_code{$c};
 		return $cls_code{$c};
 	};
 	if (defined $cls_arg) {
 		my $r = ref $cls_arg;
-		die "read_table: 'colClasses' must be a string, an ARRAY reference or a "
-		  . "HASH reference\n" if $r && $r ne 'ARRAY' && $r ne 'HASH';
+		_usage_error('read_table', "'colClasses' must be a string, an ARRAY reference or a "
+		  . "HASH reference") if $r && $r ne 'ARRAY' && $r ne 'HASH';
 		$cls_of->($_) for $r eq 'ARRAY' ? @$cls_arg : $r eq 'HASH' ? values %$cls_arg : $cls_arg;
-		die "read_table: 'colClasses' is an empty list\n" if $r eq 'ARRAY' && !@$cls_arg;
+		_usage_error('read_table', "'colClasses' is an empty list") if $r eq 'ARRAY' && !@$cls_arg;
 	}
 	my @cls;	# per field of @header, once it is fixed: a %cls_code value
 
@@ -3518,12 +3670,12 @@ sub read_table {
 		my $ns = $args{'na_strings'};
 		my @ns = !defined($ns)       ? ()
 		       : ref($ns) eq 'ARRAY' ? @$ns
-		       : ref($ns)            ? die "read_table: 'na_strings' must be a "
+		       : ref($ns)            ? _usage_error('read_table', "'na_strings' must be a "
 		                                 . 'string or an ARRAY reference, not a '
-		                                 . ref($ns) . " reference\n"
+		                                 . ref($ns) . ' reference')
 		       :                       ($ns);
 		for my $s (@ns) {
-			die "read_table: 'na_strings' may not contain an undefined value\n"
+			_usage_error('read_table', "'na_strings' may not contain an undefined value")
 				unless defined $s;
 			$na_string{ _as_bytes($s) } = 1;
 		}
@@ -4095,7 +4247,7 @@ sub read_table {
 sub view {
 	my $data = shift;
 	if (not defined $data) {
-		die 'view received undefined data';
+		_usage_error('view', 'undefined data in first position');
 	}
 	my %args = @_;
 	# reject unknown arguments (mirrors read_table/write_table)
@@ -4104,14 +4256,14 @@ sub view {
 		to return_only row_names color colors
 	);
 	my @bad = sort grep { !$allowed{$_} } keys %args;
-	die "view: unknown argument(s): @bad\n" if @bad;
+	_usage_error('view', "unknown argument(s): @bad") if @bad;
 	# n / rows (synonyms); reject conflicting or non-integer values
-	die "view: pass either 'n' or 'rows', not both\n"
+	_usage_error('view', "pass either 'n' or 'rows', not both")
 		if exists $args{n} && exists $args{rows};
 	my $n = exists $args{rows} ? $args{rows}
 		  : exists $args{n}    ? $args{n}
 		  :                      6;
-	die "view: 'n'/'rows' must be a non-negative integer\n"
+	_usage_error('view', "'n'/'rows' must be a non-negative integer")
 		unless defined $n && $n =~ /^\d+$/;
 	my $na    = exists $args{na}        ? $args{na}       : 'undef';
 	my $maxw  = exists $args{max_width} ? $args{max_width} : 80;
@@ -4126,12 +4278,12 @@ sub view {
 		   : (defined $ENV{COLUMNS} && $ENV{COLUMNS} =~ /^[1-9][0-9]*\z/)
 			 ? $ENV{COLUMNS}
 			 : 80;
-	die "view: 'width' must be a positive integer\n"
+	_usage_error('view', "'width' must be a positive integer")
 		unless defined $tw && $tw =~ /^[1-9][0-9]*\z/;
 	my $label_col = $args{row_names};
 	my $rt = ref $data;
-	die "view: expected an ARRAY (AoH) or HASH (HoA/HoH) reference, got "
-	  . ($rt || 'a non-reference') . "\n"
+	_usage_error('view', 'expected an ARRAY (AoH) or HASH (HoA/HoH) reference, got '
+	  . ($rt || 'a non-reference'))
 	  unless $rt eq 'ARRAY' or $rt eq 'HASH';
 	my ($kind, @cols, @labels, @raw, $total, $lab_header);
 	if ($rt eq 'ARRAY') {
@@ -4515,20 +4667,24 @@ sub _render_grid {
 # scale otherwise).  Per-level means are observed marginal means, which
 # match R's model.tables means for one-way (and balanced) designs.
 sub TukeyHSD {
+	_usage_error('TukeyHSD', 'first argument must be a fitted-model hashref (from aov/lm/glm)')
+		unless ref($_[0]) eq 'HASH';
+	# checked before %opt is filled, which an odd list would make perl's own
+	# "Odd number of elements" die under FATAL warnings
+	_usage_error('TukeyHSD', 'arguments after the fit must be name => value pairs')
+		unless @_ % 2;
 	my ($fit, %opt) = @_;
-	die 'TukeyHSD: first argument must be a fitted-model hashref (from aov/lm/glm)'
-		unless ref($fit) eq 'HASH';
 	my %known = map { $_ => 1 } qw(conf_level data formula ordered response which);
 	my @bad = sort grep { !$known{$_} } keys %opt;
-	die "TukeyHSD: unknown argument(s): @bad\n" if @bad;
+	_usage_error('TukeyHSD', "unknown argument(s): @bad") if @bad;
 
 	my $conf = exists $opt{conf_level} ? $opt{conf_level} : 0.95;
-	die 'TukeyHSD: conf_level must be between 0 and 1'
+	_usage_error('TukeyHSD', 'conf_level must be between 0 and 1')
 		unless $conf > 0 && $conf < 1;
 	my $ordered = $opt{ordered} ? 1 : 0;
 
 	my $data = $opt{data}
-		or die "TukeyHSD: 'data' (the data frame used to fit the model) is required";
+		or _usage_error('TukeyHSD', "'data' (the data frame used to fit the model) is required");
 
 	# residual mean square (MSE) and residual d.f., per model type
 	my ($mse, $df);
@@ -4584,7 +4740,7 @@ sub TukeyHSD {
 	if (!defined($resp) && defined $opt{formula}) {
 		($resp) = $opt{formula} =~ /\A\s*([^~]+?)\s*~/;
 	}
-	die "TukeyHSD: need the response variable; pass response => 'name' or formula => 'y ~ ...'"
+	_usage_error('TukeyHSD', "need the response variable; pass response => 'name' or formula => 'y ~ ...'")
 		unless defined($resp) && length $resp;
 
 	# factors present in the model (idx 0 of each xlevels entry = reference)
@@ -4601,7 +4757,7 @@ sub TukeyHSD {
 		if (exists $xl->{$f}) { push @factors, $f }
 		else { warn "TukeyHSD: '$f' is not a factor in the model and will be dropped\n" }
 	}
-	die "TukeyHSD: 'which' specified no factors" unless @factors;
+	_usage_error('TukeyHSD', "'which' specified no factors") unless @factors;
 
 	my $y = _tukey_col($data, $resp);
 
@@ -4794,15 +4950,15 @@ sub _sort_group_keys {
 # within each block.  The original frame is never modified.
 sub melt {
 	my $df = shift;
-	die 'melt: undefined data in first position' unless defined $df;
+	_usage_error('melt', 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, 'melt');
-	die "melt: arguments after the data frame must be name => value pairs\n"
+	_usage_error('melt', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 	my %known = ( id_vars => 1, value_vars => 1, var_name => 1,
 	              value_name => 1, 'output_type' => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "melt: unknown argument(s): @bad\n" if @bad;
+	_usage_error('melt', "unknown argument(s): @bad") if @bad;
 
 	my @id = !defined $arg{id_vars}        ? ()
 	       : ref $arg{id_vars} eq 'ARRAY'  ? @{ $arg{id_vars} }
@@ -4811,7 +4967,7 @@ sub melt {
 	my $value_name = defined $arg{value_name} ? $arg{value_name} : 'value';
 	my $otype = defined $arg{'output_type'} ? lc $arg{'output_type'} : lc $shape;
 	my %ok_otype = ( aoa => 1, aoh => 1, hoa => 1, hoh => 1 );
-	die "melt: output_type '$otype' isn't allowed (aoa, aoh, hoa, hoh)\n"
+	_usage_error('melt', "output_type '$otype' isn't allowed (aoa, aoh, hoa, hoh)")
 		unless $ok_otype{$otype};
 
 	my @universe = colnames($df);
@@ -4824,7 +4980,7 @@ sub melt {
 		die "melt: column '$c' not found\n" unless $uni{$c};
 	}
 	# name hygiene: the emitted variable/value columns must not collide
-	die "melt: var_name and value_name must differ\n"
+	_usage_error('melt', 'var_name and value_name must differ')
 		if $var_name eq $value_name;
 	if ($otype ne 'aoa') {
 		for my $c (@id) {
@@ -4913,23 +5069,23 @@ sub melt {
 # The original frame is never modified.
 sub pivot_table {
 	my $df = shift;
-	die 'pivot_table: undefined data in first position' unless defined $df;
+	_usage_error('pivot_table', 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, 'pivot_table');
-	die "pivot_table: arguments after the data frame must be name => value pairs\n"
+	_usage_error('pivot_table', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 	my %known = ( index => 1, columns => 1, values => 1, aggfunc => 1,
 	              fill_value => 1, skipna => 1, sort => 1, sep => 1,
 	              'output_type' => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "pivot_table: unknown argument(s): @bad\n" if @bad;
-	die "pivot_table: 'columns' is required\n" unless defined $arg{columns};
+	_usage_error('pivot_table', "unknown argument(s): @bad") if @bad;
+	_usage_error('pivot_table', "'columns' is required") unless defined $arg{columns};
 
 	my @index   = !defined $arg{index}       ? ()
 	            : ref $arg{index} eq 'ARRAY'  ? @{ $arg{index} }
 	            :                               ( $arg{index} );
 	my @columns = ref $arg{columns} eq 'ARRAY' ? @{ $arg{columns} } : ( $arg{columns} );
-	die "pivot_table: 'columns' must name at least one column\n" unless @columns;
+	_usage_error('pivot_table', "'columns' must name at least one column") unless @columns;
 
 	my $sep      = defined $arg{sep} ? $arg{sep} : '.';
 	my $skipna   = exists $arg{skipna} ? ($arg{skipna} ? 1 : 0) : 1;
@@ -4938,17 +5094,17 @@ sub pivot_table {
 	my $fill     = $arg{fill_value};
 	my $otype    = defined $arg{'output_type'} ? lc $arg{'output_type'} : lc $shape;
 	my %ok_otype = ( aoa => 1, aoh => 1, hoa => 1, hoh => 1 );
-	die "pivot_table: output_type '$otype' isn't allowed (aoa, aoh, hoa, hoh)\n"
+	_usage_error('pivot_table', "output_type '$otype' isn't allowed (aoa, aoh, hoa, hoh)")
 		unless $ok_otype{$otype};
 
 	my $af = exists $arg{aggfunc} ? $arg{aggfunc} : 'mean';
 	my @funcs = ref $af eq 'ARRAY' ? @$af : ( $af );
-	die "pivot_table: empty aggfunc list\n" unless @funcs;
+	_usage_error('pivot_table', 'empty aggfunc list') unless @funcs;
 	my %known_agg = map { $_ => 1 }
 		qw(mean median sum sd var min max count n nunique first last mode);
 	for my $f (@funcs) {
 		next if ref $f eq 'CODE';
-		die "pivot_table: unknown aggfunc '$f'\n" unless $known_agg{$f};
+		_usage_error('pivot_table', "unknown aggfunc '$f'") unless $known_agg{$f};
 	}
 
 	my @universe = colnames($df);
@@ -5070,19 +5226,19 @@ sub pivot_table {
 # a NEW frame (rows/columns rebuilt as needed); the original is never modified.
 sub fillna {
 	my $df = shift;
-	die 'fillna: undefined data in first position' unless defined $df;
+	_usage_error('fillna', 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, 'fillna');
-	die "fillna: arguments after the data frame must be name => value pairs\n"
+	_usage_error('fillna', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 	my %known = ( value => 1, cols => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "fillna: unknown argument(s): @bad\n" if @bad;
-	die "fillna: a 'value' is required\n" unless exists $arg{value};
+	_usage_error('fillna', "unknown argument(s): @bad") if @bad;
+	_usage_error('fillna', "a 'value' is required") unless exists $arg{value};
 
 	my $value   = $arg{value};
 	my $per_col = ref $value eq 'HASH';
-	die "fillna: 'cols' cannot be combined with a per-column 'value' hashref\n"
+	_usage_error('fillna', "'cols' cannot be combined with a per-column 'value' hashref")
 		if $per_col && exists $arg{cols};
 
 	my @universe = colnames($df);
@@ -5095,7 +5251,7 @@ sub fillna {
 	} else {
 		$scalar_fill = $value;
 		if (exists $arg{cols}) {
-			die "fillna: 'cols' must be an arrayref\n"
+			_usage_error('fillna', "'cols' must be an arrayref")
 				unless ref $arg{cols} eq 'ARRAY';
 			for my $c (@{ $arg{cols} }) {
 				die "fillna: column '$c' not found\n" unless $uni{$c};
@@ -5191,17 +5347,17 @@ sub _impute_prop {
 	my $df   = shift;
 	my $name = shift;
 	my $dir  = shift;
-	die "$name: undefined data in first position" unless defined $df;
+	_usage_error($name, 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, $name);
-	die "$name: arguments after the data frame must be name => value pairs\n"
+	_usage_error($name, 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 	my %known = ( cols => 1, limit => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "$name: unknown argument(s): @bad\n" if @bad;
+	_usage_error($name, "unknown argument(s): @bad") if @bad;
 
 	my $limit = $arg{limit};
-	die "$name: 'limit' must be a positive integer\n"
+	_usage_error($name, "'limit' must be a positive integer")
 		if defined $limit
 		&& ( !looks_like_number($limit) || $limit < 1 || $limit != int $limit );
 
@@ -5209,7 +5365,7 @@ sub _impute_prop {
 	my %uni = map { $_ => 1 } @universe;
 	my @targets;
 	if (exists $arg{cols}) {
-		die "$name: 'cols' must be an arrayref\n" unless ref $arg{cols} eq 'ARRAY';
+		_usage_error($name, "'cols' must be an arrayref") unless ref $arg{cols} eq 'ARRAY';
 		for my $c (@{ $arg{cols} }) {
 			die "$name: column '$c' not found\n" unless $uni{$c};
 		}
@@ -5316,37 +5472,37 @@ sub bfill { _impute_prop( shift, 'bfill', -1, @_ ) }
 # each column's existing length only; a non-ref row is passed through untouched.
 sub interpolate {
 	my $df = shift;
-	die "interpolate: undefined data in first position" unless defined $df;
+	_usage_error('interpolate', 'undefined data in first position') unless defined $df;
 	my $shape = _df_shape($df, 'interpolate');
-	die "interpolate: arguments after the data frame must be name => value pairs\n"
+	_usage_error('interpolate', 'arguments after the data frame must be name => value pairs')
 		if @_ % 2;
 	my %arg = @_;
 	my %known = ( cols => 1, limit => 1, limit_direction => 1,
 	              limit_area => 1, method => 1, order => 1, x => 1 );
 	my @bad = sort grep { !$known{$_} } keys %arg;
-	die "interpolate: unknown argument(s): @bad\n" if @bad;
+	_usage_error('interpolate', "unknown argument(s): @bad") if @bad;
 
 	my %known_method = map { $_ => 1 } qw(
 		linear index values time slinear nearest zero pad ffill bfill backfill
 		quadratic cubic cubicspline pchip akima barycentric krogh polynomial spline );
 	my $method = defined $arg{method} ? lc $arg{method} : 'linear';
-	die "interpolate: unknown method '$method'\n" unless $known_method{$method};
+	_usage_error('interpolate', "unknown method '$method'") unless $known_method{$method};
 
 	my $order = $arg{order};
 	if ($method eq 'polynomial' || $method eq 'spline') {
-		die "interpolate: method '$method' requires an integer 'order' >= 1\n"
+		_usage_error('interpolate', "method '$method' requires an integer 'order' >= 1")
 			unless defined $order && looks_like_number($order)
 			    && $order >= 1 && $order == int $order;
 	}
 
 	my $limit = $arg{limit};
-	die "interpolate: 'limit' must be a positive integer\n"
+	_usage_error('interpolate', "'limit' must be a positive integer")
 		if defined $limit
 		&& ( !looks_like_number($limit) || $limit < 1 || $limit != int $limit );
 
 	my $dir = defined $arg{limit_direction} ? lc $arg{limit_direction} : 'forward';
 	my %okdir = ( forward => 1, backward => 1, both => 1 );
-	die "interpolate: 'limit_direction' must be 'forward', 'backward', or 'both'\n"
+	_usage_error('interpolate', "'limit_direction' must be 'forward', 'backward', or 'both'")
 		unless $okdir{$dir};
 	# the directional-hold methods pin their own direction
 	$dir = 'forward'  if $method eq 'pad'   || $method eq 'ffill';
@@ -5355,7 +5511,7 @@ sub interpolate {
 	my $area;
 	if (defined $arg{limit_area}) {
 		$area = lc $arg{limit_area};
-		die "interpolate: 'limit_area' must be 'inside' or 'outside'\n"
+		_usage_error('interpolate', "'limit_area' must be 'inside' or 'outside'")
 			unless $area eq 'inside' || $area eq 'outside';
 	}
 
@@ -5363,7 +5519,7 @@ sub interpolate {
 	my %uni = map { $_ => 1 } @universe;
 	my @targets;
 	if (exists $arg{cols}) {
-		die "interpolate: 'cols' must be an arrayref\n" unless ref $arg{cols} eq 'ARRAY';
+		_usage_error('interpolate', "'cols' must be an arrayref") unless ref $arg{cols} eq 'ARRAY';
 		for my $c (@{ $arg{cols} }) {
 			die "interpolate: column '$c' not found\n" unless $uni{$c};
 		}
@@ -5566,7 +5722,7 @@ sub table_one {
 	my ($df, %opt) = @_;
 	my %known = map { $_ => 1 } qw(by vars types nonparametric digits pct_digits);
 	my @bad = sort grep { !$known{$_} } keys %opt;
-	die "table_one: unknown argument(s): @bad\n" if @bad;
+	_usage_error('table_one', "unknown argument(s): @bad") if @bad;
 
 	my $by     = $opt{by};
 	my $digits = defined $opt{digits}     ? $opt{digits}     : 2;
@@ -5577,8 +5733,8 @@ sub table_one {
 	# or types => { age => 'numeric' } made a row of every distinct age
 	for my $v (sort keys %types) {
 		my $t = $types{$v};
-		die "table_one: the type of '$v' must be 'continuous' or 'categorical', not '"
-		  . (defined $t ? $t : 'undef') . "'\n"
+		_usage_error('table_one', "the type of '$v' must be 'continuous' or 'categorical', not '"
+		  . (defined $t ? $t : 'undef') . "'")
 			unless defined $t && ($t eq 'continuous' || $t eq 'categorical');
 	}
 
@@ -5724,7 +5880,7 @@ sub table_one {
 # _num_pair(\@x, \@y, $who) -> (\@xn, \@yn): defined, numeric values only.
 sub _num_pair {
 	my ($x, $y, $who) = @_;
-	die "$who: first two arguments must be array references\n"
+	_usage_error($who, 'first two arguments must be array references')
 		unless ref $x eq 'ARRAY' && ref $y eq 'ARRAY';
 	my @xn = grep { defined && looks_like_number($_) } @$x;
 	my @yn = grep { defined && looks_like_number($_) } @$y;
@@ -5751,14 +5907,18 @@ sub _num_pair {
 # with df = n1 + n2 - 2.  effectsize 1.0.3 uses the exact gamma ratio; the two
 # differ by 4e-5 relative at df = 30 and by 3e-6 at df = 100.
 sub cohen_d {
-	my ($x, $y, %opt) = @_;
+	my ($x, $y, @rest) = @_;
+	_usage_error('cohen_d', 'arguments after the two groups must be name => value pairs')
+		if @rest % 2;
+	_opt_names_defined('cohen_d', @rest);
+	my %opt = @rest;
 	my @bad = sort grep { $_ ne 'conf_level' && $_ ne 'ci_method' } keys %opt;
-	die "cohen_d: unknown argument(s): @bad\n" if @bad;
+	_usage_error('cohen_d', "unknown argument(s): @bad") if @bad;
 	my $cl = defined $opt{conf_level} ? $opt{conf_level} : 0.95;
-	die "cohen_d: conf_level must be between 0 and 1\n"
+	_usage_error('cohen_d', 'conf_level must be between 0 and 1')
 		unless looks_like_number($cl) && $cl > 0 && $cl < 1;
 	my $method = defined $opt{ci_method} ? $opt{ci_method} : 'nct';
-	die "cohen_d: ci_method must be 'nct' or 'normal'\n"
+	_usage_error('cohen_d', "ci_method must be 'nct' or 'normal'")
 		unless $method eq 'nct' || $method eq 'normal';
 	my ($xn, $yn) = _num_pair($x, $y, 'cohen_d');
 	my ($n1, $n2) = (scalar @$xn, scalar @$yn);
@@ -5847,7 +6007,7 @@ sub cramers_v {
 	} elsif (ref $args[0] eq 'ARRAY' && ref $args[1] eq 'ARRAY') {
 		($tab) = _xtab($args[0], $args[1]);
 	} else {
-		die "cramers_v: expected a count table or two parallel vectors\n";
+		_usage_error('cramers_v', 'expected a count table or two parallel vectors');
 	}
 	my $r = scalar @$tab;
 	die "cramers_v: table needs at least two rows and columns\n" if $r < 2;
@@ -5933,7 +6093,7 @@ sub eta_squared {
 			? oneway_test(\%by, var_equal => 1)
 			: aov(\%by);
 	} else {
-		die "eta_squared: expected an aov() result or (\\\@values, \\\@groups)\n";
+		_usage_error('eta_squared', 'expected an aov() result or (\@values, \@groups)');
 	}
 	my $resid = $aov_res->{Residuals}
 		or die "eta_squared: not an ANOVA result (no Residuals term)\n";
@@ -6043,14 +6203,14 @@ sub _chol_det {
 # did not take its rows out, where car's model has none of them.
 sub vif {
 	my ($data, $spec) = @_;
-	die "vif: first argument must be a data reference\n" unless ref $data;
+	_usage_error('vif', 'first argument must be a data reference') unless ref $data;
 	my $formula;
 	if (ref $spec eq 'ARRAY') {
 		$formula = '~ ' . join(' + ', @$spec);
 	} elsif (defined $spec && !ref $spec && $spec =~ /~/) {
 		$formula = $spec;
 	} else {
-		die "vif: expected a formula string or an array ref of predictors\n";
+		_usage_error('vif', 'expected a formula string or an array ref of predictors');
 	}
 	# the XS croaks from this line, so its messages would name a line of this
 	# file; vif()'s own messages carry no location, and neither do these
@@ -6138,13 +6298,18 @@ sub vif {
 #    every bin: at g = 49 the package's own example bins 499 of 500 rows and,
 #    counting the NA as a group, reports df 48.
 sub hosmer_lemeshow {
-	my ($obs, $pred, %opt) = @_;
-	die "hosmer_lemeshow: observed and predicted must be array references\n"
+	my ($obs, $pred, @opt) = @_;
+	_usage_error('hosmer_lemeshow', 'observed and predicted must be array references')
 		unless ref $obs eq 'ARRAY' && ref $pred eq 'ARRAY';
+	# checked before the hash is built, which an odd list makes die with perl's
+	# own "Odd number of elements" instead
+	_usage_error('hosmer_lemeshow', 'options after the two arrays must be name => value pairs')
+		if @opt % 2;
+	my %opt = @opt;
 	die "hosmer_lemeshow: observed and predicted must have the same length\n"
 		unless @$obs == @$pred;
 	my $g = defined $opt{g} ? $opt{g} : 10;
-	die "hosmer_lemeshow: g must be an integer of at least 3\n"
+	_usage_error('hosmer_lemeshow', 'g must be an integer of at least 3')
 		unless looks_like_number($g) && $g == int $g && $g >= 3;
 
 	my (@y, @p);
@@ -6252,23 +6417,23 @@ sub _qgamma {
 sub age_standardize {
 	my @a = @_;
 	my (%opt, $count, $pop, $stdpop, $rate);
-	if (ref $a[0] eq 'ARRAY') {
-		($count, $pop, $stdpop) = (shift @a, shift @a, shift @a);
-		%opt = @a;
-	} else {
-		%opt = @a;
-		($count, $pop, $stdpop, $rate) = @opt{qw(count pop stdpop rate)};
-	}
+	my $positional = ref $a[0] eq 'ARRAY';	# else every argument is named
+	($count, $pop, $stdpop) = splice(@a, 0, 3) if $positional;
+	_usage_error('age_standardize', 'arguments must be name => value pairs, after any '
+	  . 'positional count, pop and stdpop') if @a % 2;
+	_opt_names_defined('age_standardize', @a);
+	%opt = @a;
+	($count, $pop, $stdpop, $rate) = @opt{qw(count pop stdpop rate)} unless $positional;
 	my %known = map { $_ => 1 } qw(count pop stdpop rate per conf_level);
 	my @bad = sort grep { !$known{$_} } keys %opt;
-	die "age_standardize: unknown argument(s): @bad\n" if @bad;
+	_usage_error('age_standardize', "unknown argument(s): @bad") if @bad;
 	$rate ||= $opt{rate};
 	my $cl  = defined $opt{conf_level} ? $opt{conf_level} : 0.95;
 	my $per = defined $opt{per} ? $opt{per} : 1;
-	die "age_standardize: conf_level must be between 0 and 1\n" unless $cl > 0 && $cl < 1;
-	die "age_standardize: 'pop' and 'stdpop' array refs are required\n"
+	_usage_error('age_standardize', 'conf_level must be between 0 and 1') unless $cl > 0 && $cl < 1;
+	_usage_error('age_standardize', "'pop' and 'stdpop' array refs are required")
 		unless ref $pop eq 'ARRAY' && ref $stdpop eq 'ARRAY';
-	die "age_standardize: supply either 'count' or 'rate'\n"
+	_usage_error('age_standardize', "supply either 'count' or 'rate'")
 		unless ref $count eq 'ARRAY' || ref $rate eq 'ARRAY';
 
 	my $k = scalar @$pop;
@@ -6353,12 +6518,12 @@ sub _is_fit {
 sub _anova_fits {
 	my @m;
 	push @m, shift while @_ && _is_fit($_[0]);
-	die "anova: options after the models must be name => value pairs\n" if @_ % 2;
+	_usage_error('anova', 'options after the models must be name => value pairs') if @_ % 2;
 	my %opt = @_;
-	for (keys %opt) {
-		die "anova: unknown argument '$_'\n" unless /^(?:test|dispersion)$/;
+	for (sort keys %opt) {
+		_usage_error('anova', "unknown argument '$_'") unless /^(?:test|dispersion)$/;
 	}
-	die "anova: give at least two fitted models to compare\n" if @m < 2;
+	_usage_error('anova', 'give at least two fitted models to compare') if @m < 2;
 	my $is_glm = exists $m[0]{family};
 	for (@m) {
 		die "anova: cannot compare lm() and glm() fits in one table\n"
@@ -6422,7 +6587,7 @@ sub _anova_fits {
 			     : "anova: using F test with a fixed dispersion is inappropriate\n");
 		}
 	}
-	die "anova: test must be 'F', 'Chisq' or 'LRT'\n" unless $test =~ /^(?:F|Chisq|LRT)$/;
+	_usage_error('anova', "test must be 'F', 'Chisq' or 'LRT'") unless $test =~ /^(?:F|Chisq|LRT)$/;
 	my @rows;
 	for my $i (0 .. $#m) {
 		my %r = $is_glm ? ('Resid. Df' => $resdf[$i], 'Resid. Dev' => $resdev[$i])
@@ -6720,7 +6885,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3218
+version 0.3413
 
 =head1 Synopsis
 
@@ -7512,108 +7677,6 @@ other fits identically.
 Comparing nested models -- C<anova(m1, m2)> in R -- is done by giving C<anova>
 two or more formulas, or two or more fitted models; see above.
 
-=head2 aoh2h
-
-Fold a two-column B<array-of-hashes> back down into a plain hash. This is the
-reverse of L<C<h2aoh>|/"h2aoh">, and the two are exact opposites under their
-defaults.
-
- my $h = aoh2h($aoh);
- my $h = aoh2h($aoh, var_name => 'gene', value_name => 'n');
-
-One column supplies the keys, the other the values; every other column in the
-row is ignored. R spells this C<tibble::deframe()>; pandas spells it
-C<df.set_index('k')['v'].to_dict()>.
-
-=head3 Arguments
-
-C<$aoh> — an array ref of hash refs. Required. Every row has to be a hash ref
-carrying both named columns. A blessed array or row is fine, and so is a tied
-one.
-
-Everything after it is C<< name =E<gt> value >> pairs:
-
-=for html <table>
-<thead>
-<tr>
-  <th>Option</th>
-  <th>Default</th>
-  <th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td><code>var_name</code></td>
-  <td><code>variable</code></td>
-  <td>The column holding the keys.</td>
-</tr>
-<tr>
-  <td><code>value_name</code></td>
-  <td><code>value</code></td>
-  <td>The column holding the values.</td>
-</tr>
-<tr>
-  <td><code>duplicates</code></td>
-  <td><code>die</code></td>
-  <td>What to do when two rows carry the same key: <code>die</code> is fatal, <code>first</code> keeps the earliest row, <code>last</code> keeps the latest.</td>
-</tr>
-</tbody>
-</table>
-
-C<var_name> and C<value_name> must differ.
-
-=head3 Returns
-
-A hash ref mapping each row's C<var_name> cell to its C<value_name> cell. An
-empty array ref gives back C<{}>.
-
-A key is the string Perl makes of the key cell, so the number C<2.50> becomes
-the key C<2.5>. A key cell that holds a reference is an error, because its
-string is the reference's address. An object that overloads its operators is
-keyed by its string form, and a compiled pattern (C<qr//>) by its pattern.
-
-Values are copied across, so a value that is itself a reference is shared with
-the input rather than cloned — the same shallow copy C<aoh2hoa> makes. The input
-is not changed.
-
-=head3 Example
-
- my $aoh = [
-     { gene => 'TP53',  n => 12 },
-     { gene => 'BRCA1', n =>  7 },
- ];
- my $h = aoh2h($aoh, var_name => 'gene', value_name => 'n');
- # { TP53 => 12, BRCA1 => 7 }
-
- # keep the last of a repeated key instead of dying
- my $last = aoh2h([ { variable => 'a', value => 1 },
-                    { variable => 'a', value => 9 } ], duplicates => 'last');
- # { a => 9 }
-
-=head3 Round trip
-
- is_deeply( aoh2h( h2aoh(\%h) ), \%h );   # true for any flat hash
-
-The one thing that does not survive the trip is the I<type> of a key: Perl hash
-keys are strings, so a numeric key comes back as the string that prints the
-same way.
-
-=head3 Errors
-
-C<aoh2h> dies when the first argument is undefined or not an array ref, when the
-options are not C<< name =E<gt> value >> pairs, when an option name is C<undef> or
-unknown, when C<var_name> equals C<value_name>, when C<duplicates> is not one of
-the three allowed words, when a row is not a hash ref, when a row is missing
-either named column, when a row's key cell is C<undef> or a reference, or —
-under the default C<< duplicates =E<gt> 'die' >> — when two rows share a key. Every
-message about a row names it by index; for a shared key, that is the index of
-the first repeat.
-
-=head3 See also
-
-L<C<h2aoh>|/"h2aoh"> is the reverse. L</"C<aoh2hoh>"> also indexes rows by a
-column, but keeps the whole row as the value instead of one cell.
-
 =head2 aoh2hoa
 
 C<aoh2hoa($aoh)> — transpose an B<array-of-hashes> (row-major) into a B<hash-of-arrays> (column-major).
@@ -7644,6 +7707,8 @@ Values are B<copied> (C<newSVsv>), so the returned structure is independent of t
 Keys are handled SV-first (C<hv_iterkeysv> / C<hv_fetch_ent>), so UTF-8 and otherwise non-trivial hash keys round-trip correctly.
 
 A row that is B<not> a hash ref is skipped rather than fatal: it contributes C<undef> to every column at its index. So a stray C<undef> or scalar in the input thins the columns at that position instead of dying.
+
+A tied array of rows, a tied row (such as a C<Tie::IxHash>) and a tied cell are read through their C<FETCH>, once per value.
 
 =head3 Notes
 
@@ -8436,6 +8501,12 @@ whether they do worse.
 You can also pass the counts as C<binom_test([6, 4])> — 6 right, 4 wrong — when
 you have wins and losses instead of wins and a total.
 
+Every count must be a whole number (to within 1e-7, as in R) that is not
+negative. C<NaN>, an infinity, C<undef> or a string croaks, as R's C<binom.test>
+stops on them. So does a count, or a successes + failures sum, of C<LONG_MAX>
+or more: 9223372036854775807 on most 64-bit systems, but 2147483647 on Windows
+and on 32-bit perls.
+
 =head2 cfilter
 
 Select B<columns> out of a table and return it in the same shape. A column is
@@ -8899,7 +8970,8 @@ the common OR), and C<k> (number of strata).
 As in R, the continuity correction of 0.5 is applied only when the observed
 count is at least 0.5 away from its expectation, and C<method> says whether it
 was ("with" or "without continuity correction"). A cell that is C<NaN> or
-infinite is a fatal error, as C<NA> is in R. Degenerate tables give what R
+infinite is a fatal error, as C<NA> is in R, and so is a stratum whose total is
+below 2 ("sample size in each stratum must be > 1"). Degenerate tables give what R
 gives: when every stratum has zero variance the statistic and p-value are
 C<NaN>, and when no stratum has off-diagonal counts the common odds ratio is
 C<Inf>.
@@ -9564,7 +9636,8 @@ Cox proportional-hazards regression: how covariates raise or lower the hazard
 (the risk of an event over time). It is the survival-analysis counterpart of
 L<C<glm>|/"glm"> and reports hazard ratios, like R's C<survival::coxph> (Efron ties).
 
-Give times, an event flag (1 = event, 0 = censored), and one or more covariates
+Give times, an event flag (1 = event, 0 = censored; or 2 = event, 1 = censored,
+as C<Surv()> reads a flag whose largest value is 2), and one or more covariates
 (a single C<\@x>, or C<[\@x1, \@x2, ...]>):
 
  use Stats::LikeR 'coxph';
@@ -9807,8 +9880,12 @@ Columns in an AoA are addressed by non-negative integer index:
 
 The result reuses the original row array-refs (a reorder, not a deep
 copy), so it is cheap and the caller's data is left untouched. A
-non-integer or negative index croaks; an index no row contains is
-reported as a missing column.
+non-integer or negative index croaks, and so does one too large to index
+an array (above 2*I<63 - 1, or 2>*31 - 1 on a 32-bit perl); an index no row
+contains is reported as a missing column.
+
+Rows that are tied arrays, and a tied column of a HoA, are read through
+their C<FETCH>.
 
 =head3 Undefined and missing values
 
@@ -9817,6 +9894,12 @@ row that lacks the key (AoH/HoH) or is shorter than the index (AoA); it
 is treated the same as an explicit C<undef>. Defined values are ordered
 first (ascending, or per the comparison type), undef/missing last, and
 undef rows keep their original relative order.
+
+In a numeric column a C<NaN> sorts last with them, in its original place
+among them, as R's C<order()> puts C<NaN> with C<NA>:
+C<< csort([{x=E<gt>3}, {x=E<gt>'NaN'}, {x=E<gt>1}, {x=E<gt>undef}, {x=E<gt>2}], 'x') >> gives the
+C<x> order 1, 2, 3, NaN, undef. In a column that is not all numbers,
+C<'NaN'> is a string like any other.
 
  my $rows = [
      [ 1, 5 ],
@@ -9847,6 +9930,12 @@ row is undef. Such rows go to the bottom.
 
 =item * A comparator that handles undef itself (e.g. C<< $a-E<gt>{v} // 0 >>) never trips
 the probe, so csort leaves its ordering completely alone.
+
+=item * A row the comparator cannot compare with itself -- it returns C<undef>,
+which is what C<< E<lt>=E<gt> >> returns when either side is C<NaN> -- goes to the end
+with the undef rows. So C<NaN> sorts last both ascending
+(C<< $a-E<gt>{v} E<lt>=E<gt> $b-E<gt>{v} >>) and descending (C<< $b-E<gt>{v} E<lt>=E<gt> $a-E<gt>{v} >>), as R's
+C<order()> puts it last with or without C<decreasing = TRUE>.
 
 =item * A comparator that dies for a real reason still propagates that error
 unchanged.
@@ -10127,6 +10216,288 @@ same C<eruptions> and C<precip> samples that test file uses. It is an author-onl
 script — it is not installed, and it needs C<Matplotlib::Simple>, C<python3> and
 C<matplotlib> — so re-run it only when a figure needs to change.
 
+=head2 df2h
+
+Fold two columns of a data frame — any of the four shapes — down into a plain
+hash: one column supplies the keys, the other the values, and every other
+column is ignored. This is the reverse of L<C<h2aoh>|/"h2aoh">, and the two are
+exact opposites under their defaults.
+
+ my $h = df2h($df);
+ my $h = df2h($df, var_name => 'gene', value_name => 'n');
+
+R spells this C<tibble::deframe()>; pandas spells it
+C<df.set_index('k')['v'].to_dict()>.
+
+C<aoh2h> is a true synonym (the same subroutine). It was the name up to 0.3218,
+when the function took an array of hashes alone, and it still works; its
+messages now begin C<df2h:>.
+
+=head3 Arguments
+
+C<$df> — a data frame. Required. A blessed frame or row is fine, and so is a tied
+one. The shape is read from the frame itself:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Shape</th>
+  <th>Looks like</th>
+  <th>A row is</th>
+  <th><code>var_name</code> / <code>value_name</code> are</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>AoH</td>
+  <td><code>[ { .. }, { .. } ]</code></td>
+  <td>a hash ref</td>
+  <td>column names</td>
+</tr>
+<tr>
+  <td>AoA</td>
+  <td><code>[ [ .. ], [ .. ] ]</code></td>
+  <td>an array ref</td>
+  <td>integer positions</td>
+</tr>
+<tr>
+  <td>HoA</td>
+  <td><code>{ c =&gt; [ .. ], .. }</code></td>
+  <td>element <i>i</i> of the two columns</td>
+  <td>column names</td>
+</tr>
+<tr>
+  <td>HoH</td>
+  <td><code>{ r =&gt; { .. }, .. }</code></td>
+  <td>a hash ref, named by its key</td>
+  <td>column names</td>
+</tr>
+</tbody>
+</table>
+
+An array is an AoA when its first defined element is an array ref, and an AoH
+otherwise. A hash is a HoH when its values are hash refs and a HoA when they are
+array refs; a hash holding both dies, and so does one holding neither, which is
+a flat hash already.
+
+Everything after the frame is C<< name =E<gt> value >> pairs:
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>var_name</code></td>
+  <td><code>variable</code>, or <code>0</code> for an AoA</td>
+  <td>The column holding the keys.</td>
+</tr>
+<tr>
+  <td><code>value_name</code></td>
+  <td><code>value</code>, or <code>1</code> for an AoA</td>
+  <td>The column holding the values.</td>
+</tr>
+<tr>
+  <td><code>duplicates</code></td>
+  <td><code>die</code></td>
+  <td>What to do when two rows carry the same key: <code>die</code> is fatal, <code>first</code> keeps the earliest row, <code>last</code> keeps the latest. A HoH takes <code>die</code> only.</td>
+</tr>
+</tbody>
+</table>
+
+C<var_name> and C<value_name> must differ.
+
+=head3 The shapes
+
+=over
+
+=item * B<AoH> — every row has to be a hash ref carrying both named columns.
+
+=item * B<AoA> — the two columns are positions. A negative one counts back from the
+end of each row, as C<< $row-E<gt>[-1] >> does, so C<< var_name =E<gt> -1 >> is every row's
+last cell however long the row is. Every row has to be an array ref long
+enough to hold both; a hole inside a row is an C<undef> cell. Should a
+negative and a positive position land on the same cell of some row, that
+row dies rather than map a cell to itself.
+
+=item * B<HoA> — both named columns have to be array refs of the same length, and
+row I<i> is element I<i> of each. A hole in a column is an C<undef> cell.
+
+=item * B<HoH> — every row has to be a hash ref carrying both named columns. The
+row names are not used. A HoH's rows have no order, so C<first> and C<last>
+would keep whichever row hash order happened to reach first, which changes
+from run to run; C<duplicates> therefore takes C<die> alone for a HoH. When a
+HoH has more than one bad row, the message names the first in sorted
+row-name order, so it is the same on every run.
+
+=back
+
+=head3 Returns
+
+A hash ref mapping each row's key cell to its value cell. An empty frame, C<[]>
+or C<{}>, gives back C<{}>.
+
+A key is the string Perl makes of the key cell, so the number C<2.50> becomes
+the key C<2.5>. A key cell that holds a reference is an error, because its
+string is the reference's address. An object that overloads its operators is
+keyed by its string form, and a compiled pattern (C<qr//>) by its pattern.
+
+Values are copied across, so a value that is itself a reference is shared with
+the input rather than cloned — the same shallow copy C<aoh2hoa> makes. The input
+is not changed.
+
+=head3 Example
+
+ my $aoh = [
+     { gene => 'TP53',  n => 12 },
+     { gene => 'BRCA1', n =>  7 },
+ ];
+ my $h = df2h($aoh, var_name => 'gene', value_name => 'n');
+ # { TP53 => 12, BRCA1 => 7 }
+
+ # the same table as each of the other shapes
+ df2h({ gene => [ 'TP53', 'BRCA1' ], n => [ 12, 7 ] },
+      var_name => 'gene', value_name => 'n');          # HoA
+ df2h([ [ 'TP53', 12 ], [ 'BRCA1', 7 ] ]);             # AoA, columns 0 and 1
+ df2h({ r1 => { gene => 'TP53',  n => 12 },
+        r2 => { gene => 'BRCA1', n =>  7 } },
+      var_name => 'gene', value_name => 'n');          # HoH
+ # each gives { TP53 => 12, BRCA1 => 7 }
+
+ # keep the last of a repeated key instead of dying
+ my $last = df2h([ { variable => 'a', value => 1 },
+                   { variable => 'a', value => 9 } ], duplicates => 'last');
+ # { a => 9 }
+
+=head3 Round trip
+
+ is_deeply( df2h( h2aoh(\%h) ), \%h );   # true for any flat hash
+
+The one thing that does not survive the trip is the I<type> of a key: Perl hash
+keys are strings, so a numeric key comes back as the string that prints the
+same way.
+
+=head3 Errors
+
+C<df2h> dies when the first argument is undefined or not an array or hash ref,
+when it is a hash that mixes array and hash values or holds neither, when the
+options are not C<< name =E<gt> value >> pairs, when an option name is C<undef> or
+unknown, when C<var_name> equals C<value_name>, when an AoA's column is not an
+integer, when C<duplicates> is not one of the three allowed words, or when it is
+C<first> or C<last> for a HoH.
+
+It also dies when a row is not the kind of reference its shape needs, when a
+row is missing either column, when a HoA lacks either column, when either is
+not an array ref, or when the two differ in length, when a row's key cell is
+C<undef> or a reference, or — under the default C<< duplicates =E<gt> 'die' >> — when two
+rows share a key. Every message about a row names it, by index or, in a HoH, by
+row name; for a shared key, that is the first repeat.
+
+=head3 See also
+
+L<C<h2aoh>|/"h2aoh"> is the reverse. L</"C<aoh2hoh>"> also indexes rows by a
+column, but keeps the whole row as the value instead of one cell.
+
+=head2 dftype
+
+Name the shape of a data structure, as a string. The four data frame shapes
+the rest of the module takes come back by their usual names, so C<dftype> is
+the way to ask which of them you have before handing it to a function that
+wants a particular one.
+
+ dftype([ [1, 2], [3, 4] ]);                # 'AoA'
+ dftype([ { a => 1 }, { a => 2 } ]);        # 'AoH'
+ dftype({ a => [1, 2], b => [3, 4] });      # 'HoA'
+ dftype({ r1 => { a => 1 }, r2 => { a => 2 } });   # 'HoH'
+ dftype([ 1, 2, 3 ]);                       # 'array'
+ dftype({ a => 1, b => 2 });                # 'hash'
+ dftype(42);                                # 'scalar'
+ dftype(undef);                             # 'undef'
+ dftype(\&mean);                            # 'CODE'
+
+It takes exactly one argument.
+
+=for html <table>
+<thead>
+<tr>
+  <th>Argument</th>
+  <th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>undef</code></td>
+  <td><code>undef</code> (the string)</td>
+</tr>
+<tr>
+  <td>anything else that is not a reference</td>
+  <td><code>scalar</code></td>
+</tr>
+<tr>
+  <td>an array ref whose defined elements are all array refs</td>
+  <td><code>AoA</code></td>
+</tr>
+<tr>
+  <td>an array ref whose defined elements are all hash refs</td>
+  <td><code>AoH</code></td>
+</tr>
+<tr>
+  <td>any other array ref</td>
+  <td><code>array</code></td>
+</tr>
+<tr>
+  <td>a hash ref whose defined values are all array refs</td>
+  <td><code>HoA</code></td>
+</tr>
+<tr>
+  <td>a hash ref whose defined values are all hash refs</td>
+  <td><code>HoH</code></td>
+</tr>
+<tr>
+  <td>any other hash ref</td>
+  <td><code>hash</code></td>
+</tr>
+<tr>
+  <td>a compiled pattern, <code>qr//</code></td>
+  <td><code>REGEXP</code></td>
+</tr>
+<tr>
+  <td>any other reference</td>
+  <td>its type as <code>ref</code> names an unblessed one: <code>SCALAR</code>, <code>REF</code>, <code>CODE</code>, <code>GLOB</code>, ...</td>
+</tr>
+</tbody>
+</table>
+
+Things worth knowing:
+
+=over
+
+=item * An C<undef> element or value is passed over, so C<< [ undef, { a =E<gt> 1 } ] >> is an
+C<AoH>. A container that has no defined element at all — C<[]>, C<{}>,
+C<[ undef ]> — is a plain C<array> or C<hash>, since nothing in it says which
+frame it would be.
+
+=item * One element of another kind is enough to make it plain: C<< [ [1], { a =E<gt> 1 } ] >>
+and C<[ [1], 2 ]> are both C<array>. Every element is checked, not only the
+first, up to the first one that does not fit.
+
+=item * Blessing is ignored: a blessed array or hash, and a blessed row inside one,
+counts as the container it is. A C<qr//> is C<REGEXP> on every perl,
+including 5.10, where C<Scalar::Util::reftype> calls it C<SCALAR>.
+
+=item * A tied array or hash is classified by what its elements fetch, each element at
+most once. A plain hash's C<each> iterator is left where it was. A tied
+hash's is not: the walk calls the tie class's C<FIRSTKEY>, which restarts it
+as C<keys> would.
+
+=item * Only the top two levels are looked at: C<[ [ [1] ] ]> is an C<AoA>.
+
+=back
+
 =head2 Distribution functions
 
 C<pnorm> and C<dnorm> have never had company: there was no way to ask for a
@@ -10230,6 +10601,18 @@ C<qchisq($p, 0)> is 0, or C<Inf> at C<$p = 1>. R's own C<tests/d-p-q-r-tst-2.R>
 pins those values; up to 0.3217 both functions returned C<NaN> there. A negative
 C<df> is still C<NaN>.
 
+C<< df =E<gt> Inf >> (perl's C<9**9**9>, or the string C<"Inf">) is the limit R gives it:
+C<pt($q, Inf)> is C<pnorm($q)> and C<qt($p, Inf)> is C<qnorm($p)>;
+C<pf($x, $df1, Inf)> is C<pchisq($x * $df1, $df1)>, C<pf($x, Inf, $df2)> the upper
+tail of C<pchisq($df2 / $x, $df2)>, and with both infinite I<F> is a step at 1
+(C<0.5> at 1 itself); C<qf> inverts each. Up to 0.33 none of this was handled:
+C<qt(0.975, Inf)> was C<3.1e-61> and C<pf(0.5, 3, Inf)> was C<1>. A finite but huge
+df is computed exactly rather than by R's C<< df E<gt> 4e5 >> approximation in C<qf>.
+
+C<pbinom>'s C<size> must be a whole number within R's own fuzz,
+C<1e-9 * max(1, |size|)>, and is then rounded, so C<pbinom(3, 10 + 1e-10, 0.5)>
+is R's C<0.171875>; up to 0.33 anything not exactly whole was C<NaN>.
+
 =head3 What each one does, in one picture
 
 The same identity read from two ends: a C<p*> function is given the boundary and
@@ -10299,8 +10682,10 @@ computes the requested side directly:
  pchisq(1e-30, 1);            # 7.978845608028654e-16, not 0
  pt(-75, 15);                 # 5.4e-21, from the lower tail itself
 
-C<qnorm>, C<qchisq> and C<qf> reflect a probability above C<0.5> onto C<1 - p>
-before inverting, for the same reason in the other direction — that keeps the
+Every C<q*> function inverts the I<smaller> of the two tails it is handed: a
+probability above C<0.5> is reflected onto C<1 - p>, and a log probability above
+C<log(1/2)> onto C<-expm1(log p)>, before inverting, for the same reason in the
+other direction — that keeps the
 root-finder comparing small numbers instead of numbers that agree to fifteen
 places. The reflection is free rather than a trade: for C<< p E<gt>= 0.5 >> the two
 operands of C<1 - p> lie within a factor of two of each other, so Sterbenz's
@@ -10404,42 +10789,62 @@ C<t/std_qnorm.mpmath.py> is the arbiter and prints that table, along with the
 frozen rows of the test it generates. Like the other generators it is committed
 next to its test and nothing in the suite calls it.
 
-=head3 Accuracy, and the one place C<log> is not R's
+=head3 Accuracy, C<log>, and where R is not the answer
 
-These are glue over routines the module already had — C<normal_quantile_hp>,
-C<pt_upper>/C<qt_tail>, the incomplete gamma and beta — whose series and
-continued fractions stop at a relative C<1e-15> on every build. So they are
-double-accurate on a long-double or C<__float128> perl too, rather than more
-accurate there, and they agree with R to about C<1e-14> relative.
+The incomplete gamma behind C<pchisq> and C<qchisq> is R's own (Morten Welinder's
+C<pgamma.c>), and the incomplete beta behind C<pt>, C<pf> and C<pbinom> switches
+to R's TOMS 708 algorithms once a shape reaches 1000. Both stay accurate in
+relative terms at any df: up to 0.33 C<pchisq(1e15, 1e15)> was C<0.379> where R
+and the truth are C<0.50000000594708>, C<pt(1.96, 1e15)> was C<0.97448> for
+C<0.97500>, and C<pf(1, 1e15, 1e15)> was C<0.481> for exactly C<0.5>. C<qchisq> is a
+Newton iteration from AS 91's starting value, so C<qchisq(0.5, 1e10)> takes about
+2 microseconds where it took 11 milliseconds. The constants are a double's, as
+R's are, so these agree with R to about C<1e-14> relative on a double,
+long-double and C<__float128> perl alike.
 
-Two things are deliberately not R:
+C<< log =E<gt> 1 >> is carried through in both directions, as in R:
 
 =over
 
-=item * B<< C<< log =E<gt> 1 >> on a C<p*> function returns C<log()> of the probability already
-computed >>, not a log carried through the series. A tail that underflowed
-to C<0> therefore logs to C<-Inf>, and a tail that rounded to C<1> logs to C<0>
-rather than to the tiny negative number R reports. R's C<pt>/C<pchisq>/C<pf>
-carry C<log_p> through and can do better; C<pnorm> here does too, because R's
-Cody algorithm was ported whole. The C<q*> functions take C<log_p> properly:
-the argument is exponentiated, which is exact, and lets you name quantiles
-the linear scale cannot — C<< qnorm(-800, log_p =E<gt> 1) >> is reachable where
-C<exp(-800)> is just C<0>.
+=item * B<< a C<p*> function computes the log of its tail >>, so a tail far below the
+smallest double still has one — C<< pt(-1e10, 30, log =E<gt> 1) >> is
+C<-642.385...> — and a tail a hair under 1 logs to the tiny negative number
+rather than to C<0>.
 
-=item * B<< C<qf> disagrees with R in the far tail of I<F>, and is right. >> At
-C<qf(2^-20, 1, 10)> R is 9.9e-4 away from the 60-digit value and this module
-is 1.0e-15 away; R's own C<pf> confirms it, inverting this module's answer to
-1.6e-15 and its own to 4.9e-4. Thirteen such rows are pinned in
-C<t/distributions.R.scipy.t> against mpmath at C<mp.dps = 60>, each asserted
+=item * B<< a C<q*> function takes a log probability without ever exponentiating what
+it cannot >>: C<< qnorm(-1e-20, log =E<gt> 1) >> is C<9.262340089798405> (it was C<Inf>,
+since C<exp(-1e-20)> is C<1>), and C<< qt(-1000, 5, log =E<gt> 1) >> is
+C<-1.1333163490175e+87> (it was C<-Inf>). Up to 0.33 this paragraph said the
+C<p*> functions returned C<log()> of the probability already computed, and the
+C<q*> functions exponentiated their argument.
+
+=back
+
+Where R is the weaker reference, the tests say so and pin the 60-digit value:
+
+=over
+
+=item * B<< C<qf> in the far tail of I<F>. >> At C<qf(2^-20, 1, 10)> R is 9.9e-4 away from
+the 60-digit value and this module is 1.0e-15 away; R's own C<pf> confirms
+it, inverting this module's answer to 1.6e-15 and its own to 4.9e-4. On the
+log scale R's C<qbeta> returns C<0> for roots it cannot reach:
+C<qf(-64, 1, 1, log.p = TRUE)> is C<0> in R and C<6.3466722361887e-56> here.
+These are pinned in C<t/distributions.R.scipy.t> and
+C<t/distributions.limits.R.t> against mpmath at C<mp.dps = 60>, each asserted
 both to be right I<and> to still disagree with R, so the divergence cannot
 quietly change.
+
+=item * B<< C<qt> on the log scale >>: C<qt(-700, 5, log.p = TRUE)> is 1.8e-9 off in R
+and 9e-15 here.
 
 =back
 
 Non-centrality (C<ncp>) is not implemented; nor is C<qbinom>. Everything is
 cross-validated in C<t/distributions.R.scipy.t> (2041 tests) against a frozen
 table of R 4.6.1 values, SciPy 1.18.0's own mpmath reference cases, and R's own
-round-trip identities from C<tests/d-p-q-r-tests.R>.
+round-trip identities from C<tests/d-p-q-r-tests.R>; and in
+C<t/distributions.limits.R.t> at infinite and enormous df and on the log scale,
+against R 4.6.1 and the extreme-tail checks of R's C<tests/d-p-q-r-tst-2.R>.
 
 =head2 dnorm
 
@@ -10458,6 +10863,10 @@ Usage:
 but default mean, standard deviation, and log can be passed as parameters:
 
  $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
+
+Where the density is 0 — C<x> infinite, C<< sd =E<gt> Inf >>, C<< sd =E<gt> 0 >> away from the
+mean — C<< log =E<gt> 1 >> gives C<-Inf>, as R does (up to 0.33 it gave C<0>). An C<undef>
+C<x>, or an C<undef> element, is C<NaN>.
 
 =head2 drop_cols
 
@@ -11146,13 +11555,19 @@ Any table of at least 2x2 counts is accepted, as either a 2D array reference or 
      [7, 2, 1],
  ]);
 
-For tables larger than 2x2 the p-value is computed by exact enumeration of
-every contingency table sharing the observed row and column margins (the
-multivariate hypergeometric distribution), and matches R's C<fisher.test> to
-full precision. Only the two-sided test is defined in this case, so
-C<alternative> is ignored and the returned hash reference omits C<conf_int> and
-C<estimate> (the conditional-MLE odds ratio and its confidence interval are
-reported for 2x2 tables only):
+For tables larger than 2x2 the p-value is the exact one: the sum of the
+multivariate hypergeometric probability of every contingency table that shares
+the observed row and column margins and is no more probable than the observed
+table. It is computed with Mehta & Patel's network algorithm, as R's
+C<fisher.test> does, and agrees with R to about 1e-12. On the tables where the
+two differ in the last digits, C<fisher_test> is the closer to the exact rational
+answer (within 1.4e-13 of it on every table checked), because R's FEXACT merges
+paths whose weights agree to 3.45e-7. A table counts as "as or more extreme"
+under FEXACT's own rule: its probability is at most the observed one times
+1 + 3.45e-7. Only the two-sided test is defined in this case, so C<alternative>
+is ignored and the returned hash reference omits C<conf_int> and C<estimate>
+(the conditional-MLE odds ratio and its confidence interval are reported for
+2x2 tables only):
 
  {
  alternative   "two.sided",
@@ -11166,18 +11581,31 @@ and columns by the sorted keys of the first row, so the result is deterministic;
 every row must expose the same set of column keys, and every row of an array
 input must have the same number of columns.
 
-Enumeration is exact but finite: a table whose margins put more completions in
-the way than can be walked is refused outright,
+The exact test is exact but finite. Every table R answers with its default
+C<workspace = 200000> is answered here, in comparable time or less (Mehta &
+Patel's 5x7 6th example takes 0.04 s), and so are many that R refuses, such as
+the 6x6 table of R's PR#18336, which R declines with C<< hash key 5e+09 E<gt> INT_MAX >>.
+A table that would need more than a few seconds of work, or more than about
+128 MB, is refused outright rather than answered with an approximation:
 
- fisher_test: 5x7 table is too large for exact enumeration
+ fisher_test: 4x3 table is too large for exact enumeration
 
-rather than answered with an approximation. Subtrees that lie wholly inside or
-wholly outside the tail are summed in closed form or dropped without being
-walked, which puts most tables of practical size well inside the limit --
-C<fisher_test> computes the 6x6 table of R's PR#18336, which R's own C<fisher.test>
-declines with C<< hash key 5e+09 E<gt> INT_MAX >> -- but R's network algorithm (FEXACT)
-still reaches tables this one cannot, such as the 5x7 6th example of Mehta &
-Patel. For those, use C<chisq_test>, or R.
+For those, use C<chisq_test>, or R's C<simulate.p.value>.
+
+=head3 Counts
+
+Cells are read as R's C<fisher.test> reads them. A negative, C<NaN> or infinite
+cell, an C<undef> or a string croaks, as does a count past R's
+C<.Machine$integer.max> (2147483647). A count that is not a whole number is
+rounded to the nearest one (halves to even, as R's C<round()> does) with R's
+warning:
+
+ fisher_test: 'x' has been rounded to integer: Mean relative difference: 0.1111111
+
+An all-zero 2x2 table gives p = 1, an odds ratio of 0 and a confidence interval
+of [0, Inf], as R does. An all-zero larger table croaks, as R's does
+("FEXACT error 3"). Where a C C<long> is 32 bits (Windows, 32-bit perls), a
+table whose total passes 2147483647 croaks, where R would still answer it.
 
 =head2 friedman_test
 
@@ -11716,7 +12144,9 @@ Each is called the same way:
  group_by($aoh_data, 'Testosterone, total (nmol/L)', 'Gender');
 
 and each returns a hash of arrays. A row whose value is missing or C<undef> is
-left out, so the second Female row contributes nothing. C<$aoh_data> gives
+left out, so the second Female row contributes nothing. So is a row whose
+group is missing or C<undef>, as R's C<split()> drops an C<NA> level: it is not
+pooled with a group named C<"">, and it does not warn. C<$aoh_data> gives
 
  {
      Female   [
@@ -11945,7 +12375,7 @@ only other option, and it is never what anyone wanted.
 
 =head3 See also
 
-L<C<aoh2h>|/"aoh2h"> is the reverse. L<C<melt>|/"melt"> does the same folding-out for
+L<C<df2h>|/"df2h"> is the reverse. L<C<melt>|/"melt"> does the same folding-out for
 a frame that already has more than two columns.
 
 =head2 hoa2aoh
@@ -12353,6 +12783,12 @@ C<theta_zero>/C<SE_logtheta_zero> for a C<negbin> zero part; and C<fitted_values
 the fitted mean C<< P(y E<gt> 0) mu / (1 - f(0)) >>. Validated against C<pscl> and
 C<countreg> on their documented examples, with a third opinion from C<mpmath>.
 
+When either part's counts are no more dispersed than a Poisson's, its
+negative-binomial likelihood rises all the way to C<theta = Inf>: that part is
+then the Poisson (or, for the zero part, complementary log-log) fit, and
+C<theta> (or C<theta_zero>) and its C<SE_logtheta> are reported as C<Inf>, as in
+L<C<zerotrunc>|/"zerotrunc">.
+
 =head2 interpolate
 
 Fill NA (undef) cells along the row axis, like C<pandas.DataFrame.interpolate>.
@@ -12700,8 +13136,11 @@ The result holds C<coefficients>, C<summary> (per term C<Estimate>,
 C<Std. Error>, C<t value>, C<< Pr(E<gt>|t|) >>), C<vcov>, C<vcov_type>, C<conf_int>,
 C<terms>, C<endogenous> and C<instruments> (the terms each role was given),
 C<fitted_values>, C<residuals>, C<sigma>, C<rss>, C<r_squared>, C<adj_r_squared>,
-C<df_residual>, C<rank>, C<nobs>, C<n_clusters> with a cluster, and C<waldtest>, the
-F test of every coefficient but the intercept. C<diagnostics> has
+C<df_residual>, C<rank>, C<nobs> (the rows of nonzero weight, as C<ivreg>'s
+C<nobs>), C<n_clusters> with a cluster, and C<waldtest>, the F test of every
+coefficient but the intercept. C<df_residual> and C<sigma> count only the rows of
+nonzero weight too; C<adj_r_squared> and the Sargan statistic count every row,
+as C<summary.ivreg()> does. C<diagnostics> has
 
 =over
 
@@ -12820,16 +13259,43 @@ These follow R's C<ks.test> convention: C<'greater'>/C<'less'> describe which CD
 lies I<above> the other, which (because a higher CDF means smaller values) is
 the opposite of which sample tends to be larger.
 
-C<exact> controls how the p-value is computed. Omit it to let the test choose:
-the exact distribution is used for small samples (two-sample when nx·ny 
-10000, one-sample when n < 100) and the asymptotic (Kolmogorov limiting)
-approximation otherwise. Pass C<< exact =E<gt> 1 >> to force the exact computation or
-C<< exact =E<gt> 0 >> to force the asymptotic one. Exact p-values cannot be computed
-when the data contain ties; if ties are present on the exact path, the test
-warns and falls back to the asymptotic p-value. (The exact one-sample test is
-only available for the two-sided alternative; a one-sided one-sample request
-also falls back to asymptotic.) In either fallback the returned C<method> is
-the asymptotic one, so it always names the p-value you actually got.
+C<exact> controls how the p-value is computed, by R 4.6.1's own rules. Omit it
+to let the test choose: the exact distribution is used for small samples
+(two-sample when nx·ny < 10000; one-sample when n < 100 and there are no ties)
+and the asymptotic (Kolmogorov limiting) approximation otherwise. Pass
+C<< exact =E<gt> 1 >> to force the exact computation or C<< exact =E<gt> 0 >> to force the
+asymptotic one. The returned C<method> always names the p-value you got.
+
+=over
+
+=item * B<Two samples with ties.> The exact p-value is R's: the lattice recursion
+conditioned on the observed tie pattern, so C<ks\_test([1, 2, 2, 3, 3],
+[1, 2, 3, 3, 4, 5, 6])> gives R's documented 8/33. On the asymptotic path
+ties draw R's warning, C<p-value will be approximate in the presence of
+ties>. (Up to 0.33 ties on the exact path warned and fell back to the
+asymptotic p-value.)
+
+=item * B<One sample.> Ties draw R's warning, C<ties should not be present for the
+one-sample Kolmogorov-Smirnov test>, and keep the automatic choice off the
+exact path. The exact one-sided p-value is R's Birnbaum–Tingey sum, the
+exact two-sided one Marsaglia, Tsang and Wang's algorithm.
+
+=item * B<Asymptotic two-sided p-values> are R's series to R's tolerance of 1e-6,
+so they match R to the last digit, including where that tolerance leaves R
+up to 4.6e-6 (relative) from the limiting distribution itself.
+
+=item * B<Limits that R does not have.> A forced exact run larger than nx·ny = 10⁷
+(two-sample), or a two-sided one-sample one whose matrix would be of order
+over 500, warns C<too large for an exact p-value> and uses the asymptotic
+p-value. A one-sided asymptotic
+p-value is C<exp(-2 n D²)> evaluated directly, where R's C<1 - (1 - exp())>
+rounds anything below about 1e-16 to C<0>.
+
+=back
+
+Warnings go through perl's C<warn>, so a C<$SIG{__WARN__}> handler sees them;
+one that dies leaves nothing allocated behind. A tied array is read like any
+other.
 
 =head3 Return value
 
@@ -13126,6 +13592,20 @@ C<(1 | g) + (0 + x | g)> is the uncorrelated pair; several grouping factors,
 crossed or nested, are allowed, and C<(1 | a/b)> expands to C<(1 | a) + (1 | a:b)>.
 The fixed part is expanded as for L<C<lm>|/"lm">.
 
+As in C<lme4>, a model croaks when a grouping factor has only one level among
+the rows it keeps ("grouping factors must have > 1 sampled level"), when one has
+as many levels as there are rows ("number of levels of each grouping factor must
+be < number of observations (problems: ...)"), or when a correlated term has at
+least as many random effects as there are rows. These are C<lmerControl()>'s
+default checks; C<lme4> names a nested factor C<b:a> where this names it C<a:b>.
+
+With a single grouping factor the fit takes one level at a time, so any number
+of levels is practical. With more than one (crossed or nested), the random
+effects are handled as one dense matrix, whose time grows as the cube of their
+total count: 2000 random effects took about 5 minutes on a desktop, and more
+than 4000 croaks. C<lme4>'s sparse Cholesky is the tool for designs larger than
+that.
+
 =for html <table>
 <thead>
 <tr>
@@ -13187,9 +13667,22 @@ Give times, an event flag (1 = event, 0 = censored), and a group label per row:
  print $r->{'p_value'};
 
 Result keys: C<statistic> (chi-squared), C<parameter> (df = groups − 1),
-C<p_value>, C<observed> and C<expected> events per group, and C<groups>. See
+C<p_value>, C<observed> and C<expected> events per group, C<groups> and C<rho>. See
 L<C<survfit>|/"survfit"> for the curves and L<C<coxph>|/"coxph"> to adjust for
 covariates.
+
+C<< rho =E<gt> 1 >> gives Peto & Peto's modification of the Gehan–Wilcoxon test, which
+weights the early differences more, and any other C<rho> the rest of
+C<survdiff()>'s G-rho family: each event time is weighted by S(t−)^rho, the
+pooled Kaplan–Meier estimate just before it. C<observed> and C<expected> are
+then weighted counts, as C<survdiff()>'s are. The default, 0, is the log-rank
+test.
+
+The event flag is read as C<survival::Surv()> reads it: 1 = event and 0 =
+censored, or 2 = event and 1 = censored when the largest value is 2. Perl's
+true and false count as 1 and 0. Any other value is an error, and so is an
+undef or C<NaN> time or status, where R would drop the row as missing.
+An undef group label is an error too.
 
 =head2 Lonly
 
@@ -13521,6 +14014,10 @@ Takes either an array or an array reference, and returns an array of the most co
 When several values tie for most common, they come back in the order each was
 first seen, whatever perl's hash seed is.
 
+Values are counted by their string form, so C<1>, C<1.0> and C<"1"> are one value
+and C<"1.0"> another. A number is formatted in a copy to find it, so C<mode>
+does not add a string buffer to every numeric scalar it is given.
+
 =head2 ncol
 
 C<ncol($frame)> returns how many B<columns> a data frame has. Like C<nrow>, it
@@ -13689,7 +14186,7 @@ I<group> is a vector of at least two numeric observations.
 <tr>
   <td><code>var_equal</code></td>
   <td><code>0</code> (false)</td>
-  <td><code>0</code> → Welch's test (unequal variances). <code>1</code> → pooled-variance test. The dotted <code>var.equal</code> is refused as an unknown argument.</td>
+  <td><code>0</code> → Welch's test (unequal variances). <code>1</code> → pooled-variance test. The dotted <code>var.equal</code> is refused as an unknown argument, as is any key not in this table, or a key with no value.</td>
 </tr>
 <tr>
   <td><code>formula</code></td>
@@ -13715,7 +14212,18 @@ Note that this differs from R, which drops incomplete cases via C<na.action>
 rather than complaining. If you want R's behaviour, filter the missing values
 out yourself first (see C<dropna>).
 
-Each group needs at least two observations, and you need at least two groups.
+C<NaN> is the exception: it is R's C<NA> too, and it is dropped, as C<na.action>
+drops it, in all three shapes. A C<formula> row whose response is C<NaN> goes
+before its label is counted, so a group whose every response is C<NaN> does
+not exist, as R drops an unused factor level. (Up to 0.33 a C<NaN> was kept,
+and made every statistic C<NaN>.)
+
+Each group needs at least two observations after that, and you need at least
+two groups. There is no limit on the number of groups.
+
+Group labels come back as they went in: a UTF-8 label (a hash key, or a value
+of the C<formula> factor) keeps its UTF-8 flag in C<group_stats>, and a
+C<formula> may name UTF-8 columns. Two labels that are C<eq> are one group.
 
 =head3 Output
 
@@ -13969,6 +14477,12 @@ a C<< method =E<gt> ... >> pair. These three are the same call:
 =item * An C<undef> cell counts toward the family as a p-value of 1, which is how the
 flat form has always treated it, and comes back adjusted rather than as
 C<undef>.
+
+=item * A NaN p-value is R's C<NA>: it is left out of the family, so the family size
+counts only the others, and it comes back NaN in its own place. R's
+C<p.adjust(c(0.01, NaN, 0.04, 0.03, NaN, 0.02), "holm")> and
+C<p_adjust([0.01, 'nan', 0.04, 0.03, 'nan', 0.02], 'holm')> both give 0.04,
+NaN, 0.06, 0.06, NaN, 0.06.
 
 =item * Within a frame the family is enumerated in a fixed order — rows in order and
 then columns by name for an AoA, AoH or HoH; columns by name and then rows
@@ -14259,7 +14773,8 @@ Use C<< log =E<gt> 1 >> for tails that would otherwise underflow to C<0>:
 
 =item * C<< sd E<lt> 0 >> returns C<NaN> and warns.
 
-=item * A C<NaN> input (or an C<undef> element of an array reference) yields C<NaN>.
+=item * A C<NaN> input, an C<undef> input, or an C<undef> element of an array reference
+yields C<NaN> (R's C<NA>). Up to 0.33 an C<undef> was read as C<0>.
 
 =item * C<+Inf> returns C<1>, C<-Inf> returns C<0>.
 
@@ -14291,7 +14806,7 @@ Principal Component Analysis
   <td><code>scale</code></td>
   <td>Boolean</td>
   <td><code>0</code> (False)</td>
-  <td>If true, the variables are scaled to have unit variance before the analysis takes place. <i>Note: If a column has zero variance, the function will <code>croak</code> to prevent division by zero.</i></td>
+  <td>If true, the variables are scaled to have unit variance before the analysis takes place: each column is divided by <code>sqrt(sum(x^2)/(n-1))</code> once centred, as R's <code>scale()</code> does, which is the root mean square about zero when <code>center</code> is false. <i>Note: If a column has zero variance, the function will <code>croak</code> to prevent division by zero.</i></td>
 </tr>
 <tr>
   <td><code>retx</code></td>
@@ -14303,13 +14818,13 @@ Principal Component Analysis
   <td><code>tol</code></td>
   <td>Number</td>
   <td><code>undef</code></td>
-  <td>A value indicating the magnitude below which components should be omitted. Components are omitted if their standard deviation is less than or equal to <code>tol</code> times the standard deviation of the first component.</td>
+  <td>A value indicating the magnitude below which components should be omitted from <code>rotation</code> and <code>x</code>. Components are omitted if their standard deviation is less than or equal to <code>tol</code> times the standard deviation of the first component. <code>sdev</code> keeps all of them, as R's does.</td>
 </tr>
 <tr>
   <td><code>rank</code></td>
   <td>Integer</td>
   <td><code>undef</code></td>
-  <td>Optionally specify a strict limit on the number of principal components to return. The function will return <code>min(rank, rows, columns)</code> components.</td>
+  <td>Optionally specify a strict limit on the number of principal components in <code>rotation</code> and <code>x</code>: <code>min(rank, rows, columns)</code> of them. <code>sdev</code> keeps all <code>min(rows, columns)</code>, as R's does.</td>
 </tr>
 </tbody>
 </table>
@@ -14332,12 +14847,12 @@ The C<prcomp> function returns a HashRef containing the following keys represent
 <tr>
   <td><code>sdev</code></td>
   <td>ArrayRef[Number]</td>
-  <td>The standard deviations of the principal components. Mathematically, these are the square roots of the eigenvalues of the covariance matrix.</td>
+  <td>The standard deviations of the principal components, all <code>min(rows, columns)</code> of them. Mathematically, these are the square roots of the eigenvalues of the covariance matrix; they are computed, as R computes them, from the singular values of the centred (and scaled) data, which keeps a direction the data do not span at rounding level (about <code>1e-16</code> of the first) rather than at <code>1e-8</code>.</td>
 </tr>
 <tr>
   <td><code>rotation</code></td>
   <td>ArrayRef[ArrayRef]</td>
-  <td>A 2D array representing the matrix of variable loadings (the eigenvectors). Each inner array represents a row, and the columns correspond to the principal components.</td>
+  <td>A 2D array representing the matrix of variable loadings (the eigenvectors). Each inner array represents a row, and the columns correspond to the principal components. A component is only defined up to its sign, and the signs here need not be R's.</td>
 </tr>
 <tr>
   <td><code>x</code></td>
@@ -14387,31 +14902,31 @@ which returns
      ],
      rotation   [
          [0] [
-                 [0] 0.707106781186547,
-                 [1] 0.707106781186548
-             ],
-         [1] [
                  [0] 0.707106781186548,
                  [1] -0.707106781186547
+             ],
+         [1] [
+                 [0] 0.707106781186547,
+                 [1] 0.707106781186548
              ]
      ],
      scale      0,
      sdev       [
          [0] 2.44948974278318,
-         [1] 1.4142135623731
+         [1] 1.41421356237309
      ],
      x          [
          [0] [
-                 [0] -1.41421356237309,
-                 [1] -1.4142135623731
-             ],
-         [1] [
                  [0] -1.4142135623731,
                  [1] 1.41421356237309
              ],
+         [1] [
+                 [0] -1.41421356237309,
+                 [1] -1.4142135623731
+             ],
          [2] [
                  [0] 2.82842712474619,
-                 [1] 2.22044604925031e-16
+                 [1] 6.66133814775094e-16
              ]
      ]
  }
@@ -14944,16 +15459,38 @@ and out of a data frame.
 
 =head2 quantile
 
-Calculates sample quantiles using R's continuous Type 7 interpolation. 
+Calculates sample quantiles using R's continuous Type 7 interpolation, in R's
+own arithmetic (C<index = 1 + (n-1)p>), so the values are R's to the last bit on
+a perl whose NV is a double.
 
  my $quantile = quantile('x' => [1..99], probs => [0.05, 0.1, 0.25]);
+ my $median   = quantile([1..99], probs => 0.5);    # { '50%' => 50 }
 
-If the C<probs> parameter is omitted, it behaves identically to R by defaulting to the 0, 25, 50, 75, and 100 percentiles (C<c(0, .25, .5, .75, 1)>). The returned hash keys match R's standardized naming convention (e.g., C<"25%">, C<"33.3%">).
+If the C<probs> parameter is omitted, it behaves identically to R by defaulting
+to the 0, 25, 50, 75, and 100 percentiles (C<c(0, .25, .5, .75, 1)>). C<probs> is
+an array ref, or a single number; anything else is an error.
+
+The returned hash is keyed by R's own names for the probabilities — what
+C<names(quantile(x, probs))> gives — so C<1/3> is C<"33.33333%">, C<0.0014> is
+C<"0.14%"> and C<1e-6> is C<"0.0001%">. Like R, fewer than 100 probabilities are
+each named to 7 significant digits (C<formatC(100 * p, format = "fg", digits =
+7)>), while 100 or more share one format chosen for the whole vector (C<format(100
+* p, digits = 7)>), so C<seq(0, 1, 0.005)> is keyed C<"0.0%">, C<"0.5%">, C<"1.0%">
+and so on.
+
+A hash cannot hold two values under one name. The same probability asked for
+twice is one key. Two I<different> probabilities that R would name alike — 0.99999999
+and 1 are both C<"100%"> — are an error naming both, rather than one value
+silently replacing the other.
+
+An C<undef> probability is R's C<NA>, and a NaN one is NaN: each gives C<undef> or
+NaN respectively, under the key C<"">, which is how R names them.
 
 A probability that lands a hair outside C<[0, 1]> — the usual result of computing
 one rather than writing it down — is clamped to the endpoint rather than
 refused, within the same C<100 * eps> that R allows; anything further out is an
-error. C<undef> values in C<x> are dropped.
+error. C<undef> values in C<x> are dropped, and a NaN in C<x> makes every quantile
+NaN (R refuses such an C<x> unless C<na.rm = TRUE>).
 
 =head2 rank
 
@@ -15242,8 +15779,9 @@ set to, so a C<local $/;> in the calling code does not change what is read.
 Lines may end in LF or CRLF, and a file whose lines end in a bare CR, as
 classic Mac OS wrote them, is read as R and pandas read it. The start of the
 file is read 64 KB at a time, up to 1 MB, until a CR turns up; if no LF has by
-then, the file is split on CR. In any other file a lone CR outside quotes is
-dropped.
+then, the file is split on CR. An LF inside a quoted field is part of a cell,
+not a line end, and does not count. In any other file a lone CR outside quotes
+is dropped.
 With C<< 'output_type' =E<gt> 'hoh' >> a file whose only column is the row name gives
 one empty hash per row, as R's C<read.table> gives a data frame of zero columns.
 Rows that repeat an earlier row's name overwrite it, later values winning, and
@@ -16001,13 +16539,28 @@ name/value pairs — the two are equivalent:
 
 C<center> and C<scale> each take a number to use instead of the mean or the
 standard deviation, or one of C<mean>/C<sd>, C<true>/C<false>, C<none>, C<1>/C<0> and
-the empty string, matched case-insensitively. With C<< center =E<gt> 0 >> the divisor
-is R's: the root mean square about zero, C<sqrt(sum(x^2)/(n-1))>, not the
-standard deviation.
+the empty string, matched case-insensitively. The automatic scale is R's:
+C<sqrt(sum(x^2)/(n-1))> of the column once it has been centred, which is the
+standard deviation when the centre is the mean, the root mean square about zero
+with C<< center =E<gt> 0 >>, and neither with a numeric centre.
 
 It fully supports matrix operations. By passing an array of arrays, C<scale> processes the data column by column independently:
 
  my $scaled_mat = scale([[1, 2], [3, 4], [5, 6]]);
+
+As in R, C<center> and C<scale> may also be array refs holding one number per
+column (a flat list is one column); a vector of the wrong length is an error.
+Each value is used as given, so a 0 in a C<scale> vector divides by zero, as R
+does.
+
+ my $m = scale([[1, 2], [3, 5], [5, 9]], center => [1, 2], scale => [2, 3]);
+ # [[0, 0], [1, 1], [2, 2.333...]]
+
+Every row of a matrix must be an array ref of the same length as the first;
+anything else is an error. An C<undef> value is R's C<NA>: it stays C<undef>, in
+its place, and its column's mean and scale are taken over the values that are
+there (R's C<colMeans(na.rm = TRUE)>). A NaN is left out of them the same way and
+comes back NaN. Scaling needs at least two rows (or values).
 
 =head2 sd
 
@@ -16210,7 +16763,10 @@ and returns the hash reference:
 
 matching R's C<shapiro.test(1:5)> to the last digit it prints. Values that are
 C<undef> or C<NaN> are dropped first, exactly as R's C<complete.cases()> drops
-them, and the remaining sample must hold between 3 and 5000 values.
+them, and the remaining sample must hold between 3 and 5000 values. A string
+that is not a number croaks, naming its index (C<shapiro\_test: x at index 2 is
+not a number>), as R's C<stopifnot(is.numeric(x))> refuses it; it used to be
+read as C<0>. A tied array is read like any other.
 
 =head2 skew
 
@@ -16490,6 +17046,12 @@ Option C<conf_level> (default C<0.95>). Each stratum has arrays C<time>, C<n_ris
 C<n_event>, C<n_censor>, C<surv>, C<std_err>, C<lower>, C<upper>, plus C<median>, C<n>,
 and C<events>. Compare curves with L<C<logrank_test>|/"logrank_test">; model
 covariate effects with L<C<coxph>|/"coxph">.
+
+The event flag is read as C<survival::Surv()> reads it: 1 = event and 0 =
+censored, or 2 = event and 1 = censored when the largest value is 2. Perl's
+true and false count as 1 and 0. Any other value is an error, and so is an
+undef or C<NaN> time or status, where R would drop the row as missing.
+An undef C<group> label is an error too.
 
 =head2 svyglm
 
@@ -17829,7 +18391,7 @@ An empty C<{}> or C<[]> is a table with no rows, and is written as one: the head
 
 Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as C<Tie::IxHash>) is read through its C<FETCH>. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it. Nor does finding an AoH's or a HoH's columns leave an iterator on every row hash, as walking them with C<keys> would. A row that is a restricted hash (C<Hash::Util::lock_keys>) may lack some of the columns; those cells are written empty, where they used to die with I<Attempt to access disallowed key>.
 
-A field is quoted when it holds a quote (which is doubled), a line break or the separator, as Python's C<csv.writer> quotes, and in two more places where C<read_table> would otherwise not see the record at all. A record of a single field that is empty, C<undef> or nothing but spaces and tabs is written quoted, C<""> or C<"  ">, because a blank line is skipped on reading; C<csv.writer> writes C<['']> and C<[None]> the same way. The first field of a record is quoted when it starts with C<#>, C<read_table>'s default comment character.
+A field is quoted when it holds a quote (which is doubled), a line break or the separator, as Python's C<csv.writer> quotes, and in two more places where C<read_table> would otherwise not see the record at all. With a separator of more than one character, a field is also quoted when its end and the separator written after it would spell the separator early -- C<"a:"> before C<::>, which would otherwise be written C<a:::> and read back cut at the first C<::>. A record of a single field that is empty, C<undef> or nothing but spaces and tabs is written quoted, C<""> or C<"  ">, because a blank line is skipped on reading; C<csv.writer> writes C<['']> and C<[None]> the same way. The first field of a record is quoted when it starts with C<#>, C<read_table>'s default comment character.
 
 A reference anywhere in the table is an error, in a header cell (C<col_names>, or an AoA's first row) as in a data cell. For an AoA, an C<undef> in C<col_names> is an empty header cell in its place, since an AoA's columns are positional; for every other shape, which looks its columns up by name, it is skipped.
 
@@ -17977,8 +18539,8 @@ XlsxWriter does. A literal C<_x0041_> in a cell is written C<_x005F_x0041_> so
 that it is not mistaken for one, and so is every other underscore that would
 open an escape, overlapping ones included, so that a reader decoding left to
 right gets back exactly the text written.
-In the sheet name and C<xlsx_comment> such characters are dropped. A code point
-above U+10FFFF, which no Unicode encoding has, is an error.
+In C<xlsx_comment> such characters are dropped, and a sheet name holding one is
+an error. A code point above U+10FFFF, which no Unicode encoding has, is an error.
 
 Excel's limits are enforced rather than written past: a worksheet holds 1048576
 rows (header included) and 16384 columns, and a cell 32767 characters, the
@@ -17998,15 +18560,59 @@ Mirroring C<Excel::Writer::XLSX>'s
 C<< $workbook-E<gt>set_properties(comments =E<gt> comments()) >>, the same
 C<< written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance line the LaTeX writer emits is stored in
 the workbook's document B<comments> property (C<dc:description> in
-C<docProps/core.xml>); a C<xlsx_comment> string (or array ref of strings) is
-appended after it. C<xlsx_sheet> sets the worksheet name (default C<Sheet1>). As
-in openpyxl, a name that is empty or holds any of C<\ * ? : / [ ]> is an error, and
-one longer than 31 characters draws a warning, since Excel cannot read it:
+C<docProps/core.xml>). Lines naming the login name (C<user:>), the host name
+(C<host:>), the perl version (C<perl: v5.44.0>) and the C<Stats::LikeR> version
+follow it, and a C<xlsx_comment> string (or array ref of strings) is appended
+after those. A user or host name that cannot be found is left out. The login
+name is also the workbook's B<Author> and B<Last modified by> (C<dc:creator>
+and C<cp:lastModifiedBy>), which are C<Stats::LikeR> when there is none. C<xlsx_sheet> sets the worksheet name (default C<Sheet1>). As
+in C<Excel::Writer::XLSX> and XlsxWriter, a name that is empty, holds any of
+C<\ * ? : / [ ]>, or starts or ends with an apostrophe is an error, and so is
+one holding a character XML cannot hold. As in openpyxl, a name longer than 31
+characters draws a warning, since Excel cannot read it; Excel counts a
+character above U+FFFF, such as an emoji, as two:
 
  write_table(\@rows, 'report.xlsx',
      'xlsx_sheet'   => 'Results',
      'xlsx_comment' => 'batch 9',
  );
+
+B<Several worksheets.> A hash whose values are data frames is written as a
+workbook with one worksheet per key. Each key names its sheet, and the sheets
+come in sorted key order, as a HoH's rows do. This is the shape
+L<C<read_table>|/"read_table"> returns for a workbook of several sheets, so the two
+round-trip:
+
+ my %by_gene = (
+     AUR1 => [ { pdb => '1ABC', score => 0.9 }, { pdb => '2XYZ', score => 0.5 } ],
+     COX9 => { pdb => ['3DEF'], score => [0.7] },
+ );
+ write_table(\%by_gene, 'genes.xlsx');      # sheets AUR1 and COX9
+ my $book = read_table('genes.xlsx');       # { AUR1 => [...], COX9 => [...] }
+
+A sheet can be any shape but a flat hash: an AoH, an AoA, a HoA or a HoH. An
+empty C<[]> or C<{}> is a sheet with no rows. The other options (C<col_names>,
+C<row_names>, C<undef_val>, C<xlsx_comment>, C<xlsx_freeze_rows> and
+C<xlsx_freeze_cols>) apply to every sheet. A warning about one sheet names it
+(C<write_table: sheet 'AUR1': ...>), and so does an error.
+
+The hash counts as a workbook when any of its values is a data frame, that is,
+an array or hash whose first defined element is itself a reference. A column of
+a HoA, or a row of a HoH, holds plain values instead. Every other value must then
+be a data frame or empty. A plain value or a column beside a data frame is an
+error that names both keys. A hash whose values are all empty is still the
+empty HoA or HoH it always was. A tied sheet is not looked into, so that none of
+its values is fetched twice. It can sit in a workbook beside other sheets, but
+a hash whose sheets are I<all> tied is read as a HoA or HoH.
+
+Only an C<.xlsx> file holds more than one table, so a workbook is an error for any
+other kind of file. C<xlsx_sheet> is an error too, since the keys name the sheets.
+Each key is checked as a sheet name, as above, before the file is opened. Two
+keys that are the same with case ignored (C<Sheet1> and C<sheet1>) are an error as
+well, because Excel cannot open such a workbook. Case is compared with perl's
+C<lc>, which is what C<Excel::Writer::XLSX> uses. The sheets are streamed one after
+another, so only the sheet being written is held in memory. Up to 65530 sheets
+fit in a ZIP archive without ZIP64.
 
 C<xlsx_freeze_rows> and C<xlsx_freeze_cols> freeze that many leading rows/columns in place (Excel's I<freeze panes>), so they stay visible while scrolling — most often used to pin the header row. They go up to 1048575 and 16383, one short of the sheet's limits:
 
@@ -18033,7 +18639,7 @@ C<read_table>.
   <td><code>data</code> (1st positional, or <code>data =&gt;</code>)</td>
   <td><i>required</i></td>
   <td>both</td>
-  <td>the table: flat hash, HoA, HoH, AoH, or AoA</td>
+  <td>the table: flat hash, HoA, HoH, AoH, or AoA; or, for <code>.xlsx</code>, a hash of such tables, written one worksheet per key (see <i>Several worksheets</i> above)</td>
 </tr>
 <tr>
   <td><code>file</code> (2nd positional, or <code>file =&gt;</code>)</td>
@@ -18123,7 +18729,7 @@ C<read_table>.
   <td><code>xlsx_sheet</code></td>
   <td><code>'Sheet1'</code></td>
   <td>Excel</td>
-  <td>worksheet name</td>
+  <td>worksheet name; an error for a workbook, whose keys name its sheets</td>
 </tr>
 <tr>
   <td><code>xlsx_comment</code></td>
@@ -18216,6 +18822,16 @@ C<SE_logtheta> for C<negbin>, as C<countreg> reports them; C<fitted_values>, the
 truncated mean C<mu / (1 - f(0))>, and Pearson-style C<residuals>. The fit is a
 damped Newton iteration on the exact likelihood and its analytic Hessian.
 Validated against C<countreg> and against C<mpmath> at 60 digits.
+
+For C<negbin>, counts no more dispersed than a Poisson's have no finite
+maximum-likelihood C<theta>: the likelihood keeps rising as C<theta> grows, and
+its supremum is the Poisson fit. C<zerotrunc> checks for this first (the score
+for overdispersion at the Poisson fit is not positive) and then returns that
+Poisson fit, with C<theta> and C<SE_logtheta> both C<Inf> and the degrees of
+freedom still counting C<theta>. C<countreg> returns the same fit, but stopped
+wherever its BFGS search halts on the way, typically with C<theta> near C<1e5>,
+so its coefficients and log-likelihood differ from these by roughly
+C<1/theta>.
 
 =head2 F and z tail p-values
 

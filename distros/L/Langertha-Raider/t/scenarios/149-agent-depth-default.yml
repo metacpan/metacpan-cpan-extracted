@@ -1,0 +1,36 @@
+# Claude Code: a subagent can spawn subagents of its own, up to three layers below the
+# main conversation. Main is depth 0; a run at depth 3 has no agent and no send_message.
+# Checks ADR 0027 section 8 (default 3).
+title: by default nesting goes three layers deep; the third layer gets no agent tool
+permission_mode: bypassPermissions
+prompt: Delegate three times.
+script:
+  - tool_calls:
+      - [ agent, { description: Layer1, prompt: LAYER-ONE } ]
+  - tool_calls:
+      - [ agent, { description: Layer2, prompt: LAYER-TWO } ]
+  - tool_calls:
+      - [ agent, { description: Layer3, prompt: LAYER-THREE } ]
+  - text: from three
+  - text: from two
+  - text: from one
+  - text: done
+expect:
+  answer: done
+  request_count: 7
+  requests:
+    # depth 0, 1 and 2 hold agent and send_message
+    - { index: 0, contains: "agent(description, prompt" }
+    - { index: 1, contains: LAYER-ONE }
+    - { index: 1, contains: "agent(description, prompt" }
+    - { index: 2, contains: LAYER-TWO }
+    - { index: 2, contains: "agent(description, prompt" }
+    # depth 3 has neither
+    - { index: 3, contains: LAYER-THREE }
+    - { index: 3, lacks: [ agent, send_message ] }
+    - { index: 3, absent: "agent(description" }
+    - { index: 3, absent: "send_message(" }
+  tools:
+    - { name: agent, text: '\Afrom three\nagentId: agent_3 ' }
+    - { name: agent, text: '\Afrom two\nagentId: agent_2 ' }
+    - { name: agent, text: '\Afrom one\nagentId: agent_1 ' }

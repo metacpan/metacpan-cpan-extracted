@@ -1,9 +1,11 @@
 package Langertha::Raider::CLI::PromptBuilder;
 # ABSTRACT: Internal prompt-builder sub-agent of the raider CLI (/prompt)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use utf8;
+use Cwd qw( realpath );
+use Path::Tiny;
 use Langertha::Raider;
 
 
@@ -59,11 +61,17 @@ sub run {
   my $out  = $self->output;
   my $instructions = $app->instructions;
   my $file = $instructions->file;
+  # The mission shows the file whole: it counts as read, so write_file may
+  # replace it (read before write, ADR 0023).
+  if ( -f $file && ( my $real = realpath("$file") ) ) {
+    $app->file_read_state->record( $real, bytes => path($real)->slurp_raw );
+  }
 
   my $builder_raider = Langertha::Raider->new(
     engine         => $app->_engine,
     mission        => $self->_mission($file, $instructions->label),
     max_iterations => 20,
+    _tool_gate     => $app->tool_gate,
   );
 
   $out->say_meta('entering prompt-builder. /done to return, /cancel to discard.');
@@ -116,7 +124,7 @@ Langertha::Raider::CLI::PromptBuilder - Internal prompt-builder sub-agent of the
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -163,7 +171,7 @@ of L</in>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -184,5 +192,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

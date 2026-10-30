@@ -1,5 +1,22 @@
 Revision history for Perl extension App-mdee
 
+1.13 2026-10-29T07:10:46Z
+
+    - Add --runin, --runout and --runlen.  The run-in and run-out are
+      given to nup in place of the values in ~/.ansicolumnrc, and the
+      default fold width is the pane width minus 3 and the run-in, so
+      that a larger run-in no longer breaks table rules
+    - Wrap table cells in the same way whatever ~/.ansicolumnrc says:
+      add the table_runin, table_runout, table_boundary and
+      table_linebreak parameters (2, 2, word, all) to the md module
+    - Make --dryrun print the command lines of the pipeline, ready to
+      be pasted into a shell
+    - Close a code fence with a longer fence, and accept empty and
+      indented ATX headings, as CommonMark does
+    - Do not call tput when the width is given, and work without TERM
+    - Require App::nup 1.09, App::ansicolumn 1.61 and
+      Text::ANSI::Fold::Util
+
 1.12 2026-10-26T10:50:50Z
 
     - Add --table-style=simple: tables drawn like Pandoc simple tables

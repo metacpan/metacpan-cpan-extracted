@@ -1,0 +1,19 @@
+title: a skill in .claude/skills is listed by name and description; the skill tool loads its body as a message after the result
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/greet/SKILL.md: "---\nname: greet\ndescription: Greets people in Low German.\n---\n\nSay Moin to everyone. GREET-BODY-MARKER\n"
+prompt: Greet the team.
+script:
+  - tool_calls:
+      - [ skill, { skill: greet } ]
+  - text: Moin!
+expect:
+  answer: Moin!
+  requests:
+    - { index: 0, contains: "- greet: Greets people in Low German." }
+    - { index: 0, absent: GREET-BODY-MARKER }
+    - { index: 1, contains: GREET-BODY-MARKER }
+    - { index: 1, absent: "description:" }
+    - { index: 1, tail: [ { role: tool, contains: "Launching skill: greet" }, { role: user, contains: "/.claude/skills/greet\n\nSay Moin to everyone. GREET-BODY-MARKER" } ] }
+  tools:
+    - { name: skill, text: '^Launching skill: greet$' }

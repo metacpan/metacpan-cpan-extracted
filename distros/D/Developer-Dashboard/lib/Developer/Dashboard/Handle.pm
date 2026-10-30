@@ -3,25 +3,26 @@ package Developer::Dashboard::Handle;
 use strict;
 use warnings;
 
-use Cwd ();
 use Capture::Tiny qw(capture);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::JSON qw(json_decode);
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 our $AUTOLOAD;
 
 # new(%args)
 # Builds a lazy runtime handle scoped to a working directory, matching the
 # same layer discovery the dashboard/d2 CLI uses to resolve path aliases.
-# Input: cwd => directory string (optional, defaults to Cwd::cwd()).
+# Input: cwd => directory string (optional, defaults to the verified current
+# working directory).
 # Output: Developer::Dashboard::Handle object.
 sub new {
     my ( $class, %args ) = @_;
-    return bless { cwd => $args{cwd} // Cwd::cwd() }, $class;
+    return bless { cwd => $args{cwd} // current_working_directory() }, $class;
 }
 
 # paths()

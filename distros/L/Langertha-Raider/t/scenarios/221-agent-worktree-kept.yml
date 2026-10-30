@@ -1,0 +1,28 @@
+title: an isolated agent that writes a file keeps its worktree and branch, and the result names both
+git: true
+permission_mode: bypassPermissions
+files:
+  CLAUDE.md: "# project\n"
+  a.txt: "ALPHA\n"
+prompt: Write new.txt in a worktree of its own.
+script:
+  - tool_calls:
+      - [ agent, { description: Write, prompt: Write new.txt., isolation: worktree } ]
+  - tool_calls:
+      - [ write_file, { path: new.txt, content: "NEW\n" } ]
+  - text: wrote new.txt
+  - text: The agent wrote new.txt in its worktree.
+expect:
+  answer: The agent wrote new.txt in its worktree.
+  tools:
+    - { name: write_file }
+    - name: agent
+      text: '\Awrote new.txt\nagentId: agent_1 [^\n]*\n<usage>[^\n]*\n[^\n]*\n[^\n]*</usage>\nworktreePath: {{ROOT}}/\.claude/worktrees/agent-1\nworktreeBranch: worktree-agent-1\z'
+  files:
+    .claude/worktrees/agent-1/new.txt: "NEW\n"
+  absent:
+    - new.txt
+  branches:
+    present: [ main, worktree-agent-1 ]
+  events:
+    - { type: agent.finished, agent_id: agent_1, status: completed, worktree_kept: true }

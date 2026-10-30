@@ -13,9 +13,10 @@
 #
 # Where the port departs from upstream, and why:
 #
-#  * sum() with no arguments. List::Util returns undef; Stats::LikeR croaks
-#    "sum needs >= 1 element", as it does for an empty min() and max(). That is
-#    documented behaviour, so the croak is what is tested here.
+#  * sum() with no arguments. List::Util returns undef; Stats::LikeR dies with
+#    its help screen over "sum: error: no values given", as it does for an
+#    empty min() and max(). That is documented behaviour, so the croak is what
+#    is tested here.
 #
 #  * Math::BigInt. min(), max() and sum() here are NV reductions -- the XSUBs
 #    return an NV -- so a BigInt argument goes through its 0+ overload and the
@@ -105,7 +106,7 @@ subtest 'min.t' => sub {
 	cmp_ok(min($v1, $v2, $v1, $v3, $v1), '==', nv($v3), 'bigint');
 	is(min($v1, 1, 2, 3), 1, 'bigint and normal int');
 	is(min(1, 2, $v1, 3), 1, 'bigint and normal int');
-	like(eval { min(); 1 } ? '' : $@, qr/^min needs >= 1 numeric element/, 'no args croaks');
+	like(eval { min(); 1 } ? '' : $@, qr/\Ausage: min\(.*^min: error: no values given\n\z/ms, 'no args croaks');
 };
 
 subtest 'max.t' => sub {
@@ -121,11 +122,11 @@ subtest 'max.t' => sub {
 	cmp_ok(max($v1, $v2, $v1, $v3, $v1), '==', nv($v1), 'bigint');
 	cmp_ok(max($v1, 1, 2, 3), '==', nv($v1), 'bigint and normal int');
 	cmp_ok(max(1, 2, $v1, 3), '==', nv($v1), 'bigint and normal int');
-	like(eval { max(); 1 } ? '' : $@, qr/^max needs >= 1 numeric element/, 'no args croaks');
+	like(eval { max(); 1 } ? '' : $@, qr/\Ausage: max\(.*^max: error: no values given\n\z/ms, 'no args croaks');
 };
 
 subtest 'sum.t' => sub {
-	like(eval { sum(); 1 } ? '' : $@, qr/^sum needs >= 1 element/, 'no args croaks');
+	like(eval { sum(); 1 } ? '' : $@, qr/\Ausage: sum\(.*^sum: error: no values given\n\z/ms, 'no args croaks');
 	is(sum(9), 9, 'one arg');
 	is(sum(1, 2, 3, 4), 10, '4 args');
 	is(sum(-1), -1, 'one -1');

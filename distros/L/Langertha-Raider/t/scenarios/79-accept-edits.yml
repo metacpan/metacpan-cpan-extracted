@@ -1,0 +1,23 @@
+title: acceptEdits writes and edits in the project without asking; bash and writes outside still ask
+permission_mode: acceptEdits
+approve: [ "no" ]
+files:
+  a.txt: "old\n"
+prompt: Edit.
+script:
+  - tool_calls:
+      - [ read_file, { path: a.txt } ]
+      - [ edit_file, { path: a.txt, old_string: old, new_string: new } ]
+      - [ write_file, { path: sub/b.txt, content: "b\n" } ]
+      - [ bash, { command: touch c.txt } ]
+  - text: done
+expect:
+  files: { a.txt: "new\n", sub/b.txt: "b\n" }
+  absent: [ c.txt ]
+  permissions:
+    - { tool: bash, rule: "Bash(touch c.txt)" }
+  tools:
+    - { name: read_file }
+    - { name: edit_file }
+    - { name: write_file }
+    - { name: bash, error: true, text: "^The user doesn't want to proceed with this tool use\\." }

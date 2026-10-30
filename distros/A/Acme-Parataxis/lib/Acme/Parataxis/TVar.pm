@@ -14,7 +14,7 @@ use feature 'class';
 my $TXN_KEY = 'Acme::Parataxis::TVar:txn';
 my %RETRY_REGS;    # fid => dereg: removes the fiber from every TVar's waiters list
 #
-class Acme::Parataxis::TVar v0.1.1 {
+class Acme::Parataxis::TVar v0.1.3 {
     use Acme::Parataxis;
     use Acme::Parataxis::Error;          # for the internal STM_Retry control-flow exception
     use Acme::Parataxis::Sync::Mutex;    # the global commit lock

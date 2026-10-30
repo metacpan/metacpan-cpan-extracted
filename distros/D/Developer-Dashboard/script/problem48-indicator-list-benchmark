@@ -1,0 +1,235 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd ();
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::PathRegistry;
+
+my $indicator_count = 50;
+my $runs            = 9;
+my $layers          = 2;
+my $help             = 0;
+GetOptions(
+    'indicators=i' => \$indicator_count,
+    'runs=i'       => \$runs,
+    'layers=i'     => \$layers,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--indicators must be a positive integer\n" if $indicator_count < 1;
+die "--runs must be an odd positive integer\n" . _usage() if $runs < 1 || $runs % 2 == 0;
+die "--layers must be 1 or 2\n" if $layers != 1 && $layers != 2;
+
+my $root = tempdir( 'problem48-indicators-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home = File::Spec->catdir( $root, 'home' );
+my $cwd = $home;
+make_path($home);
+if ( $layers == 2 ) {
+    $cwd = File::Spec->catdir( $home, 'project' );
+    make_path( File::Spec->catdir( $cwd, '.developer-dashboard' ) );
+}
+local $ENV{HOME} = $home;
+my $original_cwd = Cwd::getcwd();
+chdir $cwd or die "Unable to enter benchmark directory '$cwd': $!";
+
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $cwd );
+my $store = Developer::Dashboard::IndicatorStore->new( paths => $paths );
+for my $index ( 1 .. $indicator_count ) {
+    $store->set_indicator(
+        sprintf( 'probe-%06d', $index ),
+        status   => 'ok',
+        priority => $index,
+    );
+}
+
+my $legacy = sub { _legacy_list_indicators( $store, $paths ) };
+my $root_reuse = sub { _root_reuse_list_indicators( $store, $paths ) };
+my $direct = sub { [ $store->list_indicators ] };
+my $expected = _canonical_json( $legacy->() );
+my $root_reuse_json = _canonical_json( $root_reuse->() );
+my $direct_json = _canonical_json( $direct->() );
+my $parity_error = $root_reuse_json ne $expected
+  ? "Legacy and root-reuse indicator lists differ before timing"
+  : $direct_json ne $expected
+  ? "Legacy and direct indicator lists differ before timing"
+  : undef;
+if ($parity_error) {
+    chdir $original_cwd or die "Unable to restore working directory '$original_cwd': $!";
+    die "$parity_error\n";
+}
+
+my %code = (
+    legacy     => $legacy,
+    root_reuse => $root_reuse,
+    direct     => $direct,
+);
+my %samples = map { $_ => [] } keys %code;
+for my $run ( 1 .. $runs ) {
+    my @order = $run % 3 == 1 ? qw(legacy root_reuse direct)
+      : $run % 3 == 2        ? qw(root_reuse direct legacy)
+      :                         qw(direct legacy root_reuse);
+    for my $name (@order) {
+        push @{ $samples{$name} }, _timed( $code{$name}, $expected );
+    }
+}
+chdir $original_cwd or die "Unable to restore working directory '$original_cwd': $!";
+
+my $legacy_median = _median( @{ $samples{legacy} } );
+my $root_reuse_median = _median( @{ $samples{root_reuse} } );
+my $direct_median = _median( @{ $samples{direct} } );
+printf "layers=%d indicators=%d runs=%d exact_parity=yes\n", $layers, $indicator_count, $runs;
+printf "legacy_median_ms=%.3f root_reuse_median_ms=%.3f direct_median_ms=%.3f\n",
+  1000 * $legacy_median, 1000 * $root_reuse_median, 1000 * $direct_median;
+printf "root_reuse_ratio=%.2fx direct_vs_root_reuse=%.2fx\n",
+  $legacy_median / $root_reuse_median, $root_reuse_median / $direct_median;
+exit 0;
+
+# _usage()
+# Returns command usage and the benchmark workload options.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--indicators N] [--runs ODD_N] [--layers 1|2] [--help]\n"
+      . "Compares legacy, root-reuse, and current indicator-list implementations.\n";
+}
+
+# _legacy_list_indicators($store, $paths)
+# Reconstructs the original list behavior, including resolving roots again
+# through get_indicator for every directory entry.
+# Input: IndicatorStore object and its PathRegistry object.
+# Output: priority-sorted list of decoded indicator hashes.
+sub _legacy_list_indicators {
+    my ( $store, $paths ) = @_;
+    my %items;
+    for my $root ( $paths->indicators_roots ) {
+        next if !-d $root;
+        opendir my $dh, $root or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            next if $items{$entry};
+            my $item = eval { $store->get_indicator($entry) };
+            $items{$entry} = $item if $item;
+        }
+        closedir $dh;
+    }
+    return [ sort { $store->_indicator_sort_cmp( $a, $b ) } values %items ];
+}
+
+# _root_reuse_list_indicators($store, $paths)
+# Reconstructs the intermediate implementation that discovered roots once but
+# probed those roots again for every listed indicator.
+# Input: IndicatorStore object and its PathRegistry object.
+# Output: priority-sorted list of decoded indicator hashes.
+sub _root_reuse_list_indicators {
+    my ( $store, $paths ) = @_;
+    my %items;
+    my @roots = $paths->indicators_roots;
+    for my $root (@roots) {
+        next if !-d $root;
+        opendir my $dh, $root or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            next if $items{$entry};
+            my $item = eval { $store->_get_indicator_from_roots( $entry, \@roots ) };
+            $items{$entry} = $item if $item;
+        }
+        closedir $dh;
+    }
+    return [ sort { $store->_indicator_sort_cmp( $a, $b ) } values %items ];
+}
+
+# _timed($code, $expected_json)
+# Measures one result-producing operation and fails if serialized output differs.
+# Input: code reference returning an indicator array and expected canonical JSON.
+# Output: elapsed seconds.
+sub _timed {
+    my ( $code, $expected_json ) = @_;
+    my $started = time;
+    my $actual = _canonical_json( $code->() );
+    my $elapsed = time - $started;
+    die "Indicator list changed during benchmark\n" if $actual ne $expected_json;
+    return $elapsed;
+}
+
+# _canonical_json($value)
+# Encodes result data deterministically for exact output-parity checks.
+# Input: JSON-compatible Perl data.
+# Output: canonical UTF-8 JSON string.
+sub _canonical_json {
+    my ($value) = @_;
+    return JSON::XS->new->canonical->utf8->encode($value);
+}
+
+# _median(@samples)
+# Returns the median from an odd, non-empty list of elapsed times.
+# Input: elapsed-time numbers.
+# Output: median elapsed time.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-indicator-list-benchmark - measure indicator listing root reuse
+
+=head1 PURPOSE
+
+Compares the original repeated-root C<IndicatorStore::list_indicators>
+behavior, the intermediate one-root-discovery implementation that still probes
+all roots per record, and the current implementation. Each timed
+result must match canonical JSON exactly.
+
+=head1 WHY IT EXISTS
+
+NYTProf showed indicator listing on the live dashboard status route repeatedly
+entering C<PathRegistry::indicators_roots> and state-root validation. This
+benchmark makes the old and new paths comparable with realistic persisted
+records and one or two runtime layers.
+
+=head1 WHEN TO USE
+
+Use it when changing indicator listing, root precedence, or state-root
+discovery. It creates a private temporary home and does not touch real
+dashboard state.
+
+=head1 HOW TO USE
+
+  perl script/problem48-indicator-list-benchmark --indicators 50 --runs 9 --layers 2
+
+Indicator and layer counts must be positive/valid; the run count must be odd.
+The script fails rather than reporting a timing if any canonical output differs.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this helper to evaluate
+C<IndicatorStore::list_indicators>. No production command invokes the script.
+
+=head1 EXAMPLES
+
+Run inside the isolated Problem 48 Docker benchmark service:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench sh -lc 'cd /checkout && perl script/problem48-indicator-list-benchmark --indicators 50 --runs 9 --layers 2'
+
+=cut

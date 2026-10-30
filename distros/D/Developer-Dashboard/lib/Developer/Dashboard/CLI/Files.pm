@@ -3,9 +3,9 @@ package Developer::Dashboard::CLI::Files;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
@@ -84,7 +84,7 @@ sub run_files_command {
         my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         die "Usage: dashboard file locate [-o json|table] [<root-or-alias>] <term...>\n" if $output ne 'json' && $output ne 'table';
-        my $root = cwd();
+        my $root = current_working_directory();
         if ( @argv >= 2 ) {
             $load_configured_file_aliases->();
             my $candidate = $argv[0];

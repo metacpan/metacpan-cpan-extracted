@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Mail::DKIM2::Common ();
 use Mail::DKIM2::MessageInstance;
@@ -63,7 +63,7 @@ with a Recipe for undoing that hop's changes. A recipient can therefore
 tell who handled a message, in what order, and what each of them changed.
 
 This distribution implements signing and verification for
-draft-ietf-dkim-dkim2-spec-07 (see L</STATUS>). The modules:
+draft-ietf-dkim-dkim2-spec-08 (see L</STATUS>). The modules:
 
 =over 4
 
@@ -88,7 +88,7 @@ Parses and builds one DKIM2-Signature header.
 =item L<Mail::DKIM2::DSN>
 
 Generates, authenticates and propagates DKIM2-signed Delivery Status
-Notifications (-07 section 16).
+Notifications (-08 section 16).
 
 =item L<Mail::DKIM2::Gate>
 
@@ -191,7 +191,7 @@ and are never process-wide state.
 
 =head1 STATUS
 
-This implements draft-ietf-dkim-dkim2-spec-07, an Internet-Draft that is
+This implements draft-ietf-dkim-dkim2-spec-08, an Internet-Draft that is
 still changing. The wire format follows the draft, so a message signed by
 this version may not verify with a version tracking a later draft, and the
 other way round. It is in production use: Fastmail signs outbound mail

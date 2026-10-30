@@ -271,11 +271,15 @@ for my $t (
 for my $f (['auc', \&auc], ['roc', \&roc]) {
 	my ($name, $fn) = @$f;
 	throws_ok { $fn->([1, 2], [0, 1], direction => 'foo') }
-		qr/^$name: direction must be '>' or '<', not 'foo'/, "$name: unknown direction";
+		qr/\Ausage: $name\(SCORES, LABELS .*^example:\n.*\n\n$name: error: direction must be '>' or '<', not 'foo'\n\z/ms,
+		"$name: unknown direction, under the help screen";
 	throws_ok { $fn->([1, 2], [0, 1], direction => '<=') }
-		qr/^$name: direction must be/, "$name: only the first character used to be read";
+		qr/^$name: error: direction must be/m, "$name: only the first character used to be read";
 	throws_ok { $fn->([1, 2], [0, 1], 'positive') }
-		qr/^$name: options must be key => value pairs/, "$name: dangling key";
+		qr/^$name: error: options must be key => value pairs$/m, "$name: dangling key";
+	throws_ok { $fn->({}, [0, 1]) }
+		qr/^$name: error: the first two arguments must be array refs of scores and labels$/m,
+		"$name: scores that are not an array ref";
 	throws_ok { $fn->([1, 'abc', 3], [0, 1, 1]) }
 		qr/^$name: score at index 1 is not a number/, "$name: non-numeric score";
 	throws_ok { $fn->([1, undef, 3], [0, 1, 0]) }
@@ -285,9 +289,18 @@ for my $f (['auc', \&auc], ['roc', \&roc]) {
 		qr/^$name: need both positive and negative labels/, "$name: every score missing";
 }
 throws_ok { auroc([0, 1], [1, 2], direction => 'x') }
-	qr/^auroc: direction must be/, 'auroc: unknown direction';
+	qr/\Ausage: auroc\(LABELS, SCORES .*\n\nauroc: error: direction must be '>' or '<', not 'x'\n\z/ms,
+	'auroc: unknown direction, under the help screen';
 throws_ok { auroc([0, 1], [1, 2], 'cutoff') }
-	qr/^auroc: options must be key => value pairs/, 'auroc: dangling key';
+	qr/^auroc: error: options must be key => value pairs$/m, 'auroc: dangling key';
+throws_ok { auroc([0, 1], [1, 2], cutoff => 1, active_frac => 0.5) }
+	qr/^auroc: error: give either cutoff => or active_frac =>, not both$/m, 'auroc: cutoff and active_frac';
+throws_ok { auroc([0, 1], [1, 2], active_frac => 1) }
+	qr/^auroc: error: active_frac must be strictly between 0 and 1$/m, 'auroc: active_frac out of range';
+throws_ok { roc([1, 2], [0, 1], conf_level => 1) }
+	qr/^roc: error: conf_level must be between 0 and 1$/m, 'roc: conf_level out of range';
+throws_ok { auc([1, 2], [0, 1], colour => 1) }
+	qr/^auc: error: unknown argument 'colour'$/m, 'auc: unknown argument';
 throws_ok { auroc([0, 'abc', 2], [1, 2, 3], cutoff => 1) }
 	qr/^auroc: y_true at index 1 is not a number/, 'auroc: non-numeric truth value';
 

@@ -1626,6 +1626,7 @@ Adek
 Adlam
 Ado
 Adooleessa
+Adyghe
 Afar
 Afghanistan
 Afi
@@ -2159,6 +2160,7 @@ Cul
 Cum
 Cuma
 Cumartesi
+Cunha
 Curaçao
 Cuse
 Cut
@@ -3717,10 +3719,14 @@ GyMEd
 GyMMM
 GyMMMEEEEd
 GyMMMEd
+GyMMMEddd
 GyMMMM
 GyMMMMEd
+GyMMMMEddd
 GyMMMMd
+GyMMMMddd
 GyMMMd
+GyMMMddd
 GyMd
 Gy年
 Gy年M月
@@ -3753,6 +3759,7 @@ HH:mm;
 HHmm
 HHmmZ
 HHmmss
+HHmmv
 HW1
 HW2
 HW3
@@ -4204,6 +4211,7 @@ KWOTA
 KZ
 Ka
 Kab
+Kabardian
 Kabla
 Kabuverdianu
 Kabyle
@@ -4484,6 +4492,7 @@ Laboraru
 Labotlhano
 Labr
 Labt
+Ladin
 Lah
 Lahadi
 Lahlɛ̄
@@ -4678,6 +4687,7 @@ MMM'ê
 MMM'ын
 MMMEEEEd
 MMMEd
+MMMEddd
 MMMM
 MMMM'a
 MMMM'ren
@@ -4687,6 +4697,7 @@ MMMM:
 MMMM:'a
 MMMMEEEEd
 MMMMEd
+MMMMEddd
 MMMMM
 MMMMM/dd
 MMMMW-count-few
@@ -4697,6 +4708,7 @@ MMMMW-count-two
 MMMMW-count-zero
 MMMMd
 MMMMdd
+MMMMddd
 MMMM،
 MMMMৰ
 MMMMના
@@ -4707,6 +4719,7 @@ MMMM的第W週
 MMMM第W周
 MMMd
 MMMdd
+MMMddd
 MMM،
 MMMی
 MMMཚེས་d
@@ -5028,6 +5041,7 @@ Mvu
 Mvuka
 Mvulo
 Mwai
+Mwambĩrĩrio
 Mwedi
 Mwere
 Mweri
@@ -6151,6 +6165,7 @@ Uganda
 Ugu
 Ugushyingo
 Uhr
+Ukab
 Ukraine
 Ukrainian
 Ukristo
@@ -6321,6 +6336,7 @@ YA
 YK
 YM
 YY
+YYYY
 Yaijire
 Yak
 Yakshambeh
@@ -6431,16 +6447,12 @@ aa
 aa-DJ
 aa-ER
 aa-ET
-aa_DJ
-aa_ER
-aa_ET
 aadi
 aasaḍi
 aaɓ
 aaɓnde
 ab
 ab-GE
-ab_GE
 abans
 abe
 abe.ren
@@ -6463,6 +6475,10 @@ adar
 ade
 adeɛmekpɔxe
 adr
+ady
+ady_JO
+ady_RU
+ady_TR
 aeng’
 af
 af-NA
@@ -6523,13 +6539,11 @@ am_ET
 amenzu
 an
 an-ES
-an_ES
 anavyaal
 angakabuyi
 ang’wan
 ann
 ann-NG
-ann_NG
 anna
 annab
 antaŭ
@@ -6544,7 +6558,6 @@ anɔɔɖuka
 août
 ap
 apc-SY
-apc_SY
 api
 apirila
 apl
@@ -6629,7 +6642,6 @@ ariré
 ariyo
 arn
 arn-CL
-arn_CL
 arɛ́cika
 arɩs
 arɩsǝma
@@ -6714,10 +6726,6 @@ az-Cyrl
 az-Cyrl-AZ
 az-Latn
 az-Latn-AZ
-az_Arab
-az_Arab_IQ
-az_Arab_IR
-az_Arab_TR
 az_Cyrl
 az_Cyrl_AZ
 az_Latn
@@ -6739,8 +6747,6 @@ bal-Arab
 bal-Arab-PK
 bal-Latn
 bal-Latn-PK
-bal_Arab
-bal_Arab_PK
 bal_Latn
 bal_Latn_PK
 balandis
@@ -6768,7 +6774,6 @@ berî
 bese
 bew
 bew-ID
-bew_ID
 bez
 bez-TZ
 bez_TZ
@@ -6784,11 +6789,6 @@ bgn-AF
 bgn-IR
 bgn-OM
 bgn-PK
-bgn_AE
-bgn_AF
-bgn_IR
-bgn_OM
-bgn_PK
 bho
 bho-IN
 bho_IN
@@ -6810,14 +6810,11 @@ blo-BJ
 blo_BJ
 blt
 blt-VN
-blt_VN
 bm
 bm-ML
 bm-Nkoo
 bm-Nkoo-ML
 bm_ML
-bm_Nkoo
-bm_Nkoo_ML
 bn
 bn-BD
 bn-IN
@@ -6836,8 +6833,6 @@ borgemánnu
 bosi
 bow
 bowte
-bqi
-bqi_IR
 br
 br-FR
 br_FR
@@ -6858,12 +6853,10 @@ bs_Latn
 bs_Latn_BA
 bss
 bss-CM
-bss_CM
 bua
 bua_RU
 byn
 byn-ER
-byn_ER
 bře
 březen
 března
@@ -6889,13 +6882,12 @@ cab
 cabudanni
 cad
 cad-US
-cad_US
 cairteal
 ccc
 cccc
+cccccc
 cch
 cch-NG
-cch_NG
 ccntrq
 ccp
 ccp-BD
@@ -6922,7 +6914,6 @@ chenàbura
 chida
 cho
 cho-US
-cho_US
 chorshanba
 chr
 chr-US
@@ -6931,7 +6922,6 @@ chwarter
 ci
 cic
 cic-US
-cic_US
 cikin
 cim
 ckb
@@ -6941,7 +6931,6 @@ ckb_IQ
 ckb_IR
 co
 co-FR
-co_FR
 col
 colte
 comme
@@ -6961,7 +6950,6 @@ csw_CA
 csütörtök
 cu
 cu-RU
-cu_RU
 cuo
 cuoŋ
 cuoŋománnu
@@ -7052,6 +7040,7 @@ dd/MM
 dd/MM/y
 ddC
 ddE
+ddd
 dd‏/MM
 de
 de''l
@@ -7220,7 +7209,6 @@ duşem
 duşenbe
 dv
 dv-MV
-dv_MV
 dy
 dyo
 dyo-SN
@@ -7457,8 +7445,6 @@ en_DE
 en_DG
 en_DK
 en_DM
-en_Dsrt
-en_Dsrt_US
 en_EE
 en_ER
 en_ES
@@ -7538,8 +7524,6 @@ en_SL
 en_SS
 en_SX
 en_SZ
-en_Shaw
-en_Shaw_GB
 en_TC
 en_TK
 en_TO
@@ -7886,7 +7870,6 @@ frevâ
 freàrgiu
 frr
 frr-DE
-frr_DE
 frí
 fríggjadagur
 fur
@@ -7951,8 +7934,6 @@ gennaio
 gez
 gez-ER
 gez-ET
-gez_ER
-gez_ET
 ghe
 ghennàrgiu
 ghwa
@@ -7977,7 +7958,6 @@ glindesdi
 gln
 gn
 gn-PY
-gn_PY
 gnd
 gnu
 golg
@@ -8043,9 +8023,6 @@ ha-Arab-SD
 ha-GH
 ha-NE
 ha-NG
-ha_Arab
-ha_Arab_NG
-ha_Arab_SD
 ha_GH
 ha_NE
 ha_NG
@@ -8104,8 +8081,6 @@ hmvvvv
 hnj
 hnj-Hmnp
 hnj-Hmnp-US
-hnj_Hmnp
-hnj_Hmnp_US
 hodź
 hono
 hoore-biir
@@ -8118,8 +8093,6 @@ hr_HR
 hsb
 hsb-DE
 hsb_DE
-ht
-ht_HT
 hu
 hu-HU
 hu_HU
@@ -8179,6 +8152,7 @@ igihembwe
 ii
 ii-CN
 ii_CN
+ij
 ika'-W
 ika'-w
 ika-1
@@ -8213,7 +8187,6 @@ innayr
 inya
 io
 io-001
-io_001
 ira
 ira.ren
 iraila
@@ -8238,9 +8211,6 @@ iu
 iu-CA
 iu-Latn
 iu-Latn-CA
-iu_CA
-iu_Latn
-iu_Latn_CA
 iul
 iulie
 iun
@@ -8283,7 +8253,6 @@ java
 jaṭṭa
 jbo
 jbo-001
-jbo_001
 jen
 jenaro
 jeu
@@ -8391,10 +8360,6 @@ ka-4
 ka-GE
 ka_GE
 kaa
-kaa_Cyrl
-kaa_Cyrl_UZ
-kaa_Latn
-kaa_Latn_UZ
 kaana
 kab
 kab-DZ
@@ -8406,7 +8371,6 @@ kaiboirwe
 kaili
 kaj
 kaj-NG
-kaj_NG
 kalo
 kam
 kam-KE
@@ -8433,9 +8397,11 @@ kawi
 kaĩri
 kaŋɔrɔ
 ka̱n
+kbd
+kbd_RU
+kbd_TR
 kcg
 kcg-NG
-kcg_NG
 kde
 kde-TZ
 kde_TZ
@@ -8461,7 +8427,6 @@ kele
 kelĩ
 ken
 ken-CM
-ken_CM
 kenda
 kerĩ
 kesi
@@ -8551,8 +8516,6 @@ kpa
 kpe
 kpe-GN
 kpe-LR
-kpe_GN
-kpe_LR
 kris
 krisiti
 krisṭ
@@ -8583,9 +8546,6 @@ ktu
 ktubr
 ku
 ku-TR
-ku_Arab
-ku_Arab_IQ
-ku_Arab_IR
 ku_Latn
 ku_Latn_IQ
 ku_Latn_SY
@@ -8692,7 +8652,6 @@ kỹ
 l
 la
 la-VA
-la_VA
 lag
 lag-TZ
 lag_TZ
@@ -8795,8 +8754,6 @@ lrc_IR
 lt
 lt-LT
 lt_LT
-ltg
-ltg_LV
 lu
 lu-CD
 lu_CD
@@ -8838,8 +8795,6 @@ lyatatu
 lyɛ'̌ʼ
 lyɛʼɛ́
 lyɛ̌ʼ
-lzz
-lzz_TR
 làm
 làmpadas
 lá
@@ -9012,7 +8967,6 @@ mchochil’l
 md
 mdf
 mdf-RU
-mdf_RU
 me
 mei
 mej
@@ -9047,14 +9001,11 @@ mgh_MZ
 mgo
 mgo-CM
 mgo_CM
-mhn
-mhn_IT
 mi
 mi-NZ
 mi_NZ
 mic
 mic-CA
-mic_CA
 mie
 miercuri
 miercus
@@ -9096,9 +9047,6 @@ mn-Mong
 mn-Mong-CN
 mn-Mong-MN
 mn_MN
-mn_Mong
-mn_Mong_CN
-mn_Mong_MN
 mni
 mni-Beng
 mni-Beng-IN
@@ -9106,14 +9054,11 @@ mni-Mtei
 mni-Mtei-IN
 mni_Beng
 mni_Beng_IN
-mni_Mtei
-mni_Mtei_IN
 mo
 moandei
 mocha
 moh
 moh-CA
-moh_CA
 mohammad
 moies
 moja
@@ -9137,9 +9082,6 @@ ms-BN
 ms-ID
 ms-MY
 ms-SG
-ms_Arab
-ms_Arab_BN
-ms_Arab_MY
 ms_BN
 ms_ID
 ms_MY
@@ -9169,7 +9111,6 @@ murakí-mukũi
 murakí-musapíri
 mus
 mus-US
-mus_US
 musapíri
 musapíri-yasí
 musapírisawa
@@ -9183,15 +9124,11 @@ mwambe
 mwd
 mwedzi
 mwom
-mww
-mww_Hmnp
-mww_Hmnp_US
 my
 my-MM
 my_MM
 myv
 myv-RU
-myv_RU
 mzn
 mzn-IR
 mzn_IR
@@ -9477,7 +9414,6 @@ nqo-GN
 nqo_GN
 nr
 nr-ZA
-nr_ZA
 nsambo
 nsima
 nsn
@@ -9502,12 +9438,10 @@ nuw
 nuwanbir
 nv
 nv-US
-nv_US
 nvb
 nvúr
 ny
 ny-MW
-ny_MW
 nya
 nyaanya
 nyiaghuo
@@ -9567,9 +9501,6 @@ octombrie
 octubre
 of
 og
-oka
-oka_CA
-oka_US
 okko
 okt
 oktabr
@@ -9607,7 +9538,6 @@ os_GE
 os_RU
 osa
 osa-US
-osa_US
 osebiro
 osteguna
 ostirala
@@ -9664,8 +9594,6 @@ pande
 pap
 pap-AW
 pap-CW
-pap_AW
-pap_CW
 papat
 para
 parë
@@ -9695,8 +9623,6 @@ pet
 petak
 petek
 pi
-pi_Latn
-pi_Latn_GB
 piatok
 piektd
 piektdiena
@@ -9712,7 +9638,6 @@ pirmdiena
 pirms
 pis
 pis-SB
-pis_SB
 pisan
 pisuyú
 pi 22. decembra 1995, 09:05:02
@@ -9871,12 +9796,8 @@ rhg
 rhg-Rohg
 rhg-Rohg-BD
 rhg-Rohg-MM
-rhg_Rohg
-rhg_Rohg_BD
-rhg_Rohg_MM
 rif
 rif-MA
-rif_MA
 rm
 rm-CH
 rm_CH
@@ -9972,8 +9893,6 @@ sat-Deva
 sat-Deva-IN
 sat-Olck
 sat-Olck-IN
-sat_Deva
-sat_Deva_IN
 sat_Olck
 sat_Olck_IN
 sati
@@ -10014,8 +9933,6 @@ sd_Deva_IN
 sdh
 sdh-IQ
 sdh-IR
-sdh_IQ
-sdh_IR
 se
 se-FI
 se-NO
@@ -10078,6 +9995,7 @@ setenbre
 setiembre
 setmana
 sett
+settemaña
 settember
 settembre
 settimana
@@ -10090,8 +10008,6 @@ sg_CF
 sginer
 sgiovedì
 sgiugn
-sgs
-sgs_LT
 sh
 shahulembela
 shahuviluha
@@ -10128,7 +10044,6 @@ sibatê
 sibiri
 sid
 sid-ET
-sid_ET
 sie
 sierpień
 sierpnia
@@ -10167,7 +10082,6 @@ skammâ
 skammâmáánu
 skr
 skr-PK
-skr_PK
 skáb
 skábmamánnu
 sl
@@ -10178,23 +10092,18 @@ slt
 sma
 sma-NO
 sma-SE
-sma_NO
-sma_SE
 smb
 smba
 smbara
 smj
 smj-NO
 smj-SE
-smj_NO
-smj_SE
 sml
 smn
 smn-FI
 smn_FI
 sms
 sms-FI
-sms_FI
 sn
 sn-ZW
 sn_ZW
@@ -10270,11 +10179,8 @@ srpnja
 ss
 ss-SZ
 ss-ZA
-ss_SZ
-ss_ZA
 ssy
 ssy-ER
-ssy_ER
 st
 st-LS
 st-ZA
@@ -10318,8 +10224,6 @@ suoidnemánnu
 sup
 supapá
 suz
-suz_Deva
-suz_Deva_NP
 suz_Sunu
 suz_Sunu_NP
 sv
@@ -10477,7 +10381,6 @@ ti_ET
 tifawt
 tig
 tig-ER
-tig_ER
 tiisdei
 tiistai
 tiistaina
@@ -10524,7 +10427,6 @@ toukokuu
 toukokuuta
 tpi
 tpi-PG
-tpi_PG
 tr
 tr-CY
 tr-TR
@@ -10549,15 +10451,12 @@ triwulan
 trm
 trv
 trv-TW
-trv_TW
 trw
 trw-PK
-trw_PK
 trì
 trìulas
 ts
 ts-ZA
-ts_ZA
 tsalo
 tsetsáʼ
 tsetsɛ̀ɛ
@@ -10711,7 +10610,6 @@ vaztam
 vaŋdɛrɛdi
 ve
 ve-ZA
-ve_ZA
 vec
 vec-IT
 vec_IT
@@ -10750,7 +10648,6 @@ vmw-MZ
 vmw_MZ
 vo
 vo-001
-vo_001
 voalohany
 voor
 vorm
@@ -10800,14 +10697,12 @@ w-ھەپتە
 w.'ª
 wa
 wa-BE
-wa_BE
 waare
 wae
 wae-CH
 wae_CH
 wal
 wal-ET
-wal_ET
 wanja
 wassarins
 watapa
@@ -10815,7 +10710,6 @@ wał
 wałtora
 wbp
 wbp-AU
-wbp_AU
 week
 wer
 wichishu
@@ -10853,6 +10747,7 @@ wవ
 w’indwi
 w번째
 x
+xamaan
 xan
 xaneiro
 xh
@@ -10909,12 +10804,16 @@ yMM
 yMMM
 yMMMEEEEd
 yMMMEd
+yMMMEddd
 yMMMM
 yMMMMEEEEd
 yMMMMEd
+yMMMMEddd
 yMMMMccccd
 yMMMMd
+yMMMMddd
 yMMMd
+yMMMddd
 yMMdd
 yMd
 yMd-alt-variant
@@ -10997,6 +10896,8 @@ yw-count-other
 yw-count-two
 yw-count-zero
 yy
+yyMMM
+yyMMMd
 yyyyMM
 yálɛ
 yáɓe
@@ -11058,8 +10959,6 @@ zh_Hant_HK
 zh_Hant_MO
 zh_Hant_MY
 zh_Hant_TW
-zh_Latn
-zh_Latn_CN
 zil
 zilye
 zin

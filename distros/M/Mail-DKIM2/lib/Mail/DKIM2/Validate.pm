@@ -1,7 +1,7 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Email::MIME;
 use List::Util qw(max);
@@ -10,9 +10,9 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
 
-# i= / m= of a field value; tag names are case insignificant (-07 §8).
-sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d+)/i ? 0 + $1 : 0 }
-sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d+)/i ? 0 + $1 : 0 }
+# i= / m= of a field value; tag-names are case-sensitive (-08 §8, D10).
+sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d+)/ ? 0 + $1 : 0 }
+sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d+)/ ? 0 + $1 : 0 }
 
 # --- parsed-tag breakdown for the validator UI ---------------------------
 # A compact, human-readable rendering of every tag in a DKIM2-Signature or
@@ -73,7 +73,7 @@ sub _mi_tags {
     return [] unless $mi;
     my @t;
     push @t, { tag => 'm', label => 'instance', value => ($mi->get_tag('m') // '') };
-    # -07 §9.3: h= may carry a hash-set per algorithm -- show each one
+    # -08 §9.3: h= may carry a hash-set per algorithm -- show each one
     # under its own name rather than assuming sha256.
     my $hashes = $mi->get_tag('hashes') || {};
     for my $alg (sort keys %$hashes) {
@@ -125,7 +125,7 @@ sub _default_cb {
 #
 # Prior to spec-06, a receiving MTA's Received-SPF header (Fastmail adds one)
 # was covered by the Message-Instance header hash and could break
-# verification; this used to retry once with it stripped. -07 §4 excludes
+# verification; this used to retry once with it stripped. -08 §4 excludes
 # Received-SPF from the hash via the "received-" prefix rule (should_skip()),
 # so stripping it can no longer change h_digest()/b_digest() or any verdict —
 # the retry was provably a no-op. Removed rather than kept as a "safety net":
@@ -159,7 +159,7 @@ sub _report_once {
     my @sig_hdrs = $msg->header('DKIM2-Signature');
     my @mi_hdrs  = $msg->header('Message-Instance');
     $res{counts} = { signatures => scalar @sig_hdrs, instances => scalar @mi_hdrs };
-    # A Message-Instance with no signature anywhere is -07 §14's
+    # A Message-Instance with no signature anywhere is -08 §14's
     # "PERMERROR: Message-Instance m=<x> is not signed", not an absence of
     # DKIM2. Reporting it as 'none' is exactly the answer someone pasting such
     # a message here does not need: it says "nothing to see" about a message
@@ -187,6 +187,11 @@ sub _report_once {
     my $ov = $v->result // 'fail';
     $res{summary} = $v->result_detail // '';
     $res{overall} = $ov eq 'pass' ? 'pass' : ($ov eq 'none' ? 'none' : 'fail');
+    # -08 section 13 (contract D9): a pass over a null body Recipe is not a
+    # Fully Verified DKIM2 Message -- the body below it went unchecked.
+    $res{fully_verified} = $v->fully_verified;
+    $res{summary} .= '; not fully verified: a null body Recipe hides the body below it'
+        if $ov eq 'pass' && !$res{fully_verified};
 
     my %sig_by_i = map { _i($_) => $_ } @sig_hdrs;
 
@@ -271,7 +276,7 @@ sub _mi_level {
 
     $lvl{tags} = _mi_tags($mi);
 
-    # -07 §3.5/§9.3: mirror MessageInstance::verify()'s semantics here --
+    # -08 §3.5/§9.3: mirror MessageInstance::verify()'s semantics here --
     # every implemented hash-set must match; an MI naming no implemented
     # algorithm displays as a mismatch (fail-closed), not silently as a
     # sha256-only "no hash".
@@ -360,7 +365,7 @@ sub _sig_level {
             my $prev = eval { Mail::DKIM2::Signature->parse($sig_by_i->{$num-1}) };
             die $@ if ref $@;
             if ($prev) {
-                # -07 section 7.1 item 1, as Verifier.pm checks it, so the
+                # -08 section 7.1 item 1, as Verifier.pm checks it, so the
                 # report and the verdict cannot disagree.
                 my $p = $num - 1;
                 my $cur_d = $sig->domain // '';
@@ -413,7 +418,7 @@ sub _sig_level {
     $lvl{result} = 'warn' if $crypto eq 'pass' && !$lvl{timestamp}{ok};
     $_->{result} = $crypto for @{$lvl{items}};
 
-    # Local policy (-07 section 14.4 allows a top nd= only by arrangement): the
+    # Local policy (-08 section 14.4 allows a top nd= only by arrangement): the
     # highest-numbered DKIM2-Signature in the *whole* chain MUST NOT carry
     # nd= (mirrors the Verifier.pm permerror from Task 2.1). $sig_by_i is the
     # original, unmodified full signature set for every call in this walk,
@@ -451,6 +456,7 @@ Mail::DKIM2::Validate - structured per-level DKIM2 and Message-Instance report
         SkipTimestampCheck => 1,
     );
     # $report->{overall}, $report->{summary}, $report->{counts},
+    # $report->{fully_verified} (-08 section 13: false over a null body Recipe),
     # $report->{levels}: one hashref per DKIM2-Signature and Message-Instance
 
 =head1 DESCRIPTION

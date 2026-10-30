@@ -1,0 +1,174 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib 'lib';
+
+use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::PathRegistry;
+
+my $skill_count = 50;
+my $runs        = 31;
+GetOptions(
+    'skills=i' => \$skill_count,
+    'runs=i'   => \$runs,
+) or die "Usage: $0 [--skills N] [--runs ODD_N]\n";
+die "Unexpected benchmark argument(s): @ARGV\nUsage: $0 [--skills N] [--runs ODD_N]\n" if @ARGV;
+die "--skills must be a positive integer\n" if $skill_count < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $temp_root = tempdir( 'problem48-skill-marker-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home      = File::Spec->catdir( $temp_root, 'home' );
+my $state     = File::Spec->catdir( $temp_root, 'state' );
+my $skills    = File::Spec->catdir( $home, '.developer-dashboard', 'skills' );
+make_path($skills);
+for my $index ( 1 .. $skill_count ) {
+    my $name = sprintf 'skill-%03d', $index;
+    my $root = File::Spec->catdir( $skills, $name );
+    make_path($root);
+    next if $index % 5;
+    open my $marker, '>', File::Spec->catfile( $root, '.disabled' )
+      or die "Unable to create isolated disabled marker: $!";
+    close $marker or die "Unable to close isolated disabled marker: $!";
+}
+
+local $ENV{HOME}                           = $home;
+local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = $state;
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+my $original_roots = \&Developer::Dashboard::PathRegistry::installed_skill_roots;
+my $expected_json  = json_encode( _without_duplicate_marker_stat($paths) );
+die 'Optimized nested inventory changed its output' if json_encode( _nested_entries($paths) ) ne $expected_json;
+
+my ( @baseline, @optimized );
+for ( 1 .. $runs ) {
+    push @baseline, _timed( sub { _without_duplicate_marker_stat($paths) }, $expected_json );
+    push @optimized, _timed( sub { _nested_entries($paths) }, $expected_json );
+}
+
+my $baseline_median  = _median(@baseline);
+my $optimized_median = _median(@optimized);
+printf "nested_skill_entries: %d skills (%d disabled), %d alternating paired runs; exact JSON parity (%d bytes).\n",
+  $skill_count, int( $skill_count / 5 ), $runs, length $expected_json;
+printf "Duplicate-marker-stat baseline median: %.3f ms.\n", 1000 * $baseline_median;
+printf "Single-check median: %.3f ms (%.2fx).\n",
+  1000 * $optimized_median, $baseline_median / $optimized_median;
+
+exit 0;
+
+# _nested_entries($paths)
+# Runs the optimized disabled-inclusive nested skill inventory with a fresh
+# directory-listing scope for this invocation.
+# Input: PathRegistry instance.
+# Output: ordered nested-skill entry list.
+sub _nested_entries {
+    my ($paths) = @_;
+    local $paths->{_installed_skill_inventory_scope} = {};
+    return [ $paths->nested_skill_entries(include_disabled => 1) ];
+}
+
+# _without_duplicate_marker_stat($paths)
+# Replays the prior nested-skill flow by injecting the redundant marker stat
+# into installed_skill_roots while preserving its output and one-call scope.
+# Input: PathRegistry instance.
+# Output: ordered nested-skill entry list.
+sub _without_duplicate_marker_stat {
+    my ($paths) = @_;
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::installed_skill_roots = sub {
+        my ( $self, %args ) = @_;
+        my @roots = $original_roots->(@_);
+        if ( $args{include_disabled} ) {
+            for my $root (@roots) {
+                -f File::Spec->catfile( $root, '.disabled' );
+            }
+        }
+        return @roots;
+    };
+    return _nested_entries($paths);
+}
+
+# _timed($code, $expected_json)
+# Measures one inventory and rejects any output change before recording time.
+# Input: code reference returning entries and expected canonical JSON string.
+# Output: elapsed seconds.
+sub _timed {
+    my ( $code, $expected_json ) = @_;
+    my $started = time;
+    my $actual  = json_encode( $code->() );
+    my $elapsed = time - $started;
+    die 'nested skill output changed during benchmark' if $actual ne $expected_json;
+    return $elapsed;
+}
+
+# _median(@samples)
+# Returns the middle value of an odd, nonempty timing list.
+# Input: elapsed-second values.
+# Output: median elapsed seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die 'Cannot calculate a median without samples' if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-skill-marker-benchmark - measure redundant disabled-marker checks
+
+=head1 PURPOSE
+
+This script compares nested-skill discovery before and after avoiding the
+redundant top-level C<.disabled> stat used when the caller explicitly requests
+all skills. Each sample verifies exact JSON output parity before recording
+timings.
+
+=head1 WHY IT EXISTS
+
+Problem 48 uses NYTProf to identify real repeated work. The old
+C<nested_skill_entries(include_disabled =E<gt> 1)> flow checked top-level
+disabled markers in C<installed_skill_roots> and then checked them again when
+building the nested queue. This benchmark isolates the effect with a
+reproducible synthetic skill tree and does not cache marker state across
+inventory calls.
+
+=head1 WHEN TO USE
+
+Use this only in the isolated Problem 48 Docker benchmark project after
+changing skill inventory logic. Results apply to this inventory routine and
+must not be presented as whole-command or all-subroutine speedups.
+
+=head1 HOW TO USE
+
+  perl script/problem48-skill-marker-benchmark
+  perl script/problem48-skill-marker-benchmark --skills 100 --runs 51
+
+The default creates 50 temporary skills, marks every fifth one disabled, and
+runs 31 alternating pairs. It removes its temporary home automatically.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses the benchmark to decide whether the
+marker-check change is worth retaining. Application commands and release
+workflows do not invoke it.
+
+=head1 EXAMPLES
+
+Run the default fixture in the scoped Docker benchmark project:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-skill-marker-benchmark
+
+Measure a deeper inventory fixture with more alternating pairs:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-skill-marker-benchmark --skills 100 --runs 51
+
+=cut

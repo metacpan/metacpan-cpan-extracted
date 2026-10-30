@@ -45,7 +45,7 @@
 }
 </style>
 
-<p class="back-link"><a href="/">&larr; Home</a></p>
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
 
 <h2 class="catalog-heading">Dataset catalog</h2>
 

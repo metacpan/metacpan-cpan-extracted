@@ -1,0 +1,22 @@
+title: an agent declaring an unknown skill is refused with briefing's message and never starts
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/notes/SKILL.md: "---\ndescription: Notes.\n---\nnotes\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\nbriefing:\n  skills: [ notes, ghost ]\n---\nSCRIBE-BODY\n"
+prompt: Have the scribe summarise the day.
+script:
+  - tool_calls:
+      - [ agent, { description: Summarise, prompt: Summarise the day., subagent_type: scribe } ]
+  - text: The scribe cannot start.
+expect:
+  answer: The scribe cannot start.
+  request_count: 2
+  requests:
+    - { index: 1, contains: "briefing: agent 'scribe' references unknown skill(s): ghost" }
+    - { index: 1, absent: SCRIBE-BODY }
+  tools:
+    - { name: agent, error: true, text: '\Abriefing: agent ''scribe'' references unknown skill\(s\): ghost\z' }
+  events:
+    - { type: tool.call, call: c1, name: agent }
+    - { type: tool.result, call: c1, name: agent, status: failed }

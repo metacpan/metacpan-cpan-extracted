@@ -54,7 +54,11 @@ for my $file (@files) {
 
     if ($error_message) {
         say STDERR $error_message;
-        exit($code);
+
+        # A per-file problem (not found, unparseable, no package) must not
+        # abort the run: record any failure and carry on to the next file.
+        $exit_code = $code if $code;
+        next;
     }
 
     if ( $code > 0 ) {
@@ -82,7 +86,7 @@ perlvars - A command line utility for detecting unused Perl variables
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head1 SYNOPSIS
 
@@ -132,13 +136,23 @@ its C<use> statements and C<BEGIN> blocks are executed as the file is compiled.
 Only pass C<--scripts> for files you trust, exactly as you would before running
 them.
 
-A package-less file that cannot be compiled in isolation is skipped silently
-(no analysis, no error) even when C<--scripts> is given. This includes files
-that locate a sibling library at runtime (for example via L<FindBin> and C<use
-lib>) and files that C<use> a module which is not installed in the environment
-C<perlvars> runs in. A file that contains a C<#line> directive is likewise not
-analyzed, because the directive changes the filename L<Test::Vars> attributes
-subroutines to.
+A package-less file that cannot be analyzed is skipped silently (no analysis,
+no error) even when C<--scripts> is given. This includes files that locate a
+sibling library at runtime (for example via L<FindBin> and C<use lib>), files
+that C<use> a module which is not installed in the environment C<perlvars> runs
+in, and files that cannot be parsed as Perl. A file that contains a C<#line>
+directive is likewise not analyzed, because the directive changes the filename
+L<Test::Vars> attributes subroutines to.
+
+Analyzing any file C<require>s it, so its compile-time code runs and its own
+output is suppressed so it does not leak through C<perlvars>. A file that exits
+or dies at compile time -- for example one that declares a package and does
+C<use Test::More skip_all> -- cannot be analyzed and is skipped silently too,
+rather than aborting the run.
+
+When several files are given, a problem with one file (it cannot be found or
+cannot be parsed) is reported to C<STDERR> and C<perlvars> moves on to the next
+file rather than aborting the whole run; the final exit code is still non-zero.
 
 =head1 USING perlvars WITH precious
 
@@ -200,6 +214,82 @@ The package needs be in C<@INC> or in a C<./lib> folder. This means that for the
     perlvars lib/Foo/Bar.pm
 
     cd lib && PERL5OPT="-I." perlvars Foo/Bar.pm
+
+=head2 False positives from constant-folded code
+
+L<Test::Vars> inspects your code's compiled optree and reports a lexical as
+"used once" when it finds only a single reference to it. A variable that B<is>
+used in the source can therefore still be reported if the Perl compiler removed
+its uses before L<Test::Vars> looked at them. The usual cause is a block guarded
+by a compile-time constant that is false in the environment where C<perlvars>
+runs:
+
+    use constant HAVE_XS => $INC{'Some/XS.pm'} ? 1 : 0;
+
+    sub generate {
+        my @xsub;
+        if (HAVE_XS) {               # folded away when HAVE_XS is false
+            my @known = ...;         # declared and used only inside the block
+            my $xsub  = build(@known);
+            push @xsub, $xsub if $xsub;
+        }
+        return ( sub {...}, @xsub );
+    }
+
+When C<HAVE_XS> is false, Perl constant-folds the C<if> away entirely, so the
+uses of C<@known> and C<$xsub> never reach the optree and both are reported as
+"used once" -- even though the source uses them correctly. Install the optional
+dependency so the constant becomes true, and the findings disappear.
+
+Several widely used distributions do exactly this to guard an optional XS fast
+path or a version-specific workaround. For example, L<Type::Tiny> reports
+C<@known>/C<$known>/C<$xsub> in C<Types::Standard::Map> and friends only when
+L<Type::Tiny::XS> is B<not> installed, and L<Role::Tiny> reports C<$guard> in
+C<_load_module> depending on a C<_WORK_AROUND_BROKEN_MODULE_STATE> constant.
+Because the outcome depends on what is installed -- and, for constants resolved
+at load time, even on module load order -- the same source file can be reported
+in one environment and come back clean in another.
+
+This cannot be worked around inside C<perlvars> or L<Test::Vars>: both inspect
+the optree only after the compiler has already discarded the folded-out code, so
+there is nothing left to count (see L</"Can this be fixed?"> below). To silence
+such a false positive, list the variable in an C<--ignore-file> (see
+L<App::perlvars> for the format), for example:
+
+    Type::Tiny::Class = $xsub
+
+=head2 Can this be fixed?
+
+Not in C<perlvars>, and not cleanly in L<Test::Vars> either. L<Test::Vars>
+counts variable uses by walking the compiled optree (via C<B::walkoptree>).
+Perl's compiler folds a constant-false C<if> and frees the ops inside it
+B<before> the optree is handed to L<Test::Vars>, so the folded-out uses simply
+do not exist anymore -- the lexical's pad slot survives, but with no use ops to
+count. There is no information left that distinguishes "declared, uses folded
+away" from "declared and genuinely never used."
+
+A real fix would require one of:
+
+=over 4
+
+=item *
+
+Preventing Perl from constant-folding the dead branch during analysis. Perl
+offers no supported way to turn off constant folding for a single compile, so
+this is not practical.
+
+=item *
+
+Re-deriving uses from the source (for example with L<PPI>) instead of, or in
+addition to, the optree. That is a different kind of analysis that would give up
+L<Test::Vars>' main strength -- catching variables that are assigned but never
+meaningfully read -- and would reintroduce its own false positives.
+
+=back
+
+So the folding is inherent to how L<Test::Vars> works, and the practical
+response is to install the optional dependency (which makes the constant true
+and the finding go away) or to suppress the variable via C<--ignore-file>.
 
 =head1 ACKNOWLEDGEMENTS
 

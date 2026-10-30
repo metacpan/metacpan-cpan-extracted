@@ -77,7 +77,8 @@
   .piv-page-info { font-size: 0.82rem; color: #555; }
 </style>
 
-<p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+[% PROCESS "web/en/layouts/view_context.html.tt" %]
 
 <h2 style="margin-bottom:0.75rem">[% title | html %]</h2>
 

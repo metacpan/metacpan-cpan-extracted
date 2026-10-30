@@ -342,7 +342,7 @@ END_TEX
 	my ($csv, $tex) = paths();
 	throws_ok {
 		write_table([[qw(k v)], [1, 2]], $tex, 'tex.tab.file' => $tex, 'row_names' => 0)
-	} qr/Unknown argument/, 'removed tex.tab.file option now croaks as unknown';
+	} qr/\nwrite_table: error: unknown argument 'tex.tab.file'$/, 'removed tex.tab.file option now croaks as unknown';
 }
 
 # leak safety: success and croak paths (mortal collector must be reclaimed).

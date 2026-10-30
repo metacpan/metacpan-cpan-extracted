@@ -1,6 +1,6 @@
 \b[O][L][D]_CODE\b
 ^\.github/
-^cover_db/
+^cover_db(?:[-_][^/]+)?/
 ^ELLEN\.md$
 ^examples/
 ^\.developer-dashboard/

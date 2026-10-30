@@ -1,11 +1,12 @@
 package BarefootJS;
-our $VERSION = "0.40.0";
+our $VERSION = "0.40.1";
 use strict;
 use warnings;
 use utf8;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+use B ();
 use POSIX ();
 use Time::Local ();
 use Scalar::Util qw(looks_like_number weaken);
@@ -379,6 +380,24 @@ sub register_child_renderer ($self, $name, $renderer) {
     $self->_child_renderers->{$name} = $renderer;
 }
 
+# The keys the innermost `render_child` call passed (see `passed`); undef
+# outside one, i.e. while the root renders.
+our $CALLER_KEYS;
+
+# Whether this component's caller passed the prop `$name`, even as undef:
+# JS's `name in props`, which a template can't ask of its stash (every
+# declared prop is seeded, so an omitted one and an undef one read the same).
+# A `{...props}` spread onto a child carries a param only when this is true.
+# The keys are those `render_child` recorded for a child and `_props` for the
+# root; with neither recorded (a root rendered without `_props`), `$fallback`,
+# the template's own "not nil" test, decides.
+sub passed ($self, $name, $fallback = undef) {
+    return exists $CALLER_KEYS->{$name} ? 1 : 0 if $CALLER_KEYS;
+    my $props = $self->_props;
+    return exists $props->{$name} ? 1 : 0 if ref $props eq 'HASH';
+    return $fallback ? 1 : 0;
+}
+
 sub render_child ($self, $name, @args) {
     my $renderer = $self->_child_renderers->{$name};
     die "No renderer registered for child component '$name'" unless $renderer;
@@ -398,6 +417,12 @@ sub render_child ($self, $name, @args) {
     # is safe to apply unconditionally rather than naming `children`
     # specifically.
     $props{$_} = $self->backend->materialize($props{$_}) for keys %props;
+    # Record the keys this call passes for the child's `passed` while its
+    # template renders. The renderer builds the child's own instance, so the
+    # record is dynamically scoped (`local`) rather than stored on that
+    # object; rendering is synchronous, so it always holds the keys of the
+    # component whose template is running.
+    local $CALLER_KEYS = { map { $_ => 1 } keys %props };
     # Renderer contract (#1897): the renderer is invoked with TWO
     # arguments — the props hashref and the INVOKING instance. A renderer
     # registered on the root may be called from a nested child render
@@ -685,7 +710,24 @@ sub json ($self, $value) {
     # ergonomics: an unset prop becomes the string "null" rather than
     # the literal text "undefined" or an empty attribute. Matches the
     # `null` case of JS exactly; diverges from the `undefined` case.
-    return $self->backend->encode_json($value);
+    return $self->backend->encode_json(_json_zero($value));
+}
+
+# JS `JSON.stringify` writes a negative zero as `0` (`JSON.stringify(-0)`
+# is "0"). Perl's `mod` keeps `-0.0` for a negative dividend, and some
+# encoders (Mojo::JSON on newer Perls) spell it `-0.0`, so a value the
+# encoder would emit as a number is rewritten to the integer 0 when it is
+# zero. Returns a copy at every depth; the argument is never mutated.
+sub _json_zero ($value) {
+    my $ref = ref $value;
+    return [ map { _json_zero($_) } @$value ] if $ref eq 'ARRAY';
+    return { map { ($_ => _json_zero($value->{$_})) } keys %$value } if $ref eq 'HASH';
+    return $value if $ref || !defined $value;
+    my $flags = B::svref_2object(\$value)->FLAGS;
+    return $value unless $flags & (B::SVp_IOK | B::SVp_NOK);
+    no warnings qw(numeric);
+    return $value unless 0 + $value eq $value && $value == 0;
+    return 0;
 }
 
 sub string ($self, $value) {
@@ -1041,6 +1083,17 @@ sub _format_date_zone_offset ($tz, $ms) {
 # Anything else (HASH ref, code ref) returns false — matches the
 # JS semantic where `.includes` is only defined on Array /
 # TypedArray / String.
+
+# JS `a === b` when neither operand's type is known at compile time. Perl's
+# numeric `==` reads two different non-numeric strings as `0 == 0`, and `eq`
+# reads `1` and `1.0` as different, so the comparison goes by the operands'
+# JS types: numbers by value, strings by content, booleans by truth value,
+# `undef` only to `undef`, an object or array only to the same reference,
+# and values of different types never equal. The
+# result is a Perl boolean, the same value the native operators yield.
+sub strict_eq ($self, $l, $r) {
+    return BarefootJS::Evaluator::_strict_eq($l, $r) ? !!1 : !!0;
+}
 
 sub includes ($self, $recv, $elem) {
     if (ref($recv) eq 'ARRAY') {
@@ -2278,7 +2331,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.40.0";
+our $VERSION = "0.40.1";
 
 sub new {
     my ($class, $epoch_ms) = @_;

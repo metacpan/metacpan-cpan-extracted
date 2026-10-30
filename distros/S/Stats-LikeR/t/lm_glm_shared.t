@@ -195,9 +195,9 @@ for my $key (qw(_row rownames .rownames)) {
 # user called.
 
 throws_ok { lm(formula => 'y + x', data => \%d) }
-	qr/^lm: invalid formula, missing '~'/, 'lm: keeps its own prefix on a bad formula';
+	qr/\nlm: error: invalid formula, missing '~'/, 'lm: keeps its own prefix on a bad formula';
 throws_ok { glm(formula => 'y + x', data => \%d) }
-	qr/^glm: invalid formula, missing '~'/, 'glm: keeps its own prefix on a bad formula';
+	qr/\nglm: error: invalid formula, missing '~'/, 'glm: keeps its own prefix on a bad formula';
 throws_ok { lm(formula => 'y ~ x', data => [1, 2, 3]) }
 	qr/^lm: Array values must be HashRefs/, 'lm: keeps its own prefix on bad data';
 throws_ok { glm(formula => 'y ~ x', data => [1, 2, 3]) }
@@ -222,6 +222,29 @@ unless ($INC{'Devel/Cover.pm'}) {
 		'lm: no leaks when the formula has no ~';
 	no_leaks_ok { eval { glm(formula => 'y ~ x', data => [1, 2, 3]) } }
 		'glm: no leaks when the data shape is wrong';
+}
+
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { lm(formula => 'y ~ x', data => { x => [1, 2], y => [1, 2] }, colour => 1); 1 } ? '' : $@;
+	like($err, qr/\Ausage: lm\(.*^example:\n.*\n\nlm: error: \Qunknown argument 'colour'\E\n\z/ms,
+		'lm: unknown argument \'colour\', under the help screen');
+}
+{
+	my $err = eval { lm('y ~ x'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: lm\(.*^example:\n.*\n\nlm: error: \Qarguments must be name => value pairs\E\n\z/ms,
+		'lm: arguments must be name => value pairs, under the help screen');
+}
+{
+	my $err = eval { glm(formula => 'y ~ x', data => { x => [1, 2], y => [1, 2] }, family => 'gamma'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: glm\(.*^example:\n.*\n\nglm: error: \Qunsupported family 'gamma' (gaussian, binomial, poisson, negbin)\E\n\z/ms,
+		'glm: unsupported family \'gamma\' (gaussian, binomial, poisson, negbin), under the help screen');
+}
+{
+	my $err = eval { glm(formula => 'y ~ x', data => { x => [1, 2], y => [1, 2] }, offset => {}); 1 } ? '' : $@;
+	like($err, qr/\Ausage: glm\(.*^example:\n.*\n\nglm: error: \Q'offset' must be a column name or an array ref\E\n\z/ms,
+		'glm: \'offset\' must be a column name or an array ref, under the help screen');
 }
 
 done_testing();

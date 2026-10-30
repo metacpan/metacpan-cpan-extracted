@@ -41,7 +41,7 @@ use SNMP::Info::Aggregate;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.983000';
+$VERSION = '3.984000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -196,6 +196,8 @@ sub _lldp_addr_index {
     my $proto = shift(@oids);
     shift(@oids) if scalar @oids > 4;    # $length
 
+    return unless defined $proto and @oids;
+
     # IPv4
     if ( $proto == 1 ) {
         return ( $index, $proto, join( '.', @oids ) );
@@ -277,6 +279,8 @@ sub agg_ports {
 
     return $alu->agg_ports_ifstack();
 }
+
+sub _agg_ports_walked { return qw/ifStackStatus ifType/ }
 
 sub fan {
     my $alu = shift;

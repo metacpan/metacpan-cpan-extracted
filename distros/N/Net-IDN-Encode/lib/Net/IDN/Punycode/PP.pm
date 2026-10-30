@@ -9,14 +9,15 @@ use warnings;
 use Carp;
 use Exporter;
 
-our $VERSION = "2.502";
+our $VERSION = "2.600";
 
 our @ISA = qw(Exporter);
 our @EXPORT = ();
 our @EXPORT_OK = qw(encode_punycode decode_punycode);
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
-use integer;
+## no "use integer" - IV arithmetic wraps below PUNYCODE_MAXINT on 32-bit
+## perls, whereas NV arithmetic is exact up to 2**53 everywhere
 
 use constant BASE => 36;
 use constant TMIN => 1;
@@ -26,8 +27,10 @@ use constant DAMP => 700;
 use constant INITIAL_BIAS => 72;
 use constant INITIAL_N => 128;
 
-use constant UNICODE_MIN => 0;
 use constant UNICODE_MAX => 0x10FFFF;
+use constant PUNYCODE_MAXINT => 0xFFFFFFFF;
+use constant SURROGATE_MIN => 0xD800;
+use constant SURROGATE_MAX => 0xDFFF;
 
 my $Delimiter = chr 0x2D;
 my $BasicRE   = "\x00-\x7f";
@@ -39,25 +42,44 @@ sub _adapt {
     $delta += int($delta / $numpoints);
     my $k = 0;
     while ($delta > int(((BASE - TMIN) * TMAX) / 2)) {
-	$delta /= BASE - TMIN;
+	$delta = int($delta / (BASE - TMIN));
 	$k += BASE;
     }
-    return $k + (((BASE - TMIN + 1) * $delta) / ($delta + SKEW));
+    return $k + int(((BASE - TMIN + 1) * $delta) / ($delta + SKEW));
+}
+
+## die, not croak - Carp itself fails while it formats a malformed argument
+sub _die {
+    my $frame = 0;
+    $frame++ while ((caller $frame)[0] || '') eq __PACKAGE__;
+    my ($file, $line) = (caller $frame)[1, 2];
+    die "$_[0] at $file line $line.\n";
+}
+
+sub _check_input {
+    my ($input, $message) = @_;
+    unless (defined $input) {
+        warnings::warnif('uninitialized',
+            'Use of uninitialized value in subroutine entry');
+        return;
+    }
+    $input = "$input";    ## stringify an overloaded object once
+    _die($message) unless utf8::valid($input);
+    return $input;
 }
 
 sub decode_punycode {
-    die("Usage: Net::IDN::Punycode::decode_punycode(input)") unless @_;
+    _die("Usage: Net::IDN::Punycode::decode_punycode(input)") unless @_ == 1;
     no warnings 'utf8';
 
-    my $input = shift;
+    my $input = _check_input(shift,
+        "non-base character in input for decode_punycode");
+    return '' unless defined $input && length $input;
 
     my $n      = INITIAL_N;
     my $i      = 0;
     my $bias   = INITIAL_BIAS;
     my @output;
-
-    return undef unless defined $input;
-    return '' unless length $input;
 
     if($input =~ s/(.*)$Delimiter//os) {
       my $base_chars = $1;
@@ -67,9 +89,11 @@ sub decode_punycode {
     }
     my $code = $input;
 
+    croak("non-base character in input for decode_punycode")
+      if $code =~ m/[^$BasicRE]/os;
     croak('invalid digit in input for decode_punycode') if $code =~ m/[^$PunyRE]/os;
 
-    utf8::downgrade($input);	## handling failure of downgrade is more expensive than
+    utf8::downgrade($code);	## handling failure of downgrade is more expensive than
 				## doing the above regexp w/ utf8 semantics
 
     while(length $code)
@@ -79,7 +103,7 @@ sub decode_punycode {
     LOOP:
 	for (my $k = BASE; 1; $k += BASE) {
 	    my $cp = substr($code, 0, 1, '');
-	    croak("incomplete encoded code point in decode_punycode") if !defined $cp;
+	    croak("incomplete encoded code point in decode_punycode") if !length $cp;
 	    my $digit = ord $cp;
 
 	    ## NB: this depends on the PunyRE catching invalid digit characters
@@ -87,6 +111,8 @@ sub decode_punycode {
 	    ##
 	    $digit = $digit < 0x40 ? $digit + (26-0x30) : ($digit & 0x1f) -1;
 
+	    croak("input exceeds punycode limit")
+	      if $digit > (PUNYCODE_MAXINT - $i) / $w;
 	    $i += $digit * $w;
 	    my $t =  $k - $bias;
 	    $t = $t < TMIN ? TMIN : $t > TMAX ? TMAX : $t;
@@ -94,10 +120,14 @@ sub decode_punycode {
 	    last LOOP if $digit < $t;
 	    $w *= (BASE - $t);
 	}
-	$bias = _adapt($i - $oldi, @output + 1, $oldi == 0);
-	$n += $i / (@output + 1);
-	$i = $i % (@output + 1);
-	croak('invalid code point') if $n < UNICODE_MIN or $n > UNICODE_MAX;
+	my $len  = @output + 1;
+	my $step = int($i / $len);
+	$bias = _adapt($i - $oldi, $len, $oldi == 0);
+	croak('invalid code point') if $step > UNICODE_MAX - $n;
+	$n += $step;
+	croak('invalid code point')
+	  if $n >= SURROGATE_MIN && $n <= SURROGATE_MAX;
+	$i = $i % $len;
 	splice(@output, $i, 0, chr($n));
 	$i++;
     }
@@ -105,10 +135,12 @@ sub decode_punycode {
 }
 
 sub encode_punycode {
-    die("Usage: Net::IDN::Punycode::encode_punycode(input)") unless @_;
+    _die("Usage: Net::IDN::Punycode::encode_punycode(input)") unless @_ == 1;
     no warnings 'utf8';
 
-    my $input = shift;
+    my $input = _check_input(shift,
+        "malformed UTF-8 in input for encode_punycode");
+    return '' unless defined $input;
     my $input_length = length $input;
 
     ## my $output = join '', $input =~ m/([$BasicRE]+)/og; ## slower
@@ -120,6 +152,9 @@ sub encode_punycode {
 
     my @input = map ord, split //, $input;
     my @chars = sort { $a<=> $b } grep { $_ >= INITIAL_N } @input;
+    croak("invalid code point") if grep {
+        $_ > UNICODE_MAX || ($_ >= SURROGATE_MIN && $_ <= SURROGATE_MAX)
+    } @chars;
 
     my $n = INITIAL_N;
     my $delta = 0;
@@ -127,6 +162,8 @@ sub encode_punycode {
 
     foreach my $m (@chars) {
  	next if $m < $n;
+	croak("input exceeds punycode limit")
+	  if $m - $n > (PUNYCODE_MAXINT - $delta) / ($h + 1);
 	$delta += ($m - $n) * ($h + 1);
 	$n = $m;
 	for(my $i = 0; $i < $input_length; $i++)
@@ -134,6 +171,7 @@ sub encode_punycode {
 	    my $c = $input[$i];
 	    $delta++ if $c < $n;
 	    if ($c == $n) {
+		croak("input exceeds punycode limit") if $delta > PUNYCODE_MAXINT;
 		my $q = $delta;
 	    LOOP:
 		for (my $k = BASE; 1; $k += BASE) {
@@ -147,7 +185,7 @@ sub encode_punycode {
 
 		    $q = int(($q - $t) / (BASE - $t));
 		}
-		croak("input exceeds punycode limit") if $q > BASE;
+		croak("input exceeds punycode limit") if $q >= BASE;
                 $output .= chr $q + ($q < 26 ? 0x61 : 0x30-26);
 
 		$bias = _adapt($delta, $h + 1, $h == $bb);
@@ -155,6 +193,7 @@ sub encode_punycode {
 		$h++;
 	    }
 	}
+	croak("input exceeds punycode limit") if $delta >= PUNYCODE_MAXINT;
 	$delta++;
 	$n++;
     }

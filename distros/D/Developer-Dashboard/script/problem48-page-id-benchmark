@@ -1,0 +1,171 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::PageStore ();
+
+my $iterations = 500_000;
+my $runs = 9;
+my $help = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $store = bless {}, 'Developer::Dashboard::PageStore';
+my $fast = Developer::Dashboard::PageStore->can('_validated_page_id');
+my @parity_cases = (
+    [ 'nav/item-001.tt',       1 ],
+    [ 'nav/a..b.tt',           1 ],
+    [ '/app/nav/item-001.tt',  1 ],
+    [ 'nav/team/item.tt',      1 ],
+    [ 'nav/..name.tt',         1 ],
+    [ 'nav/../escape.tt',      0 ],
+);
+for my $case (@parity_cases) {
+    my ( $id, $expected_valid ) = @{$case};
+    my ( $old_ok, $old_value ) = _outcome( \&_baseline_validate_page_id, $store, $id );
+    my ( $new_ok, $new_value ) = _outcome( $fast, $store, $id );
+    die "Page-id validation parity failed for '$id'\n"
+      if $old_ok != $new_ok || $old_ok != $expected_valid
+      || ( $old_ok && $old_value ne $new_value )
+      || ( !$old_ok && $old_value ne $new_value );
+    my $uses_fast_path = defined $id && !ref($id)
+      && $id =~ m{\Anav/[A-Za-z0-9_-][A-Za-z0-9_.-]*\.tt\z}
+      && index( $id, '..' ) < 0;
+    printf "case=%s fast_path=%s parity=yes\n", $id, $uses_fast_path ? 'yes' : 'no';
+}
+
+my @ids = map { sprintf 'nav/item-%03d.tt', $_ } 1 .. 64;
+my ( @old_seconds, @fast_seconds );
+for my $run ( 1 .. $runs ) {
+    my @strategies = $run % 2 ? qw(old fast) : qw(fast old);
+    for my $strategy (@strategies) {
+        my $implementation = $strategy eq 'old' ? \&_baseline_validate_page_id : $fast;
+        my $started = time;
+        my $value = '';
+        for my $index ( 0 .. $iterations - 1 ) {
+            $value = $implementation->( $store, $ids[ $index % @ids ] );
+        }
+        die "Timed output mismatch for '$strategy' implementation\n"
+          if $value ne $ids[ ( $iterations - 1 ) % @ids ];
+        my $elapsed = ( time - $started ) / $iterations;
+        push @{ $strategy eq 'old' ? \@old_seconds : \@fast_seconds }, $elapsed;
+    }
+}
+
+my $old_median = _median(@old_seconds);
+my $fast_median = _median(@fast_seconds);
+printf "input=nav/item-NNN.tt iterations=%d runs=%d old_ms_per_call=%.6f fast_ms_per_call=%.6f speedup=%.2fx parity=yes\n",
+  $iterations, $runs, 1000 * $old_median, 1000 * $fast_median, $old_median / $fast_median;
+exit 0;
+
+# _baseline_validate_page_id($store, $id)
+# Replays the pre-fast-path implementation for an independent comparison.
+# Input: PageStore-like object and optional page id string.
+# Output: validated relative id, or dies with the standard page-id error.
+sub _baseline_validate_page_id {
+    my ( $store, $id ) = @_;
+    my $normalized = $store->_normalized_page_id($id);
+    die 'Invalid page id' if $normalized eq '';
+    die 'Invalid page id' if $normalized =~ /\A[A-Za-z]:/;
+    die 'Invalid page id'
+      if grep { $_ eq '' || $_ eq '.' || $_ eq '..' } split m{[\\/]}, $normalized, -1;
+    return $normalized;
+}
+
+# _outcome($implementation, $store, $id)
+# Captures validation success or its standard invalid-id diagnostic.
+# Input: validation coderef, PageStore-like object, and page id.
+# Output: success boolean and returned id or normalized error label.
+sub _outcome {
+    my ( $implementation, $store, $id ) = @_;
+    my $value = eval { $implementation->( $store, $id ) };
+    return ( 1, $value ) if !$@;
+    return ( 0, 'Invalid page id' ) if $@ =~ /\AInvalid page id\b/;
+    return ( 0, $@ );
+}
+
+# _median(@values)
+# Returns the middle sorted sample, averaging the middle pair for even counts.
+# Input: list of numeric sample values.
+# Output: median numeric value.
+sub _median {
+    my @sorted = sort { $a <=> $b } @_;
+    my $middle = int( @sorted / 2 );
+    return @sorted % 2 ? $sorted[$middle] : ( $sorted[ $middle - 1 ] + $sorted[$middle] ) / 2;
+}
+
+# _usage()
+# Returns the page-id benchmark command usage text.
+# Input: none.
+# Output: one-line usage string.
+sub _usage {
+    return "Usage: $0 [--iterations POSITIVE_N] [--runs ODD_N] [--help]\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-page-id-benchmark - compare PageStore page-id validation paths
+
+=head1 PURPOSE
+
+Measures the optimized C<Developer::Dashboard::PageStore::_validated_page_id>
+against a local reference that reproduces its pre-fast-path normalization and
+validation sequence. It checks exact successful values and rejection parity
+for canonical, unusual, prefixed, nested, and traversal ids before timing.
+
+=head1 WHY IT EXISTS
+
+The saved-page route profile showed page-id validation among its repeated
+helpers. This benchmark records whether the canonical static-nav id fast path
+improves that helper without changing less common input behavior. It is a
+function-level diagnostic and does not claim a dashboard-wide or
+all-subroutine speedup.
+
+=head1 WHEN TO USE
+
+Run after changing C<_validated_page_id>, C<_normalized_page_id>, or the
+canonical nav-id grammar. Run the full test suite separately; benchmark output
+is not a substitute for security or coverage gates.
+
+=head1 HOW TO USE
+
+  d2 docker compose exec dev perl script/problem48-page-id-benchmark
+  d2 docker compose exec dev perl script/problem48-page-id-benchmark --iterations 100000 --runs 9
+
+C<--iterations> must be positive. C<--runs> must be an odd positive integer;
+the benchmark alternates which implementation runs first and reports medians.
+The preflight compares successful values and standard invalid-id outcomes for
+all parity cases. A mismatch exits with an explicit error.
+
+=head1 WHAT USES IT
+
+This is an opt-in Problem 48 research command. Production request handling does
+not load this script or its timing code.
+
+=head1 EXAMPLES
+
+  d2 docker compose exec dev perl script/problem48-page-id-benchmark --iterations 500000 --runs 9
+  d2 docker compose exec dev perl script/problem48-page-id-benchmark --iterations 10000 --runs 3
+
+=cut

@@ -33,6 +33,7 @@ sub pack_fragments {
 {
   my ($packed) = pack_fragments(
     'file' => "content\n",
+    'dir [d]/guarded' => "guarded\n",
     'sub/other' => "FILENAME .other\nother\n",
     'overridden' => "packed\n");
   my $t = UpdateConfigTest->new;
@@ -42,6 +43,10 @@ sub pack_fragments {
   is($t->read_home_file('file'), guarded("content\n"), 'packed fragment applied');
   is($t->read_home_file('.other'),
     guarded("other\n"), 'packed fragment from a sub-directory applied');
+  is(
+    $t->read_home_file('guarded'),
+    guarded("guarded\n", undef, 'd'),
+    'packed fragment with a guard suffix from its directory');
   is($t->read_home_file('overridden'),
     guarded("local\n"), 'local fragment overrides packed fragment');
 }
@@ -64,6 +69,8 @@ sub pack_fragments {
   my ($packed, $t) = pack_fragments(
     'in,out' => "content\n",
     'other [x]' => "FILENAME .bar\nother\n",
+    'dir [d]/sub' => "sub\n",
+    'dir [d]/own [o]' => "GUARD SUFFIX own\nown\n",
     'no_newline' => 'last line');
   my $export_dir = catfile($t->root, 'export');
   make_path($export_dir);
@@ -75,8 +82,16 @@ sub pack_fragments {
     '--export: FILENAME added and name cleaned');
   is(
     UpdateConfigTest::read_file(catfile($export_dir, 'other [x]')),
-    "FILENAME .bar\nother\n",
-    '--export: existing FILENAME kept');
+    "GUARD SUFFIX x\nFILENAME .bar\nother\n",
+    '--export: existing FILENAME kept and GUARD SUFFIX added');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'dir [d]_sub')),
+    "FILENAME sub\nGUARD SUFFIX d\nsub\n",
+    '--export: GUARD SUFFIX from the directory added');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'dir [d]_own [o]')),
+    "FILENAME own\nGUARD SUFFIX own\nown\n",
+    '--export: existing GUARD SUFFIX kept');
   is(
     UpdateConfigTest::read_file(catfile($export_dir, 'no_newline')),
     "FILENAME no_newline\nlast line\n",

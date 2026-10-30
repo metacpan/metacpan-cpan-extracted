@@ -435,6 +435,24 @@ Kako Cameroon locale.
    1995-12-22T09:05:02 = vaŋdɛrɛdi 22 ɓulɓusɛ 1995 CE
   -0010-09-15T04:44:23 = mɔnɔ sɔndi 15 njapi -10 BCE
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 wanja
+   1995-12-22T09:05:02 = CE 1995 ɓulɓusɛ
+  -0010-09-15T04:44:23 = BCE -10 njapi
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 wanja 5, mardi
+   1995-12-22T09:05:02 = CE 1995 ɓulɓusɛ 22, vaŋdɛrɛdi
+  -0010-09-15T04:44:23 = BCE -10 njapi 15, mɔnɔ sɔndi
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 wanja 5
+   1995-12-22T09:05:02 = CE 1995 ɓulɓusɛ 22
+  -0010-09-15T04:44:23 = BCE -10 njapi 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 wanja 2008 CE
@@ -506,6 +524,12 @@ Kako Cameroon locale.
    2008-02-05T18:30:30 = mardi 5 wanja
    1995-12-22T09:05:02 = vaŋdɛrɛdi 22 ɓulɓusɛ
   -0010-09-15T04:44:23 = mɔnɔ sɔndi 15 njapi
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = wanja 5, mardi
+   1995-12-22T09:05:02 = ɓulɓusɛ 22, vaŋdɛrɛdi
+  -0010-09-15T04:44:23 = njapi 15, mɔnɔ sɔndi
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

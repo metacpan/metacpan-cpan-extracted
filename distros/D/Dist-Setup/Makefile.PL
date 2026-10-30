@@ -26,10 +26,12 @@ WriteMakefile(
     # is a file named Makefile.PL in a sub-directory. Should be customized if such a file needs to be
     # processed by ExtUtils.
     DIR              => [],
-    NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
-      # Goes with NO_MYMETA (which would provide the dynamic config).
+      # The prerequisites of the META file are complete, so that CPAN clients
+      # don't need to run Makefile.PL to find them. The MYMETA files are still
+      # generated, as some clients (e.g. cpanm) read the recommended modules
+      # only from there.
       dynamic_config => 0,
       no_index => {
         directory => [ 'local', 'vendor', 't' ],
@@ -66,13 +68,14 @@ sub MY::postamble {
 
   push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
+TEST_PM := \$(shell find t -name "*.pm")
 ALL_EXE := script/perl_dist_setup
 
 .PHONY: distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
 
 distupload: distcheck disttest
 \t\$(MAKE) tardist
-\tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
+\tcpan-upload --directory \$(DISTNAME) \$(DISTVNAME).tar\$(SUFFIX)
 
 cover:
 \tcover -test
@@ -85,7 +88,7 @@ rawcritic:
 \tperlcritic lib script
 
 tidy:
-\tperltidy -b -bext='/' \$(ALL_PM) \$(ALL_EXE)
+\tperltidy -b -bext='/' \$(ALL_PM) \$(TEST_PM) \$(ALL_EXE)
 
 spelling: export EXTENDED_TESTING = 1
 spelling:

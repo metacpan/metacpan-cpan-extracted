@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signature verification
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 use base 'Mail::Milter::Authentication::Handler';
 
 use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header parse_mime);
@@ -379,7 +379,7 @@ Mail::Milter::Authentication::Handler::DKIM2Verify - Handler class for DKIM2 sig
 Verifies DKIM2 signatures and Chain of Custody on inbound email, adding
 Authentication-Results headers with the verification outcome.
 
-This module implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-08; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.

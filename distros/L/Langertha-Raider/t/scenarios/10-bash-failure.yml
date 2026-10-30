@@ -1,0 +1,10 @@
+title: a failing shell command comes back as an error with its exit code, the raid goes on
+prompt: Run a failing command.
+script:
+  - tool_calls:
+      - [ bash, { command: "echo oops >&2; exit 3" } ]
+  - text: fehlgeschlagen
+expect:
+  answer: fehlgeschlagen
+  tools:
+    - { name: bash, error: true, text: '\AExit code 3\noops\z' }

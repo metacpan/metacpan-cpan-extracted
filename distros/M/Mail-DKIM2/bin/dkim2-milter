@@ -331,7 +331,7 @@ sub cb_eom {
     my @snapshot_tokens = _strip_snapshot_header($ctx, $priv, \$message);
 
     # X-DKIM2-Exploded: a list manager on this host (Mailman, Sympa) marks each
-    # distribution copy, asking the signer for the -07 "exploded" flag. Only
+    # distribution copy, asking the signer for the -08 "exploded" flag. Only
     # a signing milter acts on it, and it never leaves: removed before signing.
     $priv->{exploded} = _strip_exploded_header($ctx, $priv, \$message) if $do_sign;
 
@@ -506,7 +506,7 @@ sub cb_eom {
         # allow_unsigned_mi: the message may carry a Message-Instance above the
         # top signature that is OURS to sign. A list manager on this host
         # (Mailman, Sympa) records its changes as a new m= and hands the
-        # message to us unsigned; the milter is the step that signs it. -07
+        # message to us unsigned; the milter is the step that signs it. -08
         # §14's "Message-Instance m=<x> is not signed" PERMERROR is a receiver's
         # rule about mail on the wire, and applying it here refused to sign
         # every list post whose upstream chain was signed. The opt-out does not
@@ -584,10 +584,10 @@ sub cb_eom {
         $gate->{message} =~ s/AllowNullBodyRecipe not set/--allow-null-body-recipe not set/
             if defined $gate->{message};
 
-        # -07 section 13: a message that carries DKIM2 header fields but is
+        # -08 section 13: a message that carries DKIM2 header fields but is
         # not one this hop can sign MUST NOT be sent on -- so a refusal of a
         # message with an upstream DKIM2-Signature is a 550 5.7.1 with the
-        # reason (section 13.2). One with no signature (only instances this
+        # reason (section 13.3). One with no signature (only instances this
         # host's list manager added, which are removed) goes on unsigned.
         if ($gate->{reason}
             && grep { lc $_->[0] eq 'dkim2-signature' } @{$priv->{headers}}) {
@@ -694,8 +694,8 @@ sub cb_eom {
     return SMFIS_CONTINUE;
 }
 
-# Refuse the message with 550 5.7.1 and $reason as the reply text (-07
-# section 13.2), one line, with sendmail's "%" expansion escaped.
+# Refuse the message with 550 5.7.1 and $reason as the reply text (-08
+# section 13.3), one line, with sendmail's "%" expansion escaped.
 sub _reject {
     my ($ctx, $reason) = @_;
     (my $text = $reason // 'not signing') =~ s/[\r\n]+/ /g;
@@ -822,7 +822,7 @@ sub _error_text {
 #   Outbound => 1           the instance the signer is about to sign. On a
 #                           message with no DKIM2-Signature, every instance is
 #                           this host's own and unsigned, and the copy leaves
-#                           with ONE m=1 (-07 section 12.1): hashes of what is
+#                           with ONE m=1 (-08 section 12.1): hashes of what is
 #                           sent, Recipes back to the message as it arrived.
 #                           $info->{restart} then lists the instances that
 #                           go (in $info->{strip_mi_versions} too).
@@ -910,7 +910,7 @@ sub _compute_mi {
     return $mi ? _format_mi($mi) : undef;
 }
 
-# _restart_mi: the m=1 an unsigned outgoing copy leaves with (-07 section
+# _restart_mi: the m=1 an unsigned outgoing copy leaves with (-08 section
 # 12.1; see _compute_mi). The message as it arrived comes from the chain of
 # instances itself when its top matches the content (a list manager that
 # recorded its own change), else from this host's snapshot of this very
@@ -1136,21 +1136,21 @@ auto-detected from the key type (RSA or Ed25519).
 
 When signing, a message carrying an C<X-DKIM2-Exploded> header field (any
 value; Mailman and Sympa add C<X-DKIM2-Exploded: yes> to every
-distribution copy) is signed with the C<exploded> flag (-07 section 12.5),
+distribution copy) is signed with the C<exploded> flag (-08 section 12.5),
 which a signature also gets whenever the message has more than one
 recipient; never at C<i=1>. The field is removed from the message before
 it is signed and never leaves.
 
 When the signing gate (L<Mail::DKIM2::Gate>) refuses a message that carries
 an upstream DKIM2-Signature, the milter rejects it with C<550 5.7.1> and the
-reason (-07 sections 13 and 13.2: a message with DKIM2 header fields that
-is not Validly Signed must not be sent on). A refused message with no
+reason (-08 sections 13.1 and 13.3: a message with DKIM2 header fields that
+is not Fully Verified must not be sent on). A refused message with no
 signature goes on unsigned, the Message-Instances this host added removed.
 The same goes for a message the Signer refuses, such as one whose From is
-not Authentic for the signing domain (-07 section 11). New in 0.23;
+not Authentic for the signing domain (-08 section 11). New in 0.23;
 before, every refused message went on.
 
-This program implements draft-ietf-dkim-dkim2-spec-07; see L<Mail::DKIM2/STATUS>.
+This program implements draft-ietf-dkim-dkim2-spec-08; see L<Mail::DKIM2/STATUS>.
 
 =head1 KEY DIRECTORY LAYOUT
 
@@ -1274,14 +1274,14 @@ nor leave the host.  Both milters must share the directory.
 
 A message with no DKIM2-Signature (an unsigned post the inbound milter
 stamped C<m=1>, perhaps a C<--wrap-single-part> C<m=2> or a list manager's
-instance over it) is signed with B<one> Message-Instance, C<m=1> (-07
+instance over it) is signed with B<one> Message-Instance, C<m=1> (-08
 section 12.1): the hashes of the copy sent and Recipes back to the post as
 it arrived, a From munge included. The instances it carried are removed,
 with C<X-DKIM2-Info: action=restarted-unsigned-mi=m=1,...;>. The post as it
 arrived comes from those instances when the top one matches the content,
 else from the snapshot; a chain that does not undo cleanly gets no
 instance and the message is not signed. The From sent must still be
-Authentic for the signing domain (-07 section 11): without a From munge an
+Authentic for the signing domain (-08 section 11): without a From munge an
 outside author's post goes out unsigned. A post that arrived signed is
 extended with C<m=N+1> as before.
 

@@ -49,7 +49,26 @@ SETS <- list(
 		set.seed(123)
 		x <- rnorm(50, mean = c(rep(0, 25), rep(3, 25)))
 		2 * pnorm(sort(-abs(x)))
-	})
+	}),
+	# SciPy 1.18.0 scipy/stats/tests/test_morestats.py, TestFDRControl:
+	# test_against_TileStats's vector, and the one test_against_R draws from
+	# loguniform(1e-3, 0.5) with default_rng(6134137338861652935) and a tie
+	# forced at ps[3] = ps[7] (printed there by repr(), pasted here).
+	scipy_tile = c(0.005, 0.009, 0.019, 0.022, 0.051, 0.101, 0.361, 0.387),
+	scipy_r    = c(0.22155324617906308, 0.0011400256607475624, 0.016956141450127922,
+	               0.04105189560873919, 0.05592919759227762, 0.0036829815530863884,
+	               0.1403262673826463, 0.04105189560873919, 0.03648130302125419,
+	               0.254640823272164),
+	# NaN is R's NA in p.adjust(): out of the family (n counts the others) and
+	# back in its own place.  nan6 is the 2026-10-20 audit's Holm repro;
+	# nan_two leaves a family of 2, where R swaps hommel for hochberg, and
+	# nan_one a family of 1, which R returns unadjusted.
+	nan6     = c(0.01, NaN, 0.04, 0.03, NaN, 0.02),
+	nan_mix  = c(NaN, 0.6, 0.02, 0.001, NaN, 0.4, 0.31, 0.99, 0.05, 0.0001, 0.5, 0.12, NaN),
+	nan_tied = c(0.05, NaN, 0.05, 0.05),
+	nan_two  = c(0.02, NaN, 0.03),
+	nan_one  = c(NaN, 0.7),
+	nan_all  = c(NaN, NaN)
 )
 
 cat(sprintf("# p.adjust.Rd example vector: %s\n",

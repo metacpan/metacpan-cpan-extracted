@@ -1,6 +1,6 @@
 package Langertha::Raider;
 # ABSTRACT: Autonomous agent with conversation history and MCP tools
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -97,6 +97,7 @@ has _last_prompt_tokens => (
   is => 'rw',
   isa => 'Int',
   predicate => 'has_last_prompt_tokens',
+  clearer   => '_clear_last_prompt_tokens',
 );
 
 has _injections => (
@@ -203,6 +204,37 @@ has _continuation => (
   clearer => 'clear_continuation',
 );
 
+# Why the last raid died, when it died in a way a surface can name:
+# 'max_iterations' (the tool loop ran out) or 'engine_error' (a model
+# request failed, or its reply was an error). Set right before the die, so
+# the text of the error stays what it was; cleared when a raid or respond
+# starts. Internal (ADR 0017): Langertha::Raider::Application reads it for
+# the reason of a failed run (ADR 0034).
+has _end_reason => (
+  is       => 'rw',
+  isa      => 'Maybe[Str]',
+  init_arg => undef,
+  clearer  => '_clear_end_reason',
+);
+
+# Runs $code; a die in it is an engine error (_end_reason), rethrown as it is.
+sub _engine_call {
+  my ( $self, $code ) = @_;
+  my $list = wantarray;
+  my @result;
+  unless ( eval { @result = $list ? $code->() : scalar $code->(); 1 } ) {
+    $self->_end_reason('engine_error');
+    die $@;
+  }
+  return $list ? @result : $result[0];
+}
+
+# $f, with a failure marked as an engine error (_end_reason).
+sub _engine_future {
+  my ( $self, $f ) = @_;
+  return $f->else(sub { $self->_end_reason('engine_error'); Future->fail(@_) });
+}
+
 # A requested cancel (ADR 0009): the flag, and a future completed on the
 # loop that the waits of a raid race against.
 has cancel_requested => (
@@ -262,10 +294,16 @@ sub _build_cancel_wake {
 }
 
 # The cancel pipe leaves the loop with the raider; at global destruction
-# the process ends anyway.
+# the process ends anyway. The embeddings still in flight are retained until
+# they are ready: dropped with the raider, each would wake up on the loop
+# without its future ("lost its returning future"). Their vectors find no
+# raider any more and are let go. Not cancelled: a cancelled Net::Async::HTTP
+# request can leave its connection open and idle on the loop.
 sub DEMOLISH {
   my ( $self, $in_global_destruction ) = @_;
-  return if $in_global_destruction || !$self->_has_cancel_wake;
+  return if $in_global_destruction;
+  $_->retain for grep { !$_->is_ready } values %{ $self->_pending_embeddings };
+  return unless $self->_has_cancel_wake;
   my $wake = $self->_cancel_wake;
   my $handle = $wake->{handle} or return;
   $handle->loop->remove($handle) if $handle->loop;
@@ -380,16 +418,48 @@ has _tools_dirty => (
 #   $gate->( $raider, { name => ..., source => ..., arguments => ... } )
 # source is where the call runs: 'raider' (self-tools), 'inline', 'engine:N'
 # (the engine's Nth MCP server), 'catalog:NAME'; undef for a tool no source
-# offers. It answers { verdict => 'allow' }, { verdict => 'deny', reason => ... }
-# or { verdict => 'ask', reason => ... }. Without a gate every call runs.
+# offers. The call also carries 'call', its id within the raid (c1, c2, ...),
+# when a plugin recorded one in the call's context (the Events plugin does).
+# It answers { verdict => 'allow' }, { verdict => 'deny', reason => ... }
+# or { verdict => 'ask', reason => ... }; a refusal may carry 'message', the
+# whole text of the error result the model gets (else the raider words it
+# from the reason). Without a gate every call runs.
 # Read-only and constructor-only on purpose: nothing a raid carries -- model
 # output, a plugin, a manifest -- sets or changes it (ADR 0005: permissions
-# never come from prompts). Internal (ADR 0017); no policy format yet.
+# never come from prompts). Internal (ADR 0017). The application sets it from
+# its Langertha::Raider::Permissions (ADR 0021); the gate may block while it
+# asks a person, and answers ask only when nobody can be asked.
 has _tool_gate => (
   is => 'ro',
   isa => 'CodeRef',
   predicate => '_has_tool_gate',
 );
+
+# The tool hook (ADR 0022, Claude Code's PreToolUse): a CodeRef the code that
+# builds the raider hands in. Every tool call -- after plugin_before_tool_call,
+# before the inputSchema check and the gate -- is put to it as its canonical
+# call { name, source, arguments } (and 'call', as for _tool_gate); it
+# answers a Future of a hash:
+#   decision  => 'deny' | 'ask' | 'allow' | undef
+#   reason    => why (for deny and ask)
+#   arguments => a hash that replaces the call's arguments, or undef
+# deny: the call does not run, its error result takes the
+# plugin_after_tool_call path (one tool.call, one tool.result). New arguments
+# are checked against the inputSchema like the model's. allow and ask go to
+# the gate in the call's 'hook' ({ decision, reason }); the gate decides what
+# they are worth. Constructor-only and internal, like _tool_gate.
+has _tool_hook => (
+  is => 'ro',
+  isa => 'CodeRef',
+  predicate => '_has_tool_hook',
+);
+
+has async_tools => (
+  is      => 'ro',
+  isa     => 'HashRef',
+  default => sub { {} },
+);
+
 
 has _inline_mcp => (
   is => 'rw',
@@ -416,7 +486,8 @@ has _session_embeddings => (
 
 # The in-flight simple_embedding_f futures of _embed_session_slot, keyed by
 # refaddr. Held here so none is lost to GC mid-request; each removes itself
-# when ready, clear_session_history cancels the rest.
+# when ready, clear_session_history cancels the rest, and when the raider
+# goes away they are retained until ready (DEMOLISH).
 has _pending_embeddings => (
   is => 'ro',
   isa => 'HashRef',
@@ -523,6 +594,18 @@ sub reset_engine {
 }
 
 
+sub override_engine {
+  my ( $self, $engine ) = @_;
+  my @was = $self->_has_active_engine ? ( $self->_active_engine ) : ();
+  $self->_active_engine($engine);
+  $self->_tools_dirty(1);
+  return sub {
+    @was ? $self->_active_engine($was[0]) : $self->_clear_active_engine;
+    $self->_tools_dirty(1);
+  };
+}
+
+
 sub engine_info {
   my ($self) = @_;
   my $engine = $self->active_engine;
@@ -575,17 +658,24 @@ sub remove_engine {
 
 
 async sub compress_history_f {
-  my ( $self ) = @_;
+  my ( $self, %opt ) = @_;
   my @history = @{$self->history};
   return unless @history;
 
   my $engine = $self->has_compression_engine
     ? $self->compression_engine : $self->engine;
 
+  # Focus instructions (/compact INSTRUCTIONS) follow the request, as Claude
+  # Code appends them to its compaction prompt.
+  my $ask = 'Provide a concise summary.';
+  my $instructions = $opt{instructions};
+  $ask .= "\n\nAdditional instructions:\n".$instructions
+    if defined $instructions && $instructions =~ /\S/;
+
   my @messages = (
     { role => 'system', content => $self->compression_prompt },
     @history,
-    { role => 'user', content => 'Provide a concise summary.' },
+    { role => 'user', content => $ask },
   );
 
   my $request = $engine->chat_request(\@messages);
@@ -612,6 +702,11 @@ async sub compress_history_f {
     { role => 'assistant', content => $summary },
   ]);
 
+  # The last prompt size measured the history just replaced; kept, it would
+  # compress the summary again before the next raid. The next response
+  # reports the new size.
+  $self->_clear_last_prompt_tokens;
+
   # Mark compression event in session_history — through the pusher, so the
   # marker gets its embedding slot like every other message.
   $self->_push_session_history({
@@ -624,8 +719,8 @@ async sub compress_history_f {
 
 
 sub compress_history {
-  my ( $self ) = @_;
-  return $self->compress_history_f->get;
+  my ( $self, %opt ) = @_;
+  return $self->compress_history_f(%opt)->get;
 }
 
 
@@ -1335,6 +1430,58 @@ async sub _gather_tools_f {
   return ( \@all_tools, \%tool_server_map, \%tool_source );
 }
 
+# Internal (ADR 0017), read by Langertha::Raider::Application for the 'tools'
+# of run.started (ADR 0034): the names the next raid would send the model, in
+# _gather_tools_f's order and with its first-wins dedup, worked out without
+# waiting. A source whose tools are not settled yet -- a configured MCP server
+# that is not connected (or failed or stopped) yet, or a list_tools that does
+# not answer at once -- makes the answer undef: the caller then leaves the
+# field out rather than guessing.
+sub _tool_names_now {
+  my ( $self ) = @_;
+  my $engine = $self->active_engine;
+  my ( @names, %seen );
+  my $take = sub { for (@_) { push @names, $_ unless $seen{$_}++ } };
+  my $listed = sub {
+    my ( $mcp ) = @_;
+    if ( $mcp->can('status') && $mcp->can('tool_names') ) {
+      my $status = $mcp->status;
+      return [ $mcp->tool_names ] if $status eq 'connected';
+      return [] if $status eq 'failed' || $status eq 'stopped';
+      return undef;
+    }
+    my $f = $mcp->list_tools;
+    unless ( $f->is_ready ) { $f->cancel; return undef }
+    return undef unless $f->is_done;
+    my ($tools) = $f->get;
+    return [ map { $_->{name} } @{ $tools // [] } ];
+  };
+
+  if ($engine->can('mcp_servers')) {
+    for my $mcp (@{$engine->mcp_servers}) {
+      my $list = $listed->($mcp) // return undef;
+      $take->(@$list);
+    }
+  }
+  if ($self->has_inline_mcp) {
+    my $list = $listed->($self->_inline_mcp) // return undef;
+    $take->(@$list);
+  }
+  else {
+    $take->(map { $_->{name} } @{$self->tools});
+    for my $plugin (@{$self->plugin_instances}) {
+      my $tools = $plugin->self_tools;
+      $take->(map { $_->{name} } @$tools) if $tools && @$tools;
+    }
+  }
+  for my $name (sort keys %{$self->_active_catalog_mcps}) {
+    my $list = $listed->($self->_active_catalog_mcps->{$name}) // return undef;
+    $take->(@$list);
+  }
+  $take->(map { $_->{name} } @{$self->_self_tool_definitions}) if $self->has_raider_mcp;
+  return \@names;
+}
+
 async sub _initialize_inline_mcp_f {
   my ( $self ) = @_;
   return if $self->has_inline_mcp;
@@ -1415,6 +1562,7 @@ sub _check_engine_connect {
     next unless $engine->can('async_loop') && $engine->async_loop
       && $engine->can('url') && defined $engine->url;
     my $error = connect_error($engine->url) // next;
+    $self->_end_reason('engine_error');
     croak "Raider $name: $error";
   }
   return;
@@ -1427,6 +1575,7 @@ sub raid_f {
 
 async sub _raid_f {
   my ( $self, @messages ) = @_;
+  $self->_clear_end_reason;
   $self->_check_engine_loops;
   $self->_check_engine_connect;
   my $engine = $self->active_engine;
@@ -1457,7 +1606,7 @@ async sub _raid_f {
   # Auto-compress if threshold exceeded
   if ($self->has_max_context_tokens && $self->has_last_prompt_tokens
       && $self->_last_prompt_tokens > $self->max_context_tokens * $self->context_compress_threshold) {
-    await $self->compress_history_f();
+    await $self->_engine_future($self->compress_history_f());
   }
 
   # Plugin hook: transform input messages before raid
@@ -1620,16 +1769,22 @@ sub _gate_tool_call {
   return $verdict;
 }
 
-# The error result for a call the gate did not allow. ask is refused like
-# deny for now: no surface can ask for an approval yet (k121, provisional
-# until the approval step lands).
+# The error result for a call the gate did not allow. A gate that can ask
+# a person does so itself and answers allow or deny (the application,
+# ADR 0021); an ask that reaches the raider found nobody to approve it, and
+# is refused like deny. A gate that words the whole refusal itself puts it
+# in the verdict's 'message' (the application does, in Claude Code's words,
+# ADR 0026); that text is the result as it stands.
 sub _gate_refused_tool_result {
   my ( $self, $name, $verdict ) = @_;
   my $reason = $verdict->{reason};
   my $has_reason = defined $reason && length $reason;
-  my $text = $verdict->{verdict} eq 'ask'
+  my $text = defined $verdict->{message} && length $verdict->{message}
+    ? $verdict->{message}
+    : $verdict->{verdict} eq 'ask'
     ? "Tool call '".$name."' was not run: it needs approval"
-      .( $has_reason ? ' ('.$reason.')' : '' ).', and this raid has no way to ask for it.'
+      .( $has_reason ? ' ('.$reason.')' : '' ).', and nobody can approve it in this raid.'
+      .' Do not retry the same call; go on without it or say what you need.'
     : $has_reason
       ? "Tool call '".$name."' was denied: ".$reason
       : "Tool call '".$name."' was denied by policy.";
@@ -1721,14 +1876,15 @@ async sub _run_raid_loop {
     await $self->_prepare_iteration_f($state, $iteration, $start_iteration);
     my $iter = $self->_start_iteration_trace($state, $iteration);
 
-    my $response = await $self->_send_turn_f($state);
+    my $response = await $self->_engine_future($self->_send_turn_f($state));
     return $self->_cancelled_result($state) if $self->cancel_requested;
     my $data = await $self->_read_turn_f($state, $iter, $response);
 
     # Read this turn's reply (see _read_tool_loop_reply): a 200 body that is an
     # error croaks instead of silently ending the raid with '', Gemini thought
     # parts stay out of the final text, and truncated calls are dropped.
-    my ( $tool_calls, $final_text, $echo_data ) = $self->_read_tool_loop_reply($state->{engine}, $data);
+    my ( $tool_calls, $final_text, $echo_data ) = $self->_engine_call(sub {
+      $self->_read_tool_loop_reply($state->{engine}, $data) });
 
     # No tool calls means done — use the reply's final text
     unless (@$tool_calls) {
@@ -1743,6 +1899,7 @@ async sub _run_raid_loop {
     $self->_append_tool_turn($state, $echo_data, \@results);
   }
 
+  $self->_end_reason('max_iterations');
   die "Raider tool loop exceeded ".$self->max_iterations." iterations";
 }
 
@@ -1851,10 +2008,11 @@ async sub _read_turn_f {
   my $engine = $state->{engine};
 
   unless ($response->is_success) {
+    $self->_end_reason('engine_error');
     die "".(ref $engine)." raid request failed: ".$response->status_line."\n".$response->content;
   }
 
-  my $data = $engine->parse_response($response);
+  my $data = $self->_engine_call(sub { $engine->parse_response($response) });
 
   # Plugin hook: inspect/transform LLM response
   for my $plugin (@{$self->plugin_instances}) {
@@ -1978,23 +2136,118 @@ sub _trace_tool_turn {
 # Result that ends the raid when a cancel, an interactive self-tool or an
 # abort stops the batch; nothing when the whole batch ran. The iteration's
 # batch runs here, and so does the rest of a batch respond_f resumes (k120).
+# Consecutive calls of concurrent async_tools run as one group
+# (_dispatch_group_f, ADR 0027 section 9); every other call runs alone, in
+# order. A group never holds a self-tool, so it never pauses.
 async sub _execute_tool_calls_f {
   my ( $self, $state, $iter, $tool_calls, $echo_data, $results ) = @_;
 
-  for my $tc_idx (0 .. $#$tool_calls) {
-    # Safe point: no further tool call once a cancel is requested.
+  my $tc_idx = 0;
+  while ($tc_idx <= $#$tool_calls) {
+    # Safe point: no further tool call (or group) once a cancel is requested.
     return $self->_cancelled_result($state) if $self->cancel_requested;
+    my $last = $tc_idx;
+    if ($self->_concurrent_call($state, $tool_calls->[$tc_idx])) {
+      $last++ while $last < $#$tool_calls
+        && $self->_concurrent_call($state, $tool_calls->[$last + 1]);
+    }
     # Only the calls AFTER a pausing self-tool are still pending. The ones
     # before it already ran and sit in $results; carrying them too (as a plain
     # "everything but $tc" filter did) re-runs their side effects and emits a
     # second tool_result for the same tool_use id on resume — a 400 on strict
     # providers like Anthropic.
-    my $stop = await $self->_dispatch_tool_call_f($state, $iter, $echo_data,
-      $tool_calls->[$tc_idx], [ @$tool_calls[$tc_idx+1 .. $#$tool_calls] ], $results);
+    my $remaining = [ @$tool_calls[$last+1 .. $#$tool_calls] ];
+    my $stop = $last > $tc_idx
+      ? await $self->_dispatch_group_f($state, $iter, $echo_data,
+          [ @$tool_calls[$tc_idx .. $last] ], $remaining, $results)
+      : await $self->_dispatch_tool_call_f($state, $iter, $echo_data,
+          $tool_calls->[$tc_idx], $remaining, $results);
     return $stop if defined $stop;
+    $tc_idx = $last + 1;
   }
 
   return;
+}
+
+# The async tool $name as { code => CodeRef, concurrent => 0|1 }, or nothing
+# (see async_tools); $mcp is the source that offers $name in this raid, which
+# a handler's applies may decline.
+sub _async_tool {
+  my ( $self, $name, $mcp ) = @_;
+  return unless defined $name;
+  my $tool = $self->async_tools->{$name} or return;
+  return { code => $tool, concurrent => 0 } if ref $tool eq 'CODE';
+  return unless ref $tool eq 'HASH' && ref $tool->{code} eq 'CODE';
+  return if ref $tool->{applies} eq 'CODE' && !$tool->{applies}->($mcp);
+  return { code => $tool->{code}, concurrent => $tool->{concurrent} ? 1 : 0 };
+}
+
+# Whether the call $tc may run at the same time as its concurrent
+# neighbours: its tool, by the name the model called, is a concurrent async
+# tool that a source offers -- never a self-tool.
+sub _concurrent_call {
+  my ( $self, $state, $tc ) = @_;
+  my ( $name ) = $self->_tool_call_name_input($state->{engine}, $tc);
+  return 0 unless defined $name && $state->{tool_server_map}{$name};
+  my $tool = $self->_async_tool($name, $state->{tool_server_map}{$name}) or return 0;
+  return $tool->{concurrent};
+}
+
+# Dispatches the calls of $group at the same time, each through
+# _dispatch_tool_call_f with results of its own, and pushes their results
+# onto $results in call order once all of them are done -- a call whose
+# result is ready waits for the calls before it, a stop (or a failure) of
+# one waits for the others. Then a failure is rethrown, else the first stop
+# returned. One result per tool_use id holds as in a single dispatch; a
+# continuation a member saved (a plugin renamed a call to a pausing
+# self-tool) gets the merged results, so respond_f re-runs nothing.
+async sub _dispatch_group_f {
+  my ( $self, $state, $iter, $echo_data, $group, $remaining_tcs, $results ) = @_;
+  my @own = map { [] } @$group;
+  my @f = map {
+    my $i = $_;
+    Future->call(sub {
+      $self->_dispatch_tool_call_f($state, $iter, $echo_data, $group->[$i], $remaining_tcs, $own[$i]);
+    });
+  } 0 .. $#$group;
+  await Future->wait_all(@f);
+  if ( my ($failed) = grep { $_->is_failed } @f ) {
+    $failed->get;   # rethrows
+  }
+  my ( $stop, $stop_results );
+  for my $i (0 .. $#$group) {
+    push @$results, @{ $own[$i] };
+    next if defined $stop || !$f[$i]->is_done;
+    ( $stop ) = $f[$i]->get;
+    $stop_results = $own[$i] if defined $stop;
+  }
+  if ( defined $stop && $self->has_continuation ) {
+    my $cont = $self->_continuation;
+    $cont->{results_so_far} = $results if refaddr($cont->{results_so_far}) == refaddr($stop_results);
+  }
+  return $stop;
+}
+
+# The context of one tool call: the model's tool call id, for the
+# plugin hooks (their last argument) and an async tool's handler; plugins
+# may record their own keys in it.
+sub _tool_call_context {
+  my ( $self, $tc ) = @_;
+  my $id = blessed $tc ? $tc->id : ref $tc eq 'HASH' ? $tc->{id} : undef;
+  return { id => $id };
+}
+
+# plugin_before_tool_call through every plugin, as
+# Langertha::Role::PluginHost->plugin_pipeline_tool_call_f, with the call's
+# context as the last argument.
+async sub _plugin_before_tool_call_f {
+  my ( $self, $name, $input, $ctx ) = @_;
+  for my $plugin (@{$self->plugin_instances}) {
+    my @result = await $plugin->plugin_before_tool_call($name, $input, $ctx);
+    return () unless @result;
+    ( $name, $input ) = @result;
+  }
+  return ( $name, $input );
 }
 
 # Dispatches one tool call: the single path every call of a raid takes, in
@@ -2009,6 +2262,7 @@ async sub _dispatch_tool_call_f {
   my ( $self, $state, $iter, $echo_data, $tc, $remaining_tcs, $results ) = @_;
   my $engine = $state->{engine};
   my ( $name, $input ) = $self->_tool_call_name_input($engine, $tc);
+  my $ctx = $self->_tool_call_context($tc);
 
   # A call whose arguments the model did not send as valid JSON must not run
   # the tool on {} -- answer it with an error result the model can retry, as
@@ -2020,7 +2274,7 @@ async sub _dispatch_tool_call_f {
   }
 
   # Plugin hook: inspect/transform before tool execution
-  my @plugin_tc = await $self->plugin_pipeline_tool_call_f($name, $input);
+  my @plugin_tc = await $self->_plugin_before_tool_call_f($name, $input, $ctx);
   unless (@plugin_tc) {
     # Plugin returned empty list — skip this tool call
     my $skip_result = {
@@ -2034,19 +2288,6 @@ async sub _dispatch_tool_call_f {
 
   my $tool_t0 = $state->{langfuse} ? $engine->langfuse_timestamp : undef;
 
-  # Arguments that clearly break the tool's inputSchema do not run the tool:
-  # the model gets an error result it can correct (ADR 0005 "validate", k122).
-  # Checked after plugin_before_tool_call, so it is the call that would run --
-  # and the one the Events plugin recorded as tool.call -- that is held
-  # against the schema, and the error result takes the same
-  # plugin_after_tool_call path as any other result: one tool.result.
-  if ( my $invalid = $self->_invalid_args_tool_result($state, $name, $input) ) {
-    my $result = await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $invalid, 1);
-    push @$results, { tool_call => $tc, result => $result };
-    ${$state->{raid_tool_calls}}++;
-    return;
-  }
-
   # Virtual self-tools. A raider_-prefixed name routes here only when no tool
   # source announced it: an MCP source may offer a raider_-prefixed name and
   # win the first-wins dedup (karr k90), in which case it sits in
@@ -2055,19 +2296,69 @@ async sub _dispatch_tool_call_f {
   # "Unknown self-tool" instead of reaching its MCP source (karr k93).
   my $self_tool = $name =~ /^raider_/ && $self->has_raider_mcp
     && !$state->{tool_server_map}{$name};
+  my $source = $self_tool ? 'raider' : $state->{tool_sources}{$name};
+
+  # Resolve (ADR 0005): a name no source offers ends here, before the hook,
+  # the gate and any approval -- "unknown tool", not a permission question
+  # about a tool that does not exist. _call_mcp_tool_f answers the error,
+  # through plugin_after_tool_call (k177).
+  unless ( $self_tool || $state->{tool_server_map}{$name} ) {
+    my $result = await $self->_call_mcp_tool_f($state, $iter, $name, $input, $tool_t0, $ctx);
+    push @$results, { tool_call => $tc, result => $result };
+    ${$state->{raid_tool_calls}}++;
+    return;
+  }
+
+  # The tool hook (ADR 0022, PreToolUse): before the inputSchema check and
+  # the gate, so arguments it replaces are checked and gated like the
+  # model's. A deny does not run the call; its error result takes the
+  # plugin_after_tool_call path like any other.
+  # The call's id within the raid (the Events plugin's c1, c2, ...), when a
+  # plugin recorded one: the hook and the gate name it in their events.
+  my @call_id = defined $ctx->{call} ? ( call => $ctx->{call} ) : ();
+  my $hook;
+  if ($self->_has_tool_hook) {
+    $hook = await $self->_tool_hook->($self, { name => $name, source => $source, arguments => $input, @call_id });
+    $hook = {} unless ref $hook eq 'HASH';
+    if ( ( $hook->{decision} // '' ) eq 'deny' ) {
+      my $result = await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0,
+        $self->_gate_refused_tool_result($name, { verdict => 'deny', reason => $hook->{reason}, message => $hook->{message} }), 1, $ctx);
+      push @$results, { tool_call => $tc, result => $result };
+      ${$state->{raid_tool_calls}}++;
+      return;
+    }
+    $input = $hook->{arguments} if ref $hook->{arguments} eq 'HASH';
+  }
+
+  # Arguments that clearly break the tool's inputSchema do not run the tool:
+  # the model gets an error result it can correct (ADR 0005 "validate", k122).
+  # Checked after plugin_before_tool_call, so it is the call that would run --
+  # and the one the Events plugin recorded as tool.call -- that is held
+  # against the schema, and the error result takes the same
+  # plugin_after_tool_call path as any other result: one tool.result.
+  if ( my $invalid = $self->_invalid_args_tool_result($state, $name, $input) ) {
+    my $result = await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $invalid, 1, $ctx);
+    push @$results, { tool_call => $tc, result => $result };
+    ${$state->{raid_tool_calls}}++;
+    return;
+  }
 
   # The gate (ADR 0005 "check policy", k121): after the inputSchema check, on
   # the call exactly as it would run. A call it does not allow does not run;
   # its error result takes the plugin_after_tool_call path like any other, so
-  # the call keeps one tool.call and one tool.result.
+  # the call keeps one tool.call and one tool.result. A tool hook's allow or
+  # ask goes along in 'hook' (ADR 0022).
   my $verdict = $self->_gate_tool_call({
     name      => $name,
-    source    => $self_tool ? 'raider' : $state->{tool_sources}{$name},
+    source    => $source,
     arguments => $input,
+    @call_id,
+    ( $hook && defined $hook->{decision} && $hook->{decision} =~ /\A(?:allow|ask)\z/
+      ? ( hook => { decision => $hook->{decision}, reason => $hook->{reason} } ) : () ),
   });
   unless ( $verdict->{verdict} eq 'allow' ) {
     my $result = await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0,
-      $self->_gate_refused_tool_result($name, $verdict), 1);
+      $self->_gate_refused_tool_result($name, $verdict), 1, $ctx);
     push @$results, { tool_call => $tc, result => $result };
     ${$state->{raid_tool_calls}}++;
     return;
@@ -2080,7 +2371,7 @@ async sub _dispatch_tool_call_f {
 
     # Handle interactive self-tool results
     return $self->_pause_raid($state, $iter, $echo_data, $tc, $name, $input,
-      $tool_t0, $remaining_tcs, $results, $self_result)
+      $tool_t0, $remaining_tcs, $results, $self_result, $ctx)
       if $self_result->{type} eq 'question' || $self_result->{type} eq 'pause';
 
     return $self->_abort_raid($state, $self_result)
@@ -2088,15 +2379,15 @@ async sub _dispatch_tool_call_f {
 
     if ($self_result->{type} eq 'wait') {
       $result = await $self->_wait_self_tool_f(
-        $state, $iter, $name, $input, $tool_t0, $self_result->{seconds});
+        $state, $iter, $name, $input, $tool_t0, $self_result->{seconds}, $ctx);
     }
     else {
       # type eq 'result' — normal self-tool result
-      $result = await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $self_result);
+      $result = await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $self_result, undef, $ctx);
     }
   }
   else {
-    $result = await $self->_call_mcp_tool_f($state, $iter, $name, $input, $tool_t0);
+    $result = await $self->_call_mcp_tool_f($state, $iter, $name, $input, $tool_t0, $ctx);
   }
 
   push @$results, { tool_call => $tc, result => $result };
@@ -2111,7 +2402,7 @@ async sub _dispatch_tool_call_f {
 # calls of the batch after $tc, $results those that already ran.
 sub _pause_raid {
   my ( $self, $state, $iter, $echo_data, $tc, $name, $input, $tool_t0,
-    $remaining_tcs, $results, $self_result ) = @_;
+    $remaining_tcs, $results, $self_result, $ctx ) = @_;
   $self->_continuation({
     state          => $state,
     iteration      => $iter->{iteration},
@@ -2120,6 +2411,7 @@ sub _pause_raid {
     pending_name   => $name,
     pending_input  => $input,
     pending_t0     => $tool_t0,
+    pending_ctx    => $ctx,
     remaining_tcs  => $remaining_tcs,
     results_so_far => $results,
     iter_span_id   => $iter->{span_id},
@@ -2152,31 +2444,45 @@ sub _abort_raid {
 # the wait short. Returns the tool result -- a cancelled one after a cancel,
 # as for a cut-off MCP call -- through plugin_after_tool_call (k134).
 async sub _wait_self_tool_f {
-  my ( $self, $state, $iter, $name, $input, $tool_t0, $seconds ) = @_;
+  my ( $self, $state, $iter, $name, $input, $tool_t0, $seconds, $ctx ) = @_;
   my $engine = $state->{engine};
   my $loop = $engine->async_loop // IO::Async::Loop->new;
   await $self->_until_cancelled($loop->delay_future(after => $seconds));
   my $result = $self->cancel_requested
     ? $self->_cancelled_tool_result($name)
     : { content => [{ type => 'text', text => "Waited $seconds seconds." }] };
-  return await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $result);
+  return await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $result, undef, $ctx);
 }
 
-# Calls the tool $name on the MCP source that registered it. A name no server
-# offers is answered with an error result so the batch runs to the end and the
-# model can correct itself, instead of dying and losing the whole raid (core
-# k332). A failed call, or one a cancel cut off, is an error result too.
+# Calls the tool $name on the MCP source that registered it -- or, for an
+# async tool (async_tools), awaits its handler's Future in that place. A name
+# no server offers is answered with an error result so the batch runs to the
+# end and the model can correct itself, instead of dying and losing the whole
+# raid (core k332). A failed call, or one a cancel cut off, is an error result
+# too; once a cancel is requested no call starts (a call of a group whose
+# hooks were still running).
 async sub _call_mcp_tool_f {
-  my ( $self, $state, $iter, $name, $input, $tool_t0 ) = @_;
+  my ( $self, $state, $iter, $name, $input, $tool_t0, $ctx ) = @_;
   my $mcp = $state->{tool_server_map}{$name};
   unless ($mcp) {
-    return {
-      content => [{ type => 'text', text => "unknown tool ".($name // '') }],
+    # Claude Code's words (ADR 0026); a name that differs from a tool only in
+    # case gets its hint too.
+    # The error takes the plugin_after_tool_call path like any other result,
+    # so its tool.call gets a tool.result and PostToolUseFailure fires (k177).
+    my ( $same ) = defined $name ? grep { lc $_ eq lc $name } sort keys %{ $state->{tool_server_map} } : ();
+    return await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, {
+      content => [{ type => 'text', text => '<tool_use_error>Error: No such tool available: '.( $name // '' )
+        .( defined $same ? '. Tool names are case-sensitive: call '.$same.' instead.' : '' ).'</tool_use_error>' }],
       isError => JSON->true,
-    };
+    }, 1, $ctx);
   }
+  return await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0,
+    $self->_cancelled_tool_result($name), 1, $ctx) if $self->cancel_requested;
 
-  my $call_f = $mcp->call_tool($name, $input)->else(sub {
+  my $async = $self->_async_tool($name, $mcp);
+  my $call_f = ( $async
+    ? Future->call($async->{code}, $input, %{ $ctx // {} })
+    : $mcp->call_tool($name, $input) )->else(sub {
     my ( $error ) = @_;
     Future->done({
       content => [{ type => 'text', text => "Error calling tool '$name': $error" }],
@@ -2185,19 +2491,56 @@ async sub _call_mcp_tool_f {
   });
   my $result = await $self->_until_cancelled($call_f);
   $result = $self->_cancelled_tool_result($name) if $self->_cut_off($call_f, $result);
+  $result = $self->_without_foreign_messages($state, $name, $result);
 
-  return await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $result, 1);
+  return await $self->_after_tool_call_f($state, $iter, $name, $input, $tool_t0, $result, 1, $ctx);
+}
+
+# The _meta key under which a tool result hands the raider user messages to
+# add after the batch's tool results (ADR 0026): the skill tool's body, as
+# Claude Code adds a skill as a message of its own.
+sub _messages_meta_key { 'raider/messages' }
+
+# A tool of a foreign source (a catalog:NAME MCP server) cannot put words in
+# the user's mouth: its result loses the messages key before any plugin sees
+# it. raider's own sources (engine:N, inline) keep it.
+sub _without_foreign_messages {
+  my ( $self, $state, $name, $result ) = @_;
+  return $result unless ref $result eq 'HASH' && ref $result->{_meta} eq 'HASH';
+  my $key = $self->_messages_meta_key;
+  return $result unless exists $result->{_meta}{$key};
+  my $source = $state->{tool_sources}{$name} // '';
+  return $result unless $source =~ /\Acatalog:/;
+  my %meta = %{ $result->{_meta} };
+  delete $meta{$key};
+  return { %$result, _meta => \%meta };
+}
+
+# The user messages the results of a batch hand over (see
+# _messages_meta_key), in the order of the calls: plain non-empty strings.
+sub _result_messages {
+  my ( $self, $results ) = @_;
+  my $key = $self->_messages_meta_key;
+  my @messages;
+  for my $r (@$results) {
+    my $meta = ref $r->{result} eq 'HASH' ? $r->{result}{_meta} : undef;
+    my $list = ref $meta eq 'HASH' ? $meta->{$key} : undef;
+    next unless ref $list eq 'ARRAY';
+    push @messages, map { { role => 'user', content => $_ } } grep { defined && !ref && length } @$list;
+  }
+  return @messages;
 }
 
 # Runs the plugin_after_tool_call hook on a tool's result and traces the call
 # as a Langfuse span under the iteration span. With $flag_errors an error
 # result gets level ERROR (MCP calls; self-tool results carry no level).
+# $ctx is the call's context (_tool_call_context), the hook's last argument.
 async sub _after_tool_call_f {
-  my ( $self, $state, $iter, $name, $input, $tool_t0, $result, $flag_errors ) = @_;
+  my ( $self, $state, $iter, $name, $input, $tool_t0, $result, $flag_errors, $ctx ) = @_;
 
   # Plugin hook: transform tool result
   for my $plugin (@{$self->plugin_instances}) {
-    $result = await $plugin->plugin_after_tool_call($name, $input, $result);
+    $result = await $plugin->plugin_after_tool_call($name, $input, $result, $ctx);
   }
 
   if ($state->{langfuse}) {
@@ -2248,12 +2591,22 @@ sub _close_iteration_trace {
 # session_history, and tracks them as one exchange for in-loop compaction
 # (k89). $echo_data is the wire body without any tool call whose arguments
 # were truncated, so the next turn never carries a call without a result.
+# The user messages the results hand over (_result_messages, ADR 0026) follow
+# the tool results as messages of their own -- a separate user message is
+# valid on every wire, where a text block inside the tool results is not.
+# They are no part of the exchange: like injections they stay when in-loop
+# compaction drops the exchange, and they are kept in history.
 sub _append_tool_turn {
   my ( $self, $state, $echo_data, $results ) = @_;
   my @tool_msgs = $state->{engine}->format_tool_results($echo_data, $results);
   push @{$state->{conversation}}, @tool_msgs;
   push @{$state->{tool_segments}}, [ @tool_msgs ];
   $self->_push_session_history(@tool_msgs);
+  if ( my @messages = $self->_result_messages($results) ) {
+    push @{$state->{conversation}}, @messages;
+    push @{$state->{injected_history}}, @messages;
+    $self->_push_session_history(@messages);
+  }
   return;
 }
 
@@ -2266,6 +2619,7 @@ async sub _respond_f {
   my ( $self, $answer ) = @_;
   croak "No pending interaction — call raid_f first"
     unless $self->has_continuation;
+  $self->_clear_end_reason;
   $self->_check_engine_loops;
   $self->_check_engine_connect;
 
@@ -2285,7 +2639,7 @@ async sub _respond_f {
   # tool.call event gets its tool.result (k134).
   my $answer_result = await $self->_after_tool_call_f($state, $iter,
     $cont->{pending_name}, $cont->{pending_input}, $cont->{pending_t0},
-    { content => [{ type => 'text', text => "$answer" }] });
+    { content => [{ type => 'text', text => "$answer" }] }, undef, $cont->{pending_ctx});
   push @results, { tool_call => $pending_tc, result => $answer_result };
   ${$state->{raid_tool_calls}}++;
 
@@ -2308,11 +2662,9 @@ async sub _respond_f {
     );
   }
 
-  # Format tool results and append to conversation
-  my @tool_msgs = $engine->format_tool_results($data, \@results);
-  push @{$state->{conversation}}, @tool_msgs;
-  push @{$state->{tool_segments} //= []}, [ @tool_msgs ];   # track for in-loop compaction (k89)
-  $self->_push_session_history(@tool_msgs);
+  # Format tool results and append to conversation, tracked for in-loop
+  # compaction (k89), as in the first run of a batch.
+  $self->_append_tool_turn($state, $data, \@results);
 
   # Continue the raid loop from the next iteration
   return await $self->_run_raid_loop($state, $cont->{iteration} + 1);
@@ -2341,7 +2693,7 @@ Langertha::Raider - Autonomous agent with conversation history and MCP tools
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -2402,6 +2754,12 @@ version 0.503
 
 =head1 DESCRIPTION
 
+B<Status: 0.x.> The engine, the C<raider> command line and the Hall are
+covered by the test suite and an acceptance suite that drives the tools through
+a scripted model (F<t/scenarios/>). Interfaces can still change between 0.x
+releases; the documented wire formats (machine output, session journal, hall
+event bus) only change with a new format version.
+
 Langertha::Raider is an autonomous agent that wraps a Langertha engine
 with MCP tools. It maintains conversation history across multiple
 interactions (raids), enabling multi-turn conversations where the LLM
@@ -2437,6 +2795,25 @@ responses are persisted in history. Intermediate tool-call messages
 (assistant tool requests and tool results) are NOT persisted, preventing
 token bloat across long conversations. The full turn-by-turn record, tool
 calls and results included, is kept separately in L</session_history>.
+
+=head1 TOOL RESULTS THAT ADD MESSAGES
+
+A tool result may hand the raid user messages of its own: a list of
+strings under the key C<raider/messages> of the result's C<_meta> (the
+place MCP gives a result for such data):
+
+    { content => [ { type => 'text', text => 'Launching skill: pdf' } ],
+      _meta   => { 'raider/messages' => [ $skill_body ] } }
+
+After the batch's tool results each string becomes a message
+C<< { role => 'user', content => $string } >> of its own, in the order of
+the calls -- the shape Claude Code gives a loaded skill (ADR 0026). Like an
+injection (L</inject>) such a message is not part of its tool exchange: it
+stays when in-raid compaction drops the exchange, and it is kept in
+L</history> (and L</session_history>) with the user input and the answer.
+Only raider's own tool sources (the engine's MCP servers, inline tools) may
+do this; the key is removed from the result of a C<mcp_catalog> server
+before any plugin sees it.
 
 =head2 engine
 
@@ -2670,6 +3047,50 @@ keys in the C<raider_switch_engine> tool enum.
 Use C<switch_engine>, C<reset_engine>, C<active_engine>, and C<engine_info>
 to control which engine is used during raids.
 
+=head2 async_tools
+
+Optional HashRef of asynchronous in-process tools (ADR 0027 E<sect>9), by
+tool name. A value is the handler, or a HashRef with the handler as
+C<code> and C<< concurrent => 1 >>:
+
+    async_tools => {
+        agent        => { code => \&spawn_agent_f, concurrent => 1 },
+        send_message => \&send_message_f,
+    },
+
+    sub spawn_agent_f {
+        my ( $input, %ctx ) = @_;          # $ctx{id}: the model's tool call id
+        return $future;                    # of an MCP result { content => [...], isError => ... }
+    }
+
+The tool itself still comes from a tool source -- an MCP server, the
+inline L</tools> -- which carries its name, description and inputSchema,
+so the prompt and the tool list do not change; only its call is different.
+A call of a tool with a handler takes the whole path of any tool call --
+C<plugin_before_tool_call>, the tool hook, the inputSchema check, the gate,
+C<plugin_after_tool_call>, L</cancel> -- and in the place of the source's
+C<call_tool> the handler's Future is awaited: it runs on the raid's loop
+while nothing else waits for it, and is abandoned (cancelled) like any tool
+call when a cancel cuts it off. A handler that dies or whose Future fails
+gives an error result. C<%ctx> is the call's context: C<id>, the tool call
+id of the model's reply (undef when the engine's reply has none), and what
+the plugins recorded on it (see L</plugins>).
+
+A HashRef may also carry C<applies>, a code reference asked with the
+source the tool comes from in this raid (the MCP client that offers it): a
+false answer leaves the call to that source, as if there were no handler.
+So a handler can stand in for one particular server's tool and leave a
+tool of the same name from another source alone:
+
+    async_tools => { bash => { code => \&bash_f, applies => sub { $mine{ refaddr $_[0] } } } },
+
+Consecutive calls of one model turn whose tools are C<concurrent> run at
+the same time: each through the whole path above, their results appended
+in the order of the calls. Any other call -- and a self-tool always --
+ends such a group; nothing else changes the order. When a call of a group
+ends the raid (L</cancel>), the other calls of the group are still awaited
+first.
+
 =head2 embedding_engine
 
 Optional engine with L<Langertha::Role::Embedding> for semantic history search.
@@ -2677,7 +3098,8 @@ When not set, auto-detects if the main C<engine> supports embeddings.
 Set L</no_session_embeddings> to disable auto-detection.
 
 Each C<session_history> entry is embedded in the background through
-C<simple_embedding_f>, so the raid never waits for it. Like every engine of
+C<simple_embedding_f>, so the raid never waits for it; a raider that goes
+away lets the requests still in flight finish. Like every engine of
 the raider, the embedding engine must run on the same event loop as
 C<engine> (see L</raid_f>).
 
@@ -2767,6 +3189,19 @@ Croaks if the name is not in the catalog.
 
 Switches back to the default engine (the one passed at construction).
 
+=head2 override_engine
+
+    my $restore = $raider->override_engine($engine);
+    ...                                  # raids run on $engine
+    $restore->();                        # back to the engine before
+
+Makes C<$engine>, which need not be in the C<engine_catalog>, the active
+engine until the returned CodeRef is called. Calling it puts back the
+engine that was active before (a C<switch_engine> choice or the default).
+Both ways the tools are re-gathered for the engine on the next iteration;
+C<active_engine_name> is left as it is. For a temporary engine, such as
+the model of one run.
+
 =head2 engine_info
 
     my $info = $raider->engine_info;
@@ -2801,10 +3236,19 @@ the catalog.
 =head2 compress_history_f
 
     my $summary = await $raider->compress_history_f;
+    my $summary = await $raider->compress_history_f( instructions => 'Keep the API decisions' );
 
 Async. Summarizes the current working history via LLM and replaces it
 with the summary. Uses C<compression_engine> if set, otherwise falls
-back to C<engine>. A marker is added to C<session_history>.
+back to C<engine>. A marker is added to C<session_history>. Returns the
+summary; with an empty history nothing, and no request is sent. The last
+prompt size (what C<max_context_tokens> is checked against) is forgotten,
+so the next raid does not compress the summary again; the next response
+reports the new size.
+
+C<instructions> (optional) focus the summary: they are appended to the
+summary request after C<Additional instructions:>, as Claude Code's
+C</compact INSTRUCTIONS> does. Without them the request is unchanged.
 
 The summary is read through the engine's public C<chat_response> (the parser
 L<Langertha::Role::Chat/chat_f> uses), so an error carried in a 200 body croaks
@@ -2815,8 +3259,9 @@ C<response_text_content>.
 =head2 compress_history
 
     my $summary = $raider->compress_history;
+    my $summary = $raider->compress_history( instructions => 'Keep the API decisions' );
 
-Synchronous wrapper around C<compress_history_f>.
+Synchronous wrapper around C<compress_history_f>, with the same arguments.
 
 =head2 register_session_history_tool
 
@@ -2913,6 +3358,15 @@ calls C<plugin_before_raid> (the raid's messages), C<plugin_build_conversation>
 (the conversation sent to the model) and C<plugin_after_raid> (the final
 L<Langertha::Raider::Result>); the contract is in L<Langertha::Plugin>.
 
+A raider passes one more argument to C<plugin_before_tool_call> and
+C<plugin_after_tool_call>, after the ones L<Langertha::Plugin> names: the
+call's context, a HashRef that is the same for both hooks of one call. It
+holds C<id>, the tool call id of the model's reply (undef when the reply
+has none). A plugin may record keys of its own in it -- the only way to
+tell which call a result belongs to while calls run at the same time
+(L</async_tools>) -- and an async tool's handler gets them as its C<%ctx>.
+A plugin that ignores the argument works as before.
+
 =head1 SEE ALSO
 
 =over
@@ -2931,7 +3385,7 @@ L<Langertha::Raider::Result>); the contract is in L<Langertha::Plugin>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -2952,5 +3406,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

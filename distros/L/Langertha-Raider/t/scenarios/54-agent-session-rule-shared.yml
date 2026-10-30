@@ -1,0 +1,24 @@
+title: '"yes, for this session" given to a subagent''s write holds for the caller too: one question for both writes'
+permission_mode: default
+approve: [ session ]
+prompt: Have an agent write a.txt, then write b.txt yourself.
+script:
+  - tool_calls:
+      - [ agent, { description: Write, prompt: Write a.txt with a. } ]
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: a } ]
+  - text: wrote a.txt
+  - tool_calls:
+      - [ write_file, { path: b.txt, content: b } ]
+  - text: both written
+expect:
+  answer: both written
+  files:
+    a.txt: a
+    b.txt: b
+  permissions:
+    - { tool: write_file, rule: 'Edit(/**)', arguments: { path: a.txt } }
+  tools:
+    - { name: write_file }
+    - { name: agent, text: '\Awrote a.txt\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+    - { name: write_file }

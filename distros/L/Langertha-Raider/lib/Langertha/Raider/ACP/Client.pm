@@ -1,5 +1,5 @@
 package Langertha::Raider::ACP::Client;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: Minimal synchronous ACP client over TCP
 
 use strict;
@@ -24,6 +24,7 @@ sub new {
     json    => JSON::MaybeXS->new,
     host    => $args{host},
     port    => $args{port},
+    on_permission => $args{on_permission},
   }, $class;
 }
 
@@ -57,6 +58,8 @@ sub _call {
   while (defined(my $line = $self->_read_line)) {
     next unless length $line;
     my $msg = eval { $self->{json}->decode($line) } // next;
+    # A request of the agent (its ids are its own, they may equal ours).
+    if (defined $msg->{method}) { $self->_answer_request($msg) if defined $msg->{id}; next }
     if (defined $msg->{id} && $msg->{id} eq $id) {
       die "ACP error: $msg->{error}{message}\n" if $msg->{error};
       return $msg->{result};
@@ -97,15 +100,39 @@ sub prompt_stream {
   while (defined(my $line = $self->_read_line)) {
     next unless length $line;
     my $msg = eval { $self->{json}->decode($line) } // next;
+    if (defined $msg->{method}) {
+      $self->_answer_request($msg) if defined $msg->{id};    # a request of the agent
+      $on_update->($msg->{params}) if $msg->{method} eq 'session/update' && $on_update;
+      next;
+    }
     if (defined $msg->{id} && $msg->{id} eq $id) {
       die "ACP error: $msg->{error}{message}\n" if $msg->{error};
       return $msg->{result};
     }
-    if (($msg->{method} // '') eq 'session/update' && $on_update) {
-      $on_update->($msg->{params});
-    }
   }
   die "ACP connection closed during session/prompt\n";
+}
+
+# The agent asked us something. session/request_permission is answered by
+# on_permission; anything else is a method we do not have.
+sub _answer_request {
+  my ($self, $msg) = @_;
+  if (($msg->{method} // '') eq 'session/request_permission') {
+    my $params = ref $msg->{params} eq 'HASH' ? $msg->{params} : {};
+    my @options = grep { ref $_ eq 'HASH' } @{ $params->{options} // [] };
+    my $choice = $self->{on_permission} ? eval { $self->{on_permission}->($params) } : undef;
+    # Without a handler, or when it fails or picks nothing offered: reject.
+    $choice = undef unless defined $choice && grep { ($_->{optionId} // '') eq $choice } @options;
+    unless (defined $choice) {
+      my ($reject) = grep { ($_->{kind} // '') eq 'reject_once' } @options;
+      $choice = $reject->{optionId} if $reject;
+    }
+    return $self->_send({ jsonrpc => '2.0', id => $msg->{id}, result => {
+      outcome => defined $choice ? { outcome => 'selected', optionId => $choice } : { outcome => 'cancelled' },
+    } });
+  }
+  return $self->_send({ jsonrpc => '2.0', id => $msg->{id},
+    error => { code => -32601, message => 'method not found: '.($msg->{method} // '') } });
 }
 
 sub close {
@@ -130,7 +157,7 @@ Langertha::Raider::ACP::Client - Minimal synchronous ACP client over TCP
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -161,6 +188,13 @@ socket.
 
 Opens the connection; C<port> is required, C<host> defaults to
 C<127.0.0.1> and C<timeout> (seconds) to 10. Dies on failure.
+
+C<on_permission> is called as C<< $code->($params) >> when the agent sends
+C<session/request_permission> (C<params> has C<sessionId>, C<toolCall> and
+C<options>); it returns the C<optionId> to select, or undef. Without it, or
+when it returns anything that is not an offered option, the client rejects
+(the C<reject_once> option, else the C<cancelled> outcome): a client that
+cannot ask never allows.
 
 =head2 initialize
 
@@ -196,7 +230,7 @@ L<Langertha::Raider::Hall::ACP>, L<Langertha::Raider::ACP::CLI>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -217,5 +251,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

@@ -55,6 +55,8 @@ Readonly my @RECS => (
 #   VP-Alpha   : letter-start, letters only          (e.g. "sales")
 #   VP-Under   : underscore-start                    (e.g. "_data")
 #   VP-Mixed   : letter-start with digits/underscore (e.g. "sales_2024")
+#   A valid name with no file is a 404 too, but from the action: its page
+#   says "There is no table called ...", which a rejected name never gets.
 #   IP-Digit   : digit at position 0                 -> 404
 #   IP-Dot     : contains dot                        -> 404
 #   IP-Hyphen  : contains hyphen                     -> 404
@@ -68,21 +70,22 @@ Readonly my @RECS => (
 #   BV-len2-invalid  : "1a" (digit + letter)         -> 404
 # ======================================================================
 
-subtest 'table name EP-Alpha: letter-start word accepted (200, not 404)' => sub {
+subtest 'table name EP-Alpha: letter-start word accepted (200)' => sub {
 	$t->get_ok('/view/sales')->status_is(200);
 };
 
-subtest 'table name EP-Under: underscore-start accepted (200)' => sub {
-	# "_data" has no backing file; controller renders error on home page (still 200).
-	$t->get_ok('/view/_data')->status_is(200);
+subtest 'table name EP-Under: underscore-start accepted (reaches the action)' => sub {
+	# "_data" has no backing file: the name reaches the action, which says the
+	# table does not exist (404) -- unlike a rejected name, which never gets there.
+	$t->get_ok('/view/_data')->status_is(404)->content_like(qr/There is no table called/);
 };
 
-subtest 'table name EP-Mixed: letter+digits+underscore accepted (200)' => sub {
-	$t->get_ok('/view/sales_2024')->status_is(200);
+subtest 'table name EP-Mixed: letter+digits+underscore accepted (reaches the action)' => sub {
+	$t->get_ok('/view/sales_2024')->status_is(404)->content_like(qr/There is no table called/);
 };
 
 subtest 'table name IP-Digit: digit-start rejected (404)' => sub {
-	$t->get_ok('/view/1sales')->status_is(404);
+	$t->get_ok('/view/1sales')->status_is(404)->content_unlike(qr/There is no table called/);
 };
 
 subtest 'table name IP-Dot: dot in name rejected (404)' => sub {
@@ -99,11 +102,11 @@ subtest 'table name IP-NonASCII: non-ASCII characters rejected (404)' => sub {
 };
 
 subtest 'table name BV-min-letter: single letter "a" is valid (shortest VP)' => sub {
-	$t->get_ok('/view/a')->status_is(200);
+	$t->get_ok('/view/a')->status_is(404)->content_like(qr/There is no table called/);
 };
 
 subtest 'table name BV-min-underscore: single underscore "_" is valid' => sub {
-	$t->get_ok('/view/_')->status_is(200);
+	$t->get_ok('/view/_')->status_is(404)->content_like(qr/There is no table called/);
 };
 
 subtest 'table name BV-min-digit: single digit "1" is invalid -- 404' => sub {
@@ -111,7 +114,7 @@ subtest 'table name BV-min-digit: single digit "1" is invalid -- 404' => sub {
 };
 
 subtest 'table name BV-len2-valid: letter+digit "a1" is valid' => sub {
-	$t->get_ok('/view/a1')->status_is(200);
+	$t->get_ok('/view/a1')->status_is(404)->content_like(qr/There is no table called/);
 };
 
 subtest 'table name BV-len2-invalid: digit+letter "1a" is invalid -- 404' => sub {

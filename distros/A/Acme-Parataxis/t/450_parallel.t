@@ -4,6 +4,7 @@ use blib;
 use Acme::Parataxis;
 use Time::HiRes qw[time];
 $|++;
+#
 Acme::Parataxis::run(
     sub {
         my $start_time = time();
@@ -47,4 +48,5 @@ Acme::Parataxis::run(
         ok $elapsed < 1.8, "$num_tasks tasks ran in parallel (elapsed < 1.8s)";
     }
 );
+#
 done_testing();

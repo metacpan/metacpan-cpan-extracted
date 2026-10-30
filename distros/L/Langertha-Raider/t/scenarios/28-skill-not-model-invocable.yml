@@ -1,0 +1,17 @@
+title: a skill with disable-model-invocation is neither listed nor loadable by the model
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/greet/SKILL.md: "---\ndescription: Greets people.\n---\nSay Moin.\n"
+  .claude/skills/deploy/SKILL.md: "---\ndescription: Deploys to production.\ndisable-model-invocation: true\n---\nDEPLOY-BODY-MARKER\n"
+prompt: Deploy it.
+script:
+  - tool_calls:
+      - [ skill, { skill: deploy } ]
+  - text: nicht erlaubt
+expect:
+  answer: nicht erlaubt
+  requests:
+    - { index: 0, contains: "- greet: Greets people." }
+    - { index: 0, absent: "Deploys to production." }
+  tools:
+    - { name: skill, error: true, text: '^<tool_use_error>Unknown skill: deploy\. Available skills: greet</tool_use_error>$', not_text: DEPLOY-BODY-MARKER }

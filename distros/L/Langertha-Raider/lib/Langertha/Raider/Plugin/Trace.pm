@@ -1,5 +1,5 @@
 package Langertha::Raider::Plugin::Trace;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: Live ANSI-colored progress output for a running Langertha::Raider raid
 
 use Moose;
@@ -216,7 +216,7 @@ Langertha::Raider::Plugin::Trace - Live ANSI-colored progress output for a runni
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -283,7 +283,7 @@ Set, the trace has no colors and no spinner, whatever L</color> says.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -304,5 +304,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

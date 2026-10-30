@@ -1,0 +1,13 @@
+title: list_files shows the directory content
+files:
+  src/a.pl: "1\n"
+  src/b.pl: "2\n"
+prompt: What is in src?
+script:
+  - tool_calls:
+      - [ list_files, { path: src } ]
+  - text: zwei Dateien
+expect:
+  answer: zwei Dateien
+  tools:
+    - { name: list_files, text: 'a\.pl.*b\.pl|b\.pl.*a\.pl' }

@@ -125,7 +125,7 @@ for my $name (qw(test Overall p_value variable level type)) {
 # A type that is neither 'continuous' nor 'categorical' is refused; 'numeric'
 # used to be taken as categorical, a row per distinct value.
 throws_ok { table_one(\@rows, by => 'arm', types => { age => 'numeric' }) }
-	qr/^table_one: the type of 'age' must be 'continuous' or 'categorical', not 'numeric'$/m,
+	qr/\ntable_one: error: the type of 'age' must be 'continuous' or 'categorical', not 'numeric'$/m,
 	"types => { age => 'numeric' } is refused";
 throws_ok { table_one(\@rows, types => { age => undef }) }
 	qr/not 'undef'/, 'an undef type is refused';
@@ -167,4 +167,12 @@ throws_ok { table_one(\@rows, types => { age => undef }) }
 	is_deeply([ map { $_->{level} } @$t ], [ '', qw(NA a b c) ], 'string levels keep the string order');
 }
 
+# A call-form error prints table_one's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { table_one([ { a => 1 } ], bogus => 1); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: table_one\(/, 'table_one: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('table_one') . "table_one: error: unknown argument(s): bogus\n",
+		'table_one: the help screen, then the error on the last line');
+}
 done_testing();

@@ -12,7 +12,7 @@ BEGIN {
     unless -d "$Config{installsitelib}/_Inline";
 };
 
-our $VERSION = '2.7.3';
+our $VERSION = '2.7.4';
 
 my $GlobalRef = {};
 
@@ -339,7 +339,7 @@ use Inline C => _get_path('duk_perl.c');
 
 use Inline C => q{
     void poke_buffer(IV to, IV from, IV sz) {
-        memcpy( to, from, sz );
+        memcpy( INT2PTR(void *, to), INT2PTR(const void *, from), (size_t)sz );
     }
 };
 

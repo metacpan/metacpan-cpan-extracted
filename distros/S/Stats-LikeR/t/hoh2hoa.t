@@ -86,4 +86,12 @@ dies_ok { hoh2hoa( { 'r1' => { 'a' => 1, 'id' => 5 } }, 'row_names' => 'a' ) } '
 no_leaks_ok { hoh2hoa( \%ragged ) } 'no leaks: basic conversion' unless $INC{'Devel/Cover.pm'};
 no_leaks_ok { hoh2hoa( \%ragged, 'undef_val' => 'NA' ) } 'no leaks: undef_val fill' unless $INC{'Devel/Cover.pm'};
 no_leaks_ok { hoh2hoa( \%labelled, 'row_names' => 'id' ) } 'no leaks: row_names column' unless $INC{'Devel/Cover.pm'};
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { hoh2hoa({}, colour => 1); 1 } ? '' : $@;
+	like($err, qr/\Ausage: hoh2hoa\(.*\n\nhoh2hoa: error: \Qunknown option 'colour'\E\n\z/s,
+		'hoh2hoa: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing();

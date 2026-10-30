@@ -108,7 +108,7 @@ subtest 'document and finish' => sub {
   my ( $fh, $read ) = buffer();
   my $machine = Langertha::Raider::CLI::Machine->new(format => 'json', out => $fh);
   is($machine->document(failed => error => 'x', elapsed => 0),
-    { version => 1, status => 'failed', error => 'x', elapsed => 0 }, 'version and status');
+    { version => 1, status => 'failed', reason => 'error', error => 'x', elapsed => 0 }, 'version and status, a reason by default');
   $machine->event('run.state', state => 'running');
   is($read->(), '', 'no events without stream');
   $machine->finish($machine->document(completed => response => 'ä', elapsed => 1));
@@ -127,7 +127,7 @@ subtest 'the three document flags' => sub {
     is($err, '', '--'.$format.': nothing on stderr');
     ( $exit, $out ) = main_run(@base, '--'.$format, 'fail');
     is($exit, 1, '--'.$format.': a failed run exits 1');
-    is(decode_as($format, $out), { version => 1, status => 'failed', error => 'kaputt: ä', elapsed => E(),
+    is(decode_as($format, $out), { version => 1, status => 'failed', reason => 'error', error => 'kaputt: ä', elapsed => E(),
       session => { id => T(), path => T() } },
       '--'.$format.': the failed document');
     ( $exit, $out ) = main_run(@base, '--'.$format.'=1', 'hi');
@@ -193,7 +193,7 @@ my $q = sub { join ' ', map { "'$_'" } @_ };
 subtest 'bin/raider --msgpack writes binary stdout' => sub {
   my $out = `@{[ $q->(@cmd, @base, '--msgpack', '-o', 'url=http://127.0.0.1:1', 'hi') ]} 2>/dev/null </dev/null`;
   is($? >> 8, 1, 'unreachable engine: run failed');
-  is(decode_as(msgpack => $out), { version => 1, status => 'failed', error => T(), elapsed => E(),
+  is(decode_as(msgpack => $out), { version => 1, status => 'failed', reason => 'engine_error', error => T(), elapsed => E(),
     session => { id => T(), path => T() } },
     'stdout is one MessagePack document');
 };

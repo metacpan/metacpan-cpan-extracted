@@ -231,7 +231,7 @@ Yoruba Benin locale.
 
 =head3 Wide (format)
 
-  Saju Kristi
+  Sháájú Kírístì
   Lehin Kristi
 
 =head3 Abbreviated (format)
@@ -411,11 +411,11 @@ Yoruba Benin locale.
    1995-12-22T09:05:02 = AD 1995
   -0010-09-15T04:44:23 = BCE -10
 
-=head3 GyM (MM-y G)
+=head3 GyM (M/y G)
 
-   2008-02-05T18:30:30 = 02-2008 AD
-   1995-12-22T09:05:02 = 12-1995 AD
-  -0010-09-15T04:44:23 = 09--10 BCE
+   2008-02-05T18:30:30 = 2/2008 AD
+   1995-12-22T09:05:02 = 12/1995 AD
+  -0010-09-15T04:44:23 = 9/-10 BCE
 
 =head3 GyMEd (E, d/M/y G)
 
@@ -423,23 +423,41 @@ Yoruba Benin locale.
    1995-12-22T09:05:02 = Ɛtì, 22/12/1995 AD
   -0010-09-15T04:44:23 = Àbámɛ́ta, 15/9/-10 BCE
 
-=head3 GyMMM (G y MMM)
+=head3 GyMMM (MMM y G)
 
-   2008-02-05T18:30:30 = AD 2008 Oshù Èrèlè
-   1995-12-22T09:05:02 = AD 1995 Oshù Ɔ̀pɛ̀
-  -0010-09-15T04:44:23 = BCE -10 Oshù Owewe
+   2008-02-05T18:30:30 = Oshù Èrèlè 2008 AD
+   1995-12-22T09:05:02 = Oshù Ɔ̀pɛ̀ 1995 AD
+  -0010-09-15T04:44:23 = Oshù Owewe -10 BCE
 
-=head3 GyMMMEd (G y MMM d, E)
+=head3 GyMMMEd (E, d MMM, y G)
 
-   2008-02-05T18:30:30 = AD 2008 Oshù Èrèlè 5, Ìsɛ́gun
-   1995-12-22T09:05:02 = AD 1995 Oshù Ɔ̀pɛ̀ 22, Ɛtì
-  -0010-09-15T04:44:23 = BCE -10 Oshù Owewe 15, Àbámɛ́ta
+   2008-02-05T18:30:30 = Ìsɛ́gun, 5 Oshù Èrèlè, 2008 AD
+   1995-12-22T09:05:02 = Ɛtì, 22 Oshù Ɔ̀pɛ̀, 1995 AD
+  -0010-09-15T04:44:23 = Àbámɛ́ta, 15 Oshù Owewe, -10 BCE
 
-=head3 GyMMMd (G y MMM d)
+=head3 GyMMMM (MMMM y G)
 
-   2008-02-05T18:30:30 = AD 2008 Oshù Èrèlè 5
-   1995-12-22T09:05:02 = AD 1995 Oshù Ɔ̀pɛ̀ 22
-  -0010-09-15T04:44:23 = BCE -10 Oshù Owewe 15
+   2008-02-05T18:30:30 = Oshù Èrèlè 2008 AD
+   1995-12-22T09:05:02 = Oshù Ɔ̀pɛ̀ 1995 AD
+  -0010-09-15T04:44:23 = Oshù Owewe -10 BCE
+
+=head3 GyMMMMEd (E, d MMMM, y G)
+
+   2008-02-05T18:30:30 = Ìsɛ́gun, 5 Oshù Èrèlè, 2008 AD
+   1995-12-22T09:05:02 = Ɛtì, 22 Oshù Ɔ̀pɛ̀, 1995 AD
+  -0010-09-15T04:44:23 = Àbámɛ́ta, 15 Oshù Owewe, -10 BCE
+
+=head3 GyMMMMd (d MMMM, y G)
+
+   2008-02-05T18:30:30 = 5 Oshù Èrèlè, 2008 AD
+   1995-12-22T09:05:02 = 22 Oshù Ɔ̀pɛ̀, 1995 AD
+  -0010-09-15T04:44:23 = 15 Oshù Owewe, -10 BCE
+
+=head3 GyMMMd (d MMM, y G)
+
+   2008-02-05T18:30:30 = 5 Oshù Èrèlè, 2008 AD
+   1995-12-22T09:05:02 = 22 Oshù Ɔ̀pɛ̀, 1995 AD
+  -0010-09-15T04:44:23 = 15 Oshù Owewe, -10 BCE
 
 =head3 GyMd (d/M/y GGGGG)
 
@@ -507,11 +525,11 @@ Yoruba Benin locale.
    1995-12-22T09:05:02 = 22 Oshù Ɔ̀pɛ̀, Ɛtì
   -0010-09-15T04:44:23 = 15 Oshù Owewe, Àbámɛ́ta
 
-=head3 MMMMEd (d, MMMM E)
+=head3 MMMMEd (E, d MMMM)
 
-   2008-02-05T18:30:30 = 5, Oshù Èrèlè Ìsɛ́gun
-   1995-12-22T09:05:02 = 22, Oshù Ɔ̀pɛ̀ Ɛtì
-  -0010-09-15T04:44:23 = 15, Oshù Owewe Àbámɛ́ta
+   2008-02-05T18:30:30 = Ìsɛ́gun, 5 Oshù Èrèlè
+   1995-12-22T09:05:02 = Ɛtì, 22 Oshù Ɔ̀pɛ̀
+  -0010-09-15T04:44:23 = Àbámɛ́ta, 15 Oshù Owewe
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
@@ -620,6 +638,18 @@ Yoruba Benin locale.
    2008-02-05T18:30:30 = Oshù Èrèlè 2008
    1995-12-22T09:05:02 = Oshù Ɔ̀pɛ̀ 1995
   -0010-09-15T04:44:23 = Oshù Owewe -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = Ìsɛ́gun, 5 Oshù Èrèlè 2008
+   1995-12-22T09:05:02 = Ɛtì, 22 Oshù Ɔ̀pɛ̀ 1995
+  -0010-09-15T04:44:23 = Àbámɛ́ta, 15 Oshù Owewe -10
+
+=head3 yMMMMd (d MMMM, y)
+
+   2008-02-05T18:30:30 = 5 Oshù Èrèlè, 2008
+   1995-12-22T09:05:02 = 22 Oshù Ɔ̀pɛ̀, 1995
+  -0010-09-15T04:44:23 = 15 Oshù Owewe, -10
 
 =head3 yMMMd (d MMM y)
 

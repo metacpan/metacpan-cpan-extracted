@@ -411,11 +411,11 @@ Italian San Marino locale.
    1995-12-22T09:05:02 = 1995 d.C.
   -0010-09-15T04:44:23 = -10 a.C.
 
-=head3 GyM (M/y G)
+=head3 GyM (MM/y G)
 
-   2008-02-05T18:30:30 = 2/2008 d.C.
+   2008-02-05T18:30:30 = 02/2008 d.C.
    1995-12-22T09:05:02 = 12/1995 d.C.
-  -0010-09-15T04:44:23 = 9/-10 a.C.
+  -0010-09-15T04:44:23 = 09/-10 a.C.
 
 =head3 GyMEd (E dd/MM/y G)
 
@@ -435,6 +435,24 @@ Italian San Marino locale.
    1995-12-22T09:05:02 = ven 22 dic 1995 d.C.
   -0010-09-15T04:44:23 = sab 15 set -10 a.C.
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = febbraio 2008 d.C.
+   1995-12-22T09:05:02 = dicembre 1995 d.C.
+  -0010-09-15T04:44:23 = settembre -10 a.C.
+
+=head3 GyMMMMEd (E d MMMM y G)
+
+   2008-02-05T18:30:30 = mar 5 febbraio 2008 d.C.
+   1995-12-22T09:05:02 = ven 22 dicembre 1995 d.C.
+  -0010-09-15T04:44:23 = sab 15 settembre -10 a.C.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 febbraio 2008 d.C.
+   1995-12-22T09:05:02 = 22 dicembre 1995 d.C.
+  -0010-09-15T04:44:23 = 15 settembre -10 a.C.
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 feb 2008 d.C.
@@ -447,11 +465,11 @@ Italian San Marino locale.
    1995-12-22T09:05:02 = 22/12/1995 d.C.
   -0010-09-15T04:44:23 = 15/09/-10 a.C.
 
-=head3 H (H)
+=head3 H (HH)
 
    2008-02-05T18:30:30 = 18
-   1995-12-22T09:05:02 = 9
-  -0010-09-15T04:44:23 = 4
+   1995-12-22T09:05:02 = 09
+  -0010-09-15T04:44:23 = 04
 
 =head3 Hm (HH:mm)
 
@@ -506,6 +524,12 @@ Italian San Marino locale.
    2008-02-05T18:30:30 = mar 5 feb
    1995-12-22T09:05:02 = ven 22 dic
   -0010-09-15T04:44:23 = sab 15 set
+
+=head3 MMMMEd (E d MMMM)
+
+   2008-02-05T18:30:30 = mar 5 febbraio
+   1995-12-22T09:05:02 = ven 22 dicembre
+  -0010-09-15T04:44:23 = sab 15 settembre
 
 =head3 MMMMW-count-one ('settimana' W 'di' MMMM)
 
@@ -620,6 +644,18 @@ Italian San Marino locale.
    2008-02-05T18:30:30 = febbraio 2008
    1995-12-22T09:05:02 = dicembre 1995
   -0010-09-15T04:44:23 = settembre -10
+
+=head3 yMMMMEd (E d MMMM y)
+
+   2008-02-05T18:30:30 = mar 5 febbraio 2008
+   1995-12-22T09:05:02 = ven 22 dicembre 1995
+  -0010-09-15T04:44:23 = sab 15 settembre -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 febbraio 2008
+   1995-12-22T09:05:02 = 22 dicembre 1995
+  -0010-09-15T04:44:23 = 15 settembre -10
 
 =head3 yMMMd (d MMM y)
 

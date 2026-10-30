@@ -382,32 +382,32 @@ sub tmpfile {
 	for my $pair (@pairs) {
 		my ($a, $b) = ( $pair->[0], $pair->[2] );
 		throws_ok { read_table($f, @$pair) }
-			qr/^read_table: pass only one of 'na_strings', 'na_values' or 'undef_val'; got '[^']+', '[^']+'$/m,
+			qr/\nread_table: error: pass only one of 'na_strings', 'na_values' or 'undef_val'; got '[^']+', '[^']+'$/m,
 			"$a and $b together are refused";
 	}
 
 	throws_ok { read_table($f, 'na_strings' => 'NA', na_values => 'NA', 'undef_val' => 'NA') }
-		qr/^read_table: pass only one of 'na_strings', 'na_values' or 'undef_val'; got 'na_strings', 'na_values', 'undef_val'$/m,
+		qr/\nread_table: error: pass only one of 'na_strings', 'na_values' or 'undef_val'; got 'na_strings', 'na_values', 'undef_val'$/m,
 		'all three together are refused, and the message lists them in a fixed order';
 
 	throws_ok { read_table($f, 'na_strings' => {}) }
-		qr/^read_table: 'na_strings' must be a string or an ARRAY reference, not a HASH reference$/m,
+		qr/\nread_table: error: 'na_strings' must be a string or an ARRAY reference, not a HASH reference$/m,
 		'a hashref is refused (pandas takes a dict here; this module does not)';
 
 	throws_ok { read_table($f, na_values => sub { 1 }) }
-		qr/^read_table: 'na_strings' must be a string or an ARRAY reference, not a CODE reference$/m,
+		qr/\nread_table: error: 'na_strings' must be a string or an ARRAY reference, not a CODE reference$/m,
 		'a coderef is refused, and reports under the canonical option name';
 
 	throws_ok { read_table($f, 'undef_val' => \'NA') }
-		qr/^read_table: 'na_strings' must be a string or an ARRAY reference, not a SCALAR reference$/m,
+		qr/\nread_table: error: 'na_strings' must be a string or an ARRAY reference, not a SCALAR reference$/m,
 		'undef_val is validated the same way, and also reports as na_strings';
 
 	throws_ok { read_table($f, 'na_strings' => [ 'NA', undef ]) }
-		qr/^read_table: 'na_strings' may not contain an undefined value$/m,
+		qr/\nread_table: error: 'na_strings' may not contain an undefined value$/m,
 		'an undef inside the list is refused rather than silently matching nothing';
 
 	throws_ok { read_table($f, 'na_string' => 'NA') }
-		qr/aren't defined for read_table/,
+		qr/\nread_table: error: unknown argument\(s\): na_string$/,
 		'a misspelled option is still refused by the allowed-args check';
 }
 

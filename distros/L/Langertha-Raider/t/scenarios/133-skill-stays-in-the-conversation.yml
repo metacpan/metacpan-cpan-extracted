@@ -1,0 +1,21 @@
+# As in Claude Code, the skill is a user message of its own right after the
+# tool result ("Launching skill: style"), and it stays in the conversation: the
+# next prompt's request still carries it, between the first prompt and the
+# answer, so the model does not have to load it again.
+title: a loaded skill is a message after its tool result and stays in the conversation for the next prompt
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/style/SKILL.md: "---\nname: style\ndescription: House writing style.\n---\n\nWrite in short sentences. STYLE-MARKER\n"
+prompts: [ "Write the intro.", "And the outro." ]
+script:
+  - tool_calls:
+      - [ skill, { skill: style } ]
+  - text: Intro written.
+  - text: Outro written.
+expect:
+  answer: Outro written.
+  requests:
+    - { index: 1, tail: [ { role: assistant }, { role: tool, contains: "Launching skill: style" }, { role: user, contains: "Write in short sentences. STYLE-MARKER" } ] }
+    - { index: 2, tail: [ { role: user, contains: "Write the intro." }, { role: user, contains: "Base directory for this skill: " }, { role: assistant, contains: "Intro written." }, { role: user, contains: "And the outro." } ] }
+  tools:
+    - { name: skill, text: '^Launching skill: style$' }

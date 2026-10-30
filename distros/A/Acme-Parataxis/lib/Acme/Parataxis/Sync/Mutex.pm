@@ -1,7 +1,7 @@
 use v5.40;
 no warnings 'experimental::class', 'recursion';
 use feature 'class';
-class Acme::Parataxis::Sync::Mutex v0.1.1 : isa(Acme::Parataxis::Sync) {
+class Acme::Parataxis::Sync::Mutex v0.1.3 : isa(Acme::Parataxis::Sync) {
     use Acme::Parataxis;
     use Carp qw[croak];
     field $owner : reader;    # fiber id holding the lock; undef when free
@@ -80,7 +80,7 @@ class Acme::Parataxis::Sync::Mutex v0.1.1 : isa(Acme::Parataxis::Sync) {
 # violation behind threads->create on some 5.42.x builds (Acme::Parataxis::Blocking's spawn_blocking), so guard classes
 # are kept as classic blessed packages. Note: the Sync::* namespaces themselves still hit a separate, name-dependent
 # clone crash on affected perls regardless of this - see Acme::Parataxis::Blocking's pod warning.
-package Acme::Parataxis::Sync::Mutex::Guard v0.1.1 {
+package Acme::Parataxis::Sync::Mutex::Guard v0.1.3 {
 
     sub new ( $class, %args ) {
         return bless { mutex => $args{mutex} }, $class;

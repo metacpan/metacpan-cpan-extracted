@@ -1,0 +1,24 @@
+title: in the Claude layout the rules of user, project and local settings all count -- a user deny beats a project allow
+permission_mode: null
+home:
+  .claude/settings.json: '{ "permissions": { "deny": [ "Bash(rm:*)" ] } }'
+files:
+  CLAUDE.md: "# project\n"
+  .claude/settings.json: '{ "permissions": { "allow": [ "Bash" ] } }'
+  .claude/settings.local.json: '{ "permissions": { "allow": [ "Write" ] } }'
+  keep.txt: keep
+prompt: Go.
+script:
+  - tool_calls:
+      - [ bash, { command: echo hi } ]
+      - [ bash, { command: rm keep.txt } ]
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+      - [ edit_file, { path: a.txt, old_string: a, new_string: b } ]
+  - text: done
+expect:
+  files: { keep.txt: keep, a.txt: "b\n" }
+  tools:
+    - { name: bash, text: hi }
+    - { name: bash, error: true, text: "denied by rule 'Bash\\(rm:\\*\\)' from ~/\\.claude/settings\\.json" }
+    - { name: write_file }
+    - { name: edit_file }

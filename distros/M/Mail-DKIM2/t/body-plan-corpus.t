@@ -32,7 +32,7 @@ cmp_ok($checked, '>', 0, "checked $checked messages");
 
 # Both walks stop at an instance that does not parse, so such a message
 # compares nothing. The -06 charset corpus captures carry "b" Recipe steps,
-# invalid under -07: say how many, and keep it visible until the recapture.
+# invalid under -08: say how many, and keep it visible until the recapture.
 TODO: {
     local $TODO = 'recapture the -06 charset corpus after the -07 deploy';
     is($ChainPlanReference::UNPARSED, 0,

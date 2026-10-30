@@ -1,0 +1,30 @@
+[%- # What a chart, pivot or summary page is drawn from, when it is not simply
+    # the whole file: the relative time range, the reader's filters, the
+    # cross-row columns, the files stacked in and de-duplication.  The values
+    # come from the before_dispatch hooks in Database::BI, so every page that
+    # PROCESSes this names the same things the table view shows as chips.
+    # Nothing is printed for an unfiltered view.
+-%]
+[%- IF time_range || view_filters.size || cross_row_specs.size || view_combines.size || view_dedup -%]
+<p class="view-context" id="view-context">
+  <span class="view-context-label">Drawn from:</span>
+  [%- IF time_range -%]
+  <span class="filter-chip filter-chip-range" title="Rows are limited to a window worked out from today's date">[% time_range.label | html %] [% time_range.col | html %]</span>
+  [%- END -%]
+  [%- FOREACH fs IN view_filters -%]
+  <span class="filter-chip" title="Filter">[% fs | html %]</span>
+  [%- END -%]
+  [%- FOREACH spec IN cross_row_specs -%]
+  <span class="filter-chip filter-chip-cs" title="Cross-row column">[% spec | html %]</span>
+  [%- END -%]
+  [%- FOREACH cspec IN view_combines -%]
+  <span class="filter-chip" title="Rows stacked in from [% cspec | html %]">+ [% cspec.replace('^[A-Za-z]+:(?:.*[/\\\\])?', '') | html %]</span>
+  [%- END -%]
+  [%- IF view_dedup -%]
+  <span class="filter-chip" title="Duplicate rows are removed">duplicates removed</span>
+  [%- END -%]
+  [%- IF back_url -%]
+  <a class="view-context-change" href="[% back_url | html %]">Change&hellip;</a>
+  [%- END -%]
+</p>
+[%- END -%]

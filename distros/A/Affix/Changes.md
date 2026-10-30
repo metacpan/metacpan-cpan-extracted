@@ -5,6 +5,30 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.0] - 2026-10-29
+
+### Fixed
+
+- I was filtering out `eg/` in my dist builder so none of the demos I've been adding to the repo were making it to CPAN. D'oh!
+
+## [v1.2.9] - 2026-10-29
+
+### Added
+
+- New `error( )` function that returns the most recent error from Affix itself, our JIT, or the OS when you don't feel like checking all three.
+- If the `Struct[ flag => UInt32 | 3, ... ]` syntax isn't self-documenting enough, I've added a new `Bitfield` type so that you can write `Struct[ flag => Bitfield[ UInt32, 1 ], ... ]` instead.
+- New SIMD example (`eg/simd.pl`) which demonstrates 4D single-precision float vector math commonly used in 3D graphics, game physics, audio DSP, etc. Shows both the convienient mode with simple perl array refs and packed strings for higher performance.
+
+### Changed
+
+- Minor clarification in variadic function docs.
+
+## [v1.2.8] - 2026-10-29
+
+### Fixed
+
+- Cygwin. I think. Well, I hope.
+
 ## [v1.2.7] - 2026-09-22
 
 ### Fixed
@@ -423,7 +447,10 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.7...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/sanko/Affix.pm/compare/v1.2.9...v1.3.0
+[v1.2.9]: https://github.com/sanko/Affix.pm/compare/v1.2.8...v1.2.9
+[v1.2.8]: https://github.com/sanko/Affix.pm/compare/v1.2.7...v1.2.8
 [v1.2.7]: https://github.com/sanko/Affix.pm/compare/v1.2.6...v1.2.7
 [v1.2.6]: https://github.com/sanko/Affix.pm/compare/v1.2.5...v1.2.6
 [v1.2.5]: https://github.com/sanko/Affix.pm/compare/v1.2.4...v1.2.5

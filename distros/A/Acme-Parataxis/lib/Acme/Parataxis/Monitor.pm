@@ -14,7 +14,7 @@ use feature 'class';
 # The reverse edge is cut: the completion callback captures the monitor weakly, so dropping
 # a monitor lets it (and its strong target ref) dissolve instead of lingering in the target's
 # callback list.
-class Acme::Parataxis::Monitor v0.1.1 {
+class Acme::Parataxis::Monitor v0.1.3 {
     use Acme::Parataxis;
     use Acme::Parataxis::Future;
     use Carp    qw[croak];

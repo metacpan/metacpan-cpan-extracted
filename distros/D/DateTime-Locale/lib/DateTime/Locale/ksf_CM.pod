@@ -435,6 +435,24 @@ Bafia Cameroon locale.
    1995-12-22T09:05:02 = k.Y. 1995 ŋ12 22, júm
   -0010-09-15T04:44:23 = d.Y. -10 ŋ9 15, sam
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = k.Y. 2008 ŋwíí akǝ bɛ́ɛ
+   1995-12-22T09:05:02 = k.Y. 1995 ŋwíí akǝ ntɛk di bɛ́ɛ
+  -0010-09-15T04:44:23 = d.Y. -10 ŋwíí akǝ táanin
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = k.Y. 2008 ŋwíí akǝ bɛ́ɛ 5, maa
+   1995-12-22T09:05:02 = k.Y. 1995 ŋwíí akǝ ntɛk di bɛ́ɛ 22, júm
+  -0010-09-15T04:44:23 = d.Y. -10 ŋwíí akǝ táanin 15, sam
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = k.Y. 2008 ŋwíí akǝ bɛ́ɛ 5
+   1995-12-22T09:05:02 = k.Y. 1995 ŋwíí akǝ ntɛk di bɛ́ɛ 22
+  -0010-09-15T04:44:23 = d.Y. -10 ŋwíí akǝ táanin 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = k.Y. 2008 ŋ2 5
@@ -506,6 +524,12 @@ Bafia Cameroon locale.
    2008-02-05T18:30:30 = maa 5 ŋ2
    1995-12-22T09:05:02 = júm 22 ŋ12
   -0010-09-15T04:44:23 = sam 15 ŋ9
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = ŋwíí akǝ bɛ́ɛ 5, maa
+   1995-12-22T09:05:02 = ŋwíí akǝ ntɛk di bɛ́ɛ 22, júm
+  -0010-09-15T04:44:23 = ŋwíí akǝ táanin 15, sam
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

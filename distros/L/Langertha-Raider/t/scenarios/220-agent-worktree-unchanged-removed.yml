@@ -1,0 +1,29 @@
+title: an isolated agent that changes nothing leaves no worktree and no branch behind, and its result names none
+git: true
+permission_mode: bypassPermissions
+files:
+  CLAUDE.md: "# project\n"
+  a.txt: "ALPHA\n"
+prompt: Look at a.txt in a worktree of its own.
+script:
+  - tool_calls:
+      - [ agent, { description: Look, prompt: Read a.txt and report., isolation: worktree } ]
+  - tool_calls:
+      - [ read_file, { path: a.txt } ]
+  - text: a.txt holds ALPHA
+  - text: "The agent saw: ALPHA"
+expect:
+  answer: "The agent saw: ALPHA"
+  requests:
+    - { index: 1, contains: "/.claude/worktrees/agent-1" }
+  tools:
+    - { name: read_file, text: ALPHA }
+    - { name: agent, text: '\Aa.txt holds ALPHA\nagentId: agent_1 [^\n]*\n<usage>[^\n]*\n[^\n]*\n[^\n]*</usage>\z', not_text: 'worktree' }
+  absent:
+    - .claude/worktrees/agent-1
+  branches:
+    present: [ main ]
+    absent: [ worktree-agent-1 ]
+  events:
+    - { type: agent.started, agent_id: agent_1, branch: worktree-agent-1 }
+    - { type: agent.finished, agent_id: agent_1, status: completed, worktree_kept: false }

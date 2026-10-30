@@ -238,4 +238,12 @@ if ($n == 0) {
 	is($bad, 0, 'numeric values count under the same keys perl would use');
 }
 
+# A call-form error prints value_counts's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { value_counts(); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: value_counts\(/, 'value_counts: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('value_counts') . "value_counts: error: no data provided; at least one argument is required\n",
+		'value_counts: the help screen, then the error on the last line');
+}
 done_testing();

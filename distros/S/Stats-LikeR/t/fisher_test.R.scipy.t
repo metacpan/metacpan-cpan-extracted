@@ -21,6 +21,16 @@
 #     do.call(fisher.test, list(t44)) table from the PR#17671 entry.
 #   * The examples on R's ?fisher.test man page: Job Satisfaction (r x c),
 #     Convictions at conf.level = 0.99, and Mehta & Patel's 6th example.
+#     SciPy 1.18.0 test_stats.py::TestFisherExact::test_resampling_rxc pins
+#     the same MP6 value, "Compare against R fisher.exact".
+#   * For r x c tables, a third opinion: the exact p-value as a rational
+#     number, from t/fisher_test.rxc.exact.py (Python fractions, no floating
+#     point anywhere; see that file for how to re-run it).  R's FEXACT is not
+#     exact to the last digits -- it merges path weights that agree to 3.45e-7
+#     and builds log-factorials by recursion -- and sits up to 3.3e-12 away
+#     from these (Job Satisfaction, the audit's 4x4), where fisher_test() is
+#     within 1.4e-13 of them.  The R values for the tables in Case 11 come
+#     from t/fisher_test.rxc.R.
 #
 # t/fisher_test.t already covers the tea-tasting 2x2, the Convictions 2x2 at
 # the default conf_level, hash-of-hash input, argument validation and leak
@@ -38,9 +48,9 @@ use Stats::LikeR 'fisher_test';
 
 my $INF = 9**9**9;
 
-# Four of the cases below are slow by construction: two walk a 2x2 support of
-# millions of tables, and three drive the r x c enumeration to or near its
-# 50e6-node ceiling.  The work is a fixed count of iterations, identical on
+# A few of the cases below are slow by construction: two walk a 2x2 support of
+# millions of tables, and the r x c refusals in Case 8 run the network
+# algorithm into its work or memory cap.  The work is a fixed count of iterations, identical on
 # every platform, but the seconds are not: the inner loops call lgamma() per
 # step, which on a long-double or __float128 perl is lgammal/lgammaq and runs
 # one to two orders of magnitude slower than the double version.  Together
@@ -73,7 +83,14 @@ my $SLOW_WHY = 'slow case; set EXTENDED_TESTING=1 to run it';
 # the hundreds or thousands that can show well above 1e-9 -- so the CI is only
 # asked to match to the precision R itself prints.
 my $TOL_P   = 1e-11;   # 2x2 p-values: a sum over a hypergeometric support
-my $TOL_RXC = 1e-9;    # r x c p-values: a much longer sum, in another order
+# r x c p-values against R: up to 3.3e-12 apart on a double build (the audit's
+# 4x4 and Case 11's w1), and the gap is R's error, not this module's (see the
+# header).  A longer-NV build moves fisher_test() towards the exact value, so
+# the gap to R stays where it is; 1e-11 is three times it.
+my $TOL_RXC = 1e-11;
+# r x c p-values against the exact rational value: 1.4e-13 at worst (PR#18336's
+# 6x6), 1e-12 leaves seven times that.
+my $TOL_EXACT = 1e-12;
 my $TOL_OR  = 1e-10;   # conditional MLE odds ratio
 my $TOL_CI  = 1e-4;    # confidence bounds (see above)
 
@@ -307,6 +324,7 @@ SKIP: {                                  # ~5s here: the support runs to 5.7e6 t
 	my $job = [[1,3,10,6],[2,3,10,7],[1,6,14,12],[0,1,9,11]];
 	my $r = fisher_test($job);
 	close_to($r->{'p_value'}, 0.78268493896563884, 'C6 Job Satisfaction 4x4 p-value', $TOL_RXC);
+	close_to($r->{'p_value'}, 0.7826849389663948, 'C6 Job Satisfaction 4x4 p-value, exact', $TOL_EXACT);
 	is(sprintf('%.4f', $r->{'p_value'}), '0.7827', 'C6 Job Satisfaction matches the documented 0.7827');
 	ok(!exists $r->{estimate}, 'C6 no odds ratio for a 4x4');
 }
@@ -319,6 +337,8 @@ SKIP: {                                  # ~5s here: the support runs to 5.7e6 t
 		     [1,0],[3,1],[1,1],[3,0],[7,2],[4,1],[2,0],[2,0],[2,0]];
 	close_to(fisher_test($pr644)->{'p_value'}, 0.71781378237770943,
 		 'C7 PR#644 19x2 p-value', $TOL_RXC);
+	close_to(fisher_test($pr644)->{'p_value'}, 0.7178137823776645,
+		 'C7 PR#644 19x2 p-value, exact', $TOL_EXACT);
 }
 
 # PR#1662: "fisher.test with total one", which crashed R <= 1.5.0.  Every
@@ -331,7 +351,7 @@ SKIP: {                                  # ~5s here: the support runs to 5.7e6 t
 # PR#10558: "fisher.test with extreme degeneracy".  R's comment records the
 # true value as 1/60; 2.6.1-patched simulated about 0.0005 for it.
 close_to(fisher_test([[1,0,0],[0,2,0],[0,0,3]])->{'p_value'}, 1/60,
-	 'C7 PR#10558 diag(1:3) p-value is exactly 1/60', $TOL_RXC);
+	 'C7 PR#10558 diag(1:3) p-value is exactly 1/60', $TOL_EXACT);
 
 # reg-tests-1b.R, '"exact" fisher.test': R < 2.11.0 returned 1 + 1.17e-13 for
 # this table, so the assertion upstream is that p stays a probability.  Here
@@ -340,73 +360,60 @@ close_to(fisher_test([[1,0,0],[0,2,0],[0,0,3]])->{'p_value'}, 1/60,
 {
 	my $p = fisher_test([[14,29,16],[14,29,16]])->{'p_value'};
 	ok($p >= 0 && $p <= 1, 'C7 identical-rows 2x3 p-value stays in [0,1]');
-	close_to($p, 1, 'C7 identical-rows 2x3 p-value is 1', $TOL_RXC);
+	close_to($p, 1, 'C7 identical-rows 2x3 p-value is 1', $TOL_EXACT);
 }
 
 # reg-tests-1d.R (PR#17671): fisher.test on set.seed(7)'s 4x4 sample table.
 close_to(fisher_test([[1,2,1,0],[4,3,1,6],[2,6,3,5],[4,3,3,6]])->{'p_value'},
 	 0.73010293537427828, 'C7 PR#17671 t44 4x4 p-value', $TOL_RXC);
+close_to(fisher_test([[1,2,1,0],[4,3,1,6],[2,6,3,5],[4,3,3,6]])->{'p_value'},
+	 0.7301029353743108, 'C7 PR#17671 t44 4x4 p-value, exact', $TOL_EXACT);
 
-# Case 8: tables that are too big to enumerate.
+# Case 8: tables at the edge of what an exact test can do.
 #
-# R refuses two of these outright, and the point of the R entries is that it
-# does so instead of returning nonsense or dying:
+# Up to 0.331 the r x c test enumerated tables, pruned only at the start of each
+# row, and stopped after 50e6 nodes, so it refused all three of these.  It now
+# runs the network algorithm R does (see fisher_rxc_pvalue() in LikeR.xs):
 #
-#   PR#4688  4x3, N = 16442 -- R gives "FEXACT error 501", and used to report
-#            p.value = Inf.  fisher_test() has to reach its own limit and say
-#            so; before the enumeration counted its interior nodes this table
-#            ran for over five minutes without either finishing or stopping.
-#   MP6      Mehta & Patel's 6th example, 5x7.  R computes 0.0392896 with the
-#            network algorithm; plain enumeration cannot reach it (measured at
-#            well over 10 minutes with the node cap lifted), so fisher_test()
-#            declines rather than grinding.
-#
-# Both must fail the same way: bounded, and with a message that names the
-# shape rather than leaking an internal error.
-#
-# "Bounded" is a count of enumeration nodes, not a wall clock: the walk stops
-# after a fixed 50e6 interior nodes, so how many seconds that takes is a
-# property of the machine and of the perl, not of this module.  The inner loop
-# calls lgamma() per node, which on a long-double or __float128 perl is
-# lgammal/lgammaq -- one to two orders of magnitude slower than the double
-# version -- and a CPAN smoker duly measured 99s and 119s for the two tables
-# below where a plain double build here takes 1-2s.  So the croak above is the
-# real regression guard (before the node counter existed, PR#4688 ran for over
-# five minutes without either finishing or stopping); the clock is reported for
-# the record, enforced tightly only where the hardware is known, and loosely
-# otherwise so that a genuine blow-up still fails the dist.
-my $C8_BUDGET = ($ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING}) ? 60 : 900;
-for my $c ([ 'PR#4688 4x3', [[2121,4700,6234],[100,216,2461],[27,67,502],[0,0,14]], qr/4x3/ ],
-	   [ 'Mehta & Patel 5x7', [[1,2,2,1,1,0,1],[2,0,0,2,3,0,0],[0,1,1,1,2,7,3],
-				   [1,1,2,0,0,0,1],[0,1,1,1,1,0,0]], qr/5x7/ ]) {
-	my ($name, $t, $shape) = @$c;
-	SKIP: {                          # 1-2s each here: both run the cap out in full
-		skip "C8 $name $SLOW_WHY", 4 unless $EXTENDED;
-		my $started = time;
-		my $r = eval { fisher_test($t) };
-		my $took = time - $started;
-		ok(!defined $r, "C8 $name is refused, not answered wrongly");
-		like($@, qr/too large for exact enumeration/, "C8 $name croaks with a usable message");
-		like($@, $shape, "C8 $name names the table shape");
-		note("C8 $name hit the node cap after ${took}s");
-		cmp_ok($took, '<', $C8_BUDGET, "C8 $name gives up bounded (${took}s < ${C8_BUDGET}s)");
-	}
-}
-
-# PR#18336, the 6x6 "too full" table that segfaulted R <= 4.2.0 and that R
-# 4.6.1 still declines with "hash key 5e+09 > INT_MAX".  Enumeration handles
-# it: the answer below agrees with R's own Monte-Carlo fallback
-# (fisher.test(d, simulate.p.value = TRUE, B = 2e6) = 0.63224) to within its
-# sampling error, so this is a case where fisher_test() answers and R does not.
-SKIP: {                                  # ~2s here: nearly the whole node budget
-	skip "C8 PR#18336 6x6 $SLOW_WHY", 2 unless $EXTENDED;
+#   MP6      Mehta & Patel's 6th example, 5x7, from ?fisher.test.  R computes
+#            0.0392896 with the network algorithm; it is answered now, in a
+#            few hundredths of a second, so it runs unconditionally.
+#   PR#18336 the 6x6 "too full" table that segfaulted R <= 4.2.0 and that R
+#            4.6.1 still declines with "hash key 5e+09 > INT_MAX".  The value
+#            is the exact one; R's own Monte-Carlo fallback
+#            (fisher.test(d, simulate.p.value = TRUE, B = 2e6) = 0.63224) agrees
+#            to within its sampling error, so this is a case where fisher_test()
+#            answers and R does not.
+#   PR#4688  4x3, N = 16442.  R gives "FEXACT error 501" (it used to report
+#            p.value = Inf), even at workspace = 2e6.  fisher_test() has to
+#            reach its own limit and say so, bounded, with a message that names
+#            the shape rather than leaking an internal error.
+{
+	my $mp6 = [[1,2,2,1,1,0,1],[2,0,0,2,3,0,0],[0,1,1,1,2,7,3],[1,1,2,0,0,0,1],[0,1,1,1,1,0,0]];
+	my $r = fisher_test($mp6);
+	close_to($r->{'p_value'}, 0.039289643655332343, 'C8 Mehta & Patel 5x7 p-value', $TOL_RXC);
+	close_to($r->{'p_value'}, 0.03928964365533388, 'C8 Mehta & Patel 5x7 p-value, exact', $TOL_EXACT);
 	my $d = [[1,0,5,2,1,90],[2,1,0,2,3,89],[0,0,0,1,0,14],
 		 [0,0,0,0,0,5],[0,0,0,0,0,2],[0,0,0,0,0,2]];
-	my $p = fisher_test($d)->{'p_value'};
-	ok($p > 0 && $p <= 1, 'C8 PR#18336 6x6 returns a probability where R errors');
-	ok(abs($p - 0.6322381839) < 2e-3,
-	   'C8 PR#18336 6x6 p-value agrees with R simulate.p.value (B = 2e6)')
-		or diag("got=$p, R's 2e6-replicate estimate = 0.6322381839");
+	close_to(fisher_test($d)->{'p_value'}, 0.6322160531517794,
+		 'C8 PR#18336 6x6 p-value, exact (R errors)', $TOL_EXACT);
+}
+# "Bounded" is a count of work units and of stored path weights, not a wall
+# clock: how many seconds the cap takes is a property of the machine and of the
+# perl.  The clock is reported for the record, enforced tightly only where the
+# hardware is known, and loosely otherwise so that a genuine blow-up still
+# fails the dist.  It takes 0.6 s on a plain double build here.
+my $C8_BUDGET = ($ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING}) ? 60 : 900;
+SKIP: {
+	skip "C8 PR#4688 $SLOW_WHY", 4 unless $EXTENDED;
+	my $started = time;
+	my $r = eval { fisher_test([[2121,4700,6234],[100,216,2461],[27,67,502],[0,0,14]]) };
+	my $took = time - $started;
+	ok(!defined $r, "C8 PR#4688 4x3 is refused, not answered wrongly");
+	like($@, qr/too large for exact enumeration/, "C8 PR#4688 4x3 croaks with a usable message");
+	like($@, qr/4x3/, "C8 PR#4688 4x3 names the table shape");
+	note("C8 PR#4688 4x3 hit the cap after ${took}s");
+	cmp_ok($took, '<', $C8_BUDGET, "C8 PR#4688 4x3 gives up bounded (${took}s < ${C8_BUDGET}s)");
 }
 
 # Case 9: a zero row or a zero column.  SciPy's test_row_or_col_zero expects
@@ -439,9 +446,51 @@ eval { fisher_test([[1,2,3]]) };
 ok($@, 'C10 single-row table croaks (R semantics, not SciPy\'s p = 1)');
 eval { fisher_test([[1],[2],[3]]) };
 ok($@, 'C10 single-column table croaks (R semantics, not SciPy\'s p = 1)');
+# SciPy's test_input_validation_edge_cases_rxc also expects (1, 1) for
+# np.zeros((2, 3)).  R stops there ("FEXACT error 3. All elements of TABLE are
+# zero."), and so does fisher_test().  R's 2x2 path has no such check and
+# answers an all-zero 2x2 with p = 1, odds ratio 0 and CI [0, Inf], which
+# fisher_test() matches; up to 0.331 it croaked on both.
 eval { fisher_test([[0,0,0],[0,0,0]]) };
-ok($@, 'C10 all-zero table croaks rather than returning p = 1');
+like($@, qr/all elements of the 2x3 table are zero/, 'C10 all-zero 2x3 table croaks, as R does');
+{
+	my $r = fisher_test([[0,0],[0,0]]);
+	is($r->{'p_value'}, 1, 'C10 all-zero 2x2: p = 1, as R');
+	is($r->{estimate}{"odds ratio"}, 0, 'C10 all-zero 2x2: odds ratio 0, as R');
+	is_deeply($r->{'conf_int'}, [0, $INF], 'C10 all-zero 2x2: CI [0, Inf], as R');
+}
 eval { fisher_test([0,1,2,3,4,5]) };
 ok($@, 'C10 one-dimensional input croaks');
+
+# Case 11: r x c tables that the old enumeration could not reach.
+#
+# The 4x4 is the one the 2026-10-20 audit found: R answers it in a fraction of a
+# second, 0.33 hit its node cap after 2 s.  The rest are random tables from
+# t/fisher_test.rxc.R (set.seed(1), then rpois()), the ones R 4.6.1 answers at
+# its default workspace = 200000; their exact values, where Python could reach
+# them, are from t/fisher_test.rxc.exact.py.
+{
+	my @cases = (
+		# [ name, table, R 4.6.1 p-value, exact p-value or undef ]
+		[ 'audit 4x4', [[0,1,8,4],[4,7,6,3],[4,0,8,7],[7,4,5,5]], 0.030349631699025135, 0.03034963169912601 ],
+		[ 'r2 4x5', [[9,4,8,5,7],[3,4,4,3,2],[6,1,5,7,6],[3,4,5,6,4]], 0.84842364497622946, 0.8484236449761 ],
+		[ 'r3 4x5', [[7,5,6,4,4],[6,7,6,3,5],[7,1,5,2,6],[5,5,7,2,4]], 0.91213090811838105, 0.9121309081173767 ],
+		[ 'r5 4x5', [[4,6,3,6,5],[6,3,3,8,4],[4,6,3,7,7],[4,2,2,7,5]], 0.98481065744005902, 0.9848106574405021 ],
+		[ 's2 5x5', [[4,4,2,3,3],[2,4,4,7,1],[5,3,1,4,3],[2,4,3,5,5],[6,4,2,6,3]], 0.90960045535758183, undef ],
+		[ 'w1 3x6', [[9,6,11,10,11,11],[12,10,13,16,11,11],[12,10,11,11,14,9]], 0.98843647048036853, undef ],
+	);
+	for my $c (@cases) {
+		my ($name, $t, $pr, $pe) = @$c;
+		my $r = fisher_test($t);
+		close_to($r->{'p_value'}, $pr, "C11 $name p-value", $TOL_RXC);
+		close_to($r->{'p_value'}, $pe, "C11 $name p-value, exact", $TOL_EXACT) if defined $pe;
+		# The transpose has the same p-value: it is the same set of tables.  A
+		# square one is walked the other way round, so the sum is taken in
+		# another order; the two were 1.6e-13 apart at worst (s2), as close as
+		# either is to the exact value, hence $TOL_EXACT.
+		my @tt = map { my $j = $_; [ map { $_->[$j] } @$t ] } 0 .. $#{ $t->[0] };
+		close_to(fisher_test(\@tt)->{'p_value'}, $r->{'p_value'}, "C11 $name transposed", $TOL_EXACT);
+	}
+}
 
 done_testing();

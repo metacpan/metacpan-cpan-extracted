@@ -1,0 +1,22 @@
+# Claude Code: a monitor has a deadline (timeout_ms, at least 1000); at the deadline the
+# watch ends and the model gets one notice so it can start the watch again.
+# Checks ADR 0031 section 1 (timeout_ms, the notice at the deadline).
+title: a monitor that reaches its deadline is stopped and says so once
+permission_mode: bypassPermissions
+prompt: Watch for a second.
+script:
+  - tool_calls:
+      - [ monitor, { description: slow source, command: "echo up; sleep 30", timeout_ms: 1000 } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: monitor_1, block: true, timeout: 20 } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: monitor, text: 'expires in 1s unless the source ends first' }
+    - { name: bash_output, text: '\A<status>killed</status>\z' }
+  requests:
+    - index: 2
+      tail:
+        - role: user
+          contains: "<event>up</event>\n</task-notification>\n<task-notification>\n<task-id>monitor_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<status>killed</status>\n<summary>Monitor \"slow source\" timed out after 1s</summary>\n<result>The watch ended at its deadline. Start it again with monitor if you still need it.</result>\n</task-notification>"

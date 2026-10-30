@@ -210,4 +210,10 @@ for my $opts ({}, {center => 'mean', scale => 'sd'}, {center => 'MEAN', scale =>
 		'an unrecognised option name does not silently become data');
 }
 
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+is(eval { scale(); 1 }, undef, 'scale() with no values dies');
+like($@, qr/\Ausage: scale\(X \[, X \.\.\.\].*\n\nscale: error: no values given\n\z/ms,
+	'... with the help screen above the error');
+
 done_testing();

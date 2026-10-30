@@ -4,7 +4,7 @@
       "Dave Rolsky <autarch@urth.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -113,27 +113,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.46"
+         "version" : "1.47"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.46"
+         "version" : "1.47"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.46"
+         "version" : "1.47"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.46"
+         "version" : "1.47"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.46"
+         "version" : "1.47"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.46"
+         "version" : "1.47"
       }
    },
    "release_status" : "stable",
@@ -149,7 +149,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.46",
+   "version" : "1.47",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -190,27 +190,27 @@
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@DROLSKY/ManifestSkip",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@DROLSKY/License",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@DROLSKY/ExecDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@DROLSKY/ShareDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@DROLSKY/Manifest",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckVersionIncrement",
@@ -220,17 +220,17 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@DROLSKY/TestRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@DROLSKY/ConfirmRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@DROLSKY/UploadToCPAN",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
@@ -251,7 +251,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@DROLSKY/AutoPrereqs",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -276,7 +276,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@DROLSKY/MetaResources",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -286,7 +286,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.037"
+                        "version" : "6.040"
                      }
                   ],
                   "include_underscores" : 0
@@ -313,22 +313,22 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@DROLSKY/MetaConfig",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@DROLSKY/MetaJSON",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@DROLSKY/MetaYAML",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@DROLSKY/NextRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -339,7 +339,7 @@
                }
             },
             "name" : "@DROLSKY/Test::More with Test2",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -350,7 +350,7 @@
                }
             },
             "name" : "@DROLSKY/Tools for use with precious",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -361,7 +361,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -2031,6 +2031,7 @@
                      "Adlam",
                      "Ado",
                      "Adooleessa",
+                     "Adyghe",
                      "Afar",
                      "Afghanistan",
                      "Afi",
@@ -2558,6 +2559,7 @@
                      "Cum",
                      "Cuma",
                      "Cumartesi",
+                     "Cunha",
                      "Cura\u00e7ao",
                      "Cuse",
                      "Cut",
@@ -4110,10 +4112,14 @@
                      "GyMMM",
                      "GyMMMEEEEd",
                      "GyMMMEd",
+                     "GyMMMEddd",
                      "GyMMMM",
                      "GyMMMMEd",
+                     "GyMMMMEddd",
                      "GyMMMMd",
+                     "GyMMMMddd",
                      "GyMMMd",
+                     "GyMMMddd",
                      "GyMd",
                      "Gy\u5e74",
                      "Gy\u5e74M\u6708",
@@ -4146,6 +4152,7 @@
                      "HHmm",
                      "HHmmZ",
                      "HHmmss",
+                     "HHmmv",
                      "HW1",
                      "HW2",
                      "HW3",
@@ -4595,6 +4602,7 @@
                      "KZ",
                      "Ka",
                      "Kab",
+                     "Kabardian",
                      "Kabla",
                      "Kabuverdianu",
                      "Kabyle",
@@ -4874,6 +4882,7 @@
                      "Labotlhano",
                      "Labr",
                      "Labt",
+                     "Ladin",
                      "Lah",
                      "Lahadi",
                      "Lahl\u025b\u0304",
@@ -5067,6 +5076,7 @@
                      "MMM'\u044b\u043d",
                      "MMMEEEEd",
                      "MMMEd",
+                     "MMMEddd",
                      "MMMM",
                      "MMMM'a",
                      "MMMM'ren",
@@ -5076,6 +5086,7 @@
                      "MMMM:'a",
                      "MMMMEEEEd",
                      "MMMMEd",
+                     "MMMMEddd",
                      "MMMMM",
                      "MMMMM/dd",
                      "MMMMW-count-few",
@@ -5086,6 +5097,7 @@
                      "MMMMW-count-zero",
                      "MMMMd",
                      "MMMMdd",
+                     "MMMMddd",
                      "MMMM\u060c",
                      "MMMM\u09f0",
                      "MMMM\u0aa8\u0abe",
@@ -5096,6 +5108,7 @@
                      "MMMM\u7b2cW\u5468",
                      "MMMd",
                      "MMMdd",
+                     "MMMddd",
                      "MMM\u060c",
                      "MMM\u06cc",
                      "MMM\u0f5a\u0f7a\u0f66\u0f0bd",
@@ -5416,6 +5429,7 @@
                      "Mvuka",
                      "Mvulo",
                      "Mwai",
+                     "Mwamb\u0129r\u0129rio",
                      "Mwedi",
                      "Mwere",
                      "Mweri",
@@ -6535,6 +6549,7 @@
                      "Ugu",
                      "Ugushyingo",
                      "Uhr",
+                     "Ukab",
                      "Ukraine",
                      "Ukrainian",
                      "Ukristo",
@@ -6704,6 +6719,7 @@
                      "YK",
                      "YM",
                      "YY",
+                     "YYYY",
                      "Yaijire",
                      "Yak",
                      "Yakshambeh",
@@ -7177,6 +7193,7 @@
                      "cairteal",
                      "ccc",
                      "cccc",
+                     "cccccc",
                      "cch",
                      "cch-NG",
                      "ccp",
@@ -7313,6 +7330,7 @@
                      "dd/MM/y",
                      "ddC",
                      "ddE",
+                     "ddd",
                      "dd\u200f/MM",
                      "de",
                      "de''l",
@@ -8139,6 +8157,7 @@
                      "igihembwe",
                      "ii",
                      "ii-CN",
+                     "ij",
                      "ika'-W",
                      "ika'-w",
                      "ika-1",
@@ -9784,6 +9803,7 @@
                      "setiembre",
                      "setmana",
                      "sett",
+                     "settema\u00f1a",
                      "settember",
                      "settembre",
                      "settimana",
@@ -9978,6 +9998,7 @@
                      "suoidnem\u00e1nnu",
                      "sup",
                      "supap\u00e1",
+                     "suz",
                      "sv",
                      "sv-AX",
                      "sv-FI",
@@ -10447,6 +10468,7 @@
                      "w\u2019indwi",
                      "w\ubc88\uc9f8",
                      "x",
+                     "xamaan",
                      "xan",
                      "xaneiro",
                      "xh",
@@ -10500,12 +10522,16 @@
                      "yMMM",
                      "yMMMEEEEd",
                      "yMMMEd",
+                     "yMMMEddd",
                      "yMMMM",
                      "yMMMMEEEEd",
                      "yMMMMEd",
+                     "yMMMMEddd",
                      "yMMMMccccd",
                      "yMMMMd",
+                     "yMMMMddd",
                      "yMMMd",
+                     "yMMMddd",
                      "yMMdd",
                      "yMd",
                      "yMd-alt-variant",
@@ -10574,6 +10600,8 @@
                      "yw-count-two",
                      "yw-count-zero",
                      "yy",
+                     "yyMMM",
+                     "yyMMMd",
                      "yyyyMM",
                      "y\u00e1l\u025b",
                      "y\u00e1\u0253e",
@@ -15028,7 +15056,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@DROLSKY/PodSyntaxTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -15152,7 +15180,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -15384,7 +15412,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "@DROLSKY/CPANFile",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
@@ -15421,7 +15449,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
@@ -15437,7 +15465,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
@@ -15480,7 +15508,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
@@ -15510,7 +15538,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15527,12 +15555,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.46",
+                  "tag" : "v1.47",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15552,7 +15580,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
@@ -15593,7 +15621,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15613,7 +15641,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.52.0",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
@@ -15625,14 +15653,14 @@
             "config" : {
                "Dist::Zilla::Plugin::MakeMaker" : {
                   "make_path" : "make",
-                  "version" : "6.037"
+                  "version" : "6.040"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.49"
                },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : "12",
-                  "version" : "6.037"
+                  "version" : "6.040"
                }
             },
             "name" : "@DROLSKY/DROLSKY::MakeMaker",
@@ -15641,12 +15669,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "MetaResources",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
             "name" : "MetaNoIndex",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Conflicts",
@@ -15679,62 +15707,62 @@
                }
             },
             "name" : "DevelopRequires",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.037"
+            "version" : "6.040"
          }
       ],
       "zilla" : {
@@ -15742,7 +15770,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.037"
+         "version" : "6.040"
       }
    },
    "x_authority" : "cpan:DROLSKY",

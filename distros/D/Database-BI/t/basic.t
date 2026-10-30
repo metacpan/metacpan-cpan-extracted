@@ -33,8 +33,9 @@ subtest 'View table' => sub {
     $t->get_ok('/view/sales')->status_is(200);
     # Path traversal characters are rejected with 404.
     $t->get_ok('/view/../etc/passwd')->status_is(404);
-    # A nonexistent table renders the home page with an error message (still 200).
-    $t->get_ok('/view/nonexistent_xyz_table')->status_is(200);
+    # A nonexistent table is a 404 page that names it.
+    $t->get_ok('/view/nonexistent_xyz_table')->status_is(404)
+      ->content_like(qr/There is no table called &quot;nonexistent_xyz_table&quot;/);
 };
 
 # ---------------------------------------------------------------------------
@@ -67,8 +68,8 @@ subtest 'Table toolbar has a Map panel' => sub {
 	# Opening any of the other chart panels must close the Map panel, or two
 	# forms would be on screen at once.
 	my $body = $t->tx->res->body;
-	my $arrays = () = $body =~ /'map-panel'\]\.map\(function\s*\(id\)\s*\{/g;
-	cmp_ok($arrays, '>=', 15, 'every chart panel closes the Map panel');
+	my ($list) = $body =~ /var BI_PANELS = \[([^\]]*)\]/;
+	like($list // '', qr/'map-panel'/, 'every chart panel closes the Map panel');
 };
 
 # ---------------------------------------------------------------------------

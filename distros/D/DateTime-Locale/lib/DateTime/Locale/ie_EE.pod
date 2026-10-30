@@ -435,6 +435,24 @@ Interlingue Estonia locale.
    1995-12-22T09:05:02 = ven. 22 dec. 1995 e.C.
   -0010-09-15T04:44:23 = sat. 15 sept. -10 a.C.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = e.C. 2008 februar
+   1995-12-22T09:05:02 = e.C. 1995 decembre
+  -0010-09-15T04:44:23 = a.C. -10 septembre
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = e.C. 2008 februar 5, mar.
+   1995-12-22T09:05:02 = e.C. 1995 decembre 22, ven.
+  -0010-09-15T04:44:23 = a.C. -10 septembre 15, sat.
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = e.C. 2008 februar 5
+   1995-12-22T09:05:02 = e.C. 1995 decembre 22
+  -0010-09-15T04:44:23 = a.C. -10 septembre 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 febr. 2008 e.C.
@@ -506,6 +524,12 @@ Interlingue Estonia locale.
    2008-02-05T18:30:30 = mar. 5 febr.
    1995-12-22T09:05:02 = ven. 22 dec.
   -0010-09-15T04:44:23 = sat. 15 sept.
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = februar 5, mar.
+   1995-12-22T09:05:02 = decembre 22, ven.
+  -0010-09-15T04:44:23 = septembre 15, sat.
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

@@ -7,13 +7,12 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use URI ();
 
-use Linux::Event::HTTP::Request;
 use Linux::Event::WebSocket::Client::Connection;
 use Linux::Event::WebSocket::Client::_HTTPConnection;
 use Linux::Event::WebSocket::_Handshake;
 use Linux::Event::WebSocket::_State;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 my $DEFAULT_MAX_MESSAGE_SIZE = 16 * 1024 * 1024;
 
@@ -231,6 +230,7 @@ sub connect ($self, $url) {
         close_timeout    => $self->{close_timeout},
         max_message_size => $self->{max_message_size},
     );
+    $state->{connection_class} = $self->{connection_class};
 
     my %connect = (
         loop => $self->{loop},
@@ -255,36 +255,6 @@ sub connect ($self, $url) {
     );
     $self->{connection} = $connection;
     $self->{url} = "$url";
-
-    $connection->request(
-        $request,
-        upgrade_to => $self->{connection_class},
-
-        on_response => sub ($transaction, $response) {
-            $state->{response} = $response;
-            my $ok = eval {
-                Linux::Event::WebSocket::_Handshake->validate_client_response(
-                    $handshake,
-                    $response,
-                );
-                1;
-            };
-            if (!$ok) {
-                my $error = $@;
-                $transaction->cancel;
-                _report_error($state, $connection, $error);
-            }
-        },
-
-        on_upgrade => sub ($transaction, $response, $upgraded) {
-            $state->{response} = $response;
-            $upgraded->_ensure_websocket_open;
-        },
-
-        on_error => sub ($transaction, $error) {
-            _report_error($state, $connection, $error);
-        },
-    );
 
     return $connection;
 }
@@ -368,7 +338,8 @@ Linux::Event::WebSocket::Client - callback-first WebSocket client
 
 =head1 DESCRIPTION
 
-The Client uses Linux::Event::HTTP only for the opening HTTP/1.1 Upgrade. The
+The Client uses Unblock::HTTP1 for the opening HTTP/1.1 Upgrade, without
+depending on Linux::Event::HTTP internals. The
 same live connection object is then transitioned in place to
 L<Linux::Event::WebSocket::Client::Connection>. The private handshake engine
 validates WebSocket-specific response fields, including

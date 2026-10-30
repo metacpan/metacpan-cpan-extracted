@@ -30,13 +30,13 @@ Azerbaijani Latin locale.
 
 =head3 Wide (format)
 
-  bazar ertəsi
-  çərşənbə axşamı
-  çərşənbə
-  cümə axşamı
-  cümə
-  şənbə
-  bazar
+  Bazar ertəsi
+  Çərşənbə axşamı
+  Çərşənbə
+  Cümə axşamı
+  Cümə
+  Şənbə
+  Bazar
 
 =head3 Abbreviated (format)
 
@@ -61,13 +61,13 @@ Azerbaijani Latin locale.
 
 =head3 Wide (stand-alone)
 
-  bazar ertəsi
-  çərşənbə axşamı
-  çərşənbə
-  cümə axşamı
-  cümə
-  şənbə
-  bazar
+  Bazar ertəsi
+  Çərşənbə axşamı
+  Çərşənbə
+  Cümə axşamı
+  Cümə
+  Şənbə
+  Bazar
 
 =head3 Abbreviated (stand-alone)
 
@@ -123,18 +123,18 @@ Azerbaijani Latin locale.
 
 =head3 Narrow (format)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  01
+  02
+  03
+  04
+  05
+  06
+  07
+  08
+  09
+  o
+  n
+  d
 
 
 =head3 Wide (stand-alone)
@@ -169,27 +169,27 @@ Azerbaijani Latin locale.
 
 =head3 Narrow (stand-alone)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  y
+  f
+  m
+  a
+  m
+  i
+  i
+  a
+  s
+  o
+  n
+  d
 
 =head2 Quarters
 
 =head3 Wide (format)
 
-  1-ci kvartal
-  2-ci kvartal
-  3-cü kvartal
-  4-cü kvartal
+  1-ci rüb
+  2-ci rüb
+  3-cü rüb
+  4-cü rüb
 
 =head3 Abbreviated (format)
 
@@ -208,15 +208,15 @@ Azerbaijani Latin locale.
 
 =head3 Wide (stand-alone)
 
-  1-ci kvartal
-  2-ci kvartal
-  3-cü kvartal
-  4-cü kvartal
+  1-ci rüb
+  2-ci rüb
+  3-cü rüb
+  4-cü rüb
 
 =head3 Abbreviated (stand-alone)
 
-  1-ci kv.
-  2-ci kv.
+  1-ci rüb
+  2-ci rüb
   3-cü kv.
   4-cü kv.
 
@@ -232,25 +232,25 @@ Azerbaijani Latin locale.
 =head3 Wide (format)
 
   eramızdan əvvəl
-  yeni era
+  bizim era
 
 =head3 Abbreviated (format)
 
   e.ə.
-  y.e.
+  b.e.
 
 =head3 Narrow (format)
 
   e.ə.
-  y.e.
+  b.e.
 
 =head2 Date Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 5 fevral 2008, çərşənbə axşamı
-   1995-12-22T09:05:02 = 22 dekabr 1995, cümə
-  -0010-09-15T04:44:23 = 15 sentyabr -10, şənbə
+   2008-02-05T18:30:30 = Çərşənbə axşamı, 5 fevral 2008
+   1995-12-22T09:05:02 = Cümə, 22 dekabr 1995
+  -0010-09-15T04:44:23 = Şənbə, 15 sentyabr -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Azerbaijani Latin locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 5 fevral 2008, çərşənbə axşamı 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 dekabr 1995, cümə 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 sentyabr -10, şənbə 04:44:23 UTC
+   2008-02-05T18:30:30 = Çərşənbə axşamı, 5 fevral 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = Cümə, 22 dekabr 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = Şənbə, 15 sentyabr -10 04:44:23 UTC
 
 =head3 Long
 
@@ -351,11 +351,11 @@ Azerbaijani Latin locale.
    1995-12-22T09:05:02 = C.
   -0010-09-15T04:44:23 = Ş.
 
-=head3 EBh (E h B)
+=head3 EBh (E B h)
 
-   2008-02-05T18:30:30 = Ç.a. 6 B
-   1995-12-22T09:05:02 = C. 9 B
-  -0010-09-15T04:44:23 = Ş. 4 B
+   2008-02-05T18:30:30 = Ç.a. B 6
+   1995-12-22T09:05:02 = C. B 9
+  -0010-09-15T04:44:23 = Ş. B 4
 
 =head3 EBhm (E B h:mm)
 
@@ -407,44 +407,62 @@ Azerbaijani Latin locale.
 
 =head3 Gy (G y)
 
-   2008-02-05T18:30:30 = y.e. 2008
-   1995-12-22T09:05:02 = y.e. 1995
+   2008-02-05T18:30:30 = b.e. 2008
+   1995-12-22T09:05:02 = b.e. 1995
   -0010-09-15T04:44:23 = e.ə. -10
 
 =head3 GyM (G M y)
 
-   2008-02-05T18:30:30 = y.e. 2 2008
-   1995-12-22T09:05:02 = y.e. 12 1995
+   2008-02-05T18:30:30 = b.e. 2 2008
+   1995-12-22T09:05:02 = b.e. 12 1995
   -0010-09-15T04:44:23 = e.ə. 9 -10
 
 =head3 GyMEd (G d M y, E)
 
-   2008-02-05T18:30:30 = y.e. 5 2 2008, Ç.a.
-   1995-12-22T09:05:02 = y.e. 22 12 1995, C.
+   2008-02-05T18:30:30 = b.e. 5 2 2008, Ç.a.
+   1995-12-22T09:05:02 = b.e. 22 12 1995, C.
   -0010-09-15T04:44:23 = e.ə. 15 9 -10, Ş.
 
 =head3 GyMMM (G MMM y)
 
-   2008-02-05T18:30:30 = y.e. fev 2008
-   1995-12-22T09:05:02 = y.e. dek 1995
+   2008-02-05T18:30:30 = b.e. fev 2008
+   1995-12-22T09:05:02 = b.e. dek 1995
   -0010-09-15T04:44:23 = e.ə. sen -10
 
-=head3 GyMMMEd (G d MMM y, E)
+=head3 GyMMMEd (G E, d MMM y)
 
-   2008-02-05T18:30:30 = y.e. 5 fev 2008, Ç.a.
-   1995-12-22T09:05:02 = y.e. 22 dek 1995, C.
-  -0010-09-15T04:44:23 = e.ə. 15 sen -10, Ş.
+   2008-02-05T18:30:30 = b.e. Ç.a., 5 fev 2008
+   1995-12-22T09:05:02 = b.e. C., 22 dek 1995
+  -0010-09-15T04:44:23 = e.ə. Ş., 15 sen -10
+
+=head3 GyMMMM (G MMMM y)
+
+   2008-02-05T18:30:30 = b.e. fevral 2008
+   1995-12-22T09:05:02 = b.e. dekabr 1995
+  -0010-09-15T04:44:23 = e.ə. sentyabr -10
+
+=head3 GyMMMMEd (G E, d MMMM y)
+
+   2008-02-05T18:30:30 = b.e. Ç.a., 5 fevral 2008
+   1995-12-22T09:05:02 = b.e. C., 22 dekabr 1995
+  -0010-09-15T04:44:23 = e.ə. Ş., 15 sentyabr -10
+
+=head3 GyMMMMd (G d MMMM y)
+
+   2008-02-05T18:30:30 = b.e. 5 fevral 2008
+   1995-12-22T09:05:02 = b.e. 22 dekabr 1995
+  -0010-09-15T04:44:23 = e.ə. 15 sentyabr -10
 
 =head3 GyMMMd (G d MMM y)
 
-   2008-02-05T18:30:30 = y.e. 5 fev 2008
-   1995-12-22T09:05:02 = y.e. 22 dek 1995
+   2008-02-05T18:30:30 = b.e. 5 fev 2008
+   1995-12-22T09:05:02 = b.e. 22 dek 1995
   -0010-09-15T04:44:23 = e.ə. 15 sen -10
 
 =head3 GyMd (G d M y)
 
-   2008-02-05T18:30:30 = y.e. 5 2 2008
-   1995-12-22T09:05:02 = y.e. 22 12 1995
+   2008-02-05T18:30:30 = b.e. 5 2 2008
+   1995-12-22T09:05:02 = b.e. 22 12 1995
   -0010-09-15T04:44:23 = e.ə. 15 9 -10
 
 =head3 H (HH)
@@ -489,11 +507,11 @@ Azerbaijani Latin locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (dd.MM, E)
+=head3 MEd (E, dd.MM)
 
-   2008-02-05T18:30:30 = 05.02, Ç.a.
-   1995-12-22T09:05:02 = 22.12, C.
-  -0010-09-15T04:44:23 = 15.09, Ş.
+   2008-02-05T18:30:30 = Ç.a., 05.02
+   1995-12-22T09:05:02 = C., 22.12
+  -0010-09-15T04:44:23 = Ş., 15.09
 
 =head3 MMM (LLL)
 
@@ -501,23 +519,29 @@ Azerbaijani Latin locale.
    1995-12-22T09:05:02 = dek
   -0010-09-15T04:44:23 = sen
 
-=head3 MMMEd (d MMM, E)
+=head3 MMMEd (E, d MMM)
 
-   2008-02-05T18:30:30 = 5 fev, Ç.a.
-   1995-12-22T09:05:02 = 22 dek, C.
-  -0010-09-15T04:44:23 = 15 sen, Ş.
+   2008-02-05T18:30:30 = Ç.a., 5 fev
+   1995-12-22T09:05:02 = C., 22 dek
+  -0010-09-15T04:44:23 = Ş., 15 sen
 
-=head3 MMMMW-count-one (MMMM, W 'həftə')
+=head3 MMMMEd (E, d MMMM)
 
-   2008-02-05T18:30:30 = fevral, 1 həftə
-   1995-12-22T09:05:02 = dekabr, 3 həftə
-  -0010-09-15T04:44:23 = sentyabr, 2 həftə
+   2008-02-05T18:30:30 = Ç.a., 5 fevral
+   1995-12-22T09:05:02 = C., 22 dekabr
+  -0010-09-15T04:44:23 = Ş., 15 sentyabr
 
-=head3 MMMMW-count-other (MMMM, W 'həftə')
+=head3 MMMMW-count-one (MMMM, 'həftə' W)
 
-   2008-02-05T18:30:30 = fevral, 1 həftə
-   1995-12-22T09:05:02 = dekabr, 3 həftə
-  -0010-09-15T04:44:23 = sentyabr, 2 həftə
+   2008-02-05T18:30:30 = fevral, həftə 1
+   1995-12-22T09:05:02 = dekabr, həftə 3
+  -0010-09-15T04:44:23 = sentyabr, həftə 2
+
+=head3 MMMMW-count-other (MMMM, 'həftə' W)
+
+   2008-02-05T18:30:30 = fevral, həftə 1
+   1995-12-22T09:05:02 = dekabr, həftə 3
+  -0010-09-15T04:44:23 = sentyabr, həftə 2
 
 =head3 MMMMd (d MMMM)
 
@@ -609,17 +633,29 @@ Azerbaijani Latin locale.
    1995-12-22T09:05:02 = dek 1995
   -0010-09-15T04:44:23 = sen -10
 
-=head3 yMMMEd (d MMM y, E)
+=head3 yMMMEd (E, d MMM y)
 
-   2008-02-05T18:30:30 = 5 fev 2008, Ç.a.
-   1995-12-22T09:05:02 = 22 dek 1995, C.
-  -0010-09-15T04:44:23 = 15 sen -10, Ş.
+   2008-02-05T18:30:30 = Ç.a., 5 fev 2008
+   1995-12-22T09:05:02 = C., 22 dek 1995
+  -0010-09-15T04:44:23 = Ş., 15 sen -10
 
 =head3 yMMMM (MMMM y)
 
    2008-02-05T18:30:30 = fevral 2008
    1995-12-22T09:05:02 = dekabr 1995
   -0010-09-15T04:44:23 = sentyabr -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = Ç.a., 5 fevral 2008
+   1995-12-22T09:05:02 = C., 22 dekabr 1995
+  -0010-09-15T04:44:23 = Ş., 15 sentyabr -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 fevral 2008
+   1995-12-22T09:05:02 = 22 dekabr 1995
+  -0010-09-15T04:44:23 = 15 sentyabr -10
 
 =head3 yMMMd (d MMM y)
 
@@ -641,21 +677,21 @@ Azerbaijani Latin locale.
 
 =head3 yQQQQ (y QQQQ)
 
-   2008-02-05T18:30:30 = 2008 1-ci kvartal
-   1995-12-22T09:05:02 = 1995 4-cü kvartal
-  -0010-09-15T04:44:23 = -10 3-cü kvartal
+   2008-02-05T18:30:30 = 2008 1-ci rüb
+   1995-12-22T09:05:02 = 1995 4-cü rüb
+  -0010-09-15T04:44:23 = -10 3-cü rüb
 
-=head3 yw-count-one (Y, w 'həftə')
+=head3 yw-count-one (Y, 'həftə' w)
 
-   2008-02-05T18:30:30 = 2008, 6 həftə
-   1995-12-22T09:05:02 = 1995, 51 həftə
-  -0010-09-15T04:44:23 = -10, 37 həftə
+   2008-02-05T18:30:30 = 2008, həftə 6
+   1995-12-22T09:05:02 = 1995, həftə 51
+  -0010-09-15T04:44:23 = -10, həftə 37
 
-=head3 yw-count-other (Y, w 'həftə')
+=head3 yw-count-other (Y, 'həftə' w)
 
-   2008-02-05T18:30:30 = 2008, 6 həftə
-   1995-12-22T09:05:02 = 1995, 51 həftə
-  -0010-09-15T04:44:23 = -10, 37 həftə
+   2008-02-05T18:30:30 = 2008, həftə 6
+   1995-12-22T09:05:02 = 1995, həftə 51
+  -0010-09-15T04:44:23 = -10, həftə 37
 
 
 =head2 Miscellaneous
@@ -666,7 +702,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (bazar ertəsi)
+1 (Bazar ertəsi)
 
 =head2 Strftime Patterns
 

@@ -17,8 +17,10 @@
 #
 # FETCH is counted as well as the answer, because a second FETCH is a second
 # call into perl and, for a tie that computes its value, a different value.
-# sd(), var() and scale() read a tied array or a tied element once per pass,
-# which their comments document; everything else reads each value once.
+# sd() and var() read a tied array or a tied element once per pass, which
+# their comments document; everything else reads each value once.  scale()
+# made two passes until 0.331, which now reads each value once into a buffer
+# and keeps an undef in place rather than counting the defined ones first.
 
 require 5.010;
 use strict;
@@ -44,7 +46,7 @@ use Stats::LikeR qw(min max sum mean sd var median mode uniq scale skew kurtosis
 # name => FETCHes per magical value that a correct implementation makes
 my %passes = (
 	min => 1, max => 1, sum => 1, mean => 1, sd => 2, var => 2, median => 1,
-	mode => 1, uniq => 1, scale => 2, skew => 1, kurtosis => 1,
+	mode => 1, uniq => 1, scale => 1, skew => 1, kurtosis => 1,
 );
 # the list-returning ones compare as lists; mode()'s order is hash order
 my %sorted = (mode => 1);

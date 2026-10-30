@@ -6,7 +6,11 @@ use warnings;
 
 use base 'Spreadsheet::ParseExcel::Workbook';
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
+
+our $MAX_MEMBER_SIZE = 64 * 1024 * 1024;
+our $MAX_TOTAL_SIZE  = 256 * 1024 * 1024;
+our $MAX_MEMBERS     = 10000;
 
 use Archive::Zip;
 use Spreadsheet::ParseExcel;
@@ -42,11 +46,12 @@ sub _load_workbook {
     $self->{SheetCount} = 0;
     $self->{FmtClass}   = Spreadsheet::XLSX::Fmt2007->new;
     $self->{Flg1904}    = 0;
-    if ($member_workbook->contents =~ /date1904="1"/) {
+    my $workbook_xml = __member_contents($member_workbook);
+    if ($workbook_xml =~ /date1904="1"/) {
         $self->{Flg1904} = 1;
     }
 
-    foreach ($member_workbook->contents =~ /\<(.*?)\/?\>/g) {
+    foreach ($workbook_xml =~ /\<(.*?)\/?\>/g) {
 
         /^(\w+)\s+/;
 
@@ -95,10 +100,12 @@ sub _load_workbook {
         my $s    = 0;
         my $s2   = 0;
         my $sty  = 0;
-        foreach ($member_sheet->contents =~ /(\<.*?\/?\>|.*?(?=\<))/g) {
-            if (/^\<c\s*.*?\s*r=\"([A-Z])([A-Z]?)(\d+)\"/) {
+        my $sheet_xml = __member_contents($member_sheet);
+        foreach ($sheet_xml =~ /(\<.*?\/?\>|.*?(?=\<))/g) {
+            if (/^<c(?:\s|\/?>)/) {
 
-                ($row, $col) = __decode_cell_name($1, $2, $3);
+                my ($reference) = /\sr="([^"]*)"/;
+                ($row, $col) = __decode_cell_name($reference);
 
                 $s   = m/t=\"s\"/      ? 1  : 0;
                 $s2  = m/t=\"str\"/    ? 1  : 0;
@@ -163,22 +170,22 @@ sub _load_workbook {
     return $self;
 }
 
-# Convert cell name in the format AA1 to a row and column number.
+# Validate before numeric conversion or using a reference as an array index.
+# XLSX worksheets have at most 1,048,576 rows and 16,384 columns (XFD).
 
 sub __decode_cell_name {
-    my ($letter1, $letter2, $digits) = @_;
+    my ($reference) = @_;
+    die "Invalid XLSX cell reference\n"
+        unless defined($reference)
+        && $reference =~ /\A([A-Z]{1,3})([1-9][0-9]{0,6})\z/;
+    my ($letters, $digits) = ($1, $2);
+    die "XLSX cell row exceeds worksheet limit\n" if $digits > 1048576;
 
-    my $col = ord($letter1) - 65;
+    my $col = 0;
+    $col = $col * 26 + ord($_) - ord('A') + 1 for split //, $letters;
+    die "XLSX cell column exceeds worksheet limit\n" if $col > 16384;
 
-    if ($letter2) {
-        $col++;
-        $col *= 26;
-        $col += (ord($letter2) - 65);
-    }
-
-    my $row = $digits - 1;
-
-    return ($row, $col);
+    return ($digits - 1, $col - 1);
 }
 
 
@@ -191,7 +198,7 @@ sub __load_shared_strings {
 
     if ($member_shared_strings) {
 
-        my $mstr = $member_shared_strings->contents;
+        my $mstr = __member_contents($member_shared_strings);
         $mstr =~ s/<t\/>/<t><\/t>/gsm;    # this handles an empty t tag in the xml <t/>
         foreach my $si ($mstr =~ /<si.*?>(.*?)<\/si/gsm) {
             my $str;
@@ -217,15 +224,22 @@ sub __load_styles {
 
     if ($member_styles) {
         my $formatter = Spreadsheet::XLSX::Fmt2007->new();
+        my $styles_xml = __member_contents($member_styles);
 
-        foreach my $t ($member_styles->contents =~ /xf\ numFmtId="([^"]*)"(?!.*\/cellStyleXfs)/gsm) {    #"
+        # IDs from both format declarations and style references are data,
+        # never regular-expression syntax.
+        foreach my $id ($styles_xml =~ /\bnumFmtId="([^"]*)"/g) {
+            die "Invalid XLSX number format ID\n" unless $id =~ /\A[0-9]+\z/;
+        }
+
+        foreach my $t ($styles_xml =~ /xf\ numFmtId="([^"]*)"(?!.*\/cellStyleXfs)/gsm) {    #"
             push @styles, $t;
         }
 
         my $default = $1 || '';
     
         foreach my $t1 (@styles) {
-            $member_styles->contents =~ /numFmtId="$t1" formatCode="([^"]*)/;
+            $styles_xml =~ /numFmtId="\Q$t1\E" formatCode="([^"]*)/;
             my $formatCode = $1 || '';
             if ($formatCode eq $default || not($formatCode)) {
                 if ($t1 == 9 || $t1 == 10) {
@@ -253,7 +267,8 @@ sub __load_rels {
 
     my %rels = ();
 
-    foreach ($member_rels->contents =~ /\<Relationship (.*?)\/?\>/g) {
+    my $rels_xml = __member_contents($member_rels);
+    foreach ($rels_xml =~ /\<Relationship (.*?)\/?\>/g) {
 
         my ($id, $target);
         ($id) = /Id="(.*?)"/;
@@ -279,7 +294,48 @@ sub __load_zip {
         $zip->read($filename) == Archive::Zip::AZ_OK or die("Cannot open $filename as Zip archive");
     }
     
+    my @members = $zip->members();
+    die "XLSX ZIP entry count exceeds limit\n" if @members > $MAX_MEMBERS;
+    my $total = 0;
+    foreach my $member (@members) {
+        my $size = $member->uncompressedSize();
+        die "XLSX ZIP member size exceeds limit\n" if $size > $MAX_MEMBER_SIZE;
+        $total += $size;
+        die "XLSX ZIP total size exceeds limit\n" if $total > $MAX_TOTAL_SIZE;
+    }
+
     return $zip;
+}
+
+# readChunk() limits compressed input, not inflated output. Small input chunks
+# bound temporary inflate buffers; check output before appending it. Never trust
+# central-directory sizes alone: actual output must not exceed the declared size.
+sub __member_contents {
+    my ($member) = @_;
+    my $declared = $member->uncompressedSize();
+    die "XLSX ZIP member size exceeds limit\n" if $declared > $MAX_MEMBER_SIZE;
+    my $old_method = $member->desiredCompressionMethod(Archive::Zip::COMPRESSION_STORED);
+    my $contents = '';
+    my $ok = eval {
+        die "Cannot read XLSX ZIP member\n" unless $member->rewindData() == Archive::Zip::AZ_OK;
+        while (1) {
+            my ($buffer, $status) = $member->readChunk(1024);
+            die "Cannot read XLSX ZIP member\n"
+                unless $status == Archive::Zip::AZ_OK || $status == Archive::Zip::AZ_STREAM_END;
+            my $size = length($contents) + length($$buffer);
+            die "XLSX ZIP member size exceeds limit\n" if $size > $MAX_MEMBER_SIZE;
+            die "XLSX ZIP member size does not match metadata\n" if $size > $declared;
+            $contents .= $$buffer;
+            last if $status == Archive::Zip::AZ_STREAM_END;
+        }
+        die "XLSX ZIP member size does not match metadata\n" if length($contents) != $declared;
+        1;
+    };
+    my $error = $@;
+    $member->endRead();
+    $member->desiredCompressionMethod($old_method);
+    die $error unless $ok;
+    return $contents;
 }
 
 
@@ -328,6 +384,22 @@ Spreadsheet::XLSX - Perl extension for reading MS Excel 2007 files.
 
 =head1 DESCRIPTION
 
+ZIP input is limited to 10,000 entries, 64 MiB per uncompressed member, and
+256 MiB of total declared uncompressed data, including unused members.
+Members used by the parser are decompressed incrementally and their actual
+sizes are checked against the limits and ZIP metadata. Exceeding a limit or
+encountering inconsistent sizes raises an exception.
+
+Applications needing different limits can scope them to a parsing operation:
+
+    local $Spreadsheet::XLSX::MAX_MEMBER_SIZE = 128 * 1024 * 1024;
+    local $Spreadsheet::XLSX::MAX_TOTAL_SIZE = 512 * 1024 * 1024;
+    local $Spreadsheet::XLSX::MAX_MEMBERS = 20000;
+    my $excel = Spreadsheet::XLSX->new($filename);
+
+These limits bound uncompressed input, not the total memory used by parsed
+cells and XML processing.
+
 This module is a (quick and dirty) emulation of L<Spreadsheet::ParseExcel> for 
 Excel 2007 (.xlsx) file format.  It supports styles and many of Excel's quirks, 
 but not all.  It populates the classes from L<Spreadsheet::ParseExcel> for interoperability; 
@@ -339,7 +411,7 @@ including Workbook, Worksheet, and Cell.
 
 =item L<Spreadsheet::ParseXLSX>
 
-This module (Spradsheet::XLSX) has some serious issues with the way it uses regexs for parsing the XML.
+This module (Spreadsheet::XLSX) has some serious issues with the way it uses regexs for parsing the XML.
 I would strongly encourage switching to L<Spreadsheet::ParseXLSX> which takes a more reliable approach.
 
 =item L<Text::CSV_XS>, L<Text::CSV_PP>

@@ -135,6 +135,15 @@ dies_ok { binom_test(8, 20, bogus => 1) }       'E8 unknown argument dies';
 dies_ok { binom_test([1, 2, 3]) }               'E9 wrong-length array ref dies';
 lives_ok { binom_test(0, 1, p => 0) }           'E10 degenerate p=0 lives';
 
+#	an error in the call prints the help screen, then the error on the last line
+{
+	my $screen = Stats::LikeR::_usage_text('binom_test');
+	like($screen, qr/\Ausage: binom_test\(/, 'E11 binom_test has a help screen');
+	eval { binom_test(5) };
+	is($@, $screen . "binom_test: error: number of trials n is required when x is a scalar\n",
+		'E11 the screen, then the error on the last line');
+}
+
 #	binom_test: memory  (inputs hoisted out of the closures)
 unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok {

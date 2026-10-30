@@ -1,0 +1,23 @@
+title: the file tools and the search tools keep to the same directories -- root and additional directory pass, a symlink or ../ out is refused by both
+files:
+  .raider/config.yml: "permissions: {}\n"
+  in.txt: "TODO inside\n"
+home:
+  notes/todo.txt: "TODO outside\n"
+prompt: Look around.
+script:
+  - tool_calls:
+      - [ list_files, { path: "." } ]
+      - [ list_files, { path: "{{HOME}}/notes" } ]
+      - [ glob, { pattern: "*", path: "{{HOME}}/notes" } ]
+      - [ grep, { pattern: TODO, path: "../" } ]
+      - [ grep, { pattern: TODO, path: "." } ]
+  - text: looked
+expect:
+  answer: looked
+  tools:
+    - { name: list_files, text: "in\\.txt" }
+    - { name: list_files, error: true, text: "Path escapes root" }
+    - { name: glob, error: true, text: "path escapes root" }
+    - { name: grep, error: true, text: "path escapes root" }
+    - { name: grep, text: "in\\.txt" }

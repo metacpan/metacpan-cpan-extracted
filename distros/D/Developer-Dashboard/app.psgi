@@ -10,6 +10,7 @@ use Developer::Dashboard::ActionRunner;
 use Developer::Dashboard::Auth;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PageResolver;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
@@ -26,6 +27,7 @@ my $paths = Developer::Dashboard::PathRegistry->new(
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
 my $pages = Developer::Dashboard::PageStore->new( paths => $paths );
+my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
 my $runtime = Developer::Dashboard::PageRuntime->new(
     files   => $files,
     paths   => $paths,
@@ -45,7 +47,7 @@ my $resolver = Developer::Dashboard::PageResolver->new(
     pages   => $pages,
     paths   => $paths,
 );
-my $prompt = Developer::Dashboard::Prompt->new( paths => $paths );
+my $prompt = Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators );
 my $sessions = Developer::Dashboard::SessionStore->new( paths => $paths );
 my $app = Developer::Dashboard::Web::App->new(
     actions  => $actions,
@@ -78,7 +80,7 @@ running under C<plackup -s Starman>.
 
 =head1 PURPOSE
 
-This PSGI entrypoint assembles the default dashboard web stack from the file registry, config store, page store, auth service, action runner, session store, and web app wrapper, then returns one PSGI application coderef. It is the non-CLI way to boot the same browser experience that C<dashboard serve> runs through the server wrapper.
+This PSGI entrypoint assembles the default dashboard web stack from the file registry, config store, page store, indicator store, auth service, action runner, prompt renderer, session store, and web app wrapper, then returns one PSGI application coderef. The indicator store is shared with the prompt renderer so browser status payloads can read the same indicator state. It is the non-CLI way to boot the same browser experience that C<dashboard serve> runs through the server wrapper.
 
 =head1 WHY IT EXISTS
 

@@ -1,0 +1,11 @@
+title: in a plan-mode run nobody can review, exit_plan_mode is refused and tells the model to give the plan as its answer
+permission_mode: plan
+prompt: Plan it.
+script:
+  - tool_calls:
+      - [ exit_plan_mode, { plan: "1. do it" } ]
+  - text: "Plan: 1. do it"
+expect:
+  answer: "Plan: 1. do it"
+  tools:
+    - { name: exit_plan_mode, error: true, text: "^Permission to use exit_plan_mode has been denied\\. Reason: nobody can approve the plan in this run\\. Stay in plan mode and give the plan as your final answer\\.$" }

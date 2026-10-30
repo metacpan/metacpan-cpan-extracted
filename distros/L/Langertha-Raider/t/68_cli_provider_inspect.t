@@ -302,6 +302,8 @@ subtest 'usage' => sub {
     [ [ 'a.example', 'b.example' ], qr/^Usage: raider provider inspect/, 'two targets' ],
     [ ['http://provider.example'], qr/only https is allowed/, 'http' ],
     [ ['https://provider.example/v1/models'], qr/lives at \/\.well-known\/langertha\.json/, 'another path' ],
+    [ ['acme'], qr/^raider provider inspect: provider target 'acme' is no host: a host needs a dot/, 'a bare name (k170)' ],
+    [ ['localhost'], qr/'localhost' is no host/, 'localhost without a port (k170)' ],
     [ [ $host, '--stream-json' ], qr/no --stream-\* output/, 'a stream' ],
     [ [ $host, '--bogus' ], qr/Bad options/, 'an unknown option' ],
   ) {

@@ -82,23 +82,7 @@
   .folder-empty { color: #666; font-style: italic; margin-top: 0.5rem; }
 </style>
 
-<p class="back-link folder-back">
-  <a href="/">&larr; Home</a>
-  [%- IF back_url -%]
-  &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>
-  [%- END -%]
-  &rsaquo; <a href="[% base_url | html %]">Folder view</a>
-  [%- IF breadcrumb.size -%]
-    [%- FOREACH crumb IN breadcrumb -%]
-  &rsaquo;
-      [%- IF crumb.href -%]
-  <a href="[% crumb.href | html %]">[% crumb.name | html %]</a>
-      [%- ELSE -%]
-  <strong>[% crumb.name | html %]</strong>
-      [%- END -%]
-    [%- END -%]
-  [%- END -%]
-</p>
+<nav class="back-link folder-back" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" trail_tail = breadcrumb %]</nav>
 
 <h2 class="graph-title">[% title | html %]</h2>
 

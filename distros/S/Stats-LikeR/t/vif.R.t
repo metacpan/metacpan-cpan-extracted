@@ -211,13 +211,13 @@ throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp - hp') } qr/^vif: model contains f
 }
 throws_ok { vif($DATA{mtcars}, 'mpg ~ wt + hp + offset(disp)') } qr/^vif: offset\(\) is not supported$/m,
 	'offset() is refused';
-throws_ok { vif($DATA{mtcars}, { wt => 1 }) } qr/^vif: expected a formula string or an array ref of predictors$/m,
+throws_ok { vif($DATA{mtcars}, { wt => 1 }) } qr/\Ausage: vif\(.*^vif: error: expected a formula string or an array ref of predictors\n\z/ms,
 	'a hash of predictors is refused';
-throws_ok { vif($DATA{mtcars}, undef) } qr/^vif: expected a formula string or an array ref of predictors$/m,
+throws_ok { vif($DATA{mtcars}, undef) } qr/\Ausage: vif\(.*^vif: error: expected a formula string or an array ref of predictors\n\z/ms,
 	'an undef specification is refused';
-throws_ok { vif($DATA{mtcars}, 'wt + hp') } qr/^vif: expected a formula string or an array ref of predictors$/m,
+throws_ok { vif($DATA{mtcars}, 'wt + hp') } qr/\Ausage: vif\(.*^vif: error: expected a formula string or an array ref of predictors\n\z/ms,
 	'a string with no ~ is refused';
-throws_ok { vif(42, 'mpg ~ wt + hp') } qr/^vif: first argument must be a data reference$/m,
+throws_ok { vif(42, 'mpg ~ wt + hp') } qr/\Ausage: vif\(.*^vif: error: first argument must be a data reference\n\z/ms,
 	'data that is not a reference is refused';
 # through 0.3217 the response was ignored, so one that was not there worked
 throws_ok { vif($DATA{mtcars}, 'y ~ wt + hp') }

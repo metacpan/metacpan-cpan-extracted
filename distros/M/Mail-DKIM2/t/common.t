@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use lib 'lib';
-use MIME::Base64 qw(encode_base64);
-use Mail::DKIM2::Common qw(should_skip parse_dkim_pubkey);
+use MIME::Base64 qw(encode_base64 decode_base64);
+use Mail::DKIM2::Common qw(should_skip parse_dkim_pubkey parse_dkim_key_record);
 
 is(should_skip('authentication-results'), 1, 'authentication-results is skipped');
 is(should_skip('Authentication-Results'), 1, 'Authentication-Results (mixed case) is skipped');
@@ -12,15 +12,18 @@ is(should_skip('from'), 0, 'from is NOT skipped');
 is(should_skip('received'), 1, 'received is still skipped');
 is(should_skip('Delivered-To'), 1, 'Delivered-To is skipped (draft-03 §4.1)');
 
-# parse_dkim_pubkey must accept both ed25519 key encodings and never die on a
-# malformed record (a real proteamail.com record publishes a DER SPKI rather
-# than the RFC 8463 raw 32-byte form; that previously crashed the reflector).
+# parse_dkim_pubkey takes an Ed25519 key only in its raw 32-octet form, and
+# never dies on a malformed record. A real proteamail.com record publishes a
+# DER SPKI instead (that once crashed the reflector); -08 section 14.5 makes
+# Ed25519 keys exactly 32 octets, so it is malformed (contract D7).
 my $ed_der = 'v=DKIM1; k=ed25519; p=MCowBQYDK2VwAyEAerTO1LqpFWfGB9m+GLIFypeIk6x7cjSrwestuDVoMvQ=';
-ok(parse_dkim_pubkey($ed_der), 'ed25519 key in DER SubjectPublicKeyInfo form parses');
+my $der_key;
+ok(eval { $der_key = parse_dkim_pubkey($ed_der); 1 }, 'ed25519 key as DER does not die');
+is($der_key, undef, '... and is not a usable key');
+is((parse_dkim_key_record($ed_der))[1], 'is malformed', '... it is malformed');
 
-# Raw 32-byte form (RFC 8463): derive it from the DER key above for a stable vector.
-my $pk_der = parse_dkim_pubkey($ed_der);
-my $raw_b64 = encode_base64($pk_der->export_key_raw('public'), '');
+# Raw 32-byte form (RFC 8463): the same key's last 32 octets of DER.
+my $raw_b64 = encode_base64(substr(decode_base64(($ed_der =~ /p=(\S+)/)[0]), -32), '');
 ok(parse_dkim_pubkey("v=DKIM1; k=ed25519; p=$raw_b64"), 'ed25519 key in raw 32-byte form parses');
 
 my $bad;
@@ -28,24 +31,29 @@ my $ok = eval { $bad = parse_dkim_pubkey('v=DKIM1; k=ed25519; p=bm90YWtleQ=='); 
 ok($ok, 'malformed ed25519 key does not die');
 is($bad, undef, 'malformed ed25519 key returns undef');
 
-# -07 §4: names added by the HDRMAINT survey
-for my $h (qw(Apparently-To Auto-Submitted DL-Expansion-History
-              Original-Recipient SIO-Label-History VBR-Info
+# -08 §4: names added by the HDRMAINT survey
+for my $h (qw(Apparently-To DL-Expansion-History
+              Original-Recipient SIO-Label-History
               X400-Received X400-Trace)) {
-    ok(Mail::DKIM2::Common::should_skip($h), "-07 §4: $h is unsigned");
+    ok(Mail::DKIM2::Common::should_skip($h), "-08 §4: $h is unsigned");
 }
 
-# -07 §4: any Received-* field is a trace field
-ok(Mail::DKIM2::Common::should_skip('Received-SPF'), '-07 §4: Received-SPF is unsigned');
-ok(Mail::DKIM2::Common::should_skip('Received-Anything'), '-07 §4: Received-* is unsigned');
+# -08 §4 took these two off the list: they are hashed now
+for my $h (qw(Auto-Submitted VBR-Info)) {
+    ok(!Mail::DKIM2::Common::should_skip($h), "-08 §4: $h is signed");
+}
+
+# -08 §4: any Received-* field is a trace field
+ok(Mail::DKIM2::Common::should_skip('Received-SPF'), '-08 §4: Received-SPF is unsigned');
+ok(Mail::DKIM2::Common::should_skip('Received-Anything'), '-08 §4: Received-* is unsigned');
 
 # spec-05 §4: the ARC- prefix narrowed to exactly three names
-ok(Mail::DKIM2::Common::should_skip('ARC-Seal'), '-07 §4: ARC-Seal is unsigned');
-ok(Mail::DKIM2::Common::should_skip('ARC-Message-Signature'), '-07 §4: ARC-Message-Signature is unsigned');
-ok(Mail::DKIM2::Common::should_skip('ARC-Authentication-Results'), '-07 §4: ARC-Authentication-Results is unsigned');
-ok(!Mail::DKIM2::Common::should_skip('ARC-Something-Else'), '-07 §4: the ARC- prefix match is gone');
+ok(Mail::DKIM2::Common::should_skip('ARC-Seal'), '-08 §4: ARC-Seal is unsigned');
+ok(Mail::DKIM2::Common::should_skip('ARC-Message-Signature'), '-08 §4: ARC-Message-Signature is unsigned');
+ok(Mail::DKIM2::Common::should_skip('ARC-Authentication-Results'), '-08 §4: ARC-Authentication-Results is unsigned');
+ok(!Mail::DKIM2::Common::should_skip('ARC-Something-Else'), '-08 §4: the ARC- prefix match is gone');
 
-# -07 section 7.2 and 18: address domains, A-labels, the relaxed match.
+# -08 section 7.2 and 18: address domains, A-labels, the relaxed match.
 {
     use Mail::DKIM2::Common qw(domain_of to_alabel relaxed_domain_match);
     is_deeply([domain_of('<A@Example.COM.>')], ['example.com', 0], 'domain_of: lowercased, one trailing dot off');

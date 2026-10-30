@@ -1,0 +1,164 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use lib "$Bin/../t/fixtures/problem48-spvm/lib";
+use Digest::SHA qw(hmac_sha256);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+use Developer::Dashboard::Crypto::PBKDF2;
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+my $iterations = 210_000;
+my $runs       = 5;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+) or die "Usage: $0 [--iterations N] [--runs N]\n";
+die "Unexpected benchmark argument(s): @ARGV\nUsage: $0 [--iterations N] [--runs N]\n" if @ARGV;
+die "--iterations must be a positive integer no greater than 2147483647\n"
+  if $iterations < 1 || $iterations > 2_147_483_647;
+die "--runs must be a positive integer\n" if $runs < 1;
+
+my $spvm_setup_start = time;
+require SPVM;
+SPVM->import('Digest::SHA');
+SPVM->import('DeveloperDashboard::Bench::HmacChain');
+my $spvm_setup_seconds = time - $spvm_setup_start;
+
+my $password = 'problem48-password';
+my $salt     = 'problem48-salt';
+my $warmup   = SPVM::DeveloperDashboard::Bench::HmacChain->pbkdf2_sha256( $password, $salt, 1 );
+my ( @perl_seconds, @ffi_seconds, @spvm_seconds );
+my ( $reference_digest, $ffi_digest, $spvm_digest );
+
+for ( 1 .. $runs ) {
+    my $started = time;
+    $reference_digest = _pbkdf2_perl( $password, $salt, $iterations );
+    push @perl_seconds, time - $started;
+
+    $started = time;
+    $ffi_digest = Developer::Dashboard::Crypto::PBKDF2->derive_sha256(
+        password   => $password,
+        salt       => $salt,
+        iterations => $iterations,
+    );
+    die 'FFI::Platypus PBKDF2 backend is unavailable in this environment' if !defined $ffi_digest;
+    push @ffi_seconds, time - $started;
+    die 'OpenSSL FFI output did not match the Perl reference' if $ffi_digest ne $reference_digest;
+
+    $started = time;
+    my $spvm_object = SPVM::DeveloperDashboard::Bench::HmacChain->pbkdf2_sha256(
+        $password, $salt, $iterations,
+    );
+    $spvm_digest = unpack 'H*', $spvm_object->to_bin;
+    push @spvm_seconds, time - $started;
+    die 'SPVM output did not match the Perl reference' if $spvm_digest ne $reference_digest;
+}
+
+my $perl_median = _median(@perl_seconds);
+my $ffi_median  = _median(@ffi_seconds);
+my $spvm_median = _median(@spvm_seconds);
+printf "PBKDF2-HMAC-SHA256: %d iterations, %d alternating runs; all digests match.\n",
+  $iterations, $runs;
+printf "SPVM load/compile: %.3f ms (excluded from routine medians).\n", 1000 * $spvm_setup_seconds;
+printf "Perl loop median: %.3f ms.\n", 1000 * $perl_median;
+printf "SPVM compiled-loop median: %.3f ms (%.2fx Perl speed).\n",
+  1000 * $spvm_median, $perl_median / $spvm_median;
+printf "OpenSSL FFI median: %.3f ms (%.2fx Perl speed).\n",
+  1000 * $ffi_median, $perl_median / $ffi_median;
+
+exit 0;
+
+# _pbkdf2_perl($password, $salt, $iterations)
+# Calculates the established one-block PBKDF2-HMAC-SHA256 reference in Perl.
+# Input: password bytes, salt bytes, and positive iteration count.
+# Output: lowercase hexadecimal derived key.
+sub _pbkdf2_perl {
+    my ( $password_bytes, $salt_bytes, $rounds ) = @_;
+    my $u      = hmac_sha256( $salt_bytes . pack( 'N', 1 ), $password_bytes );
+    my $result = $u;
+    for ( 2 .. $rounds ) {
+        $u = hmac_sha256( $u, $password_bytes );
+        $result ^= $u;
+    }
+    return unpack 'H*', $result;
+}
+
+# _median(@seconds)
+# Returns the middle timing from a nonempty sample list.
+# Input: one or more numeric second measurements.
+# Output: median seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die 'Cannot calculate a median without samples' if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-spvm-benchmark - compare SPVM PBKDF2 with Perl and OpenSSL FFI
+
+=head1 PURPOSE
+
+This script measures the same PBKDF2-HMAC-SHA256 inputs and iteration count
+through three implementations: the existing Perl reference loop, the
+Dashboard's OpenSSL FFI adapter, and an experimental SPVM-compiled loop.
+Every measured digest must match before its timing is accepted.
+
+=head1 WHY IT EXISTS
+
+Problem 48 evaluates multiple acceleration technologies. The earlier SPVM
+probe crossed from Perl for each HMAC call and was not a fair measure of a
+compiled SPVM routine. This script keeps PBKDF2's inner loop inside SPVM,
+reports SPVM load/compile time separately, and makes the comparison
+reproducible without adding SPVM to the Dashboard runtime dependencies.
+
+=head1 WHEN TO USE
+
+Use this only in the isolated Problem 48 Docker benchmark environment, where
+SPVM, SPVM::Digest::SHA, and the optional FFI modules are installed. The fixture
+under F<t/fixtures/problem48-spvm> is benchmark-only and is not an
+authentication implementation.
+
+=head1 HOW TO USE
+
+  perl script/problem48-spvm-benchmark
+  perl script/problem48-spvm-benchmark --iterations 1000 --runs 7
+
+The default measures the production 210,000-round work factor over five
+alternating runs. A smaller iteration count is useful for a quick smoke check.
+The script exits with an error if any implementation is unavailable or if a
+digest differs.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this script to determine whether a full
+SPVM PBKDF2 implementation is faster than the existing reference and the
+OpenSSL FFI adapter. It is not called by the application or release workflow.
+
+=head1 EXAMPLES
+
+Run the production-work-factor comparison in Docker:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-spvm-benchmark
+
+Quickly verify setup and output parity with fewer iterations:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench perl script/problem48-spvm-benchmark --iterations 1000 --runs 3
+
+Run the parity regression before benchmarking:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench prove -lv t/655-spvm-hmac-loop.t
+
+=cut

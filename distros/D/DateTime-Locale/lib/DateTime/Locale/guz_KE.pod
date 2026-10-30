@@ -435,6 +435,24 @@ Gusii Kenya locale.
    1995-12-22T09:05:02 = YK 1995 Dis 22, Icm
   -0010-09-15T04:44:23 = YA -10 Sep 15, Est
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = YK 2008 Feburari
+   1995-12-22T09:05:02 = YK 1995 Disemba
+  -0010-09-15T04:44:23 = YA -10 Septemba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = YK 2008 Feburari 5, Cmn
+   1995-12-22T09:05:02 = YK 1995 Disemba 22, Icm
+  -0010-09-15T04:44:23 = YA -10 Septemba 15, Est
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = YK 2008 Feburari 5
+   1995-12-22T09:05:02 = YK 1995 Disemba 22
+  -0010-09-15T04:44:23 = YA -10 Septemba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = YK 2008 Feb 5

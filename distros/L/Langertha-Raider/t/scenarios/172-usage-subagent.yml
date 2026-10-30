@@ -1,0 +1,18 @@
+# A subagent's model calls are counted too, though its events go to its own
+# journal.
+title: a subagent's tokens count in the ledger
+permission_mode: bypassPermissions
+files:
+  .raider/agents/helper.md: "---\ndescription: Helps.\ntools: Read\n---\nHELPER-BODY\n"
+prompt: Ask the helper.
+script:
+  - tool_calls:
+      - [ agent, { description: Help, prompt: Say hello., subagent_type: helper } ]
+    usage: { prompt_tokens: 100, completion_tokens: 10 }
+  - text: hello from the helper
+    usage: { prompt_tokens: 30, completion_tokens: 6 }
+  - text: The helper said hello.
+    usage: { prompt_tokens: 140, completion_tokens: 7 }
+expect:
+  answer: The helper said hello.
+  usage: { input_tokens: 270, output_tokens: 23, calls: 3 }

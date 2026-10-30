@@ -1,0 +1,19 @@
+title: a rule of a tool name alone covers every call of the tool (Claude and raider names)
+app: { task_tools: false }
+permission_mode: default
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ Write ]
+      deny:  [ todo_write ]
+prompt: Go.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+      - [ todo_write, { todos: [ { content: x, status: pending, activeForm: x } ] } ]
+  - text: done
+expect:
+  files: { a.txt: "a\n" }
+  tools:
+    - { name: write_file }
+    - { name: todo_write, error: true, text: "denied by rule 'todo_write'" }

@@ -399,7 +399,9 @@ async sub getUserConfig {
             warn "$error";
         }
     }
-    my $userConfig = await $self->config->promisify($self->user->userInfo);
+    my $userConfig = { %{ await $self->config->promisify($self->user->userInfo) } };
+    delete $userConfig->{cbuser_password};
+    delete $userConfig->{cbuser_note} unless $self->user->may('admin');
     return {
         userInfo => $userConfig,
         plugins => \@plugins,

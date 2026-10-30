@@ -8,50 +8,50 @@ note_on:
     max: 127
 control_change:
   - number: 0
-    name: "Bank Select"
+    note: "Bank Select"
   - number: 32
-    name: "Bank Select"
+    note: "Bank Select"
   - number: 7
-    name: "Part Volume"
+    note: "Part Volume"
   - number: 10
-    name: "Pan"
+    note: "Pan"
   - number: 84
-    name: "Portamento Control"
+    note: "Portamento Control"
   - number: 1
-    name: "Modulation Wheel"
+    note: "Modulation Wheel"
   - number: 6
-    name: "Data Entry MSB"
+    note: "Data Entry MSB"
   - number: 38
-    name: "Data Entry LSB"
+    note: "Data Entry LSB"
   - number: 11
-    name: "Expression"
+    note: "Expression"
   - number: 64
-    name: "Sustain"
+    note: "Sustain"
   - number: 71
-    name: "Harmonic Content"
+    note: "Harmonic Content"
   - number: 72
-    name: "Release Time"
+    note: "Release Time"
   - number: 73
-    name: "Attack Time"
+    note: "Attack Time"
   - number: 74
-    name: "Brightness"
+    note: "Brightness"
   - number: 96
-    name: "RPN Increment"
+    note: "RPN Increment"
   - number: 97
-    name: "RPN Decrement"
+    note: "RPN Decrement"
   - number: 100
-    name: "RPN LSB"
+    note: "RPN LSB"
   - number: 101
-    name: "RPN MSB"
+    note: "RPN MSB"
   - number: 120
-    name: "All Sound Off"
+    note: "All Sound Off"
   - number: 121
-    name: "Reset All Controllers"
+    note: "Reset All Controllers"
   - number: 122
-    name: "Local Control ON/OFF"
+    note: "Local Control ON/OFF"
   - number: 123
-    name: "All Notes Off"
+    note: "All Notes Off"
   - number: 124
-    name: "Omni Mode"
+    note: "Omni Mode"
   - number: 125
-    name: "Omni Mode"
+    note: "Omni Mode"

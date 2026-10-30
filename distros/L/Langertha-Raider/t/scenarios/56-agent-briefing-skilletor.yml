@@ -1,0 +1,29 @@
+title: a skill an agent declares that is not installed is read from its skilletor source, without installing it (ADR 0020 section 6)
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skilletor.json: |
+    { "sources": { "mine": { "local": "{{ROOT}}/skill-src" } }, "install": { "skills": [ "notes@mine" ] } }
+  skill-src/skills/notes/SKILL.md: "---\nname: notes\ndescription: How notes are written.\n---\n\nSKILLETOR-NOTES-BODY: one line per note.\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\nbriefing:\n  skills:\n    - notes\n---\nSCRIBE-BODY\n"
+home:
+  .claude/skilletor/trust.json: |
+    { "mine": { "kind": "local", "address": "{{ROOT}}/skill-src" } }
+prompt: Have the scribe summarise the day.
+script:
+  - tool_calls:
+      - [ agent, { description: Summarise, prompt: Summarise the day in notes., subagent_type: scribe } ]
+  - text: "- shipped skilletor"
+  - text: "The scribe wrote: shipped skilletor."
+expect:
+  answer: "The scribe wrote: shipped skilletor."
+  request_count: 3
+  absent: [ .claude/skills/notes ]
+  requests:
+    - { index: 1, contains: "# Briefing — pre-loaded skills\n" }
+    - { index: 1, contains: "/skill-src/skills/notes\">\nSKILLETOR-NOTES-BODY: one line per note.\n</skill>\n\n---\n\n# Original task\n\nSummarise the day in notes." }
+  tools:
+    - { name: agent, text: '\A- shipped skilletor\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: agent.started, call: c1, agent: scribe }
+    - { type: agent.finished, call: c1, agent: scribe, status: completed }

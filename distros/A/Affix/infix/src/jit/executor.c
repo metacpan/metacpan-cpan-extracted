@@ -87,6 +87,7 @@ typedef struct _UNWIND_INFO {
     uint8_t FrameOffset : 4;
     UNWIND_CODE UnwindCode[1];  // Variable length array
 } UNWIND_INFO;
+#pragma pack(pop)
 
 // We reserve 512 bytes at the end of every JIT block for SEH metadata.
 #define INFIX_SEH_METADATA_SIZE 256
@@ -635,7 +636,7 @@ static void _infix_register_seh_windows_arm64(infix_executable_t * exec,
  *          and a Frame Description Entry (FDE) that match the stack behavior
  *          of our trampolines (standard RBP-based frame).
  */
-static void _infix_register_eh_frame_linux_x64(infix_executable_t * exec, infix_executable_category_t category) {
+static c23_maybe_unused void _infix_register_eh_frame_linux_x64(infix_executable_t * exec, infix_executable_category_t category) {
     // Simplified .eh_frame layout: [ CIE | FDE | Terminator ]
     const size_t cie_size = 32;
     const size_t fde_size = 64;
@@ -885,7 +886,7 @@ void infix_executable_free(infix_executable_t exec) {
 #elif defined(INFIX_OS_ANDROID) || defined(INFIX_OS_OPENBSD) || defined(INFIX_OS_DRAGONFLY)
     // Other single-mapping POSIX systems.
     if (exec.rw_ptr) {
-        mprotect(exec.rw_ptr, exec.size, PROT_NONE);
+        //mprotect(exec.rw_ptr, exec.size, PROT_NONE);
         munmap(exec.rw_ptr, exec.size);
     }
 #else

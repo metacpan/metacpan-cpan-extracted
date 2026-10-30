@@ -90,6 +90,17 @@ CDw <- CD; CDw$w <- seq(0.5, 2, length.out = nrow(CD))
 write.csv(CDw, "t/CigaretteDemand.csv", row.names = FALSE)
 CDw <- read.csv("t/CigaretteDemand.csv")
 rec("cig_weighted", ivreg(log(packs) ~ log(rincome) | log(rprice) | salestax, data = CDw, weights = w))
+## zero weights on rows 1, 5 and 9 (made here and in the .t file alike, so
+## the CSV is unchanged): nobs counts the nonzero ones, as do df.residual and
+## sigma, while summary.ivreg()'s adj.r.squared and Sargan use every row.  The
+## two-instrument form, so that Sargan is computed; and robust (HC1), whose
+## meat counts the nonzero rows.
+CDw0 <- CDw; CDw0$w0 <- CDw0$w; CDw0$w0[c(1, 5, 9)] <- 0
+m0 <- ivreg(log(packs) ~ log(rprice) + log(rincome) | salestax + cigtax + log(rincome), data = CDw0, weights = w0)
+rec("cig_zero_w", m0)
+EXP$cig_zero_w$nobs <- m0$nobs
+rec("cig_zero_w_hc1", m0, function(o, ...) suppressWarnings(vcovHC(o, type = "HC1")))
+EXP$cig_zero_w_hc1$nobs <- m0$nobs
 ## statsmodels' TestIV2SLSSt1 corpus (Stata ivreg2 results in .t)
 rec("griliches", ivreg(lw ~ s + iq + expr + tenure + rns + smsa + year |
                          expr + tenure + rns + smsa + year + med + kww + age + mrt, data = G))
@@ -99,7 +110,7 @@ for (k in names(EXP)) {
   e <- EXP[[k]]
   cat(sprintf("  %s => {\n", k))
   for (f in names(e)) cat(sprintf("    %s => %s,\n", f,
-      if (is.character(e[[f]])) str_(e[[f]]) else if (length(e[[f]]) == 1 && f %in% c("sigma", "df", "r2", "adj", "wald", "wald_p")) fmt1(e[[f]]) else num(e[[f]])))
+      if (is.character(e[[f]])) str_(e[[f]]) else if (length(e[[f]]) == 1 && f %in% c("sigma", "df", "r2", "adj", "wald", "wald_p", "nobs")) fmt1(e[[f]]) else num(e[[f]])))
   cat("  },\n")
 }
 cat(");\n")

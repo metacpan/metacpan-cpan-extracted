@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 Travel::Status::DE::DBRIS::Formation::Group->mk_ro_accessors(
 	qw(designation name train_no train_type description desc_short destination has_sectors model series start_percent end_percent)
@@ -272,6 +272,7 @@ my %ice_name = (
 	8022 => 'Waldecker Land',
 	8029 => 'Europa/Europe',
 	8052 => '#45 Halfway. Full Speed',
+	8055 => 'Europa/Europe',
 	9006 => 'Martin Luther',
 	9009 => 'Cottbus/Chóśebuz',
 	9018 => 'Freistaat Bayern',
@@ -286,14 +287,17 @@ my %ice_name = (
 	9202 => 'Schleswig-Holstein',
 	9203 => 'Stendal',
 	9205 => 'Biosphärengebiet Schwäbische Alb',
+	9206 => 'Dessau',
 	9207 => 'Altenbeken',
 	9208 => 'Nationalpark Bayrischer Wald',
+	9210 => 'Koblenz',
 	9212 => 'Braunschweig',
 	9216 => 'Ulm',
 	9217 => 'Hansestadt Rostock',
 	9218 => 'Ludwigslust',
 	9220 => 'Steiermark',
 	9223 => '75 Jahre Bundespolizei',
+	9226 => 'Schwäbisch Hall',
 	9228 => 'Potsdam',
 	9229 => 'Zwickau',
 	9230 => 'Kassel',

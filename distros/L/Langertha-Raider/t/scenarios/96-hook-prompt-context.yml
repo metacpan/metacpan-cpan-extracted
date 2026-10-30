@@ -1,0 +1,16 @@
+title: a UserPromptSubmit hook's plain stdout reaches the model as context with the prompt (ADR 0022)
+run_prompt: true
+files:
+  .claude/settings.json: |
+    { "hooks": { "UserPromptSubmit": [
+      { "matcher": "ignored for this event", "hooks": [ { "type": "command", "command": "cat >/dev/null; echo 'Current branch: feature/hooks'" } ] }
+    ] } }
+prompt: What branch am I on?
+script:
+  - text: feature/hooks
+expect:
+  answer: feature/hooks
+  outcome: { status: completed }
+  requests:
+    - { index: 0, contains: "UserPromptSubmit hook additional context: Current branch: feature/hooks" }
+    - { index: 0, contains: "What branch am I on?" }

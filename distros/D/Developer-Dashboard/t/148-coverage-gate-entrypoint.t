@@ -327,6 +327,27 @@ sub invocations {
     is( slurp_file( $stub->{log} ), '', 'an unknown option runs none of the chain' );
 }
 
+# Scenario: the instrument identity does not become garbage inside the database.
+# Given an existing database directory, when the gate stamps its Devel::Cover
+# serializer, then the marker stays beside the database so Devel::Cover can
+# read and delete its own files without reporting an invalid-database warning.
+{
+    my $stub = build_stub_path();
+    my $database = File::Spec->catdir( $stub->{dir}, 'cover_db' );
+    make_path($database);
+    my $instrument = $INC{'Devel/Cover/DB/IO.pm'};
+    write_file( File::Spec->catfile( $database, 'gate-serializer' ), "$instrument\n" );
+
+    my ( $exit, $stdout, $stderr ) = run_entry( $stub, '--dry-run' );
+
+    is( $exit, 0, 'a database with a serializer stamp can be dry-run safely' );
+    ok( !-e File::Spec->catfile( $database, 'gate-serializer' ), 'the serializer stamp is not stored inside cover_db' );
+    my $stamp = File::Spec->catfile( $stub->{dir}, '.cover_db.coverage-gate-serializer' );
+    ok( -f $stamp, 'the serializer stamp is stored beside its database' );
+    is( slurp_file($stamp), "$instrument\n", 'the adjacent stamp preserves the resolved Devel::Cover reader identity' );
+    is( $stderr, '', 'stamping a database produces no warnings' );
+}
+
 # Scenario: help is available without running the chain.
 # Given the help flag, when the entrypoint is invoked, then it explains itself
 # on standard output and succeeds.

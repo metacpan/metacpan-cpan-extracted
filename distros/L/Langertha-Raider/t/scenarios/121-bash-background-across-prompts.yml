@@ -1,0 +1,23 @@
+# run_in_background answers at once with the shell's ID; the shell belongs to
+# the session, so the next prompt reads its output with bash_output (block
+# waits for the end, filter keeps the matching lines) (ADR 0024).
+title: a background command started in one prompt is read in the next, with block and filter
+prompts:
+  - Start the build in the background.
+  - Is the build done?
+script:
+  - tool_calls:
+      - [ bash, { command: 'for step in compile link test; do echo "step $step"; echo noise; done; echo built > build.log', run_in_background: true } ]
+  - text: started
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1, block: true, timeout: 30, filter: '^step' } ]
+      - [ bash_output, { bash_id: bash_1 } ]
+  - text: done
+expect:
+  answer: done
+  files:
+    build.log: "built\n"
+  tools:
+    - { name: bash, text: '\ACommand running in background with ID: bash_1\. .*bash_output \(bash_id: bash_1\)' }
+    - { name: bash_output, text: '\A<status>completed</status>\n\n<exit_code>0</exit_code>\n\n<stdout>\nstep compile\nstep link\nstep test\n</stdout>\z' }
+    - { name: bash_output, text: '\A<status>completed</status>\n\n<exit_code>0</exit_code>\z' }

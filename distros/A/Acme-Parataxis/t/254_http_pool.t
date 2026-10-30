@@ -23,7 +23,7 @@ if ( !$http_check->get('http://www.google.com')->{success} && !$http_check->get(
             SSL_options        => $self->{SSL_options},
             verify_SSL         => $self->{verify_SSL},
             keep_alive         => $self->{keep_alive},
-            keep_alive_timeout => $self->{keep_alive_timeout},
+            keep_alive_timeout => $self->{keep_alive_timeout}
         );
         return $handle->connect( $scheme, $host, $port, $peer );
     }

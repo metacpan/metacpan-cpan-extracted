@@ -1,0 +1,31 @@
+# Claude Code: the built-in Explore agent is read-only (no Write/Edit/Agent), starts
+# without CLAUDE.md, is one-shot (no agent ID in its result) and cannot be resumed.
+# Checks ADR 0027 section 6.
+title: an Explore agent has no write tools and no CLAUDE.md, returns no agentId and refuses send_message
+permission_mode: bypassPermissions
+files:
+  CLAUDE.md: "PROJECT-MEMORY-MARKER: be nice.\n"
+prompt: Find the config.
+script:
+  - tool_calls:
+      - [ agent, { description: Find, prompt: Find the config., subagent_type: Explore } ]
+  - text: found it in /x/config.yml
+  - tool_calls:
+      - [ send_message, { to: agent_1, message: and more } ]
+  - text: done
+expect:
+  answer: done
+  request_count: 4
+  requests:
+    - { index: 0, contains: PROJECT-MEMORY-MARKER }
+    - { index: 0, tool_text: "- Explore: Read-only search agent for broad fan-out searches" }
+    - { index: 0, tool_text: "very thorough" }
+    - { index: 1, contains: Find the config. }
+    - { index: 1, contains: file search specialist }
+    - { index: 1, absent: PROJECT-MEMORY-MARKER }
+    - { index: 1, lacks: [ write_file, edit_file, multi_edit, agent, send_message, exit_plan_mode, ask_user ] }
+    - { index: 1, contains: "read_file(" }
+    - { index: 1, absent: "write_file(" }
+  tools:
+    - { name: agent, text: '\Afound it in /x/config\.yml\n<usage>subagent_tokens: \d+\ntool_uses: 0\nduration_ms: \d+</usage>\z', not_text: 'agentId' }
+    - { name: send_message, error: true, text: '\AAgent agent_1 \(Explore\) is one-shot and cannot be continued\.\z' }

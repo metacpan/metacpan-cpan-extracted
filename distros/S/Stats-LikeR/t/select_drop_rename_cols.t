@@ -156,6 +156,30 @@ dies_ok { drop_cols(\my $s, 0) }   'drop scalar ref dies';
 # no memory leaks (guarded under Devel::Cover; the XS paths were also verified
 # via a net-zero PL_sv_count delta over 20k iterations during development).
 #
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { drop_cols(undef, 'a'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: drop_cols\(.*\n\ndrop_cols: error: \Qundefined data in first position\E\n\z/s,
+		'drop_cols: a call-form error prints the help screen, the error on its last line');
+}
+
+# A call-form error prints select_cols's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { select_cols(undef, 'a'); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: select_cols\(/, 'select_cols: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('select_cols') . "select_cols: error: undefined data in first position\n",
+		'select_cols: the help screen, then the error on the last line');
+}
+# A call-form error prints rename_cols's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { my $r = rename_cols([ { a => 1 } ]); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: rename_cols\(/, 'rename_cols: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('rename_cols') . "rename_cols: error: at least one old => new mapping is required\n",
+		'rename_cols: the help screen, then the error on the last line');
+}
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok { select_cols([ [1,2,3], [4,5,6] ], 0, 2) }             'select_cols(): AoA, no leaks';
 no_leaks_ok { select_cols([ {a=>1,b=>2}, {a=>3,b=>4} ], 'a') }      'select_cols(): AoH, no leaks';

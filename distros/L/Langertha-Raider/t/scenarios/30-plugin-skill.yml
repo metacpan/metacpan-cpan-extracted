@@ -1,0 +1,26 @@
+title: the skill of an installed and enabled plugin is listed as plugin:skill and loadable
+home:
+  .claude/settings.json: '{ "enabledPlugins": { "helper@market": true, "other@market": false } }'
+  .claude/plugins/installed_plugins.json: |
+    { "version": 2, "plugins": {
+      "helper@market": [ { "scope": "user", "installPath": "{{HOME}}/.claude/plugins/cache/market/helper/1.0", "version": "1.0" } ],
+      "other@market":  [ { "scope": "user", "installPath": "{{HOME}}/.claude/plugins/cache/market/other/1.0", "version": "1.0" } ]
+    } }
+  .claude/plugins/cache/market/helper/1.0/.claude-plugin/plugin.json: '{ "name": "helper" }'
+  .claude/plugins/cache/market/helper/1.0/skills/tidy/SKILL.md: "---\ndescription: Tidies things up.\n---\nPLUGIN-BODY-MARKER\n"
+  .claude/plugins/cache/market/other/1.0/skills/noise/SKILL.md: "---\ndescription: Disabled plugin skill.\n---\nnoise\n"
+files:
+  CLAUDE.md: "Project.\n"
+prompt: Tidy up.
+script:
+  - tool_calls:
+      - [ skill, { skill: "helper:tidy" } ]
+  - text: aufgeräumt
+expect:
+  answer: aufgeräumt
+  requests:
+    - { index: 0, contains: "- helper:tidy: Tidies things up." }
+    - { index: 0, absent: "Disabled plugin skill." }
+    - { index: 1, tail: [ { role: tool }, { role: user, contains: "skills/tidy\n\nPLUGIN-BODY-MARKER" } ] }
+  tools:
+    - { name: skill, text: '^Launching skill: helper:tidy$' }

@@ -254,9 +254,9 @@ Anii locale.
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 ɩjikpaka kaŋɔrɔ 5
-   1995-12-22T09:05:02 = 1995 anɔɔbʊnka kaŋɔrɔ 22
-  -0010-09-15T04:44:23 = -10 abofʊmka kaŋɔrɔ 15
+   2008-02-05T18:30:30 = ɩjikpaka kaŋɔrɔ 5/2008
+   1995-12-22T09:05:02 = anɔɔbʊnka kaŋɔrɔ 22/1995
+  -0010-09-15T04:44:23 = abofʊmka kaŋɔrɔ 15/-10
 
 =head3 Medium
 
@@ -308,9 +308,9 @@ Anii locale.
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 ɩjikpaka kaŋɔrɔ 5, 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 anɔɔbʊnka kaŋɔrɔ 22, 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 abofʊmka kaŋɔrɔ 15, 04:44:23 UTC
+   2008-02-05T18:30:30 = ɩjikpaka kaŋɔrɔ 5/2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = anɔɔbʊnka kaŋɔrɔ 22/1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = abofʊmka kaŋɔrɔ 15/-10, 04:44:23 UTC
 
 =head3 Medium
 
@@ -429,17 +429,35 @@ Anii locale.
    1995-12-22T09:05:02 = bʊn 1995 AƖAK
   -0010-09-15T04:44:23 = fʊm -10 naaBYŊAƖ
 
-=head3 GyMMMEd (E, MMM d y G)
+=head3 GyMMMEd (E, MMM d/y G)
 
-   2008-02-05T18:30:30 = atal, kpa 5 2008 AƖAK
-   1995-12-22T09:05:02 = arɩs, bʊn 22 1995 AƖAK
-  -0010-09-15T04:44:23 = asib, fʊm 15 -10 naaBYŊAƖ
+   2008-02-05T18:30:30 = atal, kpa 5/2008 AƖAK
+   1995-12-22T09:05:02 = arɩs, bʊn 22/1995 AƖAK
+  -0010-09-15T04:44:23 = asib, fʊm 15/-10 naaBYŊAƖ
 
-=head3 GyMMMd (MMM d y G)
+=head3 GyMMMM (MMMM y G)
 
-   2008-02-05T18:30:30 = kpa 5 2008 AƖAK
-   1995-12-22T09:05:02 = bʊn 22 1995 AƖAK
-  -0010-09-15T04:44:23 = fʊm 15 -10 naaBYŊAƖ
+   2008-02-05T18:30:30 = ɩjikpaka kaŋɔrɔ 2008 AƖAK
+   1995-12-22T09:05:02 = anɔɔbʊnka kaŋɔrɔ 1995 AƖAK
+  -0010-09-15T04:44:23 = abofʊmka kaŋɔrɔ -10 naaBYŊAƖ
+
+=head3 GyMMMMEd (E, MMMM d/y G)
+
+   2008-02-05T18:30:30 = atal, ɩjikpaka kaŋɔrɔ 5/2008 AƖAK
+   1995-12-22T09:05:02 = arɩs, anɔɔbʊnka kaŋɔrɔ 22/1995 AƖAK
+  -0010-09-15T04:44:23 = asib, abofʊmka kaŋɔrɔ 15/-10 naaBYŊAƖ
+
+=head3 GyMMMMd (MMMM d/y G)
+
+   2008-02-05T18:30:30 = ɩjikpaka kaŋɔrɔ 5/2008 AƖAK
+   1995-12-22T09:05:02 = anɔɔbʊnka kaŋɔrɔ 22/1995 AƖAK
+  -0010-09-15T04:44:23 = abofʊmka kaŋɔrɔ 15/-10 naaBYŊAƖ
+
+=head3 GyMMMd (MMM d/y G)
+
+   2008-02-05T18:30:30 = kpa 5/2008 AƖAK
+   1995-12-22T09:05:02 = bʊn 22/1995 AƖAK
+  -0010-09-15T04:44:23 = fʊm 15/-10 naaBYŊAƖ
 
 =head3 GyMd (M/d/y G)
 
@@ -506,6 +524,12 @@ Anii locale.
    2008-02-05T18:30:30 = atal, kpa 5
    1995-12-22T09:05:02 = arɩs, bʊn 22
   -0010-09-15T04:44:23 = asib, fʊm 15
+
+=head3 MMMMEd (E, MMMM d)
+
+   2008-02-05T18:30:30 = atal, ɩjikpaka kaŋɔrɔ 5
+   1995-12-22T09:05:02 = arɩs, anɔɔbʊnka kaŋɔrɔ 22
+  -0010-09-15T04:44:23 = asib, abofʊmka kaŋɔrɔ 15
 
 =head3 MMMMW-count-one (MMMM 'abɔkɔɩ' W'ja')
 
@@ -626,6 +650,18 @@ Anii locale.
    2008-02-05T18:30:30 = ɩjikpaka kaŋɔrɔ 2008
    1995-12-22T09:05:02 = anɔɔbʊnka kaŋɔrɔ 1995
   -0010-09-15T04:44:23 = abofʊmka kaŋɔrɔ -10
+
+=head3 yMMMMEd (E, MMMM d/y)
+
+   2008-02-05T18:30:30 = atal, ɩjikpaka kaŋɔrɔ 5/2008
+   1995-12-22T09:05:02 = arɩs, anɔɔbʊnka kaŋɔrɔ 22/1995
+  -0010-09-15T04:44:23 = asib, abofʊmka kaŋɔrɔ 15/-10
+
+=head3 yMMMMd (MMMM d/y)
+
+   2008-02-05T18:30:30 = ɩjikpaka kaŋɔrɔ 5/2008
+   1995-12-22T09:05:02 = anɔɔbʊnka kaŋɔrɔ 22/1995
+  -0010-09-15T04:44:23 = abofʊmka kaŋɔrɔ 15/-10
 
 =head3 yMMMd (MMM d/y)
 

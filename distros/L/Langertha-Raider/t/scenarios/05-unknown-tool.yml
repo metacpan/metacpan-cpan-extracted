@@ -1,0 +1,10 @@
+title: a tool the raider does not have is an error result, the raid goes on
+prompt: Call something odd.
+script:
+  - tool_calls:
+      - [ no_such_tool, {} ]
+  - text: weiter
+expect:
+  answer: weiter
+  tools:
+    - { name: no_such_tool, error: true }

@@ -1,0 +1,48 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Books", "version": "1.0" },
+  "components": {
+    "securitySchemes": { "bearer": { "type": "http", "scheme": "bearer" } },
+    "schemas": {
+      "NewBook": { "type": "object", "required": ["title"],
+                   "properties": { "title": { "type": "string", "minLength": 1 } } }
+    }
+  },
+  "paths": {
+    "/books": {
+      "get": {
+        "operationId": "listBooks",
+        "summary": "List books",
+        "description": "Every book, filtered.",
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 50 } },
+          { "name": "tags", "in": "query", "schema": { "type": "array", "items": { "type": "string" } } },
+          { "name": "X-Trace", "in": "header", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      },
+      "post": {
+        "operationId": "createBook",
+        "x-mcp": { "name": "add_book", "title": "Add a book" },
+        "requestBody": { "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewBook" } } } },
+        "responses": { "201": { "description": "made" } }
+      }
+    },
+    "/books/{id}": {
+      "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+      "get":    { "operationId": "getBook", "summary": "One book", "responses": { "200": { "description": "ok" } } },
+      "put":    { "operationId": "replaceBook",
+                  "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
+                  "responses": { "200": { "description": "ok" } } },
+      "delete": { "operationId": "deleteBook", "responses": { "204": { "description": "gone" } } }
+    },
+    "/secret":  { "get": { "operationId": "hiddenOp", "x-mcp": false, "responses": { "200": { "description": "ok" } } } },
+    "/admin":   { "get": { "operationId": "adminOp", "security": [ { "bearer": [] } ],
+                           "responses": { "200": { "description": "ok" } } } },
+    "/weird":   { "get": { "operationId": "Get.Weird-Name", "responses": { "200": { "description": "ok" } } } },
+    "/dup1":    { "get": { "operationId": "dup.x", "responses": { "200": { "description": "ok" } } } },
+    "/dup2":    { "get": { "operationId": "dup_x", "responses": { "200": { "description": "ok" } } } }
+  }
+}

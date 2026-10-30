@@ -1,0 +1,21 @@
+title: a Read deny rule holds for read_file and list_files and through ../ too, even in bypassPermissions
+files:
+  .raider/config.yml: |
+    permissions:
+      deny: [ "Read(./secrets/**)" ]
+  secrets/key: top secret
+  lib/ok.txt: fine
+prompt: Read things.
+script:
+  - tool_calls:
+      - [ read_file, { path: lib/ok.txt } ]
+      - [ read_file, { path: secrets/key } ]
+      - [ read_file, { path: lib/../secrets/key } ]
+      - [ list_files, { path: secrets } ]
+  - text: done
+expect:
+  tools:
+    - { name: read_file, text: fine }
+    - { name: read_file, error: true, text: "denied by rule 'Read\\(\\./secrets/\\*\\*\\)'", not_text: top secret }
+    - { name: read_file, error: true, text: "denied by rule", not_text: top secret }
+    - { name: list_files, error: true, text: "denied by rule" }

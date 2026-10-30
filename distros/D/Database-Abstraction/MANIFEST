@@ -25,6 +25,7 @@ t/csv.t
 t/csv_id.t
 t/data-flow.t
 t/data/numerictest.csv
+t/data/test-1.csv
 t/data/test1.csv
 t/data/test1.html
 t/data/test2.psv
@@ -34,6 +35,7 @@ t/data/test5.csv
 t/data/test6.xml
 t/data/test7.csv
 t/data/test8.psv
+t/data/test_1.csv
 t/data/test_json.json
 t/data/test_tsv.tsv
 t/db.t
@@ -71,6 +73,8 @@ t/lib/Database/test_tsv.pm
 t/locales.t
 t/logger.t
 t/logic.t
+t/mariadb.t
+t/mariadb_live.t
 t/mutant_killers.t
 t/no_entry.t
 t/optional_deps.t

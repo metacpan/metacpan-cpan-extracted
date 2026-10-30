@@ -223,15 +223,15 @@ my $vcf_head = "##fileformat=VCFv4.2\n"
 	my $f = fixture('opts.csv', "id,v\n1,2\n");
 	for my $otype (qw(aoh hoa)) {
 		throws_ok { read_table($f, 'output_type' => $otype, 'row_names' => 'id') }
-			qr/^read_table: 'row_names' has no meaning for output_type "$otype"; the row names column is read as an ordinary column$/,
+			qr/\nread_table: error: 'row_names' has no meaning for output_type "$otype"; the row names column is read as an ordinary column$/,
 			"row_names with output_type $otype";
 	}
 	my $v = fixture('opts.vcf', "$vcf_head\tS\n1\t5\t.\tA\tC\t.\t.\t.\tGT\t0/1\n");
 	throws_ok { read_table($v, 'output_type' => 'aoh', 'row_names' => 'nope') }
-		qr/^read_table: 'row_names' has no meaning for output_type "aoh"/,
+		qr/\nread_table: error: 'row_names' has no meaning for output_type "aoh"/,
 		'... on an exploded VCF as well';
 	throws_ok { read_table($f, sheet => 2) }
-		qr/^read_table: 'sheet' applies only to an \.xlsx, and "\Q$f\E" is not named as one$/,
+		qr/\nread_table: error: 'sheet' applies only to an \.xlsx, and "\Q$f\E" is not named as one$/,
 		'sheet on a CSV';
 	is_deeply read_table($f, sheet => undef), [ { id => 1, v => 2 } ], 'sheet => undef is no sheet';
 }

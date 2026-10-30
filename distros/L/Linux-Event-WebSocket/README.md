@@ -5,13 +5,17 @@ callback-first API.
 
 ## Status
 
-Release version: `0.001`.
+Prepared version: `0.003`.
 
 The distribution provides working `ws://` and `wss://` client/server paths,
-a native RFC 6455 data engine, and a production test suite. Version 0.001 is the
-first CPAN release.
+a native RFC 6455 data engine, and a production test suite. The 0.003 release
+replaces the old HTTP internals with the published, event-loop-neutral
+Unblock::HTTP1 engine for the opening handshake.
 
 The GitHub Actions test matrix targets Perl 5.36 and Perl 5.44.0.
+
+See [0.003 release notes](docs/RELEASE-0.003.md) for the coordinated
+WebSocket/HTTP upgrade order.
 
 ## What works today
 
@@ -64,8 +68,8 @@ my $server = Linux::Event::WebSocket::Server->new(
 $loop->run;
 ```
 
-For `wss://`, pass the normal Linux::Event HTTP server `tls` policy containing
-the certificate and key.
+For `wss://`, pass Linux::Event listener `tls` options with the certificate
+and key.
 
 ## Client
 
@@ -121,6 +125,22 @@ $ws->data;
 `close()` starts the WebSocket close handshake. `abort()` closes the underlying
 transport immediately.
 
+## Choosing a WebSocket API
+
+Use `Linux::Event::WebSocket::Server` or `Linux::Event::WebSocket::Client`
+when your application is primarily WebSocket-based. The examples above are
+complete: no HTTP application handler or framework adapter is required.
+
+If you already serve ordinary HTTP traffic with `Linux::Event::HTTP`, use
+its `on_websocket` or `connect_websocket` convenience instead. That is an
+HTTP application using WebSocket, not a second required WebSocket setup.
+Neither approach requires you to configure a protocol parser or framing
+engine. The existing `Linux::Event::WebSocket` callbacks remain unchanged.
+
+Version 0.003 can coexist with Linux::Event::HTTP 0.004, but no longer depends
+on the HTTP distribution: the opening handshake belongs to Unblock::HTTP1.
+The native WebSocket engine remains private to this distribution.
+
 ## Architecture
 
 Linux::Event::WebSocket deliberately composes the existing ecosystem instead of
@@ -130,8 +150,8 @@ reimplementing each layer:
 Linux::Event
     socket, TLS, ordered bytes, buffering, backpressure, lifecycle
         |
-Linux::Event::HTTP
-    HTTP/1.1 opening Upgrade and live-stream handoff
+Unblock::HTTP1
+    HTTP/1.1 opening Upgrade
         |
 Linux::Event::WebSocket
     WebSocket connection API, RFC 6455 framing, messages, masking,
@@ -175,8 +195,8 @@ socket, TLS, HTTP Upgrade, timers, or event loop.
 
 Inbound and outbound text use Perl's C UTF-8 API from XS to enforce the RFC
 3629 boundary without a Perl-level validation pass. Client frame masks use
-Linux `getrandom(2)`. The opening HTTP handshake remains entirely owned by
-Linux::Event::HTTP and this distribution's handshake policy.
+Linux `getrandom(2)`. The opening HTTP handshake uses Unblock::HTTP1 and this distribution's
+WebSocket-specific validation and policy.
 
 The older private `_Frame` and `_Parser` helpers remain useful for tests and
 developer benchmarks, but they are not the production data-path parser.

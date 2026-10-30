@@ -50,7 +50,7 @@ use SNMP::Info::Aggregate 'agg_ports_ifstack';
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %PORTSTAT, %MODEL_MAP, %MUNGE);
 
-$VERSION = '3.983000';
+$VERSION = '3.984000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -591,6 +591,8 @@ sub set_i_vlan_tagged {
 }
 
 sub agg_ports { return agg_ports_ifstack(@_) }
+
+sub _agg_ports_walked { return qw/ifStackStatus ifType/ }
 
 1;
 __END__

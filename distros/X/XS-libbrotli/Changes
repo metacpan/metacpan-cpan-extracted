@@ -1,4 +1,6 @@
-1.1.0.0   xx.xx.2024
+1.2.1.0   26.10.2026
+    - update libbrotli to 1.2.1
+1.1.0.0   17.03.2025
     - update libbrotli to 1.1.0
 1.0.7.9   19.06.2020
     - removed useless xs file

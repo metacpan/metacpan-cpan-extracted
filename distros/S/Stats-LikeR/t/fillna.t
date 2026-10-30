@@ -179,4 +179,34 @@ no_leaks_ok {
 	eval { fillna([ { a => 1 } ], value => 0, cols => [ 'Z' ]) };
 } 'fillna: no memory leaks (die path)' unless $INC{'Devel/Cover.pm'};
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('fillna');
+	like($screen, qr/\Ausage: fillna\(/, 'fillna has a help screen');
+	is(do { local $@; eval { fillna({ x => [1] }); 1 } ? '' : $@ },
+	   $screen . "fillna: error: a 'value' is required\n",
+	   'fillna: no value prints the help screen');
+}
+
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('ffill');
+	like($screen, qr/\Ausage: ffill\(/, 'ffill has a help screen');
+	is(do { local $@; eval { ffill({ x => [1] }, limit => 0); 1 } ? '' : $@ },
+	   $screen . "ffill: error: 'limit' must be a positive integer\n",
+	   'ffill: a zero limit prints the help screen');
+}
+
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('bfill');
+	like($screen, qr/\Ausage: bfill\(/, 'bfill has a help screen');
+	is(do { local $@; eval { bfill({ x => [1] }, bogus => 1); 1 } ? '' : $@ },
+	   $screen . "bfill: error: unknown argument(s): bogus\n",
+	   'bfill: an unknown option prints the help screen');
+}
+
 done_testing;

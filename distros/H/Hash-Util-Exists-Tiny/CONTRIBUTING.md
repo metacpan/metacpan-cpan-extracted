@@ -4,9 +4,11 @@ Thank you for your interest in contributing!
 
 ## Reporting Issues
 
-Please open a [CPAN request](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-Util-Exists-Tiny) or a
-[GitHub Issue](https://github.com/AAHAZRED/perl-Hash-Util-Exists-Tiny/issues) if you encounter a
-bug or have a suggestion.
+Please open a
+[CPAN request](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Hash-Util-Exists-Tiny)
+or a
+[GitHub Issue](https://github.com/AAHAZRED/perl-hash-util-exists-tiny/issues)
+if you encounter a bug or have a suggestion.
 Include the following if possible:
 
 - A clear description of the issue
@@ -22,7 +24,7 @@ Pull requests are welcome! To contribute code:
 2. Write tests for any new feature or bug fix.
 3. Ensure all tests pass using `prove -l t/` or `make test`.
 4. Follow the existing code style, especially:
-   - No Tabs please
+   - No tabs please
    - No trailing whitespace please
    - 2 spaces indentation
 5. In your pull request, briefly explain your changes and their motivation.
@@ -38,3 +40,5 @@ This module uses MakeMaker for creating releases (`make dist`).
 By submitting code, you agree that your contributions may be distributed under the same license as the project.
 
 Thank you for helping improve this module!
+
+

@@ -185,7 +185,7 @@ subtest 'langfuse observations and tool-result shapes of a two-turn raid' => sub
   is($engine->tool_results, [ [
     echo => { content => [ { type => 'text', text => 'echo:1' } ] },
     fail => { content => [ { type => 'text', text => "Error calling tool 'fail': boom" } ], isError => T() },
-    nope => { content => [ { type => 'text', text => 'unknown tool nope' } ], isError => T() },
+    nope => { content => [ { type => 'text', text => '<tool_use_error>Error: No such tool available: nope</tool_use_error>' } ], isError => T() },
     raider_ask_user => { type => 'result', content => [ { type => 'text', text => 'yes' } ] },
     raider_wait => { content => [ { type => 'text', text => 'Waited 0 seconds.' } ] },
   ] ], 'every call of the batch left its result, in order');
@@ -206,19 +206,22 @@ subtest 'langfuse observations and tool-result shapes of a two-turn raid' => sub
     [ span => { trace_id => 'trace-1', parent_observation_id => 'span-2', name => 'tool: fail',
       input => { v => 2 }, output => "Error calling tool 'fail': boom",
       start_time => 't5', end_time => 't6', level => 'ERROR' } ],
-    # the unknown tool 'nope' takes its start time (t7) but is never traced
+    # the unknown tool 'nope' is traced like any failed call (k177)
+    [ span => { trace_id => 'trace-1', parent_observation_id => 'span-2', name => 'tool: nope',
+      input => {}, output => '<tool_use_error>Error: No such tool available: nope</tool_use_error>',
+      start_time => 't7', end_time => 't8', level => 'ERROR' } ],
     [ span => { trace_id => 'trace-1', parent_observation_id => 'span-2', name => 'tool: raider_ask_user',
-      input => { question => 'q?' }, output => 'yes', start_time => 't8', end_time => 't9' } ],
+      input => { question => 'q?' }, output => 'yes', start_time => 't9', end_time => 't10' } ],
     [ span => { trace_id => 'trace-1', parent_observation_id => 'span-2', name => 'tool: raider_wait',
-      input => { seconds => 0 }, output => 'Waited 0 seconds.', start_time => 't10', end_time => 't11' } ],
-    [ update_span => { id => 'span-2', end_time => 't12', metadata => { tool_calls => 5,
+      input => { seconds => 0 }, output => 'Waited 0 seconds.', start_time => 't11', end_time => 't12' } ],
+    [ update_span => { id => 'span-2', end_time => 't13', metadata => { tool_calls => 5,
       tools_used => [ qw( echo fail nope raider_ask_user raider_wait ) ] } } ],
-    [ span => { trace_id => 'trace-1', name => 'iteration-2', start_time => 't13' } ],
-    [ generation => { trace_id => 'trace-1', parent_observation_id => 'span-9',
+    [ span => { trace_id => 'trace-1', name => 'iteration-2', start_time => 't14' } ],
+    [ generation => { trace_id => 'trace-1', parent_observation_id => 'span-10',
       name => 'llm-call', model => 'loop-model', input => [ @$conv1, ( { role => 'tool', content => 'r' } ) x 5 ],
-      output => 'all done', start_time => 't13', end_time => 't14',
+      output => 'all done', start_time => 't14', end_time => 't15',
       usage => $lu, model_parameters => $mp } ],
-    [ update_span => { id => 'span-9', end_time => 't14', output => 'all done' } ],
+    [ update_span => { id => 'span-10', end_time => 't15', output => 'all done' } ],
     [ update_trace => { id => 'trace-1', output => 'all done' } ],
   ], 'the Langfuse observations of the raid');
 

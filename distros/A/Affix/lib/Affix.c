@@ -1,3 +1,10 @@
+/*
+|-------------------0----------------|--0---4----------------------------||
+|.----------0---3-------0---3---0----|----------3---0-------0---3---0---.||
+|.------2----------------------------|----------------------------------.||
+|---3--------------------------------|------------------3----------------||
+*/
+
 #include "Affix.h"
 #if defined(__sun) && !defined(alloca)
 #  include <alloca.h>    /* Solaris/Illumos only declare alloca() here (perl.h pulls it in on glibc/MSVC) */
@@ -12,15 +19,8 @@
 #else
 #  define AFFIX_ALLOCA(_size) alloca(_size)
 #endif
-/*
-|-------------------0----------------|--0---4----------------------------||
-|.----------0---3-------0---3---0----|----------3---0-------0---3---0---.||
-|.------2----------------------------|----------------------------------.||
-|---3--------------------------------|------------------3----------------||
-*/
 
-static void rebuild_backend_data(pTHX_ Affix_Backend * backend);
-static void rebuild_affix_data(pTHX_ Affix * affix);
+static c23_maybe_unused void rebuild_affix_data(pTHX_ Affix * affix);
 static const infix_type * _resolve_type(pTHX_ const infix_type * type);
 static infix_library_t * _get_lib_from_registry(pTHX_ const char * path);
 
@@ -31,7 +31,6 @@ static void _cleanup_arena(pTHX_ void * ptr) {
 }
 
 static MGVTBL Affix_cv_vtbl;
-static MGVTBL Affix_backend_vtbl;
 extern MGVTBL vtbl_sint8, vtbl_uint8, vtbl_sint16, vtbl_uint16, vtbl_sint32, vtbl_uint32, vtbl_sint64, vtbl_uint64,
     vtbl_float, vtbl_double, vtbl_float16, vtbl_bool, vtbl_sint128, vtbl_uint128, vtbl_void, vtbl_bitfield,
     vtbl_pointer, vtbl_array, string_vtable, wstring_vtable, vtbl_lazy_aggregate, vtbl_enum;
@@ -51,7 +50,6 @@ static __int128_t sv_to_int128(pTHX_ SV * sv) {
 
     STRLEN len;
     const char * s = SvPV(sv, len);
-    char * end;
     // Note: We assume base 10. Future me might implement a
     // custom parser here, but strtoll isn't enough either.
     __int128_t res = 0;
@@ -66,7 +64,7 @@ static __int128_t sv_to_int128(pTHX_ SV * sv) {
         s++;
     while (*s >= '0' && *s <= '9') {
         int digit = *s - '0';
-        if (res > (__int128_t)(((__uint128_t)0x7FFFFFFFFFFFFFFFULL << 64) | 0xFFFFFFFFFFFFFFFFULL - digit) / 10)
+        if (res > (__int128_t)((((__uint128_t)0x7FFFFFFFFFFFFFFFULL << 64) | (0xFFFFFFFFFFFFFFFFULL - digit)) / 10))
             croak("Integer overflow in int128 parsing");
         res = res * 10 + digit;
         s++;
@@ -89,7 +87,7 @@ static __uint128_t sv_to_uint128(pTHX_ SV * sv) {
 
     while (*s >= '0' && *s <= '9') {
         int digit = *s - '0';
-        if (res > (((__uint128_t)0xFFFFFFFFFFFFFFFFULL << 64) | 0xFFFFFFFFFFFFFFFFULL - digit) / 10)
+        if (res > ((((__uint128_t)0xFFFFFFFFFFFFFFFFULL << 64) | (0xFFFFFFFFFFFFFFFFULL - digit)) / 10))
             croak("Integer overflow in uint128 parsing");
         res = res * 10 + digit;
         s++;
@@ -317,7 +315,7 @@ static void pull_pointer_as_wstring(pTHX_ Affix * affix, SV * sv, const infix_ty
     // Worst case UTF-8 expansion: 1 wchar (4 bytes) -> 4 UTF-8 bytes.
     // +1 for null terminator.
     SvPVCLEAR(sv);
-    char * d = SvGROW(sv, (wlen * sizeof(wchar_t)) + 1);
+    char * d = SvGROW(sv, (wlen * UTF8_MAXBYTES) + 1);
     wchar_t * s = wstr;
 
     while (*s) {
@@ -843,8 +841,9 @@ static Affix_Opcode get_opcode_for_type(pTHX_ const infix_type * type) {
                 if (pointee->meta.primitive_id == INFIX_PRIMITIVE_SINT8 ||
                     pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT8)
                     return OP_PUSH_PTR_CHAR;
-                // A pointer to a wchar_t-sized primitive is a wide string (WString).
-                if (infix_type_get_size(pointee) == sizeof(wchar_t))
+                if ((pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT16 ||
+                     pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT32) &&
+                    infix_type_get_size(pointee) == sizeof(wchar_t))
                     return OP_PUSH_PTR_WCHAR;
             }
             return OP_PUSH_POINTER;
@@ -943,10 +942,11 @@ static Affix_Opcode get_ret_opcode_for_type(pTHX_ const infix_type * type) {
                 pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT8) {
                 return OP_RET_PTR_CHAR;
             }
-#if defined(INFIX_OS_WINDOWS)
-            if (infix_type_get_size(pointee) == sizeof(wchar_t))
+            if ((pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT16 ||
+                 pointee->meta.primitive_id == INFIX_PRIMITIVE_UINT32) &&
+                infix_type_get_size(pointee) == sizeof(wchar_t))
                 return OP_RET_PTR_WCHAR;
-#endif
+
         }
         return OP_RET_PTR;
     }
@@ -1209,6 +1209,35 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
             *(const char **)c_arg_ptr = SvPV_nolen(sv);
             return;
         }
+        // Wide string pointer (wchar_t* / WString)
+        if (pointee_type->category == INFIX_TYPE_PRIMITIVE &&
+            (pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT16 ||
+             pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT32) &&
+            infix_type_get_size(pointee_type) == sizeof(wchar_t)) {
+            STRLEN wlen;
+            U8 * s = (U8 *)SvPVutf8(sv, wlen);
+            U8 * e = s + wlen;
+            size_t el_sz = sizeof(wchar_t);
+            wchar_t * wbuf = (wchar_t *)infix_arena_alloc(affix->call_args_arena, (wlen + 1) * el_sz, el_sz);
+            wchar_t * d = wbuf;
+            while (s < e) {
+                STRLEN rlen;
+                UV uv = utf8_to_uvchr_buf(s, e, &rlen);
+                if (rlen == 0)
+                    break;
+                if (el_sz == 2 && uv > 0xFFFF) {
+                    uv -= 0x10000;
+                    *d++ = (wchar_t)((uv >> 10) + 0xD800);
+                    *d++ = (wchar_t)((uv & 0x3FF) + 0xDC00);
+                }
+                else
+                    *d++ = (wchar_t)uv;
+                s += rlen;
+            }
+            *d = 0;
+            *(wchar_t **)c_arg_ptr = wbuf;
+            return;
+        }
     }
     sv_dump(sv);
     char signature_buf[256];
@@ -1442,7 +1471,7 @@ static void plan_step_push_callback(pTHX_ Affix * affix,
     push_reverse_trampoline(aTHX_ affix, type, sv, c_arg_ptr);
 }
 
-static void plan_step_call_c_function(pTHX_ Affix * affix,
+static c23_maybe_unused void plan_step_call_c_function(pTHX_ Affix * affix,
                                       Affix_Plan_Step * step,
                                       SV ** perl_stack_frame,
                                       void * args_buffer,
@@ -1454,7 +1483,7 @@ static void plan_step_call_c_function(pTHX_ Affix * affix,
     affix->cif(ret_buffer, c_args);
 }
 
-static void plan_step_pull_return_value(pTHX_ Affix * affix,
+static c23_maybe_unused void plan_step_pull_return_value(pTHX_ Affix * affix,
                                         Affix_Plan_Step * step,
                                         SV ** perl_stack_frame,
                                         void * args_buffer,
@@ -1629,13 +1658,10 @@ static void writeback_pointer_generic(pTHX_ Affix * affix, const OutParamInfo * 
         AV * av = (AV *)perl_sv;
         size_t count = av_len(av) + 1;
         size_t elem_size = infix_type_get_size(info->pointee_type);
-        void * elem_ptr = nullptr;
         for (size_t i = 0; i < count; ++i) {
             SV ** item_ptr = av_fetch(av, i, 0);
-            if (item_ptr) {
-                elem_ptr = (char *)inner_ptr + (i * elem_size);
+            if (item_ptr)
                 ptr2sv(aTHX_ affix, (char *)inner_ptr + (i * elem_size), *item_ptr, info->pointee_type, false);
-            }
         }
         return;
     }
@@ -1973,21 +1999,25 @@ CASE_OP_PUSH_PTR_WCHAR:                                                         
                 STRLEN len;                                                                                     \
                 U8 * s = (U8 *)SvPVutf8(sv, len);                                                               \
                 U8 * e = s + len;                                                                               \
-                Newx(*(void **)ptr, len + 1, wchar_t);                                                          \
-                wchar_t * d = *(void **)ptr;                                                                    \
+                size_t el_sz = sizeof(wchar_t);                                                                 \
+                wchar_t * wbuf = (wchar_t *)infix_arena_alloc(affix->call_args_arena, (len + 1) * el_sz, el_sz);\
+                wchar_t * d = wbuf;                                                                             \
                 while (s < e) {                                                                                 \
-                    UV uv = utf8_to_uvchr_buf(s, e, nullptr);                                                   \
-                    if (sizeof(wchar_t) == 2 && uv > 0xFFFF) {                                                  \
+                    STRLEN rlen;                                                                                \
+                    UV uv = utf8_to_uvchr_buf(s, e, &rlen);                                                     \
+                    if (rlen == 0)                                                                              \
+                        break;                                                                                  \
+                    if (el_sz == 2 && uv > 0xFFFF) {                                                            \
                         uv -= 0x10000;                                                                          \
                         *d++ = (wchar_t)((uv >> 10) + 0xD800);                                                  \
                         *d++ = (wchar_t)((uv & 0x3FF) + 0xDC00);                                                \
                     }                                                                                           \
                     else                                                                                        \
                         *d++ = (wchar_t)uv;                                                                     \
-                    s += UTF8SKIP(s);                                                                           \
+                    s += rlen;                                                                                  \
                 }                                                                                               \
                 *d = 0;                                                                                         \
-                SAVEFREEPV(*(void **)ptr);                                                                      \
+                *(wchar_t **)ptr = wbuf;                                                                        \
             }                                                                                                   \
             else if (!SvOK(sv))                                                                                 \
                 *(void **)ptr = nullptr;                                                                        \
@@ -2815,18 +2845,26 @@ XS_INTERNAL(Affix_affix) {
             size_t arg_len = strlen(arg_sig);
             if (arg_len >= sig_remaining)
                 croak("Signature too long (buffer overflow)");
+
+            // If this argument is a VarArgs marker, ensure no preceding comma
+            if (arg_sig[0] == ';') {
+                if (sig_pos > 0 && signature_buf[sig_pos - 1] == ',')
+                    sig_pos--;
+                memcpy(signature_buf + sig_pos, arg_sig, arg_len);
+                sig_pos += arg_len;
+                sig_remaining -= arg_len;
+                continue;
+            }
+
             memcpy(signature_buf + sig_pos, arg_sig, arg_len);
             sig_pos += arg_len;
             sig_remaining -= arg_len;
 
-            // Logic to prevent adding commas around ';', which denotes VarArgs start
             if (i < num_args - 1) {
-                if (strEQ(arg_sig, ";"))
-                    continue;
                 SV ** next_sv_ptr = av_fetch(args_av, i + 1, 0);
                 if (next_sv_ptr) {
                     const char * next_sig = _get_string_from_type_obj(aTHX_ * next_sv_ptr);
-                    if (next_sig && strEQ(next_sig, ";"))
+                    if (next_sig && next_sig[0] == ';')
                         continue;
                 }
                 if (sig_remaining < 2)
@@ -3210,9 +3248,9 @@ XS_INTERNAL(Affix_Bundled_DESTROY) {
     XSRETURN_EMPTY;
 }
 
-XS_INTERNAL(Affix_DESTROY) {
+c23_maybe_unused XS_INTERNAL(Affix_DESTROY) {
     dXSARGS;
-    dMY_CXT;
+    //dMY_CXT;
     PERL_UNUSED_VAR(items);
     Affix * affix;
     STMT_START {
@@ -3332,7 +3370,7 @@ static void pull_union(pTHX_ Affix * affix, SV * sv, const infix_type * type, vo
 }
 
 // Helper for portability if strnlen isn't available
-static size_t _safe_strnlen(const char * s, size_t maxlen) {
+static c23_maybe_unused size_t _safe_strnlen(const char * s, size_t maxlen) {
     size_t len;
     for (len = 0; len < maxlen; len++, s++)
         if (!*s)
@@ -3525,7 +3563,7 @@ static void pull_pointer_as_string(pTHX_ Affix * affix, SV * sv, const infix_typ
         sv_setpv(sv, (const char *)c_ptr);
 }
 
-static void pull_pointer_as_struct(pTHX_ Affix * affix, SV * sv, const infix_type * type, void * p, bool readonly) {
+static c23_maybe_unused void pull_pointer_as_struct(pTHX_ Affix * affix, SV * sv, const infix_type * type, void * p, bool readonly) {
     void * c_ptr = *(void **)p;
     if (c_ptr == nullptr)
         sv_setsv(sv, &PL_sv_undef);
@@ -3550,7 +3588,7 @@ static void pull_struct_as_live(pTHX_ Affix * affix, SV * sv, const infix_type *
     SvREFCNT_dec(rv);
 }
 #endif
-static void pull_pointer_as_array(pTHX_ Affix * affix, SV * sv, const infix_type * type, void * p, bool readonly) {
+static c23_maybe_unused void pull_pointer_as_array(pTHX_ Affix * affix, SV * sv, const infix_type * type, void * p, bool readonly) {
     void * c_ptr = *(void **)p;
     if (c_ptr == nullptr)
         sv_setsv(sv, &PL_sv_undef);
@@ -3787,7 +3825,6 @@ static const Affix_Pull pull_handlers[] = {[INFIX_PRIMITIVE_BOOL] = pull_bool,
 #endif
 };
 
-
 Affix_Pull get_pull_handler(pTHX_ const infix_type * type) {
     const char * name = infix_type_get_name(type);
     if (!name && type->category == INFIX_TYPE_NAMED_REFERENCE)
@@ -3826,11 +3863,13 @@ Affix_Pull get_pull_handler(pTHX_ const infix_type * type) {
 
             if (pointee_type->category == INFIX_TYPE_PRIMITIVE) {
                 if (pointee_type->meta.primitive_id == INFIX_PRIMITIVE_SINT8 ||
-                    pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT8) {
+                    pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT8)
                     return pull_pointer_as_string;
-                }
             }
-
+            if ((pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT16 ||
+                pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT32) &&
+                infix_type_get_size(pointee_type) == sizeof(wchar_t))
+                return pull_pointer_as_wstring;
             /* Structural StringList Detection (char **) */
             if (is_string_list_type(aTHX_ type))
                 return pull_stringlist;
@@ -3892,7 +3931,7 @@ void ptr2sv(pTHX_ Affix * affix, void * c_ptr, SV * perl_sv, const infix_type * 
     h(aTHX_ affix, perl_sv, type, c_ptr, readonly);
 }
 
-static int _get_pointer_depth(const infix_type * t) {
+static c23_maybe_unused int _get_pointer_depth(const infix_type * t) {
     int depth = 0;
     while (t && t->category == INFIX_TYPE_POINTER) {
         depth++;
@@ -4402,15 +4441,63 @@ XS_INTERNAL(Affix_get_last_error_message) {
         ST(0) = sv_2mortal(newSVpvf("System error: %s (code %ld)", buf, err.system_error_code));
     }
 #endif
-    else
+    else if (err.code != INFIX_CODE_SUCCESS)
         ST(0) = sv_2mortal(newSVpvf("Infix error code %d at position %zu", (int)err.code, err.position));
+    else
+        ST(0) = &PL_sv_undef;
     XSRETURN(1);
 }
 
+XS_INTERNAL(Affix_error) {
+    dXSARGS;
+    PERL_UNUSED_VAR(items);
+
+    // Check infix JIT/Parser error first
+    infix_error_details_t err = infix_get_last_error();
+    if (err.message[0] != '\0') {
+        ST(0) = sv_2mortal(newSVpv(err.message, 0));
+        XSRETURN(1);
+    }
+    if (err.code != INFIX_CODE_SUCCESS) {
+        ST(0) = sv_2mortal(newSVpvf("Infix error code %d at position %zu", (int)err.code, err.position));
+        XSRETURN(1);
+    }
+
+    // Check system error (errno on Unix, GetLastError on Windows)
+#if defined(INFIX_OS_WINDOWS)
+    DWORD win_err = GetLastError();
+    if (win_err != 0) {
+        char buf[256];
+        DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                   nullptr,
+                                   win_err,
+                                   0,
+                                   buf,
+                                   sizeof(buf),
+                                   nullptr);
+        if (len > 0) {
+            while (len > 0 && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
+                buf[--len] = '\0';
+            ST(0) = sv_2mortal(newSVpv(buf, len));
+            XSRETURN(1);
+        }
+    }
+#else
+    if (errno != 0) {
+        const char * msg = strerror(errno);
+        if (msg) {
+            ST(0) = sv_2mortal(newSVpv(msg, 0));
+            XSRETURN(1);
+        }
+    }
+#endif
+
+    XSRETURN_UNDEF;
+}
 
 XS_INTERNAL(Affix_find_symbol) {
     dXSARGS;
-    dMY_CXT;  // Require the thread-local context
+    //dMY_CXT;  // Require the thread-local context
     if (items != 2 || !sv_isobject(ST(0)) || !sv_derived_from(ST(0), "Affix::Lib"))
         croak_xs_usage(cv, "Affix_Lib_object, symbol_name");
     IV tmp = SvIV((SV *)SvRV(ST(0)));
@@ -4813,6 +4900,9 @@ XS_INTERNAL(Affix_register_types_raw) {
 XS_INTERNAL(Affix_dump_registry) {
     dXSARGS;
     dMY_CXT;
+
+    PERL_UNUSED_VAR(items);
+
     char * buffer;
     size_t size = 1024 * 128;  // 128KB
     Newxz(buffer, size, char);
@@ -4829,6 +4919,8 @@ XS_INTERNAL(Affix_dump_registry) {
 XS_INTERNAL(Affix_defined_types) {
     dXSARGS;
     dMY_CXT;
+
+    PERL_UNUSED_VAR(items);
     PERL_UNUSED_VAR(cv);
 
     size_t count = 0;
@@ -4980,7 +5072,7 @@ XS_INTERNAL(Affix_malloc) {
 
 XS_INTERNAL(Affix_calloc) {
     dXSARGS;
-    dMY_CXT;
+    //dMY_CXT;
     if (items != 2)
         croak_xs_usage(cv, "count, size");
 
@@ -5875,6 +5967,7 @@ void boot_Affix(pTHX_ CV * cv) {
         // Library & core utils
         XSUB_EXPORT(load_library, "$", "lib");
         XSUB_EXPORT(find_symbol, "$$", "lib");
+        XSUB_EXPORT(error, "", "core");
         XSUB_EXPORT(get_last_error_message, "", "core");
 
         // Introspection

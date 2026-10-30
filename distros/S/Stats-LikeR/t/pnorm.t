@@ -145,8 +145,9 @@ is_approx( pnorm('-inf'), 0, 'pnorm(-Inf) = 0');
 }
 
 # usage / argument errors
-throws_ok { pnorm() }                    qr/Usage: pnorm/,           'pnorm: no args croaks';
-throws_ok { pnorm(1, 'mean') }           qr/even number of key-value/,'pnorm: dangling named arg croaks';
+throws_ok { pnorm() }                    qr/\Ausage: pnorm\(.*^options:\n.*^example:\n.*\n\npnorm: error: the first argument, a number or an array reference, is required\n\z/ms,
+	'pnorm: no args croaks with the help screen, and the error last';
+throws_ok { pnorm(1, 'mean') }           qr/^pnorm: error: arguments after x must be name => value pairs$/m,'pnorm: dangling named arg croaks';
 throws_ok { pnorm(1, foo => 2) }         qr/unknown argument 'foo'/, 'pnorm: unknown named arg croaks';
 
 # no memory leaks  (hoist real calls out of the closure first)

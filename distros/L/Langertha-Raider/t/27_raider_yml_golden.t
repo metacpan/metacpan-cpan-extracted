@@ -48,7 +48,7 @@ sub app {
   );
 }
 
-sub perl_tools_on { scalar(@{ $_[0]->_mcps }) == 4 }   # files, bash, web + perl
+sub perl_tools_on { scalar grep { $_->name eq 'perl_eval' } $_[0]->_mounted_tools }   # PerlTools mounted
 
 sub run_raider {
   my ( @args ) = @_;
@@ -86,7 +86,7 @@ subtest 'sectioned file: default then engine section' => sub {
 subtest 'skills as a hash does not disable flat keys' => sub {
   my $root = fixture_root('skills-hash.yml', 'myskills/style.md' => "# Style\n");
   my $app = app($root);
-  is([ $app->loaded_skill_names ], ['style.md'], 'hash skill spec loaded');
+  is([ $app->loaded_skill_names ], ['style'], 'hash skill spec loaded');
   ok(perl_tools_on($app), 'perl: true still applies');
   is($app->_engine_yml_options, { temperature => 0.3 }, 'temperature still applies');
 };
@@ -94,7 +94,10 @@ subtest 'skills as a hash does not disable flat keys' => sub {
 subtest 'skills under default: are loaded' => sub {
   my $root = fixture_root('skills-default.yml', 'AGENTS.md' => "# Agents\n");
   my $app = app($root);
-  is([ $app->loaded_skill_names ], ['AGENTS.md'], 'default: skills loaded');
+  # ADR 0019: openai loads AGENTS.md as an instructions item, not as a skill.
+  is([ $app->loaded_skill_names ], [], 'AGENTS.md is no skill');
+  like($app->mission, qr/^Contents of \S+AGENTS\.md \(project instructions \(AGENTS\.md\)\):\n\n# Agents$/m,
+    'default: skills: [openai] loads AGENTS.md');
   is([ $app->ignored_agent_files ], [], 'AGENTS.md not reported as ignored');
   is($app->_engine_yml_options, { temperature => 0.4 }, 'skills is no engine option');
 };
@@ -102,31 +105,44 @@ subtest 'skills under default: are loaded' => sub {
 subtest 'CLI skills merge with yml skills' => sub {
   my $root = fixture_root('skills-list.yml',
     'AGENTS.md' => "# Agents\n", 'extra/tips.md' => "# Tips\n");
+  my $agents = sub { scalar( () = $_[0]->mission =~ /^# Agents$/mg ) };
   my $app = app($root, cli_skill_sources => [ { type => 'dir', path => 'extra' } ]);
-  is([ $app->loaded_skill_names ], ['AGENTS.md', 'tips.md'], 'yml and CLI skills both loaded');
+  is([ $app->loaded_skill_names ], ['tips'], 'CLI skill listed');
+  is($agents->($app), 1, 'yml AGENTS.md loaded');
 
-  my $dup = app($root, cli_skill_sources => [ { type => 'file', path => 'AGENTS.md' } ]);
-  is([ $dup->loaded_skill_names ], ['AGENTS.md'], 'same source given twice loads once');
+  my $dup = app($root, cli_skill_sources => [ 'openai' ]);
+  is($agents->($dup), 1, 'same profile given twice loads once');
 
   my $explicit = app($root, skill_sources => [ { type => 'dir', path => 'extra' } ]);
-  is([ $explicit->loaded_skill_names ], ['tips.md'],
+  is([ $explicit->loaded_skill_names ], ['tips'],
     'explicit skill_sources (Perl API) still replace the yml list');
 };
 
-subtest 'bin/raider persists --skills like --claude' => sub {
+subtest 'bin/raider persists --skills, --claude as claude: true' => sub {
   my $root = fixture_root('skills-list.yml', 'extra/tips.md' => "# Tips\n");
   my $out = $root->child('SKILL.md');
   my ( $exit, $log ) = run_raider('-k', 'test', '-e', 'openai', '-r', "$root",
     '--claude', '--skills', 'extra', "--export-skill=$out");
   is($exit, 0, 'raider exits cleanly') or diag $log;
   my $yml = YAML::PP->new->load_string($root->child('.raider.yml')->slurp_utf8);
-  is($yml->{skills}, ['openai', 'claude', 'extra'], 'profile and dir appended once');
+  is($yml->{skills}, ['openai', 'extra'], 'dir appended once');
+  ok($yml->{claude}, '--claude saved as claude: true (ADR 0019)');
 
   ( $exit, $log ) = run_raider('-k', 'test', '-e', 'openai', '-r', "$root",
     '--claude', '--skills', 'extra', "--export-skill=$out");
   is($exit, 0, 'second run exits cleanly') or diag $log;
-  $yml = YAML::PP->new->load_string($root->child('.raider.yml')->slurp_utf8);
-  is($yml->{skills}, ['openai', 'claude', 'extra'], 'no duplicates on repeat');
+  my $again = YAML::PP->new->load_string($root->child('.raider.yml')->slurp_utf8);
+  is($again, $yml, 'no change on repeat');
+};
+
+subtest 'bin/raider in a Claude project saves nothing' => sub {
+  my $root = fixture_root(undef, 'CLAUDE.md' => "# Claude\n", 'extra/tips.md' => "# Tips\n");
+  my $out = $root->child('SKILL.md');
+  my ( $exit, $log ) = run_raider('-k', 'test', '-e', 'openai', '-r', "$root",
+    '--claude', '--openai', '--skills', 'extra', "--export-skill=$out");
+  is($exit, 0, 'raider exits cleanly') or diag $log;
+  ok(!-e $root->child('.raider.yml'), 'no .raider.yml');
+  ok(!-e $root->child('.raider'), 'no .raider/');
 };
 
 subtest 'engine: in yml picks the engine' => sub {

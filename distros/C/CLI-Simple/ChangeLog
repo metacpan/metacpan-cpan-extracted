@@ -1,3 +1,104 @@
+Thu Oct 29 08:21:10 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.4.0]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/CLI/Simple.pm.in
+	- replace "Not a Framework" POD section with description of single-module and role-based usage paths
+	(use_options): new
+	- register named option providers keyed by name => { role => \@options }
+	- applies role via Role::Tiny::apply_roles_to_package
+	- records registration order in %OPTION_PROVIDER_ORDER and provider details in %OPTION_PROVIDERS
+	- croaks on odd args, invalid name, duplicate name, or non-array option list
+	(resolve_option_providers): new
+	- called from new() before init_defaults()
+	- iterates registered providers in registration order
+	- skips options already resolved from command-line or a prior provider
+	- calls optional _${name}_init then _${name}_resolve
+	- validates resolver returns a HASH ref containing only requested option names
+	- sets resolved options via set() and marks them resolved
+	(init_defaults)
+	- accept $resolved hashref parameter
+	- skip options already present in $resolved before checking defined value, preventing provider-supplied values from being overwritten by defaults
+	(new)
+	- call resolve_option_providers() with a map of command-line-supplied options and the full accessor list before calling init_defaults()
+	- pass resolved map to init_defaults()
+	* t/07-option-providers.t: new
+	- test use_options registration: valid and invalid provider names, duplicate provider detection, odd-argument error, invalid definition structure, non-array option list
+	* t/08-option-provider-resolution.t: new
+	- test resolve_option_providers(): provider supplies values for unresolved options
+	- command-line options take precedence over provider
+	- provider returning unrequested option croaks
+	- empty option list causes provider to resolve all eligible accessors
+	- optional _init hook is called when present
+	* .includes/publish.mk: deleted
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.yml: new
+
+Thu Oct 15 15:18:45 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.2]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/CLI/Simple.pm.in
+	- POD updates
+	(main)
+	- allow multple instances of CLI::Simple enable logging separately
+	(import)
+	- accept explicit YAML filenames and glob patterns as import arguments
+	- expand glob patterns before manifest loading
+	- prepend File::ShareDir path to yaml_files list when :roles specified
+	- dispatch to _load_manifest for any collected yaml_files
+	(_validate_manifest): new
+	- validate manifest is a HASH, reject unknown keys, enforce section types
+	- reject non-scalar values in options and extra_options sections
+	(_load_manifest)
+	- accept multiple yaml_files; merge commands, roles, options, default_options, extra_options across all manifests
+	- enforce uniqueness of command names, option names (including aliases), and default_option keys across manifests
+	- allow repeated extra_options declarations without error
+	- restrict alias and abbreviations metadata to primary manifest only
+	- call _validate_manifest per file before merging
+	(_normalize_manifest): extracted from _load_manifest; performs role normalization and selective_roles construction
+	(init_options): new no-op hook called after init_logger and before init()
+	(new)
+	- call init_defaults() after init() to allow init() to add defaults
+	(init_logger)
+	- resolve log level as: --log-level > command-level > log4perl default
+	- set log level unconditionally after logger is available
+	- remove early-return path that skipped level resolution when command lacked an ARRAY handler
+	(usage)
+	- use MODULINO_MODULE_NAME env var to locate POD input when wrapper differs from module name
+	* bin/create-modulino.in: aligned with .includes/modulino.mk
+	* lib/CLI/Simple/Modulino.pm.in: likewise
+	* t/cli-simple-manifest.t
+	- add English qw(-no_match_vars)
+	- test loading multiple explicit YAML manifests via import arguments
+	- test glob pattern expansion during import
+	- test unmatched glob produces no error and no manifest
+	- test missing explicit YAML file produces an error identifying the path
+	* t/log-level-precedence.t: new
+	- test log level precedence: --log-level > command level > use_log4perl default
+	* .includes/add-plugin.mk: new
+	* .includes/release-notes.mk: deleted
+	* .includes/test.mk
+	- replace GSOURCE_FILES with SOURCE_FILES in test, test-all, and check targets
+	* .includes/update.mk
+	- add INCLUDES_DIR and BOOTSTRAPPER_DIST_DIR variable definitions
+	- add pre-update phony target with extensible double-colon rule
+	- make post-update depend on pre-update with double-colon rule
+	- move Makefile copy and chmod into post-update
+	- call pre-update explicitly from update before copying managed files
+	* Makefile
+	- add add-plugin.mk to MANAGED_MK_FILES; remove publish.mk and release-notes.mk
+	- include $(wildcard .roles/*/role.mk) for project-registered command role extensions
+	- make local/.installed order-only prerequisite for tarball conditional on SKIP_TESTS
+	- add DEPENDENCY_FILES, MISSING_DEPENDENCY_FILES, and force-reconcile target
+	- trigger reconciliation when any dependency file is absent
+	- check for missing dependency file in reconcile condition alongside .reconciled sentinel
+	- remove --log-level info from test-requires.scan scandeps invocation
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.yml: new
+
 Fri Oct  9 16:49:25 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.3.1]:

@@ -100,6 +100,10 @@ my %manifests = (
   '/noauth.json' => manifest( endpoints => [ { id => 'chat', dialect => 'openai-chat', base_url => 'ORIGIN/v1' } ], auth => [],
                       models => [ { id => 'm1', endpoint_ref => 'chat' } ] ),
   '/redir.json'  => manifest( endpoints => [ { id => 'chat', dialect => 'openai-chat', base_url => 'ORIGIN/redir/v1', auth_ref => 'api' } ] ),
+  '/multi.json'  => manifest( endpoints => [
+                        { id => 'chat',  dialect => 'openai-chat', base_url => 'ORIGIN/v1', auth_ref => 'api' },
+                        { id => 'chat2', dialect => 'openai-chat', base_url => 'ORIGIN/v1', auth_ref => 'api' } ],
+                      models => [ { id => 'm1', endpoint_ref => 'chat' }, { id => 'm1', endpoint_ref => 'chat2' } ] ),
   '/pigeon.json' => manifest( endpoints => [ { id => 'chat', dialect => 'carrier-pigeon', base_url => 'ORIGIN/v1', auth_ref => 'api' } ] ),
 );
 my %routes = map {
@@ -268,6 +272,74 @@ subtest 'provider-side refusals: exit 1' => sub {
   ( $exit, $out, $err ) = provider_run( '/pigeon.json', '-k', 'sk', 'hi' );
   is( $exit, 1, 'an unknown dialect' );
   like( $err, qr/^raider --provider: failed: endpoint 'chat': dialect 'carrier-pigeon' is unknown to this raider/, 'no guessing' );
+};
+
+subtest 'a model on several endpoints: refused, the user chooses (k150)' => sub {
+  my $seen = () = $srv->requests;
+  my ( $exit, $out, $err ) = provider_run( '/multi.json', '-k', 'sk', '-m', 'm1', 'hi' );
+  is( $exit, 1, 'exit 1' );
+  is( $out, '', 'no --json: nothing on stdout' );
+  like( $err, qr/^raider --provider: failed: model 'm1' is offered on several endpoints \(chat: openai-chat, chat2: openai-chat\); raider does not choose between them: pick one with --provider-endpoint ID$/,
+    'names the endpoints and the way to choose' );
+  is( scalar( grep { $_->{path} =~ m{/chat/completions} } requests_since( $srv, $seen ) ), 0, 'nothing was sent to a model' );
+
+  ( $exit, $out, $err ) = provider_run( '/multi.json', '-k', 'sk', '-m', 'm1', '--provider-endpoint', 'chat2', '--json', 'say hello' );
+  is( $exit, 0, '--provider-endpoint chat2: runs' ) or diag $err;
+  is( JSON::MaybeXS->new->decode($out)->{response}, 'hello from the provider', 'the endpoint answered' );
+
+  ( $exit, $out, $err ) = provider_run( '/multi.json', '-k', 'sk', '-m', 'm1', '--provider-endpoint', 'nope', 'hi' );
+  is( $exit, 2, 'an endpoint that is none: usage' );
+  like( $err, qr/model 'm1' is not listed on endpoint 'nope' \(it is on: chat, chat2\)/, 'says where it is' );
+
+  ( $exit, $out, $err ) = main_run( '--provider-endpoint', 'chat', 'hi' );
+  is( $exit, 2, 'without --provider: usage' );
+  like( $err, qr/^--provider-endpoint: only with --provider$/, 'says so' );
+};
+
+subtest 'a --provider error with --json is a refused or failed document on stdout (k150)' => sub {
+  my $json   = JSON::MaybeXS->new;
+  my $millis = qr/\A\d+(?:\.\d{1,3})?\z/;
+  my ( $exit, $out, $err ) = provider_run( '/multi.json', '-k', 'sk', '-m', 'm1', '--json', 'hi' );
+  is( $exit, 1, 'failed: exit code unchanged' );
+  my $doc = $json->decode($out);
+  is( [ @$doc{qw( version status provider )} ], [ 1, 'failed', $host ], 'the failed document' );
+  like( $doc->{error}, qr/model 'm1' is offered on several endpoints/, 'with the error' );
+  like( $doc->{elapsed}, $millis, 'elapsed to the millisecond, as in every document (k183)' );
+  like( $err, qr/^raider --provider: failed: /, 'stderr keeps the message' );
+
+  ( $exit, $out, $err ) = main_run( '--provider', $host, '-k', 'sk', '--json', 'hi' );
+  is( $exit, 1, 'refused: exit code unchanged' );
+  $doc = $json->decode($out);
+  is( $doc->{status}, 'refused', 'the refused document' );
+  like( $doc->{error}, qr/127\.0\.0\.1 is \(loopback address\); only --allow-internal/, 'with the reason' );
+  like( $doc->{elapsed}, $millis, 'a refused document has elapsed too (k183)' );
+
+  ( $exit, $out, $err ) = main_run( '--provider', $host, '--allow-internal', '--json', 'hi' );
+  is( $exit, 2, 'a usage error (no key): exit 2' );
+  $doc = $json->decode($out);
+  is( $doc->{status}, 'failed', 'a document too' );
+  like( $doc->{error}, qr/needs an API key/, 'with the reason' );
+  like( $doc->{elapsed}, $millis, 'and elapsed (k183)' );
+
+  ( $exit, $out, $err ) = main_run( '--provider', $host, '-e', 'openai', '--json', 'hi' );
+  is( $exit, 2, 'an option clash: exit 2' );
+  $doc = $json->decode($out);
+  like( $doc->{error}, qr/^--provider: not with -e\/--engine/, 'a document too' );
+  like( $doc->{elapsed}, $millis, 'and elapsed (k183)' );
+
+  ( $exit, $out, $err ) = main_run( '--provider', $host, '-e', 'openai', 'hi' );
+  is( $out, '', 'without --json stdout stays empty' );
+};
+
+subtest 'F38: a failed provider never falls back to another engine or key' => sub {
+  local @ENV{ keys %env_keys } = values %env_keys;
+  my $seen = () = $srv->requests;
+  my $other_seen = () = $other->requests;
+  my ( $exit, $out, $err ) = provider_run( '/pigeon.json', '--json', '-k', 'sk', 'hi' );
+  is( $exit, 1, 'exit 1' );
+  is( [ map { $_->{path} } requests_since( $srv, $seen ) ], ['/pigeon.json'], 'only the manifest was fetched' );
+  is( scalar( () = $other->requests ), $other_seen, 'nothing went anywhere else' );
+  unlike( $out.$err, qr/env-secret/, 'the environment key is not mentioned' );
 };
 
 subtest 'every request of this file, embeddings included' => sub {

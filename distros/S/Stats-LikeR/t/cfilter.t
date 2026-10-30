@@ -260,6 +260,14 @@ dies_ok { cfilter( 42, 'keep' => [ 'x' ] ) } 'non-reference data dies';
 # 9. No memory leaks across the by-name, default, omit and against paths.
 # Test::LeakTrace reports Devel::Cover's instrumentation SVs as leaks, so skip
 # the leak checks (which are the last tests here) when running under coverage.
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { cfilter({ x => [1] }); 1 } ? '' : $@;
+	like($err, qr/\Ausage: cfilter\(.*\n\ncfilter: error: \Qneed a keep or remove argument\E\n\z/s,
+		'cfilter: a call-form error prints the help screen, the error on its last line');
+}
+
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok { cfilter( \%hoa, 'keep' => [ 'x', 'y' ] ) } 'no leaks: keep by name';
 # The qr// is compiled outside the block on purpose: perl 5.10.0 leaks one SV

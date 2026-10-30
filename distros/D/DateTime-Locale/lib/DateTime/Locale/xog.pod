@@ -435,6 +435,24 @@ Soga locale.
    1995-12-22T09:05:02 = AF 1995 Des 22, Kuta
   -0010-09-15T04:44:23 = AZ -10 Seb 15, Muka
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AF 2008 Febwaliyo
+   1995-12-22T09:05:02 = AF 1995 Desemba
+  -0010-09-15T04:44:23 = AZ -10 Sebuttemba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AF 2008 Febwaliyo 5, Kubi
+   1995-12-22T09:05:02 = AF 1995 Desemba 22, Kuta
+  -0010-09-15T04:44:23 = AZ -10 Sebuttemba 15, Muka
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AF 2008 Febwaliyo 5
+   1995-12-22T09:05:02 = AF 1995 Desemba 22
+  -0010-09-15T04:44:23 = AZ -10 Sebuttemba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AF 2008 Feb 5

@@ -435,6 +435,24 @@ German Liechtenstein locale.
    1995-12-22T09:05:02 = Fr., 22. Dez. 1995 n. Chr.
   -0010-09-15T04:44:23 = Sa., 15. Sept. -10 v. Chr.
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = Februar 2008 n. Chr.
+   1995-12-22T09:05:02 = Dezember 1995 n. Chr.
+  -0010-09-15T04:44:23 = September -10 v. Chr.
+
+=head3 GyMMMMEd (d MMMM Y G, E)
+
+   2008-02-05T18:30:30 = 5 Februar 2008 n. Chr., Di.
+   1995-12-22T09:05:02 = 22 Dezember 1995 n. Chr., Fr.
+  -0010-09-15T04:44:23 = 15 September -10 v. Chr., Sa.
+
+=head3 GyMMMMd (d. MMMM y G)
+
+   2008-02-05T18:30:30 = 5. Februar 2008 n. Chr.
+   1995-12-22T09:05:02 = 22. Dezember 1995 n. Chr.
+  -0010-09-15T04:44:23 = 15. September -10 v. Chr.
+
 =head3 GyMMMd (d. MMM y G)
 
    2008-02-05T18:30:30 = 5. Feb. 2008 n. Chr.
@@ -644,6 +662,18 @@ German Liechtenstein locale.
    2008-02-05T18:30:30 = Februar 2008
    1995-12-22T09:05:02 = Dezember 1995
   -0010-09-15T04:44:23 = September -10
+
+=head3 yMMMMEd (E, d. MMMM y)
+
+   2008-02-05T18:30:30 = Di., 5. Februar 2008
+   1995-12-22T09:05:02 = Fr., 22. Dezember 1995
+  -0010-09-15T04:44:23 = Sa., 15. September -10
+
+=head3 yMMMMd (d. MMMM y)
+
+   2008-02-05T18:30:30 = 5. Februar 2008
+   1995-12-22T09:05:02 = 22. Dezember 1995
+  -0010-09-15T04:44:23 = 15. September -10
 
 =head3 yMMMd (d. MMM y)
 

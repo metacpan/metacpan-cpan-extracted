@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token::String;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20260216'; # VERSION
+our $VERSION = '2.20261029'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -38,21 +38,16 @@ sub parse {
         $is_first = 1;
     }
 
-    while ( length $header > 0 ) {
-        my $first = substr( $header,0,1 );
-        last if $first =~ /\s/;
-        last if $first eq ';';
-        last if $first eq '"' && ! $is_value && ! $is_first;
-        last if $first eq '(' && ! $is_value && ! $is_first;
-        last if $first eq '=' && ! $is_value && ! $is_first;
-        last if $first eq '/' && ! $is_value && ! $is_first;
-        last if $first eq '.' && ! $is_value && ! $is_first;
-
-        $value .= $first;
-        $header   = substr( $header,1 );
+    if ( $is_value || $is_first ) {
+        $value = $1 if $header =~ /^([^\s;]+)/;
+    }
+    else {
+        $value = $1 if $header =~ /^([^\s;"(=\/.]+)/;
     }
 
     croak 'Not a string' if $value eq q{};
+
+    $header = substr( $header, length $value );
 
     $self->{ 'value' } = $value;
     $self->{ 'header' } = $header;
@@ -74,7 +69,7 @@ Mail::AuthenticationResults::Token::String - Class for modelling AuthenticationR
 
 =head1 VERSION
 
-version 2.20260216
+version 2.20261029
 
 =head1 DESCRIPTION
 
@@ -82,11 +77,11 @@ Token representing a string
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

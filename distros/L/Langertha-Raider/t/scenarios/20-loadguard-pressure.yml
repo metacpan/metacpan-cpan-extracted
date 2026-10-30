@@ -1,0 +1,17 @@
+title: loadguard refuses a heavy bash command under memory pressure and the command never runs
+proc:
+  memory_full: 59.9
+  swap: 40
+prompt: Run the whole test suite.
+script:
+  - tool_calls:
+      - [ bash, { command: 'touch ran.txt && prove -lr t' } ]
+  - tool_calls:
+      - [ bash, { command: 'ls' } ]
+  - text: gewartet
+expect:
+  answer: gewartet
+  absent: [ ran.txt ]
+  tools:
+    - { name: bash, error: true, text: 'Command refused by loadguard: heavy command \(prove\): memory pressure full=59\.9% \(limit 10%\), swap 40% used \(limit 90%\)\.\nWait and retry later; light commands \(git status, ls, cat\) still run\.' }
+    - { name: bash, text: '\A\(Bash completed with no output\)\z' }

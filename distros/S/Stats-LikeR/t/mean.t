@@ -47,7 +47,7 @@ no_leaks_ok { eval { my $x = mean(-2, 0, 2) } } 'mean no leaks: negatives' unles
 # croak on empty input
 my $e_empty = '';
 eval { mean(); 1 } or $e_empty = $@;
-like $e_empty, qr/mean needs >= 1 element/, 'mean croaks on empty input';
+like $e_empty, qr/\Ausage: mean\(.*^mean: error: no values given\n\z/ms, 'mean croaks on empty input';
 no_leaks_ok { eval { mean() } } 'mean no leaks: empty croak' unless $INC{'Devel/Cover.pm'};
 
 # croak on undef scalar arg: message must be FORMATTED

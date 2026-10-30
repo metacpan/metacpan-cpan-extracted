@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Acme::Parataxis::Nursery - Structured Concurrency Container for Spawned Children that are all Joined, or all Cancelled
+Acme::Parataxis::Nursery - Structured Concurrency Container for Scoped Fiber Lifecycles
 
 =head1 SYNOPSIS
 
@@ -12,155 +12,175 @@ Acme::Parataxis::Nursery - Structured Concurrency Container for Spawned Children
     use Acme::Parataxis qw[async nursery];
 
     async {
-        my ($profile, $orders) = (undef, undef);
+        my ( $user, $preferences );
 
         my $ok = eval {
             nursery( sub ($n) {
-                $n->spawn( sub { $profile = fetch_user_profile() } );
-                $n->spawn( sub { $orders  = fetch_user_orders()  } );
+                $n->spawn( sub { $user        = fetch_user(123) } );
+                $n->spawn( sub { $preferences = fetch_prefs(123) } );
             } );
             1;
         };
         die $@ unless $ok;
 
-        say $profile->name;    # both children finished before the nursery returned
+        # Both children are guaranteed to have completed:
+        say "User: " . $user->name;
     };
 
 =head1 DESCRIPTION
 
-C<Acme::Parataxis::Nursery> is the runtime behind C<nursery( )> (exported by L<Acme::Parataxis>). It gives you the
-Go-structured-concurrency pattern in Perl:
+C<Acme::Parataxis::Nursery> implements structured concurrency (popularized by Trio and Go errgroups). When concurrent
+tasks are executed inside a nursery, the lifetimes of all child fibers are bounded by the enclosing block:
 
 =over
 
-=item * Any child you spawn with C<< $n->spawn >> is guaranteed to be finished before C<nursery( )> returns.
+=item *
 
-=item * The first child to fail cancels all of its siblings. The whole group is drained, then the failure is rethrown
-      in the calling fiber as an L<Acme::Parataxis::Error::Nursery> aggregate.
+B<Guaranteed join>: C<nursery( sub ($n) { ... } )> does not return until every child spawned via C<< $n->spawn >> has
+completely terminated.
 
-=item * The block value comes back when every child succeeded.
+=item *
+
+B<Prompt sibling cancellation>: If any child fiber dies with an unhandled exception, the nursery immediately cancels
+all surviving siblings via an internal cancellation token. The nursery drains all in-flight work before rethrowing the
+culprit failure.
+
+=item *
+
+B<No orphaned fibers>: Even if the parent fiber is interrupted (e.g. by an outer C<with_timeout>), all children in the
+nursery are cancelled and drained before the parent unwinds.
 
 =back
 
-A bare C<fiber>/C<spawn> inside the block creates an I<independent> fiber the block owns - it is B<not> adopted by the
-nursery and does B<not> delay the join. The L<Acme::Parataxis::CancellationToken> that the nursery hands you via C<<
-$n->token >> is public, so you can cancel the whole group yourself, or hand it to a C<with_timeout> deadline.
-
-=head1 CONSTRUCTOR
-
-=head2 C<new( [ token =E<gt> $token ] )>
-
-    my $n = Acme::Parataxis::Nursery->new( token => $tok );
-
-Normally you never call this: C<nursery( )> builds the object, runs your block in the calling fiber, joins every child,
-and throws the aggregate. C<new> is the lower-level entry point for embedding, and accepts a C<token> (default: a fresh
-L<Acme::Parataxis::CancellationToken>). Note that C<new> alone does not join - a child you C<spawn> through it still
-runs, but nothing aggregates its error or cancels its siblings; that is the private C<_join> that C<nursery( )> calls
-on your behalf.
+Fibers spawned independently via the top-level C<fiber { ... }> or C<spawn()> inside the block are B<not> enrolled in
+the nursery and do not delay its join.
 
 =head1 METHODS
 
 =head2 C<spawn( sub { ... } )>
 
-    $n->spawn( sub { ... } );
+    my $child = $n->spawn( sub {
+        do_concurrent_work();
+    } );
 
-Register a child fiber for this nursery and return the child fiber object. The child runs on its own fiber; the nursery
-guarantees it is reaped before C<nursery( )> returns.
+Spawns a child fiber enrolled in this nursery. Returns the C<Acme::Parataxis> fiber object.
 
-The child parks once at birth, so a failure in its very first statement surfaces through the scheduler (where the
-nursery can observe and aggregate it) rather than being thrown into your block.
+Children park once at birth rather than executing synchronously inline. This guarantees that an immediate failure on
+the child's first statement routes through the scheduler's aggregation machinery rather than throwing unexpectedly into
+the parent's setup block.
 
-Croaks with C<Nursery::spawn() requires a CODE ref> if the argument is not a code ref, and with C<Nursery::spawn() must
-be called from inside a scheduled fiber> if you are not inside a fiber.
+Croaks if called outside a scheduled fiber or without a code reference.
 
 =head2 C<token( )>
 
-    my $tok = $n->token;
+    my $token = $n->token;
 
-The nursery's public cancellation token. Cancelling it cancels and drains every child, exactly as if a sibling had
-failed. Passing it to a C<with_timeout> deadline lets the timeout cancel the group as well. A clean nursery leaves the
-token uncancelled.
+Returns the nursery's internal L<Acme::Parataxis::CancellationToken>. Cancelling this token manually cancels all
+enrolled children and drains the group. Passing this token into a nested C<with_timeout> binds the group to an external
+deadline.
 
-=head1 Recipes
+=head1 ERROR HANDLING
 
-=head2 Fan out and collect
+=head2 Acme::Parataxis::Error::Nursery
 
-    my (@rows, $err);
+When one or more child fibers die, the nursery drains all remaining siblings and throws an
+L<Acme::Parataxis::Error::Nursery> exception:
 
-    eval {
-        nursery( sub ($n) {
-            for my $id (@ids) {
-                $n->spawn( sub { push @rows, load_row($id) } );
-            }
-        } );
-        1;
-    } or $err = $@;
+=over
 
-    die $err if $err;
+=item * C<< $err->primary >>: Returns the first I<natural> failure (the real bug or exception that caused the nursery
+to fail, ignoring subsequent C<Cancelled> errors thrown by siblings as they were unwound).
 
-=head2 Bound the group with a deadline
+=item * C<< $err->failures >>: Returns the list of every exception thrown by any child in the nursery, in spawn order.
+
+=back
+
+    use v5.40;
+    use Acme::Parataxis qw[async nursery await_sleep];
 
     async {
         eval {
             nursery( sub ($n) {
-                $n->spawn( sub { await_sleep(5_000) } );
-                $n->spawn( sub { await_sleep(5_000) } );
-                with_timeout( 500, $n->token, sub { await_sleep(10_000) } );
+                $n->spawn( sub { die "Database connection lost\n" } );
+                $n->spawn( sub { await_sleep(10_000) } );
             } );
-            1;
-        } or warn "the group was cut short: $@";
+        };
+
+        if ( my $err = $@ ) {
+            if ( ref $err && $err->isa('Acme::Parataxis::Error::Nursery') ) {
+                say "Root cause: " . $err->primary;    # "Database connection lost"
+                say "Total child errors: " . scalar( $err->failures ); # 2 (database error + cancelled sleep)
+            }
+        }
     };
 
-The deadline cancels the nursery's own token, which cancels both children.
+=head1 Recipes
 
-=head1 ERRORS
+=head2 Concurrent scatter-gather
 
-=head2 Acme::Parataxis::Error::Nursery
+To collect data from children, write into variables in the parent's lexical scope:
 
-Thrown by C<nursery( )> when one or more children died. It is an L<Acme::Parataxis::Error> subclass, so C<< $@->message
->>, C<< $@->kind >> (C<nursery>), and the usual accessors work. Stringifying it gives C<nursery failure: ...> built
-from the primary failure.
+    my ( $orders, $inventory, $shipping );
 
-C<< $err->failures >> returns every child error in spawn order, including the L<Acme::Parataxis::Error::Cancelled>
-objects that the cancelled siblings threw as they unwound. C<< $err->primary >> is the first B<natural> (non-cancelled)
-failure, so it points at the error that actually broke something rather than at a consequence:
+    nursery( sub ($n) {
+        $n->spawn( sub { $orders    = load_orders($id) } );
+        $n->spawn( sub { $inventory = check_stock($id) } );
+        $n->spawn( sub { $shipping  = calc_rates($id)  } );
+    } );
 
-    my $err = eval { nursery( sub ($n) {
-        $n->spawn( sub { die "real failure\n" } );
-        $n->spawn( sub { await_sleep(5_000) } );
-    } ); 1 } ? undef : $@;
+    # All three lookups are complete and successful here.
 
-    $err->primary;                 # "real failure\n"
-    my @all = $err->failures;      # 2 - the failure plus the cancelled sibling
+=head2 Setting a deadline on the entire nursery
+
+Pass the nursery's token to L<with_timeout|Acme::Parataxis/with_timeout>:
+
+    use Acme::Parataxis qw[async nursery with_timeout await_sleep];
+
+    async {
+        eval {
+            nursery( sub ($n) {
+                $n->spawn( sub { await_sleep(5000) } );
+                $n->spawn( sub { await_sleep(5000) } );
+
+                # If 500ms elapses, the token cancels and aborts both children:
+                with_timeout( 500, $n->token, sub { await_sleep(10_000) } );
+            } );
+        };
+        warn "Nursery timed out: $@" if $@;
+    };
 
 =head1 Behavior Notes
 
-=head2 A child sets a lexical; returning from the block does not deliver a value
+=over
 
-The block cannot return early to hand a child its result: the runtime joins every spawned child, so a child's result
-must be expressed by setting a lexically-scoped variable, as in the SYNOPSIS. The block's own C<return> value is the
-value of C<nursery( )>, and it is only delivered when every child succeeded.
+=item * Block returns do not short-circuit children
 
-=head2 A child's death cancels its siblings, so most siblings never finish
+The block passed to C<nursery()> cannot return early to bypass pending children. The nursery joins I<every> child
+spawned via C<< $n->spawn >> before returning. The nursery's return value is the return value of the enclosed block,
+delivered only when all children have succeeded.
 
-The first child to die cancels the rest. A sibling that had not yet completed by then throws
-L<Acme::Parataxis::Error::Cancelled> instead of its own result, and the group is drained before the aggregate is
-rethrown. In other words, a nursery is all-or-nothing, not best-effort: on failure you learn about the first real error
-plus the cancellations it caused, not the output of the children that were still in flight.
+=item * Fail-fast vs. best-effort
 
-=head2 The block's own death wins over its children's
+A nursery enforces all-or-nothing execution. The moment one child fails, all surviving siblings are cancelled. If you
+need independent background tasks where failures do not cascade, use unmanaged C<fiber { ... }> instances combined with
+L<Acme::Parataxis::Monitor> instead.
 
-If your block C<die>s, the runtime cancels and drains the children so none are orphaned, then rethrows I<your> error
-verbatim - not wrapped in an C<Error::Nursery>. Only child failures produce the aggregate.
+=item * Parent exceptions take priority
 
-=head2 Nested nurseries are independent
+If the parent block itself throws an exception before spawning finishes, all currently enrolled children are
+immediately cancelled and drained, and the parent's own exception is rethrown verbatim (not wrapped in an
+C<Error::Nursery>).
 
-An inner C<nursery( )> that fails cancels only its own children. Catch it (as in the outer-failure recipe) and the
-outer block and its siblings carry on.
+=item * Nested nurseries are isolated
+
+Nesting a C<nursery> inside another forms an independent hierarchy. A failure in an inner nursery cancels only its own
+children; if the inner nursery's error is caught with an C<eval>, the outer nursery continues uninterrupted.
+
+=back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis>, L<Acme::Parataxis::CancellationToken>, L<Acme::Parataxis::Error>, L<Acme::Parataxis::Future>
+L<Acme::Parataxis>, L<Acme::Parataxis::CancellationToken>, L<Acme::Parataxis::Error>, L<Acme::Parataxis::Monitor>
 
 =head1 AUTHOR
 
@@ -168,7 +188,7 @@ Sanko Robinson L<https://github.com/sanko>
 
 =head1 LICENSE
 
-Copyright (C) 2026 Sanko Robinson.
+Copyright (C) Sanko Robinson.
 
 This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
 2.

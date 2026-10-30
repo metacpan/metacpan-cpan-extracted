@@ -145,6 +145,8 @@ datetime's
 datetimes
 david
 davidp
+ddd
+dddd
 deceased
 decrement
 dian

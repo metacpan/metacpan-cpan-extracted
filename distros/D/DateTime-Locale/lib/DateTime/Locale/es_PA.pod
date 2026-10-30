@@ -116,7 +116,7 @@ Spanish Panama locale.
   jun
   jul
   ago
-  sept
+  sep
   oct
   nov
   dic
@@ -162,7 +162,7 @@ Spanish Panama locale.
   jun
   jul
   ago
-  sept
+  sep
   oct
   nov
   dic
@@ -427,13 +427,13 @@ Spanish Panama locale.
 
    2008-02-05T18:30:30 = feb 2008 d.C.
    1995-12-22T09:05:02 = dic 1995 d.C.
-  -0010-09-15T04:44:23 = sept -10 a.C.
+  -0010-09-15T04:44:23 = sep -10 a.C.
 
 =head3 GyMMMEd (E, d MMM y G)
 
    2008-02-05T18:30:30 = mar, 5 feb 2008 d.C.
    1995-12-22T09:05:02 = vie, 22 dic 1995 d.C.
-  -0010-09-15T04:44:23 = sáb, 15 sept -10 a.C.
+  -0010-09-15T04:44:23 = sáb, 15 sep -10 a.C.
 
 =head3 GyMMMM (MMMM 'de' y G)
 
@@ -457,7 +457,7 @@ Spanish Panama locale.
 
    2008-02-05T18:30:30 = 5 de feb de 2008 d.C.
    1995-12-22T09:05:02 = 22 de dic de 1995 d.C.
-  -0010-09-15T04:44:23 = 15 de sept de -10 a.C.
+  -0010-09-15T04:44:23 = 15 de sep de -10 a.C.
 
 =head3 GyMd (d/M/y G)
 
@@ -523,13 +523,13 @@ Spanish Panama locale.
 
    2008-02-05T18:30:30 = feb
    1995-12-22T09:05:02 = dic
-  -0010-09-15T04:44:23 = sept
+  -0010-09-15T04:44:23 = sep
 
 =head3 MMMEd (E, d MMM)
 
    2008-02-05T18:30:30 = mar, 5 feb
    1995-12-22T09:05:02 = vie, 22 dic
-  -0010-09-15T04:44:23 = sáb, 15 sept
+  -0010-09-15T04:44:23 = sáb, 15 sep
 
 =head3 MMMMEd (E, d 'de' MMMM)
 
@@ -559,13 +559,13 @@ Spanish Panama locale.
 
    2008-02-05T18:30:30 = 5 feb
    1995-12-22T09:05:02 = 22 dic
-  -0010-09-15T04:44:23 = 15 sept
+  -0010-09-15T04:44:23 = 15 sep
 
 =head3 MMMdd (dd-MMM)
 
    2008-02-05T18:30:30 = 05-feb
    1995-12-22T09:05:02 = 22-dic
-  -0010-09-15T04:44:23 = 15-sept
+  -0010-09-15T04:44:23 = 15-sep
 
 =head3 MMd (d/M)
 
@@ -667,13 +667,13 @@ Spanish Panama locale.
 
    2008-02-05T18:30:30 = feb 2008
    1995-12-22T09:05:02 = dic 1995
-  -0010-09-15T04:44:23 = sept -10
+  -0010-09-15T04:44:23 = sep -10
 
 =head3 yMMMEd (E, d MMM y)
 
    2008-02-05T18:30:30 = mar, 5 feb 2008
    1995-12-22T09:05:02 = vie, 22 dic 1995
-  -0010-09-15T04:44:23 = sáb, 15 sept -10
+  -0010-09-15T04:44:23 = sáb, 15 sep -10
 
 =head3 yMMMM (MMMM 'de' y)
 
@@ -681,7 +681,7 @@ Spanish Panama locale.
    1995-12-22T09:05:02 = diciembre de 1995
   -0010-09-15T04:44:23 = septiembre de -10
 
-=head3 yMMMMEd (EEE, d 'de' MMMM 'de' y)
+=head3 yMMMMEd (E, d 'de' MMMM 'de' y)
 
    2008-02-05T18:30:30 = mar, 5 de febrero de 2008
    1995-12-22T09:05:02 = vie, 22 de diciembre de 1995
@@ -697,7 +697,7 @@ Spanish Panama locale.
 
    2008-02-05T18:30:30 = 5 feb 2008
    1995-12-22T09:05:02 = 22 dic 1995
-  -0010-09-15T04:44:23 = 15 sept -10
+  -0010-09-15T04:44:23 = 15 sep -10
 
 =head3 yMd (MM/dd/y)
 
@@ -746,7 +746,7 @@ No
 
    2008-02-05T18:30:30 = mar 05 feb 2008 18:30:30
    1995-12-22T09:05:02 = vie 22 dic 1995 09:05:02
-  -0010-09-15T04:44:23 = sáb 15 sept -10 04:44:23
+  -0010-09-15T04:44:23 = sáb 15 sep -10 04:44:23
 
 =head3 %x (%d/%m/%y) - date format
 

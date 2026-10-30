@@ -1,0 +1,23 @@
+# Claude Code: the built-in Plan agent (software architect) is read-only, starts without
+# CLAUDE.md and is one-shot like Explore.
+# Checks ADR 0027 section 6.
+title: a Plan agent plans read-only without CLAUDE.md and returns no agentId
+permission_mode: bypassPermissions
+files:
+  CLAUDE.md: "PROJECT-MEMORY-MARKER: be nice.\n"
+prompt: Plan the change.
+script:
+  - tool_calls:
+      - [ agent, { description: Plan it, prompt: Plan the change., subagent_type: Plan } ]
+  - text: "step 1, step 2\n### Critical Files for Implementation\n- /x/a.pm"
+  - text: done
+expect:
+  answer: done
+  requests:
+    - { index: 0, tool_text: "- Plan: Software architect agent for designing implementation plans" }
+    - { index: 1, contains: software architect and planning specialist }
+    - { index: 1, contains: Critical Files for Implementation }
+    - { index: 1, absent: PROJECT-MEMORY-MARKER }
+    - { index: 1, lacks: [ write_file, edit_file, multi_edit, agent, send_message, exit_plan_mode ] }
+  tools:
+    - { name: agent, text: '\Astep 1, step 2\n### Critical Files for Implementation\n- /x/a\.pm\n<usage>subagent_tokens: \d+\ntool_uses: 0\nduration_ms: \d+</usage>\z', not_text: 'agentId' }

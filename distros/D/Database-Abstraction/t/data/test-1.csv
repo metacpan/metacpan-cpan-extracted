@@ -1,0 +1,6 @@
+entry!number
+# Verify comment lines are ignored
+"one"!1
+"two"!2
+"three"!3
+"empty"!

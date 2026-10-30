@@ -435,6 +435,24 @@ Akan locale.
    1995-12-22T09:05:02 = KE 1995 Ɔpɛnimma 22, Fia
   -0010-09-15T04:44:23 = AK -10 Ɛbɔ 15, Mem
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = KE 2008 Ɔgyefoɔ
+   1995-12-22T09:05:02 = KE 1995 Ɔpɛnimma
+  -0010-09-15T04:44:23 = AK -10 Ɛbɔ
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = KE 2008 Ɔgyefoɔ 5, Ben
+   1995-12-22T09:05:02 = KE 1995 Ɔpɛnimma 22, Fia
+  -0010-09-15T04:44:23 = AK -10 Ɛbɔ 15, Mem
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = KE 2008 Ɔgyefoɔ 5
+   1995-12-22T09:05:02 = KE 1995 Ɔpɛnimma 22
+  -0010-09-15T04:44:23 = AK -10 Ɛbɔ 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = KE 2008 Ɔgyefoɔ 5
@@ -620,6 +638,18 @@ Akan locale.
    2008-02-05T18:30:30 = Ɔgyefoɔ 2008
    1995-12-22T09:05:02 = Ɔpɛnimma 1995
   -0010-09-15T04:44:23 = Ɛbɔ -10
+
+=head3 yMMMMEd (EEE, MMMM d, y)
+
+   2008-02-05T18:30:30 = Ben, Ɔgyefoɔ 5, 2008
+   1995-12-22T09:05:02 = Fia, Ɔpɛnimma 22, 1995
+  -0010-09-15T04:44:23 = Mem, Ɛbɔ 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Ɔgyefoɔ 5, 2008
+   1995-12-22T09:05:02 = Ɔpɛnimma 22, 1995
+  -0010-09-15T04:44:23 = Ɛbɔ 15, -10
 
 =head3 yMMMd (MMM d, y)
 

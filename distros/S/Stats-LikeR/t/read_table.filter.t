@@ -228,7 +228,7 @@ for my $shape (qw(aoh aoa)) {
 # --- a filter that is not code -------------------------------------------------
 {
 	eval { read_table($csv, filter => { age => 'x' }) };
-	is($@, "read_table: filter 'age' must be a CODE reference\n", 'a filter that is not code is refused up front');
+	is($@, Stats::LikeR::_usage_text('read_table') . "read_table: error: filter 'age' must be a CODE reference\n", 'a filter that is not code is refused up front');
 }
 
 # --- a hoh's row names come from %line_hash after the filters ------------------

@@ -435,6 +435,24 @@ Nuer locale.
    1995-12-22T09:05:02 = ƐY 1995 Tid 22, Dhieec
   -0010-09-15T04:44:23 = AY -10 Tɛɛ 15, Bäkɛl
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = ƐY 2008 Pɛt
+   1995-12-22T09:05:02 = ƐY 1995 Tio̱p in di̱i̱t
+  -0010-09-15T04:44:23 = AY -10 Tɛɛr
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = ƐY 2008 Pɛt 5, Rɛw
+   1995-12-22T09:05:02 = ƐY 1995 Tio̱p in di̱i̱t 22, Dhieec
+  -0010-09-15T04:44:23 = AY -10 Tɛɛr 15, Bäkɛl
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = ƐY 2008 Pɛt 5
+   1995-12-22T09:05:02 = ƐY 1995 Tio̱p in di̱i̱t 22
+  -0010-09-15T04:44:23 = AY -10 Tɛɛr 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = ƐY 2008 Pɛt 5
@@ -506,6 +524,12 @@ Nuer locale.
    2008-02-05T18:30:30 = Rɛw 5 Pɛt
    1995-12-22T09:05:02 = Dhieec 22 Tid
   -0010-09-15T04:44:23 = Bäkɛl 15 Tɛɛ
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Pɛt 5, Rɛw
+   1995-12-22T09:05:02 = Tio̱p in di̱i̱t 22, Dhieec
+  -0010-09-15T04:44:23 = Tɛɛr 15, Bäkɛl
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

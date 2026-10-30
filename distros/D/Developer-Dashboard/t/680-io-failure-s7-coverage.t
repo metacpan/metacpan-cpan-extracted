@@ -8,7 +8,7 @@ use Errno qw(EACCES EIO);
 # compiled. Each one fails only for an exact registered path (or for the next
 # close/flock while a flag is set), so the failure runs deterministically for
 # any uid, including root where chmod-based failures never happen.
-our ( %FAIL_OPEN, %FAIL_OPENDIR, %FAIL_UNLINK, $FAIL_CLOSEDIR, $FAIL_CLOSE, $FAIL_FLOCK, $FAKE_GETPWUID );
+our ( %FAIL_OPEN, %FAIL_OPENDIR, %FAIL_UNLINK, $FAIL_READDIR, $FAIL_CLOSEDIR, $FAIL_CLOSE, $FAIL_FLOCK, $FAKE_GETPWUID );
 
 BEGIN {
     *CORE::GLOBAL::open = sub (*;$@) {
@@ -26,10 +26,19 @@ BEGIN {
         }
         return CORE::opendir( $_[0], $_[1] );
     };
+    *CORE::GLOBAL::readdir = sub (*) {
+        if ($FAIL_READDIR) {
+            $FAIL_READDIR = 0;
+            $! = EIO;
+            return wantarray ? () : undef;
+        }
+        return CORE::readdir( $_[0] );
+    };
     *CORE::GLOBAL::closedir = sub (*) {
         my ($handle) = @_;
         if ($FAIL_CLOSEDIR) {
             $FAIL_CLOSEDIR = 0;
+            CORE::closedir($handle);
             $! = 5;
             return 0;
         }
@@ -138,9 +147,37 @@ sub write_file {
     my $page = Developer::Dashboard::PageDocument->new( id => 'p', title => 'P', layout => { body => 'b' } );
     my $html = $app->_nav_items_html( page => $page, runtime_context => { params => {} } );
     like( $html, qr/nav-x/, 'readable nav directories contribute fragments' );
-    local $FAIL_OPENDIR{$nav_root} = 1;
-    my $html_with_unopenable_root = $app->_nav_items_html( page => $page, runtime_context => { params => {} } );
-    unlike( $html_with_unopenable_root, qr/nav-x/, 'an unopenable nav directory is skipped while other runtime layers may still contribute nav entries' );
+    my $inventory_change = File::Spec->catfile( $nav_root, '.inventory-change' );
+    write_file( $inventory_change, 'change' );
+    unlink $inventory_change or die "Unable to remove nav inventory-change fixture '$inventory_change': $!";
+    {
+        local $FAIL_OPENDIR{$nav_root} = 1;
+        my $html_with_unopenable_root = $app->_nav_items_html( page => $page, runtime_context => { params => {} } );
+        unlike( $html_with_unopenable_root, qr/nav-x/, 'an unopenable nav directory is skipped while other runtime layers may still contribute nav entries' );
+    }
+
+    my $nav_inventory_change = File::Spec->catfile( $nav_root, '.read-failure-inventory-change' );
+    write_file( $nav_inventory_change, 'change' );
+    unlink $nav_inventory_change or die "Unable to remove nav read-failure fixture '$nav_inventory_change': $!";
+    {
+        local $FAIL_READDIR = 1;
+        my $read_error = eval { $app->_nav_items_html( page => $page, runtime_context => { params => {} } ); 1 } ? '' : $@;
+        like( $read_error, qr/Unable to read saved navigation directory/, 'nav directory read errors are reported' );
+    }
+    like(
+        $app->_nav_items_html( page => $page, runtime_context => { params => {} } ),
+        qr/nav-x/,
+        'a failed nav read is not cached and the next request retries the directory',
+    );
+
+    my $nav_close_inventory_change = File::Spec->catfile( $nav_root, '.close-failure-inventory-change' );
+    write_file( $nav_close_inventory_change, 'change' );
+    unlink $nav_close_inventory_change or die "Unable to remove nav close-failure fixture '$nav_close_inventory_change': $!";
+    {
+        local $FAIL_CLOSEDIR = 1;
+        my $close_error = eval { $app->_nav_items_html( page => $page, runtime_context => { params => {} } ); 1 } ? '' : $@;
+        like( $close_error, qr/Unable to close saved navigation directory/, 'nav directory close errors are reported' );
+    }
 }
 
 # --- Prompt: explicit Git metadata I/O failures ---------------------------

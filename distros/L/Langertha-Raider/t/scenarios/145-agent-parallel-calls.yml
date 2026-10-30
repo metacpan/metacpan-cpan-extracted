@@ -1,0 +1,37 @@
+# Claude Code: agent calls of one message run at the same time; their results go back in
+# call order. The mock model answers requests in the order they are made, so the overlap
+# shows in the events: agent_2 starts before agent_1 has finished, and finishes first.
+# Checks ADR 0027 section 9 (parallel).
+title: two agent calls of one turn overlap and their results come back in call order
+permission_mode: bypassPermissions
+files:
+  notes.txt: "x\n"
+sub_delay: 0.2
+prompt: Run two agents.
+script:
+  - tool_calls:
+      - [ agent, { description: One, prompt: P1 } ]
+      - [ agent, { description: Two, prompt: P2 } ]
+  # answered in the order the requests were made: agent_1 goes on with a tool, agent_2 ends
+  - tool_calls:
+      - [ list_files, { path: . } ]
+  - text: REPORT TWO
+  - text: REPORT ONE
+  - text: done
+expect:
+  answer: done
+  request_count: 5
+  events:
+    - { type: agent.started, agent_id: agent_1, call: c1 }
+    - { type: agent.started, agent_id: agent_2, call: c2 }
+    - { type: agent.finished, agent_id: agent_2, status: completed }
+    - { type: agent.finished, agent_id: agent_1, status: completed }
+  tools:
+    - { name: list_files }
+    - { name: agent, text: '\AREPORT ONE\nagentId: agent_1 .*tool_uses: 1\n' }
+    - { name: agent, text: '\AREPORT TWO\nagentId: agent_2 .*tool_uses: 0\n' }
+  requests:
+    - index: 4
+      tail:
+        - { role: tool, contains: REPORT ONE }
+        - { role: tool, contains: REPORT TWO }

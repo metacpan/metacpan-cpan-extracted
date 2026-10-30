@@ -1,8 +1,9 @@
 use v5.40;
-use Test2::V0;
+use Test2::V1 -ipP;
 use blib;
 use Acme::Parataxis qw[async fiber yield];
 use Acme::Parataxis::Signal;
+#
 my $sig = Acme::Parataxis::Signal->new;
 my @done;
 async {

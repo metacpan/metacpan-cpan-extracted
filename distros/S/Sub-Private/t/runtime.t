@@ -107,6 +107,19 @@ subtest 'declarative form, use at the end of the file' => sub {
 };
 
 subtest 'declarative form, undefined sub still croaks' => sub {
+	# The pure-Perl B::Hooks::EndOfScope (used on Windows Perl 5.42, where
+	# Variable::Magic crashes) cannot pass an exception out of a scope-end
+	# callback, so there the error arrives as a warning instead
+	if ($INC{'B/Hooks/EndOfScope/PP.pm'}) {
+		my $before = @warnings;
+		eval { require RtDeclMissing; 1 };
+		my @new = splice(@warnings, $before);
+		ok((grep { /Sub::Private: RtDeclMissing::_missing is not defined/ } @new),
+			'the pure-Perl backend reports it as a warning');
+		ok((grep { /RtDeclMissing\.pm line 3\./ } @new), 'reported at the "use" line');
+		return;
+	}
+
 	ok(!eval { require RtDeclMissing; 1 }, 'require fails');
 	like($@, qr/Sub::Private: RtDeclMissing::_missing is not defined/, 'with the usual message');
 	like($@, qr/RtDeclMissing\.pm line 3\./, 'reported at the "use" line');

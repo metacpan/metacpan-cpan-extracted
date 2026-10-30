@@ -76,9 +76,9 @@ is_deeply( [rank(1, 9 ** 9 ** 9, -9 ** 9 ** 9)],        [2, 3, 1],           '+/
 }
 
 # error handling
-throws_ok { rank(1, 2, 'ties_method', 'bogus') } qr/rank: unknown ties_method/, 'bad ties_method dies';
-throws_ok { rank(1, 2, 'na_last', 'bogus') }     qr/rank: unknown na_last/,     'bad na_last dies';
-throws_ok { rank([1, 2], 'na_last') }            qr/rank: named options must be key => value pairs/, 'odd option list dies';
+throws_ok { rank(1, 2, 'ties_method', 'bogus') } qr/\Ausage: rank\(.*^rank: error: unknown ties_method 'bogus'/ms, 'bad ties_method dies';
+throws_ok { rank(1, 2, 'na_last', 'bogus') }     qr/\Ausage: rank\(.*^rank: error: unknown na_last 'bogus'/ms,     'bad na_last dies';
+throws_ok { rank([1, 2], 'na_last') }            qr/\Ausage: rank\(.*^rank: error: named options must be key => value pairs\n\z/ms, 'odd option list dies';
 
 # leak checks (real calls hoisted out of the closures)
 unless ($INC{'Devel/Cover.pm'}) {

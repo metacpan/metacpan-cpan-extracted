@@ -1,0 +1,22 @@
+# !`cmd` runs before the text goes to the model when the command's
+# allowed-tools allow it, in default mode; the same grant holds for the
+# model's own bash calls during that run, and not in the next one.
+title: a !`cmd` allowed by allowed-tools runs before sending; the grant holds for that run only
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/commands/status.md: "---\nallowed-tools: Bash(echo:*)\n---\nStatus: !`echo SHELL-OK`\n"
+prompts: [ /status, "Once more." ]
+script:
+  - tool_calls:
+      - [ bash, { command: echo in-run } ]
+  - text: all fine
+  - tool_calls:
+      - [ bash, { command: echo next-run } ]
+  - text: refused
+expect:
+  requests:
+    - { index: 0, contains: "<command-name>/status</command-name>\n<command-args></command-args>\n\nStatus: SHELL-OK" }
+  tools:
+    - { name: bash, text: in-run }
+    - { name: bash, error: true }

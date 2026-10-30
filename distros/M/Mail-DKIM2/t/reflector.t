@@ -284,7 +284,7 @@ my $AUTHSERV = 'mail.dkim2.com';
     is(reflected_verifies($r->{message}), 'pass', 'T2: bridge-signed message verifies');
 }
 
-# --- -07 section 11: the reflector's From when it originates or changes ---
+# --- -08 section 11: the reflector's From when it originates or changes ---
 sub from_of     { my $m = Email::MIME->new($_[0]); scalar $m->header_raw('From') }
 sub reply_to_of { my $m = Email::MIME->new($_[0]); scalar $m->header_raw('Reply-To') }
 {
@@ -387,7 +387,7 @@ sub reply_to_of { my $m = Email::MIME->new($_[0]); scalar $m->header_raw('Reply-
     is($r->{signed}, 0, 'T3: unsigned (no DKIM2, no DKIM1)');
     my @mi = (Email::MIME->new($r->{message}))->header_raw('Message-Instance');
     # Originating (no chain): the inbound m=1 is dropped and the message,
-    # From rewritten, starts again at m=1 (-07 section 11, 13).
+    # From rewritten, starts again at m=1 (-08 section 11, 13).
     is(scalar @mi, 1, 'T3: one MI, m=1, even though unsigned');
     like($mi[0], qr/\bm=1;/, 'T3: ... started again at m=1');
     like($r->{message}, qr/Reflected and signed by the DKIM2 reflector/, 'T3: footer applied');

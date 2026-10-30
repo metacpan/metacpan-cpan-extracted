@@ -128,6 +128,14 @@ throws_ok { drop_duplicates({ A => [1] }, subset => 'Z') } qr/column 'Z' not fou
 lives_ok { drop_duplicates([ [1], [1] ]) } 'a well-formed call lives';
 
 # memory
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { drop_duplicates([ { a => 1 } ], keep => 'middle'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: drop_duplicates\(.*\n\ndrop_duplicates: error: \Q'keep' must be 'first', 'last', or 0 (got 'middle')\E\n\z/s,
+		'drop_duplicates: a call-form error prints the help screen, the error on its last line');
+}
+
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok {
 	my $x = drop_duplicates([ [1, 'a'], [1, 'a'], [2, 'b'] ]);

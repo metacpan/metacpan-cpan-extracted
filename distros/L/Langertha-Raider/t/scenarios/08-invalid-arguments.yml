@@ -1,0 +1,11 @@
+title: a call missing a required argument is rejected against the tool schema, nothing is written
+prompt: Write without content.
+script:
+  - tool_calls:
+      - [ write_file, { path: x.txt } ]
+  - text: abgelehnt
+expect:
+  answer: abgelehnt
+  absent: [ x.txt ]
+  tools:
+    - { name: write_file, error: true, text: 'content' }

@@ -1,3 +1,62 @@
+0.62.0 2026-10-29 17:40:14 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Restoring a configuration backup ran its database part through the
+   sqlite3 command line tool, so a crafted backup could run commands and
+   read or write files on the server. The database part is now replayed
+   as plain SQL: shell commands, ATTACH and full-text tables with a Perl
+   tokenizer are refused, ordinary full-text tables still restore.
+   (CVE-2026-118992)
+
+ - The secret that signs session cookies came from a generator with only
+   about 4 billion possible values, so one cookie was enough to find the
+   secret and sign in as any user. On startup a .secret file made by the
+   old generator is replaced with 32 random bytes, which logs everyone out
+   once; an empty one is replaced too, and a secret written by hand is
+   kept. (CVE-2026-118986)
+
+ - Taking a configuration backup left a world-readable copy of the whole
+   configuration database, password hashes and stored secrets included,
+   in /tmp/cbdump<pid>. Backups no longer write this file; delete any
+   leftover /tmp/cbdump* files. (CVE-2026-118990)
+
+ - User passwords were stored as unsalted HMAC-SHA1, so equal passwords
+   had equal hashes and a leaked user table was quick to crack. Passwords
+   are now stored as salted scrypt, in the format the HIN Access Gateway
+   uses, and may contain any Unicode character; an old hash still logs in
+   and is replaced at that login. Each login attempt, also with an unknown
+   name, now costs one scrypt check, and Crypt::ScryptKDF is a new
+   prerequisite. (CVE-2026-13576)
+
+ - A configuration backup used the password itself as the key, with no
+   salt and no integrity check: "pw" and "pwx" opened the same backup, and
+   anyone who knew the password could change one unnoticed. New backups
+   use a key derived from the password with PBKDF2 and a random salt, and
+   a changed backup is refused with "Wrong password!". Old backups still
+   restore with a warning in the log; releases before this one cannot
+   restore new backups. (CVE-2026-118991)
+
+ - Every logged-in user received their own password hash from the server,
+   and users without the admin right also received the admin-only user
+   note, in the Users table and the user edit form as well. Neither is
+   sent any more. (CVE-2026-118996)
+
+ - A session cookie stayed valid forever, also after logout. The new
+   BACKEND setting max_session_age ends a session the given number of
+   seconds after the login; without it sessions do not expire, as before.
+   (CVE-2026-118987)
+
+ - Under CGI, FastCGI and PSGI, one anonymous request with a crafted path
+   could keep a server process busy for minutes, and some paths gave an
+   error 500. The path is now matched as plain text. (CVE-2026-118993)
+
+ - A login name with a line break wrote extra lines into the log, for
+   example a forged "Login for admin from ... successful". Control
+   characters in the name are now logged as \x{..}. (CVE-2026-118994)
+
+ - A form field checked against a pattern such as "yes|no" accepted any
+   value starting with "yes" or ending with "no", and values ending in a
+   line break. The whole value must now match. (CVE-2026-118995)
+
 0.61.3 2026-10-20 13:10:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Opening a form, and every change to a field that resets the form, ran

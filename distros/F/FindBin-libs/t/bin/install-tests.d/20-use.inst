@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 ########################################################################
 # install test symlinks for one group derived from tests.yaml.
 # group name is taken from $0 (e.g. 20-use.inst => group '20-use').

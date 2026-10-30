@@ -162,6 +162,17 @@ path, serializer module and the exact commands before spending a slot, and
 `perl script/coverage-gate --database DIR t/some-file.t` to collect a focused
 run into a scratch database.
 
+The instrumented run excludes only disposable `/tmp/` and staged
+`.developer-dashboard/` source trees from Devel::Cover collection because tests
+remove those fixtures before report generation. The enforced report still
+includes every `lib/` source file; these exclusions do not lower the coverage
+scope. A Devel::Cover warning in the report fails the gate even when the Total
+row says 100.0, because the source mapping is not trustworthy until the warning
+is resolved.
+The gate stores its Devel::Cover reader-identity stamp beside `cover_db`, not
+inside it, so Devel::Cover does not treat the stamp as database content. On
+first use it verifies and migrates the earlier in-database marker.
+
 Its exit status is the interface: `0` all four metrics at 100.0, `1` a genuine
 shortfall with the failing metrics named, `2` the gate could not run or could
 not read its report, `3` the coverage instrument could not read its own
@@ -434,6 +445,9 @@ The runtime-manager tests also cover:
 
 The extension tests also cover:
 
+- Docker workspace tmux handoff passes a UTF-8 character locale along with its private
+  config overlay and writable socket location; images must provide
+  `C.UTF-8`, and an emoji-bearing prompt/status marker must survive tmux output.
 - config-backed path alias registration
 - shell helper `cdr` and `which_dir` flows where the first argument may be a saved alias, remaining arguments narrow the alias root with AND-matched regex directory keywords, and non-alias arguments search beneath the current directory with the same regex contract
 - `dashboard of` and `dashboard open-file` regex scope searches, including `Ok\.js$`-style exact suffix matches that must not drift into broader files such as `ok.json`

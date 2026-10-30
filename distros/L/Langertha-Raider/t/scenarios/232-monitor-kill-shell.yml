@@ -1,0 +1,25 @@
+# Claude Code: TaskStop stops a monitor; the model is notified that it was stopped.
+# Raider's TaskStop is kill_shell (ADR 0025), and it reaches monitors through the registry.
+# Checks ADR 0031 section 1 (stopping) and ADR 0024 section 4 (kill_shell).
+title: kill_shell stops a monitor and its command, and the model hears it was stopped
+permission_mode: bypassPermissions
+prompt: Watch the log, then stop watching.
+script:
+  - tool_calls:
+      - [ monitor, { description: the log, command: "echo started; sleep 30" } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: monitor_1 } ]
+      - [ kill_shell, { shell_id: monitor_1 } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: monitor, text: 'Monitor started \(task monitor_1' }
+    - { name: bash_output, text: '\A<status>running</status>\z' }
+    - { name: kill_shell, text: '\ASuccessfully stopped task: monitor_1 \(the log\)\z' }
+  requests:
+    - index: 2
+      tail:
+        - { role: tool, contains: 'Successfully stopped task: monitor_1 (the log)' }
+        - role: user
+          contains: "<status>killed</status>\n<summary>Monitor \"the log\" was stopped</summary>\n</task-notification>"

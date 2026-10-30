@@ -1,0 +1,24 @@
+title: defaultMode "auto" of the Claude settings = acceptEdits + read-only bash; a chain with a rm, a substitution and a redirection ask
+permission_mode: null
+files:
+  .claude/settings.json: '{ "permissions": { "defaultMode": "auto" } }'
+  hello.txt: "hello\n"
+prompt: Look around, then clean up.
+script:
+  - tool_calls:
+      - [ bash, { command: "ls && cat hello.txt" } ]
+      - [ bash, { command: "ls; rm hello.txt" } ]
+      - [ bash, { command: "cat $(echo hello.txt)" } ]
+      - [ bash, { command: "ls > listing.txt" } ]
+      - [ write_file, { path: new.txt, content: "n\n" } ]
+  - text: done
+expect:
+  answer: done
+  files: { hello.txt: "hello\n", new.txt: "n\n" }
+  absent: [ listing.txt ]
+  tools:
+    - { name: bash, text: "hello" }
+    - { name: bash, error: true, text: "auto mode asks before this call: bash runs code; nobody can approve it" }
+    - { name: bash, error: true, text: "auto mode asks before this call" }
+    - { name: bash, error: true, text: "auto mode asks before this call" }
+    - { name: write_file }

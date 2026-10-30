@@ -103,13 +103,13 @@ is_deeply([ (avals($hoh, 'val'))[1, 2] ], [20, 30], 'the returned list slices di
 
 # Exceptions -- same messages as vals(), with the function name changed
 throws_ok { my @x = avals('not_a_ref', 'val') }
-	qr/^avals: first argument must be an array-ref/,
+	qr/^avals: error: first argument must be an array-ref/m,
 	'avals croaks on a string instead of a reference';
 throws_ok { my @x = avals(\my $scalar, 'val') }
 	qr/^avals: first argument must be an array-ref/,
 	'avals croaks on a scalar reference';
 throws_ok { my @x = avals($aoh, undef) }
-	qr/^avals: column name must be defined/,
+	qr/^avals: error: column name must be defined/m,
 	'avals croaks on an undefined column name';
 throws_ok { my @x = avals([ { a => 1 }, undef ], 'a') }
 	qr/^avals: AoH row 1 is undef/,
@@ -218,6 +218,16 @@ is_deeply([ avals([ {}, { Method => 'x' } ], 'Method') ], [undef, 'x'],
 	cmp_ok(t::TiedCell::fetches(), '>=', 1, 'a tied HoA cell is fetched at extraction time');
 	is_deeply(\@got, [7, 9], '... and comes back as its fetched value');
 	ok(!defined tied $got[0], '... with no tie magic on the copy');
+}
+
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('avals');
+	like($screen, qr/\Ausage: avals\(/, 'avals has a help screen');
+	is(do { local $@; eval { my @x = avals([]); 1 } ? '' : $@ },
+	   $screen . "avals: error: expected 2 arguments, got 1\n",
+	   'avals: one argument prints the help screen');
 }
 
 done_testing();

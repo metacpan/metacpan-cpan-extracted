@@ -1,0 +1,17 @@
+title: "@server:uri in a prompt attaches the resource; an unknown server stays text (ADR 0029 Addendum 1)"
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", rich ]
+run_prompt: true
+prompt: "Compare @t:file:///a.txt with @other:file:///b.txt please."
+script:
+  - text: done
+expect:
+  answer: done
+  requests:
+    - index: 0
+      contains: "Result of calling the read_mcp_resource tool:\ncontents of a"
+      absent: contents of b

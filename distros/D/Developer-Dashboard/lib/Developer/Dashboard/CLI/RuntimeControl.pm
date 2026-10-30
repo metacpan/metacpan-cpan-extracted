@@ -3,12 +3,14 @@ package Developer::Dashboard::CLI::RuntimeControl;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Getopt::Long qw(GetOptionsFromArray);
+use Time::HiRes qw(sleep);
 
 use Developer::Dashboard::CLI::Progress;
 use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 
 # run_runtime_command(%args)
 # Dispatches the shared dashboard runtime control commands for restart, stop,
@@ -126,7 +128,7 @@ sub _run_lifecycle_command {
 
 # _run_log_command(%args)
 # Parses one top-level dashboard log or logs request and prints the requested
-# log stream.
+# log stream, optionally timestamped, followed, or limited to trailing lines.
 # Input: command name, argv array reference, runtime manager, config object,
 # and collector store.
 # Output: numeric process exit code.
@@ -137,54 +139,201 @@ sub _run_log_command {
     my $config     = $args{config};
     my $collectors = $args{collectors};
 
+    my $follow = 0;
+    my $timestamps = 0;
+    my $lines;
+    my $options_ok = GetOptionsFromArray(
+        \@argv,
+        'f'        => \$follow,
+        't'        => \$timestamps,
+        'tail|n=i' => \$lines,
+    );
+    die _log_usage() if !$options_ok;
+    die _log_usage() if defined $lines && $lines < 0;
+
     my $scope = @argv && $argv[0] !~ /^-/ ? shift @argv : 'all';
     my $name;
     if ( $scope eq 'collector' && @argv && $argv[0] !~ /^-/ ) {
         $name = shift @argv;
     }
 
-    my $follow = 0;
-    my $lines;
-    GetOptionsFromArray(
-        \@argv,
-        'f'   => \$follow,
-        'n=i' => \$lines,
-    );
     die _log_usage() if @argv;
     die _log_usage() if $scope !~ /\A(?:all|web|collector)\z/;
 
-    if ( $scope eq 'web' ) {
-        print $runtime->web_log(
-            follow => $follow,
-            ( defined $lines ? ( lines => $lines ) : () ),
-        );
-        return 0;
-    }
-
-    die "Follow mode is only supported for dashboard log web\n" if $follow;
-
-    if ( $scope eq 'collector' ) {
-        print _collector_logs_text(
-            collectors => $collectors,
-            config     => $config,
-            name       => $name,
-        );
-        return 0;
-    }
-
-    my $web_log = $runtime->web_log( ( defined $lines ? ( lines => $lines ) : () ) );
-    my $collector_log = _collector_logs_text(
-        collectors => $collectors,
+    my $sources = _read_log_sources(
+        scope      => $scope,
+        name       => $name,
+        runtime    => $runtime,
         config     => $config,
+        collectors => $collectors,
     );
-    my @parts;
-    push @parts, "=== dashboard web ===\n$web_log" if defined $web_log && $web_log ne '';
-    # _collector_logs_text() has no return path that yields undef or '' - every
-    # branch returns either the requested log or one of its own non-empty
-    # placeholder strings, so there is nothing to guard here.
-    push @parts, $collector_log;
-    print join "\n", @parts;
+    my $output = _render_log_sources( $sources, $scope, $name );
+    $output = _timestamp_log_text($output) if $timestamps;
+    $output = _tail_log_text( $output, $lines ) if defined $lines;
+    print $output;
+    _follow_log_sources(
+        sources     => $sources,
+        scope       => $scope,
+        name        => $name,
+        runtime     => $runtime,
+        config      => $config,
+        collectors  => $collectors,
+        timestamps  => $timestamps,
+    ) if $follow;
     return 0;
+}
+
+# _read_log_sources(%args)
+# Reads each selected log independently so follow mode can poll web and
+# collector streams without blocking on one source. Input: scope, optional
+# collector name, runtime, config, and collector store. Output: source-keyed
+# hash reference containing the current complete text for each selected log.
+sub _read_log_sources {
+    my (%args) = @_;
+    my $scope = $args{scope};
+    my %sources;
+    $sources{web} = $args{runtime}->web_log if $scope eq 'web' || $scope eq 'all';
+    return \%sources if $scope eq 'web';
+
+    my @names;
+    if ( defined $args{name} ) {
+        die "Unknown collector '$args{name}'\n"
+          if !_collector_known( $args{collectors}, $args{config}, $args{name} );
+        @names = ( $args{name} );
+    }
+    else {
+        @names = _known_collector_names( $args{collectors}, $args{config} );
+    }
+    for my $collector_name (@names) {
+        my $text = $args{collectors}->read_log($collector_name);
+        $sources{"collector:$collector_name"} = defined $text ? $text : '';
+    }
+    return \%sources;
+}
+
+# _render_log_sources($sources, $scope, $name)
+# Renders the current snapshot in the existing non-follow command layout.
+# Input: source snapshot, selected scope, and optional collector name. Output:
+# combined or scoped human-readable log text.
+sub _render_log_sources {
+    my ( $sources, $scope, $name ) = @_;
+    if ( $scope eq 'web' ) {
+        return defined $sources->{web} ? $sources->{web} : '';
+    }
+    if ( $scope eq 'collector' ) {
+        if ( defined $name ) {
+            my $text = $sources->{"collector:$name"} // '';
+            return $text ne '' ? $text : "No log entries are available yet for collector '$name'.\n";
+        }
+        my @names = sort map { s/^collector://r } grep { /^collector:/ } keys %$sources;
+        return "No collector logs are available yet.\n" if !@names;
+        my @logs = map {
+            my $text = $sources->{"collector:$_"} // '';
+            $text ne '' ? $text : "No log entries are available yet for collector '$_'.\n"
+        } @names;
+        return join "\n", @logs;
+    }
+    my @parts;
+    my $web_log = $sources->{web};
+    push @parts, "=== dashboard web ===\n$web_log" if defined $web_log && $web_log ne '';
+    my @names = sort map { s/^collector://r } grep { /^collector:/ } keys %$sources;
+    my $collector_log = @names
+      ? join "\n", map {
+          my $text = $sources->{"collector:$_"} // '';
+          $text ne '' ? $text : "No log entries are available yet for collector '$_'.\n"
+        } @names
+      : "No collector logs are available yet.\n";
+    push @parts, $collector_log;
+    return join "\n", @parts;
+}
+
+# _follow_log_sources(%args)
+# Polls selected source snapshots and writes only appended content until the
+# process receives a normal termination signal. Input: initial snapshots,
+# scope, optional collector name, and the source readers. Output: streamed
+# stdout; returns only if the process is externally interrupted by an exception.
+sub _follow_log_sources {
+    my (%args) = @_;
+    my %offset = map { $_ => length( $args{sources}{$_} // '' ) } keys %{ $args{sources} };
+    my $old_stdout = select STDOUT;
+    $| = 1;
+    select $old_stdout;
+    while (1) {
+        sleep 0.1;
+        my $current = _read_log_sources(
+            scope      => $args{scope},
+            name       => $args{name},
+            runtime    => $args{runtime},
+            config     => $args{config},
+            collectors => $args{collectors},
+        );
+        for my $source ( _sort_log_source_names( keys %$current ) ) {
+            my $text = $current->{$source} // '';
+            my $old_offset = $offset{$source} // 0;
+            $old_offset = 0 if length($text) < $old_offset;
+            my $new_text = substr( $text, $old_offset );
+            if ( $new_text ne '' ) {
+                $new_text = _timestamp_log_text($new_text) if $args{timestamps};
+                print $new_text;
+            }
+            $offset{$source} = length $text;
+        }
+    }
+}
+
+# _sort_log_source_names(@sources)
+# Orders snapshot source names with the web stream first and collector streams
+# in lexical order. Input: list of source-name strings. Output: ordered list.
+sub _sort_log_source_names {
+    my @sources = @_;
+    return sort {
+        my $a_web = $a eq 'web' ? 0 : 1;
+        my $b_web = $b eq 'web' ? 0 : 1;
+        my $priority = $a_web <=> $b_web;
+        return $priority if $priority != 0;
+        return $a cmp $b;
+    } @sources;
+}
+
+# _timestamp_log_text($text)
+# Prefixes every output line with a UTC timestamp; collector record lines use
+# their persisted event timestamp when one is present, while raw web output is
+# stamped at the time it is read. Input: log text string. Output: timestamped
+# log text preserving each original line ending.
+sub _timestamp_log_text {
+    my ($text) = @_;
+    return '' if !defined $text || $text eq '';
+    my $fallback = _now_iso8601( tz => 'utc' );
+    my $record_time = $fallback;
+    my @lines = split /(?<=\n)/, $text, -1;
+    pop @lines if $lines[-1] eq '';
+    my $out = '';
+    for my $line (@lines) {
+        if ( $line =~ /^=== collector \S+ \| \@ (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:Z|[+-]\d{4}))\b/ ) {
+            $record_time = $1;
+        }
+        $out .= $record_time . ' ' . $line;
+    }
+    return $out;
+}
+
+# _tail_log_text($text, $lines)
+# Returns the last requested number of complete output lines.
+# Input: log text string and a non-negative integer line count.
+# Output: the trailing log text, preserving whether it ended in a newline.
+sub _tail_log_text {
+    my ( $text, $lines ) = @_;
+    return '' if !defined $text || $text eq '' || $lines == 0;
+
+    my @parts = split /\n/, $text, -1;
+    my $had_trailing_newline = $parts[-1] eq '' ? 1 : 0;
+    pop @parts if $had_trailing_newline;
+    my $start = @parts - $lines;
+    $start = 0 if $start < 0;
+    my @tail_parts = @parts[ $start .. $#parts ];
+    my $tail = join "\n", @tail_parts;
+    $tail .= "\n" if $had_trailing_newline;
+    return $tail;
 }
 
 # _collector_logs_text(%args)
@@ -355,7 +504,7 @@ sub _lifecycle_usage {
 # Input: none.
 # Output: usage text string.
 sub _log_usage {
-    return "Usage: dashboard log[s] [web|collector [name]] [-n <lines>] [-f]\n";
+    return "Usage: dashboard log[s] [-t] [-f] [web|collector [name]] [--tail <lines>|--tail=<lines>] [-n <lines>]\n";
 }
 
 1;
@@ -384,6 +533,16 @@ Developer::Dashboard::CLI::RuntimeControl - shared restart, stop, and log comman
 Owns the command parsing and default human-facing output for the built-in
 runtime control commands: C<dashboard restart>, C<dashboard stop>,
 C<dashboard log>, and C<dashboard logs>.
+
+Log commands accept C<--tail N> and C<--tail=N> to limit the printed output to
+the last N lines. C<-n N> remains an alias. The limit applies to the selected
+web or collector stream; with the default combined scope, it applies to the
+final combined output. A count of zero prints no lines. Negative and malformed
+counts are rejected with usage text. C<-t> prefixes log lines with UTC
+timestamps; collector entries use their recorded event time and raw web output
+uses the time it is read. C<-f> follows newly appended lines in web, collector,
+or combined scope; when combined, it polls both sources without blocking on one.
+Follow output places the web stream first, then collector streams alphabetically.
 
 =for comment FULL-POD-DOC START
 
@@ -427,7 +586,11 @@ runtime-manager tests that verify scoped restart and stop progress plans.
   dashboard restart collector housekeeper -o json
   dashboard stop collector
   dashboard log
-  dashboard log collector alpha.collector
+  dashboard logs --tail 100
+  dashboard logs --tail=100
+  dashboard log -t web -n 20 -f
+  dashboard log -t collector alpha.collector --tail=50
+  dashboard logs -f --tail=20
   dashboard log web -n 50
 
 =for comment FULL-POD-DOC END

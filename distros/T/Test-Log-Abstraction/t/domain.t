@@ -27,6 +27,15 @@
 #   level(name)          undef (get), 16 names                  anything else (warns)       emergency (0) .. trace (7)
 #   failure listing      -                                      -                           0, 1, 2, 20, 21 entries
 #   invalid argument     -                                      -                           explanation 200 | 201 chars
+#   AUTOLOAD notice      any name, multibyte                    -                           name 199 | 200 | 201 chars
+#   level(reference)     object whose text is a level name      plain reference, object     -
+#                                                               whose text form dies
+#   no-argument methods  no arguments                           - (extra ones are ignored)  0, 1, 2 extra arguments
+#   i18n placeholders    integers that fit the format           text, Inf, NaN, too big     -2**63-1 | -2**63 ..
+#                                                                                           2**63-1 | 2**63 (%d);
+#                                                                                           -1 | 0 .. 2**64-1 | 2**64 (%u)
+#   repeated values      printable characters                   C0 and C1 controls          U+007F | U+0080 .. U+009F
+#                                                                                           | U+00A0
 #
 # Every rejection is checked against the exact message the POD documents.
 
@@ -38,6 +47,7 @@ use Test::Most;
 use Test::Warnings qw(warning);
 use Readonly;
 use Encode ();
+use Config;
 use Capture qw(capture_diag failing printed);
 
 use Test::Log::Abstraction;
@@ -59,6 +69,15 @@ Readonly::Scalar my $COUNTRY_LENGTH => 2;
 Readonly::Scalar my $MAX_LISTED => 20;	# entries a failing assertion lists
 Readonly::Scalar my $MAX_REASON => 200;	# characters of an invalid-argument explanation
 Readonly::Scalar my $LONG => 1_000_000;
+Readonly::Scalar my $ELLIPSIS => '...';
+Readonly::Scalar my $IV_BYTES => 8;	# placeholder limits are for 64-bit integers
+# The integer limits as text, since a float cannot hold them exactly
+Readonly::Scalar my $INT_MIN => '-9223372036854775808';
+Readonly::Scalar my $INT_MAX => '9223372036854775807';
+Readonly::Scalar my $UINT_MAX => '18446744073709551615';
+Readonly::Scalar my $BELOW_INT_MIN => '-9223372036854775809';
+Readonly::Scalar my $ABOVE_INT_MAX => '9223372036854775808';
+Readonly::Scalar my $ABOVE_UINT_MAX => '18446744073709551616';
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 
 # The level table from the POD
@@ -533,4 +552,138 @@ subtest 'invalid argument: explanation length boundary' => sub {
 	like($over, qr/\.\.\.\z/, '... and marked with an ellipsis');
 };
 
+
+# ===========================================================================
+# Values repeated in messages, placeholders, and methods with no arguments
+# ===========================================================================
+
+subtest 'AUTOLOAD: notice name length boundary' => sub {
+	# The notice cuts the name at 200 characters, counted as characters:
+	# a multibyte name must be cut between characters, never inside one
+	my %unit = ('ASCII' => 'n', 'u umlaut' => decoded("\x{fc}"), 'sharp s' => decoded("\x{df}"), 'emoji' => "\x{1F600}", 'CJK' => "\x{65e5}");
+	foreach my $kind (sort keys %unit) {
+		foreach my $length ($MAX_REASON - 1, $MAX_REASON, $MAX_REASON + 1) {
+			my $name = $unit{$kind} x $length;
+			my $logger = quiet();
+			my $out = Encode::decode('UTF-8', printed { $logger->$name('m') });
+			my $shown = ($length > $MAX_REASON) ? ($unit{$kind} x $MAX_REASON) . $ELLIPSIS : $name;
+			ok(index($out, "no method '$shown'") >= 0, "$kind, $length characters: shown " . (($length > $MAX_REASON) ? 'cut' : 'whole'));
+			is($logger->count(lc($name)), 1, "$kind, $length characters: stored in full");
+		}
+	}
+	# Combining marks and direction overrides are not controls: they are
+	# shown, with the cut still counted in characters
+	foreach my $kind ('Zalgo (stacked combining marks)', 'right-to-left override') {
+		my $name = $TEXT{$kind};
+		my $out = Encode::decode('UTF-8', printed { quiet()->$name('m') });
+		ok(index($out, "no method '$name'") >= 0, "$kind: shown unchanged");
+	}
+};
+
+subtest 'level: references' => sub {
+	my $logger = quiet();
+	foreach my $bad ([], {}) {
+		my $result = 'unset';
+		like(warning { $result = $logger->level($bad) }, qr/\Q$CLASS: invalid syslog level '\E(?:ARRAY|HASH)\(0x[0-9a-f]+\)'/, 'plain ' . ref($bad) . ': documented warning');
+		is($result, undef, 'plain ' . ref($bad) . ': undef');
+	}
+	is($logger->level(Local::Named->new('ERROR')), $logger, 'an object whose text is a level name: set');
+	is($logger->level(), $LEVEL{'error'}, '... to that level');
+	my $result = 'unset';
+	like(warning { $result = $logger->level(Local::Dying->new()) }, qr/\Q$CLASS: invalid syslog level 'Local::Dying=HASH(0x\E[0-9a-f]+\)'/, 'an object whose text form dies: shown in plain form');
+	is($result, undef, '... and undef');
+	is($logger->level(), $LEVEL{'error'}, 'unchanged by the invalid ones');
+};
+
+subtest 'no-argument methods: extra arguments are ignored' => sub {
+	foreach my $extra ([], ['x'], ['x', { y => 1 }]) {
+		my $count = scalar(@{$extra});
+		my $logger = quiet(lang => 'de');
+		$logger->warn('kept');
+		is_deeply($logger->messages(@{$extra}), [{ level => 'warn', message => 'kept' }], "messages, $count extra: the messages");
+		is($logger->flush(@{$extra}), $logger, "flush, $count extra: the logger");
+		is($logger->reopen(@{$extra}), $logger, "reopen, $count extra: the logger");
+		is($logger->lang(@{$extra}), 'de', "lang, $count extra: the language, unchanged");
+		is($logger->count(), 1, "$count extra: nothing stored or removed");
+		is($logger->clear(@{$extra}), $logger, "clear, $count extra: the logger");
+		ok($logger->empty(), "clear, $count extra: every message removed");
+	}
+};
+
+subtest 'i18n: integer placeholder boundaries' => sub {
+	plan(skip_all => 'the limits are for 64-bit integers') if($Config{'ivsize'} < $IV_BYTES);
+	my $logger = quiet(i18n => { en => { d => '%{v}d', u => '%{v}u', x => '%{v}x' } });
+	# value => [what %d shows, what %u shows]; a value outside the range
+	# is shown as written, never rounded onto the limit
+	my %partition = (
+		'just below the signed minimum' => [$BELOW_INT_MIN, $BELOW_INT_MIN, $BELOW_INT_MIN],
+		'the signed minimum' => [$INT_MIN, $INT_MIN, $ABOVE_INT_MAX],
+		'-1' => ['-1', '-1', $UINT_MAX],
+		'-0' => ['-0', '0', '0'],
+		'0' => ['0', '0', '0'],
+		'leading zeros' => ['007', '7', '7'],
+		'leading +' => ['+5', '5', '5'],
+		'the signed maximum' => [$INT_MAX, $INT_MAX, $INT_MAX],
+		'just above the signed maximum' => [$ABOVE_INT_MAX, $ABOVE_INT_MAX, $ABOVE_INT_MAX],
+		'the unsigned maximum' => [$UINT_MAX, $UINT_MAX, $UINT_MAX],
+		'just above the unsigned maximum' => [$ABOVE_UINT_MAX, $ABOVE_UINT_MAX, $ABOVE_UINT_MAX],
+		'text' => ['ten', 'ten', 'ten'],
+		'infinity' => ['Inf', 'Inf', 'Inf'],
+		'NaN' => ['NaN', 'NaN', 'NaN'],
+	);
+	foreach my $name (sort keys %partition) {
+		my ($value, $signed, $unsigned) = @{$partition{$name}};
+		is($logger->i18n('d', { v => $value }), $signed, "%d, $name");
+		is($logger->i18n('u', { v => $value }), $unsigned, "%u, $name");
+	}
+	# %x shares the unsigned range: the edges in hexadecimal
+	is($logger->i18n('x', { v => $UINT_MAX }), 'f' x 16, '%x, the unsigned maximum');
+	is($logger->i18n('x', { v => $ABOVE_UINT_MAX }), $ABOVE_UINT_MAX, '%x, just above: shown as written');
+	is($logger->i18n('x', { v => $BELOW_INT_MIN }), $BELOW_INT_MIN, '%x, below the signed minimum: shown as written');
+};
+
+subtest 'repeated values: C0 and C1 controls' => sub {
+	# A level name is repeated in the warning, so it shows how a caller's
+	# value is escaped.  Character strings: U+007F and U+0080 to U+009F are
+	# escaped (U+009B starts a terminal sequence on its own); U+00A0 is
+	# printable, and is kept
+	my %partition = (
+		'U+007F (DEL)' => ["a\x{7f}", 'a\x7F'],
+		'U+0080, the first C1 control' => [decoded("a\x{80}"), 'a\x80'],
+		'U+009B (one-character CSI)' => [decoded("a\x{9b}[2J"), 'a\x9B[2J'],
+		'U+009F, the last C1 control' => [decoded("a\x{9f}"), 'a\x9F'],
+		'U+00A0, just after the C1 controls' => [decoded("a\x{a0}"), decoded("a\x{a0}")],
+		'right-to-left override (not a control)' => [$TEXT{'right-to-left override'}, $TEXT{'right-to-left override'}],
+		# The UTF-8 bytes of the euro sign include 0x82: a byte string's
+		# bytes are kept, or UTF-8 text would be mangled
+		'UTF-8 bytes in a byte string' => [Encode::encode('UTF-8', "\x{20ac}"), Encode::encode('UTF-8', "\x{20ac}")],
+	);
+	my $logger = quiet();
+	foreach my $name (sort keys %partition) {
+		my ($value, $shown) = @{$partition{$name}};
+		my $text = warning { $logger->level($value) };
+		ok(index($text, "invalid syslog level '$shown'") >= 0, $name) or state_diag($name => $text);
+	}
+};
+
 done_testing();
+
+# An object whose text form is the name it was given
+package Local::Named;
+
+use overload '""' => sub { ${$_[0]} }, fallback => 1;
+
+sub new {
+	my ($class, $name) = @_;
+
+	return bless \$name, $class;
+}
+
+# An object whose text form dies
+package Local::Dying;
+
+use overload '""' => sub { die 'no text form' }, 'bool' => sub { 1 }, fallback => 1;
+
+sub new {
+	return bless {}, shift;
+}

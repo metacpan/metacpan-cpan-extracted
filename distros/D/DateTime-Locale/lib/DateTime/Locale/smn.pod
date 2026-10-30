@@ -435,6 +435,24 @@ Inari Sami locale.
    1995-12-22T09:05:02 = vás, juovlâ 22. 1995 mKr.
   -0010-09-15T04:44:23 = láv, čohčâ 15. -10 oKr.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = mKr. 2008 kuovâmáánu
+   1995-12-22T09:05:02 = mKr. 1995 juovlâmáánu
+  -0010-09-15T04:44:23 = oKr. -10 čohčâmáánu
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = mKr. 2008 kuovâmáánu 5, maj
+   1995-12-22T09:05:02 = mKr. 1995 juovlâmáánu 22, vás
+  -0010-09-15T04:44:23 = oKr. -10 čohčâmáánu 15, láv
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = mKr. 2008 kuovâmáánu 5
+   1995-12-22T09:05:02 = mKr. 1995 juovlâmáánu 22
+  -0010-09-15T04:44:23 = oKr. -10 čohčâmáánu 15
+
 =head3 GyMMMd (MMM d. y G)
 
    2008-02-05T18:30:30 = kuovâ 5. 2008 mKr.
@@ -506,6 +524,12 @@ Inari Sami locale.
    2008-02-05T18:30:30 = maj, kuovâ 5.
    1995-12-22T09:05:02 = vás, juovlâ 22.
   -0010-09-15T04:44:23 = láv, čohčâ 15.
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = kuovâmáánu 5, maj
+   1995-12-22T09:05:02 = juovlâmáánu 22, vás
+  -0010-09-15T04:44:23 = čohčâmáánu 15, láv
 
 =head3 MMMMW-count-one ('okko' W, MMMM)
 

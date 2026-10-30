@@ -1,0 +1,29 @@
+title: a PreToolUse hook that denies without a reason gets Claude Code's sentence; the stderr of exit 2 is a hook error (ADR 0022 addendum)
+files:
+  .claude/settings.json: |
+    { "hooks": { "PreToolUse": [
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/silent-deny", "args": [] } ] },
+      { "matcher": "Write", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/stderr-deny", "args": [] } ] }
+    ] } }
+  hooks/silent-deny: |
+    #!/bin/sh
+    cat >/dev/null
+    printf '%s' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny"}}'
+  hooks/stderr-deny: |
+    #!/bin/sh
+    cat >/dev/null
+    echo "writing is frozen" >&2
+    exit 2
+executable: [ hooks/silent-deny, hooks/stderr-deny ]
+prompt: Try both.
+script:
+  - tool_calls:
+      - [ bash, { command: echo hi } ]
+      - [ write_file, { path: a.txt, content: x } ]
+  - text: both refused
+expect:
+  answer: both refused
+  absent: [ a.txt ]
+  tools:
+    - { name: bash, error: true, text: '\APreToolUse:Bash hook blocked the tool call\z' }
+    - { name: write_file, error: true, text: '\APreToolUse:Write hook error: writing is frozen\z' }

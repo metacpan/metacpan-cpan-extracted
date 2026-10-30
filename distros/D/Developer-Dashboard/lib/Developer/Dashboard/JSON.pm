@@ -3,19 +3,28 @@ package Developer::Dashboard::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Exporter 'import';
 use JSON::XS ();
 
 our @EXPORT_OK = qw(json_encode json_encode_with_options json_decode json_decode_state);
 
+# The canonical pretty encoder's settings are constant for this module, so
+# construct it only on the first encode call and reuse it per interpreter.
+my $JSON_ENCODER;
+# The UTF-8 decoder has one immutable configuration and is reused as well.
+my $JSON_DECODER;
+
 # json_encode($value)
 # Serializes a Perl value into canonical pretty JSON.
 # Input: scalar/array/hash reference.
 # Output: JSON text string.
 sub json_encode {
-    return JSON::XS->new->utf8->canonical->pretty->encode( $_[0] );
+    if ( !$JSON_ENCODER ) {
+        $JSON_ENCODER = JSON::XS->new->utf8->canonical->pretty;
+    }
+    return $JSON_ENCODER->encode( $_[0] );
 }
 
 # json_encode_with_options($value, %opts)
@@ -47,7 +56,18 @@ sub json_encode_with_options {
 # Input: JSON text string.
 # Output: decoded Perl value.
 sub json_decode {
-    return JSON::XS->new->utf8->decode( $_[0] );
+    return _json_decoder()->decode( $_[0] );
+}
+
+# _json_decoder()
+# Returns the module's lazily initialized UTF-8 JSON decoder.
+# Input: none.
+# Output: a configured JSON::XS decoder object, reused in this interpreter.
+sub _json_decoder {
+    if ( !$JSON_DECODER ) {
+        $JSON_DECODER = JSON::XS->new->utf8;
+    }
+    return $JSON_DECODER;
 }
 
 # json_decode_state($json)
@@ -62,7 +82,7 @@ sub json_decode_state {
     my ($json) = @_;
     return undef if !defined $json;
     return undef if $json !~ /\S/;
-    my $decoded = eval { JSON::XS->new->utf8->decode($json) };
+    my $decoded = eval { _json_decoder()->decode($json) };
     return $decoded if !$@;
     return undef;
 }
@@ -104,7 +124,7 @@ Decode JSON text into a Perl value.
 
 =head1 PURPOSE
 
-This module centralizes JSON handling on top of C<JSON::XS>. It provides one canonical pretty encoder and one decoder so the runtime, helper scripts, and tests all use the same backend and the same output style.
+This module centralizes JSON handling on top of C<JSON::XS>. It provides one canonical pretty encoder and one decoder so the runtime, helper scripts, and tests all use the same backend and the same output style. The fixed-configuration encoder and UTF-8 decoder are constructed lazily once per interpreter and reused, avoiding per-call object allocation. The option-based encoder constructs an encoder per call because its settings vary dynamically.
 
 =head1 WHY IT EXISTS
 
@@ -116,7 +136,7 @@ Use this file when a feature needs JSON text, when pretty/canonical output expec
 
 =head1 HOW TO USE
 
-Import C<json_encode> and C<json_decode> from this module instead of constructing C<JSON::XS> ad hoc in feature code. Small compatibility helpers such as C<Developer::Dashboard::DataHelper> should still route back here.
+Import C<json_encode> and C<json_decode> from this module instead of constructing C<JSON::XS> ad hoc in feature code. Small compatibility helpers such as C<Developer::Dashboard::DataHelper> should still route back here. Use C<json_decode_state> for potentially incomplete runtime-state files; it returns undef for unavailable or invalid input and can decode a later valid payload using the same decoder.
 
 =head1 WHAT USES IT
 

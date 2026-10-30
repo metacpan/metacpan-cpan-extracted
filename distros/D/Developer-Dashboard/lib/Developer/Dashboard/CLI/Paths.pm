@@ -3,28 +3,48 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Cwd qw(abs_path cwd);
+use Cwd qw(abs_path);
 use File::Basename qw(basename);
 use File::Spec;
-use Getopt::Long qw(GetOptionsFromArray);
-use Developer::Dashboard::Config;
-use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
-use Developer::Dashboard::CLI::TableHelpers qw(
-    build_paths
-    aliases_table
-    list_table
-    mutation_table
-    removal_table
-    render_table
-);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
+
+# _build_paths()
+# Builds the shared path registry without loading table-rendering code, which
+# is unnecessary for machine-readable output such as "paths -o json".
+# Input: none; reads HOME and the current working directory.
+# Output: a Developer::Dashboard::PathRegistry object.
+sub _build_paths {
+    my $home = $ENV{HOME} || '';
+    my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
+    return Developer::Dashboard::PathRegistry->new(
+        home            => $home,
+        cwd             => current_working_directory(),
+        workspace_roots => \@roots,
+        project_roots   => \@roots,
+    );
+}
+
+# _load_table_helpers()
+# Loads the table formatting module only when a human/table output branch uses
+# it, keeping JSON-only command startup free of rendering imports.
+# Input: none.
+# Output: true after the module has loaded successfully; require errors
+# propagate to the caller.
+sub _load_table_helpers {
+    require Developer::Dashboard::CLI::TableHelpers;
+    return 1;
+}
 
 # run_paths_command(%args)
-# Dispatches the lightweight dashboard path/paths CLI behaviour without loading
-# the main dashboard runtime.
+# Dispatches the lightweight dashboard path/paths CLI behavior without loading
+# the main dashboard runtime. Configuration and file-registry modules are
+# required only for verbs that read configured aliases or mutate path config;
+# Getopt::Long is loaded only when the selected verb parses CLI options.
+# Filesystem-derived runtime-layer results are shared only for this command.
 # Input: command name under "command" plus the remaining argv array reference
 # under "args".
 # Output: prints the requested path data to STDOUT and exits successfully, or
@@ -35,17 +55,41 @@ sub run_paths_command {
     my $argv    = $args{args}    || die "Missing command arguments\n";
     die "Command arguments must be an array reference\n" if ref($argv) ne 'ARRAY';
 
-    my $paths = build_paths();
-    my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
-    my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+    my $paths = _build_paths();
+    local $paths->{_runtime_layer_candidate_scope} = {};
+    local $paths->{_installed_skill_inventory_scope} = {};
+    my @path_args = @{$argv};
+    my $path_action = $command eq 'paths' ? '' : ( shift @path_args || '' );
+    my $needs_config = $command eq 'paths'
+      || $path_action =~ /\A(?:resolve|cdr|complete-cdr|add|del|rm|list)\z/;
+    my $config;
+    if ($needs_config) {
+        require Developer::Dashboard::Config;
+        $config = Developer::Dashboard::Config->for_path_config($paths);
+    }
+    my $nested_skill_entries;
+    my $get_nested_skill_entries = sub {
+        if ( !defined $nested_skill_entries ) {
+            $nested_skill_entries = [ $paths->nested_skill_entries(
+                include_disabled              => 1,
+                include_config_write_location => 1,
+            ) ];
+        }
+        return $nested_skill_entries;
+    };
     my $load_configured_path_aliases = sub {
-        $paths->register_named_paths( $config->path_aliases );
+        $paths->register_named_paths(
+            $config->path_aliases( nested_skill_entries => $get_nested_skill_entries->() )
+        );
         return 1;
     };
     my $load_skill_folder_aliases = sub {
         $load_configured_path_aliases->();
         my $configured = $paths->named_paths;
-        my $folder_aliases = _skill_folder_path_aliases( paths => $paths );
+        my $folder_aliases = _skill_folder_path_aliases(
+            paths   => $paths,
+            entries => $get_nested_skill_entries->(),
+        );
         my %extra = map { exists $configured->{$_} ? () : ( $_ => $folder_aliases->{$_} ) } keys %{$folder_aliases};
         $paths->register_named_paths( \%extra );
         return 1;
@@ -75,6 +119,59 @@ sub run_paths_command {
     die "Usage: dashboard path <resolve|locate|cdr|complete-cdr|add|del|rm|project-root|list> ...\n";
 }
 
+# _get_options_from_array($argv, @option_specs)
+# Parses the common output-only grammar without loading Getopt::Long, then uses
+# Getopt::Long for any argument shape or option declaration outside that fast
+# path so less-common syntax retains the existing parser's behavior.
+# Input: mutable argv array reference followed by Getopt::Long option specs.
+# Output: Getopt::Long::GetOptionsFromArray's true/false parse result.
+sub _get_options_from_array {
+    my ( $argv, @specs ) = @_;
+    if ( @specs == 2 && $specs[0] eq 'o|output=s' && ref( $specs[1] ) eq 'SCALAR' ) {
+        my $parsed = _parse_output_options_fast( $argv, $specs[1] );
+        return $parsed if defined $parsed;
+    }
+
+    require Getopt::Long;
+    return Getopt::Long::GetOptionsFromArray(@_);
+}
+
+# _parse_output_options_fast($argv, $output_ref)
+# Removes the canonical -o/--output forms from argv and stores the final value
+# without loading Getopt::Long; returns undef when fallback parsing is needed.
+# Input: mutable argument array reference and scalar reference for the output
+# value.
+# Output: true on successful fast parsing, or undef when syntax requires the
+# compatibility parser.
+sub _parse_output_options_fast {
+    my ( $argv, $output_ref ) = @_;
+
+    my @remaining;
+    for ( my $index = 0; $index < @{$argv}; $index++ ) {
+        my $argument = $argv->[$index];
+        if ( $argument eq '-o' || $argument eq '--output' ) {
+            return undef if $index + 1 >= @{$argv};
+            ${$output_ref} = $argv->[ ++$index ];
+            next;
+        }
+        if ( $argument =~ /\A--output=(.*)\z/s ) {
+            ${$output_ref} = $1;
+            next;
+        }
+        if ( $argument =~ /\A-o(.+)\z/s ) {
+            my $value = $1;
+            $value =~ s/\A=//;
+            ${$output_ref} = $value;
+            next;
+        }
+        return undef if $argument eq '--' || $argument =~ /\A-/;
+        push @remaining, $argument;
+    }
+
+    @{$argv} = @remaining;
+    return 1;
+}
+
 # _paths_action_paths(%args)
 # Implements the top-level "dashboard paths" inventory listing.
 # Input: paths registry, config, alias-loader closure, and argv under "paths",
@@ -85,7 +182,7 @@ sub _paths_action_paths {
     my ( $paths, $load_folder_paths, $argv ) = @args{qw(paths load_folder_paths argv)};
     my @argv = @{$argv};
     my $output = 'table';
-    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    _get_options_from_array( \@argv, 'o|output=s' => \$output );
     die "Usage: dashboard paths [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
     $load_folder_paths->();
     if ( $output eq 'json' ) {
@@ -121,14 +218,15 @@ sub _paths_action_locate {
     my ( $paths, $argv ) = @args{qw(paths argv)};
     my @argv = @{$argv};
     my $output = 'table';
-    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    _get_options_from_array( \@argv, 'o|output=s' => \$output );
     die "Usage: dashboard path locate [-o json|table] <term...>\n" if $output ne 'json' && $output ne 'table';
     my $matches = [ $paths->locate_projects(@argv) ];
     if ( $output eq 'json' ) {
         print json_encode($matches);
         return 1;
     }
-    print list_table( 'Path', $matches );
+    _load_table_helpers();
+    print Developer::Dashboard::CLI::TableHelpers::list_table( 'Path', $matches );
     return 1;
 }
 
@@ -200,7 +298,7 @@ sub _paths_action_add {
     my @argv = @{$argv};
     my $output = 'table';
     my $create_raw;
-    GetOptionsFromArray( \@argv, 'o|output=s' => \$output, 'c|create:s' => \$create_raw );
+    _get_options_from_array( \@argv, 'o|output=s' => \$output, 'c|create:s' => \$create_raw );
     die "Usage: dashboard path add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
     my ( $create, $mode ) = _parse_create_option($create_raw);
     my ( $name, $path ) = _normalize_add_arguments(@argv);
@@ -211,7 +309,8 @@ sub _paths_action_add {
         print json_encode($saved);
         return 1;
     }
-    print mutation_table(
+    _load_table_helpers();
+    print Developer::Dashboard::CLI::TableHelpers::mutation_table(
         alias    => $saved->{name},
         stored   => $saved->{path},
         resolved => $saved->{resolved},
@@ -230,7 +329,7 @@ sub _paths_action_del {
     my ( $paths, $config, $argv ) = @args{qw(paths config argv)};
     my @argv = @{$argv};
     my $output = 'table';
-    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    _get_options_from_array( \@argv, 'o|output=s' => \$output );
     die "Usage: dashboard path del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
     my $name = _normalize_delete_argument(
         paths  => $paths,
@@ -243,7 +342,8 @@ sub _paths_action_del {
         print json_encode($deleted);
         return 1;
     }
-    print removal_table(
+    _load_table_helpers();
+    print Developer::Dashboard::CLI::TableHelpers::removal_table(
         alias   => $deleted->{name},
         removed => $deleted->{removed},
     );
@@ -274,14 +374,15 @@ sub _paths_action_list {
     my ( $paths, $load_folder_paths, $argv ) = @args{qw(paths load_folder_paths argv)};
     my @argv = @{$argv};
     my $output = 'table';
-    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+    _get_options_from_array( \@argv, 'o|output=s' => \$output );
     die "Usage: dashboard path list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
     $load_folder_paths->();
     if ( $output eq 'json' ) {
         print json_encode( $paths->all_path_aliases );
         return 1;
     }
-    print aliases_table( $paths->all_path_aliases );
+    _load_table_helpers();
+    print Developer::Dashboard::CLI::TableHelpers::aliases_table( $paths->all_path_aliases );
     return 1;
 }
 
@@ -295,13 +396,13 @@ sub _normalize_add_arguments {
     die "Usage: dashboard path add <name> <path>\n" if !@argv;
 
     if ( @argv == 1 && $argv[0] eq '.' ) {
-        my $cwd = cwd();
+        my $cwd = current_working_directory();
         return ( basename($cwd), $cwd );
     }
 
     my $name = shift @argv || die "Usage: dashboard path add <name> <path>\n";
     my $path = shift @argv || die "Usage: dashboard path add <name> <path>\n";
-    $path = cwd() if $path eq '.';
+    $path = current_working_directory() if $path eq '.';
     return ( $name, $path );
 }
 
@@ -319,7 +420,7 @@ sub _normalize_delete_argument {
     die "Usage: dashboard path del <name>\n" if !defined $name || $name eq '';
     return $name if $name ne '.';
 
-    my $cwd = cwd();
+    my $cwd = current_working_directory();
     my %aliases = %{ $config->path_aliases || {} };
     my $preferred = basename($cwd);
     if ( exists $aliases{$preferred} ) {
@@ -360,7 +461,8 @@ sub _resolve_path_alias {
 # _skill_folder_path_aliases(%args)
 # Reads listed path aliases from every installed skill Folder.pm without
 # changing config files; configured aliases remain authoritative on collision.
-# Input: path registry under "paths".
+# Input: path registry under "paths", optional precomputed nested-skill entry
+# array under "entries", and an optional skill-name filter.
 # Output: hash reference of skill-qualified alias names to returned paths.
 sub _skill_folder_path_aliases {
     my (%args) = @_;
@@ -368,7 +470,7 @@ sub _skill_folder_path_aliases {
     my $skill_name = $args{skill_name};
     my %aliases;
 
-    for my $entry ( _skill_folder_entries($paths) ) {
+    for my $entry ( _skill_folder_entries( $paths, $args{entries} ) ) {
         next if defined $skill_name && $entry->{name} ne $skill_name;
         next if !_load_skill_folder_module($entry);
         my $list = Folder->can('__list__') or next;
@@ -416,14 +518,17 @@ sub _skill_folder_alias_target {
     return $paths->_expand_home($target);
 }
 
-# _skill_folder_entries($paths)
+# _skill_folder_entries($paths, $entries)
 # Enumerates installed top-level and nested skill roots with their dotted names
 # and optional Folder.pm file locations.
-# Input: path registry object.
+# Input: path registry object and optional precomputed nested-skill entry array.
 # Output: list of hash references containing name, dir, and file.
 sub _skill_folder_entries {
-    my ($paths) = @_;
+    my ( $paths, $entries ) = @_;
     die "Missing paths registry\n" if !$paths;
+    die "Folder entries must be an array reference\n" if defined $entries && ref($entries) ne 'ARRAY';
+    my @nested_entries = defined $entries ? @{$entries} : $paths->nested_skill_entries;
+    die "Folder entries must contain hash references\n" if grep { ref($_) ne 'HASH' } @nested_entries;
     return map {
         my $dir = $_->{dir};
         my $lib = File::Spec->catdir( $dir, 'lib' );
@@ -433,7 +538,7 @@ sub _skill_folder_entries {
             file => File::Spec->catfile( $lib, 'Folder.pm' ),
             lib  => $lib,
         }
-    } $paths->nested_skill_entries;
+    } grep { !$_->{disabled} } @nested_entries;
 }
 
 # _load_skill_folder_module($entry)
@@ -680,7 +785,8 @@ sub _close_completion_directory {
 sub _paths_table {
     my ($all_paths) = @_;
     my @rows = map { [ $_, $all_paths->{$_} ] } sort keys %{ $all_paths || {} };
-    return render_table( [ 'Path', 'Value' ], \@rows );
+    _load_table_helpers();
+    return Developer::Dashboard::CLI::TableHelpers::render_table( [ 'Path', 'Value' ], \@rows );
 }
 
 1;
@@ -734,7 +840,10 @@ module builds a lightweight path registry, loads configured aliases on demand,
 keeps shell-plumbing verbs such as C<resolve>, C<project-root>, C<cdr>, and
 C<complete-cdr> on their direct line or JSON contracts, and renders the
 operator-facing inventory and mutation verbs as human-readable tables by
-default with C<-o json> available for the full machine payload. For
+default with C<-o json> available for the full machine payload. The
+C<project-root> and C<locate> verbs do not load config or file-registry modules;
+verbs that read or change configured aliases load them when needed. The option
+parser is also loaded on demand only for verbs that accept command-line flags. For
 C<dashboard path cdr>, the first argument is
 treated as a saved alias when one exists; otherwise it becomes the first search
 regex under the current directory. Any remaining narrowing terms are

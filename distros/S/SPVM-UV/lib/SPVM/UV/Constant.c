@@ -555,3 +555,33 @@ int32_t SPVM__UV__Constant__UV_LEAVE_GROUP(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = (int32_t)UV_LEAVE_GROUP;
   return 0;
 }
+
+int32_t SPVM__UV__Constant__UV_IGNORE(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_IGNORE;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_CREATE_PIPE(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_CREATE_PIPE;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_INHERIT_FD(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_INHERIT_FD;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_INHERIT_STREAM(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_INHERIT_STREAM;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_READABLE_PIPE(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_READABLE_PIPE;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_WRITABLE_PIPE(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_WRITABLE_PIPE;
+  return 0;
+}

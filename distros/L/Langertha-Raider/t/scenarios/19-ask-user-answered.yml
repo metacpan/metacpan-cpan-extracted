@@ -1,0 +1,23 @@
+title: ask_user puts the question to the person and the answer reaches the model
+files:
+  note.txt: "x\n"
+ask:
+  - blue
+prompt: Write the colour of my choice into colour.txt.
+script:
+  - tool_calls:
+      - [ ask_user, { question: 'Which colour?', options: [ red, blue ] } ]
+  - tool_calls:
+      - [ write_file, { path: colour.txt, content: "blue\n" } ]
+  - text: geschrieben
+expect:
+  answer: geschrieben
+  files:
+    colour.txt: "blue\n"
+  questions:
+    - { question: 'Which colour?', options: [ red, blue ] }
+  requests:
+    - { index: 1, contains: 'User answered: blue' }
+  tools:
+    - { name: ask_user, text: '^User answered: blue$' }
+    - { name: write_file }

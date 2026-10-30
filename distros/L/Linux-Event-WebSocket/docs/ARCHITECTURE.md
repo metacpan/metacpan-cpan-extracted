@@ -1,6 +1,6 @@
 # Linux::Event::WebSocket Architecture
 
-This document describes the architecture of the 0.001 release.
+This document describes version 0.003, interoperable with Linux::Event::HTTP 0.004.
 
 ## Layer ownership
 
@@ -8,8 +8,9 @@ This document describes the architecture of the 0.001 release.
 buffering, backpressure, lifecycle, timers, and in-place `transition_to()`
 operations.
 
-`Linux::Event::HTTP` owns the opening HTTP/1.1 request/response exchange and
-preserves bytes read after the Upgrade headers during the protocol transition.
+`Unblock::HTTP1` owns the opening HTTP/1.1 request/response exchange. The
+private Linux::Event WebSocket handshake streams attach it directly and
+preserve bytes after Upgrade. The public `Linux::Event::HTTP` API is not used.
 
 `Linux::Event::WebSocket` owns the public connection API, Upgrade policy,
 RFC 6455 data semantics, text policy, control behavior, and graceful close
@@ -43,26 +44,22 @@ the connection design.
 
 ## HTTP Upgrade handoff
 
-The high-level server composes `Linux::Event::HTTP::Server`. Accepted streams
-start as HTTP connections and transition to the configured WebSocket connection
-class after a valid handshake.
+The high-level server owns a Linux::Event listener. Each accepted stream
+attaches a standalone `Unblock::HTTP1::Server`, validates the WebSocket
+handshake, and transitions to the configured WebSocket connection class when
+its 101 response has been accepted into the ordered output queue.
 
-The high-level client uses `Linux::Event::HTTP::Client::Connection` for the
-opening exchange. WebSocket state is attached before the request is sent,
-because post-101 bytes may be delivered to the transitioned class before the
-public HTTP `on_upgrade` callback runs.
+The high-level client connects its Linux::Event stream and attaches a
+standalone `Unblock::HTTP1::Client`. Its opening request uses a canonical
+`Uniform::HTTP::Request`. The response is validated before the same stream
+transitions into the configured WebSocket connection class.
 
-Linux::Event::HTTP 0.002 owns server-side HTTP byte input natively, so the
-private WebSocket server handshake connection does not declare or override an
-HTTP input consumer. HTTP parses the opening request from the native ordered-byte
-buffer and Linux::Event `transition_to()` replaces the HTTP consumer with the
-WebSocket bq raw-input consumer after the validated 101 handoff.
-
-The HTTP client response path remains Perl-based in 0.002. The private WebSocket
-client handshake connection therefore keeps a small temporary native bridge that
-materializes the borrowed native window and feeds the existing HTTP client
-parser. After a valid 101 response, `transition_to()` replaces that bridge
-with the WebSocket bq raw-input consumer while preserving unread bytes.
+Both private handshake streams declare the existing native HTTP-byte bridge;
+Linux::Event's native-consumer ABI replaces it with the bq raw WebSocket
+consumer on transition. It cannot add the first native consumer to an
+already-live stream. Unblock::HTTP1 provides the exact unparsed remainder
+for delivery after the `on_open` callback, including bytes from the same read.
+No second HTTP parser or new native ABI is shipped.
 
 In both directions the live object is reblessed before preserved post-HTTP
 bytes are re-driven, so the first WebSocket frame may share the same transport
@@ -107,7 +104,7 @@ Binary data bypasses UTF-8 validation. Client masking keys come from Linux
 
 ### Raw native-input path
 
-Linux::Event 0.116's raw native-consumer ABI exposes a borrowed ordered-byte
+Linux::Event 0.117's raw native-consumer ABI exposes a borrowed ordered-byte
 input window before core creates a Perl read scalar. Linux::Event::WebSocket
 uses that facility as its established receive path without moving any
 WebSocket framing policy into Linux::Event core.
@@ -203,7 +200,7 @@ Protocol violations produce the applicable close status when possible:
 
 `Linux::Event::WebSocket::Connection::close()` intentionally means the RFC
 6455 close handshake. `abort()` is immediate transport termination.
-Linux::Event 0.116 supplies the matching core invariant that involuntary Stream
+Linux::Event 0.117 supplies the matching core invariant that involuntary Stream
 teardown bypasses a protocol subclass's public `close()`.
 
 ## Test and conformance policy

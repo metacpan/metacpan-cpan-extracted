@@ -31,7 +31,7 @@ package My::App {
   __PACKAGE__->meta->make_immutable;
 }
 
-sub app { My::App->new(root => $_[0], engine => 'openai', api_key => 'test', model => 'seq-model', @_[1 .. $#_]) }
+sub app { My::App->new(root => $_[0], engine => 'openai', api_key => 'test', model => 'seq-model', permission_mode => 'bypassPermissions', @_[1 .. $#_]) }
 
 my $json = JSON::MaybeXS->new(utf8 => 1);
 sub events { map { $json->decode($_) } path($_[0])->lines_raw({ chomp => 1 }) }
@@ -118,7 +118,7 @@ package My::HangApp {
 
 subtest 'cancel_run: the run ends cancelled, the tool call too' => sub {
   my $root = tempdir(CLEANUP => 1);
-  my $app = My::HangApp->new(root => $root, engine => 'openai', api_key => 'test', model => 'seq-model');
+  my $app = My::HangApp->new(root => $root, engine => 'openai', api_key => 'test', model => 'seq-model', permission_mode => 'bypassPermissions');
   my $session = $app->create_session;
   ok(!$app->cancel_run, 'nothing to cancel outside a run');
   $app->loop->watch_time(after => 0.3, code => sub { ok($app->cancel_run, 'cancel_run during the run') });

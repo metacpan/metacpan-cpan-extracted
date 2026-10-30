@@ -73,6 +73,14 @@ rec("strat_nofpc", svyglm(api00 ~ ell + meals + mobility, design = dstrat_nofpc)
 rec("strat_nest", svyglm(api00 ~ ell + meals, design = dstrat_nest))
 rec("strat_missing", svyglm(api00 ~ acs.k3 + ell, design = dstrat))
 rec("strat_factor", svyglm(api00 ~ stype + ell, design = dstrat))
+## a zero sampling weight on the first row, which is also the first row the
+## acs.k3 model keeps: survey drops it from the dispersion's count, and until
+## 0.331 LikeR's dispersion was 0/0 there.  The column is made here and in the
+## .t file alike, so t/apistrat.csv is unchanged.
+S0 <- S; S0$pw0 <- S0$pw; S0$pw0[1] <- 0
+dstrat_zw <- svydesign(id = ~1, strata = ~stype, weights = ~pw0, data = S0, fpc = ~fpc)
+rec("strat_zero_w", suppressWarnings(svyglm(api00 ~ ell + meals + mobility, design = dstrat_zw)))
+rec("strat_missing_zero_w", suppressWarnings(svyglm(api00 ~ acs.k3 + ell, design = dstrat_zw)))
 
 cat("my %EXPECT = (\n")
 for (k in names(EXP)) {

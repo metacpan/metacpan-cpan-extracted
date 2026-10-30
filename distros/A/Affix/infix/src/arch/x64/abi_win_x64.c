@@ -1372,6 +1372,6 @@ static infix_status generate_direct_forward_epilogue_win_x64(code_buffer * buf,
     return INFIX_SUCCESS;
 }
 
-#ifdef _MSC_VER
+#if defined(INFIX_COMPILER_MSVC)
 #pragma warning(pop)
 #endif

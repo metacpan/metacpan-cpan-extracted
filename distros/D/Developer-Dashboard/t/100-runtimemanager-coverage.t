@@ -1948,9 +1948,8 @@ is( $manager->_tail_text( "a\n",       5 ), "a\n",    '_tail_text clamps the sta
     is( $manager->web_log, "l1\nl2\nl3\n", 'web_log returns the full log' );
     is( $manager->web_log( lines => 2 ), "l2\nl3\n", 'web_log tails the requested number of lines' );
     my $err = eval { $manager->web_log( lines => 'x' ); 1 } ? '' : $@;
-    like( $err, qr/Line count must be a positive integer/, 'web_log rejects a non-numeric line count' );
-    $err = eval { $manager->web_log( lines => 0 ); 1 } ? '' : $@;
-    like( $err, qr/Line count must be a positive integer/, 'web_log rejects a zero line count' );
+    like( $err, qr/Line count must be a non-negative integer/, 'web_log rejects a non-numeric line count' );
+    is( $manager->web_log( lines => 0 ), '', 'web_log treats a zero line count as an empty tail' );
     $files->remove('dashboard_log');
     is( $manager->web_log, '', 'web_log returns empty when the log file is missing' );
 }

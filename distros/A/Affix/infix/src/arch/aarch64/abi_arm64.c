@@ -441,6 +441,7 @@ static infix_status prepare_forward_call_frame_arm64(infix_arena_t * arena,
  * @return `INFIX_SUCCESS`.
  */
 static infix_status generate_forward_prologue_arm64(code_buffer * buf, infix_call_frame_layout * layout) {
+    emit_arm64_bti_c(buf);
     // `stp x29, x30, [sp, #-16]!` : Push Frame Pointer and Link Register to the stack, pre-decrementing SP.
     emit_arm64_stp_pre_index(buf, true, X29_FP_REG, X30_LR_REG, SP_REG, -16);
     // `stp x19, x20, [sp, #-16]!` : Save callee-saved registers that we will use for our context.
@@ -867,6 +868,7 @@ static infix_status prepare_reverse_call_frame_arm64(infix_arena_t * arena,
  * @return `INFIX_SUCCESS` on success.
  */
 static infix_status generate_reverse_prologue_arm64(code_buffer * buf, infix_reverse_call_frame_layout * layout) {
+    emit_arm64_bti_c(buf);
     // `stp x29, x30, [sp, #-16]!` : Save Frame Pointer and Link Register, pre-decrementing SP.
     emit_arm64_stp_pre_index(buf, true, X29_FP_REG, X30_LR_REG, SP_REG, -16);
     // `mov x29, sp` : Establish the new frame pointer.
@@ -1318,6 +1320,7 @@ static infix_status prepare_direct_forward_call_frame_arm64(infix_arena_t * aren
  * @brief Stage 2 (Direct): Generates the function prologue.
  */
 static infix_status generate_direct_forward_prologue_arm64(code_buffer * buf, infix_direct_call_frame_layout * layout) {
+    emit_arm64_bti_c(buf);
     // Standard prologue: save FP/LR, set up new FP.
     emit_arm64_stp_pre_index(buf, true, X29_FP_REG, X30_LR_REG, SP_REG, -16);
     // Save callee-saved registers for our context.

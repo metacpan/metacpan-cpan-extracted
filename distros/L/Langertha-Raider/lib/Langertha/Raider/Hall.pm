@@ -1,6 +1,6 @@
 package Langertha::Raider::Hall;
-our $VERSION = '0.503';
-# ABSTRACT: Hall daemon — spawns and manages raider processes
+our $VERSION = '0.504';
+# ABSTRACT: Hall daemon - spawns and manages raider processes
 
 
 use strict;
@@ -11,6 +11,7 @@ use IO::Async::Stream;
 use IO::Async::Timer;
 use JSON::MaybeXS;
 use POSIX qw(WNOHANG);
+use Time::HiRes ();
 use YAML::PP;
 use Moose;
 use namespace::autoclean;
@@ -21,12 +22,15 @@ use IO::Socket::UNIX;
 use File::Which ();
 use Net::Async::HTTP;
 use Langertha::Raider::Binary qw( packed_binary );
+use Langertha::Raider::Config;
 use Langertha::Raider::Hall::ACP;
 use Langertha::Raider::Hall::Cron;
 use Langertha::Raider::Hall::MCP;
+use Langertha::Raider::Hall::PermissionChannel;
 use Langertha::Raider::Hall::Protocol;
 use Langertha::Raider::Hall::Raider;
 use Langertha::Raider::Hall::Telegram;
+use Langertha::Raider::Provider::Binding;
 use Langertha::Raider::SessionStore;
 
 has root => (
@@ -347,7 +351,7 @@ sub _drain_binding_queue {
     my $next = shift @$queue;
     delete $queues->{$binding} unless @$queue;
     $self->_persist_binding_queues;
-    $self->_spawn(%$next) if $next;
+    $self->_spawn(%$next, queued => 1) if $next;
   }
   return;
 }
@@ -538,7 +542,7 @@ sub _process_client_frames {
 
   my $msg = eval { JSON::MaybeXS->new->decode($line) };
   if (!$msg || $@) {
-    my $err = JSON::MaybeXS->new->encode({error => "invalid JSON: $@"});
+    my $err = $self->_wire_json->encode({error => "invalid JSON: $@"});
     $stream->write("$err\n");
     return;
   }
@@ -556,7 +560,7 @@ sub _process_client_frames {
     return;
   }
 
-  my $err = JSON::MaybeXS->new->encode({error => "unknown message type: $type"});
+  my $err = $self->_wire_json->encode({error => "unknown message type: $type"});
   $stream->write("$err\n");
 }
 
@@ -566,30 +570,55 @@ sub _handle_command {
 
   my $handler = $self->{_cmd_handlers}{$cmd};
   if (!$handler) {
-    my $err = JSON::MaybeXS->new->encode({error => "unknown command: $cmd"});
+    my $err = $self->_wire_json->encode({error => "unknown command: $cmd"});
     $stream->write("$err\n");
     return;
   }
 
   eval { $handler->($self, $stream, $payload) };
   if ($@) {
-    my $err = JSON::MaybeXS->new->encode({error => "command failed: $@"});
+    my $err = $self->_wire_json->encode({error => "command failed: $@"});
     $stream->write("$err\n");
   }
 }
 
+has _seq => (
+  traits   => ['Counter'],
+  is       => 'ro',
+  isa      => 'Int',
+  default  => 0,
+  init_arg => undef,
+  handles  => { _next_seq => 'inc' },
+);
+
+# Bus events and control-socket answers are wire formats: sorted keys.
+has _wire_json => (
+  is       => 'ro',
+  lazy     => 1,
+  builder  => '_build__wire_json',
+  init_arg => undef,
+);
+
+sub _build__wire_json { JSON::MaybeXS->new( canonical => 1, convert_blessed => 1 ) }
+
+# The bus envelope, version 1 (ADR 0033): version, type, seq per hall
+# process, time as a float; ts stays for subscribers of before.
 sub _emit {
   my ($self, $type, $data) = @_;
+  my $now = Time::HiRes::time();
+  $data->{version} = 1;
   $data->{type} = $type;
-  $data->{ts} //= time();
+  $data->{seq} = $self->_next_seq;
+  $data->{time} = $now;
+  $data->{ts} //= int $now;
 
-  my $json = JSON::MaybeXS->new->encode($data);
+  my $json = $self->_wire_json->encode($data);
   # Closed streams leave the list; a subscriber whose filter does not match
   # stays, and so does one added while this event went out.
   my %closed;
   for my $sub (@{[ @{$self->{_subscribers} // []} ]}) {
     my $stream = $sub->{stream};
-    unless ($stream && $stream->handle && $stream->handle->opened) {
+    unless ($stream && $self->_stream_opened($stream)) {
       $closed{$sub} = 1;
       next;
     }
@@ -598,6 +627,15 @@ sub _emit {
     eval { $stream->write("$json\n") };
   }
   $self->{_subscribers} = [ grep { !$closed{$_} } @{$self->{_subscribers} // []} ];
+}
+
+# Whether a subscriber's stream can still be written to: an
+# IO::Async::Stream of a control socket client (no `handle` method, only
+# read_handle/write_handle) or the shim of an ACP session.
+sub _stream_opened {
+  my ($self, $stream) = @_;
+  my $handle = $stream->can('write_handle') ? $stream->write_handle : $stream->handle;
+  return $handle && $handle->opened;
 }
 
 sub _broadcast_to_socket {
@@ -654,6 +692,7 @@ sub _reap_raider {
     $raider->has_binding ? ( binding => $raider->binding ) : (),
   });
 
+  if (my $channel = delete $self->_permission_channels->{$raider->id}) { $channel->close }
   delete $self->raiders->{$raider->id};
   $self->_prune_events($slot);
 
@@ -798,7 +837,7 @@ sub _spawn_next_in_queue {
     $telegram ? ( telegram => $telegram ) : (),
     binding => $binding,
   }) if defined $binding && $self->_binding_busy($binding);
-  $self->_spawn_raider($slot, $base_name, $mission, $telegram, $binding);
+  $self->_spawn_raider($slot, $base_name, $mission, $telegram, $binding, 1);
 }
 
 sub spawn {
@@ -814,6 +853,7 @@ sub _spawn {
   my $mission = $args{mission} // '';
   my $telegram = $args{telegram};
   my $binding = $args{binding};
+  my $queued = $args{queued};
 
   my ($slot, $base_name) = $self->_parse_name($name);
 
@@ -844,7 +884,7 @@ sub _spawn {
     binding => $binding,
   }) if defined $binding && $self->_binding_busy($binding);
 
-  return $self->_spawn_raider($slot // $name, $base_name // $name, $mission, $telegram, $binding);
+  return $self->_spawn_raider($slot // $name, $base_name // $name, $mission, $telegram, $binding, $queued);
 }
 
 sub _parse_name {
@@ -856,11 +896,24 @@ sub _parse_name {
 }
 
 sub _spawn_raider {
-  my ($self, $slot, $base_name, $mission, $telegram, $binding) = @_;
+  my ($self, $slot, $base_name, $mission, $telegram, $binding, $queued) = @_;
 
   my $raider_config = $self->config->{raiders}{$base_name} // {};
+  # provider: only a stored alias, never a host the hall would fetch
+  # unattended; the run is refused before anything starts.
+  if (my $problem = $self->_provider_refusal($raider_config)) {
+    return $self->_refuse(
+      slot     => $slot,
+      name     => $base_name,
+      problem  => $problem,
+      binding  => scalar $self->_binding_key($slot, $binding),
+      telegram => $telegram,
+      queued   => $queued,
+    );
+  }
   # No engine configured: leave it to raider (.raider.yml, then key autodetection).
   my $engine = $raider_config->{engine};
+  my $provider = $raider_config->{provider};
   my $model = $raider_config->{model};
   my @packs = @{ $raider_config->{packs} // [] };
   # The persona is one more pack.
@@ -871,8 +924,11 @@ sub _spawn_raider {
 
   my @cmd = ($self->_raider_command, '--stream-json');
   push @cmd, '--engine', $engine if $engine;
+  push @cmd, '--provider', $provider if defined $provider;
   push @cmd, '--model', $model if $model;
   push @cmd, '--pack', $_ for @packs;
+  push @cmd, '--permission-mode', $raider_config->{permission_mode}
+    if defined $raider_config->{permission_mode} && length $raider_config->{permission_mode};
   push @cmd, '-o', 'preferred_lib_target='.$lib_target;
   push @cmd, '--root', $self->root->stringify;
   # A bound run resumes its binding's session; an unbound one gets a
@@ -904,6 +960,22 @@ sub _spawn_raider {
   $id = $base_id.'.'.++$n while -e $log_dir->child("${id}.events.jsonl");
   my $events_path = $log_dir->child("${id}.events.jsonl");
   $events_path->touch;
+
+  # A run of an ACP session whose client can be asked gets a channel to the
+  # hall; the raider's --permission-channel puts its asks on it. Without a
+  # channel an ask is refused (ADR 0021).
+  if (defined $binding && (my $handler = $self->_permission_handlers->{$binding})) {
+    my $channel = Langertha::Raider::Hall::PermissionChannel->new(
+      loop    => $self->loop,
+      timeout => $self->permission_timeout,
+      handler => $handler,
+    );
+    my $path = eval { $channel->start };
+    if (defined $path) {
+      $self->_permission_channels->{$id} = $channel;
+      splice @cmd, -2, 0, '--permission-channel', $path;   # before the `--` and the mission
+    }
+  }
   $log_path->append_utf8($self->_start_line($id));
   $self->_note_ignored_keys($base_name, $raider_config, $log_path);
 
@@ -976,6 +1048,33 @@ sub _spawn_raider {
   };
 }
 
+# A mission whose raider entry the hall refuses runs nothing (ADR 0033): a
+# line in the slot log, raider.refused on the bus, a short reply without
+# the reason into a Telegram chat; the spawn answers with the error.
+sub _refuse {
+  my ($self, %args) = @_;
+  my ($slot, $name, $problem) = @args{qw( slot name problem )};
+  my $log_dir = $self->_log_dir;
+  $log_dir->mkpath unless -d $log_dir;
+  $log_dir->child("${slot}.log")->append_utf8(
+    '[hall] raider '.$name.' refused: '.$problem->{error}."; mission not run\n");
+  $self->_emit('raider.refused', {
+    status => 'refused',
+    slot   => $slot,
+    name   => $name,
+    defined $args{binding} ? ( binding => $args{binding} ) : (),
+    reason => $problem->{reason},
+    error  => $problem->{error},
+    queued => $args{queued} ? JSON->true : JSON->false,
+  });
+  $self->telegram->send_refused(%{$args{telegram}}) if $args{telegram};
+  return {
+    status => 'refused',
+    reason => $problem->{reason},
+    error  => 'raider '.$name.': '.$problem->{error},
+  };
+}
+
 # session and binding of a bound run, for events and replies.
 sub _session_fields {
   my ($self, $raider) = @_;
@@ -1025,6 +1124,55 @@ sub _build_lib_target {
   my ($self) = @_;
   my $target = $self->config->{preferred_lib_target} // '.raider/lib';
   return path($target)->absolute($self->root)->stringify;
+}
+
+sub config_class  { 'Langertha::Raider::Config' }
+sub binding_class { 'Langertha::Raider::Provider::Binding' }
+
+# Why the provider of a raider entry cannot be used, as the entry stands:
+# not with engine, and only an alias -- a HOST or https origin is refused.
+# A { reason, error } pair -- the code of raider.refused (ADR 0033) and the
+# human text --, nothing for an entry without provider. Hall::CLI checks
+# with it before it writes an entry.
+sub _provider_problem {
+  my ($self, $entry) = @_;
+  return unless defined $entry->{provider};
+  my $provider = $entry->{provider};
+  return {
+    reason => 'provider_with_engine',
+    error  => 'provider and engine exclude each other; the provider manifest decides the engine',
+  } if defined $entry->{engine};
+  return {
+    reason => 'provider_not_alias',
+    error  => "provider '".$provider."' is no alias; the hall runs only on a binding stored with"
+      .' raider provider add ALIAS HOST, never on a host or URL',
+  } unless $self->binding_class->valid_alias($provider);
+  return;
+}
+
+# _provider_problem, and the alias must be stored in ~/.raider/config.yml
+# now: raider --provider takes an unknown name for a host and would fetch
+# it, which the unattended hall never does.
+sub _provider_refusal {
+  my ($self, $entry) = @_;
+  if (my $problem = $self->_provider_problem($entry)) {
+    return $problem;
+  }
+  return unless defined $entry->{provider};
+  my $alias = $entry->{provider};
+  my $config = $self->config_class->new(root => $self->root->stringify);
+  my $providers = eval { $config->providers };
+  return {
+    reason => 'provider_config',
+    error  => 'provider: '.($@ =~ s/\s+\z//r),
+  } unless $providers;
+  return {
+    reason => 'provider_not_stored',
+    error  => "provider alias '".$alias."' is not stored in "
+      .($config->home_file // '~/.raider/config.yml')
+      .'; bind it first with raider provider add '.$alias.' HOST',
+  } unless exists $providers->{$alias};
+  return;
 }
 
 # Raider entry keys the hall does not read. A config that still carries
@@ -1097,6 +1245,31 @@ has cancel_grace => (
 );
 
 sub _build_cancel_grace { $_[0]->config->{cancel_grace} // 5 }
+
+
+has permission_timeout => (
+  is => 'ro',
+  lazy => 1,
+  builder => '_build_permission_timeout',
+);
+
+sub _build_permission_timeout { $_[0]->config->{permission_timeout} // 120 }
+
+has _permission_handlers => ( is => 'ro', default => sub { {} }, init_arg => undef );
+has _permission_channels => ( is => 'ro', default => sub { {} }, init_arg => undef );
+
+
+sub register_permission_handler {
+  my ($self, $binding, $cb) = @_;
+  $self->_permission_handlers->{$binding} = $cb;
+  return;
+}
+
+sub unregister_permission_handler {
+  my ($self, $binding) = @_;
+  delete $self->_permission_handlers->{$binding};
+  return;
+}
 
 # After cancel_grace, sends the first of @signals to raider $id if that
 # process ($pid) still runs, and goes on with the rest.
@@ -1243,11 +1416,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Raider::Hall - Hall daemon — spawns and manages raider processes
+Langertha::Raider::Hall - Hall daemon - spawns and manages raider processes
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -1288,9 +1461,9 @@ An MCP adapter on C<.raider-hall.mcp> is B<not implemented>:
 L<Langertha::Raider::Hall::MCP> describes the hall tools, but no socket is
 opened and an C<mcp> section in the config has no effect.
 
-All state flows through the event bus (JSONL pub/sub). Clients
-subscribe with C<{type: subscribe, payload: {filter: 'raider.'}}> and
-commands are separate frames (C<{type: command, payload: {cmd: ...}}>).
+All state flows through the event bus (JSONL pub/sub) on the control
+socket; see L</EVENT BUS> and L</CONTROL SOCKET>, both public wire
+formats (ADR 0033).
 
 Each raider runs with C<--stream-json>. Its stdout goes to a file of its
 own per run, F<.raider-hall/logs/ID.events.jsonl>; its stderr is appended
@@ -1331,6 +1504,130 @@ The C<spawn> reply and C<attach> name the run's C<events_path>;
 C<raider hall attach ID> and C<raider hall spawn --attach> print that
 file as it grows, until the hall has reaped the raider.
 
+=head1 EVENT BUS
+
+The hall writes every event as one line of JSON, with sorted keys, to each
+control-socket client that subscribed with
+C<{"type":"subscribe","payload":{"filter":PREFIX}}>; the client gets the
+events whose C<type> starts with C<PREFIX> (C<""> for all of them).
+
+B<Envelope, version 1.> Every event carries:
+
+=over
+
+=item * C<version> -- the format version, the integer C<1>.
+
+=item * C<type> -- one of the types below.
+
+=item * C<seq> -- 1, 2, 3 ... per hall process.
+
+=item * C<time> -- epoch seconds as a float.
+
+=item * C<ts> -- the whole seconds of C<time>; kept in version 1 for
+subscribers of before.
+
+=back
+
+Within a version fields and types are only added, never renamed, removed or
+changed in meaning; a subscriber ignores what it does not know (ADR 0013).
+A field in C<[brackets]> below is there only when it applies.
+
+=over
+
+=item C<hall.started> -- C<root>: the hall root.
+
+=item C<hall.stopping> -- the hall shuts down; no fields.
+
+=item C<session.bound> -- C<binding>, C<session>: a binding got a new
+session.
+
+=item C<session.reset> -- C<binding>, C<session> (the old one): see
+L</reset_session>.
+
+=item C<hall.session_error> -- C<binding>, C<error>, C<id>: the run C<id>
+could not get its binding's session and runs unbound.
+
+=item C<raider.queued> -- C<slot>, C<queue_depth>, [C<binding>]: a mission
+waits for its numbered slot, or (with C<binding>) for its binding.
+
+=item C<raider.spawned> -- C<id>, C<pid>, C<slot>, C<base_name>,
+[C<session>, C<binding>].
+
+=item C<raider.refused> -- C<status> (C<refused>), C<slot>, C<name>,
+[C<binding>], C<reason>, C<error>, C<queued>: the hall refused the
+mission's raider entry, so nothing started and the mission is not run.
+C<reason> is a code: C<provider_not_alias> (a host or URL, not an alias),
+C<provider_with_engine> (C<provider> and C<engine> on one entry),
+C<provider_not_stored> (the alias is not in F<~/.raider/config.yml>),
+C<provider_config> (that file cannot be read); more may be added in
+version 1. C<error> is the human text. C<queued> is true when the mission
+was refused as it was pulled from a queue. There is no C<id> and no
+C<pid>: a refused mission never ran.
+
+=item C<raider.done> -- C<id>, C<slot>, C<pid>, C<exit_code>, C<signaled>
+(C<1> or C<0>), C<status>, [C<response>], [C<error>], [C<session>],
+[C<binding>]: a run ended; see L</DESCRIPTION>.
+
+=item C<cron.fired> -- C<id>, C<name>, [C<raider_id>]: a cron job's
+occurrence was handed to the hall; C<raider_id> when a run started at
+once.
+
+=item C<cron.coalesced> -- C<id>, C<name>: an occurrence dropped because
+the previous one has not ended (C<coalesce: true>).
+
+=item C<acp.started> -- C<host>, C<port>: the ACP adapter listens.
+
+=item C<telegram.in> -- C<bot>, C<chat_id>, [C<message_thread_id>],
+C<text>, C<first_name>, C<username>, C<update_id>: an accepted message.
+
+=item C<telegram.rejected> -- C<bot>, C<chat_id>, C<from_id>, C<reason>
+(C<no_sender>, C<sender_not_allowed>, C<chat_not_allowed>), C<update_id>.
+
+=item C<telegram.config_warning> -- C<bot>, C<warning>.
+
+=item C<telegram.poll_error> -- C<bot>, [C<status>], C<error>.
+
+=item C<telegram.update_error> -- C<bot>, C<update_id>, C<error>.
+
+=item C<telegram.send_error> -- C<bot>, C<chat_id>, C<error>: a reply
+could not be sent.
+
+=back
+
+=head1 CONTROL SOCKET
+
+F<.raider-hall.socket> in the hall root (mode 0600) takes one JSON object per
+line: C<subscribe> (see L</EVENT BUS>) or
+C<{"type":"command","payload":{"cmd":NAME, ...}}>. Every command is
+answered with one line of JSON, with sorted keys; an unknown command, an
+unknown frame or a command that died is answered C<{"error":...}>.
+
+=over
+
+=item C<spawn> -- C<name>, C<mission>. Answers C<id>, C<pid>, C<slot>,
+C<events_path>, [C<session>, C<binding>] for a started run;
+C<queued> (C<1>), C<slot>, C<queue_depth>, [C<binding>] for one that
+waits; C<status> (C<refused>), C<reason> and C<error> for a refused one
+(the codes of C<raider.refused>).
+
+=item C<ps> -- C<raiders>: a list of C<slot>, C<pid>, C<base_name>,
+C<mission>, C<id>, [C<session>, C<binding>].
+
+=item C<attach> -- C<id>; see L</attach>.
+
+=item C<kill> -- C<id>; C<killed> and C<id>, or C<error>.
+
+=item C<logs> -- C<id>; see L</logs>.
+
+=item C<status> -- C<running>, C<root>, C<slots>.
+
+=item C<session_reset> -- C<binding>; see L</reset_session>.
+
+=item C<telegram_reply> -- C<bot>, C<chat_id>, C<text>,
+[C<message_thread_id>]; C<ok>, or C<error>.
+
+=back
+
 =head1 CONFIG FILE
 
 C<.raider-hall.yml> in the hall root:
@@ -1348,6 +1645,7 @@ C<.raider-hall.yml> in the hall root:
     acp: { port: 38421, host: 127.0.0.1 }
     logs: { keep_events: 20, max_log_size: 1048576 }
     cancel_grace: 5
+    permission_timeout: 120
 
 C<persona> on a raider entry is a pack used as the raider's persona: the
 hall passes it as one more C<--pack>, after those in C<packs>, unless
@@ -1358,10 +1656,38 @@ C<preferred_lib_target> sets the hall's L</lib_target>. C<longhouse: true>
 adds F<longhouse/lib> of the hall root to every raider's C<PERL5LIB> as
 well.
 
+C<permission_mode> on a raider entry (C<default>, C<acceptEdits>,
+C<auto>, C<plan>, C<bypassPermissions>; ADR 0021) is passed as C<--permission-mode>.
+A hall raider has nobody to ask, except a run of an ACP session whose client
+can be asked with C<session/request_permission> (see L</permission_timeout>):
+every other tool call its mode or rules ask about is refused with the
+reason. Without the key the raider takes the mode from
+its project (C<permissions.default_mode> of F<.raider/config.yml>, the
+Claude settings), else C<default> -- which refuses writing, C<bash> and the
+network unless a rule allows them.
+
 C<engine> on a raider entry is optional. Without it the hall passes no
 C<--engine> and the spawned raider decides itself: the engine from its
 F<.raider.yml> first, then autodetection from the API keys in the
 environment.
+
+C<provider> on a raider entry is the alias of a provider binding that
+C<raider provider add ALIAS HOST> stored in F<~/.raider/config.yml> (ADR
+0007); the hall passes it as C<--provider ALIAS>, and C<model> next to it
+as C<--model>, which picks the model among the manifest's. Only an alias:
+a host, C<HOST:PORT> or https origin is refused, and so is an alias that
+is not stored -- the hall runs unattended and never fetches a provider
+nobody accepted, so it never passes C<--allow-internal> either (that is
+part of the binding). C<provider> and C<engine> on one entry exclude each
+other. A refused entry starts no raider and its mission is not run -- also
+one that waited in a queue and is refused when it is pulled: the hall
+emits C<raider.refused> (see L</EVENT BUS>), the spawn answers with
+C<status: refused>, a C<reason> and an C<error>, and the slot log gets a
+C<[hall] raider NAME refused: WHY; mission not run> line. ACP sessions of
+such a raider run on the same provider.
+
+    raiders:
+      ivar: { provider: acme, model: example-model, persona: caveman }
 
 =head1 ENVIRONMENT
 
@@ -1538,6 +1864,26 @@ F<raider> time for its own cancel -- ending the tool subprocesses takes it
 up to two seconds (L<Langertha::Raider::CLI::Runner/terminate_children>)
 -- and matches the grace the hall gives its raiders on shutdown.
 
+=head2 permission_timeout
+
+Seconds an ACP client has to answer a C<session/request_permission> the hall
+forwards for a raider's tool call (ADR 0021, Nachtrag P2). From
+C<permission_timeout: N> in F<.raider-hall.yml>, default 120. After it the
+answer is I<no>: the call is refused, the run goes on, and the hall does not
+treat a run that waits for an answer as hung.
+
+=head2 register_permission_handler
+
+    $hall->register_permission_handler( 'acp:acp-1234', sub { my ($question) = @_; return $future_of_answer } );
+    $hall->unregister_permission_handler('acp:acp-1234');
+
+A surface that can ask a person (the ACP adapter) registers, per session
+binding, the code that answers the questions of the runs of that binding. A
+run spawned for a registered binding gets a permission channel
+(L<Langertha::Raider::Hall::PermissionChannel>) and the hidden raider option
+C<--permission-channel>; every other run has none and is refused as before.
+The code returns a Future of C<< { answer => 'once' | 'session' | 'no', reason } >>.
+
 =head2 logs
 
     my $res = $hall->logs(id => $id);   # { log => $text } or { error => ... }
@@ -1558,7 +1904,7 @@ appended.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -1579,5 +1925,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

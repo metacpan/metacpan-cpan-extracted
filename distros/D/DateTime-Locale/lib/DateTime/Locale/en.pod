@@ -453,11 +453,53 @@ English locale.
    1995-12-22T09:05:02 = Fri, Dec 22, 1995 AD
   -0010-09-15T04:44:23 = Sat, Sep 15, -10 BC
 
+=head3 GyMMMEddd (E, MMM ddd, y G)
+
+   2008-02-05T18:30:30 = Tue, Feb 5th, 2008 AD
+   1995-12-22T09:05:02 = Fri, Dec 22nd, 1995 AD
+  -0010-09-15T04:44:23 = Sat, Sep 15th, -10 BC
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = February 2008 AD
+   1995-12-22T09:05:02 = December 1995 AD
+  -0010-09-15T04:44:23 = September -10 BC
+
+=head3 GyMMMMEd (E, MMMM d, y G)
+
+   2008-02-05T18:30:30 = Tue, February 5, 2008 AD
+   1995-12-22T09:05:02 = Fri, December 22, 1995 AD
+  -0010-09-15T04:44:23 = Sat, September 15, -10 BC
+
+=head3 GyMMMMEddd (E, MMMM ddd, y G)
+
+   2008-02-05T18:30:30 = Tue, February 5th, 2008 AD
+   1995-12-22T09:05:02 = Fri, December 22nd, 1995 AD
+  -0010-09-15T04:44:23 = Sat, September 15th, -10 BC
+
+=head3 GyMMMMd (MMMM d, y G)
+
+   2008-02-05T18:30:30 = February 5, 2008 AD
+   1995-12-22T09:05:02 = December 22, 1995 AD
+  -0010-09-15T04:44:23 = September 15, -10 BC
+
+=head3 GyMMMMddd (MMMM ddd, y G)
+
+   2008-02-05T18:30:30 = February 5th, 2008 AD
+   1995-12-22T09:05:02 = December 22nd, 1995 AD
+  -0010-09-15T04:44:23 = September 15th, -10 BC
+
 =head3 GyMMMd (MMM d, y G)
 
    2008-02-05T18:30:30 = Feb 5, 2008 AD
    1995-12-22T09:05:02 = Dec 22, 1995 AD
   -0010-09-15T04:44:23 = Sep 15, -10 BC
+
+=head3 GyMMMddd (MMM ddd, y G)
+
+   2008-02-05T18:30:30 = Feb 5th, 2008 AD
+   1995-12-22T09:05:02 = Dec 22nd, 1995 AD
+  -0010-09-15T04:44:23 = Sep 15th, -10 BC
 
 =head3 GyMd (M/d/y G)
 
@@ -495,11 +537,11 @@ English locale.
    1995-12-22T09:05:02 = 09:05 UTC
   -0010-09-15T04:44:23 = 04:44 UTC
 
-=head3 Hv (HH'h' v)
+=head3 Hv (HH v)
 
-   2008-02-05T18:30:30 = 18h UTC
-   1995-12-22T09:05:02 = 09h UTC
-  -0010-09-15T04:44:23 = 04h UTC
+   2008-02-05T18:30:30 = 18 UTC
+   1995-12-22T09:05:02 = 09 UTC
+  -0010-09-15T04:44:23 = 04 UTC
 
 =head3 M (L)
 
@@ -525,6 +567,24 @@ English locale.
    1995-12-22T09:05:02 = Fri, Dec 22
   -0010-09-15T04:44:23 = Sat, Sep 15
 
+=head3 MMMEddd (E, MMM ddd)
+
+   2008-02-05T18:30:30 = Tue, Feb 5th
+   1995-12-22T09:05:02 = Fri, Dec 22nd
+  -0010-09-15T04:44:23 = Sat, Sep 15th
+
+=head3 MMMMEd (E, MMMM d)
+
+   2008-02-05T18:30:30 = Tue, February 5
+   1995-12-22T09:05:02 = Fri, December 22
+  -0010-09-15T04:44:23 = Sat, September 15
+
+=head3 MMMMEddd (E, MMMM ddd)
+
+   2008-02-05T18:30:30 = Tue, February 5th
+   1995-12-22T09:05:02 = Fri, December 22nd
+  -0010-09-15T04:44:23 = Sat, September 15th
+
 =head3 MMMMW-count-one ('week' W 'of' MMMM)
 
    2008-02-05T18:30:30 = week 1 of February
@@ -543,11 +603,23 @@ English locale.
    1995-12-22T09:05:02 = December 22
   -0010-09-15T04:44:23 = September 15
 
+=head3 MMMMddd (MMMM ddd)
+
+   2008-02-05T18:30:30 = February 5th
+   1995-12-22T09:05:02 = December 22nd
+  -0010-09-15T04:44:23 = September 15th
+
 =head3 MMMd (MMM d)
 
    2008-02-05T18:30:30 = Feb 5
    1995-12-22T09:05:02 = Dec 22
   -0010-09-15T04:44:23 = Sep 15
+
+=head3 MMMddd (MMM ddd)
+
+   2008-02-05T18:30:30 = Feb 5th
+   1995-12-22T09:05:02 = Dec 22nd
+  -0010-09-15T04:44:23 = Sep 15th
 
 =head3 Md (M/d)
 
@@ -669,17 +741,53 @@ English locale.
    1995-12-22T09:05:02 = Fri, Dec 22, 1995
   -0010-09-15T04:44:23 = Sat, Sep 15, -10
 
+=head3 yMMMEddd (E, MMM ddd, y)
+
+   2008-02-05T18:30:30 = Tue, Feb 5th, 2008
+   1995-12-22T09:05:02 = Fri, Dec 22nd, 1995
+  -0010-09-15T04:44:23 = Sat, Sep 15th, -10
+
 =head3 yMMMM (MMMM y)
 
    2008-02-05T18:30:30 = February 2008
    1995-12-22T09:05:02 = December 1995
   -0010-09-15T04:44:23 = September -10
 
+=head3 yMMMMEd (E, MMMM d, y)
+
+   2008-02-05T18:30:30 = Tue, February 5, 2008
+   1995-12-22T09:05:02 = Fri, December 22, 1995
+  -0010-09-15T04:44:23 = Sat, September 15, -10
+
+=head3 yMMMMEddd (E, MMMM ddd, y)
+
+   2008-02-05T18:30:30 = Tue, February 5th, 2008
+   1995-12-22T09:05:02 = Fri, December 22nd, 1995
+  -0010-09-15T04:44:23 = Sat, September 15th, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = February 5, 2008
+   1995-12-22T09:05:02 = December 22, 1995
+  -0010-09-15T04:44:23 = September 15, -10
+
+=head3 yMMMMddd (MMMM ddd, y)
+
+   2008-02-05T18:30:30 = February 5th, 2008
+   1995-12-22T09:05:02 = December 22nd, 1995
+  -0010-09-15T04:44:23 = September 15th, -10
+
 =head3 yMMMd (MMM d, y)
 
    2008-02-05T18:30:30 = Feb 5, 2008
    1995-12-22T09:05:02 = Dec 22, 1995
   -0010-09-15T04:44:23 = Sep 15, -10
+
+=head3 yMMMddd (MMM ddd, y)
+
+   2008-02-05T18:30:30 = Feb 5th, 2008
+   1995-12-22T09:05:02 = Dec 22nd, 1995
+  -0010-09-15T04:44:23 = Sep 15th, -10
 
 =head3 yMd (M/d/y)
 
@@ -710,6 +818,24 @@ English locale.
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
   -0010-09-15T04:44:23 = week 37 of -10
+
+=head3 yy (’yy)
+
+   2008-02-05T18:30:30 = ’08
+   1995-12-22T09:05:02 = ’95
+  -0010-09-15T04:44:23 = ’-10
+
+=head3 yyMMM (MMM ’yy)
+
+   2008-02-05T18:30:30 = Feb ’08
+   1995-12-22T09:05:02 = Dec ’95
+  -0010-09-15T04:44:23 = Sep ’-10
+
+=head3 yyMMMd (MMM d, ’yy)
+
+   2008-02-05T18:30:30 = Feb 5, ’08
+   1995-12-22T09:05:02 = Dec 22, ’95
+  -0010-09-15T04:44:23 = Sep 15, ’-10
 
 
 =head2 Miscellaneous

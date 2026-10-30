@@ -435,6 +435,24 @@ Kalenjin locale.
    1995-12-22T09:05:02 = KO 1995 Kpa 22, Kom
   -0010-09-15T04:44:23 = AM -10 Bur 15, Kol
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = KO 2008 Ng’atyaato
+   1995-12-22T09:05:02 = KO 1995 Kipsuunde nebo aeng’
+  -0010-09-15T04:44:23 = AM -10 Bureet
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = KO 2008 Ng’atyaato 5, Koo
+   1995-12-22T09:05:02 = KO 1995 Kipsuunde nebo aeng’ 22, Kom
+  -0010-09-15T04:44:23 = AM -10 Bureet 15, Kol
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = KO 2008 Ng’atyaato 5
+   1995-12-22T09:05:02 = KO 1995 Kipsuunde nebo aeng’ 22
+  -0010-09-15T04:44:23 = AM -10 Bureet 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = KO 2008 Ngat 5

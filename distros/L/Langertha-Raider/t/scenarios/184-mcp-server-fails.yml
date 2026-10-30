@@ -1,0 +1,27 @@
+title: a server that cannot start is reported (mcp.server failed) and never stops the run; its tools are not there (ADR 0029)
+home:
+  .raider/config.yml: |
+    mcp:
+      broken:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", exit ]
+      missing:
+        command: raider-scenario-no-such-program
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+prompt: Try every server.
+script:
+  - tool_calls:
+      - [ mcp__broken__echo_env, { name: HOME } ]
+      - [ mcp__t__with_dot, {} ]
+  - text: done
+expect:
+  answer: done
+  requests:
+    - { index: 0, lacks: [ mcp__broken__echo_env, mcp__missing__echo_env ] }
+  tools:
+    - { name: mcp__broken__echo_env, error: true, text: "No such tool available: mcp__broken__echo_env" }
+    - { name: mcp__t__with_dot, text: "\\Adotted\\z" }
+# The order in which the three starts end is not fixed, so the mcp.server
+# events are checked in t/257_application_mcp.t.

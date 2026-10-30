@@ -1,5 +1,4 @@
 use v5.40;
-no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use blib;
 use Time::HiRes     qw[time];
 use Acme::Parataxis qw[async fiber yield stop await_sleep maybe_yield];
@@ -8,19 +7,10 @@ use Acme::Parataxis::Signal;
 use Acme::Parataxis::Channel;
 use Acme::Parataxis::Future;
 use Test2::V1 -ipP;
+no warnings qw[recursion];    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 $|++;
 
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ qr[^Deep recursion on subroutine]; warn @_ }
-}
-
-# Soak test: run the balanced randomized wave from the stress fuzz for at least
-# PARATAXIS_STRESS_SECONDS of wall time (default 3s), as many successive waves as
-# fit. Every wave ends at a strict boundary (zero fibers, zero outstanding jobs), so
-# any resource leak, stack leak, or rare state bug is localised to exactly one wave
-# and printed with its seed. Peak live/outstanding counts are tracked to expose slow
-# leaks that a single wave could hide. Set PARATAXIS_STRESS_SECONDS high for long
-# local runs; CI keeps the default so its soak completes in seconds.
+# Run the balanced randomized wave from the stress fuzz for at least PARATAXIS_STRESS_SECONDS of wall time (default 3s), as many successive waves as fit. Every wave ends at a strict boundary (zero fibers, zero outstanding jobs), so any resource leak, stack leak, or rare state bug is localised to exactly one wave and printed with its seed. Peak live/outstanding counts are tracked to expose slow leaks that a single wave could hide. Set PARATAXIS_STRESS_SECONDS high for long local runs; CI keeps the default so its soak completes in seconds.
 sub newsrng {
     my $seed = @_ ? $_[0] : 1;
     my $s    = $seed;
@@ -113,8 +103,7 @@ sub one_wave ( $seed, $scale ) {
     return { plan => \%plan, inv => \%inv };
 }
 
-# Prologue: abandon a run mid-flight so a parked fiber and its job are left over; the
-# first wave has to reclaim them before it can reach a clean boundary.
+# Prologue: abandon a run mid-flight so a parked fiber and its job are left over; the first wave has to reclaim them before it can reach a clean boundary.
 async {
     my $leaker = fiber { await_sleep(4) };
     yield for 1 .. 2;
@@ -166,8 +155,8 @@ while ( time - $t0 < $SECONDS && $waves < $MAX_WAVES ) {
 }
 my $elapsed = sprintf '%.1fs', time - $t0;
 ok $fails == 0, "soak: $waves waves in $elapsed (peak scale $max_scale)";
-note 'peak live fibers: ' . $peak_live . " (limit ~" . $FIBER_CAP . ')' if $peak_live;
+note 'peak live fibers: ' . $peak_live . ' (limit ~' . $FIBER_CAP . ')' if $peak_live;
 note 'peak outstanding jobs: ' . $peak_jobs                             if $peak_jobs;
-note join "\n", @problems_out if @problems_out;
+note $_ for @problems_out;
 #
 done_testing;

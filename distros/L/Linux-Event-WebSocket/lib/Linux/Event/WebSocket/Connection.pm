@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use parent 'Linux::Event::IO::Sock::Stream';
 

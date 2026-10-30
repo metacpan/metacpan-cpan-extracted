@@ -275,6 +275,19 @@ no_leaks_ok {
 	eval { hosmer_lemeshow([0, 1, 1, 0], [(0.5) x 4], g => 3) };
 } 'hosmer_lemeshow does not leak' unless $INC{'Devel/Cover.pm'};
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { hosmer_lemeshow([0, 1], 5); 1 } ? '' : $@;
+	like($err, qr/\Ausage: hosmer_lemeshow\(.*^example:\n.*\n\nhosmer_lemeshow: error: \Qobserved and predicted must be array references\E\n\z/ms,
+		'hosmer_lemeshow: observed and predicted must be array references, under the help screen');
+}
+{
+	my $err = eval { hosmer_lemeshow([0, 1], [0.2, 0.8], 'g'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: hosmer_lemeshow\(.*^example:\n.*\n\nhosmer_lemeshow: error: \Qoptions after the two arrays must be name => value pairs\E\n\z/ms,
+		'hosmer_lemeshow: options after the two arrays must be name => value pairs, under the help screen');
+}
+
 done_testing();
 
 __DATA__

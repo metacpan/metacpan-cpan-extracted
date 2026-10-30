@@ -80,6 +80,12 @@ sub os_text {
 	sub new { my ($class, %args) = @_; return bless { %args }, $class }
 	sub get { my ($self, $id) = @_; return $self->{'handler'}->($id) }
 
+	# An exception class whose text form dies, as a badly written one may;
+	# it is still true, so the code that catches it sees an error
+	package Local::Error;
+	use overload '""' => sub { die "broken exception\n" }, 'bool' => sub { 1 }, fallback => 1;
+	sub new { return bless {}, shift }
+
 	package Local::Importer;
 
 	# Written as typical application code against the Log::Abstraction API
@@ -131,8 +137,10 @@ sub os_text {
 		Time::HiRes::alarm(0) if($self->{'timeout'});
 		if(!defined($raw)) {
 			my $error = $@ || "no response\n";
-			chomp($error);
-			$log->warn("upstream failed for $id: $error");
+			# The error is passed as it is, not put into a string: an exception
+			# object is the logger's to render
+			chomp($error) if(!ref($error));
+			$log->warn("upstream failed for $id: ", $error);
 			return;
 		}
 		my $data = eval { JSON::PP->new()->decode($raw) };
@@ -142,6 +150,14 @@ sub os_text {
 		}
 		$log->info("fetched $id");
 		return $data;
+	}
+
+	# What a SIGHUP handler does after logrotate has moved the files:
+	# reopen them, then say so
+	sub rotate {
+		my $self = shift;
+		$self->{'logger'}->reopen()->notice('log files reopened');
+		return $self;
 	}
 
 	# Fetch many; one bad record must not stop the rest
@@ -197,7 +213,7 @@ subtest 'works with any combination of related modules missing' => sub {
 
 subtest 'a missing required module stops loading, with its name' => sub {
 	# Required modules are required: there is no silent fallback
-	foreach my $required (qw(Params::Validate::Strict Params::Get Readonly)) {
+	foreach my $required (qw(Params::Validate::Strict Params::Get Readonly Readonly::Values::Syslog)) {
 		my $output = run_perl_script("require Test::Log::Abstraction;\nprint qq{loaded\\n};\n", "-MTest::Without::Module=$required");
 		(my $file = $required) =~ s{::}{/}g;
 		like($output, qr/\Q$file.pm\E/, "without $required, loading fails and names it");
@@ -227,11 +243,12 @@ subtest 'same workflow, same record, as the real Log::Abstraction' => sub {
 		$importer->import_file($good);
 		$importer->import_file(File::Spec->catfile($dir, 'missing.csv'));
 		$importer->run(1, 2);
+		$importer->rotate();
 		$record{$which} = $logger->messages();
 	}
 	state_diag(record => \%record);
 	is_deeply($record{'double'}, $record{'real'}, 'identical messages(), levels and fields');
-	is(scalar(@{$record{'double'}}), 7, 'every step was recorded') or diag(explain($record{'double'}));
+	is(scalar(@{$record{'double'}}), 8, 'every step was recorded, the reopen too') or diag(explain($record{'double'}));
 };
 
 # Strategy: call every level both modules share with no arguments, and
@@ -252,6 +269,29 @@ subtest 'calls with no arguments are stored as the real Log::Abstraction stores 
 	}
 	state_diag(record => \%record);
 	is_deeply($record{'double'}, $record{'real'}, 'the same levels store an entry');
+};
+
+# Strategy: list the public methods the real Log::Abstraction defines, and
+# check that the double has each one.  A method it lacks would be caught by
+# AUTOLOAD, stored as a message and noticed, instead of doing what the code
+# under test expects (reopen() arrived this way, in Log::Abstraction 0.41)
+subtest 'every public method of the real Log::Abstraction is a method here' => sub {
+	my $have_real = eval { require Log::Abstraction; 1 };
+	plan(skip_all => 'Log::Abstraction is not installed') if(!$have_real);
+	require B;
+
+	# Subroutines compiled in Log::Abstraction itself, not imported (such as
+	# croak), not private, and not Perl's own (DESTROY, AUTOLOAD, BEGIN...)
+	my @public = sort grep {
+		no strict 'refs';	## no critic (ProhibitNoStrict)
+		my $code = *{"Log::Abstraction::$_"}{CODE};
+		$code && !/\A_/ && !/\A[A-Z]/ && (B::svref_2object($code)->GV->STASH->NAME eq 'Log::Abstraction');
+	} keys %Log::Abstraction::;
+	state_diag(public => \@public);
+	ok(scalar(@public) > 10, 'found the public methods') or diag(explain(\@public));
+
+	my @missing = grep { !defined(&{"${CLASS}::$_"}) } @public;
+	is_deeply(\@missing, [], 'none is missing') or diag("Log::Abstraction $Log::Abstraction::VERSION has methods this module lacks");
 };
 
 subtest 'Object::Configure can supply the settings' => sub {
@@ -467,6 +507,61 @@ subtest 'slow, failing and malformed upstream' => sub {
 	$logger->like(qr/\Arun complete: 1 of \Q@{[ scalar(@ids) ]}\E\z/, 'the run completed');
 };
 
+# Strategy: an upstream that throws an exception object whose text form
+# dies.  The importer passes it straight to the logger, so the logger is
+# the only thing that turns it into text: it must store it in plain form,
+# print it when asked, and let the run carry on with the next record
+subtest 'an upstream exception whose text form dies' => sub {
+	my %logger = (quiet => quiet_logger(), loud => new_ok($CLASS => [diag => 'all', verbose => 0]));
+	my $upstream = service(ok => sub { '{"id":"ok"}' }, broken => sub { die Local::Error->new() }, after => sub { '{"id":"after"}' });
+	my %ok;
+	my $printed = capture_diag {
+		foreach my $name (sort keys %logger) {
+			my $importer = Local::Importer->new(logger => $logger{$name}, service => $upstream, timeout => ($CAN_TIME_OUT ? $TIMEOUT : undef));
+			lives_ok { $ok{$name} = $importer->run(qw(ok broken after)) } "$name: the run does not die";
+		}
+	};
+	state_diag(messages => $logger{'loud'}->messages());
+
+	foreach my $name (sort keys %logger) {
+		is($ok{$name}, 2, "$name: the records either side were still fetched");
+		$logger{$name}->like(qr/\Aupstream failed for broken: Local::Error=HASH\(0x[0-9a-f]+\)\z/, "$name: the failure is stored, in plain form");
+		$logger{$name}->like(qr/\Arun complete: 2 of 3\z/, "$name: and the run completed");
+	}
+	like($printed, qr/upstream failed for broken: Local::Error=HASH/, 'the loud logger printed it too');
+};
+
+# Strategy: logrotate moves the files and sends SIGHUP; the handler calls
+# reopen(), which Log::Abstraction 0.41 added.  Deliver the signal in the
+# middle of a run, while a deadline is running, and check that the double
+# stores only what the code logged, prints no "no method" notice, and that
+# the run and its deadline carry on as if nothing had happened
+subtest 'log rotation: SIGHUP in the middle of a run' => sub {
+	plan(skip_all => 'no SIGHUP on this platform') if(($^O eq 'MSWin32') || !exists($SIG{'HUP'}));
+	my $logger = new_ok($CLASS => [diag => 'none', verbose => 0]);
+	my $importer = Local::Importer->new(logger => $logger, service => undef, timeout => ($CAN_TIME_OUT ? $TIMEOUT : undef));
+	my $rotations = 0;
+	local $SIG{'HUP'} = sub { $importer->rotate(); $rotations++ };
+	$importer->{'service'} = service(
+		1 => sub { '{"id":1}' },
+		2 => sub { kill('HUP', $$); '{"id":2}' },
+		3 => sub { '{"id":3}' },
+	);
+	my $reopen = spy "${CLASS}::reopen";
+
+	my $printed = capture_diag { is($importer->run(1, 2, 3), 3, 'every record fetched across the rotation') };
+	my @calls = $reopen->();
+	restore_all();
+	state_diag(messages => $logger->messages());
+
+	is($rotations, 1, 'the handler ran once');
+	is(scalar(@calls), 1, 'reopen() was called once ...');
+	is($calls[0]->[1], $logger, '... on the logger the code was given');
+	is($printed, '', 'no "no method" notice: reopen() is a real method');
+	is_deeply([map { $_->{'message'} } @{$logger->messages()}], ['fetched 1', 'log files reopened', 'fetched 2', 'fetched 3', 'run complete: 3 of 3'], 'only what the code logged, in order (a signal to itself is handled as soon as kill() returns)');
+	$logger->unlike(qr/reopen\z/, 'reopen itself is not a message');
+};
+
 subtest 'logging inside a timeout handler does not disturb it' => sub {
 	plan(skip_all => 'a deadline cannot interrupt a slow call on this platform') if(!$CAN_TIME_OUT);
 	my $logger = quiet_logger();
@@ -511,6 +606,7 @@ subtest 'documented return types across a workflow' => sub {
 	returns_ok($logger->is_debug(), { type => 'boolean' }, 'is_debug()');
 	returns_ok($logger->lang(), { type => 'string', matches => qr/\A[a-z]{2,3}\z/ }, 'lang()');
 	returns_ok($logger->flush(), { type => 'object', isa => $CLASS }, 'flush()');
+	returns_ok($logger->reopen(), { type => 'object', isa => $CLASS }, 'reopen()');
 	returns_ok($logger->clear(), { type => 'object', isa => $CLASS }, 'clear()');
 };
 

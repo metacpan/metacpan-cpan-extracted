@@ -597,7 +597,7 @@ scipy_ok(vcor('kendalltau gh6134', 'kendall'), undef, 'nan', 'C4 SciPy test_kend
 		'C7 cor(X, []) croaks (used to return cor(X))';
 
 	# The method in y's slot used to be taken for "no y", and cor(x) is 1.
-	throws_ok { cor([ 1, 2, 3 ], 'spearman') } qr/^cor: y must be an ARRAY reference or undef/,
+	throws_ok { cor([ 1, 2, 3 ], 'spearman') } qr/^cor: error: y must be an ARRAY reference or undef/m,
 		"C7 cor(\\\@x, 'spearman') croaks (used to return 1)";
 
 	# A one-row matrix used to be told its column 0 had no variance.
@@ -662,12 +662,12 @@ scipy_ok(vcor('kendalltau gh6134', 'kendall'), undef, 'nan', 'C4 SciPy test_kend
 {
 	my $X = [ [ 1, 2 ], [ 2, 1 ], [ 3, 5 ] ];
 	my @CROAK = (
-		[ sub { cor([ 1, 2 ], [ 1, 2 ], 'bogus') },  qr/^cor: unknown method 'bogus' \(use 'pearson', 'spearman', or 'kendall'\)/, 'unknown method' ],
-		[ sub { cor([ 1, 2 ], [ 1, 2 ], 'Pearson') }, qr/^cor: unknown method 'Pearson'/, 'method is case-sensitive' ],
-		[ sub { cor($X, undef, 'bogus') },            qr/^cor: unknown method 'bogus'/, 'unknown method, matrix' ],
-		[ sub { cor(1) },                             qr/^cor: x must be an ARRAY reference/, 'x a number' ],
-		[ sub { cor(undef, [ 1, 2 ]) },               qr/^cor: x must be an ARRAY reference/, 'x undef' ],
-		[ sub { cor({}, [ 1, 2 ]) },                  qr/^cor: x must be an ARRAY reference/, 'x a hash ref' ],
+		[ sub { cor([ 1, 2 ], [ 1, 2 ], 'bogus') },  qr/^cor: error: unknown method 'bogus' \(use 'pearson', 'spearman', or 'kendall'\)/m, 'unknown method' ],
+		[ sub { cor([ 1, 2 ], [ 1, 2 ], 'Pearson') }, qr/^cor: error: unknown method 'Pearson'/m, 'method is case-sensitive' ],
+		[ sub { cor($X, undef, 'bogus') },            qr/^cor: error: unknown method 'bogus'/m, 'unknown method, matrix' ],
+		[ sub { cor(1) },                             qr/^cor: error: x must be an ARRAY reference/m, 'x a number' ],
+		[ sub { cor(undef, [ 1, 2 ]) },               qr/^cor: error: x must be an ARRAY reference/m, 'x undef' ],
+		[ sub { cor({}, [ 1, 2 ]) },                  qr/^cor: error: x must be an ARRAY reference/m, 'x a hash ref' ],
 		[ sub { cor([]) },                            qr/^cor: x is empty/, 'x empty, no y' ],
 		[ sub { cor([], []) },                        qr/^cor: x is empty/, 'x and y empty (reg-tests-1b numeric(0))' ],
 		[ sub { cor([ 1, 2, 3 ], [ 1, 2 ]) },         qr/^cor: x and y must have the same length \(3 vs 2\)/, 'length mismatch' ],
@@ -680,9 +680,9 @@ scipy_ok(vcor('kendalltau gh6134', 'kendall'), undef, 'nan', 'C4 SciPy test_kend
 		[ sub { cor([ 5, 5 ], [ 2, 2 ]) },            qr/^cor: standard deviation of x is 0/, 'both constant: x named first' ],
 		[ sub { cor([ [ 1, 7 ], [ 2, 7 ], [ 3, 7 ] ]) }, qr/^cor: standard deviation is 0 in x column 1/, 'constant x column' ],
 		[ sub { cor($X, [ [ 4 ], [ 4 ], [ 4 ] ]) },   qr/^cor: standard deviation is 0 in y column 0/, 'constant y column' ],
-		[ sub { cor([ 1, 2, 3 ], 'spearman') },       qr/^cor: y must be an ARRAY reference or undef \(the method is the third argument: cor\(x, undef, 'spearman'\)\)/, 'method in y slot' ],
-		[ sub { cor([ 1, 2, 3 ], {}) },               qr/^cor: y must be an ARRAY reference or undef/, 'y a hash ref' ],
-		[ sub { cor([ 1, 2, 3 ], 7) },                qr/^cor: y must be an ARRAY reference or undef/, 'y a number' ],
+		[ sub { cor([ 1, 2, 3 ], 'spearman') },       qr/^cor: error: y must be an ARRAY reference or undef \(the method is the third argument: cor\(x, undef, 'spearman'\)\)/m, 'method in y slot' ],
+		[ sub { cor([ 1, 2, 3 ], {}) },               qr/^cor: error: y must be an ARRAY reference or undef/m, 'y a hash ref' ],
+		[ sub { cor([ 1, 2, 3 ], 7) },                qr/^cor: error: y must be an ARRAY reference or undef/m, 'y a number' ],
 		[ sub { cor($X, [ 1, 2, 3 ]) },               qr/^cor: y must be a matrix \(array ref of array refs\) when x is a matrix/, 'matrix x, vector y' ],
 		[ sub { cor($X, []) },                        qr/^cor: y must be a matrix \(array ref of array refs\) when x is a matrix/, 'matrix x, empty y' ],
 		[ sub { cor([ 1, 2, 3 ], $X) },               qr/^cor: x must be a matrix \(array ref of array refs\) when y is a matrix/, 'vector x, matrix y' ],
@@ -782,7 +782,7 @@ throws_ok { cor([ [ 1 ], [ 2 ] ], [ 1, 2 ]) } qr/^cor: y must be a matrix/, 'C9d
 
 # (f) Method names.  R's match.arg() accepts any unambiguous abbreviation, so
 #     cor(x, y, method = "k") is Kendall; cor() wants the whole name.
-throws_ok { cor([ 1, 2, 3 ], [ 3, 1, 2 ], 'k') } qr/^cor: unknown method 'k'/, "C9f abbreviation 'k' croaks (R: kendall)";
+throws_ok { cor([ 1, 2, 3 ], [ 3, 1, 2 ], 'k') } qr/^cor: error: unknown method 'k'/m, "C9f abbreviation 'k' croaks (R: kendall)";
 
 # 10. Leaks: every method on each call form, the NaN path, and the croaks that
 #     free a half-built matrix.

@@ -12,12 +12,11 @@ $|++;
 package Acme::Parataxis::Test::HTTP {
     use parent 'HTTP::Tiny';
 
-    sub _open_handle {
-        my ( $self, $request, $scheme, $host, $port, $peer ) = @_;
+    sub _open_handle( $self, $request, $scheme, $host, $port, $peer ) {
         my $handle = Acme::Parataxis::Test::HTTP::Handle->new(
             timeout     => $self->{timeout},
             SSL_options => $self->{SSL_options},
-            verify_SSL  => $self->{verify_SSL},
+            verify_SSL  => $self->{verify_SSL}
         );
         return $handle->connect( $scheme, $host, $port, $peer );
     }
@@ -27,8 +26,7 @@ package Acme::Parataxis::Test::HTTP {
         $args //= {};
         my $orig_cb = $args->{data_callback};
         my $content = '';
-        $args->{data_callback} = sub {
-            my ( $data, $response ) = @_;
+        $args->{data_callback} = sub( $data, $response ) {
 
             # diag 'Progress: Received ' . length($data) . " bytes for $url";
             if ($orig_cb) {
@@ -47,9 +45,7 @@ package Acme::Parataxis::Test::HTTP {
     package Acme::Parataxis::Test::HTTP::Handle;
     use parent -norequire, 'HTTP::Tiny::Handle';
 
-    sub _do_timeout {
-        my ( $self, $type, $timeout ) = @_;
-        $timeout //= $self->{timeout};
+    sub _do_timeout ( $self, $type, $timeout = $self->{timeout} ) {
         if ( $self->{fh} ) {
             my $start = time();
             while (1) {

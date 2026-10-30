@@ -1,0 +1,15 @@
+title: in Claude mode a pack named with --pack still applies
+files:
+  CLAUDE.md: "Project rule: MEMORY-MARKER\n"
+app:
+  pack_names: [ polite ]
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "MEMORY-MARKER" }
+    - { index: 0, contains: "Active packs" }
+    - { index: 0, absent: "Caveman Mode" }
+    - { index: 0, absent: "shield-maiden" }

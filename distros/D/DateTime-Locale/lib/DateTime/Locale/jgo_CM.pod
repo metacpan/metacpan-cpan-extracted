@@ -435,6 +435,24 @@ Ngomba Cameroon locale.
    1995-12-22T09:05:02 = CE 1995 Pɛsaŋ Ntsɔ̌ppá 22, Fɛlâyɛdɛ
   -0010-09-15T04:44:23 = BCE -10 Pɛsaŋ Pɛ́nɛ́pfúꞋú 15, Sásidɛ
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 Pɛsaŋ Pɛ́pá
+   1995-12-22T09:05:02 = CE 1995 Pɛsaŋ Ntsɔ̌ppá
+  -0010-09-15T04:44:23 = BCE -10 Pɛsaŋ Pɛ́nɛ́pfúꞋú
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 Pɛsaŋ Pɛ́pá 5, Ápta Mɔ́ndi
+   1995-12-22T09:05:02 = CE 1995 Pɛsaŋ Ntsɔ̌ppá 22, Fɛlâyɛdɛ
+  -0010-09-15T04:44:23 = BCE -10 Pɛsaŋ Pɛ́nɛ́pfúꞋú 15, Sásidɛ
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 Pɛsaŋ Pɛ́pá 5
+   1995-12-22T09:05:02 = CE 1995 Pɛsaŋ Ntsɔ̌ppá 22
+  -0010-09-15T04:44:23 = BCE -10 Pɛsaŋ Pɛ́nɛ́pfúꞋú 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 Pɛsaŋ Pɛ́pá 5
@@ -502,6 +520,12 @@ Ngomba Cameroon locale.
   -0010-09-15T04:44:23 = Pɛsaŋ Pɛ́nɛ́pfúꞋú
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = Pɛsaŋ Pɛ́pá 5, Ápta Mɔ́ndi
+   1995-12-22T09:05:02 = Pɛsaŋ Ntsɔ̌ppá 22, Fɛlâyɛdɛ
+  -0010-09-15T04:44:23 = Pɛsaŋ Pɛ́nɛ́pfúꞋú 15, Sásidɛ
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = Pɛsaŋ Pɛ́pá 5, Ápta Mɔ́ndi
    1995-12-22T09:05:02 = Pɛsaŋ Ntsɔ̌ppá 22, Fɛlâyɛdɛ

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPAN::InGit repository</title>
+  <style>
+    body { font: 1rem/1.5 system-ui, sans-serif; max-width: 50rem; margin: 2rem auto; padding: 0 1rem; color: #172331; }
+    a { color: #165ca2; } li { margin: .5rem 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>CPAN::InGit repository</h1>
+    <p>This is the root of a CPAN::InGit repository. Each archive branch provides its own CPAN mirror, with package versions stored in Git.</p>
+    <p>To make changes, work in a local clone of this repository. Use <code>cpangit-create</code> to create an archive branch if needed, then check out the branch you want to update and run <code>cpangit-add</code> with module names or a cpanfile to import packages and their dependencies. Review the staged changes with <code>git diff --cached</code>, commit them with <code>git commit</code>, and push the branch to the repository served here.</p>
+    <p>See the <a href="https://metacpan.org/pod/CPAN::InGit">CPAN::InGit documentation</a> for setup and usage details.</p>
+% if ($index_branches) {
+    <section id="branch-index" aria-labelledby="branches-heading">
+      <h2 id="branches-heading">Available branches</h2>
+% if (@$branches) {
+      <ul>
+% for my $branch (@$branches) {
+        <li><a href="<%= $branch->{url} %>"><%= $branch->{name} %></a></li>
+% }
+      </ul>
+% } else {
+      <p>No CPAN archive branches are available.</p>
+% }
+    </section>
+% }
+  </main>
+</body>
+</html>

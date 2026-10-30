@@ -1,0 +1,28 @@
+title: an agent with briefing.skills gets the skills in front of its task in the briefing format, and the caller gets its answer
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/notes/SKILL.md: "---\nname: notes\ndescription: How notes are written.\n---\n\nNOTES-SKILL-BODY: one line per note.\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\nbriefing:\n  skills:\n    - notes\n---\nSCRIBE-BODY\n"
+prompt: Have the scribe summarise the day.
+script:
+  - tool_calls:
+      - [ agent, { description: Summarise, prompt: Summarise the day in notes., subagent_type: scribe } ]
+  - text: "- shipped the briefing"
+  - text: "The scribe wrote: shipped the briefing."
+expect:
+  answer: "The scribe wrote: shipped the briefing."
+  request_count: 3
+  requests:
+    - { index: 1, contains: "# Briefing — pre-loaded skills\n\nThe skills below have been injected directly into your context by the\n" }
+    - { index: 1, contains: "do NOT call the Skill tool for any of these names; their content is already here." }
+    - { index: 1, contains: "<skill name=\"notes\" dir=\"" }
+    - { index: 1, contains: "/.claude/skills/notes\">\nNOTES-SKILL-BODY: one line per note.\n</skill>\n\n---\n\n# Original task\n\nSummarise the day in notes." }
+    - { index: 1, absent: "description: How notes are written." }
+    - { index: 1, contains: SCRIBE-BODY }
+    - { index: 2, contains: "- shipped the briefing" }
+  tools:
+    - { name: agent, text: '\A- shipped the briefing\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: agent.started, call: c1, agent: scribe }
+    - { type: agent.finished, call: c1, agent: scribe, status: completed }

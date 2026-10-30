@@ -1,9 +1,9 @@
 [%- WRAPPER 'web/en/layouts/default.html.tt' -%]
 
-<p class="back-link"><a href="/">&larr; Home</a></p>
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
 
 <div class="canvas-error-box">
-	<h1 class="canvas-error-title">&#x26A0; Canvas unavailable</h1>
+	<h1 class="canvas-error-title">&#x26A0; [% canvas_id.length ? 'Canvas unavailable' : 'Canvas not found' %]</h1>
 	<p class="canvas-error-name">[% canvas_name | html %]</p>
 	<p class="canvas-error-msg">[% error_msg | html %]</p>
 [%- IF error_specs.size -%]
@@ -13,17 +13,21 @@
 [%- END -%]
 	</ul>
 [%- END -%]
+[%- IF canvas_id.length -%]
 	<p class="canvas-error-hint">
 		The data file may have been moved, renamed, or deleted.
 		You can delete this canvas below if it is no longer needed.
 	</p>
+[%- END -%]
 	<div class="canvas-error-actions">
 		<a href="/" class="btn">Go to Home</a>
+[%- IF canvas_id.length -%]
 		<button type="button" class="btn btn-danger" id="canvas-error-delete"
 			data-id="[% canvas_id | html %]"
 			data-name="[% canvas_name | html %]">
 			&#x1F5D1; Delete this canvas
 		</button>
+[%- END -%]
 	</div>
 </div>
 

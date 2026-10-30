@@ -28,6 +28,9 @@
 #include "arch/x64/abi_x64_common.h"
 #include "common/infix_internals.h"
 
+/** @internal @brief Emits `endbr64` (terminate indirect branch) for Intel IBT / CET. */
+INFIX_INTERNAL void emit_endbr64(code_buffer * buf);
+
 // GPR <-> Immediate Value Emitters
 /** @internal @brief Emits `mov r64, imm64` to load a 64-bit immediate value into a register. */
 INFIX_INTERNAL void emit_mov_reg_imm64(code_buffer * buf, x64_gpr reg, uint64_t value);

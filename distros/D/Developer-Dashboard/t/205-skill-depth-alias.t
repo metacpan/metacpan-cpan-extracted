@@ -164,6 +164,106 @@ subtest 'skill_config_write_location walks up past a .git-managed skill director
     remove_tree_quiet($skills_root);
 };
 
+subtest 'nested skill inventory can carry the already-resolved config write location' => sub {
+    my ($paths) = fresh_registries();
+
+    my $foo_dir = File::Spec->catdir( $skills_root, 'foo' );
+    my $bar_dir = File::Spec->catdir( $foo_dir, 'skills', 'bar' );
+    make_path( File::Spec->catdir( $bar_dir, '.git' ) );
+
+    my %by_name = map { join( '.', @{ $_->{segments} } ) => $_ }
+      $paths->nested_skill_entries( include_disabled => 1, include_config_write_location => 1 );
+    is_deeply(
+        $by_name{'foo.bar'}{config_write_location},
+        { kind => 'skill', dir => $foo_dir, remaining => ['bar'] },
+        'nested inventory supplies the correct nearest git-free ancestor write location',
+    );
+    is_deeply(
+        $by_name{foo}{config_write_location},
+        { kind => 'global', remaining => ['foo'] },
+        'depth-one inventory supplies the global fallback without re-resolving the skill chain',
+    );
+
+    remove_tree_quiet($skills_root);
+};
+
+subtest 'nested skill inventory carries write locations equivalent to strict chain resolution' => sub {
+    my ($paths) = fresh_registries();
+
+    my $foo_dir = File::Spec->catdir( $skills_root, 'foo' );
+    my $bar_dir = File::Spec->catdir( $foo_dir, 'skills', 'bar' );
+    my $baz_dir = File::Spec->catdir( $bar_dir, 'skills', 'baz' );
+    my $odd_dir = File::Spec->catdir( $baz_dir, 'skills', "odd\x01name" );
+    make_path( $odd_dir, File::Spec->catdir( $bar_dir, '.git' ) );
+
+    my %validation_calls;
+    my $validate = \&Developer::Dashboard::PathRegistry::validated_path_segments;
+    my @entries;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::validated_path_segments = sub {
+            $validation_calls{ $_[0] }++;
+            return $validate->(@_);
+        };
+        @entries = $paths->nested_skill_entries( include_disabled => 1, include_config_write_location => 1 );
+    }
+    my %inventory = map { join( '.', @{ $_->{segments} } ) => $_->{config_write_location} } @entries;
+
+    is_deeply( \%validation_calls, { foo => 1, bar => 1, baz => 1, "odd\x01name" => 1 },
+        'discovery validates each path segment once instead of revalidating every chain prefix' );
+
+    is_deeply( $inventory{foo}, $paths->skill_config_write_location(['foo']),
+        'top-level inventory result matches the strict public resolver' );
+    is_deeply( $inventory{'foo.bar'}, $paths->skill_config_write_location( [ 'foo', 'bar' ] ),
+        'git-managed parent inventory result matches the strict public resolver' );
+    is_deeply( $inventory{'foo.bar.baz'}, $paths->skill_config_write_location( [ 'foo', 'bar', 'baz' ] ),
+        'deeper inventory result reuses the nearest safe ancestor correctly' );
+    is( $inventory{"foo.bar.baz.odd\x01name"}, undef,
+        'a control-byte segment remains undiscoverable as a safe write target' );
+
+    remove_tree_quiet($skills_root);
+};
+
+subtest 'nested inventory handles invalid root names and git-free parent write locations' => sub {
+    my ($paths) = fresh_registries();
+
+    my $foo_dir = File::Spec->catdir( $skills_root, 'foo' );
+    my $bar_dir = File::Spec->catdir( $foo_dir, 'skills', 'bar' );
+    my $invalid_root = File::Spec->catdir( $skills_root, "bad\x01name" );
+    my $invalid_child = File::Spec->catdir( $invalid_root, 'skills', 'child' );
+    my $disabled_root = File::Spec->catdir( $skills_root, 'disabled' );
+    my $disabled_child = File::Spec->catdir( $disabled_root, 'skills', 'child' );
+    make_path( $bar_dir, $invalid_child, $disabled_child );
+    open my $disabled_fh, '>:raw', File::Spec->catfile( $disabled_root, '.disabled' )
+      or die "Unable to create disabled root marker: $!";
+    close $disabled_fh or die "Unable to close disabled root marker: $!";
+
+    my %entries = map { join( '.', @{ $_->{segments} } ) => $_ }
+      $paths->nested_skill_entries( include_config_write_location => 1 );
+    is_deeply(
+        $entries{'foo.bar'}{config_write_location},
+        { kind => 'skill', dir => $foo_dir, remaining => ['bar'] },
+        'git-free inventory parent becomes the child skill config write location',
+    );
+    ok(
+        exists $entries{"bad\x01name"}
+          && !defined $entries{"bad\x01name"}{config_write_location},
+        'an invalid top-level skill name remains discoverable but has no config write target',
+    );
+    ok(
+        exists $entries{"bad\x01name.child"}
+          && !defined $entries{"bad\x01name.child"}{config_write_location},
+        'a child of an invalid root remains discoverable without inheriting an unsafe write target',
+    );
+
+    my %disabled_entries = map { join( '.', @{ $_->{segments} } ) => $_ }
+      $paths->nested_skill_entries( include_disabled => 1 );
+    ok( $disabled_entries{disabled}{disabled}, 'the inventory records a disabled top-level skill marker' );
+    ok( $disabled_entries{'disabled.child'}{disabled}, 'disabled status propagates to a nested child' );
+
+    remove_tree_quiet($skills_root);
+};
+
 subtest 'nested_skill_entries respects a nested skill\'s own .disabled marker' => sub {
     my ($paths) = fresh_registries();
 
@@ -179,6 +279,13 @@ subtest 'nested_skill_entries respects a nested skill\'s own .disabled marker' =
 
     my @all_segments = map { join( '.', @{ $_->{segments} } ) } $paths->nested_skill_entries( include_disabled => 1 );
     ok( ( grep { $_ eq 'foo.bar' } @all_segments ), 'include_disabled => 1 still discovers the disabled nested skill' );
+
+    my $baz_dir = File::Spec->catdir( $bar_dir, 'skills', 'baz' );
+    make_path($baz_dir);
+    my %all_entries = map { join( '.', @{ $_->{segments} } ) => $_ }
+      $paths->nested_skill_entries( include_disabled => 1, include_config_write_location => 1 );
+    ok( $all_entries{'foo.bar'}{disabled}, 'inventory marks the disabled nested skill for shared enabled-only consumers' );
+    ok( $all_entries{'foo.bar.baz'}{disabled}, 'a child remains disabled through its disabled parent' );
 
     remove_tree_quiet($skills_root);
 };
@@ -446,6 +553,30 @@ subtest 'PathRegistry: nested_skill_dir_chain and skill_config_write_location ar
     is_deeply( [ $paths->nested_skill_dir_chain( ['a/b'] ) ], [], 'an invalid (non-single) segment fails validated_path_segments and resolves to nothing' );
 
     is( $paths->skill_config_write_location('not-an-arrayref'), undef, 'a non-arrayref argument resolves to undef, not just an empty arrayref' );
+
+    is( $paths->_skill_config_write_location_from_chain( 'not-an-arrayref', [] ), undef,
+        'the pre-resolved helper rejects non-array segment input' );
+    is( $paths->_skill_config_write_location_from_chain( [], [] ), undef,
+        'the pre-resolved helper rejects an empty segment list' );
+    is( $paths->_skill_config_write_location_from_chain( ['foo'], 'not-an-arrayref' ), undef,
+        'the pre-resolved helper rejects non-array chain input' );
+    is( $paths->_skill_config_write_location_from_chain( ['foo'], [] ), undef,
+        'the pre-resolved helper rejects chains with a mismatched depth' );
+    is( $paths->_skill_config_write_location_from_chain( ['a/b'], [ File::Spec->catdir( $skills_root, 'a', 'b' ) ] ), undef,
+        'the pre-resolved helper rejects a path-like skill segment' );
+    is( $paths->_skill_config_write_location_from_chain( ['foo'], [undef] ), undef,
+        'the pre-resolved helper rejects an undefined directory entry' );
+    is( $paths->_skill_config_write_location_from_chain( ['foo'], [ File::Spec->catdir( $skills_root, 'not-installed' ) ] ), undef,
+        'the pre-resolved helper rejects a nonexistent directory entry' );
+
+    my $foo_dir = File::Spec->catdir( $skills_root, 'foo' );
+    my $bar_dir = File::Spec->catdir( $foo_dir, 'skills', 'bar' );
+    my $wrong_bar_dir = File::Spec->catdir( $foo_dir, 'other', 'bar' );
+    make_path( $bar_dir, $wrong_bar_dir );
+    is( $paths->_skill_config_write_location_from_chain( ['other'], [$foo_dir] ), undef,
+        'the pre-resolved helper rejects a root whose basename does not match its segment' );
+    is( $paths->_skill_config_write_location_from_chain( [ 'foo', 'bar' ], [ $foo_dir, $wrong_bar_dir ] ), undef,
+        'the pre-resolved helper rejects a nested path outside the expected skills directory' );
 
     remove_tree_quiet($skills_root);
 };
@@ -804,7 +935,7 @@ dashboard path/file add and del
 Covers DD-1004: C<dashboard path add>/C<dashboard file add> (and their C<del>
 counterparts) now support a dotted alias name such as C<foo.bar.something>,
 resolving it against arbitrarily nested C<skills/foo/skills/bar/> directories
-and writing the alias into the correct skill's own C<config/config.json>
+and writing the alias into the correct ancestor skill's C<config/config.json>
 rather than always writing into the global config. It also covers the
 owner's git-preservation correction: a skill directory that carries its own
 C<.git> has its working tree overwritten on every C<d2 skill install>/update,
@@ -812,7 +943,11 @@ so the write walks upward to the nearest git-free ancestor directory (or all
 the way to the global config, nested under the owner-confirmed C<"skills">
 top-level key, when every ancestor including the first segment carries its
 own C<.git>) - storing the alias as a nested hash mirroring the remaining
-depth segments, never as a flattened dotted-string key.
+depth segments, never as a flattened dotted-string key. The suite also checks
+that inventory discovery leaves invalid root names visible without creating
+unsafe write targets for either the root or its nested descendants, and that a
+git-free parent is carried into each child's pre-resolved write location.
+Disabled state is also verified for a marked top-level root and its child.
 
 =head1 WHY IT EXISTS
 
@@ -832,7 +967,10 @@ C<split_skill_alias_name>, C<save_skill_path_alias>/C<save_skill_file_alias>,
 C<remove_skill_path_alias>/C<remove_skill_file_alias>,
 C<_nested_skill_alias_entries>, or
 C<Developer::Dashboard::PathRegistry>'s C<nested_skill_dir_chain>,
-C<nested_skill_entries>, or C<skill_config_write_location>.
+C<nested_skill_entries>, or C<skill_config_write_location>, including the
+optional already-resolved write location returned with nested-skill entries.
+The inventory assertions protect invalid-name handling and git-free parent
+propagation.
 
 =head1 HOW TO USE
 

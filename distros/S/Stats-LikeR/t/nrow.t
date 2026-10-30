@@ -83,4 +83,12 @@ unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { nrow({ a=>[1,2,3], b=>[4,5,6] }) }  'nrow(): HoA count, no leaks';
 }
 
+# A call-form error prints nrow's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { nrow(1); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: nrow\(/, 'nrow: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('nrow') . "nrow: error: expected an ARRAY or HASH ref (got non-ref scalar)\n",
+		'nrow: the help screen, then the error on the last line');
+}
 done_testing();

@@ -60,17 +60,15 @@
 # wider ones. That is why the tolerances below are not scaled off NV_EPSILON:
 # scaling them would tighten the test on exactly the builds that cannot meet it.
 #
-# WHAT IS DELIBERATELY DIFFERENT FROM R
+# LOG SCALE
 #
-# log => 1 on a p* function returns log() of the probability already computed,
-# not a log carried through the series. A tail that underflowed to 0 logs to
-# -Inf, and a tail that rounded to 1 logs to 0 rather than to the tiny negative
-# number R reports. Four of SciPy's six log references land in that second case;
-# log_or_zero() below accepts either the 0 a double gives or the resolved value
-# a long-double or __float128 build gives, and prints which happened, so that
-# changing this is a deliberate act on every width. The q* functions take log_p
-# properly: the argument is exponentiated, which is exact and lets them reach
-# quantiles the linear scale cannot name.
+# Up to 0.331 log => 1 on a p* function returned log() of the probability
+# already computed, so a tail that rounded to 1 logged to exactly 0, and four of
+# SciPy's six log references below were asserted as "0 or the resolved value".
+# Since 0.331 the log is carried through the series, as R carries it, and all
+# of them are asserted against SciPy's mpmath value at 2e-13 relative: the worst
+# seen is 4.6e-14, chi2.logcdf(750, 3), on a double. The log scale at its limits
+# is covered by t/distributions.limits.R.t.
 
 require 5.010;
 use strict;
@@ -270,39 +268,6 @@ my %EXACT = (
 );
 
 
-# log_or_zero($got, $ref, $what) -- the assertion for a log of a probability
-# that a double cannot tell from 1.
-#
-# log => 1 on a p* function logs the probability already computed, so where that
-# probability rounds to 1 the log is exactly 0 instead of mpmath's tiny negative
-# number. On a long-double or __float128 build the probability does NOT round to
-# 1, the log comes out, and it matches mpmath -- which is the wider build being
-# more accurate, not a different bug. Both outcomes are accepted, and which one
-# happened is printed, so the NV width is visible in the log rather than
-# inferred.
-sub log_or_zero {
-	my ($got, $ref, $what) = @_;
-	if ( $got == 0 ) {
-		return ok( 1, "$what: 0, where mpmath gives $ref "
-		            . '(this build cannot tell the probability from 1)' );
-	}
-	# How well the log CAN be resolved is set by the NV's epsilon, not by this
-	# code: the probability sits at 1 - |ref|, so the build can only tell
-	# |ref| / NV_EPSILON different values apart there, and the log inherits a
-	# relative granularity of NV_EPSILON / |ref|. On a long double that is
-	# 1.08e-19 / 1.89e-18 = 5.7% for the worst of these references (the observed
-	# error is 0.26%); on __float128 it is 1e-16, so the 1e-9 floor is what
-	# governs there. A flat tolerance would either fail the long-double build for
-	# arithmetic it cannot do or stop testing the quadmath build at all.
-	my $tol = 1e-9 + 8 * NV_EPS() / abs($ref);
-	my $rel = abs( $got - $ref ) / abs($ref);
-	my $pass = ok( $rel <= $tol, sprintf "%s: %s, resolved to %.3g of mpmath's "
-	                             . '%s (a wider NV than the reference had, '
-	                             . 'limit %.3g)', $what, $got, $rel, $ref, $tol );
-	diag "got $got want $ref rel $rel tol $tol" unless $pass;
-	return $pass;
-}
-
 # Machine epsilon for this build's NV, measured rather than assumed: 2.22e-16 on
 # a double, 1.08e-19 on a long double, 1.93e-34 on __float128.
 {
@@ -385,27 +350,18 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 	);
 	for my $c (@lg) {
 		my ($x, $df, $ref) = @$c;
-		# x = 75 puts the log at -4.9e-21, i.e. the CDF a hair under 1, which
-		# is the case log() of an already-computed probability cannot resolve:
-		# the probability rounds to 1 and its log is exactly 0.  Recorded as
-		# such rather than skipped.
-		if ( abs($ref) < 1e-15 ) {
-			log_or_zero( pt( $x, $df, log => 1 ), $ref,
-				"SciPy t.logcdf($x, $df)" );
-			next;
-		}
-		rel_ok( pt( $x, $df, log => 1 ), $ref, 1e-13, 'scipy t.logcdf',
+		# x = 75 puts the log at -4.9e-21, the CDF a hair under 1; up to
+		# 0.331 that logged to exactly 0 (see LOG SCALE above).
+		rel_ok( pt( $x, $df, log => 1 ), $ref, 2e-13, 'scipy t.logcdf',
 			"SciPy TestStudentT.test_logcdf_logsf: pt($x, $df, log => 1)" );
-		rel_ok( pt( -$x, $df, lower => 0, log => 1 ), $ref, 1e-13, 'scipy t.logcdf',
+		rel_ok( pt( -$x, $df, lower => 0, log => 1 ), $ref, 2e-13, 'scipy t.logcdf',
 			"...and the same as logsf(-x): pt(@{[ -$x ]}, $df, lower => 0, log => 1)" );
 	}
 }
 
 # TestChi2.test_logcdf:5511-5519 and TestChi2.test_logsf:5521-5529.  Four of
-# these six are logs of a probability that rounds to 1, which is the documented
-# limit of log => 1 on a p* function; they are asserted as exactly 0 with the
-# true value named so that implementing a carried-through log_p later shows up
-# here as a change rather than as a surprise.
+# these six are logs of a probability that rounds to 1, which up to 0.331 came
+# back as exactly 0; see LOG SCALE above.
 {
 	my @cases = (
 		[ 'logcdf', 750.0, 3,  '-3.0172957781136564e-162' ],
@@ -419,12 +375,8 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 		my ($which, $x, $df, $ref) = @$c;
 		my $lower = $which eq 'logcdf' ? 1 : 0;
 		my $got   = pchisq( $x, $df, lower => $lower, log => 1 );
-		if ( abs($ref) < 1e-15 ) {
-			log_or_zero( $got, $ref, "SciPy chi2.$which($x, $df)" );
-		} else {
-			rel_ok( $got, $ref, 1e-13, "scipy chi2.$which",
-				"SciPy chi2.$which($x, $df) == $ref" );
-		}
+		rel_ok( $got, $ref, 2e-13, "scipy chi2.$which",
+			"SciPy chi2.$which($x, $df) == $ref" );
 	}
 }
 
@@ -665,15 +617,24 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 
 # Argument errors.
 {
-	throws_ok { pt(1) } qr/^pt: 'df' is required/, 'a missing df is fatal';
-	throws_ok { pf(1, 2) } qr/^pf: 'df2' is required/, 'a missing df2 is fatal';
-	throws_ok { pbinom(1, 10) } qr/^pbinom: 'prob' is required/,
+	# Each is a usage error: the function's help screen, then the error alone on
+	# the last line, as Python's argparse prints one.
+	throws_ok { pt(1) } qr/^pt: error: 'df' is required\n\z/m, 'a missing df is fatal';
+	throws_ok { pf(1, 2) } qr/^pf: error: 'df2' is required\n\z/m, 'a missing df2 is fatal';
+	throws_ok { pbinom(1, 10) } qr/^pbinom: error: 'prob' is required\n\z/m,
 		'a missing prob is fatal';
-	throws_ok { pt(1, 5, bogus => 1) } qr/^pt: unknown argument 'bogus'/,
+	throws_ok { pt(1, 5, bogus => 1) } qr/^pt: error: unknown argument 'bogus'\n\z/m,
 		'an unknown argument is fatal';
-	throws_ok { pt(1, 5, 'lower') } qr/^pt: 'lower' was given with no value/,
+	throws_ok { pt(1, 5, 'lower') } qr/^pt: error: 'lower' was given with no value\n\z/m,
 		'a trailing option name with no value is fatal';
-	throws_ok { qnorm() } qr/^Usage: qnorm\(x/, 'no arguments at all is fatal';
+	throws_ok { qnorm() } qr/^qnorm: error: the first argument, a number or an array reference, is required\n\z/m,
+		'no arguments at all is fatal';
+	for my $fn (qw(qnorm pt qt pchisq qchisq pf qf pbinom)) {
+		no strict 'refs';
+		my $f = \&{"Stats::LikeR::$fn"};
+		throws_ok { $f->() } qr/\Ausage: $fn\(.*^options:\n.*^example:\n.*\n\n$fn: error: [^\n]+\n\z/ms,
+			"$fn: a call-form error prints the help screen, and the error last";
+	}
 	# qnorm's parameters both have defaults, so it needs nothing but x.
 	lives_ok { qnorm(0.5) } 'qnorm needs only a probability';
 }

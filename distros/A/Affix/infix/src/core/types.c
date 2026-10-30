@@ -109,7 +109,7 @@ static infix_type _infix_type_sint32 = INFIX_TYPE_INIT(INFIX_PRIMITIVE_SINT32, i
 static infix_type _infix_type_uint64 = INFIX_TYPE_INIT(INFIX_PRIMITIVE_UINT64, uint64_t);
 /** @internal Static singleton for the `int64_t` primitive type. */
 static infix_type _infix_type_sint64 = INFIX_TYPE_INIT(INFIX_PRIMITIVE_SINT64, int64_t);
-#if !defined(INFIX_COMPILER_MSVC)
+#if !defined(INFIX_COMPILER_MSVC) && defined(__SIZEOF_INT128__)
 /** @internal Static singleton for the `__uint128_t` primitive type (GCC/Clang only). */
 static infix_type _infix_type_uint128 = INFIX_TYPE_INIT(INFIX_PRIMITIVE_UINT128, __uint128_t);
 /** @internal Static singleton for the `__int128_t` primitive type (GCC/Clang only). */
@@ -161,7 +161,7 @@ INFIX_API c23_nodiscard infix_type * infix_type_create_primitive(infix_primitive
         return &_infix_type_uint64;
     case INFIX_PRIMITIVE_SINT64:
         return &_infix_type_sint64;
-#if !defined(INFIX_COMPILER_MSVC)
+#if !defined(INFIX_COMPILER_MSVC) && defined(__SIZEOF_INT128__)
     case INFIX_PRIMITIVE_UINT128:
         return &_infix_type_uint128;
     case INFIX_PRIMITIVE_SINT128:

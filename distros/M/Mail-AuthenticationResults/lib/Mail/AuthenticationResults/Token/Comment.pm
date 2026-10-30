@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token::Comment;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20260216'; # VERSION
+our $VERSION = '2.20261029'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -27,16 +27,17 @@ sub parse {
         croak 'Not a comment';
     }
 
-    while ( length $header > 0 ) {
-        my $first = substr( $header,0,1 );
-        $header   = substr( $header,1 );
-        $value .= $first;
-        if ( $first eq '(' ) {
+    my $end;
+    while ( $header =~ /([()])/g ) {
+        if ( $1 eq '(' ) {
             $depth++;
         }
-        elsif ( $first eq ')' ) {
+        else {
             $depth--;
-            last if $depth == 0;
+            if ( $depth == 0 ) {
+                $end = pos( $header );
+                last;
+            }
         }
     }
 
@@ -44,8 +45,8 @@ sub parse {
         croak 'Mismatched parens in comment';
     }
 
-    $value =~ s/^\(//;
-    $value =~ s/\)$//;
+    $value  = substr( $header, 1, $end - 2 );
+    $header = substr( $header, $end );
 
     $self->{ 'value' } = $value;
     $self->{ 'header' } = $header;
@@ -67,7 +68,7 @@ Mail::AuthenticationResults::Token::Comment - Class for modelling Authentication
 
 =head1 VERSION
 
-version 2.20260216
+version 2.20261029
 
 =head1 DESCRIPTION
 
@@ -75,11 +76,11 @@ Token representing a comment
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

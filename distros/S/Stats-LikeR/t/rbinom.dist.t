@@ -202,4 +202,9 @@ for my $c (@CASES) {
 	       'and they are still centred on n*p');
 }
 
+# A call of the wrong form prints rbinom's help screen, then the error last.
+like(do { local $@; eval { rbinom(n => 3, size => 10) }; $@ },
+	qr/\Ausage: rbinom\(.*^example:\n.*\n\nrbinom: error: \Q'size' and 'prob' are required arguments\E\n\z/ms,
+	'rbinom: a missing prob prints the help screen, and the error last');
+
 done_testing();

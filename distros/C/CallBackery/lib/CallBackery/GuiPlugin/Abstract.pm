@@ -291,7 +291,7 @@ sub createRxValidator {
     my $error = shift;
     return sub {
         my $value = shift;
-        return undef if $value =~ /^${rx}$/;
+        return undef if $value =~ /\A(?:${rx})\z/;
         return $error;
     };
 }

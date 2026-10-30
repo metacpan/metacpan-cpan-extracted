@@ -4,10 +4,7 @@ use blib;
 use Acme::Parataxis;
 $|++;
 
-# Helper to flush Perl's temporary stack (tmps).
-# Returning an object from XS creates a mortal SV. Even after the Perl variable
-# ($res) is cleared, the mortal reference remains until the current scope exits
-# or FREETMPS is called. Calling a simple fiber forces an ENTER/LEAVE cycle.
+# Helper to flush Perl's temporary stack (tmps). Returning an object from XS creates a mortal SV. Even after the Perl variable ($res) is cleared, the mortal reference remains until the current scope exits or FREETMPS is called. Calling a simple fiber forces an ENTER/LEAVE cycle.
 sub flush_stack {
     Acme::Parataxis->new( code => sub {1} )->call();
 }
@@ -52,7 +49,7 @@ subtest 'Yield and Resume with Complex Data' => sub {
     my $fiber = Acme::Parataxis->new(
         code => sub {
             my $input = Acme::Parataxis->yield( { status => 'waiting' } );
-            is( ref $input, 'ARRAY', 'Received an ARRAY reference via yield' );
+            is ref $input, 'ARRAY', 'Received an ARRAY reference via yield';
             return { received => $input };
         }
     );

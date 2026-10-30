@@ -92,6 +92,14 @@ like($@, qr/group_by: "Ghost" is not present in the dataset/,
 	'HoH filter: absent-column death carries the expected message');
 
 # No memory leaks on the HoH + filter path (including the empty-result case).
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { group_by([]); 1 } ? '' : $@;
+	like($err, qr/\Ausage: group_by\(.*\n\ngroup_by: error: \Qexpected data, a value column and a group column, got 1 argument(s)\E\n\z/s,
+		'group_by: a call-form error prints the help screen, the error on its last line');
+}
+
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok {
 	group_by($hoh,  'Testosterone', 'Gender', { Sex  => sub { $_ eq 'f'    } });

@@ -1,6 +1,6 @@
 package Langertha::Raider::ToolEffects;
 # ABSTRACT: Internal static table of what each built-in tool can do (effect classes)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -10,10 +10,37 @@ my %EFFECTS = (
   # files
   list_files             => [qw( read )],
   read_file              => [qw( read )],
+  glob                   => [qw( read )],
+  grep                   => [qw( read )],
   write_file             => [qw( write )],
   edit_file              => [qw( write )],
+  multi_edit             => [qw( write )],
+  enter_worktree         => [qw( write )],
+  exit_worktree          => [qw( write )],
+  # run state
+  todo_write             => [],
+  task_create            => [],
+  task_update            => [],
+  task_list              => [],
+  task_get               => [],
+  agent                  => [],
+  ask_user               => [qw( message )],
+  enter_plan_mode        => [],
+  send_message           => [],
+  cron_create            => [],
+  cron_delete            => [],
+  cron_list              => [],
+  exit_plan_mode         => [],
+  # skills
+  skill                  => [qw( read )],
+  # MCP resources of the configured servers (ADR 0029 Addendum 1)
+  list_mcp_resources     => [qw( read )],
+  read_mcp_resource      => [qw( read )],
   # shell
   bash                   => [qw( code )],
+  bash_output            => [qw( read )],
+  kill_shell             => [],
+  monitor                => [qw( code )],
   # web
   web_search             => [qw( network )],
   web_fetch              => [qw( network )],
@@ -64,7 +91,7 @@ Langertha::Raider::ToolEffects - Internal static table of what each built-in too
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -104,7 +131,45 @@ is C<message> and C<code>. C<raider_wait_for> is C<code>: the host runs a
 callback of its own for the condition and raider cannot say what it does, so
 the table takes the cautious reading. C<raider_manage_mcps> is C<code>
 (activating starts a tool server) and C<raider_switch_engine> is C<network>
-(later prompts go to another provider).
+(later prompts go to another provider). C<glob> and C<grep> only read (they do not
+follow symbolic links out of the root). C<todo_write> keeps a list in the state of
+the run and has no effect outside it. C<ask_user> is C<message>, like
+C<raider_ask_user>: it puts a question to a person.
+
+C<skill> is C<read>: it returns a skill file from the local skill directories.
+
+C<list_mcp_resources> and C<read_mcp_resource> are C<read>: they return
+resources of the configured MCP servers, as Claude Code's read-only
+C<ListMcpResourcesTool> and C<ReadMcpResourceTool>.
+
+C<bash_output> is C<read>: it returns what a background shell of the session
+wrote, or a subagent's status and report. C<kill_shell> has no effect class:
+it can only stop a shell raider itself started with C<bash> (which was
+C<code> and passed the gate then) or a subagent of the session (whose calls
+passed the gate themselves); it starts nothing, and asking before stopping
+would make stopping harder than starting (ADR 0024, ADR 0027).
+
+C<monitor> is C<code>, like C<bash>, whose command it runs in the background and
+whose gates apply to it (ADR 0031). C<cron_create>, C<cron_delete> and
+C<cron_list> have no effect class: a job only queues a prompt for a later
+turn of the session, and what that turn does goes through the gate again
+when it does it; a prompt gives no permission (ADR 0005).
+
+C<exit_plan_mode> has no effect class: it hands a plan to the person and
+may switch the permission mode of the run (ADR 0021), which changes nothing
+outside it. Neither has C<enter_plan_mode>, which switches the mode to
+C<plan>; the permission gate asks the person before it runs (ADR 0025).
+
+C<task_create>, C<task_update>, C<task_list> and C<task_get> keep the task
+list of the conversation, like C<todo_write>; no effect outside it.
+
+C<enter_worktree> and C<exit_worktree> are C<write> (ADR 0032 E<sect>4): the
+one makes a checkout and a branch, the other may delete both.
+
+C<agent> has no class of its own (ADR 0020): it starts a subagent, whose
+tool calls carry their effects in the subagent's journal. Neither has
+C<send_message> (ADR 0027 E<sect>5): it only drives a subagent, whose calls
+carry their own effects through the policy it inherited.
 
 =head2 classes
 
@@ -125,7 +190,7 @@ undef for a tool that is not in the table.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -146,5 +211,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

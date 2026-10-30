@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 
 use Langertha::Raider::Hall::CLI;
 
@@ -25,7 +25,7 @@ raider-hall - Raider Hall daemon CLI
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -49,15 +49,21 @@ one. C<raider-hall SUBCOMMAND --help> prints the options of a subcommand.
 
 =head1 COMMANDS
 
-=head2 init [--name NAME] [--engine ENGINE] [--persona PACK]
+=head2 init [--name NAME] [--engine ENGINE | --provider ALIAS] [--persona PACK]
 
 Write a starter F<.raider-hall.yml> with one raider in the current
 directory; asks for the name without C<--name>. Never overwrites one.
 
-=head2 add-raider NAME [--engine E] [--persona P] [--model M] [--pack X]...
+=head2 add-raider NAME [--engine E | --provider ALIAS] [--persona P] [--model M] [--pack X]...
 
 Add a raider entry to F<.raider-hall.yml>. A running hall reads the file
 once at start, so restart it to use the new entry.
+
+C<--provider ALIAS> (here and for C<init>) names a provider binding stored
+with C<raider provider add>; the hall starts the raider with
+C<--provider ALIAS>. A host or https origin is refused, and so is
+C<--provider> together with C<--engine>; see
+L<Langertha::Raider::Hall/CONFIG FILE>.
 
 =head2 start [DIR] [--daemon] [--acp-port N] [--acp-host H]
 
@@ -151,7 +157,7 @@ L<Langertha::Raider::Hall/ENVIRONMENT>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -172,5 +178,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

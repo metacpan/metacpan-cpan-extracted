@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.2702",
+            "Text::ANSI::Fold" : "2.35",
             "Text::ANSI::Tabs" : "1.06",
             "perl" : "v5.14.0"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "Text::ANSI::Fold::Util" : {
          "file" : "lib/Text/ANSI/Fold/Util.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Fold-Util"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -435,6 +435,24 @@ North Ndebele locale.
    1995-12-22T09:05:02 = AD 1995 Mpal 22, Sih
   -0010-09-15T04:44:23 = BC -10 Mpan 15, Mgq
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Nhlolanja
+   1995-12-22T09:05:02 = AD 1995 Mpalakazi
+  -0010-09-15T04:44:23 = BC -10 Mpandula
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Nhlolanja 5, Sib
+   1995-12-22T09:05:02 = AD 1995 Mpalakazi 22, Sih
+  -0010-09-15T04:44:23 = BC -10 Mpandula 15, Mgq
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Nhlolanja 5
+   1995-12-22T09:05:02 = AD 1995 Mpalakazi 22
+  -0010-09-15T04:44:23 = BC -10 Mpandula 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Nhlo 5

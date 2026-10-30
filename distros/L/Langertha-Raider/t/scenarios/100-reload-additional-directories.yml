@@ -1,0 +1,41 @@
+title: /reload changes the additional directories of the mounted file and search tools; the removed one is refused again
+permission_mode: acceptEdits
+files:
+  .raider/config.yml: |
+    permissions:
+      additional_directories: [ "~/first" ]
+home:
+  first/a.txt: "token in first\n"
+  second/b.txt: "token in second\n"
+between:
+  1:
+    files:
+      .raider/config.yml: |
+        permissions:
+          additional_directories: [ "~/second" ]
+    reload: true
+prompts:
+  - Look in the first directory.
+  - Look in the second directory.
+script:
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/first/a.txt" } ]
+      - [ read_file, { path: "{{HOME}}/second/b.txt" } ]
+      - [ grep, { pattern: token, path: "{{HOME}}/second" } ]
+  - text: first done
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/second/b.txt" } ]
+      - [ grep, { pattern: token, path: "{{HOME}}/second", output_mode: content } ]
+      - [ read_file, { path: "{{HOME}}/first/a.txt" } ]
+      - [ grep, { pattern: token, path: "{{HOME}}/first" } ]
+  - text: second done
+expect:
+  answer: second done
+  tools:
+    - { name: read_file, text: "token in first" }
+    - { name: read_file, error: true, text: "Path escapes root" }
+    - { name: grep, error: true, text: "path escapes root" }
+    - { name: read_file, text: "token in second" }
+    - { name: grep, text: "/second/b\\.txt:1:token in second" }
+    - { name: read_file, error: true, text: "Path escapes root" }
+    - { name: grep, error: true, text: "path escapes root" }

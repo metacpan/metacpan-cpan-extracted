@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Problem 46 — Docker workspace flow</title>
+<style>
+@page { size: A4 landscape; margin: 10mm; }
+* { box-sizing: border-box; }
+body { margin: 0; color: #14243a; font: 15px/1.4 Arial, sans-serif; }
+.page { width: 277mm; height: 190mm; padding: 4mm 2mm; page-break-after: always; position: relative; }
+.page:last-child { page-break-after: auto; }
+h1 { margin: 0 0 2mm; font-size: 25pt; color: #10294a; }
+.subtitle { margin: 0 0 4mm; color: #4a6079; font-size: 11pt; }
+.diagram { width: 100%; height: 151mm; display: block; }
+.foot { font-size: 9pt; color: #51677f; margin-top: 1mm; }
+.flow { fill: #f2f7fc; stroke: #27608e; stroke-width: 2.3; }
+.decision { fill: #fff4d8; stroke: #bb7a00; stroke-width: 2.5; }
+.branch { fill: #e9f5ed; stroke: #338251; stroke-width: 2.3; }
+.stop { fill: #fff0ef; stroke: #b8473e; stroke-width: 2.2; }
+.end { fill: #e4f5f1; stroke: #16806e; stroke-width: 2.5; }
+.line { fill: none; stroke: #47627d; stroke-width: 2.6; marker-end: url(#arrow); }
+.yesline { fill: none; stroke: #338251; stroke-width: 2.6; marker-end: url(#arrowGreen); }
+.noline { fill: none; stroke: #b47b0d; stroke-width: 2.6; marker-end: url(#arrowGold); }
+.errline { fill: none; stroke: #b8473e; stroke-width: 2.2; stroke-dasharray: 7 5; marker-end: url(#arrowRed); }
+.label { font-size: 17px; font-weight: 700; fill: #14243a; }
+.body { font-size: 14px; fill: #314b67; }
+.small { font-size: 12px; fill: #52677d; }
+.branchlabel { font-size: 13px; font-weight: 700; }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.4px; fill: #52708d; }
+.step { fill: #1f5c89; }
+.stepnum { fill: white; font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+h2 { font-size: 20pt; color: #10294a; margin: 0 0 4mm; }
+.intro { font-size: 11pt; color: #4a6079; margin: 0 0 5mm; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 7mm; }
+.item { border-left: 3px solid #27608e; padding: 1mm 3mm 2mm; min-height: 27mm; }
+.item h3 { margin: 0 0 1mm; font-size: 12pt; color: #1c4e76; }
+.item p { margin: 0; font-size: 9.5pt; color: #314b67; }
+code { font: 9pt/1.45 "DejaVu Sans Mono", monospace; color: #10294a; }
+.cmd { display: block; white-space: pre-wrap; overflow-wrap: anywhere; background: #f1f5f9; padding: 2mm 2.5mm; border-radius: 2mm; margin-top: 1mm; }
+.callout { margin-top: 4mm; background: #e8f3f7; border: 1px solid #a9c9d6; padding: 3mm 4mm; border-radius: 2mm; font-size: 9.5pt; }
+</style>
+</head>
+<body>
+<section class="page">
+  <h1>Problem 46 · Docker workspace</h1>
+  <p class="subtitle">What happens when you run <code>d2 workspace foobar -c -d</code> and host alias <code>foobar</code> resolves to <code>/tmp/foobar</code>. This default path does not request a rebuild.</p>
+  <svg class="diagram" viewBox="0 0 1500 790" role="img" aria-label="Flowchart of Docker workspace startup and tmux attachment">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#47627d"/></marker>
+      <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#338251"/></marker>
+      <marker id="arrowGold" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b47b0d"/></marker>
+      <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8473e"/></marker>
+    </defs>
+    <!-- Main path -->
+    <rect x="480" y="18" width="540" height="72" rx="18" class="flow"/>
+    <text x="750" y="47" text-anchor="middle" class="eyebrow">START · HOST TERMINAL</text>
+    <text x="750" y="72" text-anchor="middle" class="label">d2 workspace foobar -c -d</text>
+    <path d="M750 90 V120" class="line"/>
+
+    <rect x="430" y="124" width="640" height="98" rx="14" class="flow"/>
+    <circle cx="458" cy="151" r="14" class="step"/><text x="458" y="151" class="stepnum">1</text>
+    <text x="485" y="155" class="label">Resolve alias on the host</text>
+    <text x="750" y="183" text-anchor="middle" class="body">foobar → /tmp/foobar · verify it exists · d2 process uses it as cwd</text>
+    <text x="750" y="205" text-anchor="middle" class="small">The parent terminal's working directory and host alias config are not changed.</text>
+    <path d="M750 222 V250" class="line"/>
+
+    <polygon points="750,250 980,330 750,410 520,330" class="decision"/>
+    <text x="750" y="316" text-anchor="middle" class="eyebrow">2 · CHECK SERVICE STATE</text>
+    <text x="750" y="343" text-anchor="middle" class="label">Is Compose service</text>
+    <text x="750" y="366" text-anchor="middle" class="label">workspace running?</text>
+    <text x="750" y="390" text-anchor="middle" class="small">d2 docker compose ps --status running --services workspace</text>
+
+    <path d="M520 330 H275 V464" class="yesline"/>
+    <text x="332" y="316" class="branchlabel" fill="#287246">YES · reuse</text>
+    <rect x="65" y="466" width="420" height="105" rx="14" class="branch"/>
+    <text x="275" y="500" text-anchor="middle" class="label">Keep the running container</text>
+    <text x="275" y="528" text-anchor="middle" class="body">Reuse it; skip start and rebuild.</text>
+    <text x="275" y="551" text-anchor="middle" class="small">Even -C never rebuilds a running service.</text>
+    <path d="M275 571 V622 H750" class="yesline"/>
+
+    <path d="M980 330 H1225 V464" class="noline"/>
+    <text x="1091" y="316" class="branchlabel" fill="#9b6908">NO · start</text>
+    <rect x="1015" y="466" width="420" height="105" rx="14" class="branch"/>
+    <text x="1225" y="500" text-anchor="middle" class="label">Start the workspace service</text>
+      <text x="1225" y="528" text-anchor="middle" class="body">Default: up -d --no-build workspace</text>
+    <text x="1225" y="551" text-anchor="middle" class="small">With -C: up -d --build workspace (cached).</text>
+    <path d="M1225 571 V622 H750" class="noline"/>
+
+    <path d="M750 622 V645" class="line"/>
+    <rect x="410" y="648" width="680" height="93" rx="14" class="flow"/>
+    <circle cx="440" cy="676" r="14" class="step"/><text x="440" y="676" class="stepnum">3</text>
+    <text x="750" y="679" text-anchor="middle" class="label">Set container-only alias, then launch workspace</text>
+    <text x="750" y="707" text-anchor="middle" class="body">Temporary overlay maps foobar → /workspace · host still maps foobar → /tmp/foobar</text>
+    <text x="750" y="730" text-anchor="middle" class="small">Compose exec runs d2 path add, then d2 workspace foobar -c inside the container.</text>
+
+    <path d="M1090 696 H1290" class="line"/>
+    <rect x="1287" y="650" width="190" height="91" rx="14" class="end"/>
+    <text x="1382" y="679" text-anchor="middle" class="eyebrow">END</text>
+    <text x="1382" y="705" text-anchor="middle" class="label">tmux attached</text>
+    <text x="1382" y="727" text-anchor="middle" class="small">inside container</text>
+
+    <path d="M1070 174 H1390 V418" class="errline"/>
+    <path d="M980 330 H1458 V418" class="errline"/>
+    <rect x="1296" y="420" width="181" height="48" rx="10" class="stop"/>
+    <text x="1386" y="450" text-anchor="middle" class="branchlabel" fill="#a33d36">Any step fails → stop</text>
+  </svg>
+  <p class="foot">Required setup: the effective Compose config in <code>/tmp/foobar</code> defines service <code>workspace</code> and bind-mounts the project at <code>/workspace</code>. The command does not create that mount. Use <code>-C -d</code> to explicitly request a cached rebuild if stopped.</p>
+</section>
+
+<section class="page">
+  <h2>Command sequence and outcome</h2>
+  <p class="intro">Compose commands are launched by the host-side d2 process from <code>/tmp/foobar</code>. Only the commands after <code>compose exec</code> run inside the container.</p>
+  <div class="grid">
+    <article class="item">
+      <h3>1 · Resolve the host alias</h3>
+      <p>Host configuration resolves <code>foobar</code> to <code>/tmp/foobar</code>. The d2 process changes its own cwd there so Compose finds the project configuration. This does not change the parent shell directory.</p>
+    </article>
+    <article class="item">
+      <h3>2 · Check whether workspace is running</h3>
+      <code class="cmd">d2 docker compose ps --status running --services workspace</code>
+      <p>If it reports <code>workspace</code>, reuse it. A failed probe is an error; startup must not guess.</p>
+    </article>
+    <article class="item">
+      <h3>3 · Start only when it is not running</h3>
+      <code class="cmd">d2 docker compose up -d --no-build workspace</code>
+      <p>The explicit <code>--no-build</code> prevents Compose from implicitly building a missing image. To request a cached rebuild of a stopped service, use <code style="white-space:nowrap">d2 workspace foobar -d -C</code>; this runs <code>up -d --build workspace</code> and streams build output. A running service is reused even with <code>-C</code>.</p>
+    </article>
+    <article class="item">
+      <h3>4 · Register the alias inside the container</h3>
+      <code class="cmd">d2 docker compose exec -e DEVELOPER_DASHBOARD_CONFIG_OVERLAY=/dev/shm/developer-dashboard-workspace-config workspace d2 path add foobar /workspace</code>
+      <p>The overlay is container-side only. Host config remains <code>foobar → /tmp/foobar</code>.</p>
+    </article>
+    <article class="item">
+      <h3>5 · Start or attach to the inner workspace</h3>
+      <code class="cmd">d2 docker compose exec -it -e DEVELOPER_DASHBOARD_CONFIG_OVERLAY=/dev/shm/developer-dashboard-workspace-config -e TMUX_TMPDIR=/dev/shm workspace d2 workspace foobar -c</code>
+      <p>Inside the container, the alias resolves to <code>/workspace</code>; d2 creates or attaches to the <code>foobar</code> tmux session.</p>
+    </article>
+    <article class="item">
+      <h3>What you get</h3>
+      <p>Your terminal attaches to tmux running inside the Compose workspace container. With the required bind mount, edits under <code>/workspace</code> are the host files under <code>/tmp/foobar</code>. Detaching returns you to the original host shell directory.</p>
+    </article>
+  </div>
+  <div class="callout"><strong>Important:</strong> the <code>workspace</code> Compose service must already be configured and must mount the project at <code>/workspace</code>. The outer command runs on the host; only the two <code>compose exec</code> commands run inside the container. The final exec allocates a TTY and explicitly passes <code>TMUX_TMPDIR=/dev/shm</code>, so tmux can attach even when the container's <code>/tmp</code> mount is not writable. The verified checkout was version <code>5.88</code>; the host-installed <code>d2</code> is still <code>5.84</code> and must be updated before it can use this fix.</div>
+</section>
+</body>
+</html>

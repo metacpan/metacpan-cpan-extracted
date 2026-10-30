@@ -9,7 +9,7 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Signature;
 
 # Whole-field syntax (follow-up review F3-F5). Unknown tags are ignored only
-# once they parse: -07 §8 gives every tag the shape
+# once they parse: -08 §8 gives every tag the shape
 # ALPHA *(ALPHA / DIGIT / "_") [FWS] "=" [FWS] [value], and §14.2 makes a
 # field that does not parse a syntax error. Lenient extraction let a fragment
 # that is not a tag at all ride along on a passing signature.
@@ -30,12 +30,12 @@ for my $suffix ('; junk', '; 9bad=foo', '; x=a' . chr(0) . 'b', '; =v') {
     my $raw = DKIM2SignedFixture::signed(mi => (DKIM2SignedFixture::mi_value() =~ s/;\s*\z//r) . '; x_ext9=some-value');
     is(DKIM2SignedFixture::verify($raw)->result, 'pass', 'a well-formed unknown MI tag is ignored');
 }
-# -07 section 8: one trailing ";" is fine, an empty tag-spec before the end is not.
+# -08 section 8: one trailing ";" is fine, an empty tag-spec before the end is not.
 for my $case (['m=1;;', 'a ";;"'], ['; m=1;', 'a leading ";"'], ['m=1; ;', 'a "; ;"']) {
     (my $mi = DKIM2SignedFixture::mi_value()) =~ s/\Am=1;/$case->[0]/ or die;
     my $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(mi => $mi));
     is($v->result, 'permerror', "MI with $case->[1] is a syntax error");
-    like($v->details, qr/\APERMERROR: Message-Instance m=1 syntax error\z/, "... in the -07 words");
+    like($v->details, qr/\APERMERROR: Message-Instance m=1 syntax error\z/, "... in the -08 words");
 }
 {
     my $sig = Mail::DKIM2::Signature->parse('i=1;; d=example.com; s=sel:rsa-sha256:AAAA;');

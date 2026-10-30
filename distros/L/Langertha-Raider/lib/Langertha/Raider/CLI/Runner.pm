@@ -1,6 +1,6 @@
 package Langertha::Raider::CLI::Runner;
 # ABSTRACT: Internal runner of one raider CLI prompt, for a human or a machine
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Config;
@@ -35,6 +35,8 @@ has _current => (
 );
 
 
+sub run_options { qw( allow_rules allow_source model attach_reads ) }
+
 sub run_prompt {
   my ( $self, $text, %o ) = @_;
   return 1 unless defined $text && length $text;
@@ -49,13 +51,14 @@ sub run_prompt {
   # first SIGINT only cancels, so the run still ends by itself.
   my $cancelled_by;
   local $SIG{INT}  = $o{catch_signals} ? sub {
-    return $cancelled_by = 'INT' if !$cancelled_by && $self->cancel_run;
+    return $cancelled_by = 'INT' if !$cancelled_by && $self->cancel_run( reason => 'signal' );
     $self->interrupt(INT => $machine, $self->elapsed_since($t0));
   } : $SIG{INT};
   local $SIG{TERM} = $o{catch_signals} ? sub { $self->interrupt(TERM => $machine, $self->elapsed_since($t0)) } : $SIG{TERM};
 
   my $end = $app->run_prompt($text,
     ( $o{session} ? ( session => $o{session} ) : () ),
+    ( map { defined $o{$_} ? ( $_ => $o{$_} ) : () } $self->run_options, qw( notification reminders wait_background ) ),
     on_event => sub { $self->event(@_) },
   );
   # The run has ended: no signal may cut its outcome short any more.
@@ -79,6 +82,8 @@ sub _report {
       $end->{status} eq 'cancelled'
         ? $out->say_meta($cancelled_by ? 'cancelled (SIG'.$cancelled_by.')' : 'turn cancelled')
         : $out->say_error($end->{error});
+      # A cancelled subagent's kept worktree (ADR 0032).
+      $out->say_meta($_) for $app->take_meta_notes;
     }
     return $self->_document($machine, $end);
   }
@@ -112,7 +117,7 @@ sub interrupt {
   }
   elsif ($machine) {
     $machine->event('run.state', state => 'interrupted');
-    $self->_document($machine, { status => 'interrupted', signal => $signal, elapsed => $elapsed });
+    $self->_document($machine, { status => 'interrupted', reason => 'signal', signal => $signal, elapsed => $elapsed });
   }
   unless ($machine) {
     $self->output->say_meta('interrupted (SIG'.$signal.')');
@@ -123,9 +128,10 @@ sub interrupt {
 
 
 sub cancel_run {
-  my ( $self ) = @_;
-  return 0 unless $self->_current && $self->app->cancel_run;
-  $self->terminate_children;
+  my ( $self, %o ) = @_;
+  return 0 unless $self->_current && $self->app->cancel_run( defined $o{reason} ? ( reason => $o{reason} ) : () );
+  # The configured MCP servers belong to the session too (ADR 0029).
+  $self->terminate_children( keep => [ $self->app->bash_tools->background_pids, $self->app->mcp_pids ] );
   return 1;
 }
 
@@ -139,7 +145,7 @@ sub abandon {
   my $machine = $current->{machine} or return;
   unless ($end) {
     # Interrupted before the application started the run.
-    $end = { status => 'interrupted', signal => $signal, elapsed => $self->elapsed_since($current->{t0}) };
+    $end = { status => 'interrupted', reason => 'signal', signal => $signal, elapsed => $self->elapsed_since($current->{t0}) };
     $machine->event('run.state', state => 'interrupted');
   }
   $self->_document($machine, $end);
@@ -150,6 +156,11 @@ sub abandon {
 sub event {
   my ( $self, $type, %payload ) = @_;
   my $current = $self->_current or return;
+  # A hook's systemMessage, error or stop is for the person (ADR 0022).
+  if ($type eq 'hook.message' && !$current->{machine}) {
+    $self->output->say_meta(( ( $payload{kind} // '' ) eq 'error' ? 'hook error: ' : 'hook: ' ).( $payload{text} // '' ));
+    return;
+  }
   my $machine = $current->{machine} or return;
   return if $type eq 'message' && ($payload{role} // '') eq 'user';
   $machine->event($type, %payload);
@@ -186,8 +197,9 @@ sub die_of_signal {
 sub terminate_grace { 2 }
 
 sub terminate_children {
-  my ( $self ) = @_;
-  my @pids = $self->child_pids or return;
+  my ( $self, %arg ) = @_;
+  my %keep = map { $_ => 1 } @{ $arg{keep} // [] };
+  my @pids = grep { !$keep{$_} } $self->child_pids or return;
   $self->_signal_group_or_pid(TERM => $_) for @pids;
   my %left = map { $_ => 1 } @pids;
   my $deadline = Time::HiRes::time() + $self->terminate_grace;
@@ -243,7 +255,7 @@ sub _document {
   my ( $self, $machine, $end ) = @_;
   if ($machine) {
     $machine->finish($machine->document($end->{status},
-      map { exists $end->{$_} ? ( $_ => $end->{$_} ) : () } qw( response metrics error signal elapsed session )));
+      map { exists $end->{$_} ? ( $_ => $end->{$_} ) : () } qw( response metrics reason error signal elapsed session )));
   }
   return $end->{status} eq 'completed' ? 1 : 0;
 }
@@ -264,7 +276,7 @@ Langertha::Raider::CLI::Runner - Internal runner of one raider CLI prompt, for a
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -313,12 +325,30 @@ also when it failed or was interrupted; a machine document then names the
 session in C<session> (C<id>, C<path>). A journal write that fails is a
 warning (L</journal_error>); the run goes on.
 
+C<notification>, C<reminders> and C<wait_background> go to the application
+as they are (ADR 0027: a turn that delivers notifications of background
+subagents, notifications in front of the prompt, a run that waits for its
+background subagents before it ends --
+L<Langertha::Raider::Application/run_prompt>); a one-shot run passes
+C<wait_background>.
+
 With C<catch_signals>, a C<SIGINT> during the run cancels it (L</cancel_run>):
 it ends as C<cancelled> at its next safe point, its outcome is printed or
 written as always, and then the process dies of C<SIGINT>
 (L</die_of_signal>). A second C<SIGINT> while it is being cancelled, one
 before the application started the run, and a C<SIGTERM> end it as
 C<interrupted>: see L</interrupt>.
+
+The options of one run (L</run_options>: C<allow_rules>, C<allow_source>,
+C<model>, C<attach_reads> -- a C</name> run request,
+L<Langertha::Raider::Application/slash_run_request>) go to the
+application's run as they are; they hold for that run only
+(L<Langertha::Raider::Application/begin_run>).
+
+=head2 run_options
+
+The keys of a run request that L</run_prompt> hands on:
+C<allow_rules allow_source model attach_reads>.
 
 =head2 interrupt
 
@@ -338,13 +368,18 @@ C<interrupted> state change and C<run.finished>.
 =head2 cancel_run
 
     my $cancelling = $runner->cancel_run;
+    my $cancelling = $runner->cancel_run( reason => 'signal' );
 
 Cancels the run in progress without leaving the process -- the REPL's
 first Ctrl-C, and the first C<SIGINT> of a one-shot run: asks the application to cancel it
 (L<Langertha::Raider::Application/cancel_run>), then ends the tool
-subprocesses still running (L</terminate_children>). The run ends as
+subprocesses still running (L</terminate_children>) -- except the background shells of
+C<bash> (L<Langertha::Raider::BashTools/background_pids>), which belong to the
+session, not to the run. The run ends as
 C<cancelled> at its next safe point and L</run_prompt> returns false,
 after C<turn cancelled> (or with a machine, the C<cancelled> document).
+C<reason> is the document's C<reason> (default C<user_cancel>); the first
+C<SIGINT> of a one-shot run gives C<signal>.
 Only records and signals, so the signal handler calls it. Returns false
 when no run is in progress.
 
@@ -364,7 +399,9 @@ left during a run.
 One event of the run in progress, as the application hands it on: into
 the machine stream (L<Langertha::Raider::CLI::Machine/event>), except the
 user's own input -- a stream C<message> is the agent's (ADR 0013).
-Outside a run it does nothing.
+Without a machine stream, a C<hook.message> (a hook's C<systemMessage>,
+error or stop, ADR 0022) is printed as a meta line. Outside a run it does
+nothing.
 
 =head2 record
 
@@ -397,11 +434,11 @@ process survive it, it exits with 128 plus the signal number.
     $runner->terminate_children;
 
 Ends the processes this raider started that still run -- a C<bash>
-command (L<MCP::Run::Bash> puts it into a process group of its own, so a
+command (L<Langertha::Raider::BashTools> puts it into a process group of its own, so a
 signal aimed at raider alone never reaches it), a C<perl_eval> or
 C<perl_cpanm> child: C<SIGTERM> to each child's process group, or to the
 child when it leads none, and C<SIGKILL> to what is left after
-C<terminate_grace> seconds.
+C<terminate_grace> seconds. C<keep> names process IDs to leave alone.
 
 =head2 child_pids
 
@@ -429,7 +466,7 @@ C<elapsed> of a document.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -450,5 +487,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

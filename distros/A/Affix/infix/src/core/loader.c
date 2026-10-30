@@ -27,7 +27,7 @@
  * variables of any type described by a signature string.
  */
 #include "common/infix_internals.h"
-#if defined(INFIX_OS_WINDOWS)
+#if defined(INFIX_OS_WINDOWS) && !defined(__CYGWIN__)
 #include <windows.h>
 #else
 #include <dlfcn.h>
@@ -49,7 +49,7 @@ INFIX_API INFIX_NODISCARD infix_library_t * infix_library_open(const char * path
         _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_OUT_OF_MEMORY, 0);
         return nullptr;
     }
-#if defined(INFIX_OS_WINDOWS)
+#if defined(INFIX_OS_WINDOWS) && !defined(__CYGWIN__)
     // On Windows, passing NULL to GetModuleHandleA returns a handle to the main executable file of the current process.
     if (path == nullptr) {
         lib->handle = GetModuleHandleA(path);
@@ -71,7 +71,7 @@ INFIX_API INFIX_NODISCARD infix_library_t * infix_library_open(const char * path
     lib->handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
 #endif
     if (lib->handle == nullptr) {
-#if defined(INFIX_OS_WINDOWS)
+#if defined(INFIX_OS_WINDOWS) && !defined(__CYGWIN__)
         // On Windows, GetLastError() provides the specific error code.
         _infix_set_system_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_LIBRARY_LOAD_FAILED, GetLastError(), nullptr);
 #else
@@ -94,7 +94,7 @@ INFIX_API void infix_library_close(infix_library_t * lib) {
     if (lib == nullptr)
         return;
     if (lib->handle) {
-#if defined(INFIX_OS_WINDOWS)
+#if defined(INFIX_OS_WINDOWS) && !defined(__CYGWIN__)
         // Only call FreeLibrary on real handles obtained from LoadLibrary.
         // Never call it on a pseudo-handle from GetModuleHandle.
         if (!lib->is_pseudo_handle)
@@ -124,7 +124,7 @@ INFIX_API void infix_library_close(infix_library_t * lib) {
 INFIX_API INFIX_NODISCARD void * infix_library_get_symbol(infix_library_t * lib, const char * symbol_name) {
     if (lib == nullptr || lib->handle == nullptr || symbol_name == nullptr)
         return nullptr;
-#if defined(INFIX_OS_WINDOWS)
+#if defined(INFIX_OS_WINDOWS) && !defined(__CYGWIN__)
     return (void *)GetProcAddress((HMODULE)lib->handle, symbol_name);
 #else
     return dlsym(lib->handle, symbol_name);

@@ -108,6 +108,9 @@ sub effective {
   my $app = Langertha::Raider::CLI->new(root => "$root", engine => 'openai', api_key => 'test');
   my $report = $app->explain_config;
   delete @$report{qw( file label exists )};
+  # The layout mode stays raider; only the marker that decided it (ADR 0019:
+  # .raider.yml / .raider.md before, .raider/ after) names the new layout.
+  delete $report->{layout}{reason};
   $report->{values} = [ grep { $_->{key} ne 'api_key' } @{ $report->{values} } ];
   return normalize({
     config  => [ grep { $_->{key} ne 'api_key' } @{ $config->explain('openai')->{values} } ],

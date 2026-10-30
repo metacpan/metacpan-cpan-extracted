@@ -1,0 +1,32 @@
+title: enter_plan_mode asks the person; agreed, the run is in plan mode until the plan is approved
+permission_mode: acceptEdits
+approve: [ once, once ]
+review: [ yes ]
+prompt: Restructure the project.
+script:
+  - tool_calls:
+      - [ enter_plan_mode, {} ]
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+  - tool_calls:
+      - [ exit_plan_mode, { plan: "1. write a.txt" } ]
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+  - text: done
+expect:
+  files: { a.txt: "a\n" }
+  plans: [ "1. write a.txt" ]
+  permissions:
+    - { tool: enter_plan_mode, rule: EnterPlanMode, reason: "acceptEdits mode asks before this call: enter_plan_mode switches the session to plan mode (read and plan only, no changes until a plan is approved)" }
+    # exit_plan_mode set the mode to default, which asks before writing
+    - { tool: write_file }
+  tools:
+    - { name: enter_plan_mode, text: "\\AEntered plan mode\\. You should now focus on exploring the codebase and designing an implementation approach\\.\n\nIn plan mode, you should:\n1\\. Thoroughly explore .*4\\. Use ask_user if you need to clarify the approach\n.*6\\. When ready, use exit_plan_mode to present your plan for approval\n\nRemember: DO NOT write or edit any files yet\\. This is a read-only exploration and planning phase\\.\\z" }
+    - { name: write_file, error: true, text: "plan mode: write_file changes files" }
+    - { name: exit_plan_mode }
+    - { name: write_file }
+  events:
+    - { type: permission.asked, tool: enter_plan_mode }
+    - { type: permission.granted, tool: enter_plan_mode, scope: once }
+    - { type: permission.mode, from: acceptEdits, to: plan, why: enter_plan_mode }
+    - { type: permission.mode, from: plan, to: default, why: exit_plan_mode }

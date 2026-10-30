@@ -1,5 +1,17 @@
 Changes file for Speak
 
+1.07    2026-10-28
+        - Added optional $app parameter to speak() to tag invoking applications
+          in the log (e.g. [announceEmail Gmail], [announceEmail DeFaria.com]).
+        - Added -a|pp <name> option to speak and say commands.
+        - Added -l|astmsg and -r|epeatmsg / -repeat options to speak and say
+          commands to repeat the last spoken message from /var/log/speak.log.
+        - Added last_message() subroutine to Speak.pm to retrieve the last
+          spoken message from the log.
+        - Added automatic persona display name mapping (%PERSONA_MAP) for
+          square-bracket logging of TTS personas.
+        - Supported named parameters and options hashref in speak().
+
 1.06    2026-10-09
         - Added -o|utput <filename> support to speak and say commands to save
           speech audio to an output file.

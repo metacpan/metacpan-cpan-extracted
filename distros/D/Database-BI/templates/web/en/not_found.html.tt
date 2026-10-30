@@ -1,0 +1,27 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+[%- # A page that is not there: a table, file or canvas that does not exist,
+    # or an address no route knows.  The breadcrumb names what was asked for
+    # when the trail can; otherwise it ends at "Page not found".
+-%]
+[%- IF !trail.size; trail_tail = [ { name => 'Page not found' } ]; END -%]
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+
+<div class="not-found-box">
+	<h1 class="not-found-title">[% title.length ? title : 'Page not found' | html %]</h1>
+	<p class="not-found-msg">[% error_msg.length ? error_msg : 'There is nothing at this address.' | html %]</p>
+	<p><a href="/" class="btn">Go to Home</a> <a href="/browse" class="btn">Open a file</a></p>
+</div>
+
+<style>
+.not-found-box {
+	max-width: 36rem;
+	margin: 3rem auto;
+	padding: 2rem;
+	border: 1px solid var(--color-border, #d0d0d0);
+	border-radius: 0.5rem;
+	background: var(--color-surface, #fff);
+}
+.not-found-title { font-size: 1.3rem; margin: 0 0 0.75rem; }
+.not-found-msg   { margin: 0 0 1.25rem; }
+</style>
+[%- END -%]

@@ -87,7 +87,7 @@ my $signed = signed_message();
     ok(!$ok && $@ == $thrown, 'parse_dkim_pubkey rethrows an object from the RSA constructor');
 
     local *Crypt::PK::Ed25519::new = sub { die $thrown };
-    $ok = eval { Mail::DKIM2::Common::parse_dkim_pubkey('v=DKIM1; k=ed25519; p=' . ('A' x 44)); 1 };
+    $ok = eval { Mail::DKIM2::Common::parse_dkim_pubkey('v=DKIM1; k=ed25519; p=' . ('A' x 43) . '='); 1 };
     ok(!$ok && $@ == $thrown, 'parse_dkim_pubkey rethrows an object from the Ed25519 constructor');
 }
 

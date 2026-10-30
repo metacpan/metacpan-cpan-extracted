@@ -435,6 +435,24 @@ Kurdish Iraq Latin locale.
    1995-12-22T09:05:02 = PM 22 brf 1995, înî
   -0010-09-15T04:44:23 = BM 15 îln -10, şem
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = PM 2008 sibat
+   1995-12-22T09:05:02 = PM 1995 berfanbar
+  -0010-09-15T04:44:23 = BM -10 îlon
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = PM 2008 sibat 5, sşm
+   1995-12-22T09:05:02 = PM 1995 berfanbar 22, înî
+  -0010-09-15T04:44:23 = BM -10 îlon 15, şem
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = PM 2008 sibat 5
+   1995-12-22T09:05:02 = PM 1995 berfanbar 22
+  -0010-09-15T04:44:23 = BM -10 îlon 15
+
 =head3 GyMMMd (G d MMM, y)
 
    2008-02-05T18:30:30 = PM 5 sbt, 2008
@@ -506,6 +524,12 @@ Kurdish Iraq Latin locale.
    2008-02-05T18:30:30 = 5 sbt, sşm
    1995-12-22T09:05:02 = 22 brf, înî
   -0010-09-15T04:44:23 = 15 îln, şem
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = sibat 5, sşm
+   1995-12-22T09:05:02 = berfanbar 22, înî
+  -0010-09-15T04:44:23 = îlon 15, şem
 
 =head3 MMMMW-count-one ('hefteya' W'an' 'ya' MMMM'ê')
 

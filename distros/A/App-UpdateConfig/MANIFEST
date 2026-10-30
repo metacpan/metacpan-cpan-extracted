@@ -14,7 +14,10 @@ t/300-pack.t
 t/400-config_dir.t
 t/500-version.t
 t/600-bootstrap.t
+t/610-install-location.t
+t/620-readme-install.t
 t/700-merge.t
+t/lib/UpdateConfigDocker.pm
 t/lib/UpdateConfigTest.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ Test::Log::Abstraction - Capture log output in tests and assert on it
 
 ## Version
 
-0.002.0
+0.002.1
 
 ## Synopsis
 
@@ -112,8 +112,9 @@ It never writes to disk, and it does not load any logging backend.
 `critical`, `alert` and `emergency`.  It also accepts the syslog names
 `warning`, `err`, `crit`, `emerg`, `panic` and `informational`.
 - **Other logger methods.**  `level()`, `is_debug()` and the other
-`is_<level>()` methods, `messages()` and `flush()`.  Code under
-test may call these, so they work as they do in [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction).
+`is_<level>()` methods, `messages()`, `flush()` and
+`reopen()`.  Code under test may call these, so they work as they do in
+[Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction).
 - **Test methods.**  `like`, `unlike`, `has_level` and `empty`.
 Each one reports one test result, like `ok()` in [Test::More](https://metacpan.org/pod/Test%3A%3AMore).
 - **Helper methods.**  `count`, `clear`, `verbose` and `lang`.
@@ -166,7 +167,9 @@ with an error does set `$@`, as every Perl error does.)
 ### Levels and How Serious They Are
 
 Each level has a number.  A lower number means a more serious message.
-These are the syslog numbers.
+These are the syslog numbers.  The names and numbers come from
+[Readonly::Values::Syslog](https://metacpan.org/pod/Readonly%3A%3AValues%3A%3ASyslog), so they are the same as in other modules that
+use it.
 
 ```
 0  emergency, emerg, panic
@@ -282,6 +285,8 @@ So any message that you do not give keeps its normal text.
 - **A misspelt method name does not stop the test.**
 `$logger->wran('x')` stores the message under the name `wran` and
 prints a notice.  The test still passes, unless you check the messages.
+A misspelt level name given to `count()` is not caught either: see
+["LIMITATIONS"](#limitations).
 - **`prove -v` prints everything.**  `prove -v` sets
 `TEST_VERBOSE`, which turns verbose mode on.  If a test checks what is
 printed, set `verbose => 0` or `$ENV{TEST_VERBOSE} = 0`.
@@ -427,7 +432,8 @@ diag      valid: 'all' or 'none' (any case); a level name (any case),
           code or scalar reference.
 level     valid: the 16 level names, any case, setting 0 (emergency)
           to 7 (trace); absent or undef: $config{level}.  Invalid:
-          '', numbers (even 0 to 7), any other name.
+          '', numbers (even 0 to 7), any other name.  The error shows
+          the name as it was given ('LOUD', not 'loud').
 lang      valid: 'auto' (any case); 2 or 3 ASCII letters, then
           optionally one of _ . @ - and anything else ('de',
           'eng', 'de_DE.UTF-8', 'zh-Hant').  A code with no catalogue
@@ -514,13 +520,17 @@ The less serious levels (`trace`, `debug`, `info`, `informational`,
 of the message.
 - If there are two or more values and the last one is a hash
 reference, that hash is not part of the message.  A copy of it is stored as
-`fields`.  An empty hash is dropped.
+`fields`.  An empty hash is dropped.  A tied hash that dies when it is
+read cannot be copied, so it stays in the message, written in Perl's
+plain form (`HASH(0x...)`), and the log call still works.
 - A hash reference in the message is written as
 `{key => value, ...}`, with the keys sorted.  An array reference is
 written as `[a, b]`.  So you can match their contents.
 - `undef` is written as the text `undef`.  There is no warning.
 - An object is written as Perl normally writes it.  If the object
-has its own text form (overloaded `""`), that form is used.
+has its own text form (overloaded `""`), that form is used.  If that text
+form dies, the object is written in Perl's plain form, such as
+`My::Class=HASH(0x55d0c8a1e2f8)`, and the log call still works.
 - A structure that contains itself is written as `(cycle)` at the
 point where it repeats.
 
@@ -684,7 +694,10 @@ is($logger->count('wran'), 1, 'the misspelt call was stored');
 ```
 
 Domains: any method name, including '', non-ASCII names and very long
-names.  The message is stored under the name in lower case.
+names.  The message is stored under the name in lower case, in full.  The
+notice shows the name escaped and cut: up to 200 characters it is shown
+whole, and from 201 on it is cut to 200 followed by '...' (see
+["DIAGNOSTICS"](#diagnostics)).  The length is counted in characters, not bytes.
 
 ##### Output
 
@@ -699,6 +712,8 @@ Message                         Meaning                       What to do
 ------------------------------  ----------------------------  ------------------------------
 no method 'X'                   X is not a method or a level  Fix the method name
                                 (notice; the test goes on)
+                                (X is shown escaped and cut;
+                                see DIAGNOSTICS)
 X() must be called on an        an unknown method was called  Call it on a logger object
 object, not on the class        on the class name (croak)
 ```
@@ -751,6 +766,8 @@ is($first->{level}, 'warn', 'the first message is a warning');
 {}
 ```
 
+Domains: no arguments; any that are given are ignored.
+
 ##### Output
 
 ```perl
@@ -802,6 +819,8 @@ $logger->clear()->empty('nothing logged yet');
 ```
 {}
 ```
+
+Domains: no arguments; any that are given are ignored.
 
 ##### Output
 
@@ -1235,7 +1254,11 @@ print $logger->level(), "\n";    # 3
 
 Domains: absent or undef - get only; one of the 16 level names, any
 case - set (0 for emergency to 7 for trace).  Anything else - '', numbers
-such as '0' or '8', unknown names - warns and returns undef.
+such as '0' or '8', unknown names - warns and returns undef.  A reference
+is treated as its text form: a plain reference such as ARRAY(0x...) is
+never a level name, so it warns; an object whose overloaded text form is
+a level name sets that level; an object whose text form dies is shown in
+plain form in the warning.
 
 ##### Output
 
@@ -1290,6 +1313,8 @@ $logger->flush();
 {}
 ```
 
+Domains: no arguments; any that are given are ignored.
+
 ##### Output
 
 ```perl
@@ -1302,6 +1327,66 @@ $logger->flush();
 Message                         Meaning                       What to do
 ------------------------------  ----------------------------  ------------------------------
 flush() must be called on an    not called on a logger        Call it on a logger object
+object, not on the class        (croak)
+```
+
+### Reopen
+
+Do nothing.
+
+#### Purpose
+
+In [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) 0.41 and later, `reopen()` closes the log files, so
+that the next message opens them again.  A program calls it after another
+program has moved or renamed its log files (log rotation), often from a
+`$SIG{HUP}` handler.  The test logger has no files, but the code under
+test may still call `reopen()`, so it exists.  Without it, the call would
+be stored as a message at level `reopen`, and a "no method" notice would
+be printed.
+
+#### Args
+
+None.
+
+#### Returns
+
+The logger, so you can chain calls.
+
+#### Side Effects
+
+None.  No message is stored or printed, and `$@` and `$!` do not change.
+
+#### Example
+
+```perl
+# The code under test reopens its logs when it gets SIGHUP
+local $SIG{HUP} = sub { $logger->reopen() };
+kill('HUP', $$);
+$logger->empty('reopening the logs logged nothing');
+```
+
+#### Api Specification
+
+##### Input
+
+```
+{}
+```
+
+Domains: no arguments; any that are given are ignored.
+
+##### Output
+
+```perl
+{ type => 'object', isa => 'Test::Log::Abstraction' }
+```
+
+#### Messages
+
+```
+Message                         Meaning                       What to do
+------------------------------  ----------------------------  ------------------------------
+reopen() must be called on an   not called on a logger        Call it on a logger object
 object, not on the class        (croak)
 ```
 
@@ -1340,6 +1425,8 @@ my $lang = Test::Log::Abstraction->new(country => 'FR')->lang();    # 'fr'
 ```
 {}
 ```
+
+Domains: no arguments; any that are given are ignored.
 
 ##### Output
 
@@ -1441,7 +1528,10 @@ singular or plural form.  `gender` chooses a gender form.
 A template is a string.  `%{name}s` is replaced by the value called
 `name`.  After the name you can use any `sprintf` format letter, for
 example `%{count}d` or `%{ratio}.2f`.  `%%` gives one `%`.  A value
-that is missing becomes the text `undef`, with no warning.
+that is missing becomes the text `undef`, with no warning.  A value that
+the format cannot show is written as it was given: text, infinity and NaN
+for any number format, and a number too big for an integer format such as
+`%d` or `%x`, which `sprintf` would turn into `-1`.
 
 A template can also be a hash.  The keys are gender names (such as
 `male`, `female`) or plural forms (`zero`, `one`, `two`, `few`,
@@ -1512,6 +1602,12 @@ Domains: key - any string; undef renders as '', a reference as its
 string form, and an unknown key is returned as it is.  args - a hash
 reference; anything else is ignored.  count - a number selects a plural
 form (0 uses 'zero' when present); anything else uses 'other'.
+Placeholder values: any value.  With an integer format, `%d` and `%i`
+show -2\*\*63 to 2\*\*63-1, and `%u`, `%o`, `%x`, `%X`, `%b` and `%c`
+show 0 to 2\*\*64-1 (a negative number down to -2\*\*63 in two's
+complement).  Leading zeros and a leading `+` are allowed, and '-0' is 0.
+A value outside these ranges, text, infinity and NaN are shown as written.
+(These limits are for a Perl with 64-bit integers.)
 
 ##### Output
 
@@ -1539,10 +1635,17 @@ return the text
 
 - **It accepts more than the real logger.**  The syslog names
 (`warning`, `err`, `crit`, `emerg`, `panic`, `informational`) are
-methods here, but not in [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) 0.39.  Code that calls them
-passes its tests, and then stops with an error in production.
+methods here, but not in [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) (checked up to version
+0.41).  Code that calls them passes its tests, and then stops with an
+error in production.
 A `strict` option, which allows only the
 real [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) methods, would be safer.
+- **A misspelt level in `count()` is not caught.**  `count('wran')`
+returns 0, so `is($logger->count('wran'), 0)` passes whatever was
+logged.  Any name is accepted because ["AUTOLOAD"](#autoload) stores messages under
+names that are not levels.  `has_level('wran')` fails, so the typo shows
+there.  Prefer `empty()`, or `count()` with no level, when checking that
+nothing was logged.
 - **Messages are stored under the name that was called.**  See
 ["COMMON PITFALLS"](#common-pitfalls).  Your test must use the same name as the code under
 test.
@@ -1559,8 +1662,8 @@ with `_`, and the subclass methods `_emit` and `i18n`, can be called by
 any code.  Nothing checks the caller: a test helper should not need
 compiled modules to do that.  Do not rely on them outside a subclass.
 - **Many modules are needed.**  [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict),
-[Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Readonly](https://metacpan.org/pod/Readonly), and [autodie](https://metacpan.org/pod/autodie) (with
-[IPC::System::Simple](https://metacpan.org/pod/IPC%3A%3ASystem%3A%3ASimple)) must be installed, for what is a small test
+[Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Readonly](https://metacpan.org/pod/Readonly), [Readonly::Values::Syslog](https://metacpan.org/pod/Readonly%3A%3AValues%3A%3ASyslog), and [autodie](https://metacpan.org/pod/autodie)
+(with [IPC::System::Simple](https://metacpan.org/pod/IPC%3A%3ASystem%3A%3ASimple)) must be installed, for what is a small test
 helper.  [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) is not used, because it loads
 [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction), and a test logger should not need that.
 - **Simple translation system.**  [Locale::Maketext](https://metacpan.org/pod/Locale%3A%3AMaketext) uses numbered
@@ -1589,12 +1692,17 @@ Each method lists its messages under `MESSAGES`.  All messages can be
 translated or changed; see ["i18n"](#i18n).
 
 The text after `invalid argument:` explains what was wrong, and may show
-the value that was given.  Other errors and warnings repeat a name you gave:
-a level name, a diag name, or a method name.  Every value repeated like this
-is cut to 200 characters, and control characters in it (such as a newline,
-or the escape character that starts a terminal control sequence) are shown
-as `\xNN`.  So a hostile value cannot make an error message enormous, add
-a forged `ok` line to the output, or control your terminal.
+the value that was given.  Other errors, warnings and notices repeat a name
+you gave: a level name, a diag name, or a method name.  Every value repeated
+like this is cut to 200 characters, and control characters in it (such as
+a newline, or the escape character that starts a terminal control
+sequence) are shown as `\xNN`.  In a character string, the C1 controls
+U+0080 to U+009F are shown as `\xNN` too; in a byte string those bytes
+are kept, because they are usually part of UTF-8 text.  So a hostile value cannot make an error
+message enormous, add a forged `ok` line to the output, or control your
+terminal.  An object whose text form (overloaded `""`) dies is shown in
+Perl's plain form, such as `My::Class=HASH(0x55d0c8a1e2f8)`: the error
+or warning you get is this module's, not the object's.
 
 ## See Also
 
@@ -1744,7 +1852,9 @@ Unknown
   verbose' = verbose ∧ threshold' = threshold ∧ lang' = lang
 ```
 
-The notice `no method 'name?'` is always printed.  A name in another case,
+The notice `no method 'name?'` is always printed.  The name in it is
+escaped and cut, as described under ["DIAGNOSTICS"](#diagnostics); the stored `level`
+is not.  A name in another case,
 such as `INFO`, is not a method, so it comes here, and is stored as
 `info`.
 
@@ -1872,6 +1982,13 @@ Flush
   ΞLogger
 ```
 
+### Reopen
+
+```
+Reopen
+  ΞLogger
+```
+
 ### Lang
 
 ```
@@ -1935,7 +2052,8 @@ and so on) never change the state.
      |                                                      |
      | wran() or any unknown method (AUTOLOAD)              |
      | [store under that name; always print                 |
-     |  "no method 'wran'"]                                 |
+     |  "no method 'wran'", the name escaped and cut to     |
+     |  200 characters]                                     |
      v                                                      |
 +-----------------------------------------+                 |
 |               CAPTURING                 |-----------------+
@@ -1960,12 +2078,21 @@ Read-only calls in BOTH states (the state stays the same):
   like, unlike, has_level, empty
                             [one TAP result; on failure, print the
                              messages that explain it]
-  count, messages, lang, is_trace ... is_emergency, flush
+  count, messages, lang, is_trace ... is_emergency, flush, reopen,
+  i18n
                             [return a value only]
+  DESTROY() called directly [does nothing; the logger stays]
   like(undef), has_level(undef), a bad argument, or any method
   called on something that is not a logger (the class name, undef,
   a plain reference, or another class's object)
                             [croak; no change]
+
+On the class name, with no logger at all (see METHODS FOR
+SUBCLASSES):
+
+  i18n                      [return the text, in the configured
+                             language]
+  _emit                     [print the text; return the class name]
 
 Copying (the original logger does not change):
 

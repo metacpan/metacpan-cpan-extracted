@@ -1,6 +1,6 @@
 package CPAN::InGit;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Manage custom CPAN trees to pin versions for your projects
 
 use Git::Raw::Repository;
@@ -71,6 +71,7 @@ sub get_archive_tree($self, $branch_or_tag_or_id) {
    return $class->new(
       parent => $self,
       tree => $tree,
+      name => $branch? $branch->shorthand : "$branch_or_tag_or_id",
       use_workdir => $use_workdir,
       (branch => $branch)x!!$branch,
    );
@@ -101,14 +102,18 @@ sub lookup_tree($self, $branch_or_tag_or_id) {
    my ($tree, $origin);
    defined $branch_or_tag_or_id or croak "missing argument";
    my $repo= $self->git_repo;
-   if (blessed($branch_or_tag_or_id) && (
-         $branch_or_tag_or_id->isa('Git::Raw::Branch')
-      || $branch_or_tag_or_id->isa('Git::Raw::Tag')
-   )) {
+   if (blessed($branch_or_tag_or_id) && $branch_or_tag_or_id->isa('Git::Raw::Reference')) {
       $origin= $branch_or_tag_or_id;
       $tree= $origin->peel('tree');
+   } elsif (blessed($branch_or_tag_or_id) && $branch_or_tag_or_id->isa('Git::Raw::Commit')) {
+      $origin= $branch_or_tag_or_id;
+      $tree= $origin->tree;
+   } elsif (blessed($branch_or_tag_or_id) && $branch_or_tag_or_id->isa('Git::Raw::Tag')) {
+      $origin= $branch_or_tag_or_id;
+      $origin= $origin->target while $origin->isa('Git::Raw::Tag');
+      $tree= $origin->isa('Git::Raw::Commit')? $origin->tree : $origin;
    } elsif ($branch_or_tag_or_id eq 'HEAD') {
-      $tree= $repo->head->target->peel('tree');
+      $tree= $repo->head->target->tree;
       $origin= $repo->is_head_detached? undef
              : $repo->head;
    } elsif ($origin= eval { Git::Raw::Branch->lookup($repo, $branch_or_tag_or_id, 1) }) {
@@ -116,12 +121,12 @@ sub lookup_tree($self, $branch_or_tag_or_id) {
    } elsif ($origin= eval { Git::Raw::Tag->lookup($repo, $branch_or_tag_or_id) }) {
       $tree= $origin->peel('tree');
    } elsif (my $obj= eval { $repo->lookup($branch_or_tag_or_id) }) {
-      if ($obj->type == Git::Raw::Object::COMMIT()) {
+      if ($obj->isa('Git::Raw::Commit')) {
          $origin= Git::Raw::Commit->lookup($repo, $obj->id);
          $tree= $origin->tree;
-      } elsif ($obj->type == Git::Raw::Object::TREE()) {
+      } elsif ($obj->isa('Git::Raw::Tree')) {
          $tree= Git::Raw::Tree->lookup($repo, $obj->id);
-      } elsif ($obj->type == Git::Raw::Object::TAG()) {
+      } elsif ($obj->isa('Git::Raw::Tag')) {
          $origin= Git::Raw::Tag->lookup($repo, $obj->id);
          $tree= $origin->target;
       }
@@ -364,8 +369,8 @@ Using the module:
   # and commits them to that branch, as a cache.
   $cpan_repo->create_archive_tree('www_cpan_org', upstream_url => 'https://www.cpan.org');
   
-  # Create a branch to be the per-application tree of modules.  Configure
-  # it to "import_modules" from branch "www_cpan_org".
+  # Create a branch to be the per-application tree of modules.
+  # Configure it to "import_modules" from branch "www_cpan_org".
   $cpan_repo->create_archive_tree('my_app',
     default_import_sources => ['www_cpan_org'],
     corelist_perl_version => '5.026003',
@@ -383,9 +388,9 @@ Using the module:
   # Commit the changes to branch 'my_app'
   $app_pan->commit("Added Catalyst and DBIx::Class");
   
-  # This only pulls Log::Any, because the versions of Catalyst and DBIx::Class
-  # are already satisfied, even if new versions of DBIx::Class were available,
-  # and even if those new versions were in branch 'www_cpan_org'.
+  # This only pulls Log::Any because the versions of Catalyst and DBIx::Class
+  # are already satisfied, even if a new version of DBIx::Class is available,
+  # and even if a new version is indexed in branch 'www_cpan_org'.
   # The versions are pinned until you request a newer version.
   $app_pan->import_modules({
     'Catalyst' => 0,
@@ -483,7 +488,9 @@ The L<Mojo::UserAgent> object used when downloading files from the real CPAN.
   $mirror= $cpan_repo->get_archive_tree($branch_or_tag_or_id);
 
 Return a L<ArchiveTree object|CPAN::InGit::ArchiveTree> for the given
-branch name, git tag, or commit hash.  This branch must look like an archive
+branch name, git tag, or commit hash. A Git::Raw::Reference, Git::Raw::Tag,
+or Git::Raw::Commit object can also select a tree without resolving a name.
+This tree must look like an archive
 (having C<< /cpan_ingit.json >>) or it will return C<undef>.
 
 =head2 create_archive_tree
@@ -555,7 +562,7 @@ branches or an older snapshot of the combined 'PANs.
 
 =item L<CPAN::Mini::Inject>
 
-This builds on L<CPAN::Mini> to add inject custom files into a local tree that is mirroring
+This builds on L<CPAN::Mini> to inject custom files into a local tree that is mirroring
 public CPAN.
 
 =item L<Pinto>
@@ -576,7 +583,7 @@ before installing them.
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 AUTHOR
 

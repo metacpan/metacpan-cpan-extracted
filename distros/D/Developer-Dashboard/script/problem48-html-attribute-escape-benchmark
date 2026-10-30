@@ -1,0 +1,150 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::HtmlEscape ();
+
+my $iterations = 100_000;
+my $runs = 9;
+my $help = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+printf "perl_baseline=pure-perl xs_backend=%s\n",
+  $Developer::Dashboard::HtmlEscape::XS_LOADED ? 'loaded' : 'unavailable';
+my @cases = (
+    [ 'nav/static-1.tt', 'nav/static-1.tt' ],
+    [ 'quote-heavy',     q{a&<>"'b} ],
+);
+
+for my $case (@cases) {
+    my ( $name, $input ) = @{$case};
+    my $expected = _perl_attribute_escape($input);
+    my $actual = Developer::Dashboard::HtmlEscape::_escape_html_attr($input);
+    die "Attribute output differs for '$name'\n" if $actual ne $expected;
+    die "Attribute UTF-8 flag differs for '$name'\n"
+      if ( utf8::is_utf8($actual) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+
+    my ( @perl_seconds, @production_seconds );
+    for my $run ( 1 .. $runs ) {
+        my @strategies = $run % 2 ? qw(perl production) : qw(production perl);
+        for my $strategy (@strategies) {
+            my $started = time;
+            for ( 1 .. $iterations ) {
+                my $value = $strategy eq 'perl'
+                  ? _perl_attribute_escape($input)
+                  : Developer::Dashboard::HtmlEscape::_escape_html_attr($input);
+                die "Output mismatch during '$strategy' run for '$name'\n" if $value ne $expected;
+            }
+            my $elapsed = time - $started;
+            push @{ $strategy eq 'perl' ? \@perl_seconds : \@production_seconds }, $elapsed / $iterations;
+        }
+    }
+
+    my $perl_median = _median(@perl_seconds);
+    my $production_median = _median(@production_seconds);
+    printf "input=%s iterations=%d runs=%d perl_ms_per_call=%.6f production_ms_per_call=%.6f speedup=%.2fx parity=yes\n",
+      $name, $iterations, $runs, 1000 * $perl_median, 1000 * $production_median,
+      $perl_median / $production_median;
+}
+
+exit 0;
+
+# _perl_attribute_escape($text)
+# Applies the pre-XS production sequence: body escaping followed by two quote substitutions.
+# Input: undefined or scalar text value.
+# Output: escaped scalar safe for a quoted HTML attribute.
+sub _perl_attribute_escape {
+    my ($text) = @_;
+    $text = Developer::Dashboard::HtmlEscape::_escape_html_perl($text);
+    $text =~ s/"/&quot;/g;
+    $text =~ s/'/&#39;/g;
+    return $text;
+}
+
+# _median(@values)
+# Returns the middle sorted sample, averaging the middle pair for even counts.
+# Input: list of numeric samples.
+# Output: median numeric sample.
+sub _median {
+    my @sorted = sort { $a <=> $b } @_;
+    my $middle = int( @sorted / 2 );
+    return @sorted % 2 ? $sorted[$middle] : ( $sorted[ $middle - 1 ] + $sorted[$middle] ) / 2;
+}
+
+# _usage()
+# Returns concise benchmark usage text.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--iterations POSITIVE_N] [--runs ODD_N] [--help]\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-html-attribute-escape-benchmark - compare Perl and XS attribute escaping
+
+=head1 PURPOSE
+
+Measures the public HTML attribute escape helper against an independent
+pure-Perl reference that escapes body text and then runs separate double-quote
+and single-quote substitutions. It checks exact text and UTF-8-flag parity
+before timing. The reference deliberately calls the Perl body helper even when
+the XS backend is loaded, so the baseline cannot accidentally use production
+native code.
+
+=head1 WHY IT EXISTS
+
+Problem 48 uses Devel::NYTProf to identify repeated hot helpers and measures
+native changes instead of assuming they are faster. The production XS path
+escapes all five HTML-sensitive ASCII bytes in one pass. This command provides
+a repeatable function-level comparison on an ordinary navigation identifier
+and a quote-heavy value. It does not claim a whole-route or all-subroutine
+speedup.
+
+=head1 WHEN TO USE
+
+Run after changing C<_escape_html_attr>, the native XSUB, or its dispatch
+contract. Run once without a built extension to measure the source-only Perl
+path, and once with the compiled extension in C<@INC> to measure XS.
+
+=head1 HOW TO USE
+
+  d2 docker compose exec dev perl script/problem48-html-attribute-escape-benchmark
+  d2 docker compose exec dev perl -I.p48-xs-build/blib/arch -I.p48-xs-build/blib/lib -Ilib script/problem48-html-attribute-escape-benchmark --iterations 100000 --runs 9
+
+C<--iterations> selects calls per sample and must be positive. C<--runs> is an
+odd positive count so the median is a measured sample. Cases alternate which
+strategy runs first; a parity mismatch is fatal.
+
+=head1 WHAT USES IT
+
+This is an opt-in Problem 48 research command. Production code does not load it
+or its timing dependencies beyond core C<Time::HiRes>.
+
+=head1 EXAMPLES
+
+  d2 docker compose exec dev perl script/problem48-html-attribute-escape-benchmark --iterations 50000 --runs 7
+
+=cut

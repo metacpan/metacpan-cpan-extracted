@@ -53,6 +53,7 @@ when given the necessary ENV variables.
     # the redirect_uri (https://developer.gocardless.com/api-reference/#redirect-flows-complete-a-redirect-flow)
     my $Payment = $GoCardless->confirm_resource(
         redirect_flow_id => $id,
+        session_token    => 'foo', # the one passed to new_bill_url
         type             => 'payment', # bill / payment / pre_auth / subscription
         amount           => 0,
         currency         => 'GBP',
@@ -1246,6 +1247,7 @@ The object returned will depend on the C<type> parameter passed to the method
 
         # required 
         redirect_flow_id => $redirect_flow_id,
+        session_token    => $session_token,
         type             => 'payment', # one of bill, payment, pre_auth, subscription
         amount           => 0,
         currency         => 'GBP',
@@ -1256,6 +1258,12 @@ The object returned will depend on the C<type> parameter passed to the method
         start_at         =>
     );
 
+C<session_token> must be the one passed to new_bill_url,
+new_pre_authorization_url or new_subscription_url for this user's session,
+otherwise an exception is thrown and nothing is created. A flow that already
+has a mandate passes this check on every call, so call confirm_resource once
+per flow and discard the session_token afterwards.
+
 =cut
 
 # BACK COMPATIBILITY method, in which we (try to) return the correct object for
@@ -1263,7 +1271,7 @@ The object returned will depend on the C<type> parameter passed to the method
 sub confirm_resource {
     my ( $self,%params ) = @_;
 
-    for ( qw/ redirect_flow_id type amount currency / ) {
+    for ( qw/ redirect_flow_id session_token type amount currency / ) {
         $params{$_} // confess( "$_ is required for confirm_resource (v2)" );
     }
 
@@ -1275,7 +1283,7 @@ sub confirm_resource {
     my $interval  = $params{interval};
     my $start_at  = $params{start_at};
 
-    if ( my $RedirectFlow = $self->client->_confirm_redirect_flow( $r_flow_id ) ) {
+    if ( my $RedirectFlow = $self->client->_confirm_redirect_flow( $r_flow_id,$params{session_token} ) ) {
 
         # now we have a confirmed redirect flow object we can create the
         # payment, subscription, whatever

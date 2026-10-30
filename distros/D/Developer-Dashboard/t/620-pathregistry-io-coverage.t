@@ -7,7 +7,7 @@ use warnings;
 # compiled. They fail only for exact paths registered in the %FAIL_* tables,
 # so every I/O error branch runs deterministically for any uid (a chmod-based
 # unreadable file does not fail for root).
-our ( %FAIL_OPEN, %FAIL_OPENDIR, %FAIL_CHDIR, %FAIL_CHMOD, %FAIL_CLOSE, %CLOSE_HANDLE );
+our ( %FAIL_OPEN, %FAIL_OPENDIR, %FAIL_CHDIR, %FAIL_CHMOD, %FAIL_STAT, %FAIL_CLOSE, %CLOSE_HANDLE, $FAIL_NEXT_CLOSEDIR, $FAIL_STAT_UNDERSCORE );
 
 BEGIN {
     require Scalar::Util;
@@ -42,6 +42,14 @@ BEGIN {
         }
         return CORE::opendir( $_[0], $_[1] );
     };
+    *CORE::GLOBAL::closedir = sub (*) {
+        my ($handle) = @_;
+        return CORE::closedir($handle) if !$FAIL_NEXT_CLOSEDIR;
+        $FAIL_NEXT_CLOSEDIR = 0;
+        CORE::closedir($handle);
+        $! = 5;
+        return 0;
+    };
     *CORE::GLOBAL::chdir = sub (;$) {
         if ( @_ && defined $_[0] && $FAIL_CHDIR{ $_[0] } ) {
             $! = 13;
@@ -53,6 +61,19 @@ BEGIN {
         my ( $mode, @files ) = @_;
         return 0 if grep { defined $_ && $FAIL_CHMOD{$_} } @files;
         return CORE::chmod( $mode, @files );
+    };
+    *CORE::GLOBAL::stat = sub (*) {
+        if ( defined $_[0] && $_[0] eq '_' && $FAIL_STAT_UNDERSCORE ) {
+            $FAIL_STAT_UNDERSCORE = 0;
+            $! = 5;
+            return ();
+        }
+        if ( defined $_[0] && !ref $_[0] && $FAIL_STAT{ $_[0] } ) {
+            $! = 5;
+            return ();
+        }
+        return CORE::stat _ if defined $_[0] && $_[0] eq '_';
+        return CORE::stat( $_[0] );
     };
 }
 
@@ -114,7 +135,13 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
 
     local $FAIL_OPENDIR{$skills_root} = 1;
     like( error_of( sub { $paths->installed_skill_roots } ), qr/Unable to read \Q$skills_root\E/, 'installed_skill_roots dies when a skills root cannot be opened' );
+    like( error_of( sub { $paths->installed_skill_entries } ), qr/Unable to read \Q$skills_root\E/, 'installed_skill_entries dies when a skills root cannot be opened' );
     delete $FAIL_OPENDIR{$skills_root};
+
+    {
+        local $FAIL_NEXT_CLOSEDIR = 1;
+        like( error_of( sub { $paths->installed_skill_entries } ), qr/Unable to close \Q$skills_root\E/, 'installed_skill_entries dies when closing a skills root fails' );
+    }
 
     my $nested_root = File::Spec->catdir( $skill, 'skills' );
     local $FAIL_OPENDIR{$nested_root} = 1;
@@ -203,13 +230,26 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
     my $root  = File::Spec->catdir( $home, '.developer-dashboard' );
     my $sub   = File::Spec->catdir( $root, 'cfg' );
     make_path($sub);
+    CORE::chmod 0755, $root, $sub or die "Unable to prepare chmod-failure fixture: $!";
     {
         local $FAIL_CHMOD{$root} = 1;
         like( error_of( sub { $paths->secure_dir_permissions($sub) } ), qr/Unable to chmod \Q$root\E to 0700/, 'secure_dir_permissions dies when the layer root chmod fails' );
     }
+    CORE::chmod 0700, $root or die "Unable to prepare nested chmod-failure fixture: $!";
     {
         local $FAIL_CHMOD{$sub} = 1;
         like( error_of( sub { $paths->secure_dir_permissions($sub) } ), qr/Unable to chmod \Q$sub\E to 0700/, 'secure_dir_permissions dies when a nested chmod fails' );
+    }
+    {
+        local $FAIL_STAT{$root} = 1;
+        like( error_of( sub { $paths->secure_dir_permissions($sub) } ), qr/Unable to inspect runtime directory \Q$root\E/,
+            'secure_dir_permissions reports a layer-root stat failure' );
+    }
+    CORE::chmod 0700, $root or die "Unable to prepare nested stat-failure fixture: $!";
+    {
+        local $FAIL_STAT{$sub} = 1;
+        like( error_of( sub { $paths->secure_dir_permissions($sub) } ), qr/Unable to inspect runtime directory \Q$sub\E/,
+            'secure_dir_permissions reports a nested-directory stat failure' );
     }
     my $file = File::Spec->catfile( $sub, 'f.txt' );
     open my $fh, '>', $file or die "write: $!";
@@ -222,6 +262,33 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
     {
         local $FAIL_CHMOD{$sub} = 1;
         like( error_of( sub { $paths->_ensure_state_dir($sub) } ), qr/Unable to chmod \Q$sub\E to 0700/, '_ensure_state_dir dies when chmod of an existing dir fails' );
+    }
+    CORE::chmod 0700, $root, $sub or die "Unable to prepare already-private directory fixture: $!";
+    {
+        local $FAIL_CHMOD{$root} = 1;
+        local $FAIL_CHMOD{$sub} = 1;
+        is( $paths->secure_dir_permissions($sub), $sub,
+            'secure_dir_permissions avoids chmod when the complete runtime directory chain is already private' );
+    }
+    {
+        local $FAIL_STAT_UNDERSCORE = 1;
+        like(
+            error_of( sub { $paths->_ensure_state_dir($sub) } ),
+            qr/Unable to inspect state directory \Q$sub\E/,
+            '_ensure_state_dir dies when stat of an existing state directory fails',
+        );
+    }
+    my $private_dir = File::Spec->catdir( $home, 'already-private-state' );
+    make_path( $private_dir, { mode => 0700 } );
+    chmod 0700, $private_dir or die "Unable to secure $private_dir: $!";
+    {
+        local $FAIL_CHMOD{$private_dir} = 1;
+        my $actual = eval { $paths->_ensure_state_dir($private_dir) };
+        my $error = $@;
+        is( $error, '',
+            '_ensure_state_dir does not call chmod when an existing state directory is already private' );
+        is( $actual, $private_dir,
+            '_ensure_state_dir skips a redundant chmod when an existing state directory is already private' );
     }
 }
 
@@ -241,11 +308,11 @@ Test file in the Developer Dashboard codebase. forces the I/O failure and guard 
 
 =head1 WHY IT EXISTS
 
-It exists because the mandatory 100 percent lib/ coverage gate with zero uncoverable annotations needs every PathRegistry open, opendir, chdir, close and chmod failure branch exercised for any uid, including root.
+It exists because the mandatory 100 percent lib/ coverage gate with zero uncoverable annotations needs every PathRegistry open, opendir, chdir, close and chmod failure branch exercised for any uid, including root. It also verifies that a state directory already at exact mode C<0700> avoids a redundant chmod, while every other existing mode retains the explicit permission repair path.
 
 =head1 WHEN TO USE
 
-Use this file when you change PathRegistry I/O handling, or when a coverage run reports one of those branches as uncovered.
+Use this file when you change PathRegistry I/O handling, state-directory hardening, or when a coverage run reports one of those branches as uncovered.
 
 =head1 HOW TO USE
 
@@ -268,5 +335,12 @@ Example 2:
   HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/620-pathregistry-io-coverage.t
 
 Confirm the targeted branches are reported as covered.
+
+Example 3:
+
+  prove -lv t/620-pathregistry-io-coverage.t
+
+Exercise the explicit failed-stat path when hardening an existing state
+directory, as well as the successful private-mode and chmod-error paths.
 
 =cut

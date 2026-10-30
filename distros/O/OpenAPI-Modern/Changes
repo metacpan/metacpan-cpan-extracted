@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.151     2026-10-30 03:43:50Z
+          - fixed some edge cases with how server urls are matched, especially
+            when multiple OpenAPI documents are used and cross-referenced
+
 0.150     2026-10-15 21:06:52Z
           - updated bundled schemas for OAS version 3.1 to their latest
             published versions

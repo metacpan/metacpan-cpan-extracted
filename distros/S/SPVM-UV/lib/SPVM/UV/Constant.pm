@@ -664,3 +664,38 @@ C<static method UV_LEAVE_GROUP : int ();>
 
 Returns the value of C<UV_LEAVE_GROUP>.
 
+=head2 UV_IGNORE
+
+C<static method UV_IGNORE : int ();>
+
+Returns the value of C<UV_IGNORE>.
+
+=head2 UV_CREATE_PIPE
+
+C<static method UV_CREATE_PIPE : int ();>
+
+Returns the value of C<UV_CREATE_PIPE>.
+
+=head2 UV_INHERIT_FD
+
+C<static method UV_INHERIT_FD : int ();>
+
+Returns the value of C<UV_INHERIT_FD>.
+
+=head2 UV_INHERIT_STREAM
+
+C<static method UV_INHERIT_STREAM : int ();>
+
+Returns the value of C<UV_INHERIT_STREAM>.
+
+=head2 UV_READABLE_PIPE
+
+C<static method UV_READABLE_PIPE : int ();>
+
+Returns the value of C<UV_READABLE_PIPE>.
+
+=head2 UV_WRITABLE_PIPE
+
+C<static method UV_WRITABLE_PIPE : int ();>
+
+Returns the value of C<UV_WRITABLE_PIPE>.

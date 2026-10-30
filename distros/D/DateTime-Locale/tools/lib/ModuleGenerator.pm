@@ -49,6 +49,15 @@ has _only_locales => (
     documentation => 'If specified, only these locales will be built.',
 );
 
+has _pods_only => (
+    is            => 'ro',
+    isa           => t('Bool'),
+    init_arg      => 'pods_only',
+    default       => 0,
+    documentation =>
+        'Only generate the pod files. This is used internally after the data files are written.',
+);
+
 has _autogen_warning => (
     is      => 'ro',
     isa     => t('Str'),
@@ -113,10 +122,24 @@ sub run ($self) {
     binmode STDOUT, ':encoding(UTF-8)'
         or confess $!;
 
+    if ( $self->_pods_only ) {
+        $self->_write_pod_files;
+        return 0;
+    }
+
     $self->_clean_old_data;
     $self->_write_data_files;
     $self->_write_catalog_pm;
-    $self->_write_pod_files;
+
+    # ModuleGenerator::Locale uses DateTime::Locale::Util, which loads the old
+    # DateTime::Locale::Data before we regenerate it. Generating the pod from that stale data breaks
+    # when a locale is removed, since its share file is gone. A fresh process loads the new data. We
+    # pass our @INC along so that any -I flags given to this process also apply to the child.
+    system(
+        $^X, ( map {"-I$_"} grep { !ref } @INC ),
+        $self->_generator_script->stringify, '--pods-only'
+        ) == 0
+        or confess 'Generating the pod files failed';
 
     return 0;
 }

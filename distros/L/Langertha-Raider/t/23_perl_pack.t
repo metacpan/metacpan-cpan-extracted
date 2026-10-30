@@ -41,7 +41,7 @@ sub app {
   );
 }
 
-sub perl_tools_on { scalar(@{ $_[0]->_mcps }) == 4 }   # files, bash, web + perl
+sub perl_tools_on { scalar(@{ $_[0]->_mcps }) == 10 }   # files, bash, web, search, todo, ask, enter_plan_mode, agent, worktree + perl
 
 subtest 'the bundled pack' => sub {
   my $packs = Langertha::Raider::Packs::build_packs(root => workspace());

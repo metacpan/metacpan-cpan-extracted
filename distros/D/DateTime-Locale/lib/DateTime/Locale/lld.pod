@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::lld - Locale data examples for the  (lld) locale
+DateTime::Locale::lld - Locale data examples for the Ladin (lld) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
- locale.
+Ladin locale.
 
 =head2 Days
 
@@ -435,6 +435,24 @@ This pod file contains examples of the locale data available for the
    1995-12-22T09:05:02 = vën, 22 de dezëmber 1995 AD
   -0010-09-15T04:44:23 = sab, 15 de setëmber -10 dan G.C.
 
+=head3 GyMMMM (G y, MMMM)
+
+   2008-02-05T18:30:30 = AD 2008, de forá
+   1995-12-22T09:05:02 = AD 1995, de dezëmber
+  -0010-09-15T04:44:23 = dan G.C. -10, de setëmber
+
+=head3 GyMMMMEd (G y, E d MMMM)
+
+   2008-02-05T18:30:30 = AD 2008, mert 5 de forá
+   1995-12-22T09:05:02 = AD 1995, vën 22 de dezëmber
+  -0010-09-15T04:44:23 = dan G.C. -10, sab 15 de setëmber
+
+=head3 GyMMMMd (G y, d MMMM)
+
+   2008-02-05T18:30:30 = AD 2008, 5 de forá
+   1995-12-22T09:05:02 = AD 1995, 22 de dezëmber
+  -0010-09-15T04:44:23 = dan G.C. -10, 15 de setëmber
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 de forá 2008 AD
@@ -502,6 +520,12 @@ This pod file contains examples of the locale data available for the
   -0010-09-15T04:44:23 = set
 
 =head3 MMMEd (E, d MMM)
+
+   2008-02-05T18:30:30 = mert, 5 de forá
+   1995-12-22T09:05:02 = vën, 22 de dezëmber
+  -0010-09-15T04:44:23 = sab, 15 de setëmber
+
+=head3 MMMMEd (E, d MMMM)
 
    2008-02-05T18:30:30 = mert, 5 de forá
    1995-12-22T09:05:02 = vën, 22 de dezëmber
@@ -620,6 +644,18 @@ This pod file contains examples of the locale data available for the
    2008-02-05T18:30:30 = forá 2008
    1995-12-22T09:05:02 = dezëmber 1995
   -0010-09-15T04:44:23 = setëmber -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = mert, 5 de forá 2008
+   1995-12-22T09:05:02 = vën, 22 de dezëmber 1995
+  -0010-09-15T04:44:23 = sab, 15 de setëmber -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 de forá 2008
+   1995-12-22T09:05:02 = 22 de dezëmber 1995
+  -0010-09-15T04:44:23 = 15 de setëmber -10
 
 =head3 yMMMd (d MMM y)
 

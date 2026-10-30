@@ -12,6 +12,8 @@ use IO::File;
 
 my $parser = MIME::Parser->new();
 $parser->output_to_core(1);        ### keep the payload out of the filesystem
+$parser->max_depth(-1);
+$parser->max_parts(-1);
 my $entity = $parser->parse_open("testmsgs/deeply-nested.msg");
 
 is(scalar($entity->parts), 1, 'Entity has one part');
@@ -29,12 +31,14 @@ is ($body->as_string, "Here is some text for you\n", "Got expected content");
 $parser = MIME::Parser->new();
 $parser->output_to_core(1);        ### keep the payload out of the filesystem
 $parser->max_depth(500);
+$parser->max_parts(-1);
 $entity = $parser->parse_open("testmsgs/deeply-nested.msg");
 is(scalar($entity->parts), 1, 'Entity has one part');
 
 $parser = MIME::Parser->new();
 $parser->output_to_core(1);        ### keep the payload out of the filesystem
 $parser->max_depth(499);
+$parser->max_parts(-1);
 $entity = $parser->parse_open("testmsgs/deeply-nested.msg");
 ok(!defined($entity), "Maximum MIME depth was exceeded");
 

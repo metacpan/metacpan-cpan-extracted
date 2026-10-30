@@ -36,6 +36,12 @@
 # Stats-LikeR-0.3217.tar.gz's lib/Stats/LikeR.pm, or by running this file
 # against an installed 0.3217, where every "tied rows" test passes.
 #
+# 0.33 generalised aoh2h() into df2h(), which takes an AoA, HoA or HoH as well
+# as an AoH, and made aoh2h a second name for it. Its messages therefore begin
+# "df2h:" where 0.3218's began "aoh2h:", and two tests below changed meaning on
+# purpose: a blessed hash is now a frame (a HoA or HoH), and a blessed array in
+# an array makes an AoA. The other shapes are tested in t/df2h.t.
+#
 # Values invented for the test. aoh2h() is tibble::deframe() in R and
 # Series.to_dict() in pandas, but nothing tested here -- references, blessing,
 # ties, option parsing, SV flags -- has a counterpart in either.
@@ -82,7 +88,7 @@ sub kv { my $h = shift; join ',', map { "$_=" . (defined $h->{$_} ? $h->{$_} : '
 # 1. A reference key dies, unless it overloads its operators.
 {
 	my $e = err { aoh2h([ { variable => 'a', value => 1 }, { variable => [ 1, 2 ], value => 2 } ]) };
-	like($e, qr/^aoh2h: index 1 has a reference in 'variable' \(ARRAY\); a hash key would be its address/,
+	like($e, qr/^df2h: index 1 has a reference in 'variable' \(ARRAY\); a hash key would be its address/,
 		'an arrayref key dies, naming the row, the column and the kind');
 	like(err { aoh2h([ { variable => { a => 1 }, value => 1 } ]) }, qr/\(HASH\)/,
 		'a hashref key dies');
@@ -114,13 +120,13 @@ sub kv { my $h = shift; join ',', map { "$_=" . (defined $h->{$_} ? $h->{$_} : '
 # 2. An undef option name dies in the function's own words.
 {
 	my $e = err { aoh2h([], undef, 1) };
-	like($e, qr/^aoh2h: an option name is undefined$/, 'aoh2h: an undef option name gets its own message');
+	like($e, qr/\ndf2h: error: an option name is undefined\n\z/, 'aoh2h: an undef option name gets its own message');
 	unlike($e, qr/uninitialized|LikeR\.pm line/, "aoh2h: and not perl's warning about LikeR.pm");
-	like(err { aoh2h([], var_name => 'k', undef, 'v') }, qr/^aoh2h: an option name is undefined$/,
+	like(err { aoh2h([], var_name => 'k', undef, 'v') }, qr/\ndf2h: error: an option name is undefined\n\z/,
 		'aoh2h: in any position');
 
 	$e = err { h2aoh({}, undef, 1) };
-	like($e, qr/^h2aoh: an option name is undefined$/, 'h2aoh: an undef option name gets its own message');
+	like($e, qr/\nh2aoh: error: an option name is undefined\n\z/, 'h2aoh: an undef option name gets its own message');
 	unlike($e, qr/uninitialized|LikeR\.pm line/, "h2aoh: and not perl's warning about LikeR.pm");
 
 	# an undef option *value* was always fine: it means the default
@@ -136,10 +142,11 @@ sub kv { my $h = shift; join ',', map { "$_=" . (defined $h->{$_} ? $h->{$_} : '
 		'a blessed row is read');
 	is_deeply(scalar eval { aoh2h(bless([ { variable => 'a', value => 1 } ], 'Frame')) }, { a => 1 },
 		'a blessed frame is read');
-	like(err { aoh2h(bless({}, 'Frame')) }, qr/^aoh2h: first argument must be an arrayref of hashrefs/,
-		'a blessed hash is still not a frame');
-	like(err { aoh2h([ bless([], 'Row') ]) }, qr/^aoh2h: index 0 is not a hashref/,
-		'a blessed array is still not a row');
+	# 0.33: both are frames now, and fail only for lacking the two columns
+	like(err { aoh2h(bless({ k => [] }, 'Frame')) }, qr/^df2h: no 'variable' column/,
+		'a blessed hash is a frame, a HoA here');
+	like(err { aoh2h([ bless([], 'Row') ]) }, qr/^df2h: index 0 has no column 0/,
+		'a blessed array is a row of an AoA');
 }
 
 #----------------------------------------------------------------------------
@@ -148,11 +155,11 @@ sub kv { my $h = shift; join ',', map { "$_=" . (defined $h->{$_} ? $h->{$_} : '
 	my @rows = ({ variable => 'a', value => 1 }, { variable => 'b', value => 2 },
 	            { variable => 'a', value => 3 });
 	is(err { aoh2h(\@rows) },
-		"aoh2h: duplicate key 'a' has >= 2 occurrences, the first repeat at index 2\n",
+		"df2h: duplicate key 'a' has >= 2 occurrences, the first repeat at index 2\n",
 		'the duplicate message names the index of the first repeat');
 	my @tied = map { my %t; tie %t, 'Tie::StdHash'; %t = %$_; \%t } @rows;
 	is(err { aoh2h(\@tied) },
-		"aoh2h: duplicate key 'a' has >= 2 occurrences, the first repeat at index 2\n",
+		"df2h: duplicate key 'a' has >= 2 occurrences, the first repeat at index 2\n",
 		'and the same for tied rows, which find it a different way');
 }
 
@@ -235,9 +242,9 @@ sub logged_row { my ($id, %h) = @_; my %t; tie %t, 'LogHash'; %t = %h; (tied %t)
 	         . 'EXISTS(1:variable) EXISTS(1:value) FETCH(1:variable) FETCH(1:value) '
 	         . 'EXISTS(2:variable) EXISTS(2:value) FETCH(2:variable)';
 	my %want = (
-		die   => [ $head, qr/^aoh2h: duplicate key 'a'/ ],
-		first => [ "$head EXISTS(3:variable) EXISTS(3:value)", qr/^aoh2h: index 3 has no 'value' column/ ],
-		last  => [ "$head FETCH(2:value) EXISTS(3:variable) EXISTS(3:value)", qr/^aoh2h: index 3 has no 'value' column/ ],
+		die   => [ $head, qr/^df2h: duplicate key 'a'/ ],
+		first => [ "$head EXISTS(3:variable) EXISTS(3:value)", qr/^df2h: index 3 has no 'value' column/ ],
+		last  => [ "$head FETCH(2:value) EXISTS(3:variable) EXISTS(3:value)", qr/^df2h: index 3 has no 'value' column/ ],
 	);
 	for my $mode (qw(die first last)) {
 		for my $outer (qw(plain tied)) {
@@ -282,13 +289,13 @@ sub logged_row { my ($id, %h) = @_; my %t; tie %t, 'LogHash'; %t = %h; (tied %t)
 {
 	my %locked = (variable => 'a', value => 1);
 	lock_keys(%locked);
-	is(err { aoh2h([ \%locked ], var_name => 'gene') }, "aoh2h: index 0 has no 'gene' column\n",
-		"a restricted row's missing column gets aoh2h's message, not perl's");
+	is(err { aoh2h([ \%locked ], var_name => 'gene') }, "df2h: index 0 has no 'gene' column\n",
+		"a restricted row's missing column gets df2h's message, not perl's");
 	is(kv(aoh2h([ \%locked ])), 'a=1', 'a restricted row folds');
 
 	my @holes;
 	$holes[1] = { variable => 'a', value => 1 };
-	is(err { aoh2h(\@holes) }, "aoh2h: index 0 is not a hashref\n", 'a hole is not a row');
+	is(err { aoh2h(\@holes) }, "df2h: index 0 is not a hashref\n", 'a hole is not a row');
 
 	is_deeply(aoh2h([]), {}, 'no rows');
 	is_deeply(aoh2h([ { variable => 'a', value => undef } ]), { a => undef }, 'one row, undef value');

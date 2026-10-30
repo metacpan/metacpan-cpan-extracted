@@ -210,7 +210,9 @@ SQL
     for (@$rightList){
         push @{$rights{$_->{cbuserright_cbuser}}}, $_->{cbright_label};
     }
+    my $admin = $self->user->may('admin');
     for (@$data){
+        delete $_->{cbuser_note} unless $admin;
         $_->{cbuser_cbrights} = join ', ', sort @{$rights{$_->{cbuser_id}}} if ref $rights{$_->{cbuser_id}} eq 'ARRAY';
     }
     return $data;

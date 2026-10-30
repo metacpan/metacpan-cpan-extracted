@@ -144,11 +144,9 @@ subtest 're-parking after the deadline fired fails fast instead of deadlocking' 
             }
         );
     };
-    ok( $e1 && ref($e1) && $e1->isa('Acme::Parataxis::Error::Timeout'), 'the first park timed out' );
-    ok(
-        $e2 && ref($e2) && $e2->isa('Acme::Parataxis::Error::Timeout'),
-        'the re-park under the fired deadline failed fast with ::Timeout (no deadlock)'
-    );
+    ok $e1 && ref($e1) && $e1->isa('Acme::Parataxis::Error::Timeout'), 'the first park timed out';
+    ok $e2 && ref($e2) && $e2->isa('Acme::Parataxis::Error::Timeout'),
+        'the re-park under the fired deadline failed fast with ::Timeout (no deadlock)';
     ok $elapsed < 500, "re-park failed fast at ${elapsed}ms, it did not wait";
 };
 subtest 'a re-park reuses the armed timer instead of arming a second one' => sub {
@@ -173,12 +171,10 @@ subtest 'a re-park reuses the armed timer instead of arming a second one' => sub
         $jobs = Acme::Parataxis::get_outstanding_jobs();
         await_sleep(700);
     };
-    ok( $first_err && ref($first_err) && $first_err->isa('Acme::Parataxis::Error::Cancelled'), 'the cancel token tore the first park' );
+    ok $first_err && ref($first_err) && $first_err->isa('Acme::Parataxis::Error::Cancelled'), 'the cancel token tore the first park';
     is $jobs, 1, 'only the original deadline helper is armed: the re-park did not stack a second timer for the same bound';
-    ok(
-        $repark_err && ref($repark_err) && $repark_err->isa('Acme::Parataxis::Error::Timeout'),
-        'the re-park was served by the reused helper (::Timeout), so it did not deadlock'
-    );
+    ok $repark_err && ref($repark_err) && $repark_err->isa('Acme::Parataxis::Error::Timeout'),
+        'the re-park was served by the reused helper (::Timeout), so it did not deadlock';
     ok $repark_at < 5000 && $repark_at > 400, "re-park resolved at ${repark_at}ms - by the ~700ms deadline helper, not instantly";
 };
 subtest 'a cancel scope and a with_timeout deadline coexist on one park' => sub {
@@ -197,8 +193,8 @@ subtest 'a cancel scope and a with_timeout deadline coexist on one park' => sub 
         $tok->cancel;
         await_sleep(30);
     };
-    ok $done, 'the park settled';
-    ok( $err && ref($err) && $err->isa('Acme::Parataxis::Error::Cancelled'), 'the cancel scope tore the deadline-bound park' );
+    ok $done,                                                               'the park settled';
+    ok $err && ref($err) && $err->isa('Acme::Parataxis::Error::Cancelled'), 'the cancel scope tore the deadline-bound park';
 };
 #
 done_testing;

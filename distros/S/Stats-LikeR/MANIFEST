@@ -11,6 +11,7 @@ README
 README.md
 SECURITY.md
 lib/Stats/LikeR.pm
+lib/Stats/LikeR/Usage.pm
 ppport.h
 t/01.t
 t/CigaretteDemand.csv
@@ -50,6 +51,13 @@ t/arg.crash.regressions.t
 t/assign.HoH.t
 t/assign.t
 t/audit.2026-10-12.regressions.t
+t/audit.2026-10-20.A.t
+t/audit.2026-10-20.B.t
+t/audit.2026-10-20.C.t
+t/audit.2026-10-20.D.t
+t/audit.2026-10-20.E.R
+t/audit.2026-10-20.E.t
+t/audit.2026-10-20.F.t
 t/avals.t
 t/base_did.csv
 t/bedroc.mpmath.py
@@ -102,8 +110,14 @@ t/density.R.scipy.R
 t/density.R.scipy.py
 t/density.R.scipy.t
 t/density.t
+t/df2h.t
+t/df_shape.t
+t/dftype.t
 t/distributions.R.scipy.R
 t/distributions.R.scipy.t
+t/distributions.limits.R.R
+t/distributions.limits.R.t
+t/distributions.limits.mpmath.py
 t/distributions.mpmath.py
 t/dnorm.nv_width.t
 t/docvis.csv
@@ -121,6 +135,8 @@ t/filter.rowid.t
 t/filter.t
 t/filter_match.t
 t/fisher_test.R.scipy.t
+t/fisher_test.rxc.R
+t/fisher_test.rxc.exact.py
 t/fisher_test.t
 t/friedman_mcnemar_prop_cmh.R.R
 t/friedman_mcnemar_prop_cmh.R.t
@@ -220,6 +236,8 @@ t/pm.coverage.t
 t/pnorm.t
 t/portability.bugs.t
 t/power_t_test.R.scipy.t
+t/prcomp.R.R
+t/prcomp.R.t
 t/prcomp.t
 t/predict.t
 t/predict2.t
@@ -276,6 +294,8 @@ t/roc.R.R
 t/roc.R.t
 t/roc.t
 t/rownames.utf8.t
+t/scale.R.R
+t/scale.R.t
 t/scale.keywords.t
 t/select_drop_rename_cols.t
 t/seq.R.R
@@ -295,6 +315,8 @@ t/summary.t
 t/survey_fpc.csv
 t/survival.R.R
 t/survival.R.t
+t/survival.status_rho.R.R
+t/survival.status_rho.R.t
 t/survival.t
 t/svyglm.R.R
 t/svyglm.R.t
@@ -307,12 +329,14 @@ t/table_one.t
 t/tied.fetch.once.t
 t/tied.frames.t
 t/tied.hashes.t
+t/tied_cell.mutation.t
 t/transpose.t
 t/tukey.t
 t/tukey_aov_prcomp.R.R
 t/tukey_aov_prcomp.R.t
 t/uniq.t
 t/unzip_member.t
+t/usage.t
 t/utf8.keys.regressions.t
 t/vals.t
 t/vals2.t
@@ -343,6 +367,7 @@ t/write_table.tex.comment.t
 t/write_table.tex.escape.t
 t/write_table.tex.rownames.t
 t/write_table.tex.t
+t/write_table.xlsx.book.t
 t/write_table.xlsx.escape.t
 t/write_table.xlsx.t
 t/xlsx_col_idx.t

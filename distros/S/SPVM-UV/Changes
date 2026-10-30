@@ -1,3 +1,8 @@
+0.004 2026-10-28
+  [Requirement Changes]
+    * Require SPVM 0.990204.
+  [New Features]
+    * Add UV::Loop#spawn method to spawn process and do IPC communication.
 0.003 2026-09-18
   [Requirement Changes]
     * Require SPVM::Sys 0.581 for tests.

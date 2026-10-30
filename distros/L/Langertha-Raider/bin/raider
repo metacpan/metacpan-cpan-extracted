@@ -5,9 +5,21 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 
 use Langertha::Raider::CLI::Main;
+use Langertha::Raider::Loadguard;
+
+# LOADGUARD_CONFINE=1: start again inside a memory-limited systemd user scope
+# (Langertha::Raider::Loadguard/confine_command). Off by default; a failed
+# exec goes on unconfined.
+{
+  my $guard = Langertha::Raider::Loadguard->new;
+  if ( my @confined = $guard->confine_command( command => [ $guard->self_command ] ) ) {
+    $ENV{LOADGUARD_CONFINED} = 1;
+    exec @confined;
+  }
+}
 
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN,  ':encoding(UTF-8)';
@@ -26,7 +38,7 @@ raider - Autonomous CLI agent with filesystem and bash access
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -42,6 +54,9 @@ version 0.503
     raider --continue "Now fix the first one"
     raider provider inspect provider.example --json
     raider --provider provider.example -m example-model -k "$KEY" "Summarize README.md"
+    raider provider add acme provider.example --credential-env ACME_API_KEY
+    raider provider list
+    raider --provider acme "Summarize README.md"
     raider hall start --acp-port 38421
     raider acp prompt 127.0.0.1:38421 --raider bjorn "Summarize status"
 
@@ -50,7 +65,7 @@ version 0.503
 F<raider> is the command line of L<Langertha::Raider::CLI>: it runs
 L<Langertha::Raider::CLI::Main>, which parses the options below and builds
 a L<Langertha::Raider::CLI> for the working directory. That wires an LLM engine
-(via L<Langertha>) to the file tools, C<bash> (L<MCP::Run::Bash>) and the web tools,
+(via L<Langertha>) to the file tools, C<bash> (L<Langertha::Raider::BashTools>) and the web tools,
 then runs the L<Langertha::Raider> multi-turn agent loop on your prompt.
 Optional profile, pack, and Perl-native tool flags let the same CLI load
 project agent instructions, persona/power bundles, and C<perl_eval> /
@@ -158,13 +173,40 @@ generated from exactly the tools the engine is offered:
 
 =over
 
-=item * C<list_files>, C<read_file>, C<write_file>, C<edit_file>
-(L<Langertha::Raider::FileTools>), confined to C<-r>.
+=item * C<list_files>, C<read_file>, C<write_file>, C<edit_file>, C<multi_edit>
+(L<Langertha::Raider::FileTools>), answering as Claude Code's Read, Write,
+Edit and MultiEdit (ADR 0023): C<read_file> in C<cat -n> form with
+C<offset> / C<limit>; an existing file must have been read in the run before
+it is written or edited. Confined to C<-r> and the additional directories;
+in the Claude layout a path outside them is asked about instead (allow rules
+such as C<Read(//tmp/**)> open it).
 
-=item * C<bash> (L<MCP::Run::Bash>), a real shell started in C<-r>,
-120 seconds per command by default. It is not confined to C<-r>.
+=item * C<bash> (L<Langertha::Raider::BashTools>), a real shell started in C<-r>,
+120 seconds per command by default (at most 600); a command still running
+then goes on in the background, as does one started with
+C<run_in_background>; C<bash_output> reads it and C<kill_shell> stops it. It is not confined to C<-r>. A heavy
+command (C<prove>, C<make test>, C<dzil test>, C<cpanm>, C<podman run>, ...)
+is refused with the reason while the host is under memory pressure or its
+heavy slots are taken (L<Langertha::Raider::Loadguard>, the C<LOADGUARD_*>
+variables of the loadguard plugin: C<LOADGUARD_PSI_FULL>,
+C<LOADGUARD_SWAP_USED>, C<LOADGUARD_HEAVY_SLOTS>, C<LOADGUARD_THROTTLE=0> for
+off). C<LOADGUARD_CONFINE=1> starts raider in a memory-limited systemd user
+scope; off by default.
 
 =item * C<web_search>, C<web_fetch> (L<Langertha::Raider::WebTools>).
+
+=item * C<glob>, C<grep> (L<Langertha::Raider::SearchTools>), confined to
+C<-r>; C<grep> uses ripgrep when it is installed.
+
+=item * C<task_create>, C<task_update>, C<task_list>, C<task_get>
+(L<Langertha::Raider::TodoTools>), the task list of the conversation --
+C<todo_write>, the task list of the run, instead with
+C<RAIDER_ENABLE_TASKS=0> -- and C<ask_user> (L<Langertha::Raider::AskTools>),
+a question to the person at the REPL -- refused in a run nobody can answer.
+
+=item * C<enter_plan_mode> (L<Langertha::Raider::PlanTools>), which switches
+to the C<plan> permission mode once the person agrees, and C<exit_plan_mode>
+once the run has been in that mode (see L</PERMISSIONS>).
 
 =item * C<perl_eval>, C<perl_check>, C<perl_cpanm>
 (L<Langertha::Raider::PerlTools>) when granted: by C<--perl>, by C<perl:>
@@ -181,6 +223,36 @@ L</RAIDER_HALL_SOCKET>).
 
 C<raider config explain> shows whether the Perl tools are mounted and why;
 C<--export-skill> writes the same tool list as a table.
+
+=head1 PERMISSIONS
+
+Every tool call passes a permission policy as in Claude Code (ADR 0021,
+L<Langertha::Raider::Permissions>). Without a matching rule the mode
+decides: C<default> runs reading tools and asks before writing, C<bash>,
+the network and messages; C<acceptEdits> also writes files inside C<-r> and
+the additional directories; C<auto> (Claude Code's C<defaultMode: "auto">)
+is that plus bash commands from a fixed read-only list (C<ls>, C<git status>,
+C<grep>, ... where every part of the command is on it, no substitution, no
+redirection into a file); C<plan> reads only, refuses changes even with an
+allow rule, and offers C<exit_plan_mode>; C<bypassPermissions> runs
+everything a deny rule does not name. The mode comes from
+C<--permission-mode> (or C<--dangerously-skip-permissions>), else
+C<permissions.default_mode> of F<.raider/config.yml> and
+F<~/.raider/config.yml>, else C<defaultMode> of the Claude settings, else
+C<default>.
+
+Rules in Claude Code syntax (C<Bash(npm run test:*)>, C<Edit(src/**)>,
+C<Read(./.env)>, C<WebFetch(domain:example.com)>, C<mcp__server__tool>)
+come from the Claude settings (in the Claude layout) and from
+C<permissions:> (C<allow>, C<ask>, C<deny>, C<default_mode>,
+C<additional_directories>) of the config files; deny before ask before
+allow, whatever the source.
+
+In the REPL a call that asks is put to you: yes once, yes for this session
+(the rule it adds is shown), or no with a reason the model gets. With
+nobody to ask -- a one-shot run, a machine output flag, the Hall, ACP --
+such a call is refused, and the model is told which rule or mode would
+allow it. C<raider config explain> and C</permissions> show the policy.
 
 =head1 OPTIONS
 
@@ -205,11 +277,18 @@ The API key, over C<api_key:> in F<.raider.yml> and the engine's
 environment variable. With C<--provider> the only source of the key,
 together with C<-o api_key=>.
 
-=head2 --provider HOST[:PORT] | https://HOST[:PORT]
+=head2 --provider HOST[:PORT] | https://HOST[:PORT] | ALIAS
 
 Runs on the model endpoint a provider's manifest declares, for this one
-run; see L</Using a provider>. Not with C<-e>, C<-o engine=>, C<-o url=>
+run; see L</Using a provider>. A name without dot, port or C<https://> is
+always an alias (L</Stored aliases>); one that is not stored is a usage
+error and nothing is fetched. Not with C<-e>, C<-o engine=>, C<-o url=>
 or C<config explain>.
+
+=head2 --provider-endpoint ID
+
+With C<--provider>: the manifest endpoint to run on, when the model is
+offered on several; see L</Several endpoints and failures>.
 
 =head2 --allow-internal
 
@@ -222,7 +301,7 @@ An engine attribute (repeatable), e.g. C<-o temperature=0.2 -o
 response_size=4096>, merged over F<.raider.yml>; the command line wins.
 Integers, decimals and C<true> / C<false> become numbers. raider's own
 F<.raider.yml> keys (C<engine>, C<perl>, C<packs=a,b>, C<skills=a,b>,
-C<detect>, C<no_detect=a,b>, C<preferred_lib_target>) configure raider
+C<detect>, C<no_detect=a,b>, C<preferred_lib_target>, C<web_fetch_model>) configure raider
 instead and never reach the engine.
 
 =head2 -r, --root DIR
@@ -235,12 +314,12 @@ F<.raider/> are read from it.
 =head2 -M, --mission TEXT
 
 The instructions: replaces the default persona and F<.raider.md> for this
-run. Skills, packs and the tool list still apply.
+run. Skills, packs, the Claude memory and the tool list still apply.
 
 =head2 --bare
 
-An isolated context: no F<.raider.md>, no skills, no C<packs:>, no default
-packs, no detection. C<--pack NAME> and C</pack NAME> still work.
+An isolated context: no F<.raider.md>, no Claude Code layout, no skills,
+no C<packs:>, no default packs, no detection. C<--pack NAME> and C</pack NAME> still work.
 
 =head2 -i, --interactive
 
@@ -303,17 +382,47 @@ Switch pack detection off, or on over C<detect: false> in F<.raider.yml>.
 
 =head2 --claude
 
-Load F<CLAUDE.md> and F<.claude/skills/*/SKILL.md> as skills. Saved to
-C<skills:> in F<.raider.yml> on first use.
+Read the Claude Code layout also in a raider project (one with
+F<.raider/>): the F<CLAUDE.md> hierarchy (user, repository top down to the
+working directory, C<CLAUDE.local.md>, C<@imports>, nested files on first
+touch), F<.claude/settings*.json> (its C<env> is set for the tools), the
+skills of F<~/.claude/skills>, F<.claude/skills>, F<.agents/skills> and of
+the enabled plugins. Saved as C<claude: true> in F<.raider.yml> on first
+use (the older C<skills: [claude]> means the same). A project with only
+Claude Code files reads that layout without the flag, and nothing is saved
+there.
 
 =head2 --openai, --codex
 
-Load F<AGENTS.md>. Saved like C<--claude>.
+Load F<AGENTS.md> as instructions. Saved to C<skills:> in F<.raider.yml>
+on first use.
 
 =head2 --skills DIR
 
-Load the F<*.md> files in C<DIR> as skills (repeatable). Saved like
-C<--claude>.
+Offer the skills in C<DIR> (repeatable): every F<*/SKILL.md> and every
+F<*.md> in it. The prompt lists them by name and description; the model
+loads one with the C<skill> tool. Saved like C<--openai>.
+
+=head2 --permission-mode MODE
+
+The permission mode of the run: C<default>, C<acceptEdits>, C<auto>, C<plan> or
+C<bypassPermissions> (see L</PERMISSIONS>). It wins over the mode of the
+config files and the Claude settings. Any other name is a usage error.
+
+=head2 --permission-channel PATH
+
+Not for people: the hall (C<raider hall>) sets it on a run that belongs to
+an ACP session. PATH is a Unix socket on which a tool call the permission
+policy asks about is put to the hall, which asks the ACP client with
+C<session/request_permission> (ADR 0021). No answer, a closed socket, a
+cancelled run or any error is I<no>; it never allows by itself. Without the
+option (and without a terminal) such a call is refused. Not shown by
+C<--help>; ignored in the REPL (C<-i>).
+
+=head2 --dangerously-skip-permissions
+
+The same as C<--permission-mode bypassPermissions>: every tool call runs
+unless a deny rule names it. Not together with C<--permission-mode>.
 
 =head2 --customize-prompt
 
@@ -384,16 +493,16 @@ A run that completed:
 
 A run that failed:
 
-    { "elapsed" : 0.42, "error" : "...", "status" : "failed", "version" : 1 }
+    { "elapsed" : 0.42, "error" : "...", "reason" : "engine_error", "status" : "failed", "version" : 1 }
 
 A run cancelled by C<SIGINT> (Ctrl-C; see L</EXIT STATUS>):
 
-    { "elapsed" : 3.912, "status" : "cancelled", "version" : 1 }
+    { "elapsed" : 3.912, "reason" : "signal", "status" : "cancelled", "version" : 1 }
 
 A run stopped by C<SIGTERM>, by a second C<SIGINT> while it is being
 cancelled, or by either signal before it started:
 
-    { "elapsed" : 5.107, "signal" : "TERM", "status" : "interrupted", "version" : 1 }
+    { "elapsed" : 5.107, "reason" : "signal", "signal" : "TERM", "status" : "interrupted", "version" : 1 }
 
 =over
 
@@ -407,7 +516,50 @@ is reserved for when it can.
 =item C<response> -- the agent's final answer (C<completed> only).
 
 =item C<metrics> -- the raider's cumulative metrics: C<raids>,
-C<iterations>, C<tool_calls>, C<time_ms> (C<completed> only).
+C<iterations>, C<tool_calls>, C<time_ms>, and C<usage> -- the token counts of
+every model call so far, subagents and C<web_fetch> prompts included:
+C<input_tokens>, C<output_tokens>, C<cache_read_tokens>, C<cache_write_tokens>
+(both cache counts are part of the input), C<calls>, and the same per model
+under C<models> (C<completed> only; ADR 0026).
+
+=item C<reason> -- a short code for why the run ended, whenever C<status>
+is not C<completed> (ADR 0034); C<error> stays the text for a person. New
+codes may come within a version, so a consumer must treat one it does not
+know like C<error>:
+
+=over
+
+=item C<max_iterations> -- the raid used up C<--max-iterations> (C<failed>).
+
+=item C<engine_error> -- a model request failed: the provider could not be
+reached, answered with an error or with something raider cannot read
+(C<failed>).
+
+=item C<hook_blocked> -- a C<UserPromptSubmit> hook blocked the prompt
+(C<failed>).
+
+=item C<hook_stopped> -- a hook answered C<continue: false>: a
+C<SessionStart> or C<UserPromptSubmit> hook (C<failed>), a tool hook
+(C<cancelled>).
+
+=item C<run_setup> -- the run could not be set up, for example the engine
+for the model of a C</name> command (C<failed>).
+
+=item C<provider> -- the C<--provider> could not be activated (C<failed> or
+C<refused>).
+
+=item C<user_cancel> -- cancelled by the person or the client: the REPL's
+Ctrl-C, an ACP C<session/cancel> (C<cancelled>).
+
+=item C<signal> -- ended by a signal: the first C<SIGINT> of a one-shot run
+(C<cancelled>), C<SIGTERM> or a second C<SIGINT> (C<interrupted>, see
+C<signal>).
+
+=item C<error> -- any other failure (C<failed>).
+
+=item C<refused> -- a C<refused> document that names no other code.
+
+=back
 
 =item C<error> -- the error message (C<failed> only).
 
@@ -443,9 +595,16 @@ The types of version 1, with the fields each adds:
 
 =over
 
-=item C<run.started> -- C<engine> and, when there is one, C<model>. A run
-interrupted during startup (reading the configuration or the prompt) has
-none: its stream is the C<interrupted> state change and C<run.finished>.
+=item C<run.started> -- the run begins: C<engine> and, when there is one,
+C<model>; C<session> (the session id) and C<run> (the run id within it,
+C<r1>, C<r2>, ...), both missing with C<--no-session>; C<cwd>, the working
+directory (inside a worktree, the worktree); C<permission_mode>; C<tools>,
+the names of the tools the model is offered, in the order it gets them --
+missing while a configured MCP server has not connected yet, since those
+start with the run's first model request (see C<mcp.server>); and
+C<raider_version>. A run interrupted during startup (reading the
+configuration or the prompt) has none: its stream is the C<interrupted>
+state change and C<run.finished>.
 
 =item C<run.state> -- C<state>: C<running> when the run starts, then the
 C<status> it ends with (see L</The document>).
@@ -464,7 +623,77 @@ reaches the stream, but it is no filter: a secret in a tool's arguments or
 output can still show up.
 
 =item C<message> -- a finished assistant message: C<role> (C<assistant>)
-and C<content>. Version 1 reports the final answer of the run.
+and C<content>. The final answer of the run; also an answer a C<Stop> hook
+sent back with feedback (the run goes on), and an answer after which the
+run goes on with the notifications of its background agents. The person's
+own input is never a C<message> of the stream.
+
+=item C<model.usage> -- after every model request that reports tokens, and
+after a tool's own model call: C<purpose> (C<chat>, or C<web_fetch>),
+C<model>, C<input_tokens>, C<output_tokens> and, when the provider reports
+them, C<cache_read_tokens> and C<cache_write_tokens> (both part of
+C<input_tokens>).
+
+=item C<todo.updated> -- the model changed its task list: C<todos>, the
+whole list, each item with C<content>, C<status> and the fields of its
+tool (see L</TOOLS>).
+
+=item C<permission.asked> -- the policy asks about a tool call (see
+L</PERMISSIONS>): C<call>, C<tool>, C<tool_source>, C<mode>, C<reason>,
+the C<rule> and its C<source> when a rule asks, C<suggested_rule> when one
+would allow it. Also when C<exit_plan_mode> puts the plan to the person
+(C<reason> C<review of the plan>).
+
+=item C<permission.granted> -- the person allowed the call: C<call>,
+C<tool>, C<scope> (C<once>, or C<session> with the C<rule> added), C<mode>.
+
+=item C<permission.denied> -- the call does not run: C<call>, C<tool>,
+C<tool_source>, C<mode>, C<reason>, C<rule> and C<source> of a deny rule,
+and C<by> -- who refused it: C<rule>, C<mode>, C<hook>, C<worktree>, C<user>,
+or C<noninteractive> when nobody could be asked.
+
+=item C<permission.mode> -- the mode changed: C<from>, C<to>, C<why> (the
+command or tool that changed it, such as C<enter_plan_mode> or
+C</permissions>), and C<call> when a tool call changed it.
+
+=item C<hook.ran> -- one hook of the project's Claude Code hooks ran or was
+skipped: C<hook_event> (C<PreToolUse>, C<Stop>, ...), C<source> (the
+settings file or C<plugin:NAME>), C<command>, C<outcome> (C<success>,
+C<block>, C<error>, C<timeout>, C<skipped>, C<running> for an async hook,
+C<cancelled>), and when known C<plugin>, C<matcher>, C<args>, C<exit>,
+C<duration_ms>, C<message>, C<stdout> and C<stderr> (each cut at 2000
+characters). A tool hook (C<PreToolUse>, C<PostToolUse>,
+C<PostToolUseFailure>) carries the C<call> it ran for.
+
+=item C<hook.message> -- what hooks say to the person: C<hook_event>,
+C<kind> (C<system> for a C<systemMessage>, C<error>, C<stopped> for a
+C<continue: false>) and C<text>.
+
+=item C<mcp.server> -- a configured MCP server changed its state:
+C<name>, C<scope>, C<transport>, C<status> (C<starting>, C<connected>,
+C<failed>, C<stopped>), C<reason> of a failure, C<tools> (how many tools it
+offers). The servers start with the run's first model request.
+
+=item C<mcp.tools_changed> -- a server announced a new tool list: C<name>,
+C<scope>. The next model request offers the new tools.
+
+=item C<agent.started> -- the C<agent> tool started a subagent: C<call>
+(the C<agent> call), C<agent>, C<agent_id>, C<background>,
+C<description>, C<session> (its own journal), C<model>, and C<resumed> for
+a continued agent.
+
+=item C<agent.finished> -- the subagent ended: C<call>, C<agent>,
+C<agent_id>, C<session>, C<status>.
+
+=item C<agent.warning> -- a subagent starts with a problem worth a look,
+such as a briefing over 64 kB of skill text: C<call>, C<agent>, C<message>.
+Before its C<agent.started>.
+
+=item C<worktree.entered> -- the session moved into a git worktree:
+C<path>, C<branch>, C<created> (whether C<enter_worktree> created it).
+
+=item C<worktree.exited> -- it left it: C<path>, C<branch>, C<removed>,
+C<reason> (C<exit_worktree>, C<clear>, C<session_end>).
 
 =item C<run.finished> -- always the last event, also when the run failed.
 Its fields are exactly the document of L</The document>; a consumer that
@@ -472,15 +701,19 @@ only wants the result reads the last event.
 
 =back
 
+C<call> is the id of a tool call within the raid (C<c1>, C<c2>, ...): the
+events of one call share it, also when calls run at the same time.
+
 A run that calls one tool, as C<--stream-json>:
 
-    {"engine":"openai","model":"gpt-4o-mini","seq":1,"time":1790000000.1,"type":"run.started","version":1}
+    {"cwd":"/src/app","engine":"openai","model":"gpt-4o-mini","permission_mode":"default","raider_version":"0.504","run":"r1","seq":1,"session":"20261025-091500-3f2a","time":1790000000.1,"tools":["list_files","read_file","bash"],"type":"run.started","version":1}
     {"seq":2,"state":"running","time":1790000000.1,"type":"run.state","version":1}
-    {"arguments":{"command":"ls"},"name":"bash","seq":3,"time":1790000001.2,"type":"tool.call","version":1}
-    {"content":"...","name":"bash","ok":true,"seq":4,"size":42,"time":1790000001.3,"truncated":false,"type":"tool.result","version":1}
-    {"content":"There are ...","role":"assistant","seq":5,"time":1790000002.4,"type":"message","version":1}
-    {"seq":6,"state":"completed","time":1790000002.4,"type":"run.state","version":1}
-    {"elapsed":2.312,"metrics":{...},"response":"There are ...","seq":7,"status":"completed","time":1790000002.4,"type":"run.finished","version":1}
+    {"arguments":{"command":"ls"},"call":"c1","name":"bash","seq":3,"status":"dispatched","time":1790000001.2,"type":"tool.call","version":1}
+    {"call":"c1","content":"...","name":"bash","ok":true,"seq":4,"size":42,"status":"succeeded","time":1790000001.3,"truncated":false,"type":"tool.result","version":1}
+    {"input_tokens":1200,"model":"gpt-4o-mini","output_tokens":40,"purpose":"chat","seq":5,"time":1790000002.4,"type":"model.usage","version":1}
+    {"content":"There are ...","role":"assistant","seq":6,"time":1790000002.4,"type":"message","version":1}
+    {"seq":7,"state":"completed","time":1790000002.4,"type":"run.state","version":1}
+    {"elapsed":2.312,"metrics":{...},"response":"There are ...","seq":8,"session":{...},"status":"completed","time":1790000002.4,"type":"run.finished","version":1}
 
 Token deltas are not part of version 1. New event types may appear within a
 version, so a consumer must skip types it does not know.
@@ -516,7 +749,9 @@ never enter it.
 A run is recorded as C<run.started>, the input as C<message>, every
 C<tool.call> and C<tool.result> (with the whole result text, where the
 stream cuts it), the answer as C<message>, and C<run.finished> with how it
-ended -- also when it failed or was interrupted. A C</clear> in the REPL
+ended -- also when it failed or was interrupted. The permission policy's
+decisions are recorded as C<permission.asked>, C<permission.granted>,
+C<permission.denied> and C<permission.mode>. A C</clear> in the REPL
 is recorded as C<history.cleared>. While a raider writes a
 session it holds a lock on it; a second writer fails at once instead of
 waiting. A journal that cannot be written in the middle of a run (a full
@@ -572,8 +807,12 @@ with exit status C<4>.
 =head1 PROVIDERS
 
     raider provider inspect HOST[:PORT] | https://HOST[:PORT] [--json] [--allow-internal]
+    raider provider add ALIAS HOST[:PORT] | https://HOST[:PORT] [--credential-env NAME] [--allow-internal]
+    raider provider list [--json]
+    raider provider show ALIAS [--json]
+    raider provider remove ALIAS [--yes]
 
-fetches C<https://HOST[:PORT]/.well-known/langertha.json>, the provider
+C<provider inspect> fetches C<https://HOST[:PORT]/.well-known/langertha.json>, the provider
 manifest of ADR 0007, validates it with L<Langertha::Manifest> and shows
 what it declares: the provider id, the issuer, every endpoint (id,
 dialect, base URL, auth reference), every auth entry (id, type) and every
@@ -594,7 +833,11 @@ C<Authorization> header and no cookie, and is bounded:
 =over
 
 =item * C<https> only; a target with userinfo, a query, a fragment or
-another path than the well-known one is a usage error.
+another path than the well-known one is a usage error. Without
+C<https://> a host needs a dot (C<host.tld>), a port (C<host:PORT>) or
+brackets (an IPv6 literal such as C<[::1]>, with or without a port); a
+bare name such as C<acme> or C<localhost> is a provider alias, not a host
+(C<localhost:8443> or C<https://localhost> is one).
 
 =item * at most 1 MiB of body, 10 seconds from resolving the host to the
 last byte, and 3 redirects, each within the origin (scheme, host and
@@ -625,8 +868,9 @@ fetches and validates the manifest as C<provider inspect> does (same
 limits and address rules) and runs on the endpoint of one of its models:
 one-shot, machine output and the REPL work as with C<-e>. Nothing is
 stored and nothing is remembered: naming the host on the command line is
-the whole release, as with C<-o url=>. C<raider provider add> with a
-stored alias and credential is not there yet. The rules are provisional:
+the whole release, as with C<-o url=>. A name without dot, port or
+C<https://> is an alias (see L</Stored aliases>), never a host. The rules are
+provisional:
 
 =over
 
@@ -672,10 +916,89 @@ stderr, not an error: raider works through tool calls.
 
 =back
 
-Failures are reported on stderr before anything runs, without a machine
-document: a usage error exits with C<2>, a provider that cannot be used as
-it is (refused, not fetched, not valid, an unknown dialect or auth type)
-with C<1>.
+=head2 Several endpoints and failures
+
+A model that the manifest lists on several endpoints raider can use is
+refused, not guessed: the error names the endpoints and C<--provider-endpoint
+ID> chooses one (also for an alias).
+
+Failures are reported on stderr before anything runs: a usage error exits
+with C<2>, a provider that cannot be used as it is (refused, not fetched,
+not valid, an unknown dialect or auth type) with C<1>. With a machine
+output flag the same failure is also one document on stdout, C<status>
+C<refused> (an address, redirect, origin or stored binding the rules do not
+allow) or C<failed>, with C<error> and the C<provider> as given; the exit
+status is the same with and without the flag.
+
+=head2 Stored aliases
+
+    raider provider add ALIAS HOST[:PORT] | https://HOST[:PORT] [--credential-env NAME] [--allow-internal]
+    raider --provider ALIAS [-m MODEL] [-k KEY] [options] [prompt...]
+
+C<provider add> fetches and validates the manifest as C<provider inspect>
+does, shows its endpoints and auth and what will be pinned, and asks
+C<[y/N]> on a terminal. Anything but C<y> stores nothing, and without a
+terminal (stdin or stdout not a TTY) nothing is fetched or stored at all.
+The binding goes under C<providers:> in F<~/.raider/config.yml> through the
+one home-file writer (a C<providers:> in a project file is ignored):
+
+    providers:
+      acme:
+        origin: https://provider.example:443
+        issuer: https://provider.example
+        auth: [api_key]
+        credential_env: ACME_API_KEY
+        allow_internal: 0
+        pinned_at: 2026-10-15T09:30:00Z
+        fingerprint: 3f2a...
+
+C<fingerprint> is a field beyond the origin, issuer and auth types: the
+digest of what was accepted (below), which is what C<--provider ALIAS>
+compares, so an endpoint that moved is seen too.
+
+=over
+
+=item * B<The credential> is the I<name> of an environment variable
+(C<--credential-env>), required when the endpoints ask for auth and never
+guessed; its value is read at run time and goes to the pinned origin only.
+C<-k> overrides it for one run. No other C<*_API_KEY> ever selects or
+feeds an alias. The name is pinned too: another variable (edited by hand,
+or given to C<provider add> again) is another secret sent to the same
+origin, so it needs the renewed acceptance of C<provider add>; until then
+C<--provider ALIAS> stops.
+
+=item * B<What is pinned> is the origin, the issuer and the auth types, the
+credential variable and C<allow_internal>, and through the C<fingerprint>
+every endpoint's origin and dialect and the provider id (no TLS pin). A change of the model list,
+capabilities or an endpoint path needs nothing. Anything pinned that changed
+-- or an entry edited by hand, or without a fingerprint -- stops
+C<--provider ALIAS> (exit C<1>, or C<3> for an entry that is not
+well-formed), naming what differs, until C<provider add> is run again and
+accepted.
+
+=item * B<C<--allow-internal>> belongs to the alias: given to C<add> it is
+stored and covered by the pin; it is a usage error next to a stored alias.
+
+=item * B<The name> of an alias is lowercase letters, digits, C<-> and
+C<_>, at most 32: it can never look like a host. A C<--provider> value
+without dot, port or C<https://> is always an alias; one that is not stored
+is a usage error (exit C<2>; with C<--json> the C<failed> document) that
+points to C<provider add>, and nothing is fetched -- a typo in an alias
+never turns into a network request. Any other C<--provider> value is a
+HOST.
+
+=item * B<C<provider list>> and B<C<provider show ALIAS>> print what is
+stored (origin, issuer, auth types, the I<name> of the credential variable,
+whether an internal address is allowed, when it was accepted; C<show> also
+the fingerprint) and fetch nothing; an entry that cannot be used says why.
+C<--json> gives one document (C<providers>, or C<provider>). The aliases
+are also in C<raider config explain> and the REPL banner.
+
+=item * B<C<provider remove ALIAS>> deletes the entry through the same
+home-file writer, after asking on a terminal. Without a terminal it needs
+C<--yes> and is an error otherwise; nothing is removed then.
+
+=back
 
 =head2 The provider document
 
@@ -711,7 +1034,9 @@ and compatibility rules are those of L</Versions>.
 
 =item C<0> -- success, including C<--help>, C<--version>, the exports, C<config explain>,
 C<config migrate> (also with nothing to migrate, and C<--dry-run>), C<session list>, C<session show>, C<session fork>, C<session rm>,
-C<provider inspect> of a valid manifest and leaving the REPL.
+C<provider inspect> of a valid manifest, C<provider add> that stored its
+binding, C<provider list>, C<provider show> and C<provider remove> that
+removed its alias, and leaving the REPL.
 
 =item C<1> -- the run failed: the engine, a tool or the network raised an
 error. With a machine output flag, the document says C<failed>. For
@@ -720,7 +1045,11 @@ a step failed. For C<provider inspect>: the manifest was refused, could not be f
 not valid (the document says C<refused> or C<failed>). For C<--provider>
 also: its endpoint cannot be used (another origin, not C<https>, a refused
 address, a dialect or auth type this raider has no adapter for, no
-models, a model on several endpoints); see L</Using a provider>.
+models, a model on several endpoints) or a stored alias no longer matches
+what was accepted; see L</Using a provider> and L</Stored aliases>. For
+C<provider add>: no terminal, an answer other than C<y>, a manifest that
+was refused, not fetched or not valid. For C<provider remove>: no terminal
+and no C<--yes>, or an answer other than C<y>.
 
 =item C<2> -- usage error: unknown option, a C<-o> that is not
 C<KEY=VALUE>, an unknown C<config> subcommand, no prompt, more than one
@@ -730,8 +1059,13 @@ for C<provider inspect> also no target or more than one, a
 target that is no host or C<https> origin, or a C<--stream-*> flag; for
 C<--provider> a target that is none, C<-e>, C<-o engine=>, C<-o url=> or
 C<config explain> with it, a model the manifest does not list, no C<-m>
-where it lists several, or no C<-k> where the endpoint needs a key; and
-C<--allow-internal> without C<--provider>.
+where it lists several, or no C<-k> (nor the alias's variable) where the
+endpoint needs a key; for C<provider add> not two words, an alias or
+variable name that is none, auth asked for without C<--credential-env> or
+a document format; for C<provider show> and C<provider remove> not one
+word or an alias that is not stored; and C<--allow-internal> or
+C<--provider-endpoint> without C<--provider>, or C<--allow-internal> with a
+stored alias.
 
 =item C<3> -- configuration error: the config file (project or home; for
 C<config migrate> the F<.raider.yml> to migrate) cannot be read, the
@@ -827,6 +1161,13 @@ Colon-separated directories searched for packs after the project's
 F<.raider/packs/>, F<~/.raider/packs/> and the bundled ones; see
 L<Langertha::Raider::Packs/build_packs>.
 
+=head2 RAIDER_ENABLE_TASKS
+
+C<0> (or C<false>, C<no>, C<off>) mounts C<todo_write> instead of the task
+tools C<task_create>, C<task_update>, C<task_list> and C<task_get>, like
+Claude Code's C<CLAUDE_CODE_ENABLE_TASKS>; see
+L<Langertha::Raider::Application/task_tools>.
+
 =head2 HOME
 
 Where F<~/.raider/packs/> and the REPL history F<~/.raider_history> are.
@@ -860,7 +1201,7 @@ Telegram mission (see L<Langertha::Raider::HallTools>).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -881,5 +1222,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

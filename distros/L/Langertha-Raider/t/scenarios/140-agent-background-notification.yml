@@ -1,0 +1,38 @@
+# Claude Code: Agent with run_in_background answers at once ("Async agent launched
+# successfully." + agentId), keeps working while the caller goes on, and reports by a
+# <task-notification> user message in front of the caller's next model request.
+# Checks ADR 0027 sections 3 and 4.
+title: a background agent is launched at once and its notification reaches the caller before a later request
+permission_mode: bypassPermissions
+files:
+  notes.txt: "x\n"
+delay: 0.05
+prompt: Start a background agent and go on.
+script:
+  - tool_calls:
+      - [ agent, { description: Find it, prompt: BG-PROMPT, run_in_background: true } ]
+  # the background agent's own request is answered while the caller's next one waits
+  - text: 'BG REPORT: a < b & c'
+  - tool_calls:
+      - [ list_files, { path: . } ]
+  - text: main done
+expect:
+  answer: main done
+  request_count: 4
+  requests:
+    - { index: 1, contains: BG-PROMPT }
+    # not before it was due
+    - { index: 2, absent: task-notification }
+    # after the tool results of the turn, as a user message
+    - index: 3
+      tail:
+        - { role: tool, contains: notes.txt }
+        - { role: user, contains: "<task-notification>\n<task-id>agent_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<status>completed</status>\n<summary>Agent \"Find it\" finished</summary>\n<result>BG REPORT: a &lt; b &amp; c</result>" }
+    - { index: 3, contains: "<usage><subagent_tokens>" }
+  tools:
+    - name: agent
+      text: '\AAsync agent launched successfully\.\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\nThe agent is working in the background\. You will be notified automatically when it completes\. You know nothing about its results until that notification arrives .* do not report, assume, or predict them.*\nDo not duplicate this agent''s work.*\z'
+    - { name: list_files, text: notes.txt }
+  events:
+    - { type: agent.started, agent_id: agent_1, background: true, call: c1, description: Find it }
+    - { type: agent.finished, agent_id: agent_1, status: completed }

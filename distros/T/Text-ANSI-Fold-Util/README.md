@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/tecolicom/Text-ANSI-Fold-Util/workflows/test/badge.svg)](https://github.com/tecolicom/Text-ANSI-Fold-Util/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Text-ANSI-Fold-Util.svg)](https://metacpan.org/release/Text-ANSI-Fold-Util)
+[![Actions Status](https://github.com/tecolicom/Text-ANSI-Fold-Util/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tecolicom/Text-ANSI-Fold-Util/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Text-ANSI-Fold-Util.svg)](https://metacpan.org/release/Text-ANSI-Fold-Util)
 # NAME
 
 Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr)
@@ -16,7 +16,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr)
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # DESCRIPTION
 
@@ -80,7 +80,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020-2024 Kazumasa Utashiro.
+Copyright 2020-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

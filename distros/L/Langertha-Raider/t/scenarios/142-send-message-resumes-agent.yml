@@ -1,0 +1,38 @@
+# Claude Code: SendMessage to a finished subagent resumes it from its transcript under
+# the same ID, in the background ("Resuming agent ID"), and it notifies again.
+# Checks ADR 0027 section 5 (finished agent) and section 3 (a non-interactive run waits).
+title: send_message resumes a finished agent with its history and its second report arrives as a notification
+permission_mode: bypassPermissions
+wait_background: true
+prompt: Look, then follow up.
+script:
+  - tool_calls:
+      - [ agent, { description: Look, prompt: TASK-1 } ]
+  - text: first report
+  - tool_calls:
+      - [ send_message, { to: agent_1, message: FOLLOW UP, summary: asks a follow up } ]
+  - text: main first
+  # the resumed agent
+  - text: second report
+  - text: main final
+expect:
+  answer: main final
+  request_count: 6
+  tools:
+    - { name: agent, text: '\Afirst report\nagentId: agent_1 ' }
+    - { name: send_message, text: '\AResuming agent agent_1 in the background\. You will be notified when it finishes\.\z' }
+  requests:
+    # the resumed agent's request: its history kept, the message last
+    - index: 4
+      tail:
+        - { role: user, contains: TASK-1 }
+        - { role: assistant, contains: first report }
+        - { role: user, contains: FOLLOW UP }
+    # the caller is told, naming the send_message call
+    - index: 5
+      tail:
+        - { role: user, contains: "<task-notification>\n<task-id>agent_1</task-id>\n<tool-use-id>c2</tool-use-id>\n<status>completed</status>\n<summary>Agent \"Look\" finished</summary>\n<result>second report</result>" }
+  events:
+    - { type: agent.started, agent_id: agent_1, background: false }
+    - { type: agent.started, agent_id: agent_1, background: true, resumed: true, call: c2 }
+    - { type: agent.finished, agent_id: agent_1, status: completed }

@@ -50,7 +50,7 @@ sub journals { my ( $root ) = @_; my $d = path($root, '.raider', 'sessions'); -d
 sub events   { map { $json->decode($_) } path($_[0])->lines_raw({ chomp => 1 }) }
 
 my $secret = 'sk-secret-4711';
-sub base { ( '-r', $_[0], '-e', 'openai', '-k', $secret, '-m', 'seq-model', '--no-trace' ) }
+sub base { ( '-r', $_[0], '-e', 'openai', '-k', $secret, '-m', 'seq-model', '--no-trace', '--dangerously-skip-permissions' ) }
 
 subtest 'one-shot: the whole run in a new session' => sub {
   my $root = tempdir(CLEANUP => 1);

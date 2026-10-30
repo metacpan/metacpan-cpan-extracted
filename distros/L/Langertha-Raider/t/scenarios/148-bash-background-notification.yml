@@ -1,0 +1,22 @@
+# Claude Code: a background command that ends notifies the model with a
+# <task-notification> (summary: Background command "..." completed (exit code N)).
+# Checks ADR 0027 section 4 (shells post into the same queue) and section 10.
+title: a background shell that ends notifies the run that started it
+permission_mode: bypassPermissions
+prompt: Run a command in the background and wait for it.
+script:
+  - tool_calls:
+      - [ bash, { command: 'sleep 0.2; echo shell-done', run_in_background: true } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1, block: true, timeout: 20 } ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: bash, text: '\ACommand running in background with ID: bash_1\. You will be notified when it completes\.' }
+    - { name: bash_output, text: 'shell-done' }
+  requests:
+    - index: 2
+      tail:
+        - { role: tool, contains: shell-done }
+        - { role: user, contains: "<task-notification>\n<task-id>bash_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<status>completed</status>\n<summary>Background command \"sleep 0.2; echo shell-done\" completed (exit code 0)</summary>\n</task-notification>" }

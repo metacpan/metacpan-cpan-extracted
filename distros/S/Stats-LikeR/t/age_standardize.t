@@ -149,6 +149,13 @@ my @stdpop = (2000, 3000, 3000, 2000);
 throws_ok { age_standardize(\@count, [1,2,3], \@stdpop) } qr/length/, 'pop length mismatch rejected';
 throws_ok { age_standardize(pop => \@pop, stdpop => \@stdpop) } qr/count.*or.*rate/, 'needs count or rate';
 throws_ok { age_standardize(\@count, \@pop, \@stdpop, conf_level => 1.5) } qr/conf_level/, 'bad conf_level rejected';
+# a call-form error prints the help screen, with the error on its last line
+throws_ok { age_standardize(\@count, \@pop, \@stdpop, colour => 'red') }
+	qr/\Ausage: age_standardize\(COUNT, POP, STDPOP .*^example:\n.*\n\nage_standardize: error: unknown argument\(s\): colour\n\z/ms,
+	'an unknown argument is refused, under the help screen';
+throws_ok { age_standardize(\@count, \@pop, \@stdpop, 'per') }
+	qr/^age_standardize: error: arguments must be name => value pairs, after any positional count, pop and stdpop$/m,
+	'a dangling option name is refused';
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

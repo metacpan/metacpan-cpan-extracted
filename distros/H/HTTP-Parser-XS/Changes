@@ -1,7 +1,11 @@
 Revision history for Perl extension HTTP::Parser::XS.
 
+0.18
+	- preserve the full URL-decoded PATH_INFO when it contains NUL bytes (Robert Rothenberg)
+	- fix documentation typos (Sergey Romanov)
+
 0.17
-	- update picohttpparser (runs faster / does slightly more strict parsing)
+	- Set parsed values to special headers in PP's _parse_as_hashref #12 (makamaka)
 
 0.16
 	- documentation about PATH_INFO

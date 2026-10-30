@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 ## Version
 
-Version 0.52
+Version 0.53
 
 ## Description
 
@@ -433,10 +433,12 @@ string which is taken to be `directory`.
 
 - `dsn`
 
-    A DBI data-source string (e.g. `dbi:SQLite:dbname=/path/to/db` or
-    `dbi:Pg:dbname=mydb;host=db.example.com`).  When present, file detection
-    is skipped entirely and the DSN is used directly.  The SQL dialect is
-    inferred from the DSN prefix (`sqlite`, `postgres`, `mysql`).
+    A DBI data-source string (e.g. `dbi:SQLite:dbname=/path/to/db`,
+    `dbi:Pg:dbname=mydb;host=db.example.com`, or
+    `dbi:MariaDB:database=mydb;host=db.example.com`).  When present, file
+    detection is skipped entirely and the DSN is used directly.  The SQL
+    dialect is inferred from the DSN prefix (`sqlite`, `postgres`,
+    `mysql` — `dbi:MariaDB:` maps to the `mysql` dialect).
 
 - `username`
 

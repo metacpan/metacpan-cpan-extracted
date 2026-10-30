@@ -1,0 +1,24 @@
+title: a todo list with two items in progress is rejected and the earlier list stays
+# todo_write is mounted instead of the task tools (RAIDER_ENABLE_TASKS=0, ADR 0025)
+app: { task_tools: false }
+prompt: Do two things at once.
+script:
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: First, status: in_progress }
+            - { content: Second, status: pending }
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: First, status: in_progress }
+            - { content: Second, status: in_progress }
+  - text: ok
+expect:
+  answer: ok
+  tools:
+    - { name: todo_write }
+    - { name: todo_write, error: true, text: 'todo 2 is a second item in_progress' }
+  todos:
+    - { content: First, status: in_progress }
+    - { content: Second, status: pending }

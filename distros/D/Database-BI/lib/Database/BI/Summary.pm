@@ -3,7 +3,7 @@ package Database::BI::Summary;
 use strict;
 use warnings;
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 use Carp        qw(croak);
 use Digest::MD5 qw(md5_hex);
@@ -147,7 +147,7 @@ sub _call_anthropic {
 
 	require LWP::UserAgent;
 	require HTTP::Request;
-	require JSON::PP;	# core since Perl 5.013009; MIN_PERL_VERSION is 5.020000
+	require JSON::PP;	# core since Perl 5.013009; MIN_PERL_VERSION is 5.028000
 
 	my $model   = $ai_config->{model} // 'claude-haiku-5-5';
 	my $api_key = $ai_config->{api_key};
@@ -241,6 +241,31 @@ C<'template_fallback'>, or C<'llm'>), and C<cached> (1 if served from cache,
 
 C<use_ai> is only honoured when C<ai_config> is provided and
 C<ai_config-E<gt>{api_key}> is non-empty.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+	    insights  => 'arrayref',  # optional; insight hashrefs from Database::BI::Insights::compute (default [])
+	    spec_key  => 'string',    # optional; accepted for the caller's bookkeeping, never sent to the LLM
+	    label     => 'string',    # optional; dataset name (default "dataset")
+	    row_count => 'integer',   # optional; rows analysed (default 0)
+	    use_ai    => 'boolean',   # optional; ask for LLM prose
+	    ai_config => 'hashref',   # optional; { api_key, model, provider }
+	}
+
+=head4 OUTPUT
+
+	{
+	    text   => 'string',                                  # 2-4 sentences
+	    source => 'template' | 'template_fallback' | 'llm',
+	    cached => 0 | 1,
+	}
+
+C<generate> does not croak.  A failed provider call gives the template text
+with C<source =E<gt> 'template_fallback'>.  The same insights, label, row count
+and C<use_ai> within an hour return the cached text with C<cached =E<gt> 1>.
 
 =head1 AUTHOR
 

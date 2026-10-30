@@ -6,8 +6,7 @@ $|++;
 #
 my $log = '';
 
-# Set threshold to 5, once via the documented function form and once via the
-# class-method form (both must route to the same C setter).
+# Set threshold to 5, once via the documented function form and once via the class-method form (both must route to the same C setter).
 Acme::Parataxis::set_preempt_threshold(5);
 Acme::Parataxis->set_preempt_threshold(5);
 my $c1 = Acme::Parataxis->new(
@@ -27,9 +26,7 @@ my $c2 = Acme::Parataxis->new(
     }
 );
 
-# Call C1. It should run 5 times and then maybe_yield will switch back to main
-# because the threshold is hit.
-# WAIT: who is the parent? Main.
+# It should run 5 times and then maybe_yield will switch back to main because the threshold is hit.
 diag 'Calling C1...';
 my $res1 = $c1->call();
 is $log, 'AAAAA', 'C1 yielded after 5 iterations';

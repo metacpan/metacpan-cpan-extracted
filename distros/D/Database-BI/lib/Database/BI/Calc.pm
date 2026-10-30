@@ -8,7 +8,7 @@ use POSIX	qw(floor ceil);
 use Readonly;
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
@@ -46,6 +46,10 @@ our %MESSAGES = (
 	error_trailing        => "Unexpected token '%s' at position %d",
 	error_double_eq       => "Use = not == for equality comparison at position %d",
 	error_param_col_clash => "Parameter '%s' conflicts with a column of the same name",
+	error_time_format       => "Unsupported time format token %s",
+	error_time_format_date  => "Time format '%s' must name a date, with a year, a month and a day token",
+	error_const_arg         => "The second argument of %s() must be a quoted literal",
+	error_span_interval     => "Unknown time bucket '%s'; use a count and one of s, m, h, d, w, mon, q or y, for example 1h or 15m",
 );
 
 sub _fmt {
@@ -54,10 +58,35 @@ sub _fmt {
 }
 
 # --- built-in function dispatch table ---
-# 'if' is handled as a special form in _parse_call (short-circuit branches).
-# All date functions accept ISO-8601 'YYYY-MM-DD' prefix only; non-matching
-# values return undef and appear in the empty-cell bucket rather than being
-# dropped.
+# 'if' is handled as a special form in _parse_call (short-circuit branches),
+# and so are epoch() and span(), whose second argument is a constant that is
+# checked once, at compile time, rather than on every row.
+#
+# The date functions accept an ISO-8601 'YYYY-MM-DD' prefix only, and the time
+# functions an ISO date, an ISO timestamp, or an epoch in seconds or
+# milliseconds; non-matching values return undef and appear in the empty-cell
+# bucket rather than being dropped.
+
+Readonly my %_MONTH_NAME_TO_NUM => (
+	jan => 1, feb => 2, mar => 3, apr => 4,  may => 5,  jun => 6,
+	jul => 7, aug => 8, sep => 9, oct => 10, nov => 11, dec => 12,
+);
+
+# The tokens a strptime-style pattern may hold.  Plain characters in a pattern
+# are literals; anything else is a compile error, so a pattern is either fully
+# understood or refused.
+Readonly my %_FMT_RE => (
+	Y => '\d{4}',		# four-digit year
+	m => '\d{1,2}',		# month number
+	d => '\d{1,2}',		# day of month
+	H => '\d{1,2}',		# hour, 24-hour clock
+	M => '\d{1,2}',		# minute
+	S => '\d{1,2}',		# second
+	b => '[A-Za-z]{3}',	# month abbreviation, as in %d-%b-%Y
+);
+
+# The functions whose second argument is a constant, not an expression.
+Readonly my %TIME_CONST_FNS => map { $_ => 1 } qw(epoch span);
 
 my %FUNCTIONS = (
 	# --- string functions ---
@@ -150,6 +179,23 @@ my %FUNCTIONS = (
 		sprintf '%04d-%02d-%02d', $t[2] + 1900, $t[1] + 1, $t[0];
 	},
 
+	# --- time of day (see "Time values and time buckets" below) --
+	hour => sub {
+		my $t = _parse_time($_[0]);
+		return undef unless $t && $t->{has_time};
+		(localtime($t->{epoch}))[2] + 0;
+	},
+	minute => sub {
+		my $t = _parse_time($_[0]);
+		return undef unless $t && $t->{has_time};
+		(localtime($t->{epoch}))[1] + 0;
+	},
+	second => sub {
+		my $t = _parse_time($_[0]);
+		return undef unless $t && $t->{has_time};
+		(localtime($t->{epoch}))[0] + 0;
+	},
+
 	# --- grouping / binning ---
 	bin => sub {
 		# bin(value, width) -> '[lo,hi)' label for the interval containing value.
@@ -168,6 +214,294 @@ my %FUNCTIONS = (
 		sprintf("[${fmt},${fmt})", $lo, $hi);
 	},
 );
+
+# ---------------------------------------------------------------------------
+# Time values and time buckets
+#
+# One parser and one interval vocabulary, with the time-of-day functions and
+# span() on top of them.  Every value is read as *local* time, by
+# POSIX::mktime, exactly as the date functions and the relative time ranges
+# already are: no zone is parsed, none is stored, and nothing here reads the
+# clock -- a bucket for a value is the same bucket tomorrow.
+# ---------------------------------------------------------------------------
+
+# _fmt_body($fmt) -> ($regex_body, \@tokens)
+#
+# Purpose: Turn a strptime-style pattern into a regex body with one capture per
+#          token, plus the token each capture belongs to.  A token outside
+#          %_FMT_RE is a compile error rather than a silent skip: a pattern
+#          that quietly ignored half of itself is how a value ends up in the
+#          wrong bucket without anybody being told.
+sub _fmt_body {
+	my ($fmt) = @_;
+	my @tokens;
+	my $body = '';
+	my $i    = 0;
+
+	while ($i < length $fmt) {
+		my $ch = substr($fmt, $i, 1);
+		if ($ch ne '%') {
+			$body .= quotemeta($ch);
+			$i++;
+			next;
+		}
+		my $tok = substr($fmt, $i + 1, 1);
+		croak _fmt('error_time_format', length($tok // '') ? "%$tok" : $fmt)
+			unless length($tok // '') && exists $_FMT_RE{$tok};
+		push @tokens, $tok;
+		$body .= '(' . $_FMT_RE{$tok} . ')';
+		$i += 2;
+	}
+
+	return ($body, \@tokens);
+}
+
+# _fmt_compile($fmt) -> { re => qr, tokens => \@tokens }
+#
+# A pattern on its own has to name a date; a time with no day has no place on a
+# calendar to be resolved against.
+sub _fmt_compile {
+	my ($fmt) = @_;
+	my ($body, $tokens) = _fmt_body($fmt);
+	croak _fmt('error_time_format_date', $fmt)
+		unless _fmt_has_date($tokens);
+	return { re => qr/\A$body\z/, tokens => $tokens };
+}
+
+# _fmt_has_date(\@tokens) -> bool
+#
+# A pattern has to name a date: a year, a day, and a month -- as a number
+# (C<%m>) or as an abbreviation (C<%b>), which is what %d-%b-%Y uses.
+sub _fmt_has_date {
+	my ($tokens) = @_;
+	my %has = map { $_ => 1 } @$tokens;
+	return $has{Y} && $has{d} && ($has{m} || $has{b}) ? 1 : 0;
+}
+
+# _fmt_compile_pair($date_fmt, $time_fmt) -> { re => qr, tokens => \@tokens }
+#
+# A stored time pattern is two patterns holding one value between them, so they
+# are compiled into one regex: the date, an optional 'T' or space, the time.
+sub _fmt_compile_pair {
+	my ($date_fmt, $time_fmt) = @_;
+	my ($dbody, $dtokens) = _fmt_body($date_fmt);
+	my ($tbody, $ttokens) = _fmt_body($time_fmt);
+	croak _fmt('error_time_format_date', $date_fmt)
+		unless _fmt_has_date($dtokens);
+	return {
+		re     => qr/\A$dbody[ T]?$tbody\z/,
+		tokens => [ @$dtokens, @$ttokens ],
+	};
+}
+
+# _fmt_parts($value, $compiled) -> \%parts | undef
+sub _fmt_parts {
+	my ($value, $compiled) = @_;
+	my @caps = ($value =~ $compiled->{re});
+	return undef unless @caps;
+
+	my %part;
+	my @tokens = @{ $compiled->{tokens} };
+	for my $i (0 .. $#tokens) {
+		$part{ $tokens[$i] } = $caps[$i];
+	}
+	return \%part;
+}
+
+# _epoch_of($y, $mon, $day, $h, $mi, $s) -> epoch | undef
+#
+# Purpose: Local epoch seconds for a calendar date and clock time.
+# Notes:   POSIX::mktime normalises what it is given -- '2026-02-31' becomes
+#          3 March, month 13 becomes January -- so the parts are read back and
+#          compared before the value is accepted, and a date that does not
+#          exist is unparseable rather than quietly a different date.  The
+#          clock time is allowed two hours of slack, because the hour a
+#          daylight-saving change skips does not exist and mktime moves it.
+sub _epoch_of {
+	my ($y, $mon, $day, $h, $mi, $s) = @_;
+	require POSIX;
+	my $epoch = POSIX::mktime($s, $mi, $h, $day, $mon - 1, $y - 1900);
+	return undef unless defined $epoch;
+
+	my @lt = localtime($epoch);
+	return undef
+		unless $lt[5] + 1900 == $y && $lt[4] + 1 == $mon && $lt[3] == $day;
+
+	my $want = $h * 3_600 + $mi * 60 + $s;
+	my $got  = $lt[2] * 3_600 + $lt[1] * 60 + $lt[0];
+	return undef if abs($got - $want) > 7_200;
+	return $epoch;
+}
+
+# _parse_time($value) -> { epoch => E, has_time => 0|1 } | undef
+#
+# Purpose: Read one cell as a point in time.  Three shapes are recognised, in
+#          this order: an ISO date, or an ISO timestamp with 'T' or a space
+#          between the date and the time; ten digits, an epoch in seconds; and
+#          thirteen digits, an epoch in milliseconds.  Only the digit count
+#          separates the last two, so it is the rule -- and it is documented,
+#          because nothing in the value itself says which one it is.
+sub _parse_time {
+	my ($value) = @_;
+	return undef unless defined $value && !ref $value && length $value;
+	(my $s = $value) =~ s/\A\s+|\s+\z//g;
+	return undef unless length $s;
+
+	if (my ($y, $mon, $day, $h, $mi, $sec)
+		= $s =~ /\A(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?\z/)
+	{
+		my $epoch = _epoch_of($y + 0, $mon + 0, $day + 0,
+			($h // 0) + 0, ($mi // 0) + 0, ($sec // 0) + 0);
+		return undef unless defined $epoch;
+		return { epoch => $epoch, has_time => defined $h ? 1 : 0 };
+	}
+
+	return { epoch => $s + 0, has_time => 1 }       if $s =~ /\A\d{10}\z/;
+	return { epoch => int($s / 1_000), has_time => 1 } if $s =~ /\A\d{13}\z/;
+	return undef;
+}
+
+# _time_from_format($value, $compiled) -> { epoch => E, has_time => 0|1 } | undef
+sub _time_from_format {
+	my ($value, $compiled) = @_;
+	return undef unless defined $value && !ref $value;
+	my $part = _fmt_parts($value, $compiled) or return undef;
+
+	my $mon = defined $part->{m} ? $part->{m} + 0
+		: defined $part->{b} ? $_MONTH_NAME_TO_NUM{ lc $part->{b} }
+		: undef;
+	return undef unless defined $mon && $mon >= 1 && $mon <= 12;
+
+	my $epoch = _epoch_of($part->{Y} + 0, $mon, $part->{d} + 0,
+		($part->{H} // 0) + 0, ($part->{M} // 0) + 0, ($part->{S} // 0) + 0);
+	return undef unless defined $epoch;
+	return { epoch => $epoch, has_time => defined $part->{H} ? 1 : 0 };
+}
+
+# _iso_second_label($epoch) -> 'YYYY-MM-DDTHH:MM:SS' in local time
+sub _iso_second_label {
+	my @lt = localtime($_[0]);
+	return sprintf '%04d-%02d-%02dT%02d:%02d:%02d',
+		$lt[5] + 1900, $lt[4] + 1, $lt[3], $lt[2], $lt[1], $lt[0];
+}
+
+# _civil_day($y, $mon, $day) -> days since 1970-01-01
+#
+# Purpose: A day number that does not move with daylight saving, so the n-day
+#          and n-week buckets can be counted from a fixed origin.  Integer
+#          civil-calendar arithmetic; no part of this reads the clock.
+sub _civil_day {
+	my ($y, $mon, $day) = @_;
+	$y -= ($mon <= 2) ? 1 : 0;
+	my $era = int(($y >= 0 ? $y : $y - 399) / 400);
+	my $yoe = $y - $era * 400;			# [0, 399]
+	my $doy = int((153 * ($mon + ($mon > 2 ? -3 : 9)) + 2) / 5) + $day - 1;
+	my $doe = $yoe * 365 + int($yoe / 4) - int($yoe / 100) + $doy;
+	return $era * 146_097 + $doe - 719_468;
+}
+
+# _shift_days($y, $mon, $day, $delta) -> ($y, $mon, $day)
+#
+# Purpose: Move a date by whole days without a calendar library.
+# Notes:   Noon is the anchor.  A day is then 86,400 seconds away from its
+#          neighbours even across a daylight-saving change, so counting days
+#          cannot land on the wrong date -- counting from midnight does, once a
+#          year, and only in the autumn.
+sub _shift_days {
+	my ($y, $mon, $day, $delta) = @_;
+	return ($y, $mon, $day) unless $delta;
+	require POSIX;
+	my @lt = localtime(POSIX::mktime(12, 0, 0, $day, $mon - 1, $y - 1900) + $delta * 86_400);
+	return ($lt[5] + 1900, $lt[4] + 1, $lt[3]);
+}
+
+# span_interval($interval) -> { n => N, unit => U, [secs => S] } | undef
+#
+# Purpose: The interval vocabulary span() takes, and the only place its rule
+#          lives: a count and a unit, 'mon' for months (because 'm' is
+#          minutes) and 'q' for quarters.  A count below one and an unknown
+#          unit are both undef rather than a bucket that quietly means
+#          something else.  Public because the span= sugar validates an
+#          interval before it builds the expression, and one rule with two
+#          callers beats two rules that drift apart.
+sub span_interval {
+	my ($interval) = @_;
+	return undef unless defined $interval && !ref $interval && length $interval;
+	my ($n, $unit) = $interval =~ /\A(\d+)(mon|s|m|h|d|w|q|y)\z/ or return undef;
+	$n += 0;
+	return undef if $n < 1;
+
+	my $secs = $unit eq 's' ? 1
+		: $unit eq 'm' ? 60
+		: $unit eq 'h' ? 3_600
+		: undef;
+	return { n => $n, unit => $unit, (defined $secs ? (secs => $secs) : ()) };
+}
+
+# _span_label($value, \%interval) -> bucket label | undef
+#
+# Purpose: The ISO label of the bucket a value falls in -- the half-open
+#          interval from the bucket's start to the next bucket's start.
+# Notes:   The label is ISO at the bucket's own resolution, never 'Oct 2026':
+#          group keys are sorted as strings, so an ISO label makes
+#          lexicographic order chronological order and a bucketed chart comes
+#          out in the right order with no second sort path.  A pretty name is a
+#          presentation step (month_name() already reads a month number); it is
+#          never the key.
+#          The intervals below a day are floored out of the epoch, and 'd'
+#          downwards are counted in calendar units, because a day is not always
+#          86,400 seconds and a month never is.
+sub _span_label {
+	my ($value, $interval) = @_;
+	my $t = _parse_time($value);
+	return undef unless $t;
+
+	my $n    = $interval->{n};
+	my $unit = $interval->{unit};
+
+	if (defined $interval->{secs}) {
+		my $step = $n * $interval->{secs};
+		return _iso_second_label(floor($t->{epoch} / $step) * $step);
+	}
+
+	my @lt = localtime($t->{epoch});
+	my ($y, $mon, $day) = ($lt[5] + 1900, $lt[4] + 1, $lt[3]);
+
+	if ($unit eq 'd') {
+		return sprintf('%04d-%02d-%02d', $y, $mon, $day) if $n == 1;
+		my $day_no = _civil_day($y, $mon, $day);
+		return sprintf('%04d-%02d-%02d', _shift_days($y, $mon, $day, -($day_no % $n)));
+	}
+
+	if ($unit eq 'w') {
+		# Monday is the first day of the ISO week, and 1970-01-05 is the
+		# Monday the week count runs from.
+		require POSIX;
+		my $dow    = (localtime(POSIX::mktime(12, 0, 0, $day, $mon - 1, $y - 1900)))[6];
+		my $day_no = _civil_day($y, $mon, $day);
+		my $monday = $day_no - ($dow == 0 ? 6 : $dow - 1);
+		my $weeks  = floor(($monday - 4) / 7);
+		my $start  = $monday - ($weeks % $n) * 7;
+		return sprintf('%04d-%02d-%02d', _shift_days($y, $mon, $day, $start - $day_no));
+	}
+
+	# A month count runs from January 1970, and a quarter count from its first
+	# quarter, so the buckets line up with the calendar at every width and not
+	# only when the count is one.
+	if ($unit eq 'mon') {
+		my $idx = ($y - 1970) * 12 + ($mon - 1);
+		my $lo  = $idx - ($idx % $n);
+		return sprintf('%04d-%02d-01', 1970 + floor($lo / 12), $lo % 12 + 1);
+	}
+
+	if ($unit eq 'q') {
+		my $qi = ($y - 1970) * 4 + int(($mon - 1) / 3);
+		my $lo = $qi - ($qi % $n);
+		return sprintf('%04d-%02d-01', 1970 + floor($lo / 4), ($lo % 4) * 3 + 1);
+	}
+
+	return sprintf('%04d-01-01', $y - ($y % $n));
+}
 
 # ---------------------------------------------------------------------------
 # Constructor
@@ -561,7 +895,42 @@ sub _parse_call {
 	my $lc = lc($name);
 
 	croak _fmt('error_unknown_fn', $name)
-		unless exists $FUNCTIONS{$lc} || $lc eq 'if';
+		unless exists $FUNCTIONS{$lc} || $lc eq 'if' || $TIME_CONST_FNS{$lc};
+
+	# epoch(v [, fmt]) and span(v, interval) take a constant second argument:
+	# a format or an interval.  It is checked here, once per column rather than
+	# once per row, so a bad one is a compile error that names it -- and the
+	# pattern is compiled once instead of on every value.
+	if ($TIME_CONST_FNS{$lc}) {
+		$$pos_ref++;	# consume '('
+		my $value_fn = _parse_cmp($tokens, $pos_ref, $depth_ref, $cols);
+		my $const;
+		if ($tokens->[$$pos_ref]{type} eq $T_COMMA) {
+			$$pos_ref++;
+			my $tok = $tokens->[$$pos_ref];
+			croak _fmt('error_const_arg', $name)
+				unless $tok->{type} eq $T_STR;
+			$const = $tok->{val};
+			$$pos_ref++;
+		}
+		_expect($tokens, $pos_ref, $T_RPAREN);
+
+		if ($lc eq 'epoch') {
+			my $compiled = defined $const ? _fmt_compile($const) : undef;
+			return sub {
+				my $value = $value_fn->($_[0]);
+				my $t = defined $compiled
+					? _time_from_format($value, $compiled)
+					: _parse_time($value);
+				return defined $t ? $t->{epoch} : undef;
+			};
+		}
+
+		my $interval = defined $const ? span_interval($const) : undef;
+		croak _fmt('error_span_interval', defined $const ? $const : '')
+			unless $interval;
+		return sub { _span_label($value_fn->($_[0]), $interval) };
+	}
 
 	$$pos_ref++;	# consume '('
 	my @arg_fns;
@@ -616,24 +985,56 @@ sub _parse_colref {
 # Standalone date-normalisation helper (used by Dashboard::_apply_date_normalization)
 # ---------------------------------------------------------------------------
 
-Readonly my %_MONTH_NAME_TO_NUM => (
-	jan => 1, feb => 2, mar => 3, apr => 4,  may => 5,  jun => 6,
-	jul => 7, aug => 8, sep => 9, oct => 10, nov => 11, dec => 12,
-);
+# _iso_day_label($epoch) -> 'YYYY-MM-DD' in local time
+sub _iso_day_label {
+	my @lt = localtime($_[0]);
+	return sprintf '%04d-%02d-%02d', $lt[5] + 1900, $lt[4] + 1, $lt[3];
+}
 
-# date_normalise($value, $pattern) -> 'YYYY-MM-DD' or undef
+# _normalise_with_format($value, \%pattern) -> ISO string or undef
+#
+# The hash shape of a stored pattern: { date => '<fmt>', [time => '<fmt'>],
+# [as => 'timestamp'] }.  With a time pattern the value is normalised to
+# 'YYYY-MM-DDTHH:MM:SS', which is the shape the date comparisons already read
+# to the second; with as => 'timestamp' and no time pattern it is that same
+# shape at midnight, so a date-only column can be compared against a
+# last_24_hours window.
+sub _normalise_with_format {
+	my ($val, $pattern) = @_;
+	return undef unless defined $pattern->{date} && length $pattern->{date};
+
+	my $time_fmt = $pattern->{time};
+	if (defined $time_fmt && length $time_fmt) {
+		my $t = _time_from_format($val, _fmt_compile_pair($pattern->{date}, $time_fmt));
+		return undef unless $t;
+		return _iso_second_label($t->{epoch});
+	}
+
+	my $t = _time_from_format($val, _fmt_compile($pattern->{date}));
+	return undef unless $t;
+	return ($pattern->{as} // '') eq 'timestamp'
+		? _iso_second_label($t->{epoch})
+		: _iso_day_label($t->{epoch});
+}
+
+# date_normalise($value, $pattern) -> ISO string or undef
 #
 # Converts $value from the given strptime-style $pattern to ISO-8601.
 # Returns undef when $value does not match the pattern or the pattern is
 # unknown.  No external modules required.
 #
-# Supported patterns:
+# $pattern is either one of the three date patterns below, or a hashref
+# { date => ..., time => ..., as => ... } for a column that holds a time as
+# well as a date; see _normalise_with_format.
+#
+# Supported date patterns:
 #   %m/%d/%Y  -- US slash-date (01/15/2026)
 #   %d/%m/%Y  -- EU slash-date (15/01/2026)
 #   %d-%b-%Y  -- DD-Mon-YYYY  (15-Jan-2026, case-insensitive month abbrev)
 sub date_normalise {
 	my ($val, $pattern) = @_;
 	return undef unless defined $val && defined $pattern && length $val;
+	return _normalise_with_format($val, $pattern) if ref $pattern eq 'HASH';
 	if ($pattern eq '%m/%d/%Y') {
 		return undef unless $val =~ /\A(\d{1,2})\/(\d{1,2})\/(\d{4})\z/;
 		return sprintf('%04d-%02d-%02d', $3, $1, $2);
@@ -711,6 +1112,23 @@ stored in C<error()>.
 
 Always check C<error()> after construction before calling C<evaluate()>.
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+	    expr    => 'string',    # the expression; at most 512 characters
+	    columns => 'arrayref',  # optional; column names the expression may read (default [])
+	    params  => 'hashref',   # optional; named constants, read like columns
+	}
+
+=head4 OUTPUT
+
+Always a C<Database::BI::Calc> object; C<new> does not croak.  A bad
+expression, an unknown identifier, an expression over 512 characters, a
+parameter named like a column, or a bad C<span()> interval leaves the reason
+in C<error()> and the object evaluates nothing.
+
 =head1 METHODS
 
 =head2 error
@@ -722,11 +1140,29 @@ successfully.
 
 Returns true when C<error()> is defined.
 
+=head3 API SPECIFICATION
+
+Neither takes an argument.  C<error> returns C<'string' | undef>;
+C<has_error> returns a boolean.
+
 =head2 evaluate(\%row)
 
 Evaluates the compiled expression against a data row. Returns the computed
 scalar value, or C<undef> on any runtime error (division by zero, non-numeric
 operand, undef column value, etc.) rather than croaking.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	\%row   # hashref of column name => value
+
+=head4 OUTPUT
+
+	'scalar' | undef
+
+C<undef> when the expression did not compile, or when evaluating it fails for
+this row.  Bound C<params> are read in place of same-named row keys.
 
 =head1 OPERATORS
 
@@ -786,20 +1222,131 @@ Use C<=> for equality, not C<==>. Writing C<==> is a compile-time error.
 All date functions return C<undef> when the value does not start with a
 valid C<YYYY-MM-DD> prefix, rather than croaking.
 
+=head2 Time of day
+
+    hour(v)          hour of day, 0-23, or undef when v carries no time
+    minute(v)        minute, 0-59
+    second(v)        second, 0-59
+    epoch(v)         epoch seconds
+    epoch(v, fmt)    epoch seconds, read with a strptime-style pattern
+
+These read the same values as the date functions and one more shape besides:
+
+    C<2026-10-27>, C<2026-10-27T14:05>, C<2026-10-27 14:05:32>
+                     ISO date or timestamp, local time
+    C<1761660332>    ten digits: an epoch in seconds
+    C<1761660332000> thirteen digits: an epoch in milliseconds
+    anything else with C<fmt>, e.g. C<epoch(t,'%d/%m/%Y %H:%M')>
+                     read with the pattern
+
+Only the digit count separates the two epoch shapes, which is why it is the
+rule and why it is written down here.  A pattern (C<fmt>, and the stored time
+pattern below) may use C<%Y> (year), C<%m> (month number), C<%d> (day),
+C<%H> (hour), C<%M> (minute), C<%S> (second) and C<%b> (month abbreviation),
+with any other character taken literally; a pattern must name a year, a month
+and a day, and any other token is a compile error rather than a silent skip.
+
+Nothing here parses or stores a time zone: every value is local time, by
+C<POSIX::mktime>, exactly as the date functions and the relative time ranges
+already are.  A cell that carries no time -- C<2026-10-27> -- gives C<undef>
+for C<hour()>, C<minute()> and C<second()> rather than a made-up zero.
+
+=head2 Time buckets
+
+    span(v, '<n><unit>')     the ISO label of the bucket v falls in
+
+The unit is C<s>, C<m>, C<h>, C<d>, C<w>, C<mon> (months, because C<m> is
+minutes), C<q> (quarters) or C<y>, and the count is one or more.  The label is
+the start of the half-open interval containing the value:
+
+    span(v, '1s')    2026-10-27T14:05:03
+    span(v, '15m')   2026-10-27T14:00:00
+    span(v, '1h')    2026-10-27T14:00:00
+    span(v, '1d')    2026-10-27        local midnight, so a 23- or 25-hour day
+                                       still has one bucket
+    span(v, '1w')    2026-10-26        the Monday of that ISO week
+    span(v, '1mon')  2026-10-01        the first of that month
+    span(v, '1q')    2026-10-01        the first day of that quarter
+    span(v, '1y')    2026-01-01
+
+A count above one widens the bucket without moving the calendar: C<3mon>
+aligns to January, April, July and October because a month count runs from
+January 1970, not from the first value seen.
+
+Labels are ISO at the bucket's own resolution, never C<'Oct 2026'>.  Group keys
+are sorted as strings, so an ISO label makes lexicographic order chronological
+order -- a bucketed chart is in the right order with no second sort path.  A
+pretty name is a presentation step; C<month_name()> already reads a month
+number, and it is never the group key.
+
+A value that cannot be read, or an interval that is not one -- C<'1x'>,
+C<'0h'>, C<'-1d'> -- gives C<undef>, which C<Dashboard::_apply_calc_fields>
+stores as C<'(unparseable)'> so the row stays visible in one explicit bucket
+rather than disappearing.  The interval is a constant in the expression, so a
+bad one is rejected when the expression is compiled, not when a row is
+reached.
+
+The interval rule is also a function:
+
+    Database::BI::Calc::span_interval('1mon')   # { n => 1, unit => 'mon' }
+    Database::BI::Calc::span_interval('15m')    # { n => 15, unit => 'm', secs => 60 }
+    Database::BI::Calc::span_interval('0h')     # undef
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$interval   # '<n><unit>', n >= 1, unit one of s m h d w mon q y
+
+=head4 OUTPUT
+
+	{ n => 'integer', unit => 'string', secs => 'integer' } | undef
+
+C<secs> is present only for C<s>, C<m> and C<h>, whose buckets are floored from
+the epoch.  Anything else, including a reference, is C<undef>.
+
 =head2 Date normalisation (standalone helper)
 
-    date_normalise($value, $pattern) -> 'YYYY-MM-DD' or undef
+    date_normalise($value, $pattern) -> ISO string or undef
 
-Converts C<$value> from a non-ISO format to ISO-8601 C<YYYY-MM-DD>.
-Returns C<undef> when the value does not match the pattern.
-Supported patterns:
+Converts C<$value> from a non-ISO format to ISO-8601.  Returns C<undef> when
+the value does not match the pattern.  C<$pattern> is one of:
 
     %m/%d/%Y   US slash-date  (01/15/2026)
     %d/%m/%Y   EU slash-date  (15/01/2026)
     %d-%b-%Y   DD-Mon-YYYY   (15-Jan-2026; month abbreviation is case-insensitive)
 
+or a hashref for a column that holds a time as well as a date:
+
+    { date => '%d/%m/%Y', time => '%H:%M' }                  -> '2026-10-27T14:05:00'
+    { date => '%d/%m/%Y', time => '%H:%M:%S' }               -> '2026-10-27T14:05:32'
+    { date => '%d/%m/%Y', as => 'timestamp' }                -> '2026-10-27T00:00:00'
+
+With a C<time> pattern the value is normalised to C<YYYY-MM-DDTHH:MM:SS>, which
+is the shape the date comparisons in C<Database::BI::Controller::Dashboard>
+already read to the second and which a C<last_24_hours> window can filter on;
+with C<as =E<gt> 'timestamp'> and no time pattern it is that shape at midnight,
+so a date-only column can be compared the same way.  A date pattern on its own
+still means C<YYYY-MM-DD> and still normalises to C<YYYY-MM-DD>, so a stored
+pattern that has not changed its meaning has not changed its meaning.
+
 This is called by C<Dashboard::_apply_date_normalization> before calc fields
-are evaluated, so C<YEAR(date)> sees ISO values regardless of the source format.
+are evaluated, so C<YEAR(date)>, C<HOUR(date)> and C<span(date, '1h')> see ISO
+values regardless of the source format.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$value     # string
+	$pattern   # one of the three date patterns, or { date, time, as }
+
+=head4 OUTPUT
+
+	'string' | undef   # YYYY-MM-DD, or YYYY-MM-DDTHH:MM:SS with a time or as => 'timestamp'
+
+An undefined or empty value, an unknown pattern, or a value that does not
+match returns C<undef>.  It does not croak.
 
 =head2 Binning
 
@@ -860,8 +1407,10 @@ L<Database::BI>, L<Database::BI::Controller::Dashboard>
 
 Nigel Horne, C<< <njh@nigelhorne.com> >>
 
-=head1 LICENSE
+=head1 LICENCE AND COPYRIGHT
 
-Same terms as Database::BI.
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
 
 =cut

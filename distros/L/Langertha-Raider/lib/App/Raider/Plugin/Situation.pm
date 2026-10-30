@@ -1,6 +1,6 @@
 package App::Raider::Plugin::Situation;
-# ABSTRACT: Reserved namespace — the Situation plugin moved to Langertha::Raider::Plugin::Situation
-our $VERSION = '0.503';
+# ABSTRACT: Reserved namespace - the Situation plugin moved to Langertha::Raider::Plugin::Situation
+our $VERSION = '0.504';
 
 use strict;
 use warnings;
@@ -15,11 +15,11 @@ __END__
 
 =head1 NAME
 
-App::Raider::Plugin::Situation - Reserved namespace — the Situation plugin moved to Langertha::Raider::Plugin::Situation
+App::Raider::Plugin::Situation - Reserved namespace - the Situation plugin moved to Langertha::Raider::Plugin::Situation
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ dead stub on CPAN.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -56,5 +56,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

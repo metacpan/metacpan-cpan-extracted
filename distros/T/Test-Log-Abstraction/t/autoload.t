@@ -61,6 +61,20 @@ $ENV{'VERBOSE'} = 0;
 	ok(defined(&Test::Log::Abstraction::DESTROY), 'DESTROY is defined');
 }
 
+# The notice repeats the caller's method name, which can be any string:
+# like every error, it must not add lines, send terminal escapes, or be huge
+{
+	my $logger = Test::Log::Abstraction->new(diag => 'none');
+	my $name = "bad\nname\e[2J" . ('z' x 300);
+	my $out = capture_diag { $logger->$name('x') };
+
+	is(scalar($out =~ tr/\n//), 1, 'notice for a name with a newline is one line');
+	unlike($out, qr/\e/, 'no terminal escape sequence is printed');
+	like($out, qr/no method 'bad\\x0Aname\\x1B\[2Jz+\.\.\.'/, 'control characters escaped, long name cut');
+	ok(length($out) < 300, 'notice is cut short');
+	is($logger->messages()->[0]->{'level'}, lc($name), 'the name is still captured as it was called');
+}
+
 # An unknown class method croaks: there is no capture to record it in
 {
 	throws_ok { Test::Log::Abstraction->notalevel('x') }

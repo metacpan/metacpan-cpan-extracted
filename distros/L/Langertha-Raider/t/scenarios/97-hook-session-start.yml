@@ -1,0 +1,27 @@
+title: SessionStart hooks run once per session (source startup); their context and systemMessage arrive (ADR 0022)
+run_prompt: true
+files:
+  .claude/settings.json: |
+    { "hooks": { "SessionStart": [
+      { "matcher": "startup|resume", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/start", "args": [] } ] },
+      { "matcher": "compact", "hooks": [ { "type": "command", "command": "echo never > {{ROOT}}/compact.txt" } ] }
+    ] } }
+  hooks/start: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *'"source":"startup"'*) echo startup >> {{ROOT}}/started.txt;; esac
+    printf '%s' '{"systemMessage":"welcome back","hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"Sprint goal: hooks"}}'
+executable: [ hooks/start ]
+prompts: [ first, second ]
+script:
+  - text: one
+  - text: two
+expect:
+  answer: two
+  files: { started.txt: "startup\n" }
+  absent: [ compact.txt ]
+  requests:
+    - { index: 0, contains: "SessionStart hook additional context: Sprint goal: hooks" }
+  events:
+    - { type: hook.ran, hook_event: SessionStart, outcome: success }
+    - { type: hook.message, hook_event: SessionStart, kind: system, text: welcome back }

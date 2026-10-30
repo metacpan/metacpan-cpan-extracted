@@ -161,14 +161,12 @@ my $pca_aoh_scaled = prcomp($aoh, scale => 1);
 is_approx($pca_aoh_scaled->{sdev}[0], 1.22474487, 'prcomp (AoH): scaled PC1 standard deviation', 1e-7);
 is_approx($pca_aoh_scaled->{sdev}[1], 0.70710678, 'prcomp (AoH): scaled PC2 standard deviation', 1e-7);
 
-# rank restriction still applies to named-column input
+# rank restriction still applies to named-column input.  It cuts the rotation
+# and the scores; sdev keeps all min(n, p) values, as R's prcomp.default()
+# does (its s$d is never truncated) -- through 0.331 it was cut to 1 here.
 my $pca_aoh_rank = prcomp($aoh, rank => 1);
-my $n_sdev_aoh = scalar @{ $pca_aoh_rank->{sdev} };
-if ($n_sdev_aoh == 1) {
-	pass('prcomp (AoH): rank limit restricts the number of components');
-} else {
-	fail("prcomp (AoH): expected 1 component, got $n_sdev_aoh");
-}
+is(scalar @{ $pca_aoh_rank->{rotation}[0] }, 1, 'prcomp (AoH): rank limit restricts the rotation to 1 column');
+is(scalar @{ $pca_aoh_rank->{sdev} }, 2, 'prcomp (AoH): ... and sdev keeps both, as R');
 
 # retx => 0 suppresses the rotated data for AoH as well
 my $pca_aoh_noretx = prcomp($aoh, retx => 0);
@@ -289,20 +287,14 @@ if (ref $pca->{scale} eq 'ARRAY') {
 # 1.414 is less than 1.469, so PC2 should be omitted.
 my $pca_tol = prcomp($aoa, tol => 0.6);
 
-my $n_sdev = scalar @{ $pca_tol->{sdev} };
-if ($n_sdev == 1) {
-	pass('prcomp (Tol): successfully restricted components by tolerance threshold');
-} else {
-	fail("prcomp (Tol): expected 1 component, got $n_sdev");
-}
+# tol and rank cut the rotation and the scores, never sdev: R 4.6.1's
+# prcomp.default() returns all of s$d whatever they say.
+is(scalar @{ $pca_tol->{rotation}[0] }, 1, 'prcomp (Tol): tolerance restricts the rotation to 1 column');
+is(scalar @{ $pca_tol->{x}[0] }, 1, 'prcomp (Tol): ... and the scores');
+is(scalar @{ $pca_tol->{sdev} }, 2, 'prcomp (Tol): ... while sdev keeps both, as R');
 
 my $pca_rank = prcomp($aoa, rank => 1);
-$n_sdev = scalar @{ $pca_rank->{sdev} };
-if ($n_sdev == 1) {
-	pass('prcomp (Rank): successfully restricted components by explicit rank limit');
-} else {
-	fail("prcomp (Rank): expected 1 component, got $n_sdev");
-}
+is(scalar @{ $pca_rank->{sdev} }, 2, 'prcomp (Rank): sdev keeps both under rank => 1, as R');
 
 my $rot_cols = scalar @{ $pca_rank->{rotation}[0] };
 if ($rot_cols == 1) {
@@ -381,6 +373,19 @@ is_approx($pca_na->{sdev}[1], 0.0, 'prcomp (NA): collinear matrix component is z
 		is_approx( $p->{sdev}[$_], $want->[$_], "prcomp ($name): sdev $_ matches the untied data", 1e-12 ) for 0 .. 2;
 	}
 	no_leaks_ok { prcomp( \%hoa ); prcomp( $tied{'tied HoH'} ) } 'prcomp: no leaks with UTF-8 names and tied input' unless $INC{'Devel/Cover.pm'};
+}
+
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { prcomp([ [1, 2], [3, 4] ], colour => 1); 1 } ? '' : $@;
+	like($err, qr/\Ausage: prcomp\(.*^example:\n.*\n\nprcomp: error: \Qunknown argument 'colour'\E\n\z/ms,
+		'prcomp: unknown argument \'colour\', under the help screen');
+}
+{
+	my $err = eval { prcomp([ 1, 2 ]); 1 } ? '' : $@;
+	like($err, qr/\Ausage: prcomp\(.*^example:\n.*\n\nprcomp: error: \QArray reference must contain ArrayRefs (AoA) or HashRefs (AoH)\E\n\z/ms,
+		'prcomp: Array reference must contain ArrayRefs (AoA) or HashRefs (AoH), under the help screen');
 }
 
 done_testing();

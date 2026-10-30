@@ -1,0 +1,22 @@
+title: a PreToolUse hook rewrites the arguments in Claude Code's form; raider runs them in its own (ADR 0022)
+permission_mode: default
+files:
+  .claude/settings.json: |
+    { "hooks": { "PreToolUse": [
+      { "matcher": "Write", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/redirect", "args": [] } ] }
+    ] } }
+  hooks/redirect: |
+    #!/bin/sh
+    cat >/dev/null
+    printf '%s' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","updatedInput":{"file_path":"{{ROOT}}/out/b.txt","content":"rewritten"}}}'
+executable: [ hooks/redirect ]
+prompt: Write a file.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: original } ]
+  - text: done
+expect:
+  files: { out/b.txt: rewritten }
+  absent: [ a.txt ]
+  tools:
+    - { name: write_file }

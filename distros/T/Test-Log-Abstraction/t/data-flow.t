@@ -14,6 +14,9 @@
 #                         %config; setters
 #   lang                  new() (_resolve_lang)      every message the module makes  the logger is freed
 #   diag rule             new() (_diag_rule)         _diags                          the logger is freed
+#   a name given          caller: level option,      looked up lower-cased; shown    never stored escaped;
+#                         or an unknown method       as given, escaped and cut       the caller's is untouched
+#   i18n arguments        caller                     read into a copy by i18n()      never written to
 #   output handle         Test::Builder (borrowed)   _emit: layers read, diag()      never: not ours to close
 #
 # Data-flow anomalies found while mapping these chains, all now fixed:
@@ -22,7 +25,8 @@
 # computed its error class on every call but used it only on failure (D~);
 # level() overwrote its getter value unread on the setter path (DD); and
 # _resolve_lang, _plural and _format computed values some paths never
-# read (D~).
+# read (D~).  Later: level() computed its lookup key twice (a redundant
+# use, now made once).  reopen() defines, uses and kills nothing.
 #
 # The module opens no files or sockets.  The only resource it touches is
 # the output handle it borrows from Test::Builder, so the resource tests
@@ -217,6 +221,103 @@ subtest 'each argument is read exactly once' => sub {
 	is($reads, 2, 'two arguments, two reads: none read twice');
 	is($logger->messages()->[0]->{'message'}, 'read 1 and read 2', 'the message is built from those reads');
 	untie $volatile;
+};
+
+# Strategy: an object's text is defined once, when it is logged.  Rebless
+# the object afterwards, from a class whose text form dies into one whose
+# text form works, and the stored entry must still be what it was
+subtest 'an object is rendered when it is logged, not when it is read' => sub {
+	my $logger = quiet();
+	my $object = bless({}, 'Local::Broken');
+	$logger->error('got ', $object);
+	my $stored = $logger->messages()->[0]->{'message'};
+	like($stored, qr/\Agot Local::Broken=HASH\(0x[0-9a-f]+\)\z/, 'a text form that dies: the plain form was stored');
+	bless($object, 'Local::Working');
+	is($logger->messages()->[0]->{'message'}, $stored, 'mending the object later does not rewrite the entry');
+	$logger->like(qr/\Agot Local::Broken=/, 'and the assertions see the stored text');
+};
+
+{
+	package Local::Broken;
+	use overload '""' => sub { die "no text\n" }, fallback => 1;
+
+	package Local::Working;
+	use overload '""' => sub { 'mended' }, fallback => 1;
+
+	package Local::TiedTable;
+	# A tied i18n table whose template is different every time it is read,
+	# as a table backed by a file that another process rewrites would be
+	sub TIEHASH { my ($class, $reads) = @_; return bless { reads => $reads }, $class }
+	sub FETCH { my $self = shift; ${$self->{'reads'}}++; return 'version ' . ${$self->{'reads'}} }
+	sub EXISTS { return 1 }
+	sub FIRSTKEY { return 'greeting' }
+	sub NEXTKEY { return }
+}
+
+# Strategy: time of check against time of use.  The caller's i18n table is
+# read once, at new(); after that a logger must give the same text every
+# time, however the table changes behind it
+subtest 'a changing i18n table is read once, at new()' => sub {
+	my $reads = 0;
+	tie my %table, 'Local::TiedTable', \$reads;
+	my $logger = quiet(i18n => { en => \%table });
+	my $read_at_new = $reads;
+	my @seen = map { $logger->i18n('greeting') } 1 .. 3;
+	state_diag(reads => { at_new => $read_at_new, after => $reads, seen => \@seen });
+
+	is_deeply(\@seen, [($seen[0]) x 3], 'the same text on every call');
+	like($seen[0], qr/\Aversion \d+\z/, 'the text read at new()');
+	is($reads, $read_at_new, 'the table was not read again after new()');
+	untie %table;
+};
+
+# Strategy: i18n() fills placeholders from the caller's hash.  It must
+# read that hash, never write to it: no class key added, no value changed,
+# not even a string made into a number by %d
+subtest 'i18n() only reads the caller\'s arguments' => sub {
+	my $logger = quiet(i18n => { en => { t => '%{n}d %{s}s' } });
+	my %args = (n => '007', s => 'text');
+	my %before = %args;
+	is($logger->i18n('t', \%args), '7 text', 'formatted');
+	is_deeply(\%args, \%before, 'the caller\'s hash is unchanged: no class key, no values changed');
+	ok($args{'n'} eq '007', '... and \'007\' is still the string \'007\'');
+};
+
+# Strategy: one name, two uses.  The name given to new(level =>) or to an
+# unknown method is used once as data (looked up, or stored) and once in
+# a message (shown).  Each use gets its own copy: the caller's string is
+# never changed, the stored name is not the escaped one, and the message
+# repeats the name as given
+subtest 'a name is used as data and in a message, without either changing it' => sub {
+	my $level = 'LOUD';
+	throws_ok { $CLASS->new(level => $level) } qr/invalid syslog level 'LOUD'/, 'the message repeats the level as given';
+	is($level, 'LOUD', 'the caller\'s string was not lower-cased in place');
+	my $good = 'ERROR';
+	is(quiet(level => $good)->level(), 3, 'a good name in any case still sets the level');
+	is($good, 'ERROR', '... and is not changed either');
+
+	my $logger = quiet();
+	my $name = "Bad\nName";
+	my $out = capture_diag { $logger->$name('x') };
+	is($logger->messages()->[0]->{'level'}, "bad\nname", 'stored: the name, lower-cased, not escaped');
+	like($out, qr/no method 'Bad\\x0AName'/, 'shown: the name as given, escaped');
+	is($name, "Bad\nName", 'the caller\'s name is unchanged');
+};
+
+# Strategy: reopen() is in Log::Abstraction's API for files this module
+# does not have, so it must define, use and kill nothing: every piece of
+# state is the same after it, and a clone made after it is the same as
+# one made before
+subtest 'reopen() touches no data' => sub {
+	my $logger = quiet(lang => 'de', level => 'error');
+	$logger->warn('kept')->verbose(1);
+	my $snapshot = sub { my $l = shift; return { messages => $l->messages(), level => $l->level(), verbose => $l->verbose(), lang => $l->lang() } };
+	my $before = $snapshot->($logger);
+	my $clone_before = $snapshot->($logger->new());
+	returns_ok($logger->reopen(), { type => 'object', isa => $CLASS }, 'returns the logger');
+	$logger->reopen()->reopen();
+	is_deeply($snapshot->($logger), $before, 'messages, level, verbose and language unchanged');
+	is_deeply($snapshot->($logger->new()), $clone_before, 'a clone made after it is the same as one made before');
 };
 
 subtest 'every reader sees the same entries, in order' => sub {

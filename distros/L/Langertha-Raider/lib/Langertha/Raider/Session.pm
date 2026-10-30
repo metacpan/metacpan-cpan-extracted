@@ -1,6 +1,6 @@
 package Langertha::Raider::Session;
 # ABSTRACT: Internal writer of one session journal, holding its lock
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Carp qw( croak );
@@ -127,7 +127,7 @@ Langertha::Raider::Session - Internal writer of one session journal, holding its
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ Closes the journal and gives up the lock. Appending afterwards croaks.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -231,5 +231,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

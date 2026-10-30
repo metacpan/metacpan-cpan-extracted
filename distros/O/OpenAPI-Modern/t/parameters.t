@@ -49,14 +49,7 @@ sub _init_test ($data_path, $param_obj_data) {
   # hack, to allow _fetch_from_uri and cache to work: patch schema, content
   jsonp_set($openapi->entry_document->schema, $state->{keyword_path}.'/'.$_, $param_obj_data->{$_})
     foreach keys %$param_obj_data;
-
-  my $path = $state->{keyword_path};
-  my $len = length $path;
-  foreach my $document ($openapi->openapi_documents->@*) {
-    $document->{_type_in_schema} //= {};
-    delete $document->{_type_in_schema}{$_}
-      foreach grep substr($_, 0, $len) eq $path, keys $document->{_type_in_schema}->%*;
-  }
+  $_->{_type_in_schema} = {} foreach $openapi->openapi_documents->@*;
 
   return $state;
 }
@@ -3041,11 +3034,7 @@ YAML
 
       # hack, to allow _fetch_from_uri and cache to work while reusing the same starting location
       jsonp_set($openapi->entry_document->schema, $state->{keyword_path}, $schema);
-      $openapi->entry_document->{_type_in_schema} //= {};
-      my $path = $state->{keyword_path};
-      my $len = length $path;
-      delete $openapi->entry_document->{_type_in_schema}{$_}
-        foreach grep substr($_, 0, $len) eq $path, keys $openapi->entry_document->{_type_in_schema}->%*;
+      $_->{_type_in_schema} = {} foreach $openapi->openapi_documents->@*;
 
       my @types = $openapi->_type_in_schema($schema, { %$state });
       is_equal(

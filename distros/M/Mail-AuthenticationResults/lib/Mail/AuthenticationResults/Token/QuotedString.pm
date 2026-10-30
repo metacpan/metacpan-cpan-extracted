@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token::QuotedString;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20260216'; # VERSION
+our $VERSION = '2.20261029'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -22,21 +22,13 @@ sub parse {
     my $value = q{};
 
     my $first = substr( $header,0,1 );
-    $header   = substr( $header,1 );
     croak 'not a quoted string' if $first ne '"';
 
-    my $closed = 0;
-    while ( length $header > 0 ) {
-        my $first = substr( $header,0,1 );
-        $header   = substr( $header,1 );
-        if ( $first eq '"' ) {
-            $closed = 1;
-            last;
-        }
-        $value .= $first;
-    }
+    my $end = index( $header, '"', 1 );
+    croak 'Quoted string not closed' if $end == -1;
 
-    croak 'Quoted string not closed' if ! $closed;
+    $value  = substr( $header, 1, $end - 1 );
+    $header = substr( $header, $end + 1 );
 
     $self->{ 'value' } = $value;
     $self->{ 'header' } = $header;
@@ -58,7 +50,7 @@ Mail::AuthenticationResults::Token::QuotedString - Class for modelling Authentic
 
 =head1 VERSION
 
-version 2.20260216
+version 2.20261029
 
 =head1 DESCRIPTION
 
@@ -66,11 +58,11 @@ Token representing a quoted string
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

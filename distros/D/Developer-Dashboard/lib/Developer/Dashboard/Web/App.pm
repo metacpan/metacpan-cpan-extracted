@@ -3,11 +3,11 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
-use Errno qw(EACCES EPERM);
+use Errno qw(EACCES ENOENT ENOTDIR EPERM);
 use File::Basename qw(dirname);
 use File::ShareDir qw(dist_dir);
 use POSIX qw(strftime);
@@ -15,7 +15,10 @@ use File::Spec;
 use Scalar::Util qw(blessed);
 use URI;
 use URI::Escape qw(uri_escape uri_unescape);
-use Cwd qw(abs_path cwd);
+use Cwd qw(abs_path);
+use Time::HiRes ();
+use bytes ();
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::Platform qw(command_in_path is_windows);
@@ -28,7 +31,8 @@ use Developer::Dashboard::Zipper ();
 use Developer::Dashboard::SkillDispatcher ();
 use Developer::Dashboard::Auth ();
 our $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__);
-our $ORIG_CWD = cwd();    # compile-time CWD so rel2abs resolves correctly even after chdir
+our $ORIG_CWD = current_working_directory();    # compile-time CWD so rel2abs resolves correctly even after chdir
+our $MACHINE_IP_CACHE_TTL_SECONDS = 5;
 
 # new(%args)
 # Constructs the browser-facing dashboard web application.
@@ -55,6 +59,21 @@ sub new {
         resolver => $args{resolver},
         sessions => $sessions,
     }, $class;
+}
+
+# DESTROY()
+# Closes the web app's optional saved-nav filesystem watcher during teardown.
+# Input: app object supplied by Perl destruction.
+# Output: no value; close failures are emitted as visible warnings.
+sub DESTROY {
+    my ($self) = @_;
+    my $watcher = $self->{_saved_nav_items_watcher};
+    return if !ref($watcher) || !$watcher->can('close');
+    return if $watcher->close;
+    my $error = $watcher->can('last_error') ? $watcher->last_error : undef;
+    warn "Saved nav snapshot watcher close failed: "
+      . ( defined $error && $error ne '' ? $error : 'unknown close failure' ) . "\n";
+    return;
 }
 
 # HTTP methods that can change server state. The Origin/Referer half of the
@@ -122,10 +141,10 @@ sub _csrf_rejection_response {
 sub _fetch_site_is_foreign {
     my ( $self, %args ) = @_;
     my $headers = $args{headers} || {};
-    my $site =
-      defined $headers->{'sec-fetch-site'} && !ref( $headers->{'sec-fetch-site'} )
-      ? lc $headers->{'sec-fetch-site'}
-      : '';
+    my $raw_site = $headers->{'sec-fetch-site'};
+    return 0 if !defined $raw_site || ref($raw_site);
+    return 0 if $raw_site eq 'same-origin' || $raw_site eq 'none';
+    my $site = lc $raw_site;
     $site =~ s/^\s+//;
     $site =~ s/\s+$//;
     return 0 if !$FOREIGN_FETCH_SITES{$site};
@@ -175,7 +194,7 @@ sub _request_source_is_same_site {
         host                 => $authority,
         extra_loopback_hosts => (
             $config_has_web_settings
-            ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
+            ? ( $self->_web_settings->{ssl_subject_alt_names} || [] )
             : []
         ),
     );
@@ -246,7 +265,7 @@ sub _transient_url_forbidden_response {
 sub _editor_disabled {
     my ($self) = @_;
     return 0 if !blessed( $self->{config} ) || !$self->{config}->can('web_settings');
-    my $settings = $self->{config}->web_settings;
+    my $settings = $self->_web_settings;
     return $settings->{no_editor} ? 1 : 0;
 }
 
@@ -257,8 +276,428 @@ sub _editor_disabled {
 sub _indicators_disabled {
     my ($self) = @_;
     return 0 if !blessed( $self->{config} ) || !$self->{config}->can('web_settings');
-    my $settings = $self->{config}->web_settings;
+    my $settings = $self->_web_settings;
     return $settings->{no_indicators} ? 1 : 0;
+}
+
+# _web_settings()
+# Returns the web settings snapshot for this request, resolving it lazily once
+# so authorization and page chrome share the same layered configuration read.
+# Direct callers outside handle() continue to receive a fresh config lookup.
+# Input: none.
+# Output: web settings hash reference, or an empty hash when unavailable.
+sub _web_settings {
+    my ($self) = @_;
+    my $config = $self->{config};
+    return {} if !blessed($config) || !$config->can('web_settings');
+    return $self->{_request_web_settings} if exists $self->{_request_web_settings}
+      && defined $self->{_request_web_settings};
+    my $snapshot = $self->_request_config_snapshot;
+    my $settings = $snapshot
+      ? $config->web_settings( merged_config => $snapshot->{merged_config} )
+      : $config->web_settings;
+    $self->{_request_web_settings} = $settings if exists $self->{_request_web_settings};
+    return $settings;
+}
+
+# _request_config_snapshot()
+# Lazily reads merged runtime configuration once within handle(), reusing an
+# application snapshot only while its watched configuration roots and relevant
+# environment selectors remain unchanged. The request-local copy retains skill
+# entries and the lazily normalized indicator collector projection; direct calls
+# outside a request do not use the request cache.
+# Input: none.
+# Output: hash reference containing merged_config and skill_config_entries, or
+# undef when outside a request or the config object cannot provide merged data.
+sub _request_config_snapshot {
+    my ($self) = @_;
+    return undef if !exists $self->{_request_config_snapshot};
+    return $self->{_request_config_snapshot} if defined $self->{_request_config_snapshot};
+    my $config = $self->{config};
+    return undef if !blessed($config) || !$config->can('merged');
+
+    my $watcher = $self->_config_snapshot_watcher;
+    my $environment_signature = $self->_config_snapshot_environment_signature;
+    my $cached = $self->{_config_snapshot_cache};
+    my $portable_signature;
+    my @skill_entries;
+    my $watch_paths;
+    if ( !$watcher ) {
+        $watch_paths = $self->_config_snapshot_watch_paths( \@skill_entries );
+        $portable_signature = $self->_config_snapshot_portable_signature( $watch_paths, \@skill_entries );
+        if ( ref($cached) eq 'HASH' ) {
+            if ( defined $cached->{environment_signature} ) {
+                if ( $cached->{environment_signature} eq $environment_signature ) {
+                    if ( defined $cached->{portable_signature} ) {
+                        if ( $cached->{portable_signature} eq $portable_signature ) {
+                            $self->{_request_config_snapshot} = $cached->{snapshot};
+                            return $cached->{snapshot};
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if ( $watcher
+        && ref($cached) eq 'HASH'
+        && defined $cached->{environment_signature}
+        && $cached->{environment_signature} eq $environment_signature
+        && defined $cached->{watch_signature}
+        && $watcher->unchanged( $cached->{watch_signature} ) )
+    {
+        $self->{_request_config_snapshot} = $cached->{snapshot};
+        return $cached->{snapshot};
+    }
+
+    my $watch_signature;
+    my $watch_ready = 0;
+    if ($watcher) {
+        $watch_paths = $self->_config_snapshot_watch_paths( \@skill_entries );
+        $watch_signature = json_encode(
+            {
+                environment => $environment_signature,
+                paths       => $watch_paths,
+            }
+        );
+        $watch_ready = $watcher->configure( $watch_signature, $watch_paths ) ? 1 : 0;
+        if ( !$watch_ready ) {
+            my $reason = $watcher->can('last_error') ? $watcher->last_error : undef;
+            $reason = 'watch backend rejected the configuration inventory'
+              if !defined $reason || $reason eq '';
+            warn "Config snapshot watch disabled: $reason\n";
+            $self->{_config_snapshot_watcher_unavailable} = 1;
+            delete $self->{_config_snapshot_watcher};
+            delete $self->{_config_snapshot_cache};
+            $watcher = undef;
+            $portable_signature = $self->_config_snapshot_portable_signature( $watch_paths, \@skill_entries );
+        }
+    }
+
+    my @skill_config_entries;
+    my $merged_config = $config->merged( skill_config_entries_out => \@skill_config_entries );
+    my $snapshot = {
+        merged_config        => $merged_config,
+        skill_config_entries => \@skill_config_entries,
+    };
+    $self->{_request_config_snapshot} = $snapshot;
+
+    if ($watch_ready) {
+        my @fresh_skill_entries;
+        my $fresh_paths = $self->_config_snapshot_watch_paths( \@fresh_skill_entries );
+        if ( join( "\0", @{$fresh_paths} ) eq join( "\0", @{$watch_paths} )
+            && $watcher->unchanged($watch_signature) )
+        {
+            $self->{_config_snapshot_cache} = {
+                environment_signature => $environment_signature,
+                watch_signature       => $watch_signature,
+                snapshot              => $snapshot,
+            };
+        }
+        else {
+            delete $self->{_config_snapshot_cache};
+        }
+    }
+    else {
+        my @fresh_skill_entries;
+        my $fresh_paths = $self->_config_snapshot_watch_paths( \@fresh_skill_entries );
+        my $fresh_signature = $self->_config_snapshot_portable_signature( $fresh_paths, \@fresh_skill_entries );
+        if ( defined $portable_signature && $fresh_signature eq $portable_signature ) {
+            $self->{_config_snapshot_cache} = {
+                environment_signature => $environment_signature,
+                portable_signature    => $portable_signature,
+                snapshot              => $snapshot,
+            };
+        }
+        else {
+            delete $self->{_config_snapshot_cache};
+        }
+    }
+
+    return $snapshot;
+}
+
+# _config_snapshot_portable_signature($watch_paths, $skill_entries)
+# Builds a cross-platform freshness signature for configuration snapshots when
+# native filesystem notifications are unavailable. Directory metadata catches
+# layer and skill additions/removals; SHA-256 of each exact config input catches
+# same-size in-place edits regardless of filesystem timestamp resolution.
+# Input: array reference of existing directories returned by
+# _config_snapshot_watch_paths(), and optional array reference of installed
+# skill entries captured during that same discovery pass.
+# Output: deterministic SHA-256 signature string; filesystem read failures die
+#         visibly rather than allowing stale configuration to be reused.
+sub _config_snapshot_portable_signature {
+    my ( $self, $watch_paths, $skill_entries ) = @_;
+    die "Config snapshot watch paths must be an array reference\n"
+      if ref($watch_paths) ne 'ARRAY';
+    die "Config snapshot skill entries must be an array reference\n"
+      if defined $skill_entries && ref($skill_entries) ne 'ARRAY';
+    my $config = $self->{config};
+    my @files;
+    if ( blessed($config) && $config->can('_global_config_files') ) {
+        push @files, $config->_global_config_files;
+    }
+    my $paths = blessed($config) ? $config->{paths} : undef;
+    if ( defined $skill_entries ) {
+        for my $skill ( @{$skill_entries} ) {
+            next if ref($skill) ne 'HASH' || ref( $skill->{layers} ) ne 'ARRAY';
+            push @files, map {
+                File::Spec->catfile( $_, 'config', 'config.json' )
+            } @{ $skill->{layers} };
+        }
+    }
+    elsif ( blessed($paths) && $paths->can('installed_skill_entries') ) {
+        for my $skill ( $paths->installed_skill_entries( include_disabled => 1 ) ) {
+            next if ref($skill) ne 'HASH' || ref( $skill->{layers} ) ne 'ARRAY';
+            push @files, map {
+                File::Spec->catfile( $_, 'config', 'config.json' )
+            } @{ $skill->{layers} };
+        }
+    }
+    if ( blessed($paths) && $paths->can('current_project_root') ) {
+        my $project = $config->{repo_root} || $paths->current_project_root;
+        push @files, File::Spec->catfile( $project, '.developer-dashboard.json' )
+          if defined $project && $project ne '';
+    }
+
+    my @inventory;
+    for my $directory ( sort @$watch_paths ) {
+        my @link_stat = $self->_config_snapshot_lstat($directory);
+        die "Unable to inspect config snapshot directory '$directory': $!\n" if !@link_stat;
+        my @stat = $self->_config_snapshot_stat($directory);
+        die "Unable to inspect config snapshot directory '$directory': $!\n" if !@stat;
+        push @inventory,
+          [ 'directory', $directory, @link_stat[ 0, 1, 2, 7, 9, 10 ], @stat[ 0, 1, 2, 7, 9, 10 ] ];
+    }
+    my %seen;
+    for my $file ( sort grep { defined $_ && !ref($_) && $_ ne '' && !$seen{$_}++ } @files ) {
+        my @link_stat = $self->_config_snapshot_lstat($file);
+        if ( !@link_stat ) {
+            next if $! == ENOENT || $! == ENOTDIR;
+            die "Unable to inspect config snapshot file '$file': $!\n";
+        }
+        my @stat = $self->_config_snapshot_stat($file);
+        die "Unable to inspect config snapshot file '$file': $!\n" if !@stat;
+        my $digest;
+        if ( -f $file ) {
+            my $fh = $self->_config_snapshot_open($file);
+            die "Unable to read config snapshot file '$file': $!\n" if !$fh;
+            my $sha = Digest::SHA->new(256);
+            $sha->addfile($fh);
+            $self->_config_snapshot_close($fh)
+              or die "Unable to close config snapshot file '$file': $!\n";
+            $digest = $sha->hexdigest;
+        }
+        push @inventory,
+          [ 'file', $file, @link_stat[ 0, 1, 2, 7, 9, 10 ], @stat[ 0, 1, 2, 7, 9, 10 ], $digest ];
+    }
+    return sha256_hex( json_encode(\@inventory) );
+}
+
+# _config_snapshot_lstat($path)
+# Reads link metadata for a snapshot input path without following symlinks.
+# Input: one filesystem path string.
+# Output: list of lstat fields, or an empty list when the path is unavailable.
+sub _config_snapshot_lstat {
+    my ( $self, $path ) = @_;
+    return CORE::lstat($path);
+}
+
+# _config_snapshot_stat($path)
+# Reads target metadata for a snapshot input path and reports missing or
+# inaccessible targets to the caller through an empty list and $!.
+# Input: one filesystem path string.
+# Output: list of stat fields, or an empty list when the target is unavailable.
+sub _config_snapshot_stat {
+    my ( $self, $path ) = @_;
+    return CORE::stat($path);
+}
+
+# _config_snapshot_open($path)
+# Opens a config input as raw bytes so its content hash is independent of text
+# decoding and platform newline translation.
+# Input: one filesystem path string.
+# Output: open filehandle, or undef with $! preserved when opening fails.
+sub _config_snapshot_open {
+    my ( $self, $path ) = @_;
+    open my $fh, '<:raw', $path or return;
+    return $fh;
+}
+
+# _config_snapshot_close($fh)
+# Closes a raw config input after hashing so delayed filesystem errors remain
+# visible to the caller.
+# Input: open filehandle returned by _config_snapshot_open().
+# Output: true when close succeeds, false with $! on failure.
+sub _config_snapshot_close {
+    my ( $self, $fh ) = @_;
+    return CORE::close($fh);
+}
+
+# _config_snapshot_watcher()
+# Constructs the optional native watcher once for cross-request configuration
+# reuse. Missing FFI or an unsupported platform selects the portable metadata
+# and SHA-256 validator; setup errors are reported by _request_config_snapshot().
+# Its module is loaded from this file's absolute source path so request-time
+# working-directory changes cannot invalidate a relative @INC entry.
+# Input: none.
+# Output: watcher object or undef when no native watcher is available.
+sub _config_snapshot_watcher {
+    my ($self) = @_;
+    return $self->{_config_snapshot_watcher}
+      if ref( $self->{_config_snapshot_watcher} );
+    return if $self->{_config_snapshot_watcher_unavailable};
+    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'} ) {
+        my $watcher_module = File::Spec->catfile(
+            dirname( dirname($MODULE_SOURCE_PATH) ), 'IndicatorStore', 'Watch.pm'
+        );
+        require $watcher_module;
+    }
+    my $watcher = Developer::Dashboard::IndicatorStore::Watch->new;
+    if ( !$watcher ) {
+        $self->{_config_snapshot_watcher_unavailable} = 1;
+        return;
+    }
+    $self->{_config_snapshot_watcher} = $watcher;
+    return $watcher;
+}
+
+# _config_snapshot_environment_signature()
+# Captures process settings that select the configuration, runtime, home paths,
+# and collector filter so changing them cannot reuse a snapshot for another
+# configuration layout or indicator selection.
+# Input: none; reads path-related environment values and the current directory.
+# Output: deterministic, length-prefixed signature string.
+sub _config_snapshot_environment_signature {
+    my ($self) = @_;
+    my @names = qw(
+      HOME USERPROFILE HOMEDRIVE HOMEPATH
+      DEVELOPER_DASHBOARD_RUNTIME_LAYERS DEVELOPER_DASHBOARD_CONFIGS
+      DEVELOPER_DASHBOARD_CONFIG_OVERLAY DEVELOPER_DASHBOARD_CHECKERS
+    );
+    my $paths = $self->{pages};
+    $paths = $paths->{paths} if ref($paths) eq 'Developer::Dashboard::PageStore';
+    my $home = blessed($paths) && $paths->can('home') ? $paths->home : undef;
+    my $cwd = current_working_directory();
+    my $signature = "DASHBOARD_CONFIG_SNAPSHOT\0v1\0";
+
+    for my $name (@names) {
+        $signature .= 'E' . length($name) . ':' . $name;
+        if ( !exists $ENV{$name} ) {
+            $signature .= 'M';
+            next;
+        }
+        if ( !defined $ENV{$name} ) {
+            $signature .= 'U';
+            next;
+        }
+        my $value = $ENV{$name};
+        $signature .= 'D' . length($value) . ':' . $value;
+    }
+
+    $signature .= 'H';
+    $signature .= defined $home ? 'D' . length($home) . ':' . $home : 'U';
+    $signature .= 'C';
+    $signature .= defined $cwd ? 'D' . length($cwd) . ':' . $cwd : 'U';
+
+    return $signature;
+}
+
+# _config_snapshot_watch_paths($skill_entries_out)
+# Builds a sorted set of existing directories whose mutations can change
+# global, project, or installed-skill configuration. Missing targets are
+# represented by their nearest existing ancestor so their later creation
+# invalidates the snapshot as well.
+# Input: optional array reference to receive installed skill entries from the
+# same pass used to build the path inventory.
+# Output: sorted array reference of unique watchable directory paths.
+sub _config_snapshot_watch_paths {
+    my ( $self, $skill_entries_out ) = @_;
+    die "Config snapshot skill-entry output must be an array reference\n"
+      if defined $skill_entries_out && ref($skill_entries_out) ne 'ARRAY';
+    my $paths = $self->{pages};
+    $paths = $paths->{paths} if ref($paths) eq 'Developer::Dashboard::PageStore';
+    return [] if !blessed($paths) || !$paths->can('runtime_roots');
+
+    my %watch;
+    my $add = sub {
+        my ($target) = @_;
+        return if !defined $target || ref($target) || $target eq '';
+        my $directory = $target;
+        while ( !-d $directory ) {
+            my $parent = dirname($directory);
+            return if $parent eq $directory;
+            $directory = $parent;
+        }
+        $watch{$directory} = 1;
+    };
+
+    my @runtime_roots = $paths->runtime_roots;
+    $add->($_) for @runtime_roots;
+    $add->( dirname($_) ) for grep { defined $_ && $_ ne '' } @runtime_roots;
+    if ( ref($paths) eq 'Developer::Dashboard::PathRegistry' ) {
+        $add->($_) for $paths->config_roots( runtime_roots => \@runtime_roots );
+        $add->($_) for $paths->skills_roots( runtime_roots => \@runtime_roots );
+    }
+    else {
+        $add->($_) for $paths->config_roots;
+        $add->($_) for $paths->skills_roots;
+    }
+
+    my $cwd = $paths->can('current_working_directory')
+      ? $paths->current_working_directory
+      : current_working_directory();
+    my $home = $paths->can('home') ? $paths->home : undef;
+    my $project_root = $paths->can('current_project_root') ? $paths->current_project_root : undef;
+    my $stop_dir;
+    if ( defined $cwd && defined $home && $home ne ''
+        && $paths->can('_same_or_descendant_path')
+        && $paths->_same_or_descendant_path( $cwd, $home ) )
+    {
+        $stop_dir = $home;
+    }
+    elsif ( defined $cwd && defined $project_root && $project_root ne ''
+        && $paths->can('_same_or_descendant_path')
+        && $paths->_same_or_descendant_path( $cwd, $project_root ) )
+    {
+        $stop_dir = $project_root;
+    }
+    while ( defined $cwd && $cwd ne '' && defined $stop_dir ) {
+        $add->($cwd);
+        my $at_boundary = $cwd eq $stop_dir;
+        if ( !$at_boundary && $paths->can('_path_identity') ) {
+            $at_boundary = $paths->_path_identity($cwd) eq $paths->_path_identity($stop_dir);
+        }
+        last if $at_boundary;
+        my $parent = dirname($cwd);
+        last if $parent eq $cwd;
+        $cwd = $parent;
+    }
+
+    if ( $paths->can('installed_skill_entries') ) {
+        my @skill_entries = $paths->installed_skill_entries( include_disabled => 1 );
+        @{$skill_entries_out} = @skill_entries if defined $skill_entries_out;
+        for my $entry (@skill_entries) {
+            next if ref($entry) ne 'HASH' || ref( $entry->{layers} ) ne 'ARRAY';
+            for my $layer ( @{ $entry->{layers} } ) {
+                next if !defined $layer || ref($layer) || $layer eq '';
+                $add->($layer);
+                $add->( File::Spec->catdir( $layer, 'config' ) );
+                $add->( File::Spec->catdir( $layer, 'skills' ) );
+            }
+        }
+    }
+    if ( $paths->can('nested_skill_entries') ) {
+        for my $entry ( $paths->nested_skill_entries( include_disabled => 1 ) ) {
+            next if ref($entry) ne 'HASH' || !defined $entry->{dir} || ref( $entry->{dir} );
+            $add->( $entry->{dir} );
+            $add->( File::Spec->catdir( $entry->{dir}, 'config' ) );
+            $add->( File::Spec->catdir( $entry->{dir}, 'skills' ) );
+        }
+    }
+    $add->($project_root) if defined $project_root;
+
+    return [ sort keys %watch ];
 }
 
 # _no_editor_response()
@@ -274,13 +713,54 @@ sub _no_editor_response {
 }
 
 # handle(%args)
-# Dispatches one normalized request through the service-side route map.
+# Dispatches one normalized request with fresh, request-local runtime-layer,
+# installed-skill, canonical path-identity, page-root, and page-root realpath inventories
+# so route components share one filesystem view without repeating identical
+# stable-root resolution. Candidate page paths are checked on every access.
 # Input: path, query, method, headers, body, and remote address.
 # Output: array reference of status code, content type, body, and optional headers hash.
 sub handle {
     my ( $self, %args ) = @_;
+    my $pages = $self->{pages};
+    my $paths = ref($pages) eq 'Developer::Dashboard::PageStore' ? $pages->{paths} : undef;
+    if ( ref($paths) eq 'Developer::Dashboard::PathRegistry' ) {
+        local $paths->{_path_identity_scope} = {};
+        local $paths->{_runtime_layer_candidate_scope} = {};
+        local $paths->{_installed_skill_inventory_scope} = {};
+        local $pages->{_page_roots_snapshot};
+        local $pages->{_page_containment_root_realpaths} = {};
+        local $pages->{_validated_nav_roots} = {};
+        return $self->_handle_request_with_template_scope(%args);
+    }
+    return $self->_handle_request_with_template_scope(%args);
+}
+
+# _handle_request_with_template_scope(%args)
+# Gives one web request a shared Template Toolkit service cache without retaining
+# compiled include files after the request, so edits are visible next request.
+# Input: normalized request arguments accepted by _handle_request().
+# Output: the response array reference returned by _handle_request().
+sub _handle_request_with_template_scope {
+    my ( $self, %args ) = @_;
+    my $runtime = $self->{runtime};
+    if ( blessed($runtime) && $runtime->isa('Developer::Dashboard::PageRuntime') ) {
+        local $runtime->{_template_processor_scope} = {};
+        return $self->_handle_request(%args);
+    }
+    return $self->_handle_request(%args);
+}
+
+# _handle_request(%args)
+# Dispatches a normalized request through route authorization and dispatch after
+# handle() has established any applicable request-local filesystem inventories.
+# Input: path, query, method, headers, body, and remote address.
+# Output: array reference of status code, content type, body, and optional headers hash.
+sub _handle_request {
+    my ( $self, %args ) = @_;
     my $path   = $args{path} || '/';
     my $method = uc( $args{method} || 'GET' );
+    local $self->{_request_web_settings};
+    local $self->{_request_config_snapshot};
 
     # Cross-site defense first: even the pre-authorization special-case routes
     # below (the login form POST in particular) must never act on a foreign
@@ -322,7 +802,7 @@ sub _request_trust_tier {
         ssl_proxied          => ( $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED} ? 1 : 0 ),
         extra_loopback_hosts => (
             $config_has_web_settings
-            ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
+            ? ( $self->_web_settings->{ssl_subject_alt_names} || [] )
             : []
         ),
     );
@@ -681,7 +1161,7 @@ sub root_response {
         my $instruction = exists $body_params->{instruction} ? $body_params->{instruction} : $params->{instruction};
         my $page = Developer::Dashboard::PageDocument->from_instruction($instruction);
         $page->{meta}{raw_instruction} = $instruction;
-        my $page_id = $page->as_hash->{id} || '';
+        my $page_id = $page->id || '';
         if ( $page_id eq '' && !_transient_url_tokens_allowed() ) {
             return _transient_url_forbidden_response();
         }
@@ -860,8 +1340,21 @@ sub prefixed_ajax_file_response {
 # Output: response array reference.
 sub status_response {
     my ( $self, %args ) = @_;
-    my $payload = $self->_page_status_payload;
-    return [ 200, 'application/json; charset=utf-8', json_encode($payload) ];
+    my $unchanged = 0;
+    my $cached_body = $self->{_status_body_json_cache};
+    my $payload = $self->_page_status_payload(
+        \$unchanged,
+        defined $cached_body ? 1 : 0,
+    );
+    my $body;
+    if ( $unchanged && defined $cached_body ) {
+        $body = $cached_body;
+    }
+    else {
+        $body = json_encode($payload);
+        $self->{_status_body_json_cache} = $body;
+    }
+    return [ 200, 'application/json; charset=utf-8', $body ];
 }
 
 # marked_js_response(%args)
@@ -1357,7 +1850,7 @@ sub _decorate_skill_page_routes {
     my ( $self, $page ) = @_;
     return $page if ref($page) ne 'Developer::Dashboard::PageDocument';
     return $page if ( $page->{meta}{source_kind} || '' ) ne 'skill';
-    my $page_id = $page->as_hash->{id} || '';
+    my $page_id = $page->id || '';
     return $page if $page_id eq '';
 
     my $page_url = $self->_saved_page_href($page_id);
@@ -1385,7 +1878,7 @@ sub _page_route_urls {
         };
     }
 
-    my $page_id = $page->as_hash->{id} || '';
+    my $page_id = $page->id || '';
     my $source_kind = $meta->{source_kind} || '';
     my $is_saved = $source_kind eq 'saved' && $page_id ne '';
     my $is_transient = $source_kind eq 'transient';
@@ -2255,7 +2748,7 @@ sub _render_page_html {
     my %action_urls;
     for my $action ( @{ $page->as_hash->{actions} || [] } ) {
         next if ref($action) ne 'HASH' || !$action->{id};
-        my $saved_action_url = $self->_saved_page_href( $page->as_hash->{id} || '' );
+        my $saved_action_url = $self->_saved_page_href( $page->id || '' );
         $saved_action_url .= '/action/' . uri_escape( $action->{id} ) if $saved_action_url ne '';
         my $atoken = $self->{actions}
           ? $self->{actions}->encode_action_payload(
@@ -2303,7 +2796,7 @@ sub _effective_current_page {
     my ( $self, $page ) = @_;
     my $request_context = $page->{meta}{request_context} || {};
     my $request_path = $request_context->{path} || '';
-    my $page_id = $page->as_hash->{id} || '';
+    my $page_id = $page->id || '';
 
     return $self->_saved_page_url($page_id)
       if $request_path eq '/'
@@ -2314,87 +2807,450 @@ sub _effective_current_page {
 }
 
 # _nav_items_html(%args)
-# Renders saved nav/*.tt bookmark fragments between page chrome and body.
+# Renders saved nav/*.tt bookmark fragments between page chrome and body,
+# skipping runtime preparation only for literal raw fragments with no TT opener
+# and no CODE blocks; dynamic fragments retain normal request-context handling.
 # Input: page document object and runtime context hash reference.
 # Output: HTML fragment string.
 sub _nav_items_html {
     my ( $self, %args ) = @_;
     my $page = $args{page} || return '';
-    my $page_id = $page->as_hash->{id} || '';
+    my $page_id = $page->id || '';
     return '' if $page_id =~ m{\Anav/};
     return '' if ( $page->{meta}{skill_route_id} || '' ) =~ m{\Anav/};
 
     my $paths = $self->{pages}{paths} || return '';
     my @roots = $paths->can('dashboards_layers') ? $paths->dashboards_layers : $paths->dashboards_roots;
-    my %nav_ids;
-    my @nav_ids;
-    for my $dashboards_root (@roots) {
+    my $runtime_context = $args{runtime_context} || {};
+    my $items_html = '';
+    my $current_page = $runtime_context->{current_page} || '';
+    my $use_direct_nav_loader = blessed( $self->{pages} ) && $self->{pages}->can('load_nav_fragment')
+      && ( !blessed( $self->{resolver} ) || $self->{resolver}->isa('Developer::Dashboard::PageResolver') );
+    my $saved_nav_state = $self->_saved_nav_items_snapshot_state( \@roots );
+    if ( $saved_nav_state->{hit} ) {
+        $items_html .= $saved_nav_state->{html} if $saved_nav_state->{html} ne '';
+    }
+    else {
+        my $nav_ids = $self->_nav_ids_for_roots( \@roots );
+        my ( $saved_html, $saved_nav_cacheable );
+        $saved_html = '';
+        $saved_nav_cacheable = 1;
+        for my $nav_id ( @{$nav_ids} ) {
+            my $nav_entry;
+            if ($use_direct_nav_loader) {
+                my $nav_root = $self->_nav_root_for_id($nav_id);
+                $nav_entry = eval {
+                    defined $nav_root
+                      ? $self->{pages}->load_nav_fragment( $nav_id, root => $nav_root )
+                      : $self->{pages}->load_nav_fragment($nav_id);
+                };
+                if ( !$nav_entry ) {
+                    next if $@ =~ /Instruction document did not contain any sections/;
+                    die $@ if $@;
+                    $saved_nav_cacheable = 0;
+                    $nav_entry = eval { $self->_load_named_page($nav_id) };
+                    next if !$nav_entry;
+                    $nav_entry = { kind => 'page', page => $nav_entry };
+                }
+            }
+            else {
+                $saved_nav_cacheable = 0;
+                my $nav_page = eval { $self->_load_named_page($nav_id) };
+                next if !$nav_page;
+                $nav_entry = { kind => 'page', page => $nav_page };
+            }
+
+            if ( $nav_entry->{kind} eq 'literal' ) {
+                $saved_html .= qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">}
+                  . $nav_entry->{body} . '</li>';
+                next;
+            }
+
+            my $nav_page = $nav_entry->{page};
+            next if !$nav_page;
+            $saved_nav_cacheable = 0;
+            my $raw_body = $nav_page->{layout}{body};
+            my $codes = $nav_page->{meta}{codes};
+            my $literal_raw_nav = $self->_is_literal_raw_nav(
+                source_format => $nav_page->{meta}{source_format},
+                body          => $raw_body,
+                codes         => $codes,
+            );
+            if ( !$literal_raw_nav ) {
+                $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
+                $nav_page = $self->{runtime}->prepare_page(
+                    page            => $self->_page_with_runtime_state(
+                        $nav_page,
+                        query_params => $runtime_context->{params} || {},
+                        body_params  => {},
+                        path         => $self->_saved_page_url($page_id),
+                        remote_addr  => $self->{_current_request_context}{remote_addr},
+                        headers      => { host => $self->{_current_request_context}{host} || '' },
+                    ),
+                    source          => $nav_page->{meta}{source_kind} || 'saved',
+                    runtime_context => {
+                        %{ $runtime_context },
+                        current_page => $current_page,
+                    },
+                );
+            }
+            my $fragment = $self->_page_fragment_html($nav_page);
+            next if $fragment eq '';
+            $saved_html .= qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">$fragment</li>};
+        }
+        $items_html .= $saved_html if $saved_html ne '';
+        $self->_store_saved_nav_items_snapshot( $saved_nav_state, $saved_html )
+          if $saved_nav_cacheable;
+    }
+
+    my $dispatcher = $self->_skill_dispatcher;
+    my $literal_skill_nav_items = $dispatcher->all_skill_nav_literal_items_html(\&_escape_html_attr);
+    if ( defined $literal_skill_nav_items ) {
+        $items_html .= $literal_skill_nav_items if $literal_skill_nav_items ne '';
+    }
+    else {
+      for my $nav_page ( @{ $dispatcher->all_skill_nav_pages || [] } ) {
+        my $literal_raw_nav = $self->_is_literal_raw_nav(
+            source_format => $nav_page->{meta}{source_format},
+            body          => $nav_page->{layout}{body},
+            codes         => $nav_page->{meta}{codes},
+        );
+        if ( !$literal_raw_nav ) {
+            $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
+            $nav_page = $self->{runtime}->prepare_page(
+                page            => $self->_page_with_runtime_state(
+                    $nav_page,
+                    query_params => $runtime_context->{params} || {},
+                    body_params  => {},
+                    path         => $self->_saved_page_url($page_id),
+                    remote_addr  => $self->{_current_request_context}{remote_addr},
+                    headers      => { host => $self->{_current_request_context}{host} || '' },
+                ),
+                source          => 'skill',
+                runtime_context => {
+                    %{ $runtime_context },
+                    current_page => $current_page,
+                },
+            );
+        }
+        my $nav_id = $nav_page->id || '';
+        my $fragment = $self->_page_fragment_html($nav_page);
+        next if $fragment eq '';
+        $items_html .= qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">$fragment</li>};
+      }
+    }
+
+    return '' if $items_html eq '';
+    return qq{<section class="dashboard-nav-items"><ul>} . $items_html . qq{</ul></section>};
+}
+
+# _saved_nav_items_snapshot_state($dashboards_roots)
+# Validates a cached static saved-nav HTML snapshot or configures a native
+# watcher before the caller reads the current layered nav files.
+# Input: ordered dashboard-root array reference.
+# Output: state hash containing either a fresh HTML hit or cacheable watcher
+#         metadata; unsupported watchers return a non-cacheable state.
+sub _saved_nav_items_snapshot_state {
+    my ( $self, $roots ) = @_;
+    die 'Saved nav roots must be an array reference' if ref($roots) ne 'ARRAY';
+    return { cacheable => 0 }
+      if grep { !defined $_ || ref($_) || $_ eq '' } @{$roots};
+    my $signature = json_encode( { roots => $roots } );
+    my $cache = $self->{_saved_nav_items_snapshot};
+    my $watcher = $self->{_saved_nav_items_watcher};
+    my $watch_signature = $self->{_saved_nav_watch_signature};
+    if ( ref($watcher) && defined $watch_signature
+        && $watch_signature eq $signature && $watcher->unchanged($signature) )
+    {
+        if ( ref($cache) eq 'HASH' && defined $cache->{signature}
+            && $cache->{signature} eq $signature
+            && defined $cache->{html} && !ref( $cache->{html} ) )
+        {
+            return { hit => 1, html => $cache->{html}, signature => $signature };
+        }
+        return { cacheable => 1, signature => $signature };
+    }
+    if ( ref($watcher) && defined $watch_signature ) {
+        $self->_saved_nav_items_handle_watch_error($watcher)
+          if $watcher->can('last_error') && defined $watcher->last_error;
+    }
+    delete $self->{_saved_nav_items_snapshot};
+    delete $self->{_nav_ids_cache};
+
+    $watcher = $self->_saved_nav_items_watcher;
+    return { cacheable => 0 } if !$watcher;
+    my @watch_paths = $self->_saved_nav_items_watch_paths($roots);
+    return { cacheable => 0 } if !@watch_paths;
+    if ( !$watcher->configure( $signature, \@watch_paths ) ) {
+        my $error = $watcher->can('last_error') ? $watcher->last_error : undef;
+        if ( defined $error && $error ne '' ) {
+            $self->_saved_nav_items_handle_watch_error($watcher);
+        }
+        else {
+            warn "Saved nav snapshot watch setup failed: unknown watcher error\n";
+        }
+        return { cacheable => 0 };
+    }
+    $self->{_saved_nav_watch_signature} = $signature;
+    return { cacheable => 1, signature => $signature };
+}
+
+# _saved_nav_items_watcher()
+# Lazily constructs the optional native watcher used to validate cached saved-nav HTML.
+# Loads the module from the absolute application source path because a request
+# may change the current directory before this first watcher access.
+# Input: none.
+# Output: watcher object, or undef when no native backend is available.
+sub _saved_nav_items_watcher {
+    my ($self) = @_;
+    return $self->{_saved_nav_items_watcher}
+      if ref( $self->{_saved_nav_items_watcher} );
+    return if $self->{_saved_nav_items_watcher_unavailable};
+    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'} ) {
+        my $watcher_module = File::Spec->catfile(
+            dirname( dirname($MODULE_SOURCE_PATH) ), 'IndicatorStore', 'Watch.pm'
+        );
+        require $watcher_module;
+    }
+    my $watcher = Developer::Dashboard::IndicatorStore::Watch->new;
+    if ( !$watcher ) {
+        $self->{_saved_nav_items_watcher_unavailable} = 1;
+        return;
+    }
+    $self->{_saved_nav_items_watcher} = $watcher;
+    return $watcher;
+}
+
+# _saved_nav_items_watch_paths($dashboards_roots)
+# Builds a bounded watch set for nav directories and their nearest existing
+# parents so edits and namespace changes invalidate a static saved-nav snapshot.
+# Input: ordered dashboard-root array reference.
+# Output: sorted unique existing directory paths.
+sub _saved_nav_items_watch_paths {
+    my ( $self, $roots ) = @_;
+    my $paths = $self->{pages};
+    $paths = $paths->{paths} if ref($paths) eq 'Developer::Dashboard::PageStore';
+    my @boundaries = grep { defined $_ && !ref($_) && $_ ne '' }
+      ( blessed($paths) && $paths->can('home') ? $paths->home : (),
+        blessed($paths) && $paths->can('current_project_root') ? $paths->current_project_root : () );
+    my @directories;
+    for my $root ( @{$roots} ) {
+        for my $target ( File::Spec->catdir( $root, 'nav' ) ) {
+            my $directory = $target;
+            while ( !-d $directory ) {
+                my $parent = dirname($directory);
+                last if $parent eq $directory;
+                $directory = $parent;
+            }
+            while ( -d $directory ) {
+                push @directories, $directory;
+                my $at_boundary = grep { $_ eq $directory } @boundaries;
+                if ( !$at_boundary && blessed($paths) && $paths->can('_same_or_descendant_path') ) {
+                    $at_boundary = grep {
+                        $paths->_same_or_descendant_path( $directory, $_ )
+                          && $paths->_same_or_descendant_path( $_, $directory )
+                    } @boundaries;
+                }
+                last if $at_boundary;
+                my $parent = dirname($directory);
+                last if $parent eq $directory;
+                $directory = $parent;
+            }
+        }
+    }
+    push @directories, map { dirname($_) } @boundaries;
+    my %seen;
+    return sort grep { !$seen{$_}++ } @directories;
+}
+
+# _store_saved_nav_items_snapshot($state, $html)
+# Retains a bounded assembled saved-nav fragment only if the watched roots
+# remained event-free while the caller loaded every fragment.
+# Input: cacheable state returned by _saved_nav_items_snapshot_state and HTML scalar.
+# Output: true on a stored snapshot or false when the watch changed or size limit was exceeded.
+sub _store_saved_nav_items_snapshot {
+    my ( $self, $state, $html ) = @_;
+    return 0 if ref($state) ne 'HASH' || !$state->{cacheable};
+    die 'Saved nav snapshot HTML must be a scalar' if !defined $html || ref($html);
+    return 0 if bytes::length($html) > 8_388_608;
+    my $watcher = $self->{_saved_nav_items_watcher};
+    return 0 if !ref($watcher);
+    my $unchanged = $watcher->unchanged( $state->{signature} );
+    if ( !$unchanged ) {
+        $self->_saved_nav_items_handle_watch_error($watcher)
+          if $watcher->can('last_error') && defined $watcher->last_error;
+        return 0;
+    }
+    $self->{_saved_nav_items_snapshot} = {
+        signature => $state->{signature},
+        html      => $html,
+    };
+    return 1;
+}
+
+# _saved_nav_items_handle_watch_error($watcher)
+# Disables a saved-nav watcher after a visible backend failure and releases its resources.
+# Input: watcher object reporting a last_error method.
+# Output: no value; failure diagnostics are written to STDERR.
+sub _saved_nav_items_handle_watch_error {
+    my ( $self, $watcher ) = @_;
+    return if !ref($watcher);
+    my $last_error = $watcher->can('last_error');
+    return if !$last_error;
+    my $error = $last_error->($watcher);
+    return if !defined $error || $error eq '';
+    warn "Saved nav snapshot watch disabled: $error\n";
+    if ( !$watcher->close ) {
+        my $close_error = $last_error->($watcher);
+        $close_error = 'unknown close failure' if !defined $close_error || $close_error eq '';
+        warn "Saved nav snapshot watcher close failed: $close_error\n";
+    }
+    delete $self->{_saved_nav_items_watcher};
+    delete $self->{_saved_nav_watch_signature};
+    $self->{_saved_nav_items_watcher_unavailable} = 1;
+    delete $self->{_saved_nav_items_snapshot};
+    return;
+}
+
+# _nav_ids_for_roots($dashboards_roots)
+# Returns the ordered, de-duplicated saved navigation ids for dashboard layers.
+# It reuses only the filename inventory while each nav directory's high-resolution
+# identity and timestamps are unchanged; page contents are still loaded fresh.
+# Input: array reference of dashboard roots in lookup order.
+# Output: array reference of sorted nav/*.tt ids.
+sub _nav_ids_for_roots {
+    my ( $self, $dashboards_roots ) = @_;
+    return [] if ref($dashboards_roots) ne 'ARRAY';
+
+    my @signature;
+    for my $dashboards_root ( @{$dashboards_roots} ) {
+        next if !defined $dashboards_root || $dashboards_root eq '';
+        my $nav_root = File::Spec->catdir( $dashboards_root, 'nav' );
+        if ( !-d $nav_root ) {
+            push @signature, $nav_root, 'missing';
+            next;
+        }
+        my @stat = Time::HiRes::stat($nav_root);
+        die "Unable to inspect saved navigation directory '$nav_root': $!\n" if !@stat;
+        push @signature, $nav_root, @stat[ 0, 1, 2, 4, 5, 7, 9, 10 ];
+    }
+    my $signature = join "\0", @signature;
+    my $cached = $self->{_nav_ids_cache};
+    if ( ref($cached) eq 'HASH' && defined $cached->{signature} && $cached->{signature} eq $signature
+        && ref( $cached->{ids} ) eq 'ARRAY' )
+    {
+        return [ @{ $cached->{ids} } ];
+    }
+
+    my ( $ids, $cacheable, $root_by_id ) = $self->_scan_nav_directory_ids($dashboards_roots);
+    $self->{_nav_ids_cache} = {
+        signature  => $signature,
+        ids        => [ @{$ids} ],
+        root_by_id => { %{ $root_by_id || {} } },
+    } if $cacheable;
+    return $ids;
+}
+
+# _nav_root_for_id($id)
+# Returns the deepest configured dashboard layer supplying a saved nav id,
+# matching the existing saved-page lookup precedence.
+# Input: nav/<name>.tt id from the cached layered directory scan.
+# Output: configured dashboards root string, or undef when the cache lacks provenance.
+sub _nav_root_for_id {
+    my ( $self, $id ) = @_;
+    my $cached = $self->{_nav_ids_cache};
+    return if ref($cached) ne 'HASH' || ref( $cached->{root_by_id} ) ne 'HASH';
+    return $cached->{root_by_id}{$id};
+}
+
+# _scan_nav_directory_ids($dashboards_roots)
+# Scans each available layered nav directory and returns its sorted .tt ids.
+# Input: array reference of dashboard roots in lookup order.
+# Output: array reference of de-duplicated ids, a cacheable boolean, and a map
+# from id to its deepest supplying root. An unreadable layer is skipped as
+# before, but prevents caching an incomplete list.
+sub _scan_nav_directory_ids {
+    my ( $self, $dashboards_roots ) = @_;
+    my ( %seen, %root_by_id, @nav_ids );
+    my $cacheable = 1;
+    for my $dashboards_root ( @{$dashboards_roots} ) {
+        next if !defined $dashboards_root || $dashboards_root eq '';
         my $nav_root = File::Spec->catdir( $dashboards_root, 'nav' );
         next if !-d $nav_root;
-        opendir my $dh, $nav_root or next;
-        for my $entry ( sort grep {
+        my $dh = $self->_open_nav_directory($nav_root);
+        if ( !$dh ) {
+            $cacheable = 0;
+            next;
+        }
+        $! = 0;
+        my @entries = sort grep {
             $_ ne '.' && $_ ne '..'
               && $_ =~ /\.tt\z/
               && -f File::Spec->catfile( $nav_root, $_ )
-        } readdir $dh )
-        {
+        } $self->_read_nav_directory_entries( $dh, $nav_root );
+        $self->_close_nav_directory( $dh, $nav_root );
+        for my $entry (@entries) {
             my $nav_id = 'nav/' . $entry;
-            push @nav_ids, $nav_id if !$nav_ids{$nav_id}++;
+            if ( !$seen{$nav_id}++ ) {
+                push @nav_ids, $nav_id;
+            }
+            $root_by_id{$nav_id} = $dashboards_root;
         }
-        closedir $dh;
     }
-    my $runtime_context = $args{runtime_context} || {};
-    my @items;
-    my $current_page = $runtime_context->{current_page} || '';
-    for my $nav_id (@nav_ids) {
-        my $nav_page = eval { $self->_load_named_page($nav_id) };
-        next if !$nav_page;
-        $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
-        $nav_page = $self->{runtime}->prepare_page(
-            page            => $self->_page_with_runtime_state(
-                $nav_page,
-                query_params => $runtime_context->{params} || {},
-                body_params  => {},
-                path         => $self->_saved_page_url($page_id),
-                remote_addr  => $self->{_current_request_context}{remote_addr},
-                headers      => { host => $self->{_current_request_context}{host} || '' },
-            ),
-            source          => $nav_page->{meta}{source_kind} || 'saved',
-            runtime_context => {
-                %{ $runtime_context },
-                current_page => $current_page,
-            },
-        );
-        my $fragment = $self->_page_fragment_html($nav_page);
-        next if $fragment eq '';
-        push @items, qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">$fragment</li>};
+    return ( \@nav_ids, $cacheable, \%root_by_id );
+}
+
+# _open_nav_directory($path)
+# Opens one saved navigation directory for enumeration.
+# Input: nav directory path string.
+# Output: open directory handle, or undef when the layer cannot be opened.
+sub _open_nav_directory {
+    my ( $self, $path ) = @_;
+    opendir my $dh, $path or return;
+    return $dh;
+}
+
+# _read_nav_directory_entries($handle, $path)
+# Reads all names from an open saved navigation directory and checks read errors.
+# Input: directory handle and its path for diagnostics.
+# Output: list of directory entry names.
+sub _read_nav_directory_entries {
+    my ( $self, $dh, $path ) = @_;
+    my @entries = readdir $dh;
+    die "Unable to read saved navigation directory '$path': $!\n" if $!;
+    return @entries;
+}
+
+# _close_nav_directory($handle, $path)
+# Closes one saved navigation directory and reports close failures.
+# Input: directory handle and its path for diagnostics.
+# Output: true on success, or a clear exception on failure.
+sub _close_nav_directory {
+    my ( $self, $dh, $path ) = @_;
+    closedir $dh or die "Unable to close saved navigation directory '$path': $!\n";
+    return 1;
+}
+
+# _is_literal_raw_nav(%args)
+# Determines whether a raw navigation fragment can skip request-time template
+# and CODE preparation without changing the rendered fragment.
+# Input: source_format, body, and optional codes array reference.
+# Output: true only for a raw-nav-tt scalar body with no TT opener and no code blocks.
+sub _is_literal_raw_nav {
+    my ( $self, %args ) = @_;
+    return 0 if ( $args{source_format} || '' ) ne 'raw-nav-tt';
+
+    my $body = $args{body};
+    return 0 if !defined $body;
+    return 0 if ref $body;
+    return 0 if index( $body, '[%' ) >= 0;
+
+    my $codes = $args{codes};
+    if ( ref($codes) eq 'ARRAY' ) {
+        return 0 if @{$codes};
     }
 
-    my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $paths );
-    for my $nav_page ( @{ $dispatcher->all_skill_nav_pages || [] } ) {
-        $nav_page = $self->{runtime}->prepare_page(
-            page            => $self->_page_with_runtime_state(
-                $nav_page,
-                query_params => $runtime_context->{params} || {},
-                body_params  => {},
-                path         => $self->_saved_page_url($page_id),
-                remote_addr  => $self->{_current_request_context}{remote_addr},
-                headers      => { host => $self->{_current_request_context}{host} || '' },
-            ),
-            source          => 'skill',
-            runtime_context => {
-                %{ $runtime_context },
-                current_page => $current_page,
-            },
-        );
-        my $nav_id = $nav_page->as_hash->{id} || '';
-        my $fragment = $self->_page_fragment_html($nav_page);
-        next if $fragment eq '';
-        push @items, qq{<li data-nav-id="} . _escape_html_attr($nav_id) . qq{">$fragment</li>};
-    }
-
-    return '' if !@items;
-    return qq{<section class="dashboard-nav-items"><ul>} . join( '', @items ) . qq{</ul></section>};
+    return 1;
 }
 
 # _page_fragment_html($page)
@@ -2476,6 +3332,18 @@ sub _encoded_action_response {
 # Output: page document object.
 sub _load_named_page {
     my ( $self, $id ) = @_;
+    my $snapshot_state;
+    my $can_watch_saved_nav = !$self->{resolver}
+      && blessed( $self->{pages} )
+      && $self->{pages}->can('load_saved_page')
+      && ref( $self->{pages}{paths} );
+    if ($can_watch_saved_nav) {
+        my $paths = $self->{pages}{paths};
+        if ( $paths->can('dashboards_layers') ) {
+            my @roots = $paths->dashboards_layers;
+            $snapshot_state = $self->_saved_nav_items_snapshot_state( \@roots );
+        }
+    }
     my $page = eval {
         $self->{resolver}
           ? $self->{resolver}->load_named_page($id)
@@ -2717,7 +3585,13 @@ sub _custom_skill_route_response {
 sub _skill_dispatcher {
     my ($self) = @_;
     require Developer::Dashboard::SkillDispatcher;
-    return Developer::Dashboard::SkillDispatcher->new( paths => $self->{pages} ? $self->{pages}{paths} : undef );
+    return $self->{_skill_dispatcher}
+      if blessed( $self->{_skill_dispatcher} )
+      && $self->{_skill_dispatcher}->isa('Developer::Dashboard::SkillDispatcher');
+    $self->{_skill_dispatcher} = Developer::Dashboard::SkillDispatcher->new(
+        paths => $self->{pages} ? $self->{pages}{paths} : undef,
+    );
+    return $self->{_skill_dispatcher};
 }
 
 # _skill_route_spec($kind, $skill_name, $target)
@@ -2995,11 +3869,15 @@ sub _sanitize_redirect_target {
 }
 
 # _normalized_saved_page_id($id)
-# Normalizes one saved bookmark id for route generation.
+# Normalizes one saved bookmark id for route generation. Canonical flat ASCII
+# ids return directly; other input keeps the established whitespace and prefix
+# normalization path.
 # Input: saved bookmark id string, optionally already prefixed with /app/.
 # Output: bookmark id string without leading /app/ or duplicate slashes.
 sub _normalized_saved_page_id {
     my ( $self, $id ) = @_;
+    return "$id"
+      if defined $id && !ref($id) && $id =~ /\A[A-Za-z0-9_.-]+\z/;
     $id = _trim($id);
     $id =~ s{\A/+app/+}{};
     $id =~ s{\A/+}{};
@@ -3044,7 +3922,7 @@ sub _top_chrome_html {
     my $share = $readonly ? '' : ( $urls->{edit}   || '' );
     my $play  = $readonly ? '' : ( $urls->{render} || '' );
     my $src   = $readonly ? '' : ( $urls->{source} || '' );
-    my $mode  = $page->as_hash->{mode} || 'edit';
+    my $mode  = $page->mode || 'edit';
     my $ctx   = $page->{meta}{request_context} || {};
     my @links;
     push @links, qq{<button type="button" class="chrome-button" id="play-button" data-play-url="} . _escape_html_attr($play) . qq{">Play</button>} if $mode ne 'render' && $play ne '';
@@ -3137,8 +4015,14 @@ sub _top_context_html {
         ( $ctx->{tier} || '' ) eq 'helper' && ( $ctx->{username} || '' ) ne ''
     ) ? $ctx->{username} : ( $ENV{USER} || eval { getpwuid($<) } || 'user' );
     my $host = $ctx->{host} || '';
-    $host =~ s/^https?:\/\///;
-    $host =~ s/\/.*$//;
+    if ( substr( $host, 0, 7 ) eq 'http://' ) {
+        substr( $host, 0, 7, q{} );
+    }
+    elsif ( substr( $host, 0, 8 ) eq 'https://' ) {
+        substr( $host, 0, 8, q{} );
+    }
+    my $path_start = index( $host, '/' );
+    substr( $host, $path_start ) = q{} if $path_start >= 0;
     my ( $host_only, $port ) = split /:/, $host, 2;
     my $machine_ip = $self->_machine_ip || $host_only || $ctx->{remote_addr} || '127.0.0.1';
     my $host_href = 'http://' . $machine_ip . ( defined $port && $port ne '' ? ':' . $port : '' );
@@ -3151,12 +4035,28 @@ sub _top_context_html {
 }
 
 # _machine_ip()
-# Discovers the preferred machine IPv4 address, preferring VPN-style interfaces before other global addresses.
+# Discovers the preferred machine IPv4 address, preferring VPN-style interfaces
+# before other global addresses. Reuses a short-lived worker-local result so each
+# page request does not scan PATH and execute host network tools; expiry lets a
+# long-lived worker notice interface changes without restarting the dashboard.
 # Input: none.
 # Output: IPv4 address string or undef when unavailable.
 sub _machine_ip {
     my ($self) = @_;
+    my $now = time;
+    my $cache = $self->{_machine_ip_cache};
+    if ( ref($cache) eq 'HASH'
+        && ref( $cache->{candidates} ) eq 'ARRAY'
+        && defined $cache->{expires_at}
+        && $cache->{expires_at} > $now ) {
+        return $cache->{candidates}[0];
+    }
+
     my @candidates = $self->_ip_candidates;
+    $self->{_machine_ip_cache} = {
+        candidates => \@candidates,
+        expires_at => $now + $MACHINE_IP_CACHE_TTL_SECONDS,
+    };
     return $candidates[0] if @candidates;
     return;
 }
@@ -3181,15 +4081,19 @@ sub _ip_candidates {
 }
 
 # _ip_interface_pairs()
-# Reads active global IPv4 interface/address pairs from the host system.
+# Reads active global IPv4 interface/address pairs using native host commands.
+# Windows tries ipconfig after ip; Unix skips that Windows-only command and
+# falls back directly to ifconfig.
 # Input: none.
 # Output: list of hashes with iface and ip keys.
 sub _ip_interface_pairs {
     my ($self) = @_;
     my @pairs = $self->_ip_pairs_from_ip;
     return @pairs if @pairs;
-    @pairs = $self->_ip_pairs_from_ipconfig;
-    return @pairs if @pairs;
+    if ( is_windows() ) {
+        @pairs = $self->_ip_pairs_from_ipconfig;
+        return @pairs if @pairs;
+    }
     return $self->_ip_pairs_from_ifconfig;
 }
 
@@ -3288,32 +4192,90 @@ sub _ip_pairs_from_ifconfig {
 }
 
 # _prompt_summary()
-# Renders the older page-header indicator summary for page chrome.
+# Renders the older page-header indicator summary for page chrome without
+# copying the payload array or building a second intermediate list. Reuses the
+# rendered scalar only after collector and indicator freshness validation.
 # Input: none.
 # Output: short status strip string.
 sub _prompt_summary {
     my ($self) = @_;
-    my $payload = $self->_page_status_payload;
-    my @items = @{ $payload->{array} || [] };
-    my @parts;
-    for my $item (@items) {
-        push @parts, $item->{status} . $item->{alias};
-    }
-    return join ' ', @parts;
+    my $cached_summary = $self->{_prompt_summary_cache};
+    $cached_summary = undef if ref($cached_summary);
+    my $unchanged = 0;
+    my $payload = $self->_page_status_payload( \$unchanged, defined $cached_summary ? 1 : 0 );
+    return $cached_summary if $unchanged && defined $cached_summary;
+
+    my $summary = join ' ', map { $_->{status} . $_->{alias} } @{ $payload->{array} || [] };
+    $self->{_prompt_summary_cache} = $summary;
+    return $summary;
 }
 
-# _page_status_payload()
+# _page_status_payload($unchanged_ref, $skip_when_unchanged)
 # Builds the `/system/status` payload from the indicator store.
-# Input: none.
-# Output: hash reference with array, hash, and status maps.
+# Invalidates cached prompt text whenever synchronization changes configured or
+# persisted indicator data, including when the status route synchronizes first.
+# Input: optional scalar reference receiving the sync freshness result, and an
+#        optional boolean that allows a caller with a validated cached response
+#        to skip building an identical payload. A validated config snapshot
+#        retains its canonical collector-job signature between requests.
+# Output: hash reference with array, hash, and status maps, or undef when a
+#         caller may safely reuse its unchanged serialized response.
 sub _page_status_payload {
-    my ($self) = @_;
+    my ( $self, $unchanged_ref, $skip_when_unchanged ) = @_;
+    $$unchanged_ref = 0 if ref($unchanged_ref) eq 'SCALAR';
     my $indicators = $self->{prompt} ? $self->{prompt}{indicators} : undef;
     return { array => [], hash => {}, status => {} } if !$indicators || !$indicators->can('page_header_payload');
+    my $inventory;
     if ( $self->{config} && $self->{config}->can('collectors') ) {
-        $indicators->sync_collectors( $self->{config}->collectors );
+        my $snapshot = $self->_request_config_snapshot;
+        my $collector_method = $self->{config}->can('indicator_collectors')
+          ? 'indicator_collectors'
+          : 'collectors';
+        my $collectors;
+        if ( $snapshot && ref( $snapshot->{indicator_collectors} ) eq 'ARRAY' ) {
+            $collectors = $snapshot->{indicator_collectors};
+        }
+        elsif ($snapshot) {
+            $collectors = $snapshot->{indicator_collectors} = $self->{config}->$collector_method(
+            merged_config        => $snapshot->{merged_config},
+            skill_config_entries => $snapshot->{skill_config_entries},
+            );
+        }
+        else {
+            $collectors = $self->{config}->$collector_method;
+        }
+        my $collector_jobs_signature;
+        if ( ref($snapshot) eq 'HASH' ) {
+            $collector_jobs_signature = $snapshot->{indicator_collectors_signature};
+            if ( !defined $collector_jobs_signature ) {
+                $collector_jobs_signature = json_encode($collectors);
+                $snapshot->{indicator_collectors_signature} = $collector_jobs_signature;
+            }
+        }
+        else {
+            $collector_jobs_signature = json_encode($collectors);
+        }
+        my $sync = $indicators->sync_collectors(
+            $collectors,
+            return_indicators            => 1,
+            return_unchanged             => 1,
+            skip_indicators_if_unchanged => $skip_when_unchanged ? 1 : 0,
+            collector_jobs_signature    => $collector_jobs_signature,
+        );
+        if ( ref($sync) eq 'HASH' ) {
+            my $sync_unchanged = $sync->{unchanged} ? 1 : 0;
+            $$unchanged_ref = $sync_unchanged if ref($unchanged_ref) eq 'SCALAR';
+            delete $self->{_prompt_summary_cache} if !$sync_unchanged;
+        }
+        $inventory = $sync->{indicators} if ref($sync) eq 'HASH' && ref($sync->{indicators}) eq 'ARRAY';
+        return undef
+          if $skip_when_unchanged
+          && ref($unchanged_ref) eq 'SCALAR'
+          && $$unchanged_ref;
     }
-    return $indicators->page_header_payload;
+    return defined $inventory
+      ? $indicators->page_header_payload( indicators => $inventory )
+      : $indicators->page_header_payload;
 }
 
 # _session_cookie($session_id, $secure)
@@ -3628,7 +4590,18 @@ clients and browsers too old to send it working unchanged.
 
 =head2 new, handle
 
-Construct and dispatch the local web application.
+Construct and dispatch the local web application. C<handle> establishes
+request-local path-identity, runtime-layer, installed-skill, web-settings,
+merged-config, and Template Toolkit service scopes. Nested page/nav rendering
+can reuse one Template Toolkit service for the same ordered include roots
+during that request; runtime-layer directory snapshots and path identities are
+discarded on return. The preferred host-address candidate list is retained on
+the worker for five seconds and is refreshed after expiry.
+
+Input: constructor dependencies for C<new>; normalized path, query, method,
+headers, body, and remote address for C<handle>.
+Output: C<new> returns a Web::App object; C<handle> returns a response array
+reference containing status, content type, body, and optional response headers.
 
 =head2 legacy_app_response
 
@@ -3642,6 +4615,16 @@ schemes and malformed targets are rejected.
 Input: saved bookmark id and normalized request metadata.
 Output: response array reference of status, content type, body, and optional
 headers.
+
+=head2 _machine_ip
+
+Returns the preferred machine IPv4 address for browser chrome, preferring VPN
+interfaces before other global addresses. A worker-local candidate list is
+reused for five seconds, including an empty result, after which host interface
+discovery runs again so network changes become visible.
+
+Input: none.
+Output: preferred IPv4 address string, or C<undef> when no address is available.
 
 =head2 _serve_static_file($type, $filename)
 
@@ -3694,6 +4677,17 @@ Use this file when changing browser routes, helper login behavior, page render/s
 =head1 HOW TO USE
 
 Construct it with the action runner, auth service, config service, page store, prompt, page resolver, page runtime, and session store, then hand it to the Dancer adapter or PSGI bootstrap. Route-specific behavior belongs here rather than in the transport wrapper.
+
+For each request, C<handle()> lazily captures merged runtime configuration
+only when web settings or collector status needs it. Authorization, page chrome,
+and status assembly share that request-local snapshot, including its skill
+config entries; the snapshot is discarded on return so changes appear on the
+next request. Across requests, Linux may use inotify as an invalidation hint;
+without that native backend, the app hashes exact config-file content and
+checks layered-directory metadata before reusing a snapshot. Same-size edits,
+new or removed config files, and directory-layer changes therefore trigger a
+fresh merge on Linux, macOS, and Windows. Direct helper calls outside
+C<handle()> continue to use fresh configuration reads.
 
 =head1 WHAT USES IT
 

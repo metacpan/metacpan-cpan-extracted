@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.11.3';
+our $VERSION = '1.11.4';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -216,9 +216,10 @@ sub _transfer_p {
 # are the pinned spec's schemas: a member it requires and never sends as null is
 # required, a nullable or optional one may be absent or null, and every one
 # present has the spec's type at every depth, so a version served as "3" fails
-# the call rather than reaching the caller as a string. `standing`,
-# `license_type`, `format` and `outcome` stay strings, open sets as the spec
-# documents them, and a sample row is a hash whatever its columns.
+# the call rather than reaching the caller as a string. A `date` or
+# `date-time` member is RFC 3339's, as its `format` says, on a day that exists.
+# `standing`, `license_type`, `format` and `outcome` stay strings, open sets as
+# the spec documents them, and a sample row is a hash whatever its columns.
 my $VERSION_SHAPE = [fields => [
     [id => ['string'], 1], [version => ['integer'], 1], [summary => ['string'], 1],
     [formats => [list => ['string']], 1], [sample_formats => [list => ['string']]],
@@ -226,12 +227,12 @@ my $VERSION_SHAPE = [fields => [
 my $DATABASE_SHAPE = [fields => [
     [base => ['string'], 1], [name => ['string'], 1], [summary => ['string'], 1],
     [standing => ['string'], 1], [open => ['boolean'], 1], [license_type => ['string']],
-    [starts => ['string']], [expires => ['string']], [renews_at => ['string']],
-    [notice_due_at => ['string']], [versions => [list => $VERSION_SHAPE], 1],
+    [starts => ['date-time']], [expires => ['date-time']], [renews_at => ['date-time']],
+    [notice_due_at => ['date-time']], [versions => [list => $VERSION_SHAPE], 1],
 ]];
 my $COLUMN_SHAPE = [fields => [[name => ['string'], 1], [type => ['string'], 1], [description => ['string']]]];
 my $METADATA_SHAPE = [fields => [
-    [id => ['string'], 1], [update_freq => ['string']], [updated => ['string'], 1],
+    [id => ['string'], 1], [update_freq => ['string']], [updated => ['date'], 1],
     [entries => ['integer'], 1], [schema => [map_of => [list => $COLUMN_SHAPE]], 1],
     [sample => [map_of => [list => ['object']]]], [size => [map_of => ['integer']], 1],
     [sample_size => [map_of => ['integer']]], [sample_entries => ['integer']],
@@ -241,7 +242,7 @@ my $DOWNLOAD_SHAPE = [fields => [
     [dataset_id => ['string'], 1], [format => ['string'], 1], [outcome => ['string'], 1],
     [sample => ['boolean'], 1], [open => ['boolean'], 1], [bytes => ['integer']],
     [http_status => ['integer']], [apikey_id => ['string']], [client_ip => ['string']],
-    [user_agent => ['string']], [created => ['string'], 1],
+    [user_agent => ['string']], [created => ['date-time'], 1],
 ]];
 my %UNWRAP = (
     list => [databases => [fields => [[databases => [list => $DATABASE_SHAPE], 1]]]],

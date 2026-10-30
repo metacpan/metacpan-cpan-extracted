@@ -416,10 +416,10 @@ components:
       serializedValue: |
         --KJvXX
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
 
-        $yatta_encoded
+        <encoded yatta>
         --KJvXX
 paths:
   /array:

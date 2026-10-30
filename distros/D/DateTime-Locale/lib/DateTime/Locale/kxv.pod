@@ -435,6 +435,24 @@ Kuvi locale.
    1995-12-22T09:05:02 = sukru, 22 pande 1995 ad
   -0010-09-15T04:44:23 = sani, 15 bado -10 bc
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = ad 2008 maha lenju
+   1995-12-22T09:05:02 = ad 1995 pande lenju
+  -0010-09-15T04:44:23 = bc -10 bado lenju
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = ad 2008 maha lenju 5, manga
+   1995-12-22T09:05:02 = ad 1995 pande lenju 22, sukru
+  -0010-09-15T04:44:23 = bc -10 bado lenju 15, sani
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = ad 2008 maha lenju 5
+   1995-12-22T09:05:02 = ad 1995 pande lenju 22
+  -0010-09-15T04:44:23 = bc -10 bado lenju 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 maha 2008 ad
@@ -506,6 +524,12 @@ Kuvi locale.
    2008-02-05T18:30:30 = manga, 5 maha
    1995-12-22T09:05:02 = sukru, 22 pande
   -0010-09-15T04:44:23 = sani, 15 bado
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = maha lenju 5, manga
+   1995-12-22T09:05:02 = pande lenju 22, sukru
+  -0010-09-15T04:44:23 = bado lenju 15, sani
 
 =head3 MMMMW-count-other (MMMM 'tã' 'vara' W)
 

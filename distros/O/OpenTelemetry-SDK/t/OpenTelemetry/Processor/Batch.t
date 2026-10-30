@@ -57,13 +57,17 @@ tests 'Flush queue' => sub {
     $processor->shutdown->get;
 };
 
-tests 'Ignore calls on shutdown' => sub {
+tests 'Shutdown flushes and ignores further calls' => sub {
     my $processor = CLASS->new(
         exporter => my $exporter = Local::Exporter::File->new,
     );
 
     $processor->shutdown->get;
-    is $exporter->calls, [ [ 'shutdown', U ] ], 'Calling shutdown propagates to exporter';
+    is $exporter->calls, [
+        [ 'force_flush' ],
+        [ 'shutdown' ],
+    ], 'Calling shutdown propagates to exporter';
+
     $exporter->reset;
 
     is $processor->force_flush->get, TRACE_EXPORT_SUCCESS, 'force_flush returns success';

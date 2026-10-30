@@ -1,0 +1,22 @@
+title: enter_plan_mode the person says no to leaves the mode as it is
+permission_mode: default
+approve: [ "no: just do it" ]
+prompt: Restructure the project.
+script:
+  - tool_calls:
+      - [ enter_plan_mode, {} ]
+  - tool_calls:
+      - [ enter_plan_mode, {} ]
+  - text: going on without plan mode
+expect:
+  answer: going on without plan mode
+  permissions:
+    - { tool: enter_plan_mode }
+    - { tool: enter_plan_mode }
+  tools:
+    # the person says no: Claude Code's rejection, with the reason
+    - { name: enter_plan_mode, error: true, text: "\\AThe user doesn't want to proceed with this tool use\\..*just do it" }
+    # the answers ran out: no
+    - { name: enter_plan_mode, error: true, not_text: Entered plan mode }
+  events:
+    - { type: permission.denied, tool: enter_plan_mode, by: user }

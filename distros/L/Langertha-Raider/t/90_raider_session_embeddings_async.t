@@ -87,6 +87,25 @@ use Langertha::Raider;
   __PACKAGE__->meta->make_immutable;
 }
 
+{
+  # An embedding engine whose simple_embedding_f is an async sub, like
+  # Langertha::Role::Embedding's: it is suspended on the loop until its
+  # request (a timer here) is done.
+  package AsyncEmbedder;
+  use Moose;
+  use Future::AsyncAwait;
+  has loop     => (is => 'ro', required => 1);
+  has finished => (is => 'rw', default => 0);
+  sub async_loop { $_[0]->loop }
+  async sub simple_embedding_f {
+    my ( $self, $text ) = @_;
+    await $self->loop->delay_future(after => 0.05);
+    $self->finished($self->finished + 1);
+    return [ 1, 0 ];
+  }
+  __PACKAGE__->meta->make_immutable;
+}
+
 # A raid needs at least one tool.
 sub new_raider {
   my ( %args ) = @_;
@@ -221,6 +240,25 @@ subtest 'search works with partly filled slots' => sub {
   like($hits[0], qr/narwhal tusk measurements/, 'the embedded match ranks first');
   unlike($text, qr/zebra notes/, 'the entry still in flight is not scored, not waited for');
   is(scalar @hits, 2, 'only the embedded entries are ranked');
+};
+
+# A raider that goes away while its embeddings are in flight -- a subagent's,
+# at the end of its run (k160) -- must not drop them: each async sub would
+# wake up without its future and Future::AsyncAwait warns "lost its returning
+# future".
+subtest 'a raider that goes away lets its embeddings in flight finish' => sub {
+  my $loop     = IO::Async::Loop->new;
+  my $embedder = AsyncEmbedder->new(loop => $loop);
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_ };
+  {
+    my $raider = new_raider(engine => LoopEngine->new(loop => $loop), embedding_engine => $embedder);
+    $raider->add_session_history({ role => 'user', content => 'zebra' }, { role => 'assistant', content => 'tusk' });
+    is(scalar keys %{$raider->_pending_embeddings}, 2, 'two embeddings in flight');
+  }
+  $loop->delay_future(after => 0.3)->get;
+  is($embedder->finished, 2, 'both ran to their end');
+  is_deeply([ grep { /lost its returning future/ } @warnings ], [], 'no future was lost') or diag @warnings;
 };
 
 subtest 'the embedding engine must share the raid loop' => sub {

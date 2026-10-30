@@ -435,6 +435,24 @@ Walser Switzerland locale.
    1995-12-22T09:05:02 = n. Chr 1995 Chr 22, Fri
   -0010-09-15T04:44:23 = v. Chr. -10 Her 15, Sam
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = n. Chr 2008 Hornig
+   1995-12-22T09:05:02 = n. Chr 1995 Chrištmánet
+  -0010-09-15T04:44:23 = v. Chr. -10 Herbštmánet
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = n. Chr 2008 Hornig 5, Ziš
+   1995-12-22T09:05:02 = n. Chr 1995 Chrištmánet 22, Fri
+  -0010-09-15T04:44:23 = v. Chr. -10 Herbštmánet 15, Sam
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = n. Chr 2008 Hornig 5
+   1995-12-22T09:05:02 = n. Chr 1995 Chrištmánet 22
+  -0010-09-15T04:44:23 = v. Chr. -10 Herbštmánet 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = n. Chr 2008 Hor 5
@@ -506,6 +524,12 @@ Walser Switzerland locale.
    2008-02-05T18:30:30 = Ziš, 5. Hor
    1995-12-22T09:05:02 = Fri, 22. Chr
   -0010-09-15T04:44:23 = Sam, 15. Her
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Hornig 5, Ziš
+   1995-12-22T09:05:02 = Chrištmánet 22, Fri
+  -0010-09-15T04:44:23 = Herbštmánet 15, Sam
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

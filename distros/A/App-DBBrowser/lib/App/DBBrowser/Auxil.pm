@@ -410,11 +410,20 @@ sub column_names_and_types {
                 $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
             }
         }
-        #elsif ( $driver eq 'DuckDB' ) {
-        #    $sth->execute();
-        #    $column_names = [ map { decode('UTF-8', $_) } @{$sth->{NAME}} ];
-        #    $column_types = [ @{$sth->{TYPE}} ];
-        #}
+        elsif ( $driver eq 'DB2' && length $sf->{o}{G}{db2_encoding} ) {
+            $sth->execute();
+            my $encoding = Encode::find_encoding( $sf->{o}{G}{db2_encoding} );
+            if ( ! ref $encoding ) {
+                die "Unknown encoding: $sf->{o}{G}{db2_encoding}";
+            }
+            $column_names = [ map { $encoding->decode( $_ ) } @{$sth->{NAME}} ];
+            $column_types = [ @{$sth->{TYPE}} ];
+        }
+        elsif ( $driver eq 'DuckDB' && $sf->{o}{G}{duckdb_utf8_decode} ) {
+            $sth->execute();
+            $column_names = [ map { decode( 'UTF-8', $_ ) } @{$sth->{NAME}} ];
+            $column_types = [ @{$sth->{TYPE}} ];
+        }
         else {
             $sth->execute();
             $column_names = [ @{$sth->{NAME}} ];

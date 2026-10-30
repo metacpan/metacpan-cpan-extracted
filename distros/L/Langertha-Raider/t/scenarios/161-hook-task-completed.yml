@@ -1,0 +1,44 @@
+title: a TaskCompleted hook keeps a task from being completed until its check passes; starting it fires nothing (ADR 0022 addendum)
+files:
+  .claude/settings.json: |
+    { "hooks": { "TaskCompleted": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/task-completed", "args": [] } ] }
+    ] } }
+  hooks/task-completed: |
+    #!/bin/sh
+    input=$(cat)
+    printf '%s\n' "$input" | grep -o '"hook_event_name":"[^"]*"\|"task_id":"[^"]*"\|"task_subject":"[^"]*"' | sort >> {{ROOT}}/completed.log
+    [ -f {{ROOT}}/green ] || { echo "the tests are not green yet" >&2; exit 2; }
+    exit 0
+executable: [ hooks/task-completed ]
+prompt: Do the work.
+script:
+  - tool_calls:
+      - [ task_create, { subject: Fix the parser, description: make the tests pass } ]
+      - [ task_update, { taskId: "1", status: in_progress } ]
+      - [ task_update, { taskId: "1", status: completed } ]
+  - tool_calls:
+      - [ bash, { command: touch green } ]
+      - [ task_update, { taskId: "1", status: completed } ]
+  - text: finished
+expect:
+  answer: finished
+  files:
+    completed.log: |
+      "hook_event_name":"TaskCompleted"
+      "task_id":"1"
+      "task_subject":"Fix the parser"
+      "hook_event_name":"TaskCompleted"
+      "task_id":"1"
+      "task_subject":"Fix the parser"
+  todos:
+    - { content: Fix the parser, status: completed }
+  tools:
+    - { name: task_create }
+    - { name: task_update, text: '\AUpdated task #1 status\z' }
+    - { name: task_update, error: true, text: '\ATaskCompleted hook error: the tests are not green yet\z' }
+    - { name: bash }
+    - { name: task_update, text: '\AUpdated task #1 status\z' }
+  events:
+    - { type: hook.ran, hook_event: TaskCompleted, outcome: block, exit: 2 }
+    - { type: hook.ran, hook_event: TaskCompleted, outcome: success, exit: 0 }

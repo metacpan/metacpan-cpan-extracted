@@ -1,5 +1,5 @@
 package Langertha::Raider::PerlTools;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: MCP::Server factory with Perl evaluation, syntax check, and module install
 
 use strict;
@@ -47,12 +47,13 @@ sub _no_perl_message {
 sub build_perl_tools_server {
   my %args = @_;
   my $root       = path($args{root} // '.')->absolute;
+  my $lib_root   = defined $args{lib_root} ? path($args{lib_root})->absolute : $root;
   my $lib_target_override = $args{lib_target};
   my $install_timeout     = $args{install_timeout} // 300;
 
   my $resolve_lib_target = sub {
-    return path($lib_target_override)->absolute($root)->stringify if defined $lib_target_override;
-    return Langertha::Raider::Home->project_base($root)->child('lib')->stringify;
+    return path($lib_target_override)->absolute($lib_root)->stringify if defined $lib_target_override;
+    return Langertha::Raider::Home->project_base($lib_root)->child('lib')->stringify;
   };
 
   my $perl5lib_for = sub {
@@ -104,7 +105,7 @@ sub build_perl_tools_server {
     return if -d $dir && -f $dir->child('cpanfile');
 
     # A target in the project's .raider/ comes with its .gitignore.
-    my $store = Langertha::Raider::SessionStore->new(root => $root->stringify);
+    my $store = Langertha::Raider::SessionStore->new(root => $lib_root->stringify);
     $store->prepare_base if $store->base->subsumes($dir->absolute($root));
     $dir->mkpath;
     my $perl_version = _tool_perl_version($perl);
@@ -337,7 +338,7 @@ Langertha::Raider::PerlTools - MCP::Server factory with Perl evaluation, syntax 
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -353,6 +354,7 @@ one all three tools are a tool error there, and nothing runs.
 
     my $server = Langertha::Raider::PerlTools::build_perl_tools_server(
         root       => '/some/dir',  # working root (default: the current directory)
+        lib_root   => '/some',      # where the private lib lives (default: root)
         lib_target => '.raider/lib',  # optional override
         install_timeout => 300,       # seconds per cpanm run (default 300)
     );
@@ -362,6 +364,12 @@ and C<perl_cpanm> registered. A lib target inside the project's F<.raider/>
 (the default, F<.raider/lib>) is created through
 L<Langertha::Raider::SessionStore/prepare_base>, which writes
 F<.raider/.gitignore> when there is none.
+
+C<lib_root> is the project the private lib belongs to when the tools work
+somewhere else: a git worktree of it (ADR 0032). The default lib target
+(F<.raider/lib>) and a relative C<lib_target> are read against it, and so
+is its F<.raider/>; the code still runs in C<root>, and an explicit
+C<options.target> of C<perl_cpanm> still has to lie inside C<root>.
 
 =head1 TOOLS
 
@@ -408,7 +416,7 @@ otherwise the message of whatever else kept it from running.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -429,5 +437,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

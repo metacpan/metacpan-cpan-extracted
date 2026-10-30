@@ -1,0 +1,15 @@
+title: the mode given on the command line wins over default_mode of the config file
+permission_mode: acceptEdits
+files:
+  .raider/config.yml: |
+    permissions:
+      default_mode: plan
+prompt: Go.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+  - text: done
+expect:
+  files: { a.txt: "a\n" }
+  tools:
+    - { name: write_file }

@@ -62,6 +62,9 @@ BEGIN
     our $VERSION = 'v0.1.2';
 };
 
+use strict;
+use warnings;
+
 {
     no warnings 'once';
     $DateTime::Lite::IsPurePerl //= 1;

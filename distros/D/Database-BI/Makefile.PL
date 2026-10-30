@@ -17,7 +17,7 @@ WriteMakefile(
 	ABSTRACT_FROM => 'lib/Database/BI.pm',
 	AUTHOR		=> 'Nigel Horne <njh@nigelhorne.com>',
 	LICENSE		  => 'gpl_2',
-	MIN_PERL_VERSION => '5.020000',
+	MIN_PERL_VERSION => '5.028000',	# sub NAME :Attr ($sig) -- attributes before the signature -- needs 5.28
 	EXE_FILES	=> ['script/database-bi'],
 	PREREQ_PM => {
 		'Carp'		=> 0,
@@ -37,6 +37,7 @@ WriteMakefile(
 		'Mojo::Base' => 0,
 		'Mojo::JSON' => 0,
 		'HTML::D3' => '0.23',	# 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
+		'HTML::TagCloud' => '0.38',	# word cloud page (/wordcloud)
 		'HTML::TableExtract'	=> 0,
 		'HTTP::Request'			=> 0,		# Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
@@ -44,6 +45,7 @@ WriteMakefile(
 		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)
 		'DB_File'			=> 0,		# Used in DataSource.pm for Berkeley DB magic-byte detection
 		'Mojolicious'	=> '9.49',
+		'Mojolicious::Plugin::Buffer'          => 0,
 		'Mojolicious::Plugin::TemplateToolkit' => 0,
 		'Params::Get'	=> 0.17,
 		'Params::Validate::Strict'	=> '0.41',
@@ -56,6 +58,7 @@ WriteMakefile(
 		'POSIX'			=> 0,		# For floor/ceil in Calc.pm (core module, listed for completeness)
 		'Spreadsheet::ParseXLSX'	=> 0,
 		'Sub::Protected' => 0.03,
+		'Text::CSV'	=> 0,		# script/bi-alert's fallback reader when Database::Abstraction cannot open the file
 		'version'        => '0.77',
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
@@ -67,7 +70,7 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'Test::Mojo' => 0,
 		'Test::Needs' => 0,
-		'Test::Permissions' => 0.001.2,
+		'Test::Permissions' => '0.001.2',
 		'Test::Returns' => 0.005,
 		'Test::Without::Module' => 0,
 		'Text::xSV::Slurp' => 0,

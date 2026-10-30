@@ -30,4 +30,9 @@ ok(
     'common WebSocket connection is a Linux::Event Stream',
 );
 
+ok(
+    !grep { m{\ALinux/Event/HTTP(?:/|\.pm)} } keys %INC,
+    'WebSocket loads independently of Linux::Event::HTTP',
+);
+
 done_testing;

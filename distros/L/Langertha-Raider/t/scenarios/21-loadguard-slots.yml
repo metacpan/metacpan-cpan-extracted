@@ -1,0 +1,21 @@
+title: loadguard refuses a heavy command when every heavy slot is taken by a running raider's command
+proc:
+  memory_full: 0.3
+  swap: 20
+  cpus: 4
+  processes:
+    - { pid: 100, ppid: 1, comm: raider, argv: [ /usr/bin/perl, /x/bin/raider, go ] }
+    - { pid: 101, ppid: 100, comm: prove, argv: [ /usr/bin/perl, /usr/bin/prove, -lr, t ] }
+    - { pid: 102, ppid: 100, comm: dzil, argv: [ dzil, test ] }
+env:
+  LOADGUARD_HEAVY_SLOTS: 2
+prompt: Run the tests too.
+script:
+  - tool_calls:
+      - [ bash, { command: 'touch ran.txt; dzil build' } ]
+  - text: später
+expect:
+  answer: später
+  absent: [ ran.txt ]
+  tools:
+    - { name: bash, error: true, text: 'heavy command \(dzil build\): 2/2 heavy slots busy \(prove; dzil test\), memory pressure full=0\.3%.*Wait for one to finish, then retry' }

@@ -496,7 +496,8 @@ is_rel(power_t_test(n => 30, delta => 0.5)->{power}, 0.4778409859409133, 1e-9,
 throws_ok { power_t_test(n => 30, delta => 0.5, power => undef, bogus => 1) }
 	qr/unknown argument 'bogus'/, 'unknown argument croaks';
 throws_ok { power_t_test(n => 30, delta => 0.5, 'power') }
-	qr/Usage: power_t_test/, 'an odd argument list croaks';
+	qr/\Ausage: power_t_test\(.*^options:\n.*^example:\n.*\n\npower_t_test: error: arguments must be name => value pairs\n\z/ms,
+	'an odd argument list croaks with the help screen, and the error last';
 
 # R's assert_NULL_or_prob(). power => 1.5 used to run the n bracket out to
 # 1.3e12 and report that as the required sample size.
@@ -549,8 +550,11 @@ throws_ok { power_t_test(n => 30, sd => 0, power => 0.8, delta => undef) }
 # power => 0.2 is already exceeded at n = 2 when delta is 5. R extends the
 # bracket below its own lower end and answers n = 1.406729, which is not a
 # sample size. Used to return n = 2.00004 with power => 0.2 attached.
+# The upper end of the bracket is formatted by perl's %g, which on an MSVCRT
+# perl (Strawberry 5.24) writes 1e7 as 1e+007, so take it from perl too.
+my $n_hi = quotemeta sprintf('%g', 1e7);
 throws_ok { power_t_test(power => 0.2, delta => 5, sd => 1, n => undef) }
-	qr/no 'n' in \[2, 1e\+07\] gives a power of 0\.2/, 'an unreachable n croaks';
+	qr/no 'n' in \[2, $n_hi\] gives a power of 0\.2/, 'an unreachable n croaks';
 # a sig_level is a probability, so its bracket cannot be widened. R widens it
 # anyway (extendInt = "yes") and returns sig.level = 1.071987. Used to return
 # 0.99994 with power => 0.99 attached.

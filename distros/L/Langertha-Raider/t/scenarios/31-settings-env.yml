@@ -1,0 +1,12 @@
+title: the env of .claude/settings.json is set for the tools
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/settings.json: '{ "env": { "RAIDER_SCENARIO_VAR": "from-settings" } }'
+prompt: Show the variable.
+script:
+  - tool_calls:
+      - [ bash, { command: 'echo "v=$RAIDER_SCENARIO_VAR"' } ]
+  - text: ok
+expect:
+  tools:
+    - { name: bash, text: 'v=from-settings' }

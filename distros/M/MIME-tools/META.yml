@@ -1,7 +1,7 @@
 ---
 abstract: 'Tools to manipulate MIME messages'
 author:
-  - "Eryq <eryq@zeegee.com>, David F. Skoll <dfs@roaringpenguin.com>, Dave O'Neill <dmo@roaringpenguin.com>"
+  - "Eryq <eryq@zeegee.com>, Dianne Skoll <dianne@skoll.ca>, Dave O'Neill <dmo@roaringpenguin.com>"
 build_requires:
   ExtUtils::MakeMaker: 6.42
   Test::Deep: 0
@@ -37,4 +37,7 @@ requires:
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 5.520
+  repository:
+    type: git
+    url: https://salsa.debian.org/dskoll/mime-tools
+version: 5.522

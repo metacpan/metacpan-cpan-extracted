@@ -16,6 +16,8 @@ lib/SPVM/UV/Callback/Async.pm
 lib/SPVM/UV/Callback/Async.spvm
 lib/SPVM/UV/Callback/Close.pm
 lib/SPVM/UV/Callback/Close.spvm
+lib/SPVM/UV/Callback/Exit.pm
+lib/SPVM/UV/Callback/Exit.spvm
 lib/SPVM/UV/Callback/Idle.pm
 lib/SPVM/UV/Callback/Idle.spvm
 lib/SPVM/UV/Callback/Poll.pm
@@ -51,6 +53,10 @@ lib/SPVM/UV/Handle/Poll.build
 lib/SPVM/UV/Handle/Poll.c
 lib/SPVM/UV/Handle/Poll.pm
 lib/SPVM/UV/Handle/Poll.spvm
+lib/SPVM/UV/Handle/Process.build
+lib/SPVM/UV/Handle/Process.c
+lib/SPVM/UV/Handle/Process.pm
+lib/SPVM/UV/Handle/Process.spvm
 lib/SPVM/UV/Handle/Stream.build
 lib/SPVM/UV/Handle/Stream.c
 lib/SPVM/UV/Handle/Stream.pm
@@ -63,6 +69,8 @@ lib/SPVM/UV/Loop.build
 lib/SPVM/UV/Loop.c
 lib/SPVM/UV/Loop.pm
 lib/SPVM/UV/Loop.spvm
+lib/SPVM/UV/ProcessOptions.pm
+lib/SPVM/UV/ProcessOptions.spvm
 lib/SPVM/UV/Request.build
 lib/SPVM/UV/Request.c
 lib/SPVM/UV/Request.pm
@@ -77,6 +85,10 @@ lib/SPVM/UV/Resource/UV.native/include/spvm_uv.h
 lib/SPVM/UV/Resource/UV.native/src/.gitkeep
 lib/SPVM/UV/Resource/UV.pm
 lib/SPVM/UV/Resource/UV.spvm
+lib/SPVM/UV/StdioContainer.build
+lib/SPVM/UV/StdioContainer.c
+lib/SPVM/UV/StdioContainer.pm
+lib/SPVM/UV/StdioContainer.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

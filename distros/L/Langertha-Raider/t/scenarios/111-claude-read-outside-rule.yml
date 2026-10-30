@@ -1,0 +1,23 @@
+title: in the Claude layout an allow rule Read(//abs/**) opens a directory outside the root for reading and searching, not for writing
+permission_mode: null
+files:
+  CLAUDE.md: "Project notes.\n"
+  .claude/settings.json: |
+    { "permissions": { "allow": [ "Read(/{{HOME}}/notes/**)" ] } }
+home:
+  notes/todo.txt: "outside the project\n"
+prompt: Read my notes.
+script:
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/notes/todo.txt" } ]
+      - [ grep, { pattern: outside, path: "{{HOME}}/notes", output_mode: content } ]
+      - [ glob, { pattern: "*.txt", path: "{{HOME}}/notes" } ]
+      - [ write_file, { path: "{{HOME}}/notes/todo.txt", content: "changed\n" } ]
+  - text: read
+expect:
+  answer: read
+  tools:
+    - { name: read_file, text: "\\A1\\toutside the project\\n2\\t\\z" }
+    - { name: grep, text: "/notes/todo\\.txt:1:outside the project" }
+    - { name: glob, text: "/notes/todo\\.txt" }
+    - { name: write_file, error: true, text: "write_file requested permissions to write to /\\S+/notes/todo\\.txt, which is outside the project root" }

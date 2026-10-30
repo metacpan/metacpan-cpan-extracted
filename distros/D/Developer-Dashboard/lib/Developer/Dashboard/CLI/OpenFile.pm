@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use sort 'stable';
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Exporter 'import';
 use File::Find ();
 use File::Spec;
@@ -288,7 +288,7 @@ sub _resolve_open_file_matches {
     }
     else {
         $scope = $paths->current_project_root;
-        $scope = cwd() if !$scope;
+        $scope = current_working_directory() if !$scope;
         @patterns = grep { defined && $_ ne '' } ( $first, @argv );
     }
 
@@ -409,7 +409,7 @@ sub _open_file_roots {
     my (%args) = @_;
     my $paths = $args{paths} || die 'Missing path registry';
     my @roots = (
-        cwd(),
+        current_working_directory(),
         scalar( $paths->current_project_root ),
         $paths->workspace_roots,
         $paths->project_roots,

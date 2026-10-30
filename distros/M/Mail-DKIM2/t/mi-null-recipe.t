@@ -5,8 +5,8 @@ use MIME::Base64 qw(encode_base64 decode_base64);
 use lib 'lib';
 use Mail::DKIM2::MessageInstance;
 
-my $orig = "Subject: hi\r\nMessage-Instance: m=1; h=sha256:AAA:BBB;\r\n\r\nbody line one\r\n";
-my $new  = "Subject: hi\r\nMessage-Instance: m=1; h=sha256:AAA:BBB;\r\n\r\nbody line one\r\nfooter\r\n";
+my $orig = "Subject: hi\r\nMessage-Instance: m=1; h=sha256:AAAA:BBBB;\r\n\r\nbody line one\r\n";
+my $new  = "Subject: hi\r\nMessage-Instance: m=1; h=sha256:AAAA:BBBB;\r\n\r\nbody line one\r\nfooter\r\n";
 
 my $mi = Mail::DKIM2::MessageInstance->calculate($new, $orig);
 $mi->set_null_body_recipe;
@@ -24,25 +24,25 @@ unlike($json, qr/"c"\s*:/, 'no copy steps remain in body recipe');
 # draft-03 §5.1 removed the possibility of a null header Recipe: parsing an
 # instance whose "h" is null (or empty) MUST now be rejected.
 my $nullh = encode_base64('{"h":null}', '');
-eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$nullh;") };
+eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$nullh;") };
 like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/, '"h": null rejected on parse (draft-03 §5.1)');
 
 # A null body Recipe ("b": null) is still permitted and must still parse.
 my $nullb = encode_base64('{"b":null}', '');
-ok(eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$nullb;"); 1 },
+ok(eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$nullb;"); 1 },
    '"b": null still accepted on parse');
 
 # Anything that is neither null nor an array is a malformed body Recipe.
 for my $bad ('5', '"x"', '{}', 'true') {
     my $enc = encode_base64(qq({"b":$bad}), '');
-    eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$enc;") };
+    eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$enc;") };
     like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
         "\"b\": $bad is a PERMERROR");
 }
 # Likewise a header Recipe that is not an object (null/empty keep their own error).
 for my $bad ('5', '"x"', '[]') {
     my $enc = encode_base64(qq({"h":$bad}), '');
-    eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$enc;") };
+    eval { Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$enc;") };
     like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
         "\"h\": $bad is a PERMERROR");
 }

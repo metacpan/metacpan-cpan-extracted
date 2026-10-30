@@ -770,7 +770,7 @@ for my $c (
     $msg =~ s/\n/\r\n/gs;
     # An unsigned m=2 (wrong hashes) over the signed m=1, and no token: the
     # gate refuses. The message carries the sender's i=1, so it is not sent
-    # on (-07 section 13): 550 5.7.1.
+    # on (-08 section 13): 550 5.7.1.
     my $bad = 'A' x 43 . '=';
     my $with = "Message-Instance: m=2; h=sha256:$bad:$bad\r\n" . $msg;
     my ($h, $mock) = run_outbound_sign($with, $snapshot_dir);

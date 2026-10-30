@@ -1,0 +1,26 @@
+title: a deny rule Agent(reader) refuses starting that agent; the general-purpose agent still starts
+permission_mode: default
+files:
+  .raider/config.yml: "permissions:\n  deny: [ 'Agent(reader)' ]\n"
+  .raider/agents/reader.md: "---\ndescription: Reads.\ntools: Read\n---\nREADER-BODY\n"
+prompt: Use the reader, else any agent.
+script:
+  - tool_calls:
+      - [ agent, { description: Read, prompt: READER-TASK, subagent_type: reader } ]
+  - tool_calls:
+      - [ agent, { description: Read, prompt: GP-TASK } ]
+  - text: general answer
+  - text: done
+expect:
+  answer: done
+  request_count: 4
+  requests:
+    - { index: 1, contains: "denied by rule 'Agent(reader)'" }
+    - { index: 2, contains: GP-TASK }
+    - { index: 2, absent: READER-BODY }
+  tools:
+    - { name: agent, error: true, text: "denied by rule 'Agent\\(reader\\)' from \\.raider/config\\.yml" }
+    - { name: agent, text: '\Ageneral answer\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: permission.denied, tool: agent, by: rule, rule: 'Agent(reader)' }
+    - { type: agent.started, call: c2, agent: general-purpose }

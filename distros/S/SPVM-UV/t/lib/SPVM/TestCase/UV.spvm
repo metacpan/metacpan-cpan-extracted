@@ -291,5 +291,486 @@ class TestCase::UV {
     
     return 1;
   }
+
+  static method spawn : int () {
+    
+    {
+      my $loop = UV::Loop->new;
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      my $term_signal_ref = [-1];
+      
+      # Use perl one-liner for cross-platform portability
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", "print 'hello'"]);
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : , $term_signal_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $term_signal_ref->[0] = $term_signal;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1) {
+        diag;
+        return 0;
+      }
+      
+      unless ($status_ref->[0] == 0) {
+        diag;
+        return 0;
+      }
+      
+      unless ($term_signal_ref->[0] == 0) {
+        diag;
+        return 0;
+      }
+    }
+    
+    # Pipe - Get stdout
+    {
+      my $loop = UV::Loop->new;
+      
+      my $read_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($read_pipe, 0);
+      
+      my $container0 = UV::StdioContainer->new;
+      $container0->set_flags(UV_C->UV_IGNORE);
+      
+      my $container1 = UV::StdioContainer->new;
+      $container1->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container1->set_stream($read_pipe);
+      
+      my $stdios = [$container0, $container1];
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      my $read_data = new_string_len 10;
+      my $read_length_ref = [-1];
+      
+      my $read_cb = [$read_pipe : , $read_data : , $read_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 10 ? 10 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $read_data->[$i] = $buf->[$i];
+          }
+          $read_length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $read_pipe->close_safe;
+      };
+      weaken $read_cb->{read_pipe};
+      
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", "print 'hello'"]);
+      $options->set_stdios($stdios);
+      
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $read_pipe->read_start($read_data, 10, $read_cb);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1 && $status_ref->[0] == 0) {
+        diag;
+        return 0;
+      }
+      
+      unless ($read_length_ref->[0] == 5 && Fn->substr($read_data, 0, $read_length_ref->[0])  eq "hello") {
+        diag $read_length_ref->[0];
+        diag $read_data;
+        return 0;
+      }
+    }
+    
+# Pipe - stdout and stderr (without stdin)
+    {
+      my $loop = UV::Loop->new;
+      
+      my $stdout_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($stdout_pipe, 0);
+      
+      my $stderr_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($stderr_pipe, 0);
+      
+      my $container0 = UV::StdioContainer->new;
+      $container0->set_flags(UV_C->UV_IGNORE);
+      
+      my $container1 = UV::StdioContainer->new;
+      $container1->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container1->set_stream($stdout_pipe);
+      
+      my $container2 = UV::StdioContainer->new;
+      $container2->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container2->set_stream($stderr_pipe);
+      
+      my $stdios = [$container0, $container1, $container2];
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      
+      my $stdout_data = new_string_len 20;
+      my $stdout_length_ref = [-1];
+      
+      my $stdout_cb = [$stdout_pipe : , $stdout_data : , $stdout_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 20 ? 20 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $stdout_data->[$i] = $buf->[$i];
+          }
+          $stdout_length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $stdout_pipe->close_safe;
+      };
+      weaken $stdout_cb->{stdout_pipe};
+      
+      my $stderr_data = new_string_len 20;
+      my $stderr_length_ref = [-1];
+      
+      my $stderr_cb = [$stderr_pipe : , $stderr_data : , $stderr_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 20 ? 20 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $stderr_data->[$i] = $buf->[$i];
+          }
+          $stderr_length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $stderr_pipe->close_safe;
+      };
+      weaken $stderr_cb->{stderr_pipe};
+      
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", q'print STDOUT "out:hello"; print STDERR "err:hello";']);
+      $options->set_stdios($stdios);
+      
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $stdout_pipe->read_start($stdout_data, 20, $stdout_cb);
+      $stderr_pipe->read_start($stderr_data, 20, $stderr_cb);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1 && $status_ref->[0] == 0) {
+        return 0;
+      }
+      
+      unless ($stdout_length_ref->[0] == 9 && Fn->substr($stdout_data, 0, $stdout_length_ref->[0]) eq "out:hello") {
+        return 0;
+      }
+      
+      unless ($stderr_length_ref->[0] == 9 && Fn->substr($stderr_data, 0, $stderr_length_ref->[0]) eq "err:hello") {
+        return 0;
+      }
+    }
+
+    # Pipe - Input, stdout, and stderr
+    {
+      my $loop = UV::Loop->new;
+      
+      my $stdin_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($stdin_pipe, 0);
+      
+      my $stdout_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($stdout_pipe, 0);
+      
+      my $stderr_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($stderr_pipe, 0);
+      
+      my $container0 = UV::StdioContainer->new;
+      $container0->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_READABLE_PIPE);
+      $container0->set_stream($stdin_pipe);
+      
+      my $container1 = UV::StdioContainer->new;
+      $container1->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container1->set_stream($stdout_pipe);
+      
+      my $container2 = UV::StdioContainer->new;
+      $container2->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container2->set_stream($stderr_pipe);
+      
+      my $stdios = [$container0, $container1, $container2];
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      
+      my $stdout_data = new_string_len 20;
+      my $stdout_length_ref = [-1];
+      
+      my $stdout_cb = [$stdout_pipe : , $stdout_data : , $stdout_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 20 ? 20 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $stdout_data->[$i] = $buf->[$i];
+          }
+          $stdout_length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $stdout_pipe->close_safe;
+      };
+      weaken $stdout_cb->{stdout_pipe};
+      
+      my $stderr_data = new_string_len 20;
+      my $stderr_length_ref = [-1];
+      
+      my $stderr_cb = [$stderr_pipe : , $stderr_data : , $stderr_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 20 ? 20 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $stderr_data->[$i] = $buf->[$i];
+          }
+          $stderr_length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $stderr_pipe->close_safe;
+      };
+      weaken $stderr_cb->{stderr_pipe};
+      
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", q'binmode STDOUT; binmode STDERR; my $in = <STDIN>; print STDOUT \'out:\' . $in; print STDERR \'err:\' . $in;']);
+      $options->set_stdios($stdios);
+      
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $stdout_pipe->read_start($stdout_data, 20, $stdout_cb);
+      $stderr_pipe->read_start($stderr_data, 20, $stderr_cb);
+      
+      my $write_req = UV::Request::Write->new;
+      my $write_buf = "world\n";
+      $write_req->write($stdin_pipe, $write_buf, 6, [ $stdin_pipe : ] method : void ($req : UV::Request::Write, $status : int) {
+        $req->set_write_cb(undef);
+        $stdin_pipe->close_safe;
+      });
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1 && $status_ref->[0] == 0) {
+        return 0;
+      }
+      
+      unless ($stdout_length_ref->[0] == 10 && Fn->substr($stdout_data, 0, $stdout_length_ref->[0]) eq "out:world\n") {
+        return 0;
+      }
+      
+      unless ($stderr_length_ref->[0] == 10 && Fn->substr($stderr_data, 0, $stderr_length_ref->[0]) eq "err:world\n") {
+        return 0;
+      }
+    }
+    
+    # Pipe - Custom FD 3 with syswrite
+    {
+      my $loop = UV::Loop->new;
+      
+      my $pipe3 = UV::Handle::Pipe->new;
+      $loop->pipe_init($pipe3, 0);
+      
+      my $container0 = UV::StdioContainer->new;
+      $container0->set_flags(UV_C->UV_IGNORE);
+      
+      my $container1 = UV::StdioContainer->new;
+      $container1->set_flags(UV_C->UV_IGNORE);
+      
+      my $container2 = UV::StdioContainer->new;
+      $container2->set_flags(UV_C->UV_IGNORE);
+      
+      my $container3 = UV::StdioContainer->new;
+      $container3->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container3->set_stream($pipe3);
+      
+      my $stdios = [$container0, $container1, $container2, $container3];
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      
+      my $data = new_string_len 20;
+      my $length_ref = [-1];
+      
+      my $cb = [$pipe3 : UV::Handle::Pipe, $data : mutable string, $length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 20 ? 20 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $data->[$i] = $buf->[$i];
+          }
+          $length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $pipe3->close_safe;
+      };
+      weaken $cb->{pipe3};
+      
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", q'open(my $fh, ">&=3") or die $!; syswrite($fh, "data:fd3");']);
+      $options->set_stdios($stdios);
+      
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $pipe3->read_start($data, 20, $cb);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1 && $status_ref->[0] == 0) {
+        return 0;
+      }
+      
+      unless ($length_ref->[0] == 8 && Fn->substr($data, 0, $length_ref->[0]) eq "data:fd3") {
+        return 0;
+      }
+    }
+    
+    # Pipe - forwarding
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      my $non_blocking = 1;
+      Sys->pipepair(\$fd1, \$fd2, $non_blocking);
+      
+      Fn->defer([$fd1 : , $fd2 : ] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      my $pipe_in = UV::Handle::Pipe->new;
+      $loop->pipe_init($pipe_in, 0);
+      $pipe_in->open(Sys::IO->dup($fd1));
+      
+      my $pipe_out = UV::Handle::Pipe->new;
+      $loop->pipe_init($pipe_out, 0);
+      $pipe_out->open(Sys::IO->dup($fd2));
+      
+      my $read_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($read_pipe, 0);
+      
+      my $container0 = UV::StdioContainer->new;
+      $container0->set_flags(UV_C->UV_IGNORE);
+      
+      my $container1 = UV::StdioContainer->new;
+      $container1->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container1->set_stream($read_pipe);
+      
+      my $stdios = [$container0, $container1];
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      my $read_data = new_string_len 10;
+      
+      my $pair_read_data = new_string_len 10;
+      my $pair_read_length_ref = [-1];
+      
+      my $pair_read_cb = [$pipe_out : , $pair_read_data : , $pair_read_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 10 ? 10 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $pair_read_data->[$i] = $buf->[$i];
+          }
+          $pair_read_length_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $pipe_out->close_safe;
+      };
+      weaken $pair_read_cb->{pipe_out};
+      
+      # Hold write request reference to prevent premature GC/destruction
+      my $write_req_ref = [(UV::Request::Write)undef];
+      
+      my $read_cb = [$read_pipe : UV::Handle::Pipe, $pipe_in : UV::Handle::Pipe, $pipe_out : UV::Handle::Pipe, $pair_read_data : mutable string, $pair_read_length_ref : int[], $pair_read_cb : UV::Callback::Read, $write_req_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          $pipe_out->read_start($pair_read_data, 10, $pair_read_cb);
+          
+          my $write_req = UV::Request::Write->new;
+          $write_req_ref->[0] = $write_req;
+          
+          $write_req->write($pipe_in, $buf, (int)$nread, [$pipe_in : , $write_req_ref : ] method : void ($req : UV::Request::Write, $status : int) {
+            $pipe_in->close_safe;
+            $write_req_ref->[0] = undef;
+          });
+        }
+        else {
+          $stream->close_safe;
+          $read_pipe->close_safe;
+        }
+      };
+      weaken $read_cb->{read_pipe};
+      weaken $read_cb->{pipe_in};
+      weaken $read_cb->{pipe_out};
+      weaken $read_cb->{write_req_ref};
+      
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", "print 'hello'"]);
+      $options->set_stdios($stdios);
+      
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $read_pipe->read_start($read_data, 10, $read_cb);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1 && $status_ref->[0] == 0) {
+        diag;
+        return 0;
+      }
+      
+      unless ($pair_read_length_ref->[0] == 5 && Fn->substr($pair_read_data, 0, $pair_read_length_ref->[0]) eq "hello") {
+        diag $pair_read_length_ref->[0];
+        diag $pair_read_data;
+        return 0;
+      }
+    }
+    return 1;
+  }
   
 }

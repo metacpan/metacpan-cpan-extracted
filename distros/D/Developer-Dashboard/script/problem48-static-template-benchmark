@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib 'lib';
+
+use Developer::Dashboard::PageDocument;
+use Developer::Dashboard::PageRuntime;
+use Template;
+
+my $iterations = 5000;
+my $runs = 21;
+my $help = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $body = '<section data-label="static">100% ' . chr(0x1f642) . ' literal</section>';
+my $runtime = Developer::Dashboard::PageRuntime->new;
+my $page = Developer::Dashboard::PageDocument->new(
+    layout => { body => $body },
+    state  => {},
+    meta   => {},
+);
+my $tt = Template->new( { EVAL_PERL => 1, INCLUDE_PATH => ['.'] } )
+  or die "Unable to initialize Template Toolkit reference service\n";
+my $reference = _render_with_template($tt, $body);
+my $optimized = _render_static_page( $runtime, $page );
+die "Static fast path output differs from Template Toolkit\n"
+  if $optimized ne $reference || $reference ne $body;
+
+my ( @template_seconds, @static_seconds );
+for my $run ( 1 .. $runs ) {
+    my @order = $run % 2 ? qw(template static) : qw(static template);
+    for my $mode (@order) {
+        my $started = time;
+        for ( 1 .. $iterations ) {
+            my $actual = $mode eq 'template'
+              ? _render_with_template( $tt, $body )
+              : _render_static_page( $runtime, $page );
+            die "$mode render changed output\n" if $actual ne $body;
+        }
+        push @{ $mode eq 'template' ? \@template_seconds : \@static_seconds }, time - $started;
+    }
+}
+
+my $template_median = _median(@template_seconds);
+my $static_median = _median(@static_seconds);
+printf "iterations=%d runs=%d exact_unicode_parity=yes\n", $iterations, $runs;
+printf "template_process_ms=%.5f static_fast_path_ms=%.5f speedup=%.2fx\n",
+  1000 * $template_median / $iterations,
+  1000 * $static_median / $iterations,
+  $template_median / $static_median;
+exit 0;
+
+# _render_with_template($tt, $body)
+# Runs the legacy Template Toolkit processing step for a static HTML body.
+# Input: initialized Template Toolkit service and source body string.
+# Output: rendered HTML string; template errors are fatal and visible.
+sub _render_with_template {
+    my ( $tt, $body ) = @_;
+    my $template = $body;
+    my $output = '';
+    $tt->process( \$template, {}, \$output )
+      or die "Unable to process static HTML through Template Toolkit: " . $tt->error . "\n";
+    return $output;
+}
+
+# _render_static_page($runtime, $page)
+# Runs PageRuntime's delimiter-checked static-body path.
+# Input: PageRuntime object and page document with a body lacking the TT opener.
+# Output: unchanged HTML body string.
+sub _render_static_page {
+    my ( $runtime, $page ) = @_;
+    $runtime->_render_templates( page => $page, runtime_context => {} );
+    return $page->{layout}{body};
+}
+
+# _median(@samples)
+# Returns the middle wall-clock duration from an odd sample set.
+# Input: elapsed-second numbers.
+# Output: median elapsed-second number.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _usage()
+# Returns accepted arguments and their measurement meaning.
+# Input: none.
+# Output: command-line usage string.
+sub _usage {
+    return "Usage: $0 [--iterations N] [--runs ODD_N] [--help]\n"
+      . "Compares Template Toolkit processing with PageRuntime's static-body fast path.\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-static-template-benchmark - measure the static page-template fast path
+
+=head1 PURPOSE
+
+This benchmark compares the prior Template Toolkit process call for a static
+HTML body with C<PageRuntime::_render_templates>'s new delimiter check and
+early return. It requires exact output parity, including a non-ASCII character.
+
+=head1 WHY IT EXISTS
+
+NYTProf found that dashboard page preparation called Template Toolkit for
+static navigation fragments as well as templates. Static bodies with no
+default C<[%> opener have no template work to perform, so they can skip context
+assembly and processing without changing their output.
+
+=head1 WHEN TO USE
+
+Run it after changing PageRuntime's template delimiter handling or its static
+HTML rendering path. This microbenchmark measures one routine only; it is not
+an end-to-end dashboard speedup or proof of the overall 50x target.
+
+=head1 HOW TO USE
+
+    perl script/problem48-static-template-benchmark
+    perl script/problem48-static-template-benchmark --iterations 10000 --runs 21
+
+=head1 OUTPUT
+
+The report gives median milliseconds per render, the paired-run count, and the
+speed ratio. Both implementations must return the exact same UTF-8 string or
+the command exits with an explicit error.
+
+=head1 SAFETY
+
+The benchmark performs no filesystem writes and runs no shell commands.
+Template Toolkit failures and output mismatches are fatal and visible.
+
+=cut

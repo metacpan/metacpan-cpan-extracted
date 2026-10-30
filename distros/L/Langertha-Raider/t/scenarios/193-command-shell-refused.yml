@@ -1,0 +1,15 @@
+# In default mode a !`cmd` without an allow rule is not asked about: the
+# whole /command aborts and nothing goes to the model.
+title: a !`cmd` without an allow rule aborts the command in default mode, nothing is sent
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/commands/wipe.md: "Clean up: !`rm -rf build`\n"
+  build/keep.txt: "still here\n"
+prompt: /wipe
+expect:
+  outcome:
+    status: not sent
+    error: '\AShell command permission check failed for pattern "!`rm -rf build`" in /wipe: default mode asks before this call'
+  request_count: 0
+  files: { build/keep.txt: "still here\n" }

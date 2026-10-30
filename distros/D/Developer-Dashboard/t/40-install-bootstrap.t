@@ -32,7 +32,7 @@ ok( -f $aptfile, 'aptfile exists at the repo root' );
 ok( -f $apkfile, 'apkfile exists at the repo root' );
 ok( -f $dnfile, 'dnfile exists at the repo root' );
 ok( -f $brewfile, 'brewfile exists at the repo root' );
-like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/VERSION_FROM\s*=>\s*'lib\/Developer\/Dashboard\.pm'/, 'Makefile.PL uses a filesystem path for VERSION_FROM so checkout installs work on Windows' );
+like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/VERSION_FROM\s*=>\s*'lib\/Developer\/Dashboard\/Version\.pm'/, 'Makefile.PL uses lightweight filesystem version metadata so checkout installs work on Windows and XSLoader receives the actual distribution version' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/use\s+File::ShareDir::Install\s+qw\(install_share\);/, 'Makefile.PL loads File::ShareDir::Install so packaged installs can refresh shipped helper assets under auto/share/dist' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/install_share\s+dist\s*=>\s*'share';/, 'Makefile.PL explicitly installs the repo share tree so packaged helper assets stay in sync with the tarball' );
 unlike( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/package\s+MY;\s*use\s+File::ShareDir::Install\s+qw\(postamble\);/s, 'Makefile.PL does not import and redefine the File::ShareDir::Install postamble in package MY' );
@@ -818,6 +818,9 @@ SH
     my $fake_bin = tempdir( CLEANUP => 1 );
     my $log = File::Spec->catfile( $home, 'install.log' );
     my $checkout = File::Spec->catfile( $home, 'default-dashboard-checkout' );
+    my $bootstrap_tmpdir = File::Spec->catdir( $home, 'installer-tmp' );
+    make_path($bootstrap_tmpdir);
+    local $ENV{TMPDIR} = $bootstrap_tmpdir;
     _seed_fake_install_commands(
         fake_bin         => $fake_bin,
         log              => $log,
@@ -843,8 +846,9 @@ SH
     is_deeply(
         \@log_lines,
         [
-            'curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o /tmp/developer-dashboard-homebrew-install.sh',
-            '/bin/bash -c /tmp/developer-dashboard-homebrew-install.sh',
+            'curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o '
+              . File::Spec->catfile( $bootstrap_tmpdir, 'developer-dashboard-homebrew-install.sh' ),
+            '/bin/bash -c ' . File::Spec->catfile( $bootstrap_tmpdir, 'developer-dashboard-homebrew-install.sh' ),
             'brew install ' . join( ' ', @brew_packages ),
             'brew --prefix perl',
             'perl -e exit(($] >= 5.038) ? 0 : 1)',

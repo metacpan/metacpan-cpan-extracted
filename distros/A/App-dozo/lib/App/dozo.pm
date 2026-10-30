@@ -1,6 +1,6 @@
 package App::dozo;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 1;
 =encoding utf-8
@@ -38,9 +38,11 @@ dozo -I IMAGE [ options ] [ command ... ]
     -P, --port=#       port mapping (repeatable)
     -O, --other=#      additional docker options (repeatable)
 
+        --bundle       print a self-contained dozo, and exit
+
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 USAGE
 
@@ -88,6 +90,20 @@ To install the latest version from GitHub:
 
 Alternatively, you can simply place C<dozo> and C<getoptlong.sh> in
 your PATH.
+
+A self-contained single file, which needs no other part of the
+distribution, is attached to each release on GitHub; download it and
+place it in your PATH:
+
+    curl -fsSLo ~/.local/bin/dozo \
+        https://github.com/tecolicom/App-dozo/releases/download/VERSION/dozo
+    chmod +x ~/.local/bin/dozo
+
+The same file is made by C<dozo --bundle> from an installed B<Dôzo>,
+also inside the default image once it carries a B<Dôzo> with this
+option:
+
+    docker run --rm tecolicom/xlate dozo --bundle > dozo
 
 B<Dôzo> requires Bash 4.4 or later, as does the C<getoptlong.sh>
 script it uses.
@@ -256,7 +272,9 @@ relative path is resolved against the current directory. Repeatable.
 
 =item B<-B>, B<--batch>
 
-Run in batch mode (non-interactive).
+Run in batch mode (non-interactive): the container gets no terminal
+and does not wait for input from one.  Input from a pipe or a file is
+still passed to the command, as in C<git diff | dozo -B cdif>.
 
 =item B<-L>, B<--live>
 
@@ -281,14 +299,28 @@ Repeatable.
 
 Specify additional docker options. Repeatable.
 
+=item B<--bundle>
+
+Print a self-contained B<Dôzo>, which includes what it needs from
+the distribution, and exit without running Docker.  The result is a
+single file that runs where only Bash 4.4 or later and Docker are
+available:
+
+    dozo --bundle > ~/.local/bin/dozo-single
+
+A file made this way prints itself again.
+
 =back
 
 =head1 INTERACTIVE MODE
 
-Unless the B<-B> (batch) option is given, the container is started
-with Docker's C<--interactive> option, and C<--tty> is added as well
-when the standard input is a terminal (TTY). The same rule is applied
-to C<docker exec> in live container mode.
+The container is started with Docker's C<--interactive> option, and
+C<--tty> is added as well when the standard input is a terminal (TTY).
+With the B<-B> (batch) option, neither is given when the standard
+input is a terminal, so that nothing waits for keyboard input; when
+the standard input is a pipe or a file, C<--interactive> is still
+given so that the input reaches the command.  The same rule is
+applied to C<docker exec> in live container mode.
 
 This allows seamless interactive use when attaching to containers or
 running interactive commands.

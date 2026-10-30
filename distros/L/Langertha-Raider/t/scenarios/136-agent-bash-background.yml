@@ -1,0 +1,31 @@
+# A subagent's background shell belongs to the application, as the caller's
+# do (ADR 0024): the subagent starts it and reads it back with bash_output, and
+# the caller still reaches it after the subagent has ended. An agent that may
+# use Bash gets bash_output and kill_shell with it (ADR 0025).
+title: a subagent starts a background shell and reads it; the caller reads it after the subagent ended
+permission_mode: bypassPermissions
+files:
+  .raider/agents/builder.md: "---\ndescription: Builds things.\ntools: Bash\n---\nBUILDER-BODY\n"
+prompt: Let the builder build in the background.
+script:
+  - tool_calls:
+      - [ agent, { description: Build, prompt: Build in the background and wait for it., subagent_type: builder } ]
+  - tool_calls:
+      - [ bash, { command: 'echo built > build.log; echo build-ok', run_in_background: true } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1, block: true, timeout: 30 } ]
+  - text: the build is done
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1 } ]
+  - text: The builder built it.
+expect:
+  answer: The builder built it.
+  files:
+    build.log: "built\n"
+  requests:
+    - { index: 1, offers: [ bash, bash_output, kill_shell ] }
+  tools:
+    - { name: bash, text: '\ACommand running in background with ID: bash_1\.' }
+    - { name: bash_output, text: '\A<status>completed</status>\n\n<exit_code>0</exit_code>\n\n<stdout>\nbuild-ok\n</stdout>\z' }
+    - { name: agent, text: '\Athe build is done\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: 2\nduration_ms: \d+</usage>\z' }
+    - { name: bash_output, text: '\A<status>completed</status>\n\n<exit_code>0</exit_code>\z' }

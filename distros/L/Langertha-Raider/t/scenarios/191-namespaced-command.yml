@@ -1,0 +1,13 @@
+# A command in a subdirectory is named with a colon: frontend/component.md
+# is /frontend:component.
+title: a namespaced command /frontend:component
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/commands/frontend/component.md: "Build the $0 component, then $1. NS-CMD\n"
+prompt: /frontend:component Button "with tests"
+script:
+  - text: built
+expect:
+  answer: built
+  requests:
+    - { index: 0, contains: "<command-name>/frontend:component</command-name>\n<command-args>Button \"with tests\"</command-args>\n\nBuild the Button component, then with tests. NS-CMD" }

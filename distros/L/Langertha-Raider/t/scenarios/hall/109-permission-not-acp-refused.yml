@@ -1,0 +1,17 @@
+title: a run that belongs to no ACP session has nobody to ask; the ask in default mode is refused as before (ADR 0021)
+hall:
+  raiders:
+    Frager: { engine: mock, packs: [], mcp: [], isolated: 0, permission_mode: default }
+model:
+  rules:
+    Schreibe.:
+      tool_calls:
+        - [ write_file, { path: a.txt, content: "a\n" } ]
+  after:
+    write_file: { answer: "fertig" }
+  fallback: { answer: "unbekannt" }
+steps:
+  - spawn: { name: Frager, mission: "Schreibe.", as: r }
+  - done: { run: r, status: completed, response_like: fertig }
+  - expect_file: { path: a.txt, absent: true }
+  - idle: {}

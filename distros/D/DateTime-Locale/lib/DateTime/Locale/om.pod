@@ -435,6 +435,24 @@ Oromo locale.
    1995-12-22T09:05:02 = Jim, Mud 22, 1995 BA
   -0010-09-15T04:44:23 = San, Ful 15, -10 DhKD
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = BA 2008 Guraandhala
+   1995-12-22T09:05:02 = BA 1995 Mudde
+  -0010-09-15T04:44:23 = DhKD -10 Fulbaana
+
+=head3 GyMMMMEd (E, MMMM d, y G)
+
+   2008-02-05T18:30:30 = Kib, Guraandhala 5, 2008 BA
+   1995-12-22T09:05:02 = Jim, Mudde 22, 1995 BA
+  -0010-09-15T04:44:23 = San, Fulbaana 15, -10 DhKD
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = BA 2008 Guraandhala 5
+   1995-12-22T09:05:02 = BA 1995 Mudde 22
+  -0010-09-15T04:44:23 = DhKD -10 Fulbaana 15
+
 =head3 GyMMMd (MMM d, y G)
 
    2008-02-05T18:30:30 = Gur 5, 2008 BA
@@ -506,6 +524,12 @@ Oromo locale.
    2008-02-05T18:30:30 = Kib, Gur 5
    1995-12-22T09:05:02 = Jim, Mud 22
   -0010-09-15T04:44:23 = San, Ful 15
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Guraandhala 5, Kib
+   1995-12-22T09:05:02 = Mudde 22, Jim
+  -0010-09-15T04:44:23 = Fulbaana 15, San
 
 =head3 MMMMW-count-one ('torbee' W 'kan' MMMM)
 
@@ -639,17 +663,29 @@ Oromo locale.
    1995-12-22T09:05:02 = Mudde 1995
   -0010-09-15T04:44:23 = Fulbaana -10
 
+=head3 yMMMMEd (E, MMMM d, y)
+
+   2008-02-05T18:30:30 = Kib, Guraandhala 5, 2008
+   1995-12-22T09:05:02 = Jim, Mudde 22, 1995
+  -0010-09-15T04:44:23 = San, Fulbaana 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Guraandhala 5, 2008
+   1995-12-22T09:05:02 = Mudde 22, 1995
+  -0010-09-15T04:44:23 = Fulbaana 15, -10
+
 =head3 yMMMd (MMM d, y)
 
    2008-02-05T18:30:30 = Gur 5, 2008
    1995-12-22T09:05:02 = Mud 22, 1995
   -0010-09-15T04:44:23 = Ful 15, -10
 
-=head3 yMd (M/d/y)
+=head3 yMd (d/M/y)
 
-   2008-02-05T18:30:30 = 2/5/2008
-   1995-12-22T09:05:02 = 12/22/1995
-  -0010-09-15T04:44:23 = 9/15/-10
+   2008-02-05T18:30:30 = 5/2/2008
+   1995-12-22T09:05:02 = 22/12/1995
+  -0010-09-15T04:44:23 = 15/9/-10
 
 =head3 yQQQ (QQQ y)
 

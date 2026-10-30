@@ -1,6 +1,6 @@
 package Langertha::Raider::Home;
 # ABSTRACT: Internal resolver of the home and project .raider directories
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use strict;
 use warnings;
 use Path::Tiny;
@@ -22,6 +22,15 @@ sub project_base {
   return $self->_base($root);
 }
 
+sub claude_home {
+  my ( $self, $home ) = @_;
+  my $dir = $ENV{CLAUDE_CONFIG_DIR};
+  return path($dir)->absolute if defined $dir && length $dir;
+  $home //= $self->home_dir;
+  return unless defined $home;
+  return path($home)->absolute->child('.claude');
+}
+
 sub _base { path($_[1])->absolute->child($_[0]->dir_name) }
 
 1;
@@ -38,7 +47,7 @@ Langertha::Raider::Home - Internal resolver of the home and project .raider dire
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -76,11 +85,22 @@ nothing when there is no home at all.
 
 F<.raider> under the given project root.
 
+=head2 claude_home
+
+    my $dir = Langertha::Raider::Home->claude_home;          # ~/.claude
+    my $dir = Langertha::Raider::Home->claude_home($home);   # <home>/.claude
+
+The Claude Code configuration directory (ADR 0019):
+C<$ENV{CLAUDE_CONFIG_DIR}> when it is set and not empty, else F<.claude>
+under the given home, by default under L</home_dir>. Returns nothing when
+there is neither. The one place the readers of the Claude layout
+(L<Langertha::Raider::Context> and its parts) take it from.
+
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -101,5 +121,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

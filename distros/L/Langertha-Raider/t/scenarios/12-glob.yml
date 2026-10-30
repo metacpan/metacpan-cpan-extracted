@@ -1,0 +1,19 @@
+title: glob lists files by pattern, newest first, as paths relative to the root
+files:
+  a.pm: "package A;\n"
+  lib/B.pm: "package B;\n"
+  lib/deep/C.pm: "package C;\n"
+  notes.txt: "n\n"
+age:
+  a.pm: 300
+  lib/B.pm: 200
+  lib/deep/C.pm: 100
+prompt: Which Perl modules are there?
+script:
+  - tool_calls:
+      - [ glob, { pattern: '**/*.pm' } ]
+  - text: drei Module
+expect:
+  answer: drei Module
+  tools:
+    - { name: glob, text: '\Alib/deep/C\.pm\nlib/B\.pm\na\.pm\z' }

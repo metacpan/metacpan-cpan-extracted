@@ -220,6 +220,17 @@ is_deeply(
 is_deeply(
     [
         Developer::Dashboard::CLI::Complete::complete(
+            words => [ 'dashboard', 'workspace', '--d' ],
+            index => 2,
+        )
+    ],
+    ['--docker'],
+    'workspace option completion offers Docker mode without querying tmux',
+);
+
+is_deeply(
+    [
+        Developer::Dashboard::CLI::Complete::complete(
             words           => [ 'dashboard', 'restart', 'collector', 'al' ],
             index           => 3,
             collector_names => sub { return qw(alpha.collector beta.collector) },
@@ -480,6 +491,8 @@ development-action completion used when tabbing after C<d2 docker>. The static
 action map includes the API and file command trees as well as the full path
 action set. Skill Folder.pm aliases and skill-config aliases are also pinned in
 the dotted C<d2 E<lt>skillE<gt>.> completion path.
+The workspace flag completion case also pins C<-d>/C<--docker> in the existing
+workspace option namespace without invoking the tmux session-list query.
 
 =head1 PURPOSE
 
@@ -498,6 +511,8 @@ This file closes that gap so the repo can keep the 100 percent coverage rule.
 
 Run this test after changing shell completion, typo guidance, dotted skill
 command discovery, or completion of skill path aliases.
+Run it as well when changing workspace command flags or the flags exposed by
+the public completion catalog.
 
 =head1 HOW TO USE
 

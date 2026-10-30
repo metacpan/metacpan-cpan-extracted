@@ -5,11 +5,7 @@ use Config;
 use IO::Socket::INET;
 use Acme::Parataxis qw[run fiber await_sleep];
 
-# Deferred so skip_all below can run before perl tries to load threads on a
-# perl that has no thread support. threads->create itself is the "spawn a
-# cloned interpreter" primitive that spawn_blocking wraps; the corruption it
-# demonstrates is in the clone, not in Blocking's marshalling, so this test
-# never has to load Acme::Parataxis::Blocking at all.
+# Deferred so skip_all below can run before perl tries to load threads on a perl that has no thread support. threads->create itself is the "spawn a cloned interpreter" primitive that spawn_blocking wraps; the corruption it demonstrates is in the clone, not in Blocking's marshalling, so this test never has to load Acme::Parataxis::Blocking at all.
 my $CAN_CLONE = ( defined $Config{useithreads} && $Config{useithreads} eq 'define' ) && eval {
     require threads;
     require threads::shared;
@@ -92,4 +88,5 @@ subtest 'cloning while a fiber is parked inside the read override leaves the hea
     is $buf,           'framed!',               'the read payload is intact';
     is scalar @leaked, $before,                 'no interpreter-leak warning escaped the parked clone' or diag join q{}, @leaked;
 };
+#
 done_testing();

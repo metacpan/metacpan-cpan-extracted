@@ -435,6 +435,24 @@ Langi locale.
    1995-12-22T09:05:02 = KA 1995 Sasatʉ 22, Ijm
   -0010-09-15T04:44:23 = KSA -10 Saatʉ 15, Móosi
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = KA 2008 Kʉnaanɨ
+   1995-12-22T09:05:02 = KA 1995 Kʉsasatʉ
+  -0010-09-15T04:44:23 = KSA -10 Kʉsaatʉ
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = KA 2008 Kʉnaanɨ 5, Íne
+   1995-12-22T09:05:02 = KA 1995 Kʉsasatʉ 22, Ijm
+  -0010-09-15T04:44:23 = KSA -10 Kʉsaatʉ 15, Móosi
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = KA 2008 Kʉnaanɨ 5
+   1995-12-22T09:05:02 = KA 1995 Kʉsasatʉ 22
+  -0010-09-15T04:44:23 = KSA -10 Kʉsaatʉ 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = KA 2008 Naanɨ 5

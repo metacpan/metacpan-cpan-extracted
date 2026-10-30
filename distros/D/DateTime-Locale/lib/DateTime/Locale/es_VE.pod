@@ -154,18 +154,18 @@ Spanish Venezuela locale.
 
 =head3 Abbreviated (stand-alone)
 
-  ene.
-  feb.
-  mar.
-  abr.
-  may.
-  jun.
-  jul.
-  ago.
-  sept.
-  oct.
-  nov.
-  dic.
+  ene
+  feb
+  mar
+  abr
+  may
+  jun
+  jul
+  ago
+  sep
+  oct
+  nov
+  dic
 
 =head3 Narrow (stand-alone)
 
@@ -521,9 +521,9 @@ Spanish Venezuela locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = feb.
-   1995-12-22T09:05:02 = dic.
-  -0010-09-15T04:44:23 = sept.
+   2008-02-05T18:30:30 = feb
+   1995-12-22T09:05:02 = dic
+  -0010-09-15T04:44:23 = sep
 
 =head3 MMMEd (E, d MMM)
 
@@ -681,7 +681,7 @@ Spanish Venezuela locale.
    1995-12-22T09:05:02 = diciembre de 1995
   -0010-09-15T04:44:23 = septiembre de -10
 
-=head3 yMMMMEd (EEE, d 'de' MMMM 'de' y)
+=head3 yMMMMEd (E, d 'de' MMMM 'de' y)
 
    2008-02-05T18:30:30 = mar, 5 de febrero de 2008
    1995-12-22T09:05:02 = vie, 22 de diciembre de 1995

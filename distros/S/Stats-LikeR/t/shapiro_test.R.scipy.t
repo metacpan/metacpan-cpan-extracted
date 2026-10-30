@@ -467,6 +467,12 @@ for my $case (
 		eval { $code->() };
 		like($@, $re, "E croaks on $label");
 	}
+	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('shapiro_test');
+	like($screen, qr/\Ausage: shapiro_test\(/, 'E shapiro_test has a help screen');
+	eval { shapiro_test(5) };
+	is($@, $screen . "shapiro_test: error: expected an array reference\n",
+		'E a call-form error is the screen, then the error on the last line');
 }
 
 SKIP: {

@@ -3,10 +3,10 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Encode qw(decode encode_utf8 FB_DEFAULT);
 use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
 use File::Basename qw(dirname);
@@ -41,7 +41,7 @@ sub _default_project_root {
     for my $candidate (@candidates) {
         return $candidate if $candidate;
     }
-    return cwd();
+    return current_working_directory();
 }
 
 # resolve(%args)
@@ -887,7 +887,7 @@ sub run {
     );
     return $resolved if $args{dry_run};
 
-    my $old = cwd();
+    my $old = current_working_directory();
     my $compose_root = $resolved->{compose_root};
     chdir $compose_root or die "Unable to chdir to $compose_root: $!";
     local @ENV{ keys %{ $resolved->{env} } } = values %{ $resolved->{env} } if %{ $resolved->{env} };
@@ -924,7 +924,7 @@ sub run_streaming {
     ) if !defined $resolved;
     return $resolved if $args{dry_run};
 
-    my $old = cwd();
+    my $old = current_working_directory();
     my ( $result, $error );
     my $ok = eval {
         my $compose_root = $resolved->{compose_root};
@@ -1299,7 +1299,7 @@ sub _discover_base_files {
 #         the supplied project root.
 sub _base_compose_root {
     my ( $self, $project_root ) = @_;
-    my $invocation_root = cwd();
+    my $invocation_root = current_working_directory();
     return $invocation_root if $self->_discover_base_files($invocation_root);
     return $project_root;
 }

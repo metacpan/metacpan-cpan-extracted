@@ -15,6 +15,8 @@ use OcToolkit;
 
 use Data::Dumper;
 
+Getopt::Long::Configure('no_ignore_case');
+
 my $projectDir = abs_path(".")."/";
 my $customCallbacksObj;
 eval {

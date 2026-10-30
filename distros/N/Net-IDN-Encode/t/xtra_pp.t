@@ -10,7 +10,7 @@ BEGIN {
 use Test::More tests => 3 + 1;
 use Test::NoWarnings;
 
-{
+BEGIN {
   $Net::IDN::Punycode::_NO_XS = 1;
 }
 use Net::IDN::UTS46 (':all');

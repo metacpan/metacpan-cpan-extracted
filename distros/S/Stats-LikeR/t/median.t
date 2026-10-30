@@ -125,4 +125,10 @@ unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { eval { my $m = median(\@tied) } }        'median no leaks: tied array';
 }
 
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+is(eval { median(); 1 }, undef, 'median() with no values dies');
+like($@, qr/\Ausage: median\(X \[, X \.\.\.\]\)\n.*^example:\n.*\n\nmedian: error: no values given\n\z/ms,
+	'... with the help screen above the error');
+
 done_testing();

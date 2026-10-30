@@ -7,7 +7,7 @@ eval { Test::RedisServer->new } or plan skip_all => 'redis-server is required in
 
 use Redis::Namespace;
 # remove the generated commands for test.
-delete $Redis::Namespace::{$_} for qw(set setnx get mset mget xadd xread);
+delete $Redis::Namespace::{$_} for qw(set setnx get mset mget xadd xread blpop);
 
 my $redis_server = Test::RedisServer->new;
 my $redis = Redis->new( $redis_server->connect_info );
@@ -29,6 +29,15 @@ subtest 'mget and mset' => sub {
     ok($ns->mset(foo => 'bar', hoge => 'fuga'), 'mset foo => bar, hoge => fuga');
     is_deeply([$ns->mget('foo', 'hoge')], ['bar', 'fuga'], 'mget foo hoge = hoge, fuga');
     is_deeply([$redis->mget('ns:foo', 'ns:hoge')], ['bar', 'fuga'], 'foo, hoge in namespace');
+    $redis->flushall;
+};
+
+subtest 'negative last key position' => sub {
+    # BLPOP key [key ...] timeout: the timeout is not a key.
+    $redis->rpush('ns:foo', 'bar');
+    is_deeply([$ns->blpop('hoge', 'foo', 1)], ['ns:foo', 'bar'], 'blpop with non-zero timeout');
+    $redis->rpush('ns:foo', 'baz');
+    is_deeply([$ns->blpop('hoge', 'foo', 0)], ['ns:foo', 'baz'], 'blpop with zero timeout');
     $redis->flushall;
 };
 

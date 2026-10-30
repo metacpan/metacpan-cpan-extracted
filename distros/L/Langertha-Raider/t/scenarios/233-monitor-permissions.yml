@@ -1,0 +1,21 @@
+# Claude Code: Monitor runs a command, so it uses the permission rules of Bash: a Bash(...)
+# rule that allows a command allows it as a monitor, and a call the policy asks about
+# is refused when nobody can approve it.
+# Checks ADR 0031 section 4 (Monitor = Bash) and ADR 0021.
+title: a Bash rule allows the same command as a monitor; any other monitor asks like bash
+permission_mode: default
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ "Bash(echo:*)" ]
+prompt: Watch two things.
+script:
+  - tool_calls:
+      - [ monitor, { description: allowed, command: "echo ok" } ]
+      - [ monitor, { description: not allowed, command: "touch pwned" } ]
+  - text: done
+expect:
+  absent: [ pwned ]
+  tools:
+    - { name: monitor, text: 'Monitor started \(task monitor_1' }
+    - { name: monitor, error: true, text: "nobody can approve it" }

@@ -1,0 +1,16 @@
+title: a read_file that would return more than 25000 tokens is refused with the way out; a part of the file goes through
+prompt: Read big.txt.
+script:
+  - tool_calls:
+      - [ bash, { command: "perl -e 'print qq(y) x 1990, qq(\\n) for 1..80' > big.txt" } ]
+  - tool_calls:
+      - [ read_file, { path: big.txt } ]
+  - tool_calls:
+      - [ read_file, { path: big.txt, offset: 1, limit: 10 } ]
+  - text: read in parts
+expect:
+  answer: read in parts
+  tools:
+    - { name: bash }
+    - { name: read_file, error: true, text: "\\AFile content \\(\\d+ tokens\\) exceeds maximum allowed tokens \\(25000\\)\\. Use offset and limit parameters", not_text: "yyyyyyyyyy" }
+    - { name: read_file, text: "\\A1\\tyyyy" }

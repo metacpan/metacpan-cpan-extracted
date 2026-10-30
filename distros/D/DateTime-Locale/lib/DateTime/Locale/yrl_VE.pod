@@ -435,6 +435,24 @@ Nheengatu Venezuela locale.
    1995-12-22T09:05:02 = yuk, 22 ym 1995 K.a.
   -0010-09-15T04:44:23 = sau, 15 pi -10 K.s.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = K.a. 2008 mukũi
+   1995-12-22T09:05:02 = K.a. 1995 yepé-mukũi
+  -0010-09-15T04:44:23 = K.s. -10 pú-irũdí
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = K.a. 2008 mukũi 5, mmk
+   1995-12-22T09:05:02 = K.a. 1995 yepé-mukũi 22, yuk
+  -0010-09-15T04:44:23 = K.s. -10 pú-irũdí 15, sau
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = K.a. 2008 mukũi 5
+   1995-12-22T09:05:02 = K.a. 1995 yepé-mukũi 22
+  -0010-09-15T04:44:23 = K.s. -10 pú-irũdí 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 mk 2008 K.a.

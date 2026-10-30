@@ -1,1033 +1,843 @@
 #!perl -w
 
-# Domain tests: Equivalence Partitioning + Boundary Value Analysis for every
-# validated constructor / query / builder parameter in Database::Abstraction.
+# t/domain.t -- Equivalence Partitioning and Boundary Value Analysis
 #
-# For each parameter the following partitions are covered:
-#   VP  Valid Partition   — representative typical value; system must accept
-#   IP  Invalid Partition — representative bad value; system must croak
-#   BV  Boundary Value    — absolute min/max edges and the values just outside
-#   CB  Combinatorial     — one parameter at its boundary while another varies
-#
-# Domains analysed:
-#   D1   directory          new() positional / named arg
-#   D2   id                 primary-key column name (SAFE_IDENTIFIER regex)
-#   D3   host               SSH host string (host-regex)
-#   D4   url                URL scheme (https?:// only)
-#   D5   html_table_index   0-based table index (BV: 0, last-valid, last+1)
-#   D6   max_slurp_size     file-size slurp threshold (BV: exact, exact-1, 0)
-#   D7   limit              Query::limit() non-negative integer
-#   D8   offset             Query::offset() non-negative integer
-#   D9   order_by           Query::order_by() injection guard (;, --, /*)
-#   D10  join table         _build_joins() SAFE_QUALIFIED table name
-#   D11  join type          _build_joins() INNER|LEFT|RIGHT|FULL|CROSS
-#   D12  dbname/filename    _open() path-safe name (no .. / /)
-#   D13  Combinatorial      max_slurp_size at exact boundary (keyed vs no_entry)
-#   D14  sort_by            selectall_arrayref/array sort column+direction
-#   D15  base_criteria      constructor filter hashref (key safety, type check)
-#   D16  table              constructor table name (SAFE_QUALIFIED)
-#   D17  criteria values    scalar/undef/-in/-between/-like/arrayref (invalid)
-#   D18  limit/offset       selectall_arrayref direct-method (carp+ignore on bad values)
-#   D19  dsn                DSN bypasses file detection (requires DBD::SQLite)
-#   D20  non-ASCII          multibyte bytes in criteria values (no crash contract)
+# Covers every constructor and query parameter:
+#   id, table, host, url, database, base_criteria, redis_key,
+#   limit/offset, sort_by, columns, join, each_row callback,
+#   max_slurp_size, filename/dbname, and multibyte character domains.
 
 use strict;
 use warnings;
 
-use FindBin qw($Bin);
+use DBI;
 use File::Spec;
-use File::Temp  ();
+use File::Temp qw(tempfile);
+use FindBin qw($Bin);
 use Readonly;
-use Test::Most  tests => 112;
-use Test::NoWarnings;
-use Test::Mockingbird;
-use HTTP::Response;
-
-use LWP::UserAgent;
-require HTML::TableExtract;
+use Test::Most;
+use Test::Warn;
 
 use lib 't/lib';
+
+# Pre-load Database::Abstraction so Sub::Private's CHECK block runs at compile
+# time and subsequent use statements in inline packages work correctly.
 use Database::test1;
-use Database::test4ne;
 
-# ---------------------------------------------------------------------------
-# Shared fixture paths and constants
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
+# Constants
+# -----------------------------------------------------------------------
 
-Readonly my $DATA_DIR => File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
-Readonly my $CSV_FILE => File::Spec->catfile($DATA_DIR, 'test1.csv');
-Readonly my $CSV_SIZE => (-s $CSV_FILE);	# 83 bytes in the current fixture
+Readonly::Scalar my $DIR         => File::Spec->catfile($Bin, 'data');
+Readonly::Scalar my $CLASS       => 'Database::test1';
 
-# HTML fixture for html_table_index tests (2 tables: 3 rows + 2 rows)
-my $HTML_FILE = File::Spec->catfile($DATA_DIR, 'test1.html');
-open(my $html_fh, '<', $HTML_FILE) or die "Cannot open $HTML_FILE: $!";
-Readonly my $FIXTURE_HTML => do { local $/; <$html_fh> };
-close $html_fh;
+# test1.csv has 4 data rows: one(1), two(2), three(3), empty('')
+Readonly::Scalar my $TOTAL_ROWS  => 4;
+Readonly::Scalar my $MAX_NUMBER  => 3;    # highest numeric value in fixture
 
-sub make_ok_response
-{
-	my $r = HTTP::Response->new(200, 'OK');
-	$r->content_type('text/html; charset=UTF-8');
-	$r->content($FIXTURE_HTML);
-	return $r;
-}
+# Error-message fragments (exact substrings from source)
+Readonly::Scalar my $ERR_UNSAFE_ID    => qr/unsafe id column name/;
+Readonly::Scalar my $ERR_UNSAFE_TABLE => qr/unsafe table name/;
+Readonly::Scalar my $ERR_UNSAFE_HOST  => qr/unsafe host/;
+Readonly::Scalar my $ERR_UNSAFE_URL   => qr/unsafe url/;
+Readonly::Scalar my $ERR_UNSAFE_DB    => qr/unsafe database/;
+Readonly::Scalar my $ERR_BC_HASHREF   => qr/base_criteria must be a hashref/;
+Readonly::Scalar my $ERR_BC_KEY       => qr/unsafe base_criteria key/;
+Readonly::Scalar my $ERR_REDIS_KEY    => qr/redis_key is only valid with a redis/;
+Readonly::Scalar my $ERR_JOIN_TABLE   => qr/join: missing "table"/;
+Readonly::Scalar my $ERR_JOIN_ON      => qr/join: missing "on" condition/;
+Readonly::Scalar my $ERR_JOIN_UNSAFE  => qr/join: unsafe table name/;
+Readonly::Scalar my $ERR_JOIN_TYPE    => qr/Invalid JOIN type/;
+Readonly::Scalar my $ERR_CALLBACK     => qr/each_row: callback must be a code reference/;
+Readonly::Scalar my $ERR_UNSAFE_COL   => qr/unsafe column name/;
 
-# ---------------------------------------------------------------------------
-# D1: directory parameter
-#
-# VP:  an existing, readable directory string or hashref
-# IP:  no directory at all, non-existent path, file (not dir)
-# ---------------------------------------------------------------------------
-
-note('D1: directory parameter');
-
-# VP1 — bare string form is accepted (the module maps it to directory)
-ok(
-	eval { Database::test1->new($DATA_DIR); 1 },
-	'D1 VP1: bare directory string constructs ok'
-);
-
-# VP2 — named hashref form
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR }); 1 },
-	'D1 VP2: directory as named hashref arg constructs ok'
-);
-
-# IP1 — no directory, no dsn, no url → "where are the files?"
-throws_ok {
-	Database::test1->new({ directory => '' })
-} qr/where are the files|is not a directory/i, 'D1 IP1: empty directory string croaks';
-
-# IP2 — non-existent path → "is not a directory"
-throws_ok {
-	Database::test1->new('/no/such/path/xyzzy42')
-} qr/is not a directory/, 'D1 IP2: non-existent path croaks with is not a directory';
-
-# IP3 — a file path (not a directory) → "is not a directory"
-throws_ok {
-	Database::test1->new($CSV_FILE)
-} qr/is not a directory/, 'D1 IP3: a file path croaks with is not a directory';
-
-# ---------------------------------------------------------------------------
-# D2: id parameter (SAFE_IDENTIFIER = /\A[a-zA-Z_][a-zA-Z0-9_]*\z/)
-#
-# VP: any identifier starting with letter or underscore
-# BV: single character (min length 1)
-# IP: starts with digit, contains punctuation, SQL metacharacters
-# ---------------------------------------------------------------------------
-
-note('D2: id parameter');
-
-# VP1 — default 'entry'
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR, id => 'entry' }); 1 },
-	'D2 VP1: id="entry" (default) is valid'
-);
-
-# BV1 — single underscore (minimum-length valid identifier)
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR, id => '_' }); 1 },
-	'D2 BV1: id="_" (single char, underscore) is valid'
-);
-
-# VP2 — trailing digits
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR, id => 'col1' }); 1 },
-	'D2 VP2: id="col1" (letter+digit) is valid'
-);
-
-# IP1 — starts with digit (BV: just past the first-char constraint)
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, id => '1col' })
-} qr/unsafe id column name/, 'D2 IP1: id starting with digit is rejected';
-
-# IP2 — contains semicolon (SQL injection vector)
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, id => 'col;drop' })
-} qr/unsafe id column name/, 'D2 IP2: id with semicolon is rejected';
-
-# IP3 — contains dot (SAFE_IDENTIFIER forbids dot; SAFE_QUALIFIED allows it but id uses IDENTIFIER)
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, id => 'table.col' })
-} qr/unsafe id column name/, 'D2 IP3: id with dot is rejected (SAFE_IDENTIFIER not SAFE_QUALIFIED)';
-
-# IP4 — null byte (bypasses naive string checks)
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, id => "col\x00name" })
-} qr/unsafe id column name/, 'D2 IP4: id with null byte is rejected';
-
-# ---------------------------------------------------------------------------
-# D3: host parameter
-# Regex: /\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9:][a-zA-Z0-9._:-]*\z/
-#
-# VP: plain hostname, user@host, IPv4, IPv6
-# IP: spaces, semicolons, path-traversal, leading @
-# ---------------------------------------------------------------------------
-
-note('D3: host parameter');
-
-# VP1 — plain hostname (local-host short-circuit; no SSH needed for validation)
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR, host => 'localhost' }); 1 },
-	'D3 VP1: host="localhost" passes validation'
-);
-
-# VP2 — user@host form
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR, host => 'user@server1.example.com' }); 1 },
-	'D3 VP2: user@host form passes validation'
-);
-
-# VP3 — IPv6 loopback (contains ':')
-ok(
-	eval { Database::test1->new({ directory => $DATA_DIR, host => '::1' }); 1 },
-	'D3 VP3: host="::1" (IPv6) passes validation'
-);
-
-# IP1 — space in hostname (shell injection)
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, host => 'server name' })
-} qr/unsafe host/, 'D3 IP1: host with space is rejected';
-
-# IP2 — semicolon (shell metacharacter)
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, host => 'server;ls' })
-} qr/unsafe host/, 'D3 IP2: host with semicolon is rejected';
-
-# IP3 — path traversal pattern
-throws_ok {
-	Database::test1->new({ directory => $DATA_DIR, host => '../server' })
-} qr/unsafe host/, 'D3 IP3: host with path traversal is rejected';
-
-# ---------------------------------------------------------------------------
-# D4: url parameter — scheme must be http:// or https:// (case-insensitive)
-#
-# VP: http://, https://, HTTP://, HTTPS://
-# IP: ftp://, file://, javascript:, protocol-relative, bare domain
-# ---------------------------------------------------------------------------
-
-note('D4: url parameter');
-
-# VP1 — http scheme
-ok(
-	eval { Database::test1->new({ url => 'http://example.com/data.html' }); 1 },
-	'D4 VP1: http:// URL is valid'
-);
-
-# VP2 — https scheme
-ok(
-	eval { Database::test1->new({ url => 'https://example.com/data.html' }); 1 },
-	'D4 VP2: https:// URL is valid'
-);
-
-# VP3 — uppercase scheme (case-insensitive match)
-ok(
-	eval { Database::test1->new({ url => 'HTTPS://EXAMPLE.COM/data.html' }); 1 },
-	'D4 VP3: HTTPS:// (uppercase) URL is valid'
-);
-
-# IP1 — ftp scheme
-throws_ok {
-	Database::test1->new({ url => 'ftp://example.com/data.html' })
-} qr/unsafe url/, 'D4 IP1: ftp:// URL is rejected';
-
-# IP2 — file scheme (local file inclusion)
-throws_ok {
-	Database::test1->new({ url => 'file:///etc/passwd' })
-} qr/unsafe url/, 'D4 IP2: file:// URL is rejected';
-
-# IP3 — javascript: (XSS vector)
-throws_ok {
-	Database::test1->new({ url => 'javascript:alert(1)' })
-} qr/unsafe url/, 'D4 IP3: javascript: URL is rejected';
-
-# IP4 — protocol-relative (no explicit scheme)
-throws_ok {
-	Database::test1->new({ url => '//example.com/data.html' })
-} qr/unsafe url/, 'D4 IP4: protocol-relative URL is rejected';
-
-# ---------------------------------------------------------------------------
-# D5: html_table_index parameter
-# BV: 0 (min-valid), 1 (last-valid in 2-table fixture), 2 (min-invalid)
-# IP: index >= number_of_tables
-# ---------------------------------------------------------------------------
-
-note('D5: html_table_index parameter');
+# -----------------------------------------------------------------------
+# Inline no_entry subclass for SQL-path column-name tests
+# -----------------------------------------------------------------------
 
 {
-	my $g = mock_scoped 'LWP::UserAgent::get' => sub { make_ok_response() };
-
-	# BV1 — index 0: first table (3 data rows)
-	{
-		my $db = Database::test1->new(url => 'http://example.com/t.html', html_table_index => 0);
-		cmp_ok($db->count(), '==', 3, 'D5 BV1: html_table_index=0 reads first table (3 rows)');
-	}
-
-	# BV2 — index 1: last valid index (second table, 2 data rows)
-	{
-		my $db = Database::test1->new(
-			url            => 'http://example.com/t.html',
-			html_table_index => 1,
-			no_entry       => 1,
-		);
-		cmp_ok($db->count(), '==', 2, 'D5 BV2: html_table_index=1 reads second table (2 rows)');
-	}
-
-	# BV3 — index 2: first invalid (only 2 tables, 0-based)
-	throws_ok {
-		Database::test1->new(url => 'http://example.com/t.html', html_table_index => 2)
-			->count();
-	} qr/html_table_index 2 out of range/, 'D5 BV3: html_table_index=2 croaks (out of range)';
-
-	# IP1 — very large index
-	throws_ok {
-		Database::test1->new(url => 'http://example.com/t.html', html_table_index => 999)
-			->count();
-	} qr/html_table_index 999 out of range/, 'D5 IP1: html_table_index=999 croaks';
-}
-
-# ---------------------------------------------------------------------------
-# D6: max_slurp_size boundary analysis
-# The CSV is slurped when (-s $file) <= max_slurp_size.
-# test1.csv is CSV_SIZE bytes.
-#
-# BV1: max_slurp_size = CSV_SIZE     → file size == threshold → slurps  (data is ref)
-# BV2: max_slurp_size = CSV_SIZE - 1 → file size > threshold  → SQL mode (data is undef)
-# BV3: max_slurp_size = 0            → always SQL mode         (data is undef)
-# VP1: max_slurp_size = 1_000_000    → always slurps           (data is ref)
-# ---------------------------------------------------------------------------
-
-note("D6: max_slurp_size boundary (CSV_SIZE=$CSV_SIZE bytes)");
-
-{
-	# BV1 — exact size → should slurp
-	my $db_bv1 = Database::test1->new({ directory => $DATA_DIR, max_slurp_size => $CSV_SIZE });
-	$db_bv1->count();
-	ok(ref($db_bv1->{'data'}), "D6 BV1: max_slurp_size=CSV_SIZE ($CSV_SIZE) → data slurped (is ref)");
-
-	# BV2 — one byte below threshold → must NOT slurp (SQL mode)
-	my $db_bv2 = Database::test1->new({ directory => $DATA_DIR, max_slurp_size => $CSV_SIZE - 1 });
-	$db_bv2->count();
-	ok(!ref($db_bv2->{'data'}), 'D6 BV2: max_slurp_size=CSV_SIZE-1 → data NOT slurped (SQL mode)');
-
-	# BV3 — zero forces SQL mode for all file sizes
-	my $db_bv3 = Database::test1->new({ directory => $DATA_DIR, max_slurp_size => 0 });
-	$db_bv3->count();
-	ok(!ref($db_bv3->{'data'}), 'D6 BV3: max_slurp_size=0 → always SQL mode (data not ref)');
-
-	# VP1 — very large → always slurps
-	my $db_vp1 = Database::test1->new({ directory => $DATA_DIR, max_slurp_size => 1_000_000 });
-	$db_vp1->count();
-	ok(ref($db_vp1->{'data'}), 'D6 VP1: max_slurp_size=1_000_000 → always slurps');
-}
-
-# ---------------------------------------------------------------------------
-# D7: Query::limit() — must be a non-negative integer (/\A\d+\z/)
-#
-# BV: 0 (minimum valid), large value
-# IP: -1 (just below min), float, string, undef
-# ---------------------------------------------------------------------------
-
-note('D7: Query::limit()');
-
-{
-	my $db = Database::test1->new($DATA_DIR);
-
-	# BV1 — 0 (minimum valid)
-	ok(eval { $db->query->limit(0); 1 }, 'D7 BV1: limit=0 is valid');
-
-	# VP1 — typical value
-	ok(eval { $db->query->limit(10); 1 }, 'D7 VP1: limit=10 is valid');
-
-	# VP2 — large value (no upper bound in spec)
-	ok(eval { $db->query->limit(999_999); 1 }, 'D7 VP2: limit=999_999 is valid');
-
-	# IP1 — negative (BV: just below min)
-	throws_ok {
-		$db->query->limit(-1)
-	} qr/non-negative integer/, 'D7 IP1: limit=-1 is rejected';
-
-	# IP2 — float
-	throws_ok {
-		$db->query->limit('1.5')
-	} qr/non-negative integer/, 'D7 IP2: limit=1.5 (float string) is rejected';
-
-	# IP3 — non-numeric string
-	throws_ok {
-		$db->query->limit('abc')
-	} qr/non-negative integer/, 'D7 IP3: limit="abc" is rejected';
-
-	# IP4 — undef
-	throws_ok {
-		$db->query->limit(undef)
-	} qr/non-negative integer/, 'D7 IP4: limit=undef is rejected';
-}
-
-# ---------------------------------------------------------------------------
-# D8: Query::offset() — same domain as limit()
-#
-# BV: 0 (minimum valid)
-# IP: -1, float, non-numeric, undef
-# ---------------------------------------------------------------------------
-
-note('D8: Query::offset()');
-
-{
-	my $db = Database::test1->new($DATA_DIR);
-
-	# BV1 — 0 (minimum valid)
-	ok(eval { $db->query->offset(0); 1 }, 'D8 BV1: offset=0 is valid');
-
-	# VP1 — typical pagination value
-	ok(eval { $db->query->offset(100); 1 }, 'D8 VP1: offset=100 is valid');
-
-	# IP1 — negative
-	throws_ok {
-		$db->query->offset(-1)
-	} qr/non-negative integer/, 'D8 IP1: offset=-1 is rejected';
-
-	# IP2 — float string
-	throws_ok {
-		$db->query->offset('2.5')
-	} qr/non-negative integer/, 'D8 IP2: offset=2.5 (float string) is rejected';
-
-	# IP3 — undef
-	throws_ok {
-		$db->query->offset(undef)
-	} qr/non-negative integer/, 'D8 IP3: offset=undef is rejected';
-}
-
-# ---------------------------------------------------------------------------
-# D9: Query::order_by() injection guard
-# Rejects expressions containing ;  --  /*
-# Valid: column name, "col DESC", multi-column, undef (clears ordering)
-# ---------------------------------------------------------------------------
-
-note('D9: order_by() injection guard');
-
-{
-	my $db = Database::test1->new($DATA_DIR);
-
-	# VP1 — bare column name
-	ok(eval { $db->query->order_by('entry'); 1 }, 'D9 VP1: order_by("entry") is valid');
-
-	# VP2 — column with direction
-	ok(eval { $db->query->order_by('number DESC'); 1 }, 'D9 VP2: order_by("col DESC") is valid');
-
-	# VP3 — multi-column (comma-separated, legitimate SQL)
-	ok(
-		eval { $db->query->order_by('number ASC, entry DESC'); 1 },
-		'D9 VP3: multi-column order_by is valid'
-	);
-
-	# VP4 — undef clears any ordering (no croak)
-	ok(eval { $db->query->order_by(undef); 1 }, 'D9 VP4: order_by(undef) is valid (clears)');
-
-	# IP1 — semicolon injection
-	throws_ok {
-		$db->query->order_by('entry; DROP TABLE test1')
-	} qr/unsafe ORDER BY/, 'D9 IP1: semicolon in order_by is rejected';
-
-	# IP2 — SQL comment via double-dash
-	throws_ok {
-		$db->query->order_by('entry -- comment')
-	} qr/unsafe ORDER BY/, 'D9 IP2: double-dash in order_by is rejected';
-
-	# IP3 — C-style block comment
-	throws_ok {
-		$db->query->order_by('entry /* malicious */')
-	} qr/unsafe ORDER BY/, 'D9 IP3: /* comment in order_by is rejected';
-}
-
-# ---------------------------------------------------------------------------
-# D10: join table name — validated against SAFE_QUALIFIED
-# (/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/)
-#
-# VP: 'dept', 'my_table', 'schema.table'
-# IP: 'dept;cmd', '../table'
-#
-# Note: Params::Get mangles join specs for keyed (no_entry=0) databases because
-# it maps the first positional element to 'entry'.  The join spec only reaches
-# _build_joins() when no_entry => 1 (get_params(undef, \@_) preserves key names).
-# test4ne uses no_entry => 1, so it is the correct fixture for join domain tests.
-# ---------------------------------------------------------------------------
-
-note('D10: join table name');
-
-{
-	my $db = Database::test4ne->new({ directory => $DATA_DIR });
-
-	# VP1 — simple table name: passes safety guard (may fail in DBI on unknown table)
-	# Suppress DBI/CSV warnings about the missing 'dept' table — we are testing the
-	# name-guard only, not whether the join itself succeeds.
-	{
-		local $SIG{__WARN__} = sub {};
-		eval {
-			$db->selectall_arrayref(join => { table => 'dept', on => 'test4.cardinal = dept.id' })
-		};
-	}
-	unlike($@, qr/unsafe table name/, 'D10 VP1: valid table name "dept" passes the safety guard');
-
-	# VP2 — qualified schema.table
-	{
-		local $SIG{__WARN__} = sub {};
-		eval {
-			$db->selectall_arrayref(join => { table => 'schema.dept', on => 'test4.cardinal = schema.dept.id' })
-		};
-	}
-	unlike($@, qr/unsafe table name/, 'D10 VP2: schema.table form passes the safety guard');
-
-	# IP1 — semicolon (command injection)
-	throws_ok {
-		$db->selectall_arrayref(join => { table => 'dept;ls', on => 'a=b' })
-	} qr/unsafe table name/, 'D10 IP1: table name with semicolon is rejected';
-
-	# IP2 — path traversal in table name
-	throws_ok {
-		$db->selectall_arrayref(join => { table => '../evil', on => 'a=b' })
-	} qr/unsafe table name/, 'D10 IP2: table name with path traversal is rejected';
-}
-
-# ---------------------------------------------------------------------------
-# D11: join type — must be INNER | LEFT | RIGHT | FULL | CROSS (case-insensitive)
-#
-# VP: each of the 5 valid types, lowercase (normalised)
-# IP: unknown type, empty string
-# ---------------------------------------------------------------------------
-
-note('D11: join type');
-
-{
-	# test4ne (no_entry => 1) so get_params(undef, \@_) correctly preserves the join key
-	my $db = Database::test4ne->new({ directory => $DATA_DIR });
-
-	# Suppress DBI/CSV warnings about the missing 'dept' table for the VP tests —
-	# we are testing the type guard only, not whether the join succeeds.
-	for my $type (qw(INNER LEFT RIGHT FULL CROSS)) {
-		local $SIG{__WARN__} = sub {};
-		eval {
-			$db->selectall_arrayref(join => { table => 'dept', on => 'a=b', type => $type })
-		};
-		unlike($@, qr/Invalid JOIN type/,
-			"D11 VP: type '$type' passes the type guard");
-	}
-
-	# VP: lowercase is normalised to uppercase (not rejected)
-	{
-		local $SIG{__WARN__} = sub {};
-		eval {
-			$db->selectall_arrayref(join => { table => 'dept', on => 'a=b', type => 'left' })
-		};
-	}
-	unlike($@, qr/Invalid JOIN type/, 'D11 VP: lowercase "left" is normalised, not rejected');
-
-	# IP1 — unknown type
-	throws_ok {
-		$db->selectall_arrayref(join => { table => 'dept', on => 'a=b', type => 'NOSUCHTYPE' })
-	} qr/Invalid JOIN type/, 'D11 IP1: unknown join type is rejected';
-
-	# IP2 — empty string
-	throws_ok {
-		$db->selectall_arrayref(join => { table => 'dept', on => 'a=b', type => '' })
-	} qr/Invalid JOIN type/, 'D11 IP2: empty join type is rejected';
-}
-
-# ---------------------------------------------------------------------------
-# D12: dbname and filename — validated in _open() against /^[a-zA-Z0-9_.-]+$/
-# and must not contain '..'
-#
-# VP: 'test1', 'my.db', 'data-file'
-# IP: '../etc', '/etc/passwd', 'db/sub', 'db;cmd'
-# ---------------------------------------------------------------------------
-
-note('D12: dbname and filename safety');
-
-{
-	# VP1 — explicit dbname matching the fixture → query succeeds
-	my $db_vp = Database::test1->new({ directory => $DATA_DIR, dbname => 'test1' });
-	ok(eval { $db_vp->count(); 1 }, 'D12 VP1: explicit dbname="test1" is accepted');
-
-	# IP1 — path traversal in dbname
-	my $db_ip1 = Database::test1->new({ directory => $DATA_DIR, dbname => '../etc' });
-	throws_ok { $db_ip1->count() } qr/unsafe dbname/, 'D12 IP1: dbname="../etc" is rejected';
-
-	# IP2 — absolute path in dbname (contains '/')
-	my $db_ip2 = Database::test1->new({ directory => $DATA_DIR, dbname => '/etc/passwd' });
-	throws_ok { $db_ip2->count() } qr/unsafe dbname/, 'D12 IP2: dbname="/etc/passwd" is rejected';
-
-	# IP3 — path traversal in filename
-	my $db_ip3 = Database::test1->new({ directory => $DATA_DIR, filename => '../etc/passwd' });
-	throws_ok { $db_ip3->count() } qr/unsafe filename/, 'D12 IP3: filename="../etc/passwd" is rejected';
-}
-
-# ---------------------------------------------------------------------------
-# D13: Combinatorial — max_slurp_size at exact boundary, keyed vs no_entry
-#
-# Verifies that the <= comparison (not <) fires correctly for both storage
-# modes at the precise boundary value.
-# ---------------------------------------------------------------------------
-
-note('D13: Combinatorial — slurp boundary for keyed vs no_entry modes');
-
-{
-	# Keyed mode at exact boundary → data is HASH ref
-	my $db_keyed = Database::test1->new({
-		directory     => $DATA_DIR,
-		max_slurp_size => $CSV_SIZE,
-	});
-	$db_keyed->count();
-	is(ref($db_keyed->{'data'}), 'HASH',
-		"D13 CB1: keyed, max_slurp_size=CSV_SIZE ($CSV_SIZE) → HASH ref");
-
-	# Keyed mode one byte below boundary → SQL mode, no HASH
-	my $db_keyed2 = Database::test1->new({
-		directory      => $DATA_DIR,
-		max_slurp_size => $CSV_SIZE - 1,
-	});
-	$db_keyed2->count();
-	ok(!ref($db_keyed2->{'data'}),
-		'D13 CB2: keyed, max_slurp_size=CSV_SIZE-1 → SQL mode (not a ref)');
-
-	# no_entry mode at exact boundary → data is ARRAY ref
-	# test4.csv is a comma-separated file; its size may differ from test1.csv
-	my $csv4_file = File::Spec->catfile($DATA_DIR, 'test4.csv');
-	my $csv4_size = (-s $csv4_file);
-	my $db_ne = Database::test4ne->new({
-		directory      => $DATA_DIR,
-		max_slurp_size => $csv4_size,
-	});
-	$db_ne->count();
-	is(ref($db_ne->{'data'}), 'ARRAY',
-		"D13 CB3: no_entry, max_slurp_size=csv4_size ($csv4_size) → ARRAY ref");
-
-	# no_entry mode one byte below boundary → SQL mode
-	my $db_ne2 = Database::test4ne->new({
-		directory      => $DATA_DIR,
-		max_slurp_size => $csv4_size - 1,
-	});
-	$db_ne2->count();
-	ok(!ref($db_ne2->{'data'}),
-		'D13 CB4: no_entry, max_slurp_size=csv4_size-1 → SQL mode (not a ref)');
-}
-
-# ---------------------------------------------------------------------------
-# D14: sort_by parameter for selectall_arrayref / selectall_array
-#
-# Column name validated against $SAFE_QUALIFIED; direction must be ASC or DESC
-# (case-insensitive).  Invalid name or direction: carp + fallback to default
-# primary-key sort — NOT a croak.
-#
-# VP:  'entry' scalar, ['entry','DESC'] arrayref, ['entry','ASC']
-# BV:  single-underscore column name (minimum-length SAFE_QUALIFIED)
-# IP:  direction 'NOSUCHDIR' (carp+fallback), name '1bad' (carp+fallback)
-# ---------------------------------------------------------------------------
-
-note('D14: sort_by parameter');
-
-{
-	my $db = Database::test1->new($DATA_DIR);
-
-	# VP1 — scalar column name implies ascending; rows returned
-	{
-		my $rows = $db->selectall_arrayref(sort_by => 'entry');
-		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
-			'D14 VP1: sort_by scalar column name returns rows');
-	}
-
-	# VP2 — arrayref [col,'DESC'] descending form
-	{
-		my $rows = $db->selectall_arrayref(sort_by => ['entry', 'DESC']);
-		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
-			'D14 VP2: sort_by ["entry","DESC"] returns rows');
-	}
-
-	# VP3 — arrayref [col,'ASC'] explicit ascending
-	{
-		my $rows = $db->selectall_arrayref(sort_by => ['entry', 'ASC']);
-		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
-			'D14 VP3: sort_by ["entry","ASC"] returns rows');
-	}
-
-	# BV1 — sort_by with an existing column that is not the default primary key
-	{
-		my $rows = $db->selectall_arrayref(sort_by => 'number');
-		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
-			'D14 BV1: sort_by existing non-pk column "number" returns rows');
-	}
-
-	# IP1 — invalid direction: carp emitted; rows still returned (fallback)
-	{
-		my @warns;
-		local $SIG{__WARN__} = sub { push @warns, @_ };
-		my $rows = $db->selectall_arrayref(sort_by => ['entry', 'NOSUCHDIR']);
-		ok(scalar(@warns) > 0,
-			'D14 IP1: invalid sort direction triggers a carp');
-		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
-			'D14 IP1: rows still returned after invalid sort direction (fallback)');
-	}
-
-	# IP2 — column name failing SAFE_QUALIFIED (starts with digit): carp + fallback
-	{
-		my @warns;
-		local $SIG{__WARN__} = sub { push @warns, @_ };
-		my $rows = $db->selectall_arrayref(sort_by => '1invalid');
-		ok(scalar(@warns) > 0,
-			'D14 IP2: non-SAFE_QUALIFIED sort column triggers a carp');
-		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
-			'D14 IP2: rows still returned after invalid sort column (fallback)');
+	package Database::domain_noentry;
+	use Database::Abstraction;
+	our @ISA = ('Database::Abstraction');
+	sub new {
+		my $class = shift;
+		return $class->SUPER::new(no_entry => 1, sep_char => ',', dbname => 'test4', @_);
 	}
 }
 
-# ---------------------------------------------------------------------------
-# D15: base_criteria constructor parameter
-#
-# Must be a hashref.  Keys validated against $SAFE_QUALIFIED unless they
-# start with '-' (which allows -or/-and grouping keys).
-#
-# VP:  {entry=>'one'} (scalar filter), {} (empty — no filter), -or key
-# BV:  undef value (IS NULL partition) — accepted at construction time
-# IP:  scalar string (not a hashref), key with semicolon, key with null byte
-# ---------------------------------------------------------------------------
-
-note('D15: base_criteria constructor parameter');
-
-{
-	# VP1 — scalar criterion filters to matching rows only
-	{
-		my $db = Database::test1->new({
-			directory     => $DATA_DIR,
-			base_criteria => { entry => 'one' },
-		});
-		cmp_ok($db->count(), '==', 1,
-			'D15 VP1: base_criteria {entry=>"one"} filters to exactly 1 row');
-	}
-
-	# VP2 — empty hashref: no rows filtered; count equals unfiltered count
-	{
-		my $db_full = Database::test1->new({ directory => $DATA_DIR });
-		my $db_bc   = Database::test1->new({ directory => $DATA_DIR, base_criteria => {} });
-		cmp_ok($db_bc->count(), '==', $db_full->count(),
-			'D15 VP2: empty base_criteria {} does not remove any rows');
-	}
-
-	# VP3 — -or grouping key (starts with '-') is explicitly allowed
-	ok(
-		eval {
-			Database::test1->new({
-				directory     => $DATA_DIR,
-				base_criteria => { -or => [ { entry => 'one' }, { entry => 'two' } ] },
-			});
-			1
-		},
-		'D15 VP3: -or grouping key in base_criteria is valid (not rejected)'
-	);
-
-	# BV1 — undef value (IS NULL filter) is accepted at construction time
-	ok(
-		eval {
-			Database::test1->new({
-				directory     => $DATA_DIR,
-				base_criteria => { name => undef },
-			});
-			1
-		},
-		'D15 BV1: undef value (IS NULL) in base_criteria is accepted'
-	);
-
-	# IP1 — non-hashref (plain scalar) must croak
-	throws_ok {
-		Database::test1->new({ directory => $DATA_DIR, base_criteria => 'not_a_hashref' })
-	} qr/base_criteria must be a hashref/,
-		'D15 IP1: scalar base_criteria croaks "base_criteria must be a hashref"';
-
-	# IP2 — unsafe key containing semicolon
-	throws_ok {
-		Database::test1->new({
-			directory     => $DATA_DIR,
-			base_criteria => { 'col;drop' => 1 },
-		})
-	} qr/unsafe base_criteria key/,
-		'D15 IP2: base_criteria key with semicolon croaks "unsafe base_criteria key"';
-
-	# IP3 — key with null byte (bypasses naive checks)
-	throws_ok {
-		Database::test1->new({
-			directory     => $DATA_DIR,
-			base_criteria => { "col\x00name" => 1 },
-		})
-	} qr/unsafe base_criteria key/,
-		'D15 IP3: base_criteria key with null byte croaks "unsafe base_criteria key"';
+# Convenience: build a fresh Database::test1 object
+sub _db {
+	return Database::test1->new(directory => $DIR, @_);
 }
 
-# ---------------------------------------------------------------------------
-# D16: table constructor parameter
-#
-# Validated against $SAFE_QUALIFIED (/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/).
-# A dot is allowed (qualified schema.table notation); digit-leading, slash,
-# and semicolon names are all rejected.
-#
-# VP:  'mytable' (simple), 'schema.test1' (qualified with dot)
-# IP:  '1bad' (digit-leading), 'tbl;drop' (semicolon), 'dir/table' (slash)
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
+# SECTION 1: id parameter — $SAFE_IDENTIFIER
+# /\A[a-zA-Z_][a-zA-Z0-9_]*\z/
+# Valid:   letter/underscore start, alphanumeric/underscore body
+# Invalid: starts with digit, contains non-ASCII, contains punctuation
+# -----------------------------------------------------------------------
 
-note('D16: table constructor parameter');
+subtest 'id parameter — valid partition' => sub {
+	plan tests => 5;
 
-{
-	# VP1 — simple valid table name
-	ok(
-		eval { Database::test1->new({ directory => $DATA_DIR, table => 'mytable' }); 1 },
-		'D16 VP1: table="mytable" passes SAFE_QUALIFIED guard'
-	);
+	# Typical valid values
+	lives_ok { _db(id => 'entry') }     'id: standard name "entry"';
+	lives_ok { _db(id => '_id') }       'id: leading underscore "_id"';
+	lives_ok { _db(id => 'my_col') }    'id: underscore in body "my_col"';
+	lives_ok { _db(id => 'col1') }      'id: trailing digit "col1"';
+	lives_ok { _db(id => 'A') }         'id: single uppercase letter (minimum valid length)';
+};
 
-	# VP2 — qualified schema.table (dot allowed in SAFE_QUALIFIED)
-	ok(
-		eval { Database::test1->new({ directory => $DATA_DIR, table => 'schema.test1' }); 1 },
-		'D16 VP2: table="schema.test1" qualified form passes SAFE_QUALIFIED guard'
-	);
+subtest 'id parameter — boundary: minimum valid identifier length (1 char)' => sub {
+	plan tests => 2;
+	lives_ok { _db(id => 'a') } 'id: single lowercase letter accepted';
+	lives_ok { _db(id => '_') } 'id: single underscore accepted';
+};
 
-	# IP1 — starts with digit
-	throws_ok {
-		Database::test1->new({ directory => $DATA_DIR, table => '1bad' })
-	} qr/unsafe table name/,
-		'D16 IP1: table name starting with digit is rejected';
+subtest 'id parameter — invalid partition: starts with digit' => sub {
+	plan tests => 2;
+	throws_ok { _db(id => '1bad') }  $ERR_UNSAFE_ID, 'id: starts with digit rejected';
+	throws_ok { _db(id => '0') }     $ERR_UNSAFE_ID, 'id: single digit rejected (BVA: just-invalid at min)';
+};
 
-	# IP2 — semicolon (SQL injection vector)
-	throws_ok {
-		Database::test1->new({ directory => $DATA_DIR, table => 'tbl;drop' })
-	} qr/unsafe table name/,
-		'D16 IP2: table name with semicolon is rejected';
+subtest 'id parameter — invalid partition: SQL metacharacters' => sub {
+	plan tests => 4;
+	throws_ok { _db(id => 'entry; DROP TABLE t--') } $ERR_UNSAFE_ID, 'id: semicolon injection rejected';
+	throws_ok { _db(id => 'id UNION SELECT') }        $ERR_UNSAFE_ID, 'id: UNION injection rejected';
+	throws_ok { _db(id => "id\0null") }               $ERR_UNSAFE_ID, 'id: null byte rejected';
+	throws_ok { _db(id => 'my-col') }                 $ERR_UNSAFE_ID, 'id: hyphen rejected';
+};
 
-	# IP3 — slash (path separator, not in SAFE_QUALIFIED charset)
-	throws_ok {
-		Database::test1->new({ directory => $DATA_DIR, table => 'dir/table' })
-	} qr/unsafe table name/,
-		'D16 IP3: table name with slash is rejected';
-}
+subtest 'id parameter — invalid partition: non-ASCII / multibyte' => sub {
+	plan tests => 3;
+	# SAFE_IDENTIFIER is ASCII-only; non-ASCII must be rejected to prevent
+	# driver-specific encoding issues in ORDER BY / WHERE clauses.
+	throws_ok { _db(id => "\x{fc}nterwegs") }  $ERR_UNSAFE_ID, 'id: Latin-1 umlaut (ü) rejected';
+	throws_ok { _db(id => "\x{1f600}col") }    $ERR_UNSAFE_ID, 'id: emoji prefix rejected';
+	throws_ok { _db(id => "\x{202e}rtl") }     $ERR_UNSAFE_ID, 'id: RTL override char rejected';
+};
 
-# ---------------------------------------------------------------------------
-# D17: Criteria value domains for selectall_arrayref
-#
-# Valid: plain scalar, undef (IS NULL), -in, -not_in, -like
-# Invalid: plain arrayref value (croaks from _build_where_conditions)
-#
-# Note: test4ne (no_entry=1) so Params::Get uses get_params(undef,\@_) and
-# correctly preserves the column-name => value mapping without mapping the
-# first element to 'entry'.
-#
-# Note: -between and != are valid API operators but DBD::CSV (the CSV backend)
-# does not support them; those operators are covered in t/query_builder.t
-# against a SQLite fixture.
-# ---------------------------------------------------------------------------
+subtest 'id parameter — invalid partition: dots (QUALIFIED vs IDENTIFIER)' => sub {
+	plan tests => 1;
+	# dot is allowed by SAFE_QUALIFIED but NOT by SAFE_IDENTIFIER
+	throws_ok { _db(id => 't.col') } $ERR_UNSAFE_ID, 'id: qualified name with dot rejected';
+};
 
-note('D17: criteria value domains');
+# -----------------------------------------------------------------------
+# SECTION 2: table parameter — $SAFE_QUALIFIED
+# /\A[a-zA-Z_][a-zA-Z0-9_.]*\z/
+# Valid:   letter/underscore start, alphanumeric/underscore/dot body
+# Invalid: starts with digit, spaces, SQL punctuation, non-ASCII
+# -----------------------------------------------------------------------
 
-{
-	my $db = Database::test4ne->new({ directory => $DATA_DIR });
+subtest 'table parameter — valid partition' => sub {
+	plan tests => 4;
+	lives_ok { _db(table => 'test1') }      'table: simple name';
+	lives_ok { _db(table => 'db.test1') }   'table: qualified table.name with dot';
+	lives_ok { _db(table => '_tbl') }       'table: leading underscore';
+	lives_ok { _db(table => 'T1') }         'table: uppercase+digit';
+};
 
-	# VP1 — plain scalar equality: matching value returns ARRAY ref
-	{
-		my $rows = $db->selectall_arrayref(cardinal => 'one');
-		ok(ref($rows) eq 'ARRAY' && @$rows == 1,
-			'D17 VP1: plain scalar criterion matches and returns a 1-row arrayref');
-	}
+subtest 'table parameter — invalid partition: injection attempts' => sub {
+	plan tests => 4;
+	throws_ok { _db(table => 'users UNION SELECT password FROM secrets') }
+		$ERR_UNSAFE_TABLE, 'table: UNION injection rejected';
+	throws_ok { _db(table => "tbl\0") }
+		$ERR_UNSAFE_TABLE, 'table: null byte rejected';
+	throws_ok { _db(table => '1table') }
+		$ERR_UNSAFE_TABLE, 'table: starts with digit rejected';
+	throws_ok { _db(table => 'my-table') }
+		$ERR_UNSAFE_TABLE, 'table: hyphen rejected';
+};
 
-	# VP2 — undef value (IS NULL filter): lives without croak
-	# test4.csv has no NULL values so result is undef (no rows); the contract
-	# being tested is that the criteria type is ACCEPTED, not the row count.
+subtest 'table parameter — invalid partition: non-ASCII' => sub {
+	plan tests => 2;
+	throws_ok { _db(table => "caf\x{e9}") }   $ERR_UNSAFE_TABLE, 'table: Latin-1 accent (é) rejected';
+	throws_ok { _db(table => "\x{1f4db}tbl") } $ERR_UNSAFE_TABLE, 'table: emoji prefix rejected';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 3: host parameter
+# /\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9:][a-zA-Z0-9._:-]*\z/
+# Valid:   hostname, user@host, IPv4, IPv6
+# Invalid: spaces, semicolons, shell metacharacters, path traversal
+# Note:    directory check is skipped for genuinely remote hosts, so
+#          we do not need a real directory for the rejected cases.
+# -----------------------------------------------------------------------
+
+subtest 'host parameter — valid partition' => sub {
+	plan tests => 5;
+	# Providing directory is needed for local-host resolution path (it reads
+	# the directory directly); a remote host bypasses the -d check.
+	lives_ok { Database::test1->new(host => 'remoteserver',     directory => $DIR) }
+		'host: simple hostname accepted';
+	lives_ok { Database::test1->new(host => 'server.example.com', directory => $DIR) }
+		'host: FQDN accepted';
+	lives_ok { Database::test1->new(host => 'user@server',      directory => $DIR) }
+		'host: user@host accepted';
+	lives_ok { Database::test1->new(host => '192.168.1.1',      directory => $DIR) }
+		'host: dotted IPv4 accepted';
+	lives_ok { Database::test1->new(host => '::1',              directory => $DIR) }
+		'host: IPv6 loopback accepted (local-host short-circuit)';
+};
+
+subtest 'host parameter — invalid partition: shell metacharacters' => sub {
+	plan tests => 4;
+	throws_ok { Database::test1->new(host => 'host server',    directory => $DIR) }
+		$ERR_UNSAFE_HOST, 'host: space rejected';
+	throws_ok { Database::test1->new(host => 'host;rm -rf /',  directory => $DIR) }
+		$ERR_UNSAFE_HOST, 'host: semicolon rejected';
+	throws_ok { Database::test1->new(host => 'host$(id)',       directory => $DIR) }
+		$ERR_UNSAFE_HOST, 'host: command substitution rejected';
+	throws_ok { Database::test1->new(host => '@server',         directory => $DIR) }
+		$ERR_UNSAFE_HOST, 'host: leading at-sign rejected (username must be alphanumeric)';
+};
+
+subtest 'host parameter — invalid partition: path traversal' => sub {
+	plan tests => 2;
+	throws_ok { Database::test1->new(host => '../../etc',      directory => $DIR) }
+		$ERR_UNSAFE_HOST, 'host: path traversal ../ rejected';
+	throws_ok { Database::test1->new(host => '/etc/passwd',    directory => $DIR) }
+		$ERR_UNSAFE_HOST, 'host: absolute path rejected';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 4: url parameter
+# Must match /\Ahttps?:\/\//i
+# Valid:   http:// and https:// schemes
+# Invalid: ftp://, file://, javascript:, bare hostname, empty string
+# -----------------------------------------------------------------------
+
+subtest 'url parameter — valid partition' => sub {
+	plan tests => 3;
+	# url bypasses file detection; no directory needed.  The actual fetch is
+	# lazy so we only test that construction lives.
+	lives_ok { Database::test1->new(url => 'http://example.com/data.html') }
+		'url: http:// scheme accepted';
+	lives_ok { Database::test1->new(url => 'https://example.com/data.html') }
+		'url: https:// scheme accepted';
+	lives_ok { Database::test1->new(url => 'HTTPS://example.com/DATA.HTML') }
+		'url: uppercase HTTPS scheme accepted (case-insensitive)';
+};
+
+subtest 'url parameter — invalid partition: forbidden schemes' => sub {
+	plan tests => 5;
+	throws_ok { Database::test1->new(url => 'ftp://example.com/file.csv') }
+		$ERR_UNSAFE_URL, 'url: ftp:// scheme rejected';
+	throws_ok { Database::test1->new(url => 'file:///etc/passwd') }
+		$ERR_UNSAFE_URL, 'url: file:// scheme rejected';
+	throws_ok { Database::test1->new(url => 'javascript:alert(1)') }
+		$ERR_UNSAFE_URL, 'url: javascript: scheme rejected';
+	throws_ok { Database::test1->new(url => 'redis://localhost') }
+		$ERR_UNSAFE_URL, 'url: redis:// scheme rejected as url (use database= instead)';
+	throws_ok { Database::test1->new(url => 'example.com/table.html') }
+		$ERR_UNSAFE_URL, 'url: bare hostname (no scheme) rejected';
+};
+
+subtest 'url parameter — boundary: minimum valid url' => sub {
+	plan tests => 1;
+	lives_ok { Database::test1->new(url => 'http://x') }
+		'url: minimal http://x accepted (length boundary)';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 5: database parameter
+# Must match /\Aredis:\/\//i
+# Valid:   redis:// scheme
+# Invalid: http://, postgres://, bare hostname
+# -----------------------------------------------------------------------
+
+subtest 'database parameter — valid partition' => sub {
+	plan tests => 3;
+	lives_ok { Database::test1->new(database => 'redis://localhost') }
+		'database: redis://host accepted';
+	lives_ok { Database::test1->new(database => 'redis://localhost:6379/0') }
+		'database: redis://host:port/db accepted';
+	lives_ok { Database::test1->new(database => 'REDIS://localhost') }
+		'database: uppercase REDIS accepted (case-insensitive)';
+};
+
+subtest 'database parameter — invalid partition: wrong schemes' => sub {
+	plan tests => 4;
+	throws_ok { Database::test1->new(database => 'http://localhost') }
+		$ERR_UNSAFE_DB, 'database: http:// rejected';
+	throws_ok { Database::test1->new(database => 'postgres://localhost/mydb') }
+		$ERR_UNSAFE_DB, 'database: postgres:// rejected';
+	throws_ok { Database::test1->new(database => 'localhost:6379') }
+		$ERR_UNSAFE_DB, 'database: bare host:port rejected';
+	throws_ok { Database::test1->new(database => 'file:///data/db') }
+		$ERR_UNSAFE_DB, 'database: file:// rejected';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 6: base_criteria parameter
+# Must be a hashref; keys must match $SAFE_QUALIFIED or start with '-'
+# -----------------------------------------------------------------------
+
+subtest 'base_criteria — valid partition: hashref with safe keys' => sub {
+	plan tests => 4;
+	lives_ok { _db(base_criteria => { number => '1' }) }
+		'base_criteria: simple scalar criterion accepted';
+	lives_ok { _db(base_criteria => { 't.col' => '1' }) }
+		'base_criteria: qualified table.column key accepted';
+	lives_ok { _db(base_criteria => { '-or' => [{ number => 1 }] }) }
+		'base_criteria: -or grouping key accepted';
+	lives_ok { _db(base_criteria => { '-and' => [{ number => 1 }] }) }
+		'base_criteria: -and grouping key accepted';
+};
+
+subtest 'base_criteria — boundary: empty hashref' => sub {
+	plan tests => 1;
+	lives_ok { _db(base_criteria => {}) }
+		'base_criteria: empty hashref accepted (no-op filter)';
+};
+
+subtest 'base_criteria — invalid partition: not a hashref' => sub {
+	plan tests => 3;
+	throws_ok { _db(base_criteria => 'active') }
+		$ERR_BC_HASHREF, 'base_criteria: plain string rejected';
+	throws_ok { _db(base_criteria => ['active']) }
+		$ERR_BC_HASHREF, 'base_criteria: arrayref rejected';
+	throws_ok { _db(base_criteria => 1) }
+		$ERR_BC_HASHREF, 'base_criteria: integer rejected';
+	# undef is silently accepted as "no filter" — not a rejection case
+};
+
+subtest 'base_criteria — invalid partition: unsafe keys' => sub {
+	plan tests => 4;
+	throws_ok { _db(base_criteria => { '1bad' => 'v' }) }
+		$ERR_BC_KEY, 'base_criteria: key starting with digit rejected';
+	throws_ok { _db(base_criteria => { 'col; DROP' => 'v' }) }
+		$ERR_BC_KEY, 'base_criteria: semicolon in key rejected';
+	throws_ok { _db(base_criteria => { "col\0" => 'v' }) }
+		$ERR_BC_KEY, 'base_criteria: null byte in key rejected';
+	throws_ok { _db(base_criteria => { "\x{fc}col" => 'v' }) }
+		$ERR_BC_KEY, 'base_criteria: non-ASCII key rejected';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 7: redis_key parameter
+# Only valid when database is a redis:// URL
+# -----------------------------------------------------------------------
+
+subtest 'redis_key — valid only with redis:// database' => sub {
+	plan tests => 2;
 	lives_ok {
-		$db->selectall_arrayref(cardinal => undef)
-	} 'D17 VP2: undef criterion (IS NULL) does not croak';
+		Database::test1->new(database => 'redis://localhost', redis_key => 'users')
+	} 'redis_key: accepted alongside redis:// database';
 
-	# VP3 — -in operator hashref
-	{
-		my $rows = $db->selectall_arrayref(cardinal => { -in => ['one', 'two'] });
-		ok(ref($rows) eq 'ARRAY' && @$rows == 2,
-			'D17 VP3: -in operator hashref returns matching rows');
-	}
-
-	# VP4 — -not_in operator hashref
-	{
-		my $rows = $db->selectall_arrayref(cardinal => { -not_in => ['one'] });
-		ok(ref($rows) eq 'ARRAY' && @$rows == 2,
-			'D17 VP4: -not_in operator hashref returns non-matching rows');
-	}
-
-	# VP5 — -like operator hashref (wildcard — all rows match %)
-	{
-		my $rows = $db->selectall_arrayref(cardinal => { -like => '%' });
-		ok(ref($rows) eq 'ARRAY' && @$rows == 3,
-			'D17 VP5: -like "%" operator hashref returns all rows');
-	}
-
-	# IP1 — plain arrayref as criterion value: _build_where_conditions croaks
 	throws_ok {
-		$db->selectall_arrayref(cardinal => [1, 2, 3])
-	} qr/expected scalar or operator hashref|got ARRAY/i,
-		'D17 IP1: plain arrayref as criterion value is rejected';
-}
+		Database::test1->new(directory => $DIR, redis_key => 'users')
+	} $ERR_REDIS_KEY, 'redis_key: rejected when database is not set';
+};
 
-# ---------------------------------------------------------------------------
-# D18: limit / offset via selectall_arrayref direct method
-#
-# Valid non-negative integers are silently applied.
-# Invalid values (/\A\d+\z/ fails) trigger carp + the parameter is ignored.
-# This is DIFFERENT from Query::limit()/offset() which croak on invalid input.
-#
-# VP:  limit=2 (returns 2 rows), offset=1 (skips 1 row)
-# BV:  limit=0 (returns 0 rows — minimum valid)
-# IP:  limit=-1 (carp+ignored → all rows), offset='abc' (carp+ignored → no skip)
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
+# SECTION 8: limit / offset — selectall_arrayref
+# Valid:   non-negative integer (0, 1, N)
+# Invalid: negative, fractional, non-numeric string
+# Behaviour: carp + ignore (not croak)
+# Boundaries: 0 (empty result), 1 (one row), TOTAL-1, TOTAL, TOTAL+1
+# -----------------------------------------------------------------------
 
-note('D18: limit/offset via selectall_arrayref direct method');
+subtest 'limit — valid partition and BVA' => sub {
+	plan tests => 5;
+	my $db = _db();
 
-{
-	my $db = Database::test1->new($DATA_DIR);
+	my $r0 = $db->selectall_arrayref(limit => 0);
+	is(scalar @{$r0}, 0, 'limit => 0: returns empty arrayref (boundary: minimum)');
 
-	# VP1 — valid limit restricts the returned row count
-	{
-		my $rows = $db->selectall_arrayref(limit => 2);
-		cmp_ok(scalar @$rows, '==', 2,
-			'D18 VP1: limit=>2 returns exactly 2 rows');
-	}
+	my $r1 = $db->selectall_arrayref(limit => 1);
+	is(scalar @{$r1}, 1, 'limit => 1: returns exactly 1 row');
 
-	# BV1 — limit=0 is the minimum valid value; returns empty arrayref
-	{
-		my $rows = $db->selectall_arrayref(limit => 0);
-		cmp_ok(scalar @$rows, '==', 0,
-			'D18 BV1: limit=>0 returns an empty arrayref');
-	}
+	my $rm1 = $db->selectall_arrayref(limit => $TOTAL_ROWS - 1);
+	is(scalar @{$rm1}, $TOTAL_ROWS - 1, 'limit => TOTAL-1: returns N-1 rows (just-below-max BVA)');
 
-	# VP2 — valid offset skips the first N rows
-	{
-		my $all  = $db->selectall_arrayref();
-		my $rows = $db->selectall_arrayref(offset => 1);
-		cmp_ok(scalar @$rows, '==', scalar(@$all) - 1,
-			'D18 VP2: offset=>1 skips exactly one row');
-	}
+	my $rn = $db->selectall_arrayref(limit => $TOTAL_ROWS);
+	is(scalar @{$rn}, $TOTAL_ROWS, 'limit => TOTAL: returns all rows (at-max BVA)');
 
-	# IP1 — negative limit: carp emitted; all rows returned (parameter ignored)
-	{
-		my @warns;
-		local $SIG{__WARN__} = sub { push @warns, @_ };
-		my $full = scalar @{ $db->selectall_arrayref() };
-		my $rows = $db->selectall_arrayref(limit => -1);
-		ok(scalar(@warns) > 0,
-			'D18 IP1: negative limit triggers a carp');
-		cmp_ok(scalar @$rows, '==', $full,
-			'D18 IP1: negative limit is ignored (all rows returned)');
-	}
+	my $rp = $db->selectall_arrayref(limit => $TOTAL_ROWS + 1);
+	is(scalar @{$rp}, $TOTAL_ROWS, 'limit => TOTAL+1: returns all rows (past-max BVA, no padding)');
+};
 
-	# IP2 — non-numeric offset: carp emitted; no offset applied
-	{
-		my @warns;
-		local $SIG{__WARN__} = sub { push @warns, @_ };
-		my $full = scalar @{ $db->selectall_arrayref() };
-		my $rows = $db->selectall_arrayref(offset => 'abc');
-		ok(scalar(@warns) > 0,
-			'D18 IP2: non-numeric offset triggers a carp');
-		cmp_ok(scalar @$rows, '==', $full,
-			'D18 IP2: non-numeric offset is ignored (all rows returned)');
-	}
-}
+subtest 'limit — invalid partition: non-integer values (carp, ignore)' => sub {
+	plan tests => 6;
+	my $db = _db();
 
-# ---------------------------------------------------------------------------
-# D19: dsn parameter — bypasses file detection entirely
-#
-# When dsn is given, _open() skips the extension probe and calls DBI->connect()
-# directly.  No directory is required.  Dialect auto-detected from DSN prefix.
-#
-# VP:  valid SQLite DSN → count() returns integer, no directory arg needed
-# IP:  DSN with missing/non-existent driver → DBI connect error (croak)
-# ---------------------------------------------------------------------------
+	warning_like {
+		my $r = $db->selectall_arrayref(limit => -1);
+		is(scalar @{$r}, $TOTAL_ROWS, '  negative limit ignored: full result returned');
+	} qr/limit must be a non-negative integer/, 'limit => -1: carp emitted';
 
-note('D19: dsn parameter');
+	warning_like {
+		my $r = $db->selectall_arrayref(limit => '2.5');
+		is(scalar @{$r}, $TOTAL_ROWS, '  fractional limit ignored: full result returned');
+	} qr/limit must be a non-negative integer/, 'limit => "2.5": carp emitted';
 
-SKIP: {
-	eval { require DBD::SQLite } or skip 'DBD::SQLite not available', 3;
+	warning_like {
+		my $r = $db->selectall_arrayref(limit => 'abc');
+		is(scalar @{$r}, $TOTAL_ROWS, '  string limit ignored: full result returned');
+	} qr/limit must be a non-negative integer/, 'limit => "abc": carp emitted';
+};
 
-	require File::Temp;
-	my $tf    = File::Temp->new(SUFFIX => '.sqlite', UNLINK => 1);
-	my $tf_fn = $tf->filename;
+subtest 'offset — valid partition and BVA' => sub {
+	plan tests => 4;
+	my $db = _db();
 
-	# Bootstrap a minimal SQLite database for the tests below
-	{
-		require DBI;
-		my $dbh = DBI->connect(
-			"dbi:SQLite:dbname=$tf_fn", '', '',
-			{ RaiseError => 1, AutoCommit => 1, PrintError => 0 }
-		);
-		$dbh->do('CREATE TABLE test1 (entry TEXT, name TEXT)');
-		$dbh->do(q{INSERT INTO test1 VALUES ('a','Alpha')});
-		$dbh->do(q{INSERT INTO test1 VALUES ('b','Beta')});
-		$dbh->disconnect;
-	}
+	my $r0 = $db->selectall_arrayref(offset => 0);
+	is(scalar @{$r0}, $TOTAL_ROWS, 'offset => 0: full result (no rows skipped)');
 
-	# VP1 — valid SQLite DSN constructs without a directory argument
-	my $db_dsn = eval {
-		Database::test1->new({ dsn => "dbi:SQLite:dbname=$tf_fn" })
-	};
-	ok(defined $db_dsn && !$@,
-		'D19 VP1: valid SQLite DSN constructs without a directory');
+	my $r1 = $db->selectall_arrayref(offset => 1);
+	is(scalar @{$r1}, $TOTAL_ROWS - 1, 'offset => 1: one row skipped');
 
-	# VP2 — count() traverses the SQL path via the DSN connection
-	{
-		my $n = eval { $db_dsn->count() };
-		ok(!$@ && defined $n,
-			'D19 VP2: count() works on a DSN-backed SQLite database');
-	}
+	my $rn = $db->selectall_arrayref(offset => $TOTAL_ROWS);
+	is(scalar @{$rn}, 0, 'offset => TOTAL: all rows skipped (at-max boundary)');
 
-	# IP1 — bogus DSN prefix → DBI fails to load the driver
-	{
-		local $SIG{__WARN__} = sub {};    # suppress DBI's own warnings
-		throws_ok {
-			Database::test1->new({ dsn => 'dbi:NOSUCHDRIVER_xyzzy:whatever' })->count()
-		} qr/install_driver|could not find|Can't locate|driver/i,
-			'D19 IP1: unknown DSN driver croaks with a DBI driver error';
-	}
-}
+	my $rp = $db->selectall_arrayref(offset => $TOTAL_ROWS + 1);
+	is(scalar @{$rp}, 0, 'offset => TOTAL+1: empty (past-max boundary)');
+};
 
-# ---------------------------------------------------------------------------
-# D20: Non-ASCII / multibyte character values in criteria
-#
-# The module is not required to decode UTF-8 bytes; it IS required to handle
-# multibyte byte-strings in criteria without a fatal crash.
-#
-# VP:  UTF-8 two-byte umlaut in scalar criterion → lives, returns []
-# VP:  Four-byte emoji bytes in scalar criterion → lives, returns []
-# VP:  -like pattern containing non-ASCII bytes → lives, returns []
-# ---------------------------------------------------------------------------
+subtest 'offset — invalid partition: non-integer (carp, ignore)' => sub {
+	plan tests => 4;
+	my $db = _db();
 
-note('D20: non-ASCII bytes in criteria values (no-crash contract)');
+	warning_like {
+		my $r = $db->selectall_arrayref(offset => -3);
+		is(scalar @{$r}, $TOTAL_ROWS, '  negative offset ignored');
+	} qr/offset must be a non-negative integer/, 'offset => -3: carp emitted';
 
-{
-	my $db = Database::test1->new($DATA_DIR);
+	warning_like {
+		my $r = $db->selectall_arrayref(offset => 'start');
+		is(scalar @{$r}, $TOTAL_ROWS, '  string offset ignored');
+	} qr/offset must be a non-negative integer/, 'offset => "start": carp emitted';
+};
 
-	# VP1 — UTF-8 umlaut (U+00FC = \xc3\xbc) as criteria value: must not croak
-	{
-		my $rows = eval { $db->selectall_arrayref(entry => "\xc3\xbc") };
-		ok(!$@ && ref($rows) eq 'ARRAY',
-			'D20 VP1: UTF-8 umlaut in scalar criterion does not croak');
-	}
+subtest 'limit+offset combinatorial boundaries' => sub {
+	plan tests => 3;
+	my $db = _db();
 
-	# VP2 — four-byte emoji bytes (U+1F600 = \xf0\x9f\x98\x80): must not croak
-	{
-		my $rows = eval { $db->selectall_arrayref(entry => "\xf0\x9f\x98\x80") };
-		ok(!$@ && ref($rows) eq 'ARRAY',
-			'D20 VP2: four-byte emoji bytes in scalar criterion do not croak');
-	}
+	# limit at max, offset at minimum
+	my $r1 = $db->selectall_arrayref(limit => $TOTAL_ROWS, offset => 0);
+	is(scalar @{$r1}, $TOTAL_ROWS, 'limit=TOTAL + offset=0: full result');
 
-	# VP3 — -like pattern with non-ASCII bytes: must not croak (no-crash contract)
-	# Use no_entry database (test4ne) to avoid the Params::Get positional-arg
-	# pitfall that mangles operator-hashref criteria on keyed databases.
-	# The return value may be undef (DBD::CSV silently fails non-ASCII LIKE in SQL
-	# mode) — that is acceptable; the domain contract is no fatal exception.
-	{
-		my $db4 = Database::test4ne->new({ directory => $DATA_DIR });
-		my $ok   = eval {
-			$db4->selectall_arrayref(cardinal => { -like => "%\xc3\xbc%" });
-			1
+	# limit at 1, offset at TOTAL-1 (last row only)
+	my $r2 = $db->selectall_arrayref(limit => 1, offset => $TOTAL_ROWS - 1);
+	is(scalar @{$r2}, 1, 'limit=1 + offset=TOTAL-1: exactly 1 row (last row)');
+
+	# limit at minimum (0), offset at maximum (past end)
+	my $r3 = $db->selectall_arrayref(limit => 0, offset => $TOTAL_ROWS);
+	is(scalar @{$r3}, 0, 'limit=0 + offset=TOTAL: empty (both at boundary)');
+};
+
+# -----------------------------------------------------------------------
+# SECTION 9: sort_by parameter
+# Valid:   scalar column name, [$col, 'ASC'], [$col, 'DESC'] (case-insensitive)
+# Invalid: unsafe column name, unknown direction
+# Behaviour on invalid: carp + fall back to default sort
+# -----------------------------------------------------------------------
+
+subtest 'sort_by — valid partition' => sub {
+	plan tests => 4;
+	my $db = _db();
+
+	lives_ok { $db->selectall_arrayref(sort_by => 'number') }
+		'sort_by: scalar column name accepted';
+	lives_ok { $db->selectall_arrayref(sort_by => ['number', 'ASC']) }
+		'sort_by: [col, ASC] arrayref accepted';
+	lives_ok { $db->selectall_arrayref(sort_by => ['number', 'DESC']) }
+		'sort_by: [col, DESC] arrayref accepted';
+	lives_ok { $db->selectall_arrayref(sort_by => ['number', 'asc']) }
+		'sort_by: lowercase direction "asc" accepted (case-normalised)';
+};
+
+subtest 'sort_by — DESC ordering is actually applied' => sub {
+	plan tests => 4;
+	my $db = _db();
+
+	my $asc  = $db->selectall_arrayref(sort_by => ['entry', 'ASC']);
+	my $desc = $db->selectall_arrayref(sort_by => ['entry', 'DESC']);
+	is(scalar @{$asc},  $TOTAL_ROWS, 'sort_by ASC: correct row count');
+	is(scalar @{$desc}, $TOTAL_ROWS, 'sort_by DESC: correct row count');
+	is($asc->[0]{'entry'},            $desc->[$TOTAL_ROWS - 1]{'entry'}, 'sort_by DESC: first ASC == last DESC');
+	is($asc->[$TOTAL_ROWS - 1]{'entry'}, $desc->[0]{'entry'},           'sort_by DESC: last ASC == first DESC');
+};
+
+subtest 'sort_by — invalid partition: unsafe column (carp, ignore)' => sub {
+	plan tests => 2;
+	my $db = _db();
+
+	warning_like {
+		my $r = $db->selectall_arrayref(sort_by => 'col; DROP TABLE t');
+		is(scalar @{$r}, $TOTAL_ROWS, '  all rows returned despite invalid sort_by');
+	} qr/unsafe sort_by column/, 'sort_by with SQL injection: carp emitted';
+};
+
+subtest 'sort_by — invalid partition: bad direction (carp, ignore)' => sub {
+	plan tests => 2;
+	my $db = _db();
+
+	warning_like {
+		my $r = $db->selectall_arrayref(sort_by => ['number', 'SIDEWAYS']);
+		is(scalar @{$r}, $TOTAL_ROWS, '  all rows returned with fallback sort');
+	} qr/invalid sort_by direction/, 'sort_by direction "SIDEWAYS": carp emitted';
+};
+
+subtest 'sort_by — boundary: undef (no sort specified)' => sub {
+	plan tests => 1;
+	my $db = _db();
+	lives_ok { $db->selectall_arrayref(sort_by => undef) }
+		'sort_by => undef: treated as no sort (no error)';
+};
+
+subtest 'sort_by + limit combinatorial' => sub {
+	plan tests => 2;
+	my $db = _db();
+
+	# DESC + limit 1 must return the largest entry alphabetically
+	# test1.csv entries: empty, one, three, two -- "two" is lexically last
+	my $r = $db->selectall_arrayref(sort_by => ['entry', 'DESC'], limit => 1);
+	is(scalar @{$r}, 1, 'sort_by DESC + limit 1: exactly one row returned');
+	is($r->[0]{'entry'}, 'two', 'sort_by DESC + limit 1: "two" is lexically last');
+};
+
+# -----------------------------------------------------------------------
+# SECTION 10: columns parameter — selectall_arrayref
+# Valid:   arrayref of SAFE_QUALIFIED strings
+# Invalid: not an arrayref, unsafe column name, undef elements (dropped)
+# Behaviour on invalid: carp + ignore
+# -----------------------------------------------------------------------
+
+subtest 'columns — valid partition' => sub {
+	plan tests => 3;
+	my $db = _db();
+
+	my $r = $db->selectall_arrayref(columns => ['entry']);
+	ok(exists $r->[0]{'entry'},   'columns: requested column "entry" present in result');
+	ok(!exists $r->[0]{'number'}, 'columns: unrequested column "number" absent from result');
+
+	my $r2 = $db->selectall_arrayref(columns => ['entry', 'number']);
+	ok(exists $r2->[0]{'number'}, 'columns: both columns present when both requested');
+};
+
+subtest 'columns — invalid partition: not an arrayref (carp, ignore)' => sub {
+	plan tests => 2;
+	my $db = _db();
+
+	warning_like {
+		my $r = $db->selectall_arrayref(columns => 'entry');
+		ok(exists $r->[0]{'entry'} && exists $r->[0]{'number'},
+			'  all columns present when columns param is ignored');
+	} qr/columns must be an arrayref/, 'columns => "entry" (string): carp emitted';
+};
+
+subtest 'columns — invalid partition: unsafe column name in list (carp, ignore)' => sub {
+	plan tests => 2;
+	my $db = _db();
+
+	warning_like {
+		my $r = $db->selectall_arrayref(columns => ['entry; DROP TABLE t']);
+		ok(scalar @{$r} == $TOTAL_ROWS, '  rows still returned after bad column name ignored');
+	} qr/unsafe column name/, 'columns: SQL injection in column name: carp emitted';
+};
+
+subtest 'columns — boundary: empty arrayref' => sub {
+	plan tests => 1;
+	my $db = _db();
+	# Empty arrayref: no column projection applied (all columns returned)
+	my $r = $db->selectall_arrayref(columns => []);
+	ok(scalar @{$r} == $TOTAL_ROWS, 'columns => []: all rows returned (no projection)');
+};
+
+# -----------------------------------------------------------------------
+# SECTION 11: join parameter — _build_joins validation
+# Valid:   { table => 'T', on => 'condition', type => 'INNER' }
+# Invalid: missing table, missing on, unsafe table, invalid type
+# -----------------------------------------------------------------------
+
+subtest 'join — invalid partition: missing required fields' => sub {
+	plan tests => 2;
+	my $db = _db();
+	# _build_joins is called from selectall_arrayref; force the SQL path
+	throws_ok {
+		$db->selectall_arrayref(
+			max_slurp_size => 0,
+			join => { on => 'test1.entry = other.entry' }
+		)
+	} $ERR_JOIN_TABLE, 'join: missing "table" field: croak';
+
+	throws_ok {
+		$db->selectall_arrayref(
+			max_slurp_size => 0,
+			join => { table => 'other' }
+		)
+	} $ERR_JOIN_ON, 'join: missing "on" field: croak';
+};
+
+subtest 'join — invalid partition: unsafe table name' => sub {
+	plan tests => 2;
+	my $db = _db();
+	throws_ok {
+		$db->selectall_arrayref(
+			max_slurp_size => 0,
+			join => { table => 'other; DROP TABLE test1', on => 'a = b' }
+		)
+	} $ERR_JOIN_UNSAFE, 'join: SQL injection in table name: croak';
+
+	throws_ok {
+		$db->selectall_arrayref(
+			max_slurp_size => 0,
+			join => { table => '1bad', on => 'a = b' }
+		)
+	} $ERR_JOIN_UNSAFE, 'join: digit-start table name: croak';
+};
+
+subtest 'join — invalid partition: unknown type' => sub {
+	plan tests => 2;
+	my $db = _db();
+	throws_ok {
+		$db->selectall_arrayref(
+			max_slurp_size => 0,
+			join => { table => 'other', on => 'a = b', type => 'OUTER' }
+		)
+	} $ERR_JOIN_TYPE, 'join: type "OUTER" rejected';
+
+	throws_ok {
+		$db->selectall_arrayref(
+			max_slurp_size => 0,
+			join => { table => 'other', on => 'a = b', type => '' }
+		)
+	} $ERR_JOIN_TYPE, 'join: empty type rejected';
+};
+
+subtest 'join — valid partition: all five type keywords (case-insensitive)' => sub {
+	plan tests => 5;
+	my $db = _db();
+	# We just test that _build_joins does not croak on type normalisation;
+	# the DBI connect will croak on a missing join table, which is expected.
+	for my $type (qw(INNER LEFT RIGHT FULL CROSS)) {
+		my $err = '';
+		eval {
+			$db->selectall_arrayref(
+				max_slurp_size => 0,
+				join => { table => 'nonexistent', on => 'a = b', type => $type }
+			);
 		};
-		ok($ok && !$@,
-			'D20 VP3: -like pattern with non-ASCII bytes does not croak');
+		$err = $@;
+		unlike($err, $ERR_JOIN_TYPE, "join: type '$type' accepted by validator");
 	}
-}
+};
+
+# -----------------------------------------------------------------------
+# SECTION 12: each_row callback parameter
+# Valid:   code reference
+# Invalid: string, undef, hashref, arrayref
+# -----------------------------------------------------------------------
+
+subtest 'each_row — valid partition: code reference' => sub {
+	plan tests => 2;
+	my $db  = _db();
+	my $cnt = 0;
+	lives_ok { $db->each_row(sub { $cnt++ }) }
+		'each_row: code reference accepted';
+	is($cnt, $TOTAL_ROWS, 'each_row: callback invoked once per row');
+};
+
+subtest 'each_row — invalid partition: non-code-ref callback' => sub {
+	plan tests => 4;
+	my $db = _db();
+	throws_ok { $db->each_row('not_a_coderef') }   $ERR_CALLBACK, 'each_row: string rejected';
+	throws_ok { $db->each_row(undef) }              $ERR_CALLBACK, 'each_row: undef rejected';
+	throws_ok { $db->each_row({ code => sub{} }) }  $ERR_CALLBACK, 'each_row: hashref rejected';
+	throws_ok { $db->each_row([sub{}]) }             $ERR_CALLBACK, 'each_row: arrayref rejected';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 13: max_slurp_size — slurp vs SQL path boundary
+# Default: 16384 (16 KB).  0 forces SQL path.
+# Boundary: file_size - 1 (slurp), file_size (slurp), file_size + 1 (SQL)
+# -----------------------------------------------------------------------
+
+subtest 'max_slurp_size — boundary: 0 forces SQL path (no type set)' => sub {
+	plan tests => 2;
+	# With max_slurp_size => 0, the module uses DBI/CSV instead of in-memory
+	my $db_sql = _db(max_slurp_size => 0);
+	my $r = $db_sql->selectall_arrayref();
+	ok(ref $r eq 'ARRAY', 'max_slurp_size => 0: query succeeds on SQL path');
+	is(scalar @{$r}, $TOTAL_ROWS, 'max_slurp_size => 0: correct row count from SQL path');
+};
+
+subtest 'max_slurp_size — default: small file is slurped' => sub {
+	plan tests => 2;
+	my $db_slurp = _db();
+	$db_slurp->count();    # trigger open
+	ok(defined $db_slurp->{'data'}, 'default max_slurp_size: small file slurped into memory');
+	is(scalar keys %{$db_slurp->{'data'}}, $TOTAL_ROWS, 'slurped data has correct row count');
+};
+
+subtest 'max_slurp_size — results are equivalent on both paths' => sub {
+	plan tests => 1;
+	my $db_slurp = _db(max_slurp_size => 16 * 1024);
+	my $db_sql   = _db(max_slurp_size => 0);
+	my $n_slurp  = $db_slurp->count();
+	my $n_sql    = $db_sql->count();
+	is($n_slurp, $n_sql, 'count() is identical on slurp and SQL paths');
+};
+
+# -----------------------------------------------------------------------
+# SECTION 14: filename / dbname — path traversal and safety
+# Validated against /^[a-zA-Z0-9_.-]+$/ with explicit '..' rejection.
+# -----------------------------------------------------------------------
+
+subtest 'filename — invalid partition: path traversal' => sub {
+	plan tests => 3;
+	# filename is only validated in _open() (called lazily).
+	# Trigger it by calling count() after construction.
+	my $db;
+	throws_ok {
+		$db = Database::test1->new(directory => $DIR, filename => '../../../etc/passwd');
+		$db->count();
+	} qr/unsafe filename/, 'filename: path traversal ../ rejected';
+
+	throws_ok {
+		$db = Database::test1->new(directory => $DIR, filename => '..');
+		$db->count();
+	} qr/unsafe filename/, 'filename: bare ".." rejected';
+
+	throws_ok {
+		$db = Database::test1->new(directory => $DIR, filename => '/etc/passwd');
+		$db->count();
+	} qr/unsafe filename/, 'filename: absolute path rejected';
+};
+
+subtest 'filename — invalid partition: shell characters' => sub {
+	plan tests => 2;
+	throws_ok {
+		my $db = Database::test1->new(directory => $DIR, filename => 'file;rm');
+		$db->count();
+	} qr/unsafe filename/, 'filename: semicolon rejected';
+
+	throws_ok {
+		my $db = Database::test1->new(directory => $DIR, filename => "file\0null");
+		$db->count();
+	} qr/unsafe filename/, 'filename: null byte rejected';
+};
+
+subtest 'filename — valid partition: safe names' => sub {
+	plan tests => 3;
+	lives_ok { my $db = Database::test1->new(directory => $DIR, filename => 'test1.csv'); $db->count() }
+		'filename: simple name with dot accepted';
+	lives_ok { my $db = Database::test1->new(directory => $DIR, filename => 'test_1.csv'); $db->count() }
+		'filename: name with underscore accepted';
+	lives_ok { my $db = Database::test1->new(directory => $DIR, filename => 'test-1.csv'); $db->count() }
+		'filename: name with hyphen accepted';
+};
+
+# -----------------------------------------------------------------------
+# SECTION 15: Multibyte data values
+# Non-ASCII is forbidden in IDENTIFIERS (id, table, column names).
+# Non-ASCII in DATA VALUES must pass through without corruption.
+# -----------------------------------------------------------------------
+
+subtest 'multibyte — identifiers: non-ASCII rejected in all identifier positions' => sub {
+	plan tests => 5;
+	# id parameter
+	throws_ok { _db(id => "\x{fc}mlaut") }
+		$ERR_UNSAFE_ID, 'multibyte: umlaut in id rejected';
+	# table parameter
+	throws_ok { _db(table => "caf\x{e9}") }
+		$ERR_UNSAFE_TABLE, 'multibyte: accented char in table rejected';
+	# base_criteria key
+	throws_ok { _db(base_criteria => { "\x{263a}smile" => 1 }) }
+		$ERR_BC_KEY, 'multibyte: emoji in base_criteria key rejected';
+	# join table name
+	my $db = _db();
+	throws_ok {
+		$db->selectall_arrayref(
+			no_entry => 1,
+			max_slurp_size => 0,
+			join => { table => "tabl\x{e9}", on => 'a = b' }
+		)
+	} $ERR_JOIN_UNSAFE, 'multibyte: accented char in join table rejected';
+	# sort_by column
+	warning_like {
+		$db->selectall_arrayref(sort_by => "\x{e9}col")
+	} qr/unsafe sort_by column/, 'multibyte: accented char in sort_by: carp emitted';
+};
+
+subtest 'multibyte — data values: non-ASCII survives round-trip via CSV slurp' => sub {
+	# Write a temp CSV with UTF-8 encoded non-ASCII values, slurp via the CSV
+	# backend, and verify no characters are dropped or corrupted.
+	# Text::xSV::Slurp decodes UTF-8, so we compare Perl character strings.
+	use Encode qw(encode_utf8);
+
+	my $cafe  = "caf\x{e9}";                                 # é  U+00E9
+	my $emoji = "\x{1f600}";                                  # 😀 U+1F600
+	my $zalgo = "Z\x{0300}\x{0301}\x{0302}alg\x{0303}o";     # combining diacritics
+
+	my ($fh, $tmpcsv) = tempfile(SUFFIX => '.csv', UNLINK => 1);
+	binmode $fh, ':utf8';
+	print $fh "entry!val\n";
+	print $fh "cafe!$cafe\n";
+	print $fh "emoji!$emoji\n";
+	print $fh "zalgo!$zalgo\n";
+	close $fh;
+
+	{
+		package Database::domain_mb;
+		use Database::Abstraction;
+		our @ISA = ('Database::Abstraction');
+	}
+
+	my ($vol, $dirs, $base) = File::Spec->splitpath($tmpcsv);
+	my $tmpdir_abs = File::Spec->catpath($vol, $dirs, '');
+	$tmpdir_abs =~ s{[\\/]+$}{};
+	(my $dbname_short = $base) =~ s/\.csv$//;
+
+	plan tests => 4;
+	my $db;
+	lives_ok {
+		$db = Database::domain_mb->new(
+			directory => $tmpdir_abs,
+			dbname    => $dbname_short,
+		);
+	} 'multibyte data: CSV construction lives';
+
+	my $r_cafe = $db->fetchrow_hashref('cafe');
+	is($r_cafe->{'val'}, $cafe,
+		'multibyte data: Latin-1 accent survives CSV round-trip');
+
+	my $r_emoji = $db->fetchrow_hashref('emoji');
+	is($r_emoji->{'val'}, $emoji,
+		'multibyte data: emoji survives CSV round-trip');
+
+	my $r_zalgo = $db->fetchrow_hashref('zalgo');
+	is($r_zalgo->{'val'}, $zalgo,
+		'multibyte data: Zalgo text (combining diacritics) survives CSV round-trip');
+};
+
+subtest 'multibyte — data values in criteria: scalar value match' => sub {
+	plan tests => 2;
+	# Slurp path: non-ASCII in VALUES is fine; SQL uses bind params
+	my ($fh, $tmpdb) = tempfile(SUFFIX => '.sqlite', UNLINK => 1);
+	close $fh;
+
+	my $dbh = DBI->connect("dbi:SQLite:dbname=$tmpdb", '', '',
+		{ RaiseError => 1, PrintError => 0 });
+	$dbh->do('CREATE TABLE domain_val (entry TEXT PRIMARY KEY, name TEXT)');
+	my $umlaut = "K\x{f6}ln";      # Köln
+	$dbh->do('INSERT INTO domain_val VALUES (?,?)', {}, 'city1', $umlaut);
+	$dbh->do('INSERT INTO domain_val VALUES (?,?)', {}, 'city2', 'Berlin');
+	$dbh->disconnect();
+
+	{
+		package Database::domain_val;
+		use Database::Abstraction;
+		our @ISA = ('Database::Abstraction');
+	}
+
+	my $db = Database::domain_val->new(dsn => "dbi:SQLite:dbname=$tmpdb");
+	my $r = $db->selectall_arrayref(name => $umlaut);
+	is(scalar @{$r}, 1, "multibyte data: criterion with umlaut value matches 1 row");
+	is($r->[0]{'entry'}, 'city1', "multibyte data: correct row returned for umlaut criterion");
+};
+
+done_testing;

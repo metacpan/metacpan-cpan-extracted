@@ -1,0 +1,33 @@
+# Claude Code: TaskStop on a background agent answers "Successfully stopped task: ID
+# (DESCRIPTION)" and the agent notifies as killed. Raider's TaskStop is kill_shell, by
+# agent ID or by name.
+# Checks ADR 0027 section 10 (kill_shell) and section 4 (killed).
+title: kill_shell stops a background agent by name and the caller gets a killed notification
+permission_mode: bypassPermissions
+delay: 0.05
+sub_delay: 30
+wait_background: true
+prompt: Start a slow agent and stop it.
+script:
+  - tool_calls:
+      - [ agent, { description: Slow work, prompt: P, run_in_background: true, name: slowpoke } ]
+  - tool_calls:
+      - [ kill_shell, { shell_id: slowpoke } ]
+  - text: done
+expect:
+  answer: done
+  request_count: 4
+  tools:
+    - { name: agent, text: '\AAsync agent launched successfully\.\nagentId: agent_1 ' }
+    - { name: kill_shell, text: '\ASuccessfully stopped task: agent_1 \(Slow work\)\z' }
+  requests:
+    - { index: 2, contains: "Successfully stopped task: agent_1 (Slow work)" }
+    - { index: 2, absent: task-notification }
+    # the run would end; the killed agent's notification is delivered first, as its next message
+    - index: 3
+      tail:
+        - { role: assistant, contains: done }
+        - { role: user, contains: "<task-notification>\n<task-id>agent_1</task-id>\n<tool-use-id>c1</tool-use-id>\n<status>killed</status>\n<summary>Agent \"Slow work\" was stopped</summary>" }
+  events:
+    - { type: agent.started, agent_id: agent_1, background: true }
+    - { type: agent.finished, agent_id: agent_1, status: cancelled }

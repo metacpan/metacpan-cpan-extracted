@@ -435,6 +435,12 @@ Romansh locale.
    1995-12-22T09:05:02 = ve, 22 dec. 1995 s.C.
   -0010-09-15T04:44:23 = so, 15 sett. -10 a.Cr.
 
+=head3 GyMMMM (MMM y G)
+
+   2008-02-05T18:30:30 = favr. 2008 s.C.
+   1995-12-22T09:05:02 = dec. 1995 s.C.
+  -0010-09-15T04:44:23 = sett. -10 a.Cr.
+
 =head3 GyMMMMEd (E, d MMMM y G)
 
    2008-02-05T18:30:30 = ma, 5 da favrer 2008 s.C.

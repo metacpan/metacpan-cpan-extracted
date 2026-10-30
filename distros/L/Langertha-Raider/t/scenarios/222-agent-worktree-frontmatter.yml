@@ -1,0 +1,26 @@
+title: an agent file with isolation worktree always works in a worktree, without the call asking for it
+git: true
+permission_mode: bypassPermissions
+files:
+  CLAUDE.md: "# project\n"
+  .claude/agents/isolated.md: "---\nname: isolated\ndescription: Works in a worktree of its own\nisolation: worktree\n---\nYou write files.\n"
+prompt: Use the isolated agent to write x.txt.
+script:
+  - tool_calls:
+      - [ agent, { description: Write x, prompt: Write x.txt., subagent_type: isolated } ]
+  - tool_calls:
+      - [ write_file, { path: x.txt, content: "X\n" } ]
+  - text: wrote x.txt
+  - text: Done.
+expect:
+  answer: Done.
+  tools:
+    - { name: write_file }
+    - name: agent
+      text: 'worktreePath: {{ROOT}}/\.claude/worktrees/agent-1\nworktreeBranch: worktree-agent-1\z'
+  files:
+    .claude/worktrees/agent-1/x.txt: "X\n"
+  absent:
+    - x.txt
+  branches:
+    present: [ worktree-agent-1 ]

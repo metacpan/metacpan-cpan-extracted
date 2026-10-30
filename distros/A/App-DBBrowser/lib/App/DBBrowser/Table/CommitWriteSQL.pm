@@ -10,6 +10,7 @@ use Term::Choose::Util qw( insert_sep );
 use Term::TablePrint   qw();
 
 use App::DBBrowser::Auxil;
+use App::DBBrowser::Table;
 
 
 sub new {
@@ -41,22 +42,13 @@ sub commit_sql {
         $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
         my $all_arrayref = [];
         if ( ! eval {
-            my $ctes = $ax->cte_stmts( 'prepare', 1 );
-            my $stmt = length $ctes ? $ctes . ' ' : '';
-            $stmt .= "SELECT * FROM $sql->{table}";
-            if ( length $sql->{where_stmt} ) {
-                $stmt .= ' ' . $sql->{where_stmt};
-            }
-            #my $stmt = $ax->get_stmt( $sql, 'Select', 'prepare' );
-            my $sth = $dbh->prepare( $stmt );
-            $sth->execute();
-            my $col_names = $sth->{NAME};
-            $all_arrayref = $sth->fetchall_arrayref;
-            $count_affected = @$all_arrayref;
-            unshift @$all_arrayref, $col_names;
+            my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            $all_arrayref = $tbl->select_statement_results( $sql );
+            $count_affected = @$all_arrayref - 1;
             1 }
         ) {
             $ax->print_error_message( $@ );
+            return;
         }
         my $prompt = "Affected records:";
         my $info = $ax->get_sql_info( $sql );
@@ -72,7 +64,6 @@ sub commit_sql {
         }
         $ax->print_sql_info( $info, $waiting );
     }
-
     else {
         die $stmt_type // 'undefined_stmt_type';
     }

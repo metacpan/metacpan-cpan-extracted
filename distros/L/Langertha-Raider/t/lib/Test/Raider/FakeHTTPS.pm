@@ -27,7 +27,8 @@ use POSIX ();
 A forked, blocking TLS server on C<127.0.0.1>. L</pki> makes a throw-away
 CA and a server certificate for the given names (plus C<IP:127.0.0.1>);
 clients trust it through C<SSL_ca_file> or C<SSL_CERT_FILE>. Every request
-is logged, headers included, so a test can prove what was (not) sent. A
+is logged, headers included, so a test can prove what was (not) sent; a
+C<Content-Length> body is read (not logged) before the answer. A
 route returns the raw response octets, or C<< { sleep => N } >> to stall.
 Unknown paths answer 404. The server dies with the object.
 
@@ -115,6 +116,12 @@ sub _serve {
     while ( my $l = <$c> ) {
       last if $l eq "\r\n";
       $h{ lc $1 } = $2 if $l =~ /^([^:]+):\s*(.*?)\r\n/;
+    }
+    # Read the body before answering: closing with unread data sends a TCP
+    # reset, and the client loses the response it has not read yet.
+    my ( $want, $body ) = ( $h{'content-length'} // 0, '' );
+    while ( length $body < $want ) {
+      last unless read $c, $body, $want - length $body, length $body;
     }
     my ( $method, $path ) = split / /, $line;
     $log->append_utf8( $json->encode( { method => $method, path => $path, headers => \%h } )."\n" );

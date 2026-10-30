@@ -1,0 +1,16 @@
+title: in default mode a write asks first; with nobody to approve it the call is refused and says how to allow it
+permission_mode: default
+prompt: Write a file.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: x } ]
+  - text: fertig
+expect:
+  absent: [ a.txt ]
+  answer: fertig
+  tools:
+    - name: write_file
+      error: true
+      text: "^Permission to use write_file has been denied\\. Reason: default mode asks before this call: write_file changes files; nobody can approve it in this run\\. To allow it, add a rule such as 'Edit\\(/\\*\\*\\)' to \\.raider/config\\.yml.*--permission-mode acceptEdits.*Do not retry"
+  events:
+    - { type: permission.denied, tool: write_file, by: noninteractive, mode: default }

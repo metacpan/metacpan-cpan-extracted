@@ -6,7 +6,6 @@ use utf8;
 
 use Config ();
 use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
 use FindBin qw($Bin);
 use lib grep { defined && -d } ( $ENV{DEVELOPER_DASHBOARD_REPO_LIB}, "$Bin/../lib" );
 use Developer::Dashboard::PerlEnv ();
@@ -33,6 +32,7 @@ use Developer::Dashboard::Platform qw(
 use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::SeedSync ();
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
 if ( !defined $ENV{HOME} || $ENV{HOME} eq '' ) {
@@ -521,7 +521,7 @@ elsif ( $cmd eq 'indicator' ) {
         exit 0;
     }
     elsif ( $action eq 'refresh-core' ) {
-        my $cwd = shift @ARGV || cwd();
+        my $cwd = shift @ARGV || current_working_directory();
         print json_encode( $indicators->refresh_core_indicators( cwd => $cwd ) );
         exit 0;
     }
@@ -1004,18 +1004,14 @@ elsif ( $cmd eq 'serve' ) {
     _migrate_saved_pages();
     my $action = @ARGV && $ARGV[0] !~ /^-/ ? shift @ARGV : '';
     if ( $action eq 'logs' ) {
-        my $follow = 0;
-        my $lines;
-        GetOptionsFromArray(
-            \@ARGV,
-            'f'   => \$follow,
-            'n=i' => \$lines,
+        require Developer::Dashboard::CLI::RuntimeControl;
+        exit Developer::Dashboard::CLI::RuntimeControl::run_runtime_command(
+            command    => 'logs',
+            args       => [ 'web', @ARGV ],
+            runtime    => $runtime,
+            config     => $config,
+            collectors => $collectors,
         );
-        print $runtime->web_log(
-            follow => $follow,
-            ( defined $lines ? ( lines => $lines ) : () ),
-        );
-        exit 0;
     }
     if ( $action eq 'workers' ) {
         my $workers = shift @ARGV;

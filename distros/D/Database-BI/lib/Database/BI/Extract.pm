@@ -3,7 +3,7 @@ package Database::BI::Extract;
 use strict;
 use warnings;
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 use Carp		qw(croak carp);
 use Digest::MD5		qw(md5_hex);
@@ -135,6 +135,87 @@ Database::BI::Extract -- SQLite materialisation cache for Database::BI
 Stores SQLite materialisation files (extracts) under C<model_dir/extracts/>.
 The cache key is an MD5 of the dataset spec, its source mtime, and its size.
 Deleting the extracts directory leaves the application fully functional.
+
+This is a standalone cache class.  The web application does not call it; the
+caller decides when to build an extract, and the class only stores and finds
+the bytes.
+
+=head1 METHODS
+
+=head2 new
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ model_dir => 'string' }   # required; extracts live in <model_dir>/extracts/
+
+=head4 OUTPUT
+
+A C<Database::BI::Extract> object.  Croaks C<model_dir is required> without
+C<model_dir>.  Nothing is created on disc until C<put>.
+
+=head2 path
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$spec    # the dataset spec, e.g. 'table:sales'
+	$mtime   # source modification time (undef is 0)
+	$size    # source size in bytes (undef is 0)
+
+=head4 OUTPUT
+
+	'string'   # <model_dir>/extracts/<md5 of spec, mtime and size>.db
+
+The path is computed, not checked: the file need not exist.
+
+=head2 get
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+The same three arguments as C<path>.
+
+=head4 OUTPUT
+
+	'string' | undef   # the path when that file exists, otherwise undef
+
+A changed mtime or size gives a different path, so a stale extract is a miss.
+
+=head2 put
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$spec, $mtime, $size   # as for path
+	$bytes                 # required; the SQLite file's contents
+
+=head4 OUTPUT
+
+	'string'   # the path written
+
+Creates C<extracts/> when it is missing.  Croaks C<sqlite_bytes are required>
+when C<$bytes> is undefined or empty, and croaks naming the path when the
+directory or file cannot be written.
+
+=head2 evict
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$spec   # accepted but not used: see below
+
+=head4 OUTPUT
+
+	'integer'   # the number of files removed (0 when there is no extracts/)
+
+A fingerprint cannot be traced back to its spec, so C<evict> removes every
+C<.db> file in C<extracts/>, not only C<$spec>'s.
 
 =head1 AUTHOR
 

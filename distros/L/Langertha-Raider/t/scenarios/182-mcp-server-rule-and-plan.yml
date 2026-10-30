@@ -1,0 +1,28 @@
+title: a server-wide deny rule (mcp__<server>) refuses every tool of it; in plan mode a foreign tool asks instead of being refused (ADR 0021, ADR 0029)
+permission_mode: plan
+files:
+  .raider/config.yml: |
+    permissions:
+      deny: [ mcp__gone ]
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+      gone:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+prompt: Plan with the test servers.
+script:
+  - tool_calls:
+      - [ mcp__gone__echo_env, { name: HOME } ]
+      - [ mcp__t__echo_env, { name: HOME } ]
+  - text: done
+expect:
+  tools:
+    - { name: mcp__gone__echo_env, error: true, text: "mcp__gone" }
+    - { name: mcp__t__echo_env, error: true, text: "plan mode asks before this call: mcp__t__echo_env is not a tool of raider \\(MCP server 't'\\)" }
+  events:
+    - { type: permission.denied, tool: mcp__gone__echo_env, by: rule }
+    - { type: permission.denied, tool: mcp__t__echo_env, by: noninteractive }

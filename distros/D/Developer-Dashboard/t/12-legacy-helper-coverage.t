@@ -350,6 +350,9 @@ like( $runtime->_runtime_value_text( { ok => 1 } ), qr/ok => 1/, '_runtime_value
 {
     my $wrapper_source = Developer::Dashboard::PageRuntime->_saved_ajax_perl_wrapper;
     like( $wrapper_source, qr/sub params/, '_saved_ajax_perl_wrapper returns the saved Ajax bootstrap source' );
+    like( $wrapper_source, qr/\A#line 1 "\(eval \d+\)"\n/, 'saved Ajax bootstrap source carries an eval source identity for coverage tools' );
+    my $sandpit_source = Developer::Dashboard::PageRuntime->_sandpit_package_source('Local::Coverage::Sandpit');
+    like( $sandpit_source, qr/\A#line 1 "\(eval \d+\)"\n/, 'generated CODE sandpit source carries an eval source identity for coverage tools' );
 
     my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'wrapper-runtime.pl' );
     open my $fh, '>', $saved_path or die $!;
@@ -950,6 +953,9 @@ __END__
 
 This test drives the remaining legacy compatibility helpers and runtime paths
 needed to keep the active library coverage high after the bookmark-model reset.
+It also guards the eval source identity on generated CODE and saved-Ajax
+bootstrap strings so Devel::Cover does not misattribute dynamic statements to
+the static C<PageRuntime.pm> source map.
 
 =for comment FULL-POD-DOC START
 

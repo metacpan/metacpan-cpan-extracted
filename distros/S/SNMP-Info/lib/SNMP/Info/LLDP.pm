@@ -39,7 +39,7 @@ use SNMP::Info;
 
 our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.983000';
+$VERSION = '3.984000';
 
 %MIBS = (
     'LLDP-MIB'          => 'lldpLocSysCapEnabled',
@@ -533,6 +533,10 @@ sub _lldp_addr_index {
     my $index = join( '.', splice( @oids, 0, $fields ) );
     my $proto = shift(@oids);
     shift(@oids) if scalar @oids > 4;    # $length
+
+    # Some agents serve rows whose index stops before the address type or
+    # the address, as a single number on some Cisco Fabric Interconnects
+    return unless defined $proto and @oids;
 
     # IPv4
     if ( $proto == 1 ) {

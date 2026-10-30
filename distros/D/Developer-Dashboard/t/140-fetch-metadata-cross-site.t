@@ -261,6 +261,26 @@ sub run_ajax {
 # ---------------------------------------------------------------------------
 {
     is(
+        $app->_fetch_site_is_foreign( headers => { origin => 'https://evil.example' } ),
+        0,
+        'an Origin alone does not make a request foreign when fetch metadata is absent',
+    );
+    is(
+        $app->_fetch_site_is_foreign( headers => { 'sec-fetch-site' => 'same-origin' } ),
+        0,
+        'the exact same-origin fetch-site label takes the non-foreign path',
+    );
+    is(
+        $app->_fetch_site_is_foreign( headers => { 'sec-fetch-site' => undef } ),
+        0,
+        'an undefined fetch-site value follows the absent-metadata path',
+    );
+    is(
+        $app->_fetch_site_is_foreign( headers => { 'sec-fetch-site' => ['cross-site'] } ),
+        0,
+        'a reference-valued fetch-site value follows the absent-metadata path',
+    );
+    is(
         $app->_csrf_rejection_response( method => 'GET', headers => { 'sec-fetch-site' => ['cross-site'] } ),
         undef,
         'a reference-valued Sec-Fetch-Site header is treated as absent, never dereferenced',
@@ -328,6 +348,13 @@ Referer names this dashboard or one of the local aliases the loopback trust
 model already treats as the same host. Requests that carry no fetch metadata
 at all — curl, the registered API consumers, browsers too old to send it —
 must keep working exactly as before.
+
+The direct classifier assertions also keep the common headerless path's
+absent, undefined, and reference-valued cases non-foreign. These shape checks
+guard the early return before normalization without weakening scalar
+cross-site detection. Exact C<same-origin> and C<none> values are covered as
+non-foreign fast paths; unusual casing/spacing and foreign values continue to
+exercise the normalizer and origin checks.
 
 =head1 WHY IT EXISTS
 

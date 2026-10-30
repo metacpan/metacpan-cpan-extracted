@@ -1,7 +1,7 @@
 use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Sync v0.1.1 {
+class Acme::Parataxis::Sync v0.1.3 {
     use Acme::Parataxis;
     use Carp qw[croak];
 

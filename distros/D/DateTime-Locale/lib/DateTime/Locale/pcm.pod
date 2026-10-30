@@ -435,6 +435,24 @@ Nigerian Pidgin locale.
    1995-12-22T09:05:02 = KIY 1995 Dis 22, Fraí
   -0010-09-15T04:44:23 = BK -10 Sẹp 15, Sát
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = KIY 2008 Fẹ́búári
+   1995-12-22T09:05:02 = KIY 1995 Disẹ́mba
+  -0010-09-15T04:44:23 = BK -10 Sẹptẹ́mba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = KIY 2008 Fẹ́búári 5, Tiú
+   1995-12-22T09:05:02 = KIY 1995 Disẹ́mba 22, Fraí
+  -0010-09-15T04:44:23 = BK -10 Sẹptẹ́mba 15, Sát
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = KIY 2008 Fẹ́búári 5
+   1995-12-22T09:05:02 = KIY 1995 Disẹ́mba 22
+  -0010-09-15T04:44:23 = BK -10 Sẹptẹ́mba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = KIY 2008 Fẹ́b 5
@@ -489,11 +507,11 @@ Nigerian Pidgin locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (E, d/M)
+=head3 MEd (E, M/d)
 
-   2008-02-05T18:30:30 = Tiú, 5/2
-   1995-12-22T09:05:02 = Fraí, 22/12
-  -0010-09-15T04:44:23 = Sát, 15/9
+   2008-02-05T18:30:30 = Tiú, 2/5
+   1995-12-22T09:05:02 = Fraí, 12/22
+  -0010-09-15T04:44:23 = Sát, 9/15
 
 =head3 MMM (LLL)
 
@@ -506,6 +524,12 @@ Nigerian Pidgin locale.
    2008-02-05T18:30:30 = Tiú, 5 Fẹ́b
    1995-12-22T09:05:02 = Fraí, 22 Dis
   -0010-09-15T04:44:23 = Sát, 15 Sẹp
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Fẹ́búári 5, Tiú
+   1995-12-22T09:05:02 = Disẹ́mba 22, Fraí
+  -0010-09-15T04:44:23 = Sẹptẹ́mba 15, Sát
 
 =head3 MMMMW-count-one ('Wik' W 'fọ' MMMM)
 
@@ -620,6 +644,18 @@ Nigerian Pidgin locale.
    2008-02-05T18:30:30 = Fẹ́búári 2008
    1995-12-22T09:05:02 = Disẹ́mba 1995
   -0010-09-15T04:44:23 = Sẹptẹ́mba -10
+
+=head3 yMMMMEd (EEE, d MMMM y)
+
+   2008-02-05T18:30:30 = Tiú, 5 Fẹ́búári 2008
+   1995-12-22T09:05:02 = Fraí, 22 Disẹ́mba 1995
+  -0010-09-15T04:44:23 = Sát, 15 Sẹptẹ́mba -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Fẹ́búári 2008
+   1995-12-22T09:05:02 = 22 Disẹ́mba 1995
+  -0010-09-15T04:44:23 = 15 Sẹptẹ́mba -10
 
 =head3 yMMMd (d MMM y)
 

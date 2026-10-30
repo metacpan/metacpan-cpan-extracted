@@ -3,6 +3,7 @@
 /Makefile.old
 /MANIFEST
 /MANIFEST.bak
+/MYMETA.*
 /blib/
 /build/
 /cover_db/

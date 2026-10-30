@@ -21,6 +21,7 @@ describe on_emit => sub {
         $log_record = 'my-log';
         @calls = (
             [ export   => [ 'my-log', 'my-log' ], 30_000 ],
+            [ 'force_flush' ],
             [ 'shutdown' ],
         );
     };

@@ -1,0 +1,28 @@
+title: multi_edit follows the rules of edit_file -- acceptEdits takes it in the root without asking, an Edit deny rule refuses it, a failing edit writes nothing
+permission_mode: acceptEdits
+files:
+  .raider/config.yml: |
+    permissions:
+      deny: [ "Edit(locked/**)" ]
+  src/app.txt: "alpha\nbeta\ngamma\n"
+  locked/keep.txt: "keep\n"
+prompt: Rename things.
+script:
+  - tool_calls:
+      - [ read_file, { path: src/app.txt } ]
+      - [ multi_edit, { path: src/app.txt, edits: [ { old_string: alpha, new_string: ALPHA }, { old_string: "ALPHA\nbeta", new_string: "ALPHA\nBETA" } ] } ]
+      - [ multi_edit, { path: src/app.txt, edits: [ { old_string: gamma, new_string: GAMMA }, { old_string: delta, new_string: DELTA } ] } ]
+      - [ read_file, { path: locked/keep.txt } ]
+      - [ multi_edit, { path: locked/keep.txt, edits: [ { old_string: keep, new_string: gone } ] } ]
+  - text: done
+expect:
+  answer: done
+  files:
+    src/app.txt: "ALPHA\nBETA\ngamma\n"
+    locked/keep.txt: "keep\n"
+  tools:
+    - { name: read_file }
+    - { name: multi_edit, text: "\\AApplied 2 edits to /\\S+/src/app\\.txt:\\n1\\. Replaced \"alpha\" with \"ALPHA\"\\n2\\. Replaced \"ALPHA\\nbeta\" with \"ALPHA\\nBETA\"" }
+    - { name: multi_edit, error: true, text: "\\A<tool_use_error>Edit 2 of 2 failed, no edit was applied: String to replace not found in file\\.\\nString: delta</tool_use_error>\\z" }
+    - { name: read_file }
+    - { name: multi_edit, error: true, text: "denied by rule 'Edit\\(locked/\\*\\*\\)'" }

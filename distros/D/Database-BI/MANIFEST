@@ -33,27 +33,13 @@ script/database-bi
 t/alert.t
 t/basic.t
 t/binned.t
-t/browser-canvas-keys.t
-t/browser-canvas-map-degraded.t
-t/browser-canvas-map-geocoder.t
-t/browser-chart-a11y.t
-t/browser-chart-keys.t
-t/browser-config.t
-t/browser-fixture.t
-t/browser-home-keys.t
-t/browser-language.t
-t/browser-map-geocoder.t
-t/browser-map-page-renderer.t
-t/browser-map-panel.t
-t/browser-new-canvas.t
-t/browser-offline-assets.t
-t/browser-pivot-keys.t
-t/browser-seed-canvas.t
-t/browser-size.t
-t/browser-tutorial.t
+t/breadcrumb.t
 t/calc.t
 t/catalog.t
+t/canvas-cross-row.t
 t/cgi_security.t
+t/cross-row-ui.t
+t/cross-row.t
 t/data-dir-invariant.t
 t/data-flow.t
 t/domain.t
@@ -68,9 +54,10 @@ t/ask.t
 t/insights.t
 t/integration.t
 t/summary.t
+t/time-bucket.t
+t/time-range.t
 t/language-fallback.t
 t/launcher.t
-t/lib/BI/Test/Browser.pm
 t/lib/BI/Test/Marionette.pm
 t/locales.t
 t/manifest.t
@@ -84,9 +71,10 @@ t/redis_live.t
 t/rls.t
 t/transaction.t
 t/tutorial.t
+t/ui-consistency.t
 t/unit.t
 t/version.t
-t/workflow-browser.t
+t/wordcloud.t
 templates/web/en/bar.html.tt
 templates/web/en/browse.html.tt
 templates/web/en/canvas.html.tt
@@ -100,9 +88,12 @@ templates/web/en/graph.html.tt
 templates/web/en/heatmap.html.tt
 templates/web/en/histogram.html.tt
 templates/web/en/home.html.tt
+templates/web/en/layouts/breadcrumb.html.tt
 templates/web/en/layouts/default.html.tt
+templates/web/en/layouts/view_context.html.tt
 templates/web/en/insights.html.tt
 templates/web/en/map.html.tt
+templates/web/en/not_found.html.tt
 templates/web/en/pie.html.tt
 templates/web/en/pivot.html.tt
 templates/web/en/scatter.html.tt
@@ -111,5 +102,6 @@ templates/web/en/stats.html.tt
 templates/web/en/tables.html.tt
 templates/web/en/treemap.html.tt
 templates/web/en/tutorial.html.tt
+templates/web/en/wordcloud.html.tt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -148,4 +148,96 @@ subtest 'package-less file that is not valid UTF-8' => sub {
     script_stderr_unlike(qr{ill-formed|decode});
 };
 
+subtest 'compile-time output from an analyzed file does not leak' => sub {
+
+    # The wrapped file's compile-time code runs during analysis. Its output --
+    # and the synthetic wrapper path -- must be suppressed; only the real
+    # finding should reach stderr.
+    script_fails(
+        [
+            'script/perlvars', '--scripts',
+            'test-data/scripts/noisy-stderr.pl'
+        ],
+        { exit => 255 },
+    );
+    script_stderr_like(qr{\$unused_noisy});
+    script_stderr_unlike(qr{compile-time noise});
+    script_stderr_unlike(qr{PerlvarsSyntheticPackage|__perlvars_wrapper__});
+};
+
+subtest 'packaged file that exits at compile time is skipped' => sub {
+
+    # A file with a package statement is analyzed directly, not wrapped. If it
+    # exits at compile time ("plan skip_all"), Test::Vars' forked child dies
+    # before writing its pipe -> parent would die thawing an empty Storable
+    # string. Must skip cleanly, same as the package-less case above.
+    script_runs(
+        [ 'script/perlvars', 'test-data/scripts/lib/Local/PkgSkip.pm' ] );
+    script_stderr_unlike(qr{Magic number|Storable});
+};
+
+subtest 'compile-time output from a packaged file does not leak' => sub {
+
+    # Same suppression as the package-less path: the packaged file's
+    # compile-time output -- and any stray TAP -- must not reach stderr, only
+    # the genuine finding.
+    script_fails(
+        [ 'script/perlvars', 'test-data/scripts/lib/Local/PkgNoisy.pm' ],
+        { exit => 255 },
+    );
+    script_stderr_like(qr{\$unused_pkg_var});
+    script_stderr_unlike(qr{compile-time noise});
+    script_stderr_unlike(qr{PerlvarsSyntheticPackage|__perlvars_wrapper__});
+};
+
+subtest
+    'a packaged file that exits at compile time does not abort the batch' =>
+    sub {
+
+    # The first file opts out at compile time (the uncaught thaw die used to
+    # abort the whole run here); the second file's finding must still be
+    # reported.
+    script_fails(
+        [
+            'script/perlvars',
+            'test-data/scripts/lib/Local/PkgSkip.pm',
+            'test-data/scripts/lib/Local/PkgNoisy.pm',
+        ],
+        { exit => 255 },
+    );
+    script_stderr_like(qr{\$unused_pkg_var});
+    script_stderr_unlike(qr{Magic number|Storable});
+    };
+
+subtest 'ignored file that exits non-zero leaks nothing' => sub {
+
+    # The wrapper cannot compile (missing module) and an END block makes the
+    # analyzer child exit non-zero. perlvars must still skip it cleanly rather
+    # than leaking the Test::Vars "ignores ... because" note to stderr.
+    script_runs(
+        [
+            'script/perlvars', '--scripts',
+            'test-data/scripts/missing-module-nonzero-exit.pl'
+        ]
+    );
+    script_stderr_unlike(
+        qr{Test::Vars ignores|PerlvarsSyntheticPackage|__perlvars_wrapper__});
+};
+
+subtest 'a file that cannot be processed does not abort the batch' => sub {
+
+    # The first argument errors (not found); the run must still check the later
+    # file and report its findings rather than exiting on the first error.
+    script_fails(
+        [
+            'script/perlvars', '--scripts',
+            'test-data/scripts/does-not-exist.pl',
+            'test-data/scripts/unused.pl',
+        ],
+        { exit => 255 },
+    );
+    script_stderr_like(qr{could not be found});
+    script_stderr_like(qr{\$unused_in_anon});
+};
+
 done_testing();

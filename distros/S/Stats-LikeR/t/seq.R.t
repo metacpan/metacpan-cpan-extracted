@@ -542,7 +542,7 @@ SKIP: {
 	# than guessing.
 	my $one_arg = eval 'my @x = Stats::LikeR::seq(17); 1';
 	ok(!$one_arg, 'one-argument seq() is an error, not R seq(17)');
-	like($@, qr/Not enough arguments|Usage:/,
+	like($@, qr/\Ausage: seq\(FROM, TO \[, BY\]\).*^seq: error: expected 2 or 3 arguments/ms,
 	     '... and it says so rather than guessing 1:17');
 
 	# R caps the from:to branch at R_XLEN_T_MAX and the by branch at

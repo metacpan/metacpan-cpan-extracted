@@ -435,6 +435,24 @@ Asturian locale.
    1995-12-22T09:05:02 = vie, 22 avi 1995 d.C.
   -0010-09-15T04:44:23 = sáb, 15 set -10 e.C.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = d.C. 2008 de febreru
+   1995-12-22T09:05:02 = d.C. 1995 d’avientu
+  -0010-09-15T04:44:23 = e.C. -10 de setiembre
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = d.C. 2008 de febreru 5, mar
+   1995-12-22T09:05:02 = d.C. 1995 d’avientu 22, vie
+  -0010-09-15T04:44:23 = e.C. -10 de setiembre 15, sáb
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = d.C. 2008 de febreru 5
+   1995-12-22T09:05:02 = d.C. 1995 d’avientu 22
+  -0010-09-15T04:44:23 = e.C. -10 de setiembre 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 feb 2008 d.C.
@@ -506,6 +524,12 @@ Asturian locale.
    2008-02-05T18:30:30 = mar, 5 feb
    1995-12-22T09:05:02 = vie, 22 avi
   -0010-09-15T04:44:23 = sáb, 15 set
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = de febreru 5, mar
+   1995-12-22T09:05:02 = d’avientu 22, vie
+  -0010-09-15T04:44:23 = de setiembre 15, sáb
 
 =head3 MMMMW-count-one ('selmana' W 'de' MMMM)
 

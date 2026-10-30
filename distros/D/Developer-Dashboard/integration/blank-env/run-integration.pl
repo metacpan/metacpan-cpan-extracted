@@ -833,12 +833,19 @@ sub _single_subdir {
 }
 
 # _distribution_version($source_root)
-# Reads the extracted distribution version from the main module file.
+# Reads the version from distribution metadata, falling back to a literal main-module VERSION for older archives.
 # Input: extracted source root directory path string.
-# Output: version string or undef when it cannot be found.
+# Output: version string or undef when neither source exposes a version.
 sub _distribution_version {
     my ($source_root) = @_;
     return if !defined $source_root || $source_root eq '';
+
+    my $metadata = File::Spec->catfile( $source_root, 'META.yml' );
+    if ( -f $metadata ) {
+        my $text = _read_text($metadata);
+        return $1 if $text =~ /^version:\s*['"]?([0-9]+(?:\.[0-9]+)*)['"]?\s*$/m;
+    }
+
     my $module = File::Spec->catfile( $source_root, 'lib', 'Developer', 'Dashboard.pm' );
     return if !-f $module;
     my $text = _read_text($module);
@@ -967,7 +974,8 @@ sub _assert_match {
     return 1;
 }
 
-exit main();
+exit main() if !caller;
+1;
 
 __END__
 
@@ -987,6 +995,10 @@ stages a versioned local tarball copy for C<cpanm> so the install and its test
 phase stay on the host-built artifact rather than drifting to a CPAN lookup, and
 then exercises the installed C<dashboard> CLI and web runtime against a fake
 project after the source-tree test and coverage gates have already run. The
+expected version comes from the extracted distribution C<META.yml> when
+available, with a literal main-module version retained as a fallback for older
+archives. This supports the public module delegating C<$VERSION> to the
+lightweight C<Developer::Dashboard::Version> module. The
 installed-runtime help check requires the concise built-in command index and
 an API catalog entry rather than the old full-module POD dump. It also checks
 that C<d2 version> matches the installed tarball, C<d2 of grep --help> reaches
@@ -995,7 +1007,7 @@ entrypoint unchanged.
 
 =head1 FUNCTIONS
 
-=head2 main, _run_shell, _wait_for_http, _run_browser_dom, _browser_command, _browser_binary, _single_subdir, _decode_json_tail, _reset_dir, _write_text, _read_text, _trim, _shell_quote, _assert, _assert_match
+=head2 main, _run_shell, _wait_for_http, _run_browser_dom, _browser_command, _browser_binary, _single_subdir, _distribution_version, _decode_json_tail, _reset_dir, _write_text, _read_text, _trim, _shell_quote, _assert, _assert_match
 
 Run and validate the host-built-tarball integration workflow.
 

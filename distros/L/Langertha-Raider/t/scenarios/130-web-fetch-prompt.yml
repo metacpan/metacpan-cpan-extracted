@@ -1,0 +1,28 @@
+# web_fetch with a prompt, as Claude Code's WebFetch(url, prompt): the page
+# goes to a model call of its own (here the run's engine, the next scripted
+# answer), the tool returns that answer; the page itself never enters the
+# raid's conversation. The tokens of the call are a model.usage event.
+title: web_fetch with a prompt answers from the page through a model call of its own
+http:
+  /release: { type: text/html, body: "<html><body><h1>Release notes</h1><p>Version 4.2 ships the new parser. PAGE-MARKER</p><script>var hidden = 1;</script></body></html>" }
+prompt: Which version ships the parser?
+script:
+  - tool_calls:
+      - [ web_fetch, { url: "{{HTTP}}/release", prompt: "Which version ships the new parser?" } ]
+  - text: Version 4.2 ships the new parser.
+    usage: { prompt_tokens: 120, completion_tokens: 9 }
+  - text: Version 4.2.
+expect:
+  answer: Version 4.2.
+  requests:
+    - { index: 1, contains: "Web page content:\n---\n" }
+    - { index: 1, contains: PAGE-MARKER }
+    - { index: 1, contains: "---\n\nWhich version ships the new parser?" }
+    - { index: 1, absent: "var hidden" }
+    - { index: 1, tail: [ { role: user, contains: PAGE-MARKER } ] }
+    - { index: 2, contains: "Version 4.2 ships the new parser." }
+    - { index: 2, absent: PAGE-MARKER }
+  tools:
+    - { name: web_fetch, text: '^Version 4\.2 ships the new parser\.$' }
+  events:
+    - { type: model.usage, purpose: web_fetch, input_tokens: 120, output_tokens: 9 }

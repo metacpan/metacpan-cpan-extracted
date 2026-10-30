@@ -1,0 +1,18 @@
+title: in bypassPermissions enter_plan_mode needs no question, and plan mode holds from the next call on
+prompt: Plan first.
+script:
+  - tool_calls:
+      - [ enter_plan_mode, {} ]
+      - [ write_file, { path: a.txt, content: x } ]
+      - [ enter_plan_mode, {} ]
+  - text: planning
+expect:
+  answer: planning
+  absent: [ a.txt ]
+  tools:
+    - { name: enter_plan_mode, text: '\AEntered plan mode\.' }
+    - { name: write_file, error: true, text: "plan mode: write_file changes files" }
+    # already in plan mode: the same answer, no second switch
+    - { name: enter_plan_mode, text: '\AEntered plan mode\.' }
+  events:
+    - { type: permission.mode, from: bypassPermissions, to: plan, why: enter_plan_mode }

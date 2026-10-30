@@ -1,0 +1,16 @@
+title: edit_file with a text that is not in the file fails with Claude Code's words and leaves the file alone
+files:
+  app.txt: "one\ntwo\n"
+prompt: Change three to 3.
+script:
+  - tool_calls:
+      - [ read_file, { path: app.txt } ]
+      - [ edit_file, { path: app.txt, old_string: three, new_string: "3" } ]
+  - text: gescheitert
+expect:
+  answer: gescheitert
+  files:
+    app.txt: "one\ntwo\n"
+  tools:
+    - { name: read_file }
+    - { name: edit_file, error: true, text: "\\A<tool_use_error>String to replace not found in file\\.\\nString: three</tool_use_error>\\z" }

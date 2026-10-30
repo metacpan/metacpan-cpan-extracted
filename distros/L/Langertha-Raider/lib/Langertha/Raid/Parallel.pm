@@ -1,6 +1,6 @@
 package Langertha::Raid::Parallel;
 # ABSTRACT: Parallel Raid orchestrator with branched context isolation
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Future::AsyncAwait;
 use Future;
@@ -124,7 +124,7 @@ Langertha::Raid::Parallel - Parallel Raid orchestrator with branched context iso
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ deterministic result aggregation.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -195,5 +195,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

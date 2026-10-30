@@ -14,94 +14,12 @@ my %locale_codes = map { $_ => 1 } DateTime::Locale->codes;
 # These are locales that are missing English name data in the JSON source
 # files.
 my %is_locale_without_en_data = map { $_ => 1 } qw(
-    lld
-    mhn
-    mww
-    skr
-    suz
 );
 
 # These are locales that are missing native name data in the JSON source
 # files.
 my %is_locale_without_native_data = map { $_ => 1 } qw(
-    aa
-    aa-DJ
-    aa-ER
-    aa-ET
-    bew
-    bew-ID
-    bm-Nkoo
-    bm-Nkoo-ML
-    bqi
-    bqi-IR
-    byn
-    byn-ER
-    cad
-    cad-US
-    cop
-    cop-EG
-    cu
-    cu-RU
-    dv
-    dv-MV
-    en-Shaw
-    en-Shaw-GB
-    gez
-    gez-ER
-    gez-ET
-    ha-Arab
-    ha-Arab-NG
-    ha-Arab-SD
-    iu
-    iu-CA
-    iu-Latn
-    iu-Latn-CA
-    kaa-Latn
-    kaa-Latn-UZ
-    ku-Arab
-    ku-Arab-IQ
-    ku-Arab-IR
-    la
-    la-VA
-    ltg
-    ltg-LV
-    lzz
-    lzz-TR
-    mhn
-    mhn-IT
-    mn-Mong
-    mn-Mong-CN
-    ms-Arab
-    ms-Arab-BN
-    ms-Arab-MY
-    mww
-    mww-Hmnp
-    mww-Hmnp-US
     nmg
-    nr
-    nr-ZA
-    pi
-    pi-Latn
-    pi-Latn-GB
-    sgs
-    sgs-LT
-    sid
-    sid-ET
-    suz
-    suz-Deva
-    suz-Deva-NP
-    suz-Sunu
-    suz-Sunu-NP
-    tig
-    tig-ER
-    ts
-    ts-ZA
-    ve
-    ve-ZA
-    vo
-    vo-001
-    wal
-    wal-ET
 );
 
 subtest( 'basic overall tests', \&basic_tests );
@@ -114,6 +32,7 @@ subtest( 'en-GB locale',                   \&check_en_GB );
 subtest( 'en-US locale',                   \&check_en_US );
 subtest( 'es-ES locale',                   \&check_es_ES );
 subtest( 'af locale',                      \&check_af );
+subtest( 'day of month ordinals',          \&check_day_of_month );
 subtest( 'C locales',                      \&check_C_locales );
 subtest( 'DateTime::Language back-compat', \&check_DT_Lang );
 
@@ -220,6 +139,9 @@ sub test_one_locale {
         }, {
             locale_method => 'era_narrow',
             count         => 2,
+        }, {
+            locale_method => 'day_of_month_format_abbreviated',
+            count         => 31,
         },
     ) {
         check_array( locale => $locale, %{$test} );
@@ -299,7 +221,8 @@ sub check_und {
         day_stand_alone_wide        => [qw( Mon Tue Wed Thu Fri Sat Sun )],
         day_stand_alone_abbreviated => [qw( Mon Tue Wed Thu Fri Sat Sun )],
         day_stand_alone_narrow      => [qw( M T W T F S S )],
-        month_format_wide           =>
+        day_of_month_format_abbreviated => [ 1 .. 31 ],
+        month_format_wide               =>
             [qw( M01 M02 M03 M04 M05 M06 M07 M08 M09 M10 M11 M12 )],
         month_format_abbreviated =>
             [qw( M01 M02 M03 M04 M05 M06 M07 M08 M09 M10 M11 M12 )],
@@ -352,6 +275,9 @@ sub check_und {
         GyMEd               => 'G y-MM-dd, E',
         GyMMM               => 'G y MMM',
         GyMMMEd             => 'G y MMM d, E',
+        GyMMMM              => 'G y MMMM',
+        GyMMMMEd            => 'G y MMMM d, E',
+        GyMMMMd             => 'G y MMMM d',
         GyMMMd              => 'G y MMM d',
         GyMd                => 'G y-MM-dd',
         H                   => 'HH',
@@ -364,6 +290,7 @@ sub check_und {
         MEd                 => 'MM-dd, E',
         MMM                 => 'LLL',
         MMMEd               => 'MMM d, E',
+        MMMMEd              => 'MMMM d, E',
         'MMMMW-count-other' => q{'week' W 'of' MMMM},
         MMMMd               => 'MMMM d',
         MMMd                => 'MMM d',
@@ -456,7 +383,14 @@ sub check_en_GB {
         GyMMM               => 'MMM y G',
         GyMMMEEEEd          => 'EEEE, d MMM y G',
         GyMMMEd             => 'E, d MMM y G',
+        GyMMMEddd           => 'E, ddd MMM y G',
+        GyMMMM              => 'MMMM y G',
+        GyMMMMEd            => 'E, d MMMM y G',
+        GyMMMMEddd          => 'E, ddd MMMM y G',
+        GyMMMMd             => 'd MMMM y G',
+        GyMMMMddd           => 'ddd MMMM y G',
         GyMMMd              => 'd MMM y G',
+        GyMMMddd            => 'ddd MMM y G',
         GyMd                => 'dd/MM/y G',
         H                   => 'HH',
         Hm                  => 'HH:mm',
@@ -469,11 +403,16 @@ sub check_en_GB {
         MMM                 => 'LLL',
         MMMEEEEd            => 'EEEE d MMM',
         MMMEd               => 'E d MMM',
+        MMMEddd             => 'E ddd MMM',
         MMMMEEEEd           => 'EEEE d MMMM',
+        MMMMEd              => 'E d MMMM',
+        MMMMEddd            => 'E ddd MMMM',
         'MMMMW-count-one'   => q{'week' W 'of' MMMM},
         'MMMMW-count-other' => q{'week' W 'of' MMMM},
         MMMMd               => 'd MMMM',
+        MMMMddd             => 'ddd MMMM',
         MMMd                => 'd MMM',
+        MMMddd              => 'ddd MMM',
         MMdd                => 'dd/MM',
         Md                  => 'dd/MM',
         d                   => 'd',
@@ -496,14 +435,23 @@ sub check_en_GB {
         yMMM                => 'MMM y',
         yMMMEEEEd           => 'EEEE, d MMM y',
         yMMMEd              => 'E, d MMM y',
+        yMMMEddd            => 'E, ddd MMM y',
         yMMMM               => 'MMMM y',
         yMMMMEEEEd          => 'EEEE, d MMMM y',
+        yMMMMEd             => 'E, d MMMM y',
+        yMMMMEddd           => 'E, MMMM ddd, y',
+        yMMMMd              => 'd MMMM y',
+        yMMMMddd            => 'MMMM ddd, y',
         yMMMd               => 'd MMM y',
+        yMMMddd             => 'ddd MMM y',
         yMd                 => 'dd/MM/y',
         yQQQ                => 'QQQ y',
         yQQQQ               => 'QQQQ y',
         'yw-count-one'      => q{'week' w 'of' Y},
         'yw-count-other'    => q{'week' w 'of' Y},
+        yy                  => "\N{U+2019}yy",
+        yyMMM               => "MMM \N{U+2019}yy",
+        yyMMMd              => "d MMM \N{U+2019}yy",
     );
 
     test_formats( $locale, %formats );
@@ -522,6 +470,14 @@ sub check_en_US {
 
 sub en_data {
     return (
+        day_of_month_format_abbreviated => [
+            qw(
+                1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th
+                11th 12th 13th 14th 15th 16th 17th 18th 19th 20th
+                21st 22nd 23rd 24th 25th 26th 27th 28th 29th 30th
+                31st
+            )
+        ],
         day_format_wide =>
             [qw( Monday Tuesday Wednesday Thursday Friday Saturday Sunday )],
         day_format_abbreviated => [qw( Mon Tue Wed Thu Fri Sat Sun )],
@@ -608,6 +564,33 @@ sub check_es_ES {
     is( $locale->language_code,  'es',  'language_code' );
     is( $locale->territory_code, 'ES',  'territory_code' );
     is( $locale->variant_code,   undef, 'variant_code' );
+}
+
+sub check_day_of_month {
+    is(
+        DateTime::Locale->load('fr')->day_of_month_format_abbreviated,
+        [ '1er', 2 .. 31 ],
+        'fr only has an ordinal suffix for the 1st'
+    );
+
+    # uk uses "n % 10 = 3 and n % 100 != 13" for the "few" category.
+    my $uk = DateTime::Locale->load('uk')->day_of_month_format_abbreviated;
+    is(
+        [ @{$uk}[ 0, 2, 12, 22 ] ],
+        [
+            "1-\N{U+0435}", "3-\N{U+0442}\N{U+0454}", "13-\N{U+0435}",
+            "23-\N{U+0442}\N{U+0454}"
+        ],
+        'uk days of the month use the few and other categories'
+    );
+
+    # tk uses "n % 10 = 6,9 or n = 10" for the "few" category.
+    my $tk = DateTime::Locale->load('tk')->day_of_month_format_abbreviated;
+    is(
+        [ @{$tk}[ 4, 5, 8, 9, 10, 15 ] ],
+        [qw( 5-nji 6-njy 9-njy 10-njy 11-nji 16-njy )],
+        'tk days of the month handle rules with a list and an or'
+    );
 }
 
 sub check_af {

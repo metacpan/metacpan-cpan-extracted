@@ -1,9 +1,9 @@
 use v5.40;
 use blib;
-use builtin         qw[refaddr];
 use Acme::Parataxis qw[async fiber yield await_sleep];
 use Acme::Parataxis::Local;
 use Test2::V1 -ipP;
+#
 my $DEFAULT = Acme::Parataxis::Local->new( default => 'fresh' );
 sub stash_exists ($f) { exists $Acme::Parataxis::FIBER_LOCALS{ refaddr($f) } }
 sub stash_keys ()     { scalar keys %Acme::Parataxis::FIBER_LOCALS }

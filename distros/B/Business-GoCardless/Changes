@@ -1,5 +1,11 @@
 Revision history for Business-GoCardless
 
+1.01     2026-10-29
+        - Security fixes, reported by CPANSec automated scanning:
+          - 1  CVE-2026-119036  legacy webhook flattened before its check     memory exhaustion   0.07*-1.00
+          - 2  CVE-2026-119037  undef or empty secret verifies any signature  forged webhooks     0.07*-1.00
+          - 3  CVE-2026-119038  redirect flow not bound to the caller         charges another's   0.17*-1.00
+
 1.00     2026-10-19
         - MAJOR UPDATE including some breaking changes, see below
         - Add company_name, phone_number, and danish_identity_number

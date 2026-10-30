@@ -92,6 +92,8 @@ my $absent_uid = 4294967294;
     {
         local %ENV = %ENV;
         local $Developer::Dashboard::Platform::OS_NAME = $windows;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_passwd_entry = sub { die "getpwuid unavailable\n" };
         delete $ENV{DD_STATE_ROOT_USER};
         delete $ENV{USER};
         delete $ENV{LOGNAME};

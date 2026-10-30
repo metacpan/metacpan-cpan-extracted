@@ -6,12 +6,11 @@ use HTTP::Tiny;
 use IO::Socket::INET;
 use Time::HiRes qw[time];
 use POSIX       ();
-
+#
 package Acme::Parataxis::Test::MockPoolHTTP {
     use parent 'HTTP::Tiny';
 
-    sub _open_handle {
-        my ( $self, $request, $scheme, $host, $port, $peer ) = @_;
+    sub _open_handle ( $self, $request, $scheme, $host, $port, $peer ) {
         my $handle = Acme::Parataxis::Test::MockPoolHTTP::Handle->new(
             timeout            => $self->{timeout},
             SSL_options        => $self->{SSL_options},
@@ -22,8 +21,7 @@ package Acme::Parataxis::Test::MockPoolHTTP {
         return $handle->connect( $scheme, $host, $port, $peer );
     }
 
-    sub request {
-        my ( $self, $method, $url, $args ) = @_;
+    sub request ( $self, $method, $url, $args ) {
         no warnings 'uninitialized';
         $method //= 'GET';
         my %new_args = %{ $args // {} };
@@ -46,9 +44,7 @@ package Acme::Parataxis::Test::MockPoolHTTP {
 package Acme::Parataxis::Test::MockPoolHTTP::Handle {
     use parent -norequire, 'HTTP::Tiny::Handle';
 
-    sub _do_timeout {
-        my ( $self, $type, $timeout ) = @_;
-        $timeout //= $self->{timeout} // 60;
+    sub _do_timeout( $self, $type, $timeout = $self->{timeout} // 60 ) {
         if ( $self->{fh} ) {
             my $start = time();
             while (1) {
@@ -136,11 +132,11 @@ Acme::Parataxis::run(
 
         # Verify results
         todo "Shared CVs with yielding cause pad collisions" => sub {
-            is( scalar @results, 10, 'Received 10 results' );
+            is scalar @results, 10, 'Received 10 results';
             for my $i ( 0 .. $#results ) {
                 my $res = $results[$i];
-                is( $res->{status},  200,  'Request ' . ( $i + 1 ) . ' status is 200' );
-                is( $res->{content}, 'HI', 'Request ' . ( $i + 1 ) . ' content is correct' );
+                is $res->{status},  200,  'Request ' . ( $i + 1 ) . ' status is 200';
+                is $res->{content}, 'HI', 'Request ' . ( $i + 1 ) . ' content is correct';
             }
         };
         $listener->close();

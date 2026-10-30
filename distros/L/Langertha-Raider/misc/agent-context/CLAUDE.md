@@ -30,8 +30,12 @@ principle and lane are in `.claude/rules/raider-rules.md`.
 | Task | Agent |
 |---|---|
 | Implement / refactor / debug behavior-relevant code | `raider-worker` (default) |
+| Standalone binary: packing, `scripts/*-binary*.sh`, release-binaries workflow, packed-only failures | `raider-binary-worker` |
 | Write/extend tests | `raider-test-writer` |
 | Commits, `Changes`, card → done, pre-release audit | `raider-release-manager` |
+| Read-only research, audit, gap analysis | `raider-worker` ("read-only, change nothing") |
+
+Every subagent is a `raider-*` agent — never the built-in `general-purpose`/`Explore`/`Plan`.
 
 The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading them. The skills are installed by skilletor from

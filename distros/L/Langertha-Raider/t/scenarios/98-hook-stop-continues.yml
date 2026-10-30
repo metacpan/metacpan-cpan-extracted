@@ -1,0 +1,28 @@
+title: a Stop hook that blocks sends its reason back and the run goes on, stop_hook_active the second time (ADR 0022)
+run_prompt: true
+files:
+  .claude/settings.json: |
+    { "hooks": { "Stop": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/tests-first", "args": [] } ] }
+    ] } }
+  hooks/tests-first: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *'"stop_hook_active":true'*) exit 0;; esac
+    echo "run the tests first" >&2
+    exit 2
+executable: [ hooks/tests-first ]
+prompt: Fix it.
+script:
+  - text: fixed, I think
+  - text: tests pass, fixed
+expect:
+  answer: tests pass, fixed
+  outcome: { status: completed }
+  requests:
+    - { index: 1, contains: "Stop hook feedback:\nrun the tests first" }
+  events:
+    - { type: hook.ran, hook_event: Stop, outcome: block, exit: 2 }
+    - { type: message, role: assistant, content: "fixed, I think" }
+    - { type: message, role: user, content: "Stop hook feedback:\nrun the tests first", hook: Stop }
+    - { type: hook.ran, hook_event: Stop, outcome: success, exit: 0 }

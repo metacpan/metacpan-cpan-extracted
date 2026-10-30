@@ -73,7 +73,7 @@ my $instance = %mimap ? max(keys %mimap) : 0;
 # which the locally-highest i= is not the real top -- see mid_process below.
 my $top_i = $num;
 
-# -07 §14: "there MUST NOT be a Message-Instance field with a higher m=
+# -08 §14: "there MUST NOT be a Message-Instance field with a higher m=
 # value than occurs in any DKIM2-Signature field" -- reported as "PERMERROR
 # Message-Instance m=<x> is not signed". Checked up front because the walk
 # below happily verifies and reports "OK Message-Instance" for an instance

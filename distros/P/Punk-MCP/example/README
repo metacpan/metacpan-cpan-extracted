@@ -1,0 +1,139 @@
+The Bookshop
+
+A small Punk application with web routes and the same actions offered over
+MCP: two tools, two resources and a prompt.
+
+    search_books       tool, finds books by title or author words
+    add_book           tool, adds a book, needs the admin key
+    books://catalog    resource, every book, one line each
+    books://{id}       resource, one book by id
+    recommend          prompt, asks for one recommendation for a mood
+
+The commands below are run from the top of the Punk-MCP distribution.
+
+BEFORE YOU START
+
+If Punk::MCP is installed, skip this. If you have only built it (perl
+Makefile.PL && make), put the build tree on the library path first, keeping
+whatever is already there:
+
+    export PERL5LIB=$PWD/blib/lib:$PWD/blib/arch:$PERL5LIB
+
+Two environment variables change the example:
+
+    BOOKSHOP_ADMIN_KEY   the key add_book wants in X-Admin-Key,
+                         change-me without it
+    BOOKSHOP_SESSIONS    the directory MCP sessions are kept in,
+                         /tmp/bookshop-mcp without it
+
+CONNECTING CLAUDE CODE OVER HTTP
+
+Start the server and leave it running:
+
+    plackup -s Hyperman example/app.psgi
+
+In another terminal, register it. The name and URL come before --header,
+because --header takes more than one value and would swallow them:
+
+    claude mcp add --transport http bookshop http://localhost:5000/mcp \
+        --header "X-Admin-Key: change-me"
+
+Without the header Claude sees only search_books, since add_book declares
+the same admin guard its web route has.
+
+CONNECTING CLAUDE CODE OVER STDIO
+
+Claude starts punk mcp itself, so it needs absolute paths and, from a build
+tree, the library path passed with -e. The name comes before -e for the
+same reason as above:
+
+    claude mcp add bookshop \
+        -e PERL5LIB=$PWD/blib/lib:$PWD/blib/arch:$PERL5LIB \
+        -- "$(command -v punk)" mcp --dir "$PWD/example"
+
+Leave out the -e line if Punk::MCP is installed. stdio carries no headers,
+so add_book is not offered here. Use HTTP to try it.
+
+Register one or the other under the name bookshop. claude mcp remove
+bookshop takes it away again.
+
+TRYING IT
+
+    claude mcp list
+
+shows bookshop and whether it connected. Then start claude and:
+
+    /mcp                              the server, its tools, resources
+                                      and prompts
+    find books by Le Guin             calls search_books
+    add Solaris by Stanislaw Lem      calls add_book (HTTP with the key)
+    @bookshop:books://catalog         attaches the catalogue resource
+    @bookshop:books://3               attaches one book
+    /mcp__bookshop__recommend deserts runs the prompt
+
+Or without the interactive session:
+
+    claude -p "search the bookshop for dune" \
+        --allowedTools mcp__bookshop__search_books
+
+The catalogue lives in memory in each process. A book added over HTTP is
+known to the worker that took the call, and a stdio process starts with the
+three books every time.
+
+TESTING WITHOUT CLAUDE
+
+The example's own test makes every call below through Punk::Test, with no
+server:
+
+    prove -b t/93-example.t
+
+Over HTTP, with the server from above running. The example keeps sessions,
+so initialize hands back an Mcp-Session-Id that every later request sends:
+
+    URL=http://localhost:5000/mcp
+    H=(-H 'Content-Type: application/json'
+       -H 'Accept: application/json, text/event-stream')
+
+    SID=$(curl -s -D - -o /dev/null "${H[@]}" $URL -d '{"jsonrpc":"2.0","id":1,
+      "method":"initialize","params":{"protocolVersion":"2025-11-25",
+      "capabilities":{},"clientInfo":{"name":"curl","version":"1"}}}' |
+      awk 'tolower($1)=="mcp-session-id:" {print $2}' | tr -d '\r')
+    H+=(-H "Mcp-Session-Id: $SID" -H 'MCP-Protocol-Version: 2025-11-25')
+
+    curl -s "${H[@]}" $URL -d '{"jsonrpc":"2.0",
+      "method":"notifications/initialized"}'
+
+    curl -s "${H[@]}" $URL -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+
+    curl -s "${H[@]}" -H 'X-Admin-Key: change-me' $URL \
+      -d '{"jsonrpc":"2.0","id":3,"method":"tools/list"}'
+
+    curl -s "${H[@]}" $URL -d '{"jsonrpc":"2.0","id":4,"method":"tools/call",
+      "params":{"name":"search_books","arguments":{"q":"le guin"}}}'
+
+    curl -s "${H[@]}" -H 'X-Admin-Key: change-me' $URL -d '{"jsonrpc":"2.0",
+      "id":5,"method":"tools/call","params":{"name":"add_book",
+      "arguments":{"title":"Solaris","author":"Stanislaw Lem"}}}'
+
+    curl -s "${H[@]}" $URL -d '{"jsonrpc":"2.0","id":6,
+      "method":"resources/read","params":{"uri":"books://catalog"}}'
+
+    curl -s "${H[@]}" $URL -d '{"jsonrpc":"2.0","id":7,"method":"prompts/get",
+      "params":{"name":"recommend","arguments":{"mood":"deserts"}}}'
+
+    curl -s -X DELETE -H "Mcp-Session-Id: $SID" $URL
+
+The first tools/list has search_books alone and the second adds add_book.
+initialized answers 202 with no body, and DELETE ends the session with 204.
+
+Over stdio, one JSON-RPC message a line in, one answer a line out:
+
+    printf '%s\n' \
+      '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"sh","version":"1"}}}' \
+      '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+      '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+      '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_books","arguments":{"q":"dune"}}}' |
+      punk mcp --dir example
+
+The search also writes a notifications/message line, the mcp_log call in
+Books#search.

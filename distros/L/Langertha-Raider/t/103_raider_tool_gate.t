@@ -13,7 +13,8 @@ use Langertha::Raider;
 # internal gate about the canonical call -- name, source, final arguments. No
 # gate: everything runs, as before. deny: the tool does not run, the model gets
 # an error result with the reason, and the call keeps exactly one tool.call and
-# one (failed) tool.result. ask: no approval UX exists yet, so it is refused
+# one (failed) tool.result. ask: a gate that can ask a person answers allow or
+# deny itself (the application, ADR 0021), so an ask reaching the raider is refused
 # like deny, with a reason that says so. Only the code that builds the raider
 # sets the gate; nothing the model or a plugin sends changes its verdict.
 # Offline, through a scripted engine.
@@ -229,7 +230,7 @@ subtest 'deny without a reason' => sub {
     'a generic reason';
 };
 
-subtest 'ask: refused for now, and the model is told why' => sub {
+subtest 'ask: refused (nobody to approve it), and the model is told why' => sub {
   my ( $raider, $engine, $mcp, $events ) = raider(
     { _tool_gate => gate([], bash => { verdict => 'ask', reason => 'writes outside the project' }) },
     { tool_calls => [ [ bash => { cmd => 'touch /etc/x' } ] ] }, { text => 'all done' },
@@ -241,7 +242,7 @@ subtest 'ask: refused for now, and the model is told why' => sub {
   ok $res->{isError}, 'error result';
   is text_of($res),
     "Tool call 'bash' was not run: it needs approval (writes outside the project), "
-    ."and this raid has no way to ask for it.",
+    ."and nobody can approve it in this raid. Do not retry the same call; go on without it or say what you need.",
     'saying it needs approval that cannot be asked for here';
   every_call_has_one_result($events, 'tool.call and tool.result once each');
 };
@@ -253,7 +254,8 @@ subtest 'ask without a reason' => sub {
   );
   run_f($raider->raid_f('go'));
   is text_of(result_for($engine, 'tc1')),
-    "Tool call 'bash' was not run: it needs approval, and this raid has no way to ask for it.",
+    "Tool call 'bash' was not run: it needs approval, and nobody can approve it in this raid."
+    ." Do not retry the same call; go on without it or say what you need.",
     'no empty parentheses';
 };
 
@@ -275,13 +277,13 @@ subtest 'the gate sees the canonical call: name, source, final arguments' => sub
   );
   ok run_f($raider->raid_f('go'))->is_final, 'final';
   is \@seen, [
-    { name => 'bash',  source => 'engine:1',
+    { name => 'bash',  source => 'engine:1', call => 'c1',
       arguments => { cmd => 'ls', rewritten => 1, approved => T() } },
-    { name => 'greet', source => 'inline',
+    { name => 'greet', source => 'inline', call => 'c2',
       arguments => { rewritten => 1, approved => T() } },
-    { name => 'raider_wait', source => 'raider',
+    { name => 'raider_wait', source => 'raider', call => 'c3',
       arguments => { seconds => 0, rewritten => 1, approved => T() } },
-  ], 'each call as plugin_before_tool_call handed it on, with the source it runs on';
+  ], 'each call as plugin_before_tool_call handed it on, with the source it runs on and its id';
   is $mcp->calls, [ [ bash => { cmd => 'ls', rewritten => 1, approved => T() } ] ],
     'and those are the arguments the tool ran with';
 };

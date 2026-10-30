@@ -186,7 +186,9 @@ subtest 'writers write the file in use' => sub {
     output => Langertha::Raider::CLI::Output->new(out => $out, color => 0),
     err    => $err,
   )->run('-r', "$root", '-e', 'openai', '-k', 'test', '--no-trace', '--claude', '--export-skill', "$root/S.md");
-  is(load($root, '.raider', 'config.yml')->{skills}, ['claude'], '--claude into .raider/config.yml');
+  # ADR 0019: --claude is the layout switch, saved as claude: true.
+  is(load($root, '.raider', 'config.yml')->{claude}, T(), '--claude into .raider/config.yml as claude: true');
+  is(load($root, '.raider', 'config.yml')->{skills}, undef, 'not as skills: [claude]');
   ok(!-e $root->child('.raider.yml'), 'no .raider.yml created');
 };
 

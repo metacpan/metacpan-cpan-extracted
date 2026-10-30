@@ -140,7 +140,7 @@ my $hoa_in = { id => ['a', 'b', 'c'], v => [1, 5, 9] };
 }
 
 # Usage guards still fire.
-throws_ok { filter($score) } qr/Usage: filter/, 'filter: missing predicate croaks';
+throws_ok { filter($score) } qr/^filter: error: expected a data frame and a predicate\n\z/m, 'filter: missing predicate croaks';
 throws_ok { filter('not a ref', sub { 1 }) } qr/data frame/,
 	'filter: non-ref data frame croaks';
 

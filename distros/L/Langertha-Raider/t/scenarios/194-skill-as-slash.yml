@@ -1,0 +1,14 @@
+# A skill is a command too: /style runs it with its base directory line,
+# the arguments appended when the body has no placeholder.
+title: a skill run as /style keeps its base directory line and gets ARGUMENTS appended
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/style/SKILL.md: "---\nname: style\ndescription: House writing style.\n---\n\nWrite in short sentences. STYLE-MARKER\n"
+prompt: /style the intro
+script:
+  - text: Short. Sentences.
+expect:
+  answer: Short. Sentences.
+  requests:
+    - { index: 0, contains: "<command-name>/style</command-name>\n<command-args>the intro</command-args>\n\nBase directory for this skill: " }
+    - { index: 0, contains: "/.claude/skills/style\n\nWrite in short sentences. STYLE-MARKER\n\nARGUMENTS: the intro" }

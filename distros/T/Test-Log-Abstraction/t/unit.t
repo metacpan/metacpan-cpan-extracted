@@ -33,6 +33,8 @@ Readonly::Scalar my $ALARM => 300;	# seconds; long enough never to fire
 # so there the timer can only be checked for not having been replaced
 Readonly::Scalar my $CAN_READ_ALARM => ($^O ne 'MSWin32');
 Readonly::Scalar my $MAX_LISTED => 20;	# entries a failing assertion lists (POD: like)
+Readonly::Scalar my $MAX_SHOWN => 200;	# characters of a repeated value kept (POD: DIAGNOSTICS)
+Readonly::Scalar my $CUT_MARK => '...';	# what follows a value that was cut
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 
 # Every documented level name and its number, from "Levels and how serious
@@ -119,12 +121,22 @@ my %ledger = (
 
 	'flush: logger' => 'Returns',
 	'flush: must be called on an object' => 'MESSAGES',
+	'reopen: logger' => 'Returns',
+	'reopen: must be called on an object' => 'MESSAGES',
 	'lang: code' => 'Returns',
 	'lang: must be called on an object' => 'MESSAGES',
 
 	'_emit: logger' => 'Returns',
 	'i18n: string' => 'Returns',
 	'i18n: key when not found' => 'Where the template is found',
+	'i18n: a value the format cannot show is written as given' => 'How a message template works',
+	'i18n: never fails, for any key or arguments' => 'MESSAGES',
+	'count: unknown names give 0' => 'API SPECIFICATION',
+	'level methods: an object whose text form dies is written in plain form' => 'Args',
+
+	'DIAGNOSTICS: a repeated value is cut to 200 characters' => 'DIAGNOSTICS',
+	'DIAGNOSTICS: control characters are shown as \\xNN' => 'DIAGNOSTICS',
+	'DIAGNOSTICS: an object whose text form dies is shown in plain form' => 'DIAGNOSTICS',
 );
 
 # Mark a documented state as proven.  A name that is not in the ledger is
@@ -218,6 +230,10 @@ sub leaves_globals_alone {
 
 	package Local::Other;
 	sub new { return bless {}, shift }
+
+	# An object whose text form dies, as a badly written exception class may
+	package Local::Bomb;
+	use overload '""' => sub { die "kaboom\n" }, fallback => 1;
 }
 
 # ---------------------------------------------------------------------------
@@ -478,6 +494,9 @@ subtest 'flush and lang' => sub {
 	is($logger->flush(), $logger, 'flush returns the logger');
 	is($logger->count(), 0, 'flush stores nothing');
 	proven('flush: logger');
+	is($logger->reopen(), $logger, 'reopen returns the logger');
+	is($logger->count(), 0, 'reopen stores nothing');
+	proven('reopen: logger');
 
 	is($logger->lang(), 'zh', 'lang returns the code');
 	returns_ok($logger->lang(), { type => 'string', matches => qr/\A[a-z]{2,3}\z/ }, 'a language code');
@@ -487,7 +506,7 @@ subtest 'flush and lang' => sub {
 
 subtest 'every inspection method refuses anything that is not a logger' => sub {
 	my %not_loggers = ('the class' => $CLASS, 'undef' => undef, 'a plain hash' => {}, 'another class' => Local::Other->new());
-	foreach my $method (qw(messages clear count verbose level flush lang like unlike has_level empty)) {
+	foreach my $method (qw(messages clear count verbose level flush reopen lang like unlike has_level empty)) {
 		foreach my $what (sort keys %not_loggers) {
 			no strict 'refs';
 			throws_ok { &{"${CLASS}::$method"}($not_loggers{$what}, 'x') } at_caller("$method() must be called on an object, not on the class"), "$method on $what";
@@ -667,6 +686,93 @@ subtest 'methods for subclasses' => sub {
 	lives_ok { Local::Subclass->new(diag => 'none')->say('x') } 'a subclass may call them';
 };
 
+# Strategy: the template rules say what happens when a value does not fit
+# its format, so feed each kind of misfit through a template of our own
+subtest 'i18n: a value the format cannot show is written as it was given' => sub {
+	my $logger = logger(i18n => { en => { all => '%{v}d|%{v}x|%{v}.2f' } });
+	foreach my $odd ('text', 'Inf', '-Inf', 'NaN') {
+		is($logger->i18n('all', { v => $odd }), "$odd|$odd|$odd", "'$odd' in every number format");
+	}
+	my $big = 1e30;
+	is($logger->i18n('all', { v => $big }), "$big|$big|" . sprintf('%.2f', $big), 'too big for %d and %x, but %.2f can show it');
+	is($logger->i18n('all', { v => 255 }), '255|ff|255.00', 'a value that fits is formatted');
+	is($logger->i18n('all', {}), 'undef|undef|undef', 'a missing value is the text undef');
+	proven('i18n: a value the format cannot show is written as given');
+};
+
+# Strategy: MESSAGES says "None.  It never fails, for any key or
+# arguments" - so try the keys and arguments most likely to make it fail
+subtest 'i18n: never fails, for any key or arguments' => sub {
+	my $logger = logger();
+	my %keys = (
+		'undef' => undef,
+		'an empty string' => '',
+		'an array reference' => [],
+		'an object whose text form dies' => bless({}, 'Local::Bomb'),
+	);
+	foreach my $what (sort keys %keys) {
+		my $text;
+		lives_ok { $text = $logger->i18n($keys{$what}, 'not a hash') } "key: $what";
+		returns_ok($text, { type => 'string' }, '... gives a string');
+	}
+	lives_ok { $logger->i18n('captured', { count => bless({}, 'Local::Bomb') }) } 'an argument whose text form dies';
+	proven('i18n: never fails, for any key or arguments');
+};
+
+# Strategy: the Domains line of count()'s API SPECIFICATION, including the
+# misspelt level that LIMITATIONS warns about
+subtest 'count: unknown names give 0' => sub {
+	my $logger = logger();
+	$logger->warn('a');
+	foreach my $name ('', '0', 'wran', 'WARN ') {
+		is($logger->count($name), 0, "count('$name') is 0");
+	}
+	is($logger->count('warn'), 1, 'while the real level still counts');
+	proven('count: unknown names give 0');
+};
+
+# Strategy: the level methods' Args promise that an object whose text form
+# dies does not stop the log call
+subtest 'level methods: an object whose text form dies' => sub {
+	my $logger = logger();
+	my $bomb = bless({}, 'Local::Bomb');
+	lives_ok { $logger->error('got ', $bomb) } 'the log call works';
+	like($logger->messages()->[0]->{'message'}, qr/\Agot Local::Bomb=HASH\(0x[0-9a-f]+\)\z/, 'the object is written in plain form');
+	proven('level methods: an object whose text form dies is written in plain form');
+};
+
+# Strategy: DIAGNOSTICS promises that every value an error, warning or
+# notice repeats is cut and escaped.  Send one hostile name to every place
+# that repeats a name, and expect exactly the same safe text from each
+subtest 'DIAGNOSTICS: every repeated value is cut and escaped' => sub {
+	my $hostile = "x\ny\e" . ('z' x $MAX_SHOWN);
+	my $prefix = 'x\x0Ay\x1B';
+	my $shown = $prefix . ('z' x ($MAX_SHOWN - length($prefix))) . $CUT_MARK;
+	my $logger = logger();
+
+	throws_ok { $CLASS->new(diag => $hostile) } at_caller("invalid diag level '$shown'"), 'new(diag => name)';
+	throws_ok { $CLASS->new(diag => ['info', $hostile]) } at_caller("invalid diag level '$shown'"), 'new(diag => [names])';
+	throws_ok { $CLASS->new(level => $hostile) } at_caller("invalid syslog level '$shown'"), 'new(level => name)';
+	warning_like { $logger->level($hostile) } at_caller("invalid syslog level '$shown'"), 'level(name) warning';
+	throws_ok { $CLASS->$hostile() } at_caller("$shown() must be called on an object, not on the class"), 'unknown method on the class';
+	my $out = printed { $logger->$hostile() };
+	is($out, "# $CLASS: no method '$shown'\n", 'the "no method" notice: one line');
+	proven('DIAGNOSTICS: a repeated value is cut to 200 characters');
+	proven('DIAGNOSTICS: control characters are shown as \\xNN');
+};
+
+# Strategy: DIAGNOSTICS promises that an object whose text form dies gives
+# this module's message, never the object's own error
+subtest 'DIAGNOSTICS: an object whose text form dies is shown in plain form' => sub {
+	my $bomb = bless({}, 'Local::Bomb');
+	my $plain = qr/Local::Bomb=HASH\(0x[0-9a-f]+\)/;
+	throws_ok { $CLASS->new(diag => [$bomb]) } qr/\A\Q$CLASS: invalid diag level '\E$plain' at \Q$FILE\E line \d+/, 'new(diag => [object]) croaks with its own message';
+	my $result = 'not called';
+	warning_like { $result = logger()->level($bomb) } qr/\A\Q$CLASS: invalid syslog level '\E$plain'/, 'level(object) warns with its own message';
+	is($result, undef, '... and returns undef, as for any bad name');
+	proven('DIAGNOSTICS: an object whose text form dies is shown in plain form');
+};
+
 # ---------------------------------------------------------------------------
 # Global state (POD: Global variables are left alone)
 # ---------------------------------------------------------------------------
@@ -691,6 +797,7 @@ subtest 'no method changes $@, $!, $_ or alarm()' => sub {
 		'verbose' => sub { $logger->verbose(0) },
 		'level' => sub { $logger->level('debug') },
 		'flush' => sub { $logger->flush() },
+		'reopen' => sub { $logger->reopen() },
 		'lang' => sub { $logger->lang() },
 		'clear' => sub { $logger->clear() },
 		'empty' => sub { $logger->empty('empty inside the globals check') },

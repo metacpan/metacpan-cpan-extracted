@@ -61,6 +61,13 @@ sub is_approx {
 throws_ok { mcnemar_test([[1,2,3],[4,5,6]]) } qr/square/, 'non-square rejected';
 throws_ok { mcnemar_test([[1,2],[3,4],[5,6]]) } qr/square/, 'non-square rejected (rows)';
 throws_ok { mcnemar_test([[1,2,0],[3,4,0],[0,0,1]], exact => 1) } qr/2x2/, 'exact requires 2x2';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('mcnemar_test');
+	like($screen, qr/\Ausage: mcnemar_test\(/, 'mcnemar_test has a help screen');
+	eval { mcnemar_test([[5, 1], [2, 5]], exakt => 1) };
+	is($@, $screen . "mcnemar_test: error: unknown argument 'exakt'\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

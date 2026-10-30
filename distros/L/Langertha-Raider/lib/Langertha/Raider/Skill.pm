@@ -1,5 +1,5 @@
 package Langertha::Raider::Skill;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: Generate a "how to use raider" documentation file from a live Langertha::Raider::CLI configuration
 
 use Moose;
@@ -136,13 +136,26 @@ and raider warns about the other.
 |--------------------------|------------------------------------------------------|
 | `/help`                  | Command list                                         |
 | `/clear`                 | Reset conversation history and token counters        |
-| `/metrics`               | Cumulative raid metrics                              |
+| `/reset`                 | Same as `/clear`                                     |
+| `/new`                   | Same as `/clear`                                     |
+| `/compact [TEXT]`        | Summarise the history now, TEXT says what to keep    |
+| `/context`               | Context by part with estimated tokens                |
+| `/memory [N]`            | Instruction files; `/memory N` edits one             |
+| `/skills`                | Skills and custom commands with their sources        |
+| `/agents`                | Agents the agent tool can start                      |
+| `/hooks`                 | Configured hooks by event                            |
+| `/init`                  | Model writes or improves the instructions file       |
+| `/metrics`             | Cumulative raid metrics                              |
 | `/stats`                 | Tokens in / out / total this session                 |
 | `/reload`                | Re-read the instructions file, hot-swap the mission  |
 | `/prompt`                | Launch the prompt-builder (edits the instructions)   |
 | `/skill [PATH]`          | Export plain-markdown how-to-use doc                 |
 | `/skill-claude [PATH]`   | Export Claude Code SKILL.md with YAML frontmatter    |
 | `/config`                | Show each setting and where it came from             |
+| `/permissions`           | Permission mode, rules and session rules             |
+| `/permissions mode MODE` | Switch the permission mode                           |
+| `/mcp`                   | Configured MCP servers: status, source, tools        |
+| `/mcp reconnect [NAME]`  | Restart one MCP server (all without a name)          |
 | `/model [NAME]`          | Save NAME as model to the config file (next start)   |
 | `/model list [FILTER]`   | List the engine's models                             |
 | `/packs`                 | List the packs and which are active                  |
@@ -151,17 +164,25 @@ and raider warns about the other.
 | `/pack NAME`             | Toggle a pack                                        |
 | `/quit` `/exit` `:q`     | Leave                                                |
 
-## Loading project skills
+## Instructions, layout and skills
 
-Profile flags preload per-tool agent files into the mission and persist
-themselves to the config file after first use:
+A project with only Claude Code files (`CLAUDE.md`, `CLAUDE.local.md`,
+`.claude/`) is read like Claude Code reads it: the `CLAUDE.md` hierarchy
+with its imports, `.claude/settings*.json` (its `env` is applied), the
+Claude skill directories and the skills of enabled plugins. A project with
+`.raider/` reads it only with `claude: true` in its config. Skills are
+listed in the prompt as `name: description` and loaded on demand by the
+`skill` tool. These flags persist themselves to the config file after
+first use:
 
-- `--claude` — loads `CLAUDE.md` and any `.claude/skills/*/SKILL.md`.
+- `--claude` — read the Claude Code layout also in a raider project
+  (saved as `claude: true`).
 - `--openai` / `--codex` — loads `AGENTS.md`.
-- `--skills DIR` — extra plain-markdown directory (repeatable).
+- `--skills DIR` — extra skill directory, `*/SKILL.md` or plain `*.md`
+  (repeatable).
 
-When a well-known file is present but its profile isn't active, the startup
-banner shows a `seeing FILE, ignoring (use --<profile> to load)` hint.
+When a well-known file is present but not loaded, the startup banner shows
+a `seeing FILE, ignoring (use --<profile> to load)` hint.
 
 ## Engine options via the config file
 
@@ -273,7 +294,7 @@ Langertha::Raider::Skill - Generate a "how to use raider" documentation file fro
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -367,7 +388,7 @@ export.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -388,5 +409,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

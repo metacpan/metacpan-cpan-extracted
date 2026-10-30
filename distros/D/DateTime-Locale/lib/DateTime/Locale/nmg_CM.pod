@@ -435,6 +435,24 @@ Kwasio Cameroon locale.
    1995-12-22T09:05:02 = PB 1995 kris 22, mbs
   -0010-09-15T04:44:23 = BL -10 ng9 15, sas
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = PB 2008 ngwɛn ńmba
+   1995-12-22T09:05:02 = PB 1995 krísimin
+  -0010-09-15T04:44:23 = BL -10 ngwɛn rɛbvuâ
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = PB 2008 ngwɛn ńmba 5, smb
+   1995-12-22T09:05:02 = PB 1995 krísimin 22, mbs
+  -0010-09-15T04:44:23 = BL -10 ngwɛn rɛbvuâ 15, sas
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = PB 2008 ngwɛn ńmba 5
+   1995-12-22T09:05:02 = PB 1995 krísimin 22
+  -0010-09-15T04:44:23 = BL -10 ngwɛn rɛbvuâ 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = PB 2008 ng2 5
@@ -506,6 +524,12 @@ Kwasio Cameroon locale.
    2008-02-05T18:30:30 = smb 5 ng2
    1995-12-22T09:05:02 = mbs 22 kris
   -0010-09-15T04:44:23 = sas 15 ng9
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = ngwɛn ńmba 5, smb
+   1995-12-22T09:05:02 = krísimin 22, mbs
+  -0010-09-15T04:44:23 = ngwɛn rɛbvuâ 15, sas
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

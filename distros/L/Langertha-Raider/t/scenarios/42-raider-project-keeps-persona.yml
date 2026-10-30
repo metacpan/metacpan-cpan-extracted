@@ -1,0 +1,12 @@
+title: a raider project that reads the Claude layout (claude true) keeps raider's persona
+files:
+  .raider/config.yml: "claude: true\n"
+  CLAUDE.md: "Project rule: MEMORY-MARKER\n"
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "MEMORY-MARKER" }
+    - { index: 0, contains: "shield-maiden" }

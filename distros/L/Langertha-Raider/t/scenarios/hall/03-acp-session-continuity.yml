@@ -1,0 +1,22 @@
+title: prompts of one ACP session land in one journal, a new ACP session gets its own
+model:
+  rules:
+    Merke dir Apfelkuchen.: { answer: "Gemerkt." }
+    Und jetzt?: { answer: "Weiter." }
+    Anderes Gespraech.: { answer: "Neu." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_session: { as: s1, raider: Testie }
+  - acp_prompt: { session: s1, text: "Merke dir Apfelkuchen.", as: p1 }
+  - expect_acp: { prompt: p1, stop_reason: end_turn, text_like: 'Gemerkt\.' }
+  - acp_prompt: { session: s1, text: "Und jetzt?", as: p2 }
+  - expect_acp: { prompt: p2, stop_reason: end_turn, text_like: 'Weiter\.' }
+  - acp_session: { as: s2, raider: Testie }
+  - acp_prompt: { session: s2, text: "Anderes Gespraech.", as: p3 }
+  - expect_acp: { prompt: p3, stop_reason: end_turn, text_like: 'Neu\.' }
+  - expect_event: { type: raider.done, nth: 3, binding_like: '^acp:' }
+  - expect_journals:
+      count: 2
+      prompts:
+        - [ "Merke dir Apfelkuchen.", "Und jetzt?" ]
+        - [ "Anderes Gespraech." ]

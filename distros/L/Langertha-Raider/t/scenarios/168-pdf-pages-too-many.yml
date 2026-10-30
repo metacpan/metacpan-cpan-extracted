@@ -1,0 +1,12 @@
+title: read_file takes at most 20 PDF pages per request
+files:
+  doc.pdf: "%PDF-1.4\n"
+prompt: Read the whole PDF.
+script:
+  - tool_calls:
+      - [ read_file, { path: doc.pdf, pages: "1-30" } ]
+  - text: too many
+expect:
+  answer: too many
+  tools:
+    - { name: read_file, error: true, text: "\\A<tool_use_error>Page range \"1-30\" exceeds maximum of 20 pages per request\\. Please use a smaller range\\.</tool_use_error>\\z" }

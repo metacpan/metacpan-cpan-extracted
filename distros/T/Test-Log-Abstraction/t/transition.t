@@ -14,9 +14,12 @@
 #             CAPTURING --level method / unknown method----> CAPTURING (+1)
 #             CAPTURING --clear()--------------------------> EMPTY
 #             either    --verbose(), level(), read-only----> same state
+#                         (read-only includes i18n(), and DESTROY()
+#                         called directly)
 #             either    --bad argument / not a logger------> same state, croak
 #             either    --$logger->new()-------------------> new logger, same state
 #             either    --last reference goes--------------> DESTROYED
+#             (none)    --i18n() or _emit() on the class---> (none), no logger
 #
 # The state is never read from inside the object: it is worked out from
 # what the public API reports, and every way of asking must agree.
@@ -42,6 +45,7 @@ Readonly::Scalar my $MESSAGE => 'payload';
 Readonly::Scalar my $UNKNOWN => 'wran';	# a misspelt level
 Readonly::Scalar my $TRACE => 7;	# the default level number
 Readonly::Scalar my $ERROR => 3;	# the level number of 'error'
+Readonly::Scalar my $MAX_SHOWN => 200;	# characters of a name repeated in a notice
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 
 # Every level method, and whether the default diag rule ('warning' and
@@ -198,6 +202,32 @@ subtest "State: $EMPTY -> Trigger: unknown method (AUTOLOAD) -> State: $CAPTURIN
 	is(state_of($logger), $CAPTURING, 'now CAPTURING');
 	is_deeply($logger->messages(), [{ level => $UNKNOWN, message => $MESSAGE }], 'stored under the name called');
 	is($out, "# $CLASS: no method '$UNKNOWN'\n", 'the notice is printed although diag is none');
+
+	# The diagram's side effect: the name in the notice is escaped and cut,
+	# while the message is stored under the name exactly as called
+	my $hostile = "a\nok 1" . ('x' x $MAX_SHOWN);
+	my $other = fresh(diag => 'none');
+	$out = printed { $other->$hostile($MESSAGE) };
+	is($other->messages()->[0]->{'level'}, $hostile, 'a hostile name is stored as called');
+	is(scalar($out =~ tr/\n//), 1, 'but its notice is one line');
+	like($out, qr/no method 'a\\x0Aok 1x+\.\.\.'\n\z/, 'escaped and cut, as the diagram says');
+	is(length(($out =~ /no method '(.*)\.\.\.'/)[0]), $MAX_SHOWN, "cut to $MAX_SHOWN characters");
+};
+
+subtest "State: $CAPTURING -> Trigger: warn() and above, no arguments -> State: $CAPTURING (+0)" => sub {
+	# The '(or CAPTURING)' half of the diagram's no-argument rule: at warn
+	# or above, nothing is added; below it, one empty message
+	foreach my $method (sort keys %PRINTED_BY_DEFAULT) {
+		my $logger = capturing();
+		my $before = snapshot($logger);
+		$logger->$method();
+		is(state_of($logger), $CAPTURING, "$method(): still CAPTURING");
+		if($PRINTED_BY_DEFAULT{$method}) {
+			is_deeply(snapshot($logger), $before, "$method(): nothing added");
+		} else {
+			is_deeply($logger->messages()->[-1], { level => $method, message => '' }, "$method(): one empty message added");
+		}
+	}
 };
 
 subtest "State: $CAPTURING -> Trigger: level or unknown method -> State: $CAPTURING (+1)" => sub {
@@ -330,7 +360,7 @@ foreach my $state ($EMPTY, $CAPTURING) {
 		}
 	};
 
-	subtest "State: $state -> Trigger: count, messages, lang, is_*, flush -> State: $state" => sub {
+	subtest "State: $state -> Trigger: count, messages, lang, is_*, flush, reopen, i18n -> State: $state" => sub {
 		my $logger = ($state eq $EMPTY) ? fresh() : capturing();
 		my $before = snapshot($logger);
 		my $results = results();
@@ -341,11 +371,27 @@ foreach my $state ($EMPTY, $CAPTURING) {
 			$logger->lang();
 			$logger->$_() foreach(@PREDICATES);
 			$logger->flush();
+			$logger->reopen();
+			$logger->i18n('no_method', { method => $UNKNOWN });
 		};
 		is(results(), $results, 'no TAP results');
 		is($out, '', 'nothing printed');
 		is_deeply(snapshot($logger), $before, "still $state, nothing changed");
 		is($logger->flush(), $logger, 'flush returns the logger');
+		is($logger->reopen(), $logger, 'reopen returns the logger');
+		is($logger->i18n('no_method', { method => $UNKNOWN }), "$CLASS: no method '$UNKNOWN'", 'i18n returns the text');
+	};
+
+	subtest "State: $state -> Trigger: DESTROY() called directly -> State: $state" => sub {
+		# Only the last reference going away ends a logger; calling DESTROY
+		# by hand does nothing, so the logger is still alive and usable
+		my $logger = ($state eq $EMPTY) ? fresh(diag => 'all') : capturing(diag => 'all');
+		my $before = snapshot($logger);
+		my $out = printed { $logger->DESTROY() };
+		is($out, '', 'nothing printed');
+		is_deeply(snapshot($logger), $before, "still $state, nothing changed");
+		printed { $logger->info('afterwards') };
+		is($logger->count(), scalar(@{$before->{'messages'}}) + 1, 'and it still logs');
 	};
 
 	subtest "State: $state -> Trigger: bad argument -> croak, State: $state" => sub {
@@ -381,7 +427,7 @@ subtest 'Negative: no transition from something that is not a logger' => sub {
 		"another class's object" => bless({}, 'Local::Other'),
 	);
 	# Every trigger in the diagram that is a method call
-	my @triggers = ('info', 'warn', $UNKNOWN, 'clear', 'verbose', 'level', 'like', 'unlike', 'has_level', 'empty', 'count', 'messages', 'lang', 'flush', 'is_info');
+	my @triggers = ('info', 'warn', $UNKNOWN, 'clear', 'verbose', 'level', 'like', 'unlike', 'has_level', 'empty', 'count', 'messages', 'lang', 'flush', 'reopen', 'is_info');
 	foreach my $who (sort keys %invocants) {
 		foreach my $method (@triggers) {
 			# Called as a function, so that undef and plain references can
@@ -392,6 +438,23 @@ subtest 'Negative: no transition from something that is not a logger' => sub {
 		}
 	}
 	is_deeply(snapshot($logger), $before, 'the real logger was never touched');
+};
+
+subtest 'State: (none) -> Trigger: i18n() or _emit() on the class -> State: (none)' => sub {
+	# The one exception to "not a logger: croak".  Both are methods for
+	# subclasses, and work on the class name, so no logger is needed - and
+	# none is made
+	my $made = spy "${CLASS}::_build";
+	my $text;
+	lives_ok { $text = $CLASS->i18n('no_method', { method => $UNKNOWN }) } 'i18n on the class: no croak';
+	is($text, "$CLASS: no method '$UNKNOWN'", '... and it returns the text');
+	my $returned;
+	my $out = printed { $returned = $CLASS->_emit($MESSAGE) };
+	is($out, "# $MESSAGE\n", '_emit on the class: prints');
+	is($returned, $CLASS, '... and returns the class name');
+	my @built = $made->();
+	restore_all();
+	is(scalar(@built), 0, 'no logger was built for either');
 };
 
 # ===========================================================================

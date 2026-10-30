@@ -435,6 +435,24 @@ Scottish Gaelic locale.
    1995-12-22T09:05:02 = Dih, 22 Dùbh 1995 AD
   -0010-09-15T04:44:23 = DiS, 15 Sult -10 RC
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 dhen Ghearran
+   1995-12-22T09:05:02 = AD 1995 dhen Dùbhlachd
+  -0010-09-15T04:44:23 = RC -10 dhen t-Sultain
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 dhen Ghearran 5, DiM
+   1995-12-22T09:05:02 = AD 1995 dhen Dùbhlachd 22, Dih
+  -0010-09-15T04:44:23 = RC -10 dhen t-Sultain 15, DiS
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 dhen Ghearran 5
+   1995-12-22T09:05:02 = AD 1995 dhen Dùbhlachd 22
+  -0010-09-15T04:44:23 = RC -10 dhen t-Sultain 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Gearr 2008 AD
@@ -506,6 +524,12 @@ Scottish Gaelic locale.
    2008-02-05T18:30:30 = DiM, 5 Gearr
    1995-12-22T09:05:02 = Dih, 22 Dùbh
   -0010-09-15T04:44:23 = DiS, 15 Sult
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = dhen Ghearran 5, DiM
+   1995-12-22T09:05:02 = dhen Dùbhlachd 22, Dih
+  -0010-09-15T04:44:23 = dhen t-Sultain 15, DiS
 
 =head3 MMMMW-count-few ('seachdain' W MMMM)
 
@@ -644,6 +668,18 @@ Scottish Gaelic locale.
    2008-02-05T18:30:30 = An Gearran 2008
    1995-12-22T09:05:02 = An Dùbhlachd 1995
   -0010-09-15T04:44:23 = An t-Sultain -10
+
+=head3 yMMMMEd (EEE, d MMMM y)
+
+   2008-02-05T18:30:30 = DiM, 5 dhen Ghearran 2008
+   1995-12-22T09:05:02 = Dih, 22 dhen Dùbhlachd 1995
+  -0010-09-15T04:44:23 = DiS, 15 dhen t-Sultain -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 dhen Ghearran 2008
+   1995-12-22T09:05:02 = 22 dhen Dùbhlachd 1995
+  -0010-09-15T04:44:23 = 15 dhen t-Sultain -10
 
 =head3 yMMMd (d MMM y)
 

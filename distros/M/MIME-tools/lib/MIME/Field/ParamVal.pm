@@ -80,7 +80,7 @@ use MIME::Tools qw(:config :msgs);
 #------------------------------
 
 # The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.520";
+$VERSION = "5.522";
 
 
 #------------------------------
@@ -90,10 +90,10 @@ $VERSION = "5.520";
 #------------------------------
 
 # Pattern to match parameter names (like fieldnames, but = not allowed):
-my $PARAMNAME = '[^\x00-\x1f\x80-\xff :=]+?';
+my $PARAMNAME = '[^\x00-\x1f\x80-\xff :;=()]+?';
 
 # Pattern to match the first value on the line:
-my $FIRST    = '[^\s\;\x00-\x1f\x80-\xff]*';
+my $FIRST    = '[^\s\;"(\x00-\x1f\x80-\xff]*';
 
 # Pattern to match an RFC 2045 token:
 #
@@ -108,10 +108,11 @@ my $TOKEN    = '[^ \x00-\x1f\x80-\xff' . "\Q$TSPECIAL\E" . ']+';
 my $QUOTED_STRING = '"([^\\\\"]*(?:\\\\.(?:[^\\\\"]*))*)"';
 
 # Encoded token:
-my $ENCTOKEN = "=\\?[^?]*\\?[A-Za-z]\\?[^?]+\\?=";
+my $ENCTOKEN = "=\\?[^?;\"]*\\?[A-Za-z]\\?[^?;\"]+\\?=";
 
 # pattern to match comments
-my $COMMENT  = '\([^\)]*\)';
+# (one that holds ; or " would hide a parameter from other readers)
+my $COMMENT  = '\([^();"]*\)';
 
 # Pattern to match spaces or comments:
 my $SPCZ     = '(?:\s|' . $COMMENT . ')*';
@@ -252,6 +253,10 @@ sub parse_params {
 	$saw_semicolon = 0;
 	$raw =~ m/\G([^;]*)(\;$SPCZ)+/ogc or last;             # skip leading separator
 	my $leftover = $1;
+	# a comment still open at this ";" hides it from other readers
+	$params{'@unparsed_parameters'} = 1 if $leftover =~ /\([^)]*\z/;
+	# an odd '"' here makes readers that count quotes split elsewhere
+	$params{'@unparsed_parameters'} = 1 if ($leftover =~ tr/"//) % 2;
 	$saw_semicolon = 1;
 
 	# the previous param was 'boundary' and we had leftover data
@@ -259,11 +264,17 @@ sub parse_params {
 	    $boundary_leftover = 1;
 	}
 
-	$raw =~ m/\G($PARAMNAME)($COMMENT|$WSP)*=($COMMENT|$WSP)*/ogc or last;      # give up if not a param
+	unless ($raw =~ m/\G($PARAMNAME)($COMMENT|$WSP)*=($COMMENT|$WSP)*/ogc) {
+	    # give up if not a param, noting if a later parameter is lost
+	    $params{'@unparsed_parameters'} = 1 if substr($raw, pos($raw)) =~ /=/;
+	    last;
+	}
 	$param = lc($1);
 	$raw =~ m/\G(?:$QUOTED_STRING|($ENCTOKEN)|($TOKEN)|($BADTOKEN)|())/gc or last;
 	my ($qstr, $enctoken, $token, $badtoken, $empty_value) = ($1, $2, $3, $4, $5);
 	if (defined($qstr)) {
+	    # readers that count quotes take a final \" as escaped
+	    $params{'@unparsed_parameters'} = 1 if $qstr =~ /\\\z/;
             # unescape
 	    $qstr =~ s/\\(.)/$1/g;
 	}
@@ -293,17 +304,6 @@ sub parse_params {
 	     (defined($badtoken) ? $badtoken :
               (defined($token) ? $token : $empty_value)));
 
-        # Mark parse ambiguous if boundary parameter is encoded
-        if ($param eq 'boundary') {
-                if (defined($val) && $val =~ /^=\?.*\?[A-Z]\?.*\?=$/i) {
-                        $params{'@boundary_ambiguous'} = 1;
-                }
-                # multipart_boundary() strips trailing whitespace per RFC 2046,
-                # so a verbatim parser sees a different boundary: mark ambiguous
-                if (defined($val) && $val =~ /\s+\z/) {
-                        $params{'@boundary_ambiguous'} = 1;
-                }
-        }
 	# Do RFC 2231 processing
 	# Pick out the parts of the parameter
 	if ($param =~ /\*/ &&
@@ -318,6 +318,11 @@ sub parse_params {
 		$val = rfc2231percent($val);
 		$rfc2231encoding_is_used{$name} = 1;
 	    }
+	    # A section number is digits, and "0" and "00" are the same section
+	    if ($num !~ /\A[0-9]+\z/ || exists($rfc2231params{$name}{0 + $num})) {
+	        $dup_params{$name} = 1;
+	    }
+	    $num = 0 + $num if $num =~ /\A[0-9]+\z/;
 	    $rfc2231params{$name}{$num} .= $val;
 	} else {
 	    # Assign non-rfc2231 value directly.  If we
@@ -330,7 +335,10 @@ sub parse_params {
             $params{$param} = $val;
 	}
         if (($val // '') eq '') {
-            $empty_params{$param} = 1;
+            # Allow filename and name parameters to be empty
+            if ($param ne 'name' && $param ne 'filename') {
+                $empty_params{$param} = 1;
+            }
         }
     }
 
@@ -350,6 +358,9 @@ sub parse_params {
             $dup_params{$param} = 1;
         }
 	$params{$param} = '';
+	# sections must run 0, 1, 2, ... or other readers join another value
+	my @parts = sort { $a <=> $b } keys %{$rfc2231params{$param}};
+	$dup_params{$param} = 1 if grep { $parts[$_] ne $_ } 0 .. $#parts;
 	foreach $part (sort { $a <=> $b } keys %{$rfc2231params{$param}}) {
 	    $params{$param} .= $rfc2231params{$param}{$part};
 	}
@@ -359,19 +370,39 @@ sub parse_params {
 	    $boundary_is_rfc2231 = 1 if $param eq 'boundary';
 	    my($enc, $lang, $val) = rfc2231decode($params{$param});
 	    if (defined $enc) {
-		# re-encode as QP, preserving charset and language info
+		# an empty or malformed charset is read as US-ASCII
+		$enc = 'US-ASCII' unless $enc =~ /\A[A-Za-z0-9!#\$%&+^_`{}~-]+\z/;
+		# re-encode as QP, preserving charset info
 		$val =~ s{([=?_\x00-\x1F\x7F-\xFF])}
 			 {sprintf("=%02X", ord($1))}eg;
 		$val =~ tr/ /_/;
-		# RFC 2231 section 5: Language specification in Encoded Words
-		$enc .= '*' . $lang  if defined $lang && $lang ne '';
 		$params{$param} = '=?' . $enc . '?Q?' . $val . '?=';
 	    }
 	}
         if ($params{$param} eq '') {
-            $empty_params{$param} = 1;
+            # Allow filename and name parameters to be empty
+            if ($param ne 'name' && $param ne 'filename') {
+                $empty_params{$param} = 1;
+            }
         }
 	debug "   field param <$param> = <$params{$param}>";
+    }
+
+    # Check the boundary as multipart_boundary() sees it, after any
+    # RFC 2231 continuations have been joined
+    if (defined($params{'boundary'})) {
+        # Mark parse ambiguous if boundary parameter is encoded, wholly
+        # or in part, or has the "?= =?" that decode_mimewords() joins
+        if ($params{'boundary'} =~ /^=\?.*\?[A-Z]\?.*\?=$/i ||
+            $params{'boundary'} =~ /=\?[^?]*\?[A-Z]\?[^?]*\?=/i ||
+            $params{'boundary'} =~ /\?=\s+=\?/) {
+            $params{'@boundary_ambiguous'} = 1;
+        }
+        # multipart_boundary() strips trailing whitespace per RFC 2046,
+        # so a verbatim parser sees a different boundary: mark ambiguous
+        if ($params{'boundary'} =~ /\s+\z/) {
+            $params{'@boundary_ambiguous'} = 1;
+        }
     }
 
     # If there are any duplicate parameters, store them in the

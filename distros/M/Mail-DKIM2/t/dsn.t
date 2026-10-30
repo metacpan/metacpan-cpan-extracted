@@ -28,11 +28,12 @@ sub mk_signer {
 
 my $CB = DKIM2TestKeys::pubkey_callback();
 
-# propagate() authenticates the DSN first (§12.1.2) unless told it has been
-# done already. The fixtures below deliberately do NOT verify (signed_inbound
-# signs d=test1 over a sender@origin.example envelope, which the d=/mf= rule
-# rejects), because they exist to exercise the rebuild machinery -- so they
-# pass SkipAuthentication and the authentication itself is tested separately.
+# propagate() authenticates the DSN first (§16.4) unless told it has been
+# done already. The fixtures below exist to exercise the rebuild machinery,
+# not the authentication -- so they pass SkipAuthentication and the
+# authentication itself is tested separately. signed_inbound's mf= is in its
+# d= domain: -08 section 13.2 step 5 makes that part of being Provisionally
+# Verified, which generate() requires.
 my %NO_AUTH = (SkipAuthentication => 1);
 
 # Build a v=1 signed inbound message from a sender.
@@ -45,7 +46,7 @@ sub signed_inbound {
     my $mi = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($raw));
     my $with_mi = "Message-Instance: " . $mi->as_string . "\r\n" . $raw;
     my $signer = mk_signer(domain => 'test1.dkim2.com',
-                           mailfrom => 'sender@origin.example',
+                           mailfrom => 'sender@test1.dkim2.com',
                            rcptto => ['user@test1.dkim2.com']);
     $signer->PRINT($with_mi); $signer->CLOSE;
     my $sig = $signer->as_string; $sig =~ s/\r?\n$//;
@@ -97,8 +98,8 @@ sub forwarded_twohop {
     );
     ok($out->{raw}, 'propagate returned a DSN');
     # After stripping the forwarder hop (i=2), the now-top sig is i=1 with
-    # mf=sender@origin.example.
-    is($out->{upstream_mailfrom}, '<sender@origin.example>',
+    # mf=sender@test1.dkim2.com.
+    is($out->{upstream_mailfrom}, '<sender@test1.dkim2.com>',
        'propagated DSN addressed to upstream MAIL FROM');
     my $m = Email::MIME->new($out->{raw});
     like($m->header('Content-Type'), qr{multipart/report}i, 'still multipart/report');
@@ -184,7 +185,7 @@ sub forwarded_unchanged {
         Message => $dsn->as_string, ForwarderDomain => 'test2.dkim2.com', Signer => $signer, %NO_AUTH,
     );
     ok($out->{raw}, 'propagate accepts a valid 3-part DSN (text/rfc822-headers variant)');
-    is($out->{upstream_mailfrom}, '<sender@origin.example>',
+    is($out->{upstream_mailfrom}, '<sender@test1.dkim2.com>',
        'propagated DSN (headers-only variant) addressed to upstream MAIL FROM');
 }
 
@@ -216,7 +217,7 @@ sub forwarded_unchanged {
         Message => dsn_around($cur->as_string), ForwarderDomain => 'test2.dkim2.com',
         Signer => mk_signer(domain => 'test2.dkim2.com'), %NO_AUTH,
     );
-    is($out->{upstream_mailfrom}, '<sender@origin.example>',
+    is($out->{upstream_mailfrom}, '<sender@test1.dkim2.com>',
        'a null-Recipe DSN still propagates to the upstream MAIL FROM');
 
     my $m = Email::MIME->new($out->{raw});
@@ -238,13 +239,21 @@ sub forwarded_unchanged {
 # === generate: reflector-dsn behaviour ===
 {
     my $inbound = signed_inbound();
-    my $bouncer = mk_signer(domain => 'test2.dkim2.com');
+    # -08 section 16.2: the DSN's d= matches the reported message's rt=
+    # (user@test1.dkim2.com); a bouncer at test2 may not report on it.
+    my $stranger = mk_signer(domain => 'test2.dkim2.com');
+    ok(!eval { Mail::DKIM2::DSN->generate(Message => $inbound, Signer => $stranger,
+        PubkeyCallback => $CB, SkipTimestampCheck => 1); 1 },
+        'no DSN signed by a domain the message was not sent to');
+    like($@, qr/not sending a DSN: DSN d=test2\.dkim2\.com is not aligned/, '... saying why');
+
+    my $bouncer = mk_signer(domain => 'test1.dkim2.com');
     my $out = Mail::DKIM2::DSN->generate(
-        Message => $inbound, Signer => $bouncer, ReportingMTA => 'test2.dkim2.com',
+        Message => $inbound, Signer => $bouncer, ReportingMTA => 'test1.dkim2.com',
         PubkeyCallback => $CB, SkipTimestampCheck => 1,
     );
     ok($out->{raw}, 'generate returned a DSN');
-    is($out->{send_to}, '<sender@origin.example>', 'DSN addressed to original sender');
+    is($out->{send_to}, '<sender@test1.dkim2.com>', 'DSN addressed to original sender');
 
     my $m = Email::MIME->new($out->{raw});
     like($m->header('Content-Type'), qr{multipart/report}i, 'is multipart/report');
@@ -263,7 +272,7 @@ sub forwarded_unchanged {
     is($v->result, 'pass', 'generated DSN verifies (pass)');
 }
 
-# === generate: never for a message that is not Provisionally Verified (-07 §16) ===
+# === generate: never for a message that is not Provisionally Verified (-08 §16.2) ===
 {
     my $inbound = "From: nobody\@origin.example\r\nTo: user\@test1.dkim2.com\r\n"
                 . "Subject: unsigned\r\n\r\nhi\r\n";
@@ -274,9 +283,10 @@ sub forwarded_unchanged {
     ) };
     ok(!$out, 'unsigned mail: no DSN');
     like($@, qr/not sending a DSN: .*not Provisionally Verified/, '... and generate says why');
+    # -08 section 13.2: timestamps are not a Provisionally Verified check,
+    # so a DSN may report on a message too old to be Fully Verified.
     my ($ok, $why) = Mail::DKIM2::DSN->may_generate(Message => signed_inbound(), PubkeyCallback => $CB);
-    ok(!$ok, 'an expired top signature is not Provisionally Verified');
-    like($why, qr/signature expired/, '... saying so');
+    ok($ok, 'an expired top signature is still Provisionally Verified') or diag $why;
     my @r = Mail::DKIM2::Reflector::generate_dsn(sender => 'nobody@origin.example',
         message => $inbound, domain => 'test2.dkim2.com', selector => 'rsa1024',
         key => DKIM2TestKeys::private_key('test2.dkim2.com', 'rsa1024'), pubkey_cb => $CB);
@@ -292,9 +302,9 @@ sub forwarded_unchanged {
     my $out = Mail::DKIM2::Reflector::generate_dsn(
         sender   => 'sender@origin.example',
         message  => $inbound,
-        domain   => 'test2.dkim2.com',
+        domain   => 'test1.dkim2.com',
         selector => 'rsa1024',
-        key      => DKIM2TestKeys::private_key('test2.dkim2.com', 'rsa1024'),
+        key      => DKIM2TestKeys::private_key('test1.dkim2.com', 'rsa1024'),
         now      => $TS,
         pubkey_cb => $CB, skip_timestamp_check => 1,
     );
@@ -333,7 +343,7 @@ sub forwarded_unchanged {
     my $out = Mail::DKIM2::Reflector::generate_dsn(
         sender   => 'sender@test1.dkim2.com',
         message  => $inbound,
-        domain   => 'test2.dkim2.com',
+        domain   => 'test2.dkim2.com',    # the message went to user@test2
         selector => 'rsa1024',
         key      => DKIM2TestKeys::private_key('test2.dkim2.com', 'rsa1024'),
         now      => $TS,
@@ -354,8 +364,7 @@ sub forwarded_unchanged {
 
 # === authenticate: §12.1.2, the returned original's chain must verify ===
 
-# The fixtures above never verify (signed_inbound signs d=test1 over a
-# sender@origin.example envelope, which the d=/mf= rule rejects), which the
+# The fixtures above are not built to verify as a whole chain, which the
 # propagate tests never needed. authenticate does, so build a chain that
 # holds: test1 originates to a user at test2, who forwards to test3.
 sub verifiable_twohop {
@@ -386,7 +395,7 @@ sub dsn_around {
                               body => $embedded);
     return Email::MIME->create(
         attributes => { content_type => 'multipart/report', encoding => '7bit' },
-        # From the domain that signs it (-07 section 11).
+        # From the domain that signs it (-08 section 11).
         header_str => [ From => 'postmaster@' . ($o{domain} // 'test3.dkim2.com'),
                         To => 'user@test2.dkim2.com',
                         Subject => 'failure' ],

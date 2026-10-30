@@ -435,6 +435,24 @@ Vai Latin locale.
    1995-12-22T09:05:02 = CE 1995 M12 22, aijima
   -0010-09-15T04:44:23 = BCE -10 M09 15, siɓiti
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 M02
+   1995-12-22T09:05:02 = CE 1995 M12
+  -0010-09-15T04:44:23 = BCE -10 M09
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 M02 5, talata
+   1995-12-22T09:05:02 = CE 1995 M12 22, aijima
+  -0010-09-15T04:44:23 = BCE -10 M09 15, siɓiti
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 M02 5
+   1995-12-22T09:05:02 = CE 1995 M12 22
+  -0010-09-15T04:44:23 = BCE -10 M09 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 M02 5
@@ -506,6 +524,12 @@ Vai Latin locale.
    2008-02-05T18:30:30 = talata, M02 5
    1995-12-22T09:05:02 = aijima, M12 22
   -0010-09-15T04:44:23 = siɓiti, M09 15
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = M02 5, talata
+   1995-12-22T09:05:02 = M12 22, aijima
+  -0010-09-15T04:44:23 = M09 15, siɓiti
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

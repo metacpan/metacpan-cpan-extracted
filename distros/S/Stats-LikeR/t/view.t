@@ -243,4 +243,12 @@ is( $@, '', 'all documented args accepted' );
 	like( $lines[3], qr/^b\b/, 'HoH: second row label is the outer key' );
 }
 
+# A call-form error prints view's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { view([ { a => 1 } ], bogus => 1); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: view\(/, 'view: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('view') . "view: error: unknown argument(s): bogus\n",
+		'view: the help screen, then the error on the last line');
+}
 done_testing();

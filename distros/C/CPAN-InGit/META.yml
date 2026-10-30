@@ -3,9 +3,11 @@ abstract: 'Serve CPAN mirrrors from git branches'
 author:
   - 'Michael Conrad <mike@nrdvana.net>'
 build_requires:
+  File::Spec: '0'
   File::Temp: '0'
   Git::Raw: '0'
   IO::Handle: '0'
+  Mojo::Server::PSGI: '0'
   Test2::Suite: '0.000156'
   Test2::Tools::Compare: '0.000156'
   Test2::Tools::Subtest: '0'
@@ -17,6 +19,7 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -31,6 +34,7 @@ requires:
   CPAN::Meta::Requirements: '0'
   Carp: '0'
   Fcntl: '0'
+  File::ShareDir: '0'
   FindBin: '0'
   Getopt::Long: '0'
   Git::Raw::Branch: '0'
@@ -41,12 +45,15 @@ requires:
   JSON::PP: '0'
   Log::Any: '0'
   Log::Any::Adapter: '0'
+  Log::Any::Adapter::MojoLog: '0'
   Module::CPANfile: '0'
   Module::CoreList: '0'
   Module::Metadata: '0'
   Mojo::Base: '0'
+  Mojo::File: '0'
   Mojo::UserAgent: '0'
   Mojolicious::Lite: '0'
+  Mojolicious::Static: '0'
   Moo: '0'
   POSIX: '0'
   Pod::Usage: '0'
@@ -57,7 +64,7 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-CPAN-InGit/issues
   repository: https://github.com/nrdvana/perl-CPAN-InGit.git
-version: '0.003'
+version: '0.006'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

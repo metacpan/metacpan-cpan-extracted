@@ -36,6 +36,11 @@ my $lifecycle_progress  = \&Developer::Dashboard::CLI::RuntimeControl::_lifecycl
 my $summary_table       = \&Developer::Dashboard::CLI::RuntimeControl::_lifecycle_summary_table;
 my $render_table        = \&Developer::Dashboard::CLI::RuntimeControl::_render_table;
 my $pad_row             = \&Developer::Dashboard::CLI::RuntimeControl::_pad_row;
+my $tail_log_text       = \&Developer::Dashboard::CLI::RuntimeControl::_tail_log_text;
+my $read_log_sources    = \&Developer::Dashboard::CLI::RuntimeControl::_read_log_sources;
+my $render_log_sources  = \&Developer::Dashboard::CLI::RuntimeControl::_render_log_sources;
+my $follow_log_sources  = \&Developer::Dashboard::CLI::RuntimeControl::_follow_log_sources;
+my $timestamp_log_text  = \&Developer::Dashboard::CLI::RuntimeControl::_timestamp_log_text;
 my $lifecycle_usage     = \&Developer::Dashboard::CLI::RuntimeControl::_lifecycle_usage;
 my $log_usage           = \&Developer::Dashboard::CLI::RuntimeControl::_log_usage;
 
@@ -72,7 +77,7 @@ my $log_usage           = \&Developer::Dashboard::CLI::RuntimeControl::_log_usag
     sub web_log {
         my $self = shift;
         push @{ $self->{calls} }, [ 'web_log', @_ ];
-        return $self->{web_log_result};
+        return ref( $self->{web_log_result} ) eq 'CODE' ? $self->{web_log_result}->() : $self->{web_log_result};
     }
 }
 
@@ -103,7 +108,7 @@ my $log_usage           = \&Developer::Dashboard::CLI::RuntimeControl::_log_usag
         }, $class;
     }
 
-    sub read_log          { my ( $self, $name ) = @_; return $self->{logs}{$name}; }
+    sub read_log          { my ( $self, $name ) = @_; my $text = $self->{logs}{$name}; return ref($text) eq 'CODE' ? $text->() : $text; }
     sub collector_exists  { my ( $self, $name ) = @_; return $self->{existing}{$name} ? 1 : 0; }
     sub list_collectors   { my $self = shift; return @{ $self->{persisted} }; }
 }
@@ -309,6 +314,214 @@ sub base_args {
 
 # ---------------------------------------------------------- _run_log_command
 
+is_deeply(
+    [ Developer::Dashboard::CLI::RuntimeControl::_sort_log_source_names(qw(collector:beta web collector:alpha)) ],
+    [qw(web collector:alpha collector:beta)],
+    'log source ordering always puts web first and keeps collector sources alphabetical',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::RuntimeControl::_sort_log_source_names(qw(collector:beta collector:alpha)) ],
+    [qw(collector:alpha collector:beta)],
+    'log source ordering compares collector names alphabetically when neither source is web',
+);
+
+{
+    my %a = base_args(
+        runtime    => Test::RC::Runtime->new( web_log_result => "web old\nweb newest\n" ),
+        collectors => Test::RC::Collectors->new( existing => { alpha => 1 }, logs => { alpha => "collector old\ncollector newest\n" } ),
+        config     => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => ['--tail=2'], %a ); };
+    is( $rc, 0, 'logs accepts Docker-style --tail=N syntax' );
+    is( $out, "collector old\ncollector newest\n", '--tail=N limits combined logs to the final N output lines' );
+}
+
+{
+    my %a = base_args(
+        runtime => Test::RC::Runtime->new( web_log_result => "web event\n" ),
+    );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => [ '-t', 'web' ], %a ); };
+    is( $rc, 0, '-t is accepted for the web log scope' );
+    like( $out, qr/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ web event\n\z/, '-t prefixes each web log line with a UTC timestamp' );
+}
+
+{
+    my %a = base_args(
+        collectors => Test::RC::Collectors->new(
+            existing => { alpha => 1 },
+            logs     => { alpha => "=== collector alpha | \@ 2026-01-02T03:04:05Z | exit=0 ===\n[stdout]\ncollector event\n\n" },
+        ),
+        config => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => [ 'collector', 'alpha', '-t' ], %a ); };
+    is( $rc, 0, '-t is accepted for a named collector log' );
+    like( $out, qr/\A2026-01-02T03:04:05Z === collector alpha/, '-t preserves the collector event timestamp' );
+    like( $out, qr/2026-01-02T03:04:05Z collector event/, '-t applies the collector event timestamp to its output lines' );
+}
+
+{
+    my %a = base_args(
+        runtime => Test::RC::Runtime->new( web_log_result => "web first\nweb last\n" ),
+        collectors => Test::RC::Collectors->new(
+            existing => { alpha => 1 },
+            logs => { alpha => "=== collector alpha | \@ 2026-01-02T03:04:05Z | exit=0 ===\n[stdout]\ncollector event\n\n" },
+        ),
+        config => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => [ '-t', '--tail=2' ], %a ); };
+    is( $rc, 0, 'timestamp and tail flags combine for mixed logs' );
+    like( $out, qr/2026-01-02T03:04:05Z collector event/, 'combined tail keeps collector event timestamp when its record header is outside the tail' );
+    unlike( $out, qr/web first|web last/, 'combined tail is applied after the complete timestamped stream is formed' );
+}
+
+{
+    my $sources = $read_log_sources->(
+        scope      => 'collector',
+        collectors => Test::RC::Collectors->new,
+        config     => Test::RC::Config->new,
+    );
+    is_deeply( $sources, {}, 'reading web-free logs with no configured collectors produces an empty source map' );
+    my $error = eval {
+        $read_log_sources->(
+            scope      => 'collector',
+            name       => 'unknown',
+            collectors => Test::RC::Collectors->new,
+            config     => Test::RC::Config->new,
+        );
+        1;
+    } ? '' : $@;
+    like( $error, qr/^Unknown collector 'unknown'/, 'reading a specifically named unknown collector reports the error' );
+}
+
+{
+    my $sources = $read_log_sources->(
+        scope      => 'collector',
+        collectors => Test::RC::Collectors->new( existing => { alpha => 1 }, logs => { alpha => undef } ),
+        config     => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    is( $sources->{'collector:alpha'}, '', 'an undefined collector log is normalized to an empty snapshot' );
+}
+
+{
+    is( $render_log_sources->( {}, 'web' ), '', 'web rendering returns an empty string for a missing web source' );
+    is( $render_log_sources->( { web => undef }, 'web' ), '', 'web rendering normalizes an undefined web source' );
+    is( $render_log_sources->( {}, 'collector', 'alpha' ), "No log entries are available yet for collector 'alpha'.\n", 'named collector rendering supplies a placeholder for a missing source key' );
+    is( $render_log_sources->( { 'collector:alpha' => '' }, 'collector', 'alpha' ), "No log entries are available yet for collector 'alpha'.\n", 'named collector rendering supplies a placeholder for an empty log' );
+    is( $render_log_sources->( {}, 'collector' ), "No collector logs are available yet.\n", 'collector rendering supplies an empty-list placeholder' );
+    my $collector_output = $render_log_sources->(
+        { 'collector:alpha' => "alpha entry\n", 'collector:beta' => '', 'collector:gamma' => undef },
+        'collector',
+    );
+    like( $collector_output, qr/alpha entry\n/, 'collector rendering includes existing logs' );
+    like( $collector_output, qr/No log entries are available yet for collector 'beta'/, 'collector rendering includes placeholders for empty logs' );
+    like( $collector_output, qr/No log entries are available yet for collector 'gamma'/, 'collector rendering normalizes an undefined source' );
+    my $combined_output = $render_log_sources->(
+        { web => "web entry\n", 'collector:alpha' => '', 'collector:beta' => undef },
+        'all',
+    );
+    like( $combined_output, qr/=== dashboard web ===\nweb entry/, 'combined rendering preserves the web header and body' );
+    like( $combined_output, qr/No log entries are available yet for collector 'alpha'/, 'combined rendering includes empty collector placeholders' );
+    like( $combined_output, qr/No log entries are available yet for collector 'beta'/, 'combined rendering normalizes an undefined source' );
+}
+
+is( $timestamp_log_text->(undef), '', 'timestamp formatting returns empty for undefined text' );
+is( $timestamp_log_text->(''),    '', 'timestamp formatting returns empty for empty text' );
+like( $timestamp_log_text->('unterminated'), qr/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ unterminated\z/, 'timestamp formatting handles a final line without a newline' );
+
+{
+    my $poll = 0;
+    my $runtime = Test::RC::Runtime->new( web_log_result => sub { ++$poll; return undef } );
+    my %a = base_args( runtime => $runtime );
+    my $capture_file = File::Spec->catfile( $home, 'follow-undefined-snapshot.log' );
+    open my $saved_stdout, '>&', \*STDOUT or die $!;
+    open STDOUT, '>', $capture_file or die $!;
+    my $sleep_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub {
+            die "__FOLLOW_STOP__\n" if ++$sleep_count > 1;
+            return 0.1;
+        };
+        eval {
+            $follow_log_sources->(
+                sources     => { web => "initial\n" },
+                scope       => 'web',
+                runtime     => $runtime,
+                config      => $a{config},
+                collectors  => $a{collectors},
+                timestamps  => 0,
+            );
+        };
+    }
+    my $follow_error = $@;
+    open STDOUT, '>&', $saved_stdout or die $!;
+    like( $follow_error, qr/__FOLLOW_STOP__/, 'test stops follow after an undefined current snapshot' );
+    is( $poll, 1, 'follow handles an undefined source snapshot without printing or dying' );
+}
+
+{
+    my %a = base_args(
+        runtime => Test::RC::Runtime->new( web_log_result => "web oldest\nweb middle\nweb newest\n" ),
+    );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => [ 'web', '--tail', '2' ], %a ); };
+    is( $rc, 0, 'logs accepts --tail N syntax for an explicit web scope' );
+    is( $out, "web middle\nweb newest\n", '--tail N prints only the requested trailing web lines' );
+}
+
+{
+    my %a = base_args(
+        collectors => Test::RC::Collectors->new( existing => { alpha => 1 }, logs => { alpha => "old\nmiddle\nnewest\n" } ),
+        config     => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => [ 'collector', 'alpha', '--tail', '1' ], %a ); };
+    is( $rc, 0, 'tail can be scoped to one collector log' );
+    is( $out, "newest\n", 'collector scope prints only its requested trailing lines' );
+}
+
+{
+    my %a = base_args( runtime => Test::RC::Runtime->new( web_log_result => "one\ntwo\n" ) );
+    my ( $out, $err, $rc ) = capture { $run_log->( args => [ '--tail=0', 'web' ], %a ); };
+    is( $rc, 0, 'zero tail is accepted as a request for no log lines' );
+    is( $out, '', 'zero tail prints no log lines' );
+}
+
+{
+    my %a = base_args();
+    my @parse_warnings;
+    my $error;
+    {
+        local $SIG{__WARN__} = sub { push @parse_warnings, $_[0]; return; };
+        eval { capture { $run_log->( args => ['--tail'], %a ); }; };
+        $error = $@;
+    }
+    like( $error, qr/^Usage: dashboard log/, 'tail without its required value is rejected with usage' );
+    like( join( '', @parse_warnings ), qr/Option tail requires an argument/, 'Getopt reports the missing tail value explicitly' );
+}
+
+{
+    my %a = base_args();
+    my @parse_warnings;
+    my $error;
+    {
+        local $SIG{__WARN__} = sub { push @parse_warnings, $_[0]; return; };
+        eval { capture { $run_log->( args => ['--tail=not-a-number'], %a ); }; };
+        $error = $@;
+    }
+    like( $error, qr/^Usage: dashboard log/, 'a non-integer tail value is rejected with usage' );
+    like( join( '', @parse_warnings ), qr/Value .* invalid for option tail/, 'Getopt reports the malformed tail value explicitly' );
+}
+
+{
+    my %a = base_args();
+    eval { capture { $run_log->( args => ['--tail=-1'], %a ); }; };
+    like( $@, qr/^Usage: dashboard log/, 'negative tail count is rejected with usage' );
+}
+
+is( $tail_log_text->( undef, 1 ), '', 'tailing an undefined log returns empty output' );
+is( $tail_log_text->( '', 1 ), '', 'tailing an empty log returns empty output' );
+is( $tail_log_text->( "one\ntwo", 4 ), "one\ntwo", 'tail larger than the log keeps all lines without adding a newline' );
+is( $tail_log_text->( "\n", 1 ), "\n", 'tailing a blank newline preserves the newline' );
+
 {
     my %a = base_args( runtime => Test::RC::Runtime->new( web_log_result => "web line\n" ) );
     my ( $out, $err, $rc ) = capture { $run_log->( args => [ 'web', '-n', '5' ], %a ); };
@@ -318,14 +531,175 @@ sub base_args {
 
 {
     my %a = base_args( runtime => Test::RC::Runtime->new( web_log_result => "streamed\n" ) );
-    eval { capture { $run_log->( args => [ 'web', '-f' ], %a ); } };
-    is( $@, '', 'follow mode is accepted for the web scope' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub { die "__FOLLOW_STOP__\n" };
+        eval { capture { $run_log->( args => [ 'web', '-f' ], %a ); } };
+    }
+    like( $@, qr/__FOLLOW_STOP__/, 'follow mode enters the web polling loop' );
 }
 
 {
     my %a = base_args();
-    eval { capture { $run_log->( args => [ 'collector', '-f' ], %a ); } };
-    like( $@, qr/Follow mode is only supported for dashboard log web/, 'follow mode rejected outside web scope' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub { die "__FOLLOW_STOP__\n" };
+        eval { capture { $run_log->( args => [ 'collector', '-f' ], %a ); } };
+    }
+    like( $@, qr/__FOLLOW_STOP__/, 'follow mode enters the collector polling loop' );
+}
+
+{
+    my $poll = 0;
+    my $runtime = Test::RC::Runtime->new(
+        web_log_result => sub { return ++$poll == 1 ? "web before\n" : "web before\nweb after\n" },
+    );
+    my %a = base_args( runtime => $runtime );
+    my $capture_file = File::Spec->catfile( $home, 'follow-output.log' );
+    open my $saved_stdout, '>&', \*STDOUT or die $!;
+    open STDOUT, '>', $capture_file or die $!;
+    my $sleep_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub {
+            die "__FOLLOW_STOP__\n" if ++$sleep_count > 1;
+            return 0.1;
+        };
+        eval { $run_log->( args => [ 'web', '-f' ], %a ); };
+    }
+    my $follow_error = $@;
+    open STDOUT, '>&', $saved_stdout or die $!;
+    open my $follow_fh, '<', $capture_file or die $!;
+    local $/;
+    my $follow_output = <$follow_fh>;
+    close $follow_fh;
+    like( $follow_error, qr/__FOLLOW_STOP__/, 'test stops web follow after one poll' );
+    like( $follow_output, qr/web before\nweb after\n\z/, 'web follow emits the initial log and newly appended lines once' );
+}
+
+{
+    my ( $web_poll, $collector_poll ) = ( 0, 0 );
+    my $runtime = Test::RC::Runtime->new(
+        web_log_result => sub { return ++$web_poll == 1 ? "web initial\n" : "web initial\nweb appended\n" },
+    );
+    my $collectors = Test::RC::Collectors->new(
+        existing => { alpha => 1 },
+        logs => { alpha => sub { return ++$collector_poll == 1 ? "collector initial\n" : "collector initial\ncollector appended\n" } },
+    );
+    my %a = base_args(
+        runtime    => $runtime,
+        collectors => $collectors,
+        config     => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    my $capture_file = File::Spec->catfile( $home, 'follow-mixed-output.log' );
+    open my $saved_stdout, '>&', \*STDOUT or die $!;
+    open STDOUT, '>', $capture_file or die $!;
+    my $sleep_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub {
+            die "__FOLLOW_STOP__\n" if ++$sleep_count > 1;
+            return 0.1;
+        };
+        eval { $run_log->( args => [ '-t', '-f', '--tail=2' ], %a ); };
+    }
+    my $follow_error = $@;
+    open STDOUT, '>&', $saved_stdout or die $!;
+    open my $follow_fh, '<', $capture_file or die $!;
+    local $/;
+    my $follow_output = <$follow_fh>;
+    close $follow_fh;
+    like( $follow_error, qr/__FOLLOW_STOP__/, 'test stops mixed follow after one poll' );
+    like( $follow_output, qr/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ collector initial\n/, 'mixed follow starts with a timestamped combined tail' );
+    unlike( $follow_output, qr/web initial\n/, 'mixed follow applies --tail before entering follow mode' );
+    like( $follow_output, qr/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ web appended\n/, 'mixed follow timestamps appended web lines' );
+    like( $follow_output, qr/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ collector appended\n/, 'mixed follow timestamps appended collector lines' );
+}
+
+{
+    my $poll = 0;
+    my $collectors = Test::RC::Collectors->new(
+        existing => { alpha => 1 },
+        logs => { alpha => sub { return ++$poll == 1 ? "old\nnew\n" : "old\nnew\nlater\n" } },
+    );
+    my %a = base_args(
+        collectors => $collectors,
+        config     => Test::RC::Config->new( collectors => [ { name => 'alpha' } ] ),
+    );
+    my $capture_file = File::Spec->catfile( $home, 'follow-named-collector-output.log' );
+    open my $saved_stdout, '>&', \*STDOUT or die $!;
+    open STDOUT, '>', $capture_file or die $!;
+    my $sleep_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub {
+            die "__FOLLOW_STOP__\n" if ++$sleep_count > 1;
+            return 0.1;
+        };
+        eval { $run_log->( args => [ 'collector', 'alpha', '-t', '-f', '--tail=1' ], %a ); };
+    }
+    my $follow_error = $@;
+    open STDOUT, '>&', $saved_stdout or die $!;
+    open my $follow_fh, '<', $capture_file or die $!;
+    local $/;
+    my $follow_output = <$follow_fh>;
+    close $follow_fh;
+    like( $follow_error, qr/__FOLLOW_STOP__/, 'test stops named collector follow after one poll' );
+    like( $follow_output, qr/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ new\n/, 'named collector follow starts with its timestamped tail' );
+    like( $follow_output, qr/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ later\n/, 'named collector follow streams and timestamps new entries' );
+    unlike( $follow_output, qr/ old\n/, 'named collector follow does not print lines excluded by --tail' );
+}
+
+{
+    my $web_poll = 0;
+    my %collector_poll = ( alpha => 0, beta => 0 );
+    my $runtime = Test::RC::Runtime->new(
+        web_log_result => sub { return ++$web_poll == 1 ? "short web\n" : "short web\n" },
+    );
+    my $collectors = Test::RC::Collectors->new(
+        existing => { alpha => 1, beta => 1 },
+        logs => {
+            alpha => sub { return ++$collector_poll{alpha} ? "alpha entry\n" : "alpha entry\n" },
+            beta  => sub { return ++$collector_poll{beta}  ? "beta entry\n"  : "beta entry\n" },
+        },
+    );
+    my %a = base_args(
+        runtime    => $runtime,
+        collectors => $collectors,
+        config     => Test::RC::Config->new( collectors => [ { name => 'alpha' }, { name => 'beta' } ] ),
+    );
+    my $capture_file = File::Spec->catfile( $home, 'follow-rotation-output.log' );
+    open my $saved_stdout, '>&', \*STDOUT or die $!;
+    open STDOUT, '>', $capture_file or die $!;
+    my $sleep_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::RuntimeControl::sleep = sub {
+            die "__FOLLOW_STOP__\n" if ++$sleep_count > 2;
+            return 0.1;
+        };
+        eval {
+            $follow_log_sources->(
+                sources => { web => "a much longer prior log snapshot\n", 'collector:alpha' => undef },
+                scope => 'all',
+                runtime => $runtime,
+                config => $a{config},
+                collectors => $collectors,
+                timestamps => 0,
+            );
+        };
+    }
+    my $follow_error = $@;
+    open STDOUT, '>&', $saved_stdout or die $!;
+    open my $follow_fh, '<', $capture_file or die $!;
+    local $/;
+    my $follow_output = <$follow_fh>;
+    close $follow_fh;
+    like( $follow_error, qr/__FOLLOW_STOP__/, 'test stops follow polling after an unchanged second snapshot' );
+    like( $follow_output, qr/short web\n/, 'follow restarts at the beginning after a web-log truncation' );
+    like( $follow_output, qr/alpha entry\n/, 'follow starts a newly observed source with no prior offset' );
+    like( $follow_output, qr/beta entry\n/, 'follow merges a second collector source into mixed output' );
+    is( scalar( () = $follow_output =~ /short web/g ), 1, 'follow emits no duplicate data when the next poll is unchanged' );
 }
 
 {
@@ -377,6 +751,18 @@ sub base_args {
     my %a = base_args();
     eval { capture { $run_log->( args => ['bogus'], %a ); } };
     like( $@, qr/^Usage: dashboard log/, 'unknown scope dies with usage' );
+}
+
+{
+    my %a = base_args();
+    eval { capture { $run_log->( args => ['-'], %a ); } };
+    like( $@, qr/^Usage: dashboard log/, 'a lone dash is not consumed as the log scope' );
+}
+
+{
+    my %a = base_args();
+    eval { capture { $run_log->( args => [ 'collector', '-' ], %a ); } };
+    like( $@, qr/^Usage: dashboard log/, 'a lone dash is not consumed as a collector name' );
 }
 
 {
@@ -541,7 +927,8 @@ t/26-cli-runtimecontrol-coverage.t - Devel::Cover gate for the runtime control C
 
 Exercises every function in C<Developer::Dashboard::CLI::RuntimeControl> - the
 shared parser and default output renderer behind C<dashboard restart>,
-C<dashboard stop>, and C<dashboard log[s]> - against injected stand-in objects
+C<dashboard stop>, and C<dashboard log[s]> (including Docker-style timestamps,
+follow mode, and tail options) - against injected stand-in objects
 for the runtime manager, config, and collector store it is handed, so the
 module can reach 100.0 on all four Devel::Cover metrics without a real
 process-managing runtime.
@@ -557,8 +944,10 @@ output-format choices, none of which had ever been exercised.
 =head1 WHEN TO USE
 
 Use this file when changing C<run_runtime_command>, the restart/stop lifecycle
-parser, the log/logs parser, collector name resolution, the optional progress
-board, or the default table/JSON rendering for runtime-control commands.
+parser, the log/logs parser and timestamp/follow/tail behavior, collector name resolution,
+the optional progress board, or the default table/JSON rendering for
+runtime-control commands. The source-name sorter test also pins web-first and
+alphabetical collector ordering for follow-mode output.
 
 =head1 HOW TO USE
 
@@ -599,5 +988,13 @@ Example 3:
 
 Run them under the coverage gate to confirm the runtime-control branch and
 condition columns stay at 100.
+
+Example 4:
+
+  d2 logs --tail 25
+  d2 logs --tail=25
+
+Exercise both public spellings for limiting combined dashboard and collector
+logs to the last 25 output lines.
 
 =cut

@@ -1,0 +1,47 @@
+title: raider briefs the agent itself, so the briefing plugin's briefing-preload is skipped on the Agent call and on SubagentStart, while another PreToolUse hook on Agent still rewrites the spawn's prompt (ADR 0020 section 6, ADR 0022 section 7)
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/notes/SKILL.md: "---\nname: notes\ndescription: How notes are written.\n---\n\nNOTES-SKILL-BODY\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\nbriefing:\n  skills:\n    - notes\n---\nSCRIBE-BODY\n"
+  .claude/settings.json: |
+    { "hooks": {
+      "PreToolUse": [ { "matcher": "Agent", "hooks": [
+        { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/briefing-preload", "args": [] },
+        { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/rewrite", "args": [] }
+      ] } ],
+      "SubagentStart": [ { "hooks": [
+        { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/briefing-preload", "args": [] }
+      ] } ]
+    } }
+  hooks/briefing-preload: |
+    #!/bin/sh
+    cat >/dev/null
+    echo "briefing-preload must not run under raider" >&2
+    exit 2
+  hooks/rewrite: |
+    #!/bin/sh
+    cat >/dev/null
+    printf '%s' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","updatedInput":{"description":"Summarise","prompt":"REWRITTEN-TASK","subagent_type":"scribe"}}}'
+executable: [ hooks/briefing-preload, hooks/rewrite ]
+prompt: Have the scribe summarise the day.
+script:
+  - tool_calls:
+      - [ agent, { description: Summarise, prompt: ORIGINAL-TASK, subagent_type: scribe } ]
+  - text: "- noted"
+  - text: "The scribe noted it."
+expect:
+  answer: "The scribe noted it."
+  request_count: 3
+  requests:
+    - { index: 1, contains: "<skill name=\"notes\" dir=\"" }
+    - { index: 1, contains: "NOTES-SKILL-BODY\n</skill>\n\n---\n\n# Original task\n\nREWRITTEN-TASK" }
+    - { index: 1, absent: ORIGINAL-TASK }
+  tools:
+    - { name: agent, text: '\A- noted\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: hook.ran, hook_event: PreToolUse, outcome: skipped, message: "briefing.skills are loaded by raider itself (native_briefing)" }
+    - { type: hook.ran, hook_event: PreToolUse, outcome: success, exit: 0 }
+    - { type: hook.ran, hook_event: SubagentStart, outcome: skipped, message: "briefing.skills are loaded by raider itself (native_briefing)" }
+    - { type: agent.started, call: c1, agent: scribe }
+    - { type: agent.finished, call: c1, agent: scribe, status: completed }

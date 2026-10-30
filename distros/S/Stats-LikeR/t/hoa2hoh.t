@@ -72,4 +72,12 @@ no_leaks_ok {
 	}
 } 'hoa2hoh(): no leaks on missing-column croak' unless $INC{'Devel/Cover.pm'};
 
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { hoa2hoh({ a => [1] }); 1 } ? '' : $@;
+	like($err, qr/\Ausage: hoa2hoh\(.*\n\nhoa2hoh: error: \Qexpected 2 arguments, got 1\E\n\z/s,
+		'hoa2hoh: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing();

@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # PODNAME: cpangit-server
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: serve a CPAN tree from a git branch, or all CPAN trees in the git repo
 
 use FindBin;
@@ -25,6 +25,7 @@ my %mount_options;
       'base-path|p=s'    => \$base_path,
       'tree|t=s'         => \$mount_options{archive_tree},
       'branch-head-only' => \$mount_options{branch_head_only},
+      'index-branches'   => \$mount_options{index_branches},
       'help|h'           => sub { pod2usage(1) },
    ) or pod2usage(2);
 }
@@ -52,7 +53,7 @@ if (defined $mount_options{archive_tree}) {
 # The routes for the server controller can be mounted at any sub-path desired.
 # By default, this mounts every possible Git tree which looks like a valid ArchiveTree layout
 # so you can point cpanm to `-M host:/BRANCH_NAME` or `-M host:/SHA-1` or `-M host:/GIT_TAG`
-CPAN::InGit::Server->mount(app->routes->any($base_path), $cpan_repo, %mount_options);
+CPAN::InGit::Server->mount(app->routes->any($base_path), $cpan_repo, app => app, %mount_options);
 
 app->start;
 
@@ -78,6 +79,11 @@ This command acts as a CPAN file server, either serving all the repo's branches 
 SHA-1 hashes) or serving a single specified branch.  OPTIONS are described below. MOJO_OPTIONS
 control how the server is launched, and are described by `mojo --help`.
 
+Friendly paths such as C</feature/demo/> resolve the shortest existing selector,
+preferring branches over tags and commit IDs at each boundary. Explicit paths
+C</~branch/feature~demo/>, C</~tag/feature~demo/>, and C</~commit/SHA1/>
+select one namespace unambiguously. Slashes in ref names are encoded as C<~>.
+
 =head1 OPTIONS
 
 =over
@@ -100,11 +106,16 @@ Serve only a single Git tree from the root path.
 When serving all branches, this prevents serving any Git tree which is not a current branch head.
 For example, C<< /TAG/... >> and C<< /SHA-1/... >> return 404 when this option is enabled.
 
+=item --index-branches
+
+Show links to available local CPAN archive branches on the repository's index page.
+Disabled by default.  This has no effect when serving a single tree with C<--tree>.
+
 =back
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 AUTHOR
 

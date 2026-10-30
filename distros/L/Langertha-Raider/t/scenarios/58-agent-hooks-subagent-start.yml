@@ -1,0 +1,62 @@
+title: SubagentStart fires for the agent its matcher names, with agent_id and agent_type, and its context goes in front of the subagent's prompt; the subagent's own tool calls run the PreToolUse hooks with agent_type (ADR 0020, ADR 0022)
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  notes.txt: "NOTE\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\n---\nSCRIBE-BODY\n"
+  .claude/settings.json: |
+    { "hooks": {
+      "SubagentStart": [
+        { "matcher": "scribe", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/start", "args": [] } ] },
+        { "matcher": "other", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/wrong", "args": [] } ] }
+      ],
+      "PreToolUse": [
+        { "matcher": "Read", "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/no-reads-in-agents", "args": [] } ] }
+      ]
+    } }
+  hooks/start: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in
+      *'"agent_id":"local-agent-'*'"agent_type":"scribe"'*'"hook_event_name":"SubagentStart"'*)
+        printf '%s' '{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":"START-CONTEXT: write short notes"}}';;
+      *) printf '%s' '{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":"BAD-INPUT"}}';;
+    esac
+  hooks/wrong: |
+    #!/bin/sh
+    cat >/dev/null
+    printf '%s' '{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":"WRONG-AGENT-CONTEXT"}}'
+  hooks/no-reads-in-agents: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *'"agent_type":"scribe"'*)
+      printf '%s' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"no reads in the scribe"}}';;
+    esac
+    exit 0
+executable: [ hooks/start, hooks/wrong, hooks/no-reads-in-agents ]
+prompt: Have the scribe read the notes.
+script:
+  - tool_calls:
+      - [ read_file, { path: notes.txt } ]
+  - tool_calls:
+      - [ agent, { description: Notes, prompt: Read notes.txt., subagent_type: scribe } ]
+  - tool_calls:
+      - [ read_file, { path: notes.txt } ]
+  - text: reading is denied here
+  - text: The scribe may not read.
+expect:
+  answer: The scribe may not read.
+  request_count: 5
+  requests:
+    - { index: 2, contains: "<system-reminder>\nSubagentStart hook additional context: START-CONTEXT: write short notes\n</system-reminder>\n\nRead notes.txt." }
+    - { index: 2, absent: WRONG-AGENT-CONTEXT }
+    - { index: 2, absent: BAD-INPUT }
+  tools:
+    - { name: read_file, text: NOTE }
+    - { name: read_file, error: true, text: "\\Ano reads in the scribe\\z" }
+    - { name: agent, text: '\Areading is denied here\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: hook.ran, hook_event: PreToolUse, outcome: success }
+    - { type: hook.ran, hook_event: SubagentStart, outcome: success, matcher: scribe }
+    - { type: agent.started, call: c2, agent: scribe }
+    - { type: agent.finished, call: c2, agent: scribe, status: completed }

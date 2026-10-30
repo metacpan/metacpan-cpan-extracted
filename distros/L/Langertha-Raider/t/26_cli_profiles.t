@@ -7,10 +7,11 @@ use lib 't/lib';
 use Test::Raider::Env qw( clear_engine_env isolate_home );
 isolate_home();
 
-# Regression: bin/raider must read the agent profile table from
-# $Langertha::Raider::CLI::AGENT_PROFILES (formerly $App::Raider::...).
-# Looking it up in the engine package crashed --claude/--openai/--codex with
-# "Can't use an undefined value as an ARRAY reference".
+# Regression: the profile flags --claude/--openai/--codex once crashed with
+# "Can't use an undefined value as an ARRAY reference" (the agent profile
+# table was looked up in the wrong package). Since ADR 0019 --claude is the
+# layout switch and the table only names the agent files; the flags must
+# still run cleanly.
 
 clear_engine_env();
 

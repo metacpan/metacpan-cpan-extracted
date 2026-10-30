@@ -48,7 +48,7 @@ use SNMP::Info::IEEE802_Bridge;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MODEL_MAP, %MUNGE);
 
-$VERSION = '3.983000';
+$VERSION = '3.984000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -134,6 +134,13 @@ sub vendor {
     my $mfg = $cx->entPhysicalMfgName(1) || {};
     my $vendor = $mfg->{1} || "aruba";
     return lc($vendor);
+}
+
+sub mac {
+    my $cx = shift;
+    my $b_mac = $cx->b_mac();
+    return $b_mac if defined $b_mac and $b_mac !~ /^[0:]+$/;
+    return $cx->orig_mac();
 }
 
 sub stack_info {
@@ -334,6 +341,8 @@ sub agg_ports {
     return $ret;    
 }
 
+sub _agg_ports_walked { return qw/raw_ad_lag_ports/ }
+
 # Overrides for VLAN & forwarding table methods
 sub v_name {
     my $cx = shift;
@@ -456,6 +465,12 @@ C<sysObjectID> as a last resort, stripping 'arubaWiredSwitch' from the value.
 =item $cx->vendor()
 
 Returns (lowercased) value for C<entPhysicalMfgName.1>, or 'aruba'.
+
+=item $cx->mac()
+
+Returns the system MAC address from C<dot1dBaseBridgeAddress>. Interface 1
+is a front panel port with its own MAC address. Falls back to
+C<ifPhysAddress.1> when the bridge address is missing or all zeros.
 
 =item $cx->os()
 

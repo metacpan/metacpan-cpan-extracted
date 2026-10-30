@@ -1071,10 +1071,62 @@ for my $k (0 .. 11) {
 	eval { lmer(formula => 'Reaction ~ Days + (1 | Subject)', data => $S, method => 'ML') };
 	like($@, qr/unknown argument 'method'/, 'unknown argument');
 }
+{
+	# lme4 tests/testthat/test-lmer.R, with lmerControl()'s default checks
+	# (lme4 2.0-6): one subject's rows; and Days 1 and 9 only, 36 rows for
+	# 18 subjects x (Intercept, Days).  The other two messages are lme4's
+	# checkNlevels() and checkZdims() as R 4.6.1 prints them on sleepstudy
+	# with a one-level factor, a factor with a level per row, and
+	# (Days | g) for g of 90 levels.
+	my $sub = sub {
+		my $keep = shift;
+		my %d;
+		for my $i (0 .. $#{ $S->{Reaction} }) {
+			next unless $keep->($i);
+			push @{ $d{$_} }, $S->{$_}[$i] for keys %$S;
+		}
+		\%d;
+	};
+	my $s1 = $sub->(sub { $S->{Subject}[ $_[0] ] eq $S->{Subject}[0] });
+	eval { lmer(formula => 'Reaction ~ Days + (1|Subject)', data => $s1) };
+	like($@, qr/^lmer: grouping factors must have > 1 sampled level/, 'test-lmer.R: one subject croaks "must have > 1"');
+	my $s9 = $sub->(sub { $S->{Days}[ $_[0] ] == 1 || $S->{Days}[ $_[0] ] == 9 });
+	eval { lmer(formula => 'Reaction ~ 1 + Days + (1 + Days | Subject)', data => $s9) };
+	like($@, qr/number of observations \(=36\) <= number of random effects \(=36\)/,
+	     'test-lmer.R: Days 1 and 9 only croaks, n <= number of random effects');
+	like($@, qr/\Qfor term (1+Days | Subject); the random-effects parameters and the residual variance (or scale parameter) are probably unidentifiable\E/,
+	     'and says which term, as checkZdims() does');
+	my $n = @{ $S->{Reaction} };
+	my %d = (%$S, one => [('a') x $n], id => [1 .. $n], half => [map { int($_ / 2) } 0 .. $n - 1]);
+	eval { lmer(formula => 'Reaction ~ Days + (1|one)', data => \%d) };
+	like($@, qr/^lmer: grouping factors must have > 1 sampled level/, 'a one-level factor croaks');
+	eval { lmer(formula => 'Reaction ~ Days + (1|Subject) + (1|one) + (1|id)', data => \%d) };
+	like($@, qr/must have > 1 sampled level/, 'that check comes first, as in checkNlevels()');
+	eval { lmer(formula => 'Reaction ~ Days + (1|id)', data => \%d) };
+	like($@, qr/^\Qlmer: number of levels of each grouping factor must be < number of observations (problems: id)\E/,
+	     'a level per row croaks, naming the factor');
+	eval { lmer(formula => 'Reaction ~ Days + (1|Subject) + (1|id)', data => \%d) };
+	like($@, qr/\(problems: id\)/, 'and names only the offending factor');
+	eval { lmer(formula => 'Reaction ~ Days + (1|Subject/id)', data => \%d) };
+	like($@, qr/\(problems: Subject:id\)/, 'a nested factor too (lme4 calls it id:Subject)');
+	eval { lmer(formula => 'Reaction ~ Days + (Days|half)', data => \%d) };
+	like($@, qr/number of observations \(=180\) <= number of random effects \(=180\) for term \(Days \| half\)/,
+	     '(Days | half): 2 x 90 random effects for 180 rows croaks');
+	my $u = lmer(formula => 'Reaction ~ Days + (Days||half)', data => \%d);
+	ok(defined $u->{sigma}, '(Days || half) is two terms of 90 each in lme4, and fits');
+}
 SKIP: {
 	skip 'Test::LeakTrace not installed', 2 unless eval { require Test::LeakTrace; 1 };
 	Test::LeakTrace::no_leaks_ok(sub { lmer(formula => 'Reaction ~ Days + (Days | Subject)', data => $S) }, 'no leaks');
 	Test::LeakTrace::no_leaks_ok(sub { eval { lmer(formula => 'Reaction ~ Days', data => $S) } }, 'no leaks: croak');
 }
 diag(sprintf('worst relative disagreement, %s: %.3g (%s)', $_, $worst{$_}, $worst_at{$_})) for sort keys %worst;
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { lmer(formula => 'y ~ x + (1 | g)', data => { x => [1, 2], y => [1, 2], g => [1, 2] }, conf_level => 2); 1 } ? '' : $@;
+	like($err, qr/\Ausage: lmer\(.*^example:\n.*\n\nlmer: error: \Qconf_level must be between 0 and 1\E\n\z/ms,
+		'lmer: conf_level must be between 0 and 1, under the help screen');
+}
+
 done_testing();

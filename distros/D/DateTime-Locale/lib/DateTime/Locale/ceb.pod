@@ -411,11 +411,11 @@ Cebuano locale.
    1995-12-22T09:05:02 = 1995 AD
   -0010-09-15T04:44:23 = -10 BC
 
-=head3 GyM (G y-MM)
+=head3 GyM (M/y G)
 
-   2008-02-05T18:30:30 = AD 2008-02
-   1995-12-22T09:05:02 = AD 1995-12
-  -0010-09-15T04:44:23 = BC -10-09
+   2008-02-05T18:30:30 = 2/2008 AD
+   1995-12-22T09:05:02 = 12/1995 AD
+  -0010-09-15T04:44:23 = 9/-10 BC
 
 =head3 GyMEd (G y-MM-dd, E)
 
@@ -434,6 +434,24 @@ Cebuano locale.
    2008-02-05T18:30:30 = Mar, Peb 5, 2008 AD
    1995-12-22T09:05:02 = Biy, Dis 22, 1995 AD
   -0010-09-15T04:44:23 = Sab, Sep 15, -10 BC
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = Pebrero 2008 AD
+   1995-12-22T09:05:02 = Disyembre 1995 AD
+  -0010-09-15T04:44:23 = Septiyembre -10 BC
+
+=head3 GyMMMMEd (E, MMMM d, y G)
+
+   2008-02-05T18:30:30 = Mar, Pebrero 5, 2008 AD
+   1995-12-22T09:05:02 = Biy, Disyembre 22, 1995 AD
+  -0010-09-15T04:44:23 = Sab, Septiyembre 15, -10 BC
+
+=head3 GyMMMMd (MMMM d, y G)
+
+   2008-02-05T18:30:30 = Pebrero 5, 2008 AD
+   1995-12-22T09:05:02 = Disyembre 22, 1995 AD
+  -0010-09-15T04:44:23 = Septiyembre 15, -10 BC
 
 =head3 GyMMMd (MMM d, y G)
 
@@ -506,6 +524,12 @@ Cebuano locale.
    2008-02-05T18:30:30 = Mar, Peb 5
    1995-12-22T09:05:02 = Biy, Dis 22
   -0010-09-15T04:44:23 = Sab, Sep 15
+
+=head3 MMMMEd (E, MMMM d)
+
+   2008-02-05T18:30:30 = Mar, Pebrero 5
+   1995-12-22T09:05:02 = Biy, Disyembre 22
+  -0010-09-15T04:44:23 = Sab, Septiyembre 15
 
 =head3 MMMMW-count-one ('semana' W 'sa' MMMM)
 
@@ -620,6 +644,18 @@ Cebuano locale.
    2008-02-05T18:30:30 = Pebrero 2008
    1995-12-22T09:05:02 = Disyembre 1995
   -0010-09-15T04:44:23 = Septiyembre -10
+
+=head3 yMMMMEd (E, MMMM d, y)
+
+   2008-02-05T18:30:30 = Mar, Pebrero 5, 2008
+   1995-12-22T09:05:02 = Biy, Disyembre 22, 1995
+  -0010-09-15T04:44:23 = Sab, Septiyembre 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Pebrero 5, 2008
+   1995-12-22T09:05:02 = Disyembre 22, 1995
+  -0010-09-15T04:44:23 = Septiyembre 15, -10
 
 =head3 yMMMd (MMM d, y)
 

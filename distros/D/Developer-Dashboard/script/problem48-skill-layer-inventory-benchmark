@@ -1,0 +1,186 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib 'lib';
+
+use Developer::Dashboard::PathRegistry;
+
+my $skill_count = 50;
+my $runs = 21;
+GetOptions(
+    'skills=i' => \$skill_count,
+    'runs=i'   => \$runs,
+) or die _usage();
+die _usage() if @ARGV || $skill_count < 1 || $runs < 1 || $runs % 2 == 0;
+
+my $root = tempdir( 'problem48-skill-layers-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home = File::Spec->catdir( $root, 'home' );
+my $project = File::Spec->catdir( $root, 'project' );
+my $home_skills = File::Spec->catdir( $home, '.developer-dashboard', 'skills' );
+my $project_skills = File::Spec->catdir( $project, '.developer-dashboard', 'skills' );
+make_path( $home_skills, $project_skills );
+my @names;
+for my $index ( 1 .. $skill_count ) {
+    my $name = sprintf 'skill-%05d', $index;
+    push @names, $name;
+    make_path( File::Spec->catdir( $home_skills, $name ), File::Spec->catdir( $project_skills, $name ) );
+    next if $index % 5;
+    my $marker = File::Spec->catfile( $project_skills, $name, '.disabled' );
+    open my $fh, '>', $marker or die "Unable to create benchmark marker '$marker': $!";
+    close $fh or die "Unable to close benchmark marker '$marker': $!";
+}
+
+local $ENV{HOME} = $home;
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $project );
+my ( @baseline, @candidate );
+my $expected = _run_lookup_set( 'baseline', $paths, \@names );
+my $parity = _run_lookup_set( 'candidate', $paths, \@names );
+die 'Scoped skill-layer inventory changed ordered lookup output' if !_same_results( $expected, $parity );
+
+for my $run ( 1 .. $runs ) {
+    my @order = $run % 2 ? qw(baseline candidate) : qw(candidate baseline);
+    for my $mode (@order) {
+        my $started = time;
+        my $actual = _run_lookup_set( $mode, $paths, \@names );
+        my $elapsed = time - $started;
+        die "$mode skill-layer output changed in run $run" if !_same_results( $actual, $expected );
+        push @{ $mode eq 'baseline' ? \@baseline : \@candidate }, $elapsed;
+    }
+}
+
+my $baseline_median = _median(@baseline);
+my $candidate_median = _median(@candidate);
+printf "skills=%d layers=2 lookups=%d runs=%d exact_layer_parity=yes\n",
+  $skill_count, scalar(@names), $runs;
+printf "root_scan_baseline_ms=%.4f inventory_candidate_ms=%.4f speedup=%.2fx\n",
+  1000 * $baseline_median, 1000 * $candidate_median, $baseline_median / $candidate_median;
+
+exit 0;
+
+# _run_lookup_set($mode, $paths, $names)
+# Runs one lookup per skill after establishing request-local runtime and skill
+# directory scopes, comparing the former root scan with the proposed inventory
+# lookup.
+# Input: mode string, PathRegistry object, and array reference of skill names.
+# Output: nested array reference of home-to-project layer paths.
+sub _run_lookup_set {
+    my ( $mode, $paths, $names ) = @_;
+    local $paths->{_runtime_layer_candidate_scope} = {};
+    local $paths->{_installed_skill_inventory_scope} = {};
+    $paths->_installed_skill_directory_inventory;
+    my @results;
+    for my $name ( @{$names} ) {
+        push @results, $mode eq 'baseline'
+          ? [ _baseline_skill_layers( $paths, $name ) ]
+          : [ $paths->skill_layers($name) ];
+    }
+    return \@results;
+}
+
+# _baseline_skill_layers($paths, $name)
+# Replays PathRegistry's current per-name root scan for comparison.
+# Input: PathRegistry object and validated top-level skill name.
+# Output: participating layer paths in home-to-project precedence order.
+sub _baseline_skill_layers {
+    my ( $paths, $name ) = @_;
+    my @segments = Developer::Dashboard::PathRegistry::validated_path_segments($name);
+    return () if @segments != 1;
+    my @matches;
+    my $saw_effective = 0;
+    for my $skills_root ( $paths->skills_roots ) {
+        my $skill_root = File::Spec->catdir( $skills_root, $name );
+        next if !-d $skill_root;
+        my $disabled = -f File::Spec->catfile( $skill_root, '.disabled' ) ? 1 : 0;
+        if ( !$saw_effective++ ) {
+            return () if $disabled;
+        }
+        next if $disabled;
+        push @matches, $skill_root;
+    }
+    return reverse @matches;
+}
+
+# _same_results($left, $right)
+# Compares nested layer-list outputs without stringifying ambiguous values.
+# Input: two array references of per-skill layer arrays.
+# Output: boolean true when each ordered layer list is identical.
+sub _same_results {
+    my ( $left, $right ) = @_;
+    return 0 if @{$left} != @{$right};
+    for my $index ( 0 .. $#{$left} ) {
+        return 0 if join( "\0", @{ $left->[$index] } ) ne join( "\0", @{ $right->[$index] } );
+    }
+    return 1;
+}
+
+# _median(@seconds)
+# Returns the median of a nonempty odd set of elapsed values.
+# Input: elapsed seconds.
+# Output: middle elapsed value.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die 'Cannot calculate a median without samples' if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _usage()
+# Returns the benchmark's accepted options and comparison purpose.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--skills N] [--runs ODD_N]\n"
+      . "Compares per-skill root scans with a scoped inventory candidate.\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-skill-layer-inventory-benchmark - measure layered skill lookup reuse
+
+=head1 PURPOSE
+
+This benchmark compares the current per-skill filesystem-root scan with a
+candidate operation-scoped installed-skill inventory lookup. Every timed run
+verifies the same ordered layer results.
+
+=head1 WHY IT EXISTS
+
+NYTProf found repeated skill-root work during dashboard page rendering. The
+candidate reuses directory names already read by the request, but it is kept
+out of production unless a realistic scoped benchmark shows a gain.
+
+=head1 WHEN TO USE
+
+Run this benchmark after changing skill-layer discovery or its request-local
+inventory. It measures only the tested synthetic skill workload, not the
+entire dashboard or the Problem 48 50x target.
+
+=head1 HOW TO USE
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init-gate.yml run --rm bench perl script/problem48-skill-layer-inventory-benchmark
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init-gate.yml run --rm bench perl script/problem48-skill-layer-inventory-benchmark --skills 250 --runs 31
+
+=head1 OUTPUT
+
+The report gives skill and layer counts, median milliseconds, exact
+ordered-layer parity, and relative speed. Any output mismatch or filesystem
+error terminates the command visibly.
+
+=head1 SAFETY
+
+All generated directories and marker files live in an automatically removed
+temporary directory. The benchmark does not modify dashboard configuration or
+installed skills.
+
+=cut

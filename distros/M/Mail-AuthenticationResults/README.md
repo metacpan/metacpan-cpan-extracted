@@ -14,11 +14,11 @@ Object Oriented Authentication-Results Headers
 
 # AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

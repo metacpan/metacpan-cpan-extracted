@@ -681,7 +681,7 @@ Spanish Mexico locale.
    1995-12-22T09:05:02 = diciembre de 1995
   -0010-09-15T04:44:23 = septiembre de -10
 
-=head3 yMMMMEd (EEE, d 'de' MMMM 'de' y)
+=head3 yMMMMEd (E, d 'de' MMMM 'de' y)
 
    2008-02-05T18:30:30 = mar, 5 de febrero de 2008
    1995-12-22T09:05:02 = vie, 22 de diciembre de 1995

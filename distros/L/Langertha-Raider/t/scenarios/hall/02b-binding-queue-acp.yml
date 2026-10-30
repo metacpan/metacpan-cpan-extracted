@@ -1,0 +1,27 @@
+title: a second ACP prompt sent while the first still runs waits in the binding's queue and continues its session
+model:
+  rules:
+    Arbeite lange.:
+      tool_calls:
+        - [ bash, { command: "touch busy && sleep 3" } ]
+    Zweiter Auftrag.: { answer: "Zweiter fertig." }
+  after:
+    bash: { answer: "Erster fertig." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_session: { as: s, raider: Testie }
+  - acp_prompt: { session: s, text: "Arbeite lange.", as: p1, wait: false }
+  - wait_file: { path: busy }
+  - acp_prompt: { session: s, text: "Zweiter Auftrag.", as: p2, wait: false }
+  - expect_event: { type: raider.queued, slot: Testie }
+  - ps: {}
+  - expect_ps: { count: 1, missions: ["Arbeite lange."] }
+  - acp_wait: { prompt: p1 }
+  - expect_acp: { prompt: p1, stop_reason: end_turn, text_like: 'Erster fertig' }
+  - acp_wait: { prompt: p2 }
+  - expect_acp: { prompt: p2, stop_reason: end_turn, text_like: 'Zweiter fertig' }
+  - idle: {}
+  - expect_journals:
+      count: 1
+      prompts:
+        - [ "Arbeite lange.", "Zweiter Auftrag." ]

@@ -135,7 +135,8 @@
   :root[data-theme="dark"] .summary-source { color: #778; }
 </style>
 
-<p class="back-link"><a href="/">&larr; Home</a>[% IF back_url && back_url != '/' %] &rsaquo; <a href="[% back_url | html %]">[% back_label | html %]</a>[% END %][%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+[% PROCESS "web/en/layouts/view_context.html.tt" %]
 
 <h2 style="margin-bottom:0.5rem">[% title | html %]</h2>
 <p class="insights-meta">Source: [% left_label | html %] &mdash; [% row_count %] row[% IF row_count != 1 %]s[% END %] analysed</p>

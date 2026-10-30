@@ -1,0 +1,24 @@
+title: session/cancel while the client has not answered a permission question ends the run cancelled; nothing is written, the hall does not treat the wait as a hang
+hall:
+  permission_timeout: 60
+  raiders:
+    Frager: { engine: mock, packs: [], mcp: [], isolated: 0, permission_mode: default }
+model:
+  rules:
+    Schreibe.:
+      tool_calls:
+        - [ write_file, { path: a.txt, content: "a\n" } ]
+  after:
+    write_file: { answer: "fertig" }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_permissions: { answers: [ ignore ] }
+  - acp_session: { as: s, raider: Frager }
+  - acp_prompt: { session: s, text: "Schreibe.", as: p, wait: false }
+  - wait_permission_request: { count: 1 }
+  - expect_permission_requests: { count: 1 }
+  - acp_cancel: { session: s }
+  - acp_wait: { prompt: p, timeout: 30 }
+  - expect_acp: { prompt: p, stop_reason: cancelled }
+  - expect_file: { path: a.txt, absent: true }
+  - idle: {}

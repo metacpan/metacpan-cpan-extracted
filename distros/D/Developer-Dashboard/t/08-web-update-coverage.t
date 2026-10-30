@@ -418,6 +418,15 @@ is( $nav_self_render, '', 'shared nav renderer does not inject nav items while r
     make_path( File::Spec->catdir( $layer_parent, '.developer-dashboard', 'dashboards', 'partials' ) );
     make_path( File::Spec->catdir( $layer_leaf, '.developer-dashboard', 'dashboards', 'nav' ) );
 
+    my $skill_nav_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'nav-render-skill', 'dashboards', 'nav' );
+    make_path($skill_nav_root);
+    open my $literal_skill_nav_fh, '>', File::Spec->catfile( $skill_nav_root, 'literal.tt' ) or die $!;
+    print {$literal_skill_nav_fh} '<span id="literal-skill-nav">literal skill nav</span>';
+    close $literal_skill_nav_fh or die $!;
+    open my $dynamic_skill_nav_fh, '>', File::Spec->catfile( $skill_nav_root, 'dynamic.tt' ) or die $!;
+    print {$dynamic_skill_nav_fh} '<span id="dynamic-skill-nav">[% "dynamic skill nav" %]</span>';
+    close $dynamic_skill_nav_fh or die $!;
+
     open my $parent_partial_fh, '>', File::Spec->catfile( $layer_parent, '.developer-dashboard', 'dashboards', 'partials', 'nav-fragment.tt' ) or die $!;
     print {$parent_partial_fh} "parent-fragment\n";
     close $parent_partial_fh;
@@ -481,15 +490,34 @@ PAGE
         layout => { body => 'layered body' },
     );
     $layer_store->save_page($layer_page);
-    my $layer_nav_html = $layer_app->_nav_items_html(
-        page            => $layer_page,
-        runtime_context => { params => {} },
-    );
+    my $prepare_page = \&Developer::Dashboard::PageRuntime::prepare_page;
+    my %prepared_sources;
+    my ( $layer_nav_html, $layer_nav_without_params );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageRuntime::prepare_page = sub {
+            my ( $runtime, %prepare_args ) = @_;
+            $prepared_sources{ $prepare_args{source} || '' }++;
+            return $prepare_page->(@_);
+        };
+        $layer_nav_html = $layer_app->_nav_items_html(
+            page            => $layer_page,
+            runtime_context => { params => {} },
+        );
+        $layer_nav_without_params = $layer_app->_nav_items_html(
+            page            => $layer_page,
+            runtime_context => { params => undef },
+        );
+    }
     like( $layer_nav_html, qr/parent-only-nav/, 'nav renderer includes parent-layer nav fragments' );
     like( $layer_nav_html, qr/leaf-only-nav/, 'nav renderer includes leaf-layer nav fragments' );
     like( $layer_nav_html, qr/parent-fragment/, 'nav renderer resolves TT includes from ancestor dashboard layers' );
     like( $layer_nav_html, qr/shared-nav-leaf/, 'nav renderer prefers the deepest matching nav bookmark id' );
     unlike( $layer_nav_html, qr/shared-nav-parent/, 'nav renderer suppresses overridden parent nav fragments when a deeper layer replaces the same id' );
+    like( $layer_nav_html, qr/literal-skill-nav/, 'skill nav renderer emits literal HTML fragments' );
+    like( $layer_nav_html, qr/dynamic-skill-nav">dynamic skill nav/, 'skill nav renderer evaluates TT fragments' );
+    like( $layer_nav_without_params, qr/dynamic-skill-nav">dynamic skill nav/, 'dynamic skill nav still renders without request parameters' );
+    is( $prepared_sources{skill} || 0, 2, 'skill nav renderer prepares only dynamic skill fragments across both requests' );
     chdir $home or die $!;
 }
 
@@ -586,6 +614,7 @@ BAT
     local $ENV{PATH} = $fake_bin . ':' . $ENV{PATH};
     local *Developer::Dashboard::Web::App::_ip_pairs_from_ip = sub { return (); };
     local *Developer::Dashboard::Web::App::_ip_pairs_from_ifconfig = sub { return (); };
+    local *Developer::Dashboard::Web::App::is_windows = sub { return 1; };
     is_deeply(
         [ $app->_ip_interface_pairs ],
         [ { iface => 'Ethernet', ip => '10.20.30.40' } ],
@@ -594,10 +623,46 @@ BAT
 }
 
 {
+    my $windows_probe_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::is_windows = sub { return 0; };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ip = sub { return (); };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ipconfig = sub {
+        $windows_probe_calls++;
+        return ();
+    };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ifconfig = sub { return (); };
+    is_deeply( [ $app->_ip_interface_pairs ], [], 'Unix IP discovery returns no candidates when available Unix tools find none' );
+    is( $windows_probe_calls, 0, 'Unix IP discovery does not probe the Windows-only ipconfig command' );
+}
+
+{
     no warnings 'redefine';
     local *Developer::Dashboard::Web::App::_ip_pairs_from_ip = sub { return (); };
     local *Developer::Dashboard::Web::App::_ip_pairs_from_ifconfig = sub { return (); };
+    # Earlier route assertions may have populated this worker-local cache with
+    # the container's real address; this case specifically exercises empty
+    # interface discovery, independent of the machine running the suite.
+    delete $app->{_machine_ip_cache};
     ok( !defined $app->_machine_ip, '_machine_ip returns undef when neither ip nor ifconfig yields a usable address' );
+}
+
+{
+    my $ip_cache_app = bless {}, 'Developer::Dashboard::Web::App';
+    my $discovery_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_ip_candidates = sub {
+        $discovery_calls++;
+        return $discovery_calls == 1 ? ('192.0.2.10') : ('192.0.2.11');
+    };
+
+    is( $ip_cache_app->_machine_ip, '192.0.2.10', '_machine_ip discovers the first address on a cache miss' );
+    is( $ip_cache_app->_machine_ip, '192.0.2.10', '_machine_ip reuses the worker-local address within its freshness window' );
+    is( $discovery_calls, 1, 'worker-local address reuse avoids a second interface discovery' );
+
+    $ip_cache_app->{_machine_ip_cache}{expires_at} = 0;
+    is( $ip_cache_app->_machine_ip, '192.0.2.11', '_machine_ip refreshes the address after cache expiry' );
+    is( $discovery_calls, 2, 'expired interface data is discovered again' );
 }
 
 my ( $ajax_missing_code, $ajax_missing_type, $ajax_missing_body ) = @{ $app->handle( path => '/ajax', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
@@ -1523,14 +1588,15 @@ __END__
 
 =head1 DESCRIPTION
 
-This test verifies extended web server bridging, auth behavior, and update
-manager edge cases.
+This test verifies extended web server bridging, auth behavior, update-manager
+edge cases, the worker-local machine-address cache's reuse and expiry, and
+literal versus dynamic installed-skill navigation rendering.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for runtime update, bootstrap, and staged maintenance behavior. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for runtime update, bootstrap, staged maintenance, and selected Web::App behavior. It checks machine-address cache reuse and expiry alongside platform-specific address discovery, plus verifies that literal installed-skill nav does not enter PageRuntime while dynamic TT nav still renders. Read it when you need the fixture setup and failure modes for these web paths.
 
 =head1 WHY IT EXISTS
 
@@ -1538,7 +1604,7 @@ It exists because runtime update, bootstrap, and staged maintenance behavior has
 
 =head1 WHEN TO USE
 
-Use this file when changing runtime update, bootstrap, and staged maintenance behavior, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
+Use this file when changing runtime update, bootstrap, staged maintenance, or saved/skill navigation rendering, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 

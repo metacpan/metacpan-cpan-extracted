@@ -1,6 +1,6 @@
 package Langertha::Raider::Session::Journal;
 # ABSTRACT: Internal read-only view of one session journal
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use JSON::MaybeXS ();
@@ -68,17 +68,20 @@ sub last_run_number {
 
 sub runs {
   my ( $self ) = @_;
-  my ( @runs, %run );
+  my ( @runs, %run, %notice );
   for my $e (@{ $self->events }) {
     my $id = $e->{run} // next;
     my $r = $run{$id} //= do { push @runs, { run => $id }; $runs[-1] };
     if    ($e->{type} eq 'run.started')  { $r->{started}  = $e }
     elsif ($e->{type} eq 'run.finished') { $r->{finished} = $e }
     elsif ($e->{type} eq 'message') {
-      $r->{prompt}   //= $e->{content} if ($e->{role} // '') eq 'user';
+      if (($e->{role} // '') eq 'user') {
+        $e->{notification} ? ( $notice{$id} //= $e->{content} ) : ( $r->{prompt} //= $e->{content} );
+      }
       $r->{response}   = $e->{content} if ($e->{role} // '') eq 'assistant';
     }
   }
+  $_->{prompt} = $notice{ $_->{run} } for grep { !defined $_->{prompt} && defined $notice{ $_->{run} } } @runs;
   $_->{status} = $_->{finished} ? ($_->{finished}{status} // 'unknown') : 'interrupted' for @runs;
   return \@runs;
 }
@@ -103,6 +106,19 @@ sub history_messages {
     }
   }
   return \@messages;
+}
+
+
+sub tasks {
+  my ( $self ) = @_;
+  my @tasks;
+  for my $e (@{ $self->events }) {
+    if ($e->{type} eq 'history.cleared') { @tasks = () }
+    elsif ($e->{type} eq 'todo.updated') {
+      @tasks = ref $e->{todos} eq 'ARRAY' ? grep { ref $_ eq 'HASH' && defined $_->{id} } @{ $e->{todos} } : ();
+    }
+  }
+  return [ map { { %$_ } } @tasks ];
 }
 
 
@@ -145,7 +161,7 @@ Langertha::Raider::Session::Journal - Internal read-only view of one session jou
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -215,7 +231,9 @@ The highest run number (C<r3> is 3) in the journal, C<0> for none.
 The runs in order, each a hash reference: C<run>, C<status> (from
 C<run.finished>, or C<interrupted> without one), C<started> and
 C<finished> (the events, C<finished> may be C<undef>), C<prompt> (the
-user message) and C<response> (the assistant message, when there is one).
+user message -- the first that is not a notification of background work,
+ADR 0027, else the first notification) and C<response> (the assistant
+message, when there is one).
 
 =head2 unknown_calls
 
@@ -231,6 +249,16 @@ answer adds nothing, as a live raid adds nothing to C<history> then. A
 C<history.cleared> event (C</clear> in the REPL) empties it: only the
 messages after the last one count. A C<message> outside any run (the
 history a fork took over) counts as it is.
+
+=head2 tasks
+
+    my $tasks = $journal->tasks;   # [ { id, content, status, ... }, ... ]
+
+The task list the session left (ADR 0025): the C<todos> of the last
+C<todo.updated> event, after the last C<history.cleared> (C</clear> empties
+the list). Only entries with an C<id> count -- the task tools' -- so a list
+of C<todo_write>, which has none, restores nothing. A copy; empty when the
+session kept no tasks.
 
 =head2 session_history_messages
 
@@ -254,7 +282,7 @@ for a call without result an entry saying its outcome is unknown.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -275,5 +303,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

@@ -411,11 +411,11 @@ Slovenian Slovenia locale.
    1995-12-22T09:05:02 = 1995 po Kr.
   -0010-09-15T04:44:23 = -10 pr. Kr.
 
-=head3 GyM (MMM y G)
+=head3 GyM (M/y G)
 
-   2008-02-05T18:30:30 = feb. 2008 po Kr.
-   1995-12-22T09:05:02 = dec. 1995 po Kr.
-  -0010-09-15T04:44:23 = sep. -10 pr. Kr.
+   2008-02-05T18:30:30 = 2/2008 po Kr.
+   1995-12-22T09:05:02 = 12/1995 po Kr.
+  -0010-09-15T04:44:23 = 9/-10 pr. Kr.
 
 =head3 GyMEd (E, d. M. y G)
 
@@ -434,6 +434,24 @@ Slovenian Slovenia locale.
    2008-02-05T18:30:30 = tor., 5. feb. 2008 po Kr.
    1995-12-22T09:05:02 = pet., 22. dec. 1995 po Kr.
   -0010-09-15T04:44:23 = sob., 15. sep. -10 pr. Kr.
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = februar 2008 po Kr.
+   1995-12-22T09:05:02 = december 1995 po Kr.
+  -0010-09-15T04:44:23 = september -10 pr. Kr.
+
+=head3 GyMMMMEd (E, d. MMMM y G)
+
+   2008-02-05T18:30:30 = tor., 5. februar 2008 po Kr.
+   1995-12-22T09:05:02 = pet., 22. december 1995 po Kr.
+  -0010-09-15T04:44:23 = sob., 15. september -10 pr. Kr.
+
+=head3 GyMMMMd (d. MMMM y G)
+
+   2008-02-05T18:30:30 = 5. februar 2008 po Kr.
+   1995-12-22T09:05:02 = 22. december 1995 po Kr.
+  -0010-09-15T04:44:23 = 15. september -10 pr. Kr.
 
 =head3 GyMMMd (d. MMM y G)
 
@@ -506,6 +524,12 @@ Slovenian Slovenia locale.
    2008-02-05T18:30:30 = tor., 5. feb.
    1995-12-22T09:05:02 = pet., 22. dec.
   -0010-09-15T04:44:23 = sob., 15. sep.
+
+=head3 MMMMEd (E, d. MMMM)
+
+   2008-02-05T18:30:30 = tor., 5. februar
+   1995-12-22T09:05:02 = pet., 22. december
+  -0010-09-15T04:44:23 = sob., 15. september
 
 =head3 MMMMW-count-few (MMMM: W. 'teden')
 
@@ -632,6 +656,18 @@ Slovenian Slovenia locale.
    2008-02-05T18:30:30 = februar 2008
    1995-12-22T09:05:02 = december 1995
   -0010-09-15T04:44:23 = september -10
+
+=head3 yMMMMEd (E, d. MMMM y)
+
+   2008-02-05T18:30:30 = tor., 5. februar 2008
+   1995-12-22T09:05:02 = pet., 22. december 1995
+  -0010-09-15T04:44:23 = sob., 15. september -10
+
+=head3 yMMMMd (d. MMMM y)
+
+   2008-02-05T18:30:30 = 5. februar 2008
+   1995-12-22T09:05:02 = 22. december 1995
+  -0010-09-15T04:44:23 = 15. september -10
 
 =head3 yMMMd (d. MMM y)
 

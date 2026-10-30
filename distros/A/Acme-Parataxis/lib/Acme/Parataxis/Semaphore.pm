@@ -1,7 +1,7 @@
 use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
-class Acme::Parataxis::Semaphore v0.1.1 {
+class Acme::Parataxis::Semaphore v0.1.3 {
     use Acme::Parataxis;
     use Carp qw[croak];
     field $count : reader : param //= 1;
@@ -72,7 +72,7 @@ class Acme::Parataxis::Semaphore v0.1.1 {
 # Util. A classic package, not feature::class: a perlclass 'method DESTROY' on a second class
 # block in the same file crashes perl_clone on some perls (threads->create => access violation
 # in Perl_newPADNAMEouter), and keep()/sync primitives must remain loadable pre-thread-create.
-package Acme::Parataxis::Semaphore::Guard v0.1.1 {
+package Acme::Parataxis::Semaphore::Guard v0.1.3 {
 
     sub new ( $class, %args ) {
         return bless { semaphore => $args{semaphore} }, $class;

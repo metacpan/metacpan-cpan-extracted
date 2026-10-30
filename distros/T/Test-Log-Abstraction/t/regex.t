@@ -18,6 +18,7 @@ use warnings;
 use Test::Most;
 use Readonly;
 use Time::HiRes ();
+use Scalar::Util ();
 
 use Test::Log::Abstraction;
 
@@ -30,6 +31,9 @@ Readonly::Scalar my $HUGE => 1_000_000;	# characters in an adversarial input
 # not minutes.  At this size a linear pattern takes about 0.01s and the
 # quadratic one described below about 9s.
 Readonly::Scalar my $FLOOD => 200_000;
+# Zeros before the end of a number: the old integer-fit pattern took 2.3s
+# at 20,000 and grows with the square, so about 14s here
+Readonly::Scalar my $ZERO_FLOOD => 50_000;
 Readonly::Scalar my $BUDGET => 2;	# seconds; linear work at $HUGE takes milliseconds
 Readonly::Scalar my $FILE => $INC{'Test/Log/Abstraction.pm'};
 
@@ -38,12 +42,14 @@ Readonly::Scalar my $OLD_TRAILING => qr/\s+at \S+ line \d+\.?\s*\z/s;
 Readonly::Scalar my $OLD_THIS_FILE => qr/\s+at \Q$FILE\E line \d+\.?/;
 Readonly::Scalar my $OLD_PLACEHOLDER => qr/%(?:(%)|\{(\w+)\}([-+ 0#]*\d{0,3}(?:\.\d{1,3})?[sdiufeEgGxXobc]))/;
 Readonly::Scalar my $OLD_LANG => qr/\A(?:(?i:auto)|[A-Za-z]{2,3}(?:[_.\@-][\w.\@-]*)?)\z/;
+Readonly::Scalar my $OLD_DIGITS => qr/\A([+-]?)0*(\d+)\z/;
 
 # The forms after the audit, as the module now writes them
 Readonly::Scalar my $NEW_TRAILING => qr/(?<!\s)\s++at\ \S++\ line\ \d++\.?\s*+\z/sx;
 Readonly::Scalar my $NEW_THIS_FILE => qr/(?<!\s)\s++at\ \Q$FILE\E\ line\ \d++\.?/x;
 Readonly::Scalar my $NEW_PLACEHOLDER => qr/%(?:(%)|\{(\w+)\}([-+\ 0\#]*+\d{0,3}(?:\.\d{1,3})?[sdiufeEgGxXobc]))/x;
 Readonly::Scalar my $NEW_LANG => qr/\A(?:(?i:auto)|[A-Za-z]{2,3}(?:[_.\@-][\w.\@-]*+)?)\z/;
+Readonly::Scalar my $NEW_DIGITS => qr/\A([+-]?+)(?>0*(?=\d))(\d++)\z/a;
 
 # Deterministic random strings made of the given pieces
 sub corpus {
@@ -115,6 +121,21 @@ subtest 'lang format: old and new accept the same values' => sub {
 	is($differ, 0, "$SAMPLES generated values: no difference");
 };
 
+subtest 'integer digits: old and new give the same sign and digits' => sub {
+	my @strings = ('', '0', '-0', '+0', '00', '007', '-007', corpus('0', '00', '1', '9', '+', '-', '.', 'e', ' ', 'x'));
+	my $differ = 0;
+	foreach my $string (@strings) {
+		my @old = ($string =~ $OLD_DIGITS);
+		my @new = ($string =~ $NEW_DIGITS);
+		$differ++ if(join("\0", map { defined($_) ? $_ : '<undef>' } @old) ne join("\0", map { defined($_) ? $_ : '<undef>' } @new));
+	}
+	is($differ, 0, scalar(@strings) . ' generated strings: no difference');
+	# The one deliberate difference, /a, can never be seen: a value reaches
+	# the pattern only if looks_like_number() accepts it, and it accepts no
+	# digits but ASCII ones
+	ok(!Scalar::Util::looks_like_number("\x{661}\x{662}"), 'Arabic-Indic digits are not a number, so never reach it');
+};
+
 # ===========================================================================
 # 2. Linear on hostile input, through the module's public behaviour
 # ===========================================================================
@@ -140,6 +161,16 @@ subtest 'placeholders: zero floods' => sub {
 	within_budget('one placeholder with a million zeros', sub { Test::Log::Abstraction::_interpolate('%{a}' . ('0' x $HUGE) . 'Q', { a => 1 }) });
 	within_budget('many unfinished placeholders', sub { Test::Log::Abstraction::_interpolate(('%{a}0000' x ($HUGE / 8)) . 'Q', { a => 1 }) });
 	is(Test::Log::Abstraction::_interpolate('[%{a}05d]', { a => 7 }), '[00007]', 'and still reads a zero flag followed by a width');
+};
+
+subtest 'integer placeholders: numbers with a flood of zeros' => sub {
+	my $logger = Test::Log::Abstraction->new(diag => 'none', verbose => 0, i18n => { en => { n => '%{v}d' } });
+	foreach my $tail ('.5', 'e5', '1.5') {
+		my $value = ('0' x $ZERO_FLOOD) . $tail;
+		within_budget("$ZERO_FLOOD zeros, then $tail", sub { $logger->i18n('n', { v => $value }) });
+	}
+	is($logger->i18n('n', { v => '0007' }), '7', 'and still drops leading zeros');
+	is($logger->i18n('n', { v => '-0' }), '0', "and still reads '-0' as 0");
 };
 
 subtest 'lang: a long tail that fails at the end' => sub {

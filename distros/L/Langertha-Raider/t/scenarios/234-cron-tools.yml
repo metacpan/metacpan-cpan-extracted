@@ -1,0 +1,33 @@
+# Claude Code: CronCreate schedules a prompt (5-field cron, local time), CronList lists the
+# jobs with their next run, CronDelete cancels one; a one-shot job is recurring: false.
+# Raider offers them where a prompt can be run when idle (the REPL: app scheduling, ADR 0031).
+# Checks ADR 0031 section 2 (create, list, delete, the texts and the errors).
+title: cron_create, cron_list and cron_delete schedule, list and cancel session jobs
+permission_mode: default
+app: { scheduling: 1 }
+prompt: Schedule a check and take it back.
+script:
+  - tool_calls:
+      - [ cron_create, { cron: "7 * * * *", prompt: check the deploy } ]
+      - [ cron_create, { cron: "30 14 15 3 *", prompt: remind me, recurring: false } ]
+      - [ cron_create, { cron: "61 * * * *", prompt: bad } ]
+      - [ cron_create, { cron: "* * * * *", prompt: "" } ]
+      - [ cron_list, {} ]
+  - tool_calls:
+      - [ cron_delete, { id: cron_1 } ]
+      - [ cron_delete, { id: cron_1 } ]
+      - [ cron_list, {} ]
+  - text: done
+expect:
+  answer: done
+  tools:
+    - { name: cron_create, text: '\AScheduled recurring job cron_1 \(7 \* \* \* \*\)\. Session-only \(not written to disk, dies when raider exits\)\. Auto-expires after 7 days\. Use cron_delete to cancel sooner\.\z' }
+    - { name: cron_create, text: '\AScheduled one-shot job cron_2 \(30 14 15 3 \*\)\. It fires once, then is deleted\.' }
+    - { name: cron_create, error: true, text: 'Invalid cron expression "61 \* \* \* \*": out of range in the minute field' }
+    - { name: cron_create, error: true, text: '\ANo prompt given' }
+    - { name: cron_list, text: '\Acron_1 - 7 \* \* \* \* \(recurring, next run \d{4}-\d\d-\d\d \d\d:\d\d:\d\d\): check the deploy\ncron_2 - 30 14 15 3 \* \(one-shot, next run \d{4}-03-15 14:\d\d:\d\d\): remind me\z' }
+    - { name: cron_delete, text: '\ACancelled job cron_1\.\z' }
+    - { name: cron_delete, error: true, text: '\ANo scheduled job with ID: cron_1\z' }
+    - { name: cron_list, text: '\Acron_2 - 30 14 15 3 \*' }
+  requests:
+    - { index: 0, tool_text: 'Schedule a prompt to be run at a future time' }

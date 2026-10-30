@@ -388,14 +388,19 @@ for my $kind (sort keys %worst) {
 	diag(sprintf 'worst relative error, %s: %.2g (%s)', $kind, @{ $worst{$kind} });
 }
 
+# a call-form error prints the help screen, with the error on its last line
 throws_ok { cohen_d([1, 2, 3], [4, 5, 6], ci_method => 'exact') }
-	qr/^cohen_d: ci_method must be 'nct' or 'normal'$/m, 'an unknown ci_method is refused';
+	qr/\Ausage: cohen_d\(X, Y .*^options:\n.*^example:\n.*\n\ncohen_d: error: ci_method must be 'nct' or 'normal'\n\z/ms,
+	'an unknown ci_method is refused, under the help screen';
 for my $cl (0, 1, 1.5, -0.5, 'high') {
 	throws_ok { cohen_d([1, 2, 3], [4, 5, 6], conf_level => $cl) }
-		qr/^cohen_d: conf_level must be between 0 and 1$/m, "conf_level $cl is refused";
+		qr/^cohen_d: error: conf_level must be between 0 and 1$/m, "conf_level $cl is refused";
 }
 throws_ok { cohen_d([1, 2, 3], [4, 5, 6], alpha => 0.05) }
-	qr/^cohen_d: unknown argument\(s\): alpha$/m, 'an unknown argument is refused';
+	qr/^cohen_d: error: unknown argument\(s\): alpha$/m, 'an unknown argument is refused';
+throws_ok { cohen_d([1, 2, 3], [4, 5, 6], 'conf_level') }
+	qr/^cohen_d: error: arguments after the two groups must be name => value pairs$/m,
+	'a dangling option name is refused';
 throws_ok { cohen_d([1, 1, 1], [2, 2, 2]) }
 	qr/^cohen_d: pooled standard deviation is zero$/m, 'constant groups are refused';
 throws_ok { cohen_d([1], [2, 3]) }

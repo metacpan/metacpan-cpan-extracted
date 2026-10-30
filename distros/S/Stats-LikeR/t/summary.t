@@ -103,4 +103,12 @@ sub s_ { return summary(@_, return_only => 1, color => 0) }
 		qr/unknown argument/, 'die: unknown option (mirrors view/read_table)';
 }
 
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+is(eval { summary([1, 2, 3], colour => 0); 1 }, undef, 'summary with an unknown option dies');
+like($@, qr/\Ausage: summary\(DATA .*^options:\n.*\n\nsummary: error: unknown argument\(s\): colour\n\z/ms,
+	'... with the help screen above the error');
+is(eval { summary([1, 2, 3], 'nrows'); 1 }, undef, 'summary with an odd option list dies');
+like($@, qr/^summary: error: arguments after the data must be name => value pairs\n\z/m, '... naming it on the last line');
+
 done_testing;

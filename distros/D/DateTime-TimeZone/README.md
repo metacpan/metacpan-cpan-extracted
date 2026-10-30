@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.71
+version 2.72
 
 # SYNOPSIS
 

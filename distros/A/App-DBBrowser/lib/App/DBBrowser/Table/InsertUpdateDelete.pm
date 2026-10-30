@@ -68,7 +68,9 @@ sub table_write_access {
         my $stmt_type = $menu->[$idx];
         $stmt_type =~ s/^-\ //;
         $sf->{d}{stmt_types} = [ $stmt_type ];
-        $ax->reset_sql( $sql );
+
+        $ax->reset_sql( $sql ); # Reset SQL
+
         if ( $stmt_type eq 'Insert' || $dbms eq 'SQLite' ) {
             #if ( $sf->{d}{table_origin} eq 'ordinary' ) {
                 # use tablename without alias:

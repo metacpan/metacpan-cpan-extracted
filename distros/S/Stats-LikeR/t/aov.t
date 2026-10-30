@@ -186,7 +186,14 @@ throws_ok { aov([1, 2, 3], 'y~x') } qr/HashRefs/, 'AoH of non-hashrefs croaks';
 throws_ok { aov({ a => 1 }) } qr/ArrayRefs/, 'no-formula non-HoA croaks';
 throws_ok { aov({ y => [1, undef, undef], g => [qw(A B C)] }, 'y~g') }
 	qr/aov: fewer than 2 complete observations/, 'one complete row croaks';
-throws_ok { aov({ y => [1, 2] }, \'y~g') } qr/aov: formula must be a string/, 'formula reference croaks';
+throws_ok { aov({ y => [1, 2] }, \'y~g') } qr/aov: error: formula must be a string/, 'formula reference croaks';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('aov');
+	like($screen, qr/\Ausage: aov\(/, 'aov has a help screen');
+	eval { aov({ y => [1, 2] }, \'y~g') };
+	is($@, $screen . "aov: error: formula must be a string\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 # R fits both of these; the old parser refused the first and croaked on the second.
 {
 	my $r = aov({ y => [1, 2, 3, 4], a => [qw(p q p q)], b => [qw(r r s s)] }, 'y~a:b');

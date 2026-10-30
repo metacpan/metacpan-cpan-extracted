@@ -1,0 +1,21 @@
+title: a subagent inherits the caller's default mode; with nobody to approve, its write is refused as the caller's would be
+permission_mode: default
+prompt: Have an agent write a.txt.
+script:
+  - tool_calls:
+      - [ agent, { description: Write, prompt: Write a.txt with x. } ]
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: x } ]
+  - text: could not write a.txt
+  - text: The agent could not write a.txt.
+expect:
+  answer: The agent could not write a.txt.
+  absent: [ a.txt ]
+  tools:
+    - name: write_file
+      error: true
+      text: "\\APermission to use write_file has been denied\\. Reason: default mode asks before this call: write_file changes files; nobody can approve it in this run\\. To allow it, add a rule such as 'Edit\\(/\\*\\*\\)'.*--permission-mode acceptEdits"
+    - { name: agent, text: '\Acould not write a.txt\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: agent.started, call: c1, agent: general-purpose }
+    - { type: agent.finished, call: c1, status: completed }

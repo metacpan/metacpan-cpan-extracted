@@ -93,6 +93,150 @@ sub fresh {
 # --- Config: open/close failures -------------------------------------------
 {
     my ( $paths, $config ) = fresh();
+    like(
+        dies { $config->path_aliases( nested_skill_entries => {} ) },
+        qr/nested_skill_entries must be an array reference/,
+        'path_aliases rejects malformed shared nested-skill inventory',
+    );
+    like(
+        dies { $config->path_aliases( unsupported => 1 ) },
+        qr/Unsupported path_aliases option 'unsupported'/,
+        'path_aliases rejects unknown options instead of silently ignoring them',
+    );
+    like(
+        dies { $config->path_aliases('odd') },
+        qr/path_aliases options must be key\/value pairs/,
+        'path_aliases reports an incomplete option pair directly',
+    );
+    like(
+        dies { $config->_nested_skill_alias_entries( 'path_aliases', nested_skill_entries => {} ) },
+        qr/nested_skill_entries must be an array reference/,
+        'nested alias reader rejects malformed shared inventory directly',
+    );
+    like(
+        dies { $config->_nested_skill_alias_entries( 'path_aliases', nested_skill_entries => [undef] ) },
+        qr/nested_skill_entries must contain hash references/,
+        'nested alias reader rejects malformed inventory rows directly',
+    );
+    like(
+        dies { $config->load_global( skill_config_entries => {} ) },
+        qr/skill_config_entries must be an array reference/,
+        'load_global rejects malformed precomputed skill config entries',
+    );
+    like(
+        dies { $config->load_global( skill_config_entries_out => {} ) },
+        qr/skill_config_entries_out must be an array reference/,
+        'load_global rejects a malformed skill config output array',
+    );
+    like(
+        dies { $config->merged( unsupported => 1 ) },
+        qr/Unsupported merged option 'unsupported'/,
+        'merged rejects unknown inventory options visibly',
+    );
+    like(
+        dies { $config->merged( skill_config_entries => {} ) },
+        qr/skill_config_entries must be an array reference/,
+        'merged rejects malformed precomputed skill config entries',
+    );
+    like(
+        dies { $config->merged( skill_config_entries_out => {} ) },
+        qr/skill_config_entries_out must be an array reference/,
+        'merged rejects a malformed skill config output array',
+    );
+    like(
+        dies { $config->_skill_path_aliases( skill_config_entries => {} ) },
+        qr/skill_config_entries must be an array reference/,
+        'skill alias reader rejects malformed precomputed config entries',
+    );
+    like(
+        dies { $config->_skill_path_aliases( skill_config_entries => [undef] ) },
+        qr/skill_config_entries must contain hash references/,
+        'skill alias reader rejects malformed precomputed config rows',
+    );
+    like(
+        dies { $config->_skill_config_fragments([undef]) },
+        qr/skill config entries must contain hash references/,
+        'skill fragment reader rejects malformed inventory rows',
+    );
+    like(
+        dies { $config->_skill_config_fragments( {} ) },
+        qr/skill config entries must be an array reference/,
+        'skill fragment reader rejects a malformed input array',
+    );
+    like(
+        dies { $config->_skill_config_fragments( [], {} ) },
+        qr/skill config entries output must be an array reference/,
+        'skill fragment reader rejects a malformed output array',
+    );
+    like(
+        dies { $config->_skill_collectors({}) },
+        qr/skill config entries must be an array reference/,
+        'skill collector reader rejects a malformed input array',
+    );
+    like(
+        dies { $config->_skill_collectors([undef]) },
+        qr/skill config entries must contain hash references/,
+        'skill collector reader rejects malformed entry rows',
+    );
+    like(
+        dies { $config->collectors( merged_config => {} ) },
+        qr/merged_config and skill_config_entries must be supplied together/,
+        'collectors rejects an incomplete request snapshot',
+    );
+    like(
+        dies { $config->collectors( skill_config_entries => [] ) },
+        qr/merged_config and skill_config_entries must be supplied together/,
+        'collectors rejects a request snapshot with only skill entries',
+    );
+    like(
+        dies { $config->collectors( merged_config => [], skill_config_entries => [] ) },
+        qr/merged_config must be a hash reference/,
+        'collectors rejects a non-hash merged request snapshot',
+    );
+    like(
+        dies { $config->collectors( merged_config => {}, skill_config_entries => {} ) },
+        qr/skill_config_entries must be an array reference/,
+        'collectors rejects non-array skill entries in a request snapshot',
+    );
+    like(
+        dies { $config->collectors( unsupported => 1 ) },
+        qr/Unsupported collectors option 'unsupported'/,
+        'collectors rejects unsupported snapshot options',
+    );
+    like(
+        dies { $config->collectors('merged_config') },
+        qr/collectors options must be key\/value pairs/,
+        'collectors rejects an incomplete option pair',
+    );
+    like(
+        dies { $config->web_settings( merged_config => [] ) },
+        qr/merged_config must be a hash reference/,
+        'web_settings rejects a malformed merged request snapshot',
+    );
+    like(
+        dies { $config->web_settings( unsupported => 1 ) },
+        qr/Unsupported web_settings option 'unsupported'/,
+        'web_settings rejects unsupported snapshot options',
+    );
+    like(
+        dies { $config->web_settings('merged_config') },
+        qr/web_settings options must be key\/value pairs/,
+        'web_settings rejects an incomplete option pair',
+    );
+    is( Developer::Dashboard::Config::_normalize_ssl_validity_days(undef), 365,
+        'SSL validity normalization defaults an unset value' );
+    is( Developer::Dashboard::Config::_normalize_ssl_validity_days('invalid'), 365,
+        'SSL validity normalization defaults a non-numeric value' );
+    is( Developer::Dashboard::Config::_normalize_ssl_validity_days(0), 365,
+        'SSL validity normalization defaults a non-positive value' );
+    is( Developer::Dashboard::Config::_normalize_ssl_validity_days(800), 800,
+        'SSL validity normalization preserves a valid configured value' );
+    my @no_output_fragments = $config->_skill_config_fragments([]);
+    is_deeply( \@no_output_fragments, [], 'skill config fragments accept an omitted entries output target' );
+    my $captured_skill_entries = ['stale'];
+    my @captured_fragments = $config->_skill_config_fragments( [], $captured_skill_entries );
+    is_deeply( \@captured_fragments, [], 'skill config fragments return no entries for an empty input' );
+    is_deeply( $captured_skill_entries, [], 'skill config fragments populate a supplied entries output target' );
     my $global = $config->_global_config_file;
     write_file( $global, '{}' );
 
@@ -134,14 +278,70 @@ sub fresh {
         local $CLOSE_FAIL_PREFIX{$skill_cfg} = 1;
         is_deeply( $config->_skill_config_hash('alpha'), { a => 1 }, '_skill_config_hash ignores close status of the read handle' );
     }
+    is_deeply( $config->_skill_config_hash( 'alpha', layers => {} ), {},
+        '_skill_config_hash rejects a non-array grouped layer argument' );
+    is_deeply( $config->_skill_api_hash( 'alpha', layers => {} ), {},
+        '_skill_api_hash rejects a non-array grouped layer argument' );
 
     # empty skill config / api are skipped; unmatched roots produce no skill name
     {
         no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::installed_skill_entries = sub {
+            return (
+                { skill_root => '/', layers => [] },
+                { skill_name => 'nope-skill', skill_root => File::Spec->catdir( $home, 'nope-skill' ), layers => [] },
+            );
+        };
         local *Developer::Dashboard::PathRegistry::installed_skill_roots = sub { return ( '/', File::Spec->catdir( $home, 'nope-skill' ) ) };
-        is_deeply( [ $config->_skill_config_entries ], [], '_skill_config_entries skips roots with no name and no config' );
+        is_deeply( [ $config->_skill_config_entries ], [], '_skill_config_entries skips grouped entries with no name or no config' );
         is_deeply( [ $config->_skill_api_entries ],    [], '_skill_api_entries skips roots with no name and no api keys' );
     }
+}
+
+# --- Config: path_aliases reuses the layered skill config inventory --------
+{
+    my $skill_config = File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'inventory-test', 'config', 'config.json' );
+    write_file( $skill_config, json_encode( { path_aliases => { source => '/tmp/source' }, unrelated => { expensive => [ 1 .. 50 ] } } ) );
+    my ( $paths, $config ) = fresh();
+    my $original = \&Developer::Dashboard::PathRegistry::installed_skill_entries;
+    my $original_merge = \&Developer::Dashboard::Config::_merge_hashes;
+    my $calls = 0;
+    my $unused_skill_fragments = 0;
+    my $unused_skill_fields = 0;
+    my $aliases;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::installed_skill_entries = sub {
+            $calls++;
+            return $original->(@_);
+        };
+        local *Developer::Dashboard::Config::_merge_hashes = sub {
+            my ( $self, $left, $right ) = @_;
+            $unused_skill_fragments++
+              if ref($right) eq 'HASH'
+              && keys(%{$right}) == 1
+              && exists $right->{'_inventory-test'};
+            $unused_skill_fields++ if ref($right) eq 'HASH' && exists $right->{unrelated};
+            return $original_merge->(@_);
+        };
+        $aliases = $config->path_aliases( nested_skill_entries => [] );
+    }
+    is( $calls, 1, 'path_aliases scans installed skill layers once to read qualified aliases' );
+    is( $unused_skill_fragments, 0, 'path_aliases skips merging unused full skill namespaces into the global config view' );
+    is( $unused_skill_fields, 0, 'path_aliases does not merge unrelated skill config fields while reading aliases' );
+    is( $aliases->{'inventory-test.source'}, '/tmp/source', 'reusing the config inventory preserves the skill-qualified alias' );
+}
+
+# --- Config: alias-only skill views skip skills without the selected domain --
+{
+    my $skill_config = File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'without-aliases', 'config', 'config.json' );
+    write_file( $skill_config, json_encode( { unrelated => { values => [ 1 .. 20 ] } } ) );
+    my ( $paths, $config ) = fresh();
+    my @entries = $config->_skill_path_alias_entries;
+    ok( !grep( { $_->{skill_name} eq 'without-aliases' } @entries ),
+        '_skill_path_alias_entries skips a skill with no path_aliases domain' );
+    is_deeply( $config->_skill_config_hash( 'without-aliases', only_key => 'missing' ), {},
+        '_skill_config_hash returns an empty view when the selected key is absent' );
 }
 
 # --- Config: empty alias keys and unreachable removal paths ----------------
@@ -155,14 +355,28 @@ sub fresh {
     my ( $paths, $config ) = fresh();
     ok( exists $config->_skill_path_aliases->{'foo.ok'} && !exists $config->_skill_path_aliases->{'foo.'}, 'empty path alias keys are skipped for skills' );
     ok( exists $config->_skill_file_aliases->{'foo.ok'} && !exists $config->_skill_file_aliases->{'foo.'}, 'empty file alias keys are skipped for skills' );
-    is_deeply( [ sort keys %{ $config->_nested_skill_alias_entries('path_aliases') } ], ['foo.bar.ok'], 'empty nested alias keys are skipped (shipped defaults and overrides)' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::skill_config_write_location = sub { die 'nested alias discovery must reuse its resolved chain' };
+        is_deeply(
+            [ sort keys %{ $config->_nested_skill_alias_entries('path_aliases') } ],
+            ['foo.bar.ok'],
+            'empty nested alias keys are skipped while the already-resolved write location is reused',
+        );
+    }
 
     # a global fallback section holding an empty key
     my $global = $config->_global_config_file;
     write_file( $global, json_encode( { skills => { bar => { path_aliases => $aliases } } } ) );
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::PathRegistry::skill_config_write_location = sub { return { kind => 'global', remaining => ['bar'] } };
+        my $nested_skill_entries = \&Developer::Dashboard::PathRegistry::nested_skill_entries;
+        local *Developer::Dashboard::PathRegistry::nested_skill_entries = sub {
+            my ( $registry, %args ) = @_;
+            return map {
+                { %$_, config_write_location => { kind => 'global', remaining => ['bar'] } }
+            } $nested_skill_entries->( $registry, %args );
+        };
         my $got = $config->_nested_skill_alias_entries('path_aliases');
         ok( exists $got->{'foo.bar.ok'} || exists $got->{'foo.ok'}, 'global fallback walk still yields aliases' );
         ok( !grep( { /\.$/ } keys %{$got} ), 'global fallback skips the empty alias key' );
@@ -247,7 +461,7 @@ sub fresh {
     is( $h->{cwd}, Cwd::cwd(), 'Handle->new defaults cwd to the current directory' );
     {
         no warnings 'redefine';
-        local *Cwd::cwd = sub { return undef };
+        local *Developer::Dashboard::Handle::current_working_directory = sub { return undef };
         ok( !defined Developer::Dashboard::Handle->new->{cwd}, 'Handle->new accepts an undefined default cwd' );
     }
     {
@@ -290,7 +504,11 @@ t/650-core-modules-coverage.t - zero-annotation coverage for Config, EnvLoader, 
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. It forces open, opendir and close failures with exact-path CORE::GLOBAL overrides, stubs gzip and abs_path, and exercises empty alias keys and the filesystem-root walk so every branch of these modules is reached by a real test.
+This coverage test exercises core module contracts, rejects incomplete or
+malformed merged-config snapshots passed to web-settings and collector readers,
+and covers SSL-validity normalization and optional skill-entry output capture.
+
+Test file in the Developer Dashboard codebase. It forces open, opendir and close failures with exact-path CORE::GLOBAL overrides, stubs gzip and abs_path, and exercises empty alias keys, malformed shared skill-config entries and output arrays, grouped installed-skill entries, and the filesystem-root walk so every branch of these modules is reached by a real test.
 
 =head1 WHY IT EXISTS
 
@@ -298,7 +516,7 @@ It exists because lib/ must reach 100 percent Devel::Cover coverage with no unco
 
 =head1 WHEN TO USE
 
-Use this file when you change I/O error handling or alias walking in Config, EnvLoader or EnvInclude, the PerlEnv fallbacks, the Handle proxy, Codec or Auth.
+Use this file when you change I/O error handling or alias walking in Config, EnvLoader or EnvInclude, grouped skill-config discovery, the PerlEnv fallbacks, the Handle proxy, Codec or Auth. Its Config checks guard that callers can reuse skill config entries from a merged read and that malformed precomputed or output arrays are rejected explicitly.
 
 =head1 HOW TO USE
 

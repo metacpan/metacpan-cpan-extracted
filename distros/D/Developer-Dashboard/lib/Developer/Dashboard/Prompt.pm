@@ -4,14 +4,15 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Cwd qw(abs_path cwd);
+use Cwd qw(abs_path);
 use File::Basename qw(basename);
 use File::Spec;
 use POSIX qw(strftime);
 
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 
 # new(%args)
 # Constructs the prompt renderer.
@@ -36,7 +37,7 @@ sub render {
     my ( $self, %args ) = @_;
 
     my $jobs = defined $args{jobs} ? $args{jobs} : 0;
-    my $cwd  = $args{cwd} ? $args{cwd} : cwd();
+    my $cwd  = $args{cwd} ? $args{cwd} : current_working_directory();
     my $mode = $args{mode} || 'compact';
     my $color = exists $args{color} ? $args{color} : 0;
     my $max_age = defined $args{max_age} ? $args{max_age} : 300;

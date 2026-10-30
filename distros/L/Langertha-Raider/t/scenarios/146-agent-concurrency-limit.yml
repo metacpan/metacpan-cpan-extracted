@@ -1,0 +1,22 @@
+# Claude Code: a spawn beyond the concurrent subagent limit fails with "Concurrent
+# subagent limit reached" and tells the model not to retry. Limit 1 here; default 20.
+# Checks ADR 0027 section 9 (limit).
+title: with max_concurrent_agents 1 the second of two parallel agent calls is refused
+permission_mode: bypassPermissions
+sub_delay: 0.1
+app: { max_concurrent_agents: 1 }
+prompt: Run two agents.
+script:
+  - tool_calls:
+      - [ agent, { description: One, prompt: P1 } ]
+      - [ agent, { description: Two, prompt: P2 } ]
+  - text: R1
+  - text: done
+expect:
+  answer: done
+  request_count: 3
+  tools:
+    - { name: agent, text: '\AR1\nagentId: agent_1 ' }
+    - { name: agent, error: true, text: '\AConcurrent subagent limit reached \(1 running\)\. Do not retry this call now; wait for running agents to finish\.\z' }
+  events:
+    - { type: agent.started, agent_id: agent_1 }

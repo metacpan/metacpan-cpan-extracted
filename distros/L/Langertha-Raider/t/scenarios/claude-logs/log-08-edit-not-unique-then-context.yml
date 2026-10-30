@@ -1,0 +1,35 @@
+# Real pattern: Read, then Edit with a short old_string that occurs twice -> the
+# tool refuses; the model repeats the Edit with more surrounding lines taken
+# from the text it read, then a second Edit, then a failed Edit on text it had
+# misremembered ("String to replace not found"), re-read, and a correct Edit.
+# The texts are Claude Code's (ADR 0023): "Found 2 matches of the string to
+# replace, but replace_all is false ..." and "String to replace not found in
+# file.", both as a <tool_use_error>.
+title: edit_file needs a unique old_string; the model adds context, and re-reads after a miss
+files:
+  config.txt: "[web]\nport = 80\nhost = a\n\n[api]\nport = 80\nhost = b\n"
+prompt: Set the api port to 8080 and the web host to www.
+script:
+  - tool_calls:
+      - [ read_file, { path: config.txt } ]
+  - tool_calls:
+      - [ edit_file, { path: config.txt, old_string: "port = 80", new_string: "port = 8080" } ]
+  - tool_calls:
+      - [ edit_file, { path: config.txt, old_string: "[api]\nport = 80\n", new_string: "[api]\nport = 8080\n" } ]
+  - tool_calls:
+      - [ edit_file, { path: config.txt, old_string: "host = a\n", new_string: "host = www\n" } ]
+      - [ edit_file, { path: config.txt, old_string: "host = web", new_string: "host = www" } ]
+  - tool_calls:
+      - [ read_file, { path: config.txt } ]
+  - text: Both changed.
+expect:
+  answer: Both changed.
+  files:
+    config.txt: "[web]\nport = 80\nhost = www\n\n[api]\nport = 8080\nhost = b\n"
+  tools:
+    - { name: read_file, text: '\A1\t\[web\]\n2\tport = 80\n' }
+    - { name: edit_file, error: true, text: '\A<tool_use_error>Found 2 matches of the string to replace, but replace_all is false\. To replace all occurrences, set replace_all to true\. To replace only one occurrence, please provide more context to uniquely identify the instance\.\nString: port = 80</tool_use_error>\z' }
+    - { name: edit_file, text: '\AThe file \S+/config\.txt has been updated successfully\.' }
+    - { name: edit_file, text: '\AThe file \S+/config\.txt has been updated successfully\.' }
+    - { name: edit_file, error: true, text: '\A<tool_use_error>String to replace not found in file\.\nString: host = web</tool_use_error>\z' }
+    - { name: read_file, text: '3\thost = www\n4\t\n5\t\[api\]\n6\tport = 8080' }

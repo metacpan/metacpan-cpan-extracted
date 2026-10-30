@@ -1,5 +1,16 @@
 Revision history for MIDI-Device
 
+0.0300 2026-10-28 22:08:33
+  - Add the `find()` method.
+
+0.0201 2026-10-28 16:16:52
+  - Improve documentation.
+
+0.0200 2026-10-27 19:35:02
+  - Change the "name" key to "note."
+  - Add the MIDI Rock: Stone joystick.
+  - Add the pitch_wheel_change method.
+
 0.0102 2026-09-17 12:17:25
   - Fix synopsis.
 

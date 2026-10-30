@@ -8,10 +8,14 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 use File::Path qw(make_path);
+use Errno qw(EIO);
 
 use lib 'lib';
 
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::PathIdentity ();
+use Developer::Dashboard::Config;
+use Developer::Dashboard::JSON qw(json_decode);
 use Developer::Dashboard::Platform ();
 
 # Hermetic runtime: isolated home + isolated state root, cwd anchored inside the
@@ -22,6 +26,92 @@ local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = tempdir( CLEANUP => 1 );
 chdir $home or die "Unable to chdir to $home: $!";
 
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = '';
+    delete $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    my @provided_roots = map { File::Spec->catdir( $home, $_ ) } qw(home project);
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::runtime_roots = sub {
+        die "runtime_roots was recomputed instead of using its supplied snapshot\n";
+    };
+    is_deeply(
+        [ $paths->config_roots( runtime_roots => \@provided_roots ) ],
+        [ map { File::Spec->catdir( $_, 'config' ) } @provided_roots ],
+        'config_roots derives from an operation-provided runtime-root snapshot',
+    );
+    is_deeply(
+        [ $paths->skills_roots( runtime_roots => \@provided_roots ) ],
+        [ map { File::Spec->catdir( $_, 'skills' ) } @provided_roots ],
+        'skills_roots derives from an operation-provided runtime-root snapshot',
+    );
+}
+
+# --------------------------------------------------------------------------
+# config overlay: a private writable root augments, rather than replaces, the
+# normal layered config chain.
+# --------------------------------------------------------------------------
+{
+    my $overlay = File::Spec->catdir( $home, 'private-config-overlay' );
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = $overlay;
+    delete $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    my @base_roots = map { File::Spec->catdir( $_, 'config' ) } $paths->runtime_roots;
+    is( $paths->config_root, $overlay, 'config writes target the private overlay when configured' );
+    is_deeply( [ $paths->config_roots ], [ $overlay, @base_roots ], 'private config overlay augments existing config lookup roots at highest priority' );
+    is_deeply( [ $paths->config_layers ], [ ( map { File::Spec->catdir( $_, 'config' ) } $paths->runtime_layers ), $overlay ], 'private config overlay is the final inherited config layer' );
+    my @overlay_stat = stat $overlay;
+    is( $overlay_stat[2] & 0777, 0700, 'private config overlay is restricted to its owner' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = '';
+    ok( !defined $paths->_config_overlay_root, 'an explicitly empty config overlay is treated as unset' );
+}
+
+{
+    my $overlay = File::Spec->catdir( $home, 'missing-config-overlay' );
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = $overlay;
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::_config_overlay_stat = sub { return () };
+    dies_like( sub { $paths->_config_overlay_root }, qr/Unable to inspect config overlay directory/,
+        'config overlay reports when filesystem metadata cannot be read' );
+}
+
+{
+    my $overlay = File::Spec->catdir( $home, 'foreign-owner-config-overlay' );
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = $overlay;
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::_config_overlay_stat = sub { return ( 0, 0, 0, 0, $> + 1 ) };
+    dies_like( sub { $paths->_config_overlay_root }, qr/Config overlay directory is not owned by the current user/,
+        'config overlay refuses a directory reported as owned by another user' );
+}
+
+{
+    my $target = File::Spec->catdir( $home, 'overlay-symlink-target' );
+    my $link   = File::Spec->catdir( $home, 'overlay-symlink' );
+    make_path($target);
+    symlink $target, $link or die "Unable to create overlay symlink fixture $link: $!";
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = $link;
+    my $error = eval { $paths->config_root; 1 } ? '' : $@;
+    like( $error, qr/Config overlay must not be a symbolic link/, 'config overlay refuses a symlink target' );
+}
+
+{
+    my $overlay = File::Spec->catdir( $home, 'workspace-config-overlay' );
+    my $config  = Developer::Dashboard::Config->for_paths($paths);
+    $config->save_global_path_alias( 'somewhere', '/tmp/foobar' );
+
+    local $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY} = $overlay;
+    $config->save_global_path_alias( 'somewhere', '/workspace' );
+    is( $config->path_aliases->{somewhere}, '/workspace', 'container-local overlay alias wins over the inherited host alias' );
+
+    my $host_file = File::Spec->catfile( $home, '.developer-dashboard', 'config', 'config.json' );
+    open my $host_fh, '<:raw', $host_file or die "Unable to open $host_file: $!";
+    local $/;
+    my $host_config = json_decode(<$host_fh>);
+    close $host_fh or die "Unable to close $host_file: $!";
+    is( $host_config->{path_aliases}{somewhere}, '/tmp/foobar', 'saving the container override leaves the host alias unchanged' );
+}
 
 sub dies_like {
     my ( $code, $pattern, $label ) = @_;
@@ -126,8 +216,8 @@ sub dies_like {
 }
 
 # --------------------------------------------------------------------------
-# current_working_directory uses the in-process getcwd implementation while
-# preserving explicit constructor overrides and live post-construction chdir.
+# current_working_directory uses verified PWD before falling back to a live
+# directory lookup, while preserving explicit overrides and later chdir.
 # --------------------------------------------------------------------------
 {
     my $first = File::Spec->catdir( $home, 'cwd-first' );
@@ -285,6 +375,36 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     is( $paths->_compile_search_regex(undef), undef, 'undef pattern compiles to nothing' );
     is( $paths->_compile_search_regex(''),    undef, 'empty pattern compiles to nothing' );
     ok( ref( $paths->_compile_search_regex('alpha') ) eq 'Regexp', 'valid pattern compiles to a regex' );
+}
+
+# --------------------------------------------------------------------------
+# runtime_layer_root_for normalizes the candidate once while checking multiple
+# runtime roots, preserving the strict symlink-aware comparison contract.
+# --------------------------------------------------------------------------
+{
+    my $fixture = tempdir( CLEANUP => 1 );
+    my @roots = map { File::Spec->catdir( $fixture, "layer-$_" ) } 1 .. 2;
+    my $unrelated = File::Spec->catdir( $fixture, 'outside', 'candidate' );
+    make_path( @roots, $unrelated );
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_LAYERS} = join "\n", @roots;
+
+    my $reg = Developer::Dashboard::PathRegistry->new(
+        home => File::Spec->catdir( $fixture, 'home' ),
+        cwd  => $home,
+    );
+    my $candidate_identity_calls = 0;
+    my $path_identity = \&Developer::Dashboard::PathIdentity::_path_identity;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathIdentity::_path_identity = sub {
+            ++$candidate_identity_calls if defined $_[0] && $_[0] eq $unrelated;
+            goto &$path_identity;
+        };
+        is( $reg->runtime_layer_root_for($unrelated), '',
+            'an unrelated candidate does not belong to a configured runtime layer' );
+    }
+    is( $candidate_identity_calls, 1,
+        'runtime_layer_root_for canonicalizes the candidate only once across all roots' );
 }
 
 # --------------------------------------------------------------------------
@@ -475,6 +595,283 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     is( $paths->_write_state_metadata( $dir, undef ), '', 'undef runtime root writes no metadata' );
     is( $paths->_write_state_metadata( $dir, '' ),    '', 'empty runtime root writes no metadata' );
     ok( -e $paths->_write_state_metadata( $dir, '/rt/x' ), 'a valid call writes the metadata file' );
+
+    local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = File::Spec->catdir( $dir, 'state-root' );
+    my $metadata_paths = Developer::Dashboard::PathRegistry->new( home => $paths->home );
+    my $metadata_dir = File::Spec->catdir( $metadata_paths->state_base_root, 'metadata-cache-test' );
+    my $secure_calls = 0;
+    my $secure_permissions = \&Developer::Dashboard::PathRegistry::secure_file_permissions;
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::secure_file_permissions = sub {
+        $secure_calls++;
+        return $secure_permissions->(@_);
+    };
+    my $metadata = $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+    is( $secure_calls, 1, 'the first metadata write secures the state file' );
+    is( $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ), $metadata,
+        'a repeated identical metadata request keeps the same path' );
+    is( $secure_calls, 1, 'identical, already-secured metadata is not rewritten' );
+
+    my $metadata_encode_calls = 0;
+    my $json_encode_original = \&Developer::Dashboard::PathRegistry::json_encode;
+    my $content_cache_dir = File::Spec->catdir( $metadata_dir, 'content-cache' );
+    my $content_paths = Developer::Dashboard::PathRegistry->new( home => $paths->home );
+    {
+        local *Developer::Dashboard::PathRegistry::secure_file_permissions = $secure_permissions;
+        local *Developer::Dashboard::PathRegistry::json_encode = sub {
+            $metadata_encode_calls++;
+            return $json_encode_original->(@_);
+        };
+        my $content_path = $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-a' );
+        $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-a' );
+        is( $metadata_encode_calls, 1, 'identical runtime metadata reuses its encoded JSON string' );
+        $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+        is( $metadata_encode_calls, 2, 'a changed runtime root regenerates metadata JSON' );
+        {
+            local $content_paths->{app_name} = 'problem48-cache-test';
+            $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+            open my $cache_fh, '<:raw', $content_path or die "Unable to read cached metadata $content_path: $!";
+            my $cached_record = json_decode( do { local $/; <$cache_fh> } );
+            close $cache_fh or die "Unable to close cached metadata $content_path: $!";
+            is_deeply( $cached_record, { runtime_root => '/rt/cache-b', app_name => 'problem48-cache-test' },
+                'metadata output reflects the latest application name after a cache-key change' );
+            $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+        }
+        is( $metadata_encode_calls, 3, 'a changed application name regenerates metadata JSON and then reuses it' );
+        {
+            local $content_paths->{app_name};
+            $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+            $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+            is( $metadata_encode_calls, 4, 'undefined application name is encoded once and then reuses its exact cache entry' );
+            open my $cache_fh, '<:raw', $content_path or die "Unable to read cached metadata $content_path: $!";
+            my $cached_record = json_decode( do { local $/; <$cache_fh> } );
+            close $cache_fh or die "Unable to close cached metadata $content_path: $!";
+            is_deeply( $cached_record, { runtime_root => '/rt/cache-b', app_name => undef },
+                'metadata output preserves an undefined application name as JSON null' );
+        }
+        $content_paths->{_state_metadata_json_cache} = {
+            runtime_root => '/rt/cache-b',
+            app_name     => undef,
+            content      => 'stale cached bytes',
+        };
+        $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+        is( $metadata_encode_calls, 5,
+            'a defined application name rejects a cache entry whose application name is undefined' );
+        $content_paths->{_state_metadata_json_cache} = {
+            runtime_root => undef,
+            app_name     => 'developer-dashboard',
+            content      => 'stale cached bytes',
+        };
+        $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+        is( $metadata_encode_calls, 6, 'a hash cache entry without a runtime root is treated as a miss' );
+        $content_paths->{_state_metadata_json_cache} = {
+            runtime_root => '/rt/cache-b',
+            app_name     => 'developer-dashboard',
+            content      => undef,
+        };
+        $content_paths->_write_state_metadata( $content_cache_dir, '/rt/cache-b' );
+        is( $metadata_encode_calls, 7, 'a hash cache entry without encoded bytes is treated as a miss' );
+    }
+
+    unlink $metadata or die "Unable to remove test metadata $metadata: $!";
+    $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+    is( $secure_calls, 2, 'missing metadata is recreated and secured' );
+
+    open my $stale_fh, '>:raw', $metadata or die "Unable to corrupt test metadata $metadata: $!";
+    print {$stale_fh} 'stale metadata' or die "Unable to write test metadata $metadata: $!";
+    close $stale_fh or die "Unable to close test metadata $metadata: $!";
+    $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+    is( $secure_calls, 3, 'changed metadata is rewritten and secured' );
+    open my $read_fh, '<:raw', $metadata or die "Unable to read test metadata $metadata: $!";
+    my $record = json_decode( do { local $/; <$read_fh> } );
+    close $read_fh or die "Unable to close test metadata $metadata: $!";
+    is_deeply( $record, { runtime_root => '/rt/x', app_name => $metadata_paths->app_name },
+        'rewritten metadata retains the runtime identity payload' );
+
+    chmod 0644, $metadata or die "Unable to loosen test metadata $metadata: $!";
+    $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+    is( $secure_calls, 4, 'metadata with loose permissions is rewritten and secured' );
+    my @secure_stat = stat $metadata;
+    is( $secure_stat[2] & 0777, 0600, 'rewritten state metadata remains owner-only' );
+
+    open my $empty_fh, '>:raw', $metadata or die "Unable to empty test metadata $metadata: $!";
+    close $empty_fh or die "Unable to close empty test metadata $metadata: $!";
+    chmod 0600, $metadata or die "Unable to secure empty test metadata $metadata: $!";
+    $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+    is( $secure_calls, 5, 'an empty existing metadata file is rewritten' );
+
+    {
+        require Symbol;
+        my $open = \&Developer::Dashboard::PathRegistry::_open_state_metadata_file;
+        my $close = \&Developer::Dashboard::PathRegistry::_close_state_metadata_file;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_open_state_metadata_file = sub {
+            return $open->(@_) if $_[1] ne '<:raw';
+            my $fh = Symbol::gensym();
+            tie *{$fh}, 'Local::UnreadableMetadataHandle';
+            return $fh;
+        };
+        local *Developer::Dashboard::PathRegistry::_close_state_metadata_file = sub {
+            return 1 if tied *{ $_[0] };
+            return $close->(@_);
+        };
+        $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+        is( $secure_calls, 6, 'metadata with an unreadable empty content stream is rewritten' );
+    }
+
+    can_ok( 'Developer::Dashboard::PathRegistry',
+        qw(_state_metadata_lstat _open_state_metadata_file _print_state_metadata _close_state_metadata_file) );
+    ok( !defined Developer::Dashboard::PathRegistry::_open_state_metadata_file(
+            File::Spec->catfile( $dir, 'absent-metadata' ), '<:raw' ),
+        'the metadata open helper reports a missing file without hiding the open failure' );
+
+    my $lstat_error = eval {
+        local *Developer::Dashboard::PathRegistry::_state_metadata_lstat = sub { $! = EIO; return; };
+        $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
+        1;
+    } ? '' : $@;
+    like( $lstat_error, qr/Unable to inspect runtime metadata/, 'a non-ENOENT metadata lstat error is reported' );
+
+    unlink $metadata or die "Unable to remove metadata before non-file fixture $metadata: $!";
+    mkdir $metadata or die "Unable to create non-file metadata fixture $metadata: $!";
+    dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+        qr/Runtime metadata is not a regular file/, 'metadata directories are refused' );
+    rmdir $metadata or die "Unable to remove non-file metadata fixture $metadata: $!";
+    open my $owner_fh, '>:raw', $metadata or die "Unable to create owner fixture $metadata: $!";
+    print {$owner_fh} 'foreign owner' or die "Unable to write owner fixture $metadata: $!";
+    close $owner_fh or die "Unable to close owner fixture $metadata: $!";
+    chmod 0600, $metadata or die "Unable to secure owner fixture $metadata: $!";
+    my $metadata_lstat = \&Developer::Dashboard::PathRegistry::_state_metadata_lstat;
+    my @foreign_stat = $metadata_lstat->($metadata);
+    $foreign_stat[4] = $> + 1;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_state_metadata_lstat = sub {
+            # Keep Perl's cached lstat record valid for the file-type checks,
+            # while overriding only the owner field under test.
+            my @actual_stat = lstat $_[0];
+            $actual_stat[4] = $foreign_stat[4];
+            return @actual_stat;
+        };
+        dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+            qr/Runtime metadata is not owned by the current user/, 'metadata owned by another user is refused' );
+    }
+
+    {
+        my $open = \&Developer::Dashboard::PathRegistry::_open_state_metadata_file;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_open_state_metadata_file = sub {
+            return if $_[1] eq '<:raw';
+            return $open->(@_);
+        };
+        dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+            qr/Unable to read/, 'metadata read-open failures are reported' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_close_state_metadata_file = sub { return; };
+        dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+            qr/Unable to close/, 'metadata read-close failures are reported' );
+    }
+    {
+        my $open = \&Developer::Dashboard::PathRegistry::_open_state_metadata_file;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_open_state_metadata_file = sub {
+            return if $_[1] eq '>:raw';
+            return $open->(@_);
+        };
+        dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+            qr/Unable to write/, 'metadata write-open failures are reported' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_print_state_metadata = sub { return; };
+        dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+            qr/Unable to write runtime metadata/, 'metadata print failures are reported' );
+    }
+    {
+        my $close = \&Developer::Dashboard::PathRegistry::_close_state_metadata_file;
+        my $close_calls = 0;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_close_state_metadata_file = sub {
+            return $close->(@_) if ++$close_calls == 1;
+            return;
+        };
+        dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+            qr/Unable to close/, 'metadata write-close failures are reported' );
+    }
+
+    {
+        my $directory = File::Spec->catdir( $dir, 'not-a-metadata-file' );
+        mkdir $directory or die "Unable to create metadata open failure fixture $directory: $!";
+        ok( !defined Developer::Dashboard::PathRegistry::_open_state_metadata_file( $directory, '>:raw' ),
+            'the metadata open helper exposes a write-open failure' );
+        rmdir $directory or die "Unable to remove metadata open failure fixture $directory: $!";
+    }
+
+    my $target = File::Spec->catfile( $dir, 'metadata-link-target' );
+    open my $target_fh, '>:raw', $target or die "Unable to create symlink target $target: $!";
+    print {$target_fh} 'do not overwrite' or die "Unable to write symlink target $target: $!";
+    close $target_fh or die "Unable to close symlink target $target: $!";
+    unlink $metadata or die "Unable to remove test metadata $metadata: $!";
+    symlink $target, $metadata or die "Unable to create metadata symlink $metadata: $!";
+    dies_like( sub { $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' ) },
+        qr/Refusing symbolic link for runtime metadata/, 'metadata symlinks are refused' );
+    open my $target_read_fh, '<:raw', $target or die "Unable to read symlink target $target: $!";
+    my $target_content = do { local $/; <$target_read_fh> };
+    close $target_read_fh or die "Unable to close symlink target $target: $!";
+    is( $target_content, 'do not overwrite', 'refusing a metadata symlink leaves its target untouched' );
+}
+
+# The state-root callers and the metadata writer used to harden the same
+# directory consecutively. The writer owns that check, so each route should
+# perform it once while preserving metadata creation.
+{
+    my $state_paths = Developer::Dashboard::PathRegistry->new(
+        home => tempdir( CLEANUP => 1 ),
+    );
+    my $runtime_root = $state_paths->runtime_root;
+    my $state_dir = File::Spec->catdir(
+        $state_paths->state_base_root,
+        $state_paths->_state_root_key($runtime_root),
+    );
+    my $ensure_count = 0;
+    my $ensure_state_dir = \&Developer::Dashboard::PathRegistry::_ensure_state_dir;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_ensure_state_dir = sub {
+            my ( $self, $dir ) = @_;
+            $ensure_count++ if $dir eq $state_dir;
+            return $ensure_state_dir->(@_);
+        };
+        is( $state_paths->state_root, $state_dir, 'state_root preserves its resolved state directory' );
+    }
+    is( $ensure_count, 1,
+        'state_root and its metadata write harden the state directory only once' );
+    ok( -f File::Spec->catfile( $state_dir, 'runtime.json' ),
+        'state_root still writes runtime identity metadata' );
+
+    my $other_runtime_root = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'external-runtime' );
+    make_path($other_runtime_root);
+    my $other_state_dir = File::Spec->catdir(
+        $state_paths->state_base_root,
+        $state_paths->_state_root_key($other_runtime_root),
+    );
+    $ensure_count = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_ensure_state_dir = sub {
+            my ( $self, $dir ) = @_;
+            $ensure_count++ if $dir eq $other_state_dir;
+            return $ensure_state_dir->(@_);
+        };
+        is( $state_paths->_state_root_for_layer($other_runtime_root), $other_state_dir,
+            '_state_root_for_layer preserves its resolved directory' );
+    }
+    is( $ensure_count, 1,
+        '_state_root_for_layer and its metadata write harden the state directory only once' );
+    ok( -f File::Spec->catfile( $other_state_dir, 'runtime.json' ),
+        '_state_root_for_layer still writes runtime identity metadata' );
 }
 
 # --------------------------------------------------------------------------
@@ -520,13 +917,69 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     # answer, which is the non-interactive Windows case, so the literal is used.
     {
         local %ENV = %ENV;
-        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
         delete $ENV{DD_STATE_ROOT_USER};
         delete $ENV{USER};
         delete $ENV{LOGNAME};
         delete $ENV{USERNAME};
+        delete $paths->{_state_root_user_cache};
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_passwd_user_name = sub { return; };
         is( $paths->_state_root_user, 'user', 'the literal fallback names the state root when nothing else can' );
     }
+
+    {
+        local %ENV = %ENV;
+        delete @ENV{qw(DD_STATE_ROOT_USER USER LOGNAME USERNAME)};
+        delete $paths->{_state_root_user_cache};
+        my $lookups = 0;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_passwd_user_name = sub {
+            $lookups++;
+            return 'passwd-name';
+        };
+        is( $paths->_state_root_user, 'passwd-name', 'the passwd fallback is sanitized before caching' );
+        is( $paths->_state_root_user, 'passwd-name', 'a repeated passwd fallback preserves the resolved name' );
+        is( $lookups, 1, 'the passwd database is queried once while the account environment stays unchanged' );
+    }
+
+    {
+        local %ENV = %ENV;
+        delete @ENV{qw(DD_STATE_ROOT_USER USER LOGNAME USERNAME)};
+        delete $paths->{_state_root_user_cache};
+        local *Developer::Dashboard::PathRegistry::_passwd_user_name = sub { return 'fallback-user' };
+        is( $paths->_state_root_user, 'fallback-user', 'an undefined environment tuple is cached' );
+        $ENV{USER} = 'environment-user';
+        is( $paths->_state_root_user, 'environment-user', 'a newly defined environment value invalidates the cache' );
+        is( $paths->_state_root_user, 'environment-user', 'the changed environment tuple is then reused' );
+        $ENV{USER} = 'updated-user';
+        is( $paths->_state_root_user, 'updated-user', 'a changed defined environment value invalidates the cache' );
+        delete $ENV{USER};
+        is( $paths->_state_root_user, 'fallback-user', 'an environment value becoming undefined invalidates the cache' );
+    }
+
+    {
+        local %ENV = %ENV;
+        $ENV{USER} = 'cache-shape-user';
+        $paths->{_state_root_user_cache} = { environment => 'not-an-array', user => 'stale' };
+        is( $paths->_state_root_user, 'cache-shape-user', 'a malformed cache environment is discarded' );
+        $paths->{_state_root_user_cache} = 'not-a-hash';
+        is( $paths->_state_root_user, 'cache-shape-user', 'a non-hash cache entry is discarded' );
+    }
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::_passwd_entry = sub { return ('passwd-name') };
+    is( Developer::Dashboard::PathRegistry::_passwd_user_name(), 'passwd-name',
+        'the lightweight passwd lookup returns the account name' );
+
+    local *Developer::Dashboard::PathRegistry::_passwd_entry = sub { die "passwd lookup unavailable\\n" };
+    is( Developer::Dashboard::PathRegistry::_passwd_user_name(), undef,
+        'the lightweight passwd lookup contains platform lookup exceptions' );
+
+    local *Developer::Dashboard::PathRegistry::_passwd_entry = sub { return () };
+    is( Developer::Dashboard::PathRegistry::_passwd_user_name(), undef,
+        'the lightweight passwd lookup returns undef when no record exists' );
 }
 
 # --------------------------------------------------------------------------
@@ -609,6 +1062,172 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     }
 }
 
+# A PathRegistry can be retained by a resident process. Runtime-layer memoized
+# data must therefore be refreshed after the filesystem topology changes.
+{
+    my $layer_home    = tempdir( CLEANUP => 1 );
+    my $project_root  = tempdir( CLEANUP => 1 );
+    my $project_cwd   = File::Spec->catdir( $project_root, 'work' );
+    my $project_layer = File::Spec->catdir( $project_root, '.developer-dashboard' );
+    make_path( File::Spec->catdir( $project_root, '.git' ), $project_cwd );
+    my $resident_paths = Developer::Dashboard::PathRegistry->new(
+        home => $layer_home,
+        cwd  => $project_cwd,
+    );
+
+    {
+        local $resident_paths->{_runtime_layer_candidate_scope} = {};
+        is_deeply( [ $resident_paths->_existing_layer_dirs_for($project_root) ], [],
+            'runtime-layer request scope starts with no existing project layer' );
+        make_path($project_layer);
+        is_deeply( [ $resident_paths->_existing_layer_dirs_for($project_root) ], [],
+            'runtime-layer request scope reuses its directory snapshot' );
+    }
+    is_deeply( [ $resident_paths->_existing_layer_dirs_for($project_root) ], [$project_layer],
+        'a later unscoped operation observes a newly created project layer' );
+    rmdir $project_layer or die "Unable to remove project runtime layer $project_layer: $!";
+
+    my $choice_home = tempdir( CLEANUP => 1 );
+    my $canonical_runtime = File::Spec->catdir( $choice_home, '.developer-dashboard' );
+    my $alias_runtime = File::Spec->catdir( $choice_home, '.d2' );
+    my $choice_paths = Developer::Dashboard::PathRegistry->new( home => $choice_home, cwd => $choice_home );
+    {
+        local $choice_paths->{_runtime_layer_candidate_scope} = {};
+        is( $choice_paths->home_runtime_path, $canonical_runtime,
+            'runtime choice begins with the canonical name when neither layer exists' );
+        make_path($alias_runtime);
+        is( $choice_paths->home_runtime_path, $canonical_runtime,
+            'runtime choice is stable within one runtime-layer snapshot' );
+    }
+    is( $choice_paths->home_runtime_path, $alias_runtime,
+        'a later operation observes the newly created .d2 runtime layer' );
+
+    for my $invalid_parent ( undef, '', [] ) {
+        my $valid = eval {
+            $choice_paths->_layer_dir_for($invalid_parent);
+            1;
+        };
+        ok( !$valid, 'runtime layer-name lookup rejects an invalid parent' );
+        like( $@, qr/parent path is required/i, 'invalid runtime layer-name parent reports its contract' );
+    }
+
+    my $same_home_paths = Developer::Dashboard::PathRegistry->new( home => $choice_home, cwd => $choice_home );
+    my ( $same_path_checks, $project_root_checks ) = ( 0, 0 );
+    my $same_path = \&Developer::Dashboard::PathRegistry::_same_or_descendant_path;
+    my $project_root_method = \&Developer::Dashboard::PathRegistry::current_project_root;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_same_or_descendant_path = sub {
+            $same_path_checks++;
+            return $same_path->(@_);
+        };
+        local *Developer::Dashboard::PathRegistry::current_project_root = sub {
+            $project_root_checks++;
+            return $project_root_method->(@_);
+        };
+        is_deeply( [ $same_home_paths->_ancestor_runtime_layers ], [],
+            'the home directory has no additional ancestor runtime layers' );
+    }
+    is( $same_path_checks, 0, 'exact home cwd skips canonical ancestry comparisons' );
+    is( $project_root_checks, 0, 'exact home cwd skips project-root discovery' );
+
+    for my $invalid_parent ( undef, '', [] ) {
+        my $valid_parent = eval {
+            $resident_paths->_existing_layer_dirs_for($invalid_parent);
+            1;
+        };
+        ok( !$valid_parent, 'runtime-layer lookup rejects an invalid parent path' );
+        like( $@, qr/parent path is required/i, 'invalid runtime-layer parent reports its input contract' );
+    }
+
+    my $ancestor_calls = 0;
+    my $ancestor_layers = \&Developer::Dashboard::PathRegistry::_ancestor_runtime_layers;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_ancestor_runtime_layers = sub {
+            $ancestor_calls++;
+            return $ancestor_layers->(@_);
+        };
+        local $resident_paths->{_runtime_layer_candidate_scope} = {};
+        my @first_in_scope  = $resident_paths->runtime_layers;
+        my @second_in_scope = $resident_paths->runtime_layers;
+        is_deeply( \@second_in_scope, \@first_in_scope,
+            'a single runtime-layer scope reuses its immutable result' );
+        cmp_ok( $ancestor_calls, '<=', 2,
+            'a runtime-layer scope bounds ancestor walks during home-root initialization and repeated reads' );
+    }
+
+    my $scoped_root_paths = Developer::Dashboard::PathRegistry->new(
+        home => $choice_home,
+        cwd  => $choice_home,
+    );
+    my $runtime_layer_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::runtime_layers = sub {
+            $runtime_layer_calls++;
+            return ( '/home/.developer-dashboard', '/project/.developer-dashboard' );
+        };
+        local $scoped_root_paths->{_runtime_layer_candidate_scope} = {};
+        is( $scoped_root_paths->runtime_root, '/project/.developer-dashboard',
+            'runtime_root returns the deepest layer from the operation snapshot' );
+        is( $scoped_root_paths->runtime_root, '/project/.developer-dashboard',
+            'runtime_root reuses its result in the same operation snapshot' );
+        is( $runtime_layer_calls, 1,
+            'repeated runtime_root reads do not re-enter runtime_layers within one operation' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::runtime_layers = sub {
+            die "runtime_root should use the precomputed scoped layer list\n";
+        };
+        local $scoped_root_paths->{_runtime_layer_candidate_scope} = {
+            runtime_layers => [ '/home/.developer-dashboard', '/project/.developer-dashboard' ],
+        };
+        is( $scoped_root_paths->runtime_root, '/project/.developer-dashboard',
+            'runtime_root reads the deepest value from a precomputed operation layer list' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::runtime_layers = sub { return; };
+        local $scoped_root_paths->{_runtime_layer_candidate_scope} = { runtime_layers => [] };
+        ok( !defined $scoped_root_paths->runtime_root,
+            'runtime_root preserves undef for an empty precomputed layer list' );
+        ok( !defined $scoped_root_paths->runtime_root,
+            'an empty deepest-root value is cached only for the active operation' );
+    }
+
+    my $unscoped_root_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::runtime_layers = sub {
+            $unscoped_root_calls++;
+            return $unscoped_root_calls == 1 ? ('/home/.d2') : ('/new-home/.d2');
+        };
+        is( $scoped_root_paths->runtime_root, '/home/.d2',
+            'an unscoped runtime_root reads the current layer inventory' );
+        is( $scoped_root_paths->runtime_root, '/new-home/.d2',
+            'an unscoped runtime_root does not retain a stale layer result' );
+        is( $unscoped_root_calls, 2, 'unscoped runtime_root requests recompute the layer inventory' );
+    }
+
+    my @initial_layers = $resident_paths->runtime_layers;
+    ok( !( grep { $_ eq $project_layer } @initial_layers ),
+        'runtime layer inventory initially excludes a missing project layer' );
+
+    make_path($project_layer);
+    my @created_layers = $resident_paths->runtime_layers;
+    ok( ( grep { $_ eq $project_layer } @created_layers ),
+        'the same PathRegistry object discovers a runtime layer created after its prior lookup' );
+
+    rmdir $project_layer or die "Unable to remove project runtime layer $project_layer: $!";
+    my @removed_layers = $resident_paths->runtime_layers;
+    ok( !( grep { $_ eq $project_layer } @removed_layers ),
+        'the same PathRegistry object drops a project runtime layer removed after its prior lookup' );
+}
+
 # --------------------------------------------------------------------------
 # _memoize guards.
 # --------------------------------------------------------------------------
@@ -643,6 +1262,12 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     open my $df, '>', File::Spec->catfile( $home_skills, 'ms', '.disabled' ) or die $!;
     close $df;
 
+    # A disabled deepest layer masks every enabled inherited layer.
+    make_path( File::Spec->catdir( $proj_skills, 'masked' ) );
+    make_path( File::Spec->catdir( $home_skills, 'masked' ) );
+    open my $masked_marker, '>', File::Spec->catfile( $proj_skills, 'masked', '.disabled' ) or die $!;
+    close $masked_marker;
+
     # Distinct skills for the docker-root runtime filter.
     make_path( File::Spec->catdir( $proj_skills, 'aaa' ) );
     make_path( File::Spec->catdir( $home_skills, 'bbb' ) );
@@ -653,6 +1278,159 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     # include_disabled keeps every layer, exercising the disabled-inclusive path.
     my @all_layers = $mreg->skill_layers( 'ms', include_disabled => 1 );
     is( scalar @all_layers, 2, 'include_disabled surfaces both the enabled and disabled skill layers' );
+
+    my %layer_entries = map { $_->{skill_name} => $_ } $mreg->installed_skill_entries( include_disabled => 1 );
+    is_deeply(
+        [ map { $_->{skill_root} } $mreg->installed_skill_entries( include_disabled => 1 ) ],
+        [ $mreg->installed_skill_roots( include_disabled => 1 ) ],
+        'grouped inventory root ordering matches installed_skill_roots for disabled-inclusive lookup',
+    );
+    is_deeply(
+        [ map { $_->{skill_root} } $mreg->installed_skill_entries ],
+        [ $mreg->installed_skill_roots ],
+        'grouped inventory root ordering matches effective installed_skill_roots',
+    );
+    is( $layer_entries{ms}{skill_root}, File::Spec->catdir( $proj_skills, 'ms' ),
+        'installed skill entry records the deepest selected skill root' );
+    is_deeply( $layer_entries{ms}{layers}, [ File::Spec->catdir( $home_skills, 'ms' ), File::Spec->catdir( $proj_skills, 'ms' ) ],
+        'installed skill entry provides every layer in home-to-project merge order' );
+    is_deeply( $layer_entries{masked}{layers}, [ File::Spec->catdir( $home_skills, 'masked' ), File::Spec->catdir( $proj_skills, 'masked' ) ],
+        'include_disabled preserves the disabled deepest layer and inherited layers in precedence order' );
+    my %effective_entries = map { $_->{skill_name} => $_ } $mreg->installed_skill_entries;
+    is_deeply( $effective_entries{ms}{layers}, [ File::Spec->catdir( $proj_skills, 'ms' ) ],
+        'installed skill entry excludes a disabled inherited layer while keeping the enabled deepest layer' );
+    ok( !exists $effective_entries{masked}, 'a disabled deepest skill layer masks all inherited layers from effective inventory' );
+
+    my $original_disabled_marker_check = Developer::Dashboard::PathRegistry->can('_skill_is_disabled');
+    is( $mreg->_skill_is_disabled(undef), 0, 'disabled-marker helper treats an undefined root as enabled' );
+    is( $mreg->_skill_is_disabled(''),    0, 'disabled-marker helper treats an empty root as enabled' );
+    my %disabled_marker_checks;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_skill_is_disabled = sub {
+            my ( $self, $skill_root ) = @_;
+            $disabled_marker_checks{$skill_root}++;
+            return $original_disabled_marker_check
+              ? $original_disabled_marker_check->(@_)
+              : 0;
+        };
+        my @nested = $mreg->nested_skill_entries(include_disabled => 1);
+        ok( @nested, 'disabled-inclusive nested discovery returns the fixture skills' );
+        is( $disabled_marker_checks{ File::Spec->catdir( $proj_skills, 'ms' ) }, 1,
+            'nested discovery checks each disabled-inclusive top-level marker only once' );
+    }
+
+    my $original_skills_roots = \&Developer::Dashboard::PathRegistry::skills_roots;
+    my $skills_roots_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::skills_roots = sub {
+            $skills_roots_calls++;
+            return $original_skills_roots->(@_);
+        };
+        local $mreg->{_installed_skill_inventory_scope} = {};
+        my @nested = $mreg->nested_skill_entries(
+            include_disabled              => 1,
+            include_config_write_location => 1,
+        );
+        my @inventory = $mreg->installed_skill_entries( include_disabled => 1 );
+        ok( @nested && @inventory, 'nested and layered views both return the fixture skill inventory' );
+        is( $skills_roots_calls, 1, 'nested discovery and layered config share one request-scoped skill-root scan' );
+    }
+
+    {
+        my $original_segment_validator = Developer::Dashboard::PathRegistry->can('validated_path_segments');
+        my $segment_validation_calls = 0;
+        my $scoped_skills_root_calls = 0;
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::validated_path_segments = sub {
+            $segment_validation_calls++;
+            return $original_segment_validator->(@_);
+        };
+        local *Developer::Dashboard::PathRegistry::skills_roots = sub {
+            $scoped_skills_root_calls++;
+            return $original_skills_roots->(@_);
+        };
+        local $mreg->{_runtime_layer_candidate_scope} = {};
+        local $mreg->{_installed_skill_inventory_scope} = {};
+        my @first = $mreg->skill_layers('ms');
+        my $project_disabled = File::Spec->catfile( $proj_skills, 'ms', '.disabled' );
+        open my $marker_fh, '>', $project_disabled or die "Unable to create $project_disabled: $!";
+        close $marker_fh or die "Unable to close $project_disabled: $!";
+        my @masked = $mreg->skill_layers('ms');
+        unlink $project_disabled or die "Unable to remove $project_disabled: $!";
+        my @restored = $mreg->skill_layers('ms');
+        is( scalar @first, 1, 'scoped skill-layer lookup finds the active project layer' );
+        is_deeply( \@masked, [], 'scoped skill-layer reuse still observes a newly-created disable marker' );
+        is_deeply( \@restored, \@first, 'scoped skill-layer reuse still observes a removed disable marker' );
+        is( $segment_validation_calls, 1, 'request-scoped repeated skill names reuse their validated path segments' );
+        is( $scoped_skills_root_calls, 1, 'request-scoped skill-layer lookup reuses its installed directory inventory' );
+    }
+
+    # Exercise the bounded request-local segment cache and compatibility path
+    # for inventory records created before name_set was added.
+    {
+        local $mreg->{_installed_skill_inventory_scope} = {
+            directories => [
+                {
+                    skills_root => $proj_skills,
+                    names       => ['ms'],
+                },
+            ],
+            skill_layer_segments => {},
+        };
+        is_deeply( [ $mreg->skill_layers('ms') ], [ File::Spec->catdir( $proj_skills, 'ms' ) ],
+            'scoped lookup builds membership from a legacy names-only inventory record' );
+        is_deeply( [ $mreg->skill_layers('not-installed') ], [],
+            'scoped lookup skips names absent from the inventory membership list' );
+        local $mreg->{_installed_skill_inventory_scope}{directories}[0]{names} = undef;
+        is_deeply( [ $mreg->skill_layers('ms') ], [],
+            'scoped lookup treats a missing legacy names list as empty' );
+        is_deeply( [ $mreg->skill_layers( [] ) ], [],
+            'scoped lookup safely rejects a reference-valued skill name' );
+    }
+
+    {
+        my %full_segment_cache = map { ("cached-$_" => ['cached-$_']) } 1 .. 512;
+        local $mreg->{_installed_skill_inventory_scope} = {
+            directories          => [],
+            skill_layer_segments => \%full_segment_cache,
+        };
+        is_deeply( [ $mreg->skill_layers('new-cache-entry') ], [],
+            'scoped lookup remains correct when the bounded segment cache is full' );
+        is_deeply( [ $mreg->skill_layers( 'x' x 4097 ) ], [],
+            'scoped lookup does not cache an exceptionally long skill name' );
+    }
+
+    {
+        local $mreg->{_installed_skill_inventory_scope} = {
+            directories          => [],
+            skill_layer_segments => 'invalid-cache-shape',
+        };
+        is_deeply( [ $mreg->skill_layers('ms') ], [],
+            'scoped lookup remains safe if supplied a non-hash segment-cache value' );
+    }
+    make_path( File::Spec->catdir( $proj_skills, 'added-after-scope' ) );
+    my %after_scope = map { $_->{skill_name} => 1 } $mreg->installed_skill_entries( include_disabled => 1 );
+    ok( $after_scope{'added-after-scope'}, 'a later inventory sees a skill added after the request-scoped scan' );
+
+    my $ms_disabled = File::Spec->catfile( $proj_skills, 'ms', '.disabled' );
+    open my $ms_disabled_fh, '>', $ms_disabled or die "Unable to create $ms_disabled: $!";
+    close $ms_disabled_fh or die "Unable to close $ms_disabled: $!";
+    my %disabled_after_request = map { $_ => 1 } $mreg->installed_skill_roots;
+    ok( !$disabled_after_request{ File::Spec->catdir( $proj_skills, 'ms' ) },
+        'a later inventory sees a newly-created disable marker instead of reusing prior request state' );
+
+    unlink $ms_disabled or die "Unable to remove $ms_disabled: $!";
+    my %enabled_after_request = map { $_ => 1 } $mreg->installed_skill_roots;
+    ok( $enabled_after_request{ File::Spec->catdir( $proj_skills, 'ms' ) },
+        'a later inventory sees a removed disable marker instead of reusing prior request state' );
+
+    my $removed_skill = File::Spec->catdir( $proj_skills, 'added-after-scope' );
+    rmdir $removed_skill or die "Unable to remove $removed_skill: $!";
+    my %removed_after_request = map { $_ => 1 } $mreg->installed_skill_roots( include_disabled => 1 );
+    ok( !$removed_after_request{$removed_skill},
+        'a later inventory sees a deleted skill directory instead of reusing prior request state' );
 
     # skill_layers / skill_root argument guards.
     is_deeply( [ $mreg->skill_layers(undef) ], [], 'skill_layers undef name yields nothing' );
@@ -690,6 +1468,84 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     my @docker = $mreg->installed_skill_docker_roots_for_runtime($proj_runtime);
     ok( ( grep { m{aaa} } @docker ), 'a skill under the runtime is included in its docker roots' );
     ok( !( grep { m{bbb} } @docker ), 'a skill from another layer is excluded from the runtime docker roots' );
+}
+
+# A resident candidate must not retain config bytes across command-like reads.
+{
+    my $cache_home = tempdir( CLEANUP => 1 );
+    my $cache_cwd  = File::Spec->catdir( $cache_home, 'project' );
+    my $skill_dir  = File::Spec->catdir( $cache_cwd, '.developer-dashboard', 'skills', 'dynamic' );
+    my $config_dir = File::Spec->catdir( $skill_dir, 'config' );
+    make_path($config_dir);
+    my $config_file = File::Spec->catfile( $config_dir, 'config.json' );
+    my $write_config = sub {
+        my ($path_value) = @_;
+        open my $fh, '>:raw', $config_file or die "Unable to write $config_file: $!";
+        print {$fh} Developer::Dashboard::JSON::json_encode(
+            { path_aliases => { workspace => $path_value } }
+        ) or die "Unable to write config bytes to $config_file: $!";
+        close $fh or die "Unable to close $config_file: $!";
+    };
+    $write_config->('/workspace/first');
+
+    my $cache_paths = Developer::Dashboard::PathRegistry->new(
+        home => $cache_home,
+        cwd  => $cache_cwd,
+    );
+    my $cache_config = Developer::Dashboard::Config->for_path_config($cache_paths);
+    is( $cache_config->path_aliases->{'dynamic.workspace'}, '/workspace/first',
+        'resident-candidate config reads expose the initial skill alias' );
+
+    $write_config->('/workspace/second');
+    is( $cache_config->path_aliases->{'dynamic.workspace'}, '/workspace/second',
+        'a later read from the same Config object sees replaced skill config bytes' );
+
+    my $new_skill_dir = File::Spec->catdir( $cache_cwd, '.developer-dashboard', 'skills', 'later' );
+    make_path( File::Spec->catdir( $new_skill_dir, 'config' ) );
+    my $new_config_file = File::Spec->catfile( $new_skill_dir, 'config', 'config.json' );
+    open my $new_fh, '>:raw', $new_config_file or die "Unable to write $new_config_file: $!";
+    print {$new_fh} Developer::Dashboard::JSON::json_encode(
+        { path_aliases => { fresh => '/workspace/new' } }
+    ) or die "Unable to write config bytes to $new_config_file: $!";
+    close $new_fh or die "Unable to close $new_config_file: $!";
+    is( $cache_config->path_aliases->{'later.fresh'}, '/workspace/new',
+        'the same Config and PathRegistry objects discover a newly installed skill' );
+}
+
+SKIP: {
+    my $link_home = tempdir( CLEANUP => 1 );
+    my $link_cwd  = File::Spec->catdir( $link_home, 'project' );
+    my $runtime_link = File::Spec->catdir( $link_cwd, '.developer-dashboard' );
+    my $target_a = File::Spec->catdir( $link_home, 'runtime-a' );
+    my $target_b = File::Spec->catdir( $link_home, 'runtime-b' );
+    my $write_target = sub {
+        my ( $target, $alias_path ) = @_;
+        my $config_dir = File::Spec->catdir( $target, 'skills', 'linked', 'config' );
+        make_path($config_dir);
+        my $config_file = File::Spec->catfile( $config_dir, 'config.json' );
+        open my $fh, '>:raw', $config_file or die "Unable to write $config_file: $!";
+        print {$fh} Developer::Dashboard::JSON::json_encode(
+            { path_aliases => { link => $alias_path } }
+        ) or die "Unable to write config bytes to $config_file: $!";
+        close $fh or die "Unable to close $config_file: $!";
+    };
+    make_path($link_cwd);
+    $write_target->( $target_a, '/target/a' );
+    $write_target->( $target_b, '/target/b' );
+    skip 'symlink creation is not available', 2 if !symlink $target_a, $runtime_link;
+
+    my $link_paths = Developer::Dashboard::PathRegistry->new(
+        home => $link_home,
+        cwd  => $link_cwd,
+    );
+    my $link_config = Developer::Dashboard::Config->for_path_config($link_paths);
+    is( $link_config->path_aliases->{'linked.link'}, '/target/a',
+        'a reused Config object reads a skill alias through its initial runtime symlink' );
+
+    unlink $runtime_link or die "Unable to remove runtime symlink $runtime_link: $!";
+    symlink $target_b, $runtime_link or die "Unable to retarget runtime symlink $runtime_link: $!";
+    is( $link_config->path_aliases->{'linked.link'}, '/target/b',
+        'a later read follows a retargeted runtime symlink instead of stale cached config' );
 }
 
 # --------------------------------------------------------------------------
@@ -764,18 +1620,101 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     # cwd outside home but inside a git project: the project root is the stop dir.
     my $ext = tempdir( CLEANUP => 1 );
     make_path( File::Spec->catdir( $ext, '.git' ) );
-    my $work = File::Spec->catdir( $ext, 'work' );
+    my $work = File::Spec->catdir( $ext, 'work', 'nested', 'leaf' );
     make_path( File::Spec->catdir( $work, '.developer-dashboard' ) );
     my $ereg = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $work );
-    my @layers = $ereg->_ancestor_runtime_layers;
+    my $original_identity = \&Developer::Dashboard::PathRegistry::_path_identity;
+    my $stop_identity_calls = 0;
+    my @layers;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_path_identity = sub {
+            my ( $self, $path ) = @_;
+            $stop_identity_calls++ if defined $path && $path eq $ext;
+            return $original_identity->(@_);
+        };
+        @layers = $ereg->_ancestor_runtime_layers;
+    }
     ok( ( grep { m{\.developer-dashboard} } @layers ),
         'an ancestor .developer-dashboard under the project root is discovered' );
+    is( $stop_identity_calls, 1,
+        'a deep ancestry walk resolves the stop identity once rather than once per parent' );
 
     # cwd outside home and outside any git project: no stop dir, no layers.
     my $orphan = tempdir( CLEANUP => 1 );
     my $oreg = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $orphan );
     is_deeply( [ $oreg->_ancestor_runtime_layers ], [],
         'a cwd under neither home nor a project yields no ancestor layers' );
+
+    my $plain_root = tempdir( CLEANUP => 1 );
+    my $plain_work = File::Spec->catdir( $plain_root, 'work', 'nested', 'leaf' );
+    make_path( File::Spec->catdir( $plain_root, '.git' ), $plain_work );
+    my $plain_paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $plain_work );
+    my $plain_root_identity_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_path_identity = sub {
+            my ( $self, $path ) = @_;
+            $plain_root_identity_calls++ if defined $path && $path eq $plain_root;
+            return $original_identity->(@_);
+        };
+        $plain_paths->_ancestor_runtime_layers;
+    }
+    is( $plain_root_identity_calls, 1,
+        'a deep walk with no runtime layers resolves the stop identity once' );
+
+    # The home runtime root is present in both inputs to the exclusion set
+    # when the canonical home runtime directory exists. It should be resolved
+    # once while building that set, then once while comparing the candidate.
+    my $duplicate_home = tempdir( CLEANUP => 1 );
+    my $duplicate_work = File::Spec->catdir( $duplicate_home, 'work' );
+    my $duplicate_runtime = File::Spec->catdir( $duplicate_home, '.developer-dashboard' );
+    make_path( $duplicate_runtime, $duplicate_work, File::Spec->catdir( $duplicate_home, '.d2' ) );
+    my $duplicate_paths = Developer::Dashboard::PathRegistry->new(
+        home => $duplicate_home,
+        cwd  => $duplicate_work,
+    );
+    my $duplicate_runtime_identity_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_path_identity = sub {
+            my ( $self, $path ) = @_;
+            $duplicate_runtime_identity_calls++ if defined $path && $path eq $duplicate_runtime;
+            return $original_identity->(@_);
+        };
+        is_deeply( [ $duplicate_paths->_ancestor_runtime_layers ], [],
+            'home runtime directories are excluded from the ancestor-layer result' );
+    }
+    is( $duplicate_runtime_identity_calls, 2,
+        'ancestor discovery canonicalizes the duplicate home runtime path once per distinct use' );
+}
+
+{
+    my $fixture = tempdir( CLEANUP => 1 );
+    my $real_home = File::Spec->catdir( $fixture, 'real-home' );
+    my $home_alias = File::Spec->catdir( $fixture, 'home-alias' );
+    my $work = File::Spec->catdir( $real_home, 'work' );
+    my $work_layer = File::Spec->catdir( $work, '.d2' );
+    make_path($work_layer);
+    symlink $real_home, $home_alias or die "Unable to create home alias $home_alias: $!";
+
+    my $alias_paths = Developer::Dashboard::PathRegistry->new( home => $home_alias, cwd => $work );
+    my $original_identity = \&Developer::Dashboard::PathRegistry::_path_identity;
+    my $physical_stop_calls = 0;
+    my @layers;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_path_identity = sub {
+            my ( $self, $path ) = @_;
+            $physical_stop_calls++ if defined $path && $path eq $real_home;
+            return $original_identity->(@_);
+        };
+        @layers = $alias_paths->_ancestor_runtime_layers;
+    }
+    ok( ( grep { $_ eq $work_layer } @layers ),
+        'ancestor discovery retains a runtime layer below a symlink-aliased home' );
+    is( $physical_stop_calls, 1,
+        'different spellings still canonicalize once when the walk reaches a symlink-equivalent stop' );
 }
 
 # --------------------------------------------------------------------------
@@ -808,6 +1747,113 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     my $aliases = $paths->all_path_aliases;
     ok( $aliases->{home}, 'all_path_aliases reports the home alias' );
     ok( $paths->_state_root_key( $paths->home_runtime_root ), 'state root key hashes the runtime identity' );
+}
+
+# An aggregate inventory should resolve and record its shared state root once,
+# then derive the collector and indicator children from that exact root.
+{
+    my $inventory = Developer::Dashboard::PathRegistry->new(
+        home => tempdir( CLEANUP => 1 ),
+        cwd  => $home,
+    );
+    my $metadata_writes = 0;
+    my $ancestor_walks = 0;
+    my $write_metadata = \&Developer::Dashboard::PathRegistry::_write_state_metadata;
+    my $ancestor_runtime_layers = \&Developer::Dashboard::PathRegistry::_ancestor_runtime_layers;
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::_write_state_metadata = sub {
+        $metadata_writes++;
+        return $write_metadata->(@_);
+    };
+    local *Developer::Dashboard::PathRegistry::_ancestor_runtime_layers = sub {
+        $ancestor_walks++;
+        return $ancestor_runtime_layers->(@_);
+    };
+
+    my $all = $inventory->all_paths;
+    is( $metadata_writes, 1,
+        'all_paths writes shared runtime metadata once for its aggregate inventory' );
+    is( $ancestor_walks, 1,
+        'all_paths shares one request-scoped ancestor inventory across permission checks' );
+    is( $all->{collectors_root}, File::Spec->catdir( $all->{state_root}, 'collectors' ),
+        'all_paths derives collector state from its resolved state root' );
+    is( $all->{indicators_root}, File::Spec->catdir( $all->{state_root}, 'indicators' ),
+        'all_paths derives indicator state from its resolved state root' );
+}
+
+# Path identity is shared only inside the explicit aggregate scope; the
+# all_paths integration opens that scope and later lookups remain fresh.
+{
+    my $inventory = Developer::Dashboard::PathRegistry->new(
+        home => tempdir( CLEANUP => 1 ),
+        cwd  => $home,
+    );
+    my $resolve_identity = \&Developer::Dashboard::PathIdentity::_path_identity;
+    my %identity_calls;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathIdentity::_path_identity = sub {
+            my ( $path, %options ) = @_;
+            my $key = defined $path ? "defined:$path" : 'undefined';
+            $identity_calls{$key}++;
+            return $resolve_identity->(@_);
+        };
+        my $path = $inventory->home;
+        my ( $first, $second );
+        {
+            local $inventory->{_path_identity_scope} = {};
+            $first  = $inventory->_path_identity($path);
+            $second = $inventory->_path_identity($path);
+        }
+        is( $first, $second, 'scoped path identity reuse preserves the normalized value' );
+        is( $identity_calls{"defined:$path"}, 1,
+            'the same path is normalized once during an explicit aggregate scope' );
+        $inventory->_path_identity($path);
+        is( $identity_calls{"defined:$path"}, 2,
+            'path identity is normalized afresh after the explicit scope ends' );
+        {
+            local $inventory->{_path_identity_scope} = {};
+            is( $inventory->_path_identity(undef), '',
+                'undefined path identity keeps the historical empty result' );
+            is( $inventory->_path_identity(undef), '',
+                'undefined path identity can use the scoped cached empty result' );
+        }
+        is( $identity_calls{undefined}, 1,
+            'undefined path input is normalized once in a cache scope' );
+
+        my $all_paths_scope_calls = 0;
+        my $original_registry_identity = \&Developer::Dashboard::PathRegistry::_path_identity;
+        local *Developer::Dashboard::PathRegistry::_path_identity = sub {
+            my ($self) = @_;
+            $all_paths_scope_calls++ if ref( $self->{_path_identity_scope} ) eq 'HASH';
+            return $original_registry_identity->(@_);
+        };
+        my $all = $inventory->all_paths;
+        ok( $all->{state_root}, 'all_paths preserves the state-root result' );
+        cmp_ok( $all_paths_scope_calls, '>', 0,
+            'all_paths opens the path-identity cache only for its aggregate work' );
+    }
+}
+
+# A request-local permission inventory must not survive into a later call.
+{
+    my $fixture = tempdir( CLEANUP => 1 );
+    my $repo = File::Spec->catdir( $fixture, 'repo' );
+    my $work = File::Spec->catdir( $repo, 'work' );
+    make_path( File::Spec->catdir( $repo, '.git' ), $work );
+    my $registry = Developer::Dashboard::PathRegistry->new(
+        home => File::Spec->catdir( $fixture, 'home' ),
+        cwd  => $work,
+    );
+
+    $registry->all_paths;
+    my $new_layer = File::Spec->catdir( $repo, '.d2' );
+    make_path($new_layer);
+    is(
+        $registry->runtime_layer_root_for( File::Spec->catfile( $new_layer, 'config', 'config.json' ) ),
+        $new_layer,
+        'a later security lookup discovers a runtime layer created after all_paths completed',
+    );
 }
 
 
@@ -865,6 +1911,15 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     }
 }
 
+{
+    package Local::UnreadableMetadataHandle;
+
+    sub TIEHANDLE { return bless {}, $_[0] }
+    sub READLINE  { return }
+}
+
+package main;
+
 done_testing;
 
 __END__
@@ -879,12 +1934,20 @@ This test drives the guard clauses, environment fallbacks, filesystem error
 handling, and layered discovery edges of C<Developer::Dashboard::PathRegistry>
 that ordinary runtime callers never reach with malformed or boundary input. It
 exists to keep every reachable branch and condition of the path model executed
-by the suite so the coverage gate stays honest.
+by the suite so the coverage gate stays honest. It also verifies that aggregate
+path output resolves and writes shared state metadata once, and that passwd
+fallback errors remain contained without loading platform helpers. It also
+drives metadata I/O failures and checks that cached usernames are invalidated
+whenever any of the four account environment values changes, including
+transitions to or from undef. Its runtime-layer fixture verifies that an
+explicit request scope retains one filesystem existence snapshot while a later
+unscoped lookup sees a newly created layer. Invalid undefined, empty, and
+reference-valued parent paths are rejected before directory discovery.
 
 =head1 WHY IT EXISTS
 
 The path registry is the authoritative model for DD-OOP-LAYER discovery, state
-root hashing, secure permission tightening, and directory search. Most of its
+root hashing, secure permission tightening, passwd fallback, and directory search. Most of its
 defensive guards (undef or empty names, absent home runtime trees, blank
 environment layer entries, alias-prefix rewrites) are only taken under inputs
 that higher-level modules pre-sanitize. Without a dedicated probe those genuine
@@ -895,14 +1958,40 @@ code paths would appear untested, masking real regressions in the safety net.
 Run this whenever changing runtime-layer discovery, named-path registration,
 project-root resolution, skill layer masking, state root derivation, or the
 permission-hardening helpers, to confirm the boundary behavior is still exercised
-and no branch silently regresses.
+and no branch silently regresses. Its skill fixtures also verify that the
+grouped installed-skill inventory preserves layer order and disable masking.
+Use it when changing state metadata validation,
+metadata open/write/close handling, or the per-registry account-name cache too.
+The aggregate path inventory also checks that permission-layer discovery is
+shared only during that call and that later operations observe new layers.
+The installed-skill inventory verifies nested discovery and layered metadata
+reuse one directory listing only during a scoped operation, while a later
+operation sees a newly created skill.
+Later inventory calls also verify live creation/removal of disable markers and
+skill-directory deletion, which are required freshness cases for any future
+resident cache. A same-object Config fixture also verifies replaced skill
+config bytes and newly installed skill aliases are visible on later reads.
+Where symlink creation is supported, the same objects also follow a runtime
+symlink retargeted between reads.
+The tied metadata stream also exercises the failed-read/undefined-content path,
+and the cache fixture changes one environment value between two defined values.
+The multi-root fixture also guards the path-ownership check against redundant
+candidate canonicalization while preserving independently checked runtime
+root identities.
+The resident-process fixture proves that runtime-layer lookup refreshes after
+project layer creation/removal outside an operation scope, while repeated
+lookups inside one scope share one ancestor walk and one per-parent layer
+directory-existence snapshot.
 
 =head1 HOW TO USE
 
 Execute it directly with C<perl -Ilib t/97-pathregistry-coverage.t> for a fast
 standalone check, or under the coverage harness to confirm the registry keeps
 full branch and condition coverage. It constructs isolated temporary homes and
-state roots and drives the public and internal helpers with edge inputs.
+state roots and drives the public and internal helpers with edge inputs. The
+metadata fixtures cover exact repeats, empty and stale content, loose mode,
+symlinks, directories, foreign ownership, lstat/open/print/close failures, and
+username cache environment changes.
 
 =head1 WHAT USES IT
 

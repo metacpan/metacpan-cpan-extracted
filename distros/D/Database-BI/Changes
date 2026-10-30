@@ -1,5 +1,110 @@
 Revision history for Database-BI
 
+0.018.0	Wed Oct 28 08:41:28 PM EDT 2026
+	[ Enhancements ]
+	- Cross-row columns: cs=<col>:<fn>:<alias>[:<arg>] with by= and order=
+	  adds a running total, moving average, rank, z-score or share of the
+	  total per row.  A Cross-row panel builds them; charts and exports
+	  carry the new column.
+	- Canvas cards can carry their own cross-row plan (cross_row), replacing
+	  the page's, run on the card's own filtered rows.  Add current view
+	  collects several columns; the card header's Edit cross-row edits the
+	  plan as chips and warns when a rename affects a plotted column.
+	  PATCH /api/analyses/:id/visuals/:visual replaces a card's plan.
+	- Word cloud (GET /wordcloud, and canvas cards with kind=wordcloud),
+	  drawn with HTML::TagCloud.  Each word links to its rows, or on a
+	  canvas cross-filters to them.
+	- Relative time ranges: ?range=<name>&rcol=<column> on every data route
+	  and saved canvas (last_24_hours, today, yesterday, last_7_days,
+	  last_30_days, last_90_days, this_month, last_month, this_quarter,
+	  last_quarter, this_year, last_year).  An unknown name or missing rcol=
+	  is a 400.  The dashboard filter bar and canvas toolbar have a Time
+	  range menu.
+	- The filter UI adapts to the column's detected type: date pickers,
+	  numeric operators, or string operators.
+	- New "between" filter operator (col:between:YYYY-MM-DD:YYYY-MM-DD);
+	  lt/le/gt/ge compare ISO dates as dates.
+	- New measures for the pivot, column statistics and canvas cards:
+	  median, stdev, first, last, range and p<N> percentiles.
+	- Time buckets: span= groups a chart or pivot by hour, day, week, month,
+	  quarter or year; /graph?agg= plots one point per bucket.
+	- Stored time patterns accept time=, e.g. 27/10/2026 14:05.
+	- bi-alert: --suppress, --recovery (exit 3), --notify-cmd, and several
+	  analyses and thresholds in one run.
+	- Response compression, ETag/304 and HTML minification via
+	  Mojolicious::Plugin::Buffer (new prerequisite); downloads opt out.
+	- Optional page cache: page_cache_dir and page_cache_duration store
+	  /catalog and /tutorial in a CHI File cache.
+	- Internal: every data route's filter stage is one function,
+	  _reduce_records.
+	- Main navigation links to Canvases, Catalog and Open file on every page.
+	- Chart, pivot, stats and insights pages show a "Drawn from:" strip naming
+	  the time range, filters, cross-row columns, combined files and
+	  de-duplication, with a link back to change them.
+	- Every page has a full breadcrumb, from Home to the page itself, each
+	  step named after what it shows: Home > sales > Bar chart: amount by
+	  region > sales (region = East) > Pie chart: Count by region.  The
+	  trail is read from each page's back links, so it is no longer cut at
+	  two levels; a file opened from the browser sits under its folder, and
+	  a canvas is named.  Back links to another site are not followed, and
+	  the trail is at most eight steps.
+	[ Bug Fixes ]
+	- Two charts on one canvas no longer collide; the second card draws.
+	- A card's cross-row column no longer appears in the cards beside it.
+	- A card naming a column no plan produces is refused, instead of
+	  printing a heading over empty cells.
+	- A day bound on a timestamp column (e.g. le 2026-10-27) now includes
+	  the rows stamped on that day.
+	- A stale ?dd= bookmark no longer makes canvas marks unfocusable.
+	- Canvas help now describes what the page actually does.
+	- Charts, pivots, stats and insights of a combined (c=), de-duplicated
+	  (d=1) or inner/outer-joined (jtype=) view now draw from the rows the
+	  table shows; before, the panels dropped those parameters, and d=1 was
+	  ignored by every chart route.  Export keeps jtype= too.
+	- Opening any toolbar panel closes all the others: the histogram panel
+	  left Cross-row and Word cloud open, and Merge, Combine and Export left
+	  chart panels open and their own buttons disabled.
+	- The Word cloud, Cross-row and Ask toolbar buttons are styled like the
+	  others; all of them now share one btn-tool class.
+	- Toolbar and filter-bar controls on the same row now line up top and
+	  bottom: they share one height and are centred, rather than aligned on
+	  their text baselines.
+	- The pivot panel's Limit to top, ranked by, Time bucket and "of column"
+	  fields are the same size as its Row, Column and Measure fields.
+	- Canvas controls line up: the Time range bar, parameter bar and toolbar
+	  share the table toolbar's height, the Time range menus and Apply
+	  button are styled, and card-header buttons are one height.
+	- Every dropdown and text field is white with one border colour, from a
+	  single rule in the layout; the table page's filter bar and pivot fields
+	  showed the browser's grey, and pivot fields turned near-black when the
+	  OS was in dark mode.
+	- An unknown canvas (/a/<id>) is an HTML page with the breadcrumb and
+	  navigation, not a line of plain text.
+	- Folder view levels keep the link back to the table they came from,
+	  and its crumb is an absolute link.
+	- A missing page is a 404 with the breadcrumb and navigation, not
+	  Mojolicious's bare page.  /view/<table> for a table that does not
+	  exist is now a 404 naming it, rather than the home page with an
+	  error that showed the data directory.
+	- A view that is both joined (j=) and combined (c=) shows both, from
+	  /join or /combine: /combine ignored j=, and Merge after Combine
+	  dropped c=.  The table now shows the rows its charts draw from.
+	- Tests: the read-only model_dir and export-write-failure tests skip
+	  where chmod cannot revoke access (Cygwin, Windows ACLs, root), using
+	  Test::Permissions; they failed on Cygwin (CPAN Testers).
+	  Fixes https://www.cpantesters.org/cpan/report/b2c11820-d297-11f1-a488-efeb21b3859a
+	- Tests: t/unit.t no longer segfaults at exit under Devel::Cover on
+	  perl 5.42 (the CI coverage step); its LLM-response helper was a
+	  lexical "my sub".
+	- Text::CSV is a prerequisite: script/bi-alert's fallback reader needed
+	  it and it was not declared.
+	- Documentation: cross-row columns (cs=, by=, order=), compression and the
+	  page cache (page_cache_dir, page_cache_duration), breadcrumbs and 404
+	  pages, j= with c= on /join and /combine, and an API SPECIFICATION for
+	  every public function.  Util.pm's licence now matches the
+	  distribution's (GPL2).  Fixed POD that rendered "= >" and "&>".
+	- The templates and controller comments are ASCII again.
+
 0.017.1	Sun Oct 25 09:23:34 PM EDT 2026
 	[ Bug Fixes ]
 	- script/database-bi: shebang is perl again; the script starts morbo

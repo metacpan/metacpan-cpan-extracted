@@ -1,5 +1,13 @@
 Revision history for OpenTelemetry-SDK
 
+0.101     2026-10-30 00:04:09 GMT
+
+    * Fixed a long-standing bug where calling 'shutdown' on a tracer
+      or logger provider would not correctly propagate a call to
+      'force_flush' in the configured processors.
+    * The batch processor no longer attempts to block until its
+      underlying worker function to stop during global destruction.
+
 0.100     2026-10-11 23:18:42 BST
 
     * Add documentation for the new OTEL_LOGS_EXPORTER environment

@@ -106,3 +106,46 @@ for (k in names(EXP)) {
   cat("  },\n")
 }
 cat(");\n")
+
+## ---------------------------------------------------------------- underdispersed
+## Counts no more dispersed than a Poisson's, where the negative binomial's
+## MLE is theta = Inf, the Poisson fit itself.  countreg and pscl stop BFGS on
+## the way there (theta near 1e5); the Poisson fit is frozen beside each one.
+## The data are written out rather than drawn, so the corpus does not move
+## with R's RNG: ud_zt is hand-made, ud_h's count half is too, and ud_hz is
+## set.seed(20); y <- ifelse(rbinom(20, 1, 1 - exp(-exp(-2 + 0.15 * (1:20)))) == 1,
+## 1 + rbinom(20, 2, 0.5), 0), a cloglog zero process.
+## Printed as a second block, %UNDER, below %PKG.
+UND <- list()
+ud_zt <- data.frame(y = c(1, 2, 1, 2, 1, 2, 3, 2, 1, 2, 2, 3), x = 1:12)
+for (d in c("negbin", "poisson")) {
+  m <- zerotrunc(y ~ x, data = ud_zt, dist = d)
+  UND[[paste0("ud_zt_", d)]] <- list(coef = unname(coef(m)), se = unname(sqrt(diag(vcov(m)))[1:2]),
+    ll = as.numeric(logLik(m)), theta = if (d == "negbin") m$theta else NA)
+}
+ud_h <- data.frame(y = c(0, 1, 2, 0, 1, 2, 1, 2, 0, 1, 2, 3, 2, 1, 0, 2), x = 1:16)
+for (d in c("negbin", "poisson")) {
+  m <- hurdle(y ~ x, data = ud_h, dist = d)
+  UND[[paste0("ud_h_", d)]] <- list(count = unname(coef(m, "count")), zero = unname(coef(m, "zero")),
+    count_se = unname(sqrt(diag(vcov(m)))[1:2]), zero_se = unname(sqrt(diag(vcov(m)))[3:4]),
+    ll = as.numeric(logLik(m)), theta = if (d == "negbin") unname(m$theta["count"]) else NA)
+}
+ud_hz <- data.frame(y = c(2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 3, 0, 2, 2, 2, 3, 2, 2), x = 1:20)
+for (d in c("negbin", "poisson")) {
+  m <- hurdle(y ~ x, data = ud_hz, dist = "poisson", zero.dist = d)
+  UND[[paste0("ud_hz_", d)]] <- list(count = unname(coef(m, "count")), zero = unname(coef(m, "zero")),
+    count_se = unname(sqrt(diag(vcov(m)))[1:2]), zero_se = unname(sqrt(diag(vcov(m)))[3:4]),
+    ll = as.numeric(logLik(m)), theta = if (d == "negbin") unname(m$theta["zero"]) else NA)
+}
+cat("my %UNDER = (\n")
+for (k in names(UND)) {
+  e <- UND[[k]]
+  cat(sprintf("  %s => {\n", k))
+  for (f in names(e)) {
+    v <- e[[f]]
+    if (length(v) == 1 && !grepl("^(coef|count|zero|se)$", f)) cat(sprintf("    %s => %s,\n", f, fmt1(v)))
+    else cat(sprintf("    %s => %s,\n", f, num(v)))
+  }
+  cat("  },\n")
+}
+cat(");\n")

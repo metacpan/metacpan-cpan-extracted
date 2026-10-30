@@ -137,7 +137,7 @@ my %WriteMakefileArgs = (
     "Test::LeakTrace" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.3218",
+  "VERSION" => "0.3413",
   "test" => {
     "TESTS" => "t/*.t"
   }

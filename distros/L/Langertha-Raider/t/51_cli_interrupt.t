@@ -77,7 +77,7 @@ subtest '--json: SIGTERM writes the interrupted document' => sub {
   my ( $status, $stdout, $stderr ) = interrupted_run(TERM => '--json');
   died_of($status, 'TERM', '--json');
   my $doc = eval { JSON::MaybeXS->new(utf8 => 1)->decode($stdout) };
-  is($doc, { version => 1, status => 'interrupted', signal => 'TERM', elapsed => E(),
+  is($doc, { version => 1, status => 'interrupted', reason => 'signal', signal => 'TERM', elapsed => E(),
     session => { id => T(), path => T() } },
     'one document, status interrupted') or diag 'stdout: '.$stdout."\nstderr: ".$stderr;
   unlike($stderr, qr/ at \S+ line \d+/, 'no Perl error on stderr') or diag $stderr;
@@ -152,7 +152,7 @@ SKIP: {
     my ( $status, $stdout, $stderr ) = startup_interrupted_run(TERM => '--json');
     died_of($status, 'TERM', '--json at startup');
     my $doc = eval { JSON::MaybeXS->new(utf8 => 1)->decode($stdout) };
-    is($doc, { version => 1, status => 'interrupted', signal => 'TERM', elapsed => D() },
+    is($doc, { version => 1, status => 'interrupted', reason => 'signal', signal => 'TERM', elapsed => D() },
       'one document, status interrupted') or diag 'stdout: '.$stdout."\nstderr: ".$stderr;
     unlike($stderr, qr/ at \S+ line \d+/, 'no Perl error on stderr') or diag $stderr;
   };

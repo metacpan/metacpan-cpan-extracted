@@ -75,11 +75,12 @@ REPORT
     my ( $exit, $stdout, $stderr ) = run_gate(<<'REPORT');
 File              stmt   branch   cond    sub
 Total            100.0    100.0  100.0  100.0
+Devel::Cover: ignoring extra statement
 REPORT
 
-    is( $exit, 0, 'coverage gate accepts exact 100 totals for all four metrics' );
-    like( $stdout, qr/statement.*branch.*condition.*subroutine/i, 'success names all four enforced metrics' );
-    is( $stderr, '', 'successful coverage gate emits no error output' );
+    is( $exit, 2, 'coverage gate rejects a report with a Devel::Cover diagnostic' );
+    like( $stderr, qr/report contains Devel::Cover warning/i, 'coverage gate explains the report diagnostic' );
+    unlike( $stdout, qr/coverage gate: statement/, 'a report with a diagnostic emits no success result' );
 }
 
 # Scenario: reject a malformed report instead of silently passing it.
@@ -267,6 +268,8 @@ for my $workflow_name (qw(test.yml release-github.yml)) {
     }
     like( $body, qr/\^lib\//,                     'the canonical entrypoint restricts the report to lib/' );
     like( $body, qr/check-all-metric-coverage/,   'the canonical entrypoint enforces the report through the checker' );
+    like( $body, qr/\+ignore,\^\/tmp\//, 'coverage instrumentation excludes disposable temporary source files' );
+    like( $body, qr/\+ignore[^\n]*\\\.developer-dashboard\//, 'coverage instrumentation excludes staged runtime helper files' );
 }
 
 # Scenario: the documented gate is the executed gate.

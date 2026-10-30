@@ -20,6 +20,9 @@ class UV::Loop : pointer {
   use UV::Callback::Write;
   use UV::Callback::Close;
   
+  use UV::Handle::Process;
+  use UV::ProcessOptions;
+  
   use Resource::UV;
   use UV::Resource::UV;
   use Hash;
@@ -82,6 +85,8 @@ class UV::Loop : pointer {
       $uv_handle->{loop} = undef;
     }
   }
+  
+  native method spawn : int ($uv_process : UV::Handle::Process, $options : UV::ProcessOptions);
   
   native method DESTROY : void ();
   

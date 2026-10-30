@@ -15,6 +15,15 @@ $Error::Debug = 1;
 # matching an (invalid) \08 octal digit
 my $file = qr/\Q$0\E/;
 
+# Detect the line number reporting behaviour of this version of perl
+our $use_block_end;
+BEGIN {
+    sub X { my (undef, undef, $line) = caller;
+                $use_block_end++ if ($line != shift); }
+    X __LINE__, # $use_block_end = 0
+    sub { }     # $use_block_end = 1
+};
+
 # Most of these tests are fatal, and print data on STDERR. We therefore use
 # this testing function to run a CODEref in a child process and captures its
 # STDERR and note whether the CODE block exited
@@ -73,7 +82,7 @@ run_kid {
     warn "A warning\n";
 };
 
-my ( $linea, $lineb ) = ( $line + 2, $line + 3 );
+my ( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1 ) );
 like( $s, qr/^A warning at $file line $linea\.?:
 \tmain::__ANON__\(\) called at $file line $linekid
 \tmain::run_kid\('?CODE\(0x[0-9a-f]+\)'?\) called at $file line $lineb
@@ -85,7 +94,7 @@ run_kid {
     warn "A warning";
 };
 
-( $linea, $lineb ) = ( $line + 2, $line + 3 );
+( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1 ) );
 like( $s, qr/^A warning at $file line $linea\.?:
 \tmain::__ANON__\(\) called at $file line $linekid
 \tmain::run_kid\('?CODE\(0x[0-9a-f]+\)'?\) called at $file line $lineb
@@ -97,7 +106,7 @@ run_kid {
     die "An error\n";
 };
 
-( $linea, $lineb ) = ( $line + 2, $line + 3 );
+( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1 ) );
 like( $s, qr/^
 Unhandled perl error caught at toplevel:
 
@@ -118,7 +127,7 @@ run_kid {
     die "An error";
 };
 
-( $linea, $lineb ) = ( $line + 2, $line + 3 );
+( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1) );
 like( $s, qr/^
 Unhandled perl error caught at toplevel:
 
@@ -139,7 +148,7 @@ run_kid {
     throw Error( -text => "An exception" );
 };
 
-( $linea, $lineb ) = ( $line + 2, $line + 3 );
+( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1) );
 like( $s, qr/^
 Unhandled exception of type Error caught at toplevel:
 
@@ -188,7 +197,7 @@ run_kid {
     warn "A warning\n";
 };
 
-( $linea, $lineb ) = ( $line + 2, $line + 3 );
+( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1) );
 like( $s, qr/^My custom warning here: A warning at $file line $linea\.?:
 \tmain::__ANON__\(\) called at $file line $linekid
 \tmain::run_kid\('?CODE\(0x[0-9a-f]+\)'?\) called at $file line $lineb
@@ -201,7 +210,7 @@ run_kid {
 };
 
 my $WS = ' ';
-( $linea, $lineb ) = ( $line + 2, $line + 3 );
+( $linea, $lineb ) = ( $line + 2, $line + ( $use_block_end ? 3 : 1) );
 like( $s, qr/^My custom death here:$WS
 Unhandled perl error caught at toplevel:
 

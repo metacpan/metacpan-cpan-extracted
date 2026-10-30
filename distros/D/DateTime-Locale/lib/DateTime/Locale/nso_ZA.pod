@@ -435,6 +435,24 @@ Northern Sotho South Africa locale.
    1995-12-22T09:05:02 = AD 1995 Dis 22, Hla
   -0010-09-15T04:44:23 = BC -10 Sep 15, Mok
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Febereware
+   1995-12-22T09:05:02 = AD 1995 Disemere
+  -0010-09-15T04:44:23 = BC -10 Setemere
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Febereware 5, Bed
+   1995-12-22T09:05:02 = AD 1995 Disemere 22, Hla
+  -0010-09-15T04:44:23 = BC -10 Setemere 15, Mok
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Febereware 5
+   1995-12-22T09:05:02 = AD 1995 Disemere 22
+  -0010-09-15T04:44:23 = BC -10 Setemere 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Feb 5
@@ -506,6 +524,12 @@ Northern Sotho South Africa locale.
    2008-02-05T18:30:30 = Feb 5, Bed
    1995-12-22T09:05:02 = Dis 22, Hla
   -0010-09-15T04:44:23 = Sep 15, Mok
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Febereware 5, Bed
+   1995-12-22T09:05:02 = Disemere 22, Hla
+  -0010-09-15T04:44:23 = Setemere 15, Mok
 
 =head3 MMMMW-count-one ('beke' W 'ya' MMM)
 
@@ -620,6 +644,18 @@ Northern Sotho South Africa locale.
    2008-02-05T18:30:30 = 2008 Febereware
    1995-12-22T09:05:02 = 1995 Disemere
   -0010-09-15T04:44:23 = -10 Setemere
+
+=head3 yMMMMEd (y MMMM d, EEE)
+
+   2008-02-05T18:30:30 = 2008 Febereware 5, Bed
+   1995-12-22T09:05:02 = 1995 Disemere 22, Hla
+  -0010-09-15T04:44:23 = -10 Setemere 15, Mok
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Febereware 2008
+   1995-12-22T09:05:02 = 22 Disemere 1995
+  -0010-09-15T04:44:23 = 15 Setemere -10
 
 =head3 yMMMd (d MMM y)
 

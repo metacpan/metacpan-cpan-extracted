@@ -1,11 +1,11 @@
-# Security Policy for the Software::Security::Policy distribution.
+# Security Policy for the Hash::Util::Exists::Tiny distribution.
 
 Report security issues by email to Abdul al Hazred <451@gmx.eu>.
 
-This is the Security Policy for Software::Security::Policy.
+This is the Security Policy for Hash::Util::Exists::Tiny.
 
 The latest version of the Security Policy can be found in the
-[git repository for Software::Security::Policy](https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md).
+[git repository for Hash::Util::Exists::Tiny](https://github.com/AAHAZRED/perl-hash-util-exists-tiny/blob/main/SECURITY.md).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
 a Security Policy to Perl Distributions (version 1.3.0)
@@ -13,7 +13,7 @@ https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability
 
-Security vulnerabilities can be reported to the current Software::Security::Policy
+Security vulnerabilities can be reported to the current Hash::Util::Exists::Tiny
 maintainers by email to Abdul al Hazred <451@gmx.eu>.
 
 Please include as many details as possible, including code samples
@@ -42,7 +42,7 @@ on the CPANSec website.
 The maintainer(s) aim to acknowledge your security report as soon as
 possible.  However, this project is maintained by a single person in
 their spare time, and they cannot guarantee a rapid response.  If you
-have not received a response from them within 7 days, then
+have not received a response from them within 10 days, then
 please send a reminder to them and copy the report to CPANSec at
 <cpan-security@security.metacpan.org>.
 
@@ -59,10 +59,10 @@ They may also forward this issue to CPANSec.
 
 # Which Software This Policy Applies To
 
-Any security vulnerabilities in Software::Security::Policy are covered by this policy.
+Any security vulnerabilities in Hash::Util::Exists::Tiny are covered by this policy.
 
 Security vulnerabilities in versions of any libraries that are
-included in Software::Security::Policy are also covered by this policy.
+included in Hash::Util::Exists::Tiny are also covered by this policy.
 
 Security vulnerabilities are considered anything that allows users
 to execute unauthorised code, access unauthorised resources, or to
@@ -70,27 +70,27 @@ have an adverse impact on accessibility or performance of a system.
 
 Security vulnerabilities in upstream software (prerequisite modules
 or system libraries, or in Perl), are not covered by this policy
-unless they affect Software::Security::Policy, or Software::Security::Policy can
+unless they affect Hash::Util::Exists::Tiny, or Hash::Util::Exists::Tiny can
 be used to exploit vulnerabilities in them.
 
 Security vulnerabilities in downstream software (any software that
-uses Software::Security::Policy, or plugins to it that are not included with the
-Software::Security::Policy distribution) are not covered by this policy.
+uses Hash::Util::Exists::Tiny, or plugins to it that are not included with the
+Hash::Util::Exists::Tiny distribution) are not covered by this policy.
 
-## Supported Versions of Software::Security::Policy
+## Supported Versions of Hash::Util::Exists::Tiny
 
 The maintainer(s) will only commit to releasing security fixes for
-the latest version of Software::Security::Policy.
+the latest version of Hash::Util::Exists::Tiny.
 
-Note that the Software::Security::Policy project only supports major versions of Perl
-released in the past 10 years, even though Software::Security::Policy will run on
+Note that the Hash::Util::Exists::Tiny project only supports major versions of Perl
+released in the past 10 years, even though Hash::Util::Exists::Tiny will run on
 older versions of Perl.  If a security fix requires us to increase
 the minimum version of Perl that is supported, then we may do so.
 
 # Installation and Usage Issues
 
 The distribution metadata specifies minimum versions of
-prerequisites that are required for Software::Security::Policy to work.  However, some
+prerequisites that are required for Hash::Util::Exists::Tiny to work.  However, some
 of these prerequisites may have security vulnerabilities, and you
 should ensure that you are using up-to-date versions of these
 prerequisites.
@@ -101,4 +101,3 @@ newer versions as recommended.
 ## Usage
 
 Please see the software documentation for further information.
-

@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Test::More;
+use Capture::Tiny ();
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
@@ -94,6 +95,11 @@ sub plant {
     is( $with_ts->{updated_at}, 123, 'set_indicator keeps an explicit updated_at value' );
 
     is( $store->get_indicator('no-such-indicator'), undef, 'get_indicator returns undef for a missing indicator' );
+    my $bad_roots_error = eval { $store->_get_indicator_from_roots( 'alpha', {} ); 1 } ? '' : $@;
+    like( $bad_roots_error, qr/Indicator roots must be an array reference/,
+        '_get_indicator_from_roots rejects a malformed root inventory' );
+    is( $store->_get_indicator_from_roots( 'missing', [] ), undef,
+        '_get_indicator_from_roots returns undef for an empty root inventory' );
 }
 
 # ---------------------------------------------------------------------------
@@ -380,6 +386,21 @@ SKIP: {
     # non-array jobs -> empty result
     is_deeply( $store->sync_collectors('not-array'), [], 'sync_collectors returns empty for a non-array argument' );
     is_deeply( $store->sync_collectors( [] ), [], 'sync_collectors returns empty for an empty job list' );
+    my ( $empty_inventory_store, $empty_inventory_paths ) = fresh_store();
+    $empty_inventory_store->set_indicator( 'existing', status => 'ok' );
+    my $empty_sync_inventory = $empty_inventory_store->sync_collectors( [], return_indicators => 1 );
+    is( ref($empty_sync_inventory), 'HASH', 'sync_collectors can return an inventory for an empty job list' );
+    is_deeply(
+        [ map { $_->{name} } @{ $empty_sync_inventory->{indicators} } ],
+        ['existing'],
+        'empty-job inventory mode returns the current persisted indicators',
+    );
+    my $invalid_sync_inventory = $empty_inventory_store->sync_collectors( 'not-array', return_indicators => 1 );
+    is_deeply(
+        [ map { $_->{name} } @{ $invalid_sync_inventory->{indicators} } ],
+        ['existing'],
+        'invalid-job inventory mode also returns the current persisted indicators',
+    );
 
     # happy write path
     my ( $s, $p ) = fresh_store();
@@ -389,19 +410,28 @@ SKIP: {
     is( ref($written), 'ARRAY', 'sync_collectors returns an array reference of written indicators' );
     ok( scalar(@$written) >= 1, 'sync_collectors writes the collector-declared indicator' );
     is( $s->get_indicator('live')->{managed_by_collector}, 1, 'sync_collectors marks the indicator as collector-managed' );
+    my $synced_inventory = $s->sync_collectors(
+        [ { name => 'live', indicator => { name => 'live', label => 'Live' } } ],
+        return_indicators => 1,
+    );
+    is( ref($synced_inventory), 'HASH', 'inventory mode returns written and final indicator arrays' );
+    is_deeply( [ map { $_->{name} } @{ $synced_inventory->{indicators} } ], ['live'],
+        'inventory mode includes active collector indicator state' );
 
     # filtered jobs: non-hash, hash-indicator with empty name, disabled
     my ( $s2, $p2 ) = fresh_store();
-    my $w2 = $s2->sync_collectors(
-        [
+    my $filtered_jobs = [
             'not-a-hash',
             { indicator => {}, name => undef },
             { indicator => {}, name => '' },
             { indicator => {}, name => 'dis', disable => 1 },
             { indicator => 'not-a-hash', name => 'noind' },
-        ]
-    );
+        ];
+    my $w2 = $s2->sync_collectors($filtered_jobs);
     is_deeply( $w2, [], 'sync_collectors skips malformed and disabled jobs without writing' );
+    my $filtered_inventory = $s2->sync_collectors( $filtered_jobs, return_indicators => 1 );
+    is( ref($filtered_inventory), 'HASH',
+        'sync_collectors reuses a stable inventory while skipping malformed collector indicators' );
 
     # second loop: a single corrupt (array) indicator is skipped as a non-hash
     my ( $s3, $p3 ) = fresh_store();
@@ -415,8 +445,11 @@ SKIP: {
     plant( $root4, 'ghost',    { managed_by_collector => 1, collector_name => 'gonecollector', status => 'ok', name => 'ghost', priority => 2 } );
     plant( $root4, 'nameless', { managed_by_collector => 1, collector_name => '', status => 'ok', name => 'nameless', priority => 1 } );
     plant( $root4, 'plain',    { managed_by_collector => 0, status => 'ok', name => 'plain', priority => 3 } );
-    my $w4 = $s4->sync_collectors( [ { indicator => {}, name => '' } ] );
-    my %deleted = map { $_->{name} => 1 } grep { $_->{deleted} } @$w4;
+    my $w4 = $s4->sync_collectors( [ { indicator => {}, name => '' } ], return_indicators => 1 );
+    is( ref($w4), 'HASH', 'inventory mode remains available when orphan cleanup runs' );
+    is_deeply( [ map { $_->{name} } @{ $w4->{indicators} } ], [ 'nameless', 'plain' ],
+        'inventory after orphan cleanup excludes deleted records and keeps remaining indicators' );
+    my %deleted = map { $_->{name} => 1 } grep { $_->{deleted} } @{ $w4->{written} };
     ok( $deleted{ghost}, 'sync_collectors deletes an indicator whose collector is no longer active' );
     ok( !$deleted{nameless}, 'sync_collectors leaves a managed indicator with a blank collector name alone' );
     is( $s4->get_indicator('ghost'), undef, 'sync_collectors physically removes the orphaned indicator' );
@@ -730,6 +763,104 @@ sub run_plan {
     is( $list[0]{name}, 'coll-b', 'list_indicators orders by priority then collector order' );
     is( $list[1]{name}, 'coll-a', 'list_indicators keeps collector order within a priority tier' );
 
+    my $root_discovery_calls = 0;
+    my $indicators_roots = \&Developer::Dashboard::PathRegistry::indicators_roots;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::indicators_roots = sub {
+            $root_discovery_calls++;
+            return $indicators_roots->(@_);
+        };
+        my @listed = $s->list_indicators;
+        is( scalar(@listed), 4, 'root reuse still returns every status record' );
+    }
+    is( $root_discovery_calls, 1,
+        'list_indicators discovers its ordered runtime roots once per listing call' );
+
+    for my $index ( 1 .. 40 ) {
+        $s->set_indicator(
+            sprintf( 'bulk-%03d', $index ),
+            status               => 'ok',
+            priority             => $index % 7 ? $index % 5 : undef,
+            managed_by_collector => $index % 3 ? 0 : 1,
+            ( $index % 2 ? ( collector_order => $index % 4 ) : () ),
+        );
+    }
+    my @before_bulk = $s->list_indicators;
+    my @expected_bulk = sort { $s->_indicator_sort_cmp( $a, $b ) } @before_bulk;
+    is_deeply(
+        [ $s->_sort_indicators(@before_bulk) ],
+        \@expected_bulk,
+        'precomputed sort keys preserve the reference comparator for one identical input list',
+    );
+    my $sort_comparator_calls = 0;
+    my $original_sort_comparator = \&Developer::Dashboard::IndicatorStore::_indicator_sort_cmp;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::_indicator_sort_cmp = sub {
+            $sort_comparator_calls++;
+            return $original_sort_comparator->(@_);
+        };
+        my @bulk = $s->list_indicators;
+        is_deeply(
+            [ sort map { $_->{name} } @bulk ],
+            [ sort map { $_->{name} } @expected_bulk ],
+            'large indicator listing still returns every persisted record',
+        );
+    }
+    is( $sort_comparator_calls, 0,
+        'large indicator listing avoids repeated indicator-sort method dispatch' );
+
+    my @collector_sort_input = map {
+        {
+            name                 => sprintf( 'collector-sort-%02d', 40 - $_ ),
+            priority             => 1,
+            managed_by_collector => 1,
+            collector_order      => int( $_ / 2 ),
+        }
+    } 1 .. 40;
+    my @collector_sort_expected = sort { $s->_indicator_sort_cmp( $a, $b ) } @collector_sort_input;
+    is_deeply(
+        [ $s->_sort_indicators(@collector_sort_input) ],
+        \@collector_sort_expected,
+        'large collector-only lists preserve collector-order and name tie breaking',
+    );
+    my $field_compare = \&Developer::Dashboard::IndicatorStore::_indicator_sort_order_cmp;
+    is( $field_compare->( [ undef, 1, 0, 999, 'a' ], [ undef, 2, 0, 999, 'z' ] ), -1,
+        'decorated comparator orders different priorities first' );
+    is( $field_compare->( [ undef, 1, 1, 1, 'z' ], [ undef, 1, 1, 2, 'a' ] ), -1,
+        'decorated comparator orders two collectors by configured order' );
+    is( $field_compare->( [ undef, 1, 1, 1, 'a' ], [ undef, 1, 1, 1, 'b' ] ), -1,
+        'decorated comparator uses names when collector order ties' );
+    is( $field_compare->( [ undef, 1, 1, 1, 'a' ], [ undef, 1, 0, 1, 'b' ] ), -1,
+        'decorated comparator uses names for collector/non-collector pairs' );
+    is( $field_compare->( [ undef, 1, 0, 1, 'a' ], [ undef, 1, 0, 1, 'b' ] ), -1,
+        'decorated comparator uses names for non-collector pairs' );
+    my @name_fallback_input = map {
+        {
+            name                 => $_ == 1 ? undef : sprintf( 'name-sort-%02d', 40 - $_ ),
+            priority             => 1,
+            managed_by_collector => 0,
+        }
+    } 1 .. 40;
+    my @name_fallback_expected = sort { $s->_indicator_sort_cmp( $a, $b ) } @name_fallback_input;
+    is_deeply(
+        [ $s->_sort_indicators(@name_fallback_input) ],
+        \@name_fallback_expected,
+        'large decorated sort preserves the empty-name fallback',
+    );
+
+    my ( $layered, $layered_paths, $deep_root, $home_root ) = two_layer_store();
+    plant( $deep_root, 'same', { status => 'local', priority => 10, name => 'same' } );
+    plant( $home_root, 'same', { status => 'inherited', priority => 20, name => 'same' } );
+    plant( $home_root, 'home-only', { status => 'home', priority => 30, name => 'home-only' } );
+    my @layered_items = $layered->list_indicators;
+    my %layered_by_name = map { $_->{name} => $_ } @layered_items;
+    is( $layered_by_name{same}{status}, 'local',
+        'list_indicators keeps the deepest runtime layer as the winning record' );
+    is( $layered_by_name{'home-only'}{status}, 'home',
+        'list_indicators still finds records that exist only in inherited layers' );
+
     # equal priority + falsy names -> name comparator right-hand fallbacks
     my ( $s2, $p2 ) = fresh_store();
     my ($root2) = $p2->indicators_roots;
@@ -864,7 +995,7 @@ sub run_plan {
         my ($s) = fresh_store();
         no warnings 'redefine';
         local *Developer::Dashboard::PathRegistry::project_root_for = sub { return $gitproj };
-        local *Developer::Dashboard::IndicatorStore::capture = sub (&) { return ( "false\n", '', 0 ) };
+        local *Capture::Tiny::capture = sub (&) { return ( "false\n", '', 0 ) };
         my $items = $s->refresh_core_indicators;
         my %by = map { $_->{name} => $_ } @$items;
         is( $by{git}{status}, 'none', 'refresh_core_indicators keeps git status none when the tree is not a work tree' );
@@ -875,7 +1006,7 @@ sub run_plan {
         my ($s) = fresh_store();
         no warnings 'redefine';
         local *Developer::Dashboard::PathRegistry::project_root_for = sub { return $gitproj };
-        local *Developer::Dashboard::IndicatorStore::capture = sub (&) { return ( '', 'boom', 128 ) };
+        local *Capture::Tiny::capture = sub (&) { return ( '', 'boom', 128 ) };
         my $items = $s->refresh_core_indicators;
         my %by = map { $_->{name} => $_ } @$items;
         is( $by{git}{status}, 'none', 'refresh_core_indicators keeps git status none when git rev-parse fails' );
@@ -895,8 +1026,8 @@ sub run_plan {
         my ($s) = fresh_store();
         no warnings 'redefine';
         local *Developer::Dashboard::PathRegistry::project_root_for = sub { return $gitproj };
-        local *Developer::Dashboard::IndicatorStore::cwd     = sub { return File::Spec->catdir( $home, 'vanished-old-cwd' ) };
-        local *Developer::Dashboard::IndicatorStore::capture = sub (&) { return ( "false\n", '', 0 ) };
+        local *Developer::Dashboard::IndicatorStore::current_working_directory = sub { return File::Spec->catdir( $home, 'vanished-old-cwd' ) };
+        local *Capture::Tiny::capture = sub (&) { return ( "false\n", '', 0 ) };
         my $err = eval { $s->refresh_core_indicators; 1 } ? '' : $@;
         like( $err, qr/Unable to restore cwd/, 'refresh_core_indicators dies when it cannot restore the original directory' );
         chdir $home or die "Unable to restore test cwd: $!";
@@ -911,7 +1042,7 @@ sub run_plan {
         my ($s) = fresh_store();
         no warnings 'redefine';
         local *Developer::Dashboard::PathRegistry::project_root_for = sub { return $gitproj };
-        local *Developer::Dashboard::IndicatorStore::capture = sub (&) { die "boom: simulated capture failure\n" };
+        local *Capture::Tiny::capture = sub (&) { die "boom: simulated capture failure\n" };
         my $before = Cwd::cwd();
         my $err = eval { $s->refresh_core_indicators; 1 } ? '' : $@;
         like( $err, qr/boom: simulated capture failure/,
@@ -1059,6 +1190,11 @@ This test is the executable coverage contract for
 C<Developer::Dashboard::IndicatorStore>. It exercises every persistence,
 resolution, collector-sync, healing, ordering, and core-refresh branch of the
 indicator store so the module holds at 100% on all four Devel::Cover metrics.
+Its large-list test compares the optimized decorated-key sort with the shared
+comparator on identical input, exercises collector-only ordering ties, and
+verifies that large inventories avoid repeated comparator method dispatch.
+Direct tuple-comparator cases cover priority, collector-order, and name
+fallback outcomes so each short-circuit is deterministic.
 
 =head1 WHY IT EXISTS
 

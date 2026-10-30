@@ -72,7 +72,7 @@ subtest '/clear, /metrics, /stats' => sub {
   $cmds->dispatch('/metrics');
   like($read->(), qr/^raids=0 iterations=0 tool_calls=0 time_ms=\d+\n\z/, '/metrics');
   $cmds->dispatch('/stats');
-  like($read->(), qr/^stats unavailable \(trace is off/, '/stats without trace');
+  is($read->(), "no model calls yet.\n", '/stats without model calls, trace off or on');
 };
 
 subtest '/reload names where the mission comes from' => sub {

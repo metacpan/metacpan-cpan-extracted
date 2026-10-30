@@ -1,5 +1,5 @@
 package Langertha::Raider::Packs::Pack;
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 # ABSTRACT: A single raider pack - persona or power bundle
 
 
@@ -38,7 +38,7 @@ Langertha::Raider::Packs::Pack - A single raider pack - persona or power bundle
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 DESCRIPTION
 
@@ -57,7 +57,7 @@ C<env> (C<$RAIDER_PACK_DIRS>); see L<Langertha::Raider::Packs/build_packs>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -78,5 +78,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

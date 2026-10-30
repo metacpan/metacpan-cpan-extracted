@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# -07 §14.2: "errors in a JSON object specifying Recipes should be
+# -08 §14.2: "errors in a JSON object specifying Recipes should be
 # called out specifically" -- a malformed r= payload must produce
 #   PERMERROR: Message-Instance m=<x> contains invalid JSON
 # distinct from a generic syntax error.
@@ -21,21 +21,21 @@ use DKIM2TestKeys;
 
 eval {
     my $bad_r = encode_base64('{"h": ', '');
-    Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$bad_r;");
+    Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$bad_r;");
 };
 like($@, qr/^PERMERROR: Message-Instance m=2 contains invalid JSON/,
-     '-07 §14.2: MessageInstance::parse dies with the exact PERMERROR string on malformed r= JSON');
+     '-08 §14.2: MessageInstance::parse dies with the exact PERMERROR string on malformed r= JSON');
 
-# -07 section 5's schema requires "h" or "b": an empty object is invalid.
+# -08 section 5's schema requires "h" or "b": an empty object is invalid.
 eval {
     my $empty_r = encode_base64('{}', '');
-    Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$empty_r;");
+    Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$empty_r;");
 };
 is($@, "PERMERROR: Message-Instance m=2 contains invalid JSON\n",
     'an empty recipe object is invalid JSON');
 ok(eval {
     my $ok_r = encode_base64('{"b":null,"x":1}', '');
-    Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$ok_r;");
+    Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$ok_r;");
     1;
 }, 'an unknown top-level key is ignored');
 
@@ -47,27 +47,27 @@ for my $json ('{"b":[{"c":[1,1]}],"b":null}', '{"b":null,"b":[{"c":[1,1]}]}',
               '{"h":{"subject":[{"d":["a"]}],"subj\\u0065ct":[]}}') {
     eval {
         my $r = encode_base64($json, '');
-        Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAA:BBB; r=$r;");
+        Mail::DKIM2::MessageInstance->parse("m=2; h=sha256:AAAA:BBBB; r=$r;");
     };
     is($@, "PERMERROR: Message-Instance m=2 contains invalid JSON\n",
        "duplicate key is invalid JSON: $json");
 }
 ok(eval {
-    Mail::DKIM2::MessageInstance->parse('m=2; h=sha256:AAA:BBB; r='
+    Mail::DKIM2::MessageInstance->parse('m=2; h=sha256:AAAA:BBBB; r='
         . encode_base64('{"h":{"subject":[{"d":["b"]}],"to":[]},"b":[{"d":["b"]}]}', '') . ';');
     1;
 }, 'the same key in different objects (and "b" inside a step) is fine') or diag($@);
 
-# -07 §14.2 ruling: a bad base64 r= value is a DIFFERENT error from a
+# -08 §14.2 ruling: a bad base64 r= value is a DIFFERENT error from a
 # JSON parse failure -- "syntax error", not "contains invalid JSON". "!!!!"
 # is not valid base64 (decode_base64() is lenient and would otherwise just
 # drop the invalid characters and decode to garbage that happens to also
 # fail JSON parsing, mislabelling the error as JSON).
 eval {
-    Mail::DKIM2::MessageInstance->parse('m=5; h=sha256:AAA:BBB; r=!!!!;');
+    Mail::DKIM2::MessageInstance->parse('m=5; h=sha256:AAAA:BBBB; r=!!!!;');
 };
 is($@, "PERMERROR: Message-Instance m=5 syntax error\n",
-   '-07 §14.2: bad base64 r= is a syntax error, exact string, distinct from invalid JSON');
+   '-08 §14.2: bad base64 r= is a syntax error, exact string, distinct from invalid JSON');
 unlike($@, qr/invalid JSON/,
    'bad base64 is never mislabelled as invalid JSON');
 
@@ -164,7 +164,7 @@ is($v->result, 'permerror',
 is($v->details, 'PERMERROR: Message-Instance m=2 contains invalid JSON',
      'end-to-end: the specific §11.2 invalid-JSON message reaches the caller, verbatim');
 
-# --- -07 §12.1: the BOTTOM (m=1) instance may carry Recipes too, and    --
+# --- -08 §12.1: the BOTTOM (m=1) instance may carry Recipes too, and    --
 # --- never participates in the undo/reconstruction that a non-bottom      --
 # --- instance's r= is used for -- so it needs its own, separate check.    --
 # --- A single-instance (m=1 only) message, hand-signed the same way as    --

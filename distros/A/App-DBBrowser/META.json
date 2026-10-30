@@ -57,11 +57,11 @@
             "Storable" : "0",
             "String::Substitution" : "0",
             "String::Unescape" : "0",
-            "Term::Choose" : "1.782",
+            "Term::Choose" : "1.783",
             "Term::Choose::Util" : "0.148",
             "Term::Form" : "0.563",
             "Term::Form::ReadLine" : "0.563",
-            "Term::TablePrint" : "0.182",
+            "Term::TablePrint" : "0.183",
             "Text::CSV_XS" : "0",
             "bytes" : "0",
             "open" : "0",
@@ -82,6 +82,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.444",
+   "version" : "2.445",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

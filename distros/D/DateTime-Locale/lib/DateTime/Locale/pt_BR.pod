@@ -435,6 +435,24 @@ Portuguese Brazil locale.
    1995-12-22T09:05:02 = sex., 22 de dez. de 1995 d.C.
   -0010-09-15T04:44:23 = sáb., 15 de set. de -10 a.C.
 
+=head3 GyMMMM (MMMM 'de' Y G)
+
+   2008-02-05T18:30:30 = fevereiro de 2008 d.C.
+   1995-12-22T09:05:02 = dezembro de 1995 d.C.
+  -0010-09-15T04:44:23 = setembro de -10 a.C.
+
+=head3 GyMMMMEd (E, d 'de' MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = ter., 5 de fevereiro de 2008 d.C.
+   1995-12-22T09:05:02 = sex., 22 de dezembro de 1995 d.C.
+  -0010-09-15T04:44:23 = sáb., 15 de setembro de -10 a.C.
+
+=head3 GyMMMMd (d 'de' MMMM 'de' y G)
+
+   2008-02-05T18:30:30 = 5 de fevereiro de 2008 d.C.
+   1995-12-22T09:05:02 = 22 de dezembro de 1995 d.C.
+  -0010-09-15T04:44:23 = 15 de setembro de -10 a.C.
+
 =head3 GyMMMd (d 'de' MMM 'de' y G)
 
    2008-02-05T18:30:30 = 5 de fev. de 2008 d.C.

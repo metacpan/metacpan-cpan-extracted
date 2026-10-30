@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Logs::LoggerProvider;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 class OpenTelemetry::SDK::Logs::LoggerProvider
     :isa(OpenTelemetry::Logs::LoggerProvider)

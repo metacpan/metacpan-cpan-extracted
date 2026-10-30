@@ -4,378 +4,172 @@
 
 =head1 NAME
 
-Acme::Parataxis::Sync::WaitGroup - Count outstanding jobs and wait for the count to reach zero
+Acme::Parataxis::Sync::WaitGroup - Coordinate Completion of Multiple Concurrent Fibers
 
 =head1 SYNOPSIS
 
     use v5.40;
-    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis qw[async fiber await_sleep];
     use Acme::Parataxis::Sync::WaitGroup;
+
     my $wg = Acme::Parataxis::Sync::WaitGroup->new;
+
     async {
-        $wg->add(3);                            # three jobs about to start
-        my @jobs = map {
+        # Register 3 tasks before spawning:
+        $wg->add(3);
+
+        for my $id ( 1 .. 3 ) {
             fiber {
-                my $id = $_;
-                say "job $id running";
-                $wg->done;                      # one done per add, exactly once
-            }
-        } 1 .. 3;
-        $wg->wait;                              # parks until the count is back to zero
-        $_->await for @jobs;
-        say 'every job has reported, count is ', $wg->count;
+                say "Task $id running...";
+                await_sleep(50);
+                $wg->done;    # decrement counter
+            };
+        }
+
+        say "Waiting for all tasks to finish...";
+        $wg->wait;            # parks until counter hits 0
+        say "All tasks complete!";
     };
-    # job 1 running
-    # job 2 running
-    # job 3 running
-    # every job has reported, count is 0
 
 =head1 DESCRIPTION
 
-A counter shared between fibers. C<add( $n )> puts B<n> units on it, C<done> takes one off, and C<wait> parks the
-calling fiber until nothing is left outstanding. It is the fan-in half of fan-out: start N fibers, have each report
-when it finishes, and wait for the reports rather than for the fibers.
+An C<Acme::Parataxis::Sync::WaitGroup> coordinates the completion of multiple asynchronous tasks, providing the fan-in
+half of a fan-out/fan-in concurrency pattern.
 
-The group holds no job state and knows no jobs at all. It is a number, and C<done> is a decrement - which is worth
-keeping in mind, because it means the group cannot tell whether the reports it received are the ones it was waiting
-for. A job that dies without reporting leaves its unit on the counter forever, and no later C<wait> returns. L</"A job
-that dies without done"> is the failure mode to design around.
+The group maintains an integer counter:
 
-The counter is not a queue and the group does not order anything. Two fibers that call C<done> at the same moment are
-both accepted; what matters is only that the total reaches zero, not who got there first.
+=over
+
+=item * C<add($n)> increments the counter by C<$n>.
+
+=item * C<done()> decrements the counter by C<1>.
+
+=item * C<wait()> parks the calling fiber until the counter drops to C<0>.
+
+=back
+
+WaitGroups do not track fibers or job handles; they track a numeric tally. This keeps the primitive lightweight and
+fast, but requires callers to ensure that every C<add> is matched by exactly one C<done>.
 
 =head1 METHODS
 
-=head2 C<new( [ count => $n ] )>
+=head2 C<new( [ count =E<gt> $n = 0 ] )>
 
-    use v5.40;
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $fresh = Acme::Parataxis::Sync::WaitGroup->new;
-    say 'a new group: count ', $fresh->count, ', waiters ', $fresh->waiters;
-    my $primed = Acme::Parataxis::Sync::WaitGroup->new( count => 3 );
-    say 'a primed one: count ', $primed->count;
-    # a new group: count 0, waiters 0
-    # a primed one: count 3
+    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
+    my $primed = Acme::Parataxis::Sync::WaitGroup->new( count => 5 );
 
-Creates a group. The only parameter is C<count>, which primes the counter and defaults to 0. Any other key croaks with
-C<Unrecognized parameters for "Acme::Parataxis::Sync::WaitGroup" constructor> - including C<remaining>, which is a
-reader but not a parameter.
+Constructs a new WaitGroup with an initial counter of C<$n> (default C<0>).
 
 =head2 C<add( $n )>
 
-    use v5.40;
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
-    say 'add(3): ', $wg->add(3), ', count now ', $wg->count;
-    say 'add(0): ', $wg->add(0), ', count still ', $wg->count;
-    for my $n ( 2.5, 'x' ) {
-        my $trial = Acme::Parataxis::Sync::WaitGroup->new( count => 4 );
-        say "add('$n'): ", ( eval { $trial->add($n); 'ok' } || 'croaks' ), ', count still ', $trial->count;
-    }
-    # add(3): 1, count now 3
-    # add(0): 1, count still 3
-    # add('2.5'): croaks, count still 4
-    # add('x'): croaks, count still 4
+    $wg->add(4);
 
-Adds C<$n> to the counter and returns true. The argument is checked by string, against C</\A-?\d+\z/>, so an integer
-written as a number, as a string, or as a float that happens to have no fractional part is all accepted, while a real
-fraction is not. A reference, C<undef> and anything non-numeric croak with C<WaitGroup add() requires an integer>, and
-the counter is left alone.
+Adds C<$n> to the counter and returns true. C<$n> must be an integer string or number (matches C</\A-?\d+\z/>).
+Negative numbers are supported.
 
-C<$n> may be negative, which is how C<done> is implemented. A C<$n> that would take the counter below zero croaks with
-C<WaitGroup counter would become negative> - but see L</"A croaking done still moves the counter"> for what the counter
-reads afterwards.
+=over
+
+=item * Croaks with C<WaitGroup add() requires an integer> if C<$n> is invalid or non-numeric.
+
+=item * Croaks with C<WaitGroup counter would become negative> if adding C<$n> drives the counter below zero.
+
+=item * If the counter transitions to C<0>, all fibers currently parked in C<wait()> are unblocked immediately.
+
+=back
+
+Safe to call outside a scheduled fiber.
 
 =head2 C<done( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
-    async {
-        $wg->add( 1 );
-        say 'done: ', $wg->done, ', count now ', $wg->count;
-        say 'one too many: ', ( eval { $wg->done; 'ok' } || 'croaks' );
-    };
-    # done: 1, count now 0
-    # one too many: croaks
+    $wg->done;
 
-Removes one unit and returns true. It is exactly C<< add(-1) >>, with the same validation and the same return value,
-and it needs a fiber no more than C<add> does - both work off a scheduled fiber.
+Decrements the counter by 1. Equivalent to C<< $wg->add(-1) >>. Safe to call outside a scheduled fiber.
 
 =head2 C<wait( )>
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new( count => 1 );
-    async {
-        my $slow = fiber { await_sleep( 50 ); $wg->done };
-        say 'parking on a count of ', $wg->count;
-        $wg->wait;
-        say 'woken, and the count reads ', $wg->count;
-        $slow->await;
-    };
-    # parking on a count of 1
-    # woken, and the count reads 0
+    $wg->wait;
 
-Parks the calling fiber until the counter reaches zero, then returns true. Called on a group whose count is already
-zero it returns immediately without parking, so a C<wait> is never a way to find out whether work is outstanding -
-check C<remaining> for that. Called off a scheduled fiber it croaks with C<WaitGroup waits must occur inside a
-scheduled fiber>.
+Parks the calling fiber until the counter reaches C<0>. If the counter is already C<0>, returns true immediately
+without parking.
 
-A C<wait> is interruptible, and an interrupted one gives up its place in the queue, leaving the group itself untouched
-and usable. See L</"Waiting with a deadline">.
+Must be called from within a scheduled fiber (croaks otherwise). Bounded waits are supported via
+L<with_timeout|Acme::Parataxis/with_timeout>.
 
-=head2 C<count> and C<remaining>
+=head2 C<count( )> / C<remaining( )>
 
-    use v5.40;
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new( count => 2 );
-    say 'count: ', $wg->count, ', remaining: ', $wg->remaining;
-    $wg->done;
-    say 'after one done: count ', $wg->count, ', remaining ', $wg->remaining;
-    # count: 2, remaining: 2
-    # after one done: count 1, remaining 1
+Returns the current value of the counter. C<remaining> is an alias. Both work outside of scheduled fibers.
 
-The same number, twice over. C<count> is the counter field, and C<remaining> is an ordinary method that returns it, so
-the two can never disagree. Pick whichever reads better at the call site: C<count> when you are thinking about the
-arithmetic, C<remaining> when you are thinking about how much is left.
+=head2 C<waiters( )>
 
-Both are readers, so they work off a scheduled fiber as well as on one, and neither croaks.
-
-=head2 C<waiters>
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new( count => 1 );
-    async {
-        my @ws = map { fiber { $wg->wait } } 1 .. 3;
-        await_sleep( 10 );
-        say 'parked in wait: ', $wg->waiters;
-        $wg->done;
-        $_->await for @ws;
-        say 'once the count reached zero: ', $wg->waiters;
-    };
-    # parked in wait: 3
-    # once the count reached zero: 0
-
-How many fibers are currently parked in C<wait>. The count drops to zero the moment the last unit is taken off, before
-any of those fibers has run again, so this reads as a queue depth rather than as a list of fibers still to finish. It
-is a plain method and works off a fiber.
-
-=head1 How It Works
-
-The state is one integer and one array of fiber ids. The integer is the counter; the array is the fibers parked in
-C<wait>, in the order they arrived.
-
-Three methods do all the work. C<add> moves the counter and, if that landed it on zero, calls the private C<_release>,
-which empties the queue and wakes every fiber in it at once. C<wait> pushes the calling fiber's id and parks it.
-C<done> is C<< add(-1) >>, so it goes through the same release check and needs no code of its own.
-
-C<wait> is a loop rather than a single park, and that is the one detail worth knowing. A fiber released from C<wait>
-does not simply return: it re-tests the counter, and if anything has been added since the release it pushes its id back
-on the queue and parks again. C<wait> therefore means "wait until the count is zero", not "wait until the next time the
-count is zero" - which is the guarantee you want when a job can add more jobs as it runs.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new( count => 1 );
-    async {
-        my $w = fiber { $wg->wait };
-        await_sleep( 10 );
-        say 'parked, and the count is ', $wg->count;
-        $wg->add( 2 );
-        $wg->done for 1 .. 2;
-        await_sleep( 10 );
-        say 'back to ', $wg->count . ', but the waiter is still parked: ', $wg->waiters;
-        $wg->done;
-        $w->await;
-        say 'and now it is through, at ', $wg->waiters;
-    };
-    # parked, and the count is 1
-    # back to 1, but the waiter is still parked: 1
-    # and now it is through, at 0
-
-The park is registered with a cleanup closure that pulls the fiber's id back out of the queue, so a C<wait> that is cut
-short by a deadline or a cancellation does not leave a stale id behind for the next release to wake.
+Returns the number of fibers currently parked in C<wait()>.
 
 =head1 Recipes
 
-=head2 Fan out, then fan in
+=head2 Safe fan-out with guaranteed completion
 
-The shape to reach for. Count the jobs before starting them, let each report when it finishes, and wait for the count.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
-    my @squares;
-    async {
-        $wg->add(4);                             # before the jobs, always
-        my @jobs = map {
-            fiber {
-                my $id = $_;
-                await_sleep( 10 );
-                push @squares, $id * $id;
-                $wg->done;
-            }
-        } 1 .. 4;
-        $wg->wait;
-        say 'the squares came back ', join ', ', ( sort { $a <=> $b } @squares );
-    };
-    # the squares came back 1, 4, 9, 16
-
-The C<add> comes first deliberately. See L</"Add before you spawn"> for what happens when it does not.
-
-=head2 A job that cannot strand the group
-
-C<done> in the same place on every path out of the job, so a failure still reports. The C<eval> is what makes that
-possible: it turns the job's own failure into a value, so the reporting line is reached either way.
+To prevent jobs from stranding the group if an exception occurs, wrap the task in an C<eval> or C<defer>:
 
     use v5.40;
+    use experimental 'defer';
     use Acme::Parataxis qw[async fiber];
     use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
-    my @outcomes;
+
     async {
-        my @jobs = map {
+        my $wg = Acme::Parataxis::Sync::WaitGroup->new;
+        $wg->add( scalar @items );
+
+        for my $item (@items) {
             fiber {
-                my $id = $_;
-                $wg->add( 1 );
-                my $ok = eval { die "job $id failed\n" if $id == 3; 1 };
-                $wg->done;                       # always, failure or not
-                push @outcomes, $id . ( $ok ? ' ok' : ' failed' );
-            }
-        } 1 .. 4;
+                defer { $wg->done };    # always decrements, even if process_item dies!
+                process_item($item);
+            };
+        }
+
         $wg->wait;
-        say join( ', ', sort @outcomes ), ' and the count is back to ', $wg->count;
     };
-    # 1 ok, 2 ok, 3 failed, 4 ok and the count is back to 0
 
-Note the C<add> inside the job rather than before it. That is what makes the group safe to add to while it is already
-being waited on: a job that registers itself is counted before it can finish, so there is no window in which a fast job
-reports against a counter that does not know about it yet.
+=head2 Dynamic task registration
 
-=head2 Waiting with a deadline
+A running task can increment the WaitGroup to enroll sub-tasks dynamically:
 
-A C<wait> is an ordinary interruptible wait, so C<with_timeout( $ms, ... )> bounds it. The waiter gives up its place in
-the queue on the way out, and the group stays usable - which matters, because the jobs it was waiting for are still
-running and will still report.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
-    async {
-        $wg->add( 1 );
-        fiber { await_sleep( 300 ); $wg->done };
-        eval { Acme::Parataxis::with_timeout( 30, sub { $wg->wait } ) };
-        my $why = $@ ? ( $@->message =~ s/ at .*//sr ) : 'it returned';
-        say "the fan-in gave up: $why";
-        say 'the group is still usable, and the count reads ', $wg->count;
-    };
-    # the fan-in gave up: The operation timed out
-    # the group is still usable, and the count reads 1
+    sub worker ($wg, $task) {
+        if ( my @subtasks = split_work($task) ) {
+            $wg->add( scalar @subtasks );    # add subtasks before spawning
+            for my $st (@subtasks) {
+                fiber { worker($wg, $st) };
+            }
+        }
+        $wg->done;
+    }
 
 =head1 Behavior Notes
 
-=head2 Add before you spawn
+=over
 
-C<add> and the jobs it counts have to be ordered, and only one order is safe. A job that calls C<done> before the
-matching C<add> lands drives the counter below zero and croaks, and the C<add> that follows then lands on a counter
-that has already been thrown off by the amount.
+=item * Add before spawn
 
-    use v5.40;
-    use Acme::Parataxis qw[async fiber];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $late = Acme::Parataxis::Sync::WaitGroup->new;
-    my @after;
-    async {
-        my @jobs = map { fiber { push @after, ( eval { $late->done; 'ok' } || 'croaked' ) } } 1 .. 2;
-        $late->add( scalar @jobs );
-        $_->await for @jobs;
-        say 'counted after spawning: ', join( ', ', @after ), ', ending at ', $late->count;
-    };
-    # counted after spawning: croaked, croaked, ending at 0
+Always call C<< $wg->add() >> B<before> spawning the child fiber. If you call C<add> inside the spawned fiber, the
+calling fiber might reach C<wait()> while the counter is still C<0>, causing C<wait()> to return immediately before the
+children have even begun.
 
-The ending count of 0 looks like success, and it is the arithmetic of two croaked calls rather than two reports. Count
-first - either C<< $wg->add( scalar @jobs ) >> on a list of handles you have already built, or C<< $wg->add(1) >> as
-the first line of each job, which is the form L</"A job that cannot strand the group"> uses.
+=item * Counter underflows
 
-=head2 A croaking done still moves the counter
+Calling C<done()> more times than C<add()> throws an exception. Crucially, C<add()> decrements the counter I<before>
+checking the bounds, so a croaked C<done()> leaves the counter negative. A negative counter causes future C<wait()>
+calls to return immediately without waiting. Avoid this by matching counts carefully.
 
-C<add> adjusts the counter and B<then> checks it, so a C<done> that croaks for want of a matching C<add> has already
-taken its unit off. The croak tells you the call was wrong; it does not undo it.
+=item * Re-checking on wake
 
-    use v5.40;
-    use Acme::Parataxis qw[async];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new( count => 1 );
-    async {
-        eval { $wg->done; $wg->done };
-        say 'the second done croaked, and the count reads ', $wg->count;
-    };
-    # the second done croaked, and the count reads -1
+C<wait()> re-checks C<count> in a loop upon waking. If a waking fiber is unblocked when C<count == 0>, but a concurrent
+fiber immediately calls C<< $wg->add(2) >> before the waiter resumes, the waiter detects the positive count and
+re-parks automatically until zero is reached again.
 
-The consequence is worse than the wrong number. C<wait> parks only while the count is B<above> zero, so a counter that
-has been driven negative makes every later C<wait> return at once - the group reports success while jobs are still
-running, and no amount of waiting will catch up.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new( count => 2 );
-    async {
-        eval { $wg->done; $wg->done; $wg->done };     # one more than there was
-        say 'the counter now reads ', $wg->count;
-        my $stray = fiber { await_sleep( 20 ); eval { $wg->done; 1 } };
-        $wg->wait;
-        say 'and wait returned at once, with the job still running';
-        $stray->await;
-    };
-    # the counter now reads -1
-    # and wait returned at once, with the job still running
-
-So a negative count is not something to test for at the call site; it is something to avoid by counting before
-spawning. If you are picking a group up from code you do not control, C<remaining> reading below zero is the signal
-that its accounting has already gone wrong.
-
-=head2 A job that dies without done
-
-C<done> is a line of code, and nothing calls it for you. A job that returns early, takes an exception that escapes, or
-is torn down mid-flight leaves its unit on the counter, and because C<wait> is a loop rather than a single park,
-nothing will ever satisfy it.
-
-    use v5.40;
-    use Acme::Parataxis qw[async fiber await_sleep];
-    use Acme::Parataxis::Sync::WaitGroup;
-    my $wg = Acme::Parataxis::Sync::WaitGroup->new;
-    async {
-        $wg->add( 2 );
-        fiber { $wg->done };
-        fiber { eval { die "the job blew up\n" }; 1 };
-        await_sleep( 20 );
-        say 'both jobs have finished, yet the count is ', $wg->count;
-        eval { Acme::Parataxis::with_timeout( 20, sub { $wg->wait } ) };
-        say 'so waiting gives: ', ( $@ ? ( $@->message =~ s/ at .*//sr ) : 'it returned' );
-    };
-    # both jobs have finished, yet the count is 1
-    # so waiting gives: The operation timed out
-
-Left alone this does not merely return the wrong answer, it hangs: the scheduler eventually reports a deadlock, because
-the only fiber left is parked on a count nothing is going to move.
-
-The fix is the one in L</"A job that cannot strand the group"> - put the C<done> where every path reaches it. Where
-that is awkward, a small wrapper is worth having, so the reporting lives in one place rather than in every job.
+=back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::Barrier>, L<Acme::Parataxis::Sync::Once>,
-L<Acme::Parataxis::Sync::Mutex>, L<Acme::Parataxis::Sync::RwLock>, L<Acme::Parataxis::Nursery>,
-L<Acme::Parataxis::Error::Timeout>, L<Acme::Parataxis::Error::Cancelled>
+L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::Barrier>, L<Acme::Parataxis::Sync::Mutex>,
+L<Acme::Parataxis::Nursery>
 
 =head1 AUTHOR
 
@@ -389,4 +183,3 @@ This library is free software; you can redistribute it and/or modify it under th
 2.
 
 =cut
-

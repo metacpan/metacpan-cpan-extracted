@@ -1,3 +1,9 @@
+0.002011  2026-10-27 17:20:56-07:00 America/Los_Angeles
+
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+    - Fix crash when UUID is preloaded (#3)
+
 0.002010  2025-03-29 12:18:57-07:00 America/Los_Angeles
 
     - Remove void use of warnings {}

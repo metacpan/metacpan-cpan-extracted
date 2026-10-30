@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Config ();
 use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
@@ -13,7 +13,10 @@ use IO::Select;
 use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
 use File::Basename qw(dirname basename);
+use Scalar::Util qw(refaddr);
+use Time::HiRes ();
 use Symbol qw(gensym);
+use bytes ();
 use URI;
 use URI::Escape qw(uri_escape uri_unescape);
 use Developer::Dashboard::CLI::Suggest;
@@ -24,6 +27,7 @@ use Developer::Dashboard::PerlEnv ();
 use Developer::Dashboard::Runtime::Result;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file resolve_runnable_file);
+our $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__);
 
 # new()
 # Creates a SkillDispatcher instance to execute skill commands.
@@ -36,6 +40,29 @@ sub new {
     return bless {
         manager => $manager,
     }, $class;
+}
+
+# DESTROY()
+# Releases the aggregate skill-nav filesystem watcher before the dispatcher is
+# discarded, reporting native cleanup failures instead of leaking descriptors.
+# Input: dispatcher object being destroyed by Perl.
+# Output: none; emits an explicit warning if watcher shutdown fails.
+sub DESTROY {
+    my ($self) = @_;
+    my $watcher = delete $self->{_skill_nav_pages_watcher};
+    return if !ref($watcher);
+    my $closed = eval { $watcher->close };
+    if ( !$closed ) {
+        my $error = $@;
+        # eval leaves $@ as a string (empty on successful close), so the
+        # undefined case is not reachable here and needlessly duplicates the
+        # following last_error normalization.
+        $error = $watcher->can('last_error') ? $watcher->last_error : undef
+          if $error eq '';
+        $error = 'unknown watcher shutdown failure' if !defined $error || $error eq '';
+        warn "Skill nav snapshot watcher shutdown failed: $error\n";
+    }
+    return;
 }
 
 # dispatch($skill_name, $command, @args)
@@ -641,7 +668,22 @@ sub route_response {
 sub skill_nav_pages {
     my ( $self, $skill_name ) = @_;
     return [] if !$skill_name;
-    my %route_ids = $self->_skill_nav_route_ids($skill_name);
+    my @skill_layers = $self->_skill_layers($skill_name);
+    return [] if !@skill_layers;
+    return $self->_skill_nav_pages_for_layers( $skill_name, \@skill_layers );
+}
+
+# _skill_nav_pages_for_layers($skill_name, $skill_layers, $cache_literal_nav)
+# Loads all nav pages for one skill using its already-resolved layered roots.
+# Input: skill repository name, home-to-leaf layer array reference, and optional
+# boolean enabling bounded reuse of unchanged static literal nav pages. It also
+# obtains stable, inventory-derived route segments for its private page lookups.
+# Output: array reference of nav page documents.
+sub _skill_nav_pages_for_layers {
+    my ( $self, $skill_name, $skill_layers, $cache_literal_nav ) = @_;
+    return [] if !$skill_name || ref($skill_layers) ne 'ARRAY' || !@{$skill_layers};
+    my %route_segments;
+    my %route_ids = $self->_skill_nav_route_ids( $skill_name, $skill_layers, \%route_segments );
     return [] if !%route_ids;
 
     my @pages;
@@ -649,6 +691,9 @@ sub skill_nav_pages {
         push @pages, $self->_load_skill_page(
             skill_name => $skill_name,
             route_id   => $route_ids{$entry},
+            validated_route_segments => $route_segments{$entry},
+            layers     => $skill_layers,
+            cache_literal_nav => $cache_literal_nav ? 1 : 0,
         );
     }
     return \@pages;
@@ -656,15 +701,292 @@ sub skill_nav_pages {
 
 # all_skill_nav_pages()
 # Loads nav bookmark pages from every installed skill in deterministic skill order.
+# Unchanged literal raw fragments reuse read-only, high-resolution-stat-checked
+# page documents in a bounded per-dispatcher cache; dynamic/structured pages are
+# read and parsed for each request. A native watcher can validate an aggregate
+# snapshot of literal pages and bypass repeated per-page path resolution.
 # Input: none.
 # Output: array ref of prepared page documents before runtime state is applied.
 sub all_skill_nav_pages {
     my ($self) = @_;
+    my $cached_pages = $self->_cached_all_skill_nav_pages;
+    return $cached_pages if $cached_pages;
     my @pages;
+    my ( @skill_roots, @skill_layers );
+    my $paths = $self->{manager}{paths};
+    die 'Skill paths are required for nav discovery' if !$paths;
+    if ( $paths->can('installed_skill_entries') ) {
+        for my $entry ( $paths->installed_skill_entries ) {
+            die 'Invalid installed skill entry for nav discovery'
+              if ref($entry) ne 'HASH'
+              || !$entry->{skill_name}
+              || !$entry->{skill_root}
+              || ref( $entry->{layers} ) ne 'ARRAY';
+            push @skill_roots, $entry->{skill_root};
+            push @skill_layers, @{ $entry->{layers} };
+            my @skill_names = $self->_descendant_skill_names(
+                $entry->{skill_name},
+                $entry->{skill_root},
+            );
+            for my $skill_name (@skill_names) {
+                my $layers = $skill_name eq $entry->{skill_name}
+                  ? $entry->{layers}
+                  : [ $self->_skill_layers($skill_name) ];
+                push @skill_layers, @{$layers};
+                push @pages, @{ $self->_skill_nav_pages_for_layers( $skill_name, $layers, 1 ) };
+            }
+        }
+        $self->_cache_all_skill_nav_pages( \@pages, \@skill_roots, \@skill_layers );
+        return \@pages;
+    }
+
     for my $skill_name ( $self->_all_installed_skill_names ) {
         push @pages, @{ $self->skill_nav_pages($skill_name) };
     }
     return \@pages;
+}
+
+# all_skill_nav_literal_items_html($escape_attribute)
+# Returns the pre-rendered list items for a watcher-validated aggregate of
+# literal skill-nav fragments. Dynamic or non-aggregated pages return undef so
+# callers can use the ordinary per-request renderer.
+# Input: attribute-escaping coderef.
+# Output: cached concatenated <li> HTML, including an empty string for a valid
+#         empty snapshot, or undef when pages are unavailable or no safe
+#         aggregate snapshot is available.
+sub all_skill_nav_literal_items_html {
+    my ( $self, $escape_attribute ) = @_;
+    die 'Skill-nav attribute escaper must be a code reference'
+      if ref($escape_attribute) ne 'CODE';
+    my $pages = $self->all_skill_nav_pages;
+    my $snapshot = $self->{_skill_nav_pages_snapshot};
+    return if ref($snapshot) ne 'HASH'
+      || ref( $snapshot->{pages} ) ne 'ARRAY'
+      || ref($pages) ne 'ARRAY'
+      || refaddr( $snapshot->{pages} ) != refaddr($pages);
+    if ( exists $snapshot->{html} ) {
+        die 'Malformed rendered skill-nav HTML cache'
+          if !defined $snapshot->{html} || ref( $snapshot->{html} );
+        return $snapshot->{html};
+    }
+
+    my @items;
+    my $bytes = 0;
+    for my $page ( @{$pages} ) {
+        die 'Malformed page in literal skill-nav snapshot'
+          if ref($page) ne 'Developer::Dashboard::PageDocument'
+          || ref( $page->{meta} ) ne 'HASH'
+          || ref( $page->{layout} ) ne 'HASH';
+        my $body = $page->{layout}{body};
+        my $codes = $page->{meta}{codes};
+        return if ($page->{meta}{source_format} || '') ne 'raw-nav-tt'
+          || !defined $body || ref($body) || index( $body, '[%' ) >= 0
+          || ( defined $codes && ref($codes) ne 'ARRAY' )
+          || ( ref($codes) eq 'ARRAY' && @{$codes} );
+        my $id = $page->{id};
+        die 'Malformed route id in literal skill-nav snapshot' if !defined $id || ref($id);
+        my $escaped_id = $escape_attribute->($id);
+        die 'Skill-nav attribute escaper returned a non-scalar value'
+          if !defined $escaped_id || ref($escaped_id);
+        push @items, '<li data-nav-id="' . $escaped_id . '">' . $body . '</li>';
+        $bytes += bytes::length( $items[-1] );
+    }
+    my $html = join '', @items;
+    $snapshot->{html} = $html if $bytes <= 10_485_760;
+    return $html;
+}
+
+# _cached_all_skill_nav_pages()
+# Returns the prepared literal-nav page snapshot only when its configured native
+# watcher confirms that no watched skill, layer, or nav directory changed.
+# Input: none.
+# Output: cached array reference on an event-free watch, or undef for a miss.
+sub _cached_all_skill_nav_pages {
+    my ($self) = @_;
+    my $cache = $self->{_skill_nav_pages_snapshot};
+    return if ref($cache) ne 'HASH';
+    die 'Malformed aggregate skill-nav page cache' if ref( $cache->{pages} ) ne 'ARRAY';
+    die 'Malformed aggregate skill-nav page cache signature'
+      if !defined $cache->{signature} || ref( $cache->{signature} );
+    my $paths_signature = $self->_skill_nav_paths_signature;
+    if ( !defined $paths_signature || ref( $cache->{paths_signature} ) ne 'ARRAY'
+        || @{ $cache->{paths_signature} } != @{$paths_signature} )
+    {
+        delete $self->{_skill_nav_pages_snapshot};
+        return;
+    }
+    for my $index ( 0 .. $#{$paths_signature} ) {
+        if ( !defined $cache->{paths_signature}[$index]
+            || $cache->{paths_signature}[$index] ne $paths_signature->[$index] )
+        {
+            delete $self->{_skill_nav_pages_snapshot};
+            return;
+        }
+    }
+    my $watcher = $self->_skill_nav_pages_watcher;
+    if ( !$watcher ) {
+        delete $self->{_skill_nav_pages_snapshot};
+        return;
+    }
+    return $cache->{pages} if $watcher->unchanged( $cache->{signature} );
+    my $error = $watcher->can('last_error') ? $watcher->last_error : undef;
+    if ( defined $error && $error ne '' ) {
+        warn "Skill nav snapshot watch disabled: $error\n";
+        $watcher->close or warn "Skill nav snapshot watcher close failed: "
+          . ( $watcher->last_error || 'unknown close failure' ) . "\n";
+        delete $self->{_skill_nav_pages_watcher};
+        $self->{_skill_nav_pages_watcher_unavailable} = 1;
+    }
+    delete $self->{_skill_nav_pages_snapshot};
+    return;
+}
+
+# _skill_nav_paths_signature()
+# Captures the identity of the paths registry and its current ordered runtime
+# roots so process-environment or runtime-layer changes cannot reuse an
+# aggregate page snapshot configured for another path context.
+# Input: none; reads the dispatcher's current paths registry.
+# Output: array reference containing registry identity and runtime roots, or undef when the provider cannot
+#         expose a runtime-root inventory.
+sub _skill_nav_paths_signature {
+    my ($self) = @_;
+    my $paths = $self->{manager}{paths};
+    return if !ref($paths) || !$paths->can('runtime_roots');
+    my @runtime_roots = $paths->runtime_roots;
+    die 'Invalid runtime root in skill-nav paths signature' if grep { !defined $_ || ref($_) } @runtime_roots;
+    return [ refaddr($paths), @runtime_roots ];
+}
+
+# _skill_nav_pages_watcher()
+# Lazily constructs the existing optional native filesystem watcher for an
+# aggregate literal-nav snapshot; absent optional backends retain portable page
+# inventory validation rather than disabling route loading. It resolves the
+# module relative to this absolute source path so nested skill working-directory
+# changes cannot invalidate a relative @INC entry.
+# Input: none.
+# Output: watcher object or undef when the current platform has no backend.
+sub _skill_nav_pages_watcher {
+    my ($self) = @_;
+    return $self->{_skill_nav_pages_watcher}
+      if ref( $self->{_skill_nav_pages_watcher} );
+    return if $self->{_skill_nav_pages_watcher_unavailable};
+    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'} ) {
+        my $watcher_module = File::Spec->catfile(
+            dirname($MODULE_SOURCE_PATH), 'IndicatorStore', 'Watch.pm'
+        );
+        require $watcher_module;
+    }
+    my $watcher = Developer::Dashboard::IndicatorStore::Watch->new;
+    if ( !$watcher ) {
+        $self->{_skill_nav_pages_watcher_unavailable} = 1;
+        return;
+    }
+    $self->{_skill_nav_pages_watcher} = $watcher;
+    return $watcher;
+}
+
+# _cache_all_skill_nav_pages($pages, $skill_roots, $skill_layers)
+# Configures a native watcher and caches the aggregate array only when every
+# page is an unchanged-independent literal nav fragment and the bounded cache
+# size is respected. It watches each skill root, its parent, dashboards/nav
+# parents, and all recursively inventoried nav directories so both content and
+# route namespace changes invalidate the snapshot.
+# Input: page array reference, installed skill-root array, and contributing
+#        layered-skill-root array.
+# Output: true if the aggregate snapshot is installed; false when unsafe,
+#         oversized, or unsupported. Watch setup failures are warned visibly.
+sub _cache_all_skill_nav_pages {
+    my ( $self, $pages, $skill_roots, $skill_layers ) = @_;
+    die 'Aggregate skill-nav pages must be an array reference' if ref($pages) ne 'ARRAY';
+    die 'Aggregate skill roots must be an array reference' if ref($skill_roots) ne 'ARRAY';
+    die 'Aggregate skill layers must be an array reference' if ref($skill_layers) ne 'ARRAY';
+    delete $self->{_skill_nav_pages_snapshot};
+    return 0 if @{$pages} > 8192;
+    my $paths_signature = $self->_skill_nav_paths_signature;
+    return 0 if !defined $paths_signature;
+    my $bytes = 0;
+    for my $page ( @{$pages} ) {
+        return 0 if ref($page) ne 'Developer::Dashboard::PageDocument';
+        my $meta = $page->{meta};
+        my $body = $page->{layout}{body};
+        return 0 if ref($meta) ne 'HASH'
+          || ($meta->{source_format} || '') ne 'raw-nav-tt'
+          || !defined $body || ref($body) || index( $body, '[%' ) >= 0
+          || ( defined $meta->{codes} && ref( $meta->{codes} ) ne 'ARRAY' )
+          || ( ref( $meta->{codes} ) eq 'ARRAY' && @{ $meta->{codes} } );
+        $bytes += length($body);
+        return 0 if $bytes > 8 * 1024 * 1024;
+    }
+
+    my $paths = $self->{manager}{paths};
+    my @runtime_roots = $paths->can('runtime_roots') ? $paths->runtime_roots : ();
+    my @skills_roots = $paths->can('skills_roots') ? $paths->skills_roots : ();
+    my @directories;
+    my $add_existing_ancestor = sub {
+        my ($target) = @_;
+        return if !defined $target || ref($target) || $target eq '';
+        my $directory = $target;
+        while ( !-d $directory ) {
+            my $parent = dirname($directory);
+            return if $parent eq $directory;
+            $directory = $parent;
+        }
+        push @directories, $directory;
+    };
+    for my $root ( @runtime_roots, @skills_roots ) {
+        next if !defined $root || ref($root) || $root eq '';
+        $add_existing_ancestor->($root);
+        $add_existing_ancestor->( dirname($root) );
+    }
+    for my $root ( @{$skill_roots} ) {
+        next if !defined $root || ref($root) || $root eq '';
+        # Skill-level state such as the .disabled marker is written directly
+        # inside the installed root. Inotify watches are not recursive, so the
+        # parent watch alone cannot observe that marker changing.
+        $add_existing_ancestor->($root);
+        $add_existing_ancestor->( dirname($root) );
+    }
+    for my $layer ( @{$skill_layers} ) {
+        next if !defined $layer || ref($layer) || $layer eq '';
+        $add_existing_ancestor->( File::Spec->catdir( $layer, 'skills' ) );
+        $add_existing_ancestor->( File::Spec->catdir( $layer, 'dashboards' ) );
+        $add_existing_ancestor->( File::Spec->catdir( $layer, 'dashboards', 'nav' ) );
+    }
+    my $inventory = $self->{_skill_nav_inventory_cache};
+    if ( defined $inventory ) {
+        die 'Malformed aggregate skill-nav inventory cache' if ref($inventory) ne 'HASH'
+          || ref( $inventory->{entries} ) ne 'HASH';
+        for my $entry ( values %{ $inventory->{entries} } ) {
+            die 'Malformed aggregate skill-nav inventory directories' if ref($entry) ne 'HASH'
+              || ref( $entry->{directories} ) ne 'ARRAY';
+            $add_existing_ancestor->( $_->[0] ) for @{ $entry->{directories} };
+        }
+    }
+    my %seen;
+    my @watch_paths = sort grep { !$seen{$_}++ } @directories;
+    return 0 if !@watch_paths;
+    my $signature = join "\0", @watch_paths;
+    my $watcher = $self->_skill_nav_pages_watcher;
+    return 0 if !$watcher;
+    if ( !$watcher->configure( $signature, \@watch_paths ) ) {
+        my $error = $watcher->can('last_error') ? $watcher->last_error : undef;
+        warn "Skill nav snapshot watch setup failed: "
+          . ( defined $error && $error ne '' ? $error : 'unknown watcher error' ) . "\n";
+        if ( !$watcher->close ) {
+            my $close_error = $watcher->can('last_error') ? $watcher->last_error : undef;
+            warn "Skill nav snapshot watcher close failed: "
+              . ( defined $close_error && $close_error ne '' ? $close_error : 'unknown close failure' ) . "\n";
+        }
+        delete $self->{_skill_nav_pages_watcher};
+        $self->{_skill_nav_pages_watcher_unavailable} = 1;
+        return 0;
+    }
+    $self->{_skill_nav_pages_snapshot} = {
+        signature      => $signature,
+        paths_signature => $paths_signature,
+        pages          => $pages,
+    };
+    return 1;
 }
 
 # _skill_page_response(%args)
@@ -742,26 +1064,59 @@ sub _merge_saved_url_query {
 
 # _load_skill_page(%args)
 # Loads one layered skill page document from dashboards/<id> and namespaces its
-# page id under /app/<skill>/...
-# Input: skill name and relative route id such as index, foo, or nav/file.tt.
+# page id under /app/<skill>/.... Internal nav callers may opt into reuse of
+# unchanged literal raw fragments; dynamic page sources always reload.
+# Input: skill name, relative route id such as index, foo, or nav/file.tt, and
+# optional resolved skill layers, literal-nav-cache flag, and route segments
+# derived from the stable internal nav inventory.
 # Output: page document object.
 sub _load_skill_page {
     my ( $self, %args ) = @_;
     my $skill_name = $args{skill_name} || die 'Missing skill name';
     my $route_id   = $args{route_id}   || die 'Missing route id';
-    my ( $file, $skill_path ) = $self->_page_location( $skill_name, $route_id );
+    my $provided_layers = ref( $args{layers} ) eq 'ARRAY';
+    my @skill_layers = $provided_layers ? @{ $args{layers} } : $self->_skill_layers($skill_name);
+    my ( $file, $skill_path, $file_stat ) = $self->_page_location(
+        $skill_name,
+        $route_id,
+        layers => \@skill_layers,
+        ( exists $args{validated_route_segments}
+            ? ( validated_route_segments => $args{validated_route_segments} )
+            : () ),
+    );
     die "Skill bookmark '$route_id' not found" if !defined $file;
 
-    require Developer::Dashboard::PageDocument;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    my $instruction = <$fh>;
-    close $fh;
+    my $is_raw_nav = $route_id =~ m{\Anav/.+\.tt\z};
+    my $cache_key;
+    my $cache_fingerprint;
+    if ( $args{cache_literal_nav} && $is_raw_nav && ref($file_stat) eq 'ARRAY' ) {
+        $cache_key = join "\0", $skill_name, $route_id, $file, @skill_layers;
+        $cache_fingerprint = _skill_nav_fingerprint($file_stat);
+        my $cached_page = $self->_cached_literal_skill_nav_page( $cache_key, $cache_fingerprint );
+        return $cached_page if $cached_page;
+    }
 
-    my $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
-    my $parse_error = $@;
+    require Developer::Dashboard::PageDocument;
+    my $instruction = $self->_read_skill_page_instruction($file);
+
     my $raw_url = $instruction;
     $raw_url =~ s/\A\s+|\s+\z//g;
+    my $page;
+    my $parse_error = '';
+    if ( $is_raw_nav && $raw_url !~ m{\A(?:https?:)?//[^\s]+\z}
+        && !_looks_like_skill_page_instruction($instruction) )
+    {
+        $page = Developer::Dashboard::PageDocument->new(
+            id     => $skill_name . '/' . $route_id,
+            title  => $route_id,
+            layout => { body => $instruction },
+            meta   => { source_format => 'raw-nav-tt' },
+        );
+    }
+    else {
+        $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
+        $parse_error = $@;
+    }
     if ( !$page && $raw_url =~ m{\A(?:https?:)?//[^\s]+\z} ) {
         $page = Developer::Dashboard::PageDocument->new(
             id     => $skill_name . ( $route_id eq 'index' ? '' : '/' . $route_id ),
@@ -770,7 +1125,7 @@ sub _load_skill_page {
             meta   => { source_format => 'raw-url', raw_url => $raw_url },
         );
     }
-    if ( !$page && $route_id =~ m{\Anav/.+\.tt\z} ) {
+    if ( !$page && $is_raw_nav ) {
         $page = Developer::Dashboard::PageDocument->new(
             id     => $skill_name . '/' . $route_id,
             title  => $route_id,
@@ -785,9 +1140,135 @@ sub _load_skill_page {
     $page->{meta}{skill_name}       = $skill_name;
     $page->{meta}{skill_route_id}   = $route_id;
     $page->{meta}{skill_path}       = $skill_path;
-    $page->{meta}{skill_layers}     = [ $self->_skill_layers($skill_name) ];
+    $page->{meta}{skill_layers}     = \@skill_layers;
     $page->{meta}{raw_instruction}  = $instruction;
+    if ( defined $cache_key
+        && ( $page->{meta}{source_format} || '' ) eq 'raw-nav-tt'
+        && index( $instruction, '[%' ) < 0 )
+    {
+        $self->_cache_literal_skill_nav_page(
+            $cache_key,
+            $cache_fingerprint,
+            $page,
+            bytes::length($instruction),
+        );
+    }
     return $page;
+}
+
+# _read_skill_page_instruction($file, $close_callback)
+# Reads one skill dashboard instruction file using the existing text-mode
+# behavior required by the page parser. An optional close callback provides a
+# deterministic way to test close failures; normal callers use Perl's close.
+# Input: resolved skill dashboard file path and optional close coderef.
+# Output: complete instruction text scalar; open and close failures are fatal.
+sub _read_skill_page_instruction {
+    my ( $self, $file, $close_callback ) = @_;
+    open my $fh, '<', $file or die "Unable to read $file: $!";
+    local $/;
+    my $instruction = <$fh>;
+    my $closed = ref($close_callback) eq 'CODE' ? $close_callback->($fh) : close $fh;
+    die "Unable to close $file: $!" if !$closed;
+    return $instruction;
+}
+
+# _skill_nav_fingerprint($stat)
+# Converts a high-resolution stat result into a stable identity for one literal
+# skill-nav cache entry.
+# Input: stat array reference returned while resolving the existing page path.
+# Output: NUL-separated device, inode, mode, size, mtime, and ctime fingerprint.
+sub _skill_nav_fingerprint {
+    my ($stat) = @_;
+    return if ref($stat) ne 'ARRAY' || @{$stat} < 11;
+    return join "\0", @{$stat}[ 0, 1, 2, 7, 9, 10 ];
+}
+
+# _cached_literal_skill_nav_page($key, $fingerprint)
+# Returns a previously parsed literal nav page only when its current file stat
+# identity matches; a mismatch removes the stale cache entry.
+# Input: layer-aware cache key and the current high-resolution file fingerprint.
+# Output: cached page object or undef for a miss or stale entry.
+sub _cached_literal_skill_nav_page {
+    my ( $self, $key, $fingerprint ) = @_;
+    return if !defined $key || !defined $fingerprint;
+    my $cache = $self->{_skill_literal_nav_cache};
+    return if ref($cache) ne 'HASH' || ref( $cache->{entries} ) ne 'HASH';
+    die 'Malformed literal skill-nav cache order'
+      if ref( $cache->{order} ) ne 'ARRAY';
+    die 'Malformed literal skill-nav cache byte count'
+      if !defined $cache->{bytes} || $cache->{bytes} !~ /\A\d+\z/;
+    my $entry = $cache->{entries}{$key};
+    return if ref($entry) ne 'HASH';
+    if ( defined $entry->{fingerprint}
+        && $entry->{fingerprint} eq $fingerprint
+        && ref( $entry->{page} ) eq 'Developer::Dashboard::PageDocument' )
+    {
+        return $entry->{page};
+    }
+    die 'Malformed literal skill-nav cache entry size'
+      if !defined $entry->{bytes} || $entry->{bytes} !~ /\A\d+\z/;
+    $cache->{bytes} -= $entry->{bytes};
+    delete $cache->{entries}{$key};
+    @{ $cache->{order} } = grep { $_ ne $key } @{ $cache->{order} };
+    return;
+}
+
+# _cache_literal_skill_nav_page($key, $fingerprint, $page, $size)
+# Stores a read-only literal nav page in a bounded per-dispatcher FIFO cache.
+# Input: layer-aware key, matching file fingerprint, page object, and size.
+# Output: true after insertion, false when cache inputs are unusable.
+sub _cache_literal_skill_nav_page {
+    my ( $self, $key, $fingerprint, $page, $size ) = @_;
+    return 0
+      if !defined $key
+      || !defined $fingerprint
+      || ref($page) ne 'Developer::Dashboard::PageDocument'
+      || !defined $size
+      || $size !~ /\A\d+\z/;
+    my $cache = $self->{_skill_literal_nav_cache};
+    if ( ref($cache) ne 'HASH' ) {
+        $cache = $self->{_skill_literal_nav_cache} = { bytes => 0, entries => {}, order => [] };
+    }
+    return 0
+      if ref( $cache->{entries} ) ne 'HASH'
+      || ref( $cache->{order} ) ne 'ARRAY'
+      || !defined $cache->{bytes}
+      || $cache->{bytes} !~ /\A\d+\z/;
+    if ( exists $cache->{entries}{$key} ) {
+        my $old = $cache->{entries}{$key};
+        $cache->{bytes} -= ref($old) eq 'HASH' ? ( $old->{bytes} || 0 ) : 0;
+        @{ $cache->{order} } = grep { $_ ne $key } @{ $cache->{order} };
+    }
+    $cache->{entries}{$key} = {
+        fingerprint => $fingerprint,
+        page        => $page,
+        bytes       => $size,
+    };
+    $cache->{bytes} += $size;
+    push @{ $cache->{order} }, $key;
+    while ( @{ $cache->{order} } > 256 || $cache->{bytes} > 8_388_608 ) {
+        my $evict = shift @{ $cache->{order} };
+        next if !exists $cache->{entries}{$evict};
+        my $old = delete $cache->{entries}{$evict};
+        $cache->{bytes} -= ref($old) eq 'HASH' ? ( $old->{bytes} || 0 ) : 0;
+    }
+    return 1;
+}
+
+# _looks_like_skill_page_instruction($text)
+# Identifies the section markers that make a skill nav file a structured page
+# document; ordinary TT/HTML fragments bypass the exception-driven parser.
+# Input: decoded instruction text scalar.
+# Output: true for modern markers, legacy separators, or a legacy section header.
+sub _looks_like_skill_page_instruction {
+    my ($text) = @_;
+    return 0 if !defined $text || ref($text);
+    return 1 if $text =~ /^===\s*[A-Z][A-Z0-9.]*\s*===/m;
+    return 1 if $text =~ /^\Q$Developer::Dashboard::PageDocument::LEGACY_SEP\E\s*$/m;
+    return 1 if $text =~ /^\s*---\s*$/m;
+    my $first_content = $text;
+    $first_content =~ s/\A[\r\n\s]+//;
+    return $first_content =~ /\A(?:TITLE|ICON|BOOKMARK|STASH|NOTE|HEAD|HTML|CODE\d+)\s*:/i ? 1 : 0;
 }
 
 # _skill_env(%args)
@@ -1029,7 +1510,7 @@ sub _command_spec {
 # script of its own, by reading a raw VERSION= line from the skill's own
 # layered .env files (leaf-most layer first, same precedence order
 # _command_spec already uses for resolving a real command file).
-# Input: skill repository name string.
+# Input: skill repository name string and optional home-to-leaf layer array ref.
 # Output: hash reference with stdout, stderr, and exit_code (never an error -
 # a missing .env or a missing VERSION= key are reported in stdout, not failed).
 sub _native_version_fallback {
@@ -1102,20 +1583,43 @@ sub _nested_skill_path {
     return File::Spec->catdir(@parts);
 }
 
-# _page_location($skill_name, $route_id)
+# _page_location($skill_name, $route_id, %args)
 # Resolves one skill dashboard file across every participating skill layer,
-# refusing any route id whose segments fail the shared path validation so a
-# browser-supplied id can never address a file outside a skill dashboards tree.
-# Input: skill repository name string and route id string such as index or nav/foo.tt.
-# Output: file path string and the skill layer root that provided it.
+# refusing unsafe route segments. Browser-supplied ids use the shared path
+# validator; private inventory callers can reuse validated segments after
+# explicit per-segment separator, control-byte, and traversal checks.
+# Input: skill repository name, route id string such as index or nav/foo.tt,
+# optional pre-resolved layers, and optional inventory-derived route segments.
+# Output: file path string, serving skill layer root, and high-resolution stat
+# array reference for the located regular file; or the empty list when missing.
 sub _page_location {
-    my ( $self, $skill_name, $route_id ) = @_;
+    my ( $self, $skill_name, $route_id, %args ) = @_;
     return if !$skill_name || !$route_id;
-    my @segments = Developer::Dashboard::PathRegistry::validated_path_segments($route_id);
+    my @segments;
+    if ( exists $args{validated_route_segments} ) {
+        return if ref( $args{validated_route_segments} ) ne 'ARRAY';
+        @segments = @{ $args{validated_route_segments} };
+        return if !@segments || grep {
+               !defined $_
+            || ref($_)
+            || $_ eq ''
+            || $_ eq '.'
+            || $_ eq '..'
+            || $_ =~ m{[\\/\x00-\x1F\x7F]}
+        } @segments;
+        return if $segments[0] =~ /\A[A-Za-z]:/;
+    }
+    else {
+        @segments = Developer::Dashboard::PathRegistry::validated_path_segments($route_id);
+    }
     return if !@segments;
-    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+    my @skill_roots = ref( $args{layers} ) eq 'ARRAY'
+      ? reverse @{ $args{layers} }
+      : $self->_skill_lookup_roots($skill_name);
+    for my $skill_path (@skill_roots) {
         my $file = File::Spec->catfile( $skill_path, 'dashboards', @segments );
-        return ( $file, $skill_path ) if -f $file;
+        my @stat = Time::HiRes::stat($file);
+        return ( $file, $skill_path, \@stat ) if @stat && -f _;
     }
     return;
 }
@@ -1243,7 +1747,8 @@ sub _skill_routes_for {
 
 # _skill_ajax_routes_for($skill_name)
 # Backward-compatible wrapper for the ajax-specific custom route map loader.
-# Input: skill repository name string.
+# Input: skill repository name, optional pre-resolved skill layers, and optional
+# hash reference to receive validated route segments keyed by nav filename.
 # Output: hash reference keyed by ajax file path.
 sub _skill_ajax_routes_for {
     my ( $self, $skill_name ) = @_;
@@ -1476,21 +1981,164 @@ sub _skill_bookmark_entries {
 
 # _skill_nav_route_ids($skill_name)
 # Enumerates nav/*.tt routes contributed by one layered skill with deepest
-# duplicates overriding shallower layers.
+# duplicates overriding shallower layers. A bounded inventory cache avoids
+# recursively reopening unchanged nav directories; directory stat fingerprints
+# invalidate it when routes are created, removed, or moved.
 # Input: skill repository name string.
 # Output: hash of nav filenames to route ids.
 sub _skill_nav_route_ids {
-    my ( $self, $skill_name ) = @_;
+    my ( $self, $skill_name, $skill_layers, $validated_routes ) = @_;
     return () if !$skill_name;
     my %routes;
-    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+    $validated_routes = undef if ref($validated_routes) ne 'HASH';
+    my @lookup_roots = ref($skill_layers) eq 'ARRAY'
+      ? reverse @{$skill_layers}
+      : $self->_skill_lookup_roots($skill_name);
+    for my $skill_path (@lookup_roots) {
         my $nav_root = File::Spec->catdir( $skill_path, 'dashboards', 'nav' );
-        next if !-d $nav_root;
-        for my $entry ( $self->_relative_files($nav_root) ) {
-            $routes{$entry} = 'nav/' . $entry if !exists $routes{$entry};
+        my %inventory_segments;
+        for my $entry ( $self->_skill_nav_inventory( $nav_root, \%inventory_segments ) ) {
+            if ( !exists $routes{$entry} ) {
+                $routes{$entry} = 'nav/' . $entry;
+                if ($validated_routes) {
+                    my $segments = $inventory_segments{$entry};
+                    $validated_routes->{$entry} = defined $segments
+                      ? [ 'nav', @{$segments} ]
+                      : undef;
+                }
+            }
         }
     }
     return %routes;
+}
+
+# _skill_nav_directory_fingerprint($directory)
+# Builds a high-resolution identity for one directory in a cached nav inventory.
+# Input: directory path string.
+# Output: NUL-separated stat identity or undef when the directory cannot be statted.
+sub _skill_nav_directory_fingerprint {
+    my ($directory) = @_;
+    return if !defined $directory || $directory eq '';
+    my @stat = Time::HiRes::stat($directory);
+    return if !@stat;
+    return if !-d $directory;
+    return join "\0", @stat[ 0, 1, 2, 7, 9, 10 ];
+}
+
+# _skill_nav_inventory($nav_root)
+# Returns recursively discovered nav file ids, reusing a bounded inventory only
+# while every directory in that tree has the same high-resolution stat identity.
+# Input: nav root directory, optional hash reference receiving validated
+# relative segments by file, and private force-refresh boolean for benchmarks.
+# Output: sorted relative file paths, or an empty list for a missing root.
+sub _skill_nav_inventory {
+    my ( $self, $nav_root, $validated_segments ) = @_;
+    return () if !$nav_root;
+    return () if !-d $nav_root;
+
+    my $cache = $self->{_skill_nav_inventory_cache};
+    if ( defined $cache ) {
+        die 'Malformed skill-nav inventory cache' if ref($cache) ne 'HASH';
+        die 'Malformed skill-nav inventory entries' if ref( $cache->{entries} ) ne 'HASH';
+        die 'Malformed skill-nav inventory order' if ref( $cache->{order} ) ne 'ARRAY';
+        my $entry = $cache->{entries}{$nav_root};
+        if ( defined $entry ) {
+            die 'Malformed skill-nav inventory entry' if ref($entry) ne 'HASH';
+            die 'Malformed skill-nav inventory files' if ref( $entry->{files} ) ne 'ARRAY';
+            die 'Malformed skill-nav inventory directories' if ref( $entry->{directories} ) ne 'ARRAY';
+            my $valid = 1;
+            for my $directory ( @{ $entry->{directories} } ) {
+                die 'Malformed skill-nav inventory directory fingerprint' if ref($directory) ne 'ARRAY';
+                die 'Malformed skill-nav inventory directory fingerprint width' if @{$directory} != 2;
+                my $current = _skill_nav_directory_fingerprint( $directory->[0] );
+                if ( !defined $current ) {
+                    $valid = 0;
+                    last;
+                }
+                if ( $current ne $directory->[1] ) {
+                    $valid = 0;
+                    last;
+                }
+            }
+            if ($valid) {
+                my $segments = $entry->{segments};
+                die 'Malformed skill-nav inventory segments' if ref($segments) ne 'HASH';
+                for my $file ( @{ $entry->{files} } ) {
+                    die 'Malformed skill-nav inventory segment entry'
+                      if !exists $segments->{$file}
+                      || ( defined $segments->{$file} && ref( $segments->{$file} ) ne 'ARRAY' );
+                }
+                if ( ref($validated_segments) eq 'HASH' ) {
+                    %{$validated_segments} = map {
+                        $_ => ( ref( $segments->{$_} ) eq 'ARRAY' ? [ @{ $segments->{$_} } ] : undef )
+                    } keys %{$segments};
+                }
+                return @{ $entry->{files} };
+            }
+            delete $cache->{entries}{$nav_root};
+            @{ $cache->{order} } = grep { $_ ne $nav_root } @{ $cache->{order} };
+        }
+    }
+
+    my ( @directories, @before_scan );
+    my @files = $self->_relative_files( $nav_root, \@directories, \@before_scan );
+    my %segments_by_file;
+    for my $file (@files) {
+        my @segments = Developer::Dashboard::PathRegistry::validated_path_segments($file);
+        $segments_by_file{$file} = @segments ? \@segments : undef;
+    }
+    %{$validated_segments} = map {
+        $_ => ( ref( $segments_by_file{$_} ) eq 'ARRAY' ? [ @{ $segments_by_file{$_} } ] : undef )
+    } keys %segments_by_file
+      if ref($validated_segments) eq 'HASH';
+    my @before = map { [ $directories[$_], $before_scan[$_] ] } 0 .. $#directories;
+    my $stable = !grep { !defined $_->[1] } @before;
+    if ($stable) {
+        my @after = map { [ $_, _skill_nav_directory_fingerprint($_) ] } @directories;
+        for my $index ( 0 .. $#before ) {
+            if ( !defined $after[$index][1] || $before[$index][1] ne $after[$index][1] ) {
+                $stable = 0;
+                last;
+            }
+        }
+    }
+    my $entry_bytes = 0;
+    if ($stable) {
+        $entry_bytes += length($_) for @files;
+        $entry_bytes += 8 + length($_) for @files;
+        $entry_bytes += 8 + length($_) for map { @{ $segments_by_file{$_} || [] } } @files;
+        $entry_bytes += length( $_->[0] ) + length( $_->[1] ) for @before;
+    }
+    if ( $stable
+        && _skill_nav_inventory_within_limits( scalar @directories, scalar @files, $entry_bytes ) )
+    {
+        if ( !defined $cache ) {
+            $cache = $self->{_skill_nav_inventory_cache} = { entries => {}, order => [] };
+        }
+        $cache->{entries}{$nav_root} = {
+            files       => [@files],
+            segments    => \%segments_by_file,
+            directories => \@before,
+        };
+        push @{ $cache->{order} }, $nav_root;
+        while ( @{ $cache->{order} } > 128 ) {
+            my $expired = shift @{ $cache->{order} };
+            delete $cache->{entries}{$expired};
+        }
+    }
+    return @files;
+}
+
+# _skill_nav_inventory_within_limits($directory_count, $file_count, $bytes)
+# Keeps a single cached route inventory below fixed memory and traversal bounds.
+# Input: counts and byte size for one nav-tree inventory.
+# Output: true when that inventory is safe to retain, otherwise false.
+sub _skill_nav_inventory_within_limits {
+    my ( $directory_count, $file_count, $bytes ) = @_;
+    return 0 if !defined $directory_count || $directory_count > 4096;
+    return 0 if !defined $file_count || $file_count > 8192;
+    return 0 if !defined $bytes || $bytes > 262_144;
+    return 1;
 }
 
 # _all_installed_skill_names()
@@ -1541,21 +2189,27 @@ sub _descendant_skill_names {
     return @names;
 }
 
-# _relative_files($root)
+# _relative_files($root, $visited_directories)
 # Recursively lists files beneath one root as forward-slash relative paths so
-# nested nav fragments can be routed without flattening subdirectories.
-# Input: absolute root directory path.
+# nested nav fragments can be routed without flattening subdirectories. When an
+# accumulator is supplied, each visited directory is appended for cache checks.
+# Input: absolute root directory path and optional directory-path array reference.
 # Output: sorted list of relative file path strings.
 sub _relative_files {
-    my ( $self, $root ) = @_;
+    my ( $self, $root, $visited_directories, $initial_fingerprints ) = @_;
     return () if !$root || !-d $root;
 
+    push @{$visited_directories}, $root if ref($visited_directories) eq 'ARRAY';
+    push @{$initial_fingerprints}, _skill_nav_directory_fingerprint($root)
+      if ref($initial_fingerprints) eq 'ARRAY';
     my @relative_files;
     opendir my $dh, $root or die "Unable to read $root: $!";
     for my $entry ( sorted_dir_entries($dh) ) {
         my $path = File::Spec->catfile( $root, $entry );
         if ( -d $path ) {
-            push @relative_files, map { $entry . '/' . $_ } $self->_relative_files($path);
+            push @relative_files,
+              map { $entry . '/' . $_ }
+              $self->_relative_files( $path, $visited_directories, $initial_fingerprints );
             next;
         }
         push @relative_files, $entry if -f $path;
@@ -1634,6 +2288,26 @@ joining it onto a skill root, so parent-directory, absolute, drive-qualified,
 backslash, and control-byte shapes resolve to nothing instead of escaping the
 layered skills trees, and C<skill_static_roots> exposes the layered
 C<dashboards/public> roots the web layer asserts containment against.
+
+Installed-skill navigation discovery caches each sorted relative route list in
+a bounded per-dispatcher FIFO. Every request fingerprints each directory in a
+cached tree before reusing its route list; a changed or missing directory
+causes a rescan. This avoids repeated directory enumeration without caching
+resolved files or skipping the normal path containment and file-identity
+checks. The cache retains at most 128 roots, with each inventory limited to
+4,096 directories, 8,192 file paths, and 256 KiB of route and fingerprint data.
+
+When every installed skill nav page is a literal raw fragment, the dispatcher
+also keeps one aggregate page-array snapshot behind the existing optional
+cross-platform filesystem watcher. Its watch set includes runtime and skill
+roots, their creation parents, dashboards/nav directories, and every discovered
+nested nav directory. An event invalidates the aggregate and returns loading to
+the normal route-inventory and per-file stat checks. Dynamic or structured
+pages are never held in the aggregate snapshot. If the watcher is unavailable,
+fails setup, or fails while polling, aggregate reuse is disabled and the
+portable page-loading path remains active; watcher shutdown is explicit when
+the dispatcher is destroyed. Failed watcher closure is reported even when an
+optional watcher implementation does not provide a diagnostic method.
 
 Skill command and hook environments are loaded through
 C<Developer::Dashboard::EnvLoader::load_skill_runtime_layers>: home runtime

@@ -3,11 +3,18 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
+use Developer::Dashboard::HtmlEscape ();
 use Developer::Dashboard::TextUtils qw(_trim);
 use Safe ();
+use bytes ();
+
+my %LEGACY_STASH_CACHE;
+my $LEGACY_STASH_CACHE_CLOCK = 0;
+our $LEGACY_STASH_CACHE_MAX_ENTRIES     = 32;
+our $LEGACY_STASH_CACHE_MAX_TEXT_BYTES  = 65_536;
 
 # Opcode set permitted inside the Safe compartment _safe_eval_stash_literal
 # uses to parse a legacy STASH body. Deliberately minimal: only what is
@@ -23,7 +30,9 @@ our @STASH_SAFE_OPS = qw(
 );
 
 our $LEGACY_SEP = ':--------------------------------------------------------------------------------:';
+my $LEGACY_MARKDOWN_SEP = qr{^\s*---\s*$}m;
 our @LEGACY_KEYS = ( qw(TITLE ICON BOOKMARK STASH NOTE HEAD HTML), map { sprintf 'CODE%d', $_ } 0 .. 1000 );
+my %LEGACY_FIXED_KEYS = map { $_ => 1 } qw(TITLE ICON BOOKMARK STASH NOTE HEAD HTML);
 
 # new(%args)
 # Constructs a page document from normalized field values.
@@ -164,6 +173,24 @@ sub with_mode {
     my ( $self, $mode ) = @_;
     $self->{mode} = $mode if defined $mode && $mode ne '';
     return $self;
+}
+
+# id()
+# Returns the stored page identifier without constructing the public hash view.
+# Input: none.
+# Output: page identifier string, or undef when the document has no identifier.
+sub id {
+    my ($self) = @_;
+    return $self->{id};
+}
+
+# mode()
+# Returns the stored display mode without constructing the public hash view.
+# Input: none.
+# Output: mode string, or undef if explicitly set to undef.
+sub mode {
+    my ($self) = @_;
+    return $self->{mode};
 }
 
 # as_hash()
@@ -458,8 +485,39 @@ sub _decode_stash_section {
         return $value if ref($value) eq 'HASH';
         return {};
     }
+
+    my $text_bytes = bytes::length($text);
+    if ( $text_bytes <= $LEGACY_STASH_CACHE_MAX_TEXT_BYTES
+        && exists $LEGACY_STASH_CACHE{$text} )
+    {
+        my $entry = $LEGACY_STASH_CACHE{$text};
+        $entry->{used} = ++$LEGACY_STASH_CACHE_CLOCK;
+        my $copy = json_decode( $entry->{json} );
+        die 'Cached legacy STASH snapshot did not decode to a hash reference'
+          if ref($copy) ne 'HASH';
+        return $copy;
+    }
+
     my $hash = _safe_eval_stash_literal($text);
-    return ref($hash) eq 'HASH' ? $hash : {};
+    return {} if ref($hash) ne 'HASH';
+
+    if ( $text_bytes <= $LEGACY_STASH_CACHE_MAX_TEXT_BYTES
+        && $LEGACY_STASH_CACHE_MAX_ENTRIES > 0 )
+    {
+        my $snapshot = json_encode($hash);
+        while ( keys(%LEGACY_STASH_CACHE) >= $LEGACY_STASH_CACHE_MAX_ENTRIES ) {
+            my ($oldest_text) = sort {
+                $LEGACY_STASH_CACHE{$a}{used} <=> $LEGACY_STASH_CACHE{$b}{used}
+            } keys %LEGACY_STASH_CACHE;
+            delete $LEGACY_STASH_CACHE{$oldest_text};
+        }
+        $LEGACY_STASH_CACHE{$text} = {
+            json => $snapshot,
+            used => ++$LEGACY_STASH_CACHE_CLOCK,
+        };
+    }
+
+    return $hash;
 }
 
 # _safe_eval_stash_literal($text)
@@ -482,14 +540,20 @@ sub _safe_eval_stash_literal {
 }
 
 # _parse_legacy_sections($text)
-# Parses older bookmark syntax separated by the older separator line.
+# Parses older bookmark syntax separated by the older separator line. Fixed
+# section names use a prebuilt membership hash; numbered CODE names retain the
+# parser's existing acceptance of any digit sequence.
 # Input: full older bookmark text string.
 # Output: hash of section name to arrayref of lines.
 sub _parse_legacy_sections {
     my ($text) = @_;
+    return () if !defined $text;
+    if ( index( $text, $LEGACY_SEP ) < 0 && $text !~ $LEGACY_MARKDOWN_SEP ) {
+        return _parse_single_legacy_section($text);
+    }
+
     my %sections;
-    my $markdown_sep = qr{^\s*---\s*$}m;
-    my @parts = split /(?:\Q$LEGACY_SEP\E\s*\n?|$markdown_sep)/, $text;
+    my @parts = split /(?:\Q$LEGACY_SEP\E\s*\n?|$LEGACY_MARKDOWN_SEP)/, $text;
     for my $part (@parts) {
         $part =~ s/\A[\r\n\s]+//;
         $part =~ s/[\r\n\s]+\z//;
@@ -497,10 +561,28 @@ sub _parse_legacy_sections {
         next if $part !~ /^([A-Za-z][A-Za-z0-9.]*)\s*:\s*(.*)$/s;
         my ( $name, $body ) = ( uc($1), $2 );
         $body =~ s/\A\s+//;
-        next if !grep { $_ eq $name || ( $name =~ /^CODE\d+$/ && /^CODE\d+$/ ) } @LEGACY_KEYS;
+        next if !$LEGACY_FIXED_KEYS{$name} && $name !~ /^CODE\d+$/;
         $sections{$name} = [ split /\n/, $body, -1 ];
     }
     return %sections;
+}
+
+# _parse_single_legacy_section($text)
+# Parses one legacy section without allocating the multi-section split list.
+# Input: one section body string, possibly undefined or whitespace-only.
+# Output: section-name to array-of-lines hash, empty when the section is invalid.
+sub _parse_single_legacy_section {
+    my ($text) = @_;
+    return () if !defined $text;
+    $text =~ s/\A[\r\n\s]+//;
+    $text =~ s/[\r\n\s]+\z//;
+    return () if $text eq '';
+    return () if $text !~ /^([A-Za-z][A-Za-z0-9.]*)\s*:\s*(.*)$/s;
+
+    my ( $name, $body ) = ( uc($1), $2 );
+    $body =~ s/\A\s+//;
+    return () if !$LEGACY_FIXED_KEYS{$name} && $name !~ /^CODE\d+$/;
+    return ( $name => [ split /\n/, $body, -1 ] );
 }
 
 # _legacy_stash_text($value)
@@ -719,12 +801,31 @@ sub _trim_trailing_newline {
 }
 
 # _html($text)
-# Escapes text for safe HTML rendering.
+# Uses the shared native-capable body escaper for long, densely escaped text;
+# ordinary text returns unchanged after metacharacter checks, and sparse text
+# retains the existing Perl replacement behavior.
 # Input: text string.
 # Output: escaped string.
 sub _html {
     my ($text) = @_;
     $text = '' if !defined $text;
+    return $text
+      if !ref($text)
+      && index( $text, '&' ) < 0
+      && index( $text, '<' ) < 0
+      && index( $text, '>' ) < 0
+      && index( $text, '"' ) < 0;
+    if ( $Developer::Dashboard::HtmlEscape::XS_LOADED
+        && !ref($text) && length($text) >= 64 )
+    {
+        my $prefix = substr( $text, 0, 16 );
+        my $early_escape_count = $prefix =~ tr/&<>/&<>/;
+        if ( $early_escape_count >= 4 ) {
+            $text = Developer::Dashboard::HtmlEscape::_escape_html($text);
+            $text =~ s/"/&quot;/g;
+            return $text;
+        }
+    }
     $text =~ s/&/&amp;/g;
     $text =~ s/</&lt;/g;
     $text =~ s/>/&gt;/g;
@@ -743,6 +844,7 @@ Developer::Dashboard::PageDocument - common page model for Developer Dashboard
 =head1 SYNOPSIS
 
   my $page = Developer::Dashboard::PageDocument->from_instruction($text);
+  my $id = $page->id;
   print $page->canonical_instruction;
 
 =head1 DESCRIPTION
@@ -752,9 +854,13 @@ transient encoded pages, and provider-generated pages.
 
 =head1 METHODS
 
-=head2 new, from_hash, from_json, from_instruction, merge_state, with_mode, as_hash, canonical_json, canonical_instruction, instruction_text, render_html
+=head2 new, from_hash, from_json, from_instruction, merge_state, with_mode, id, mode, as_hash, canonical_json, canonical_instruction, instruction_text, render_html
 
 Construct, mutate, serialize, and render page documents.
+
+C<id> returns the stored identifier without allocating the complete hash
+returned by C<as_hash>. Use it when a caller only needs the page identifier.
+C<mode> likewise returns only the stored display mode for renderer decisions.
 
 =for comment FULL-POD-DOC START
 
@@ -762,9 +868,27 @@ Construct, mutate, serialize, and render page documents.
 
 This module parses and normalizes dashboard bookmark instruction documents. It understands the separator-based bookmark format, extracts fields such as C<TITLE>, C<BOOKMARK>, C<STASH>, C<HEAD>, C<HTML>, and C<CODE*> blocks, and preserves the raw instruction when callers need source-stable editing behavior. C<HEAD> is trusted raw HTML inserted inside the rendered document head; never put untrusted text there.
 
+Legacy parsing uses a direct single-section path when the input contains no
+legacy separator or Markdown C<---> separator. Multi-section documents retain
+the separator-aware parser. This avoids constructing a parts array for the
+common one-section form without changing section-name validation, whitespace
+handling, undefined-input behavior, or body-line preservation.
+
+C<id> and C<mode> are lightweight accessors for code paths that need only a
+document's identifier or display mode; C<as_hash> remains the public way to
+obtain the complete page data structure.
+C<mode> avoids building that full hash when the renderer only needs to choose
+the edit or render chrome.
+
 =head1 WHY IT EXISTS
 
 It exists because bookmark parsing is a core format contract. The editor, renderer, source view, seeded pages, and saved page store all need the same understanding of how a bookmark document is shaped.
+
+The renderer's text escaping also needs to preserve the bookmark format's
+existing HTML output while using the shared XS body escaper for long, densely
+escaped titles, descriptions, or runtime errors. Ordinary plain scalars return
+after metacharacter checks; sparse or short escaped values keep the established
+Perl substitutions, including double-quote escaping.
 
 =head1 WHEN TO USE
 

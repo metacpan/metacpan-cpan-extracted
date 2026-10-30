@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Problem 48 — Performance Objective</title>
+<style>
+@page { size:A4; margin:16mm 17mm; }
+body { font:10pt/1.43 Arial,sans-serif; color:#172033; }
+h1 { color:#102b50; font-size:25pt; margin:0 0 3pt; }
+h2 { color:#125b80; font-size:14pt; border-bottom:1px solid #b8d5e2; padding-bottom:3pt; margin:16pt 0 6pt; }
+.eyebrow { color:#1684a5; font-weight:bold; letter-spacing:1.3pt; text-transform:uppercase; }
+.subtitle { color:#34465e; font-size:12pt; margin:4pt 0 14pt; }
+.callout { background:#edf7fa; border-left:4px solid #1684a5; padding:8pt 10pt; margin:8pt 0; }
+.warning { background:#fff6e7; border-left:4px solid #d68a16; padding:8pt 10pt; margin:8pt 0; }
+table { border-collapse:collapse; width:100%; margin:7pt 0; }
+th,td { border:1px solid #c9d7df; padding:5pt 6pt; text-align:left; vertical-align:top; }
+th { background:#eaf2f6; }
+code { font:8.5pt "Liberation Mono",monospace; color:#133b59; }
+li { margin:3pt 0; }
+.foot { color:#5b6878; font-size:8pt; border-top:1px solid #d9e1e6; padding-top:5pt; margin-top:18pt; }
+</style></head><body>
+<p class="eyebrow">Engineering brief · 14 October 2026</p>
+<h1>Problem 48</h1>
+<p class="subtitle">Full performance objective, current evidence, plan, and proof</p>
+<div class="callout"><b>Required target:</b> Make every Developer Dashboard subroutine at least 50× faster than version 5.88, evaluating MCE, FFI::Platypus, Inline::C, XS, SPVM, Memoize, and Perl's built-in class/method/field/signatures—without changing behavior. The target is not yet achieved.</div>
+
+<h2>Problem statement and cause</h2>
+<p>A source-line inventory finds 1,648 named <code>sub</code> declarations in the current worktree and 1,624 in the v5.88 <code>HEAD</code> tree; anonymous closures are excluded. They do not share one workload: some are tiny getters, some mutate runtime state, some wait on filesystem/process/network I/O, and some are CPU-bound. A worker pool, cache, or native-language boundary cannot safely or profitably accelerate all of them in the same way. The goal therefore requires profiling and proof at the level of each claimed routine; a single faster algorithm is not evidence for the rest.</p>
+<p>NYTProf found startup/module-loading and filesystem/environment discovery in light CLI paths, plus a real CPU hotspot in helper-password PBKDF2-HMAC-SHA256. These are distinct causes and need distinct measures.</p>
+
+<h2>Measurements so far</h2>
+<table><tr><th>Path / method</th><th>Measured outcome</th><th>Interpretation</th></tr>
+<tr><td><code>dashboard version</code></td><td>56.7 ms original median. Latest 15-run median: 31.486 ms.</td><td>Lazy imports, lightweight version access, and validated-PWD lookup yield about 1.80×. Still not 50×.</td></tr>
+<tr><td><code>dashboard paths</code> / <code>ps1</code></td><td>71.309 ms / 83.641 ms latest 15-run medians.</td><td>About 1.31× versus respective 5.88 baselines; command-level gains only.</td></tr>
+<tr><td>PBKDF2, 210,000 rounds</td><td>Perl 278–300 ms, median 284 ms. OpenSSL FFI 29.7–31.4 ms, median 29.9 ms.</td><td>Exact digest parity; about 9.5× faster for this one function.</td></tr>
+<tr><td>Inline::C / XS versus FFI</td><td>Warmed averages: 31.0 ms versus 32.4 ms for the same OpenSSL call.</td><td>About 4% difference. Inline::C generates XS glue; no significant extra speed or duplicate backend.</td></tr>
+<tr><td>MCE synthetic independent batch</td><td>Ten 300 ms jobs: 3.001 s sequential, 0.906 s using four workers.</td><td>Not the collector runtime. Real collector startup must preserve sequential readiness checks and fail-fast rollback.</td></tr>
+<tr><td>Tiny FFI boundary</td><td>Perl accessor: 12.43 million calls/s; FFI getenv: 5.58 million calls/s.</td><td>Same value in the measured environment; FFI was about 2.23× slower. Boundary cost makes blanket wrapping counterproductive.</td></tr>
+</table>
+
+<h2>Technology findings</h2>
+<ul>
+<li><b>FFI::Platypus:</b> used for the measured PBKDF2 hotspot, with Perl fallback and exact byte/digest checks.</li>
+<li><b>Inline::C / XS:</b> benchmarked as an alternate wrapper for the same OpenSSL function; no meaningful improvement beyond FFI.</li>
+<li><b>MCE:</b> useful for independent expensive tasks; no behavior-safe production batch is established.</li>
+<li><b>SPVM:</b> SPVM and SPVM::Digest::SHA installed in Docker; no Dashboard subroutine speedup has been demonstrated.</li>
+<li><b>Memoize:</b> no safe hot candidate beyond existing explicitly keyed runtime caches; caching mutable filesystem state or password outputs is unsafe.</li>
+<li><b>Perl class/method/field/signatures:</b> not a native-code transformation. The class feature is experimental in tested Perl 5.40.1 and emits warnings.</li>
+</ul>
+
+<h2>Solution and current status</h2>
+<ol>
+<li>Profile representative behavior with NYTProf — used on CLI paths and path tests.</li>
+<li>Implement evidence-backed optimizations with red tests — FFI PBKDF2 and lazy usage-renderer load implemented.</li>
+<li>Preserve behavior — focused crypto/auth/runtime tests and 1,029 CLI smoke tests passed in Docker.</li>
+<li>Latest Docker run: 265 files / 23,316 tests passed. Coverage is 100.0% across all four metrics (47,375 detail rows). Nine optional files and three MCE-only assertions were skipped in the standard image; the focused MCE test passed 11 assertions. Post-gate <code>perldoc perlsec</code> passed.</li>
+<li>Security, integration, dependency, docs/release, blank-install, image-build, and commit gates — pending.</li>
+</ol>
+
+<h2>New route under test: resident runtime</h2>
+<p>In Docker, ten fresh <code>dashboard paths -o json</code> executions averaged 84.412 ms each. The same handler in a resident process took 5.636 ms/request when aliases were rebuilt. Reusing the validated path/config context while recomputing the path map and JSON took 1.018 ms/request, with byte-for-byte parity against the current CLI payload (981 bytes): an experiment-level 82.9× reduction. A second prototype added a compiled C client and resident Perl Unix-socket server; 100 separate client launches averaged 0.514 ms/request with exact output parity, an experiment-level 164× reduction. This is a credible route to 50× for repeated requests.</p>
+<div class="warning">These are prototype measurements, not a shipped fix or proof for all subroutines. A synthetic Docker mutation test found second-resolution stat can miss same-second directory changes. Focused tests now confirm existing readers see skill creation/deletion, disable-marker changes, config replacement, new skill aliases, and runtime symlink retargeting. A dynamic <code>Folder.pm</code> method is reevaluated after its environment input changes. Persistent-cache invalidation, refreshed output parity, and watcher cost remain unproven.</div>
+
+<div class="warning"><b>50× audit:</b> A bare Perl process in the same container takes 1.032–1.268 ms. A 50× speedup for the original 56.7 ms median version command would require about 1.134 ms total—near the measured interpreter startup floor. This disproves the target for that invocation on this runtime. No 50× proof exists for the other 1,648 current named routines. Problem 48 remains in progress.</div>
+
+<h2>Expected outcome and proof required</h2>
+<p>Preserve observable behavior while materially accelerating any routine shown by profiling to be a real bottleneck. Current proven gains are 1.80× for version, 1.31× for paths, 1.31× for ps1, and 9.5× for PBKDF2. Do not claim the 50× whole-dashboard or every-routine target until the corresponding evidence exists.</p>
+<ul>
+<li>Run tests inside the unique Problem 48 Docker Compose project and retain complete logs.</li>
+<li>For each claimed routine, use fixed representative inputs, compare v5.88 against the optimized version over repeated runs, and verify exact output/error parity.</li>
+<li>Keep NYTProf test-harness time separate from actual application-route timings.</li>
+<li>Finish security, integration, dependency, version alignment, packaging, Docker image, blank-install, and git delivery gates before calling the cycle complete.</li>
+</ul>
+<p class="foot">Editable source: doc/problem-48-statement.md · Supporting measurements: doc/problem-48-performance-research.md</p>
+</body></html>

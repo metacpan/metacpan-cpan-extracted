@@ -21,7 +21,11 @@ subtest HPD15 => sub {
     is $obj->manufacturer, 'Roland', 'manufacturer';
     is $obj->port_in, 'generic', 'port_in';
     is $obj->port_out, 'generic', 'port_out';
-    is_deeply $obj->cc->[0], { name => 'Bank Select', number => 0 }, 'cc';
+    is_deeply $obj->cc->[0], { note => 'Bank Select', number => 0 }, 'cc';
+    my $got = $obj->find('control_change', 'pan');
+    is_deeply $got, [{ note => "Panpot (PAN knob)", number => 10 }], 'find';
+    $got = $obj->find('bugus', 'pan');
+    is_deeply $got, undef, 'find';
 };
 
 subtest VolcaDrum => sub {
@@ -30,7 +34,7 @@ subtest VolcaDrum => sub {
     is $obj->manufacturer, 'Korg', 'manufacturer';
     is $obj->port_in, 'generic', 'port_in';
     is $obj->port_out, 'generic', 'port_out';
-    is_deeply $obj->cc->[0], { name => 'Pan', number => 10 }, 'cc';
+    is_deeply $obj->cc->[0], { note => 'Pan', number => 10 }, 'cc';
     is_deeply $obj->note_on, [qw(60 62 64 65 67 69)], 'note_on';
 };
 
@@ -40,7 +44,7 @@ subtest microKORG => sub {
     is $obj->manufacturer, 'Korg', 'manufacturer';
     is $obj->port_in, 'generic', 'port_in';
     is $obj->port_out, 'generic', 'port_out';
-    is_deeply $obj->cc->[0], { name => 'Modulation Depth (MOD Wheel)', number => 1 }, 'cc';
+    is_deeply $obj->cc->[0], { note => 'Modulation Depth (MOD Wheel)', number => 1 }, 'cc';
     is_deeply $obj->note_on, { min => 0, max => 127 }, 'note_on';
 };
 

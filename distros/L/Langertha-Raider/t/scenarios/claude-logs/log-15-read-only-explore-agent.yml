@@ -1,0 +1,66 @@
+# Real pattern: the main session sends an Explore-style agent (subagent_type
+# Explore: read-only, Write/Edit/NotebookEdit/Bash disallowed) to find where
+# something is defined. It sweeps with Glob and Grep, reads the one file, and
+# reports file and line; the parent then reads the file and does the edit
+# itself, because the agent cannot. A write attempt by the agent has no tool to
+# land on. The agent's read does not count for the caller: each has a read
+# state of its own (ADR 0023), so the caller reads before it edits.
+# Abweichung: Claude Code's Explore is a built-in agent type; raider has one too
+# since ADR 0027, but this scenario keeps the shape of an agent file with
+# disallowedTools (an Explore file copied from a Claude Code setup works the
+# same). Agent is disallowed as in Claude Code's Explore: with nesting depth 3
+# a subagent would otherwise get the agent tool.
+# Abweichung: NotebookEdit has no raider counterpart; it is ignored (reported by
+# `config explain`), the rest of the list still applies.
+# Abweichung: where Claude Code's agent is never offered a removed tool, raider
+# answers a call to it with an error result "No such tool available: write_file"; the agent goes on.
+title: a read-only explore agent searches with glob, grep and read_file, its write attempt finds no tool, and the caller edits
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/agents/scout.md: "---\nname: scout\ndescription: Read-only search of the tree; reports file and line, changes nothing.\ndisallowedTools: Write, Edit, NotebookEdit, Bash, Agent\n---\nSCOUT-BODY: you search and report, you never change files.\n"
+  src/limits.txt: "max_items = 10\nretries = 3\n"
+  src/other.txt: "retries_note = see limits\n"
+prompt: Find where the retry count is set and change it to 5.
+script:
+  - tool_calls:
+      - [ agent, { description: Find retry setting, prompt: "Find where the retry count is defined under src/ and report file and line. Do not change anything.", subagent_type: scout } ]
+  - tool_calls:
+      - [ glob, { pattern: "src/*.txt" } ]
+      - [ grep, { pattern: "^retries =", path: src, output_mode: content, '-n': true } ]
+  - tool_calls:
+      - [ read_file, { path: src/limits.txt } ]
+  - tool_calls:
+      - [ write_file, { path: src/limits.txt, content: "retries = 5\n" } ]
+  - text: "The retry count is set in src/limits.txt line 2 (retries = 3). I could not change it, I have no write tools."
+  - tool_calls:
+      - [ read_file, { path: src/limits.txt } ]
+  - tool_calls:
+      - [ edit_file, { path: src/limits.txt, old_string: "retries = 3", new_string: "retries = 5" } ]
+  - text: Set retries to 5 in src/limits.txt.
+expect:
+  answer: Set retries to 5 in src/limits.txt.
+  request_count: 8
+  files:
+    src/limits.txt: "max_items = 10\nretries = 5\n"
+  requests:
+    - { index: 0, tool_text: "- scout: Read-only search of the tree; reports file and line, changes nothing. (Tools: All tools except write_file, edit_file, bash, agent)" }
+    - { index: 1, contains: "SCOUT-BODY" }
+    - { index: 1, lacks: [ write_file, edit_file, bash, agent, ask_user ] }
+    - { index: 1, contains: "glob(" }
+    - { index: 1, contains: "grep(" }
+    - { index: 1, contains: "read_file(" }
+    - { index: 3, contains: "retries = 3" }
+    - { index: 4, contains: "No such tool available: write_file" }
+    - { index: 5, contains: "line 2 (retries = 3)" }
+    - { index: 5, absent: "SCOUT-BODY" }
+  tools:
+    - { name: glob, text: 'src/limits\.txt\nsrc/other\.txt' }
+    - { name: grep, text: 'src/limits\.txt:2:retries = 3' }
+    - { name: read_file, text: 'max_items = 10' }
+    - { name: write_file, error: true, text: 'No such tool available: write_file</tool_use_error>' }
+    - { name: agent, text: 'src/limits\.txt line 2' }
+    - { name: read_file, text: '2\tretries = 3' }
+    - { name: edit_file, text: '\AThe file \S+/src/limits\.txt has been updated successfully\.' }
+  events:
+    - { type: agent.started, call: c1, agent: scout }
+    - { type: agent.finished, call: c1, agent: scout, status: completed }

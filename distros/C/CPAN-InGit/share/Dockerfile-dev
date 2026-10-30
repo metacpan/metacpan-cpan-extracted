@@ -1,0 +1,22 @@
+# Build this docker image with
+#   docker build -t cpangit-dev -f Dockerfile-dev .
+# and then you can open a shell for development as:
+#   docker run --rm -it -w $PWD -v $PWD:$PWD cpangit-dev
+
+FROM debian:13
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      gosu git ca-certificates cpanminus make \
+      libio-socket-ssl-perl libgit-raw-perl libmoo-perl \
+      libmojolicious-perl libmodule-metadata-perl \
+      liblog-any-perl liblog-any-adapter-tap-perl \
+      libtest-pod-coverage-perl libtest-pod-perl libpod-coverage-trustpod-perl \
+      libdist-zilla-perl libdist-zilla-plugin-git-perl \
+      nodejs \
+ && rm -rf /var/lib/apt/lists \
+ && cpanm Log::Any::Adapter::MojoLog Dist::Zilla::Plugin::ShareDir \
+ && rm -rf ~/.cpanm
+
+ENTRYPOINT ["/usr/bin/env"]
+CMD ["/bin/bash"]

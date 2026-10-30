@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -16,6 +16,7 @@ use Database::BI::Tutorial;
 use Mojo::File;
 use Mojo::JSON		qw(encode_json decode_json);
 use Mojo::Parameters;
+use Mojo::URL;
 use Mojo::Util		qw(url_escape encode xml_escape);
 use File::Path		qw(remove_tree);
 use File::Spec;
@@ -87,6 +88,7 @@ Readonly my $MIN_HTML_OSM_VERSION => '0.12';
 Readonly my %MESSAGES => (
 	error_table_invalid    => 'Invalid table name "%s"',
 	error_table_open       => 'Could not open table "%s": %s',
+	error_table_missing    => 'There is no table called "%s".',
 	error_file_open        => 'Could not open "%s": %s',
 	error_no_path          => 'No path specified',
 	error_not_found        => 'File or directory not found: %s',
@@ -108,7 +110,8 @@ Readonly my %MESSAGES => (
 	error_measure_column        => 'Measure column "%s" is not in the view',
 	error_pivot_rows_required   => 'At least one rows= dimension is required',
 	error_pivot_measure_req     => 'At least one m= measure (col:fn:as) is required',
-	error_pivot_measure_invalid => 'Invalid measure spec "%s"; expected col:fn:as where fn is one of: sum avg min max count count_distinct',
+	error_pivot_measure_invalid => 'Invalid measure spec "%s"; expected col:fn:as where fn is one of: %s, or p1 to p100 for a percentile',
+	error_stats_percentile      => 'The percentile must be a whole number from 1 to 100; "%s" is not',
 	error_pivot_dim_not_found   => 'Row/column dimension "%s" is not in the view',
 	error_pivot_dim_comma       => 'Dimension name "%s" must not contain a comma',
 	error_calc_compile          => 'Calculated field "%s": %s',
@@ -116,6 +119,8 @@ Readonly my %MESSAGES => (
 	error_topn_col              => 'Top-N column "%s" is not a measure alias in this view',
 	warn_calc_undef             => 'Calculated field "%s" returned undef for %d row(s)',
 	error_date_pattern          => 'Unsupported date format pattern "%s"; allowed: %%m/%%d/%%Y, %%d/%%m/%%Y, %%d-%%b-%%Y',
+	error_date_time_pattern     => 'Unsupported time format pattern "%s"; allowed: %%H:%%M, %%H:%%M:%%S',
+	error_date_as               => 'as= must be "timestamp" or absent; "%s" is neither',
 	error_analysis_not_found    => 'Analysis "%s" not found',
 	error_analysis_invalid      => 'Invalid analysis spec: %s',
 	error_analysis_version      => 'Unsupported analysis version %s; please upgrade the application',
@@ -150,6 +155,26 @@ Readonly my %MESSAGES => (
 	error_token_invalid         => 'Share token is invalid or has expired',
 	error_token_missing         => 'A share token is required to view this analysis',
 	freshness_stale_msg         => 'Source data has changed since this analysis was last saved',
+	error_agg_fn                => 'Unknown aggregate function "%s"; expected one of: %s, or p1 to p100 for a percentile',
+	error_range_name            => 'Unknown time range "%s"; expected one of: %s',
+	error_range_column          => 'A time range is applied to one column: add rcol=<column> to the URL',
+	error_span_interval         => 'Unknown time bucket "%s" for span=; use a count and one of s, m, h, d, w, mon, q or y, for example 1h or 15m',
+	error_span_no_column        => 'A time bucket needs one column to bucket: add tcol=<column>, or name exactly one of the dimensions this page already takes',
+	error_span_tcol_orphan      => 'tcol=%s names the column to bucket, but span=<interval> is missing',
+	error_span_tcol_unknown     => 'Column "%s" is not in this view, so there is nothing to bucket',
+	error_span_conflict         => 'The bucket column "%s" is already defined by a calculated field; add as=<name> to bucket under a name of its own',
+	error_span_name             => 'Bucket column name "%s" is not a usable column name; add as=<name>',
+	error_cs_spec               => 'cs=%s must be <column>:<function>:<alias>, optionally followed by :<parameter>',
+	error_cs_column             => 'cs=%s names the column "%s", which is not in this view',
+	error_cs_fn                 => 'Unknown cross-row function "%s"; use one of: %s',
+	error_cs_alias              => 'Cross-row alias "%s" is not a usable column name',
+	error_cs_conflict           => 'Cross-row alias "%s" is already a column of this view, or another cs= already writes it; choose another name',
+	error_cs_arg                => 'cs=%s: %s takes a whole number greater than zero, as in %s:%s:ma7:7',
+	error_cs_no_arg             => 'cs=%s: %s takes no parameter',
+	error_cs_by                 => 'by=%s names "%s", which is not a column of this view',
+	error_cs_order              => 'order=%s must be <column>, <column>:asc or <column>:desc',
+	error_cs_order_col          => 'order=%s names "%s", which is not a column of this view',
+	error_cs_order_need         => 'cs=%s needs order=: %s reads its rows in order, so the order has to be named',
 );
 
 # Maximum accepted upload body size.  Enforced both here (application layer)
@@ -200,16 +225,97 @@ Readonly my %NAMED_COLOR_HEX => (
 	lime    => '#00ff00', white   => '#ffffff', black   => '#000000',
 );
 
-# Valid aggregate function vocabulary shared by _measure, _grouped_totals,
-# and the /pivot measure-spec parser.  Do not add functions here
-# without a corresponding implementation in _grouped_totals's Perl fold AND
-# a corresponding entry in the lower-layer aggregate() implementations.
-Readonly my @MEASURE_FNS  => qw(sum avg min max count count_distinct);
-Readonly my %MEASURE_FN_OK => map { $_ => 1 } @MEASURE_FNS;
+# The aggregate function vocabulary shared by _measure, _grouped_totals, the
+# /pivot measure-spec parser and the /stats view.
+#
+# It has two halves.  @PUSHED_MEASURE_FNS are the functions
+# Database::Abstraction's aggregate() computes in the backend: adding one here
+# means adding it there as well.  @PERL_MEASURE_FNS are computed by the Perl
+# fold in _grouped_totals from all the values in a group, because a subtotal has
+# to be recomputed from the rows rather than combined out of the cells (a median
+# is not the sum of the medians of its parts), and because the app already holds
+# the rows: the fold is one pass over records that are in memory, with no second
+# implementation of the same statistic to agree with.  Database::Abstraction
+# does accept a median and a stddev measure, computing them in Perl over rows it
+# materialises itself -- close enough to be tempting, and exactly the second
+# implementation to avoid, so _measure_pushable refuses to send them.
+#
+# A percentile is spelled p<N>, for N from 1 to 100: p90, p99, p1.  The level
+# rides in the function name because the spec dialect is col:fn:as, with no
+# room for a parameter in it; p50 is the median, and median is kept as its own
+# name because that is what a reader looks for.
+Readonly my @PUSHED_MEASURE_FNS   => qw(sum avg min max count count_distinct);
+Readonly my @PERL_MEASURE_FNS     => qw(median stdev first last range);
+Readonly my @MEASURE_FNS          => (@PUSHED_MEASURE_FNS, @PERL_MEASURE_FNS);
+Readonly my %PUSHED_MEASURE_FN_OK => map { $_ => 1 } @PUSHED_MEASURE_FNS;
+Readonly my %MEASURE_FN_OK        => map { $_ => 1 } @MEASURE_FNS;
 
-# Allowed strptime-style date format patterns for the /dates/save endpoint.
+# _measure_percentile($fn) -> $level | undef
+#
+# The percentile level a measure function names, or undef when it names none:
+# 'p95' -> 95, 'p50' -> 50, 'percentile' -> undef, 'sum' -> undef.  A level
+# outside 1..100 is not a percentile, so an unknown function still fails as an
+# unknown function rather than as a percentile of -40.
+sub _measure_percentile {
+	my $fn = shift;
+	return undef unless defined $fn && length $fn;
+	my ($level) = $fn =~ /\Ap(\d{1,3})\z/;
+	return undef unless defined $level;
+	return ($level >= 1 && $level <= 100) ? $level + 0 : undef;
+}
+
+# _measure_fn_ok($fn) -> bool
+#
+# True for every function _grouped_totals can compute: the named ones and any
+# percentile level.  This is the single answer to "is this a measure function?"
+# for the parser, and the vocabulary the 400 message prints comes from the same
+# two lists, so a message can never list a function the fold cannot compute.
+sub _measure_fn_ok {
+	my $fn = shift;
+	return 0 unless defined $fn && length $fn;
+	return 1 if $MEASURE_FN_OK{$fn};
+	return defined _measure_percentile($fn) ? 1 : 0;
+}
+
+# ---------------------------------------------------------------------------
+# Relative time ranges
+#
+# A relative time range is a named window worked out from the clock when the
+# request arrives -- "the last 30 days", "this quarter" -- so a link, a
+# bookmark or a saved canvas that carries one keeps meaning the same thing
+# every time it is opened instead of freezing the dates it first resolved to.
+#
+# The range is named in the URL (?range=<name>&rcol=<column>) and resolved to
+# two f= filters on that column, which every data route already applies, so the
+# table view, the charts, the pivot, the stats page, the insights page, the
+# exports and a saved canvas all see the same rows.
+#
+# The vocabulary is day-granular except last_24_hours, which is to the second.
+# ---------------------------------------------------------------------------
+
+Readonly my @TIME_RANGES => (
+	{ name => 'last_24_hours', label => 'Last 24 hours', hours => 24 },
+	{ name => 'today',         label => 'Today',         day   => 0 },
+	{ name => 'yesterday',     label => 'Yesterday',     day   => -1 },
+	{ name => 'last_7_days',   label => 'Last 7 days',   days  => 7 },
+	{ name => 'last_30_days',  label => 'Last 30 days',  days  => 30 },
+	{ name => 'last_90_days',  label => 'Last 90 days',  days  => 90 },
+	{ name => 'this_month',    label => 'This month',    month => 0 },
+	{ name => 'last_month',    label => 'Last month',    month => -1 },
+	{ name => 'this_quarter',  label => 'This quarter',  quarter => 0 },
+	{ name => 'last_quarter',  label => 'Last quarter',  quarter => -1 },
+	{ name => 'this_year',     label => 'This year',     year  => 0 },
+	{ name => 'last_year',     label => 'Last year',     year  => -1 },
+);
+Readonly my %TIME_RANGE => map { $_->{name} => $_ } @TIME_RANGES;
+
+# Allowed strptime-style date format patterns for the /dates/save endpoint, and
+# the two time patterns that may be given beside one of them for a column that
+# holds a clock time as well as a date.
 Readonly my %ALLOWED_DATE_PATTERNS => map { $_ => 1 }
 	qw(%m/%d/%Y %d/%m/%Y %d-%b-%Y);
+Readonly my %ALLOWED_TIME_PATTERNS => map { $_ => 1 }
+	qw(%H:%M %H:%M:%S);
 
 # Default share token lifetime: 30 days in seconds.
 Readonly my $SHARE_TOKEN_TTL => 30 * 86_400;
@@ -318,6 +424,253 @@ sub _safe_back_url {
 	return undef unless defined $url && length($url);
 	return $url if $url =~ m{\A(?:/(?!/)|https?://)}i;
 	return undef;
+}
+
+# ---------------------------------------------------------------------------
+# Breadcrumb trail
+# ---------------------------------------------------------------------------
+#
+# Every page shows Home > ... > the page itself.  The trail is not passed in:
+# each page's URL already names the page it was opened from (a chart's back=,
+# a table's back2= when it was drilled into from a chart), and that URL names
+# its own, so the whole path is recovered by following the links up.  Each
+# step is named from its own URL by one function, so a crumb always reads the
+# same whichever page it appears on.
+
+# The chart and analysis routes, which name their parent with back=.
+Readonly my %CRUMB_KIND => (
+	graph     => 'Line graph',   line      => 'Line graph',
+	pie       => 'Pie chart',    heatmap   => 'Heatmap',
+	bar       => 'Bar chart',    stacked   => 'Stacked bar chart',
+	scatter   => 'Scatter plot', combo     => 'Combo chart',
+	treemap   => 'Treemap',      histogram => 'Histogram',
+	wordcloud => 'Word cloud',   map       => 'Map',
+	pivot     => 'Pivot table',  stats     => 'Column stats',
+	insights  => 'Insights',     folder    => 'Folder view',
+);
+
+# How a filter reads in a crumb: "region = East".
+Readonly my %CRUMB_OP => (
+	eq => '=', ne => '!=', contains => 'contains', starts => 'starts with',
+	lt => '<', le => '<=', gt => '>', ge => '>=', between => 'between',
+	empty => 'is empty', notempty => 'is not empty',
+);
+
+# A trail is never longer than this, whatever the URLs say.
+Readonly my $CRUMB_MAX_DEPTH => 8;
+
+# A column name or filter value that a crumb will repeat.  The URL is the
+# user's, so a crafted one could put any text in the trail; markup and
+# over-long values are left out and the crumb names the page more generally.
+Readonly my $CRUMB_TEXT_RE => qr/\A[^<>"\x00-\x1f]{1,64}\z/;
+
+# _breadcrumb_trail($c) -> \@crumbs
+#
+# Purpose: The pages between Home and this one, this one last: a list of
+#          { label, url }.  Home itself is not in the list; the template
+#          always puts it first.
+# Entry:   $c -- the controller for the request.  A plain function, called
+#          from the before_render hook in Database::BI, so every page gets a
+#          trail without per-action code.
+# Exit:    An arrayref, empty for Home and for a controller that is not this
+#          class (a 404 page rendered by Mojolicious itself).
+# Notes:   A parent is followed only when _safe_back_url accepts it and it is
+#          on this host; a loop or the depth cap ends the trail, so a crafted
+#          URL can make it short but never wrong or endless.
+sub _breadcrumb_trail {
+	my ($c) = @_;
+	return [] unless ref $c && $c->isa(__PACKAGE__);
+
+	my @trail;
+	my %seen;
+	my $url = Mojo::URL->new($c->req->url->path_query);
+	while ($url && @trail < $CRUMB_MAX_DEPTH) {
+		my $key = $url->path_query;
+		last if $seen{$key}++;
+		my $label = $c->_crumb_label($url);
+		last unless defined $label && length $label;
+		unshift @trail, { label => $label, url => $key };
+		$url = $c->_crumb_parent($url);
+	}
+	return \@trail;
+}
+
+# _crumb_local($self, $raw) -> Mojo::URL | undef
+#
+# A parent link as a URL on this site, or undef when there is none to follow:
+# empty, refused by _safe_back_url, on another host, or Home (which the trail
+# shows anyway).  Absolute links -- the panels pass window.location.href --
+# are reduced to their path and query.
+sub _crumb_local :Protected ($self, $raw) {
+	my $safe = _safe_back_url($raw) or return undef;
+	my $url  = Mojo::URL->new($safe);
+	if (defined $url->host) {
+		my $here = $self->req->url->to_abs;
+		return undef unless lc($url->host_port // '') eq lc($here->host_port // '');
+	}
+	my $path = $url->path->to_string;
+	return undef if $path eq '' || $path eq '/';
+	return Mojo::URL->new($url->path_query);
+}
+
+# _crumb_parent($self, $url) -> Mojo::URL | undef
+#
+# The page $url was opened from.  A chart names it with back=.  A table page
+# names it with back2= when it was drilled into from a chart, and otherwise
+# has a natural parent: the left table for a merge or a combine, the schema
+# page or the folder for a file, nothing for a table in data_dir.
+sub _crumb_parent :Protected ($self, $url) {
+	my $path = $url->path->to_string;
+	my $q    = $url->query;
+
+	if ($path =~ m{\A/([a-z]+)\z} && $CRUMB_KIND{$1}) {
+		return $self->_crumb_local($q->param('back'))
+			// $self->_crumb_local($self->_spec_to_url($q->param('l') // ''));
+	}
+	if ($path =~ m{\A/view/} || $path eq '/import') {
+		return $self->_crumb_local($q->param('back2'));
+	}
+	if ($path eq '/join' || $path eq '/combine') {
+		return $self->_crumb_local($q->param('back2'))
+			// $self->_crumb_local($self->_spec_to_url($q->param('l') // ''));
+	}
+	if ($path eq '/open') {
+		my $parent = $self->_crumb_local($q->param('back2'))
+			// $self->_crumb_local($q->param('back'));
+		return $parent if $parent;
+		my $file = $q->param('path') // '';
+		return undef unless length $file && $file !~ m{\A/\.\./};
+		return Mojo::URL->new('/browse?path=' . url_escape(Mojo::File->new($file)->dirname->to_string));
+	}
+	if ($path eq '/tables') {
+		my $spec = $q->param('l') // '';
+		return undef unless $spec =~ /\Apath:(.+)\z/;
+		return Mojo::URL->new('/browse?path=' . url_escape(Mojo::File->new($1)->dirname->to_string));
+	}
+	if ($path =~ m{\A/a/}) {
+		return $self->_crumb_local($q->param('back'));
+	}
+	return undef;
+}
+
+# _crumb_label($self, $url) -> $text | undef
+#
+# What a page is called in a trail.  undef for a page that has no place in
+# one, which ends the trail there.
+sub _crumb_label :Protected ($self, $url) {
+	my $path = $url->path->to_string;
+	my $q    = $url->query;
+	my $view = _crumb_view_suffix($q);
+
+	return _crumb_spec_name("table:$1") . $view if $path =~ m{\A/view/([^/]+)\z};
+
+	if ($path eq '/open') {
+		my $name = Mojo::File->new($q->param('path') // '')->basename;
+		my $it   = $q->param('it');
+		$name .= ": $it" if defined $it && length $it;
+		return length $name ? "$name$view" : undef;
+	}
+	# Either route takes both joins and combined files.
+	if ($path eq '/join' || $path eq '/combine') {
+		my @names = map { _crumb_spec_name($_) } grep { /\A(?:table|path|url|redis):/i }
+			($q->param('l') // ''),
+			(map { (split /\|/, $_, 2)[0] // '' } @{ $q->every_param('j') }),
+			@{ $q->every_param('c') };
+		return @names ? join(' + ', @names) . $view : undef;
+	}
+	if ($path eq '/import') {
+		my $src = Mojo::URL->new($q->param('url') // '');
+		return defined $src->host ? $src->host . $view : undef;
+	}
+	if ($path =~ m{\A/([a-z]+)\z} && $CRUMB_KIND{$1}) {
+		my $what = _crumb_chart_subject($1, $q);
+		return $CRUMB_KIND{$1} . (length $what ? ": $what" : '');
+	}
+	if ($path eq '/tables') {
+		my $spec = $q->param('l') // '';
+		return length $spec ? _crumb_spec_name($spec) . ' schema' : undef;
+	}
+	if ($path eq '/browse') {
+		my $dir = $q->param('path') // '';
+		return length $dir ? 'Files: ' . Mojo::File->new($dir)->basename : 'Files';
+	}
+	return 'Catalog'  if $path eq '/catalog';
+	return 'Tutorial' if $path eq '/tutorial';
+	if ($path =~ m{\A/a/([A-Za-z0-9_-]+)}) {
+		my $a = $self->_read_analyses->{$1};
+		return (ref $a eq 'HASH' && length($a->{name} // '')) ? $a->{name} : 'Canvas';
+	}
+	return undef;
+}
+
+# _crumb_spec_name($spec) -> $name
+#
+# A data source as a person would name it: "sales" for table:sales,
+# "store: orders" for an internal table, the file name for path:, the host
+# for a web page.
+sub _crumb_spec_name {
+	my ($spec) = @_;
+	$spec //= '';
+	return "$1: $2" if $spec =~ m{\Atable:([^/]+)/(.+)\z};
+	return $1       if $spec =~ m{\Atable:(.+)\z};
+	return Mojo::File->new($1)->basename if $spec =~ m{\Apath:(.+)\z};
+	if ($spec =~ m{\Aurl:(.+)\z}i) {
+		my $host = Mojo::URL->new($1)->host;
+		return $host // $1;
+	}
+	return 'Redis' if $spec =~ /\Aredis:/i;
+	return $spec;
+}
+
+# _crumb_view_suffix($query) -> " (region = East, last 90 days)" | ''
+#
+# The part of a table's view that makes it a different page from the whole
+# table: its filters and its time range.  Two filters are shown; more are
+# counted, so a crumb stays short.
+sub _crumb_view_suffix {
+	my ($q) = @_;
+	my @bits;
+	for my $spec (@{ $q->every_param('f') }) {
+		my ($col, $op, $val) = split /:/, $spec, 3;
+		next unless length($col // '') && length($op // '');
+		next unless $col =~ $CRUMB_TEXT_RE;
+		next if length($val // '') && $val !~ $CRUMB_TEXT_RE;
+		my $word = $CRUMB_OP{$op} // $op;
+		push @bits, ($op eq 'empty' || $op eq 'notempty')
+			? "$col $word" : "$col $word " . (($val // '') =~ s/:/ and /r);
+	}
+	my $extra = @bits > 2 ? @bits - 2 : 0;
+	splice @bits, 2 if $extra;
+	push @bits, "+$extra more" if $extra;
+	if (my $range = $TIME_RANGE{ $q->param('range') // '' }) {
+		push @bits, lc $range->{label};
+	}
+	return @bits ? ' (' . join(', ', @bits) . ')' : '';
+}
+
+# _crumb_chart_subject($kind, $query) -> $text
+#
+# What a chart shows, from its own parameters: "amount by region",
+# "Count by region", "amount".  Empty for the pages that are about the
+# whole table (stats, insights).
+sub _crumb_chart_subject {
+	my ($kind, $q) = @_;
+	my %p = map {
+		my $v = $q->param($_) // '';
+		($_ => ($v =~ $CRUMB_TEXT_RE ? $v : ''));
+	} qw(x y cat val seg col rows bar_val line_val loc lat lon);
+
+	return "$p{y} by $p{x}" if ($kind eq 'graph' || $kind eq 'line' || $kind eq 'scatter') && length $p{x} && length $p{y};
+	return "$p{x} by $p{y}" if $kind eq 'heatmap' && length $p{x} && length $p{y};
+	return "$p{cat} by $p{seg}" if $kind eq 'stacked' && length $p{cat} && length $p{seg};
+	return $p{rows} =~ s/,/, /gr if $kind eq 'pivot';
+	return length $p{loc} ? $p{loc} : (length $p{lat} ? "$p{lat}, $p{lon}" : '') if $kind eq 'map';
+
+	my $dim     = (grep { length } @p{qw(cat x col)})[0] // '';
+	my $measure = (grep { length } @p{qw(val bar_val y)})[0] // '';
+	$measure = 'Count' if $measure eq '__count__';
+	$measure = 'Count' if !length $measure && ($kind eq 'pie' || $kind eq 'bar' || $kind eq 'treemap');
+	return length $measure && length $dim ? "$measure by $dim" : $dim;
 }
 
 # _resolve_template($self) -> ($platform, $language)
@@ -728,6 +1081,8 @@ sub _get_columns {
 #       lt (strict), le (inclusive), gt (strict), ge (inclusive)
 #     Unary (val is ignored):
 #       empty (cell eq ''), notempty (cell ne '')
+#     Range (val = lo:hi, string comparison -- correct for ISO YYYY-MM-DD dates):
+#       between -- lo le cell le hi
 #   Boundary rules for numeric operators:
 #     le/ge include the boundary value; lt/gt exclude it.
 #   contains/starts with empty val ('') match every record (index always 0).
@@ -740,34 +1095,878 @@ sub _get_columns {
 # precompute, every case-insensitive operator (eq, ne, contains, starts) would
 # call lc($val) O(N) times for N records -- a pure O(N) waste since $val is
 # constant within a single filter application.
+# _is_iso_date($value) -> bool
+#
+# Purpose: Report whether a filter value names a point in time rather than a
+#          plain string, so the date comparisons can be used instead of the
+#          string ones.  A bare date (YYYY-MM-DD) qualifies, and so does an ISO
+#          timestamp (YYYY-MM-DDTHH:MM:SS) or the same with a space separator,
+#          which is what CSV exports and SQLite text columns usually hold.
+sub _is_iso_date {
+	return $_[0] =~ /\A\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\z/;
+}
+
+# Convert M/D/YYYY or YYYY-MM-DD to YYYY-MM-DD; returns undef for other formats.
+# A value that is already ISO is returned unchanged, including its time part: a
+# timestamp cell is the caller's to compare, not this sub's to truncate.
+sub _to_iso_date {
+	my ($v) = @_;
+	return $v if _is_iso_date($v);
+	if (my ($m, $d, $y) = $v =~ m{\A(\d{1,2})/(\d{1,2})/(\d{4})\z}) {
+		return sprintf '%04d-%02d-%02d', $y, $m, $d;
+	}
+	return;
+}
+
+# _date_key($value, $precision) -> comparable key | undef
+#
+# Purpose: Put a cell and a filter bound on the same footing so that a
+#          lexicographic comparison answers the question the filter asked.
+#          $precision is 10 for a day and 19 for a second: a cell holding a
+#          timestamp is compared at the day it falls in when the bound is a
+#          day, and to the second when the bound carries a time.  A value that
+#          is not date-shaped at all returns undef, and the caller keeps the
+#          raw cell instead.
+sub _date_key {
+	my ($value, $precision) = @_;
+	return undef unless defined $value;
+	my ($day, $hour, $min, $sec) =
+		$value =~ /\A(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?\z/;
+	return undef unless defined $day;
+	return $day if $precision < 19;
+	return sprintf '%sT%s:%s:%s', $day, $hour // '00', $min // '00', $sec // '00';
+}
+
+# ---------------------------------------------------------------------------
+# Relative time ranges
+# ---------------------------------------------------------------------------
+
+# _iso_day($epoch) -> 'YYYY-MM-DD' in local time
+sub _iso_day {
+	my @lt = localtime($_[0]);
+	return sprintf '%04d-%02d-%02d', $lt[5] + 1900, $lt[4] + 1, $lt[3];
+}
+
+# _iso_second($epoch) -> 'YYYY-MM-DDTHH:MM:SS' in local time
+sub _iso_second {
+	my @lt = localtime($_[0]);
+	return sprintf '%04d-%02d-%02dT%02d:%02d:%02d',
+		$lt[5] + 1900, $lt[4] + 1, $lt[3], $lt[2], $lt[1], $lt[0];
+}
+
+# _midday($mday, $mon, $year) -> epoch
+#
+# Noon, so a boundary never lands in a daylight-saving gap, and mktime's own
+# normalisation (day 0 is the last day of the previous month, month -1 is
+# December, and so on) is what makes the month, quarter and year arithmetic
+# below one line each.  $mon is 0-based, $year is years since 1900, matching
+# localtime's own convention.
+sub _midday {
+	require POSIX;
+	return POSIX::mktime(12, 0, 0, $_[0], $_[1], $_[2]);
+}
+
+# _time_range_bounds($preset, $now) -> ($lo, $hi)
+#
+# Purpose: Resolve one preset to the window it names, as two strings that the
+#          filter engine can compare against: 'YYYY-MM-DD' for a day-granular
+#          window, 'YYYY-MM-DDTHH:MM:SS' for last_24_hours.
+# Entry:   $preset -- one entry of @TIME_RANGES.
+#          $now    -- epoch second; defaults to the clock, and a caller may
+#                     pass one so a test can name the day it is asking about.
+# Exit:    Two-element list, or an empty list for a preset with no window.
+# Notes:   "This month" and "this quarter" end today rather than at the end of
+#          the period, which is what the same names mean in a search bar; the
+#          completed period is last_month / last_quarter.
+sub _time_range_bounds {
+	my ($preset, $now) = @_;
+	$now = time() unless defined $now;
+
+	my @lt = localtime($now);
+	my ($mday, $mon, $year) = @lt[3, 4, 5];	# mon is 0-based
+
+	if ($preset->{hours}) {
+		return (_iso_second($now - $preset->{hours} * 3600), _iso_second($now));
+	}
+
+	my $today = _midday($mday, $mon, $year);
+
+	if (defined $preset->{day}) {
+		my $day = _midday($mday + $preset->{day}, $mon, $year);
+		return (_iso_day($day), _iso_day($day));
+	}
+
+	if (defined $preset->{days}) {
+		return (_iso_day(_midday($mday - $preset->{days} + 1, $mon, $year)),
+			_iso_day($today));
+	}
+
+	if (defined $preset->{month}) {
+		my $m = $mon + $preset->{month};
+		return $preset->{month} == 0
+			? (_iso_day(_midday(1, $mon, $year)), _iso_day($today))
+			: (_iso_day(_midday(1, $m, $year)), _iso_day(_midday(0, $m + 1, $year)));
+	}
+
+	if (defined $preset->{quarter}) {
+		my $q = int($mon / 3) * 3 + 3 * $preset->{quarter};
+		return $preset->{quarter} == 0
+			? (_iso_day(_midday(1, $q, $year)), _iso_day($today))
+			: (_iso_day(_midday(1, $q, $year)), _iso_day(_midday(0, $q + 3, $year)));
+	}
+
+	if (defined $preset->{year}) {
+		my $y = $preset->{year}; 	# 0 = this year, -1 = last year
+		my $start = _midday(1, 0, $year + $y);
+		return $preset->{year} == 0
+			? (_iso_day($start), _iso_day($today))
+			: (_iso_day($start), _iso_day(_midday(31, 11, $year + $y)));
+	}
+
+	return ();
+}
+
+# _time_range_specs($col, $lo, $hi) -> \@specs
+#
+# Purpose: Express a window as the f= filters the pipeline applies.
+# Notes:   Two bounds -- col:ge:lo and col:le:hi -- rather than one between
+#          spec.  A between value is "lo:hi" and its separator is a colon, so
+#          it cannot carry a bound with a time in it (last_24_hours ends in
+#          HH:MM:SS), and a colon in a column value would end the operator
+#          field early.  Two specs are inclusive at both ends exactly once,
+#          whatever precision the bounds carry.
+sub _time_range_specs {
+	my ($col, $lo, $hi) = @_;
+	return [] unless length($col // '') && length($lo // '') && length($hi // '');
+	return [ "$col:ge:$lo", "$col:le:$hi" ];
+}
+
+# _time_range_preset($name) -> \%preset | undef
+#
+# The named entry of the vocabulary above, or undef for a name that is not in
+# it.  A URL value reaches this, so it answers undef rather than croaking.
+sub _time_range_preset {
+	my ($name) = @_;
+	return $TIME_RANGE{$name // ''};
+}
+
+# _time_range_presets($now) -> \@presets
+#
+# Purpose: The menu a filter bar offers, with the dates each entry currently
+#          resolves to, so the page can show a range and, where it has asked
+#          for the dataset's own extent, disable an entry the data cannot
+#          answer.
+sub _time_range_presets {
+	my ($now) = @_;
+	return [ map {
+		my ($lo, $hi) = _time_range_bounds($_, $now);
+		{ name => $_->{name}, label => $_->{label}, lo => $lo, hi => $hi }
+	} @TIME_RANGES ];
+}
+
+# _apply_time_range($records, $name, $col) -> \@records
+#
+# Purpose: Apply a named relative range to a record set.  Used by the canvas,
+#          which renders its cards from its own pipeline rather than through a
+#          route's f= params.
+# Entry:   $name and $col are the URL values; neither is trusted.  An unknown
+#          name or an unusable column leaves the records alone, so a stale
+#          bookmark shows unfiltered data rather than an error page.
+sub _apply_time_range {
+	my ($records, $name, $col) = @_;
+	my $preset = $TIME_RANGE{$name // ''} or return $records;
+	return $records unless defined $col && length $col && $col !~ /:/;
+	my ($lo, $hi) = _time_range_bounds($preset);
+	for my $spec (@{ _time_range_specs($col, $lo, $hi) }) {
+		$records = _apply_filter_spec($records, $spec);
+	}
+	return $records;
+}
+
+# _time_range_request($c) -> bool
+#
+# Purpose: Turn the relative time range a request names -- ?range=<name> and
+#          ?rcol=<column> -- into the f= filters every data route already
+#          applies, and describe the range on the stash so a template can show
+#          a chip and the preset menu.  Registered as a before_dispatch hook in
+#          Database::BI::startup, so one implementation covers the table view,
+#          every chart, the pivot, stats, insights, the exports and the canvas,
+#          and a request that carries a range needs no per-route code.
+# Entry:   $c -- the controller for the request.
+# Exit:    Records the resolved bounds on the stash, where _filter_specs picks
+#          them up for whichever pipeline the route runs, and returns true --
+#          or renders 400 for a range that cannot be honoured and returns
+#          false, which stops the route from running against the wrong rows.
+#          The bounds are not written back into the request's f= params, so the
+#          reader's own filter list -- the chips, the panel forms and the
+#          filter UI -- never shows a range as dates it did not choose.
+sub _time_range_request ($c) {
+	my $name = $c->param('range');
+	my $col  = $c->param('rcol');
+
+	$c->stash(time_range_presets => _time_range_presets());
+	$c->stash(range_specs        => []);
+
+	return 1 unless defined $name && length $name;
+
+	my $preset = $TIME_RANGE{$name};
+	unless ($preset) {
+		$c->render(
+			text   => sprintf($MESSAGES{error_range_name}, $name,
+				join(', ', map { $_->{name} } @TIME_RANGES)),
+			status => 400,
+		);
+		return 0;
+	}
+	unless (defined $col && length $col && $col !~ /:/) {
+		$c->render(text => $MESSAGES{error_range_column}, status => 400);
+		return 0;
+	}
+
+	my ($lo, $hi) = _time_range_bounds($preset);
+	my $specs = _time_range_specs($col, $lo, $hi);
+
+	$c->stash(
+		time_range  => {
+			name  => $preset->{name},
+			label => $preset->{label},
+			col   => $col,
+			lo    => $lo,
+			hi    => $hi,
+		},
+		range_specs => $specs,
+	);
+	return 1;
+}
+
 sub _apply_filter_spec {
 	my ($records, $spec) = @_;
 	my ($col, $op, $val) = split /:/, $spec, 3;
 	return $records unless length($col // '') && defined $op && length $op;
 	$val //= '';
-	my $lval = lc $val;	# precompute once; avoids O(N) redundant lc() inside grep
+	my $lval    = lc $val;	# precompute once; avoids O(N) redundant lc() inside grep
+	my $is_date = _is_iso_date($val)
+		|| ($op eq 'between' && $val =~ /\A\d{4}-\d{2}-\d{2}:/);
+	# Compare at the precision the bound names: a bound with a time in it asks
+	# about the second, a bare date asks about the day.  Without this, a date
+	# bound compared against a column of timestamps drops every row on the
+	# boundary day, because the cell string carries more characters than the
+	# bound and "2026-10-27T09:15:00" sorts after "2026-10-27".
+	my $prec = ($is_date && $val =~ /\A\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/) ? 19 : 10;
+	my $nval = $is_date ? (_date_key($val, $prec) // $val) : $val;
 	return [grep {
-		my $cell = $_->{$col} // '';
-		$op eq 'eq'       ? lc($cell) eq $lval                :
-		$op eq 'ne'       ? lc($cell) ne $lval                :
-		$op eq 'contains' ? index(lc($cell), $lval) != -1     :
-		$op eq 'starts'   ? index(lc($cell), $lval) == 0      :
-		$op eq 'lt'       ? $cell <  $val                     :
-		$op eq 'le'       ? $cell <= $val                     :
-		$op eq 'gt'       ? $cell >  $val                     :
-		$op eq 'ge'       ? $cell >= $val                     :
-		$op eq 'empty'    ? $cell eq ''                        :
-		$op eq 'notempty' ? $cell ne ''                        :
+		my $cell  = $_->{$col} // '';
+		# Normalise M/D/YYYY cells to ISO for date comparisons so that the
+		# ISO values produced by <input type="date"> match against either format.
+		my $ncell = $is_date
+			? (_date_key(_to_iso_date($cell) // $cell, $prec) // $cell)
+			: $cell;
+		$op eq 'eq'       ? ($is_date ? $ncell eq $nval  : lc($cell) eq $lval) :
+		$op eq 'ne'       ? ($is_date ? $ncell ne $nval  : lc($cell) ne $lval) :
+		$op eq 'contains' ? index(lc($cell), $lval) != -1                      :
+		$op eq 'starts'   ? index(lc($cell), $lval) == 0                       :
+		$op eq 'lt'       ? ($is_date ? $ncell lt $nval  : $cell <  $val)      :
+		$op eq 'le'       ? ($is_date ? $ncell le $nval  : $cell <= $val)      :
+		$op eq 'gt'       ? ($is_date ? $ncell gt $nval  : $cell >  $val)      :
+		$op eq 'ge'       ? ($is_date ? $ncell ge $nval  : $cell >= $val)      :
+		$op eq 'empty'    ? $cell eq ''                                         :
+		$op eq 'notempty' ? $cell ne ''                                         :
+		$op eq 'between'  ? do {
+			my ($lo, $hi) = split /:/, $val, 2;
+			length($lo // '') && length($hi // '') && $ncell ge $lo && $ncell le $hi
+		} :
 		1
 	} @$records];
 }
 
-# _apply_filters($self, $records) -> ($filtered_records, \@raw_specs, $json_string)
+# ---------------------------------------------------------------------------
+# The cross-row pass (BI-Phase-7.md item 7.2)
+# ---------------------------------------------------------------------------
+#
+# A measure folds a group into one number and a calculated field computes one
+# row from that row.  This is the third shape: one row from many rows, written
+# back onto every row -- a running total, a moving average, a rank, a share of
+# the whole.  None of them can be a measure (the answer is per row, not per
+# group) and none can be a calc field (it needs its neighbours), which is why
+# they are a pass of their own.
+#
+# The functions follow Splunk's split, because it is also the natural one:
+# the eventstats family is order-free (pct_of_total, rank, zscore), the
+# streamstats family is incremental and therefore needs an order (running_*,
+# window_*, lag, delta, pct_change).
+
+# The same vocabulary as a menu, for the panel that adds a cross-row column.
+# It is data rather than a list written into the template so the function
+# names, their labels and the two facts the form needs -- whether a function
+# takes a window, and whether it needs an order -- cannot drift from the
+# validator above.
+Readonly my @CROSS_ROW_MENU => (
+	{ name => 'running_total', label => 'Running total',        arg => 0, order => 1 },
+	{ name => 'running_count', label => 'Running count',        arg => 0, order => 1 },
+	{ name => 'running_pct',   label => 'Running percent',      arg => 0, order => 1 },
+	{ name => 'window_sum',    label => 'Moving sum',           arg => 1, order => 1 },
+	{ name => 'window_avg',    label => 'Moving average',       arg => 1, order => 1 },
+	{ name => 'lag',           label => 'Previous row',         arg => 0, order => 1 },
+	{ name => 'delta',         label => 'Change from previous', arg => 0, order => 1 },
+	{ name => 'pct_change',    label => 'Percent change',       arg => 0, order => 1 },
+	{ name => 'pct_of_total',  label => 'Percent of total',     arg => 0, order => 0 },
+	{ name => 'rank',          label => 'Rank, largest first',  arg => 0, order => 0 },
+	{ name => 'zscore',        label => 'Z-score',              arg => 0, order => 0 },
+);
+
+Readonly my %CROSS_ROW_FNS => (
+	running_total => { family => 'stream' },
+	running_count => { family => 'stream' },
+	running_pct   => { family => 'stream' },
+	window_sum    => { family => 'stream', arg => 'count' },
+	window_avg    => { family => 'stream', arg => 'count' },
+	lag           => { family => 'stream' },
+	delta         => { family => 'stream' },
+	pct_change    => { family => 'stream' },
+	pct_of_total  => { family => 'event' },
+	rank          => { family => 'event' },
+	zscore        => { family => 'event' },
+);
+
+# _cross_row_specs($self, \@columns, $params) -> \%plan | { error => $message } | undef
+#
+# Purpose: Read cs=/by=/order= and turn them into a plan the pass can run:
+#          which function writes which column, partitioned by what, ordered by
+#          what.  Nothing is evaluated here, so a request that names a column
+#          or a function that does not exist is refused before a single row is
+#          touched, and the refusal is a 400 rather than a chart of something
+#          else.
+# Entry:   \@columns -- the columns of this view, so a cs=/by=/order= column is
+#                       checked against what the reader can actually see.
+#          $params -- where the three parameters are read from, or undef for
+#                     this request.  Anything with param()/every_param() will
+#                     do: the canvas reads them from the canvas page's own query
+#                     string, because its cards are drawn against the canvas's
+#                     state rather than against whatever URL fetched them.
+# Exit:    undef when the request names no cross-row column.  Otherwise
+#          { specs => [ { col, fn, as, arg } ], by => [col ...],
+#            order => [ { col, dir } ] }, or { error => $message } for a
+#          request that cannot be honoured.
+# Notes:   The streamstats family reads its rows in order, so order= is
+#          required for it and refused as missing by name.  The eventstats
+#          family does not care and does not require it.
+sub _cross_row_specs :Protected ($self, $columns, $params = undef) {
+	my $p = $params // $self;
+
+	# The three values are the URL's spelling of a plan, read once here so the
+	# parser below serves a canvas card too - a card stores its own plan as
+	# { cs, by, order } rather than as a query string.
+	return $self->_cross_row_specs_from($columns, {
+		cs    => [ @{ $p->every_param('cs') // [] } ],
+		by    => ($p->param('by') // ''),
+		order => [ @{ $p->every_param('order') // [] } ],
+	});
+}
+
+# _cross_row_specs_from($self, \@columns, \%raw) -> \%plan | { error } | undef
+#
+# Purpose: The same validation, from a plan as a saved canvas card stores it.
+# Entry:   \%raw -- { cs => [spec ...], by => 'a,b', order => ['col:dir' ...] },
+#                    in the spelling cs=/by=/order= use.
+# Exit:    As _cross_row_specs.
+sub _cross_row_specs_from :Protected ($self, $columns, $raw) {
+	my @texts = grep { defined $_ && !ref $_ && length } @{ $raw->{cs} // [] };
+	return undef unless @texts;
+
+	my %col_set = map { $_ => 1 } @{ $columns // [] };
+	my %taken;
+	my @specs;
+
+	for my $text (@texts) {
+		my ($col, $fn, $as, $arg) = split /:/, $text, 4;
+		return { error => $self->_i18n('error_cs_spec', $text) }
+			unless defined $col && length $col
+				&& defined $fn  && length $fn
+				&& defined $as  && length $as;
+
+		return { error => $self->_i18n('error_cs_column', $text, $col) }
+			unless $col_set{$col};
+
+		return { error => $self->_i18n('error_cs_fn', $fn, join(' ', sort keys %CROSS_ROW_FNS)) }
+			unless $CROSS_ROW_FNS{$fn};
+
+		return { error => $self->_i18n('error_cs_alias', $as) }
+			unless $as =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+
+		return { error => $self->_i18n(q{error_cs_conflict}, $as) }
+			if $col_set{$as} || $taken{$as};
+		$taken{$as} = 1;
+
+		my $decl = $CROSS_ROW_FNS{$fn};
+		if ($decl->{arg}) {
+			return { error => $self->_i18n('error_cs_arg', $text, $fn, $col, $fn) }
+				unless defined $arg && $arg =~ /\A\d+\z/ && $arg > 0;
+		}
+		elsif (defined $arg && length $arg) {
+			return { error => $self->_i18n('error_cs_no_arg', $text, $fn) };
+		}
+
+		push @specs, {
+			col => $col,
+			fn  => $fn,
+			as  => $as,
+			arg => (defined $arg && length $arg) ? $arg + 0 : undef,
+		};
+	}
+
+	# by= is the partition.  An empty value is its own partition rather than a
+	# dropped row: a windowed column has to cover every displayed row, which is
+	# not the rule the pivot uses for a cell -- see the POD.
+	my $by_text = (!ref $raw->{by} && defined $raw->{by}) ? "$raw->{by}" : '';
+	my @by      = grep { length } map { _trim($_) } split /,/, $by_text, -1;
+	for my $c (@by) {
+		return { error => $self->_i18n('error_cs_by', $by_text, $c) } unless $col_set{$c};
+	}
+
+	my @order;
+	for my $text (@{ $raw->{order} // [] }) {
+		my $spec = _trim((!ref $text && defined $text) ? $text : '');
+		next unless length $spec;
+		my ($c, $dir) = split /:/, $spec, 2;
+		$c = _trim($c // '');
+		$dir = defined $dir && length $dir ? lc _trim($dir) : 'asc';
+		return { error => $self->_i18n('error_cs_order', $spec) }
+			unless length $c && $dir =~ /\A(?:asc|desc)\z/;
+		return { error => $self->_i18n('error_cs_order_col', $spec, $c) }
+			unless $col_set{$c};
+		push @order, { col => $c, dir => $dir };
+	}
+
+	for my $spec (@specs) {
+		next unless $CROSS_ROW_FNS{ $spec->{fn} }{family} eq 'stream';
+		return {
+			error => $self->_i18n('error_cs_order_need',
+				join(':', $spec->{col}, $spec->{fn}, $spec->{as}), $spec->{fn})
+		} unless @order;
+	}
+
+	return { specs => \@specs, by => \@by, order => \@order };
+}
+
+# _card_plan($raw) -> \%plan | { error }
+#
+# Purpose: The cross-row plan a saved canvas card carries, in the spelling
+#          cs=/by=/order= use, so a card added and a card repaired store the
+#          same shape and the one parser above reads them both.
+# Entry:   $raw -- the request's cross_row value.  A hash that names no cs is
+#          the card saying it runs no plan of its own; _cross_row_specs_from
+#          reads that as no pass at all, and so does the renderer.
+# Exit:    { cs => [...], by => '', order => [...] } -- only the shape is
+#          checked here.  Which columns exist is a fact about the data file and
+#          is checked again on every render, so a plan written today is read
+#          against the columns the canvas has today.
+# Notes:   A part of the plan that is the wrong kind is an error rather than a
+#          silently empty list: a repair that stores nothing still answers 200,
+#          and the caller would have no way to know the card had not changed.
+sub _card_plan {
+	my ($raw) = @_;
+
+	for my $key (qw(cs order)) {
+		next unless defined $raw->{$key};
+		return { error => "cross_row.$key must be a list" }
+			if ref $raw->{$key} ne 'ARRAY';
+		return { error => "cross_row.$key must be a list of strings" }
+			if grep { ref } @{ $raw->{$key} };
+	}
+	return { error => 'cross_row.by must be a column name' } if ref $raw->{by};
+
+	return {
+		cs    => [ grep { defined $_ && length } @{ $raw->{cs} // [] } ],
+		by    => (defined $raw->{by} ? "$raw->{by}" : ''),
+		order => [ grep { defined $_ && length } @{ $raw->{order} // [] } ],
+	};
+}
+
+# _cross_row_ui_state($c) -> %stash_pairs
+#
+# Purpose: The cross-row state the table page shows: the specs it puts in
+#          chips, the partition and order its chart panels carry, and the
+#          panel's own menu.  Also the rest of the query string, because the
+#          panel edits three parameters and must submit the others unchanged.
+# Entry:   $c -- the controller, for its query string only.
+# Exit:    A list suitable for stash(): cross_row_specs, cross_row_by,
+#          cross_row_order, cross_row_menu, cross_row_hidden.
+# Notes:   cs=/by=/order= are deliberately absent from cross_row_hidden.  The
+#          panel writes them from its own controls, and a hidden by= as well
+#          would send two values; param('by') reads the first, so the reader's
+#          choice would be silently ignored in favour of the old one.
+#          Only the query string is read -- never the body -- because this runs
+#          before dispatch on every request, including JSON posts.
+sub _cross_row_ui_state {
+	my ($c) = @_;
+
+	my $query  = $c->req->query_params;
+	my @specs  = grep { length } @{ $query->every_param('cs') // [] };
+	my @orders = grep { length } @{ $query->every_param('order') // [] };
+
+	my @hidden;
+	# names() is a list in some Mojo releases and an arrayref in others; taking
+	# the arrayref is what both accept.
+	for my $name (@{ $query->names }) {
+		next if $name eq 'cs' || $name eq 'by' || $name eq 'order';
+		push @hidden, map { { name => $name, value => $_ } }
+			@{ $query->every_param($name) // [] };
+	}
+
+	return (
+		cross_row_specs  => \@specs,
+		cross_row_by     => ($query->param('by') // ''),
+		cross_row_order  => \@orders,
+		cross_row_menu   => \@CROSS_ROW_MENU,
+		cross_row_hidden => \@hidden,
+	);
+}
+
+# _apply_cross_row($self, $records, \@columns, $plan) -> ($records, \@columns)
+#
+# Purpose: Stage 6 of the pipeline: run every cs= spec over the rows and write
+#          the answer onto each row as a column of its own.  Called from
+#          _reduce_records (the routes that reduce there) and from _fetch_page
+#          after its own filtering (the routes that paginate), always before
+#          anything slices a page, so page 2 continues page 1's running total.
+# Entry:   $records -- arrayref of hashrefs, already filtered.
+#          \@columns -- the columns list, or undef where the caller has none in
+#                       scope; then it is derived from the first row.
+#          $plan -- an already validated plan from _cross_row_specs($columns,
+#                   $params), or undef to read this request's cs=.  A canvas
+#                   validates once and runs the plan once per card, on each
+#                   card's own rows; re-reading cs= there would work today only
+#                   because the canvas page carries it, and would silently stop
+#                   working for a card redrawn by an API call.
+# Exit:    ($records, \@columns) with the produced columns appended, or the
+#          arguments untouched when the request names no cs=.  Croaks with an
+#          i18n message when a spec cannot be honoured; the caller renders 400.
+# Notes:   Rows are grouped into partitions by by=, each partition is sorted
+#          once (stable, ties in arrival order, so two runs over the same file
+#          agree), and each spec is then one pass over each partition.  A
+#          partition total is accumulated in that pass, never per row.
+#
+#          The rows keep the order they arrived in: order= says which order the
+#          window is read along, not which order the table is shown in.  The
+#          table has its own sort controls, and a reader may well want them to
+#          disagree (a ledger sorted by amount, running totals following the
+#          date), so the pass writes values in place rather than reordering.
+#
+#          A cell that is not numeric yields undef in the produced column rather
+#          than a placeholder: there is no previous row for the first row of a
+#          partition, and a chart skips undef while the measure fold does too,
+#          so an undef window cannot silently become a zero.
+sub _apply_cross_row :Protected ($self, $records, $columns, $plan = undef) {
+	my $cols = $columns;
+	unless (defined $cols) {
+		$cols = [ sort keys %{ $records->[0] // {} } ];
+	}
+
+	$plan //= $self->_cross_row_specs($cols);
+	return ($records, $columns) unless $plan;
+	croak $plan->{error} if $plan->{error};
+
+	# Partitions, in first-appearance order so a report reads in file order.
+	my (@part_keys, %parts);
+	for my $i (0 .. $#$records) {
+		my $row = $records->[$i] // {};
+		my $key = join("\x00", map { defined $row->{$_} ? "$row->{$_}" : '' } @{ $plan->{by} });
+		push @part_keys, $key unless exists $parts{$key};
+		push @{ $parts{$key} }, $i;
+	}
+
+	# One sort per partition, whatever the number of specs.  The index is the
+	# tie-break, so the sort is stable even where the keys are equal.
+	if (my @order = @{ $plan->{order} }) {
+		for my $key (@part_keys) {
+			my $idx = $parts{$key};
+			next unless @$idx > 1;
+			$parts{$key} = [ sort {
+				my $cmp = 0;
+				for my $o (@order) {
+					$cmp = _cross_row_cmp($records->[$a]{ $o->{col} }, $records->[$b]{ $o->{col} });
+					$cmp = -$cmp if $o->{dir} eq 'desc';
+					last if $cmp;
+				}
+				$cmp || $a <=> $b;
+			} @$idx ];
+		}
+	}
+
+	my @names;
+	for my $spec (@{ $plan->{specs} }) {
+		my ($fn, $as, $col) = @{$spec}{qw(fn as col)};
+		for my $key (@part_keys) {
+			my $idx  = $parts{$key};
+			my @vals = map { _numeric_cell($records->[$_]{$col}) } @$idx;
+			my @out  = _cross_row_values($fn, \@vals, $spec->{arg});
+			for my $j (0 .. $#$idx) {
+				my $i = $idx->[$j];
+				$records->[$i] = _extend_row($records->[$i], $as, $out[$j]);
+			}
+		}
+		push @names, $as;
+	}
+
+	my @extended = (@$cols, @names);
+	$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
+	$self->stash('_virtual_columns')->{$_} = 1 for @names;
+	# The routes that paginate ask for their columns separately, after the page
+	# is sliced, so the names are left where they can be picked up.
+	$self->stash('_cross_row_columns' => \@names);
+
+	return ($records, \@extended);
+}
+
+# _cross_row_values($fn, \@values, $arg) -> @values
+#
+# The arithmetic of one spec over one partition: @values is the source column
+# of each row in order, numeric or undef, and the answer is aligned with it.
+# A plain function, so the pass has one place where the functions are defined
+# and the tests can drive them without a controller.
+sub _cross_row_values {
+	my ($fn, $vals, $arg) = @_;
+	my @out;
+	my $n = scalar @$vals;
+	return @out unless $n;
+
+	if ($fn eq 'running_count') {
+		return map { $_ + 1 } 0 .. $n - 1;
+	}
+
+	if ($fn eq 'running_total') {
+		my $run = 0;
+		for my $v (@$vals) {
+			$run += $v if defined $v;
+			push @out, defined $v ? $run : undef;
+		}
+		return @out;
+	}
+
+	if ($fn eq 'running_pct') {
+		my $total = 0;
+		$total += $_ for grep { defined } @$vals;
+		my $run = 0;
+		for my $v (@$vals) {
+			$run += $v if defined $v;
+			push @out, ($total && defined $v) ? $run / $total : undef;
+		}
+		return @out;
+	}
+
+	if ($fn eq 'window_sum' || $fn eq 'window_avg') {
+		for my $i (0 .. $n - 1) {
+			my $lo = $i - $arg + 1;
+			$lo = 0 if $lo < 0;
+			my @win = grep { defined } @{$vals}[$lo .. $i];
+			unless (@win) { push @out, undef; next }
+			my $sum = 0;
+			$sum += $_ for @win;
+			push @out, $fn eq 'window_sum' ? $sum : $sum / scalar @win;
+		}
+		return @out;
+	}
+
+	if ($fn eq 'lag') {
+		my $prev;
+		for my $v (@$vals) {
+			push @out, $prev;
+			$prev = $v;
+		}
+		return @out;
+	}
+
+	if ($fn eq 'delta' || $fn eq 'pct_change') {
+		my $prev;
+		for my $v (@$vals) {
+			my $d;
+			if (defined $v && defined $prev) {
+				$d = $fn eq 'delta' ? $v - $prev : ($prev ? ($v - $prev) / $prev : undef);
+			}
+			push @out, $d;
+			$prev = $v;
+		}
+		return @out;
+	}
+
+	my @nums = grep { defined } @$vals;
+
+	if ($fn eq 'pct_of_total') {
+		my $total = 0;
+		$total += $_ for @nums;
+		for my $v (@$vals) {
+			push @out, ($total && defined $v) ? $v / $total : undef;
+		}
+		return @out;
+	}
+
+	if ($fn eq 'rank') {
+		# SQL RANK(): ties share a rank and the next rank skips, which counting
+		# the values strictly greater gives for free.
+		for my $v (@$vals) {
+			push @out, defined $v ? 1 + scalar(grep { $_ > $v } @nums) : undef;
+		}
+		return @out;
+	}
+
+	if ($fn eq 'zscore') {
+		my ($mean, $sd);
+		if (@nums >= 2) {
+			$mean = 0;
+			$mean += $_ for @nums;
+			$mean /= scalar @nums;
+			$sd = _stdev_of(\@nums);
+		}
+		for my $v (@$vals) {
+			push @out, (defined $v && defined $sd && $sd > 0) ? ($v - $mean) / $sd : undef;
+		}
+		return @out;
+	}
+
+	croak "Unknown cross-row function '$fn'";	# unreachable: validated above
+}
+
+# _cross_row_cmp($x, $y) -> -1 | 0 | 1
+#
+# The order= comparator: numeric when both cells are numbers, case-sensitive
+# string otherwise.  Numbers sort as numbers because an order= on an amount is
+# meant to put 100 after 20, and a mixed column still has to be total.
+sub _cross_row_cmp {
+	my ($x, $y) = @_;
+	my ($nx, $ny) = (_numeric_cell($x), _numeric_cell($y));
+	return $nx <=> $ny if defined $nx && defined $ny;
+	return ($x // '') cmp($y // '');
+}
+
+# _trim($text) -> $text
+sub _trim {
+	my $s = defined $_[0] ? $_[0] : '';
+	$s =~ s/\A\s+//;
+	$s =~ s/\s+\z//;
+	return $s;
+}
+
+# _reduce_records($self, $records, $columns, $opts) -> ($records, $columns)
+#
+# Purpose: The reduce half of every data pipeline, in one place: the request's
+#          filters -- the reader's own f= params, then the two bounds of the
+#          relative time range -- run over $records in order, with the columns
+#          list threaded through so a later stage can add columns and hand back
+#          the extended list.  Every route that reads rows and then filters
+#          them calls this rather than writing the loop out again, so a stage
+#          added here reaches all of them at once.
+# Entry:   $records -- arrayref of hashrefs, after the calculated-field pass.
+#          $columns -- arrayref of column names, or undef where the caller has
+#                      no list in scope; a stage that adds columns needs one,
+#                      so undef is only for the filters-only callers.
+#          $opts    -- optional hashref.  chips_only => 1 says the caller's rows
+#                      have already been reduced and it is here only for the
+#                      chip list _apply_filters returns: the stage is skipped
+#                      and both arguments come back as they arrived.
+#                      no_cross_row => 1 runs the filters only, for a caller
+#                      that wants the rows without stage 6 (_apply_filters,
+#                      whose callers are after the chip list).
+# Exit:    ($records, $columns), reduced -- or untouched, when chips_only is
+#          set.  A malformed f= spec leaves the records alone rather than
+#          croaking, as _apply_filter_spec always has.
+# Notes:   This is stage 5 of the stage order in BI-Phase-7.md section 3, and
+#          it is where that document's stages 6 and 7 are meant to land: the
+#          cross-row pass and the second calculated-field pass.  Both belong
+#          here rather than at a call site, because they have to see *filtered*
+#          rows and have to run before pagination (an exported or second page
+#          then carries the same numbers as the first).
+#
+#          Three kinds of row-reading route deliberately do not reduce here,
+#          and each is a different case: the canvas builds its own per-card
+#          pipeline and runs stage 6 per card, after that card's filters
+#          (_canvas_render_context, _render_visual_html), /view's table action
+#          filters inside _fetch_page before it paginates, and /api/ask samples
+#          rows without filtering them at all.
+#
+#          chips_only exists for the routes that filter somewhere else and then
+#          call _apply_filters for its chip list: /view, the three /open
+#          branches and /join reduce inside _fetch_page, before they paginate,
+#          and /combine reduces through this function before slicing its page.
+#          Re-running the stage on that page would still give the right answer
+#          today, because every stage in it is idempotent -- filtering a
+#          filtered set changes nothing.  It stops being harmless as soon as a
+#          stage is not: a cross-row pass (running totals, differences) or a
+#          time-fill that adds rows would double-apply to a page that has
+#          already been through it, and would do so only on non-first pages.
+#          So the option is not a micro-optimisation; it is what keeps those
+#          six call sites correct once such a stage lands here.
+#
+#          A plain function rather than a method, like _filter_specs and
+#          _apply_filter_spec beside it: the tests drive the reduce stage with a
+#          controller-shaped mock (build_controller), and only every_param and
+#          stash are ever wanted of $self.
+sub _reduce_records {
+	my ($self, $records, $columns, $opts) = @_;
+
+	# Already reduced: hand the rows and the columns back exactly as they came,
+	# ahead of the first stage, so a stage that is not idempotent cannot see
+	# these rows a second time.
+	return ($records, $columns) if $opts && $opts->{chips_only};
+
+	for my $s (@{ _filter_specs($self) }) {
+		$records = _apply_filter_spec($records, $s);
+	}
+
+	# d=1 removes duplicate rows after the filters and before the cross-row
+	# pass, the order _fetch_page uses for the table view, so a chart of a
+	# de-duplicated view counts the rows the table shows.  Only callers with a
+	# columns list run the whole stage; the filters-only entry point does not.
+	$records = _dedup_records($records, $columns)
+		if $columns && _dedup_requested($self);
+
+	# Stage 6: the cross-row pass, and only when the request asks for one.  It
+	# has to see filtered rows -- a window is over what the filters left -- and it
+	# has to run before anything paginates, which is why the routes that slice
+	# their own page call it again (once) inside _fetch_page.
+	if (!$opts || !$opts->{no_cross_row}) {
+		($records, $columns) = $self->_apply_cross_row($records, $columns)
+			if length($self->param('cs') // '');
+	}
+
+	return ($records, $columns);
+}
+
+# _reduce_or_render($self, \$records, \$columns) -> $ok
+#
+# Purpose: Run _reduce_records and turn a cross-row spec that cannot be
+#          honoured into the 400 it deserves, in the one shape every route
+#          already uses for a calculated field that will not compile.
+# Entry:   References to the route's own lexicals: on success they are updated
+#          in place, so a call site is one line.
+# Exit:    True when the records are ready.  False after rendering a 400 -- the
+#          caller returns straight away, because nothing has been produced.
+# Notes:   A method, unlike _reduce_records itself, because the failure needs
+#          a controller to render through.  The error text is the i18n message
+#          the pass croaked with, with the "at File line N" tail removed so a
+#          reader sees the fault rather than the interpreter's location.
+sub _reduce_or_render :Protected ($self, $recs_ref, $cols_ref) {
+	my @reduced = eval { _reduce_records($self, $$recs_ref, $$cols_ref) };
+	if (@reduced) {
+		($$recs_ref, $$cols_ref) = @reduced;
+		return 1;
+	}
+
+	(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+	$self->render(text => $e, status => 400);
+	# Recorded because the callers that answer a missing table with a 404 get
+	# their rows back empty here, and the 400 has already been rendered.
+	$self->stash('_reduce_error' => 1);
+	return 0;
+}
+
+# _apply_filters($self, $records, $opts) -> ($filtered_records, \@raw_specs, $json_string)
 #
 # Purpose: Read all "f=" query params, apply them in order via _apply_filter_spec,
 #          and return: the filtered arrayref, the raw spec strings (for building
 #          export URLs), and a script-safe JSON string for pre-populating the UI.
-# Entry:   $records is an arrayref of hashrefs.
+# Entry:   $records is an arrayref of hashrefs.  $opts is passed straight to
+#          _reduce_records: chips_only => 1 for the routes whose rows are
+#          already reduced and which are here only for the chips.
 # Exit:    Three-element list; never croaks.  $json_string has '</' escaped to
 #          '<\/' so it is safe to embed directly in a <script> block.
 #
@@ -776,18 +1975,60 @@ sub _apply_filter_spec {
 # returns $records unchanged for a malformed spec (same guard condition), so
 # skipping the call for malformed specs is equivalent.  Merging into one loop
 # eliminates a full O(n) pass and the redundant split() on every spec.
-sub _apply_filters :Protected ($self, $records) {
+sub _apply_filters :Protected ($self, $records, $opts = undef) {
 	my @specs  = @{ $self->every_param('f') // [] };
 	my @parsed;
 	for my $s (@specs) {
 		my ($col, $op, $val) = split /:/, $s, 3;
 		next unless length($col // '') && defined $op && length $op;
 		push @parsed, { col => $col, op => $op, val => $val // '' };
-		$records = _apply_filter_spec($records, $s);
 	}
+
+	# The range joins the request's own filters here, but it is not one of them:
+	# @specs -- which the page shows as chips, keeps in its panel forms and
+	# offers to its filter UI -- stays the reader's own list, so a relative range
+	# cannot be submitted as a frozen pair of dates and a reopened link cannot
+	# narrow twice.  The application itself is _reduce_records, so this entry
+	# point and the routes that call it directly cannot drift apart; the columns
+	# list is not in scope here and every caller holds its own, so none is
+	# threaded through.  $opts travels with the records for the same reason:
+	# a caller that has already reduced asks for the chips alone here, and the
+	# seam, not this wrapper, is where that is decided.
+	# no_cross_row: this entry point is the chip list, and its callers either
+	# skip the stage entirely (chips_only) or want the rows without stage 6.
+	($records) = _reduce_records($self, $records, undef, { %{ $opts // {} }, no_cross_row => 1 });
+
 	my $json = encode_json(\@parsed);
 	$json =~ s{</}{<\\/}g;
 	return ($records, \@specs, $json);
+}
+
+# _filter_specs($self) -> \@specs
+#
+# Purpose: Every filter that applies to this request: the f= params the reader
+#          wrote, followed by the two bounds of the relative time range the
+#          request names, if any.  This is the list the data pipelines fold over
+#          -- charts, pivots, stats, insights and the exports as well as the
+#          table view -- so a range narrows all of them through one call site
+#          each, and a route that never heard of ranges still honours one.
+# Entry:   $self -- the controller; it needs only every_param() and stash().
+# Exit:    Returns an arrayref of "col:op:val" strings; possibly empty.
+sub _filter_specs {
+	my ($self) = @_;
+	return [
+		@{ $self->every_param('f') // [] },
+		@{ $self->stash('range_specs') // [] },
+	];
+}
+
+# _dedup_requested($self) -> $bool
+#
+# Purpose: True when the request asks for duplicate rows to be removed (d=1).
+#          The SQL aggregate push paths check it too, because the backend
+#          would count the duplicates the Perl fold has already dropped.
+sub _dedup_requested {
+	my ($self) = @_;
+	return $self->param('d') ? 1 : 0;
 }
 
 # _dedup_records(\@records, \@columns) -> \@unique_records
@@ -897,7 +2138,7 @@ sub _filter_specs_to_criteria {
 				? ($criteria{$col} = { '>=' => $val })
 				: push @residual, $spec;
 		} else {
-			# empty, notempty, unknown operator: always residual.
+			# empty, notempty, between, unknown operator: always residual.
 			push @residual, $spec;
 		}
 	}
@@ -933,6 +2174,76 @@ sub _numeric_cell {
 	return $n + 0;
 }
 
+# _percentile_of(\@sorted, $level) -> $number | undef
+#
+# The value at the given percentile of an already sorted list of numbers, by
+# linear interpolation between closest ranks (R's type 7, Excel's
+# PERCENTILE.INC).  $level is 1..100.  The empty list has no percentile, so it
+# returns undef rather than a made-up 0.
+#
+# At level 50 this is the median the column-stats view has always shown: the
+# middle value when the count is odd, the mean of the two middle values when it
+# is even.  That is the point of it, and the reason median is defined in terms
+# of it below -- one arithmetic, so a p50 measure, a median measure and the
+# median column of the stats page cannot disagree.
+sub _percentile_of {
+	my ($sorted, $level) = @_;
+	my $n = scalar @$sorted;
+	return undef unless $n;
+	my $h  = ($n - 1) * $level / 100;
+	my $lo = int $h;
+	return $sorted->[$lo] if $h == $lo || $lo >= $n - 1;
+	return $sorted->[$lo] + ($h - $lo) * ($sorted->[ $lo + 1 ] - $sorted->[$lo]);
+}
+
+# _median_of(\@sorted) -> $number | undef
+sub _median_of {
+	return _percentile_of($_[0], 50);
+}
+
+# _stdev_of(\@nums) -> $number | undef
+#
+# Sample standard deviation, the n-1 denominator: what Splunk's stdev() and
+# Excel's STDEV.S report.  One value has no spread to measure, so fewer than
+# two values give undef rather than a reassuring 0.
+sub _stdev_of {
+	my $nums = shift;
+	my $n = scalar @$nums;
+	return undef unless $n >= 2;
+	my $mean = 0;
+	$mean += $_ for @$nums;
+	$mean /= $n;
+	my $sum_sq = 0;
+	$sum_sq += ($_ - $mean) ** 2 for @$nums;
+	return sqrt($sum_sq / ($n - 1));
+}
+
+# _range_of(\@sorted) -> $number | undef
+#
+# Largest minus smallest, on the already sorted list: the spread a reader means
+# by "range", which is not min/max in the sense the SQL backend could push.
+sub _range_of {
+	my $sorted = shift;
+	return undef unless @$sorted;
+	return $sorted->[-1] - $sorted->[0];
+}
+
+# _measure_value($fn, \@sorted_values) -> $number | undef
+#
+# The function from @PERL_MEASURE_FNS (or a percentile) applied to the sorted
+# values of one group.  It takes the values rather than a group key so that the
+# caller decides what a group is: the pivot's fold has one list per group, and
+# the stats page measures a whole column with the same four functions.
+sub _measure_value {
+	my ($fn, $sorted) = @_;
+	my $level = _measure_percentile($fn);
+	return _percentile_of($sorted, $level) if defined $level;
+	return _median_of($sorted)             if $fn eq 'median';
+	return _stdev_of($sorted)              if $fn eq 'stdev';
+	return _range_of($sorted)              if $fn eq 'range';
+	return undef;
+}
+
 # _column_is_numeric($records, $col) -> bool
 #
 # Says whether a column can be used as a chart measure.  It samples the first
@@ -957,6 +2268,11 @@ sub _column_is_numeric {
 # the result will be identical to the Perl fold.  False means use the Perl fold.
 #
 # Decision table:
+#   Not in the pushed vocabulary -- never pushable.  None of median, a
+#                             percentile, stdev, first, last or range is a sum
+#                             of its parts, and the backend would either refuse
+#                             the spec or quietly answer with its own idea of
+#                             the statistic (it has one for median and stddev).
 #   count / count_distinct -- always pushable (no numeric coercion).
 #   sum / avg / min / max  -- only when every sampled value in $col is either
 #                             a plain number (looks_like_number) or empty/undef.
@@ -968,6 +2284,7 @@ sub _column_is_numeric {
 sub _measure_pushable {
 	my ($source, $fn, $col, $records) = @_;
 	return 0 unless $source && $source->can('aggregate');
+	return 0 unless defined $fn && $PUSHED_MEASURE_FN_OK{$fn};
 	return 1 if $fn eq 'count' || $fn eq 'count_distinct';
 	return 0 unless defined $col;
 	# For sum/avg/min/max, only push when at least one value is a plain number
@@ -975,10 +2292,10 @@ sub _measure_pushable {
 	#
 	# Two cases where both paths must agree:
 	#   - All values undef/blank: Perl fold produces no rows; SQL SUM(NULL)
-	#     produces NULL, normalised to 0 by D::A → discrepancy.  Return 0 so
+	#     produces NULL, normalised to 0 by D::A -> discrepancy.  Return 0 so
 	#     the Perl fold runs and yields the expected "No plottable data" result.
 	#   - Currency/accounting notation (e.g. ($1,234)): _numeric_cell strips
-	#     these correctly; SQL sees non-numeric text → SUM = NULL → 0.  Return 0
+	#     these correctly; SQL sees non-numeric text -> SUM = NULL -> 0.  Return 0
 	#     so _numeric_cell is used on every value.
 	require Scalar::Util;
 	my $found = 0;
@@ -995,14 +2312,15 @@ sub _measure_pushable {
 #
 # Parse 'col:fn:as' into { col => ..., fn => ..., as => ... }.
 # Shared dialect for /pivot so it does not invent a second format.
-# Returns undef for an invalid or unrecognised spec.
+# $fn is lower-cased first, so SUM and P90 are the same measures as sum and
+# p90.  Returns undef for an invalid or unrecognised spec.
 sub _parse_measure_param {
 	my $str = shift;
 	return undef unless defined $str && length($str);
 	my ($col, $fn, $as) = split /:/, $str, 3;
 	return undef unless defined $fn && defined $as && length($fn) && length($as);
 	$fn = lc $fn;
-	return undef unless $MEASURE_FN_OK{$fn};
+	return undef unless _measure_fn_ok($fn);
 	return { col => $col, fn => $fn, as => $as };
 }
 
@@ -1044,7 +2362,7 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	# specs as possible to SQL criteria.  The push path is used only when ALL
 	# specs are SQL-pushable (no residual); otherwise the Perl fold handles the
 	# pre-filtered records the caller already passed in.
-	my @f_specs    = grep { /\S/ } @{ $self->every_param('f') // [] };
+	my @f_specs    = grep { /\S/ } @{ _filter_specs($self) };
 	my $has_filter = !!@f_specs;
 
 	# SQL::Statement 1.414 (the SQL engine under DBD::CSV) uses
@@ -1086,7 +2404,7 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	my $has_virtual = grep { $virt->{$_} }
 		(@$by, (defined $val_col ? $val_col : ()));
 
-	unless ($ENV{BI_FORCE_PERL_AGG} || $has_virtual || !$can_push_filters || $has_null_by_key || !$source
+	unless ($ENV{BI_FORCE_PERL_AGG} || _dedup_requested($self) || $has_virtual || !$can_push_filters || $has_null_by_key || !$source
 		|| !_measure_pushable($source, $fn, $val_col, $records)) {
 		my $m = _measure($fn, $val_col, $as);
 		my $agg_rows = eval {
@@ -1107,8 +2425,14 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	}
 
 	# Perl fold over pre-filtered records.
+	#
+	# The fold keeps a running total for the functions that are sums of their
+	# parts (sum, avg, min, max) and the values themselves for the ones that are
+	# not (median, a percentile, stdev, range), which are resolved once the group
+	# is complete.  first and last are order-dependent, so they are taken as the
+	# rows arrive and need no list at all.
 	my (%seen_warned, %seen_key, @key_order);
-	my (%totals, %count_map, %distinct_vals);
+	my (%totals, %count_map, %distinct_vals, %values);
 
 	for my $row (@$records) {
 		# Skip rows where any 'by' column is empty/undef (mirrors SQL GROUP BY NULL exclusion).
@@ -1125,6 +2449,16 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 			push @key_order, $key unless $seen_key{$key}++;
 			my $dv = defined $val_col ? ($row->{$val_col} // '') : '';
 			$distinct_vals{$key}{$dv}++;
+		} elsif ($fn eq 'first' || $fn eq 'last') {
+			# first/last read any column, not only a numeric one, and they
+			# report the value as it appears: the number a cell holds when it
+			# holds a number, the text it holds otherwise.  A blank cell is
+			# not a value, so it is passed over -- the first row that has
+			# something in the column is the first value.
+			my $v = defined $val_col ? $row->{$val_col} : undef;
+			next unless defined $v && length $v;
+			push @key_order, $key unless $seen_key{$key}++;
+			$totals{$key} = $v if $fn eq 'last' || !exists $totals{$key};
 		} else {
 			my $v = defined $val_col ? ($row->{$val_col} // '') : '';
 			my $n = _numeric_cell($v);
@@ -1139,6 +2473,7 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 			elsif ($fn eq 'avg') { $totals{$key}  += $n; $count_map{$key}++                                        }
 			elsif ($fn eq 'min') { $totals{$key}   = (!exists $totals{$key} || $n < $totals{$key}) ? $n : $totals{$key} }
 			elsif ($fn eq 'max') { $totals{$key}   = (!exists $totals{$key} || $n > $totals{$key}) ? $n : $totals{$key} }
+			else                 { push @{ $values{$key} }, $n                                                       }
 		}
 	}
 
@@ -1149,6 +2484,13 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	} elsif ($fn eq 'count_distinct') {
 		for my $k (@key_order) {
 			$totals{$k} = scalar keys %{ $distinct_vals{$k} // {} };
+		}
+	} elsif (%values) {
+		# median / p<N> / stdev / range: resolved from the group's values, and
+		# through the same arithmetic the stats view uses for a whole column.
+		for my $k (keys %values) {
+			my @sorted = sort { $a <=> $b } @{ $values{$k} };
+			$totals{$k} = _measure_value($fn, \@sorted);
 		}
 	}
 
@@ -1208,11 +2550,11 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	# D::A 0.49+ and D::J 0.009.0 both support sort_by => [$col, $dir].
 	my @sort_args = $sort_col ? (sort_by => [$sort_col, $sort_dir]) : ();
 
-	# Collect and validate f= specs.
+	# Collect and validate the filters, the range's bounds included.
 	my @f_specs = grep {
 		my ($c, $o) = split /:/, $_, 3;
 		length($c // '') && defined $o && length $o;
-	} @{ $self->every_param('f') // [] };
+	} @{ _filter_specs($self) };
 
 	# Determine whether the source has a SQL backend that supports LIMIT/OFFSET.
 	# DBD::CSV / SQL::Statement do not implement LIMIT/OFFSET; passing them emits
@@ -1222,7 +2564,12 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	# below materialises the full set and paginates in Perl.
 	my $is_sql = $source->can('dbi_source') && $source->dbi_source;
 
-	unless (@f_specs || $dedup) {
+	# A cross-row column is a column of the whole filtered set, so a request that
+	# names one cannot take the N+1 fast path: it would see one page of rows and
+	# restart every running total on page 2.
+	my $cross = length($self->param('cs') // '') ? 1 : 0;
+
+	unless (@f_specs || $dedup || $cross) {
 		if ($is_sql) {
 			# Fast path (SQL-backed): delegate LIMIT/OFFSET to the backend N+1 trick.
 			# Copy before pop: D::A may return a read-only ref to its internal cache.
@@ -1248,12 +2595,38 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	# source file size (the same as the dedup path already accepted).
 	my $all = $source->selectall_arrayref(@sort_args) // [];
 
+	# A stored date or time pattern is what makes a patterned column comparable
+	# with the ISO bounds a relative time range carries, and it belongs to stage 2
+	# of the pipeline -- before the filters of stage 5.  The rest of the
+	# application reaches the filters through that order already; this path, which
+	# filters before it paginates, is the one call site that would otherwise
+	# compare the reader's format, so it normalises first, on exactly the rows the
+	# specs are about to be applied to.
+	$self->_apply_date_normalization($all, [_get_columns($source, $all)],
+		$self->_calc_spec_key);
+
 	$all = _apply_filter_spec($all, $_) for @f_specs;
 
 	if ($dedup) {
 		my $cols = $source->columns;
 		my @dcols = $cols ? @$cols : (keys %{ $all->[0] // {} });
 		$all = _dedup_records($all, \@dcols);
+	}
+
+	# Stage 6, and before the slice: a running total has to see every filtered
+	# row, or page 2 would start again from zero.  A spec that cannot be honoured
+	# renders its 400 here; the caller returns rather than drawing a page over it.
+	if ($cross) {
+		my $cols  = $source->columns;
+		my @xcols = $cols ? @$cols : (sort keys %{ $all->[0] // {} });
+		my ($crossed) = eval { $self->_apply_cross_row($all, \@xcols) };
+		if ($@) {
+			(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+			$self->render(text => $e, status => 400);
+			$self->stash('_cross_row_error' => $e);
+			return ();
+		}
+		$all = $crossed;
 	}
 
 	my $total    = scalar @$all;
@@ -1324,12 +2697,20 @@ sub _csv_row {
 #          logical view.  The caller must apply | html in TT to escape & as &amp;.
 # Entry:   All args non-undef; spec arrays may be empty.
 # Exit:    Returns a relative URL string beginning with '/export'.
-sub _build_export_url :Protected ($self, $left_spec, $join_specs, $filter_specs, $combine_specs = undef, $dedup = 0) {
+sub _build_export_url :Protected ($self, $left_spec, $join_specs, $filter_specs, $combine_specs = undef, $dedup = 0, $extra = undef) {
 	my $u = '/export?l=' . url_escape($left_spec);
 	$u .= '&j=' . url_escape($_) for @$join_specs;
 	$u .= '&c=' . url_escape($_) for @{ $combine_specs // [] };
 	$u .= '&f=' . url_escape($_) for @$filter_specs;
 	$u .= '&d=1' if $dedup;
+	# Parameters that shape the columns rather than the rows travel with the
+	# export, so the file holds the column the page shows -- a time bucket, for
+	# one -- and not the raw values behind it.
+	for my $key (sort keys %{ $extra // {} }) {
+		my $val = $extra->{$key};
+		next unless defined $val && length $val;
+		$u .= "&$key=" . url_escape($val);
+	}
 	return $u;
 }
 
@@ -1442,7 +2823,7 @@ sub _run_pipeline_source :Protected ($self) {
 	my $join_type = $self->param('jtype') // 'left';
 	$join_type    = 'left' unless $join_type =~ /\A(?:left|inner|outer)\z/;
 	my $src = $left_src;
-	my @schema_warnings;
+	my (@schema_warnings, @joined, @combined);
 	for my $jspec (@{ $self->every_param('j') }) {
 		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
 		next unless defined $right_spec && defined $left_key && defined $right_key;
@@ -1475,6 +2856,7 @@ sub _run_pipeline_source :Protected ($self) {
 			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
 			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
 		);
+		push @joined, { label => $right_label, left_key => $left_key, right_key => $right_key };
 	}
 
 	$self->stash(schema_warnings => \@schema_warnings) if @schema_warnings;
@@ -1490,12 +2872,13 @@ sub _run_pipeline_source :Protected ($self) {
 	if (@cspecs) {
 		my @sources = ([$records, \@columns]);
 		for my $cspec (@cspecs) {
-			my ($csrc) = $self->_open_spec($cspec);
+			my ($csrc, $clabel) = $self->_open_spec($cspec);
 			next unless $csrc;
 			my $crecs = eval { $csrc->fetch_all } // [];
 			next if $@;
 			my @ccols = _get_columns($csrc, $crecs);
-			push @sources, [$crecs, \@ccols];
+			push @sources,  [$crecs, \@ccols];
+			push @combined, { label => $clabel };
 		}
 		if (@sources > 1) {
 			($records, my $new_cols) = _combine_tables(\@sources);
@@ -1504,7 +2887,100 @@ sub _run_pipeline_source :Protected ($self) {
 		}
 	}
 
+	# What was actually joined and stacked, for the page that shows the rows.
+	$self->stash(pipeline_joined => \@joined, pipeline_combined => \@combined);
+
 	return ($src, $records, \@columns, $left_label);
+}
+
+# _calc_spec_key($self) -> $spec
+#
+# Purpose: The key the stored calc fields, groups and date patterns are filed
+#          under for this request: the l= spec, or the table a /view route is
+#          addressed by, which names its spec explicitly because it has no l=.
+sub _calc_spec_key :Protected ($self) {
+	my $l = $self->param('l') // '';
+	return $l if length $l;
+	my $table = $self->stash('table');
+	return (defined $table && $table =~ /$TABLE_NAME_RE/) ? "table:$table" : '';
+}
+
+# _span_calc_spec($self, \@columns, @dimension_params) -> \%span | undef
+#
+# Purpose: Turn span=/tcol=/as= into the c= calculated field a reader could have
+#          typed, so bucketing a dimension is one code path with one set of
+#          semantics (Calc.pm's span()) rather than a second pipeline of its
+#          own, and so a bucket works on every route at once.
+# Entry:   \@columns -- the source's columns, so the column to bucket and the
+#                       name of the bucket are both checked before anything is
+#                       evaluated.
+#          @dimension_params -- the params that name this route's dimension
+#                       (cat, x, rows, ...), in the order they should be tried.
+# Exit:    undef when the request says nothing about bucketing.  Otherwise
+#          { calc => [ '<col>_span:span(<col>,<interval>)' ],
+#            src  => <column to bucket>, col => '<bucket column>' },
+#          or { error => <message> } for a request that cannot be honoured,
+#          which the caller renders as a 400 rather than drawing a chart of
+#          something the reader did not ask for.
+# Notes:   An ambiguous dimension is refused, not guessed: with rows=at,region
+#          only tcol= knows which column the reader meant, and bucketing the
+#          wrong one silently is worse than an error that says so.  A name that
+#          is already a column, or already a calculated field, is refused too,
+#          because two definitions of one name is the bug that rule prevents.
+sub _span_calc_spec :Protected ($self, $columns, @dimension_params) {
+	my $interval = $self->param('span') // '';
+	my $tcol     = $self->param('tcol') // '';
+	my $as       = $self->param('as')   // '';
+	return undef unless length($interval) || length($tcol);
+
+	return { error => $self->_i18n('error_span_tcol_orphan', $tcol) }
+		if length($tcol) && !length($interval);
+
+	require Database::BI::Calc;
+	return { error => $self->_i18n('error_span_interval', $interval) }
+		unless Database::BI::Calc::span_interval($interval);
+
+	my %col_set = map { $_ => 1 } @$columns;
+
+	my $col;
+	if (length $tcol) {
+		return { error => $self->_i18n('error_span_tcol_unknown', $tcol) }
+			unless $col_set{$tcol};
+		$col = $tcol;
+	} else {
+		my @named = grep { length }
+			map { split /,/, ($self->param($_) // ''), -1 } @dimension_params;
+		return { error => $self->_i18n('error_span_no_column') } unless @named == 1;
+		$col = $named[0];
+	}
+
+	# A bucket column is written in the calc grammar, so spaces in the column's
+	# name arrive as underscores, exactly as a reader typing the expression
+	# would have to write them.
+	(my $expr_col = $col) =~ s/ /_/g;
+	my $name = length($as) ? $as : "${expr_col}_span";
+	return { error => $self->_i18n('error_span_name', $name) }
+		unless $name =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/;
+
+	my $taken = $col_set{$name} || do {
+		my $found  = 0;
+		my $sk     = $self->_calc_spec_key;
+		my $stored = length($sk) ? (($self->_read_models)->{fields}{$sk} // {}) : {};
+		$found = 1 if $stored->{$name};
+		for my $spec (@{ $self->every_param('c') // [] }) {
+			next if $spec =~ /\A(?:path:|table:|url:|redis:)/i;
+			my ($n) = $spec =~ /\A([A-Za-z_][A-Za-z0-9_]*):/;
+			$found = 1 if defined $n && $n eq $name;
+		}
+		$found;
+	};
+	return { error => $self->_i18n('error_span_conflict', $name) } if $taken;
+
+	return {
+		src  => $col,
+		col  => $name,
+		calc => [ "$name:span($expr_col,'$interval')" ],
+	};
 }
 
 # _apply_date_normalization($self, $records, \@columns, $spec_key) -> void
@@ -1536,6 +3012,32 @@ sub _apply_date_normalization :Protected ($self, $records, $columns, $spec_key) 
 	}
 }
 
+# _extend_row($row, $name, $value) -> $row | \%copy
+#
+# Purpose: Write a virtual column into a row that came out of a source.  A row
+#          from a SQL-backed source arrives with its key set locked (the backend
+#          locks it so that reading a column that is not there fails loudly),
+#          and a locked row cannot take a new key in place: the assignment raises
+#          "Attempt to access disallowed key".  Such a row is replaced by an
+#          unlocked copy of itself carrying the new cell, which the rest of the
+#          pipeline reads exactly as it reads any other row.
+# Entry:   $row -- the row hashref; $name -- the column to add; $value -- its value.
+# Exit:    $row itself when it can take the key (already present, or writable),
+#          otherwise a new hashref.
+# Notes:   Only a *new* key is a problem -- writing a key a locked row already
+#          has is allowed -- so the common case (a CSV-backed source, and any
+#          repeated evaluation) copies nothing.
+sub _extend_row {
+	my ($row, $name, $value) = @_;
+	return $row if ref $row ne 'HASH';
+	require Hash::Util;
+	unless (Hash::Util::hashref_locked($row)) {
+		$row->{$name} = $value;
+		return $row;
+	}
+	return { %$row, $name => $value };
+}
+
 # _apply_calc_fields($self, $records, \@columns, \%extra) -> ($records, \@columns)
 #
 # Reads ?c=<name>:<expression> params (those NOT matching a path:/table:/url:/redis:
@@ -1565,7 +3067,7 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 	$self->_apply_date_normalization($records, $columns, $date_spec);
 
 	# Build calc spec list: stored fields from models.json first (lower priority),
-	# then URL ?c= params (higher priority — they override stored fields of the
+	# then URL ?c= params (higher priority -- they override stored fields of the
 	# same name so the user can test a new expression without permanently saving).
 	my (@calc_specs, %seen_calc);
 	{
@@ -1607,13 +3109,16 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 				if $calc->has_error;
 
 			my $undef_count = 0;
-			for my $row (@{$records}) {
+			for my $i (0 .. $#$records) {
+				my $row = $records->[$i];
 				my $val = $calc->evaluate($row);
+				$undef_count++ unless defined $val;
 				# Store '(unparseable)' rather than undef so that pivot/bar
 				# grouping (which skips empty-string keys) keeps these rows in a
 				# visible '(unparseable)' bucket rather than silently dropping them.
-				$row->{$name} = defined $val ? $val : '(unparseable)';
-				$undef_count++ unless defined $val;
+				# See _extend_row for why the row may have to be replaced.
+				$records->[$i] = _extend_row($row, $name,
+					defined $val ? $val : '(unparseable)');
 			}
 			if ($undef_count) {
 				$self->app->log->warn(
@@ -1648,9 +3153,11 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 						}
 					}
 					my $vcol = "${col}_group";
-					for my $row (@{$records}) {
-						my $v = $row->{$col} // '';
-						$row->{$vcol} = $val2group{$v} // '(other)';
+					for my $i (0 .. $#$records) {
+						my $row = $records->[$i];
+						my $v   = $row->{$col} // '';
+						$records->[$i] = _extend_row(
+							$row, $vcol, $val2group{$v} // '(other)');
 					}
 					push @cols, $vcol unless grep { $_ eq $vcol } @cols;
 					# Record group column as virtual.
@@ -2154,11 +3661,11 @@ sub analyses_add_visual ($self) {
 
 	my $kind = $body->{kind} // '';
 	my %supported = map { $_ => 1 }
-		qw( table bar pie line graph scatter heatmap stacked combo treemap histogram map );
+		qw( table bar pie line graph scatter heatmap stacked combo treemap histogram map wordcloud );
 	return $self->render(json => { error => 'Unsupported visual kind' }, status => 400)
 		unless $supported{$kind};
 
-	for my $key (qw( encode options )) {
+	for my $key (qw( encode options cross_row )) {
 		return $self->render(json => { error => "$key must be an object" }, status => 400)
 			if defined $body->{$key} && ref $body->{$key} ne 'HASH';
 	}
@@ -2168,6 +3675,20 @@ sub analyses_add_visual ($self) {
 		encode  => ($body->{encode}  // {}),
 		options => ($body->{options} // {}),
 	};
+
+	# A card may bring a cross-row plan of its own; it is stored in the same
+	# spelling cs=/by=/order= use -- { cs => [...], by => '...', order => [...] }
+	# -- so the pass reads it through the one parser, with the page's plan left
+	# out of it.  Only the shape is checked here: which columns exist is a fact
+	# about the data file, and it is checked again on every render for the same
+	# reason a saved canvas is.
+	if (my $raw = $body->{cross_row}) {
+		my $plan = _card_plan($raw);
+		return $self->render(json => { error => $plan->{error} }, status => 400)
+			if $plan->{error};
+		$vis->{cross_row} = $plan;
+	}
+
 	$vis->{title} = $body->{title}
 		if defined $body->{title} && !ref $body->{title} && length $body->{title};
 
@@ -2195,6 +3716,7 @@ sub analyses_add_visual ($self) {
 	my $rendered = $self->_render_visual_html(
 		$vis, $records, $ctx->{columns}, $ctx->{src}, $index, $ctx->{spec_key},
 		(@{ $ctx->{cf_specs} } ? 1 : 0),
+		$ctx->{cross_row},
 	);
 	return $self->render(json => { error => $rendered->{error} }, status => 400)
 		if $rendered->{error};
@@ -2228,6 +3750,17 @@ sub analyses_add_visual ($self) {
 # before it is stored, so an unknown column is a 400 and the saved visual is
 # left alone.  The optional C<query> is the canvas page's URL state, so a card
 # edited while the canvas is cross-filtered is redrawn with the others.
+#
+# C<cross_row> is repaired the same way, and on the same request: a card's plan
+# is stored data like its columns, so a card that was saved with a plan this
+# canvas cannot honour - or with none where one is now wanted - is fixed in
+# place, keeping its layout slot, its size and its title.  The two keys are
+# independent, so a repair that renames the column the pass produces writes
+# both in one request rather than leaving the card drawn against a column that
+# no longer exists.  A JSON C<null> is the card giving up its plan and taking
+# the page's again, which is the state a card added without one is in; an
+# empty plan (C<{ cs => [] }>) is the card running no pass even where the page
+# runs one, and leaving the key out is no request to change it at all.
 sub analyses_update_visual ($self) {
 	my $id = $self->stash('id') // '';
 	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
@@ -2249,11 +3782,32 @@ sub analyses_update_visual ($self) {
 	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
 		unless ref $body eq 'HASH';
 
-	return $self->render(json => { error => 'encode must be an object' }, status => 400)
-		unless ref $body->{encode} eq 'HASH';
+	my $has_encode = exists $body->{encode};
+	my $has_plan   = exists $body->{cross_row};
+	return $self->render(json => { error => 'encode or cross_row must be given' }, status => 400)
+		unless $has_encode || $has_plan;
 
 	my $vis = { %{ $a->{visuals}[$index] } };
-	$vis->{encode} = { %{ $body->{encode} } };
+
+	if ($has_encode) {
+		return $self->render(json => { error => 'encode must be an object' }, status => 400)
+			unless ref $body->{encode} eq 'HASH';
+		$vis->{encode} = { %{ $body->{encode} } };
+	}
+
+	if ($has_plan) {
+		if (defined $body->{cross_row}) {
+			return $self->render(json => { error => 'cross_row must be an object or null' }, status => 400)
+				unless ref $body->{cross_row} eq 'HASH';
+			my $plan = _card_plan($body->{cross_row});
+			return $self->render(json => { error => $plan->{error} }, status => 400)
+				if $plan->{error};
+			$vis->{cross_row} = $plan;
+		}
+		else {
+			delete $vis->{cross_row};
+		}
+	}
 
 	my $ctx = $self->_canvas_render_context($a, $body->{query});
 	return $self->render(json => { error => $ctx->{error} }, status => $ctx->{status})
@@ -2273,6 +3827,7 @@ sub analyses_update_visual ($self) {
 	my $rendered = $self->_render_visual_html(
 		$vis, $records, $ctx->{columns}, $ctx->{src}, $index, $ctx->{spec_key},
 		$prefiltered,
+		$ctx->{cross_row},
 	);
 	return $self->render(json => { error => $rendered->{error} }, status => 400)
 		if $rendered->{error};
@@ -2359,9 +3914,12 @@ sub analyses_import ($self) {
 # the base pipeline, calculated columns, bound parameters and the cross-filters
 # named by a canvas page's query string.  C<cf_specs> are returned unapplied so
 # the caller can decide which card, if any, is their source; C<cf_source> is
-# the C<cv> index, or -1 when the page names none.  Only C<cf>, C<c> and
-# C<p.<name>> are read from C<$query> - the same keys canvas_render reads from
-# its own URL - so a page's state is not a way to reach anything else.
+# the C<cv> index, or -1 when the page names none.  C<cross_row> is the
+# validated cs= plan, undef when the page names none, which the caller passes to
+# _render_visual_html so each card runs it over its own rows.  Only C<cf>,
+# C<cv>, C<c>, C<cs>, C<by>, C<order>, C<range>, C<rcol> and C<p.<name>> are read
+# from C<$query> - the same keys canvas_render reads from its own URL - so a
+# page's state is not a way to reach anything else.
 sub _canvas_render_context :Protected ($self, $a, $query) {
 	my $params;
 	if (defined $query) {
@@ -2397,9 +3955,27 @@ sub _canvas_render_context :Protected ($self, $a, $query) {
 		return { error => $e, status => 400 };
 	}
 
+	# The canvas names cs= once and every card runs the same plan over its own
+	# rows (see _render_visual_html).  Validated here, against the columns the
+	# cards will be drawn from, so a card added or edited in place fails with
+	# the same 400 the page itself would give.
+	my $cross_row = $self->_cross_row_specs($columns, $params || Mojo::Parameters->new);
+	return { error => $cross_row->{error}, status => 400 }
+		if $cross_row && $cross_row->{error};
+
 	my @cf_specs  = $params ? grep { /\S/ } @{ $params->every_param('cf') // [] } : ();
 	my $cf_source = (defined $params && defined $params->param('cv'))
 		? int($params->param('cv')) : -1;
+
+	# The relative time range the canvas page names in its query string is part
+	# of the state a card is drawn through, like cf= and the bound parameters,
+	# so a visual added while a range is active shows the same rows as the
+	# cards already on screen.
+	$records = _apply_time_range(
+		$records,
+		$params ? $params->param('range') : undef,
+		$params ? $params->param('rcol')  : undef,
+	);
 
 	return {
 		src       => $src,
@@ -2408,6 +3984,7 @@ sub _canvas_render_context :Protected ($self, $a, $query) {
 		spec_key  => ($a->{datasets}[0]{spec} // ''),
 		cf_specs  => \@cf_specs,
 		cf_source => $cf_source,
+		cross_row => $cross_row,
 	};
 }
 
@@ -2480,15 +4057,83 @@ sub _chart_orientation {
 	return ($orient =~ /\A(?:h|horizontal)\z/i) ? 'horizontal' : 'vertical';
 }
 
-# _render_visual_html($self, \%vis, $records, \@columns, $src, $vis_id, $spec_key)
+# _visual_measure($agg_fn, $val_col) -> \%measure
+#
+# The measure a canvas card aggregates a value column with: C<{ fn, val,
+# label }> when the card can be drawn, or C<{ error }> when it cannot, which
+# the card reports in place of its chart.
+#
+# A card that names no function keeps the default it has always had: count the
+# rows when it names no value column, sum it when it does.  A named function is
+# the measure vocabulary the pivot and the stats page share, with a percentile
+# riding in the name as p<N> -- p90, p50 -- exactly as a pivot's measure spells
+# it, so a card needs no second key to keep in step.  'count' counts rows, so it
+# ignores the value column and needs none.
+#
+# label is what the card's title calls the result: 'Count', the column's own
+# name for a plain sum, and "fn(col)" for anything else, so two cards over one
+# column do not read alike when one of them is a median.  An explicit sum keeps
+# the plain name, because naming the default should not change a card.
+#
+# The name itself is not checked here: _render_visual_html validates it once,
+# before the dispatch, so that a card of any kind reports a function it cannot
+# compute -- including the kinds that never call this.
+sub _visual_measure {
+	my ($agg_fn, $val_col) = @_;
+	my $count_col = (!defined $val_col || !length $val_col || $val_col eq '__count__');
+	# An absent name and an empty one are the same non-choice, so the default is
+	# one branch rather than two.
+	my $named = (defined $agg_fn && !ref $agg_fn && length $agg_fn) ? $agg_fn : undef;
+
+	return { fn => 'count', val => undef, label => 'Count' }
+		if defined $named && $named eq 'count';
+	return { fn => 'count', val => undef, label => 'Count' }
+		if !defined $named && $count_col;
+	return { error => "Aggregate '$named' needs a value column" }
+		if defined $named && $count_col;
+
+	my $fn = defined $named ? $named : 'sum';
+	return {
+		fn    => $fn,
+		val   => $val_col,
+		label => ($fn eq 'sum' ? $val_col : "$fn($val_col)"),
+	};
+}
+
+# _render_visual_html($self, \%vis, $records, \@columns, $src, $vis_id, $spec_key,
+#                     $prefiltered, $cross_row)
 #     -> { html => Str, title => Str, head => Str } | { error => Str }
 #
 # Renders one canvas visual spec to an HTML snippet without touching
-# $self->render().  Applies any per-visual filters, then dispatches by
+# $self->render(), with each of the card's inline scripts closed over a
+# function of its own (see _scope_card_scripts).  The scoping is done here
+# rather than by the callers because every card passes through here and every
+# caller wants the same thing: a card's script and the page's are separate
+# programs, whether the card is drawn on a canvas of its own kind or returned
+# to a page that is about to insert it.
+sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row = undef) {
+	my $rendered = $self->_render_visual_markup(
+		$vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row,
+	);
+	return $rendered unless defined $rendered->{html};
+
+	$rendered->{html} = _scope_card_scripts($rendered->{html});
+	return $rendered;
+}
+
+# _render_visual_markup($self, \%vis, $records, \@columns, $src, $vis_id,
+#                       $spec_key, $prefiltered, $cross_row)
+#     -> { html => Str, title => Str, head => Str } | { error => Str }
+#
+# The card itself, without the scope _render_visual_html puts around its
+# scripts.  Applies any per-visual filters, then dispatches by
 # kind to the appropriate renderer.  $vis_id gives a map's Leaflet element
 # ids a page-unique suffix; $spec_key is the dataset whose older per-dataset
 # geocode entry may still be read while the shared cache is migrated.
-sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered) {
+# $cross_row is the canvas's validated cs= plan, run here so that each card's
+# window is over that card's own rows: see the note at the pass below.  A card
+# that saved a plan of its own uses that one instead.
+sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row = undef) {
 	my $kind    = $vis->{kind}    // '';
 	my $encode  = $vis->{encode}  // {};
 	my $options = $vis->{options} // {};
@@ -2509,7 +4154,62 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		$vis_recs = _apply_filter_spec($vis_recs, $f);
 	}
 
+	# Stage 6, per card.  A canvas names cs= once, but by the time the pass runs
+	# the card has already been narrowed by its own filters and by the page's
+	# cross-filter, so a running total is over the rows that card is drawn from:
+	# two cards showing different regions show different running totals.  The
+	# pass therefore cannot be hoisted above the card loop -- one shared pass
+	# would give every card the same numbers, and those are the numbers of
+	# neither card.  A fault is this card's error, not the page's: the plan was
+	# validated once, and only the arithmetic can still fail here.
+	#
+	# A card that carries a cross-row plan of its own (visual.cross_row) runs that
+	# plan instead of the page's: putting a running total on one card is not a
+	# request to put one on every card, and a card whose plan is empty has none
+	# at all rather than the page's.  Its plan is validated here rather than
+	# when it was saved, because the columns a saved canvas has are the columns
+	# its data file has today.  A card's own plan is its own fault, so a bad one
+	# is that card's error while the page's bad plan is the page's 400.
+	my $plan = $cross_row;
+	if (ref $vis->{cross_row} eq 'HASH') {
+		$plan = $self->_cross_row_specs_from($columns, $vis->{cross_row});
+		return { error => $plan->{error} }
+			if $plan && $plan->{error};
+	}
+
+	if ($plan) {
+		# The pass writes its column onto the rows it is handed, and a card is
+		# handed the canvas's rows -- the same hashrefs every card draws from.  The
+		# numbers a pass produces are that card's, so it runs on copies: without
+		# them one card's running total is written into its neighbour's rows, and a
+		# card that asked for no plan at all reads a column it never asked for.
+		my $own = [ map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$vis_recs ];
+		my ($crossed, $crossed_cols) = eval {
+			$self->_apply_cross_row($own, $columns, $plan)
+		};
+		if (my $e = $@) {
+			$e =~ s/ at \S+ line \d+\.?\n?$//;
+			return { error => $e };
+		}
+		($vis_recs, $columns) = ($crossed, $crossed_cols);
+	}
+
 	my %col_set = map { $_ => 1 } @$columns;
+
+	# The aggregate function this card picked for itself, if any (encode.agg).
+	# It is read and checked here, before the dispatch, so a misspelt function
+	# is this card's error whatever kind it is, rather than a chart quietly
+	# drawn some other way; the kinds that aggregate then honour it below.  A
+	# percentile rides in the name (p90, p50), as it does in a pivot measure, so
+	# there is no second key to keep in step.
+	my $agg_fn = $encode->{agg};
+	if (defined $agg_fn && !ref $agg_fn && length $agg_fn) {
+		return { error => "Unknown aggregate function '$agg_fn'; expected one of: "
+			. join(' ', @MEASURE_FNS) . ', or p1 to p100 for a percentile' }
+			unless _measure_fn_ok($agg_fn);
+	} else {
+		$agg_fn = undef;
+	}
 
 	# A chart aggregates the rows it is given.  The SQL push path in
 	# _grouped_totals re-reads the source, which has none of the filters the
@@ -2530,14 +4230,17 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		return { error => "Column not found: $val_col" }
 			unless $count_mode || $col_set{$val_col};
 
+		my $m = _visual_measure($agg_fn, $val_col);
+		return { error => $m->{error} } if $m->{error};
+
 		my $agg = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
-			{ by => [$cat_col], fn => $count_mode ? 'count' : 'sum',
-			  val => $count_mode ? undef : $val_col, as => 'value' },
+			{ by => [$cat_col], fn => $m->{fn},
+			  val => $m->{val}, as => 'value' },
 		);
 		return { error => 'No plottable data' } unless @$agg;
 
-		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+		$title ||= "$m->{label} by $cat_col";
 		my @bars   = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
 		my $orient = _chart_orientation($options);
 		# The bar page caps its bars as max_bars and stores the cap as
@@ -2567,14 +4270,17 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		return { error => "Column not found: $val_col" }
 			unless $count_mode || $col_set{$val_col};
 
+		my $m = _visual_measure($agg_fn, $val_col);
+		return { error => $m->{error} } if $m->{error};
+
 		my $agg = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
-			{ by => [$cat_col], fn => $count_mode ? 'count' : 'sum',
-			  val => $count_mode ? undef : $val_col, as => 'value' },
+			{ by => [$cat_col], fn => $m->{fn},
+			  val => $m->{val}, as => 'value' },
 		);
 		return { error => 'No plottable data' } unless @$agg;
 
-		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+		$title ||= "$m->{label} by $cat_col";
 		my @slices = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
 		my $scheme = $options->{scheme} // 'tableau10';
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
@@ -2598,15 +4304,33 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		return { error => "Column not found: $x_col" } unless $col_set{$x_col};
 		return { error => "Column not found: $y_col" } unless $col_set{$y_col};
 
+		# A card whose spec names a measure plots one point per x value rather
+		# than one per row: the shape /graph?agg= draws, and the only shape that
+		# makes sense when the x axis is a bucket.  The fold writes its result
+		# back under the y column's own name, so the loop below is the same one
+		# an unaggregated card runs, and the groups arrive in label order, which
+		# for an ISO bucket is chronological order.
+		my $rows = $vis_recs;
+		my $m;
+		if (defined $agg_fn) {
+			$m = _visual_measure($agg_fn, $y_col);
+			return { error => $m->{error} } if $m->{error};
+			my $agg = $self->_grouped_totals(
+				{ source => undef, records => $vis_recs },
+				{ by => [$x_col], fn => $m->{fn}, val => $m->{val}, as => 'value' },
+			);
+			$rows = [ map { { %$_, $y_col => $_->{value} } } @$agg ];
+		}
+
 		my @pairs;
-		for my $row (@$vis_recs) {
+		for my $row (@$rows) {
 			my $xv = $row->{$x_col} // ''; next unless length $xv;
 			my $yn = _numeric_cell($row->{$y_col} // ''); next unless defined $yn;
 			push @pairs, [_decode_cell($xv), $yn];
 		}
 		return { error => 'No plottable data' } unless @pairs;
 
-		$title ||= "$y_col vs $x_col";
+		$title ||= $m ? "$m->{label} by $x_col" : "$y_col vs $x_col";
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_zoomable_line_chart_snippet(\@pairs, { id => $svg_id });
 		my $html = $sn->{html};
@@ -2662,11 +4386,14 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 			push @x_order, $xv unless $seen_x{$xv}++;
 			push @y_order, $yv unless $seen_y{$yv}++;
 		}
+		my $m = _visual_measure($agg_fn, $val_col);
+		return { error => $m->{error} } if $m->{error};
+
 		my $agg = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$x_col, $y_col],
-			  fn  => length($val_col) ? 'sum' : 'count',
-			  val => length($val_col) ? $val_col : undef,
+			  fn  => $m->{fn},
+			  val => $m->{val},
 			  as  => 'value' },
 		);
 		my %grid;
@@ -2679,14 +4406,13 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		} @x_order;
 		return { error => 'No plottable data' } unless @triples;
 
-		$title ||= length($val_col) ? "$val_col by $x_col and $y_col"
-		                            : "Count by $x_col and $y_col";
+		$title ||= "$m->{label} by $x_col and $y_col";
 		my $scheme = $options->{scheme} // 'YlOrRd';
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_heatmap_snippet(\@triples, {
 				x_label      => $x_col,
 				y_label      => $y_col,
-				val_label    => (length($val_col) ? $val_col : 'Count'),
+				val_label    => $m->{label},
 				color_scheme => $scheme,
 				show_values  => ($options->{show_values} ? 1 : 0),
 				id           => $svg_id,
@@ -2709,11 +4435,14 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		return { error => "Column not found: $val_col" }
 			unless $count_mode || $col_set{$val_col};
 
+		my $m = _visual_measure($agg_fn, $val_col);
+		return { error => $m->{error} } if $m->{error};
+
 		my $agg = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$cat_col, $seg_col],
-			  fn  => $count_mode ? 'count' : 'sum',
-			  val => $count_mode ? undef   : $val_col,
+			  fn  => $m->{fn},
+			  val => $m->{val},
 			  as  => 'value' },
 		);
 		my @data = map {
@@ -2724,8 +4453,7 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		} @$agg;
 		return { error => 'No plottable data' } unless @data;
 
-		$title ||= $count_mode ? "Count by $cat_col and $seg_col"
-		                       : "$val_col by $cat_col and $seg_col";
+		$title ||= "$m->{label} by $cat_col and $seg_col";
 		my $scheme = $options->{scheme} // 'tableau10';
 		my $orient = (_chart_orientation($options) eq 'horizontal') ? 'h' : 'v';
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
@@ -2751,13 +4479,21 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		return { error => "Column not found: $bar_col"  } unless $col_set{$bar_col};
 		return { error => "Column not found: $line_col" } unless $col_set{$line_col};
 
+		# One card, one function: a combo aggregates both its series the same
+		# way, so the two cannot be read against different arithmetic by
+		# accident.
+		my $bar_m  = _visual_measure($agg_fn, $bar_col);
+		my $line_m = _visual_measure($agg_fn, $line_col);
+		return { error => $bar_m->{error}  } if $bar_m->{error};
+		return { error => $line_m->{error} } if $line_m->{error};
+
 		my $bar_rows = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
-			{ by => [$x_col], fn => 'sum', val => $bar_col,  as => 'bar_val' },
+			{ by => [$x_col], fn => $bar_m->{fn}, val => $bar_m->{val},  as => 'bar_val' },
 		);
 		my $line_rows = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
-			{ by => [$x_col], fn => 'sum', val => $line_col, as => 'line_val' },
+			{ by => [$x_col], fn => $line_m->{fn}, val => $line_m->{val}, as => 'line_val' },
 		);
 		my (%bar_map, %line_map, @x_order, %x_seen);
 		for my $r (@$bar_rows) {
@@ -2774,7 +4510,13 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 
 		my @data = map { { x => $_, bar_val => $bar_map{$_}, line_val => $line_map{$_} } }
 		           @x_order;
-		$title ||= "$bar_col and $line_col by $x_col";
+		# Sum keeps the columns in the title because that is what the card has
+		# always said; count needs no column, so it reads as the tally it is.
+		$title ||= ($bar_m->{fn} eq 'sum')
+			? "$bar_col and $line_col by $x_col"
+			: ($bar_m->{fn} eq 'count')
+				? "Count by $x_col"
+				: "$bar_m->{fn} of $bar_col and $line_col by $x_col";
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_combo_snippet(\@data, {
 				bar_label  => $bar_col,
@@ -2796,16 +4538,19 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		return { error => "Column not found: $val_col" }
 			unless $count_mode || $col_set{$val_col};
 
+		my $m = _visual_measure($agg_fn, $val_col);
+		return { error => $m->{error} } if $m->{error};
+
 		my $agg = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$cat_col],
-			  fn  => $count_mode ? 'count' : 'sum',
-			  val => $count_mode ? undef   : $val_col,
+			  fn  => $m->{fn},
+			  val => $m->{val},
 			  as  => 'value' },
 		);
 		return { error => 'No plottable data' } unless @$agg;
 
-		$title ||= $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+		$title ||= "$m->{label} by $cat_col";
 		my $scheme = $options->{scheme} // 'tableau10';
 		# The snippet takes one row per tile as { path, value }, the shape the
 		# treemap page builds; a [label, value] pair is not a path and croaks.
@@ -2911,12 +4656,109 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 		};
 	}
 
+	# ------------------------------------------------------------ word cloud --
+	# A card that draws the words of a text column, the way GET /wordcloud does,
+	# from the same counted and ranked words (see _wordcloud_counts).  It is the
+	# one kind with no value column and no measure: the size of a word is how
+	# many of the card's own rows contain it, so a card the reader has filtered
+	# shows the words of those rows.
+	if ($kind eq 'wordcloud') {
+		my $col = $encode->{col} // '';
+		return { error => 'Missing col for word cloud visual' } unless length $col;
+		return { error => "Column not found: $col" } unless $col_set{$col};
+
+		my $topn   = _wordcloud_option($options->{topn},   50, 1, 500);
+		my $minlen = _wordcloud_option($options->{minlen},  3, 1, 64);
+
+		my $cloud = _wordcloud_counts(
+			$vis_recs, $col, $topn, $minlen, $options->{stop},
+		);
+		my @tags = @{ $cloud->{words} };
+
+		$title ||= "Words in $col";
+		my $summary = $cloud->{distinct}
+			? scalar(@tags) . ' of ' . $cloud->{distinct} . ' different word'
+				. ($cloud->{distinct} == 1 ? '' : 's')
+				. ' &middot; ' . $cloud->{total} . ' word'
+				. ($cloud->{total} == 1 ? '' : 's')
+				. ' in ' . $cloud->{rows} . ' row'
+				. ($cloud->{rows} == 1 ? '' : 's')
+			: '';
+
+		if (!@tags) {
+			return {
+				html  => '<div class="wordcloud-card"><p class="wordcloud-empty">'
+					. 'No words: no row in this view has text in '
+					. xml_escape($col) . ' at least ' . $minlen
+					. ' characters long.</p></div>',
+				title => $title,
+			};
+		}
+
+		# HTML::TagCloud ranks the words and works out each one's level; the size
+		# it would give that level is 12px plus the level.  The size is written on
+		# the word here instead of using the module's style sheet, because that
+		# sheet scopes itself through #htmltagcloud -- an id only one element on a
+		# page may carry, and a canvas may hold two word-cloud cards.  The level,
+		# the part that is actually arithmetic, stays the module's.  The module is
+		# handed the word as it is and the escaping happens on the way out, because
+		# the same word is both what the reader reads and, unescaped, the filter a
+		# click on it asks for.
+		require HTML::TagCloud;
+		my $ranked = HTML::TagCloud->new(levels => 18);
+		$ranked->add_static($_->{word}, $_->{count}) for @tags;
+
+		# A word is a control, not a label.  Clicking one cross-filters the canvas
+		# the way a chart mark does -- ?cf=...&cv=<card>, so every other card is
+		# narrowed and this one stays drawn in full -- but with C<contains> rather
+		# than C<eq>: a word is a token inside a cell, not the cell's whole value,
+		# so no row equals it.  The href carries the whole URL the click asks for,
+		# so a word filters even before the page's script runs; the script takes
+		# the click over only to keep the rest of the query string (a bound
+		# parameter, a drill path) and to record the undo step, as it does for a
+		# mark.  A card drawn with no index -- by anything that is not a canvas
+		# render -- names no source, so the filter applies to every card.
+		my $cv = (defined $vis_id && $vis_id =~ /\A\d+\z/) ? "&cv=$vis_id" : '';
+		my $spans = join(' ', map {
+			my $word  = $_->{name};
+			my $label = xml_escape("Filter by $col: $word");
+			# aria-describedby names the canvas's cross-filter help, which covers
+			# a word as well as a chart mark: the label says which word this is,
+			# the help says what pressing Enter on it does.
+			'<a class="wordcloud-word" href="?cf='
+				. _percent_encode("$col:contains:$word") . $cv . '"'
+				. ' data-cf-value="' . xml_escape($word) . '"'
+				. ' style="font-size:' . (12 + $_->{level}) . 'px"'
+				. ' aria-label="' . $label . '" title="' . $label . '"'
+				. ' aria-describedby="cf-help">'
+				. xml_escape($word) . '</a>'
+		} $ranked->tags(scalar @tags));
+
+		return {
+			html  => '<div class="wordcloud-card" data-col="' . xml_escape($col) . '">'
+				. '<p class="wordcloud-cloud">' . $spans . '</p>'
+				. '<p class="wordcloud-summary">' . $summary . '</p></div>',
+			title => $title,
+		};
+	}
+
 	# ----------------------------------------------------------------- table --
 	if ($kind eq 'table') {
 		return { error => 'No data to display' } unless @$vis_recs;
 		my @cols = @$columns;
-		@cols = @{ $encode->{columns} }
-			if ref $encode->{columns} eq 'ARRAY' && @{ $encode->{columns} };
+		if (ref $encode->{columns} eq 'ARRAY' && @{ $encode->{columns} }) {
+			# A table names the columns it shows, and it is the one kind that
+			# could name a column nothing produces: the heading printed and
+			# every cell under it was empty, which reads as missing data rather
+			# than as a card drawn against a column that is not there.  Whether
+			# a plan produces a name is not something a reader can see from the
+			# card, so the name is refused here as the charts below refuse it.
+			for my $c (@{ $encode->{columns} }) {
+				next if ref $c || !length $c;
+				return { error => "Column not found: $c" } unless $col_set{$c};
+			}
+			@cols = @{ $encode->{columns} };
+		}
 
 		$title ||= 'Table';
 		my $max_rows_t = int($options->{rows} // 50);
@@ -3017,8 +4859,22 @@ sub canvas_render ($self) {
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
-		unless exists $analyses->{$id};
+	unless (exists $analyses->{$id}) {
+		# An HTML page, not plain text, so the user keeps the breadcrumb and
+		# the site navigation.  No canvas_id: there is nothing to delete.
+		my ($platform, $language) = $self->_resolve_template;
+		return $self->render(
+			handler     => 'tt',
+			template    => "$platform/$language/canvas_error",
+			format      => 'html',
+			status      => 404,
+			title       => 'Canvas not found',
+			canvas_name => $id,
+			error_msg   => sprintf($MESSAGES{error_analysis_not_found}, $id),
+			error_specs => [],
+			language    => $language,
+		);
+	}
 	my $a = $analyses->{$id};
 
 	# freshness: compare each dataset's current mtime against
@@ -3087,6 +4943,20 @@ sub canvas_render ($self) {
 			}
 		} sort keys %param_defs;
 
+		# Everything else the canvas is showing has to survive a change of time
+		# range, so the control carries the rest of this page's query string: the
+		# cross-filter (cf/vc), the drill path (dd/dl), the calculated columns
+		# (c) and the what-if parameter values (p.<name>).
+		my @canvas_range_hidden;
+		{
+			my $q = $self->req->query_params;
+			for my $name ($q->names) {
+				next if $name eq 'range' || $name eq 'rcol';
+				push @canvas_range_hidden,
+					map { { name => $name, value => $_ } } @{ $q->every_param($name) // [] };
+			}
+		}
+
 		my ($src, $records, $columns) = $self->_build_canvas_pipeline($a);
 		unless (defined $records) {
 			my ($platform, $language) = $self->_resolve_template;
@@ -3116,6 +4986,25 @@ sub canvas_render ($self) {
 		if ($@) {
 			(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
 			return $self->render(text => $e, status => 400);
+		}
+
+		# cs= belongs to the page, not to a card: one plan, run per card on that
+		# card's own rows (see _render_visual_html).  A fault is the page's 400 --
+		# the same message repeated on every card would be noise, not a report.
+		my $cross_row = $self->_cross_row_specs($columns);
+		if ($cross_row && $cross_row->{error}) {
+			return $self->render(text => $cross_row->{error}, status => 400);
+		}
+
+		# The relative time range the page names (?range=/?rcol=) narrows every
+		# card, before the per-card cross-filter.  The before_dispatch hook has
+		# already resolved it into the f= params the routes apply, but the canvas
+		# builds its own pipeline, so it applies the range itself from the same
+		# two specs.
+		if (my $range = $self->stash('time_range')) {
+			for my $spec (@{ $self->stash('range_specs') // [] }) {
+				$records = _apply_filter_spec($records, $spec);
+			}
 		}
 
 		# cross-filter state from URL params.
@@ -3182,7 +5071,10 @@ sub canvas_render ($self) {
 		my ($dd_hier) = grep { ($_->{name} // '') eq $dd_name }
 		                     @{ $a->{hierarchies} // [] };
 
-		my $drill_active = (defined $dd_hier && length $dd_name) ? 1 : 0;
+		# A drill needs a first level to name: a hierarchy with none answers no
+		# press, and #cf-help has no column it could call the one that drills.
+		my $drill_active = ($dd_hier && length $dd_name
+			&& @{ $dd_hier->{levels} // [] }) ? 1 : 0;
 		my $drill_col    = '';
 		my @drill_crumb  = ();
 		my $drill_max    = 0;
@@ -3271,6 +5163,7 @@ sub canvas_render ($self) {
 			my $result = $self->_render_visual_html(
 				$vis, $vis_recs, $columns, $src, $i, $canvas_spec_key,
 				($cf_active && $i != $cf_source ? 1 : 0),
+				$cross_row,
 			);
 			$canvas_map_head ||= $result->{head} // '';
 			push @rendered, {
@@ -3303,6 +5196,15 @@ sub canvas_render ($self) {
 		# name containing markup cannot close the tag, as the chart spec is.
 		$canvas_columns_json =~ s{<}{\\u003c}g;
 
+		# The columns the page's own plan produces, for the panel that repairs a
+		# card's: a card that takes the page's plan plots whatever that plan makes,
+		# so the panel can only tell a reader what a change would cost it if it
+		# knows the page's columns too.
+		my $page_aliases = ($cross_row && ref $cross_row eq 'HASH')
+			? [ map { $_->{as} } @{ $cross_row->{specs} // [] } ] : [];
+		my $canvas_page_aliases_json = encode_json($page_aliases);
+		$canvas_page_aliases_json =~ s{<}{\\u003c}g;
+
 		my ($platform, $language) = $self->_resolve_template;
 		return $self->render(
 			handler      => 'tt',
@@ -3313,16 +5215,33 @@ sub canvas_render ($self) {
 			canvas_name  => $a->{name},
 			canvas_data_url  => ($self->_analysis_to_url($a) // ''),
 			canvas_columns_json => $canvas_columns_json,
+			canvas_page_aliases_json => $canvas_page_aliases_json,
+			# The same menu the table page's cross-row panel renders, so a card
+			# can offer the functions the pass actually knows.
+			cross_row_menu => \@CROSS_ROW_MENU,
 			visuals      => \@rendered,
 			canvas_params    => \@canvas_params,
 			canvas_bookmarks => \@canvas_bookmarks,
 			canvas_bookmarks_json => $bm_json,
+			canvas_time_range  => $self->stash('time_range'),
+			canvas_time_range_col => ($self->stash('time_range') ? $self->stash('time_range')->{col} : ''),
+			canvas_time_range_clear_url => (do {
+				my $u = $self->req->url->clone;
+				$u->query->remove('range')->remove('rcol');
+				$self->stash('time_range') ? $u->to_string : '';
+			}),
+			canvas_range_cols  => [ @$columns ],
+			canvas_range_hidden => \@canvas_range_hidden,
 			cf_active        => $cf_active    ? 1 : 0,
 			cf_display       => $cf_display,
 			cf_clear_url     => $cf_clear_url,
 			drillthrough_url => $drillthrough_url,
 			drill_active     => $drill_active  ? 1 : 0,
-			drill_name       => $dd_name,
+			# A drill is a hierarchy that exists, not a name in the query string:
+			# a bookmark can outlive the hierarchy it was saved on, and a page
+			# that said it was drilled when nothing answered would stop making
+			# its marks controls and have no column to name in #cf-help.
+			drill_name       => ($drill_active ? $dd_name : ''),
 			drill_level      => $dd_level,
 			drill_col        => $drill_col,
 			drill_crumb      => \@drill_crumb,
@@ -3359,20 +5278,28 @@ sub _run_export_pipeline :Protected ($self) {
 	my (undef, $records, $columns, $left_label) = $self->_run_pipeline_source;
 	return () unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	# The export honours span= like the page it was linked from, and accepts the
+	# dimension params of the aggregating routes so a chart's own URL can be
+	# pasted into /export and mean the same thing.
+	my $span = $self->_span_calc_spec($columns, 'cat', 'x', 'rows', 'group');
+	if ($span && $span->{error}) {
+		$self->render(text => $span->{error}, status => 400);
+		return ();
+	}
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) {
 		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
 		$self->render(text => $e, status => 400);
 		return ();
 	}
 
+	return () unless $self->_reduce_or_render(\$records, \$columns);
+
 	my @columns = @{ $columns // [] };
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
-
-	$records = _dedup_records($records, \@columns) if $self->param('d');
+	# d=1 has been applied by _reduce_or_render, before the cross-row pass.
 
 	# Sort support for /export: applied in memory after filtering/dedup.
 	my $sort = $self->param('sort');
@@ -3447,6 +5374,7 @@ sub _serialize_csv {
 # Exit:    Renders the Mojolicious response; does not return a meaningful value.
 # Side Effects: Writes HTTP response headers and body.
 sub _render_csv :Protected ($self, $records, $columns, $name) {
+	$self->stash(buffer => 0);
 	$self->res->headers->content_type('text/csv; charset=UTF-8');
 	$self->res->headers->content_disposition(qq{attachment; filename="${name}.csv"});
 	$self->render(data => _serialize_csv($records, $columns));
@@ -3459,6 +5387,7 @@ sub _render_csv :Protected ($self, $records, $columns, $name) {
 # Exit:    Renders the Mojolicious response.
 # Side Effects: Creates and unlinks a temporary file; writes HTTP response.
 sub _render_sqlite :Protected ($self, $records, $columns, $name) {
+	$self->stash(buffer => 0);
 	my $data = $self->_write_sqlite_db($records, $columns);
 	$self->res->headers->content_type('application/vnd.sqlite3');
 	$self->res->headers->content_disposition(qq{attachment; filename="${name}.db"});
@@ -3472,6 +5401,7 @@ sub _render_sqlite :Protected ($self, $records, $columns, $name) {
 # Exit:    Renders the Mojolicious response.
 # Side Effects: Writes HTTP response headers and body.
 sub _render_json :Protected ($self, $records, $columns, $name) {
+	$self->stash(buffer => 0);
 	$self->res->headers->content_disposition(qq{attachment; filename="${name}.json"});
 	$self->render(json => $records);
 }
@@ -3547,6 +5477,7 @@ there and no change to this action or to the template.
 =cut
 
 sub tutorial ($self) {
+	return if $self->buffer_is_cached;
 	my ($platform, $language) = $self->_resolve_template;
 
 	$self->render(
@@ -3653,6 +5584,21 @@ sub view ($self) {
 		}
 	};
 	if ($@) {
+		# No file by that name: a 404 that names the table, with the trail
+		# and the navigation, rather than the home page and the backend's
+		# message (which gives away the data directory).
+		my $stem_of = sub { lc($_[0]->basename =~ s/\.[^.]+\z//r) };
+		unless (grep { $stem_of->($_) eq lc $table } _data_dir_for($self->app)->list->each) {
+			return $self->render(
+				template  => "$platform/$language/not_found",
+				handler   => 'tt',
+				format    => 'html',
+				status    => 404,
+				title     => 'Table not found',
+				error_msg => $self->_i18n('error_table_missing', $table),
+				language  => $language,
+			);
+		}
 		return $self->render(
 			template => "$platform/$language/home",
 			handler  => 'tt',
@@ -3668,18 +5614,36 @@ sub view ($self) {
 		return $self->redirect_to('/tables?l=' . url_escape("table:$table"));
 	}
 
+	# A cross-row spec that could not be honoured has already rendered its 400
+	# inside _fetch_page; drawing the page over it would hide the reason.
+	return if $self->stash('_cross_row_error');
+
 	$records //= [];
 	my @columns = _get_columns($source, $records);
-	# _apply_filters on already-reduced records is a no-op for filtering but
-	# correctly builds filter_specs (for export URLs) and filters_json (for UI).
-	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+	# Stage 6 wrote its columns onto the rows before the page was sliced, so the
+	# list is what makes the table show them -- and what lets a calculated field
+	# below name one of them.
+	my %seen_col = map { $_ => 1 } @columns;
+	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
+	# The page from _fetch_page is already reduced; this call is here for the chip
+	# list only -- filter_specs (for export URLs) and filters_json (for the UI).
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 
 	# Calculated fields belong to the table, not only to its charts.  The table
 	# action is addressed by :table rather than l=, so name the spec explicitly
 	# when looking up the fields saved for it; otherwise a saved column would
 	# appear in every chart and not in the table it was made from.
+	# span= adds a bucket column to the table rather than grouping it: a table has
+	# no dimension to bucket *into*, so the reader gets the column and the raw
+	# value beside it.  See _span_calc_spec.
+	my $span = $self->_span_calc_spec(\@columns, ());
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+
 	my ($calc_records, $calc_columns) = eval {
-		$self->_apply_calc_fields($records, \@columns, { spec_key => "table:$table" })
+		$self->_apply_calc_fields($records, \@columns, {
+			spec_key => "table:$table",
+			($span ? (calc => $span->{calc}) : ()),
+		})
 	};
 	if ($@) {
 		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
@@ -3710,7 +5674,9 @@ sub view ($self) {
 		dedup            => $dedup,
 		back_url         => _safe_back_url($self->param('back2')),
 		back_label       => $self->param('back2_label') // 'Back',
-		export_url       => $self->_build_export_url("table:$table", [], $filter_specs, undef, $dedup),
+		export_url       => $self->_build_export_url("table:$table", [], $filter_specs, undef, $dedup, {
+			span => $self->param('span'), tcol => $self->param('tcol'), as => $self->param('as'),
+		}),
 		page             => $page,
 		per_page         => $per_page,
 		has_next         => $has_next,
@@ -3921,9 +5887,15 @@ sub open_file ($self) {
 				language   => $language,
 			);
 		}
+		# A cross-row spec that could not be honoured has already rendered its 400
+		# inside _fetch_page; the page must not be drawn over it.
+		return if $self->stash('_cross_row_error');
+
 		$records //= [];
 		my @columns  = _get_columns($source, $records);
-		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+		my %seen_col = map { $_ => 1 } @columns;
+		push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
+		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 		my $rpage_url = $self->req->url->clone;
 		$rpage_url->query->remove('page')->remove('per_page');
 		return $self->render(
@@ -3983,9 +5955,15 @@ sub open_file ($self) {
 				language   => $language,
 			);
 		}
+		# A cross-row spec that could not be honoured has already rendered its 400
+		# inside _fetch_page; the page must not be drawn over it.
+		return if $self->stash('_cross_row_error');
+
 		$records //= [];
 		my @columns  = _get_columns($source, $records);
-		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+		my %seen_col = map { $_ => 1 } @columns;
+		push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
+		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 		my $rpage_url = $self->req->url->clone;
 		$rpage_url->query->remove('page')->remove('per_page');
 		return $self->render(
@@ -4089,9 +6067,15 @@ sub open_file ($self) {
 		return $self->redirect_to('/tables?l=' . url_escape("path:${\$file->to_string}"));
 	}
 
+	# A cross-row spec that could not be honoured has already rendered its 400
+	# inside _fetch_page; the page must not be drawn over it.
+	return if $self->stash('_cross_row_error');
+
 	$records //= [];
 	my @columns  = _get_columns($source, $records);
-	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+	my %seen_col = map { $_ => 1 } @columns;
+	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 
 	my $lpage_url = $self->req->url->clone;
 	$lpage_url->query->remove('page')->remove('per_page');
@@ -4330,6 +6314,61 @@ sub columns_api ($self) {
 	$self->render(json => { columns => \@cols });
 }
 
+=head2 range_api
+
+C<GET /api/range> -- Return the min and max ISO date values for one column.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  ?l=    string   Required. Data source spec ("table:name", "path:/abs/path", etc.).
+  ?col=  string   Required. Column name to compute the range for.
+
+=head4 OUTPUT
+
+  200 application/json   { "min": "YYYY-MM-DD", "max": "YYYY-MM-DD" }
+  200 application/json   { "min": null, "max": null }  (no parseable dates)
+  400 application/json   { "error": "..." }
+
+=head3 FORMAL SPECIFICATION
+
+  range_api == lambda self .
+    let src = _open_spec(param('l')) in
+    pre  src /= undef /\ col /= ''
+    post render_json({ min: min_date(src, col), max: max_date(src, col) })
+
+=cut
+
+sub range_api ($self) {
+	my $spec_str = $self->param('l') // '';
+	my $col      = $self->param('col') // '';
+	return $self->render(json => { error => 'l required'   }, status => 400) unless length $spec_str;
+	return $self->render(json => { error => 'col required' }, status => 400) unless length $col;
+
+	my ($source) = $self->_open_spec($spec_str);
+	return $self->render(json => { min => undef, max => undef }) unless $source;
+
+	my $records = eval { $source->fetch_all } // [];
+
+	my $iso_re = qr/\A\d{4}-\d{2}-\d{2}\z/;
+	my $mdy_re = qr|\A(\d{1,2})/(\d{1,2})/(\d{4})\z|;
+	my @dates;
+	for my $rec (@$records) {
+		my $v = $rec->{$col} // '';
+		next unless length $v;
+		if ($v =~ $iso_re) {
+			push @dates, $v;
+		} elsif (my @m = ($v =~ $mdy_re)) {
+			push @dates, sprintf '%04d-%02d-%02d', $m[2], $m[0], $m[1];
+		}
+	}
+
+	return $self->render(json => { min => undef, max => undef }) unless @dates;
+	@dates = sort @dates;
+	$self->render(json => { min => $dates[0], max => $dates[-1] });
+}
+
 =head2 join_tables
 
 C<GET /join> -- Perform one or more left joins and render the merged table.
@@ -4382,6 +6421,10 @@ Renders C<dashboard.html.tt> with the merged/filtered result set.
 =cut
 
 sub join_tables ($self) {
+	# Rows stacked from other files cannot be paged from one backend; the
+	# combine route runs joins and combines together.
+	return $self->combine_tables if @{ $self->every_param('c') };
+
 	my ($platform, $language) = $self->_resolve_template;
 
 	my $left_spec = $self->param('l') // '';
@@ -4456,14 +6499,20 @@ sub join_tables ($self) {
 			language => $language,
 		);
 	}
+	# A cross-row spec that could not be honoured has already rendered its 400
+	# inside _fetch_page; the page must not be drawn over it.
+	return if $self->stash('_cross_row_error');
+
 	$records //= [];
 	my @columns = _get_columns($src, $records);
+	my %seen_col = map { $_ => 1 } @columns;
+	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
 
 	if (defined $sort && !grep { $_ eq $sort } @columns) {
 		carp $self->_i18n('error_sort_column', $sort);
 	}
 
-	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 
 	my $title     = $left_label;
 	$title       .= ' + ' . join(' + ', map { $_->{label} } @summaries) if @summaries;
@@ -4561,47 +6610,31 @@ sub combine_tables ($self) {
 	my ($left_src, $left_label) = $self->_open_spec($left_spec);
 	return $self->reply->not_found unless $left_src;
 
-	my $left_recs = eval { $left_src->fetch_all };
-	if ($@) {
+	# The same join-then-stack pipeline the charts of this view use, so the
+	# table shows the rows they draw.
+	my (undef, $records, $cols_ref) = $self->_run_pipeline_source;
+	unless (defined $records) {
 		return $self->render(
 			template => "$platform/$language/home",
 			handler  => 'tt',
 			format   => 'html',
 			tables   => [],
 			title    => 'Error',
-			error    => $self->_i18n('error_table_open', $left_label, $@),
+			error    => $self->_i18n('error_table_open', $left_label, ''),
 			language => $language,
 		);
 	}
-	$left_recs //= [];
-
-	my @left_cols     = _get_columns($left_src, $left_recs);
+	my @join_specs    = @{ $self->every_param('j') };
 	my @combine_specs = @{ $self->every_param('c') };
+	my @summaries     = (@{ $self->stash('pipeline_joined') // [] },
+		@{ $self->stash('pipeline_combined') // [] });
 
-	my @sources   = ([$left_recs, \@left_cols]);
-	my @summaries;
-
-	for my $cspec (@combine_specs) {
-		my ($csrc, $clabel) = $self->_open_spec($cspec);
-		next unless $csrc;
-		my $crecs = eval { $csrc->fetch_all } // [];
-		next if $@;
-		my @ccols = _get_columns($csrc, $crecs);
-		push @sources,   [$crecs, \@ccols];
-		push @summaries, { label => $clabel };
-	}
-
-	my ($records, $cols_ref) = @sources > 1
-		? _combine_tables(\@sources)
-		: ($left_recs, \@left_cols);
-	my @columns = @$cols_ref;
-
-	# Apply f= filters in memory before paginating (reduce-before-paginate).
-	for my $s (@{ $self->every_param('f') // [] }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	# Apply the filters in memory before paginating (reduce-before-paginate).
+	my @columns;
+	return unless $self->_reduce_or_render(\$records, \$cols_ref);
+	@columns = @$cols_ref;
+	# _reduce_or_render has removed duplicates for d=1; $dedup is for the page.
 	my $dedup = $self->param('d') ? 1 : 0;
-	$records = _dedup_records($records, \@columns) if $dedup;
 
 	# In-memory sort for /combine (no single backend to delegate to).
 	my $sort = $self->param('sort');
@@ -4614,18 +6647,19 @@ sub combine_tables ($self) {
 		carp $self->_i18n('error_sort_column', $sort);
 	}
 
-	# Server-side pagination: slice the fully-reduced combined set.
+	# Server-side pagination: slice the fully-reduced combined set.  The page
+	# below is therefore reduced too, and asks for chips only.
 	my ($page, $per_page, $offset) = $self->_pagination;
 	my $total    = scalar @$records;
 	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
 	my @page_recs = splice(@$records, $offset, $per_page);
 	$records = \@page_recs;
 
-	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records);
+	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 
 	my $title     = $left_label;
 	$title       .= ' + ' . join(' + ', map { $_->{label} } @summaries) if @summaries;
-	my $table_key = 'combine:' . lc($left_label);
+	my $table_key = (@join_specs ? 'join+combine:' : 'combine:') . lc($left_label);
 	$table_key   .= ':' . lc($_->{label}) for @summaries;
 
 	my $page_url = $self->req->url->clone;
@@ -4645,13 +6679,14 @@ sub combine_tables ($self) {
 		back2_label      => $self->param('back2_label') // 'Back',
 		left_spec        => $left_spec,
 		combine_specs    => \@combine_specs,
-		current_joins    => [],
+		current_joins    => \@join_specs,
 		available_tables => $self->_scan_join_tables,
 		join_summaries   => \@summaries,
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
 		dedup            => $dedup,
-		export_url       => $self->_build_export_url($left_spec, [], $filter_specs, \@combine_specs, $dedup),
+		export_url       => $self->_build_export_url($left_spec, \@join_specs, $filter_specs, \@combine_specs, $dedup),
+		schema_warnings  => $self->stash('schema_warnings') // [],
 		page             => $page,
 		per_page         => $per_page,
 		has_next         => $has_next,
@@ -4720,6 +6755,7 @@ None beyond the 404 response.
 
 sub export_data ($self) {
 	my ($records, $columns, $left_label) = $self->_run_export_pipeline;
+	return if $self->stash('_reduce_error');
 	return $self->reply->not_found unless $records;
 
 	# Surface schema-type-mismatch warnings in a response header so API
@@ -4836,6 +6872,7 @@ sub export_write ($self) {
 	}
 
 	my ($records, $columns, $left_label) = $self->_run_export_pipeline;
+	return if $self->stash('_reduce_error');
 	return $self->render(json => { error => 'Table not found' }, status => 404)
 		unless $records;
 
@@ -5184,6 +7221,7 @@ sub graph_view ($self) {
 	my $x_col      = $self->param('x')      // '';
 	my $y_col      = $self->param('y')      // '';
 	my $series_col = $self->param('series') // '';
+	my $agg_fn     = lc($self->param('agg') // '');
 	my $back       = _safe_back_url($self->param('back')) // '/';
 	my $back2      = _safe_back_url($self->param('back2'));
 	my $back2_lbl  = $self->param('back2_label') // '';
@@ -5191,17 +7229,29 @@ sub graph_view ($self) {
 	return $self->render(text => 'Missing x or y column parameter', status => 400)
 		unless length($x_col) && length($y_col);
 
+	# ?agg= is the measure vocabulary the pivot and the stats page already use,
+	# with no new names: a misspelt one is refused here rather than drawn as
+	# nothing.  Absent, this route behaves exactly as it always has.
+	if (length $agg_fn && !_measure_fn_ok($agg_fn)) {
+		return $self->render(
+			text   => $self->_i18n('error_agg_fn', $agg_fn, join(' ', @MEASURE_FNS)),
+			status => 400,
+		);
+	}
+
 	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404)
 		unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	my $span = $self->_span_calc_spec($columns, 'x');
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	# Apply f= filters (pre-filter before building pairs, same as _run_export_pipeline).
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	# Pre-filter before building pairs, same as _run_export_pipeline.
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $x_col", status => 400)
@@ -5211,6 +7261,103 @@ sub graph_view ($self) {
 	if (length $series_col) {
 		return $self->render(text => "Column not found: $series_col", status => 400)
 			unless $col_set{$series_col};
+	}
+
+	# The x axis is the dimension span= buckets.
+	$x_col = $span->{col} if $span;
+
+	# --- Aggregated path: ?agg= plots one point per group of the x axis rather
+	# than one per row, which is what turns a bucketed x into a timechart. ---
+	if (length $agg_fn) {
+		my $m = _visual_measure($agg_fn, $y_col);
+		return $self->render(text => $m->{error}, status => 400) if $m->{error};
+
+		my $agg_rows = $self->_grouped_totals(
+			{ source => $src, records => $records },
+			{
+				by  => [ length($series_col) ? ($x_col, $series_col) : ($x_col) ],
+				fn  => $m->{fn},
+				val => $m->{val},
+				as  => 'value',
+			},
+		);
+
+		my (%value_of, %series_seen, @series_order, %bucket_seen, @bucket_order);
+		for my $row (@$agg_rows) {
+			my $bucket = _decode_cell($row->{$x_col} // '');
+			next unless length $bucket;
+			push @bucket_order, $bucket unless $bucket_seen{$bucket}++;
+			my $name = length($series_col) ? _decode_cell($row->{$series_col} // '') : '';
+			next if length($series_col) && !length $name;
+			push @series_order, $name unless $series_seen{$name}++;
+			$value_of{$bucket}{$name} = $row->{value};
+		}
+
+		# Buckets in label order: the ISO labels a time bucket produces sort
+		# chronologically as strings, which is why they are ISO.
+		my @buckets = sort @bucket_order;
+		my @series  = sort @series_order;
+		my $title   = "$m->{label} by $x_col" . (length($series_col) ? " and $series_col" : '');
+
+		require HTML::D3;
+		my ($chart_html, $point_count, @series_data);
+		if (length $series_col) {
+			@series_data = map {
+				my $name = $_;
+				my @points = map {
+					defined $value_of{$_}{$name}
+						? { label => $_, value => $value_of{$_}{$name} } : ()
+				} @buckets;
+				@points ? { name => $name, data => \@points } : ();
+			} @series;
+			return $self->render(
+				text   => 'No plottable data: no rows have valid numeric values in the Y column.',
+				status => 200,
+			) unless @series_data;
+			$point_count = scalar @series_data;
+			$chart_html = HTML::D3->new(title => $title, width => 1100, height => 580)
+				->render_multi_series_line_chart_snippet(\@series_data, { animated => 1 })->{html};
+		} else {
+			my @pairs = map {
+				defined $value_of{$_}{''} ? [ $_, $value_of{$_}{''} ] : ()
+			} @buckets;
+			return $self->render(
+				text   => 'No plottable data: no rows have valid numeric values in the Y column.',
+				status => 200,
+			) unless @pairs;
+			$point_count = scalar @pairs;
+			$chart_html = HTML::D3->new(title => $title, width => 1100, height => 580)
+				->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 })->{html};
+		}
+		utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
+
+		my %chart_spec = (
+			kind   => 'graph',
+			title  => $title,
+			encode => {
+				x => $x_col, y => $y_col,
+				(length($series_col) ? (series => $series_col) : ()),
+				agg => $m->{fn},
+			},
+		);
+		my ($platform, $language) = $self->_resolve_template;
+		my ($source_url, $source_accessed) = $self->_url_attribution;
+		return $self->render(
+			handler          => 'tt',
+			template         => "$platform/$language/graph",
+			format           => 'html',
+			title            => $title,
+			chart_html       => $chart_html,
+			chart            => \%chart_spec,
+			chart_json       => $self->_chart_json(\%chart_spec),
+			back_url         => ($back2 // $back),
+			back_label       => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+			($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+			point_count      => $point_count,
+			source_url       => $source_url,
+			source_accessed  => $source_accessed,
+			language         => $language,
+		);
 	}
 
 	# --- Multi-series path: ?series=<col> groups records into one line per value ---
@@ -5297,9 +7444,9 @@ sub graph_view ($self) {
 	# Try aggregate() push path for the global min/max/avg reference lines.
 	# Falls back to List::Util on the already-extracted @y_vals when push is
 	# not available (no source, filters active, or non-pushable column).
-	my @f_specs    = grep { /\S/ } @{ $self->every_param('f') // [] };
+	my @f_specs    = grep { /\S/ } @{ _filter_specs($self) };
 	my $has_filter = !!@f_specs;
-	if (!$ENV{BI_FORCE_PERL_AGG} && $src && !$has_filter
+	if (!$ENV{BI_FORCE_PERL_AGG} && $src && !$has_filter && !_dedup_requested($self)
 		&& _measure_pushable($src, 'avg', $y_col, $records)) {
 		my $ref = eval {
 			$src->aggregate(
@@ -5376,13 +7523,15 @@ sub pie_view ($self) {
 	return $self->render(text => 'Could not open data source', status => 404)
 		unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	my $span = $self->_span_calc_spec($columns, 'cat');
+	return $self->render(text => $span->{error}, status => 400)
+		if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	# Apply f= filters.
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $cat_col", status => 400)
@@ -5392,6 +7541,8 @@ sub pie_view ($self) {
 	my $count_mode = ($val_col eq '__count__');
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
+
+	$cat_col = $span->{col} if $span;
 
 	# Detect the currency symbol from the first non-empty source value.
 	# This is a display concern; derive from the pre-filtered source rows so the
@@ -5564,13 +7715,15 @@ sub heatmap_view ($self) {
 	return $self->render(text => 'Could not open data source', status => 404)
 		unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	my $span = $self->_span_calc_spec($columns, 'x');
+	return $self->render(text => $span->{error}, status => 400)
+		if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	# Apply f= filters.
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $x_col", status => 400)
@@ -5579,6 +7732,9 @@ sub heatmap_view ($self) {
 		unless $col_set{$y_col};
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		if length($val_col) && !$col_set{$val_col};
+
+	# A heatmap's time dimension is its x axis, which is the one span= buckets.
+	$x_col = $span->{col} if $span;
 
 	# Collect first-seen axis order from the filtered source rows.
 	# The aggregate path returns groups ordered by (x,y) ascending, which
@@ -5734,13 +7890,18 @@ sub bar_view ($self) {
 	return $self->render(text => 'Could not open data source', status => 404)
 		unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	# span= buckets the category column by expanding into the calculated field a
+	# reader could have typed, so the buckets come from the same arithmetic a
+	# ?c= definition would use.  See _span_calc_spec.
+	my $span = $self->_span_calc_spec($columns, 'cat');
+	return $self->render(text => $span->{error}, status => 400)
+		if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	# Apply f= filters.
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $cat_col", status => 400)
@@ -5750,6 +7911,9 @@ sub bar_view ($self) {
 	my $count_mode = ($val_col eq '__count__' || !length($val_col));
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
+
+	# The chart groups by the bucket column the request asked for, if it did.
+	$cat_col = $span->{col} if $span;
 
 	# Aggregate via _grouped_totals (push path or Perl fold).
 	my $agg_rows = $self->_grouped_totals(
@@ -5920,6 +8084,7 @@ sub folder_view ($self) {
 		|| $self->_spec_to_url($left_spec);
 
 	my ($records, $columns) = $self->_run_export_pipeline;
+	return if $self->stash('_reduce_error');
 	return $self->render(text => 'Could not open data source', status => 404)
 		unless $records;
 
@@ -5980,6 +8145,8 @@ sub folder_view ($self) {
 	# re-uses the same data source without repeating params.
 	my $base_url = '/folder?l=' . url_escape($left_spec);
 	$base_url .= '&col=' . url_escape($key_col) if length($key_col);
+	# The table it came from travels too, so a folder level keeps the trail.
+	$base_url .= '&back=' . url_escape($back);
 
 	my (@folders, @items, @breadcrumb);
 
@@ -6043,6 +8210,13 @@ sub folder_view ($self) {
 		key_col    => $key_col,
 		prefix     => $prefix,
 		breadcrumb => \@breadcrumb,
+		# Inside a folder the trail goes on past this page, so its own crumb
+		# links to the top of the folder view.
+		(@breadcrumb ? (trail => do {
+			my $trail = _breadcrumb_trail($self);
+			$trail->[-1]{url} = $base_url if @$trail;
+			$trail;
+		}) : ()),
 		base_url   => $base_url,
 		back_url   => $back,
 		back_label => 'Back to table',
@@ -6247,7 +8421,7 @@ sub pivot_view ($self) {
 	for my $ms (@measure_strs) {
 		my $m = _parse_measure_param($ms);
 		return $self->render(
-			text   => $self->_i18n('error_pivot_measure_invalid', $ms),
+			text   => $self->_i18n('error_pivot_measure_invalid', $ms, join(' ', @MEASURE_FNS)),
 			status => 400,
 		) unless $m;
 		push @measures, $m;
@@ -6263,17 +8437,19 @@ sub pivot_view ($self) {
 	return $self->render(text => 'Could not open data source', status => 404)
 		unless defined $records;
 
+	# span= buckets one dimension, which for a pivot is one of the rows= columns;
+	# the dimension itself may be any of them, so with more than one it is tcol=
+	# that says which.  See _span_calc_spec.
+	my $span = $self->_span_calc_spec($columns, 'rows');
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+
 	# Calculated fields (?c=name:expr) -- evaluated before aggregation so calc
 	# columns are available as row/col dimensions and measure columns.
-	{
-		my $err;
-		eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
-		if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
-	}
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 
@@ -6282,6 +8458,11 @@ sub pivot_view ($self) {
 			text   => $self->_i18n('error_pivot_dim_not_found', $dim),
 			status => 400,
 		) unless $col_set{$dim};
+	}
+
+	if ($span) {
+		@rows = map { $_ eq $span->{src} ? $span->{col} : $_ } @rows;
+		@cols = map { $_ eq $span->{src} ? $span->{col} : $_ } @cols;
 	}
 
 	for my $m (@measures) {
@@ -6453,7 +8634,7 @@ sub pivot_view ($self) {
 				}
 			}
 
-			# Grand total: group by nothing (all rows → one result row).
+			# Grand total: group by nothing (all rows -> one result row).
 			my $gtot = $self->_grouped_totals($pipeline, {
 				by  => [],
 				fn  => $m->{fn},
@@ -6524,6 +8705,7 @@ sub pivot_view ($self) {
 		return $self->_render_json(\@grid_records, \@export_cols, 'pivot')
 			if $format eq 'json';
 		if ($format eq 'xlsx') {
+			$self->stash(buffer => 0);
 			require Excel::Writer::XLSX;
 			my $out = '';
 			open my $fh, '>', \$out
@@ -6621,12 +8803,19 @@ sub pivot_view ($self) {
 
 C<GET /stats> -- Column statistics panel.
 
-Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join> and displays
-per-column statistics: min, max, mean, median, null_count, distinct_count,
-row_count.
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus C<p=N>
+to choose the percentile column (1 to 100, default 95), and C<range=name> with
+C<rcol=column> for a relative window of rows.  Displays per-column statistics:
+row_count, null_count, distinct_count, and for numeric columns min, max, range,
+mean, median, the chosen percentile and sample standard deviation; first and
+last are shown for every column, being the first and last value the column
+holds.
 
-Statistics are computed through C<_grouped_totals> so they agree with the pivot
-view.  Median is computed in Perl by sorting the column values.
+C<distinct_count> is computed through C<_grouped_totals>, so it agrees with the
+pivot view.  The numeric statistics are computed in Perl by sorting the column's
+values, through the same C<_percentile_of>, C<_median_of>, C<_stdev_of> and
+C<_range_of> arithmetic the pivot's C<median>, C<pN>, C<stdev> and C<range>
+measures use -- so a median here and a median measure there are the same number.
 
 =cut
 
@@ -6634,6 +8823,19 @@ sub stats_view ($self) {
 	my $left_spec = $self->param('l') // '';
 	return $self->render(text => 'Missing l= parameter', status => 400)
 		unless length $left_spec;
+
+	# The percentile column is the reader's to choose; an unreadable one is a
+	# 400 rather than a silent 95, so the page never claims a level it did not
+	# apply.
+	my $pct_arg    = $self->param('p');
+	my $percentile = 95;
+	if (defined $pct_arg && length $pct_arg) {
+		return $self->render(
+			text   => $self->_i18n('error_stats_percentile', $pct_arg),
+			status => 400,
+		) unless $pct_arg =~ /\A\d{1,3}\z/ && $pct_arg >= 1 && $pct_arg <= 100;
+		$percentile = $pct_arg + 0;
+	}
 
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
@@ -6646,9 +8848,7 @@ sub stats_view ($self) {
 	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my $row_count = scalar @$records;
 	my $pipeline  = { source => $src, records => $records };
@@ -6667,9 +8867,15 @@ sub stats_view ($self) {
 		});
 		my $distinct_count = scalar @$dist_rows;
 
-		# Numeric statistics.
+		# first/last: the value the column holds in the first and the last row
+		# that has one.  $nonnull is in row order, so no second pass is needed
+		# and the two agree with the pivot's first() and last() measures.
+		my $first_val = $nonnull[0]  ? $nonnull[0]{$col}  : undef;
+		my $last_val  = $nonnull[-1] ? $nonnull[-1]{$col} : undef;
+
+		# Numeric statistics, through the same arithmetic the pivot measures use.
 		my @nums = grep { defined $_ } map { _numeric_cell($_->{$col}) } @nonnull;
-		my ($min_val, $max_val, $avg_val, $median_val);
+		my ($min_val, $max_val, $avg_val, $median_val, $range_val, $pct_val, $stdev_val);
 		if (@nums) {
 			my @sorted = sort { $a <=> $b } @nums;
 			$min_val = $sorted[0];
@@ -6677,10 +8883,12 @@ sub stats_view ($self) {
 			my $sum  = 0;
 			$sum += $_ for @nums;
 			$avg_val = $sum / @nums;
-			my $mid  = int(@sorted / 2);
-			$median_val = @sorted % 2
-				? $sorted[$mid]
-				: ($sorted[$mid - 1] + $sorted[$mid]) / 2;
+			# _median_of is _percentile_of at 50; a stdev of one value is undef,
+			# which the template shows as a dash rather than as a spread of 0.
+			$median_val = _median_of(\@sorted);
+			$range_val  = _range_of(\@sorted);
+			$pct_val    = _percentile_of(\@sorted, $percentile);
+			$stdev_val  = _stdev_of(\@sorted);
 		}
 
 		push @stats, {
@@ -6688,11 +8896,16 @@ sub stats_view ($self) {
 			row_count      => $row_count,
 			null_count     => $null_count,
 			distinct_count => $distinct_count,
+			first          => $first_val,
+			last           => $last_val,
 			(defined $min_val ? (
-				min    => $min_val,
-				max    => $max_val,
-				avg    => sprintf('%.4g', $avg_val),
-				median => sprintf('%.4g', $median_val),
+				min     => $min_val,
+				max     => $max_val,
+				range   => sprintf('%.4g', $range_val),
+				avg     => sprintf('%.4g', $avg_val),
+				median  => sprintf('%.4g', $median_val),
+				pct     => sprintf('%.4g', $pct_val),
+				stdev   => (defined $stdev_val ? sprintf('%.4g', $stdev_val) : undef),
 			) : ()),
 		};
 	}
@@ -6706,6 +8919,7 @@ sub stats_view ($self) {
 		format     => 'html',
 		title          => 'Column statistics',
 		stats          => \@stats,
+		stats_percentile => $percentile,
 		row_count      => $row_count,
 		left_spec      => $left_spec,
 		left_label     => $left_label,
@@ -6821,13 +9035,23 @@ sub groups_list ($self) {
 # Date-pattern CRUD  (POST /dates/save, POST /dates/delete, GET /dates/list)
 # ---------------------------------------------------------------------------
 
-# dates_save: POST /dates/save?l=<spec>&col=<col>&pattern=<fmt>
+# dates_save: POST /dates/save?l=<spec>&col=<col>&pattern=<fmt>[&time=<fmt>][&as=timestamp]
 # Stores a strptime-style date normalisation pattern for $col in models.json.
-# Only the three patterns in %ALLOWED_DATE_PATTERNS are accepted.
+# Only the three patterns in %ALLOWED_DATE_PATTERNS are accepted, and only the
+# two in %ALLOWED_TIME_PATTERNS beside one of them.
+#
+# A pattern on its own is stored as the string it has always been, so an
+# existing entry keeps its meaning.  A time, or as=timestamp, stores the hash
+# shape { date =>, time =>, as => } that Calc::date_normalise reads, and which
+# normalises the column to 'YYYY-MM-DDTHH:MM:SS' -- the shape the date
+# comparisons already read to the second, so a last_24_hours window filters on
+# a column that has a pattern of this kind.
 sub dates_save ($self) {
 	my $spec    = $self->param('l')       // '';
 	my $col     = $self->param('col')     // '';
 	my $pattern = $self->param('pattern') // '';
+	my $time    = $self->param('time')    // '';
+	my $as      = $self->param('as')      // '';
 
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
@@ -6837,9 +9061,21 @@ sub dates_save ($self) {
 		json   => { error => $self->_i18n('error_date_pattern', $pattern) },
 		status => 400,
 	) unless $ALLOWED_DATE_PATTERNS{$pattern};
+	return $self->render(
+		json   => { error => $self->_i18n('error_date_time_pattern', $time) },
+		status => 400,
+	) if length($time) && !$ALLOWED_TIME_PATTERNS{$time};
+	return $self->render(
+		json   => { error => $self->_i18n('error_date_as', $as) },
+		status => 400,
+	) if length($as) && $as ne 'timestamp';
+
+	my $stored = (length($time) || length($as))
+		? { date => $pattern, (length($time) ? (time => $time) : ()), (length($as) ? (as => $as) : ()) }
+		: $pattern;
 
 	my $models = $self->_read_models;
-	$models->{date_patterns}{$spec}{$col} = $pattern;
+	$models->{date_patterns}{$spec}{$col} = $stored;
 	$self->_write_models($models);
 	$self->render(json => { ok => 1 });
 }
@@ -6864,7 +9100,9 @@ sub dates_delete ($self) {
 }
 
 # dates_list: GET /dates/list?l=<spec>
-# Returns { patterns: { col: pattern, ... } } for $spec.
+# Returns { patterns: { col: pattern, ... } } for $spec, where a pattern is the
+# date-format string it has always been or, for a column that also holds a time,
+# { date =>, time =>, as => }.
 sub dates_list ($self) {
 	my $spec = $self->param('l') // '';
 	return $self->render(json => { error => 'l= required' }, status => 400)
@@ -6959,9 +9197,7 @@ sub scatter_view ($self) {
 	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $x_col",      status => 400) unless $col_set{$x_col};
@@ -7063,12 +9299,14 @@ sub stacked_view ($self) {
 	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	my $span = $self->_span_calc_spec($columns, 'cat');
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $cat_col", status => 400) unless $col_set{$cat_col};
@@ -7077,6 +9315,8 @@ sub stacked_view ($self) {
 	my $count_mode = (!length $val_col || $val_col eq '__count__');
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
+
+	$cat_col = $span->{col} if $span;
 
 	# Aggregate by [cat, seg] via _grouped_totals to respect the governing
 	# invariant (all numbers from a single path) and to get ascending key order.
@@ -7170,17 +9410,21 @@ sub combo_view ($self) {
 	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	my $span = $self->_span_calc_spec($columns, 'cat', 'x');
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $x_col",    status => 400) unless $col_set{$x_col};
 	return $self->render(text => "Column not found: $bar_col",  status => 400) unless $col_set{$bar_col};
 	return $self->render(text => "Column not found: $line_col", status => 400) unless $col_set{$line_col};
+
+	$x_col = $span->{col} if $span;
 
 	# Aggregate bar and line measures separately via _grouped_totals so both
 	# use the same path (push or fold) and produce ascending x-axis order.
@@ -7281,12 +9525,14 @@ sub treemap_view ($self) {
 	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
 
-	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	my $span = $self->_span_calc_spec($columns, 'group', 'cat');
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns,
+		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $cat_col", status => 400) unless $col_set{$cat_col};
@@ -7294,6 +9540,8 @@ sub treemap_view ($self) {
 	my $count_mode = (!length $val_col || $val_col eq '__count__');
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
+
+	$cat_col = $span->{col} if $span;
 
 	my $agg_rows = $self->_grouped_totals(
 		{ source => $src, records => $records },
@@ -7394,9 +9642,7 @@ sub histogram_view ($self) {
 	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{$columns};
 	return $self->render(text => "Column not found: $col", status => 400) unless $col_set{$col};
@@ -7495,6 +9741,254 @@ sub histogram_view ($self) {
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
 		language         => $language,
+	);
+}
+
+# ---------------------------------------------------------------------------
+# Word cloud  (GET /wordcloud)
+# ---------------------------------------------------------------------------
+
+# The words that say nothing about the data: without them a cloud of a notes
+# column is all "the" and "and".  English, like the only page language the
+# templates have.  ?stop= adds to this list for one request rather than
+# replacing it, so adding a word never silently brings back the ones this list
+# already removes.
+my %STOP_WORD = map { $_ => 1 } qw(
+	a about above after again against all also am an and any are as at be
+	because been before being below between both but by can could did do does
+	doing down during each few for from further had has have having he her here
+	hers herself him himself his how i if in into is it its itself just me more
+	most my myself no nor not now of off on once only or other our ours ourselves
+	out over own same she should so some such than that the their theirs them
+	themselves then there these they this those through to too under until up
+	very was we were what when where which while who whom why will with would
+	you your yours yourself yourselves
+);
+
+# _percent_encode($text) -> $url_component
+#
+# Purpose: Percent-encode one value for a query string.
+# Notes:   url_escape() works on bytes, so a decoded (character) string is
+#          encoded to UTF-8 first; otherwise "caf\x{e9}" would become "caf%E9" and a
+#          browser would read that back as Latin-1.
+sub _percent_encode {
+	my ($text) = @_;
+	my $bytes = defined $text ? "$text" : '';
+	utf8::encode($bytes) if utf8::is_utf8($bytes);
+	return url_escape($bytes);
+}
+
+# _word_tokens($text, $minlen) -> @words
+#
+# Purpose: The words in one cell, lower-cased and split on everything that is
+#          neither a letter, a digit nor an apostrophe.
+# Entry:   $text is a cell (may be undef); $minlen is the shortest word kept.
+# Exit:    The words at least $minlen characters long that contain a letter.
+#          A run of digits alone is kept -- a year or a model number can be the
+#          point of a column -- while a run of punctuation is not a word at all.
+# Notes:   A CSV cell arrives as bytes, so it is decoded first (the same
+#          _decode_cell() every page uses): without that, \p{L} would see the
+#          bytes of "caf\x{e9}" and split the word in two.  The apostrophe stays
+#          inside a word, so O'Brien is one word rather than "o" and "brien".
+sub _word_tokens {
+	my ($text, $minlen) = @_;
+	return () unless defined $text && length $text;
+
+	my @words = split /[^\p{L}\p{N}']+/, lc _decode_cell($text);
+	for my $word (@words) {
+		$word =~ s/\A'+//;
+		$word =~ s/'+\z//;
+	}
+
+	return grep { length($_) >= $minlen && /\p{L}/ } @words;
+}
+
+# _wordcloud_option($raw, $default, $min, $max) -> $n
+#
+# Purpose: One of the two counts a cloud takes -- how many words to show, how
+#          short a word may be.
+# Notes:   A value that is absent or unreadable is the default, not the minimum:
+#          ?topn= with nothing after it must not silently show a single word.
+sub _wordcloud_option {
+	my ($raw, $default, $min, $max) = @_;
+
+	my $n = (defined $raw && !ref $raw && $raw =~ /\A\d+\z/) ? int $raw : $default;
+	$n = $min if $n < $min;
+	$n = $max if $n > $max;
+	return $n;
+}
+
+# _wordcloud_counts($records, $col, $topn, $minlen, $extra_stop) -> \%cloud
+#
+# Purpose: The words a text column repeats and how often each appears, ranked,
+#          which is what both the /wordcloud page and a canvas's word-cloud card
+#          draw.  One function, so the page and the card cannot count differently.
+# Entry:   $records is a list of rows; $col names the text column; $topn is how
+#          many words to return; $minlen is the shortest word kept; $extra_stop
+#          is the reader's own stoplist ("apple,pear"), added to the built-in
+#          one rather than replacing it.
+# Exit:    { words => [ { word, count }, ... ] } in cloud order -- count
+#          descending, then alphabetically -- with distinct (every different word
+#          seen, before truncation), total (words counted) and rows (rows read).
+# Notes:   A word counts once per row that contains it, so a long note does not
+#          outweigh ten short rows that say the same thing.
+sub _wordcloud_counts {
+	my ($records, $col, $topn, $minlen, $extra_stop) = @_;
+
+	my %stop = %STOP_WORD;
+	for my $extra (split /[\s,]+/, $extra_stop // '') {
+		$stop{ lc $extra } = 1 if length $extra;
+	}
+
+	my (%count, $row_count);
+	for my $row (@$records) {
+		$row_count++;
+		my %seen;
+		$count{$_}++ for grep { !$seen{$_}++ && !$stop{$_} }
+			_word_tokens($row->{$col}, $minlen);
+	}
+
+	my $total = sum(values %count) // 0;
+	my @words = sort { $count{$b} <=> $count{$a} || $a cmp $b } keys %count;
+	my $distinct = scalar @words;
+	@words = @words[0 .. $topn - 1] if @words > $topn;
+
+	return {
+		words    => [ map { { word => $_, count => $count{$_} } } @words ],
+		distinct => $distinct,
+		total    => $total,
+		rows     => $row_count,
+	};
+}
+
+# _wordcloud_link($back, $col, $word, $cloud_url) -> $url
+#
+# Purpose: The view URL that shows the rows containing one word, with the cloud
+#          as that page's breadcrumb, so a click on a word is a drill-down.
+# Note:    The URL is returned unescaped; the caller escapes it once for the
+#          href it goes into, because HTML::TagCloud writes its input verbatim.
+sub _wordcloud_link {
+	my ($back, $col, $word, $cloud_url) = @_;
+	my $sep = $back =~ /\?/ ? '&' : '?';
+
+	return $back . $sep . 'f=' . _percent_encode("$col:contains:$word")
+		. '&back2=' . _percent_encode($cloud_url)
+		. '&back2_label=' . _percent_encode('Back to word cloud');
+}
+
+sub wordcloud_view ($self) {
+	my $col       = $self->param('col') // '';
+	my $_topn     = $self->param('topn');
+	my $_minlen   = $self->param('minlen');
+	my $back_raw  = $self->param('back');
+	my $back      = _safe_back_url($back_raw) // '/';
+	my $back2     = _safe_back_url($self->param('back2'));
+	my $back2_lbl = $self->param('back2_label') // '';
+
+	# A count that is absent or unreadable is the default, not a clamp of zero:
+	# ?topn= with nothing after it must not silently show a single word.
+	my $topn   = _wordcloud_option($_topn,   50, 1, 500);
+	my $minlen = _wordcloud_option($_minlen,  3, 1, 64);
+
+	return $self->render(text => 'Missing col= parameter', status => 400) unless length $col;
+
+	my ($src, $records, $columns) = $self->_run_pipeline_source;
+	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
+
+	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
+	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
+
+	return unless $self->_reduce_or_render(\$records, \$columns);
+
+	my %col_set = map { $_ => 1 } @$columns;
+	return $self->render(text => "Column not found: $col", status => 400) unless $col_set{$col};
+
+	# One pass over the rows, shared with a canvas's word-cloud card so the page
+	# and the card count the same way.
+	my $cloud = _wordcloud_counts(
+		$records, $col, $topn, $minlen, $self->param('stop'),
+	);
+	my @words      = map { $_->{word} } @{ $cloud->{words} };
+	my %count      = map { $_->{word} => $_->{count} } @{ $cloud->{words} };
+	my $distinct   = $cloud->{distinct};
+	my $word_total = $cloud->{total};
+	my $row_count  = $cloud->{rows};
+
+	# A word links back to the rows that contain it, so the cloud is a way into
+	# the data rather than a picture of it.  Only when the request names the page
+	# it came from: a bare /wordcloud URL has no table to filter, and sending a
+	# click to "/?f=..." would be a dead end.
+	my $drill = (defined $back_raw && length $back_raw) ? 1 : 0;
+
+	my $cloud_url = $self->req->url->path->to_string;
+	my $qs        = $self->req->url->query->to_string;
+	$cloud_url .= "?$qs" if length $qs;
+
+	my @tags = map {
+		{
+			word  => _decode_cell($_),
+			count => $count{$_},
+			($drill ? (href => _wordcloud_link($back, $col, $_, $cloud_url)) : ()),
+		}
+	} @words;
+
+	# The font size is the module's own logarithm of the count, so a word that
+	# appears twice as often is one step bigger rather than twice as wide.
+	require HTML::TagCloud;
+	my $ranked = HTML::TagCloud->new(levels => 18);
+	for my $tag (@tags) {
+		my $name = xml_escape($tag->{word});
+		if (defined $tag->{href}) {
+			$ranked->add($name, xml_escape($tag->{href}), $tag->{count});
+		}
+		else {
+			$ranked->add_static($name, $tag->{count});
+		}
+	}
+
+	my $cloud_html = @tags ? $ranked->html_and_css(scalar @tags) : '';
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+	my $title = "Words in $col";
+
+	# The spec a canvas word-cloud card reads (_render_visual_html), so the
+	# layout's New canvas / Add to existing canvas buttons save this cloud as
+	# it is drawn, as they do for every other chart page.
+	my $stop = $self->param('stop');
+	my %chart_spec = (
+		kind    => 'wordcloud',
+		title   => $title,
+		encode  => { col => $col },
+		options => {
+			topn   => $topn,
+			minlen => $minlen,
+			((defined $stop && length $stop) ? (stop => $stop) : ()),
+		},
+	);
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler         => 'tt',
+		template        => "$platform/$language/wordcloud",
+		format          => 'html',
+		title           => $title,
+		chart           => \%chart_spec,
+		chart_json      => $self->_chart_json(\%chart_spec),
+		cloud_html      => $cloud_html,
+		words           => \@tags,
+		col             => $col,
+		topn            => $topn,
+		minlen          => $minlen,
+		drill           => $drill,
+		distinct_words  => $distinct,
+		word_total      => $word_total,
+		row_count       => $row_count,
+		back_url        => ($back2 // $back),
+		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
+		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
+		source_url      => $source_url,
+		source_accessed => $source_accessed,
+		language        => $language,
 	);
 }
 
@@ -7932,6 +10426,53 @@ sub _map_renderer_version {
 # canvas with two maps gets distinct element ids and local variable scopes.
 # The head is the same Leaflet stylesheet and script for every map, so only
 # the first head is passed to the layout.
+# _scope_card_scripts($html) -> $html
+#
+# Purpose: Close every inline script in a rendered card over a function of its
+#          own, so two cards on one canvas cannot collide.
+# Entry:   $html -- one card's markup, as _render_visual_markup returns it.
+# Exit:    The same markup, with each inline script wrapped.
+# Notes:   Called once, by _render_visual_html, so no caller has to remember
+#          it and no card is scoped twice.  HTML::D3 writes a chart as a
+#          snippet that declares its SVG with
+#          C<const>.  A top-level C<const> belongs to the page's shared lexical
+#          environment rather than to the <script> element it was written in,
+#          so a canvas of two charts failed at the second one -- "Identifier
+#          'svg' has already been declared" -- and drew an empty card, while
+#          either card on a page of its own was fine.  A script with a C<src>,
+#          or with a C<type> of its own (a data block, a module), is left
+#          alone, and one that is already wrapped is not wrapped twice.
+sub _scope_card_scripts {
+	my ($html) = @_;
+	return '' unless defined $html && length $html;
+
+	# ~ is the delimiter because the lookaheads below need !, and the wrapper
+	# the replacement builds is a pair of braces, which a brace-delimited
+	# pattern would take for its own.
+	$html =~ s~(<script\b(?![^>]*\bsrc=)(?![^>]*\btype=)[^>]*>)(.*?)(</script>)~_wrap_card_script($1, $2, $3)~gsex;
+
+	return $html;
+}
+
+# _wrap_card_script($open, $body, $close) -> $html
+#
+# Purpose: One <script> element of a card, closed over a function of its own.
+# Entry:   The element's opening tag, its body and its closing tag.
+# Exit:    The same element, wrapped unless it already is.
+# Notes:   Split out of _scope_card_scripts so that pattern can use a plain
+#          delimiter: its lookaheads need the ones the wrapper is made of.
+sub _wrap_card_script {
+	my ($open, $body, $close) = @_;
+
+	# A body that already opens with the wrapper is left alone, so scoping a
+	# card twice is scoping it once.
+	my ($blank) = $body =~ /\A(\s*)/;
+	return $open . $body . $close
+		if CORE::index(substr($body, length $blank), '(function () {') == 0;
+
+	return $open . "\n(function () {\n" . $body . "\n})();\n" . $close;
+}
+
 sub _canvas_map_html {
 	my ($head, $body, $id_suffix) = @_;
 
@@ -7956,11 +10497,8 @@ sub _canvas_map_html {
 	# The card owns the map's size, so the page-wide #map rule is noise here.
 	$head =~ s{<style>.*?</style>}{}s;
 
-	# One map per card, one local scope per map.  The replacement uses !
-	# as its delimiter because the wrapper itself contains braces.
-	$body =~ s!<script>\s*!<script>\n(function () {\n!;
-	$body =~ s!</script>!})();\n</script>!;
-
+	# The scope around the map's script is not put on here: every card is
+	# scoped once, by _render_visual_html, whichever kind it is.
 	return ($head, $body);
 }
 
@@ -8031,9 +10569,7 @@ sub map_view ($self) {
 		return $self->render(text => $e, status => 400);
 	}
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{ $columns };
 	my @popup = grep { length($_) && $_ ne $loc_col && $col_set{$_} }
@@ -8414,6 +10950,7 @@ sub _catalog_entry :Protected ($self, $mf, $analyses) {
 
 # GET /catalog
 sub catalog_view ($self) {
+	return if $self->buffer_is_cached;
 	my $dir       = _data_dir_for($self->app);
 	my $analyses  = $self->_read_analyses;
 
@@ -8600,6 +11137,7 @@ sub visual_download ($self) {
 		unless $n < scalar @visuals;
 
 	if ($format eq 'csv') {
+		$self->stash(buffer => 0);
 		# Run the pipeline and return CSV for this visual's data.
 		my (undef, $records, $columns) = $self->_run_pipeline_source;
 		return $self->render(text => 'Cannot open data source', status => 422)
@@ -8714,9 +11252,7 @@ sub summary_api ($self) {
 	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(json => { error => $e }, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my $row_count = scalar @$records;
 	(my $label = $left_spec) =~ s/\A(?:table:|path:|url:|redis:[^|]+\|)//;
@@ -8779,9 +11315,7 @@ sub insights_view ($self) {
 	eval { ($records, $columns) = $self->_apply_calc_fields($records, $columns) };
 	if ($@) { (my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//; return $self->render(text => $e, status => 400) }
 
-	for my $s (@{ $self->every_param('f') }) {
-		$records = _apply_filter_spec($records, $s);
-	}
+	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my $row_count = scalar @$records;
 	(my $left_label = $left_spec) =~ s/\A(?:table:|path:|url:|redis:[^|]+\|)//;
@@ -9351,6 +11885,53 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
 
 =cut
 
+=head2 wordcloud_view
+
+C<GET /wordcloud> -- Render a word cloud of a text column with HTML::TagCloud.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  col=<col>    Text column to read (required)
+  topn=N       Different words to show (default 50; range 1--500)
+  minlen=N     Shortest word kept (default 3; range 1--64)
+  stop=<words> Extra words to ignore, comma or space separated
+  back=<url>   URL for the "Back to table" breadcrumb link; when given, each
+               word links to the rows that contain it
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l       spec    Required.  Left table spec.
+  col     string  Required.  Column whose cells are read as text.
+  topn    int     Optional.  Word count 1-500 (default 50).
+  minlen  int     Optional.  Minimum word length 1-64 (default 3).
+  stop    string  Optional.  Extra stopwords, comma or space separated.
+  back    url     Optional.  Safe back-link URL; enables the drill-down links.
+
+=head4 OUTPUT
+
+  200 text/html    Rendered word cloud page.
+  400 text/plain   Missing col= parameter.
+  400 text/plain   Column not found: <col>.
+  400 text/plain   A refused c= calculated field or cs= cross-row spec.
+  404 text/plain   "Could not open data source".
+
+=head4 SEMANTICS
+
+A word is lower-cased, split on anything that is not a letter, a digit or an
+apostrophe, and dropped when it is shorter than C<minlen> or holds no letter.
+A word counts once per row that contains it, so the size of a word is the
+number of rows, not the number of repetitions inside one cell.  The built-in
+English stopword list is removed, and C<stop=> adds to it.
+
+=head3 EXAMPLE
+
+  GET /wordcloud?l=table:sales&col=product&back=/view/sales
+    -> 200 HTML page with a word cloud whose words filter the sales table
+
+=cut
+
 =head2 map_view
 
 C<GET /map> -- Render an OpenStreetMap map of the view.
@@ -9467,6 +12048,11 @@ the selected value; drill-down uses C<?dd=E<lt>hierarchyE<gt>&dl=E<lt>levelE<gt>
 where level 0 is the first level and one past the last means "drilled
 through"; parameter overrides are C<?p.E<lt>nameE<gt>=E<lt>valueE<gt>>.
 
+C<?cs=>/C<by=>/C<order=> name the cross-row columns (see C<_cross_row_specs>).
+The plan is validated once for the page and then run once per card, after that
+card's own filters and after the cross-filter, so each card's running total is
+over the rows that card draws.
+
 =head3 API SPECIFICATION
 
 =head4 INPUT
@@ -9477,6 +12063,9 @@ through"; parameter overrides are C<?p.E<lt>nameE<gt>=E<lt>valueE<gt>>.
   dd       string  Optional.  Named hierarchy to drill.
   dl       int     Optional.  Current drill level (0-based).
   p.<name> string  Optional.  Parameter override.
+  cs       string  Optional, repeatable.  Cross-row spec, as on the data pages.
+  by       string  Optional.  Partition for the cross-row pass.
+  order    string  Optional, repeatable.  Read order for the cross-row pass.
 
 =head4 OUTPUT
 
@@ -9779,6 +12368,53 @@ B<Drill-down from pie chart:>
 Clicking a pie slice or legend entry on C</pie> navigates to the table
 view with C<f=cat_col:eq:label> appended, so the user can inspect the
 rows behind any slice without manually typing a filter.
+
+=head2 Cross-row columns
+
+A measure folds a group into one number, a calculated field computes one row
+from that row, and C<cs=> is the third shape: one row worked out from many,
+written back beside every row of the view.
+
+  cs=<column>:<function>:<alias>            write a column of that name
+  cs=<column>:<function>:<alias>:<count>    a moving window needs its width
+  by=<column>[,<column>...]                 partition; without it there is one
+  order=<column>[:asc|desc]                 the order the rows are read in
+
+B<Functions:> C<pct_of_total>, C<rank> and C<zscore> are order-free.  They
+answer a whole-partition question: a row's share of the partition total (the
+shares sum to 1), its rank with ties sharing a rank and the next rank
+skipping (as SQL C<RANK()> does), and its z-score against the same sample
+standard deviation the C<stdev> measure and C</stats> use.
+
+C<running_total>, C<running_count>, C<running_pct>, C<window_sum>,
+C<window_avg>, C<lag>, C<delta> and C<pct_change> accumulate in order and
+require C<order=>; each takes the rows in that order, so
+C<running_total(amount)> over C<order=day:asc> is the year-to-date a reader
+expects.  Only C<window_sum> and C<window_avg> take a parameter, the width of
+the row window, and the window includes the row itself.
+
+C<order=> decides the order the pass reads the rows in, not the order the
+page shows them in: the table and its sort controls are untouched, so a
+reader can sort by amount while a running total follows the date.  Ties keep
+their arrival order, which is what makes two runs over the same file agree.
+
+C<by=> partitions the rows.  Rows whose partition column is empty are grouped
+together under the empty value rather than dropped -- C<_grouped_totals>
+excludes such rows, because a pivot cell needs a key, but a windowed column has
+to cover every displayed row.
+
+A cell that is not numeric yields C<undef> in the produced column rather than
+a placeholder: there is no previous row for the first row of a partition, and
+a chart skips an undefined value while the measure fold does too, so a window
+column cannot silently become a zero.
+
+The pass is stage 6 of the pipeline: after the filters, so a window is over
+what the filters left, and before anything slices a page, so page 2 continues
+page 1's running total rather than restarting it.  C</export> runs the same
+stages and carries the same column.  A spec that cannot be honoured -- an
+unknown function, an unknown column, a parameter on a function that takes
+none, a parameter that is not a positive whole number, a missing C<order=>
+for an accumulating function -- is a 400 naming the parameter.
 
 =head1 COMMON PITFALLS
 

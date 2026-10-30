@@ -1,0 +1,180 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::JSON qw(json_encode);
+
+my $iterations = 500_000;
+my $runs       = 9;
+my $help       = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $fixture = tempdir( 'problem48-runtime-root-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $home    = File::Spec->catdir( $fixture, 'home' );
+make_path($home);
+local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = File::Spec->catdir( $fixture, 'state' );
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+
+my ( @baseline, @optimized );
+my ( @baseline_inventory, @optimized_inventory );
+my $expected = $paths->runtime_root;
+my $expected_inventory = json_encode( $paths->all_paths );
+for my $run ( 1 .. $runs ) {
+    my @strategies = $run % 2 ? qw(baseline optimized) : qw(optimized baseline);
+    for my $strategy (@strategies) {
+        local $paths->{_runtime_layer_candidate_scope} = {};
+        my @layers = $paths->runtime_layers;
+        die "Runtime layer fixture is empty\n" if !@layers || $layers[-1] ne $expected;
+
+        my $started = time;
+        my $observed;
+        for ( 1 .. $iterations ) {
+            $observed = $strategy eq 'baseline'
+              ? _baseline_runtime_root($paths)
+              : $paths->runtime_root;
+        }
+        my $elapsed = time - $started;
+        die "$strategy returned an unexpected runtime root\n" if !defined $observed || $observed ne $expected;
+        push @{ $strategy eq 'baseline' ? \@baseline : \@optimized }, $elapsed;
+
+        local $paths->{_runtime_layer_candidate_scope} = {};
+        my $inventory_started = time;
+        my $inventory;
+        if ( $strategy eq 'baseline' ) {
+            no warnings 'redefine';
+            local *Developer::Dashboard::PathRegistry::runtime_root = sub {
+                my ($registry) = @_;
+                my @runtime_layers = $registry->runtime_layers;
+                return $runtime_layers[-1];
+            };
+            $inventory = $paths->all_paths;
+        }
+        else {
+            $inventory = $paths->all_paths;
+        }
+        my $inventory_elapsed = time - $inventory_started;
+        die "$strategy changed the all_paths payload\n"
+          if json_encode($inventory) ne $expected_inventory;
+        push @{ $strategy eq 'baseline' ? \@baseline_inventory : \@optimized_inventory },
+          $inventory_elapsed;
+    }
+}
+
+my $baseline_median  = _median(@baseline);
+my $optimized_median = _median(@optimized);
+my $baseline_inventory_median  = _median(@baseline_inventory);
+my $optimized_inventory_median = _median(@optimized_inventory);
+printf "runtime_root: %d alternating runs x %d calls; exact path parity=yes\n", $runs, $iterations;
+printf "baseline_ms=%.3f scoped_cache_ms=%.3f speedup=%.2fx\n",
+  1000 * $baseline_median, 1000 * $optimized_median, $baseline_median / $optimized_median;
+printf "all_paths: exact JSON parity=yes baseline_ms=%.3f scoped_cache_ms=%.3f speedup=%.2fx\n",
+  1000 * $baseline_inventory_median, 1000 * $optimized_inventory_median,
+  $baseline_inventory_median / $optimized_inventory_median;
+exit 0;
+
+# _baseline_runtime_root($paths)
+# Reproduces the former runtime_root body for a benchmark-only control.
+# Input: PathRegistry instance with an operation-local runtime-layer snapshot.
+# Output: last runtime-layer path or undef for an empty inventory.
+sub _baseline_runtime_root {
+    my ($registry) = @_;
+    my @layers = $registry->runtime_layers;
+    return $layers[-1];
+}
+
+# _median(@samples)
+# Returns the middle sorted elapsed duration.
+# Input: odd, nonempty list of elapsed seconds.
+# Output: median elapsed duration in seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _usage()
+# Returns the benchmark's supported options.
+# Input: none.
+# Output: concise usage string.
+sub _usage {
+    return "Usage: $0 [--iterations POSITIVE_N] [--runs ODD_N] [--help]\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-runtime-root-benchmark - compare request-scoped runtime-root access
+
+=head1 PURPOSE
+
+Measures repeated C<runtime_root> reads against the pre-cache body using a
+precomputed operation-local runtime-layer inventory. The output path must match
+exactly before a timing result is reported. It also compares the complete
+C<all_paths> inventory with the previous C<runtime_root> body and requires
+byte-identical canonical JSON before reporting the aggregate timing.
+
+=head1 WHY IT EXISTS
+
+The warmed saved-page NYTProf profile attributed repeated calls to
+C<PathRegistry::runtime_layers>. This benchmark isolates the accessor dispatch
+and list-copy cost without including filesystem discovery in the timed loop,
+then checks whether that helper improvement moves the real C<all_paths>
+aggregate.
+
+=head1 WHEN TO USE
+
+Use inside the repository's Docker development service after changing the
+operation-scoped C<runtime_root> fast path. This microbenchmark does not predict
+whole-route latency or prove the universal 50x objective.
+
+=head1 HOW TO USE
+
+  d2 docker compose exec dev perl script/problem48-runtime-root-benchmark
+  d2 docker compose exec dev perl script/problem48-runtime-root-benchmark --iterations 1000000 --runs 21
+
+The run count must be odd and positive. Baseline and optimized loops alternate
+order on one isolated temporary home and compare exact returned paths.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this script; the application and release
+workflow do not invoke it.
+
+=head1 EXAMPLES
+
+Run the default comparison:
+
+  d2 docker compose exec dev perl script/problem48-runtime-root-benchmark
+
+Use more calls and samples when the per-call duration approaches timer
+resolution:
+
+  d2 docker compose exec dev perl script/problem48-runtime-root-benchmark --iterations 1000000 --runs 21
+
+=cut

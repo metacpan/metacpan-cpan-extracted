@@ -435,6 +435,24 @@ Silesian locale.
    1995-12-22T09:05:02 = CE 1995 grudnia 22, piōntek
   -0010-09-15T04:44:23 = BCE -10 września 15, sobota
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 lutego
+   1995-12-22T09:05:02 = CE 1995 grudnia
+  -0010-09-15T04:44:23 = BCE -10 września
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 lutego 5, wtorek
+   1995-12-22T09:05:02 = CE 1995 grudnia 22, piōntek
+  -0010-09-15T04:44:23 = BCE -10 września 15, sobota
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 lutego 5
+   1995-12-22T09:05:02 = CE 1995 grudnia 22
+  -0010-09-15T04:44:23 = BCE -10 września 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 lutego 5
@@ -502,6 +520,12 @@ Silesian locale.
   -0010-09-15T04:44:23 = września
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = lutego 5, wtorek
+   1995-12-22T09:05:02 = grudnia 22, piōntek
+  -0010-09-15T04:44:23 = września 15, sobota
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = lutego 5, wtorek
    1995-12-22T09:05:02 = grudnia 22, piōntek

@@ -69,8 +69,9 @@ subtest 'stock set: the table is the prompt tool set' => sub {
   my $app = app();
   my $rows = rows($app);
   is([ map { $_->[0] } @$rows ], prompt_signatures($app), 'same tools, same signatures, same order');
-  is($rows->[4], [ 'bash(command, [compress], [timeout], [working_directory])',
-    'Run a shell command with bash -c' ], 'bash row from its schema and description');
+  my ($bash) = grep { $_->[0] =~ /\Abash\(/ } @$rows;
+  like($bash, [ 'bash(command, [description], [run_in_background], [timeout], [working_directory])',
+    qr/\ARun a shell command with bash -c\b/ ], 'bash row from its schema and description');
   ok(!(grep { $_->[0] =~ /^perl_/ } @$rows), 'Perl tools not mounted, not documented');
 };
 

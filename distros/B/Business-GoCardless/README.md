@@ -5,7 +5,7 @@ set of modules
 
 # VERSION
 
-1.00
+1.01
 
 # DESCRIPTION
 

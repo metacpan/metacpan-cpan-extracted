@@ -318,6 +318,68 @@ subtest 'a member of the wrong type at any depth is a retried server_error' => s
     }
 };
 
+# RFC 3339 alone, on a day that exists. Through 1.11.3 a date was checked as a
+# string alone, so every one of these came back as served (measured 2026-10-29).
+subtest 'a date or date-time that is not RFC 3339 is a retried server_error' => sub {
+    my $body;
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        $c->res->headers->content_type('application/json');
+        $c->render(data => $body);
+    });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 1)->database;
+    my @date_times = ('2026-10-05', '2026-10-05T10:00:00', '2026-10-05T10:00:00+05', '2026-10-05T10:00Z',
+        '2026-10-05T10:00:00+0500', '2026-10-05T10:00:00+05:00:30', '2026-10-05T24:00:00Z', '2026-10-05T10:60:00Z',
+        '2026-10-05T10:00:60Z', '2026-02-30T10:00:00Z', '2026-10-05T10:00:00+24:00', '2026-10-05T10:00:00+05:60',
+        ' 2026-10-05T10:00:00Z', '2026-10-05T10:00:00Z ', '2026-10-05 10:00:00Z', '2026-10-5T10:00:00Z',
+        '+12026-10-05T10:00:00Z', '2026-10-05T10:00:00.Z', '20261005T100000Z', '2026-10-05T10:00:00UTC', 'x',
+        'tomorrow', 'monday', '', "2026-10-05T10:00:00Z\n", "\x{0662}026-10-05T10:00:00Z");
+    my @dates = ('2026-10-05T10:00:00', '2026-10-05T10:00:00Z', '2026-02-30', '2026-11-31', '2026-13-01', '2026-10-5',
+        '20261005', '2026-W41-1', '2026-278', ' 2026-10-05', '+12026-10-05', 'x', 'tomorrow', 'monday', '',
+        "2026-10-05\n", "\x{0662}026-10-05", '2025-02-29', '1900-02-29');
+    my $family = InternetDataTest::family();
+    my @cases;
+    for my $value (@date_times) {
+        for my $member (qw(starts expires renews_at notice_due_at)) {
+            push @cases, [list => "$member '$value'", sub { $db->list }, { databases => [{ %$family, $member => $value }] }];
+        }
+        push @cases, [downloads => "created '$value'", sub { $db->downloads },
+            { downloads => [InternetDataTest::download(created => $value)] }];
+    }
+    for my $value (@dates) {
+        push @cases, [metadata => "updated '$value'", sub { $db->metadata('bogon_ip_v1') },
+            InternetDataTest::metadata(updated => $value)];
+    }
+    for my $case (@cases) {
+        my ($call, $name, $run, $wire) = @$case;
+        $name =~ s/([^\x20-\x7e])/sprintf '\\x{%x}', ord $1/ge;
+        $body = Mojo::JSON::encode_json($wire);
+        $origin->reset;
+        my $error = eval { $run->(); 1 } ? undef : $@;
+        ok(ref $error && $error->isa('InternetData::Error'), "$call, $name: raised an InternetData::Error")
+            or next;
+        is($error->kind, 'server_error', "$call, $name: server_error");
+        is($error->status, 200, "$call, $name: carrying the status");
+        is($origin->count, 2, "$call, $name: retried like any outage");
+    }
+    for my $value ('2026-10-05T10:00:00Z', '2026-10-05t10:00:00.5z', '2026-10-05T10:00:00-00:00',
+        '2026-10-05T10:00:00.123456789+05:30', '2024-02-29T23:59:59+23:59', '0001-01-01T00:00:00Z',
+        '2000-02-29T00:00:00Z') {
+        $body = Mojo::JSON::encode_json({ databases => [{ %$family, starts => $value }] });
+        is(eval { $db->list->[0]{starts} } // "died: $@", $value, "starts '$value' is an answer");
+        $body = Mojo::JSON::encode_json({ downloads => [InternetDataTest::download(created => $value)] });
+        is(eval { $db->downloads->[0]{created} } // "died: $@", $value, "created '$value' is an answer");
+    }
+    for my $value ('2026-10-05', '2024-02-29', '0099-12-31', '2000-02-29') {
+        $body = Mojo::JSON::encode_json(InternetDataTest::metadata(updated => $value));
+        is(eval { $db->metadata('bogon_ip_v1')->{updated} } // "died: $@", $value, "updated '$value' is an answer");
+    }
+    $body = Mojo::JSON::encode_json(InternetDataTest::metadata(sample => { csvgz => [undef] }));
+    $origin->reset;
+    my $error = eval { $db->metadata('bogon_ip_v1'); 1 } ? undef : $@;
+    ok(ref $error && $error->kind eq 'server_error' && $origin->count == 2, 'a sample row of null is a retried server_error');
+};
+
 # Refusing these would fail every refused download and every family with no
 # license: a nullable member may be null, and an optional one absent.
 subtest 'nullable and optional members stay an answer' => sub {
@@ -452,7 +514,7 @@ subtest 'a per-call timeout bounds every attempt of that call and nothing after 
 };
 
 subtest "a request started inside another call's window takes its own bound" => sub {
-    my $origin = InternetDataTest::Origin->new(sub { shift->render(json => { databases => [] }) });
+    my $origin = InternetDataTest::Origin->new(sub { shift->render(json => { databases => [], downloads => [] }) });
     my $ua = Mojo::UserAgent->new;
     my $db = InternetData->new(base_url => $origin->url, api_key => 'k', timeout => 3, ua => $ua)->database;
     my (%bound, $nested);

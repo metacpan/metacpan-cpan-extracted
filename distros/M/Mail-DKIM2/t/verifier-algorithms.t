@@ -8,10 +8,10 @@ use DKIM2SignedFixture;
 use DKIM2TestKeys;
 use Mail::DKIM2::Verifier;
 
-# -07 §3.5: Verifiers MUST ignore signatures using algorithms they do
-# not implement. Only the exact names rsa-sha256 and ed25519-sha256 are
-# implemented (tag values are case significant, §8); anything else is
-# skipped before any key lookup, and is never verified as RSA.
+# -08 §14.6: an algorithm a Verifier does not implement is a PERMERROR item,
+# so it passes only beside a "|" alternative that does. Only the exact names
+# rsa-sha256 and ed25519-sha256 are implemented (names are case-sensitive,
+# §2.14); anything else gets no key lookup, and is never verified as RSA.
 
 my $calls;
 my $cb = DKIM2TestKeys::pubkey_callback();
@@ -21,31 +21,34 @@ sub run {
     my ($name, $items, $want, $want_calls) = @_;
     $calls = 0;
     my $v = DKIM2SignedFixture::verify(
-        DKIM2SignedFixture::signed(items => $items), PubkeyCallback => $counting);
+        DKIM2SignedFixture::signed(ref $items ? (items => $items) : (s => $items)),
+        PubkeyCallback => $counting);
     like($v->result_detail, $want, "$name: " . $v->result_detail);
     is($calls, $want_calls, "$name: $want_calls key lookup(s)");
 }
 
 run('rsa-sha256', [['sel1', 'rsa-sha256']], qr/^pass/, 1);
-run('unknown algorithm, correctly signed with RSA',
-    [['sel1', 'future-alg']], qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has no signature with a supported algorithm\)$/, 0);
-run('RSA-SHA256 is not rsa-sha256',
-    [['sel1', 'RSA-SHA256']], qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has no signature with a supported algorithm\)$/, 0);
-run('ed25519-sha256x is not ed25519-sha256',
-    [['sel1', 'ed25519-sha256x']], qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has no signature with a supported algorithm\)$/, 0);
-run('unknown item beside a good one',
-    [['sel2', 'future-alg', 'AAAA'], ['sel1', 'rsa-sha256']], qr/^pass/, 1);
+my $UNKNOWN = qr/^permerror \(PERMERROR: DKIM2-Signature i=1 selector sel1 algorithm unknown\)$/;
+run('unknown algorithm, correctly signed with RSA', [['sel1', 'future-alg']], $UNKNOWN, 0);
+run('RSA-SHA256 is not rsa-sha256', [['sel1', 'RSA-SHA256']], $UNKNOWN, 0);
+run('ed25519-sha256x is not ed25519-sha256', [['sel1', 'ed25519-sha256x']], $UNKNOWN, 0);
+run('unknown item "|" a good one',
+    'sel2:future-alg:AAAA|sel1:rsa-sha256:SIG', qr/^pass/, 1);
+run('unknown item "," a good one',
+    [['sel2', 'future-alg', 'AAAA'], ['sel1', 'rsa-sha256']],
+    qr/^permerror \(PERMERROR: DKIM2-Signature i=1 selector sel2 algorithm unknown\)$/, 1);
 run('known algorithm, value not base64',
     [['sel1', 'rsa-sha256', '!!notbase64!!']],
     qr/^permerror .*DKIM2-Signature i=1 syntax error/, 0);
 run('known algorithm, base64 missing its padding',
     [['sel1', 'rsa-sha256', 'AAA']],
     qr/^permerror .*DKIM2-Signature i=1 syntax error/, 0);
-run('unknown algorithm, value not base64: still ignored',
-    [['sel2', 'future-alg', '!!x!!'], ['sel1', 'rsa-sha256']], qr/^pass/, 1);
+run('unknown algorithm, value not base64: a syntax error all the same',
+    'sel2:future-alg:!!x!!|sel1:rsa-sha256:SIG',
+    qr/^permerror \(PERMERROR: DKIM2-Signature i=1 syntax error\)$/, 0);
 
-# -07 §14.5: an absent key is a PERMERROR when nothing else can be
-# checked; an item with no key beside one that verifies is skipped.
+# -08 §14.5, §14.6: an absent key is a PERMERROR item, overridden only by
+# a "|" alternative that passes.
 {
     my $absent = sub { $calls++; return undef };
     $calls = 0;
@@ -59,11 +62,17 @@ run('unknown algorithm, value not base64: still ignored',
     $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(
             items => [['gone', 'rsa-sha256', 'AAAA'], ['sel1', 'rsa-sha256']]),
         PubkeyCallback => $some);
-    like($v->result_detail, qr/^pass/, 'one key absent, one verifies: pass');
+    like($v->result_detail,
+        qr/^permerror \(PERMERROR: DKIM2-Signature i=1 public key gone does not exist\)$/,
+        'one key absent "," one that verifies: does not exist');
+    $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(
+            s => 'gone:rsa-sha256:AAAA|sel1:rsa-sha256:SIG'),
+        PubkeyCallback => $some);
+    like($v->result_detail, qr/^pass/, 'one key absent "|" one that verifies: pass');
 }
 
-# -07 section 14.6: every signature that can be checked is; all failing,
-# or some failing beside one that passes, is a FAIL naming the selectors.
+# -08 section 14.6: every signature is checked; one failing in a "," group
+# fails the group, naming its selector.
 # (sel2's key is test1's sel2 key; the fixture signs every item with sel1's.)
 {
     my $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(
@@ -73,8 +82,8 @@ run('unknown algorithm, value not base64: still ignored',
     $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(
         items => [['sel1', 'rsa-sha256'], ['sel2', 'rsa-sha256']]));
     is($v->result, 'fail', 'one passes, one fails: fail');
-    is($v->details, 'FAIL: DKIM2-Signature i=1 signature sel1 signature sel2 failed',
-        '... naming the one that passed and the one that failed');
+    is($v->details, 'FAIL: DKIM2-Signature i=1 selector sel2 incorrect signature',
+        '... naming the one that failed');
 }
 
 # A key of the wrong type for the algorithm, from a callback.
@@ -92,15 +101,21 @@ run('unknown algorithm, value not base64: still ignored',
         'Ed25519 key for rsa-sha256: algorithm mismatch');
 }
 
-# Review R1: thousands of distinct unknown algorithms cost no key lookups.
+# Review R1: thousands of items cost no key lookups: past
+# MAX_SIGNATURE_ITEMS the field is refused before any is fetched.
 {
-    my @items = map { ["x$_", "unknown$_", q(AAAA)] } 1 .. 4000;
-    push @items, ['sel1', 'rsa-sha256'];
-    my $raw = DKIM2SignedFixture::signed(items => \@items);
+    my $s = join('|', map { "x$_:unknown$_:AAAA" } 1 .. 4000) . '|sel1:rsa-sha256:SIG';
+    my $raw = DKIM2SignedFixture::signed(s => $s);
     $calls = 0;
     my $v = DKIM2SignedFixture::verify($raw, PubkeyCallback => $counting);
-    like($v->result_detail, qr/^pass/, '4000 unknown items + one good: pass');
-    is($calls, 1, '4000 unknown items: one key lookup');
+    is($v->result_detail, 'permerror (PERMERROR: DKIM2-Signature i=1 has more than 8 signatures)',
+        '4001 items: refused');
+    is($calls, 0, '4001 items: no key lookup');
+    $s = join('|', map { "x$_:unknown$_:AAAA" } 1 .. 7) . '|sel1:rsa-sha256:SIG';
+    $calls = 0;
+    $v = DKIM2SignedFixture::verify(DKIM2SignedFixture::signed(s => $s), PubkeyCallback => $counting);
+    like($v->result_detail, qr/^pass/, '7 unknown items + one good: pass');
+    is($calls, 1, '... with one key lookup');
 }
 
 done_testing;

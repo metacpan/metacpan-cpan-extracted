@@ -16,6 +16,12 @@ setupTestConfig();
 
 my $t = Test::Mojo->new('CallBackery');
 
+# A second app in production mode. It lives at file scope on purpose: on
+# perl 5.30 with Devel::Cover 1.52, destroying a Mojolicious app that has
+# served a request makes the next request on any other app segfault.
+my $prod = Test::Mojo->new('CallBackery');
+$prod->app->mode('production');
+
 # A file outside @INC that the server process can read and that carries POD.
 # Stands in for anything sensitive on the host, e.g. a config file whose
 # comment block happens to start with a POD directive.
@@ -48,8 +54,6 @@ subtest 'rejected document name is not reflected back to the client' => sub {
     # The body is Mojolicious' own 404 page. In development it echoes the
     # request path for every unmatched route, HTML escaped; in production it
     # is a static page that echoes nothing.
-    my $prod = Test::Mojo->new('CallBackery');
-    $prod->app->mode('production');
     $prod->get_ok("/doc/$marker")
          ->status_is(404)
          ->content_unlike(qr/REFLECTED_CANARY/,

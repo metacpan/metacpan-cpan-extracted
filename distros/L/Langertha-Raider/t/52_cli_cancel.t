@@ -47,7 +47,7 @@ sub spawn_raider {
     open STDOUT, '>', "$out"      or die $!;
     open STDERR, '>', "$err"      or die $!;
     exec $^X, '-I'.$repo->child('lib'), "$bin", '-r', $root, '-e', 'openai', '-k', 'test',
-      '-m', 'stub-model', '--no-trace', @args;
+      '-m', 'stub-model', '--no-trace', '--dangerously-skip-permissions', @args;
     die 'exec: '.$!;
   }
   return ( $pid, $out, $err );
@@ -67,22 +67,20 @@ sub reap {
 
 # Runs raider against a stub engine that answers the chat completion only
 # after 60 seconds (the session embedding request gets its 404 at once),
-# sends SIGINT once the run started and its request is on the way; returns
-# ( wait status, stdout, stderr ).
+# sends SIGINT once the stub has the request -- the run started and waits
+# for the model; returns ( wait status, stdout, stderr ).
 sub cancelled_run {
   my ( @flags ) = @_;
   my $root = tempdir(CLEANUP => 1);
-  my ( $stub, $url ) = stub_engine(bash => { command => 'true' }, delay => 60);
+  my $seen = path($root)->child('seen');
+  my ( $stub, $url ) = stub_engine(bash => { command => 'true' }, delay => 60, seen => $seen);
   my ( $pid, $out, $err ) = spawn_raider($root, '-o', 'url='.$url, @flags, 'hang please');
-  my $sessions = path($root)->child('.raider', 'sessions');
   my $started;
-  for (1 .. 300) {
-    $started = grep { /"run\.started"/ } map { $_->lines_raw } -d $sessions ? $sessions->children(qr/\.jsonl\z/) : ()
-      and last;
+  for (1 .. 600) {
+    $started = -e $seen and last;
     select undef, undef, undef, 0.1;
   }
   if ($started) {
-    select undef, undef, undef, 1;   # the request is on its way
     kill INT => $pid;
   }
   else {
@@ -98,7 +96,7 @@ subtest '--json: SIGINT during the model request writes the cancelled document' 
   my ( $status, $stdout, $stderr ) = cancelled_run('--json');
   died_of($status, 'INT', '--json');
   my $doc = eval { $json->decode($stdout) };
-  is($doc, { version => 1, status => 'cancelled', elapsed => D(),
+  is($doc, { version => 1, status => 'cancelled', reason => 'signal', elapsed => D(),
     session => { id => T(), path => T() } },
     'one document, status cancelled') or diag 'stdout: '.$stdout."\nstderr: ".$stderr;
   unlike($stderr, qr/ at \S+ line \d+/, 'no Perl error on stderr') or diag $stderr;
@@ -194,7 +192,7 @@ SKIP: {
     ok($tool_pid, 'bash started and wrote its pid') or return;
     died_of($status, 'INT', 'raider');
     my $doc = eval { $json->decode($stdout) };
-    is($doc, { version => 1, status => 'interrupted', signal => 'INT', elapsed => D(),
+    is($doc, { version => 1, status => 'interrupted', reason => 'signal', signal => 'INT', elapsed => D(),
       session => { id => T(), path => T() } },
       'one document, status interrupted') or diag 'stdout: '.$stdout;
     ok($gone->($tool_pid), 'the bash subprocess is gone');

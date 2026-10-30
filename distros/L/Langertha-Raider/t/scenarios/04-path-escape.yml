@@ -1,0 +1,11 @@
+title: a path leaving the root is refused and nothing is written outside
+prompt: Write outside.
+script:
+  - tool_calls:
+      - [ write_file, { path: ../escaped.txt, content: no } ]
+  - text: refused
+expect:
+  answer: refused
+  absent: [ ../escaped.txt ]
+  tools:
+    - { name: write_file, error: true, text: 'escapes root' }

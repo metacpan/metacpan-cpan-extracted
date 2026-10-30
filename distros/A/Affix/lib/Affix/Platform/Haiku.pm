@@ -1,4 +1,4 @@
-package Affix::Platform::Haiku v1.2.7 {
+package Affix::Platform::Haiku v1.3.0 {
     use v5.40;
     use Path::Tiny qw[path];
     use Config     qw[%Config];

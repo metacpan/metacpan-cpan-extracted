@@ -217,7 +217,7 @@ for my $otype (qw(aoa aoh hoa hoh)) {
 	$r = read_all($f{hdronly}, 'output_type' => 'aoa');
 	is_deeply $r->[0], [ [qw(a b)] ], 'aoa: a header-only file is its header row';
 	$r = read_all($f{duprn}, 'output_type' => 'aoa', 'row_names' => 'id');
-	like $r->[1], qr/^read_table: 'row_names' has no meaning for output_type "aoa"/,
+	like $r->[1], qr/\nread_table: error: 'row_names' has no meaning for output_type "aoa"/,
 		'aoa: row_names is refused';
 }
 

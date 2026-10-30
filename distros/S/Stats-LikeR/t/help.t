@@ -43,7 +43,8 @@ my @FUNCS = qw(
 	add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc
 	auroc bedroc bfill binom_test cfilter chisq_test chunk cmh_test cohen_d col
 	bw_bcv bw_nrd bw_nrd0 bw_sj bw_ucv
-	col2col colnames concat cor cor_test cov coxph cramers_v csort density dnorm
+	col2col colnames concat cor cor_test cov coxph cramers_v csort density df2h
+	dnorm
 	drop_cols drop_duplicates dropna dunn_test epi_2x2 eta_squared ffill
 	fillna filter fisher_test friedman_test get_union glm group_by h h2aoh hist
 	hoa2aoh hoa2hoh hoh2hoa hosmer_lemeshow interpolate intersection
@@ -137,7 +138,7 @@ for my $f (qw(quantile agg write_table col)) {
 # business), none of them may print help, and none may die the help death.
 my @PERL_FUNCS = qw(
 	age_standardize agg aoh2h aoh2hoh assign bfill chunk cohen_d col colnames
-	concat cramers_v drop_cols drop_duplicates dropna eta_squared ffill fillna
+	concat cramers_v df2h drop_cols drop_duplicates dropna eta_squared ffill fillna
 	h2aoh hosmer_lemeshow interpolate melt ncol nrow pivot_table qcut read_table
 	rename_cols rownames select_cols smd summary table_one TukeyHSD view vif
 );
@@ -230,13 +231,13 @@ for my $f (@PERL_FUNCS) {
 	is(scalar(Stats::LikeR::_pod_section('no_such_fn')), 0, 'an unknown name finds nothing');
 }
 
-# h2aoh / aoh2h have documentation of their own, and h() reaches it.  The loop
+# h2aoh / df2h have documentation of their own, and h() reaches it.  The loop
 # over @FUNCS above only proves the call does not die -- the fallback page is
 # also titled after the function, so it would pass without a section existing.
 # These names are also the reason _pod_key has to compare whole names: 'h' is
 # itself a function, and a prefix match would hand h2aoh's page to h().
 {
-	for my $f (qw(h2aoh aoh2h)) {
+	for my $f (qw(h2aoh df2h)) {
 		ok(scalar(Stats::LikeR::_pod_section($f)), "$f has a POD section");
 		my ($out, $err) = capture(sub { Stats::LikeR::h($f) });
 		is($err, undef, "h('$f') does not die");
@@ -248,9 +249,15 @@ for my $f (@PERL_FUNCS) {
 
 	# the two directions cite each other, so either page leads to the other
 	my ($fwd) = capture(sub { Stats::LikeR::h('h2aoh') });
-	my ($rev) = capture(sub { Stats::LikeR::h('aoh2h') });
-	like($fwd, qr/\baoh2h\b/, "h('h2aoh') mentions the inverse");
-	like($rev, qr/\bh2aoh\b/, "h('aoh2h') mentions the inverse");
+	my ($rev) = capture(sub { Stats::LikeR::h('df2h') });
+	like($fwd, qr/\bdf2h\b/, "h('h2aoh') mentions the inverse");
+	like($rev, qr/\bh2aoh\b/, "h('df2h') mentions the inverse");
+
+	# aoh2h is df2h under the name it had up to 0.3218, and has no section
+	# of its own, as rbind has none beside concat's
+	my ($old) = capture(sub { Stats::LikeR::h('aoh2h') });
+	like($old, qr/\Q(documented under `df2h')\E/, "h('aoh2h') shows df2h's section");
+	like($old, qr/\bh2aoh\b/, "h('aoh2h') mentions the inverse too");
 	isnt($fwd, $rev, 'the two pages are different pages');
 
 	# h and h2aoh are distinct topics

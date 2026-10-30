@@ -10,6 +10,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   JSON::PP: '0'
+  Log::Abstraction: '0.41'
   Test::Builder::Tester: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.14'
@@ -41,15 +42,17 @@ requires:
   Params::Get: '0.17'
   Params::Validate::Strict: '0.41'
   Readonly: '0'
+  Readonly::Values::Syslog: '0.04'
   Scalar::Util: '0'
   Test::Builder: '0'
   autodie: '0'
   perl: '5.026'
   strict: '0'
+  version: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Log-Abstraction
   homepage: https://metacpan.org/pod/Test::Log::Abstraction
   repository: git://github.com/nigelhorne/Test-Log-Abstraction.git
-version: v0.002.0
+version: 0.002.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

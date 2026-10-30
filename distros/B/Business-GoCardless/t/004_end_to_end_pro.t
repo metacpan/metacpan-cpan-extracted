@@ -557,6 +557,7 @@ sub _complete_redirect_flow {
 
     return {
         redirect_flow_id => $redirect_flow_id,
+        session_token    => $LastRedirectFlow->{session_token},
         %params,
     };
 }

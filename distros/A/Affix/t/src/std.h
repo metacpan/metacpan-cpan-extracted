@@ -20,7 +20,9 @@
 #if defined _WIN32 || defined __CYGWIN__
 #include <BaseTsd.h>
 // typedef SSIZE_T ssize_t;
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef signed __int64 int64_t;
+#endif
 #ifdef __GNUC__
 #define DLLEXPORT __attribute__((dllexport))
 #else

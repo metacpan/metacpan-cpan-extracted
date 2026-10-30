@@ -1,5 +1,5 @@
 {
-   "abstract" : "A dangerous hybrid of cooperative fibers and preemptive native threads",
+   "abstract" : "Lightweight cooperative fibers and native OS thread offloading",
    "author" : [
       "Sanko Robinson"
    ],
@@ -56,8 +56,10 @@
       },
       "test" : {
          "recommends" : {
+            "IO::Async" : "0",
             "IO::Socket::IP" : "0.32",
             "IO::Socket::SSL" : "1.968",
+            "Mojo::IOLoop" : "0",
             "Net::SSLeay" : "1.49"
          },
          "requires" : {
@@ -68,147 +70,147 @@
    "provides" : {
       "Acme::Parataxis" : {
          "file" : "lib/Acme/Parataxis.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Actor" : {
          "file" : "lib/Acme/Parataxis/Actor.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Blocking" : {
          "file" : "lib/Acme/Parataxis/Blocking.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::CancellationToken" : {
          "file" : "lib/Acme/Parataxis/CancellationToken.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Channel" : {
          "file" : "lib/Acme/Parataxis/Channel.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Compat" : {
          "file" : "lib/Acme/Parataxis/Compat.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Driver" : {
          "file" : "lib/Acme/Parataxis/Driver.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Driver::IOAsync" : {
          "file" : "lib/Acme/Parataxis/Driver/IOAsync.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Driver::Mojo" : {
          "file" : "lib/Acme/Parataxis/Driver/Mojo.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Error" : {
          "file" : "lib/Acme/Parataxis/Error.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Error::Cancelled" : {
          "file" : "lib/Acme/Parataxis/Error.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Error::Nursery" : {
          "file" : "lib/Acme/Parataxis/Error.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Error::STM_Retry" : {
          "file" : "lib/Acme/Parataxis/Error.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Error::Supervisor" : {
          "file" : "lib/Acme/Parataxis/Error.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Error::Timeout" : {
          "file" : "lib/Acme/Parataxis/Error.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Future" : {
          "file" : "lib/Acme/Parataxis/Future.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Generator" : {
          "file" : "lib/Acme/Parataxis/Generator.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Local" : {
          "file" : "lib/Acme/Parataxis/Local.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Monitor" : {
          "file" : "lib/Acme/Parataxis/Monitor.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Nursery" : {
          "file" : "lib/Acme/Parataxis/Nursery.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::RateLimiter" : {
          "file" : "lib/Acme/Parataxis/RateLimiter.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Semaphore" : {
          "file" : "lib/Acme/Parataxis/Semaphore.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Semaphore::Guard" : {
          "file" : "lib/Acme/Parataxis/Semaphore.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Signal" : {
          "file" : "lib/Acme/Parataxis/Signal.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Stream" : {
          "file" : "lib/Acme/Parataxis/Stream.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Supervisor" : {
          "file" : "lib/Acme/Parataxis/Supervisor.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync" : {
          "file" : "lib/Acme/Parataxis/Sync.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::Barrier" : {
          "file" : "lib/Acme/Parataxis/Sync/Barrier.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::Mutex" : {
          "file" : "lib/Acme/Parataxis/Sync/Mutex.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::Mutex::Guard" : {
          "file" : "lib/Acme/Parataxis/Sync/Mutex.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::Once" : {
          "file" : "lib/Acme/Parataxis/Sync/Once.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::RwLock" : {
          "file" : "lib/Acme/Parataxis/Sync/RwLock.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::RwLock::Guard" : {
          "file" : "lib/Acme/Parataxis/Sync/RwLock.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Sync::WaitGroup" : {
          "file" : "lib/Acme/Parataxis/Sync/WaitGroup.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::TVar" : {
          "file" : "lib/Acme/Parataxis/TVar.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       },
       "Acme::Parataxis::Ticker" : {
          "file" : "lib/Acme/Parataxis/Ticker.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.3"
       }
    },
    "release_status" : "stable",
@@ -226,7 +228,7 @@
          "web" : "https://github.com/sanko/Acme-Parataxis.pm"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.3",
    "x_ignore" : [
       ".tidyallrc",
       ".gitignore",

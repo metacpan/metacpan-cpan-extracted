@@ -435,6 +435,24 @@ Low German Germany locale.
    1995-12-22T09:05:02 = CE 1995 Dezember 22, Freedag
   -0010-09-15T04:44:23 = BCE -10 September 15, Sünnavend
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 Februaar
+   1995-12-22T09:05:02 = CE 1995 Dezember
+  -0010-09-15T04:44:23 = BCE -10 September
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 Februaar 5, Dingsdag
+   1995-12-22T09:05:02 = CE 1995 Dezember 22, Freedag
+  -0010-09-15T04:44:23 = BCE -10 September 15, Sünnavend
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 Februaar 5
+   1995-12-22T09:05:02 = CE 1995 Dezember 22
+  -0010-09-15T04:44:23 = BCE -10 September 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 Februaar 5
@@ -502,6 +520,12 @@ Low German Germany locale.
   -0010-09-15T04:44:23 = September
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = Februaar 5, Dingsdag
+   1995-12-22T09:05:02 = Dezember 22, Freedag
+  -0010-09-15T04:44:23 = September 15, Sünnavend
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = Februaar 5, Dingsdag
    1995-12-22T09:05:02 = Dezember 22, Freedag

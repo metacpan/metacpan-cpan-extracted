@@ -6,7 +6,6 @@ use Path::Tiny;
 
 my $dockerfile = path('Dockerfile')->slurp_utf8;
 my $dist_ini   = path('dist.ini')->slurp_utf8;
-my $release    = path('maint/release-after.pl')->slurp_utf8;
 my $ignore     = path('.dockerignore')->slurp_utf8;
 
 unlike($dockerfile, qr/Langertha-Raider-\$\{RAIDER_VERSION\}\.tar\.gz/,
@@ -18,17 +17,29 @@ like($dockerfile, qr/cpm install\b.*--cpanfile cpanfile/s,
   'Dockerfile installs dependencies through cpm from the cpanfile');
 like($dockerfile, qr/cpm install\b.*--resolver metacpan/s,
   'Dockerfile uses the MetaCPAN resolver');
+like($dockerfile, qr/cpm install\b[^&]*--metafile META\.json[^&]*--top-level-phase configure[^&]*&& perl Makefile\.PL/s,
+  'Dockerfile installs the configure prereqs of the built META.json before Makefile.PL');
 like($dockerfile, qr/ARG RAIDER_VERSION=dev/,
   'Dockerfile has a dev-safe version build arg');
 like($dockerfile, qr/WORKDIR\s+\$\{RAIDER_SRC\}/,
   'Dockerfile builds from a stable source directory');
 
-like($dist_ini, qr/run_after_release = %x %o\/maint\/release-after\.pl --archive %a --dir %d --version %v/,
-  'release hook delegates archive, build directory, and version to maint script');
-unlike($dist_ini, qr/Langertha-Raider-%v\.tar\.gz[^\n]*docker\} build/,
-  'release hook does not require the archive as Docker input');
-like($release, qr/\$docker, 'build'.*'--build-arg', 'RAIDER_VERSION=' \. \$opt\{version\}.*\$opt\{dir\}/s,
-  'maint script builds Docker from the Dist::Zilla build directory');
+like($dist_ini, qr/^docker_image = raudssus\/raider$/m,
+  'the bundle builds and pushes raudssus/raider');
+like($dist_ini, qr/^docker_tags = latest %V %v$/m,
+  'the image is tagged latest, major and version');
+unlike($dist_ini, qr/^docker_default\b/m,
+  'the bundle\'s automatic Docker section is on');
+unlike($dist_ini, qr/^\[\@Author::GETTY::Docker\b/m,
+  'no explicit Docker section beside it');
+unlike($dist_ini, qr/^run_after_release\b/m,
+  'no release hook: Docker image and GitHub release both come from the bundle');
+ok(!-e 'maint/release-after.pl',
+  'no maint script creates the GitHub release beside GitHub::CreateRelease');
+
+my @stages = $dockerfile =~ /^FROM \S+ AS (\S+)$/mg;
+is($stages[-1], 'runtime-root',
+  'the published image is the last stage, the one a build without a target gets');
 
 SKIP: {
   # README.md lives in the repository only; the built distribution ships the

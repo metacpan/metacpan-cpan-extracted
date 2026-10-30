@@ -3,10 +3,10 @@ package Developer::Dashboard::CLI::TableHelpers;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
-use Cwd qw(cwd);
 use Exporter 'import';
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Developer::Dashboard::PathRegistry;
 
 our @EXPORT_OK = qw(
@@ -28,7 +28,7 @@ sub build_paths {
     my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
     return Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        cwd             => cwd(),
+        cwd             => current_working_directory(),
         workspace_roots => \@roots,
         project_roots   => \@roots,
     );

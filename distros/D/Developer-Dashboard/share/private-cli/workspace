@@ -27,6 +27,8 @@ workspace - private tmux workspace helper for Developer Dashboard
   dashboard workspace <workspace-ref>
   dashboard workspace -c <workspace-ref>
   dashboard workspace <workspace-ref> -c
+  dashboard workspace -c <path-alias> --docker
+  dashboard workspace <path-alias> -c -d
 
 =head1 DESCRIPTION
 
@@ -76,6 +78,20 @@ refresh both start from the resolved directory.
 When the name is not a registered dashboard path, C<-c> fails with an explicit
 error instead of silently starting the workspace from the wrong directory.
 
+Use C<-d> or C<--docker> together with C<-c> and a registered path alias to
+run the workspace inside the Compose service named C<workspace>. The helper
+first changes into the alias target and runs
+C<d2 docker compose up -d --build workspace>. If that fails, it stops
+and asks the user to configure the service; it does not run any in-container
+commands. On success it runs C<d2 docker compose exec workspace d2 path
+add E<lt>aliasE<gt> /workspace>, then
+C<d2 docker compose exec workspace d2 workspace E<lt>aliasE<gt> -c>.
+The last command starts the normal tmux workspace inside the container. Docker
+mode uses argument-list process execution rather than a shell. Without C<-d>
+or C<--docker>, the regular local tmux workspace flow is unchanged. The Compose
+service must bind-mount the alias target at C</workspace> and stay running so
+both in-container commands can execute.
+
 =head1 WHAT USES IT
 
 It is used by workspace-session workflows in the shell, by prompt integrations
@@ -90,6 +106,8 @@ that verify explicit workspace selection, env refresh, and environment fallback.
   dashboard workspace feature-branch-42
   dashboard workspace -c foobar
   dashboard workspace foobar -c
+  dashboard workspace -c foobar --docker
+  dashboard workspace foobar -c -d
 
 =for comment FULL-POD-DOC END
 

@@ -1,0 +1,30 @@
+title: an enabled plugin's PostToolUse hook (${CLAUDE_PLUGIN_ROOT}) adds context to the tool result (ADR 0022)
+files:
+  CLAUDE.md: "# project\n"
+  a.txt: generated
+home:
+  .claude/settings.json: '{ "enabledPlugins": { "demo@local": true } }'
+  .claude/plugins/installed_plugins.json: '{ "version": 2, "plugins": { "demo@local": [ { "scope": "user", "installPath": "{{HOME}}/plugins/demo" } ] } }'
+  plugins/demo/.claude-plugin/plugin.json: '{ "name": "demo" }'
+  plugins/demo/hooks/hooks.json: |
+    { "hooks": { "PostToolUse": [
+      { "matcher": "Read", "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/note", "args": [ "${CLAUDE_PLUGIN_DATA}" ] } ] }
+    ] } }
+  plugins/demo/hooks/note: |
+    #!/bin/sh
+    cat >/dev/null
+    printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"This file is generated (data in %s)."}}' "$1"
+executable: [ ~/plugins/demo/hooks/note ]
+prompt: Read a.txt.
+script:
+  - tool_calls:
+      - [ read_file, { path: a.txt } ]
+  - text: done
+expect:
+  tools:
+    - { name: read_file, text: "generated.*PostToolUse:Read hook additional context: This file is generated \\(data in .*/\\.claude/plugins/data/demo-local\\)" }
+  requests:
+    - { index: 1, contains: "PostToolUse:Read hook additional context: This file is generated" }
+  events:
+    - { type: hook.ran, hook_event: PostToolUse, plugin: demo, source: "plugin:demo", outcome: success }
+    - { type: tool.result, name: read_file }

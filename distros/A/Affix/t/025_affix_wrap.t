@@ -10,6 +10,12 @@ $|++;
 # Determine if Clang is available
 my $CLANG_AVAIL = do {
     my ( undef, undef, $exit ) = capture { system 'clang', '--version' };
+    if ( $exit == 0 && $^O eq 'cygwin' ) {
+
+        # On Cygwin, ensure clang is actually the Cygwin binary and not Windows LLVM
+        my $which = `which clang 2>/dev/null` // '';
+        $exit = 1 unless $which =~ m{^/(usr/)?bin/clang};
+    }
     $exit == 0;
 };
 

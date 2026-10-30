@@ -1,0 +1,16 @@
+title: a WebFetch domain rule refuses its host (and default mode refuses any other with nobody to ask) -- no network needed
+permission_mode: default
+files:
+  .raider/config.yml: |
+    permissions:
+      deny: [ "WebFetch(domain:*.example.com)" ]
+prompt: Fetch.
+script:
+  - tool_calls:
+      - [ web_fetch, { url: "https://www.example.com/page" } ]
+      - [ web_fetch, { url: "https://example.org/" } ]
+  - text: done
+expect:
+  tools:
+    - { name: web_fetch, error: true, text: "denied by rule 'WebFetch\\(domain:\\*\\.example\\.com\\)'" }
+    - { name: web_fetch, error: true, text: "web_fetch uses the network; nobody can approve it.*'WebFetch\\(domain:example\\.org\\)'" }

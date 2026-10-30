@@ -60,4 +60,5 @@ subtest 'Recursion interleaved with yields' => sub {
     };
     ok @log >= 49, 'fiber yielded during recursion';
 };
+#
 done_testing();

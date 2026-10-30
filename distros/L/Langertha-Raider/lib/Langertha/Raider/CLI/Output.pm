@@ -1,6 +1,6 @@
 package Langertha::Raider::CLI::Output;
 # ABSTRACT: Internal terminal renderer of the raider CLI
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use JSON::MaybeXS ();
@@ -91,6 +91,16 @@ sub config_report {
   for my $ign (@{ $report->{ignored_instructions_files} // [] }) {
     $self->emit('  ', $self->c(warn => 'ignored file '.$ign->{file}.': '.$ign->{reason}), "\n");
   }
+  if (my $l = $report->{layout}) {
+    $self->emit($self->c(meta => 'layout: '), $self->c(title => $l->{mode}),
+      $self->c(meta => ' ('.$l->{reason}.'); Claude layout '
+        .( $l->{claude_layout} ? 'on' : 'off' ).' ('.$l->{claude_layout_reason}.')'), "\n");
+    $self->emit('  ', $self->c(meta => 'project dir: '), $l->{project_dir}, "\n") if defined $l->{project_dir};
+  }
+  for my $m (@{ $report->{memory} // [] }) {
+    $self->emit('  ', $self->c(meta => 'memory '), $self->c(title => $m->{label}),
+      $self->c(meta => ' ('.$m->{scope}.( @{ $m->{imports} } ? ', imports '.join(', ', @{ $m->{imports} }) : '' ).')'), "\n");
+  }
   for my $v (@{ $report->{values} }) {
     my $value = ref $v->{value} ? $json->encode($v->{value}) : $v->{value} // '';
     my $from  = 'from '.$v->{source};
@@ -119,12 +129,96 @@ sub config_report {
     $self->emit($self->c(meta => 'perl tools: '), $perl->{enabled} ? 'on' : 'off',
       '  ', $self->c(meta => '('.$perl->{reason}.')'), "\n");
   }
+  if (my $se = $report->{session_embeddings}) {
+    $self->emit($self->c(meta => 'session embeddings: '), $se->{enabled} ? 'on' : 'off',
+      $se->{reason} ? ( '  ', $self->c(meta => '('.$se->{reason}.')') ) : (), "\n");
+  }
   if (my $tools = $report->{tools}) {
     $self->emit($self->c(meta => 'tools:  '), $self->c(meta => '(what a tool can do: information only)'), "\n");
     for my $t (@$tools) {
       my $fx = $t->{effects};
       $self->emit(sprintf("  %s %-10s  %s\n", $self->c(title => sprintf('%-22s', $t->{name})), $t->{source},
         $self->c(meta => !$fx ? 'unknown' : @$fx ? join(', ', @$fx) : 'none')));
+    }
+  }
+  $self->permissions_report($report->{permissions}) if $report->{permissions};
+  $self->mcp_report($report->{mcp}) if $report->{mcp};
+  if (my $skills = $report->{skills}) {
+    $self->emit($self->c(meta => 'skills: '), $self->c(meta => '(listed in the prompt, loaded by the skill tool)'), "\n")
+      if @$skills || @{ $report->{shadowed_skills} // [] } || @{ $report->{skill_problems} // [] };
+    # The name column as wide as the longest name (plugin:skill names run long).
+    my ( $width ) = sort { $b <=> $a } 22, map { length $_->{name} } @$skills;
+    for my $s (@$skills) {
+      $self->emit(sprintf("  %s %-8s  %s\n", $self->c(title => sprintf('%-'.$width.'s', $s->{name})),
+        $s->{listed} ? 'listed' : 'hidden', $self->c(meta => $s->{source}.( $s->{listed} ? '' : '; disable-model-invocation' ))));
+    }
+    for my $s (@{ $report->{shadowed_skills} // [] }) {
+      $self->emit('  ', $self->c(warn => 'shadowed skill '.$s->{name}.' ('.$s->{source}.') by '.$s->{by}), "\n");
+    }
+    for my $p (@{ $report->{skill_problems} // [] }) {
+      $self->emit('  ', $self->c(warn => 'skill file '.$p->{file}.': '.$p->{reason}), "\n");
+    }
+  }
+  if (my $agents = $report->{agents}) {
+    $self->emit($self->c(meta => 'agents: '), $self->c(meta => '(started by the agent tool; tools in raider names)'), "\n");
+    my ( $width ) = sort { $b <=> $a } 22, map { length $_->{name} } @$agents;
+    for my $ag (@$agents) {
+      my $m = $ag->{model};
+      $self->emit('  ', $self->c(title => sprintf('%-'.$width.'s', $ag->{name})), ' ', $self->c(meta => $ag->{source}), "\n");
+      $self->emit('    ', join('; ',
+        'tools '.( ref $ag->{tools} ? ( @{ $ag->{tools} } ? join(', ', @{ $ag->{tools} }) : 'none' ) : $ag->{tools} ),
+        ( @{ $ag->{disallowed} } ? 'not '.join(', ', @{ $ag->{disallowed} }) : () ),
+        'model '.( defined $m->{model} ? $m->{model} : 'inherit ('.$m->{reason}.')' ),
+        ( @{ $ag->{skills} } ? 'skills '.join(', ',
+          map { defined $ag->{skill_via}{$_} ? $_.' ('.$ag->{skill_via}{$_}.')' : $_ } @{ $ag->{skills} }) : () ),
+      ), "\n");
+      $self->emit('    ', $self->c(warn => 'unknown skills: '.join(', ',
+        map { defined $ag->{missing_reasons}{$_} ? $_.' ('.$ag->{missing_reasons}{$_}.')' : $_ } @{ $ag->{missing_skills} })
+        .' (the agent tool refuses to start it)'), "\n") if @{ $ag->{missing_skills} // [] };
+      $self->emit('    ', $self->c(warn => 'unknown tools: '.join(', ', @{ $ag->{unknown_tools} })), "\n")
+        if @{ $ag->{unknown_tools} };
+      $self->emit('    ', $self->c(meta => 'not used by raider: '.join(', ', @{ $ag->{ignored_keys} })), "\n")
+        if @{ $ag->{ignored_keys} };
+    }
+    for my $s (@{ $report->{shadowed_agents} // [] }) {
+      $self->emit('  ', $self->c(warn => 'shadowed agent '.$s->{name}.' ('.$s->{source}.') by '.$s->{by}), "\n");
+    }
+    for my $p (@{ $report->{agent_problems} // [] }) {
+      $self->emit('  ', $self->c(warn => 'agent file '.$p->{file}.': '.$p->{reason}), "\n");
+    }
+  }
+  if (my $st = $report->{settings}) {
+    my $perm = $st->{permissions};
+    $self->emit($self->c(meta => 'settings: '), $self->c(meta => '(Claude Code settings; permissions and hooks read only)'), "\n");
+    for my $f (@{ $st->{files} }) {
+      $self->emit('  ', $self->c(title => sprintf('%-30s', $f->{label})), ' ',
+        $f->{error} ? $self->c(warn => $f->{error}) : $f->{exists} ? 'read' : $self->c(meta => 'not present'), "\n");
+    }
+    $self->emit('  ', $self->c(meta => 'permissions: '), join(', ', map { $_.' '.$perm->{$_} } qw( allow ask deny )),
+      ( defined $perm->{default_mode} ? ', default mode '.$perm->{default_mode} : '' ),
+      ( $perm->{additional_directories} ? ', '.$perm->{additional_directories}.' additional directories' : '' ), "\n");
+    $self->emit('  ', $self->c(meta => 'env: '), join(', ', @{ $st->{env} }), $self->c(meta => ' (set for tools)'), "\n")
+      if @{ $st->{env} };
+    $self->emit('  ', $self->c(meta => 'hooks: '), join(', ', map { $_.' ('.$st->{hooks}{$_}.')' } sort keys %{ $st->{hooks} }),
+      $self->c(meta => ' (not run yet)'), "\n") if %{ $st->{hooks} };
+    $self->emit('  ', $self->c(meta => 'enabled plugins: '), join(', ', @{ $st->{enabled_plugins} }), "\n")
+      if @{ $st->{enabled_plugins} };
+    for my $i (@{ $st->{ignored} }) {
+      $self->emit('  ', $self->c(warn => 'ignored '.$i->{key}.' ('.$i->{source}.'): not used by raider'), "\n");
+    }
+  }
+  if (my @plugins = @{ $report->{plugins} // [] }) {
+    $self->emit($self->c(meta => 'plugins: '), join(', ', map { $_->{name}.' ('.$_->{scope}.')' } @plugins), "\n");
+  }
+  if (my $providers = $report->{providers}) {
+    $self->emit($self->c(meta => 'providers: '), $self->c(meta => '(stored aliases of the home file; raider provider list|show|remove)'), "\n");
+    for my $p (@$providers) {
+      $self->emit(sprintf("  %s %s\n", $self->c(title => sprintf('%-20s', $p->{alias})),
+        $p->{problem} ? $self->c(warn => 'unusable: '.$p->{problem})
+          : join('  ', $p->{origin},
+            $self->c(meta => 'auth: '.( @{ $p->{auth} } ? join(', ', @{ $p->{auth} }) : 'none' )),
+            $self->c(meta => 'credential: '.( $p->{credential_env} // 'none' )),
+            ( $p->{allow_internal} ? $self->c(warn => 'internal allowed') : () ))));
     }
   }
   if (my $pt = $report->{project_tools}) {
@@ -146,6 +240,77 @@ sub config_report {
         @{ $t->{granted_by} } ? 'granted by '.join(', ', @{ $t->{granted_by} }) : 'not granted',
         $self->c(meta => '('.join('; ', @about).')')));
     }
+  }
+  return;
+}
+
+
+sub permissions_report {
+  my ( $self, $p, %o ) = @_;
+  $self->emit($self->c(meta => 'permissions: '), 'mode ', $self->c(title => $p->{mode}),
+    $self->c(meta => ' (from '.$p->{mode_source}.')'), "\n");
+  $self->emit('  ', $self->c(meta => $p->{mode_note}), "\n") if defined $p->{mode_note};
+  for my $m (@{ $p->{ignored_modes} }) {
+    $self->emit('  ', $self->c(warn => 'ignored mode '.$m->{value}.' ('.$m->{source}.'): '.$m->{reason}), "\n");
+  }
+  for my $kind (qw( deny ask allow )) {
+    my $rules = $p->{rules}{$kind};
+    if ($o{rules}) {
+      $self->emit(sprintf("  %s %s  %s\n", $self->c(title => sprintf('%-6s', $kind)), $_->{rule},
+        $self->c(meta => '('.$_->{source}.')'))) for @$rules;
+      next;
+    }
+    next unless @$rules;
+    my ( %count, @order );
+    for my $r (@$rules) { push @order, $r->{source} unless $count{ $r->{source} }++ }
+    $self->emit(sprintf("  %s %d  %s\n", $self->c(title => sprintf('%-6s', $kind)), scalar @$rules,
+      $self->c(meta => '('.join(', ', map { $_.' '.$count{$_} } @order).')')));
+  }
+  for my $r (@{ $p->{invalid_rules} }) {
+    $self->emit('  ', $self->c(warn => 'ignored '.$r->{kind}.' rule '.$r->{rule}.' ('.$r->{source}.'): '.$r->{error}), "\n");
+  }
+  for my $d (@{ $p->{additional_directories} }) {
+    $self->emit('  ', $self->c(meta => 'additional directory '), $d->{path}, $self->c(meta => ' ('.$d->{source}.')'), "\n");
+  }
+  return;
+}
+
+
+my %MCP_STATUS = ( pending => 'pending approval', not_configured => 'not configured' );
+
+sub mcp_report {
+  my ( $self, $r, %o ) = @_;
+  my $servers = $r->{servers} // [];
+  $self->emit($self->c(meta => 'mcp servers: '), @$servers ? scalar(@$servers) : 'none',
+    $self->c(meta => sprintf(' (start %ds each%s)', $r->{startup_timeout_ms} / 1000,
+      defined $r->{tool_timeout_ms} ? sprintf(', calls %ds', $r->{tool_timeout_ms} / 1000) : '')), "\n");
+  for my $s (@$servers) {
+    my $status = $MCP_STATUS{ $s->{status} } // $s->{status};
+    my $color = $s->{status} eq 'connected' ? 'title' : $s->{status} =~ /\A(?:configured|starting|stopped)\z/ ? 'meta' : 'warn';
+    $self->emit('  ', $self->c(title => $s->{name}), ' ', $self->c($color => $status),
+      $self->c(meta => '  '.$s->{scope}.', '.( $s->{transport} // '?' ).', '.$s->{source}), "\n");
+    $self->emit('    ', $self->c(meta => $s->{reason}), "\n")
+      if defined $s->{reason} && $s->{status} ne 'pending';
+    my $ap = $s->{approval};
+    $self->emit('    ', $self->c(meta => 'approval: '.$ap->{state}
+      .( defined $ap->{source} ? ' ('.$ap->{by}.' in '.$ap->{source}.')' : '' )), "\n") if $ap && $ap->{required};
+    $self->emit('    ', $self->c(warn => 'warning: '.$_), "\n") for @{ $s->{warnings} // [] };
+    $self->emit('    ', $self->c(meta => 'shadows '.$_->{scope}.' entry in '.$_->{source}), "\n") for @{ $s->{shadowed} // [] };
+    if ($s->{status} eq 'failed') {
+      my @err = @{ $s->{stderr} // [] };
+      @err = @err[ -3 .. -1 ] if @err > 3;
+      $self->emit('    ', $self->c(meta => 'stderr: '.$_), "\n") for @err;
+    }
+    if ($o{tools} && @{ $s->{tools} // [] }) {
+      $self->emit('    ', $self->c(meta => 'tools: '), join(', ', @{ $s->{tools} }), "\n");
+    }
+  }
+  $self->emit('  ', $self->c(warn => 'cannot read '.$_->{source}.': '.$_->{error}), "\n") for @{ $r->{errors} // [] };
+  $self->emit('  ', $self->c(warn => 'warning: '.$_), "\n") for @{ $r->{warnings} // [] };
+  if (grep { $_->{approval} && $_->{approval}{required} } @$servers) {
+    my $t = $r->{trust} // {};
+    $self->emit('  ', $self->c(meta => 'folder '.( $t->{trusted} ? 'trusted ('.$t->{source}.')' : 'not trusted by Claude Code' )
+      .( defined $r->{approvals_go_to} ? '; answers are saved in '.$r->{approvals_go_to} : '' )), "\n");
   }
   return;
 }
@@ -231,7 +396,7 @@ Langertha::Raider::CLI::Output - Internal terminal renderer of the raider CLI
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -307,14 +472,57 @@ setting with its value, source, what it was merged with, what it overrides
 and whether it applies to the engine or to raider; the instructions source (C<-M>,
 C<.raider/instructions.md>, C<.raider.md>, C<default>) with C<(bare)> under
 C<--bare>, and any instructions file ignored next to the one in use (a
-legacy F<.raider.md> beside F<.raider/instructions.md>); each pack with its state, the
+legacy F<.raider.md> beside F<.raider/instructions.md>); the layout mode
+(ADR 0019) with what decided it and whether the Claude layout is read, and
+each memory file with its scope and imports; each pack with its state, the
 kind of place it was found in (C<project>, C<home>, C<shipped>, C<env>)
 and why it is on or off; the pack directories that were skipped, and why; the perl tools grant; and
-each mounted tool with its source and effect classes (C<unknown> for a tool
-the built-in table does not know); and, when F<~/.raider/config.yml> has a
+each mounted tool with its source and effect classes; the permission policy
+(L</permissions_report>) (C<unknown> for a tool
+the built-in table does not know); each skill with its state (C<listed>,
+or C<hidden> for C<disable-model-invocation>) and root, the shadowed skills
+and the broken skill files; each agent (ADR 0020) with its root, its tools
+in raider names (C<*> for all of the caller's), the disallowed ones, the
+model it would get or why it inherits, its declared skills (marked with
+the skilletor source of those found there) and those that do not resolve,
+each with the reason a resolver gives (the agent tool would refuse it), the tool names
+and frontmatter keys raider does not use, then the shadowed agents and the
+files in an agent root that are not agents; in the Claude layout the settings -- each file
+(read, not present, or its error), the permission rule counts and default
+mode, the names of the C<env> keys (never their values), the hook events
+with their group counts, the enabled plugins and the keys raider does not
+use -- and the plugins whose skills are offered; and, when F<~/.raider/config.yml> has a
 C<project_tools>, each of its selectors (matched or not, and why) and each
 tool name with the selectors granting it, the packs requesting it and
-whether raider knows it -- information only.
+whether raider knows it -- information only; and, when the home file has
+stored provider aliases (C<providers:>), each with origin, auth types,
+credential variable name and whether an internal address is allowed.
+
+=head2 permissions_report
+
+    $out->permissions_report( $app->permissions->report );
+
+Prints the permission policy (L<Langertha::Raider::Permissions/report>):
+the mode and where it came from, ignored mode names, per kind the number of
+rules by source (with C<rules =E<gt> 1> each rule), the invalid rules and
+the additional directories. Part of L</config_report>; the REPL's
+C</permissions> prints it with every rule.
+
+=head2 mcp_report
+
+    $out->mcp_report( $app->mcp_report );
+    $out->mcp_report( $app->mcp_report, tools => 1 );   # /mcp
+
+Prints the configured MCP servers (ADR 0029,
+L<Langertha::Raider::Application/mcp_report>): per server its name and
+status in Claude Code's words (C<connected>, C<failed>, C<pending
+approval>, C<rejected>, C<disabled>, C<unsupported>, C<not configured>,
+C<invalid>, C<configured> before the start), scope, transport and source,
+the reason, the approval and where it came from, warnings, shadowed
+entries; for a failed server its last stderr lines. With C<tools> each
+server's tools too. Then the files that could not be read, the timeouts,
+whether the folder is trusted and where answers are written. Part of
+L</config_report>; the REPL's C</mcp> prints it with the tools.
 
 =head2 migrate_report
 
@@ -359,7 +567,7 @@ appended (C<[rule: pack default]>).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -380,5 +588,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

@@ -1,0 +1,17 @@
+title: read_file then edit_file change an existing file
+files:
+  app.txt: "one\ntwo\nthree\n"
+prompt: Change two to 2.
+script:
+  - tool_calls:
+      - [ read_file, { path: app.txt } ]
+  - tool_calls:
+      - [ edit_file, { path: app.txt, old_string: two, new_string: "2" } ]
+  - text: Geändert.
+expect:
+  answer: Geändert.
+  files:
+    app.txt: "one\n2\nthree\n"
+  tools:
+    - { name: read_file, text: 'two' }
+    - { name: edit_file }

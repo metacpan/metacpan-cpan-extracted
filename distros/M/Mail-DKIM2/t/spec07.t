@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# The draft -07 shared behaviour tests (U1..D1), the cases every
+# The draft -08 shared behaviour tests (U1..D1), the cases every
 # implementation in the interop repository runs with the same domains,
 # addresses and expected strings, plus the -07 review-focus cases.
 #
@@ -79,40 +79,49 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is_pass(add_sig($n2, %HOP2), 'U2: the UTF-8 body line undoes byte-exactly');
 }
 
-# --- U3, U4, U5, K2: malformed Recipes are invalid JSON -------------------------
+# --- U3, U4, U5, K2: malformed Recipes (-08 §14.2, contract D6) ----------------
+# A bad step is "Recipe <path> is invalid"; a fault of the document as a
+# whole is "contains invalid JSON".
 {
+    my $JSON = 'contains invalid JSON';
     my %bad = (
-        'U3 u not canonical (pad bits)' => '{"b":[{"u":["QR=="]}]}',
-        'U4 the old b step'             => '{"b":[{"b":["eA=="]}]}',
-        'U4 two keys in a step'         => '{"b":[{"c":[1,1],"d":["x"]}]}',
-        'U4 an empty step'              => '{"b":[{}]}',
-        'U5 u decodes to a CR'          => '{"b":[{"u":["YQ1i"]}]}',
-        'U5 h with no properties'       => '{"h":{}}',
-        'U5 neither h nor b'            => '{"x":1}',
-        'K2 header name twice (case)'   => '{"h":{"Subject":[],"subject":[]}}',
-        'K2 step key twice (case)'      => '{"b":[{"c":[1,1],"C":[1,1]}]}',
-        'c is not two integers'         => '{"b":[{"c":["1",1]}]}',
-        'c starts at 0'                 => '{"b":[{"c":[0,1]}]}',
-        'u not padded'                  => '{"b":[{"u":["eA"]}]}',
-        'd is not UTF-8'                => qq({"b":[{"d":["caf\xE9"]}]}),
-        'a header Recipe is not array'  => '{"h":{"subject":{"c":[1,1]}}}',
+        'U3 u not canonical (pad bits)' => ['{"b":[{"u":["QR=="]}]}', 'Recipe b[0] is invalid'],
+        'U4 the old b step'             => ['{"b":[{"b":["eA=="]}]}', 'Recipe b[0] is invalid'],
+        'U4 two keys in a step'         => ['{"b":[{"c":[1,1],"d":["x"]}]}', 'Recipe b[0] is invalid'],
+        'U4 an empty step'              => ['{"b":[{}]}', 'Recipe b[0] is invalid'],
+        'U5 u decodes to a CR'          => ['{"b":[{"u":["YQ1i"]}]}', 'Recipe b[0] is invalid'],
+        'U5 h with no properties'       => ['{"h":{}}', $JSON],
+        'U5 neither h nor b'            => ['{"x":1}', $JSON],
+        'K2 header name twice (case)'   => ['{"h":{"Subject":[],"subject":[]}}', $JSON],
+        'K2 step key twice (case)'      => ['{"b":[{"c":[1,1],"C":[1,1]}]}', $JSON],
+        'c is not two integers'         => ['{"b":[{"c":["1",1]}]}', 'Recipe b[0] is invalid'],
+        'c starts at 0'                 => ['{"b":[{"c":[0,1]}]}', 'Recipe b[0] is invalid'],
+        'u not padded'                  => ['{"b":[{"u":["eA"]}]}', 'Recipe b[0] is invalid'],
+        'd is not UTF-8'                => [qq({"b":[{"d":["caf\xE9"]}]}), $JSON],
+        'a header Recipe is not array'  => ['{"h":{"subject":{"c":[1,1]}}}', 'Recipe h.subject is invalid'],
+        'a step in the second header'   => ['{"h":{"subject":[{"c":[1,1]}],"to":[{"c":[1]}]}}',
+                                            'Recipe h.to[0] is invalid'],
     );
     for my $name (sort keys %bad) {
-        my $t = add_sig(mi_with_recipe($HOP1_TEXT, $bad{$name}), %HOP2);
-        is_error($t, 'permerror', 'PERMERROR: Message-Instance m=2 contains invalid JSON', $name);
-    }
-}
-
-# --- K1: keys match without regard to case --------------------------------------
-{
-    for my $json ('{"h":{"subject":[{"c":[1,1]}]}}', '{"H":{"Subject":[{"C":[1,1]}]}}',
-                  '{"B":[{"C":[1,1]}]}') {
+        my ($json, $want) = @{ $bad{$name} };
         my $t = add_sig(mi_with_recipe($HOP1_TEXT, $json), %HOP2);
-        is_pass($t, "K1: $json verifies");
+        is_error($t, 'permerror', "PERMERROR: Message-Instance m=2 $want", $name);
     }
 }
 
-# --- No r= at m=2: no change (-07 sections 9 and 12.1) ---------------------------
+# --- K1: keys are lowercase (-08 §5, contract D10) -------------------------------
+{
+    my $t = add_sig(mi_with_recipe($HOP1_TEXT, '{"h":{"subject":[{"c":[1,1]}]}}'), %HOP2);
+    is_pass($t, 'K1: {"h":{"subject":[{"c":[1,1]}]}} verifies');
+    for my $json ('{"H":{"subject":[{"c":[1,1]}]}}', '{"h":{"Subject":[{"c":[1,1]}]}}',
+                  '{"b":[{"C":[1,1]}]}') {
+        my $t = add_sig(mi_with_recipe($HOP1_TEXT, $json), %HOP2);
+        is_error($t, 'permerror', 'PERMERROR: Message-Instance m=2 contains invalid JSON',
+            "K1: $json is invalid");
+    }
+}
+
+# --- No r= at m=2: no change (-08 sections 9 and 12.1) ---------------------------
 {
     (my $no_r = mi_with_recipe($HOP1_TEXT, '{}')) =~ s/; r=[^;]*;/;/;
     unlike($no_r, qr/^Message-Instance: m=2;[^\r\n]*r=/m, 'no-change MI: no r= tag');
@@ -179,12 +188,12 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is_pass(add_sig($odd, %HOP2), 'C1: ... and an mf= hop matches them too');
 
     my $c2 = add_sig($HOP1_TEXT, d => 'other.net', mf => '<>', rt => ['<a@example.com>']);
-    is_error($c2, 'permerror', 'PERMERROR: DKIM2-Signature i=2 d= does not match the rt= of i=1', 'C2');
-    # -07 section 13.1: the top signature and top instance are fine, so it
+    is_error($c2, 'fail', 'FAIL: DKIM2-Signature i=2 d= does not match the rt= of i=1', 'C2');
+    # -08 section 13.2: the top signature and top instance are fine, so it
     # is Provisionally Verified all the same.
     my $pv = verify($c2);
     ok($pv->provisionally_verified, 'C2: still Provisionally Verified');
-    is($pv->details, 'PERMERROR: DKIM2-Signature i=2 d= does not match the rt= of i=1',
+    is($pv->details, 'FAIL: DKIM2-Signature i=2 d= does not match the rt= of i=1',
         'C2: ... and the verdict is left alone');
     (my $bad_top = $c2) =~ s/^Subject: test/Subject: changed/m;
     ok(!verify($bad_top)->provisionally_verified, 'a top instance that does not match: not PV');
@@ -200,23 +209,23 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
                        rt => ['<x@example.org>']);
     $swap = add_sig($swap, d => 'mail.example.org', nd => 'fwd.example.net');
     $swap = add_sig($swap, d => 'fwd.example.net', mf => '<b@fwd.example.net>', rt => ['<c@dest.example>']);
-    is_error($swap, 'permerror', 'PERMERROR: DKIM2-Signature i=2 d= does not match the rt= of i=1',
+    is_error($swap, 'fail', 'FAIL: DKIM2-Signature i=2 d= does not match the rt= of i=1',
         'C3 swapped (only the rt= domain is shortened)');
 
     my $c4 = add_sig($nd, d => 'other.example', mf => '<b@other.example>', rt => ['<c@dest.example>']);
-    is_error($c4, 'permerror', 'PERMERROR: DKIM2-Signature i=2 nd= does not match', 'C4');
+    is_error($c4, 'fail', 'FAIL: DKIM2-Signature i=2 nd= does not match', 'C4');
 
     my $lit = add_sig(add_mi(message()), d => 'example.com', mf => '<a@example.com>',
                       rt => ['<x@[192.0.2.1]>']);
     my ($r5, $d5) = verdict(add_sig($lit, d => 'example.org', mf => '<y@[192.0.2.1]>',
                                     rt => ['<c@dest.example>']));
-    is($r5, 'permerror', 'C5: a domain literal never matches');
-    like($d5, qr/\APERMERROR: DKIM2-Signature i=2 (?:mf= does not match the rt= of i=1|MAIL FROM and d= do not match)\z/,
+    is($r5, 'fail', 'C5: a domain literal never matches');
+    like($d5, qr/\AFAIL: DKIM2-Signature i=2 (?:mf= does not match the rt= of i=1|MAIL FROM and d= do not match)\z/,
         'C5: details') or diag($d5);
 
     my $c6 = add_sig(add_mi(message()), d => 'example.com', mf => '<a@example.net>',
                      rt => ['<list@lists.example.org>']);
-    is_error($c6, 'permerror', 'PERMERROR: DKIM2-Signature i=1 MAIL FROM and d= do not match', 'C6');
+    is_error($c6, 'fail', 'FAIL: DKIM2-Signature i=1 MAIL FROM and d= do not match', 'C6');
 }
 
 # --- A1..A4: From must be Authentic -----------------------------------------------
@@ -224,7 +233,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is_pass($HOP1_TEXT, 'A1: From A <a@example.com>, d=example.com');
     my $net = add_sig(add_mi(message()), d => 'example.net', mf => '<a@example.net>',
                       rt => ['<list@lists.example.org>']);
-    is_error($net, 'permerror', 'PERMERROR: DKIM2-Signature i=1 matching From is not authentic',
+    is_error($net, 'fail', 'FAIL: DKIM2-Signature i=1 matching From is not authentic',
         'A1: d=example.net');
     is_pass(add_sig(add_mi(message(from => 'a@sub.example.com')), %HOP1), 'A1: a@sub.example.com');
     is_pass(add_sig(add_mi(message(from => "=?utf-8?q?Caf=C3=A9?=\r\n <a\@example.com>")), %HOP1),
@@ -235,30 +244,30 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     # (final review T3); all five implementations agree.
     for my $from ('a@example.com, b@example.com', 'a@[192.0.2.1]', 'group: a@example.com;',
                   '"A" <a@example.com>, <b@example.com>', 'A a@example.com') {
-        is_error(add_sig(add_mi(message(from => $from)), %HOP1), 'permerror',
-            'PERMERROR: DKIM2-Signature i=1 matching From is not authentic', "A1: From: $from");
+        is_error(add_sig(add_mi(message(from => $from)), %HOP1), 'fail',
+            'FAIL: DKIM2-Signature i=1 matching From is not authentic', "A1: From: $from");
     }
     my $two = message(extra => "From: a\@example.com\r\n");
-    is_error(add_sig(add_mi($two), %HOP1), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 matching From is not authentic', 'A1: two From fields');
+    is_error(add_sig(add_mi($two), %HOP1), 'fail',
+        'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A1: two From fields');
     my $none = "To: b\@example.net\r\nSubject: no from\r\n\r\nbody\r\n";
-    is_error(add_sig(add_mi($none), %HOP1), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 matching From is not authentic', 'A1: no From field');
+    is_error(add_sig(add_mi($none), %HOP1), 'fail',
+        'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A1: no From field');
 
     # A2: the list changes From in m=2 and signs i=2.
     (my $changed = $HOP1_TEXT) =~ s/^From: .*$/From: list\@lists.example.org\r/m;
     is_pass(add_sig(add_mi($changed, $HOP1_TEXT), %HOP2), 'A2: From changed in m=2, signed by example.org');
     (my $elsewhere = $HOP1_TEXT) =~ s/^From: .*$/From: x\@elsewhere.net\r/m;
-    is_error(add_sig(add_mi($elsewhere, $HOP1_TEXT), %HOP2), 'permerror',
-        'PERMERROR: DKIM2-Signature i=2 matching From is not authentic', 'A2: From changed to elsewhere.net');
+    is_error(add_sig(add_mi($elsewhere, $HOP1_TEXT), %HOP2), 'fail',
+        'FAIL: DKIM2-Signature i=2 matching From is not authentic', 'A2: From changed to elsewhere.net');
     # ... and the original From still has to be Authentic against i=1.
     my $bad1 = add_sig(add_mi(message(from => 'a@example.net')), d => 'example.com',
                        mf => '<a@example.com>', rt => ['<list@lists.example.org>']);
     (my $fixed = $bad1) =~ s/^From: .*$/From: list\@lists.example.org\r/m;
-    is_error(add_sig(add_mi($fixed, $bad1), %HOP2), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 matching From is not authentic', 'A2: a From before the change is checked too');
-    is_error(add_sig(add_mi($fixed, $bad1), %HOP2), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 matching From is not authentic', 'A2: ... with the undo walk',
+    is_error(add_sig(add_mi($fixed, $bad1), %HOP2), 'fail',
+        'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A2: a From before the change is checked too');
+    is_error(add_sig(add_mi($fixed, $bad1), %HOP2), 'fail',
+        'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A2: ... with the undo walk',
         StreamBody => 0);
 
     # Ruling 19: i=1 is checked against the From at state m(i=1). An
@@ -272,8 +281,8 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
         'Ruling 19: ... with the undo walk', StreamBody => 0);
     my $ingress_ok = add_mi(message());
     (my $tagged = $ingress_ok) =~ s/^Subject: .*$/Subject: [list] test\r/m;
-    is_error(add_sig(add_mi($tagged, $ingress_ok), %HOP2), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 matching From is not authentic',
+    is_error(add_sig(add_mi($tagged, $ingress_ok), %HOP2), 'fail',
+        'FAIL: DKIM2-Signature i=1 matching From is not authentic',
         'Ruling 19: the From at state m(i=1) is checked against i=1');
 
     # A3: the signer refuses.
@@ -293,17 +302,18 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
 # --- T1: timestamps -----------------------------------------------------------------
 {
     is_pass(add_sig(add_mi(message()), %HOP1, t => time + 7200), 'T1: two hours ahead');
-    is_error(add_sig(add_mi(message()), %HOP1, t => time + 172800), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 signature is from the future', 'T1: two days ahead');
-    is_error(add_sig(add_mi(message()), %HOP1, t => time - 15 * 86400), 'permerror',
-        'PERMERROR: DKIM2-Signature i=1 signature expired', 'T1: fifteen days old');
+    is_error(add_sig(add_mi(message()), %HOP1, t => time + 172800), 'fail',
+        'FAIL: DKIM2-Signature i=1 signature is from the future', 'T1: two days ahead');
+    is_error(add_sig(add_mi(message()), %HOP1, t => time - 15 * 86400), 'fail',
+        'FAIL: DKIM2-Signature i=1 signature expired', 'T1: fifteen days old');
 }
 
 # --- D1: no DSN for a null top mf= ----------------------------------------------------
 {
-    my %dsn = (Signer => Mail::DKIM2::Signer->new(Domain => 'example.net', Selector => 'sel1',
+    # The DSN's d= is a recipient domain of the reported hop (-08 section 16.2).
+    my %dsn = (Signer => Mail::DKIM2::Signer->new(Domain => 'example.org', Selector => 'sel1',
                    Key => Spec07Fixture::key(), MailFrom => '<>'),
-               ReportingMTA => 'example.net', PubkeyCallback => Spec07Fixture::pubkey_cb());
+               ReportingMTA => 'lists.example.org', PubkeyCallback => Spec07Fixture::pubkey_cb());
     my $null_top = add_sig($HOP1_TEXT, d => 'example.org', mf => '<>', rt => ['<b@example.net>']);
     my ($ok, $why) = Mail::DKIM2::DSN->may_generate(Message => $null_top,
         PubkeyCallback => Spec07Fixture::pubkey_cb());
@@ -366,7 +376,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     $s->load($nd);
     is($s->result, 'signed', 'gate: ... and signs') or diag($s->details);
     is_pass($s->as_string . "\r\n" . $nd, 'gate: ... and the result verifies');
-    is_error($nd, 'permerror', 'PERMERROR: DKIM2-Signature i=2 unexpected nd= tag', 'inbound top nd=');
+    is_error($nd, 'fail', 'FAIL: DKIM2-Signature i=2 unexpected nd= tag', 'inbound top nd=');
 
     # From changed in an unsigned top instance.
     (my $changed = $HOP1_TEXT) =~ s/^From: .*$/From: list\@lists.example.org\r/m;
@@ -406,13 +416,13 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is_error($from, 'fail', 'FAIL: Message-Instance m=1 header hash sha256 mismatch',
         'C9: From changed after signing (14.7 before 14.8)');
     is_error(add_sig(add_mi(message()), %HOP1, mf => '<a@example.net>', t => time - 15 * 86400),
-        'permerror', 'PERMERROR: DKIM2-Signature i=1 signature expired',
+        'fail', 'FAIL: DKIM2-Signature i=1 signature expired',
         'C9: expired and custody (14.3 before 14.4)');
     is_error(add_sig(add_mi(message()), d => 'example.com', nd => 'fwd.example.net', t => time - 15 * 86400),
-        'permerror', 'PERMERROR: DKIM2-Signature i=1 signature expired',
+        'fail', 'FAIL: DKIM2-Signature i=1 signature expired',
         'C9: expired and a top nd= (14.3 before 14.4)');
     is_error($corrupt->(add_sig(add_mi(message()), %HOP1, mf => '<a@example.net>'), 1),
-        'permerror', 'PERMERROR: DKIM2-Signature i=1 MAIL FROM and d= do not match',
+        'fail', 'FAIL: DKIM2-Signature i=1 MAIL FROM and d= do not match',
         'C9: custody and a bad signature (14.4 before 14.6)');
 
     # The Message-Instances before the signatures: a header or body hash that

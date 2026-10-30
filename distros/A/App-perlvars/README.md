@@ -4,7 +4,7 @@ App::perlvars - CLI tool to detect unused variables in Perl modules
 
 # VERSION
 
-version 0.000008
+version 0.000009
 
 # DESCRIPTION
 
@@ -48,11 +48,24 @@ variable in a package-less file.
 
 Wrapping a file for analysis `require`s it, which executes its compile-time
 code (`use` statements and `BEGIN` blocks) even though its runtime statements
-do not run. A package-less file that cannot be compiled in isolation -- because
-it finds a sibling library at runtime (e.g. [FindBin](https://metacpan.org/pod/FindBin)), depends on a module
-that is not installed, or contains a `#line` directive that hides its
-subroutines from [Test::Vars](https://metacpan.org/pod/Test%3A%3AVars) -- is skipped silently and returns a success
-exit code with no notes.
+do not run. The analyzed file's own output on `STDOUT` and `STDERR` is
+suppressed during analysis so it does not leak through `perlvars`; the real
+findings are returned, not printed. A package-less file that cannot be analyzed
+\-- because it finds a sibling library at runtime (e.g. [FindBin](https://metacpan.org/pod/FindBin)), depends on
+a module that is not installed, contains a `#line` directive that hides its
+subroutines from [Test::Vars](https://metacpan.org/pod/Test%3A%3AVars), or cannot be parsed as Perl at all -- is
+skipped silently and returns a success exit code with no notes.
+
+Files whose source is UTF-8 (for example a file with a Unicode identifier under
+`use utf8`) are handled: the file body is always copied verbatim as raw bytes,
+and when the tree cannot be built from those raw bytes it is rebuilt from the
+UTF-8-decoded source.
+
+A file that **does** declare a package is analyzed directly rather than wrapped,
+but it is `require`d in the same way, so the same protections apply: its
+compile-time output is suppressed, and if it exits or dies at compile time (for
+example `use Test::More skip_all`) it is skipped silently with a success exit
+code rather than aborting the run.
 
 # AUTHOR
 

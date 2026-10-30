@@ -1,0 +1,22 @@
+title: todo_write is not a task tool -- TaskCreated and TaskCompleted hooks do not run for it, as in Claude Code (ADR 0022 addendum)
+app: { task_tools: false }
+files:
+  .claude/settings.json: |
+    { "hooks": {
+      "TaskCreated":   [ { "hooks": [ { "type": "command", "command": "echo created > {{ROOT}}/created.txt; exit 2" } ] } ],
+      "TaskCompleted": [ { "hooks": [ { "type": "command", "command": "echo completed > {{ROOT}}/completed.txt; exit 2" } ] } ]
+    } }
+prompt: Keep a list.
+script:
+  - tool_calls:
+      - - todo_write
+        - todos:
+            - { content: First, status: completed }
+  - text: listed
+expect:
+  answer: listed
+  absent: [ created.txt, completed.txt ]
+  todos:
+    - { content: First, status: completed }
+  tools:
+    - { name: todo_write }

@@ -56,12 +56,17 @@ describe on_end => sub {
     case 'Sampled span' => sub {
         @calls = (
             [ export   => [ 'snapshot', 'snapshot' ], 30_000 ],
+            [ 'force_flush' ],
             [ 'shutdown' ],
         );
     };
 
     case 'Unsampled span' => sub {
         $sampled = 0;
+        @calls = (
+            [ 'force_flush' ],
+            [ 'shutdown' ],
+        );
     };
 
     it Works => { flat => 1 } => sub {

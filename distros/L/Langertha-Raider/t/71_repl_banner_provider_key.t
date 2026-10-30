@@ -48,6 +48,13 @@ subtest 'endpoint without an auth_ref' => sub {
   like( $text, qr/^api key:  \(no API key required\)$/m, 'needs none' );
 };
 
+subtest 'endpoint without an auth_ref and -k: the key is not "none required" (k150)' => sub {
+  my $text = banner_text( provider => { %provider, auth => undef }, api_key => $SECRET );
+  like( $text, qr/^api key:  \(the endpoint asks for none; the key you gave is set and sent\)$/m, 'says the key is set' );
+  unlike( $text, qr/no API key required/, 'not claimed to need none' );
+  unlike( $text, qr/\Q$SECRET\E/, 'the key itself is never printed' );
+};
+
 subtest 'without --provider' => sub {
   my $text = banner_text( engine => 'openai', api_key => $SECRET );
   like( $text, qr/^api key:  OPENAI_API_KEY \(missing\)$/m, 'env var status as before' );

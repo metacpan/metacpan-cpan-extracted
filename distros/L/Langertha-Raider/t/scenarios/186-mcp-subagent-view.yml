@@ -1,0 +1,39 @@
+title: a subagent uses the caller's MCP connection, limited to the tools its agent file names; its own stock tools stay raider's (ADR 0029 §11)
+permission_mode: default
+approve: [ once ]
+files:
+  hello.txt: hi
+  .raider/agents/reader.md: |
+    ---
+    name: reader
+    description: Reads
+    tools: Read, mcp__t__echo_env
+    ---
+    You read.
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+prompt: Let the reader look.
+script:
+  - tool_calls:
+      - [ agent, { description: Look, prompt: Read hello.txt and ask the server., subagent_type: reader } ]
+  - tool_calls:
+      - [ read_file, { path: hello.txt } ]
+      - [ mcp__t__echo_env, { name: HOME } ]
+      - [ mcp__t__with_dot, {} ]
+  - text: looked
+  - text: The reader looked.
+expect:
+  answer: The reader looked.
+  requests:
+    - { index: 1, lacks: [ mcp__t__with_dot, mcp__t__fail ] }
+  tools:
+    - { name: read_file, text: "hi" }
+    - { name: mcp__t__echo_env, text: "\\AHOME=" }
+    - { name: mcp__t__with_dot, error: true, text: "No such tool available" }
+    - { name: agent, text: '\Alooked\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: 3\nduration_ms: \d+</usage>\z' }
+  permissions:
+    - { tool: mcp__t__echo_env, rule: mcp__t__echo_env }

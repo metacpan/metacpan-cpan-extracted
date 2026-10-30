@@ -9,6 +9,7 @@ use File::Spec;
 use File::Temp qw(tempdir tempfile);
 use Mojo::File;
 use Mojo::Util qw(url_escape);
+use Test::Permissions qw(skip_unless_can_revoke with_revoked);
 
 # ---------------------------------------------------------------------------
 # Minimal stub geocoder and point, injected through the app config so no
@@ -901,19 +902,20 @@ subtest 'POST /export -- write failure returns 500 JSON {error}' => sub {
 	my $dir = tempdir(CLEANUP => 1);
 
 	SKIP: {
-		skip 'Cannot simulate write failure as root', 3 unless $> != 0;
-		chmod(0555, $dir) or skip 'Cannot set directory read-only', 3;
+		# Skips where chmod cannot stop a file being created: root, Cygwin
+		# and Windows ACLs, some network and container filesystems.
+		skip_unless_can_revoke('create', 4, $dir);
 
-		$t->post_ok('/export', form => {
-			l        => "table:$SALES_TABLE",
-			dir      => $dir,
-			filename => 'out.csv',
-		})->status_is(500, '500 when write to read-only dir fails')
-		  ->json_has('/error', 'error key present in JSON response');
-		my $err = $t->tx->res->json('/error');
-		like $err, qr/Write failed/i, 'error message mentions Write failed';
-
-		chmod(0755, $dir);	# restore so CLEANUP can remove the dir
+		with_revoked('create', $dir, sub {
+			$t->post_ok('/export', form => {
+				l        => "table:$SALES_TABLE",
+				dir      => $dir,
+				filename => 'out.csv',
+			})->status_is(500, '500 when write to read-only dir fails')
+			  ->json_has('/error', 'error key present in JSON response');
+			my $err = $t->tx->res->json('/error');
+			like $err, qr/Write failed/i, 'error message mentions Write failed';
+		});
 	}
 	delete $ledger{'POST./export.write_failed'};
 };
@@ -1653,7 +1655,10 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 	require HTTP::Response;
 
 	# Helper: wraps an LLM text response in the Anthropic Messages API envelope.
-	my sub make_llm_response {
+	# A package sub, not "my sub": on perl 5.42 a lexical sub here makes
+	# Devel::Cover segfault in B::CV::GV at global destruction, after every
+	# test has passed.
+	sub make_llm_response {
 		my ($text, $status) = @_;
 		$status //= 200;
 		if ($status != 200) {

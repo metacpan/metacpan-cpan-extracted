@@ -2,7 +2,6 @@ package CallBackery::GuiPlugin::UserForm;
 use Mojo::Base 'CallBackery::GuiPlugin::AbstractForm';
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
-use Mojo::Util qw(hmac_sha1_sum);
 use Mojo::JSON qw(true false);
 
 =head1 NAME
@@ -156,9 +155,9 @@ has actionCfg => sub {
             die mkerror(2847,trm("The password instances did not match."))
                 if $args->{cbuser_password} ne $args->{cbuser_password_check};
             push @fields, 'password';
+            $args->{cbuser_password} = $self->user->hashPassword($args->{cbuser_password});
         }
 
-        $args->{cbuser_password} = hmac_sha1_sum($args->{cbuser_password});
         my $db = $self->user->db;
 
         $args->{cbuser_id} = $db->updateOrInsertData('cbuser',{
@@ -261,6 +260,7 @@ sub getAllFieldValues {
 
     my $data = $self->user->db->fetchRow('cbuser',{id => $id});
     $data->{cbuser_password} = $DUMMY_PASSWORD;
+    delete $data->{cbuser_note} unless $self->user->may('admin');
     $data->{cbuser_password_check} = $DUMMY_PASSWORD;
     my $db = $self->user->mojoSqlDb;
     my $rightTbl= $db->dbh->quote_identifier('cbright');

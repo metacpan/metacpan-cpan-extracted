@@ -98,6 +98,13 @@ eval { fisher_test([[3,1],[1,3]], alternative => "sideways") };
 ok($@, "C5 bad alternative croaks");
 eval { fisher_test([[3,1],[1,3]], conf_level => 1.5) };
 ok($@, "C5 conf_level out of range croaks");
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('fisher_test');
+	like($screen, qr/\Ausage: fisher_test\(/, 'C5 fisher_test has a help screen');
+	eval { fisher_test(5) };
+	is($@, $screen . "fisher_test: error: the data must be a reference to a 2D array or hash\n",
+		'C5 a call-form error is the screen, then the error on the last line');
+}
 
 # R x C tables (added 2026-07-16). fisher_test now accepts any table >= 2x2.
 # For non-2x2 the two-sided p-value is computed by exact enumeration over the

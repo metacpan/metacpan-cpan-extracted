@@ -435,6 +435,24 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = be 22 juov 1995 mKr.
   -0010-09-15T04:44:23 = lá 15 čakč -10 oKr.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = mKr. 2008 guovvamánnu
+   1995-12-22T09:05:02 = mKr. 1995 juovlamánnu
+  -0010-09-15T04:44:23 = oKr. -10 čakčamánnu
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = mKr. 2008 guovvamánnu 5, di
+   1995-12-22T09:05:02 = mKr. 1995 juovlamánnu 22, be
+  -0010-09-15T04:44:23 = oKr. -10 čakčamánnu 15, lá
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = mKr. 2008 guovvamánnu 5
+   1995-12-22T09:05:02 = mKr. 1995 juovlamánnu 22
+  -0010-09-15T04:44:23 = oKr. -10 čakčamánnu 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 guov 2008 mKr.
@@ -506,6 +524,12 @@ Northern Sami Finland locale.
    2008-02-05T18:30:30 = di 5 guov
    1995-12-22T09:05:02 = be 22 juov
   -0010-09-15T04:44:23 = lá 15 čakč
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = guovvamánnu 5, di
+   1995-12-22T09:05:02 = juovlamánnu 22, be
+  -0010-09-15T04:44:23 = čakčamánnu 15, lá
 
 =head3 MMMMW-count-one (MMMM:'a' 'vahkku' W)
 

@@ -111,6 +111,20 @@ C<method pipe_init : void ($uv_pipe : L<UV::Handle::Pipe|SPVM::UV::Handle::Pipe>
 
 Initializes a pipe handle $uv_pipe associated with the event loop with $ipc. See L<uv_pipe_init|https://docs.libuv.org/en/v1.x/pipe.html#c.uv_pipe_init>.
 
+=head2 spawn
+
+C<method spawn : int ($uv_process : L<UV::Handle::Process|SPVM::UV::Handle::Process>, $options : L<UV::ProcessOptions|SPVM::UV::ProcessOptions>);>
+
+Spawns a process with the specified options associated with the event loop, and returns the return value of L<uv_spawn|https://docs.libuv.org/en/v1.x/process.html#c.uv_spawn>.
+
+Exceptions:
+
+$uv_process must be defined. Otherwise an exception is thrown.
+
+$options must be defined. Otherwise an exception is thrown.
+
+If C<uv_spawn> fails, an exception is thrown.
+
 =head2 DESTROY
 
 C<method DESTROY : void ();>

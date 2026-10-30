@@ -435,6 +435,24 @@ Venetian locale.
    1995-12-22T09:05:02 = vèn 22 dez 1995 d.C.
   -0010-09-15T04:44:23 = sab 15 set -10 v.C.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = d.C. 2008 febraro
+   1995-12-22T09:05:02 = d.C. 1995 dezenbre
+  -0010-09-15T04:44:23 = v.C. -10 setenbre
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = d.C. 2008 febraro 5, mar
+   1995-12-22T09:05:02 = d.C. 1995 dezenbre 22, vèn
+  -0010-09-15T04:44:23 = v.C. -10 setenbre 15, sab
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = d.C. 2008 febraro 5
+   1995-12-22T09:05:02 = d.C. 1995 dezenbre 22
+  -0010-09-15T04:44:23 = v.C. -10 setenbre 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 feb 2008 d.C.
@@ -506,6 +524,12 @@ Venetian locale.
    2008-02-05T18:30:30 = mar 5 feb
    1995-12-22T09:05:02 = vèn 22 dez
   -0010-09-15T04:44:23 = sab 15 set
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = febraro 5, mar
+   1995-12-22T09:05:02 = dezenbre 22, vèn
+  -0010-09-15T04:44:23 = setenbre 15, sab
 
 =head3 MMMMW-count-one (W'ª' 'setemana' 'de' MMMM)
 

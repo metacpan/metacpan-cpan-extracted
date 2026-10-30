@@ -27,11 +27,25 @@ use Stats::LikeR qw(write_table);
 my $dir = File::Temp->newdir;
 my $seq = 0;
 sub texfile { $seq++; return "$dir/t$seq.tex" }
+# write_table opens its file with PerlIO_open()'s default layers, which are
+# :crlf where perl is a CRLF shop (Windows), so every "\n" it writes lands as
+# "\r\n" there; 0.33's MSWin32 smoker failed 8 of these on that alone.
+# :crlf maps "\n" and nothing else, so undoing it gives back exactly the text
+# write_table wrote -- a CR that leaked from tex_comment still shows -- and the
+# literals below stay in \n.
+my $CRLF = do {
+	open my $fh, '>', "$dir/nl.probe" or die "cannot write a probe: $!";
+	my $crlf = grep { $_ eq 'crlf' } PerlIO::get_layers($fh);
+	close $fh;
+	$crlf;
+};
 sub slurp {
 	my $file = shift;
 	open my $fh, '<:raw', $file or die "cannot read $file: $!";
 	local $/;
-	return <$fh>;
+	my $text = <$fh>;
+	$text =~ s/\r\n/\n/g if $CRLF;
+	return $text;
 }
 # the file after its "%written by" line
 sub body {
@@ -76,9 +90,9 @@ sub body {
 	write_table([['a'], [1]], $f, quiet => 1, tex_comment => bless([], 'Plain'));
 	like(body($f), qr/\A% Plain=ARRAY\(0x[0-9a-f]+\)\n/, 'a blessed array is an object, and stringified');
 	throws_ok { write_table([['a']], texfile(), quiet => 1, tex_comment => {}) }
-		qr/^write_table: 'tex_comment' must be a string or an ARRAY reference/, 'an unblessed hash dies';
+		qr/\nwrite_table: error: 'tex_comment' must be a string or an ARRAY reference/, 'an unblessed hash dies';
 	throws_ok { write_table([['a']], "$dir/x.xlsx", quiet => 1, xlsx_comment => sub { 1 }) }
-		qr/^write_table: 'xlsx_comment' must be a string or an ARRAY reference/, 'xlsx_comment: an unblessed code ref dies';
+		qr/\nwrite_table: error: 'xlsx_comment' must be a string or an ARRAY reference/, 'xlsx_comment: an unblessed code ref dies';
 	my $kept = texfile();
 	write_table([['old']], $kept, quiet => 1, tex => 0);
 	eval { write_table([['a']], $kept, quiet => 1, tex_comment => {}) };

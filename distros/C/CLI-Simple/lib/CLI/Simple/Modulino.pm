@@ -103,10 +103,13 @@ __DATA__
 # modulino invocation
 
 MODULINO_WRAPPER=@modulino_wrapper@
-MODULE_NAME=@perl_module_name@
-MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
+MODULINO_MODULE_NAME=@perl_module_name@
 
-MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"
+MODULINO_WRAPPER="$MODULINO_WRAPPER" \
+MODULINO_MODULE_NAME="$MODULINO_MODULE_NAME" \
+  perl -M"$MODULINO_MODULE_NAME" \
+  -e 'exit $ENV{MODULINO_MODULE_NAME}->main' \
+  -- "$@"
 
 =pod
 
@@ -116,21 +119,21 @@ CLI::Simple::Modulino - Create CLI wrapper around a modulino
 
 =head1 SYNOPSIS
 
- # create $RealBin/my-app
- create-modulino -m My::App
+  # create my-app in the default installation directory
+  create-modulino -m My::App
 
- # create /usr/local/bin/my-app
- create-modulino -i /usr/local/bin -m My::App
+  # create /usr/local/bin/my-app
+  create-modulino -i /usr/local/bin -m My::App
 
- # create /usr/local/bin app
- create-modulino -a app -i /usr/local/bin -m My::App
+  # create /usr/local/bin app
+  create-modulino -a app -i /usr/local/bin -m My::App
 
 =head2 Options
 
- -h, --help            help
- -a, --alias           name of the modulino (default: lower cased snake cased module name)
- -m, --module          module name - Perl module implementing the modulino
- -i, --installbindir   executable directory
+  -h, --help            help
+  -a, --alias           wrapper name (default: lowercase module name with :: replaced by -)
+  -m, --module          module name - Perl module implementing the modulino
+  -i, --installbindir   executable directory
 
 Example:
 

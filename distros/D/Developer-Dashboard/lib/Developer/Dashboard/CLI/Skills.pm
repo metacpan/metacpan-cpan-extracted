@@ -3,10 +3,10 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Getopt::Long qw(GetOptionsFromArray);
-use Cwd qw(getcwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::CLI::Progress;
 use Developer::Dashboard::CLI::TableHelpers qw(render_table);
@@ -92,7 +92,7 @@ sub _skills_action_install {
     my $error;
     eval {
         $result = $use_ddfile
-          ? $manager->install_from_ddfiles( getcwd() )
+          ? $manager->install_from_ddfiles( current_working_directory() )
           : @argv
             ? @argv == 1
                 ? $manager->install( shift @argv )

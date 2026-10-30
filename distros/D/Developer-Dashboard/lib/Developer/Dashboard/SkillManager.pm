@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -19,6 +19,7 @@ use JSON::XS qw(decode_json encode_json);
 use Symbol qw(gensym);
 use Developer::Dashboard::Platform qw(command_in_path passwd_home_directory);
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Developer::Dashboard::StreamDrain qw(_drain_ready_handle);
 
 # new()
@@ -1356,7 +1357,7 @@ sub _run_streaming_command {
     };
 
     if ( defined $cwd && $cwd ne '' ) {
-        my $orig = Cwd::getcwd();
+        my $orig = current_working_directory();
         chdir $cwd or die "Unable to chdir to $cwd for command launch: $!";
         my $ok = eval { $launcher->(); 1 };
         my $error = $@;
@@ -1685,7 +1686,7 @@ sub _install_skill_dependency_manifest {
             local $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} = $install_stack;
             local $ENV{DEVELOPER_DASHBOARD_DEPENDENCY_MANIFEST} = $manifest_name;
             local $ENV{DEVELOPER_DASHBOARD_SKIP_SKILL_REGISTRY} = 1;
-            my $cwd = Cwd::getcwd();
+            my $cwd = current_working_directory();
             my ( $stdout, $stderr, $status );
             eval {
                 chdir $skills_root or die "Unable to chdir to $skills_root for $manifest_name dependency install: $!";
@@ -1697,7 +1698,7 @@ sub _install_skill_dependency_manifest {
             };
             my $eval_error = $@;
             if ($eval_error) {
-                chdir $cwd if Cwd::getcwd() ne $cwd;
+                chdir $cwd if current_working_directory() ne $cwd;
                 die $eval_error;
             }
             ( $stdout, $stderr, $status );

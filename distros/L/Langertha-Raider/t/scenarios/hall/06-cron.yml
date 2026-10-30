@@ -1,0 +1,19 @@
+title: a cron entry fires its mission, and every occurrence continues the job's session
+# The cron expression has the seconds field Schedule::Cron knows as its sixth:
+# every 4 seconds.
+hall:
+  cron:
+    - { id: tick, name: Testie, cron: '* * * * * */4', mission: "Tick." }
+model:
+  rules:
+    Tick.: { answer: "Getickt." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - wait_event: { type: cron.fired, id: tick, timeout: 20, as: first_fire }
+  - wait_event: { type: cron.fired, id: tick, nth: 2, timeout: 20 }
+  - wait_event: { type: raider.spawned, binding: 'cron:tick', as: first }
+  - done: { run: first, status: completed, response_like: 'Getickt', binding: 'cron:tick' }
+  - wait_event: { type: raider.spawned, binding: 'cron:tick', nth: 2, as: second }
+  - done: { run: second, status: completed, response_like: 'Getickt', binding: 'cron:tick', session: { same_as: first } }
+  - stop_hall: {}
+  - expect_journals: { count: 1 }

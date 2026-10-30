@@ -1,0 +1,663 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path getcwd);
+use Digest::SHA qw(sha256_hex);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Scalar::Util qw(blessed);
+use Time::HiRes qw(time);
+
+our $SELECTED_LIB;
+BEGIN {
+    my $requested_lib = defined $ENV{P48_LIB}
+      ? $ENV{P48_LIB}
+      : File::Spec->catdir( $Bin, '..', 'lib' );
+    $SELECTED_LIB = abs_path($requested_lib)
+      or die "Unable to resolve selected source library '$requested_lib': $!\n";
+    die "Selected source library '$SELECTED_LIB' is not a directory\n" if !-d $SELECTED_LIB;
+    unshift @INC, $SELECTED_LIB;
+}
+
+use Developer::Dashboard::Auth;
+use Developer::Dashboard::Config;
+use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::IndicatorStore::Watch;
+use Developer::Dashboard::PageDocument;
+use Developer::Dashboard::PageRuntime;
+use Developer::Dashboard::PageStore;
+use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::Prompt;
+use Developer::Dashboard::SessionStore;
+use Developer::Dashboard::SkillDispatcher;
+use Developer::Dashboard::Web::App;
+
+my $iterations = 100;
+my $runs = 21;
+my $nav_fragment_count = 5;
+my $skill_nav_fragment_count = 0;
+my $indicator_count = 0;
+my $profile = 0;
+my $disable_prompt_summary_cache = 0;
+my $disable_nav_cache = 0;
+my $disable_nav_fragment_cache = 0;
+my $duplicate_page_containment = 0;
+my $duplicate_skill_layer_resolution = 0;
+my $duplicate_skill_nav_layer_resolution = 0;
+my $legacy_skill_nav_enumeration = 0;
+my $parse_raw_skill_nav = 0;
+my $disable_skill_literal_nav_cache = 0;
+my $disable_skill_nav_inventory_cache = 0;
+my $disable_page_roots_cache = 0;
+my $disable_skill_nav_snapshot_cache = 0;
+my $disable_saved_nav_snapshot_cache = 0;
+my $disable_native_watch = 0;
+my $legacy_runtime_root_access = 0;
+my $legacy_config_snapshot_signature = 0;
+my $help = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'nav-fragments=i' => \$nav_fragment_count,
+    'skill-nav-fragments=i' => \$skill_nav_fragment_count,
+    'indicators=i' => \$indicator_count,
+    'profile!'     => \$profile,
+    'no-prompt-summary-cache' => \$disable_prompt_summary_cache,
+    'no-nav-cache' => \$disable_nav_cache,
+    'no-nav-fragment-cache' => \$disable_nav_fragment_cache,
+    'duplicate-page-containment' => \$duplicate_page_containment,
+    'duplicate-skill-layer-resolution' => \$duplicate_skill_layer_resolution,
+    'duplicate-skill-nav-layer-resolution' => \$duplicate_skill_nav_layer_resolution,
+    'legacy-skill-nav-enumeration' => \$legacy_skill_nav_enumeration,
+    'parse-raw-skill-nav' => \$parse_raw_skill_nav,
+    'no-skill-literal-nav-cache' => \$disable_skill_literal_nav_cache,
+    'no-skill-nav-inventory-cache' => \$disable_skill_nav_inventory_cache,
+    'no-page-roots-cache' => \$disable_page_roots_cache,
+    'no-native-watch' => \$disable_native_watch,
+    'legacy-runtime-root-access' => \$legacy_runtime_root_access,
+    'legacy-config-snapshot-signature' => \$legacy_config_snapshot_signature,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be a positive odd integer\n" if $runs < 1 || $runs % 2 == 0;
+die "--nav-fragments must be a positive integer\n" if $nav_fragment_count < 1;
+die "--skill-nav-fragments must be a non-negative integer\n" if $skill_nav_fragment_count < 0;
+die "--indicators must be a non-negative integer\n" if $indicator_count < 0;
+die "--profile requires perl -d:NYTProf\n" if $profile && !defined &DB::enable_profile;
+
+if ($disable_native_watch) {
+    no warnings qw(redefine once);
+    *Developer::Dashboard::IndicatorStore::Watch::new = sub { return; };
+}
+if ($legacy_runtime_root_access) {
+    no warnings 'redefine';
+    *Developer::Dashboard::PathRegistry::runtime_root = sub {
+        my ($paths) = @_;
+        my @layers = $paths->runtime_layers;
+        return $layers[-1];
+    };
+}
+if ($legacy_config_snapshot_signature) {
+    no warnings 'redefine';
+    *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub {
+        my ($self) = @_;
+        my @names = qw(
+          HOME USERPROFILE HOMEDRIVE HOMEPATH
+          DEVELOPER_DASHBOARD_RUNTIME_LAYERS DEVELOPER_DASHBOARD_CONFIGS
+          DEVELOPER_DASHBOARD_CONFIG_OVERLAY DEVELOPER_DASHBOARD_CHECKERS
+        );
+        my @environment = map {
+            [ $_, exists $ENV{$_} ? 1 : 0, defined $ENV{$_} ? $ENV{$_} : undef ]
+        } @names;
+        my $paths = $self->{pages};
+        $paths = $paths->{paths} if ref($paths) eq 'Developer::Dashboard::PageStore';
+        return json_encode(
+            {
+                environment => \@environment,
+                home        => blessed($paths) && $paths->can('home') ? $paths->home : undef,
+                cwd         => Developer::Dashboard::PathIdentity::current_working_directory(),
+            }
+        );
+    };
+}
+my $watch_probe = Developer::Dashboard::IndicatorStore::Watch->new;
+my $native_watch_backend = defined $watch_probe ? 'available' : 'unavailable';
+
+my $nav_inventory_scans = 0;
+if ( Developer::Dashboard::Web::App->can('_scan_nav_directory_ids') ) {
+    no warnings 'redefine';
+    my $scan_nav_directory_ids = Developer::Dashboard::Web::App->can('_scan_nav_directory_ids');
+    *Developer::Dashboard::Web::App::_scan_nav_directory_ids = sub {
+        $nav_inventory_scans++;
+        return $scan_nav_directory_ids->(@_);
+    };
+    if ($disable_nav_cache) {
+        *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub {
+            my ( $self, $roots ) = @_;
+            my ($ids) = $self->_scan_nav_directory_ids($roots);
+            return $ids;
+        };
+    }
+}
+
+my $page_root_lookups = 0;
+my $saved_nav_snapshot_hits = 0;
+my $original_dashboards_roots = Developer::Dashboard::PathRegistry->can('dashboards_roots');
+{
+    no warnings 'redefine';
+    *Developer::Dashboard::PathRegistry::dashboards_roots = sub {
+        $page_root_lookups++;
+        return $original_dashboards_roots->(@_);
+    };
+    $disable_saved_nav_snapshot_cache =
+         $disable_nav_cache
+      || $disable_nav_fragment_cache
+      || $duplicate_page_containment
+      || $disable_page_roots_cache;
+    if ($disable_saved_nav_snapshot_cache) {
+        *Developer::Dashboard::Web::App::_saved_nav_items_snapshot_state = sub {
+            delete $_[0]->{_saved_nav_items_snapshot};
+            return { cacheable => 0 };
+        };
+    }
+    my $original_snapshot_state = Developer::Dashboard::Web::App->can('_saved_nav_items_snapshot_state');
+    *Developer::Dashboard::Web::App::_saved_nav_items_snapshot_state = sub {
+        my $state = $original_snapshot_state->(@_);
+        $saved_nav_snapshot_hits++ if ref($state) eq 'HASH' && $state->{hit};
+        return $state;
+    };
+    if ($disable_page_roots_cache) {
+        my $original_page_file_candidates = Developer::Dashboard::PageStore->can('_page_file_candidates');
+        *Developer::Dashboard::PageStore::_page_file_candidates = sub {
+            delete $_[0]->{_page_roots_snapshot};
+            return $original_page_file_candidates->(@_);
+        };
+    }
+}
+
+my $original_cwd = getcwd();
+END {
+    if ( defined $original_cwd && $original_cwd ne '' && getcwd() ne $original_cwd ) {
+        chdir $original_cwd or die "Unable to restore benchmark directory '$original_cwd': $!\n";
+    }
+}
+my $fixture_root = tempdir( 'problem48-saved-page-route-XXXXXX', CLEANUP => 1 );
+my $home = File::Spec->catdir( $fixture_root, 'home' );
+make_path($home);
+local $ENV{HOME} = $home;
+local $ENV{USER} = 'problem48-benchmark';
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+chdir $home or die "Unable to enter benchmark HOME '$home': $!\n";
+
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+my $config = Developer::Dashboard::Config->new( paths => $paths, files => $files );
+my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
+my $pages = Developer::Dashboard::PageStore->new( paths => $paths );
+my @indicator_jobs = map {
+    {
+        name      => sprintf( 'p48-indicator-%04d', $_ ),
+        cwd       => 'home',
+        code      => 'return 0;',
+        indicator => { name => sprintf( 'p48-indicator-%04d', $_ ), icon => 'x', priority => $_ },
+    }
+} 1 .. $indicator_count;
+$config->save_global( { collectors => \@indicator_jobs } );
+$indicators->sync_collectors( \@indicator_jobs ) if @indicator_jobs;
+$pages->save_page(
+    Developer::Dashboard::PageDocument->new(
+        id     => 'welcome',
+        title  => 'Problem 48 Saved Page Benchmark',
+        state  => { name => 'Benchmark User' },
+        layout => { body => '<p id="p48-page-body">saved-page-route-fixture</p>' },
+    ),
+);
+my $nav_root = File::Spec->catdir( $paths->dashboards_root, 'nav' );
+make_path($nav_root);
+for my $index ( 1 .. $nav_fragment_count ) {
+    my $suffix = sprintf '%02d', $index;
+    my $nav_file = File::Spec->catfile( $nav_root, "nav-$suffix.tt" );
+    open my $nav_fh, '>:raw', $nav_file or die "Unable to create benchmark nav fragment '$nav_file': $!\n";
+    print {$nav_fh} "<span>saved-navigation-$suffix</span>\n"
+      or die "Unable to write benchmark nav fragment '$nav_file': $!\n";
+    close $nav_fh or die "Unable to close benchmark nav fragment '$nav_file': $!\n";
+}
+for my $index ( 1 .. $skill_nav_fragment_count ) {
+    my $suffix = sprintf '%05d', $index;
+    my $skill_nav_root = File::Spec->catdir(
+        $home, '.developer-dashboard', 'skills', "skill-$suffix", 'dashboards', 'nav'
+    );
+    make_path($skill_nav_root);
+    my $skill_nav_file = File::Spec->catfile( $skill_nav_root, 'index.tt' );
+    open my $skill_nav_fh, '>:raw', $skill_nav_file
+      or die "Unable to create benchmark skill nav fragment '$skill_nav_file': $!\n";
+    print {$skill_nav_fh} "<span>skill-nav-$suffix</span>\n"
+      or die "Unable to write benchmark skill nav fragment '$skill_nav_file': $!\n";
+    close $skill_nav_fh or die "Unable to close benchmark skill nav fragment '$skill_nav_file': $!\n";
+}
+my @nav_files = glob File::Spec->catfile( $nav_root, '*.tt' );
+die "Expected $nav_fragment_count saved navigation fragments, found " . scalar(@nav_files) . "\n"
+  if @nav_files != $nav_fragment_count;
+
+my $app = Developer::Dashboard::Web::App->new(
+    auth     => Developer::Dashboard::Auth->new( paths => $paths, files => $files ),
+    config   => $config,
+    pages    => $pages,
+    prompt   => Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators ),
+    runtime  => Developer::Dashboard::PageRuntime->new( paths => $paths ),
+    sessions => Developer::Dashboard::SessionStore->new( paths => $paths ),
+);
+
+my $page_containment_checks = 0;
+my $nav_candidate_searches = 0;
+my $original_containment_check = Developer::Dashboard::PageStore->can('_assert_page_path_contained');
+my $original_page_file_candidates = Developer::Dashboard::PageStore->can('_page_file_candidates');
+my $nav_fragment_file_reads = 0;
+my $original_read_saved_instruction = Developer::Dashboard::PageStore->can('_read_saved_instruction');
+my $prompt_summary_freshness_checks = 0;
+my $prompt_summary_cache_hits = 0;
+my $original_page_status_payload = Developer::Dashboard::Web::App->can('_page_status_payload');
+my $skill_layer_resolutions = 0;
+my $original_skill_layers = Developer::Dashboard::SkillDispatcher->can('_skill_layers');
+my $skill_nav_content_reads = 0;
+my $original_skill_page_read = Developer::Dashboard::SkillDispatcher->can('_read_skill_page_instruction');
+my $skill_nav_inventory_scans = 0;
+my $original_relative_files = Developer::Dashboard::SkillDispatcher->can('_relative_files');
+{
+    no warnings 'redefine';
+    *Developer::Dashboard::Web::App::_page_status_payload = sub {
+        my ( $app, $unchanged_ref, $skip_when_unchanged ) = @_;
+        $prompt_summary_freshness_checks++ if $skip_when_unchanged;
+        my $payload = $original_page_status_payload->(@_);
+        $prompt_summary_cache_hits++
+          if $skip_when_unchanged
+          && ref($unchanged_ref) eq 'SCALAR'
+          && $$unchanged_ref
+          && !defined $payload;
+        return $payload;
+    };
+    if ($disable_prompt_summary_cache) {
+        my $original_prompt_summary = Developer::Dashboard::Web::App->can('_prompt_summary');
+        *Developer::Dashboard::Web::App::_prompt_summary = sub {
+            delete $_[0]->{_prompt_summary_cache};
+            return $original_prompt_summary->(@_);
+        };
+    }
+    *Developer::Dashboard::SkillDispatcher::_skill_layers = sub {
+        $skill_layer_resolutions++;
+        return $original_skill_layers->(@_);
+    };
+    *Developer::Dashboard::SkillDispatcher::_read_skill_page_instruction = sub {
+        my ( $dispatcher, $file ) = @_;
+        $skill_nav_content_reads++ if $file =~ m{[\\/]dashboards[\\/]nav[\\/]};
+        return $original_skill_page_read->(@_);
+    };
+    *Developer::Dashboard::SkillDispatcher::_relative_files = sub {
+        $skill_nav_inventory_scans++;
+        return $original_relative_files->(@_);
+    };
+    if ($disable_skill_nav_inventory_cache) {
+        my $original_skill_nav_inventory = Developer::Dashboard::SkillDispatcher->can('_skill_nav_inventory');
+        *Developer::Dashboard::SkillDispatcher::_skill_nav_inventory = sub {
+            my ( $dispatcher, $nav_root, $validated_segments ) = @_;
+            my $cache = $dispatcher->{_skill_nav_inventory_cache};
+            if ( ref($cache) eq 'HASH' && ref( $cache->{entries} ) eq 'HASH' ) {
+                delete $cache->{entries}{$nav_root};
+                if ( ref( $cache->{order} ) eq 'ARRAY' ) {
+                    @{ $cache->{order} } = grep { $_ ne $nav_root } @{ $cache->{order} };
+                }
+            }
+            return $original_skill_nav_inventory->( $dispatcher, $nav_root, $validated_segments );
+        };
+    }
+    if ($disable_skill_literal_nav_cache) {
+        my $original_skill_nav_pages_for_layers = Developer::Dashboard::SkillDispatcher->can('_skill_nav_pages_for_layers');
+        *Developer::Dashboard::SkillDispatcher::_skill_nav_pages_for_layers = sub {
+            my ( $dispatcher, $skill_name, $layers ) = @_;
+            return $original_skill_nav_pages_for_layers->( $dispatcher, $skill_name, $layers, 0 );
+        };
+    }
+    $disable_skill_nav_snapshot_cache =
+         $disable_skill_literal_nav_cache
+      || $disable_skill_nav_inventory_cache
+      || $duplicate_skill_layer_resolution
+      || $duplicate_skill_nav_layer_resolution;
+    if ($disable_skill_nav_snapshot_cache) {
+        # Aggregate page reuse bypasses the per-page and inventory controls
+        # below; disable it for those comparison runs so they measure the
+        # requested path rather than silently measuring the aggregate cache.
+        *Developer::Dashboard::SkillDispatcher::_cache_all_skill_nav_pages = sub { return 0 };
+    }
+    if ($duplicate_skill_layer_resolution) {
+        my $original_page_location = Developer::Dashboard::SkillDispatcher->can('_page_location');
+        *Developer::Dashboard::SkillDispatcher::_page_location = sub {
+            my ( $dispatcher, $skill_name, $route_id, %args ) = @_;
+            delete $args{layers};
+            return $original_page_location->( $dispatcher, $skill_name, $route_id, %args );
+        };
+    }
+    if ($duplicate_skill_nav_layer_resolution) {
+        my $original_load_skill_page = Developer::Dashboard::SkillDispatcher->can('_load_skill_page');
+        *Developer::Dashboard::SkillDispatcher::_load_skill_page = sub {
+            my ( $dispatcher, %args ) = @_;
+            delete $args{layers};
+            return $original_load_skill_page->( $dispatcher, %args );
+        };
+    }
+    if ($legacy_skill_nav_enumeration) {
+        *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub {
+            my ($dispatcher) = @_;
+            my @pages;
+            for my $skill_name ( $dispatcher->_all_installed_skill_names ) {
+                push @pages, @{ $dispatcher->skill_nav_pages($skill_name) };
+            }
+            return \@pages;
+        };
+    }
+    if ($parse_raw_skill_nav) {
+        *Developer::Dashboard::SkillDispatcher::_looks_like_skill_page_instruction = sub { return 1 };
+    }
+    *Developer::Dashboard::PageStore::_assert_page_path_contained = sub {
+        $page_containment_checks++;
+        return $original_containment_check->(@_);
+    };
+    *Developer::Dashboard::PageStore::_page_file_candidates = sub {
+        my ( $store, $id ) = @_;
+        $nav_candidate_searches++ if ( $id || '' ) =~ m{\Anav/};
+        return $original_page_file_candidates->(@_);
+    };
+    *Developer::Dashboard::PageStore::_read_saved_instruction = sub {
+        my ( $store, $file, %args ) = @_;
+        $nav_fragment_file_reads++ if ( $args{id} || '' ) =~ m{\Anav/};
+        return $original_read_saved_instruction->(@_);
+    };
+    if ($duplicate_page_containment) {
+        my $original_existing_page_file = Developer::Dashboard::PageStore->can('_existing_page_file');
+        *Developer::Dashboard::PageStore::_existing_page_file = sub {
+            my $wantarray = wantarray;
+            my ( $store, @args ) = @_;
+            my ( $file, $root ) = $original_existing_page_file->( $store, @args );
+            $store->_assert_page_path_contained( $file, root => $root ) if defined $file;
+            return $wantarray ? ( $file, $root ) : $file;
+        };
+    }
+}
+
+my $first_response = _request_saved_page( $app, $disable_nav_fragment_cache );
+die "Saved page route returned HTTP $first_response->[0], expected 200\n"
+  if $first_response->[0] != 200;
+my $expected_body = _normalized_body($first_response->[2]);
+die "Saved page response did not include the fixture body\n"
+  if index( $expected_body, 'saved-page-route-fixture' ) < 0;
+my $rendered_nav_count = () = $expected_body =~ /data-nav-id=/g;
+die "Saved page response did not include all $nav_fragment_count navigation fragments\n"
+  if $rendered_nav_count != $nav_fragment_count + $skill_nav_fragment_count;
+for my $index ( 1 .. $skill_nav_fragment_count ) {
+    my $suffix = sprintf '%05d', $index;
+    die "Saved page response did not include skill nav fragment $suffix\n"
+      if index( $expected_body, "skill-nav-$suffix" ) < 0;
+}
+for ( 1 .. 2 ) {
+    my $response = _request_saved_page( $app, $disable_nav_fragment_cache );
+    die "Saved page route returned HTTP $response->[0] during warmup\n" if $response->[0] != 200;
+    die "Saved page response changed during warmup\n"
+      if _normalized_body($response->[2]) ne $expected_body;
+}
+
+my @samples;
+$page_containment_checks = 0;
+$page_root_lookups = 0;
+$skill_layer_resolutions = 0;
+$prompt_summary_freshness_checks = 0;
+$prompt_summary_cache_hits = 0;
+DB::enable_profile() if $profile;
+for my $run ( 1 .. $runs ) {
+    my $started = time;
+    for ( 1 .. $iterations ) {
+        my $response = _request_saved_page( $app, $disable_nav_fragment_cache, $disable_prompt_summary_cache );
+        die "Saved page route returned HTTP $response->[0] in run $run\n" if $response->[0] != 200;
+        die "Saved page response changed in run $run\n"
+          if _normalized_body($response->[2]) ne $expected_body;
+    }
+    push @samples, time - $started;
+}
+DB::disable_profile() if $profile;
+
+my $median = _median(@samples);
+printf "source_lib=%s iterations=%d runs=%d median_ms_per_request=%.6f profile=%s\n",
+  $SELECTED_LIB, $iterations, $runs, 1000 * $median / $iterations, $profile ? 'yes' : 'no';
+printf "config_snapshot_signature=%s\n", $legacy_config_snapshot_signature ? 'legacy-json' : 'length-prefixed';
+printf "route=/app/welcome nav_fragments=%d skill_nav_fragments=%d response_status=200 response_bytes=%d response_sha256=%s exact_repeat_parity=yes\n",
+  $nav_fragment_count, $skill_nav_fragment_count, length($expected_body), sha256_hex($expected_body);
+printf "skill_nav_content_parity=yes\n";
+printf "nav_cache=%s nav_inventory_scans=%d\n", $disable_nav_cache ? 'disabled' : 'enabled', $nav_inventory_scans;
+printf "nav_content_cache=%s\n", $disable_nav_fragment_cache ? 'disabled' : 'enabled';
+printf "page_containment=%s page_containment_checks=%d\n",
+  $duplicate_page_containment ? 'duplicate' : 'single', $page_containment_checks;
+printf "nav_candidate_searches=%d\n", $nav_candidate_searches;
+printf "nav_fragment_file_reads=%d\n", $nav_fragment_file_reads;
+printf "page_root_cache=%s page_root_lookups=%d\n",
+  $disable_page_roots_cache ? 'disabled' : 'enabled', $page_root_lookups;
+printf "skill_layer_resolutions=%d mode=%s\n", $skill_layer_resolutions,
+  $duplicate_skill_layer_resolution || $duplicate_skill_nav_layer_resolution ? 'duplicate' : 'single';
+printf "skill_nav_enumeration=%s\n", $legacy_skill_nav_enumeration ? 'legacy' : 'bulk';
+printf "skill_literal_nav_cache=%s\n", $disable_skill_literal_nav_cache ? 'disabled' : 'enabled';
+printf "skill_nav_inventory_cache=%s skill_nav_inventory_scans=%d\n",
+  $disable_skill_nav_inventory_cache ? 'disabled' : 'enabled', $skill_nav_inventory_scans;
+printf "skill_nav_content_reads=%d\n", $skill_nav_content_reads;
+printf "native_watch_backend=%s\n", $native_watch_backend;
+printf "saved_nav_snapshot_cache_requested=%s hits=%d\n",
+  $disable_saved_nav_snapshot_cache ? 'disabled' : 'enabled', $saved_nav_snapshot_hits;
+printf "prompt_summary_cache=%s freshness_checks=%d hits=%d indicators=%d\n",
+  $disable_prompt_summary_cache ? 'disabled' : 'enabled',
+  $prompt_summary_freshness_checks, $prompt_summary_cache_hits, $indicator_count;
+printf "raw_skill_nav_parse=%s\n", $parse_raw_skill_nav ? 'enabled' : 'skipped';
+
+chdir $original_cwd or die "Unable to restore benchmark directory '$original_cwd': $!\n";
+exit 0;
+
+# _request_saved_page($app, $disable_fragment_cache, $disable_summary_cache)
+# Executes the production Web::App route for one saved page from loopback.
+# Input: configured Web::App instance plus optional booleans to disable its
+#        saved-nav fragment or prompt-summary cache for comparison runs.
+# Output: response array reference or a visible exception on failure.
+sub _request_saved_page {
+    my ( $app, $disable_fragment_cache, $disable_summary_cache ) = @_;
+    delete $app->{pages}{_nav_fragment_cache} if $disable_fragment_cache;
+    delete $app->{_prompt_summary_cache} if $disable_summary_cache;
+    return $app->handle(
+        path        => '/app/welcome',
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => { host => '127.0.0.1' },
+    );
+}
+
+# _normalized_body($body)
+# Replaces only the live clock text so repeated page bodies can be compared.
+# Input: scalar HTML response body.
+# Output: normalized scalar HTML; malformed response bodies throw an error.
+sub _normalized_body {
+    my ($body) = @_;
+    die "Saved page route returned a non-scalar response body\n" if !defined $body || ref($body);
+    my $normalized = $body;
+    my $matches = $normalized =~ s{(<span id="status-datetime">)[^<]*(</span>)}{$1<TIMESTAMP>$2};
+    die "Saved page response did not contain exactly one live timestamp\n" if $matches != 1;
+    return $normalized;
+}
+
+# _median(@samples)
+# Returns the center duration from the odd-sized benchmark sample set.
+# Input: elapsed durations in seconds.
+# Output: median elapsed duration in seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _usage()
+# Describes workload, source selection, and profiler requirements.
+# Input: none.
+# Output: command-line usage string.
+sub _usage {
+    return "Usage: P48_LIB=<lib> $0 [--iterations N] [--runs ODD_N] [--nav-fragments N] [--skill-nav-fragments N] [--indicators N] [--profile|--no-profile] [--no-prompt-summary-cache] [--no-nav-cache] [--no-nav-fragment-cache] [--no-skill-literal-nav-cache] [--no-skill-nav-inventory-cache] [--duplicate-page-containment] [--duplicate-skill-layer-resolution] [--duplicate-skill-nav-layer-resolution] [--legacy-skill-nav-enumeration] [--legacy-runtime-root-access] [--legacy-config-snapshot-signature] [--parse-raw-skill-nav] [--no-page-roots-cache] [--no-native-watch] [--help]\n"
+      . "Measures the warmed production /app/welcome route with saved and installed-skill nav fragments in a private HOME.\n"
+      . "Only the live status timestamp is normalized for exact repeat parity. Set P48_LIB to select v5.88 or current source.\n"
+      . "Use --indicators N to configure synthetic collector indicators and --no-prompt-summary-cache for the exact-output comparison control.\n"
+      . "Use --profile with perl -d:NYTProf and NYTPROF=start=no to profile only the warmed route loop.\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-saved-page-route-benchmark - profile a saved browser page and its navigation fragments
+
+=head1 PURPOSE
+
+Measures the warmed production C<Web::App-E<gt>handle('/app/welcome')> path
+with a configurable number of saved C<nav/*.tt> fragments, an isolated temporary HOME, strict
+HTTP/body validation, configurable installed-skill navigation fragments, and
+optional collector indicators and NYTProf profiling.
+
+=head1 WHY IT EXISTS
+
+Problem 48 needs performance evidence at ordinary application boundaries, not
+only the status endpoint. This tool compares the same fixture on v5.88 and the
+current source tree and supports larger nav sets to measure how per-request
+root discovery scales. It normalizes only the live status timestamp, then
+requires the remainder of every response to stay byte-identical during the
+run.
+
+=head1 WHEN TO USE
+
+Run after changes to saved-page routing, Template Toolkit preparation, page
+chrome, saved navigation discovery, or request-local runtime caches. Compare
+the output from both source trees before attributing a speedup to a change.
+The report includes nav candidate-root searches, nav file reads, and containment
+checks so cache and provenance effects remain distinguishable.
+Output distinguishes requested snapshot caching from observed hits and reports
+whether the optional native watch backend is available. Use C<--no-native-watch>
+to benchmark the portable fallback explicitly on a system that has the native
+backend installed.
+Use C<--indicators> to seed collector-managed indicator records and measure the
+prompt-summary freshness cache under status-heavy page rendering. The cache
+control C<--no-prompt-summary-cache> disables only prompt-summary reuse; the
+benchmark reports freshness-check and cache-hit counts and requires the same
+response bytes in both modes.
+Use C<--skill-nav-fragments> to create temporary installed skills with one raw
+navigation fragment each. The report verifies that every fixture fragment was
+rendered by the real route; this isolates the skill-navigation discovery and
+rendering path without reading user skill directories.
+Use C<--no-nav-cache> on current source to compare the same fixture with nav
+inventory rescanning on every request; the output reports scan count.
+Use C<--no-nav-fragment-cache> to clear the bounded literal-fragment cache
+before each request and compare the file-read count and latency with the
+validated-cache path.
+Use C<--no-skill-literal-nav-cache> to disable reuse of unchanged static
+skill-nav pages while preserving skill discovery and exact rendered output.
+The report includes the number of skill-nav instruction reads, making the
+warm-cache effect measurable.
+Use C<--no-skill-nav-inventory-cache> to rescan the skill-nav directory tree on
+every request. Compare it with the metadata-validated directory inventory
+cache; both modes preserve exact response bytes, and the report records actual
+recursive directory scans.
+Use C<--duplicate-page-containment> to recreate the former extra containment
+check in candidate lookup, so exact-output route measurements can compare its
+cost with the single validation at secure open time. Output reports the total
+containment checks during measured requests.
+Use C<--no-page-roots-cache> to disable the request-local saved-page root
+snapshot for page lookups that do not have a supplying-layer provenance hint.
+Saved nav files use their scanned layer provenance and do not repeat candidate
+root search. Output reports the number of measured calls to C<dashboards_roots>.
+Use C<--duplicate-skill-layer-resolution> to recreate the former second
+layer lookup in C<_load_skill_page>; compare its layer-resolution count and
+route timing with the optimized path while checking response hash parity.
+Use C<--duplicate-skill-nav-layer-resolution> to recreate repeated layer
+resolution while enumerating and loading each skill navigation fragment.
+Use C<--legacy-skill-nav-enumeration> to replay the former per-skill discovery
+loop against the same fixture. The benchmark reports layer-resolution counts
+and requires exact response parity with the bulk-inventory path.
+Use C<--parse-raw-skill-nav> as a control that forces raw skill nav templates
+through the structured instruction parser rather than the raw-fragment path.
+Use C<--legacy-runtime-root-access> as the pre-cache control for the
+request-scoped runtime-root accessor.
+Use C<--legacy-config-snapshot-signature> as the prior pretty-JSON control for
+the request-local configuration snapshot key; the response bytes must match.
+
+=head1 HOW TO USE
+
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --nav-fragments 100
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50 --no-skill-literal-nav-cache
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50 --no-skill-nav-inventory-cache
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --no-nav-cache
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --no-nav-fragment-cache
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --duplicate-page-containment
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --no-page-roots-cache
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --no-native-watch
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --legacy-runtime-root-access
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --legacy-config-snapshot-signature
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50 --duplicate-skill-layer-resolution
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50 --duplicate-skill-nav-layer-resolution
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50 --parse-raw-skill-nav
+  d2 docker compose exec dev env P48_LIB=/work/nytprof/v588/lib NYTPROF=file=/work/nytprof/saved-v588.out:start=no perl -d:NYTProf script/problem48-saved-page-route-benchmark --iterations 20 --runs 1 --profile
+  d2 docker compose exec dev env P48_LIB=/work/lib NYTPROF=file=/work/nytprof/saved-current.out:start=no perl -d:NYTProf script/problem48-saved-page-route-benchmark --iterations 20 --runs 1 --profile
+
+The profile switch is enabled only around the warmed request loop. Benchmark
+HOME and saved-page fixtures are private and automatically removed at exit.
+Skill-nav fixtures are created under that same temporary HOME and removed with
+the rest of the fixture.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this benchmark to compare saved-page
+rendering, navigation includes, and chrome under identical route conditions.
+
+=head1 EXAMPLES
+
+Example 1: run a robust unprofiled median comparison.
+
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark
+
+Example 2: collect a profile for current source.
+
+  d2 docker compose exec dev env NYTPROF=file=/work/nytprof/saved-current.out:start=no perl -d:NYTProf script/problem48-saved-page-route-benchmark --profile
+
+Example 3: check CLI documentation and input validation.
+
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --help
+
+Example 4: compare navigation inventory caching with repeated directory scans.
+
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --no-nav-cache
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --no-native-watch
+
+Example 5: measure installed-skill nav discovery and rendering.
+
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --skill-nav-fragments 50
+
+Example 6: compare prompt-summary reuse with a seeded indicator inventory.
+
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --indicators 50
+  d2 docker compose exec dev perl script/problem48-saved-page-route-benchmark --iterations 100 --runs 21 --indicators 50 --no-prompt-summary-cache
+
+=cut

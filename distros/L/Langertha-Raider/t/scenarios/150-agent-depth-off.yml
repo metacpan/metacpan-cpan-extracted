@@ -1,0 +1,19 @@
+# Claude Code: CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns nesting off; raider's
+# max_agent_depth does the same (1 = subagents get no agent tool).
+# Checks ADR 0027 section 8 (the config key).
+title: with max_agent_depth 1 a subagent gets neither agent nor send_message
+permission_mode: bypassPermissions
+app: { max_agent_depth: 1 }
+prompt: Delegate.
+script:
+  - tool_calls:
+      - [ agent, { description: Only one, prompt: LAYER-ONE } ]
+  - text: from one
+  - text: done
+expect:
+  answer: done
+  requests:
+    - { index: 0, contains: "agent(description, prompt" }
+    - { index: 1, contains: LAYER-ONE }
+    - { index: 1, lacks: [ agent, send_message ] }
+    - { index: 1, absent: "agent(description" }

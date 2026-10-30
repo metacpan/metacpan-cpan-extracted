@@ -265,4 +265,17 @@ is_deeply(
 	{ A => ['a'..'f'], B => ['x','y','z','g','h','i'] },
 	'add_data: HoA to HoA works'
 );
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('add_data');
+	like($screen, qr/\Ausage: add_data\(/, 'add_data has a help screen');
+	is(do { local $@; eval { add_data(1, {}); 1 } ? '' : $@ },
+	   $screen . "add_data: error: 1st argument must be a hash or array reference\n",
+	   'add_data: a non-reference target prints the help screen');
+	is(do { local $@; eval { add_data({}); 1 } ? '' : $@ },
+	   $screen . "add_data: error: expected 2 arguments, got 1\n",
+	   'add_data: one argument prints the help screen');
+}
+
 done_testing();

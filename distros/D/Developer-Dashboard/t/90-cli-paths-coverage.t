@@ -40,6 +40,7 @@ my $build_paths      = \&Developer::Dashboard::CLI::TableHelpers::build_paths;
 my $normalize_delete = \&Developer::Dashboard::CLI::Paths::_normalize_delete_argument;
 my $resolve_alias    = \&Developer::Dashboard::CLI::Paths::_resolve_path_alias;
 my $folder_aliases   = \&Developer::Dashboard::CLI::Paths::_skill_folder_path_aliases;
+my $folder_entries   = \&Developer::Dashboard::CLI::Paths::_skill_folder_entries;
 my $folder_target    = \&Developer::Dashboard::CLI::Paths::_skill_folder_alias_target;
 my $cdr_payload      = \&Developer::Dashboard::CLI::Paths::_cdr_payload;
 my $cdr_completion   = \&Developer::Dashboard::CLI::Paths::_cdr_completion;
@@ -209,6 +210,25 @@ subtest 'paths and path list reject leftover positional arguments' => sub {
     like( $@, qr/^Usage: dashboard path list \[-o json\|table\]$/m, 'the list usage message is printed' );
 };
 
+subtest 'paths reuses one nested-skill inventory for configured and Folder.pm aliases' => sub {
+    my $original = \&Developer::Dashboard::PathRegistry::nested_skill_entries;
+    my $calls = 0;
+    my ( $out, $err );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::nested_skill_entries = sub {
+            $calls++;
+            return $original->(@_);
+        };
+        ( $out, $err ) = capture {
+            $run->( command => 'paths', args => [ '-o', 'json' ] );
+        };
+    }
+    is( $calls, 1, 'configured path aliases and Folder.pm aliases share a single nested-skill inventory' );
+    is( $err, '', 'the shared inventory path emits no diagnostics' );
+    like( $out, qr/\A\{/, 'the path list still emits its JSON payload' );
+};
+
 subtest 'path dispatch reports usage for missing verbs and operands' => sub {
     my $no_action = eval { $run->( command => 'path', args => [] ); 1 };
     is( $no_action, undef, 'an empty path argument list falls through to the dispatch usage error' );
@@ -338,7 +358,7 @@ subtest '_build_paths tolerates an empty home environment' => sub {
     delete local $ENV{HOMEDRIVE};
     delete local $ENV{HOMEPATH};
 
-    my $built = eval { $build_paths->() };
+    my $built = eval { Developer::Dashboard::CLI::Paths::_build_paths() };
     is( $built, undef, 'an empty HOME leaves no resolvable home directory' );
     like( $@, qr/Missing home directory/, 'the unresolvable home directory is reported' );
 };
@@ -371,6 +391,18 @@ subtest 'Folder alias discovery validates registries and safely skips invalid ca
     like( $@, qr/^Missing paths registry$/m, 'Folder alias enumeration reports a missing registry' );
 
     is_deeply( $folder_aliases->( paths => $paths ), {}, 'Folder alias enumeration is empty when no skills are installed' );
+
+    my $bad_entries = eval { $folder_entries->( $paths, {} ); 1 };
+    is( $bad_entries, undef, 'precomputed Folder entries must be an array reference' );
+    like( $@, qr/^Folder entries must be an array reference$/m, 'invalid precomputed Folder entries have a direct diagnostic' );
+    my $bad_entry = eval { $folder_entries->( $paths, [undef] ); 1 };
+    is( $bad_entry, undef, 'precomputed Folder entries must contain hash references' );
+    like( $@, qr/^Folder entries must contain hash references$/m, 'invalid entry rows have a direct diagnostic' );
+    is_deeply(
+        [ $folder_entries->( $paths, [ { segments => ['disabled'], dir => $home, disabled => 1 } ] ) ],
+        [],
+        'disabled providers in a shared inventory are excluded from Folder aliases',
+    );
 
     for my $invalid ( undef, [], "bad\nname", 'unqualified', 'skill..alias', 'skill.__list__', 'skill.can' ) {
         ok( !defined $folder_target->( paths => $paths, name => $invalid ), 'invalid or reserved Folder alias target is rejected before lookup' );
@@ -981,6 +1013,53 @@ subtest 'Folder alias discovery exercises absent modules, invalid list names, an
 
 };
 
+subtest 'Folder.pm aliases reevaluate arbitrary external file inputs' => sub {
+    my $external_dir = tempdir( CLEANUP => 1 );
+    my $state_file   = File::Spec->catfile( $external_dir, 'folder-state.txt' );
+    my $write_state = sub {
+        my ($value) = @_;
+        open my $fh, '>:raw', $state_file or die "Unable to write $state_file: $!";
+        print {$fh} $value or die "Unable to write state bytes to $state_file: $!";
+        close $fh or die "Unable to close $state_file: $!";
+    };
+    my $folder_source = <<'FOLDER_SOURCE';
+package Folder;
+sub __list__ { return ('current') }
+sub current {
+    open my $fh, '<:raw', $ENV{PROBLEM48_FOLDER_STATE_FILE}
+      or die "Unable to read dynamic Folder state: $!";
+    local $/;
+    my $value = <$fh>;
+    close $fh or die "Unable to close dynamic Folder state: $!";
+    return $value;
+}
+1;
+FOLDER_SOURCE
+    my $entry = _write_folder_fixture(
+        'dynamic-source',
+        $folder_source,
+    );
+    my $paths = Test::CLIPaths::FolderPaths->new(
+        entries     => [$entry],
+        named_paths => {},
+    );
+
+    local $ENV{PROBLEM48_FOLDER_STATE_FILE} = $state_file;
+    $write_state->('/runtime/first');
+    is_deeply(
+        $folder_aliases->( paths => $paths ),
+        { 'dynamic-source.current' => '/runtime/first' },
+        'the first Folder.pm evaluation reads its external sidecar file',
+    );
+
+    $write_state->('/runtime/second');
+    is_deeply(
+        $folder_aliases->( paths => $paths ),
+        { 'dynamic-source.current' => '/runtime/second' },
+        'the same paths object reevaluates Folder.pm after a file outside the skill changes',
+    );
+};
+
 subtest '_cdr_directory_candidates reports malformed narrowing expressions' => sub {
     my $root = File::Spec->catdir( $home, 'invalid-cdr-regex-root' );
     make_path($root);
@@ -1031,6 +1110,8 @@ Use this file when changing the argument validation, usage messages, alias
 loading, current-directory shorthand, C<cdr> target selection, skill-provided
 C<Folder.pm> aliases, shell-completion candidates, or table rendering inside
 the path CLI runtime.
+Its dynamic Folder-provider test also ensures user method results are not
+treated as immutable cache entries when files outside the skill tree change.
 
 =head1 HOW TO USE
 

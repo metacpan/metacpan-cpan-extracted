@@ -9,7 +9,9 @@
 # as P1, P2, ...; each test's name starts with the path it takes.
 #
 # Path analysis found no unreachable code (the whole suite already takes
-# every branch both ways), and no loop that runs only once or at most once.
+# every branch both ways).  The one loop that always ran exactly once - the
+# bare block in _entry() that held local($/) - was removed, keeping its
+# body; no loop runs at most once.
 # This file alone reaches every statement, branch, condition and
 # subroutine (Devel::Cover).
 # It did find one redundant iteration: _template() searched English twice
@@ -25,6 +27,7 @@ use Test::Mockingbird;
 use Test::Returns;
 use Readonly;
 use Encode ();
+use Config;
 use Capture qw(failing printed);
 
 use Test::Log::Abstraction;
@@ -36,6 +39,11 @@ Readonly::Scalar my $MAX_REASON => 200;
 Readonly::Scalar my $DEFAULT_LEVEL => 7;	# trace
 Readonly::Scalar my $ERROR => 3;
 Readonly::Scalar my $LOCALE => 'fr_FR.UTF-8';
+Readonly::Scalar my $IV_BYTES => 8;	# the integer limits below are for 64-bit integers
+Readonly::Scalar my $INT_MAX => '9223372036854775807';
+Readonly::Scalar my $ABOVE_INT_MAX => '9223372036854775808';
+Readonly::Scalar my $UINT_MAX => '18446744073709551615';
+Readonly::Scalar my $ABOVE_UINT_MAX => '18446744073709551616';
 
 {
 	package Local::Sub;
@@ -109,6 +117,11 @@ subtest '_build: 6 paths' => sub {
 	is(Test::Log::Abstraction::_build($CLASS, { verbose => 'yes' }, [])->{'verbose'}, 1, 'P4 verbose given: normalised');
 	throws_ok { Test::Log::Abstraction::_build($CLASS, { level => 'loud' }, []) } at_caller(q{invalid syslog level 'loud'}), 'P5 unknown level';
 	throws_ok { Test::Log::Abstraction::_build($CLASS, { country => 'XYZ' }, []) } qr/\A\Q$CLASS: invalid argument: \E/, 'P6 invalid option';
+	is(Test::Log::Abstraction::_build($CLASS, { level => 'ERROR' }, [])->{'level'}, $ERROR, 'P7 level given: looked up in lower case');
+	{
+		local $Test::Log::Abstraction::config{'level'} = undef;
+		throws_ok { Test::Log::Abstraction::_build($CLASS, {}, []) } at_caller(q{invalid syslog level 'undef'}), 'P8 no level and no default: croak, named undef';
+	}
 };
 
 # _copy_tree: P1 not a structure.  P2 hash.  P3 array.  P4 back-reference.
@@ -181,8 +194,9 @@ subtest '_resolve_lang: 8 paths' => sub {
 };
 
 # _diag_rule: list loop run 0, 1 and 2 times; a bad element (croak in the
-# loop); a non-list reference; 'none'; 'all'; a level; anything else.
-subtest '_diag_rule: 9 paths' => sub {
+# loop); a non-list reference; 'none'; 'all'; a level; anything else;
+# undef, taking the default; undef with no default (croak).
+subtest '_diag_rule: 11 paths' => sub {
 	my $self = quiet();
 	is_deeply($self->_diag_rule([]), { levels => {} }, 'P1 list, loop runs 0 times');
 	is_deeply($self->_diag_rule(['info']), { levels => { info => 1 } }, 'P2 list, loop runs once');
@@ -193,6 +207,46 @@ subtest '_diag_rule: 9 paths' => sub {
 	is_deeply($self->_diag_rule('all'), { all => 1 }, "P7 'all'");
 	is_deeply($self->_diag_rule('error'), { threshold => $ERROR }, 'P8 level name');
 	throws_ok { $self->_diag_rule('bad') } at_caller(q{invalid diag level 'bad'}), 'P9 anything else';
+	{
+		local $Test::Log::Abstraction::config{'diag'} = 'error';
+		is_deeply($self->_diag_rule(undef), { threshold => $ERROR }, 'P10 undef: the default');
+		$Test::Log::Abstraction::config{'diag'} = undef;
+		throws_ok { $self->_diag_rule(undef) } at_caller(q{invalid diag level 'undef'}), 'P11 undef with no default: croak';
+	}
+};
+
+# _diag_level: P1 a level name.  P2 any other text -> croak.  P3 undef ->
+# croak, named undef.  P4 an object whose text form dies -> croak, plain form.
+subtest '_diag_level: 4 paths' => sub {
+	my $self = quiet();
+	is($self->_diag_level('ERROR'), 'error', 'P1 level name: lower case');
+	throws_ok { $self->_diag_level('bad') } at_caller(q{invalid diag level 'bad'}), 'P2 other text';
+	throws_ok { $self->_diag_level(undef) } at_caller(q{invalid diag level 'undef'}), 'P3 undef';
+	throws_ok { $self->_diag_level(bless({}, 'Local::Bomb')) } qr/\A\Q$CLASS: invalid diag level 'Local::Bomb=HASH(0x\E[0-9a-f]+\)'/, 'P4 dying text form: plain form';
+};
+
+# _string: P1 not a reference.  P2 a reference that stringifies.  P3 a
+# reference whose text form dies -> plain form.
+subtest '_string: 3 paths' => sub {
+	is(Test::Log::Abstraction::_string(42), '42', 'P1 plain value');
+	like(Test::Log::Abstraction::_string([]), qr/\AARRAY\(0x[0-9a-f]+\)\z/, 'P2 reference');
+	like(Test::Log::Abstraction::_string(bless({}, 'Local::Bomb')), qr/\ALocal::Bomb=HASH\(0x[0-9a-f]+\)\z/, 'P3 dying text form');
+};
+
+# _shown: undef or a value (2) x byte or character string, which decides
+# whether the C1 step runs (2) x cut or not (2).  undef is short ASCII, so
+# it takes one combination: 5 paths.
+subtest '_shown: 5 paths' => sub {
+	is(Test::Log::Abstraction::_shown(undef), 'undef', 'P1 undef');
+	my $bytes = "a\x{9b}";
+	utf8::downgrade($bytes);
+	is(Test::Log::Abstraction::_shown($bytes), $bytes, 'P2 byte string, short: the C1 step is skipped');
+	my $characters = "a\x{9b}";
+	utf8::upgrade($characters);
+	is(Test::Log::Abstraction::_shown($characters), 'a\x9B', 'P3 character string, short: C1 escaped');
+	is(Test::Log::Abstraction::_shown('x' x ($MAX_REASON + 1)), ('x' x $MAX_REASON) . '...', 'P4 byte string, long: cut');
+	my $long = "\x{263a}" x ($MAX_REASON + 1);
+	is(Test::Log::Abstraction::_shown($long), ("\x{263a}" x $MAX_REASON) . '...', 'P5 character string, long: cut in characters');
 };
 
 # ===========================================================================
@@ -283,17 +337,18 @@ subtest 'AUTOLOAD: 2 paths' => sub {
 # Inspection
 # ===========================================================================
 
-# Each of messages, clear, flush, lang: P1 logger.  P2 not a logger.
+# Each of messages, clear, flush, reopen, lang: P1 logger.  P2 not a logger.
 # count: P1 no level.  P2 a level.  P3 invalid level.  P4 not a logger.
 # verbose: P1 get.  P2 set.  level: P1 get.  P2 set.  P3 warn.
-subtest 'messages, clear, flush, lang, count, verbose, level: every path' => sub {
+subtest 'messages, clear, flush, reopen, lang, count, verbose, level: every path' => sub {
 	my $logger = quiet();
 	$logger->info('x');
 	returns_ok($logger->messages(), { type => 'arrayref' }, 'messages P1');
 	returns_ok($logger->clear(), { type => 'object', isa => $CLASS }, 'clear P1');
 	returns_ok($logger->flush(), { type => 'object', isa => $CLASS }, 'flush P1');
+	returns_ok($logger->reopen(), { type => 'object', isa => $CLASS }, 'reopen P1');
 	returns_ok($logger->lang(), { type => 'string' }, 'lang P1');
-	foreach my $method (qw(messages clear flush lang count verbose level)) {
+	foreach my $method (qw(messages clear flush reopen lang count verbose level)) {
 		throws_ok { $CLASS->$method() } at_caller("$method() must be called on an object, not on the class"), "$method: not a logger";
 	}
 	$logger->info('x');
@@ -481,6 +536,115 @@ subtest '_interpolate and _format: every path' => sub {
 	is(Test::Log::Abstraction::_format(undef, 'd', 'x'), 'x', '_format P5 not a number');
 	like(Test::Log::Abstraction::_format(undef, 's', bless({}, 'Local::Bomb')), qr/\ALocal::Bomb=HASH/, '_format P6 text form dies');
 };
+
+# _format, integer conversions of a number: read as signed (%d, or any
+# negative) or unsigned (%u of a non-negative) x a digit string or a float
+# x fits or not; and a digit string's sign, which '-0' drops.
+#   P1 signed, digits, fits.        P2 signed, digits, too big.
+#   P3 unsigned, digits, fits.      P4 unsigned, digits, too big.
+#   P5 negative, unsigned format: read as signed.   P6 float, fits.
+#   P7 float, too big.
+#   P8 '-0': the minus sign is dropped before comparing.
+subtest '_format: integer conversion paths' => sub {
+	plan(skip_all => 'the limits are for 64-bit integers') if($Config{'ivsize'} < $IV_BYTES);
+	is(Test::Log::Abstraction::_format(undef, 'd', $INT_MAX), $INT_MAX, 'P1 signed, digits, fits');
+	is(Test::Log::Abstraction::_format(undef, 'd', $ABOVE_INT_MAX), $ABOVE_INT_MAX, 'P2 signed, digits, too big: as written');
+	is(Test::Log::Abstraction::_format(undef, 'u', $UINT_MAX), $UINT_MAX, 'P3 unsigned, digits, fits');
+	is(Test::Log::Abstraction::_format(undef, 'u', $ABOVE_UINT_MAX), $ABOVE_UINT_MAX, 'P4 unsigned, digits, too big: as written');
+	is(Test::Log::Abstraction::_format(undef, 'x', '-1'), 'f' x 16, 'P5 negative under %x: read as signed, printed in two\'s complement');
+	is(Test::Log::Abstraction::_format(undef, 'd', 2.5), '2', 'P6 float that fits: formatted');
+	my $huge = 1e30;
+	is(Test::Log::Abstraction::_format(undef, 'd', $huge), "$huge", 'P7 float too big: as written');
+	is(Test::Log::Abstraction::_format(undef, 'd', '-0'), '0', "P8 '-0': 0");
+};
+
+# ===========================================================================
+# Paths that only the rest of the suite took.  This file claims to reach
+# every statement, branch and condition on its own, so each is taken here.
+# ===========================================================================
+
+# _build verbose: P1 option given.  P2 TEST_VERBOSE set.  P3 only VERBOSE
+# set.  P4 neither.
+subtest '_build: verbose, 4 paths' => sub {
+	foreach my $row ([{ verbose => 0 }, 1, 1, 0, 'P1 option given: it decides'], [{}, 1, 0, 1, 'P2 TEST_VERBOSE'], [{}, 0, 1, 1, 'P3 VERBOSE only'], [{}, 0, 0, 0, 'P4 neither']) {
+		my ($options, $test_verbose, $verbose, $want, $name) = @{$row};
+		local $ENV{'TEST_VERBOSE'} = $test_verbose;
+		local $ENV{'VERBOSE'} = $verbose;
+		is(Test::Log::Abstraction::_build($CLASS, { %{$options}, diag => 'none' }, [])->{'verbose'}, $want, $name);
+	}
+};
+
+# _clone's copy loop: P1 no messages (0 runs).  P2 one entry without
+# fields.  P3 one with fields, which are copied too.
+subtest '_clone: copy loop, 3 paths' => sub {
+	my $logger = quiet();
+	is_deeply($logger->new()->messages(), [], 'P1 nothing to copy');
+	$logger->info('plain');
+	is_deeply($logger->new()->messages(), [{ level => 'info', message => 'plain' }], 'P2 entry without fields');
+	$logger->info('m', { k => 1 });
+	my $clone = $logger->new();
+	is_deeply($clone->messages()->[-1]->{'fields'}, { k => 1 }, 'P3 entry with fields: copied');
+	isnt($clone->messages()->[-1]->{'fields'}, $logger->messages()->[-1]->{'fields'}, 'P3 ... into a new hash');
+};
+
+# _resolve_lang: P9 no lang and an undefined default -> English.
+subtest '_resolve_lang: undefined default' => sub {
+	local $Test::Log::Abstraction::config{'lang'} = undef;
+	is(Test::Log::Abstraction::_resolve_lang({}), 'en', 'P9 nothing to go on: English');
+};
+
+# Level methods: P3 warn or more serious, no arguments -> ignored.  P4 less
+# serious, no arguments -> an empty message.
+subtest 'level methods: calls with no arguments' => sub {
+	my $logger = quiet();
+	is(calls_to('_record', sub { $logger->warn() }), 0, 'P3 warn(): ignored');
+	is(calls_to('_record', sub { $logger->notice() }), 1, 'P4 notice(): recorded');
+	is($logger->messages()->[0]->{'message'}, '', 'P4 ... as an empty message');
+};
+
+# _entry: P8 several arguments, the last not a hash.  P9 an undefined part.
+# P10 a part that cannot be rendered at all -> plain form.  P11 trailing
+# fields that cannot be copied -> put back as a part, so plain form.
+# P12 a reference part that renders.
+subtest '_entry: more paths' => sub {
+	is(Test::Log::Abstraction::_entry('i', ['a', 'b'])->{'message'}, 'ab', 'P8 several arguments, no fields');
+	is(Test::Log::Abstraction::_entry('i', ['a', undef])->{'message'}, 'aundef', 'P9 undefined part');
+	tie my %broken, 'Local::DyingHash';
+	like(Test::Log::Abstraction::_entry('i', ['a', \%broken, 'b'])->{'message'}, qr/\AaHASH\(0x[0-9a-f]+\)b\z/, 'P10 part that cannot be rendered: plain form');
+	my $entry;
+	lives_ok { $entry = Test::Log::Abstraction::_entry('i', ['a', \%broken]) } 'P11 fields that cannot be read: no death';
+	like($entry->{'message'}, qr/\AaHASH\(0x[0-9a-f]+\)\z/, 'P11 ... shown as a part, in plain form');
+	ok(!exists($entry->{'fields'}), 'P11 ... and not as fields');
+	is(Test::Log::Abstraction::_entry('i', ['a', [1, 2]])->{'message'}, 'a[1, 2]', 'P12 a reference part that renders');
+};
+
+# _variant: P6 a gender not in the template -> plural form.  P7 the chosen
+# form is missing -> ''.
+# _plural: P6 count 0 with no 'zero' form.  P7 undefined language -> English.
+subtest '_variant and _plural: more paths' => sub {
+	is(Test::Log::Abstraction::_variant({ male => 'he', other => 'they' }, { gender => 'female' }, 'en'), 'they', '_variant P6 gender missing: plural form');
+	is(Test::Log::Abstraction::_variant({ one => 'one' }, { count => 2 }, 'en'), '', '_variant P7 no such form: empty');
+	is(Test::Log::Abstraction::_plural({ one => 1, other => 1 }, 0, 'en'), 'other', "_plural P6 0 with no 'zero'");
+	is(Test::Log::Abstraction::_plural({ one => 1, other => 1 }, 1, undef), 'one', '_plural P7 undefined language');
+};
+
+# _format, not a finite plain number for %d: P9 a reference.  P10 NaN.
+# P11 infinity.  i18n: P6 called on the class.  P7 called as a function
+# with no invocant: no class to name.
+subtest '_format and i18n: more paths' => sub {
+	my $ref = [];
+	is(Test::Log::Abstraction::_format(undef, 'd', $ref), "$ref", '_format P9 reference: as written');
+	is(Test::Log::Abstraction::_format(undef, 'd', 'NaN'), 'NaN', '_format P10 NaN: as written');
+	is(Test::Log::Abstraction::_format(undef, 'd', 9**9**9), 9**9**9, '_format P11 infinity: as written');
+	is($CLASS->i18n('no_method', { method => 'm' }), "$CLASS: no method 'm'", 'i18n P6 called on the class');
+	is(Test::Log::Abstraction::i18n('', 'no_method', { method => 'm' }), ": no method 'm'", 'i18n P7 no invocant: no class named');
+};
+
+{
+	package Local::DyingHash;
+	sub TIEHASH { return bless {}, shift }
+	sub FIRSTKEY { die "no keys\n" }
+}
 
 # DESTROY: one path, which does nothing - in particular, it never reaches
 # AUTOLOAD, so destruction stores and prints nothing

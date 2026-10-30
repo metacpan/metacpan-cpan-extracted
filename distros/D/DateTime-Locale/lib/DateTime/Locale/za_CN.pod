@@ -435,6 +435,24 @@ Zhuang China locale.
    1995-12-22T09:05:02 = CE 1995 ndwencibngeih 22, singhgizhaj
   -0010-09-15T04:44:23 = BCE -10 ndwengouj 15, singhgizroek
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 ndwenngeih
+   1995-12-22T09:05:02 = CE 1995 ndwencibngeih
+  -0010-09-15T04:44:23 = BCE -10 ndwengouj
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 ndwenngeih 5, singhgizngeih
+   1995-12-22T09:05:02 = CE 1995 ndwencibngeih 22, singhgizhaj
+  -0010-09-15T04:44:23 = BCE -10 ndwengouj 15, singhgizroek
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 ndwenngeih 5
+   1995-12-22T09:05:02 = CE 1995 ndwencibngeih 22
+  -0010-09-15T04:44:23 = BCE -10 ndwengouj 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 ndwenngeih 5
@@ -502,6 +520,12 @@ Zhuang China locale.
   -0010-09-15T04:44:23 = ndwengouj
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = ndwenngeih 5, singhgizngeih
+   1995-12-22T09:05:02 = ndwencibngeih 22, singhgizhaj
+  -0010-09-15T04:44:23 = ndwengouj 15, singhgizroek
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = ndwenngeih 5, singhgizngeih
    1995-12-22T09:05:02 = ndwencibngeih 22, singhgizhaj

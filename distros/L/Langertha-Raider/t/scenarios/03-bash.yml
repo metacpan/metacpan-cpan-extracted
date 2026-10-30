@@ -1,0 +1,11 @@
+title: bash runs in the root and reports exit code and output
+files:
+  marker.txt: x
+prompt: List the files.
+script:
+  - tool_calls:
+      - [ bash, { command: ls } ]
+  - text: ok
+expect:
+  tools:
+    - { name: bash, text: '\Amarker\.txt\z' }

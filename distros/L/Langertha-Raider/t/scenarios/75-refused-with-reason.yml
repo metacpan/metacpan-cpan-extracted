@@ -1,0 +1,14 @@
+title: refused with a reason, the model gets Claude Code's refusal with the reason
+permission_mode: default
+approve: [ "no: write into tmp/ instead" ]
+prompt: Write a file.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: x } ]
+  - text: ok
+expect:
+  absent: [ a.txt ]
+  tools:
+    - { name: write_file, error: true, text: "^The user doesn't want to proceed with this tool use\\. The tool use was rejected \\(eg\\. if it was a file edit, the new_string was NOT written to the file\\)\\. To tell you how to proceed, the user said:\nwrite into tmp/ instead$" }
+  events:
+    - { type: permission.denied, tool: write_file, by: user, reason: "The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). To tell you how to proceed, the user said:\nwrite into tmp/ instead" }

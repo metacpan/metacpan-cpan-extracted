@@ -1,0 +1,21 @@
+title: Claude Code's own skills key briefs the agent too, before briefing.skills, with a skill the model may not invoke
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/skills/style/SKILL.md: "---\ndescription: House style.\ndisable-model-invocation: true\n---\nSTYLE-BODY\n"
+  .claude/skills/notes/SKILL.md: "---\ndescription: Notes.\n---\nNOTES-BODY\n"
+  .claude/agents/scribe.md: "---\nname: scribe\ndescription: Writes notes.\nskills: style\nbriefing:\n  skills: [ notes, style ]\n---\nSCRIBE-BODY\n"
+prompt: Have the scribe write.
+script:
+  - tool_calls:
+      - [ agent, { description: Write, prompt: Write it., subagent_type: scribe } ]
+  - text: written
+  - text: done
+expect:
+  answer: done
+  request_count: 3
+  requests:
+    - { index: 1, contains: "/.claude/skills/style\">\nSTYLE-BODY\n</skill>\n\n<skill name=\"notes\" dir=\"" }
+    - { index: 1, contains: "/.claude/skills/notes\">\nNOTES-BODY\n</skill>\n\n---\n\n# Original task\n\nWrite it." }
+  tools:
+    - { name: agent, text: '\Awritten\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }

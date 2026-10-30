@@ -411,17 +411,17 @@ Dutch Curaçao locale.
    1995-12-22T09:05:02 = 1995 n.Chr.
   -0010-09-15T04:44:23 = -10 v.Chr.
 
-=head3 GyM (M/y G)
+=head3 GyM (M-y G)
 
-   2008-02-05T18:30:30 = 2/2008 n.Chr.
-   1995-12-22T09:05:02 = 12/1995 n.Chr.
-  -0010-09-15T04:44:23 = 9/-10 v.Chr.
+   2008-02-05T18:30:30 = 2-2008 n.Chr.
+   1995-12-22T09:05:02 = 12-1995 n.Chr.
+  -0010-09-15T04:44:23 = 9--10 v.Chr.
 
-=head3 GyMEd (E d/M/y G)
+=head3 GyMEd (E d-M-y G)
 
-   2008-02-05T18:30:30 = di 5/2/2008 n.Chr.
-   1995-12-22T09:05:02 = vr 22/12/1995 n.Chr.
-  -0010-09-15T04:44:23 = za 15/9/-10 v.Chr.
+   2008-02-05T18:30:30 = di 5-2-2008 n.Chr.
+   1995-12-22T09:05:02 = vr 22-12-1995 n.Chr.
+  -0010-09-15T04:44:23 = za 15-9--10 v.Chr.
 
 =head3 GyMMM (MMM y G)
 
@@ -435,17 +435,35 @@ Dutch Curaçao locale.
    1995-12-22T09:05:02 = vr 22 dec 1995 n.Chr.
   -0010-09-15T04:44:23 = za 15 sep -10 v.Chr.
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = februari 2008 n.Chr.
+   1995-12-22T09:05:02 = december 1995 n.Chr.
+  -0010-09-15T04:44:23 = september -10 v.Chr.
+
+=head3 GyMMMMEd (E d MMMM y G)
+
+   2008-02-05T18:30:30 = di 5 februari 2008 n.Chr.
+   1995-12-22T09:05:02 = vr 22 december 1995 n.Chr.
+  -0010-09-15T04:44:23 = za 15 september -10 v.Chr.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 februari 2008 n.Chr.
+   1995-12-22T09:05:02 = 22 december 1995 n.Chr.
+  -0010-09-15T04:44:23 = 15 september -10 v.Chr.
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 feb 2008 n.Chr.
    1995-12-22T09:05:02 = 22 dec 1995 n.Chr.
   -0010-09-15T04:44:23 = 15 sep -10 v.Chr.
 
-=head3 GyMd (d/M/y GGGGG)
+=head3 GyMd (d-M-y G)
 
-   2008-02-05T18:30:30 = 5/2/2008 n.C.
-   1995-12-22T09:05:02 = 22/12/1995 n.C.
-  -0010-09-15T04:44:23 = 15/9/-10 v.C.
+   2008-02-05T18:30:30 = 5-2-2008 n.Chr.
+   1995-12-22T09:05:02 = 22-12-1995 n.Chr.
+  -0010-09-15T04:44:23 = 15-9--10 v.Chr.
 
 =head3 H (HH)
 
@@ -506,6 +524,12 @@ Dutch Curaçao locale.
    2008-02-05T18:30:30 = di 5 feb
    1995-12-22T09:05:02 = vr 22 dec
   -0010-09-15T04:44:23 = za 15 sep
+
+=head3 MMMMEd (E d MMMM)
+
+   2008-02-05T18:30:30 = di 5 februari
+   1995-12-22T09:05:02 = vr 22 december
+  -0010-09-15T04:44:23 = za 15 september
 
 =head3 MMMMW-count-one ('week' W 'van' MMMM)
 
@@ -620,6 +644,18 @@ Dutch Curaçao locale.
    2008-02-05T18:30:30 = februari 2008
    1995-12-22T09:05:02 = december 1995
   -0010-09-15T04:44:23 = september -10
+
+=head3 yMMMMEd (E d MMMM y)
+
+   2008-02-05T18:30:30 = di 5 februari 2008
+   1995-12-22T09:05:02 = vr 22 december 1995
+  -0010-09-15T04:44:23 = za 15 september -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 februari 2008
+   1995-12-22T09:05:02 = 22 december 1995
+  -0010-09-15T04:44:23 = 15 september -10
 
 =head3 yMMMd (d MMM y)
 

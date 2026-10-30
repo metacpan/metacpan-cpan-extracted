@@ -429,11 +429,29 @@ Latvian locale.
    1995-12-22T09:05:02 = m.ē. 1995. g. dec.
   -0010-09-15T04:44:23 = p.m.ē. -10. g. sept.
 
-=head3 GyMMMEd (E, G y. 'g'. d. MMM)
+=head3 GyMMMEd (E, y. 'g'. d. MMM, G)
 
-   2008-02-05T18:30:30 = otrd., m.ē. 2008. g. 5. febr.
-   1995-12-22T09:05:02 = piektd., m.ē. 1995. g. 22. dec.
-  -0010-09-15T04:44:23 = sestd., p.m.ē. -10. g. 15. sept.
+   2008-02-05T18:30:30 = otrd., 2008. g. 5. febr., m.ē.
+   1995-12-22T09:05:02 = piektd., 1995. g. 22. dec., m.ē.
+  -0010-09-15T04:44:23 = sestd., -10. g. 15. sept., p.m.ē.
+
+=head3 GyMMMM (y. 'gada' MMMM, G)
+
+   2008-02-05T18:30:30 = 2008. gada februāris, m.ē.
+   1995-12-22T09:05:02 = 1995. gada decembris, m.ē.
+  -0010-09-15T04:44:23 = -10. gada septembris, p.m.ē.
+
+=head3 GyMMMMEd (E, y. 'gada' d. MMMM, G)
+
+   2008-02-05T18:30:30 = otrd., 2008. gada 5. februāris, m.ē.
+   1995-12-22T09:05:02 = piektd., 1995. gada 22. decembris, m.ē.
+  -0010-09-15T04:44:23 = sestd., -10. gada 15. septembris, p.m.ē.
+
+=head3 GyMMMMd (y. 'gada' d. MMMM, G)
+
+   2008-02-05T18:30:30 = 2008. gada 5. februāris, m.ē.
+   1995-12-22T09:05:02 = 1995. gada 22. decembris, m.ē.
+  -0010-09-15T04:44:23 = -10. gada 15. septembris, p.m.ē.
 
 =head3 GyMMMd (G y. 'g'. d. MMM)
 
@@ -441,11 +459,11 @@ Latvian locale.
    1995-12-22T09:05:02 = m.ē. 1995. g. 22. dec.
   -0010-09-15T04:44:23 = p.m.ē. -10. g. 15. sept.
 
-=head3 GyMd (GGGGG dd-MM-y)
+=head3 GyMd (d.M.y. G)
 
-   2008-02-05T18:30:30 = m.ē. 05-02-2008
-   1995-12-22T09:05:02 = m.ē. 22-12-1995
-  -0010-09-15T04:44:23 = p.m.ē. 15-09--10
+   2008-02-05T18:30:30 = 5.2.2008. m.ē.
+   1995-12-22T09:05:02 = 22.12.1995. m.ē.
+  -0010-09-15T04:44:23 = 15.9.-10. p.m.ē.
 
 =head3 H (HH)
 
@@ -633,11 +651,23 @@ Latvian locale.
    1995-12-22T09:05:02 = piektd., 1995. g. 22. dec.
   -0010-09-15T04:44:23 = sestd., -10. g. 15. sept.
 
-=head3 yMMMM (y. 'g'. MMMM)
+=head3 yMMMM (y. 'gada'. MMMM)
 
-   2008-02-05T18:30:30 = 2008. g. februāris
-   1995-12-22T09:05:02 = 1995. g. decembris
-  -0010-09-15T04:44:23 = -10. g. septembris
+   2008-02-05T18:30:30 = 2008. gada. februāris
+   1995-12-22T09:05:02 = 1995. gada. decembris
+  -0010-09-15T04:44:23 = -10. gada. septembris
+
+=head3 yMMMMEd (E, y. 'gada' d. MMMM)
+
+   2008-02-05T18:30:30 = otrd., 2008. gada 5. februāris
+   1995-12-22T09:05:02 = piektd., 1995. gada 22. decembris
+  -0010-09-15T04:44:23 = sestd., -10. gada 15. septembris
+
+=head3 yMMMMd (y. 'gada' d. MMMM)
+
+   2008-02-05T18:30:30 = 2008. gada 5. februāris
+   1995-12-22T09:05:02 = 1995. gada 22. decembris
+  -0010-09-15T04:44:23 = -10. gada 15. septembris
 
 =head3 yMMMd (y. 'g'. d. MMM)
 

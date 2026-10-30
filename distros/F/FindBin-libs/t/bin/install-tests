@@ -29,6 +29,7 @@ typeset -rx test_d=$( dirname $bin_d  );
 typeset -rx root_d=$( dirname $test_d );
 typeset -rx  etc_d=$test_d/etc;
 typeset -rx yaml_f=$etc_d/tests.yaml;
+typeset -rx  PERL="${PERL:-perl}";
 
 [[ -f $yaml_f ]] || fatal "Missing: $yaml_f";
 
@@ -46,7 +47,7 @@ done
 # create per-group .inst symlinks from the top-level keys in tests.yaml.
 
 for group in $(
-    perl -MYAML::Tiny -e '
+    "$PERL" -MYAML::Tiny -e '
         my $y = YAML::Tiny->read( $ARGV[0] )
             or die "Cannot read: $ARGV[0]";
         print join "\n", sort keys %{ $y->[0] };
@@ -76,7 +77,7 @@ do
 
         log-msg "$i ($dest_d)";
 
-        perl "$i" \
+        "$PERL" "$i" \
         || fatal "Failed: $i ($?)";
     else
         log-msg "Non-readable: $i";

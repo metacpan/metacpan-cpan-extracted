@@ -36,4 +36,8 @@ t/14child_finish_hook.t
 t/14interim_response.t
 t/15smuggling-content-length-and-transfer-encoding.t
 t/16smuggling-multiple-content-length-header.t
+t/17chunked_ext.t
+t/18huge_content_length.t
+t/19head_response.t
+t/20chunk_size_line.t
 t/assets/baybridge.jpg

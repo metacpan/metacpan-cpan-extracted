@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,7 +41,8 @@ requires:
   warnings: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/DateTime-Lite/issues
-  repository: https://gitlab.com/jackdeguest/DateTime-Lite
-version: v0.10.0
+  bugtracker: https://gitlab.com/deguest/DateTime-Lite/issues
+  repository: https://gitlab.com/deguest/DateTime-Lite
+version: v0.11.0
 x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

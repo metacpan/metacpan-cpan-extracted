@@ -435,6 +435,24 @@ Ewe locale.
    1995-12-22T09:05:02 = fiɖ, dzm 22 lia 1995 Yŋ
   -0010-09-15T04:44:23 = mem, any 15 lia -10 HYV
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = Yŋ 2008 dzodze
+   1995-12-22T09:05:02 = Yŋ 1995 dzome
+  -0010-09-15T04:44:23 = HYV -10 anyɔnyɔ
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = Yŋ 2008 dzodze 5, bla
+   1995-12-22T09:05:02 = Yŋ 1995 dzome 22, fiɖ
+  -0010-09-15T04:44:23 = HYV -10 anyɔnyɔ 15, mem
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = Yŋ 2008 dzodze 5
+   1995-12-22T09:05:02 = Yŋ 1995 dzome 22
+  -0010-09-15T04:44:23 = HYV -10 anyɔnyɔ 15
+
 =head3 GyMMMd (MMM d 'lia', y G)
 
    2008-02-05T18:30:30 = dzd 5 lia, 2008 Yŋ
@@ -626,6 +644,18 @@ Ewe locale.
    2008-02-05T18:30:30 = dzodze 2008
    1995-12-22T09:05:02 = dzome 1995
   -0010-09-15T04:44:23 = anyɔnyɔ -10
+
+=head3 yMMMMEd (E, MMMM d, y)
+
+   2008-02-05T18:30:30 = bla, dzodze 5, 2008
+   1995-12-22T09:05:02 = fiɖ, dzome 22, 1995
+  -0010-09-15T04:44:23 = mem, anyɔnyɔ 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = dzodze 5, 2008
+   1995-12-22T09:05:02 = dzome 22, 1995
+  -0010-09-15T04:44:23 = anyɔnyɔ 15, -10
 
 =head3 yMMMd (MMM d 'lia', y)
 

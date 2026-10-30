@@ -3,7 +3,7 @@ package Database::BI::Ask;
 use strict;
 use warnings;
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 use Carp                qw(croak);
 use Database::BI::Util  qw(urlencode);
@@ -113,7 +113,7 @@ sub _call_llm {
 
 	require LWP::UserAgent;
 	require HTTP::Request;
-	require JSON::PP;	# core since Perl 5.013009; MIN_PERL_VERSION is 5.020000
+	require JSON::PP;	# core since Perl 5.013009; MIN_PERL_VERSION is 5.028000
 
 	my $col_lines = join("\n", map { "- $_->{name} ($_->{type})" } @$columns);
 	my $kinds_str = join(', ', sort keys %SUPPORTED_KINDS);
@@ -315,12 +315,50 @@ Returns C<{ spec, url, valid =E<gt> 1 }> on success, or C<{ error =E<gt> 'code' 
 on failure.  Error codes: C<ask_no_question>, C<ask_unavailable>,
 C<ask_provider_error>, C<ask_unparseable>, C<ask_invalid_spec:col>.
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+	    question  => 'string',     # required; empty returns ask_no_question
+	    spec_key  => 'string',     # l= spec the URL is built on, e.g. "table:sales"
+	    label     => 'string',     # optional; dataset name shown to the model (default "dataset")
+	    columns   => 'arrayref',   # [ { name, type } ... ], as infer_column_types returns
+	    ai_config => 'hashref',    # { api_key, model, provider }; no api_key returns ask_unavailable
+	}
+
+A flat key/value list.  C<ask> does not croak: every failure, including no
+arguments, comes back as an error code.
+
+=head4 OUTPUT
+
+	{ spec => 'hashref', url => 'string', valid => 1 }   # success
+	{ error => 'string' }                              # one of the codes above
+
+The model sees only the question, the label and C<columns>.  No row data,
+file path or C<spec_key> is sent.
+
 =head2 infer_column_types($records, $columns)
 
 Infers each column's type (C<'number'>, C<'date'>, C<'string'>) from a
 sample of records.  A column is C<'number'> when more than half its
 non-empty values pass C<Scalar::Util::looks_like_number>.  It is C<'date'>
 when more than half match C<YYYY-MM-DD> or C<M/D/YYYY>.  Otherwise C<'string'>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$records   # arrayref of hashrefs (rows)
+	$columns   # arrayref of column names to classify
+
+=head4 OUTPUT
+
+	[ { name => 'string', type => 'number' | 'date' | 'string' }, ... ]
+
+One entry per name in C<$columns>, in that order.  Either argument not an
+array reference returns C<[]>.  A column with no non-empty values is
+C<'string'>.
 
 =head1 AUTHOR
 

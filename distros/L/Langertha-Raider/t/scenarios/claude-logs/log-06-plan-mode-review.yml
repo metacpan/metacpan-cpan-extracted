@@ -1,0 +1,45 @@
+# Real pattern: plan mode -- Glob and Read to explore, a Write attempt is refused,
+# ExitPlanMode with a plan, the person asks for a change, a second plan is
+# approved, then the Writes go through (default mode after the plan: each asks).
+# The refused plan is an error result with Claude Code's "doesn't want to
+# proceed" text and the feedback; the approval says "User has approved your plan".
+title: plan mode explores, the first plan is sent back with feedback, the second is approved, then the files are written
+permission_mode: plan
+review: [ "no: also add a test", yes ]
+approve: [ once, once ]
+files:
+  src/app.txt: "app\n"
+prompt: Add a version file.
+script:
+  - tool_calls:
+      - [ glob, { pattern: "**/*.txt" } ]
+      - [ read_file, { path: src/app.txt } ]
+  - tool_calls:
+      - [ write_file, { path: VERSION, content: "1\n" } ]
+  - tool_calls:
+      - [ exit_plan_mode, { plan: "1. write VERSION" } ]
+  - tool_calls:
+      - [ exit_plan_mode, { plan: "1. write VERSION\n2. write t/version.txt" } ]
+  - tool_calls:
+      - [ write_file, { path: VERSION, content: "1\n" } ]
+      - [ write_file, { path: t/version.txt, content: "ok\n" } ]
+  - text: Both files written.
+expect:
+  answer: Both files written.
+  files:
+    VERSION: "1\n"
+    t/version.txt: "ok\n"
+  plans: [ "1. write VERSION", "1. write VERSION\n2. write t/version.txt" ]
+  permissions:
+    - { tool: write_file }
+    - { tool: write_file }
+  tools:
+    - { name: glob, text: 'src/app\.txt' }
+    - { name: read_file, text: '^1\tapp' }
+    - { name: write_file, error: true, text: "^Permission to use write_file has been denied\\. Reason: plan mode: write_file changes files, which plan mode does not allow; present your plan with exit_plan_mode first\\.$" }
+    - { name: exit_plan_mode, error: true, text: "^The user doesn't want to proceed with this tool use\\. .*To tell you how to proceed, the user said:\nalso add a test$" }
+    - { name: exit_plan_mode, text: "^User has approved your plan\\. You can now start coding\\..*## Approved Plan:\n1\\. write VERSION\n2\\. write t/version\\.txt$" }
+    - { name: write_file }
+    - { name: write_file }
+  events:
+    - { type: permission.mode, from: plan, to: default, why: exit_plan_mode }

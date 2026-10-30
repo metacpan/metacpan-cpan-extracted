@@ -10,6 +10,16 @@ README.md
 SECURITY.md
 builder/Affix/Builder.pm
 cpanfile
+eg/affix_build.pl
+eg/affix_wrap.pl
+eg/benchmark.pl
+eg/ithreads.pl
+eg/libm.pl
+eg/qsort.pl
+eg/simd.pl
+eg/synopsis.pl
+eg/win32_msgbox.pl
+eg/win32_screenres.pl
 infix/LICENSE-A2
 infix/LICENSE-CC
 infix/LICENSE-MIT
@@ -60,6 +70,7 @@ lib/Affix.pod
 lib/Affix/Build.pm
 lib/Affix/Build.pod
 lib/Affix/Platform/BSD.pm
+lib/Affix/Platform/Cygwin.pm
 lib/Affix/Platform/Haiku.pm
 lib/Affix/Platform/MacOS.pm
 lib/Affix/Platform/Solaris.pm

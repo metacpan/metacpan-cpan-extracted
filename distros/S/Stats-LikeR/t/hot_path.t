@@ -377,15 +377,13 @@ for my $name ( sort keys %SHAPE ) {
 	# R reg-tests-1a.R: quantile(x, probs = ((1:n)-1)/(n-1)) == sort(x).
 	my $probs = [ map { $_ / ( $n - 1 ) } 0 .. $n - 1 ];
 	my $q = quantile( \@x, probs => $probs );
+	# 501 probs is R's format() route for the names (100 or more), which gives
+	# every one of i/5 the same single decimal: "0.0%", "0.2%", ... "100.0%".
+	is( scalar keys %$q, $n, 'quantile: one key per requested rank' );
 	my $bad = 0;
 	for my $i ( 0 .. $n - 1 ) {
-		my $p   = $i / ( $n - 1 );
-		my $pct = $p * 100;
-		my $key = ( abs( $pct - sprintf( '%.0f', $pct ) ) < 1e-9 )
-			? sprintf( '%.0f%%', $pct )
-			: sprintf( '%.1f%%', $pct );
-		next unless exists $q->{$key};
-		$bad++ if abs( $q->{$key} - $sorted[$i] ) > 1e-12;
+		my $key = sprintf( '%.1f%%', 100 * $i / ( $n - 1 ) );
+		$bad++ unless exists $q->{$key} && abs( $q->{$key} - $sorted[$i] ) <= 1e-12;
 	}
 	is( $bad, 0, 'quantile: every requested rank matches a full sort (R reg-tests-1a.R)' );
 

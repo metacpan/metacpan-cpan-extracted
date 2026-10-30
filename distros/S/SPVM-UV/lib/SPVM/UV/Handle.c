@@ -43,6 +43,7 @@ static void SPVM__UV__Handle__close_cb(uv_handle_t* uv_handle) {
   stack[0].oval = obj_uv_loop;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "delete_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  
   if (error_id) {
     spvm_diag("[Unexpected Error]Calling 'delete_uv_handle' failed.");
     abort();

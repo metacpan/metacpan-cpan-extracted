@@ -10,6 +10,11 @@ use Mojo::JSON qw(encode_json decode_json);
 use CallBackery::Exception qw(mkerror);
 use Time::HiRes qw(gettimeofday);
 use Mojo::Util qw(hmac_sha1_sum);
+use Crypt::ScryptKDF qw(scrypt_hash scrypt_hash_verify);
+use Unicode::Normalize qw(NFC);
+use Encode qw(encode_utf8);
+
+my $dummyHash;
 
 =head1 NAME
 
@@ -125,13 +130,27 @@ has loginName => sub {
 
 True when a validly-signed session cookie was presented but is too old. Distinct
 from "not authenticated at all" (no/invalid cookie), which leaves this false. Set
-by whichever layer detects expiry (e.g. a subclass' C<cookieConf> that enforces a
-max cookie age); read by the RPC dispatcher to choose the session-expired signal
+by C<cookieConf> when a cookie is older than C<maxSessionAge>, or by a subclass
+that enforces its own limit; read by the RPC dispatcher to choose the session-expired signal
 (code 7) over the login-required signal (code 6). Per-request.
 
 =cut
 
 has sessionExpired => 0;
+
+=head2 maxSessionAge
+
+How long a session is accepted after the login that started it, in seconds;
+C<0> for no limit. Taken from C<max_session_age> in the BACKEND section,
+no limit by default. Cookies renewed with C<makeSessionCookie> keep the
+start of their session. Logging out does not invalidate a cookie that was
+already issued; this limit is what ends it.
+
+=cut
+
+has maxSessionAge => sub ($self) {
+    $self->app->config->cfgHash->{BACKEND}{max_session_age} // 0;
+};
 
 =head2 $self->sessionConf
 
@@ -202,6 +221,15 @@ has cookieConf => sub {
         die mkerror(38445,"cookie has expired");
     }
 
+    # s is when the session started; cookies renewed by makeSessionCookie keep it
+    my $start = $conf->{s} // $conf->{t};
+    if ($self->maxSessionAge and gettimeofday() - $start > $self->maxSessionAge){
+        $self->log->debug(qq{Session cookie is older than maxSessionAge});
+        $self->sessionExpired(1);
+        return {};
+    }
+    $self->{sessionStart} = $start;
+
     return $conf;
 };
 
@@ -217,30 +245,63 @@ sub login {
     my $password = shift;
     my $cfg = $self->app->config->cfgHash;
     my $remoteAddress = eval { $self->controller->tx->remote_address } // 'UNKNOWN_IP';
+    my $logLogin = ($login // '') =~ s/([\p{Cc}\x{2028}\x{2029}])/sprintf('\\x{%x}',ord $1)/ger;
     if ($cfg->{sesame_pass} and $cfg->{sesame_user}
         and $login and $password
         and $login eq $cfg->{sesame_user}
         and hmac_sha1_sum($password) eq $cfg->{sesame_pass}){
-        $self->log->info("SESAME Login for $login from $remoteAddress successful");
+        $self->log->info("SESAME Login for $logLogin from $remoteAddress successful");
         $self->session(userId=>'__ROOT');
         return 1;
     }
 
     my $db = $self->db;
     my $userData = $db->fetchRow('cbuser',{login=>$login});
+    my $hash = $userData ? $userData->{cbuser_password} // '' : '';
+    my $legacy = $hash =~ /^[0-9a-f]{40}\z/;
+    my $scrypt = $hash =~ /^SCRYPT:/;
+    # one scrypt check on every path, so the time taken does not tell whether the login exists
+    my $ok = $self->verifyPassword($scrypt ? $hash : ($dummyHash //= $self->hashPassword(rand)),$password);
+    $ok = 0 if not $scrypt;
+    $ok = secure_compare(eval { hmac_sha1_sum($password // '') } // '',$hash) if $legacy;
     if (not $userData) {
-        $self->log->info("Login attempt with unknown user $login from $remoteAddress failed");
+        $self->log->info("Login attempt with unknown user $logLogin from $remoteAddress failed");
         return undef;
     }
 
-    if ($userData->{cbuser_password} and $password
-        and hmac_sha1_sum($password) eq $userData->{cbuser_password} ){
+    if ($ok and $hash and $password){
+        $db->updateOrInsertData('cbuser',{password => $self->hashPassword($password)},
+            {id => $userData->{cbuser_id}}) if $legacy;
         $self->userId($userData->{cbuser_id});
-        $self->log->info("Login for $login from $remoteAddress successful");
+        delete $self->{sessionStart};
+        $self->log->info("Login for $logLogin from $remoteAddress successful");
         return 1;
     }
-    $self->log->info("Login attempt with wrong password for $login from $remoteAddress failed");
+    $self->log->info("Login attempt with wrong password for $logLogin from $remoteAddress failed");
     return undef;
+}
+
+=head2 $hash = $self->hashPassword($password)
+
+Hash a password for the C<cbuser_password> column: scrypt with a random salt
+over the NFC normalized, UTF-8 encoded password, stored as
+C<SCRYPT:N:r:p:salt:key>. Hashes in the old unsalted HMAC-SHA1 format are
+still accepted by C<login>, which replaces them on the next successful login.
+
+=cut
+
+sub hashPassword ($self,$password) {
+    return scrypt_hash(encode_utf8(NFC($password // '')));
+}
+
+=head2 $bool = $self->verifyPassword($hash,$password)
+
+Check a password against a hash made by C<hashPassword>.
+
+=cut
+
+sub verifyPassword ($self,$hash,$password) {
+    return eval { scrypt_hash_verify(encode_utf8(NFC($password // '')),$hash) } ? 1 : 0;
 }
 
 =head2 $bool = $self->C<may>(right);
@@ -275,6 +336,7 @@ sub makeSessionCookie {
     my $conf = b64_encode(encode_json({
         u => $self->userId,
         t => $now,
+        s => $self->{sessionStart} // $now,
     }));
     $conf =~ s/\s+//g;
     my $secret = $self->firstSecret;

@@ -8,7 +8,7 @@ use feature 'class';
 # runs the block in the calling fiber (the parent), joins every child, and rethrows the
 # first failure as an Acme::Parataxis::Error::Nursery whose ->failures lists every child
 # error (Principle 4: a plain aggregate error, no Java ExceptionGroup).
-class Acme::Parataxis::Nursery v0.1.1 {
+class Acme::Parataxis::Nursery v0.1.3 {
     use Acme::Parataxis;
     use Acme::Parataxis::CancellationToken;
     use Carp qw[croak];

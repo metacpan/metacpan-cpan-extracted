@@ -1,0 +1,21 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Handle::Process extends UV::Handle {
+  
+  use UV;
+  use UV::Constant;
+  use UV::Callback::Exit;
+  
+  # Fields
+  has exit_cb : rw UV::Callback::Exit;
+  
+  # Class Methods
+  native static method new : UV::Handle::Process ();
+  
+  # Instance Methods
+  native method pid : int ();
+  
+  native method kill : int ($signum : int);
+  
+}

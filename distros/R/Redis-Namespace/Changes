@@ -1,5 +1,13 @@
 Revision history for Perl extension Redis::Namespace
 
+0.16 2026-10-28T13:52:39Z
+        - Namespace falsy keys ('0', 0, '') and blessed objects.
+          They were sent to the global keyspace without the namespace prefix.
+        - The guess option no longer namespaces trailing non-key arguments
+          of commands whose last key position is negative. e.g. BLPOP's timeout
+        - Namespace '0' now prefixes keys with '0:'.
+          An omitted or empty namespace means no namespace in every command, including KEYS, SCAN and PSUBSCRIBE.
+
 0.15 2026-10-02T13:57:33Z
         - Document possible duplicate scan_callback invocations
 

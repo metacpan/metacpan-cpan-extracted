@@ -435,6 +435,24 @@ Kaingang Brazil locale.
    1995-12-22T09:05:02 = pén., 22 ne 12Ky., 1995 C.kk.
   -0010-09-15T04:44:23 = sav., 15 ne 9Ky., -10 C.j.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = C.kk. 2008 2-Kysã
+   1995-12-22T09:05:02 = C.kk. 1995 12-Kysã
+  -0010-09-15T04:44:23 = C.j. -10 9-Kysã
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = C.kk. 2008 2-Kysã 5, rég.
+   1995-12-22T09:05:02 = C.kk. 1995 12-Kysã 22, pén.
+  -0010-09-15T04:44:23 = C.j. -10 9-Kysã 15, sav.
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = C.kk. 2008 2-Kysã 5
+   1995-12-22T09:05:02 = C.kk. 1995 12-Kysã 22
+  -0010-09-15T04:44:23 = C.j. -10 9-Kysã 15
+
 =head3 GyMMMd (d 'ne' MMM, y G)
 
    2008-02-05T18:30:30 = 5 ne 2Ky., 2008 C.kk.

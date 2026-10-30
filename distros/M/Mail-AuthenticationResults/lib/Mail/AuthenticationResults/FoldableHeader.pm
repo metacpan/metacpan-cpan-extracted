@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::FoldableHeader;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20260216'; # VERSION
+our $VERSION = '2.20261029'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Token::String;
@@ -248,7 +248,7 @@ Mail::AuthenticationResults::FoldableHeader - Class for modelling a foldable hea
 
 =head1 VERSION
 
-version 2.20260216
+version 2.20261029
 
 =head1 DESCRIPTION
 
@@ -347,11 +347,11 @@ Return the current header string
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

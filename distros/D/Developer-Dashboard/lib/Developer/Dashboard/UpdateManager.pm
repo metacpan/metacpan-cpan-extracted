@@ -3,10 +3,10 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use File::Basename qw(dirname);
 use File::Spec;
 
@@ -37,7 +37,7 @@ sub new {
 # Output: directory path string.
 sub updates_dir {
     my ($self) = @_;
-    return File::Spec->catdir( cwd(), 'updates' );
+    return File::Spec->catdir( current_working_directory(), 'updates' );
 }
 
 # run()

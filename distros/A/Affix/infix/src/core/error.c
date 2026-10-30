@@ -69,7 +69,7 @@
 #endif
 
 // A portable macro for safe string copying to prevent buffer overflows.
-#if defined(INFIX_COMPILER_MSVC)
+#if defined(_MSC_VER) || defined(INFIX_COMPILER_MSVC)
 #define _INFIX_SAFE_STRNCPY(dest, src, count) strncpy_s(dest, sizeof(dest), src, count)
 #else
 #define _INFIX_SAFE_STRNCPY(dest, src, count) \

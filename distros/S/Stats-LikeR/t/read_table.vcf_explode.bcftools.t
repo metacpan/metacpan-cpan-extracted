@@ -852,12 +852,12 @@ my $f   = fixture('ex2.vcf', $ex2);
 # croaks
 {
 	my ($err) = outcome(sub { read_table(fixture('x.tsv', "a\tb\n1\t2\n"), explode => 1) });
-	like $err, qr/^read_table: 'explode' applies only to a VCF \(\.vcf, \.vcf\.gz or \.vcf\.bgz\), and ".*x\.tsv" is not named as one$/,
+	like $err, qr/\nread_table: error: 'explode' applies only to a VCF \(\.vcf, \.vcf\.gz or \.vcf\.bgz\), and ".*x\.tsv" is not named as one$/,
 		'explode on a file not named as a VCF';
 	($err) = outcome(sub { read_table($f, explode => 2) });
-	is $err, "read_table: 'explode' must be 0 or 1\n", 'explode => 2';
+	is $err, Stats::LikeR::_usage_text('read_table') . "read_table: error: 'explode' must be 0 or 1\n", 'explode => 2';
 	($err) = outcome(sub { read_table($f, explode => undef) });
-	is $err, "read_table: 'explode' must be 0 or 1\n", 'explode => undef';
+	is $err, Stats::LikeR::_usage_text('read_table') . "read_table: error: 'explode' must be 0 or 1\n", 'explode => undef';
 	($err) = outcome(sub { read_table($f, 'row_names' => 'NA00001') });
 	is $err, "\"NA00001\" isn't in the header of $f\n",
 		'row_names naming a sample column, which the exploded table has not got';
@@ -865,7 +865,7 @@ my $f   = fixture('ex2.vcf', $ex2);
 	is $err, "read_table: undefined row name (column 'QUAL') in $f data row 2\n",
 		'a row name made undef by na_strings';
 	($err) = outcome(sub { read_table($f, 'output_type' => 'aoa', 'row_names' => 'POS') });
-	like $err, qr/^read_table: 'row_names' has no meaning for output_type "aoa"/,
+	like $err, qr/\nread_table: error: 'row_names' has no meaning for output_type "aoa"/,
 		'row_names with an aoa';
 	(my $long = $ex2) =~ s/\t0\|0:48:1:25,30:10,20\t/\t0|0:48:1:25,30:10,20:9\t/;
 	my $g = fixture('long.vcf', $long);

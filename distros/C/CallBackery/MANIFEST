@@ -7,6 +7,9 @@ MANIFEST
 README.md
 bin/callbackery-pobuilder
 t/basic.t
+t/config-blob-auth.t
+t/config-blob-tmpfile.t
+t/config-restore-safe.t
 t/config-restore.t
 t/doc-traversal.t
 t/export-qrcode.t
@@ -14,8 +17,15 @@ t/export-translate.t
 t/form-getter-once.t
 t/invalidPlugin.t
 t/jsonrpc.t
+t/login-log.t
+t/password-hash.t
+t/path-info-regex.t
+t/rx-validator.t
+t/session-max-age.t
+t/session-secret.t
 t/session_expiry.t
 t/translate.t
+t/user-row-fields.t
 t/callbackery.cfg
 t/lib/CallBackeryTest.pm
 lib/CallBackery/Config.pm

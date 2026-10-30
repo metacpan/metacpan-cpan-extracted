@@ -1,0 +1,18 @@
+title: session/cancel ends a long run; the prompt answers cancelled and raider.done says so
+model:
+  rules:
+    Lange Arbeit.:
+      tool_calls:
+        - [ bash, { command: "touch started && sleep 60" } ]
+  after:
+    bash: { answer: "Wurde nicht abgebrochen." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_session: { as: s, raider: Testie }
+  - acp_prompt: { session: s, text: "Lange Arbeit.", as: p, wait: false }
+  - wait_file: { path: started }
+  - acp_cancel: { session: s }
+  - acp_wait: { prompt: p }
+  - expect_acp: { prompt: p, stop_reason: cancelled }
+  - expect_event: { type: raider.done, status: cancelled }
+  - idle: {}

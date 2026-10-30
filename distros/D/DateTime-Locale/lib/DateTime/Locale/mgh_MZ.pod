@@ -435,6 +435,24 @@ Makhuwa-Meetto Mozambique locale.
    1995-12-22T09:05:02 = YY 1995 Yel 22, Iju
   -0010-09-15T04:44:23 = HY -10 Tis 15, Jmo
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = YY 2008 Mweri wo unayeli
+   1995-12-22T09:05:02 = YY 1995 Mweri wo kumi na yel’li
+  -0010-09-15T04:44:23 = HY -10 Mweri wo tisa
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = YY 2008 Mweri wo unayeli 5, Jnn
+   1995-12-22T09:05:02 = YY 1995 Mweri wo kumi na yel’li 22, Iju
+  -0010-09-15T04:44:23 = HY -10 Mweri wo tisa 15, Jmo
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = YY 2008 Mweri wo unayeli 5
+   1995-12-22T09:05:02 = YY 1995 Mweri wo kumi na yel’li 22
+  -0010-09-15T04:44:23 = HY -10 Mweri wo tisa 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = YY 2008 Una 5
@@ -506,6 +524,12 @@ Makhuwa-Meetto Mozambique locale.
    2008-02-05T18:30:30 = Jnn, Una 5
    1995-12-22T09:05:02 = Iju, Yel 22
   -0010-09-15T04:44:23 = Jmo, Tis 15
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Mweri wo unayeli 5, Jnn
+   1995-12-22T09:05:02 = Mweri wo kumi na yel’li 22, Iju
+  -0010-09-15T04:44:23 = Mweri wo tisa 15, Jmo
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

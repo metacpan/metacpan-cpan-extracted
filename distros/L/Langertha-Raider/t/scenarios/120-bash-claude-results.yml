@@ -1,0 +1,23 @@
+# The bash results read like Claude Code's Bash: the output alone on exit 0,
+# "(Bash completed with no output)" without any, "Exit code N" first on a
+# failure, stdout and stderr as one stream in the order written (ADR 0024).
+title: bash answers like Claude Code -- output, no output, Exit code N, both streams in one
+files:
+  notes.txt: "alpha\nbeta\n"
+prompt: Look at the notes.
+script:
+  - tool_calls:
+      - [ bash, { command: cat notes.txt, description: Show the notes } ]
+      - [ bash, { command: 'touch seen' } ]
+      - [ bash, { command: 'echo out; echo err >&2; echo out again; exit 5' } ]
+      - [ bash, { command: 'test -e missing.txt' } ]
+  - text: done
+expect:
+  answer: done
+  files:
+    seen: ''
+  tools:
+    - { name: bash, text: '\Aalpha\nbeta\z' }
+    - { name: bash, text: '\A\(Bash completed with no output\)\z' }
+    - { name: bash, error: true, text: '\AExit code 5\nout\nerr\nout again\z' }
+    - { name: bash, error: true, text: '\AExit code 1\z' }

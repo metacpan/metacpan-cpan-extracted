@@ -1,0 +1,13 @@
+title: the user's ~/.claude/CLAUDE.md and the project's CLAUDE.local.md are loaded
+home:
+  .claude/CLAUDE.md: "User rule: greet with Moin.\n"
+files:
+  CLAUDE.local.md: "Local rule: never push.\n"
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "User rule: greet with Moin." }
+    - { index: 0, contains: "Local rule: never push." }

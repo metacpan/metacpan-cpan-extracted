@@ -4,7 +4,7 @@ use Test::More;
 use lib 'lib';
 use Mail::DKIM2::Signature;
 
-# -07 section 10.10: flags round-trip, with no verifier enforcement.
+# -08 section 10.10: flags round-trip, with no verifier enforcement.
 my $built = Mail::DKIM2::Signature->new(
     Sequence => 1, Version => 1, Timestamp => 1, Domain => 'ex.example',
     MailFrom => 'a@x.example', RcptTo => ['b@y.example'],

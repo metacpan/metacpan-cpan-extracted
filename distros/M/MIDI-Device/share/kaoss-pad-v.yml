@@ -5,24 +5,24 @@ port:
     out: "KAOSS PAD KPV KPV_CTRL_OUT"
 control_change:
   - number: 0
-    name: "Bank Select"
+    note: "Bank Select"
   - number: 12
-    name: "Touch pad X direction (first point)"
+    note: "Touch pad X direction (first point)"
   - number: 13
-    name: "Touch pad Y direction (first point)"
+    note: "Touch pad Y direction (first point)"
   - number: 14
-    name: "Touch pad X direction (second point)"
+    note: "Touch pad X direction (second point)"
   - number: 15
-    name: "Touch pad Y direction (second point)"
+    note: "Touch pad Y direction (second point)"
   - number: 32
-    name: "Bank Select"
+    note: "Bank Select"
   - number: 92
-    name: "Touch pad ON/OFF (first point)"
+    note: "Touch pad ON/OFF (first point)"
   - number: 93
-    name: "LEVEL fader"
+    note: "LEVEL fader"
   - number: 94
-    name: "FX DEPTH knob"
+    note: "FX DEPTH knob"
   - number: 95
-    name: "HOLD button"
+    note: "HOLD button"
   - number: 96
-    name: "Touch pad ON/OFF (second point)"
+    note: "Touch pad ON/OFF (second point)"

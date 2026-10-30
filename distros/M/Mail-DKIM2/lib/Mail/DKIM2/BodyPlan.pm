@@ -2,7 +2,7 @@ package Mail::DKIM2::BodyPlan;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Carp;
 use MIME::Base64 qw(encode_base64);
@@ -18,7 +18,7 @@ use Mail::DKIM2::MessageInstance;
 # instance is the whole current body; each instance below is its parent's
 # list with the parent's body Recipe applied to it -- a copy range picks
 # lines out of the parent's segments, a literal adds a literal segment.
-# Copy ranges ascend (-07 §5.2), so every list is in body order, and the
+# Copy ranges ascend (-08 §5.2), so every list is in body order, and the
 # body is read once, front to back, each line going to every instance whose
 # list holds it. Instances with the same list (no body Recipe: an unchanged
 # body) share one set of digests.
@@ -222,7 +222,7 @@ sub _block {
 
 # The $n whole CRLF lines of $$bref from $from to $to into $g, in one piece.
 # Blank lines are held back until a non-blank line follows them (trailing
-# blank lines are not hashed, -07 §6.1): those at the end of the run are
+# blank lines are not hashed, -08 §6.1): those at the end of the run are
 # found by looking back from its end, and counted, not hashed.
 sub _span {
     my ($g, $bref, $from, $to, $n) = @_;
@@ -343,7 +343,7 @@ The undo walk checks a chain by rebuilding each previous body from the one
 above it and hashing it, so a chain of N instances copies and hashes the
 body N times. A BodyPlan reads the body Recipes first and works out, for
 every instance, which lines of the current body and which Recipe literals
-make up its body, in order. Copy ranges ascend (-07 section 5.2), so
+make up its body, in order. Copy ranges ascend (-08 section 5.2), so
 those lists are all in body order, and the current body is read once, front
 to back, in pieces of any size, each line going to the digests of the
 instances that hold it. No previous body is built, and the current one is

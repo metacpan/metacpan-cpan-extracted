@@ -38,6 +38,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use Config;
 use Stats::LikeR 'binom_test';
 
 # The n = 2.1e7 cases scan the whole support once per call, which is a fixed
@@ -1627,21 +1628,28 @@ for my $n (7, 40, 500) {
 	like($@, qr/positive integer/, 'C9 croak names the problem');
 }
 
-# (b) Underflow.  For x far from the mean at n = 1e6 the two-sided p-value is
-#     around 1e-301030 and so is zero in any double.  R reports
-#     2.9643938750474793e-323 -- exactly 6 denormal ULPs, and the *same* value
-#     for x = 1, x = 5 and x = 999999, which is its own pbeta() underflow floor
-#     rather than three different tiny numbers.  binom_test() returns a clean 0.
-#
-#     This one is a side effect rather than an original design choice: before
-#     the front factor moved off differenced lgamma()s (see @BIG_CORPUS) the XS
-#     produced R's denormal artefact too, because the old expression underflowed
-#     the same way.  It is kept as the expected behaviour because 0 is the
-#     faithful answer at ~1e-301030 and a denormal is not, but it is recorded
-#     here rather than left as an accident nobody noticed.
+# (b) Underflow.  For x far from the mean at n = 1e6 the probability of the
+#     observed side is around 1e-301030, zero in any double.  R reports
+#     2.9643938750474793e-323 -- 6 denormal ULPs -- for x = 1, 5 and 999999
+#     alike.  That is not an artefact: binom.test() sums P(X <= x) and
+#     P(X >= n - y), where y counts the dbinom() values no larger than
+#     dbinom(x); dbinom(x) has underflowed to 0, so y stops where dbinom()
+#     itself underflows, about 18,800 above the mean, and the far tail from
+#     there really is about 3e-323.  Up to 0.331 binom_test() returned 0
+#     here, because its incomplete beta lost that tail; since 0.331 the tail
+#     goes through TOMS 708's bfrac() (see IB_LARGE in LikeR.xs), as R's does,
+#     and the result is R's to the last bit.  On a long-double or __float128
+#     build dbinom() underflows much further out, so y, and with it the tail,
+#     is that NV's own version of the same thing: a number past 1e-300.
 for my $x (1, 5, 999999) {
 	my $p = binom_test($x, 1000000, p => 0.5)->{'p_value'};
-	is($p, 0, "C9 x=$x n=1e6 two-sided underflows to exactly 0 (R: 2.96e-323)");
+	if ($Config{nvsize} == 8) {
+		is(sprintf('%.15g', $p), '2.96439387504748e-323',
+			"C9 x=$x n=1e6 two-sided is R's 2.9643938750474793e-323");
+	} else {
+		ok($p >= 0 && $p < 1e-300,
+			"C9 x=$x n=1e6 two-sided is past 1e-300 on this NV ($p)");
+	}
 }
 
 done_testing();

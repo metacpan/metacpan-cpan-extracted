@@ -14,7 +14,7 @@ use Mail::DKIM2::Signer;
 use Mail::DKIM2::Verifier;
 use DKIM2TestKeys;
 
-# Local policy (-07 §13.1, §14.4): the highest-numbered DKIM2-Signature MUST NOT carry
+# Local policy (-08 §13.2, §14.4): the highest-numbered DKIM2-Signature MUST NOT carry
 # nd=, and every DKIM2-Signature MUST carry i=, m=, t=, d=, s=. The only
 # legitimate nd= producer is reflector-brand-nd, which always emits the nd=
 # signature together with the matching higher-i= signature, so nd= never
@@ -114,7 +114,7 @@ sub verify_text {
         { domain => 'test1.dkim2.com', next_domain => 'test2.dkim2.com' },
     );
     my $v = verify_text($msg->as_string);
-    is($v->result, 'permerror', 'top nd= rejected');
+    is($v->result, 'fail', 'top nd= rejected');
     like($v->result_detail, qr/DKIM2-Signature i=\d+ unexpected nd= tag/,
         'correct detail for top nd=');
 }
@@ -173,8 +173,8 @@ sub _strip_t {
         { domain => 'test3.dkim2.com', mailfrom => 'srs0=x@bounce.test3.dkim2.com', rcptto => ['dest@test5.dkim2.com'] },
     );
     my $v = verify_text($msg->as_string);
-    is($v->result, 'permerror', 'a bridge from a domain the mail never reached fails');
-    is($v->details, 'PERMERROR: DKIM2-Signature i=2 d= does not match the rt= of i=1',
+    is($v->result, 'fail', 'a bridge from a domain the mail never reached fails');
+    is($v->details, 'FAIL: DKIM2-Signature i=2 d= does not match the rt= of i=1',
         'correct detail for a mismatched bridge');
 }
 
@@ -188,8 +188,8 @@ sub _strip_t {
         { domain => 'test3.dkim2.com', mailfrom => 'srs0=x@bounce.test3.dkim2.com', rcptto => ['dest@test5.dkim2.com'] },
     );
     my $v = verify_text($msg->as_string);
-    is($v->result, 'permerror', 'an unbridged forward from another domain fails custody');
-    is($v->details, 'PERMERROR: DKIM2-Signature i=2 mf= does not match the rt= of i=1',
+    is($v->result, 'fail', 'an unbridged forward from another domain fails custody');
+    is($v->details, 'FAIL: DKIM2-Signature i=2 mf= does not match the rt= of i=1',
         'correct detail for an unbridged forward');
 }
 

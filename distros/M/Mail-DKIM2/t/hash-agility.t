@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# -07 hash agility (draft-05 added sha512): sha512 alongside sha256, multi-hash-set h= parsing,
+# -08 hash agility (draft-05 added sha512): sha512 alongside sha256, multi-hash-set h= parsing,
 # and the --hash signer flag (sha256|sha512|both, default sha256).
 
 use 5.020;
@@ -21,28 +21,28 @@ use DKIM2TestKeys;
 # bin/dkim2sign verifies an upstream chain before extending it.
 $ENV{DKIM2_DNS_JSON} = DKIM2TestKeys::dns_json();
 
-# -07 §3: both hashing algorithms must be implemented
+# -08 §3: both hashing algorithms must be implemented
 my $algs = Mail::DKIM2::MessageInstance::hash_algs();
-is_deeply([sort keys %$algs], ['sha256', 'sha512'], '-07 §3: both hash algorithms present');
+is_deeply([sort keys %$algs], ['sha256', 'sha512'], '-08 §3: both hash algorithms present');
 
-# -07 §9.3: h= is a comma-separated list of hash-sets
-my $sets = Mail::DKIM2::MessageInstance::parse_hash_sets('sha256:AAA:BBB,sha512:CCC:DDD');
+# -08 §9.3: h= is a comma-separated list of hash-sets
+my $sets = Mail::DKIM2::MessageInstance::parse_hash_sets('sha256:AAAA:BBBB,sha512:CCCC:DDDD');
 is(scalar @$sets, 2, 'two hash-sets parsed');
-is_deeply($sets->[0], ['sha256', 'AAA', 'BBB'], 'first hash-set');
-is_deeply($sets->[1], ['sha512', 'CCC', 'DDD'], 'second hash-set');
+is_deeply($sets->[0], ['sha256', 'AAAA', 'BBBB'], 'first hash-set');
+is_deeply($sets->[1], ['sha512', 'CCCC', 'DDDD'], 'second hash-set');
 
-# RFC 5234: ABNF quoted strings are case-insensitive
-my $upper = Mail::DKIM2::MessageInstance::parse_hash_sets('SHA512:AAA:BBB');
-is($upper->[0][0], 'sha512', 'hash-name matched case-insensitively');
+# -08 §2.14: hash names are case-sensitive
+my $upper = Mail::DKIM2::MessageInstance::parse_hash_sets('SHA512:AAAA:BBBB');
+is($upper->[0][0], 'SHA512', 'hash-name keeps its case');
 
 # FWS inside a folded h= must not corrupt the hash-set (§2.12: FWS may
 # appear anywhere inside a base64 value, not just at the ends of an item).
-my $folded = Mail::DKIM2::MessageInstance::parse_hash_sets("sha256:AA\r\n\tA:BBB");
-is($folded->[0][1], 'AAA', 'FWS stripped from a folded header hash');
+my $folded = Mail::DKIM2::MessageInstance::parse_hash_sets("sha256:AA\r\n\tAA:BBBB");
+is($folded->[0][1], 'AAAA', 'FWS stripped from a folded header hash');
 
-my $folded_mid = Mail::DKIM2::MessageInstance::parse_hash_sets("sha256:A\tA A:B B\r\nB");
-is($folded_mid->[0][1], 'AAA', 'FWS stripped from the middle of a header hash');
-is($folded_mid->[0][2], 'BBB', 'FWS stripped from the middle of a body hash');
+my $folded_mid = Mail::DKIM2::MessageInstance::parse_hash_sets("sha256:A\tA A A:B B\r\nB B");
+is($folded_mid->[0][1], 'AAAA', 'FWS stripped from the middle of a header hash');
+is($folded_mid->[0][2], 'BBBB', 'FWS stripped from the middle of a body hash');
 
 # §11.2: a malformed base64 value in h= must never crash the verifier. Perl
 # compares hash-set strings directly (it never base64-decodes an h= value),
@@ -89,7 +89,7 @@ is($folded_mid->[0][2], 'BBB', 'FWS stripped from the middle of a body hash');
         "Message-Instance: m=1; h=unknownalg:AAAA:BBBB;\r\n$headers\r\n$body");
     my ($ok2, $err2) = Mail::DKIM2::MessageInstance->verify($unimplemented_only_msg);
     ok(!$ok2, 'MI naming only an unimplemented algorithm fails');
-    like($err2, qr/no supported hash algorithm/,
+    like($err2, qr/\APERMERROR: Message-Instance m=1 algorithm unknownalg unknown\z/,
         'MI naming only an unimplemented algorithm fails CLOSED, distinct from the sha512-only case');
 }
 

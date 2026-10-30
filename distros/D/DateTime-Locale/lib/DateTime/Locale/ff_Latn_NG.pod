@@ -435,6 +435,24 @@ Fula Nigeria Latin locale.
    1995-12-22T09:05:02 = C-I 1995 bow 22, mwd
   -0010-09-15T04:44:23 = H-I -10 slt 15, hbi
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = C-I 2008 colte
+   1995-12-22T09:05:02 = C-I 1995 bowte
+  -0010-09-15T04:44:23 = H-I -10 siilto
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = C-I 2008 colte 5, maw
+   1995-12-22T09:05:02 = C-I 1995 bowte 22, mwd
+  -0010-09-15T04:44:23 = H-I -10 siilto 15, hbi
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = C-I 2008 colte 5
+   1995-12-22T09:05:02 = C-I 1995 bowte 22
+  -0010-09-15T04:44:23 = H-I -10 siilto 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = C-I 2008 col 5

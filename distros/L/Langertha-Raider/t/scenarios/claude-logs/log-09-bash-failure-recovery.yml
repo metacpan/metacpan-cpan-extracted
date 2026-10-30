@@ -1,0 +1,27 @@
+# Real pattern: Bash on a path that does not exist (exit 1, "No such file or
+# directory"), the model lists the directory to find the real name, retries and
+# gets on; a grep without a match (exit 1, no output) is not mistaken for a
+# failure of the tool; a later command with a real exit code is fixed with a flag.
+title: a bash call on a missing file fails with exit 1; the model lists, retries, and handles a no-match grep
+files:
+  data/report-2026.txt: "total: 42\n"
+prompt: Show me the total from the report.
+script:
+  - tool_calls:
+      - [ bash, { command: cat data/report.txt } ]
+  - tool_calls:
+      - [ bash, { command: ls data } ]
+  - tool_calls:
+      - [ bash, { command: grep total data/report-2026.txt } ]
+      - [ bash, { command: grep -c missing data/report-2026.txt } ]
+  - tool_calls:
+      - [ bash, { command: "grep -c missing data/report-2026.txt || echo none" } ]
+  - text: The total is 42.
+expect:
+  answer: The total is 42.
+  tools:
+    - { name: bash, error: true, text: '\AExit code 1\ncat: data/report\.txt: No such file or directory\z' }
+    - { name: bash, text: '\Areport-2026\.txt\z' }
+    - { name: bash, text: '\Atotal: 42\z' }
+    - { name: bash, error: true, text: '\AExit code 1\n0\z' }
+    - { name: bash, text: '\A0\nnone\z' }

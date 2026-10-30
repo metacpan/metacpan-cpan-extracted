@@ -435,6 +435,24 @@ Luba-Katanga Congo - Kinshasa locale.
    1995-12-22T09:05:02 = kny. Y. K. 1995 Cis 22, Ngv
   -0010-09-15T04:44:23 = kmp. Y.K. -10 Lut 15, Lub
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = kny. Y. K. 2008 Lùishi
+   1995-12-22T09:05:02 = kny. Y. K. 1995 Ciswà
+  -0010-09-15T04:44:23 = kmp. Y.K. -10 Lutongolo
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = kny. Y. K. 2008 Lùishi 5, Ndy
+   1995-12-22T09:05:02 = kny. Y. K. 1995 Ciswà 22, Ngv
+  -0010-09-15T04:44:23 = kmp. Y.K. -10 Lutongolo 15, Lub
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = kny. Y. K. 2008 Lùishi 5
+   1995-12-22T09:05:02 = kny. Y. K. 1995 Ciswà 22
+  -0010-09-15T04:44:23 = kmp. Y.K. -10 Lutongolo 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = kny. Y. K. 2008 Lui 5
@@ -506,6 +524,12 @@ Luba-Katanga Congo - Kinshasa locale.
    2008-02-05T18:30:30 = Ndy 5 Lui
    1995-12-22T09:05:02 = Ngv 22 Cis
   -0010-09-15T04:44:23 = Lub 15 Lut
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Lùishi 5, Ndy
+   1995-12-22T09:05:02 = Ciswà 22, Ngv
+  -0010-09-15T04:44:23 = Lutongolo 15, Lub
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

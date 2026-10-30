@@ -136,6 +136,70 @@ subtest 'package-less file that cannot compile in isolation' => sub {
     );
 };
 
+subtest 'ignored file that exits non-zero is still skipped' => sub {
+    my ( $exit_code, $msg, @errors )
+        = App::perlvars->new( lint_scripts => 1 )
+        ->validate_file('test-data/scripts/missing-module-nonzero-exit.pl');
+
+    # The wrapper cannot compile (missing module), so Test::Vars inspects
+    # nothing -- but an END block makes the analyzer child exit non-zero. That
+    # must not turn "could not be analyzed" into a reported finding.
+    is( $exit_code,     0,     '0 exit code (skipped, not failed)' );
+    is( $msg,           undef, 'no message' );
+    is( scalar @errors, 0,     'no findings leak' );
+    unlike(
+        "@errors",
+        qr/Test::Vars ignores|PerlvarsSyntheticPackage|__perlvars_wrapper__/,
+        'no synthetic wrapper details leak',
+    );
+};
+
+subtest 'package-less UTF-8 file is parsed and linted' => sub {
+    my ( $exit_code, $msg, @errors )
+        = App::perlvars->new( lint_scripts => 1 )
+        ->validate_file('test-data/scripts/utf8.pl');
+
+    # A Unicode identifier in code trips PPI's raw-byte lexer; we retry against
+    # UTF-8-decoded source so the file is still analyzed.
+    ok( $exit_code, 'non-zero exit code' );
+    is( scalar @errors, 1, 'found the one unused var' );
+    like( "@errors", qr/\$unused_utf8\b/, 'reports the unused var' );
+    like( "@errors", qr/\bline 10\b/,     'maps to the real line' );
+    like( "@errors", qr{\Qtest-data/scripts/utf8.pl\E}, 'names real file' );
+    unlike(
+        "@errors",
+        qr/PerlvarsSyntheticPackage|__perlvars_wrapper__/,
+        'no synthetic wrapper details leak',
+    );
+};
+
+subtest 'package-less file PPI cannot parse is skipped under lint_scripts' =>
+    sub {
+    my ( $exit_code, $msg, @errors )
+        = App::perlvars->new( lint_scripts => 1 )
+        ->validate_file('test-data/scripts/unparseable.pl');
+
+    # PPI cannot lex this file even decoded, so we cannot analyze it. Under
+    # lint_scripts that is a silent skip, consistent with other unanalyzable
+    # files -- not an error that would abort a batch run.
+    is( $exit_code,     0,     '0 exit code (skipped, not failed)' );
+    is( $msg,           undef, 'no message' );
+    is( scalar @errors, 0,     'no findings' );
+    };
+
+subtest 'unparseable file without lint_scripts is reported' => sub {
+    my ( $exit_code, $msg, @errors )
+        = App::perlvars->new->validate_file(
+        'test-data/scripts/unparseable.pl');
+
+    # Without opt-in the old contract stands: an unparseable file is an error.
+    is( $exit_code, 1, 'exit code 1' );
+    like(
+        $msg, qr{could not be parsed as Perl},
+        'reports the parse failure'
+    );
+};
+
 subtest 'package-less file that is not valid UTF-8' => sub {
     my ( $exit_code, $msg, @errors )
         = App::perlvars->new( lint_scripts => 1 )

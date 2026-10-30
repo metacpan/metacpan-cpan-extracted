@@ -1,0 +1,13 @@
+title: a project with only CLAUDE.md is in Claude mode; its @import is expanded into the prompt
+files:
+  CLAUDE.md: "Project rule: indent with tabs.\n@docs/style.md\n"
+  docs/style.md: "Style rule: short names.\n"
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "Project rule: indent with tabs." }
+    - { index: 0, contains: "Style rule: short names." }
+    - { index: 0, absent: "@docs/style.md" }

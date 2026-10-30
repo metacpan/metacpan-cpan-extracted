@@ -1,0 +1,21 @@
+# Without a prompt web_fetch returns the page as text. A response that is not a
+# success is Claude Code's "The server returned HTTP ..." text and, as there,
+# no error result; with a prompt it makes no model call (request 1 is the
+# raid's next turn, not a page question).
+title: web_fetch without a prompt returns the page; a missing page is Claude Code's status text, not an error
+http:
+  /doc: { type: text/html, body: "<p>Hello DOC-MARKER</p>" }
+prompt: Read the docs.
+script:
+  - tool_calls:
+      - [ web_fetch, { url: "{{HTTP}}/doc" } ]
+      - [ web_fetch, { url: "{{HTTP}}/gone", prompt: "What does it say?" } ]
+  - text: done
+expect:
+  answer: done
+  requests:
+    - { index: 1, contains: "The server returned HTTP 404 Not Found." }
+    - { index: 1, absent: "Web page content:" }
+  tools:
+    - { name: web_fetch, text: '^URL: http://127\.0\.0\.1:\d+/doc\nStatus: 200 OK\nContent-Type: text/html\n\n.*DOC-MARKER' }
+    - { name: web_fetch, text: '^The server returned HTTP 404 Not Found\.\n\nThe response body was not retrieved\. If this URL requires authentication, use an authenticated tool \(e\.g\. `gh` for GitHub, or an MCP-provided fetch tool\) instead of web_fetch\.$' }

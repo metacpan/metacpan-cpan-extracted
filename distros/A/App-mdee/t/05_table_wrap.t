@@ -5,8 +5,13 @@ use Test::More;
 use open qw(:std :encoding(utf-8));
 use Text::ANSI::Fold::Util qw(ansi_width);
 
+use File::Temp qw(tempdir);
+
 use lib '.';
 use t::Util;
+
+# no ~/.ansicolumnrc of the user
+$ENV{HOME} = tempdir(CLEANUP => 1);
 
 my $md = 't/table_wrap.md';
 my $V = "\x{2502}";   # │
@@ -77,5 +82,19 @@ my @list = grep { /grep foo|wc -l|cat a/ } @f;
 ok(@list == 3, 'fixture has three pipe-containing list items');
 my ($l1) = grep { $f[$_] =~ /grep foo/ } 0..$#f;
 like($f[$l1 + 1], qr/^\h+\S/, 'pipe-containing list items are folded by ansifold');
+
+# how cells are wrapped is given by the table_* parameters, not by
+# the user's ~/.ansicolumnrc
+my $boundary = run("'-Mmd::config(colorize=0,table=1,rule=1,table_width=40,table_boundary=none,table_linebreak=none)' $md")->stdout;
+isnt($boundary, $wrapped, 'table_boundary and table_linebreak change the wrapping');
+{
+    my $home = tempdir(CLEANUP => 1);
+    open my $fh, '>', "$home/.ansicolumnrc" or die;
+    print $fh "option default --runin=0 --runout=0 --boundary=none --linebreak=none\n";
+    close $fh;
+    local $ENV{HOME} = $home;
+    my $rc = run("'-Mmd::config(colorize=0,table=1,rule=1,table_width=40)' $md")->stdout;
+    is($rc, $wrapped, '~/.ansicolumnrc does not change the wrapping');
+}
 
 done_testing;

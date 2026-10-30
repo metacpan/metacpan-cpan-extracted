@@ -4,10 +4,11 @@
 
 =head1 NAME
 
-Acme::Parataxis::Generator - Stackful, Lazily-pulled Iterator
+Acme::Parataxis::Generator - Stackful, Lazily-Pulled Coroutine Iterators
 
 =head1 SYNOPSIS
 
+    use v5.40;
     use Acme::Parataxis::Generator;
 
     my $fib = Acme::Parataxis::Generator->new( sub ($y) {
@@ -19,274 +20,183 @@ Acme::Parataxis::Generator - Stackful, Lazily-pulled Iterator
     } );
 
     my $total = 0;
-    while ( defined( my $n = $fib->next ) ) { $total += $n }
-    say $total;                          # 232
+    while ( defined( my $n = $fib->next ) ) {
+        $total += $n;
+    }
+    say "Sum of Fibonacci numbers < 100: $total";    # 232
 
 =head1 DESCRIPTION
 
-A generator runs its body in a private fiber and pulls it one value at a time. The body is ordinary synchronous code:
-it can loop, C<return>, call other subroutines and recurse deeply, and C<< $y->(...) >> works from any depth. Each C<<
-$y->($value) >> suspends the body exactly where it stands - every lexical, every loop counter, the whole call stack is
-still there - and the next C<< ->next >> picks it up from that same point.
+A generator executes its producer body on an isolated, private coroutine fiber and produces values on demand. The body
+is plain synchronous Perl: it can loop, return, call functions, and recurse deeply. Calling C<< $y->($value) >> from
+any depth suspends the producer immediately, preserving lexical variables, loop states, and call frames intact. The
+next invocation of C<< ->next >> resumes execution right where it paused.
 
-Nothing in the body runs until the first C<next>, so a generator over an expensive source costs nothing until you start
-pulling, and an infinite sequence is fine as long as you stop pulling.
+Key properties:
 
-Two things the body must not do: park (see L</"Parking inside a body injects a bogus value">), and pull the generator
-it is itself running in (see L</"Re-entrant next ends the generator">). Everything else is plain Perl.
+=over
 
-You can pull from the mainline, from a run's main fiber, from a C<fiber> you spawned, or from a nursery child, in any
-order. The first generator a process builds may be created wherever you like; nothing needs to be primed first.
+=item *
+
+B<Lazy evaluation>: Nothing inside the body executes until the first call to C<next()>. An infinite sequence costs
+nothing until pulled, and consumes only as much memory and CPU as needed for the values requested.
+
+=item *
+
+B<Full coroutine ergonomics>: Unlike shallow iterators, yielding is not restricted to the top-level block; helper subs
+can accept C<$y> and yield on behalf of the generator.
+
+=item *
+
+B<Safe lifecycle teardown>: Abandoning an unexhausted generator cleanly drains the fiber: the yield site raises an
+internal drain sentinel, unwinding lexical scopes and executing object destructors without leaking fibers.
+
+=item *
+
+B<Context independence>: Generators do not enter the scheduler run queue. They can be instantiated and pulled from
+top-level mainline scripts, within C<async> blocks, inside spawned fibers, or inside nurseries.
+
+=back
 
 =head1 CONSTRUCTOR
 
-=head2 C<Generator-E<gt>new( sub ($y) { ... } )>
+=head2 C<new( sub ($y) { ... } )>
 
     my $gen = Acme::Parataxis::Generator->new( sub ($y) {
         $y->($_) for 1 .. 3;
     } );
 
-    is $gen->next, 1;
-    is $gen->next, 2;
-    is $gen->next, 3;
-    ok !defined $gen->next;
+Constructs and returns a new generator.
 
-Returns a generator. C<$y> is the yield function: call C<< $y->($value) >> to produce the next value and suspend until
-the next pull. It takes exactly one value, so C<< $y->() >> and C<< $y->( 1, 2 ) >> are both croaks - reported against
-C<__ANON__>, since C<$y> is a closure and has no name of its own. Whatever the body returns is discarded. Exactly one
-argument is accepted by C<new> itself - see L</"The constructor is strict">.
+The constructor takes exactly one argument: a code reference representing the producer body. That code reference
+receives a single parameter: the yield closure (conventionally named C<$y>).
+
+Calling C<< $y->($value) >> suspends the body and delivers C<$value> to the caller's C<next()>. C<$y> requires exactly
+one argument; calling C<< $y->() >> or passing multiple arguments croaks.
 
 =head1 METHODS
 
 =head2 C<next( )>
 
-    if ( defined( my $v = $gen->next ) ) { handle($v) }
-    else                               { last }
+    my $val = $gen->next;
 
-Resumes the body and returns the value it yielded. Once the body has finished, returns C<undef> and keeps returning it.
-
-A C<undef> the body itself yielded comes back exactly the same way, so C<is_done> is the only way to tell a real value
-from the end of the sequence.
-
-If the body threw, the exception is raised on your stack at the C<next> that provoked it, and the generator is finished
-afterwards. An exception object arrives as that same object, not as a string - which is not what
-L<Acme::Parataxis::Future> does, since that croaks the message.
-
-In list context this returns a one-element list.
-
-=head2 C<is_done( )>
-
-    while ( !$gen->is_done ) { handle( $gen->next ) }
-
-Returns C<1> once the body has finished, whether it returned or threw, and C<0> before that. This is the reliable way
-to drain a sequence that can contain C<undef>.
-
-=head1 Recipes
-
-=head2 Drain a generator without stopping at a yielded C<undef>
-
-    sub drain ($gen) {
-        my @out;
-        while (1) {
-            my $v = $gen->next;
-            last if $gen->is_done;              # the pull that finished the body, not a value
-            push @out, $v;                      # a yielded undef is a value, and is kept
-        }
-        return @out;
-    }
-
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) { $y->($_) for undef, 'after' } );
-    my @got = drain($gen);                      # ( undef, 'after' )
-
-The C<while ( defined( my $v = $gen->next ) )> form used in L</SYNOPSIS> stops at the first C<undef>, so a sequence
-that contains one silently truncates.
-
-=head2 Take only the first few values
-
-    sub take ($gen, $n) {
-        my @out;
-        while ( @out < $n ) {
-            my $v = $gen->next;
-            last if $gen->is_done;
-            push @out, $v;
-        }
-        return @out;
-    }
-
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) { $y->($_) for 1 .. 1_000 } );
-    say join ' ', take( $gen, 3 );               # 1 2 3
-
-The body is never resumed again, so the remaining 997 values are never computed and the abandoned generator is drained
-when C<$gen> goes out of scope.
-
-=head2 Build a lazy pipeline
-
-    my $squares = Acme::Parataxis::Generator->new( sub ($y) {
-        my $nums = Acme::Parataxis::Generator->new( sub ($z) { $z->($_) for 1 .. 10 } );
-        while ( defined( my $n = $nums->next ) ) { $y->( $n**2 ) }
-    } );
-
-    say $squares->next for 1 .. 3;              # 1 4 9
-
-C<$nums> is a lexical in the outer body's frame, so it survives across every suspension. The inner body is entered once
-and then suspended: after three pulls its loop has advanced as far as C<3> and no further, and it is not created at all
-until the first pull.
-
-=head2 Handle a failure without losing the error object
-
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) {
-        $y->($_) for 1 .. 3;
-        die Acme::Parataxis::Error::Timeout->new( wait_reason => [ 'fetch', __FILE__, __LINE__ ] );
-    } );
-
-    while (1) {
-        my $v = eval { $gen->next };
-        if ( my $err = $@ ) {
-            say 'failed: ' . $err->kind;        # timeout - the object crossed the resume intact
-            last;
-        }
-        last if $gen->is_done;
-        say "got $v";
-    }
-
-    # got 1
-    # got 2
-    # got 3
-    # failed: timeout
-
-=head1 Behavior Notes
-
-=head2 A yielded C<undef> is the end of the sequence as far as C<next> is concerned
-
-C<next> cannot tell a body that yielded C<undef> from a body that has finished; both return C<undef>. The usual C<while
-( defined( my $v = $gen->next ) )> loop therefore stops at the first C<undef> the body produces:
-
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) { $y->($_) for undef, 'after' } );
-    my @got;
-    while ( defined( my $v = $gen->next ) ) { push @got, $v }
-    say scalar @got;                           # 0 - and 'after' never arrives
-
-Test for the end with C<is_done> instead, as L</"Drain a generator without stopping at a yielded undef"> does.
-
-=head2 The body's return value is discarded
-
-A generator's last value always comes from a C<< $y->(...) >> call. If the body returns without yielding again, the
-next C<next> returns C<undef> and the generator is finished, whatever the body returned:
-
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) { $y->(1); return 'final' } );
-    say $gen->next;                            # 1
-    say defined( $gen->next ) ? 'a value' : 'undef';   # undef
-
-Use a trailing C<< $y->($value) >> if the final value matters.
-
-=head2 Parking inside a body injects a bogus value
-
-The body runs in a fiber but never enters the scheduler's run queue, so a park inside it does not behave. Every park
-adds the scheduler's own resume token to the sequence as if the body had yielded it:
-
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) {
-        $y->('before');
-        await_sleep 20;
-        $y->('after');
-    } );
-
-    say $gen->next while !$gen->is_done;        # before WAITING after
-
-C<await_sleep>, C<await_read>, C<await_write> and anything else that parks all do this. Keep the body synchronous and
-pull from the consumer side instead, where parking is a normal thing to do.
-
-=head2 An abandoned generator is drained only if it is suspended at a yield
-
-Dropping a generator whose body is parked at a C<< $y->(...) >> call resumes it with a private drain marker, the yield
-dies on that marker, and the fiber finishes normally. Dropping one whose body is parked somewhere else - inside
-C<await_sleep>, say - cannot do that, so the fiber is torn down and everything after the park is skipped:
-
-    my $reached = 'never';
-    {
-        my $gen = Acme::Parataxis::Generator->new( sub ($y) {
-            $y->('x');
-            await_sleep 5_000;
-            $reached = 'ran';                   # never reached: the body is torn down, not resumed
-        } );
-        $gen->next;
-    }
-    say $reached;                              # never
-
-The drain marker is a private scalar ref rather than a sentinel string, so no value a body yields can be mistaken for
-it and drained silently.
-
-=head2 The constructor is strict
-
-C<new> takes exactly one CODE ref. Anything else is a croak, and the message names the actual problem:
-
-    Acme::Parataxis::Generator->new;                 # Too few arguments ... (got 1; expected 2)
-    Acme::Parataxis::Generator->new('nope');         # Generator->new() requires a CODE ref
-    Acme::Parataxis::Generator->new( sub { }, 1 );   # Too many arguments ... (got 3; expected 2)
-
-Note that the extra-argument case is rejected even though a plain-looking C<new( sub { ... }, @whatever )> would be a
-reasonable thing to want.
-
-=head2 One fiber stays parked, but only for a generator built on the mainline
-
-Resuming a die path through the very first fiber a process allocates is unreliable on Windows, where it escapes every
-anchored error trap, so a generator must never land on fid 0. On the mainline nothing else has allocated a fiber yet,
-so the first generator there parks one reserved fiber to take fid 0, and C<get_live_fiber_count()> goes from C<0> to
-C<1> and stays there:
-
-    Acme::Parataxis::get_live_fiber_count();         # 0 in a fresh process
-    my $gen = Acme::Parataxis::Generator->new( sub ($y) { $y->(1) } );
-    Acme::Parataxis::get_live_fiber_count();         # 1
-
-Inside a run there is nothing to reserve. The run's own main fiber already holds fid 0 before your block executes, so a
-generator built there lands on fid 1 or later. It adds only its own fiber while it is alive: once it is exhausted or
-dropped, C<get_live_fiber_count()> is back to whatever it was, with nothing parked for the lifetime of the process.
-
-=head2 Re-entrant C<next> ends the generator
-
-Pulling a generator from inside its own body re-enters a fiber that is already running. It does not raise, and it does
-not return the value you want - the generator simply finishes:
-
-    my $gen;
-    $gen = Acme::Parataxis::Generator->new( sub ($y) {
-        $y->('one');
-        my $v = $gen->next;                 # re-entrant: ends the generator
-        $y->("re-entered with " . $v );
-    } );
-
-    say $gen->next;                          # one
-    say defined( $gen->next ) ? 'a value' : 'undef';   # undef
-    say $gen->is_done;                       # 1
-
-If a body needs to consume another sequence, give the two generators separate frames and let the consumer pull from
-outside, as in L</"Build a lazy pipeline">.
-
-=head1 How It Works
+Resumes the generator body and returns the next yielded value.
 
 =over
 
-=item * B<Asymmetric pull.> Each C<next> resumes the private fiber with a fresh scheduler call (the runtime's
-C<coro_call>), and each C<yield> parks it back. Exhaustion finishes the fiber through the normal scheduler teardown.
+=item * Once the body finishes (either by falling off the end or returning), C<next()> returns C<undef> and continues
+returning C<undef> on subsequent calls.
 
-=item * B<Errors cross the resume.> The body runs inside a fiber-local C<eval>; a die raised on a resumed trip is caught
-there (the scheduler's own error trap can miss a die that fires across a resumption) and parked in a lexical that
-C<next> dereferences and rethrows, so no die ever escapes across a resumption boundary. Because the error is rethrown
-rather than interpolated, an exception object arrives as itself.
+=item * If the body explicitly yields C<undef> (e.g. C<< $y->(undef) >>), C<next()> returns C<undef>. Use
+L</"is_done( )"> to differentiate a yielded C<undef> from sequence exhaustion.
 
-=item * B<Abandoned generators drain.> Discarding a generator whose fiber is suspended mid-yield resumes it with a drain
-marker; the yield function dies on it, the fiber stops and finishes normally, and perl unwinds its own scopes. This is
-deliberately preferred over tearing a suspended, eval-bearing fiber down mid-shot. See
-L</"An abandoned generator is drained only if it is suspended at a yield"> for the one case this does not cover.
+=item * If the body throws an exception, that exception is rethrown directly on the caller's stack at the C<next()>
+call site, and the generator is marked permanently finished. Exception objects cross the resumption boundary intact.
 
-=item * B<Reserved first fiber.> On Windows, resuming a die path through the very first fiber a process ever allocates
-can defeat every anchored error trap, so the module keeps one permanently parked fiber and generators always start on a
-later slot. A run's own main fiber already holds that slot, so the reserved fiber is only created for a generator
-built on the mainline.
+=back
+
+=head2 C<is_done( )>
+
+    while ( !$gen->is_done ) {
+        my $v = $gen->next;
+        process($v) if defined $v;
+    }
+
+Returns true if the generator has finished execution (whether it returned normally or threw an exception), and false if
+it is still suspended awaiting the next pull.
+
+=head2 C<fiber( )>
+
+Returns the underlying private C<Acme::Parataxis> fiber object. Intended for debugging and ID inspection.
+
+=head1 Recipes
+
+=head2 Safely consuming sequences that contain C<undef>
+
+The idiom C<< while ( defined(my $v = $gen->next) ) >> halts prematurely if the sequence legitimately yields C<undef>.
+Test C<is_done()> instead:
+
+    sub drain ($gen) {
+        my @items;
+        while (1) {
+            my $val = $gen->next;
+            last if $gen->is_done;
+            push @items, $val;
+        }
+        return @items;
+    }
+
+    my $gen = Acme::Parataxis::Generator->new( sub ($y) {
+        $y->('alpha');
+        $y->(undef);
+        $y->('omega');
+    } );
+
+    my @values = drain($gen);    # [ 'alpha', undef, 'omega' ]
+
+=head2 Composing lazy generator pipelines
+
+    my $cubes = Acme::Parataxis::Generator->new( sub ($y) {
+        my $ints = Acme::Parataxis::Generator->new( sub ($z) {
+            my $i = 1;
+            while (1) { $z->($i++) }
+        } );
+
+        while ( defined( my $n = $ints->next ) ) {
+            $y->( $n ** 3 );
+        }
+    } );
+
+    say $cubes->next for 1 .. 4;    # 1, 8, 27, 64
+
+=head2 Exception propagation preserving error objects
+
+    use Acme::Parataxis::Error;
+
+    my $gen = Acme::Parataxis::Generator->new( sub ($y) {
+        $y->(1);
+        Acme::Parataxis::Error::Timeout->throw( seconds => 5 );
+    } );
+
+    say $gen->next;    # 1
+    eval { $gen->next };
+    if ( my $err = $@ ) {
+        say "Caught typed error: " . $err->kind;    # 'timeout'
+    }
+
+=head1 Behavior Notes
+
+=over
+
+=item * Body return values are discarded
+
+A generator's output must be produced via C<< $y->(...) >>. If a body terminates via C<return $val>, that final return
+value is ignored, and the next C<next()> returns C<undef>. Always yield the final value before returning.
+
+=item * Do not park inside a generator body
+
+Generators run outside the cooperative scheduler queue. Calling cooperative parking primitives (C<await_sleep>,
+C<await_read>, or channel C<get>) inside a generator injects scheduler control tokens (such as C<'WAITING'>) into the
+sequence as yielded values. Keep the generator body synchronous; perform async I/O on the consumer side.
+
+=item * Abandoned generators drain on destruction
+
+If a generator goes out of scope while suspended at a yield point, its C<DESTROY> handler resumes the private fiber
+with an internal drain sentinel. This causes the yield call to throw internally, allowing enclosing scopes,
+destructors, and C<finally> blocks in the generator to execute cleanups.
+
+=item * Reserved fiber 0 on Windows
+
+On Windows, longjmp-based unwinding across the very first fiber in a process (ID 0) can bypass anchored exception
+traps. To guarantee stability, the first generator allocated at the mainline permanently reserves fiber ID 0, ensuring
+generators always execute on fiber ID 1 or higher. Inside a scheduled C<run()> block, the root fiber already holds ID
+0, so no extra reservation is created.
 
 =back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis>, L<Acme::Parataxis::Future>, L<Acme::Parataxis::Channel>
+L<Acme::Parataxis>, L<Acme::Parataxis::Channel>, L<Acme::Parataxis::Stream>
 
 =head1 AUTHOR
 

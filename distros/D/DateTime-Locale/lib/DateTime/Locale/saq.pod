@@ -435,6 +435,24 @@ Samburu locale.
    1995-12-22T09:05:02 = BK 1995 Tow 22, Sap
   -0010-09-15T04:44:23 = KK -10 Saa 15, Kwe
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = BK 2008 Lapa le waare
+   1995-12-22T09:05:02 = BK 1995 Lapa le tomon waare
+  -0010-09-15T04:44:23 = KK -10 Lapa le saal
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = BK 2008 Lapa le waare 5, Ong
+   1995-12-22T09:05:02 = BK 1995 Lapa le tomon waare 22, Sap
+  -0010-09-15T04:44:23 = KK -10 Lapa le saal 15, Kwe
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = BK 2008 Lapa le waare 5
+   1995-12-22T09:05:02 = BK 1995 Lapa le tomon waare 22
+  -0010-09-15T04:44:23 = KK -10 Lapa le saal 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = BK 2008 Waa 5

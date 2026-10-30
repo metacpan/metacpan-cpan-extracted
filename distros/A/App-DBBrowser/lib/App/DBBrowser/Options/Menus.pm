@@ -143,6 +143,9 @@ sub sub_groups {
     if ( $driver eq 'DB2' ) {
         push @{$groups->{group_output}}, { name => '_db2_encoding', text => "- DB2 encoding", section => 'G' };
     }
+    if ( $driver eq 'DuckDB' ) {
+        push @{$groups->{group_output}}, { name => '_duckdb_utf8_decode', text => "- Decode output", section => 'G' };
+    }
     return $groups->{$group};
 }
 
@@ -533,6 +536,13 @@ sub group_output {
         ];
         my $prompt = 'Set the DB2 application code set';
         $sf->__group_readline( $info, $lo, $section, $items, $prompt );
+    }
+    elsif ( $sub_group eq '_duckdb_utf8_decode' ) {
+        my $prompt = 'Your choice: ';
+        my $sub_menu = [
+            [ 'duckdb_utf8_decode', "- Decode the output of VARCHAR columns as UTF-8.", [ $no, $yes ] ],
+        ];
+        $sf->__settings_menu_wrap( $info, $lo, $section, $sub_menu, $prompt );
     }
     else {
         die "output: unknown sub_group $sub_group";

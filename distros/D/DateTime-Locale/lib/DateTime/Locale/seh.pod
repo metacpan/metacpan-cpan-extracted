@@ -435,6 +435,24 @@ Sena locale.
    1995-12-22T09:05:02 = AD 1995 Dec 22, Sha
   -0010-09-15T04:44:23 = AC -10 Set 15, Sab
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Fevreiro
+   1995-12-22T09:05:02 = AD 1995 Decembro
+  -0010-09-15T04:44:23 = AC -10 Setembro
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Fevreiro 5, Pir
+   1995-12-22T09:05:02 = AD 1995 Decembro 22, Sha
+  -0010-09-15T04:44:23 = AC -10 Setembro 15, Sab
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Fevreiro 5
+   1995-12-22T09:05:02 = AD 1995 Decembro 22
+  -0010-09-15T04:44:23 = AC -10 Setembro 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Fev 5

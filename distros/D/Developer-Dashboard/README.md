@@ -2,1122 +2,53 @@
 
 # NAME
 
-Developer::Dashboard - a local home for development work
+Developer Dashboard - a home for day-to-day development
 
 # VERSION
 
-5.73
+6.06
 
 # INTRODUCTION
 
-Developer::Dashboard gives a developer one place to organize the moving parts of day-to-day work.
-
-Without it, local development usually ends up spread across shell history,
-ad-hoc scripts, browser bookmarks, half-remembered file paths, one-off health
-checks, and project-specific Docker commands. With it, those pieces can live
-behind one entrypoint: a browser home, a prompt status layer, and a CLI
-toolchain that all read from the same runtime.
-
-It brings together browser pages, saved notes, helper actions, collectors,
-prompt indicators, path aliases, open-file shortcuts, data query tools, and
-Docker Compose helpers so local development can stay centered around one
-consistent home instead of a pile of disconnected scripts and tabs.
-
-When the current project contains `./.developer-dashboard`, that tree becomes
-the first runtime lookup root for dashboard-managed files. The home runtime
-under `~/.developer-dashboard` stays as the fallback base, so project-local
-bookmarks, config, CLI hooks, helper users, sessions, and isolated docker
-service folders can override home defaults without losing shared fallback data
-that is not redefined locally.
-
-The home runtime is now hardened to owner-only access by default. Directories
-under `~/.developer-dashboard` are kept at `0700`, regular runtime files are
-kept at `0600`, and owner-executable scripts stay owner-executable at
-`0700`. Run `dashboard doctor` to audit the current home runtime plus any
-older dashboard roots still living directly under `$HOME`, or
-`dashboard doctor --fix` to tighten those permissions in place. The same
-command also audits the staged helper namespace under
-`~/.developer-dashboard/cli/dd/` for missing or stale dashboard-managed
-helpers such as `_dashboard-core`, and `--fix` restages them from the
-currently shipped helper assets when the runtime drift is repairable. It also
-checks whether dashboard-managed bash bootstrap lines were appended after the
-standard Debian-family non-interactive `return` guard in `~/.bashrc`; when
-that drift is present, `dashboard doctor --fix` rewrites those lines above
-the guard so tmux status commands and other non-interactive shells can still
-resolve `dashboard` correctly. It also
-reads optional hook results from
-`~/.developer-dashboard/cli/doctor.d` so users can layer in more
-site-specific checks later.
-
-Frequently used built-in commands such as `jq`, `yq`, `tomq`, `propq`,
-`iniq`, `csvq`, `xmlq`, `of`, `open-file`, `file`, `files`, and
-`workspace` are staged
-privately under `~/.developer-dashboard/cli/dd/` and dispatched by
-`dashboard` without polluting the global PATH. That keeps dashboard-owned
-built-ins separate from user commands and hooks under
-`~/.developer-dashboard/cli/`. Compatibility aliases `pjq`, `pyq`,
-`ptomq`, and `pjp` still normalize to the current commands when they are invoked
-through `dashboard`. The older `ticket` alias has been removed; use
-`workspace` for tmux workspace sessions. The public switchboard now keeps the
-prompt path lighter as well: once the managed helper files are already staged,
-`dashboard ps1` refreshes only the requested helper, reuses one path registry
-for the whole invocation, and avoids loading the suggestion and skill dispatch
-stack on the ordinary prompt fast path.
-
-Dashboard also normalizes `PERL5LIB` for its own processes before the staged
-helper runtime loads. Dashboard-owned libraries stay visible, but the active
-Perl core, site, and vendor directories are forced ahead of inherited
-user-local shadow copies. That keeps stale dual-life XS modules such as
-`Encode` from breaking helper startup, collector child commands, saved Ajax
-subprocesses, or skill hooks on hosts with older local-lib artefacts.
-Dashboard-managed child commands also keep the current interpreter's bin
-directory plus the active shell directory at the front of `PATH`, and
-collector shell commands now run through a non-login shell so macOS
-shell-session restore banners and similar startup chatter do not get prefixed
-onto JSON collector output. On Windows, long-lived web, collector-loop,
-collector-worker, and watchdog launches now re-enter through staged private
-`_dashboard-core` foreground commands instead of relying on Perl
-pseudo-forking, and their runtime-state writes keep explicit replacement
-fallbacks for hosts where Windows rename collisions would otherwise leave stale
-or missing state files behind.
-
-Explicit named collector stop and restart actions also pause the watchdog
-supervisor for the targeted collector set while the lifecycle command is in
-flight, then restore supervision for the remaining watched fleet afterwards.
-That prevents the watchdog from racing a manual collector restart and spawning
-another replacement loop underneath the CLI.
-
-Collector watchdog stall checks distinguish cron scheduler liveness from job
-execution time. A cron collector may correctly wait hours between matching
-minutes; while its loop heartbeat is fresh, that quiet period does not count as
-a stalled collector or consume the automatic-restart budget. A stale scheduler
-heartbeat remains eligible for watchdog recovery.
-
-It provides a small ecosystem for:
-
-- saved and transient dashboard pages built from the original bookmark-file shape
-- bookmark-file syntax compatibility using the original
-`:--------------------------------------------------------------------------------:` separator plus directives such as
-`TITLE:`, `STASH:`, `HTML:`, and `CODE1:`
-- Template Toolkit rendering for `HTML:`, with access to `stash`, `ENV`, and
-`SYSTEM`
-- bookmark `CODE*` execution with captured `STDOUT` rendered into the page and
-captured `STDERR` rendered as visible errors
-- per-page sandpit isolation so one bookmark run can share runtime
-variables across `CODE*` blocks without leaking them into later page runs
-- old-style root editor behavior with a free-form bookmark textarea when no path is provided
-- file-backed collectors and indicators
-- prompt rendering for `PS1` and the PowerShell `prompt` function
-- project/path discovery helpers
-- a lightweight local web interface
-- action execution with trusted and safer page boundaries
-- config-backed providers, path aliases, and compose overlays
-- asking an AI backend from the shell with `dashboard ask`, over the Anthropic
-API, the local `claude` CLI, or the `codex`, `copilot`, and `gemini`
-command-line tools, keeping a per-workspace conversation so follow-up questions
-carry context and inlining `--file` attachments
-- update scripts and installable runtime packaging
-
-Managed runtime children are expected to clean up after themselves. Detached
-web startup helpers, collector loops, the collector watchdog supervisor, the
-SSL frontend connection workers, and background page actions now reap the
-direct children they own instead of leaving zombie processes behind on hosts
-such as macOS and WSL. Collector loops and the collector watchdog supervisor
-also reap those children immediately on `SIGCHLD`, so long-interval
-collectors and orphaned watchdogs do not leave visible `<defunct>`
-dashboard processes behind until some later housekeeping pass. Managed
-collectors are also watched after startup: an
-unexpected exit triggers an automatic restart, while repeated crash loops are
-raised as explicit `attention_required` collector state instead of silently
-stopping or spinning forever.
-Managed collector indicators also keep the collector array order declared in
-`config/config.json` even after a live collector run rewrites its own status,
-so the browser status board and `dashboard ps1` do not drift back to
-alphabetical ordering after one collector refreshes.
-Collector schedules now also support bounded overlap control. The default
-collector `mode` is `singleton`, which means one long-running collector run
-blocks the next scheduled start until the active run finishes. Set
-`mode => "multiple"` to allow overlap, and use `multiple => N` to
-bound how many concurrent runs of that same collector can exist at once. When
-the field is omitted in `multiple` mode, the runtime defaults that bound to
-`2`.
-
-Developer Dashboard is meant to become the developer's working home:
-
-- shared nav fragments from saved `nav/*.tt` bookmarks rendered between the top
-chrome and the main page body on other saved pages
-- a local dashboard page that can hold links, notes, forms, actions, and
-rendered output
-- a prompt layer that shows live status for the things you care about
-- a command surface for opening files, jumping to known paths, querying data, and
-running repeatable local tasks
-- a configurable runtime that can adapt to each codebase without losing one
-familiar entrypoint
-
-## Shared Nav Fragments
-
-If `nav/*.tt` files exist under the saved bookmark root, every non-nav page
-render includes them between the top chrome and the main page body.
-
-For the default runtime that means files such as:
-
-- `~/.developer-dashboard/dashboards/nav/foo.tt`
-- `~/.developer-dashboard/dashboards/nav/bar.tt`
-
-And with route access such as:
-
-- `/app/nav/foo.tt`
-- `/app/nav/foo.tt/edit`
-- `/app/nav/foo.tt/source`
-
-The bookmark editor can save those nested ids directly, for example
-`BOOKMARK: nav/foo.tt`. Raw TT/HTML fragment files under `nav/` also work
-without bookmark wrappers, for example:
-
-    [% index = '/app/index' %]
-    <a href=[% index %]>[% index %]</a>
-
-On a page like `/app/index`, the direct `nav/*.tt` files are loaded in
-sorted filename order, rendered through the normal page runtime, and inserted
-above the page body. Non-`.tt` files, subdirectories under `nav/`, and junk
-files that do not look like TT or HTML fragments are ignored by that shared
-nav renderer.
-
-Under `DD-OOP-LAYERS`, the shared nav renderer now scans every inherited
-`dashboards/nav/` layer from `~/.developer-dashboard` down to the current
-directory, keeps parent-only fragments visible, and lets a deeper layer
-replace the same `nav/<name>.tt` id without losing the rest of the
-shared nav set. Template includes used by those bookmarks follow the same
-layered bookmark lookup path. Installed skill nav also follows nested
-`skills/<repo>/skills/<child>/...` trees now, so a nested
-skill can contribute `dashboards/nav/index.tt` or other shared fragments
-without being flattened back into only the first installed-skill level.
-
-Shared nav fragments and normal bookmark pages both render through Template
-Toolkit with `env.current_page` set to the active request path, such as
-`/app/index`. The same path is also available as
-`env.runtime_context.current_page`, alongside the rest of the request-time
-runtime context. Token play renders for named bookmarks also reuse that saved
-`/app/<id>` path for nav context, so shared `nav/*.tt` fragments do
-not disappear just because the browser reached the page through a transient
-`/?mode=render&token=...` URL.
-Shared nav markup now wraps horizontally by default and inherits the page
-theme through CSS variables such as `--panel`, `--line`, `--text`, and
-`--accent`, so dark bookmark themes no longer force a pale nav box or hide
-nav link text against the background.
-
-## What You Get
-
-- a browser interface on port `7890` for pages, status, editing, and helper
-access
-- a shell entrypoint for file navigation, page operations, collectors,
-indicators, auth, and Docker Compose
-- saved runtime state that lets the browser, prompt, and CLI all see the same
-prepared information
-- a place to collect project-specific shortcuts without rebuilding your daily
-workflow for every repo
-
-## Web Interface And Access Model
-
-Run the web interface with:
-
-    dashboard serve
-
-By default it listens on `0.0.0.0:7890`, so you can open it in a browser at:
-
-    http://127.0.0.1:7890/
-
-Run `dashboard serve --ssl` to enable HTTPS with a generated self-signed
-certificate under `~/.developer-dashboard/certs/`, then open:
-
-    https://127.0.0.1:7890/
-
-When SSL mode is on, plain HTTP requests on that same host and port are
-redirected to the equivalent `https://...` URL before the dashboard route
-runs. The generated certificate now carries browser-correct SAN coverage for
-`localhost`, `127.0.0.1`, and `::1`, automatically includes the concrete
-`--host HOST` bind target when that host is not a wildcard listen address, and
-also includes any extra names or IPs listed under
-`web.ssl_subject_alt_names` in `config/config.json`. Older dashboard certs are
-rotated forward automatically when they no longer match that expected profile.
-Browsers still show the normal self-signed certificate warning until you trust
-the generated certificate locally.
-
-Run `dashboard serve --no-editor` or `dashboard serve --no-endit` to keep
-the browser in read-only mode. That hides the Share, Play, and View Source
-links, blocks bookmark editor and source routes with `403`, blocks
-bookmark-save POST requests even if someone tries to hit them directly, and
-persists the mode so later `dashboard restart` runs stay read-only until you
-switch it back with `dashboard serve --editor`.
-
-Run `dashboard serve --no-indicators` or `dashboard serve --no-indicator` to
-clear the whole top-right browser chrome area. That hides the browser-only
-indicator strip, username, host or IP link, and live date-time line without
-changing `/system/status` or terminal prompt output such as `dashboard ps1`,
-and persists the mode until `dashboard serve --indicators` turns it back on.
-
-For example, if you want the same dashboard cert to work for one local
-`/etc/hosts` alias and one LAN IP, keep the runtime config like this:
-
-    {
-      "web": {
-        "ssl_subject_alt_names": [
-          "dashboard.local",
-          "192.168.1.20",
-          "fd00::20"
-        ]
-      }
-    }
-
-The access model is deliberate:
-
-- numeric loopback and loopback-only hostnames such as `localhost` do not
-require a password when the request still originates from loopback
-- configured loopback aliases listed under `web.ssl_subject_alt_names` are also
-treated as local-admin when they still arrive from loopback
-- helper access is for everyone else, including non-loopback IPs and other
-machines on the network
-- the loopback-admin shortcut applies only to direct (plain HTTP) connections;
-under `dashboard serve --ssl` the public front-proxy relays TLS to an internal
-loopback backend, so every backend connection looks like loopback and cannot
-prove the real client is local -- in that mode the shortcut is disabled and
-even loopback HTTPS requests require a helper login
-- helper logins let you share the dashboard safely without turning every browser
-request into full local-admin access
-
-In practice that means the developer at the machine gets friction-free local
-admin access, while shared or forwarded access is forced through explicit
-helper accounts.
-If no helper user exists yet in the active dashboard runtime, outsider requests return
-`401` with an empty body and do not render the login form at all.
-When a saved `index` bookmark exists, opening `/` now redirects straight to
-`/app/index` so the saved home page becomes the default browser entrypoint.
-When no saved `index` bookmark exists yet, `/` still opens the free-form
-bookmark editor.
-If a user opens an unknown saved route such as `/app/foobar`, the browser now
-opens the bookmark editor with a prefilled blank bookmark for that requested
-path instead of showing a 404 error page.
-When helper access is sent to `/login`, the login form now keeps the original
-requested path and query string in a hidden redirect target. After a
-successful helper login, the browser is sent back to that saved route, such as
-`/app/index`, instead of being dropped at `/`.
-
-## Collectors, Indicators, And PS1
-
-Collectors are background or on-demand jobs that prepare state for the rest of
-the dashboard. A collector can run a shell command or a Perl snippet, then
-store stdout, stderr, exit code, and timestamps as file-backed runtime data.
-
-That prepared state drives indicators. Indicators are the short status records
-used by:
-
-- the shell prompt rendered by `dashboard ps1`
-- the top-right status strip in the web interface
-- CLI inspection commands such as `dashboard indicator list`
-
-This matters because prompt and browser status should be cheap to render.
-Instead of re-running a Docker check, VPN probe, or project health command
-every time the prompt draws, a collector prepares the answer once and the rest
-of the system reads the cached result.
-When the generated shell bootstrap runs inside a `dashboard workspace` tmux
-session, those prompt indicators move out of the inline shell prompt and into
-that session's tmux status area so the cursor line stays clean while the
-indicator strip keeps updating between prompts. Workspace sessions use a
-two-line bottom status block: the first row is the dashboard indicator strip
-with the trailing date-time segment, and the second row keeps tmux's normal
-session and indexed window list. Ordinary tmux sessions keep the normal
-inline prompt. The
-workspace workflow seeds a dedicated
-`DEVELOPER_DASHBOARD_TMUX_STATUS=1` session flag for that behavior, and
-Developer Dashboard also treats the older `TICKET_REF` session reference as a
-fallback signal so older workspace sessions do not keep duplicating indicators in the
-inline prompt. Developer Dashboard updates tmux through session-local runtime
-commands instead of editing any user tmux config file or changing unrelated
-tmux sessions on the same server.
-Configured collector indicators now prefer the configured icon in both places,
-and when a collector is renamed the old managed indicator is cleaned up
-automatically so the prompt and top-right browser strip do not show both the
-old and new names at the same time. Those managed indicator records now also
-preserve a newer live collector status during restart/config-sync windows, so
-a healthy collector does not flicker back to `missing` after it has already
-reported `ok`.
-If `indicator.icon` contains Template Toolkit syntax such as `[% a %]`, the
-collector runner now treats collector `stdout` as JSON, decodes it through
-`JSON::XS`, exposes hash keys as direct template variables plus `data`, and
-persists the rendered icon as the live indicator value. Invalid JSON or TT
-render failures are explicit collector errors: the collector `stderr` records
-the template problem and the indicator stays red instead of silently falling
-back.
-
-## Why It Works As A Developer Home
-
-The pieces are designed to reinforce each other:
-
-- pages give you a browser home for links, notes, forms, and actions
-- collectors prepare state for indicators and prompt rendering
-- indicators summarize that state in both the browser and the shell
-- path aliases, open-file helpers, and data query commands shorten the jump from
-I know what I need to I am at the file or value now
-- Docker Compose helpers keep recurring container workflows behind the same
-`dashboard` entrypoint
-
-That combination makes the dashboard useful as a real daily base instead of
-just another utility script.
-
-## Not Just For Perl
-
-Developer Dashboard is implemented in Perl, but it is not only for Perl
-developers.
-
-It is useful anywhere a developer needs:
-
-- a local browser home
-- repeatable health checks and status indicators
-- path shortcuts and file-opening helpers
-- JSON, YAML, TOML, or properties inspection from the CLI
-- a consistent Docker Compose wrapper
-
-The toolchain already understands Perl module names, Java class names, direct
-files, structured-data formats, and project-local compose flows, so it suits
-mixed-language teams and polyglot repositories as well as Perl-heavy work.
-
-Project-specific behavior is added through configuration, saved pages, and
-user CLI extensions.
-
-# MODULE NAMESPACING
-
-All project modules are scoped under the `Developer::Dashboard::` namespace
-to prevent pollution of the CPAN ecosystem. Core helper modules are available
-under this namespace:
-
-- Developer::Dashboard::File
-
-    File I/O helpers with alias support for older bookmark compatibility.
-
-- Developer::Dashboard::Folder
-
-    Folder path resolution and discovery with runtime registry support.
-
-- Developer::Dashboard::DataHelper
-
-    JSON encoding and decoding helpers for older bookmark code.
-
-- Developer::Dashboard::Zipper
-
-    Token encoding and Ajax command building for transient URL construction.
-
-- Developer::Dashboard::Runtime::Result
-
-    Hook result environment variable decoding and access for command runners.
-
-Project-owned modules now live only under the `Developer::Dashboard::`
-namespace so the distribution does not pollute the CPAN ecosystem with
-generic package names. The bookmark CODE runtime imports the short JSON helper
-names from `Developer::Dashboard::DataHelper` automatically for every block.
-
-## Main Concepts
-
-- Path Registry
-
-    `Developer::Dashboard::PathRegistry` resolves the runtime roots that
-    everything else depends on, such as dashboards, config, collectors,
-    indicators, CLI hooks, logs, and cache. The registry now keeps one
-    invocation-scoped cwd plus memoized derived roots so thin-helper startup does
-    not keep recomputing the same DD-OOP-LAYERS path chain during one command.
-
-- File Registry
-
-    `Developer::Dashboard::FileRegistry` resolves stable file locations on top of
-    the path registry so the rest of the system can read and write well-known
-    runtime files without duplicating path logic.
-
-- Page Model
-
-    `Developer::Dashboard::PageDocument` and `Developer::Dashboard::PageStore`
-    implement the saved and transient page model, including bookmark-style source
-    documents, encoded transient pages, and persistent bookmark storage.
-
-- Page Resolver
-
-    `Developer::Dashboard::PageResolver` resolves saved pages and provider pages
-    so browser pages and actions can come from both built-in and config-backed
-    sources.
-
-- Actions
-
-    `Developer::Dashboard::ActionRunner` executes built-in actions and trusted
-    local command actions with cwd, env, timeout, background support, and encoded
-    action transport, letting pages act as operational dashboards instead of static
-    documents.
-
-- Collectors
-
-    `Developer::Dashboard::Collector` and
-    `Developer::Dashboard::CollectorRunner` implement file-backed prepared-data
-    jobs with managed loop metadata, timeout/env handling, interval and cron-style
-    scheduling, process-title validation, duplicate prevention, and collector
-    inspection data. This is the prepared-state layer that feeds indicators,
-    prompt status, and operational pages.
-
-- Indicators and Prompt
-
-    `Developer::Dashboard::IndicatorStore` and `Developer::Dashboard::Prompt`
-    expose cached state to shell prompts and dashboards, including compact versus
-    extended prompt rendering, stale-state marking, local project/Git indicator
-    refresh, and page-header status payloads for the web UI. Docker is not a
-    built-in indicator; Docker status appears only when configured as a collector.
-
-- Web Layer
-
-    `Developer::Dashboard::Web::DancerApp`,
-    `Developer::Dashboard::Web::App`, and
-    `Developer::Dashboard::Web::Server` provide the browser interface on port
-    `7890`, with Dancer2 owning the HTTP route table while the web-app service
-    handles page rendering, login/logout, helper sessions, and the
-    exact-loopback admin trust model. At web startup, active skills may contribute
-    Dancer2 routes and settings through `skills/<name`/lib/Dashboard.pm>; these
-    trusted extension routes remain behind the dashboard authorization gate. Each
-    skill `Dashboard.pm` is loaded while the PSGI app is built at web startup,
-    not on each request; registered Dancer2 hooks run per request. Use Dancer2's
-    `hook before => sub { ... }` form to populate app variables or response
-    headers. Bookmark CODE can read those variables by importing the same app with
-    `use Dancer2 appname => 'DeveloperDashboard'`. Existing hook response
-    headers override matching dashboard defaults, while explicit headers returned
-    by the backend take final precedence.
-
-- Open File Commands
-
-    `dashboard of` and `dashboard open-file` resolve direct files, `file:line`
-    references, Perl module names, Java class names, and recursive file-pattern
-    matches under a resolved scope so the dashboard can shorten navigation work
-    across different stacks.
-
-- File Alias Commands
-
-    `dashboard file` and `dashboard files` persist and inspect config-backed
-    named file aliases, paralleling the existing path alias flow while targeting
-    files instead of directories.
-
-- Data Query Commands
-
-    `dashboard jq`, `dashboard yq`, `dashboard tomq`, `dashboard propq`,
-    `dashboard iniq`, `dashboard csvq`, and `dashboard xmlq` parse JSON, YAML,
-    TOML, Java properties, INI, CSV, and XML input, then optionally extract a
-    dotted path and print a scalar or canonical JSON, giving the CLI a small
-    data-inspection toolkit that fits naturally into shell workflows.
-    `dashboard tomq` inflates TOML booleans into plain Perl `1` and `0`
-    scalars, so CLI output and JSON-encoded query results stay stable instead of
-    depending on backend-specific boolean objects.
-
-- Private CLI Helper Assets
-
-    Private `~/.developer-dashboard/cli/dd/` helper files provide the built-in
-    command behaviour without installing generic command names into the global
-    PATH. Query, open-file, workspace, path, file, and `ps1` commands keep
-    dedicated helper bodies, while the remaining built-ins stage thin wrappers
-    that hand off to a shared private `_dashboard-core` runtime.
-
-    Only `dashboard` is intended to be the public CPAN-facing command-line
-    entrypoint. The real built-in command bodies live outside `bin/dashboard`
-    under `share/private-cli/`, then stage into `~/.developer-dashboard/cli/dd/`
-    on demand. Generic helper names such as `workspace`, `of`, `open-file`,
-    `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, `path`,
-    `paths`, `file`, and `files` are intentionally kept out of the installed
-    global PATH to avoid
-    polluting the wider Perl and shell ecosystem while still keeping
-    dashboard-owned commands separate from user commands under
-    `~/.developer-dashboard/cli/`. While those staged helpers run, their process
-    title is normalized to the public `developer-dashboard ...` form so `ps`
-    output shows the user-facing command instead of the staged helper path.
-
-    Both `dashboard init` and `d2 init` preserve this boundary: dashboard
-    helpers remain in `cli/dd/`, while existing files directly in `cli/` are
-    treated as user-owned and are never overwritten by helper staging.
-
-    `dashboard workspace` creates or reuses a tmux session for the requested
-    workspace reference, seeds `WORKSPACE_REF`, keeps `TICKET_REF` for
-    compatibility with older shells, refreshes plain-directory `.env` files from
-    the highest ancestor down to the current directory when it creates or resumes a
-    session, attaches through a dashboard-managed private helper, and completes
-    already-open tmux session names when
-    shell completion is enabled. The older `dashboard ticket` spelling has been
-    removed; use `dashboard workspace`.
-    If another command creates the same named session between the existence check
-    and the create request, a duplicate-session response is accepted only after a
-    second tmux query confirms that exact session exists; unrelated create errors
-    remain visible.
-    Logical dotted workspace references map to tmux's underscore-normalized
-    session names because tmux treats a period as a session/window separator.
-    Existing tagged sessions are checked against `WORKSPACE_REF` so a name
-    collision cannot attach to an unrelated workspace.
-
-    When the workspace name is registered in the dashboard paths inventory, the
-    command changes into that registered directory before planning the session.
-    This includes skill-qualified aliases such as `bar.foo`, just like the shell
-    `cdr` helper, including aliases provided by a skill's `lib/Folder.pm` and
-    deeper names such as `bar.baz.qux.work`. Configured path aliases keep
-    precedence over Folder.pm methods. For example, `dashboard workspace bar.foo
-    \-c` names the session `bar.foo` and starts it in the registered directory.
-    Passing `-c` before or
-    after the workspace name remains available to explicitly request this behavior;
-    when `-c` is used with an unregistered name, the command fails with an explicit
-    error instead of silently starting from the wrong directory. The tmux session
-    and its layered `.env` refresh both start from the resolved directory.
-
-    Built-in commands and actions share a help catalog used by both command
-    dispatch and shell completion. Use `d2 help` for a concise command index,
-    `d2 help docker development` for nested action guidance, or append `--help`,
-    `-h`, or `help` to a command/action. TAB offers the same public actions and
-    known option flags. Help is passed through when it belongs to a delegated
-    tool: `d2 of grep --help` displays grep's usage, while `d2 docker compose
-    config --help` and `d2 docker compose help` reach Docker Compose. Use
-    `d2 docker compose --help` or `d2 help docker compose` for the dashboard's
-    Compose wrapper help. Dotted skill commands such as
-    `d2 tira.tasklist.prune --help` pass help options through to the skill's own
-    CLI rather than interpreting its private `skills _exec` dispatch as a public
-    Dashboard action. Workspace session names are queried only while
-    completing a positional workspace name; completing an option such as `-c`
-    does not call tmux.
-
-- Runtime Manager
-
-    `Developer::Dashboard::RuntimeManager` manages the background web service and
-    collector lifecycle with process-title validation, numeric POSIX shutdown
-    signals for Alpine/iSH compatibility, `pkill`-style fallback shutdown, and
-    restart orchestration, tying the browser and prepared-state loops together as
-    one runtime.
-
-- Update Manager
-
-    `Developer::Dashboard::UpdateManager` implements ordered update-script
-    execution and validated-collector-loop restart, and carries its own unit
-    test suite - but it is not currently wired into `bin/dashboard` or any
-    `share/private-cli/` command. Nothing in the shipped CLI switchboard calls
-    it today, so no update scripts run and no collector loops restart through
-    this path in the running product; it exists as tested groundwork for a
-    bootstrap/upgrade command that is not yet cut over.
-
-- Docker Compose Resolver
-
-    `Developer::Dashboard::DockerCompose` resolves project-aware compose files,
-    explicit overlay layers, services, addons, modes, env injection, and the
-    final `docker compose` command so container workflows can live inside the
-    same dashboard ecosystem instead of in separate wrapper scripts.
-
-## Environment Variables
-
-The distribution supports these compatibility-style customization variables:
-
-- `DEVELOPER_DASHBOARD_BOOKMARKS`
-
-    Override the saved page root.
-
-- `DEVELOPER_DASHBOARD_CHECKERS`
-
-    Filter enabled collector/checker names.
-
-- `DEVELOPER_DASHBOARD_CONFIGS`
-
-    Override the config root.
-
-- `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS`
-
-    Allow browser execution of transient `/?token=...`, `/action?atoken=...`,
-    and older `/ajax?token=...` payloads. The default is off, so the web UI only
-    executes saved bookmark files unless this is set to a truthy value such as
-    `1`, `true`, `yes`, or `on`.
-
-## Transient Web Token Policy
-
-Transient page tokens still exist for CLI workflows such as `dashboard page encode`
-and `dashboard page decode`, but browser routes that execute a transient payload
-from `token=` or `atoken=` are disabled by default.
-
-That means links such as:
-
-- `http://127.0.0.1:7890/?token=...`
-- `http://127.0.0.1:7890/action?atoken=...`
-- `http://127.0.0.1:7890/ajax?token=...`
-
-return a `403` unless `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is enabled.
-Saved bookmark-file routes such as `/app/index` and
-`/app/index/action/...` continue to work without that flag. Saved bookmark
-editor pages also stay on their named `/app/<id>/edit` and
-`/app/<id>` routes when you save from the browser, so editing an
-existing bookmark file does not fall back to transient `token=` URLs under the
-default deny policy.
-
-`Ajax` helper calls inside saved bookmark `CODE*` blocks should use
-an explicit `file => 'name.json'` argument. When a saved page supplies that
-name, the helper stores the Ajax Perl code under the saved dashboard ajax tree and emits a
-stable saved-bookmark endpoint such as
-`/ajax/name.json?type=text`. Skill pages use the same helper contract. Without
-extra skill route metadata the generated saved endpoint is namespaced under the
-longest matching skill route, for example
-`/ajax/example-skill/name.json?type=text` or
-`/ajax/example-skill/sub-skill/name.json?type=text`. The runtime config tree
-and installed skills can both ship `config/routes.json` to declare canonical
-custom paths for normal saved app pages, skill-local app pages, Ajax handlers,
-JavaScript assets, CSS assets, and other public assets. The schema is a JSON
-object whose keys are the public custom paths and whose values are either one
-smart local route string or an object with `to` plus an optional `type`, for
-example
-
-    {
-       "/java" : "/app/learn.ai",
-       "/v1/status" : {
-          "to" : "/ajax/status",
-          "type" : "json"
-       },
-       "/hello/world" : "/app/hello/world",
-       "/main.css" : "/css/hello/world.css",
-       "/hey.js" : "/js/hey/how/are/you.js",
-       "/what/are/you" : "/others/hello/world/you.html"
-    }
-
-When that file is present, skill pages emit the declared canonical
-`ajax` path such as `/v1/status` instead of the default `/ajax/...` url,
-and runtime-level aliases such as `/java` can point at normal saved bookmark
-ids such as `/app/learn.ai` without treating the dot as skill notation. The
-same manifest also makes the declared custom `/app`, `/js`, `/css`, and
-`/others` paths requestable. The smart longest-prefix routes remain the
-parent resolvers:
-`/app/example-skill/...`, `/ajax/example-skill/...`,
-`/js/example-skill/...`, `/css/example-skill/...`, and
-`/others/example-skill/...` are always checked first, and any declared custom
-path is checked only after the normal smart route misses. Runtime-level custom
-paths from the active `config/routes.json` layer chain follow the same
-fallback rule against the built-in `/app`, `/ajax`, `/js`, `/css`, and
-`/others` route handlers. If neither the smart route nor the custom path
-resolves, the request falls through to the normal `404` response. Ajax custom
-routes default to `json` when no explicit `type` is present, and the
-optional `type` value can also be `html`,
-`text`, or an arbitrary raw mime type such as
-`application/vnd.example+json`. Those saved Ajax handlers run the stored file
-as a real process, defaulting to Perl unless the file starts with a shebang,
-and stream both `stdout` and `stderr` back to the browser as they happen.
-That keeps bookmark Ajax workflows usable even while transient token URLs stay
-disabled by default, and it means bookmark Ajax code can rely on normal
-`print`, `warn`, `die`, `system`, and `exec` process behaviour instead of
-a buffered JSON wrapper.
-The same layered runtime config chain and installed-skill config trees can now
-ship `config/api.json` files that authorize selected `/ajax/...` routes for
-machine-to-machine callers without forcing a helper login form. The schema is a
-JSON object keyed by API client name. Each entry must provide a stored SHA-256
-hex digest under `secret` plus an `ajax` array of exact saved Ajax route
-paths such as `/ajax/stream.txt` or
-`/ajax/example-skill/status.json`. When a non-admin remote request targets one
-of those registered `/ajax/...` paths, the caller can send
-`X-DD-API-Key: NAME` and `X-DD-API-Secret: RAW-SECRET`. Developer Dashboard
-hashes the raw secret with SHA-256, compares it to the stored digest, and
-executes the saved Ajax handler when they match. Missing or wrong credentials
-for a registered API route return `403` with the JSON body
-`{"status":"forbidden"}`. Existing helper-session auth still works on the
-same saved Ajax routes, so browser workflows and machine callers can coexist on
-one handler without adding a second copy of the route. Like the rest of
-`DD-OOP-LAYERS`, runtime `config/api.json` files merge from home to the
-deepest active child layer, and installed skills contribute their own layered
-`config/api.json` fragments for skill-local saved Ajax routes. The built-in
-`dashboard api` command is the supported way to inspect or update the writable
-runtime layer for that registry.
-An entry carrying `"disabled": true` (or the same flag under `_disabled`)
-is dropped from the registry; a JSON literal `false` there keeps the key
-visible, exactly as `"disabled": 0` or `"disabled": "no"` does.
-Saved bookmark Ajax handlers also default to `text/plain` when no explicit
-`type => ...` argument is supplied, and the generated Perl wrapper now
-enables autoflush on both `STDOUT` and `STDERR` so long-running handlers
-show incremental output in the browser instead of stalling behind process
-buffers.
-If a saved handler also needs refresh-safe process reuse, pass
-`singleton => 'NAME'` in the `Ajax` helper. The generated url then carries
-that singleton name, the Perl worker runs as `dashboard ajax: NAME`, and the
-runtime terminates any older matching Perl Ajax worker before starting the
-replacement stream for the refreshed browser request. Singleton-managed Ajax
-workers are also terminated by `dashboard stop` and `dashboard restart`, and
-the bookmark page now registers a `pagehide` cleanup beacon against
-`/ajax/singleton/stop?singleton=NAME` so closing the browser tab also tears
-down the matching worker instead of leaving it behind.
-If `code => ...` is omitted, `Ajax(file => 'name')` targets the
-existing executable at `dashboards/ajax/name` instead of rewriting it.
-Static files referenced by saved bookmarks are resolved from the effective
-runtime public tree first and then from the saved bookmark root. The web layer
-also provides a built-in bundled `/js/jquery.js` asset that serves the local
-copy of jQuery 4.0.0, with `/js/jquery-4.0.0.min.js` kept as a compatibility
-alias for the same shipped payload even when no runtime file has been copied
-into `dashboard/public/js` yet. The bundled browser tab icon works the same
-way: browsers request `/favicon.ico` on their own for every page load, so that
-route is served outside the authorization gate, on every trust tier and before
-any helper login, from the bundled 16x16 icon. Dropping your own
-`dashboard/public/others/favicon.ico` into any runtime layer overrides it.
-Skills can ship the same classes of assets
-under their own dashboard tree: `dashboards/ajax/*` resolves at
-`/ajax/<repo-name>/...` or
-`/ajax/<repo-name>/<sub-skill>/...`, and
-`dashboards/public/js/*`, `dashboards/public/css/*`, and
-`dashboards/public/others/*` resolve at
-`/js/<repo-name>/...`, `/css/<repo-name>/...`, and
-`/others/<repo-name>/...` with the same nested-skill extension,
-for example `/js/<repo-name>/<sub-skill>/path/file.js`. If a
-request such as `/js/<repo-name>/foo/bar.js` or
-`/js/<repo-name>/<sub-skill>/foo/bar.js` does not exist in the
-skill-local public tree, the web layer falls back to the normal nested
-saved-bookmark asset path `dashboards/public/js/...` or saved Ajax file path
-`dashboards/ajax/...` instead of assuming the leading path segments must
-belong to a skill.
-
-Saved bookmark editor and view-source routes also protect literal inline
-script content from breaking the browser bootstrap. If a bookmark body
-contains HTML such as `/script`, the editor now escapes the inline JSON
-assignment used to reload the source text, so the browser keeps the full
-bookmark source inside the editor instead of spilling raw text below the page.
-Saved browser workspaces can also show a request-specific token form above the
-editor whenever the current request uses `{{token}}` placeholders, carrying
-those token values across matching placeholders in the same workflow so later
-requests can reuse the operator-supplied values without manual copy-and-paste.
-Bookmark rendering now emits saved `set_chain_value()` bindings after
-the bookmark body HTML, so pages that declare `var endpoints = {}` and then
-call helpers from `$(document).ready(...)` receive their saved `/ajax/...`
-endpoint URLs without throwing a play-route JavaScript `ReferenceError`.
-Bookmark pages now also expose
-`fetch_value(url, target, options, formatter)`,
-`stream_value(url, target, options, formatter)`, and
-`stream_data(url, target, options, formatter)` helpers so a bookmark can bind
-saved Ajax endpoints into DOM targets without hand-writing the fetch and
-render boilerplate. `stream_data()` and `stream_value()` now use
-`XMLHttpRequest` progress events for browser-visible incremental updates, so
-a saved `/ajax/...` endpoint that prints early output updates the DOM before
-the request finishes. Those helpers support plain text, JSON, and HTML output
-modes, and the saved Ajax endpoint bindings now run after the page declares
-its endpoint root object, so `$(document).ready(...)` callbacks can call
-helpers such as `fetch_value(endpoints.foo, '#foo')` on first render.
-Saved browser workspaces that render response inspection panels should place
-their Response Body and Response Headers tabs below the response `pre` box so
-the main response payload stays visible while the tabbed details remain
-reachable without jumping away from the current result.
-
-## User CLI Extensions
-
-Unknown top-level subcommands can be provided by executable files under
-the current working directory's `./.developer-dashboard/cli` first, then the
-nearest git-backed project runtime `./.developer-dashboard/cli` when it is a
-different directory, and then `~/.developer-dashboard/cli`. For example,
-`dashboard foobar a b` will exec the first matching
-`cli/foobar` with `a b` as argv, while preserving stdin, stdout, and
-stderr.
-
-A direct custom command can also be stored as an executable
-`cli/<command>.pl`, `cli/<command>.py`, `cli/<command>.js`, `cli/<command>.go`,
-`cli/<command>.java`, `cli/<command>.sh`,
-`cli/<command>.bash`, `cli/<command>.ps1`,
-`cli/<command>.cmd`, or `cli/<command>.bat`, and
-`dashboard <command>` resolves the same logical command name to
-those files.
-
-Concrete source-backed examples:
-
-    dashboard hi
-    dashboard foo
-
-If `cli/hi.go` is executable, `dashboard hi` runs it through `go run`.
-If `cli/report.py` is executable, `dashboard report` runs it through `python`.
-If `cli/webhook.js` is executable, `dashboard webhook` runs it through `node`.
-If `cli/foo.java` is executable, `dashboard foo` compiles it with `javac`
-into an isolated temp directory and then runs the declared main class with
-`java`.
-
-If a user mistypes a command, dashboard now prints an explicit unknown-command
-error together with the closest matching public command before the usual usage
-summary. The same guidance also applies to dotted skill commands, so
-`dashboard alpha-skill.run-tset` suggests the nearest installed dotted skill
-command instead of only dumping generic help.
-
-## Built-in command help and completion
-
-Every dashboard-managed built-in command and its public actions use one help
-catalog. Request help with `--help`, `-h`, or a trailing `help`, for
-example `d2 api add --help`, `d2 api add help`, or the global form
-`d2 help docker development enable`. The public `version` command also
-supports `d2 version --help` and global `d2 help version`. Bare `d2 help`,
-`d2 --help`, and `d2 -h` print a concise index of public built-in commands
-instead of the full module manual. Top-level TAB completion lists commands and
-dotted skill commands; path aliases are offered in the `d2 workspace
-<alias>` position instead of being mixed into the command list. Help is returned before the built-in
-command body runs, while the normal main and per-command hook order is
-preserved. The global help form and command help include actionable usage and
-the available action/options where applicable.
-
-The same catalog supplies TAB candidates for public commands, nested actions,
-and supported option flags. Bash and zsh call the live `dashboard complete`
-helper, so their candidates stay aligned with the command catalog rather than
-maintaining separate shell-side action lists. Existing dynamic completions for
-skills, workspace sessions, collectors, and workspace path aliases remain
-available. When a skill with the same name exists in project and home runtime
-layers, its dotted command candidates are merged from every participating
-layer and duplicate command names appear once; execution still uses the
-normal deepest-layer lookup. `cdr` TAB completion lists aliases and direct
-child directories.
-Each entered narrowing term descends one matching directory level before
-suggesting the next child, avoiding recursive scans of unrelated repository
-and dependency trees.
-When a command has a default action, the root help and completion also expose
-that action's options; for example, `d2 api --key helper-bot -o json` lists
-API keys without requiring the explicit `ls` action.
-
-`DD-OOP-LAYERS` is now the runtime contract for the whole local ecosystem.
-Starting at the home directory and walking down through every parent directory
-until the current working directory, every existing `.developer-dashboard/`
-and `.d2/` runtime directory participates. When both names exist at the same
-depth, both are searched independently; `.developer-dashboard/` has priority
-over `.d2/` at that depth and remains the write target. The deepest available
-runtime root is the write target, but bookmarks, `nav/*.tt`, config,
-collectors, indicators, auth/session state lookups, runtime
-`local/lib/perl5`, Docker Compose service folders, skills, and custom CLI
-hooks are inherited across the full chain instead of only a single
-project-or-home split.
-
-Per-command hook files can live under either
-`./.developer-dashboard/cli/<command>` or
-`./.developer-dashboard/cli/<command>.d` in every inherited layer
-from `~/.developer-dashboard` down to the current directory. Executable files
-in those directories are run in sorted filename order within each layer, with
-the layers themselves running top-down from home to the deepest current layer,
-non-executable files are skipped, and each hook now streams its own
-`stdout` and `stderr` live to the terminal while still accumulating those
-channels into `RESULT` as JSON. If that JSON grows too large for a safe
-`exec()` environment, `dashboard` spills it into `RESULT_FILE` and
-`Developer::Dashboard::Runtime::Result` reads the same logical payload from
-there so later hooks and the final command still see the same result set
-without tripping `Argument list too long`. Built-in commands such as `dashboard jq`
-use the same hook directory. A
-directory-backed custom command can provide its real executable as
-`~/.developer-dashboard/cli/<command>/run`, and that runner receives
-the final `RESULT` plus `LAST_RESULT` environment variables. After each hook
-finishes, the updated `RESULT` JSON is written back into the environment
-before the next sorted hook starts, and `LAST_RESULT` is rewritten to the
-structured result for the hook that just ran, so later hook scripts can react
-to earlier hook output and also inspect the immediate previous hook in a stable
-shape. `LAST_RESULT` carries `file`, `exit`, `STDOUT`, and `STDERR`.
-Only an explicit `[[STOP]]` marker in one hook's `stderr` stops the
-remaining hook files for that command. A non-zero exit code alone is still
-recorded, but it does not skip later hooks. Executable `.py` hook files and
-direct `.py` custom commands run through `python`. Executable `.js` hook files and
-direct `.js` custom commands run through `node`. Executable `.go` hook files and
-direct `.go` custom commands run through `go run`. Executable `.java`
-hook files and direct `.java` custom commands are compiled with `javac`
-into an isolated temp directory and then run through `java` using the
-declared main class from the source file.
-
-Perl hook code can use `Runtime::Result` to decode `RESULT` safely, read the
-immediate `last_result`, and inspect per-hook `stdout`, `stderr`, exit
-codes, or the last recorded hook entry.
-If a Perl-backed command wants a compact final summary after its hook files
-run, it can also call `Developer::Dashboard::Runtime::Result->report()` to print a simple
-success/error report for each sorted hook file.
-
-### Layered Env Files
-
-Environment files are part of the same `DD-OOP-LAYERS` contract.
-When `dashboard ...` runs, it loads every participating plain-directory env
-file and runtime-layer env file from root to leaf before command hooks,
-custom commands, or built-in helpers execute.
-
-That ordered runtime pass loads, when present:
-
-- `<root>/.env`
-- `<root>/.env.pl`
-- each deeper ancestor directory `.env`
-- each deeper ancestor directory `.env.pl`
-- each participating `.developer-dashboard/.env` and `.d2/.env`
-- each participating `.developer-dashboard/.env.pl` and `.d2/.env.pl`
-
-Deeper files win because later layers overwrite earlier keys. Plain `.env`
-files must contain explicit `KEY=VALUE` lines, and the load order at one
-directory is always `.env` first and then `.env.pl`. Plain `.env` parsing
-ignores blank lines, whole-line `#` comments, whole-line `//` comments, and
-`/* ... */` block comments that can span multiple lines. Plain `.env`
-values also support:
-
-- leading `~` expansion to `$HOME`
-- `$NAME` expansion from the current effective environment
-- `${NAME:-default}` expansion with a fallback value
-- `${Namespace::function():-default}` expansion through a static Perl function
-
-Expansion can see system env keys, values loaded from earlier layers, and
-values assigned by earlier lines in the same `.env` file. Missing functions,
-malformed lines, malformed keys, and unterminated block comments fail
-explicitly instead of being skipped silently. Executable logic can live in
-`.env.pl`, which is run directly and may set `%ENV` programmatically.
-
-Skill-local env files are loaded only when a skill command or skill hook is
-actually running. A normal non-skill command inherits only the root-to-leaf
-runtime env chain. For a skill command, home-level runtime env files load
-first as defaults, then each participating skill root loads from the base
-installed skill layer to the deepest matching child skill layer, applying:
-
-- `<skill-root>/.env`
-- `<skill-root>/.env.pl`
-
-Skill `.env` and `.env.pl` values override matching values from the home
-runtime. Skill `cli/.env` and `cli/.env.pl` values are applied after the skill
-root files. Any deeper project runtime layers are applied last, so the nearest
-project runtime still has final precedence among file-based values. Values
-explicitly inherited from the invoking shell have highest precedence and are
-preserved across every env-file layer; a file may populate a variable that the
-caller did not set, but cannot replace an exported caller value. Skill
-overrides stay isolated to the skill execution path and do not leak into
-unrelated commands.
-
-The runtime chain is collected from the DD-OOP layers rooted at the current
-working directory, walking its existing parent directories toward the leaf.
-For skill execution, the home runtime portion is applied before the skill
-chain and deeper runtime layers after it. Therefore a nested command such as
-`d2 foo.bar.bob` receives home defaults, then the `foo` and `bar` skill
-overrides, then any nearer project runtime values.
-
-For nested skill commands such as `dashboard foo.bar.zzz.show`, the skill env
-chain expands from the root nested skill to the leaf skill before the command
-runs:
-
-- `skills/foo/.env`
-- `skills/foo/skills/bar/.env`
-- `skills/foo/skills/bar/skills/zzz/.env`
-
-If a deeper nested skill overrides the same key, the parent value is preserved
-under that parent skill alias before the deeper skill replaces the plain key.
-For example, if all three nested skills assign `VERSION`, the leaf command
-sees `VERSION` from `zzz`, `foo_VERSION` from `foo`, and
-`foo_bar_VERSION` from `foo.bar`.
-
-The Docker Compose resolver also loads `<skill-root>/.env` for each installed
-skill whose `config/docker/<service>/compose.yml` or
-`config/docker/<service>/development.compose.yml` file actually participates in
-the resolved compose stack. A service's `compose.yml` is its base and is loaded
-whenever present; `development.compose.yml` is loaded afterward only while the
-service's `develop.yml` marker is enabled. That compose-only skill env layer
-stays isolated to the compose resolver, respects disabled skills, and does not
-execute `<skill-root>/.env.pl`. Nested skill compose services use that same
-root-to-leaf env expansion, so a participating leaf service such as
-`skills/foo/skills/bar/skills/zzz/config/docker/zzz/compose.yml` loads the
-env chain from `foo` to `foo.bar` to `foo.bar.zzz` and preserves parent
-overrides under aliases such as `foo_VERSION` and `foo_bar_VERSION`.
-
-Perl code can inspect where a dashboard-managed env key came from with
-`Developer::Dashboard::EnvAudit`.
-
-Single-key lookup:
-
-    use Developer::Dashboard::EnvAudit;
-
-    my $entry = Developer::Dashboard::EnvAudit->key('FOO');
-
-That returns either `undef` for normal system env keys or a hashref like:
-
-    {
-        value   => 'bar',
-        envfile => '/full/path/to/.env',
-    }
-
-Full inventory lookup:
-
-    my $all = Developer::Dashboard::EnvAudit->keys;
-
-The audit records only dashboard-loaded env keys. System-provided keys that
-did not come from a dashboard-managed `.env` or `.env.pl` file are left
-untracked on purpose.
-
-For example, a layered `.env` file can now look like:
-
-    # root defaults
-    ROOT_CACHE=~/cache
-    API_BASE=https://example.test
-    TOKEN=${ACCESS_TOKEN:-anonymous}
-    MESSAGE=${Local::Env::Helper::message():-hello}
-
-    /*
-    child layers can still override
-    any value later in the root-to-leaf chain
-    */
-    CHAINED=$ROOT_CACHE/$TOKEN
-
-A separate mechanism, `# include <skill.path>`, pulls another
-skill's own `.env`/`.env.pl` in by name rather than by layer position -
-see ["EMBEDDING IN PERL CODE"](#embedding-in-perl-code) for `env->include(...)`, its `.env.pl`
-counterpart.
-
-## Open File Commands
-
-`dashboard of` is the shorthand name for `dashboard open-file`.
-
-These commands support:
-
-- direct file paths
-- `file:line` references
-- Perl module names such as `My::Module`, resolved against every directory in
-the running Perl's `@INC`
-- Java class names such as `com.example.App` or `javax.jws.WebService`
-- recursive regex searches inside a resolved directory alias or path
-- recursive content searches with `dashboard of grep -nr <pattern>
-<directory>`
-
-Without `--print`, `dashboard of` and `dashboard open-file` now behave like
-the older picker workflow again: one unique match opens directly in
-`--editor`, `VISUAL`, `EDITOR`, or `vim` as the final fallback, and
-multiple matches render a numbered prompt. At that prompt you can press Enter
-to open all matches with `vim -p`, type one number to open one file, type comma-separated
-numbers such as `1,3`, or use a range such as `2-5`. Scoped searches also
-rank exact helper/script names before broader regex hits, so
-`dashboard of . jq` lists `jq` and `jq.js` ahead of `jquery.js`. Every
-scoped search token is treated as a case-insensitive regex, so
-`dashboard of . 'Ok\.js$'` matches `ok.js` but not `ok.json`.
-Content grep passes arguments directly to the system `grep` executable (no
-shell expansion), adds filename and line-number output for reliable file
-selection, then opens the unique matching files using the same chooser. Add
-`--print` before `grep` to print the unique paths without opening an editor.
-
-Java class lookup first checks live `.java` files under the current project,
-workspace roots, and `@INC`-adjacent source trees. If no live source file
-exists, it also searches local source archives such as `-sources.jar`,
-`-src.jar`, `src.zip`, `war`, and `jar` files under the current roots,
-`~/.m2/repository`, Gradle caches, and `JAVA_HOME`. When a local archive
-still does not provide the requested class, the helper can fetch a matching
-Maven source jar, cache it under
-`~/.developer-dashboard/cache/open-file/`, and then open the extracted Java
-source.
-
-## Data Query Commands
-
-These built-in commands parse structured text and can then either extract a
-dotted path or evaluate a Perl expression against the decoded document through
-`$d`:
-
-- `dashboard jq [path] [file]` for JSON
-- `dashboard yq [path] [file]` for YAML
-- `dashboard tomq [path] [file]` for TOML
-- `dashboard propq [path] [file]` for Java properties
-- `dashboard iniq [path] [file]` for INI
-- `dashboard csvq [path] [file]` for CSV
-- `dashboard xmlq [path] [file]` for XML
-
-If the selected value is a hash or array, the command prints canonical JSON.
-If the selected value is a scalar, it prints the scalar plus a trailing
-newline.
-
-The file path and query text are order-independent, and `$d` selects the
-whole parsed document. For example, `cat file.json | dashboard jq '$d'` and
-`dashboard jq file.json '$d'` return the same result. If the query text uses
-`$d` inside a Perl expression, the command evaluates that expression against
-the decoded document. For example, `echo '{"foo":[1],"bar":[2]}' | dashboard
-jq 'sort keys %$d'` prints `["bar","foo"]`. The same contract applies to
-`yq`, `tomq`, `propq`, `iniq`, `csvq`, and `xmlq`.
-
-`xmlq` follows the same decoded-data model as the other query commands. XML
-elements decode into nested hashes and arrays, repeated sibling tags become
-arrays, attributes live under `_attributes`, and mixed text lives under
-`_text`. That means `printf '<root`&lt;value>demo&lt;/value>&lt;/root>' | dashboard
-xmlq root.value> prints `demo`, while `dashboard xmlq feed.xml '$d'` prints
-the full decoded XML tree as canonical JSON.
-
-# MANUAL
+Developer Dashboard brings the everyday tools of local development into one
+place. Its browser interface, shell commands, prompt status, and scheduled
+checks share the same saved pages, settings, and runtime data.
+
+Use it to keep project links and notes close at hand, run repeatable checks,
+open files quickly, inspect structured data, and manage recurring container
+workflows. Project-specific settings can sit alongside shared home settings,
+so one installation can support several codebases without forcing them to use
+the same pages or commands.
+
+## Start Here
+
+New users can follow the guide in this order:
+
+- Install the command line tool using ["Installation"](#installation).
+- Create the initial runtime and open the browser using ["First Run"](#first-run).
+- Add saved pages and actions using ["Working With Pages"](#working-with-pages).
+- Connect checks to prompt and browser status using ["Working With Collectors"](#working-with-collectors)
+and ["Prompt Integration"](#prompt-integration).
+
+Experienced users can go directly to the reference topics for
+["Environment Customisation"](#environment-customisation), ["Browser Access Model"](#browser-access-model), ["Docker Compose"](#docker-compose),
+and ["Skills System"](#skills-system).
+
+## Main Capabilities
+
+- **Browser pages** for links, notes, forms, and reusable actions.
+- **Command line tools** for opening files, navigating to project paths, querying
+structured data, managing pages, and running repeatable tasks.
+- **Collectors and prompt status** for scheduled checks whose latest results can
+appear in the browser and shell prompt.
+- **Project configuration** for path aliases, command extensions, API settings,
+and Docker Compose overlays, with project settings layered over shared settings.
+- **Skills and integrations** for reusable commands, pages, and runtime extensions,
+including workspace-aware conversations through supported AI command line tools.
+- **Cross-platform use** with installers and runtime support for macOS, Linux, and
+Windows.
+
+# USER GUIDE
 
 ## Installation
 
@@ -1132,138 +63,89 @@ Bootstrap a blank Windows PowerShell host from a checkout or the current shell w
 
 `install.sh` and `install.ps1` are checkout-only bootstrap helpers. They ship
 in the source tree and release tarball so operators can run them explicitly
-from a checkout, extracted tarball, or streamed bootstrap, but CPAN and
-`cpanm` do not install them as global commands. When the Unix-like installer
-is streamed through `sh` without a checkout, such as `curl ... | sh`, it
-falls back to embedded Debian-family, Alpine, Fedora, and Homebrew package
-manifests instead of assuming repo-local `aptfile`, `apkfile`, `dnfile`,
-and `brewfile` files exist on disk, then clones the current GitHub
-`master` checkout into a temporary local tree and installs that checkout so
-the streamed bootstrap gets the same implementation snapshot that shipped the
-installer instead of a stale CPAN release.
+from a checkout, extracted tarball, or streamed bootstrap. CPAN and `cpanm`
+do not install them as global commands.
 
-That installer reads the repo-root `aptfile` on Debian-family hosts and runs
-`apt-get update` plus `apt-get install -y` for the listed packages, reads
-the repo-root `apkfile` on Alpine hosts and runs
-`apk add --no-cache` for the listed packages, reads the repo-root
-`dnfile` on Fedora hosts and runs `dnf install -y` for the listed
-packages, reads the repo-root
-`brewfile` on macOS and runs `brew install` for the listed packages,
-ships `tmux` in every one of those bootstrap package lists because
-`dashboard workspace` is a first-party tmux workflow, verifies that `node`,
-`npm`, and `npx` are available from those
-bootstrap packages before finishing the install, or falls back to the embedded
-copies of those package lists when the script is streamed without the checkout
-files, installs Debian-family Node tooling in a conflict-aware order by
-bringing in `nodejs` first and only attempting the distro `npm` package if
-`npm` and `npx` are still missing, prints a visible install progress board
-before doing any system changes, prints that full checklist once and then only
-emits step transitions so the active pointer does not appear duplicated in
-interactive terminals, explains that any upcoming `sudo` prompt is asking for
-the user's operating-system account password only for package-manager work,
-bootstraps Homebrew itself on blank macOS hosts before it tries to read the
-repo-root `brewfile`, updates `PATH` from the discovered Homebrew prefix so
-the same run can immediately install the listed macOS packages without asking
-the operator to reopen the shell,
-bootstraps user-space Perl
-tooling under `~/perl5` with
-`cpanm --no-wget --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus File::ShareDir::Install`,
-appends exactly one `local::lib` bootstrap line to `~/.bashrc`,
-`~/.zshrc`, or `~/.profile` depending on the preferred login shell even
-when the installer is run through plain `sh`, keeps bash login shells wired
-by bridging `~/.profile` to `~/.bashrc`, prefers
-Homebrew Perl on macOS when `brew --prefix perl` exposes a brewed
-interpreter, bootstraps a user-space `perlbrew` Perl on Debian-family,
-Alpine, or Fedora hosts when the system Perl is older than the required
-`5.44`, installs `App::perlbrew` into `~/perl5/bin` first if the package manager did not
-already put `perlbrew` on `PATH`, keeps that local `perlbrew` and
-`patchperl` toolchain pinned to the private `~/perl5/lib/perl5` include path
-while the rescue build runs, fetches the `App::perlbrew` tarball with
-`curl` before the local install so Alpine does not emit the noisy
-`IO::Socket::IP` warning during that bootstrap step, uses
-`perlbrew --notest install perl-5.44.0` so blank-machine bootstrap does not
-stall in upstream Perl core test failures, updates the selected shell rc file
-itself with the needed `PERLBREW_HOME` and rescue-Perl `PATH` lines instead
-of leaving a manual `~/.profile` editing step behind or sourcing perlbrew's
-bash-only startup file under generic `sh`, appends the matching
-`eval "$(".../dashboard" shell bash|zsh|sh)"` bootstrap so `d2`, prompt
-integration, and completion come up automatically in future shells, re-enters
-an activated shell automatically at the end of a terminal-backed streamed
-install so `dashboard`, `d2`, prompt integration, and completion are live
-immediately instead of leaving the user at a dead prompt, falls back to
-printing the exact shell file it updated plus the exact `. "<rc-file`">
-command the user should run only when the installer cannot safely take over a
-terminal, never probes `/dev/tty` during a piped `curl ... | sh` run so
-non-interactive installs stay quiet, installs Developer Dashboard into the user
-account with `cpanm --no-wget --notest .` when the installer is running from a
-checkout or extracted tarball, and uses that same `cpanm --no-wget --notest .`
-flow against a temporary cloned checkout when the Unix-like bootstrap had to
-clone GitHub `master` for a streamed install. That bootstrap now seeds
-`File::ShareDir::Install` into `~/perl5` before the checkout install step so
-`Makefile.PL` can refresh the shipped share tree even on a blank Ubuntu host,
-and then runs `dashboard init` so the runtime exists immediately after
-installation.
+When the Unix-like installer is streamed through `sh` without a checkout,
+such as `curl ... | sh`, it uses embedded package manifests and creates a
+temporary checkout before installing. This gives the bootstrap the same source
+snapshot as the installer rather than relying on an older published release.
 
-On Windows PowerShell hosts, `install.ps1` uses `winget` to install missing
-Git, Strawberry Perl, and Node.js LTS packages, pins those installs to the
-community `winget` source so a broken `msstore` source does not block the
-bootstrap, resets and refreshes the source catalog once before retrying when a
-`winget` source failure still occurs, downloads `cpanm` from
-`https://cpanmin.us/`, bootstraps `local::lib` into the private
-`~/perl5` tree with that standalone script together with
-`File::ShareDir::Install`, installs Developer Dashboard with `cpanm --notest`,
-sets the CurrentUser PowerShell execution policy to
-`RemoteSigned` when it is still too restrictive to load profile scripts,
-updates the current-user PowerShell profile with self-contained
-private `~/perl5` and runtime PATH setup, seeds `$env:HOME` from PowerShell's
-own `$HOME` when Windows did not export `HOME` itself, and dot-sources the
-generated `~/.developer-dashboard/cache/powershell-env.ps1` and
-`powershell-bootstrap.ps1` files instead of launching Perl at profile load.
-`dashboard shell ps` remains the explicit cache refresh command and writes
-both files atomically. The installer runs `dashboard init`, refreshes and
-syntax-checks both non-empty caches before writing the managed profile, and
-then activates the bootstrap in the current shell when possible. Missing,
-empty, or corrupt caches produce an actionable refresh warning rather than a
-silent Perl fallback. The installer also creates a stable user-space
-`make.cmd` shim that points at Strawberry Perl's GNU make provider so skill
-`Makefile` workflows keep working in later sessions. Future PowerShell
-sessions do not rely on installer-only helper functions while loading that
-generated profile block. The generated bash, zsh,
-POSIX sh, and PowerShell shell bootstraps all follow the same tmux-aware
-prompt rule: when the shell starts inside a `dashboard workspace` tmux session
-that carries `DEVELOPER_DASHBOARD_TMUX_STATUS=1`, indicator glyphs move to
-the first row of that session's two-line bottom tmux status block, while the
-second row keeps tmux's normal session and indexed window list. The inline
+On Unix-like systems, the installer uses the package manifest for the host
+(Debian-family, Alpine, Fedora, or macOS) to install system prerequisites. It
+then prepares a user-local Perl environment, installs Developer Dashboard,
+configures shell integration, and runs `dashboard init`.
+
+The installer displays progress and may ask for the operating-system password
+when a system package manager requires elevated access. It prepares the
+runtime and shell configuration for future sessions; a terminal-backed
+installation also activates the new shell setup when possible.
+
+Security and release validation use a hardened Perl baseline: `5.44`. The
+Unix bootstrap accepts an existing host Perl from `5.38`; when it must build
+an isolated fallback, it installs `perlbrew --notest install perl-5.44.0`.
+The dependency set also pins `HTTP::Tiny` to `0.096` so the transitive
+minimum inherited through Plack cannot resolve to versions with known TLS,
+request-validation, or cross-origin redirect credential vulnerabilities.
+
+The Unix-like installer prepares its user-local Perl dependencies before
+installing the checkout and initialising the runtime.
+
+On Windows, `install.ps1` installs Git, Strawberry Perl, and Node.js when
+needed, then installs the dashboard and initialises its runtime. It configures
+the current user's PowerShell profile to load the generated environment and
+shell bootstrap files. Use `dashboard shell ps` to refresh those generated
+PowerShell files later.
+
+Future PowerShell sessions do not rely on installer-only helper functions
+while loading the generated profile block.
+
+The generated bash, zsh, POSIX sh, and PowerShell bootstraps share the same
+tmux prompt behaviour. In a `dashboard workspace` session with
+`DEVELOPER_DASHBOARD_TMUX_STATUS=1`, indicators appear on the first row of the
+two-line bottom status block. The second row keeps tmux's session and window
+list.
+
+The inline
 prompt suppresses indicator fragments with `dashboard ps1 --no-indicators`.
+
 Ordinary tmux sessions keep the normal inline prompt. Developer Dashboard
-does not edit the user's tmux config file to provide that behavior, and it
+does not edit the user's tmux config file to provide that behaviour, and it
 uses session-local tmux options
 instead of changing the whole tmux server. Those dashboard-managed tmux
 sessions also refresh the status block at a 15-second cadence instead of a
 hot 2-second loop.
+
 When helper staging reruns during upgrades, the managed home runtime also
 removes dashboard-owned older flat helper files from
 `~/.developer-dashboard/cli/` so the public command and shell bootstrap
 always converge on the current `~/.developer-dashboard/cli/dd/` helper
 generation instead of silently reusing stale wrappers from older releases.
-The Windows bootstrap
-does not try to self-install `App::cpanminus` while the downloaded
+
+The Windows bootstrap does not try to self-install `App::cpanminus` while the downloaded
 `cpanm` bootstrap script is still running, which avoids the Windows file
 replacement failure that can break streamed `irm .../install.ps1 | iex`
-installs. The shipped distribution metadata also keeps `Plack::Test` and
+installs.
+
+The shipped distribution metadata also keeps `Plack::Test` and
 `Test::Pod` out of the end-user install prerequisite path so blank Windows
 hosts do not have to pull the `Test::SharedFork` dependency chain during the
 bootstrap. The Windows bootstrap target stays literal: when
 `DD_INSTALL_CPAN_TARGET` is set, `install.ps1` passes that exact value
-through to `cpanm --notest` instead of trying to reinterpret it. When that
+through to `cpanm --notest` instead of trying to reinterpret it.
+
+When that
 override is unset in the streamed `irm .../install.ps1 | iex` path,
 `install.ps1` clones the current GitHub `master` checkout into a temporary
 local tree and installs that local checkout so the bootstrap installs the same
-snapshot that shipped the installer instead of an older CPAN release. The
-Windows smoke gate also proves that a brand-new profile-loaded PowerShell
+snapshot that shipped the installer instead of an older CPAN release.
+
+The Windows smoke gate also checks that a new profile-loaded PowerShell
 session can resolve `dashboard`, print `dashboard version`, run
 `dashboard logs`, run `dashboard restart`, and install at least one real
-skill after that streamed bootstrap completes. The generated PowerShell shell
+skill after that streamed bootstrap completes.
+
+The generated PowerShell shell
 bootstrap now forces UTF-8 console input and output encoding before it returns
 the multi-line prompt from `dashboard ps1`, so the prompt keeps the trailing
 command marker on the next line and preserves indicator plus branch glyphs
@@ -1297,125 +179,9 @@ Or install from a checkout with:
     make test
     make install
 
-## Local Development
-
-The CLI runs through the active Perl interpreter. It does not compile or cache
-standalone command binaries, so development and release checks exercise the same
-interpreted command path.
-
-Build the distribution:
-
-    dzil clean
-    dzil build
-
-The release gather rules exclude local coverage output such as `cover_db`, so
-covered runs before `dzil build` do not leak Devel::Cover artifacts into the
-shipped tarball.
-Release hygiene now also requires that this cleanup leaves exactly one
-unpacked `Developer-Dashboard-X.XX/` build directory and exactly one matching
-`Developer-Dashboard-X.XX.tar.gz` artifact after the build.
-The built distribution also ships a plain `README` companion so CPAN and
-kwalitee consumers still receive a top-level readme without re-including the
-checkout-only documentation set.
-
-To publish the built distribution to PAUSE, first complete the repository's
-release gates and configure PAUSE credentials outside the checkout, then run
-`dzil release` explicitly. The distribution config uses the
-`Dist::Zilla::Plugin::UploadToCPAN` releaser. It reads credentials from the
-user's Dist::Zilla configuration or `~/.pause`; never place credentials in
-`dist.ini` or another tracked file. `dzil release` uploads to CPAN and must
-not be used as a substitute for `dzil build`.
-
-Run the CLI directly from the repository:
-
-    perl -Ilib bin/dashboard init
-    perl -Ilib bin/dashboard auth add-user <username> <password>
-    perl -Ilib bin/dashboard version
-    perl -Ilib bin/dashboard of --print My::Module
-    perl -Ilib bin/dashboard open-file --print com.example.App
-    printf '{"alpha":{"beta":2}}' | perl -Ilib bin/dashboard jq alpha.beta
-    printf 'alpha:\n  beta: 3\n' | perl -Ilib bin/dashboard yq alpha.beta
-    mkdir -p ~/.developer-dashboard/cli/update.d
-    printf '#!/usr/bin/env perl\nuse Developer::Dashboard::Runtime::Result;\nprint Developer::Dashboard::Runtime::Result::stdout(q{01-runtime});\nprint $ENV{RESULT} // q{}\n' > ~/.developer-dashboard/cli/update
-    chmod +x ~/.developer-dashboard/cli/update
-    printf '#!/bin/sh\necho runtime-update\n' > ~/.developer-dashboard/cli/update.d/01-runtime
-    chmod +x ~/.developer-dashboard/cli/update.d/01-runtime
-    perl -Ilib bin/dashboard update
-    perl -Ilib bin/dashboard serve
-    perl -Ilib bin/dashboard stop
-    perl -Ilib bin/dashboard restart
-
-User CLI extensions can be tested from the repository too:
-
-    mkdir -p ~/.developer-dashboard/cli
-    printf '#!/bin/sh\ncat\n' > ~/.developer-dashboard/cli/foobar
-    chmod +x ~/.developer-dashboard/cli/foobar
-    printf 'hello\n' | perl -Ilib bin/dashboard foobar
-
-    mkdir -p ~/.developer-dashboard/cli/jq.d
-    printf '#!/usr/bin/env perl\nprint "seed\\n";\n' > ~/.developer-dashboard/cli/jq.d/00-seed.pl
-    chmod +x ~/.developer-dashboard/cli/jq.d/00-seed.pl
-    printf '{"alpha":{"beta":2}}' | perl -Ilib bin/dashboard jq alpha.beta
-
-Dashboard-managed built-in helpers are different from user commands. All
-built-in helper assets are always staged only under
-`~/.developer-dashboard/cli/dd/`. Dedicated helper bodies are used for
-`jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, `of`,
-`open-file`, `workspace`, `path`, `paths`, and `ps1`, while the remaining
-built-in commands stage thin wrappers that delegate into the shared private
-`_dashboard-core` runtime. Under `DD-OOP-LAYERS`, layered lookup still
-applies to user-provided commands and hook directories, but `dashboard init`
-does not copy those built-in helpers into child project layers.
-
-Each top-level dashboard command can also use an optional hook directory at
-`~/.developer-dashboard/cli/<command>`. Executable files from that
-directory run in sorted filename order before the real command starts,
-non-executable files are skipped, and the captured stdout/stderr from the hook
-files are accumulated into `$ENV{RESULT}` as JSON for later hooks and the
-final command. Directory-backed custom commands can use
-`~/.developer-dashboard/cli/<command>/run` as the actual executable.
-If a subcommand does not have a built-in implementation, the real command can
-be supplied as `~/.developer-dashboard/cli/<command>` or
-`~/.developer-dashboard/cli/<command>/run`.
-
-If you want `dashboard update`, provide it as a normal user command at
-`~/.developer-dashboard/cli/update` or
-`~/.developer-dashboard/cli/update/run` in any inherited layer, with the
-deepest matching layer winning the final command path. Its hook files can live
-under `update/` or `update.d`, and the real command receives the final
-`RESULT` and `LAST_RESULT` payloads through the environment after those hook
-files run. Each later hook also sees the latest rewritten `RESULT` from the
-earlier hook set, the immediate previous hook through `LAST_RESULT`, and an
-explicit `[[STOP]]` marker in one hook's `stderr` skips the remaining hook
-files before control returns to the real update command. Perl code can read
-those payloads through `Runtime::Result`.
-
-Use `dashboard version` to print the installed Developer Dashboard version.
-
-Use `dashboard upgrade` or the identical `d2 upgrade` short entrypoint to
-download, validate, and run the canonical HTTPS installer for the active
-platform. Add `--dry-run` to print the selected installer URL and execution
-plan without making a network request or changing the host.
-
-The blank-container integration harness applies fake-project dashboard override
-environment variables only after plain `cpanm <tarball>` has installed
-and tested the distribution. It then verifies that both `dashboard version`
-and `d2 version` match the archive, that `d2 of grep --help` reaches GNU
-grep, and that `d2 docker compose config --help` and `d2 docker compose help`
-preserve native Compose arguments. This checks installed runtime behavior and
-the packaged short-entrypoint dispatch, not only the checkout-local scripts.
-The repository's `d2 docker.images.build` workflow also installs the archive
-into the image's active local Perl library, so the rebuilt image runs the same
-release version rather than an older bootstrap copy shadowing the system
-library.
-That same blank-container path also verifies web stop/restart behavior in a
-minimal image where listener ownership may need to be discovered from `/proc`
-instead of `ss`, including a late listener re-probe before
-`dashboard restart` brings the web service back up.
-
 ## First Run
 
-Initialize the runtime:
+Initialise the runtime:
 
     dashboard init
 
@@ -1448,23 +214,63 @@ helpers such as `cdr foobar` and `which_dir foobar` keep working across
 sessions. Installed skills can also provide `lib/Folder.pm` with path methods:
 `cdr ch.workspace` checks the effective skill `config/config.json` alias
 first, then loads `Folder.pm` and calls `Folder->workspace` only when no
-configured alias exists. If the module implements `Folder->__list__`, its
+configured alias exists.
+
+If the module implements `Folder->__list__`, its
 list-context alias names are merged into `dashboard paths`, `dashboard path
-list`, `cdr` completion, and `d2 ch.` shell completion. Typing a skill name
+list`, `cdr` completion, and `d2 ch.` shell completion.
+
+Typing a skill name
 followed by a dot offers that skill's config aliases and listed module aliases;
 only the named skill's module is loaded for this completion. That runtime merge
 is read-only; `dashboard path add` continues to write to config, and a config alias overrides a collision
 with a module method. When a project-local `./.developer-dashboard` tree exists, alias
-writes go there first; otherwise they go to the home runtime. Under
+writes go there first; otherwise they go to the home runtime.
+
+Under
 `DD-OOP-LAYERS`, that write stays local to the deepest participating layer:
 adding one child-layer alias does not copy inherited parent `config.json`
-domains into the child file. The child layer keeps only its own new delta and
+domains into the child file.
+
+The child layer keeps only its own new delta and
 still inherits the rest from home and parent layers at read time. When an
 alias points inside the current home directory, the stored config uses
 `$HOME/...` instead of a hard-coded absolute home path so a shared fallback
 runtime remains portable across different developer accounts. Re-adding an
 existing alias updates it without error, and deleting a missing alias is also
 safe.
+
+For `dashboard paths`, the global alias view and skill-qualified aliases
+share one installed-skill configuration inventory. Each participating skill's
+layered `config/config.json` data is read once for that operation, preserving
+home-to-project precedence while avoiding a second filesystem scan.
+
+The machine-readable `dashboard paths -o json` route does not load terminal
+table-rendering helpers. Human-readable output still loads those helpers on
+demand, so `dashboard paths` and `dashboard path list` retain their table
+format without paying that import cost when only JSON is requested.
+
+Runtime-layer ownership checks also canonicalise a candidate only once when
+testing it against multiple layers. Each root remains freshly canonicalised
+and compared at a path-component boundary, preserving symlink-aware security
+checks while avoiding repeated candidate resolution.
+
+The aggregate `dashboard paths` inventory shares its runtime-layer candidate
+list only for the duration of that one inventory call. This avoids repeating
+the same ancestor scan across its permission checks without retaining a stale
+layer list for later operations; a subsequent lookup discovers newly created
+or removed runtime layers.
+
+`PathRegistry::runtime_layers` follows the same freshness rule for a retained
+registry object: unscoped calls refresh filesystem discovery, while the path
+CLI shares a result only within one command. This keeps repeated reads within
+one operation bounded while later operations discover newly created or removed
+runtime layers.
+
+When resolving path aliases, one grouped inventory is used and only each
+skill's layered `path_aliases` domain is recursively merged. Unrelated config
+fields and underscored skill namespaces do not affect the alias result, so
+they are omitted without changing skill alias precedence or output.
 
 Developer Dashboard now uses one CLI output contract for operator-facing
 built-ins. By default, inventory and mutation commands print a human-readable
@@ -1476,15 +282,21 @@ table.
 
 `cdr` now follows a two-stage path flow instead of only jumping to one alias
 or one top-level project name. If the first argument resolves as a saved alias
-and there are no later arguments, `cdr alias` still goes straight there. If
+and there are no later arguments, `cdr alias` still goes straight there.
+
+If
 the first argument resolves as a saved alias and more arguments remain,
 `cdr` enters the alias root, then searches every directory under that root
 with AND-matched regex keywords taken from the remaining arguments. One match
 means `cd` into that directory; multiple matches mean print the full list and
-stay at the alias root. If the first argument is not a saved alias, `cdr`
+stay at the alias root.
+
+If the first argument is not a saved alias, `cdr`
 treats every argument as an AND-matched regex search beneath the current
 directory. One match means `cd` there; multiple matches mean print the list
-and leave the current directory unchanged. `which_dir` follows the same
+and leave the current directory unchanged.
+
+`which_dir` follows the same
 selection logic but only prints the chosen target or match list instead of
 changing directory. Unreadable subdirectories are skipped explicitly during
 that search so one protected tree does not abort the whole lookup.
@@ -1525,8 +337,12 @@ route, or any direct Perl caller resolves it and the target directory does
 not yet exist, it is created (with parents) before being returned - chmod'd
 to the given octal mode (bare, `--create 0777`, `--create=0777`, or
 `-c 0777` all work) when one is provided, or left at the implicit
-umask-governed default otherwise. An alias saved without `-c`/`--create`
-behaves exactly as before this feature existed. `dashboard file add`
+umask-governed default otherwise.
+
+An alias saved without `-c`/`--create`
+behaves exactly as before this feature existed.
+
+`dashboard file add`
 accepts the identical flag, but since a file alias points at a file rather
 than a directory, "lazy create" there means only the file's PARENT
 directory chain is created - the file itself is left absent for the
@@ -1535,7 +351,8 @@ caller to write.
 Use `Developer::Dashboard::File` for runtime file helpers. It resolves the
 same built-in and config-backed file aliases exposed by `dashboard files` and
 `dashboard file list`, supports direct reads and writes through one public
-wrapper, and keeps file alias behavior parallel with the folder/path contract.
+wrapper, and keeps file alias behaviour parallel with the folder/path contract.
+
 It is the file-side twin of the existing Folder contract in the same way that
 `dashboard of` and `dashboard open-file` are the file-side twins of
 `cdr` and `which_dir`.
@@ -1545,36 +362,51 @@ If you need the whole `dashboard paths` payload in Perl, call
 `Developer::Dashboard::PathRegistry->all_paths` instead of rebuilding the
 hash by hand. If you need a fresh path registry object from that public Folder
 inventory, call `Developer::Dashboard::PathRegistry->new_from_all_folders`.
-If you need a collector store from the same Folder-derived runtime roots, call
+
+Runtime-layer ancestry stops at the configured home or project boundary. Exact
+path spellings stop without canonicalisation; symlink-equivalent boundaries
+resolve their canonical identity once per walk.
+
+During one `all_paths` inventory or path CLI operation, ancestor runtime
+layers are discovered once and reused by path resolution and permission checks;
+the result is discarded at the operation boundary so later operations see
+runtime-layer creation and removal. If you need a collector store from the same Folder-derived runtime roots, call
 `Developer::Dashboard::Collector->new_from_all_folders`.
+
 If you need the whole `dashboard files` payload in Perl, call
 `Developer::Dashboard::File->all` or
 `Developer::Dashboard::FileRegistry->all_files` instead of rebuilding the
 hash by hand.
 
-File aliases follow the same effective-config write rules as path aliases.
-`dashboard file add <name> <path>` writes to the deepest
+File aliases follow the same effective-config write rules as path aliases. `dashboard file add <name> <path>` writes to the deepest
 participating config layer, keeps `$HOME/...` storage portable when the
 target lives under the current home directory, updates existing aliases
 idempotently, and lets `dashboard file resolve <name>`,
 `dashboard of <name>`, or
 `Developer::Dashboard::File->resolve($name)` read that alias back later.
+
 When the alias name is a valid Perl method token,
-`Developer::Dashboard::File->$name()` also works directly. When the alias
+`Developer::Dashboard::File->$name()` also works directly.
+
+When the alias
 is numeric such as `123`, use a scalar method name like
 `my $name = 123; Developer::Dashboard::File->$name()` because bare
 `->123` is not valid Perl syntax. `dashboard files` prints the full
 built-in plus configured file inventory as a table by default, while
-`dashboard file list` prints only the named configured file aliases. Use
+`dashboard file list` prints only the named configured file aliases.
+
+Use
 `-o json` with either command when you need the full raw payload.
 
 `dashboard of` and `dashboard open-file` now treat configured file aliases
 as direct file targets before they fall back to Perl-module, Java-class, or
-regex search behavior. If the first token resolves as a saved path alias and
+regex search behaviour. If the first token resolves as a saved path alias and
 the remaining tokens join into one existing relative file path inside that
 aliased directory, `dashboard of <path-alias> <relative-file>`
 opens that exact file instead of treating the remaining tokens as regex
-patterns. That means flows such as
+patterns.
+
+That means flows such as
 `dashboard file add 123 /tmp/123.txt` followed by `dashboard of 123`, or
 `dashboard path add foobar .` followed by `dashboard of foobar 456.txt`, now
 resolve the exact configured or scoped file target directly.
@@ -1582,20 +414,31 @@ resolve the exact configured or scoped file target directly.
 The hashed `state_root`, `collectors_root`, `indicators_root`, and
 `sessions_root` paths live under the shared temp state tree, not inside the
 layered runtime config tree. If a reboot or temp cleanup removes one of those
-hashed state roots, the path registry recreates it automatically the next time
-dashboard code resolves the path and rewrites the matching `runtime.json`
-metadata file before collectors, indicators, or sessions use it again.
+hashed state roots, the path registry recreates them automatically the next
+time dashboard code resolves them.
+
+Its `runtime.json` metadata is rewritten
+only when missing, stale, or not owner-only; an unchanged owner-owned regular
+file is left untouched, and a metadata symlink is refused.
+
+For each path-registry instance, the account name used in the state-root path
+is reused while the relevant environment values stay unchanged; changes to
+those values are detected and resolved again.
 
 Use `dashboard which <target>` to inspect what `dashboard` would
 execute before you run it. The command prints one
 `COMMAND /full/path` line for the resolved file and then one
 `HOOK /full/path` line for each participating hook in runtime execution
-order. That works for built-in helpers such as `jq`, layered custom commands
+order.
+
+That works for built-in helpers such as `jq`, layered custom commands
 such as `layered-tool`, single-level skill commands such as
 `example-skill.somecmd`, and multi-level nested skill commands such as
-`nest.level1.level2.here`. If you add `--edit`, `dashboard which` skips the
+`nest.level1.level2.here`.
+
+If you add `--edit`, `dashboard which` skips the
 inspection output and re-enters `dashboard open-file` with the resolved
-command file path so the normal editor-selection behavior is reused.
+command file path so the normal editor-selection behaviour is reused.
 
 Render shell bootstrap for bash, zsh, POSIX sh, or PowerShell:
 
@@ -1643,7 +486,11 @@ Start the local app:
 
     dashboard serve
 
-Open the root path with no bookmark path to get the free-form bookmark editor directly. The browser now splits bookmark sections into separate editor blocks instead of making you manage one long source textarea by hand, but it still saves the same on-disk bookmark file format behind the scenes. If you start the web service with `dashboard serve --no-editor` or `dashboard serve --no-endit`, the browser stays read-only instead and direct editor/source routes are blocked. If you start it with `dashboard serve --no-indicators` or `dashboard serve --no-indicator`, the right-top browser chrome is cleared while normal page rendering still works.
+Open the root path with no bookmark path to get the free-form bookmark editor directly. The browser now splits bookmark sections into separate editor blocks instead of making you manage one long source textarea by hand, but it still saves the same on-disk bookmark file format behind the scenes.
+
+If you start the web service with `dashboard serve --no-editor` or `dashboard serve --no-endit`, the browser stays read-only instead and direct editor/source routes are blocked.
+
+If you start it with `dashboard serve --no-indicators` or `dashboard serve --no-indicator`, the right-top browser chrome is cleared while normal page rendering still works.
 
 Stop the local app and collector loops:
 
@@ -1657,13 +504,12 @@ Restart the local app and configured collector loops:
 
     dashboard restart
 
-Interactive terminal runs now print the full restart task board on `stderr`,
-mark the active step with a blue `-`, stream active detail lines in blue,
-mark completed steps with a green `[OK]`, mark failed steps with a red
-`[X]` plus red failure detail lines, and keep the final JSON result on
-`stdout`. Stop and restart shutdown paths send numeric POSIX signals instead
-of named signal strings, so minimal Alpine/iSH Perl builds that reject `TERM`
-by name still terminate managed web and collector processes correctly.
+Interactive restarts print a task board on `stderr`. The active step is
+highlighted, and completed or failed steps receive a status marker. The final
+JSON result remains on `stdout`.
+
+Stop and restart use numeric POSIX signals. This supports minimal Alpine and
+iSH Perl builds that do not accept signal names such as `TERM`.
 
 Create a helper login user:
 
@@ -1707,7 +553,9 @@ Remove one route or remove the whole API group:
 The `dashboard api` command manages the deepest writable runtime
 `config/api.json` layer under `DD-OOP-LAYERS`. Listing shows the effective
 merged registry from home through the active child layer together with any
-installed-skill API fragments that contribute saved Ajax machine auth. Updates
+installed-skill API fragments that contribute saved Ajax machine auth.
+
+Updates
 never rewrite installed skill files; they only change the writable runtime
 layer for the current working context. List, add, and remove actions print
 human-readable tables by default; use `-o json` when you need the full raw
@@ -1717,8 +565,12 @@ When you pass `--secret`, the raw secret is hashed to a SHA-256 hex digest
 before it is stored. `--maybe-secret` is the route-friendly alias for the
 same raw secret input: if the key is missing it creates the group, and if the
 key already exists it overwrites the stored secret while the command updates
-the requested routes. The saved JSON keeps the digest under `secret` plus the
-exact allowed saved Ajax routes under `ajax`. `dashboard api add` accepts
+the requested routes.
+
+The saved JSON keeps the digest under `secret` plus the
+exact allowed saved Ajax routes under `ajax`.
+
+`dashboard api add` accepts
 one or more repeated `--route` flags, so one command can create the key,
 hash the secret, and register multiple exact routes at once. Adding the same
 route twice is a no-op. Removing an inherited API group from a deeper child
@@ -1771,7 +623,9 @@ keeps the canonical separator-based bookmark source in a hidden form field for
 saves and play requests. Each visible block still uses the syntax-highlighted
 overlay viewport that follows the real textarea scroll position by transform
 instead of a second scrollbox, so long lines, full-text selection, and caret
-placement stay aligned with the real editor. Pressing `Tab` inside one block
+placement stay aligned with the real editor.
+
+Pressing `Tab` inside one block
 starts the next section block, and the browser recomposes those blocks back
 into the original separator-line bookmark document before it posts or plays
 the page. The directive assist still understands `:---` when you paste older
@@ -1780,10 +634,11 @@ line and seeding the next sensible directive.
 
 Edit and source views preserve raw Template Toolkit placeholders inside
 `HTML:` sections, so values such as `[% title %]` are kept in the bookmark
-source instead of being rewritten to rendered HTML after a browser save.
-Template Toolkit rendering exposes the page title as `title`, so a bookmark
+source instead of being rewritten to rendered HTML after a browser save. Template Toolkit rendering exposes the page title as `title`, so a bookmark
 with `TITLE: Sample Dashboard` can reference it directly inside `HTML:`
-with `[% title %]`. Transient play and view-source links are also encoded
+with `[% title %]`.
+
+Transient play and view-source links are also encoded
 from the raw bookmark instruction text when it is available, so
 `[% stash.foo %]` stays in source views instead of being baked into the
 rendered scalar value after a render pass.
@@ -1793,6 +648,7 @@ Earlier `CODE*` blocks now run before Template Toolkit rendering during
 `[% stash.a %]` in the page body. Returned hash and array values are also
 dumped into the runtime output area, so `CODE1: { a =` 1 }> both populates
 stash and shows the bookmark-style dumped value below the rendered page body.
+
 The `hide` helper no longer discards already-printed STDOUT, so
 `CODE2: hide print $a` keeps the printed value while suppressing the Perl
 return value from affecting later merge logic.
@@ -1848,6 +704,7 @@ Inspect collector logs:
 
 `dashboard collector log` prints the known collector log streams.
 `dashboard collector log <name>` prints one collector transcript.
+
 If a configured collector has not run yet, the command prints an explicit
 no-log message instead of blank output.
 `dashboard collector status <name>` now also exposes watchdog
@@ -1855,6 +712,7 @@ metadata for managed loops, including `watchdog_restart_count`,
 `watchdog_last_unexpected_stop_at`, `watchdog_last_restart_at`, and
 `watchdog_attention_required`, so repeated collector crashes are visible
 instead of looking like silent disappearance.
+
 Collector status timestamps and collector log headers use the machine's local
 system time with an explicit numeric timezone offset such as `+0100`, so the
 visible timestamps line up with cron scheduling on the same machine instead of
@@ -1868,12 +726,17 @@ Collector jobs support two execution fields:
 
 A collector may use `interval` polling or a standard five-field local-time
 `cron` expression in `config/config.json`. The fields are minute, hour,
-day-of-month, month, and day-of-week. Numeric values, comma-separated lists,
+day-of-month, month, and day-of-week.
+
+Numeric values, comma-separated lists,
 ranges, range steps, `*/step`, and case-insensitive month and weekday names
 are supported. When both day-of-month and day-of-week are restricted, either
-matching field makes the date due, following crontab semantics. An explicit
+matching field makes the date due, following crontab semantics.
+
+An explicit
 `schedule` value takes precedence over inferred scheduling; use
 `"schedule": "cron"` with `cron` when you want to state the mode explicitly.
+
 Missing or malformed cron expressions are rejected when the loop starts rather
 than running once per scheduler poll.
 
@@ -1903,24 +766,30 @@ rules as `dashboard path resolve`.
 The built-in `housekeeper` collector is always present even when
 `config/config.json` is otherwise empty. It runs every `900` seconds with
 Perl `code` instead of a shell command, so it does not depend on `PATH`
-resolution. That collector removes stale hashed runtime state roots from the
+resolution.
+
+That collector removes stale hashed runtime state roots from the
 shared temp tree under `/tmp/<user>/developer-dashboard/state/` and
 removes older `developer-dashboard-ajax-*` temp files plus
 `dashboard-result-*` runtime result temp files left behind in `/tmp/`. It
 also rotates collector log transcripts when a collector defines `rotation`
-or `rotations`. `lines` keeps the trailing line count, while `minute`,
+or `rotations`.
+
+`lines` keeps the trailing line count, while `minute`,
 `minutes`, `hour`, `hours`, `day`, `days`, `week`, `weeks`,
 `month`, and `months` keep only log entries newer than the requested
 retention window. Both rules cut on entry boundaries, so a rotated
 transcript always starts at a complete entry header: a line budget drops
 whole entries rather than slicing one in half, and a budget smaller than
 the newest entry empties the transcript instead of leaving a headerless
-fragment behind. Run it on demand with:
+fragment behind.
+
+Run it on demand with:
 
     dashboard housekeeper
     dashboard collector run housekeeper
 
-If you need different cadence or behavior, define your own collector named
+If you need different cadence or behaviour, define your own collector named
 `housekeeper` in config. That override now inherits the built-in `code` and
 `cwd` defaults, so changing only `interval` or adding `indicator`
 metadata is enough:
@@ -1997,42 +866,53 @@ will not start that collector, explicit named starts reject it, and any
 already-running managed loop for that collector is stopped during the next
 collector lifecycle action. Managed indicator state for that collector is
 also removed instead of lingering as if it were still active.
-The flag is read by its truth value, so a JSON literal `false` (or `0`,
-`"false"`, `"no"`, `"off"`) keeps the collector enabled while `true` and
-any other non-empty value disable it; `"disable": false` is not a disabled
-collector.
+
+    The flag is read by its truth value, so a JSON literal `false` (or `0`,
+    `"false"`, `"no"`, `"off"`) keeps the collector enabled while `true` and
+    any other non-empty value disable it; `"disable": false` is not a disabled
+    collector.
+
 - Stopping a singleton collector loop also terminates the long-running command
 currently owned by that loop, so `dashboard stop collector foo` does not leave
 the old worker command alive behind the stopped dispatcher.
 
 Collector indicators follow the collector exit code automatically: `0`
-stores an `ok` indicator state and any non-zero exit code stores `error`.
-When `indicator.name` is omitted, the collector name is reused
-automatically. When `indicator.label` is omitted, it defaults to that same
+stores an `ok` indicator state and any non-zero exit code stores `error`. When `indicator.name` is omitted, the collector name is reused
+automatically.
+
+When `indicator.label` is omitted, it defaults to that same
 name. Configured collector indicators are seeded immediately, so prompt and
-page status strips show them before the first collector run. Before a
-collector has produced real output it appears as missing. Prompt output
+page status strips show them before the first collector run.
+
+Before a
+collector has produced real output it appears as missing.
+
+Prompt output
 renders an explicit status glyph in front of the collector icon, so
 successful checks show fragments such as `✅🔑` while failing or not-yet-run
-checks show fragments such as `🚨🔑`.
-Under `DD-OOP-LAYERS`, a deeper child layer no longer pins an inherited
+checks show fragments such as `🚨🔑`. Under `DD-OOP-LAYERS`, a deeper child layer no longer pins an inherited
 collector indicator at that default `missing` placeholder just because the
-child runtime has its own `.developer-dashboard/` folder. If the child layer
+child runtime has its own `.developer-dashboard/` folder.
+
+If the child layer
 does not override that collector config and only has the placeholder state,
 dashboard now falls back to the nearest inherited real collector state such
 as a parent-layer `ok` result instead of turning the same indicator red.
+
 The top-right browser status strip now uses that same configured icon instead
 of falling back to the collector name, and stale managed indicators are
 removed automatically if the collector config is renamed. The browser chrome
 now uses an emoji-capable font stack there as well, so UTF-8 icons such as
 `🐳` and `💰` remain visible instead of collapsing into fallback boxes.
+
 For TT-backed collector icons, a collector such as `./foobar` can print
 `{"a":123}` on `stdout`; the runner decodes that JSON into Perl data and
-renders `[% a %]` into the live icon `123`. Later config-sync passes keep
+renders `[% a %]` into the live icon `123`.
+
+Later config-sync passes keep
 the configured `icon_template` metadata and the already-rendered live
 `icon`, so commands such as `dashboard indicator list` and `dashboard ps1`
-do not revert the persisted icon back to raw `[% ... %]` text between runs.
-The blank-environment integration flow also keeps a regression for mixed
+do not revert the persisted icon back to raw `[% ... %]` text between runs. The blank-environment integration flow also keeps a regression for mixed
 collector health: one intentionally broken Perl collector must stay red
 without stopping a second healthy collector from staying green in
 `dashboard indicator list`, `dashboard ps1`, and `/system/status`.
@@ -2069,51 +949,66 @@ The resolver also supports isolated service folders without adding entries to
 dashboard JSON config. If
 `./.developer-dashboard/config/docker/green/compose.yml` exists in the current
 project it wins; otherwise the resolver falls back to
-`~/.developer-dashboard/config/docker/green/compose.yml`.
-`dashboard docker compose config` and operational commands first resolve the
+`~/.developer-dashboard/config/docker/green/compose.yml`. `dashboard docker compose config` and operational commands first resolve the
 base Compose config, including configured non-service project/addon/mode
-files, and read its resulting `services:` map. Only those service names are
+files, and read its resulting `services:` map.
+
+Only those service names are
 used to discover isolated service folders; a service name appearing only in
 the CLI arguments or in an unrelated runtime folder cannot introduce an
 overlay. The base config resolution is a real `docker compose config` call,
 not a raw YAML parse, so Compose's own includes, interpolation, and merge
 rules determine the authoritative list. The selected per-service files are
-then layered and materialized before the requested operation runs.
+then layered and materialised before the requested operation runs.
+
 Service names emitted by Compose must be non-empty single path segments;
 names containing separators or directory-navigation segments are rejected
-before runtime folders are searched.
-If any matching `config/docker/<service>` directory in the active
+before runtime folders are searched. If any matching `config/docker/<service>` directory in the active
 runtime layers contains `disabled.yml`, the service is skipped. Each enabled isolated folder
-contributes `compose.yml` as its base whenever it exists. Its optional
+contributes `compose.yml` as its base whenever it exists.
+
+Its optional
 `development.compose.yml` is layered after the base only when `develop.yml`
 exists in any matching service folder across those layers; without a marker,
-the development file is ignored even when present. If the marker exists but the development
+the development file is ignored even when present.
+
+If the marker exists but the development
 file does not, only the base is loaded and no error is raised. Toggle
 development mode without creating or deleting the file manually with
 `dashboard docker development enable <service>` or
-`dashboard docker development disable <service>`. A newly enabled
+`dashboard docker development disable <service>`.
+
+A newly enabled
 marker is written under the selected home runtime: `~/.developer-dashboard`
-when it exists (or when neither runtime name exists), otherwise `~/.d2`.
-Disabling development removes every `develop.yml` marker for that service
-across active layers. To toggle the disabled marker without
+when it exists (or when neither runtime name exists), otherwise `~/.d2`. Disabling development removes every `develop.yml` marker for that service
+across active layers.
+
+To toggle the disabled marker without
 creating or deleting the file manually, use
 `dashboard docker disable <service>` or
 `dashboard docker enable <service>`. The disable toggle uses the same
-selected home runtime root. `dashboard docker enable <service>` removes
-every `disabled.yml` marker for that service across active layers.
-To inspect the effective marker state without walking the folders manually,
-use `dashboard docker list`. Add `--disabled` to show only disabled
+selected home runtime root.
+
+`dashboard docker enable <service>` removes
+every `disabled.yml` marker for that service across active layers. To inspect the effective marker state without walking the folders manually,
+use `dashboard docker list`.
+
+Add `--disabled` to show only disabled
 services or `--enabled` to show only enabled services.
 
 If the invocation directory contains `compose.yml`, `compose.yaml`,
 `docker-compose.yml`, or `docker-compose.yaml`, those local files are the
 base stack and the Compose command runs from that directory. For execution,
 the first `docker compose config` runs against the base and other configured
-non-service layers. Its resolved services—not service names guessed from
+non-service layers.
+
+Its resolved services—not service names guessed from
 command arguments—control isolated-service lookup across home, project, and
 nested skill runtime roots. The selected service files are added only after
 that first config succeeds; disabled folders are excluded and development
-files require a matching `develop.yml` marker. In a dry run, Docker is not
+files require a matching `develop.yml` marker.
+
+In a dry run, Docker is not
 invoked, so the resolver reports a source-based preview instead of a
 Compose-resolved service list. This distinction keeps dry-run non-executing
 while ensuring real operations follow Compose's own effective service map. If
@@ -2123,14 +1018,18 @@ ecosystem-wide auto-discovery; Compose's resulting service map still controls
 the final stack.
 
 For operational actions such as `build`, `up`, and `down`, layered files are
-first materialized into a temporary Compose file. The final Compose invocation
+first materialised into a temporary Compose file. The final Compose invocation
 also receives the original project directory explicitly, so relative build and
 volume paths and the default project identity continue to come from the local
-Compose project rather than the temporary file's directory. An explicit
+Compose project rather than the temporary file's directory.
+
+An explicit
 `--project-directory` supplied by the user is preserved. An undefined Compose
 argument or an empty/missing project-directory value is rejected before the
-Compose executable is called. The public helper routes these actions through
-the materializing runner (not directly through the unresolved `-f` list),
+Compose executable is called.
+
+The public helper routes these actions through
+the materialising runner (not directly through the unresolved `-f` list),
 keeps the temporary merged file until the operation exits, and streams Compose
 stdout and stderr normally. This applies to `build`, `up`, `down`, and other
 Compose operations; `config` remains available for inspection without starting
@@ -2138,53 +1037,100 @@ containers.
 
 Before saving that merged output, the resolver preserves valid UTF-8 sequences
 and converts isolated non-UTF-8 Windows-1252 bytes from the combined inputs to
-UTF-8. The temporary file is written as raw bytes only after normalization, so
+UTF-8. The temporary file is written as raw bytes only after normalisation, so
 the same clean merged YAML is used by `config`, `up`, `down`, `build`,
 `ps`, `logs`, and other Compose operations. Undefined Windows-1252 octets
 become the Unicode replacement character rather than being written as invalid
 UTF-8.
 
-This materialization also runs when the dashboard resolver found no explicit
+This materialisation also runs when the dashboard resolver found no explicit
 layered files. In that case Docker Compose discovers its ordinary base file
 from the configured Compose working directory, emits the effective config,
 and the requested operation consumes the generated temporary file. This keeps
-the UTF-8 normalization and common execution path consistent for `build`,
+the UTF-8 normalisation and common execution path consistent for `build`,
 `ps`, and other verbs even when no runtime overlay was selected.
 
 During compose execution the dashboard exports `DDDC` as the runtime
 `config/docker` directory for the current runtime, so compose YAML can keep using
 `${DDDC}` paths inside the YAML itself. Project-local isolated services are
 discovered from that same
-`./.developer-dashboard/config/docker/<service>/...` tree. Wrapper flags such as
+`./.developer-dashboard/config/docker/<service>/...` tree.
+
+Wrapper flags such as
 `--service`, `--addon`, `--mode`, `--project`, and `--dry-run` are
 consumed first, and all remaining docker compose flags such as `-d` and
 `--build` pass straight through to the real `docker compose` command.
+
 If one resolved service comes from an installed skill docker root, the
 resolver also loads that skill's `<skill-root>/.env` file into the compose
-environment before docker-config, addon, and mode env overlays are applied.
-Only skills whose compose service files actually participate are included,
+environment before docker-config, addon, and mode env overlays are applied. Only skills whose compose service files actually participate are included,
 disabled skills are skipped, and `<skill-root>/.env.pl` is not executed from
-this compose path. Nested skill services expand their env chain from the root
+this compose path.
+
+Nested skill services expand their env chain from the root
 nested skill to the participating leaf service, preserving overwritten parent
 keys under cumulative aliases such as `foo_VERSION` and
 `foo_bar_VERSION` before the leaf value becomes the plain key. The resolver
 also exports one skill-specific `<skill-name>_DDDC` variable for each
 participating skill, using the leaf skill name with non-identifier characters
-normalized to underscores and pointing that variable at the owning
-`config/docker/` root. Nested skill services additionally export the full
+normalised to underscores and pointing that variable at the owning
+`config/docker/` root.
+
+Nested skill services additionally export the full
 cumulative skill path alias such as `foo_bar_zzz_DDDC` for the same compose
 root, while the leaf alias stays available as `zzz_DDDC`.
+
 When one or more Compose services are explicitly selected, skill env files
 are resolved only for those selected services during interpolation; unrelated
 skill service folders cannot replace a selected service's same-named env key
 merely because they are enumerated later. If no selected service is present
 in the effective base config, or the operation selects no service, env files
-for all effective base services are used. This keeps sequential commands such
+for all effective base services are used.
+
+This keeps sequential commands such
 as `d2 docker compose up foo` and `d2 docker compose up bar` scoped to the
-matching skill env while preserving all-service operations.
-When `--dry-run` is omitted, the dashboard hands off with `exec` so the
+matching skill env while preserving all-service operations. When `--dry-run` is omitted, the dashboard hands off with `exec` so the
 terminal sees the normal streaming output from `docker compose` itself
 instead of a dashboard JSON wrapper.
+
+### Publishing Docker Hub images
+
+The repository's master-push workflow publishes a runnable Docker image from
+the latest `master` checkout. It first runs the repository `install.sh` to
+install the platform tools and Perl environment, then builds a fresh
+Dist::Zilla archive from that checked-out source and installs that archive
+into the image with `cpanm --notest`.
+
+This final local-archive install deliberately
+replaces the version that the bootstrap installer may have fetched from
+MetaCPAN, so the image contains the current repository code.
+
+The regular container/release gates run the full test and coverage suites
+before publishing. The multi-platform image build skips rerunning those suites
+under QEMU for each target architecture; the tarball itself is still installed
+and its install is verified separately in a blank Docker environment.
+
+The workflow selects the GitHub Actions environment `release`, whose
+secrets `DOCKER_HUB_USER` and `DOCKER_HUB_TOKEN` provide the Docker Hub
+credentials. It pushes two tags under `DOCKER_HUB_USER/developer-dashboard`:
+the distribution version read from `dist.ini` (for example `5.88`) and
+`latest`.
+
+A manual workflow dispatch also builds the current `master`
+branch. The image targets `linux/amd64` and
+`linux/arm64`; Docker does not support a macOS-kernel image platform, while
+Apple Silicon can run the Linux arm64 image using Docker Desktop's Linux VM.
+
+The Ubuntu Linux base image is pinned by its multi-platform manifest digest,
+and every GitHub Action dependency is pinned to a full commit SHA.
+
+For example, pull the moving tag or a pinned version:
+
+    docker pull YOUR_DOCKER_HUB_USER/developer-dashboard:latest
+    docker pull YOUR_DOCKER_HUB_USER/developer-dashboard:5.88
+
+The container entrypoint is `d2`. The versioned tag is intended for selecting
+a known image build; `latest` follows successful master builds.
 
 ## Prompt Integration
 
@@ -2198,15 +1144,25 @@ bracketed working directory, an optional jobs suffix, and a trailing
 `🌿branch` marker when git metadata is available. The prompt helper reads the
 branch directly from on-disk git metadata instead of shelling out to
 `git branch`, so repeated prompt renders stay lightweight on slower hosts such
-as iSH. If the workspace workflow seeded `WORKSPACE_REF` or the older
+as iSH.
+
+Working-directory lookup uses `Cwd::getcwd` for the ordinary physical
+path; it preserves a distinct logical `$PWD` only after confirming that both
+paths identify the same directory.
+
+If the workspace workflow seeded
+`WORKSPACE_REF` or the older
 `TICKET_REF` into the current tmux session, `dashboard ps1` also reads that
 context from tmux when the shell environment does not already export it, but it
-skips that tmux probe entirely when the shell is not inside tmux.
-The branch marker preserves every component of a local branch such as
-`team/feature`. If HEAD is detached at a commit that matches an
+skips that tmux probe entirely when the shell is not inside tmux. The branch marker preserves every component of a local branch such as
+`team/feature`.
+
+If HEAD is detached at a commit that matches an
 `origin` remote-tracking ref, the marker shows `origin/team/feature` unless
 the same-named local branch points to the same commit; only then is the
-redundant `origin/` prefix omitted. Packed and loose refs are both recognized,
+redundant `origin/` prefix omitted.
+
+Packed and loose refs are both recognised,
 while symlinked refs are not followed. When no matching remote ref exists, it
 keeps the short commit id. All generated shell adapters
 call this same `dashboard ps1` renderer, so the branch label is consistent in
@@ -2224,17 +1180,21 @@ The generated shell helper keeps the same bookmark-aware `cdr`, `dd_cdr`,
 and `which_dir` functions across all supported shells. `cdr` first tries a
 saved alias, then falls back to an AND-matched directory search beneath the
 alias root or the current directory depending on whether that first argument
-was a known alias. One match changes directory, multiple matches print the
+was a known alias.
+
+One match changes directory, multiple matches print the
 list, and `which_dir` prints the same selected target or match list without
-changing directory. Bash still uses `\j` for job counts, zsh refreshes
-The shell-smoke regression coverage also compares those printed paths by
-canonical identity, so macOS `/var/...` and `/private/var/...` aliases do
-not fail equivalent `pwd` / `which_dir` checks. Bash still uses `\j` for
-job counts, zsh refreshes
-`PS1` through a `precmd` hook with `${#jobstates}`, POSIX `sh` falls back
-to a prompt command that does not depend on bash-only prompt escapes, and
-PowerShell installs a `prompt` function instead of using the POSIX `PS1`
-variable.
+changing directory.
+
+The generated prompt adapters handle job counts by shell:
+
+- Bash uses `\j`.
+- Zsh refreshes `PS1` through a `precmd` hook.
+- POSIX `sh` uses a prompt command without bash-specific escapes.
+- PowerShell uses a `prompt` function.
+
+The shell checks compare canonical paths, so equivalent macOS paths such as
+`/var/...` and `/private/var/...` are treated as the same location.
 
 `d2` is a real, installed short command for `dashboard`, shipped in the same
 `bin` directory and re-execing the `dashboard` entrypoint, so you can run
@@ -2248,9 +1208,12 @@ and `d2`. Bash registers `_dashboard_complete`, zsh registers
 `Register-ArgumentCompleter` for both command names. Completion candidates
 come from the live runtime instead of a hardcoded shell list, so built-in
 commands, layered custom CLI commands, and installed dotted skill commands
-all show up in suggestions. For bash, the generated helper captures
+all show up in suggestions.
+
+For bash, the generated helper captures
 completion payloads first instead of relying on process substitution, which
 keeps completion responsive on macOS and inside packaged install-test shells.
+
 The generated bootstrap also wires `cdr`,
 `dd_cdr`, and `which_dir` completion. The first argument suggests saved
 aliases plus matching directory names beneath the current directory, and later
@@ -2261,7 +1224,9 @@ For the POSIX shell bootstrap, the generated helper now decodes its JSON
 payloads through the same Perl interpreter that generated the shell fragment
 instead of a bare `perl -MJSON::XS ...` call. That keeps `cdr` and
 `which_dir` stable on macOS installs where `/usr/bin/perl` and a user-local
-`~/perl5` XS stack do not belong to the same Perl build. The generated
+`~/perl5` XS stack do not belong to the same Perl build.
+
+The generated
 `d2` shortcut re-enters the `dashboard` script directly instead of
 hardcoding the current Perl binary path, so the shortcut still works when the
 bootstrap is loaded by a shell whose preferred Perl lives somewhere else.
@@ -2272,7 +1237,8 @@ trusted command actions, saved Ajax files, custom CLI commands, hook files,
 and update scripts now resolve `.ps1`, `.cmd`, `.bat`, and `.pl`
 runners without assuming `sh` or `bash`. That keeps Strawberry Perl installs
 usable without requiring a Unix shell just to load the dashboard runtime.
-The Windows command launcher also normalizes extensionless local `cmd` shims
+
+The Windows command launcher also normalises extensionless local `cmd` shims
 back to `cmd.exe` so Linux, WSL, and packaging hosts that happen to expose a
 helper named `cmd` do not break the expected Windows `.cmd` and `.bat`
 dispatch contract during cross-platform tests or tarball installs.
@@ -2283,7 +1249,9 @@ host smoke in the source checkout, and a host-side rerun helper that delegates
 to the QEMU launcher for release-grade Windows compatibility claims. The
 supported baseline on Windows is PowerShell plus Strawberry Perl. Git Bash is
 optional. Scoop is optional. They are setup helpers, not runtime requirements
-for the installed `dashboard` command. In the Dockur-backed path, the launcher
+for the installed `dashboard` command.
+
+In the Dockur-backed path, the launcher
 stages the Strawberry Perl MSI from the Linux host into the OEM bundle and can
 keep multiple retained Windows guests alive on configurable host web/RDP ports
 while it reruns the same smoke.
@@ -2310,14 +1278,18 @@ refused on **every** method, including `GET`, unless the accompanying
 This keeps the fast path for loopback-local access while making non-loopback or shared access explicit.
 
 The two cross-site checks above sit at one choke point that runs before trust
-tier classification, because the loopback-admin tier authorizes on the remote
+tier classification, because the loopback-admin tier authorises on the remote
 address alone: there is no cookie in that decision, so `SameSite=Strict`
 protects nothing there and any page the operator visits would otherwise reach
-an already-authorized dashboard. The fetch-metadata half covers `GET` because
+an already-authorised dashboard.
+
+The fetch-metadata half covers `GET` because
 `GET` is not a safe method on this product — `/ajax/<file>` runs an
 operator-written saved handler as a child process from a plain `GET` — while
 `Origin` is frequently absent on a `GET` and `Referer` can be suppressed by
-the attacking page. `Sec-Fetch-Site` is set by the browser and is a forbidden
+the attacking page.
+
+`Sec-Fetch-Site` is set by the browser and is a forbidden
 header name, so page script can neither forge nor suppress it. Opening the
 dashboard by typed URL or bookmark reports `Sec-Fetch-Site: none` and is
 unaffected, as are `curl` and registered `x-dd-api-key` machine consumers,
@@ -2326,28 +1298,33 @@ refused, which is deliberate on a route that executes saved handlers.
 
 The editor and rendered pages also include a shared top chrome with share and
 source links on the left and the original status-plus-alias indicator strip on
-the right, refreshed from `/system/status`.
-That top-right area also includes the local username, the current host or IP
+the right, refreshed from `/system/status`. That top-right area also includes the local username, the current host or IP
 link, and the current date/time in the same spirit as the old local dashboard chrome.
+
 The displayed address is discovered from the machine interfaces, preferring a VPN-style address when one is active, and the date/time is refreshed in the browser with JavaScript.
-`dashboard serve --no-indicators` and `dashboard serve --no-indicator` clear that whole top-right browser-only area without changing the terminal prompt or `/system/status`.
-The bookmark editor also follows the old auto-submit flow, but now it waits
+
+`dashboard serve --no-indicators` and `dashboard serve --no-indicator` clear that whole top-right browser-only area without changing the terminal prompt or `/system/status`. The bookmark editor also follows the old auto-submit flow, but now it waits
 until focus leaves the whole editor form instead of firing every time you move
-between section blocks. For saved bookmark files, that browser save posts back
+between section blocks.
+
+For saved bookmark files, that browser save posts back
 to the named `/app/<id>/edit` route, while the Play button
 recomposes the visible blocks, saves the hidden source payload, and submits the
 same form in render mode against `/app/<id>` instead of a transient
 `token=` URL, so updates still work while transient URLs are disabled.
+
 Smart-routed skill pages now follow that same browser contract on their
 canonical aliases: `/app/<skill>/edit` and nested forms such as
 `/app/<skill>/<sub-skill>/edit` load the underlying skill
 bookmark source, `/app/<skill>/source` returns the raw skill
 bookmark text, and Play keeps the browser on the smart route alias instead of
 collapsing to the underlying `BOOKMARK: index` id from the skill file.
+
 Bookmark parsing also treats a standalone `---` line as a section
 break, preventing pasted prose after a code block from being compiled into the
 saved `CODE*` body.
-Saved bookmark loads now also normalize malformed bookmark icon bytes from older files before the
+
+Saved bookmark loads now also normalise malformed bookmark icon bytes from older files before the
 browser sees them. Broken section glyphs fall back to `◈`, broken item-icon
 glyphs fall back to `🏷️`, and common damaged joined emoji sequences such as
 `🧑‍💻` are repaired so edit and play routes stop showing Unicode replacement
@@ -2355,13 +1332,14 @@ boxes from older bookmark files.
 
 The default web bind is `0.0.0.0:7890`. Trust is still decided from the request origin and host header, not from the listen address.
 
-`DD-OOP-LAYERS` comparisons normalize canonical path identities, so symlinked
+`DD-OOP-LAYERS` comparisons normalise canonical path identities, so symlinked
 aliases such as macOS `/var/...` versus `/private/var/...` do not break
 layer discovery, deepest-layer writes, or layered bookmark/nav lookup.
 The CLI path helpers follow the same portability rule: commands such as
 `dashboard path project-root` may surface the canonical filesystem path, and
 the supported contract treats macOS aliases such as `/var/...` and
 `/private/var/...` as the same project root instead of different repos.
+
 The same portability rule now also applies to the shell-helper and
 `locate_dirs_under` regression suites, so equivalent temp roots are compared
 by real path identity instead of raw string spelling.
@@ -2394,9 +1372,11 @@ whole top-right browser-only chrome area, including the status strip,
 username, host or IP link, and live date-time line, and persisting that flag
 for later `dashboard restart` runs until `dashboard serve --indicators`
 turns it back off
-- `dashboard serve logs` prints the combined Dancer2 and Starman runtime log
-captured in the dashboard log file, `dashboard serve logs -n 100` starts from
-the last 100 lines, and `dashboard serve logs -f` follows appended output live
+- `dashboard serve logs` prints the web-service runtime log captured in the
+dashboard log file. `-t` prefixes lines with UTC timestamps, `--tail N`,
+`--tail=N`, and `-n N` limit the initial output, and `-f` follows appended
+lines. For example, `dashboard serve logs -t --tail 100 -f` starts with the
+final 100 lines and then follows new output.
 - `dashboard serve workers N` saves the default Starman worker count and starts
 the web service immediately when it is currently stopped; `--host HOST` and
 `--port PORT` can steer that auto-start path, and both
@@ -2406,14 +1386,18 @@ override the worker count for one run
 prints the final lifecycle summary as a terminal table by default or JSON with
 `-o json`; on an interactive terminal it also prints the full stop task board
 on `stderr` before work starts so each shutdown step becomes visible instead
-of silent waiting. The shutdown path now also follows the saved managed
-listener port back to the real listener pid when the live web process has
-renamed itself into a `starman master` shape, so minimal Docker runs still
-stop the actual serving process instead of leaving the listener behind.
-Managed collector stop and restart flows also wait for the previous loop to
-really die before accepting a replacement, so a slow shutdown does not leave a
-stale collector process rewriting loop state while the next restart is proving
-the new pid.
+of silent waiting.
+
+    The shutdown path now also follows the saved managed
+    listener port back to the real listener pid when the live web process has
+    renamed itself into a `starman master` shape, so minimal Docker runs still
+    stop the actual serving process instead of leaving the listener behind.
+
+    Managed collector stop and restart flows also wait for the previous loop to
+    really die before accepting a replacement, so a slow shutdown does not leave a
+    stale collector process rewriting loop state while the next restart is proving
+    the new pid.
+
 - `dashboard stop web` only stops the managed web service
 - `dashboard stop collector` only stops managed collector loops
 - `dashboard stop collector <name>` only stops the requested managed
@@ -2424,15 +1408,18 @@ starts the web service, prints the final lifecycle summary as a terminal table
 by default or JSON with `-o json`, and only reports success after the
 replacement collector loops and web runtime become visible and survive a short
 post-ready confirmation window, with the web side still holding a live managed
-pid and an accepting listener on the requested port. Restart now also reuses
-the saved listener port to recover the real serving pid when the web process
-has renamed itself into the underlying `starman master` form, so container
-restarts still own and replace the active listener instead of losing control
-after startup. On Linux hosts that are also running Developer Dashboard inside
-Docker containers, managed stop and restart paths now reject sibling runtime
-pids that live in a different Linux pid namespace, so a host-side restart does
-not accidentally kill or adopt a container-owned web listener or collector
-loop
+pid and an accepting listener on the requested port.
+
+    Restart now also reuses
+    the saved listener port to recover the real serving pid when the web process
+    has renamed itself into the underlying `starman master` form, so container
+    restarts still own and replace the active listener instead of losing control
+    after startup. On Linux hosts that are also running Developer Dashboard inside
+    Docker containers, managed stop and restart paths now reject sibling runtime
+    pids that live in a different Linux pid namespace, so a host-side restart does
+    not accidentally kill or adopt a container-owned web listener or collector
+    loop
+
 - `dashboard restart web` only restarts the managed web service
 - `dashboard restart collector` only restarts managed collector loops
 - `dashboard restart collector <name>` only restarts the requested
@@ -2446,11 +1433,26 @@ inside the watchdog window marks the collector `attention_required` so the
 operator sees an explicit problem instead of infinite silent restart churn
 - `dashboard log` and `dashboard logs` print the combined dashboard web log
 plus collector logs
-- `dashboard log web` prints only the dashboard web log and still supports
-`-n` and `-f`
-- `dashboard log collector` prints only collector logs
+- `dashboard logs --tail 100` or `dashboard logs --tail=100` prints only the
+last 100 lines of the combined output. The same `--tail` option accepts both
+spellings for `dashboard log web`, `dashboard log collector`, and a named
+collector log. `-n N` remains a compatible short form. `--tail=0` prints no
+lines; negative or non-integer counts are rejected with usage information.
+
+    `-t` prefixes each displayed line with a UTC timestamp. Collector output uses
+    the recorded run timestamp; raw web output, which has no stored per-line event
+    time, uses the time it is read. `-f` follows new lines from web logs, one
+    collector, all collectors, or the combined view. Flags may be combined, so
+    `dashboard logs -f -t --tail 50` starts with the last 50 combined lines and
+    continues following both sources.
+
+- `dashboard log web` prints only the dashboard web log and supports `-t`,
+`--tail N`, `--tail=N`, `-n N`, and `-f`
+- `dashboard log collector` prints only collector logs and accepts `-t`,
+`-f`, and the same trailing-line limit
 - `dashboard log collector <name>` prints only the requested collector
-log, and collector-name shell completion suggests registered collector names
+log, accepts `-t`, `-f`, `--tail N`, and `--tail=N`, and collector-name
+shell completion suggests registered collector names
 - interactive restart and stop task boards mark the active step with a blue
 `-`, stream active detail lines in blue, mark completed steps with a green
 `[OK]`, mark failed steps with a red `[X]` plus red failure detail lines,
@@ -2463,9 +1465,9 @@ process table and the parent-written loop state. That state closes the short
 startup interval before a newly forked supervisor adopts its process title, so
 a concurrent start does not fork a second loop.
 
-## Environment Customization
+## Environment Customisation
 
-After installing with `cpanm`, the runtime can be customized with these environment variables:
+After installing with `cpanm`, the runtime can be customised with these environment variables:
 
 - `DEVELOPER_DASHBOARD_BOOKMARKS`
 
@@ -2489,193 +1491,6 @@ After installing with `cpanm`, the runtime can be customized with these environm
 Collector definitions come only from dashboard configuration JSON, so config
 remains the single source of truth for path aliases, providers, collectors,
 and Docker compose overlays.
-
-## Testing And Coverage
-
-Run the test suite:
-
-    prove -lr t
-
-Measure library coverage with Devel::Cover:
-
-    cpanm --no-wget --notest --local-lib-contained ./.perl5 Devel::Cover
-    export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
-    export PATH="$PWD/.perl5/bin:$PATH"
-    perl script/coverage-gate
-
-`script/coverage-gate` is the canonical entrypoint and the one every CI
-workflow runs. It drops the coverage database, runs the instrumented suite,
-collects the `lib/` report and enforces 100.0 on statement, branch, condition
-and subroutine. Its exit status is the interface: `0` all four metrics at
-100.0, `1` a genuine shortfall, `2` the gate could not run or could not read
-its report, `3` the coverage instrument could not read its own database.
-
-The chain is one command rather than three because
-`Devel::Cover::DB::IO` picks its on-disk serialization format at `BEGIN` from
-whatever `@INC` makes visible and records the choice nowhere. Typed as separate
-shell lines, a library path omitted from one of them leaves the reader unable to
-parse what the writer just produced; running them as children of one process
-removes that split by construction. An exit `3` is an environment fault and is
-never fixed by re-running.
-
-The repository target is 100.0 on all four metrics for `lib/`.
-This is a standing QA gate for every change, not only releases. After the
-normal `prove -lr t` test gate passes, run the numeric `Devel::Cover` gate
-and do not treat the work as done until it exits `0`. Only one coverage run may
-be in flight on a host at a time, because instrumented timing-sensitive tests
-misread under contention.
-GitHub workflow coverage gates must match the `Devel::Cover` `Total` summary
-line by regex rather than one fixed-width spacing layout, because runner or
-module upgrades can change column padding without changing the real
-`100.0 / 100.0 / 100.0` result.
-The tag-driven GitHub release workflow must also install `Devel::Cover`
-before it runs that numeric coverage gate, or the signed-release path can
-fail before any release assets are published.
-The GitHub release tag path is intentionally decoupled from the repository's
-GitHub Actions CPAN upload workflow. Tag pushes in the form `vX.XX` are for
-the signed GitHub release path, while any GitHub-hosted CPAN upload remains a
-manual `workflow_dispatch` action so an ordinary release tag cannot perform an
-unasked PAUSE upload behind the operator's back. A local `dzil release` is a
-separate, explicitly invoked PAUSE upload path.
-
-The coverage-closure suite includes managed collector loop start/stop paths
-under `Devel::Cover`, including wrapped fork coverage in
-`t/14-coverage-closure-extra.t`, so the covered run stays green without
-breaking TAP from daemon-style child processes.
-The `t/07-core-units.t` collector loop guard treats both
-`HARNESS_PERL_SWITCHES` and `PERL5OPT` as valid `Devel::Cover` signals,
-because this machine uses both launch styles during verification.
-The runtime-manager coverage cases also use bounded child reaping for stubborn
-process shutdown scenarios, so `Devel::Cover` runs do not stall indefinitely
-after the escalation path has already been exercised.
-The focused skill regression in `t/19-skill-system.t` now also exercises
-`PathRegistry::installed_skill_docker_roots()` directly, including the
-default enabled-only view and the explicit `include_disabled => 1` path,
-so skill docker layering changes do not silently pull the `lib/` total below
-the required `100.0 / 100.0 / 100.0`.
-The focused web coverage suites must also call low-traffic
-`Developer::Dashboard::Web::App` compatibility helpers directly when their
-other execution path would only be indirect route fan-out. That is now part
-of the reviewed contract for the `/apps` redirect helper, the singleton stop
-helper, the shipped shim asset responses, and the installed-distribution
-`File::ShareDir` asset-root fallback, so GitHub-hosted `Devel::Cover` runs
-cannot drift below the local `100.0 / 100.0 / 100.0` result for
-`lib/Developer/Dashboard/Web/App.pm`.
-The packaged `t/09-runtime-manager.t` fallback assertions also stub ambient
-managed-web discovery explicitly, so tarball and PAUSE installs do not get
-contaminated by unrelated live dashboard-shaped processes already running on
-the host.
-Release kwalitee is also a hard tarball-level gate. After `dzil build`, run:
-
-    prove -lv t/36-release-kwalitee.t
-
-That gate analyzes the built `Developer-Dashboard-X.XX.tar.gz` with
-`Module::CPANTS::Analyse` and fails unless every reported kwalitee indicator
-passes. It also fails if stale unpacked `Developer-Dashboard-X.XX/` build
-directories remain beside the current tarball, so artifact cleanup is now an
-enforced release invariant instead of a manual habit. Do not trust
-source-tree kwalitee probes for this repository; use the built tarball
-because that is the artifact PAUSE and CPANTS actually inspect. The CPANTS
-modules used by this gate stay release-only and must not leak into the
-generated install-time test prerequisites for blank-environment `cpanm`
-verification.
-The post-build smart-router two-stage Docker guard also retries one transient
-`cpanm` fetch or unpack failure inside its container, so one corrupt upstream
-download does not masquerade as a deterministic packaging regression in the
-repository itself.
-Tests that depend on a missing or empty environment variable now establish that
-state explicitly inside the test file, rather than assuming the parent shell
-or install harness starts clean.
-The JavaScript fast-check wrapper is a source-tree fuzz gate: it runs when
-`node`, `npm`, `package.json`, and `package-lock.json` are all present, and
-it skips in packaged install-test trees that do not ship those checkout-only
-JavaScript manifests.
-
-Security review is also a hard verification gate. This repository now treats
-OWASP as a full gate rather than a baseline-only spot check: every
-security-sensitive change must complete an OWASP ASVS 5.0.0 applicability
-review across V1 through V14, use ASVS Level 2 rigor as the default floor,
-and escalate to Level 3 review when the change touches higher-trust surfaces
-such as authentication, session handling, cryptographic handling, release
-signing, or externally callable API routes. The same review must also map the
-change against the OWASP Top 10 2021 categories, with explicit attention to
-`A01 Broken Access Control`, `A02 Cryptographic Failures`,
-`A03 Injection`, `A04 Insecure Design`,
-`A05 Security Misconfiguration`, `A06 Vulnerable and Outdated Components`,
-`A07 Identification and Authentication Failures`,
-`A08 Software and Data Integrity Failures`,
-`A09 Security Logging and Monitoring Failures`, and
-`A10 Server-Side Request Forgery`.
-
-The shipped security review now also keeps a dedicated OWASP compliance SOW
-and evidence matrix. That record exists so the project can distinguish
-between the currently safe public wording, which is OWASP-aligned or
-OWASP-gated, and the stronger blanket phrase `OWASP compliant`. Do not use
-the stronger phrase until the chapter-by-chapter evidence record, repo-side
-audit set, and remaining governance gates are all closed together.
-
-For the local repo-side evidence, run the grep-based auth/session, redirect,
-traversal, command-execution, header, and raw-SQL checks from the shipped
-security verification guidance, then keep the focused web and SSL regressions
-green:
-
-    rg -n "LWP::Simple|HTTP::Tiny|JSON::PP|capture_merged" bin lib t
-    rg -n "companies house|\\bewf|xmlgw|chips|tuxedo|\\bchs|grover|cidev|pbs|password=|dsn=" bin lib README doc t
-    rg -n "X-Content-Type-Options|nosniff|Content-Security-Policy|X-Frame-Options|Referrer-Policy|SameSite=Strict|HttpOnly" lib doc SECURITY
-    rg -n "Transient token URLs are disabled|_transient_url_tokens_allowed|verify_user|login_response|_session_cookie" lib/Developer/Dashboard/Web lib/Developer/Dashboard/Auth.pm
-    rg -n "DBI->connect|\\$dbh->prepare\\(\\$sql\\)|table_info|column_info" bin/dashboard lib t
-    rg -n "_sanitize_redirect_target|Location|redirect" lib/Developer/Dashboard/Web lib t
-    rg -n "\\.\\./|rel2abs|dashboards/public|dashboards/ajax|skills/.+/dashboards" lib/Developer/Dashboard/Web lib t
-    rg -n "system\\(|exec\\(|open STDOUT|open STDERR|timeout_ms|alarm\\(" lib/Developer/Dashboard/ActionRunner.pm lib/Developer/Dashboard/CollectorRunner.pm lib/Developer/Dashboard/Web/Server.pm t
-    prove -lv t/08-web-update-coverage.t t/web_app_static_files.t t/17-web-server-ssl.t
-
-From a source checkout, for fast saved-bookmark browser regressions, run the
-dedicated smoke script:
-
-    integration/browser/run-bookmark-browser-smoke.pl
-
-That host-side smoke runner creates an isolated temporary runtime, starts the
-checkout-local dashboard, loads one saved bookmark page through headless
-Chromium, and can assert page-source fragments, saved `/ajax/...` output, and
-the final browser DOM. With no arguments it runs the built-in Ajax
-`foo.bar` bookmark case. For a real bookmark file, point it at the saved file
-and add explicit expectations:
-
-    integration/browser/run-bookmark-browser-smoke.pl \
-      --bookmark-file ~/.developer-dashboard/dashboards/test \
-      --expect-page-fragment "set_chain_value(foo,'bar','/ajax/foobar?type=text')" \
-      --expect-ajax-path /ajax/foobar?type=text \
-    --expect-ajax-body 123 \
-    --expect-dom-fragment '<span class="display">123</span>'
-
-From a source checkout, for Windows-targeted changes, also run the Strawberry
-Perl smoke on a Windows host:
-
-    powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz
-    powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz -UseInstallBootstrap -BootstrapScript C:\path\install.ps1
-
-Before calling a release Windows-compatible from the source checkout, also run
-the same smoke through the host-side Windows VM helper:
-
-    WINDOWS_QEMU_ENV_FILE=.developer-dashboard/windows-qemu.env \
-    integration/windows/run-host-windows-smoke.sh
-
-That helper keeps the Windows VM path rerunnable by loading a reusable env
-file, rebuilding the latest tarball when needed, and then delegating to the
-checked-in QEMU launcher. The supported baseline on Windows is PowerShell plus
-Strawberry Perl. Git Bash is optional. Scoop is optional. They are setup
-helpers only. In the Dockur-backed path, the launcher can resolve the latest
-64-bit Strawberry Perl MSI from Strawberry Perl's official `releases.json`
-feed so the env file does not need a pinned installer URL for every rerun.
-That same Windows guest smoke can install the tarball with `cpanm --notest`
-for third-party dependency setup while still running the full Developer
-Dashboard CLI, collector, Ajax, web, and browser smoke afterward. When the
-checkout bootstrap is part of the change, the Windows smoke also runs
-`install.ps1` through a streamed `Invoke-Expression` wrapper with the staged
-tarball passed through the literal `DD_INSTALL_CPAN_TARGET` environment
-variable so the guest matches the operator flow of `irm .../install.ps1 | iex`
-while still overriding the default GitHub `master` checkout clone with the
-exact staged tarball under test.
 
 ## Updating Runtime State
 
@@ -2710,23 +1525,26 @@ update dashboard-managed built-in helpers only under
 `./.developer-dashboard/cli/` roots, and init must not overwrite or delete
 those user-space files while refreshing the home-only dd namespace.
 
-The public `dashboard` entrypoint also stays thin for all built-in commands.
-It only stages and execs helper assets from `share/private-cli/`: dedicated
+The public `dashboard` entrypoint also stays thin for all built-in commands. It only stages and execs helper assets from `share/private-cli/`: dedicated
 helper bodies for `dashboard jq`, `dashboard yq`, `dashboard of`,
 `dashboard open-file`, `dashboard workspace`, `dashboard path`,
 `dashboard paths`, `dashboard file`, `dashboard files`, and
 `dashboard ps1`, plus thin wrappers for the
 remaining built-ins that hand off to the shared private
-`_dashboard-core` runtime. The shipped starter bookmark source lives under
+`_dashboard-core` runtime.
+
+The shipped starter bookmark source lives under
 `share/seeded-pages/`, and the shipped helper scripts live under
 `share/private-cli/`, so neither bookmark bodies nor helper script bodies
-are embedded directly in the command script.
-Installed copies resolve the same seeded pages and helper assets from the
+are embedded directly in the command script. Installed copies resolve the same seeded pages and helper assets from the
 distribution share directory, so `dashboard init` works after a `cpanm`
-install and not just from a source checkout. Those helper-backed built-ins
+install and not just from a source checkout.
+
+Those helper-backed built-ins
 also rewrite their live process title to `developer-dashboard ...`, so
 process listings stay aligned with the public command names instead of
 exposing the staged helper path.
+
 When `dashboard` re-execs a Perl-backed helper or hook, it also forces the
 same active dashboard `lib/` root into that child Perl process. That keeps
 thin switchboard handoff on the current checkout code instead of drifting onto
@@ -2735,7 +1553,9 @@ an older installed `Developer::Dashboard` copy that may also be visible in
 
 `dashboard cpan <Module...>` installs optional Perl modules into the
 active runtime-local `./.developer-dashboard/local` tree and appends matching
-`requires 'Module';` lines to `./.developer-dashboard/cpanfile`. The command
+`requires 'Module';` lines to `./.developer-dashboard/cpanfile`.
+
+The command
 stays implemented in the `dashboard` entrypoint rather than introducing a
 separate CPAN manager product module, and saved Ajax workers infer the
 same runtime-local `local/lib/perl5` path directly from the active runtime
@@ -2768,25 +1588,34 @@ Bare one-word skill names are expanded against the official
 `https://github.com/manif3station/browser`. Two-part `owner/repo`
 shorthand is expanded against GitHub too, so
 `dashboard skills install foo/bar` clones `https://github.com/foo/bar`.
+
 Full URLs such as `https://github.com/user/example-skill.git` and
-`git@github.com:user/example-skill.git` are used exactly as supplied.
-Use `-b <branch>` or `--branch <branch>` to select a remote
-Git branch explicitly. For a new checkout without this option, the installer
+`git@github.com:user/example-skill.git` are used exactly as supplied. Use `-b <branch>` or `--branch <branch>` to select a remote
+Git branch explicitly.
+
+For a new checkout without this option, the installer
 tries `master` first and `main` second. On a reinstall, it keeps the named
 branch currently checked out in the installed skill directory unless an
-explicit `-b` overrides it. A detached checkout has no named branch to keep,
+explicit `-b` overrides it.
+
+A detached checkout has no named branch to keep,
 so the normal `master` then `main` selection is used. The branch option is
 for remote Git sources; it is rejected for local directory and `--ddfile`
 installs rather than being silently ignored.
+
 When a skill contains `ddfile` or `ddfile.local` but no dependency install is
 needed, the progress label says so; it reports the manifest as missing only
-when that file is actually absent.
-Multiple explicit sources can be supplied to one install command. Developer
+when that file is actually absent. Multiple explicit sources can be supplied to one install command.
+
+Developer
 Dashboard installs them in the order given, prints a progress rundown before
-work starts, and registers every source once.
-The default install summary is a terminal table with each skill's `.env`
-`VERSION` before and after the install. Use `-o json` when a script needs the
-raw result payload. `dashboard skill` is
+work starts, and registers every source once. The default install summary is a terminal table with each skill's `.env`
+`VERSION` before and after the install.
+
+Use `-o json` when a script needs the
+raw result payload.
+
+`dashboard skill` is
 accepted as a singular alias for the `dashboard skills` management command
 family, so `dashboard skill list` and `dashboard skill install browser` are
 equivalent to the plural form. It does not replace dotted skill execution;
@@ -2794,7 +1623,9 @@ installed skill commands still run as `dashboard <skill>.<command>`.
 
 For Perl commands, the `lib/` directory of the skill layer providing the
 command is the first module search path in the child process `@INC`. Other
-participating skill libraries follow it, then shared local libraries. For
+participating skill libraries follow it, then shared local libraries.
+
+For
 `/app/<skill>/<page>` pages, CODE blocks similarly place the
 exact skill layer supplying the page first in their scoped `@INC`, followed
 by the remaining skill layers. A skill can therefore use a module such as
@@ -2804,39 +1635,51 @@ Git sources are cloned. Direct local checked-out directories are synced in
 place instead of recloned, using `rsync` when it is available and the
 built-in Perl tree-copy fallback when it is not. That means
 `dashboard skills install` also acts as reinstall and update for an already
-installed skill. A direct local directory is only accepted when it is a
+installed skill.
+
+A direct local directory is only accepted when it is a
 checked-out Git repository with a `.git/` directory plus a `.env` file that
 declares `VERSION=...`; otherwise the install is rejected. The installed
 copy lives in its own isolated skill root under the deepest participating
-`DD-OOP-LAYERS` runtime. In a home-only session that is
+`DD-OOP-LAYERS` runtime.
+
+In a home-only session that is
 `~/.developer-dashboard/skills/<repo-name>/`. In a deeper project
 layer that already has its own `.developer-dashboard/`, the install target
 becomes
-`<that-layer>/.developer-dashboard/skills/<repo-name>/`.
-Each explicit `dashboard skills install <source>`, including every
+`<that-layer>/.developer-dashboard/skills/<repo-name>/`. Each explicit `dashboard skills install <source>`, including every
 source in a multi-source command, also registers that exact source in
-`~/.developer-dashboard/ddfile` unless it is already listed there. When
+`~/.developer-dashboard/ddfile` unless it is already listed there.
+
+When
 `~/.developer-dashboard/.gitignore` already exists, the install also adds
 `skills/<repo-name>/` for each installed skill without duplicating
 existing entries, so users who keep the dashboard runtime in Git do not
 accidentally track cloned skill trees. The installer also honors an existing
 `~/.developer-dashboard/.gitiignore` spelling as a compatibility safety net.
+
 Calling bare `dashboard skills install` with no source reads that root
 `ddfile` and reinstalls every listed skill as an update batch, showing the
-same progress rundown and before/after version table. If no listed skill
+same progress rundown and before/after version table.
+
+If no listed skill
 changes version, the summary explicitly says `No update.`. First-time installs
 from that root `ddfile` still report `installed` even when the skill ships no
 `.env` `VERSION` metadata. If the root `ddfile` does not exist yet or has no
 installable entries, the command returns an explicit error telling the user to
-install a skill first or pass a skill source. When an operator later runs
+install a skill first or pass a skill source.
+
+When an operator later runs
 `dashboard skills uninstall <repo-name>`, the home root
 `ddfile` now drops any exact source lines that resolve back to that repo name
 while leaving comments and unrelated entries untouched.
+
 Long-running dependency manifests now show a Docker-build-style live detail
 window under the active epic task. That rolling window keeps the newest ten
 detail lines from tools such as `brew`, `npx npm install`, `cpanm`, and
 `make`, collapses automatically when the task completes, and leaves the full
 epic checklist visible while the active manifest streams.
+
 Developer Dashboard does not merge the skill's `cli/`, `dashboards/`,
 `config/`, `ddfile`, `ddfile.local`, `aptfile`, `apkfile`, `dnfile`,
 `wingetfile`, `brewfile`, `Makefile`, `dockerfile`, `package.json`, `cpanfile`,
@@ -2847,21 +1690,30 @@ normal runtime folders.
 current directory instead of taking one explicit skill source. If `ddfile`
 exists there, each listed source installs into the base home-layer skills root
 at `~/.developer-dashboard/skills/<repo-name>/` even when the command
-is run inside a deeper child `.developer-dashboard/` layer. If `ddfile.local`
+is run inside a deeper child `.developer-dashboard/` layer.
+
+If `ddfile.local`
 exists there, each listed source installs into the current directory's nested
 `skills/<repo-name>/` tree instead. When both manifests are present,
-the command processes `ddfile` first and `ddfile.local` second. Repeated
+the command processes `ddfile` first and `ddfile.local` second.
+
+Repeated
 `dashboard skills install --ddfile` runs also act as reinstall and refresh
 for already-installed targets, just like repeated explicit
-`dashboard skills install <source>` runs.
-Interactive `dashboard skills install` runs also print a task board on
+`dashboard skills install <source>` runs. Interactive `dashboard skills install` runs also print a task board on
 `stderr`; multi-source and bare update-all installs show one task for every
-source before any clone or dependency step starts. For a single skill, the
+source before any clone or dependency step starts.
+
+For a single skill, the
 board begins with fetch and layout only, then appends dependency tasks after
-the fetched skill root has been inspected. A dependency row appears only when
+the fetched skill root has been inspected.
+
+A dependency row appears only when
 the matching manifest file really exists, and operating-system-specific rows
 such as `aptfile`, `apkfile`, `dnfile`, `wingetfile`, and `brewfile`
-appear only on matching host families. When a single skill ships dependency
+appear only on matching host families.
+
+When a single skill ships dependency
 manifests such as `package.json` or `Makefile`, the matching task updates to
 show the detected file path so a long-running `npm`, `make`, `cpanm`, or
 package-manager step stays visible instead of looking blind, with a rolling
@@ -2872,7 +1724,7 @@ with an error.
 Installed dotted skill commands such as `dashboard demo-skill.foo` now hand
 control to the real skill command after hook processing instead of wrapping
 the main command in an extra capture layer. That keeps interactive prompting
-behavior intact for commands that print a prompt and then read from standard
+behaviour intact for commands that print a prompt and then read from standard
 input.
 
 Skill lookup also follows `DD-OOP-LAYERS`, but a same-named deeper skill is
@@ -2880,10 +1732,14 @@ now layered instead of flattening the whole repo. The home
 `~/.developer-dashboard/skills/<repo-name>/` checkout is the base
 layer, and any deeper
 `.developer-dashboard/skills/<repo-name>/` checkout becomes an
-inherited layer for that same skill. Runtime lookup walks those
+inherited layer for that same skill.
+
+Runtime lookup walks those
 participating skill layers for `cli/<command>`,
 `cli/<command>.d`, `dashboards/*`, `dashboards/nav/*`,
-`config/config.json`, and `perl5/lib/perl5`. If a child layer omits a file,
+`config/config.json`, and `perl5/lib/perl5`.
+
+If a child layer omits a file,
 folder, or config key, lookup falls back to the base layer. If multiple
 layers provide the same file or config key, the deepest layer still wins that
 override.
@@ -2982,6 +1838,7 @@ public form keeps walking those nested skill roots until it resolves the final
 The first command executes the nested skill command. The second prints the
 resolved nested `cli/here` file plus any matching hook files that would run
 before it.
+
 Nested skill trees under `skills/<repo>/cli/` stay reachable through
 that same public dotted route, including multiple nested levels. For example,
 if `example-skill` ships `skills/foo/skills/bar/cli/baz`, then
@@ -3136,7 +1993,7 @@ kernel arg/env limit
 - ordinary non-zero exit codes are recorded but do not act like an implicit stop
 request
 
-### Additional Release Notes
+### Additional Skill Behaviour
 
 When `~/.developer-dashboard/.gitignore` exists, skill installs add
 `skills/<repo-name`/> entries without duplication so cloned skill trees stay
@@ -3148,35 +2005,13 @@ Skill-shipped pages mount under app-style routes such as
 Under `DD-OOP-LAYERS`, same-name skills shadow by the deepest matching repo
 name while missing files still fall back to the base skill layer.
 
-For repository delivery on this machine, follow the loop:
-
-    fix -> test -> commit -> push -> rerun scorecard
-
-Use `~/bin/git-push-mf` for the authenticated push step.
-Do not treat Scorecard as a pre-commit local gate; run it only after the local
-gates, commit, and push are complete.
-When Scorecard needs a signed GitHub release, push a `vX.XX` tag so the
-tag-triggered GitHub release workflow can publish the tarball, checksum, and
-detached signature assets that back the `Signed-Releases` check. A signature
-alone caps that check at eight of ten, because the remaining points are scored
-only for a release that also carries build provenance, and provenance is
-recognised solely by a release asset whose name ends in `.intoto.jsonl` -
-recording an attestation in the GitHub attestation store does not count. So a
-second job in the same workflow re-downloads the published tarball, verifies it
-against the published checksum, attests it, and attaches the SLSA build
-provenance as `<tarball>.intoto.jsonl` together with the full Sigstore
-bundle that carries the material needed to verify that provenance offline. That
-job is deliberately separate: minting an OIDC token is what lets the workflow
-speak as the repository, and it is never granted to the job that runs the test
-suite, the coverage pass, and the tarball build.
-
 Skill fleet integration:
 
 - collectors declared in a skill `config/config.json` join the same managed
 fleet used by the system config
 - `dashboard serve`, `dashboard restart`, and `dashboard stop` manage those
 skill collectors together with the system-owned collectors
-- skill collector names are normalized to
+- skill collector names are normalised to
 `<repo-name>.<collector-name>` so collector process titles,
 status rows, and indicator state stay unambiguous
 - indicator configuration attached to those skill collectors participates in the
@@ -3210,10 +2045,12 @@ the underlying saved filename
 `/others/<repo-name>/...`, with nested child skills extending those
 same prefixes under `/js/.../<sub-skill>/...`,
 `/css/.../<sub-skill>/...`, and `/others/.../<sub-skill>/...`.
-Optional `config/routes.json` metadata can also publish canonical custom
-`/js`, `/css`, and `/others` paths for those same assets, but the smart
-`/js/...`, `/css/...`, and `/others/...` routes still stay the parent
-resolvers and custom paths remain fallback-only after the smart lookup misses
+
+    Optional `config/routes.json` metadata can also publish canonical custom
+    `/js`, `/css`, and `/others` paths for those same assets, but the smart
+    `/js/...`, `/css/...`, and `/others/...` routes still stay the parent
+    resolvers and custom paths remain fallback-only after the smart lookup misses
+
 - the installed web server uses the same smart longest-prefix dispatcher for
 those `/app`, `/ajax`, `/js`, `/css`, and `/others` routes, so installed
 skill-local pages, Ajax handlers, and public assets work through the shipped
@@ -3300,9 +2137,13 @@ To build a new skill, start with a Git repository that contains `cli/`,
 `state/`, `logs/`, `ddfile`, `ddfile.local`, `aptfile`, `apkfile`,
 `dnfile`,
 `brewfile`, `Makefile`, `package.json`, `requirements.txt`, `cpanfile`, and `cpanfile.local` files under the skill
-root. Skill commands are file-based
+root.
+
+Skill commands are file-based
 commands run through the dotted
-`dashboard <repo-name>.<command>` form. Skill hook files live
+`dashboard <repo-name>.<command>` form.
+
+Skill hook files live
 under `cli/<command>.d/`, skill app pages render from
 `/app/<repo-name>` and `/app/<repo-name>/<id>`, and
 the older `/skill/<repo-name>/bookmarks/<id>` route still
@@ -3310,29 +2151,30 @@ resolves direct bookmark renders. If `config/config.json` declares
 collectors, those collectors join the normal managed fleet under
 repo-qualified names such as `example-skill.status`, which means
 `dashboard serve`, `dashboard restart`, and `dashboard stop` treat them the
-same way they treat system-owned collectors. If `config/api.json` declares API
+same way they treat system-owned collectors.
+
+If `config/api.json` declares API
 clients, those entries join the layered machine-auth allowlist for exact
 saved `/ajax/...` route paths owned by that skill.
 
 The repository also ships a dedicated skill authoring guide, and the installed
 reference is available through the POD module
-`Developer::Dashboard::SKILLS`. Together they cover the isolated skill
-layout, environment variables such as `DEVELOPER_DASHBOARD_SKILL_ROOT`,
-bookmark syntax like `TITLE:`, `BOOKMARK:`, `HTML:`, and `CODE1:`,
-bookmark browser helpers such as `fetch_value()`, `stream_value()`, and
-`stream_data()`, underscored config merge keys such as `_example-skill`,
-`aptfile -` apkfile -> dnfile -> wingetfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> ddfile -> ddfile.local>
-automatic dependency install order, the explicit
-`dashboard skills install --ddfile` operator order of
-the deferred `ddfile -` ddfile.local> pass, the shared `~/perl5` versus skill-local
-`perl5/` split, the `$HOME/node_modules` Node install target used by
-`package.json`, the `python -m pip install --user` path used by
-`requirements.txt`, the optional `Makefile` command chain and `--notest` skip,
-the skill-private `skills/<repo-name>/` target used by installed-skill
-`ddfile.local`,
-skill docker layering, and when to use dashboard-wide custom CLI hook folders such as
-`~/.developer-dashboard/cli/<command>.d` instead of a skill-local
-hook tree.
+`Developer::Dashboard::SKILLS`.
+
+Together they cover the isolated skill layout, environment variables such as
+`DEVELOPER_DASHBOARD_SKILL_ROOT`, bookmark syntax such as `TITLE:` and
+`CODE1:`, browser helpers such as `fetch_value()` and `stream_data()`, and
+configuration merge keys such as `_example-skill`.
+
+The guide describes automatic dependency installation order:
+`aptfile -` apkfile -> dnfile -> wingetfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> ddfile -> ddfile.local>.
+The explicit `dashboard skills install --ddfile` option handles the deferred
+`ddfile -` ddfile.local> pass separately.
+
+It also explains shared and skill-local dependency directories, the install
+targets used for Node and Python packages, optional Makefile commands, Docker
+layering, and when to use dashboard-wide command hooks instead of skill-local
+hooks.
 
 Skill dashboard CODE blocks and saved skill Ajax handlers load the active
 skill's root-to-leaf `.env` and `.env.pl` files. For example,
@@ -3348,13 +2190,999 @@ For operators rather than authors, `dashboard skills list`,
 inventorying and toggling installed skills without deleting their isolated
 runtime trees.
 
+# FEATURE REFERENCE
+
+## Shared Nav Fragments
+
+If `nav/*.tt` files exist under the saved bookmark root, every non-nav page
+render includes them between the top chrome and the main page body.
+
+For the default runtime that means files such as:
+
+- `~/.developer-dashboard/dashboards/nav/foo.tt`
+- `~/.developer-dashboard/dashboards/nav/bar.tt`
+
+And with route access such as:
+
+- `/app/nav/foo.tt`
+- `/app/nav/foo.tt/edit`
+- `/app/nav/foo.tt/source`
+
+The bookmark editor can save those nested ids directly, for example
+`BOOKMARK: nav/foo.tt`. Raw TT/HTML fragment files under `nav/` also work
+without bookmark wrappers, for example:
+
+    [% index = '/app/index' %]
+    <a href=[% index %]>[% index %]</a>
+
+On a page like `/app/index`, the direct `nav/*.tt` files are loaded in
+sorted filename order, rendered through the normal page runtime, and inserted
+above the page body. Non-`.tt` files, subdirectories under `nav/`, and junk
+files that do not look like TT or HTML fragments are ignored by that shared
+nav renderer.
+
+Under `DD-OOP-LAYERS`, the shared nav renderer now scans every inherited
+`dashboards/nav/` layer from `~/.developer-dashboard` down to the current
+directory, keeps parent-only fragments visible, and lets a deeper layer
+replace the same `nav/<name>.tt` id without losing the rest of the
+shared nav set. Template includes used by those bookmarks follow the same
+layered bookmark lookup path.
+
+Installed skill nav also follows nested
+`skills/<repo>/skills/<child>/...` trees now, so a nested
+skill can contribute `dashboards/nav/index.tt` or other shared fragments
+without being flattened back into only the first installed-skill level.
+
+The web application keeps a per-instance inventory of the discovered nav
+fragment ids so unchanged directories are not enumerated on every request.
+The inventory is reused only while each ordered `nav/` directory retains the
+same high-resolution filesystem identity and metadata signature.
+
+Adding or
+removing a fragment changes that signature and refreshes the next request.
+Only the filename inventory is reused: every fragment's contents are loaded
+and rendered for each request, so edits remain visible without an ID rescan.
+
+Missing nav directories continue to contribute no items; an incomplete
+directory scan is not cached, and filesystem stat, read, or close failures
+remain explicit.
+
+Saved-page lookup selects the first existing layered candidate, then the
+secure-read path performs the containment check immediately before its
+no-follow open. Candidate lookup does not repeat that same resolved-path check
+earlier; both normal page reads and raw-entry reads still use the guarded open.
+
+For one web request, ordered candidate roots are discovered lazily once and
+shared by its saved-page loads; a later request receives a fresh root list.
+Direct PageStore calls outside a web request do not retain a root snapshot.
+
+Shared nav fragments and normal bookmark pages both render through Template
+Toolkit with `env.current_page` set to the active request path, such as
+`/app/index`. The same path is also available as
+`env.runtime_context.current_page`, alongside the rest of the request-time
+runtime context.
+
+Token play renders for named bookmarks also reuse that saved
+`/app/<id>` path for nav context, so shared `nav/*.tt` fragments do
+not disappear just because the browser reached the page through a transient
+`/?mode=render&token=...` URL.
+
+Shared nav markup now wraps horizontally by default and inherits the page
+theme through CSS variables such as `--panel`, `--line`, `--text`, and
+`--accent`, so dark bookmark themes no longer force a pale nav box or hide
+nav link text against the background.
+
+## What You Get
+
+- a browser interface on port `7890` for pages, status, editing, and helper
+access
+- a shell entrypoint for file navigation, page operations, collectors,
+indicators, auth, and Docker Compose
+- saved runtime state that lets the browser, prompt, and CLI all see the same
+prepared information
+- a place to collect project-specific shortcuts without rebuilding your daily
+workflow for every repo
+
+## Web Interface And Access Model
+
+Run the web interface with:
+
+    dashboard serve
+
+By default it listens on `0.0.0.0:7890`, so you can open it in a browser at:
+
+    http://127.0.0.1:7890/
+
+Run `dashboard serve --ssl` to enable HTTPS with a generated self-signed
+certificate under `~/.developer-dashboard/certs/`, then open:
+
+    https://127.0.0.1:7890/
+
+When SSL mode is on, plain HTTP requests on that same host and port are
+redirected to the equivalent `https://...` URL before the dashboard route
+runs.
+
+The generated certificate covers `localhost`, `127.0.0.1`, and `::1`. It
+also includes a concrete non-wildcard `--host HOST` value and any additional
+names or IPs in `config/config.json` under
+`web.ssl_subject_alt_names`.
+
+Older dashboard certs are
+rotated forward automatically when they no longer match that expected profile.
+Browsers still show the normal self-signed certificate warning until you trust
+the generated certificate locally.
+
+Run `dashboard serve --no-editor` or `dashboard serve --no-endit` to keep
+the browser in read-only mode. That hides the Share, Play, and View Source
+links, blocks bookmark editor and source routes with `403`, blocks
+bookmark-save POST requests even if someone tries to hit them directly, and
+persists the mode so later `dashboard restart` runs stay read-only until you
+switch it back with `dashboard serve --editor`.
+
+Run `dashboard serve --no-indicators` or `dashboard serve --no-indicator` to
+clear the whole top-right browser chrome area. That hides the browser-only
+indicator strip, username, host or IP link, and live date-time line without
+changing `/system/status` or terminal prompt output such as `dashboard ps1`,
+and persists the mode until `dashboard serve --indicators` turns it back on.
+
+For example, if you want the same dashboard cert to work for one local
+`/etc/hosts` alias and one LAN IP, keep the runtime config like this:
+
+    {
+      "web": {
+        "ssl_subject_alt_names": [
+          "dashboard.local",
+          "192.168.1.20",
+          "fd00::20"
+        ]
+      }
+    }
+
+The access model is deliberate:
+
+- numeric loopback and loopback-only hostnames such as `localhost` do not
+require a password when the request still originates from loopback
+- configured loopback aliases listed under `web.ssl_subject_alt_names` are also
+treated as local-admin when they still arrive from loopback
+- helper access is for everyone else, including non-loopback IPs and other
+machines on the network
+- the loopback-admin shortcut applies only to direct (plain HTTP) connections;
+under `dashboard serve --ssl` the public front-proxy relays TLS to an internal
+loopback backend, so every backend connection looks like loopback and cannot
+prove the real client is local -- in that mode the shortcut is disabled and
+even loopback HTTPS requests require a helper login
+- helper logins let you share the dashboard safely without turning every browser
+request into full local-admin access
+
+In practice that means the developer at the machine gets friction-free local
+admin access, while shared or forwarded access is forced through explicit
+helper accounts. Helper passwords use PBKDF2-HMAC-SHA256 with 210,000 iterations.
+
+When
+FFI::Platypus and a compatible system OpenSSL `libcrypto` are available, the
+same derivation runs through OpenSSL's native PBKDF2 function; this preserves
+the existing salts, stored hashes, and verification format. If the native
+library is unavailable or the password cannot safely use the byte-oriented
+FFI path, authentication uses the existing `Digest::SHA` implementation.
+
+MakeMaker compiles the extension as
+part of the normal distribution build; a source checkout without the compiled
+object uses the equivalent Perl implementation. Overloaded references retain
+Perl stringification behaviour, and native-load errors other than a genuinely
+missing object remain visible.
+
+The XS result retains the Perl UTF-8 and taint
+flags. Quoted attribute values use a separate single-pass XS loop that escapes
+the body metacharacters and both quote characters together; source-only builds
+and overloaded references retain the Perl path.
+
+For path ancestry checks, byte-identical nonempty path strings are recognised
+before calling `abs_path`; different spellings still use canonical resolution
+to preserve symlink-aware behaviour. Component-boundary checks use the active
+`File::Spec` separator and case-tolerance rules, including Windows drive roots
+and backslash paths, so a textual prefix cannot be mistaken for a descendant.
+
+Cold ratios against serial were 0.21, 0.90, 0.97, and 0.89; warmed
+ratios were 0.92, 1.18, 1.13, and 1.18. MCE module import is excluded, so
+these cold figures understate its one-shot cost. Cold MCE was slower at every
+size, and warmed gains remained below 1.2 times; it is not added to the
+one-shot path command. Collector startup remains sequential so readiness failures retain their
+existing fail-fast behaviour.
+
+If no helper user exists yet in the active dashboard runtime, outsider requests return
+`401` with an empty body and do not render the login form at all.
+
+When a saved `index` bookmark exists, opening `/` now redirects straight to
+`/app/index` so the saved home page becomes the default browser entrypoint. When no saved `index` bookmark exists yet, `/` still opens the free-form
+bookmark editor.
+
+If a user opens an unknown saved route such as `/app/foobar`, the browser now
+opens the bookmark editor with a prefilled blank bookmark for that requested
+path instead of showing a 404 error page.
+
+When helper access is sent to `/login`, the login form now keeps the original
+requested path and query string in a hidden redirect target.
+
+After a
+successful helper login, the browser is sent back to that saved route, such as
+`/app/index`, instead of being dropped at `/`.
+
+## Collectors, Indicators, And PS1
+
+Collectors are background or on-demand jobs that prepare state for the rest of
+the dashboard. A collector can run a shell command or a Perl snippet, then
+store stdout, stderr, exit code, and timestamps as file-backed runtime data.
+
+That prepared state drives indicators. Indicators are the short status records
+used by:
+
+- the shell prompt rendered by `dashboard ps1`
+- the top-right status strip in the web interface
+- CLI inspection commands such as `dashboard indicator list`
+
+This matters because prompt and browser status should be cheap to render. Instead of re-running a Docker check, VPN probe, or project health command
+every time the prompt draws, a collector prepares the answer once and the rest
+of the system reads the cached result.
+
+When the status strip or indicator-list command reads indicators, the store
+resolves the applicable runtime roots once for that listing and searches those
+roots in precedence order. It still reads the indicator files on each request,
+so updates and inherited-versus-local overrides remain visible.
+
+During each collector
+sync, the store now resolves ordered indicator roots once and passes that
+snapshot through all collector comparisons and the final inventory. Decoded
+indicator files are cached only for that sync; writes and deletions invalidate
+the affected entry, and a later request rereads disk state. A Docker regression
+checks one root resolution and one physical file read per indicator, next-sync
+visibility of an external state change, and correct inventory after retirement.
+
+Workspace sessions use a
+two-line bottom status block: the first row is the dashboard indicator strip
+with the trailing date-time segment, and the second row keeps tmux's normal
+session and indexed window list. Ordinary tmux sessions keep the normal
+inline prompt.
+
+The
+workspace workflow seeds a dedicated
+`DEVELOPER_DASHBOARD_TMUX_STATUS=1` session flag for that behaviour, and
+Developer Dashboard also treats the older `TICKET_REF` session reference as a
+fallback signal so older workspace sessions do not keep duplicating indicators in the
+inline prompt.
+
+Developer Dashboard updates tmux through session-local runtime
+commands instead of editing any user tmux config file or changing unrelated
+tmux sessions on the same server. Configured collector indicators now prefer the configured icon in both places,
+and when a collector is renamed the old managed indicator is cleaned up
+automatically so the prompt and top-right browser strip do not show both the
+old and new names at the same time.
+
+Those managed indicator records now also
+preserve a newer live collector status during restart/config-sync windows, so
+a healthy collector does not flicker back to `missing` after it has already
+reported `ok`.
+
+If `indicator.icon` contains Template Toolkit syntax such as `[% a %]`, the
+collector runner now treats collector `stdout` as JSON, decodes it through
+`JSON::XS`, exposes hash keys as direct template variables plus `data`, and
+persists the rendered icon as the live indicator value. Invalid JSON or TT
+render failures are explicit collector errors: the collector `stderr` records
+the template problem and the indicator stays red instead of silently falling
+back.
+
+If optional watcher setup fails and watcher shutdown also fails, the dispatcher
+reports the close failure even when that watcher has no `last_error` method.
+
+## Why It Works As A Developer Home
+
+The pieces are designed to reinforce each other:
+
+- pages give you a browser home for links, notes, forms, and actions
+- collectors prepare state for indicators and prompt rendering
+- indicators summarise that state in both the browser and the shell
+- path aliases, open-file helpers, and data query commands shorten the jump from
+I know what I need to I am at the file or value now
+- Docker Compose helpers keep recurring container workflows behind the same
+`dashboard` entrypoint
+
+That combination makes the dashboard useful as a real daily base instead of
+just another utility script.
+
+## Works Across Languages
+
+Developer Dashboard supports mixed-language teams and polyglot repositories.
+It provides common navigation, status, and repeatable workflows across a
+project, regardless of the language used for its application code.
+
+- a local browser home
+- repeatable health checks and status indicators
+- path shortcuts and file-opening helpers
+- JSON, YAML, TOML, or properties inspection from the CLI
+- a consistent Docker Compose wrapper
+
+File helpers can locate source files, structured data, and project-local
+container configuration alongside the browser and prompt tools.
+
+Project-specific behaviour is added through configuration, saved pages, and
+user CLI extensions.
+
+# MODULE NAMESPACING
+
+All project modules are scoped under the `Developer::Dashboard::` namespace
+to prevent pollution of the CPAN ecosystem. Core helper modules are available
+under this namespace:
+
+- Developer::Dashboard::File
+
+    File I/O helpers with alias support for older bookmark compatibility.
+
+- Developer::Dashboard::Folder
+
+    Folder path resolution and discovery with runtime registry support.
+
+- Developer::Dashboard::DataHelper
+
+    JSON encoding and decoding helpers for older bookmark code.
+
+- Developer::Dashboard::Zipper
+
+    Token encoding and Ajax command building for transient URL construction.
+
+- Developer::Dashboard::Runtime::Result
+
+    Hook result environment variable decoding and access for command runners.
+
+Project-owned modules now live only under the `Developer::Dashboard::`
+namespace so the distribution does not pollute the CPAN ecosystem with
+generic package names. The bookmark CODE runtime imports the short JSON helper
+names from `Developer::Dashboard::DataHelper` automatically for every block.
+The shared JSON wrapper lazily reuses its fixed-configuration canonical
+encoder and UTF-8 decoder within each Perl interpreter; calls requiring
+different encoder options construct their own configured encoder.
+
+## Main Concepts
+
+The runtime has a few shared parts:
+
+- Path and file registries
+
+    Resolve the layered home, project, and skill locations used for configuration,
+    pages, logs, collectors, and other runtime data.
+
+- Pages and actions
+
+    Store saved pages, render browser views, and run configured actions with their
+    working directory, environment, and timeout settings.
+
+- Collectors and indicators
+
+    Run scheduled or on-demand checks, save their results, and expose concise
+    status to the browser and shell prompt.
+
+- Web and command interfaces
+
+    Provide the local browser UI and the `dashboard` command line entry point over
+    the same runtime data.
+
+- Skills and extensions
+
+    Add isolated commands, pages, configuration, and collectors that can be
+    layered with the shared and project runtimes.
+
+The implementation modules are under the `Developer::Dashboard::` namespace.
+The command guides below describe supported user-facing behaviour; module
+references are most useful when embedding or extending the system.
+
+## Environment Variables
+
+The distribution supports these compatibility-style customisation variables:
+
+- `DEVELOPER_DASHBOARD_BOOKMARKS`
+
+    Override the saved page root.
+
+- `DEVELOPER_DASHBOARD_CHECKERS`
+
+    Filter enabled collector/checker names.
+
+- `DEVELOPER_DASHBOARD_CONFIGS`
+
+    Override the config root.
+
+- `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS`
+
+    Allow browser execution of transient `/?token=...`, `/action?atoken=...`,
+    and older `/ajax?token=...` payloads. The default is off, so the web UI only
+    executes saved bookmark files unless this is set to a truthy value such as
+    `1`, `true`, `yes`, or `on`.
+
+## Transient Web Token Policy
+
+Transient page tokens still exist for CLI workflows such as `dashboard page encode`
+and `dashboard page decode`, but browser routes that execute a transient payload
+from `token=` or `atoken=` are disabled by default.
+
+That means links such as:
+
+- `http://127.0.0.1:7890/?token=...`
+- `http://127.0.0.1:7890/action?atoken=...`
+- `http://127.0.0.1:7890/ajax?token=...`
+
+return a `403` unless `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is enabled.
+Saved bookmark-file routes such as `/app/index` and
+`/app/index/action/...` continue to work without that flag.
+
+Saved bookmark
+editor pages also stay on their named `/app/<id>/edit` and
+`/app/<id>` routes when you save from the browser, so editing an
+existing bookmark file does not fall back to transient `token=` URLs under the
+default deny policy.
+
+`Ajax` helper calls inside saved bookmark `CODE*` blocks should use
+an explicit `file => 'name.json'` argument. When a saved page supplies that
+name, the helper stores the Ajax Perl code under the saved dashboard ajax tree and emits a
+stable saved-bookmark endpoint such as
+`/ajax/name.json?type=text`.
+
+Skill pages use the same helper contract. Without
+extra skill route metadata the generated saved endpoint is namespaced under the
+longest matching skill route, for example
+`/ajax/example-skill/name.json?type=text` or
+`/ajax/example-skill/sub-skill/name.json?type=text`.
+
+The runtime config tree
+and installed skills can both ship `config/routes.json` to declare canonical
+custom paths for normal saved app pages, skill-local app pages, Ajax handlers,
+JavaScript assets, CSS assets, and other public assets. The schema is a JSON
+object whose keys are the public custom paths and whose values are either one
+smart local route string or an object with `to` plus an optional `type`, for
+example
+
+    {
+       "/java" : "/app/learn.ai",
+       "/v1/status" : {
+          "to" : "/ajax/status",
+          "type" : "json"
+       },
+       "/hello/world" : "/app/hello/world",
+       "/main.css" : "/css/hello/world.css",
+       "/hey.js" : "/js/hey/how/are/you.js",
+       "/what/are/you" : "/others/hello/world/you.html"
+    }
+
+When that file is present, skill pages emit the declared canonical
+`ajax` path such as `/v1/status` instead of the default `/ajax/...` url,
+and runtime-level aliases such as `/java` can point at normal saved bookmark
+ids such as `/app/learn.ai` without treating the dot as skill notation. The
+same manifest also makes the declared custom `/app`, `/js`, `/css`, and
+`/others` paths requestable.
+
+The smart longest-prefix routes remain the
+parent resolvers:
+`/app/example-skill/...`, `/ajax/example-skill/...`,
+`/js/example-skill/...`, `/css/example-skill/...`, and
+`/others/example-skill/...` are always checked first, and any declared custom
+path is checked only after the normal smart route misses.
+
+Runtime-level custom
+paths from the active `config/routes.json` layer chain follow the same
+fallback rule against the built-in `/app`, `/ajax`, `/js`, `/css`, and
+`/others` route handlers. If neither the smart route nor the custom path
+resolves, the request falls through to the normal `404` response.
+
+Ajax custom
+routes default to `json` when no explicit `type` is present, and the
+optional `type` value can also be `html`,
+`text`, or an arbitrary raw mime type such as
+`application/vnd.example+json`. Those saved Ajax handlers run the stored file
+as a real process, defaulting to Perl unless the file starts with a shebang,
+and stream both `stdout` and `stderr` back to the browser as they happen.
+
+That keeps bookmark Ajax workflows usable even while transient token URLs stay
+disabled by default, and it means bookmark Ajax code can rely on normal
+`print`, `warn`, `die`, `system`, and `exec` process behaviour instead of
+a buffered JSON wrapper. The same layered runtime config chain and installed-skill config trees can now
+ship `config/api.json` files that authorise selected `/ajax/...` routes for
+machine-to-machine callers without forcing a helper login form.
+
+The schema is a
+JSON object keyed by API client name.
+
+Each entry must provide a stored SHA-256
+hex digest under `secret` plus an `ajax` array of exact saved Ajax route
+paths such as `/ajax/stream.txt` or
+`/ajax/example-skill/status.json`. When a non-admin remote request targets one
+of those registered `/ajax/...` paths, the caller can send
+`X-DD-API-Key: NAME` and `X-DD-API-Secret: RAW-SECRET`.
+
+Developer Dashboard
+hashes the raw secret with SHA-256, compares it to the stored digest, and
+executes the saved Ajax handler when they match.
+
+Missing or wrong credentials
+for a registered API route return `403` with the JSON body
+`{"status":"forbidden"}`.
+
+Existing helper-session auth still works on the
+same saved Ajax routes, so browser workflows and machine callers can coexist on
+one handler without adding a second copy of the route. Like the rest of
+`DD-OOP-LAYERS`, runtime `config/api.json` files merge from home to the
+deepest active child layer, and installed skills contribute their own layered
+`config/api.json` fragments for skill-local saved Ajax routes.
+
+The built-in
+`dashboard api` command is the supported way to inspect or update the writable
+runtime layer for that registry.
+
+An entry carrying `"disabled": true` (or the same flag under `_disabled`)
+is dropped from the registry; a JSON literal `false` there keeps the key
+visible, including values such as `"disabled": 0` or `"disabled": "no"`.
+
+Saved bookmark Ajax handlers default to `text/plain` when no explicit
+`type => ...` argument is supplied, and the generated Perl wrapper now
+enables autoflush on both `STDOUT` and `STDERR` so long-running handlers
+show incremental output in the browser instead of stalling behind process
+buffers.
+
+If a saved handler also needs refresh-safe process reuse, pass
+`singleton => 'NAME'` in the `Ajax` helper.
+
+The generated URL carries the singleton name, and the worker runs as
+`dashboard ajax: NAME`. A refreshed request replaces the older matching
+worker.
+
+`dashboard stop` and `dashboard restart` also stop singleton Ajax workers.
+Closing a browser tab sends a `pagehide` cleanup request to
+`/ajax/singleton/stop?singleton=NAME`.
+
+If `code => ...` is omitted, `Ajax(file => 'name')` targets the
+existing executable at `dashboards/ajax/name` instead of rewriting it. Static files referenced by saved bookmarks are resolved from the effective
+runtime public tree first and then from the saved bookmark root.
+
+The web layer
+also provides a built-in bundled `/js/jquery.js` asset that serves the local
+copy of jQuery 4.0.0, with `/js/jquery-4.0.0.min.js` kept as a compatibility
+alias for the same shipped payload even when no runtime file has been copied
+into `dashboard/public/js` yet.
+
+The bundled browser tab icon works the same
+way: browsers request `/favicon.ico` on their own for every page load, so that
+route is served outside the authorisation gate, on every trust tier and before
+any helper login, from the bundled 16x16 icon. Dropping your own
+`dashboard/public/others/favicon.ico` into any runtime layer overrides it.
+
+Skills can ship the same classes of assets
+under their own dashboard tree: `dashboards/ajax/*` resolves at
+`/ajax/<repo-name>/...` or
+`/ajax/<repo-name>/<sub-skill>/...`, and
+`dashboards/public/js/*`, `dashboards/public/css/*`, and
+`dashboards/public/others/*` resolve at
+`/js/<repo-name>/...`, `/css/<repo-name>/...`, and
+`/others/<repo-name>/...` with the same nested-skill extension,
+for example `/js/<repo-name>/<sub-skill>/path/file.js`.
+
+If a
+request such as `/js/<repo-name>/foo/bar.js` or
+`/js/<repo-name>/<sub-skill>/foo/bar.js` does not exist in the
+skill-local public tree, the web layer falls back to the normal nested
+saved-bookmark asset path `dashboards/public/js/...` or saved Ajax file path
+`dashboards/ajax/...` instead of assuming the leading path segments must
+belong to a skill.
+
+Saved bookmark editor and view-source routes also protect literal inline
+script content from breaking the browser bootstrap. If a bookmark body
+contains HTML such as `/script`, the editor now escapes the inline JSON
+assignment used to reload the source text, so the browser keeps the full
+bookmark source inside the editor instead of spilling raw text below the page.
+
+Saved browser workspaces can also show a request-specific token form above the
+editor whenever the current request uses `{{token}}` placeholders, carrying
+those token values across matching placeholders in the same workflow so later
+requests can reuse the operator-supplied values without manual copy-and-paste.
+
+Bookmark rendering now emits saved `set_chain_value()` bindings after
+the bookmark body HTML, so pages that declare `var endpoints = {}` and then
+call helpers from `$(document).ready(...)` receive their saved `/ajax/...`
+endpoint URLs without throwing a play-route JavaScript `ReferenceError`.
+
+Bookmark pages now also expose
+`fetch_value(url, target, options, formatter)`,
+`stream_value(url, target, options, formatter)`, and
+`stream_data(url, target, options, formatter)` helpers so a bookmark can bind
+saved Ajax endpoints into DOM targets without hand-writing the fetch and
+render boilerplate. `stream_data()` and `stream_value()` now use
+`XMLHttpRequest` progress events for browser-visible incremental updates, so
+a saved `/ajax/...` endpoint that prints early output updates the DOM before
+the request finishes.
+
+Those helpers support plain text, JSON, and HTML output. Saved Ajax bindings
+are available after the page declares its endpoint root, so
+`$(document).ready(...)` callbacks can call helpers such as
+`fetch_value(endpoints.foo, '#foo')` on first render.
+
+For response inspection panels, place the Response Body and Response Headers
+tabs below the response `pre` box. This keeps the main response visible while
+the details remain accessible.
+
+## User CLI Extensions
+
+Unknown top-level subcommands can be provided by executable files under
+the current working directory's `./.developer-dashboard/cli` first, then the
+nearest git-backed project runtime `./.developer-dashboard/cli` when it is a
+different directory, and then `~/.developer-dashboard/cli`. For example,
+`dashboard foobar a b` will exec the first matching
+`cli/foobar` with `a b` as argv, while preserving stdin, stdout, and
+stderr.
+
+A direct custom command can also be stored as an executable
+`cli/<command>.pl`, `cli/<command>.py`, `cli/<command>.js`, `cli/<command>.go`,
+`cli/<command>.java`, `cli/<command>.sh`,
+`cli/<command>.bash`, `cli/<command>.ps1`,
+`cli/<command>.cmd`, or `cli/<command>.bat`, and
+`dashboard <command>` resolves the same logical command name to
+those files.
+
+Concrete source-backed examples:
+
+    dashboard hi
+    dashboard foo
+
+If `cli/hi.go` is executable, `dashboard hi` runs it through `go run`.
+If `cli/report.py` is executable, `dashboard report` runs it through `python`.
+
+If `cli/webhook.js` is executable, `dashboard webhook` runs it through `node`.
+If `cli/foo.java` is executable, `dashboard foo` compiles it with `javac`
+into an isolated temp directory and then runs the declared main class with
+`java`.
+
+To demonstrate a custom `update` command with a hook, create both files in a
+runtime CLI layer and then invoke the switchboard:
+
+    mkdir -p ~/.developer-dashboard/cli/update.d
+    printf '#!/usr/bin/env perl\nprint "custom update\\n";\n' > ~/.developer-dashboard/cli/update
+    chmod +x ~/.developer-dashboard/cli/update
+    printf '#!/bin/sh\nprintf "before update\\n"\n' > ~/.developer-dashboard/cli/update.d/01-log
+    chmod +x ~/.developer-dashboard/cli/update.d/01-log
+    perl -Ilib bin/dashboard update
+
+The command file is user-provided, not a built-in. The hook runs before it;
+project-local runtime layers take precedence over the home layer.
+
+If a user mistypes a command, dashboard now prints an explicit unknown-command
+error together with the closest matching public command before the usual usage
+summary. The same guidance also applies to dotted skill commands, so
+`dashboard alpha-skill.run-tset` suggests the nearest installed dotted skill
+command instead of only dumping generic help.
+
+## Built-in command help and completion
+
+Every dashboard-managed built-in command and its public actions use one help
+catalogue. Request help with `--help`, `-h`, or a trailing `help`, for
+example `d2 api add --help`, `d2 api add help`, or the global form
+`d2 help docker development enable`.
+
+The public `version` command also
+supports `d2 version --help` and global `d2 help version`. Bare `d2 help`,
+`d2 --help`, and `d2 -h` print a concise index of public built-in commands
+instead of the full module manual.
+
+Top-level TAB completion lists commands and
+dotted skill commands; path aliases are offered in the `d2 workspace
+<alias>` position instead of being mixed into the command list. Help is returned before the built-in
+command body runs, while the normal main and per-command hook order is
+preserved. The global help form and command help include actionable usage and
+the available action/options where applicable.
+
+The same catalogue supplies TAB candidates for public commands, nested actions,
+and supported option flags. Bash and zsh call the live `dashboard complete`
+helper, so their candidates stay aligned with the command catalogue rather than
+maintaining separate shell-side action lists. Existing dynamic completions for
+skills, workspace sessions, collectors, and workspace path aliases remain
+available.
+
+When a skill with the same name exists in project and home runtime
+layers, its dotted command candidates are merged from every participating
+layer and duplicate command names appear once; execution still uses the
+normal deepest-layer lookup.
+
+`cdr` TAB completion lists aliases and direct
+child directories. Each entered narrowing term descends one matching directory level before
+suggesting the next child, avoiding recursive scans of unrelated repository
+and dependency trees. When a command has a default action, the root help and completion also expose
+that action's options; for example, `d2 api --key helper-bot -o json` lists
+API keys without requiring the explicit `ls` action.
+
+`DD-OOP-LAYERS` is now the runtime contract for the whole local ecosystem.
+Starting at the home directory and walking down through every parent directory
+until the current working directory, every existing `.developer-dashboard/`
+and `.d2/` runtime directory participates. When both names exist at the same
+depth, both are searched independently; `.developer-dashboard/` has priority
+over `.d2/` at that depth and remains the write target.
+
+The deepest available
+runtime root is the write target, but bookmarks, `nav/*.tt`, config,
+collectors, indicators, auth/session state lookups, runtime
+`local/lib/perl5`, Docker Compose service folders, skills, and custom CLI
+hooks are inherited across the full chain instead of only a single
+project-or-home split.
+
+Per-command hooks can live in `cli/<command>` or
+`cli/<command>.d` at each runtime layer, from home to the current
+directory.
+
+Executable hooks run in sorted order within each layer. Layers run from home
+to the deepest active directory, and non-executable files are skipped.
+
+Hook output streams to the terminal and is also accumulated as JSON in
+`RESULT`.
+
+If that JSON grows too large for a safe
+`exec()` environment, `dashboard` spills it into `RESULT_FILE` and
+`Developer::Dashboard::Runtime::Result` reads the same logical payload from
+there so later hooks and the final command still see the same result set
+without tripping `Argument list too long`. Built-in commands such as `dashboard jq`
+use the same hook directory.
+
+A
+directory-backed custom command can provide its real executable as
+`~/.developer-dashboard/cli/<command>/run`, and that runner receives
+the final `RESULT` plus `LAST_RESULT` environment variables.
+
+After each hook
+finishes, the updated `RESULT` JSON is written back into the environment
+before the next sorted hook starts, and `LAST_RESULT` is rewritten to the
+structured result for the hook that just ran, so later hook scripts can react
+to earlier hook output and also inspect the immediate previous hook in a stable
+shape. `LAST_RESULT` carries `file`, `exit`, `STDOUT`, and `STDERR`.
+
+Only an explicit `[[STOP]]` marker in one hook's `stderr` stops the
+remaining hook files for that command. A non-zero exit code alone is still
+recorded, but it does not skip later hooks.
+
+Executable `.py` hook files and
+direct `.py` custom commands run through `python`. Executable `.js` hook files and
+direct `.js` custom commands run through `node`.
+
+Executable `.go` hook files and
+direct `.go` custom commands run through `go run`. Executable `.java`
+hook files and direct `.java` custom commands are compiled with `javac`
+into an isolated temp directory and then run through `java` using the
+declared main class from the source file.
+
+Perl hook code can use `Runtime::Result` to decode `RESULT` safely, read the
+immediate `last_result`, and inspect per-hook `stdout`, `stderr`, exit
+codes, or the last recorded hook entry.
+If a Perl-backed command wants a compact final summary after its hook files
+run, it can also call `Developer::Dashboard::Runtime::Result->report()` to print a simple
+success/error report for each sorted hook file.
+
+### Layered Env Files
+
+Environment files are part of the same `DD-OOP-LAYERS` contract.
+When `dashboard ...` runs, it loads every participating plain-directory env
+file and runtime-layer env file from root to leaf before command hooks,
+custom commands, or built-in helpers execute.
+
+That ordered runtime pass loads, when present:
+
+- `<root>/.env`
+- `<root>/.env.pl`
+- each deeper ancestor directory `.env`
+- each deeper ancestor directory `.env.pl`
+- each participating `.developer-dashboard/.env` and `.d2/.env`
+- each participating `.developer-dashboard/.env.pl` and `.d2/.env.pl`
+
+Deeper files win because later layers overwrite earlier keys. Plain `.env`
+files must contain explicit `KEY=VALUE` lines, and the load order at one
+directory is always `.env` first and then `.env.pl`. Plain `.env` parsing
+ignores blank lines, whole-line `#` comments, whole-line `//` comments, and
+`/* ... */` block comments that can span multiple lines. Plain `.env`
+values also support:
+
+- leading `~` expansion to `$HOME`
+- `$NAME` expansion from the current effective environment
+- `${NAME:-default}` expansion with a fallback value
+- `${Namespace::function():-default}` expansion through a static Perl function
+
+Expansion can see system env keys, values loaded from earlier layers, and
+values assigned by earlier lines in the same `.env` file. Missing functions,
+malformed lines, malformed keys, and unterminated block comments fail
+explicitly instead of being skipped silently. Executable logic can live in
+`.env.pl`, which is run directly and may set `%ENV` programmatically.
+
+Skill-local env files are loaded only when a skill command or skill hook is
+actually running. A normal non-skill command inherits only the root-to-leaf
+runtime env chain. For a skill command, home-level runtime env files load
+first as defaults, then each participating skill root loads from the base
+installed skill layer to the deepest matching child skill layer, applying:
+
+- `<skill-root>/.env`
+- `<skill-root>/.env.pl`
+
+Skill `.env` and `.env.pl` values override matching values from the home
+runtime. Skill `cli/.env` and `cli/.env.pl` values are applied after the skill
+root files.
+
+Any deeper project runtime layers are applied last, so the nearest
+project runtime still has final precedence among file-based values. Values
+explicitly inherited from the invoking shell have highest precedence and are
+preserved across every env-file layer; a file may populate a variable that the
+caller did not set, but cannot replace an exported caller value.
+
+Skill
+overrides stay isolated to the skill execution path and do not leak into
+unrelated commands.
+
+The runtime chain is collected from the DD-OOP layers rooted at the current
+working directory, walking its existing parent directories toward the leaf.
+For skill execution, the home runtime portion is applied before the skill
+chain and deeper runtime layers after it. Therefore a nested command such as
+`d2 foo.bar.bob` receives home defaults, then the `foo` and `bar` skill
+overrides, then any nearer project runtime values.
+
+For nested skill commands such as `dashboard foo.bar.zzz.show`, the skill env
+chain expands from the root nested skill to the leaf skill before the command
+runs:
+
+- `skills/foo/.env`
+- `skills/foo/skills/bar/.env`
+- `skills/foo/skills/bar/skills/zzz/.env`
+
+If a deeper nested skill overrides the same key, the parent value is preserved
+under that parent skill alias before the deeper skill replaces the plain key.
+For example, if all three nested skills assign `VERSION`, the leaf command
+sees `VERSION` from `zzz`, `foo_VERSION` from `foo`, and
+`foo_bar_VERSION` from `foo.bar`.
+
+The Docker Compose resolver also loads `<skill-root>/.env` for each installed
+skill whose `config/docker/<service>/compose.yml` or
+`config/docker/<service>/development.compose.yml` file actually participates in
+the resolved compose stack. A service's `compose.yml` is its base and is loaded
+whenever present; `development.compose.yml` is loaded afterward only while the
+service's `develop.yml` marker is enabled.
+
+That compose-only skill env layer
+stays isolated to the compose resolver, respects disabled skills, and does not
+execute `<skill-root>/.env.pl`.
+
+Nested skill compose services use that same
+root-to-leaf env expansion, so a participating leaf service such as
+`skills/foo/skills/bar/skills/zzz/config/docker/zzz/compose.yml` loads the
+env chain from `foo` to `foo.bar` to `foo.bar.zzz` and preserves parent
+overrides under aliases such as `foo_VERSION` and `foo_bar_VERSION`.
+
+Perl code can inspect where a dashboard-managed env key came from with
+`Developer::Dashboard::EnvAudit`.
+
+Single-key lookup:
+
+    use Developer::Dashboard::EnvAudit;
+
+    my $entry = Developer::Dashboard::EnvAudit->key('FOO');
+
+That returns either `undef` for normal system env keys or a hashref like:
+
+    {
+        value   => 'bar',
+        envfile => '/full/path/to/.env',
+    }
+
+Full inventory lookup:
+
+    my $all = Developer::Dashboard::EnvAudit->keys;
+
+The audit records only dashboard-loaded env keys. System-provided keys that
+did not come from a dashboard-managed `.env` or `.env.pl` file are left
+untracked on purpose.
+
+For example, a layered `.env` file can now look like:
+
+    # root defaults
+    ROOT_CACHE=~/cache
+    API_BASE=https://example.test
+    TOKEN=${ACCESS_TOKEN:-anonymous}
+    MESSAGE=${Local::Env::Helper::message():-hello}
+
+    /*
+    child layers can still override
+    any value later in the root-to-leaf chain
+    */
+    CHAINED=$ROOT_CACHE/$TOKEN
+
+A separate mechanism, `# include <skill.path>`, pulls another
+skill's own `.env`/`.env.pl` in by name rather than by layer position -
+see ["EMBEDDING IN PERL CODE"](#embedding-in-perl-code) for `env->include(...)`, its `.env.pl`
+counterpart.
+
+## Open File Commands
+
+`dashboard of` is the shorthand name for `dashboard open-file`.
+
+These commands support:
+
+- direct file paths
+- `file:line` references
+- Perl module names such as `My::Module`, resolved against every directory in
+the running Perl's `@INC`
+- Java class names such as `com.example.App` or `javax.jws.WebService`
+- recursive regex searches inside a resolved directory alias or path
+- recursive content searches with `dashboard of grep -nr <pattern>
+<directory>`
+
+Without `--print`, `dashboard of` and `dashboard open-file` now behave like
+the older picker workflow again: one unique match opens directly in
+`--editor`, `VISUAL`, `EDITOR`, or `vim` as the final fallback, and
+multiple matches render a numbered prompt. At that prompt you can press Enter
+to open all matches with `vim -p`, type one number to open one file, type comma-separated
+numbers such as `1,3`, or use a range such as `2-5`.
+
+Scoped searches also
+rank exact helper/script names before broader regex hits, so
+`dashboard of . jq` lists `jq` and `jq.js` ahead of `jquery.js`.
+
+Every
+scoped search token is treated as a case-insensitive regex, so
+`dashboard of . 'Ok\.js$'` matches `ok.js` but not `ok.json`. Content grep passes arguments directly to the system `grep` executable (no
+shell expansion), adds filename and line-number output for reliable file
+selection, then opens the unique matching files using the same chooser. Add
+`--print` before `grep` to print the unique paths without opening an editor.
+
+Java class lookup first checks live `.java` files under the current project,
+workspace roots, and `@INC`-adjacent source trees. If no live source file
+exists, it also searches local source archives such as `-sources.jar`,
+`-src.jar`, `src.zip`, `war`, and `jar` files under the current roots,
+`~/.m2/repository`, Gradle caches, and `JAVA_HOME`.
+
+When a local archive
+still does not provide the requested class, the helper can fetch a matching
+Maven source jar, cache it under
+`~/.developer-dashboard/cache/open-file/`, and then open the extracted Java
+source.
+
+## Data Query Commands
+
+These built-in commands parse structured text and can then either extract a
+dotted path or evaluate a Perl expression against the decoded document through
+`$d`:
+
+- `dashboard jq [path] [file]` for JSON
+- `dashboard yq [path] [file]` for YAML
+- `dashboard tomq [path] [file]` for TOML
+- `dashboard propq [path] [file]` for Java properties
+- `dashboard iniq [path] [file]` for INI
+- `dashboard csvq [path] [file]` for CSV
+- `dashboard xmlq [path] [file]` for XML
+
+If the selected value is a hash or array, the command prints canonical JSON.
+If the selected value is a scalar, it prints the scalar plus a trailing
+newline.
+
+The file path and query text are order-independent, and `$d` selects the
+whole parsed document. For example, `cat file.json | dashboard jq '$d'` and
+`dashboard jq file.json '$d'` return the same result.
+
+If the query text uses
+`$d` inside a Perl expression, the command evaluates that expression against
+the decoded document. For example, `echo '{"foo":[1],"bar":[2]}' | dashboard
+jq 'sort keys %$d'` prints `["bar","foo"]`.
+
+The same contract applies to
+`yq`, `tomq`, `propq`, `iniq`, `csvq`, and `xmlq`.
+
+`xmlq` follows the same decoded-data model as the other query commands. XML
+elements decode into nested hashes and arrays, repeated sibling tags become
+arrays, attributes live under `_attributes`, and mixed text lives under
+`_text`. That means `printf '<root`&lt;value>demo&lt;/value>&lt;/root>' | dashboard
+xmlq root.value> prints `demo`, while `dashboard xmlq feed.xml '$d'` prints
+the full decoded XML tree as canonical JSON.
+
 # FAQ
 
 ## Is this tied to a specific company or codebase?
 
 No. The core distribution is intended to be reusable for any project.
 
-## Where should project-specific behavior live?
+## Where should project-specific behaviour live?
 
 In configuration, saved pages, and user CLI extensions. The core should stay generic.
 
@@ -3410,7 +3238,7 @@ as the Java source lookup or mirror path behind `dashboard of` and
 Perl code that wants the same runtime the `dashboard`/`d2` command line
 resolves - a configured path alias, or the output of any other subcommand -
 does not need to build a path registry, file registry, and config loader by
-hand. `use Developer::Dashboard` exports `d2()`, a memoized runtime handle
+hand. `use Developer::Dashboard` exports `d2()`, a memoised runtime handle
 scoped to the current working directory:
 
     use Developer::Dashboard;
@@ -3425,10 +3253,14 @@ scoped to the current working directory:
 prints. Any other bareword method name starts a **lazy chain** that mirrors
 the CLI's own dotted dispatch at arbitrary depth - `d2->foo->bar->()`
 runs `dashboard foo.bar` - and **nothing executes until the chain is
-terminated with a call**, the trailing `->()`. An un-terminated chain is
+terminated with a call**, the trailing `->()`.
+
+An un-terminated chain is
 inert in boolean, numeric and string context, and stringifies to something
 obviously non-executing such as `d2 proxy: foo.bar`, so a stray debug print
-cannot run a command. `d2->run(...)` remains available and takes its
+cannot run a command.
+
+`d2->run(...)` remains available and takes its
 words as separate arguments. Output is decoded from
 JSON into a real Perl structure automatically when it looks like JSON,
 otherwise returned as plain text; a failing subcommand raises an exception
@@ -3452,9 +3284,87 @@ Unlike `d2`, `env` cannot be a plain exported sub: Perl resolves a bareword
 immediately before `->` as a literal package name at parse time
 regardless of any same-named sub, so `env` is a real second package declared
 inside this file - loading `Developer::Dashboard` is what makes it
-available, the same practical effect as `d2`'s own export. See ["Layered
+available, the same practical effect as `d2`'s own export.
+
+See ["Layered
 Env Files"](#layered-env-files) for the `.env`-file-native `# include <skill.path>`
 directive this method mirrors.
+
+# MAINTAINER GUIDE
+
+Build, change, and verify the project using these contributor notes.
+
+## Local Development
+
+Follow `CONTRIBUTING.pod` for the complete contributor workflow.
+
+Build a distribution archive:
+
+    dzil clean
+    dzil build
+
+Run the checkout's command line interface:
+
+    perl -Ilib bin/dashboard help
+    perl -Ilib bin/dashboard version
+
+When documentation changes, regenerate this README from the main POD:
+
+    script/sync-readme-from-pod
+
+## Testing And Coverage
+
+### Test suite
+
+Run the full Perl test suite from the repository root:
+
+    prove -lr t
+
+The maintained end-to-end scenario plan defines expected routes, inputs, and
+outputs. Hosted workflows provide additional platform checks and packaging
+verification.
+
+### Library coverage
+
+Install Devel::Cover into the local development library and run the repository
+gate:
+
+    cpanm --no-wget --notest --local-lib-contained ./.perl5 Devel::Cover
+    export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
+    export PATH="$PWD/.perl5/bin:$PATH"
+    perl script/coverage-gate
+
+The gate requires 100.0% statement, subroutine, branch, and condition coverage
+for `lib/`. A passing run exits with status `0`. Run one coverage job at a
+time on a host.
+
+### Integration and release checks
+
+For an installed-package check in a blank environment, run:
+
+    integration/blank-env/run-host-integration.sh
+
+After building a distribution, check its release metadata and kwalitee with:
+
+    prove -lv t/36-release-kwalitee.t
+
+Security-sensitive changes require the OWASP ASVS 5.0 review and a cross-check
+against the OWASP Top 10, alongside repository security checks. The full
+contribution and release sequence is documented in the contributor guide.
+
+Push a `vX.XX` tag so the tag-triggered GitHub release workflow runs. It
+publishes tarball, checksum, and detached signature assets. The release also
+publishes a `.intoto.jsonl` provenance asset; build provenance, not merely a
+signature, is required for the Signed-Releases Scorecard check.
+
+Do not treat Scorecard as a pre-commit local gate. Finish local tests,
+documentation, security, coverage, and packaging checks, then commit and push
+with the authenticated `git-push-mf` helper before running live Scorecard.
+For repository-fixable findings, repeat the sequence fix -> test -> commit -> push -> rerun scorecard until the checks pass.
+
+Run numeric coverage QA after the normal `prove -lr t` test gate. It applies
+to every change, not only releases; the target is 100.0 on all four metrics:
+statement, branch, condition, and subroutine coverage for `lib/`.
 
 # SEE ALSO
 
@@ -3467,17 +3377,17 @@ directive this method mirrors.
 
 Developer Dashboard Contributors
 
-# LICENSE
+# LICENCE
 
 This library is free software; you can redistribute it and/or modify it under
-the terms of the MIT license. The repository root `LICENSE` file carries the
-canonical MIT text used for repository metadata, GitHub license detection, and
+the terms of the MIT licence. The repository root `LICENSE` file carries the
+canonical MIT text used for repository metadata, GitHub licence detection, and
 distribution packaging.
 
-Like most widely used open-source licenses, those license texts include strong
+Like most widely used open-source licences, those licence texts include strong
 disclaimers. In practical terms the software is provided `"as is"`, no
 warranty is given, and the authors are not accepting liability for damages
 caused by somebody using the free software wrongly or suffering a problem on
-their own side. That license disclaimer is the main baseline protection for
+their own side. That licence disclaimer is the main baseline protection for
 normal open-source distribution, although it is not unlimited and local law
 can still matter.

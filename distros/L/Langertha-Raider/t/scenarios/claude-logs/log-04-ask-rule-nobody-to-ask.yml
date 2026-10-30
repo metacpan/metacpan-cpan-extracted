@@ -1,0 +1,27 @@
+# Real pattern: a settings "ask" rule on pushing, in a run nobody can approve
+# (headless -p); the model tries ask_user first, is told nobody is there, tries
+# the push, is refused with the rule, and finishes locally only.
+title: an ask rule with nobody to approve refuses with the reason; ask_user without a person says so
+permission_mode: default
+files:
+  .claude/settings.json: '{ "permissions": { "allow": [ "Bash(echo:*)" ], "ask": [ "Bash(echo push:*)" ] } }'
+prompt: Publish the change.
+script:
+  - tool_calls:
+      - [ ask_user, { question: 'Push to the remote now?', options: [ 'Yes, push', 'No, keep it local' ] } ]
+  - tool_calls:
+      - [ bash, { command: echo push origin main > pushed.txt } ]
+      - [ bash, { command: echo push dry-run } ]
+  - tool_calls:
+      - [ bash, { command: echo local only } ]
+  - text: Not pushed; nobody could approve it.
+expect:
+  answer: "Not pushed; nobody could approve it."
+  absent: [ pushed.txt ]
+  tools:
+    - { name: ask_user, error: true, text: 'not interactive.*Decide yourself' }
+    - { name: bash, error: true, text: "nobody can approve it" }
+    - { name: bash, error: true, text: "rule 'Bash\\(echo push:\\*\\)' from \\.claude/settings\\.json asks before this call; nobody can approve it" }
+    - { name: bash, text: 'local only' }
+  events:
+    - { type: permission.denied, tool: bash, by: noninteractive }

@@ -168,13 +168,13 @@ my %WriteMakefileArgs = (
         {
             repository =>
             {
-                url  => 'git@gitlab.com:jackdeguest/DateTime-Lite.git',
-                web  => 'https://gitlab.com/jackdeguest/DateTime-Lite',
+                url  => 'git@gitlab.com:deguest/DateTime-Lite.git',
+                web  => 'https://gitlab.com/deguest/DateTime-Lite',
                 type => 'git',
             },
             bugtracker =>
             {
-                web => 'https://gitlab.com/jackdeguest/DateTime-Lite/issues',
+                web => 'https://gitlab.com/deguest/DateTime-Lite/issues',
             },
         },
         x_contributors => [],

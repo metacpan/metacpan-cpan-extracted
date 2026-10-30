@@ -4,6 +4,13 @@ use Test::More;
 
 use Redis::Namespace;
 
+# an object that is stringified to the given value
+{
+    package StringifiedObject;
+    use overload '""' => sub { ${$_[0]} }, fallback => 1;
+    sub new { my ($class, $value) = @_; bless \$value, $class }
+}
+
 subtest 'simple' => sub {
     my $ns = Redis::Namespace->new(redis => bless({},'FakeRedis'), namespace => 'ns');
 
@@ -21,7 +28,24 @@ subtest 'simple' => sub {
         bless({},'SomeClass'),
     );
     is_deeply [$ns->add_namespace($obj1, $obj2)],
-        [$obj1, $obj2], 'others';
+        ["ns:$obj1", "ns:$obj2"], 'others';
+};
+
+subtest 'false values' => sub {
+    my $ns = Redis::Namespace->new(redis => bless({},'FakeRedis'), namespace => 'ns');
+
+    is_deeply [$ns->add_namespace('0', 0, '')],
+        ['ns:0', 'ns:0', 'ns:'], 'non ref';
+    is_deeply [$ns->add_namespace(\'0', \'')],
+        [\'ns:0', \'ns:'], 'scalar ref';
+    is_deeply [$ns->add_namespace(['0', 0, ''])],
+        [['ns:0', 'ns:0', 'ns:']], 'array ref';
+    is_deeply [$ns->add_namespace({ '0' => 1, '' => 2 })],
+        [{ 'ns:0' => 1, 'ns:' => 2 }], 'hash ref';
+    is_deeply [$ns->add_namespace(StringifiedObject->new('0'), StringifiedObject->new(''))],
+        ['ns:0', 'ns:'], 'objects';
+    is_deeply [$ns->add_namespace(undef)],
+        [undef], 'undef';
 };
 
 subtest 'included special chars' => sub {
@@ -41,7 +65,7 @@ subtest 'included special chars' => sub {
         bless({},'SomeClass'),
     );
     is_deeply [$ns->add_namespace($obj1, $obj2)],
-        [$obj1, $obj2], 'others';
+        ["ns;.+\":$obj1", "ns;.+\":$obj2"], 'others';
 };
 
 done_testing;

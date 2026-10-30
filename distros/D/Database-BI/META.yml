@@ -52,6 +52,7 @@ requires:
   File::Temp: '0.22'
   HTML::D3: '0.23'
   HTML::TableExtract: '0'
+  HTML::TagCloud: '0.38'
   HTTP::Request: '0'
   IPC::System::Simple: '0'
   LWP::UserAgent: '0'
@@ -61,6 +62,7 @@ requires:
   Mojo::Base: '0'
   Mojo::JSON: '0'
   Mojolicious: '9.49'
+  Mojolicious::Plugin::Buffer: '0'
   Mojolicious::Plugin::TemplateToolkit: '0'
   Net::SFTP::Foreign: '0'
   POSIX: '0'
@@ -71,10 +73,11 @@ requires:
   Socket: '2.010'
   Spreadsheet::ParseXLSX: '0'
   Sub::Protected: '0.03'
-  perl: '5.020000'
+  Text::CSV: '0'
+  perl: '5.028000'
   version: '0.77'
 resources:
   bugtracker: https://github.com/nigelhorne/Database-BI/issues
   repository: https://github.com/nigelhorne/Database-BI.git
-version: 0.017.1
+version: 0.018.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

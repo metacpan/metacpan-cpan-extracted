@@ -152,12 +152,12 @@ STUB
     like( $@, qr/stub failure detail/, 'AC-8: and stderr is attached to the die message' );
 }
 
-# Coverage: new() with no explicit cwd falls back to Cwd::cwd() - exercises
+# Coverage: new() with no explicit cwd uses the shared current-directory lookup - exercises
 # the "defined-or fell through" leg that every other test in this file
 # avoids by always passing cwd explicitly.
 {
     my $handle = Developer::Dashboard::Handle->new;
-    is( $handle->{cwd}, getcwd(), 'new() with no cwd falls back to Cwd::cwd()' );
+    is( $handle->{cwd}, getcwd(), 'new() with no cwd uses the shared current-directory lookup' );
 }
 
 # Coverage: run() validates its own subcommand argument - both the "missing

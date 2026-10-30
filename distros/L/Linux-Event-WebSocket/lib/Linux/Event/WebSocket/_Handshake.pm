@@ -8,7 +8,7 @@ use Digest::SHA qw(sha1);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use URI ();
 
-use Linux::Event::HTTP::Request;
+use Uniform::HTTP::Request;
 use Linux::Event::WebSocket::_Random;
 
 my $GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -221,7 +221,7 @@ sub client_request ($class, $url, %option) {
     push @http_headers, [ Origin => "$origin" ] if defined $origin;
     push @http_headers, @extra;
 
-    my $request = Linux::Event::HTTP::Request->new(
+    my $request = Uniform::HTTP::Request->new(
         method  => 'GET',
         target  => $target,
         version => '1.1',

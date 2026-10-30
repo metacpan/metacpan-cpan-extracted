@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class', 'experimental::try', 'recursion';
 #
-class Acme::Parataxis::Channel v0.1.1 {
+class Acme::Parataxis::Channel v0.1.3 {
     use Acme::Parataxis qw[fiber await_sleep];
     use Acme::Parataxis::CancellationToken;
     use Acme::Parataxis::Semaphore;

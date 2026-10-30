@@ -435,6 +435,24 @@ Uzbek Latin locale.
    1995-12-22T09:05:02 = Jum, 22-dek, milodiy 1995
   -0010-09-15T04:44:23 = Shan, 15-sen, m.a. -10
 
+=head3 GyMMMM (MMMM, G y)
+
+   2008-02-05T18:30:30 = fevral, milodiy 2008
+   1995-12-22T09:05:02 = dekabr, milodiy 1995
+  -0010-09-15T04:44:23 = sentabr, m.a. -10
+
+=head3 GyMMMMEd (E, d-MMMM, G y)
+
+   2008-02-05T18:30:30 = Sesh, 5-fevral, milodiy 2008
+   1995-12-22T09:05:02 = Jum, 22-dekabr, milodiy 1995
+  -0010-09-15T04:44:23 = Shan, 15-sentabr, m.a. -10
+
+=head3 GyMMMMd (d-MMMM, G y)
+
+   2008-02-05T18:30:30 = 5-fevral, milodiy 2008
+   1995-12-22T09:05:02 = 22-dekabr, milodiy 1995
+  -0010-09-15T04:44:23 = 15-sentabr, m.a. -10
+
 =head3 GyMMMd (d-MMM, G y)
 
    2008-02-05T18:30:30 = 5-fev, milodiy 2008
@@ -506,6 +524,12 @@ Uzbek Latin locale.
    2008-02-05T18:30:30 = Sesh, 5-fev
    1995-12-22T09:05:02 = Jum, 22-dek
   -0010-09-15T04:44:23 = Shan, 15-sen
+
+=head3 MMMMEd (E, d-MMMM)
+
+   2008-02-05T18:30:30 = Sesh, 5-fevral
+   1995-12-22T09:05:02 = Jum, 22-dekabr
+  -0010-09-15T04:44:23 = Shan, 15-sentabr
 
 =head3 MMMMW-count-one (MMMM, W-'hafta')
 
@@ -620,6 +644,18 @@ Uzbek Latin locale.
    2008-02-05T18:30:30 = fevral, 2008
    1995-12-22T09:05:02 = dekabr, 1995
   -0010-09-15T04:44:23 = sentabr, -10
+
+=head3 yMMMMEd (E, d-MMMM, y)
+
+   2008-02-05T18:30:30 = Sesh, 5-fevral, 2008
+   1995-12-22T09:05:02 = Jum, 22-dekabr, 1995
+  -0010-09-15T04:44:23 = Shan, 15-sentabr, -10
+
+=head3 yMMMMd (d-MMMM, y)
+
+   2008-02-05T18:30:30 = 5-fevral, 2008
+   1995-12-22T09:05:02 = 22-dekabr, 1995
+  -0010-09-15T04:44:23 = 15-sentabr, -10
 
 =head3 yMMMd (d-MMM, y)
 

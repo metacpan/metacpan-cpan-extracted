@@ -1,5 +1,858 @@
 Revision history for Stats-LikeR
 
+0.3413 2026-10-29 CDT (Claude Opus 5.5 helped)
+
+ [Build: gcc 13 and 14 at -O3]
+
+ - hist() gives finite midpoints again when built with gcc 13 or 14 at -O3,
+   for data whose range is wider than the largest double. Two finite breaks
+   whose sum overflows were found by testing the overflowed midpoint for Inf
+   and then halving each break first; gcc's predictive commoning and jump
+   threading together turned that test into an assumption that the next
+   break was +Inf, so the following midpoint came back Inf. A Cygwin perl
+   5.44.0 smoker of 0.3412 (gcc 14.4.0, -O3) failed 6 subtests of
+   t/hist.R.t this way, and gcc-13 and gcc-14 at -O3 reproduce all 6 here.
+   The halved form is now chosen from the breaks' own magnitudes, above
+   NV_MAX / 2, where halving is exact, so the result equals R's wherever
+   R's is finite.
+
+ - The other overflow tests of the same shape no longer give gcc anything
+   to reason back from: median()'s halved pair, now chosen from the pair's
+   magnitudes as hist()'s is, and the finiteness tests on to - from in
+   seq(), on the range in pretty() and its break fill, and on a + b in the
+   incomplete beta, each of which falls back on its operands. Those four
+   test the difference through a volatile, as pretty()'s nu loop has since
+   0.3412. None of them miscompiles under gcc 13 or 14 at -O3 here, but each
+   has the shape that did, and the next gcc need not spare them.
+
+0.3412 2026-10-29 CDT (Claude Opus 5.5 helped)
+
+ [Build: gcc 15.2.0]
+
+ - hist() gives R's breaks again when built with gcc 15.2.0, for data whose
+   range is wider than the largest double. pretty() steps its bounds back
+   from an overflowed product with R's own `while (!finite(nu * unit))
+   nu--`, and gcc 15.2.0 (not 15.1 or 15.3) miscompiles that at -O2 and
+   -O3: the loop stopped one step low, so hist([1.7e308, -1.7e308]) came
+   back with one interval where R has two, and breaks of 0 and 0. A perl
+   5.44.0 smoker of 0.3411 failed 124 subtests of t/hist.R.t this way. The
+   product now passes through a volatile, which keeps gcc from reasoning
+   back from it to nu; the arithmetic is R's as before. The fault was
+   reproduced with the function extracted, on Compiler Explorer's gcc 15.2.
+
+0.3411 2026-10-28 CDT (Claude Opus 5.5 helped)
+
+ [Build]
+
+ - It builds on Cygwin again. 0.341 declared the warning catcher that
+   csort() installs to find which rows its comparator reads undef from as
+   `static XS()`, so that it would not be exported; on Cygwin, XS() is
+   XS_EXTERNAL and carries __declspec(dllexport), which gcc refuses on a
+   static function ("external linkage required for symbol
+   'cs_uninit_catcher' because of 'dllexport' attribute"). It is now
+   declared XS_INTERNAL, perl's own static XSUB, with a fallback copied from
+   XSUB.h for perls before 5.15.2, which do not have it and get no help from
+   ppport.h.
+
+ [Windows: three-digit exponents]
+
+ - value_counts() keys a number the way perl stringifies it on Windows
+   perls built against MSVCRT, such as Strawberry 5.24. Its fast renderer
+   for doubles, also used by drop_duplicates() and merge(), always wrote a
+   two-digit exponent (1e+20), while perl's %g there is the CRT's and writes
+   three (1e+020), so such numbers were counted under keys perl would never
+   produce. The fast path is now taken only when perl itself writes 1e20 as
+   1e+20, and perl's own stringification is used otherwise.
+
+ - t/power_t_test.R.scipy.t takes the 1e+07 in an expected croak message
+   from perl's own %g rather than hardcoding it, since that message is
+   formatted by perl and reads 1e+007 on the same perls.
+
+0.341 2026-10-26 CDT (Claude Opus 5.5 helped)
+
+ [write_table: workbooks of several worksheets]
+
+ - write_table(\%book, 'out.xlsx') writes a hash of data frames as one
+   workbook, a worksheet per key, the keys sorted as a HoH's rows are. A
+   sheet is any frame but a flat hash (AoH, AoA, HoA, HoH), or an empty []
+   or {}; col_names, row_names, undef_val, xlsx_comment and the freeze
+   options apply to every sheet. It is the shape read_table returns for a
+   workbook of several sheets, so the two round-trip. Up to 0.34 such a hash
+   was taken for a HoA or HoH and refused: "Cannot write nested reference
+   types to table". The sheets are streamed one after another, as the single
+   worksheet was, so only the one being written is in memory; a single
+   table's workbook is byte for byte what 0.34 wrote.
+
+ - A hash is a workbook when any of its values is a data frame, an array or
+   hash whose first defined element is a reference. Every other value must
+   then be a frame or empty, and a column or scalar beside a frame is refused
+   naming both keys. A workbook written to anything but .xlsx, or with
+   xlsx_sheet, is refused. Errors and warnings about one sheet name it:
+   "write_table: sheet 'AUR1': ...". A tied sheet is not looked into, so
+   that no value of it is FETCHed twice; a hash whose sheets are all tied is
+   still read as a HoA or HoH.
+
+ - Each key is checked as a sheet name before the file is opened, and two
+   keys the same with case ignored (Sheet1, sheet1) are refused, as
+   Excel::Writer::XLSX 1.15 and XlsxWriter 1.3.9 refuse them; case is folded
+   with perl's lc(), as Excel::Writer::XLSX folds it. A name starting or
+   ending with an apostrophe, which Excel refuses, is now refused for
+   xlsx_sheet too. t/write_table.xlsx.book.t takes its cases from pandas
+   3.0.4's test_creating_and_reading_multiple_sheets and test_sheets and
+   from Excel::Writer::XLSX 1.15's workbook_check_sheetname.t.
+
+ [write_table: who wrote a workbook, and with what]
+
+ - An .xlsx workbook's document comments (dc:description) now record the
+   login name, the host name, the perl version and the Stats::LikeR version,
+   one "user:", "host:", "perl:" and "Stats::LikeR:" line each, between the
+   "written by <cwd>/<script>" line and any xlsx_comment. The login name is
+   also the Author and Last modified by fields (dc:creator,
+   cp:lastModifiedBy), which up to 0.34 were always Stats::LikeR and still
+   are when no name can be found. The names come from getpwuid(), getlogin()
+   and then $ENV{USER}, USERNAME or LOGNAME, and from Sys::Hostname, all
+   looked up in perl so that Windows, where getpwuid() is unimplemented, is
+   covered; a name not found is left out rather than guessed.
+
+ - A login name, host name or directory whose bytes are valid UTF-8 is read
+   as UTF-8, and any other as Latin-1. Taking all of them for Latin-1 wrote a
+   UTF-8 login name "josé" as "JosÃ©".
+
+ - write_table() leaves the caller's $@ alone. An .xlsx write cleared it,
+   through the evals that look up the login and host names, and so did the
+   first .tex or .xlsx write of a program, through those Cwd.pm runs as it
+   loads.
+
+ [write_table: sheet names XML cannot hold]
+
+ - A sheet name holding a character XML 1.0 cannot hold (a control
+   character other than tab and newline, U+FFFE, U+FFFF or a surrogate) is
+   refused, naming the character. It used to be dropped from workbook.xml
+   after the checks had passed, so "a\x01" beside "a" wrote two sheets named
+   "a", which Excel cannot open, and "\x02" a sheet with an empty name; a
+   surrogate died inside lc() with "Operation "lc" returns its argument for
+   UTF-16 surrogate". xlsx_comment still drops such characters.
+
+ - The 31-character limit on a sheet name counts UTF-16 code units, as Excel
+   does, so a character above U+FFFF, such as an emoji, counts two. Sixteen
+   emoji used to pass without the warning.
+
+ [oneway_test and p_adjust: a tied cell that changes the frame]
+
+ - Both functions size a buffer in one pass over the frame and fill it in a
+   second, and a tied cell's FETCH runs in the second. A FETCH that grew a
+   later group made oneway_test() write past the end of its buffer: the
+   process aborted with "malloc(): unaligned tcache chunk detected" for an
+   array of groups, and the heap was corrupted silently for a hash of groups.
+   Each group and formula column is now held and read only to the length the
+   first pass measured.
+
+ - A FETCH that replaced a p_adjust() row with a number segfaulted, and one
+   that shrank a row left the adjusted values written through uninitialised
+   pointers. The frame, its rows and columns and their values are now held,
+   and every row and column is checked again: one that was replaced, grew or
+   shrank croaks "the data frame changed while it was being read", and one
+   merely deleted is read as it was. t/tied_cell.mutation.t covers every
+   shape.
+
+ - The same sweep found nine more functions that read a row, column, cell
+   or key of the caller's frame through a pointer taken before user code ran
+   -- a tied cell's FETCH, or a group_by() filter or filter() closure -- and
+   that code could free it. write_table() segfaulted on an AoA row and on a
+   HoH row that stopped being a hash; group_by() died "panic: attempt to copy
+   freed scalar" or "Bizarre copy of ARRAY"; cor(), cov(), cor_test(), agg(),
+   merge(), ljoin() and filter() read freed memory that valgrind reported.
+   Each now holds what it borrows for as long as it reads it, so it sees
+   the frame as it was when it took it; write_table() croaks "the data
+   frame changed while it was being written" where a row it checked is no
+   longer one. cor()'s matrix rows, which a comment had left unheld as not
+   worth nrows refcount pairs, are held in one mortal array. cor_test() also
+   fetched y's cell before reading x's, so a FETCH on x that grew y left the
+   pointer in y's old storage, and the array scan behind cor(), cov() and
+   quantile() now stops at the array's current end, not the length it was
+   given.
+
+ - Every XSUB now holds the arrays and hashes its reference arguments refer
+   to, until the statement that called it is over. Perl's argument stack
+   holds no references, so a FETCH or callback that did `undef $x` on the
+   caller's only reference freed the array an XSUB was reading, in any of
+   the module's functions. dXSARGS, which opens every XSUB, is redefined to
+   take the holds, so a new XSUB gets them too. It costs about 4.5 ns a
+   call, measured on 4 million calls of mean() of three numbers and
+   dftype(); a call doing real work does not show it.
+
+0.34 2026-10-21 CDT (Claude Opus 5.5 helped)
+
+ [New function: dftype]
+
+ - dftype($data) names the shape of a structure: AoA, AoH, HoA or HoH for
+   the four data frame shapes, array or hash for any other container, scalar
+   or undef for a value, and the referent's type, as ref() gives an unblessed
+   one, for any other reference. It is in XS and checks every element up to
+   the first that does not fit, so [ [1], { a => 1 } ] is an array rather
+   than the AoA its first row suggests. undef elements are passed over, a
+   blessed container counts as what it is, a tied one by what it fetches,
+   and a qr// is REGEXP on 5.10 as well. t/dftype.t covers every row of the
+   table in its documentation, the call-form error and the leak checks.
+
+ [Shape detection in XS]
+
+ - _df_shape(), which every frame function written in Perl calls to tell
+   an AoA, AoH, HoA or HoH apart (colnames, rownames, select_cols,
+   drop_cols, rename_cols, agg, concat, drop_duplicates, melt, pivot_table,
+   fillna, ffill, bfill, interpolate and table_one), is now XS. It gives the
+   same answers and dies with the same messages; t/df_shape.t keeps the
+   0.331 Perl sub and checks the two agree on 39 inputs, each with and
+   without a caller name. A hash is 3 to 8 times faster to classify: 0.23
+   us instead of 1.76 for a 20-column HoA, and 73 ms instead of 112 to 192
+   for a HoH of a million rows. An array is 2 to 4 times faster, as it
+   already looked at one row only. Memory is unchanged within a few kB.
+
+ - A tied frame's values are fetched once each by the shape check, where
+   the Perl fetched a value up to twice, and a plain hash's each iterator
+   is left where it was instead of being reset. A tied hash's still is, as
+   the walk has to call its FIRSTKEY.
+
+0.331 2026-10-20 CDT (Claude Opus 5.5 helped)
+
+ [survfit(), logrank_test() and coxph()]
+
+ - A `NaN` survival time hung both functions again. 0.315 refused a time
+   that is not a number, but `looks_like_number()` accepts `NaN`, and `NaN`
+   fails no comparison: it passed the `t < 0` check, and in the risk-set loop
+   `o[j].time == t` never held. `survfit([1, 'nan', 3], [1, 1, 1])` pushed
+   onto its curve until the kernel killed perl for running out of memory, and
+   `logrank_test` with the same time never returned. Both now croak "time at
+   index 1 is NaN". A `NaN` status, which used to read as an event, croaks
+   the same way.
+
+ - The event flag is read as survival's `Surv()` reads it: 1 = event and 0 =
+   censored, or 2 = event and 1 = censored when the largest value is 2.
+   `survfit` and `logrank_test` used to take any nonzero status as an event,
+   so a 1/2-coded column, such as R's own `lung` data, made every row a
+   death: `logrank_test` on status `(2, 1, 2, 1, 2, 2)` gave chi-squared 5.05
+   where `survdiff()` gives 3.57. `coxph` read 1/2 already, but only when no
+   0 was present; `Surv()` calls such a 0 invalid. All three share one reader
+   now, and any value that is neither censored nor an event under the
+   column's coding croaks, naming the index, where `Surv()` makes it NA with
+   a warning.
+
+ - Perl's false, `!!0`, is accepted as a status of 0. It is the empty string
+   to `looks_like_number()`, so all three used to croak "status at index 1
+   is not a number" on the result of a comparison, which `Surv()` takes as
+   `FALSE`.
+
+ - An undef group label croaks "group at index N is undef", as an undef time
+   does. It used to be read as "", so it made a group of its own named "" and
+   was pooled with any row whose label really was "".
+
+ - `logrank_test` takes `rho`, `survdiff()`'s G-rho family: each event time
+   is weighted by S(t-)^rho, the pooled Kaplan-Meier estimate just before it,
+   and `rho => 1` is Peto & Peto's modification of the Gehan-Wilcoxon test.
+   Nothing after the third argument used to be read, so `rho => 1` was
+   accepted and answered as the log-rank test. `observed` and `expected` are
+   then weighted, as `survdiff()`'s are, and the result has a `rho` key. An
+   unknown argument, or a key with no value, now croaks in both functions
+   rather than being ignored.
+
+ - `coxph`'s `maxit` was an `unsigned short`, so `maxit => 65536` wrapped to
+   0, ran no iterations, and reported the null model's coefficient of 0 as
+   the fit. It is 32 bits wide now, which covers the documented limit of
+   1e6.
+
+ [quantile()]
+
+ - The result was keyed by "%.1f%%", so close probabilities collided: `probs
+   => [0.001, 0.0014, 0.0012]` came back as the single key "0.1%", and any p
+   below 0.0005 was "0.0%". The keys are now R's own names,
+   format_perc(probs, digits = 7): formatC(100 * p, "fg") for fewer than 100
+   probs ("0.1%", "0.14%", "0.12%"; 1/3 is "33.33333%" where it was "33.3%"),
+   and format(100 * p) over the whole vector from 100 on, so seq(0, 1, 0.005)
+   is keyed "0.0%", "0.5%", "1.0%" as in R. The same probability asked for
+   twice is one key; two different ones that R names alike (0.99999999 and 1
+   are both "100%") croak, naming both, rather than one value silently
+   replacing the other.
+
+ - A scalar or a hashref `probs` was ignored and the five defaults came back.
+   A number is now a one-element probs, as quantile(x, 0.5) is in R, and
+   anything else that is not an array ref croaks. A non-numeric prob croaks,
+   naming its index.
+
+ - A NaN prob passed the range check and was cast to size_t, which is
+   undefined behaviour; an undef prob was read as 0. They are R's NaN and NA
+   now: NaN and undef, under R's name for them, "".
+
+ - The index was (n-1)p, 0-based, where R's type 7 takes 1 + (n-1)p. The two
+   agree in exact arithmetic and not in double: 205 of 4990 quantiles at
+   probs k/997 over five samples came out an ulp or two from R's, and
+   quantile(1:10, 1e-17) interpolated where R returns 1. The arithmetic is
+   now R's, step for step (type 7's fuzz is 0 in R), and every one of those
+   values is R's to the bit on a double perl.
+
+ - x and probs were freed by hand, so a tied array whose FETCH died leaked
+   both: 60 such calls on a 2e5-element column grew the process by 92 MB.
+   Every buffer is on the save stack now.
+
+ [p_adjust()]
+
+ - A NaN p-value made the sort comparator inconsistent, so qsort() scrambled
+   the order and the NaNs counted in n: holm on (0.01, NaN, 0.04, 0.03, NaN,
+   0.02) gave 0.06 0.06 0.12 0.12 0.12 0.12 where R gives 0.04 NaN 0.06 0.06
+   NaN 0.06. A NaN is R's NA now, in the flat form and in a frame: left out
+   of n and returned NaN in its own place, for every method. A family of one
+   is returned unadjusted and hommel on two is hochberg, as in R. undef still
+   counts as a p-value of 1, as documented.
+
+ - BH and BY multiply in R's order (n / i * p, q * n / i * p), and BY's
+   harmonic constant is added compensated, as R adds it in long double. BY
+   used to be up to three ulp from R (0.073499999999999996 for R's
+   0.07350000000000001); all 120 vectors in t/p_adjust.R.t are now R's to the
+   bit.
+
+ [scale()]
+
+ - `center` and `scale` given as array refs were read as "true", so center =>
+   [1, 2] centred on the column means. They are R's per-column vectors now,
+   one value per column, and a vector of the wrong length croaks as R does. A
+   numeric center with the automatic scale divides by sqrt(sum(x^2)/(n-1)) of
+   the centred column, as R's does.
+
+ - An undef cell became 0 in a matrix and was dropped from a flat list, so
+   scale(1, undef, 3, 6) returned three values. undef is R's NA now: it stays
+   undef in its place, and the column's mean and scale are taken over the
+   rest (colMeans(na.rm = TRUE)), with R's max(1, m - 1) divisor for a column
+   left with one value. A NaN is left out the same way.
+
+ - A short or long row was padded with 0 or cut, and a row that was not an
+   array ref read as zeros. Each croaks now, naming the row; so does a
+   non-numeric cell, which read as 0.
+
+ - A one-row matrix croaked after building its output rows and leaked 3 SVs a
+   call. The matrix is read whole before anything is built, and each buffer
+   is on the save stack. A tied array is now read once rather than twice.
+
+ [prcomp()]
+
+ - `center => 0, scale => 1` divided by the standard deviation about the
+   mean, where R's scale(center = FALSE) divides by sqrt(sum(x^2)/(n-1)):
+   scale (2.5, 2.94) for R's (5, 6.48), and sdev (2.97, 0.234) for R's (1.41,
+   0.112).
+
+ - `rank` and `tol` truncated sdev as well as the rotation. R keeps every one
+   of the min(n, p) sdev and cuts only the rotation and the scores, and so
+   does prcomp() now.
+
+ - sdev came from the eigenvalues of X'X, which squares the singular values,
+   so a direction the data do not span came out near 1e-8 (1.3e-8 on a scaled
+   matrix whose third column is the sum of the first two, where R gives
+   2e-16), and the small sdev lost digits: 0.140871624013729 for R's
+   0.14087162401373760. The decomposition is now an SVD of the centred data
+   -- a Householder QR, then one-sided Jacobi on the triangle -- which gives
+   both as R does. Rotation signs are as arbitrary as R's, and on README's
+   example they now agree with R's.
+
+ [pchisq(), qchisq() and every chi-square p-value]
+
+ - The incomplete gamma lost all accuracy at a large df. It was Numerical
+   Recipes' series and continued fraction times exp(-x + a log x -
+   lgamma(a)), whose exponent is a difference of numbers near a log a, and
+   the series stopped on an absolute 1e-15 term. pchisq(1e15, 1e15) was 0.379
+   where R gives 0.50000000594708038, and pchisq(1e10, 1e10) was 0.4999978
+   for 0.5000019. It is R's own pgamma.c now (Morten Welinder's algorithm: a
+   saddle-point Poisson prefactor, relative stopping rules, and Temme's
+   expansion near the median), computed in NV arithmetic. Its series
+   constants are double precision, as R's are, so a long-double or quadmath
+   perl now gets about double's accuracy from it rather than its own. The
+   same routine is behind chisq_test, cmh_test, coxph, friedman_test, ivreg,
+   kruskal_test, logrank_test, mcnemar_test, prop_test and age_standardize.
+
+ - log => 1 on pchisq() is carried through the series, as in R, rather than
+   being log() of the probability: a tail a hair under 1 logs to the tiny
+   negative number it is, where it used to log to exactly 0.
+
+ [pt(), pf(), pbinom() and the incomplete beta at a large shape]
+
+ - The incomplete beta lost digits once a shape was large. Its front factor
+   formed log(b/(a + b)) as log1p(-a/(a + b)), so pt(1.96, df = 1e15) was
+   0.97448286722801003 for R's 0.97500210485177941 and qt(0.975, 1e15) was
+   1.974 for 1.95996; and its continued fraction loses about max(a, b) eps
+   relative, so pf(1, 1e15, 1e15) was 0.481 where F and 1/F share a
+   distribution and the answer is exactly 0.5. From a shape of 1000 up it
+   takes TOMS 708's algorithms now, as R's pbeta() does: bfrac(), basym()
+   near the mean of two large shapes, and bgrat() when the smaller shape is
+   at most 1. Below 1000 nothing changed but the front factor, which is TOMS
+   708's brcomp() form. This is behind t_test, cor_test, anova, lm,
+   oneway_test, var_test and binom_test too.
+
+ - binom_test()'s two-sided p-value for x = 1, 5 or 999999 of n = 1e6 at p =
+   0.5 is R's 2.9643938750474793e-323 rather than 0. The test pinned 0 as a
+   deliberate divergence; it was the incomplete beta losing the far tail of
+   P(X >= n - y), which the new one computes as R does.
+
+ - log => 1 on pt(), pf() and pbinom() is carried through as well: pt(-1e10,
+   30, log => 1) is -642.38543618949132, where it was log(0).
+
+ [pt(), qt(), pf() and qf() with an infinite df]
+
+ - None of the four handled df = Inf. qt(0.975, Inf) was 3.1e-61, pt(1.96,
+   Inf) was NaN, pf(0.5, 3, Inf) was 1 and qf(0.5, 3, Inf) was NaN. They take
+   R's limits now: pt is pnorm, pf(x, df1, Inf) is pchisq(x df1, df1), pf(x,
+   Inf, df2) is the upper pchisq(df2/x, df2), and with both infinite F is a
+   step at 1, with 0.5 at 1 itself; qt and qf invert them, and qt takes the
+   normal quantile from df > 1e20, as R does. Perl's 9**9**9 and the string
+   "Inf" both reach them as an infinite df.
+
+ [qnorm(), qt(), qchisq(), qf() and qtukey() with log_p]
+
+ - Every q* function exponentiated a log p before inverting it, so a log p
+   near 0 rounded to 1 and one below -745 to 0: qnorm(-1e-20, log_p => 1) was
+   Inf for R's 9.2623400897984052, qt(-1000, 5, log_p => 1) was -Inf for
+   -1.13331635e+87, and qchisq(-1000, 5, log_p => 1) was 0 for
+   6.1925242751513702e-174. Each now inverts the smaller of the two tails,
+   reflecting a log p above log(1/2) through -expm1(), and solves in logs
+   where the probability underflows. qnorm takes R's own asymptotic formulas
+   there. Where these q* functions and R's differ by more than 1e-12, mpmath
+   at 60 digits sides with this module: R's qt(-700, 5, log.p = TRUE) is
+   1.8e-9 off, and its qf(-64, 1, 1, log.p = TRUE) is 0 for
+   6.3466722361887189e-56.
+
+ - qt() near the median inverts the central probability 1 - 2p, and takes the
+   closed forms for df = 1 and 2 in the tail, as R's qt.c does. qt(1/2 +
+   2^-25, 2) was 8.429369701354e-08 where R's own tests/d-p-q-r-tst-2.R pins
+   8.429369702179e-08.
+
+ - qf() bisects whichever of t and 1 - t is smaller at the root. It used to
+   choose by p alone, which fails when one df dwarfs the other: qf(0.975, 3,
+   1e15) was 3.1086244689504672 for 3.1161345348320483.
+
+ [dnorm()]
+
+ - log => 1 returned 0 -- log density 0, density 1 -- wherever the density is
+   0: dnorm(Inf, log => 1), dnorm(1, sd => 0, log => 1) and dnorm(0, sd =>
+   Inf, log => 1). They are -Inf now, as in R.
+
+ [ptukey() and qtukey()]
+
+ - ptukey() of a NaN was 1, or 0 for the upper tail; it is NaN, as in R.
+   qtukey() took a p outside [0, 1] as the nearer end, so qtukey(1.5, 3, 10)
+   was Inf and qtukey(-0.1, 3, 10) was 0; it is NaN, as the other q*
+   functions return it. The upper tail on the log scale is formed with
+   log1p() and -expm1(), as R forms it.
+
+ [pnorm(), dnorm() and the rest of the distribution family]
+
+ - An undef was read as 0, so pnorm([undef]) was [0.5] where R's pnorm(NA) is
+   NA; it is NaN, as the README has always said and as the rest of the family
+   reads it. Tied elements are fetched once.
+
+ - The result array of pnorm(), dnorm() and the other eight leaked when
+   reading an element died -- a tied FETCH, or "isn't numeric" made fatal by
+   use warnings FATAL => 'all'. It is mortal before the first element is read
+   now.
+
+ [pbinom()]
+
+ - A size that was not exactly whole was NaN, so pbinom(3, 10 + 1e-10, 0.5)
+   had no answer where R gives 0.17187500000000006. R's own fuzz, 1e-9 *
+   max(1, |size|), is taken now, and the size rounded. A q just below 0 is 0
+   now, as R tests q < 0 before its 1e-7 fudge: pbinom(-1e-8, 10, 0.5) used
+   to answer for 0.
+
+ [zerotrunc() and hurdle()]
+
+ - A negative-binomial fit to counts no more dispersed than a Poisson's
+   returned NaN for every coefficient, standard error and log-likelihood.
+   Such a likelihood rises all the way to theta = Inf, so Newton walked
+   log(theta) up by about 1 a step until theta * theta overflowed.
+   `zerotrunc(y ~ x, dist => 'negbin')` on y = (1, 2, 1, 2, 1, 2, 3, 2, 1, 2,
+   2, 3), x = 1..12 was all NaN after 500 iterations. The Poisson limit is
+   now fitted first, and when the score for overdispersion there is not
+   positive that fit is the answer, with `theta` and `SE_logtheta` both Inf:
+   intercept -0.4454338 and log-likelihood -13.0227811 on that data, which is
+   countreg's Poisson fit. countreg's negbin stops BFGS at theta = 103103 on
+   its way there, with -0.4454419 and -13.0228175. The degrees of freedom
+   still count theta, as countreg's do. The same check covers a negbin count
+   part and a negbin zero part of `hurdle`, whose zero half used to report
+   theta_zero near 1e17 where pscl stops at 6.8e4.
+
+ - The derivatives of the negative-binomial likelihood are formed from
+   theta/(theta + mu) and mu/(theta + mu) rather than theta * theta, so a
+   very large but finite theta no longer overflows them.
+
+ [svyglm()]
+
+ - A zero sampling weight on the first row the model kept made `dispersion`
+   NaN: the rescaling it corrects by was read off that row as 0/0. It is the
+   mean of the kept rows' rescaled weights now. On apistrat with the first
+   row's weight set to 0, `api00 ~ ell + meals + mobility` gives 5081.0203
+   and `api00 ~ acs.k3 + ell` 9994.1128, as survey::svyglm() does.
+
+ [ivreg()]
+
+ - `nobs` counted rows of zero weight; it is now the number of nonzero
+   weights, as ivreg's `nobs` is. The two-instrument CigaretteDemand model
+   with three rows weighted 0 reported 48 where ivreg reports 45.
+   `df_residual` and `sigma` already counted only the nonzero rows, and
+   `adj_r_squared` and the Sargan statistic count every row, as
+   summary.ivreg() does; none of those changes.
+
+ [lmer()]
+
+ - A grouping factor with one level, or with as many levels as there are
+   rows, was fitted and reported as converged. Both now croak with lme4's
+   messages, "grouping factors must have > 1 sampled level" and "number of
+   levels of each grouping factor must be < number of observations (problems:
+   id)", as does a correlated term with at least as many random effects as
+   rows ("number of observations (=36) <= number of random effects (=36) for
+   term (1+Days | Subject); ..."). These are lmerControl()'s default checks,
+   and the cases are lme4's own tests.
+
+ - More than one grouping factor puts every random effect in one dense
+   matrix, and it accepted up to 20000 of them: two 20000 x 20000 matrices,
+   6.4 GB at a double NV, and at the measured cubic rate days of work. The
+   limit is 4000 now. 2000 random effects took 283 s and 71 MB here, so 4000
+   is about 40 minutes and 256 MB; the croak names the limit and says to use
+   a single grouping factor, which is fitted a level at a time, or fewer
+   levels.
+
+ [cmh_test()]
+
+ - A stratum whose total was 0 was skipped, and one whose total was 1 was
+   pooled into the statistic. R's mantelhaen.test() stops on both, and
+   `cmh_test` now croaks "sample size in each stratum must be > 1", naming
+   the stratum.
+
+ [fisher_test()]
+
+ - Tables larger than 2x2 are answered with Mehta & Patel's network
+   algorithm, as R's fisher.test answers them. The test used to enumerate
+   tables, pruning only at the start of each row, and gave up after 50
+   million nodes: the 4x4 [[0,1,8,4],[4,7,6,3],[4,0,8,7],[7,4,5,5]] croaked
+   "too large for exact enumeration" after 2.3 s where R answers 0.0303 in
+   0.07 s, and Mehta & Patel's 5x7 from ?fisher.test was refused outright.
+   Both take a few hundredths of a second now. Every table R 4.6.1 answers
+   with its default workspace that was tried is answered, the slowest in 0.15
+   s where R took 0.45 s, and so are most of those R refuses. A table that
+   needs more than about 1.5 s of work, or 128 MB, is still refused.
+
+ - The p-value agrees with R to about 1e-12, and where the two differ it is
+   the closer to the exact answer, computed as a rational number: within
+   1.4e-13 of it on every table checked, where R is up to 3.3e-12 off,
+   because FEXACT merges paths whose weights agree to 3.45e-7. "As or more
+   extreme" follows FEXACT's rule, a probability at most 1 + 3.45e-7 times
+   the observed one; the old enumeration used the 2x2 rule of 1 + 1e-7.
+
+ - Cells are read as fisher.test() reads them. They went through SvIV(),
+   which truncated 2.7 to 2, and read NaN and -0.4 as 0: [[2.7,1],[3,4]] gave
+   p = 1 where R rounds to 3 and gives 0.5455. A non-integer is now rounded
+   half to even with R's warning, "'x' has been rounded to integer: Mean
+   relative difference: 0.1111111", and a negative, NaN or infinite cell
+   croaks, as does one past 2147483647.
+
+ - An all-zero 2x2 table croaked. It gives p = 1, an odds ratio of 0 and a
+   confidence interval of [0, Inf], as in R. An all-zero larger table still
+   croaks, as R's does.
+
+ - The croak for a table too large to answer leaked the result hash and the
+   two values already stored in it, 3 SVs a call.
+
+ [binom_test()]
+
+ - An infinite or NaN count was accepted: NaN fails every comparison and Inf
+   - Inf is NaN, so neither tripped the integer check, and the count was then
+   cast to a long, which is undefined. binom_test('inf', 10) and
+   binom_test('nan', 10) returned p = 0. Both now croak, as R's binom.test
+   stops on them, and so does a count, or a successes + failures sum, of
+   LONG_MAX or more, which is 2147483647 on Windows and 32-bit perls.
+
+ [oneway_test()]
+
+ - An argument it did not know was skipped, so R's dotted `var.equal => 1`,
+   which README says is refused, ran Welch's test: `oneway_test({ a => [1, 2,
+   3], b => [4, 5, 7] }, 'var.equal' => 1)` gave p = 0.0419 where the pooled
+   test R means by it gives 0.0341. An unknown argument, or a key with no
+   value, now croaks with the usage screen, as in `logrank_test`.
+
+ - A `NaN` observation was kept, and made every statistic `NaN`. It is R's
+   `NA`, and is dropped now, as `oneway.test()`'s `na.action` drops it, in
+   all three input shapes: `{ a => [1, 2, 3], b => ['NaN', 5, 6, 8] }` gives
+   R's F = 16.9, p = 0.0199. A `formula` group whose every response is `NaN`
+   is gone, as R drops an unused level. `undef` still croaks, as documented.
+
+ - Group labels lost their UTF-8 flag: a group named "α" came back in
+   `group_stats` as its two bytes, and a `formula` naming a UTF-8 column
+   croaked that the column was not in the hash. Labels are kept as SVs now,
+   and two labels that are `eq` are one group.
+
+ - The `formula` path had a table of 1024 group names, and the 1025th
+   distinct label croaked "too many distinct groups" after freeing the table
+   but not the 1024 names in it. R has no limit and neither does this now; a
+   hash lookup replaces the linear scan, and every buffer is on the save
+   stack, so no croak leaks.
+
+ [shapiro_test()]
+
+ - A tied array read as all missing, because `SvOK` ran before its `FETCH`,
+   and croaked "Sample size must be between 3 and 5000".
+
+ - A string that is not a number was read as 0, where R's
+   `stopifnot(is.numeric(x))` refuses it. It croaks now, naming the index.
+
+ - The sample was freed by hand, so a croak from anything it called -- an
+   "isn't numeric" warning made fatal, above all -- leaked it: 2000 such
+   calls on 5000 values grew the process by 80 MB. It is on the save stack.
+
+ [ks_test()]
+
+ - The exact/asymptotic choice is now R 4.6.1's throughout. With ties, an
+   exact two-sample p-value is R's, conditioned on the tie pattern: Schroeer
+   & Trenkler's pair from `?ks.test` gives R's documented 8/33, where
+   `ks_test` warned and gave the asymptotic 0.658, and the Ozone example R's
+   0.0006919, not 0.0010644. The exact one-sided one-sample p-value is R's
+   Birnbaum & Tingey sum (Hollander & Wolfe's x, "less": 1.555e-7, where
+   `ks_test` warned and gave 3.40e-6). A tied one-sample input goes
+   asymptotic by default, as R's `(n < 100) && !TIES` does, and both of R's
+   tie warnings are given where R gives them.
+
+ - The two-sample asymptotic two-sided p-value summed its series to 1e-9
+   where R's `psmirnov_asymp` uses 1e-6, so it differed from R in the fifth
+   figure: 0.41536343 for SciPy's x2233/x3344 pair, where R says 0.41536534.
+   It uses R's tolerance now.
+
+ - A tied array read as all missing ("Not enough non-missing 'x'
+   observations"), x and y alike.
+
+ - Both data buffers leaked when a `$SIG{__WARN__}` handler died on one of
+   its warnings: 1000 such calls on two samples of 3200 grew the process by
+   51 MB. They are on the save stack.
+
+ [rank()]
+
+ - Two loops compared a `Stack_off_t` counter with a `size_t` bound, which
+   `-Wextra` reports under `-std=c99`. The bound is a stack index, and has
+   the stack's type now; nothing else changed.
+
+ [write_table()]
+
+ - A separator of more than one character could be spelled early by the end
+   of a field and the separator written after it, and such a field was not
+   quoted: with sep "::" the fields "a:" and ":b" were written "a::::b",
+   which read_table cuts at the first "::" into "a", "" and "b". The row then
+   died as misaligned, or, when every row did it, the table read back wrong
+   without a word. A field is now quoted whenever its last m bytes are the
+   separator's first m and the separator is unchanged by a shift of m, which
+   is exactly when this can happen. 3000 generated tables over random 1- to
+   4-byte separators failed to round-trip 30 times on 0.33 and none now.
+
+ [csort()]
+
+ - A NaN compared equal to everything, so the merge sort took a numeric
+   column holding one as already in order: [3, NaN, 1, 2] came back
+   unchanged. NaN now sorts last together with undef, each keeping its
+   original place among them, as R's order() places NaN and NA: order(c(3,
+   NaN, 1, NA, 2, NaN)) is 3 5 1 2 4 6, and so is csort's.
+
+ - A comparator that compares a row with itself as undef, which is what `<=>`
+   gives for a NaN, puts that row last with the undef rows, so NaN is last
+   whether the comparator sorts ascending or descending, as with R's
+   order(decreasing = TRUE). Such a comparator used to die under `use
+   warnings FATAL => 'all'` with "Use of uninitialized value in subroutine
+   entry".
+
+ - An AoA column index was accumulated without a bound, so
+   '18446744073709551615' wrapped to -1 and the table was sorted by its last
+   column, and '9223372036854775808' became a negative index. An index past
+   what an array can be indexed with (2**63 - 1, or 2**31 - 1 on a 32-bit
+   perl) now croaks as out of range.
+
+ - The cells of an AoA whose rows are tied arrays, and of a tied HoA column,
+   were tested before their FETCH had run, so every one read as undef and the
+   table came back unsorted. They are read through FETCH now.
+
+ [aoh2hoa(), hoa2aoh() and hoa2hoh()]
+
+ - aoh2hoa read tied input as missing: a tied array of rows gave {}, and a
+   tied row gave undef in every cell. Rows, row hashes and cells are now read
+   through FETCH, once per value.
+
+ - All three leaked when a cell's FETCH died: aoh2hoa 7 SVs a call on a
+   two-row table, hoa2aoh 6 and hoa2hoh 2. Each result is now mortal until it
+   is returned, and each row is stored before it is filled.
+
+ [group_by()]
+
+ - An undef group label was used as a hash key, so its rows were pooled with
+   those whose label really was "", and under `use warnings FATAL => 'all'`
+   the call died with "Use of uninitialized value". Such a row is now left
+   out, as group_by already leaves out an undef value and as R's split()
+   drops an NA level: split(1:5, c("a", NA, "", "a", NA)) gives "" = 3 and a
+   = 1 4, and so does group_by.
+
+ [read_table()]
+
+ - A file whose lines end in a bare CR was read as an LF file when a quoted
+   field held an LF, because any LF at the start of the file counted. The
+   table 'a,b\r1,"x\ny"\r2,z\r' came back as the single row a, b1, "x\ny2",
+   z, where R 4.6.1's read.csv() and pandas 3.0.4's read_csv() both read a
+   and b over (1, "x\ny") and (2, z), as read_table now does. Quotes are
+   counted the way the parser counts them, and not at all under quote => ''.
+
+ [Speed]
+
+ - `survfit` walks the time-sorted rows once for all groups together. Each
+   group used to scan every row twice, which was O(groups x rows): 200,000
+   rows in 5,000 groups took 1.15 s and take 0.14 s now. Two groups cost
+   what they did.
+
+ - `logrank_test` fills only the upper triangle of its variance matrix,
+   skips groups with nobody left at risk, and no longer allocates a buffer at
+   every event time. 20,000 rows in 500 groups took 1.30 s and take 0.66 s.
+   The terms summed are the same ones, and the statistic is bit for bit what
+   it was.
+
+ - qchisq() is a Newton iteration from AS 91's starting value, on the log of
+   whichever tail it was given. It bisected, against an incomplete gamma that
+   itself cost O(sqrt(df)) terms near the median: qchisq(0.5, 1e10) took 11
+   ms a call and takes 2.2 us, and qchisq(0.5, 1e15) took 0.26 s and takes
+   7.7 us. qchisq(0.95, 3) went from 8.6 us to 1.5 us. Each timing is a fresh
+   process per variant on perl-5.44.0.
+
+ - chisq_test no longer builds a mortal string naming each cell as it reads
+   it; the name is formatted only when the cell is bad. A 1000 x 1000 table
+   took 0.155 s and takes 0.049 s, a 500 x 500 hash of hashes 0.065 s and
+   0.029 s, and a million-cell goodness-of-fit vector 0.160 s and 0.040 s. A
+   cell named by a UTF-8 hash key is now named as that string rather than as
+   its bytes.
+
+ - mode() keyed a number by calling SvPV() on the caller's own scalar, which
+   stores the text in it: mode(\@a) on 1e6 NVs left @a 79 MB heavier for
+   good, and on 1e6 IVs 56 MB. The text is now made in one scratch scalar, so
+   nothing is retained (0.5 MB peak, the counting hash), and the call is
+   faster for not allocating a string per cell: the NVs took 0.27 s and take
+   0.16 s, the IVs 0.11 s and 0.04 s (best of three, one process each). The
+   keys, and so the grouping of 1, 1.0, "1" and "1.0", are those of the same
+   sv_2pv_flags() as before.
+
+ [Tests]
+
+ - t/survival.status_rho.R.t: 1118 tests against R 4.6.1 with survival
+   3.8-12, frozen from t/survival.status_rho.R.R, which regenerates them. Its
+   reference cases are survival's own: `survdiff(Surv(time, status) ~ inst,
+   lung, rho=.5)` from tests/cancer.R, whose pinned output it matches,
+   `survfit(Surv(time, status) ~ ph.ecog, lung)` from man/Surv.Rd, and the
+   ovarian example from man/survdiff.Rd, with rho crossed over ovarian and
+   aml. It also covers the status codings, a tied group column, every new
+   croak with a leak check, and `maxit => 65536`. Against 0.33 it fails 814
+   subtests before dying on the first `NaN`.
+
+ - t/quantile.R.t: 4990 quantiles at probs k/997, frozen exactly (m * 2^e)
+   from R 4.6.1 and compared bit for bit on a double perl, and R's names for
+   six probs vectors over both of format_perc()'s routes. Against 0.33 it
+   fails 17 of the new tests.
+
+ - t/p_adjust.R.t: every method on six NaN-bearing vectors and SciPy's
+   TestFDRControl vectors; t/scale.R.t (new): scale.Rd's example and every
+   branch of scale.default, NA included; t/prcomp.R.t (new): README's
+   example, center = FALSE, rank, reg-tests-1a.R's prcomp(tol = 1e-6) case on
+   R's own data, an exactly collinear matrix and prcomp.Rd's rank./tol
+   example in kind. Each has its generator next to it.
+
+ - t/audit.2026-10-20.A.t: the audit's repros, the croaks, leak checks on
+   every croak path, and a resident-size check for the buffers a dying FETCH
+   used to leak.
+
+ - t/audit.2026-10-20.E.t: the cases above, against R 4.6.1 values frozen
+   from t/audit.2026-10-20.E.R, with leak checks and, on Linux, an RSS check
+   for the C buffers. Against 0.33 it fails 5 tests before dying on the UTF-8
+   formula, and its RSS checks see 80 MB and 51 MB.
+
+ - t/ks_test.R.scipy.t: every case its generator produces is now an ordinary
+   R row (165, against 112), with R's warnings as a column; the tied and
+   one-sided exact rows, which were recorded divergences, are among them.
+   t/ks_test.R.scipy.R now records R's warnings.
+
+ - t/audit.2026-10-20.F.t: csort's NaN placement against R's order() in all
+   four shapes and both comparator directions, tied AoA rows and HoA columns,
+   aoh2hoa on tied input, group_by's undef label against R's split(), and
+   that mode() leaves an NV or IV cell as it was. t/write_table.quoting.t,
+   t/csort.AoA.t, t/read_table.cr_eol.R.pandas.t and t/croak.leaks.t each
+   gain the cases above that belong to them.
+
+ - t/distributions.limits.R.t: 568 tests, among them 504 rows of R 4.6.1
+   values frozen from t/distributions.limits.R.R over df = Inf, huge df,
+   log_p near 0 and below -745, and the far tails, plus ports of the
+   extreme-tail checks in R's tests/d-p-q-r-tests.R and
+   tests/d-p-q-r-tst-2.R. Nine rows where R is measurably wrong are pinned to
+   mpmath at 60 digits instead, from t/distributions.limits.mpmath.py.
+   t/distributions.R.scipy.t asserts its six log-scale SciPy rows at 2e-13
+   where it used to accept 0. t/audit.2026-10-20.B.t covers the leaks, tied
+   elements, undef, ptukey's NaN, qtukey's range, dnorm's log zero and
+   pbinom's fuzz.
+
+ - t/zerotrunc_hurdle.R.t gains underdispersed counts against countreg and
+   pscl, t/svyglm.R.t and t/ivreg.R.t the zero-weight cases, regenerated from
+   their generators, and t/lmer.R.t lme4's own tests/testthat/test-lmer.R
+   cases for the new checks. t/audit.2026-10-20.C.t covers cmh_test's strata,
+   the lmer limit and the leak checks for every new croak.
+
+ - t/fisher_test.R.scipy.t answers Mehta & Patel's 5x7 and R bug 18336's 6x6,
+   which R refuses, and checks every r x c case against the exact rational
+   p-value from t/fisher_test.rxc.exact.py; a new case adds the audit's 4x4
+   and random tables from t/fisher_test.rxc.R. t/audit.2026-10-20.D.t covers
+   the rounding warning, the croaks for bad cells and counts, the all-zero
+   tables, chisq_test's cell names and the leaks.
+
+0.33 2026-10-17 CDT (Claude Opus 5.5 helped)
+
+ [usage]
+ - when given an incorrect series of arguments, a menu resembling the help
+   from Python's `argparse` is shown
+
+ [df2h(), which was aoh2h()]
+
+ - aoh2h() is now df2h(), and folds two columns of any of the four data
+   frame shapes into a plain hash, where it took an array of hashes alone.
+   An AoA's columns are integer positions, defaulting to 0 and 1, which is
+   what tibble's deframe() reads; a negative position counts back from the
+   end of each row, as $row->[-1] does. A HoA's two columns must be the
+   same length, and row i is element i of each. A HoH's row names are not
+   used.
+
+ - aoh2h remains, as a second name for the same sub, as rbind is for
+   concat. Every AoH it took before folds the same way, but its messages
+   now begin "df2h:" rather than "aoh2h:". A hash it used to refuse as
+   "not an arrayref of hashrefs" is now read as a HoA or HoH, and a flat
+   hash, the likely mistake, gets a message of its own. h('aoh2h') shows
+   df2h's documentation.
+
+ - duplicates => 'first' and 'last' are refused for a HoH, since its rows
+   have no order and either would keep a different row from run to run.
+   When a HoH has more than one bad row, the message names the first in
+   sorted row-name order. The rows are read in hash order, which needs no
+   sort, and are read again sorted only once that has croaked, so a frame
+   that folds pays nothing for this.
+
+ - A tied frame is copied once before its shape is read, so each row is
+   still FETCHed once. The AoH fold is the 0.3218 XS code unchanged, and
+   keeps its speed and memory figures.
+
+ [Tests]
+
+ - t/df2h.t: 123 tests of the AoA, HoA and HoH paths, the reading of a
+   frame's shape, and every message. Its reference cases are tibble
+   3.3.1's own deframe() tests and pandas 3.0.4's to_dict() tests; where
+   df2h() departs from either, the file's header says how and why. The
+   HoH ordering tests pass under PERL_HASH_SEED 1 to 8. Without the sorted
+   second reading, the repeated-key one would name another row under 15
+   of the seeds 1 to 20.
+
+ - t/aoh2h.regressions.t and t/h2aoh_aoh2h.t expect the "df2h:" prefix,
+   and the two tests that held a blessed hash and an array in an array to
+   be no frame at all now expect each to be read as one.
+
+ - t/help.t checks that df2h has a documentation section of its own, and
+   that h('aoh2h') shows it.
+
 0.3218 2026-10-16 CDT (Claude Opus 5.5 helped)
 
  [read_table()]

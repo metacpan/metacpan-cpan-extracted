@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.12";
+our $VERSION = "1.13";
 
 1;
 =encoding utf-8
@@ -34,7 +34,10 @@ mdee - em·dee, Markdown Easy on the Eyes
          --table-style=#    table style: pipe or simple (default: pipe)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
-         --fold-width=#     fold width (default: pane width - 5)
+         --fold-width=#     fold width (default: pane width - 3 - run-in)
+         --runin=#          run-in width for line breaking (default: 2)
+         --runout=#         run-out width for line breaking (default: 2)
+         --runlen=#         set both run-in and run-out
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -55,7 +58,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.12
+Version 1.13
 
 =cut
 =head1 DESCRIPTION
@@ -213,9 +216,11 @@ then disables tracing.
 
 =item B<-n>, B<--dryrun>
 
-Dry-run mode. Show the pipeline without executing.
-With C<-dd>, shows expanded command lines for each stage instead
-of function names.
+Dry-run mode.  Print the commands that would be run, one pipeline
+stage per line joined with C<|>, without running them.  Arguments
+are quoted so that the output can be pasted into a shell.  The
+environment that B<mdee> sets (C<LESS>, C<LESSANSIENDCHARS>) is not
+shown.  With C<-d>, the stage names are printed to stderr as well.
 
 =back
 
@@ -362,9 +367,24 @@ the text itself is the output, so this is the fold width.
 
 Set the fold width for text wrapping directly.  Default is the
 pane width (output width divided by the number of columns) minus
-5 for borders and padding, which gives 80 when pane-width is 85.
+3 for borders and padding and the run-in width (see C<--runin>),
+which gives 80 when pane-width is 85.
 Only effective when C<--fold> is enabled.  The same width is used
 to fit tables (see C<--table>).
+
+=item B<--runin>=I<N>, B<--runout>=I<N>, B<--runlen>=I<N>
+
+Set the run-in and run-out widths that L<ansicolumn(1)|App::ansicolumn>
+uses for line breaking (kinsoku) when nup folds the panes.
+C<--runlen> sets both; options given later override earlier ones.
+Default is 2.  A run-in character may go past the fold width, so
+ansicolumn keeps the run-in width free at the end of the pane, and
+the default fold width is made narrower by the same amount.  These
+values are given to nup, and they take precedence over the values
+in F<~/.ansicolumnrc>.
+
+A larger value such as 4 suits Japanese text, where a run of
+characters that must not start a line, such as C<ーッ>, can be long.
 
 =back
 
@@ -873,8 +893,8 @@ The overall data flow is:
 
 B<em·dee> dynamically constructs a pipeline based on enabled options.
 Each stage is defined as a Bash function (e.g., C<run_greple>,
-C<run_nup>).  The C<--dryrun> option displays the function-based
-pipeline without execution.
+C<run_nup>).  The C<--dryrun> option prints the command line of
+each stage without running them, and C<-d> prints the stage names.
 
 =head3 Processing Stages
 

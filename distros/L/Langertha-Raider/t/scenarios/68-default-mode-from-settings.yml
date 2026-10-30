@@ -1,0 +1,19 @@
+title: defaultMode of the Claude settings sets the mode; the local file wins over the project file
+permission_mode: null
+files:
+  CLAUDE.md: "# project\n"
+  .claude/settings.json: '{ "permissions": { "defaultMode": "acceptEdits" } }'
+  .claude/settings.local.json: '{ "permissions": { "defaultMode": "plan" } }'
+prompt: Go.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+      - [ read_file, { path: CLAUDE.md } ]
+  - text: done
+expect:
+  absent: [ a.txt ]
+  tools:
+    - { name: write_file, error: true, text: "plan mode: write_file changes files.*present your plan with exit_plan_mode first" }
+    - { name: read_file, text: project }
+  events:
+    - { type: permission.denied, tool: write_file, by: mode, mode: plan, source: .claude/settings.local.json }

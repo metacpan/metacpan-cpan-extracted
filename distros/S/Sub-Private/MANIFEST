@@ -28,6 +28,7 @@ t/metrics.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
+t/oo_namespace_mode.t
 t/package_mode.t
 t/pod-cm.t
 t/pod-coverage.t

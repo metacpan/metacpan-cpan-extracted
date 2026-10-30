@@ -1,0 +1,21 @@
+title: a skills entry of type file is a skill; listed by name, loaded on demand
+files:
+  CLAUDE.md: "Project.\n"
+  docs/style.md: "Write short sentences.\n\nSTYLE-BODY-MARKER\n"
+app:
+  skill_sources:
+    - { type: file, path: docs/style.md }
+prompt: Write the intro.
+script:
+  - tool_calls:
+      - [ skill, { skill: style } ]
+  - text: geschrieben
+expect:
+  answer: geschrieben
+  requests:
+    - { index: 0, contains: "- style: Write short sentences." }
+    - { index: 0, absent: STYLE-BODY-MARKER }
+    - { index: 1, contains: STYLE-BODY-MARKER }
+    - { index: 1, tail: [ { role: tool }, { role: user, contains: "/docs\n\nWrite short sentences.\n\nSTYLE-BODY-MARKER" } ] }
+  tools:
+    - { name: skill, text: '^Launching skill: style$' }

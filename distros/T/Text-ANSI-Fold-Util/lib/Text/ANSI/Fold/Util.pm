@@ -1,5 +1,5 @@
 package Text::ANSI::Fold::Util;
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use v5.14;
 use utf8;
@@ -32,7 +32,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr)
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,9 @@ BEGIN { push @EXPORT_OK, qw(&ansi_width) }
 sub ansi_width { goto &width }
 
 sub width {
-    (ansi_fold($_[0], -1))[2];
+    my $text = $_[0] // '';
+    # an empty or printable ASCII string is as wide as its length
+    $text !~ /[^\x20-\x7e]/ ? length $text : (ansi_fold($text, -1))[2];
 }
 
 
@@ -146,7 +148,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2024 Kazumasa Utashiro.
+Copyright 2020-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

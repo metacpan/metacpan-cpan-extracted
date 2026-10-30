@@ -1,0 +1,24 @@
+title: in the Claude layout a file outside the root is not refused by the tool but asked about; with nobody to ask it is refused, saying how to allow it
+permission_mode: null
+files:
+  CLAUDE.md: "Project notes.\n"
+home:
+  notes/todo.txt: "outside the project\n"
+prompt: Read my notes.
+script:
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/notes/todo.txt" } ]
+      - [ list_files, { path: "{{HOME}}/notes" } ]
+      - [ grep, { pattern: outside, path: "{{HOME}}/notes" } ]
+  - text: no access
+expect:
+  answer: no access
+  tools:
+    - name: read_file
+      error: true
+      text: "\\APermission to use read_file has been denied\\. Reason: default mode asks before this call: read_file requested permissions to read from /\\S+/notes/todo\\.txt, which is outside the project root and the additional directories, but you haven't granted it yet; nobody can approve it in this run\\. To allow it, add a rule such as 'Read\\(//\\S+/notes/\\*\\*\\)' to \\.raider/config\\.yml \\(permissions: allow:\\) or \\.claude/settings\\.json \\(permissions\\.allow\\), add the directory to additionalDirectories \\(additional_directories\\), or run raider with --permission-mode bypassPermissions\\."
+      not_text: "\\A1\\t"
+    - { name: list_files, error: true, text: "list_files requested permissions to read from /\\S+/notes, which is outside", not_text: "todo\\.txt" }
+    - { name: grep, error: true, text: "grep requested permissions to read from /\\S+/notes, which is outside" }
+  events:
+    - { type: permission.denied, tool: read_file, by: noninteractive }

@@ -32,6 +32,18 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+
+/**
+ * @internal
+ * @brief Emits `BTI C` (hint #34) as a landing pad for indirect calls.
+ * @details Opcode: D5 03 24 5F
+ */
+INFIX_INTERNAL void emit_arm64_bti_c(code_buffer * buf) {
+    if (buf->error)
+        return;
+    emit_int32(buf, 0xD503245F);
+}
+
 // GPR <-> Immediate Value Emitters
 /*
  * @internal

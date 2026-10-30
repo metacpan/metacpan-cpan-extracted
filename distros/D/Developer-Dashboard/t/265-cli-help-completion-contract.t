@@ -71,6 +71,9 @@ is_deeply(
     'legacy command aliases resolve through the same help catalog',
 );
 
+my @log_options = Developer::Dashboard::CLI::Help::options_for('log');
+ok( ( grep { $_ eq '--tail' } @log_options ), 'log help and completion catalog expose --tail' );
+
 for my $command (@public_commands) {
     like( $global_overview, qr/^\s*dashboard\s+\Q$command\E\b/m, "$command appears in the global help overview" );
 }
@@ -352,7 +355,7 @@ for my $spec (
     [ [ 'dashboard', 'source', '-' ], 2, [qw(--files)] ],
     [ [ 'dashboard', 'upgrade', '-' ], 2, [qw(--dry-run)] ],
     [ [ 'dashboard', 'which', '-' ], 2, [qw(--edit --no-edit)] ],
-    [ [ 'dashboard', 'workspace', '-' ], 2, [qw(-c)] ],
+    [ [ 'dashboard', 'workspace', '-' ], 2, [qw(-c -C -d --docker)] ],
     [ [ 'dashboard', 'of', '-' ], 2, [qw(--print --no-print --line --editor --online --no-online)] ],
     [ [ 'dashboard', 'log', 'web', '-' ], 3, [qw(-f -n)] ],
     [ [ 'dashboard', 'serve', 'workers', '-' ], 3, [qw(--host --port)] ],

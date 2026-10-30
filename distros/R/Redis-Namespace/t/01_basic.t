@@ -22,6 +22,20 @@ subtest 'get and set' => sub {
     $redis->flushall;
 };
 
+subtest 'false keys' => sub {
+    $redis->set('0', 'global');
+    $redis->set('', 'global');
+    ok($ns->set('0' => 'zero'), 'set "0" => zero');
+    ok($ns->set('' => 'empty'), 'set "" => empty');
+    cmp_ok($ns->get(0), 'eq', 'zero', 'get 0 = zero');
+    cmp_ok($ns->get(''), 'eq', 'empty', 'get "" = empty');
+    cmp_ok($redis->get('ns:0'), 'eq', 'zero', '"0" in namespace');
+    cmp_ok($redis->get('ns:'), 'eq', 'empty', '"" in namespace');
+    cmp_ok($redis->get('0'), 'eq', 'global', 'global "0" is not changed');
+    cmp_ok($redis->get(''), 'eq', 'global', 'global "" is not changed');
+    $redis->flushall;
+};
+
 subtest 'mget and mset' => sub {
     ok($ns->mset(foo => 'bar', hoge => 'fuga'), 'mset foo => bar, hoge => fuga');
     is_deeply([$ns->mget('foo', 'hoge')], ['bar', 'fuga'], 'mget foo hoge = hoge, fuga');

@@ -435,6 +435,24 @@ Colognian locale.
    1995-12-22T09:05:02 = n. Chr. 1995 Dez 22, Fr.
   -0010-09-15T04:44:23 = v. Chr. -10 Säp 15, Sa.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = n. Chr. 2008 Fäbrowa
+   1995-12-22T09:05:02 = n. Chr. 1995 Dezämber
+  -0010-09-15T04:44:23 = v. Chr. -10 Septämber
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = n. Chr. 2008 Fäbrowa 5, Di.
+   1995-12-22T09:05:02 = n. Chr. 1995 Dezämber 22, Fr.
+  -0010-09-15T04:44:23 = v. Chr. -10 Septämber 15, Sa.
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = n. Chr. 2008 Fäbrowa 5
+   1995-12-22T09:05:02 = n. Chr. 1995 Dezämber 22
+  -0010-09-15T04:44:23 = v. Chr. -10 Septämber 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = n. Chr. 2008 Fäb 5
@@ -465,11 +483,11 @@ Colognian locale.
    1995-12-22T09:05:02 = 9:05:02
   -0010-09-15T04:44:23 = 4:44:23
 
-=head3 Hmsv (HH:mm:ss v)
+=head3 Hmsv (H:mm:ss a v)
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18:30:30 n.M. UTC
+   1995-12-22T09:05:02 = 9:05:02 v.M. UTC
+  -0010-09-15T04:44:23 = 4:44:23 v.M. UTC
 
 =head3 Hmv (HH:mm v)
 
@@ -506,6 +524,12 @@ Colognian locale.
    2008-02-05T18:30:30 = Di. 5. Fäb
    1995-12-22T09:05:02 = Fr. 22. Dez
   -0010-09-15T04:44:23 = Sa. 15. Säp
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Fäbrowa 5, Di.
+   1995-12-22T09:05:02 = Dezämber 22, Fr.
+  -0010-09-15T04:44:23 = Septämber 15, Sa.
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
@@ -555,11 +579,11 @@ Colognian locale.
    1995-12-22T09:05:02 = 9:05:02 v.M.
   -0010-09-15T04:44:23 = 4:44:23 v.M.
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 n.M. UTC
-   1995-12-22T09:05:02 = 9:05:02 v.M. UTC
-  -0010-09-15T04:44:23 = 4:44:23 v.M. UTC
+   2008-02-05T18:30:30 = 6:30:30 n.M. UTC
+   1995-12-22T09:05:02 = 9:05:02 v.M. UTC
+  -0010-09-15T04:44:23 = 4:44:23 v.M. UTC
 
 =head3 hmv (h:mm a v)
 

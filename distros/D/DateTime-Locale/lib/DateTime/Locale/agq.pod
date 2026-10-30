@@ -435,6 +435,24 @@ Aghem locale.
    1995-12-22T09:05:02 = BK 1995 fwo 22, ghɨ
   -0010-09-15T04:44:23 = SK -10 dzu 15, dzk
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = BK 2008 ndzɔ̀ŋɔ̀kƗ̀zùʔ
+   1995-12-22T09:05:02 = BK 1995 ndzɔ̀ŋèfwòo
+  -0010-09-15T04:44:23 = SK -10 ndzɔ̀ŋɔ̀tƗ̀fʉ̀ghàdzughù
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = BK 2008 ndzɔ̀ŋɔ̀kƗ̀zùʔ 5, ghɔ
+   1995-12-22T09:05:02 = BK 1995 ndzɔ̀ŋèfwòo 22, ghɨ
+  -0010-09-15T04:44:23 = SK -10 ndzɔ̀ŋɔ̀tƗ̀fʉ̀ghàdzughù 15, dzk
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = BK 2008 ndzɔ̀ŋɔ̀kƗ̀zùʔ 5
+   1995-12-22T09:05:02 = BK 1995 ndzɔ̀ŋèfwòo 22
+  -0010-09-15T04:44:23 = SK -10 ndzɔ̀ŋɔ̀tƗ̀fʉ̀ghàdzughù 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = BK 2008 kɨz 5
@@ -506,6 +524,12 @@ Aghem locale.
    2008-02-05T18:30:30 = ghɔ 5 kɨz
    1995-12-22T09:05:02 = ghɨ 22 fwo
   -0010-09-15T04:44:23 = dzk 15 dzu
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = ndzɔ̀ŋɔ̀kƗ̀zùʔ 5, ghɔ
+   1995-12-22T09:05:02 = ndzɔ̀ŋèfwòo 22, ghɨ
+  -0010-09-15T04:44:23 = ndzɔ̀ŋɔ̀tƗ̀fʉ̀ghàdzughù 15, dzk
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

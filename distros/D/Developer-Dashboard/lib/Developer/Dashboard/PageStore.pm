@@ -3,16 +3,18 @@ package Developer::Dashboard::PageStore;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 use utf8;
 
 use Encode qw(decode FB_CROAK FB_DEFAULT);
 use Cwd qw(abs_path);
-use Fcntl qw(:DEFAULT);
+use Fcntl qw(:DEFAULT :mode);
 use File::Find ();
 use File::Spec;
 use File::Basename qw(basename dirname);
 use URI::Escape qw(uri_escape);
+use Time::HiRes ();
+use bytes ();
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::PageDocument;
@@ -89,6 +91,133 @@ sub load_saved_page {
     $page->{meta}{source_kind} = 'saved';
     $page->{meta}{raw_instruction} = $instruction;
     return $page;
+}
+
+# load_nav_fragment($id)
+# Loads a discovered saved nav fragment. Literal HTML returns directly without
+# allocating a page document; TT and structured instructions retain the normal
+# parsing path and saved-page metadata. Reads still use the no-follow secure
+# open boundary, and every call observes current file contents.
+# Input: nav/<name>.tt id discovered from a dashboards layer and optional root
+# from the scanned configured layers.
+# Output: { kind => 'literal', body => $text }, { kind => 'page', page => the
+# document }, or undef if the fragment disappeared before opening.
+sub load_nav_fragment {
+    my ( $self, $id, %args ) = @_;
+    my $normalized_id = $self->_validated_page_id($id);
+    die 'Invalid nav fragment id' if $normalized_id !~ m{\Anav/.+\.tt\z};
+
+    my ( $file, $root );
+    my @initial_stat;
+    if ( defined $args{root} ) {
+        my $validated_roots = $self->{_validated_nav_roots};
+        if ( ref($validated_roots) ne 'HASH' || !$validated_roots->{ $args{root} } ) {
+            my @roots = ref( $self->{_page_roots_snapshot} ) eq 'ARRAY'
+              ? @{ $self->{_page_roots_snapshot} }
+              : $self->{paths}->dashboards_roots;
+            die 'Invalid nav fragment root' if !grep { defined $_ && $_ eq $args{root} } @roots;
+            $self->{_validated_nav_roots}{ $args{root} } = 1
+              if ref($validated_roots) eq 'HASH';
+        }
+        $root = $args{root};
+        $file = File::Spec->catfile( $root, $normalized_id );
+        @initial_stat = Time::HiRes::lstat($file);
+        return if !@initial_stat;
+        die 'Invalid page path' if S_ISLNK( $initial_stat[2] );
+        return if !S_ISREG( $initial_stat[2] );
+    }
+    else {
+        ( $file, $root ) = $self->_existing_page_file($normalized_id);
+        return if !$file;
+        @initial_stat = Time::HiRes::lstat($file);
+        die 'Invalid page path' if @initial_stat && S_ISLNK( $initial_stat[2] );
+        die 'Invalid page path' if @initial_stat && !S_ISREG( $initial_stat[2] );
+    }
+
+    my $initial_fingerprint = @initial_stat
+      ? join( "\0", @initial_stat[ 0, 1, 2, 7, 9, 10 ] )
+      : undef;
+    my $cache = $self->{_nav_fragment_cache};
+    if ( defined $initial_fingerprint && ref($cache) eq 'HASH'
+        && ref( $cache->{entries} ) eq 'HASH'
+        && exists $cache->{entries}{$file} )
+    {
+        my $cached = $cache->{entries}{$file};
+        if ( ref($cached) eq 'HASH'
+          && defined $cached->{fingerprint}
+          && $cached->{fingerprint} eq $initial_fingerprint )
+        {
+            $self->_assert_page_path_contained( $file, root => $root );
+            return { kind => 'literal', body => $cached->{body} };
+        }
+    }
+
+    my $instruction = $self->_read_saved_instruction( $file, root => $root, id => $normalized_id );
+    my $looks_like_nav = $self->_looks_like_raw_nav_fragment($instruction);
+    my $has_instruction_header = $instruction =~ /^===\s*[A-Z][A-Z0-9.]*\s*===\s*$/m
+      || $instruction =~ /^(?:TITLE|ICON|BOOKMARK|STASH|NOTE|HEAD|HTML|CODE\d+)\s*:/m;
+
+    if ( $looks_like_nav && !$has_instruction_header ) {
+        if ( index( $instruction, '[%' ) < 0 ) {
+            my @final_stat = Time::HiRes::lstat($file);
+            my $final_fingerprint = @final_stat && S_ISREG( $final_stat[2] )
+              ? join( "\0", @final_stat[ 0, 1, 2, 7, 9, 10 ] )
+              : undef;
+            $self->_cache_literal_nav_fragment( $file, $final_fingerprint, $instruction )
+              if defined $initial_fingerprint && defined $final_fingerprint
+              && $initial_fingerprint eq $final_fingerprint
+              && bytes::length($instruction) <= 262144;
+            return { kind => 'literal', body => $instruction };
+        }
+        my $page = $self->_raw_nav_fragment_page( id => $normalized_id, instruction => $instruction );
+        $page->{meta}{source_kind} = 'saved';
+        $page->{meta}{raw_instruction} = $instruction;
+        return { kind => 'page', page => $page };
+    }
+
+    my $page = $self->_load_page_instruction( $instruction, id => $normalized_id );
+    $page->{id} = $normalized_id if !$page->{id};
+    $page->{meta}{source_kind} = 'saved';
+    $page->{meta}{raw_instruction} = $instruction;
+    return { kind => 'page', page => $page };
+}
+
+# _cache_literal_nav_fragment($file, $fingerprint, $body)
+# Stores a small verified literal nav body in a bounded per-PageStore cache.
+# Input: file path, matching high-resolution lstat fingerprint, and decoded HTML.
+# Output: true after insertion or an explicit false for an unusable cache.
+sub _cache_literal_nav_fragment {
+    my ( $self, $file, $fingerprint, $body ) = @_;
+    return 0 if !defined $file || !defined $fingerprint || !defined $body;
+
+    my $cache = $self->{_nav_fragment_cache};
+    if ( ref($cache) ne 'HASH' ) {
+        $cache = $self->{_nav_fragment_cache} = { bytes => 0, entries => {}, order => [] };
+    }
+    return 0
+      if ref( $cache->{entries} ) ne 'HASH'
+      || ref( $cache->{order} ) ne 'ARRAY'
+      || !defined $cache->{bytes}
+      || $cache->{bytes} !~ /\A\d+\z/;
+    if ( exists $cache->{entries}{$file} ) {
+        my $old_entry = $cache->{entries}{$file};
+        my $old_body = ref($old_entry) eq 'HASH' ? ( $old_entry->{body} || '' ) : '';
+        $cache->{bytes} -= bytes::length($old_body);
+        @{ $cache->{order} } = grep { $_ ne $file } @{ $cache->{order} };
+    }
+    $cache->{entries}{$file} = { fingerprint => $fingerprint, body => $body };
+    $cache->{bytes} += bytes::length($body);
+    push @{ $cache->{order} }, $file;
+
+    while ( @{ $cache->{order} } > 128 || $cache->{bytes} > 4_194_304 ) {
+        my $evict = shift @{ $cache->{order} };
+        next if !exists $cache->{entries}{$evict};
+        my $old_entry = $cache->{entries}{$evict};
+        my $old_body = ref($old_entry) eq 'HASH' ? ( $old_entry->{body} || '' ) : '';
+        $cache->{bytes} -= bytes::length($old_body);
+        delete $cache->{entries}{$evict};
+    }
+    return 1;
 }
 
 # read_saved_entry($id)
@@ -220,23 +349,47 @@ sub migrate_legacy_json_pages {
 
 # _page_file_candidates($id)
 # Returns candidate bookmark files for a page id in lookup order.
+# Within a web request, all saved-page lookups share that request's fresh
+# ordered root snapshot; direct calls continue to resolve roots on every call.
 # Input: page id string.
 # Output: ordered list of hash references with root and file keys.
 sub _page_file_candidates {
     my ( $self, $id ) = @_;
     my $normalized = $self->_validated_page_id($id);
+    my @roots;
+    if ( exists $self->{_page_roots_snapshot} ) {
+        if ( ref( $self->{_page_roots_snapshot} ) eq 'ARRAY' ) {
+            @roots = @{ $self->{_page_roots_snapshot} };
+        }
+        else {
+            @roots = $self->{paths}->dashboards_roots;
+            $self->{_page_roots_snapshot} = [@roots];
+        }
+    }
+    else {
+        @roots = $self->{paths}->dashboards_roots;
+    }
     return map {
         my $root = $_;
         { root => $root, file => File::Spec->catfile( $root, $normalized ) }
-    } $self->{paths}->dashboards_roots;
+    } @roots;
 }
 
 # _validated_page_id($id)
-# Validates one normalized bookmark id before it is joined to a dashboards root.
+# Validates one bookmark id before it is joined to a dashboards root. Canonical
+# flat ASCII names bypass the general prefix and path-component normalization.
 # Input: page id string, optionally already prefixed with /app/.
 # Output: relative bookmark id with no current/parent-directory components.
 sub _validated_page_id {
     my ( $self, $id ) = @_;
+    return $id
+      if defined $id && !ref($id)
+      && $id =~ m{\Anav/[A-Za-z0-9_-][A-Za-z0-9_.-]*\.tt\z}
+      && index( $id, '..' ) < 0;
+    return $id
+      if defined $id && !ref($id)
+      && $id =~ m{\A[A-Za-z0-9_-][A-Za-z0-9_.-]*\z};
+
     my $normalized = $self->_normalized_page_id($id);
     die 'Invalid page id' if $normalized eq '';
     die 'Invalid page id' if $normalized =~ /\A[A-Za-z]:/;
@@ -247,6 +400,9 @@ sub _validated_page_id {
 # _assert_page_path_contained($file, %args)
 # Ensures a page path's resolved target or nearest existing ancestor remains
 # beneath one configured dashboards root before a read or write follows it.
+# Windows-only case and separator normalization preserves POSIX backslash names.
+# Dashboard requests share only a stable root realpath within one request;
+# every candidate path is still resolved and checked on every access.
 # Input: candidate file path plus optional for_write boolean.
 # Output: true, or dies with Invalid page path when containment is violated.
 sub _assert_page_path_contained {
@@ -256,7 +412,14 @@ sub _assert_page_path_contained {
     my @roots = exists $args{root} ? ( $args{root} ) : $self->{paths}->dashboards_roots;
     for my $root (@roots) {
         next if !defined $root || $root eq '';
-        my $root_real = abs_path($root);
+        my $scope = $self->{_page_containment_root_realpaths};
+        my $root_real;
+        if ( ref($scope) eq 'HASH' ) {
+            $root_real = exists $scope->{$root} ? $scope->{$root} : ( $scope->{$root} = abs_path($root) );
+        }
+        else {
+            $root_real = abs_path($root);
+        }
         next if !defined $root_real;
 
         my $probe = $file;
@@ -271,9 +434,9 @@ sub _assert_page_path_contained {
         if ( is_windows() ) {
             $probe_cmp = lc $probe_cmp;
             $root_cmp  = lc $root_cmp;
+            $probe_cmp =~ s{\\}{/}g;
+            $root_cmp  =~ s{\\}{/}g;
         }
-        $probe_cmp =~ s{\\}{/}g;
-        $root_cmp  =~ s{\\}{/}g;
         return 1 if $probe_cmp eq $root_cmp;
         return 1 if index( $probe_cmp, $root_cmp . '/' ) == 0;
     }
@@ -348,7 +511,8 @@ sub _normalized_page_id {
 }
 
 # _existing_page_file($id)
-# Resolves the first existing bookmark file path for a page id.
+# Resolves the first existing bookmark file path for a page id. Containment is
+# enforced once at the secure open boundary, not repeated during this lookup.
 # Input: page id string.
 # Output: file path plus its owning root in list context, the file path alone
 # in scalar context, or nothing when the page is missing.
@@ -357,7 +521,6 @@ sub _existing_page_file {
     for my $candidate ( $self->_page_file_candidates($id) ) {
         my $file = $candidate->{file};
         next if !-f $file;
-        $self->_assert_page_path_contained( $file, root => $candidate->{root} );
         return wantarray ? ( $file, $candidate->{root} ) : $file;
     }
     return;
@@ -374,16 +537,27 @@ sub _load_page_file {
 }
 
 # _load_page_instruction($instruction, %args)
-# Parses saved instruction text into a page document, with raw nav/*.tt fragment fallback.
+# Parses saved instruction text into a page document, wrapping raw nav/*.tt
+# fragments directly when they contain no bookmark-section header. The direct
+# path avoids invoking the full legacy parser for ordinary HTML/TT fragments.
 # Input: decoded instruction text string plus optional saved-page id.
 # Output: Developer::Dashboard::PageDocument object.
 sub _load_page_instruction {
     my ( $self, $instruction, %args ) = @_;
+    my $id = $args{id} || '';
+    my $is_nav_fragment = $id =~ m{\Anav/.+\.tt\z};
+    my $looks_like_nav_fragment = $is_nav_fragment && $self->_looks_like_raw_nav_fragment($instruction);
+    if ($looks_like_nav_fragment) {
+        my $has_instruction_header = $instruction =~ /^===\s*[A-Z][A-Z0-9.]*\s*===\s*$/m
+          || $instruction =~ /^(?:TITLE|ICON|BOOKMARK|STASH|NOTE|HEAD|HTML|CODE\d+)\s*:/m;
+        return $self->_raw_nav_fragment_page( id => $id, instruction => $instruction )
+          if !$has_instruction_header;
+    }
+
     my $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
     return $page if $page;
 
-    my $id = $args{id} || '';
-    if ( $id =~ m{\Anav/.+\.tt\z} && $self->_looks_like_raw_nav_fragment($instruction) ) {
+    if ($looks_like_nav_fragment) {
         return $self->_raw_nav_fragment_page(
             id          => $id,
             instruction => $instruction,
@@ -443,11 +617,13 @@ sub _read_saved_instruction {
 
 # _normalize_legacy_icon_markup($text)
 # Repairs browser-visible icon placeholders left behind by malformed older bookmark bytes.
+# A U+FFFD precheck bypasses all repair expressions for the common case.
 # Input: decoded bookmark instruction text string.
 # Output: normalized instruction text string with stable fallback glyphs in icon HTML contexts.
 sub _normalize_legacy_icon_markup {
     my ( $self, $text ) = @_;
     return '' if !defined $text;
+    return $text if index( $text, "\x{FFFD}" ) < 0;
     $text =~ s/\x{1F9D1}\x{FFFD}\x{1F4BB}/\x{1F9D1}\x{200D}\x{1F4BB}/g;
     $text =~ s{(<h2>)\x{FFFD}(\s+)}{$1◈$2}g;
     $text =~ s{(<span\s+class="icon">)[^<]*\x{FFFD}[^<]*(</span>)}{$1🏷️$2}g;
@@ -500,11 +676,16 @@ Developer::Dashboard::PageStore - page persistence and token transport
 =head1 DESCRIPTION
 
 This module persists saved page instruction documents and handles transient
-encoded page transport.
+encoded page transport. Its nav-fragment loader can return unchanged literal
+HTML without constructing a page object, while dynamic or structured nav files
+still use the canonical parser and renderer. The bounded in-memory cache uses
+high-resolution file identity and timestamps; it does not cache dynamic
+Template Toolkit output and each cache lookup checks that the file is still a
+regular file under a configured dashboards layer.
 
 =head1 METHODS
 
-=head2 new, page_file, save_page, load_saved_page, load_transient_page, encode_page, editable_url, render_url, source_url, list_saved_pages, migrate_legacy_json_pages
+=head2 new, page_file, save_page, load_saved_page, load_nav_fragment, load_transient_page, encode_page, editable_url, render_url, source_url, list_saved_pages, migrate_legacy_json_pages
 
 Manage saved and transient pages.
 
@@ -513,6 +694,12 @@ Manage saved and transient pages.
 =head1 PURPOSE
 
 This module persists and lists saved dashboard pages under the runtime dashboards tree. It turns page IDs into concrete bookmark files, writes edited pages back to disk, and provides the saved-page inventory used by the browser and CLI page commands.
+
+Canonical single-segment ASCII ids use a narrow validation fast path that
+avoids general prefix normalization and path splitting. Prefixed, nested,
+Unicode, whitespace-bearing, and reference ids still follow the full
+normalization and validation path; traversal checks and secure path containment
+remain in force for every file operation.
 
 =head1 WHY IT EXISTS
 
@@ -525,6 +712,14 @@ Use this file when changing saved page file layout, bookmark ID handling, list o
 =head1 HOW TO USE
 
 Construct it with the active paths object, then use the page load/save/list methods instead of reading the dashboards directory directly. Let this module enforce the saved-page storage contract.
+
+The web application uses C<load_nav_fragment> for discovered C<nav/*.tt>
+files. It supplies the scanned root so the store can avoid searching every
+layer, while the store still validates the root, checks the current file
+identity, and uses the secure no-follow open when content is not cached. A
+literal HTML fragment is returned as a body string; fragments with Template
+Toolkit directives and structured bookmark files are returned as page
+documents for normal request-time rendering.
 
 =head1 WHAT USES IT
 
@@ -555,6 +750,15 @@ Example 4:
   prove -lr t
 
 Put any module-level change back through the entire repository suite before release.
+
+Example 5:
+
+  my $fragment = $store->load_nav_fragment('nav/status.tt', root => $dashboard_root);
+
+Use this for a discovered layered nav file. A literal fragment returns
+C<{ kind =E<gt> 'literal', body =E<gt> ... }>; a dynamic or structured file
+returns C<{ kind =E<gt> 'page', page =E<gt> $document }>, and a file removed
+between inventory and load returns C<undef>.
 
 
 =for comment FULL-POD-DOC END

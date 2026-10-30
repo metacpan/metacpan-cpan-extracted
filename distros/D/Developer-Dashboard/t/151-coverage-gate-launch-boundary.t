@@ -108,7 +108,7 @@ subtest 'a database stamped by another serializer is refused, and both are named
     my $dir = temp_repo();
     make_path( File::Spec->catdir( $dir, 'cover_db' ) );
 
-    open my $fh, '>', File::Spec->catfile( $dir, 'cover_db', 'gate-serializer' )
+    open my $fh, '>', File::Spec->catfile( $dir, '.cover_db.coverage-gate-serializer' )
       or die "cannot write stamp: $!";
     print {$fh} "$FOREIGN\n";
     close $fh;
@@ -139,16 +139,22 @@ subtest 'a database this serializer wrote is graded normally' => sub {
         'and it does not warn about a disagreement that is not there' );
 };
 
-subtest 'the stamp is written so the NEXT run can make this check' => sub {
-    plan tests => 2;
+subtest 'legacy database stamp migrates beside the database for the NEXT run' => sub {
+    plan tests => 3;
 
     my $dir = temp_repo();
     make_path( File::Spec->catdir( $dir, 'cover_db' ) );
 
+    my $legacy_stamp = File::Spec->catfile( $dir, 'cover_db', 'gate-serializer' );
+    open my $legacy_fh, '>', $legacy_stamp or die "cannot write legacy stamp: $!";
+    print {$legacy_fh} "$INC{'Devel/Cover/DB/IO.pm'}\n";
+    close $legacy_fh;
+
     run_gate( dir => $dir );
 
-    my $stamp = File::Spec->catfile( $dir, 'cover_db', 'gate-serializer' );
-    ok( -f $stamp, 'the gate records which serializer wrote the database' );
+    my $stamp = File::Spec->catfile( $dir, '.cover_db.coverage-gate-serializer' );
+    ok( -f $stamp, 'the gate records serializer metadata beside the database' );
+    ok( !-e $legacy_stamp, 'the legacy in-database metadata is removed after migration' );
 
     open my $fh, '<', $stamp or die "cannot read stamp: $!";
     my $recorded = <$fh>;
@@ -173,7 +179,7 @@ subtest 'an empty stamp file is treated as no stamp, not as a mismatch' => sub {
 
     my $dir = temp_repo();
     make_path( File::Spec->catdir( $dir, 'cover_db' ) );
-    open my $fh, '>', File::Spec->catfile( $dir, 'cover_db', 'gate-serializer' )
+    open my $fh, '>', File::Spec->catfile( $dir, '.cover_db.coverage-gate-serializer' )
       or die "cannot write stamp: $!";
     close $fh;
 
@@ -187,7 +193,7 @@ subtest 'the refusal is explained, which is the whole point of the card' => sub 
 
     my $dir = temp_repo();
     make_path( File::Spec->catdir( $dir, 'cover_db' ) );
-    open my $fh, '>', File::Spec->catfile( $dir, 'cover_db', 'gate-serializer' )
+    open my $fh, '>', File::Spec->catfile( $dir, '.cover_db.coverage-gate-serializer' )
       or die "cannot write stamp: $!";
     print {$fh} "$FOREIGN\n";
     close $fh;

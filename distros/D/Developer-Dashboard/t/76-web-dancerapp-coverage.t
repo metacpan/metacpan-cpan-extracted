@@ -9,12 +9,15 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use HTTP::Request::Common qw(GET);
+use Plack::Request;
 
 use lib 'lib';
 use lib 't/lib';
 
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::PathIdentity ();
 use Developer::Dashboard::PageDocument;
+use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PageRuntime ();
 use Developer::Dashboard::Web::DancerApp;
 use Local::PSGITest;
@@ -39,15 +42,22 @@ isa_ok( $paths, 'Developer::Dashboard::PathRegistry', 'path registry anchors the
     package Local::CovRequest;
     sub new {
         my ( $class, %args ) = @_;
+        my $env = $args{env} || {};
+        for my $name ( keys %{ $args{headers} || {} } ) {
+            my $key = uc $name;
+            $key =~ s/-/_/g;
+            $env->{"HTTP_$key"} = $args{headers}{$name};
+        }
         return bless {
             headers => $args{headers} || {},
-            env     => $args{env}     || {},
+            env     => $env,
             body    => $args{body},
+            calls   => { header => 0, env => 0, body => 0 },
         }, $class;
     }
-    sub header { return $_[0]->{headers}{ $_[1] }; }
-    sub env    { return $_[0]->{env}; }
-    sub body   { return $_[0]->{body}; }
+    sub header { $_[0]->{calls}{header}++; return $_[0]->{headers}{ $_[1] }; }
+    sub env    { $_[0]->{calls}{env}++;    return $_[0]->{env}; }
+    sub body   { $_[0]->{calls}{body}++;   return $_[0]->{body}; }
     sub method { return $_[0]->{env}{REQUEST_METHOD}; }
 }
 
@@ -469,6 +479,76 @@ sub request_args_with {
 }
 
 {
+    my $fake = Local::CovRequest->new(
+        headers => { Host => 'count.example', Cookie => 'sid=1' },
+        env => {
+            PATH_INFO => '/counted', QUERY_STRING => 'x=1', REQUEST_METHOD => 'GET',
+            REMOTE_ADDR => '127.0.0.1', SERVER_NAME => 'localhost', SERVER_PORT => '80',
+        },
+        body => '',
+    );
+    my $request_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::DancerApp::request = sub { $request_calls++; return $fake; };
+        my $args = Developer::Dashboard::Web::DancerApp::_request_args();
+        is( $args->{path}, '/counted', 'cached request normalization preserves the request path' );
+    }
+    is( $request_calls, 1, 'request normalization acquires the active request once' );
+    is( $fake->{calls}{env}, 1, 'request normalization acquires the PSGI environment once' );
+    is( $fake->{calls}{header}, 0, 'request normalization reads headers from the captured PSGI environment' );
+    is( $fake->{calls}{body}, 1, 'request normalization reads the body once' );
+}
+
+{
+    my $fake = Local::CovRequest->new( env => { HTTP_HOST => 'direct.example' } );
+    my $request_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::DancerApp::request = sub { $request_calls++; return $fake; };
+        my $headers = Developer::Dashboard::Web::DancerApp::_request_headers();
+        is( $headers->{host}, 'direct.example', '_request_headers without an argument uses the active request' );
+    }
+    is( $request_calls, 1, '_request_headers obtains the active request once when omitted' );
+    is( $fake->{calls}{env}, 1, '_request_headers obtains the PSGI environment once when omitted' );
+}
+
+{
+    my $env = {
+        HTTP_HOST              => 'parity.example',
+        HTTP_COOKIE            => 'sid=one',
+        HTTP_ORIGIN            => 'https://origin.example',
+        HTTP_REFERER           => 'https://referer.example/page',
+        HTTP_SEC_FETCH_SITE    => 'same-origin',
+        HTTP_X_DD_API_KEY      => 'key-value',
+        HTTP_X_DD_API_SECRET   => 'secret-value',
+        PATH_INFO              => '/parity',
+        REQUEST_METHOD         => 'POST',
+        REMOTE_ADDR            => '192.0.2.5',
+    };
+    my $request = Plack::Request->new($env);
+    my $headers = Developer::Dashboard::Web::DancerApp::_request_headers($env);
+    is_deeply(
+        $headers,
+        {
+            host              => scalar( $request->header('Host') // '' ),
+            cookie            => scalar( $request->header('Cookie') // '' ),
+            origin            => scalar( $request->header('Origin') // '' ),
+            referer           => scalar( $request->header('Referer') // '' ),
+            'sec-fetch-site'  => scalar( $request->header('Sec-Fetch-Site') // '' ),
+            'x-dd-api-key'    => scalar( $request->header('X-DD-API-Key') // '' ),
+            'x-dd-api-secret' => scalar( $request->header('X-DD-API-Secret') // '' ),
+        },
+        'direct PSGI header mapping exactly matches Plack request header normalization',
+    );
+    my $error = eval {
+        Developer::Dashboard::Web::DancerApp::_request_headers([]);
+        1;
+    } ? '' : $@;
+    like( $error, qr/Dancer request environment must be a hash reference/, '_request_headers rejects an invalid environment explicitly' );
+}
+
+{
     my $args = request_args_with(
         headers => {
             Origin           => 'https://same.example',
@@ -832,6 +912,64 @@ is( run_authorized_body( Local::NoAuthBackend->new ), 'root-noauth',
 # Dancer request/response keywords (not the doubles above).
 # ---------------------------------------------------------------------------
 {
+    my $called = 0;
+    my $value = Developer::Dashboard::Web::DancerApp::_with_request_scopes(
+        { app => Local::CovBackend->new },
+        sub { $called++; return 'unscoped-result'; },
+    );
+    is( $value, 'unscoped-result', 'request scope helper preserves results for a backend without a page store' );
+    is( $called, 1, 'request scope helper invokes the callback exactly once without a registry' );
+    is(
+        Developer::Dashboard::Web::DancerApp::_with_request_scopes(
+            'not-a-backend-hash', sub { return 'non-hash-backend-result'; },
+        ),
+        'non-hash-backend-result',
+        'request scope helper supports a non-hash backend descriptor',
+    );
+    is(
+        Developer::Dashboard::Web::DancerApp::_with_request_scopes(
+            { app => [] }, sub { return 'non-hash-app-result'; },
+        ),
+        'non-hash-app-result',
+        'request scope helper safely bypasses PageStore lookup for a non-hash app reference',
+    );
+    my $error = eval {
+        Developer::Dashboard::Web::DancerApp::_with_request_scopes( {}, undef );
+        1;
+    } ? '' : $@;
+    like( $error, qr/Missing Dancer backend callback/, 'request scope helper rejects a missing callback explicitly' );
+}
+
+{
+    my $page_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    my $backend = {
+        app => bless( { pages => $page_store }, 'Local::CovBackend' ),
+    };
+    my $identity_calls = 0;
+    my $identity = \&Developer::Dashboard::PathIdentity::_path_identity;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathIdentity::_path_identity = sub {
+            $identity_calls++;
+            return $identity->(@_);
+        };
+        for my $request_number ( 1 .. 2 ) {
+            my $resolved = Developer::Dashboard::Web::DancerApp::_with_request_scopes(
+                $backend,
+                sub {
+                    my $first  = $paths->_path_identity($home);
+                    my $second = $paths->_path_identity($home);
+                    return [ $first, $second ];
+                },
+            );
+            is( $resolved->[0], $resolved->[1], "request $request_number reuses an identical path identity" );
+            ok( !exists $paths->{_path_identity_scope}, "request $request_number discards its path-identity scope" );
+        }
+    }
+    is( $identity_calls, 2, 'identical path identities resolve once in each fresh request scope' );
+}
+
+{
     my $backend = bless {}, 'Local::RealBackend';
     {
         no warnings 'once';
@@ -862,6 +1000,35 @@ is( run_authorized_body( Local::NoAuthBackend->new ), 'root-noauth',
     is( $res->content,            'real:/system/status', 'a real PSGI route returns the backend body' );
     is( $res->header('X-Default'), 'dv',                'a real PSGI route merges backend default headers' );
     is( $res->header('X-Real'),    'yes',               'a real PSGI route merges per-response headers' );
+
+    # Direct Dancer route methods must receive the same request-local runtime
+    # inventory scope as calls dispatched through Web::App::handle().
+    $backend->{pages} = Developer::Dashboard::PageStore->new( paths => $paths );
+    my $scope_observed = 0;
+    {
+        no warnings qw(redefine once);
+        *Local::RealBackend::status_response = sub {
+            my ($self) = @_;
+            $scope_observed = exists $self->{pages}{paths}{_runtime_layer_candidate_scope} ? 1 : 0;
+            $self->{pages}{paths}->runtime_layers;
+            $self->{pages}{paths}->runtime_layers;
+            return [ 200, 'text/plain; charset=utf-8', 'scoped-status', {} ];
+        };
+        my $ancestor_calls = 0;
+        my $ancestor_layers = \&Developer::Dashboard::PathRegistry::_ancestor_runtime_layers;
+        local *Developer::Dashboard::PathRegistry::_ancestor_runtime_layers = sub {
+            $ancestor_calls++;
+            return $ancestor_layers->(@_);
+        };
+        my $scoped_response = Local::PSGITest::request(
+            $psgi_app, GET 'http://127.0.0.1/system/status'
+        );
+        is( $scoped_response->code, 200, 'a direct PSGI backend method remains successful with request scoping' );
+        is( $scoped_response->content, 'scoped-status', 'the direct PSGI backend method response is unchanged' );
+        ok( $scope_observed, 'direct Dancer methods share the request-local runtime-layer scope' );
+        is( $ancestor_calls, 1, 'runtime ancestry is resolved once across repeated reads in one Dancer request' );
+        ok( !exists $paths->{_runtime_layer_candidate_scope}, 'the Dancer request scope is discarded after dispatch' );
+    }
 }
 
 {
@@ -977,6 +1144,15 @@ backend-dispatch helpers in the dashboard's Dancer2 route adapter so that every
 defensive branch and short-circuiting condition is exercised. It pins the exact
 behavior of the host/remote-address defaults, the delayed streaming writer, the
 disconnect detection, and the authorize-then-run dispatch guards.
+It also proves that direct Dancer backend methods share a runtime-layer
+inventory and exact path-identity results for one request, discard them
+afterward, and preserve behavior for backends without the dashboard's
+PageStore/PathRegistry pair. Repeated identity calls are counted across two
+request scopes to verify intra-request reuse and next-request freshness. An
+array-reference app exercises the defensive PageStore type guard. Counted
+request doubles also prove normalization acquires the active Dancer request
+and PSGI environment once, reads each required header once, and retains the
+standalone header-helper behavior.
 
 =head1 WHY IT EXISTS
 
@@ -999,7 +1175,9 @@ adapter's default-header pass.
 
 Use this file when changing how the route adapter normalizes requests, resolves
 the remote address, builds delayed streaming responses, detects client
-disconnects, or enforces per-route authorization before dispatch.
+disconnects, scopes request-local filesystem inventories, or enforces per-route
+authorization before dispatch. It also protects request-local path-identity
+reuse and its cleanup boundary.
 
 =head1 HOW TO USE
 

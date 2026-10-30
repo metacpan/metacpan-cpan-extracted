@@ -4,7 +4,9 @@ description: "Owns raider's commits and release readiness — cuts commits from 
 model: sonnet
 briefing:
   skills:
+    - raider-core
     - getty-git-commit-style
+    - getty-git-usage
     - getty-perl-release-author-getty
     - perl-release-dist-ini
     - kanban-issues-karr-ticket
@@ -25,12 +27,16 @@ code goes back to the worker as a note on its card, not as your own fix. **Never
 
 1. **cpanfile** — every dep declared; the `Langertha` floor is deliberate and
    moves up whenever this dist starts using a new Langertha feature.
-2. **dist.ini** — once it exists, check it follows the `[@Author::GETTY]`
-   pattern used by `langertha-knarr`/`langertha-skeid`. The old `raider` repo's
-   `dist.ini` had a `run_after_release` chain publishing a GitHub release and a
-   Docker Hub image (`raudssus/raider`) — that image name is kept (decided
-   2026-09-24, karr #6).
-3. **`dzil build`** — runs clean: no missing files, no warnings.
+2. **dist.ini** — check it follows the `[@Author::GETTY]` pattern used by
+   `langertha-knarr`/`langertha-skeid`. The Docker Hub image is built and pushed
+   by the bundle's Docker::API (`docker_image` + `docker_tags = latest %V %v`, no
+   subsection: the Dockerfile's last stage `runtime-root` is what gets built);
+   the GitHub release comes from the bundle's `GitHub::CreateRelease`. There is
+   no `run_after_release` and no `maint/release-after.pl`. The image name
+   `raudssus/raider` is kept (decided 2026-09-24, karr #6).
+3. **`DZIL_DOCKER_API_SKIP=1 dzil build`** — runs clean: no missing files, no
+   warnings. A plain `dzil build` also builds the image at `DOCKER_HOST`; run
+   that only when the dispatching agent asks for the image check.
 4. **Changes** — `{{$NEXT}}` section exists and covers the user-visible changes
    since the last tag.
 

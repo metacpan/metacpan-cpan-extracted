@@ -1,5 +1,24 @@
 Revision history for Perl extension Spreadsheet::XLSX.
 
+0.20  2026-10-29
+
+    - Security: limit ZIP entry counts and uncompressed sizes; read members
+      incrementally and reject inconsistent size metadata.
+    - Security: validate number format IDs and escape regex lookups to prevent
+      regex injection from crafted styles.
+    - Security: reject out-of-range date values to prevent excessive CPU usage.
+    - Security: validate cell references against XLSX worksheet limits before
+      indexing cell arrays, preventing excessive allocation from invalid rows.
+    - Add cpanfile for easy dependency installation.
+    - Improve Readme.
+
+0.19  2026-10-29
+
+    - Security: replace string eval of number-format conditions with strict
+      numeric comparisons; invalid conditions use the fallback format section.
+      Prevents arbitrary Perl code execution when parsing crafted XLSX files.
+    - Add regression tests for numeric conditions and malicious XLSX formats.
+
 0.18
 
     - fix RT #117166: unformatted date values can no longer be retrieved, thx to lherschi

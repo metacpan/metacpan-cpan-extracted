@@ -979,9 +979,9 @@ subtest 'HTTP view path-A: invalid table name -> 404 (TABLE_NAME_RE guard)' => s
 	$t->get_ok('/view/1badname')->status_is(404);
 };
 
-subtest 'HTTP view path-B: valid name, no backing file -> 200 with error in body' => sub {
+subtest 'HTTP view path-B: valid name, no backing file -> 404 page' => sub {
 	$t->get_ok('/view/no_such_table_xyz')
-	  ->status_is(200)
+	  ->status_is(404)
 	  ->content_type_like(qr{text/html});
 };
 

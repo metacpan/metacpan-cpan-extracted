@@ -1,0 +1,186 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib 'lib';
+
+use Developer::Dashboard::PageRuntime;
+use Template;
+
+my $iterations = 500;
+my $runs = 9;
+my $workload = 'repeated';
+my $help = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'workload=s'   => \$workload,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+die "--workload must be 'repeated' or 'distinct'\n" if $workload !~ /\A(?:repeated|distinct)\z/;
+
+my $root = tempdir( 'problem48-template-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+make_path($root);
+my $include_file = File::Spec->catfile( $root, 'piece.tt' );
+open my $include_fh, '>:encoding(UTF-8)', $include_file or die "open $include_file: $!\n";
+print {$include_fh} '[% stash.value %]';
+close $include_fh or die "close $include_file: $!\n";
+my $roots = [$root];
+my $runtime = Developer::Dashboard::PageRuntime->new;
+my $template = '[% title %]:[% INCLUDE piece.tt %]';
+my @sources = $workload eq 'repeated'
+  ? ($template) x 5
+  : map { $template . "[%# distinct template $_ %]" } 1 .. 5;
+my @expected = _render_request( 'fresh', $roots, \@sources, 0, $runtime );
+my @actual = _render_request( 'cached', $roots, \@sources, 0, $runtime );
+die "Fresh and cached Template Toolkit results differ before timing\n"
+  if join( "\0", @actual ) ne join( "\0", @expected );
+
+my ( @fresh_seconds, @cached_seconds );
+for my $run ( 1 .. $runs ) {
+    my @order = $run % 2 ? qw(fresh cached) : qw(cached fresh);
+    for my $mode (@order) {
+        my $measure = sub {
+            my $started = time;
+            for my $request ( 1 .. $iterations ) {
+                my @actual = _render_request( $mode, $roots, \@sources, $request, $runtime );
+                for my $index ( 0 .. $#actual ) {
+                    my $wanted = "title-$request-$index:value-$request-$index";
+                    die "$mode output mismatch at request $request render $index\n"
+                      if $actual[$index] ne $wanted;
+                }
+            }
+            return time - $started;
+        };
+        my $elapsed = $mode eq 'cached'
+          ? do { local $runtime->{_template_processor_scope} = {}; $measure->() }
+          : $measure->();
+        push @{ $mode eq 'fresh' ? \@fresh_seconds : \@cached_seconds }, $elapsed;
+    }
+}
+
+my $fresh_median = _median(@fresh_seconds);
+my $cached_median = _median(@cached_seconds);
+printf "requests=%d renders_per_request=%d runs=%d parity=exact roots=one workload=%s\n",
+  $iterations, scalar(@sources), $runs, $workload;
+printf "fresh_ms_per_render=%.4f cached_ms_per_render=%.4f speedup=%.2fx\n",
+  1000 * $fresh_median / ( $iterations * @sources ),
+  1000 * $cached_median / ( $iterations * @sources ),
+  $fresh_median / $cached_median;
+exit 0;
+
+# _render_request($mode, $roots, $sources, $request, $runtime)
+# Renders five scalar bodies through one TT service in an isolated request scope.
+# Input: baseline/cached mode, include roots, source list, request sequence, runtime.
+# Output: rendered page bodies; initialization and processing errors are fatal.
+sub _render_request {
+    my ( $mode, $roots, $sources, $request, $runtime ) = @_;
+    my $render = sub {
+        my $tt = $mode eq 'fresh'
+          ? Template->new( { EVAL_PERL => 1, INCLUDE_PATH => $roots } )
+          : $runtime->_template_processor_for_roots($roots);
+        die "Unable to initialize $mode Template Toolkit service\n" if !$tt;
+        my @output;
+        for my $index ( 0 .. $#$sources ) {
+            my $template = $sources->[$index];
+            my $title = "title-$request-$index";
+            my $value = "value-$request-$index";
+            my $input = \$template;
+            if ( $mode eq 'cached' ) {
+                my $document = $runtime->_template_document_for_source( $tt, $roots, $template );
+                $input = $document if $document;
+            }
+            my $body = '';
+            $tt->process( $input, { title => $title, stash => { value => $value } }, \$body )
+              or die "Unable to render $mode template: " . $tt->error . "\n";
+            push @output, $body;
+        }
+        return @output;
+    };
+    return $mode eq 'cached'
+      ? do { local $runtime->{_template_processor_scope} = {}; $render->() }
+      : $render->();
+}
+
+# _median(@samples)
+# Returns the middle wall-clock sample for an odd non-empty sample list.
+# Input: elapsed-second numbers.
+# Output: median elapsed-second number.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _usage()
+# Returns the benchmark command syntax.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--iterations N] [--runs ODD_N] [--workload repeated|distinct] [--help]\n"
+      . "Compares fresh Template Toolkit setup with request-local service and worker-local compiled-template reuse.\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-template-service-benchmark - compare Template Toolkit service and compiled scalar-template reuse
+
+=head1 PURPOSE
+
+This benchmark compares many request-like scopes, each with one Template
+Toolkit service and five scalar bodies. The baseline reparses and compiles
+source on each render; the candidate uses PageRuntime's request-scoped service
+and bounded worker-local compiled scalar-template cache.
+C<--workload repeated> uses five identical sources per request, while
+C<--workload distinct> uses five different sources. Both arms render dynamic
+stash values and an INCLUDE file.
+
+=head1 WHY IT EXISTS
+
+The Problem 48 NYTProf route profile showed repeated Template Toolkit parsing
+and compilation in PageRuntime. This benchmark checks exact output parity while
+isolating scalar-template reuse from route dispatch. The distinct workload approximates requests
+whose page and navigation fragments have different source bodies; neither
+workload is a whole-route latency claim.
+
+=head1 WHEN TO USE
+
+Run this after changing C<PageRuntime::_template_processor_for_roots> or
+C<PageRuntime::_template_document_for_source>. It uses a private temporary
+include root and does not touch dashboard user state.
+
+=head1 HOW TO USE
+
+  perl script/problem48-template-service-benchmark
+  perl script/problem48-template-service-benchmark --iterations 500 --runs 21 --workload repeated
+  perl script/problem48-template-service-benchmark --iterations 500 --runs 21 --workload distinct
+
+=head1 OUTPUT
+
+The command prints request count, renders per request, workload, exact parity,
+median milliseconds per render for each path, and their ratio. This isolated measurement must not be
+presented as end-to-end dashboard latency or as a 50x result for all routines.
+
+=head1 SAFETY
+
+No shell commands are executed. The temporary directory is automatically
+removed at process exit. Errors from service creation or template processing
+are fatal and remain visible.
+
+=cut

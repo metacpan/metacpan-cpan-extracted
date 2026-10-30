@@ -210,6 +210,14 @@ sub _io_module_paths {
 sub _check_report {
     my ($lines) = @_;
 
+    my ($warning) = grep {
+        /^Devel::Cover: (?:Warning:|ignoring extra statement\b)/i
+    } @{$lines};
+    if (defined $warning) {
+        $warning =~ s/\s+\z//;
+        return _unreadable("report contains Devel::Cover warning: $warning");
+    }
+
     my @headers = grep { /^File\b/ } @{$lines};
     my @totals  = grep { /^Total\b/ } @{$lines};
     return _unreadable('missing Total row')                if !@totals;
@@ -436,7 +444,8 @@ coverage failure
 
 A fail-closed filter. It reads a C<Devel::Cover> text report on standard input,
 echoes it so the operator still sees the table, and turns it into one of five
-verdicts, each with its own exit status.
+verdicts, each with its own exit status. Devel::Cover warning diagnostics make
+the report unreadable for release purposes, even when its Total row says 100.0.
 
 =head1 WHAT IT IS FOR
 
@@ -454,6 +463,10 @@ Three failures look alike at a glance and demand opposite responses:
 =item * An B<unreadable report> is a fact about the report. Something upstream
 did not produce what it claimed to produce, and the gate must never read that as
 a clean result.
+
+=item * A B<report warning> means the instrumentation could not confidently map
+runtime counts to source. The Total row is not accepted as proof until the
+warning is resolved.
 
 =item * An B<instrument failure> is a fact about the environment.
 
@@ -497,7 +510,8 @@ Exit statuses are the interface:
 
 =item * B<1> - a genuine shortfall; the failing metrics are named.
 
-=item * B<2> - the report could not be read, or never arrived.
+=item * B<2> - the report could not be read, never arrived, or contains a
+C<Devel::Cover> warning diagnostic.
 
 =item * B<4> - a B<stale uncoverable annotation>: the report marks a line as
 uncoverable that the suite actually reached, so a covered outcome is being

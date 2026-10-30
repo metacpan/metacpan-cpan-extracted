@@ -135,4 +135,22 @@ unless ($INC{'Devel/Cover.pm'}) {
 	is($s->{events}, 14, 'total events unaffected: sum(status)');
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { survfit([1, 2]); 1 } ? '' : $@;
+	like($err, qr/\Ausage: survfit\(.*^example:\n.*\n\nsurvfit: error: \Qthe first two arguments must be array refs of times and event flags\E\n\z/ms,
+		'survfit: the first two arguments must be array refs of times and event flags, under the help screen');
+}
+{
+	my $err = eval { logrank_test([1, 2], [1, 1]); 1 } ? '' : $@;
+	like($err, qr/\Ausage: logrank_test\(.*^example:\n.*\n\nlogrank_test: error: \Qthe first three arguments must be array refs of times, event flags and groups\E\n\z/ms,
+		'logrank_test: the first three arguments must be array refs of times, event flags and groups, under the help screen');
+}
+{
+	my $err = eval { coxph([1, 2], [1, 1], [0, 1], ties => 'exact'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: coxph\(.*^example:\n.*\n\ncoxph: error: \Qties must be 'efron' or 'breslow'\E\n\z/ms,
+		'coxph: ties must be \'efron\' or \'breslow\', under the help screen');
+}
+
 done_testing();

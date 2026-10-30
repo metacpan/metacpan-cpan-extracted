@@ -232,7 +232,7 @@ throws_ok { kurtosis([1, 2, 4], type => 2) } qr/\Qkurtosis: type 2 needs >= 4 el
 	'kurtosis: type 2 needs four points to divide by n - 3';
 throws_ok { skew(1) }     qr/\Qskew needs >= 2 elements\E/,     'skew: one point is not a sample';
 throws_ok { kurtosis(1) } qr/\Qkurtosis needs >= 2 elements\E/, 'kurtosis: one point is not a sample';
-throws_ok { skew() }      qr/\Qskew needs >= 2 elements\E/,     'skew: dies with no arguments';
+throws_ok { skew() }      qr/\Ausage: skew\(.*^skew: error: no values given\n\z/ms, 'skew: dies with no arguments';
 throws_ok { kurtosis([]) } qr/\Qkurtosis needs >= 2 elements\E/,'kurtosis: dies on an empty array ref';
 
 # --- a constant sample has no shape at all
@@ -247,19 +247,19 @@ throws_ok { skew(1, undef, 3) } qr/\Qskew: undefined value at argument index 1\E
 throws_ok { kurtosis([1, 2, undef]) }
 	qr/\Qkurtosis: undefined value at array ref index 2 (argument 0)\E/,
 	'kurtosis: names the element and argument of an undef inside an array ref';
-throws_ok { skew(\@w, type => 0) } qr/\Qskew: type must be 1, 2 or 3, not 0\E/,
+throws_ok { skew(\@w, type => 0) } qr/\Qskew: error: type must be 1, 2 or 3, not 0\E/,
 	'skew: rejects type 0';
-throws_ok { skew(\@w, type => 4) } qr/\Qskew: type must be 1, 2 or 3, not 4\E/,
+throws_ok { skew(\@w, type => 4) } qr/\Qskew: error: type must be 1, 2 or 3, not 4\E/,
 	'skew: rejects type 4';
-throws_ok { skew(\@w, type => 'g1') } qr/\Qskew: type must be 1, 2 or 3\E/,
+throws_ok { skew(\@w, type => 'g1') } qr/\Qskew: error: type must be 1, 2 or 3\E/,
 	'skew: rejects a non-numeric type';
-throws_ok { skew(\@w, 'type') } qr/\Qskew: 'type' needs a value\E/,
+throws_ok { skew(\@w, 'type') } qr/\Qskew: error: 'type' needs a value\E/,
 	'skew: reports a trailing option name with no value';
-throws_ok { skew(\@w, 'x') } qr/\Qskew: 'x' needs a value\E/,
+throws_ok { skew(\@w, 'x') } qr/\Qskew: error: 'x' needs a value\E/,
 	'skew: reports a trailing x with no value';
-throws_ok { skew(x => 5) } qr/\Qskew: 'x' must be an array reference\E/,
+throws_ok { skew(x => 5) } qr/\Qskew: error: 'x' must be an array reference\E/,
 	"skew: 'x' has to be an array ref";
-throws_ok { kurtosis(\@w, types => 2) } qr/\Qkurtosis: unknown argument 'types'\E/,
+throws_ok { kurtosis(\@w, types => 2) } qr/\Qkurtosis: error: unknown argument 'types'\E/,
 	'kurtosis: a misspelled option is an error, not silently averaged in';
 
 # --- leaks, on the data paths and the croak paths

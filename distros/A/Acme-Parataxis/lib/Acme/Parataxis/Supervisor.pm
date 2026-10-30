@@ -9,7 +9,7 @@ use feature 'class';
 # deliberately out of scope" guardrail, and it is pure Perl on top of the existing park/wake
 # machinery: one supervision fiber owns the tree and learns a child died through that child's own
 # teardown (an actor's on_death hook, or a wrapper fiber around a nested supervisor's run).
-class Acme::Parataxis::Supervisor v0.1.1 {
+class Acme::Parataxis::Supervisor v0.1.3 {
     use Acme::Parataxis qw[fiber];
     use Acme::Parataxis::Channel;
     use Acme::Parataxis::Error;

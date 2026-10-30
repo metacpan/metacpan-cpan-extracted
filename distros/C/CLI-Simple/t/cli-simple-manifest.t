@@ -6,6 +6,7 @@ use warnings;
 use File::Temp qw(tempfile);
 use Test::More;
 use YAML::Tiny qw(DumpFile);
+use English qw(-no_match_vars);
 
 use_ok('CLI::Simple');
 
@@ -261,5 +262,145 @@ sub write_manifest {
 
   ok( CLI::Simple::Test::Legacy->can('cmd_legacy'), 'class without manifest retains its own methods', );
 }
+
+subtest 'additional YAML manifest supplied during import' => sub {
+  require File::Temp;
+
+  my ( $primary_fh, $primary_file ) = File::Temp::tempfile( SUFFIX => '.yml', UNLINK => 1 );
+
+  my ( $extension_fh, $extension_file ) = File::Temp::tempfile( SUFFIX => '.yml', UNLINK => 1 );
+
+  print {$primary_fh} <<'YAML';
+roles:
+  primary-command: Local::PrimaryRole
+YAML
+
+  print {$extension_fh} <<'YAML';
+roles:
+  extension-command: Local::ExtensionRole
+YAML
+
+  close $primary_fh;
+  close $extension_fh;
+
+  my $package = 'Local::ManifestImportTest';
+  my $code    = sprintf q{
+  package %s;
+  use parent qw(CLI::Simple);
+  use CLI::Simple '%s', '%s';
+  1;
+}, $package, $primary_file, $extension_file;
+
+  my $loaded = eval $code;
+
+  ok( $loaded, 'YAML manifests accepted as import arguments' )
+    or diag($EVAL_ERROR);
+
+  if ($loaded) {
+    my $manifest = $package->_manifest;
+
+    ok( exists $manifest->{_roles}{'primary-command'}, 'primary command registered' );
+
+    ok( exists $manifest->{_roles}{'extension-command'}, 'extension command registered' );
+
+    ok( !$package->can('cmd_primary_command'), 'primary role not composed during import' );
+
+    ok( !$package->can('cmd_extension_command'), 'extension role not composed during import' );
+  }
+};
+
+subtest 'YAML manifest glob expansion during import' => sub {
+  require File::Temp;
+  require File::Path;
+
+  my $dir = File::Temp::tempdir( CLEANUP => 1 );
+
+  for my $spec (
+    [ 'Primary',   'primary-command',   'Local::PrimaryRole' ],
+    [ 'Extension', 'extension-command', 'Local::ExtensionRole' ],
+  ) {
+    my ( $name, $command, $role ) = @{$spec};
+
+    my $path = "$dir/$name";
+    File::Path::make_path($path);
+
+    open my $fh, '>', "$path/role.yml"
+      or die "Cannot create $path/role.yml: $OS_ERROR";
+
+    print {$fh} "roles:\n  $command: $role\n";
+    close $fh;
+  }
+
+  my $package = 'Local::ManifestGlobTest';
+  my $pattern = "$dir/*/role.yml";
+
+  my $code = sprintf q{
+    package %s;
+    use parent qw(CLI::Simple);
+    use CLI::Simple '%s';
+    1;
+  }, $package, $pattern;
+
+  my $loaded = eval $code;
+
+  ok( $loaded, 'glob manifest import succeeds' )
+    or diag($EVAL_ERROR);
+
+  if ($loaded) {
+    my $manifest = $package->_manifest;
+
+    ok( exists $manifest->{_roles}{'primary-command'}, 'primary command registered' );
+
+    ok( exists $manifest->{_roles}{'extension-command'}, 'extension command registered' );
+
+    ok( !$package->can('cmd_primary_command'), 'primary role not composed during import' );
+
+    ok( !$package->can('cmd_extension_command'), 'extension role not composed during import' );
+  }
+};
+
+subtest 'unmatched YAML manifest glob' => sub {
+  require File::Temp;
+
+  my $dir     = File::Temp::tempdir( CLEANUP => 1 );
+  my $package = 'Local::ManifestUnmatchedGlobTest';
+  my $pattern = "$dir/*/role.yml";
+
+  my $code = sprintf q{
+    package %s;
+    use parent qw(CLI::Simple);
+    use CLI::Simple '%s';
+    1;
+  }, $package, $pattern;
+
+  my $loaded = eval $code;
+
+  ok( $loaded, 'unmatched glob does not cause an error' )
+    or diag($EVAL_ERROR);
+
+  if ($loaded) {
+    ok( !defined $package->_manifest, 'no manifest registered for unmatched glob' );
+  }
+};
+subtest 'missing explicit YAML manifest' => sub {
+  require File::Temp;
+
+  my $dir     = File::Temp::tempdir( CLEANUP => 1 );
+  my $package = 'Local::ManifestMissingFileTest';
+  my $missing = "$dir/missing.yml";
+
+  my $code = sprintf q{
+    package %s;
+    use parent qw(CLI::Simple);
+    use CLI::Simple '%s';
+    1;
+  }, $package, $missing;
+
+  my $loaded = eval $code;
+
+  ok( !$loaded, 'missing explicit manifest rejected' );
+
+  like( $EVAL_ERROR, qr/File '\Q$missing\E' does not exist/, 'error identifies missing manifest' );
+};
 
 done_testing;

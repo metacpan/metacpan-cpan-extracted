@@ -6,7 +6,7 @@ use feature 'class';
 # runs at most one message at a time. spawn() builds and starts it (a class-level factory, since
 # perlclass instances cannot be assembled by hand); the mailbox is created in ADJUST, the fiber
 # and its weak self-capture in _start, so spawn() does the checks and plumbing a factory must.
-class Acme::Parataxis::Actor v0.1.1 {
+class Acme::Parataxis::Actor v0.1.3 {
     use Acme::Parataxis qw[fiber];
     use Acme::Parataxis::Channel;
     use Acme::Parataxis::Future;

@@ -46,7 +46,7 @@ my %secure_minimum = (
     'Digest::SHA'            => '5.96',
     'HTML::Parser'           => '3.84',
     'HTTP::Date'             => '6.08',
-    'HTTP::Tiny'             => '0.095',
+    'HTTP::Tiny'             => '0.096',
     'IO::Compress::Gzip'     => '2.220',
     'IO::Uncompress::Gunzip' => '2.220',
     'JSON::XS'               => '4.04',
@@ -117,7 +117,7 @@ like( $workflow, qr/echo\s+"\$GITHUB_WORKSPACE\/audit-local\/bin"\s+>>\s+"\$GITH
 unlike( $workflow, qr/PATH:\s*\$\{\{\s*env\.PATH\s*\}\}/, 'CI does not replace the runner PATH with an unavailable env context value' );
 like( $installer, qr/PERLBREW_PERL="\$\{DD_INSTALL_PERLBREW_PERL:-perl-5\.44\.0\}"/, 'bootstrap fallback builds the hardened Perl 5.44 runtime' );
 like( $installer, qr/MIN_PERL_VERSION='5\.038'/, 'bootstrap accepts host Perl releases from 5.38 and only builds the perlbrew fallback below that floor' );
-like( $main_pod, qr/older than the required\s+C<5\.44>/, 'installation documentation names the hardened Perl baseline' );
+like( $main_pod, qr/hardened Perl baseline:\s+C<5\.44>/, 'installation documentation names the hardened Perl baseline' );
 like( $main_pod, qr/perlbrew --notest install perl-5\.44\.0/, 'installation documentation names the hardened rescue Perl' );
 like( $blank_env, qr/\AFROM\s+perl:5\.44-bookworm\@sha256:[0-9a-f]{64}\b/, 'blank-environment E2E uses a digest-pinned hardened Perl image' );
 

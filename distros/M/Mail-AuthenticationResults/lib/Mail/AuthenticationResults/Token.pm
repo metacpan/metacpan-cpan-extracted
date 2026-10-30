@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20260216'; # VERSION
+our $VERSION = '2.20261029'; # VERSION
 use Carp;
 
 
@@ -69,7 +69,7 @@ Mail::AuthenticationResults::Token - Base class for modelling AuthenticationResu
 
 =head1 VERSION
 
-version 2.20260216
+version 2.20261029
 
 =head1 DESCRIPTION
 
@@ -101,6 +101,11 @@ Return the value of the current Token instance.
 
 Return the remainder of the header string after parsing the current token out.
 
+Tokens created by L<Mail::AuthenticationResults::Parser> do not retain the
+remainder once it has been consumed, and will return undef. Retaining a copy
+of the remaining header in every token uses memory quadratic in the number
+of tokens.
+
 =head2 parse()
 
 Run the parser on the current $header and set up value() and remainder().
@@ -111,11 +116,11 @@ Return the type of token we are.
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

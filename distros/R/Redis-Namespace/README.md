@@ -31,6 +31,7 @@ It is useful when you have multiple systems using Redis differently in your app.
 - namespace
 
     prefix of keys.
+    If it is omitted or an empty string, the keys are not prefixed.
 
 - guess
 

@@ -83,6 +83,7 @@ my %ropt = (PubkeyCallback=>$cb, SkipTimestampCheck=>1);
     my $r2 = Mail::DKIM2::Reflector::reflect(%common, mode=>'body', message=>$in);
     my $rep = Mail::DKIM2::Validate::report($r2->{message}, %ropt);
     is($rep->{overall}, 'pass', 'valid chain overall pass');
+    ok($rep->{fully_verified}, 'valid chain fully verified');
     is($rep->{counts}{signatures}, 2, 'two signatures');
     my @sig = grep { $_->{kind} eq 'signature' } @{$rep->{levels}};
     my @mi  = grep { $_->{kind} eq 'mi' } @{$rep->{levels}};
@@ -140,7 +141,7 @@ my %ropt = (PubkeyCallback=>$cb, SkipTimestampCheck=>1);
 }
 
 # 1c) top-level nd=: the highest-numbered DKIM2-Signature carries nd= instead
-# of mf=/rt=. Local policy (-07 §13.1, §14.4, stricter than the letter of the draft;
+# of mf=/rt=. Local policy (-08 §13.2, §14.4, stricter than the letter of the draft;
 # matches the Verifier.pm permerror added for Task 2.1) rejects this: the
 # report must surface a failing level whose detail matches the same message
 # as the Verifier's permerror.
@@ -181,7 +182,7 @@ sub signed_input_nd {
 # and only ever sub-verifies one signature at a time against a partial
 # message view, so it never sees both i=1 and i=2 together the way
 # Verifier.pm's whole-chain _verify_chain() does). It must use the exact
-# same canonical -07 wording as Task 3.1's Verifier.pm permerror
+# same canonical -08 wording as Task 3.1's Verifier.pm permerror
 # (verbatim "MAIL nd=" typo preserved), keyed on the *previous* hop's i=.
 {
     my $msg = build_chain(
@@ -194,7 +195,7 @@ sub signed_input_nd {
     ok($sig2, 'nd= mismatch: i=2 level present');
     ok(!$sig2->{custody}{ok}, 'nd= mismatch: custody flagged not ok');
     is($sig2->{custody}{detail}, 'PERMERROR: DKIM2-Signature i=1 nd= does not match',
-       'nd= adjacency custody detail matches the -07 wording');
+       'nd= adjacency custody detail matches the -08 wording');
 }
 
 # 1d-bis) A Forwarder's §9.3 bridge after a real hop: the message arrived at
@@ -261,7 +262,7 @@ sub signed_input_nd {
     ok($sig2, 'custody break: i=2 level present');
     ok(!$sig2->{custody}{ok}, 'custody break: custody flagged not ok');
     is($sig2->{custody}{detail}, 'PERMERROR: DKIM2-Signature i=2 mf= does not match the rt= of i=1',
-       'custody-break detail matches the -07 wording');
+       'custody-break detail matches the -08 wording');
 }
 
 # 2) Post-sign body tamper (damage)
@@ -331,10 +332,10 @@ sub signed_input_nd {
     is(Mail::DKIM2::Validate::report($good, %ropt)->{overall}, 'pass', 'clean reflected verifies');
 
     # a folded Received-SPF prepended by the receiver does not pollute the
-    # header hash at all: it verifies cleanly (-07 §4).
+    # header hash at all: it verifies cleanly (-08 §4).
     my $polluted = "Received-SPF: pass\r\n (test.example: 1.2.3.4 authorized)\r\n" . $good;
     my $rep = Mail::DKIM2::Validate::report($polluted, %ropt);
-    is($rep->{overall}, 'pass', 'a Received-SPF prepended by the receiver verifies cleanly (-07 §4)');
+    is($rep->{overall}, 'pass', 'a Received-SPF prepended by the receiver verifies cleanly (-08 §4)');
 
     # a genuinely broken message must still fail even with Received-SPF present
     my $broken = $good; $broken =~ s/orig body/evil body/;

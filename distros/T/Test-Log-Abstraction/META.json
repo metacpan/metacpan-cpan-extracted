@@ -40,11 +40,13 @@
             "Params::Get" : "0.17",
             "Params::Validate::Strict" : "0.41",
             "Readonly" : "0",
+            "Readonly::Values::Syslog" : "0.04",
             "Scalar::Util" : "0",
             "Test::Builder" : "0",
             "autodie" : "0",
             "perl" : "5.026",
             "strict" : "0",
+            "version" : "0",
             "warnings" : "0"
          }
       },
@@ -56,6 +58,7 @@
             "Exporter" : "0",
             "File::Temp" : "0",
             "JSON::PP" : "0",
+            "Log::Abstraction" : "0.41",
             "Test::Builder::Tester" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.14",
@@ -83,6 +86,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Log-Abstraction"
       }
    },
-   "version" : "v0.002.0",
+   "version" : "0.002.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

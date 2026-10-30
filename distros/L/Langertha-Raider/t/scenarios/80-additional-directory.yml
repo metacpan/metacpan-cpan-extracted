@@ -1,0 +1,24 @@
+title: an additional directory can be read, searched and (in acceptEdits) written; other places outside the root cannot
+permission_mode: acceptEdits
+files:
+  .raider/config.yml: |
+    permissions:
+      additional_directories: [ "~/extra" ]
+home:
+  extra/notes.txt: "the token is here\n"
+prompt: Use the extra directory.
+script:
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/extra/notes.txt" } ]
+      - [ grep, { pattern: token, path: "{{HOME}}/extra", output_mode: content } ]
+      - [ write_file, { path: "{{HOME}}/extra/new.txt", content: "n\n" } ]
+      - [ read_file, { path: "{{HOME}}/extra/new.txt" } ]
+      - [ write_file, { path: "{{HOME}}/elsewhere.txt", content: "x\n" } ]
+  - text: done
+expect:
+  tools:
+    - { name: read_file, text: "the token is here" }
+    - { name: grep, text: "/extra/notes\\.txt:1:the token is here" }
+    - { name: write_file }
+    - { name: read_file, text: "\\A1\\tn\\n2\\t\\z" }
+    - { name: write_file, error: true, text: "acceptEdits mode asks before this call: write_file changes files; nobody can approve it" }

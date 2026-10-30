@@ -446,4 +446,14 @@ no_leaks_ok {
 	    by => 'k', agg => { v => 'sum' });
 } 'agg(): empty frame, wide-character, NaN and undef keys, no leaks' unless $INC{'Devel/Cover.pm'};
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('agg');
+	like($screen, qr/\Ausage: agg\(/, 'agg has a help screen');
+	is(do { local $@; eval { agg([ { x => 1 } ], agg => { x => 'mean' }, bogus => 1); 1 } ? '' : $@ },
+	   $screen . "agg: error: unknown argument(s): bogus\n",
+	   'agg: an unknown option prints the help screen');
+}
+
 done_testing();

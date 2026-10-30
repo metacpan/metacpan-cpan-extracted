@@ -224,7 +224,7 @@ typedef struct {
  */
 struct infix_library_t {
     void * handle; /**< The platform-native library handle (`HMODULE` on Windows, `void*` on POSIX). */
-#if defined(INFIX_OS_WINDOWS)
+#if defined(INFIX_OS_WINDOWS) && !defined(__CYGWIN__)
     bool is_pseudo_handle; /**< True if the handle is a "pseudo-handle" from GetModuleHandle. */
 #endif
 };

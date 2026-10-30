@@ -332,20 +332,25 @@ for my $key (sort keys %CMP) {
 	is($c->[1]{formula}, 'sr ~ pop15 + pop75', 'the remaining models keep their order');
 }
 
-# Argument validation
+# Argument validation.  An error in the call, rather than in the data, is the
+# help screen, then the error on the last line.
 {
 	my $wb = $DATA{wb};
 	my %ragged = (y => [1, 2, 3], x => [1, 2]);
 	eval { anova(\%ragged, 'y ~ x') };
 	like($@, qr/^anova: HoA columns have unequal lengths/, 'ragged columns croak');
 	eval { anova($wb, undef) };
-	like($@, qr/^anova: second argument must be a formula string/, 'undef formula croaks');
+	like($@, qr/\Ausage: anova\(.*^anova: error: second argument must be a formula string/ms, 'undef formula croaks');
 	eval { anova($wb, 'breaks ~ wool', [1]) };
-	like($@, qr/^anova: model argument 2 must be a formula string/, 'reference as a later formula croaks');
+	like($@, qr/\Ausage: anova\(.*^anova: error: model argument 2 must be a formula string/ms, 'reference as a later formula croaks');
 	eval { anova($wb, 'breaks ~ ') };
-	like($@, qr/^anova: could not parse formula/, 'empty right-hand side croaks');
+	like($@, qr/\Ausage: anova\(.*^anova: error: could not parse formula/ms, 'empty right-hand side croaks');
 	eval { anova(\'x', 'y ~ x') };
-	like($@, qr/^anova: first argument must be a hash or array reference/, 'scalar ref croaks');
+	like($@, qr/\Ausage: anova\(.*^anova: error: first argument must be a hash or array reference/ms, 'scalar ref croaks');
+	my $screen = Stats::LikeR::_usage_text('anova');
+	eval { anova($wb) };
+	is($@, $screen . "anova: error: a data frame and at least one formula are required\n",
+		'a call-form error is the screen, then the error on the last line');
 }
 
 diag(sprintf 'worst relative disagreement with R: %.3g (%s)', $worst, $worst_at);

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Acme::Parataxis::Local - Per-fiber Storage Slot
+Acme::Parataxis::Local - Per-Fiber Storage Slots and Context Propagation
 
 =head1 SYNOPSIS
 
@@ -13,189 +13,158 @@ Acme::Parataxis::Local - Per-fiber Storage Slot
     use Acme::Parataxis::Local;
 
     my $request_id = Acme::Parataxis::Local->new;
-    my $trace_id   = Acme::Parataxis::Local->new( inherit => 1 );    # copied into spawned children
+    my $trace_id   = Acme::Parataxis::Local->new( inherit => 1 );
 
     async {
         $request_id->set(42);
-        $trace_id->set('span-1');
+        $trace_id->set('span-100');
 
-        fiber { $request_id->set(99); say $request_id->get };        # 99
-        fiber { say $trace_id->get };                                # span-1
-        say $request_id->get;                                        # 42
+        fiber {
+            # Inherited slot carries the parent's value at spawn time:
+            say "Child trace:   " . $trace_id->get;      # span-100
+
+            # Uninherited slot starts empty (undef):
+            say "Child request: " . ($request_id->get // 'unset'); # unset
+
+            $request_id->set(99);
+            say "Child modified: " . $request_id->get;    # 99
+        };
+
+        # Parent's slot remains untouched:
+        say "Parent request: " . $request_id->get;        # 42
     };
-
-C<$request_id> is walled off: the child writes 99 and the parent still reads 42. C<$trace_id> was inherited, so the
-child starts from the parent's value without being handed one. The three lines print in that order, because a C<fiber>
-body begins running at the C<fiber> call rather than after it.
 
 =head1 DESCRIPTION
 
-A C<Local> is one named variable that reads differently depending on which fiber asks. Parent, children and siblings
-each get a private cell, so no fiber can read or overwrite another's value:
+C<Acme::Parataxis::Local> provides fiber-local storage, analogous to thread-local storage in multi-threaded runtimes. A
+single C<Local> instance represents a variable that resolves to a private cell for each individual fiber.
 
-    my $depth = Acme::Parataxis::Local->new( default => 0 );
+Fibers never share or leak cells:
 
-    async {
-        $depth->set(1);
-        fiber { say $depth->get };        # 0 - the child starts from the default
-        say $depth->get;                  # 1
-    };
+=over
 
-This is the opposite of C<local>: the value follows the fiber rather than the dynamic call stack, and it survives any
-number of C<await>s and C<yield>s in between without being passed down by hand.
+=item * Writing to a C<Local> in a child fiber never overwrites the parent's or siblings' values.
 
-Create one C<Local> per logical variable - a trace id, a request id, a per-fiber database handle, a re-entrancy flag -
-and none of it needs cooperation from the scheduler or the C core. Each fiber's cell is dropped when that fiber
-finishes and is reaped, so a long-running program does not accumulate stale values.
+=item * Unlike Perl's dynamic C<local>, the value follows the fiber's execution lifetime rather than the block scope.
+It survives any number of C<await> and C<yield> boundaries.
 
-=head1 Inheritance
+=item * When a fiber terminates and is reaped, its local cells are cleaned up automatically, avoiding memory leaks in
+long-running processes.
 
-A slot created with C<inherit =E<gt> 1> opts into trace propagation: at the moment a child fiber is spawned, each such
-slot's current value is copied out of the spawning fiber into the child's own cell, before the child's body runs its
-first statement. That is how a request id or a logging context reaches work you would rather not thread arguments
-through.
+=back
 
-    my $trace = Acme::Parataxis::Local->new( inherit => 1 );
+=head1 Inheritance and Trace Propagation
 
-    async {
-        $trace->set('span-1');
-        fiber { say $trace->get };    # span-1
-    };
+Constructing a slot with C<inherit =E<gt> 1> enables automatic context propagation. When a fiber spawns a child fiber
+via C<fiber { ... }>, C<spawn()>, an actor, or a nursery, all active inherited slots are shallow-copied into the
+child's cell before its first statement runs.
 
-The copy is shallow, and the child owns it outright from that moment. Later C<set>s in the child never reach the
-parent, and later C<set>s in the parent never reach the child.
-
-Propagation happens at the three spawn points that go through C<spawn>: C<fiber> and C<spawn>, a C<nursery> child, and
-an actor's own fiber. It does B<not> happen for an C<async> or C<run> block - see L</"Behavior Notes">.
+This is the standard mechanism for passing request IDs, tracing spans, and security contexts down an asynchronous call
+tree without manually threading parameters through every helper function. Once copied, the child owns its cell
+outright; subsequent writes by parent or child do not cross the boundary.
 
 =head1 METHODS
 
-=head2 C<new( [ default =E<gt> $default, inherit =E<gt> 0 ] )>
+=head2 C<new( [%opts] )>
 
     my $plain  = Acme::Parataxis::Local->new;
-    my $seeded = Acme::Parataxis::Local->new( default => 'unset' );
+    my $seeded = Acme::Parataxis::Local->new( default => 'anonymous' );
     my $traced = Acme::Parataxis::Local->new( inherit => 1 );
 
-Creates a slot. Both arguments are named and optional; C<default> is C<undef> and C<inherit> is false unless you say
-otherwise. C<default> is what C<get> returns in a fiber that has not written to the slot yet, and C<inherit> opts the
-slot into L</"Inheritance">. Any true value works for C<inherit>.
+Constructs a new fiber-local slot. Arguments are keyword-only:
 
-Arguments are keyword only. C<< Acme::Parataxis::Local->new('x') >> is rejected with C<Unrecognized parameters for
-"Acme::Parataxis::Local" constructor: x>, as is any key that is not C<default> or C<inherit>.
+=over
+
+=item * C<default =E<gt> $val>
+
+The fallback value returned by C<get()> in fibers that have not explicitly set a value. Default is C<undef>.
+
+=item * C<inherit =E<gt> $bool>
+
+If true, child fibers spawned via C<spawn()>, C<fiber>, nurseries, or actors inherit a snapshot of the parent's current
+value at spawn time. Default is false.
+
+=back
 
 =head2 C<get( )>
 
-    fiber { say $request_id->get };    # 99
+    my $val = $slot->get;
 
-Returns the calling fiber's value, or the slot's C<default> if that fiber has never written to it. Never exposes
-another fiber's value, in either direction.
+Returns the value stored in the calling fiber's private cell, or the configured C<default> if unwritten.
 
-Croaks with C<Local->get must be called from inside a scheduled fiber> when called outside a fiber, so a missing
-C<async> is a loud error rather than a silent C<undef>.
+Must be called from within a scheduled fiber (croaks with C<Local->get must be called from inside a scheduled fiber>
+otherwise).
 
 =head2 C<set( $value )>
 
-    $request_id->set(42);
+    $slot->set('req-123');
 
-Writes C<$value> into the calling fiber's cell and returns it. The write is private to this fiber and is never visible
-to its parent or its siblings.
+Stores C<$value> in the calling fiber's private cell and returns that value. The write is strictly private to this
+fiber.
 
-Croaks with C<Local->set must be called from inside a scheduled fiber> when called outside a fiber.
+Must be called from within a scheduled fiber (croaks otherwise).
 
 =head1 Recipes
 
-=head2 Carry a request id into work you cannot pass arguments to
+=head2 Contextual logging without parameter threading
 
-    my $request_id = Acme::Parataxis::Local->new;
+    use v5.40;
+    use Acme::Parataxis qw[async fiber];
+    use Acme::Parataxis::Local;
+
+    my $CURRENT_USER = Acme::Parataxis::Local->new( default => 'guest', inherit => 1 );
+
+    sub log_action ($action) {
+        my $user = $CURRENT_USER->get;
+        say "[$user] $action";
+    }
 
     async {
-        my $id = $request_id->get // 'anonymous';
+        $CURRENT_USER->set('alice');
+        log_action('logging in');    # [alice] logging in
 
         fiber {
-            # ... a deep call chain that never mentions $id, but every line of it can log it
-            log_line( request => $id );
+            # Inherited context carries into background work:
+            log_action('processing queue');    # [alice] processing queue
         };
     };
 
-=head2 Give each fiber its own connection handle
+=head2 Isolated fiber-scoped resource handles
 
-    my $dbh = Acme::Parataxis::Local->new;
+    my $DB_CONN = Acme::Parataxis::Local->new;
 
-    fiber {
-        my $handle = connect();
-        $dbh->set($handle);
+    sub get_db () {
+        my $dbh = $DB_CONN->get;
+        unless ($dbh) {
+            $dbh = create_database_handle();
+            $DB_CONN->set($dbh);
+        }
+        return $dbh;
+    }
 
-        # any helper reached from here can reach for the handle without it being passed along
-        $dbh->get->do_something;
-    };
-
-Because the cell is private, two fibers working at once never share a handle, and nothing has to be locked.
-
-=head2 Assert isolation in a test
-
-    my $slot = Acme::Parataxis::Local->new( default => 'empty' );
-
-    my $ok = eval {
-        async {
-            $slot->set('mine');
-            fiber { die 'a child saw ' . $slot->get if $slot->get ne 'empty' };
-        };
-        1;
-    };
-
-    die $@ unless $ok;
+    # Concurrent fibers calling get_db() each maintain an isolated connection.
 
 =head1 Behavior Notes
 
-=head2 C<async> does not propagate inherited values
+=over
 
-An C<async> block (or C<run>) does run its block in a fiber of its own, so an ordinary C<Local> is isolated from it as
-usual. But C<async> builds that fiber directly rather than through C<spawn>, and the inheritance seed lives in
-C<spawn>. That produces the one asymmetry in this class:
+=item * Top-level C<async> blocks do not inherit
 
-    my $trace = Acme::Parataxis::Local->new( inherit => 1 );
+Inheritance is wired into C<spawn()>. Because C<async { ... }> and C<run()> initialize a brand-new scheduler run
+directly rather than spawning off a parent fiber, they do not inherit slots from an enclosing context. Pass values into
+an C<async> block explicitly or wrap the work in an internal C<fiber { ... }>.
 
-    async {
-        $trace->set('root');
-        async { say $trace->get };     # undef - not inherited
-        fiber  { say $trace->get };     # root
-    };
+=item * Writing C<undef> overrides the default
 
-To carry a value across an C<async> boundary, pass it in explicitly or move the work into a C<fiber>.
+C<default> is only consulted when a fiber has never called C<set()>. Calling C<< $slot->set(undef) >> stores an
+explicit undefined value, and subsequent C<get()> calls return C<undef>, not the default.
 
-=head2 C<default> is only a fallback for an unwritten cell
+=item * Unique slot identity
 
-A fiber that has written anything gets exactly what it wrote, and C<undef> counts as a write:
+Each instantiated C<Local> object receives a monotonically increasing process-wide ID. Two distinct C<Local> instances
+with identical configurations remain completely isolated from one another.
 
-    my $slot = Acme::Parataxis::Local->new( default => 'dflt' );
-
-    async {
-        say $slot->get;        # dflt
-        $slot->set(undef);
-        say $slot->get;        # undef, not dflt
-    };
-
-=head2 A value lives exactly as long as its fiber
-
-A cell belongs to a fiber, not to the slot. When that fiber finishes and is reaped, its stash is deleted and the value
-goes with it, whether or not a C<Local> object is still in scope. Holding the object alive does not resurrect it. A new
-fiber starts from C<default> again.
-
-=head2 Each object is a separate variable
-
-Two C<Local> objects never share a value, whatever their arguments; there is no name to collide on and no identifier
-exposed to compare. Create as many as the program needs.
-
-=head1 How It Works
-
-Each C<Local> takes a process-wide monotonic id at construction, so two slots never collide and a recycled memory
-address cannot alias a newer slot. C<get> and C<set> look up the calling fiber's stash - a plain hash addressed by the
-fiber object's C<refaddr> - and index it by that id, falling back to C<default> when the key is absent.
-
-An C<inherit =E<gt> 1> slot pushes its id onto C<@Acme::Parataxis::INHERIT_LOCAL_IDS> at construction and removes it
-again when the C<Local> is destroyed. C<spawn> reads that list, snapshots the parent's matching cells before the child
-body gets control, and wraps the child so the snapshot lands in the child's own stash on its first instruction. When
-nothing is set, the snapshot is empty and no wrapper is built, so the ordinary spawn path costs nothing extra.
+=back
 
 =head1 SEE ALSO
 

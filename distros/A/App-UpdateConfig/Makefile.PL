@@ -22,10 +22,12 @@ WriteMakefile(
     # is a file named Makefile.PL in a sub-directory. Should be customized if such a file needs to be
     # processed by ExtUtils.
     DIR              => [],
-    NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
-      # Goes with NO_MYMETA (which would provide the dynamic config).
+      # The prerequisites of the META file are complete, so that CPAN clients
+      # don't need to run Makefile.PL to find them. The MYMETA files are still
+      # generated, as some clients (e.g. cpanm) read the recommended modules
+      # only from there.
       dynamic_config => 0,
       no_index => {
         directory => [ 'local', 'vendor', 't' ],

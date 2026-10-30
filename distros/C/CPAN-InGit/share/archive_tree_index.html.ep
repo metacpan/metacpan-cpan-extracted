@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= $tree_label %> — CPAN index</title>
+  <style>
+    body { font: 1rem/1.5 system-ui, sans-serif; max-width: 80rem; margin: 2rem auto; padding: 0 1rem; color: #172331; }
+    h1 { margin-bottom: .5rem; }
+    dl {
+      display: grid;
+      grid-template-columns: max-content 1fr; /* label column sizes to the longest label */
+      gap: 0.5rem 1rem;
+      align-items: baseline;
+    }
+    dt { font-weight: 600; } dd { margin: 0 0 .5rem; }
+    input[type="search"] { font: inherit; padding: .2rem .5rem; width: min(30rem, 90%); flex: 1 1 15rem; }
+    button { font: inherit; padding: .2rem 1rem; cursor: pointer; }
+    [hidden] { display: none !important; }
+    .filter-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
+    .module-progress { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
+    .module-progress p { margin: 0; }
+    .cve-state { display: inline-flex; align-items: center; gap: .5rem; }
+    .cve-spinner { width: 1em; height: 1em; border: 2px solid #c7cfd7; border-top-color: #165ca2; border-radius: 50%; animation: cve-spin .7s linear infinite; }
+    @keyframes cve-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .cve-spinner { animation: none; } }
+    tr.cve-affected { background: #ffe8e8; }
+    tr.cve-affected td:nth-child(2) { color: #d00000; font-weight: 700; }
+    .cve-report { display: block; white-space: nowrap; }
+    .table-scroll { overflow-x: auto; margin-bottom: 1rem; }
+    table { border-collapse: collapse; width: 100%; text-align: left; }
+    th, td { border-bottom: 1px solid #d9e0e6; padding: .5rem; }
+    th { background: #eef2f6; } a { color: #165ca2; }
+    td:first-child {
+      width: 50%;
+      max-width: 0;             /* cell can't grow past its 50% share */
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    
+    td:first-child > span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;  /* use "clip" if you want it cut off with no ellipsis */
+    }
+    
+    /* on hover: let it escape the cell and sit on top */
+    td:first-child:hover {
+      overflow: visible;
+    }
+    
+    td:first-child:hover > span {
+      position: relative;       /* needed for z-index to apply */
+      z-index: 10;
+      width: max-content;       /* grow to natural width, extending rightward */
+      overflow: visible;
+      background: #fff;         /* so it covers what's underneath */
+      /*box-shadow: 2px 2px 6px rgba(0, 0, 0, .25);*/
+      padding-right: 0.75rem;
+    }
+  </style>
+  <script src="<%= $cve_script_url %>" defer></script>
+  <script src="<%= $script_url %>" defer></script>
+</head>
+<body>
+  <main id="cpan-index" data-json-url="<%= $json_url %>" data-authors-url="<%= $authors_url %>"
+      data-filter="<%= $module_page->{filter} %>" data-tree="<%= $module_page->{tree} %>"
+      data-complete="<%= $module_page->{complete}? 'true' : 'false' %>"
+      data-next-after="<%= $module_page->{next_after} // '' %>"
+      data-previous-before="<%= $module_page->{previous_before} // '' %>">
+    <h1><%= $tree_label %></h1>
+    <dl>
+      <dt>Commit date</dt><dd id="commit-date"><%= $commit_date // 'Unavailable for this tree' %></dd>
+      <dt>02packages.details.txt updated</dt><dd id="index-updated"><%= $index_updated // 'Unknown' %></dd>
+    </dl>
+    <form method="get" id="module-filter-form">
+      <label for="module-filter">Filter modules, versions, or distribution paths (case insensitive)</label><br>
+      <div class="filter-controls">
+        <input id="module-filter" name="filter" type="search" value="<%= $module_page->{filter} %>" autocomplete="off" aria-describedby="filter-help">
+        <noscript><button type="submit">Filter</button></noscript>
+        <button id="check-cves" type="button" hidden>Check CVEs</button>
+        <span id="cve-state" class="cve-state" role="status" aria-live="polite" hidden>
+          <span id="cve-spinner" class="cve-spinner" aria-hidden="true"></span>
+          <span id="cve-message"></span>
+        </span>
+        <label id="only-cves-label" hidden><input id="only-cves" type="checkbox" checked> Only CVEs</label>
+      </div>
+    </form>
+    <div class="module-progress">
+      <p id="module-status" role="status" aria-live="polite">
+        Showing <%= scalar $module_page->{modules}->@* %> modules<%= $module_page->{complete}? ' (all matches).' : '.' %>
+      </p>
+      <button id="load-more" type="button" <%= $module_page->{next_after}? '' : 'hidden' %>>Load more</button>
+      <button id="load-all" type="button" <%= $module_page->{complete}? 'hidden' : '' %>>Load all</button>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Module</th><th scope="col">Version</th><th id="cve-column" scope="col" hidden>CVEs</th><th scope="col">Distribution</th></tr></thead>
+        <tbody id="module-rows">
+% for my $row ($module_page->{modules}->@*) {
+          <tr data-row="<%= JSON::PP->new->encode($row) %>">
+            <td><span><%= $row->{name} %></span></td><td><%= $row->{version} %></td>
+            <td class="cve-reports" hidden></td>
+            <td><a href="<%= $authors_url %><%= join '/', map Mojo::Util::url_escape($_), split '/', $row->{path} %>"><%= $row->{path} %></a></td>
+          </tr>
+% }
+        </tbody>
+      </table>
+    </div>
+    <noscript><p>Enable JavaScript to load more modules without reloading.</p></noscript>
+  </main>
+</body>
+</html>

@@ -39,6 +39,25 @@ subtest 'json — mirrors JS JSON.stringify (with documented undef divergence)' 
     is $bf->json(undef),     'null',    'undef → "null" (matches JS null; diverges from JS undefined)';
 };
 
+subtest 'json — a negative zero is written as 0 (JS JSON.stringify(-0) is "0")' => sub {
+    # `mod` keeps `-0.0` for a negative dividend; whether the encoder spells
+    # it `-0`, `-0.0` or `0` depends on the Perl / JSON module version, so
+    # check the value handed to the encoder (`%g` keeps the sign).
+    my $neg_zero = POSIX::fmod(-4, 2);
+    is sprintf('%g', $neg_zero), '-0', 'precondition: fmod(-4, 2) is -0.0';
+    is sprintf('%g', BarefootJS::_json_zero($neg_zero)), '0', 'scalar';
+    my $nested = BarefootJS::_json_zero({ a => [$neg_zero, 1], b => $neg_zero });
+    is sprintf('%g', $nested->{a}[0]), '0', 'inside an array inside a hash';
+    is sprintf('%g', $nested->{b}),    '0', 'hash value';
+    is $nested->{a}[1], 1, 'non-zero numbers kept';
+    is BarefootJS::_json_zero('-0'),  '-0',  'a string stays a string';
+    is BarefootJS::_json_zero('0.0'), '0.0', 'a "0.0" string stays a string';
+    my $input = [$neg_zero];
+    BarefootJS::_json_zero($input);
+    is sprintf('%g', $input->[0]), '-0', 'the argument is not mutated';
+    is $bf->json([$neg_zero, 1]), '[0,1]', 'json() end to end';
+};
+
 subtest 'string — JS String(v) mirror' => sub {
     is $bf->string(42),    '42', 'int';
     is $bf->string('hi'),  'hi', 'string passthrough';
@@ -142,6 +161,40 @@ subtest 'includes — array + string + non-array/string dispatch' => sub {
     # refactor doesn't accidentally match HASH keys.
     ok !$bf->includes({a => 1}, 'a'),    'hash ref → 0 (.includes undefined on Object)';
     ok !$bf->includes(sub {}, 'x'),      'code ref → 0';
+};
+
+# JS `===` between operands whose type the compiler cannot see. Perl's
+# numeric `==` reads two non-numeric strings as `0 == 0`; `eq` reads `1` and
+# `1.0` as different. The comparison goes by the operands' JS types instead.
+subtest 'strict_eq — JS === by type and value' => sub {
+    ok !$bf->strict_eq('p', 'q'), 'different non-numeric strings are not equal';
+    ok $bf->strict_eq('p', 'p'), 'equal strings are equal';
+    ok !$bf->strict_eq('', 'a'), 'empty string vs non-empty string';
+    ok !$bf->strict_eq('001', '1'), 'numeric-looking strings compare by content';
+    ok $bf->strict_eq(1, 1.0), 'numbers compare by value';
+    ok $bf->strict_eq(0, -0.0), '0 === -0';
+    ok $bf->strict_eq(1e3, 1000), 'exponent notation is the same number';
+    ok !$bf->strict_eq(0.5, 1), 'different numbers are not equal';
+    ok !$bf->strict_eq(1, '1'), 'number vs string of the same digits';
+    ok !$bf->strict_eq('abc', 0), 'non-numeric string vs 0';
+    my $nan = 0 + 'nan';
+    ok !$bf->strict_eq($nan, $nan), 'NaN !== NaN';
+    ok $bf->strict_eq(undef, undef), 'undef === undef';
+    ok !$bf->strict_eq(undef, 0), 'undef vs 0';
+    ok !$bf->strict_eq(undef, ''), 'undef vs empty string';
+    ok $bf->strict_eq(JSON::PP::true(), JSON::PP::true()), 'true === true';
+    ok !$bf->strict_eq(JSON::PP::true(), JSON::PP::false()), 'true !== false';
+    ok !$bf->strict_eq(JSON::PP::true(), 1), 'true !== 1';
+    my ($obj, $arr) = ({ id => 1 }, [1]);
+    ok $bf->strict_eq($obj, $obj), 'the same hash ref is equal to itself';
+    ok $bf->strict_eq($arr, $arr), 'the same array ref is equal to itself';
+    ok !$bf->strict_eq({ id => 1 }, { id => 1 }), 'distinct hashes with equal contents are not equal';
+    ok !$bf->strict_eq([1], [1]), 'distinct arrays with equal contents are not equal';
+    ok !$bf->strict_eq($obj, $arr), 'a hash is not an array';
+    ok !$bf->strict_eq($arr, '1'), 'an array is not its string form';
+    ok !$bf->strict_eq($obj, undef), 'a hash is not undef';
+    ok $bf->includes([$obj, $arr], $arr), 'includes finds the same reference';
+    ok !$bf->includes([{ id => 1 }], $obj), 'includes misses a distinct equal hash';
 };
 
 # `Array.prototype.indexOf(x)` / `Array.prototype.lastIndexOf(x)`

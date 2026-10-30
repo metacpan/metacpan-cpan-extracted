@@ -26,6 +26,40 @@ use Developer::Dashboard::JSON qw(json_decode json_encode);
     sub home { return $_[0]->{home}; }
 }
 
+{
+    package Local::CountedIdentityHash;
+    # TIEHASH($name)
+    # Creates a test hash that counts reads of its identity field.
+    # Input: configured identity name string.
+    # Output: tie object with a name-read counter.
+    sub TIEHASH { my ( $class, %args ) = @_; return bless { name => $args{name}, name_reads => 0 }, $class; }
+    # FETCH($key)
+    # Returns one stored field and counts identity lookups.
+    # Input: requested hash key string.
+    # Output: stored name or undef for unsupported keys.
+    sub FETCH { my ( $self, $key ) = @_; $self->{name_reads}++ if $key eq 'name'; return $self->{$key}; }
+    # EXISTS($key)
+    # Reports whether a supported test hash field exists.
+    # Input: requested hash key string.
+    # Output: boolean presence flag.
+    sub EXISTS { return $_[1] eq 'name' ? 1 : exists $_[0]{ $_[1] }; }
+    # STORE($key, $value)
+    # Stores a test hash field for tied-hash completeness.
+    # Input: key string and field value.
+    # Output: stored field value.
+    sub STORE { $_[0]{ $_[1] } = $_[2]; return $_[2]; }
+    # FIRSTKEY()
+    # Starts tied-hash iteration over the sole identity field.
+    # Input: none.
+    # Output: identity key string.
+    sub FIRSTKEY { return 'name'; }
+    # NEXTKEY($last)
+    # Ends tied-hash iteration after the sole identity field.
+    # Input: last key string.
+    # Output: undef to indicate iteration completion.
+    sub NEXTKEY { return; }
+}
+
 # Hermetic runtime rooted at a throwaway home. The config root resolves from the
 # deepest .developer-dashboard layer under the current working directory, so we
 # must chdir into the temp home before building the registry.
@@ -81,6 +115,65 @@ sub dies_like {
     return;
 }
 
+# A single global-config operation may resolve runtime roots through both the
+# global-file reader and skill-config discovery. Share that filesystem snapshot
+# only for this call, then prove a later load sees a newly created layer.
+{
+    my $scope_home = tempdir( CLEANUP => 1 );
+    my $project = File::Spec->catdir( $scope_home, 'project' );
+    my $scope_cwd = File::Spec->catdir( $project, 'nested' );
+    make_path( $scope_cwd, File::Spec->catdir( $project, '.d2', 'config' ) );
+    my $scope_paths = Developer::Dashboard::PathRegistry->new(
+        home => $scope_home,
+        cwd  => $scope_cwd,
+    );
+    my $scope_config = Developer::Dashboard::Config->for_path_config($scope_paths);
+    my $walks = 0;
+    my $ancestor_walk = \&Developer::Dashboard::PathRegistry::_ancestor_runtime_layers;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_ancestor_runtime_layers = sub {
+            $walks++;
+            return $ancestor_walk->(@_);
+        };
+        $scope_config->load_global;
+    }
+    is( $walks, 1,
+        'load_global shares one runtime-layer ancestry scan across its internal lookups' );
+
+    my $api_walks = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_ancestor_runtime_layers = sub {
+            $api_walks++;
+            return $ancestor_walk->(@_);
+        };
+        $scope_config->api_registry;
+    }
+    is( $api_walks, 1,
+        'api_registry shares one runtime-layer ancestry scan across skill and global lookups' );
+
+    my $new_config_dir = File::Spec->catdir( $scope_cwd, '.d2', 'config' );
+    make_path($new_config_dir);
+    my $new_config_file = File::Spec->catfile( $new_config_dir, 'config.json' );
+    open my $new_config_fh, '>:raw', $new_config_file
+      or die "Unable to write $new_config_file: $!";
+    print {$new_config_fh} json_encode( { created_after_load => 1 } )
+      or die "Unable to write $new_config_file: $!";
+    close $new_config_fh or die "Unable to close $new_config_file: $!";
+    is( $scope_config->load_global->{created_after_load}, 1,
+        'a later load sees a runtime layer created after the prior operation ended' );
+
+    my $new_api_file = File::Spec->catfile( $new_config_dir, 'api.json' );
+    open my $new_api_fh, '>:raw', $new_api_file
+      or die "Unable to write $new_api_file: $!";
+    print {$new_api_fh} json_encode( { fresh => { secret => 'fresh-key', ajax => ['/ajax/fresh'] } } )
+      or die "Unable to write $new_api_file: $!";
+    close $new_api_fh or die "Unable to close $new_api_file: $!";
+    is( $scope_config->api_registry->{fresh}{secret}, 'fresh-key',
+        'a later api_registry call sees a runtime layer created after the earlier API load' );
+}
+
 # -------------------------------------------------------------------------
 # Block A: hash/array merge helpers + collector normalization (direct calls).
 # -------------------------------------------------------------------------
@@ -134,6 +227,14 @@ sub dies_like {
         [ { name => 'x', a => 1, b => 2 } ],
         '_merge_named_hash_array merges duplicate identities',
     );
+    my %counted_identity;
+    tie %counted_identity, 'Local::CountedIdentityHash', name => 'single-read';
+    my $identity_counter = tied %counted_identity;
+    my $single_item_merge = $config->_merge_named_hash_array( [], [ \%counted_identity ], 'name' );
+    is( $identity_counter->{name_reads}, 1,
+        '_merge_named_hash_array reads each item identity only once' );
+    is( $single_item_merge->[0]{name}, 'single-read',
+        '_merge_named_hash_array retains identity after reducing identity reads' );
 
     # 208: _merge_named_hash_item returns the right side unless both are hashes.
     is_deeply( $config->_merge_named_hash_item( 'scalar', { a => 1 } ), { a => 1 }, '_merge_named_hash_item returns right when left is not a hash' );
@@ -148,6 +249,23 @@ sub dies_like {
     is( $config->_normalize_collector_job( { name => 'd', mode => 'multiple', multiple => 3 } )->{multiple}, 3, '_normalize_collector_job keeps a valid multiple count' );
     is( $config->_normalize_collector_job( { name => 'e', mode => 'multiple' } )->{multiple}, 2, '_normalize_collector_job defaults an absent multiple to two' );
     is( $config->_normalize_collector_job( { name => 'i', mode => 'multiple', multiple => 2 } )->{multiple}, 2, '_normalize_collector_job accepts a positive multiple' );
+    my $disable_normalizer_calls = 0;
+    my $real_disable_normalizer = Developer::Dashboard::Config->can('_collector_disable_flag');
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_collector_disable_flag = sub {
+            $disable_normalizer_calls++;
+            return $real_disable_normalizer->(@_);
+        };
+        my $default_job = $config->_normalize_collector_job( { name => 'default-disable' } );
+        is( $default_job->{disable}, 0, '_normalize_collector_job keeps an absent disable flag enabled' );
+        is( $disable_normalizer_calls, 0,
+            '_normalize_collector_job skips the disable normalizer for an absent value' );
+        my $boolean_job = $config->_normalize_collector_job( { name => 'boolean-disable', disable => json_decode('false') } );
+        is( $boolean_job->{disable}, 0, '_normalize_collector_job preserves JSON false disable semantics' );
+        is( $disable_normalizer_calls, 1,
+            '_normalize_collector_job invokes the disable normalizer for explicit JSON booleans' );
+    }
     dies_like( sub { $config->_normalize_collector_job( { name => 'f', mode => 'bogus' } ) },              qr/unsupported mode 'bogus'/,             '_normalize_collector_job rejects an unsupported mode' );
     dies_like( sub { $config->_normalize_collector_job( { name => 'g', mode => 'multiple', multiple => 'abc' } ) }, qr/must be a positive integer/, '_normalize_collector_job rejects a non-numeric multiple' );
     dies_like( sub { $config->_normalize_collector_job( { name => 'h', mode => 'multiple', multiple => '0' } ) },   qr/must be a positive integer/, '_normalize_collector_job rejects a zero multiple' );
@@ -538,9 +656,282 @@ sub dies_like {
 {
     set_config( { collectors => [ 'scalar-job', { name => 'housekeeper', interval => 60 } ] } );
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'housekeeper::extra';
-    my $jobs = $config->collectors;
+    my $skill_config_entry_reads = 0;
+    my $skill_config_entries = \&Developer::Dashboard::Config::_skill_config_entries;
+    my $jobs;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_skill_config_entries = sub {
+            $skill_config_entry_reads++;
+            return $skill_config_entries->(@_);
+        };
+        $jobs = $config->collectors;
+    }
+    is( $skill_config_entry_reads, 1,
+        'collectors reuses the skill config entries already loaded for the merged configuration' );
     is( scalar( @{$jobs} ), 1, 'collectors filters to the requested checker and drops non-hash jobs' );
     is( $jobs->[0]{name}, 'housekeeper', 'collectors keeps the requested collector' );
+    my @request_skill_config_entries;
+    my $merge_hashes_calls = 0;
+    my $merge_hashes = Developer::Dashboard::Config->can('_merge_hashes');
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_merge_hashes = sub {
+            $merge_hashes_calls++;
+            return $merge_hashes->(@_);
+        };
+        $config->merged;
+    }
+    is( $merge_hashes_calls, 0,
+        'merged skips recursive merges when a single global config has no repo overlay' );
+    set_config(
+        {
+            web         => { host => 'global.example', port => 7890 },
+            path_aliases => { base => '/base', shared => '/global' },
+            collectors  => [ { name => 'shared', interval => 60 } ],
+        }
+    );
+    my $repo_root = tempdir( CLEANUP => 1 );
+    my $repo_config_file = File::Spec->catfile( $repo_root, '.developer-dashboard.json' );
+    open my $repo_config_fh, '>:raw', $repo_config_file or die "Unable to write $repo_config_file: $!";
+    print {$repo_config_fh} json_encode(
+        {
+            web          => { host => 'repo.example' },
+            path_aliases => { shared => '/repo', project => '/project' },
+            collectors   => [ { name => 'shared', label => 'repo' }, { name => 'repo-only' } ],
+        }
+    );
+    close $repo_config_fh or die "Unable to close $repo_config_file: $!";
+    my $repo_overlay_config = Developer::Dashboard::Config->new(
+        files     => $files,
+        paths     => $paths,
+        repo_root => $repo_root,
+    );
+    my $repo_merged = $repo_overlay_config->merged;
+    is_deeply( $repo_merged->{web}, { host => 'repo.example', port => 7890 },
+        'merged applies a non-empty repo web overlay while retaining global defaults' );
+    is_deeply( $repo_merged->{path_aliases}, { base => '/base', shared => '/repo', project => '/project' },
+        'merged applies repo aliases without dropping unrelated global aliases' );
+    is_deeply(
+        $repo_merged->{collectors},
+        [ { name => 'shared', interval => 60, label => 'repo' }, { name => 'repo-only' } ],
+        'merged retains named collector fields while applying a non-empty repo overlay',
+    );
+    my $invalid_repo_root = tempdir( CLEANUP => 1 );
+    my $invalid_repo_file = File::Spec->catfile( $invalid_repo_root, '.developer-dashboard.json' );
+    open my $invalid_repo_fh, '>:raw', $invalid_repo_file or die "Unable to write $invalid_repo_file: $!";
+    print {$invalid_repo_fh} '[]';
+    close $invalid_repo_fh or die "Unable to close $invalid_repo_file: $!";
+    my $invalid_repo_config = Developer::Dashboard::Config->new(
+        files     => $files,
+        paths     => $paths,
+        repo_root => $invalid_repo_root,
+    );
+    my $invalid_repo_error = eval { $invalid_repo_config->merged; 1 } ? '' : $@;
+    like( $invalid_repo_error, qr/HASH reference/, 'merged preserves failure for a non-hash repo document' );
+    set_config( { collectors => [ 'scalar-job', { name => 'housekeeper', interval => 60 } ] } );
+    set_config(
+        {
+            collectors => [ { name => 'same', value => 'only' } ],
+        }
+    );
+    my $single_layer_merge_calls = 0;
+    my $single_layer_config;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_merge_hashes = sub {
+            $single_layer_merge_calls++;
+            return $merge_hashes->(@_);
+        };
+        $single_layer_config = $config->load_global;
+    }
+    is( $single_layer_merge_calls, 0,
+        'load_global avoids the recursive merge when exactly one global file contributes' );
+    set_config(
+        {
+            collectors => [
+                { name => 'same', value => 'earlier' },
+                { name => 'same', value => 'later' },
+            ],
+        }
+    );
+    $single_layer_config = $config->load_global;
+    is_deeply(
+        $single_layer_config->{collectors},
+        [ { name => 'same', value => 'later' } ],
+        'single-layer collector identity normalization keeps later duplicate values',
+    );
+    set_config( { collectors => [ 'scalar-job', { name => 'housekeeper', interval => 60 } ] } );
+    my $request_merged_config = $config->merged(
+        skill_config_entries_out => \@request_skill_config_entries,
+    );
+    $skill_config_entry_reads = 0;
+    my $collector_merge_calls = 0;
+    my $merge_named_hash_array = Developer::Dashboard::Config->can('_merge_named_hash_array');
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_skill_config_entries = sub {
+            $skill_config_entry_reads++;
+            return $skill_config_entries->(@_);
+        };
+        local *Developer::Dashboard::Config::_merge_named_hash_array = sub {
+            $collector_merge_calls++;
+            return $merge_named_hash_array->(@_);
+        };
+        $jobs = $config->collectors(
+            merged_config        => $request_merged_config,
+            skill_config_entries => \@request_skill_config_entries,
+        );
+    }
+    is( $skill_config_entry_reads, 0,
+        'collectors reuses a complete request config snapshot without reading skill configs again' );
+    is( $collector_merge_calls, 1,
+        'collectors skips the named-array merge when the resolved skill collector list is empty' );
+    set_config(
+        {
+            collectors => [
+                'malformed collector entry',
+                {
+                    name      => 'active',
+                    mode      => 'multiple',
+                    multiple  => 4,
+                    command   => 'collector executable settings are not required by status sync',
+                    disable   => json_decode('false'),
+                    indicator => { name => 'active', icon => 'A' },
+                },
+                {
+                    name      => 'disabled',
+                    disable   => json_decode('true'),
+                    indicator => { name => 'disabled', icon => 'D' },
+                },
+                { name => 'not-an-indicator-collector', mode => 'singleton' },
+                { indicator => { name => 'missing-name' } },
+                { name => '', indicator => { name => 'empty-name' } },
+            ],
+        }
+    );
+    my @indicator_skill_entries = (
+        {
+            skill_name => 'sample',
+            skill_root => '/skills/sample',
+            config     => {
+                collectors => [
+                    { name => 'from-skill', indicator => { name => 'from-skill', icon => 'S' } },
+                ],
+            },
+        },
+    );
+    my @indicator_snapshot_entries;
+    my $indicator_snapshot = $config->merged(
+        skill_config_entries_out => \@indicator_snapshot_entries,
+    );
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $normalizer_calls = 0;
+    my $normalize_collector_job = Developer::Dashboard::Config->can('_normalize_collector_job');
+    my $indicator_jobs;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_normalize_collector_job = sub {
+            $normalizer_calls++;
+            return $normalize_collector_job->(@_);
+        };
+        $indicator_jobs = $config->indicator_collectors(
+            merged_config        => $indicator_snapshot,
+            skill_config_entries => \@indicator_skill_entries,
+        );
+    }
+    is( $normalizer_calls, 0,
+        'indicator_collectors does not normalize execution-only collector fields' );
+    is_deeply(
+        $indicator_jobs,
+        [
+            { name => 'active', indicator => { name => 'active', icon => 'A' } },
+            { name => 'sample.from-skill', indicator => { name => 'from-skill', icon => 'S' } },
+        ],
+        'indicator_collectors keeps active global and qualified skill declarations and drops disabled/non-indicator jobs',
+    );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_builtin_collectors = sub {
+            return [
+                'ignored built-in entry',
+                { name => 'builtin', indicator => { name => 'builtin', icon => 'base' } },
+            ];
+        };
+        is_deeply(
+            $config->indicator_collectors(
+                merged_config => {
+                    collectors => [
+                        { name => 'builtin', indicator => { label => 'Configured' } },
+                    ],
+                },
+                skill_config_entries => [],
+            ),
+            [
+                {
+                    name      => 'builtin',
+                    indicator => { name => 'builtin', icon => 'base', label => 'Configured' },
+                },
+            ],
+            'indicator projection merges a configured override into a built-in indicator and ignores malformed built-ins',
+        );
+    }
+    {
+        local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'active';
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        is_deeply(
+            $config->indicator_collectors(
+                merged_config        => $indicator_snapshot,
+                skill_config_entries => \@indicator_snapshot_entries,
+            ),
+            [ { name => 'active', indicator => { name => 'active', icon => 'A' } } ],
+            'indicator projection checker filter skips malformed and unselected jobs',
+        );
+        is( scalar(@warnings), 0, 'indicator checker filter handles unnamed jobs without warnings' );
+    }
+    my $indicator_merge_calls = 0;
+    my $indicator_named_merge = Developer::Dashboard::Config->can('_merge_named_hash_array');
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Config::_merge_named_hash_array = sub {
+            $indicator_merge_calls++;
+            return $indicator_named_merge->(@_);
+        };
+        $config->indicator_collectors(
+            merged_config        => $indicator_snapshot,
+            skill_config_entries => \@indicator_snapshot_entries,
+        );
+    }
+    is( $indicator_merge_calls, 0,
+        'indicator_collectors reuses the already-deduplicated merged list when no built-in or skill declarations need merging' );
+    {
+        local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'sample.from-skill';
+        is_deeply(
+            $config->indicator_collectors(
+                merged_config        => $indicator_snapshot,
+                skill_config_entries => \@indicator_skill_entries,
+            ),
+            [ { name => 'sample.from-skill', indicator => { name => 'from-skill', icon => 'S' } } ],
+            'indicator_collectors preserves the checker environment filter',
+        );
+    }
+    my $path_config = Developer::Dashboard::Config->for_path_config($paths);
+    is_deeply(
+        $path_config->collectors,
+        $config->collectors,
+        'for_path_config returns the same normalized jobs without needing FileRegistry',
+    );
+    is_deeply(
+        $path_config->path_aliases,
+        $config->path_aliases,
+        'for_path_config returns the same aliases without needing FileRegistry',
+    );
+    dies_like(
+        sub { Developer::Dashboard::Config->for_path_config(undef) },
+        qr/Missing path registry/,
+        'for_path_config rejects a missing path registry',
+    );
     clear_config();
 }
 
@@ -684,14 +1075,26 @@ sub dies_like {
     is_deeply( $config->_skill_api_hash('realapi'), { client1 => { secret => 's1', ajax => ['/ajax/x'] } }, '_skill_api_hash merges an object payload' );
 
     # 774/776: _skill_config_entries skips empty configs and keeps real ones.
-    my %entries = map { $_->{skill_name} => $_->{config} } $config->_skill_config_entries;
+    my %entries;
+    my %batched_api_entries;
+    my $per_skill_layer_scan = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::skill_layers = sub {
+            $per_skill_layer_scan++;
+            die 'Config repeated one skill-layer traversal per installed skill';
+        };
+        %entries = map { $_->{skill_name} => $_->{config} } $config->_skill_config_entries;
+        %batched_api_entries = map { $_->{skill_name} => $_->{api} } $config->_skill_api_entries;
+    }
+    is( $per_skill_layer_scan, 0, 'skill config and API entry discovery use grouped layers instead of rescanning once per skill' );
     ok( exists $entries{realcfg},   '_skill_config_entries keeps a skill with a real config' );
     ok( exists $entries{collskill}, '_skill_config_entries keeps a skill with collectors' );
     ok( !exists $entries{emptyskill}, '_skill_config_entries drops a skill with an empty config' );
     ok( !exists $entries{arrjson},    '_skill_config_entries drops a skill whose config is not an object' );
 
     # 809/811: _skill_api_entries skips empty api payloads and keeps real ones.
-    my %api_entries = map { $_->{skill_name} => $_->{api} } $config->_skill_api_entries;
+    my %api_entries = %batched_api_entries;
     ok( exists $api_entries{realapi},    '_skill_api_entries keeps a skill with a real api payload' );
     ok( !exists $api_entries{emptyskill}, '_skill_api_entries drops a skill with an empty api payload' );
 
@@ -1055,6 +1458,10 @@ t/93-config-coverage.t - branch and condition coverage closure for the layered c
 
 =head1 PURPOSE
 
+This test exercises layered configuration readers and writers, including
+collector assembly from either a fresh merged config or a caller-supplied
+request snapshot with the skill entries that produced it.
+
 This test is the executable coverage contract for
 C<Developer::Dashboard::Config>. It drives the merge, normalization,
 persistence, alias-expansion, web-settings, API-key, and installed-skill
@@ -1069,12 +1476,17 @@ contract, and small merge or normalization regressions silently corrupt the
 effective config that every command consumes. Keeping these expectations in a
 dedicated file makes the TDD loop and the all-metric coverage gate concrete for
 this module instead of relying on incidental coverage from unrelated tests.
+The collector test also guards against duplicate skill-config enumeration:
+the same entries used for the merged view must feed the skill-qualified job
+list, while preserving the collector order and normalized output.
 
 =head1 WHEN TO USE
 
 Use this file when changing config merge semantics, collector or API-key
 normalization, path/file alias persistence, web-service settings, installed
-skill config/api discovery, or the atomic config writer.
+skill config/api discovery, or the atomic config writer. Its installed-skill
+config checks also ensure collector and API discovery use the grouped layer
+inventory instead of rescanning skill layers separately for every skill.
 
 =head1 HOW TO USE
 

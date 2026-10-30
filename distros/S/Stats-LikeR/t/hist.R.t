@@ -47,6 +47,23 @@
 # compared exactly.  Most of the arithmetic is exact -- pretty()'s breaks are
 # small multiples of a power of ten -- so what the tolerance covers is density,
 # which divides by n and by a width.
+#
+# The ovf.* breaks and mids are measured against the largest magnitude in their
+# vector instead, to 4e-15 of it.  Their bounds are ns * unit with unit built
+# from pow(10, floor(log10(cell))), as in R, and C does not require pow() to
+# round correctly: glibc gives 10^307 exactly, but 0.33's MSWin32 smoker
+# (Strawberry perl 5.42.2, gcc 13.2.0) evidently got it 4 to 6 ulp high --
+# replaying pretty() with base nudged that far reproduces its result to every
+# printed digit.  The bounds then move a few ulp, which is 2.4e-16 of the
+# range, and a break next to zero, built as l + 8 * by from -1.6e308, carries
+# that same absolute error at 3.9e306: 1.03e-14 relative to itself, past the
+# limit above.  The largest seen on this scale is 1.38e-15, and it is not
+# hist()'s: perl 5.10.1's atof() reads the 17-digit expected breaks near 1e308
+# 4 to 5 ulp off (1.6773070034857416e+308 as 7feddb680117aa93, not ...8e), and
+# that is in the literals, not the result.  4e-15 of the largest magnitude
+# leaves 2.9x over that, 14x over the 2.83e-16 of the 32-bit and x87 builds, and
+# 16x over Windows' 2.4e-16; these rows run only on double builds, so no wider
+# NV needs it.  Density has no such cancellation and keeps the 1e-14 above.
 
 require 5.010;
 use strict;
@@ -57,11 +74,18 @@ use lib 'blib/lib', 'blib/arch';
 use Stats::LikeR qw(hist);
 
 my $TOL = 1e-14;   # justified in the header
+my $TOL_OVF = 4e-15;   # of the vector's largest magnitude; justified in the header
 
-my $worst = 0;
+my ($worst, $worst_ovf) = (0, 0);
+# $by_scale true: error is measured against the largest finite |value| in
+# $want, with $TOL_OVF, rather than against each element with $TOL
 sub vec_ok {
-	my ($got, $want, $name) = @_;
+	my ($got, $want, $name, $by_scale) = @_;
 	my @w = split /,/, $want;
+	my $scale = 0;
+	if ($by_scale) {
+		for my $v (@w) { $scale = abs($v) if $v !~ /Inf/ && abs($v) > $scale }
+	}
 	if (@$got != @w) {
 		fail($name);
 		diag("got " . scalar(@$got) . " values, expected " . scalar(@w)
@@ -74,6 +98,14 @@ sub vec_ok {
 			next if $got->[$i] == $inf;
 			fail($name);
 			diag("element $i: got $got->[$i], expected $w[$i]");
+			return;
+		}
+		if ($by_scale) {
+			my $err = abs($got->[$i] - $w[$i]) / $scale;
+			$worst_ovf = $err if $err > $worst_ovf;
+			next if $err <= $TOL_OVF;
+			fail($name);
+			diag("element $i: got $got->[$i], expected $w[$i], $err of $scale");
 			return;
 		}
 		my $err = abs($w[$i]) > 1e-300 ? abs($got->[$i] - $w[$i]) / abs($w[$i])
@@ -229,7 +261,7 @@ my @R_ROWS = (
 	["ovf.f1", 20, "-1e+308,1.6773070034857416e+308", "-1e+308,-9.0000000000000005e+307,-7.9999999999999999e+307,-7.0000000000000003e+307,-5.9999999999999997e+307,-5.0000000000000001e+307,-4.0000000000000004e+307,-2.9999999999999998e+307,-2.0000000000000002e+307,-9.9999999999999961e+306,0,9.9999999999999961e+306,1.9999999999999992e+307,2.9999999999999988e+307,4.0000000000000004e+307,5.0000000000000001e+307,5.9999999999999997e+307,6.9999999999999993e+307,8.0000000000000009e+307,8.9999999999999985e+307,1e+308,1.0999999999999998e+308,1.1999999999999999e+308,1.3000000000000001e+308,1.3999999999999999e+308,1.5e+308,1.5999999999999998e+308,1.6999999999999999e+308", "1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1", "-Inf,-8.4999999999999997e+307,-7.5000000000000001e+307,-6.5000000000000005e+307,-5.4999999999999999e+307,-4.5000000000000002e+307,-3.5000000000000001e+307,-2.5e+307,-1.4999999999999999e+307,-4.9999999999999981e+306,4.9999999999999981e+306,1.4999999999999994e+307,2.499999999999999e+307,3.4999999999999996e+307,4.5000000000000002e+307,5.4999999999999999e+307,6.4999999999999995e+307,7.5000000000000001e+307,8.4999999999999997e+307,Inf,Inf,Inf,Inf,Inf,Inf,Inf,Inf", "5.0000000000000015e-308,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4.9999999999999916e-308"],
 );
 
-plan tests => 4 * scalar(@R_ROWS) + 3;
+plan tests => 4 * scalar(@R_ROWS) + 5;
 
 # The ovf.* rows' x, exactly: big-endian IEEE double bit patterns, printed by
 # t/hist.R.R's last block.  perl 5.10's atof() reads a 17-digit decimal near
@@ -255,7 +287,7 @@ for my $r (@R_ROWS) {
 			@x = map { unpack 'd>', pack 'H16', $_ } split /,/, $OVF_XBITS{$nm};
 			my $h = $nb ? hist(\@x, breaks => $nb) : hist(\@x);
 			my $id = "$nm breaks=" . ($nb || 'default');
-			vec_ok($h->{breaks},  $breaks,  "$id: breaks");
+			vec_ok($h->{breaks},  $breaks,  "$id: breaks", 1);
 			is(join(',', @{$h->{counts}}), $counts, "$id: counts");
 			# R's mids are 0.5 * (a + b), which overflows to -Inf or Inf on
 			# some of these; hist() halves each break first instead (see
@@ -264,9 +296,11 @@ for my $r (@R_ROWS) {
 			my @b = split /,/, $breaks;
 			my @m = split /,/, $mids;
 			for my $i (0 .. $#m) {
-				$m[$i] = $b[$i] / 2 + $b[$i + 1] / 2 if $m[$i] =~ /Inf/;
+				# at 17 digits: the join below would otherwise keep 15, which
+				# alone is 4e-15 off
+				$m[$i] = sprintf '%.17g', $b[$i] / 2 + $b[$i + 1] / 2 if $m[$i] =~ /Inf/;
 			}
-			vec_ok($h->{mids},    join(',', @m), "$id: mids");
+			vec_ok($h->{mids},    join(',', @m), "$id: mids", 1);
 			vec_ok($h->{density}, $density, "$id: density");
 		}
 		next;
@@ -291,4 +325,11 @@ for my $r (@R_ROWS) {
 	is($total, 10, 'every observation lands in exactly one bin');
 }
 
-diag(sprintf('worst relative error: %.3g (limit %.3g)', $worst, $TOL));
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+is(eval { hist(5); 1 }, undef, 'hist() of a bare number dies');
+like($@, qr/\Ausage: hist\(X \[, breaks => N\]\)\n.*\n\nhist: error: first argument must be an array reference\n\z/ms,
+	'... with the help screen above the error');
+
+diag(sprintf('worst relative error: %.3g (limit %.3g); ovf.* breaks and mids: %.3g of their largest magnitude (limit %.3g)',
+	$worst, $TOL, $worst_ovf, $TOL_OVF));

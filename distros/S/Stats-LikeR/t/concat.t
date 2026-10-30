@@ -147,4 +147,17 @@ no_leaks_ok {
 	rbind([ { n => 1 } ], [ { n => 2 } ]);
 } 'rbind(): no leaks' unless $INC{'Devel/Cover.pm'};
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('concat');
+	like($screen, qr/\Ausage: concat\(/, 'concat has a help screen');
+	is(do { local $@; eval { concat(); 1 } ? '' : $@ },
+	   $screen . "concat: error: needs at least one data frame\n",
+	   'concat: no frame prints the help screen');
+	is(do { local $@; eval { concat('x'); 1 } ? '' : $@ },
+	   $screen . "concat: error: every frame must be an ARRAY or HASH ref\n",
+	   'concat: a string prints the help screen');
+}
+
 done_testing();

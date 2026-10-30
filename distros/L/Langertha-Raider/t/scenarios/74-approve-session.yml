@@ -1,0 +1,20 @@
+title: allowed for the session, the rule shown before holds for the same command; another command asks again
+permission_mode: default
+approve: [ session ]
+prompt: Greet twice.
+script:
+  - tool_calls:
+      - [ bash, { command: echo hi } ]
+      - [ bash, { command: echo hi } ]
+      - [ bash, { command: echo other } ]
+  - text: done
+expect:
+  permissions:
+    - { tool: bash, rule: "Bash(echo hi)", reason: "default mode asks before this call: bash runs code" }
+    - { tool: bash, rule: "Bash(echo other)" }
+  tools:
+    - { name: bash, text: hi }
+    - { name: bash, text: hi }
+    - { name: bash, error: true, text: "^The user doesn't want to proceed with this tool use\\." }
+  events:
+    - { type: permission.granted, tool: bash, scope: session, rule: "Bash(echo hi)" }

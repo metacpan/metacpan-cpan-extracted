@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs   v5.0.0;
+package FindBin::libs   v5.0.3;
 use v5.40;
 
 use File::Basename;
@@ -21,7 +21,7 @@ qw
     rel2abs
 );
 
-use FindBin::Bin        qw( $Bin $Bin_c );
+use FindBin::Bin        qw( $Bin_l $Bin_p );
 use FindBin::Parents    qw( dir_paths   );
 
 ########################################################################
@@ -79,8 +79,8 @@ my $find_libs
 
     my $bin
     = $argz->{ abspath }
-    ? $Bin
-    : $Bin_c
+    ? $Bin_p
+    : $Bin_l
     ;
 
     say STDERR "\nSearching $bin for '$base' ($subdir)..."
@@ -820,27 +820,48 @@ that has FindBin::libs will simply use it first.
 
 =item Testing with Symlinks
 
-$FindBin::Bin is relative to where an executable is started from.
-This allows a symlink to change the location of directories used
-by FindBin::libs. Full regression testing of an executable can be
-accomplished with a symlink:
+When the program's directory path passes through a directory symlink,
+C<abspath> and C<noabspath> walk the tree from different starting
+points and therefore find different C<lib/> directories.
 
-    ./sandbox
-        ./lib -> /homegrown/dir/lib
-        ./lib/What/Ever.pm
+Consider a layout where C</home/user/app> is a directory symlink to
+C</work/projects/app>:
 
-        ./pre-change
-            ./bin/foobar
+    /home/user/                       # logical subtree
+    +-- lib/
+    |   \-- SandboxLib.pm             # alternate/test version
+    \-- app -> /work/projects/app     # directory symlink
 
-        ./post-change
-            ./lib/What/Ever.pm
-            ./bin/foobar -> ../../pre-last-change/bin/foobar
+    /work/projects/                   # physical subtree
+    +-- lib/
+    |   \-- StableLib.pm              # production version
+    \-- app/
+        \-- bin/
+            \-- script                # $0
 
-Running foobar symlinked into the post-change directory will
-test it with whatever collection of modules is in the post-change
-directory. A large regression test on some collection of
-changed modules can be performed with a few symlinks into a
-sandbox area.
+Running C<script> via the symlink path
+(C</home/user/app/bin/script>):
+
+    $Bin_l  =  /home/user/app/bin      # symlink path preserved
+    $Bin_p  =  /work/projects/app/bin  # symlink resolved
+
+C<FindBin::libs> uses one of these as the starting point for its
+directory walk, depending on the C<abspath> setting:
+
+    use FindBin::libs;               # abspath => 1 (default)
+    # walks up from $Bin_p: /work/projects/app/bin -> /work/projects
+    # use lib '/work/projects/lib'   -> loads StableLib.pm
+
+    use FindBin::libs qw( noabspath );
+    # walks up from $Bin_l: /home/user/app/bin -> /home/user
+    # use lib '/home/user/lib'       -> loads SandboxLib.pm
+
+The default C<abspath =E<gt> 1> always walks from the physical location
+of the program, so C<lib/> directories are resolved relative to where
+the file actually lives on disk.  Use C<noabspath> when you want to
+test a program against alternate library versions placed in a tree
+you control by pointing a directory symlink at the program's real
+C<bin/> directory.
 
 =item Managing Configuration and Meta-data Files
 

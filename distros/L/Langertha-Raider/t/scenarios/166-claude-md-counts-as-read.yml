@@ -1,0 +1,19 @@
+title: the CLAUDE.md the prompt carries counts as read -- the model edits it without a read_file first, any other file is refused until it is read
+run_prompt: true
+files:
+  CLAUDE.md: "Rule one.\n"
+  notes.txt: "Rule one.\n"
+prompt: Change the rule.
+script:
+  - tool_calls:
+      - [ edit_file, { path: CLAUDE.md, old_string: one, new_string: two } ]
+      - [ edit_file, { path: notes.txt, old_string: one, new_string: two } ]
+  - text: edited
+expect:
+  answer: edited
+  files:
+    CLAUDE.md: "Rule two.\n"
+    notes.txt: "Rule one.\n"
+  tools:
+    - { name: edit_file, text: "\\AThe file /\\S+/CLAUDE\\.md has been updated successfully\\." }
+    - { name: edit_file, error: true, text: "\\A<tool_use_error>File has not been read yet\\. Read it first before writing to it\\.</tool_use_error>\\z" }

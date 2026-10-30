@@ -1,0 +1,30 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::StdioContainer : pointer {
+  
+  use UV;
+  use UV::Handle::Stream;
+  
+  # Fields
+  has stream : UV::Handle::Stream;
+  
+  # Class Methods
+  native static method new : UV::StdioContainer ();
+  
+  # Instance Methods
+  native method flags : int ();
+  
+  native method set_flags : void ($flags : int);
+  
+  native method stream : UV::Handle::Stream ();
+  
+  native method set_stream : void ($stream : UV::Handle::Stream);
+  
+  native method fd : int ();
+  
+  native method set_fd : void ($fd : int);
+  
+  native method DESTROY : void ();
+  
+}

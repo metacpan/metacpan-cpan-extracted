@@ -63,7 +63,8 @@ Control what gets imported:
 use Affix qw[:all];    # Import everything
 use Affix qw[:lib];    # Library helpers (libc, libm, load_library...)
 use Affix qw[:memory]; # malloc, free, memcpy, cast, dump, raw, snapshot, pin, unpin...
-use Affix qw[:types];  # Types only (Int, Struct, Pointer...)
+use Affix qw[:types];  # Types only (Int, Struct, Pointer, Bitfield...)
+use Affix qw[:core];   # Core functions (affix, wrap, typedef, error, errno...)
 ```
 
 # CORE API
@@ -352,11 +353,21 @@ typedef Vector3 => Array[ Double, 3 ];
 
 ### Bitfields
 
-Specify bit widths using the pipe (`|`) operator within Structs/Unions. Affix handles all masking and shifting.
+Declare bitfields inside Structs or Unions using either `Bitfield[ $type, $width ]` or the `|` operator shorthand.
+Affix automatically handles masking, shifting, and boundary alignment.
 
 ```perl
-# C: typedef struct { uint32_t a : 1; uint32_t b : 3; } Config;
-typedef Config => Struct[ a => UInt32 | 1, b => UInt32 | 3 ];
+# Using Bitfield[...]
+typedef Config => Struct[
+    flag_a => Bitfield[ UInt32, 1 ],
+    flag_b => Bitfield[ UInt32, 3 ]
+];
+
+# Using operator shorthand (C: uint32_t a : 1; uint32_t b : 3;)
+typedef Config => Struct[
+    a => UInt32 | 1,
+    b => UInt32 | 3
+];
 ```
 
 ## Live Views (Zero-Copy Aggregates)
@@ -400,17 +411,23 @@ $p->{y} = 50; # Writes directly to C memory.
 
 ## Variadic Functions (VarArgs)
 
-Affix supports C functions that take a variable number of arguments (e.g., `printf`, `ioctl`). When defining a
-signature, use the `VarArgs` token at the end of the argument list.
+Affix supports C functions that take a variable number of arguments (e.g., `printf`, `ioctl`). Use the `VarArgs`
+token in the argument list to mark where variadic arguments begin.
 
 ### Basic Usage
 
+For open variadic functions where argument types vary per call:
+
 ```perl
 # C: int printf(const char* format, ...);
-affix libc(), ['printf' => 'my_printf'], [ String, VarArgs ] => Int;
+affix libc(), 'printf', [ String, VarArgs ] => Int;
+```
 
-# Basic types are marshalled automatically based on Perl's internal state
-my_printf("Integer: %d, String: %s\n", 42, "Hello");
+For functions where the trailing arguments follow a known pattern, you can also define typed variadics:
+
+```perl
+# C: int ioctl(int fd, unsigned long request, ...);
+affix libc(), 'ioctl', [ Int, ULong, VarArgs[ Pointer[Void] ] ] => Int;
 ```
 
 ### Explicit Type Control with `coerce()`
@@ -932,6 +949,19 @@ Diagnose FFI issues with built-in error reporting, memory inspection, and hex du
 runtimes can lead to spectacular crashes if types or memory boundaries are mismatched.
 
 ## Error Handling
+
+### `error()`
+
+Returns a human-readable description of the most recent error from Affix or the operating system. If no error occurred,
+returns `undef`.
+
+This is the recommended, unified error function. It checks both internal Infix JIT compiler/parser errors and
+system-level errors (such as missing libraries or failed symbol lookups).
+
+```perl
+my $lib = load_library('nonexistent');
+die 'Failed to load library: ' . Affix::error() unless $lib;
+```
 
 ### `errno()`
 

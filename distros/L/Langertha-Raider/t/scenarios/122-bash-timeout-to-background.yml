@@ -1,0 +1,17 @@
+# A command still running after its timeout is not killed: it is moved to the
+# background, as in Claude Code, and the model waits for it with bash_output.
+title: a command over its timeout goes on in the background and finishes there
+prompt: Run the slow job.
+script:
+  - tool_calls:
+      - [ bash, { command: 'echo working; sleep 2; echo finished > result.txt; echo end', timeout: 1 } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1, block: true, timeout: 30 } ]
+  - text: the job finished
+expect:
+  answer: the job finished
+  files:
+    result.txt: "finished\n"
+  tools:
+    - { name: bash, text: '\ACommand did not complete within its 1s timeout and was moved to the background \(ID: bash_1\)\.' }
+    - { name: bash_output, text: '\A<status>completed</status>\n\n<exit_code>0</exit_code>\n\n<stdout>\nworking\nend\n</stdout>\z' }

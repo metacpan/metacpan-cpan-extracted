@@ -5,12 +5,6 @@ use Test2::V1 -ipP;
 $|++;
 #
 subtest 'Resume after nested spawn' => sub {
-
-    # Regression: coro_call overwrote the fiber's saved top_env on every
-    # resume, so a fiber that yielded AFTER a nested spawn came back with
-    # PL_top_env pointing at the caller's (main) stack.  The resumed fiber's
-    # call_sv then failed perl.c:3298 "Assertion PL_top_env == &cur_env
-    # failed" on threaded-debug perls (abort, exit 134).
     my $out = '';
     async {
         fiber {1};

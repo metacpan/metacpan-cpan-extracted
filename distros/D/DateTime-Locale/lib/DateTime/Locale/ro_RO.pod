@@ -435,6 +435,24 @@ Romanian Romania locale.
    1995-12-22T09:05:02 = vin., 22 dec. 1995 d.Hr.
   -0010-09-15T04:44:23 = sâm., 15 sept. -10 î.Hr.
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = februarie 2008 d.Hr.
+   1995-12-22T09:05:02 = decembrie 1995 d.Hr.
+  -0010-09-15T04:44:23 = septembrie -10 î.Hr.
+
+=head3 GyMMMMEd (E, d MMMM y G)
+
+   2008-02-05T18:30:30 = mar., 5 februarie 2008 d.Hr.
+   1995-12-22T09:05:02 = vin., 22 decembrie 1995 d.Hr.
+  -0010-09-15T04:44:23 = sâm., 15 septembrie -10 î.Hr.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 februarie 2008 d.Hr.
+   1995-12-22T09:05:02 = 22 decembrie 1995 d.Hr.
+  -0010-09-15T04:44:23 = 15 septembrie -10 î.Hr.
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 feb. 2008 d.Hr.
@@ -644,6 +662,18 @@ Romanian Romania locale.
    2008-02-05T18:30:30 = februarie 2008
    1995-12-22T09:05:02 = decembrie 1995
   -0010-09-15T04:44:23 = septembrie -10
+
+=head3 yMMMMEd (E, d MMMM y)
+
+   2008-02-05T18:30:30 = mar., 5 februarie 2008
+   1995-12-22T09:05:02 = vin., 22 decembrie 1995
+  -0010-09-15T04:44:23 = sâm., 15 septembrie -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 februarie 2008
+   1995-12-22T09:05:02 = 22 decembrie 1995
+  -0010-09-15T04:44:23 = 15 septembrie -10
 
 =head3 yMMMd (d MMM y)
 

@@ -31,6 +31,17 @@
 # written with sep = "\r" and no final line end reads back as those three lines.
 # read.table("that file") in R 4.6.1 gives V1 = aaa, bbb, ccc.
 #
+# A CR file with an LF inside a quoted field, and the R 4.6.1 / pandas 3.0.4
+# reading of each, made by writing the bytes with printf and reading them with
+#   R:      read.csv(f, colClasses = "character")
+#   pandas: pd.read_csv(f, dtype=str, keep_default_na=False)
+#   'a,b\r1,"x\ny"\r2,z\r'  both: header a, b; rows (1, "x\ny"), (2, z)
+#   'a,b\r"p\nq",1\r'        both: header a, b; row ("p\nq", 1)
+#   'a,"b\nc"\r1,2\r'        pandas: header a, "b\nc"; row (1, 2).  R has the
+#                             same, its header made "b.c" by check.names.
+# Up to 0.33 the LF made the whole file read as LF-terminated: the first read
+# back as the one row a, b1, "x\ny2", z.
+#
 # The rest -- a compressed CR file, a commented-out header, a quoted field that
 # runs over a line end, a regex sep, and where the start-of-file test draws its
 # lines -- are carried by neither suite and are here because they are what
@@ -163,6 +174,19 @@ SKIP: {
 	is_deeply read_table($gz), [ { id => 1, v => 2 }, { id => 3, v => 4 } ],
 		'a gzip-compressed CR file';
 }
+
+# --- an LF inside quotes is not a line end ---------------------------------
+
+is_deeply read_table(fixture(qq{a,b\r1,"x\ny"\r2,z\r}), 'output_type' => 'aoa'),
+	[ [qw(a b)], [1, "x\ny"], [2, 'z'] ], 'a quoted LF in a data row: as R and pandas read it';
+is_deeply read_table(fixture(qq{a,b\r"p\nq",1\r}), 'output_type' => 'aoa'),
+	[ [qw(a b)], ["p\nq", 1] ], 'a quoted LF in the first field: as R and pandas read it';
+is_deeply read_table(fixture(qq{a,"b\nc"\r1,2\r}), 'output_type' => 'aoa'),
+	[ [ 'a', "b\nc" ], [1, 2] ], 'a quoted LF in the header: as pandas reads it';
+is_deeply read_table(fixture(qq{a,b\r1,"x""\ny"\r2,z\r}), 'output_type' => 'aoa'),
+	[ [qw(a b)], [1, qq{x"\ny}], [2, 'z'] ], 'a doubled quote before the LF keeps the field open';
+is_deeply read_table(fixture(qq{a,b\n"1\r2",x\n}), 'output_type' => 'aoa'),
+	[ [qw(a b)], ["1\r2", 'x'] ], 'an LF file with a CR inside quotes is still LF';
 
 # --- where the start-of-file test draws its lines --------------------------
 

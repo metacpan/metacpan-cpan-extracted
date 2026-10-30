@@ -1,0 +1,21 @@
+# web_fetch's prompt is a model call of its own; its tokens count beside the
+# main run's.
+title: the model call of web_fetch's prompt counts in the ledger
+http:
+  /page: { type: text/html, body: "<html><body><p>Version 4.2 ships.</p></body></html>" }
+prompt: Which version ships?
+script:
+  - tool_calls:
+      - [ web_fetch, { url: "{{HTTP}}/page", prompt: "Which version ships?" } ]
+    usage: { prompt_tokens: 100, completion_tokens: 10 }
+  - text: Version 4.2.
+    usage: { prompt_tokens: 40, completion_tokens: 3 }
+  - text: Version 4.2.
+    usage: { prompt_tokens: 160, completion_tokens: 4 }
+expect:
+  answer: Version 4.2.
+  events:
+    - { type: model.usage, purpose: chat, input_tokens: 100 }
+    - { type: model.usage, purpose: web_fetch, input_tokens: 40, output_tokens: 3 }
+    - { type: model.usage, purpose: chat, input_tokens: 160 }
+  usage: { input_tokens: 300, output_tokens: 17, calls: 3 }

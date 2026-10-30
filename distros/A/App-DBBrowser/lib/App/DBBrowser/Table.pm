@@ -190,6 +190,7 @@ sub browse_the_table {
 sub select_statement_results {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $driver = $sf->{i}{driver};
     my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
     unshift @{$sf->{d}{table_print_history}}, $statement;
     if ( $#{$sf->{d}{table_print_history}} > 50 ) {
@@ -198,40 +199,34 @@ sub select_statement_results {
     my $sth = $sf->{d}{dbh}->prepare( $statement );
     $sth->execute();
     my $col_names = $sth->{NAME}; # not quoted
-    my $col_types = $sth->{TYPE};
+    my $col_types = $sth->{TYPE}; # array_ref
     my $all_arrayref = $sth->fetchall_arrayref;
-    unshift @$all_arrayref, $col_names;
-    if ( $sf->{i}{driver} eq 'DB2' && length $sf->{o}{G}{db2_encoding} ) {
+    if ( $driver eq 'DB2' && length $sf->{o}{G}{db2_encoding} ) {
         print 'Decoding: ...' . "\r"  if $sf->{o}{table}{progress_bar};
         my $encoding = Encode::find_encoding( $sf->{o}{G}{db2_encoding} );
         if ( ! ref $encoding ) {
-            die qq(encoding "$sf->{o}{G}{db2_encoding}" not found);
+            die "Unknown encoding: $sf->{o}{G}{db2_encoding}";
         }
-        my $is_text = [ map { /^(?:1|12|2005|-15)\z/ ? 1 : 0 } @$col_types ];
+        my @text_cols = grep { $col_types->[$_] =~ /^(?:1|12|2005|-15)\z/ } 0 .. $#$col_types;
 
         for my $row ( @$all_arrayref ) {
-            for my $i ( 0 .. $#$row ) {
-                if ( $is_text->[$i] ) {
-                    $row->[$i] = $encoding->decode( $row->[$i] )
-                }
+            for my $i ( @text_cols ) {
+                $row->[$i] = $encoding->decode( $row->[$i] )
             }
         }
+        $col_names = [ map { $encoding->decode( $_ ) } @$col_names ];
     }
-    elsif ( $sf->{i}{driver} eq 'DuckDB' ) {
-        my $duckdb_encoding = 'UTF-8';
-        my $encoding = Encode::find_encoding( $duckdb_encoding );
-        if ( ! ref $encoding ) {
-            die qq(encoding "$duckdb_encoding" not found);
-        }
+    elsif ( $driver eq 'DuckDB' && $sf->{o}{G}{duckdb_utf8_decode} ) {
+        print 'Decoding: ...' . "\r"  if $sf->{o}{table}{progress_bar};
+        my @text_cols = grep { $col_types->[$_] == 12 } 0 .. $#$col_types;
+        no warnings 'uninitialized';
+
         for my $row ( @$all_arrayref ) {
-            for my $i ( 0 .. $#$row ) {
-                if ( $col_types->[$i] == 12 ) {
-                    $row->[$i] = $encoding->decode( $row->[$i] );
-                    #Encode::_utf8_on( $row->[$i] );
-                }
-            }
+            utf8::decode( $row->[$_] ) for @text_cols;
         }
+        utf8::decode( $_ ) for @$col_names;
     }
+    unshift @$all_arrayref, $col_names;
     return $all_arrayref;
 }
 

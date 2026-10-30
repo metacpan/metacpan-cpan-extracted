@@ -56,6 +56,7 @@ use lib 'lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::InternalCLI;
+use Developer::Dashboard::Platform ();
 
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
@@ -99,7 +100,7 @@ ok( length call( 'helper_content', 'jq' ), 'helper_content still reads normally'
     make_path( File::Spec->catdir( call( '_helper_install_root', $paths ) ) );
     wf( $target, "user owned\n" );
     no warnings 'redefine';
-    local *Developer::Dashboard::InternalCLI::is_windows = sub { 1 };
+    local *Developer::Dashboard::Platform::is_windows = sub { 1 };
     {
         local $OPEN_FAIL{$target} = 1;
         like( eval { call( 'ensure_helper', paths => $paths, name => 'ask' ); 1 } ? '' : $@, qr/Unable to read \Q$target\E/, 'ensure_helper dies on windows when the existing helper cannot be opened' );

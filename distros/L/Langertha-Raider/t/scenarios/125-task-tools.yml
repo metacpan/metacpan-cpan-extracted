@@ -1,0 +1,51 @@
+title: the task tools keep a list by id with Claude Code's answers, and report every change as todo.updated
+files:
+  greet.txt: "hello world\n"
+prompt: Rename the greeting to Moin and check it.
+script:
+  - tool_calls:
+      - [ task_create, { subject: Read greet.txt, description: Find the greeting, activeForm: Reading greet.txt } ]
+      - [ task_create, { subject: Change the greeting, description: hello becomes Moin } ]
+      - [ task_create, { subject: Check the result, description: cat the file } ]
+      - [ task_update, { taskId: "3", addBlockedBy: [ "2" ] } ]
+      - [ task_update, { taskId: "1", status: in_progress } ]
+      - [ read_file, { path: greet.txt } ]
+  - tool_calls:
+      - [ task_update, { taskId: "1", status: completed } ]
+      - [ task_update, { taskId: "2", status: in_progress, owner: main } ]
+      - [ edit_file, { path: greet.txt, old_string: hello, new_string: Moin } ]
+      - [ task_list, {} ]
+  - tool_calls:
+      - [ task_update, { taskId: "2", status: completed } ]
+      - [ task_list, {} ]
+      - [ task_get, { taskId: "3" } ]
+      - [ task_update, { taskId: "9", status: completed } ]
+      - [ task_update, { taskId: "3", status: completed } ]
+  - text: Done.
+expect:
+  answer: Done.
+  files:
+    greet.txt: "Moin world\n"
+  todos:
+    - { content: Read greet.txt, status: completed }
+    - { content: Change the greeting, status: completed }
+    - { content: Check the result, status: completed }
+  tools:
+    - { name: task_create, text: '\ATask #1 created successfully: Read greet\.txt\z' }
+    - { name: task_create, text: '\ATask #2 created successfully: Change the greeting\z' }
+    - { name: task_create, text: '\ATask #3 created successfully: Check the result\z' }
+    - { name: task_update, text: '\AUpdated task #3 blockedBy\z' }
+    - { name: task_update, text: '\AUpdated task #1 status\z' }
+    - { name: read_file, text: hello world }
+    - { name: task_update, text: '\AUpdated task #1 status\z' }
+    - { name: task_update, text: '\AUpdated task #2 owner, status\z' }
+    - { name: edit_file }
+    - { name: task_list, text: '\A#1 \[completed\] Read greet\.txt\n#2 \[in_progress\] Change the greeting \(main\)\n#3 \[pending\] Check the result \[blocked by #2\]\z' }
+    - { name: task_update, text: '\AUpdated task #2 status\z' }
+    - { name: task_list, text: '\n#3 \[pending\] Check the result\z' }
+    - { name: task_get, text: '\ATask #3: Check the result\nStatus: pending\nDescription: cat the file\nBlocked by: #2\z' }
+    - { name: task_update, text: '\ATask not found\z' }
+    - { name: task_update, text: '\AUpdated task #3 status\z' }
+  events:
+    - { type: todo.updated, todos: [ { id: "1", content: Read greet.txt, status: pending, activeForm: Reading greet.txt } ] }
+    - { type: todo.updated, todos: [ { id: "1" }, { id: "2", content: Change the greeting, activeForm: Change the greeting, description: hello becomes Moin } ] }

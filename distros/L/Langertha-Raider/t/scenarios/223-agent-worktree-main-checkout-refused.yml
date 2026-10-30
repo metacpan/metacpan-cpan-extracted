@@ -1,0 +1,26 @@
+title: an isolated agent that writes into the main checkout is refused and told which path to use, even in bypassPermissions
+git: true
+permission_mode: bypassPermissions
+files:
+  CLAUDE.md: "# project\n"
+  a.txt: "ALPHA\n"
+prompt: Have the isolated agent edit the main checkout.
+script:
+  - tool_calls:
+      - [ agent, { description: Stray, prompt: Edit the main checkout., isolation: worktree } ]
+  - tool_calls:
+      - [ write_file, { path: "{{ROOT}}/stray.txt", content: "STRAY\n" } ]
+  - text: could not write
+  - text: The agent was refused.
+expect:
+  answer: The agent was refused.
+  tools:
+    - name: write_file
+      error: true
+      text: '\A{{ROOT}}/stray\.txt is in the main checkout {{ROOT}}; this session works in the worktree {{ROOT}}/\.claude/worktrees/agent-1\. Edit {{ROOT}}/\.claude/worktrees/agent-1/stray\.txt instead\.\z'
+    - { name: agent, text: '\Acould not write', not_text: 'worktreePath' }
+  absent:
+    - stray.txt
+    - .claude/worktrees/agent-1
+  branches:
+    absent: [ worktree-agent-1 ]

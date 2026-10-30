@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Folding whitespace inside DKIM2 tag values (-07 §2.12): FWS may appear
+# Folding whitespace inside DKIM2 tag values (-08 §2.12): FWS may appear
 # inside a base64 string and around the colons of an s= item, and "MUST be
 # ignored when the value is used".
 #
@@ -120,7 +120,7 @@ for my $case (@cases) {
 my ($ra, $da) = verify_result($all);
 is($ra, 'pass', "every fold point at once still verifies ($da)");
 
-# --- Multi-item lists folded at the comma (-07 §2.12) -------------------
+# --- Multi-item lists folded at the comma (-08 §2.12) -------------------
 #
 # The cases above all use a single-key s=, so the value never contains a comma
 # and a fold can only land inside an item.  A signer with two keys emits
@@ -160,7 +160,7 @@ my $vis = sub {
 }
 
 # A long but valid signing domain (two 40-character labels) has no place to
-# fold: -07 §10.8's Domain allows no FWS, so a hard break inside d= made
+# fold: -08 §10.8's Domain allows no FWS, so a hard break inside d= made
 # the signer's own output fail the MAIL FROM/d= match (follow-up review F2).
 # Tokens that cannot fold stay whole on an over-long line; base64 still folds.
 {

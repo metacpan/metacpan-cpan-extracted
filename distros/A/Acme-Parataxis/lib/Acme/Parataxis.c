@@ -70,6 +70,15 @@
 #define USE_ASM_CORO 1
 #endif
 
+/*
+ * Under USE_ASM_CORO, no function ever callse para_entry_point() so let's hide it from lto-enabled compilers.
+ */
+#if defined(__GNUC__) && !defined(_WIN32)
+#define PARA_HIDDEN __attribute__((visibility("hidden"), used))
+#else
+#define PARA_HIDDEN
+#endif
+
 #define PERL_NO_GET_CONTEXT
 #define NO_XSLOCKS
 #include "EXTERN.h"
@@ -184,6 +193,7 @@ __asm__(
     ".hidden para_coro_switch\n"
     ".type para_coro_switch, @function\n"
     "para_coro_switch:\n"
+    "    endbr64\n"
     "    pushq %rbx\n"
     "    pushq %rbp\n"
     "    pushq %r12\n"
@@ -205,6 +215,7 @@ __asm__(
     ".hidden para_trampoline\n"
     ".type para_trampoline, @function\n"
     "para_trampoline:\n"
+    "    endbr64\n"
     "    popq %rdi\n"
     "    call para_entry_point\n"
     "    ud2\n"
@@ -1226,7 +1237,7 @@ DLLEXPORT SV * maybe_yield() {
 static void para_report_avreal_pad(pTHX_ CV * cv, I32 depth, const char * where) {
     if (!cv || SvTYPE((SV *)cv) != SVt_PVCV)
         return;
-    const char * pkg = (CvSTASH(cv) && HvNAME_get(CvSTASH(cv))) ? HvNAME_get(CvSTASH(cv)) : "?";
+    const char * pkg = (CvSTASH(cv) && HvNAME(CvSTASH(cv))) ? HvNAME(CvSTASH(cv)) : "?";
     const char * name = "?";
     GV * gv = CvGV(cv);
     if (gv && isGV_with_GP(gv) && GvNAME_HEK(gv))
@@ -1671,7 +1682,7 @@ static void para_diag_pads(pTHX_ const char * tag, PERL_SI * si) {
             tag, i, (void*)cv, CvDEPTH(cv), cx->blk_sub.olddepth, occ, (void*)at_occ, (void*)at_cd, (void*)PL_curpad,
             (CvDEPTH(cv) != occ) ? "  <== DEPTH MISMATCH (assert would fire at pop)" : "",
             (at_cd != at_occ) ? "  <== DEPTH-PAD MISMATCH" : "",
-            (!at_occ || at_occ == &PL_sv_undef) ? "  <== MISSING PAD" : "");
+            (!at_occ || (SV *)at_occ == &PL_sv_undef) ? "  <== MISSING PAD" : "");
     }
 }
 
@@ -2364,7 +2375,7 @@ DLLEXPORT SV * coro_yield(SV * ret_val) {
  *
  * @param c Pointer to the fiber context being started.
  */
-void para_entry_point(para_fiber_t * c) {
+PARA_HIDDEN void para_entry_point(para_fiber_t * c) {
     dTHX;
     c->started = 1;
     ENTER;
@@ -2588,7 +2599,7 @@ static void stack_guard_handler(int sig, siginfo_t * si, void * uc) {
         return;
     }
     static const char msg[] = "Parataxis: fatal: fiber C-stack overflow (> 64MB used); aborting\n";
-    write(2, msg, sizeof(msg) - 1);
+    (void)!write(2, msg, sizeof(msg) - 1);
     signal(SIGSEGV, SIG_DFL);
 }
 

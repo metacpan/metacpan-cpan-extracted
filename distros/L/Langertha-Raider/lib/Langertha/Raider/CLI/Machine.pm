@@ -1,6 +1,6 @@
 package Langertha::Raider::CLI::Machine;
 # ABSTRACT: Internal writer of the raider CLI's machine output (JSON, MessagePack, YAML)
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Moose::Util::TypeConstraints qw( enum );
 use namespace::autoclean;
@@ -65,8 +65,11 @@ has _seq => (
 sub versions { (1) }
 
 
+my %DEFAULT_REASON = ( failed => 'error', cancelled => 'user_cancel', interrupted => 'signal', refused => 'refused' );
+
 sub document {
   my ( $self, $status, %fields ) = @_;
+  $fields{reason} //= $DEFAULT_REASON{$status} // 'error' unless $status eq 'completed';
   return { %fields, version => $self->version, status => $status };
 }
 
@@ -163,7 +166,7 @@ Langertha::Raider::CLI::Machine - Internal writer of the raider CLI's machine ou
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -230,6 +233,9 @@ The format versions this raider can write.
     my $doc = $machine->document(failed => error => $message, elapsed => $s);
 
 The document of a finished run: C<version>, C<status> and the given fields.
+A document whose C<status> is not C<completed> always has a C<reason> (ADR
+0034): the one given, else C<error> for C<failed>, C<user_cancel> for
+C<cancelled>, C<signal> for C<interrupted>, C<refused> for C<refused>.
 
 =head2 event
 
@@ -278,7 +284,7 @@ The data after a round trip through JSON: numbers, strings and booleans
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -299,5 +305,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

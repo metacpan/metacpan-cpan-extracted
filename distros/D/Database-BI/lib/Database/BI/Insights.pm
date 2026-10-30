@@ -3,7 +3,7 @@ package Database::BI::Insights;
 use strict;
 use warnings;
 
-our $VERSION = '0.017.0';
+our $VERSION = '0.018.0';
 
 use Database::BI::Util  qw(urlencode);
 use List::Util          qw(sum min max);
@@ -661,9 +661,41 @@ Returns an arrayref of insight hashrefs.  Each hashref has:
     view_url  -- URL to the view showing the data
     method    -- key for method_note()
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+	    records  => 'arrayref',  # row hashrefs, already filtered and with calculated fields
+	    columns  => 'arrayref',  # column names, in order
+	    spec_key => 'string',    # optional; the l= spec (default '')
+	    base_url => 'string',    # optional; default "/insights?l=<spec_key>"
+	}
+
+=head4 OUTPUT
+
+	[ { kind => 'string', headline => 'string', detail => 'string',
+	    view_url => 'string', method => 'string' }, ... ]
+
+No rows or no columns returns C<[]>.  Outliers need a numeric column.
+Period-over-period, top movers and seasonality also need an ISO
+C<YYYY-MM-DD> date column; only the first one found is used.  Every insight
+has a C<view_url>.  The function is pure arithmetic: it makes no network
+call and does not croak.
+
 =head2 method_note($key)
 
 Returns a one-sentence description of the algorithm behind C<$key>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$key   # 'iqr_fence' | 'pop_delta' | 'top_mover' | 'autocorr'
+
+=head4 OUTPUT
+
+	'string'   # the note; an unknown key is returned unchanged
 
 =head1 ALGORITHM NOTES
 

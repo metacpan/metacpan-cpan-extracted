@@ -1,0 +1,21 @@
+title: a CLAUDE.md below the root is appended to the first file tool result in its subtree, once
+files:
+  CLAUDE.md: "Top rule.\n"
+  sub/CLAUDE.md: "Sub rule: NESTED-MARKER\n"
+  sub/x.txt: "payload\n"
+prompt: Read sub/x.txt twice.
+script:
+  - tool_calls:
+      - [ read_file, { path: sub/x.txt } ]
+  - tool_calls:
+      - [ read_file, { path: sub/x.txt } ]
+  - text: gelesen
+expect:
+  answer: gelesen
+  requests:
+    - { index: 0, contains: "Top rule." }
+    - { index: 0, absent: NESTED-MARKER }
+    - { index: 1, contains: NESTED-MARKER }
+  tools:
+    - { name: read_file, text: 'payload.*<system-reminder>\nContents of \S+/sub/CLAUDE\.md \(project instructions, checked into the codebase\):\n\nSub rule: NESTED-MARKER\n</system-reminder>' }
+    - { name: read_file, text: payload, not_text: NESTED-MARKER }

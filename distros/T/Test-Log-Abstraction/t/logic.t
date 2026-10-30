@@ -20,6 +20,7 @@ use Capture qw(printed);
 use Test::Mockingbird;
 use Encode ();
 use Scalar::Util qw(looks_like_number);
+use Config;
 
 use Test::Log::Abstraction;
 
@@ -30,6 +31,8 @@ Readonly::Scalar my $FILE => __FILE__;
 Readonly::Scalar my $MOST_SEVERE => 0;
 Readonly::Scalar my $LEAST_SEVERE => 7;
 Readonly::Scalar my $MIDDLE => 3;	# error: a threshold with levels either side
+Readonly::Scalar my $MAX_SHOWN => 200;	# characters of a caller's value repeated in a message
+Readonly::Scalar my $IV_BYTES => 8;	# the integer-fit table is for 64-bit integers
 Readonly::Scalar my $ENV_LOCALE => 'zh_CN.UTF-8';	# a locale whose language differs from every other input
 Readonly::Hash my %NAME_FOR => (0 => 'emergency', 1 => 'alert', 2 => 'critical', 3 => 'error', 4 => 'warning', 5 => 'notice', 6 => 'info', 7 => 'debug');
 Readonly::Array my @PREDICATES => qw(trace debug info notice warn error critical alert emergency);
@@ -488,6 +491,8 @@ subtest 'contradictions are refused before any effect' => sub {
 		['a level is required', sub { $logger->has_level() }, 'has_level() needs a level name'],
 		['logging needs a logger, not the class', sub { $CLASS->error('x') }, 'error() must be called on an object, not on the class'],
 		['a test name is text', sub { $logger->empty({}) }, q{invalid argument: Parameter 'name' must be a string}],
+		['a clone obeys the rules of new()', sub { $logger->new(level => 'LOUD') }, q{invalid syslog level 'LOUD'}],
+		['undef is not a level name, even in a list', sub { $CLASS->new(diag => [undef]) }, q{invalid diag level 'undef'}],
 	);
 	my $test = Test::Builder->new();
 	foreach my $case (@cases) {
@@ -499,6 +504,210 @@ subtest 'contradictions are refused before any effect' => sub {
 		is($reported, 1, "$premise: only throws_ok itself reported a test");
 		is($logger->count(), 0, "$premise: nothing stored");
 		is_deeply(violations($logger), [], "$premise: invariant intact");
+	}
+};
+
+# ===========================================================================
+# More truth tables: the remaining compound conditions
+# ===========================================================================
+
+# Verbose = G ? g : (TV || V): an explicit option (G) decides alone;
+# otherwise either environment variable is enough.  3 x 2 x 2 = 12 rows.
+subtest 'truth table: _build verbose, all 12 rows' => sub {
+	foreach my $given (undef, 0, 1) { foreach my $test_verbose (0, 1) { foreach my $verbose (0, 1) {
+		local $ENV{'TEST_VERBOSE'} = $test_verbose;
+		local $ENV{'VERBOSE'} = $verbose;
+		my $want = defined($given) ? $given : any_of($test_verbose, $verbose);
+		my $logger = $CLASS->new(diag => 'none', (defined($given) ? (verbose => $given) : ()));
+		is($logger->verbose(), $want, 'option=' . (defined($given) ? $given : '-') . " TEST_VERBOSE=$test_verbose VERBOSE=$verbose: $want");
+	} } }
+};
+
+# A clone keeps a runtime change to verbose (or level) unless that option is
+# overridden: Keep = NOT overridden.  Each is decided on its own: 2 x 2 rows.
+subtest 'truth table: _clone carry-over, all 4 rows' => sub {
+	foreach my $override_verbose (0, 1) { foreach my $override_level (0, 1) {
+		my $original = quiet();
+		$original->verbose(1);
+		$original->level($NAME_FOR{1});	# changed at run time, away from the options
+		my $clone = $original->new(($override_verbose ? (verbose => 0) : ()), ($override_level ? (level => $NAME_FOR{$MIDDLE}) : ()));
+		is($clone->verbose(), $override_verbose ? 0 : 1, "override verbose=$override_verbose level=$override_level: verbose " . ($override_verbose ? 'from the override' : 'carried over'));
+		is($clone->level(), $override_level ? $MIDDLE : 1, "override verbose=$override_verbose level=$override_level: level " . ($override_level ? 'from the override' : 'carried over'));
+	} }
+};
+
+# A level method stores unless the level is warn or more serious (I) AND it
+# was given no arguments (E).  Store = NOT (I AND E) = (NOT I) OR (NOT E),
+# by De Morgan.  warn and notice are the two levels either side of the
+# edge.  2 x 2 = 4 rows.
+subtest 'truth table: level methods with no arguments, all 4 rows' => sub {
+	foreach my $level ('warn', 'notice') { foreach my $empty (0, 1) {
+		my $ignore = ($SEVERITY{$level} <= $SEVERITY{'warn'}) ? 1 : 0;
+		my $store = any_of(!$ignore, !$empty);
+		is($store, ($ignore && $empty) ? 0 : 1, "$level empty=$empty: De Morgan holds");
+		my $logger = quiet();
+		$logger->$level($empty ? () : ('m'));
+		is($logger->count(), $store, "$level empty=$empty: " . ($store ? 'stored' : 'ignored'));
+	} }
+};
+
+# An integer conversion formats a number only if sprintf reads it back as
+# itself: Format = fits, where fits depends on the conversion (signed or
+# unsigned), the sign (an unsigned format reads a negative as signed, in
+# two's complement), and is tested on two forms of number (a string of
+# digits, compared digit by digit, and a float).  2 x 2 x 2 x 2 = 16 rows.
+subtest 'truth table: _format integer fit, all 16 rows' => sub {
+	plan(skip_all => 'the limits are for 64-bit integers') if($Config{'ivsize'} < $IV_BYTES);
+	# conversion => sign => fits => [digit string, float]
+	my %value = (
+		d => {
+			'+' => { 1 => ['42', 42.0], 0 => ['9223372036854775808', 1e19] },
+			'-' => { 1 => ['-42', -42.0], 0 => ['-9223372036854775809', -1e19] },
+		},
+		u => {
+			'+' => { 1 => ['18446744073709551615', 42.0], 0 => ['18446744073709551616', 1e20] },
+			'-' => { 1 => ['-1', -1.0], 0 => ['-9223372036854775809', -1e19] },
+		},
+	);
+	foreach my $conversion (sort keys %value) { foreach my $sign ('+', '-') { foreach my $fits (0, 1) {
+		foreach my $form (0, 1) {
+			my $v = $value{$conversion}{$sign}{$fits}[$form];
+			my $want = $fits ? sprintf("%$conversion", $v) : "$v";
+			is(Test::Log::Abstraction::_format(undef, $conversion, $v), $want, "%$conversion sign=$sign fits=$fits " . ($form ? 'float' : 'digits') . ': ' . ($fits ? 'formatted' : 'as written'));
+		}
+	} } }
+};
+
+# Escaped = C0 OR (C1 AND character string); printable characters never
+# are.  3 kinds x 2 string types = 6 rows.  Then: Cut = length > limit,
+# measured after escaping, so one control character at the end can push a
+# value over the limit.
+subtest 'truth table: _shown escaping and cutting' => sub {
+	my %char = (C0 => "\x{1b}", C1 => "\x{9b}", printable => "\x{e9}");
+	foreach my $kind (sort keys %char) { foreach my $flagged (0, 1) {
+		my $text = "a$char{$kind}";
+		$flagged ? utf8::upgrade($text) : utf8::downgrade($text);
+		my $escape = any_of(($kind eq 'C0'), (($kind eq 'C1') && $flagged));
+		my $want = $escape ? sprintf('a\\x%02X', ord($char{$kind})) : $text;
+		is(Test::Log::Abstraction::_shown($text), $want, "$kind character string=$flagged: " . ($escape ? 'escaped' : 'kept'));
+	} }
+	my $at_limit = 'x' x $MAX_SHOWN;
+	is(Test::Log::Abstraction::_shown($at_limit), $at_limit, "$MAX_SHOWN characters: not cut");
+	is(Test::Log::Abstraction::_shown('x' x ($MAX_SHOWN + 1)), "$at_limit...", ($MAX_SHOWN + 1) . ' characters: cut');
+	# 199 characters and a newline: 200 as given, 203 once escaped
+	is(Test::Log::Abstraction::_shown(('x' x ($MAX_SHOWN - 1)) . "\n"), ('x' x ($MAX_SHOWN - 1)) . "\\...", 'the cut counts the escaped form');
+};
+
+# The first template found wins, in this order: the logger's override in its
+# own language (O_l), the built-in in its language (B_l), the English
+# override (O_e), the built-in English (B_e); with none, there is no
+# template.  The built-in catalogue is fixed, so it is controlled by the
+# choice of key: one in both languages, one in English only, or neither.
+# 2 x 3 x 2 = 12 rows, for a German logger.
+subtest 'truth table: _template search order, all 12 rows' => sub {
+	my %builtin = ('in German and English' => 'needs_level', 'in English only' => 'entry', 'nowhere' => 'no_such_key');
+	my $plain = quiet();
+	foreach my $own (0, 1) { foreach my $kind (sort keys %builtin) { foreach my $english (0, 1) {
+		my $key = $builtin{$kind};
+		my %i18n = (($own ? (de => { $key => 'override de' }) : ()), ($english ? (en => { $key => 'override en' }) : ()));
+		my $logger = quiet(lang => 'de', i18n => \%i18n);
+		my $builtin_de = ($kind eq 'in German and English');
+		my $builtin_en = ($kind ne 'nowhere');
+		my $want = $own ? 'override de'
+			: $builtin_de ? Test::Log::Abstraction::_template($plain, 'de', $key)
+			: $english ? 'override en'
+			: $builtin_en ? Test::Log::Abstraction::_template($plain, 'en', $key)
+			: undef;
+		is(Test::Log::Abstraction::_template($logger, 'de', $key), $want, "O_l=$own built-in $kind O_e=$english");
+	} } }
+	isnt(Test::Log::Abstraction::_template($plain, 'de', 'needs_level'), Test::Log::Abstraction::_template($plain, 'en', 'needs_level'), 'premise: the German and English built-ins differ, so the table can tell them apart');
+};
+
+# Gender is used when given AND the template has it; otherwise the plural
+# form decides.  3 genders x 2 counts = 6 rows.
+subtest 'truth table: _variant gender or plural, all 6 rows' => sub {
+	my $template = { female => 'she', one => 'one', other => 'many' };
+	foreach my $gender (undef, 'male', 'female') { foreach my $count (1, 2) {
+		my $by_gender = defined($gender) && exists($template->{$gender});
+		my $want = $by_gender ? $template->{$gender} : ($count == 1) ? 'one' : 'many';
+		is(Test::Log::Abstraction::_variant($template, { gender => $gender, count => $count }, 'en'), $want, 'gender ' . (defined($gender) ? $gender : 'undef') . " count $count: $want");
+	} }
+};
+
+# Text = Perl's form, unless a reference's overloaded "" dies; then the
+# plain form.  An overload that gives undef does not die: Perl's form of
+# undef is '', so that is the text.  5 rows: a plain value can never fail.
+subtest 'truth table: _string, all 5 rows' => sub {
+	my %value = (
+		'plain value' => ['text', 'text'],
+		'reference, no overloading' => [[], undef],
+		'overloading that works' => [Local::Text->new('shown'), 'shown'],
+		'overloading that dies' => [Local::Text->new(undef, 1), undef],
+		'overloading that gives undef' => [Local::Text->new(undef), ''],
+	);
+	foreach my $name (sort keys %value) {
+		my ($v, $want) = @{$value{$name}};
+		$want = overload::StrVal($v) if(!defined($want));
+		is(Test::Log::Abstraction::_string($v), $want, $name);
+	}
+};
+
+{
+	package Local::Text;
+	use overload '""' => sub { die "no text\n" if($_[0]->{'dies'}); return $_[0]->{'text'} }, fallback => 1;
+	sub new { my ($class, $text, $dies) = @_; return bless { text => $text, dies => $dies }, $class }
+}
+
+# ===========================================================================
+# Reductions: checks removed because an earlier step already proved them.
+# Each subtest tests the premise the removal relies on, then the outcome.
+# ===========================================================================
+
+# _diag_rule() compares the name with 'none' and 'all' without first asking
+# whether it is defined.
+#   Premise 1: undef is compared as '', and '' is neither word.
+#   Premise 2: so both undef and '' go on to the level-name check.
+#   Conclusion: '' is refused under its own name, and undef as 'undef'.
+subtest 'reduction: _diag_rule needs no defined() before the words' => sub {
+	my $self = quiet();
+	throws_ok { $self->_diag_rule('') } at_caller(q{invalid diag level ''}), "'': neither word, so checked as a level name";
+	{
+		local $Test::Log::Abstraction::config{'diag'} = undef;
+		throws_ok { $self->_diag_rule(undef) } at_caller(q{invalid diag level 'undef'}), 'undef: neither word, so checked as a level name';
+	}
+	# The boundary on each side of the words: changed case still matches,
+	# one letter more or less does not
+	is_deeply($self->_diag_rule('nONE'), {}, "'nONE': the word none");
+	is_deeply($self->_diag_rule('ALL'), { all => 1 }, "'ALL': the word all");
+	throws_ok { $self->_diag_rule('non') } at_caller(q{invalid diag level 'non'}), "'non': not a word, not a level";
+	throws_ok { $self->_diag_rule('alll') } at_caller(q{invalid diag level 'alll'}), "'alll': not a word, not a level";
+};
+
+# _object() names a class in its error only when the invocant is a class
+# name, and tests that with UNIVERSAL::isa() alone.
+#   Premise 1: an object of this class, or a subclass, never reaches it.
+#   Premise 2: isa() is false, without a warning, for everything else that
+#              is not a class name: undef, '', unblessed references and
+#              other classes' objects.
+#   Conclusion: the class named is the invocant exactly when it is the name
+#   of this class or a subclass; Test::Warnings proves no warning was given.
+subtest 'reduction: _object needs no defined() or ref() before isa()' => sub {
+	my %invocant = (
+		'undef' => [undef, $CLASS],
+		'empty string' => ['', $CLASS],
+		'unblessed hash' => [{}, $CLASS],
+		'unblessed array' => [[], $CLASS],
+		'reference to this class name' => [\$CLASS, $CLASS],
+		'another class object' => [Local::Other->new(), $CLASS],
+		'another class name' => ['Local::Other', $CLASS],
+		'this class name' => [$CLASS, $CLASS],
+		'a subclass name' => ['Local::Sub', 'Local::Sub'],
+	);
+	foreach my $name (sort keys %invocant) {
+		my ($self, $named) = @{$invocant{$name}};
+		my $is_name = UNIVERSAL::isa($self, $CLASS) ? 1 : 0;
+		is($is_name, ($named ne $CLASS) || (defined($self) && ($self eq $CLASS)) ? 1 : 0, "$name: premise 2 holds");
+		throws_ok { Test::Log::Abstraction::_object($self, 'm') } qr/\A\Q$named: m() must be called on an object, not on the class\E at /, "$name: names $named";
 	}
 };
 

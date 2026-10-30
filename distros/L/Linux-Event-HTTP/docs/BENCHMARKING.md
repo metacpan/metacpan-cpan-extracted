@@ -1,336 +1,148 @@
 # Linux::Event::HTTP benchmarking
 
-The distribution keeps parser microbenchmarks and full HTTP transaction
-benchmarks separate. The parser benchmark answers questions about pico and the
-native Request representation. The end-to-end harness measures the combined
-cost of TCP accept/read/write, HTTP parsing, Request/Response message lifecycle,
-Transaction execution, application callback dispatch, response serialization,
-persistence, and the client-visible round trip.
+HTTP/1 throughput was compared with the former implementation before the
+0.004 release. The measured gap is documented, not a fixed release target.
+Never compare results from different machines as a direct A/B result.
 
-## End-to-end harness
+## Rebuilt end-to-end benchmark
 
-Run from a built checkout:
+After `perl Makefile.PL && make`, run:
 
 ```sh
-perl -Mblib bench/run-http-end-to-end.pl
+perl -Mblib bench/run-unblock-end-to-end.pl \
+    --requests 10000 --warmup 1000 --connections 100 \
+    --pipeline 1 --response-bytes 32 --repeats 2
 ```
 
-The harness forks the Linux::Event HTTP server into a separate process and runs
-the load generator in the parent. This avoids putting the client and server on
-the same event loop or in the same Perl interpreter.
+The same harness accepts `--no-native-input` to compare the Perl path.
+For historical performance, compare with the original 0.003 source (commit
+`c0bf714e0f08f9031684e2eb4fd70dea3c68449f`) on the same runner,
+using its `bench/run-http-end-to-end.pl`.
+A manually dispatched CI run can perform a legacy/rebuild/rebuild/legacy
+sequence. Ordinary push CI focuses on correctness and packaging.
 
-Defaults:
+The new client benchmark is `bench/run-rebuild-client.pl`.
+`bench/run-unblock-engine.pl` isolates the protocol engine without
+TCP socket costs; `bench/run-unblock-retention.pl` examines retained
+memory during server/client request workloads.
 
-```text
-measured requests:    20000
-warmup requests:       2000
-connections:            100
-pipeline depth:            1
-request body bytes:         0
-response body bytes:       32
-repeats:                    5
-```
+## Independent Perl HTTP server comparison
 
-Each repeat starts a fresh server process. Connections stay persistent through
-warmup and measurement. The server returns a fixed scalar response with
-Content-Length so the default result measures the ordinary HTTP/1.1 request and
-`Response->body` callback-return path. Transaction output lifecycle and the
-private eligible scalar fast path remain part of the measured server stack;
-incremental response production and chunked response framing are not part of the
-default workload.
+For a peer baseline, the development workflow
+`.github/workflows/http1-peer-benchmark.yml` uses the unchanged shared
+client from [Benchmark::Web](https://github.com/haxmeister/perl-Benchmark-Web)
+(revision `ceb8b2f9c4cd0764441844dd91dacc1240ebc4c7`).
+It compares the rebuilt Server's normal public API (a fresh Uniform
+response for each request) against the original Linux::Event::HTTP,
+Feersum, Hyperman and Mojolicious. No Unblock engines were modified.
 
-Useful variations:
+Validated 2026-10-25 on one GitHub-hosted Ubuntu runner:
+https://github.com/haxmeister/perl-Linux-Event-HTTP/actions/runs/40211468264
+
+All servers used one process and one application execution slot,
+100 persistent HTTP/1.1 loopback connections, pipeline depth 1,
+a 32-byte HTTP 200 response body, a shared raw Perl client, and
+rotated target order. GET: 20,000 measured, 2,000 warmup, 5 repeats;
+POST: 4,096-byte complete body, 10,000 measured, 1,000 warmup,
+3 repeats. The table shows the median requests per second:
+
+| Server | GET /bench | POST /bench, 4 KiB |
+| --- | ---: | ---: |
+| Hyperman | 111,289 | 67,543 |
+| Feersum | 108,622 | 99,643 |
+| Original Linux::Event::HTTP | 40,413 | 34,617 |
+| Linux::Event::HTTP (Unblock rebuild) | 9,666 | 7,991 |
+| Mojolicious | 2,483 | 2,334 |
+
+This is a comparative protocol-stack workload, not identical
+application-level processing across frameworks. The rebuild passes
+canonical Uniform messages through a generic transaction lifecycle;
+other adapters use their normal documented APIs. The result identifies
+a meaningful throughput gap against the faster Perl servers but does
+not, on its own, establish a defect in the Unblock::HTTP1 engine or
+justify rewriting the shared architecture.
+
+These absolute numbers apply to that hosted runner only. Do not
+treat them as deployment capacity or cross-machine rankings. The
+complete JSON records and latency percentiles are preserved in the
+GitHub Actions artifact `stage-b-http1-perl-peers`. Historical
+`bench/results/` JSON files are retained in Git but deliberately
+excluded from the CPAN source archive. The benchmark-only adapter
+also remains in Git, not in the shipped distribution.
+
+## Cost-boundary diagnostics
 
 ```sh
-# Higher concurrency
-perl -Mblib bench/run-http-end-to-end.pl \
-  --requests=100000 --warmup=10000 --connections=500
-
-# HTTP/1.1 pipelining
-perl -Mblib bench/run-http-end-to-end.pl \
-  --requests=100000 --connections=100 --pipeline=16
-
-# Request-body path
-perl -Mblib bench/run-http-end-to-end.pl \
-  --requests=50000 --connections=100 --request-body-bytes=4096
-
-# Larger scalar response
-perl -Mblib bench/run-http-end-to-end.pl \
-  --requests=50000 --connections=100 --response-bytes=65536
+perl -Mblib bench/run-unblock-cost-breakdown.pl \
+    --iterations 12000 --rounds 3
 ```
 
-The text result reports requests/second, p50/p95/p99/max client-visible latency,
-and server process CPU microseconds per request. `--json=PATH` writes the full
-configuration, environment, per-repeat records, medians, and Linux::Event loop
-statistics.
+This measures canonical Uniform::HTTP::Response construction, wire-plan
+work, direct Unblock::HTTP1 and the upper Unblock facade under matched
+conditions. The temporary
+`--diagnostic-prebuilt-response` option of the end-to-end harness
+uses a single frozen canonical Response **only to bound constructor cost**.
+It is not a production caching recommendation; engines must not reuse or
+mutate application responses behind callers.
 
-## Cross-server comparison harness
+Recorded evidence in Git (not shipped in the source archive):
+`bench/results/unblock-stage-b/20261025-cost-boundary.json`
+and `bench/results/unblock-stage-b/20261025-bodyless.json`,
+plus the active status and handoff documents.
+In the paired runs so far, the upper Unblock facade added no meaningful
+per-request penalty versus direct HTTP1. Native input outperformed the
+Perl bridge, but the rebuilt real-socket throughput remained well below
+the legacy baseline, which is a measured trade-off rather than an unresolved release blocker.
 
-A second harness drives multiple HTTP servers with the same raw Perl client code
-and the same wire workload:
+HTTP/2 h2spec, HTTP/3 QUIC/TLS, WebSocket and generic CONNECT regressions
+are protocol correctness checks, independent of HTTP/1 throughput.
+
+## Published-stack validation and historical reproduction
+
+Current CI installs Unblock::HTTP 0.03, HTTP1 0.13, HTTP2 0.13 and HTTP3
+0.14 from CPAN. Historical Linux::Event::HTTP comparisons use the frozen original
+0.003 source at c0bf714e0f08f9031684e2eb4fd70dea3c68449f.
+
+The original development-stack workflows and exact dependency pins are
+preserved at root revision 476f2e84bfcff2d326c46a75a8a9b690c0c3cca4.
+Use that revision's workflow/dependency set to reproduce the old HTTP1
+engine before/after experiment (06a0f5d7c0509ad0deaebe4a8269c03fbe07ea14
+versus 4d19f59196481ae4460207c5b22c5125fdbfe186, upper layer
+e9efa51ee0110227945628f3f85a3feedba90558). Do not prepend old engine
+Perl sources to the published 0.13 XS installation: their version checks
+correctly reject that mixed installation. Current correctness CI and
+current benchmarks use the complete published stack instead.
+
+## Server-only and independent native CPU profiles
+
+`--nytprof` profiles only the server event loop, excluding the load generator
+and setup. It needs the optional developer tool Devel::NYTProf (tested with
+6.16). Run ordinary benchmarks without profiling for throughput; profiler
+instrumentation substantially changes absolute costs and relative weights.
+On Linux, `clock=2` selects process CPU time rather than time waiting in epoll.
+The denominator below includes the 1,000 warmup requests.
 
 ```sh
-perl -Mblib bench/run-http-comparison.pl
+NYTPROF=file=/tmp/socket.nytprof:addpid=1:start=no:stmts=0:calls=2:clock=2 \
+  perl -Mblib -d:NYTProf bench/run-unblock-end-to-end.pl \
+  --nytprof --requests 10000 --warmup 1000 --repeats 1
+perl tools/http1-profile-summary.pl /tmp/socket.nytprof.CHILD_PID 11000
+
+NYTPROF=file=/tmp/engine.nytprof:start=no:stmts=0:calls=2:clock=2 \
+  perl -d:NYTProf bench/run-unblock-engine.pl \
+  --case engine_input_and_response --native-input --nytprof --requests 10000
+perl tools/http1-profile-summary.pl /tmp/engine.nytprof 11000
 ```
 
-The primary comparison set is:
+The independent engine case uses HTTP1 0.13's own diagnostic BorrowedDriver,
+without any Linux::Event module or socket. The helper is private upstream
+benchmark machinery, not an application API or a production dependency.
+Omit `--native-input` for ordinary portable input. `--case` prevents separate
+constructor/control benchmarks from contaminating the engine profile.
+The summary reports exclusive subroutine time and calls per request;
+inclusive times in JSON overlap and must not be added. C work without its
+own Perl frame can be charged to its enclosing call, so namespace shares
+are attribution evidence, not an exact limit on possible optimization.
 
-- Linux::Event::HTTP;
-- Feersum using its native HTTP interface;
-- Mojolicious using Mojo::Server::Daemon;
-- Node.js built-in `http` server;
-- Go `net/http`;
-- Python aiohttp.
-
-Twiggy/AnyEvent remains available with `--servers=twiggy`, but is not in the
-primary set because current Twiggy closes the long-lived benchmark connections
-before the requested keep-alive workload completes.
-
-All primary comparison servers run as one process with one application execution
-slot. The Go adapter sets `GOMAXPROCS=1`; the Go runtime may still create helper
-OS threads, so this constraint means one slot for executing Go code rather than
-literally one runtime thread. The Go server is compiled once before measurement
-and the resulting binary is executed directly for every repeat.
-
-The harness starts a fresh server for each repeat, uses persistent loopback TCP
-connections, rotates server order between repeats, and applies the same
-connection count, pipeline depth, request body, response body, warmup, response
-parser, and latency measurement to every server.
-
-That contract is intentional. A prefork server such as Starman should be
-compared separately because multiple worker processes answer a different
-capacity-scaling question.
-
-Competitors are optional locally. Missing runtimes or modules are skipped unless
-`--strict` is supplied. A complete primary setup needs Mojolicious and Feersum
-in Perl, Node.js, a Go toolchain, and Python aiohttp. Twiggy is needed only when
-it is selected explicitly.
-
-Examples:
-
-```sh
-# Default six-way comparison
-perl -Mblib bench/run-http-comparison.pl \
-  --requests=50000 --warmup=5000 --connections=100 --repeats=5
-
-# Compare the primary Perl servers
-perl -Mblib bench/run-http-comparison.pl \
-  --servers=linuxevent,feersum,mojo \
-  --requests=50000 --connections=100 --repeats=5
-
-# Request-body workload
-perl -Mblib bench/run-http-comparison.pl \
-  --request-body-bytes=4096 --response-bytes=32
-
-# Pipelining workload
-perl -Mblib bench/run-http-comparison.pl \
-  --pipeline=16
-
-# Machine-readable report
-perl -Mblib bench/run-http-comparison.pl \
-  --json=bench/results/http-comparison.json
-```
-
-Comparison output reports per-repeat and median requests/second plus
-p50/p95/p99/max client-visible latency. Runtime and framework versions are
-included in JSON output when available.
-
-### Linux::Event request-body diagnostics
-
-The comparison harness exposes production Linux::Event::HTTP request-body modes
-for isolating application lifecycle costs while keeping the same native HTTP
-input path:
-
-```text
-linuxevent_body_ignore
-linuxevent_body_callback
-linuxevent_body_end
-linuxevent_body_callback_end
-```
-
-They distinguish bodies drained without an application consumer from bodies
-delivered through `on_body`, and responses generated immediately in
-`on_request` from responses generated after completion in `on_request_end`.
-These are diagnostic server modes, not separate public APIs.
-
-For example:
-
-```sh
-perl -Mblib bench/run-http-comparison.pl \
-  --servers=linuxevent_body_ignore,linuxevent_body_callback,linuxevent_body_end,linuxevent_body_callback_end \
-  --request-body-bytes=65536 --response-bytes=32 --repeats=5
-```
-
-To send the same decoded body using HTTP/1.1 chunked transfer coding:
-
-```sh
-perl -Mblib bench/run-http-comparison.pl \
-  --servers=linuxevent_body_ignore,linuxevent_body_callback,linuxevent_body_end,linuxevent_body_callback_end \
-  --request-body-bytes=65536 \
-  --request-body-framing=chunked \
-  --request-chunk-bytes=4096 \
-  --response-bytes=32 --repeats=5
-```
-
-`--request-body-bytes` always means decoded application body bytes.
-`--request-chunk-bytes` controls only the payload size of each chunk on the
-wire; the harness adds hexadecimal chunk lengths, CRLF delimiters, and the final
-zero chunk.
-
-Production `Server::Connection` uses the raw native HTTP/1 consumer. A
-Content-Length body is drained directly from the native ordered-byte buffer when
-there is no `on_body` callback; when `on_body` is present, only body bytes are
-materialized for that callback.
-
-Chunked request bodies also remain on the native path. The provider keeps a
-persistent pico chunk decoder and copies each borrowed encoded input window only
-into mutable native scratch because pico's decoder rewrites its input. Drained
-chunked bodies do not materialize body bytes in Perl; when `on_body` is present,
-only decoded payload bytes cross into Perl. Trailers are consumed by the decoder,
-and bytes following the terminating chunk remain in Linux::Event's native input
-buffer for the next request head.
-
-A following request head that shares the same read with either a Content-Length
-body boundary or a completed chunked body therefore remains native input and is
-parsed without an ordinary Perl `on_data` handoff.
-
-The comparison is a protocol-stack comparison, not an attempt to make each
-framework perform an identical amount of application-layer work. Each adapter
-uses the smallest normal server API that still receives the complete request
-body before producing the same fixed Content-Length response payload.
-
-## Client receive-path harness
-
-The client receive-path harness measures `Client::Connection` separately from
-server execution:
-
-```sh
-perl -Mblib bench/run-http-client-receive.pl
-```
-
-It forks a small raw HTTP responder into a separate process and measures CPU time
-in the Linux::Event::HTTP client process. The default cases cover:
-
-```text
-cl32_drain
-cl16k_drain
-chunked16k_drain
-cl16k_buffer
-cl16k_on_body
-```
-
-This isolates response parsing, Response/Transaction lifecycle, body framing,
-and application delivery from the CPU cost of a full Linux::Event::HTTP server.
-
-The native client response-head experiment used an exact same-run comparison:
-the pre-native tree and candidate tree were built with the same Perl and
-Linux::Event on one runner, then each executed the same 10,000-response,
-100-persistent-connection, three-repeat matrix. That comparison showed
-throughput gains from 10.1% to 22.7% and client CPU reductions from 9.2% to
-18.5% across all five workloads.
-
-For the current native-head design, response heads remain in Linux::Event's
-native ordered-input buffer until picohttpparser has found the message boundary.
-Only the Response metadata is materialized into Perl. Body bytes then enter the
-existing Client::Connection body state machine through the native provider's
-fallback input. This benchmark therefore also reports fallback calls and bytes
-so a later native-body experiment can be evaluated independently.
-
-When comparing an optimization, prefer an exact baseline worktree on the same
-machine and runtime. Do not treat separate hosted-runner medians as
-decision-quality evidence for small differences.
-
-## Profiling
-
-Normal benchmark runs leave Linux::Event native nanosecond timing disabled so
-measurement overhead does not contaminate the throughput baseline. Cheap loop
-counters are still recorded.
-
-Use a separate profiling run when event-loop timing is needed:
-
-```sh
-perl -Mblib bench/run-http-end-to-end.pl \
-  --requests=50000 --connections=100 --profile \
-  --json=bench/results/http-profile.json
-```
-
-`--profile` enables `$loop->profile(1)` in the server process. Compare profiling
-runs only with other profiling runs.
-
-## CI smoke mode
-
-```sh
-perl -Mblib bench/run-http-end-to-end.pl --smoke
-perl -Mblib bench/run-http-comparison.pl --smoke
-```
-
-Smoke mode uses a tiny workload and exists only to verify that the harness can
-start servers, maintain persistent connections, pipeline requests, parse
-responses, and collect latency. GitHub-hosted runner throughput must not be used
-as a release performance claim.
-
-## Measurement discipline
-
-For publishable numbers:
-
-- use a stable local machine or dedicated runner;
-- record CPU model, kernel, runtime and framework versions;
-- pin or otherwise control CPU placement when comparing small differences;
-- run multiple repeats and report medians;
-- keep request/response sizes, connection count, and pipeline depth identical;
-- compare one-process servers with one-process servers unless worker scaling is
-  the subject of the test;
-- compare non-profiled runs with non-profiled runs;
-- avoid running unrelated CPU- or network-heavy work at the same time;
-- retain the JSON report with the benchmark conclusion.
-
-A single parser microbenchmark number is not a server throughput number, and a
-single end-to-end throughput number does not identify where CPU time is spent.
-Use the parser benchmark, the end-to-end harness, the comparison harness, and
-Linux::Event profiling as separate views of the stack.
-
-## Current production lifecycle diagnostic
-
-The transaction ladder uses contract 10:
-
-```sh
-perl -Mblib bench/run-http-transaction-ladder.pl \
-  --requests=50000 --warmup=5000 --connections=100 --pipeline=1 \
-  --response-bytes=32 --repeats=5 --read-budget-bytes=0 \
-  --json=bench/results/production-lifecycle.json
-```
-
-| Case | Work measured |
-| --- | --- |
-| `prod_api` | Manual Stream byte driver: native Request parse, sparse Response, public Content-Type/body setters, prebuilt diagnostic wire |
-| `prod_wire` | Adds the production native scalar-final builder and generated Content-Length/commit work |
-| `prod_active` | Adds the three live exchange references used by the HTTP Connection |
-| `prod_connection` | Actual production `Server::Connection` with inherited native HTTP input through a Listener |
-| `current_http` | Adds the full `Server` wrapper with Content-Type |
-
-The first three stages intentionally use a plain `IO::Sock::Stream` because
-they manually drive bytes in order to isolate construction costs. They are not
-HTTP Connection subclasses and should not be interpreted as alternative server
-implementations. `prod_connection` is the first stage that runs the real
-production HTTP input provider.
-
-The older copied Perl `on_data` lifecycle ladder was removed when native HTTP
-input became the production Connection contract. Keeping it as an HTTP subclass
-would misrepresent the public API and require an invalid native-consumer /
-`on_data` combination.
-
-For an actual optimization, build an exact baseline in another directory and
-run the production comparison with `BENCH_BASE_TREE` set to that directory:
-
-```sh
-BENCH_BASE_TREE=/path/to/built/baseline \
-  perl -Mblib bench/run-http-comparison.pl \
-  --servers=linuxevent_baseline_content_type,linuxevent_content_type \
-  --requests=100000 --warmup=10000 --connections=100 --pipeline=1 \
-  --response-bytes=32 --repeats=7 \
-  --json=bench/results/production-ab.json
-```
-
-Also measure a 16 KiB response and a 4 KiB POST
-(`--request-body-bytes=4096`). Both builds must use the same Perl and
-Linux::Event core.
+Detailed historical profiler data is retained in Git. These diagnostics
+are not required for application use.

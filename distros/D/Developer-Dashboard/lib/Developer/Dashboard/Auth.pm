@@ -3,7 +3,7 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Crypt::URandom qw(urandom);
 use Fcntl qw(:mode);
@@ -13,6 +13,7 @@ use Socket qw(AF_INET AF_INET6 SOCK_STREAM getaddrinfo inet_ntoa inet_ntop unpac
 use String::Compare::ConstantTime ();
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::Crypto::PBKDF2;
 use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 
 # Work factor for the PBKDF2-HMAC-SHA256 helper-password scheme. This is the
@@ -482,10 +483,19 @@ sub _password_hash {
 # _pbkdf2_hmac_sha256_hex($password, $salt, $iterations)
 # Stretches a password with PBKDF2-HMAC-SHA256 (RFC 2898). The 32-byte SHA-256
 # output equals the derived-key length, so exactly one output block is needed.
+# Uses the optional OpenSSL FFI adapter when compatible; otherwise preserves
+# the established Digest::SHA implementation.
 # Input: password string, salt string, positive iteration count.
 # Output: 64-character lowercase hex string of the derived key.
 sub _pbkdf2_hmac_sha256_hex {
     my ( $password, $salt, $iterations ) = @_;
+    my $native = Developer::Dashboard::Crypto::PBKDF2->derive_sha256(
+        password   => $password,
+        salt       => $salt,
+        iterations => $iterations,
+    );
+    return $native if defined $native;
+
     my $u      = hmac_sha256( $salt . pack( 'N', 1 ), $password );
     my $result = $u;
     for ( 2 .. $iterations ) {
@@ -542,6 +552,14 @@ carries its own scheme label and iteration work factor. Helper records written
 before stretching was introduced used a single-round salted SHA-256 hash and
 are still accepted, so tightening the scheme never locks out an established
 helper user.
+
+New and existing PBKDF2 helper-password hashes use 210,000 HMAC-SHA256 rounds.
+When FFI::Platypus and a compatible system C<libcrypto> are available, the
+derivation is performed by OpenSSL's one-shot PBKDF2 routine. This does not
+change stored hashes, salts, iteration counts, or comparisons. Unsupported
+wide-character inputs and unavailable native crypto use the existing
+Digest::SHA loop, so authentication behavior remains compatible across
+platforms.
 
 =head1 METHODS
 

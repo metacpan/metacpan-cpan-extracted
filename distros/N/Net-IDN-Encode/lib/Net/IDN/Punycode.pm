@@ -8,7 +8,8 @@ use warnings;
 
 use Exporter;
 
-our $VERSION = "2.502";
+our $VERSION    = "2.600";
+our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
 our @ISA = qw(Exporter);
@@ -83,14 +84,33 @@ The following functions are available:
 =item encode_punycode($input)
 
 Encodes C<$input> with Punycode and returns the result.
+If C<$input> is undefined, the function raises an C<uninitialized>
+warning and returns the empty string.
 
-This function will throw an exception on invalid/unencodable input.
+This function throws an exception on input it cannot encode. It
+rejects malformed UTF-8 and a code point that is not a Unicode scalar
+value. The latter covers a surrogate in U+D800 to U+DFFF and any
+value above U+10FFFF. It also rejects input large enough to overflow
+the Punycode counters.
+
+The cost of encoding is quadratic in the length of the input. This is
+a property of the algorithm as published in S<RFC 3492>. The function
+does not limit the length of its input, so callers that accept
+untrusted input should apply their own limit before encoding.
+L<Net::IDN::UTS46> and L<Net::IDN::Encode> reject a label that is too
+long for DNS before encoding it.
 
 =item decode_punycode($input)
 
 Decodes C<$input> with Punycode and returns the result.
+If C<$input> is undefined, the function raises an C<uninitialized>
+warning and returns the empty string.
 
-This function will throw an exception on invalid input.
+This function throws an exception on input it cannot decode. It
+rejects a character outside the basic set, an invalid or truncated
+digit sequence, and a decoded code point that is not a Unicode scalar
+value. It also rejects input large enough to overflow the Punycode
+counters.
 
 =back
 

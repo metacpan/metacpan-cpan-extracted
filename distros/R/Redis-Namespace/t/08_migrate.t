@@ -38,6 +38,22 @@ subtest 'basic MIGRATE test' => sub {
     is $ns2->get('hogehoge'), 'foobar';
 };
 
+subtest 'false key' => sub {
+    my $redis_version = version->parse($redis1->info->{redis_version});
+    plan skip_all => 'your redis does not support MIGRATE command'
+        unless $redis_version >= '2.6.0';
+
+    $redis1->flushall;
+    $redis2->flushall;
+    $redis1->set('0', 'global');
+    $ns1->set('0', 'foobar');
+    is $ns1->migrate('localhost', $server->port, '0', 0, 60), 'OK';
+    is $ns1->get('0'), undef;
+    is $ns2->get('0'), 'foobar';
+    is $redis1->get('0'), 'global', 'global "0" is not migrated';
+    is $redis2->get('0'), undef, 'global "0" is not migrated';
+};
+
 subtest 'COPY' => sub {
     my $redis_version = version->parse($redis1->info->{redis_version});
     plan skip_all => 'your redis does not support COPY clause of MIGRATE command'

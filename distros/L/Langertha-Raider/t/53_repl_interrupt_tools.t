@@ -7,6 +7,7 @@ use Test2::V0;
 use File::Temp qw( tempdir );
 use JSON::MaybeXS ();
 use Path::Tiny;
+use Time::HiRes ();
 use lib 't/lib';
 use Test::Raider::Env qw( clear_engine_env isolate_home );
 isolate_home();
@@ -19,19 +20,23 @@ skip_all 'needs /proc to find the tool subprocess' unless -d '/proc/'.$$;
 my $repo = path(__FILE__)->absolute->parent->parent;
 my $bin  = $repo->child('bin', 'raider');
 
+# Polls $cond until it holds or $seconds (default 30) are over. Every wait
+# is for an event; the deadline only bounds a failing run, so it is wide
+# enough for a raider that starts slowly on a loaded machine (its start
+# alone takes seconds).
 sub wait_until {
-  my ( $cond ) = @_;
-  for (1 .. 50) { return 1 if $cond->(); select undef, undef, undef, 0.1 }
-  return 0;
+  my ( $cond, $seconds, $step ) = @_;
+  my $deadline = Time::HiRes::time() + ( $seconds // 30 );
+  while (1) {
+    return 1 if $cond->();
+    return 0 if Time::HiRes::time() > $deadline;
+    select undef, undef, undef, $step // 0.1;
+  }
 }
 
 # The same within 1.5 seconds, so a second Ctrl-C still falls in the
 # two-strike window.
-sub wait_until_quick {
-  my ( $cond ) = @_;
-  for (1 .. 30) { return 1 if $cond->(); select undef, undef, undef, 0.05 }
-  return 0;
-}
+sub wait_until_quick { wait_until($_[0], 1.5, 0.05) }
 
 sub journal_events {
   my ( $out ) = @_;
@@ -66,16 +71,13 @@ sub repl_in_tool {
     open STDOUT, '>', "$out"                or die $!;
     open STDERR, '>', path($root)->child('err')->stringify or die $!;
     exec $^X, '-I'.$repo->child('lib'), "$bin", '-r', $root, '-e', 'openai', '-k', 'test',
-      '-m', 'stub-model', '-o', 'url='.$url, '--no-trace', '-i', @flags;
+      '-m', 'stub-model', '-o', 'url='.$url, '--no-trace', '--dangerously-skip-permissions', '-i', @flags;
     die 'exec: '.$!;
   }
   close $r;
   syswrite $w, "run the tool\n";
   my $tool_pid;
-  for (1 .. 300) {
-    ( $tool_pid ) = ( eval { $pidfile->slurp } // '' ) =~ /(\d+)/ and last;
-    select undef, undef, undef, 0.1;
-  }
+  wait_until(sub { ( $tool_pid ) = ( eval { $pidfile->slurp } // '' ) =~ /(\d+)/ }, 60);
   return ( $pid, $tool_pid, $out, $stub, $w );
 }
 
@@ -110,16 +112,24 @@ for my $case (
 
     if ($signal eq 'INT') {
       kill INT => $pid;
-      # The second one has to follow within two seconds.
-      ok(wait_until_quick(sub { !alive($tool_pid) }), 'the first Ctrl-C ends the '.$tool.' subprocess');
-      ok(wait_until_quick(sub { finished($out, 'r1') }), 'and cancels the turn');
+      # The second one has to follow within two seconds: one wait for
+      # both, not one after the other.
+      wait_until_quick(sub { !alive($tool_pid) && finished($out, 'r1') });
+      ok(!alive($tool_pid), 'the first Ctrl-C ends the '.$tool.' subprocess');
+      ok(finished($out, 'r1'), 'and cancels the turn');
       ok(alive($pid), 'raider still runs after the first Ctrl-C');
     }
     kill $signal => $pid;
     my $status = finish($pid, $tool_pid, $stub);
     is($status, 0, 'raider left the REPL with exit status 0');
-    like($out->slurp, qr/cancelling the turn; press Ctrl-C again within 2s to quit.*^turn cancelled$/ms,
-      'the first Ctrl-C said so') if $signal eq 'INT';
+    # The second Ctrl-C follows as soon as the journal has run.finished; the
+    # runner prints "turn cancelled" only after the application has written
+    # it, so the second one may leave raider before that line. The single
+    # Ctrl-C below checks it.
+    if ($signal eq 'INT') {
+      like($out->slurp, qr/\(cancelling the turn; press Ctrl-C again within 2s to quit\)/, 'the first Ctrl-C said so');
+      unlike($out->slurp, qr/^turn cancelled\n.*cancelling the turn/ms, 'not after the turn ended');
+    }
     like($out->slurp, qr/bye\.\n\z/, 'and said bye');
 
     my @events = journal_events($out);
@@ -138,8 +148,10 @@ for my $case (
 
 subtest 'Ctrl-C while the model answers abandons the request' => sub {
   my $root = tempdir(CLEANUP => 1);
-  # The stub answers the first request after 60 seconds only.
-  my ( $stub, $url ) = stub_engine(bash => { command => 'true' }, delay => 60);
+  # The stub answers the first request after 60 seconds only, and says
+  # when it has it.
+  my $seen = path($root)->child('seen');
+  my ( $stub, $url ) = stub_engine(bash => { command => 'true' }, delay => 60, seen => $seen);
   my $out = path($root)->child('out');
   pipe(my $r, my $w) or die 'pipe: '.$!;
   my $pid = fork // die 'fork: '.$!;
@@ -149,17 +161,18 @@ subtest 'Ctrl-C while the model answers abandons the request' => sub {
     open STDOUT, '>', "$out"                or die $!;
     open STDERR, '>', path($root)->child('err')->stringify or die $!;
     exec $^X, '-I'.$repo->child('lib'), "$bin", '-r', $root, '-e', 'openai', '-k', 'test',
-      '-m', 'stub-model', '-o', 'url='.$url, '--no-trace', '-i';
+      '-m', 'stub-model', '-o', 'url='.$url, '--no-trace', '--dangerously-skip-permissions', '-i';
     die 'exec: '.$!;
   }
   close $r;
   syswrite $w, "hello\n";
-  ok(wait_until(sub { scalar grep { $_->{type} eq 'run.started' } journal_events($out) }), 'the run started');
-  select undef, undef, undef, 1;   # the request is on its way
+  # From raider's start on: the request reaches the model.
+  ok(wait_until(sub { -e $seen }, 60), 'the request is on its way');
+  ok((grep { $_->{type} eq 'run.started' } journal_events($out)), 'the run started');
   my $t0 = time;
   kill INT => $pid;
   ok(wait_until(sub { finished($out, 'r1') }), 'the turn ends');
-  ok(time - $t0 < 10, 'without waiting for the model');
+  ok(time - $t0 < 40, 'without waiting for the model (it answers after 60s)');
   close $w;
   is(finish($pid, 0, $stub), 0, 'the REPL ends with its input, exit status 0');
   my @events = journal_events($out);

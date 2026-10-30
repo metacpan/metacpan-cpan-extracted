@@ -27,13 +27,13 @@ my $skill_ok_payload = qq|{"status":"skill-local"}\n|;
 my $skill_mount_path = "/tmp/$skill_name";
 
 my $version = do {
-    open my $fh, '<', File::Spec->catfile( $ROOT, 'lib', 'Developer', 'Dashboard.pm' )
-      or die "Unable to read lib/Developer/Dashboard.pm: $!";
+    open my $fh, '<', File::Spec->catfile( $ROOT, 'lib', 'Developer', 'Dashboard', 'Version.pm' )
+      or die "Unable to read lib/Developer/Dashboard/Version.pm: $!";
     local $/;
     my $pm = <$fh>;
-    close $fh or die "Unable to close lib/Developer/Dashboard.pm: $!";
+    close $fh or die "Unable to close lib/Developer/Dashboard/Version.pm: $!";
     my ($found) = $pm =~ /our \$VERSION = '([^']+)'/;
-    $found || die "Unable to determine distribution version\n";
+    $found || die "Unable to determine distribution version from Version.pm\n";
 };
 
 my $tarball = File::Spec->catfile( $ROOT, "Developer-Dashboard-$version.tar.gz" );

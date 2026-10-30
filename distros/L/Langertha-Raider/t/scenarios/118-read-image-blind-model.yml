@@ -1,0 +1,15 @@
+title: read_file of an image for a model that cannot see images, and of another binary file, is refused with a message instead of bytes
+files:
+  shot.png: "not really a png, the extension decides"
+  archive.zip: "PK"
+prompt: Look at the screenshot.
+script:
+  - tool_calls:
+      - [ read_file, { path: shot.png } ]
+      - [ read_file, { path: archive.zip } ]
+  - text: cannot see it
+expect:
+  answer: cannot see it
+  tools:
+    - { name: read_file, error: true, text: "\\A<tool_use_error>This model cannot see images: /\\S+/shot\\.png was not read\\." }
+    - { name: read_file, error: true, text: "This tool cannot read binary files\\. The file appears to be a binary \\.zip file\\." }

@@ -1,0 +1,24 @@
+title: in plan mode a subagent cannot write and its exit_plan_mode switches nothing; the caller stays in plan mode
+permission_mode: plan
+review: [ yes ]
+prompt: Plan with an agent.
+script:
+  - tool_calls:
+      - [ agent, { description: Plan, prompt: Plan the change. } ]
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: x } ]
+  - tool_calls:
+      - [ exit_plan_mode, { plan: CHILD-PLAN } ]
+  - text: CHILD-PLAN
+  - tool_calls:
+      - [ write_file, { path: b.txt, content: x } ]
+  - text: still planning
+expect:
+  answer: still planning
+  absent: [ a.txt, b.txt ]
+  plans: []
+  tools:
+    - { name: write_file, error: true, text: 'plan mode: write_file changes files' }
+    - { name: exit_plan_mode, text: '\ANobody can approve the plan in a subagent\. Stay in plan mode' }
+    - { name: agent, text: '\ACHILD-PLAN\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+    - { name: write_file, error: true, text: 'plan mode: write_file changes files' }

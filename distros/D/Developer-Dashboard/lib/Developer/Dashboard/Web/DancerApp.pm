@@ -3,13 +3,13 @@ package Developer::Dashboard::Web::DancerApp;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Dancer2 appname => 'DeveloperDashboard';
 use Dancer2::Core::Hook ();
 use Cwd qw(abs_path);
 use File::Spec;
-use Scalar::Util qw(refaddr);
+use Scalar::Util qw(refaddr reftype);
 
 our $BACKEND_APP;
 
@@ -136,25 +136,29 @@ sub _current_backend {
     return $BACKEND_APP || die 'Missing backend web app';
 }
 
-# _request_headers()
+# _request_headers($env)
 # Normalizes the subset of inbound headers the backend service expects. The
 # Origin and Referer headers ride along so the backend's cross-site
 # request forgery check can compare the browser context against the request
 # host for every state-changing route, and Sec-Fetch-Site rides along with
 # them because it is the only one of the three a GET can rely on — the browser
 # sets it itself, and page script can neither forge nor suppress it.
-# Input: none.
+# Input: optional PSGI environment hash reference; when omitted, use the active
+# Dancer2 request's environment.
 # Output: hash reference with host, cookie, api-key, origin, referer, and
 # fetch-site values.
 sub _request_headers {
+    my ($env) = @_;
+    $env = request->env if !defined $env;
+    die 'Dancer request environment must be a hash reference' if ref($env) ne 'HASH';
     return {
-        host              => scalar( request->header('Host') // '' ),
-        cookie            => scalar( request->header('Cookie') // '' ),
-        origin            => scalar( request->header('Origin') // '' ),
-        referer           => scalar( request->header('Referer') // '' ),
-        'sec-fetch-site'  => scalar( request->header('Sec-Fetch-Site') // '' ),
-        'x-dd-api-key'    => scalar( request->header('X-DD-API-Key') // '' ),
-        'x-dd-api-secret' => scalar( request->header('X-DD-API-Secret') // '' ),
+        host              => scalar( $env->{HTTP_HOST} // '' ),
+        cookie            => scalar( $env->{HTTP_COOKIE} // '' ),
+        origin            => scalar( $env->{HTTP_ORIGIN} // '' ),
+        referer           => scalar( $env->{HTTP_REFERER} // '' ),
+        'sec-fetch-site'  => scalar( $env->{HTTP_SEC_FETCH_SITE} // '' ),
+        'x-dd-api-key'    => scalar( $env->{HTTP_X_DD_API_KEY} // '' ),
+        'x-dd-api-secret' => scalar( $env->{HTTP_X_DD_API_SECRET} // '' ),
     };
 }
 
@@ -163,23 +167,26 @@ sub _request_headers {
 # Input: none.
 # Output: hash reference with path, query, method, body, headers, and remote address.
 sub _request_args {
-    my $host = scalar( request->header('Host') // '' );
+    my $request = request;
+    my $env = $request->env;
+    my $headers = _request_headers($env);
+    my $host = $headers->{host};
     if ( $host eq '' ) {
-        my $server_name = scalar( request->env->{SERVER_NAME} // '' );
-        my $server_port = scalar( request->env->{SERVER_PORT} // '' );
+        my $server_name = scalar( $env->{SERVER_NAME} // '' );
+        my $server_port = scalar( $env->{SERVER_PORT} // '' );
         $host = $server_name;
         $host .= ':' . $server_port if $host ne '' && $server_port ne '';
     }
-    my $remote_addr = scalar( request->env->{REMOTE_ADDR} // request->env->{SERVER_ADDR} // '' );
-    $remote_addr = scalar( request->env->{SERVER_NAME} // '' ) if $remote_addr eq '';
+    my $remote_addr = scalar( $env->{REMOTE_ADDR} // $env->{SERVER_ADDR} // '' );
+    $remote_addr = scalar( $env->{SERVER_NAME} // '' ) if $remote_addr eq '';
     return {
-        path        => scalar( request->env->{PATH_INFO} // '/' ),
-        query       => scalar( request->env->{QUERY_STRING} // '' ),
-        method      => scalar( request->env->{REQUEST_METHOD} // 'GET' ),
-        body        => scalar( request->body // '' ),
+        path        => scalar( $env->{PATH_INFO} // '/' ),
+        query       => scalar( $env->{QUERY_STRING} // '' ),
+        method      => scalar( $env->{REQUEST_METHOD} // 'GET' ),
+        body        => scalar( $request->body // '' ),
         remote_addr => $remote_addr,
         headers     => {
-            %{ _request_headers() },
+            %{$headers},
             host => $host,
         },
     };
@@ -284,6 +291,27 @@ sub _looks_like_disconnect_error {
     return $error =~ /(broken pipe|client disconnected|connection reset|stream closed|connection aborted|write failed)/i ? 1 : 0;
 }
 
+# _with_request_scopes($backend, $callback)
+# Establishes request-local filesystem inventories and path-identity results
+# while one direct Dancer backend route runs.
+# Input: backend hash containing the application, and a callback for dispatch.
+# Output: callback return value; request caches are discarded afterward and
+# callback exceptions remain visible to caller.
+sub _with_request_scopes {
+    my ( $backend, $callback ) = @_;
+    die 'Missing Dancer backend callback' if ref($callback) ne 'CODE';
+
+    my $app = ref($backend) eq 'HASH' ? $backend->{app} : undef;
+    my $pages = ref($app) && ( reftype($app) || '' ) eq 'HASH' ? $app->{pages} : undef;
+    my $paths = ref($pages) eq 'Developer::Dashboard::PageStore' ? $pages->{paths} : undef;
+    return $callback->() if ref($paths) ne 'Developer::Dashboard::PathRegistry';
+
+    local $paths->{_runtime_layer_candidate_scope} = {};
+    local $paths->{_installed_skill_inventory_scope} = {};
+    local $paths->{_path_identity_scope} = {};
+    return $callback->();
+}
+
 # _run_backend($method, %extra)
 # Runs one backend service method and converts failures into 500 responses.
 # Input: backend method name plus extra normalized request arguments.
@@ -291,16 +319,21 @@ sub _looks_like_disconnect_error {
 sub _run_backend {
     my ( $method, %extra ) = @_;
     my $backend = _current_backend();
-    my %args = ( %{ _request_args() }, %extra );
-    my $result = eval {
-        return $backend->{app}->$method(%args) if $backend->{app}->can($method);
-        return $backend->{app}->handle(%args) if $backend->{app}->can('handle');
-        die "Backend app does not implement $method or handle";
-    };
-    if ($@) {
-        $result = [ 500, 'text/plain; charset=utf-8', "$@", {} ];
-    }
-    return _response_from_result($result);
+    return _with_request_scopes(
+        $backend,
+        sub {
+            my %args = ( %{ _request_args() }, %extra );
+            my $result = eval {
+                return $backend->{app}->$method(%args) if $backend->{app}->can($method);
+                return $backend->{app}->handle(%args) if $backend->{app}->can('handle');
+                die "Backend app does not implement $method or handle";
+            };
+            if ($@) {
+                $result = [ 500, 'text/plain; charset=utf-8', "$@", {} ];
+            }
+            return _response_from_result($result);
+        },
+    );
 }
 
 # _run_authorized($method, %extra)
@@ -310,22 +343,27 @@ sub _run_backend {
 sub _run_authorized {
     my ( $method, %extra ) = @_;
     my $backend = _current_backend();
-    my %args = ( %{ _request_args() }, %extra );
-    my $result = eval {
-        if ( $backend->{app}->can($method) ) {
-            my $auth_response = $backend->{app}->can('authorize_request')
-              ? $backend->{app}->authorize_request(%args)
-              : undef;
-            return $auth_response if $auth_response;
-            return $backend->{app}->$method(%args);
-        }
-        return $backend->{app}->handle(%args) if $backend->{app}->can('handle');
-        die "Backend app does not implement $method or handle";
-    };
-    if ($@) {
-        $result = [ 500, 'text/plain; charset=utf-8', "$@", {} ];
-    }
-    return _response_from_result($result);
+    return _with_request_scopes(
+        $backend,
+        sub {
+            my %args = ( %{ _request_args() }, %extra );
+            my $result = eval {
+                if ( $backend->{app}->can($method) ) {
+                    my $auth_response = $backend->{app}->can('authorize_request')
+                      ? $backend->{app}->authorize_request(%args)
+                      : undef;
+                    return $auth_response if $auth_response;
+                    return $backend->{app}->$method(%args);
+                }
+                return $backend->{app}->handle(%args) if $backend->{app}->can('handle');
+                die "Backend app does not implement $method or handle";
+            };
+            if ($@) {
+                $result = [ 500, 'text/plain; charset=utf-8', "$@", {} ];
+            }
+            return _response_from_result($result);
+        },
+    );
 }
 
 post '/login' => sub {
@@ -470,18 +508,55 @@ has to ride along too because it is the only one of the three that defends a
 C<GET>: the browser sets it, and page script can neither forge nor suppress
 it, which is what stops a foreign page from executing a saved C</ajax> handler
 on the cookie-less loopback-admin tier.
+Each direct backend call also scopes runtime-layer and installed-skill
+inventories to the current request, matching C<Developer::Dashboard::Web::App>
+dispatch. The scope is discarded after the response so a later request sees
+runtime directories created or removed in the meantime.
 
 =head1 METHODS
 
-=head2 build_psgi_app, _load_skill_dashboard_modules, _authorize_skill_dashboard_routes, _current_backend, _request_headers, _request_args, _response_header_overrides, _response_from_result, _run_backend, _run_authorized
+=head2 build_psgi_app, _load_skill_dashboard_modules, _authorize_skill_dashboard_routes, _current_backend, _request_headers, _request_args, _response_header_overrides, _response_from_result, _with_request_scopes, _run_backend, _run_authorized
 
 Build and serve the Dancer2 application around the dashboard route handlers.
+
+=head2 _with_request_scopes($backend, $callback)
+
+Runs one direct route callback with request-local runtime-layer and installed-
+skill inventories plus exact path-identity results when the backend exposes a
+C<PageStore> backed by a real C<PathRegistry>. This keeps Dancer's direct-method
+route path consistent with C<Web::App::handle()>: repeated reads share one
+filesystem view and exact path spellings reuse their canonical identity for the
+request, while the next request builds fresh scopes. Backends without that
+registry run the callback without these scopes. The callback's return value is
+preserved, and callback errors propagate to the existing route error handler.
+
+Inputs are the current backend descriptor hash and a callback code reference.
+The callback may inspect or use the app's path registry. Output is exactly the
+callback's return value.
+
+=head2 _request_args and _request_headers
+
+C<_request_args> captures the active Dancer request and its PSGI environment
+once, then returns the normalized path, query, method, body, remote address,
+and selected headers expected by the backend. It reads selected header values
+from their standard PSGI C<HTTP_*> keys through C<_request_headers>. If Host is empty,
+the normalized host is still assembled from SERVER_NAME and SERVER_PORT; the
+remote address still falls back from REMOTE_ADDR to SERVER_ADDR and then
+SERVER_NAME. C<_request_headers> may also be called without an argument, in
+which case it obtains the current Dancer request's environment itself. Neither
+helper retains the request object or environment after it returns.
+
+Both helpers take the current Dancer request implicitly for ordinary callers;
+C<_request_headers> additionally accepts an optional PSGI environment hash to
+avoid reacquiring request header objects during normalization. It rejects
+non-hash environment values explicitly. They return hash references and do not
+mutate request state.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This module adapts the dashboard route backend to PSGI/Dancer-style request handling. It turns the backend app object into a PSGI coderef, translates request and response state, and preserves the dashboard default headers while keeping the route logic out of the transport adapter.
+This module adapts the dashboard route backend to PSGI/Dancer-style request handling. It turns the backend app object into a PSGI coderef, translates request and response state, and preserves the dashboard default headers while keeping the route logic out of the transport adapter. Direct Dancer handlers establish request-local runtime-layer, installed-skill, and path-identity scopes around authorization and backend dispatch, matching the freshness boundary of Web::App's handle method.
 
 =head1 WHY IT EXISTS
 
@@ -489,11 +564,11 @@ It exists because the transport adapter should be small and separate from the ac
 
 =head1 WHEN TO USE
 
-Use this file when changing PSGI wrapping, response translation, or the way the backend app is exposed to Plack and Starman.
+Use this file when changing PSGI wrapping, response translation, direct-route request scopes, or the way the backend app is exposed to Plack and Starman.
 
 =head1 HOW TO USE
 
-Call C<build_psgi_app> with the backend app object, default headers, and path registry, then pass the returned coderef to a PSGI server. Active installed skills are scanned recursively; each C<lib/Dashboard.pm> is loaded with its own C<lib/> first in C<@INC> so it can add routes or settings using C<use Dancer2 appname =E<gt> 'DeveloperDashboard'>. Skill routes are inserted before the final catch-all and are checked through the dashboard authorization handler. These are trusted local Perl extensions; load failures stop startup with an explicit error. Route behavior and core auth logic should stay in C<Developer::Dashboard::Web::App>, including the smart namespaced route resolution for installed skill-local pages, Ajax handlers, and public assets.
+Call C<build_psgi_app> with the backend app object, default headers, and path registry, then pass the returned coderef to a PSGI server. Active installed skills are scanned recursively; each C<lib/Dashboard.pm> is loaded with its own C<lib/> first in C<@INC> so it can add routes or settings using C<use Dancer2 appname =E<gt> 'DeveloperDashboard'>. Skill routes are inserted before the final catch-all and are checked through the dashboard authorization handler. Each direct handler scopes runtime-layer, installed-skill, and path-identity reads to one request and discards all request caches afterward. These are trusted local Perl extensions; load failures stop startup with an explicit error. Route behavior and core auth logic should stay in C<Developer::Dashboard::Web::App>, including the smart namespaced route resolution for installed skill-local pages, Ajax handlers, and public assets.
 
 =head1 WHAT USES IT
 

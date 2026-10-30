@@ -191,4 +191,12 @@ no_leaks_ok { eval { filter($LA, sub { die "x\n" }) } }					 'no leak: dying pre
 	no_leaks_ok { filter( \%th, col('x') > 1 ); filter( \%thh, sub { $_->{'x'} > 1 } ) } 'no leak: tied HoA and HoH' unless $INC{'Devel/Cover.pm'};
 }
 
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { filter([]); 1 } ? '' : $@;
+	like($err, qr/\Ausage: filter\(.*\n\nfilter: error: \Qexpected a data frame and a predicate\E\n\z/s,
+		'filter: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing;

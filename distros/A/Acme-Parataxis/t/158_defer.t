@@ -135,4 +135,5 @@ async {
         is \@log,     ['cleanup'], 'the defer fired while the slot was released';
     };
 };
+#
 done_testing;

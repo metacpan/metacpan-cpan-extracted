@@ -26,7 +26,7 @@ my @names = qw(
     mime-version precedence subject to x-original-to
 );
 my $hn  = join(',', @names);
-my $val = "draft=ietf-dkim-dkim2-spec-07; repo=github.com/dkim2wg/interop; "
+my $val = "draft=ietf-dkim-dkim2-spec-08; repo=github.com/dkim2wg/interop; "
         . "date=2026-09-30; sw=dkim2-milter.pl; action=mi-m=2; "
         . "hc=" . scalar(@names) . "; hn=$hn;";
 

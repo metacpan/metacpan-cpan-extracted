@@ -1,5 +1,13 @@
 Revision history for Perl distribution App-UpdateConfig
 
+1.02 - 2026-10-27
+ - Use cpanm when available to install the missing modules.
+ - Install the missing modules globally with sudo when needed.
+ - Accept the MERGE formats in upper case or from the file name.cd 
+ - Add a DIR directive to set the directory of the target file.
+ - Various improvements to handling multiple fragments with the same target.
+ - Extract the default guard suffix from file or dir names (e.g. "foo [bar]").
+
 1.01 - 2026-10-26
  - Add support for a MERGE directive to handle structured formats.
 

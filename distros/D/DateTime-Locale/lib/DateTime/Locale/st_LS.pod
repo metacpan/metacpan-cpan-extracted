@@ -435,6 +435,24 @@ Southern Sotho Lesotho locale.
    1995-12-22T09:05:02 = CE 1995 Tsh 22, Hla
   -0010-09-15T04:44:23 = BCE -10 Leo 15, Moq
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 Hlakola
+   1995-12-22T09:05:02 = CE 1995 Tshitwe
+  -0010-09-15T04:44:23 = BCE -10 Lwetse
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 Hlakola 5, Bed
+   1995-12-22T09:05:02 = CE 1995 Tshitwe 22, Hla
+  -0010-09-15T04:44:23 = BCE -10 Lwetse 15, Moq
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 Hlakola 5
+   1995-12-22T09:05:02 = CE 1995 Tshitwe 22
+  -0010-09-15T04:44:23 = BCE -10 Lwetse 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = CE 2008 Kol 5
@@ -506,6 +524,12 @@ Southern Sotho Lesotho locale.
    2008-02-05T18:30:30 = Kol 5, Bed
    1995-12-22T09:05:02 = Tsh 22, Hla
   -0010-09-15T04:44:23 = Leo 15, Moq
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Hlakola 5, Bed
+   1995-12-22T09:05:02 = Tshitwe 22, Hla
+  -0010-09-15T04:44:23 = Lwetse 15, Moq
 
 =head3 MMMMW-count-one ('week' W 'of' MMM)
 
@@ -620,6 +644,18 @@ Southern Sotho Lesotho locale.
    2008-02-05T18:30:30 = 2008 Hlakola
    1995-12-22T09:05:02 = 1995 Tshitwe
   -0010-09-15T04:44:23 = -10 Lwetse
+
+=head3 yMMMMEd (y MMMM d, EEE)
+
+   2008-02-05T18:30:30 = 2008 Hlakola 5, Bed
+   1995-12-22T09:05:02 = 1995 Tshitwe 22, Hla
+  -0010-09-15T04:44:23 = -10 Lwetse 15, Moq
+
+=head3 yMMMMd (y MMMM d)
+
+   2008-02-05T18:30:30 = 2008 Hlakola 5
+   1995-12-22T09:05:02 = 1995 Tshitwe 22
+  -0010-09-15T04:44:23 = -10 Lwetse 15
 
 =head3 yMMMd (y MMM d)
 

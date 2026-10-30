@@ -1,0 +1,23 @@
+title: a server announces notifications/tools/list_changed; the next prompt offers and can call the new tool (ADR 0029 Addendum 1)
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", rich ]
+prompts: [ one, two ]
+script:
+  - tool_calls:
+      - [ mcp__t__bump, {} ]
+  - text: one done
+  - tool_calls:
+      - [ mcp__t__added_by_bump, {} ]
+  - text: two done
+expect:
+  answer: two done
+  requests:
+    - { index: 0, lacks: [ mcp__t__added_by_bump ] }
+    - { index: 2, tool_text: "Appears after bump" }
+  tools:
+    - { name: mcp__t__bump, text: "\\Abumped\\z" }
+    - { name: mcp__t__added_by_bump, text: "\\Anew tool\\z" }

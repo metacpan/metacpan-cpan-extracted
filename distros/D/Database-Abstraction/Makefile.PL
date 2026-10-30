@@ -44,7 +44,7 @@ WriteMakefile(
 		'Params::Get' => 0.17,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
-		'Sub::Private' => 0,
+		'Sub::Private' => 0.09,
 		'Sub::Protected' => 0,
 		# Core modules required lazily at runtime — not listed as deps because
 		# MIN_PERL_VERSION (5.010) guarantees their presence on all targets:
@@ -105,6 +105,7 @@ WriteMakefile(
 			# Optional runtime backends — lazy-loaded; install for full functionality
 			'DBD::CSV' => 0.64,		# CSV/PSV/TSV DBI backend; 0.64+ required for SELECT DISTINCT
 			'DBD::Excel' => 0,		# .xls (old binary Excel) backend
+			'DBD::MariaDB' => 0,		# MariaDB/MySQL backend (preferred over DBD::mysql for MariaDB)
 			'DBM::Deep' => 0,		# .dbm/.deep/magic-byte .db backend
 			'File::Slurp::Remote' => 0,	# remote host backend (SSH/SCP)
 			'Gzip::Faster' => 0,		# gzip CSV backend

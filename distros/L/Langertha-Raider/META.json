@@ -4,7 +4,7 @@
       "Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,10 +49,9 @@
             "IO::Prompt::Tiny" : "0",
             "IPC::Run" : "0",
             "JSON::MaybeXS" : "1.002004",
-            "Langertha" : "0.503",
+            "Langertha" : "0.504",
             "Langertha::Manifest" : "0",
             "Log::Any" : "0",
-            "MCP::Run::Bash" : "0.106",
             "MCP::Server" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
@@ -61,6 +60,7 @@
             "Net::Async::WebSearch" : "0.003",
             "Path::Tiny" : "0",
             "Schedule::Cron" : "0",
+            "Skilletor" : "0.001",
             "Term::ANSIColor" : "0",
             "Time::HiRes" : "0",
             "URI" : "0",
@@ -77,251 +77,443 @@
    "provides" : {
       "App::Raider" : {
          "file" : "lib/App/Raider.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "App::Raider::FileTools" : {
          "file" : "lib/App/Raider/FileTools.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "App::Raider::Plugin::Situation" : {
          "file" : "lib/App/Raider/Plugin/Situation.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "App::Raider::Plugin::Trace" : {
          "file" : "lib/App/Raider/Plugin/Trace.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "App::Raider::Skill" : {
          "file" : "lib/App/Raider/Skill.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "App::Raider::WebTools" : {
          "file" : "lib/App/Raider/WebTools.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raid" : {
          "file" : "lib/Langertha/Raid.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raid::Loop" : {
          "file" : "lib/Langertha/Raid/Loop.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raid::Parallel" : {
          "file" : "lib/Langertha/Raid/Parallel.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raid::Sequential" : {
          "file" : "lib/Langertha/Raid/Sequential.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider" : {
          "file" : "lib/Langertha/Raider.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::ACP::CLI" : {
          "file" : "lib/Langertha/Raider/ACP/CLI.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::ACP::Client" : {
          "file" : "lib/Langertha/Raider/ACP/Client.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::AgentTools" : {
+         "file" : "lib/Langertha/Raider/AgentTools.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Application" : {
          "file" : "lib/Langertha/Raider/Application.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Approval" : {
          "file" : "lib/Langertha/Raider/Approval.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::AskTools" : {
+         "file" : "lib/Langertha/Raider/AskTools.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::BashTools" : {
+         "file" : "lib/Langertha/Raider/BashTools.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Binary" : {
          "file" : "lib/Langertha/Raider/Binary.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Briefing" : {
+         "file" : "lib/Langertha/Raider/Briefing.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI" : {
          "file" : "lib/Langertha/Raider/CLI.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Commands" : {
          "file" : "lib/Langertha/Raider/CLI/Commands.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Machine" : {
          "file" : "lib/Langertha/Raider/CLI/Machine.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Main" : {
          "file" : "lib/Langertha/Raider/CLI/Main.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Output" : {
          "file" : "lib/Langertha/Raider/CLI/Output.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::PromptBuilder" : {
          "file" : "lib/Langertha/Raider/CLI/PromptBuilder.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Provider" : {
          "file" : "lib/Langertha/Raider/CLI/Provider.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::REPL" : {
          "file" : "lib/Langertha/Raider/CLI/REPL.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Runner" : {
          "file" : "lib/Langertha/Raider/CLI/Runner.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::CLI::Sessions" : {
          "file" : "lib/Langertha/Raider/CLI/Sessions.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Config" : {
          "file" : "lib/Langertha/Raider/Config.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Config::Migrate" : {
          "file" : "lib/Langertha/Raider/Config/Migrate.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::ConnectCheck" : {
          "file" : "lib/Langertha/Raider/ConnectCheck.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context" : {
+         "file" : "lib/Langertha/Raider/Context.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Agents" : {
+         "file" : "lib/Langertha/Raider/Context/Agents.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Frontmatter" : {
+         "file" : "lib/Langertha/Raider/Context/Frontmatter.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Layout" : {
+         "file" : "lib/Langertha/Raider/Context/Layout.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Memory" : {
+         "file" : "lib/Langertha/Raider/Context/Memory.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Plugins" : {
+         "file" : "lib/Langertha/Raider/Context/Plugins.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Settings" : {
+         "file" : "lib/Langertha/Raider/Context/Settings.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Context::Skills" : {
+         "file" : "lib/Langertha/Raider/Context/Skills.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Cron" : {
+         "file" : "lib/Langertha/Raider/Cron.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::CronTools" : {
+         "file" : "lib/Langertha/Raider/CronTools.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Detect" : {
          "file" : "lib/Langertha/Raider/Detect.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::EngineResolver" : {
          "file" : "lib/Langertha/Raider/EngineResolver.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::FileTools" : {
          "file" : "lib/Langertha/Raider/FileTools.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::FileTools::ReadState" : {
+         "file" : "lib/Langertha/Raider/FileTools/ReadState.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall" : {
          "file" : "lib/Langertha/Raider/Hall.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::ACP" : {
          "file" : "lib/Langertha/Raider/Hall/ACP.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::ACP::SubStream" : {
          "file" : "lib/Langertha/Raider/Hall/ACP/SubStream.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::CLI" : {
          "file" : "lib/Langertha/Raider/Hall/CLI.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::Cron" : {
          "file" : "lib/Langertha/Raider/Hall/Cron.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::MCP" : {
          "file" : "lib/Langertha/Raider/Hall/MCP.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Hall::PermissionChannel" : {
+         "file" : "lib/Langertha/Raider/Hall/PermissionChannel.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::Protocol" : {
          "file" : "lib/Langertha/Raider/Hall/Protocol.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::Raider" : {
          "file" : "lib/Langertha/Raider/Hall/Raider.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Hall::Telegram" : {
          "file" : "lib/Langertha/Raider/Hall/Telegram.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::HallTools" : {
          "file" : "lib/Langertha/Raider/HallTools.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Home" : {
          "file" : "lib/Langertha/Raider/Home.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Hooks" : {
+         "file" : "lib/Langertha/Raider/Hooks.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Hooks::Result" : {
+         "file" : "lib/Langertha/Raider/Hooks/Result.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Instructions" : {
          "file" : "lib/Langertha/Raider/Instructions.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Loadguard" : {
+         "file" : "lib/Langertha/Raider/Loadguard.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP" : {
+         "file" : "lib/Langertha/Raider/MCP.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP::Config" : {
+         "file" : "lib/Langertha/Raider/MCP/Config.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP::HTTP" : {
+         "file" : "lib/Langertha/Raider/MCP/HTTP.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP::Resources" : {
+         "file" : "lib/Langertha/Raider/MCP/Resources.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP::Server" : {
+         "file" : "lib/Langertha/Raider/MCP/Server.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP::Stdio" : {
+         "file" : "lib/Langertha/Raider/MCP/Stdio.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::MCP::View" : {
+         "file" : "lib/Langertha/Raider/MCP/View.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Monitor" : {
+         "file" : "lib/Langertha/Raider/Monitor.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Packs" : {
          "file" : "lib/Langertha/Raider/Packs.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Packs::Collection" : {
          "file" : "lib/Langertha/Raider/Packs/Collection.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Packs::Pack" : {
          "file" : "lib/Langertha/Raider/Packs/Pack.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::PathConfine" : {
+         "file" : "lib/Langertha/Raider/PathConfine.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::PerlTools" : {
          "file" : "lib/Langertha/Raider/PerlTools.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::PermissionChannel" : {
+         "file" : "lib/Langertha/Raider/PermissionChannel.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Permissions" : {
+         "file" : "lib/Langertha/Raider/Permissions.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Permissions::ReadOnlyBash" : {
+         "file" : "lib/Langertha/Raider/Permissions/ReadOnlyBash.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Permissions::Rule" : {
+         "file" : "lib/Langertha/Raider/Permissions/Rule.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::PlanTools" : {
+         "file" : "lib/Langertha/Raider/PlanTools.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Plugin::ClaudeHooks" : {
+         "file" : "lib/Langertha/Raider/Plugin/ClaudeHooks.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Plugin::Events" : {
          "file" : "lib/Langertha/Raider/Plugin/Events.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Plugin::NestedMemory" : {
+         "file" : "lib/Langertha/Raider/Plugin/NestedMemory.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Plugin::Situation" : {
          "file" : "lib/Langertha/Raider/Plugin/Situation.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Plugin::Trace" : {
          "file" : "lib/Langertha/Raider/Plugin/Trace.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Provider::Activation" : {
          "file" : "lib/Langertha/Raider/Provider/Activation.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Provider::Binding" : {
+         "file" : "lib/Langertha/Raider/Provider/Binding.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Provider::Change" : {
          "file" : "lib/Langertha/Raider/Provider/Change.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Provider::Fetch" : {
          "file" : "lib/Langertha/Raider/Provider/Fetch.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Result" : {
          "file" : "lib/Langertha/Raider/Result.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::SearchTools" : {
+         "file" : "lib/Langertha/Raider/SearchTools.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::Session" : {
          "file" : "lib/Langertha/Raider/Session.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Session::Journal" : {
          "file" : "lib/Langertha/Raider/Session/Journal.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::SessionStore" : {
          "file" : "lib/Langertha/Raider/SessionStore.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::Skill" : {
          "file" : "lib/Langertha/Raider/Skill.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::SkillResolver" : {
+         "file" : "lib/Langertha/Raider/SkillResolver.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::SkillResolver::Catalog" : {
+         "file" : "lib/Langertha/Raider/SkillResolver/Catalog.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::SkillResolver::Skilletor" : {
+         "file" : "lib/Langertha/Raider/SkillResolver/Skilletor.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::SkillTools" : {
+         "file" : "lib/Langertha/Raider/SkillTools.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::SlashCommand" : {
+         "file" : "lib/Langertha/Raider/SlashCommand.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Subagent" : {
+         "file" : "lib/Langertha/Raider/Subagent.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Tasks" : {
+         "file" : "lib/Langertha/Raider/Tasks.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::TodoTools" : {
+         "file" : "lib/Langertha/Raider/TodoTools.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::ToolArgs" : {
          "file" : "lib/Langertha/Raider/ToolArgs.pm",
-         "version" : "0.503"
+         "version" : "0.504"
       },
       "Langertha::Raider::ToolEffects" : {
          "file" : "lib/Langertha/Raider/ToolEffects.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::ToolNames" : {
+         "file" : "lib/Langertha/Raider/ToolNames.pm",
+         "version" : "0.504"
       },
       "Langertha::Raider::WebTools" : {
          "file" : "lib/Langertha/Raider/WebTools.pm",
-         "version" : "0.503"
+         "version" : "0.504"
+      },
+      "Langertha::Raider::Worktree" : {
+         "file" : "lib/Langertha/Raider/Worktree.pm",
+         "version" : "0.504"
+      },
+      "Langertha::Raider::WorktreeTools" : {
+         "file" : "lib/Langertha/Raider/WorktreeTools.pm",
+         "version" : "0.504"
       }
    },
    "release_status" : "stable",
@@ -338,7 +530,7 @@
       "x_IRC" : "irc://irc.perl.org/#langertha",
       "x_IRC_user" : "Getty"
    },
-   "version" : "0.503",
+   "version" : "0.504",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -353,11 +545,9 @@
                      "README.md"
                   ],
                   "exclude_match" : [
-                     "^CLAUDE\\.md$",
-                     "^CONTEXT\\.md$",
-                     "^\\.claude/",
-                     "^\\.github/",
+                     "^assets/",
                      "^docs/",
+                     "^maint/",
                      "^scripts/"
                   ],
                   "include_dotfiles" : 1,
@@ -375,37 +565,37 @@
          {
             "class" : "Dist::Zilla::Plugin::GatherAgentContext",
             "name" : "@Author::GETTY/GatherAgentContext",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::GETTY/@Filter/ManifestSkip",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::GETTY/@Filter/MetaYAML",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Author::GETTY/@Filter/Readme",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::GETTY/@Filter/ExtraTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::GETTY/@Filter/ExecDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::GETTY/@Filter/ShareDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -415,27 +605,27 @@
                }
             },
             "name" : "@Author::GETTY/@Filter/MakeMaker",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::GETTY/@Filter/Manifest",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Author::GETTY/@Filter/TestRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::GETTY/@Filter/ConfirmRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Author::GETTY/@Filter/UploadToCPAN",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::LicenseFile",
@@ -443,34 +633,19 @@
             "version" : "0.002"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
-            "config" : {
-               "Dist::Zilla::Plugin::Run::Role::Runner" : {
-                  "fatal_errors" : 1,
-                  "quiet" : 0,
-                  "run" : [
-                     "%x %o/maint/release-after.pl --archive %a --dir %d --version %v"
-                  ],
-                  "version" : "0.050"
-               }
-            },
-            "name" : "@Author::GETTY/Run::AfterRelease",
-            "version" : "0.050"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::GETTY/MetaJSON",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
@@ -485,7 +660,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.037"
+                        "version" : "6.040"
                      }
                   ],
                   "include_underscores" : 0
@@ -512,7 +687,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@Author::GETTY/MetaResources",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -555,92 +730,92 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@GETTY/SingleEncoding",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@GETTY/Name",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@GETTY/Version",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/Prelude",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Synopsis",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Description",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Overview",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Stability",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@GETTY/Leftovers",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/postlude",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@GETTY/Support",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@GETTY/Contributing",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@GETTY/Authors",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Legal",
+                        "class" : "Pod::Weaver::Section::Author::GETTY::Legal",
                         "name" : "@GETTY/Legal",
-                        "version" : "4.020"
+                        "version" : "0.328"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/List",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/GETTY",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      }
                   ]
                }
@@ -657,7 +832,7 @@
                }
             },
             "name" : "@Author::GETTY/@Git::VersionManager/pluginbundle version",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
@@ -727,7 +902,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.503",
+                  "tag" : "0.504",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -761,7 +936,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Author::GETTY/@Git::VersionManager/NextRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -817,59 +992,64 @@
             "version" : "0.0012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Docker::API",
+            "name" : "@Author::GETTY/@Author::GETTY::Docker/Docker::API",
+            "version" : "0.105"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.037"
+            "version" : "6.040"
          }
       ],
       "zilla" : {
@@ -877,12 +1057,12 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.037"
+         "version" : "6.040"
       }
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.53",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

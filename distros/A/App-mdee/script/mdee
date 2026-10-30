@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-define() { IFS='\n' read -r -d '' ${1} || true ; }
+define() { IFS= read -rd '' "$1" || : ; }
 
 myname="${0##*/}"
 
@@ -43,7 +43,10 @@ mdee - em·dee, Markdown Easy on the Eyes
          --table-style=#    table style: pipe or simple (default: pipe)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
-         --fold-width=#     fold width (default: pane width - 5)
+         --fold-width=#     fold width (default: pane width - 3 - run-in)
+         --runin=#          run-in width for line breaking (default: 2)
+         --runout=#         run-out width for line breaking (default: 2)
+         --runlen=#         set both run-in and run-out
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -64,7 +67,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.12
+Version 1.13
 
 =cut
 
@@ -174,8 +177,11 @@ declare -A OPTS=(
     [     parallel | V             # files side by side    ]=
     [         rule |               # table rule lines      ]=_
     [  table-style |    :          # table style           ]=pipe
-    [        width | w  :=i        # output width          ]=0
-    [   fold-width |    :=i        # fold width            ]=0
+    [        width | w  : =i       # output width          ]=0
+    [   fold-width |    : =i       # fold width            ]=0
+    [        runin |    : =i       # run-in width          ]=2
+    [       runout |    : =i       # run-out width         ]=2
+    [       runlen |    :!=i       # run-in and run-out    ]=
     [        theme | t  @          # color theme           ]=
     [         mode | m  :          # light or dark         ]=
     [   base-color | B  :          # base color            ]=
@@ -185,8 +191,8 @@ declare -A OPTS=(
     [heading-markup|hm  :          # markup in headings    ]=
     [         show |    %!         # field visibility      ]=
     [        pager |    ?!         # pager command         ]=
-    [         pane | C  :=i        # number of columns     ]=0
-    [   pane-width | S  :=i        # pane width            ]=85
+    [         pane | C  : =i       # number of columns     ]=0
+    [   pane-width | S  : =i       # pane width            ]=85
     [         grid | G  :>pass_nup # grid layout           ]=
     [          row | R  :>pass_nup # number of rows        ]=
     [         page | P  :>pass_nup # page height           ]=
@@ -257,6 +263,8 @@ pager() {
     [[ $pager ]] && pass_nup+=("--pager=$pager") || pass_nup+=("--no-pager")
 }
 
+runlen() { runin=$2 runout=$2; }
+
 filter() {
     style=filter
 }
@@ -323,7 +331,10 @@ fi
 # Output width: explicit option (non-zero) > config default > terminal width
 (( width == 0 )) && width=${default[width]:-0}
 (( fold_width == 0 )) && fold_width=${default[fold_width]:-0}
-: ${COLUMNS:=$(tput cols)}
+# tput reads the size from stderr when stdout is captured, so do not
+# redirect it; without TERM (docker run without a tty) tput only
+# complains, so skip it and fall back to 80 below
+(( width > 0 )) || [[ ! ${TERM:-} ]] || : ${COLUMNS:=$(tput cols)}
 (( width > 0 )) && _total=$width || _total=${COLUMNS:-}
 (( debug > 0 )) && echo "debug: COLUMNS=${COLUMNS:-unset} width=$width pane=$pane pane_width=$pane_width" >&2
 # Calculate columns from output width and pane width
@@ -367,14 +378,15 @@ esac
 
 # Fold width default: --fold-width > config default > derived from the output width.
 # Without nup the text is the whole output; with nup each pane is
-# (output width / _cols) wide, minus 5 for borders and padding.
+# (output width / _cols) wide, minus 3 for borders and padding and
+# the run-in width that ansicolumn keeps free when it folds.
 if (( fold_width == 0 )); then
     if [[ ! $nup ]] && (( width > 0 )); then
         fold_width=$width
     elif (( _cols > 0 )); then
-        fold_width=$(( ${_total:-80} / _cols - 5 ))
+        fold_width=$(( ${_total:-80} / _cols - 3 - runin ))
     else
-        fold_width=$(( pane_width - 5 ))
+        fold_width=$(( pane_width - 3 - runin ))
     fi
 fi
 
@@ -457,10 +469,24 @@ for file in "$@"; do
     [[ -e "$file" ]] || die "$file: No such file or directory"
 done
 
+# Quote arguments for display: as they are when safe, in '...' otherwise
+quote_args() {
+    local _a _out=()
+    for _a in "$@"; do
+        if [[ $_a =~ ^[-A-Za-z0-9_./:=,+%@]+$ ]]; then
+            _out+=("$_a")
+        else
+            _out+=("'${_a//\'/\'\\\'\'}'")
+        fi
+    done
+    echo "${_out[*]}"
+}
+
 # Define pipeline stage functions
+# In dryrun mode a stage prints its command line instead of running it
 invoke() {
-    (( debug > 1 )) && echo "debug: $(printf '%q ' "$@")" >&2
-    [[ ${dryrun:-} ]] && return
+    (( debug > 1 )) && echo "debug: $(quote_args "$@")" >&2
+    [[ ${dryrun:-} ]] && { quote_args "$@"; return; }
     "$@"
 }
 
@@ -538,13 +564,22 @@ run_nup() {
         invoke nup "${pass_nup[@]}"
     fi
 }
-run_column() { invoke nup "${pass_nup[@]}" --no-pager --no-paginate --pane=1 - --pages ${column_opts[@]+"${column_opts[@]}"}; }
+# --pane=1 unless -C1 has put it in pass_nup already
+run_column() {
+    local -a _pane=()
+    (( pane == 0 )) && _pane=(--pane=1)
+    invoke nup "${pass_nup[@]}" --no-pager --no-paginate ${_pane[@]+"${_pane[@]}"} - --pages ${column_opts[@]+"${column_opts[@]}"}
+}
 run_cat_v()  { invoke cat-v --nl=0; }
 run_pager()  { invoke ${PAGER:-less}; }
 
 # Set defaults for less environment
 export LESS="${LESS:--R}"
 export LESSANSIENDCHARS="${LESSANSIENDCHARS:-mK}"
+
+# The fold width leaves room for the run-in width, so give nup the
+# same run-in and run-out rather than those in ~/.ansicolumnrc
+pass_nup+=("--runin=$runin" "--runout=$runout")
 
 # Add pane/pane-width to pass_nup
 (( pane_width != 85 )) && pass_nup+=("--pane-width=$pane_width")
@@ -563,23 +598,30 @@ fi
 [[ $style == pager ]] && stages+=(run_pager)
 
 # Build and execute pipeline
-# run_greple needs "$@" for file arguments; other stages read from stdin
-pipeline='run_greple "$@"'
+# A stage is a run_* function, which calls invoke, or a command line
+# written as shell words ("sed -e 's/a/b/'"), which is given to invoke.
+# run_greple needs "$@" for file arguments; other stages read from stdin.
+declare -a calls=('run_greple "$@"')
 for stage in "${stages[@]:1}"; do
-    pipeline+=" | $stage"
+    if [[ $(type -t "${stage%% *}") == function ]]; then
+        calls+=("$stage")
+    else
+        calls+=("invoke $stage")
+    fi
 done
 
 (( debug > 0 )) && echo "debug: stages: ${stages[*]}" >&2
 
 if [[ ${dryrun:-} ]]; then
-    if (( debug > 1 )); then
-        for stage in "${stages[@]}"; do
-            $stage "$@"
-        done
-    else
-        echo "$pipeline"
-    fi
+    # each call prints its command line instead of running it (see
+    # invoke); run them one by one and join the lines into a pipeline
+    _cmd=$(eval "${calls[0]}")
+    for _call in "${calls[@]:1}"; do
+        _cmd+=$' \\\n    | '"$(eval "$_call")"
+    done
+    echo "$_cmd"
 else
+    pipeline=$(IFS='|'; echo "${calls[*]}")
     eval "$pipeline"
 fi
 
@@ -740,9 +782,11 @@ then disables tracing.
 
 =item B<-n>, B<--dryrun>
 
-Dry-run mode. Show the pipeline without executing.
-With C<-dd>, shows expanded command lines for each stage instead
-of function names.
+Dry-run mode.  Print the commands that would be run, one pipeline
+stage per line joined with C<|>, without running them.  Arguments
+are quoted so that the output can be pasted into a shell.  The
+environment that B<mdee> sets (C<LESS>, C<LESSANSIENDCHARS>) is not
+shown.  With C<-d>, the stage names are printed to stderr as well.
 
 =back
 
@@ -889,9 +933,24 @@ the text itself is the output, so this is the fold width.
 
 Set the fold width for text wrapping directly.  Default is the
 pane width (output width divided by the number of columns) minus
-5 for borders and padding, which gives 80 when pane-width is 85.
+3 for borders and padding and the run-in width (see C<--runin>),
+which gives 80 when pane-width is 85.
 Only effective when C<--fold> is enabled.  The same width is used
 to fit tables (see C<--table>).
+
+=item B<--runin>=I<N>, B<--runout>=I<N>, B<--runlen>=I<N>
+
+Set the run-in and run-out widths that L<ansicolumn(1)|App::ansicolumn>
+uses for line breaking (kinsoku) when nup folds the panes.
+C<--runlen> sets both; options given later override earlier ones.
+Default is 2.  A run-in character may go past the fold width, so
+ansicolumn keeps the run-in width free at the end of the pane, and
+the default fold width is made narrower by the same amount.  These
+values are given to nup, and they take precedence over the values
+in F<~/.ansicolumnrc>.
+
+A larger value such as 4 suits Japanese text, where a run of
+characters that must not start a line, such as C<ーッ>, can be long.
 
 =back
 
@@ -1400,8 +1459,8 @@ The overall data flow is:
 
 B<em·dee> dynamically constructs a pipeline based on enabled options.
 Each stage is defined as a Bash function (e.g., C<run_greple>,
-C<run_nup>).  The C<--dryrun> option displays the function-based
-pipeline without execution.
+C<run_nup>).  The C<--dryrun> option prints the command line of
+each stage without running them, and C<-d> prints the stage names.
 
 =head3 Processing Stages
 

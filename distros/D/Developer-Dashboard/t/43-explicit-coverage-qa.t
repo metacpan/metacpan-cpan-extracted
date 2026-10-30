@@ -883,12 +883,15 @@ subtest 'CLI::Paths covers table defaults and output guards' => sub {
     no warnings 'redefine';
     no warnings 'once';
 
-    local *Developer::Dashboard::CLI::Paths::build_paths = sub {
+    local *Developer::Dashboard::CLI::Paths::_build_paths = sub {
         return bless {
             named_paths => {},
         }, 'TestCLIPathRegistry';
     };
     local *Developer::Dashboard::Config::new = sub { return bless {}, 'TestCLIPathsConfig' };
+    local *Developer::Dashboard::Config::for_path_config = sub {
+        return bless {}, 'TestCLIPathsConfig';
+    };
     local *TestCLIPathsConfig::path_aliases = sub { return { %path_aliases }; };
     local *TestCLIPathsConfig::save_global_path_alias = sub {
         my ( $self, $name, $path ) = @_;

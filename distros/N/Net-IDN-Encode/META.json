@@ -39,6 +39,9 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Test::LeakTrace" : "0"
+         },
          "requires" : {
             "Test::More" : "0",
             "Test::NoWarnings" : "0"
@@ -55,6 +58,6 @@
          "url" : "http://github.com/robrwo/Net-IDN-Encode"
       }
    },
-   "version" : "2.502",
+   "version" : "2.600",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

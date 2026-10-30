@@ -78,6 +78,13 @@ sub is_approx {
 throws_ok { prop_test(120, 100) } qr/must not exceed/, 'x > n rejected';
 throws_ok { prop_test([1,2], [10]) } qr/same length/,  'length mismatch rejected';
 throws_ok { prop_test(5, 100, alternative => 'sideways') } qr/alternative/, 'bad alternative rejected';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('prop_test');
+	like($screen, qr/\Ausage: prop_test\(/, 'prop_test has a help screen');
+	eval { prop_test(5) };
+	is($@, $screen . "prop_test: error: both the successes and the trials are required\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

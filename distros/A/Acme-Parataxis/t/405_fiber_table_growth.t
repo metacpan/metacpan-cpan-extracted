@@ -1,17 +1,10 @@
 use v5.40;
-no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use blib;
 use Acme::Parataxis qw[async fiber dump_fibers];
 use Acme::Parataxis::Signal;
 use Test2::V1 -ipP;
+no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 $|++;
-
-# Fibers run on separate heap stacks; Perl's C-stack-depth heuristic can misfire and falsely report "Deep recursion"
-# (it ignores lexical 'no warnings' once a framework such as Test2 is loaded). Genuine runaway recursion inside a fiber
-# surfaces as a hang, access violation, or croak the harness already catches, so filter the noise.
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ /^Deep recursion on subroutine/; warn @_ }
-}
 
 # The fiber table used to be a fixed MAX_FIBERS array compiled into Parataxis.c, so the 1025th fiber croaked "the fiber
 # table is full" no matter how much memory was free. It is now allocated on demand (doubling, bounded) and split into
@@ -48,16 +41,16 @@ async {
     # (the policy, not the stack mmap, must be what refuses the next spawn). Both bursts below are sized from it.
     $default = Acme::Parataxis::max_fibers();
 
-    # 1) The diagnostics snapshot has to keep up with the growth. dump_fibers() walks the slots itself, and it used to
-    #    walk a hardcoded first 1024 of them, so every fiber past that - exactly the ones a full table is made of, and
-    #    exactly the ones a deadlock report has to name - went missing. Run first, while the table is still at its
-    #    initial 1024 and this fiber holds slot 0, so the ids in play are guaranteed to straddle 1024 rather than
-    #    depending on which slots later scenarios happen to recycle.
+    # The diagnostics snapshot has to keep up with the growth. dump_fibers() walks the slots itself, and it used to
+    # walk a hardcoded first 1024 of them, so every fiber past that - exactly the ones a full table is made of, and
+    # exactly the ones a deadlock report has to name - went missing. Run first, while the table is still at its
+    # initial 1024 and this fiber holds slot 0, so the ids in play are guaranteed to straddle 1024 rather than
+    # depending on which slots later scenarios happen to recycle.
     #
-    #    That needs more than 1024 fibers to exist at once, which is exactly what the MAP_NORESERVE clamp on
-    #    OpenBSD forbids: there the default is a few hundred, so the premise is unreachable and asking for 1100 only
-    #    re-proved that the limit is enforced (scenario 2 already checks that). Ask for the same achievable target
-    #    instead, and let $reaches1024 decide what the snapshot subtest is allowed to claim.
+    # That needs more than 1024 fibers to exist at once, which is exactly what the MAP_NORESERVE clamp on
+    # OpenBSD forbids: there the default is a few hundred, so the premise is unreachable and asking for 1100 only
+    # re-proved that the limit is enforced (scenario 2 already checks that). Ask for the same achievable target
+    # instead, and let $reaches1024 decide what the snapshot subtest is allowed to claim.
     $reaches1024 = $default > 1024;
     my $sig5 = Acme::Parataxis::Signal->new;
     my ( $made5, $err5 ) = spawn_parked( $reaches1024 ? 1100 : $default - 2, $sig5 );
@@ -65,14 +58,14 @@ async {
     $r5 = [ $made5, $err5, scalar @$rows5, scalar( grep { $_->{fid} >= 1024 } @$rows5 ) ];
     drain( $sig5, $here );
 
-    # 2) With nobody configuring anything, the default must already be reachable in one burst.
+    # With nobody configuring anything, the default must already be reachable in one burst.
     $want1 = $default > 1024 ? 1100 : $default - 2;
     my $sig1 = Acme::Parataxis::Signal->new;
     my ( $made1, $err1 ) = spawn_parked( $want1, $sig1 );
     $r1 = [ $made1, $err1, live() ];
     drain( $sig1, $here );
 
-    # 3) A limit the user sets is enforced exactly and read back exactly.
+    # A limit the user sets is enforced exactly and read back exactly.
     $target2 = $default > 1024 ? 1300 : $default - 2;
     Acme::Parataxis::set_max_fibers($target2);
     my $sig2 = Acme::Parataxis::Signal->new;
@@ -80,14 +73,14 @@ async {
     $r2 = [ $made2, $err2, live(), Acme::Parataxis::max_fibers() ];
     drain( $sig2, $here );
 
-    # 4) Lowering the limit is honoured too, even though the table is already allocated far below it.
+    # Lowering the limit is honoured too, even though the table is already allocated far below it.
     Acme::Parataxis::set_max_fibers(40);
     my $sig3 = Acme::Parataxis::Signal->new;
     my ( $made3, $err3 ) = spawn_parked( 5000, $sig3 );
     $r3 = [ $made3, $err3, live(), Acme::Parataxis::max_fibers() ];
     drain( $sig3, $here );
 
-    # 5) And raising it again frees the way with no reallocation and no restart.
+    # And raising it again frees the way with no reallocation and no restart.
     Acme::Parataxis::set_max_fibers(5000);
     my $sig4 = Acme::Parataxis::Signal->new;
     my ( $made4, $err4 ) = spawn_parked( 50, $sig4 );

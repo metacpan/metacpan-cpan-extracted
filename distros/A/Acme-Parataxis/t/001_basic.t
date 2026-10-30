@@ -10,23 +10,24 @@ subtest 'Asymmetric Coroutines' => sub {
     my $f = Acme::Parataxis->new(
         code => sub ($name) {
             diag "Inside fiber. Hello, $name!";
-            is( $name, 'Alice', 'Received arg' );
+            is $name, 'Alice', 'Received arg';
             diag 'Yielding back to parent...';
             my $val = Acme::Parataxis->yield( 'Hello ' . $name );
             diag "Resumed in fiber. Received: $val";
-            is( $val, 'Bob', 'Received resume arg' );
+            is $val, 'Bob', 'Received resume arg';
             return 'Goodbye ' . $name;
         }
     );
     diag "Calling fiber with 'Alice'...";
     my $res1 = $f->call('Alice');
-    is( $res1, 'Hello Alice', 'First call result' );
+    is $res1, 'Hello Alice', 'First call result';
     diag "First result: $res1";
     diag "Resuming fiber with 'Bob'...";
     my $res2 = $f->call('Bob');
-    is( $res2, 'Goodbye Alice', 'Second call result' );
+    is $res2, 'Goodbye Alice', 'Second call result';
     diag "Final result: $res2";
-    ok( $f->is_done, 'Parataxis finished' );
+    ok $f->is_done, 'Parataxis finished';
     diag 'Fiber finished successfully.';
 };
+#
 done_testing();

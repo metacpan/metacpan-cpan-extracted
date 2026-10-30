@@ -1,0 +1,455 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::HtmlEscape ();
+use Developer::Dashboard::Web::App ();
+
+my $runs = 21;
+my $help = 0;
+GetOptions(
+    'runs=i' => \$runs,
+    'help'   => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $inline_dir = tempdir( 'problem48-html-xs-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+local $ENV{PERL_INLINE_DIRECTORY} = $inline_dir;
+require Inline;
+my $compile_started = time;
+Inline->bind( C => _inline_source() );
+my $compile_seconds = time - $compile_started;
+printf "Inline-C/XS compile_ms=%.3f (excluded from per-call medians)\n", 1000 * $compile_seconds;
+
+my @parity_cases = (
+    undef,
+    '',
+    '<>&"\'',
+    "raw-byte-\xE9",
+    "utf8-caf" . chr(0xE9) . chr(0x1F600),
+    "nul\0inside<&>",
+);
+for my $case_index ( 0 .. $#parity_cases ) {
+    my $case = $parity_cases[$case_index];
+    my $expected = Developer::Dashboard::HtmlEscape::_escape_html_perl($case);
+    my $actual   = main::dd_problem48_escape_html($case);
+    my $chunked  = main::dd_problem48_escape_html_chunked($case);
+    my $lookup   = main::dd_problem48_escape_html_lookup($case);
+    my $production = Developer::Dashboard::HtmlEscape::_escape_html($case);
+    my $adaptive = _escape_adaptive_with_backend($case);
+    die 'Inline::C output or UTF-8 flag differed from the Perl helper'
+      if $actual ne $expected
+      || ( utf8::is_utf8($actual) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+    die 'Chunk-scanning Inline::C output or UTF-8 flag differed from the Perl helper'
+      if $chunked ne $expected
+      || ( utf8::is_utf8($chunked) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+    die 'Lookup-table Inline::C output or UTF-8 flag differed from the Perl helper'
+      if $lookup ne $expected
+      || ( utf8::is_utf8($lookup) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+    die 'Production escaper output or UTF-8 flag differed from the Perl helper'
+      if $production ne $expected
+      || ( utf8::is_utf8($production) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+    die 'Adaptive dispatch output or UTF-8 flag differed from the Perl helper'
+      if $adaptive ne $expected
+      || ( utf8::is_utf8($adaptive) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+}
+print "chunked_parity=yes\n";
+print "lookup_table_parity=yes\n";
+print "adaptive_dispatch_parity=yes\n";
+printf "production_xs=%s\n", $Developer::Dashboard::HtmlEscape::XS_LOADED ? 'loaded' : 'unavailable';
+my $app = bless {}, 'Developer::Dashboard::Web::App';
+
+for my $size ( 64, 4_096, 65_536, 1_048_576 ) {
+    for my $workload (qw(dense sparse prefix_sparse plain)) {
+        my $text = _workload_text( $workload, $size );
+        my $expected = Developer::Dashboard::HtmlEscape::_escape_html_perl($text);
+        my $expected_html = _highlight_with_backend( $app, $text, 'perl' );
+        my %escape_seconds = map { $_ => [] } qw(perl inline production adaptive chunked lookup);
+        my %html_seconds   = map { $_ => [] } qw(perl inline production adaptive chunked lookup);
+        my $iterations = $size <= 64 ? 500 : $size <= 4_096 ? 25 : 1;
+
+        for my $run ( 1 .. $runs ) {
+            my @kinds = qw(perl inline production adaptive chunked lookup);
+            my $offset = ( $run - 1 ) % @kinds;
+            my @order = ( @kinds[ $offset .. $#kinds ], @kinds[ 0 .. $offset - 1 ] );
+            for my $kind (@order) {
+                my $started = time;
+                for ( 1 .. $iterations ) {
+                    my $actual = $kind eq 'perl'
+                      ? Developer::Dashboard::HtmlEscape::_escape_html_perl($text)
+                      : $kind eq 'inline'
+                      ? main::dd_problem48_escape_html($text)
+                      : $kind eq 'production'
+                      ? Developer::Dashboard::HtmlEscape::_escape_html($text)
+                      : $kind eq 'adaptive'
+                      ? _escape_adaptive_with_backend($text)
+                      : $kind eq 'lookup'
+                      ? main::dd_problem48_escape_html_lookup($text)
+                      : main::dd_problem48_escape_html_chunked($text);
+                    die "Output mismatch in $kind $workload sample at $size characters"
+                      if $actual ne $expected
+                      || ( utf8::is_utf8($actual) ? 1 : 0 ) != ( utf8::is_utf8($expected) ? 1 : 0 );
+                }
+                push @{ $escape_seconds{$kind} }, ( time - $started ) / $iterations;
+            }
+
+            for my $kind (@order) {
+                my $started = time;
+                my $html;
+                for ( 1 .. $iterations ) {
+                    $html = _highlight_with_backend( $app, $text, $kind );
+                    die "$kind instruction-HTML output mismatch in $workload at $size characters"
+                      if $html ne $expected_html;
+                }
+                push @{ $html_seconds{$kind} }, ( time - $started ) / $iterations;
+            }
+        }
+
+        my $perl_median    = _median( @{ $escape_seconds{perl} } );
+        my $inline_median  = _median( @{ $escape_seconds{inline} } );
+        my $production_median = _median( @{ $escape_seconds{production} } );
+        my $adaptive_median = _median( @{ $escape_seconds{adaptive} } );
+        my $chunked_median = _median( @{ $escape_seconds{chunked} } );
+        my $lookup_median = _median( @{ $escape_seconds{lookup} } );
+        printf "workload=%s chars=%d Perl=%.3f ms Inline-C/XS=%.3f ms (%.2fx) production-XS=%.3f ms (%.2fx) adaptive-dispatch=%.3f ms (%.2fx) chunked-XS=%.3f ms (%.2fx) lookup-table-XS=%.3f ms (%.2fx) parity=yes\n",
+          $workload, length($text), 1000 * $perl_median, 1000 * $inline_median,
+          $perl_median / $inline_median, 1000 * $production_median,
+          $perl_median / $production_median, 1000 * $adaptive_median,
+          $perl_median / $adaptive_median, 1000 * $chunked_median,
+          $perl_median / $chunked_median, 1000 * $lookup_median,
+          $perl_median / $lookup_median;
+        my $perl_html_median    = _median( @{ $html_seconds{perl} } );
+        my $inline_html_median  = _median( @{ $html_seconds{inline} } );
+        my $production_html_median = _median( @{ $html_seconds{production} } );
+        my $adaptive_html_median = _median( @{ $html_seconds{adaptive} } );
+        my $chunked_html_median = _median( @{ $html_seconds{chunked} } );
+        my $lookup_html_median = _median( @{ $html_seconds{lookup} } );
+        printf "instruction_html workload=%s chars=%d Perl=%.3f ms Inline-C/XS=%.3f ms (%.2fx) production-XS=%.3f ms (%.2fx) adaptive-dispatch=%.3f ms (%.2fx) chunked-XS=%.3f ms (%.2fx) lookup-table-XS=%.3f ms (%.2fx) parity=yes\n",
+          $workload, length($text), 1000 * $perl_html_median, 1000 * $inline_html_median,
+          $perl_html_median / $inline_html_median, 1000 * $production_html_median,
+          $perl_html_median / $production_html_median, 1000 * $adaptive_html_median,
+          $perl_html_median / $adaptive_html_median, 1000 * $chunked_html_median,
+          $perl_html_median / $chunked_html_median, 1000 * $lookup_html_median,
+          $perl_html_median / $lookup_html_median;
+    }
+}
+exit 0;
+
+# _highlight_with_backend($app, $text, $kind)
+# Runs the production highlighter while substituting one controlled escaper
+# backend through HtmlEscape's actual imported wrapper call path.
+# Input: Web::App object, source string, and perl/inline/production/chunked/lookup name.
+# Output: highlighted HTML string with behavior identical across backends.
+sub _highlight_with_backend {
+    my ( $app, $text, $kind ) = @_;
+    return $app->_highlight_instruction_html($text) if $kind eq 'production';
+    if ( $kind eq 'adaptive' ) {
+        no warnings 'redefine';
+        local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+        local *Developer::Dashboard::HtmlEscape::_xs_escape_html = sub {
+            return main::dd_problem48_escape_html( $_[0] );
+        };
+        local *Developer::Dashboard::HtmlEscape::_xs_escape_html_chunked = sub {
+            return main::dd_problem48_escape_html_chunked( $_[0] );
+        };
+        return $app->_highlight_instruction_html($text);
+    }
+    my %backend = (
+        perl    => sub { return Developer::Dashboard::HtmlEscape::_escape_html_perl( $_[0] ) },
+        inline  => sub { return main::dd_problem48_escape_html( $_[0] ) },
+        chunked => sub { return main::dd_problem48_escape_html_chunked( $_[0] ) },
+        lookup  => sub { return main::dd_problem48_escape_html_lookup( $_[0] ) },
+    );
+    die "Unknown HTML escape benchmark backend '$kind'\n" if !exists $backend{$kind};
+    no warnings 'redefine';
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    local *Developer::Dashboard::HtmlEscape::_xs_escape_html = $backend{$kind};
+    local *Developer::Dashboard::HtmlEscape::_xs_escape_html_chunked = $backend{$kind};
+    return $app->_highlight_instruction_html($text);
+}
+
+# _escape_adaptive_with_backend($text)
+# Runs the production dispatch logic with the two native routines replaced by
+# Inline::C candidates, so fallback builds can measure the dispatch decision.
+# Input: an undefined or scalar HTML text value.
+# Output: escaped text identical to the Perl reference.
+sub _escape_adaptive_with_backend {
+    my ($text) = @_;
+    no warnings 'redefine';
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    local *Developer::Dashboard::HtmlEscape::_xs_escape_html = sub {
+        return main::dd_problem48_escape_html( $_[0] );
+    };
+    local *Developer::Dashboard::HtmlEscape::_xs_escape_html_chunked = sub {
+        return main::dd_problem48_escape_html_chunked( $_[0] );
+    };
+    return Developer::Dashboard::HtmlEscape::_escape_html($text);
+}
+
+# _usage()
+# Returns the benchmark options and sample-count constraint.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: $0 [--runs ODD_N] [--help]\n";
+}
+
+# _inline_source()
+# Returns direct-loop, chunk-copy, and lookup-table C implementations for the
+# three body-sensitive ASCII characters, preserving source UTF-8 and taint flags.
+# Input: none.
+# Output: Inline::C source string.
+sub _inline_source {
+    return <<'C_SOURCE';
+#include <string.h>
+
+SV* dd_problem48_escape_html(SV *input) {
+    if (!SvOK(input)) {
+        return newSVpvn("", 0);
+    }
+    STRLEN length = 0;
+    const char *source = SvPV(input, length);
+    if (length > ((((STRLEN)-1) - 1) / 5)) {
+        croak("HTML input is too large to escape safely");
+    }
+
+    SV *output = newSVpvn("", 0);
+    SvGROW(output, (length * 5) + 1);
+    char *target = SvPVX(output);
+    STRLEN written = 0;
+
+    for (STRLEN index = 0; index < length; index++) {
+        switch (source[index]) {
+            case '&': memcpy(target + written, "&amp;", 5); written += 5; break;
+            case '<': memcpy(target + written, "&lt;", 4); written += 4; break;
+            case '>': memcpy(target + written, "&gt;", 4); written += 4; break;
+            default: target[written++] = source[index]; break;
+        }
+    }
+
+    target[written] = '\0';
+    SvCUR_set(output, written);
+    SvPOK_on(output);
+    if (SvUTF8(input)) SvUTF8_on(output);
+    if (SvTAINTED(input)) SvTAINTED_on(output);
+    return output;
+}
+
+SV* dd_problem48_escape_html_chunked(SV *input) {
+    if (!SvOK(input)) {
+        return newSVpvn("", 0);
+    }
+    STRLEN length = 0;
+    const char *source = SvPV(input, length);
+    if (length > ((((STRLEN)-1) - 1) / 5)) {
+        croak("HTML input is too large to escape safely");
+    }
+
+    SV *output = newSVpvn("", 0);
+    SvGROW(output, (length * 5) + 1);
+    char *target = SvPVX(output);
+    const char *cursor = source;
+    STRLEN remaining = length;
+    STRLEN written = 0;
+
+    while (remaining) {
+        const char *amp = (const char *)memchr(cursor, '&', remaining);
+        const char *lt = (const char *)memchr(cursor, '<', remaining);
+        const char *gt = (const char *)memchr(cursor, '>', remaining);
+        const char *match = amp;
+        if (!match || (lt && lt < match)) match = lt;
+        if (!match || (gt && gt < match)) match = gt;
+        if (!match) {
+            memcpy(target + written, cursor, remaining);
+            written += remaining;
+            break;
+        }
+
+        STRLEN span = (STRLEN)(match - cursor);
+        if (span) {
+            memcpy(target + written, cursor, span);
+            written += span;
+        }
+        if (*match == '&') {
+            memcpy(target + written, "&amp;", 5);
+            written += 5;
+        }
+        else if (*match == '<') {
+            memcpy(target + written, "&lt;", 4);
+            written += 4;
+        }
+        else {
+            memcpy(target + written, "&gt;", 4);
+            written += 4;
+        }
+        cursor = match + 1;
+        remaining = length - (STRLEN)(cursor - source);
+    }
+
+    target[written] = '\0';
+    SvCUR_set(output, written);
+    SvPOK_on(output);
+    if (SvUTF8(input)) SvUTF8_on(output);
+    if (SvTAINTED(input)) SvTAINTED_on(output);
+    return output;
+}
+
+SV* dd_problem48_escape_html_lookup(SV *input) {
+    if (!SvOK(input)) {
+        return newSVpvn("", 0);
+    }
+    STRLEN length = 0;
+    const char *source = SvPV(input, length);
+    if (length > ((((STRLEN)-1) - 1) / 5)) {
+        croak("HTML input is too large to escape safely");
+    }
+
+    static const char *const replacement[256] = {
+        ['&'] = "&amp;",
+        ['<'] = "&lt;",
+        ['>'] = "&gt;"
+    };
+    static const unsigned char replacement_length[256] = {
+        ['&'] = 5,
+        ['<'] = 4,
+        ['>'] = 4
+    };
+
+    SV *output = newSVpvn("", 0);
+    SvGROW(output, (length * 5) + 1);
+    char *target = SvPVX(output);
+    STRLEN written = 0;
+
+    for (STRLEN index = 0; index < length; index++) {
+        unsigned char byte = (unsigned char)source[index];
+        const char *escaped = replacement[byte];
+        if (escaped) {
+            STRLEN escaped_length = replacement_length[byte];
+            memcpy(target + written, escaped, escaped_length);
+            written += escaped_length;
+        }
+        else {
+            target[written++] = source[index];
+        }
+    }
+
+    target[written] = '\0';
+    SvCUR_set(output, written);
+    SvPOK_on(output);
+    if (SvUTF8(input)) SvUTF8_on(output);
+    if (SvTAINTED(input)) SvTAINTED_on(output);
+    return output;
+}
+C_SOURCE
+}
+
+# _median(@seconds)
+# Returns the middle elapsed time from an odd, nonempty sample set.
+# Input: one or more elapsed-second measurements.
+# Output: median elapsed seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+# _workload_text($kind, $size)
+# Builds a fixed-length Unicode input with dense, sparse, or no escapable bytes.
+# Input: workload name (dense/sparse/plain) and target character count.
+# Output: generated source text for parity-checked timing.
+sub _workload_text {
+    my ( $kind, $size ) = @_;
+    my $unit = $kind eq 'dense'
+      ? '<&>' . chr(0xE9) . chr(0x1F600)
+      : $kind eq 'sparse'
+      ? ( 'ordinary words and punctuation ' x 32 ) . '<&>' . chr(0xE9)
+      : $kind eq 'prefix_sparse'
+      ? '<' . ( 'ordinary words and punctuation ' x 32 ) . '&>'
+      : $kind eq 'plain'
+      ? 'ordinary words and punctuation ' . chr(0xE9) . chr(0x1F600)
+      : die "Unknown workload '$kind'\n";
+    my $text = $unit x int( $size / length($unit) + 1 );
+    return substr( $text, 0, $size );
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-inline-html-escape-benchmark - compare Perl and Inline::C HTML escaping
+
+=head1 PURPOSE
+
+Compares the Perl reference with the production compiled XS backend and three
+Inline::C/XS implementations for replacing C<&>, C<E<lt>>, and C<E<gt>>: a
+direct byte loop, a chunk-copy variant using C<memchr>/C<memcpy>, and a
+byte-indexed lookup table. It also measures the production dispatch rules over
+those candidate helpers. Workloads include dense escapes, sparse escapes
+whose first match is late, sparse escapes whose first match is at byte zero,
+and plain text. This tests whether dispatch based only on the first match
+position misses early-but-rare input. Each workload includes four sizes. It
+checks raw-byte, UTF-8, NUL, undef, empty, and quote-containing cases,
+including the UTF-8 flag, before reporting helper and full
+instruction-highlighting timings.
+
+=head1 WHY IT EXISTS
+
+Problem 48 evaluates native acceleration for repeated Dashboard routines.
+HTML escaping is a representative text operation; a native implementation is
+only a candidate until exact behavior and a meaningful speedup are measured.
+The lookup-table variant preserves evidence for a rejected algorithm.
+Production uses the direct XS loop for inputs up to 64 characters or when a
+long input has at least four escapes in its first 16 characters. Other escaped
+long inputs use the chunk-copy path, including early-but-rare escape strings.
+
+=head1 WHEN TO USE
+
+Use in the isolated Problem 48 Docker image with Inline::C, a C compiler, and
+Perl development headers. Every candidate is checked against the Perl result
+and complete highlighting output before timing. The benchmark does not claim
+that the helper is a whole-route bottleneck.
+
+=head1 HOW TO USE
+
+  perl script/problem48-inline-html-escape-benchmark
+  perl script/problem48-inline-html-escape-benchmark --runs 9
+
+The run count must be an odd positive integer. Four text sizes and four
+character distributions (dense, sparse, prefix-sparse, and plain) are tested.
+Small inputs are repeated within each sample to avoid timer-resolution zeros.
+Every timed result is compared with the Perl helper output and UTF-8 flag; the
+full editor-instruction highlighting result is compared byte-for-byte too.
+Inline compilation time is reported separately and excluded from per-call
+medians.
+
+=head1 WHAT USES IT
+
+Problem 48 research uses this benchmark to assess the Inline::C/XS approach,
+compare the shipped XS implementation with the Inline::C direct loop, and keep
+slower chunk-copy and lookup-table candidates reproducible. The dashboard and release
+process do not invoke it. With no compiled extension present, the production
+backend row explicitly reports the Perl fallback rather than claiming a native
+measurement.
+
+=head1 EXAMPLES
+
+  d2 docker compose --service bench -f /tmp/d2-problem48-bench.yml --project-name dd-problem48-profile-next run --rm bench perl script/problem48-inline-html-escape-benchmark
+
+  d2 docker compose --service bench -f /tmp/d2-problem48-bench.yml --project-name dd-problem48-profile-next run --rm bench perl script/problem48-inline-html-escape-benchmark --runs 9
+
+=cut

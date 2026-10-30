@@ -435,6 +435,24 @@ Masai locale.
    1995-12-22T09:05:02 = EY 1995 Ntʉ́ 22, Iju
   -0010-09-15T04:44:23 = MY -10 Kús 15, Jmo
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = EY 2008 Arát
+   1995-12-22T09:05:02 = EY 1995 Ntʉ́ŋʉ́s
+  -0010-09-15T04:44:23 = MY -10 Kúshîn
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = EY 2008 Arát 5, Jnn
+   1995-12-22T09:05:02 = EY 1995 Ntʉ́ŋʉ́s 22, Iju
+  -0010-09-15T04:44:23 = MY -10 Kúshîn 15, Jmo
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = EY 2008 Arát 5
+   1995-12-22T09:05:02 = EY 1995 Ntʉ́ŋʉ́s 22
+  -0010-09-15T04:44:23 = MY -10 Kúshîn 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = EY 2008 Ará 5

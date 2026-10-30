@@ -24,7 +24,10 @@ mdee - em·dee, Markdown Easy on the Eyes
          --table-style=#    table style: pipe or simple (default: pipe)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
-         --fold-width=#     fold width (default: pane width - 5)
+         --fold-width=#     fold width (default: pane width - 3 - run-in)
+         --runin=#          run-in width for line breaking (default: 2)
+         --runout=#         run-out width for line breaking (default: 2)
+         --runlen=#         set both run-in and run-out
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -45,7 +48,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.12
+Version 1.13
 
 # DESCRIPTION
 
@@ -194,9 +197,11 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
 - **-n**, **--dryrun**
 
-    Dry-run mode. Show the pipeline without executing.
-    With `-dd`, shows expanded command lines for each stage instead
-    of function names.
+    Dry-run mode.  Print the commands that would be run, one pipeline
+    stage per line joined with `|`, without running them.  Arguments
+    are quoted so that the output can be pasted into a shell.  The
+    environment that **mdee** sets (`LESS`, `LESSANSIENDCHARS`) is not
+    shown.  With `-d`, the stage names are printed to stderr as well.
 
 ## Processing Options
 
@@ -331,9 +336,24 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
     Set the fold width for text wrapping directly.  Default is the
     pane width (output width divided by the number of columns) minus
-    5 for borders and padding, which gives 80 when pane-width is 85.
+    3 for borders and padding and the run-in width (see `--runin`),
+    which gives 80 when pane-width is 85.
     Only effective when `--fold` is enabled.  The same width is used
     to fit tables (see `--table`).
+
+- **--runin**=_N_, **--runout**=_N_, **--runlen**=_N_
+
+    Set the run-in and run-out widths that [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn)
+    uses for line breaking (kinsoku) when nup folds the panes.
+    `--runlen` sets both; options given later override earlier ones.
+    Default is 2.  A run-in character may go past the fold width, so
+    ansicolumn keeps the run-in width free at the end of the pane, and
+    the default fold width is made narrower by the same amount.  These
+    values are given to nup, and they take precedence over the values
+    in `~/.ansicolumnrc`.
+
+    A larger value such as 4 suits Japanese text, where a run of
+    characters that must not start a line, such as `ーッ`, can be long.
 
 ## Theme Options
 
@@ -782,8 +802,8 @@ The overall data flow is:
 
 **em·dee** dynamically constructs a pipeline based on enabled options.
 Each stage is defined as a Bash function (e.g., `run_greple`,
-`run_nup`).  The `--dryrun` option displays the function-based
-pipeline without execution.
+`run_nup`).  The `--dryrun` option prints the command line of
+each stage without running them, and `-d` prints the stage names.
 
 ### Processing Stages
 

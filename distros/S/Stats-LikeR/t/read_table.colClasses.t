@@ -102,14 +102,14 @@ for my $shape (qw(aoh hoa hoh aoa)) {
 	eval { read_table($f, colClasses => [qw(numeric numeric numeric numeric)]) };
 	like($@, qr/^read_table: 'colClasses' has 4 entries for the 3 columns of \S+$/, 'a list longer than the columns is refused');
 	eval { read_table($f, colClasses => []) };
-	is($@, "read_table: 'colClasses' is an empty list\n", 'an empty list is refused');
+	is($@, Stats::LikeR::_usage_text('read_table') . "read_table: error: 'colClasses' is an empty list\n", 'an empty list is refused');
 	eval { read_table($f, colClasses => \'numeric') };
-	is($@, "read_table: 'colClasses' must be a string, an ARRAY reference or a HASH reference\n", 'a scalar reference is refused');
+	is($@, Stats::LikeR::_usage_text('read_table') . "read_table: error: 'colClasses' must be a string, an ARRAY reference or a HASH reference\n", 'a scalar reference is refused');
 	eval { read_table($f, colClasses => { a => 'logical' }) };
-	is($@, "read_table: colClasses 'logical' is not one read_table reads: it takes 'numeric' (or 'double' or 'real'), 'integer', 'character' or undef\n",
+	is($@, Stats::LikeR::_usage_text('read_table') . "read_table: error: colClasses 'logical' is not one read_table reads: it takes 'numeric' (or 'double' or 'real'), 'integer', 'character' or undef\n",
 	   'a class R has and read_table does not is refused, by name');
 	eval { read_table($f, colClasses => [undef, 'factor']) };
-	like($@, qr/^read_table: colClasses 'factor'/, 'a bad class anywhere in the list is refused');
+	like($@, qr/\nread_table: error: colClasses 'factor'/, 'a bad class anywhere in the list is refused');
 	my $u = fixture("\xd0\xb6\n1\n");
 	is(kind(\read_table($u, colClasses => { "\x{436}" => 'integer' })->[0]{"\xd0\xb6"}), 'IV',
 	   'a name given as characters matches the header\'s UTF-8 bytes, as a filter key does');

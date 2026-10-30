@@ -10,6 +10,22 @@ use File::Temp qw(tempdir);
 use lib 'lib';
 use Developer::Dashboard::PageDocument;
 
+{
+    package Local::Problem48LegacyKeyReadCounter;
+
+    sub TIEARRAY {
+        my ( $class, $values ) = @_;
+        return bless { values => $values, fetches => 0 }, $class;
+    }
+
+    sub FETCHSIZE { return scalar @{ $_[0]->{values} } }
+    sub FETCH {
+        my ( $self, $index ) = @_;
+        $self->{fetches}++;
+        return $self->{values}[$index];
+    }
+}
+
 # Warnings are fatal in this repo: trap every warning and assert none appear.
 my @warnings;
 $SIG{__WARN__} = sub { push @warnings, $_[0] };
@@ -31,6 +47,17 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
     my $page = eval { $PD->from_instruction(undef) };
     ok( !defined $page, 'from_instruction(undef) does not return a page' );
     like( $@, qr/did not contain any sections/, 'undef instruction hits the empty-sections die' );
+}
+
+# Problem 48: reading a page id must not materialize the full public hash view.
+{
+    my $page = $PD->new( id => 'page-id-fast-path', title => 'Page ID' );
+    is( $page->id, 'page-id-fast-path', 'id accessor returns the stored page id' );
+    my $idless = $PD->new( title => 'No ID' );
+    ok( !defined $idless->id, 'id accessor preserves an undefined page id' );
+    my $mode = $PD->new( mode => 'render' );
+    is( $mode->mode, 'render', 'mode accessor returns the stored mode' );
+    is( $idless->mode, 'edit', 'mode accessor preserves the constructor default' );
 }
 
 # ---------------------------------------------------------------------------
@@ -88,11 +115,57 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
     ok( !$page->{id} || $page->{id} eq 'bm-legacy', 'unknown FOO key did not become the bookmark id' );
 }
 
+# Problem 48: the common one-section legacy instruction uses a single-section
+# parser instead of allocating the split-parts list. Pin down the helper's
+# exact section shape before wiring it into the production parser.
+{
+    my $parse_one = $PD->can('_parse_single_legacy_section');
+    ok( $parse_one, 'single-section legacy parser helper is available' );
+    my %undefined_single = $parse_one->(undef);
+    is_deeply( \%undefined_single, {}, 'single-section parser returns no section for undefined input' );
+    my %title = $parse_one->("\n TITLE :  Welcome\nline two \n");
+    is_deeply( $title{TITLE}, [ 'Welcome', 'line two' ], 'single-section parser trims boundaries and preserves body lines' );
+    my %code = $parse_one->("CODE1001: print 1\n");
+    is_deeply( $code{CODE1001}, [ 'print 1' ], 'single-section parser accepts extended CODE section numbers' );
+    my %unknown = $parse_one->('UNKNOWN: ignore me');
+    is_deeply( \%unknown, {}, 'single-section parser discards unsupported section names' );
+    my %empty = $parse_one->(" \n\t");
+    is_deeply( \%empty, {}, 'single-section parser handles whitespace-only input' );
+    my %undefined_legacy = $PD->can('_parse_legacy_sections')->(undef);
+    is_deeply( \%undefined_legacy, {}, 'multi-section parser returns no sections for undefined input' );
+}
+
+# Problem 48: parsing a CODE key must not scan the 1,008-entry legacy-key list.
+# The current parser also accepts CODE sections above CODE1000, so preserve it.
+{
+    my @original_keys = @Developer::Dashboard::PageDocument::LEGACY_KEYS;
+    my $counter = tie @Developer::Dashboard::PageDocument::LEGACY_KEYS,
+      'Local::Problem48LegacyKeyReadCounter', \@original_keys;
+    my %sections = $PD->can('_parse_legacy_sections')->('CODE1000: final');
+    is_deeply( $sections{CODE1000}, ['final'], 'legacy parser accepts the highest declared CODE key' );
+    is( $counter->{fetches}, 0, 'legacy section allowlist validation does not linearly scan @LEGACY_KEYS' );
+    my %extended = $PD->can('_parse_legacy_sections')->('CODE1001: extended');
+    is_deeply( $extended{CODE1001}, ['extended'], 'legacy parser preserves acceptance of CODE keys above the declared range' );
+    undef $counter;
+    untie @Developer::Dashboard::PageDocument::LEGACY_KEYS;
+    @Developer::Dashboard::PageDocument::LEGACY_KEYS = @original_keys;
+}
+
 # Legacy doc that begins with a separator: yields an empty leading part that is
 # skipped (line 416 "part is empty" true side).
 {
     my $page = $PD->from_instruction("---\nTITLE: Leading Sep");
     is( $page->{title}, 'Leading Sep', 'leading --- separator yields an empty part that is skipped' );
+}
+
+# Problem 48: hoisting the legacy Markdown separator regexp must preserve
+# whitespace and CRLF delimiter behavior across multi-section documents.
+{
+    my %sections = $PD->can('_parse_legacy_sections')->(
+        "TITLE: spaced separator\r\n  ---  \r\nHTML: body\r\n"
+    );
+    is_deeply( $sections{TITLE}, ['spaced separator'], 'legacy parser accepts padded CRLF Markdown separator' );
+    is_deeply( $sections{HTML}, ['body'], 'legacy parser keeps the section after a padded CRLF separator' );
 }
 
 # ---------------------------------------------------------------------------
@@ -228,6 +301,104 @@ is_deeply( $PD->can('_decode_structured_json')->(''),        {},         'empty 
 is_deeply( $PD->can('_decode_stash_section')->('oops'),      {},           'unparseable legacy stash falls back to {}' );
 is_deeply( $PD->can('_decode_stash_section')->('foo => 1'),  { foo => 1 }, 'perl-ish legacy stash decodes to a hash' );
 
+{
+    my $stash_text = q{p48_memo_copy_20261016 => { nested => ['original'] }};
+    my $original_safe_parser = $PD->can('_safe_eval_stash_literal');
+    my $safe_parser_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageDocument::_safe_eval_stash_literal = sub {
+            $safe_parser_calls++;
+            return $original_safe_parser->(@_);
+        };
+        my $first = $PD->can('_decode_stash_section')->($stash_text);
+        $first->{p48_memo_copy_20261016}{nested}[0] = 'mutated';
+        my $second = $PD->can('_decode_stash_section')->($stash_text);
+        is( $second->{p48_memo_copy_20261016}{nested}[0], 'original',
+            'memoized legacy STASH returns a deep copy unaffected by caller mutation' );
+        is( $safe_parser_calls, 1,
+            'repeated identical legacy STASH text is evaluated in Safe only once' );
+    }
+    is_deeply( $PD->can('_decode_stash_section')->($stash_text),
+        { p48_memo_copy_20261016 => { nested => ['original'] } },
+        'memoized legacy STASH remains stable after the caller mutates a previous result' );
+}
+
+{
+    my $stash_text = q{p48_memo_corruption_20261016 => 1};
+    $PD->can('_decode_stash_section')->($stash_text);
+    my $error = '';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageDocument::json_decode = sub { return [] };
+        eval { $PD->can('_decode_stash_section')->($stash_text); 1 } or $error = $@;
+    }
+    like( $error, qr/Cached legacy STASH snapshot did not decode to a hash reference/,
+        'memoized legacy STASH refuses a corrupt cached snapshot explicitly' );
+}
+
+{
+    my $original_safe_parser = $PD->can('_safe_eval_stash_literal');
+    my $safe_parser_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageDocument::_safe_eval_stash_literal = sub {
+            $safe_parser_calls++;
+            return $original_safe_parser->(@_);
+        };
+        local $Developer::Dashboard::PageDocument::LEGACY_STASH_CACHE_MAX_ENTRIES = 2;
+        my $first  = q{p48_lru_first_20261016 => 1};
+        my $second = q{p48_lru_second_20261016 => 2};
+        my $third  = q{p48_lru_third_20261016 => 3};
+        $PD->can('_decode_stash_section')->($first);
+        is( $safe_parser_calls, 1, 'first bounded-cache literal is parsed' );
+        $PD->can('_decode_stash_section')->($second);
+        is( $safe_parser_calls, 2, 'second bounded-cache literal fills the cache' );
+        $PD->can('_decode_stash_section')->($first);
+        is( $safe_parser_calls, 2, 'recently used first literal remains cached' );
+        $PD->can('_decode_stash_section')->($third);
+        is( $safe_parser_calls, 3, 'third literal evicts the least-recently-used entry' );
+        $PD->can('_decode_stash_section')->($first);
+        is( $safe_parser_calls, 3, 'most recently used first literal survives eviction' );
+        $PD->can('_decode_stash_section')->($second);
+        is( $safe_parser_calls, 4, 'least-recently-used second literal must be evaluated after eviction' );
+    }
+}
+
+{
+    my $original_safe_parser = $PD->can('_safe_eval_stash_literal');
+    my $safe_parser_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageDocument::_safe_eval_stash_literal = sub {
+            $safe_parser_calls++;
+            return $original_safe_parser->(@_);
+        };
+        local $Developer::Dashboard::PageDocument::LEGACY_STASH_CACHE_MAX_TEXT_BYTES = 1;
+        my $oversized = q{p48_oversized_memo_20261016 => 1};
+        $PD->can('_decode_stash_section')->($oversized);
+        $PD->can('_decode_stash_section')->($oversized);
+        is( $safe_parser_calls, 2, 'legacy STASH text over the cache byte limit is not retained' );
+    }
+}
+
+{
+    my $original_safe_parser = $PD->can('_safe_eval_stash_literal');
+    my $safe_parser_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageDocument::_safe_eval_stash_literal = sub {
+            $safe_parser_calls++;
+            return $original_safe_parser->(@_);
+        };
+        local $Developer::Dashboard::PageDocument::LEGACY_STASH_CACHE_MAX_ENTRIES = 0;
+        my $disabled = q{p48_disabled_memo_20261016 => 1};
+        $PD->can('_decode_stash_section')->($disabled);
+        $PD->can('_decode_stash_section')->($disabled);
+        is( $safe_parser_calls, 2, 'legacy STASH memoization can be disabled without changing results' );
+    }
+}
+
 # _legacy_stash_text: non-hash arg (line 432 left-true), empty hash
 # (right-true), populated hash (both-false).
 is( $PD->can('_legacy_stash_text')->( [] ), '', 'non-hash stash value serializes to empty string' );
@@ -248,6 +419,77 @@ is( $PD->can('_trim')->(undef),                 '', '_trim(undef) is empty strin
 is( $PD->can('_trim_trailing_newline')->(undef), '', '_trim_trailing_newline(undef) is empty string' );
 is( $PD->can('_html')->(undef),                 '', '_html(undef) is empty string' );
 is( $PD->can('_html')->('<a> & "b"'), '&lt;a&gt; &amp; &quot;b&quot;', '_html escapes the standard entities' );
+is( $PD->can('_html')->('&'), '&amp;', '_html escapes ampersand when it is the first metacharacter' );
+is( $PD->can('_html')->('<'), '&lt;', '_html escapes less-than when no earlier metacharacter exists' );
+is( $PD->can('_html')->('>'), '&gt;', '_html escapes greater-than when no earlier metacharacter exists' );
+is( $PD->can('_html')->('"'), '&quot;', '_html escapes a quote when no earlier metacharacter exists' );
+{
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 0;
+    is( $PD->can('_html')->('<' . ('plain text ' x 8)), '&lt;' . ('plain text ' x 8),
+        '_html preserves the long-string fallback when the optional XS backend is unavailable' );
+}
+{
+    my $dense_unicode = ( '<&>' x 30 ) . '"' . chr(0x1F600);
+    my $escaped = $PD->can('_html')->($dense_unicode);
+    is( $escaped, ( '&lt;&amp;&gt;' x 30 ) . '&quot;' . chr(0x1F600),
+        '_html preserves output for large dense escaped Unicode text' );
+    is( utf8::is_utf8($escaped) ? 1 : 0, utf8::is_utf8($dense_unicode) ? 1 : 0,
+        '_html preserves the Perl UTF-8 flag on large dense text' );
+}
+{
+    my $shared_escape_calls = 0;
+    no warnings qw(redefine once);
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    local *Developer::Dashboard::HtmlEscape::_escape_html = sub {
+        $shared_escape_calls++;
+        return 'shared&amp;&lt;&gt;"';
+    };
+    my $dense_html = ( '<&>' x 32 ) . '"';
+    is( $PD->can('_html')->($dense_html), 'shared&amp;&lt;&gt;&quot;',
+        '_html keeps legacy quote escaping after shared body escaping' );
+    is( $shared_escape_calls, 1, '_html delegates body metacharacters to the shared optimized escaper' );
+}
+{
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::HtmlEscape::_escape_html = sub {
+        die "plain page text should bypass HTML escaping\n";
+    };
+    my $plain = 'ordinary page description ' x 5;
+    is( $PD->can('_html')->($plain), $plain,
+        '_html returns plain text without invoking the escaper' );
+}
+{
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::HtmlEscape::_escape_html = sub {
+        die "sparse text should use the compatibility replacement path\n";
+    };
+    my $sparse = '<x> ' . ( 'ordinary text ' x 12 );
+    is( $PD->can('_html')->($sparse), '&lt;x&gt; ' . ( 'ordinary text ' x 12 ),
+        '_html uses the Perl path for long text with sparse early escapes' );
+}
+{
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::HtmlEscape::_escape_html = sub {
+        die "short text should use the compatibility replacement path\n";
+    };
+    is( $PD->can('_html')->('short & text'), 'short &amp; text',
+        '_html uses the Perl path for escaped text shorter than the XS threshold' );
+}
+{
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 1;
+    my $reference_text = [];
+    like( $PD->can('_html')->($reference_text), qr/^ARRAY\(/,
+        '_html keeps references on the Perl stringification path instead of XS' );
+}
+{
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 0;
+    my $reference_text = [];
+    like( $PD->can('_html')->($reference_text), qr/^ARRAY\(/,
+        '_html keeps reference stringification when the optional XS backend is unavailable' );
+}
 
 # ---------------------------------------------------------------------------
 # DD-866: CODE-section ordering must be NUMERIC, not lexicographic. A page
@@ -299,9 +541,11 @@ t/72-pagedocument-coverage.t - branch and condition coverage for the page docume
 This test drives every decision path in the page document model that the broader
 suite leaves unexercised: the instruction parser's modern and legacy branches,
 the C<HEAD> section parse/serialize/render paths, the per-section serialization
-guards, the HTML renderer's runtime-chunk handling,
-and the private stash, template, trim, and escape helpers. It exists to hold the
-module at full branch and condition coverage without weakening any behavior.
+guards, the HTML renderer's runtime-chunk handling, the lightweight page-id
+and display-mode accessors, the private stash, template, trim, and escape helpers, and
+dense-versus-sparse native HTML escape dispatch.
+It exists to hold the module at full branch and condition coverage without
+weakening any behavior.
 
 =head1 WHY IT EXISTS
 
@@ -342,5 +586,13 @@ Example 2:
   prove -lr t
 
 Run it inside the full repository suite before release.
+
+Example 3:
+
+  my $id = $page->id;
+  my $mode = $page->mode;
+
+Read the identifier and display mode without constructing the complete
+C<as_hash> result.
 
 =cut

@@ -763,7 +763,7 @@ BASHRC
         my $error = '';
         {
             no warnings 'redefine';
-            local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+            local *Developer::Dashboard::Platform::is_windows = sub { return 1 };
             local *Developer::Dashboard::InternalCLI::_rename_path = sub {
                 my ( $from, $to ) = @_;
                 push @rename_calls, [ $from, $to ];
@@ -6301,7 +6301,7 @@ EOF
     );
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::EnvLoader::cwd = sub { die "EnvLoader plain-directory scanning should reuse the registry cwd\n"; };
+        local *Developer::Dashboard::PathRegistry::getcwd = sub { die "EnvLoader plain-directory scanning should reuse the registry cwd\n"; };
         Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
     }
     is( $ENV{ROOT_CACHE}, 'home', 'EnvLoader still loads the root plain-directory env file when using the registry cwd cache' );

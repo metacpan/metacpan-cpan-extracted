@@ -1,5 +1,4 @@
 use v5.40;
-no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use blib;
 use Time::HiRes     qw[time];
 use Acme::Parataxis qw[async fiber yield stop await_read current_fid];
@@ -8,11 +7,8 @@ use Acme::Parataxis::Signal;
 use Acme::Parataxis::Channel;
 use Acme::Parataxis::Future;
 use Test2::V1 -ipP;
+no warnings qw[recursion];    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 $|++;
-
-BEGIN {
-    $SIG{__WARN__} = sub { return if $_[0] =~ /^Deep recursion on subroutine/; warn @_ }
-}
 use constant MAX_JOBS => 1024;
 
 # The fiber table used to be a fixed 1024-slot array, so this file pinned that size. The table grows on demand now,

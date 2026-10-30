@@ -5,8 +5,8 @@ use warnings;
 use Test::More;
 use MIME::Base64 qw(decode_base64);
 
-use Linux::Event::HTTP::Request;
-use Linux::Event::HTTP::Response;
+use Uniform::HTTP::Request;
+use Uniform::HTTP::Response;
 use Linux::Event::WebSocket::_Handshake;
 
 my $RFC_KEY = 'dGhlIHNhbXBsZSBub25jZQ==';
@@ -19,7 +19,7 @@ sub dies_like ($code, $pattern, $name) {
     like($error, $pattern, "$name reports expected error");
 }
 
-my $request = Linux::Event::HTTP::Request->new(
+my $request = Uniform::HTTP::Request->new(
     method  => 'GET',
     target  => '/chat',
     version => '1.1',
@@ -37,7 +37,7 @@ my $server_handshake = Linux::Event::WebSocket::_Handshake->server_from_request(
     $request,
     subprotocols => [qw(superchat chat)],
 );
-my $response = Linux::Event::HTTP::Response->new(status => 200);
+my $response = Uniform::HTTP::Response->new(status => 200);
 Linux::Event::WebSocket::_Handshake->apply_server_response(
     $server_handshake,
     $response,
@@ -92,7 +92,7 @@ like($random_key, qr/\A[A-Za-z0-9+\/] {22} ==\z/x,
 is(length(decode_base64($random_key)), 16,
     'client nonce decodes to sixteen bytes');
 
-my $client_response = Linux::Event::HTTP::Response->new(
+my $client_response = Uniform::HTTP::Response->new(
     status => 101,
     reason => 'Switching Protocols',
     headers => [
@@ -127,7 +127,7 @@ for my $case (
         ],
     );
     $copy{$field} = $value;
-    my $bad = Linux::Event::HTTP::Request->new(%copy);
+    my $bad = Uniform::HTTP::Request->new(%copy);
     dies_like(
         sub { Linux::Event::WebSocket::_Handshake->server_from_request($bad) },
         $pattern,
@@ -135,7 +135,7 @@ for my $case (
     );
 }
 
-my $bad_accept = Linux::Event::HTTP::Response->new(
+my $bad_accept = Uniform::HTTP::Response->new(
     status => 101,
     headers => [
         [ Upgrade                => 'websocket' ],

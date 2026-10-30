@@ -72,7 +72,7 @@ sub main_run {
 }
 
 my $root = tempdir(CLEANUP => 1);
-my @base = ( '-r', $root, '-e', 'openai', '-k', 'test', '-m', 'seq-model', '--no-trace' );
+my @base = ( '-r', $root, '-e', 'openai', '-k', 'test', '-m', 'seq-model', '--no-trace', '--dangerously-skip-permissions' );
 
 subtest 'events: fields, seq, framing in every encoding' => sub {
   for my $format (qw( json msgpack yaml )) {

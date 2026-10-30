@@ -147,7 +147,7 @@ Tongan locale.
   Sune
   Siulai
   ʻAokosi
-  Sepitema
+  Sēpitema
   ʻOkatopa
   Nōvema
   Tīsema
@@ -434,6 +434,24 @@ Tongan locale.
    2008-02-05T18:30:30 = Tūs 5 Fēp 2008 TS
    1995-12-22T09:05:02 = Fal 22 Tīs 1995 TS
   -0010-09-15T04:44:23 = Tok 15 Sēp -10 KM
+
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = TS 2008 Fēpueli
+   1995-12-22T09:05:02 = TS 1995 Tīsema
+  -0010-09-15T04:44:23 = KM -10 Sēpitema
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = TS 2008 Fēpueli 5, Tūs
+   1995-12-22T09:05:02 = TS 1995 Tīsema 22, Fal
+  -0010-09-15T04:44:23 = KM -10 Sēpitema 15, Tok
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = TS 2008 Fēpueli 5
+   1995-12-22T09:05:02 = TS 1995 Tīsema 22
+  -0010-09-15T04:44:23 = KM -10 Sēpitema 15
 
 =head3 GyMMMd (d MMM y G)
 

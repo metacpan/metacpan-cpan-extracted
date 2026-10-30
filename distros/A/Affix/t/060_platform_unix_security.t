@@ -62,7 +62,13 @@ subtest '_get_soname: safe command execution (C4)' => sub {
     is $result, undef, '_get_soname returns undef for empty string';
 
     # Malicious input must not execute shell commands
-    for my $evil ( '/tmp/fake; echo INJECTED', '/tmp/fake && touch /tmp/pwned', '/tmp/fake | cat /etc/passwd', '/tmp/fake $(id)', '/tmp/fake`id`', ) {
+    for my $evil (
+        File::Spec->tmpdir . '/fake; echo INJECTED',
+        File::Spec->tmpdir . '/fake && touch /tmp/pwned',
+        File::Spec->tmpdir . '/fake | cat /etc/passwd',
+        File::Spec->tmpdir . '/fake $(id)',
+        File::Spec->tmpdir . '/fake`id`',
+    ) {
         $result = eval { Affix::Platform::Unix::_get_soname($evil) };
         is $result, undef, "Malicious soname input rejected safely: $evil";
     }
@@ -82,17 +88,16 @@ subtest 'find_library: graceful handling' => sub {
     }
 };
 subtest 'is_elf: binary detection' => sub {
-    skip_all 'No /tmp on Windows' if $^O eq 'MSWin32';
 
     # Create a fake ELF file
-    my $fake_elf = '/tmp/_test_fake_elf_' . $$;
+    my $fake_elf = File::Spec->tmpdir . '/_test_fake_elf_' . $$;
     open( my $fh, '>', $fake_elf ) or die "Cannot create temp file: $!";
     print $fh "\x7fELF" . "\x00" x 20;
     close $fh;
     ok Affix::Platform::Unix::is_elf($fake_elf), 'is_elf detects ELF header';
 
     # Create a non-ELF file
-    my $fake_txt = '/tmp/_test_fake_txt_' . $$;
+    my $fake_txt = File::Spec->tmpdir . '/_test_fake_txt_' . $$;
     open( $fh, '>', $fake_txt ) or die "Cannot create temp file: $!";
     print $fh "This is not an ELF file";
     close $fh;

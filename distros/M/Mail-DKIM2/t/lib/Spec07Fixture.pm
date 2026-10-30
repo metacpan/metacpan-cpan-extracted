@@ -1,5 +1,5 @@
 package Spec07Fixture;
-# Messages for the draft -07 shared behaviour tests (the U1..D1 table every
+# Messages for the draft -08 shared behaviour tests (the U1..D1 table every
 # implementation in the interop repository writes). The table fixes the
 # domains (example.com, example.org, lists.example.org, fwd.example.net, ...),
 # so instead of DNS entries for each, every signature here is made with

@@ -72,6 +72,12 @@ my %ok_groups = (
 
 	throws_ok { oneway_test(42) } qr/hash or array reference/,
 		'non-reference first argument dies';
+	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('oneway_test');
+	like($screen, qr/\Ausage: oneway_test\(/, 'oneway_test has a help screen');
+	eval { oneway_test(42) };
+	is($@, $screen . "oneway_test: error: first argument must be a hash or array reference\n",
+		'a call-form error is the screen, then the error on the last line');
 	throws_ok { oneway_test({a => 1, b => 2}) } qr/array ref/,
 		'hash whose values are not array refs dies';
 }

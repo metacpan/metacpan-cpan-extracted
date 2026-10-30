@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Processor::Batch;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 # TODO: If we move the different base implementations of processors
 # to the top-level, that still leaves the specific implementations
@@ -135,7 +135,7 @@ class OpenTelemetry::Processor::Batch :does(OpenTelemetry::Processor) {
     async method shutdown ( $timeout = undef ) {
         return EXPORT_RESULT_SUCCESS if $done;
 
-        $done = 1;
+        defer { $done = 1 }
 
         my $start = timeout_timestamp;
 
@@ -190,7 +190,7 @@ class OpenTelemetry::Processor::Batch :does(OpenTelemetry::Processor) {
     }
 
     method DESTROY {
-        try { $function->stop->get }
-        catch ($e) { }
+        return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+        $function->stop->get if $function;
     }
 }

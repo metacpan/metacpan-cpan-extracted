@@ -2,7 +2,7 @@ use v5.40;
 no warnings qw[experimental::class recursion];
 use feature 'class';
 #
-class Acme::Parataxis::Ticker v0.1.1 {
+class Acme::Parataxis::Ticker v0.1.3 {
     use Carp qw[croak];
     use Time::HiRes     qw[time];
     use Acme::Parataxis qw[await_sleep];

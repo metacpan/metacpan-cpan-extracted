@@ -14,6 +14,8 @@ use Test::More;
 
 my $repo_root = File::Spec->rel2abs( File::Spec->catdir( File::Spec->curdir ) );
 my $source_makefile_pl = File::Spec->catfile( $repo_root, 'Makefile.PL' );
+my $source_xs = File::Spec->catfile( $repo_root, 'HtmlEscape.xs' );
+my $source_version = File::Spec->catfile( $repo_root, 'lib', 'Developer', 'Dashboard', 'Version.pm' );
 my $fixture = tempdir( CLEANUP => 1 );
 my $home = File::Spec->catdir( $fixture, 'absolute-home' );
 my $local_perl5 = File::Spec->catdir( $home, 'perl5', 'lib', 'perl5' );
@@ -22,12 +24,17 @@ my $active_version = File::Spec->catdir( $local_perl5, $Config{version} );
 
 make_path(
     File::Spec->catdir( $fixture, 'lib', 'Developer' ),
+    File::Spec->catdir( $fixture, 'lib', 'Developer', 'Dashboard' ),
     File::Spec->catdir( $fixture, 'share' ),
     $active_arch,
     $active_version,
 );
 copy( $source_makefile_pl, File::Spec->catfile( $fixture, 'Makefile.PL' ) )
   or die "Unable to copy Makefile.PL into fixture: $!";
+copy( $source_xs, File::Spec->catfile( $fixture, 'HtmlEscape.xs' ) )
+  or die "Unable to copy HtmlEscape.xs into fixture: $!";
+copy( $source_version, File::Spec->catfile( $fixture, 'lib', 'Developer', 'Dashboard', 'Version.pm' ) )
+  or die "Unable to copy the version module into fixture: $!";
 
 _open_write(
     File::Spec->catfile( $fixture, 'lib', 'Developer', 'Dashboard.pm' ),

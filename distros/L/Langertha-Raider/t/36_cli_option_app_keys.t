@@ -54,7 +54,7 @@ subtest '-o behaves like .raider.yml for raider keys' => sub {
   path($root)->child('notes')->mkpath;
   path($root)->child('notes/a.md')->spew_utf8("hello\n");
   my $skills = app($root, skills => 'notes');
-  is([ $skills->loaded_skill_names ], ['a.md'], 'skills');
+  is([ $skills->loaded_skill_names ], ['a'], 'skills (a flat skill is named by its file, ADR 0019)');
 };
 
 subtest '-o wins over .raider.yml, --pack over -o' => sub {

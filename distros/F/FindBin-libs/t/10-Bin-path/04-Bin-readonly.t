@@ -11,7 +11,7 @@ BEGIN
 }
 
 use Test::More;
-use FindBin::Bin    qw( $Bin $Bin_c );
+use FindBin::Bin    qw( $Bin $Bin_l );
 
 ok length( $Bin ),
     "\$Bin is non-empty: '$Bin'";
@@ -28,19 +28,19 @@ eval { $Bin = undef; 1 }
 and fail   "\$Bin was modified to undef"
 or  pass   "\$Bin is not modifiable: undef";
 
-ok length( $Bin_c ),
-    "\$Bin_c is non-empty: '$Bin_c'";
+ok length( $Bin_l ),
+    "\$Bin_l is non-empty: '$Bin_l'";
 
-eval { $Bin_c = 'foobar'; 1 }
-and fail   "\$Bin_c was modified to 'foobar'"
-or  pass   "\$Bin_c is not modifiable: string value";
+eval { $Bin_l = 'foobar'; 1 }
+and fail   "\$Bin_l was modified to 'foobar'"
+or  pass   "\$Bin_l is not modifiable: string value";
 
-eval { $Bin_c = ''; 1 }
-and fail   "\$Bin_c was modified to empty string"
-or  pass   "\$Bin_c is not modifiable: empty string";
+eval { $Bin_l = ''; 1 }
+and fail   "\$Bin_l was modified to empty string"
+or  pass   "\$Bin_l is not modifiable: empty string";
 
-eval { $Bin_c = undef; 1 }
-and fail   "\$Bin_c was modified to undef"
-or  pass   "\$Bin_c is not modifiable: undef";
+eval { $Bin_l = undef; 1 }
+and fail   "\$Bin_l was modified to undef"
+or  pass   "\$Bin_l is not modifiable: undef";
 
 done_testing;

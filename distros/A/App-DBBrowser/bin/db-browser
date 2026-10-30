@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.444';
+our $VERSION = '2.445';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.444
+Version 2.445
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ If C<db-browser> is called without arguments, the user can choose from the datab
 If C<db-browser> is called with arguments, those arguments are treated as the list of available databases (or as
 available ODBC data sources when using the DBD::ODBC driver).
 
-=head2 SQLite/Firebird
+=head2 SQLite/Firebird/DuckDB
 
     db-browser -s|--search
 
@@ -77,8 +77,8 @@ Before using C<db-browser>, ensure you have backed up your databases.
 Search and read in SQL databases: one can interactively browse databases and their tables.
 
 C<App::DBBrowser> provides and supports plugins for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>, C<DBD::MariaDB>,
-C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DB2>, C<DBD::Informix>, C<DBD::Oracle> and C<DBD::ODBC>. Refer to
-L<App::DBBrowser::DB> for guidance on writing a database plugin.
+C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DuckDB>, C<DBD::DB2>, C<DBD::Informix>, C<DBD::Oracle> and C<DBD::ODBC>. Refer
+to L<App::DBBrowser::DB> for guidance on writing a database plugin.
 
 =head1 NAVIGATION
 
@@ -1285,9 +1285,13 @@ row width, even after all columns wider than I<Column trim threshold> have been 
 
 =head3 DB2 Encoding
 
-For C<DB2> databases only: set the application code set.
+For C<DB2> databases only: Set the application code set.
 
 Data from a DB2 database is decoded using this encoding.
+
+=head3 DuckDB output decoding
+
+For C<DuckDB> databases only: If enabled, the output of VARCHAR columns will be decoded using UTF-8.
 
 =head2 Import Data
 

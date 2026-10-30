@@ -21,6 +21,7 @@ my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
 my %tracked_repo_paths = _tracked_repo_paths();
 
 my $pm = _slurp( _repo_path('lib', 'Developer', 'Dashboard.pm') );
+my $version_pm = _slurp( _repo_path( 'lib', 'Developer', 'Dashboard', 'Version.pm' ) );
 my $readme = _slurp_optional( _repo_path('README.md') );
 my $plain_readme = _slurp_optional( _repo_path('README') );
 my $skill_guide = _slurp_optional( _repo_path('SKILL.md') );
@@ -92,14 +93,14 @@ my $skills_pod = _extract_pod($skills_pm);
 my @problem_report_numbers = $problem_report =~ /^### Problem (\d+):/gm;
 is_deeply(
     \@problem_report_numbers,
-    [ 1 .. 44 ],
-    'problem-report.md has one ordered entry for every numbered problem 1 through 44, including explicitly unassigned numbers',
+    [ 1 .. 49 ],
+    'problem-report.md has one ordered entry for every numbered problem 1 through 49, including explicitly unassigned numbers',
 );
 my %problem_history_numbers = map { $_ => 1 } $problem_history =~ /^Problem (\d+):/gm;
 is_deeply(
     [ sort { $a <=> $b } keys %problem_history_numbers ],
-    [ 1 .. 44 ],
-    'problem-report.txt records evidence or an explicit unassigned entry for every numbered problem 1 through 44',
+    [ 1 .. 49 ],
+    'problem-report.txt records evidence or an explicit unassigned entry for every numbered problem 1 through 49',
 );
 like(
     $dist,
@@ -107,8 +108,9 @@ like(
     'Dist::Zilla excludes generated terminal transcript logs from the release archive',
 );
 
-like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
-my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
+like( $version_pm, qr/our \$VERSION = '([^']+)'/, 'lightweight version module declares the distribution version' );
+my ($version) = $version_pm =~ /our \$VERSION = '([^']+)'/;
+like( $pm, qr/our \$VERSION = \$Developer::Dashboard::Version::VERSION;/, 'main module exposes the shared lightweight version scalar' );
 my ($dist_version) = $dist =~ /^version = (\S+)$/m;
 is( $version, $dist_version, 'release version matches dist.ini, including the security fixes already released' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
@@ -127,6 +129,10 @@ like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
         my $module_source = _slurp($module_file);
         my ($module_version) = $module_source =~ /our \$VERSION = '([^']+)'/;
         my $relative = File::Spec->abs2rel( $module_file, $ROOT );
+        $module_version = $version
+          if !defined $module_version
+          && $relative eq File::Spec->catfile( 'lib', 'Developer', 'Dashboard.pm' )
+          && $module_source =~ /our \$VERSION = \$Developer::Dashboard::Version::VERSION;/;
         is( $module_version, $version, "$relative carries the repo release version so no packaged module can drift behind a bump" );
     }
 }
@@ -140,7 +146,7 @@ like(
 like( $dist, qr/^\[Prereqs \/ ConfigureRequires\]$/m, 'dist.ini declares explicit configure prerequisites for packaged installs' );
 like(
     $dist,
-    qr/^exclude_match = \^cover_db\(\?:_\[\^\/\]\+\)\?\(\?:\/\|\$\)/m,
+    qr/^exclude_match = \^cover_db\(\?:\[-_\]\[\^\/\]\+\)\?\(\?:\/\|\$\)/m,
     'dist.ini excludes root coverage databases and their contents from the release tarball',
 );
 like( $dist, qr/^File::ShareDir::Install = 0$/m, 'dist.ini declares File::ShareDir::Install as a configure prerequisite so packaged installs refresh shipped helper assets' );
@@ -180,6 +186,13 @@ if ( $dist ne '' ) {
             _repo_path( 'lib', 'Developer', 'Dashboard.pm' ),
             File::Spec->catfile( $fixture, 'lib', 'Developer', 'Dashboard.pm' ),
           ) or die "Unable to copy Developer::Dashboard into $fixture: $!";
+        make_path( File::Spec->catdir( $fixture, 'lib', 'Developer', 'Dashboard' ) );
+        copy(
+            _repo_path( 'lib', 'Developer', 'Dashboard', 'Version.pm' ),
+            File::Spec->catfile( $fixture, 'lib', 'Developer', 'Dashboard', 'Version.pm' ),
+          ) or die "Unable to copy Developer::Dashboard::Version into $fixture: $!";
+        copy( _repo_path('HtmlEscape.xs'), File::Spec->catfile( $fixture, 'HtmlEscape.xs' ) )
+          or die "Unable to copy HtmlEscape.xs into $fixture: $!";
         make_path( File::Spec->catdir( $fixture, 'share' ) );
 
         my ( $configure_stdout, $configure_stderr, $configure_exit ) = capture {
@@ -193,16 +206,25 @@ if ( $dist ne '' ) {
         };
         is( $configure_exit, 0, 'Makefile.PL generates metadata in a temporary source fixture' )
           or diag("stdout:\n$configure_stdout\nstderr:\n$configure_stderr");
+        unlike( $configure_stderr, qr/Setting VERSION via file .* failed/,
+            'MakeMaker obtains the version from the lightweight version module without warnings' );
 
         my $mymeta_path = File::Spec->catfile( $fixture, 'MYMETA.json' );
         ok( -f $mymeta_path, 'Makefile.PL writes MYMETA.json' );
         my $generated_meta = JSON::XS->new->decode( _slurp($mymeta_path) );
         is_deeply( $generated_meta->{license}, ['mit'], 'generated MakeMaker metadata declares only the canonical MIT license' );
     }
+    like( $makefile, qr/VERSION_FROM\s*=>\s*'lib\/Developer\/Dashboard\/Version\.pm'/,
+        'Makefile.PL reads version metadata from the lightweight version module' );
     like( $dist, qr/^skip = \^Module::CPANTS::Analyse\$$/m, 'dist.ini skips release-only Module::CPANTS::Analyse from generated install-time prereqs' );
     like( $dist, qr/^skip = \^Module::CPANTS::Kwalitee\$$/m, 'dist.ini skips release-only Module::CPANTS::Kwalitee from generated install-time prereqs' );
+like(
+    $dist,
+    qr/^skip = \^\(\?:Inline\|MCE::Map\|SPVM\|SPVM::Digest::SHA\)\$$/m,
+    'dist.ini keeps optional Problem 48 benchmark engines out of required install prerequisites',
+);
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
-    like( $dist, qr/^exclude_match = \^cover_db\(\?:_\[\^\/\]\+\)\?\(\?:\/\|\$\)$/m, 'dist.ini excludes root coverage databases and their contents from release tarballs' );
+    like( $dist, qr/^exclude_match = \^cover_db\(\?:\[-_\]\[\^\/\]\+\)\?\(\?:\/\|\$\)$/m, 'dist.ini excludes root coverage databases and their contents from release tarballs' );
     like( $dist, qr/^package = env$/m, 'dist.ini prevents the env helper package from being advertised as a standalone module' );
     like( $dist, qr/^package = Developer::Dashboard::Handle::Proxy$/m, 'dist.ini prevents the nested handle proxy package from being advertised as a standalone module' );
     like( $dist, qr/^exclude_match = \^node_modules\/$/m, 'dist.ini excludes node_modules so JavaScript dependency trees do not leak into release tarballs' );
@@ -268,7 +290,21 @@ unlike( $makefile, qr/install\.sh|install\.ps1/, 'Makefile.PL does not install c
 unlike( $makefile, qr/["']Test::Pod["']\s*=>\s*0/, 'Makefile.PL does not ship Test::Pod as a runtime prerequisite' );
 unlike( $makefile, qr/["']HTTP::Daemon["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Daemon metadata' );
 unlike( $makefile, qr/["']HTTP::Status["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Status metadata' );
+like( $makefile, qr/["']HTTP::Tiny["']\s*=>\s*["']0\.096["']/, 'Makefile.PL pins Plack\x27s transitive HTTP::Tiny dependency at the fixed security release' );
+my ($makefile_runtime_prereqs) = $makefile =~ /PREREQ_PM\s*=>\s*\{(.*?)\n\s*\},/s;
+unlike( $makefile_runtime_prereqs // q{}, qr/["']FFI::(?:Platypus|CheckLib)["']\s*=>/, 'Makefile.PL does not put optional FFI acceleration into PREREQ_PM' );
+like( $makefile, qr/prereqs\s*=>\s*\{\s*runtime\s*=>\s*\{\s*recommends\s*=>\s*\{\s*'FFI::Platypus'\s*=>\s*'2\.12'.*?'FFI::CheckLib'\s*=>\s*'0\.31'/s, 'Makefile.PL publishes FFI acceleration as optional runtime recommendations' );
 unlike( $cpanfile, qr/requires ['"]Test::Pod['"];/, 'cpanfile does not ship Test::Pod as an install-time prerequisite' );
+like( $cpanfile, qr/requires ['"]HTTP::Tiny['"]\s*,\s*['"]0\.096['"];/, 'cpanfile pins Plack\x27s transitive HTTP::Tiny dependency at the fixed security release' );
+like( $dist, qr/^HTTP::Tiny = 0\.096$/m, 'dist.ini pins Plack\x27s transitive HTTP::Tiny dependency at the fixed security release' );
+my ($dist_runtime_prereqs) = $dist =~ /^\[Prereqs\]\s*\n(.*?)(?=^\[|\z)/ms;
+unlike( $dist_runtime_prereqs // q{}, qr/^FFI::(?:Platypus|CheckLib)\s*=/m, 'dist.ini does not make optional FFI acceleration a hard runtime prerequisite' );
+my ($runtime_recommends) = $dist =~ /^\[Prereqs \/ RuntimeRecommends\]\s*\n(.*?)(?=^\[|\z)/ms;
+like( $runtime_recommends // q{}, qr/^FFI::Platypus = 2\.12$/m, 'dist.ini recommends the tested FFI::Platypus version' );
+like( $runtime_recommends // q{}, qr/^FFI::CheckLib = 0\.31$/m, 'dist.ini recommends the tested FFI::CheckLib version' );
+unlike( $cpanfile, qr/^requires ['"]FFI::(?:Platypus|CheckLib)['"]/m, 'cpanfile does not require optional FFI acceleration modules' );
+like( $cpanfile, qr/^recommends ['"]FFI::Platypus['"]\s*,\s*['"]2\.12['"];/m, 'cpanfile recommends the tested FFI::Platypus version' );
+like( $cpanfile, qr/^recommends ['"]FFI::CheckLib['"]\s*,\s*['"]0\.31['"];/m, 'cpanfile recommends the tested FFI::CheckLib version' );
 my %runtime_prereq_minimum = (
     'JSON::XS'               => '4.04',
     'YAML::XS'               => '0.903.0',
@@ -293,7 +329,6 @@ my %runtime_prereq_minimum = (
     'HTML::Parser'           => '3.84',
     'HTTP::Date'             => '6.08',
     'HTTP::Request'          => '0',
-    'HTTP::Tiny'             => '0.095',
     'LWP::Protocol::https'   => '6.07',
     'LWP::UserAgent'         => '6.83',
     'Template'               => '3.103',
@@ -405,6 +440,8 @@ my @operator_local_files = qw(
 
     my @must_be_excluded = qw(
         cover_db/coverage.html
+        cover_db-p48-focus/coverage.html
+        cover_db_named/coverage.html
         local/lib/perl5/Net/SSLeay.pod
         audit-local/lib/perl5/CPANSA/DB.pm
         logs/ft99.log
@@ -421,7 +458,11 @@ my @operator_local_files = qw(
         docs/gate-map.md
         examples/sample-dashboard.pl
         .github/workflows/test.yml
+        nytprof/e-1-line.csv
         OLD_CODE/legacy-helper.pl
+        Archive/lib/Developer/Dashboard.pm
+        OldFiles/operator-data.json
+        CODE/src/main.cpp
         test_by_michael/Dockerfile
         updates/2026-01-01-migrate.pl
         blogs/2026-release-notes.md
@@ -434,7 +475,7 @@ my @operator_local_files = qw(
         return scalar grep { $directory =~ $_ } @prune_directory;
     };
     ok( $pruned->($_), "dist.ini prunes excluded generated directory $_ before walking it" )
-      for qw(.worktrees node_modules test_by_michael);
+      for qw(.worktrees node_modules test_by_michael cover_db-p48-focus cover_db_named Archive OldFiles CODE);
 
     # DERIVE BOTH HALVES, NOT ONE. The patterns above are compiled out of
     # dist.ini, so a new exclusion is picked up automatically - but the sample
@@ -496,6 +537,7 @@ my @required_tarball_paths = (
 );
 push @required_tarball_paths, "Developer-Dashboard-$version/doc/install-bootstrap.md"
   if $tracked_repo_paths{'doc/install-bootstrap.md'};
+push @required_tarball_paths, "Developer-Dashboard-$version/doc/docker-hub-image.md";
 my $matching_tarball = _repo_path("Developer-Dashboard-$version.tar.gz");
 SKIP: {
     skip "matching release tarball $matching_tarball has not been built yet",
@@ -589,6 +631,12 @@ SKIP: {
     # files above, different cause (a dev-tool artifact, not a rules file).
     my @nytprof_leaked = grep { m{^Developer-Dashboard-\Q$version\E/nytprof(?:\.out|/)} } @files;
     is( scalar @nytprof_leaked, 0, 'release tarball carries no nytprof.out or nytprof/ member' );
+
+    my @coverage_leaked = grep {
+        m{^Developer-Dashboard-\Q$version\E/cover_db(?:[-_][^/]+)?(?:/|$)}
+    } @files;
+    is( scalar @coverage_leaked, 0,
+        'release tarball carries no default or named Devel::Cover database members' );
 
     my $meta_member = "Developer-Dashboard-$version/META.json";
     ok( $files{$meta_member}, 'matching release tarball ships META.json for packaged prerequisite assertions' );
@@ -1228,7 +1276,7 @@ Use this file when you are reproducing or fixing behaviour in its area, when you
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/15-release-metadata.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/15-release-metadata.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers. The metadata contract distinguishes required runtime modules from optional runtime recommendations, including FFI acceleration with an established Perl fallback.
 
 =head1 WHAT USES IT
 

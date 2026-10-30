@@ -1,0 +1,25 @@
+# The loadguard gate (ADR 0018) is asked before a background command starts,
+# exactly as in the foreground: a heavy command under memory pressure never
+# starts and there is no shell to read; a light one still runs in the background.
+title: loadguard refuses a heavy command in the background too; a light one starts
+proc:
+  memory_full: 37.5
+  swap: 20
+prompt: Run the tests in the background.
+script:
+  - tool_calls:
+      - [ bash, { command: 'touch started && prove -lr t', run_in_background: true } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1 } ]
+      - [ bash, { command: 'ls -a', run_in_background: true } ]
+  - tool_calls:
+      - [ bash_output, { bash_id: bash_1, block: true } ]
+  - text: waiting for the host
+expect:
+  answer: waiting for the host
+  absent: [ started ]
+  tools:
+    - { name: bash, error: true, text: '\ACommand refused by loadguard: heavy command \(prove\): memory pressure full=37\.5%' }
+    - { name: bash_output, error: true, text: '\ANo task found with ID: bash_1\z' }
+    - { name: bash, text: 'ID: bash_1\.' }
+    - { name: bash_output, text: '\A<status>completed</status>\n\n<exit_code>0</exit_code>' }

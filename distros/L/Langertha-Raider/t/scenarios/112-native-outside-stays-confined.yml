@@ -1,0 +1,18 @@
+title: outside the Claude layout the file tools stay confined to the root -- even in bypassPermissions a path outside it is refused by the tool
+files:
+  .raider/config.yml: "permissions: {}\n"
+home:
+  notes/todo.txt: "outside the project\n"
+prompt: Read my notes.
+script:
+  - tool_calls:
+      - [ read_file, { path: "{{HOME}}/notes/todo.txt" } ]
+      - [ grep, { pattern: outside, path: "{{HOME}}/notes" } ]
+      - [ write_file, { path: "{{HOME}}/notes/new.txt", content: "x\n" } ]
+  - text: confined
+expect:
+  answer: confined
+  tools:
+    - { name: read_file, error: true, text: "Path escapes root", not_text: "outside the project\\n" }
+    - { name: grep, error: true, text: "path escapes root" }
+    - { name: write_file, error: true, text: "Path escapes root" }

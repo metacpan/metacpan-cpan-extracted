@@ -1,4 +1,4 @@
-package Affix::Wrap v1.2.7 {
+package Affix::Wrap v1.3.0 {
     use v5.40;
     use feature 'class';
     no warnings 'experimental::class';
@@ -1071,6 +1071,7 @@ package Affix::Wrap v1.2.7 {
                 if   ( $Config{cc} =~ /gcc/i ) { return "$arch-pc-windows-gnu"; }
                 else                           { return "$arch-pc-windows-msvc"; }
             }
+            elsif ( $^O eq 'cygwin' ) { return "$arch-pc-cygwin"; }
             elsif ( $^O eq 'linux' )  { return "$arch-unknown-linux-gnu"; }
             elsif ( $^O eq 'darwin' ) { return "$arch-apple-darwin"; }
             my ($out) = Capture::Tiny::capture { system $clang, '-print-target-triple' };
@@ -1092,9 +1093,10 @@ package Affix::Wrap v1.2.7 {
 
         method _is_valid_file ($f) {
             return 0 unless defined $f && length $f;
-            return $f !~ m{^/usr/(include|lib|share|local/include)} &&
-                $f !~ m{^/System/Library} &&
-                $f !~ m{(Program Files|Strawberry|MinGW|Windows|cygwin|msys)}i;
+            return 0 if $f =~ m{^/usr/(include|lib|share|local/include)};
+            return 0 if $f =~ m{^/System/Library};
+            return 0 if $f =~ m{/(?:Windows|Program Files|Strawberry|MinGW)/}i;
+            return 1;
         }
 
         method parse( $entry_point, $ids //= [] ) {
@@ -1493,6 +1495,10 @@ package Affix::Wrap v1.2.7 {
                     system( 'clang', '--version', '>', File::Spec->devnull, '2>&1' );
                 };
                 my $use_clang = ( $exit == 0 );
+                if ( $use_clang && $^O eq 'cygwin' ) {
+                    my $which = `which clang 2>/dev/null` // '';
+                    $use_clang = 0 unless $which =~ m{^/(usr/)?bin/clang};
+                }
                 $driver = $use_clang ? Affix::Wrap::Driver::Clang->new( project_files => $project_files ) :
                     Affix::Wrap::Driver::Regex->new( project_files => $project_files );
             }
@@ -1516,8 +1522,7 @@ package Affix::Wrap v1.2.7 {
             }
             my %cache;
             my $resolve;
-            $resolve = sub {
-                my ($token) = @_;
+            $resolve = sub($token) {
                 return undef unless defined $token;
                 $token =~ s/^\s+|\s+$//g;
                 return oct($token)    if $token =~ /^0x[\da-fA-F]+$/i;
@@ -1615,6 +1620,7 @@ package Affix::Wrap v1.2.7 {
                 }
             }
             $out .= "};\n1;\n";
+            return ( $out, \@nodes );
         }
 
         method generate( $lib, $pkg, $file ) {

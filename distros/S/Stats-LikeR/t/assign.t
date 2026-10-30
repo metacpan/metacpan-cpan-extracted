@@ -571,4 +571,25 @@ SKIP: {
 	} 'no SV leak on the croak path';
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('assign');
+	like($screen, qr/\Ausage: assign\(/, 'assign has a help screen');
+	is(do { local $@; eval { assign([ { a => 1 } ], 'b'); 1 } ? '' : $@ },
+	   $screen . "assign: error: expected an even list of (name => value) pairs\n",
+	   'assign: an odd pair list prints the help screen');
+	is(do { local $@; eval { assign([ { a => 1 } ], b => 2); 1 } ? '' : $@ },
+	   $screen . "assign: error: value for 'b' must be a CODE or ARRAY ref\n",
+	   'assign: a plain-scalar value prints the help screen');
+}
+
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { &map_cell('x'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: map_cell\(.*\n\nmap_cell: error: \Qexpects a code block\E\n\z/s,
+		'map_cell: a call-form error prints the help screen, the error on its last line');
+}
+
 done_testing;

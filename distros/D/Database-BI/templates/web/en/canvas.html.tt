@@ -45,7 +45,7 @@
 }
 /* The edit control on a map card: changes the columns it plots without
  * deleting the card and adding it again. */
-.visual-edit-btn {
+.visual-edit-btn, .visual-cs-btn {
 	font-size: 0.72rem;
 	padding: 0.08rem 0.4rem;
 	margin-left: 0.4rem;
@@ -56,8 +56,19 @@
 	white-space: nowrap;
 	cursor: pointer;
 }
-.visual-edit-btn:hover { background: #f0f0f0; }
+.visual-edit-btn:hover, .visual-cs-btn:hover { background: #f0f0f0; }
+/* The small controls in a card header share one height, so they line up with
+ * each other; the header centres them on the title. */
+.visual-edit-btn,
+.visual-cs-btn,
+.visual-size-select,
+.visual-dl-btn {
+	box-sizing: border-box;
+	height: 1.25rem;
+	line-height: 1;
+}
 .map-edit-panel { width: 330px; }
+.cs-edit-panel { width: 340px; }
 .visual-card-body {
 	flex: 1;
 	overflow: auto;
@@ -74,7 +85,7 @@
 .canvas-map-wrap input[type="text"] {
 	margin: 0.35rem;
 	padding: 0.3rem 0.5rem;
-	border: 1px solid var(--border, #dee2e6);
+	border: 1px solid var(--field-border);
 	border-radius: 4px;
 }
 .canvas-map-wrap button {
@@ -107,6 +118,35 @@
 	color: #dc3545;
 	padding: 0.5rem;
 	font-size: 0.85rem;
+}
+/* A word-cloud card: the size of a word is how many of the card's rows
+ * contain it, so the words are one wrapping line rather than a chart. */
+.wordcloud-cloud {
+	margin: 0;
+	line-height: 1.9;
+	text-align: center;
+}
+.wordcloud-word {
+	display: inline-block;
+	margin: 0 0.25rem;
+	color: #2c3e7a;
+	white-space: nowrap;
+	text-decoration: none;
+}
+.wordcloud-word:hover, .wordcloud-word:focus-visible {
+	text-decoration: underline;
+}
+/* A word that is not a control -- a drill owns the canvas, and a word never
+ * drills -- is still a word: no click, no link colour, no underline on hover. */
+.wordcloud-word-off, .wordcloud-word-off:hover {
+	color: inherit;
+	text-decoration: none;
+	cursor: default;
+}
+.wordcloud-summary, .wordcloud-empty {
+	margin: 0.5rem 0 0;
+	font-size: 0.8rem;
+	color: var(--muted, #6c757d);
 }
 .visual-table-wrap {
 	overflow: auto;
@@ -198,11 +238,44 @@
 .param-bar input {
 	font-size: 0.85rem;
 	padding: 0.2rem 0.4rem;
-	border: 1px solid var(--border, #dee2e6);
+	border: 1px solid var(--field-border);
 	border-radius: 4px;
 	width: 8rem;
 }
 .param-bar input[type="number"] { width: 6rem; }
+/* The Time range bar's menus and its Apply button, styled like the parameter
+ * inputs and the toolbar buttons.  Every control on these bars and on the
+ * toolbar is 1.75rem high -- the table page's toolbar height -- so a row lines
+ * up top and bottom whatever its font size or icon glyph. */
+.param-bar select {
+	font-size: 0.85rem;
+	padding: 0.2rem 0.4rem;
+	border: 1px solid var(--field-border);
+	border-radius: 4px;
+	background: var(--field-bg);
+	color: inherit;
+}
+.param-bar .btn-add-visual {
+	padding: 0.28rem 0.75rem;
+	border: 1px solid #888;
+	border-radius: 6px;
+	background: transparent;
+	color: #444;
+	font-size: 0.82rem;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: background 0.12s;
+}
+.param-bar .btn-add-visual:hover { background: #f0f0f0; }
+.param-bar input,
+.param-bar select,
+.param-bar button,
+.canvas-toolbar > button,
+.canvas-toolbar > .bm-wrap > button,
+.canvas-toolbar .btn-add-visual {
+	box-sizing: border-box;
+	height: 1.75rem;
+}
 /* Drill-down breadcrumb */
 .drill-crumb {
 	display: inline-flex;
@@ -247,7 +320,7 @@
 	flex: 1;
 	font-size: 0.82rem;
 	padding: 0.2rem 0.4rem;
-	border: 1px solid var(--border, #dee2e6);
+	border: 1px solid var(--field-border);
 	border-radius: 4px;
 }
 .bm-save-btn, .bm-del-btn {
@@ -310,12 +383,85 @@
 	font-size: 0.82rem;
 	font-weight: 400;
 	padding: 0.22rem 0.4rem;
+	border: 1px solid var(--field-border);
+	border-radius: 4px;
+	background: var(--field-bg);
+	color: inherit;
+}
+.ac-field select[multiple] { padding: 0.15rem; }
+/* The cross-row section of the panel: a group of its own, because it is the
+ * one choice in the panel that belongs to the card rather than to its view. */
+.ac-cs {
+	margin: 0.2rem 0 0.55rem;
+	padding: 0.45rem 0.5rem 0.15rem;
+	border: 1px solid var(--border, #dee2e6);
+	border-radius: 4px;
+}
+.ac-cs legend { font-size: 0.78rem; font-weight: 600; padding: 0 0.25rem; }
+.ac-cs #ac-cs-fields[hidden] { display: none; }
+/* The columns a card will carry, one chip each, so a plan of several is
+ * something the reader can see and take apart before the card is added. */
+.ac-cs-addrow { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin: 0.1rem 0 0.45rem; }
+.ac-cs-add {
+	font-size: 0.78rem;
+	padding: 0.22rem 0.6rem;
+	border: 1px dashed var(--link, #0d6efd);
+	border-radius: 4px;
+	background: var(--card-bg, #fff);
+	color: var(--link, #0d6efd);
+	cursor: pointer;
+}
+.ac-cs-add:hover, .ac-cs-add:focus-visible { background: #eef2fb; }
+.ac-cs-list-title { margin: 0 0 0.2rem; font-size: 0.78rem; font-weight: 600; }
+.ac-cs-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.ac-cs-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	background: #eef2fb;
+	border: 1px solid #ccd6ec;
+	border-radius: 999px;
+	padding: 0.1rem 0.15rem 0.1rem 0.55rem;
+	font-size: 0.78rem;
+}
+.ac-cs-remove {
+	border: 0;
+	background: none;
+	color: #2c3e7a;
+	cursor: pointer;
+	font-size: 0.95rem;
+	line-height: 1;
+	padding: 0 0.3rem;
+	border-radius: 999px;
+}
+.ac-cs-remove:hover, .ac-cs-remove:focus-visible { background: #dbe4f7; }
+/* A chip's label is a button where the chip can be reopened: it is the column
+   as the reader will see it, so it reads as text and only shows that it can be
+   pressed on hover or focus. */
+button.ac-cs-chip-text {
+	border: 0;
+	background: none;
+	padding: 0;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	text-align: left;
+}
+button.ac-cs-chip-text:hover, button.ac-cs-chip-text:focus-visible { text-decoration: underline; }
+.ac-cs-chip.is-editing { background: #dbe4f7; border-color: #8fa8d8; }
+.ac-cs-stop {
+	font-size: 0.78rem;
+	padding: 0.22rem 0.6rem;
 	border: 1px solid var(--border, #dee2e6);
 	border-radius: 4px;
 	background: var(--card-bg, #fff);
 	color: inherit;
+	cursor: pointer;
 }
-.ac-field select[multiple] { padding: 0.15rem; }
+.ac-cs-stop:hover, .ac-cs-stop:focus-visible { background: #f0f0f0; }
+.ac-cs-stop[hidden] { display: none; }
+.ac-cs-empty { margin: 0.1rem 0 0; font-size: 0.72rem; color: var(--muted, #6c757d); }
+.ac-cs-empty[hidden] { display: none; }
 .ac-note { font-size: 0.72rem; font-weight: 400; color: var(--muted, #6c757d); }
 .ac-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
 .ac-actions button {
@@ -330,6 +476,19 @@
 .ac-actions button:disabled { opacity: 0.55; cursor: wait; }
 .ac-error { margin: 0.35rem 0 0; font-size: 0.78rem; color: var(--danger-fg, #c0392b); }
 .ac-error[hidden] { display: none; }
+/* A repair that would leave the card plotting a column the plan no longer
+   makes: said while it can still be undone, not after the card has been
+   redrawn with an error. */
+.ac-warning {
+	margin: 0.35rem 0 0;
+	font-size: 0.78rem;
+	color: var(--warning-fg, #8a6d3b);
+	background: #fff8e1;
+	border: 1px solid #f0d58c;
+	border-radius: 4px;
+	padding: 0.25rem 0.45rem;
+}
+.ac-warning[hidden] { display: none; }
 /* Canvas toolbar buttons: same look as virtual table page toolbar buttons */
 .canvas-toolbar > button,
 .canvas-toolbar > .bm-wrap > button,
@@ -504,9 +663,9 @@
 	margin-left: 0.3rem;
 	max-width: 11.5rem;
 	min-width: 5rem;
-	border: 1px solid var(--border, #dee2e6);
+	border: 1px solid var(--field-border);
 	border-radius: 3px;
-	background: var(--header-bg, #f8f9fa);
+	background: var(--field-bg);
 	color: var(--body-color, #212529);
 	cursor: pointer;
 	flex-shrink: 1;
@@ -588,11 +747,7 @@
 }
 </style>
 
-[%- IF back_url.length -%]
-<p class="back-link"><a href="[% back_url | html %]">&larr; [% back_label | html %]</a> &rsaquo; <span>[% canvas_name | html %]</span></p>
-[%- ELSE -%]
-<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <span>[% canvas_name | html %]</span></p>
-[%- END -%]
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
 [%- IF freshness_stale -%]
 <div class="freshness-banner" role="alert" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:0.4rem 0.75rem;margin-bottom:0.5rem;font-size:0.85rem;color:#664d03;">
 	&#9888; [% freshness_msg | html %]
@@ -622,6 +777,18 @@
 		<a href="[% drillthrough_url | html %]" class="cf-drillthrough" title="View matching rows in source table">View rows &rarr;</a>
 		[% END %]
 		<a href="[% cf_clear_url | html %]" title="Clear cross-filter">&times; Clear</a>
+	</div>
+	[% END %]
+	[% IF canvas_time_range %]
+	<div class="cf-chip" id="canvas-range-chip"
+	     title="Rows are limited to a window worked out from today's date; it stays relative wherever this canvas is opened from">
+		<span>Time range: <strong>[% canvas_time_range.label | html %]</strong></span>
+		[% IF canvas_time_range_col %]
+		<span>&middot; [% canvas_time_range_col | html %]</span>
+		[% END %]
+		[% IF canvas_time_range_clear_url.length %]
+		<a href="[% canvas_time_range_clear_url | html %]" title="Remove the time range">&times; Clear</a>
+		[% END %]
 	</div>
 	[% END %]
 	<button id="btn-undo" class="btn-undo" type="button" title="Undo last action" disabled>&larr; Undo</button>
@@ -666,6 +833,7 @@
 						<option value="combo">Combo chart</option>
 						<option value="treemap">Treemap</option>
 						<option value="histogram">Histogram</option>
+						<option value="wordcloud">Word cloud</option>
 						<option value="map">Map</option>
 					</select>
 				</label>
@@ -681,6 +849,26 @@
 				</label>
 				<label class="ac-field" data-for="bar pie stacked treemap heatmap" data-label="Value">Value
 					<select id="ac-value"></select>
+				</label>
+				<label class="ac-field" data-for="bar pie stacked treemap heatmap combo" data-label="Aggregate">Aggregate
+					<select id="ac-agg">
+						<option value="">Sum (default)</option>
+						<option value="avg">Average</option>
+						<option value="min">Min</option>
+						<option value="max">Max</option>
+						<option value="count_distinct">Count distinct</option>
+						<option value="median">Median</option>
+						<option value="stdev">Std dev</option>
+						<option value="first">First</option>
+						<option value="last">Last</option>
+						<option value="range">Range</option>
+						<option value="p">Percentile&#x2026;</option>
+					</select>
+					<span class="ac-note">Count (no column needed) as the value counts rows instead.</span>
+				</label>
+				<label class="ac-field" data-for="bar pie stacked treemap heatmap combo" data-agg-for="p" data-label="Percentile">Percentile
+					<input id="ac-agg-p" type="number" min="1" max="100" step="1" value="95"
+					       title="Percentile level, 1 to 100" aria-label="Percentile level">
 				</label>
 				<label class="ac-field" data-for="line scatter heatmap combo" data-label="X column">X column
 					<select id="ac-x"></select>
@@ -700,6 +888,16 @@
 				<label class="ac-field" data-for="histogram" data-label="Bins">Bins
 					<input id="ac-bins" type="number" min="1" max="200" value="10">
 				</label>
+				<label class="ac-field" data-for="wordcloud" data-label="Text column">Text column
+					<select id="ac-wc-col"></select>
+					<span class="ac-note">The words in this column are counted once per row.</span>
+				</label>
+				<label class="ac-field" data-for="wordcloud" data-label="Words to show">Words to show
+					<input id="ac-wc-topn" type="number" min="1" max="500" step="1" value="50">
+				</label>
+				<label class="ac-field" data-for="wordcloud" data-label="Shortest word">Shortest word
+					<input id="ac-wc-minlen" type="number" min="1" max="64" step="1" value="3">
+				</label>
 				<label class="ac-field" data-for="map" data-label="Place column (optional)">Place column (optional)
 					<select id="ac-map-loc"></select>
 					<span class="ac-note">Or choose latitude and longitude below.</span>
@@ -710,9 +908,66 @@
 				<label class="ac-field" data-for="map" data-label="Longitude">Longitude
 					<select id="ac-map-lon"></select>
 				</label>
-				<label class="ac-field" data-for="table bar pie line scatter heatmap stacked combo treemap histogram map" data-label="Title (optional)">Title (optional)
+				<label class="ac-field" data-for="table bar pie line scatter heatmap stacked combo treemap histogram wordcloud map" data-label="Title (optional)">Title (optional)
 					<input id="ac-title-inp" type="text" maxlength="200" autocomplete="off">
 				</label>
+				[%- # A cross-row column belongs to one card, not to the page: a running
+				    # total on this card is not a running total on every card.  Inherit
+				    # is the default, and sending no plan at all is how a card says so.
+				-%]
+				<fieldset class="ac-cs" id="ac-cs-group">
+					<legend>Cross-row column</legend>
+					<label class="ac-field">This card
+						<select id="ac-cs-mode">
+							<option value="inherit">Uses the page's cross-row columns</option>
+							<option value="none">Has no cross-row column</option>
+							<option value="own">Has a column of its own</option>
+						</select>
+					</label>
+					<div id="ac-cs-fields" hidden>
+						<label class="ac-field">Number column
+							<select id="ac-cs-col"></select>
+						</label>
+						<label class="ac-field">Work out
+							<select id="ac-cs-fn">
+								[%- FOREACH fn IN cross_row_menu -%]
+								<option value="[% fn.name | html %]" data-arg="[% fn.arg %]" data-order="[% fn.order %]">[% fn.label | html %]</option>
+								[%- END -%]
+							</select>
+						</label>
+						<label class="ac-field" id="ac-cs-window-field" hidden>Window (rows)
+							<input id="ac-cs-window" type="number" min="1" max="100000" step="1" value="7">
+						</label>
+						<label class="ac-field">New column name
+							<input id="ac-cs-alias" type="text" maxlength="64" autocomplete="off" placeholder="e.g. running_total">
+						</label>
+						<label class="ac-field">Read rows in order of
+							<select id="ac-cs-order"></select>
+						</label>
+						<label class="ac-field">Direction
+							<select id="ac-cs-dir">
+								<option value="asc">Low to high</option>
+								<option value="desc">High to low</option>
+							</select>
+						</label>
+						<label class="ac-field">Restart for each
+							<select id="ac-cs-by"></select>
+						</label>
+						[%- # One column at a time is described above and put in the list below:
+						    # a card may carry several, and each one can be taken out again
+						    # before the card is added.  The order and the partition belong to
+						    # the plan rather than to one column, so they are read when the
+						    # card is added. -%]
+						<div class="ac-cs-addrow">
+							<button type="button" class="ac-cs-add" id="ac-cs-add">Add this column</button>
+							<span class="ac-note">The order and the partition above apply to every column in the list.</span>
+						</div>
+						<p class="ac-cs-list-title" id="ac-cs-list-title">Columns this card will carry</p>
+						<ul class="ac-cs-list" id="ac-cs-list" aria-labelledby="ac-cs-list-title"></ul>
+						<p class="ac-cs-empty" id="ac-cs-empty">No columns yet: the column described above is the one this card carries.</p>
+					</div>
+					<span class="ac-note">A cross-row column is worked out from the rows around each row: a running total, a moving average, a rank, a percent of total. It counts the rows this card shows.</span>
+				</fieldset>
 				<p class="ac-error" id="ac-error" role="alert" hidden></p>
 				<div class="ac-actions">
 					<button type="submit" class="ac-submit" id="ac-add-btn">Add to canvas</button>
@@ -745,6 +1000,68 @@
 			</div>
 		</form>
 	</div>
+	<!-- Editing a card's cross-row plan in place: the card keeps its place, its
+	     size and its title, and only the plan changes.  The list is the plan, as
+	     it is in Add current view, so a plan that names a column this canvas no
+	     longer has can be repaired one chip at a time. -->
+	<div class="ac-panel cs-edit-panel" id="cr-panel" role="dialog"
+	     aria-labelledby="cr-heading" hidden>
+		<h3 id="cr-heading">Cross-row columns</h3>
+		<p class="ac-help">Change the columns this card works out from the rows around each row. Its place on the canvas, its size and its title are kept, and it is redrawn where it is. Press a column's name to open it in the fields below and change it where it stands, rather than taking it out and adding it again. A column this card plots moves with the new name when the plan renames it; one the plan has lost for good is dropped from a card that lists its columns.</p>
+		<form id="cr-form">
+			<label class="ac-field">This card
+				<select id="cr-mode">
+					<option value="inherit">Uses the page's cross-row columns</option>
+					<option value="none">Has no cross-row column</option>
+					<option value="own">Has columns of its own</option>
+				</select>
+			</label>
+			<div id="cr-fields" hidden>
+				<p class="ac-cs-list-title" id="cr-list-title">Columns this card carries</p>
+				<ul class="ac-cs-list" id="cr-list" aria-labelledby="cr-list-title"></ul>
+				<p class="ac-cs-empty" id="cr-empty">No columns yet: add the one described below.</p>
+				<label class="ac-field">Number column
+					<select id="cr-col"></select>
+				</label>
+				<label class="ac-field">Work out
+					<select id="cr-fn">
+						[%- FOREACH fn IN cross_row_menu -%]
+						<option value="[% fn.name | html %]" data-arg="[% fn.arg %]" data-order="[% fn.order %]">[% fn.label | html %]</option>
+						[%- END -%]
+					</select>
+				</label>
+				<label class="ac-field" id="cr-window-field" hidden>Window (rows)
+					<input id="cr-window" type="number" min="1" max="100000" step="1" value="7">
+				</label>
+				<label class="ac-field">New column name
+					<input id="cr-alias" type="text" maxlength="64" autocomplete="off" placeholder="e.g. running_total">
+				</label>
+				<label class="ac-field">Read rows in order of
+					<select id="cr-order"></select>
+				</label>
+				<label class="ac-field">Direction
+					<select id="cr-dir">
+						<option value="asc">Low to high</option>
+						<option value="desc">High to low</option>
+					</select>
+				</label>
+				<label class="ac-field">Restart for each
+					<select id="cr-by"></select>
+				</label>
+				<div class="ac-cs-addrow">
+					<button type="button" class="ac-cs-add" id="cr-add">Add this column</button>
+					<button type="button" class="ac-cs-stop" id="cr-add-cancel" hidden>Stop editing</button>
+					<span class="ac-note">The order and the partition above apply to every column in this card's plan.</span>
+				</div>
+			</div>
+			<p class="ac-warning" id="cr-warning" role="status" hidden></p>
+			<p class="ac-error" id="cr-error" role="alert" hidden></p>
+			<div class="ac-actions">
+				<button type="submit" class="ac-submit" id="cr-save">Save columns</button>
+				<button type="button" id="cr-cancel">Cancel</button>
+			</div>
+		</form>
+	</div>
 	[% END %]
 	[% IF canvas_data_url.length %]
 	<a href="[% canvas_data_url | html %]" class="btn-add-visual" id="btn-add-visual"
@@ -762,6 +1079,30 @@
 		[% visuals.size %] visual[% visuals.size != 1 ? 's' : '' %]
 	</span>
 </div>
+
+[% IF canvas_range_cols.size %]
+<form class="param-bar canvas-range-bar" id="canvas-range-form" method="get"
+      action="/a/[% canvas_id | html %]">
+	[% FOREACH h IN canvas_range_hidden %]
+	<input type="hidden" name="[% h.name | html %]" value="[% h.value | html %]">
+	[% END %]
+	<label for="canvas-range-preset">Time range</label>
+	<select id="canvas-range-preset" name="range"
+	        title="Show only the rows inside a window worked out from today's date">
+		<option value="">&#x2014; no time range &#x2014;</option>
+		[% FOREACH rp IN time_range_presets %]
+		<option value="[% rp.name | html %]"[% IF canvas_time_range and canvas_time_range.name == rp.name %] selected[% END %]>[% rp.label | html %]</option>
+		[% END %]
+	</select>
+	<label for="canvas-range-col">of</label>
+	<select id="canvas-range-col" name="rcol">
+		[% FOREACH col IN canvas_range_cols %]
+		<option value="[% col | html %]"[% IF canvas_time_range and canvas_time_range.col == col %] selected[% END %]>[% col | html %]</option>
+		[% END %]
+	</select>
+	<button type="submit" class="btn-add-visual">Apply range</button>
+</form>
+[% END %]
 
 [% IF canvas_params.size %]
 <div class="param-bar" id="param-bar">
@@ -784,11 +1125,11 @@
 [% IF canvas_id.length && visuals.size %]
 <div class="canvas-hint" id="canvas-hint" hidden>
 	<p class="canvas-hint-text" id="canvas-hint-text">
-		<strong>Arrange this canvas:</strong> drag a visual by the
-		<span class="canvas-hint-grip" aria-hidden="true">::</span> handle in its header to move it
-		to another cell, and drag the grip in the card's bottom right corner to resize it.  Both
-		work from the keyboard as well: focus the header to move the visual, the corner grip
-		to resize it, and the Size menu in its header to set its width and height without a drag.
+		<strong>Arrange this canvas:</strong> drag a visual by its header to move it to another
+		cell, and drag the grip in the card's bottom right corner to resize it.  Both work from the
+		keyboard as well: focus the <span class="canvas-hint-grip" aria-hidden="true">::</span>
+		grip in the header to move the visual, the corner grip to resize it, and the Size menu in
+		its header to set its width and height without a drag.
 	</p>
 	<button type="button" class="canvas-hint-close" id="canvas-hint-close"
 	        aria-describedby="canvas-hint-text">&#x2715; Got it</button>
@@ -826,6 +1167,13 @@
 			        aria-haspopup="dialog" aria-expanded="false" aria-controls="me-panel"
 			        aria-label="Edit columns of [% v.title | html %]"
 			        title="Change the place or latitude/longitude columns">Edit columns</button>
+			[% END %]
+			[% IF canvas_id.length %]
+			<button type="button" class="visual-cs-btn"
+			        data-edit-cs="[% v.id %]"
+			        aria-haspopup="dialog" aria-expanded="false" aria-controls="cr-panel"
+			        aria-label="Edit cross-row columns of [% v.title | html %]"
+			        title="Change the columns this card works out from the rows around each row">Edit cross-row</button>
 			[% END %]
 			<span style="font-size:0.75rem;opacity:0.5;margin-left:0.5rem">[% v.kind | html %]</span>
 			[% IF canvas_id.length %]
@@ -886,13 +1234,25 @@
 </div>
 
 [% IF canvas_id.length %]
-<p class="sr-only" id="move-help">Move a visual: drag its header, or focus the header and use
-the arrow keys to move it one grid cell at a time.  Hold Shift with an arrow key to jump to the
-edge of the canvas in that direction.  The new position is saved as you go, and reads out as
-the column and row it was moved to, along with any visual the move pushed down.</p>
+<p class="sr-only" id="move-help">Move a visual: drag its header, or focus the grip at the
+left of the header and use the arrow keys to move it one grid cell at a time.  Hold Shift with
+an arrow key to jump to the edge of the canvas in that direction.  The new position is saved as
+you go, and reads out as the column and row it was moved to, along with any visual the move
+pushed down.</p>
 <p class="sr-only" id="canvas-live" role="status"></p>
-<p class="sr-only" id="cf-help">Filter by a chart mark: focus a bar, slice or point with
-Tab, then press Enter or Space to filter the canvas by its value.</p>
+[% # Two pages wear this id, and each gets its own paragraph: a drilled canvas
+   # answers one column, so telling its reader to press a mark to filter would
+   # be telling them about a page they are not on. -%]
+<p class="sr-only" id="cf-help">[% IF drill_name.length %]Filter the canvas by what it shows,
+one level at a time.  This canvas is drilled, so Tab to a mark on the
+[% drill_col | html %] column and press Enter or Space to go down a level, or to open its rows
+on the last level; marks and words on the other columns wait until the drill is cleared.  The
+drill path above the canvas says what the canvas is filtered by and clears it, and the card
+whose mark was used stays whole.[% ELSE %]Filter the canvas by what it shows.  Tab to a bar,
+tile, cell, slice or point and press Enter or Space to filter by its value, and that one filter
+replaces whatever the canvas was filtered by; or Tab to a word in a word-cloud card and press
+Enter to filter by the rows that contain it.  The card whose mark you used stays whole, and the
+chip above the canvas says what the rest is filtered by and clears it.[% END %]</p>
 [% END %]
 
 [% IF canvas_id.length %]
@@ -942,6 +1302,10 @@ menu, so it reads without the menu being opened.</p>
 	var grid         = document.getElementById('canvas-grid');
 	var anaId        = grid ? grid.getAttribute('data-canvas-id') : '';
 	var canvasColumns = [% canvas_columns_json || '[]' %];
+	/* The columns the page's own plan (cs=) produces, which a card that inherits
+	 * takes.  A card's own plan is not here: it is read from the API when its
+	 * panel opens. */
+	var pageAliases   = [% canvas_page_aliases_json || '[]' %];
 	var drillName  = grid ? (grid.getAttribute('data-drill-name')  || '') : '';
 	var drillLevel = grid ? parseInt(grid.getAttribute('data-drill-level') || '0', 10) : 0;
 	var drillMax   = grid ? parseInt(grid.getAttribute('data-drill-max')   || '0', 10) : 0;
@@ -1388,7 +1752,7 @@ menu, so it reads without the menu being opened.</p>
 		var st  = state || resizeState(card);
 		var sel = card.querySelector('.visual-size-select');
 
-		badge.textContent = st.w + ' × ' + st.h;
+		badge.textContent = st.w + ' \u00D7 ' + st.h;
 		badge.setAttribute('title', sel
 			? sizeSummary(sel, st.w, st.h)
 			: st.w + ' columns wide, ' + st.h + ' rows high');
@@ -1629,6 +1993,14 @@ menu, so it reads without the menu being opened.</p>
 	 */
 	function extractCfValue(d) {
 		if (d === undefined || d === null) return null;
+		/* A stacked segment's datum is a position in its group -- [row, column]
+		 * -- carrying the row it came from in .data, so the category has to be
+		 * read before the array is taken as the value: the array holds indexes,
+		 * and the first of them is why every segment used to filter by "0". */
+		if (d.data && typeof d.data === 'object' && !Array.isArray(d.data)
+				&& d.data.cat !== undefined) {
+			return String(d.data.cat);
+		}
 		if (Array.isArray(d) && d.length >= 1) {
 			var v = d[0];
 			return (v !== null && v !== undefined) ? String(v) : null;
@@ -1636,11 +2008,36 @@ menu, so it reads without the menu being opened.</p>
 		if (d.data) {
 			if (Array.isArray(d.data) && d.data.length >= 1) return String(d.data[0]);
 			if (d.data.label !== undefined)                   return String(d.data.label);
+			/* A treemap hands out a hierarchy node, and the category is the leaf
+			 * it names: the id is the whole path down the tree
+			 * ("Root/Gadget Pro"), so the part after the last slash is the tile. */
+			if (d.data.id !== undefined) {
+				var parts = String(d.data.id).split('/');
+				return parts[parts.length - 1] || null;
+			}
 		}
 		if (d.cat   !== undefined) return String(d.cat);
 		if (d.label !== undefined) return String(d.label);
 		if (d.x     !== undefined) return String(d.x);
 		return null;
+	}
+
+	/* The URL a cross-filter click asks for: one filter, replacing whatever
+	 * filter is in force, and the card that was clicked named as the source so
+	 * the server draws it in full and marks it.  Everything else in the query
+	 * string -- a bound parameter, a calculated column, a drill path -- is kept,
+	 * because a click on a mark says what to filter by, not what to forget.
+	 *
+	 * The value goes in as it is, because searchParams encodes what it is given:
+	 * encoding it here as well turned "Gadget Pro" into Gadget%2520Pro, and the
+	 * canvas then filtered for a value no row has. */
+	function cfUrl(cfCol, op, val, visId) {
+		var u = new URL(window.location.href);
+		u.searchParams.delete('cf');
+		u.searchParams.delete('cv');
+		u.searchParams.append('cf', cfCol + ':' + op + ':' + val);
+		u.searchParams.set('cv', visId);
+		return u;
 	}
 
 	function initCrossFilters(root) {
@@ -1652,15 +2049,55 @@ menu, so it reads without the menu being opened.</p>
 			var cfCol = card.getAttribute('data-cf-col');
 			var visId = card.getAttribute('data-visual');
 			if (!cfCol || visId === null) return;
+
+			/* A word-cloud card has no marks, so its words are the controls: a
+			 * word is a token inside a cell rather than the cell's value, so it
+			 * filters with contains and never drills -- a drill level is a value of
+			 * the drill column, and a word is not one.  The anchor's href already
+			 * asks for the same filter, so the card works without this handler;
+			 * what it adds is the rest of the query string and the undo step.
+			 *
+			 * Being drilled takes the words out of it: a mark on a column that is not
+			 * the drilled one does nothing, and a word never drills, so a word that
+			 * filtered here would leave the canvas filtered by something the drill
+			 * path has no chip to show or clear -- and #cf-help says the drill path
+			 * is what a drilled canvas is read and cleared by.  The anchor is left as
+			 * the word it shows, so nothing offers a press that does nothing. */
+			Array.prototype.forEach.call(
+				card.querySelectorAll('a.wordcloud-word[data-cf-value]'),
+				function (word) {
+					if (drillName) {
+						word.removeAttribute('href');
+						word.removeAttribute('aria-label');
+						word.removeAttribute('aria-describedby');
+						word.className += ' wordcloud-word-off';
+						return;
+					}
+					word.addEventListener('click', function (event) {
+						event.preventDefault();
+						pushUndo(window.location.search);
+						window.location.href = cfUrl(cfCol, 'contains',
+							word.getAttribute('data-cf-value'), visId).toString();
+					});
+				}
+			);
+
 			var svg = card.querySelector('svg');
 			if (!svg) return;
 			/* What a mark does, in the words the state it is in calls for: filter
 			 * normally, drill down when this is the drill column, and show the rows
-			 * at the deepest level. */
+			 * at the deepest level.
+			 *
+			 * A drilled canvas answers one column.  On any other card the mark is
+			 * left as it is drawn -- no tab order, no role, no label -- because
+			 * applyCf ignores the press: a control labelled "Drill into product: X"
+			 * that does nothing is a worse lie than a chart that says nothing, and
+			 * #cf-help says the other columns wait for the drill to be cleared. */
 			function cfLabel(d) {
 				var val = extractCfValue(d);
 				if (val === null || val === '') return null;
-				if (drillName && cfCol === drillCol && drillLevel >= drillMax) {
+				if (drillName && cfCol !== drillCol) return null;
+				if (drillName && drillLevel >= drillMax) {
 					return 'Show rows for ' + cfCol + ': ' + val;
 				}
 				return (drillName ? 'Drill into ' : 'Filter by ') + cfCol + ': ' + val;
@@ -1684,35 +2121,47 @@ menu, so it reads without the menu being opened.</p>
 					u.searchParams.delete('cv');
 					u.searchParams.delete('dl');
 					u.searchParams.set('dl', drillLevel + 1);
-					u.searchParams.append('cf', drillCol + ':eq:' + encodeURIComponent(val));
+					u.searchParams.append('cf', drillCol + ':eq:' + val);
 					pushUndo(window.location.search);
 					window.location.href = u.toString();
 				} else if (!drillName) {
 					/* Normal cross-filter mode: replace any existing filter. */
-					u.searchParams.delete('cf');
-					u.searchParams.delete('cv');
-					u.searchParams.append('cf', cfCol + ':eq:' + encodeURIComponent(val));
-					u.searchParams.set('cv', visId);
 					pushUndo(window.location.search);
-					window.location.href = u.toString();
+					window.location.href = cfUrl(cfCol, 'eq', val, visId).toString();
 				}
 				/* drillName set but cfCol !== drillCol: ignore the choice. */
 			}
 
 			/* The marks are the controls, so they are in the tab order and say what
 			 * they do.  A mark with no value to filter by is not a control and is
-			 * left out of both the tab order and the accessibility tree's buttons. */
+			 * left out of both the tab order and the accessibility tree's buttons.
+			 *
+			 * attr() callbacks are given the datum first: unlike an event listener,
+			 * which is called with the event and then the datum, an attribute is
+			 * worked out from the datum alone.  Reading the datum from the second
+			 * argument here gives every mark the index instead -- a number with no
+			 * label and no value -- so the marks came out unlabelled and out of the
+			 * tab order while still answering a click, which is what #cf-help
+			 * promises they do not do. */
+			/* The shapes each snippet draws its marks as.  A pie puts the class on
+			 * the group around each slice and the point classes are named per chart
+			 * (cc-dot on a combo, msl-dot on a multi-series line, sc-circle on a
+			 * scatter), so the list names what is drawn rather than one class that
+			 * every snippet would have to share -- and it names the marks only: a
+			 * line series path carries the whole data set as its datum, and making
+			 * that a control would offer to filter by "[object Object]". */
 			var marks = d3.select(svg)
-				.selectAll('rect, path.arc, path.slice, circle.dot, g.bar > rect');
+				.selectAll('rect, g.arc > path, path.slice, g.bar > rect,'
+					+ ' circle.dot, circle.cc-dot, circle.msl-dot, circle.sc-circle');
 			marks
-				.attr('tabindex', function (event, d) {
+				.attr('tabindex', function (d) {
 					return cfLabel(d) === null ? null : 0;
 				})
-				.attr('role', function (event, d) {
+				.attr('role', function (d) {
 					return cfLabel(d) === null ? null : 'button';
 				})
-				.attr('aria-label', function (event, d) { return cfLabel(d); })
-				.attr('aria-describedby', function (event, d) {
+				.attr('aria-label', function (d) { return cfLabel(d); })
+				.attr('aria-describedby', function (d) {
 					return cfLabel(d) === null ? null : 'cf-help';
 				})
 				.on('click.cf', applyCf)
@@ -1774,7 +2223,7 @@ menu, so it reads without the menu being opened.</p>
 			var name = btnDeleteCanvas.getAttribute('data-canvas-name') || 'this canvas';
 			if (!confirm('Delete canvas "' + name + '"?\n\nThis cannot be undone.')) return;
 			btnDeleteCanvas.disabled = true;
-			btnDeleteCanvas.textContent = 'Deleting…';
+			btnDeleteCanvas.textContent = 'Deleting\u2026';
 			fetch('/api/analyses/[% canvas_id | uri %]', { method: 'DELETE' })
 				.then(function (r) {
 					if (r.ok) {
@@ -2008,11 +2457,29 @@ menu, so it reads without the menu being opened.</p>
 		var catSel   = document.getElementById('ac-cat');
 		var seriesSel = document.getElementById('ac-series');
 		var valueSel = document.getElementById('ac-value');
+		var aggSel   = document.getElementById('ac-agg');
+		var pctInp   = document.getElementById('ac-agg-p');
 		var xSel     = document.getElementById('ac-x');
 		var ySel     = document.getElementById('ac-y');
 		var barSel   = document.getElementById('ac-bar-value');
 		var lineSel  = document.getElementById('ac-line-value');
 		var histSel  = document.getElementById('ac-hist-col');
+		var wcColSel = document.getElementById('ac-wc-col');
+		var wcTopnInp = document.getElementById('ac-wc-topn');
+		var wcMinlenInp = document.getElementById('ac-wc-minlen');
+		var csModeSel  = document.getElementById('ac-cs-mode');
+		var csFields   = document.getElementById('ac-cs-fields');
+		var csColSel   = document.getElementById('ac-cs-col');
+		var csFnSel    = document.getElementById('ac-cs-fn');
+		var csWinField = document.getElementById('ac-cs-window-field');
+		var csWinInp   = document.getElementById('ac-cs-window');
+		var csAliasInp = document.getElementById('ac-cs-alias');
+		var csOrderSel = document.getElementById('ac-cs-order');
+		var csDirSel   = document.getElementById('ac-cs-dir');
+		var csBySel    = document.getElementById('ac-cs-by');
+		var csAddBtn   = document.getElementById('ac-cs-add');
+		var csList     = document.getElementById('ac-cs-list');
+		var csEmpty    = document.getElementById('ac-cs-empty');
 		var mapLocSel = document.getElementById('ac-map-loc');
 		var mapLatSel = document.getElementById('ac-map-lat');
 		var mapLonSel = document.getElementById('ac-map-lon');
@@ -2044,7 +2511,7 @@ menu, so it reads without the menu being opened.</p>
 		var allCols = canvasColumns.map(function (c) { return { value: c.name }; });
 		var numCols = canvasColumns.filter(function (c) { return c.numeric; })
 			.map(function (c) { return { value: c.name }; });
-		var choose   = [{ value: '', label: 'Choose a column…' }];
+		var choose   = [{ value: '', label: 'Choose a column\u2026' }];
 		var countOpt = [{ value: '__count__', label: 'Count (no column needed)' }];
 
 		fill(tableSel, allCols);
@@ -2056,14 +2523,265 @@ menu, so it reads without the menu being opened.</p>
 		fill(barSel, choose.concat(numCols));
 		fill(lineSel, choose.concat(numCols));
 		fill(histSel, choose.concat(numCols));
+		fill(wcColSel, choose.concat(allCols));
+		fill(csColSel, choose.concat(numCols));
+		/* The two optional columns say "none" first, because a partition and a
+		 * read order are choices a cross-row column can do without. */
+		fill(csOrderSel,
+			[{ value: '', label: '\u2014 none \u2014' }].concat(allCols));
+		fill(csBySel,
+			[{ value: '', label: '\u2014 the whole view \u2014' }].concat(allCols));
 		fill(mapLocSel, choose.concat(allCols));
 		fill(mapLatSel, choose.concat(numCols));
 		fill(mapLonSel, choose.concat(numCols));
 
+		/* The views whose value column is aggregated, and so the only ones that
+		 * can use an aggregate function of their own. */
+		var AGG_KINDS = { bar: 1, pie: 1, stacked: 1, treemap: 1, heatmap: 1, combo: 1 };
+
+		/* A percentile is written into the function name -- p95 -- because a card
+		 * stores one key for its aggregate, as a pivot measure does.  Reading the
+		 * level back clamps it, so the panel cannot build a name the server would
+		 * have to refuse. */
+		function percentileLevel(input) {
+			var n = parseInt(input.value, 10);
+			if (!isFinite(n)) return 95;
+			return Math.min(100, Math.max(1, n));
+		}
+
+		function aggregateValue(kind) {
+			if (!aggSel || !AGG_KINDS[kind]) return '';
+			if (aggSel.value === 'p') return 'p' + percentileLevel(pctInp);
+			return aggSel.value;   /* '' is the default: sum, or count rows */
+		}
+
+		/* ---- the card's own cross-row columns ----
+		 *
+		 * The page's cs= belongs to the page.  A card either inherits it, has
+		 * none (so a canvas full of running totals can hold one card of raw
+		 * numbers), or brings a plan of its own, which the server stores as
+		 * { cs, by, order } on the visual and validates against the columns
+		 * every time the card is drawn.
+		 *
+		 * A plan is a list, so the fields describe one column at a time and Add
+		 * this column puts it in csSpecs, which is drawn as a removable chip per
+		 * column.  The list is what the card carries: what is on screen is what
+		 * is sent, and nothing is taken out of it behind the reader's back.  With
+		 * no list at all the fields themselves are the single column, so one
+		 * column needs no second click.
+		 */
+		var csAliasTouched = false;
+		var csSpecs = [];   /* { spec, alias, label, needsOrder } */
+
+		function csMeta() {
+			var opt = csFnSel ? csFnSel.options[csFnSel.selectedIndex] : null;
+			return {
+				arg:   !!opt && opt.getAttribute('data-arg')   === '1',
+				order: !!opt && opt.getAttribute('data-order') === '1',
+			};
+		}
+
+		/* A column name has to be usable in a URL and as a column, and the
+		 * column it comes from may hold anything at all ("Unit price ($)"), so
+		 * the suggestion is reduced to letters, digits and underscores. */
+		function csSlug(text) {
+			var s = String(text || '').toLowerCase()
+				.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+			if (!s) return 'value';
+			if (/^[0-9]/.test(s)) s = 'c_' + s;
+			return s;
+		}
+
+		/* A name a column of the view already has, or one already in the list,
+		 * cannot be used again: the pass refuses a name that shadows a column, and
+		 * two entries under one name would show one column where the reader asked
+		 * for two. */
+		function csAliasTaken(alias) {
+			for (var i = 0; i < csSpecs.length; i++) {
+				if (csSpecs[i].alias === alias) return true;
+			}
+			for (var j = 0; j < canvasColumns.length; j++) {
+				if (canvasColumns[j].name === alias) return true;
+			}
+			return false;
+		}
+
+		function csSuggestion() {
+			if (!csColSel.value) return '';
+			var base  = csSlug(csColSel.value + '_' + csFnSel.value);
+			var alias = base;
+			var n     = 1;
+			while (csAliasTaken(alias)) alias = base + '_' + (++n);
+			return alias;
+		}
+
+		function syncCs() {
+			if (!csModeSel || !csFields) return;
+			csFields.hidden = csModeSel.value !== 'own';
+			if (csFields.hidden) return;
+			var m = csMeta();
+			csWinField.hidden = !m.arg;
+			if (!csAliasTouched) csAliasInp.value = csSuggestion();
+		}
+
+		if (csModeSel) {
+			csModeSel.addEventListener('change', syncCs);
+			csColSel.addEventListener('change', syncCs);
+			csFnSel.addEventListener('change', syncCs);
+			csAliasInp.addEventListener('input', function () { csAliasTouched = true; });
+		}
+
+		/* The column the fields describe, or undefined after saying what is
+		 * missing.  The window and the name belong to the column; the order and
+		 * the partition belong to the plan, so they are read when the card is
+		 * added. */
+		function csDraft() {
+			var col = picked(csColSel, 'number column');
+			if (!col) return undefined;
+
+			var alias = (csAliasInp.value || '').replace(/^\s+|\s+$/g, '');
+			if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(alias)) {
+				setError('Name the new column with letters, digits and underscores, starting with a letter or underscore.');
+				csAliasInp.focus();
+				return undefined;
+			}
+			if (csAliasTaken(alias)) {
+				setError('"' + alias + '" is already a column here. Give this one a name of its own.');
+				csAliasInp.focus();
+				return undefined;
+			}
+
+			var m    = csMeta();
+			var spec = col + ':' + csFnSel.value + ':' + alias;
+			if (m.arg) {
+				var win = parseInt(csWinInp.value, 10);
+				if (!(win > 0)) {
+					setError('A moving total needs a window of at least one row.');
+					csWinInp.focus();
+					return undefined;
+				}
+				spec += ':' + win;
+			}
+
+			var fn = csFnSel.options[csFnSel.selectedIndex];
+			return {
+				spec       : spec,
+				alias      : alias,
+				label      : (fn ? fn.textContent : csFnSel.value) + '(' + col + ') as ' + alias,
+				needsOrder : m.order,
+			};
+		}
+
+		/* The list as the reader sees it: one chip per column, each with its own
+		 * way out.  Redrawn from csSpecs rather than patched, so a chip cannot
+		 * disagree with what the card will be sent. */
+		function renderCsList() {
+			csList.innerHTML = '';
+			csEmpty.hidden = csSpecs.length > 0;
+			csSpecs.forEach(function (entry, index) {
+				var li = document.createElement('li');
+				li.className = 'ac-cs-chip';
+				li.setAttribute('data-spec', entry.spec);
+
+				var text = document.createElement('span');
+				text.className = 'ac-cs-chip-text';
+				text.textContent = entry.label;
+
+				var remove = document.createElement('button');
+				remove.type = 'button';
+				remove.className = 'ac-cs-remove';
+				remove.setAttribute('data-index', String(index));
+				remove.setAttribute('aria-label', 'Remove ' + entry.label);
+				remove.setAttribute('title', 'Remove this column');
+				remove.textContent = '\u00d7';
+
+				li.appendChild(text);
+				li.appendChild(remove);
+				csList.appendChild(li);
+			});
+		}
+
+		if (csAddBtn) {
+			csAddBtn.addEventListener('click', function () {
+				setError('');
+				var draft = csDraft();
+				if (!draft) return;
+				csSpecs.push(draft);
+				/* The next column starts with a name of its own: leaving the old one
+				 * in the box would suggest a name already in the list. */
+				csAliasTouched = false;
+				csAliasInp.value = '';
+				renderCsList();
+				syncCs();
+				csAddBtn.focus();
+			});
+		}
+
+		/* Removing one is a click on its own chip.  Focus goes to the chip that
+		 * takes its place, or back to the fields once the list is empty, so a
+		 * reader taking several out never loses the keyboard. */
+		if (csList) {
+			csList.addEventListener('click', function (event) {
+				var target = event.target;
+				while (target && target !== csList
+						&& !(target.classList && target.classList.contains('ac-cs-remove'))) {
+					target = target.parentNode;
+				}
+				if (!target || target === csList) return;
+				event.preventDefault();
+				var index = parseInt(target.getAttribute('data-index'), 10);
+				if (!(index >= 0)) return;
+				csSpecs.splice(index, 1);
+				renderCsList();
+				setError('');
+				var buttons = csList.querySelectorAll('.ac-cs-remove');
+				if (buttons.length) buttons[Math.min(index, buttons.length - 1)].focus();
+				else if (csColSel) csColSel.focus();
+			});
+		}
+
+		/* The plan as the visual stores it, or null for "inherit the page".
+		 * The list is the plan, and an empty list means the fields are the one
+		 * column, so the single-column case needs no second click.  A reader's
+		 * mistake is reported in the panel, not left to the server: a stream
+		 * function cannot read rows without an order. */
+		function crossRowPlan() {
+			if (!csModeSel || csModeSel.value === 'inherit') return null;
+			if (csModeSel.value !== 'own') return {};   /* none: an empty plan */
+
+			var entries = csSpecs.slice();
+			if (!entries.length) {
+				var draft = csDraft();
+				if (!draft) return undefined;
+				entries.push(draft);
+			}
+
+			for (var i = 0; i < entries.length; i++) {
+				if (entries[i].needsOrder && !csOrderSel.value) {
+					setError('"' + entries[i].label + '" reads the rows in an order: choose the column to read them in order of.');
+					csOrderSel.focus();
+					return undefined;
+				}
+			}
+
+			var plan = { cs: entries.map(function (entry) { return entry.spec; }) };
+			if (csOrderSel.value) {
+				plan.order = [csOrderSel.value + (csDirSel.value === 'desc' ? ':desc' : '')];
+			}
+			if (csBySel.value) plan.by = csBySel.value;
+			return plan;
+		}
+
 		function syncFields() {
 			var kind = kindSel.value;
+			var agg  = aggSel ? aggSel.value : '';
 			Array.prototype.forEach.call(panel.querySelectorAll('.ac-field[data-for]'), function (field) {
-				field.hidden = field.getAttribute('data-for').split(/\s+/).indexOf(kind) < 0;
+				var shown = field.getAttribute('data-for').split(/\s+/).indexOf(kind) >= 0;
+				/* A field may also depend on the aggregate: the percentile level
+				 * is wanted only while Percentile is the chosen function. */
+				var only = field.getAttribute('data-agg-for');
+				if (shown && only && agg !== only) shown = false;
+				field.hidden = !shown;
 			});
 		}
 
@@ -2110,6 +2828,7 @@ menu, so it reads without the menu being opened.</p>
 			if (!panel.hidden) positionPanel();
 		}, { passive: true });
 		kindSel.addEventListener('change', syncFields);
+		if (aggSel) aggSel.addEventListener('change', syncFields);
 		cancelBtn.addEventListener('click', function () { closePanel(1); });
 		panel.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape') { e.preventDefault(); closePanel(1); }
@@ -2141,7 +2860,7 @@ menu, so it reads without the menu being opened.</p>
 			table: 'Table', bar: 'Bar chart', pie: 'Pie chart', line: 'Line chart',
 			graph: 'Line chart', scatter: 'Scatter chart', heatmap: 'Heatmap',
 			stacked: 'Stacked bar chart', combo: 'Combo chart', treemap: 'Treemap',
-			histogram: 'Histogram', map: 'Map',
+			histogram: 'Histogram', wordcloud: 'Word cloud', map: 'Map',
 		};
 
 		/* Which library draws a card, so a card whose CDN copy did not load can
@@ -2237,6 +2956,17 @@ menu, so it reads without the menu being opened.</p>
 					title: 'Change the place or latitude/longitude columns',
 				}, 'Edit columns'));
 			}
+			/* Every card on a saved canvas can have its cross-row plan repaired
+			 * in place, whatever its kind: the plan is stored data, not a
+			 * property of the view. */
+			header.appendChild(element('button', {
+				'class': 'visual-cs-btn', type: 'button',
+				'data-edit-cs': String(idx),
+				'aria-haspopup': 'dialog', 'aria-expanded': 'false',
+				'aria-controls': 'cr-panel',
+				'aria-label': 'Edit cross-row columns of ' + title,
+				title: 'Change the columns this card works out from the rows around each row',
+			}, 'Edit cross-row'));
 
 			var kind = element('span', null, json.kind || '');
 			kind.style.fontSize = '0.75rem';
@@ -2452,7 +3182,7 @@ menu, so it reads without the menu being opened.</p>
 					opt.textContent = label;
 					sel.appendChild(opt);
 				};
-				add('', 'Choose a column…');
+				add('', 'Choose a column\u2026');
 				columns.forEach(function (name) { add(name, name); });
 				/* A saved column is offered even when the sampler did not call
 				 * it numeric: the server, not this list, decides what a
@@ -2500,7 +3230,7 @@ menu, so it reads without the menu being opened.</p>
 				editLoaded = false;
 				editSave.disabled = true;
 				editSave.textContent = 'Save columns';
-				editLoc.innerHTML = '<option value="">Loading…</option>';
+				editLoc.innerHTML = '<option value="">Loading\u2026</option>';
 				editLat.innerHTML = '';
 				editLon.innerHTML = '';
 				editSetError('');
@@ -2528,7 +3258,7 @@ menu, so it reads without the menu being opened.</p>
 					})
 					.catch(function () {
 						if (editTarget && editTarget.card === card) {
-							editSetError('Could not read the card’s columns. Check the connection and try again.');
+							editSetError('Could not read the card\u2019s columns. Check the connection and try again.');
 						}
 					});
 			};
@@ -2574,7 +3304,7 @@ menu, so it reads without the menu being opened.</p>
 
 				var target = editTarget;
 				editSave.disabled = true;
-				editSave.textContent = 'Saving…';
+				editSave.textContent = 'Saving\u2026';
 
 				fetch('/api/analyses/' + encodeURIComponent(anaId) + '/visuals/' + target.index, {
 					method  : 'PATCH',
@@ -2634,6 +3364,861 @@ menu, so it reads without the menu being opened.</p>
 			});
 		}
 
+		/* ---- editing a card's cross-row plan in place ----
+		 *
+		 * A card's plan is stored data like its columns, so it is repaired where
+		 * the card is: the header button opens this panel with the plan the server
+		 * holds, the reader changes the list of columns, and one PATCH replaces the
+		 * plan while the place in the layout, the size and the title stay.  The
+		 * list is the plan, as it is in Add current view, because a plan that names
+		 * a column this canvas no longer has has to be fixable one chip at a time
+		 * rather than rebuilt from nothing.
+		 */
+		var crPanel    = document.getElementById('cr-panel');
+		var crForm     = document.getElementById('cr-form');
+		var crMode     = document.getElementById('cr-mode');
+		var crFields   = document.getElementById('cr-fields');
+		var crList     = document.getElementById('cr-list');
+		var crEmpty    = document.getElementById('cr-empty');
+		var crCol      = document.getElementById('cr-col');
+		var crFn       = document.getElementById('cr-fn');
+		var crWinField = document.getElementById('cr-window-field');
+		var crWin      = document.getElementById('cr-window');
+		var crAlias    = document.getElementById('cr-alias');
+		var crOrder    = document.getElementById('cr-order');
+		var crDir      = document.getElementById('cr-dir');
+		var crBy       = document.getElementById('cr-by');
+		var crAdd      = document.getElementById('cr-add');
+		var crSave     = document.getElementById('cr-save');
+		var crCancel   = document.getElementById('cr-cancel');
+		var crStop     = document.getElementById('cr-add-cancel');
+		var crError    = document.getElementById('cr-error');
+		var crWarning  = document.getElementById('cr-warning');
+
+		if (crPanel && crForm && crMode && crFields && crList && crCol && crFn
+				&& crOrder && crBy && crSave && crError) {
+			var crTarget = null;    /* { card, btn, index } */
+			var crLoaded = false;
+			var crSpecs  = [];      /* { spec, alias, label, needsOrder } */
+			/* The columns this card plots that a plan makes: the names its encode
+			 * points at that its plan produces.  Renaming one of those leaves the
+			 * plot pointing at a column no card has. */
+			var crPlotted = [];
+			/* The card's columns, when it holds them as a list -- a table does, a
+			 * chart names one column per job.  A list is what a stranded column can
+			 * be taken off, so a repair the server would refuse becomes one save. */
+			var crCardColumns = null;
+			var crCardEncode  = null;   /* the card's encode, as it was opened */
+			/* The aliases of the plan the card had when it was opened, in order:
+			 * a chip renamed where it stands is the same column under a new name,
+			 * and this is what says which new name belongs to which old one. */
+			var crPlanSaved = null;
+			var crTouched = false;  /* the name box has been edited */
+			var crEditing = -1;     /* the chip the fields are describing, or -1 */
+			/* The order the card had when it was opened.  A plan may read rows in
+			 * more than one order (a URL can say order=a&order=b); the selects
+			 * hold one column each, so an untouched multi-entry order is written
+			 * back whole rather than cut down to what the panel can show. */
+			var crOrderSaved = [];
+			var crOrderShown = null;
+
+			var crSetError = function (message) {
+				crError.textContent = message || '';
+				crError.hidden = !message;
+			};
+
+			/* The columns of a re-drawn card are replaced in place, so the title
+			 * the response names has to reach the controls that speak it too; and
+			 * the card's own <script> has to be re-created to run, as an appended
+			 * card's is.  Both are local because this panel stands on its own: it
+			 * needs nothing from the panel that adds cards. */
+			var crSetTitle = function (card, title) {
+				var titleEl = card.querySelector('.visual-card-title');
+				if (titleEl) titleEl.textContent = title;
+				var handle = card.querySelector('.drag-handle');
+				if (handle) handle.setAttribute('aria-label', 'Move ' + title);
+				var size = card.querySelector('.visual-size-select');
+				if (size) size.setAttribute('aria-label', 'Size of ' + title);
+				var dl = card.querySelector('.visual-dl-btn');
+				if (dl) dl.setAttribute('data-title', title);
+			};
+
+			var crRunScripts = function (card) {
+				Array.prototype.slice.call(card.querySelectorAll('script')).forEach(function (old) {
+					var script = document.createElement('script');
+					Array.prototype.forEach.call(old.attributes, function (attr) {
+						script.setAttribute(attr.name, attr.value);
+					});
+					script.textContent = old.textContent;
+					old.parentNode.replaceChild(script, old);
+				});
+			};
+
+			/* A column name has to be usable in a URL and as a column, and the
+			 * column it comes from may hold anything at all, so the suggestion is
+			 * reduced to letters, digits and underscores. */
+			var crSlug = function (text) {
+				var s = String(text || '').toLowerCase()
+					.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+				if (!s) return 'value';
+				if (/^[0-9]/.test(s)) s = 'c_' + s;
+				return s;
+			};
+
+			var crFill = function (sel, names, placeholder, selected) {
+				if (!sel) return;
+				sel.innerHTML = '';
+				var seen = {};
+				var add = function (value, label) {
+					if (seen[value]) return;
+					seen[value] = 1;
+					var opt = document.createElement('option');
+					opt.value = value;
+					opt.textContent = label;
+					sel.appendChild(opt);
+				};
+				if (placeholder) add('', placeholder);
+				names.forEach(function (name) { add(name, name); });
+				/* A saved value is offered even when the sampler no longer lists
+				 * it: the plan may name anything the canvas has, and hiding the
+				 * value it holds would make a plan that needs repairing look like
+				 * one that never named it. */
+				if (selected && !seen[selected]) add(selected, selected);
+				sel.value = selected || '';
+			};
+
+			var crFnOption = function (fn) {
+				for (var i = 0; i < crFn.options.length; i++) {
+					if (crFn.options[i].value === fn) return crFn.options[i];
+				}
+				return null;
+			};
+
+			var crMeta = function () {
+				var opt = crFnOption(crFn.value);
+				return {
+					arg:   !!opt && opt.getAttribute('data-arg')   === '1',
+					order: !!opt && opt.getAttribute('data-order') === '1',
+				};
+			};
+
+			/* A column keeps its own name while it is being edited: the chip the
+			 * fields describe is not a clash with itself. */
+			var crAliasTaken = function (alias) {
+				for (var i = 0; i < crSpecs.length; i++) {
+					if (i === crEditing) continue;
+					if (crSpecs[i].alias === alias) return true;
+				}
+				for (var j = 0; j < canvasColumns.length; j++) {
+					if (canvasColumns[j].name === alias) return true;
+				}
+				return false;
+			};
+
+			/* One stored spec, as a chip: col:fn:name[:arg] is all it says, so the
+			 * function's own label is read back out of the menu it came from. */
+			var crSpecEntry = function (spec) {
+				var parts = String(spec).split(':');
+				var opt   = crFnOption(parts[1] || '');
+				return {
+					spec       : String(spec),
+					alias      : parts[2] || '',
+					label      : (opt ? opt.textContent : (parts[1] || ''))
+						+ '(' + (parts[0] || '') + ') as ' + (parts[2] || ''),
+					needsOrder : !!opt && opt.getAttribute('data-order') === '1',
+				};
+			};
+
+			/* A plan's columns are the names it produces, which is the third field
+			 * of col:fn:alias[:arg]. */
+			var crAliases = function (specs) {
+				return (specs || []).map(function (spec) {
+					return String(spec).split(':')[2] || '';
+				}).filter(function (alias) { return alias; });
+			};
+
+			/* Every column name the card's encode points at, in the order it reads
+			 * them: a table names its columns in a list, a chart in a field each. */
+			var crPlots = function (encode) {
+				var names = [];
+				var add = function (value) {
+					if (typeof value === 'string' && value && names.indexOf(value) < 0) {
+						names.push(value);
+					}
+				};
+				for (var key in encode) {
+					if (!Object.prototype.hasOwnProperty.call(encode, key)) continue;
+					/* The one field whose value is a function rather than a column:
+					 * a plan's column may be called "sum" without this reading the
+					 * aggregate as a plot of it. */
+					if (key === 'agg') continue;
+					if (Array.isArray(encode[key])) encode[key].forEach(add);
+					else                           add(encode[key]);
+				}
+				return names;
+			};
+
+			/* The plotted columns a plan makes.  Only those: a column the data has
+			 * is not a plan's to rename, so nothing here depends on the sampler.
+			 * A card with no plan of its own plots the page's columns. */
+			var crColumnPlots = function (encode, planSpecs) {
+				var made = (planSpecs === null) ? pageAliases : crAliases(planSpecs);
+				return crPlots(encode).filter(function (name) {
+					return made.indexOf(name) >= 0;
+				});
+			};
+
+			/* A list as a sentence: "a", "a" and "b", "a", "b" and "c". */
+			var crJoin = function (items) {
+				if (items.length < 2) return items.join('');
+				return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+			};
+
+			var crNameList = function (names) {
+				return crJoin(names.map(function (name) { return '"' + name + '"'; }));
+			};
+
+			var crRenameText = function (names) {
+				return 'This card plots ' + crNameList(names) + ', and this plan no longer makes '
+					+ (names.length === 1 ? 'that column' : 'those columns') + '.';
+			};
+
+			/* What the plan the panel would save makes.  A card that takes the
+			 * page's plan takes the cs= the page was opened with; one that runs no
+			 * plan makes nothing. */
+			var crProduced = function (specs) {
+				if (crMode.value === 'inherit') return pageAliases.slice();
+				if (crMode.value !== 'own')     return [];
+				var list = specs || crSpecs.map(function (entry) { return entry.spec; });
+				return crAliases(list);
+			};
+
+			var crUnmadePlots = function (specs) {
+				var made = crProduced(specs);
+				return crPlotted.filter(function (name) {
+					return made.indexOf(name) < 0;
+				});
+			};
+
+			/* The stranded columns the card can do without: the ones its column
+			 * list holds.  A column the card is drawn from rather than listed --
+			 * a bar's value, a line's y -- is not one of those: taking it away
+			 * would leave the chart with nothing to draw. */
+			var crDroppable = function (names) {
+				if (!crCardColumns) return [];
+				return names.filter(function (name) {
+					return crCardColumns.indexOf(name) >= 0;
+				});
+			};
+
+			var crDropText = function (names) {
+				return crRenameText(names) + ' Save the plan and take '
+					+ (names.length === 1 ? 'that column' : 'those columns')
+					+ ' off this card, so it is drawn without '
+					+ (names.length === 1 ? 'it' : 'them') + '?';
+			};
+
+			/* Old name -> new name, for the columns the plan has renamed rather
+			 * than lost.  A chip changed where it stands is the same column and
+			 * the same function under another name, so the card can go on plotting
+			 * it; a chip taken out, or changed into a different column, is not a
+			 * rename and is left to the drop-and-save path instead. */
+			var crRenames = function (specs) {
+				var was  = crPlanSaved || [];
+				var next = specs || crSpecs.map(function (entry) { return entry.spec; });
+				var map  = {};
+				if (was.length !== next.length) return map;
+				for (var i = 0; i < was.length; i++) {
+					var before = String(was[i]).split(':');
+					var after  = String(next[i]).split(':');
+					if ((before[0] || '') !== (after[0] || '')) continue;
+					if ((before[1] || '') !== (after[1] || '')) continue;
+					if (!after[2] || before[2] === after[2]) continue;
+					if (before[2]) map[before[2]] = after[2];
+				}
+				return map;
+			};
+
+			var crFollowText = function (names, renames) {
+				return 'This card plots ' + crNameList(names) + ', which this plan now makes as '
+					+ crJoin(names.map(function (name) { return '"' + renames[name] + '"'; }))
+					+ ', so the card moves with it.';
+			};
+
+			/* Said while the name can still be put back, not after the card has
+			 * been drawn against a column nothing makes.  Three answers, said in
+			 * the order they are likelier: a renamed column the card follows, a
+			 * column taken out of a list the card can drop, and one there is no
+			 * honest answer for. */
+			var crWarnRenames = function (specs) {
+				var missing = crUnmadePlots(specs);
+				if (!missing.length) {
+					crWarning.textContent = '';
+					crWarning.hidden = true;
+					return missing;
+				}
+
+				var renames  = crRenames(specs);
+				var renamed  = missing.filter(function (name) { return !!renames[name]; });
+				var stranded = missing.filter(function (name) { return !renames[name]; });
+				var drop     = crDroppable(stranded);
+
+				var text = stranded.length ? crRenameText(missing)
+					: crFollowText(renamed, renames);
+				if (stranded.length) {
+					text += drop.length === stranded.length
+						? ' Keep the name, or save and drop '
+							+ (stranded.length === 1 ? 'it' : 'them') + ' from this card\u2019s columns.'
+						: ' Keep the name, or the repair will be refused.';
+				}
+
+				crWarning.textContent = text;
+				crWarning.hidden = false;
+				return missing;
+			};
+
+			/* The card's encoding with a renamed column followed: every place the
+			 * old name is read as a column -- a table's list, a bar's value, a
+			 * line's y -- reads the new one instead.  The aggregate is left alone
+			 * because it is a function name, not a column. */
+			var crRenamedEncode = function (follow, drop) {
+				var map = {};
+				follow.forEach(function (pair) { map[pair[0]] = pair[1]; });
+
+				var rename = function (value) {
+					return (typeof value === 'string' && map[value]) ? map[value] : value;
+				};
+
+				var encode = {};
+				for (var key in crCardEncode) {
+					if (!Object.prototype.hasOwnProperty.call(crCardEncode, key)) continue;
+					var value = crCardEncode[key];
+					if (key === 'agg') {
+						encode[key] = value;
+					} else if (Array.isArray(value)) {
+						encode[key] = value.map(rename).filter(function (name) {
+							return drop.indexOf(name) < 0;
+						});
+					} else {
+						encode[key] = rename(value);
+					}
+				}
+				return encode;
+			};
+
+			var crRenderList = function () {
+				crList.innerHTML = '';
+				crEmpty.hidden = crSpecs.length > 0;
+				crSpecs.forEach(function (entry, index) {
+					var li = document.createElement('li');
+					li.className = 'ac-cs-chip' + (index === crEditing ? ' is-editing' : '');
+					li.setAttribute('data-spec', entry.spec);
+
+					/* The column itself is the control that reopens it, because a
+					 * chip that can only be taken out makes every change a removal
+					 * followed by a retyping of what it said. */
+					var text = document.createElement('button');
+					text.type = 'button';
+					text.className = 'ac-cs-chip-text ac-cs-edit';
+					text.setAttribute('data-index', String(index));
+					text.setAttribute('title', 'Change this column');
+					text.setAttribute('aria-label', 'Change ' + entry.label);
+					if (index === crEditing) text.setAttribute('aria-pressed', 'true');
+					text.textContent = entry.label;
+
+					var remove = document.createElement('button');
+					remove.type = 'button';
+					remove.className = 'ac-cs-remove';
+					remove.setAttribute('data-index', String(index));
+					remove.setAttribute('aria-label', 'Remove ' + entry.label);
+					remove.setAttribute('title', 'Remove this column');
+					remove.textContent = '\u00d7';
+
+					li.appendChild(text);
+					li.appendChild(remove);
+					crList.appendChild(li);
+				});
+				crWarnRenames();
+			};
+
+			var crSuggestion = function () {
+				if (!crCol.value) return '';
+				var base  = crSlug(crCol.value + '_' + crFn.value);
+				var alias = base;
+				var n     = 1;
+				while (crAliasTaken(alias)) alias = base + '_' + (++n);
+				return alias;
+			};
+
+			var crSyncFields = function () {
+				crFields.hidden = crMode.value !== 'own';
+				if (!crFields.hidden) {
+					crWinField.hidden = !crMeta().arg;
+					if (!crTouched) crAlias.value = crSuggestion();
+				}
+				/* The mode is part of the plan: giving a card the page's columns,
+				 * or none, changes what it makes as much as a rename does. */
+				crWarnRenames();
+			};
+
+			/* A select is given a value, and keeps one it does not list: a saved plan
+			 * may name a column the sampler no longer offers, and the panel has to
+			 * show what the card actually says before it can be repaired. */
+			var crSelectValue = function (sel, value) {
+				if (!value) { sel.value = ''; return; }
+				var found = false;
+				for (var i = 0; i < sel.options.length; i++) {
+					if (sel.options[i].value === value) { found = true; break; }
+				}
+				if (!found) {
+					var opt = document.createElement('option');
+					opt.value = value;
+					opt.textContent = value;
+					sel.appendChild(opt);
+				}
+				sel.value = value;
+			};
+
+			/* The fields describe the chip that was pressed, so an update replaces
+			 * that column where it stands instead of adding a second one beside it
+			 * and leaving the reader to take the first out. */
+			var crEditStart = function (index) {
+				var entry = crSpecs[index];
+				if (!entry) return;
+				var parts = entry.spec.split(':');
+
+				crEditing = index;
+				crSelectValue(crFn,  parts[1] || '');
+				crSelectValue(crCol, parts[0] || '');
+				crTouched = true;                    /* the name is the chip's */
+				crAlias.value = parts[2] || '';
+				crWin.value   = /^\d+$/.test(parts[3] || '') ? parts[3] : '7';
+
+				crSyncFields();
+				crAdd.textContent = 'Update column';
+				if (crStop) crStop.hidden = false;
+				crRenderList();
+				crSetError('');
+				crCol.focus();
+			};
+
+			var crEditStop = function (focusAdd) {
+				crEditing = -1;
+				crTouched = false;
+				crAlias.value = '';
+				crAdd.textContent = 'Add this column';
+				if (crStop) crStop.hidden = true;
+				crRenderList();
+				crSyncFields();
+				if (focusAdd) crAdd.focus();
+			};
+
+			/* The column the fields describe, or undefined after saying what is
+			 * missing.  The same rules the server applies, said here so a repair
+			 * is not posted and bounced for a name or a window. */
+			var crDraft = function () {
+				var col = crCol.value;
+				if (!col) {
+					crSetError('Choose a number column.');
+					crCol.focus();
+					return undefined;
+				}
+
+				var alias = (crAlias.value || '').replace(/^\s+|\s+$/g, '');
+				if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(alias)) {
+					crSetError('Name the new column with letters, digits and underscores, starting with a letter or underscore.');
+					crAlias.focus();
+					return undefined;
+				}
+				if (crAliasTaken(alias)) {
+					crSetError('"' + alias + '" is already a column here. Give this one a name of its own.');
+					crAlias.focus();
+					return undefined;
+				}
+
+				var m    = crMeta();
+				var spec = col + ':' + crFn.value + ':' + alias;
+				if (m.arg) {
+					var win = parseInt(crWin.value, 10);
+					if (!(win > 0)) {
+						crSetError('A moving total needs a window of at least one row.');
+						crWin.focus();
+						return undefined;
+					}
+					spec += ':' + win;
+				}
+				return crSpecEntry(spec);
+			};
+
+			/* The panel is tall - the list, seven fields and the buttons - and the
+			 * card that opened it may be near the foot of the window.  It opens
+			 * below the header when there is room there, and above it when there is
+			 * more room above; either way it is never taller than the room it has,
+			 * and scrolls rather than hiding its Save button under the frame. */
+			var crPosition = function () {
+				if (!crTarget) return;
+				var r     = crTarget.btn.getBoundingClientRect();
+				var w     = crPanel.offsetWidth;
+				var left  = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8));
+				var below = window.innerHeight - r.bottom - 12;
+				var above = r.top - 12;
+				var want  = crPanel.scrollHeight + 2;   /* the height it would like */
+				var up    = below < want && above > below;
+				var max   = Math.max(180, up ? above : below);
+				var top   = up
+					? Math.max(8, r.top - 4 - Math.min(want, max))
+					: r.bottom + 4;
+				crPanel.style.left = left + 'px';
+				crPanel.style.top = top + 'px';
+				crPanel.style.right = 'auto';
+				crPanel.style.maxHeight = max + 'px';
+			};
+
+			var crClose = function (returnFocus) {
+				var target = crTarget;
+				crPanel.hidden = true;
+				if (target) target.btn.setAttribute('aria-expanded', 'false');
+				crTarget = null;
+				crLoaded = false;
+				crEditing = -1;
+				if (returnFocus && target) target.btn.focus();
+			};
+
+			var crOpen = function (card, btn) {
+				var index = parseInt(card.getAttribute('data-visual'), 10);
+				if (isNaN(index)) return;
+
+				if (!crPanel.hidden && crTarget && crTarget.card === card) {
+					crClose(1);
+					return;
+				}
+				if (crTarget) crTarget.btn.setAttribute('aria-expanded', 'false');
+
+				crTarget  = { card: card, btn: btn, index: index };
+				crLoaded  = false;
+				crSpecs   = [];
+				crTouched = false;
+				crEditing = -1;
+				crOrderSaved = [];
+				crOrderShown = null;
+				crPlotted    = [];
+				crCardColumns = null;
+				crCardEncode  = null;
+				crPlanSaved   = null;
+				crWarning.textContent = '';
+				crWarning.hidden = true;
+				crAdd.textContent = 'Add this column';
+				if (crStop) crStop.hidden = true;
+				btn.setAttribute('aria-expanded', 'true');
+				crPanel.hidden = false;
+				crSave.disabled = true;
+				crSave.textContent = 'Save columns';
+				crMode.value = 'inherit';
+				crFields.hidden = true;
+				crList.innerHTML = '';
+				crAlias.value = '';
+				crEmpty.textContent = 'Loading\u2026';
+				crEmpty.hidden = false;
+				crSetError('');
+				crPosition();
+				crMode.focus();
+
+				var all = canvasColumns.map(function (c) { return c.name; });
+				var num = canvasColumns.filter(function (c) { return c.numeric; })
+					.map(function (c) { return c.name; });
+
+				fetch('/api/analyses/' + encodeURIComponent(anaId))
+					.then(function (r) { return r.json(); })
+					.then(function (analysis) {
+						if (!crTarget || crTarget.card !== card) return;
+						var vis = (analysis && analysis.visuals && analysis.visuals[index]) || null;
+						if (!vis) {
+							crSetError('This card is no longer on the canvas. Reload it to see its current columns.');
+							return;
+						}
+
+						var plan = vis.cross_row;
+						var specs = (plan && typeof plan === 'object' && plan.cs && plan.cs.length) ? plan.cs : [];
+						crSpecs = specs.map(crSpecEntry);
+						crOrderSaved = (plan && typeof plan === 'object' && plan.order) ? plan.order : [];
+
+						var first = crOrderSaved.length ? String(crOrderSaved[0]).split(':') : null;
+						crOrderShown = first
+							? { col: first[0] || '', dir: (first[1] || 'asc').toLowerCase() }
+							: { col: '', dir: 'asc' };
+
+						crFill(crCol, num, 'Choose a column\u2026', '');
+						crFill(crOrder, all, '\u2014 none \u2014', crOrderShown.col);
+						crFill(crBy, all, '\u2014 the whole view \u2014',
+							(plan && typeof plan === 'object' && plan.by) ? plan.by : '');
+						crDir.value = crOrderShown.dir === 'desc' ? 'desc' : 'asc';
+
+						if (!plan || typeof plan !== 'object') crMode.value = 'inherit';
+						else if (!specs.length)              crMode.value = 'none';
+						else                                crMode.value = 'own';
+
+						/* The plotted columns a plan makes, read from the plan the card
+						 * has now: its own, or the page's where it inherits.  A card that
+						 * runs no plan has none to rename, so it has nothing to lose. */
+						crPlotted = crColumnPlots(vis.encode || {},
+							(plan && typeof plan === 'object') ? (plan.cs || []) : null);
+
+						/* The card's columns as it holds them, for the save that has to
+						 * take a stranded one off it: encode is replaced whole, so the
+						 * rest of it has to travel with the list. */
+						crCardEncode  = vis.encode || {};
+						crCardColumns = Array.isArray(crCardEncode.columns)
+							? crCardEncode.columns.slice() : null;
+
+						/* The aliases the card's own plan had, so a chip renamed where
+						 * it stands can be followed by the card rather than dropped. */
+						crPlanSaved = (plan && typeof plan === 'object'
+							&& Array.isArray(plan.cs) && plan.cs.length) ? plan.cs.slice() : null;
+
+						crEmpty.textContent = 'No columns yet: add the one described below.';
+						crTouched = false;
+						crAlias.value = '';
+						crRenderList();
+						crSyncFields();
+						crLoaded = true;
+						crSave.disabled = false;
+						crPosition();   /* the list has changed the room it needs */
+					})
+					.catch(function () {
+						if (crTarget && crTarget.card === card) {
+							crSetError('Could not read the card\u2019s cross-row columns. Check the connection and try again.');
+						}
+					});
+			};
+
+			crMode.addEventListener('change', crSyncFields);
+			crCol.addEventListener('change', crSyncFields);
+			crFn.addEventListener('change', crSyncFields);
+			crAlias.addEventListener('input', function () { crTouched = true; });
+
+			if (crAdd) {
+				crAdd.addEventListener('click', function () {
+					crSetError('');
+					var draft = crDraft();
+					if (!draft) return;
+
+					var edited = crEditing;
+					if (edited >= 0) {
+						crSpecs[edited] = draft;
+						crEditStop(0);
+						var chip = crList.children[edited]
+							&& crList.children[edited].querySelector('.ac-cs-edit');
+						if (chip) chip.focus();   /* where the change landed */
+					} else {
+						crSpecs.push(draft);
+						crTouched = false;
+						crAlias.value = '';
+						crRenderList();
+						crSyncFields();
+						crAdd.focus();
+					}
+					crPosition();   /* the list has changed the room it needs */
+				});
+			}
+
+			if (crStop) crStop.addEventListener('click', function () { crEditStop(1); });
+
+			/* One delegated handler for the two controls a chip carries: its label
+			 * reopens it in the fields, its cross takes it out of the plan. */
+			crList.addEventListener('click', function (event) {
+				var target = event.target;
+				var isChipControl = function (node) {
+					return node.classList
+						&& (node.classList.contains('ac-cs-edit')
+							|| node.classList.contains('ac-cs-remove'));
+				};
+				while (target && target !== crList && !isChipControl(target)) {
+					target = target.parentNode;
+				}
+				if (!target || target === crList) return;
+				event.preventDefault();
+
+				var index = parseInt(target.getAttribute('data-index'), 10);
+				if (!(index >= 0) || !crSpecs[index]) return;
+
+				if (target.classList.contains('ac-cs-edit')) {
+					crEditStart(index);
+					return;
+				}
+
+				crSpecs.splice(index, 1);
+				/* The fields cannot go on describing a column the card no longer
+				 * has, and the chip they describe may have moved down one. */
+				if (crEditing === index)     crEditStop(0);
+				else if (crEditing > index)  crEditing--;
+				crRenderList();
+				crSetError('');
+				var buttons = crList.querySelectorAll('.ac-cs-remove');
+				if (buttons.length) buttons[Math.min(index, buttons.length - 1)].focus();
+				else crCol.focus();
+			});
+
+			/* Delegated: a card appended in place carries the same button but no
+			 * listener of its own. */
+			grid.addEventListener('click', function (e) {
+				var btn = e.target.closest('.visual-cs-btn');
+				if (!btn) return;
+				var card = btn.closest('.visual-card');
+				if (card) crOpen(card, btn);
+			});
+
+			crCancel.addEventListener('click', function () { crClose(1); });
+			crPanel.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				e.preventDefault();
+				/* Escape backs out of the change before it backs out of the panel:
+				 * the plan is why the reader is here. */
+				if (crEditing >= 0) crEditStop(1);
+				else crClose(1);
+			});
+			window.addEventListener('resize', function () { if (!crPanel.hidden) crPosition(); });
+			window.addEventListener('scroll', function () { if (!crPanel.hidden) crPosition(); }, { passive: true });
+			document.addEventListener('mousedown', function (e) {
+				if (crPanel.hidden) return;
+				if (crPanel.contains(e.target)) return;
+				if (e.target.closest && e.target.closest('.visual-cs-btn')) return;
+				crClose(0);
+			});
+
+			crForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				if (!crTarget || !crLoaded) return;
+				crSetError('');
+
+				var plan;
+				if (crMode.value === 'inherit') {
+					plan = null;   /* the key goes: the card takes the page's plan */
+				} else if (crMode.value === 'none') {
+					plan = {};     /* a stored plan that runs nothing */
+				} else {
+					var entries = crSpecs.slice();
+					if (!entries.length) {
+						var draft = crDraft();
+						if (!draft) return;
+						entries.push(draft);
+					}
+
+					for (var i = 0; i < entries.length; i++) {
+						if (entries[i].needsOrder && !crOrder.value) {
+							crSetError('"' + entries[i].label + '" reads the rows in an order: choose the column to read them in order of.');
+							crOrder.focus();
+							return;
+						}
+					}
+
+					plan = { cs: entries.map(function (entry) { return entry.spec; }) };
+					var unchanged = crOrderShown && crOrderSaved.length > 1
+						&& crOrder.value === crOrderShown.col
+						&& (crDir.value === 'desc' ? 'desc' : 'asc') === crOrderShown.dir;
+					if (unchanged) {
+						plan.order = crOrderSaved.slice();
+					} else if (crOrder.value) {
+						plan.order = [crOrder.value + (crDir.value === 'desc' ? ':desc' : '')];
+					}
+					if (crBy.value) plan.by = crBy.value;
+				}
+
+				/* A rename the card would be drawn against.  Said while the fields
+				 * change, and settled here because the plan that lands is this one --
+				 * the column the fields describe but the list does not hold yet
+				 * included.  The server refuses a repair that leaves the card plotting
+				 * a column nothing makes, so the rename is carried through to the
+				 * card's own reference where it is a rename at all, and a column the
+				 * plan has really lost is taken off a card that lists its columns. */
+				var unplotted = crWarnRenames(plan && plan.cs ? plan.cs : []);
+				var renames   = (crMode.value === 'own') ? crRenames(plan.cs) : {};
+				var follow    = [];
+				var drop      = [];
+				unplotted.forEach(function (name) {
+					if (renames[name]) follow.push([name, renames[name]]);
+					else               drop.push(name);
+				});
+				if (drop.length) {
+					var droppable = crDroppable(drop);
+					if (droppable.length !== drop.length) {
+						/* A column the card is drawn from rather than one of a list:
+						 * there is nothing to take it off, so the repair is not sent. */
+						crSetError('Not saved: this card plots ' + crNameList(drop)
+							+ ', and a chart cannot be drawn without the column it plots.'
+							+ ' Keep the name.');
+						return;
+					}
+					if (!window.confirm(crDropText(drop))) {
+						crSetError('Not saved: this card plots ' + crNameList(drop) + '.');
+						return;
+					}
+				}
+
+				var payload = { cross_row: plan, query: window.location.search || '' };
+				if (follow.length || drop.length) {
+					/* encode is replaced whole, so it is the card's own encoding with
+					 * the rename followed and the lost columns taken out of a list. */
+					payload.encode = crRenamedEncode(follow, drop);
+				}
+
+				var target = crTarget;
+				crSave.disabled = true;
+				crSave.textContent = 'Saving\u2026';
+
+				fetch('/api/analyses/' + encodeURIComponent(anaId) + '/visuals/' + target.index, {
+					method  : 'PATCH',
+					headers : { 'Content-Type': 'application/json' },
+					body    : JSON.stringify(payload),
+				}).then(function (r) {
+					return r.json().catch(function () { return {}; }).then(function (json) {
+						if (!r.ok) throw new Error(json.error || ('The canvas refused the change (' + r.status + ')'));
+						return json;
+					});
+				}).then(function (json) {
+					if (!json || json.visual !== target.index || typeof json.html !== 'string') {
+						window.location.reload();
+						return;
+					}
+
+					var card = target.card;
+					if (json.title) crSetTitle(card, json.title);
+					if (json.cf_col) card.setAttribute('data-cf-col', json.cf_col);
+					else card.removeAttribute('data-cf-col');
+
+					var body = card.querySelector('.visual-card-body');
+					if (body) body.innerHTML = json.html;
+
+					var titleEl = card.querySelector('.visual-card-title');
+					var title   = json.title || (titleEl ? titleEl.textContent : 'This card');
+					crClose(1);
+					announce((plan === null
+						? 'Cross-row columns cleared: "' + title + '" uses the page\'s.'
+						: plan.cs && plan.cs.length
+							? 'Cross-row columns of "' + title + '" updated: ' + plan.cs.join(', ') + '.'
+							: 'Cross-row columns of "' + title + '" removed.')
+						+ (follow.length
+							? ' It now reads ' + crNameList(follow.map(function (pair) { return pair[1]; }))
+								+ ' in place of '
+								+ crNameList(follow.map(function (pair) { return pair[0]; })) + '.'
+							: '')
+						+ (drop.length
+							? ' ' + crNameList(drop) + ' dropped from its columns.' : ''));
+
+					/* The libraries this card was drawn with are already on the
+					 * page: a plan changes the numbers in a view, not the view. */
+					crRunScripts(card);
+					setTimeout(function () {
+						initCrossFilters(card);
+						initDownloadButtons(card);
+					}, 50);
+				}).catch(function (err) {
+					crSetError(err.message || 'The cross-row columns could not be changed.');
+					crSave.disabled = false;
+					crSave.textContent = 'Save columns';
+				});
+			});
+		}
+
 		form.addEventListener('submit', function (e) {
 			e.preventDefault();
 			setError('');
@@ -2642,6 +4227,10 @@ menu, so it reads without the menu being opened.</p>
 			var encode = {};
 			var options = {};
 			var title  = titleInp.value.trim();
+
+			/* Empty means the default the card has always had: count the rows when
+			 * no value column is named, sum it when one is. */
+			var agg = aggregateValue(kind);
 
 			if (kind === 'table') {
 				var cols = Array.prototype.map.call(tableSel.selectedOptions, function (o) { return o.value; });
@@ -2676,6 +4265,12 @@ menu, so it reads without the menu being opened.</p>
 			} else if (kind === 'histogram') {
 				encode.value = picked(histSel, 'column'); if (!encode.value) return;
 				options.bins = parseInt(binsInp.value, 10) || 10;
+			} else if (kind === 'wordcloud') {
+				encode.col = picked(wcColSel, 'text column'); if (!encode.col) return;
+				/* The two counts the route takes, clamped here so the panel cannot
+				 * build a request the server would have to refuse outright. */
+				options.topn   = Math.min(500, Math.max(1, parseInt(wcTopnInp.value, 10)   || 50));
+				options.minlen = Math.min(64,  Math.max(1, parseInt(wcMinlenInp.value, 10) || 3));
 			} else if (kind === 'map') {
 				if (mapLocSel.value) {
 					encode.loc = mapLocSel.value;
@@ -2685,6 +4280,11 @@ menu, so it reads without the menu being opened.</p>
 				}
 			}
 
+			if (agg) encode.agg = agg;
+
+			var crossRow = crossRowPlan();
+			if (crossRow === undefined) return;   /* the panel has said why */
+
 			var payload = {
 				kind: kind, encode: encode, options: options,
 				/* The canvas's own URL state, so a card added while a chart is
@@ -2693,10 +4293,13 @@ menu, so it reads without the menu being opened.</p>
 				query: window.location.search || '',
 			};
 			if (title) payload.title = title;
+			/* Left off entirely when the card inherits the page's plan: an
+			 * absent key is what "inherit" means. */
+			if (crossRow) payload.cross_row = crossRow;
 
 			addBtn.disabled = true;
 			btn.disabled = true;
-			addBtn.textContent = 'Adding…';
+			addBtn.textContent = 'Adding\u2026';
 
 			fetch('/api/analyses/' + encodeURIComponent(anaId) + '/visuals', {
 				method  : 'POST',
@@ -2718,6 +4321,14 @@ menu, so it reads without the menu being opened.</p>
 
 				appendCard(json);
 				form.reset();
+				/* The reset returns the aggregate to Sum and the cross-row section
+				 * to "inherit", so the boxes and the chips they were showing have to
+				 * go with them. */
+				syncFields();
+				csAliasTouched = false;
+				csSpecs = [];
+				renderCsList();
+				syncCs();
 				addBtn.disabled = false;
 				btn.disabled = false;
 				addBtn.textContent = 'Add to canvas';

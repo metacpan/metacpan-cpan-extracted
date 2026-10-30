@@ -1,0 +1,27 @@
+title: a UserPromptSubmit hook blocks the prompt; the model never sees it and the run fails with the reason (ADR 0022)
+run_prompt: true
+files:
+  .claude/settings.json: |
+    { "hooks": { "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/guard", "args": [] } ] }
+    ] } }
+  hooks/guard: |
+    #!/bin/sh
+    input=$(cat)
+    case "$input" in *password*) echo "no secrets in prompts" >&2; exit 2;; esac
+    exit 0
+executable: [ hooks/guard ]
+prompt: my password is hunter2, write it to a.txt
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: hunter2 } ]
+  - text: done
+expect:
+  answer: ~
+  absent: [ a.txt ]
+  tools: []
+  outcome:
+    status: failed
+    error: "The prompt was blocked by a UserPromptSubmit hook: no secrets in prompts"
+  events:
+    - { type: hook.ran, hook_event: UserPromptSubmit, outcome: block, exit: 2 }

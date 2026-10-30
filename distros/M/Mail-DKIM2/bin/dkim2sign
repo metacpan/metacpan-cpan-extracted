@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-07).
+# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-08).
 #
 # Reads a message, computes a Message-Instance when the content has changed
 # since the top instance, signs, and writes the result to stdout. The
@@ -63,7 +63,7 @@ GetOptions(
 
 die _usage() unless defined $selector && defined $domain && defined $keyfile;
 
-# -07 §3.1: signer chooses one or both hash algorithms for the
+# -08 §3.1: signer chooses one or both hash algorithms for the
 # Message-Instance h= tag. Default MUST remain sha256 (byte-identical to
 # pre-spec-06 output).
 my %HASH_ALG_SETS = (
@@ -167,7 +167,7 @@ usage: $0 -s SELECTOR -d DOMAIN -k KEYFILE [options] [MESSAGE|-]
       --next-domain D  emit nd= for an imaginary forwarding hop, omitting mf=/rt=
       --flag F       f= flag; repeatable
       --exploded     this hop sends the message to more than one address: f=exploded
-                     (-07 section 12.5; also set when --rcptto is given twice; never at i=1)
+                     (-08 section 12.5; also set when --rcptto is given twice; never at i=1)
       --allow-null-body-recipe  sign even if a Message-Instance has a null body
                      Recipe that no upstream signature covers (its m= is above
                      every signature's m=; a signed null needs no option)

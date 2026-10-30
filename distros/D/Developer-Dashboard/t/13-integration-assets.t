@@ -3,6 +3,9 @@ use warnings;
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::JSON qw(json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
 use Test::More;
 
 my $has_source_tree_docs = -f 'dist.ini';
@@ -142,6 +145,28 @@ if ($has_integration_assets) {
     like( $runner, qr/legacy-ajax-stream|project-stream\.txt/, 'integration runner provisions a long-running saved ajax stream regression case' );
     like( $runner, qr/_capture_stream_prefix/, 'integration runner captures early ajax stream chunks during the long-running saved ajax regression case' );
     like( $runner, qr/_distribution_version/, 'integration runner reads the expected installed version from the extracted tarball instead of hard-coding a release number' );
+
+    my $loaded_runner = do './integration/blank-env/run-integration.pl';
+    is( $@, '', 'blank-environment integration runner can be loaded for focused helper tests' );
+    is( $loaded_runner, 1, 'loading the integration runner does not start the full integration flow' );
+    my $source_root = tempdir( CLEANUP => 1 );
+    my $module_dir = File::Spec->catdir( $source_root, qw(lib Developer) );
+    make_path($module_dir);
+    open my $module_fh, '>', File::Spec->catfile( $module_dir, 'Dashboard.pm' ) or die $!;
+    print {$module_fh} 'our $VERSION = $Developer::Dashboard::Version::VERSION;' . "\n";
+    close $module_fh or die $!;
+    open my $metadata_fh, '>', File::Spec->catfile( $source_root, 'META.yml' ) or die $!;
+    print {$metadata_fh} "name: Developer-Dashboard\nversion: '5.89'\n";
+    close $metadata_fh or die $!;
+    is( main::_distribution_version($source_root), '5.89', 'integration runner reads version from META.yml when the main module delegates its VERSION' );
+    open $module_fh, '>', File::Spec->catfile( $module_dir, 'Dashboard.pm' ) or die $!;
+    print {$module_fh} q{our $VERSION = '5.88';}, "\n";
+    close $module_fh or die $!;
+    is( main::_distribution_version($source_root), '5.89', 'distribution metadata takes precedence over a stale literal main-module version' );
+    unlink File::Spec->catfile( $source_root, 'META.yml' ) or die $!;
+    is( main::_distribution_version($source_root), '5.88', 'integration runner retains support for older archives without distribution metadata' );
+    is( main::_distribution_version(''), undef, 'integration runner rejects an empty source root' );
+
     like( $runner, qr/\.developer-dashboard/, 'integration runner provisions a fake-project local runtime tree' );
     like( $runner, qr/cpanm install host-built tarball.*dashboard init/s, 'integration runner builds the fake-project local runtime only after the tarball install step' );
     like( $runner, qr/dashboard init reports only the fake-project bookmark files that the integration fixture created instead of seeding extracted core starter dashboards/, 'integration runner documents that dashboard init now reports the fixture bookmark files instead of seeding extracted starter dashboards from core' );
@@ -425,12 +450,14 @@ This test verifies that the blank-environment Docker integration plan and
 runner assets are present and cover the intended install and smoke flow. When
 the ignored local D2 image recipe exists, it also checks that image rebuilds
 install the release archive into the runtime-first local Perl library.
+It also loads the integration runner without starting it and checks version
+extraction for metadata-backed releases and older literal-version archives.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for the blank-environment Docker integration plan and runner assets, including the release-to-local-library behavior of the ignored local D2 image recipe when it is present. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for the blank-environment Docker integration plan and runner assets, including the release-to-local-library behavior of the ignored local D2 image recipe when it is present. Its version-extraction fixture protects releases where the public module delegates its version scalar to a dedicated version module. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 

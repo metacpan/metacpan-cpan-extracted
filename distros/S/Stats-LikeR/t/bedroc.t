@@ -128,6 +128,17 @@ dies_ok { bedroc(\@s) }                         'missing labels dies';
 dies_ok { bedroc(\@s, [1,0,1]) }                'length mismatch dies';
 dies_ok { bedroc([1,2,3],[1,1,1]) }             'single-class dies';
 dies_ok { bedroc(\@s, \@l, bogus => 1) }        'unknown option dies';
+# a call-form error prints the help screen, with the error on its last line
+throws_ok { bedroc(\@s, \@l, bogus => 1) }
+	qr/\Ausage: bedroc\(SCORES, LABELS .*^example:\n.*\n\nbedroc: error: unknown argument 'bogus'\n\z/ms,
+	'unknown option dies under the help screen';
+throws_ok { bedroc(\@s) }
+	qr/^bedroc: error: the first two arguments must be array refs of scores and labels$/m,
+	'missing labels names the call form';
+throws_ok { bedroc(\@s, \@l, alpha => 0) } qr/^bedroc: error: alpha must be > 0 and finite$/m,
+	'alpha 0 is a call-form error';
+throws_ok { bedroc(\@s, \@l, top => 2) } qr/^bedroc: error: top must be between 0 and 1$/m,
+	'top 2 is a call-form error';
 dies_ok { bedroc(\@s, \@l, alpha => 0) }        'alpha = 0 dies';
 dies_ok { bedroc(\@s, \@l, alpha => -5) }       'negative alpha dies';
 dies_ok { bedroc(\@s, \@l, top => 0) }          'top = 0 dies';

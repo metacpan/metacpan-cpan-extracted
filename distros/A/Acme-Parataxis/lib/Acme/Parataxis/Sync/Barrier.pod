@@ -4,238 +4,142 @@
 
 =head1 NAME
 
-Acme::Parataxis::Sync::Barrier - Hold a fixed number of fibers at a common phase boundary
+Acme::Parataxis::Sync::Barrier - Phase-Boundary Rendezvous Synchronization for Fibers
 
 =head1 SYNOPSIS
 
     use v5.40;
     use Acme::Parataxis qw[async fiber];
     use Acme::Parataxis::Sync::Barrier;
+
     my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 3 );
     my @log;
+
     async {
-        my @handles;
-        for my $worker ( 1 .. 3 ) {
-            push @handles, fiber {
+        my @workers = map {
+            my $id = $_;
+            fiber {
                 for my $phase ( 1 .. 2 ) {
-                    $barrier->arrive_and_wait;      # nobody moves on until all three arrive
-                    push @log, "w$worker/p$phase";
+                    $barrier->arrive_and_wait;    # blocks until all 3 fibers arrive
+                    push @log, "worker_$id/phase_$phase";
                 }
             };
-        }
-        $_->await for @handles;
-        say 'crossed: ', join ' ', @log;
+        } 1 .. 3;
+
+        $_->await for @workers;
+        say "Crossed: " . join(' ', @log);
     };
-    # crossed: w3/p1 w1/p1 w2/p1 w2/p2 w3/p2 w1/p2
 
 =head1 DESCRIPTION
 
-A rendezvous point for a fixed number of fibers. Each of them calls C<arrive_and_wait>; the first C<parties> E<gt> 1
-park, and the last arrival releases them all at the same instant. Nobody gets past the boundary until every party has
-arrived, which is what makes a barrier the right tool for a lockstep algorithm - barrier-synchronisation parallelism, a
-phase-locked loop, or a pipeline that must not dribble one stage's output into the next.
+An C<Acme::Parataxis::Sync::Barrier> provides a synchronized rendezvous point for a fixed number of fibers. Fibers
+arrive at the barrier by calling C<arrive_and_wait()>. The first C<parties - 1> fibers park; the final arrival
+immediately unblocks all waiting fibers simultaneously and re-arms the barrier for the next phase.
 
-The barrier re-arms as it releases, so one object serves any number of rounds. Round two starts counting from a fresh
-C<parties>, so arrivals for the next phase never mix with the phase that just closed.
+Barriers are ideal for lockstep algorithms, phased pipelines, and parallel computations where intermediate data from a
+given stage must be completely produced before any worker is permitted to begin the next stage.
 
-Reach for a L<Acme::Parataxis::Sync::WaitGroup> when you are counting work and want to wait for it to finish, and a
-L<Acme::Parataxis::Sync::Barrier> when the point is the B<boundary> rather than the end. A barrier with C<parties>
-E<gt> 1 never parks at all.
+=over
 
-Waits here are cooperative and interruptible, like the rest of the L<Acme::Parataxis::Sync> family: a fiber that
-arrives and is then cancelled removes itself from the queue, but see L</"An abandoned arrival still consumes a slot">
-before you rely on that.
+=item *
+
+B<Cyclic re-arming>: A barrier automatically resets its arrival counter to C<parties> as soon as a phase is released,
+allowing a single barrier instance to coordinate multiple consecutive rounds.
+
+=item *
+
+B<Zero-wait final arrival>: The fiber that registers the final arrival does not park; it enqueues the waiting fibers
+and returns immediately.
+
+=back
 
 =head1 METHODS
 
 =head2 C<new( parties =E<gt> $n )>
 
     my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 4 );
-    say 'each phase needs ', $barrier->parties, ' arrivals and ', $barrier->remaining, ' are still outstanding';
-    # each phase needs 4 arrivals and 4 are still outstanding
 
-Creates a barrier requiring C<parties> arrivals per phase. C<parties> is keyword only and required, and must be at
-least 1; C<0> and a negative count croak with C<Barrier requires a positive number of parties>, as does a value that is
-not a number. It is stored as given, so see L</"parties is only checked for being at least 1"> before passing anything
-but a whole number.
+Constructs a barrier requiring C<$n> arrivals per phase. C<parties> is required and must be an integer C<E<gt>= 1>.
+Croaks if C<parties> is less than 1.
 
 =head2 C<arrive_and_wait( )>
 
-    my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 2 );
-    async {
-        fiber { $barrier->arrive_and_wait; say 'the first party was released' };
-        $barrier->arrive_and_wait;                 # the second arrival releases, and does not park
-        say 'and so was the second, straight away';
-    };
-    # and so was the second, straight away
-    # the first party was released
+    $barrier->arrive_and_wait;
 
-Arrives at the current phase and parks until C<parties> fibers have arrived. Returns true either way: the last arrival
-returns its own release without parking, and a released waiter returns as it wakes. Croaks outside a scheduled fiber
-with C<Barrier waits must occur inside a scheduled fiber>.
+Registers the current fiber's arrival in the current phase.
 
-The last arrival does not yield before it returns, which is why its C<say> lands before the released party's in the
-snippet above: it enqueues the waiters on its way past and carries straight on, and the waiters only run when the
-scheduler comes back to them.
+=over
 
-The wait is FIFO. Parked parties are released in the order they arrived, and the fiber that completed the phase is
-already running by the time the first of them is.
+=item *
 
-    my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 4 );
-    my @order;
-    async {
-        my @handles;
-        for my $i ( 1 .. 3 ) {
-            push @handles, fiber { $barrier->arrive_and_wait; push @order, $i };
-        }
-        say 'queued: ', $barrier->waiters, ' waiters, ', $barrier->remaining, ' still to arrive';
-        $barrier->arrive_and_wait;
-        push @order, 'me';
-        $_->await for @handles;
-        say 'crossed: ', join ',', @order;
-    };
-    # queued: 3 waiters, 1 still to arrive
-    # crossed: me,1,2,3
+If fewer than C<parties> have arrived, the calling fiber parks until the remaining parties arrive.
 
-=head2 C<parties( )>, C<remaining( )> and C<waiters( )>
+=item *
 
-    my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 3 );
-    my $need    = $barrier->remaining;
-    say "a fresh barrier: ", $barrier->parties, " parties, $need to arrive, ", $barrier->waiters, ' parked';
-    # a fresh barrier: 3 parties, 3 to arrive, 0 parked
+If this call represents the final arrival (C<remaining == 1>), it bumps the generation counter, resets C<remaining> to
+C<parties>, wakes all parked parties, and returns true immediately without yielding.
 
-C<parties> is the number of arrivals each phase needs. C<remaining> is how many are still outstanding in the phase
-currently open - it counts down, and is reset to C<parties> the moment a phase closes, so a reading of the full count
-means either nothing has happened yet or a phase has just closed. C<waiters> is how many fibers are parked at the
-boundary right now.
+=back
 
-All three are read-only. There is no way to change C<parties> after construction, and no reader for the phase counter
-the barrier bumps internally - see L</"There is no reader for the phase counter">.
+Must be called from within a scheduled fiber (croaks otherwise).
+
+=head2 C<parties( )>
+
+Returns the total number of participating fibers required to open a phase.
+
+=head2 C<remaining( )>
+
+Returns the number of arrivals still required to complete the current phase.
+
+=head2 C<waiters( )>
+
+Returns the number of fibers currently parked waiting for the phase to complete.
 
 =head1 Recipes
 
-=head2 Lockstep rounds
+=head2 Multiphase lockstep iteration
 
-The canonical shape: the same N fibers run the same code together, over and over, with nobody allowed to run ahead.
+    my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 2 );
 
-    my $round = Acme::Parataxis::Sync::Barrier->new( parties => 2 );
-    my $crossings = 0;
     async {
-        for my $round_no ( 1 .. 4 ) {
-            my @handles = map { fiber { $round->arrive_and_wait; $crossings++ } } 1 .. 2;
-            $_->await for @handles;                # both parties are through before the next round starts
-        }
-        say "four rounds, $crossings crossings";
+        my $f1 = fiber {
+            for my $round ( 1 .. 3 ) {
+                compute_part_a($round);
+                $barrier->arrive_and_wait;
+            }
+        };
+
+        my $f2 = fiber {
+            for my $round ( 1 .. 3 ) {
+                compute_part_b($round);
+                $barrier->arrive_and_wait;
+            }
+        };
+
+        $f1->await;
+        $f2->await;
     };
-
-Awaiting the round's handles before starting the next one is what keeps the phases from interleaving. Without it the
-same barrier still works - it re-arms on release - but a fast party would be counted towards the next round while a
-slow one is still finishing the last.
-
-=head2 A phased pipeline
-
-Two barriers turn three independent workers into a pipeline with a stage boundary: nobody totals until every slice
-exists, and nobody finishes until every total does.
-
-    my $stage  = Acme::Parataxis::Sync::Barrier->new( parties => 3 );
-    my @slices = ( [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] );
-    my @totals;
-    async {
-        my @handles;
-        for my $n ( 0 .. 2 ) {
-            push @handles, fiber {
-                $stage->arrive_and_wait;              # every slice is in before any total is computed
-                my $sum = 0;
-                $sum += $_ for @{ $slices[$n] };
-                $stage->arrive_and_wait;              # and every total is in before any worker finishes
-                push @totals, $sum;
-            };
-        }
-        $_->await for @handles;
-        my $total = 0;
-        $total += $_ for @totals;
-        say 'slices totalled: ', join( ' + ', sort { $a <=> $b } @totals ), ' = ', $total;
-    };
-    # slices totalled: 3 + 7 + 11 = 21
 
 =head1 Behavior Notes
 
-=head2 An abandoned arrival still consumes a slot
+=over
 
-C<remaining> is decremented when a fiber arrives, not when a phase opens, and an interrupted arrival is only removed
-from the parked queue - the slot it took is never given back. So a fiber that times out or is cancelled on its way to
-the barrier leaves the phase permanently one party short unless something else arrives to take its place.
+=item * Interrupted arrivals consume quota
 
-    my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 2 );
-    async {
-        eval { Acme::Parataxis::with_timeout( 50, sub { $barrier->arrive_and_wait } ) };
-        say 'the abandoned arrival left remaining at ', $barrier->remaining;
-        my $opened = eval { Acme::Parataxis::with_timeout( 50, sub { $barrier->arrive_and_wait } ) };
-        say 'a replacement arrival: ', ( $opened ? 'opened the phase' : 'still one short' );
-        say 'a fresh phase is armed: remaining=', $barrier->remaining;
-    };
-    # the abandoned arrival left remaining at 1
-    # a replacement arrival: opened the phase
-    # a fresh phase is armed: remaining=2
+When a fiber calls C<arrive_and_wait()>, C<remaining> is decremented immediately. If that fiber's wait is interrupted
+by a timeout or cancellation token, the fiber unregisters from the queue, but the slot it claimed is not refunded. The
+barrier remains one arrival short until a replacement arrival occurs.
 
-With a replacement it recovers, which is why a barrier can be used with a timeout as long as a standby party is waiting
-to take the abandoned slot. Without one, the phase can never open and every later arrival parks - see L</"A barrier
-never opens on its own">.
+=item * Deadlock risk if workers fail to arrive
 
-=head2 parties is only checked for being at least 1
+A barrier never opens on its own; it requires exactly C<parties> arrivals. If a participant dies before arriving,
+surviving waiters will park permanently, triggering a scheduler deadlock error unless protected by C<with_timeout>.
 
-The constructor's whole test is C<< $parties < 1 >>, so a fractional count is accepted and stored as given. It then
-takes C<ceil($parties)> arrivals to open a phase, because the counter is decremented by one and compared against zero,
-while C<remaining> reports the fraction. C<parties> E<gt> 2.5 is a three-party barrier that calls itself two and a
-half.
-
-    my $barrier = Acme::Parataxis::Sync::Barrier->new( parties => 1 );
-    async {
-        $barrier->arrive_and_wait for 1 .. 3;
-        my $remaining = $barrier->remaining;
-        say "a one-party barrier never parks: remaining is still $remaining";
-    };
-    for my $count ( 0, -1, 1.5, 2.5 ) {
-        my $made = eval { Acme::Parataxis::Sync::Barrier->new( parties => $count ) };
-        if ($made) { my $got = $made->parties; say "  parties => $count -> accepted as $got" }
-        else       { say "  parties => $count -> croaks" }
-    };
-    # a one-party barrier never parks: remaining is still 1
-    #   parties => 0 -> croaks
-    #   parties => -1 -> croaks
-    #   parties => 1.5 -> accepted as 1.5
-    #   parties => 2.5 -> accepted as 2.5
-
-Two more construction notes. The argument is keyword only, so C<< Barrier->new(4) >> warns about an odd argument list
-and then croaks with C<Required parameter 'parties' is missing>. And a value that is not a number at all - C<'x'>, or
-C<undef> - croaks too, but only after an C<isn't numeric> warning on the way to the check.
-
-=head2 There is no reader for the phase counter
-
-The barrier bumps an internal generation counter on every release and there is no accessor for it, so nothing in the
-public API can tell you how many phases have completed. C<remaining> returning to C<parties> is the only visible sign
-that a phase closed, and it looks exactly like a barrier nobody has arrived at yet. Count the rounds yourself.
-
-=head2 A barrier never opens on its own
-
-Nothing but an arrival releases a barrier: there is no C<stop>, no C<cancel>, and no timeout of its own. A fiber
-waiting on one is waiting for other fibers, so if they cannot all arrive the wait is a deadlock, and the run reports
-C<FATAL: deadlock detected> rather than a timeout. C<parties> is a claim about how many fibers exist, and the barrier
-does nothing to check it.
-
-A fiber cannot cover two slots of the same phase by arriving twice, either: the first arrival parks, so the second is a
-second wait rather than a shortcut.
-
-=head2 waiters can over-report
-
-A fiber destroyed while parked at a barrier leaves its id in the queue, because nothing removes it - the deregistration
-callback only runs for an interrupted park. The count is briefly high. It is harmless: a release skips ids whose fiber
-has gone, and clears the queue, so a leaked id is never woken at whatever fiber takes its number next.
+=back
 
 =head1 SEE ALSO
 
-L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::WaitGroup>, L<Acme::Parataxis::Sync::Mutex>,
-L<Acme::Parataxis::Sync::Once>, L<Acme::Parataxis::Nursery>, L<Acme::Parataxis>
+L<Acme::Parataxis::Sync>, L<Acme::Parataxis::Sync::WaitGroup>, L<Acme::Parataxis::Sync::Mutex>
 
 =head1 AUTHOR
 
@@ -249,4 +153,3 @@ This library is free software; you can redistribute it and/or modify it under th
 2.
 
 =cut
-

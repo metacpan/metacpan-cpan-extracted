@@ -96,7 +96,7 @@ Māori locale.
   Hānuere
   Pēpuere
   Māehe
-  Āpereira
+  Āperira
   Mei
   Hune
   Hūrae
@@ -435,6 +435,24 @@ Māori locale.
    1995-12-22T09:05:02 = Par, 22 Tīh 1995 CE
   -0010-09-15T04:44:23 = Rāh, 15 Hep -10 BCE
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = CE 2008 Pēpuere
+   1995-12-22T09:05:02 = CE 1995 Tīhema
+  -0010-09-15T04:44:23 = BCE -10 Hepetema
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = CE 2008 Pēpuere 5, Tūr
+   1995-12-22T09:05:02 = CE 1995 Tīhema 22, Par
+  -0010-09-15T04:44:23 = BCE -10 Hepetema 15, Rāh
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = CE 2008 Pēpuere 5
+   1995-12-22T09:05:02 = CE 1995 Tīhema 22
+  -0010-09-15T04:44:23 = BCE -10 Hepetema 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Pēp 2008 CE
@@ -506,6 +524,12 @@ Māori locale.
    2008-02-05T18:30:30 = Tūr, 5 Pēp
    1995-12-22T09:05:02 = Par, 22 Tīh
   -0010-09-15T04:44:23 = Rāh, 15 Hep
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Pēpuere 5, Tūr
+   1995-12-22T09:05:02 = Tīhema 22, Par
+  -0010-09-15T04:44:23 = Hepetema 15, Rāh
 
 =head3 MMMMW-count-other ('wiki' W 'o' MMMM)
 
@@ -614,6 +638,18 @@ Māori locale.
    2008-02-05T18:30:30 = Pēpuere 2008
    1995-12-22T09:05:02 = Tīhema 1995
   -0010-09-15T04:44:23 = Hepetema -10
+
+=head3 yMMMMEd (EEE, d MMMM y)
+
+   2008-02-05T18:30:30 = Tūr, 5 Pēpuere 2008
+   1995-12-22T09:05:02 = Par, 22 Tīhema 1995
+  -0010-09-15T04:44:23 = Rāh, 15 Hepetema -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Pēpuere 2008
+   1995-12-22T09:05:02 = 22 Tīhema 1995
+  -0010-09-15T04:44:23 = 15 Hepetema -10
 
 =head3 yMMMd (d MMM y)
 

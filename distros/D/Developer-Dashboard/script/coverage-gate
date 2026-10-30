@@ -346,7 +346,14 @@ sub main {
 
     my $before = _grading_identity();
 
-    local $ENV{HARNESS_PERL_SWITCHES} = "-MDevel::Cover=-db,$database,-blib,0";
+    # Coverage is enforced only for lib/. Tests deliberately stage executable
+    # helper trees under /tmp and .developer-dashboard, then remove those trees;
+    # asking Devel::Cover to hash those non-target files during report generation
+    # produces missing-file warnings after cleanup. Keep its defaults and exclude
+    # only those disposable source roots, leaving every repository lib/ file
+    # instrumented and graded.
+    local $ENV{HARNESS_PERL_SWITCHES}
+        = "-MDevel::Cover=-db,$database,-blib,0,+ignore,^/tmp/,\\.developer-dashboard/";
     my $ran = _run( 'instrumented suite', @suite );
 
     my $after = _grading_identity();
@@ -494,17 +501,21 @@ sub _child_instrument_module {
 }
 
 # Purpose: refuse to grade a database written by a different Devel::Cover than the
-#          one that will read it, and stamp the database for the next run.
+#          one that will read it, and stamp its sibling metadata file for the next run.
 # Input:   the database directory and this run's resolved serializer path.
 # Output:  EXIT_UNUSABLE when the stamps disagree, undef when it is safe to go on.
 sub _check_database_stamp {
     my ( $database, $instrument ) = @_;
 
-    my $stamp_file = File::Spec->catfile( $database, 'gate-serializer' );
+    my $stamp_file        = _database_stamp_path($database);
+    my $legacy_stamp_file = File::Spec->catfile( $database, 'gate-serializer' );
 
-    if ( -d $database && -f $stamp_file ) {
-        my $previous = _slurp_stamp($stamp_file);
-        if ( defined $previous && $previous ne $instrument ) {
+    if ( -d $database ) {
+        for my $candidate ( $stamp_file, $legacy_stamp_file ) {
+            next if !-f $candidate;
+            my $previous = _slurp_stamp($candidate);
+            next if !defined $previous;
+            next if $previous eq $instrument;
             return _unusable(
                 "this database was written by a different Devel::Cover than the one that would read it "
                     . "now, so any number it produced would be meaningless:\n"
@@ -513,6 +524,10 @@ sub _check_database_stamp {
                     . 'This is the launch boundary: a login shell rebuilds PERL5LIB from the profile and '
                     . 'selects the other install. Delete cover_db and run the whole chain in one environment'
             );
+        }
+
+        if ( -f $legacy_stamp_file && !unlink $legacy_stamp_file ) {
+            return _unusable("cannot remove the old in-database serializer marker $legacy_stamp_file: $!");
         }
     }
 
@@ -530,6 +545,15 @@ sub _check_database_stamp {
     }
 
     return undef;
+}
+
+# Purpose: place the serializer identity beside, not inside, Devel::Cover's database.
+# Input:   the coverage database directory path.
+# Output:  an absolute sibling-file path unique to that database.
+sub _database_stamp_path {
+    my ($database) = @_;
+    my ( $volume, $directories, $file ) = File::Spec->splitpath( File::Spec->rel2abs($database) );
+    return File::Spec->catpath( $volume, $directories, ".$file.coverage-gate-serializer" );
 }
 
 # Purpose: read a serializer stamp, tolerating an unreadable or empty file.
@@ -737,6 +761,18 @@ why a C<--dry-run> inspection could not tell two trees apart. Give it test paths
 to narrow the instrumented run, C<--database> to keep the database somewhere
 other than C<cover_db>, and C<--dry-run> to see the resolved environment and the
 exact commands before spending a suite slot.
+
+The reader identity stamp is stored in a hidden sibling file next to the
+database, never inside C<cover_db>, because Devel::Cover treats unknown files
+in that directory as invalid database content. A prior C<gate-serializer>
+marker inside the database is compared with the current reader and removed
+before the database is dropped; a mismatch still fails closed.
+
+The coverage collector excludes only disposable C</tmp/> and staged
+C<.developer-dashboard/> source trees. Tests remove those temporary helper files
+before report generation, which would otherwise make Devel::Cover emit missing
+source warnings. The enforced report still includes every repository C<lib/>
+source; these exclusions do not reduce the library coverage target.
 
 It takes TWO locks, and they guard different things. The first is named after
 the coverage B<database>, so two gates conflict exactly when they would share a

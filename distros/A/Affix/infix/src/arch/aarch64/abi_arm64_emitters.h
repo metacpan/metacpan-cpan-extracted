@@ -30,6 +30,10 @@
  */
 #include "arch/aarch64/abi_arm64_common.h"
 #include "common/infix_internals.h"
+
+/** @internal @brief Emits `BTI C` (Branch Target Identification - Call) for ARM64 BTI/CFI. */
+INFIX_INTERNAL void emit_arm64_bti_c(code_buffer * buf);
+
 // GPR <-> Immediate Value Emitters
 /** @internal @brief Emits a MOVZ/MOVK sequence to load an arbitrary 64-bit immediate into a GPR. */
 INFIX_INTERNAL void emit_arm64_load_u64_immediate(code_buffer * buf, arm64_gpr dest, uint64_t value);

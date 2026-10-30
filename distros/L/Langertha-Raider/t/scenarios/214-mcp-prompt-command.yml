@@ -1,0 +1,18 @@
+title: /mcp__server__prompt runs a prompt of an MCP server with its arguments; a missing argument sends nothing (ADR 0029 Addendum 1)
+home:
+  .raider/config.yml: |
+    mcp:
+      t:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", rich ]
+prompts: [ "/mcp__t__greet Ada Hi", "/mcp__t__greet" ]
+script:
+  - text: greeted
+expect:
+  request_count: 1
+  requests:
+    - index: 0
+      contains: "<command-name>/mcp__t__greet</command-name>\n<command-args>Ada Hi</command-args>\n\nHi, Ada!\n\nUnderstood."
+  outcome:
+    status: not sent
+    error: "Missing required argument for MCP prompt mcp__t__greet: name"

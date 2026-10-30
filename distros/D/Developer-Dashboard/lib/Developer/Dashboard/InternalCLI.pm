@@ -3,12 +3,11 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
-use Developer::Dashboard::Platform qw(is_windows);
 use Time::HiRes qw(sleep);
 
 our $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__);
@@ -178,7 +177,8 @@ sub ensure_helper {
     }
 
     my $target = helper_path( paths => $paths, name => $name );
-    if ( is_windows() && _helper_uses_dashboard_core($name) && -f $target ) {
+    require Developer::Dashboard::Platform;
+    if ( Developer::Dashboard::Platform::is_windows() && _helper_uses_dashboard_core($name) && -f $target ) {
         open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";
         my $existing = do { local $/; <$existing_fh> };
         close $existing_fh or die "Unable to close $target: $!";
@@ -240,7 +240,8 @@ sub _stage_managed_helper {
 # Output: boolean true when the Windows helper refresh should be deferred.
 sub _should_defer_windows_helper_refresh {
     my ( $name, $target ) = @_;
-    return 0 if !is_windows();
+    require Developer::Dashboard::Platform;
+    return 0 if !Developer::Dashboard::Platform::is_windows();
     return 1 if defined $name && $name eq '_dashboard-core';
     return _running_helper_matches_target($target);
 }
@@ -298,7 +299,8 @@ sub _replace_helper_file {
     return 1 if _rename_path( $source, $target );
 
     my $error = $!;
-    if ( is_windows() && -e $target ) {
+    require Developer::Dashboard::Platform;
+    if ( Developer::Dashboard::Platform::is_windows() && -e $target ) {
         _unlink_path($target)
           or die "Unable to remove $target before Windows helper replace retry: $!";
         sleep 0.05;

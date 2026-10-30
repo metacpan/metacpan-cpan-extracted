@@ -3,16 +3,15 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Digest::MD5 qw(md5_hex);
-use Cwd qw(getcwd);
-use File::Basename qw(dirname);
+use Errno qw(ENOENT);
+use File::Basename qw(basename dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use Scalar::Util qw(blessed);
 use Developer::Dashboard::JSON qw(json_encode);
-use Developer::Dashboard::Platform qw(passwd_user_name);
 use Developer::Dashboard::PathIdentity ();
 
 # _resolved_home_from_env()
@@ -134,13 +133,25 @@ sub named_paths {
 # Output: hash references describing resolved runtime roots and aliases.
 
 # runtime_root()
-# Returns the effective runtime root directory.
+# Returns the deepest runtime root, reusing the active operation snapshot when
+# one exists; unscoped calls resolve a fresh layer inventory.
 # Input: none.
 # Output: deepest discovered runtime layer directory, falling back to the home runtime directory.
 sub runtime_root {
     my ($self) = @_;
+    my $scope = $self->{_runtime_layer_candidate_scope};
+    return $scope->{runtime_root} if ref($scope) eq 'HASH' && exists $scope->{runtime_root};
+
+    if ( ref($scope) eq 'HASH' && ref( $scope->{runtime_layers} ) eq 'ARRAY' ) {
+        my $runtime_root = $scope->{runtime_layers}[-1];
+        $scope->{runtime_root} = $runtime_root;
+        return $runtime_root;
+    }
+
     my @layers = $self->runtime_layers;
-    return $layers[-1];
+    my $runtime_root = $layers[-1];
+    $scope->{runtime_root} = $runtime_root if ref($scope) eq 'HASH';
+    return $runtime_root;
 }
 
 # home_runtime_root()
@@ -158,28 +169,59 @@ sub home_runtime_root {
 # (DD-809), or .developer-dashboard's path when NEITHER exists yet - a fresh
 # layer is always created under the long name, never the alias, so this is
 # the write-target name too, not only a read-time lookup.
-# Input: parent directory path string.
+# Within a runtime-layer operation scope, reuse the first name choice for a
+# parent so all lookups in that operation see one consistent filesystem view.
+# Input: required non-empty parent directory path string.
 # Output: full layer directory path string (may not exist on disk).
 sub _layer_dir_for {
     my ( $self, $parent ) = @_;
+    die "Runtime layer parent path is required\n"
+      if !defined $parent || ref($parent) || $parent eq '';
+
+    my $scope = $self->{_runtime_layer_candidate_scope};
+    my $cache;
+    if ( ref($scope) eq 'HASH' ) {
+        $cache = $scope->{layer_dir_for} ||= {};
+        return $cache->{$parent} if exists $cache->{$parent};
+    }
+
     my $primary = File::Spec->catdir( $parent, '.developer-dashboard' );
-    return $primary if -d $primary;
-    my $alias = File::Spec->catdir( $parent, '.d2' );
-    return $alias if -d $alias;
-    return $primary;
+    my $selected = $primary;
+    if ( !-d $primary ) {
+        my $alias = File::Spec->catdir( $parent, '.d2' );
+        $selected = $alias if -d $alias;
+    }
+    $cache->{$parent} = $selected if $cache;
+    return $selected;
 }
 
 # _existing_layer_dirs_for($parent)
 # Returns both existing runtime directory names at one filesystem level in
 # canonical-first order; runtime_layers preserves alias-before-canonical
 # lookup order so the canonical directory remains the effective write target.
-# Input: parent directory path string.
+# Within an explicit runtime-layer operation scope, reuses that parent's
+# existence snapshot; unscoped calls always observe current filesystem state.
+# Input: required non-empty parent directory path string.
 # Output: existing .developer-dashboard and/or .d2 directory paths.
 sub _existing_layer_dirs_for {
     my ( $self, $parent ) = @_;
+    die "Runtime layer parent path is required\n"
+      if !defined $parent || ref($parent) || $parent eq '';
+    my $scope = $self->{_runtime_layer_candidate_scope};
+    if ( ref($scope) eq 'HASH' ) {
+        my $key = 'S' . $parent;
+        my $snapshots = $scope->{existing_layer_dirs} ||= {};
+        return @{ $snapshots->{$key} } if exists $snapshots->{$key};
+    }
+
     my $primary = File::Spec->catdir( $parent, '.developer-dashboard' );
     my $alias   = File::Spec->catdir( $parent, '.d2' );
-    return grep { -d $_ } ( $primary, $alias );
+    my @existing = grep { -d $_ } ( $primary, $alias );
+    if ( ref($scope) eq 'HASH' ) {
+        my $key = 'S' . $parent;
+        $scope->{existing_layer_dirs}{$key} = \@existing;
+    }
+    return @existing;
 }
 
 # home_runtime_path()
@@ -235,28 +277,30 @@ sub alias_cache_key {
 # runtime_layers()
 # Returns the effective runtime roots in inheritance order from home to the
 # current working directory, including both sibling names when both exist.
-# Input: none.
+# Reuses a result only when the caller has established an operation-local
+# _runtime_layer_candidate_scope; unscoped calls rescan so a retained registry
+# sees runtime-layer creation/removal between requests.
+# Input: none; reads the current environment and runtime-layer filesystem.
 # Output: ordered list of runtime root directory path strings from home to deepest layer.
 sub runtime_layers {
     my ($self) = @_;
-    my $cwd = $self->current_working_directory;
-    my $cache_key = 'runtime_layers:' . $self->_path_identity( defined $cwd ? $cwd : '' );
-    return @{ $self->_memoize(
-            $cache_key => sub {
-                my @roots;
-                my %seen;
-                my @home_layers = $self->_existing_layer_dirs_for( $self->home );
-                @home_layers = reverse @home_layers;
-                for my $root ( $self->_runtime_layers_from_env, @home_layers, $self->home_runtime_root, $self->_ancestor_runtime_layers ) {
-                    next if $root eq '';
-                    my $identity = $self->_path_identity($root);
-                    next if $seen{$identity}++;
-                    push @roots, $root;
-                }
-                return \@roots;
-            }
-        )
-    };
+    my $scope = $self->{_runtime_layer_candidate_scope};
+    return @{ $scope->{runtime_layers} }
+      if ref($scope) eq 'HASH' && exists $scope->{runtime_layers};
+
+    my @roots;
+    my %seen;
+    my @home_layers = $self->_existing_layer_dirs_for( $self->home );
+    @home_layers = reverse @home_layers;
+    for my $root ( $self->_runtime_layers_from_env, @home_layers, $self->home_runtime_root, $self->_ancestor_runtime_layers_for_scope ) {
+        next if $root eq '';
+        my $identity = $self->_path_identity($root);
+        next if $seen{$identity}++;
+        push @roots, $root;
+    }
+
+    $scope->{runtime_layers} = \@roots if ref($scope) eq 'HASH';
+    return @roots;
 }
 
 # state_root()
@@ -265,7 +309,9 @@ sub runtime_layers {
 # Output: directory path string.
 sub state_root {
     my ($self) = @_;
-    my $dir = $self->_ensure_state_dir( File::Spec->catdir( $self->state_base_root, $self->_state_root_key( $self->runtime_root ) ) );
+    my $dir = File::Spec->catdir( $self->state_base_root, $self->_state_root_key( $self->runtime_root ) );
+    # _write_state_metadata creates and hardens this directory before touching
+    # its metadata file; do not repeat that same permission check here.
     $self->_write_state_metadata( $dir, $self->runtime_root );
     return $dir;
 }
@@ -375,19 +421,42 @@ sub bookmarks_root {
 # Output: hash reference describing the active runtime path set plus named aliases.
 sub all_paths {
     my ($self) = @_;
+    # The aggregate inventory performs several permission checks for paths
+    # derived from the same runtime tree. Share only the candidate list during
+    # this call; the registry does not retain it, so a later operation sees
+    # runtime layers created or removed since this inventory was requested.
+    # Reuse an enclosing request's candidate scope when present. A nested
+    # aggregate read should share that request's ancestor scan, while a
+    # standalone call still gets a fresh scope that expires on return.
+    local $self->{_runtime_layer_candidate_scope} =
+      ref( $self->{_runtime_layer_candidate_scope} ) eq 'HASH'
+      ? $self->{_runtime_layer_candidate_scope}
+      : {};
+    # The same exact filesystem paths are normalized repeatedly while deriving
+    # this one immutable payload. Keep those identities local to this call;
+    # later lookups must re-read the filesystem and observe symlink changes.
+    local $self->{_path_identity_scope} = {};
+    my $state_root = $self->state_root;
+    my $collectors_root = $self->_ensure_state_dir(
+        File::Spec->catdir( $state_root, 'collectors' )
+    );
+    my $indicators_root = $self->_ensure_state_dir(
+        File::Spec->catdir( $state_root, 'indicators' )
+    );
+
     return {
         home                 => $self->home,
         home_runtime_root    => $self->home_runtime_root,
         project_runtime_root => scalar $self->project_runtime_root,
         runtime_root         => $self->runtime_root,
-        state_root           => $self->state_root,
+        state_root           => $state_root,
         cache_root           => $self->cache_root,
         logs_root            => $self->logs_root,
         dashboards_root      => $self->dashboards_root,
         bookmarks_root       => $self->bookmarks_root,
         cli_root             => $self->cli_root,
-        collectors_root      => $self->collectors_root,
-        indicators_root      => $self->indicators_root,
+        collectors_root      => $collectors_root,
+        indicators_root      => $indicators_root,
         config_root          => $self->config_root,
         current_project_root => scalar $self->current_project_root,
         %{ $self->named_paths },
@@ -455,13 +524,27 @@ sub skills_root {
     return $self->_ensure_dir( File::Spec->catdir( $self->runtime_root, 'skills' ) );
 }
 
-# skills_roots()
-# Returns the installed skill roots in effective lookup order from deepest layer to home.
-# Input: none.
+# skills_roots( runtime_roots => $array_ref )
+# Returns installed skill roots in effective lookup order, using a supplied
+# runtime-root snapshot when an enclosing operation already computed one.
+# Input: optional named runtime_roots array reference; omitted calls discover roots.
 # Output: ordered list of skill root directory path strings.
 sub skills_roots {
-    my ($self) = @_;
-    return map { File::Spec->catdir( $_, 'skills' ) } $self->runtime_roots;
+    my ( $self, %args ) = @_;
+    my @runtime_roots = ref( $args{runtime_roots} ) eq 'ARRAY'
+      ? @{ $args{runtime_roots} }
+      : $self->runtime_roots;
+    return map { File::Spec->catdir( $_, 'skills' ) } @runtime_roots;
+}
+
+# _skill_is_disabled($skill_root)
+# Checks whether one installed skill has a disabled marker at its root.
+# Input: installed skill directory path string.
+# Output: boolean true when its .disabled marker is a regular file.
+sub _skill_is_disabled {
+    my ( $self, $skill_root ) = @_;
+    return 0 if !defined $skill_root || $skill_root eq '';
+    return -f File::Spec->catfile( $skill_root, '.disabled' ) ? 1 : 0;
 }
 
 # validated_path_segments($path)
@@ -502,18 +585,47 @@ sub skill_root {
 # skill from normal runtime lookup. The name is joined straight onto each
 # skills root, so any name that is not exactly one validated path segment
 # resolves to no layer at all instead of escaping the skills tree.
+# An explicit installed-skill inventory scope reuses pure segment validation
+# and directory-name membership, but still rechecks each directory and its
+# disabled marker on every lookup. Calls outside that scope remain fresh.
 # Input: skill repository name string and optional include_disabled flag.
 # Output: ordered list of skill root directory path strings from home to leaf.
 sub skill_layers {
     my ( $self, $name, %args ) = @_;
     return () if !defined $name || $name eq '';
-    my @name_segments = validated_path_segments($name);
+    my $inventory_scope = $self->{_installed_skill_inventory_scope};
+    my $segment_cache = ref($inventory_scope) eq 'HASH'
+      ? ( $inventory_scope->{skill_layer_segments} ||= {} )
+      : undef;
+    my @name_segments;
+    if ( ref($segment_cache) eq 'HASH' && !ref($name) && exists $segment_cache->{$name} ) {
+        @name_segments = @{ $segment_cache->{$name} };
+    }
+    else {
+        @name_segments = validated_path_segments($name);
+        $segment_cache->{$name} = [@name_segments]
+          if ref($segment_cache) eq 'HASH' && !ref($name) && length($name) <= 4096
+          && keys(%{$segment_cache}) < 512;
+    }
     return () if @name_segments != 1;
 
     my @matches;
     my $saw_effective = 0;
-    for my $skills_root ( $self->skills_roots ) {
-        my $skill_root = File::Spec->catdir( $skills_root, $name );
+    my @skill_roots;
+    if ( ref($inventory_scope) eq 'HASH' ) {
+        for my $directory ( $self->_installed_skill_directory_inventory ) {
+            my $name_set = $directory->{name_set};
+            $name_set = { map { $_ => 1 } @{ $directory->{names} || [] } }
+              if ref($name_set) ne 'HASH';
+            next if !$name_set->{$name};
+            push @skill_roots, File::Spec->catdir( $directory->{skills_root}, $name );
+        }
+    }
+    else {
+        @skill_roots = map { File::Spec->catdir( $_, $name ) } $self->skills_roots;
+    }
+
+    for my $skill_root (@skill_roots) {
         next if !-d $skill_root;
         my $disabled = -f File::Spec->catfile( $skill_root, '.disabled' ) ? 1 : 0;
         if ( !$saw_effective++ ) {
@@ -536,6 +648,42 @@ sub skill_roots_for {
     return reverse $self->skill_layers( $name, %args );
 }
 
+# _installed_skill_directory_inventory()
+# Discovers the sorted top-level skill directory names for each runtime skills
+# root. When a caller establishes an inventory scope, these directory listings
+# are shared only for that caller's current operation; disabled markers remain
+# checked by each higher-level consumer. Each record contains ordered names and
+# a membership hash for repeated exact-name lookups.
+# Input: none.
+# Output: ordered list of hash references with skills_root, names, and name_set fields.
+sub _installed_skill_directory_inventory {
+    my ($self) = @_;
+    my $scope = $self->{_installed_skill_inventory_scope};
+    if ( ref($scope) eq 'HASH' && exists $scope->{directories} ) {
+        return @{ $scope->{directories} };
+    }
+
+    my @directories;
+    for my $skills_root ( $self->skills_roots ) {
+        next if !-d $skills_root;
+        opendir my $dh, $skills_root or die "Unable to read $skills_root: $!";
+        my @names = sort grep {
+               $_ ne '.'
+            && $_ ne '..'
+            && -d File::Spec->catdir( $skills_root, $_ )
+        } readdir $dh;
+        closedir $dh or die "Unable to close $skills_root: $!";
+        push @directories, {
+            skills_root => $skills_root,
+            names       => \@names,
+            name_set    => { map { $_ => 1 } @names },
+        };
+    }
+
+    $scope->{directories} = \@directories if ref($scope) eq 'HASH';
+    return @directories;
+}
+
 # installed_skill_roots()
 # Returns every installed skill root in deterministic sorted order.
 # Input: none.
@@ -544,26 +692,62 @@ sub installed_skill_roots {
     my ( $self, %args ) = @_;
     my @roots;
     my %seen_names;
-    for my $skills_root ( $self->skills_roots ) {
-        next if !-d $skills_root;
-        opendir my $dh, $skills_root or die "Unable to read $skills_root: $!";
-        for my $entry (
-            sort grep {
-                   $_ ne '.'
-                && $_ ne '..'
-                && -d File::Spec->catdir( $skills_root, $_ )
-            } readdir $dh
-          )
-        {
+    for my $directory ( $self->_installed_skill_directory_inventory ) {
+        my $skills_root = $directory->{skills_root};
+        for my $entry ( @{ $directory->{names} } ) {
             next if $seen_names{$entry}++;
             my $skill_root = File::Spec->catdir( $skills_root, $entry );
-            my $disabled = -f File::Spec->catfile( $skill_root, '.disabled' ) ? 1 : 0;
+            my $disabled = !$args{include_disabled}
+              && -f File::Spec->catfile( $skill_root, '.disabled' ) ? 1 : 0;
             next if !$args{include_disabled} && $disabled;
             push @roots, $skill_root;
         }
-        closedir $dh;
     }
     return @roots;
+}
+
+# installed_skill_entries(%args)
+# Enumerates each installed skill once together with all of its layer paths in
+# the same precedence order used by skill_layers(), avoiding one roots
+# traversal per skill when callers need layered metadata for the fleet.
+# Input: optional include_disabled boolean matching installed_skill_roots().
+# Output: ordered list of hash refs with skill_name, deepest skill_root, and
+# layers ordered from home to the deepest runtime layer.
+sub installed_skill_entries {
+    my ( $self, %args ) = @_;
+    my ( @entries, %by_name );
+
+    for my $directory ( $self->_installed_skill_directory_inventory ) {
+        my $skills_root = $directory->{skills_root};
+        for my $name ( @{ $directory->{names} } ) {
+            my $root = File::Spec->catdir( $skills_root, $name );
+            my $disabled = -f File::Spec->catfile( $root, '.disabled' ) ? 1 : 0;
+            my $entry = $by_name{$name};
+            if ( !$entry ) {
+                $entry = {
+                    skill_name => $name,
+                    skill_root => $root,
+                    layers     => [],
+                    masked     => $disabled && !$args{include_disabled} ? 1 : 0,
+                };
+                $by_name{$name} = $entry;
+                push @entries, $entry;
+            }
+
+            next if $entry->{masked};
+            next if !$args{include_disabled} && $disabled;
+            push @{ $entry->{layers} }, $root;
+        }
+    }
+
+    my @visible;
+    for my $entry (@entries) {
+        next if !@{ $entry->{layers} };
+        $entry->{layers} = [ reverse @{ $entry->{layers} } ];
+        delete $entry->{masked};
+        push @visible, $entry;
+    }
+    return @visible;
 }
 
 # nested_skill_dir_chain(\@segments)
@@ -610,24 +794,80 @@ sub nested_skill_dir_chain {
 # into "skills/" subdirectories arbitrarily deep, starting from each
 # top-level installed_skill_roots() entry (DD-1004 read-side counterpart to
 # nested_skill_dir_chain, shared so discovery never drifts from resolution).
-# Input: optional include_disabled flag.
+# Input: optional include_disabled flag and include_config_write_location flag.
 # Output: ordered list of hash refs {segments => arrayref of skill-name
-# segments from the top down, dir => that skill's directory path string}
-# covering every depth, shallowest first.
+# segments from the top down, dir => that skill's directory path string;
+# when requested, config_write_location contains the safe write target
+# derived from this already-discovered chain; include_disabled entries also
+# identify disabled skills and descendants}. Entries cover every depth,
+# shallowest first.
 sub nested_skill_entries {
     my ( $self, %args ) = @_;
     my @entries;
-    my @queue = map { { segments => [ ( $_ =~ m{/([^/]+)\z} )[0] ], dir => $_ } } $self->installed_skill_roots(%args);
-    while ( my $node = shift @queue ) {
-        push @entries, $node;
+    my @queue = map {
+        my $name = ( $_ =~ m{/([^/]+)\z} )[0];
+        my @valid = $args{include_config_write_location} ? validated_path_segments($name) : ();
+        {
+            segments           => [$name],
+            dir                => $_,
+            config_chain_valid => !$args{include_config_write_location} || @valid == 1 ? 1 : 0,
+            config_parent_dir  => undef,
+            config_parent_depth => undef,
+            disabled           => $args{include_disabled}
+              && $self->_skill_is_disabled($_) ? 1 : 0,
+        }
+    } $self->installed_skill_roots(%args);
+    for ( my $queue_index = 0; $queue_index < @queue; $queue_index++ ) {
+        my $node = $queue[$queue_index];
+        my %entry = ( segments => $node->{segments}, dir => $node->{dir} );
+        $entry{disabled} = $node->{disabled} ? 1 : 0 if $args{include_disabled};
+        if ( $args{include_config_write_location} ) {
+            if ( $node->{config_chain_valid} ) {
+                if ( @{ $node->{segments} } == 1 || !defined $node->{config_parent_dir} ) {
+                    $entry{config_write_location} = {
+                        kind      => 'global',
+                        remaining => [ @{ $node->{segments} } ],
+                    };
+                }
+                else {
+                    my @remaining = @{ $node->{segments} }[ $node->{config_parent_depth} + 1 .. $#{ $node->{segments} } ];
+                    $entry{config_write_location} = {
+                        kind      => 'skill',
+                        dir       => $node->{config_parent_dir},
+                        remaining => \@remaining,
+                    };
+                }
+            }
+            else {
+                $entry{config_write_location} = undef;
+            }
+        }
+        push @entries, \%entry;
         my $nested_root = File::Spec->catdir( $node->{dir}, 'skills' );
         next if !-d $nested_root;
         opendir my $dh, $nested_root or next;
+        my $has_git = $args{include_config_write_location}
+          && $node->{config_chain_valid}
+          ? ( -d File::Spec->catdir( $node->{dir}, '.git' ) ? 1 : 0 )
+          : 0;
+        my ( $child_parent_dir, $child_parent_depth ) = ( $node->{config_parent_dir}, $node->{config_parent_depth} );
+        if ( $args{include_config_write_location} && $node->{config_chain_valid} && !$has_git ) {
+            ( $child_parent_dir, $child_parent_depth ) = ( $node->{dir}, $#{ $node->{segments} } );
+        }
         for my $child ( sort grep { $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $nested_root, $_ ) } readdir $dh ) {
             my $child_dir = File::Spec->catdir( $nested_root, $child );
-            my $disabled = -f File::Spec->catfile( $child_dir, '.disabled' ) ? 1 : 0;
+            my $disabled = $node->{disabled} || -f File::Spec->catfile( $child_dir, '.disabled' ) ? 1 : 0;
             next if !$args{include_disabled} && $disabled;
-            push @queue, { segments => [ @{ $node->{segments} }, $child ], dir => $child_dir };
+            my @valid = $args{include_config_write_location} ? validated_path_segments($child) : ();
+            push @queue, {
+                segments            => [ @{ $node->{segments} }, $child ],
+                dir                 => $child_dir,
+                config_chain_valid  => !$args{include_config_write_location}
+                  || ( $node->{config_chain_valid} && @valid == 1 ) ? 1 : 0,
+                config_parent_dir   => $child_parent_dir,
+                config_parent_depth => $child_parent_depth,
+                disabled            => $disabled,
+            };
         }
         closedir $dh;
     }
@@ -662,10 +902,33 @@ sub skill_config_write_location {
     my ( $self, $segments ) = @_;
     return if ref($segments) ne 'ARRAY' || !@{$segments};
     my @chain = $self->nested_skill_dir_chain($segments);
-    return if !@chain;
+    return $self->_skill_config_write_location_from_chain( $segments, \@chain );
+}
 
-    for ( my $i = $#chain - 1; $i >= 0; $i-- ) {
-        my $dir = $chain[$i];
+# _skill_config_write_location_from_chain($segments, $chain)
+# Finds the safe config write ancestor from an already-resolved skill chain.
+# Input: skill path segments and corresponding existing skill directories.
+# Output: skill/global write-location hash reference, or undef for an invalid chain.
+sub _skill_config_write_location_from_chain {
+    my ( $self, $segments, $chain ) = @_;
+    return if ref($segments) ne 'ARRAY' || !@{$segments};
+    return if ref($chain) ne 'ARRAY' || @{$chain} != @{$segments};
+
+    for my $index ( 0 .. $#{$segments} ) {
+        my @valid = validated_path_segments( $segments->[$index] );
+        return if @valid != 1;
+        return if !defined $chain->[$index] || !-d $chain->[$index];
+        if ( $index == 0 ) {
+            return if basename( $chain->[$index] ) ne $segments->[$index];
+        }
+        else {
+            my $expected = File::Spec->catdir( $chain->[ $index - 1 ], 'skills', $segments->[$index] );
+            return if $chain->[$index] ne $expected;
+        }
+    }
+
+    for ( my $i = $#{$chain} - 1; $i >= 0; $i-- ) {
+        my $dir = $chain->[$i];
         next if -d File::Spec->catdir( $dir, '.git' );
         my @remaining = @{$segments}[ $i + 1 .. $#{$segments} ];
         return { kind => 'skill', dir => $dir, remaining => \@remaining };
@@ -770,20 +1033,62 @@ sub _state_root_key {
 # Returns a sanitized username used to namespace runtime state roots in the shared temp area.
 # The chain reads the interactive Unix variables, then the Windows USERNAME
 # variable a non-interactive Windows session still carries, then the guarded
-# passwd lookup, so no runtime can abort here.
+# passwd lookup, so no runtime can abort here. The resolved value is cached per
+# instance for the exact four environment values, avoiding repeated passwd
+# database calls while still observing environment changes.
 # Input: none.
 # Output: username string.
 sub _state_root_user {
     my ($self) = @_;
+    my @environment = @ENV{qw(DD_STATE_ROOT_USER USER LOGNAME USERNAME)};
+    my $cached = $self->{_state_root_user_cache};
+    if ( ref($cached) eq 'HASH' && ref( $cached->{environment} ) eq 'ARRAY' ) {
+        my $same_environment = 1;
+        for my $index ( 0 .. $#environment ) {
+            my $current = $environment[$index];
+            my $previous = $cached->{environment}[$index];
+            next if !defined $current && !defined $previous;
+            if ( !defined $current || !defined $previous || $current ne $previous ) {
+                $same_environment = 0;
+                last;
+            }
+        }
+        return $cached->{user} if $same_environment;
+    }
+
     my $raw =
          $ENV{DD_STATE_ROOT_USER}
       || $ENV{USER}
       || $ENV{LOGNAME}
       || $ENV{USERNAME}
-      || passwd_user_name($<);
+      || _passwd_user_name();
     $raw = 'user' if !$raw;
     $raw =~ s{[^A-Za-z0-9._-]}{_}g;
+    $self->{_state_root_user_cache} = {
+        environment => \@environment,
+        user        => $raw,
+    };
     return $raw;
+}
+
+# _passwd_user_name()
+# Reads the effective account name from the system passwd database without
+# loading the larger platform helper module on lightweight path commands.
+# Input: none; the effective numeric user id is read from Perl's $< variable.
+# Output: passwd account name, or undef when the platform lookup is unavailable.
+sub _passwd_user_name {
+    my @entry = eval { _passwd_entry($<) };
+    return @entry ? $entry[0] : undef;
+}
+
+# _passwd_entry($uid)
+# Reads one passwd record while leaving platform-specific exceptions visible to
+# the guarded caller, which converts an unavailable lookup to undef.
+# Input: numeric user id.
+# Output: passwd record fields, or an exception for unsupported lookups.
+sub _passwd_entry {
+    my ($uid) = @_;
+    return getpwuid($uid);
 }
 
 # _state_root_for_layer($runtime_root)
@@ -793,14 +1098,17 @@ sub _state_root_user {
 sub _state_root_for_layer {
     my ( $self, $runtime_root ) = @_;
     my $dir = File::Spec->catdir( $self->state_base_root, $self->_state_root_key($runtime_root) );
-    $self->_ensure_state_dir($dir);
+    # _write_state_metadata owns creation and hardening for this directory.
     $self->_write_state_metadata( $dir, $runtime_root );
     return $dir;
 }
 
 # _write_state_metadata($dir, $runtime_root)
 # Records the runtime identity for one hashed temp-state root, recreating the
-# hashed directory first if temp cleanup removed it.
+# hashed directory first if temp cleanup removed it. It skips unchanged metadata
+# only after verifying file type, owner, mode, and content; missing or stale
+# files are repaired and symlinks are rejected. The encoded JSON scalar is
+# reused for the most recent exact runtime-root/application-name pair.
 # Input: state root directory path and originating runtime root path.
 # Output: metadata file path string.
 sub _write_state_metadata {
@@ -809,16 +1117,101 @@ sub _write_state_metadata {
     return '' if !defined $runtime_root || $runtime_root eq '';
     $self->_ensure_state_dir($dir);
     my $file = File::Spec->catfile( $dir, 'runtime.json' );
-    open my $fh, '>:raw', $file or die "Unable to write $file: $!";
-    print {$fh} json_encode(
-        {
+    my $app_name = $self->app_name;
+    my $content_cache = $self->{_state_metadata_json_cache};
+    my $content;
+    if (
+        ref($content_cache) eq 'HASH'
+        && defined $content_cache->{runtime_root}
+        && defined $content_cache->{content}
+        && $content_cache->{runtime_root} eq $runtime_root
+        && (
+            !defined $app_name
+            ? !defined $content_cache->{app_name}
+            : defined $content_cache->{app_name} && $content_cache->{app_name} eq $app_name
+        )
+      ) {
+        $content = $content_cache->{content};
+    }
+    else {
+        $content = json_encode(
+            {
+                runtime_root => $runtime_root,
+                app_name     => $app_name,
+            }
+        );
+        $self->{_state_metadata_json_cache} = {
             runtime_root => $runtime_root,
-            app_name     => $self->app_name,
+            app_name     => $app_name,
+            content      => $content,
+        };
+    }
+
+    $! = 0;
+    my @metadata_stat = _state_metadata_lstat($file);
+    die "Unable to inspect runtime metadata $file: $!" if !@metadata_stat && $! != ENOENT;
+    if (@metadata_stat) {
+        # The preceding lstat populated Perl's cached stat record; these file
+        # tests inspect it without importing Fcntl's mode constants.
+        die "Refusing symbolic link for runtime metadata $file" if -l _;
+        die "Runtime metadata is not a regular file: $file" if !-f _;
+        die "Runtime metadata is not owned by the current user: $file" if $metadata_stat[4] != $>;
+
+        if ( ( $metadata_stat[2] & 0777 ) == 0600 ) {
+            my $existing_fh = _open_state_metadata_file( $file, '<:raw' );
+            die "Unable to read $file: $!" if !$existing_fh;
+            local $/;
+            my $existing = <$existing_fh>;
+            die "Unable to close $file: $!" if !_close_state_metadata_file($existing_fh);
+            return $file if defined $existing && $existing eq $content;
         }
-    );
-    close $fh or die "Unable to close $file: $!";
+    }
+
+    my $fh = _open_state_metadata_file( $file, '>:raw' );
+    die "Unable to write $file: $!" if !$fh;
+    die "Unable to write runtime metadata $file: $!" if !_print_state_metadata( $fh, $content );
+    die "Unable to close $file: $!" if !_close_state_metadata_file($fh);
     $self->secure_file_permissions($file);
     return $file;
+}
+
+# _state_metadata_lstat($file)
+# Reads non-following metadata for the state identity file so links can be
+# rejected before any content is opened.
+# Input: runtime metadata file path string.
+# Output: lstat result list, empty on failure with the operating-system error in $!.
+sub _state_metadata_lstat {
+    my ($file) = @_;
+    return lstat $file;
+}
+
+# _open_state_metadata_file($file, $mode)
+# Opens the runtime metadata file using the requested raw mode and preserves
+# the system error when the open fails.
+# Input: metadata file path string and Perl open mode string.
+# Output: filehandle reference on success, undef on failure.
+sub _open_state_metadata_file {
+    my ( $file, $mode ) = @_;
+    open my $fh, $mode, $file or return;
+    return $fh;
+}
+
+# _print_state_metadata($fh, $content)
+# Writes the complete encoded runtime identity to an already-open metadata file.
+# Input: output filehandle reference and JSON content string.
+# Output: print's boolean success value.
+sub _print_state_metadata {
+    my ( $fh, $content ) = @_;
+    return print {$fh} $content;
+}
+
+# _close_state_metadata_file($fh)
+# Closes an opened metadata file and exposes a flush or close error to the caller.
+# Input: open metadata filehandle reference.
+# Output: close's boolean success value.
+sub _close_state_metadata_file {
+    my ($fh) = @_;
+    return close $fh;
 }
 
 # temp_root()
@@ -831,27 +1224,41 @@ sub temp_root {
 }
 
 # config_root()
-# Returns the configuration root directory.
+# Returns the writable configuration root, preferring the optional private
+# overlay before the ordinary active runtime config directory.
 # Input: none.
 # Output: directory path string.
 sub config_root {
     my ($self) = @_;
+    my $overlay = $self->_config_overlay_root;
+    return $overlay if defined $overlay;
     if ( my $dir = $ENV{DEVELOPER_DASHBOARD_CONFIGS} ) {
         return $self->_ensure_dir( $self->_expand_home($dir) );
     }
     return $self->_ensure_dir( File::Spec->catdir( $self->runtime_root, 'config' ) );
 }
 
-# config_roots()
-# Returns the configuration roots in effective lookup order.
-# Input: none.
+# config_roots( runtime_roots => $array_ref )
+# Returns configuration roots in effective lookup order, deriving them from a
+# supplied runtime-root snapshot unless the explicit replacement config setting
+# is active.
+# Input: optional named runtime_roots array reference; omitted calls discover roots.
 # Output: ordered list of configuration root directory path strings.
 sub config_roots {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
+    my @roots;
     if ( my $dir = $ENV{DEVELOPER_DASHBOARD_CONFIGS} ) {
-        return ( $self->_ensure_dir( $self->_expand_home($dir) ) );
+        @roots = ( $self->_ensure_dir( $self->_expand_home($dir) ) );
     }
-    return map { File::Spec->catdir( $_, 'config' ) } $self->runtime_roots;
+    else {
+        my @runtime_roots = ref( $args{runtime_roots} ) eq 'ARRAY'
+          ? @{ $args{runtime_roots} }
+          : $self->runtime_roots;
+        @roots = map { File::Spec->catdir( $_, 'config' ) } @runtime_roots;
+    }
+    my $overlay = $self->_config_overlay_root;
+    unshift @roots, $overlay if defined $overlay;
+    return @roots;
 }
 
 # config_layers()
@@ -861,10 +1268,44 @@ sub config_roots {
 # Output: ordered list of configuration root directory path strings.
 sub config_layers {
     my ($self) = @_;
+    my @layers;
     if ( my $dir = $ENV{DEVELOPER_DASHBOARD_CONFIGS} ) {
-        return ( $self->_ensure_dir( $self->_expand_home($dir) ) );
+        @layers = ( $self->_ensure_dir( $self->_expand_home($dir) ) );
     }
-    return map { File::Spec->catdir( $_, 'config' ) } $self->runtime_layers;
+    else {
+        @layers = map { File::Spec->catdir( $_, 'config' ) } $self->runtime_layers;
+    }
+    my $overlay = $self->_config_overlay_root;
+    push @layers, $overlay if defined $overlay;
+    return @layers;
+}
+
+# _config_overlay_root()
+# Resolves and creates the optional extra config root used for container-local
+# overrides without replacing the normal home/project config lookup chain.
+# Input: none; reads DEVELOPER_DASHBOARD_CONFIG_OVERLAY when set.
+# Output: expanded overlay directory path, or undef when no overlay is set.
+sub _config_overlay_root {
+    my ($self) = @_;
+    my $dir = $ENV{DEVELOPER_DASHBOARD_CONFIG_OVERLAY};
+    return if !defined $dir || $dir eq '';
+    $dir = $self->_expand_home($dir);
+    die "Config overlay must not be a symbolic link: $dir" if -l $dir;
+    $self->_ensure_state_dir($dir);
+    my @stat = $self->_config_overlay_stat($dir);
+    die "Unable to inspect config overlay directory $dir: $!" if !@stat;
+    die "Config overlay directory is not owned by the current user: $dir"
+      if $stat[4] != $>;
+    return $dir;
+}
+
+# _config_overlay_stat($dir)
+# Reads the filesystem metadata used to validate a private config overlay.
+# Input: expanded overlay directory path.
+# Output: stat fields for the directory, or an empty list when it cannot be read.
+sub _config_overlay_stat {
+    my ( $self, $dir ) = @_;
+    return stat $dir;
 }
 
 # auth_root()
@@ -944,9 +1385,18 @@ sub current_working_directory {
     return eval { getcwd() };
 }
 
+# getcwd()
+# Preserves the package-level function name formerly provided by Cwd's
+# imported getcwd while routing normal calls through the verified fast lookup.
+# Input: none.
+# Output: logical absolute working-directory path or undef when unavailable.
+sub getcwd {
+    return Developer::Dashboard::PathIdentity::current_working_directory();
+}
+
 # cwd()
-# Preserves the public path-registry working-directory accessor that was
-# historically supplied incidentally by importing Cwd::cwd into this package.
+# Preserves the public path-registry working-directory accessor as a
+# compatibility alias for the current-directory lookup.
 # Input: none.
 # Output: the same directory path or undef as current_working_directory().
 sub cwd {
@@ -1263,12 +1713,25 @@ sub is_home_runtime_path {
 # the ensuring accessor. Build the candidate list from the non-creating sources
 # instead: home_runtime_PATH and _existing_layer_dirs_for are pure path
 # computations, and the env and ancestor layer helpers create nothing.
+# The candidate path is canonicalized once while each root retains its own
+# current filesystem identity check. During all_paths(), the candidate-root
+# list is shared only for that aggregate operation to avoid rescanning an
+# unchanged tree for each permission check; the scoped list is discarded on
+# return so later operations see new or removed runtime layers.
 sub runtime_layer_root_for {
     my ( $self, $path ) = @_;
     return '' if !defined $path || $path eq '';
-    my @home_layers = reverse $self->_existing_layer_dirs_for( $self->home );
-    push @home_layers, $self->home_runtime_path;
-    for my $root ( $self->_runtime_layers_from_env, @home_layers, $self->_ancestor_runtime_layers ) {
+    my ( $path_identity, $path_identity_ready );
+    my $scope = $self->{_runtime_layer_candidate_scope};
+    if ( ref($scope) ne 'HASH' ) {
+        $scope = {};
+    }
+    if ( !exists $scope->{roots} ) {
+        my @home_layers = reverse $self->_existing_layer_dirs_for( $self->home );
+        push @home_layers, $self->home_runtime_path;
+        $scope->{roots} = [ $self->_runtime_layers_from_env, @home_layers, $self->_ancestor_runtime_layers_for_scope ];
+    }
+    for my $root ( @{ $scope->{roots} } ) {
         # None of the three sources above can yield undef or empty in
         # production - the env reader filters blanks itself, home_runtime_path
         # is a pure File::Spec->catdir on an always-set home, and the ancestor
@@ -1278,7 +1741,13 @@ sub runtime_layer_root_for {
         # entry ahead of a real root, which drives both operands of this OR
         # true independently while a normal run still drives it false.
         next if !defined $root || $root eq '';
-        return $root if $self->_same_or_descendant_path( $path, $root );
+        return $root if $path eq $root;
+        if ( !$path_identity_ready ) {
+            $path_identity = $self->_path_identity($path);
+            $path_identity_ready = 1;
+        }
+        my $root_identity = $self->_path_identity($root);
+        return $root if Developer::Dashboard::PathIdentity::_same_or_descendant_identity( $path_identity, $root_identity );
     }
     return '';
 }
@@ -1295,7 +1764,8 @@ sub is_runtime_layer_path {
 }
 
 # secure_dir_permissions($dir)
-# Tightens one home-runtime directory chain to owner-only mode.
+# Tightens one runtime directory chain to owner-only mode, skipping chmod
+# syscalls when each directory already has the required mode.
 # Input: directory path string.
 # Output: directory path string.
 sub secure_dir_permissions {
@@ -1311,7 +1781,11 @@ sub secure_dir_permissions {
 
     my $path = $layer_root;
     if ( -d $path ) {
-        chmod 0700, $path or die "Unable to chmod $path to 0700: $!";
+        my @dir_stat = stat $path;
+        die "Unable to inspect runtime directory $path: $!" if !@dir_stat;
+        if ( ( $dir_stat[2] & 07777 ) != 0700 ) {
+            chmod 0700, $path or die "Unable to chmod $path to 0700: $!";
+        }
     }
     return $dir if $dir eq $layer_root;
 
@@ -1320,7 +1794,11 @@ sub secure_dir_permissions {
     for my $part ( grep { $_ ne '' } File::Spec->splitdir($suffix) ) {
         $path = File::Spec->catdir( $path, $part );
         next if !-d $path;
-        chmod 0700, $path or die "Unable to chmod $path to 0700: $!";
+        my @dir_stat = stat $path;
+        die "Unable to inspect runtime directory $path: $!" if !@dir_stat;
+        if ( ( $dir_stat[2] & 07777 ) != 0700 ) {
+            chmod 0700, $path or die "Unable to chmod $path to 0700: $!";
+        }
     }
 
     return $dir;
@@ -1449,7 +1927,11 @@ sub _ensure_state_dir {
         make_path( $dir, { mode => 0700 } );
     }
     else {
-        chmod 0700, $dir or die sprintf 'Unable to chmod %s to 0700: %s', $dir, $!;
+        my @dir_stat = stat _;
+        die "Unable to inspect state directory $dir: $!" if !@dir_stat;
+        chmod 0700, $dir
+          or die sprintf 'Unable to chmod %s to 0700: %s', $dir, $!
+          if ( $dir_stat[2] & 07777 ) != 0700;
     }
     return $dir;
 }
@@ -1469,7 +1951,8 @@ sub _expand_home {
 # _ancestor_runtime_layers()
 # Discovers every existing .developer-dashboard and .d2 runtime directory
 # between the current working directory and the configured home directory,
-# excluding both home-level runtime roots.
+# excluding both home-level runtime roots. Exact duplicate home-root spellings
+# are removed before canonical identity checks to avoid resolving one path twice.
 # Input: none.
 # Output: ordered list of runtime root paths from home toward the deepest
 # current layer; .d2 precedes .developer-dashboard at the same depth.
@@ -1478,8 +1961,15 @@ sub _ancestor_runtime_layers {
     my $cwd = $self->current_working_directory;
     return () if !defined $cwd || $cwd eq '';
     my $home = $self->home;
-    my %home_runtime = map { $self->_path_identity($_) => 1 }
-      ( $self->home_runtime_path, $self->_existing_layer_dirs_for($home) );
+    # An exact home cwd has no intermediate layer to discover; symlink-spelled
+    # equivalents still take the canonical ancestry path below.
+    return () if $cwd eq $home;
+    my %home_runtime;
+    my %seen_home_runtime_path;
+    for my $runtime_path ( $self->home_runtime_path, $self->_existing_layer_dirs_for($home) ) {
+        next if $seen_home_runtime_path{$runtime_path}++;
+        $home_runtime{ $self->_path_identity($runtime_path) } = 1;
+    }
     my $project_root = eval { $self->current_project_root } || '';
     my $stop_dir = '';
     if ( $self->_same_or_descendant_path( $cwd, $home ) ) {
@@ -1493,6 +1983,7 @@ sub _ancestor_runtime_layers {
     }
 
     my @layers;
+    my $stop_identity;
     my $dir = $cwd;
     while ($dir) {
         for my $candidate ( $self->_existing_layer_dirs_for($dir) ) {
@@ -1500,7 +1991,11 @@ sub _ancestor_runtime_layers {
             my $visible_candidate = $self->_display_path($candidate);
             unshift @layers, $visible_candidate;
         }
-        last if $self->_path_identity($dir) eq $self->_path_identity($stop_dir);
+        last if $dir eq $stop_dir;
+        # Resolve a symlink-spelled boundary only once per walk. Deferring this
+        # preserves the exact-string fast path when cwd is already the boundary.
+        $stop_identity = $self->_path_identity($stop_dir) if !defined $stop_identity;
+        last if $self->_path_identity($dir) eq $stop_identity;
         my $parent = dirname($dir);
         last if $parent eq $dir;
         $dir = $parent;
@@ -1508,9 +2003,26 @@ sub _ancestor_runtime_layers {
     return @layers;
 }
 
+# _ancestor_runtime_layers_for_scope()
+# Returns discovered ancestor runtime layers, sharing the result only inside an
+# explicit operation scope so runtime creation/removal remains visible later.
+# Input: none; reads the existing operation-local candidate scope when present.
+# Output: ordered list of ancestor runtime-layer directory paths.
+sub _ancestor_runtime_layers_for_scope {
+    my ($self) = @_;
+    my $scope = $self->{_runtime_layer_candidate_scope};
+    return @{ $scope->{ancestor_runtime_layers} }
+      if ref($scope) eq 'HASH' && exists $scope->{ancestor_runtime_layers};
+    my @layers = $self->_ancestor_runtime_layers;
+    $scope->{ancestor_runtime_layers} = \@layers if ref($scope) eq 'HASH';
+    return @layers;
+}
+
 # _path_identity($path)
 # Normalizes a path for identity and ancestry comparisons without requiring the
 # caller to care about symlink aliases such as /var versus /private/var on macOS.
+# Exact spellings reuse identities only within an explicit all_paths, CLI, or
+# web-request scope; no identity survives the operation/request.
 # Delegates to Developer::Dashboard::PathIdentity (DD-903) with
 # empty_fallback => 1, preserving this class's historical behavior of falling
 # back to File::Spec->canonpath when abs_path() returns an empty string.
@@ -1518,6 +2030,14 @@ sub _ancestor_runtime_layers {
 # Output: canonical existing path or a stable canonpath string.
 sub _path_identity {
     my ( $self, $path ) = @_;
+    my $scope = $self->{_path_identity_scope};
+    if ( ref($scope) eq 'HASH' ) {
+        my $key = defined $path ? 'S' . $path : 'U';
+        return $scope->{$key} if exists $scope->{$key};
+        return $scope->{$key} = Developer::Dashboard::PathIdentity::_path_identity(
+            $path, empty_fallback => 1,
+        );
+    }
     return Developer::Dashboard::PathIdentity::_path_identity( $path, empty_fallback => 1 );
 }
 
@@ -1642,9 +2162,18 @@ such an alias back to a bare path string for display consumers
 metadata; resolve_dir() itself always reads the raw internal registration,
 so the create/mode metadata is never lost between the two.
 
-=head2 current_working_directory, cwd
+=head2 current_working_directory, cwd, getcwd
 
-Report the effective working directory: the explicit constructor C<cwd> when one was supplied, otherwise a live in-process C<getcwd> lookup that follows later C<chdir> calls without forking an external C<pwd> process (undef when the directory is unavailable). C<cwd> is the public compatibility alias consumed by the file registry.
+Report the effective working directory: the explicit constructor C<cwd> when one was supplied, otherwise a lookup that uses absolute C<PWD> only when its device and inode match the process directory, preserving valid logical symlink paths; otherwise it falls back to C<Cwd::cwd> (undef when the directory is unavailable). C<cwd> remains the object-level accessor consumed by the file registry. The package-level C<getcwd> function preserves the historical imported C<Cwd::getcwd> name while using the verified fast lookup.
+
+=head2 _ensure_state_dir
+
+Creates a missing state directory with mode C<0700>. For an existing directory,
+it inspects the mode from the directory check and calls C<chmod 0700> only when
+the complete permission/special-bit mask is not already exactly C<0700>. The
+directory remains private after either path; inspection or chmod errors are
+reported instead of being ignored. It accepts a directory path and returns
+that same path on success.
 
 =head2 validated_path_segments
 
@@ -1658,9 +2187,85 @@ context) on rejection. C<skill_layers> requires exactly one validated segment
 for a skill name, and the skill dispatcher and web layer reuse this guard for
 every skill-namespaced route, ajax, and static asset path.
 
+=head2 installed_skill_entries
+
+Returns each effective installed skill once with its deepest selected root and
+all participating roots in home-to-project precedence order. The optional
+C<include_disabled> flag follows C<installed_skill_roots> semantics. This
+grouped inventory is intended for readers that need each skill's layered
+metadata; it avoids rescanning every runtime's skill directory once per skill.
+
+=head2 skill_layers
+
+Returns the participating roots for one validated top-level skill name in
+home-to-leaf precedence order. A disabled first effective layer masks the
+skill unless C<include_disabled =E<gt> 1> is supplied; disabled later layers
+are skipped in normal lookup. During an explicit installed-skill inventory
+scope, directory names and validated name segments are reused, but every
+candidate directory and disabled marker is checked on each call. Outside that
+scope, the method resolves runtime skill roots afresh so later filesystem
+changes are visible. Input is a skill name and optional C<include_disabled>
+boolean; output is an ordered list of skill-root paths, or an empty list for
+missing, invalid, or effectively disabled skills.
+
+  my @layers = $paths->skill_layers('example-skill');
+  my @all    = $paths->skill_layers('example-skill', include_disabled => 1);
+
 =head2 runtime_root, cache_root, home_runtime_root, home_cache_root
 
 Report the layered runtime directories. C<runtime_root> and C<cache_root> follow the deepest discovered layer, which is the write target for layered runtime state. At each depth, both existing C<.d2/> and C<.developer-dashboard/> roots are independently discoverable; C<.developer-dashboard/> wins same-depth lookup precedence and remains the write target when both exist. C<home_runtime_root> and C<home_cache_root> stay pinned to the selected home write root, for per-user artifacts that a fixed external consumer reads from one well-known path.
+
+C<runtime_layers> refreshes filesystem discovery on an unscoped call so a
+retained registry notices project runtime-layer creation and removal. Callers
+may share its result only within an operation by localizing
+C<_runtime_layer_candidate_scope>; C<all_paths> and the path CLI establish
+such scopes. A scope snapshots each parent's existing C<.d2> and
+C<.developer-dashboard> directories, while unscoped calls always check the
+filesystem again. The private C<_existing_layer_dirs_for> helper requires a
+defined, non-empty parent path and reports invalid input before touching the
+filesystem. Direct Dancer routes establish request-local path-identity
+and runtime-layer scopes so repeated spellings are canonicalized once and
+directory existence is checked once per parent during that request.
+C<runtime_root> also stores the deepest root in that active scope so repeated
+accessor calls avoid rebuilding a list from C<runtime_layers>; outside a scope,
+it resolves a fresh list on every call. All request-local data is discarded
+before the next request; these filesystem-derived values are never retained
+across operations or requests.
+
+=head2 _write_state_metadata
+
+Record the runtime-root identity in C<runtime.json> under the private shared
+state tree. Recreate missing directories or metadata after temporary cleanup.
+An existing file is left untouched only if it is a regular file owned by the
+current user, has mode C<0600>, and contains the exact expected JSON. Stale or
+loosely permissioned metadata is rewritten and secured; symlinks, non-regular
+files, and files owned by another user are refused with an explicit error.
+The canonical expected JSON string is kept in a bounded one-entry object cache
+for the latest exact runtime-root/application-name pair, avoiding redundant
+encoding. Every call still checks the live directory and file, validates
+ownership, mode, and type, and reads the on-disk bytes before accepting the
+metadata as unchanged.
+Filesystem inspection, open, write, and close failures are returned as explicit
+errors rather than being ignored. The small C<_state_metadata_lstat>,
+C<_open_state_metadata_file>, C<_print_state_metadata>, and
+C<_close_state_metadata_file> helpers preserve those operation results for
+deterministic failure-path tests.
+
+=head2 config_root, config_roots, config_layers
+
+C<config_root> selects the writable config directory. When
+C<DEVELOPER_DASHBOARD_CONFIG_OVERLAY> is set, that private directory becomes
+the write target; C<config_roots> still returns the normal layered config
+directories and prepends the overlay so its values have the highest lookup
+priority. C<config_layers> appends it as the final inherited layer. This lets
+container commands store a path-alias override without writing through a
+bind-mounted host config or hiding existing config values. The older
+C<DEVELOPER_DASHBOARD_CONFIGS> setting remains a replacement config root.
+C<config_roots> and C<skills_roots> also accept an internal
+C<runtime_roots =E<gt> \@roots> snapshot. Request-scoped discovery uses this
+to derive sibling directories from one consistent layer inventory instead of
+re-discovering runtime layers for each accessor. Calls without the argument
+retain normal live discovery behavior.
 
 =for comment FULL-POD-DOC START
 

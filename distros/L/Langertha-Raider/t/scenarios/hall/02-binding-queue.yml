@@ -1,0 +1,29 @@
+title: two missions for one numbered slot run one after the other, the second continues the session of the first
+# 1testie is a singleton slot bound as slot:1testie. The first mission keeps the
+# raider busy (a bash call that sleeps); the second waits in the hall's queue
+# and starts when the first ended -- in the same session, so one journal carries
+# both prompts.
+model:
+  rules:
+    Arbeite lange.:
+      tool_calls:
+        - [ bash, { command: "touch busy && sleep 3" } ]
+    Zweiter Auftrag.: { answer: "Zweiter fertig." }
+  after:
+    bash: { answer: "Erster fertig." }
+  fallback: { answer: "unbekannt" }
+steps:
+  - spawn: { name: 1testie, mission: "Arbeite lange.", as: first }
+  - wait_file: { path: busy }
+  - spawn: { name: 1testie, mission: "Zweiter Auftrag.", queued: true }
+  - expect_event: { type: raider.queued, slot: 1testie }
+  - ps: {}
+  - expect_ps: { count: 1, missions: ["Arbeite lange."] }
+  - done: { run: first, status: completed, response_like: 'Erster fertig', binding: 'slot:1testie' }
+  - wait_event: { type: raider.spawned, slot: 1testie, nth: 2, as: second }
+  - done: { run: second, status: completed, response_like: 'Zweiter fertig', binding: 'slot:1testie', session: { same_as: first } }
+  - idle: {}
+  - expect_journals:
+      count: 1
+      prompts:
+        - [ "Arbeite lange.", "Zweiter Auftrag." ]

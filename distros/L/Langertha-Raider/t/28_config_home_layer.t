@@ -192,9 +192,8 @@ subtest 'skills: union, home first' => sub {
   home({ skills => [ 'claude', 'home-skills' ] });
   my $root = project(new => { skills => [ 'notes', 'claude' ] });
   my $config = config($root);
+  # claude is the layout switch now (ADR 0019), no skill directory.
   is([ $config->skill_specs('openai') ], [
-    { type => 'file',   path => 'CLAUDE.md' },
-    { type => 'claude', path => '.claude/skills' },
     { type => 'dir',    path => 'home-skills' },
     { type => 'dir',    path => 'notes' },
   ], 'both lists, deduplicated');
@@ -349,7 +348,7 @@ subtest 'writers never write the home file' => sub {
   my ( $exit ) = run_cli('-r', "$none", '-e', 'openai', '-k', 'test', '--no-trace', '--claude',
     '--export-skill', "$none/S.md");
   is($exit, 0, 'exit 0');
-  is(load($none, '.raider.yml')->{skills}, ['claude'], '--claude persisted into the project file');
+  is(load($none, '.raider.yml')->{claude}, T(), '--claude persisted into the project file as claude: true');
   is($home->child('.raider', 'config.yml')->slurp_utf8, $before, 'home file untouched');
 };
 

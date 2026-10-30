@@ -231,4 +231,12 @@ my $snow = "\xE2\x98\x83";	# U+2603 SNOWMAN
 	is( scalar @warnings, 0, 'utf8: reading a non-ASCII file emits no warnings' )
 		or diag "warnings seen: @warnings";
 }
+# A call-form error prints read_table's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { read_table(); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: read_table\(/, 'read_table: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('read_table') . "read_table: error: file name missing\n",
+		'read_table: the help screen, then the error on the last line');
+}
 done_testing();

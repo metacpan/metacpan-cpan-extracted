@@ -1,0 +1,202 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd ();
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Memoize ();
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::PathIdentity ();
+
+my $path_count = 250;
+my $runs       = 9;
+my $help       = 0;
+GetOptions(
+    'paths=i' => \$path_count,
+    'runs=i'  => \$runs,
+    'help'    => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die _usage() if @ARGV || $path_count < 1;
+die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $root = tempdir( 'problem48-memoize-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+my $target_a = File::Spec->catdir( $root, 'target-a' );
+my $target_b = File::Spec->catdir( $root, 'target-b' );
+my $link = File::Spec->catdir( $root, 'mutable-link' );
+make_path( $target_a, $target_b );
+my @base_paths;
+for my $index ( 1 .. $path_count ) {
+    my $dir = File::Spec->catdir( $root, sprintf( 'path-%06d', $index ) );
+    make_path($dir);
+    push @base_paths, $dir;
+}
+my @workload = map { ( $_, $_ ) } @base_paths;
+
+Memoize::memoize('main::_memoized_path_identity');
+my @strategies = qw(uncached request_hash Memoize);
+my %samples = map { $_ => [] } @strategies;
+my $expected = _evaluate( 'uncached', \@workload );
+for my $strategy (@strategies) {
+    die "$strategy output differs before timing\n"
+      if join( "\0", @{ _evaluate( $strategy, \@workload ) } ) ne join( "\0", @{$expected} );
+}
+
+for my $run ( 1 .. $runs ) {
+    my @order = @strategies;
+    @order = ( @order[ $run % @order .. $#order ], @order[ 0 .. $run % @order - 1 ] ) if $run > 1;
+    for my $strategy (@order) {
+        my $started = time;
+        my $actual = _evaluate( $strategy, \@workload );
+        push @{ $samples{$strategy} }, time - $started;
+        die "$strategy output changed in run $run\n"
+          if join( "\0", @{$actual} ) ne join( "\0", @{$expected} );
+    }
+}
+
+_replace_link( $link, $target_a );
+my $refresh_ok = 1;
+for my $strategy (@strategies) {
+    my $first = _evaluate( $strategy, [$link] )->[0];
+    _replace_link( $link, $target_b );
+    my $next = _evaluate( $strategy, [$link] )->[0];
+    $refresh_ok = 0 if $first eq $next || $next ne ( Cwd::abs_path($target_b) // '' );
+    _replace_link( $link, $target_a );
+}
+die "A strategy returned stale symlink identity after operation boundary\n" if !$refresh_ok;
+
+printf "repeated_paths=%d unique_paths=%d runs=%d exact_parity=yes symlink_refresh=yes\n",
+  scalar(@workload), scalar(@base_paths), $runs;
+for my $strategy (@strategies) {
+    printf "%s_median_ms=%.3f\n", $strategy, 1000 * _median( @{ $samples{$strategy} } );
+}
+printf "request_hash_vs_uncached=%.2fx Memoize_vs_uncached=%.2fx\n",
+  _median( @{ $samples{uncached} } ) / _median( @{ $samples{request_hash} } ),
+  _median( @{ $samples{uncached} } ) / _median( @{ $samples{Memoize} } );
+exit 0;
+
+# _usage()
+# Returns benchmark usage and argument constraints.
+# Input: none.
+# Output: usage text string.
+sub _usage {
+    return "Usage: $0 [--paths N] [--runs ODD_N] [--help]\n"
+      . "Compares uncached, request-scoped hash, and Memoize path identity.\n";
+}
+
+# _evaluate($strategy, $paths)
+# Resolves each input path with no cache, a per-operation hash, or a flushed
+# Memoize cache, returning results in input order.
+# Input: strategy name and array reference of paths.
+# Output: array reference of canonical path identities.
+sub _evaluate {
+    my ( $strategy, $paths ) = @_;
+    Memoize::flush_cache('main::_memoized_path_identity') if $strategy eq 'Memoize';
+    if ( $strategy eq 'request_hash' ) {
+        my %cache;
+        return [ map { $cache{$_} //= _uncached_path_identity($_) } @{$paths} ];
+    }
+    return [ map { _uncached_path_identity($_) } @{$paths} ] if $strategy eq 'uncached';
+    return [ map { _memoized_path_identity($_) } @{$paths} ] if $strategy eq 'Memoize';
+    die "Unknown path identity strategy '$strategy'\n";
+}
+
+# _uncached_path_identity($path)
+# Resolves an existing path with the production symlink-aware identity helper.
+# Input: path string.
+# Output: canonical path identity string.
+sub _uncached_path_identity {
+    my ($path) = @_;
+    return Developer::Dashboard::PathIdentity::_path_identity( $path, empty_fallback => 1 );
+}
+
+# _memoized_path_identity($path)
+# Provides Memoize's wrapper with the same path identity behavior as production.
+# Input: path string.
+# Output: canonical path identity string.
+sub _memoized_path_identity {
+    my ($path) = @_;
+    return _uncached_path_identity($path);
+}
+
+# _replace_link($link, $target)
+# Replaces one benchmark symlink so operation-boundary freshness can be tested.
+# Input: symlink path and existing target directory.
+# Output: true after the replacement succeeds; dies on filesystem errors.
+sub _replace_link {
+    my ( $link, $target ) = @_;
+    if ( -l $link ) {
+        unlink $link or die "Unable to remove benchmark symlink '$link': $!";
+    }
+    symlink $target, $link or die "Unable to create benchmark symlink '$link': $!";
+    return 1;
+}
+
+# _median(@seconds)
+# Returns the middle value from an odd, nonempty timing sample list.
+# Input: elapsed seconds.
+# Output: median elapsed seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-memoize-benchmark - compare uncached and request-scoped path identity
+
+=head1 PURPOSE
+
+Compares path identity resolution without a cache, with a request-local hash,
+and with Memoize flushed at each operation boundary. It reports only results
+that preserve identical ordered identities and detects symlink retargeting
+between operations.
+
+=head1 WHY IT EXISTS
+
+Problem 48 evaluates Memoize as a possible accelerator. Path identity depends
+on mutable filesystem state, so this benchmark explicitly prevents cached
+results from surviving an operation and verifies freshness after symlink
+replacement.
+
+=head1 WHEN TO USE
+
+Use this only in the isolated Problem 48 benchmark container after changing
+path identity or cache strategy code. It is research tooling, not a production
+cache or proof that every dashboard routine is faster.
+
+=head1 HOW TO USE
+
+  perl script/problem48-memoize-benchmark
+  perl script/problem48-memoize-benchmark --paths 1000 --runs 15
+
+The sample count must be odd and positive. Every strategy is checked for exact
+output parity before and during timing.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this tool to determine whether the
+standard Memoize module improves on the existing operation-local hash. The
+dashboard itself does not invoke it.
+
+=head1 EXAMPLES
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench sh -lc 'cd /checkout && perl script/problem48-memoize-benchmark --paths 1000 --runs 15'
+
+=cut

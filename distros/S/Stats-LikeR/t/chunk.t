@@ -63,10 +63,10 @@ use Stats::LikeR;
 	# number of elements in hash assignment at LikeR.pm line NNN" -- naming
 	# neither chunk nor the option it wanted.
 	like(do { local $@; eval { chunk([1, 2], 2) }; $@ },
-	     qr/\Achunk: arguments after the array reference must be name => value/,
+	     qr/^chunk: error: arguments after the array reference must be name => value/m,
 	     'a positional size is a chunk usage error, not a hash-assignment warning');
 	like(do { local $@; eval { chunk([1, 2], 'size') }; $@ },
-	     qr/\Achunk: arguments after the array reference must be name => value/,
+	     qr/^chunk: error: arguments after the array reference must be name => value/m,
 	     'a dangling option name is caught the same way');
 }
 
@@ -77,6 +77,16 @@ unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { eval { my @g = chunk(\@data, parts => 13) } } 'chunk: no leaks (parts)';
 	no_leaks_ok { eval { my @g = chunk(\@data, parts => 999) } } 'chunk: no leaks (parts > n)';
 	no_leaks_ok { eval { my @g = chunk('x', size => 2) } }     'chunk: no leaks (error path)';
+}
+
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('chunk');
+	like($screen, qr/\Ausage: chunk\(/, 'chunk has a help screen');
+	is(do { local $@; eval { chunk([1, 2]); 1 } ? '' : $@ },
+	   $screen . "chunk: error: pass exactly one of size => N or parts => K\n",
+	   'chunk: neither size nor parts prints the help screen');
 }
 
 done_testing();

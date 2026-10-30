@@ -112,9 +112,30 @@ subtest 'add_skills appends once, top level' => sub {
 subtest 'add_skills keeps a hash skills entry' => sub {
   my $config = config_for('skills-hash.yml');
   $config->add_skills('openai');
-  is([ $config->skill_specs('openai') ],
-    [ { type => 'dir', path => 'myskills' }, { type => 'file', path => 'AGENTS.md' } ],
-    'hash entry kept, profile appended');
+  # ADR 0019: the profile is no skill directory, it names AGENTS.md.
+  is([ $config->skill_specs('openai') ], [ { type => 'dir', path => 'myskills' } ],
+    'hash entry kept');
+  is([ $config->profiles('openai') ], ['openai'], 'profile appended');
+};
+
+subtest 'enable_claude writes claude: true once, only that key' => sub {
+  my $config = config_with("# keep me\ndefault:\n  model: x\nperl: 1\n");
+  is($config->enable_claude, 1, 'written');
+  my $raw = YAML::PP->new->load_string($config->file->slurp_utf8);
+  is($raw, { default => { model => 'x' }, perl => 1, claude => T() }, 'claude: true at top, other keys kept');
+  ok($config->options('openai')->{claude}, 're-read: claude is on');
+  is($config->enable_claude, 0, 'nothing on repeat');
+
+  for my $yml ("claude: true\n", "default:\n  claude: true\n", "skills: [claude]\n", "default:\n  skills: claude\n") {
+    my $same = config_with($yml);
+    my $before = $same->file->slurp_utf8;
+    is($same->enable_claude, 0, 'already on: '.( $yml =~ s/\n/ /gr ));
+    is($same->file->slurp_utf8, $before, 'file untouched');
+  }
+  my $off = config_with("claude: false\n");
+  is($off->enable_claude, 1, 'claude: false is switched on');
+  ok(YAML::PP->new->load_string($off->file->slurp_utf8)->{claude}, 'now true');
+  ok(dies { config_for('broken.yml')->enable_claude }, 'croaks on a broken file');
 };
 
 subtest 'add_skills does not write keys it did not change' => sub {
@@ -144,15 +165,18 @@ subtest 'skill_specs merges layers and CLI, deduplicated' => sub {
     default => { skills => ['openai'] },
     openai  => { skills => [ { type => 'dir', path => 'oa' } ] },
   }));
-  is([ $config->skill_specs('openai', { type => 'file', path => 'AGENTS.md' }, { type => 'dir', path => 'cli' }) ],
+  # ADR 0019: the profile keywords name no skill directory; a type: file names one skill file.
+  is([ $config->skill_specs('openai', 'openai', { type => 'file', path => 'one.md' },
+      { type => 'claude', path => 'cl' }, { type => 'dir', path => 'cli' }) ],
     [
-      { type => 'file',   path => 'CLAUDE.md' },
-      { type => 'claude', path => '.claude/skills' },
-      { type => 'file',   path => 'AGENTS.md' },
       { type => 'dir',    path => 'oa' },
+      { type => 'file',   path => 'one.md' },
+      { type => 'claude', path => 'cl' },
       { type => 'dir',    path => 'cli' },
     ], 'top, default, engine section, then CLI');
-  is(scalar(my @s = $config->skill_specs('anthropic')), 3, 'engine section only when active');
+  is(scalar(my @s = $config->skill_specs('anthropic')), 0, 'engine section only when active');
+  is([ $config->profiles('openai', 'codex') ], [ 'claude', 'openai' ], 'profiles of the layers and the extra items');
+  is([ $config->profiles('anthropic', 'claude') ], [ 'claude', 'openai' ], 'each profile once');
 };
 
 subtest 'engine key' => sub {

@@ -1,0 +1,22 @@
+title: allow_always becomes a session rule of the raider; the second write is not asked again
+hall:
+  raiders:
+    Frager: { engine: mock, packs: [], mcp: [], isolated: 0, permission_mode: default }
+model:
+  rules:
+    Schreibe zwei.:
+      tool_calls:
+        - [ write_file, { path: a.txt, content: "a\n" } ]
+        - [ write_file, { path: b.txt, content: "b\n" } ]
+  after:
+    write_file: { answer: "fertig" }
+  fallback: { answer: "unbekannt" }
+steps:
+  - acp_permissions: { answers: [ always ] }
+  - acp_session: { as: s, raider: Frager }
+  - acp_prompt: { session: s, text: "Schreibe zwei.", as: p }
+  - expect_acp: { prompt: p, stop_reason: end_turn }
+  - expect_file: { path: a.txt, content: "a\n" }
+  - expect_file: { path: b.txt, content: "b\n" }
+  - expect_permission_requests: { count: 1 }
+  - idle: {}

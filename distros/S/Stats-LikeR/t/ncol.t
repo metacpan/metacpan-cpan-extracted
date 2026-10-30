@@ -117,4 +117,12 @@ unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { ncol({ r1=>{a=>1}, r2=>{a=>2} }) }   'ncol(): HoH count, no leaks';
 }
 
+# A call-form error prints ncol's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { ncol(undef); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: ncol\(/, 'ncol: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('ncol') . "ncol: error: expected an ARRAY or HASH ref (got undef)\n",
+		'ncol: the help screen, then the error on the last line');
+}
 done_testing();

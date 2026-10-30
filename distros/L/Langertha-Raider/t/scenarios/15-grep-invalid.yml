@@ -1,0 +1,14 @@
+title: grep reports an invalid pattern and an unknown option as errors the model can read
+prompt: Search badly.
+script:
+  - tool_calls:
+      - [ grep, { pattern: '(' } ]
+      - [ grep, { pattern: x, type: cobol } ]
+      - [ grep, { pattern: x, '-A': -2 } ]
+  - text: korrigiert
+expect:
+  answer: korrigiert
+  tools:
+    - { name: grep, error: true, text: '^Error: invalid ' }
+    - { name: grep, error: true, text: 'unknown type: cobol \(known: ' }
+    - { name: grep, error: true, text: 'minimum|-2|Invalid' }

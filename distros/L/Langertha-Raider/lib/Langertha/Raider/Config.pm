@@ -1,18 +1,21 @@
 package Langertha::Raider::Config;
 # ABSTRACT: Internal resolver and writer for the project config file
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use namespace::autoclean;
 use Carp qw( croak );
 use JSON::MaybeXS ();
 use Path::Tiny;
+use Scalar::Util ();
 use YAML::PP ();
 use Langertha::Raider::Detect;
 use Langertha::Raider::Home;
 
 
 # Keys that configure raider itself and never reach the engine constructor.
-my %APP_KEY = map { $_ => 1 } qw( detect engine no_detect packs perl preferred_lib_target project_tools skills );
+my %APP_KEY = map { $_ => 1 } qw( agent_models claude detect engine max_agent_depth max_concurrent_agents no_detect packs permissions perl preferred_lib_target project_tools providers skills web_fetch_model worktree_base_ref );
+# The MCP servers and their approvals (ADR 0029), read on their own.
+$APP_KEY{$_} = 1 for qw( mcp mcp_approvals );
 
 my %PROFILE_KEYWORD = (
   claude => 'claude',
@@ -170,7 +173,8 @@ sub file_exists { -f $_[0]->file ? 1 : 0 }
 # is an engine section.
 sub _may_be_mapping {
   my ( $self, $key ) = @_;
-  return $key eq 'skills' || $key eq 'detect' || $key eq 'project_tools';
+  return $key eq 'skills' || $key eq 'detect' || $key eq 'project_tools' || $key eq 'providers'
+    || $key eq 'permissions' || $key eq 'agent_models' || $key eq 'mcp' || $key eq 'mcp_approvals';
 }
 
 sub _is_section {
@@ -275,6 +279,30 @@ sub _resolve_file {
           unless $top && ( length $prefix || $self->_is_home_file );
         next;
       }
+      if ($key eq 'providers') {
+        # Read on its own (providers), never layered; only the top level of
+        # the home file holds provider bindings.
+        my $top = $name eq $prefix.'top';
+        push @ignored, $self->_ignored_providers($name, $top)
+          unless $top && ( length $prefix || $self->_is_home_file );
+        next;
+      }
+      if ($key eq 'permissions' || $key eq 'mcp') {
+        # Read on its own (permissions, mcp_servers), from the top level of both files.
+        push @ignored, { key => $name.'.'.$key, reason => 'read only at the top level of a config file' }
+          unless $name eq $prefix.'top';
+        next;
+      }
+      if ($key eq 'mcp_approvals') {
+        # Read on its own (mcp_approvals); only the top level of the home
+        # file approves project servers.
+        my $top = $name eq $prefix.'top';
+        push @ignored, $top
+          ? { key => 'mcp_approvals', reason => 'only ~/.raider/config.yml approves MCP servers; a project file cannot' }
+          : { key => $name.'.mcp_approvals', reason => 'read only at the top level of ~/.raider/config.yml' }
+          unless $top && ( length $prefix || $self->_is_home_file );
+        next;
+      }
       if ($key eq 'engine' && $name ne $prefix.'top' && $name ne $prefix.'default') {
         push @ignored, { key => $name.'.engine', reason => 'engine: inside an engine section' };
         next;
@@ -335,7 +363,34 @@ sub engine {
 
 sub options {
   my ( $self, $engine ) = @_;
-  return { %{ $self->_resolve($engine)->{value} } };
+  return $self->normalize_bools({ %{ $self->_resolve($engine)->{value} } });
+}
+
+
+sub parse_bool {
+  my ( $self, $value, $label ) = @_;
+  return unless defined $value;
+  if (ref $value) {
+    return $value ? 1 : 0 if Scalar::Util::blessed($value);
+    croak 'Invalid '.( $label // 'boolean' ).': a list or map is not a boolean';
+  }
+  my $word = lc $value;
+  $word =~ s/\A\s+|\s+\z//g;
+  return 1 if $word =~ /\A(?:true|yes|on|y)\z/;
+  return 0 if $word =~ /\A(?:false|no|off|n|)\z/;
+  return $word + 0 ? 1 : 0 if $word =~ /\A-?\d+(?:\.\d+)?\z/;
+  croak 'Invalid '.( $label // 'boolean' ).": '".$value."' is not a boolean (true/false, yes/no, on/off, 1/0)";
+}
+
+
+sub bool_keys { qw( claude perl ) }
+
+sub normalize_bools {
+  my ( $self, $options ) = @_;
+  for my $key ($self->bool_keys) {
+    $options->{$key} = $self->parse_bool($options->{$key}, $key.':') if defined $options->{$key};
+  }
+  return $options;
 }
 
 
@@ -385,7 +440,7 @@ sub normalize_detect {
       croak 'Invalid detect setting detect: must be a map of pack name to rule, or false';
     }
     else {
-      $settings{enabled} = $detect ? 1 : 0;
+      $settings{enabled} = $self->parse_bool($detect, 'detect:');
     }
   }
   if (defined $no_detect) {
@@ -515,19 +570,163 @@ sub _ignored_project_tools {
   return { key => $layer.'.project_tools', reason => 'read only at the top level of ~/.raider/config.yml' };
 }
 
+sub _ignored_providers {
+  my ( $self, $layer, $top ) = @_;
+  return { key => 'providers', reason => 'only ~/.raider/config.yml holds provider bindings; a project file cannot' }
+    if $top;
+  return { key => $layer.'.providers', reason => 'read only at the top level of ~/.raider/config.yml' };
+}
+
+
+sub providers {
+  my ( $self ) = @_;
+  my $file = $self->home_file;
+  return {} unless defined $file && -f $file;
+  my $raw = $self->_load($file)->{providers};
+  return {} unless defined $raw;
+  croak 'Cannot use '.$file.': providers: must be a mapping of alias to binding' unless ref $raw eq 'HASH';
+  return $raw;
+}
+
+
+sub _home_rule_label { '~/'.$_[0]->home_class->dir_name.'/config.yml' }
+
+sub permissions {
+  my ( $self ) = @_;
+  my %out = ( allow => [], ask => [], deny => [], default_mode => undef, additional_directories => [] );
+  my @files = (
+    ( $self->uses_home ? [ $self->home_data, $self->_home_rule_label ] : () ),
+    [ $self->data, $self->label ],
+  );
+  for my $file (@files) {
+    my ( $data, $label ) = @$file;
+    my $perms = $data->{permissions};
+    next unless defined $perms;
+    my $fail = sub { croak 'Invalid permissions setting in '.$label.': '.$_[0] };
+    $fail->('permissions: must be a mapping') unless ref $perms eq 'HASH';
+    for my $key (sort keys %$perms) {
+      next if exists $out{$key};
+      my %hint = ( defaultMode => 'default_mode', additionalDirectories => 'additional_directories' );
+      $fail->('permissions.'.$key.': unknown key'.( $hint{$key} ? ' (use '.$hint{$key}.')' : '' ));
+    }
+    for my $kind (qw( allow ask deny additional_directories )) {
+      my $list = $perms->{$kind};
+      next unless defined $list;
+      $list = [ $list ] unless ref $list;
+      $fail->('permissions.'.$kind.': must be a list of strings') unless ref $list eq 'ARRAY';
+      for my $item (@$list) {
+        $fail->('permissions.'.$kind.': must be a list of strings') if ref $item || !length($item // '');
+        push @{ $out{$kind} }, { ( $kind eq 'additional_directories' ? 'path' : 'rule' ) => $item, source => $label };
+      }
+    }
+    if (defined( my $mode = $perms->{default_mode} )) {
+      $fail->('permissions.default_mode: must be a mode name') if ref $mode;
+      $out{default_mode} = { value => $mode, source => $label };
+    }
+  }
+  return \%out;
+}
+
+
+sub mcp_servers {
+  my ( $self ) = @_;
+  my $home_file = $self->_is_home_file;
+  my @files = (
+    [ $self->data, ( $home_file ? ( $self->_home_rule_label, 'raider-home' ) : ( $self->label, 'raider-project' ) ) ],
+    ( $self->uses_home ? [ $self->home_data, $self->_home_rule_label, 'raider-home' ] : () ),
+  );
+  my @out;
+  for my $file (@files) {
+    my ( $data, $label, $scope ) = @$file;
+    my $mcp = $data->{mcp};
+    next unless defined $mcp;
+    my $fail = sub { croak 'Invalid mcp setting in '.$label.': '.$_[0] };
+    $fail->('mcp: must be a mapping of server name to server entry') unless ref $mcp eq 'HASH';
+    for my $name (sort keys %$mcp) {
+      $fail->('mcp.'.$name.': must be a mapping (command/args/env or type/url/headers)')
+        unless ref $mcp->{$name} eq 'HASH';
+      push @out, { name => $name, entry => $mcp->{$name}, scope => $scope, source => $label };
+    }
+  }
+  return \@out;
+}
+
+
+sub mcp_approvals {
+  my ( $self ) = @_;
+  my $raw = $self->_project_tools_data->{mcp_approvals};
+  return [] unless defined $raw;
+  my $label = $self->_home_rule_label;
+  my $fail = sub { croak 'Invalid mcp_approvals setting in '.$label.': '.$_[0] };
+  $fail->('mcp_approvals: must be a mapping of project path to approvals') unless ref $raw eq 'HASH';
+  my %hint = (
+    enableAllProjectMcpServers => 'enable_all',
+    enabledMcpjsonServers      => 'enabled',
+    disabledMcpjsonServers     => 'disabled',
+  );
+  my @out;
+  for my $path (sort keys %$raw) {
+    my $key = 'mcp_approvals.'.$path;
+    my $dir;
+    if ($path =~ m{\A/}) {
+      $dir = $path;
+    }
+    elsif ($path =~ m{\A~(?:/|\z)}) {
+      my $home = $self->home_class->home_dir;
+      $fail->($key.': no home directory for ~') unless defined $home;
+      $dir = $home.substr($path, 1);
+    }
+    else {
+      $fail->($key.': must be an absolute path or start with ~/');
+    }
+    $fail->($key.': a path cannot hold * or ?') if $path =~ /[*?]/;
+    $dir = path($dir)->absolute;
+    $dir = $dir->realpath if -e $dir;
+    my $entry = $raw->{$path};
+    $fail->($key.': must be a mapping (enable_all, enabled, disabled)') unless ref $entry eq 'HASH';
+    for my $k (sort keys %$entry) {
+      next if $k eq 'enable_all' || $k eq 'enabled' || $k eq 'disabled';
+      $fail->($key.'.'.$k.': unknown key'.( $hint{$k} ? ' (use '.$hint{$k}.')' : '' ));
+    }
+    my %lists;
+    for my $kind (qw( enabled disabled )) {
+      my $list = $entry->{$kind} // [];
+      $list = [ $list ] unless ref $list;
+      $fail->($key.'.'.$kind.': must be a list of server names') unless ref $list eq 'ARRAY';
+      for my $name (@$list) {
+        $fail->($key.'.'.$kind.': must be a list of server names') if ref $name || !length($name // '');
+      }
+      $lists{$kind} = [ @$list ];
+    }
+    my $all = eval { $self->parse_bool($entry->{enable_all}) };
+    $fail->($key.'.enable_all: must be a boolean (true/false)') if $@;
+    push @out, {
+      path       => $path,
+      dir        => $dir->stringify,
+      enable_all => $all,
+      enabled    => $lists{enabled},
+      disabled   => $lists{disabled},
+      source     => $label,
+    };
+  }
+  return \@out;
+}
+
 
 sub normalize_skill_spec {
   my ( $self, $spec ) = @_;
   if (!ref $spec) {
-    return (
-      { type => 'file',   path => 'CLAUDE.md' },
-      { type => 'claude', path => '.claude/skills' },
-    ) if $spec eq 'claude';
-    return { type => 'file', path => 'AGENTS.md' } if $PROFILE_KEYWORD{$spec};
+    return if !defined $spec || $PROFILE_KEYWORD{$spec};
     return { type => 'dir', path => $spec };
   }
-  return $spec if ref $spec eq 'HASH';
-  return;
+  croak 'Invalid skills: an item is a path, a profile keyword or a map with type and path'
+    if ref $spec ne 'HASH';
+  my $type = $spec->{type} // 'dir';
+  croak "Invalid skills: type '".( ref $type ? 'a '.ref $type : $type )."' is none of dir, claude, file"
+    unless !ref $type && grep { $_ eq $type } qw( dir claude file );
+  croak 'Invalid skills: an item of type '.$type.' needs a path'
+    unless defined $spec->{path} && !ref $spec->{path} && length $spec->{path};
+  return $spec;
 }
 
 sub _skill_items {
@@ -558,9 +757,9 @@ sub skill_specs {
 
 
 sub profiles {
-  my ( $self, $engine ) = @_;
+  my ( $self, $engine, @more ) = @_;
   my ( %seen, @profiles );
-  for my $item ($self->_skill_items($engine)) {
+  for my $item ($self->_skill_items($engine), @more) {
     next if ref $item;
     my $profile = $PROFILE_KEYWORD{$item} or next;
     push @profiles, $profile unless $seen{$profile}++;
@@ -675,6 +874,22 @@ sub add_skills {
   return @added;
 }
 
+
+sub enable_claude {
+  my ( $self ) = @_;
+  return $self->_update(sub {
+    my ( $data ) = @_;
+    for my $layer ( $data, ( ref $data->{default} eq 'HASH' ? $data->{default} : () ) ) {
+      return 0 if $layer->{claude};
+      my $skills = $layer->{skills};
+      return 0 if grep { defined && !ref && $_ eq 'claude' }
+        ref $skills eq 'ARRAY' ? @$skills : ($skills);
+    }
+    $data->{claude} = !!1;
+    return 1;
+  }) ? 1 : 0;
+}
+
 sub _item_key {
   my ( $self, $item ) = @_;
   return ref $item eq 'HASH' ? $self->_spec_key($item) : 'item:'.($item // '');
@@ -747,7 +962,7 @@ Langertha::Raider::Config - Internal resolver and writer for the project config 
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -759,7 +974,8 @@ version 0.503
     my @specs   = $config->skill_specs('openai');
     my $report  = $config->explain('openai');         # which value came from where
 
-    my @added = $config->add_skills('claude');        # the one writer
+    my @added = $config->add_skills('my-skills');     # the project writers
+    $config->enable_claude;                           # claude: true
     $config->set_model('gpt-4o');
 
 =head1 DESCRIPTION
@@ -781,7 +997,8 @@ winning:
 =over
 
 =item C<top> -- every top-level key whose value is not a hash (plus
-C<skills>, C<detect> and C<project_tools>, which may be one)
+C<skills>, C<detect>, C<project_tools>, C<providers> and C<permissions>,
+which may be one)
 
 =item C<default> -- the C<default:> section
 
@@ -813,15 +1030,23 @@ value replaces the home's
 =back
 
 C<project_tools> is not layered at all: only the top level of the home
-file grants tools to projects (L</project_tools>).
+file grants tools to projects (L</project_tools>). Neither is C<providers>:
+only the top level of the home file holds provider bindings
+(L</providers>).
+C<permissions> is read on its own too (L</permissions>): the rules of both
+files are concatenated with their source, never replaced. So is C<mcp>
+(L</mcp_servers>, ADR 0029): the MCP servers of both files, the project
+file's first, each with its source. C<mcp_approvals> (L</mcp_approvals>) is read
+from the top level of the home file only.
 
 The project writers never touch the home file (L</update_home> is the only
-one, with no caller yet). When the home file is the file in
+one; C<raider provider add> calls it). When the home file is the file in
 use -- raider runs in the home directory itself -- it is read once, as the
 project file, and there is no home layer.
 
 A file, project or home, that does not parse, whose top level is not a mapping, or that holds
-a mapping under one of raider's own keys other than C<skills>, C<detect> and C<project_tools>
+a mapping under one of raider's own keys other than C<skills>, C<detect>, C<project_tools>,
+C<providers>, C<permissions>, C<agent_models>, C<mcp> and C<mcp_approvals>
 (see L</is_app_key>) -- at top level or in any section, active or not -- is
 an error: readers croak and the writer refuses to
 overwrite it.
@@ -931,21 +1156,50 @@ The engine name from C<engine:> (top level or C<default:>), or undef.
 
 Every effective key except C<skills>, layered for C<$engine_name>.
 
+=head2 parse_bool
+
+    my $bool = $config->parse_bool($value, 'claude');   # 1, 0 or undef
+
+The one boolean parser of raider's own keys, for a C<-o KEY=VALUE>, a
+config file and an API caller alike: C<undef> stays C<undef>; a boolean
+object is read by truth; the words C<true>, C<yes>, C<on>, C<y> (any
+case) are C<1>; C<false>, C<no>, C<off>, C<n>, C<0> and the empty string
+are C<0>; other numbers are read by truth. Anything else croaks naming
+C<$label>, so C<-o claude=false> can never be read as the true string
+C<"false">.
+
+=head2 bool_keys
+
+The raider keys that hold a plain boolean: C<claude> and C<perl>.
+(C<detect> also takes a map of rules; its scalar form is read with
+L</parse_bool> too.)
+
+=head2 normalize_bools
+
+    $config->normalize_bools(\%options);
+
+Replaces the L</bool_keys> of a hash by L</parse_bool>, in place, and
+returns it.
+
 =head2 engine_options
 
     my $opts = $config->engine_options($engine_name);
 
-L</options> without raider's own keys (C<detect>, C<engine>, C<no_detect>,
-C<packs>, C<perl>, C<preferred_lib_target>, C<project_tools>, C<skills>): what goes to the
-engine constructor.
+L</options> without raider's own keys (C<agent_models>, C<claude>, C<detect>, C<engine>,
+C<max_agent_depth>, C<max_concurrent_agents>, C<no_detect>,
+C<packs>, C<perl>, C<preferred_lib_target>, C<project_tools>, C<providers>,
+C<skills>, C<web_fetch_model>): what goes to the engine constructor.
 
 =head2 is_app_key
 
     $config->is_app_key('perl');   # 1
 
-True for the keys that configure raider itself (C<detect>, C<engine>,
-C<no_detect>, C<packs>, C<perl>, C<preferred_lib_target>, C<project_tools>,
-C<skills>) and never reach the engine constructor.
+True for the keys that configure raider itself (C<agent_models>, C<claude>,
+C<detect>, C<engine>, C<max_agent_depth>, C<max_concurrent_agents>,
+C<no_detect>, C<packs>, C<permissions>, C<perl>, C<preferred_lib_target>, C<project_tools>,
+C<providers>, C<skills>, C<web_fetch_model>, C<worktree_base_ref>) and never reach the engine constructor.
+C<mcp> and C<mcp_approvals> are raider keys too (L</mcp_servers>,
+L</mcp_approvals>).
 
 =head2 detect_settings
 
@@ -1028,13 +1282,118 @@ The entries of L</project_tools>, each with whether it applies to
 L</root> (C<matched>) and why (C<reason>). A workspace name never matches:
 C<workspace names are not supported yet>.
 
+=head2 providers
+
+    my $bindings = $config->providers;   # { ALIAS => { origin => ..., ... } }
+
+The C<providers:> map of the home file (L</home_file>), as written by
+C<raider provider add> through L</update_home>: one flat entry per alias
+(C<origin>, C<issuer>, C<auth>, C<credential_env>, C<allow_internal>,
+C<pinned_at> and the C<fingerprint> of what was accepted; see
+L<Langertha::Raider::Provider::Binding>). C<raider provider remove> deletes
+one through the same writer. Empty when there is no home
+file or no such key. Read from the home file only -- a C<providers:> in a
+project file is ignored and reported (L</explain>), so a repository cannot
+plant a binding. Croaks like L</data> does, and when C<providers:> is not a
+mapping.
+
+=head2 permissions
+
+    my $p = $config->permissions;
+
+The C<permissions:> of the home file and the project file (ADR 0021), in the
+shape of L<Langertha::Raider::Context::Settings/permissions>:
+
+    {
+      allow => [ { rule => 'Bash(make test)', source => '.raider/config.yml' }, ... ],
+      ask   => [ ... ],
+      deny  => [ ... ],
+      default_mode           => { value => 'acceptEdits', source => ... } | undef,
+      additional_directories => [ { path => '../docs', source => ... }, ... ],
+    }
+
+    permissions:
+      allow: [ "Bash(make test)", "Edit(lib/**)" ]
+      deny:  [ "Read(./.env)" ]
+      default_mode: acceptEdits
+      additional_directories: [ ../docs ]
+
+The rules are strings in Claude Code syntax
+(L<Langertha::Raider::Permissions::Rule>); a single string counts as a list
+of one. Both files' lists are concatenated, home first, with the source of
+every entry (C<~/.raider/config.yml> or L</label>); C<default_mode> of the
+project file wins over the home file's. Only the top level is read; a
+C<permissions:> inside a section is reported by L</explain>. Rules and modes
+are not checked here -- the policy reports the invalid ones. Croaks when
+C<permissions:> is not a mapping, has a key other than these five, or a list
+holds anything but non-empty strings.
+
+=head2 mcp_servers
+
+    for my $s (@{ $config->mcp_servers }) {
+      # { name => 'github', entry => { type => 'http', url => ... },
+      #   scope => 'raider-project', source => '.raider/config.yml' }
+    }
+
+The C<mcp:> entries of the project file, then of the home file (ADR 0029
+E<sect>2), each with its C<scope> (C<raider-project>, or C<raider-home> for
+the home file -- also when raider runs in the home directory and the home
+file is the file in use) and C<source> (L</label>, or
+C<~/.raider/config.yml>). Sorted by name within a file. The entries are as
+written, in Claude Code's F<.mcp.json> format; checking their fields,
+precedence and expansion are L<Langertha::Raider::MCP::Config>'s business.
+
+    mcp:
+      db:
+        command: npx
+        args: [ -y, "@bytebase/dbhub" ]
+        env: { DB_URL: "${DB_URL}" }
+
+Only the top level is read; an C<mcp:> inside a section is reported by
+L</explain>. Croaks with C<Invalid mcp setting in FILE: ...> when C<mcp:>
+is not a mapping or an entry is not a mapping.
+
+=head2 mcp_approvals
+
+    for my $a (@{ $config->mcp_approvals }) {
+      # { path => '~/dev/app', dir => '/home/me/dev/app', enable_all => 1,
+      #   enabled => ['github'], disabled => ['db'], source => '~/.raider/config.yml' }
+    }
+
+The C<mcp_approvals:> of the home file (ADR 0029 E<sect>7): which project
+MCP servers (F<.mcp.json>, the C<mcp:> of a project config) may start in
+which project. Read from the top level of the home file only -- a project
+file cannot approve its own servers, its C<mcp_approvals:> is reported by
+L</explain>.
+
+    mcp_approvals:
+      ~/dev/app:
+        enable_all: false
+        enabled: [ github ]
+        disabled: [ db ]
+
+Each key is the absolute or C<~/> path of a project directory (no globs);
+C<dir> is it with C<~> expanded and, when it exists, by its real path.
+C<enable_all> is a boolean (L</parse_bool>), C<undef> when not set;
+C<enabled> and C<disabled> are lists of server names (a single string
+counts as a list of one). Croaks with C<Invalid mcp_approvals setting in
+FILE: ...> on any other shape, an unknown key (camelCase gets a hint) or a
+path that is neither absolute nor C<~/>.
+
 =head2 normalize_skill_spec
 
     my @specs = $config->normalize_skill_spec($item);
 
-Turns one C<skills:> item into skill-source hashes: C<claude> becomes
-F<CLAUDE.md> plus F<.claude/skills>, C<openai> / C<codex> / C<agents> become
-F<AGENTS.md>, any other string a markdown directory, a hash passes through.
+Turns one C<skills:> item into the skill directories it names (ADR 0019
+E<sect>4): any string that is no profile keyword becomes
+C<< { type => 'dir', path => $item } >>, a hash with C<type> C<claude> or
+C<dir> (or none) passes through. The profile keywords name no directory
+and give nothing: C<claude> is the legacy spelling of C<claude: true>,
+C<openai> / C<codex> / C<agents> load F<AGENTS.md> as an instructions item
+(see L</profiles>). A hash with C<type> C<file> names one skill file (a
+flat F<*.md> skill, named by its file name). A hash with another C<type>,
+without a C<path>, or an item that is neither a string nor a hash croaks:
+a skill source is never dropped silently.
 
 =head2 skill_specs
 
@@ -1046,8 +1405,12 @@ deduplicated in that order.
 =head2 profiles
 
     my @profiles = $config->profiles($engine_name);
+    my @profiles = $config->profiles($engine_name, @more_items);
 
-The agent profiles (C<claude>, C<openai>) named in C<skills:>, in order.
+The agent profiles (C<claude>, C<openai>) named in C<skills:>, then in
+C<@more_items> (C<skills:> items from elsewhere, such as C<-o skills=>),
+in order: C<claude> for the item C<claude>, C<openai> for C<openai>,
+C<codex> and C<agents>.
 
 =head2 explain
 
@@ -1094,7 +1457,7 @@ is listed in C<ignored>.
       return 1;             # true: write it
     });
 
-Internal, no caller yet besides tests. The one writer of the home file
+Internal. The one writer of the home file
 L</home_file>, shaped like the project writers: the callback gets the
 parsed data of that file (empty when the file is absent), changes it in
 place and returns true to have it written; false leaves the disk alone.
@@ -1114,11 +1477,22 @@ there is no home at all.
 
 =head2 add_skills
 
-    my @added = $config->add_skills('claude', 'my-skills');
+    my @added = $config->add_skills('openai', 'my-skills');
 
 Appends the items not yet listed to the top-level C<skills:> list and writes
 the file. Items already present at top level or in C<default:> are skipped.
 Returns the items that were added.
+
+=head2 enable_claude
+
+    my $written = $config->enable_claude;
+
+Writes the top-level C<claude: true> (ADR 0019 E<sect>1, what C<--claude>
+persists) and returns true -- unless the file already says C<claude: true>
+at the top level or in C<default:>, or still lists the legacy C<claude> in
+C<skills:> there: then nothing is written and it returns false. Only that
+one key is touched. Without any file it creates the legacy F<.raider.yml>,
+as every project writer does.
 
 =head2 set_model
 
@@ -1162,7 +1536,7 @@ gives an empty text.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -1183,5 +1557,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

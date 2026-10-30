@@ -2,7 +2,7 @@ package Mail::DKIM2::BodyHasher;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use base 'Mail::DKIM2::HeaderParser';
 
@@ -92,7 +92,7 @@ Mail::DKIM2::BodyHasher - the body hash of a message, streamed
 
 =head1 DESCRIPTION
 
-The -07 section 6.1 body hash of a message, as
+The -08 section 6.1 body hash of a message, as
 C<Mail::DKIM2::MessageInstance::body_digest_raw> computes it, from a
 message fed through C<PRINT> and C<CLOSE> (or C<load>) in pieces of any
 size. The body is hashed as it arrives and never held: at most a megabyte

@@ -20,7 +20,7 @@ use Test::Returns;
 use Test::Permissions qw(:revoke :guard);
 use Readonly;
 use Encode ();
-use Errno qw(ENOSPC EIO);
+use Errno qw(ENOSPC EIO EMFILE);
 use Cwd qw(getcwd);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -38,6 +38,8 @@ Readonly::Scalar my $MAX_LISTED => 20;	# entries a failing assertion lists
 Readonly::Scalar my $MAX_REASON => 200;	# characters kept from a validator's error
 Readonly::Scalar my $BUDGET => 5;	# seconds any single hostile call may take
 Readonly::Scalar my $RANDOM_BYTES => 256;
+Readonly::Scalar my $FD_SPARE => 32;	# descriptors left free above those already open
+Readonly::Scalar my $BIG_NUMBER => 1e30;	# finite, but too big for any integer format
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 
 # Paths that would do damage if anything opened or ran them
@@ -681,6 +683,7 @@ subtest 'list context returns exactly one value' => sub {
 		level_get => sub { $logger->level() },
 		level_set => sub { $logger->level('debug') },
 		flush => sub { $logger->flush() },
+		reopen => sub { $logger->reopen() },
 		lang => sub { $logger->lang() },
 		autoload => sub { my $returned; printed { $returned = $logger->nosuch() }; $returned },
 	);
@@ -755,8 +758,110 @@ subtest 'a broken %config' => sub {
 };
 
 # ===========================================================================
+# Resource exhaustion: no file descriptors left
+# ===========================================================================
+
+# How many descriptors this process has open, where the system can say
+sub open_descriptors {
+	my $dir = '/proc/self/fd';
+	return if(!-d $dir);
+	opendir(my $dh, $dir) or return;
+	my $count = grep { /\A\d+\z/ } readdir($dh);
+	closedir($dh);
+	return $count - 1;	# not the handle used to count them
+}
+
+# Strategy: lower the descriptor limit, then open handles until the system
+# says EMFILE.  With nothing left, the whole API must still work - logging,
+# printing (including the encoding path), passing and failing assertions,
+# translated messages and errors - because none of it may need a new file
+# or a module loaded on demand.  Afterwards the limit and every handle are
+# given back, and the module must not have kept any of its own.
+subtest 'no file descriptors left (EMFILE)' => sub {
+	plan(skip_all => 'BSD::Resource is needed to lower the descriptor limit') if(!eval { require BSD::Resource; 1 });
+	my $limit = BSD::Resource::RLIMIT_NOFILE();
+	my ($soft, $hard) = BSD::Resource::getrlimit($limit);
+	my $before = open_descriptors();
+	# Warm up the paths under test once, so that what is checked is the
+	# module itself, not Perl loading something for the first time
+	printed { quiet(diag => 'all', lang => 'fr')->error("caf\x{e9}") };
+
+	my (@handles, $errno);
+	{
+		my $in_use = defined($before) ? $before : $FD_SPARE;
+		BSD::Resource::setrlimit($limit, $in_use + $FD_SPARE, $hard) or plan(skip_all => "cannot lower the descriptor limit: $!");
+		while(open(my $fh, '<', File::Spec->devnull())) {
+			push @handles, $fh;
+		}
+		$errno = $! + 0;
+	}
+	state_diag(opened => scalar(@handles));
+	is($errno, EMFILE, 'the process really is out of descriptors') or diag("stopped with errno $errno");
+
+	# Everything that follows runs with no descriptor free
+	my $logger;
+	lives_ok { $logger = $CLASS->new(diag => 'all', verbose => 0, lang => 'fr') } 'new() works';
+	$! = EMFILE;
+	my $out = printed { $logger->error("caf\x{e9} \x{263A}", { k => 'v' }) };
+	is($! + 0, EMFILE, 'logging leaves $! as it was');
+	like($out, qr/caf/, 'the message was printed, through the encoding path');
+	is($logger->count(), 1, 'and stored');
+	ok($logger->like(qr/caf/, 'a passing assertion with no descriptors'), 'like() passes');
+	my ($result, $explained) = failing(sub { $logger->unlike(qr/caf/) });
+	ok(!$result, 'a failing assertion still fails ...');
+	like($explained, qr/1 message correspond/, '... and explains itself in French');
+	throws_ok { $logger->has_level() } qr/\A\Q$CLASS : has_level() n\E\x{e9}\Qcessite un nom de niveau\E/, 'a translated error is still raised';
+
+	# Give everything back, then check nothing was kept
+	@handles = ();
+	BSD::Resource::setrlimit($limit, $soft, $hard);
+	undef $logger;
+	SKIP: {
+		skip('this system cannot count open descriptors', 1) if(!defined($before));
+		is(open_descriptors(), $before, 'every descriptor was released: the module kept none');
+	}
+};
+
+# ===========================================================================
 # Regressions
 # ===========================================================================
+
+# Strategy: one check for each bug fixed in 0.002.1, through the public
+# API, so that none of them can come back unnoticed
+subtest 'regressions fixed in 0.002.1' => sub {
+	my $logger = quiet(i18n => { en => { n => '%{v}d|%{v}x' } });
+	my $bomb = bless({}, 'Local::Bomb');
+	my $plain = qr/Local::Bomb=HASH\(0x[0-9a-f]+\)/;
+
+	# GitHub#1: a number too big for %d was printed as -1, and the test of
+	# it only passed on perls without long doubles
+	is($logger->i18n('n', { v => $BIG_NUMBER }), "$BIG_NUMBER|$BIG_NUMBER", 'GitHub#1: a huge number is shown as written, not as -1');
+	is($logger->i18n('n', { v => '9' x 400 }), ('9' x 400) . '|' . ('9' x 400), 'GitHub#1: so is a 400-digit one');
+
+	# The "no method" notice repeated the method name raw
+	my $name = "a\nok 1\e[2J";
+	is(scalar(printed { $logger->$name() } =~ tr/\n//), 1, 'a method name with a newline gives a one-line notice');
+
+	# new() reported an invalid level in lower case, unlike every other error
+	throws_ok { $CLASS->new(level => 'LOUD') } at_caller(q{invalid syslog level 'LOUD'}), 'new() repeats the level as given';
+
+	# An object whose text form dies crashed these with its own error
+	throws_ok { $CLASS->new(diag => [$bomb]) } qr/\A\Q$CLASS: invalid diag level '\E$plain'/, 'as a diag level: this module\'s error';
+	warning_like { is($logger->level($bomb), undef, 'level() returns undef') } qr/\A\Q$CLASS: invalid syslog level '\E$plain'/, 'as a level: a warning';
+	like($logger->i18n($bomb), qr/\A$plain\z/, 'as an i18n key: the plain form');
+	like($logger->i18n('n', { v => $bomb }), qr/\A$plain\|$plain\z/, 'in a number placeholder: the plain form');
+
+	# Trailing fields were copied outside any eval, so a tied hash that dies
+	# when read killed the log call
+	tie my %unreadable, 'Local::UnreadableHash';
+	lives_ok { $logger->clear()->info('m', \%unreadable) } 'tied fields that die when read: the log call lives';
+	like($logger->messages()->[0]->{'message'}, qr/\AmHASH\(0x[0-9a-f]+\)\z/, '... and the hash is shown in plain form');
+
+	# Log::Abstraction 0.41 added reopen(); without it, the call was stored
+	my $out = printed { $logger->clear()->reopen() };
+	is($logger->count(), 0, 'reopen() is not stored as a message');
+	is($out, '', '... and prints no "no method" notice');
+};
 
 # Each of these was a real bug, found in the wild or by this suite
 subtest 'regressions' => sub {
@@ -803,3 +908,10 @@ subtest 'regressions' => sub {
 };
 
 done_testing();
+
+# A tied hash that dies as soon as it is read
+package Local::UnreadableHash;
+
+sub TIEHASH { return bless {}, shift }
+sub FIRSTKEY { die "unreadable\n" }
+sub SCALAR { die "unreadable\n" }

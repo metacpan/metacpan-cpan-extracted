@@ -3,12 +3,13 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
 use File::Spec;
 use File::Temp qw(tempfile);
+use bytes ();
 use IO::Select;
 use IPC::Open3 qw(open3);
 use POSIX qw(:sys_wait_h);
@@ -22,6 +23,8 @@ use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path is_w
 use Developer::Dashboard::RuntimeManager ();
 use Developer::Dashboard::Folder ();
 use Template;
+use Template::Config;
+use Template::Document;
 use Developer::Dashboard::Zipper qw(Ajax acmdx zip unzip);
 
 my $SANDPIT_SEQ = 0;
@@ -180,6 +183,14 @@ sub _render_templates {
     my $page = $args{page} || die 'Missing page';
     my $layout = $page->{layout} || {};
     my $state  = $page->{state}  || {};
+    my $template = $layout->{body};
+    # The default Template Toolkit opener is "[%". Scalar static HTML cannot
+    # execute TT directives or resolve includes, so avoid building request
+    # context and a template service when that opener is absent. References
+    # remain on the old path so rendering errors stay visible.
+    return if !defined $template;
+    return if !ref($template) && ( $template eq '' || index( $template, '[%' ) < 0 );
+
     my $request_context = $page->{meta}{request_context} || {};
     my $current_page = $args{runtime_context}{current_page} || $request_context->{path} || '';
     my %template_runtime = (
@@ -194,33 +205,19 @@ sub _render_templates {
 
     my $system = $self->_system_context(%args);
     my @tt_roots = $self->_template_include_roots($page);
-    my $tt = Template->new(
-        {
-            EVAL_PERL   => 1,
-            INCLUDE_PATH => \@tt_roots,
-        }
-    );
-    # TT3 returns undef when NONE of the INCLUDE_PATH directories exist at
-    # construction time (unlike TT2 which deferred the check to process()).
-    # Fall back to the first existing root, or the project root, or '.'.
-    if (!$tt) {
-        @tt_roots = grep { -d } @tt_roots;
-        $tt = Template->new(
-            { EVAL_PERL => 1, INCLUDE_PATH => \@tt_roots }
-        ) if @tt_roots;
-        $tt ||= Template->new(
-            { EVAL_PERL => 1, INCLUDE_PATH => ['.'] }
-        );
-        return if !$tt;
-    }
+    my $tt = $self->_template_processor_for_roots(\@tt_roots);
+    return if !$tt;
 
     for my $field (qw(body)) {
-        my $template = $layout->{$field};
-        next if !defined $template || $template eq '';
+        $template = $layout->{$field};
         my $rendered = '';
         my $page_data = $page->as_hash;
+        my $template_document = !ref($template)
+          ? $self->_template_document_for_source( $tt, \@tt_roots, $template )
+          : undef;
+        my $template_input = $template_document || \$template;
         my $ok = $tt->process(
-            \$template,
+            $template_input,
             {
                 app    => $page,
                 parts  => $page,
@@ -274,6 +271,162 @@ sub _render_templates {
         $page->{layout}{$field} = '';
         push @{ $page->{meta}{runtime_errors} ||= [] }, '' . $tt->error;
     }
+}
+
+# _template_document_for_source($tt, $roots, $source)
+# Reuses parsed and compiled TT scalar templates in a bounded worker-local LRU
+# while requiring an active request scope, then creates a fresh
+# Template::Document per render using cached code references. Exact source and
+# ordered include-root keys keep edits and root changes distinct; request-local
+# Template services still resolve INCLUDE files afresh.
+# Input: configured Template service, ordered include roots, and scalar source.
+# Output: fresh Template::Document, or undef to use normal Template processing.
+sub _template_document_for_source {
+    my ( $self, $tt, $roots, $source ) = @_;
+    return if ref($source);
+    my $scope = $self->{_template_processor_scope};
+    return if ref($scope) ne 'HASH';
+    my $source_bytes = bytes::length($source);
+
+    my @roots = ref($roots) eq 'ARRAY' ? @$roots : ('.');
+    my $root_key = join "\0", map {
+        defined $_ && !ref($_) ? length($_) . ':' . $_ : '0:';
+    } @roots;
+    my $cache_entry_bytes = $source_bytes + bytes::length($root_key);
+    my $cache = $self->{_template_parsed_tree_cache} ||= {
+        sources => {},
+        entries => 0,
+        bytes   => 0,
+        clock   => 0,
+    };
+    my $root_sources = $cache->{sources}{$root_key};
+    my $entry = ref($root_sources) eq 'HASH' ? $root_sources->{$source} : undef;
+    my $compiled;
+
+    if ($entry) {
+        $entry->{used} = ++$cache->{clock};
+        $compiled = $entry->{compiled};
+    }
+    else {
+        # Parse and compile before evicting so invalid user templates cannot
+        # displace a successful worker-cache entry. One bounded source may be
+        # transiently compiled before admission, but retained cache memory stays
+        # bounded by source size and entry count.
+        return if $source_bytes > 262_144 || $cache_entry_bytes > 262_144;
+        my $parser = Template::Config->parser( { EVAL_PERL => 1, INCLUDE_PATH => \@roots } );
+        return if !$parser;
+
+        my $tree = $parser->parse(
+            $source,
+            { name => 'input text', time => time() },
+        );
+        return if ref($tree) ne 'HASH';
+        my %compile_document = %{$tree};
+        $compile_document{DEFBLOCKS} = { %{ $tree->{DEFBLOCKS} || {} } };
+        $compile_document{METADATA} = {
+            name    => 'input text',
+            modtime => time(),
+            %{ $tree->{METADATA} || {} },
+        };
+        my $compiled_document = Template::Document->new(\%compile_document);
+        return if !$compiled_document;
+        $compiled = {
+            block    => $compiled_document->block,
+            blocks   => $compiled_document->blocks,
+            variables => $compiled_document->variables,
+            metadata => $tree->{METADATA} || {},
+        };
+
+        my $cacheable = 1;
+        while ( $cache->{entries} >= 16 || $cache->{bytes} + $cache_entry_bytes > 1_048_576 ) {
+            my ( $oldest_root, $oldest_source, $oldest_used );
+            for my $candidate_root ( keys %{ $cache->{sources} } ) {
+                my $candidate_root_sources = $cache->{sources}{$candidate_root};
+                for my $candidate_source ( keys %{$candidate_root_sources} ) {
+                    my $candidate = $candidate_root_sources->{$candidate_source};
+                    if ( !defined $oldest_used || $candidate->{used} < $oldest_used ) {
+                        ( $oldest_root, $oldest_source, $oldest_used ) =
+                          ( $candidate_root, $candidate_source, $candidate->{used} );
+                    }
+                }
+            }
+            if ( !defined $oldest_used ) {
+                $cacheable = 0;
+                last;
+            }
+            my $removed = delete $cache->{sources}{$oldest_root}{$oldest_source};
+            delete $cache->{sources}{$oldest_root} if !keys %{ $cache->{sources}{$oldest_root} };
+            $cache->{entries}--;
+            $cache->{bytes} -= $removed->{bytes};
+        }
+        if ($cacheable) {
+            $cache->{sources}{$root_key}{$source} = {
+                compiled => $compiled,
+                bytes    => $cache_entry_bytes,
+                used     => ++$cache->{clock},
+            };
+            $cache->{entries}++;
+            $cache->{bytes} += $cache_entry_bytes;
+        }
+    }
+
+    return if ref($compiled) ne 'HASH' || ref($compiled->{block}) ne 'CODE';
+    my %document = (
+        BLOCK     => $compiled->{block},
+        DEFBLOCKS => { %{ $compiled->{blocks} || {} } },
+        VARIABLES => $compiled->{variables},
+    );
+    $document{METADATA} = {
+        name    => 'input text',
+        modtime => time(),
+        %{ $compiled->{metadata} || {} },
+    };
+    my $compiled_document = Template::Document->new(\%document);
+    return if !$compiled_document;
+    return $compiled_document;
+}
+
+# _template_processor_for_roots($roots)
+# Reuses a Template Toolkit service only within an explicit request scope while
+# its ordered include roots and root-existence state remain unchanged; outside
+# that scope each render receives a fresh service so file edits are visible.
+# Input: array reference of allowed include directory paths.
+# Output: Template Toolkit service object, or undef when initialization fails.
+sub _template_processor_for_roots {
+    my ( $self, $roots ) = @_;
+    my @roots = ref($roots) eq 'ARRAY'
+      ? grep { defined $_ && !ref($_) && length $_ } @$roots
+      : ();
+    @roots = ('.') if !@roots;
+    my $cache_key = join "\0", map {
+        length($_) . ':' . $_ . ':' . ( -d $_ ? 1 : 0 );
+    } @roots;
+    my $scope = $self->{_template_processor_scope};
+    my $cache = ref($scope) eq 'HASH' ? ( $scope->{processors} ||= {} ) : {};
+    return $cache->{$cache_key} if $cache->{$cache_key};
+
+    my $tt = Template->new(
+        {
+            EVAL_PERL    => 1,
+            INCLUDE_PATH => \@roots,
+        }
+    );
+    # TT3 returns undef when NONE of the INCLUDE_PATH directories exist at
+    # construction time (unlike TT2 which deferred the check to process()).
+    # Preserve that compatibility path and its fallback to the project root or '.'.
+    if (!$tt) {
+        @roots = grep { -d } @roots;
+        $tt = Template->new(
+            { EVAL_PERL => 1, INCLUDE_PATH => \@roots }
+        ) if @roots;
+        $tt ||= Template->new(
+            { EVAL_PERL => 1, INCLUDE_PATH => ['.'] }
+        );
+        return if !$tt;
+    }
+
+    $cache->{$cache_key} = $tt if ref($scope) eq 'HASH';
+    return $tt;
 }
 
 # _template_include_roots($page)
@@ -1024,10 +1177,12 @@ sub _query_string_from_params {
 
 # _saved_ajax_perl_wrapper()
 # Builds the Perl bootstrap source used for saved Ajax files without a shebang.
+# The eval filename keeps generated statements separate from this static module.
 # Input: none.
-# Output: Perl source string.
+# Output: Perl source string beginning with a stable eval source identity.
 sub _saved_ajax_perl_wrapper {
     return <<'PERL';
+#line 1 "(eval 1)"
 use strict;
 use warnings;
 use Developer::Dashboard::DataHelper qw(j je);
@@ -1167,12 +1322,14 @@ sub _code_header {
 # _sandpit_package_source($package)
 # Builds the Perl source of one throwaway sandpit package: the CODE-block
 # accessors (stash/hide/void/stop/params) plus the internal error/context
-# machinery __run_code and __initial_context call.
+# machinery __run_code and __initial_context call. Its eval filename prevents
+# generated package statements from being counted as static module statements.
 # Input: fully-qualified package name to declare.
-# Output: Perl source text ready for eval.
+# Output: Perl source text ready for eval, with a stable eval source identity.
 sub _sandpit_package_source {
     my ($package) = @_;
     return <<"PERL";
+#line 1 "(eval 1)"
 package $package;
 use strict;
 use warnings;
@@ -1377,6 +1534,11 @@ example C<use Dancer2 appname =E<gt> 'DeveloperDashboard'; print var('foo');>.
 The matching skill extension must register its hook with the Dancer2 form
 C<hook before =E<gt> sub { var foo =E<gt> 'bar' }>; a bare C<before =E<gt>
 sub { ... }> expression does not register a hook.
+Web requests may share one Template Toolkit service for an identical ordered
+include-root list so page and navigation rendering avoid rebuilding service,
+context, and plugin objects. Web::App discards the cache when the request ends;
+standalone PageRuntime calls without a request scope construct a fresh service,
+so later requests observe include-file edits.
 
 =head1 METHODS
 
@@ -1407,6 +1569,43 @@ C<fragment.tt> continue to resolve from the current skill dashboard first.
 
 Input: page document, optionally carrying C<meta.skill_path>.
 Output: ordered list of include-root directory paths.
+
+=head2 _template_processor_for_roots
+
+Builds a Template Toolkit service for an ordered include-root list. Undefined,
+reference-valued, and empty roots are discarded; an empty resulting list uses
+the current directory. The service is reused only when Web::App establishes a
+request-local processor scope and the roots plus their existence state are
+unchanged. Without that scope, each render creates a fresh service. This
+request boundary prevents a long-lived provider cache from hiding include-file
+edits on a later request.
+
+Scalar bookmark bodies that are undefined, empty, or contain no default
+C<[%> opener return before environment/context assembly, include-root
+discovery, or Template Toolkit setup. Since no TT directive or include can
+occur without that opener, static HTML is preserved exactly; bodies containing
+TT syntax or reference-valued bodies continue through the normal renderer so
+existing Template Toolkit behavior and visible failures remain unchanged.
+
+Input: array reference of allowed include-root directory paths.
+Output: Template Toolkit service object, or C<undef> if all compatible
+initialization attempts fail.
+
+=head2 _template_document_for_source
+
+For scalar template bodies inside an explicit Web::App request scope, reuses
+the successful parsed and compiled TT block for the exact body and ordered
+include-root set. The retained worker-local LRU admits at most 16 entries, no
+source/root key over 256 KiB, and at most 1 MiB of aggregate source/root-key
+bytes. It creates a fresh Template::Document for each render, preserving
+per-render metadata and avoiding reuse of mutable document state; TT services
+remain request-local so changed INCLUDE files are visible on the next request.
+Reference-valued bodies, oversized entries, and parser/compiler failures keep
+the existing Template Toolkit processing/error path.
+
+Input: Template service, ordered include-root array reference, scalar source.
+Output: fresh Template::Document, or C<undef> when normal TT processing should
+handle the input.
 
 =for comment FULL-POD-DOC START
 

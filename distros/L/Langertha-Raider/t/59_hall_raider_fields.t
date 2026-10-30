@@ -125,4 +125,14 @@ subtest 'mcp and isolated on a raider entry are ignored and noted once' => sub {
     'one note, in the first slot log of the raider that carries them' );
 };
 
+subtest 'permission_mode is passed as --permission-mode (ADR 0021)' => sub {
+  my ( $run ) = spawn_one("raiders:\n  bjorn: { permission_mode: acceptEdits }\n");
+  is( flag_values( $run->{argv}, '--permission-mode' ), ['acceptEdits'], 'the mode' );
+  my $main = Langertha::Raider::CLI::Main->new;
+  my %args = $main->app_args( ( $main->parse_options( @{ $run->{argv} } ) )[0] );
+  is( $args{permission_mode}, 'acceptEdits', 'which raider takes' );
+  my ( $none ) = spawn_one("raiders:\n  bjorn: { engine: mock }\n");
+  is( flag_values( $none->{argv}, '--permission-mode' ), [], 'without the key: none' );
+};
+
 done_testing;

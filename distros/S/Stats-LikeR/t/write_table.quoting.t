@@ -34,6 +34,13 @@
 #   "Attempt to access disallowed key" partway through the file;
 # - finding an AoH's or a HoH's columns iterated every row hash, which left an
 #   iterator allocated on each (the OOK flag) for good.
+# - with a separator of more than one byte, a field whose end and the
+#   separator after it spelled the separator again was written bare: sep "::"
+#   and the fields "a:", ":b" became "a::::b", which read_table cuts at the
+#   first "::" it finds, as three fields.  The round trips below (fixed cases,
+#   then 2000 generated tables) all failed somewhere on 0.33; the generator is
+#   a fixed LCG so that the tables are the same on every run and srand() is
+#   left alone.
 
 require 5.010;
 use strict;
@@ -50,11 +57,24 @@ use Stats::LikeR qw(write_table read_table);
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
 sub path { $seq++; return "$dir/q$seq." . (shift // 'csv') }
+# write_table opens its file with PerlIO_open()'s default layers, which are
+# :crlf where perl is a CRLF shop (Windows), so every "\n" it writes lands as
+# "\r\n" there; 0.33's MSWin32 smoker failed 29 of these on that alone.
+# :crlf maps "\n" and nothing else, so undoing it gives back exactly the text
+# write_table wrote, a stray CR included, and the literals below stay in \n.
+my $CRLF = do {
+	open my $fh, '>', path('nl.probe') or die "cannot write a probe: $!";
+	my $crlf = grep { $_ eq 'crlf' } PerlIO::get_layers($fh);
+	close $fh;
+	$crlf;
+};
 sub slurp {
 	my $file = shift;
 	open my $fh, '<:raw', $file or die "cannot read \"$file\": $!";
 	local $/;
-	return <$fh>;
+	my $text = <$fh>;
+	$text =~ s/\r\n/\n/g if $CRLF;
+	return $text;
 }
 # write, then the bytes written; warnings are kept in @W
 our @W;
@@ -126,20 +146,70 @@ throws_ok { wbytes([[1]], col_names => [[]]) } qr/^write_table: Cannot write nes
 	'AoA col_names: a reference dies';
 
 # ---- sep and the file name ---------------------------------------------
-throws_ok { wbytes([['a']], sep => '') } qr/^write_table: 'sep' must not be empty/, "sep => '' dies";
-throws_ok { wbytes([['a']], delim => '') } qr/^write_table: 'sep' must not be empty/, "delim => '' dies";
-throws_ok { wbytes([['a']], sep => "\0") } qr/^write_table: 'sep' may not contain a NUL/, 'a NUL sep dies';
-throws_ok { wbytes([['a']], sep => ";\0") } qr/^write_table: 'sep' may not contain a NUL/, 'a NUL inside sep dies';
-throws_ok { wbytes([['a']], sep => '"') } qr/^write_table: 'sep' may not contain '"'/, 'a quote sep dies';
-throws_ok { wbytes([['a']], sep => "\r") } qr/^write_table: 'sep' may not contain a CR/, 'a CR sep dies';
-throws_ok { wbytes([['a']], sep => "\n") } qr/^write_table: 'sep' may not contain a LF/, 'a LF sep dies';
-throws_ok { wbytes([['a']], sep => undef) } qr/^write_table: 'sep' must be a string/, 'sep => undef dies';
-throws_ok { wbytes([['a']], sep => qr/,/) } qr/^write_table: 'sep' must be a string/, 'a qr// sep dies';
+throws_ok { wbytes([['a']], sep => '') } qr/\nwrite_table: error: 'sep' must not be empty/, "sep => '' dies";
+throws_ok { wbytes([['a']], delim => '') } qr/\nwrite_table: error: 'sep' must not be empty/, "delim => '' dies";
+throws_ok { wbytes([['a']], sep => "\0") } qr/\nwrite_table: error: 'sep' may not contain a NUL/, 'a NUL sep dies';
+throws_ok { wbytes([['a']], sep => ";\0") } qr/\nwrite_table: error: 'sep' may not contain a NUL/, 'a NUL inside sep dies';
+throws_ok { wbytes([['a']], sep => '"') } qr/\nwrite_table: error: 'sep' may not contain '"'/, 'a quote sep dies';
+throws_ok { wbytes([['a']], sep => "\r") } qr/\nwrite_table: error: 'sep' may not contain a CR/, 'a CR sep dies';
+throws_ok { wbytes([['a']], sep => "\n") } qr/\nwrite_table: error: 'sep' may not contain a LF/, 'a LF sep dies';
+throws_ok { wbytes([['a']], sep => undef) } qr/\nwrite_table: error: 'sep' must be a string/, 'sep => undef dies';
+throws_ok { wbytes([['a']], sep => qr/,/) } qr/\nwrite_table: error: 'sep' must be a string/, 'a qr// sep dies';
 is(wbytes([['a', 'b'], ['x::y', 1]], sep => '::'), qq{a::b\n"x::y"::1\n}, 'a two-byte sep still works');
+# ---- a multi-byte sep made by a field's end and the separator after it ---
+is(wbytes([['a', 'b'], ['a:', ':b']], sep => '::'), qq{a::b\n"a:":::b\n},
+	"sep '::': a field ending in ':' is quoted");
+is(wbytes([['a', 'b'], [':b', 'a:']], sep => '::'), qq{a::b\n:b::a:\n},
+	"sep '::': ... but not the last field, which no separator follows");
+is(wbytes([['a', 'b'], ['xab', 'y']], sep => 'aba'), qq{aabab\n"xab"abay\n},
+	"sep 'aba': 'ab' then 'aba' spells 'aba' one byte early");
+is(wbytes([['a', 'b'], ['xa', 'y']], sep => 'aba'), qq{aabab\nxaabay\n},
+	"sep 'aba': 'a' then 'aba' is 'aaba', which holds 'aba' only where it belongs");
+is(wbytes([['h', 'b'], ['xa', 'y']], sep => 'aaa'), qq{haaab\n"xa"aaay\n},
+	"sep 'aaa': 'a' then 'aaa' spells it one byte early");
+is(wbytes([['h', 'b'], ['xaa', 'y']], sep => 'aaa'), qq{haaab\n"xaa"aaay\n},
+	"sep 'aaa': ... and 'aa' then 'aaa' two bytes early");
+is(wbytes([['a', 'b'], ['xab', 'y']], sep => 'abab'), qq{aababb\n"xab"ababy\n},
+	"sep 'abab': 'ab' then 'abab'");
+is(wbytes([['a', 'b'], ['xa', 'by']], sep => 'ab'), qq{aabb\nxaabby\n},
+	"sep 'ab': 'a' then 'ab' cannot spell 'ab' early, so stays bare");
+is(wbytes([['a', 'b'], ['x:', 'y']], sep => ':;'), qq{a:;b\nx::;y\n},
+	"sep ':;': a field ending in ':' is safe, the sep is not periodic");
 {
-	my $f = "$dir/nul.csv";
+	my $f = path();
+	write_table([['h1', 'h2', 'h3'], ['a:', ':b', 'c:'], [':', ':', ':']], $f, sep => '::', quiet => 1);
+	is_deeply(read_table($f, sep => '::', output_type => 'aoa'),
+		[['h1', 'h2', 'h3'], ['a:', ':b', 'c:'], [':', ':', ':']], "sep '::': the fields read back");
+}
+{
+	my $state = 20261020;	# LCG state: Numerical Recipes' a and c, mod 2**32
+	my $rand = sub { $state = (1664525 * $state + 1013904223) % 4294967296; $state % $_[0] };
+	my @sep_bytes = (':', ';', 'a', 'b', '|', ',', ' ', "\t", 'x');
+	my @cell_bytes = (@sep_bytes, '"', "\n", '#');
+	my ($bad, $first) = (0, '');
+	for my $t (1 .. 2000) {
+		my $sep = join '', map { $sep_bytes[ $rand->(scalar @sep_bytes) ] } 0 .. $rand->(4);
+		my $nc = 2 + $rand->(3);
+		my @rows = map { [ map { join '', map { $cell_bytes[ $rand->(scalar @cell_bytes) ] } 1 .. $rand->(6) } 1 .. $nc ] } 1 .. 3;
+		my @head = map { "c$_" } 1 .. $nc;
+		my $f = path('txt');
+		write_table([\@head, @rows], $f, sep => $sep, quiet => 1);
+		my $got = eval { local $SIG{__WARN__} = sub {}; read_table($f, sep => $sep, output_type => 'aoa') };
+		my $want = [\@head, map { [ map { length $_ ? $_ : undef } @$_ ] } @rows];	# '' reads back as undef
+		next if $got && Test::More::_deep_check($got, $want);
+		$bad++;
+		$first ||= "sep " . B::perlstring($sep) . ', rows ' . join(' | ', map { join ' ', map { B::perlstring($_) } @$_ } @rows);
+		unlink $f;
+	}
+	is($bad, 0, '2000 generated tables with a multi-byte or one-byte sep read back as written')
+		or diag("the first that did not: $first");
+}
+
+{
+	# not "nul.csv": NUL is a DOS device name, which -e finds on Windows
+	my $f = "$dir/nulbyte.csv";
 	throws_ok { write_table([['a']], "$f\0.tex", quiet => 1) }
-		qr/^write_table: the file name contains a NUL character/, 'a NUL in the file name dies';
+		qr/\nwrite_table: error: the file name contains a NUL character/, 'a NUL in the file name dies';
 	ok(!-e $f, '... and nothing was written under the name before it');
 }
 
@@ -180,7 +250,7 @@ throws_ok { wbytes({ a => [1, 2] }, row_names => 'nope') }
 	like($W[0], qr/^write_table: 1 row of '.*' has no 'id' \(row_names\); its label/, 'AoH: singular wording');
 }
 throws_ok { wbytes([['a'], [1]], row_names => [1]) }
-	qr/^write_table: 'row_names' must be 0, 1 or a column name, not a reference/, 'row_names => [] dies';
+	qr/\nwrite_table: error: 'row_names' must be 0, 1 or a column name, not a reference/, 'row_names => [] dies';
 
 # ---- restricted hashes ---------------------------------------------------
 {

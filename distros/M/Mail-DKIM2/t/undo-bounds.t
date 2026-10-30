@@ -49,7 +49,7 @@ sub undo_error {
 
 # Trailing blank lines are lines a Recipe may copy, as every other
 # implementation in the interop set numbers them: they are not hashed
-# (-07 §6.1), but they are there. The body here is "line one",
+# (-08 §6.1), but they are there. The body here is "line one",
 # "line two", "footer" and two blank lines: five lines.
 {
     my $cur = Email::MIME->new($with1);
@@ -69,21 +69,22 @@ sub undo_error {
 my @bogus = (
     [ [[1, 1000000000]],     qr/^body Recipe copies lines 1-1000000000 of 3$/,
       'a range past the end' ],
-    [ [[0, 1]],              qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
+    [ [[0, 1]],              qr/^PERMERROR: Message-Instance m=2 Recipe b\[0\] is invalid$/,
       'a range from line 0' ],
-    [ [[3, 2]],              qr/^body Recipe copies lines 3-2 of 3$/,
+    [ [[3, 2]],              qr/^PERMERROR: Message-Instance m=2 Recipe b\[0\] is invalid$/,
       'a range that runs backwards' ],
-    [ [[1, 3], [1, 3]],      qr/^body Recipe copies lines 1-3 twice$/,
+    [ [[1, 3], [1, 3]],      qr/^PERMERROR: Message-Instance m=2 Recipe b\[1\] is invalid$/,
       'the same range twice' ],
-    [ [[2, 3], [1, 2]],      qr/^body Recipe copies lines 2-2 twice$/,
+    [ [[2, 3], [1, 2]],      qr/^PERMERROR: Message-Instance m=2 Recipe b\[1\] is invalid$/,
       'ranges that overlap by one line, out of order' ],
-    [ [[-1, 2]],             qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
+    [ [[-1, 2]],             qr/^PERMERROR: Message-Instance m=2 Recipe b\[0\] is invalid$/,
       'a negative line number' ],
+    # Any number with a fraction or exponent is the document's fault (D6).
     [ [[1.5, 2]],            qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
       'a fractional line number' ],
-    [ [[1, 2, 3]],           qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
+    [ [[1, 2, 3]],           qr/^PERMERROR: Message-Instance m=2 Recipe b\[0\] is invalid$/,
       'a range of three numbers' ],
-    [ [[1]],                 qr/^PERMERROR: Message-Instance m=2 contains invalid JSON$/,
+    [ [[1]],                 qr/^PERMERROR: Message-Instance m=2 Recipe b\[0\] is invalid$/,
       'a range of one number' ],
 );
 
@@ -95,11 +96,11 @@ for my $case (@bogus) {
     ok(!$ok, "... and so does chain_verifies");
 }
 
-# Ranges must ascend (-07 §5.1): a Recipe that copies a later line before
+# Ranges must ascend (-08 §5.1): a Recipe that copies a later line before
 # an earlier one describes a reordering, which a hop records literally.
 {
     my $text = with_body_recipe([[3, 3], [1, 2]]);
-    like(undo_error($text), qr/^body Recipe copies lines 1-2 out of order$/,
+    like(undo_error($text), qr/^PERMERROR: Message-Instance m=2 Recipe b\[1\] is invalid$/,
         'undo refuses ranges out of order even when apart');
     my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($text);
     ok(!$ok, '... and so does chain_verifies');

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 package Testophile;
 
 use v5.40;

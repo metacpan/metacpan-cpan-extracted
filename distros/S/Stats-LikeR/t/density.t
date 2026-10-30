@@ -374,7 +374,9 @@ for my $k (@KERNELS) {
 # traceable.
 {
 	ok(!defined eval { density(\@X, bw => 'nope'); 1 }, 'density croak');
-	like($@, qr/^density: /, 'density croaks with its own name');
+	# a bw rule outside its choices is a call-form error: the help screen, then
+	# the error, still in density's name, on the last line
+	like($@, qr/\Ausage: density\(.*^density: error: unknown bandwidth rule\n\z/ms, 'density croaks with its own name');
 	ok(!defined eval { bw_sj([1]); 1 }, 'bw_sj croak');
 	like($@, qr/^bw_sj: /, 'bw_sj croaks with its own name');
 	took();
@@ -397,5 +399,20 @@ SKIP: {
 }
 
 is(scalar @W, 0, 'nothing warned unexpectedly') or diag("warnings: @W");
+
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+for my $c ([ bw_nrd0 => \&bw_nrd0 ], [ bw_nrd => \&bw_nrd ], [ bw_ucv => \&bw_ucv ],
+           [ bw_bcv => \&bw_bcv ], [ bw_sj => \&bw_sj ]) {
+	my ($fn, $code) = @$c;
+	is(eval { $code->(5); 1 }, undef, "$fn(5) dies");
+	like($@, qr/\Ausage: \Q$fn\E\(X.*\n\n\Q$fn\E: error: 'x' must be an array reference\n\z/ms,
+		'... with the help screen above the error');
+}
+is(eval { bw_sj([1, 2, 3], method => 'bogus'); 1 }, undef, 'bw_sj with an unknown method dies');
+like($@, qr/^bw_sj: error: 'method' must be 'ste' or 'dpi'\n\z/m, '... naming it on the last line');
+is(eval { density([1, 2, 3], kernal => 'gaussian'); 1 }, undef, 'density with a misspelled option dies');
+like($@, qr/\Ausage: density\(.*^options:\n.*\n\ndensity: error: unknown argument 'kernal'\n\z/ms,
+	'... with the help screen above the error');
 
 done_testing();

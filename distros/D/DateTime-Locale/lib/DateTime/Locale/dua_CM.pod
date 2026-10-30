@@ -435,6 +435,24 @@ Duala Cameroon locale.
    1995-12-22T09:05:02 = mb.Ys 1995 elá 22, ɗón
   -0010-09-15T04:44:23 = ɓ.Ys -10 nyɛt 15, esa
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = mb.Ys 2008 ŋgɔndɛ
+   1995-12-22T09:05:02 = mb.Ys 1995 eláŋgɛ́
+  -0010-09-15T04:44:23 = ɓ.Ys -10 nyɛtɛki
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = mb.Ys 2008 ŋgɔndɛ 5, kwa
+   1995-12-22T09:05:02 = mb.Ys 1995 eláŋgɛ́ 22, ɗón
+  -0010-09-15T04:44:23 = ɓ.Ys -10 nyɛtɛki 15, esa
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = mb.Ys 2008 ŋgɔndɛ 5
+   1995-12-22T09:05:02 = mb.Ys 1995 eláŋgɛ́ 22
+  -0010-09-15T04:44:23 = ɓ.Ys -10 nyɛtɛki 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = mb.Ys 2008 ŋgɔn 5
@@ -506,6 +524,12 @@ Duala Cameroon locale.
    2008-02-05T18:30:30 = kwa 5 ŋgɔn
    1995-12-22T09:05:02 = ɗón 22 elá
   -0010-09-15T04:44:23 = esa 15 nyɛt
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = ŋgɔndɛ 5, kwa
+   1995-12-22T09:05:02 = eláŋgɛ́ 22, ɗón
+  -0010-09-15T04:44:23 = nyɛtɛki 15, esa
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

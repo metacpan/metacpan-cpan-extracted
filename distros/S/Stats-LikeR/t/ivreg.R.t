@@ -13,7 +13,8 @@
 #   cig*        ivreg man/summary.ivreg.Rd: log(packs) ~ log(rincome) |
 #               log(rprice) | salestax, the three-part formula; with HC1 as
 #               a function, which makes the diagnostics robust too; the
-#               two-part form with two instruments; and with case weights.
+#               two-part form with two instruments; and with case weights,
+#               then with three of them 0 (cig_zero_w*, also with HC1).
 #   school      ivreg man/ivreg.Rd's SchoolingReturns model, with the
 #               quadratics written as I(x^2) where the example has poly().
 #   cigsw*      AER ?CigarettesSW / ?ivreg: 1995 alone, and both years with
@@ -234,6 +235,46 @@ my %EXPECT = (
     diag_stat => [38.99484897643677, 0.8464199109661311, undef],
     diag_p => [1.3521973852931917e-07, 0.3625837288477848, undef],
   },
+  cig_zero_w => {
+    names => ['Intercept', 'log(rprice)', 'log(rincome)'],
+    coef => [10.066071591427345, -1.4267374491272542, 0.4879487809684859],
+    se => [1.102118200509726, 0.27683572579069327, 0.2588545557010125],
+    t => [9.133386588454686, -5.153733121157799, 1.8850306870089877],
+    p => [1.5633705918771383e-11, 6.453750731935228e-06, 0.06635691064969201],
+    sigma => 0.21538576339930765,
+    df => 42,
+    r2 => 0.4477071139043066,
+    adj => 0.3819579607976764,
+    wald => 13.980622741763977,
+    wald_p => 2.219355726328146e-05,
+    ci => [7.841907016635478, 12.290236166219213, -1.9854145620319164, -0.868060336222592, -0.03444086158292531, 1.010338423519897],
+    diag_rows => ['Weak instruments', 'Wu-Hausman', 'Sargan'],
+    diag_df1 => [2, 1, 1],
+    diag_df2 => [41, 41, undef],
+    diag_stat => [202.33194248500521, 0.9734728290273443, 0.12858803045014255],
+    diag_p => [5.720269700390832e-22, 0.3296026627758163, 0.7199005326988112],
+    nobs => 45,
+  },
+  cig_zero_w_hc1 => {
+    names => ['Intercept', 'log(rprice)', 'log(rincome)'],
+    coef => [10.066071591427345, -1.4267374491272542, 0.4879487809684859],
+    se => [0.898736782513688, 0.22718468413926526, 0.28848166605941716],
+    t => [11.20024437330074, -6.280077614090647, 1.6914377528171425],
+    p => [3.420473215576404e-14, 1.5701077837063376e-07, 0.09816162487436352],
+    sigma => 0.21538576339930765,
+    df => 42,
+    r2 => 0.4477071139043066,
+    adj => 0.3819579607976764,
+    wald => 22.674801685378878,
+    wald_p => 2.0977581385706393e-07,
+    ci => [8.252347334986553, 11.879795847868138, -1.885214703349293, -0.9682601949052153, -0.09423079090460457, 1.0701283528415764],
+    diag_rows => ['Weak instruments', 'Wu-Hausman', 'Sargan'],
+    diag_df1 => [2, 1, 1],
+    diag_df2 => [41, 41, undef],
+    diag_stat => [142.67156688173412, 1.5545324109116037, 0.12858803045014255],
+    diag_p => [3.402062053739974e-19, 0.21954363133471363, 0.7199005326988112],
+    nobs => 45,
+  },
   griliches => {
     names => ['Intercept', 's', 'iq', 'expr', 'tenure', 'rns', 'smsa', 'yeary67', 'yeary68', 'yeary69', 'yeary70', 'yeary71', 'yeary73'],
     coef => [4.033509894697668, 0.1724253119097814, -0.009098831036219971, 0.04928948974564126, 0.042217092103617626, -0.10179345002195325, 0.12611094946985146, -0.05961710621434885, 0.04867955999311057, 0.1528176332263854, 0.17443605149018218, 0.0916659665637741, 0.09323976497617278],
@@ -342,6 +383,7 @@ sub check {
 	}
 	close_to($fit->{sigma}, $e->{sigma}, "$key: sigma");
 	is($fit->{'df_residual'}, $e->{df}, "$key: df_residual");
+	is($fit->{nobs}, $e->{nobs}, "$key: nobs counts the rows of nonzero weight") if defined $e->{nobs};
 	close_to($fit->{'r_squared'}, $e->{r2}, "$key: R-squared");
 	close_to($fit->{'adj_r_squared'}, $e->{adj}, "$key: adjusted R-squared");
 	close_to($fit->{waldtest}{statistic}, $e->{wald}, "$key: Wald test");
@@ -376,6 +418,14 @@ check('cig_two',    ivreg(formula => 'log(packs) ~ log(rprice) + log(rincome) | 
                           data => $D{CigaretteDemand}));
 check('cig_weighted', ivreg(formula => 'log(packs) ~ log(rincome) | log(rprice) | salestax', data => $D{CigaretteDemand},
                             weights => 'w'));
+{
+	# rows 1, 5 and 9 at weight 0; nobs was 48 until 0.331
+	my %d = %{ $D{CigaretteDemand} };
+	$d{w0} = [ @{ $d{w} } ]; $d{w0}[$_] = 0 for 0, 4, 8;
+	my $f = 'log(packs) ~ log(rprice) + log(rincome) | salestax + cigtax + log(rincome)';
+	check('cig_zero_w',     ivreg(formula => $f, data => \%d, weights => 'w0'));
+	check('cig_zero_w_hc1', ivreg(formula => $f, data => \%d, weights => 'w0', vcov => 'HC1'));
+}
 check('school',     ivreg(formula => 'log(wage) ~ education + experience + I(experience^2) + ethnicity + smsa + south'
                                    . ' | nearcollege + age + I(age^2) + ethnicity + smsa + south', data => $D{SchoolingReturns}));
 {
@@ -453,4 +503,12 @@ SKIP: {
 	                             'no leaks: croak');
 }
 diag(sprintf('worst relative disagreement with %s: %.3g (%s)', $_, $worst{$_}, $worst_at{$_})) for sort keys %worst;
+# A call of the wrong form dies with the function's argparse-style help screen
+# (lib/Stats/LikeR/Usage.pm), then "fn: error: ..." as its last line.
+{
+	my $err = eval { ivreg(formula => 'y ~ x | z', data => { x => [1, 2], y => [1, 2], z => [2, 1] }, vcov => 'HC3'); 1 } ? '' : $@;
+	like($err, qr/\Ausage: ivreg\(.*^example:\n.*\n\nivreg: error: \Qvcov must be 'model', 'HC0' or 'HC1'\E\n\z/ms,
+		'ivreg: vcov must be \'model\', \'HC0\' or \'HC1\', under the help screen');
+}
+
 done_testing();

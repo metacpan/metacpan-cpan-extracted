@@ -28,7 +28,7 @@ class    #
     field $ldflags;
     field $cppver = 'c++17';    # https://en.wikipedia.org/wiki/C%2B%2B20#Compiler_support
     field $cver   = 'c17';      # https://en.wikipedia.org/wiki/C17_(C_standard_revision)
-    field $make : param //= $Config{make};
+    field $make : param //= $Config{make} || 'dmake';
     #
     field $action : param //= 'build';
     field $meta : reader = CPAN::Meta->load_file('META.json');
@@ -46,13 +46,16 @@ class    #
     field $prefix        : param    //= '';
     #
     ADJUST {
-        -e 'META.json' or die "No META information provided\n";
+        die "No META information provided\n" unless -e 'META.json';
+        die "OS unsupported: Affix requires a 64-bit architecture\n" if $Config{ptrsize} < 8;
 
         # Configure Flags
         my $is_bsd = $^O =~ /bsd/i;
         my $is_win = $^O =~ /MSWin32/i;
-        $cflags  = $is_bsd ? '' : '-fPIC ';
-        $ldflags = $is_bsd ? '' : ' -flto=auto ';
+        my $is_sun = $^O =~ /(solaris|sunos)/i;
+        $cflags  = ( $is_bsd || $is_sun ) ? '' : '-fPIC ';
+        $ldflags = ( $is_bsd || $is_sun ) ? '' : ' -flto=auto ';
+        $cflags .= ' -D__EXTENSIONS__ -D_LARGEFILE64_SOURCE' if $is_sun;
         if ( $debug > 0 ) {
             $cflags
                 .= '-DDEBUG=' .
@@ -65,14 +68,15 @@ class    #
             $cflags .= ' -fvar-tracking-assignments' unless $Config{osname} eq 'darwin';
         }
         elsif ( !$is_win ) {
-            $cflags
-                .= ' -DNDEBUG -DBOOST_DISABLE_ASSERTS -O3 -ftree-vectorize -ffast-math -fno-align-functions -fno-align-loops -fno-omit-frame-pointer -flto';
+            $cflags .= ' -DNDEBUG -DBOOST_DISABLE_ASSERTS -O3 -ftree-vectorize -ffast-math -fno-align-functions -fno-omit-frame-pointer';
+            $cflags .= ' -flto' unless ( $is_bsd || $is_sun );
         }
 
         # Threading support (Critical for shm_open/librt on Linux)
         if ( !$is_win ) {
             $cflags  .= ' -pthread';
             $ldflags .= ' -pthread';
+            $ldflags .= ' -Wl,-z,nobtcfi' if $^O eq 'openbsd';    # XXX - Temp BTI/IBT workaround https://www.openbsd.org/innovations.html
         }
     }
     method write_file( $filename, $content ) { path($filename)->spew_raw($content) or die "Could not open $filename: $!\n" }
@@ -135,12 +139,13 @@ class    #
         0;
     }
 
-    method step_test() {
+    method step_test(%args) {
+        $jobs = $args{j} // $args{jobs} // $jobs;
         $self->step_build() unless -d 'blib';
         require TAP::Harness::Env;
         my %test_args = (
             ( verbosity => $verbose ),
-            ( jobs  => $jobs ),
+            ( $jobs ? ( jobs => $jobs ) : () ),
             ( color => -t STDOUT ),
             lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ],
         );
@@ -371,6 +376,8 @@ while ( @ARGV ) {
 
             # Pass pthread to compilation of static lib too (safe practice)
             push @cflags, '-pthread' unless $^O eq 'MSWin32';
+            #
+            push @cflags, '-D__EXTENSIONS__', '-D_LARGEFILE64_SOURCE' if $^O =~ /(solaris|sunos)/i;
         }
 
         # Compile infix.c -> infix.o
@@ -406,7 +413,7 @@ while ( @ARGV ) {
 
     # Detects if linking against librt is required (common on Linux/BSD/Solaris for shm_open)
     method check_for_lrt() {
-        return ''                                if $^O eq 'MSWin32';
+        return ''                                if $^O eq 'MSWin32' || $^O eq 'android';
         warn "Checking if -lrt is required...\n" if $verbose;
         my $cc        = $Config{cc} || 'cc';
         my $test_code = <<'END_C';

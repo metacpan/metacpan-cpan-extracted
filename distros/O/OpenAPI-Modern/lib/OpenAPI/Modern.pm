@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.149-12-g4e03e7cd
+package OpenAPI::Modern; # git description: v0.150-7-g92ffb1dc
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.150';
+our $VERSION = '0.151';
 
 use 5.020;
 use utf8;
@@ -737,7 +737,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
   my @path_capture_values = map substr($uri, $-[$_], $+[$_]-$-[$_]), 1 .. $#-;
 
   # we set aside $state for potential restoration because we might still encounter issues later on
-  # that require us to keep iterating for another URI match
+  # that require us to keep iterating for another URI match, and we use the original $state for
+  # the global servers object
   my $local_state = +{ %$state };
 
   while (defined(my $ref = $local_state->{path_item}{'$ref'})) {
@@ -758,34 +759,52 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
   return if not $local_state->{operation};
 
+  my $server_state = +{ %$local_state };  # for errors pertaining to the server object
+
   # we need to keep track of the traversed path to the servers object, as well as its absolute
   # location, for usage in error objects
-  my ($servers, $more_keyword_path, $base_schema_uri) =
-      exists $local_state->{operation}{servers}
-        ? ($local_state->{operation}{servers}, $local_state->{operation_path_suffix})
-    : exists $local_state->{path_item}{servers}
-        ? ($local_state->{path_item}{servers}, '')
-    : exists $self->entry_document->schema->{servers}
-        ? ($self->entry_document->schema->{servers}, '', $self->entry_document->canonical_uri)
-    : ();
+  my $servers;
+  if (exists $local_state->{operation}{servers}) {
+    $servers = $local_state->{operation}{servers};
+    $server_state->{keyword_path} .= $server_state->{operation_path_suffix}.'/servers';
+  }
+  elsif (exists $local_state->{path_item}{servers}) {
+    $servers = $local_state->{path_item}{servers};
+    $server_state->{keyword_path} .= '/servers';
+  }
+  else {
+    # v3.2.1 §4.1.1: "If the servers field is not provided ..., the default value
+    # would be an array consisting of a single Server Object with a url value of `/`."
+    $servers = $state->{document}->schema->{servers} // [{ url => '/' }];
 
-  # v3.2.1 §4.1.1: "If the servers field is not provided, or is an empty array, the default value
+    # The global server object comes from the document containing the original
+    # /paths/<path_template> (via $state), not the document containing the resulting path-item and
+    # operation (via $local_state)
+    $server_state = +{ %$state };
+    $server_state->{initial_schema_uri} = $state->{document}->canonical_uri;
+    $server_state->{traversed_keyword_path} = '';
+    $server_state->{keyword_path} = exists $state->{document}->schema->{servers} ? '/servers' : '';
+  }
+
+  # v3.2.1 §4.1.1: "If the servers field is ... an empty array, the default value
   # would be an array consisting of a single Server Object with a url value of `/`."
-  $servers = [{ url => '/' }] if not $servers or not @$servers;
+  $servers = [{ url => '/' }] if not @$servers;
 
   my @path_capture_names = ($path_template =~ /\{([^{}]+)\}/g);
 
   foreach my $index_and_server (pairs indexed @$servers) {
     my ($server_index, $server) = @$index_and_server;
 
-    # We need a full uri to match against the full uri taken from the request (scheme and host)
-    # we fall back to using the request's scheme, host and port, otherwise the match can never
-    # succeed.
+    # v3.2.1 §4.5.1: "This [server] URL ... MAY be relative, to indicate that the host location is
+    # relative to the location where the document containing the Server Object is being served."
+    # We need a full uri to match against the full uri taken from the request (with scheme and
+    # host). If it is unknown, or relative, then we further resolve against the request's scheme,
+    # host and port, otherwise the match can never succeed.
     # But before we apply URI logic to the server url, we must first protect any templated sections
     # so they are not altered by normalization. We use NUL, as it is unchanged in the host during
     # punycode-encoding
     my $normalized_server_url = Mojo::URL->new($server->{url} =~ s/\{[^{}]+\}/\x00/gr)
-      ->to_abs($self->entry_document->retrieval_uri//())
+      ->to_abs($server_state->{document}->retrieval_uri//())
       ->to_abs($uri);
 
     my $normalized_host = $normalized_server_url->host;
@@ -812,7 +831,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
       (map +(/^xn--(.+)\z/ ? punycode_decode($1) : $_), @server_capture_values[0 .. $host_variable_count-1]),
       (map uri_decode($_), @server_capture_values[$host_variable_count .. $#server_capture_values]));
 
-    # we have a match, so preserve our new $state values created via _resolve_ref
+    # we have a match, so preserve our new $state values created via _resolve_ref (but do not change
+    # values being used specifically for the "server" location)
     %$state = %$local_state;
 
     my @server_capture_names = ($server->{url} =~ /\{([^{}]+)\}/g);
@@ -828,11 +848,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
       my $name = $server_capture_names[$name_index];
       next if not exists((($server->{variables}//{})->{$name}//{})->{enum});
 
-      $valid = E({ %$state, data_path => '/request/uri', keyword => 'enum',
-            defined $base_schema_uri
-              ? (initial_schema_uri => $base_schema_uri, traversed_keyword_path => '',
-                  keyword_path => jsonp('/servers', $server_index, 'variables', $name))
-              : (keyword_path => jsonp($state->{keyword_path}.$more_keyword_path, 'servers', $server_index, 'variables', $name)) },
+      $valid = E({ %$server_state, data_path => '/request/uri', keyword => 'enum',
+            keyword_path => jsonp($server_state->{keyword_path}, $server_index, 'variables', $name) },
           'server url value does not match any of the allowed values')
         if not elem($server_capture_values[$name_index], $server->{variables}{$name}{enum});
     }
@@ -2477,7 +2494,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.150
+version 0.151
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2659,21 +2676,27 @@ property, and are also populated into C<data>. See example in L</validate_reques
 Optional.
 
 The URI that identifies the OpenAPI document; as an accessor, is an alias to
-C<< ->entry_document->canonical_uri >>.
-Defaults to C<''>.
+C<< ->entry_document->canonical_uri >> (but this will not necessarily be the value passed in to the
+constructor, see below).
 Ignored if L</documents> is provided.
 
-This URI will be used at runtime to resolve relative URIs used in
-the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values and C<$ref>
-locations, as well as used for locations in L<JSON::Schema::Modern::Result> objects (see below).
-
-The value of C<$self> in the document (if present) is resolved against this value.
+The value of C<$self> in the document (if present) is resolved against this value and then this
+value is reassigned to the result (therefore, if C<$self> is an absolute URI (with host and scheme),
+then no parts of the original URI are used).
 It is strongly recommended that this resulting URI is absolute.
 
-The use of this as an accessor is B<deprecated>; instead use
-L<JSON::Schema::Modern::Document::OpenAPI/canonical_uri>
-or L<JSON::Schema::Modern::Document::OpenAPI/retrieval_uri>
-on the relevant document object (see L</entry_document> and L</documents>).
+The resulting URI will be used at runtime to resolve relative URIs used in the OpenAPI document,
+such as for C<jsonSchemaDialect> and C<$ref> locations, as well as used for locations in
+L<JSON::Schema::Modern::Result> objects (see below).
+
+The originally-provided value is still available as
+L<JSON::Schema::Modern::Document::OpenAPI/original_uri> and
+L<JSON::Schema::Modern::Document::OpenAPI/retrieval_uri>.
+It is used for resolving relative URIs and URI templates used with C<servers url> values for runtime
+request URI matching.
+
+The use of this as an accessor is B<deprecated>; use the accessors on the relevant document directly
+(see L</entry_document> and L</documents>).
 
 =head2 openapi_schema
 
@@ -2906,7 +2929,8 @@ C<uri_captures>: a hashref mapping placeholders in the entire uri template (serv
 
 C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that (as long as the operation is in the entry document) this is the same as:
 
-    $openapi->entry_document->get(Mojo::URL->new($openapi->entry_document->canonical_uri)->fragment($path_to_operation));
+    $openapi->entry_document->get(Mojo::URL->new($openapi->entry_document->canonical_uri)
+      ->fragment($path_to_operation));
 
 (See the L<documentation for an operation|https://learn.openapis.org/specification/paths.html#the-endpoints-list>
 or in

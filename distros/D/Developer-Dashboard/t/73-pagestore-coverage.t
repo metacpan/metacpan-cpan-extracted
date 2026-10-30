@@ -58,6 +58,41 @@ ok( $store->page_file('welcome'),          'page_file(valid id) returns a path' 
 is( $store->_normalized_page_id(undef),      '',    '_normalized_page_id(undef) => empty string' );
 is( $store->_normalized_page_id('/app/foo'), 'foo', '_normalized_page_id strips /app/ prefix' );
 
+{
+    no warnings qw(once redefine);
+    local *Developer::Dashboard::PageStore::_normalized_page_id = sub {
+        die 'common nav id should not enter the normalization path';
+    };
+    is( $store->_validated_page_id('nav/item-1.tt'), 'nav/item-1.tt',
+        'a common canonical nav id uses the validation fast path' );
+}
+is( $store->_validated_page_id('nav/a..b.tt'), 'nav/a..b.tt',
+    'a valid nav id outside the fast-path grammar retains the normal validation path' );
+is( $store->_validated_page_id('/app/nav/item-1.tt'), 'nav/item-1.tt',
+    'the /app/ compatibility prefix retains normal id normalization' );
+{
+    no warnings qw(once redefine);
+    local *Developer::Dashboard::PageStore::_normalized_page_id = sub {
+        die 'canonical flat ids should not enter the normalization path';
+    };
+    is( $store->_validated_page_id('welcome'), 'welcome',
+        'a canonical flat page id bypasses general normalization' );
+    is( $store->_validated_page_id('team-status_2.json'), 'team-status_2.json',
+        'a canonical flat page id preserves supported punctuation' );
+}
+ok( !eval { $store->_validated_page_id('nav/../escape.tt'); 1 },
+    'a parent-directory component in a nav id remains rejected' );
+like( $@, qr/Invalid page id/, 'a parent-directory nav id reports the standard validation error' );
+ok( !eval { $store->_validated_page_id(undef); 1 },
+    'undefined page id remains rejected through the normalization fallback' );
+like( $@, qr/Invalid page id/, 'undefined page id reports the standard validation error' );
+{
+    package DD::PageStore::OverloadedPageId;
+    use overload '""' => sub { 'nav/item-2.tt' }, fallback => 1;
+}
+is( $store->_validated_page_id( bless( {}, 'DD::PageStore::OverloadedPageId' ) ), 'nav/item-2.tt',
+    'overloaded reference ids retain the general normalization path' );
+
 # ---------------------------------------------------------------------------
 # Saved page ids stay beneath dashboards_root. Nested ids are supported, but
 # parent/current-directory components can otherwise escape the storage root.
@@ -258,6 +293,21 @@ ok( $store->_assert_page_path_contained( File::Spec->catfile( $droot, 'team', 's
         'containment still accepts a contained path under Windows comparison rules' );
 }
 
+# POSIX treats backslash as a valid filename character. It must not be
+# normalized into a separator while comparing a real root against a sibling.
+SKIP: {
+    skip 'POSIX-only path comparison regression', 1 if $^O eq 'MSWin32';
+    my $comparison_root = tempdir( CLEANUP => 1 );
+    my $literal_backslash_root = File::Spec->catdir( $comparison_root, 'root\\segment' );
+    my $outside_root_alias = File::Spec->catdir( $comparison_root, 'root', 'segment' );
+    make_path($literal_backslash_root);
+    make_path($outside_root_alias);
+    my $outside_file = File::Spec->catfile( $outside_root_alias, 'outside-page' );
+    write_raw( $outside_file, "TITLE: outside\n" );
+    ok( !eval { $store->_assert_page_path_contained( $outside_file, root => $literal_backslash_root ); 1 },
+        'POSIX containment does not normalize a literal backslash into a path separator' );
+}
+
 # ---------------------------------------------------------------------------
 # _existing_page_file context contract: file in scalar context, file plus the
 # owning root in list context.
@@ -267,6 +317,47 @@ is( $scalar_file, File::Spec->catfile( $droot, 'team', 'status' ),
     '_existing_page_file returns the file in scalar context' );
 my ( $list_file, $list_root ) = $store->_existing_page_file('team/status');
 is( $list_root, $droot, '_existing_page_file returns the owning root in list context' );
+
+my $containment_assertions = 0;
+my $original_containment_assert = Developer::Dashboard::PageStore->can('_assert_page_path_contained');
+{
+    no warnings qw(once redefine);
+    local *Developer::Dashboard::PageStore::_assert_page_path_contained = sub {
+        $containment_assertions++;
+        return $original_containment_assert->(@_);
+    };
+    my $raw_entry = $store->read_saved_entry('team/status');
+    like( $raw_entry, qr/TITLE: Nested page/, 'read_saved_entry reads the selected bookmark through the secure open path' );
+}
+is( $containment_assertions, 1,
+    'read_saved_entry validates candidate containment once at the secure open boundary' );
+
+my $root_snapshot_reads = 0;
+my $next_dashboard_root = File::Spec->catdir( $home, 'later-dashboard-layer' );
+{
+    no warnings qw(once redefine);
+    local *Developer::Dashboard::PathRegistry::dashboards_roots = sub {
+        $root_snapshot_reads++;
+        return $root_snapshot_reads == 1 ? ($droot) : ($next_dashboard_root);
+    };
+    {
+        local $store->{_page_roots_snapshot};
+        my @first_roots  = $store->_page_file_candidates('team/status');
+        my @second_roots = $store->_page_file_candidates('team/status');
+        is_deeply( [ map { $_->{root} } @first_roots ], [$droot],
+            'first page lookup receives the roots discovered for this request' );
+        is_deeply( [ map { $_->{root} } @second_roots ], [$droot],
+            'later lookups in the same request reuse its ordered roots' );
+        is( $root_snapshot_reads, 1, 'one request discovers its dashboard roots once' );
+    }
+    {
+        local $store->{_page_roots_snapshot};
+        my @fresh_roots = $store->_page_file_candidates('team/status');
+        is_deeply( [ map { $_->{root} } @fresh_roots ], [$next_dashboard_root],
+            'a subsequent request observes the newly discovered dashboard root' );
+        is( $root_snapshot_reads, 2, 'a subsequent request obtains a fresh root inventory' );
+    }
+}
 
 # ---------------------------------------------------------------------------
 # Descriptor-open unit paths: missing root, missing intermediate directory,
@@ -503,6 +594,404 @@ is( $store->_looks_like_raw_nav_fragment(''),             0, 'empty fragment is 
 is( $store->_looks_like_raw_nav_fragment('plain words'),  0, 'plain text is not raw nav' );
 is( $store->_looks_like_raw_nav_fragment('<div>x</div>'), 1, 'an html tag looks like raw nav' );
 
+# load_nav_fragment returns literal HTML before allocating or parsing a page.
+{
+    my $nav_dir = File::Spec->catdir( $droot, 'nav' );
+    make_path($nav_dir);
+    my $literal_nav = File::Spec->catfile( $nav_dir, 'literal.tt' );
+    write_raw( $literal_nav, '<span id="literal-nav">ready</span>' );
+
+    my $full_parser_calls = 0;
+    my $literal_result;
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageDocument::from_instruction = sub {
+            $full_parser_calls++;
+            die 'Literal nav must not enter the page parser';
+        };
+        $literal_result = $store->load_nav_fragment('nav/literal.tt');
+    }
+    is( $literal_result->{kind}, 'literal', 'load_nav_fragment classifies static HTML as literal output' );
+    is( $literal_result->{body}, '<span id="literal-nav">ready</span>', 'literal output preserves exact HTML bytes after UTF-8 decoding' );
+    is( $full_parser_calls, 0, 'literal nav bypasses PageDocument construction and parsing' );
+
+    my $candidate_lookups = 0;
+    my $original_candidates = Developer::Dashboard::PageStore->can('_page_file_candidates');
+    delete $store->{_nav_fragment_cache};
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_page_file_candidates = sub {
+            $candidate_lookups++;
+            return $original_candidates->(@_);
+        };
+        my $root_selected = $store->load_nav_fragment( 'nav/literal.tt', root => $droot );
+        is( $root_selected->{body}, '<span id="literal-nav">ready</span>', 'known-layer nav lookup returns the expected literal content' );
+    }
+    is( $candidate_lookups, 0, 'a known dashboard layer avoids searching every candidate root' );
+    my $original_path_containment = Developer::Dashboard::PageStore->can('_assert_page_path_contained');
+    my $cache_miss_containment_checks = 0;
+    delete $store->{_nav_fragment_cache};
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_assert_page_path_contained = sub {
+            $cache_miss_containment_checks++;
+            return $original_path_containment->(@_);
+        };
+        my $cache_miss = $store->load_nav_fragment( 'nav/literal.tt', root => $droot );
+        is( $cache_miss->{body}, '<span id="literal-nav">ready</span>',
+            'a literal nav cache miss preserves its body while secure reading it' );
+    }
+    is( $cache_miss_containment_checks, 1,
+        'a cache miss checks containment once at the secure open boundary' );
+
+    my $cached_path_containment_checks = 0;
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_assert_page_path_contained = sub {
+            $cached_path_containment_checks++;
+            return $original_path_containment->(@_);
+        };
+        $store->load_nav_fragment( 'nav/literal.tt', root => $droot );
+    }
+    is( $cached_path_containment_checks, 1, 'a cached nav hit still checks path containment on every request' );
+    ok( !eval { $store->load_nav_fragment( 'nav/literal.tt', root => dirname($droot) ); 1 },
+        'load_nav_fragment rejects a root outside configured dashboard layers' );
+    like( $@, qr/Invalid nav fragment root/, 'an untrusted nav root has an explicit diagnostic' );
+
+    my $original_read_saved_instruction = Developer::Dashboard::PageStore->can('_read_saved_instruction');
+    my $literal_file_reads = 0;
+    delete $store->{_nav_fragment_cache};
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_read_saved_instruction = sub {
+            $literal_file_reads++;
+            return $original_read_saved_instruction->(@_);
+        };
+        my $cached_first = $store->load_nav_fragment('nav/literal.tt');
+        my $cached_second = $store->load_nav_fragment('nav/literal.tt');
+        is( $cached_first->{body}, $cached_second->{body}, 'cached literal nav keeps exact content' );
+        is( $literal_file_reads, 1, 'an unchanged literal nav avoids reopening and decoding its file' );
+
+        write_raw( $literal_nav, '<span id="literal-nav">fresh</span>' );
+        my $updated = $store->load_nav_fragment('nav/literal.tt');
+        is( $updated->{body}, '<span id="literal-nav">fresh</span>', 'literal nav cache invalidates on a same-size file edit' );
+        is( $literal_file_reads, 2, 'a changed literal nav is reopened once to refresh its cached content' );
+    }
+
+    my $dynamic_nav = File::Spec->catfile( $nav_dir, 'dynamic.tt' );
+    write_raw( $dynamic_nav, '<a href="[% url %]">dynamic</a>' );
+    my $dynamic_result = $store->load_nav_fragment('nav/dynamic.tt');
+    is( $dynamic_result->{kind}, 'page', 'Template Toolkit nav remains a page document' );
+    is( $dynamic_result->{page}{meta}{source_format}, 'raw-nav-tt', 'dynamic raw nav retains its source classification' );
+    is( $dynamic_result->{page}{meta}{source_kind}, 'saved', 'dynamic raw nav retains its saved-page source kind' );
+    is( $dynamic_result->{page}{meta}{raw_instruction}, '<a href="[% url %]">dynamic</a>', 'dynamic raw nav retains its original instruction' );
+
+    my $structured_nav = File::Spec->catfile( $nav_dir, 'structured.tt' );
+    write_raw( $structured_nav, "=== HTML ===\n<strong>structured</strong>" );
+    my $structured_result = $store->load_nav_fragment('nav/structured.tt');
+    is( $structured_result->{kind}, 'page', 'structured nav remains a page document' );
+    like( $structured_result->{page}{layout}{body}, qr/structured/, 'structured nav retains parsed content' );
+
+    ok( !defined $store->load_nav_fragment('nav/missing.tt'), 'missing nav file is reported as absent' );
+    ok( !eval { $store->load_nav_fragment('pages/outside.tt'); 1 }, 'load_nav_fragment rejects ids outside nav/*.tt' );
+    like( $@, qr/Invalid nav fragment id/, 'invalid nav fragment id has an explicit diagnostic' );
+
+    my $outside_nav = File::Spec->catfile( dirname($droot), 'outside-nav-fragment.tt' );
+    write_raw( $outside_nav, '<span id="outside-nav">secret</span>' );
+    unlink $literal_nav or die "Unable to replace literal nav cache fixture '$literal_nav': $!";
+    SKIP: {
+        skip 'symlink creation is unavailable for this user', 2 if !symlink( $outside_nav, $literal_nav );
+        my $symlink_error = eval { $store->load_nav_fragment('nav/literal.tt'); 1 } ? '' : $@;
+        like( $symlink_error, qr/Invalid page path/, 'cached literal nav never follows a replacement symlink' );
+        unlike( $symlink_error, qr/outside-nav-fragment/, 'symlink rejection does not expose the outside path' );
+        unlink $literal_nav or die "Unable to remove nav symlink '$literal_nav': $!";
+    }
+    unlink $outside_nav or die "Unable to remove outside nav fixture '$outside_nav': $!";
+
+    my $bounded_cache_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    ok( !$bounded_cache_store->_cache_literal_nav_fragment( undef, 'fingerprint', 'body' ),
+        'literal nav cache rejects incomplete keys' );
+    $bounded_cache_store->{_nav_fragment_cache} = { bytes => 0, entries => [], order => [] };
+    ok( !$bounded_cache_store->_cache_literal_nav_fragment( 'nav/bad.tt', 'fingerprint', 'body' ),
+        'literal nav cache refuses malformed in-memory cache state' );
+    delete $bounded_cache_store->{_nav_fragment_cache};
+    ok( $bounded_cache_store->_cache_literal_nav_fragment( 'nav/one.tt', 'fingerprint', 'body' ),
+        'literal nav cache accepts a complete small entry' );
+    ok( $bounded_cache_store->_cache_literal_nav_fragment( 'nav/one.tt', 'updated', 'fresh' ),
+        'literal nav cache replaces an existing entry' );
+    for my $index ( 2 .. 129 ) {
+        $bounded_cache_store->_cache_literal_nav_fragment( "nav/$index.tt", "fingerprint-$index", 'x' );
+    }
+    is( scalar( keys %{ $bounded_cache_store->{_nav_fragment_cache}{entries} } ), 128,
+        'literal nav cache evicts entries above its bounded item count' );
+    is( $bounded_cache_store->{_nav_fragment_cache}{bytes}, 128,
+        'literal nav cache byte accounting follows evictions' );
+
+    my $byte_bounded_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    my $large_literal = 'x' x 262144;
+    $byte_bounded_store->_cache_literal_nav_fragment( "nav/large-$_.tt", "large-$_", $large_literal )
+      for 1 .. 17;
+    is( scalar( keys %{ $byte_bounded_store->{_nav_fragment_cache}{entries} } ), 16,
+        'literal nav cache evicts entries above its byte budget' );
+    is( $byte_bounded_store->{_nav_fragment_cache}{bytes}, 4_194_304,
+        'literal nav cache stays within its four-megabyte body budget' );
+}
+
+# Exercise the remaining filesystem/race and bounded-cache branches without
+# weakening the production path checks.
+{
+    my $nav_dir = File::Spec->catdir( $droot, 'nav' );
+    make_path($nav_dir);
+    my $known_root_file = File::Spec->catfile( $nav_dir, 'known-root.tt' );
+    write_raw( $known_root_file, '<span>known root</span>' );
+
+    delete $store->{_validated_nav_roots};
+    local $store->{_page_roots_snapshot} = [$droot];
+    my $known_root_result = $store->load_nav_fragment( 'nav/known-root.tt', root => $droot );
+    is( $known_root_result->{kind}, 'literal', 'an uncached configured root is validated against the request snapshot' );
+    ok( !defined $store->load_nav_fragment( 'nav/root-missing.tt', root => $droot ),
+        'a configured root whose fragment disappeared returns absence' );
+
+    my $root_symlink = File::Spec->catfile( $nav_dir, 'root-symlink.tt' );
+    my $outside = File::Spec->catfile( dirname($droot), 'outside-root-nav.tt' );
+    write_raw( $outside, '<span>outside</span>' );
+    SKIP: {
+        skip 'symlink creation is unavailable for this user', 2 if !symlink( $outside, $root_symlink );
+        ok( !eval { $store->load_nav_fragment( 'nav/root-symlink.tt', root => $droot ); 1 },
+            'the known-root path rejects a symlinked fragment before reading it' );
+        like( $@, qr/Invalid page path/, 'the known-root symlink rejection is explicit' );
+        unlink $root_symlink or die "Unable to remove nav symlink '$root_symlink': $!";
+    }
+    unlink $outside or die "Unable to remove outside nav fixture '$outside': $!";
+
+    my $root_directory = File::Spec->catfile( $nav_dir, 'root-directory.tt' );
+    make_path($root_directory);
+    ok( !defined $store->load_nav_fragment( 'nav/root-directory.tt', root => $droot ),
+        'a directory where a known-root nav file is expected is treated as absent' );
+
+    my $missing_initial_stat = File::Spec->catfile( $nav_dir, 'initial-stat-race.tt' );
+    write_raw( $missing_initial_stat, '<span>initial stat race</span>' );
+    my $real_lstat = Time::HiRes->can('lstat');
+    my $initial_lstat_calls = 0;
+    {
+        no warnings qw(once redefine);
+        local *Time::HiRes::lstat = sub {
+            return if $_[0] eq $missing_initial_stat && ++$initial_lstat_calls == 1;
+            return $real_lstat->(@_);
+        };
+        my $result = $store->load_nav_fragment('nav/initial-stat-race.tt');
+        is( $result->{kind}, 'literal', 'a transient missing initial stat does not corrupt a later secure read' );
+        ok( !exists $store->{_nav_fragment_cache}{entries}{$missing_initial_stat},
+            'a file without an initial stat fingerprint is not cached' );
+    }
+
+    my $missing_final_stat = File::Spec->catfile( $nav_dir, 'final-stat-race.tt' );
+    write_raw( $missing_final_stat, '<span>final stat race</span>' );
+    my $final_lstat_calls = 0;
+    {
+        no warnings qw(once redefine);
+        local *Time::HiRes::lstat = sub {
+            return if $_[0] eq $missing_final_stat && ++$final_lstat_calls == 2;
+            return $real_lstat->(@_);
+        };
+        my $result = $store->load_nav_fragment('nav/final-stat-race.tt');
+        is( $result->{kind}, 'literal', 'a transient missing final stat keeps the already-read body' );
+        ok( !exists $store->{_nav_fragment_cache}{entries}{$missing_final_stat},
+            'a file without a final stat fingerprint is not cached' );
+    }
+
+    my $large_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    my $oversized_file = File::Spec->catfile( $nav_dir, 'oversized-literal.tt' );
+    write_raw( $oversized_file, '<div>' . ( 'x' x 262_145 ) . '</div>' );
+    my $oversized_result = $large_store->load_nav_fragment( 'nav/oversized-literal.tt', root => $droot );
+    is( $oversized_result->{kind}, 'literal', 'oversized literal nav still renders from its secure read' );
+    ok( !exists $large_store->{_nav_fragment_cache}{entries}{$oversized_file},
+        'oversized literal nav is not retained in the bounded cache' );
+
+    for my $invalid ( [ 'nav/no-fingerprint.tt', undef, 'body' ], [ 'nav/no-body.tt', 'fingerprint', undef ] ) {
+        ok( !$large_store->_cache_literal_nav_fragment( $invalid->[0], $invalid->[1], $invalid->[2] ),
+            'literal nav cache rejects an absent fingerprint or body' );
+    }
+
+    for my $bad_cache (
+        { entries => {}, order => {}, bytes => 0 },
+        { entries => {}, order => [], bytes => undef },
+        { entries => {}, order => [], bytes => 'not-a-count' },
+    ) {
+        my $bad_store = Developer::Dashboard::PageStore->new( paths => $paths );
+        $bad_store->{_nav_fragment_cache} = $bad_cache;
+        ok( !$bad_store->_cache_literal_nav_fragment( 'nav/bad-state.tt', 'fingerprint', 'body' ),
+            'literal nav cache rejects each malformed order/byte-count state' );
+    }
+
+    my $replace_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    $replace_store->{_nav_fragment_cache} = {
+        bytes   => 0,
+        entries => { 'nav/replace.tt' => { fingerprint => 'old', body => undef } },
+        order   => ['nav/replace.tt'],
+    };
+    ok( $replace_store->_cache_literal_nav_fragment( 'nav/replace.tt', 'new', 'replacement' ),
+        'replacing a cache entry with an absent old body preserves valid accounting' );
+
+    my $stale_order_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    $stale_order_store->{_nav_fragment_cache} = {
+        bytes   => 4_194_304,
+        entries => {
+            'nav/malformed-entry.tt' => [],
+            'nav/undef-body.tt' => { fingerprint => 'empty', body => undef },
+            'nav/large-body.tt' => { fingerprint => 'large', body => 'x' x 4_194_304 },
+        },
+        order => [ 'nav/stale.tt', 'nav/malformed-entry.tt', 'nav/undef-body.tt', 'nav/large-body.tt' ],
+    };
+    ok( $stale_order_store->_cache_literal_nav_fragment( 'nav/new-entry.tt', 'new', 'x' ),
+        'bounded cache recovers while evicting stale ordering and an absent body' );
+    ok( !exists $stale_order_store->{_nav_fragment_cache}{entries}{'nav/stale.tt'},
+        'stale ordering metadata does not create a cache entry' );
+    ok( !exists $stale_order_store->{_nav_fragment_cache}{entries}{'nav/malformed-entry.tt'},
+        'evicting a malformed cache entry does not dereference it as a hash' );
+}
+
+my $raw_nav_parse_calls = 0;
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::PageDocument::from_instruction = sub {
+        $raw_nav_parse_calls++;
+        die 'Raw nav must not enter the full bookmark parser';
+    };
+    my $raw_nav_fast = $store->_load_page_instruction(
+        '<div class="nav-fast-path">raw navigation</div>',
+        id => 'nav/fast-path.tt',
+    );
+    is( $raw_nav_fast->{meta}{source_format}, 'raw-nav-tt',
+        'raw HTML nav fragment selects the direct wrapper fast path' );
+}
+is( $raw_nav_parse_calls, 0, 'raw HTML nav fragment bypasses legacy instruction parsing' );
+
+my $structured_nav = $store->_load_page_instruction(
+    "=== HTML ===\n<span class=\"nav-structured\">structured navigation</span>",
+    id => 'nav/structured.tt',
+);
+like( $structured_nav->{layout}{body}, qr/structured navigation/,
+    'structured bookmark headers in a nav file still use the instruction parser' );
+
+# Cover the literal-fragment cache's defensive read paths and filesystem races
+# through the public loader, rather than testing only its private cache helper.
+{
+    my $nav_dir = File::Spec->catdir( $droot, 'nav' );
+    make_path($nav_dir);
+    my $cache_file = File::Spec->catfile( $nav_dir, 'cache-validation.tt' );
+    write_raw( $cache_file, '<b>source body</b>' );
+
+    my @malformed_caches = (
+        { bytes => 0, entries => [], order => [] },
+        { bytes => 0, entries => { $cache_file => [] }, order => [] },
+        { bytes => 0, entries => { $cache_file => { body => '<b>stale</b>' } }, order => [] },
+        { bytes => 0, entries => { $cache_file => { fingerprint => 'stale', body => '<b>stale</b>' } }, order => [] },
+    );
+    for my $index ( 0 .. $#malformed_caches ) {
+        my $cache_store = Developer::Dashboard::PageStore->new( paths => $paths );
+        $cache_store->{_nav_fragment_cache} = $malformed_caches[$index];
+        my $result = $cache_store->load_nav_fragment('nav/cache-validation.tt');
+        is( $result->{body}, '<b>source body</b>', "malformed or stale cache entry $index falls through to current file content" );
+    }
+
+    my $bad_root_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    $bad_root_store->{_page_roots_snapshot} = [undef];
+    ok( !eval { $bad_root_store->load_nav_fragment( 'nav/cache-validation.tt', root => $droot ); 1 },
+        'a configured-root lookup rejects a snapshot without a usable root' );
+    like( $@, qr/Invalid nav fragment root/, 'the invalid root snapshot failure is explicit' );
+
+    my $nonregular_file = File::Spec->catfile( $nav_dir, 'nonregular-race.tt' );
+    write_raw( $nonregular_file, '<b>will become directory</b>' );
+    my $existing_page_file = Developer::Dashboard::PageStore->can('_existing_page_file');
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_existing_page_file = sub {
+            my @resolved = $existing_page_file->(@_);
+            unlink $resolved[0] or die "Unable to replace nav file with directory '$resolved[0]': $!";
+            make_path( $resolved[0] );
+            return @resolved;
+        };
+        ok( !eval { $store->load_nav_fragment('nav/nonregular-race.tt'); 1 },
+            'a file replaced by a directory before lstat is rejected' );
+        like( $@, qr/Invalid page path/, 'the non-regular replacement has an explicit path error' );
+    }
+    rmdir $nonregular_file or die "Unable to remove nav race directory '$nonregular_file': $!";
+
+    my $page_file = File::Spec->catfile( $nav_dir, 'page-id-fallback.tt' );
+    write_raw( $page_file, "TITLE: page id fallback\nplain body\n" );
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_load_page_instruction = sub { return { meta => {} } };
+        my $result = $store->load_nav_fragment('nav/page-id-fallback.tt');
+        is( $result->{page}{id}, 'nav/page-id-fallback.tt',
+            'a parsed nav page without an id receives the validated id' );
+    }
+
+    my $replacement_file = File::Spec->catfile( $nav_dir, 'post-read-replacement.tt' );
+    my $replacement_target = File::Spec->catfile( dirname($droot), 'post-read-outside.tt' );
+    write_raw( $replacement_file, '<b>read before replacement</b>' );
+    write_raw( $replacement_target, '<b>outside</b>' );
+    SKIP: {
+        skip 'symlink creation is unavailable for this user', 2 if !symlink( $replacement_target, "$replacement_file.symlink-probe" );
+        unlink "$replacement_file.symlink-probe"
+          or die "Unable to remove symlink probe '$replacement_file.symlink-probe': $!";
+        my $real_read = Developer::Dashboard::PageStore->can('_read_saved_instruction');
+        my $reads = 0;
+        {
+            no warnings qw(once redefine);
+            local *Developer::Dashboard::PageStore::_read_saved_instruction = sub {
+                my $body = $real_read->(@_);
+                if ( $_[1] eq $replacement_file && !$reads++ ) {
+                    unlink $replacement_file or die "Unable to replace nav file '$replacement_file': $!";
+                    symlink $replacement_target, $replacement_file
+                      or die "Unable to create replacement nav symlink '$replacement_file': $!";
+                }
+                return $body;
+            };
+            my $result = $store->load_nav_fragment('nav/post-read-replacement.tt');
+            is( $result->{body}, '<b>read before replacement</b>',
+                'a post-read path replacement does not change the already securely read response' );
+            ok( !exists $store->{_nav_fragment_cache}{entries}{$replacement_file},
+                'a post-read symlink replacement is never cached' );
+        }
+        unlink $replacement_file or die "Unable to remove replacement nav symlink '$replacement_file': $!";
+    }
+    unlink $replacement_target or die "Unable to remove replacement nav target '$replacement_target': $!";
+
+    my $changed_file = File::Spec->catfile( $nav_dir, 'changed-during-read.tt' );
+    write_raw( $changed_file, '<b>first body</b>' );
+    my $real_read = Developer::Dashboard::PageStore->can('_read_saved_instruction');
+    my $changed_reads = 0;
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PageStore::_read_saved_instruction = sub {
+            my $body = $real_read->(@_);
+            if ( $_[1] eq $changed_file && !$changed_reads++ ) {
+                write_raw( $changed_file, '<b>other body</b>' );
+            }
+            return $body;
+        };
+        my $result = $store->load_nav_fragment('nav/changed-during-read.tt');
+        is( $result->{body}, '<b>first body</b>', 'the in-flight response keeps the bytes it securely read' );
+        ok( !exists $store->{_nav_fragment_cache}{entries}{$changed_file},
+            'content changed during a read is not cached under the stale fingerprint' );
+    }
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::PageDocument::from_instruction = sub {
+        die 'synthetic structured nav parse rejection';
+    };
+    my $legacy_nav_fallback = $store->_load_page_instruction(
+        "TITLE: legacy nav\n<span>fallback navigation</span>",
+        id => 'nav/legacy-fallback.tt',
+    );
+    is( $legacy_nav_fallback->{meta}{source_format}, 'raw-nav-tt',
+        'raw nav fallback remains available when structured parsing rejects a fragment' );
+}
+
 # ---------------------------------------------------------------------------
 # _read_saved_instruction decode paths
 # (line 286 open-fail; line 291 UTF-8 decode fallback across all three outcomes).
@@ -528,6 +1017,26 @@ ok( length $store->_read_saved_instruction($invalid_file),
 # ---------------------------------------------------------------------------
 is( $store->_normalize_legacy_icon_markup(undef),   '',      'normalize(undef) => empty string' );
 is( $store->_normalize_legacy_icon_markup('plain'), 'plain', 'normalize passes plain text through' );
+is(
+    $store->_normalize_legacy_icon_markup("\x{1F9D1}\x{FFFD}\x{1F4BB}"),
+    "\x{1F9D1}\x{200D}\x{1F4BB}",
+    'normalize repairs the legacy malformed person-at-computer sequence',
+);
+is(
+    $store->_normalize_legacy_icon_markup("<h2>\x{FFFD} Heading"),
+    "<h2>◈ Heading",
+    'normalize repairs the legacy heading glyph only in its heading context',
+);
+is(
+    $store->_normalize_legacy_icon_markup('<span class="icon">' . "\x{FFFD}" . '</span>'),
+    '<span class="icon">🏷️</span>',
+    'normalize repairs the legacy icon glyph only in its icon span',
+);
+is(
+    $store->_normalize_legacy_icon_markup("ordinary \x{FFFD} replacement text"),
+    "ordinary \x{FFFD} replacement text",
+    'normalize preserves unrelated replacement characters',
+);
 
 # ---------------------------------------------------------------------------
 # _saved_page_entries_for_root root guards (line 314: defined $root && -d $root).
@@ -664,8 +1173,8 @@ t/73-pagestore-coverage.t - branch and condition coverage for the page store
 
 This test drives the residual branch and condition paths of the saved-page and
 transient-page store so its behaviour under malformed input, permission errors,
-and legacy-migration edge cases is pinned by an executable contract rather than
-left implicit.
+legacy-migration edge cases, and canonical flat-id validation fast paths is
+pinned by an executable contract rather than left implicit.
 
 =head1 WHY IT EXISTS
 
@@ -675,13 +1184,16 @@ defensive paths - missing and empty page ids, id inheritance for parsed pages
 without a bookmark, the strict-then-lenient UTF-8 decode fallback, legacy JSON
 migration skips, and the write/read/unlink failure exits - are never touched by
 the happy-path suite. This test exercises each of them directly so those guards
-cannot silently rot or be removed.
+cannot silently rot or be removed. It also pins all three legacy icon repairs
+and verifies that unrelated Unicode replacement characters remain untouched
+when the common no-repair path is used.
 
 =head1 WHEN TO USE
 
 Use this file when changing saved-page file layout, page id normalization,
-transient encoding, legacy JSON migration, or the raw-file decode behaviour in
-the page store. Re-run it whenever a page-store branch is added or reshaped.
+transient encoding, legacy JSON migration, raw-file UTF-8 decoding, or legacy
+icon normalization in the page store. Re-run it whenever a page-store branch
+or validation fast path is added or reshaped.
 
 =head1 HOW TO USE
 

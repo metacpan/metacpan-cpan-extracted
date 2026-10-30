@@ -1,12 +1,13 @@
 package Langertha::Raider::SessionStore;
 # ABSTRACT: Internal store of the session journals of one scope
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 use Moose;
 use Moose::Util::TypeConstraints qw( enum );
 use namespace::autoclean;
 use Carp qw( croak );
 use Fcntl qw( O_WRONLY O_CREAT O_EXCL );
 use POSIX qw( strftime );
+use JSON::MaybeXS ();
 use Path::Tiny;
 use Time::HiRes ();
 use Langertha::Raider::Home;
@@ -100,7 +101,44 @@ sub ids {
 }
 
 
-sub latest { ( $_[0]->ids )[0] }
+sub latest {
+  my ( $self ) = @_;
+  for my $id ($self->ids) {
+    return $id unless defined $self->parent_of($id);
+  }
+  return;
+}
+
+
+sub parent_of {
+  my ( $self, $id ) = @_;
+  my $created = $self->created_of($id) or return;
+  return $created->{parent};
+}
+
+
+sub created_of {
+  my ( $self, $id ) = @_;
+  my $fh = eval { $self->path_of($id)->openr_raw } or return;
+  my $line = <$fh>;
+  close $fh;
+  return unless defined $line;
+  my $event = eval { JSON::MaybeXS->new(utf8 => 1)->decode($line) };
+  return unless ref $event eq 'HASH' && ( $event->{type} // '' ) eq 'session.created';
+  return $event;
+}
+
+
+sub children_of {
+  my ( $self, $id ) = @_;
+  return unless defined $id;
+  my @children;
+  for my $child ($self->ids) {
+    my $created = $self->created_of($child) or next;
+    push @children, { id => $child, created => $created } if ( $created->{parent} // '' ) eq $id;
+  }
+  return @children;
+}
 
 
 sub is_ref {
@@ -211,7 +249,7 @@ Langertha::Raider::SessionStore - Internal store of the session journals of one 
 
 =head1 VERSION
 
-version 0.503
+version 0.504
 
 =head1 SYNOPSIS
 
@@ -294,7 +332,32 @@ no F<sessions> directory.
 
 =head2 latest
 
-The id of the newest session, or C<undef>.
+The id of the newest session that is not a subagent's (L</parent_of>), or
+C<undef>: what C<--continue> resumes.
+
+=head2 parent_of
+
+    my $parent = $store->parent_of($id);
+
+The C<parent> of the session's C<session.created> -- the id of the session
+whose run started it as a subagent (ADR 0020) -- or C<undef> for a session
+of its own. Reads only the first line of the journal.
+
+=head2 created_of
+
+    my $created = $store->created_of($id);   # { type => 'session.created', parent => ..., ... }
+
+The C<session.created> event of the session, read from the first line of
+its journal only, or C<undef> when there is none.
+
+=head2 children_of
+
+    my @children = $store->children_of($id);   # ( { id => ..., created => { ... } }, ... )
+
+The subagent sessions whose C<parent> is the session C<$id>, newest first,
+each with its C<session.created> (ADR 0020, ADR 0027 E<sect>5: C<agent>,
+C<agent_id>, C<name>, C<depth>, ...). Reads the first line of every journal
+of the scope.
 
 =head2 is_ref
 
@@ -379,7 +442,7 @@ Raider removes a session on its own.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha-raider/issues>.
 
 =head2 IRC
@@ -400,5 +463,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

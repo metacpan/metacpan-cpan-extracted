@@ -1,6 +1,14 @@
 Revision history for App-DBBrowser
 
 
+2.445   2026-10-28
+    - Added DuckDB plugin.
+    - DB2: decode column names.
+    - Raised required minimum version for Term::Choose (Unicode 18).
+    - Update/Delete: Return if fetching info data fails.
+    - Code refactoring.
+    - Update documentation.
+
 2.444   2026-08-04
     - Option 'extended columns' enabled by default.
     - Select DISTINCT from within the SELECT submenu.

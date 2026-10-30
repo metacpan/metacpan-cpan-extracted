@@ -53,7 +53,7 @@ sub defaults {
             pg_autocast           => 1,
 
             db2_encoding          => 'utf8',
-            duckdb_decode_db_out  => 0,
+            duckdb_utf8_decode    => 1,
         },
         alias => {
             complex_cols_select => 0,

@@ -21,6 +21,7 @@ use Time::HiRes qw(time);
 
 use constant MAX_REQUEST_SIZE => 131072;
 use constant CHUNKSIZE        => 64 * 1024;
+use constant MAX_CHUNK_LINE   => 4096;
 use constant MSWin32          => $^O eq 'MSWin32';
 
 my $null_io = do { open my $io, "<", \""; $io };
@@ -257,10 +258,11 @@ sub handle_connection {
     my($self, $env, $conn, $app, $use_keepalive, $is_keepalive, $prebuf) = @_;
     
     my $buf = '';
+    my $method;
     my $pipelined_buf='';
     my $res = $bad_response;
     
-    while (1) {
+    REQUEST: while (1) {
         my $rlen;
         if ( $rlen = length $prebuf ) {
             $buf = $prebuf;
@@ -275,6 +277,7 @@ sub handle_connection {
         my $reqlen = parse_http_request($buf, $env);
         if ($reqlen >= 0) {
             # handle request
+            $method = $env->{REQUEST_METHOD};
             my $protocol = $env->{SERVER_PROTOCOL};
             if ($use_keepalive) {
                 if ($self->{term_received}) {
@@ -330,7 +333,7 @@ sub handle_connection {
                         $buf = '';
                     } else {
                         $self->read_timeout(
-                            $conn, \$chunk, $cl, 0, $self->{timeout})
+                            $conn, \$chunk, $cl < CHUNKSIZE ? $cl : CHUNKSIZE, 0, $self->{timeout})
                             or return;
                     }
                     $buffer->print($chunk);
@@ -342,6 +345,7 @@ sub handle_connection {
                 my $buffer = Plack::TempBuffer->new;
                 my $chunk_buffer = '';
                 my $length;
+                my $chunk_left = 0; # bytes of the current chunk still to come, CRLF included
                 DECHUNK: while(1) {
                     my $chunk;
                     if ( length $buf ) {
@@ -354,19 +358,30 @@ sub handle_connection {
                     }
 
                     $chunk_buffer .= $chunk;
-                    while ( $chunk_buffer =~ s/^(([0-9a-fA-F]+).*\015\012)// ) {
-                        my $trailer   = $1;
-                        my $chunk_len = hex $2;
-                        if ($chunk_len == 0) {
-                            last DECHUNK;
-                        } elsif (length $chunk_buffer < $chunk_len + 2) {
-                            $chunk_buffer = $trailer . $chunk_buffer;
-                            last;
+                    while (1) {
+                        if ($chunk_left > 2) {
+                            my $n = $chunk_left - 2;
+                            $n = length $chunk_buffer if length $chunk_buffer < $n;
+                            last unless $n;
+                            $buffer->print(substr $chunk_buffer, 0, $n, '');
+                            $length += $n;
+                            $chunk_left -= $n;
+                            next;
                         }
-                        $buffer->print(substr $chunk_buffer, 0, $chunk_len, '');
-                        $chunk_buffer =~ s/^\015\012//;
-                        $length += $chunk_len;                        
+                        if ($chunk_left) {
+                            last if length $chunk_buffer < 2;
+                            $chunk_buffer =~ s/^\015\012//;
+                            $chunk_left = 0;
+                        }
+                        # atomic hex run: a size line that cannot match fails in linear time
+                        $chunk_buffer =~ s/^((?>([0-9a-fA-F]+))[^\012]*\015\012)//
+                            or last;
+                        last REQUEST if length $1 > MAX_CHUNK_LINE;
+                        my $chunk_len = hex $2;
+                        last DECHUNK if $chunk_len == 0;
+                        $chunk_left = $chunk_len + 2;
                     }
+                    last REQUEST if !$chunk_left && length $chunk_buffer > MAX_CHUNK_LINE;
                 }
                 $env->{CONTENT_LENGTH} = $length;
                 $env->{'psgi.input'} = $buffer->rewind;
@@ -390,10 +405,10 @@ sub handle_connection {
     }
 
     if (ref $res eq 'ARRAY') {
-        $self->_handle_response($env->{SERVER_PROTOCOL}, $res, $conn, \$use_keepalive);
+        $self->_handle_response($env->{SERVER_PROTOCOL}, $res, $conn, \$use_keepalive, $method);
     } elsif (ref $res eq 'CODE') {
         $res->(sub {
-            $self->_handle_response($env->{SERVER_PROTOCOL}, $_[0], $conn, \$use_keepalive);
+            $self->_handle_response($env->{SERVER_PROTOCOL}, $_[0], $conn, \$use_keepalive, $method);
         });
     } else {
         die "Bad response $res";
@@ -417,10 +432,12 @@ sub _informational {
 }
 
 sub _handle_response {
-    my($self, $protocol, $res, $conn, $use_keepalive_r) = @_;
+    my($self, $protocol, $res, $conn, $use_keepalive_r, $method) = @_;
     my $status_code = $res->[0];
     my $headers = $res->[1];
     my $body = $res->[2];
+    my $no_body = (defined $method && $method eq 'HEAD')
+        || $status_code == 204 || $status_code == 304;
     
     my @lines;
     my %send_headers;
@@ -449,7 +466,7 @@ sub _handle_response {
         if (defined $send_headers{'content-length'}
                 || defined $send_headers{'transfer-encoding'}) {
             # ok
-        } elsif (!Plack::Util::status_with_no_entity_body($status_code)) {
+        } elsif (!$no_body && !Plack::Util::status_with_no_entity_body($status_code)) {
             push @lines, "Transfer-Encoding: chunked\015\012";
             $use_chunked = 1;
         }
@@ -474,6 +491,13 @@ sub _handle_response {
     unshift @lines, "HTTP/1.1 $status_code @{[ HTTP::Status::status_message($status_code) ]}\015\012";
     push @lines, "\015\012";
     
+    if ($no_body) {
+        $self->write_all($conn, join('', @lines), $self->{timeout});
+        return Plack::Util::inline_object write => sub {}, close => sub {}
+            unless defined $body;
+        $body->close if ref $body ne 'ARRAY';
+        return;
+    }
     if (defined $body && ref $body eq 'ARRAY' && @$body == 1
             && length $body->[0] < 8192) {
         # combine response header and small request body

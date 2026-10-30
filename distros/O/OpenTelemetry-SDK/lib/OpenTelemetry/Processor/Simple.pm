@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Processor::Simple;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 class OpenTelemetry::Processor::Simple :does(OpenTelemetry::Processor) {
     use Feature::Compat::Try;

@@ -1,0 +1,29 @@
+title: with max_agent_depth 2 in the config a subagent starts a subagent of its own; that one gets no agent tool
+permission_mode: default
+files:
+  .raider/config.yml: "max_agent_depth: 2\n"
+prompt: Delegate twice.
+script:
+  - tool_calls:
+      - [ agent, { description: Outer, prompt: OUTER-TASK delegate the inner part. } ]
+  - tool_calls:
+      - [ agent, { description: Inner, prompt: INNER-TASK say hello. } ]
+  - text: hello from inner
+  - text: "outer got: hello from inner"
+  - text: "done: outer got: hello from inner"
+expect:
+  answer: "done: outer got: hello from inner"
+  requests:
+    - { index: 0, contains: "agent(description, prompt, [isolation], [model], [name], [run_in_background], [subagent_type])" }
+    - { index: 1, contains: OUTER-TASK }
+    - { index: 1, contains: "agent(description, prompt, [isolation], [model], [name], [run_in_background], [subagent_type])" }
+    - { index: 2, contains: INNER-TASK }
+    - { index: 2, absent: OUTER-TASK }
+    - { index: 2, lacks: [ agent, send_message, ask_user, enter_worktree, exit_worktree ] }
+    - { index: 2, absent: "agent(description" }
+  tools:
+    - { name: agent, text: '\Ahello from inner\nagentId: agent_2 \(use send_message with to: ''agent_2'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+    - { name: agent, text: '\Aouter got: hello from inner\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }
+  events:
+    - { type: agent.started, call: c1, description: Outer }
+    - { type: agent.finished, call: c1, status: completed }

@@ -132,6 +132,14 @@ throws_ok { melt([ { A => 1, v => 2 } ], id_vars => 'A', var_name => 'A') }
 	qr/collides/, 'var_name colliding with id_vars dies';
 
 # memory
+# A call-form error prints melt's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { melt([ { a => 1 } ], 'x'); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: melt\(/, 'melt: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('melt') . "melt: error: arguments after the data frame must be name => value pairs\n",
+		'melt: the help screen, then the error on the last line');
+}
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok {
 	my $x = melt([ { A => 'a', B => 1, C => 2 } ], id_vars => 'A', value_vars => [ 'B', 'C' ]);

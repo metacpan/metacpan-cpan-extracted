@@ -6,11 +6,18 @@ use 5.036000;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Serve CPAN mirrrors from git branches",
   "AUTHOR" => "Michael Conrad <mike\@nrdvana.net>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "CPAN-InGit",
   "EXE_FILES" => [
@@ -28,6 +35,7 @@ my %WriteMakefileArgs = (
     "CPAN::Meta::Requirements" => 0,
     "Carp" => 0,
     "Fcntl" => 0,
+    "File::ShareDir" => 0,
     "FindBin" => 0,
     "Getopt::Long" => 0,
     "Git::Raw::Branch" => 0,
@@ -38,12 +46,15 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "Log::Any" => 0,
     "Log::Any::Adapter" => 0,
+    "Log::Any::Adapter::MojoLog" => 0,
     "Module::CPANfile" => 0,
     "Module::CoreList" => 0,
     "Module::Metadata" => 0,
     "Mojo::Base" => 0,
+    "Mojo::File" => 0,
     "Mojo::UserAgent" => 0,
     "Mojolicious::Lite" => 0,
+    "Mojolicious::Static" => 0,
     "Moo" => 0,
     "POSIX" => 0,
     "Pod::Usage" => 0,
@@ -52,9 +63,11 @@ my %WriteMakefileArgs = (
     "version" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
     "File::Temp" => 0,
     "Git::Raw" => 0,
     "IO::Handle" => 0,
+    "Mojo::Server::PSGI" => 0,
     "Test2::Suite" => "0.000156",
     "Test2::Tools::Compare" => "0.000156",
     "Test2::Tools::Subtest" => 0,
@@ -65,7 +78,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,6 +92,8 @@ my %FallbackPrereqs = (
   "CPAN::Meta::Requirements" => 0,
   "Carp" => 0,
   "Fcntl" => 0,
+  "File::ShareDir" => 0,
+  "File::Spec" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
@@ -92,12 +107,16 @@ my %FallbackPrereqs = (
   "JSON::PP" => 0,
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
+  "Log::Any::Adapter::MojoLog" => 0,
   "Module::CPANfile" => 0,
   "Module::CoreList" => 0,
   "Module::Metadata" => 0,
   "Mojo::Base" => 0,
+  "Mojo::File" => 0,
+  "Mojo::Server::PSGI" => 0,
   "Mojo::UserAgent" => 0,
   "Mojolicious::Lite" => 0,
+  "Mojolicious::Static" => 0,
   "Moo" => 0,
   "POSIX" => 0,
   "Pod::Usage" => 0,
@@ -126,3 +145,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

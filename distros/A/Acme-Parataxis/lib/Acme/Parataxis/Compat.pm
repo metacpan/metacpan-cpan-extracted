@@ -1,6 +1,6 @@
 use v5.40;
 
-package Acme::Parataxis::Compat v0.1.1 {
+package Acme::Parataxis::Compat v0.1.3 {
     use Errno       qw[EAGAIN EWOULDBLOCK];
     use IO::Handle  ();                       # loaded only: the overrides call IO::Handle::blocking() fully qualified
     use Carp        qw[croak];

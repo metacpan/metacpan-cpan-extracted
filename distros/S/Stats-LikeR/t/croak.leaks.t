@@ -36,6 +36,12 @@
 #        prcomp       a croak other than its own: column names, data matrix
 #        col2col      a tied row whose FIRSTKEY dies: row table, union hash
 #
+# 0.331 adds three found by the 2026-10-20 audit: aoh2hoa, hoa2aoh and hoa2hoh
+# built their result, or the row in hand, outside the save stack and the tmps
+# stack, so a cell whose tied FETCH died leaked it -- 7 SVs a call from aoh2hoa
+# on the table below, 6 from hoa2aoh and 2 from hoa2hoh. Each result is now
+# mortal until it is returned, and each row is stored before it is filled.
+#
 # The leak half needs Test::LeakTrace, which is optional; those subtests skip
 # without it, exactly as the sibling suites do. The signal half needs nothing
 # and always runs, because a segfault is the more serious of the two and a
@@ -102,6 +108,15 @@ my @kw_g = ( 'a', 'a', 'b', bless( {}, 'DieStr' ) );
     use overload '0+' => sub { die "number refused\n" }, 'fallback' => 1;
 }
 my $die_num = bless {}, 'DieNum';
+# a scalar whose FETCH dies, tied into a cell of an otherwise plain table
+{
+    package DieFetch;
+    require Tie::Scalar;
+    our @ISA = ('Tie::StdScalar');
+    sub FETCH { die "fetch refused\n" }
+}
+sub dying_col { my @c = ( 1, 2, 3 ); tie $c[1], 'DieFetch'; return \@c }
+sub dying_row { my %h = ( a => 1 ); tie $h{b}, 'DieFetch'; return \%h }
 tie my %dying_row, 'DieFirstKey';
 my @c2c_aoh = ( { x => 1, y => 2 }, { x => 3, y => 5 }, \%dying_row );
 
@@ -120,7 +135,7 @@ my @cases = (
     [ 'cmh_test flat hole',  sub { Stats::LikeR::cmh_test( [ hole_at(2) ] ) },
         qr/cmh_test: cell at index 2 is undef/ ],
     [ 'binom_test hole',     sub { my @x; $x[1] = 5; Stats::LikeR::binom_test( \@x ) },
-        qr/binom_test: successes is undef/ ],
+        qr/binom_test: error: successes is undef/ ],
     # A hole in the middle: `delete $r[-1]` would shorten the array instead,
     # and be caught by the column-count check rather than by the cell reader.
     [ 'fisher_test AoA hole', sub { my @r; $r[0] = 3; $r[2] = 5; $#r = 1;
@@ -143,7 +158,7 @@ my @cases = (
     # -- the leaking-croak set
     [ 'dunn_test unknown method',
         sub { Stats::LikeR::dunn_test( \@dunn_x, \@dunn_g, method => 'nope' ) },
-        qr/dunn_test: unknown method 'nope'/ ],
+        qr/dunn_test: error: unknown method 'nope'/ ],
     [ 'scale non-numeric element',
         sub { Stats::LikeR::scale( [ 1 .. 50, 'notanumber' ] ) },
         qr/scale: non-numeric value/ ],
@@ -155,7 +170,7 @@ my @cases = (
         qr/col2col: column 'nosuchcolumn' not found/ ],
     [ 'col2col undef in column list',
         sub { Stats::LikeR::col2col( \%c2c, 'sum', [undef] ) },
-        qr/col2col: column list contains an undefined entry/ ],
+        qr/col2col: error: column list contains an undefined entry/ ],
     [ 'fisher_test non-numeric cell',
         sub { Stats::LikeR::fisher_test( [ [ 1, 2 ], [ 3, 'zz' ] ] ) },
         qr/fisher_test: array cell is not a number/ ],
@@ -230,6 +245,20 @@ my @cases = (
         sub { local $SIG{__WARN__} = sub { die "warning refused\n" };
               Stats::LikeR::bw_ucv( [ 1 .. 50 ], lower => 1e-9, upper => 1e-8 ) },
         qr/warning refused/ ],
+
+    # -- 0.331
+    [ 'aoh2hoa row cell whose FETCH dies',
+        sub { Stats::LikeR::aoh2hoa( [ { a => 1, b => 2 }, dying_row() ] ) },
+        qr/fetch refused/ ],
+    [ 'hoa2aoh column cell whose FETCH dies',
+        sub { Stats::LikeR::hoa2aoh( { a => [ 1, 2, 3 ], b => dying_col() } ) },
+        qr/fetch refused/ ],
+    [ 'hoa2hoh column cell whose FETCH dies',
+        sub { Stats::LikeR::hoa2hoh( { k => [qw(x y z)], b => dying_col() }, 'k' ) },
+        qr/fetch refused/ ],
+    [ 'hoa2hoh key cell whose FETCH dies',
+        sub { Stats::LikeR::hoa2hoh( { k => dying_col(), b => [ 1, 2, 3 ] }, 'k' ) },
+        qr/fetch refused/ ],
 );
 
 # 1. every case croaks, with the message that names what went wrong. A signal

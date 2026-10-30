@@ -145,7 +145,7 @@ is_approx( var(@large_data), 0.01, 'var: handles large magnitude data cleanly' )
 is_approx( sd(@large_data), 0.1, 'sd: handles large magnitude data cleanly' );
 # Exceptional cases for mean
 eval { mean() };
-like( $@, qr/mean needs >= 1 element/, 'mean: dies when given empty input' );
+like( $@, qr/\Ausage: mean\(.*^mean: error: no values given\n\z/ms, 'mean: dies when given empty input' );
 
 no_leaks_ok {
 	eval {
@@ -710,7 +710,7 @@ eval { matrix(data => "string", nrow => 2) };
 like( $@, qr/must be an array reference/, 'matrix: dies on non-arrayref data' );
 
 eval { matrix(data => [1,2], nrow => 0, ncol => 0) };
-like( $@, qr/Dimensions must be greater than 0/, 'matrix: dies on 0 dimensions' );
+like( $@, qr/\nmatrix: error: nrow and ncol must be greater than 0$/, 'matrix: dies on 0 dimensions' );
 
 eval { matrix(data => []) };
 like( $@, qr/Data array cannot be empty/, 'matrix: dies on empty data array' );
@@ -1458,6 +1458,13 @@ is_approx(sd($normals), $sd, 'rnorm sd', 0.1);
 # rnorm exceptions
 eval { rnorm(n => 10, sd => -1) };
 like( $@, qr/standard deviation must be non-negative/, 'rnorm: dies on negative sd' );
+# a call of the wrong form prints the function's help screen, then the error last
+like(do { local $@; eval { rnorm() }; $@ },
+	qr/\Ausage: rnorm\(.*^example:\n.*\n\nrnorm: error: \Q'n' is a required argument\E\n\z/ms,
+	'rnorm: no arguments prints the help screen, and the error last');
+like(do { local $@; eval { runif(5, 'min') }; $@ },
+	qr/\Ausage: runif\(.*^example:\n.*\n\nrunif: error: \Qodd number of named arguments ('min' has no value)\E\n\z/ms,
+	'runif: a dangling key prints the help screen, and the error last');
 
 #eval { rnorm(n => 10, mean => 0, 'missing_value_key') };
 #like( $@, qr/must be even key\/value pairs/, 'rnorm: dies on odd argument count' );
@@ -3499,6 +3506,13 @@ dies_ok {
 dies_ok {
 	var_test(\@xk, [1]);
 } 'var_test: dies with insufficient # of observations in y';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('var_test');
+	like($screen, qr/\Ausage: var_test\(/, 'var_test has a help screen');
+	eval { var_test(\@xk) };
+	is($@, $screen . "var_test: error: 'y' is a required argument and must be an ARRAY reference\n",
+		'var_test: a call-form error is the screen, then the error on the last line');
+}
 # sample
 %h = (a => 1, b => 2, c => 3, d => 4);
 
@@ -3739,6 +3753,12 @@ if ($size == 1) {
 	fail("mode: returns $size instead of a single value");
 }
 is_approx($arr[0], 3, 'mode: mode is correct number', 1e-14);
+
+# A call of the wrong form dies with the function's help screen, laid out as
+# argparse lays one out, and the error itself on the last line.
+is(eval { mode(); 1 }, undef, 'mode() with no values dies');
+like($@, qr/\Ausage: mode\(X \[, X \.\.\.\]\)\n.*\n\nmode: error: no values given\n\z/ms,
+	'mode: the help screen is above the error');
 
 @arr = mode([1,3,3,3]);
 $size = scalar @arr;
@@ -4139,5 +4159,21 @@ no_leaks_ok {
 		group_by($test_data, 'Testosterone', 'Gender', { Sex => sub { $_ eq 'f' } });
 	};
 } 'group_by: no leaks with filter' unless $INC{'Devel/Cover.pm'};
+# A call-form error dies with the function's argparse-style help screen from
+# lib/Stats/LikeR/Usage.pm, the error itself on the last line.
+{
+	my $err = eval { ljoin({}); 1 } ? '' : $@;
+	like($err, qr/\Ausage: ljoin\(.*\n\nljoin: error: \Qexpected 2 arguments, got 1\E\n\z/s,
+		'ljoin: a call-form error prints the help screen, the error on its last line');
+}
+
+# A call-form error prints matrix's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { matrix(data => 'string'); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: matrix\(/, 'matrix: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('matrix') . "matrix: error: 'data' must be an array reference\n",
+		'matrix: the help screen, then the error on the last line');
+}
 done_testing();
 

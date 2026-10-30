@@ -435,6 +435,24 @@ Sicilian Italy locale.
    1995-12-22T09:05:02 = ven 22 dic 1995 d.C.
   -0010-09-15T04:44:23 = sab 15 sit -10 p.C.
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = d.C. 2008 frivaru
+   1995-12-22T09:05:02 = d.C. 1995 dicèmmiru
+  -0010-09-15T04:44:23 = p.C. -10 sittèmmiru
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = d.C. 2008 frivaru 5, mar
+   1995-12-22T09:05:02 = d.C. 1995 dicèmmiru 22, ven
+  -0010-09-15T04:44:23 = p.C. -10 sittèmmiru 15, sab
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = d.C. 2008 frivaru 5
+   1995-12-22T09:05:02 = d.C. 1995 dicèmmiru 22
+  -0010-09-15T04:44:23 = p.C. -10 sittèmmiru 15
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 fri 2008 d.C.
@@ -506,6 +524,12 @@ Sicilian Italy locale.
    2008-02-05T18:30:30 = mar 5 fri
    1995-12-22T09:05:02 = ven 22 dic
   -0010-09-15T04:44:23 = sab 15 sit
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = frivaru 5, mar
+   1995-12-22T09:05:02 = dicèmmiru 22, ven
+  -0010-09-15T04:44:23 = sittèmmiru 15, sab
 
 =head3 MMMMW-count-one ('simana' W 'di' MMMM)
 

@@ -1,0 +1,21 @@
+title: plan mode reads but refuses writing and bash, even with an allow rule
+permission_mode: plan
+files:
+  .raider/config.yml: |
+    permissions:
+      allow: [ Bash, Edit ]
+  notes.txt: plan me
+prompt: Plan.
+script:
+  - tool_calls:
+      - [ read_file, { path: notes.txt } ]
+      - [ write_file, { path: a.txt, content: x } ]
+      - [ bash, { command: touch b.txt } ]
+  - text: here is my plan
+expect:
+  answer: here is my plan
+  absent: [ a.txt, b.txt ]
+  tools:
+    - { name: read_file, text: plan me }
+    - { name: write_file, error: true, text: "plan mode: write_file changes files, which plan mode does not allow; present your plan with exit_plan_mode first" }
+    - { name: bash, error: true, text: "plan mode: bash runs code" }

@@ -1,0 +1,11 @@
+^Punk-MCP-
+\bMakefile$
+\bMakefile\.old$
+\bMYMETA\.
+\bMETA\.
+\bblib/
+\bpm_to_blib$
+\.tar\.gz$
+(^|/)\.git
+^ignore\.txt$
+\.(c|o|obj|bs)$

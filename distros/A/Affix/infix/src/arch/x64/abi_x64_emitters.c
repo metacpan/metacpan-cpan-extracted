@@ -35,6 +35,16 @@
 #define REX_R (1 << 2)  // Extends ModR/M 'reg' field
 #define REX_X (1 << 1)  // Extends SIB 'index' field
 #define REX_B (1 << 0)  // Extends ModR/M 'r/m' or SIB 'base' field
+
+/**
+ * @internal
+ * @brief Emits `endbr64` (Terminate Indirect Branch 64-bit) for Intel IBT / CET.
+ * @details Opcode: F3 0F 1E FA
+ */
+INFIX_INTERNAL void emit_endbr64(code_buffer * buf) {
+    EMIT_BYTES(buf, 0xF3, 0x0F, 0x1E, 0xFA);
+}
+
 // Instruction Encoding Helpers
 /*
  * @internal

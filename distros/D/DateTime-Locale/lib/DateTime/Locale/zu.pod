@@ -266,9 +266,9 @@ Zulu locale.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2/5/08
-   1995-12-22T09:05:02 = 12/22/95
-  -0010-09-15T04:44:23 = 9/15/-10
+   2008-02-05T18:30:30 = 2008-02-05
+   1995-12-22T09:05:02 = 1995-12-22
+  -0010-09-15T04:44:23 = -10-09-15
 
 
 =head2 Time Formats
@@ -320,9 +320,9 @@ Zulu locale.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2/5/08 18:30
-   1995-12-22T09:05:02 = 12/22/95 09:05
-  -0010-09-15T04:44:23 = 9/15/-10 04:44
+   2008-02-05T18:30:30 = 2008-02-05 18:30
+   1995-12-22T09:05:02 = 1995-12-22 09:05
+  -0010-09-15T04:44:23 = -10-09-15 04:44
 
 
 =head2 Available Formats
@@ -435,17 +435,35 @@ Zulu locale.
    1995-12-22T09:05:02 = AD 1995 Dis 22, Hla
   -0010-09-15T04:44:23 = BC -10 Sep 15, Mgq
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = AD 2008 Februwari
+   1995-12-22T09:05:02 = AD 1995 Disemba
+  -0010-09-15T04:44:23 = BC -10 Septhemba
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = AD 2008 Februwari 5, Bil
+   1995-12-22T09:05:02 = AD 1995 Disemba 22, Hla
+  -0010-09-15T04:44:23 = BC -10 Septhemba 15, Mgq
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = AD 2008 Februwari 5
+   1995-12-22T09:05:02 = AD 1995 Disemba 22
+  -0010-09-15T04:44:23 = BC -10 Septhemba 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = AD 2008 Feb 5
    1995-12-22T09:05:02 = AD 1995 Dis 22
   -0010-09-15T04:44:23 = BC -10 Sep 15
 
-=head3 GyMd (M/d/y GGGGG)
+=head3 GyMd (G y-MM-dd)
 
-   2008-02-05T18:30:30 = 2/5/2008 AD
-   1995-12-22T09:05:02 = 12/22/1995 AD
-  -0010-09-15T04:44:23 = 9/15/-10 BC
+   2008-02-05T18:30:30 = AD 2008-02-05
+   1995-12-22T09:05:02 = AD 1995-12-22
+  -0010-09-15T04:44:23 = BC -10-09-15
 
 =head3 H (HH)
 
@@ -506,6 +524,12 @@ Zulu locale.
    2008-02-05T18:30:30 = Bil, Feb 5
    1995-12-22T09:05:02 = Hla, Dis 22
   -0010-09-15T04:44:23 = Mgq, Sep 15
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Februwari 5, Bil
+   1995-12-22T09:05:02 = Disemba 22, Hla
+  -0010-09-15T04:44:23 = Septhemba 15, Mgq
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
@@ -614,6 +638,18 @@ Zulu locale.
    2008-02-05T18:30:30 = Februwari 2008
    1995-12-22T09:05:02 = Disemba 1995
   -0010-09-15T04:44:23 = Septhemba -10
+
+=head3 yMMMMEd (EEE, MMMM d, y)
+
+   2008-02-05T18:30:30 = Bil, Februwari 5, 2008
+   1995-12-22T09:05:02 = Hla, Disemba 22, 1995
+  -0010-09-15T04:44:23 = Mgq, Septhemba 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Februwari 5, 2008
+   1995-12-22T09:05:02 = Disemba 22, 1995
+  -0010-09-15T04:44:23 = Septhemba 15, -10
 
 =head3 yMMMd (MMM d, y)
 

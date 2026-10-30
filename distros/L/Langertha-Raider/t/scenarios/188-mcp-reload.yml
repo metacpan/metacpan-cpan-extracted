@@ -1,0 +1,40 @@
+title: /reload reads the MCP servers again; a server added to ~/.raider/config.yml is offered from the next prompt on, a removed one is gone (ADR 0029 §11)
+home:
+  .raider/config.yml: |
+    mcp:
+      first:
+        command: "{{PERL}}"
+        args: [ "{{MCP_TEST_SERVER}}", normal ]
+prompts: [ one, two ]
+between:
+  1:
+    home:
+      .raider/config.yml: |
+        mcp:
+          second:
+            command: "{{PERL}}"
+            args: [ "{{MCP_TEST_SERVER}}", normal ]
+    reload: true
+script:
+  - tool_calls:
+      - [ mcp__first__with_dot, {} ]
+  - text: one done
+  - tool_calls:
+      - [ mcp__second__with_dot, {} ]
+      - [ mcp__first__with_dot, {} ]
+  - text: two done
+expect:
+  answer: two done
+  requests:
+    - { index: 0, lacks: [ mcp__second__with_dot ] }
+    - { index: 2, lacks: [ mcp__first__with_dot ] }
+  tools:
+    - { name: mcp__first__with_dot, text: "\\Adotted\\z" }
+    - { name: mcp__second__with_dot, text: "\\Adotted\\z" }
+    - { name: mcp__first__with_dot, error: true, text: "No such tool available" }
+  events:
+    - { type: mcp.server, name: first, status: starting }
+    - { type: mcp.server, name: first, status: connected }
+    - { type: mcp.server, name: first, status: stopped }
+    - { type: mcp.server, name: second, status: starting }
+    - { type: mcp.server, name: second, status: connected }

@@ -435,6 +435,24 @@ Breton France locale.
    1995-12-22T09:05:02 = Gwe. 22 Kzu. 1995 goude J.K.
   -0010-09-15T04:44:23 = Sad. 15 Gwen. -10 a-raok J.K.
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = Cʼhwevrer 2008 goude J.K.
+   1995-12-22T09:05:02 = Kerzu 1995 goude J.K.
+  -0010-09-15T04:44:23 = Gwengolo -10 a-raok J.K.
+
+=head3 GyMMMMEd (E d MMMM y G)
+
+   2008-02-05T18:30:30 = Meu. 5 Cʼhwevrer 2008 goude J.K.
+   1995-12-22T09:05:02 = Gwe. 22 Kerzu 1995 goude J.K.
+  -0010-09-15T04:44:23 = Sad. 15 Gwengolo -10 a-raok J.K.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 Cʼhwevrer 2008 goude J.K.
+   1995-12-22T09:05:02 = 22 Kerzu 1995 goude J.K.
+  -0010-09-15T04:44:23 = 15 Gwengolo -10 a-raok J.K.
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Cʼhwe. 2008 goude J.K.
@@ -506,6 +524,12 @@ Breton France locale.
    2008-02-05T18:30:30 = Meu. 5 Cʼhwe.
    1995-12-22T09:05:02 = Gwe. 22 Kzu.
   -0010-09-15T04:44:23 = Sad. 15 Gwen.
+
+=head3 MMMMEd (E d MMMM)
+
+   2008-02-05T18:30:30 = Meu. 5 Cʼhwevrer
+   1995-12-22T09:05:02 = Gwe. 22 Kerzu
+  -0010-09-15T04:44:23 = Sad. 15 Gwengolo
 
 =head3 MMMMW-count-few ('sizhun' W 'miz' MMMM)
 
@@ -638,6 +662,18 @@ Breton France locale.
    2008-02-05T18:30:30 = Cʼhwevrer 2008
    1995-12-22T09:05:02 = Kerzu 1995
   -0010-09-15T04:44:23 = Gwengolo -10
+
+=head3 yMMMMEd (E d MMMM y)
+
+   2008-02-05T18:30:30 = Meu. 5 Cʼhwevrer 2008
+   1995-12-22T09:05:02 = Gwe. 22 Kerzu 1995
+  -0010-09-15T04:44:23 = Sad. 15 Gwengolo -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 Cʼhwevrer 2008
+   1995-12-22T09:05:02 = 22 Kerzu 1995
+  -0010-09-15T04:44:23 = 15 Gwengolo -10
 
 =head3 yMMMd (d MMM y)
 

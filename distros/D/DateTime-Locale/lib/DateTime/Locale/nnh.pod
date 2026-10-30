@@ -435,6 +435,24 @@ Ngiemboon locale.
    1995-12-22T09:05:02 = m.g.n.Y. 1995 saŋ lùm 22, mvfò màga lyɛ̌ʼ
   -0010-09-15T04:44:23 = m.z.Y. -10 saŋ ngwɔ̀ʼ mbÿɛ 15, màga lyɛ̌ʼ
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = m.g.n.Y. 2008 saŋ kàg ngwóŋ
+   1995-12-22T09:05:02 = m.g.n.Y. 1995 saŋ lùm
+  -0010-09-15T04:44:23 = m.z.Y. -10 saŋ ngwɔ̀ʼ mbÿɛ
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = m.g.n.Y. 2008 saŋ kàg ngwóŋ 5, mbɔ́ɔntè mvfò lyɛ̌ʼ
+   1995-12-22T09:05:02 = m.g.n.Y. 1995 saŋ lùm 22, mvfò màga lyɛ̌ʼ
+  -0010-09-15T04:44:23 = m.z.Y. -10 saŋ ngwɔ̀ʼ mbÿɛ 15, màga lyɛ̌ʼ
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = m.g.n.Y. 2008 saŋ kàg ngwóŋ 5
+   1995-12-22T09:05:02 = m.g.n.Y. 1995 saŋ lùm 22
+  -0010-09-15T04:44:23 = m.z.Y. -10 saŋ ngwɔ̀ʼ mbÿɛ 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = m.g.n.Y. 2008 saŋ kàg ngwóŋ 5
@@ -502,6 +520,12 @@ Ngiemboon locale.
   -0010-09-15T04:44:23 = saŋ ngwɔ̀ʼ mbÿɛ
 
 =head3 MMMEd (MMM d, E)
+
+   2008-02-05T18:30:30 = saŋ kàg ngwóŋ 5, mbɔ́ɔntè mvfò lyɛ̌ʼ
+   1995-12-22T09:05:02 = saŋ lùm 22, mvfò màga lyɛ̌ʼ
+  -0010-09-15T04:44:23 = saŋ ngwɔ̀ʼ mbÿɛ 15, màga lyɛ̌ʼ
+
+=head3 MMMMEd (MMMM d, E)
 
    2008-02-05T18:30:30 = saŋ kàg ngwóŋ 5, mbɔ́ɔntè mvfò lyɛ̌ʼ
    1995-12-22T09:05:02 = saŋ lùm 22, mvfò màga lyɛ̌ʼ

@@ -51,7 +51,14 @@ sub is_approx {
 throws_ok { friedman_test([[1,2,3]]) }        qr/at least two blocks/, 'needs >= 2 blocks';
 throws_ok { friedman_test([[1],[2]]) }        qr/at least two treatments/, 'needs >= 2 treatments';
 throws_ok { friedman_test([[1,2,3],[1,2]]) }  qr/same number of columns/, 'ragged rows rejected';
-throws_ok { friedman_test(42) }               qr/Usage/, 'non-matrix rejected';
+throws_ok { friedman_test(42) }               qr/\Ausage: friedman_test\(/, 'non-matrix rejected';
+{	# an error in the call prints the help screen, then the error on the last line
+	my $screen = Stats::LikeR::_usage_text('friedman_test');
+	like($screen, qr/\Ausage: friedman_test\(/, 'friedman_test has a help screen');
+	eval { friedman_test(42) };
+	is($@, $screen . "friedman_test: error: the first argument must be an array ref of blocks\n",
+		'a call-form error is the screen, then the error on the last line');
+}
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

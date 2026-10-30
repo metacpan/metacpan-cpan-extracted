@@ -91,4 +91,17 @@ SKIP: {
 		'no leaks: croak path';
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('aoh2hoa');
+	like($screen, qr/\Ausage: aoh2hoa\(/, 'aoh2hoa has a help screen');
+	is(do { local $@; eval { aoh2hoa({ a => 1 }); 1 } ? '' : $@ },
+	   $screen . "aoh2hoa: error: argument must be an arrayref of hashrefs\n",
+	   'aoh2hoa: a hashref prints the help screen');
+	is(do { local $@; eval { aoh2hoa(); 1 } ? '' : $@ },
+	   $screen . "aoh2hoa: error: expected 1 argument, got 0\n",
+	   'aoh2hoa: no argument prints the help screen');
+}
+
 done_testing;

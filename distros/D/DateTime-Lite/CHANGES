@@ -1,5 +1,10 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.11.0 2026-10-28T23:41:57+0900
+    [Maintenance]
+    - SQLite database updated with the newly released IANA data version 2026f.
+    - No API change.
+
 v0.10.0 2026-09-30T11:15:40+0900
     [Maintenance]
     - SQLite database updated with the newly released IANA data version 2026e.

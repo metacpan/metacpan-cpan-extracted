@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt);
-our $VERSION = '0.18';    #
+our $VERSION = '0.20';    #
 
 my %hFmtDefault = (
     0x00 => '@',

@@ -435,6 +435,24 @@ Zarma locale.
    1995-12-22T09:05:02 = IZ 1995 Dee 22, Alz
   -0010-09-15T04:44:23 = IJ -10 Sek 15, Asi
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = IZ 2008 Feewiriye
+   1995-12-22T09:05:02 = IZ 1995 Deesanbur
+  -0010-09-15T04:44:23 = IJ -10 Sektanbur
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = IZ 2008 Feewiriye 5, Ata
+   1995-12-22T09:05:02 = IZ 1995 Deesanbur 22, Alz
+  -0010-09-15T04:44:23 = IJ -10 Sektanbur 15, Asi
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = IZ 2008 Feewiriye 5
+   1995-12-22T09:05:02 = IZ 1995 Deesanbur 22
+  -0010-09-15T04:44:23 = IJ -10 Sektanbur 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = IZ 2008 Fee 5
@@ -506,6 +524,12 @@ Zarma locale.
    2008-02-05T18:30:30 = Ata 5 Fee
    1995-12-22T09:05:02 = Alz 22 Dee
   -0010-09-15T04:44:23 = Asi 15 Sek
+
+=head3 MMMMEd (MMMM d, E)
+
+   2008-02-05T18:30:30 = Feewiriye 5, Ata
+   1995-12-22T09:05:02 = Deesanbur 22, Alz
+  -0010-09-15T04:44:23 = Sektanbur 15, Asi
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 

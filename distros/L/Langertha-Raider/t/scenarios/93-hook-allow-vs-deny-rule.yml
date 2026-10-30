@@ -1,0 +1,22 @@
+title: a hook's allow spares the mode's question but never beats a deny rule (ADR 0022, Claude Code's precedence)
+permission_mode: default
+files:
+  .claude/settings.json: |
+    { "permissions": { "deny": [ "Bash(rm:*)" ] },
+      "hooks": { "PreToolUse": [
+        { "matcher": "Bash", "hooks": [ { "type": "command", "command": "cat >/dev/null; printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\"}}'" } ] }
+      ] } }
+  keep.txt: keep
+prompt: Go.
+script:
+  - tool_calls:
+      - [ bash, { command: echo allowed by the hook } ]
+      - [ bash, { command: rm -f keep.txt } ]
+  - text: done
+expect:
+  files: { keep.txt: keep }
+  tools:
+    - { name: bash, text: allowed by the hook }
+    - { name: bash, error: true, text: "denied by rule 'Bash\\(rm:\\*\\)' from \\.claude/settings\\.json" }
+  events:
+    - { type: permission.denied, tool: bash, by: rule, rule: "Bash(rm:*)" }

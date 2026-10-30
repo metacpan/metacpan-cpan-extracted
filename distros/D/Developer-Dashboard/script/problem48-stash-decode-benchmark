@@ -1,0 +1,149 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use Digest::SHA qw(sha256_hex);
+use File::Spec;
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use Time::HiRes qw(time);
+
+our $SELECTED_LIB;
+BEGIN {
+    my $requested_lib = defined $ENV{P48_LIB}
+      ? $ENV{P48_LIB}
+      : File::Spec->catdir( $Bin, '..', 'lib' );
+    $SELECTED_LIB = abs_path($requested_lib)
+      or die "Unable to resolve selected source library '$requested_lib': $!\n";
+    die "Selected source library '$SELECTED_LIB' is not a directory\n" if !-d $SELECTED_LIB;
+    unshift @INC, $SELECTED_LIB;
+}
+
+use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::PageDocument;
+
+my $iterations = 1000;
+my $runs = 21;
+my $help = 0;
+GetOptions(
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be a positive odd integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $stash_text = q{person => { name => "Benchmark", roles => ["reader", "writer"], active => 1 }, nested => { count => 42 }};
+my $decode = Developer::Dashboard::PageDocument->can('_decode_stash_section')
+  or die "PageDocument::_decode_stash_section is unavailable\n";
+my $expected_json = json_encode( $decode->($stash_text) );
+my @samples;
+for my $run ( 1 .. $runs ) {
+    my $started = time;
+    my $value;
+    for ( 1 .. $iterations ) {
+        $value = $decode->($stash_text);
+    }
+    push @samples, time - $started;
+    my $actual_json = json_encode($value);
+    die "Decoded STASH value changed in run $run\n" if $actual_json ne $expected_json;
+}
+
+my $median = _median(@samples);
+printf "source_lib=%s iterations=%d runs=%d median_us_per_call=%.3f\n",
+  $SELECTED_LIB, $iterations, $runs, 1_000_000 * $median / $iterations;
+printf "result_sha256=%s exact_repeat_parity=yes\n", sha256_hex($expected_json);
+exit 0;
+
+# _median(@values)
+# Selects the middle of an odd number of elapsed-time samples.
+# Input: one or more numeric seconds values.
+# Output: median elapsed-time number, or a fatal diagnostic for no samples.
+sub _median {
+    my (@values) = @_;
+    die "Cannot select a median without samples\n" if !@values;
+    my @sorted = sort { $a <=> $b } @values;
+    return $sorted[ int( @sorted / 2 ) ];
+}
+
+# _usage()
+# Returns command usage text for the STASH decode microbenchmark.
+# Input: none.
+# Output: one usage string.
+sub _usage {
+    return <<'USAGE';
+Usage: problem48-stash-decode-benchmark [--iterations N] [--runs ODD_N] [--help]
+
+Measures repeated legacy STASH decoding and verifies exact serialized output.
+Set P48_LIB to select a source library; the default is this checkout's lib/.
+USAGE
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-stash-decode-benchmark - compare the legacy STASH decoder cost
+
+=head1 PURPOSE
+
+Measures repeated decoding of one deterministic legacy Perl-literal STASH
+through C<Developer::Dashboard::PageDocument::_decode_stash_section> and
+verifies that each measured run produces the same canonical JSON value.
+
+=head1 WHY IT EXISTS
+
+Problem 48 requires subroutine-specific performance evidence. The legacy
+decoder uses C<Safe> for Perl-literal compatibility; current source may use its
+bounded JSON-snapshot memoization for repeated identical values. This tool
+isolates that call without changing application files or fixtures.
+
+=head1 WHEN TO USE
+
+Run when changing the legacy STASH parser, its memoization bounds, cache
+copying behavior, or the source-version comparison procedure. It is a focused
+microbenchmark and does not represent whole-route latency.
+
+=head1 HOW TO USE
+
+Run both source trees in the development container, selecting each library
+with C<P48_LIB>:
+
+  d2 docker compose exec dev env P48_LIB=/work/nytprof/v588/lib perl script/problem48-stash-decode-benchmark --iterations 3000 --runs 21
+  d2 docker compose exec dev env P48_LIB=/work/lib perl script/problem48-stash-decode-benchmark --iterations 3000 --runs 21
+
+C<--iterations> must be positive. C<--runs> must be a positive odd integer so
+the reported median is a sample value. The benchmark dies if source selection,
+decoding, or exact serialized-result parity fails.
+
+=head1 WHAT USES IT
+
+The Problem 48 performance investigation uses this script after its regression
+tests pass, comparing the v5.88 baseline tree with the current repository.
+
+=head1 EXAMPLES
+
+Print usage without running a measurement:
+
+  perl script/problem48-stash-decode-benchmark --help
+
+Measure 3,000 calls across 21 samples for one selected source tree:
+
+  P48_LIB=/work/lib perl script/problem48-stash-decode-benchmark --iterations 3000 --runs 21
+
+=head1 OUTPUT
+
+The first line records the resolved source library, workload size, and median
+microseconds per call. The second line reports a SHA-256 digest of the
+canonical decoded value and confirms repeat parity.
+
+=cut

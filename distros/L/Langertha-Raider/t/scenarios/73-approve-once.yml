@@ -1,0 +1,23 @@
+title: approved once, a write runs; the next one is asked again (and refused when nobody says yes)
+permission_mode: default
+approve: [ once ]
+prompt: Write two files.
+script:
+  - tool_calls:
+      - [ write_file, { path: a.txt, content: "a\n" } ]
+      - [ write_file, { path: b.txt, content: "b\n" } ]
+  - text: done
+expect:
+  files: { a.txt: "a\n" }
+  absent: [ b.txt ]
+  permissions:
+    - { tool: write_file, rule: "Edit(/**)" }
+    - { tool: write_file, rule: "Edit(/**)" }
+  tools:
+    - { name: write_file }
+    - { name: write_file, error: true, text: "^The user doesn't want to proceed with this tool use\\. The tool use was rejected \\(eg\\. if it was a file edit, the new_string was NOT written to the file\\)\\. STOP what you are doing and wait for the user to tell you how to proceed\\.$" }
+  events:
+    - { type: permission.asked, tool: write_file, suggested_rule: "Edit(/**)" }
+    - { type: permission.granted, tool: write_file, scope: once }
+    - { type: permission.asked, tool: write_file }
+    - { type: permission.denied, tool: write_file, by: user }

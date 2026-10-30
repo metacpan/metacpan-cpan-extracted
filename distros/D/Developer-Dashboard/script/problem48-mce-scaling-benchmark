@@ -1,0 +1,206 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+use Time::HiRes qw(time);
+
+my $skill_counts = '50,250,1000';
+my $runs         = 9;
+my $workers      = 4;
+my $help         = 0;
+GetOptions(
+    'skills=s'  => \$skill_counts,
+    'runs=i'    => \$runs,
+    'workers=i' => \$workers,
+    'help'      => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die _usage() if @ARGV || $runs < 1 || $runs % 2 == 0 || $workers < 1;
+my @skill_counts = split /,/, $skill_counts;
+die "--skills must be a comma-separated list of positive integers\n"
+  if !@skill_counts || grep { !/\A[1-9][0-9]*\z/ } @skill_counts;
+eval { require MCE::Map; MCE::Map->import(); 1 }
+  or die "MCE::Map is required for this benchmark: $@";
+
+my $root = tempdir( 'problem48-mce-scale-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
+
+for my $count (@skill_counts) {
+    my @files = _write_configs( $root, $count );
+    my $expected = _serial_read(\@files);
+    my $expected_json = JSON::XS->new->canonical->encode($expected);
+    MCE::Map->init( max_workers => $workers, chunk_size => 1, use_threads => 0 );
+    my $cold_start = time;
+    my $first_parallel = _parallel_read(\@files);
+    my $first_seconds = time - $cold_start;
+    die "MCE output mismatch for $count configs\n"
+      if JSON::XS->new->canonical->encode($first_parallel) ne $expected_json;
+
+    my ( @serial, @parallel );
+    for ( 1 .. $runs ) {
+        push @serial, _timed( sub { _serial_read(\@files) }, $expected_json );
+        push @parallel,
+          _timed( sub { _parallel_read(\@files) }, $expected_json );
+    }
+    printf "configs=%d workers=%d exact_ordered_parity=yes cold_map_ms=%.3f serial_median_ms=%.3f mce_warm_median_ms=%.3f cold_ratio=%.2fx warm_ratio=%.2fx\n",
+      $count, $workers, 1000 * $first_seconds,
+      1000 * _median(@serial), 1000 * _median(@parallel),
+      _median(@serial) / $first_seconds,
+      _median(@serial) / _median(@parallel);
+    MCE::Map->finish;
+}
+exit 0;
+
+# _usage()
+# Returns the command-line help and validation message.
+# Input: none.
+# Output: usage text string.
+sub _usage {
+    return "Usage: $0 [--skills N,N,...] [--runs ODD_N] [--workers N] [--help]\n";
+}
+
+# _write_configs($root, $count)
+# Creates independent JSON config fixtures with a realistic alias and unrelated keys.
+# Input: temporary root path and positive config count.
+# Output: ordered list of config file paths.
+sub _write_configs {
+    my ( $base, $count ) = @_;
+    my $fixture_root = File::Spec->catdir( $base, "count-$count" );
+    my @files;
+    for my $index ( 1 .. $count ) {
+        my $dir = File::Spec->catdir( $fixture_root, sprintf( 'skill-%06d', $index ), 'config' );
+        make_path($dir);
+        my %config = map { ( "unrelated_$_" => "value-$index-$_" ) } 1 .. 80;
+        $config{path_aliases} = { work => "/workspace/skill-$index" };
+        my $file = File::Spec->catfile( $dir, 'config.json' );
+        open my $fh, '>:raw', $file or die "Unable to create benchmark fixture $file: $!";
+        print {$fh} JSON::XS->new->canonical->encode(\%config)
+          or die "Unable to write benchmark fixture $file: $!";
+        close $fh or die "Unable to close benchmark fixture $file: $!";
+        push @files, $file;
+    }
+    return @files;
+}
+
+# _read_alias_config($file)
+# Reads one JSON file and returns its path plus decoded alias domain.
+# Input: config file path string.
+# Output: array reference containing the file path and path_aliases hash.
+sub _read_alias_config {
+    my ($file) = @_;
+    open my $fh, '<:raw', $file or die "Unable to read benchmark fixture $file: $!";
+    local $/;
+    my $config = JSON::XS->new->decode(<$fh>);
+    close $fh or die "Unable to close benchmark fixture $file: $!";
+    die "Benchmark config is not an object: $file\n" if ref($config) ne 'HASH';
+    return [ $file, $config->{path_aliases} ];
+}
+
+# _serial_read($files)
+# Reads and decodes the fixture paths in deterministic input order.
+# Input: array reference of config file paths.
+# Output: array reference of decoded path alias records.
+sub _serial_read {
+    my ($files) = @_;
+    return [ map { _read_alias_config($_) } @{$files} ];
+}
+
+# _parallel_read($files)
+# Runs independent file reads through an ordered MCE map operation.
+# Input: array reference of config file paths.
+# Output: array reference of decoded alias records in original input order.
+sub _parallel_read {
+    my ($files) = @_;
+    return [ MCE::Map::run( sub { _read_alias_config($_) }, @{$files} ) ];
+}
+
+# _timed($code, $expected_json)
+# Times a result-producing workload and rejects any parity change.
+# Input: code reference and canonical expected JSON string.
+# Output: elapsed seconds.
+sub _timed {
+    my ( $code, $expected_json ) = @_;
+    my $started = time;
+    my $actual = JSON::XS->new->canonical->encode( $code->() );
+    my $elapsed = time - $started;
+    die "Benchmark output mismatch\n" if $actual ne $expected_json;
+    return $elapsed;
+}
+
+# _median(@samples)
+# Returns the middle value of an odd, non-empty sample set.
+# Input: elapsed-time values in seconds.
+# Output: median elapsed time.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot compute a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-mce-scaling-benchmark - measure MCE config-read scaling
+
+=head1 PURPOSE
+
+This utility compares serial reads and JSON::XS decoding with MCE's ordered
+parallel map for independent skill configuration files. It records worker
+startup, first-map time, warmed medians, and verifies exact ordered output
+parity for every sample.
+
+=head1 WHY IT EXISTS
+
+Problem 48 profiling identified independent config-file reads as one possible
+parallel workload. Earlier measurements showed MCE slower for 50 small files;
+this benchmark checks larger inventories before any production MCE dependency
+or threshold is considered.
+
+=head1 WHEN TO USE
+
+Use this in the isolated Problem 48 Docker benchmark when evaluating a change
+to layered skill configuration loading. Results describe fixture scaling only,
+not full CLI latency or every dashboard subroutine.
+
+=head1 HOW TO USE
+
+  perl script/problem48-mce-scaling-benchmark
+  perl script/problem48-mce-scaling-benchmark --skills 50,250,1000 --runs 9
+
+MCE must be installed in the benchmark container. The default creates 50, 250,
+and 1,000 JSON configs, each with 80 unrelated fields and one path alias. It
+uses four processes and nine alternating samples per workload; fixture data
+is kept in an automatically removed temporary directory.
+
+=head1 WHAT USES IT
+
+Problem 48 research uses its timings to decide whether MCE is appropriate for
+large installed-skill inventories. The application and release process do not
+invoke this benchmark.
+
+=head1 EXAMPLES
+
+Run in the isolated Docker benchmark project with its optional MCE library:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench sh -lc 'export PERL5LIB=/bench-perl/lib/perl5:$PERL5LIB; cd /checkout && perl script/problem48-mce-scaling-benchmark'
+
+Compare more repetitions at larger counts:
+
+  d2 docker compose -p dd-problem48-bench -f /tmp/d2-problem48-bench.yml -f /tmp/d2-problem48-init.yml run --rm bench sh -lc 'export PERL5LIB=/bench-perl/lib/perl5:$PERL5LIB; cd /checkout && perl script/problem48-mce-scaling-benchmark --skills 250,500,1000 --runs  fifteen --workers 4'
+
+=head1 RUN COUNT
+
+Use odd integer values for C<--runs>, for example 9 or 15.
+
+=cut

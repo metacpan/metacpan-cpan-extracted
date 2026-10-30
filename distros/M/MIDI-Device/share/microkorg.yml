@@ -8,94 +8,94 @@ note_on:
     max: 127
 control_change:
   - number: 1
-    name: "Modulation Depth (MOD Wheel)"
+    note: "Modulation Depth (MOD Wheel)"
   - number: 7
-    name: "Volume (AMP Level)"
+    note: "Volume (AMP Level)"
   - number: 10
-    name: "Panpot (AMP Panpot)"
+    note: "Panpot (AMP Panpot)"
   - number: 5
-    name: "Portamento"
+    note: "Portamento"
   - number: 12
-    name: "MOD FX LFO Speed"
+    note: "MOD FX LFO Speed"
   - number: 13
-    name: "DELAY Time"
+    note: "DELAY Time"
   - number: 14
-    name: "OSC 1 Control 1"
+    note: "OSC 1 Control 1"
   - number: 15
-    name: "OSC 1 Control 2"
+    note: "OSC 1 Control 2"
   - number: 18
-    name: "OSC 2 Semitone / Vocoder HPF Level"
+    note: "OSC 2 Semitone / Vocoder HPF Level"
   - number: 19
-    name: "OSC 2 Tune / Vocoder Threshold"
+    note: "OSC 2 Tune / Vocoder Threshold"
   - number: 20
-    name: "MIXER OSC 1 Level"
+    note: "MIXER OSC 1 Level"
   - number: 21
-    name: "MIXER OSC 2 Level / Vocoder Inst Level"
+    note: "MIXER OSC 2 Level / Vocoder Inst Level"
   - number: 22
-    name: "MIXER Noise Level"
+    note: "MIXER Noise Level"
   - number: 23
-    name: "FILTER EG Attack"
+    note: "FILTER EG Attack"
   - number: 24
-    name: "FILTER EG Decay"
+    note: "FILTER EG Decay"
   - number: 25
-    name: "FILTER EG Sustain"
+    note: "FILTER EG Sustain"
   - number: 26
-    name: "FILTER EG Release"
+    note: "FILTER EG Release"
   - number: 27
-    name: "LFO 1 Frequency"
+    note: "LFO 1 Frequency"
   - number: 28
-    name: "Virtual PATCH 1 Intensity"
+    note: "Virtual PATCH 1 Intensity"
   - number: 29
-    name: "Virtual PATCH 2 Intensity"
+    note: "Virtual PATCH 2 Intensity"
   - number: 30
-    name: "Virtual PATCH 3 Intensity"
+    note: "Virtual PATCH 3 Intensity"
   - number: 31
-    name: "Virtual PATCH 4 Intensity"
+    note: "Virtual PATCH 4 Intensity"
   - number: 70
-    name: "AMP EG Sustain"
+    note: "AMP EG Sustain"
   - number: 71
-    name: "FILTER Resonance"
+    note: "FILTER Resonance"
   - number: 72
-    name: "AMP EG Release"
+    note: "AMP EG Release"
   - number: 73
-    name: "AMP EG Attack"
+    note: "AMP EG Attack"
   - number: 74
-    name: "FILTER Cutoff"
+    note: "FILTER Cutoff"
   - number: 75
-    name: "AMP EG Decay"
+    note: "AMP EG Decay"
   - number: 76
-    name: "LFO 2 Frequency"
+    note: "LFO 2 Frequency"
   - number: 77
-    name: "OSC 1 Waveform"
+    note: "OSC 1 Waveform"
   - number: 78
-    name: "OSC 2 Waveform"
+    note: "OSC 2 Waveform"
   - number: 79
-    name: "FILTER EG Intensity / Vocoder Mod Intensity"
+    note: "FILTER EG Intensity / Vocoder Mod Intensity"
   - number: 82
-    name: "OSC Modulation (OFF, Ring, Sync, RingSync)"
+    note: "OSC Modulation (OFF, Ring, Sync, RingSync)"
   - number: 83
-    name: "FILTER Type / Vocoder Formant Shift"
+    note: "FILTER Type / Vocoder Formant Shift"
   - number: 85
-    name: "FILTER Keyboard Track / Vocoder Envelope Follower Sensitivity"
+    note: "FILTER Keyboard Track / Vocoder Envelope Follower Sensitivity"
   - number: 87
-    name: "LFO 1 Waveform"
+    note: "LFO 1 Waveform"
   - number: 88
-    name: "LFO 2 Waveform"
+    note: "LFO 2 Waveform"
   - number: 90
-    name: "Sync Control"
+    note: "Sync Control"
   - number: 92
-    name: "AMP Distortion"
+    note: "AMP Distortion"
   - number: 93
-    name: "MOD FX Depth"
+    note: "MOD FX Depth"
   - number: 94
-    name: "DELAY Depth"
+    note: "DELAY Depth"
   - number: 95
-    name: "Timbre Select"
+    note: "Timbre Select"
   - number: 6
-    name: "Data Entry MSB"
+    note: "Data Entry MSB"
   - number: 98
-    name: "NRPN LSB"
+    note: "NRPN LSB"
   - number: 99
-    name: "NRPN MSB"
+    note: "NRPN MSB"
   - number: 121
-    name: "Reset All Controllers"
+    note: "Reset All Controllers"

@@ -3,12 +3,10 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '5.73';
+our $VERSION = '6.06';
 
 use File::Spec;
 use File::Path qw(make_path);
-use Cwd qw(cwd);
-
 use JSON::XS ();
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
@@ -39,21 +37,72 @@ sub for_paths {
     return $class->new( paths => $paths, files => Developer::Dashboard::FileRegistry->new( paths => $paths ) );
 }
 
-# load_global()
+# for_path_config($paths)
+# Constructs a configuration view for operations that use layered configuration
+# and path resolution without creating a file registry. Config reads and writes
+# resolve their paths through PathRegistry directly.
+# Input: Developer::Dashboard::PathRegistry object.
+# Output: Developer::Dashboard::Config object bound to the given path registry.
+sub for_path_config {
+    my ( $class, $paths ) = @_;
+    die 'Missing path registry' if !$paths;
+    return bless { paths => $paths }, $class;
+}
+
+# load_global(%args)
 # Loads the user-global dashboard configuration file.
-# Input: none.
+# Input: optional skill_config_entries array reference already resolved for
+# this operation and optional skill_config_entries_out array reference to
+# receive the exact entries used during loading.
 # Output: configuration hash reference.
 sub load_global {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
+    die "Unsupported load_global option '$_'\n"
+      for grep { $_ ne 'skill_config_entries' && $_ ne 'skill_config_entries_out' } keys %args;
+    die "skill_config_entries must be an array reference\n"
+      if exists $args{skill_config_entries} && ref( $args{skill_config_entries} ) ne 'ARRAY';
+    die "skill_config_entries_out must be an array reference\n"
+      if exists $args{skill_config_entries_out} && ref( $args{skill_config_entries_out} ) ne 'ARRAY';
+
+    # A single config load resolves runtime roots through both the global-file
+    # and installed-skill readers. Share only the runtime-layer inventory for
+    # this operation, preserving any enclosing request scope and ensuring the
+    # next load sees filesystem changes made after this one returns.
+    my $paths = $self->{paths};
+    local $paths->{_runtime_layer_candidate_scope} =
+      ref( $paths->{_runtime_layer_candidate_scope} ) eq 'HASH'
+      ? $paths->{_runtime_layer_candidate_scope}
+      : {};
+
     my $merged = {};
+    my $has_global_config = 0;
     for my $file ( reverse $self->_global_config_files ) {
         next if !-f $file;
         open my $fh, '<:raw', $file or die "Unable to read $file: $!";
         local $/;
-        $merged = $self->_merge_hashes( $merged, json_decode(<$fh>) );
+        my $config = json_decode(<$fh>);
+        if ( !$has_global_config ) {
+            $merged = $config;
+            $has_global_config = 1;
+            next;
+        }
+        $merged = $self->_merge_hashes( $merged, $config );
     }
-    for my $fragment ( $self->_skill_config_fragments ) {
+    my @skill_config_entries;
+    my @fragments = $self->_skill_config_fragments(
+        $args{skill_config_entries},
+        \@skill_config_entries,
+    );
+    @{ $args{skill_config_entries_out} } = @skill_config_entries
+      if exists $args{skill_config_entries_out};
+    for my $fragment (@fragments) {
         $merged = $self->_merge_hashes( $merged, $fragment );
+    }
+    if ( $has_global_config && !@fragments ) {
+        $merged->{collectors} = $self->_merge_named_hash_array( [], $merged->{collectors}, 'name' )
+          if ref( $merged->{collectors} ) eq 'ARRAY';
+        $merged->{providers} = $self->_merge_named_hash_array( [], $merged->{providers}, 'id' )
+          if ref( $merged->{providers} ) eq 'ARRAY';
     }
     return $merged;
 }
@@ -126,15 +175,25 @@ sub load_repo {
     return json_decode(<$fh>);
 }
 
-# merged()
-# Returns the merged global and repo-local configuration view.
-# Input: none.
+# merged(%args)
+# Returns the merged global and repo-local configuration view, skipping a
+# redundant merge when the repo layer contributes no keys.
+# Input: optional skill_config_entries array reference shared with other
+# readers, and optional skill_config_entries_out array reference populated with
+# the entries actually read by this operation.
 # Output: merged configuration hash reference.
 sub merged {
-    my ($self) = @_;
-    my $global = $self->load_global;
+    my ( $self, %args ) = @_;
+    die "Unsupported merged option '$_'\n"
+      for grep { $_ ne 'skill_config_entries' && $_ ne 'skill_config_entries_out' } keys %args;
+    die "skill_config_entries must be an array reference\n"
+      if exists $args{skill_config_entries} && ref( $args{skill_config_entries} ) ne 'ARRAY';
+    die "skill_config_entries_out must be an array reference\n"
+      if exists $args{skill_config_entries_out} && ref( $args{skill_config_entries_out} ) ne 'ARRAY';
+    my $global = $self->load_global(%args);
     my $repo   = $self->load_repo;
 
+    return $global if ref($repo) eq 'HASH' && !%{$repo};
     return $self->_merge_hashes( $global, $repo );
 }
 
@@ -188,23 +247,19 @@ sub _merge_named_hash_array {
     my ( $self, $left, $right, $identity_key ) = @_;
     my @merged = ();
     my %positions;
+    my $has_identity_key = defined $identity_key && $identity_key ne '';
 
     for my $item ( @{ $left || [] }, @{ $right || [] } ) {
-        if (
-            ref($item) eq 'HASH'
-            && defined $identity_key
-            && $identity_key ne ''
-            && defined $item->{$identity_key}
-            && $item->{$identity_key} ne ''
-        ) {
-            if ( exists $positions{ $item->{$identity_key} } ) {
-                $merged[ $positions{ $item->{$identity_key} } ] = $self->_merge_named_hash_item(
-                    $merged[ $positions{ $item->{$identity_key} } ],
-                    $item,
-                );
-                next;
+        if ( ref($item) eq 'HASH' && $has_identity_key ) {
+            my $identity = $item->{$identity_key};
+            if ( defined $identity && $identity ne '' ) {
+                my $position = $positions{$identity};
+                if ( defined $position ) {
+                    $merged[$position] = $self->_merge_named_hash_item( $merged[$position], $item );
+                    next;
+                }
+                $positions{$identity} = scalar @merged;
             }
-            $positions{ $item->{$identity_key} } = scalar @merged;
         }
         push @merged, $item;
     }
@@ -223,27 +278,122 @@ sub _merge_named_hash_item {
     return $self->_merge_hashes( $left, $right );
 }
 
-# collectors()
-# Returns all configured collectors from merged configuration.
-# Input: none.
+# collectors(%args)
+# Returns all configured collectors from merged configuration, optionally
+# reusing a request snapshot and its already-read skill config entries.
+# Input: optional merged_config hash reference paired with its
+# skill_config_entries array reference.
 # Output: array reference of collector job hash references.
 sub collectors {
-    my ($self) = @_;
-    my $cfg = $self->merged;
+    my $self = shift;
+    my $jobs = $self->_configured_collector_jobs(@_);
+    return [ map { $self->_normalize_collector_job($_) } @{$jobs} ];
+}
+
+# indicator_collectors(%args)
+# Returns only active collector declarations that can contribute indicator
+# state, without normalizing execution-only mode, multiplicity, or command fields.
+# Input: the same optional merged_config and skill_config_entries snapshot pair
+# accepted by collectors().
+# Output: array reference of minimal {name, indicator} jobs in collector order.
+sub indicator_collectors {
+    my $self = shift;
+    my $jobs = $self->_configured_indicator_jobs(@_);
+    my @indicators;
+    for my $job ( @{$jobs} ) {
+        next if ref($job) ne 'HASH';
+        next if ref( $job->{indicator} ) ne 'HASH';
+        next if !defined $job->{name} || $job->{name} eq '';
+        next if defined $job->{disable} && $self->_collector_disable_flag( $job->{disable} );
+        push @indicators, { name => $job->{name}, indicator => $job->{indicator} };
+    }
+    return \@indicators;
+}
+
+# _configured_collector_jobs(%args)
+# Merges built-in, layered, and skill collector declarations while preserving
+# identity precedence and the optional checker filter, before caller-specific
+# normalization or projection.
+# Input: optional merged_config and matching skill_config_entries array reference.
+# Output: array reference of merged collector jobs in resolved order.
+sub _configured_collector_jobs {
+    my ( $self, @options ) = @_;
+    my ( $cfg, $skill_config_entries ) = $self->_collector_config_snapshot(@options);
     my @jobs = @{ $self->_builtin_collectors };
 
     if ( ref( $cfg->{collectors} ) eq 'ARRAY' ) {
         @jobs = @{ $self->_merge_named_hash_array( \@jobs, $cfg->{collectors}, 'name' ) };
     }
-    @jobs = @{ $self->_merge_named_hash_array( \@jobs, [ $self->_skill_collectors ], 'name' ) };
+    my @skill_jobs = $self->_skill_collectors($skill_config_entries);
+    @jobs = @{ $self->_merge_named_hash_array( \@jobs, \@skill_jobs, 'name' ) }
+      if @skill_jobs;
 
     if ( my $filter = $ENV{DEVELOPER_DASHBOARD_CHECKERS} ) {
         my %wanted = map { $_ => 1 } grep { $_ ne '' } split /:/, $filter;
         @jobs = grep { ref($_) eq 'HASH' && $wanted{ $_->{name} } } @jobs;
     }
 
-    @jobs = map { $self->_normalize_collector_job($_) } @jobs;
     return \@jobs;
+}
+
+# _configured_indicator_jobs(%args)
+# Resolves indicator-bearing built-ins, already-merged configured collectors,
+# and skill collectors, avoiding an identity merge when the merged snapshot
+# already contains the only declarations and no built-in indicator can collide.
+# Input: optional merged_config and matching skill_config_entries array reference.
+# Output: array reference of unnormalized collector declarations for status sync.
+sub _configured_indicator_jobs {
+    my ( $self, @options ) = @_;
+    my ( $cfg, $skill_config_entries ) = $self->_collector_config_snapshot(@options);
+    my @jobs = grep { ref($_) eq 'HASH' && ref( $_->{indicator} ) eq 'HASH' }
+      @{ $self->_builtin_collectors };
+    if ( ref( $cfg->{collectors} ) eq 'ARRAY' ) {
+        if (@jobs) {
+            @jobs = @{ $self->_merge_named_hash_array( \@jobs, $cfg->{collectors}, 'name' ) };
+        }
+        else {
+            @jobs = @{ $cfg->{collectors} };
+        }
+    }
+    my @skill_jobs = $self->_skill_collectors($skill_config_entries);
+    @jobs = @{ $self->_merge_named_hash_array( \@jobs, \@skill_jobs, 'name' ) }
+      if @skill_jobs;
+    if ( my $filter = $ENV{DEVELOPER_DASHBOARD_CHECKERS} ) {
+        my %wanted = map { $_ => 1 } grep { $_ ne '' } split /:/, $filter;
+        @jobs = grep { ref($_) eq 'HASH' && defined $_->{name} && $wanted{ $_->{name} } } @jobs;
+    }
+    return \@jobs;
+}
+
+# _collector_config_snapshot(%args)
+# Validates and resolves the optional merged-config/skill-entry pair shared by
+# generic collector execution and indicator-only collector projection.
+# Input: optional merged_config hash reference and matching skill_config_entries array reference.
+# Output: merged configuration hash reference and the paired skill-entry array reference.
+sub _collector_config_snapshot {
+    my ( $self, @options ) = @_;
+    die "collectors options must be key/value pairs\n" if @options % 2;
+    my %args = @options;
+    die "Unsupported collectors option '$_'\n"
+      for grep { $_ ne 'merged_config' && $_ ne 'skill_config_entries' } keys %args;
+    my $has_merged_config = exists $args{merged_config};
+    my $has_skill_config_entries = exists $args{skill_config_entries};
+    die "merged_config and skill_config_entries must be supplied together\n"
+      if ( $has_merged_config && !$has_skill_config_entries )
+      || ( !$has_merged_config && $has_skill_config_entries );
+    die "merged_config must be a hash reference\n"
+      if exists $args{merged_config} && ref( $args{merged_config} ) ne 'HASH';
+    die "skill_config_entries must be an array reference\n"
+      if exists $args{skill_config_entries} && ref( $args{skill_config_entries} ) ne 'ARRAY';
+    my $cfg = $args{merged_config};
+    my @skill_config_entries;
+    if ( !exists $args{merged_config} ) {
+        $cfg = $self->merged( skill_config_entries_out => \@skill_config_entries );
+    }
+    else {
+        @skill_config_entries = @{ $args{skill_config_entries} };
+    }
+    return ( $cfg, \@skill_config_entries );
 }
 
 # _normalize_collector_job($job)
@@ -255,7 +405,9 @@ sub _normalize_collector_job {
     my ( $self, $job ) = @_;
     return $job if ref($job) ne 'HASH';
     my %normalized = %{$job};
-    $normalized{disable} = $self->_collector_disable_flag( $normalized{disable} );
+    $normalized{disable} = defined $normalized{disable}
+      ? $self->_collector_disable_flag( $normalized{disable} )
+      : 0;
     $normalized{mode} = defined $normalized{mode} && $normalized{mode} ne '' ? $normalized{mode} : 'singleton';
     die "Collector '$normalized{name}' has unsupported mode '$normalized{mode}'"
       if $normalized{mode} ne 'singleton' && $normalized{mode} ne 'multiple';
@@ -317,14 +469,26 @@ PERL
 # installed skill's own config/config.json path_aliases block, qualified by
 # skill name (DD-977) so cdr/d2 paths can see them at all - a skill's own
 # path_aliases were previously invisible outside the skill's own runtime.
-# Input: none.
+# Input: optional nested_skill_entries array reference from a caller sharing
+# one runtime inventory; omitted calls discover their own nested entries.
 # Output: hash reference of path aliases.
 sub path_aliases {
-    my ($self) = @_;
-    my $cfg = $self->merged;
+    my $self = shift;
+    die "path_aliases options must be key/value pairs\n" if @_ % 2;
+    my %args = @_;
+    die "Unsupported path_aliases option '$_'\n" for grep { $_ ne 'nested_skill_entries' } keys %args;
+    die "nested_skill_entries must be an array reference\n"
+      if exists $args{nested_skill_entries} && ref( $args{nested_skill_entries} ) ne 'ARRAY';
+    # Skill config fragments contribute only to underscored runtime namespaces,
+    # not to path_aliases. Avoid building and merging those unrelated values;
+    # the same discovered entries below provide the skill-qualified aliases.
+    my $cfg = $self->merged( skill_config_entries => [] );
+    my @skill_config_entries = $self->_skill_path_alias_entries;
     my %aliases;
     %aliases = %{ $self->_expand_path_aliases( $cfg->{path_aliases} ) } if ref( $cfg->{path_aliases} ) eq 'HASH';
-    my $skill_aliases = $self->_expand_path_aliases( $self->_skill_path_aliases );
+    my $skill_aliases = $self->_expand_path_aliases(
+        $self->_skill_path_aliases( %args, skill_config_entries => \@skill_config_entries )
+    );
     @aliases{ keys %{$skill_aliases} } = values %{$skill_aliases};
     return \%aliases;
 }
@@ -337,12 +501,23 @@ sub path_aliases {
 # merges recursively across every DD-OOP-LAYER it participates in via
 # _skill_config_hash (the same _merge_hashes recursion every other nested
 # config key gets), so this is layer-merge-safe by construction.
-# Input: none.
+# Input: optional nested_skill_entries and skill_config_entries array
+# references passed to their respective readers.
 # Output: hash reference of skill-qualified path aliases (unexpanded).
 sub _skill_path_aliases {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
+    my @skill_config_entries;
+    if ( exists $args{skill_config_entries} ) {
+        die "skill_config_entries must be an array reference\n"
+          if ref( $args{skill_config_entries} ) ne 'ARRAY';
+        @skill_config_entries = @{ $args{skill_config_entries} };
+    }
+    else {
+        @skill_config_entries = $self->_skill_config_entries;
+    }
     my %aliases;
-    for my $entry ( $self->_skill_config_entries ) {
+    for my $entry (@skill_config_entries) {
+        die "skill_config_entries must contain hash references\n" if ref($entry) ne 'HASH';
         my $skill_aliases = $entry->{config}{path_aliases};
         next if ref($skill_aliases) ne 'HASH';
         for my $name ( keys %{$skill_aliases} ) {
@@ -353,9 +528,36 @@ sub _skill_path_aliases {
             $aliases{$qualified_name} = $skill_aliases->{$name};
         }
     }
-    my $nested = $self->_nested_skill_alias_entries('path_aliases');
+    my $nested = $self->_nested_skill_alias_entries( 'path_aliases', %args );
     @aliases{ keys %{$nested} } = values %{$nested};
     return \%aliases;
+}
+
+# _skill_path_alias_entries()
+# Reads only each installed skill's layered path_aliases config domain, avoiding
+# recursive merging of unrelated skill settings for the path-alias command.
+# Input: none; uses the grouped installed-skill layer inventory from PathRegistry.
+# Output: ordered skill config-entry hash refs containing skill_name,
+# skill_root, and a config hash with path_aliases when present.
+sub _skill_path_alias_entries {
+    my ($self) = @_;
+    my @entries;
+    for my $skill ( $self->{paths}->installed_skill_entries ) {
+        my $skill_name = $skill->{skill_name};
+        my $config = $self->_skill_config_hash(
+            $skill_name,
+            layers   => $skill->{layers},
+            only_key => 'path_aliases',
+        );
+        next if !%{$config};
+        push @entries,
+          {
+            skill_name => $skill_name,
+            skill_root => $skill->{skill_root},
+            config     => $config,
+          };
+    }
+    return @entries;
 }
 
 # file_aliases()
@@ -408,7 +610,8 @@ sub _skill_file_aliases {
 # Shared read-side walker for skill-depth-prefixed path_aliases/file_aliases
 # (DD-1004). Owner's rule (Q-182): "add" never writes into a skill's own
 # config.json at any depth - so this reads in two priority-ordered passes,
-# mirroring the write side exactly, never duplicating its resolution logic.
+# mirroring the write side exactly. Discovery supplies each entry's resolved
+# write location, avoiding a second walk over the same skill layers.
 #
 # PASS 1 (lower priority) - a nested (depth 2+) skill's own SHIPPED
 # defaults, read directly from ITS OWN config.json regardless of .git,
@@ -420,20 +623,32 @@ sub _skill_file_aliases {
 #
 # PASS 2 (higher priority, OVERRIDES pass 1 for the same qualified name) -
 # whatever save_skill_path_alias/save_skill_file_alias actually wrote,
-# resolved via the exact same PathRegistry::skill_config_write_location a
-# write of those same segments would use: an ancestor skill's config.json,
+# resolved with the same location rule as PathRegistry::skill_config_write_location:
+# an ancestor skill's config.json,
 # or the global config's fallback section when no git-free parent ancestor
 # exists (always true at depth 1, since a depth-1 target has no parent
 # skill at all - Q-182). This is what lets a user's "d2 path add" override a
 # skill-shipped default without ever touching the skill's own file.
-# Input: the config domain key to read, "path_aliases" or "file_aliases".
+# Input: config domain key plus optional nested_skill_entries array reference.
 # Output: hash reference of fully-qualified dotted alias names (skill
 # segments joined by "." plus the alias name) to their stored (unexpanded)
 # path values.
 sub _nested_skill_alias_entries {
-    my ( $self, $alias_key ) = @_;
+    my ( $self, $alias_key, %args ) = @_;
     my %aliases;
-    my @entries = $self->{paths}->nested_skill_entries( include_disabled => 1 );
+    my @entries;
+    if ( exists $args{nested_skill_entries} ) {
+        die "nested_skill_entries must be an array reference\n"
+          if ref( $args{nested_skill_entries} ) ne 'ARRAY';
+        @entries = @{ $args{nested_skill_entries} };
+    }
+    else {
+        @entries = $self->{paths}->nested_skill_entries(
+            include_disabled              => 1,
+            include_config_write_location => 1,
+        );
+    }
+    die "nested_skill_entries must contain hash references\n" if grep { ref($_) ne 'HASH' } @entries;
 
     # PASS 1: nested (depth 2+) shipped defaults, straight from the skill's
     # own file - never routed through the write-location resolver.
@@ -457,7 +672,7 @@ sub _nested_skill_alias_entries {
     my $global_cfg;
     for my $entry (@entries) {
         my $segments = $entry->{segments};
-        my $location = $self->{paths}->skill_config_write_location($segments) or next;
+        my $location = $entry->{config_write_location} or next;
 
         my $node;
         if ( $location->{kind} eq 'skill' ) {
@@ -766,7 +981,16 @@ sub web_workers {
 sub ssl_validity_days {
     my ($self) = @_;
     my $cfg  = $self->merged;
-    my $days = $cfg->{web}{ssl_validity_days};
+    return _normalize_ssl_validity_days( $cfg->{web}{ssl_validity_days} );
+}
+
+# _normalize_ssl_validity_days($days)
+# Validates a configured certificate lifetime without loading configuration,
+# allowing web_settings() to normalize from its existing request snapshot.
+# Input: configured day count, possibly undefined or invalid.
+# Output: positive integer day count, defaulting to 365.
+sub _normalize_ssl_validity_days {
+    my ($days) = @_;
     return 365 if !defined $days;
     return 365 if $days !~ /^\d+$/;
     return 365 if $days < 1;
@@ -809,15 +1033,21 @@ sub save_global_web_workers {
     };
 }
 
-# web_settings()
+# web_settings(%args)
 # Returns the current web service settings (host, port, workers, ssl, no_editor, no_indicators, and optional SSL SAN aliases).
 # Loads from global config with sensible defaults if not configured.
-# Input: none.
+# Input: optional merged_config hash reference from the same request snapshot.
 # Output: hash reference with host, port, workers, ssl, no_editor, no_indicators, ssl_subject_alt_names, and ssl_validity_days keys.
 sub web_settings {
-    my ($self) = @_;
-    my $cfg = $self->merged;
+    my $self = shift;
+    die "web_settings options must be key/value pairs\n" if @_ % 2;
+    my %args = @_;
+    die "Unsupported web_settings option '$_'\n" for grep { $_ ne 'merged_config' } keys %args;
+    die "merged_config must be a hash reference\n"
+      if exists $args{merged_config} && ref( $args{merged_config} ) ne 'HASH';
+    my $cfg = exists $args{merged_config} ? $args{merged_config} : $self->merged;
     my $web = $cfg->{web} || {};
+    my $ssl_validity_days = _normalize_ssl_validity_days( $web->{ssl_validity_days} );
 
     return {
         host                  => $web->{host} || '0.0.0.0',
@@ -827,7 +1057,7 @@ sub web_settings {
         no_editor             => $web->{no_editor} ? 1 : 0,
         no_indicators         => $web->{no_indicators} ? 1 : 0,
         ssl_subject_alt_names => $self->_normalize_ssl_subject_alt_names( $web->{ssl_subject_alt_names} ),
-        ssl_validity_days     => $self->ssl_validity_days,
+        ssl_validity_days     => $ssl_validity_days + 0,
     };
 }
 
@@ -1147,6 +1377,16 @@ sub api_keys {
 # the project layers, rather than inventing new collision-rejection logic.
 sub api_registry {
     my ($self) = @_;
+    # Skill API fragments and layered api.json files resolve the same runtime
+    # inventory several times. Keep the candidate roots stable for this read,
+    # without retaining them after the call or replacing an enclosing request
+    # scope.
+    my $paths = $self->{paths};
+    local $paths->{_runtime_layer_candidate_scope} =
+      ref( $paths->{_runtime_layer_candidate_scope} ) eq 'HASH'
+      ? $paths->{_runtime_layer_candidate_scope}
+      : {};
+
     my $merged = {};
     for my $fragment ( $self->_skill_api_fragments ) {
         $merged = $self->_merge_api_key_hashes( $merged, $fragment );
@@ -1276,14 +1516,22 @@ sub _load_json_hash_file {
     return $decoded;
 }
 
-# _skill_config_fragments()
+# _skill_config_fragments($entries, $entries_out)
 # Loads installed skill config/config.json payloads as underscored runtime config fragments.
-# Input: none.
+# Input: optional precomputed skill config-entry array reference and optional
+# output array reference populated with the entries used.
 # Output: ordered list of hash refs such as { _skill_name => { ... } }.
 sub _skill_config_fragments {
-    my ($self) = @_;
+    my ( $self, $entries, $entries_out ) = @_;
+    die "skill config entries must be an array reference\n"
+      if defined $entries && ref($entries) ne 'ARRAY';
+    die "skill config entries output must be an array reference\n"
+      if defined $entries_out && ref($entries_out) ne 'ARRAY';
     my @fragments;
-    for my $entry ( $self->_skill_config_entries ) {
+    my @skill_entries = defined $entries ? @{$entries} : $self->_skill_config_entries;
+    die "skill config entries must contain hash references\n" if grep { ref($_) ne 'HASH' } @skill_entries;
+    @{$entries_out} = @skill_entries if defined $entries_out;
+    for my $entry (@skill_entries) {
         push @fragments, { '_' . $entry->{skill_name} => $entry->{config} };
     }
     return @fragments;
@@ -1296,15 +1544,14 @@ sub _skill_config_fragments {
 sub _skill_config_entries {
     my ($self) = @_;
     my @entries;
-    for my $skill_root ( $self->{paths}->installed_skill_roots ) {
-        my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
-        next if !defined $skill_name;
-        my $config = $self->_skill_config_hash($skill_name);
+    for my $skill ( $self->{paths}->installed_skill_entries ) {
+        my $skill_name = $skill->{skill_name};
+        my $config = $self->_skill_config_hash( $skill_name, layers => $skill->{layers} );
         next if !%{$config};
         push @entries,
           {
             skill_name => $skill_name,
-            skill_root => $skill_root,
+            skill_root => $skill->{skill_root},
             config     => $config,
           };
     }
@@ -1331,29 +1578,37 @@ sub _skill_api_fragments {
 sub _skill_api_entries {
     my ($self) = @_;
     my @entries;
-    for my $skill_root ( $self->{paths}->installed_skill_roots ) {
-        my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
-        next if !defined $skill_name;
-        my $api = $self->_skill_api_hash($skill_name);
+    for my $skill ( $self->{paths}->installed_skill_entries ) {
+        my $skill_name = $skill->{skill_name};
+        my $api = $self->_skill_api_hash( $skill_name, layers => $skill->{layers} );
         next if !%{$api};
         push @entries,
           {
             skill_name => $skill_name,
-            skill_root => $skill_root,
+            skill_root => $skill->{skill_root},
             api        => $api,
           };
     }
     return @entries;
 }
 
-# _skill_config_hash($skill_name)
+# _skill_config_hash($skill_name, %args)
 # Reads and merges config/config.json from every participating layer of one installed skill.
-# Input: skill repository name string.
+# Input: skill repository name string and optional layers array reference already
+# grouped by PathRegistry::installed_skill_entries, and optional only_key string
+# selecting one top-level config domain before layer merging.
 # Output: merged skill configuration hash reference.
 sub _skill_config_hash {
-    my ( $self, $skill_name ) = @_;
+    my ( $self, $skill_name, %args ) = @_;
     return {} if !defined $skill_name || $skill_name eq '';
-    my @layers = $self->{paths}->skill_layers( $skill_name, include_disabled => 1 );
+    my @layers;
+    if ( exists $args{layers} ) {
+        return {} if ref( $args{layers} ) ne 'ARRAY';
+        @layers = @{ $args{layers} };
+    }
+    else {
+        @layers = $self->{paths}->skill_layers( $skill_name, include_disabled => 1 );
+    }
     return {} if !@layers;
     my $merged = {};
     for my $skill_path (@layers) {
@@ -1364,19 +1619,32 @@ sub _skill_config_hash {
         my $config = eval { json_decode(<$fh>) } || {};
         close $fh;
         return {} if ref($config) ne 'HASH';
+        if ( defined $args{only_key} ) {
+            $config = exists $config->{ $args{only_key} }
+              ? { $args{only_key} => $config->{ $args{only_key} } }
+              : {};
+        }
         $merged = $self->_merge_hashes( $merged, $config );
     }
     return $merged;
 }
 
-# _skill_api_hash($skill_name)
+# _skill_api_hash($skill_name, %args)
 # Reads and merges config/api.json from every participating layer of one installed skill.
-# Input: skill repository name string.
+# Input: skill repository name string and optional layers array reference already
+# grouped by PathRegistry::installed_skill_entries.
 # Output: merged API auth configuration hash reference.
 sub _skill_api_hash {
-    my ( $self, $skill_name ) = @_;
+    my ( $self, $skill_name, %args ) = @_;
     return {} if !defined $skill_name || $skill_name eq '';
-    my @layers = $self->{paths}->skill_layers( $skill_name, include_disabled => 1 );
+    my @layers;
+    if ( exists $args{layers} ) {
+        return {} if ref( $args{layers} ) ne 'ARRAY';
+        @layers = @{ $args{layers} };
+    }
+    else {
+        @layers = $self->{paths}->skill_layers( $skill_name, include_disabled => 1 );
+    }
     return {} if !@layers;
     my $merged = {};
     for my $skill_path (@layers) {
@@ -1482,14 +1750,20 @@ sub _normalize_api_ajax_routes {
     return \@normalized;
 }
 
-# _skill_collectors()
+# _skill_collectors($entries)
 # Expands installed skill config collectors into the managed fleet using repo-qualified names.
-# Input: none.
+# Input: optional preloaded skill config-entry array reference; omitted calls
+# load their own entries.
 # Output: ordered list of collector job hash references.
 sub _skill_collectors {
-    my ($self) = @_;
+    my ( $self, $entries ) = @_;
+    die "skill config entries must be an array reference\n"
+      if defined $entries && ref($entries) ne 'ARRAY';
     my @jobs;
-    for my $entry ( $self->_skill_config_entries ) {
+    my @skill_config_entries = defined $entries ? @{$entries} : $self->_skill_config_entries;
+    die "skill config entries must contain hash references\n"
+      if grep { ref($_) ne 'HASH' } @skill_config_entries;
+    for my $entry (@skill_config_entries) {
         my $collectors = $entry->{config}{collectors};
         next if ref($collectors) ne 'ARRAY';
         for my $job ( @{$collectors} ) {
@@ -1532,9 +1806,35 @@ C<indicator> metadata without discarding inherited defaults.
 
 =head1 METHODS
 
-=head2 new, load_global, save_global, load_repo, merged, collectors, path_aliases, global_path_aliases, watchdog_restart_limit, watchdog_restart_window_seconds, watchdog_stall_grace_seconds, web_workers, save_global_web_workers, ssl_validity_days, web_settings, save_global_web_settings, save_global_path_alias, remove_global_path_alias, docker_config, api_keys, api_registry, writable_api_registry, save_writable_api_registry, providers
+=head2 new, for_paths, for_path_config, load_global, save_global, load_repo, merged, collectors, path_aliases, global_path_aliases, watchdog_restart_limit, watchdog_restart_window_seconds, watchdog_stall_grace_seconds, web_workers, save_global_web_workers, ssl_validity_days, web_settings, save_global_web_settings, save_global_path_alias, remove_global_path_alias, docker_config, api_keys, api_registry, writable_api_registry, save_writable_api_registry, providers
 
 Load and expose configuration domains used by the runtime.
+
+C<for_path_config($paths)> creates a lightweight configuration view bound to a
+C<Developer::Dashboard::PathRegistry>. Configuration lookup and persistence
+resolve their targets directly through that registry, so prompt collector
+reads and path CLI alias operations can use this constructor without creating
+a C<Developer::Dashboard::FileRegistry>. Use C<for_paths($paths)> when the
+caller needs the established combined Config/FileRegistry object shape.
+
+C<merged(skill_config_entries_out =E<gt> \@entries)> fills the supplied array
+reference with the skill configuration entries actually read while creating
+the merged result. This allows a caller that needs both the merged config and
+a skill-specific view, such as C<collectors()>, to reuse those entries without
+reading every skill's C<config.json> a second time. Ordinary callers can omit
+this option and retain the same return value and read behavior.
+
+C<load_global(skill_config_entries_out =E<gt> \@entries)> provides the same
+entry-capture behavior for callers that load only global and skill config,
+without loading repo-local configuration.
+
+C<collectors(merged_config =E<gt> $merged, skill_config_entries =E<gt> \@entries)>
+accepts that same pair so a request that already loaded its complete
+configuration can assemble collector jobs without scanning skill config files
+again. The two arguments must be supplied together; malformed or partial
+snapshots are rejected. C<web_settings(merged_config =E<gt> $merged)> similarly
+derives web settings and SSL validity from a caller's merged snapshot, or loads
+one itself when no snapshot is supplied.
 
 The watchdog_restart_limit(), watchdog_restart_window_seconds(), and
 watchdog_stall_grace_seconds() methods (DD-624) expose the collector
@@ -1550,6 +1850,13 @@ L<Developer::Dashboard::RuntimeManager>'s own tunable getters can fall through
 to their env-var check (still the top-precedence override) and then their
 hardcoded default.
 
+Collector and API-key views gather skill metadata through
+C<PathRegistry::installed_skill_entries>, which returns grouped layer roots in
+one inventory pass. Config then merges each skill's files in the same
+home-to-project order as before without repeating a full installed-skill root
+scan for every individual skill. Direct C<_skill_config_hash($name)> and
+C<_skill_api_hash($name)> calls retain their original lookup and merge behavior.
+
 The web_settings() and save_global_web_settings() methods manage web service settings
 including host, port, workers, ssl flag, the persisted C<no_editor> read-only
 browser flag, and optional C<ssl_subject_alt_names> entries used to extend the
@@ -1559,6 +1866,10 @@ is deliberately not capped, because the 398-day ceiling browsers enforce applies
 to certificates issued by publicly trusted CAs and not to a self-signed
 localhost certificate. These settings persist across restart, so
 dashboard restart inherits the previous serve session configuration.
+C<Developer::Dashboard::Web::App> creates a lazy snapshot for each request and
+passes it to these accessors and collector assembly. The snapshot is discarded
+when the request ends, so it avoids duplicate reads within a route without
+hiding config edits from subsequent requests.
 The api_keys() and api_registry() methods merge layered runtime and installed-skill
 F<config/api.json> files into the exact saved C</ajax/...> machine-auth
 allowlist used by the web backend. The writable_api_registry() and
@@ -1573,8 +1884,10 @@ C<path_aliases>/C<file_aliases> block, each name qualified by its skill
 convention collectors() already applies to skill-contributed collector names
 via _skill_collectors(). A skill's own path_aliases/file_aliases already
 merge across every DD-OOP-LAYER that skill participates in (the same
-recursive _merge_hashes every nested config key gets), so this is
-layer-safe without any new merge logic.
+recursive _merge_hashes behavior), so layer precedence stays consistent.
+Path-alias reads project only the C<path_aliases> domain before merging each
+skill layer; unrelated config fields and underscored skill namespaces do not
+need to be recursively copied for this command.
 
 save_global_path_alias(), save_global_file_alias(), save_skill_path_alias()
 and save_skill_file_alias() (DD-1005) accept optional C<create> and C<mode>

@@ -1,0 +1,12 @@
+title: "a raider project (.raider/) without claude: true does not read CLAUDE.md"
+files:
+  .raider/instructions.md: "Raider rule: be brief.\n"
+  CLAUDE.md: "Claude rule: be verbose.\n"
+prompt: Hallo
+script:
+  - text: ok
+expect:
+  answer: ok
+  requests:
+    - { index: 0, contains: "Raider rule: be brief." }
+    - { index: 0, absent: "Claude rule: be verbose." }

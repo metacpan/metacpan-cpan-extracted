@@ -430,6 +430,50 @@ is( $app->handle( path => '/js/route-skill/fallback.js', remote_addr => '127.0.0
     );
     is( $emptyp->_prompt_summary, '', 'payload without array yields an empty prompt summary' );
 
+    my $summary_rows = [
+        map { { status => "[OK]", alias => sprintf( 'agent-%02d 🔑', $_ ) } } 1 .. 50,
+    ];
+    my $summary_payload = { array => $summary_rows };
+    my $updated_summary_payload = { array => [ { status => '[WARN]', alias => 'updated' } ] };
+    my $summary_app = bless {}, 'Developer::Dashboard::Web::App';
+    my $summary_payload_calls = 0;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_page_status_payload = sub {
+            my ( $self, $unchanged_ref, $skip_when_unchanged ) = @_;
+            $summary_payload_calls++;
+            is( ref($unchanged_ref), 'SCALAR', 'prompt summary requests a freshness result' );
+            is( $skip_when_unchanged, $summary_payload_calls == 1 || $summary_payload_calls == 5 ? 0 : 1,
+                'prompt summary enables cached-payload reuse only after it has a value' );
+            if ( $summary_payload_calls == 2 || $summary_payload_calls == 4 ) {
+                $$unchanged_ref = 1;
+                return;
+            }
+            return $summary_payload_calls == 3 ? $updated_summary_payload : $summary_payload;
+        };
+        is(
+            $summary_app->_prompt_summary,
+            join( ' ', map { $_->{status} . $_->{alias} } @{$summary_rows} ),
+            'prompt summary preserves ordered status and Unicode aliases for many indicators',
+        );
+        is(
+            $summary_app->_prompt_summary,
+            join( ' ', map { $_->{status} . $_->{alias} } @{$summary_rows} ),
+            'prompt summary reuses its value when indicator freshness is unchanged',
+        );
+        is( $summary_payload_calls, 2, 'unchanged prompt-summary reuse still validates freshness' );
+        is( $summary_app->_prompt_summary, '[WARN]updated', 'changed status refreshes the cached prompt summary' );
+        is( $summary_app->_prompt_summary, '[WARN]updated', 'refreshed prompt summary is reused while still current' );
+        is( $summary_payload_calls, 4, 'each prompt-summary cache hit still validates freshness' );
+        $summary_app->{_prompt_summary_cache} = [];
+        is(
+            $summary_app->_prompt_summary,
+            join( ' ', map { $_->{status} . $_->{alias} } @{$summary_rows} ),
+            'unexpected cached reference is discarded and replaced with fresh summary text',
+        );
+    }
+    is( scalar @{$summary_payload->{array}}, 50, 'prompt summary does not consume or mutate status rows' );
+
     # no prompt at all (2854 left-false) and no config (2855 left-false)
     my $noprompt = Developer::Dashboard::Web::App->new(
         auth     => bless( {}, 'Local::AuthStub' ),
@@ -720,6 +764,32 @@ is( $m->_page_fragment_html(undef), '', 'fragment for undef page' );
 # _nav_items_html defaults
 is( $m->_nav_items_html(), '', 'nav items without a page' );
 {
+    my $welcome = $store->load_saved_page('welcome');
+    for my $literal ( '', '<li data-nav-id="skill-nav">Skill</li>' ) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_saved_nav_items_snapshot_state = sub {
+            return { hit => 1, html => '' };
+        };
+        local *Developer::Dashboard::Web::App::_skill_dispatcher = sub {
+            return bless {}, 'Developer::Dashboard::SkillDispatcher';
+        };
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_literal_items_html = sub {
+            return $literal;
+        };
+        my $html = $m->_nav_items_html(
+            page => $welcome,
+            runtime_context => { params => {}, current_page => '/x' },
+        );
+        if ($literal eq '') {
+            is( $html, '', 'empty cached literal skill-nav HTML adds no dashboard nav section' );
+        }
+        else {
+            like( $html, qr/\Q$literal\E/,
+                'non-empty cached literal skill-nav HTML is rendered in the dashboard nav section' );
+        }
+    }
+}
+{
     my $navskill = Developer::Dashboard::PageDocument->new( id => 'x', title => 'X', meta => { skill_route_id => 'nav/thing' } );
     is( $m->_nav_items_html( page => $navskill ), '', 'nav items skips nav skill route pages' );
 }
@@ -816,6 +886,20 @@ is( $m->_missing_named_page_response('x')->[0], 200, 'missing page editor -> 200
     ok( $m->_top_chrome_html($page), 'top chrome minimal (default urls)' );
     like( $m->_top_chrome_html( $page, { render => '/app/welcome', edit => '/app/welcome/edit', source => '/app/welcome/edit' } ), qr/play-button/, 'top chrome renders a play button' );
 
+    {
+        my $render_page = Developer::Dashboard::PageDocument->new( id => 'welcome', mode => 'render' );
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageDocument::as_hash = sub {
+            die "top chrome mode lookup must not materialize the whole page hash\n";
+        };
+        my $chrome = $m->_top_chrome_html(
+            $render_page,
+            { render => '/app/welcome', edit => '/app/welcome/edit', source => '/app/welcome/source' },
+        );
+        like( $chrome, qr/class="dd-top-chrome"/, 'top chrome renders a PageDocument using its mode accessor' );
+        unlike( $chrome, qr/id="play-button"/, 'render mode still hides the Play button without as_hash' );
+    }
+
     my $helper_ctx = Developer::Dashboard::PageDocument->new( id => 'w', title => 'W', layout => { body => 'b' } );
     $helper_ctx->{meta}{request_context} = { tier => 'helper', username => 'alice', host => 'host.example:7890' };
     like( $m->_top_context_html($helper_ctx), qr/alice/, 'top context uses helper username and port' );
@@ -824,6 +908,21 @@ is( $m->_missing_named_page_response('x')->[0], 200, 'missing page editor -> 200
     $noport_ctx->{meta}{request_context} = { tier => 'admin', host => 'host.example' };
     local $ENV{USER} = '';
     ok( $m->_top_context_html($noport_ctx), 'top context falls back to system user without a port' );
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_machine_ip = sub { return; };
+    my @host_cases = (
+        [ 'http://example.test:7890/app/page', qr{href="http://example\.test:7890"}, 'lowercase HTTP scheme and path' ],
+        [ 'https://example.test:8443/app/page', qr{href="http://example\.test:8443"}, 'lowercase HTTPS scheme and path' ],
+        [ 'HTTPS://example.test/app/page', qr{href="http://HTTPS"}, 'uppercase scheme keeps existing case-sensitive behavior' ],
+        [ 'ftp://example.test/app/page', qr{href="http://ftp"}, 'unsupported scheme keeps existing path stripping behavior' ],
+    );
+    for my $case (@host_cases) {
+        my ( $host, $expected, $description ) = @{$case};
+        my $host_page = Developer::Dashboard::PageDocument->new( id => 'host', title => 'Host' );
+        $host_page->{meta}{request_context} = { host => $host };
+        like( $m->_top_context_html($host_page), $expected, "top context preserves $description" );
+    }
 }
 
 # =====================================================================
@@ -1303,7 +1402,19 @@ for my $spec (
         actions => $actions, auth => $auth, config => $config, pages => $store, prompt => $prompt, runtime => $runtime, sessions => $sessions,
     );
     $pd->{pages} = 0;
-    isa_ok( $pd->_skill_dispatcher, 'Developer::Dashboard::SkillDispatcher', 'skill dispatcher with falsy pages (2312 false)' );
+    my $dispatcher = $pd->_skill_dispatcher;
+    isa_ok( $dispatcher, 'Developer::Dashboard::SkillDispatcher', 'skill dispatcher with falsy pages (2312 false)' );
+    is( $pd->_skill_dispatcher, $dispatcher,
+        'the web app reuses its dispatcher so literal skill nav entries can be cached across requests' );
+}
+{
+    my $pd = Developer::Dashboard::Web::App->new(
+        actions => $actions, auth => $auth, config => $config, pages => $store, prompt => $prompt, runtime => $runtime, sessions => $sessions,
+    );
+    $pd->{_skill_dispatcher} = bless {}, 'Local::StaleSkillDispatcher';
+    my $dispatcher = $pd->_skill_dispatcher;
+    isa_ok( $dispatcher, 'Developer::Dashboard::SkillDispatcher',
+        'skill dispatcher replaces an object cached under an unrelated class' );
 }
 
 # ---- _skill_route_spec argument guards (2321) ----
@@ -1388,13 +1499,137 @@ $m->{_current_request_context} ||= { host => '127.0.0.1', remote_addr => '127.0.
 }
 {
     no warnings 'redefine';
+    my $np = Developer::Dashboard::Web::App->new(
+        actions => $actions, auth => $auth, config => $config, pages => $store, prompt => $prompt, runtime => $runtime, sessions => $sessions,
+    );
+    $np->{pages} = { paths => undef };
+    my $nav_page = Developer::Dashboard::PageDocument->new( id => 'nav/fast-path.tt', title => 'Nav' );
+    local *Developer::Dashboard::PageDocument::as_hash = sub { die "nav id lookup must not materialize the whole page hash\n" };
+    is( $np->_nav_items_html( page => $nav_page ), '', 'nav route id lookup does not materialize the whole page hash' );
+}
+{
+    no warnings 'redefine';
     local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
     my $nl = Developer::Dashboard::Web::App->new(
         actions => $actions, auth => $auth, config => $config, pages => $store, prompt => $prompt, runtime => $runtime, sessions => $sessions,
     );
     $nl->{pages} = { paths => bless( {}, 'Local::PathsNoLayers' ) };
     $nl->{_current_request_context} = { host => 'h', remote_addr => '1.1.1.1' };
-    ok( defined eval { $nl->_nav_items_html( page => Developer::Dashboard::PageDocument->new( id => 'x', title => 'X', layout => { body => 'b' } ), runtime_context => { params => {}, current_page => '' } ) } // '', 'nav with paths lacking dashboards_layers (1998 false)' );
+    my $nav_ok = eval {
+        $nl->_nav_items_html(
+            page => Developer::Dashboard::PageDocument->new( id => 'x', title => 'X', layout => { body => 'b' } ),
+            runtime_context => { params => {}, current_page => '' },
+        );
+        1;
+    };
+    diag "navigation rendering failed: $@" if $@;
+    ok( $nav_ok, 'nav with paths lacking dashboards_layers (1998 false)' );
+}
+{
+    my $nav_id = 'nav/problem48-compatibility.tt';
+    my $nav_file = File::Spec->catfile( $paths->dashboards_root, split m{/}, $nav_id );
+    wfile( $nav_file, '<span>compatibility nav fallback</span>' );
+    my $fallback_app = Developer::Dashboard::Web::App->new(
+        actions => $actions, auth => $auth, config => $config, pages => $store,
+        prompt => $prompt, runtime => $runtime, sessions => $sessions,
+    );
+    my $request_page = Developer::Dashboard::PageDocument->new( id => 'fallback-page', title => 'Fallback' );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::Web::App::_nav_root_for_id = sub { undef };
+        my $html = $fallback_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } );
+        like( $html, qr/compatibility nav fallback/, 'a missing inventory root uses the saved-page candidate lookup path' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::Web::App::_nav_root_for_id = sub { undef };
+        local *Developer::Dashboard::PageStore::load_nav_fragment = sub { return; };
+        local *Developer::Dashboard::Web::App::_load_named_page = sub {
+            return if $_[1] ne $nav_id;
+            return $store->load_saved_page( $_[1] );
+        };
+        delete $fallback_app->{_saved_nav_items_snapshot};
+        my $html = $fallback_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } );
+        like( $html, qr/compatibility nav fallback/, 'an absent direct fragment falls back to the saved-page resolver' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::PageStore::load_nav_fragment = sub { return; };
+        local *Developer::Dashboard::Web::App::_load_named_page = sub { return; };
+        delete $fallback_app->{_saved_nav_items_snapshot};
+        is( $fallback_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } ),
+            '', 'an absent direct fragment and absent resolver page are skipped' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::Web::App::_load_named_page = sub { return; };
+        my $compatibility_app = Developer::Dashboard::Web::App->new(
+            actions => $actions, auth => $auth, config => $config, pages => { paths => $paths },
+            prompt => $prompt, runtime => $runtime, sessions => $sessions,
+        );
+        is( $compatibility_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } ),
+            '', 'the compatibility resolver skips an absent page' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::Web::App::_nav_root_for_id = sub { undef };
+        local *Developer::Dashboard::PageStore::load_nav_fragment = sub { return { kind => 'page', page => undef }; };
+        delete $fallback_app->{_saved_nav_items_snapshot};
+        is( $fallback_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } ),
+            '', 'a direct nav entry without a page is skipped' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::PageStore::load_nav_fragment = sub { die "Instruction document did not contain any sections\n"; };
+        delete $fallback_app->{_saved_nav_items_snapshot};
+        is( $fallback_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } ),
+            '', 'a missing-section nav is skipped without invoking the fallback resolver' );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { [] };
+        local *Developer::Dashboard::Web::App::_nav_ids_for_roots = sub { [$nav_id] };
+        local *Developer::Dashboard::PageStore::load_nav_fragment = sub { die "unexpected nav read failure\n"; };
+        delete $fallback_app->{_saved_nav_items_snapshot};
+        my $ok = eval {
+            $fallback_app->_nav_items_html( page => $request_page, runtime_context => { params => {}, current_page => '' } );
+            1;
+        };
+        ok( !$ok, 'unexpected direct-nav failures are not hidden by the fallback resolver' );
+        like( $@, qr/unexpected nav read failure/, 'unexpected direct-nav failure remains visible' );
+    }
+}
+
+{
+    my $nav_app = Developer::Dashboard::Web::App->new(
+        actions => $actions, auth => $auth, config => $config, pages => $store,
+        prompt => $prompt, runtime => $runtime, sessions => $sessions,
+    );
+    local *Developer::Dashboard::Web::App::_scan_nav_directory_ids = sub { return ( [], 1, undef ); };
+    delete $nav_app->{_nav_ids_cache};
+    is_deeply( $nav_app->_nav_ids_for_roots( [ $paths->dashboards_root ] ), [],
+        'nav-id scanning tolerates a missing root-provenance map from the scanner' );
+    is_deeply( $nav_app->{_nav_ids_cache}{root_by_id}, {},
+        'a missing root-provenance map is normalized to an empty cached map' );
 }
 {
     my $nav_dir = File::Spec->catdir( $paths->dashboards_root, 'nav' );
@@ -1427,8 +1662,409 @@ $m->{_current_request_context} ||= { host => '127.0.0.1', remote_addr => '127.0.
 {
     no warnings 'redefine';
     local *Developer::Dashboard::SkillDispatcher::all_skill_nav_pages = sub { undef };
+    my $warning = '';
+    local $SIG{__WARN__} = sub { $warning .= join '', @_ };
     my $welcome = $store->load_saved_page('welcome');
     ok( defined $m->_nav_items_html( page => $welcome, runtime_context => { params => {}, current_page => '/x' } ), 'skill nav pages undef (2044 true)' );
+    is( $warning, '', 'undefined skill-nav pages do not trigger a numeric refaddr warning' );
+}
+{
+    my $app = bless {}, 'Developer::Dashboard::Web::App';
+    is( $app->_saved_nav_items_handle_watch_error(undef), undef,
+        'saved-nav watch error handling ignores a missing watcher' );
+    my $silent_watcher = bless {}, 'Local::Problem48SavedNavWatchNoError';
+    is( $app->_saved_nav_items_handle_watch_error($silent_watcher), undef,
+        'saved-nav watch error handling ignores a watcher without an error method' );
+    my $empty_watcher = bless { error => '' }, 'Local::Problem48SavedNavWatch';
+    is( $app->_saved_nav_items_handle_watch_error($empty_watcher), undef,
+        'saved-nav watch error handling ignores an empty backend error' );
+    is( $empty_watcher->{close_calls} || 0, 0,
+        'an empty backend error leaves a healthy watcher open' );
+    my $undefined_watcher = bless {}, 'Local::Problem48SavedNavWatchUndefinedError';
+    is( $app->_saved_nav_items_handle_watch_error($undefined_watcher), undef,
+        'saved-nav watch error handling ignores an undefined backend diagnostic' );
+
+    my $roots = [$paths->dashboards_root];
+    my $stable_watcher = bless { configure_result => 1, unchanged => 1 },
+      'Local::Problem48SavedNavWatch';
+    my $snapshot_app = bless {}, 'Developer::Dashboard::Web::App';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $stable_watcher };
+        local *Developer::Dashboard::Web::App::_saved_nav_items_watch_paths = sub { return ['/watched/nav'] };
+        my $state = $snapshot_app->_saved_nav_items_snapshot_state($roots);
+        ok( $state->{cacheable}, 'a configured watcher enables the saved-nav HTML snapshot' );
+        is( $stable_watcher->{signature}, $state->{signature},
+            'the saved-nav watcher is configured with the root signature' );
+        $snapshot_app->{_saved_nav_watch_signature} = $state->{signature};
+        $snapshot_app->{_saved_nav_items_snapshot} = {
+            signature => $state->{signature},
+            html      => '<nav>cached</nav>',
+        };
+        my $hit = $snapshot_app->_saved_nav_items_snapshot_state($roots);
+        is_deeply( $hit, { hit => 1, html => '<nav>cached</nav>', signature => $state->{signature} },
+            'an event-free watcher returns the complete saved-nav HTML cache hit' );
+
+        for my $invalid_cache (
+            [ 'missing cache', undef ],
+            [ 'undefined cache signature', { html => '<nav>cached</nav>' } ],
+            [ 'different cache signature', { signature => 'stale', html => '<nav>cached</nav>' } ],
+            [ 'undefined cache HTML', { signature => $state->{signature} } ],
+            [ 'reference cache HTML', { signature => $state->{signature}, html => [] } ],
+        ) {
+            my ( $label, $cache ) = @{$invalid_cache};
+            $snapshot_app->{_saved_nav_items_snapshot} = $cache;
+            is_deeply(
+                $snapshot_app->_saved_nav_items_snapshot_state($roots),
+                { cacheable => 1, signature => $state->{signature} },
+                "an unchanged watcher declines a cache with $label and requests a fresh render"
+            );
+        }
+        $snapshot_app->{_saved_nav_items_snapshot} = {
+            signature => $state->{signature},
+            html      => '<nav>cached</nav>',
+        };
+
+        my $stale_error_watcher = bless {
+            signature => $state->{signature},
+            error     => 'injected stale saved-nav event',
+        }, 'Local::Problem48SavedNavWatch';
+        my $stale_error_app = bless {
+            _saved_nav_items_watcher       => $stale_error_watcher,
+            _saved_nav_watch_signature     => $state->{signature},
+            _saved_nav_items_watcher_unavailable => 1,
+        }, 'Developer::Dashboard::Web::App';
+        my $stale_warning = '';
+        {
+            local $SIG{__WARN__} = sub { $stale_warning .= join '', @_ };
+            my $stale_state = $stale_error_app->_saved_nav_items_snapshot_state($roots);
+            ok( !$stale_state->{cacheable}, 'a reported stale saved-nav watcher failure disables snapshot caching' );
+        }
+        like( $stale_warning, qr/Saved nav snapshot watch disabled: injected stale saved-nav event/,
+            'a stale saved-nav watcher error is reported explicitly' );
+
+        my $no_error_watcher = bless {
+            signature       => $state->{signature},
+            configure_result => 1,
+            unchanged      => 0,
+        }, 'Local::Problem48SavedNavWatcherWithoutErrorMethod';
+        my $no_error_app = bless {
+            _saved_nav_items_watcher   => $no_error_watcher,
+            _saved_nav_watch_signature => $state->{signature},
+        }, 'Developer::Dashboard::Web::App';
+        my $no_error_state = $no_error_app->_saved_nav_items_snapshot_state($roots);
+        ok( $no_error_state->{cacheable}, 'a stale watcher without last_error is reconfigured without method dispatch failure' );
+
+        my $different_signature_app = bless {
+            _saved_nav_items_watcher   => bless(
+                { configure_result => 1, unchanged => 0 }, 'Local::Problem48SavedNavWatcherWithoutErrorMethod'
+            ),
+            _saved_nav_watch_signature => 'older-root-signature',
+        }, 'Developer::Dashboard::Web::App';
+        ok( $different_signature_app->_saved_nav_items_snapshot_state($roots)->{cacheable},
+            'a watcher configured for different roots takes the current-root setup path' );
+
+        my $unconfigured_app = bless {
+            _saved_nav_items_watcher => bless(
+                { configure_result => 1, unchanged => 0 }, 'Local::Problem48SavedNavWatcherWithoutErrorMethod'
+            ),
+        }, 'Developer::Dashboard::Web::App';
+        ok( $unconfigured_app->_saved_nav_items_snapshot_state($roots)->{cacheable},
+            'a configured watcher without a prior signature takes the fresh setup path' );
+
+        ok( $snapshot_app->_store_saved_nav_items_snapshot( $state, '<nav>fresh</nav>' ),
+            'an unchanged watcher stores newly rendered saved-nav HTML' );
+        is( $snapshot_app->{_saved_nav_items_snapshot}{html}, '<nav>fresh</nav>',
+            'stored saved-nav HTML replaces the previous snapshot' );
+        is( $snapshot_app->_store_saved_nav_items_snapshot( undef, '<nav>ignored</nav>' ), 0,
+            'saved-nav snapshot storage ignores a missing state object' );
+        is( $snapshot_app->_store_saved_nav_items_snapshot( { cacheable => 0 }, '<nav>ignored</nav>' ), 0,
+            'saved-nav snapshot storage ignores a non-cacheable state' );
+        my $undefined_html = eval { $snapshot_app->_store_saved_nav_items_snapshot( $state, undef ); 1 };
+        ok( !$undefined_html, 'saved-nav snapshot storage rejects undefined HTML' );
+        my $reference_html = eval { $snapshot_app->_store_saved_nav_items_snapshot( $state, [] ); 1 };
+        ok( !$reference_html, 'saved-nav snapshot storage rejects reference HTML' );
+        is( $snapshot_app->_store_saved_nav_items_snapshot( $state, 'x' x 8_388_609 ), 0,
+            'saved-nav snapshot storage declines HTML larger than its memory bound' );
+        $stable_watcher->{unchanged} = 0;
+        is( $snapshot_app->_store_saved_nav_items_snapshot( $state, '<nav>changed</nav>' ), 0,
+            'saved-nav snapshot storage rejects content rendered across a watcher event' );
+
+        my $failed_event_watcher = bless {}, 'Local::Problem48SavedNavWatcherWithoutErrorMethod';
+        my $failed_event_app = bless { _saved_nav_items_watcher => $failed_event_watcher },
+          'Developer::Dashboard::Web::App';
+        is( $failed_event_app->_store_saved_nav_items_snapshot( $state, '<nav>event</nav>' ), 0,
+            'snapshot storage declines an event from a watcher without an error accessor' );
+    }
+    my $invalid_roots = eval { $snapshot_app->_saved_nav_items_snapshot_state(undef); 1 };
+    ok( !$invalid_roots, 'saved-nav snapshot state rejects roots that are not an array' );
+    my $invalid_root = $snapshot_app->_saved_nav_items_snapshot_state( [undef] );
+    ok( !$invalid_root->{cacheable}, 'a saved-nav root list with an undefined entry is not cached' );
+    my $reference_root = $snapshot_app->_saved_nav_items_snapshot_state( [ {} ] );
+    ok( !$reference_root->{cacheable}, 'a saved-nav root list with a reference entry is not cached' );
+    my $empty_root = $snapshot_app->_saved_nav_items_snapshot_state( [''] );
+    ok( !$empty_root->{cacheable}, 'a saved-nav root list with an empty entry is not cached' );
+
+    my $root_boundary_app = bless { pages => {} }, 'Developer::Dashboard::Web::App';
+    my @root_watch_paths = $root_boundary_app->_saved_nav_items_watch_paths( [ File::Spec->rootdir ] );
+    ok( scalar( grep { $_ eq File::Spec->rootdir } @root_watch_paths ),
+        'saved-nav watch-path discovery stops safely when the filesystem root is its own parent' );
+    my $same_parent_app = bless { pages => bless( {}, 'Local::Problem48SavedNavBoundaryPaths' ) },
+      'Developer::Dashboard::Web::App';
+    my @same_parent_paths;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::dirname = sub { return $_[0] };
+        @same_parent_paths = $same_parent_app->_saved_nav_items_watch_paths( ['/p48-missing-root'] );
+    }
+    is_deeply( \@same_parent_paths, [],
+        'saved-nav watch-path discovery stops when a missing target has a non-advancing parent' );
+    my $reference_boundary_app = bless {
+        pages => bless( {}, 'Local::Problem48SavedNavBoundaryPaths' ),
+    }, 'Developer::Dashboard::Web::App';
+    my @reference_boundary_paths = $reference_boundary_app->_saved_nav_items_watch_paths( ['/p48-boundary'] );
+    ok( @reference_boundary_paths, 'saved-nav watch-path construction ignores reference-valued path boundaries' );
+    my $no_boundary_methods_app = bless {
+        pages => bless( {}, 'Local::Problem48SavedNavNoBoundaryMethods' ),
+    }, 'Developer::Dashboard::Web::App';
+    my @unbounded_watch_paths = $no_boundary_methods_app->_saved_nav_items_watch_paths($roots);
+    ok( @unbounded_watch_paths,
+        'saved-nav watch paths remain usable when the path object provides no optional boundaries' );
+    my $false_boundary_app = bless {
+        pages => bless( {}, 'Local::Problem48SavedNavFalseBoundaryPaths' ),
+    }, 'Developer::Dashboard::Web::App';
+    my @false_boundary_paths = $false_boundary_app->_saved_nav_items_watch_paths(
+        ['/p48-missing-boundary-root']
+    );
+    ok( scalar( grep { $_ eq File::Spec->rootdir } @false_boundary_paths ),
+        'saved-nav path discovery continues when a candidate does not match a boundary' );
+
+    {
+        my $empty_watch_paths_app = bless {}, 'Developer::Dashboard::Web::App';
+        my $watcher = bless {}, 'Local::Problem48SavedNavSetupWithoutErrorMethod';
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_saved_nav_items_watcher = sub {
+            return $watcher;
+        };
+        local *Developer::Dashboard::Web::App::_saved_nav_items_watch_paths = sub {
+            return ();
+        };
+        my $state = $empty_watch_paths_app->_saved_nav_items_snapshot_state(
+            ['/valid-but-unwatched-root']
+        );
+        ok( !$state->{cacheable},
+            'saved-nav cache remains disabled when a watcher has no valid paths' );
+    }
+
+    for my $failure_case (qw(reported empty)) {
+        my $watcher = bless {
+            configure_result => 0,
+            error            => $failure_case eq 'reported' ? 'injected setup failure' : '',
+            close_result     => 1,
+            last_error_calls => 0,
+        }, 'Local::Problem48SavedNavWatch';
+        my $app_with_failed_setup = bless {}, 'Developer::Dashboard::Web::App';
+        my $setup_warning = '';
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $watcher };
+            local *Developer::Dashboard::Web::App::_saved_nav_items_watch_paths = sub { return ['/watched/nav'] };
+            local $SIG{__WARN__} = sub { $setup_warning .= join '', @_ };
+            my $state = $app_with_failed_setup->_saved_nav_items_snapshot_state($roots);
+            ok( !$state->{cacheable}, "$failure_case saved-nav watcher setup rejection uses the uncached path" );
+        }
+        if ( $failure_case eq 'reported' ) {
+            like( $setup_warning, qr/Saved nav snapshot watch disabled: injected setup failure/,
+                'reported saved-nav setup failures are sent through watcher cleanup' );
+            is( $watcher->{close_calls}, 1, 'reported saved-nav setup failure closes the watcher' );
+        }
+        else {
+            like( $setup_warning, qr/Saved nav snapshot watch setup failed: unknown watcher error/,
+                'empty saved-nav setup errors use an explicit generic warning' );
+            is( $watcher->{close_calls} || 0, 0,
+                'an empty setup diagnostic does not close a watcher as if its backend failed' );
+        }
+    }
+
+    {
+        my $new_calls = 0;
+        my $app = bless {}, 'Developer::Dashboard::Web::App';
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { $new_calls++; return undef };
+        local *Developer::Dashboard::Web::App::_saved_nav_items_watch_paths = sub { return ['/watched/nav'] };
+        my $state = $app->_saved_nav_items_snapshot_state($roots);
+        ok( !$state->{cacheable}, 'an unavailable saved-nav watcher keeps pages on the uncached path' );
+        ok( $app->{_saved_nav_items_watcher_unavailable},
+            'an absent saved-nav watcher is remembered for the application lifetime' );
+        ok( !defined $app->_saved_nav_items_watcher, 'an unavailable saved-nav watcher is not reconstructed' );
+        is( $app->_store_saved_nav_items_snapshot( { cacheable => 1, signature => 'missing' }, '<nav>no watcher</nav>' ), 0,
+            'saved-nav snapshot storage declines when no watcher object exists' );
+        is( $new_calls, 1, 'saved-nav watcher construction is attempted only once after backend absence' );
+    }
+
+    {
+        my $watcher = bless {}, 'Local::Problem48SavedNavSetupWithoutErrorMethod';
+        my $app = bless {}, 'Developer::Dashboard::Web::App';
+        my $warning = '';
+        no warnings 'redefine';
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $watcher };
+        local *Developer::Dashboard::Web::App::_saved_nav_items_watch_paths = sub { return ['/watched/nav'] };
+        local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+        my $state = $app->_saved_nav_items_snapshot_state($roots);
+        ok( !$state->{cacheable}, 'saved-nav watcher setup without last_error remains uncached' );
+        like( $warning, qr/Saved nav snapshot watch setup failed: unknown watcher error/,
+            'saved-nav setup without last_error emits the explicit unknown-error diagnostic' );
+    }
+
+    my $no_watcher_app = bless {}, 'Developer::Dashboard::Web::App';
+    is( $no_watcher_app->DESTROY, undef, 'web-app destruction ignores an absent saved-nav watcher' );
+    my $no_close_app = bless {
+        _saved_nav_items_watcher => bless( {}, 'Local::Problem48SavedNavWatchNoClose' ),
+    }, 'Developer::Dashboard::Web::App';
+    is( $no_close_app->DESTROY, undef, 'web-app destruction ignores a watcher without close support' );
+
+    my $close_ok_app = bless {
+        _saved_nav_items_watcher => bless(
+            { close_result => 1 }, 'Local::Problem48SavedNavWatch'
+        ),
+    }, 'Developer::Dashboard::Web::App';
+    my $close_warning = '';
+    {
+        local $SIG{__WARN__} = sub { $close_warning .= join '', @_ };
+        is( $close_ok_app->DESTROY, undef, 'web-app destruction returns after a successful watcher close' );
+    }
+    is( $close_warning, '', 'successful watcher teardown emits no warning' );
+
+    my $close_without_error_app = bless {
+        _saved_nav_items_watcher => bless( {}, 'Local::Problem48SavedNavCloseFailureWithoutErrorMethod' ),
+    }, 'Developer::Dashboard::Web::App';
+    my $close_without_error_warning = '';
+    {
+        local $SIG{__WARN__} = sub { $close_without_error_warning .= join '', @_ };
+        is( $close_without_error_app->DESTROY, undef,
+            'web-app destruction handles a failed watcher close without last_error' );
+    }
+    like( $close_without_error_warning, qr/unknown close failure/,
+        'web-app destruction names an unknown close failure explicitly' );
+    delete $close_without_error_app->{_saved_nav_items_watcher};
+
+    for my $close_error ( 'injected close error', '', undef ) {
+        my $watcher = bless { close_result => 0, error => $close_error }, 'Local::Problem48SavedNavWatch';
+        my $app = bless { _saved_nav_items_watcher => $watcher }, 'Developer::Dashboard::Web::App';
+        my $warning = '';
+        {
+            local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+            is( $app->DESTROY, undef, 'web-app destruction reports close failures without throwing' );
+        }
+        like( $warning, qr/Saved nav snapshot watcher close failed:/,
+            'failed saved-nav watcher teardown logs a visible diagnostic' );
+        if ( defined $close_error && $close_error ne '' ) {
+            like( $warning, qr/injected close error/, 'watcher teardown preserves the backend error' );
+        }
+        else {
+            like( $warning, qr/unknown close failure/, 'watcher teardown reports a generic error when none is supplied' );
+        }
+        delete $app->{_saved_nav_items_watcher};
+    }
+
+    my $failed_watcher = bless {
+        error              => 'injected saved-nav watch failure',
+        close_error        => '',
+        close_result       => 0,
+        last_error_calls   => 0,
+    }, 'Local::Problem48SavedNavWatch';
+    $app->{_saved_nav_items_watcher} = $failed_watcher;
+    $app->{_saved_nav_watch_signature} = 'stale-signature';
+    $app->{_saved_nav_items_snapshot} = { signature => 'stale-signature', html => 'stale' };
+    my $changed_watcher = bless {
+        error            => 'saved-nav tree changed during render',
+        close_result     => 1,
+        unchanged        => 0,
+        last_error_calls => 0,
+    }, 'Local::Problem48SavedNavWatch';
+    my $changed_app = bless {
+        _saved_nav_items_watcher => $changed_watcher,
+    }, 'Developer::Dashboard::Web::App';
+    my $changed_warning = '';
+    {
+        local $SIG{__WARN__} = sub { $changed_warning .= join '', @_ };
+        is( $changed_app->_store_saved_nav_items_snapshot(
+                { cacheable => 1, signature => 'changed-signature' }, '<nav>unstable</nav>'
+            ), 0,
+            'saved-nav HTML is not cached when a filesystem event arrives during rendering' );
+    }
+    like( $changed_warning, qr/Saved nav snapshot watch disabled: saved-nav tree changed during render/,
+        'a watcher event error during rendering is visible and disables the watcher' );
+
+    my $diagnostic_disappears = bless {}, 'Local::Problem48SavedNavDiagnosticDisappears';
+    my $diagnostic_app = bless { _saved_nav_items_watcher => $diagnostic_disappears },
+      'Developer::Dashboard::Web::App';
+    my $diagnostic_warning = '';
+    {
+        local $SIG{__WARN__} = sub { $diagnostic_warning .= join '', @_ };
+        $diagnostic_app->_saved_nav_items_handle_watch_error($diagnostic_disappears);
+    }
+    like( $diagnostic_warning, qr/Saved nav snapshot watcher close failed: unknown close failure/,
+        'a watcher whose close diagnostic disappears gets the explicit fallback message' );
+
+    my $persistent_close_diagnostic = bless {}, 'Local::Problem48SavedNavCloseDiagnosticPersists';
+    my $persistent_close_app = bless { _saved_nav_items_watcher => $persistent_close_diagnostic },
+      'Developer::Dashboard::Web::App';
+    my $persistent_close_warning = '';
+    {
+        local $SIG{__WARN__} = sub { $persistent_close_warning .= join '', @_ };
+        $persistent_close_app->_saved_nav_items_handle_watch_error($persistent_close_diagnostic);
+    }
+    like( $persistent_close_warning, qr/Saved nav snapshot watcher close failed: close diagnostic persists/,
+        'a nonempty close-time diagnostic is preserved in the watcher failure warning' );
+
+    my $warning = '';
+    {
+        local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+        is( $app->_saved_nav_items_handle_watch_error($failed_watcher), undef,
+            'saved-nav watch error handling returns no value after disabling a failed watcher' );
+    }
+    like( $warning, qr/Saved nav snapshot watch disabled: injected saved-nav watch failure/,
+        'saved-nav backend failure is logged explicitly' );
+    like( $warning, qr/Saved nav snapshot watcher close failed: unknown close failure/,
+        'failed watcher close without a second diagnostic reports an explicit fallback error' );
+    ok( $app->{_saved_nav_items_watcher_unavailable},
+        'failed saved-nav watcher is marked unavailable for this application' );
+    ok( !exists $app->{_saved_nav_items_watcher}
+            && !exists $app->{_saved_nav_watch_signature}
+            && !exists $app->{_saved_nav_items_snapshot},
+        'disabling a failed saved-nav watcher clears every dependent cached value' );
+}
+
+{
+    my $resolver_page = bless { id => 'resolver-page' }, 'Local::Problem48NamedPageResolver';
+    my $resolver_app = bless { resolver => $resolver_page }, 'Developer::Dashboard::Web::App';
+    is( $resolver_app->_load_named_page('resolver-page'), $resolver_page,
+        'named-page loading prefers a configured resolver without consulting saved-nav paths' );
+
+    my $pages = bless {
+        paths => bless( {}, 'Local::PathsNoDashboardLayers' ),
+    }, 'Local::Problem48PageStoreWithoutLayers';
+    my $page_app = bless { pages => $pages }, 'Developer::Dashboard::Web::App';
+    is( $page_app->_load_named_page('stored-page'), $pages->{expected_page},
+        'named-page loading falls back to a page store whose paths lack dashboard layers' );
+
+    my $pages_without_paths = bless {}, 'Local::Problem48PageStoreWithoutLayers';
+    my $page_app_without_paths = bless { pages => $pages_without_paths }, 'Developer::Dashboard::Web::App';
+    is( $page_app_without_paths->_load_named_page('stored-page'), $pages_without_paths->{expected_page},
+        'named-page loading proceeds when the page store has no path registry' );
+
+    my $autoload_pages = bless {
+        paths => bless( {}, 'Local::PathsNoLayers' ),
+    }, 'Local::Problem48PageStoreAutoload';
+    my $autoload_app = bless { pages => $autoload_pages }, 'Developer::Dashboard::Web::App';
+    is( $autoload_app->_load_named_page('autoload-page')->{id}, 'autoload-page',
+        'named-page loading remains compatible with a page store providing load through AUTOLOAD' );
+
+    my $invalid_page_app = bless { pages => 'not-a-page-store' }, 'Developer::Dashboard::Web::App';
+    my $page_error = eval { $invalid_page_app->_load_named_page('stored-page'); 1 } ? '' : $@;
+    like( $page_error, qr/Can't locate object method "load_saved_page"/,
+        'named-page loading exposes an invalid unblessed page-store error' );
 }
 {
     no warnings 'redefine';
@@ -1438,7 +2074,6 @@ $m->{_current_request_context} ||= { host => '127.0.0.1', remote_addr => '127.0.
     my $welcome = $store->load_saved_page('welcome');
     ok( defined eval { $m->_nav_items_html( page => $welcome, runtime_context => { params => {}, current_page => '/x' } ) } // '', 'skill nav page with no id and empty fragment (2060 right, 2062 true)' );
 }
-
 # ---- action responses: no id, non-hash result (2100, 2115, 2137) ----
 {
     my $pact = Developer::Dashboard::PageDocument->new( id => 'pact', title => 'PA', actions => [ { id => 'go', builtin => 'page.state' } ] );
@@ -1710,6 +2345,9 @@ ok( defined 'Developer::Dashboard::Web::App'->_highlight_perl_text('my $x = 1;')
     local *Developer::Dashboard::Web::App::capture = sub (&) {
         return ( "1: eth0    inet 10.0.0.1/24 brd 10.0.0.255\n", '', 0 );
     };
+    # This fixture exercises live discovery, not a value cached by an earlier
+    # request in this long-running test process.
+    delete $m->{_machine_ip_cache};
     my $ip = $m->_machine_ip;
     # If a real interface was found it's a string; if not it falls through
     ok( defined $ip, 'machine_ip with a real ip pair (2755 true side)' );
@@ -1822,6 +2460,135 @@ sub api_keys {
     };
 }
 
+package Local::Problem48SavedNavWatchNoError;
+
+# close()
+# Records and reports closing a watcher without an error-reporting method.
+# Input: watcher instance.
+# Output: true to represent a successful close.
+sub close { $_[0]->{close_calls}++; return 1 }
+
+package Local::Problem48SavedNavWatchUndefinedError;
+
+# last_error()
+# Reports no diagnostic value to exercise the undefined-error return path.
+# Input: watcher instance.
+# Output: undef, indicating no reportable backend error.
+sub last_error { return }
+
+package Local::Problem48SavedNavWatchNoClose;
+
+package Local::Problem48SavedNavWatcherWithoutErrorMethod;
+
+# configure($signature, $paths)
+# Stores watched inputs and returns a controlled setup result without an error accessor.
+# Input: watcher signature and ordered directory list.
+# Output: boolean setup result.
+sub configure {
+    my ( $self, $signature, $paths ) = @_;
+    $self->{signature} = $signature;
+    $self->{paths} = [ @{$paths} ];
+    return $self->{configure_result} // 1;
+}
+
+# unchanged($signature)
+# Reports a controlled event-free result without an error accessor.
+# Input: expected watcher signature.
+# Output: boolean indicating whether the watched tree is unchanged.
+sub unchanged { return $_[0]->{unchanged} // 0 }
+
+package Local::Problem48SavedNavSetupWithoutErrorMethod;
+
+# configure($signature, $paths)
+# Reports an unsupported setup without providing optional diagnostics.
+# Input: ignored watcher signature and directory list.
+# Output: false to force the explicit unknown-error setup path.
+sub configure { return 0 }
+
+# close()
+# Reports successful cleanup after setup has been rejected.
+# Input: watcher instance.
+# Output: true close status.
+sub close { return 1 }
+
+package Local::Problem48SavedNavCloseFailureWithoutErrorMethod;
+
+# close()
+# Simulates a failed watcher close without optional diagnostic support.
+# Input: watcher instance.
+# Output: false close status.
+sub close { return 0 }
+
+package Local::Problem48SavedNavDiagnosticDisappears;
+
+# last_error()
+# Reports an initial failure and then an absent close-time diagnostic.
+# Input: watcher instance.
+# Output: nonempty error once, then undef.
+sub last_error { return ++$_[0]->{calls} == 1 ? 'initial saved-nav failure' : undef }
+
+# close()
+# Simulates failure to close the already-reported watcher.
+# Input: watcher instance.
+# Output: false close status.
+sub close { return 0 }
+
+package Local::Problem48SavedNavCloseDiagnosticPersists;
+
+# last_error()
+# Returns an initial failure and then a close-time diagnostic.
+# Input: watcher instance.
+# Output: nonempty first and second diagnostic strings.
+sub last_error { return ++$_[0]->{calls} == 1 ? 'initial saved-nav failure' : 'close diagnostic persists' }
+
+# close()
+# Simulates a failed close after a backend error was reported.
+# Input: watcher instance.
+# Output: false close status.
+sub close { return 0 }
+
+package Local::Problem48SavedNavWatch;
+
+# configure($signature, $paths)
+# Captures the watched identity and returns its configured result.
+# Input: watch signature and ordered directory path array reference.
+# Output: boolean configuration result.
+sub configure {
+    my ( $self, $signature, $paths ) = @_;
+    $self->{signature} = $signature;
+    $self->{paths} = [ @{$paths} ];
+    return $self->{configure_result} // 1;
+}
+
+# unchanged($signature)
+# Reports whether the configured watcher still matches the requested signature.
+# Input: signature string.
+# Output: boolean unchanged status.
+sub unchanged {
+    my ( $self, $signature ) = @_;
+    return 0 if !defined $self->{signature} || $self->{signature} ne $signature;
+    return $self->{unchanged} // 0;
+}
+
+# last_error()
+# Returns the configured initial error and optional close-time diagnostic.
+# Input: watcher instance.
+# Output: error string, or an empty string when no close diagnostic exists.
+sub last_error {
+    my ($self) = @_;
+    my $call = $self->{last_error_calls}++;
+    return $call ? ( $self->{close_error} // $self->{error} ) : $self->{error};
+}
+
+# close()
+# Records and reports the configured watcher close result.
+# Input: watcher instance.
+# Output: boolean close status.
+sub close {
+    $_[0]->{close_calls}++;
+    return $_[0]->{close_result} // 1;
+}
+
 package Local::PathsNoLayers;    # a paths object with dashboards_roots but no dashboards_layers
 
 # dashboards_roots()
@@ -1829,6 +2596,83 @@ package Local::PathsNoLayers;    # a paths object with dashboards_roots but no d
 # Input: none.
 # Output: empty list.
 sub dashboards_roots { return () }
+
+package Local::Problem48NamedPageResolver;
+
+# load_named_page($id)
+# Returns a stable page object so the resolver-only app path avoids saved-nav lookup.
+# Input: page id string.
+# Output: this resolver object as the loaded page.
+sub load_named_page { return $_[0] }
+
+package Local::Problem48SavedNavBoundaryPaths;
+
+# home()
+# Returns a reference-valued path to ensure invalid boundaries are discarded.
+# Input: path-registry fixture instance.
+# Output: array reference, intentionally not a scalar path.
+sub home { return [] }
+
+# current_project_root()
+# Returns no project boundary for this watch-path fixture.
+# Input: path-registry fixture instance.
+# Output: undef, indicating that no project root is configured.
+sub current_project_root { return }
+
+package Local::Problem48SavedNavNoBoundaryMethods;
+
+package Local::Problem48SavedNavFalseBoundaryPaths;
+
+# home()
+# Supplies a scalar boundary while the injected identity check refuses a match.
+# Input: path-registry fixture instance.
+# Output: a non-existent absolute boundary path.
+sub home { return '/p48-unmatched-boundary' }
+
+# current_project_root()
+# Reports no project boundary for the watch-path fixture.
+# Input: path-registry fixture instance.
+# Output: undef, indicating that no project root is configured.
+sub current_project_root { return }
+
+# _same_or_descendant_path($path, $root)
+# Forces the boundary-mismatch branch while watch paths walk to the filesystem root.
+# Input: candidate and boundary path strings.
+# Output: false for every candidate.
+sub _same_or_descendant_path { return 0 }
+
+package Local::Problem48PageStoreWithoutLayers;
+
+# load_saved_page($id)
+# Returns the fixture page used when paths have no dashboard-layer method.
+# Input: saved page id string.
+# Output: configured page object.
+sub load_saved_page {
+    my ( $self, $id ) = @_;
+    $self->{expected_page} ||= bless { id => $id }, 'Local::Problem48Page';
+    return $self->{expected_page};
+}
+
+package Local::Problem48PageStoreAutoload;
+
+# AUTOLOAD()
+# Supplies a page-load method while keeping can('load_saved_page') false.
+# Input: dynamic method call; method name is in $AUTOLOAD and first arg is id.
+# Output: deterministic page object for coverage of the capability check.
+our $AUTOLOAD;
+sub AUTOLOAD {
+    my ( $self, $id ) = @_;
+    return if $AUTOLOAD =~ /::DESTROY\z/;
+    return bless { id => $id }, 'Local::Problem48Page';
+}
+
+# DESTROY()
+# Avoids dispatching fixture teardown through AUTOLOAD.
+# Input: fixture object supplied by Perl destruction.
+# Output: no value.
+sub DESTROY { return }
+
+package Local::Problem48Page;
 
 package Local::StubActionsScalar;    # action runner returning a non-hash (scalar) result
 
@@ -1886,7 +2730,9 @@ This test is the executable coverage-closure contract for
 C<Developer::Dashboard::Web::App>. It drives the browser-facing route table,
 helper login, transient-token policy, saved-page render/source/edit/action
 flows, saved and skill-local Ajax endpoints, static asset serving, and the
-defensive fallback paths. Static-file permission denials are checked with DAC
+defensive fallback paths. It also verifies prompt-summary cache freshness,
+unchanged reuse, changed indicator refresh, and invalid cached-reference
+recovery. Static-file permission denials are checked with DAC
 capabilities dropped so a root test process observes the same refusal as an
 ordinary user; unrelated open failures remain explicit server errors. Together
 these cases exercise every Devel::Cover branch and condition in the module.
@@ -1896,14 +2742,29 @@ these cases exercise every Devel::Cover branch and condition in the module.
 The web app backend is large and security-sensitive, and its happy paths were
 already covered by the broader suite while the defensive sides (missing config,
 absent headers, empty option defaults, error responses, and machine-auth edge
-cases) were not. This file closes those remaining branch and condition sides so
-the all-metric coverage gate stays honest for this module.
+cases) were not. It also isolates nav fallback tests from previously cached
+HTML and verifies that an unavailable skill-nav page list does not trigger a
+warning during aggregate snapshot validation. Direct saved-nav watcher error
+cases assert that missing and empty errors are ignored while non-empty
+diagnostics close the watcher and invalidate dependent snapshots. Destruction
+coverage checks supported, absent, successful, and failed watcher close paths;
+snapshot storage checks invalid state, non-scalar and oversized HTML, absent
+watchers, invalid cached HTML variants, unavailable watcher diagnostics, stale
+watch events, mismatched watcher signatures, root-directory and absent-boundary
+cases, resolver-only page loads, page stores
+with absent paths or an AUTOLOAD-provided loader, and backends with undefined,
+lost, or preserved close-time diagnostics. Malformed page-store input is also
+checked for a visible dispatch error. These cases close the remaining branch
+and condition sides so the all-metric coverage gate stays honest for this
+module.
 
 =head1 WHEN TO USE
 
 Use this file when changing browser routes, auth gating, saved or transient page
-handling, Ajax endpoints, skill route resolution, or the static file serving in
-the web app backend.
+handling, Ajax endpoints, skill route resolution or nav snapshots, or the static
+file serving in the web app backend. The nav regression also proves that
+request-page id and chrome-mode lookups use lightweight page accessors instead
+of building the full public page hash.
 
 =head1 HOW TO USE
 

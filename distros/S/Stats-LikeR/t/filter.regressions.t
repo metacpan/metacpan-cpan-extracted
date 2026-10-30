@@ -351,4 +351,14 @@ unless ($INC{'Devel/Cover.pm'}) {
 	no_leaks_ok { eval { filter($LO, $die) } }							'no leak: object cells, dying closure';
 }
 
+# A call of the wrong form dies with the function's argparse-style help screen
+# from Stats::LikeR::Usage, and the error itself as the last line.
+{
+	my $screen = Stats::LikeR::_usage_text('col');
+	like($screen, qr/\Ausage: col\(/, 'col has a help screen');
+	is(do { local $@; eval { col(undef); 1 } ? '' : $@ },
+	   $screen . "col: error: expects a single column name\n",
+	   'col: an undefined name prints the help screen');
+}
+
 done_testing;

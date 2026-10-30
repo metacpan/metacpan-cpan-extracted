@@ -1,8 +1,3 @@
-Changes
-MANIFEST
-MANIFEST.SKIP
-Makefile.PL
-README
 bin/dkim2-delayedbounce-fail.pl
 bin/dkim2-milter
 bin/dkim2-reflector.pl
@@ -12,13 +7,14 @@ bin/dkim2verify
 bin/validate.cgi
 bin/validate.pl
 build-fraud-test.pl
+Changes
 contrib/strip.pl
 lib/Mail/DKIM2.pm
 lib/Mail/DKIM2/BodyHasher.pm
 lib/Mail/DKIM2/BodyPlan.pm
 lib/Mail/DKIM2/Common.pm
-lib/Mail/DKIM2/DSN.pm
 lib/Mail/DKIM2/Digest.pm
+lib/Mail/DKIM2/DSN.pm
 lib/Mail/DKIM2/Gate.pm
 lib/Mail/DKIM2/HeaderParser.pm
 lib/Mail/DKIM2/HeaderPlan.pm
@@ -34,6 +30,10 @@ lib/Mail/DKIM2/Verifier.pm
 lib/Mail/DKIM2/Wrap.pm
 lib/Mail/Milter/Authentication/Handler/DKIM2Sign.pm
 lib/Mail/Milter/Authentication/Handler/DKIM2Verify.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
 spec-review-notes.md
 t/body-canon.t
 t/body-diff-vectors.t
@@ -82,6 +82,7 @@ t/fold-info.t
 t/foreign-exception.t
 t/fraud-detection.t
 t/full-chain.t
+t/fully-verified.t
 t/gate-mime-warn.t
 t/gate-null-top.t
 t/gate-one-walk.t
@@ -133,6 +134,9 @@ t/signature-nd.t
 t/signature-nonce.t
 t/signer-result.t
 t/spec07.t
+t/spec08-algebra.t
+t/spec08-provisional.t
+t/spec08-review.t
 t/split-lmtp.t
 t/split.t
 t/stream-from-handle.t

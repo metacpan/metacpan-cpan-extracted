@@ -63,4 +63,34 @@ SKIP: {
     like($wb_line, qr/x___y___z/, "___ not applied inside word x___y___z");
 }
 
+# Closing code fence: the same character, at least as long (CommonMark)
+{
+    use File::Temp qw(tempfile);
+    my ($fh, $file) = tempfile(SUFFIX => '.md', UNLINK => 1);
+    print $fh "```\ncode A\n````\n\nText with **bold** here.\n\n"
+            . "```\n```sh\ncode B\n```\n";
+    close $fh;
+    my @lines = split /\n/, run("-Mmd $file")->stdout;
+    my ($text) = grep { /Text with/ } @lines;
+    like($text, qr/\e\[[0-9;]*1[;m]/, "a longer closing fence closes the block");
+    my ($inner) = grep { /```sh/ } @lines;
+    like($inner, qr/\e\[[0-9;]*48;/, "```sh inside a ``` block is code, not a fence");
+}
+
+# ATX headings: empty headings and up to 3 spaces of indentation (CommonMark)
+{
+    use File::Temp qw(tempfile);
+    my ($fh, $file) = tempfile(SUFFIX => '.md', UNLINK => 1);
+    print $fh "#\n\n##\n\n   # indented\n\n    # four spaces\n\n#foo\n\n####### seven\n";
+    close $fh;
+    my @lines = split /\n/, run("-Mmd $file")->stdout;
+    my $colored = sub { my $re = shift; my ($l) = grep { /$re/ } @lines; $l =~ /\e\[/ };
+    ok($colored->(qr/^(?:\e\[[0-9;]*[mK])+#\e/), "'#' alone is an empty h1");
+    ok($colored->(qr/##/),              "'##' alone is an empty h2");
+    ok($colored->(qr/# indented/),      "a heading indented by 3 spaces");
+    ok(!$colored->(qr/# four spaces/),  "4 spaces of indentation is not a heading");
+    ok(!$colored->(qr/#foo/),           "'#foo' is not a heading");
+    ok(!$colored->(qr/####### seven/),  "7 '#' is not a heading");
+}
+
 done_testing;

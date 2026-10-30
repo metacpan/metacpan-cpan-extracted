@@ -144,6 +144,11 @@ subtest 'line-style option' => sub {
     like $out, qr/--ls truncate/, 'line-style option';
 };
 
+subtest 'run-in options' => sub {
+    like nup('--runlen=4 date'), qr/--runlen 4/, 'runlen option';
+    like nup('--runin=3 --runout=1 date'), qr/--runin 3 --runout 1/, 'runin and runout options';
+};
+
 subtest 'pager option' => sub {
     my $out = nup('--pager=less date');
     like $out, qr/--pager=less/, 'pager with value';

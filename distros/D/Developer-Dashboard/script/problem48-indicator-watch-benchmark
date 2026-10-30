@@ -1,0 +1,215 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(getcwd);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use JSON::XS ();
+use Time::HiRes qw(time);
+
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::IndicatorStore::Watch;
+use Developer::Dashboard::PathRegistry;
+
+my $indicator_count = 50;
+my $iterations = 100;
+my $runs = 21;
+my $help = 0;
+GetOptions(
+    'indicators=i' => \$indicator_count,
+    'iterations=i' => \$iterations,
+    'runs=i'       => \$runs,
+    'help'         => \$help,
+) or die _usage();
+if ($help) {
+    print _usage();
+    exit 0;
+}
+die "Unexpected argument(s): @ARGV\n" . _usage() if @ARGV;
+die "--indicators must be a positive integer\n" if $indicator_count < 1;
+die "--iterations must be a positive integer\n" if $iterations < 1;
+die "--runs must be a positive odd integer\n" if $runs < 1 || $runs % 2 == 0;
+
+my $watch_probe = Developer::Dashboard::IndicatorStore::Watch->new;
+die "FFI::Platypus Linux inotify backend is unavailable\n" if !$watch_probe;
+
+my $original_cwd = getcwd();
+my $fixture_root = tempdir( 'problem48-watch-XXXXXX', CLEANUP => 1 );
+my $home = File::Spec->catdir( $fixture_root, 'home' );
+make_path($home);
+local $ENV{HOME} = $home;
+chdir $home or die "Unable to enter benchmark HOME '$home': $!\n";
+
+my $paths = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home );
+my $store = Developer::Dashboard::IndicatorStore->new( paths => $paths );
+my @jobs = map {
+    {
+        name      => sprintf( 'p48-watch-%06d', $_ ),
+        cwd       => 'home',
+        code      => 'return 0;',
+        indicator => { name => sprintf( 'p48-watch-%06d', $_ ), icon => 'x', priority => $_ },
+    }
+} 1 .. $indicator_count;
+
+my $seeded = $store->sync_collectors( \@jobs, return_indicators => 1 );
+die "Expected $indicator_count seeded indicators, got " . scalar( @{ $seeded->{indicators} } ) . "\n"
+  if scalar( @{ $seeded->{indicators} } ) != $indicator_count;
+die "The store did not install its native filesystem watcher\n"
+  if ref( $store->{_indicator_sync_watcher} ) ne 'Developer::Dashboard::IndicatorStore::Watch';
+
+my @roots = $paths->indicators_roots;
+my $watched = sub { return $store->_collector_sync_files_unchanged( \@roots, \@jobs ) };
+my $portable = sub {
+    return $store->_collector_sync_files_unchanged( \@roots, \@jobs, skip_watcher => 1 );
+};
+my $expected_inventory = _canonical_json( [ $store->list_indicators ] );
+die "Native watch fast path failed its warmup check\n" if !$watched->();
+die "Portable validator failed its warmup check\n" if !$portable->();
+die "The warmup inventory changed while setting up the benchmark\n"
+  if _canonical_json( [ $store->list_indicators ] ) ne $expected_inventory;
+
+my %samples = ( watcher => [], portable => [] );
+for my $run ( 1 .. $runs ) {
+    my @order = $run % 2 ? qw(watcher portable) : qw(portable watcher);
+    for my $mode (@order) {
+        my $check = $mode eq 'watcher' ? $watched : $portable;
+        my $started = time;
+        for ( 1 .. $iterations ) {
+            die "$mode validation rejected an unchanged fixture\n" if !$check->();
+        }
+        push @{ $samples{$mode} }, time - $started;
+    }
+}
+
+my $current_inventory = _canonical_json( [ $store->list_indicators ] );
+die "The watcher and portable measurements changed indicator output\n"
+  if $current_inventory ne $expected_inventory;
+
+my $changed_name = $jobs[ int( $indicator_count / 2 ) ]{name};
+$store->set_indicator( $changed_name, status => 'event-updated', icon => 'x' );
+die "Filesystem event did not invalidate the next stable-sync check\n" if $watched->();
+my $fresh = $store->sync_collectors( \@jobs, return_indicators => 1 );
+my ($changed_indicator) = grep { $_->{name} eq $changed_name } @{ $fresh->{indicators} };
+die "The next full sync did not return the new status\n"
+  if !$changed_indicator || $changed_indicator->{status} ne 'event-updated';
+
+my $watcher_median = _median( @{ $samples{watcher} } );
+my $portable_median = _median( @{ $samples{portable} } );
+printf "indicators=%d iterations=%d runs=%d native_inotify=yes exact_inventory_parity=yes event_freshness=yes\n",
+  $indicator_count, $iterations, $runs;
+printf "watcher_median_ms=%.6f portable_median_ms=%.6f stable_sync_speedup=%.2fx\n",
+  1000 * $watcher_median / $iterations,
+  1000 * $portable_median / $iterations,
+  $portable_median / $watcher_median;
+chdir $original_cwd or die "Unable to restore benchmark directory '$original_cwd': $!\n";
+exit 0;
+
+# _usage()
+# Returns the supported options and the comparison performed by this program.
+# Input: none.
+# Output: command-line usage string.
+sub _usage {
+    return "Usage: $0 [--indicators N] [--iterations N] [--runs ODD_N] [--help]\n"
+      . "Compares event-validated stable indicator sync with portable stat validation.\n";
+}
+
+# _canonical_json($value)
+# Serializes one data structure deterministically for output-parity checks.
+# Input: JSON-compatible Perl value.
+# Output: canonical UTF-8 JSON byte string.
+sub _canonical_json {
+    my ($value) = @_;
+    return JSON::XS->new->canonical->utf8->encode($value);
+}
+
+# _median(@samples)
+# Returns the middle duration from an odd non-empty sample set.
+# Input: elapsed durations in seconds.
+# Output: median elapsed duration in seconds.
+sub _median {
+    my @samples = sort { $a <=> $b } @_;
+    die "Cannot calculate a median without samples\n" if !@samples;
+    return $samples[ int( @samples / 2 ) ];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+problem48-indicator-watch-benchmark - compare event and metadata validation
+
+=head1 PURPOSE
+
+Measures the integrated stable indicator-sync check with a real Linux inotify
+watch against the existing portable directory and high-resolution stat
+validator. It requires exact indicator inventory parity and verifies that an
+external status write invalidates the next check and is returned by full sync.
+
+=head1 WHY IT EXISTS
+
+An empty inotify poll is not evidence of a useful dashboard optimization by
+itself. This benchmark measures the actual C<IndicatorStore> helper that
+otherwise enumerates indicator directories and stats persisted status files,
+using the same in-memory store and filesystem fixture in both arms.
+
+=head1 WHEN TO USE
+
+Run it after changing C<IndicatorStore::Watch>, stable collector sync, or the
+portable freshness validator. It requires Linux, FFI::Platypus, and libc
+inotify support; the regular test suite does not require those optional pieces.
+
+=head1 HOW TO USE
+
+Install the optional test dependency and run inside the project Docker dev
+service:
+
+  cpanm FFI::Platypus
+  perl script/problem48-indicator-watch-benchmark --indicators 50 --iterations 100 --runs 21
+
+The command creates a private temporary HOME for synthetic status files. It
+does not use or modify the real dashboard state.
+
+=head1 WHAT USES IT
+
+Problem 48 performance research uses this benchmark to decide whether Linux
+event notifications should remain in the production sync path. It is a
+measurement tool, not a dependency of dashboard startup.
+
+=head1 EXAMPLES
+
+Example 1: compare a 50-indicator setup with 21 alternating samples.
+
+  perl script/problem48-indicator-watch-benchmark
+
+Example 2: scale the inventory and increase each timed sample.
+
+  perl script/problem48-indicator-watch-benchmark --indicators 500 --iterations 100 --runs 31
+
+Example 3: inspect accepted options without installing FFI.
+
+  perl script/problem48-indicator-watch-benchmark --help
+
+=head1 OUTPUT
+
+The report includes median milliseconds per helper call, exact inventory
+parity, external-write freshness, and the portable-to-watcher speed ratio.
+Every timed call must return an unchanged result or the program exits with a
+visible error.
+
+=head1 SAFETY
+
+The benchmark writes only under its private temporary HOME, runs no shell
+commands, and uses generated collector names. It restores its original working
+directory before normal exit. All failed setup, parity, or freshness checks
+are fatal and visible.
+
+=cut

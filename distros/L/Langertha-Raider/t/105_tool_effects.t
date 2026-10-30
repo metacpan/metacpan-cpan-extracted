@@ -42,6 +42,7 @@ subtest 'the table only names the five classes' => sub {
     is([ grep { !$valid{$_} } @$fx ], [], $name.': valid classes');
   }
   is($table->effects_for('write_file'), ['write'], 'write_file');
+  is($table->effects_for($_), ['write'], $_.': a checkout and a branch (ADR 0032)') for qw( enter_worktree exit_worktree );
   is($table->effects_for('read_file'),  ['read'],  'read_file: read and write are separate');
   is($table->effects_for('bash'),       ['code'],  'bash');
   is($table->effects_for('perl_check'), ['code'],  'perl -c runs BEGIN/use');
@@ -90,7 +91,7 @@ subtest 'explain_config carries the tools with source and classes' => sub {
   my $perl = app(perl => 1)->explain_config;
   my %ptool = map { $_->{name} => $_ } @{ $perl->{tools} };
   is($ptool{perl_eval}{effects}, ['code'], 'perl_eval: code');
-  is($ptool{perl_cpanm}{source}, 'engine:4', 'perl server is engine:4');
+  is($ptool{perl_cpanm}{source}, 'engine:7', 'perl server is engine:7');
 };
 
 {
@@ -121,7 +122,7 @@ subtest 'config explain prints the classes next to the source' => sub {
   like($buf, qr/^tools:  /m, 'tools section');
   like($buf, qr/^  write_file\s+engine:1\s+write$/m, 'write_file');
   like($buf, qr/^  bash\s+engine:2\s+code$/m, 'bash');
-  like($buf, qr/^  perl_cpanm\s+engine:4\s+network, code$/m, 'two classes');
+  like($buf, qr/^  perl_cpanm\s+engine:7\s+network, code$/m, 'two classes');
   like($buf, qr/^  weird\s+engine:9\s+unknown$/m, 'unknown');
   like($buf, qr/^  raider_wait\s+raider\s+none$/m, 'known without effect');
 };

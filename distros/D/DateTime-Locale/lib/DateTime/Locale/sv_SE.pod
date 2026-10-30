@@ -417,11 +417,11 @@ Swedish Sweden locale.
    1995-12-22T09:05:02 = 1995-12 e.Kr.
   -0010-09-15T04:44:23 = -10-09 f.Kr.
 
-=head3 GyMEd (E M-d-y G)
+=head3 GyMEd (E, y-MM-dd GGGGG)
 
-   2008-02-05T18:30:30 = tis 2-5-2008 e.Kr.
-   1995-12-22T09:05:02 = fre 12-22-1995 e.Kr.
-  -0010-09-15T04:44:23 = lör 9-15--10 f.Kr.
+   2008-02-05T18:30:30 = tis, 2008-02-05 e.Kr.
+   1995-12-22T09:05:02 = fre, 1995-12-22 e.Kr.
+  -0010-09-15T04:44:23 = lör, -10-09-15 f.Kr.
 
 =head3 GyMMM (MMM y G)
 
@@ -434,6 +434,24 @@ Swedish Sweden locale.
    2008-02-05T18:30:30 = tis 5 feb. 2008 e.Kr.
    1995-12-22T09:05:02 = fre 22 dec. 1995 e.Kr.
   -0010-09-15T04:44:23 = lör 15 sep. -10 f.Kr.
+
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = februari 2008 e.Kr.
+   1995-12-22T09:05:02 = december 1995 e.Kr.
+  -0010-09-15T04:44:23 = september -10 f.Kr.
+
+=head3 GyMMMMEd (E d MMMM y G)
+
+   2008-02-05T18:30:30 = tis 5 februari 2008 e.Kr.
+   1995-12-22T09:05:02 = fre 22 december 1995 e.Kr.
+  -0010-09-15T04:44:23 = lör 15 september -10 f.Kr.
+
+=head3 GyMMMMd (d MMMM y G)
+
+   2008-02-05T18:30:30 = 5 februari 2008 e.Kr.
+   1995-12-22T09:05:02 = 22 december 1995 e.Kr.
+  -0010-09-15T04:44:23 = 15 september -10 f.Kr.
 
 =head3 GyMMMd (d MMM y G)
 
@@ -644,6 +662,18 @@ Swedish Sweden locale.
    2008-02-05T18:30:30 = februari 2008
    1995-12-22T09:05:02 = december 1995
   -0010-09-15T04:44:23 = september -10
+
+=head3 yMMMMEd (E d MMMM y)
+
+   2008-02-05T18:30:30 = tis 5 februari 2008
+   1995-12-22T09:05:02 = fre 22 december 1995
+  -0010-09-15T04:44:23 = lör 15 september -10
+
+=head3 yMMMMd (d MMMM y)
+
+   2008-02-05T18:30:30 = 5 februari 2008
+   1995-12-22T09:05:02 = 22 december 1995
+  -0010-09-15T04:44:23 = 15 september -10
 
 =head3 yMMMd (d MMM y)
 

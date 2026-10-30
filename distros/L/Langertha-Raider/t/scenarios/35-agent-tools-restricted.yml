@@ -1,0 +1,29 @@
+title: a .claude/agents file with tools Read, Grep gets only read_file and grep; its bash call is an unknown tool
+permission_mode: default
+files:
+  CLAUDE.md: "Project.\n"
+  .claude/agents/reader.md: "---\nname: reader\ndescription: Reads and searches, changes nothing.\ntools: Read, Grep\n---\nREADER-BODY-MARKER: you only read.\n"
+  data.txt: "alpha\nbeta\n"
+prompt: Have the reader look at data.txt.
+script:
+  - tool_calls:
+      - [ agent, { description: Look at data, prompt: Report the lines of data.txt., subagent_type: reader } ]
+  - tool_calls:
+      - [ bash, { command: cat data.txt } ]
+  - tool_calls:
+      - [ read_file, { path: data.txt } ]
+  - text: alpha and beta
+  - text: "Two lines: alpha and beta."
+expect:
+  answer: "Two lines: alpha and beta."
+  requests:
+    - { index: 0, tool_text: "- reader: Reads and searches, changes nothing. (Tools: read_file, grep)" }
+    - { index: 1, offers: [ read_file, grep ] }
+    - { index: 1, contains: "READER-BODY-MARKER: you only read." }
+    - { index: 1, absent: "viking shield-maiden" }
+    - { index: 1, contains: "Project." }
+    - { index: 1, absent: "bash(" }
+  tools:
+    - { name: bash, error: true, text: 'No such tool available: bash</tool_use_error>' }
+    - { name: read_file, text: 'alpha' }
+    - { name: agent, text: '\Aalpha and beta\nagentId: agent_1 \(use send_message with to: ''agent_1'' to continue this agent\)\n<usage>subagent_tokens: \d+\ntool_uses: \d+\nduration_ms: \d+</usage>\z' }

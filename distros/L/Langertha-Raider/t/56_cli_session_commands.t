@@ -51,7 +51,7 @@ sub main_run {
 my $json = JSON::MaybeXS->new(utf8 => 1);
 sub events { map { $json->decode($_) } path($_[0])->lines_raw({ chomp => 1 }) }
 sub doc    { $json->decode(encode_utf8($_[0])) }
-sub engine { ( '-e', 'openai', '-k', 'test', '-m', 'seq-model', '--no-trace' ) }
+sub engine { ( '-e', 'openai', '-k', 'test', '-m', 'seq-model', '--no-trace', '--dangerously-skip-permissions' ) }
 
 subtest 'session list' => sub {
   my $root = tempdir(CLEANUP => 1);

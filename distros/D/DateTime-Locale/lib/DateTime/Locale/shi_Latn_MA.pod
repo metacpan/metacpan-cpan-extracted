@@ -435,6 +435,24 @@ Tachelhit Morocco Latin locale.
    1995-12-22T09:05:02 = dfɛ 1995 duj 22, asim
   -0010-09-15T04:44:23 = daɛ -10 cut 15, asiḍ
 
+=head3 GyMMMM (G y MMMM)
+
+   2008-02-05T18:30:30 = dfɛ 2008 bṛayṛ
+   1995-12-22T09:05:02 = dfɛ 1995 dujanbir
+  -0010-09-15T04:44:23 = daɛ -10 cutanbir
+
+=head3 GyMMMMEd (G y MMMM d, E)
+
+   2008-02-05T18:30:30 = dfɛ 2008 bṛayṛ 5, asi
+   1995-12-22T09:05:02 = dfɛ 1995 dujanbir 22, asim
+  -0010-09-15T04:44:23 = daɛ -10 cutanbir 15, asiḍ
+
+=head3 GyMMMMd (G y MMMM d)
+
+   2008-02-05T18:30:30 = dfɛ 2008 bṛayṛ 5
+   1995-12-22T09:05:02 = dfɛ 1995 dujanbir 22
+  -0010-09-15T04:44:23 = daɛ -10 cutanbir 15
+
 =head3 GyMMMd (G y MMM d)
 
    2008-02-05T18:30:30 = dfɛ 2008 bṛa 5

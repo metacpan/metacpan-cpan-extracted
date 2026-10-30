@@ -351,7 +351,7 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 }
 
 # error handling
-throws_ok { merge([{a=>1}], [{a=>1}], how => 'bogus') } qr/merge: how must be/, 'bad how dies';
+throws_ok { merge([{a=>1}], [{a=>1}], how => 'bogus') } qr/merge: error: how must be/, 'bad how dies';
 throws_ok { merge([{a=>1}], [{b=>1}], on => 'a') } qr/right frame has no join column/, 'missing key dies';
 throws_ok { merge([{a=>1}], [{b=>1}]) } qr/no common columns/, 'no common columns dies';
 throws_ok { merge([{a=>1}], [{a=>1}], on => 'a', 'left_on' => 'a') } qr/not both/, 'on + left_on dies';
@@ -359,6 +359,14 @@ throws_ok { merge([{a=>1}], [{a=>1}], how => 'cross', on => 'a') } qr/cross join
 throws_ok { merge([[1,2]], [{a=>1}], on => 'a') } qr/array-of-arrays/, 'AoA input dies';
 
 # no memory leaks
+# A call-form error prints merge's argparse-style help screen (from
+# lib/Stats/LikeR/Usage.pm), with the error itself on the last line.
+{
+	my $err = do { local $@; eval { merge([ { a => 1 } ]); 1 } ? '' : $@ };
+	like($err, qr/\Ausage: merge\(/, 'merge: a call-form error opens with the usage line');
+	is($err, Stats::LikeR::_usage_text('merge') . "merge: error: two data frames are required\n",
+		'merge: the help screen, then the error on the last line');
+}
 if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 SKIP: {
 	skip 'Test::LeakTrace not installed', 1 unless $HAVE_LEAKTRACE;

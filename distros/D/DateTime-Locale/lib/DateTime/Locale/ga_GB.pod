@@ -435,6 +435,24 @@ Irish United Kingdom locale.
    1995-12-22T09:05:02 = Aoine 22 Noll 1995 AD
   -0010-09-15T04:44:23 = Sath 15 MFómh -10 RC
 
+=head3 GyMMMM (MMMM y G)
+
+   2008-02-05T18:30:30 = Feabhra 2008 AD
+   1995-12-22T09:05:02 = Nollaig 1995 AD
+  -0010-09-15T04:44:23 = Meán Fómhair -10 RC
+
+=head3 GyMMMMEd (E, MMMM d, y G)
+
+   2008-02-05T18:30:30 = Máirt, Feabhra 5, 2008 AD
+   1995-12-22T09:05:02 = Aoine, Nollaig 22, 1995 AD
+  -0010-09-15T04:44:23 = Sath, Meán Fómhair 15, -10 RC
+
+=head3 GyMMMMd (MMMM d, y G)
+
+   2008-02-05T18:30:30 = Feabhra 5, 2008 AD
+   1995-12-22T09:05:02 = Nollaig 22, 1995 AD
+  -0010-09-15T04:44:23 = Meán Fómhair 15, -10 RC
+
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Feabh 2008 AD
@@ -506,6 +524,12 @@ Irish United Kingdom locale.
    2008-02-05T18:30:30 = Máirt 5 Feabh
    1995-12-22T09:05:02 = Aoine 22 Noll
   -0010-09-15T04:44:23 = Sath 15 MFómh
+
+=head3 MMMMEd (E, MMMM d)
+
+   2008-02-05T18:30:30 = Máirt, Feabhra 5
+   1995-12-22T09:05:02 = Aoine, Nollaig 22
+  -0010-09-15T04:44:23 = Sath, Meán Fómhair 15
 
 =head3 MMMMW-count-few (MMMM: 'seachtain' W)
 
@@ -638,6 +662,18 @@ Irish United Kingdom locale.
    2008-02-05T18:30:30 = Feabhra 2008
    1995-12-22T09:05:02 = Nollaig 1995
   -0010-09-15T04:44:23 = Meán Fómhair -10
+
+=head3 yMMMMEd (E, MMMM d, y)
+
+   2008-02-05T18:30:30 = Máirt, Feabhra 5, 2008
+   1995-12-22T09:05:02 = Aoine, Nollaig 22, 1995
+  -0010-09-15T04:44:23 = Sath, Meán Fómhair 15, -10
+
+=head3 yMMMMd (MMMM d, y)
+
+   2008-02-05T18:30:30 = Feabhra 5, 2008
+   1995-12-22T09:05:02 = Nollaig 22, 1995
+  -0010-09-15T04:44:23 = Meán Fómhair 15, -10
 
 =head3 yMMMd (d MMM y)
 
