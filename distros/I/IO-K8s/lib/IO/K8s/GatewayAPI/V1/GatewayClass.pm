@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GatewayClass;
 # ABSTRACT: GatewayClass describes a class of Gateways available to the user for creating Gateway resources.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'gatewayclasses',
@@ -25,7 +25,7 @@ IO::K8s::GatewayAPI::V1::GatewayClass - GatewayClass describes a class of Gatewa
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 spec
 
@@ -42,7 +42,7 @@ specify their controller name.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -70,5 +70,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -4,7 +4,7 @@
  * Authors              : Patrick LECOANET
  * Creation date        : Wed Dec  8 11:04:44 1999
  *
- * $Id: Image.h,v 1.20 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -29,6 +29,7 @@ typedef void    *ZnImage;
 #define ZnGetBitmapPixel(bits, stride, x, y)\
   (((bits)[(y)*(stride)+((x)>>3)]<<((x)&7))&0x80)
 
+int To2Power(int a);
 ZnImage ZnGetImage(struct _ZnWInfo *wi, Tk_Uid image_name,
                    void (*inv_proc)(void *cd), void *cd);
 ZnImage ZnGetImageByValue(ZnImage image, void (*inv_proc)(void *cd), void *cd);

@@ -1,6 +1,6 @@
 package Kubernetes::Comb::CRD::CombResource;
 # ABSTRACT: Identity of one Kubernetes object a Comb manages
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use IO::K8s::Resource;
 
@@ -31,7 +31,7 @@ Kubernetes::Comb::CRD::CombResource - Identity of one Kubernetes object a Comb m
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ Required. Name of the object.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

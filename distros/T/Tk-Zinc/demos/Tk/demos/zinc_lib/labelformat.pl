@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
-# $Id: labelformat.pl,v 1.4 2003/09/15 12:25:05 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

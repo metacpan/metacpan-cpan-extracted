@@ -1,0 +1,129 @@
+# -*- coding: utf-8 -*-
+
+TITLE: conditional call, no body, if=
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2"/>world!
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+TITLE: conditional call, with body, if=
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2">world!</yatt:hello>
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+ &yatt:body();
+PARAM[
+- 1
+]
+OUT:
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+
+TITLE: conditional call, unless=
+IN:
+ <!yatt:args x>
+ <yatt:hello unless="&yatt:x; >= 2"/>world!
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ world!
+
+TITLE: conditional call, with other args
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2" who="&yatt:x;"/>world!
+ 
+ <!yatt:widget hello who>
+ <h2>Hello &yatt:who;</h2>
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello 2</h2>
+ world!
+
+TITLE: conditional call of code argument
+IN:
+ <!yatt:args x>
+ <yatt:hello x>
+ <:yatt:world/>
+ world!</yatt:hello>
+ 
+ <!yatt:widget hello x world=[code]>
+ <h2>Hello</h2>
+ <yatt:world if="&yatt:x; >= 2"/>
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ 
+ 
+
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: error - both if and unless
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2" unless="&yatt:x; >= 4"/>
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+ERROR: Too many conditions
+
+TITLE: error - valueless if
+IN:
+ <!yatt:args x>
+ <yatt:hello if/>
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+ERROR: Condition 'if' requires a value

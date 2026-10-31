@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GCRAccessToken;
 # ABSTRACT: GCRAccessToken generates an GCP access token that can be used to authenticate with GCR.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'gcraccesstokens',
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GCRAccessToken - GCRAccessToken generates an
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 spec
 
@@ -34,7 +34,7 @@ GCRAccessTokenSpec defines the desired state to generate a Google Container Regi
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -62,5 +62,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

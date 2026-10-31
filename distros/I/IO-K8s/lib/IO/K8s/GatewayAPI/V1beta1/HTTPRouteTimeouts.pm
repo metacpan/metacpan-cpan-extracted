@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::HTTPRouteTimeouts;
 # ABSTRACT: Timeouts defines the timeouts that can be configured for an HTTP request.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s backendRequest => Str, { pattern => qr/^([0-9]{1,5}(h|m|s|ms)){1,4}$/ };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1beta1::HTTPRouteTimeouts - Timeouts defines the timeouts 
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 backendRequest
 
@@ -75,7 +75,7 @@ Support: Extended
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -103,5 +103,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

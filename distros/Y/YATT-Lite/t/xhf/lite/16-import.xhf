@@ -1,0 +1,125 @@
+# -*- coding: utf-8 -*-
+#
+# GH-256: <!yatt:import [name...]="file"> のテスト。
+#   name := srcName | local=srcName | srcName:kind | local=srcName:kind
+#   kind := widget | page | action | entity | argmacro
+#
+# page/action の dispatch (sigil) と循環 import は PSGI 環境が要るため
+# t/lite_import.t 側でカバーする。
+#
+
+TITLE: import source
+FILE: form.ytmpl
+IN:
+ <!yatt:argmacro pair=[x y] pair>
+ my ($x, $y) = split /\s*,\s*/, $cgen->node_value($args->{pair});
+ $result->{x} = $x;
+ $result->{y} = $y;
+ 
+ <!yatt:widget confirm x y>
+ confirm x=[&yatt:x;] y=[&yatt:y;]
+ <!yatt:widget register>
+ register widget
+ <!yatt:widget outer>
+ outer(<yatt:helper/>)
+ <!yatt:widget helper>
+ lib helper
+ <!yatt:entity hex num>
+ sprintf "%x", $num;
+
+
+TITLE: import source with duplicated name (widget and entity)
+FILE: dup.ytmpl
+IN:
+ <!yatt:widget dup>
+ dup widget
+ <!yatt:entity dup>
+ "dup entity";
+
+
+TITLE: widget import
+IN:
+ <!yatt:import [confirm register]="form.ytmpl">
+ <yatt:confirm x="a" y="b"/><yatt:register/>
+OUT:
+ confirm x=[a] y=[b]
+ register widget
+ 
+
+
+TITLE: widget import with rename
+IN:
+ <!yatt:import [ok=confirm]="form.ytmpl">
+ <yatt:ok x="A" y="B"/>
+OUT:
+ confirm x=[A] y=[B]
+ 
+
+
+TITLE: entity import (auto detected)
+IN:
+ <!yatt:import [hex]="form.ytmpl">
+ val=[&yatt:hex(255);]
+OUT:
+ val=[ff]
+
+
+TITLE: entity import with rename and kind annotation
+IN:
+ <!yatt:import [h=hex:entity]="form.ytmpl">
+ val=[&yatt:h(255);]
+OUT:
+ val=[ff]
+
+
+TITLE: argmacro import
+IN:
+ <!yatt:import [pair:argmacro]="form.ytmpl">
+ <yatt:foo pair="3, 8"/>
+ 
+ <!yatt:widget foo %pair;>
+ x=&yatt:x; y=&yatt:y;
+OUT:
+ x=3 y=8
+ 
+
+
+TITLE: static binding to definition side
+IN:
+ <!yatt:import [outer]="form.ytmpl">
+ <yatt:outer/>
+ 
+ <!yatt:widget helper>
+ LOCAL helper
+OUT:
+ outer(lib helper
+ )
+ 
+
+
+TITLE: import error - unknown name
+IN:
+ <!yatt:import [nosuch]="form.ytmpl">
+ body
+ERROR: No such part to import
+
+TITLE: import error - kind mismatch
+IN:
+ <!yatt:import [confirm:action]="form.ytmpl">
+ body
+ERROR: Import kind mismatch
+
+TITLE: import error - ambiguous name requires kind annotation
+IN:
+ <!yatt:import [dup]="dup.ytmpl">
+ body
+ERROR: Ambiguous import
+
+TITLE: import error - conflict with local part
+IN:
+ <!yatt:import [confirm]="form.ytmpl">
+ body
+ 
+ <!yatt:widget confirm>
+ local confirm
+ERROR: Conflicting part name

@@ -61,11 +61,11 @@ my $test_widget_lineno = sub {
   foreach my $test (@test) {
     my ($name, $region, %call) = @$test;
     my $part = $yatt->find_part('index', $name);
-    is $part->{cf_startln}, $region->[0]
+    is $part->{startln}, $region->[0]
       , "$THEME widget '$name' startln == $region->[0]";
-    is $part->{cf_endln}, $region->[1]
+    is $part->{endln}, $region->[1]
       , "$THEME widget '$name' endln == $region->[1]";
-    foreach my $tok (@{$part->{tree}}) {
+    foreach my $tok (@{$part->{_tree}}) {
       next unless ref $tok and $tok->[NODE_TYPE] == TYPE_ELEMENT;
       my $callpath = join ":", @{$tok->[NODE_PATH]};
       is $tok->[NODE_LNO], $call{$callpath}
@@ -167,7 +167,7 @@ END
     my $part = $yatt->find_part('index', $name);
     foreach my $arginfo (@args) {
       my ($arg, $lineno) = @$arginfo;
-      is $part->{arg_dict}{$arg}->lineno, $lineno, "$THEME arg $arg";
+      is $part->{_arg_dict}{$arg}->lineno, $lineno, "$THEME arg $arg";
     }
   }
   run_list($THEME, \@list, $pkg, render_ => 'myx', 'myY');
@@ -224,7 +224,7 @@ hoehoe
 </div>
 END
 
-  is $yatt->find_part($SUB, 'bar')->{cf_startln}, 10, "$THEME-$SUB. bar lineno";
+  is $yatt->find_part($SUB, 'bar')->{startln}, 10, "$THEME-$SUB. bar lineno";
 
   my $pkg = $yatt->find_product(perl => $tmpl);
   run_list($THEME, \@list, $pkg, render_ => 'foo', 'bar');
@@ -283,7 +283,7 @@ BODY<!--3-->
 </body>
 END
 
-  is $yatt->find_part($SUB, $THEME)->{cf_startln}, 11
+  is $yatt->find_part($SUB, $THEME)->{startln}, 11
      , "$THEME-$SUB. lineno";
 
   $yatt->ensure_parsed($yatt->find_part($SUB, ''));
@@ -327,7 +327,7 @@ BODY
 </body>
 END
 
-  is $yatt->find_part($SUB, $THEME)->{cf_startln}, 15
+  is $yatt->find_part($SUB, $THEME)->{startln}, 15
      , "$THEME-$SUB. lineno";
 
   $yatt->ensure_parsed($yatt->find_part($SUB, ''));
@@ -362,5 +362,27 @@ END
   my $pkg = $yatt->find_product(perl => $tmpl);
   run_list($THEME, \@list, $pkg, render_ => ([["FOO"]]));
 }
+
+$i = 10;
+{
+  my $THEME = "suppressed implicit";
+  my $yatt = new YATT::Lite(app_ns => myapp($i), vfs => [data => {}], @OPT);
+  my $SUB = 'index';
+  ok(my $tmpl = $yatt->add_to($SUB => inject <<'END', \ my @list), "$THEME - add_to $SUB");
+<!yatt:base>
+
+<!yatt:widget foo>
+foo
+<!yatt:args>
+<!--6-->
+END
+
+
+  $yatt->ensure_parsed($yatt->find_part($SUB, ''));
+
+  my $pkg = $yatt->find_product(perl => $tmpl);
+  run_list($THEME, \@list, $pkg, render_ => ([["FOO"]]));
+}
+
 
 done_testing();

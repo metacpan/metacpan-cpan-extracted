@@ -20,7 +20,7 @@ mcp-k8s - MCP Server for Kubernetes with RBAC-aware dynamic tools
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ L<Kubernetes::REST::Kubeconfig> — How kubeconfig is parsed
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-mcp-k8s/issues>.
 
 =head1 CONTRIBUTING
@@ -170,5 +170,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

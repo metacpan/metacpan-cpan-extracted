@@ -56,7 +56,7 @@ sub run_form {
    my $status = AnyEvent::Util::run_cmd (
       [$^X, "-Ilib", "-MPOSIX", "-e",
          'defined POSIX::setsid () or die $!; do shift @ARGV; die $@ if $@;',
-         "bin/anyevent-mcp-form-elicitation", @options],
+         "./bin/anyevent-mcp-form-elicitation", @options],
       "<" => \(JSON::XS::encode_json $params), ">" => \$output, "2>" => \$error,
    )->recv;
    ($status, length $output ? JSON::XS::decode_json ($output) : undef, $error)

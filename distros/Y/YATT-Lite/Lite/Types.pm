@@ -11,14 +11,14 @@ sub Desc () {'YATT::Lite::Types::TypeDesc'}
   use parent qw(YATT::Lite::Object);
   BEGIN {
     our %FIELDS = map {$_ => 1}
-      qw/cf_name cf_ns cf_fields cf_overloads cf_alias cf_base cf_eval
-	 fullname
-	 cf_no_require
-	 cf_constants cf_export_default/
+      qw/name ns fields overloads alias base eval
+	 _fullname
+	 no_require
+	 constants export_default/
   }
   sub pkg {
     my Desc $self = shift;
-    join '::', $self->{cf_ns}, $self->{cf_name};
+    join '::', $self->{ns}, $self->{name};
   }
 }
 
@@ -47,24 +47,24 @@ sub buildns {
   my $debug = $ENV{DEBUG_YATT_TYPES};
   my (@script, @task);
   my $export_ok = do {
-    my $sym = globref($$root{cf_ns}, 'EXPORT_OK');
+    my $sym = globref($$root{ns}, 'EXPORT_OK');
     *{$sym}{ARRAY} // (*$sym = []);
   };
-  if (my $sub = $$root{cf_ns}->can('export_ok')) {
-    push @$export_ok, $sub->($$root{cf_ns});
+  if (my $sub = $$root{ns}->can('export_ok')) {
+    push @$export_ok, $sub->($$root{ns});
   }
   {
-    my $sym = globref($$root{cf_ns}, 'export_ok');
+    my $sym = globref($$root{ns}, 'export_ok');
     *$sym = sub { @$export_ok } unless *{$sym}{CODE};
   }
   foreach my Desc $obj (@desc) {
-    push @$export_ok, $obj->{cf_name};
-    $obj->{fullname} = join '::', $$root{cf_ns}, $obj->{cf_name};
-    $INC{pkg2pm($obj->{fullname})} = 1; # To make require happy.
-    push @script, qq|package $obj->{fullname};|;
+    push @$export_ok, $obj->{name};
+    $obj->{_fullname} = join '::', $$root{ns}, $obj->{name};
+    $INC{pkg2pm($obj->{_fullname})} = 1; # To make require happy.
+    push @script, qq|package $obj->{_fullname};|;
     push @script, q|use YATT::Lite::Inc;|;
-    my $base = $obj->{cf_base} || $root->{cf_base}
-      || safe_invoke($$root{cf_ns}, $obj->{cf_name})
+    my $base = $obj->{base} || $root->{base}
+      || safe_invoke($$root{ns}, $obj->{name})
 	|| 'YATT::Lite::Object';
     #
     # I finally found base::has_fields() is broken
@@ -72,25 +72,25 @@ sub buildns {
     #
     push @script, sprintf q|use parent qw(%s);|, $base;
     push @script, sprintf q|use YATT::Lite::MFields %s;|, do {
-      if ($obj->{cf_fields}) {
-	sprintf(q|qw(%s)|, join " ", @{$obj->{cf_fields}});
+      if ($obj->{fields}) {
+	sprintf(q|qw(%s)|, join " ", @{$obj->{fields}});
       } else {
 	# To avoid generating 'use YATT::Lite::MFields qw()';
 	'';
       }
     };
     push @script, sprintf q|use overload qw(%s);|
-      , join " ", @{$obj->{cf_overloads}} if $obj->{cf_overloads};
-    push @script, $obj->{cf_eval} if $obj->{cf_eval};
+      , join " ", @{$obj->{overloads}} if $obj->{overloads};
+    push @script, $obj->{eval} if $obj->{eval};
     push @script, "\n";
 
-    push @task, [\&add_alias, $$root{cf_ns}, $obj->{cf_name}, $obj->{cf_name}];
-    foreach my $alias (lexpand($obj->{cf_alias})) {
-      push @task, [\&add_alias, $$root{cf_ns}, $alias, $obj->{cf_name}];
+    push @task, [\&add_alias, $$root{ns}, $obj->{name}, $obj->{name}];
+    foreach my $alias (lexpand($obj->{alias})) {
+      push @task, [\&add_alias, $$root{ns}, $alias, $obj->{name}];
       push @$export_ok, $alias;
     }
-    foreach my $spec (lexpand($obj->{cf_constants})) {
-      push @task, [\&add_const, $obj->{fullname}, @$spec];
+    foreach my $spec (lexpand($obj->{constants})) {
+      push @task, [\&add_const, $obj->{_fullname}, @$spec];
     }
   }
   my $script = join(" ", @script, "; 1");
@@ -100,21 +100,21 @@ sub buildns {
     my ($sub, @args) = @$task;
     $sub->(@args);
   }
-  if ($root->{cf_export_default}) {
+  if ($root->{export_default}) {
     my $export = do {
-      my $sym = globref($$root{cf_ns}, 'EXPORT');
+      my $sym = globref($$root{ns}, 'EXPORT');
       *{$sym}{ARRAY} // (*$sym = []);
     };
     @$export = @$export_ok;
   }
   foreach my Desc $obj (@desc) {
-    my $sym = look_for_globref($obj->{fullname}, 'FIELDS');
+    my $sym = look_for_globref($obj->{_fullname}, 'FIELDS');
     if ($sym and my $fields = *{$sym}{HASH}) {
-      print "Fields in type $obj->{fullname}: "
+      print "Fields in type $obj->{_fullname}: "
 	, join(" ", sort keys %$fields), "\n" if $debug;
-    } elsif ($obj->{cf_fields}) {
-      croak "Failed to define type fields for '$obj->{fullname}': "
-	. join(" ", @{$obj->{cf_fields}});
+    } elsif ($obj->{fields}) {
+      croak "Failed to define type fields for '$obj->{_fullname}': "
+	. join(" ", @{$obj->{fields}});
     }
   }
 }
@@ -143,9 +143,9 @@ sub parse_desc {
     unless (defined (my $item = shift)) {
       croak "Undefined type desc!";
     } elsif (ref $item) {
-      my @base = (base => $parent->pkg) if $parent->{cf_name};
+      my @base = (base => $parent->pkg) if $parent->{name};
       push @desc, my Desc $sub = $pack->Desc->new
-	(name => shift @$item, ns => $parent->{cf_ns}, @base);
+	(name => shift @$item, ns => $parent->{ns}, @base);
       push @desc, $pack->parse_desc($sub, @$item);
     } elsif (@_) {
       $item =~ s/^-//;

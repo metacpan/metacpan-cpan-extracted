@@ -187,3 +187,19 @@ IN:
  bar is 2.
  </yatt:if>
 ERROR: Unknown option for <yatt:if>: elsif
+
+
+TITLE: code var is not for if condition
+IN:
+ <!yatt:widget foo body=[code]>
+ <yatt:if "&yatt:body();">yes</yatt:if>
+ERROR: Syntax error, not allowed here:
+
+
+TITLE: code var is not for else if condition
+IN:
+ <!yatt:widget foo body=[code]>
+ <yatt:if "0">no
+ <:yatt:else if="&yatt:body();"/>
+ yes</yatt:if>
+ERROR: Syntax error, not allowed here:

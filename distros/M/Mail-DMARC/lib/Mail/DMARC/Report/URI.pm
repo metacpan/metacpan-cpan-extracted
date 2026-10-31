@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-our $VERSION = '2.20260827';
+our $VERSION = '2.20261030';
 
 use Carp;
 use URI;
@@ -20,6 +20,9 @@ sub parse( $self, $str = undef ) {
 
         #       warn "raw: $raw\n";
         my ( $u, $size_f ) = split /!/, $raw;
+
+        # #39: a bare address is a common slip for a mailto: URI
+        $u = "mailto:$u" if $u =~ m{^[^:/@]+@[^:/@]+$};
         my $bytes = $self->get_size_limit($size_f);
         my $uri   = URI->new($u) or do {
             carp "can't parse URI from $u";
@@ -68,7 +71,7 @@ Mail::DMARC::Report::URI - a DMARC report URI
 
 =head1 VERSION
 
-version 2.20260827
+version 2.20261030
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : 
  *
- * $Id: perfos.c,v 1.13 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -19,13 +19,16 @@
 
 #include "perfos.h"
 #include "List.h"
-#include "Types.h"
 
 #include <X11/Xutil.h>
 
+#include <stdio.h>
+#include <math.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/times.h>
 
-static const char rcsid[] = "$Id: perfos.c,v 1.13 2005/04/27 07:32:03 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
+
 
 
 static ZnList   Chronos = NULL;

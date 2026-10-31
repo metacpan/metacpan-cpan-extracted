@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Fri Dec 31 10:03:34 1999
  *
- * $Id: Attrs.c,v 1.14 2005/10/18 09:32:23 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -22,13 +22,15 @@
 #include "Geo.h"
 #include "WidgetInfo.h"
 
-#include <GL/glu.h>
+#if defined(MAC_OSX_TK)
+  #include <AGL/glu.h>
+#else
+  #include <GL/glu.h>
+#endif
 #include <memory.h>
 #include <stdlib.h>
 
 
-static const char rcsid[] = "$Id: Attrs.c,v 1.14 2005/10/18 09:32:23 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -104,7 +106,7 @@ ZnGetRelief(ZnWInfo             *wi,
                      RELIEF_ROUND_RIDGE_SPEC, ", ",
                      RELIEF_SUNKEN_RULE_SPEC, ", ",
                      RELIEF_RAISED_RULE_SPEC,
-                     NULL);
+                     (char *) NULL);
     return TCL_ERROR;
   }
   if (!wi->render) {
@@ -166,7 +168,8 @@ ZnGetBorder(ZnWInfo     *wi,
             Tcl_Obj     *name,
             ZnBorder    *border)
 {
-  unsigned int j, len, largc;
+  unsigned int j, len;
+  int          largc;
   Tcl_Obj      **largv;
   char         *str;
 
@@ -184,7 +187,7 @@ ZnGetBorder(ZnWInfo     *wi,
                      BORDER_OBLIQUE_SPEC, " or ",
                      BORDER_CONTOUR_SPEC, ", ",
                      NO_BORDER_SPEC, " alone",
-                     NULL);
+                     (char *) NULL);
     return TCL_ERROR;
   }
   for (j = 0; j < largc; j++) {
@@ -327,7 +330,7 @@ ZnGetLineShape(ZnWInfo          *wi,
                      LEFT_CORNER_SPEC, ", ",
                      DOUBLE_RIGHT_CORNER_SPEC, ", ",
                      DOUBLE_LEFT_CORNER_SPEC,
-                     NULL);
+                     (char *) NULL);
     return TCL_ERROR;
   }
   return TCL_OK;
@@ -390,7 +393,7 @@ ZnGetLineStyle(ZnWInfo          *wi,
                      DASHED_SPEC, ", ",
                      DOTTED_SPEC, ", ",
                      MIXED_SPEC,
-                     NULL);
+                     (char *) NULL);
     return TCL_ERROR;         
   }
   return TCL_OK;
@@ -452,7 +455,7 @@ ZnGetLeaderAnchors(ZnWInfo              *wi,
       if (num_tok != 1) {
       la_error:
         Tcl_AppendResult(wi->interp, " incorrect leader anchors \"",
-                         name, "\"", NULL);
+                         name, "\"", (char *) NULL);
         return TCL_ERROR;
       }
       anchors[anchor_index+1] = -1;
@@ -641,7 +644,7 @@ ZnLFCreate(Tcl_Interp   *interp,
     }
     else {
       Tcl_AppendResult(interp, "too many fields in label format: \"",
-                       format_str, "\"", NULL);
+                       format_str, "\"", (char *) NULL);
       return NULL;
     }
   }
@@ -663,7 +666,7 @@ ZnLFCreate(Tcl_Interp   *interp,
     if ((ptr == next_ptr) || (*next_ptr != 'x')) {
     lf_error_syn:
       Tcl_AppendResult(interp, "invalid label format specification \"",
-                       ptr, "\"", NULL);
+                       ptr, "\"", (char *) NULL);
     lf_error:
       Tcl_DeleteHashEntry(entry);
       ZnListFree(fields);
@@ -734,12 +737,12 @@ ZnLFCreate(Tcl_Interp   *interp,
     else if (!*ptr || (field_index != 0)) {
       /* An incomplete field spec is an error if there are several fields. */
       Tcl_AppendResult(interp, "incomplete field in label format: \"",
-                       ptr-index, "\"", NULL);
+                       ptr-index, "\"", (char *) NULL);
       goto lf_error;            
     }
     if (field_index >= num_fields) {
       Tcl_AppendResult(interp, "too many fields in label format: \"",
-                       format_str, "\"", NULL);
+                       format_str, "\"", (char *) NULL);
       goto lf_error;
     }
     field_struct.width_spec = (short) width;
@@ -928,7 +931,7 @@ ZnLineEndCreate(Tcl_Interp      *interp,
   }
   else {
     Tcl_AppendResult(interp, "incorrect line end spec: \"",
-                     line_end_str, "\", should be: shapeA shapeB shapeC", NULL);
+                     line_end_str, "\", should be: shapeA shapeB shapeC", (char *) NULL);
     return NULL;
   }
 }
@@ -1004,7 +1007,7 @@ ZnGetFillRule(ZnWInfo    *wi,
                      FILL_RULE_POSITIVE_SPEC, ", ",
                      FILL_RULE_NEGATIVE_SPEC, ", ",
                      FILL_RULE_ABS_GEQ_2_SPEC,
-                     NULL);
+                     (char *) NULL);
     return TCL_ERROR;
   }
   return TCL_OK;
@@ -1071,7 +1074,7 @@ ZnGetAutoAlign(ZnWInfo          *wi,
   else {
   aa_error:
     Tcl_AppendResult(wi->interp, "invalid auto alignment specification \"", name,
-                     "\" should be - or a triple of lcr", NULL);
+                     "\" should be - or a triple of lcr", (char *) NULL);
     return TCL_ERROR;
   }
   return TCL_OK;

@@ -1,0 +1,139 @@
+#!/bin/env perl
+########################################################################
+# Call FindBin::libs twice -- once with abspath, once with noabspath --
+# to collect lib dirs from both the physical and logical trees.
+# The two arrays are identical when no symlinks appear in the path;
+# they diverge when the script is invoked through a directory symlink.
+# See POD for the symlink scenario and practical use cases.
+########################################################################
+
+use strict;
+use warnings;
+use feature 'say';
+
+use FindBin::Bin
+qw
+(
+    $Bin_l
+    $Bin_p
+);
+
+# abspath   (default): walks from $Bin_p -- physical path, symlinks resolved.
+# noabspath          : walks from $Bin_l -- logical path,  symlinks preserved.
+# Each call exports into its own array; neither clobbers the other.
+
+use FindBin::libs qw( abspath   export=remote );
+use FindBin::libs qw( noabspath export=local  );
+
+say "physical bin (\$Bin_p, abspath):   $Bin_p";
+say "logical  bin (\$Bin_l, noabspath): $Bin_l";
+say '';
+
+if( $Bin_l eq $Bin_p )
+{
+    say 'No symlinks in path -- @remote and @local are identical.';
+    say '';
+}
+else
+{
+    say 'Symlinks in path -- @remote and @local may differ.';
+    say '';
+}
+
+say '@remote (abspath walk from $Bin_p):';
+
+if( @remote )
+{
+    say "  $_" for @remote;
+}
+else
+{
+    say '  (none found)';
+}
+
+say '';
+say '@local (noabspath walk from $Bin_l):';
+
+if( @local )
+{
+    say "  $_" for @local;
+}
+else
+{
+    say '  (none found)';
+}
+
+=head1 NAME
+
+dual_lib_paths - collect lib dirs from both the physical and logical trees
+
+=head1 SYNOPSIS
+
+    dual_lib_paths
+
+=head1 DESCRIPTION
+
+Calls L<FindBin::libs> twice with different arguments to export two
+independent arrays of C<lib> directories:
+
+    use FindBin::libs qw( abspath   export=remote );
+    use FindBin::libs qw( noabspath export=local  );
+
+C<@remote> holds the directories found walking up from C<$Bin_p> (the
+physical path, symlinks resolved).  C<@local> holds the directories
+found walking up from C<$Bin_l> (the logical path, symlinks preserved).
+
+When no symlinks appear in the path, both arrays are identical.  They
+differ when the script is invoked through a directory symlink.
+
+=head2 Symlink scenario
+
+Consider a layout where C</home/user/app> is a directory symlink pointing
+to the real source tree under C</work/projects/app>:
+
+    /home/user/                       # logical subtree (sandbox)
+    +-- lib/
+    |   \-- Override.pm               # alternate version for testing
+    \-- app -> /work/projects/app     # directory symlink
+
+    /work/projects/                   # physical subtree (production)
+    +-- lib/
+    |   \-- Production.pm             # stable version
+    \-- app/
+        \-- bin/
+            \-- myscript              # $0
+
+Invoked as C</home/user/app/bin/myscript>:
+
+    $Bin_p = /work/projects/app/bin   # symlink resolved
+    $Bin_l = /home/user/app/bin       # symlink preserved
+
+    @remote  =>  ( '/work/projects/lib' )   # finds Production.pm
+    @local   =>  ( '/home/user/lib'     )   # finds Override.pm
+
+=head2 Choosing which dirs to use lib
+
+Export alone does not call C<use lib>.  To add both sets to C<@INC>:
+
+    use FindBin::libs qw( abspath   use export=remote );
+    use FindBin::libs qw( noabspath use export=local  );
+
+To load only the local (sandbox) tree, use C<@local> after the fact:
+
+    use lib @local;
+
+To prefer local overrides but fall back to remote, put local first:
+
+    use lib @local, @remote;
+
+=head2 Identical results without symlinks
+
+On a filesystem with no directory symlinks in the path, C<$Bin_l eq $Bin_p>
+and both walks produce the same list.  Keeping both calls is harmless in
+that case; C<@remote> and C<@local> simply hold the same paths.
+
+=head1 SEE ALSO
+
+L<FindBin::Bin>, L<FindBin::libs>, L<FindBin::Parents>
+
+=cut

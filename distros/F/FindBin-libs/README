@@ -1,4 +1,10 @@
 
+You can find the source at:
+
+https://gitlab.com/lembark/findbin-libs
+
+This may be the simplest way to view the examples also.
+
 This should work anyplace File::Spec can split directories, which 
 should be anywhere Perl runs.
 
@@ -6,14 +12,8 @@ This may not do much good on Windows: the crazy directory structure
 common to Windows systems do not seem very amenable to using 
 $FindBin::Bin as the starting point for locating libraries.
 
-Anyone with access to VMS warn me if this works at all -- through 
-judicious use of virtual devices should make it useful.
-
-The pod describes using the module in a few situations, any 
-suggestions appreciated. In particular, I toyed with several ways of 
-passing in switches. The one used here was chosen because it supports 
-qw( ... ) syntax with optional parameters (e.g., qw(export) and 
-qw(export=foo)).
+Anyone with access to VMS should find this working, quite useful 
+with virtual devices for associating file trees in development.
 
 Note that the lookup can be for any basename, not just a directory.
 This makes the module useful for finding config files, named pipes,

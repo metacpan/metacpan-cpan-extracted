@@ -260,7 +260,36 @@ B<git clone するだけ> でそのまま使用できます。
 
 =head3 Command Line util
 
-XXX: To be written about: F<./lib/YATT/scripts/yatt>
+F<./lib/YATT/scripts/> 以下にコマンドラインツールがあります。
+F<yatt> はサブコマンドドライバで、C<yatt render> のように
+F<yatt.*> スクリプト群を起動します。主なもの:
+
+=over 4
+
+=item F<yatt.render> I<FILE> [I<name=value>..]
+
+テンプレートファイルを 1 つレンダリングして標準出力へ出します。
+part 解決・sigil・public チェックは Web 経由と同一で、
+テンプレート内のエラーは素の die として伝播します
+(C<perl -d> でそのままデバッグできます)。
+
+=item F<yatt.lint> [C<--tap>] [C<--all>] I<FILE>..
+
+テンプレートをコンパイルして構文・生成コードの誤りを
+C<FILE:LINE: MESSAGE> 形式で報告します。実体は language server と
+同じ L<YATT::Lite::Inspector> の lint です。
+
+=item F<yatt.genperl> [C<--all>] I<FILE>..
+
+テンプレートから生成される Perl コードを出力します
+(トランスパイラのオフライン入口)。C<--all> で依存テンプレートの
+生成コードも出力します。
+
+=back
+
+これらの本体は L<YATT::Lite::Site> の公開 API の上に
+C<YATT::Lite::CLI::*> モジュールとして実装されており、
+プロセス起動なしにテスト・再利用できます。
 
 =head3 Emacs Lisp
 

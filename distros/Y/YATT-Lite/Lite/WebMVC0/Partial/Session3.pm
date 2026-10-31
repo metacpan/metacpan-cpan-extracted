@@ -27,12 +27,12 @@ use YATT::Lite::Partial
 		  /]
    , fields => [qw/
                     _session_middleware
-                    cf_session_middleware_class
-                    cf_session_state
-                    cf_session_store
-                    cf_session_serializer
+                    session_middleware_class
+                    session_state
+                    session_store
+                    session_serializer
                     _session
-                    cf_session_cookie_option
+                    session_cookie_option
                     _session_in_request
 		  /]
    , -Entity, -CON
@@ -81,13 +81,13 @@ sub prepare_app {
   dputs('START') if DEBUG >= 3;
 
   my $sef = Session::ExpiryFriendly->new(
-        ($self->{cf_session_state}
-            ? (state => $self->create_session_backend(state => $self->{cf_session_state})) : ()),
-        ($self->{cf_session_store}
-            ? (store => $self->create_session_backend(store => $self->{cf_session_store})) : ()),
+        ($self->{session_state}
+            ? (state => $self->create_session_backend(state => $self->{session_state})) : ()),
+        ($self->{session_store}
+            ? (store => $self->create_session_backend(store => $self->{session_store})) : ()),
   );
 
-    if ( my $opt = $self->{cf_session_cookie_option} ) {
+    if ( my $opt = $self->{session_cookie_option} ) {
         for my $attr (qw(session_key path domain expires secure httponly)) {
             $sef->state->$attr($opt->{$attr}) if exists $opt->{$attr};
         }
@@ -96,7 +96,7 @@ sub prepare_app {
   $self->{_session} = $sef;
 
   my $mw = $self->{_session_middleware} = do {
-    my $class = $self->{cf_session_middleware_class}
+    my $class = $self->{session_middleware_class}
       || $self->default_session_middleware_class;
 
     $class->new({app => sub {[200, [], []]}, session => $sef});

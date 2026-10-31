@@ -203,6 +203,12 @@ $child->recv;
 is $stdout, "", "reverse server does not emit protocol on stdout";
 
 File::Path::mkpath ("$dir/config/anyevent-mcp/rules", 0, 0700);
+SKIP: {
+skip "WebSocket modules not installed", 2 unless eval {
+   require AnyEvent::WebSocket::Server;
+   require AnyEvent::WebSocket::Message;
+   1
+};
 open my $rules, ">", "$dir/config/anyevent-mcp/rules/webbrowser-default.ini" or die $!;
 print {$rules} "[rule]\ndecision=allow\naction=read\nsandbox-grants=\n";
 close $rules or die $!;
@@ -217,6 +223,7 @@ ok $success && !@{$result->{structuredContent}{tabs}},
 kill TERM => $pid;
 $child->recv;
 unlike $stderr, qr/EV: error|already finished|Can't call/, "reverse browser shutdown has no callback errors";
+}
 
 $downstream->close;
 $web->close;

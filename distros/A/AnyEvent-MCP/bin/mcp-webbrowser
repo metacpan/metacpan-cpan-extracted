@@ -187,18 +187,47 @@ elements a distinctive C<id> or C<data-*> attribute when later page-context
 C<execute> calls need to modify or remove them. Uses C<exec> permission and
 supports the same optional C<instance_id> and C<revision> guards as C<execute>.
 
+=item list-tab-operations
+
+Ask the connected tab for additional operations it supports. Returns
+C<{operations: [...]}> with operation descriptions and input schemas, or an
+empty array if none are available. Unlike MCP tools, these are discovered
+per tab and are not registered with the broker. Requires C<read> permission.
+Supports optional C<instance_id> and C<revision> guards.
+
+=item call-tab-operation
+
+Call a tab-specific operation previously discovered with
+C<list-tab-operations>. Supply C<target>, C<operation> and optional
+C<arguments>. The browser implements and authorizes the operation; the
+broker does not interpret its name or arguments. Returns C<{value: ...}> or
+a tool error. Requires C<exec> permission, and supports the same document
+guards, timeout and result-size options as C<execute>.
+
 =back
 
 =head1 PERMISSIONS
 
 The default rule file is C<~/.config/anyevent-mcp/rules/webbrowser-default.ini>,
 under C<$XDG_CONFIG_HOME> when set. C<--name NAME> replaces C<default>.
-C<read> covers tab discovery; C<exec> covers arbitrary JavaScript.
+C<read> covers tab and operation discovery; C<exec> covers arbitrary JavaScript
+and tab-operation calls. A userscript or extension may apply additional
+permissions for individual operations.
 
-Exec prompts offer this exact code in this target, any code in this target,
-or any code in all targets. Saved target grants also cover future tabs using
-the same target name. Client-reported URLs and titles are display information,
-not verified origin identities or saved permission scopes.
+JavaScript exec prompts offer this exact code in this target, any code in
+this target, or any code in all targets. Operation exec prompts offer
+corresponding scopes for browser operations. Independently, each exec request
+offers this origin, the same scheme and host on any port, or any origin.
+Only HTTP(S) origins offer persistent scopes: opaque origins such as C<null>
+cannot distinguish different documents, so they allow one-time decisions only.
+Saved target grants also cover future tabs using the same target name.
+Saved rules use C<match.subject> and C<match.origin> as independent fields.
+Rules without C<match.origin> match all origins, as do broad C<--auto-allow>
+overrides. The broker derives origins from the URL already reported by the
+userscript on connect, state changes and navigation, including older clients.
+For HTTP(S), credentials and the path/query/fragment are excluded.
+Origin identity relies on the connected userscript's reported URL, not on
+independently authenticating the page's location.
 C<--ask> selects the same helper, tty, yad, mcp or auto modes as other servers.
 
 =head1 OPTIONS
@@ -224,11 +253,14 @@ auto prefers native elicitation when offered. See L</PERMISSIONS>.
 WebSocket authentication happens at C</TOKEN/TARGET>. C<TARGET> is one
 percent-encoded path component. Before ordinary messages, send:
 
-   ["mcp-webbrowser", 1, 0, INSTANCE_ID, {"url": URL, "title": TITLE}]
+   ["mcp-webbrowser", 1, 1, INSTANCE_ID, {"url": URL, "title": TITLE}]
 
 C<INSTANCE_ID> identifies one loaded document. Keep it across reconnects of that
 document and change it on navigation/reload. The private browser protocol is
-1.0, independent of MCP and the old xpcse browser-transfer protocol.
+1.1, independent of MCP and the old xpcse browser-transfer protocol. Compatible
+older/newer minor versions can connect. Version 1.0 clients support page
+execution but not additional tab operations; discovery returns an empty list
+and unsupported calls fail without disconnecting the browser.
 The broker answers C<["welcome", TARGET, INSTANCE_ID, REVISION]>.
 The requested target represents a browser tab: a different document with the
 same target replaces its previous connection and increments the revision.
@@ -250,6 +282,8 @@ Broker to browser:
    ["call", ID, "execute", {"code": CODE, "max_bytes": BYTES}]
    ["call", ID, "navigate", {"code": CODE, "max_bytes": BYTES}]
    ["call", ID, "add_element", {"tag": TAG, "parent": SELECTOR, "attributes": ATTRS, "properties": PROPS}]
+   ["call", ID, "list_tab_operations", {"max_bytes": BYTES}]
+   ["call", ID, "call_tab_operation", {"operation": NAME, "arguments": ARGS, "max_bytes": BYTES}]
    ["proceed", ID]
    ["cancel", ID]
 
@@ -267,6 +301,11 @@ Only C<proceed> starts evaluation. C<navigated> reports a completed
 same-document navigation; a different document's hello is the other
 completion path. C<reply> with C<false> can report an evaluation failure.
 Only JSON values cross the wire; undefined becomes null. Errors are strings.
+For C<list_tab_operations>, a successful reply is an array of operation
+descriptions; an empty array means no additional operations. The broker
+wraps it as C<{operations: [...]}>. C<call_tab_operation> uses the usual
+C<{value: ...}> reply. The distributed userscript currently offers no
+additional operations and returns an empty list or an operation error.
 Late replies after cancellation are ignored. State updates replace cached
 metadata. Malformed messages close the connection with status 1002.
 The initial hello has a 15-second deadline; a silent connection is closed.
@@ -322,7 +361,7 @@ my $permissions = AnyEvent::MCP::Server::Permissions->new (
    name => "webbrowser-$name",
    actions => {
       read => "List connected browser tabs and their reported metadata",
-      exec => "Execute arbitrary JavaScript in a connected browser page",
+      exec => "Execute JavaScript or tab operations in a connected browser page",
    },
    (defined $ask ? (ask => $ask) : ()),
    auto_rules => [@{$options->{auto_rules} || []},
@@ -335,15 +374,15 @@ sub page_label {
    my ($title, $url) = @{$state}{qw(title url)};
    s/[\x00-\x1f\x7f]/ /g for $title, $url;
 
-   (length $title ? substr ($title, 0, 80) . " - " : "")
-      . substr ($url, 0, 160)
+   (length $title ? (substr $title, 0, 80) . " - " : "")
+      . (substr $url, 0, 160)
 }
 
 sub code_preview {
    my ($code, $limit) = @_;
 
    $limit //= 160;
-   my $short = substr ($code, 0, $limit);
+   my $short = substr $code, 0, $limit;
    $short .= "..." if length $code > $limit;
    $json->encode ($short)
 }
@@ -354,38 +393,81 @@ sub url_preview {
    $url =~ s/[?#].*//s;
    $url =~ s{(://)[^/]*@}{$1};
    $url =~ s/[\x00-\x1f\x7f]/ /g;
-   my $short = substr ($url, 0, 64);
+   my $short = substr $url, 0, 64;
    $short .= "..." if length $url > 64;
    $json->encode ($short)
 }
 
+sub browser_origin {
+   my ($scheme, $authority) = $_[0] =~ m{\A(https?://)([^/?#]+)};
+   return "null" unless defined $authority;
+   $authority =~ s/.*@//;
+   $scheme . $authority
+}
+
+sub browser_state {
+   my ($state) = @_;
+   +{ %$state, origin => browser_origin ($state->{url}) }
+}
+
 sub permission {
-   my ($req, $action, $target, $code) = @_;
+   my ($req, $action, $target, $code, $kind) = @_;
 
    my $subject = "tabs";
-   my @subjects = ({ label => "the list of connected browser tabs", subject => $subject });
+   my @subjects = ({ label => "the list of connected browser tabs", match => $subject });
+   my ($origin, @origins);
 
    if (defined $target) {
-      my $label = $target;
-      if (my $page = $pages{$target}) {
-         $label = page_label ($page->{state}) . " (tab " . substr ($target, 0, 8) . ")";
-      }
+      my $page = $pages{$target} or die "Browser page is not connected\n";
+      my $label = (page_label $page->{state}) . " (tab " . (substr $target, 0, 8) . ")";
 
       my $coder = JSON::XS->new->allow_nonref;
-      my $prefix = "execute:" . $coder->encode ($target) . ":";
+      my $operation = defined $kind && $kind eq "operation";
+      my $prefix = ($operation ? "operation:" : "execute:") . $coder->encode ($target) . ":";
       $subject = $prefix . $coder->encode ($code);
       @subjects = (
-         { label => "this exact code in page '$label'", subject => $subject },
-         { label => "any JavaScript in page '$label'", subject => "^" . (quotemeta $prefix) },
-         { label => "any JavaScript in all browser tabs, including future connections", subject => "^" },
+         {
+            label   => ($operation ? "this exact operation" : "this exact code") . " in page '$label'",
+            match => $subject,
+         },
+         {
+            label   => ($operation ? "any operation" : "any JavaScript") . " in page '$label'",
+            match => "^" . (quotemeta $prefix),
+         },
+         {
+            label   => ($operation ? "any operation" : "any JavaScript")
+               . " in all browser tabs, including future connections",
+            match => "^" . (quotemeta ($operation ? "operation:" : "execute:")),
+         },
       );
       $target = $label;
+      $origin = $page->{state}{origin};
+      if ($origin =~ m{\Ahttps?://}) {
+         @origins = ({ label => "This origin ($origin)", match => $origin });
+         (my $host_origin = $origin) =~ s/:[0-9]+\z//;
+         push @origins, {
+            label  => "Same scheme and host, any port ($host_origin)",
+            match => "^" . (quotemeta $host_origin) . "(?::[0-9]+)?\\z",
+         };
+         push @origins, { label => "Any origin", match => "^" };
+      }
    }
 
    $req->require_permission ({
       tool => $req->{tool}, action => $action,
-      subject => $subject, subjects => \@subjects, sandbox_grants => [],
-      reason => defined $target ? "Execute JavaScript in '$target'\n\n$code" : "List connected browser tabs",
+      dimensions => {
+         subject => {
+            label => "Code / tab", value => $subject, choices => \@subjects,
+            (defined $target && !(defined $kind && $kind eq "operation")
+               ? (default => $subjects[1]{match}) : ()),
+         },
+         (defined $origin ? (origin => { label => "Origin", value => $origin, choices => \@origins }) : ()),
+      },
+      sandbox_grants => [],
+      reason => defined $target ? (defined $kind && $kind eq "operation"
+         ? "Call browser operation in '$target'\n\n$code"
+         : "Execute JavaScript in '$target'\n\n$code")
+         : "List connected browser tabs or tab operations",
    });
 }
 
@@ -402,7 +484,69 @@ sub finish_call {
    my $req = $entry->{request};
    return if $req->{finished};
 
-   $success ? $req->result ({ value => $value }) : $req->error ($value)
+   if ($success && $entry->{result_key} && $entry->{result_key} eq "operations" && ref $value ne "ARRAY") {
+      $req->error ("Browser operation list is not an array");
+   } elsif ($success) {
+      $req->result ({ ($entry->{result_key} || "value") => $value });
+   } else {
+      $req->error ($value);
+   }
+}
+
+sub tab_operation {
+   my ($req, $args, $method) = @_;
+
+   defined $args->{target} && !ref $args->{target} && length $args->{target}
+      or die "Invalid browser target\n";
+   my $list = $method eq "list_tab_operations";
+   unless ($list) {
+      defined $args->{operation} && !ref $args->{operation} && length $args->{operation}
+         or die "Invalid browser operation name\n";
+      !exists $args->{arguments} || ref $args->{arguments} eq "HASH"
+         or die "Browser operation arguments must be an object\n";
+   }
+
+   my $page = $pages{$args->{target}} or die "Browser page is not connected\n";
+   !defined $args->{instance_id} || $args->{instance_id} eq $page->{instance_id}
+      or die "Browser document instance changed\n";
+   !defined $args->{revision} || $args->{revision} == $page->{tab}{revision}
+      or die "Browser document revision changed (now $page->{tab}{revision})\n";
+   !$page->{tab}{navigation} or die "Navigation already in progress for this tab\n";
+
+   if ($list) {
+      permission $req, "read";
+   } else {
+      permission $req, exec => $args->{target},
+         $json->encode ({ operation => $args->{operation}, arguments => $args->{arguments} || {} }), "operation";
+   }
+   $pages{$args->{target}} && $pages{$args->{target}} == $page
+      or die "Browser document changed while permission was pending\n";
+
+   if ($page->{minor} < 1) {
+      $req->result ({ operations => [] }) if $list;
+      $req->error ("Browser tab operations require protocol 1.1") unless $list;
+      return;
+   }
+
+   my $id = ++$page->{rpcid};
+   my $entry = $page->{pending}{$id} = {
+      request => $req, result_key => $list ? "operations" : "value",
+   };
+   weaken (my $weak = $page);
+   $entry->{timer} = AE::timer $args->{timeout} // 30, 0, sub {
+      return unless $weak && exists $weak->{pending}{$id};
+      send_message $weak, ["cancel", $id*1];
+      finish_call $weak, $id, 0, "Browser tab operation timed out";
+   };
+   $req->{on_cancel} = sub {
+      return unless $weak && delete $weak->{pending}{$id};
+      send_message $weak, ["cancel", $id*1];
+   };
+   AE::log debug => "webbrowser $method " . $json->encode ($args->{target});
+   send_message $page, ["call", $id*1, $method, {
+      ($list ? () : (operation => $args->{operation}, arguments => $args->{arguments} || {})),
+      max_bytes => $args->{max_bytes} // 16 * 1024,
+   }];
 }
 
 sub finish_tab {
@@ -481,11 +625,13 @@ sub receive_message {
 
    unless (defined $page->{target}) {
       @$packet == 5 && $packet->[0] eq "mcp-webbrowser"
-         && defined $packet->[1] && !ref $packet->[1] && $packet->[1] eq "1"
-         && defined $packet->[2] && !ref $packet->[2] && $packet->[2] eq "0"
+         && defined $packet->[1] && !ref $packet->[1]
+         && defined $packet->[2] && !ref $packet->[2]
          && defined $packet->[3] && !ref $packet->[3] && length $packet->[3]
          && valid_state ($packet->[4])
          or die "Invalid browser hello\n";
+      $packet->[1] eq "1" && $packet->[2] =~ /\A(?:0|[1-9][0-9]*)\z/
+         or die "Unsupported browser protocol $packet->[1].$packet->[2] (server 1.1)\n";
 
       my $new = !exists $tabs{$page->{requested}};
       my $tab = $tabs{$page->{requested}} ||= {
@@ -497,7 +643,8 @@ sub receive_message {
 
       ++$tab->{revision} if $different;
       $tab->{instance_id} = $packet->[3];
-      @$page{qw(target instance_id state tab)} = ($page->{requested}, $packet->[3], $packet->[4], $tab);
+      @$page{qw(target instance_id minor state tab)} =
+         ($page->{requested}, $packet->[3], $packet->[2], browser_state ($packet->[4]), $tab);
       $tab->{page} = $page;
       delete $page->{hello_timer};
       $pages{$page->{target}} = $page;
@@ -549,12 +696,12 @@ sub receive_message {
       my $entry = $page->{tab}{navigation};
       if ($entry && $entry->{page} == $page && $entry->{id} == $packet->[1]
           && $entry->{phase} eq "proceed") {
-         $page->{state} = $packet->[2];
+         $page->{state} = browser_state ($packet->[2]);
          finish_navigation $page->{tab}, "same-document";
       }
    } elsif ($type eq "state") {
       @$packet == 2 && valid_state ($packet->[1]) or die "Invalid browser state\n";
-      $page->{state} = $packet->[1];
+      $page->{state} = browser_state ($packet->[1]);
    } elsif ($type eq "quit") {
       @$packet == 1 or die "Invalid browser quit\n";
       close_page $page, 1000, "Page disconnected";
@@ -603,8 +750,11 @@ sub accept_browser {
             1
          };
          unless ($ok) {
-            AE::log warn => "Browser protocol error: $@";
-            close_page $weak, 1002, "Invalid browser protocol";
+            my $reason = $@;
+            AE::log warn => "Browser protocol error: $reason";
+            $reason =~ s/\n.*//s;
+            $reason =~ s/[^\x20-\x7e]/?/g;
+            close_page $weak, 1002, substr $reason, 0, 123;
          }
       });
       $page->{hello_timer} = AE::timer 15, 0, sub {
@@ -690,7 +840,10 @@ $toolset->tool (execute => "Page JS: CODE becomes body of async () => CODE; supp
             send_message $page, ["cancel", $id*1] if $tab->{page} && $tab->{page} == $page;
             expire_tab $tab unless $tab->{page};
          };
-         send_message $page, ["call", $id*1, "navigate", { code => $args->{code}, max_bytes => $args->{max_bytes} // 16 * 1024 }];
+         send_message $page, ["call", $id*1, "navigate", {
+            code      => $args->{code},
+            max_bytes => $args->{max_bytes} // 16 * 1024,
+         }];
          return;
       }
 
@@ -706,7 +859,10 @@ $toolset->tool (execute => "Page JS: CODE becomes body of async () => CODE; supp
          send_message $weak, ["cancel", $id*1];
       };
       AE::log trace => "webbrowser execute $args->{target} #$id: " . code_preview ($args->{code});
-      send_message $page, ["call", $id*1, "execute", { code => $args->{code}, max_bytes => $args->{max_bytes} // 16 * 1024 }];
+      send_message $page, ["call", $id*1, "execute", {
+         code      => $args->{code},
+         max_bytes => $args->{max_bytes} // 16 * 1024,
+      }];
    },
 );
 $toolset->tool (add_element => "Insert DOM element via userscript GM_addElement; style/script bypass page CSP. "
@@ -759,6 +915,39 @@ $toolset->tool (add_element => "Insert DOM element via userscript GM_addElement;
    },
 );
 
+$toolset->tool (list_tab_operations =>
+   "List additional operations offered by a connected tab. Returns {operations: [...]} with descriptions and argument schemas; empty if none. Requires read permission.",
+   {
+      type => "object",
+      properties => {
+         target => { type => "string", minLength => 1 },
+         instance_id => { type => "string", minLength => 1 },
+         revision => { type => "integer", minimum => 1 },
+         timeout => { type => "number", minimum => 1, maximum => 300, default => 30 },
+         max_bytes => { type => "integer", minimum => 1024, maximum => 2 * 1024 * 1024, default => 16 * 1024 },
+      },
+      required => ["target"], additionalProperties => JSON::XS::false,
+   },
+   sub { tab_operation $_[0], $_[1], "list_tab_operations" },
+);
+$toolset->tool (call_tab_operation =>
+   "Invoke an additional operation offered by a connected tab. Find operations with list-tab-operations. The browser handles its own operation permissions; requires broker exec permission.",
+   {
+      type => "object",
+      properties => {
+         target => { type => "string", minLength => 1 },
+         operation => { type => "string", minLength => 1 },
+         arguments => { type => "object", default => {} },
+         instance_id => { type => "string", minLength => 1 },
+         revision => { type => "integer", minimum => 1 },
+         timeout => { type => "number", minimum => 1, maximum => 300, default => 30 },
+         max_bytes => { type => "integer", minimum => 1024, maximum => 2 * 1024 * 1024, default => 16 * 1024 },
+      },
+      required => ["target", "operation"], additionalProperties => JSON::XS::false,
+   },
+   sub { tab_operation $_[0], $_[1], "call_tab_operation" },
+);
+
 mcp_tool_help ($options->{tool_help}, $toolset);
 
 my $custom_instructions = $options->{custom_instructions}
@@ -767,14 +956,16 @@ my $custom_instructions = $options->{custom_instructions}
 my %server = (
    server_info => { name => "mcp-webbrowser", version => "0" },
    auto_instructions  => 1,
-   short_instructions => "Inspect connected tabs; run page JavaScript. Discover tools.",
+   short_instructions => "Inspect connected tabs; run page JavaScript; discover optional per-tab operations. Discover tools.",
    (defined $custom_instructions ? (custom_instructions => $custom_instructions) : ()),
    instructions => "Tabs have stable targets/document revisions. "
       . "Use tabs for current revision. execute runs async () => CODE in page; "
       . "expression returns implicitly; { ... } body needs return; parenthesize object literals. "
       . "navigate=true acknowledges before evaluation; waits for new document or SPA navigation. "
       . "Navigation result: document, same-document, timeout. Execution may have happened even on timeout; never retried. "
-      . "Guard later calls with revision; metadata client-reported.",
+      . "Guard later calls with revision; metadata client-reported. "
+      . "list-tab-operations discovers browser-provided operations for one tab; "
+      . "call-tab-operation invokes one by name and JSON arguments.",
    toolsets => [$toolset], permissions => $permissions,
    on_request => \&mcp_log_request,
    on_error => sub { AE::log info => "mcp-tool $_[1]{tool}: $_[2]" },

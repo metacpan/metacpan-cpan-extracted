@@ -1,0 +1,3 @@
+&yatt:mkhidden(.bar[]);
+
+&yatt:mkhidden(.bar);

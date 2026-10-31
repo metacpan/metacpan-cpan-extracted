@@ -4,9 +4,9 @@ use warnings qw(FATAL all NONFATAL misc);
 use Carp;
 
 use YATT::Lite::Types ([Route =>
-			-fields => [qw/pattern_re
-				       cf_name
-				       cf_pattern cf_item cf_params/]]);
+			-fields => [qw/_pattern_re
+				       name
+				       pattern item params/]]);
 use YATT::Lite::RegexpNames;
 
 sub new {
@@ -24,9 +24,9 @@ sub append {
 sub match {
   my $self = shift;
   foreach my Route $r (@$self) {
-    my ($slash, @match) = $_[0] =~ $r->{pattern_re}
+    my ($slash, @match) = $_[0] =~ $r->{_pattern_re}
       or next;
-    return ($r->{cf_item} // $r->{cf_name}, $r->{cf_params}, \@match);
+    return ($r->{item} // $r->{name}, $r->{params}, \@match);
   }
   return;
 }
@@ -35,11 +35,11 @@ sub create {
   my ($self, $spec, $item) = @_;
   my ($name, $pat) = ref $spec eq 'ARRAY' ? @$spec : (undef, $spec);
   my Route $r = $self->Route->new;
-  $r->{cf_name}    = $name;
-  $r->{cf_pattern} = $pat;
-  $r->{cf_item}    = $item;
-  ($r->{pattern_re}, my @params) = $self->parse_pattern($pat);
-  $r->{cf_params}  = \ @params;
+  $r->{name}    = $name;
+  $r->{pattern} = $pat;
+  $r->{item}    = $item;
+  ($r->{_pattern_re}, my @params) = $self->parse_pattern($pat);
+  $r->{params}  = \ @params;
   $r;
 }
 

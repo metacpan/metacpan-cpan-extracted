@@ -11,7 +11,7 @@ use File::Temp qw/tempdir/;
 
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 
 my $tempdir = tempdir(CLEANUP => 1);
 my $testno = 0;
@@ -20,9 +20,9 @@ describe "mode: reload requested only", sub {
 
   my $dir = "$tempdir/t" . ++$testno;
 
-  MY->mkfile("$dir/html/index.yatt", qq{<yatt:foo/><yatt:bar/>});
-  MY->mkfile("$dir/html/foo.ytmpl", qq{<h2>foo</h2>});
-  MY->mkfile("$dir/html/bar.yatt", qq{<h2>bar</h2>});
+  MY->mkfile_may_wait("$dir/html/index.yatt", qq{<yatt:foo/><yatt:bar/>});
+  MY->mkfile_may_wait("$dir/html/foo.ytmpl", qq{<h2>foo</h2>});
+  MY->mkfile_may_wait("$dir/html/bar.yatt", qq{<h2>bar</h2>});
 
   my $site = YATT::Lite::WebMVC0::SiteApp
     ->new(app_ns => "Test$testno", app_root => $dir, doc_root => "$dir/html"
@@ -39,20 +39,20 @@ describe "mode: reload requested only", sub {
     describe "compilation counter of internal vfs", sub {
       my $ncomps;
       it "should be equal to 3 (index, foo, bar)", sub {
-	expect($ncomps = $yatt_vfs->{n_compiles})->to_be(3);
+	expect($ncomps = $yatt_vfs->{_n_compiles})->to_be(3);
       };
 
       it "should be unchanged after repeative access", sub {
 	$site->render("index") for 0..9;
 
-	expect($yatt_vfs->{n_compiles})->to_be($ncomps);
+	expect($yatt_vfs->{_n_compiles})->to_be($ncomps);
       };
     };
 
   };
 
   describe "When index.yatt is updated, index.yatt", sub {
-    if (my ($slept) = MY->mkfile("$dir/html/index.yatt", qq{<yatt:foo/>})) {
+    if (my ($slept) = MY->mkfile_may_wait("$dir/html/index.yatt", qq{<yatt:foo/>})) {
       diag("slept $slept to update mtime of $dir/html/index.yatt");
     }
 
@@ -62,13 +62,13 @@ describe "mode: reload requested only", sub {
 
     describe "Compilation counter of internal vfs", sub {
       it "should be equal to 4 now.", sub {
-	expect($yatt_vfs->{n_compiles})->to_be(4);
+	expect($yatt_vfs->{_n_compiles})->to_be(4);
       };
     };
   };
 
   describe "When foo.ytmpl is updated, index.yatt", sub {
-    if (my ($slept) = MY->mkfile("$dir/html/foo.ytmpl", qq{<h2>FOO</h2>})) {
+    if (my ($slept) = MY->mkfile_may_wait("$dir/html/foo.ytmpl", qq{<h2>FOO</h2>})) {
       diag("slept $slept to update mtime of $dir/html/foo.ytmpl");
     }
 
@@ -78,7 +78,7 @@ describe "mode: reload requested only", sub {
 
     describe "Compilation counter of internal vfs", sub {
       it "should be equal to 4 still.", sub {
-	expect($yatt_vfs->{n_compiles})->to_be(4);
+	expect($yatt_vfs->{_n_compiles})->to_be(4);
       };
     };
   };
@@ -88,9 +88,9 @@ describe "mode: always_refresh_deps", sub {
 
   my $dir = "$tempdir/t" . ++$testno;
 
-  MY->mkfile("$dir/html/index.yatt", qq{<yatt:foo/><yatt:bar/>});
-  MY->mkfile("$dir/html/foo.ytmpl", qq{<h2>foo</h2>});
-  MY->mkfile("$dir/html/bar.yatt", qq{<h2>bar</h2>});
+  MY->mkfile_may_wait("$dir/html/index.yatt", qq{<yatt:foo/><yatt:bar/>});
+  MY->mkfile_may_wait("$dir/html/foo.ytmpl", qq{<h2>foo</h2>});
+  MY->mkfile_may_wait("$dir/html/bar.yatt", qq{<h2>bar</h2>});
 
   my $site = YATT::Lite::WebMVC0::SiteApp
     ->new(app_ns => "Test$testno", app_root => $dir, doc_root => "$dir/html"
@@ -107,20 +107,20 @@ describe "mode: always_refresh_deps", sub {
     describe "compilation counter of internal vfs", sub {
       my $ncomps;
       it "should be equal to 3 (index, foo, bar)", sub {
-	expect($ncomps = $yatt_vfs->{n_compiles})->to_be(3);
+	expect($ncomps = $yatt_vfs->{_n_compiles})->to_be(3);
       };
 
       it "should be unchanged after repeative access", sub {
 	$site->render("index") for 0..9;
 
-	expect($yatt_vfs->{n_compiles})->to_be($ncomps);
+	expect($yatt_vfs->{_n_compiles})->to_be($ncomps);
       };
     };
 
   };
 
   describe "When foo.ytmpl is updated, index.yatt", sub {
-    if (my ($slept) = MY->mkfile("$dir/html/foo.ytmpl", qq{<h2>FOO</h2>})) {
+    if (my ($slept) = MY->mkfile_may_wait("$dir/html/foo.ytmpl", qq{<h2>FOO</h2>})) {
       diag("slept $slept to update mtime of $dir/html/foo.ytmpl");
     }
 
@@ -130,13 +130,13 @@ describe "mode: always_refresh_deps", sub {
 
     describe "Compilation counter of internal vfs", sub {
       it "should be equal to 4 now.", sub {
-	expect($yatt_vfs->{n_compiles})->to_be(4);
+	expect($yatt_vfs->{_n_compiles})->to_be(4);
       };
     };
   };
 
   describe "When bar.yatt is updated, index.yatt", sub {
-    if (my ($slept) = MY->mkfile("$dir/html/bar.yatt", qq{<h2>BAR</h2>})) {
+    if (my ($slept) = MY->mkfile_may_wait("$dir/html/bar.yatt", qq{<h2>BAR</h2>})) {
       diag("slept $slept to update mtime of $dir/html/foo.ytmpl");
     }
 
@@ -146,13 +146,13 @@ describe "mode: always_refresh_deps", sub {
 
     describe "Compilation counter of internal vfs", sub {
       it "should be equal to 5 now.", sub {
-	expect($yatt_vfs->{n_compiles})->to_be(5);
+	expect($yatt_vfs->{_n_compiles})->to_be(5);
       };
     };
   };
 
   describe "When index.yatt is updated, index.yatt", sub {
-    if (my ($slept) = MY->mkfile("$dir/html/index.yatt", qq{<yatt:foo/>})) {
+    if (my ($slept) = MY->mkfile_may_wait("$dir/html/index.yatt", qq{<yatt:foo/>})) {
       diag("slept $slept to update mtime of $dir/html/index.yatt");
     }
 
@@ -163,19 +163,70 @@ describe "mode: always_refresh_deps", sub {
     describe "Compilation counter of internal vfs", sub {
       my $ncomps = 6;
       it "should be equal to 6 now.", sub {
-	expect($yatt_vfs->{n_compiles})->to_be($ncomps);
+	expect($yatt_vfs->{_n_compiles})->to_be($ncomps);
       };
 
       it "should be unchanged after repeative access", sub {
 	$site->render("index") for 0..9;
 
-	expect($yatt_vfs->{n_compiles})->to_be($ncomps);
+	expect($yatt_vfs->{_n_compiles})->to_be($ncomps);
       };
     };
   };
 
 };
 
+describe "always_refresh_deps for <!yatt:base> with entity only template", sub {
 
+  my $dir = "$tempdir/t" . ++$testno;
+
+  MY->mkfile_may_wait("$dir/public/index.yatt", qq{<!yatt:base file="super.ytmpl">\n&yatt:baz();});
+  MY->mkfile_may_wait("$dir/public/super.ytmpl", qq{<!yatt:entity baz>\n return "SUPER"});
+
+  my $site = YATT::Lite::WebMVC0::SiteApp
+    ->new(app_ns => "Test$testno", app_root => $dir, doc_root => "$dir/public"
+	  , always_refresh_deps => 1
+	);
+
+  my $yatt_vfs = $site->get_yatt('/')->get_vfs;
+
+  describe "Initially, index.yatt", sub {
+    it "should be rendered", sub {
+      expect($site->render("index"))->to_be("SUPER");
+    };
+
+    describe "compilation counter of internal vfs", sub {
+      my $ncomps = 2;
+      it "should be equal to $ncomps (index, foo, bar)", sub {
+	expect($ncomps = $yatt_vfs->{_n_compiles})->to_be($ncomps);
+      };
+
+      it "should be unchanged after repeative access", sub {
+	$site->render("index") for 0..9;
+
+	expect($yatt_vfs->{_n_compiles})->to_be($ncomps);
+      };
+    };
+
+  };
+
+  describe "When super.ytmpl is updated, index.yatt", sub {
+    if (my ($slept) = MY->mkfile_may_wait("$dir/public/super.ytmpl", qq{<!yatt:entity baz>\n return "BAZ"})) {
+      diag("slept $slept to update mtime of $dir/public/super.ytmpl");
+    }
+
+    it "should be rendered with NEW content in this time", sub {
+      expect($site->render("index"))->to_be("BAZ");
+    };
+
+    describe "Compilation counter of internal vfs", sub {
+      it "should be equal to 3 now.", sub {
+	expect($yatt_vfs->{_n_compiles})->to_be(3);
+      };
+    };
+  };
+
+
+};
 
 done_testing();

@@ -30,6 +30,9 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `t/02_colorize.t` - md module colorize tests (uses t/runner)
 - `t/03_nofork.t` - nofork vs fork table formatting tests
 - `t/04_table_align.t` - Table alignment tests (parse_separator unit + integration)
+- `t/05_table_wrap.t` - Table cell wrapping tests (sets `HOME` to an empty directory)
+- `t/06_user_settings.t` - ansifold/ansicolumn rc files are not read when called from the md module
+- `t/07_fold_runin.t` - fold_runin/fold_runout reach ansifold (line width with and without run-in)
 - `t/Util.pm` - Test helper for greple-based tests
 - `t/runner/` - Submodule (p5-script-runner) for finding greple path
 - `t/test.md` - Test Markdown file
@@ -199,7 +202,7 @@ Each stage is controlled by `--style` and individual `--[no-]fold`, `--[no-]tabl
 
 `--[no-]filename` controls the file name label that greple prints at the top of each file (`--filestyle=once`, format and color from the `FILE_FORMAT`/`FILE` theme keys): `--no-filename` passes `-h` to greple so that panes start with the text. The label is only printed for more than one file anyway.
 
-`--width` (`-w`) is the output width, as in ansicolumn: when given, it replaces `COLUMNS` in the pane-count and fold-width calculation (`_total`), and `run_nup`/`run_column` pass `--pane=$_cols` plus `-w N` after the file name `-` so nup agrees with mdee on the pane count. `--fold-width` sets the fold/table width directly (`fold_width`); its default is `_total / _cols - 3 - runin` with nup, or the output width without nup. Both have `default[...]` config keys. The 3 is for borders and padding; the run-in width is kept free by ansicolumn when it folds the panes. `--runin`/`--runout` (default 2) and `--runlen` (`:!=i`, a callback that sets both, so the later option wins) are always given to nup in `pass_nup` (App::nup >= 1.09), which passes them to ansicolumn after `~/.ansicolumnrc`; otherwise a larger run-in in the rc file would make the outer fold break lines, such as table rules, that fill the fold width.
+`--width` (`-w`) is the output width, as in ansicolumn: when given, it replaces `COLUMNS` in the pane-count and fold-width calculation (`_total`), and `run_nup`/`run_column` pass `--pane=$_cols` plus `-w N` after the file name `-` so nup agrees with mdee on the pane count. `--fold-width` sets the fold/table width directly (`fold_width`); its default is `_total / _cols - 3 - runin` with nup, or the output width without nup. Both have `default[...]` config keys. The 3 is for borders and padding; the run-in width is kept free by ansicolumn when it folds the panes. `--runin`/`--runout` (default 4, the ansifold default, so that Japanese text is folded well) and `--runlen` (`:!=i`, a callback that sets both, so the later option wins) are always given to nup in `pass_nup` (App::nup >= 1.09), which passes them to ansicolumn after `~/.ansicolumnrc`; otherwise a larger run-in in the rc file would make the outer fold break lines, such as table rules, that fill the fold width. `--boundary` (default `word`; `space` or `none`) is given to nup in `pass_nup` the same way (App::nup >= 1.10), because ansicolumn's `--document` only sets the boundary when it is not set and a `--boundary=none` in `~/.ansicolumnrc` would otherwise break paragraphs inside words while the md module folds lists at word boundaries. nup 1.10 counts only the arguments before the first option as files, so the `-w N` given after the file name `-` does not switch off page mode.
 
 ### Style System
 
@@ -316,7 +319,7 @@ Syntax highlighting, table formatting, and text folding are handled by the `App:
 - `--show LABEL=VALUE`: Field visibility control; passed from `show[]` array
 - `pass_md[]`: Passthrough options for md module (e.g., `--colormap` via `:>pass_md`)
 - Options before `--` are module-specific; after `--` are greple options
-- Fold controlled via `foldlist=1`; md module adds `--fold-by $foldwidth` to its default option
+- Fold controlled via `foldlist=1`; md module adds `--fold-by $foldwidth $fold_runin $fold_runout` to its default option
 
 ### Protection Mechanism (protect/restore)
 
@@ -423,8 +426,9 @@ Text folding is handled within the `App::Greple::md` module using `-Mtee` to pip
 
 - `foldlist` config parameter (default: 0) enables/disables folding
 - `foldwidth` config parameter (default: 80) controls the fold width
-- `finalize()` defines `--fold` as `--fold-by $foldwidth` via `$mod->setopt()` (for direct command-line use)
-- When `foldlist=1` in config, `finalize()` adds `--fold-by $foldwidth` to the module's default option
+- `fold_runin`/`fold_runout` config parameters (default: 4, the ansifold default) are the run-in and run-out widths for the line breaking of folded lines; mdee passes its own `--runin`/`--runout` values (default 4 as well), so the folded lines run in by exactly the width that mdee keeps free in the pane and the outer fold (nup) never breaks them again
+- `finalize()` defines `--fold` as `--fold-by $foldwidth $fold_runin $fold_runout` via `$mod->setopt()` (for direct command-line use); `--fold-by` takes the three values as `$<shift>` arguments
+- When `foldlist=1` in config, `finalize()` adds the same `--fold-by ...` to the module's default option
 - mdee passes `foldlist=1,foldwidth=$width` in config when fold is enabled
 - The `--fold-by` option in `__DATA__` uses `-Mtee "&ansifold"` with `--exclude` patterns for code blocks, HTML comments, and tables
 - Formatted tables are excluded from folding by `--exclude &__PACKAGE__::table_regions`: `table_regions()` builds its pattern from the config at run time and matches three or more consecutive lines that start with a border/rule character, a dash, whitespace, or the first character of a configured mark (`table_wrap_mark`, `table_cell_mark`) and contain a column separator, where the block must include a separator row such as `───┼───`, so that list items containing `|` are not mistaken for a table. It works in trim and non-trim, rule and non-rule modes, including wrapped continuation lines. A `define` in `__DATA__` cannot depend on the config because option text is expanded when the module is parsed, before `finalize()` runs. Non-ASCII characters in `__DATA__` patterns must be written as `\x{2502}`-style escapes: the pattern text is not decoded, so literal box-drawing characters never match decoded input
@@ -504,7 +508,7 @@ sub parse_separator {
    - Detects `:---:` (center) and `---:` (right) patterns; `:---` and `---` are left-aligned (default, no option needed)
    - Returns raw 1-based column numbers as `(\@right, \@center)` — caller applies offset and builds option strings
    - Minimizes dashes and strips colons (`s/:?-+:?/-/gr`) to prevent separator width from inflating column widths
-   - Requires App::ansicolumn >= 1.61 (1.55 for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`; 1.58 for `-w` table fitting and `--cell` in table mode; 1.5801 gives width that wrapped columns leave unused back to the other wrapped columns; 1.59 for `--table-wrap-mark` and `--table-cell-mark`; 1.60 for `--table-head` and cell marks limited to wrapped columns; 1.61 for its own rc file when called from greple, with Getopt::EX 3.04)
+   - Requires App::ansicolumn >= 1.61 (1.55 for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`; 1.58 for `-w` table fitting and `--cell` in table mode; 1.5801 gives width that wrapped columns leave unused back to the other wrapped columns; 1.59 for `--table-wrap-mark` and `--table-cell-mark`; 1.60 for `--table-head` and cell marks limited to wrapped columns; 1.61 for its own rc file when called from greple, with Getopt::EX 3.04; the md module stops it from reading that rc file with Getopt::EX 3.05, see below)
 
 **Cell wrapping** (`table_width`, `table_cell`): when `table_width > 0`, `-w $table_width` is appended and ansicolumn fits the table into that width. Columns that fit are untouched; over-wide columns share the remaining width equally (water level, floor 4) and their cells are wrapped by `Text::ANSI::Fold` (word boundary, kinsoku, run-in margin). In trim mode each column costs `content + 2` (item format) plus 1 per separator, so the budget is `table_width - (n-1)`. `table_cell` is converted from `0:10:<20` to `0,10,<20` and passed as `--cell`; in non-trim mode `0,` is prepended for the phantom first column. `table_wrap_mark` (default empty; the `markwrap` theme sets `›` U+203A) is passed as `--table-wrap-mark`; ansicolumn puts it at the start of the second and later lines of a wrapped cell in place of the item-format pad, so column widths do not change. Empty disables it. `table_cell_mark` (default empty; the default theme `markcell` sets `‣` U+2023) is passed as `--table-cell-mark` together with `--table-head 2` (App::ansicolumn >= 1.60): ansicolumn marks the first line of every non-empty body cell in the columns that have a wrapped cell, and leaves the two header rows (the header and, to ansicolumn, the separator row of `-` cells) alone, so `format_table` has nothing to undo before `fix_separator`.
 
@@ -547,6 +551,7 @@ sub fix_separator {
 Config parameters from mdee:
 - `foldlist=1`: Enable text folding (default disabled in md module)
 - `foldwidth=$width`: Fold width in columns
+- `fold_runin=$runin`, `fold_runout=$runout`: Run-in and run-out widths for the folded lines, the same values mdee gives to nup (default 4, as in ansifold and in the md module)
 - `table=1`: Enable table formatting (default enabled in md module)
 - `table_trim=1`: Enable cell whitespace trimming (default enabled in md module)
 - `rule=1`: Enable box-drawing characters (default enabled in md module)
@@ -555,7 +560,8 @@ Config parameters from mdee:
 - `table_cell=SPEC`: Per-column widths for ansicolumn `--cell`, colon-separated (`0:10:<20`) because commas separate config parameters; md module converts to commas and prepends `0,` in non-trim mode for the phantom first column. Not passed by mdee; set via `--config`.
 - `table_wrap_mark=STRING`: Mark for continuation lines of wrapped cells (default none; the `markwrap` theme sets `›` U+203A).
 - `table_cell_mark=STRING`: Mark for the first line of every body cell in a column that has a wrapped cell (default none; the default theme `markcell` sets `‣` U+2023). Passed with `--table-head 2` so the header and separator rows are not marked.
-- `table_runin=2`, `table_runout=2`, `table_boundary=word`, `table_linebreak=all`: How wrapped cells are folded. Always passed to ansicolumn as `--runin`/`--runout`/`--boundary`/`--linebreak`, so the user's `~/.ansicolumnrc` (read by ansicolumn also when called from greple) does not change the table. In table mode these options are used only for the cells. Kept apart from mdee's `--runin`/`--runout`, which are for nup's pane folding. `t/05_table_wrap.t` sets `HOME` to an empty directory so that the user's rc does not affect the tests.
+- `table_runin=2`, `table_runout=2`, `table_boundary=word`, `table_linebreak=all`: How wrapped cells are folded. Always passed to ansicolumn as `--runin`/`--runout`/`--boundary`/`--linebreak`, so the intent is visible in the command line. In table mode these options are used only for the cells. Kept apart from mdee's `--runin`/`--runout`, which are for nup's pane folding.
+- **User rc files**: `finalize()` calls `no_user_settings(qw(ansicolumn ansifold))`, which adds the two names to `GETOPTEX_NO_USER_SETTINGS` (Getopt::EX >= 3.05; names already there are kept, `1`/`*` is left alone). Getopt::EX::Long then skips `~/.ansicolumnrc` and `~/.ansifoldrc` when the two are called as functions (Command::Run nofork) and, because the variable is inherited, also when the tee module runs ansifold in fork mode. nup runs in its own process from mdee, so the user's `~/.ansicolumnrc` still applies to the pane folding. `t/06_user_settings.t` checks this with rc files that would pad folded lines and mark table cells; `t/05_table_wrap.t` still sets `HOME` to an empty directory.
 - Color labels (e.g., `h1=RD`): Override default colors (pre-declared in `Config->new()` with `undef`, applied in `setup_colors()` before `${base}` expansion)
 
 ### Field Visibility with --show Option

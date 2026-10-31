@@ -10,11 +10,11 @@ Geo::Coder::Free::DB::Free::OpenAddr - driver for http://results.openaddresses.i
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use parent 'Database::Abstraction';
 

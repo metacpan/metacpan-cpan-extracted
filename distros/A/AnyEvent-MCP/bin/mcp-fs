@@ -94,7 +94,7 @@ assuming every tool is present.
 
 =head2 Command output
 
-C<exec>, C<vcs-diff> and C<vcs-status> share three presentation options:
+C<exec>, C<vcs-diff>, C<vcs-status> and C<vcs-log> share three presentation options:
 
 =over
 
@@ -132,7 +132,7 @@ merely because its output filter failed.
 
 =head2 Version control
 
-C<vcs-diff> and C<vcs-status> take a required C<backend>: C<git>, C<svn>,
+C<vcs-diff>, C<vcs-status> and C<vcs-log> take a required C<backend>: C<git>, C<svn>,
 C<cvs> or C<hg>, a workdir, an optional C<cwd> (default C<.>), and an optional
 C<files> array. C<cwd> selects a directory within the workdir; it does not
 change the granted mount boundary. Files are relative to C<cwd> and must
@@ -143,11 +143,15 @@ working copy at C<cwd>. Files must be inside the selected workdir;
 they are passed as literal filenames, not options, revisions or shell code.
 Git diff shows unstaged changes; SVN, CVS and Mercurial diff compare the
 working copy with its base. No commit, update, fetch or push is performed.
+C<vcs-log> reads revision history. CVS reports revisions separately per file
+(including their commit IDs), unlike Git's repository-wide commits.
+Use output limits to bound potentially long histories.
 
-These tools have separate C<vcs-diff> and C<vcs-status> permission actions.
+These tools have separate C<vcs-diff>, C<vcs-status> and C<vcs-log> permission actions.
 They request C<workdir-read> for the selected working copy. CVS additionally
-requests C<ssh-agent>, which includes network access. Git, SVN and Mercurial
-perform these local operations without network or home access.
+requests C<ssh-agent>, which includes network access. SVN log may contact the
+repository and also requests C<ssh-agent> to support svn+ssh; SVN diff/status,
+Git and Mercurial operations run without network or home access.
 A saved approval can cover the fixed operation regardless of filenames or
 output filters, for that workdir and backend, or all supported backends.
 Configured VCS clients and their configuration are trusted, including any
@@ -354,6 +358,11 @@ implying read. C<network> and C<shared-tmp> independently enable networking
 and the host's C</tmp> and C</var/tmp>. C<long-running> permits exec timeouts
 over 300 seconds. C<host-proc> is unavailable with bubblewrap; direct execution has host-process access.
 
+Without C<network>, bubblewrap uses a separate network namespace. Loopback
+connections between processes in that same sandbox work without this grant,
+but the sandbox's C<127.0.0.1> is not the host's C<127.0.0.1>. Connecting
+to a host-side loopback server requires C<network>.
+
 C<ssh-agent> implies C<network>. It exposes the server's C<SSH_AUTH_SOCK>
 at C</run/anyevent-mcp/ssh-agent> and sets the child's variable to that path.
 It also exposes C<~/.ssh/known_hosts> read-only if present, without mounting
@@ -380,13 +389,13 @@ C<manage> covers path-op, and C<exec> covers command execution. C<file-write>
 may create files despite being in the write class; manage refers specifically
 to pathname operations rather than an exclusive right to create files.
 Filesystem operations have no path-based persistent subjects: their rules
-match C<action>, C<sandbox-grants>, and C<workdir> when selected-workdir
+match C<action>, C<sandbox-grants>, and C<match.workdir> when selected-workdir
 authority is required. All-workdirs-only requests have no workdir identity.
-Rules without C<workdir> can apply to any selected workdir if their sandbox
-grants cover the request; dialog-generated selected-workdir rules are exact.
+Rules without C<match.workdir> can apply to any selected workdir if their sandbox
+grants cover the request; dialog-generated workdir rules select exact or any.
 Requested paths are shown in the approval dialog for information only.
 Exec additionally offers persistent
-command/argv subjects. When stdin is provided, exec attaches display-only
+command/argv scopes as C<match.subject>. When stdin is provided, exec attaches display-only
 details to the permission request: Unicode text for UTF-8 input, or a
 bounded escaped-byte preview for Latin-1/Base64 input. The YAD helper offers
 a separate C<View stdin...> window; the preview shows input size and
@@ -711,6 +720,7 @@ $permissions = AnyEvent::MCP::Server::Permissions->new (
       exec    => "Run arbitrary commands",
       "vcs-diff"   => "Read working-copy differences using a VCS client",
       "vcs-status" => "Read working-copy status using a VCS client",
+      "vcs-log"    => "Read revision history using a VCS client",
    },
    name         => $name,
    file         => "$config_home/anyevent-mcp/rules/fs-$name.ini",
@@ -796,6 +806,24 @@ sub fs_effective_grants {
 }
 
 # one worker needs the combined sandbox authority for every path it will access.
+sub fs_permission_dimensions {
+   my ($workdir, $subject, $choices) = @_;
+   my %dimensions;
+
+   $dimensions{workdir} = {
+      label => "Workdir", value => $workdir,
+      choices => [
+         { label => "This configured workdir", match => $workdir },
+         { label => "Any configured workdir, including future ones", match => "^" },
+      ],
+   } if defined $workdir;
+   $dimensions{subject} = {
+      label => "Subject", value => $subject, choices => $choices,
+   } if defined $subject;
+
+   \%dimensions
+}
+
 sub fs_require_paths {
    my ($req, $workdir, $identity, $paths, $mode, $reason, $details) = @_;
 
@@ -807,7 +835,7 @@ sub fs_require_paths {
    my $grant = fs_require_permission ($req, $identity, {
       tool           => $req->{tool},
       action         => $tool_action{$req->{tool}},
-      workdir        => fs_grant_workdir ($identity, \@grants),
+      dimensions     => fs_permission_dimensions (fs_grant_workdir ($identity, \@grants)),
       paths          => $paths,
       sandbox_grants => \@grants,
       reason         => $reason // "$req->{tool} " . join (", ", @$paths),
@@ -951,6 +979,7 @@ sub fs_sandbox {
       "--clearenv",
       "--setenv", "PATH", $sandbox_path,
       "--setenv", "LC_ALL", "C.UTF-8",
+      "--setenv", "PERL_BADLANG", "0",
       "--setenv", "HOME", $home;
 
    for my $name (qw(TERM COLORTERM TERMINFO TERMINFO_DIRS NO_COLOR CLICOLOR CLICOLOR_FORCE LINES COLUMNS)) {
@@ -1009,7 +1038,7 @@ my $probe = q{#perl
       find => [[qw(--version)], qr/^find \(GNU findutils\)/m],
       grep => [[qw(--version)], qr/^grep \(GNU grep\)/m],
       patch => [[qw(--version)], qr/^GNU patch /m],
-      sed => [["-n", "1p", "/dev/null"], qr/\A\z/],
+      sed => [[qw(--version)], qr/\(GNU sed\)/],
    );
 
    sub find_executable {
@@ -1709,7 +1738,7 @@ sub fs_find_relative {
    my ($base, $path) = @_;
 
    return "" if $path eq $base;
-   substr $path, length ($base) + ($base eq "/" ? 0 : 1)
+   substr $path, (length $base) + ($base eq "/" ? 0 : 1)
 }
 
 sub format_path_listing {
@@ -2516,12 +2545,13 @@ my $file_patch = q{#perl
       my @after = lstat $path;
       @after
          or return undef, "lstat: $!";
-      join ("\0", @$before[0, 1, 2, 3, 4, 5, 7, 9, 10]) eq join ("\0", @after[0, 1, 2, 3, 4, 5, 7, 9, 10])
+      (join "\0", @$before[0, 1, 2, 3, 4, 5, 7, 9, 10])
+         eq (join "\0", @after[0, 1, 2, 3, 4, 5, 7, 9, 10])
          or return undef, "file changed while applying patch";
       my @new = stat $newfh;
       $after[3] == 1
          or return undef, "refusing to replace multiply-linked file";
-      join ("\0", @after[2, 4, 5]) eq join ("\0", @new[2, 4, 5])
+      (join "\0", @after[2, 4, 5]) eq (join "\0", @new[2, 4, 5])
          or return undef, "cannot preserve file metadata";
 
       rename $newname, $path
@@ -2588,7 +2618,7 @@ $perl && $patch && mcp_tool file_patch =>
       my $diff = $args->{diff};
       my $detail = $diff;
 
-      if (index ($diff, "@") >= 0) {
+      if ((index $diff, "@") >= 0) {
          $diff = AnyEvent::MCP::utf8enc $diff;
       } else {
          my $bytes = MIME::Base64::decode_base64 $diff;
@@ -2831,7 +2861,9 @@ $perl && mcp_tool stat =>
 ;
 
 mcp_tool exec =>
-   "Run argv " . ($bwrap ? "in bubblewrap" : "UNSANDBOXED with full host-user privileges") . "; stdin_encoding: utf-8 (default), latin1 or base64; max 4 MiB decoded. "
+   "Run argv " . ($bwrap ? "in bubblewrap. " : "UNSANDBOXED with full host-user privileges. ")
+   . ($bwrap ? "Private /tmp by default (gone after exec); use for temp files/IPC. shared-tmp exposes HOST /tmp (sockets/services). Request ONLY for HOST /tmp, NOT ordinary temp/IPC. " : "")
+   . "stdin_encoding: utf-8 (default), latin1 or base64; max 4 MiB decoded. "
    . "stdout/stderr UTF-8, captured to 1 MiB each; max_lines/max_bytes bound response. Optional grep: PCRE stdout filter after capture; stderr unfiltered. Reports capture truncation. "
    . "Explicit sandbox_grants replace default workdir-read. Exit/signal/timeout are normal results, not tool errors. No command-prefix safety classification. Timeout >300 s requires "
    . "long-running grant; max six hours.",
@@ -2919,7 +2951,7 @@ mcp_tool exec =>
       length $input <= 4 * 1024 * 1024 or die "stdin exceeds 4 MiB\n";
       my $stdin_detail = $stdin_text;
       if (length $input && $stdin_encoding ne "utf-8") {
-         my $preview = substr ($input, 0, 4096);
+         my $preview = substr $input, 0, 4096;
          $preview =~ s/([^\x20-\x5b\x5d-\x7e])/sprintf "\\x{%02X}", ord $1/ge;
          $stdin_detail = "$stdin_encoding stdin: " . length ($input) . " bytes (escaped preview)\n\n" . $preview;
          $stdin_detail .= "\n... (preview limited to 4096 bytes)"
@@ -2932,25 +2964,16 @@ mcp_tool exec =>
       my $granted = fs_require_permission ($req, $identity, {
          tool           => "exec",
          action         => "exec",
-         workdir        => fs_grant_workdir ($identity, $sandbox_grants),
-         subject        => $subject,
+         dimensions     => fs_permission_dimensions (fs_grant_workdir ($identity, $sandbox_grants),
+            $subject, [
+               { label => "exact executable and argv", match => $subject },
+               { label => "this executable, arbitrary argv",
+                  match => "^\\[\Q$executable\E(?:,.*)?\\]\\z" },
+               { label => "any command", match => "^" },
+            ]),
          reason         => $args->{reason},
          sandbox_grants => $sandbox_grants,
          (length $input ? (details => { "View stdin" => $stdin_detail }) : ()),
-         subjects => [
-            {
-               label   => "exact executable and argv",
-               subject => $subject,
-            },
-            {
-               label   => "this executable, arbitrary argv",
-               subject => "^\\[\Q$executable\E(?:,.*)?\\]\\z",
-            },
-            {
-               label   => "any command",
-               subject => "^",
-            },
-         ],
       });
 
       $timeout <= 300 || $permissions->closure ($granted)->{"long-running"}
@@ -2966,12 +2989,12 @@ mcp_tool exec =>
 ;
 
 # fixed operations accept filenames, never caller-supplied VCS options or shell code.
-for my $operation (qw(diff status)) {
+for my $operation (qw(diff status log)) {
    mcp_tool "vcs-$operation" =>
       "Run $operation via Git, SVN, CVS or Mercurial in workdir. "
       . "Explicit backend; cwd within workdir (default .). "
       . "files relative to cwd; must stay in workdir; never options. "
-      . "Dedicated permission plus workdir-read; CVS also needs ssh-agent/network. "
+      . "Dedicated permission plus workdir-read; CVS and SVN log also need ssh-agent/network. "
       . "Returns exit/signal, bounded stdout/stderr, truncation flags. "
       . "grep filters stdout via PCRE after 1 MiB capture; max_lines/max_bytes bound output. "
       . "Trusts VCS client/config; sandbox enforces approved filesystem/network grants.",
@@ -3015,23 +3038,27 @@ for my $operation (qw(diff status)) {
          my @argv = $backend eq "git"
             ? ($program, "--no-pager", "--no-optional-locks", "--literal-pathspecs", "-c", "core.fsmonitor=false",
                $operation, ($operation eq "diff" ? qw(--no-ext-diff --no-textconv --no-color --ignore-submodules)
-                                                : qw(--short --untracked-files=normal --ignore-submodules)),
+                         : $operation eq "status" ? qw(--short --untracked-files=normal --ignore-submodules)
+                                                  : qw(--no-decorate)),
                "--", @files)
             : $backend eq "svn"
             ? ($program, "--non-interactive", "--no-auth-cache", $operation,
                ($operation eq "diff" ? ("--internal-diff") : ()), "--", map "$_\@", @files)
             : $backend eq "cvs"
-            ? ($program, "-f", $operation, ($operation eq "diff" ? ("-u") : ()), "--", @files)
+            ? ($program, "-f", $operation,
+               ($operation eq "diff" ? ("-u") : $operation eq "log" ? ("-N") : ()),
+               "--", @files)
             : ($program, "--noninteractive", "--config", "ui.paginate=never", $operation, "--", @files);
 
-         my @need = fs_effective_grants ("workdir-read", ($backend eq "cvs" ? ("ssh-agent") : ()));
+         my @need = fs_effective_grants ("workdir-read",
+            ($backend eq "cvs" || $backend eq "svn" && $operation eq "log" ? ("ssh-agent") : ()));
          my $granted = fs_require_permission ($req, $identity, {
             tool => $req->{tool}, action => "vcs-$operation",
-            workdir => fs_grant_workdir ($identity, \@need),
-            subject => $backend, subjects => [
-               { label => "$backend working copies", subject => $backend },
-               { label => "all supported VCS clients", subject => "^" },
-            ],
+            dimensions => fs_permission_dimensions (fs_grant_workdir ($identity, \@need),
+               $backend, [
+                  { label => "$backend working copies", match => $backend },
+                  { label => "all supported VCS clients", match => "^" },
+               ]),
             sandbox_grants => \@need, paths => \@paths,
             reason => "$backend $operation in $cwd (workdir $identity)"
                . (@files ? ": " . join (", ", @files) : " (entire working copy)"),
@@ -3058,7 +3085,21 @@ mcp_config
          if $_[0]->isa ("AnyEvent::MCP::Server::HTTP");
    },
    short_instructions => "Filesystem access: read/edit files, run sandboxed commands, inspect VCS in configured workdirs. Discover tools when working with files.",
-   instructions => "Start with workdirs: IDs/paths, mounts, sandbox_grants. Select persistent integer ID (listing key, not array position) or configured/resolved path. Inactive mappings expire after seven days; IDs may be reused; stale paths fail. Paths relative to selected workdir. workdir-read/write grant only selected workdir; all-workdirs-read/write grant every workdir. all-workdirs-read + workdir-write: read all, write selected only. Absolute paths in other workdirs need all-workdirs grants; other absolute paths need home/world grants or shared-tmp for host tmp. Multi-path stat stays in selected workdir; rename across paths needs combined grants and may fail EXDEV at mount boundary. Symlinks resolve inside granted mounts; overlapping workdir access unspecified. Trusted mounts add baseline authority; world-read keeps writable exceptions, world-write ignores them. exec requires useful reason and explicit sandbox_grants when needed. Prefer vcs-diff/vcs-status for working copies: explicit backend, fixed argv, automatic grants. exec/VCS: grep filters stdout via PCRE after capture; max_lines/max_bytes bound output; stderr unfiltered. capture_truncated means possible unseen matches.\n";
+   instructions =>
+      "Start with workdirs: IDs/paths, mounts, sandbox_grants. "
+      . "Select persistent integer ID (listing key, not array position) or configured/resolved path. "
+      . "Inactive mappings expire after seven days; IDs may be reused; stale paths fail. "
+      . "Paths relative to selected workdir. "
+      . "workdir-read/write grant only selected workdir; all-workdirs-read/write grant every workdir. "
+      . "all-workdirs-read + workdir-write: read all, write selected only. "
+      . "Absolute paths in other workdirs need all-workdirs grants; other absolute paths need home/world grants or shared-tmp for host tmp. "
+      . "Multi-path stat stays in selected workdir; rename across paths needs combined grants and may fail EXDEV at mount boundary. "
+      . "Symlinks resolve inside granted mounts; overlapping workdir access unspecified. "
+      . "Trusted mounts add baseline authority; world-read keeps writable exceptions, world-write ignores them. "
+      . "exec requires useful reason and explicit sandbox_grants when needed. "
+      . "Prefer vcs-diff/vcs-status/vcs-log for working copies: explicit backend, fixed argv, automatic grants. "
+      . "exec/VCS: grep filters stdout via PCRE after capture; max_lines/max_bytes bound output; stderr unfiltered. "
+      . "capture_truncated means possible unseen matches.\n";
 
 mcp_start %$server_options, (stdio => $stdio);
 

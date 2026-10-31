@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: clipping.pl,v 1.7 2004/04/30 11:35:18 lecoanet Exp $
+# $Id$
 # this simple sample has been developped by C. Mertz mertz@cena.fr
 
 use Tk;
@@ -10,7 +10,7 @@ use Tk::Checkbutton;
 package clipping;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 my $defaultfont = '-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*';
 my $mw = MainWindow->new();

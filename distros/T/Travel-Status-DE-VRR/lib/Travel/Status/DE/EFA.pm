@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.21';
+our $VERSION = '3.22';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -69,6 +69,7 @@ sub new_p {
 sub new {
 	my ( $class, %opt ) = @_;
 
+	my $service;
 	my $encoding     = 'UTF-8';
 	my $tls_insecure = 0;
 	$opt{timeout} //= 10;
@@ -93,7 +94,7 @@ sub new {
 	}
 
 	if ( $opt{service} ) {
-		if ( my $service
+		if ( $service
 			= Travel::Status::DE::EFA::Services::get_service( $opt{service} ) )
 		{
 			$opt{efa_url} = $service->{url};
@@ -244,10 +245,20 @@ sub new {
 	}
 
 	if ( $opt{place} ) {
-		$self->{post}{placeInfo_dm}  = 'invalid';
-		$self->{post}{placeState_dm} = 'empty';
-		$self->{post}{place_dm}
-		  = uri_escape( encode( $encoding, $opt{place} ), '^A-Za-z0-9-._~ ' );
+		if ( $service and $service->{map_place_to_name} ) {
+			$self->{post}{name_dm}
+			  = uri_escape( encode( $encoding, $opt{place} ),
+				'^A-Za-z0-9-._~ ' )
+			  . q{ }
+			  . $self->{post}{name_dm};
+		}
+		else {
+			$self->{post}{placeInfo_dm}  = 'invalid';
+			$self->{post}{placeState_dm} = 'empty';
+			$self->{post}{place_dm}
+			  = uri_escape( encode( $encoding, $opt{place} ),
+				'^A-Za-z0-9-._~ ' );
+		}
 	}
 
 	if ( $opt{full_routes} ) {
@@ -751,7 +762,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.21
+version 3.22
 
 =head1 DESCRIPTION
 

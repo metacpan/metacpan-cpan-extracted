@@ -4,7 +4,7 @@ package IO::K8s::Api::Core::V1::ReplicationControllerList;
 use strict;
 use warnings;
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 die __PACKAGE__ . " has been removed. IO-K8s replaced all per-resource"
   . " *List classes with the single generic IO::K8s::List back in its 1.00"
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::ReplicationControllerList - REMOVED -- superseded by the
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ L<IO::K8s::List>, L<IO::K8s::Deprecated>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/io-k8s-p5-deprecated/issues>.
 
 =head2 IRC
@@ -97,5 +97,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

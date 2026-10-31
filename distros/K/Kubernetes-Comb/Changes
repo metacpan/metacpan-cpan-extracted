@@ -1,5 +1,15 @@
 Revision history for Kubernetes-Comb
 
+0.002     2026-10-31 00:27:26Z
+
+ - New public methods rendered_resources and plan: what reconcile would
+   apply (labelled objects) and what it would create, update and prune
+   against managedResources, so a caller can ask for a go-ahead before the
+   pruning. Both read only, both Futures.
+ - logs also shows init containers that did not complete successfully
+   (labelled pod/init:name), so a Pod stuck in Init:CrashLoopBackOff
+   explains itself.
+
 0.001     2026-10-01 03:50:33Z
 
  - First release. A Comb is a self-contained "micro collection of

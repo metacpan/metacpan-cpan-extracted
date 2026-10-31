@@ -12,7 +12,7 @@ use AutoLoader;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # Preloaded methods go here.
 
@@ -122,14 +122,10 @@ sub read_handle_perl {
         ($len, undef) = $self->_stat($soid);
     }
     my $count = 0;
-    #
-    for (my $pos = $off; $pos <= $len+$off; $pos += $CHUNK_SIZE) {
-        my $chunk;
-        if ($pos + $CHUNK_SIZE > $len) {
-            $chunk = $len % $CHUNK_SIZE;
-        } else {
-            $chunk = $CHUNK_SIZE;
-        }
+    my $end = $len + $off;
+    for (my $pos = $off; $pos < $end; $pos += $CHUNK_SIZE) {
+        my $chunk = $end - $pos;
+        $chunk = $CHUNK_SIZE if $chunk > $CHUNK_SIZE;
         my $data = $self->_read($soid, $chunk, $pos);
         if ($is_filehandle) {
             syswrite $handle, $data;

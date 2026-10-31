@@ -1,10 +1,17 @@
 use common::sense;
 use Test::More;
+BEGIN {
+   eval {
+      require AnyEvent::WebSocket::Server;
+      require AnyEvent::WebSocket::Message;
+      require Protocol::WebSocket::Frame;
+      1
+   } or plan skip_all => "WebSocket modules not installed";
+}
 use JSON::XS ();
 use IO::Socket::INET ();
 use IO::Select ();
 use IPC::Open3 ();
-use Protocol::WebSocket::Frame ();
 use File::Temp ();
 use File::Path ();
 use Symbol ();
@@ -16,11 +23,12 @@ File::Path::mkpath ("$dir/config/anyevent-mcp/rules", 0, 0700);
 my $policy = "$dir/config/anyevent-mcp/rules/webbrowser-default.ini";
 
 sub policy {
-   my ($decision) = @_;
+   my ($decision, $origin) = @_;
    open my $fh, ">", $policy or die $!;
    chmod 0600, $policy or die $!;
    print {$fh} "[rule]\ndecision=allow\naction=read\nsandbox-grants=\n\n"
-      . "[rule]\ndecision=$decision\naction=exec\nsandbox-grants=\n";
+      . "[rule]\ndecision=$decision\naction=exec\nsandbox-grants=\n"
+      . (defined $origin ? "match.origin=$origin\n\n[rule]\ndecision=deny\naction=exec\n" : "");
    close $fh or die $!;
 }
 policy "allow";
@@ -103,7 +111,7 @@ my $init = rpc ("initialize", {
 is $init->{result}{serverInfo}{name}, "mcp-webbrowser", "independent browser server identity";
 my $listing = rpc ("tools/list", {});
 is_deeply [sort map $_->{name}, @{$listing->{result}{tools}}],
-   ["add-element", "execute", "meta-instructions", "tabs"], "browser toolset includes instructions";
+   ["add-element", "call-tab-operation", "execute", "list-tab-operations", "meta-instructions", "tabs"], "browser toolset includes instructions";
 like +(grep { $_->{name} eq "execute" } @{$listing->{result}{tools}})[0]{description},
    qr/Single expression returns implicitly.*body needs explicit return/, "tool advertises expression/body contract";
 my ($execute_tool) = grep { $_->{name} eq "execute" } @{$listing->{result}{tools}};
@@ -173,7 +181,7 @@ sub connect_page {
    my ($target, $instance) = @_;
    my ($peer, $header) = upgrade "secondary", $target;
    $header =~ /101/ or die "WebSocket upgrade failed: $header";
-   send_ws $peer, ["mcp-webbrowser", 1, 0, $instance, { url => "https://page.example/", title => "Page" }];
+   send_ws $peer, ["mcp-webbrowser", 1, 1, $instance, { url => "https://page.example/", origin => "https://page.example", title => "Page" }];
    my $welcome = read_ws ($peer)->[1];
    ($peer, $welcome)
 }
@@ -186,7 +194,47 @@ send_ws $early, ["state", { url => "https://page.example/", title => "early" }];
 my $closed = read_ws $early;
 is $closed->[0], 8, "commands before hello close the connection";
 is unpack ("n", $closed->[1]), 1002, "protocol rejection uses status 1002";
+like substr ($closed->[1], 2), qr/Invalid browser hello/, "protocol rejection carries its reason";
 close $early->{socket};
+my ($wrong_version) = upgrade "primary", "wrong-version";
+send_ws $wrong_version, ["mcp-webbrowser", 2, 0, "wrong-version",
+   { url => "https://page.example/", title => "Page" }];
+my $rejected = read_ws $wrong_version;
+is $rejected->[0], 8, "incompatible browser protocol closes the connection";
+is unpack ("n", $rejected->[1]), 1002, "incompatible protocol uses status 1002";
+like substr ($rejected->[1], 2), qr/Unsupported browser protocol 2\.0 \(server 1\.1\)/,
+   "close frame explains the version mismatch";
+close $wrong_version->{socket};
+
+my ($old_client) = upgrade "primary", "old-client";
+send_ws $old_client, ["mcp-webbrowser", 1, 0, "old-document",
+   { url => 'https://user:pass@page.example/path?query', title => "Old client" }];
+is_deeply read_ws ($old_client)->[1], ["welcome", "old-client", "old-document", 1],
+   "compatible old browser protocol 1.0 connects";
+is +(tabs ())->[0]{origin}, "https://page.example", "broker derives origin from URL without credentials";
+my $old_id = ++$serial;
+send_rpc $old_id, "tools/call", { name => "execute", arguments => { target => "old-client", code => "1+1" } };
+my $old_call = read_ws ($old_client)->[1];
+is $old_call->[3]{code}, "1+1", "old browser client retains JavaScript execution";
+send_ws $old_client, ["reply", $old_call->[1], JSON::XS::true, 2];
+is read_rpc ($old_id)->{result}{structuredContent}{value}, 2, "old client execution completes";
+is_deeply tool ("list-tab-operations", { target => "old-client" })->{result}{structuredContent}{operations},
+   [], "unsupported tab operations discover as empty for old client";
+like tool ("call-tab-operation", { target => "old-client", operation => "test" })
+   ->{result}{content}[0]{text}, qr/require protocol 1\.1/,
+   "calling unsupported old-client operation fails without disconnect";
+send_ws $old_client, ["quit"];
+is read_ws ($old_client)->[0], 8, "old browser client quits normally";
+close $old_client->{socket};
+
+my ($newer_client) = upgrade "primary", "newer-client";
+send_ws $newer_client, ["mcp-webbrowser", 1, 2, "newer-document",
+   { url => "https://page.example/", title => "Newer client" }];
+is_deeply read_ws ($newer_client)->[1], ["welcome", "newer-client", "newer-document", 1],
+   "compatible newer minor protocol connects";
+send_ws $newer_client, ["quit"];
+is read_ws ($newer_client)->[0], 8, "newer client quits normally";
+close $newer_client->{socket};
 
 my ($one, $welcome) = connect_page "tab", "document-one";
 is_deeply $welcome, ["welcome", "tab", "document-one", 1], "authenticated page is registered";
@@ -204,16 +252,69 @@ close $two->{socket};
 my $registered = tabs;
 is_deeply [map $_->{target}, @$registered], ["other", "tab"], "tabs enumerates registered tabs";
 
-send_ws $one, ["state", { url => "https://page.example/next?secret=not-for-logs#fragment", title => "Updated" }];
+send_ws $one, ["state", { url => "https://page.example/next?secret=not-for-logs#fragment", origin => "https://page.example", title => "Updated" }];
 for (1 .. 100) {
    $registered = tabs;
-   last if $registered->[0]{title} eq "Updated";
+   last if $registered->[1]{title} eq "Updated";
    Time::HiRes::sleep (.01);
 }
 is $registered->[1]{title}, "Updated", "state updates replace reported metadata";
 is $registered->[1]{revision}, 1, "tabs expose the document revision";
 like JSON::XS::encode_json ({revision => $registered->[1]{revision}}),
    qr/"revision":1/, "tabs serializes document revision as a JSON number";
+
+policy "allow", "https://page.example";
+my $origin_id = ++$serial;
+send_rpc $origin_id, "tools/call", { name => "execute", arguments => { target => "tab", code => "allowed_origin()" } };
+my $origin_call = read_ws ($one)->[1];
+is $origin_call->[3]{code}, "allowed_origin()", "exact origin allows execution";
+send_ws $one, ["reply", $origin_call->[1], JSON::XS::true, "yes"];
+is read_rpc ($origin_id)->{result}{structuredContent}{value}, "yes", "origin-scoped permission dispatch succeeded";
+send_ws $one, ["state", { url => "https://other.example/", origin => "https://other.example", title => "Cross-origin" }];
+for (1 .. 100) {
+   last if (tabs ())->[1]{origin} eq "https://other.example";
+   Time::HiRes::sleep (.01);
+}
+ok tool ("execute", { target => "tab", code => "forbidden_origin()" })->{result}{isError},
+   "same opted-in tab loses origin-specific execution authority on cross-origin navigation";
+ok tool ("add-element", { target => "tab", tag => "style" })->{result}{isError},
+   "DOM injection is origin-scoped too";
+ok tool ("call-tab-operation", { target => "tab", operation => "debugger.trace" })->{result}{isError},
+   "tab operation execution is origin-scoped too";
+send_ws $one, ["state", { url => "https://page.example/next?secret=not-for-logs#fragment", origin => "https://page.example", title => "Updated" }];
+for (1 .. 100) {
+   last if (tabs ())->[1]{origin} eq "https://page.example";
+   Time::HiRes::sleep (.01);
+}
+policy "allow", "https://page.example";
+
+send_ws $one, ["state", { url => "https://page.example/", title => "Old userscript" }];
+for (1 .. 100) {
+   $registered = tabs;
+   last if $registered->[1]{title} eq "Old userscript";
+   Time::HiRes::sleep (.01);
+}
+is $registered->[1]{origin}, "https://page.example", "origin is inferred from legacy state update";
+$old_id = ++$serial;
+send_rpc $old_id, "tools/call", { name => "execute", arguments => {
+   target => "tab", code => "legacy_origin()",
+}};
+$old_call = read_ws ($one)->[1];
+is $old_call->[3]{code}, "legacy_origin()", "origin-scoped permission works for legacy state";
+send_ws $one, ["reply", $old_call->[1], JSON::XS::true, "old"];
+is read_rpc ($old_id)->{result}{structuredContent}{value}, "old",
+   "old state without origin does not prevent execution";
+send_ws $one, ["state", {
+   url => "https://page.example/next?secret=not-for-logs#fragment",
+   origin => "https://spoof.example", title => "Updated",
+}];
+for (1 .. 100) {
+   $registered = tabs;
+   last if $registered->[1]{title} eq "Updated";
+   Time::HiRes::sleep (.01);
+}
+is $registered->[1]{origin}, "https://page.example", "URL takes precedence over redundant origin field";
+policy "allow";
 
 my $id = ++$serial;
 send_rpc $id, "tools/call", { name => "execute", arguments => {
@@ -258,12 +359,72 @@ is_deeply $call->[3], { tag => "div" }, "add_element does not add automatic attr
 send_ws $one, ["reply", $call->[1], JSON::XS::false, "Element parent not found"];
 like read_rpc ($id)->{result}{content}[0]{text}, qr/Element parent not found/, "DOM injection errors propagate";
 
+$id = ++$serial;
+send_rpc $id, "tools/call", { name => "list-tab-operations", arguments => {
+   target => "tab", instance_id => "document-one", revision => 1,
+}};
+$call = read_ws ($one)->[1];
+is_deeply [@$call[0, 2, 3]], ["call", "list_tab_operations", { max_bytes => 16384 }],
+   "list-tab-operations asks the tab, without registering any commands";
+send_ws $one, ["reply", $call->[1], JSON::XS::true, []];
+is_deeply read_rpc ($id)->{result}{structuredContent}, { operations => [] },
+   "a tab with no extensions offers no additional operations";
+
+$id = ++$serial;
+send_rpc $id, "tools/call", { name => "list-tab-operations", arguments => {
+   target => "tab", max_bytes => 32768,
+}};
+$call = read_ws ($one)->[1];
+is $call->[3]{max_bytes}, 32768, "custom discovery result budget reaches tab";
+send_ws $one, ["reply", $call->[1], JSON::XS::true, [
+   { name => "debugger.trace", description => "Collect breakpoint hits",
+     inputSchema => { type => "object" } },
+]];
+is +(read_rpc ($id)->{result}{structuredContent}{operations}[0]{name}),
+   "debugger.trace", "tab-provided operation descriptions pass through";
+
+$id = ++$serial;
+send_rpc $id, "tools/call", { name => "call-tab-operation", arguments => {
+   target => "tab", instance_id => "document-one", revision => 1,
+   operation => "debugger.trace", arguments => { max_hits => 10 }, max_bytes => 32768,
+}};
+$call = read_ws ($one)->[1];
+is_deeply [@$call[0, 2, 3]], ["call", "call_tab_operation", {
+   operation => "debugger.trace", arguments => { max_hits => 10 }, max_bytes => 32768,
+}], "generic tab-operation call forwards name, arguments and result budget";
+send_ws $one, ["reply", $call->[1], JSON::XS::true, { hits => [1, 2] }];
+is_deeply read_rpc ($id)->{result}{structuredContent}{value}, { hits => [1, 2] },
+   "tab-operation result passes through unchanged";
+
+$id = ++$serial;
+send_rpc $id, "tools/call", { name => "call-tab-operation", arguments => {
+   target => "tab", operation => "debugger.pause",
+}};
+$call = read_ws ($one)->[1];
+is_deeply $call->[3]{arguments}, {}, "omitted operation arguments default to empty object";
+send_ws $one, ["reply", $call->[1], JSON::XS::false, "No additional operations"];
+like read_rpc ($id)->{result}{content}[0]{text}, qr/No additional operations/,
+   "userscript can reject calls when no additional operations exist";
+
+ok tool ("call-tab-operation", { target => "tab", operation => "", arguments => {} })
+   ->{result}{isError}, "empty operation name is rejected";
+ok tool ("call-tab-operation", { target => "tab", operation => "debugger.trace", arguments => [] })
+   ->{result}{isError}, "operation arguments must be a JSON object";
+ok tool ("list-tab-operations", { target => [] })
+   ->{result}{isError}, "operation discovery requires a valid target";
+ok tool ("call-tab-operation", { target => "tab", revision => 999, operation => "debugger.trace" })
+   ->{result}{isError}, "stale document revision rejects additional operations";
+ok tool ("list-tab-operations", { target => "tab", instance_id => "old" })
+   ->{result}{isError}, "stale document instance rejects operation discovery";
+
 ok tool ("execute", { target => "tab", instance_id => "old", code => "1" })->{result}{isError},
    "optional instance guard rejects a replaced document";
 policy "deny";
 ok tool ("execute", { target => "tab", code => "denied" })->{result}{isError}, "permission denial prevents dispatch";
 ok tool ("add-element", { target => "tab", tag => "style" })->{result}{isError},
    "add_element requires the same exec permission";
+ok tool ("call-tab-operation", { target => "tab", operation => "debugger.trace" })->{result}{isError},
+   "tab operations also require exec permission";
 policy "allow";
 
 $id = ++$serial;
@@ -293,6 +454,12 @@ is scalar @{tabs ()}, 1, "disconnected page is removed";
 
 my ($rejoined, $same_doc) = connect_page "tab", "document-one";
 is $same_doc->[3], 1, "same document rejoining after disconnect keeps revision";
+$id = ++$serial;
+send_rpc $id, "tools/call", { name => "list-tab-operations", arguments => { target => "tab" }};
+$call = read_ws ($rejoined)->[1];
+send_ws $rejoined, ["reply", $call->[1], JSON::XS::true, []];
+is_deeply read_rpc ($id)->{result}{structuredContent}{operations}, [],
+   "reconnect rediscovers operations rather than retaining a stale list";
 
 $id = ++$serial;
 send_rpc $id, "tools/call", { name => "execute", arguments => {
@@ -312,7 +479,7 @@ like JSON::XS::encode_json ($proceed), qr/\A\["proceed",[1-9][0-9]*\]\z/,
 send_ws $rejoined, ["navigated", $call->[1], {url => "https://page.example/spa", title => "SPA"}];
 my $nav_result = read_rpc ($id)->{result}{structuredContent};
 is_deeply $nav_result, {navigation => "same-document", revision => 1,
-   url => "https://page.example/spa", title => "SPA"},
+   url => "https://page.example/spa", origin => "https://page.example", title => "SPA"},
    "same-document navigation completes without changing revision";
 
 $id = ++$serial;
@@ -327,7 +494,7 @@ is $new_doc->[3], 2, "replacement document increments revision";
 is read_ws ($rejoined)->[0], 8, "old connection replaced when a new document arrives";
 $nav_result = read_rpc ($id)->{result}{structuredContent};
 is_deeply $nav_result, {navigation => "document", revision => 2,
-   url => "https://page.example/", title => "Page"},
+   url => "https://page.example/", origin => "https://page.example", title => "Page"},
    "new document finishes pending navigation request";
 ok tool ("execute", {target => "tab", revision => 1, code => "1"})->{result}{isError},
    "stale revision rejects execution";

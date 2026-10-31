@@ -1,7 +1,7 @@
 package Tk::Text::SuperText;
 
 use Exporter ();
-use Tk qw(800 Ev);
+use Tk 804.030 qw(Ev);
 use Tk::Text;
 use Tk::Derived;
 
@@ -34,7 +34,7 @@ use vars qw($VERSION @ISA @EXPORT);
 	leftTab copy cut paste inlinePaste undo redo destroy keyPress menuSelect noOP
 );
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 @ISA = qw(Tk::Derived Tk::Text Exporter);
 
 use base qw(Tk::Text);
@@ -199,6 +199,7 @@ sub Populate
 
 	# and set configuration parameters defaults
 	$w->ConfigSpecs(
+		'-readonly'           => ['METHOD','readOnly','ReadOnly',0],
 		'-indentmode'		=> ['PASSIVE','indentMode','IndentMode','auto'],
 #+20010117 JWT TextANSIColor support
 		'-ansicolor'		=> ['PASSIVE','ansicolor','ansicolor',undef],
@@ -276,6 +277,39 @@ sub insertmode
 	
 	if(!defined $val) {return $w->{INSERTMODE};}
 	$w->{INSERTMODE}=$val;
+}
+
+# Read-only affects editing commands, not application insert/delete calls.
+sub readonly
+{
+	my ($w,$val) = @_;
+	return $w->{READONLY} || 0 unless @_ > 1;
+	$w->{READONLY} = $val ? 1 : 0;
+	delete $w->{ASCIICODE} if $w->{READONLY};
+	return $w->{READONLY};
+}
+
+# Tk::Text uses Insert for interactive insertion (including replacement of sel).
+sub Insert
+{
+	my $w = shift;
+	return if $w->cget('-readonly');
+	return $w->SUPER::Insert(@_);
+}
+
+# Also protect the inherited edit menu and search/replace dialog.
+sub ReplaceSelectionsWith
+{
+	my $w = shift;
+	return if $w->cget('-readonly');
+	return $w->SUPER::ReplaceSelectionsWith(@_);
+}
+
+sub clipboardCut
+{
+	my $w = shift;
+	return if $w->cget('-readonly');
+	return $w->SUPER::clipboardCut(@_);
 }
 
 # insertion and deletion functions intereptors
@@ -579,6 +613,7 @@ sub getansi
 sub deleteSelected
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	
 	if(!defined $Tk::selectionType || ($Tk::selectionType eq 'normal')) {
 		$w->SUPER::deleteSelected;
@@ -670,12 +705,12 @@ sub SetCursor
 sub Button1
 {
 	my $w = shift;
-	my $str;
-	
+    
 	$w->SUPER::Button1(@_);
 	
 	if((!defined $w->tag('ranges','sel')) && $w->cget('-showmatching') == 1) {
-		if(exists $w->{MATCHINGCOUPLES}->{$str=$w->get('insert','insert + 1c')}) {
+        my $str = $w->get('insert', 'insert + 1c');
+		if(defined $str && exists $w->{MATCHINGCOUPLES}->{$str}) {
 			# calculate visible zone and search only in this one
 			my ($l,$c) = split('\.',$w->index('end'));
 			my ($slimit,$elimit) = $w->yview;
@@ -769,6 +804,7 @@ sub resetUndo
 sub undo
 {
 	my ($w) = @_;
+	return 0 if $w->cget('-readonly');
 	my $s;
 	my $op;
 	my @args;
@@ -821,6 +857,7 @@ sub undo
 sub redo
 {
 	my ($w) = @_;
+	return 0 if $w->cget('-readonly');
 	my $block = 0;
 	
 	if(exists $w->{REDO}) {
@@ -1116,6 +1153,7 @@ sub mouseMovePage
 sub mousePasteSelection
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	my $ev = $w->XEvent;
 
 	if(!$Tk::mouseMoved) {
@@ -1550,6 +1588,7 @@ sub selectionShiftRightTab
 sub _SelectionShift
 {
 	my ($w,$type,$dir) = @_;
+	return if $w->cget('-readonly');
 	
 	if((!defined $type) || (!defined $dir)) {return;}
 	if(!defined $w->tag('ranges','sel')) {return;}
@@ -1591,6 +1630,7 @@ sub _SelectionShift
 sub ins
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	$w->{LINESTART}=0;
 	if($w->{INSERTMODE} eq 'insert') {$w->{INSERTMODE}='overwrite';}
@@ -1600,6 +1640,7 @@ sub ins
 sub enter
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	$w->_BeginUndoBlock;
 	Tk::catch {$w->Insert("\n")};
@@ -1612,6 +1653,7 @@ sub enter
 sub autoIndentEnter
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	$w->_BeginUndoBlock;
 	Tk::catch {$w->Insert("\n")};
@@ -1622,6 +1664,7 @@ sub autoIndentEnter
 sub noAutoIndentEnter
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	Tk::catch {$w->Insert("\n")};
 }
@@ -1629,6 +1672,7 @@ sub noAutoIndentEnter
 sub _AutoIndent
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	my ($line,$col) = split('\.',$w->index('insert'));
 
 	# no autoindent for first line
@@ -1653,6 +1697,7 @@ sub del
 sub Delete
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	my $sel = Tk::catch {$w->tag('nextrange','sel','1.0','end');};
 	
 	if(defined $sel) {
@@ -1674,6 +1719,7 @@ sub backSpace
 sub Backspace
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	my $sel = Tk::catch {$w->tag('nextrange','sel','1.0','end');};
 	
 	if(defined $sel) {
@@ -1687,6 +1733,7 @@ sub Backspace
 sub deleteToWordStart
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	
 	if($w->compare('insert','==','insert wordstart')) {
 		$w->delete('insert - 1c');
@@ -1698,6 +1745,7 @@ sub deleteToWordStart
 sub deleteToWordEnd
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	
 	if($w->compare('insert','==','insert wordend')) {
 		$w->delete('insert');
@@ -1709,6 +1757,7 @@ sub deleteToWordEnd
 sub deleteToLineStart
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	if($w->compare('insert','==','1.0')) {return;}
 	if($w->compare('insert','==','insert linestart')) {
@@ -1721,6 +1770,7 @@ sub deleteToLineStart
 sub deleteToLineEnd
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	
 	if($w->compare('insert','==','insert lineend')) {
 		$w->delete('insert');
@@ -1732,6 +1782,7 @@ sub deleteToLineEnd
 sub deleteWord
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	$w->delete('insert wordstart','insert wordend');
 }
@@ -1739,6 +1790,7 @@ sub deleteWord
 sub deleteLine
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	$w->delete('insert linestart','insert lineend + 1c');
 	$w->markSet('insert','insert linestart');
@@ -1747,6 +1799,7 @@ sub deleteLine
 sub insertControlCode
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	
 	$w->{LINESTART}=0;
 	$w->{ASCIICODE} = 1;
@@ -1863,6 +1916,7 @@ sub escape
 sub tab
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	$w->Insert("\t");
 	$w->focus;
@@ -1883,6 +1937,7 @@ sub copy
 sub cut
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	Tk::catch{$w->clipboardCut;};
 	$w->see('insert');
@@ -1891,6 +1946,7 @@ sub cut
 sub paste
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 
 	Tk::catch{$w->clipboardPaste;};
 	$w->see('insert');
@@ -1899,6 +1955,7 @@ sub paste
 sub inlinePaste
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	my ($l,$c) = split('\.',$w->index('insert'));
 	my $str;
 	my $f=0;
@@ -1932,6 +1989,7 @@ sub destroy
 sub keyPress
 {
 	my $w = shift;
+	return if $w->cget('-readonly');
 	my $ev = $w->XEvent;
 
 	$w->Insert($ev->A);
@@ -1969,7 +2027,17 @@ Tk::Text::SuperText - An improved text widget for Perl/Tk
 
 =head1 SYNOPSIS
 
-    $super_text = $paren->SuperText(?options?);
+    use Tk;
+    use Tk::Text::SuperText;
+
+    my $mw = MainWindow->new;
+    my $super_text = $mw->SuperText(
+        -wrap       => 'none',
+        -indentmode => 'auto',
+        -readonly   => 0,
+    )->pack(-fill => 'both', -expand => 1);
+
+    MainLoop;
 
 =head1 STANDARD OPTIONS
 
@@ -1979,18 +2047,35 @@ B<-cursor>	B<-highlightthickness>	B<-padx>	B<-setgrid>
 B<-exportselection>	B<-insertbackground>	B<-pady>	B<-takefocus>
 B<-font>	B<-insertborderwidth>	B<-relief>	B<-xscrollcommand>
 B<-foreground>	B<-insertofftime>	B<-selectbackground>	B<-yscrollcommand>
-B<-ansicolor>
 
 See L<Tk::options> for details of the standard options.
 
 B<-height>	B<-spacing1>	B<-spacing2>	B<-spacing3>
 B<-state>	B<-tabs>	B<-width>	B<-wrap>
 
-See L<Tk::Text> for details of theis options.
+See L<Tk::Text> for details of these options.
 
 =head1 WIDGET-SPECIFIC OPTIONS
 
 =over 4
+
+=item Name: B<readOnly>
+
+=item Class: B<ReadOnly>
+
+=item Switch: B<-readonly>
+
+Defaults to B<0>. When true, prevents interactive edits, including cut, paste,
+rectangular selection shifts, and undo/redo. Navigation, selection, copying,
+and matching-pair commands remain available. The option can be changed at
+runtime with C<$w-E<gt>configure(-readonly =E<gt> 1)> or the
+C<$w-E<gt>readonly(1)> method; C<$w-E<gt>readonly> returns the current value.
+
+Application calls to C<insert> and C<delete> remain available, allowing the
+displayed content to be updated while read-only. Unlike C<-state =E<gt> 'disabled'>,
+this option only blocks editing commands. Toggling it does not clear the content,
+selection, or undo/redo history. Programmatic edits retain normal undo behavior;
+call C<resetUndo> after replacing content if its old history is no longer needed.
 
 =item Name:	B<indentMode>
 
@@ -1999,8 +2084,9 @@ See L<Tk::Text> for details of theis options.
 =item Switch:	B<-indentmode>
 
 Specifies how to indent when a new line is inserted in the text.
-The possible modes are B<none> for no indent at all or B<auto> for positioning
-the insertion cursor right below the first non-white space character of the previous line.
+The possible modes are B<none> for no indentation or B<auto> for positioning
+the insertion cursor directly below the first non-whitespace character of the
+previous line.
 
 =item Name:	B<undoDepth>
 
@@ -2008,10 +2094,9 @@ the insertion cursor right below the first non-white space character of the prev
 
 =item Switch:	B<-undodepth>
 
-Sets the maximum depth for the undo buffer:a number specifies the numbers of 
-insert or delete operations that can be stored in the buffer before the oldest one is
-poped out and forgotten; B<0> stops the undo feature, B<undef> sets unlimited
-depth.
+Sets the maximum depth of the undo buffer. A positive number specifies how many
+insert or delete operations can be stored before the oldest one is discarded.
+B<0> disables undo; C<undef> allows unlimited depth.
 
 =item Name:	B<redoDepth>
 
@@ -2019,9 +2104,9 @@ depth.
 
 =item Switch:	B<-redodepth>
 
-Sets the maximum depth for the redo buffer:a number specifies the numbers of 
-undo operations that can be stored in the buffer before the oldest one is poped
-out and forgotten; B<0> stops the redo feature, B<undef> sets unlimited depth.
+Sets the maximum depth of the redo buffer. A positive number specifies how many
+undo operations can be stored before the oldest one is discarded.
+B<0> disables redo; C<undef> allows unlimited depth.
 
 =item Name:	B<showMatching>
 
@@ -2029,7 +2114,7 @@ out and forgotten; B<0> stops the redo feature, B<undef> sets unlimited depth.
 
 =item Switch:	B<-showmatching>
 
-With a value of B<1> activates the matching parentheses feature.B<0> deactivates it.
+A value of B<1> enables automatic matching-pair highlighting; B<0> disables it.
 
 =item Name:	B<matchHighlightTime>
 
@@ -2037,7 +2122,9 @@ With a value of B<1> activates the matching parentheses feature.B<0> deactivates
 
 =item Switch:	B<-matchhighlighttime>
 
-Sets the number of milliseconds the match highlight stays visible; with a value of B<0> the highlight stays on till next match.
+Sets the number of milliseconds that a matching character remains highlighted.
+With a value of B<0>, the highlight remains until it is cleared or replaced by
+another match.
 
 =item Name:	B<matchForeground>
 
@@ -2045,7 +2132,7 @@ Sets the number of milliseconds the match highlight stays visible; with a value 
 
 =item Switch:	B<-matchforeground>
 
-Set the foreground color for the char hilighted by the match-parentheses command.
+Sets the foreground color of the character highlighted by a matching-pair command.
 
 =item Name:	B<matchBackground>
 
@@ -2053,7 +2140,7 @@ Set the foreground color for the char hilighted by the match-parentheses command
 
 =item Switch:	B<-matchbackground>
 
-Set the background color for the char hilighted by the match-parentheses command.
+Sets the background color of the character highlighted by a matching-pair command.
 
 =item Name:	B<matchingCouples>
 
@@ -2061,10 +2148,11 @@ Set the background color for the char hilighted by the match-parentheses command
 
 =item Switch:	B<-matchingcouples>
 
-Sets the chars that are searched for a matching counterpart.
-The format is a simple string with matching chars coupled in left-right order;
-here's an example: I<{}[]()""> .
-For double couples (I<"">) the match is done only on the forwarding chars.
+Specifies the characters for which matching counterparts are searched.
+The value is a string of character pairs, with each pair in opening-closing
+order, for example C<{}[]()"">.
+When both characters in a pair are identical, as in C<"">, matching searches
+only forward.
 
 =item Name:	B<insertMode>
 
@@ -2072,7 +2160,7 @@ For double couples (I<"">) the match is done only on the forwarding chars.
 
 =item Switch:	B<-insertmode>
 
-Sets the default insert mode: B<insert> or B<overwrite> .
+Sets the insertion mode to B<insert> or B<overwrite>.
 
 =item Name:	B<ansiColor>
 
@@ -2080,125 +2168,109 @@ Sets the default insert mode: B<insert> or B<overwrite> .
 
 =item Switch:	B<-ansicolor>
 
-Enables or disables use of L<Tk::TextANSIColor> module.
-This option was implemented by Jim Turner (THANKS for the support!)
+Enables or disables interpretation of ANSI color codes in inserted text.
+This feature requires L<Term::ANSIColor> and was adapted from
+L<Tk::TextANSIColor> by Jim Turner. Thank you for the contribution!
 
 =back
 
 =head1 DESCRIPTION
 
-B<Tk::Text::SuperText> implements many new features over the 
-standard L<Tk::Text> widget while supporting all its standard 
-features. It's used simply as the L<Tk::Text> widget.
-New Features:
+B<Tk::Text::SuperText> extends the standard L<Tk::Text> widget with additional
+editing features. It can be used in the same way as L<Tk::Text>.
+Its additional features include:
 
 =over 4
 
 =item * Unlimited undo/redo.
 
-So you can undo and redo whatever you deleted/inserted whenever you want.
-To reset the undo and redo buffers call this method:
-I<$w>-E<gt>B<resetUndo>;
+Insertions and deletions can be undone and redone. The history is unlimited
+unless C<-undodepth> or C<-redodepth> sets a limit.
+To clear both history buffers, call:
+
+    $w->resetUndo;
 
 =item * Rectangular selections.
 
-Rectangular text zones can be selected, copied, deleted, shifted with the mouse
-or with the keyboard.
+Rectangular text regions can be selected with the mouse or keyboard, then
+copied, deleted, or shifted.
 
-=item * Selection right/left char and tab shift.
+=item * Shifting selections left or right.
 
-Text selections can be shifted left/right of  one or more chars or a tabs.
+Text selections can be shifted left or right by a character or a tab.
 
-=item * Normal and 'inline' selection paste.
+=item * Normal and inline paste.
 
-The 'normal' paste is the normal text paste you know:
+For example, suppose the clipboard contains these two lines, each ending with
+a newline:
 
-=over 4
+    line x
+    line y
 
-=item Paste Buffer:
+The text buffer contains:
 
-line x
+    line 1
+    line 2
 
-line y
+Normal paste at the start of line 1 inserts the clipboard contents together:
 
-=back
+    line x
+    line y
+    line 1
+    line 2
 
-=over 4
+Inline paste inserts each clipboard line at the same column on successive
+lines of the text buffer. At the start of line 1, the result is:
 
-=item Text Buffer:
+    line xline 1
+    line yline 2
 
-line 1
-
-line2
-
-=back
-
-
-=over 4
-
-=item Normal paste at line 1:
-
-I<line x>
-
-I<line y>
-
-line 1
-
-line 2
-
-=back
-
-=over 4
-
-=item The 'inline' paste works like this:
-
-=item Inline paste at line 1:
-
-I<line x> line 1
-
-I<line y> line 2
-
-=back
+Include trailing spaces in the clipboard text if a separator is needed.
 
 =item * Parentheses matching.
 
 To help you inspect nested parentheses, brackets, and other characters, B<SuperText>
-has both an automatic parenthesis matching mode, and a find matching command.
+provides both automatic matching-pair highlighting and explicit matching commands.
 Automatic parenthesis matching is activated when you type or when you move the
-insertion cursor after a parenthesis.
+insertion cursor onto a parenthesis.
 It momentarily highlights the matching character if that character is visible in the window.
-To find a matching character anywhere in the file, position the cursor after the it,
-and call the find matching command.
+To find a matching character anywhere in the buffer, position the cursor on a
+delimiter and call C<findMatchingChar>. Use C<jumpToMatchingChar> to move the
+cursor to its counterpart.
 
 =item * Auto-indenting.
 
 When you press the Return or Enter key, spaces and tabs are inserted to line up the
-insert point under the start of the previous line.
+insertion point with the first non-whitespace character of the previous line.
 
-=item * Control codes insertion.
+=item * Inserting control codes.
 
 You can directly insert a non-printable control character in the text.
 
 =item * Commands are managed via virtual events.
 
-Every B<SuperText> command is bound to a virtual event, so to call it or to bind it
-to a key sequence use the L<Tk::event> functions.
-I used this format for key bind so there's no direct key-to-command bind, and this
-gives me more flexibility; however, you can use normal binds.
+Editing and navigation commands are bound to virtual events. Use the
+L<Tk::event> methods to generate these events or associate them with key
+sequences. Ordinary bindings can also be used.
 
-Example: I<$w>-E<gt>B<eventAdd>(I<'Tk::Text::SuperText','E<lt>E<lt>SelectAllE<gt>E<gt>','E<lt>Control-aE<gt>'>);
+For example:
 
-To set default event bindings use this method:
-I<$w>-E<gt>B<bindDefault>;
+    $w->eventAdd('<<SelectAll>>', '<Control-a>');
+    $w->eventGenerate('<<SelectAll>>');
 
-=item * Default key bindings are redefined (not really a feature :).
+To restore the default event bindings, call:
 
-Every virtual event has an associated public method with the same name of the event but with the first
-char in lower case (e.g.: B<E<lt>E<lt>MouseSelectE<gt>E<gt>> event has a corresponding  I<$super_text>-E<gt>B<mouseSelect> method).
+    $w->bindDefault;
+
+=item * Redefined default key bindings.
+
+Each virtual event has an associated public method with the same name, but
+with its first character in lowercase. For example, C<<< <<MouseSelect>> >>>
+corresponds to C<$super_text-E<gt>mouseSelect>.
 
     Virtual Event/Command     Default Key Binding
-    
-    MouseSetInsert            <Button1>
+
+    MouseSetInsert            <Button-1>
     MouseSelect               <B1-Motion>
     MouseSelectWord           <Double-1>
     MouseSelectLine           <Triple-1>
@@ -2212,7 +2284,7 @@ char in lower case (e.g.: B<E<lt>E<lt>MouseSelectE<gt>E<gt>> event has a corresp
     MouseMovePageTo           <2>
     MouseMovePage             <B2-Motion>
     MousePasteSelection       <ButtonRelease-2>
-    
+
     MoveLeft                  <Left>
     SelectLeft                <Shift-Left>
     SelectRectLeft            <Shift-Alt-Left>
@@ -2249,241 +2321,178 @@ char in lower case (e.g.: B<E<lt>E<lt>MouseSelectE<gt>E<gt>> event has a corresp
     MovePageRight             <Control-Next>
     SetSelectionMark          <Control-space>,<Select>
     SelectToMark              <Shift-Control-space>,<Shift-Select>
-    
+
     SelectAll                 <Control-a>
     SelectionShiftLeft        <Control-comma>
     SelectionShiftLeftTab     <Control-Alt-comma>
     SelectionShiftRight       <Control-period>
     SelectionShiftRightTab    <Control-Alt-period>
-    
+
     Ins                       <Insert>
     Enter                     <Return>
     AutoIndentEnter           <Control-Return>
-    NoAutoindentEnter         <Shift-Return>
+    NoAutoIndentEnter         <Shift-Return>
     Del                       <Delete>
-    BackSpace                 <BackSpace>
+    Backspace                 <BackSpace>
     DeleteToWordStart         <Shift-BackSpace>
     DeleteToWordEnd           <Shift-Delete>
     DeleteToLineStart         <Alt-BackSpace>
     DeleteToLineEnd           <Alt-Delete>
     DeleteWord                <Control-BackSpace>
     DeleteLine                <Control-Delete>
-    
+
     InsertControlCode         <Control-Escape>
-    
+
     FocusNext                 <Control-Tab>
     FocusPrev                 <Shift-Control-Tab>
-    
+
     FlashMatchingChar         <Control-b>
     RemoveMatch               <Control-B>
     FindMatchingChar          <Control-j>
-    JumpToMatchingChar        <Control-J>
-    
+    JumpToMatchingChar        <Control-p>
+
     Escape                    <Escape>
-    
+
     Tab                       <Tab>
-    
+
     LeftTab                   <Shift-Tab>
-    
+
     Copy                      <Control-c>
-    
+
     Cut                       <Control-x>
-    
+
     Paste                     <Control-v>
-    
+
     InlinePaste               <Control-V>
-    
+
     Undo                      <Control-z>
-    
+
     Redo                      <Control-Z>
-    
+
     Destroy                   <Destroy>
-    
+
     MenuSelect                <Alt-KeyPress>
-
-=item * Public methods.
-
-I<$widget>-E<gt>B<mouseSetInsert>
-
-I<$widget>-E<gt>B<museSelect>			
-
-I<$widget>-E<gt>B<mouseSelectWord>		
-
-I<$widget>-E<gt>B<mouseSelectLine>		
-
-I<$widget>-E<gt>B<mouseSelectAdd>	
-
-I<$widget>-E<gt>B<mouseSelectAddWord>	
-
-I<$widget>-E<gt>B<mouseSelectAddLine>
-
-I<$widget>-E<gt>B<mouseSelectAutoScan>
-
-I<$widget>-E<gt>B<mouseSelectAutoScanStop>
-
-I<$widget>-E<gt>B<mouseMoveInsert>
-
-I<$widget>-E<gt>B<mouseRectSelection>	
-
-I<$widget>-E<gt>B<mouseMovePageTo>
-
-I<$widget>-E<gt>B<mouseMovePage>
-
-I<$widget>-E<gt>B<mousePasteSelection>	
-
-I<$widget>-E<gt>B<moveLeft>
-
-I<$widget>-E<gt>B<selectLeft>	
-
-I<$widget>-E<gt>B<selectRectLeft>		
-
-I<$widget>-E<gt>B<moveLeftWord>	
-
-I<$widget>-E<gt>B<selectLeftWord>
-
-I<$widget>-E<gt>B<moveRight>
-
-I<$widget>-E<gt>B<selectRight>
-
-I<$widget>-E<gt>B<selectRectRight>	
-
-I<$widget>-E<gt>B<moveRightWord>
-
-I<$widget>-E<gt>B<selectRightWord>
-
-I<$widget>-E<gt>B<moveUp>	
-
-I<$widget>-E<gt>B<selectUp>			
-
-I<$widget>-E<gt>B<selectRectUp>			
-
-I<$widget>-E<gt>B<moveUpParagraph>
-
-I<$widget>-E<gt>B<selectUpParagraph>
-
-I<$widget>-E<gt>B<moveDown>
-
-I<$widget>-E<gt>B<selectDown>		
-
-I<$widget>-E<gt>B<selectRectDown>		
-
-I<$widget>-E<gt>B<moveDownParagraph>
-
-I<$widget>-E<gt>B<selectDownParagraph>
-
-I<$widget>-E<gt>B<moveLineStart>
-
-I<$widget>-E<gt>B<selectToLineStart>	
-
-I<$widget>-E<gt>B<moveTextStart>	
-
-I<$widget>-E<gt>B<selectToTextStart>	
-
-I<$widget>-E<gt>B<moveLineEnd>	
-
-I<$widget>-E<gt>B<selectToLineEnd>	
-
-I<$widget>-E<gt>B<moveTextEnd>	
-
-I<$widget>-E<gt>B<selectToTextEnd>	
-
-I<$widget>-E<gt>B<movePageUp>	
-
-I<$widget>-E<gt>B<selectToPageUp>		
-
-I<$widget>-E<gt>B<movePageLeft>	
-
-I<$widget>-E<gt>B<movePageDown>
-
-I<$widget>-E<gt>B<selectToPageDown>	
-
-I<$widget>-E<gt>B<movePageRight>	
-
-I<$widget>-E<gt>B<setSelectionMark>	
-
-I<$widget>-E<gt>B<selectToMark>	
-
-I<$widget>-E<gt>B<selectAll>
-
-I<$widget>-E<gt>B<selectionShiftLeft>
-
-I<$widget>-E<gt>B<selectionShiftLeftTab>
-
-I<$widget>-E<gt>B<selectionShiftRight>
-
-I<$widget>-E<gt>B<selectionShiftRightTab>	
-
-I<$widget>-E<gt>B<ins>
-
-I<$widget>-E<gt>B<enter>			
-
-I<$widget>-E<gt>B<autoIndentEnter>
-
-I<$widget>-E<gt> B<noAutoindentEnter>	
-
-I<$widget>-E<gt>B<del>
-
-I<$widget>-E<gt>B<backSpace>
-
-I<$widget>-E<gt>B<deleteToWordStart>
-
-I<$widget>-E<gt>B<deleteToWordEnd>	
-
-I<$widget>-E<gt>B<deleteToLineStart>	
-
-I<$widget>-E<gt>B<deleteToLineEnd>	
-
-I<$widget>-E<gt>B<deleteWord>	
-
-I<$widget>-E<gt>B<deleteLine>	
-
-I<$widget>-E<gt>B<insertControlCode>
-
-I<$widget>-E<gt>B<focusNext>
-
-I<$widget>-E<gt>B<focusPrev>		
-
-I<$widget>-E<gt>B<flashMatchingChar>
-
-I<$widget>-E<gt>B<removeMatch>
-
-I<$widget>-E<gt>B<findMatchingChar>		
-
-I<$widget>-E<gt>B<jumpToMatchingChar>
-
-I<$widget>-E<gt>B<escape>
-
-I<$widget>-E<gt>B<tab>
-
-I<$widget>-E<gt>B<leftTab>
-
-I<$widget>-E<gt>B<copy>
-
-I<$widget>-E<gt>B<cut>
-
-I<$widget>-E<gt>B<paste>
-
-I<$widget>-E<gt>B<inlinePaste>
-
-I<$widget>-E<gt>B<undo>
-
-I<$widget>-E<gt>B<redo>
-
-I<$widget>-E<gt>B<destroy>
-
-I<$widget>-E<gt>B<menuSelect>
 
 =back
 
+=head1 METHODS
+
+The following editing and navigation methods correspond to the virtual events
+listed above:
+
+    $widget->mouseSetInsert;
+    $widget->mouseSelect;
+    $widget->mouseSelectWord;
+    $widget->mouseSelectLine;
+    $widget->mouseSelectAdd;
+    $widget->mouseSelectAddWord;
+    $widget->mouseSelectAddLine;
+    $widget->mouseSelectAutoScan;
+    $widget->mouseSelectAutoScanStop;
+    $widget->mouseMoveInsert;
+    $widget->mouseRectSelection;
+    $widget->mouseMovePageTo;
+    $widget->mouseMovePage;
+    $widget->mousePasteSelection;
+    $widget->moveLeft;
+    $widget->selectLeft;
+    $widget->selectRectLeft;
+    $widget->moveLeftWord;
+    $widget->selectLeftWord;
+    $widget->moveRight;
+    $widget->selectRight;
+    $widget->selectRectRight;
+    $widget->moveRightWord;
+    $widget->selectRightWord;
+    $widget->moveUp;
+    $widget->selectUp;
+    $widget->selectRectUp;
+    $widget->moveUpParagraph;
+    $widget->selectUpParagraph;
+    $widget->moveDown;
+    $widget->selectDown;
+    $widget->selectRectDown;
+    $widget->moveDownParagraph;
+    $widget->selectDownParagraph;
+    $widget->moveLineStart;
+    $widget->selectToLineStart;
+    $widget->moveTextStart;
+    $widget->selectToTextStart;
+    $widget->moveLineEnd;
+    $widget->selectToLineEnd;
+    $widget->moveTextEnd;
+    $widget->selectToTextEnd;
+    $widget->movePageUp;
+    $widget->selectToPageUp;
+    $widget->movePageLeft;
+    $widget->movePageDown;
+    $widget->selectToPageDown;
+    $widget->movePageRight;
+    $widget->setSelectionMark;
+    $widget->selectToMark;
+    $widget->selectAll;
+    $widget->selectionShiftLeft;
+    $widget->selectionShiftLeftTab;
+    $widget->selectionShiftRight;
+    $widget->selectionShiftRightTab;
+    $widget->ins;
+    $widget->enter;
+    $widget->autoIndentEnter;
+    $widget->noAutoIndentEnter;
+    $widget->del;
+    $widget->backSpace;
+    $widget->deleteToWordStart;
+    $widget->deleteToWordEnd;
+    $widget->deleteToLineStart;
+    $widget->deleteToLineEnd;
+    $widget->deleteWord;
+    $widget->deleteLine;
+    $widget->insertControlCode;
+    $widget->focusNext;
+    $widget->focusPrev;
+    $widget->flashMatchingChar;
+    $widget->removeMatch;
+    $widget->findMatchingChar;
+    $widget->jumpToMatchingChar;
+    $widget->escape;
+    $widget->tab;
+    $widget->leftTab;
+    $widget->copy;
+    $widget->cut;
+    $widget->paste;
+    $widget->inlinePaste;
+    $widget->undo;
+    $widget->redo;
+    $widget->destroy;
+    $widget->menuSelect;
+
+=head2 readonly
+
+C<$widget-E<gt>readonly> returns whether interactive editing is blocked.
+C<$widget-E<gt>readonly($boolean)> sets the mode, just like configuring
+C<-readonly>, and returns the new value. Each widget has its own mode.
+
+=head2 paste
+
+C<$widget-E<gt>paste> inserts the clipboard contents at the insertion cursor
+using normal paste behavior. Use C<inlinePaste> to insert successive clipboard
+lines at the same column on successive buffer lines. Both commands are blocked
+when C<-readonly> is true.
+
+=head2 tab
+
+C<$widget-E<gt>tab> inserts a tab at the insertion cursor and keeps keyboard
+focus in the widget. This command is blocked when C<-readonly> is true.
+
 =head1 AUTHOR
 
-Current maintainer is Alexander Becker, L<asb@cpan.org>.
+The current maintainer is Alexander Becker, L<asb@cpan.org|mailto:asb@cpan.org>.
 
 Originally written by Alessandro Iob.
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under 
+This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =head1 SEE ALSO

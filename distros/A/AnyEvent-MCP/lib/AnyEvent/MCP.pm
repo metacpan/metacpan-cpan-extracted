@@ -445,7 +445,7 @@ package AnyEvent::MCP;
 
 use common::sense;
 
-our $VERSION = 0.65;
+our $VERSION = 0.71;
 
 sub json_class {
    our $JSON_CLASS ||= eval { require JSON::XS; "JSON::XS" }
@@ -502,7 +502,7 @@ sub random_bytes($) {
    if (open my $fh, "<", "/dev/urandom") {
       binmode $fh;
       while (length $bytes < $length) {
-         read ($fh, $bytes, $length - length ($bytes), length $bytes)
+         read $fh, $bytes, $length - length $bytes, length $bytes
             or last;
       }
       close $fh;
@@ -599,7 +599,7 @@ sub normalize_udiff {
    $hunks
       or die "normalize_udiff: no hunks\n";
 
-   (join ("\n", @line, ""), \@max_offset)
+   ((join "\n", @line, ""), \@max_offset)
 }
 
 sub parse_patch_output {

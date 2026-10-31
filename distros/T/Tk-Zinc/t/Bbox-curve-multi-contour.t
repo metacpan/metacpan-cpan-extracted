@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w 
 
 #
-# $Id: Bbox-curve-multi-contour.t,v 1.2 2006/02/12 09:38:07 mertz Exp $
+# $Id$
 # Author: Christophe Mertz  mertz@intuilab.com, adapted from a script 
 # reported by Daniel Etienne for a bug report in Tk::Zinc 3.3.0
 #

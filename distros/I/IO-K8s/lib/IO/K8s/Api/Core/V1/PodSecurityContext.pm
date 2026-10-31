@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodSecurityContext;
 # ABSTRACT: PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s appArmorProfile => 'Core::V1::AppArmorProfile';
@@ -56,7 +56,7 @@ IO::K8s::Api::Core::V1::PodSecurityContext - PodSecurityContext holds pod-level 
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 appArmorProfile
 
@@ -128,7 +128,7 @@ The Windows specific settings applied to all containers. If unspecified, the opt
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -156,5 +156,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

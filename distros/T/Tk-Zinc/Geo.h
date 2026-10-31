@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Geo.h,v 1.21 2005/10/19 10:58:11 lecoanet Exp $
+ * $Id$
  */
 
 /*

@@ -23,9 +23,24 @@ use base qw/File::Spec/;
 
 my (@libdir);
 
-if ((my $p = List::MoreUtils::last_index
-     (sub {$_ eq 'YATT'}
-      , my @d = MY->splitdir($dir))) >= 0) {
+#
+# When the checkout itself is a directory named YATT (with this t/
+# directly in it), its parent is a library root for YATT::Lite. A YATT
+# directory further up is a different checkout: e.g. `./Build disttest`
+# unpacks YATT-Lite-X.Y/ inside the checkout, and mixing that outer
+# YATT::Lite into the dist's tests is exactly what GH-301 reports.
+# blib/lib and the @INC hook below cover the dist case.
+#
+my @d;
+foreach my $seg (MY->splitdir($dir)) {
+  # Collapse "." and ".." lexically (callers pass things like
+  # "$FindBin::Bin/../../../../t"); no realpath, symlinks stay as spelled.
+  if ($seg eq '.') { next }
+  elsif ($seg eq '..' and @d > 1 and $d[-1] ne '..') { pop @d }
+  else { push @d, $seg }
+}
+my $p = List::MoreUtils::last_index(sub {$_ eq 'YATT'}, @d);
+if ($p >= 0 and $p < $#d and $d[$p+1] eq 't') {
   my @outer_dir = @d[0 .. ($p-1)];
   push @libdir, MY->catdir(@outer_dir);
   if ($outer_dir[-1] eq 'lib'

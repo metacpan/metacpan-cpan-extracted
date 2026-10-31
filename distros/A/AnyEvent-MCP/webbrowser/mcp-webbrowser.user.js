@@ -2,7 +2,7 @@
 // @name         mcp-webbrowser support
 // @namespace    https://dist.schmorp.de/mcp-webbrowser
 // @description  AnyEvent::MCP's mcp-webbrowser support script
-// @version      1.0.20261022.2
+// @version      1.1.20261028.1
 // @updateURL    https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
 // @downloadURL  https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
 // @match        *://*/*
@@ -53,6 +53,7 @@ function start (tab, allow_menu, allow) {
    let indicator_menus = [];
    let indicators;
    let status = "connecting";
+   let connection_error = "";
    let offline_timer, grace_timer, title_observer, toast, toast_timer;
 
    const symbols = { connecting: "🟡", connected: "🟢", disconnected: "🔴" };
@@ -108,7 +109,7 @@ function start (tab, allow_menu, allow) {
             return;
          }
       }
-      toast.textContent = `${symbols[status]} MCP ${status}`;
+      toast.textContent = `${symbols[status]} MCP ${status}${connection_error ? ": " + connection_error : ""}`;
       clearTimeout (toast_timer);
       if (status === "connected")
          toast_timer = setTimeout (hide_toast, 3000);
@@ -146,6 +147,7 @@ function start (tab, allow_menu, allow) {
    }
 
    function connected () {
+      connection_error = "";
       clear_status_timers ();
       set_status ("connected");
    }
@@ -472,7 +474,7 @@ ${code}
             return;
 
          socket.send (JSON.stringify ([
-            "mcp-webbrowser", 1, 0, instance_id,
+            "mcp-webbrowser", 1, 1, instance_id,
             { url: location.href, title: plain_title (document.title) },
          ]));
       };
@@ -508,6 +510,10 @@ ${code}
             }
          } else if (msg[0] === "call" && msg[2] === "add_element") {
             add_element (socket, msg[1], msg[3]);
+         } else if (msg[0] === "call" && msg[2] === "list_tab_operations") {
+            socket.send (JSON.stringify (["reply", msg[1], true, []]));
+         } else if (msg[0] === "call" && msg[2] === "call_tab_operation") {
+            socket.send (JSON.stringify (["reply", msg[1], false, "No additional operations"]));
          } else if (msg[0] === "proceed") {
             const call = pending[msg[1]];
 
@@ -525,13 +531,19 @@ ${code}
          }
       };
 
-      socket.onclose = () => {
+      socket.onclose = ev => {
          if (socket !== ws)
             return;
 
          for (const id in pending) {
             pending[id].cancel?.();
             delete pending[id];
+         }
+         if (ev.code !== 1000 && ev.code !== 1001) {
+            connection_error = `WebSocket ${ev.code}${ev.reason ? ": " + ev.reason : ""}`;
+            console.warn ("mcp-webbrowser:", connection_error);
+            set_status ("disconnected");
+            show_toast ();
          }
          ws = undefined;
 

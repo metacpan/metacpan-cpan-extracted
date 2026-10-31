@@ -1,0 +1,8 @@
+<!yatt:argmacro foo>
+
+<!yatt:args>
+
+foo bar
+
+<!yatt:entity bar>
+  "bar";

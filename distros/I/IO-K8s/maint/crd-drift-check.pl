@@ -565,7 +565,7 @@ sub require_class {
 # IngressRouteSpec') that resource_map never lists -- so without this,
 # shipped_spec_fields() reads %IO::K8s::Resource::_attr_registry for a class
 # that was never require()d, its registry entry doesn't exist, and every
-# field is falsely reported MISSING (k105). Mirrors t/34_registry_guard.t /
+# field is falsely reported MISSING (k105). Mirrors t/02_compile_all.t /
 # spec-drift-check.pl's load_registry: walk + require every .pm, but scoped
 # to this provider's own subtree so an unrelated provider's tree stays
 # unloaded. A provider with no per-Kind subdirectory yet (nothing beyond the

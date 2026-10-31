@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::OpaqueDeviceConfiguration;
 # ABSTRACT: OpaqueDeviceConfiguration contains configuration parameters for a driver in a format defined by the driver vendor.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s driver => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1beta1::OpaqueDeviceConfiguration - OpaqueDeviceConfigu
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 driver
 
@@ -37,7 +37,7 @@ Parameters can contain arbitrary data. It is the responsibility of the driver de
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -65,5 +65,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

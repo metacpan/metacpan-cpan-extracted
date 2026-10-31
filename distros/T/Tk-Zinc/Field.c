@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : 
  *
- * $Id: Field.c,v 1.33 2005/10/18 09:32:23 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -27,8 +27,6 @@
 #include <stdlib.h>
 
 
-static const char rcsid[] = "$Id: Field.c,v 1.33 2005/10/18 09:32:23 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 #define FIELD_SENSITIVE_BIT     1
@@ -924,7 +922,7 @@ static int
 ConfigureField(ZnFieldSet       fs,
                int              field,
                int              argc,
-               Tcl_Obj *CONST   argv[],
+               Tcl_Obj *const   argv[],
                int              *flags)
 {
   unsigned int  i;
@@ -939,7 +937,7 @@ ConfigureField(ZnFieldSet       fs,
 #endif
 
   if ((field < 0) || ((unsigned int) field >= fs->num_fields)) {
-    Tcl_AppendResult(wi->interp, "invalid field index", NULL);
+    Tcl_AppendResult(wi->interp, "invalid field index", (char *) NULL);
     return TCL_ERROR;
   }
   
@@ -1045,10 +1043,10 @@ static int
 QueryField(ZnFieldSet           fs,
            int                  field,
            int                  argc,
-           Tcl_Obj *CONST       argv[])
+           Tcl_Obj *const       argv[])
 {
   if ((field < 0) || ((unsigned int) field >= fs->num_fields)) {
-    Tcl_AppendResult(fs->item->wi->interp, "invalid field index \"", NULL);
+    Tcl_AppendResult(fs->item->wi->interp, "invalid field index \"", (char *) NULL);
     return TCL_ERROR;
   }
     
@@ -1617,7 +1615,15 @@ ComputeFieldImageLocation(Field         fptr,
  */
 static void
 FieldsEngine(ZnFieldSet field_set,
-             void       (*cb)())
+             void       (*cb)(ZnWInfo     *wi,
+                              Field       fptr,
+                              ZnBBox      *bbox,
+                              ZnBBox      *pm_bbox,
+                              ZnPoint     *text_pos,
+                              ZnBBox      *text_bbox,
+                              int         cursor,
+                              int         sel_start,
+                              int         sel_stop))
 {
   ZnWInfo       *wi = field_set->item->wi;
   /*int         i;      This one *NEED* to be an int */
@@ -1919,7 +1925,7 @@ DrawField(ZnWInfo       *wi,
    */
   if (fptr->border_edges != ZN_NO_BORDER) {
     values.foreground = ZnGetGradientPixel(fptr->border_color, 0.0);
-    values.line_width = 0;
+    values.line_width = 1;
     values.line_style = LineSolid;
     values.fill_style = FillSolid;
     XChangeGC(wi->dpy, wi->gc,
@@ -1999,7 +2005,6 @@ RenderField(ZnWInfo     *wi,
   ZnReal        xs;
   ZnTextInfo    *ti = &wi->text_info;
 
-  ZnGLMakeCurrent(wi->dpy, wi);
   /*
    * Draw the background.
    */
@@ -2190,7 +2195,7 @@ PsField(ZnWInfo *wi,
         /* TODO No support yet */
       }
       else { /* Fill stippled */
-        Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+        Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
         if (Tk_PostscriptColor(wi->interp, wi->ps_info,
                                ZnGetGradientColor(fptr->fill_color, 0.0, NULL)) != TCL_OK) {
           return TCL_ERROR;
@@ -2199,7 +2204,7 @@ PsField(ZnWInfo *wi,
                                  ZnImagePixmap(fptr->tile, wi->win)) != TCL_OK) {
           return TCL_ERROR;
         }
-        Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+        Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
       }
     }
     else { /* Fill solid */
@@ -2207,7 +2212,7 @@ PsField(ZnWInfo *wi,
                              ZnGetGradientColor(fptr->fill_color, 0.0, NULL)) != TCL_OK) {
         return TCL_ERROR;
       }
-      Tcl_AppendResult(wi->interp, "fill\n", NULL);
+      Tcl_AppendResult(wi->interp, "fill\n", (char *) NULL);
     }
   }
 
@@ -2224,21 +2229,21 @@ PsField(ZnWInfo *wi,
       if (fptr->image != ZnUnspecifiedImage) {
 	int w, h;
 
-        Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+        Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
         sprintf(path, "%.15g %.15g translate 1 -1 scale\n",
                 pm_bbox->orig.x, pm_bbox->corner.y);
-        Tcl_AppendResult(wi->interp, path, NULL);
+        Tcl_AppendResult(wi->interp, path, (char *) NULL);
         w = ZnNearestInt(pm_bbox->corner.x - pm_bbox->orig.x);
         h = ZnNearestInt(pm_bbox->corner.y - pm_bbox->orig.y);
         if (Tk_PostscriptImage(ZnImageTkImage(fptr->image), wi->interp, wi->win,
                                wi->ps_info, 0, 0, w, h, prepass) != TCL_OK) {
           return TCL_ERROR;
         }
-        Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+        Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
       }
     }
     else if (fptr->text) {
-      Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+      Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
       if (Tk_PostscriptFont(wi->interp, wi->ps_info, fptr->font) != TCL_OK) {
         return TCL_ERROR;
       }
@@ -2253,13 +2258,13 @@ PsField(ZnWInfo *wi,
        */
       sprintf(path, "%.15g %.15g translate 1 -1 scale 0 0 [\n",
               text_bbox->orig.x, text_bbox->orig.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
       /*
        * strlen should do the work of counting _bytes_ in the utf8 string.
        */
       ZnPostscriptString(wi->interp, fptr->text, strlen(fptr->text));
-      Tcl_AppendResult(wi->interp, "] 0 0.0 0.0 0.0 false DrawText\n", NULL);
-      Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+      Tcl_AppendResult(wi->interp, "] 0 0.0 0.0 0.0 false DrawText\n", (char *) NULL);
+      Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
     }
   }
 
@@ -2277,36 +2282,36 @@ PsField(ZnWInfo *wi,
                            ZnGetGradientColor(fptr->border_color, 0.0, NULL)) != TCL_OK) {
       return TCL_ERROR;
     }
-    Tcl_AppendResult(wi->interp, "1 setlinewidth 0 setlinejoin 2 setlinecap\n", NULL);
+    Tcl_AppendResult(wi->interp, "1 setlinewidth 0 setlinejoin 2 setlinecap\n", (char *) NULL);
     if (fptr->border_edges & ZN_LEFT_BORDER) {
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto stroke\n",
               bbox->orig.x, bbox->orig.y, bbox->orig.x, bbox->corner.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
     if (fptr->border_edges & ZN_RIGHT_BORDER) {
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto stroke\n",
               bbox->corner.x, bbox->orig.y, bbox->corner.x, bbox->corner.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
     if (fptr->border_edges & ZN_TOP_BORDER) {
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto stroke\n",
               bbox->orig.x, bbox->orig.y, bbox->corner.x, bbox->orig.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
     if (fptr->border_edges & ZN_BOTTOM_BORDER) {
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto stroke\n",
               bbox->orig.x, bbox->corner.y, bbox->corner.x, bbox->corner.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
     if (fptr->border_edges & ZN_OBLIQUE) {
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto stroke\n",
               bbox->orig.x, bbox->orig.y, bbox->corner.x, bbox->corner.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
     if (fptr->border_edges & ZN_COUNTER_OBLIQUE) {
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto stroke\n",
               bbox->corner.x, bbox->orig.y, bbox->orig.x, bbox->corner.y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
   }
 
@@ -2337,7 +2342,7 @@ PostScriptFields(ZnFieldSet field_set,
      * Fields are drawn with respect to a point already converted
      * to device space, so we need to reinstate the initial transform.
      */
-    Tcl_AppendResult(wi->interp, "/InitialTransform load setmatrix\n", NULL);
+    Tcl_AppendResult(wi->interp, "/InitialTransform load setmatrix\n", (char *) NULL);
 
     lclip_bbox.orig.x = ZnNearestInt(field_set->label_pos.x);
     lclip_bbox.orig.y = ZnNearestInt(field_set->label_pos.y);
@@ -2363,12 +2368,12 @@ PostScriptFields(ZnFieldSet field_set,
       /*
        * Setup a clip area around the field
        */
-      Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+      Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
       sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto %.15g %.15g lineto %.15g %.15g",
               fclip_bbox.orig.x, fclip_bbox.orig.y, fclip_bbox.corner.x+1, fclip_bbox.orig.y,
               fclip_bbox.corner.x+1, fclip_bbox.corner.y+1, fclip_bbox.orig.x,
               fclip_bbox.corner.y+1);
-      Tcl_AppendResult(wi->interp, path, " lineto closepath clip\n", NULL);
+      Tcl_AppendResult(wi->interp, path, " lineto closepath clip\n", (char *) NULL);
 
       if (fptr->text) {
         ComputeFieldTextLocation(fptr, &bbox, &text_pos, &text_bbox);
@@ -2381,7 +2386,7 @@ PostScriptFields(ZnFieldSet field_set,
         return TCL_ERROR;
       }
 
-      Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+      Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
     }
   }
 

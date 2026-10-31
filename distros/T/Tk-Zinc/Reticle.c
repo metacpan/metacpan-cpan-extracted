@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Mon Feb  1 12:13:24 1999
  *
- * $Id: Reticle.c,v 1.45 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -25,8 +25,6 @@
 #include <math.h>
 
 
-static const char rcsid[] = "$Id: Reticle.c,v 1.45 2005/05/10 07:59:48 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -74,6 +72,9 @@ static ZnAttrConfig     reticle_attrs[] = {
     Tk_Offset(ReticleItemStruct, bright_line_color), 0, ZN_DRAW_FLAG, False },
   { ZN_CONFIG_LINE_STYLE, "-brightlinestyle", NULL,
     Tk_Offset(ReticleItemStruct, bright_line_style), 0, ZN_DRAW_FLAG, False },
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(ReticleItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
     Tk_Offset(ReticleItemStruct, header.flags), ZN_COMPOSE_ALPHA_BIT,
     ZN_DRAW_FLAG, False },
@@ -127,13 +128,14 @@ static ZnAttrConfig     reticle_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])     
+     Tcl_Obj *const     *args[])
 {
   ReticleItem   reticle = (ReticleItem) item;
   ZnWInfo       *wi = item->wi;
   
   SET(item->flags, ZN_VISIBLE_BIT);
   CLEAR(item->flags, ZN_SENSITIVE_BIT);
+  CLEAR(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -202,7 +204,7 @@ Destroy(ZnItem  item)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   if (ZnConfigureAttributes(item->wi, item, item, reticle_attrs,
@@ -224,7 +226,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, reticle_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -278,7 +280,7 @@ ComputeCoordinates(ZnItem       item,
                  (reticle->num_circles - 1) * reticle->step_size_dev;
     item->item_bounding_box.orig.x = reticle->dev.x - half_width;
     item->item_bounding_box.orig.y = reticle->dev.y - half_width;
-    item->item_bounding_box.corner.x = item->item_bounding_box.orig.y + (2 * half_width);
+    item->item_bounding_box.corner.x = item->item_bounding_box.orig.x + (2 * half_width);
     item->item_bounding_box.corner.y = item->item_bounding_box.orig.y + (2 * half_width);
   }
 }
@@ -339,7 +341,7 @@ Draw(ZnItem     item)
   while (radius <= radius_max_dev) {
     ZnSetLineStyle(wi, reticle->line_style);
     values.foreground = ZnGetGradientPixel(reticle->line_color, 0.0);
-    values.line_width = 0;
+    values.line_width = 1;
     values.fill_style = FillSolid;
     XChangeGC(wi->dpy, wi->gc, GCForeground | GCLineWidth | GCFillStyle, &values);
     for (i = 1; ((radius <= radius_max_dev) && (i < reticle->period)); i++) {
@@ -364,7 +366,7 @@ Draw(ZnItem     item)
         (reticle->dev.y <= wi->damaged_area.corner.y + radius)) {
       ZnSetLineStyle(wi, reticle->bright_line_style);
       values.foreground = ZnGetGradientPixel(reticle->bright_line_color, 0.0);
-      values.line_width = 0;
+      values.line_width = 1;
       values.fill_style = FillSolid;
       XChangeGC(wi->dpy, wi->gc, GCForeground | GCLineWidth | GCFillStyle, &values);
       XDrawArc(wi->dpy, wi->draw_buffer, wi->gc,
@@ -541,13 +543,13 @@ Coords(ZnItem           item,
   
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " reticles can't add or remove vertices", NULL);
+                     " reticles can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if ((cmd == ZN_COORDS_REPLACE) || (cmd == ZN_COORDS_REPLACE_ALL)) {
     if (*num_pts == 0) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 1 point on reticles", NULL);
+                       " coords command need 1 point on reticles", (char *) NULL);
       return TCL_ERROR;
     }
     reticle->pos = (*pts)[0];
@@ -611,6 +613,7 @@ static ZnItemClassStruct RETICLE_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

@@ -1,6 +1,6 @@
 package Kubernetes::Comb;
 # ABSTRACT: A self-contained micro collection of Kubernetes parts as a live Perl instance
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 
@@ -343,6 +343,30 @@ sub reconcile {
 }
 
 
+
+sub rendered_resources {
+  my ( $self ) = @_;
+  return $self->_planned_items->then( sub { Future->done( map { $_->{manifest} } @_ ) } );
+}
+
+
+sub plan {
+  my ( $self ) = @_;
+  return $self->_planned_items->then( sub {
+    my @items = @_;
+    return $self->_fetch_live(@items)->then( sub {
+      my @desired = map { $self->_resource_of($_) } @items;
+      my %changed = map { ( $_ => 1 ) } $self->_changed_items(@items);
+      my @previous = $self->_previous_resources( { previous => $self->recorded_status } );
+      return Future->done( {
+        create => [ map { $self->_resource_of($_) } grep { !$_->{live} } @items ],
+        update => [ map { $self->_resource_of($_) } grep { $_->{live} && $changed{$_} } @items ],
+        delete => [ grep { !$self->_cluster_scoped($_) } $self->_orphans( \@previous, \@desired ) ],
+      } );
+    } );
+  } );
+}
+
 sub deploy {
   my ( $self ) = @_;
   return Future->call( sub {
@@ -467,6 +491,23 @@ sub recorded_status {
 ####
 #### Internals
 ####
+
+# Future of the items a reconcile that gets as far as deploying would apply:
+# the rendered manifests, or the bridge of the upstream it borrows from.
+sub _planned_items {
+  my ( $self ) = @_;
+  return Future->call( sub {
+    return $self->_resolve_upstream->then( sub {
+      my ( $upstream ) = @_;
+      return $self->_render unless defined $upstream;
+      return $self->_observe_upstream($upstream)->then( sub {
+        my ( $o ) = @_;
+        return Future->fail( $o->{stop}[2], upstream => $o->{stop}[1] ) if $o->{stop};
+        return Future->done( @{ $o->{items} } );
+      } );
+    } );
+  } );
+}
 
 # A contract method whose result may be a list or one Future of it, as a
 # Future; whatever it dies with becomes the failure.
@@ -949,18 +990,27 @@ sub _log_streams {
   my ( $self, $pod ) = @_;
   my $data = $pod->TO_JSON;
   my $name = $data->{metadata}{name};
-  my %status = map { ( $_->{name} => $_ ) } @{ $data->{status}{containerStatuses} // [] };
+  my %status = map { ( $_->{name} => $_ ) }
+    @{ $data->{status}{containerStatuses} // [] }, @{ $data->{status}{initContainerStatuses} // [] };
   my @containers = map { $_->{name} } @{ $data->{spec}{containers} // [] };
-  return map {
-    my $waiting  = $status{$_} && $status{$_}{state} ? $status{$_}{state}{waiting} : undef;
-    my $previous = $waiting && ( $waiting->{reason} // '' ) eq 'CrashLoopBackOff' ? 1 : 0;
-    +{
-      pod       => $name,
-      container => $_,
-      previous  => $previous,
-      label     => $name.( @containers > 1 ? '/'.$_ : '' ).( $previous ? ' (previous)' : '' )
-    };
-  } @containers;
+  my @init = grep {
+    my $terminated = $status{$_} && $status{$_}{state} ? $status{$_}{state}{terminated} : undef;
+    !( $terminated && !$terminated->{exitCode} )
+  } map { $_->{name} } @{ $data->{spec}{initContainers} // [] };
+  return ( map { $self->_log_stream( $name, $_, $status{$_}, $_, @containers > 1 || @init ) } @containers ),
+    map { $self->_log_stream( $name, $_, $status{$_}, 'init:'.$_, 1 ) } @init;
+}
+
+sub _log_stream {
+  my ( $self, $pod, $container, $status, $label, $qualify ) = @_;
+  my $waiting  = $status && $status->{state} ? $status->{state}{waiting} : undef;
+  my $previous = $waiting && ( $waiting->{reason} // '' ) eq 'CrashLoopBackOff' ? 1 : 0;
+  return +{
+    pod       => $pod,
+    container => $container,
+    previous  => $previous,
+    label     => $pod.( $qualify ? '/'.$label : '' ).( $previous ? ' (previous)' : '' )
+  };
 }
 
 sub _log_text {
@@ -1670,8 +1720,7 @@ sub _apply_and_prune {
   my @desired  = map { $self->_resource_of($_) } @items;
   return $self->_apply(@items)->then(
     sub {
-      my %desired = map { ( $self->_resource_key($_) => 1 ) } @desired;
-      return $self->_prune( grep { !$desired{ $self->_resource_key($_) } } @previous )->then( sub {
+      return $self->_prune( $self->_orphans( \@previous, \@desired ) )->then( sub {
         my @pruned = @_;
         $r->{managed} = $self->_union( \@desired, [ map { $_->{resource} } grep { $_->{keep} } @pruned ] );
         return $done->( map { $_->{note} // () } @pruned );
@@ -1708,6 +1757,14 @@ sub _resource_of {
     ( defined $item->{namespace} ? ( namespace => $item->{namespace} ) : () ),
     name       => $item->{name}
   };
+}
+
+# The recorded resources the desired ones no longer name, by identity: what
+# the pruning is about.
+sub _orphans {
+  my ( $self, $previous, $desired ) = @_;
+  my %desired = map { ( $self->_resource_key($_) => 1 ) } @$desired;
+  return grep { !$desired{ $self->_resource_key($_) } } @$previous;
 }
 
 # Identity of a resource across API versions: group, kind, namespace, name.
@@ -2034,7 +2091,7 @@ Kubernetes::Comb - A self-contained micro collection of Kubernetes parts as a li
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -2513,6 +2570,59 @@ C<StatusWritten> -- present only when writing the status failed (see step
 6), C<False> with the reason. Their C<lastTransitionTime> changes only when
 their status does.
 
+=head2 rendered_resources
+
+  my @objects = $comb->rendered_resources->get;
+
+Future of the objects a L</reconcile> would apply right now, as it would
+apply them: labelled, with the namespace set and the applied-digest
+annotation on, the manifests of the class -- or, while the Comb borrows from
+an upstream, the bridge. IO::K8s objects, or hashrefs for what the class
+rendered as hashrefs. Reads the contract methods and, when borrowing, the
+upstream; changes nothing, and does not look at the C<enabled> switch, the
+dependencies or L</check>. Unlike L</reconcile> the Future fails when
+rendering fails.
+
+=head2 plan
+
+  my $plan = $comb->plan->get;
+  # { create => [ ... ], update => [ ... ], delete => [ ... ] }
+
+Future of what a L</reconcile> would do to the cluster, for a caller that
+wants to see (or ask for a go-ahead) before it prunes. Every list holds
+resources as C<managedResources> does -- hashrefs with C<apiVersion>,
+C<kind>, C<namespace> (not for a cluster-scoped one) and C<name> -- in the
+order of rendering, resp. of the record:
+
+=over
+
+=item create
+
+Rendered, and not in the cluster (found by the Comb labels).
+
+=item update
+
+Rendered and in the cluster, but applied from another manifest than the one
+rendered now, or from none with a digest -- the test L</reconcile> makes of a
+healthy Comb. Unchanged resources are in none of the lists. A reconcile of a
+Comb that is not healthy yet applies everything rendered, which the plan
+does not list as an update.
+
+=item delete
+
+Recorded in C<managedResources> of the status, and not rendered any more:
+what the pruning of L</reconcile> goes through, but for cluster-scoped
+resources, which it leaves in place. One that does not carry the Comb labels
+any more is left alone then, too -- the plan does not read that far.
+
+=back
+
+Reads the cluster and changes nothing. After a L</reconcile> that applied
+everything and pruned everything, the three lists are empty. Like
+L</rendered_resources> it ignores C<enabled>, the dependencies and
+L</check>, and the Future fails when the plan cannot be made (rendering, the
+upstream, reading the cluster) -- it is a question, not a step.
+
 =head2 deploy
 
   my @stored = $comb->deploy->get;
@@ -2598,7 +2708,9 @@ Future of a boolean: whether L</status> is C<Running>.
 
 Future of the last C<lines> (default 100) log lines of every container of the
 Comb's Pods. With more than one container, each gets a C<==E<gt> pod/container
-E<lt>==> header. A container in C<CrashLoopBackOff> shows its previous
+E<lt>==> header. Init containers that have not completed successfully are
+included, labelled C<pod/init:name>, so a Pod stuck in an init container
+shows why. A container in C<CrashLoopBackOff> shows its previous
 instance, marked C<(previous)>. A container whose log cannot be read shows why
 instead of failing the whole Future.
 
@@ -2660,7 +2772,7 @@ L<Kubernetes::Comb::Upstream::Static> -- layering
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Fri Dec  2 14:47:42 1994
  *
- * $Id: Rectangle.c,v 1.71 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -26,8 +26,6 @@
 #include "tkZinc.h"
 
 
-static const char rcsid[] = "$Id: Rectangle.c,v 1.71 2005/05/10 07:59:48 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 /*
  * Bit offset of flags.
@@ -66,6 +64,9 @@ typedef struct _RectangleItemStruct {
 
 
 static ZnAttrConfig     rect_attrs[] = {
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(RectangleItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
     Tk_Offset(RectangleItemStruct, header.flags), ZN_COMPOSE_ALPHA_BIT,
     ZN_DRAW_FLAG, False },
@@ -122,7 +123,7 @@ static ZnAttrConfig     rect_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   ZnWInfo       *wi = item->wi;
   RectangleItem rect = (RectangleItem) item;
@@ -135,13 +136,14 @@ Init(ZnItem             item,
   /* Init attributes */
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
   item->priority = 1;
   
   if (*argc < 1) {
-    Tcl_AppendResult(wi->interp, " rectangle coords expected", NULL);
+    Tcl_AppendResult(wi->interp, " rectangle coords expected", (char *) NULL);
     return TCL_ERROR;
   }
   if (ZnParseCoordList(wi, (*args)[0], &points,
@@ -149,7 +151,7 @@ Init(ZnItem             item,
     return TCL_ERROR;
   }
   if (num_points != 2) {
-    Tcl_AppendResult(wi->interp, " malformed rectangle coords", NULL);
+    Tcl_AppendResult(wi->interp, " malformed rectangle coords", (char *) NULL);
     return TCL_ERROR;
   };
   rect->coords[0] = points[0];
@@ -238,7 +240,7 @@ Destroy(ZnItem  item)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   ZnWInfo       *wi = item->wi;
@@ -277,7 +279,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, rect_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -556,7 +558,7 @@ Draw(ZnItem     item)
       ZnSetLineStyle(wi, rect->line_style);
       gc_mask = GCFillStyle|GCLineWidth|GCForeground|GCJoinStyle;
       values.foreground = ZnGetGradientPixel(rect->line_color, 0.0);
-      values.line_width = (rect->line_width == 1) ? 0 : (int) rect->line_width;
+      values.line_width = (int) rect->line_width;
       values.join_style = JoinMiter;
       if (ISCLEAR(rect->flags, ALIGNED_BIT)) {
         gc_mask |= GCCapStyle;
@@ -772,14 +774,14 @@ PostScript(ZnItem item,
   sprintf(path, "%.15g %.15g moveto %.15g %.15g lineto %.15g %.15g lineto %.15g %.15g lineto closepath\n",
           rect->dev[0].x, rect->dev[0].y, rect->dev[1].x, rect->dev[1].y,
           rect->dev[2].x, rect->dev[2].y, rect->dev[3].x, rect->dev[3].y);
-  Tcl_AppendResult(wi->interp, path, NULL);
+  Tcl_AppendResult(wi->interp, path, (char *) NULL);
 
   /*
    * Emit code to draw the filled area.
    */
   if (ISSET(rect->flags, FILLED_BIT)) {
     if (rect->line_width) {
-      Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+      Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
     }
     if (!ZnGradientFlat(rect->fill_color)) {
       if (ZnPostscriptGradient(wi->interp, wi->ps_info, rect->fill_color,
@@ -798,7 +800,7 @@ PostScript(ZnItem item,
                                ZnGetGradientColor(rect->fill_color, 0.0, NULL)) != TCL_OK) {
           return TCL_ERROR;
         }
-        Tcl_AppendResult(wi->interp, "clip ", NULL);
+        Tcl_AppendResult(wi->interp, "clip ", (char *) NULL);
         if (ZnPostscriptStipple(wi->interp, wi->win, wi->ps_info, rect->tile) != TCL_OK) {
           return TCL_ERROR;
         }
@@ -809,10 +811,10 @@ PostScript(ZnItem item,
                              ZnGetGradientColor(rect->fill_color, 0.0, NULL)) != TCL_OK) {
         return TCL_ERROR;
       }
-      Tcl_AppendResult(wi->interp, "fill\n", NULL);
+      Tcl_AppendResult(wi->interp, "fill\n", (char *) NULL);
     }
     if (rect->line_width) {
-      Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+      Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
     }
   }
 
@@ -824,7 +826,7 @@ PostScript(ZnItem item,
       /* TODO No support yet */
     }
     else {
-      Tcl_AppendResult(wi->interp, "0 setlinejoin 2 setlinecap\n", NULL);
+      Tcl_AppendResult(wi->interp, "0 setlinejoin 2 setlinecap\n", (char *) NULL);
       if (ZnPostscriptOutline(wi->interp, wi->ps_info, wi->win,
                               rect->line_width, rect->line_style,
                               rect->line_color, rect->line_pattern) != TCL_OK) {
@@ -911,13 +913,13 @@ Coords(ZnItem           item,
 
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " rectangles can't add or remove vertices", NULL);
+                     " rectangles can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if (cmd == ZN_COORDS_REPLACE_ALL) {
     if (*num_pts != 2) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 2 points on rectangles", NULL);
+                       " coords command need 2 points on rectangles", (char *) NULL);
       return TCL_ERROR;
     }
     rect->coords[0] = (*pts)[0];
@@ -927,7 +929,7 @@ Coords(ZnItem           item,
   else if (cmd == ZN_COORDS_REPLACE) {
     if (*num_pts < 1) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need at least 1 point", NULL);
+                       " coords command need at least 1 point", (char *) NULL);
       return TCL_ERROR;
     }
     if (index < 0) {
@@ -936,7 +938,7 @@ Coords(ZnItem           item,
     if ((index < 0) || (index > 1)) {
     range_err:
       Tcl_AppendResult(item->wi->interp,
-                       " incorrect coord index, should be between -2 and 1", NULL);
+                       " incorrect coord index, should be between -2 and 1", (char *) NULL);
       return TCL_ERROR;
     }
     rect->coords[index] = (*pts)[0];
@@ -1016,6 +1018,7 @@ static ZnItemClassStruct RECTANGLE_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

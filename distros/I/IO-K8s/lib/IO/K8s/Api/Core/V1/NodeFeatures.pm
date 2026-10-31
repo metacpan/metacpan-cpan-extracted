@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeFeatures;
 # ABSTRACT: NodeFeatures describes the set of features implemented by the CRI implementation. The features contained in the NodeFeatures should depend only on the cri implementation independent of runtime handlers.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s supplementalGroupsPolicy => Bool;
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodeFeatures - NodeFeatures describes the set of feature
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 supplementalGroupsPolicy
 
@@ -30,7 +30,7 @@ SupplementalGroupsPolicy is set to true if the runtime supports SupplementalGrou
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -58,5 +58,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

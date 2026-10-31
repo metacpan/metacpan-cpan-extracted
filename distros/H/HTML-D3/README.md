@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.23
+Version 0.24
 
 ## Synopsis
 
@@ -1464,6 +1464,10 @@ is derived:
 
     The caller owns the binning, so `d3.bin()` is never called: one bar is drawn
     per entry, in the order supplied, and the supplied counts are authoritative.
+
+    The bin labels are drawn rotated.  The plot gives up as much room as they need,
+    up to half the chart's height and a quarter of its width, so that they and
+    `x_label` do not overlap and stay inside the chart.
 
 - `scheme` (string, optional) - D3 categorical colour scheme (for example
 `'tableau10'` or `'category10'`) whose first colour is used as the bar fill

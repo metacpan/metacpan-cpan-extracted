@@ -1,17 +1,29 @@
 use common::sense;
-use File::Find ();
 use Test::More;
 
-# Load every module, including new ones not yet added to the manifest.
-my @modules;
-File::Find::find ({ no_chdir => 1, wanted => sub {
-   push @modules, $File::Find::name if /\.pm\z/ && -f _;
-}}, "lib");
-
-for my $path (sort @modules) {
-   (my $module = $path) =~ s{\Alib/}{};
-   $module =~ s{/}{::}g;
-   $module =~ s/\.pm\z//;
+# Modules that need only the mandatory distribution dependencies.
+# Optional components such as Worker::IMAP have their own tests.
+for my $module (qw(
+   AnyEvent::MCP
+   AnyEvent::MCP::Client
+   AnyEvent::MCP::Client::HTTP
+   AnyEvent::MCP::Client::JSONL
+   AnyEvent::MCP::Client::Request
+   AnyEvent::MCP::Config
+   AnyEvent::MCP::Extension
+   AnyEvent::MCP::File
+   AnyEvent::MCP::Helper
+   AnyEvent::MCP::Permissions::Ask
+   AnyEvent::MCP::Server
+   AnyEvent::MCP::Server::Connect
+   AnyEvent::MCP::Server::HTTP
+   AnyEvent::MCP::Server::JSONL
+   AnyEvent::MCP::Server::Permissions
+   AnyEvent::MCP::Server::Request
+   AnyEvent::MCP::Server::Simple
+   AnyEvent::MCP::Server::Toolset
+   AnyEvent::MCP::Workdirs
+)) {
    require_ok $module;
 }
 

@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ShardInfo;
 # ABSTRACT: ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s selector => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ShardInfo - ShardInfo describes the 
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 selector
 
@@ -30,7 +30,7 @@ selector is the shard selector string from the request, echoed back so clients c
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -58,5 +58,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

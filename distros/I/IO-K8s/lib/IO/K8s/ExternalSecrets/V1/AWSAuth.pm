@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AWSAuth;
 # ABSTRACT: Auth defines the information necessary to authenticate against AWS if not set aws sdk will infer credentials from your environment see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s jwt       => '+IO::K8s::ExternalSecrets::V1::AWSJWTAuth';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::AWSAuth - Auth defines the information necessary t
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 jwt
 
@@ -37,7 +37,7 @@ both AccessKeyID and SecretAccessKey must be defined in order to properly authen
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -65,5 +65,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

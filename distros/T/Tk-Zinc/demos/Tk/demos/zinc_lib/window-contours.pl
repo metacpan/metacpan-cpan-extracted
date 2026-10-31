@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-# $Id: window-contours.pl,v 1.6 2003/09/15 12:25:05 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 package window_contours; # for avoiding symbol collision between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

@@ -1,3 +1,28 @@
+0.004     2026-10-31 01:38:48Z
+  - Fix cluster-scoped permissions being empty. The RBAC discovery sent a
+    SelfSubjectRulesReview without a namespace, which the API server
+    rejects with 400 "no namespace on request" - so every cluster-scoped
+    kind (Node, Namespace, CRDs) was denied, also for a cluster-admin.
+    The cluster scope is derived from the namespace reviews now: what all
+    of them have in common is what the account may do cluster-wide.
+  - BEHAVIOUR CHANGE: a cluster-scoped kind is called without a namespace
+    and checked against the cluster scope; a namespaced kind without a
+    namespace answers "namespace required" instead of "Permission denied"
+    (k20).
+  - Fix MCP_K8S_NAMESPACES keeping whitespace around names ('default,
+    production' lost "production") and empty elements, and the plural
+    heuristic turning Gateway into "gatewaies" (k21).
+  - Fix k8s_apply failing with 415 when updating an existing custom resource:
+    the fallback patch is strategic only for built-in kinds (IO::K8s::Api::*)
+    and a merge patch for all others (k19).
+  - Fix k8s_apply treating any create error whose body merely contains "409"
+    as a conflict and patching over the real error. The decision now comes
+    from Kubernetes::REST::APIError->is_conflict; the string match remains
+    only for errors that are not such objects (k18).
+  - Fix k8s_events and k8s_list resource=Event returning only event names:
+    the summary now carries type, reason, message, count, timestamps and
+    involvedObject (kind/name), also for events.k8s.io note/regarding (k17).
+
 0.003     2026-10-01 16:06:40Z
   - Require IO::K8s 1.109 and Kubernetes::REST 1.109: string-map fields
     (labels, annotations, ConfigMap data, ...) now serialize numeric values

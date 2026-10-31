@@ -1,0 +1,146 @@
+#!/bin/env perl
+########################################################################
+# Call FindBin::libs twice -- once with abspath, once with noabspath --
+# to collect etc dirs from both the physical and logical trees.
+# The two arrays are identical when no symlinks appear in the path;
+# they diverge when the script is invoked through a directory symlink,
+# loading production config from @remote and sandbox config from @local.
+# See POD for the symlink scenario and practical use cases.
+########################################################################
+
+use strict;
+use warnings;
+use feature 'say';
+
+use FindBin::Bin
+qw
+(
+    $Bin_l
+    $Bin_p
+);
+
+# abspath   (default): walks from $Bin_p -- physical path, symlinks resolved.
+# noabspath          : walks from $Bin_l -- logical path,  symlinks preserved.
+# Each call exports into its own array; neither clobbers the other.
+
+use FindBin::libs qw( base=etc abspath   export=remote );
+use FindBin::libs qw( base=etc noabspath export=local  );
+
+say "physical bin (\$Bin_p, abspath):   $Bin_p";
+say "logical  bin (\$Bin_l, noabspath): $Bin_l";
+say '';
+
+if( $Bin_l eq $Bin_p )
+{
+    say 'No symlinks in path -- @remote and @local are identical.';
+    say '';
+}
+else
+{
+    say 'Symlinks in path -- @remote and @local may differ.';
+    say '';
+}
+
+say '@remote etc dirs (abspath walk from $Bin_p):';
+
+if( @remote )
+{
+    say "  $_" for @remote;
+}
+else
+{
+    say '  (none found)';
+}
+
+say '';
+say '@local etc dirs (noabspath walk from $Bin_l):';
+
+if( @local )
+{
+    say "  $_" for @local;
+}
+else
+{
+    say '  (none found)';
+}
+
+=head1 NAME
+
+dual_etc_paths - collect etc dirs from both the physical and logical trees
+
+=head1 SYNOPSIS
+
+    dual_etc_paths
+
+=head1 DESCRIPTION
+
+Calls L<FindBin::libs> twice with C<base=etc> and different path arguments
+to export two independent arrays of C<etc> directories:
+
+    use FindBin::libs qw( base=etc abspath   export=remote );
+    use FindBin::libs qw( base=etc noabspath export=local  );
+
+C<@remote> holds the C<etc> directories found walking up from C<$Bin_p>
+(the physical path, symlinks resolved).  C<@local> holds the C<etc>
+directories found walking up from C<$Bin_l> (the logical path, symlinks
+preserved).
+
+When no symlinks appear in the path, both arrays are identical.  They
+differ when the script is invoked through a directory symlink.
+
+=head2 Symlink scenario
+
+Consider a layout where C</home/user/app> is a directory symlink pointing
+to the real source tree under C</work/projects/app>:
+
+    /home/user/                       # logical subtree (sandbox)
+    +-- etc/
+    |   \-- database.conf             # points at test database
+    \-- app -> /work/projects/app     # directory symlink
+
+    /work/projects/                   # physical subtree (production)
+    +-- etc/
+    |   \-- database.conf             # points at production database
+    \-- app/
+        \-- bin/
+            \-- myscript              # $0
+
+Invoked as C</home/user/app/bin/myscript>:
+
+    $Bin_p = /work/projects/app/bin   # symlink resolved
+    $Bin_l = /home/user/app/bin       # symlink preserved
+
+    @remote  =>  ( '/work/projects/etc' )   # production database.conf
+    @local   =>  ( '/home/user/etc'     )   # test database.conf
+
+=head2 Choosing which config to read
+
+Export alone does not select a config file.  With both arrays available
+the script can pick deliberately:
+
+    use List::Util qw( first );
+
+    # nearest production config
+    my $prod_etc = first { -d } @remote;
+
+    # nearest sandbox override (falls back to production if none)
+    my $conf_dir = ( first { -d } @local ) // $prod_etc
+    or die "No etc dir found\n";
+
+    my $db_conf  = "$conf_dir/database.conf";
+
+This lets the same script run against either environment simply by
+controlling whether it is invoked via the symlink path (sandbox) or
+directly (production), with no changes to the source.
+
+=head2 Identical results without symlinks
+
+On a filesystem with no directory symlinks in the path, C<$Bin_l eq $Bin_p>
+and both walks produce the same list.  Keeping both calls is harmless in
+that case; C<@remote> and C<@local> simply hold the same paths.
+
+=head1 SEE ALSO
+
+L<FindBin::Bin>, L<FindBin::libs>, L<FindBin::Parents>
+
+=cut

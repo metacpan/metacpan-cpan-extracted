@@ -2,8 +2,8 @@
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 
-use fields qw(dbic
-	      cf_tmpdir cf_datadir cf_dbname);
+use fields qw(_dbic
+	      tmpdir datadir dbname);
 
 use YATT::Lite::Entities qw(*CON);
 
@@ -225,7 +225,7 @@ sub sendmail {
   my $is_debug = defined $transport && $transport eq 'YATT_TEST';
 
   my $layer = $con->get_encoding_layer;
-  my $fh = $is_debug ? output_file("$self->{cf_datadir}/.htdebug.eml", $layer)
+  my $fh = $is_debug ? output_file("$self->{datadir}/.htdebug.eml", $layer)
     : ostream(my $buffer, $layer);
 
   $sub->($page, $fh, $to, @rest);
@@ -251,12 +251,12 @@ Entity mail_sender => sub {
 
 sub dbic {
   my MY $self = shift;
-  $self->{dbic} //= $self->DBIC->connect($self->dbi_dsn);
+  $self->{_dbic} //= $self->DBIC->connect($self->dbi_dsn);
 }
 
 sub dbic_disconnect {
   (my MY $self) = @_;
-  if (my $dbic = $self->{dbic}) {
+  if (my $dbic = $self->{_dbic}) {
     $dbic->storage->disconnect;
   }
   $self;
@@ -264,13 +264,13 @@ sub dbic_disconnect {
 
 sub dbi_dsn {
   my MY $self = shift;
-  "dbi:SQLite:dbname=$self->{cf_dbname}";
+  "dbi:SQLite:dbname=$self->{dbname}";
 }
 
 sub cmd_setup {
   my MY $self = shift;
   require File::Path;
-  foreach my $dir ($self->{cf_datadir}, $self->{cf_tmpdir}) {
+  foreach my $dir ($self->{datadir}, $self->{tmpdir}) {
     next if -d $dir;
     File::Path::make_path($dir, {mode => 02775, verbose => 1});
   }
@@ -279,7 +279,7 @@ sub cmd_setup {
   # $self->dbic->YATT_DBSchema->deploy;
   $self->DBIC->YATT_DBSchema->cf_let
     ([verbose => 1]
-     , connect_to => sqlite => $self->{cf_dbname});
+     , connect_to => sqlite => $self->{dbname});
 }
 
 #========================================
@@ -288,7 +288,7 @@ sub after_new {
 
   $self->SUPER::after_new(); # **REQUIRED**
 
-  $self->{cf_tmpdir}  //= $self->app_path_var_tmp;
-  $self->{cf_datadir} //= $self->app_path_var('data');
-  $self->{cf_dbname}  //= "$self->{cf_datadir}/.htdata.db";
+  $self->{tmpdir}  //= $self->app_path_var_tmp;
+  $self->{datadir} //= $self->app_path_var('data');
+  $self->{dbname}  //= "$self->{datadir}/.htdata.db";
 }

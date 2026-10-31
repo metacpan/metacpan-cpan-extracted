@@ -1,5 +1,22 @@
 Revision history for IO-K8s-Deprecated
 
+1.112     2026-10-30 22:25:44Z
+
+    * 212 new tombstones for the classes of IO-K8s 0.01 to 0.03 (2018)
+      that no IO-K8s 1.x ships. 180 belong to alpha and beta API versions
+      Kubernetes has retired and name their successor in the current
+      IO-K8s; 32 belong to types Kubernetes dropped without one
+      (PodSecurityPolicy, Initializers, Deployment rollback, PodPreset,
+      RawExtension) and say why. With these, IO-K8s and IO-K8s-Deprecated
+      together cover every IO::K8s name in the PAUSE index.
+
+    * The name guard (t/02-name-guard.t) takes what an installed IO-K8s
+      ships from the .packlist of that installation. Class files an older
+      IO-K8s left in the tree count as leftovers, a file the .packlist
+      lists counts as a collision. An installed IO::K8s without a
+      .packlist is not compared against, and the test skips.
+      (GitHub issue 1)
+
 1.111     2026-10-21 18:26:25Z
 
     * Removed the tombstones for

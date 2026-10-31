@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::GitRepoVolumeSource;
 # ABSTRACT: Represents a volume that is populated with the contents of a git repository. Git repo volumes do not support ownership management. Git repo volumes support SELinux relabeling. DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s directory => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::GitRepoVolumeSource - Represents a volume that is popula
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 directory
 
@@ -44,7 +44,7 @@ revision is the commit hash for the specified revision.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -72,5 +72,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

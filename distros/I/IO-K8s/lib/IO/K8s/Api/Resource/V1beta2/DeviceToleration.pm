@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceToleration;
 # ABSTRACT: The ResourceClaim this DeviceToleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s effect => Str;
@@ -32,7 +32,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceToleration - The ResourceClaim this Devic
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 effect
 
@@ -58,7 +58,7 @@ Value is the taint value the toleration matches to. If the operator is Exists, t
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -86,5 +86,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

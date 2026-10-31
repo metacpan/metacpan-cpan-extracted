@@ -1,7 +1,11 @@
 {
   "sources": {
-    "getty": { "git": "https://github.com/Getty/skills" },
-    "karr": { "git": "https://github.com/Getty/karr" }
+    "getty": {
+      "git": "https://github.com/Getty/skills"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr"
+    }
   },
   "install": {
     "skills": [
@@ -14,7 +18,12 @@
       "kanban-issues-karr-coordination@karr",
       "getty-perl-release-author-getty@karr",
       "getty-perl-pod@karr"
+    ],
+    "bundles": [
+      "getty-cpan-dist@getty"
     ]
   },
-  "targets": ["claude"]
+  "targets": [
+    "claude"
+  ]
 }

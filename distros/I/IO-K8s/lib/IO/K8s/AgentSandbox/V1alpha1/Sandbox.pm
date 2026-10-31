@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1alpha1::Sandbox;
 # ABSTRACT: Isolated runtime environment for AI agents
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxes';
@@ -37,7 +37,7 @@ IO::K8s::AgentSandbox::V1alpha1::Sandbox - Isolated runtime environment for AI a
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ C<spec.service> and C<status.podIPs>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -96,5 +96,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

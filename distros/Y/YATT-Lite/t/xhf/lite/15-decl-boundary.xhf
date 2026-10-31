@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+#
+# GH-258: source_substr ベースの part (action/entity) の本体境界が、
+# 直後の <!yatt:argmacro> 宣言や yatt コメントを飲み込まないこと。
+# yatt コメントは宣言より強い構文要素であり、raw 本体の中でも
+# 「取り除かれる」意味論が成立すること。
+#
+
+TITLE: GH-258 argmacro right after entity
+IN:
+ <!yatt:args>
+ <yatt:foo pair="3, 8"/>[&yatt:e1();]
+ 
+ <!yatt:entity e1>
+ "E1";
+ <!yatt:argmacro test3=[x y] pair>
+ my ($x, $y) = split /\s*,\s*/, $cgen->node_value($args->{pair});
+ $result->{x} = $x;
+ $result->{y} = $y;
+ 
+ <!yatt:widget foo %test3;>
+ x=&yatt:x; y=&yatt:y;
+OUT:
+ x=3 y=8
+ [E1]
+
+
+TITLE: GH-258 argmacro right after action
+IN:
+ <!yatt:args>
+ <yatt:foo pair="4, 9"/>
+ 
+ <!yatt:action doit>
+ print $CON "doit";
+ <!yatt:argmacro test4=[x y] pair>
+ my ($x, $y) = split /\s*,\s*/, $cgen->node_value($args->{pair});
+ $result->{x} = $x;
+ $result->{y} = $y;
+ 
+ <!yatt:widget foo %test4;>
+ x=&yatt:x; y=&yatt:y;
+OUT:
+ x=4 y=9
+ 
+
+
+TITLE: GH-258 yatt comment right after entity can comment-out parts
+IN:
+ <!yatt:args>
+ <yatt:live/>[&yatt:e1();]
+ 
+ <!yatt:entity e1>
+ "E1";
+ <!--#yatt
+ <!yatt:widget disabled>
+ DISABLED
+ #-->
+ <!yatt:widget live>
+ LIVE
+OUT:
+ LIVE
+ [E1]
+
+
+TITLE: GH-258 yatt comment inside entity body
+IN:
+ [&yatt:e1();]
+ 
+ <!yatt:entity e1>
+ my $x = 1;
+ <!--#yatt note #-->
+ $x * 2;
+OUT:
+ [2]

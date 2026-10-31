@@ -44,7 +44,9 @@ use YATT::Lite::Breakpoint;
 use YATT::Lite::Util qw(lexpand);
 use YATT::Lite::Test::XHFTest2;
 use base qw(YATT::Lite::Test::XHFTest2);
+use YATT::Lite::MFields;
 use YATT::t::t_preload; # To make Devel::Cover happy.
+use CGI::Session; do {CGI::Session->new}; # To avoid module load error during rendering.
 
 my MY $tests = MY->load_tests([dir => "$FindBin::Bin/../html"]
 			      , @ARGV ? @ARGV : $FindBin::Bin);
@@ -64,20 +66,20 @@ is_refcount($site, 2, "refcount after load_factory_script(includes sub2self)");
 
 test_psgi $site->to_app, sub {
   my ($cb) = shift;
-  foreach my File $sect (@{$tests->{files}}) {
-    my $dir = $tests->{cf_dir};
+  foreach my File $sect (@{$tests->{_files}}) {
+    my $dir = $tests->{dir};
     my $sect_name = $tests->file_title($sect);
-    foreach my Item $item (@{$sect->{items}}) {
+    foreach my Item $item (@{$sect->{_items}}) {
     SKIP: {
-	if ($item->{cf_PERL_MINVER} and $] < $item->{cf_PERL_MINVER}) {
-	  Test::More::skip "by perl-$] < PERL_MINVER($item->{cf_PERL_MINVER}) $sect_name", 1;
+	if ($item->{PERL_MINVER} and $] < $item->{PERL_MINVER}) {
+	  Test::More::skip "by perl-$] < PERL_MINVER($item->{PERL_MINVER}) $sect_name", 1;
 	}
 
-	if ($item->{cf_BREAK}) {
+	if ($item->{BREAK}) {
 	  YATT::Lite::Breakpoint::breakpoint();
 	}
 
-	if (my $action = $item->{cf_ACTION}) {
+	if (my $action = $item->{ACTION}) {
 	  my ($method, @args) = @$action;
 	  my $sub = $tests->can("action_$method")
 	    or die "No such action: $method";
@@ -85,35 +87,35 @@ test_psgi $site->to_app, sub {
 	  next;
 	}
 
-	$item->{cf_METHOD} //= 'GET';
-	my $T = defined $item->{cf_TITLE} ? "[$item->{cf_TITLE}]" : '';
+	$item->{METHOD} //= 'GET';
+	my $T = defined $item->{TITLE} ? "[$item->{TITLE}]" : '';
 
 	my $res = do {
-	  $site->cf_let([lexpand($item->{cf_SITE_CONFIG})]
+	  $site->cf_let([lexpand($item->{SITE_CONFIG})]
 			, sub {
 			  $tests->run_psgicb($cb, $item);
 			});
 	};
 
-	if ($item->{cf_ERROR}) {
+	if ($item->{ERROR}) {
 	  (my $str = $res->content) =~ s/^Internal Server error\n//;
-	  like $str, qr{$item->{cf_ERROR}}
-	    , "[$sect_name] $T ERROR $item->{cf_METHOD} $item->{cf_FILE}";
+	  like $str, qr{$item->{ERROR}}
+	    , "[$sect_name] $T ERROR $item->{METHOD} $item->{FILE}";
 	  next;
-	} elsif ($item->{cf_STATUS}
-                 ? $item->{cf_STATUS} == $res->code
+	} elsif ($item->{STATUS}
+                 ? $item->{STATUS} == $res->code
                  : $res->code >= 300 && $res->code < 500) {
 	  # fall through
 	} elsif ($res->code != 200) {
-	  Test::More::fail $item->{cf_FILE};
+	  Test::More::fail $item->{FILE};
 	  Test::More::diag $res->content;
 	  next;
 	}
 
-	if ($item->{cf_METHOD} eq 'POST' and $item->{cf_HEADER}) {
-	  my @header = @{$item->{cf_HEADER}};
+	if ($item->{METHOD} eq 'POST' and $item->{HEADER}) {
+	  my @header = @{$item->{HEADER}};
 	  while (my ($f, $v) = splice @header, 0, 2) {
-	    my $name = "[$sect_name] $T POST $item->{cf_FILE} $f";
+	    my $name = "[$sect_name] $T POST $item->{FILE} $f";
 	    my $got = $res->header($f);
 	    if (defined $got) {
 	      like $got, qr/$v/, $name;
@@ -121,12 +123,12 @@ test_psgi $site->to_app, sub {
 	      fail $name; diag("Header '$f' was undef");
 	    }
 	  }
-	} elsif (ref $item->{cf_BODY}) {
-	  like nocr($res->content), $tests->mkseqpat($item->{cf_BODY})
-	    , "[$sect_name] $T $item->{cf_METHOD} $item->{cf_FILE}";
+	} elsif (ref $item->{BODY}) {
+	  like nocr($res->content), $tests->mkseqpat($item->{BODY})
+	    , "[$sect_name] $T $item->{METHOD} $item->{FILE}";
 	} else {
-	  eq_or_diff trimlast(nocr($res->content)), $item->{cf_BODY}
-	    , "[$sect_name] $T $item->{cf_METHOD} $item->{cf_FILE}";
+	  eq_or_diff trimlast(nocr($res->content)), $item->{BODY}
+	    , "[$sect_name] $T $item->{METHOD} $item->{FILE}";
 	}
       }
     }

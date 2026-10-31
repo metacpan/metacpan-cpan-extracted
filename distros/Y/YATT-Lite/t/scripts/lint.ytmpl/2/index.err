@@ -1,2 +1,1 @@
-error [[[ <!>\[\[file\][^\[\]]+]]][line] 1]
- Not enough arguments for <yatt:foreach>!
+[[[<!>^.*?/index\.yatt:1: ]]]Not enough arguments for <yatt:foreach>!

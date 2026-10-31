@@ -29,8 +29,6 @@
 #endif
 
 
-static const char rcsid[] = "$Id: Image.c,v 1.51 2005/10/18 09:31:01 lecoanet Exp $";
-static const char compile_id[] = "$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 static int              images_inited = 0;
@@ -99,7 +97,7 @@ char *ZnNameOfImage(ZnImage image);
 
 #ifdef GL
 
-static int
+int
 To2Power(int a)
 {
   int result = 1;
@@ -212,7 +210,7 @@ ZnGetImage(ZnWInfo      *wi,
   ImageBits     *bits;
   ZnBool        for_gl = wi->render>0;
   Image         image;
-  Tk_ImageType  *type;
+  CONST86 Tk_ImageType  *type;
   ClientStruct  cs, *cs_ptr;
 
   /*printf("ZnGetImage: %s\n", image_name);*/
@@ -262,7 +260,7 @@ ZnGetImage(ZnWInfo      *wi,
       
       Tk_SizeOfBitmap(wi->dpy, pmap, &bits->width, &bits->height);    
       mask = XGetImage(wi->dpy, pmap, 0, 0, (unsigned int) bits->width,
-                       (unsigned int) bits->height, 1L, XYPixmap);
+                       (unsigned int) bits->height, 1L, ZPixmap);
       bits->depth = 1;
       bits->rowstride = mask->bytes_per_line;
       bits->bpixels = ZnMalloc((unsigned int) (bits->height * bits->rowstride));
@@ -1055,8 +1053,8 @@ ZnImageTex(ZnImage      image,
     glBindTexture(GL_TEXTURE_2D, this->i.texobj);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glGetError();
     if (is_bmap) {
       glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY4,
@@ -1128,6 +1126,9 @@ ZnList DeferredGLGlyphs;
 #include "CharsetISO8859-15.h"
 #endif
 
+#ifndef PTK_800
+#define AA_FONTS 1
+#endif
 
 static void
 SuckGlyphsFromServer(ZnWInfo    *wi,
@@ -1135,6 +1136,10 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
 {
   Pixmap        offscreen = 0;
   XImage        *image = NULL;
+#ifdef AA_FONTS
+  XColor        *white, *black;
+  unsigned long pixel;
+#endif
   GC            xgc = 0;
   unsigned int  height, length, pixwidth;
   unsigned int  i, j, use_max_width;
@@ -1147,13 +1152,13 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
   unsigned int  numToGrab, glyph;
   ZnTexGVI      *tgvip;
   Tk_FontMetrics fm;
-  CONST unsigned char   *cur, *next;
+  const unsigned char   *cur, *next;
 #ifndef PTK_800
   Tcl_UniChar   uni_ch;
 #endif
   ZnGLContextEntry *ce = ZnGetGLContext(wi->dpy);
 
-  /*printf("loading a font \n");*/
+  //printf("loading a font \n");
   Tk_GetFontMetrics(txf->tkfont, &fm);
 #ifndef PTK_800
   txf->num_glyphs = Tcl_NumUtfChars(ZnDefaultCharset, strlen(ZnDefaultCharset));
@@ -1225,6 +1230,14 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
     tgvip++;
   }
 
+  //
+  // If max_char_width is still not known, perhaps because of a bogus
+  // font with character width not documented, set the width to an
+  // arbitrary value.
+  if (!txf->max_char_width) {
+    txf->max_char_width = 1;
+  }
+
   if (use_max_width) {
     tex_width = ce->max_tex_size;
   }
@@ -1241,8 +1254,8 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
   } 
   txf->tex_width = tex_width;
   txf->tex_height = tex_height;
-  /*printf("(%s) Texture size is %d x %d for %d chars (max size: %d)\n",
-    Tk_NameOfFont(font), txf->tex_width, txf->tex_height, txf->num_glyphs, ce->max_tex_size);*/
+  //printf("(%s) Texture size is %d x %d for %d chars (max size: %d)\n",
+   // Tk_NameOfFont(txf->tkfont), txf->tex_width, txf->tex_height, txf->num_glyphs, ce->max_tex_size);
 
   /*
    * Now render the font bits into the texture.
@@ -1251,25 +1264,42 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
   if (!txf->teximage) {
     goto FreeAndReturn;
   }
+#ifndef AA_FONTS
   memset(txf->teximage, 0, tex_height * tex_width);
+#endif
 
   maxSpanLength = (txf->max_char_width + 7) / 8;
   /* Be careful determining the width of the pixmap; the X protocol allows
      pixmaps of width 2^16-1 (unsigned short size) but drawing coordinates
-     max out at 2^15-1 (signed short size).  If the width is too large, we
-     need to limit the glyphs per grab.  */
-  if ((glyphsPerGrab * 8 * maxSpanLength) >= (1 << 15)) {
-    glyphsPerGrab = (1 << 15) / (8 * maxSpanLength);
+     max out at 2^15-1 (signed short size). Some problems have been encountered
+     with XFree86, it is safe to limit the width to 4096. */
+  if ((glyphsPerGrab * 8 * maxSpanLength) >= (1 << 12)) {
+    glyphsPerGrab = (1 << 12) / (8 * maxSpanLength);
   }
   pixwidth = glyphsPerGrab * 8 * maxSpanLength;
+#ifdef AA_FONTS
+  offscreen = Tk_GetPixmap(wi->dpy, RootWindowOfScreen(wi->screen),
+                           (int) pixwidth, (int) height, Tk_Depth(wi->win));
+#else
   offscreen = Tk_GetPixmap(wi->dpy, RootWindowOfScreen(wi->screen),
                            (int) pixwidth, (int) height, 1);
-  
+#endif
   xgc = XCreateGC(wi->dpy, offscreen, 0, NULL);
+#ifdef AA_FONTS
+  white = Tk_GetColor(wi->interp, wi->win, "white");
+  black = Tk_GetColor(wi->interp, wi->win, "black");
+  XSetForeground(wi->dpy, xgc, white->pixel);
+  XSetBackground(wi->dpy, xgc, white->pixel);
+#else
   XSetForeground(wi->dpy, xgc, WhitePixelOfScreen(wi->screen));
   XSetBackground(wi->dpy, xgc, WhitePixelOfScreen(wi->screen));
+#endif
   XFillRectangle(wi->dpy, offscreen, xgc, 0, 0, pixwidth, height);
+#ifdef AA_FONTS
+  XSetForeground(wi->dpy, xgc, black->pixel);
+#else
   XSetForeground(wi->dpy, xgc, BlackPixelOfScreen(wi->screen));
+#endif
   XSetFont(wi->dpy, xgc, Tk_FontId(txf->tkfont));
 
   numToGrab = 0;
@@ -1285,13 +1315,16 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
     if (txf->glyph[i].width != 0) {
       Tk_DrawChars(wi->dpy, offscreen, xgc, txf->tkfont, cur, next - cur, 
                    (int) (8*maxSpanLength*numToGrab), txf->ascent);
-      grabList[numToGrab] = i;    
+      grabList[numToGrab] = i;
       numToGrab++;
     }
 
     if ((numToGrab >= glyphsPerGrab) || (i == txf->num_glyphs - 1)) {
+#ifdef AA_FONTS
+      image = XGetImage(wi->dpy, offscreen, 0, 0, pixwidth, height, AllPlanes, ZPixmap);
+#else
       image = XGetImage(wi->dpy, offscreen, 0, 0, pixwidth, height, 1, XYPixmap);
-
+#endif
       for (j = 0; j < numToGrab; j++) {
         glyph = grabList[j];
         width = txf->glyph[glyph].width;
@@ -1310,9 +1343,14 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
                each pixel from the image which is not that efficient.  We
                could either do tighter packing in the pixmap or more
                efficient extraction from the image.  Oh well.  */
+#ifdef AA_FONTS
+            pixel = XGetPixel(image, (int) (j*maxSpanLength*8) + x, y);
+            *to = 255 - (pixel & 0xFF);
+#else
             if (XGetPixel(image, (int) (j*maxSpanLength*8) + x, y) == BlackPixelOfScreen(wi->screen)) {
               *to = 255;
-              }
+            }
+#endif
           }
           to += tex_width - width;
         }
@@ -1322,10 +1360,18 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
       numToGrab = 0;
       /* do we need to clear the offscreen pixmap to get more? */
       if (i < txf->num_glyphs - 1) {
+#ifdef AA_FONTS
+        XSetForeground(wi->dpy, xgc, white->pixel);
+#else
         XSetForeground(wi->dpy, xgc, WhitePixelOfScreen(wi->screen));
+#endif
         XFillRectangle(wi->dpy, offscreen, xgc, 0, 0,
                        8 * maxSpanLength * glyphsPerGrab, height);
+#ifdef AA_FONTS
+        XSetForeground(wi->dpy, xgc, black->pixel);
+#else
         XSetForeground(wi->dpy, xgc, BlackPixelOfScreen(wi->screen));
+#endif
       }
     }
     
@@ -1333,6 +1379,10 @@ SuckGlyphsFromServer(ZnWInfo    *wi,
     i++;
   }
 
+#ifdef AA_FONTS
+  Tk_FreeColor(black);
+  Tk_FreeColor(white);
+#endif
   XFreeGC(wi->dpy, xgc);
   Tk_FreePixmap(wi->dpy, offscreen);
   return;
@@ -1529,10 +1579,11 @@ ZnTexFontTex(ZnTexFontInfo      tfi)
     glBindTexture(GL_TEXTURE_2D, this->texobj);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glGetError();
-    /*printf("Demande texture de %d x %d\n", txf->tex_width, txf->tex_height);*/
+    //printf("Demande texture de %d x %d pour %s\n",
+      //     txf->tex_width, txf->tex_height, ZnNameOfTexFont(tfi));
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, txf->tex_width,
                  txf->tex_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE,
                  txf->teximage);

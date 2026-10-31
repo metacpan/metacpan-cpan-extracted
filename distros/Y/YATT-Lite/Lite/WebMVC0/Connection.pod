@@ -4,11 +4,37 @@ YATT::Lite::WebMVC0::Connection - output buffer with request properties
 
 =head1 SYNOPSIS
 
+  # Inside actions (*.ydo, <!yatt:action>, .htyattrc.pl), you will get
+  # a connection object as $CON (or $con). In templates, entity calls
+  # like &yatt:site_path(); implicitly use it.
+
+  # Read request parameters.
+  my $q = $CON->param('q');
+
+  # Build app-internal urls (mount-prefix aware).
+  my $path = $CON->site_path("/auth/login", [nx => $CON->current_path]);
+  my $url  = $CON->site_url("/confirm", [token => $token]); # for emails
+
+  # Redirect (never returns).
+  $CON->raise_redirect($CON->site_path("/"));
+
+  # Connection is just a blessed glob handle. You can print to it.
+  print {$CON} "foo", "bar";
+
+  # Per-request stash.
+  $CON->stash->{foo} = 3;
+
+  # Raise an error page.
+  $CON->error("Found error in %s!", $path);
+
+  #========================================
+  # Under the hood, a connection is created like this
+  # (usually via $siteapp->make_connection($parent_fh, @config)):
+
   # If $env is like followings:
   # $env->{PATH_INFO}       = '/mysite/user/hkoba'
   # $env->{PATH_TRANSLATED} = '/var/www/webapps/mysite/html/user.yatt/hkoba'
 
-  # $con should be created like this:
   my $con = YATT::Lite::WebMVC0::Connection->create(
                $parent_fh,
                env => $env,
@@ -18,35 +44,460 @@ YATT::Lite::WebMVC0::Connection - output buffer with request properties
                dir         => "/var/www/webapps/mysite/html",
                location    => "/",
                file        => "user.yatt",
+               request_file => "user",  # file name part as requested
                subpath     => "/hkoba",
 
                # cgi => Plack::Request->new($env),
                # no_nested_query => 1
             );
 
-  # or
-
-  $con = $siteapp->make_connection($parent_fh, @config);
-
-  # Connection is just a blessed glob handle
-
-  print $con "foo", "bar";
-  my $result = $con->buffer; # "foobar";
-
-  # Connection can carry request specific values such as parameters.
-  my $val = $con->param('x') + $con->param('y');
-  $con->stash->{'foo'} = 3;
-
-
-  # Connection implements YATT::Lite::Object like configure/cget methods.
-  print $con->cget('env');
-  $con->configure(dir => $foo, file => $bar);
-
-
-  $con->redirect($url, $params);
-
-  $con->error("Found error in %s!", $path);
-  # $con->raise(error => "Found error in %s!", $path);
-
 =head1 DESCRIPTION
 
+A connection object represents one HTTP request/response cycle.
+It is a blessed GLOB which buffers output printed to it,
+and also carries request properties (PSGI env, query parameters,
+the I<location quad>: C<dir>, C<location>, C<file>, C<subpath>,
+and L</request_file>).
+
+Most methods below are also exposed to templates as same-named
+entity functions (e.g. C<< $CON->site_path(...) >> as
+C<&yatt:site_path(...);>). See L<YATT::Lite::WebMVC0::SiteApp>.
+
+=head1 URL BUILDING METHODS
+
+X<GH-251> These four methods are the recommended way to build
+app-internal urls. The naming follows the widespread convention:
+C<*_path> returns a path (no C<scheme://host>), C<*_url> returns
+an absolute url. All of them respect the mount point of the site
+(L</site_prefix>), so they keep working when the app is deployed
+under a sub-path (e.g. behind C<Alias>, C<Action> or a reverse proxy).
+
+C<$query> is optional. It must be a HASH ref, an ARRAY ref of
+key-value pairs, or a query object (including C<$CON> itself).
+Plain scalars and flattened C<< key => value >> lists are rejected
+with an error (to prevent silent mistakes; see L<mkurl|/"mkurl($file, $param, %opts)">).
+
+Note: for a link to a I<sibling> page with a I<known> depth,
+plain relative links (C<< href="other" >>, C<< href="../login" >>)
+are also fine and need no helper.
+
+=head2 site_path($path, $query)
+
+Returns C<site_prefix . $path . query_string>.
+C<$path> must start with C</> (it means I<site root>, not server root).
+If C<$path> is omitted, returns the site root (= L</site_location>).
+
+  $CON->site_path;                        # => /myapp/
+  $CON->site_path("/admin/");             # => /myapp/admin/
+  $CON->site_path("/list", {page => 2});  # => /myapp/list?page=2
+
+=head2 site_url($path, $query)
+
+Absolute url version of L<site_path|/"site_path($path, $query)">. Use this when you need
+C<scheme://host> - typically for urls put into emails.
+The scheme respects C<X-Forwarded-Proto> (see L<mkprefix|/"mkprefix(@extras)">).
+
+  $CON->site_url("/confirm", [token => $token]);
+  # => https://example.com/myapp/confirm?token=...
+
+=head2 current_path($query)
+
+Returns the path of the current request (query string I<replaced>
+by C<$query>, dropped if omitted). Since C<< $CON->mkquery >> accepts
+C<$CON> itself as a query object, C<< $CON->current_path($CON) >>
+reproduces the current url with its current parameters
+- useful to build C<nx> (come-back url) parameters.
+
+  # Requested url: /myapp/item?page=2
+  $CON->current_path;               # => /myapp/item
+  $CON->current_path([page => 3]);  # => /myapp/item?page=3
+  $CON->current_path($CON);         # => /myapp/item?page=2
+
+Since GH-259, when the request has a body
+(C<< $env->{CONTENT_TYPE} >> and C<< $env->{CONTENT_LENGTH} >> are set,
+typically POST), C<< $CON->current_path($CON) >> reproduces only the
+C<QUERY_STRING>-derived parameters - body parameters never leak into
+generated urls. To restore the old merged behavior, set the SiteApp
+option L<mkquery_with_body_params|YATT::Lite::WebMVC0::SiteApp/mkquery_with_body_params>.
+
+=head2 current_url($query)
+
+Absolute url version of L<current_path|/"current_path($query)">.
+
+=head1 REDIRECT
+
+=head2 raise_redirect($url)
+
+=head2 redirect($url)
+
+Sends a C<302 Found> redirect and B<never returns> - it is
+implemented with C<die> and unwinds the stack, like other
+C<raise_*> family members (L<YATT::Lite::Util/raise_response>).
+Do not write code after it expecting it to run.
+C<raise_redirect> is an alias of C<redirect>, preferred because
+the name tells this never-return behavior.
+
+  $CON->raise_redirect($CON->site_path("/login", [nx => $nx]));
+
+B<Open redirect protection is built in>: a plain string C<$url>
+is accepted only when it stays on this origin, as a browser would
+interpret the C<Location:> header:
+
+=over 4
+
+=item *
+
+a path (C</...>) or a relative reference (C<./>, C<index?x=1>,
+C<?x=1>, C<#frag>), or
+
+=item *
+
+an absolute C<http(s)://host/...> or scheme-relative C<//host/...>
+url whose C<host> equals C<< $CON->mkhost >>.
+
+=back
+
+Anything else is rejected with C<400 Bad Request>: a foreign host,
+a non-http scheme (C<javascript:>, C<data:>), and the forms browsers
+normalize into a foreign host - C<\\host>, C</\host>, C<///host>,
+C<http:\\host>, or a url with leading whitespace or control characters
+(which would also allow header injection). The check is
+L</is_same_origin_redirect_url($url)>.
+
+To intentionally redirect to an external site, pass a SCALAR REF:
+
+  $CON->raise_redirect(\ $external_url);
+
+=head2 is_same_origin_redirect_url($url)
+
+Returns true if the plain string C<$url> passes the open redirect
+check described above. Exposed so that application code can test a
+user-supplied url (e.g. a C<nx> parameter) before storing it.
+
+Output printed so far is discarded, and the session (if any)
+is flushed before the redirect.
+
+=head1 REQUEST PARAMETER METHODS
+
+=head2 param($name)
+
+Returns the query/body parameter. Without arguments, returns the
+list of parameter names. With C<< $CON->param($name, $value) >>,
+sets the value.
+
+Note: unless L<YATT::Lite::WebMVC0::SiteApp/no_nested_query> is on,
+parameters like C<foo[0]>, C<foo[bar]> are restructured into
+ARRAY/HASH refs (nested query) and C<param> returns them as-is.
+
+=head2 multi_param($name)
+
+List context aware variant, following modern L<CGI> convention.
+
+=head2 param_type($name, $type, $diag, $opts)
+
+Type-checked parameter access. C<$type> is either a C<Regexp>
+or a name of C<re_*> patterns in L<YATT::Lite::RegexpNames>
+(e.g. C<integer>, C<digit>, C<name>, C<nonempty>, C<any>).
+If the value does not match, dies with C<400 Bad Request>
+(or C<$diag> message if given). Handy for input validation:
+
+  my $id = $CON->param_type(id => 'integer');
+
+=head2 delete_param($name)
+
+=head2 remove_param($name)
+
+Deletes the parameter. (Two names for the same method.)
+
+=head2 param_exists($name)
+
+=head2 as_hash
+
+=head2 queryobj
+
+C<as_hash> returns all parameters as a plain HASH.
+C<queryobj> returns the underlying parameter container
+(nested query HASH, L<Hash::MultiValue> or CGI-ish object).
+
+=head1 LOCATION INSPECTION METHODS
+
+These methods tell I<where the current request is>. They return
+values, not links - to build links, use L</URL BUILDING METHODS>.
+
+Suppose the site is mounted at C</myapp> (C<SCRIPT_NAME=/myapp>)
+and C<https://example.com/myapp/auth/test?q=1> is served by
+C<auth/test.yatt>. Then:
+
+  site_prefix    /myapp
+  site_location  /myapp/
+  location       /auth/
+  dir_location   /myapp/auth/
+  file_location  /myapp/auth/test
+  page_location  /myapp/auth/test
+  request_file   test
+  mapped_path    /myapp/auth/test
+  request_path   /myapp/auth/test
+  request_uri    /myapp/auth/test?q=1
+
+(If the request were C</myapp/auth/test.yatt?q=1> instead,
+C<request_file> would be C<test.yatt>, and C<file_location> /
+C<mapped_path> would be C</myapp/auth/test.yatt> - they reproduce
+how the request spelled the file name. C<page_location> stays
+canonical (C</myapp/auth/test>) regardless. Others are not
+affected.)
+
+=head2 site_prefix
+
+The mount point of the whole site (without trailing C</>).
+Comes from L<YATT::Lite::WebMVC0::SiteApp/site_prefix> config,
+or falls back to C<< $env->{'yatt.script_name'} >>
+(normalized C<SCRIPT_NAME>, set by SiteApp).
+
+=head2 site_location
+
+=head2 site_loc
+
+C<site_prefix . '/'>. The url path of the site root.
+
+=head2 location
+
+The location of current L<DirApp|YATT::Lite::WebMVC0::DirApp>
+(directory), B<without> site_prefix. Guaranteed to end with C</>.
+
+=head2 dir_location
+
+Like L</location>, but B<with> the mount prefix prepended.
+
+=head2 file_location
+
+The url path of the current page:
+L</dir_location> + L</request_file>.
+Like L</mapped_path>, this follows how the request spelled the
+file name (Apache content-negotiation model: the requested name is
+the base name and negotiation just appends extensions to it).
+The file name part is empty for index requests.
+
+=head2 page_location
+
+X<GH-251> Canonical url path of the current page, based on the
+physical file name: L</dir_location> + file name without the last
+extension (file name part is omitted for index pages). Unlike
+L</file_location>, this is B<not> affected by how the request
+spelled the url. Use this for canonical links.
+
+=head2 request_file
+
+X<GH-251> The file name part B<as it appeared in the request>:
+extension-less when the request omitted it, extension-ful when the
+request spelled it, and empty when the file name was totally omitted
+(index requests). In other words,
+C<file - request_file = the extension supplemented by the dispatcher>.
+
+=head2 mapped_path
+
+X<GH-251> Reconstruction of the url path of the current request from
+the mapping result: C<site_prefix + location + request_file + subpath>.
+Usually this equals L</request_path>; they differ when C<REQUEST_URI>
+does not represent the logical location (e.g. url rewriting).
+In list context, returns C<($prefix_location_file, $subpath)>.
+
+=head2 request_path
+
+=head2 request_uri
+
+C<request_uri> is C<< $env->{REQUEST_URI} >> (query string included).
+C<request_path> is the same with query string stripped.
+
+=head2 is_current_file($path)
+
+X<GH-251> True when C<$path> addresses the current page.
+C<$path> is a site-rooted literal - the same form as the argument
+of L<site_path|/"site_path($path, $query)">, so a nav link and its
+current-page test can share one literal:
+
+  <yatt:if "&yatt:is_current_file(/auth/login);">
+    <b>login</b>
+  <:yatt:else/>
+    <a href="&yatt:site_path(/auth/login);">login</a>
+  </yatt:if>
+
+Accepted forms: canonical (C</auth/login>), physical
+(C</auth/login.yatt>), and directory form for index pages
+(C</auth/>). Mount prefix and how the request spelled the url do
+not affect the result. Subpath is ignored.
+
+=head2 is_current_page($file, $page)
+
+Compares the page B<name> (directory-independent) and subpage
+(subpath) against the current request.
+
+=head1 LOW LEVEL URL METHODS
+
+Building blocks of the above. Usually you won't need them directly
+- prefer L<site_path|/"site_path($path, $query)"> and its friends for new code.
+
+=head2 mkurl($file, $param, %opts)
+
+The oldest url builder. Returns an B<absolute url> by default
+(note: this default is opposite to L<site_path|/"site_path($path, $query)"> family).
+
+C<$file> selects the base path:
+
+=over 4
+
+=item C<undef> or C<''>
+
+The current request path.
+
+=item C<'.'>
+
+The directory part of the current request path.
+
+=item C<'name'> (relative)
+
+Sibling file in the same directory.
+
+=item C</abs> (starts with C</>)
+
+C<site_prefix . $file>.
+
+=back
+
+C<$param> is passed to L<mkquery|/"mkquery($param, $separator)">. C<%opts> are:
+
+=over 4
+
+=item local => 1
+
+Omit C<scheme://host> part (return path only).
+
+=item mapped_path => 1
+
+Use L</mapped_path> (reconstruction of the requested url path from
+the mapping result) as the base, instead of C<REQUEST_URI>.
+Useful when C<REQUEST_URI> does not represent the logical location
+(e.g. url rewriting).
+
+=item separator => $sep
+
+Query separator. Default is C<&>.
+
+=back
+
+B<Caveat>: C<%opts> comes I<after> the positional C<$param>.
+C<< mkurl("/admin/", local => 1) >> is a common mistake -
+C<"local"> is taken as C<$param>. Write
+C<< mkurl("/admin/", undef, local => 1) >>,
+or just use C<< site_path("/admin/") >>.
+
+=head2 mkpath($file, $use_mapped_path)
+
+The path building part of L<mkurl|/"mkurl($file, $param, %opts)">.
+
+=head2 mkquery($param, $separator)
+
+Builds a query string from C<$param>: a HASH ref (keys sorted),
+an ARRAY ref of key-value pairs (order preserved), an object with
+C<keys>/C<get_all> (like L<Hash::MultiValue>) or C<param> (like CGI),
+or a connection itself (meaning its current parameters).
+In scalar context, returns C<?key=value&...> (C<?> included)
+or an empty string. In list context, returns encoded C<key=value>
+pairs.
+
+When a connection itself is passed and the request has a body
+(C<< $env->{CONTENT_TYPE} >> and C<< $env->{CONTENT_LENGTH} >> are set,
+typically POST), only the C<QUERY_STRING>-derived parameters are used
+(GH-259) so that body parameters never leak into generated urls.
+To restore the old merged behavior, set the SiteApp option
+L<mkquery_with_body_params|YATT::Lite::WebMVC0::SiteApp/mkquery_with_body_params>,
+or pass C<< $CON->queryobj >> explicitly instead of C<$CON>.
+
+=head2 mkprefix(@extras)
+
+Returns C<scheme://host[:port]> + C<@extras>. The scheme respects
+C<< $env->{HTTP_X_FORWARDED_PROTO} >> (reverse proxy) over
+C<< $env->{'psgi.url_scheme'} >>.
+
+=head2 mkhost($scheme)
+
+Returns C<HTTP_HOST> if set, otherwise C<SERVER_NAME> with
+non-default C<:port>.
+
+=head1 PSGI/CGI ENV METHODS
+
+Following methods return raw request env values.
+Each takes an optional C<$default>:
+
+C<referer>, C<remote_addr>, C<request_method>, C<script_name>,
+C<path_info>, C<query_string>, C<server_name>, C<server_port>,
+C<server_protocol>, C<content_length>, C<content_type>.
+
+B<Caveat about script_name>: C<< $CON->script_name >> is the B<raw>
+C<< $env->{SCRIPT_NAME} >>, which may contain handler artifacts like
+C</cgi-bin/dispatch.cgi> under Apache C<Action> mapping.
+On the other hand, the I<entity> C<&yatt:script_name();> returns
+the normalized C<< $env->{'yatt.script_name'} >>.
+For url building, use L</site_prefix> (or the entity).
+
+Also:
+
+=head2 raw_body, uploads, upload
+
+Delegated to L<Plack::Request>. PSGI mode only.
+
+=head2 file, subpath, parameters, request_file
+
+Read-only accessors of connection properties.
+
+=head1 SESSION METHODS
+
+Session support is delegated to the C<system> (SiteApp).
+See L<YATT::Lite::WebMVC0::Partial::Session2> for the actual
+implementation of C<session_*> hooks.
+
+=head2 get_session
+
+Returns the session object if the request has (or lazily resumes) one.
+
+=head2 start_session(@init)
+
+Starts a new session.
+
+=head2 delete_session
+
+=head2 flush_session
+
+=head1 OTHER METHODS
+
+=head2 current_user
+
+=head2 current_user($method, @args)
+
+Returns the user object loaded via C<< $system->load_current_user >>.
+With arguments, invokes C<< $user->$method(@args) >>
+(dies if no user is loaded).
+
+=head2 accept_language(%opts)
+
+Parses C<Accept-Language> header and returns preferred language(s).
+Options: C<< filter => \@langs (or Regexp/HASH/CODE) >>,
+C<< long => 1 >> (C<en_US> style), C<< detail => 1 >>
+(with quality values).
+
+  my $lang = $CON->accept_language(filter => [qw/en ja/]) || 'en';
+
+=head2 Inherited basics
+
+From L<YATT::Lite::Connection> (parent class):
+C<buffer> (current output), C<flush>, C<stash> (per-request HASH
+for your app), C<set_header>, C<list_header>, C<cget>, C<configure>,
+C<error($fmt, @args)>, C<raise($type, $fmt, @args)>,
+C<error_with_status($code, $fmt, @args)>, C<logbacktrace>, C<logdump>.
+
+=head1 SEE ALSO
+
+L<YATT::Lite::WebMVC0::SiteApp> (entity functions),
+L<YATT::Lite::ConnectionProxy> (C<$CON> while capturing output),
+L<YATT::Lite>
+
+=cut

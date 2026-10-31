@@ -18,8 +18,8 @@
 #   * statically: every scalar field of a shipped core class has the kind
 #     its upstream property declares (Str <-> string, Int <-> integer,
 #     Num <-> number, Bool <-> boolean), so a class that types a number as
-#     Str again fails here, not at the API server -- and compare_to_schema
-#     describes a Num field as number.
+#     Str again fails -- and compare_to_schema describes a Num field as
+#     number. (That last claim lives in t/02_compile_all.t, see the end.)
 #
 # Wire types are checked on the JSON / YAML text: Perl cannot tell 1 from
 # "1". Local fixtures only (lib/, spec/), no network, no cluster.
@@ -28,7 +28,6 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
-use File::Find;
 use FindBin;
 use JSON::MaybeXS ();
 use Path::Tiny qw( path );
@@ -181,80 +180,10 @@ subtest 'shipped Gateway API v1.6.1 CRDs keep their bounds numeric' => sub {
     cmp_ok($bounds, '>', 50, "checked $bounds bounds");
 };
 
-# ----------------------------------------------------------------------------
-# Static: every core scalar field has its upstream kind
-# ----------------------------------------------------------------------------
-
-sub defkey_to_perl_class {
-    my ($key) = @_;
-    return unless $key =~ /^io\.k8s\./;
-    my @parts = split /\./, substr($key, length 'io.k8s.');
-    my $kind  = pop @parts;
-    return join '::', 'IO::K8s',
-        ( map { join '', map { ucfirst } grep { length } split /-/, $_ } @parts ), $kind;
-}
-
-subtest 'every core scalar field has the kind its upstream property declares' => sub {
-    my @have = grep { $ROOT->child('spec', $_)->is_file } qw( v1.37.0.json v1.36.3.json );
-    plan skip_all => 'spec/v1.37.0.json not available (spec/ is not shipped in the dist)'
-        unless grep { $_ eq 'v1.37.0.json' } @have;
-
-    my @modules;
-    find(sub {
-        return unless /\.pm$/;
-        (my $mod = $File::Find::name) =~ s{^\Q$ROOT\E/lib/}{};
-        $mod =~ s{/}{::}g;
-        $mod =~ s{\.pm$}{};
-        push @modules, $mod;
-    }, "$ROOT/lib/IO/K8s");
-    for my $mod (@modules) { eval "require $mod; 1" or fail("load $mod: $@") }
-
-    my @specs = map {
-        my $d = JSON::MaybeXS->new->decode($ROOT->child('spec', $_)->slurp_raw)->{definitions};
-        my %for_class;
-        for my $key (keys %$d) {
-            my $class = defkey_to_perl_class($key) or next;
-            $for_class{$class} = $key;
-        }
-        { defs => $d, for_class => \%for_class };
-    } @have;
-
-    # Scalar kind flag -> the OpenAPI type it stands for. Quantity, Time
-    # and IntOrStr are $refs or formats upstream and are not scalar kinds here.
-    my %WANT = ( is_str => 'string', is_int => 'integer', is_num => 'number', is_bool => 'boolean' );
-    my $CORE = qr/^IO::K8s::(?:Api|Apimachinery|ApiextensionsApiserver|KubeAggregator)::/;
-    my $registry = \%IO::K8s::Resource::_attr_registry;
-    my ($checked, $numbers, @wrong) = (0, 0);
-
-    for my $class (sort grep { /$CORE/ } keys %$registry) {
-        my ($spec) = grep { $_->{for_class}{$class} } @specs or next;
-        my $props = $spec->{defs}{ $spec->{for_class}{$class} }{properties} // {};
-        for my $attr (sort keys %{ $registry->{$class} }) {
-            my $entry = $registry->{$class}{$attr};
-            next if $entry->{is_quantity} || $entry->{is_time} || $entry->{is_int_or_string};
-            my ($flag) = grep { $entry->{$_} } sort keys %WANT or next;
-            my $prop = $props->{ $entry->{json_key} // $attr } or next;
-            next if $prop->{'$ref'};
-            $checked++;
-            $numbers++ if ($prop->{type} // '') eq 'number';
-            push @wrong, "$class.$attr: declared " . ($flag =~ s/^is_//r)
-                . ", upstream type " . ($prop->{type} // '(none)')
-                unless ($prop->{type} // '') eq $WANT{$flag};
-        }
-    }
-
-    # compare_to_schema, the per-class form of this check, reads Num as
-    # number (it had no arm for it and reported 'unknown').
-    my $props_def = $specs[0]{defs}{ $specs[0]{for_class}{$PROPS} };
-    my @num_mismatch = grep { $_->{attr} =~ /^(?:minimum|maximum|multipleOf)\z/ }
-        @{ $PROPS->compare_to_schema($props_def)->{type_mismatch} };
-    is_deeply(\@num_mismatch, [], 'compare_to_schema: the number fields match upstream')
-        or diag explain \@num_mismatch;
-
-    cmp_ok($checked, '>', 1000, "checked $checked scalar fields against the schema");
-    cmp_ok($numbers, '>=', 3, "$numbers of them are upstream type: number");
-    is_deeply(\@wrong, [], 'every scalar field matches its upstream type')
-        or diag join "\n", @wrong;
-};
+# The static claim -- every scalar field of a shipped core class has the kind
+# its upstream property declares, and compare_to_schema describes a Num field
+# as number -- needs the whole tree loaded and not this file's fixture class
+# (Test::K196::Bounded), so it runs in t/02_compile_all.t on its one shared load
+# (as "k196: every core scalar field has the kind its upstream property declares").
 
 done_testing;

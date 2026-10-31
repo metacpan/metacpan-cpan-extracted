@@ -17,7 +17,7 @@ use HTTP::Message::PSGI;
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
 use YATT::Lite::Util qw/combination/;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use File::Path qw(make_path);
 use Cwd;
 
@@ -62,7 +62,7 @@ my $make_siteapp = sub {
 
     my ($app_root, $html_dir, $site) = $make_siteapp->($make_dirs->());
 
-    MY->mkfile("$html_dir/index.yatt", <<'END');
+    MY->mkfile_may_wait("$html_dir/index.yatt", <<'END');
 <h2>Hello</h2>
 
 <!yatt:action foo x y z>

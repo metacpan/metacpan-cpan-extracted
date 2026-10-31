@@ -7,12 +7,38 @@ from the the Encoder and Decoder changelogs:
    * https://github.com/Sereal/Sereal/blob/master/Perl/Encoder/Changes
 
 ****************************************************************
-* Warning: For a seamless upgrade, upgrade to version 5        *
-*          of the decoder before upgrading to version 5 of the *
-*          encoder! This may mean you should NOT install the   *
-*          Sereal package and instead install the Encoder or   *
-*          Decoder independently.                              *
+* Sereal 6 is a major release. For a site-wide rollout, upgrade *
+* Sereal::Decoder to version 6 on every node first. Verify the   *
+* Decoder rollout is complete before upgrading Sereal::Encoder  *
+* to version 6 anywhere in the fleet. Encoder 6 can emit v6     *
+* packets, which require Decoder 6 to read.                     *
 ****************************************************************
+6.002
+    * Prevent Decoder callbacks from freeing an active Decoder handle.
+    * Fix older-Perl build and Decoder compatibility issues and improve
+      test portability and missing-dependency diagnostics.
+    * Preserve unsigned tied integer values when encoding on older Perls.
+
+6.001
+    * Add protocol v6 VSTRING extension tags, NEG_VARINT, and keyed
+      SipHash checksums. Upgrade Decoder to version 6 everywhere before
+      upgrading Encoder or emitting v6 packets.
+    * Add checksum keys, modes, policies, defaults, and checksum helper
+      functions in Encoder and Decoder.
+    * Preserve regexp modifiers, including /n and /xx. Upgrade Decoder
+      before emitting these modifiers.
+    * Ship a SECURITY policy in release archives and improve the protocol
+      specification, build and compatibility tests, and general robustness.
+    * Reported fixes: regexp modifiers
+      (https://github.com/Sereal/Sereal/issues/180 and
+      https://github.com/Sereal/Sereal/issues/262), and unsupported-type
+      diagnostics (https://github.com/Sereal/Sereal/issues/191).
+      Related work: specification
+      (https://github.com/Sereal/Sereal/issues/218) and packaged security
+      policy (https://github.com/Sereal/Sereal/issues/305).
+    * Thanks to Matt Koscica and Oz Kaiser (@tatikoma), with assistance from
+      Claude Code and Codex.
+
 5.011
     * Robustness fixes. Thanks to Steffen Mueller and kumar-Prakash07.
     * Preserve zstd deprecation warnings when building with IBM XL C on AIX.

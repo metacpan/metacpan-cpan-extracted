@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: PreviousKnownBugs.t,v 1.3 2004/04/02 12:01:49 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

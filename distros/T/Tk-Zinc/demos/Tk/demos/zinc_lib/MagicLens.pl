@@ -11,11 +11,11 @@
 #
 #      Authors: Jean-Luc Vinot <vinot@cena.fr>
 #
-# $Id: MagicLens.pl,v 1.8 2004/09/21 12:47:28 mertz Exp $
+# $Id$
 #-----------------------------------------------------------------------------------
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

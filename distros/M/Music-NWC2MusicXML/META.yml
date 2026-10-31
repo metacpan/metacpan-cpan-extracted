@@ -48,10 +48,11 @@ requires:
   autodie: '0'
   perl: '5.036'
   strict: '0'
+  version: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-NWC2MusicXML
   homepage: https://metacpan.org/pod/Music::NWC2MusicXML
   repository: https://github.com/nigelhorne/NWC2MusicXML.git
-version: v0.002.1
+version: 0.002.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

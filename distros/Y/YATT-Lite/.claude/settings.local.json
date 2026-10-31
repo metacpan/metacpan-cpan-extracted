@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk 'NR>=380 && NR<=400' /home/hkoba/db/yatt/lib/YATT/Lite.pm)",
+      "Bash(awk 'NR>=1140 && NR<=1160' /home/hkoba/db/yatt/lib/YATT/Lite/Factory.pm)",
+      "Bash(awk 'NR>=115 && NR<=128' /home/hkoba/db/yatt/lib/YATT/Lite/Factory.pm)",
+      "Bash(awk 'NR>=360 && NR<=380' /home/hkoba/db/yatt/lib/YATT/Lite.pm)",
+      "Bash(awk 'NR>=1125 && NR<=1142' /home/hkoba/db/yatt/lib/YATT/Lite/Factory.pm)",
+      "Read(//home/hkoba/db/yatt/lib/**)",
+      "Bash(perl /tmp/claude-1002/-home-hkoba-db-yatt-lib-YATT/6a283eac-67fa-43e9-a174-1f656668a573/scratchpad/inherit_part.pl)",
+      "Bash(git log *)",
+      "Bash(perl YATT/Lite/agent_docs/reports/import-naive-item-copy/01_dispatch_can_failure.pl)",
+      "Bash(perl YATT/Lite/agent_docs/reports/import-naive-item-copy/02_stale_meta_after_source_edit.pl)",
+      "Bash(perl YATT/Lite/agent_docs/reports/import-naive-item-copy/03_ghost_part_after_delete.pl)",
+      "Bash(perl YATT/Lite/agent_docs/reports/import-naive-item-copy/04_circular_reference.pl)",
+      "Bash(perl YATT/Lite/agent_docs/reports/import-naive-item-copy/05_partlist_recompile_context_shift.pl)",
+      "Bash(echo \"-- exit: $?\")",
+      "Bash(perl YATT/Lite/agent_docs/reports/import-naive-item-copy/00_base_inheritance_is_order_dependent.pl)",
+      "Bash(gh issue *)",
+      "Workflow(claude-security:scan)"
+    ]
+  }
+}

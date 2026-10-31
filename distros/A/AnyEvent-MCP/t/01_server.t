@@ -11,9 +11,10 @@ use Socket;
 
 my $toolset = AnyEvent::MCP::Server::Toolset->new;
 my $pending;
+my $on_slow;
 
 $toolset->tool (echo => "echo", {}, sub { $_[0]->result ($_[1]) });
-$toolset->tool (slow => "slow", {}, sub { $pending = $_[0] });
+$toolset->tool (slow => "slow", {}, sub { $pending = $_[0]; $on_slow->() if $on_slow });
 $toolset->tool (fail => "fail", {}, sub { die "tool failed\n" });
 
 my $server = AnyEvent::MCP::Server->new (toolsets => [$toolset]);
@@ -320,16 +321,19 @@ $http->accept ($a);
 $client = AnyEvent::Handle->new (fh => $b, on_error => sub { die $_[2] });
 $cv = AnyEvent->condvar;
 $timer = AnyEvent->timer (after => 30, cb => sub { die "HTTP timeout" });
+my $release;
+$on_slow = sub {
+   $release = AnyEvent->timer (after => 0.01, cb => sub {
+      $pending->reply ({});
+      $pending = undef;
+   });
+};
 
 $client->push_write (
    post (message (30, "tools/call", { name => "slow" }),
       "Method: DELETE\r\nUri: /not-mcp/\r\nHttp_Version: 0.0\r\n")
    . post (message (31, "ping"))
 );
-my $release = AnyEvent->timer (after => 0.01, cb => sub {
-   $pending->reply ({});
-   $pending = undef;
-});
 http_read ($client, sub {
    like $_[0], qr/HTTP\/1.1 200 OK/, "HTTP status";
    like $_[1], qr/"id":30(?:,|})/, "HTTP preserves numeric ID";
@@ -342,6 +346,7 @@ http_read ($client, sub {
 $cv->recv;
 undef $timer;
 undef $release;
+undef $on_slow;
 $http->close;
 $client->destroy;
 
@@ -472,14 +477,16 @@ $client = AnyEvent::Handle->new (
    },
 );
 $timer = AnyEvent->timer (after => 30, cb => sub { $cv->croak ("connection_close timeout") });
+$on_slow = sub {
+   $release = AnyEvent->timer (after => 0.01, cb => sub {
+      $pending->reply ({ content => [{ type => "text", text => "x" x 131072 }] });
+      $pending = undef;
+   });
+};
 $client->push_write (
    post (message (60, "tools/call", { name => "slow" }))
    . post (message (61, "ping"))
 );
-$release = AnyEvent->timer (after => 0.01, cb => sub {
-   $pending->reply ({ content => [{ type => "text", text => "x" x 131072 }] });
-   $pending = undef;
-});
 http_read ($client, sub {
    my ($header, $body) = @_;
 
@@ -492,6 +499,7 @@ http_read ($client, sub {
 $cv->recv;
 undef $timer;
 undef $release;
+undef $on_slow;
 $http->close;
 $client->destroy;
 

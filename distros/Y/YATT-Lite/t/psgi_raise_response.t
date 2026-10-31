@@ -110,7 +110,10 @@ describe '$this->raise_psgi_SOMETHING helpers', sub {
   };
 };
 
-describe '$CON->raise_response(sub {$streamhandler})', sub {
+foreach my $how (qw(raise return)) {
+describe $how eq 'raise'
+  ? '$CON->raise_response(sub {$streamhandler})'
+  : 'action returns sub {$streamhandler}', sub {
   #
   # Stolen (and converted for Test::Kantan) from Plack-Middleware/bufferedstreaming.t
   #
@@ -120,9 +123,12 @@ describe '$CON->raise_response(sub {$streamhandler})', sub {
   my $tester = sub {
     my ($block) = @_;
     my $sub = $block->{app};
-    $site->mount_action($URL, sub {
+    $site->mount_action($URL, $how eq 'raise' ? sub {
                           my ($this, $con) = @_;
                           $con->raise_response($sub)
+                        } : sub {
+                          my ($this, $con) = @_;
+                          return $sub;
                         });
     my $handler = $site->wrapped_by(builder {
         enable "BufferedStreaming";
@@ -172,6 +178,21 @@ describe '$CON->raise_response(sub {$streamhandler})', sub {
         body => 'OK',
       });
   };
+
+  describe 'responder->write() with text/html', sub {
+    $tester->({
+        app => sub {
+          my ($responder) = @_;
+          my $writer = $responder->([200, ['Content-Type', "text/html"]]);
+          $writer->write('<h2>Hello</h2>');
+          $writer->close();
+        },
+        env => { REQUEST_METHOD => 'GET', PATH_INFO => $URL },
+        headers => [ 'Content-Type', 'text/html' ],
+        body => '<h2>Hello</h2>',
+      });
+  };
 };
+}
 
 done_testing();

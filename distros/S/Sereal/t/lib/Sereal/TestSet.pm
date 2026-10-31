@@ -27,14 +27,17 @@ sub get_git_top_dir {
         my $tdir = File::Spec->catdir( map File::Spec->updir, 1 .. $d );
         my $gdir = File::Spec->catdir( $tdir,                 '.git' );
         return $tdir
-            if -d $gdir;
+            if -e $gdir;
     }
     return ();
 }
 
 BEGIN {
     if ( defined( my $top_dir = get_git_top_dir() ) ) {
-        for my $need ( 'Encoder', 'Decoder' ) {
+        my @need = -e 'lib/Sereal.pm' || -e 'lib/Sereal/Encoder.pm'
+            ? ( 'Encoder', 'Decoder' )
+            : ('Decoder');
+        for my $need (@need) {
             my $blib_dir = File::Spec->catdir( $top_dir, 'Perl', $need, "blib" );
             if ( -d $blib_dir ) {
                 require blib;
@@ -79,11 +82,17 @@ our @EXPORT_OK = qw(
     Header
     TRACK_FLAG
     hobodecode
-    integer short_string varint array array_fbit
+    integer short_string varint read_varint_at array array_fbit checksum_tag
     hash dump_bless
     have_encoder_and_decoder
+    array_slot_ref
+    regexp_modifier_test_cases
     check_for_dependency_issues
     run_roundtrip_tests
+    run_roundtrip_version_tests
+    run_roundtrip_corpus_tests
+    run_roundtrip_profile_tests
+    roundtrip_corpus_name
     write_test_files
     $use_objectv
     setup_tests
@@ -97,6 +106,14 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 our $use_objectv = 1;
 
 use constant TRACK_FLAG => 128;
+
+sub checksum_tag {
+    my ( $type, $bytes, $key ) = @_;
+    my %functions = ( 0 => 'siphash24', 1 => 'siphash24_128', 2 => 'siphash36_128' );
+    my $name      = $functions{$type}  or die "Unknown checksum type $type";
+    my $function  = $Class->can($name) or die "$Class does not provide $name";
+    return $function->( $bytes, $key );
+}
 
 sub hobodecode {
     return unless defined $_[0];
@@ -199,6 +216,31 @@ sub varint {
     }
     $out .= chr($n);
     return $out;
+}
+
+sub read_varint_at {
+    my ( $bytes, $offset ) = @_;
+    my $length = length($bytes);
+    die "varint offset is outside input" if $offset < 0 || $offset > $length;
+
+    my $uv_bits   = 8 * $Config{uvsize};
+    my $max_bytes = int( ( $uv_bits + 6 ) / 7 );
+    my ( $value, $shift ) = ( 0, 0 );
+    for my $index ( 0 .. $max_bytes - 1 ) {
+        die "truncated varint" if $offset >= $length;
+        my $byte = ord( substr( $bytes, $offset++, 1 ) );
+        my $part = $byte & 0x7f;
+        if ( $index == $max_bytes - 1 ) {
+            my $bits_left = $uv_bits - $shift;
+            my $max_part  = ( 1 << $bits_left ) - 1;
+            die "varint too big" if $part > $max_part;
+        }
+        $value |= $part << $shift;
+        return ( $value, $offset ) unless $byte & 0x80;
+        $shift += 7;
+    }
+
+    die "varint too long";
 }
 
 our $PROTO_VERSION;
@@ -352,10 +394,28 @@ sub setup_tests {
         ],
         [
             [ { foooo => "barrr" }, { barrr => "foooo" } ],
-            array(
-                hash( short_string("foooo"), short_string("barrr") ),
-                hash( short_string("barrr"), short_string("foooo") )
-            ),
+            sub {
+                my $opt = shift;
+                if ( ( $opt->{dedupe_strings} || $opt->{aliased_dedupe_strings} )
+                    && !$opt->{no_shared_hashkeys} )
+                {
+                    my $d       = array_head(2) . hash_head(2);
+                    my $key_pos = offset($d);
+                    $d .= short_string("foooo");
+                    my $value_pos = offset($d);
+                    return
+                          $d
+                        . short_string("barrr")
+                        . hash_head(2)
+                        . chr(SRL_HDR_COPY)
+                        . varint($value_pos)
+                        . chr(SRL_HDR_COPY)
+                        . varint($key_pos);
+                }
+                return array(
+                    hash( short_string("foooo"), short_string("barrr") ),
+                    hash( short_string("barrr"), short_string("foooo") ) );
+            },
             "ary ref of hash refs without repeated strings"
         ],
         [
@@ -363,15 +423,24 @@ sub setup_tests {
             sub {
                 my $opt = shift;
                 if ( $opt->{dedupe_strings} || $opt->{aliased_dedupe_strings} ) {
-                    my $tag = $opt->{aliased_dedupe_strings} ? SRL_HDR_ALIAS : SRL_HDR_COPY;
-                    my $d   = array_head(2) . hash_head(2) . short_string("foooo");
+                    my $tag     = $opt->{aliased_dedupe_strings} ? SRL_HDR_ALIAS : SRL_HDR_COPY;
+                    my $d       = array_head(2) . hash_head(2);
+                    my $key_pos = offset($d);
+                    $d .= short_string("foooo");
                     my $pos = offset($d);
+                    my $first_value =
+                        $opt->{no_shared_hashkeys}
+                        ? short_string("foooo")
+                        : chr(SRL_HDR_COPY) . varint($key_pos);
+                    substr( $first_value, 0, 1 ) = chr( ord($first_value) | TRACK_FLAG )
+                        if $opt->{aliased_dedupe_strings};
                     $d .=
-                          short_string( "foooo", $opt->{aliased_dedupe_strings} ? 1 : 0 )
+                          $first_value
                         . hash_head(2)
                         . short_string("foooo2")
                         . chr($tag)
-                        . varint($pos);
+                        . varint( $opt->{aliased_dedupe_strings}
+                            || $opt->{no_shared_hashkeys} ? $pos : $key_pos );
                     return $d;
                 }
                 else {
@@ -672,6 +741,50 @@ sub setup_tests {
     );
 }
 
+sub regexp_modifier_test_cases {
+    # First stable releases: /msix are present in Perl 5.000, /p is 5.10,
+    # /dluaa is 5.14, /n is 5.22 and /xx is 5.26. Check the development
+    # introductions too: a reserved flag bit does not imply working /xx.
+    # Perl origin/blead commits: 87e95b7ff3 (/p), 94b03d7d32 (charset
+    # suffixes), 41d7c59e80 (/n), and 77c8f26370 (/xx).
+    my $charset       = $] >= 5.013010;
+    my $nocapture     = $] >= 5.021008;
+    my $extended_more = $] >= 5.025009;
+    return (
+        [ 'm',         '^b',           "a\nb",     1, 1 ],
+        [ 's',         'a.b',          "a\nb",     1, 1 ],
+        [ 'i',         'a',            'A',        1, 1 ],
+        [ 'x',         'a b',          'ab',       1, 1 ],
+        [ 'p',         'a',            'a',        1, $] >= 5.010 ],
+        [ 'd',         '\\w',          "\xe9",     0, $charset ],
+        [ 'u',         '\\w',          "\xe9",     1, $charset ],
+        [ 'ui',        'foo\\xdf',     'fooss',    1, $charset ],
+        [ 'l',         '[[:alpha:]]',  'a',        1, $charset ],
+        [ 'a',         '\\w',          "\xe9",     0, $charset ],
+        [ 'ai',        'k',            "\x{212a}", 1, $charset ],
+        [ 'aai',       'k',            "\x{212a}", 0, $charset ],
+        [ 'n',         '(a)',          'a',        1, $nocapture ],
+        [ 'xx',        '[ a]',         ' ',        0, $extended_more ],
+        [ 'xx',        '[ a]',         'a',        1, $extended_more ],
+        [ 'xxx',       '[ a]',         ' ',        0, $extended_more ],
+        [ 'uimsxnp',   '^(a) . b$',    "A\nb",     1, $charset && $nocapture ],
+        [ 'aaimsxxnp', '^([ a]) . b$', "A\nb",     1, $extended_more ],
+        [ '',          '(?i:a)',       'A',        1, 1 ],
+    );
+}
+
+# Inspect an array slot without asking av_fetch() for an lvalue. Older
+# Perls replace PL_sv_undef with a fresh scalar when evaluating \$array->[$i],
+# which would destroy the alias identity these tests are inspecting.
+sub array_slot_ref {
+    my ( $array, $index ) = @_;
+    require B;
+    my @slots = B::svref_2object($array)->ARRAY;
+    my $slot = $slots[$index];
+    return \undef if ref($slot) eq 'B::SPECIAL' && $$slot == 1;
+    return $slot->object_2svref;
+}
+
 sub have_encoder_and_decoder {
     my $ret = check_for_dependency_issues(@_);
     diag $ret if $ret;
@@ -697,9 +810,9 @@ sub check_for_dependency_issues {
     my $other_version = $have_version{$Other}
         or return "No $Other available to test with.";
 
-    if ( !$min_v and $0 =~ m!/v(\d+)/! ) {
+    if ( !$min_v and $0 =~ m![\\/]v(\d+)[\\/]! ) {
         $min_v = $1;
-        if ( $Config{usequadmath} || $Config{uselongdouble} ) {
+        if ( ( $Config{usequadmath} || $Config{uselongdouble} ) && $min_v < 5 ) {
             $min_v = 5;
         }
     }
@@ -740,13 +853,13 @@ my $sum = $eng0e0 + $eng0e1 + $eng2;
 
 sub encoder_required {
     my ( $ver, $name ) = @_;
-    return "" . ( $Sereal::Encoder::VERSION < $ver ? "TODO " : "" ) . $name;
+    return "" . ( !defined($Sereal::Encoder::VERSION) || $Sereal::Encoder::VERSION < $ver ? "TODO " : "" ) . $name;
 }
 
 sub _get_roundtrip_tests {
     my @ScalarRoundtripTests = (
 
-        # name, structure
+        # name, structure, optional minimum UV width for stored integer fixtures
         [ "undef",                           undef ],
         [ "small int",                       3 ],
         [ "small negative int",              -8 ],
@@ -754,9 +867,17 @@ sub _get_roundtrip_tests {
         [ "largeish negative int -302001",   -302001 ],
         [ "largeish negative int -1234567",  -1234567 ],
         [ "largeish negative int -12345678", -12345678 ],
+        [ "negative int -16",                -16 ],
+        [ "negative int -17",                -17 ],
+        [ "negative int -33",                -33 ],
 
         (
-            map { [ "integer: $_", 0 + $_ ] } (
+            # The stored corpus encodes these as integers on a 64-bit Perl.
+            # A native 32-bit live encoder can instead use a floating value.
+            map {
+                [ "integer: $_", 0 + $_,
+                    $_ < -2147483648 || $_ > 4294967295 ? 64 : 32 ]
+            } (
 
                 # IV bounds of 8 bits
                 -1, 0, 1, -127, -128, -129, 42, 126, 127, 128, 129, 254, 255, 256, 257,
@@ -948,11 +1069,17 @@ sub _get_roundtrip_tests {
         [ "escaped string",    "\\012\345\267\145123\\277ABC\\x{DF}456" ],
         [ "more escapes",      "\\0123\0124" ],
         [ "ref to undef",      \undef ],
-        [ "negative big num",  -4123456789 ],
+        [ "negative big num",  -4123456789, 64 ],
         [ "positive big num",  4123456789 ],
         [ "eng-ref",           [ \$eng0e0, \$eng0e1, \$eng2 ] ],
         [ "undef",             [ \undef,   \undef ] ],
     );
+
+    if ( $PROTO_VERSION >= 6 ) {
+        push @ScalarRoundtripTests,
+            [ "binary Perl v-string", v01.002.003 ],
+            [ "UTF8 Perl v-string",   v01.002.0300 ];
+    }
 
     my @blessed_array_check1;
     $blessed_array_check1[0] = "foo";
@@ -980,14 +1107,14 @@ sub _get_roundtrip_tests {
             [ { foo => 1 }, { foo => 2 } ]
         ],
 
-        ( map { [ "scalar ref to " . $_->[0],        ( \( $_->[1] ) ) ] } @ScalarRoundtripTests ),
-        ( map { [ "nested scalar ref to " . $_->[0], ( \\( $_->[1] ) ) ] } @ScalarRoundtripTests ),
-        ( map { [ "array ref to " . $_->[0],         ( [ $_->[1] ] ) ] } @ScalarRoundtripTests ),
-        ( map { [ "hash ref to " . $_->[0], ( { foo => $_->[1] } ) ] } @ScalarRoundtripTests ),
+        ( map { [ "scalar ref to " . $_->[0],        ( \( $_->[1] ) ), $_->[2] ] } @ScalarRoundtripTests ),
+        ( map { [ "nested scalar ref to " . $_->[0], ( \\( $_->[1] ) ), $_->[2] ] } @ScalarRoundtripTests ),
+        ( map { [ "array ref to " . $_->[0],         ( [ $_->[1] ] ), $_->[2] ] } @ScalarRoundtripTests ),
+        ( map { [ "hash ref to " . $_->[0], ( { foo => $_->[1] } ), $_->[2] ] } @ScalarRoundtripTests ),
 
         # ---
         (
-            map { [ "array ref to duplicate " . $_->[0], ( [ $_->[1], $_->[1] ] ) ] }
+            map { [ "array ref to duplicate " . $_->[0], ( [ $_->[1], $_->[1] ] ), $_->[2] ] }
                 @ScalarRoundtripTests
         ),
         (
@@ -996,7 +1123,7 @@ sub _get_roundtrip_tests {
                     "AoA of duplicates " . $_->[0],
                     ( [
                             $_->[1], [ $_->[1], $_->[1] ], $_->[1], [ $_->[1], $_->[1], $_->[1] ],
-                            $_->[1] ] ) ]
+                            $_->[1] ] ), $_->[2] ]
             } @ScalarRoundtripTests
         ),
 
@@ -1005,14 +1132,14 @@ sub _get_roundtrip_tests {
             map { [
                     "array ref to aliases " . $_->[0], (
                         sub { \@_ }
-                            ->( $_->[1], $_->[1] ) ) ]
+                            ->( $_->[1], $_->[1] ) ), $_->[2] ]
             } @ScalarRoundtripTests
         ),
         (
             map {
                 [
                     "array ref to scalar refs to same " . $_->[0],
-                    ( [ \( $_->[1] ), \( $_->[1] ) ] ) ]
+                    ( [ \( $_->[1] ), \( $_->[1] ) ] ), $_->[2] ]
             } @ScalarRoundtripTests
         ),
     );
@@ -1051,6 +1178,119 @@ sub run_roundtrip_tests {
     }
     setup_tests($proto_version);
     run_roundtrip_tests_internal( $name . $suffix, $opts );
+}
+
+sub roundtrip_corpus_name {
+    my ( $index, $name ) = @_;
+    $name =~ s/TODO //g;
+    return sprintf( 'roundtrip/%05u/%s', $index + 1, $name );
+}
+
+sub _protocol_version_from_test_path {
+    return $1 if $0 =~ m![\\/]v(\d+)[\\/]!;
+    die "Failed to detect protocol version from test path\n";
+}
+
+sub _installed_encoder_protocol_version {
+    return unless eval {
+        require Sereal::Encoder;
+        require Sereal::Encoder::Constants;
+        1;
+    };
+    return eval { Sereal::Encoder::Constants::SRL_PROTOCOL_VERSION() };
+}
+
+sub _should_run_live_encoder_roundtrips {
+    my ($proto_version) = @_;
+    return 1 if $Class eq 'Sereal::Encoder';
+    my $encoder_protocol = _installed_encoder_protocol_version();
+    return defined($encoder_protocol) && $encoder_protocol == $proto_version;
+}
+
+sub _run_live_roundtrip_layer {
+    my ( $description, $proto_version, $callback ) = @_;
+    subtest $description => sub {
+        unless ( _should_run_live_encoder_roundtrips($proto_version) ) {
+            plan skip_all => "live Encoder round trips are covered by the matching protocol suite";
+        }
+        require Sereal::Encoder;
+        require Sereal::Decoder;
+        $callback->();
+        done_testing();
+    };
+}
+
+sub run_roundtrip_version_tests {
+    my ($name) = @_;
+    my $proto_version = _protocol_version_from_test_path();
+    my $corpus = File::Spec->catdir( 't', 'data', 'packet_corpus' );
+    require Sereal::TestSet::Corpus;
+    my $source = "roundtrip-v$proto_version-plain";
+    die "Missing required packet corpus source '$source'"
+        unless Sereal::TestSet::Corpus::has_source( $corpus, $source );
+
+    run_roundtrip_corpus_tests($corpus);
+    _run_live_roundtrip_layer(
+        "live Encoder round trips (protocol v$proto_version)",
+        $proto_version,
+        sub { run_roundtrip_tests($name) },
+    );
+}
+
+sub run_roundtrip_corpus_tests {
+    my ( $root, $profile, $decoder_opts ) = @_;
+    $profile ||= 'plain';
+    my $proto_version = _protocol_version_from_test_path();
+
+    setup_tests($proto_version);
+    require Sereal::Decoder;
+    require Sereal::TestSet::Corpus;
+    my $source = "roundtrip-v$proto_version-$profile";
+    my %available = map { $_ => 1 } Sereal::TestSet::Corpus::packet_names( $root, $source );
+    my $decoder = Sereal::Decoder->new( {
+        %{ $decoder_opts || {} },
+    } );
+    my @tests   = _get_roundtrip_tests();
+    for my $index ( 0 .. $#tests ) {
+        my ( $name, $expected, $required_uv_bits ) = @{ $tests[$index] };
+        my $logical_name = roundtrip_corpus_name( $index, $name );
+        if ( $required_uv_bits && 8 * $Config{uvsize} < $required_uv_bits ) {
+            SKIP: {
+                skip( "$name (stored integer requires $required_uv_bits-bit UVs)", 2 );
+            }
+            next;
+        }
+        unless ( $available{$logical_name} ) {
+            SKIP: {
+                skip( "$name (not included in the compact corpus)", 2 );
+            }
+            next;
+        }
+        my $packet = Sereal::TestSet::Corpus::read_packet( $root, $source, $logical_name );
+        my ( $ok, $decoded, $error );
+        {
+            local $@;
+            $ok = eval { $decoded = $decoder->decode($packet); 1 };
+            $error = $@ unless $ok;
+        }
+        ok( $ok, "$name (stored encoder corpus, decoding)" ) or do { diag $error; next };
+        deep_cmp( $decoded, $expected, "$name (stored encoder corpus, decoded vs data)" );
+    }
+}
+
+sub run_roundtrip_profile_tests {
+    my ( $profile, $opts, $decoder_opts ) = @_;
+    my $corpus = File::Spec->catdir( 't', 'data', 'packet_corpus' );
+    require Sereal::TestSet::Corpus;
+    my $has_corpus = Sereal::TestSet::Corpus::has_source(
+        $corpus, "roundtrip-v6-$profile"
+    );
+    plan skip_all => "Missing required stored v6 $profile corpus" unless $has_corpus;
+    run_roundtrip_corpus_tests( $corpus, $profile, $decoder_opts );
+    _run_live_roundtrip_layer( "live Encoder round trips (v6 $profile)", 6, sub {
+        $opts = $opts->() if ref($opts) eq 'CODE';
+        run_roundtrip_tests( $profile, $opts );
+    } );
 }
 
 sub _test {
@@ -1150,6 +1390,15 @@ sub _cmp_str {
     return $ret;
 }
 
+sub _vstring_spelling {
+    require B;
+    my $sv = B::svref_2object( $_[0] );
+    for my $magic ( $sv->MAGIC ) {
+        return $magic->PTR if $magic->TYPE eq 'V';
+    }
+    return;
+}
+
 our $deep_cmp_name;    # set by deep_cmp()
 
 sub _test_deep_cmp {
@@ -1201,7 +1450,10 @@ sub _deep_cmp {
                     and return $cmp;
             }
         }
-        elsif ( reftype($x) eq "SCALAR" or reftype($x) eq "REF" ) {
+        elsif (reftype($x) eq "SCALAR"
+            or reftype($x) eq "REF"
+            or reftype($x) eq "VSTRING" )
+        {
             return _deep_cmp( $$x, $$y, $seenx, $seeny );
         }
         elsif ( reftype($x) eq "REGEXP" ) {
@@ -1213,6 +1465,10 @@ sub _deep_cmp {
         }
     }
     else {
+        my $x_is_vstring = ( reftype( \$x ) || "" ) eq "VSTRING";
+        my $y_is_vstring = ( reftype( \$y ) || "" ) eq "VSTRING";
+        $cmp = _test( "vstring mismatch", $x_is_vstring, $y_is_vstring )
+            and return $cmp;
         if (    $deep_cmp_name !~ /v5/
             and $deep_cmp_name =~ /float/
             and $x             =~ /^-?\d+\.\d+\z/
@@ -1229,6 +1485,10 @@ sub _deep_cmp {
         }
         $cmp = _cmp_str( $x, $y )
             and return $cmp;
+        if ($x_is_vstring) {
+            $cmp = _test( "vstring spelling", _vstring_spelling( \$x ), _vstring_spelling( \$y ) )
+                and return $cmp;
+        }
     }
     return "";
 }
@@ -1244,6 +1504,37 @@ sub deep_cmp {
         return;
     }
     return 1;
+}
+
+sub _roundtrip_decoder_options {
+    my ($encoder_options) = @_;
+    my %decoder_keys = map { $_ => 1 } qw(
+        alias_smallint alias_varint_under incremental max_num_hash_entries
+        max_recursion_depth no_bless_objects refuse_objects refuse_snappy
+        refuse_zlib set_readonly set_readonly_scalars use_undef validate_utf8
+        refuse_zstd max_num_array_entries max_string_length max_uncompressed_size
+        no_thaw_objects thaw_allow_classes thaw_deny_action checksum_key_v1
+        checksum_key_v2 checksum_policy checksum_key_v3 undef_deadly_policy
+    );
+    my %decoder_options = map { $_ => $encoder_options->{$_} }
+        grep { exists $decoder_keys{$_} } keys %{ $encoder_options || {} };
+    return \%decoder_options;
+}
+
+sub _roundtrip_encoder_options {
+    my ($options) = @_;
+    my %encoder_keys = map { $_ => 1 } qw(
+        aliased_dedupe_strings canonical canonical_refs compress compress_level
+        compress_threshold croak_on_bless dedupe_strings freeze_callbacks
+        max_recursion_depth no_bless_objects no_shared_hashkeys protocol_version
+        snappy snappy_incr snappy_threshold sort_keys stringify_unknown undef_unknown
+        use_protocol_v1 warn_unknown use_standard_double freeze_allow_classes
+        freeze_deny_action checksum_key_v1 checksum_key_v2 checksum_policy
+        checksum_key_v3
+    );
+    my %encoder_options = map { $_ => $options->{$_} }
+        grep { exists $encoder_keys{$_} } keys %{ $options || {} };
+    return \%encoder_options;
 }
 
 sub run_roundtrip_tests_internal {
@@ -1269,12 +1560,23 @@ sub run_roundtrip_tests_internal {
 
     my $failed = 0;
 
-    my $decoder = Sereal::Decoder->new($opt);
-    my $encoder = Sereal::Encoder->new($opt);
+    my $decoder_opt = _roundtrip_decoder_options($opt);
+    my $encoder_opt = _roundtrip_encoder_options($opt);
+    my $decoder = Sereal::Decoder->new($decoder_opt);
+    my $encoder = Sereal::Encoder->new($encoder_opt);
     my %seen_name;
     my @RoundtripTests = _get_roundtrip_tests();
     foreach my $rt (@RoundtripTests) {
         my ( $name, $data ) = @$rt;
+
+        if ( $name =~ /regexp/i && defined($Sereal::Encoder::VERSION)
+            && $Sereal::Encoder::VERSION < 4.025 )
+        {
+            SKIP: {
+                skip( "live Encoder $Sereal::Encoder::VERSION does not preserve regexp references", 5 );
+            }
+            next;
+        }
 
         if ( $failed > 20 ) {
             fail("too many test failures to continue");
@@ -1289,8 +1591,8 @@ sub run_roundtrip_tests_internal {
             ],
             [
                 'functional simple',
-                sub { Sereal::Encoder::encode_sereal( $_[0], $opt ) },
-                sub { Sereal::Decoder::decode_sereal( $_[0], $opt ) }
+                sub { Sereal::Encoder::encode_sereal( $_[0], $encoder_opt ) },
+                sub { Sereal::Decoder::decode_sereal( $_[0], $decoder_opt ) }
             ],
             [
                 'functional with object',
@@ -1428,38 +1730,6 @@ sub run_roundtrip_tests_internal {
                     or do { $failed++; next };    #test
                 deep_cmp( $encoded3, $encoded, "$name ($ename, $mname, encoded3 vs encoded)" )
                     or do { $failed++; next };    #test
-
-                if ( $ENV{SEREAL_TEST_SAVE_OUTPUT} and $mname eq 'object-oriented' ) {
-                    use File::Path;
-                    my $combined_name = "$ename - $name";
-                    if ( !$seen_name{$combined_name} ) {
-                        my @clean = ( $ename, $name );
-                        s/[^\w.-]+/_/g, s/__+/_/g for @clean;
-                        my $cleaned = join "/", @clean;
-                        my ( $v, $p, $d ) = File::Spec->splitpath($0);
-                        my $dir = File::Spec->catpath(
-                            $v,
-                            File::Spec->catdir(
-                                File::Spec->splitdir($p),
-                                "data", $clean[0] ) );
-                        mkpath $dir unless -d $dir;
-                        my $base = "$dir/$clean[1].enc";
-                        $seen_name{$combined_name} = $base;
-                        for my $f (
-                            [ "", $encoded ],
-                            $encoded ne $encoded2 ? [ "2", $encoded2 ] : () )
-                        {
-                            my $file = $base . $f->[0];
-                            next if -e $file;
-                            open my $fh, ">", $file
-                                or die "Can't open '$file' for writing: $!";
-                            binmode($fh);
-                            print $fh $f->[1];
-                            close $fh;
-                        }
-                        diag "Wrote sample files for '$combined_name' to $base";
-                    }
-                }
             }
             pass("$name ($ename, $mname)");
         }    # end method type

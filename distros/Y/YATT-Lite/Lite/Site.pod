@@ -1,0 +1,174 @@
+=encoding utf-8
+
+=head1 NAME
+
+YATT::Lite::Site - public facade API of YATT::Lite
+
+=head1 SYNOPSIS
+
+  use YATT::Lite::Site;
+
+  # Open the site defined by app.psgi/runyatt.psgi (searched upward).
+  my $site = YATT::Lite::Site->load(dir => $dir);
+
+  # ...or fall back to a plain default site when there is none.
+  my $site = YATT::Lite::Site->load_or_default(dir => $dir);
+
+  # Run one file (tool style; raw die passes through).
+  my $res = $site->render_file("$dir/hello.yatt", {name => "world"});
+  print $res->body if $res->is_success;
+
+  # Run one web request (100% identical to the real PSGI path).
+  my $res = $site->request(GET => "/hello", {name => "world"});
+  printf "%s %s\n%s", $res->status, scalar $res->header('Content-Type')
+    , $res->content;
+
+  # Resolve a filename to its directory handler.
+  my ($dh, $name) = $site->resolve_file($fn);
+
+  # Multi-site tools: one cached site per app root.
+  my $reg = YATT::Lite::Site::Registry->new;
+  my $site = $reg->site_for($fn);
+
+=head1 DESCRIPTION
+
+YATT::Lite::Site is the B<public facade> of YATT::Lite: the official
+way for programs and tools to open a site and execute one path or one
+file, without hand-rolling connections, faking C<%ENV> or touching
+package globals.
+
+It is inserted as a parent class of L<YATT::Lite::Factory>, so every
+site object satisfies C<< $site->isa('YATT::Lite::Site') >>.
+L<YATT::Lite::WebMVC0::SiteApp> is C<Site + PSGI adapter>: the same
+object, plus C<to_app>/C<call> for the web.
+
+The methods defined (and documented) here are the public API surface;
+methods of Factory and below are implementation detail unless their own
+pod says otherwise.
+
+=head1 CLASS METHODS
+
+=head2 load (dir => $dir, %opts)
+
+Searches F<app.psgi> / F<runyatt.psgi> upward from C<$dir> and loads
+it, returning the site instance the script created. Dies when no
+factory script is found.
+
+Defaults to C<< offline => 1 >> (the error_handler passes raw die
+through), since this entry is for programs and tools; the web entry
+point is app.psgi itself.
+
+Like Node's C<require.cache>, one factory script yields B<one site
+object per process>: loading the same script twice would collide on
+C<app_ns> anyway, so subsequent C<load()>s return the cached instance
+(re-configuring any explicitly given C<%opts> onto it).
+
+C<< stop_at => $boundary >> limits the upward search: directories
+above C<$boundary> (compared after resolving symlinks) are never
+looked at, so a factory script found there is not executed. Tools
+working from their own cwd normally leave this unset; the language
+server sets it to the workspace root the editor named, because a
+script planted above an untrusted workspace must not run.
+
+=head2 load_or_default (dir => $dir, %opts)
+
+Like C<load>, but when no factory script is found (within C<stop_at>,
+if given), synthesizes a plain site (L<YATT::Lite::WebMVC0::SiteApp>
+by default; override with C<< class => 'My::SiteApp' >>) with
+C<doc_root>/C<app_root> set to C<$dir>, utf-8 defaults, and an
+auto-uniquified C<app_ns> so that multiple default sites can coexist
+in one process.
+
+=head1 INSTANCE METHODS
+
+=head2 resolve_file ($filename)
+
+  my ($dh, $name, $loc) = $site->resolve_file($fn);
+
+Resolves a filename to C<($dirhandler, $basename [, $location])>.
+Files under C<doc_root> are resolved via their location - exactly like
+the web does - and other files fall back to the physical directory
+handler.
+
+=head2 request ($method, $path, $args, %opts)
+
+Synthesizes a PSGI env (C<$args> become query parameters for GET,
+an C<application/x-www-form-urlencoded> body for POST/PUT) and runs it
+through the B<real> C<call($env)>. Path resolution, request sigils,
+subpath handling, the public check, the __DIE__/__WARN__ traps and the
+error page: everything behaves exactly as a real web request.
+Returns a L<YATT::Lite::Response>.
+
+Requires a web-capable site (a SiteApp); C<$args> may be a HASH
+(ARRAY values become multi-value params), an ARRAY of pairs, or a raw
+query string.
+
+=head2 render_file ($filename, $args, %opts)
+
+Runs one template file. Dispatch (part resolution, sigils, the public
+check, argument reordering) is identical to the web, but the B<error
+policy defaults to tool style>: no __DIE__/__WARN__ traps take effect,
+no error page is rendered - a raw die from the template propagates to
+the caller untouched, which keeps C<perl -d> fully useful.
+
+Pass C<< error_style => 'web' >> to get web-equivalent error handling
+(traps + error page) instead. Returns a L<YATT::Lite::Response>.
+
+=head1 EXECUTION CONTRACTS
+
+=head2 The cwd of a template is its directory
+
+Every official execution path chdirs into the entry dirhandler's
+directory, so templates may do file I/O with relative paths. The chdir
+is a B<restoring guard> (see C<chdir_guard> in L<YATT::Lite>): the
+previous cwd comes back when the call returns or dies.
+
+Nesting: only the entry dirhandler chdirs. Templates in other
+directories called via C<< <!yatt:base> >> or C<< <!yatt:import> >> do
+B<not> re-chdir.
+
+Opt-out: C<< no_chdir => 1 >> (Compatibility option) disables the
+chdir entirely - for event-loop embedding or threaded hosts, where the
+process-global cwd must not move.
+
+=head2 Error policy by path
+
+The presence of the __DIE__/__WARN__ traps (leading to error_handler
+and the error page) is an B<intentional distinction>, not an accident:
+
+  path                        chdir  SIG traps + error page  dirhandler hooks
+  --------------------------  -----  ----------------------  ----------------
+  web (call / request)        yes    yes                     yes
+  render_file (default)       yes    NO - raw die (perl -d)  yes
+  Factory::render (program)   yes    NO                      yes
+
+"dirhandler hooks" are before/after_dirhandler - where
+C<site_config_as_entity> and similar site-level setup runs.
+
+=head2 $SYS, $YATT and $CON
+
+The three package globals importable via
+C<< use YATT::Lite qw/*SYS *YATT *CON/ >> are permanent public API for
+template and entity code:
+
+  $SYS  == $CON->system   (the site object)
+  $YATT == $CON->YATT     (the dirhandler)
+  $CON                    (the current connection)
+
+Every official execution entry (C<call>, C<request>, C<render_file>,
+C<< Factory::render/render_into >>, C<run_dirhandler>) localizes all
+three - user code and tools never need to set them up by hand.
+Conversely, internal per-extension handlers (like C<_handle_yatt>)
+must never be called directly, because setting these globals is
+C<handle>'s job.
+
+=head1 SEE ALSO
+
+L<YATT::Lite>, L<YATT::Lite::Factory>,
+L<YATT::Lite::WebMVC0::SiteApp>, L<YATT::Lite::Response>
+
+=head1 AUTHOR
+
+"KOBAYASI, Hiroaki" <hkoba@cpan.org>
+
+=cut

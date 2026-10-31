@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : 
  *
- * $Id: Item.c,v 1.93 2005/11/25 15:40:28 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -31,15 +31,17 @@
 #include "OverlapMan.h"
 #endif
 
-#include <GL/glu.h>
+#if defined(MAC_OSX_TK)
+  #include <AGL/glu.h>
+#else
+  #include <GL/glu.h>
+#endif
 #include <limits.h>             /* For INT_MAX */
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
 
-static const char rcsid[] = "$Id: Item.c,v 1.93 2005/11/25 15:40:28 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 static  ZnList  item_classes = NULL;
@@ -92,7 +94,7 @@ static char *attribute_type_strings[] = {
 
 
 #ifndef PTK
-static int SetAttrFromAny _ANSI_ARGS_((Tcl_Interp *interp, Tcl_Obj *obj));
+static int SetAttrFromAny(Tcl_Interp *interp, Tcl_Obj *obj);
 
 /*
  * The structure below defines an object type that is used to cache the
@@ -215,7 +217,7 @@ GetAttrDesc(Tcl_Interp          *interp,
 
   while (True) {
     if (desc->type == ZN_CONFIG_END) {
-      Tcl_AppendResult(interp, "unknown attribute \"", attr_uid, "\"", NULL);
+      Tcl_AppendResult(interp, "unknown attribute \"", attr_uid, "\"", (char *) NULL);
       return NULL;
     }
     else if (attr_uid == desc->uid) {
@@ -248,7 +250,7 @@ ZnAttributesInfo(Tcl_Interp     *interp,
                  void           *record,
                  ZnAttrConfig   *desc_table,
                  int            argc,
-                 Tcl_Obj *CONST args[])
+                 Tcl_Obj *const args[])
 {
   Tcl_Obj       *l, *entries[5];
   
@@ -296,7 +298,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
                       void              *record,
                       ZnAttrConfig      *desc_table,
                       int               argc,
-                      Tcl_Obj *CONST    args[],
+                      Tcl_Obj *const    args[],
                       int               *flags)
 {
   int           i;
@@ -311,7 +313,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
     }
     else if (desc->read_only) {
       Tcl_AppendResult(wi->interp, "attribute \"",
-                       Tcl_GetString(args[i]), "\" can only be read", NULL);
+                       Tcl_GetString(args[i]), "\" can only be read", (char *) NULL);
       return TCL_ERROR;
     }
 
@@ -331,7 +333,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
           if (!g) {
             Tcl_AppendResult(wi->interp,
                              " gradient expected for attribute \"",
-                             Tcl_GetString(args[i]), "\"", NULL);
+                             Tcl_GetString(args[i]), "\"", (char *) NULL);
             return TCL_ERROR;
           }
           if (*((ZnGradient **) valp)) {
@@ -346,14 +348,15 @@ ZnConfigureAttributes(ZnWInfo           *wi,
       {
         ZnList   new_grad_list = NULL;
         ZnGradient       **grads;
-        unsigned int num_grads, j, k;
+        int          num_grads;
+        unsigned int j, k;
         Tcl_Obj  **elems;
             
         if (Tcl_ListObjGetElements(wi->interp, args[i+1],
                                    &num_grads, &elems) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp,
                            " gradient list expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (num_grads) {
@@ -374,7 +377,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
             if (!grads[j]) {
             grads_err:
               Tcl_AppendResult(wi->interp, " invalid gradient \"", str,
-                               "\" in gradient list", NULL);
+                               "\" in gradient list", (char *) NULL);
               for (k = 0; k < j; k++) {
                 ZnFreeGradient(grads[k]);
               }
@@ -408,7 +411,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         int     b;
         if (Tcl_GetBooleanFromObj(wi->interp, args[i+1], &b) != TCL_OK) {
           Tcl_AppendResult(wi->interp, " boolean expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (b ^ (ISSET(*((unsigned short *) valp), desc->bool_bit) != 0)) {
@@ -434,7 +437,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
               image = ZnGetImage(wi, str, ZnUpdateItemImage, record);
               if (image == ZnUnspecifiedImage) {
                 Tcl_AppendResult(wi->interp, " image expected for attribute \"",
-                                 Tcl_GetString(args[i]), "\"", NULL);
+                                 Tcl_GetString(args[i]), "\"", (char *) NULL);
                 return TCL_ERROR;
               }
             }
@@ -446,7 +449,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
                   ZnFreeImage(image, NULL, NULL);
                 }
                 Tcl_AppendResult(wi->interp, " bitmap expected for attribute \"",
-                                 Tcl_GetString(args[i]), "\"", NULL);
+                                 Tcl_GetString(args[i]), "\"", (char *) NULL);
                 return TCL_ERROR;
               }
             }
@@ -463,7 +466,8 @@ ZnConfigureAttributes(ZnWInfo           *wi,
       {
         ZnList   new_pat_list = NULL;
         ZnImage  *pats;
-        unsigned int num_pats, j, k;
+        int      num_pats;
+        unsigned int j, k;
         Tcl_Obj  **elems;
         ZnBool   is_bmap = True;
         
@@ -471,7 +475,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
                                    &num_pats, &elems) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp,
                            " pattern list expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (num_pats) {
@@ -492,7 +496,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
                 }
                 ZnListFree(new_pat_list);
                 Tcl_AppendResult(wi->interp, " unknown pattern \"", str,
-                                 "\" in pattern list", NULL);
+                                 "\" in pattern list", (char *) NULL);
                 return TCL_ERROR;
               }
             }
@@ -530,7 +534,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
                                    &num_tags, &elems) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp,
                            " tag list expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (*((ZnList *) valp)) {
@@ -575,7 +579,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
           font = Tk_GetFont(wi->interp, wi->win, str);
           if (!font) {
             Tcl_AppendResult(wi->interp, " font expected for attribute \"",
-                             Tcl_GetString(args[i]), "\"", NULL);
+                             Tcl_GetString(args[i]), "\"", (char *) NULL);
             return TCL_ERROR;
           }
           if (*((Tk_Font *) valp)) {
@@ -592,7 +596,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
 
         if (ZnGetBorder(wi, args[i+1], &border) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " edge list expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (border != *((ZnBorder *) valp)) {
@@ -607,7 +611,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
 
         if (ZnGetLineShape(wi, Tcl_GetString(args[i+1]), &line_shape) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " line shape expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (line_shape != *((ZnLineShape *) valp)) {
@@ -622,7 +626,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
 
         if (ZnGetLineStyle(wi, Tcl_GetString(args[i+1]), &line_style) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " line style expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (line_style != *((ZnLineStyle *) valp)) {
@@ -659,7 +663,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         ZnReliefStyle relief;
         if (ZnGetRelief(wi, Tcl_GetString(args[i+1]), &relief) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " relief expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (relief != *((ZnReliefStyle *) valp)) {
@@ -674,7 +678,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         int     join;
         if (Tk_GetJoinStyle(wi->interp, Tcl_GetString(args[i+1]), &join) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " join expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (join != *((int *) valp)) {
@@ -688,7 +692,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         int     cap;
         if (Tk_GetCapStyle(wi->interp, Tcl_GetString(args[i+1]), &cap) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " cap expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (cap != *((int *) valp)) {
@@ -709,7 +713,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
             (largc != 2)) {
         point_error:
           Tcl_AppendResult(wi->interp, " position expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (Tcl_GetDoubleFromObj(wi->interp, largv[0], &d) == TCL_ERROR) {
@@ -762,7 +766,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         }
         if (pri < 0) {
           Tcl_AppendResult(wi->interp, " priority must be a positive integer \"",
-                           Tcl_GetString(args[i+1]), "\"", NULL);
+                           Tcl_GetString(args[i+1]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (pri != *((unsigned short *) valp)) {
@@ -791,7 +795,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
           ZnTagSearchDestroy(search_var);
           if ((result == TCL_ERROR) || (item2 == ZN_NO_ITEM)) {
             Tcl_AppendResult(wi->interp, " unknown item \"",
-                             Tcl_GetString(args[i+1]), "\"", NULL);
+                             Tcl_GetString(args[i+1]), "\"", (char *) NULL);
             return TCL_ERROR;
           }
         }
@@ -932,7 +936,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
 
         if (ZnGetFillRule(wi, Tcl_GetString(args[i+1]), &fill_rule) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " fill rule expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (fill_rule != *((ZnFillRule *) valp)) {
@@ -946,7 +950,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         Tk_Justify justify;
         if (Tk_GetJustify(wi->interp, Tcl_GetString(args[i+1]), &justify) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " justify expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (justify != *((Tk_Justify *) valp)) {
@@ -960,7 +964,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         Tk_Anchor       anchor;
         if (Tk_GetAnchor(wi->interp, Tcl_GetString(args[i+1]), &anchor) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " anchor expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (anchor != *((Tk_Anchor *) valp)) {
@@ -1005,7 +1009,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
 
         if (ZnGetAutoAlign(wi, Tcl_GetString(args[i+1]), &aa) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " auto alignment expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if ((aa.automatic != ((ZnAutoAlign *) valp)->automatic) ||
@@ -1023,7 +1027,7 @@ ZnConfigureAttributes(ZnWInfo           *wi,
         ZnLeaderAnchors lanch = NULL;
         if (ZnGetLeaderAnchors(wi, Tcl_GetString(args[i+1]), &lanch) == TCL_ERROR) {
           Tcl_AppendResult(wi->interp, " leader anchors expected for attribute \"",
-                           Tcl_GetString(args[i]), "\"", NULL);
+                           Tcl_GetString(args[i]), "\"", (char *) NULL);
           return TCL_ERROR;
         }
         if (*((ZnLeaderAnchors *) valp) != NULL) {
@@ -1334,7 +1338,7 @@ ZnItemInit()
 {
   /* First check if static part already inited */
   if (item_classes == NULL) {
-    item_classes = ZnListNew(16, sizeof(ZnItemClass));
+    item_classes = ZnListNew(17, sizeof(ZnItemClass));
 #ifdef ATC
     ZnAddItemClass(ZnTrack);
     ZnAddItemClass(ZnWayPoint);
@@ -1350,6 +1354,7 @@ ZnItemInit()
     ZnAddItemClass(ZnIcon);
     ZnAddItemClass(ZnText);
     ZnAddItemClass(ZnWindow);
+    ZnAddItemClass(ZnViewport);
     InitAttrDesc(ZnFIELD.attr_desc);
   }
 }
@@ -1507,7 +1512,7 @@ SetId(ZnItem    item)
 
   item->id = wi->obj_id;
   wi->obj_id++;
-  entry = Tcl_CreateHashEntry(wi->id_table, (char *) item->id, &dummy);
+  entry = Tcl_CreateHashEntry(wi->id_table, ZnIdToHashKey(item->id), &dummy);
   Tcl_SetHashValue(entry, item);  
 }
 
@@ -1517,7 +1522,7 @@ FreeId(ZnItem   item)
   Tcl_HashEntry *entry;
   
   if (item->id) {
-    entry = Tcl_FindHashEntry(item->wi->id_table, (char *) item->id);
+    entry = Tcl_FindHashEntry(item->wi->id_table, ZnIdToHashKey(item->id));
     if (entry) {
       Tcl_DeleteHashEntry(entry);
       item->id = 0;
@@ -1664,7 +1669,7 @@ ZnItem
 ZnCreateItem(ZnWInfo        *wi,
              ZnItemClass   item_class,
              int            *argc,
-             Tcl_Obj *CONST *args[])
+             Tcl_Obj *const *args[])
 {
   ZnItem        item;
 
@@ -1771,7 +1776,7 @@ static int
 ConfigureItem(ZnItem            item,
               int               field,
               int               argc,
-              Tcl_Obj   *CONST  argv[],
+              Tcl_Obj   *const  argv[],
               ZnBool            init)
 {
   ZnWInfo       *wi = item->wi;
@@ -1800,12 +1805,17 @@ ConfigureItem(ZnItem            item,
     }
   }
 
-  if (previous_visible && ISCLEAR(item->flags, ZN_VISIBLE_BIT)) {
-    /*
-     * Special case when the item has its visibility
-     * just turned out.
-     */
-    ZnDamage(wi, &item->item_bounding_box);
+  //
+  // If visibility changed.
+  if (previous_visible ^ ISSET(item->flags, ZN_VISIBLE_BIT)) {
+    // First must force an update of the parent geometry (bbox).
+    Invalidate(item, ZN_COORDS_FLAG);
+    //
+    // Special case when the item has its visibility
+    // just turned out.
+    if (ISCLEAR(item->flags, ZN_VISIBLE_BIT)) {
+      ZnDamage(wi, &item->item_bounding_box);
+    }
   }
   
   Invalidate(item, flags);
@@ -1825,7 +1835,7 @@ static int
 QueryItem(ZnItem                item,
           int                   field,
           int                   argc,
-          Tcl_Obj *CONST        argv[])
+          Tcl_Obj *const        argv[])
 {
   if (field < 0) {
     return item->class->Query(item, argc, argv);
@@ -1976,7 +1986,6 @@ GetItemTransform(ZnItem         item,
  * ZnResetTransformStack
  * ZnInitTransformStack
  * ZnFreeTransformStack
- * ZnCurrentTransform
  * ZnPushTransform
  * ZnPopTransform --
  *
@@ -2127,7 +2136,7 @@ ZnPushClip(ZnWInfo      *wi,
   unsigned int  num_pts, max_num_pts;
   ZnPoint       *p;
   ClipState     *previous_clip=NULL;
-  TkRegion      reg, reg_op, reg_to;
+  TkRegion      reg, reg_op/*, reg_to*/;
   XRectangle    rect;
   XPoint        xpts[3];
   
@@ -2186,11 +2195,12 @@ ZnPushClip(ZnWInfo      *wi,
           xpts[2].x = ZnNearestInt(p->x);
           xpts[2].y = ZnNearestInt(p->y);
           reg_op = (TkRegion) ZnPolygonRegion(xpts, 3, EvenOddRule);
-          reg_to = TkCreateRegion();
-          ZnUnionRegion(reg, reg_op, reg_to);
-          TkDestroyRegion(reg);
+          //reg_to = TkCreateRegion();
+          //ZnUnionRegion(reg, reg_op, reg_to);
+          ZnUnionRegion(reg, reg_op, reg);
+          //TkDestroyRegion(reg);
           TkDestroyRegion(reg_op);
-          reg = reg_to;
+          //reg = reg_to;
           xpts[1] = xpts[2];
         }
       }
@@ -2205,11 +2215,12 @@ ZnPushClip(ZnWInfo      *wi,
           xpts[2].x = (short) p->x;
           xpts[2].y = (short) p->y;     
           reg_op = (TkRegion) ZnPolygonRegion(xpts, 3, EvenOddRule);
-          reg_to = TkCreateRegion();
-          ZnUnionRegion(reg, reg_op, reg_to);
-          TkDestroyRegion(reg);
+          //reg_to = TkCreateRegion();
+          //ZnUnionRegion(reg, reg_op, reg_to);
+          ZnUnionRegion(reg, reg_op, reg);
+          //TkDestroyRegion(reg);
           TkDestroyRegion(reg_op);
-          reg = reg_to;
+          //reg = reg_to;
           xpts[0] = xpts[1];
           xpts[1] = xpts[2];
         }
@@ -2399,6 +2410,7 @@ Invalidate(ZnItem       item,
     if (ISSET(item->flags, ZN_VISIBLE_BIT)) {
       /*printf("invalidate graphics for item %d\n", item->id);*/
       ZnDamage(item->wi, &item->item_bounding_box);
+      ZnNeedRedisplay(item->wi);
 #ifdef GL
 #ifdef GL_LIST
       /*

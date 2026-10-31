@@ -10,7 +10,7 @@ use Path::Tiny;
 use Scalar::Util qw( blessed );
 use Kubernetes::Comb::SVG;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my $ME = 'comb-svg';
 
@@ -32,9 +32,10 @@ sub usage {
     '  --size N            radius of a hexagon in SVG units',
     '  --no-edges          leave out the dependency edges (--edges draws them)',
     '  --no-legend         leave out the legend',
-    '  --color KEY=COLOUR  colour of a phase or of bg, fg, muted, border, edge;',
+    '  --color KEY=COLOUR  colour of a phase, @group, Phase@group or bg, fg, muted,',
+    '                      border, edge;',
     '                      KEY=LIGHT,DARK for the two modes; repeatable',
-    '  --blink PHASES      phases whose cells pulse, comma-separated',
+    '  --blink PHASES      phases (or @group, Phase@group) that pulse, comma-separated',
     '  --blink-seconds N   period of the pulse in seconds',
     '  --help              this text',
     '  --version           the version',
@@ -195,7 +196,7 @@ comb-svg - Render Kubernetes::Comb custom resources from JSON as an SVG honeycom
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -298,7 +299,8 @@ module. C<KEY=LIGHT,DARK> gives one colour for light and one for dark mode; a
 comma inside parentheses, as in C<rgb(1,2,3)>, does not separate. Repeatable,
 the last one for a key wins. A key or a colour the module does not accept is
 ignored and the built-in colour stays; a value that is not C<KEY=...> with one
-or two colours is an error.
+or two colours is an error. A key can name a group: C<@extern> for every phase
+of the group C<extern> (see C<--group-label>), C<Error@extern> for one.
 
   comb-svg combs.json --color Error=#ff0033 --color 'bg=#ffffff,rgb(0,0,0)'
 
@@ -306,8 +308,9 @@ or two colours is an error.
 
 The phases whose cells pulse, separated by commas (C<Error,Blocked>);
 repeatable. Phase names are the eight phases and C<Unknown>, case-sensitive; a name that is no phase is
-ignored. Where the viewer asks for reduced motion the cells do not move and
-have a thicker outline instead. Without the option nothing is animated.
+ignored. An entry can name a group: C<@extern> for every cell of the group
+C<extern>, C<Error@extern> for its C<Error> cells. Where the viewer asks for
+reduced motion the cells do not move and have a thicker outline instead. Without the option nothing is animated.
 
 =head2 --blink-seconds N
 
@@ -335,7 +338,7 @@ Print C<comb-svg VERSION> and exit with status C<0>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb-svg/issues>.
 
 =head2 IRC

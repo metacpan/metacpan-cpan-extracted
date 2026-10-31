@@ -16,7 +16,7 @@ sub _callas_cgi {
   my Env $env = $self->psgi_cgi_newenv($init_env, $fh);
 
   my $res;
-  if ($self->{cf_noheader}) {
+  if ($self->{noheader}) {
     require Cwd;
     local $env->{GATEWAY_INTERFACE} = 'CGI/YATT';
     local $env->{REQUEST_METHOD} //= 'GET';
@@ -56,7 +56,7 @@ sub _runas_cgi {
 
   $self->init_by_env($env);
 
-  if ($self->{cf_noheader}) {
+  if ($self->{noheader}) {
     # コマンド行起動時
     require Cwd;
     local $env->{GATEWAY_INTERFACE} = 'CGI/YATT';
@@ -122,8 +122,8 @@ sub cgi_dirhandler {
 
 sub make_cgi {
   (my MY $self, my Env $env, my ($args, $opts)) = @_;
-  my ($cgi, $root, $loc, $file, $trailer, $is_index);
-  unless ($self->{cf_noheader}) {
+  my ($cgi, $root, $loc, $file, $trailer, $is_index, $request_file);
+  unless ($self->{noheader}) {
     $cgi = do {
       if (ref $args and UNIVERSAL::can($args, 'param')) {
 	$args;
@@ -132,7 +132,8 @@ sub make_cgi {
       }
     };
 
-    ($root, $loc, $file, $trailer, $is_index) = my @pi = $self->split_path_info($env);
+    ($root, $loc, $file, $trailer, $is_index, $request_file)
+      = my @pi = $self->split_path_info($env);
 
     unless (@pi) {
       # XXX: This is too early for fatal to browser. mmm
@@ -155,7 +156,8 @@ sub make_cgi {
       $path = Cwd::abs_path($path) // die "No such file: $path\n";
     }
     # XXX: widget 直接呼び出しは？ cgi じゃなしに、直接パラメータ渡しは？ =>
-    ($root, $loc, $file, $trailer, $is_index) = split_path($path, $self->{cf_app_root});
+    ($root, $loc, $file, $trailer, $is_index, $request_file)
+      = split_path($path, $self->{app_root});
     $cgi = $self->new_cgi(@$args);
   }
 
@@ -167,14 +169,18 @@ sub make_cgi {
                          );
   }
 
-  (env => $env, $self->connection_quad(["$root$loc", $loc, $file, $trailer])
+  $request_file //= $is_index ? '' : trim_ext($file, $self->{ext_public});
+
+  (env => $env
+   , $self->connection_quad(["$root$loc", $loc, $file, $trailer
+			     , $request_file])
    , cgi => $cgi, root => $root, is_psgi => 0);
 }
 
 sub init_by_env {
   (my MY $self, my Env $env) = @_;
-  $self->{cf_noheader} //= 0 if $env->{GATEWAY_INTERFACE};
-  $self->{cf_doc_root} //= $env->{DOCUMENT_ROOT} if $env->{DOCUMENT_ROOT};
+  $self->{noheader} //= 0 if $env->{GATEWAY_INTERFACE};
+  $self->{doc_root} //= $env->{DOCUMENT_ROOT} if $env->{DOCUMENT_ROOT};
   $self;
 }
 

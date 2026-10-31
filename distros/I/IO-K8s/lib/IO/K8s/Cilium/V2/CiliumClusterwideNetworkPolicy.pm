@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumClusterwideNetworkPolicy;
 # ABSTRACT: CiliumClusterwideNetworkPolicy is a Kubernetes third-party resource with an modified version of CiliumNetworkPolicy which is cluster scoped rather than namespace scoped.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumclusterwidenetworkpolicies',
@@ -29,7 +29,7 @@ IO::K8s::Cilium::V2::CiliumClusterwideNetworkPolicy - CiliumClusterwideNetworkPo
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 spec
 
@@ -51,7 +51,7 @@ field does not exist in the structure.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -79,5 +79,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

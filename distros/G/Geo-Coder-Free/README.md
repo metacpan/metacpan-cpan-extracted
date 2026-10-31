@@ -4,7 +4,7 @@ Geo::Coder::Free - Geocoding using free, locally-hosted databases
 
 ## Version
 
-Version 0.51
+Version 0.52
 
 ## Synopsis
 
@@ -60,8 +60,10 @@ curl 'https://geocode.nigelhorne.com/cgi-bin/page.fcgi?page=query&q=1600+Pennsyl
 
 ## Limitations
 
-- `scantext` mode only finds locations in OpenAddresses; it falls back
-silently when `OPENADDR_HOME` is not set (**FIXME**: should warn).
+- `scantext` mode only finds locations in OpenAddresses.  When
+`OPENADDR_HOME` is not set it finds nothing, and warns once per object.
+- Pass decoded character strings.  Non-ASCII text is matched exactly, so `Munchen`
+doesn't find `München`, and bytes that have not been decoded are a different address.
 - The `__DATA__` alternatives table is hard-coded; it should live in a
 user-editable config file.
 - The address-regex scantext path misses birth-year sentences such as
@@ -121,6 +123,20 @@ libpostal => { type => 'boolean', optional => 1, default => 1 }           # fals
 
 `libpostal` is passed to [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AOpenAddresses); see its
 "Optional modules" section for why you might turn it off.
+
+The domain of each parameter:
+
+- `openaddr` - an existing, readable directory.  A directory that does
+not exist, or a file, croaks `Can't find the directory`.  Absent or `undef`
+falls back to `OPENADDR_HOME`; `''` or `'0'` configures no backend, and beats
+`OPENADDR_HOME`.
+- `directory` - an existing directory.  A directory that does not exist,
+or a file, croaks `directory ... doesn't exist`.  Absent means the one beside
+the module.
+- `libpostal` - false turns it off; absent or `undef` is true.
+- `cache` - absent or `undef` means the facade holds none.
+- The arguments - nothing, an even list or a hashref.  An odd list croaks
+`Usage:`.  Called as a function with arguments, it warns and returns `undef`.
 
 ##### Output
 
@@ -182,6 +198,12 @@ not valid.
 ```perl
 location => { type => 'scalar', optional => 1 }  # the string to test
 ```
+
+- False: `undef`, `''`, a reference, and a string only of digits of any
+length.  A digit is a Unicode decimal digit, so `"\x{661}"` counts as one.
+- True: anything with a non-digit in it.  The shortest are one character
+long.  `'-'`, `' '`, `'3.14'`, `"1\n"`, a zero byte and any non-ASCII letter,
+emoji or control character are all true.  No maximum length applies.
 
 ##### Output
 
@@ -262,13 +284,41 @@ scantext is a usage error rather than an input error - the same croak as calling
 ##### Input
 
 ```perl
-# Input schema (Params::Validate::Strict) - exactly one of location or scantext is required
-location     => { type => 'scalar',   optional => 1 }  # address string (exclusive with scantext)
+# Input schema (Params::Validate::Strict) - at least one of location or scantext is required
+location     => { type => 'scalar',   optional => 1 }  # address string
 scantext     => { type => 'scalar',   optional => 1 }  # free text to scan for place names
 region       => { type => 'scalar',   optional => 1 }  # ISO 3166-1 alpha-2 country code hint
 ignore_words => { type => 'arrayref', optional => 1 }  # words to suppress during scantext scan
 on_error     => { type => 'scalar',   optional => 1 }  # 'croak' (default) or 'undef'
 ```
+
+The domain of each parameter:
+
+- `location` - a string with a non-digit in it, from one character up; no
+maximum length applies.  It reaches the backends unchanged, whatever its
+characters.  `''` finds nothing and is not an error; `undef` counts as absent.
+A string only of digits, or a reference, croaks `invalid location to geocode()`.
+- `scantext` - the same partitions as `location`, with the message
+`invalid scantext to geocode()`.  Without OpenAddresses it is not looked at and
+finds nothing.
+- `location` and `scantext` together - both are checked.  With
+OpenAddresses the scantext is searched, and without it the location is.
+- `region` - any string; nothing is refused.  `CA`, `AU` and `IE` are
+appended to a scantext candidate by name, in either case.  Any other two letters
+are appended in upper case, and any other value as written.  `''` and `'0'`
+append nothing.  A scantext that found nothing is remembered per `region` and
+`ignore_words`, as long as a miss in [Geo::Coder::Free::MissCache](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMissCache) lasts and
+until ["clear\_miss\_cache"](#clear_miss_cache).
+- `ignore_words` - an arrayref of words, matched in any case.  A false
+value is the same as absent.  With OpenAddresses, anything else true dies with
+perl's own `ARRAY` reference error during a scantext scan; without it the value
+is not looked at.
+- `on_error` - exactly `'croak'` or `'undef'`, in lower case; `undef` is
+`'croak'`.  Anything else, `''` included, croaks `on_error must be ...`, and
+that is reported before a bad location or scantext.
+- The arguments - a bare string, an even list or a hashref.  No arguments, a
+lone `undef`, an empty hashref, a reference other than a hashref, an odd list
+longer than one, or options with neither a location nor a scantext croak `Usage:`.
 
 ##### Output
 
@@ -311,7 +361,7 @@ if openaddr backend is available:
         try 3-word windows (triplets) at confidence 0.8
         try 2-word windows (duplets) at confidence 0.7
         try the address-pattern regex at confidence 0.7
-        try region-specific address finders (GB / US / CA)
+        try region-specific address finders (GB / US / CA / IE)
         mark scantext as a miss; return undef
     else:
         try openaddr backend
@@ -417,6 +467,22 @@ region   => { type => 'scalar', optional => 1 }     # ISO 3166-1 alpha-2 country
 on_error => { type => 'scalar', optional => 1 }     # 'croak' (the default) or 'undef'
 ```
 
+The domain of each parameter:
+
+- `values` - an arrayref of any size, from none up.  Anything that is not
+an arrayref, or none at all, croaks `Usage:`.  Each row is a `location` as
+`geocode()` defines it, in any characters, and keys the result as given.
+`undef` and `''` are one value, which is unresolved on either `on_error`
+setting.  A string only of digits, or a reference, follows `on_error`.
+- A reserved value - `lookups`, `reads`, `resolved`, `unresolved` and
+`unresolved_values`, spelled exactly, croak on either `on_error` setting before
+anything is looked up.  `Lookups` or `' resolved'` are ordinary values.
+- `region` - any string, handed to every lookup as it is.
+- `on_error` - as for `geocode()`.  It is checked first, so a bad setting
+croaks even with no values, or with a reserved value.
+- The options - a hashref or an even list of non-references.  A lone scalar,
+an odd list, an arrayref or a reference as a value croak `Usage:`.
+
 ##### Output
 
 ```perl
@@ -497,6 +563,9 @@ true.
 scope => { type => 'string', optional => 1 }  # OpenAddresses, Local or MaxMind
 ```
 
+Any string is accepted.  `undef` or absent empties everything, and one that
+names no backend, `''` and any non-ASCII string included, forgets nothing.
+
 ##### Output
 
 ```perl
@@ -545,6 +614,12 @@ geocoder has no provenance to report.
 point => { type => 'hashref', optional => 1 }  # a result, usually a Geo::Location::Point
 ```
 
+Anything hash-based, in any class, counts as a result, however few of the keys
+it holds; nothing else does, so `undef`, a string, or a reference to an array,
+scalar or subroutine (blessed or not) returns the empty answer.  The values are
+reported as they are held and aren't checked: a `confidence` of `2` comes back
+as `2`.  Only a leading `Geo::Coder::Free::` is removed from `database`.
+
 ##### Output
 
 ```perl
@@ -589,6 +664,13 @@ latlng => { type => 'scalar' }  # "$lat,$long" comma-separated decimal degrees
 # lat/lon/long instead of latlng will croak "not yet supported".
 # To use separate coordinates call Geo::Coder::Free::Local::reverse_geocode.
 ```
+
+The facade only asks whether `latlng` is true, and passes it to the backend as
+it is.  Its format and range are the backend's concern; see
+["reverse\_geocode" in Geo::Coder::Free::MaxMind](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMaxMind#reverse_geocode).  With `undef`, `''`, `'0'`,
+separate coordinates or no arguments it croaks `not yet supported`; so does
+every call when OpenAddresses is configured.  A reference other than a hashref,
+or an odd list longer than one, croaks `Usage:`.
 
 ##### Output
 
@@ -639,6 +721,10 @@ is found.
 class    => { type => 'string' }                    # Geo::Coder::Free
 location => { type => 'arrayref', of => 'string' }  # the words of the location, joined with spaces
 ```
+
+No words make the empty location, which finds nothing, so it croaks
+`geocoding failed`.  One word of digits croaks `invalid location to geocode()`;
+two are a valid location, since the space between them is a non-digit.
 
 ##### Output
 
@@ -772,9 +858,52 @@ Geocode : Address × Region? × ErrorMode? → Point?
   let mode == e ∨ "croak" •
   let backends == (openaddr ≠ undef ⟹ [OpenAddresses, Local, MaxMind])
                 ∧ (openaddr = undef ⟹ [MaxMind]) •
-  ¬ ValidLocation(addr) ⟹ (mode = "undef" ⟹ result = ∅ | mode = "croak" ⟹ ⊥)
+  addr = "" ⟹ result = ∅
+  ∧ addr ≠ "" ∧ ¬ ValidLocation(addr) ⟹ (mode = "undef" ⟹ result = ∅ | mode = "croak" ⟹ ⊥)
   ∧ ValidLocation(addr) ⟹
   result = first { defined } map { b.geocode(addr, r) } backends
+  -- with OpenAddresses, addr rewritten by the alternatives map is tried before MaxMind
+```
+
+### Geocode (Scantext)
+
+```
+Scantext : TEXT × Region? × ignore_words? → seq Point
+∀ t : TEXT; r : Region?; w : ignore_words? •
+  openaddr = undef ⟹ result = ∅
+  ∧ (t, r, w) ∈ misses ⟹ result = ∅
+  ∧ result = first { non-empty } of
+      direct(t), triplets(t, r, w), duplets(t, r, w), pattern(t, r), regional(t, r)
+  ∧ result = ∅ ⟹ misses' = misses ∪ { (t, r, w) }
+```
+
+### Geocode\_Many
+
+```
+GeocodeMany : seq Address × Region? × ErrorMode? → Batch
+∀ vs : seq Address •
+  let ds == distinct(vs) •
+  ds ∩ RESERVED ≠ ∅ ⟹ ⊥
+  ∧ Batch.resolved + Batch.unresolved = # ds
+  ∧ Batch.lookups ≤ # ds
+  ∧ ∀ d ∈ ds • Batch[d] = Geocode(d, r, e)
+```
+
+### Reverse\_Geocode
+
+```
+ReverseGeocode : LatLng? → Location?
+openaddr ≠ undef ⟹ ⊥
+∧ latlng ≠ ∅ ⟹ result = MaxMind.reverse_geocode(latlng)
+∧ latlng = ∅ ⟹ ⊥
+```
+
+### Clear\_Miss\_Cache
+
+```
+ClearMissCache : Scope? → BOOLEAN
+scope = ∅ ⟹ misses' = ∅
+∧ scope ≠ ∅ ⟹ misses' = { m ∈ misses | scope(m) not within scope }
 ```
 
 ### Provenance

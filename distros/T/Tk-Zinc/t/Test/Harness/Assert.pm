@@ -1,4 +1,4 @@
-# $Id: Assert.pm,v 1.1 2003/09/22 10:11:39 mertz Exp $
+# $Id$
 
 package Test::Harness::Assert;
 

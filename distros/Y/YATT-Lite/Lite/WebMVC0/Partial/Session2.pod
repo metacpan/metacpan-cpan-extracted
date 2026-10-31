@@ -75,6 +75,45 @@ using L<Plack::Util::load_class($NAME, 'Plack::Session::State')|Plack::Util/load
 
 If no option is provided the default Plack::Session::State::Cookie will be used.
 
+=head3 Session cookie attributes
+
+Whatever state object is used, the session cookie is sent with these
+attributes unless the state object (or C<psgix.session.options>)
+already defines them:
+
+=over 4
+
+=item C<Secure>
+
+Set whenever the request came over TLS: C<psgi.url_scheme> is C<https>,
+or C<X-Forwarded-Proto: https> from a TLS-terminating proxy, or the
+CGI-style C<HTTPS> variable is set.
+
+=item C<HttpOnly>
+
+Always, so the session id is not readable from C<document.cookie>.
+
+=item C<SameSite=Lax>
+
+Always.
+
+=back
+
+To change them, pass an explicitly configured state object:
+
+  session_state => Plack::Session::State::Cookie->new(
+    httponly => 1, samesite => 'Strict', secure => 1,
+  ),
+
+=head3 Session id validation
+
+The id taken from the request cookie is checked with the state's
+C<validate_session_id> (C</\A[0-9a-f]{40}\Z/> for the Plack default)
+before it is handed to the store. A cookie that does not pass is
+treated as if there were no cookie, so a crafted value never reaches
+C<< $store->fetch >> or C<< $store->remove >> (which, with
+L<Plack::Session::Store::File>, is a file path).
+
 =head2 session_store = C<Plack::Session::Store> | C<< [$NAME => @ARGS] >>
 X<session_store>
 

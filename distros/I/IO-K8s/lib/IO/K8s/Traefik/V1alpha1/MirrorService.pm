@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::MirrorService;
 # ABSTRACT: MirrorService holds the mirror configuration.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s healthCheck        => '+IO::K8s::Traefik::V1alpha1::ServerHealthCheck';
@@ -52,7 +52,7 @@ IO::K8s::Traefik::V1alpha1::MirrorService - MirrorService holds the mirror confi
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 healthCheck
 
@@ -143,7 +143,7 @@ Weight defines the weight and should only be specified when Name references a Tr
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -171,5 +171,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

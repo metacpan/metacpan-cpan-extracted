@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeClaimVolumeSource;
 # ABSTRACT: PersistentVolumeClaimVolumeSource references the user's PVC in the same namespace. This volume finds the bound PV and mounts that volume for the pod. A PersistentVolumeClaimVolumeSource is, essentially, a wrapper around another type of volume that is owned by someone else (the system).
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s claimName => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::PersistentVolumeClaimVolumeSource - PersistentVolumeClai
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 claimName
 
@@ -37,7 +37,7 @@ readOnly Will force the ReadOnly setting in VolumeMounts. Default false.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -65,5 +65,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

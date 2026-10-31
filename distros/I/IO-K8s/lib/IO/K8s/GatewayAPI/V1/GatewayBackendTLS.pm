@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GatewayBackendTLS;
 # ABSTRACT: Backend describes TLS configuration for gateway when connecting to backends.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s clientCertificateRef => '+IO::K8s::GatewayAPI::V1::SecretObjectReference';
@@ -20,7 +20,7 @@ IO::K8s::GatewayAPI::V1::GatewayBackendTLS - Backend describes TLS configuration
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 clientCertificateRef
 
@@ -53,7 +53,7 @@ different type (e.g., `Opaque`).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -81,5 +81,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

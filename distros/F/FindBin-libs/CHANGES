@@ -1,3 +1,29 @@
+-   5.1.1 Fri Oct 30 18:38:09 EDT 2026
+
+    Bin uses abspath/noabspath to match libs for export of Bin. 
+    Makes things more consistent & explicit if "abspath" is used.
+
+-   5.1.0 Fri Oct 30 18:07:19 EDT 2026
+
+    Bin::pwd() is no longer a state value; this made sense when its 
+    only use was assigning $Bin_l & $Bin_p. It is now used in Parents 
+    for a default at runtime and needs to respect chdir.
+
+    $FindBin::Bin::Bin is the physical path (eq $Bin_p) to conform
+    with old behavior. The value exported into the callers space
+    will be $Bin_p or $Bin_l depending on whether "abspath" or 
+    "noabspath" is passed to use with the default being $Bin_p 
+    to conform with the existing behavior.
+
+-   5.0.6 Fri Oct 30 15:39:12 EDT 2026
+
+    Botched manifest file.
+
+-   5.0.5 Fri Oct 30 15:22:23 EDT 2026
+
+    add "pwd" as a literal for FindBin::Parents::dir_paths
+    to break down the paths above the working directory.
+
 -   5.0.4 Thu Oct 29 22:55:12 EDT 2026
 
     Version hardwired in Makefile.PL, not from libs.pm

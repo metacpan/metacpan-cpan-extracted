@@ -39,6 +39,10 @@ YATT::Lite::WebMVC0::SiteApp - PSGI Handler for yatt
 
 =head1 DESCRIPTION
 
+C<SiteApp> is C<Site + PSGI adapter>: it inherits the public facade
+API of L<YATT::Lite::Site> (C<load>, C<request>, C<render_file>...)
+and adds C<to_app>/C<call> for the web.
+
 C<SiteApp> is a L<Factory|YATT::Lite::Factory>
 of L<DirApp|YATT::Lite::WebMVC0::DirApp>, which is a web specific
 subclass of L<YATT::Lite>.
@@ -101,12 +105,39 @@ and L<Ruby on Rails|http://guides.rubyonrails.org/action_controller_overview.htm
 This feature is useful(I hope), but is experimental.
 So if you don't want this feature, turn this config on.
 
+=head2 mkquery_with_body_params
+
+(Compatibility option) Before GH-259, url reproducing APIs
+(C<< $CON->mkquery($CON) >>, C<< $CON->current_path($CON) >>,
+C<< $CON->mkurl(undef, $CON) >>...) reproduced POST body parameters
+too. Since POST is often chosen exactly to keep parameters out of
+access logs, they now reproduce only C<QUERY_STRING>-derived
+parameters when the request has a body. Set this option to 1 to
+restore the old merged behavior.
+
+=head2 pagevars
+
+Package name of the I<pagevars module>, which defines per-page
+compile-time constants for templates. See L<YATT::Lite::PageConsts>.
+
+=head2 argmacro
+
+Hash of argmacro name to the Perl module which defines it,
+like C<< {enum => 'MyApp::ArgMacro::Enum'} >>.
+Templates can use them as C<%enum;> without C<< <!yatt:argmacro> >>.
+
+To register them in a namespace, give a list of hashes, each optionally
+paired with a namespace, like
+C<< [[myorg => {enum => 'MyApp::ArgMacro::Enum'}], {...}] >>.
+Then templates use it as C<%myorg:enum;>.
+See L<YATT::Lite::ArgMacro/REGISTRATION>.
+
 =head2 psgi_static
 
 Requests other than F<*.yatt>, F<*.ytmpl>, F<*.ydo> are passed to this PSGI app.
 Default is:
 
-  Plack::App::File->new(root => $self->{cf_doc_root})->to_app
+  Plack::App::File->new(root => $self->{doc_root})->to_app
 
 
 =head2 backend
@@ -115,6 +146,58 @@ Room for your Model instance.
 If it is given and it has C<startup> method is implemented,
 C<< $backend->startup($siteapp, @all_dirapps) >>
 will be called when C<prepare_app>.
+
+=head2 allow_debug_from
+
+List of client addresses which may see developer-only error output:
+the C<error_trace> widget of the shipped F<ytmpl/error.ytmpl>
+(backtrace, source lines and frame arguments) and, under
+C<runas_fcgi>, the raw exception text. Anything else gets the public
+error page. Templates can ask the same question with
+C<&yatt:is_debug_allowed_ip();>.
+
+Default is C<['127.0.0.1', '::1']>: the loopback client only.
+Giving this option I<replaces> the default, so list the loopback
+addresses too if you still want them.
+
+Each entry is compared with the client address as a whole string,
+exactly. (Earlier versions anchored this check only at the start, so
+C<127.0.0.1> also matched C<127.0.0.100>.) For CIDR ranges, IPv6
+normalization and IPv4-mapped IPv6 addresses, use
+L<YATT::Lite::WebMVC0::Partial::StrictIPMatch>.
+
+The client address is C<REMOTE_ADDR>, unless L</trusted_proxies>
+says otherwise.
+
+=head2 trusted_proxies
+
+List of addresses of the reverse proxies in front of this app.
+When C<REMOTE_ADDR> is one of them, the client address (for
+L</allow_debug_from>) is taken from the headers the proxy added:
+C<X-Real-IP>, then C<X-Client-IP>, then C<X-Forwarded-For>, whose
+entries are read from the right, skipping other trusted proxies, so
+that a value the client itself planted at the left is not used.
+Entries are matched like L</allow_debug_from> (exact string by
+default, CIDR with L<YATT::Lite::WebMVC0::Partial::StrictIPMatch>).
+
+B<Compatibility note>: before this option existed, those headers
+were believed from I<any> peer, so a remote client could send
+C<X-Real-IP: 127.0.0.1> and pass C<allow_debug_from>. Now they are
+ignored unless C<trusted_proxies> is set. If your app runs behind a
+proxy and you rely on C<allow_debug_from> for addresses other than
+the proxy itself, add the proxy here:
+
+  trusted_proxies => ['10.0.0.1'],
+
+Alternatively, keep this option unset and let
+L<Plack::Middleware::ReverseProxy> rewrite C<REMOTE_ADDR>, enabled
+only for connections from the proxy:
+
+  enable_if { $_[0]->{REMOTE_ADDR} eq '10.0.0.1' } 'ReverseProxy';
+
+C<X-Forwarded-Proto> is not affected by this option: it is still
+honoured from any peer for URL building and the C<Secure> cookie
+attribute.
 
 =head1 METHODS
 
@@ -137,6 +220,39 @@ under F<doc_root> and F<app_base>, in this order.
 
 =back
 
+=head3 Return value of actions
+
+If an action (F<*.ydo>, C<< <!yatt:action> >> or C<mount_action>)
+returns a PSGI response, it is used as the response instead of
+the connection buffer. Both forms of PSGI response are accepted:
+
+=over 4
+
+=item ARRAY - C<[$status, \@headers, \@body]>
+
+=item CODE - delayed response / streaming
+
+  return sub {
+    my ($responder) = @_;
+    my $writer = $responder->([200, ['Content-Type', "text/html"]]);
+    $writer->write('....');
+    $writer->close;
+  };
+
+=back
+
+These are equivalent to C<< $CON->raise_response($response) >>.
+
+B<Note for CODE responses:> the callback is invoked by the PSGI server
+B<after> C<call($env)> has returned. At that time, dynamically scoped
+variables such as C<$SYS> and C<$YATT> are no longer set up.
+(C<$CON> is fine, because actions receive it as an argument
+and capture it lexically.) If you need them in the callback,
+copy them into lexical variables before returning the callback:
+
+  my ($sys, $yatt) = ($SYS, $YATT);
+  return sub { ... uses $sys, $yatt ... };
+
 =head2 prepare_app
 
 PSGI startup hook.
@@ -154,4 +270,164 @@ If specified, C<< $con->flush >> will flush buffered contents to $parent_fh.
 =head1 HOOKS
 
 =head2 before_dirhandler($dirapp, $connection, $filename)
+
+=head1 ENTITY FUNCTIONS
+
+SiteApp registers following entity functions (usable in every
+template as C<&yatt:NAME(ARGS);>). This section covers URL-related
+ones. Most of them delegate to the same-named method of
+L<$CON|YATT::Lite::WebMVC0::Connection>.
+
+=head2 URL builders
+
+X<GH-251> Recommended way to build app-internal links.
+C<*_path> returns a path, C<*_url> returns an absolute url,
+and both respect the mount point of the site. See
+L<YATT::Lite::WebMVC0::Connection/URL BUILDING METHODS> for details.
+
+  <a href="&yatt:site_path(/admin/);">admin</a>
+  <a href="&yatt:site_path(/list,[page,2]);">page 2</a>
+
+  <a href="&yatt:current_path([page,2]);">page 2 of this page</a>
+
+  &yatt:site_url(/confirm);   (absolute; for emails etc.)
+  &yatt:current_url();
+
+=over 4
+
+=item &yatt:site_path(PATH,QUERY);
+
+=item &yatt:site_url(PATH,QUERY);
+
+=item &yatt:current_path(QUERY);
+
+=item &yatt:current_url(QUERY);
+
+QUERY is optional and must be C<[key,value,...]> array form.
+
+=back
+
+=head2 Redirect
+
+=over 4
+
+=item &yatt:raise_redirect(URL);
+
+=item &yatt:redirect(URL);
+
+Same as C<< $CON->raise_redirect >>. Html made so far is discarded
+and the rendering stops there.
+See L<YATT::Lite::WebMVC0::Connection/REDIRECT>.
+
+=back
+
+=head2 Debugging
+
+=over 4
+
+=item &yatt:is_debug_allowed_ip();
+
+=item &yatt:is_debug_allowed_ip(ADDRESS);
+
+True if the client address (or the given ADDRESS) is listed in
+L</allow_debug_from>. Without an argument the client address is
+decided by L</trusted_proxies>. The shipped F<ytmpl/error.ytmpl>
+uses this to choose between the developer trace and the public
+error page.
+
+=back
+
+=head2 Location inspection
+
+These entities answer I<where this page is served>.
+As a general rule, B<lowercase entities return yatt-normalized
+values and are recommended>; UPPERCASE ones return raw PSGI env
+values as-is (mainly for debugging).
+
+Suppose the app is deployed at C</myapp> via Apache
+C<Action> + C<AddHandler> (so raw C<SCRIPT_NAME> contains the
+handler script path) behind a reverse proxy which sets
+C<X-Forwarded-Proto: https>, and
+C<https://example.com/myapp/auth/test?q=1> is served by
+F<auth/test.yatt>:
+
+  &yatt:script_name();    /myapp
+  &yatt:SCRIPT_NAME();    /myapp/cgi-bin/runplack.cgi
+
+  &yatt:script_dir();     /myapp/
+
+  &yatt:script_uri();     https://example.com/myapp/auth/test
+  &yatt:SCRIPT_URI();     http://example.com/myapp/auth/test
+
+  &yatt:script_url();     /myapp/auth/test
+  &yatt:SCRIPT_URL();     /myapp/auth/test
+
+  &yatt:dir_location();   /myapp/auth/
+  &yatt:file_location();  /myapp/auth/test
+  &yatt:page_location();  /myapp/auth/test
+
+  &yatt:absrequest();     /auth/test
+  &yatt:abspath();        /auth/test.yatt
+
+  &yatt:request_uri();    /myapp/auth/test?q=1
+  &yatt:path_info();      /auth/test
+
+=over 4
+
+=item &yatt:script_name();
+
+The mount point of the site, without trailing C</>
+(C<< $env->{'yatt.script_name'} >> - normalized C<SCRIPT_NAME>;
+handler artifacts of Apache Action mapping are trimmed).
+The most basic building block for path abstraction.
+Note: this usually equals to C<< &yatt:site_prefix(); >>
+(explicit L</site_prefix> config wins if given).
+
+=item &yatt:script_dir();
+
+C<script_name> + C</>.
+
+=item &yatt:script_uri();
+
+Absolute url of the current page. Unlike raw C<SCRIPT_URI>,
+this respects C<X-Forwarded-Proto> (GH-205).
+
+=item &yatt:script_url();
+
+Path-only version of C<script_uri>.
+
+=item &yatt:dir_location(); &yatt:file_location(); &yatt:page_location();
+
+Mount-prefix aware location of the current directory / page.
+C<file_location> follows how the request spelled the file name
+(with/without extension), while C<page_location> is always the
+canonical (extension-less) form. Both omit the file name for
+F<index.yatt> requests.
+See L<YATT::Lite::WebMVC0::Connection/LOCATION INSPECTION METHODS>.
+
+=item &yatt:abspath();
+
+C<location> + C<file> (physical file name), without mount prefix.
+
+=item &yatt:absrequest();
+
+C<REQUEST_URI> minus C<script_name>, query string stripped.
+Since C<REQUEST_URI> typically does not contain F<index.yatt>,
+this is not suitable to get the physical file name.
+
+=item &yatt:is_current_file(PATH); &yatt:is_current_page(PAGE);
+
+Current page predicates, useful for navigation highlighting.
+
+=item &yatt:path_info(); &yatt:request_uri(); &yatt:script_filename();
+
+Raw C<PATH_INFO> / C<REQUEST_URI> / C<SCRIPT_FILENAME>.
+
+=back
+
+=head1 SEE ALSO
+
+L<YATT::Lite::WebMVC0::Connection>,
+L<YATT::Lite::WebMVC0::DirApp>,
+L<YATT::Lite>
 

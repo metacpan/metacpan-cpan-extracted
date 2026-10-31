@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::APIServerConfig;
 # ABSTRACT: apiserverConfig allows specifying a host and auth methods to access the Kuberntees API server.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1::Authorization';
@@ -38,7 +38,7 @@ IO::K8s::PrometheusOperator::V1::APIServerConfig - apiserverConfig allows specif
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 authorization
 
@@ -106,7 +106,7 @@ tlsConfig to use for the API server.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -134,5 +134,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -4,7 +4,7 @@ use warnings qw(FATAL all NONFATAL misc);
 use Carp;
 
 use base qw(YATT::Lite::WebMVC0::DBSchema);
-use fields qw(DBIC cf_DBIC);
+use YATT::Lite::MFields qw(_DBIC DBIC);
 
 use YATT::Lite::Util::AsBase qw/_import_as_base/;
 
@@ -14,30 +14,30 @@ require DBIx::Class::Core;
 sub DBIC_SCHEMA {'YATT::Lite::WebMVC0::DBSchema::DBIC::DBIC_SCHEMA'}
 
 use YATT::Lite::Types
-  ([Table => -fields => [qw(cf_package cf_components)]]
-   , [Column => -fields => [qw(cf_dbic_opts)]]
+  ([Table => -fields => [qw(package components)]]
+   , [Column => -fields => [qw(dbic_opts)]]
   );
 
 use YATT::Lite::Util qw(globref define_const lexpand terse_dump);
 
 sub dbic {
   (my MY $schema) = @_;
-  $schema->{DBIC} //= do {
-      if ($schema->{cf_debug}) {
+  $schema->{_DBIC} //= do {
+      if ($schema->{debug}) {
 	print STDERR "INFO: DBSchema($schema) DBIC->connect"
-	  , ", class = $schema->{cf_DBIC}\n";
+	  , ", class = $schema->{DBIC}\n";
       }
       weaken($schema); # !! This is very important to avoid memleak!
-      $schema->{cf_DBIC}->connect(sub {$schema->make_connection});
+      $schema->{DBIC}->connect(sub {$schema->make_connection});
     };
 }
 
 sub connect {
   my MY $schema = ref $_[0] ? shift->clone : shift->new;
-  $schema->{DBIC} = $schema->{cf_DBIC}->connect(@_);
-  if ($schema->{cf_debug}) {
+  $schema->{_DBIC} = $schema->{DBIC}->connect(@_);
+  if ($schema->{debug}) {
     print STDERR "INFO: DBSchema($schema)::connect"
-      ,", class = $schema->{cf_DBIC}\n";
+      ,", class = $schema->{DBIC}\n";
   }
   $schema;
 }
@@ -51,26 +51,26 @@ sub disconnect {
 sub reset {
   (my MY $self) = @_;
   $self->SUPER::reset;
-  delete $self->{DBIC};
+  delete $self->{_DBIC};
 }
 
 sub txn_do {
   (my MY $schema, my $sub) = splice @_, 0, 2;
-  $schema->dbic->txn_do($sub, @_ ? @_ : $schema->{DBIC});
+  $schema->dbic->txn_do($sub, @_ ? @_ : $schema->{_DBIC});
 }
 
 sub startup {
   (my MY $schema, my (@apps)) = @_;
-  unless ($schema->{cf_DBIC}) {
+  unless ($schema->{DBIC}) {
     croak "DBIC classname parameter is empty!";
   }
-  unless ($schema->{cf_DBIC} =~ /::/) {
-    croak "DBIC classname MUST has '::'! $schema->{cf_DBIC}";
+  unless ($schema->{DBIC} =~ /::/) {
+    croak "DBIC classname MUST has '::'! $schema->{DBIC}";
   }
   $schema->SUPER::startup(@apps);
-  $schema->build_dbic($schema->{cf_DBIC});
-  if (my (@args) = $schema->{cf_DBH}
-      || lexpand($schema->{cf_connection_spec})) {
+  $schema->build_dbic($schema->{DBIC});
+  if (my (@args) = $schema->{DBH}
+      || lexpand($schema->{connection_spec})) {
     $schema->connect(@args);
   }
 }
@@ -116,70 +116,70 @@ sub build_dbic {
       *$sym = sub {
 	my $dbic = shift;
 	print STDERR "DEBUG: DBIC->YATT_DBSchema is called\n"
-	  if $schema->{cf_debug};
+	  if $schema->{debug};
 	# Class method として呼んだときは, schema に set しない。
-	$schema->{DBIC} ||= $dbic
+	$schema->{_DBIC} ||= $dbic
 	  if defined $dbic and ref $dbic; # XXX: weaken??
 	$schema;
       };
     }
   }
-  $schema->{cf_DBIC} = $DBIC;
+  $schema->{DBIC} = $DBIC;
 
   *{globref($DBIC, 'ISA')} = [$myPkg->DBIC_SCHEMA];
   $myPkg->add_inc($DBIC);
 
-  foreach my Table $tab (@{$schema->{table_list}}) {
+  foreach my Table $tab (@{$schema->{_table_list}}) {
     # XXX: 正確には rowClass よね、これって。
     # XXX: じゃぁ ResultSet の方は作らなくてよいのか?
-    my $tabClass = $tab->{cf_package}
-      = join('::', $DBIC, Result => $tab->{cf_name});
+    my $tabClass = $tab->{package}
+      = join('::', $DBIC, Result => $tab->{name});
     *{globref($tabClass, 'ISA')} = ['DBIx::Class::Core'];
     $myPkg->add_inc($tabClass);
 
     my Column $pk;
-    my @comp = (qw/Core/, lexpand($tab->{cf_components}));
+    my @comp = (qw/Core/, lexpand($tab->{components}));
 
-    if ($tab->{cf_view}) {
+    if ($tab->{view}) {
       $tabClass->load_components(@comp);
       $tabClass->table_class('DBIx::Class::ResultSource::View');
       # ------------- (order is important!) ----------------
-      $tabClass->table($tab->{cf_name});
-      $tabClass->result_source_instance->view_definition($tab->{cf_view});
-      $tabClass->result_source_instance->is_virtual($tab->{cf_virtual} ? 1 : 0);
+      $tabClass->table($tab->{name});
+      $tabClass->result_source_instance->view_definition($tab->{view});
+      $tabClass->result_source_instance->is_virtual($tab->{virtual} ? 1 : 0);
     } else {
       $pk = $schema->get_table_pk($tab);
-      push @comp, qw(PK::Auto) if $pk and $pk->{cf_autoincrement};
+      push @comp, qw(PK::Auto) if $pk and $pk->{autoincrement};
       $tabClass->load_components(@comp);
-      $tabClass->table($tab->{cf_name});
+      $tabClass->table($tab->{name});
     }
 
-    my @constraints = lexpand($tab->{chk_unique});
+    my @constraints = lexpand($tab->{_chk_unique});
     {
       my @colSpecs;
-      foreach my Column $col (@{$tab->{col_list}}) {
+      foreach my Column $col (@{$tab->{_col_list}}) {
 	# dbic_opts;
-	my %dbic_opts = (data_type => $col->{cf_type}
-                         , ($col->{cf_autoincrement} ? (is_auto_increment => 1) : ())
-			 , map(defined $_ ? %$_ : (), $col->{cf_dbic_opts}));
-	push @colSpecs, $col->{cf_name} => \%dbic_opts;
-	push @constraints, [$col->{cf_name}] if $col->{cf_unique};
+	my %dbic_opts = (data_type => $col->{type}
+                         , ($col->{autoincrement} ? (is_auto_increment => 1) : ())
+			 , map(defined $_ ? %$_ : (), $col->{dbic_opts}));
+	push @colSpecs, $col->{name} => \%dbic_opts;
+	push @constraints, [$col->{name}] if $col->{unique};
       }
       $tabClass->add_columns(@colSpecs);
     }
     $tabClass->set_primary_key($schema->get_table_pk($tab)) if $pk;
     foreach my $uniq (@constraints) {
       my $ixname = join("_", $tabClass, @$uniq);
-      print STDERR <<END if $schema->{cf_verbose};
+      print STDERR <<END if $schema->{verbose};
 -- $tabClass->add_unique_constraint($ixname, [@{[join ", ", @$uniq]}])
 END
       $tabClass->add_unique_constraint($ixname, $uniq);
     }
   }
   # Relationship の設定と、 register_class の呼び出し。
-  foreach my Table $tab (@{$schema->{table_list}}) {
-    my $tabClass = $tab->{cf_package};
-    foreach my $rel ($schema->list_relations($tab->{cf_name})) {
+  foreach my Table $tab (@{$schema->{_table_list}}) {
+    my $tabClass = $tab->{package};
+    foreach my $rel ($schema->list_relations($tab->{name})) {
       my ($relType, @relOpts) = @$rel;
       if (my $sub = $myPkg->can("add_relation_$relType")) {
 	$sub->($myPkg, $schema, $tab, @relOpts);
@@ -188,23 +188,23 @@ END
 
       my ($relName, $fkName, $fTabName) = @relOpts;
       unless (defined $fTabName) {
-	croak "Foreign table is empty for $tab->{cf_name} $relType $relName $fkName";
+	croak "Foreign table is empty for $tab->{name} $relType $relName $fkName";
       }
-      my $fTab = $schema->{table_dict}{$fTabName};
+      my $fTab = $schema->{_table_dict}{$fTabName};
       # table の package 名が確定するまで、relation の設定を遅延させたいから。
-      print STDERR <<END if $schema->{cf_verbose};
--- $tabClass->$relType($relName, $fTab->{cf_package}, @{[terse_dump($fkName)]})
+      print STDERR <<END if $schema->{verbose};
+-- $tabClass->$relType($relName, $fTab->{package}, @{[terse_dump($fkName)]})
 END
       eval {
-	$tabClass->$relType($relName, $fTab->{cf_package}, $fkName);
+	$tabClass->$relType($relName, $fTab->{package}, $fkName);
       };
       if ($@) {
 	die "Relationship Error in: $relType $relName, foreign="
-	  .$fTab->{cf_package}.": $@";
+	  .$fTab->{package}.": $@";
       }
     }
     # register_class は Relationship 設定が済んでからじゃないとダメ?
-    $DBIC->register_class($tab->{cf_name}, $tabClass);
+    $DBIC->register_class($tab->{name}, $tabClass);
   }
 
   $schema;
@@ -215,8 +215,8 @@ sub add_relation_many_to_many {
   (my $myPkg, my MY $schema, my Table $tab
    , my ($relName, $fkName, $tabName)) = @_;
   my $relType = 'many_to_many';
-  my $tabClass = $tab->{cf_package};
-  print STDERR <<END if $schema->{cf_verbose};
+  my $tabClass = $tab->{package};
+  print STDERR <<END if $schema->{verbose};
 -- $tabClass->$relType($relName, $tabName, @{[terse_dump($fkName)]})
 END
   eval {
@@ -230,7 +230,7 @@ END
 *deploy = *ensure_created; *deploy = *ensure_created;
 sub ensure_created {
   (my MY $self, my $dbic) = @_;
-  $dbic ||= $self->{DBIC};
+  $dbic ||= $self->{_DBIC};
   $dbic->storage->dbh_do
     (sub {
        (my ($storage, $dbh), my MY $self) = @_;

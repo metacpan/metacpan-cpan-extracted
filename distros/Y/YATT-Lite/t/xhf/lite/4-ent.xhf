@@ -33,7 +33,7 @@ OUT:
 TITLE: &yatt:template();
 IN:
  <!yatt:config usage="For template entity">
- &yatt:template(){cf_usage};.
+ &yatt:template(){usage};.
 OUT:
  For template entity.
 
@@ -370,9 +370,9 @@ IN:
 OUT:
  x=foo
  {
-   'a' => 'xxx',
-   'b' => 'yyy',
-   'x' => 'foo'
+   &#39;a&#39; =&gt; &#39;xxx&#39;,
+   &#39;b&#39; =&gt; &#39;yyy&#39;,
+   &#39;x&#39; =&gt; &#39;foo&#39;
  }
  
 

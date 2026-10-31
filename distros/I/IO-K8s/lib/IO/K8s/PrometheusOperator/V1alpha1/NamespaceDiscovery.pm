@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::NamespaceDiscovery;
 # ABSTRACT: namespaces defines the namespace discovery.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s names        => [Str];
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1alpha1::NamespaceDiscovery - namespaces defines t
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 names
 
@@ -37,7 +37,7 @@ ownNamespace includes the namespace in which the Prometheus pod runs to the list
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -65,5 +65,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

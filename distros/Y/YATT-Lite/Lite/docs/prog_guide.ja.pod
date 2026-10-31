@@ -174,6 +174,10 @@ yatt の widget には、宣言した引数以外に, 先頭に C<$this> と C<$
 
     MyYATT::EntNS->render_hello(\*STDOUT, "foo", undef);
 
+最後の C<$body> のような code 型の引数も、widget と同じく
+C<$CON> を第一引数に受け取る closure です。呼び出すときは
+C<< $body->($CON) >> のように C<$CON> を渡します。
+
 
 =head3 Why stream writer
 

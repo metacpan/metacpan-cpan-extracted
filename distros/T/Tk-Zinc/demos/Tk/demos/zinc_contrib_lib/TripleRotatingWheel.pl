@@ -2,7 +2,7 @@
 # TripleRotatingWheel gambling game contributed by "zentara"
 
 # Idea derived from the wheelOfFortune.pl demo by D. Etienne etienne@cena.fr
-# $Id: TripleRotatingWheel.pl,v 1.2 2004/03/05 14:54:23 etienne Exp $ 
+# $Id$ 
 
 
 use Tk; 

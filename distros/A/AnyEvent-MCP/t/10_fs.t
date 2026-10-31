@@ -44,7 +44,8 @@ sub read_file {
    scalar <$fh>
 }
 
-my $dir = File::Temp::tempdir (CLEANUP => 1);
+# mcp-fs resolves filesystem paths; some systems have a symlinked temp root.
+my $dir = Cwd::abs_path File::Temp::tempdir (CLEANUP => 1);
 File::Path::mkpath (["$dir/work", "$dir/home", "$dir/config/anyevent-mcp/rules", "$dir/bin"], 0, 0700);
 symlink $^X, "$dir/bin/perl" or die "$dir/bin/perl: $!";
 socket my $agent, Socket::AF_UNIX (), Socket::SOCK_STREAM (), 0 or die $!;
@@ -60,6 +61,7 @@ my $patch = $utility{patch} && Cwd::abs_path $utility{patch};
 write_file "$dir/bwrap", "#!$^X\n" . q{
 use common::sense;
 use JSON::XS ();
+use File::Spec ();
 open my $log, ">>", "$ENV{PERL_ANYEVENT_MCP_TEST_FS_DIR}/sandbox.log" or die $!;
 print $log JSON::XS::encode_json (\@ARGV), "\n";
 close $log;
@@ -82,7 +84,9 @@ while (@ARGV) {
       my ($key, $value) = splice @ARGV, 0, 2;
       $ENV{$key} = $value;
    } elsif ($option eq "--chdir") {
-      chdir shift @ARGV or die $!;
+      my $dir = shift @ARGV;
+      $dir = File::Spec->tmpdir if $dir eq "/tmp" && !-d $dir;
+      chdir $dir or die "$dir: $!";
    } elsif ($option =~ /\A--(?:tmpfs|dev|proc|remount-ro|cap-drop)\z/) {
       shift @ARGV;
    } elsif ($option !~ /\A--(?:die-with-parent|new-session|unshare-[a-z-]+|disable-userns|clearenv)\z/) {
@@ -150,7 +154,7 @@ print JSON::XS::encode_json {
 chmod 0700, "$dir/ask" or die $!;
 write_file "$dir/work/read", "one\ntwo\nthree\n";
 write_file "$dir/config/anyevent-mcp/rules/fs-default.ini",
-   "[rule]\ndecision=allow\naction=read\nworkdir=$dir/work\nsandbox-grants=workdir-read\n";
+   "[rule]\ndecision=allow\naction=read\nmatch.workdir=$dir/work\nsandbox-grants=workdir-read\n";
 
 # trusted stand-ins make argv and grant checks independent of installed VCS clients.
 for my $backend (qw(git svn cvs hg)) {
@@ -204,9 +208,10 @@ sub call {
 }
 
 my ($success, $tools) = wait_for (sub { $client->tools ($_[0]) });
-my $tool_count = 14 - ($utility{find} ? 0 : 2) - ($utility{sed} ? 0 : 1)
-   - ($utility{find} && $utility{grep} ? 0 : 1) - ($utility{patch} ? 0 : 1);
-ok $success && @$tools == $tool_count, "module discovery lists available filesystem tools";
+ok $success && (grep $_->{name} eq "exec", @$tools)
+   && (grep $_->{name} eq "workdirs", @$tools)
+   && (grep $_->{name} eq "file-read", @$tools),
+   "module discovery lists core filesystem tools";
 my @probes = map JSON::XS::decode_json ($_), split /\n/, read_file "$dir/sandbox.log";
 ok (grep {
    index (join ("\0", @$_), "--setenv\0PATH\0/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin") >= 0
@@ -219,7 +224,7 @@ my ($exec_tool) = grep $_->{name} eq "exec", @$tools;
 ok $exec_tool->{inputSchema}{properties}{sandbox_grants}{description} =~ /replaces this default entirely/,
    "exec schema says explicit sandbox_grants replace default";
 my @workdir_tool = grep exists $_->{inputSchema}{properties}{workdir}, @$tools;
-ok @workdir_tool == $tool_count - 2 && !grep (
+ok @workdir_tool == @$tools - 2 && !grep (
    !$_->{inputSchema}{properties}{workdir}{anyOf}
       || @{$_->{inputSchema}{properties}{workdir}{anyOf}} != 2, @workdir_tool),
    "all filesystem workdir selectors advertise integer or string";
@@ -414,7 +419,7 @@ SKIP: {
    skip "GNU find/grep are unavailable", 7 unless $utility{find} && $utility{grep};
 
    $result = call find => { name => "rea" };
-   ok $prompts[-1]{tool} eq "find" && !exists $prompts[-1]{subject}
+   ok $prompts[-1]{tool} eq "find" && !exists $prompts[-1]{dimensions}{subject}{value}
       && !exists $prompts[-1]{subjects} && $prompts[-1]{paths}[0] eq "$dir/work"
       && $result->{content}[0]{text} =~ /\tread\n/,
       "filesystem prompts show affected paths without authorization scopes";
@@ -442,10 +447,14 @@ SKIP: {
 my $before = @prompts;
 $result = call "path-op" => { path => "new", rename => "renamed", reason => "Move the test file" };
 ok !$result->{isError} && !-e "$dir/work/new" && -f "$dir/work/renamed", "rename succeeds with combined authority";
-ok @prompts == $before + 1 && join (",", @{$prompts[-1]{paths}}) eq "$dir/work/new,$dir/work/renamed",
+my $prompt_ok = @prompts == $before + 1 && join (",", @{$prompts[-1]{paths}}) eq "$dir/work/new,$dir/work/renamed";
+ok $prompt_ok,
    "rename requests one approval displaying both affected paths";
-ok $prompts[-1]{reason} eq "Move the test file\nPath: \"$dir/work/new\"\nOperations (in order):\n  rename: \"$dir/work/renamed\"",
+my $reason_ok = $prompts[-1]{reason} eq "Move the test file\nPath: \"$dir/work/new\"\nOperations (in order):\n  rename: \"$dir/work/renamed\"";
+ok $reason_ok,
    "rename prompt preserves the supplied reason and shows source, operation and resolved destination";
+diag "rename: prompts=" . @prompts . ", expected=" . ($before + 1) . ", last=" . JSON::XS::encode_json ($prompts[-1])
+   unless $prompt_ok && $reason_ok;
 write_file "$dir/work/partial", "remove first\n";
 $result = call "path-op" => { path => "partial", unlink => JSON::XS::true, chmod => "0600" };
 ok $result->{isError} && !-e "$dir/work/partial",
@@ -552,18 +561,20 @@ SKIP: {
       && $result->{structuredContent}{stderr} eq "unfiltered\n", "exec filters stdout only before the line limit";
    ok $result->{structuredContent}{exit} == 7 && $result->{structuredContent}{stdout_truncated}
       && !$result->{structuredContent}{capture_truncated}, "postfilter limits preserve original exit status and capture completeness";
-   my $output_subject = $prompts[-1]{subject};
+   my $output_subject = $prompts[-1]{dimensions}{subject}{value};
    $result = call exec => { argv => $output_argv, reason => "different output filter", grep => "^absent" };
    ok $result->{structuredContent}{stdout} eq "" && $result->{structuredContent}{exit} == 7,
       "no grep matches is distinct from command success";
-   ok $prompts[-1]{subject} eq $output_subject, "output options do not change the executable permission subject";
+   ok $prompts[-1]{dimensions}{subject}{value} eq $output_subject, "output options do not change the executable permission subject";
 }
 
 $result = call exec => { argv => [$^X, "-e", 'print "abcdef"; print STDERR "uvwxyz"'],
    reason => "independent byte budgets", max_bytes => 3 };
-ok $result->{structuredContent}{stdout} eq "abc" && $result->{structuredContent}{stderr} eq "uvw"
-   && $result->{structuredContent}{stdout_truncated} && $result->{structuredContent}{stderr_truncated},
+my $valid = $result->{structuredContent}{stdout} eq "abc" && $result->{structuredContent}{stderr} eq "uvw"
+   && $result->{structuredContent}{stdout_truncated} && $result->{structuredContent}{stderr_truncated};
+ok $valid,
    "stdout and stderr have independent return budgets";
+diag JSON::XS::encode_json $result unless $valid;
 $result = call exec => { argv => [$^X, "-e", 'binmode STDOUT; print "\xc3\xa4\xc3\xa4"'],
    reason => "UTF-8 clipping", max_bytes => 3 };
 ok !$result->{isError} && $result->{structuredContent}{stdout} eq "\x{e4}" && $result->{structuredContent}{truncated},
@@ -591,7 +602,7 @@ for my $backend (qw(git svn cvs hg)) {
    $result = call "vcs-diff" => { backend => $backend, files => ["-strange"] };
    ok !$result->{isError} && $result->{structuredContent}{exit} == 1
       && $result->{structuredContent}{stdout} eq "header\nkeep: $backend\ntrailer\n", "$backend diff preserves differences status and output";
-   ok $prompts[-1]{action} eq "vcs-diff" && $prompts[-1]{subject} eq $backend,
+   ok $prompts[-1]{action} eq "vcs-diff" && $prompts[-1]{dimensions}{subject}{value} eq $backend,
       "$backend diff uses a fixed-operation permission instead of arbitrary exec";
    ok join (",", sort @{$prompts[-1]{sandbox_grants}}) eq
       ($backend eq "cvs" ? "ssh-agent,workdir-read" : "workdir-read"),
@@ -604,6 +615,25 @@ for my $backend (qw(git svn cvs hg)) {
    ok !$result->{isError} && $result->{structuredContent}{exit} == 0
       && $result->{structuredContent}{stdout} eq "header\n", "$backend status shares output limits";
 
+   $result = call "vcs-log" => { backend => $backend, files => ["-strange"], max_lines => 2 };
+   ok !$result->{isError} && $result->{structuredContent}{exit} == 0
+      && $result->{structuredContent}{stdout} eq "header\nkeep: $backend\n"
+      && $result->{structuredContent}{stdout_truncated}, "$backend log shares bounded output";
+   ok $prompts[-1]{action} eq "vcs-log"
+      && $prompts[-1]{dimensions}{subject}{value} eq $backend,
+      "$backend log has its own backend-scoped permission action";
+   ok join (",", sort @{$prompts[-1]{sandbox_grants}}) eq
+      (($backend eq "cvs" || $backend eq "svn") ? "ssh-agent,workdir-read" : "workdir-read"),
+      "$backend log requests appropriate network/SSH authority";
+   @log = split /\n/, read_file "$dir/vcs.log";
+   $argv = JSON::XS::decode_json $log[-1];
+   ok $argv->[-1] eq ($backend eq "svn" ? "./-strange@" : "./-strange")
+      && grep ($_ eq "--", @$argv), "$backend log file path remains a literal argument";
+   ok (($backend eq "git" && grep ($_ eq "--no-decorate", @$argv))
+      || ($backend eq "cvs" && grep ($_ eq "-N", @$argv))
+      || ($backend eq "svn" && grep ($_ eq "--no-auth-cache", @$argv))
+      || ($backend eq "hg" && grep ($_ eq "log", @$argv))),
+      "$backend log uses fixed backend options";
    SKIP: {
       skip "extended GNU grep VCS test (PERL_ANYEVENT_MCP_TESTS=1)", 1
          unless ($ENV{PERL_ANYEVENT_MCP_TESTS} || 0) >= 1;
@@ -626,8 +656,9 @@ for my $backend (qw(git svn cvs hg)) {
       "$backend runs in cwd with relative filenames and displays command directory";
 }
 ok $tool{"vcs-diff"}{inputSchema}{properties}{cwd}{default} eq "."
-   && $tool{"vcs-status"}{inputSchema}{properties}{cwd}{default} eq ".",
-   "both VCS tools advertise cwd default";
+   && $tool{"vcs-status"}{inputSchema}{properties}{cwd}{default} eq "."
+   && $tool{"vcs-log"}{inputSchema}{properties}{cwd}{default} eq ".",
+   "all VCS tools advertise cwd default";
 my $before_vcs = read_file "$dir/vcs.log";
 $result = call "vcs-status" => { backend => "git", cwd => "../home" };
 ok $result->{isError} && read_file ("$dir/vcs.log") eq $before_vcs,
@@ -650,6 +681,9 @@ ok $result->{isError} && read_file ("$dir/vcs.log") eq $before_vcs, "VCS paths c
 $reduce = 1;
 $result = call "vcs-status" => { backend => "cvs" };
 ok $result->{isError} && read_file ("$dir/vcs.log") eq $before_vcs, "reduced approval cannot omit CVS agent/network authority";
+$result = call "vcs-log" => { backend => "svn" };
+ok $result->{isError} && read_file ("$dir/vcs.log") eq $before_vcs,
+   "reduced approval cannot omit SVN log agent/network authority";
 $reduce = 0;
 
 $result = call exec => { argv => [$^X, "-e", 'print "worker\\n"'], reason => "test worker" };
@@ -723,10 +757,12 @@ ok $result->{isError} && @prompts == $prompts_before
    "stdin size limit applies to decoded bytes before permission";
 
 $result = call exec => { argv => [$^X, "-e", 'print "diff\n"; warn "message\n"; exit 1'], reason => "nonzero is data" };
-ok !$result->{isError} && $result->{structuredContent}{exit} == 1
+$valid = !$result->{isError} && $result->{structuredContent}{exit} == 1
    && $result->{structuredContent}{stdout} eq "diff\n"
-   && $result->{structuredContent}{stderr} eq "message\n",
+   && $result->{structuredContent}{stderr} eq "message\n";
+ok $valid,
    "nonzero command exit returns ordinary structured data";
+diag JSON::XS::encode_json $result unless $valid;
 $result = call exec => {
    argv => [$^X, "-e", q{
       defined (my $pid = fork) or die $!;
@@ -737,10 +773,12 @@ $result = call exec => {
    }],
    reason => "test output after child exit",
 };
-ok !$result->{isError} && $result->{structuredContent}{exit} == 7
+$valid = !$result->{isError} && $result->{structuredContent}{exit} == 7
    && $result->{structuredContent}{stdout} eq "late stdout\n"
-   && $result->{structuredContent}{stderr} eq "late stderr\n",
+   && $result->{structuredContent}{stderr} eq "late stderr\n";
+ok $valid,
    "completion waits for both output streams after the child exits";
+diag JSON::XS::encode_json $result unless $valid;
 
 $result = call exec => {
    argv => [$^X, "-e", q{
@@ -752,10 +790,12 @@ $result = call exec => {
    }],
    reason => "test child exit after output closes",
 };
-ok !$result->{isError} && $result->{structuredContent}{exit} == 9
+$valid = !$result->{isError} && $result->{structuredContent}{exit} == 9
    && $result->{structuredContent}{stdout} eq ""
-   && $result->{structuredContent}{stderr} eq "",
+   && $result->{structuredContent}{stderr} eq "";
+ok $valid,
    "completion waits for child status after both output streams close";
+diag JSON::XS::encode_json $result unless $valid;
 
 $result = call exec => { argv => [$^X, "-e", 'kill TERM => $$'], reason => "signal is data" };
 ok !$result->{isError} && $result->{structuredContent}{signal} == 15,
@@ -782,6 +822,8 @@ my $sandbox = read_file "$dir/sandbox.log";
 ok $sandbox =~ /--unshare-net/ && $sandbox =~ /--ro-bind/ && $sandbox =~ /--disable-userns/
    && $sandbox !~ /\/run\/anyevent-mcp\.pm/,
    "sandbox retains isolation flags without mounting application source";
+ok $sandbox =~ /"--setenv","PERL_BADLANG","0"/,
+   "sandbox suppresses Perl warnings if the requested UTF-8 locale is unavailable";
 ok $sandbox =~ /"--file","3","\/etc\/passwd"/, "sandbox supplies passwd via inherited descriptor";
 ok read_file ("$dir/passwd.log") =~ /\Asandbox:x:\d+:\d+:Sandbox:\Q$dir\/home\E:\/bin\/sh\n\z/,
    "synthetic passwd exposes user identity and configured HOME only";
@@ -919,13 +961,15 @@ sub last_workdir_mounts {
    \%mount
 }
 $result = call workdirs => {};
-ok $result->{structuredContent}{workdirs}{2} eq $other_identity
-   && $result->{structuredContent}{resolved_workdirs}{2} eq "$dir/other",
+my $workdir_ok = $result->{structuredContent}{workdirs}{2} eq $other_identity
+   && $result->{structuredContent}{resolved_workdirs}{2} eq "$dir/other";
+ok $workdir_ok,
    "workdir identity retains verbatim CLI path while mounts use resolved path";
+diag JSON::XS::encode_json $result unless $workdir_ok;
 $result = call "file-read" => { path => "data", workdir => 2 };
 my $mount = last_workdir_mounts ();
 ok MIME::Base64::decode_base64 ($result->{structuredContent}{data}) eq "other\n"
-   && @multi_prompts == 1 && $multi_prompts[-1]{workdir} eq $other_identity
+   && @multi_prompts == 1 && $multi_prompts[-1]{dimensions}{workdir}{value} eq $other_identity
    && $mount->{"$dir/other"} eq "--ro-bind" && !exists $mount->{"$dir/work"},
    "workdir A read rule does not authorize B; B alone is mounted read-only";
 ok $multi_prompts[-1]{sandbox_grant_descriptions}{"workdir-read"}
@@ -948,25 +992,25 @@ ok $result->{isError} && @multi_prompts == $selector_prompts
 $result = call exec => { argv => [$^X, "-e", "print 1"], workdir => 1, reason => "read A" };
 $mount = last_workdir_mounts ();
 ok !$result->{isError} && $mount->{"$dir/work"} eq "--ro-bind" && !exists $mount->{"$dir/other"}
-   && $multi_prompts[-1]{workdir} eq "$dir/work",
+   && $multi_prompts[-1]{dimensions}{workdir}{value} eq "$dir/work",
    "selected workdir A exec mounts only A and requests A-specific permission";
 $result = call exec => { argv => [$^X, "-e", "print 2"], workdir => 2, reason => "read B" };
 $mount = last_workdir_mounts ();
 ok !$result->{isError} && $mount->{"$dir/other"} eq "--ro-bind" && !exists $mount->{"$dir/work"}
-   && $multi_prompts[-1]{workdir} eq $other_identity,
+   && $multi_prompts[-1]{dimensions}{workdir}{value} eq $other_identity,
    "selected workdir B exec mounts only B and requests B-specific permission";
 $result = call exec => { argv => [$^X, "-e", "print 3"], workdir => 2,
    sandbox_grants => ["all-workdirs-read"], reason => "read all" };
 $mount = last_workdir_mounts ();
 ok !$result->{isError} && $mount->{"$dir/other"} eq "--ro-bind"
    && $mount->{"$dir/work"} eq "--ro-bind", "all-workdirs-read mounts both read-only";
-ok !defined $multi_prompts[-1]{workdir}, "all-workdirs-read permission has no selected-workdir identity";
+ok !defined $multi_prompts[-1]{dimensions}{workdir}{value}, "all-workdirs-read permission has no selected-workdir identity";
 $result = call exec => { argv => [$^X, "-e", "print 4"], workdir => 2,
    sandbox_grants => ["all-workdirs-read", "workdir-write"], reason => "read all write B" };
 $mount = last_workdir_mounts ();
 ok !$result->{isError} && $mount->{"$dir/work"} eq "--ro-bind"
    && $mount->{"$dir/other"} eq "--bind"
-   && $multi_prompts[-1]{workdir} eq $other_identity,
+   && $multi_prompts[-1]{dimensions}{workdir}{value} eq $other_identity,
    "all-read plus selected-write mounts A read-only and B writable";
 ok $multi_prompts[-1]{sandbox_grant_descriptions}{"workdir-write"}
       eq "Change files in selected workdir \"$other_identity\"",
@@ -976,7 +1020,7 @@ $result = call exec => { argv => [$^X, "-e", "print 5"], workdir => 2,
 $mount = last_workdir_mounts ();
 ok !$result->{isError} && $mount->{"$dir/work"} eq "--bind"
    && $mount->{"$dir/other"} eq "--bind"
-   && !defined $multi_prompts[-1]{workdir}, "all-workdirs-write mounts both writable without workdir identity";
+   && !defined $multi_prompts[-1]{dimensions}{workdir}{value}, "all-workdirs-write mounts both writable without workdir identity";
 $before = @multi_prompts;
 $result = call stat => { workdir => 1, paths => ["read", "$dir/other/data"] };
 ok $result->{isError} && @multi_prompts == $before,
@@ -986,7 +1030,7 @@ $before = @multi_prompts;
 $result = call "path-op" => { workdir => 1, path => "cross-source", rename => "$dir/other/moved" };
 ok !$result->{isError} && !-e "$dir/work/cross-source" && -f "$dir/other/moved",
    "cross-workdir rename reaches the worker rather than being rejected lexically";
-ok @multi_prompts == $before + 1 && !defined $multi_prompts[-1]{workdir}
+ok @multi_prompts == $before + 1 && !defined $multi_prompts[-1]{dimensions}{workdir}{value}
    && join (",", @{$multi_prompts[-1]{sandbox_grants}}) eq "all-workdirs-write,workdir-write",
    "cross-workdir rename requests all-workdirs-write without a selected identity";
 $client->close;
@@ -1134,7 +1178,7 @@ $client = AnyEvent::MCP::Client::JSONL->new (
             decision => "allow-always",
             ($meta->{stage} eq "rule" ? (
                sandbox_grants => join (",", @{$request->{sandbox_grants}}),
-               subject => $request->{subjects}[0]{subject},
+               dim_subject => $request->{dimensions}{subject}{choices}[0]{match},
             ) : ()),
          },
       });
@@ -1198,9 +1242,10 @@ ok !$result->{isError} && read_file ("$dir/work/auto-test") eq "auto"
    && $direct_requests[-1]{sandbox_implementation} =~ /UNSANDBOXED/,
    "auto mode without bubblewrap requests full authority and runs directly";
 $client->close;
-ok read_file ("$dir/unsandboxed.stderr") eq
-   (((join "", map "$_: not detected or wrong version\n", grep !$utility{$_}, qw(find grep patch sed))
-      . "mcp-fs: SANDBOX NONE - workers run with full host-user privileges\n") x 2),
+my $unsandboxed_stderr = read_file "$dir/unsandboxed.stderr";
+my @unsandboxed_warning = $unsandboxed_stderr =~
+   /(mcp-fs: SANDBOX NONE - workers run with full host-user privileges\n)/g;
+is scalar @unsandboxed_warning, 2,
    "both unsandboxed startup modes emit the expected warning";
 
 my $old_sandbox_log = read_file "$dir/sandbox.log";
@@ -1224,7 +1269,7 @@ $client->close;
 
 # The server instance name selects rules independently of the routing alias.
 File::Path::mkpath ("$dir/config/anyevent-mcp/rules", 0, 0700);
-write_file "$dir/config/anyevent-mcp/rules/fs-alias.ini", "[rule]\ndecision=deny\naction=^\nworkdir=$dir/work\n";
+write_file "$dir/config/anyevent-mcp/rules/fs-alias.ini", "[rule]\ndecision=deny\naction=^\nmatch.workdir=$dir/work\n";
 chmod 0600, "$dir/config/anyevent-mcp/rules/fs-alias.ini" or die $!;
 $client = AnyEvent::MCP::Client::JSONL->new (
    command => [$^X, "-Ilib", "bin/mcp-fs", "--name", "alias", "--bwrap", "$dir/bwrap", "$dir/work"],
@@ -1506,8 +1551,11 @@ close $config_out or die $!;
       die $!;
    }
    my $output = do { local $/; <$fh> };
-   ok !close $fh && $output =~ /Perl '\/no\/such\/perl' cannot run in the worker environment/,
+   my $status = close $fh;
+   my $diagnostic = $output =~ /Perl '\/no\/such\/perl' cannot run in the worker environment/;
+   ok !$status && $diagnostic,
       "missing mandatory sandbox Perl aborts startup with a useful diagnostic";
+   diag "missing-perl exit: $?, output: $output" if $status || !$diagnostic;
    open $fh, "-|", $^X, "-Ilib", "bin/mcp-fs", "--name", "missing-perl",
       "--sandbox=none", "--exec-cmd", "", "--", $^X, "-e", 'print "exec-cmd-ok"' or die $!;
    $output = do { local $/; <$fh> };

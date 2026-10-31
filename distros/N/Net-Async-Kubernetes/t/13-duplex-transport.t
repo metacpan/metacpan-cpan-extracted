@@ -30,11 +30,14 @@ use Net::Async::Kubernetes;
         my ($self, %args) = @_;
         $self->{connect_args} = \%args;
         return Future->fail($self->{connect_fail}) if $self->{connect_fail};
+        return $self->{connect_future} = Future->new if $self->{connect_pending};
         return Future->done($self);
     }
 
-    sub connect_args { $_[0]->{connect_args} }
-    sub connect_fail { $_[0]->{connect_fail} = $_[1] }
+    sub connect_args    { $_[0]->{connect_args} }
+    sub connect_fail    { $_[0]->{connect_fail} = $_[1] }
+    sub connect_pending { $_[0]->{connect_pending} = $_[1] }
+    sub connect_future  { $_[0]->{connect_future} }
 
     sub send_binary_frame {
         my ($self, $bytes) = @_;
@@ -171,6 +174,64 @@ subtest 'connect failure is propagated and reported to on_error' => sub {
     ok($f->is_failed, 'port_forward future failed');
     like($f->failure, qr/ws connect failed/, 'connect failure propagated');
     like($errors[0], qr/ws connect failed/, 'connect failure sent to on_error callback');
+    ok(!$last_ws->parent, 'failed websocket client detached from notifier');
+};
+
+subtest 'a pending session request reports its failure without a caller reference' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $kube = make_kube($loop);
+    my $last_ws;
+
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::_make_websocket_client = sub {
+        my ($self, %args) = @_;
+        $last_ws = Test::WSClient->new(%args);
+        $last_ws->connect_pending(1);
+        return $last_ws;
+    };
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+
+    my @errors;
+    $kube->port_forward('Pod', 'nginx',
+        namespace => 'default',
+        ports     => [8080],
+        on_error  => sub { push @errors, $_[0] },
+    );
+
+    $last_ws->connect_future->fail('ws connect failed');
+
+    like($errors[0], qr/ws connect failed/, 'connect failure sent to on_error callback');
+    ok(!$last_ws->parent, 'failed websocket client detached from notifier');
+    is_deeply(\@warnings, [], 'no lost sequence future');
+};
+
+subtest 'on_error may drop the last reference to the session request' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $kube = make_kube($loop);
+    my $last_ws;
+
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::_make_websocket_client = sub {
+        my ($self, %args) = @_;
+        $last_ws = Test::WSClient->new(%args);
+        $last_ws->connect_pending(1);
+        return $last_ws;
+    };
+
+    my %pending;
+    my @errors;
+    $pending{request} = $kube->port_forward('Pod', 'nginx',
+        namespace => 'default',
+        ports     => [8080],
+        on_error  => sub { push @errors, $_[0]; delete $pending{request} },
+    );
+
+    $last_ws->connect_future->fail('ws connect failed');
+
+    like($errors[0], qr/ws connect failed/, 'connect failure sent to on_error callback');
+    ok(!exists $pending{request}, 'on_error dropped the request');
     ok(!$last_ws->parent, 'failed websocket client detached from notifier');
 };
 

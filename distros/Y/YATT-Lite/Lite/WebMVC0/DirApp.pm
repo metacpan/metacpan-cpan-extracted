@@ -8,14 +8,14 @@ use constant DEBUG_ERROR => $ENV{DEBUG_YATT_ERROR};
 
 use YATT::Lite -as_base, qw/*SYS *CON
 			    Entity/;
-use YATT::Lite::MFields qw/cf_dir_config
-			   cf_use_subpath
-			   cf_overwrite_status_code_for_errors_as
-                           cf_ext_public_action
+use YATT::Lite::MFields qw/dir_config
+			   use_subpath
+			   overwrite_status_code_for_errors_as
+                           ext_public_action
                            _ignore_warn
                            _ignore_die
 
-			   Action/;
+			   _Action/;
 
 use YATT::Lite::WebMVC0::Connection;
 sub Connection () {'YATT::Lite::WebMVC0::Connection'}
@@ -33,15 +33,14 @@ use YATT::Lite::Error;
 sub after_new {
   (my MY $self) = @_;
   $self->SUPER::after_new;
-  $self->{cf_ext_public_action} //= $self->default_ext_public_action;
+  $self->{ext_public_action} //= $self->default_ext_public_action;
 }
 
 # sub handle_ydo, _do, _psgi...
 
 sub handle {
   (my MY $self, my ($type, $con, $file)) = @_;
-  chdir($self->{cf_dir})
-    or die "Can't chdir '$self->{cf_dir}': $!";
+  my $chdir_guard = $self->chdir_guard; # cwd is restored at scope exit. GH-267
   local $SIG{__WARN__} = sub {
     my ($msg) = @_;
     if ($self->{_ignore_warn}) {
@@ -68,7 +67,7 @@ sub handle {
     } else {
       print STDERR "# from __DIE__ $err\n" if DEBUG_ERROR;
     }
-    local $self->{cf_in_sig_die} = 1;
+    local $self->{in_sig_die} = 1;
     die $self->error({ignore_frame => [undef, __FILE__, __LINE__]}, $err);
   };
   if (my $charset = $self->header_charset) {
@@ -103,16 +102,16 @@ sub prepare_part_handler {
   my ($part, $sub, $pkg, @args);
   my ($type, $item) = $self->parse_request_sigil($con);
 
-  if (defined $type and my $subpath = $prop->{cf_subpath}) {
+  if (defined $type and my $subpath = $prop->{subpath}) {
     croak $self->error(q|Bad request: subpath %s and sigil %s|
 		       , $subpath, terse_dump($type, $item))
       if $type ne 'action';
   }
 
   if (not defined $type
-      and $self->{cf_use_subpath} and $prop->{cf_subpath}
+      and $self->{use_subpath} and $prop->{subpath}
       and (my $tmpl, $part, my ($formal, $actual)) = $self->find_subpath_handler(
-        $trans, $file, $prop->{cf_subpath}
+        $trans, $file, $prop->{subpath}
       )) {
 
       $pkg = $trans->find_product(perl => $tmpl) or do {
@@ -124,12 +123,12 @@ sub prepare_part_handler {
                            , $part->cget('kind'), $part->public_name, $file);
       };
       @args = $trans->reorder_cgi_params($part, $con, $actual)
-        unless $self->{cf_dont_map_args};
+        unless $self->{dont_map_args};
   } else {
     ($part, $sub, $pkg) = $trans->find_part_handler([$file, $type, $item]);
 
     @args = $trans->reorder_cgi_params($part, $con)
-      unless $self->{cf_dont_map_args};
+      unless $self->{dont_map_args};
   }
 
   unless ($part->public) {
@@ -152,7 +151,7 @@ sub find_subpath_handler {
   } else {
     if ($subpath ne '/') {
       die $self->psgi_error(404, "No such subpath:: ". $subpath
-                            . " in file " . $tmpl->{cf_path});
+                            . " in file " . $tmpl->{path});
     }
   }
   return;
@@ -167,8 +166,8 @@ sub default_ext_public_action {'ydo'}
 sub find_handler {
   (my MY $self, my ($ext, $file, $con)) = @_;
   my PROP $prop = $con->prop;
-  if ($prop->{cf_is_index}) {
-    my $sub_fn = substr($prop->{cf_path_info}, length($prop->{cf_location}));
+  if ($prop->{is_index}) {
+    my $sub_fn = substr($prop->{path_info}, length($prop->{location}));
     $sub_fn =~ s,/.*,,;
     if ($sub_fn ne '' and my $action = $self->get_action_handler($sub_fn, 1)) {
       return $action
@@ -193,16 +192,16 @@ sub _handle_ydo {
 #
 sub get_action_handler {
   (my MY $self, my ($filename, $can_be_missing)) = @_;
-  my $path = "$self->{cf_dir}/$filename";
+  my $path = "$self->{dir}/$filename";
 
   # Each action item is stored as:
   # [$action_sub, $is_virtual, @more_opts..., $age_from_mtime]
   #
   my $item = $self->cached_in
-    ($self->{Action} //= {}, $path, $self, undef, sub {
+    ($self->{_Action} //= {}, $path, $self, undef, sub {
        # first time.
        my ($self, $sys, $path) = @_;
-       return undef unless $path =~ m{\.$self->{cf_ext_public_action}\z};
+       return undef unless $path =~ m{\.$self->{ext_public_action}\z};
        my $age = -M $path;
        return undef if not defined $age and $can_be_missing;
        my $sub = compile_file_in(ref $self, $path);
@@ -223,7 +222,7 @@ sub get_action_handler {
        } elsif ($$item[-1] == $age) {
 	 return;
        } else {
-	 $sub = compile_file_in($self->{cf_app_ns}, $path);
+	 $sub = compile_file_in($self->{app_ns}, $path);
        }
        @{$item}[0, -1] = ($sub, $age);
      });
@@ -236,9 +235,9 @@ sub set_action_handler {
 
   $filename =~ s,^/*,,;
 
-  my $path = "$self->{cf_dir}/$filename";
+  my $path = "$self->{dir}/$filename";
 
-  $self->{Action}{$path} = [$sub, 1, undef];
+  $self->{_Action}{$path} = [$sub, 1, undef];
 }
 
 #========================================
@@ -248,7 +247,7 @@ sub set_action_handler {
 sub default_header_charset {''}
 sub header_charset {
   (my MY $self) = @_;
-  $self->{cf_header_charset} || $self->{cf_output_encoding}
+  $self->{header_charset} || $self->{output_encoding}
     || $SYS->header_charset
       || $self->default_header_charset;
 }
@@ -257,7 +256,7 @@ sub header_charset {
 
 sub get_lang_msg {
   (my MY $self, my $lang) = @_;
-  $self->{locale_cache}{$lang} || do {
+  $self->{_locale_cache}{$lang} || do {
     if (-r (my $fn = $self->fn_msgfile($lang))) {
       $self->lang_load_msgcat($lang, $fn);
     }
@@ -266,7 +265,7 @@ sub get_lang_msg {
 
 sub fn_msgfile {
   (my MY $self, my $lang) = @_;
-  "$self->{cf_dir}/.htyattmsg.$lang.po";
+  "$self->{dir}/.htyattmsg.$lang.po";
 }
 
 #========================================
@@ -286,13 +285,13 @@ sub error_handler {
 
   $errcon->add_error($err);
 
-  my $error_status = $self->{cf_overwrite_status_code_for_errors_as}
-    // $err->{cf_http_status_code}
+  my $error_status = $self->{overwrite_status_code_for_errors_as}
+    // $err->{http_status_code}
     // try_invoke($errcon, [cget => 'status'])
     // 500;
 
   $errcon->configure(status => $error_status);
-  $err->{cf_http_status_code} = $error_status;
+  $err->{http_status_code} = $error_status;
 
   my $msg = $err->message;
 
@@ -307,14 +306,15 @@ sub error_handler {
   #
   # For [GH #172] - to avoid 'ARRAY(0x5575a6c9c2a8)Compilation failed in require'
   #
-  if ($self->{cf_in_sig_die}) {
+  if ($self->{in_sig_die}) {
     print STDERR "# error_handler(sig die): $msg\n" if DEBUG_ERROR;
     die $err;
   }
 
   print STDERR "# error_handler(normal): $msg\n" if DEBUG_ERROR;
 
-  my $is_psgi = $self->CON->cget('is_psgi');
+  my $maybeCON = $self->CON;
+  my $is_psgi = $maybeCON ? $maybeCON->cget('is_psgi') : undef;
 
   # error.ytmpl を探し、あれば呼び出す。
   my ($sub, $pkg);
@@ -350,20 +350,20 @@ sub dir_config {
   (my MY $self, my ($name, $default)) = @_;
 
   my PROP $prop = $CON->prop;
-  my $cache = $prop->{dir_config_cache} //= +{};
+  my $cache = $prop->{_dir_config_cache} //= +{};
   # This ensures every request has a fresh cache for dir_config
   # and every request tests the cache at most once.
 
-  my $config = $cache->{$self->{cf_app_name}};
+  my $config = $cache->{$self->{app_name}};
 
   unless ($config) {
-    my $cfg = $self->{cf_dir_config} || +{};
+    my $cfg = $self->{dir_config} || +{};
 
     # If dirapp_config exist, merge it onto original dir_config.
     if (my $dirapp_config = $SYS->dirapp_config_for($self)) {
       $cfg->{$_} = $dirapp_config->{$_} for keys %$dirapp_config;
     }
-    $config = $cache->{$self->{cf_app_name}} = $cfg;
+    $config = $cache->{$self->{app_name}} = $cfg;
   }
 
   return $config unless defined $name;

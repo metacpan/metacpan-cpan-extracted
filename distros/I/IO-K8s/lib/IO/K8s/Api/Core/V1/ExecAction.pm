@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ExecAction;
 # ABSTRACT: ExecAction describes a "run in container" action.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s command => [Str];
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::ExecAction - ExecAction describes a "run in container" a
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 command
 
@@ -30,7 +30,7 @@ Command is the command line to execute inside the container, the working directo
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -58,5 +58,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

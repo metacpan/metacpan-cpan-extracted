@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "open_source"
+      "restricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -25,16 +25,28 @@
          "prereqs" : {
             "runtime" : {
                "requires" : {
+                  "CGI::ACL" : "0",
+                  "CGI::Carp" : "0",
                   "CGI::IDS" : "0",
                   "CGI::Info" : "0",
+                  "Carp::Always" : "0",
+                  "Class::Simple" : "0",
                   "Config::Abstraction" : "0",
                   "Crypt::URandom" : "0",
                   "Data::Throttler" : "0",
                   "DateTime" : "0",
+                  "Digest::SHA" : "0",
                   "Error" : "0",
+                  "FCGI" : "0",
+                  "FCGI::Buffer" : "0",
+                  "File::HomeDir" : "0",
                   "HTML::SocialMedia" : "0",
+                  "HTTP::Date" : "0",
+                  "HTTP::Status" : "0",
                   "JSON::MaybeXS" : "0",
                   "LWP::Simple::WithCache" : "0",
+                  "Log::Abstraction" : "0",
+                  "Log::WarnDie" : "0",
                   "Template" : "0",
                   "Template::Filters" : "0",
                   "Template::Plugin::EnvHash" : "0",
@@ -56,7 +68,6 @@
             "Config::Abstraction" : "0",
             "Cwd" : "0",
             "DB_File" : "0",
-            "Database::Abstraction" : "0",
             "Devel::Size" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
@@ -101,22 +112,28 @@
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "DB_File" : "0",
+            "Data::Dumper" : "0",
             "Data::Validate::URI" : "0",
+            "Database::Abstraction" : "0",
             "Digest::MD5" : "0",
             "Encode" : "0",
             "Error" : "0",
+            "Exporter" : "0",
             "File::Spec" : "0",
             "File::pfopen" : "0.02",
+            "FindBin" : "0",
             "Geo::Coder::Abbreviations" : "0.03",
             "Geo::Hash" : "0",
             "Geo::Location::Point" : "0.19",
             "Geo::Location::Predicate" : "0.01",
             "Geo::StreetAddress::US" : "0",
+            "Getopt::Std" : "0",
             "Lingua::EN::AddressParse" : "0",
             "Locale::CA" : "0",
             "Locale::Country" : "0",
             "Locale::SubCountry" : "0",
             "Locale::US" : "0",
+            "Math::Trig" : "0",
             "Module::Info" : "0",
             "Module::Runtime" : "0",
             "Object::Configure" : "0",
@@ -132,9 +149,6 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "Test::Consumer::Contract" : "0.04"
-         },
          "requires" : {
             "CGI::IDS" : "0",
             "CGI::Info" : "0",
@@ -142,7 +156,9 @@
             "CHI::Driver::Null" : "0",
             "Data::Throttler" : "0",
             "Error" : "0",
+            "File::Path" : "0",
             "File::Temp" : "0",
+            "FindBin" : "0",
             "JSON::PP" : "0",
             "Test::Carp" : "0",
             "Test::Deep" : "0",
@@ -151,6 +167,7 @@
             "Test::Log::Abstraction" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
+            "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -176,6 +193,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.51",
+   "version" : "0.52",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

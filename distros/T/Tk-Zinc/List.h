@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Tue Mar 15 17:24:51 1994
  *
- * $Id: List.h,v 1.12 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -26,7 +26,7 @@ extern "C" {
 
 
 #define ZnListHead      0
-#define ZnListTail      (~(1 << ((8*sizeof(int)) - 1)))
+#define ZnListTail      (~(1u << ((8*sizeof(int)) - 1)))
 
 
 typedef void    *ZnList;

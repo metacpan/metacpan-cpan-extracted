@@ -20,7 +20,7 @@ use Config '%Config';
     }
     if (-d (my $dn = "$app_root/lib")) {
       push @libdir, $dn
-    } elsif (my ($found) = $app_root =~ m{^(.*?/)YATT/}) {
+    } elsif (my ($found) = $app_root =~ m{^(.*?/)YATT/samples(?:/|\z)}) {
       push @libdir, $found;
     }
     if (-d (my $dn = "$app_root/extlib")) {

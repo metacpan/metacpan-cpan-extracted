@@ -20,7 +20,7 @@ use vars qw/$COLOR $FONT_STYLE $POINT_SIZE $DEMO_FILE %DEMO_DESCRIPTION/;
 use strict;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.27 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 my $version = $Tk::Zinc::VERSION;
 print "Tkzinc version: $version\n";
@@ -201,7 +201,7 @@ $T->insert('end', "4. Circular color variation (requires openGL).\n", [qw/demo d
 $T->insert('end', "5. Path and Conical color variations (requires openGL).\n", [qw/demo demo-color-path-and-conic/]);
 $T->insert('end', "6. The triangles item (requires openGL).\n",  [qw/demo demo-triangles/]);
 $T->insert('end', "7. A set of demos based on Graphics.pm module (really better with openGL).\n",  [qw/demo demo-testGraphics/]);
-
+$T->insert('end', "8. OpenGL optimization (requires openGL).\n", [qw/demo demo-usedamage/]);
 
 
 $T->insert('end', "\n", '', "User Contributed Demonstrations\n", 'title');

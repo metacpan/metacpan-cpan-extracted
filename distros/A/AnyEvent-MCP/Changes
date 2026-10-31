@@ -1,5 +1,87 @@
 Revision history for AnyEvent::MCP
 
+0.71  Fri 30 Oct 2026 18:01:51 CET
+	- make multibroker-spawned children ask for permissions through MCP,
+	  independently of the multibroker's own permission prompt mode.
+	- log VCS backend and a bounded, JSON-quoted preview of filenames for
+	  vcs-diff, vcs-status and vcs-log.
+	- load only core modules in t/00_load.t; optional IMAP dependencies
+	  are tested separately when available.
+	- let the fake bubblewrap test use the host temporary directory on
+	  systems without /tmp (notably Termux).
+	- suppress Perl startup locale warnings in sandbox workers when
+	  the requested C.UTF-8 locale is unavailable.
+	- canonicalize temporary test paths to match mcp-fs on systems with
+	  symlinked temp directories; diagnose failing filesystem assertions.
+	- test SSE notification ordering at client delivery rather than
+	  server enqueue time, avoiding a network scheduling race.
+	- diagnose failing multibroker HTTP integration tests with preflight
+	  responses, RPC results and bounded server startup diagnostics.
+
+0.7   Fri 30 Oct 2026 14:56:18 CET
+	- WARNING: mcp-imap is unfinished and has not been tested against a real IMAP server.
+	- INCOMPATIBLE CHANGE: rules have changed, old rules will be erased.
+	- declare the same license terms as Perl itself in distribution metadata.
+        - new mcp servers in this release: mcp-http
+	- accept optional dimension default matcher for persistent-rule prompts;
+	- clarify that mcp-fs exec has private /tmp by default; shared-tmp
+	  exposes host /tmp and is not needed for ordinary temporary files or IPC.
+	- add mcp-fs vcs-log for Git, SVN, CVS and Mercurial, reusing bounded
+	  output and dedicated permission actions; SVN log receives network
+	  and SSH-agent grants alongside CVS operations.
+	  mcp-webbrowser prefers any JavaScript in the current tab, while the
+	  independent origin dimension remains scoped to the current origin.
+	- log mcp-http requests with their method and a sanitized URL preview;
+	  identify mcp-http/$VERSION in User-Agent unless overridden by the caller.
+	  Allow generic key=value context in the shared mcp_log_request formatter.
+	- silently treat invalid saved permission-rule files as empty, prompting
+	  instead of aborting broker startup; subsequent saves replace the old file.
+	- add mcp-http for arbitrary HTTP methods with URL-scoped approvals,
+	  caller-managed cookie jars, bounded bodies and text grep/regex/substitution.
+	  Disable redirects, retries and proxies; verify HTTPS certificates.
+	- derive browser permission origins from reported URLs, not a new
+	  userscript field; keep older browser clients able to execute with
+	  origin-scoped permissions.
+	- accept compatible browser-protocol minor versions; return empty
+	  operation discovery for 1.0 clients instead of disconnecting them.
+	  Direct rule saves no longer perform semantic validation.
+	- replace special-case subject, origin and workdir permission scopes with
+	  named dimensions: metadata-driven prompts, generic match.NAME rule keys,
+	  and engine-enforced matcher choices. Reject old request and rule fields;
+	  no conversion or backward-compatible rule loading.
+	- preserve selected origin scopes when external permission helpers
+	  forward persistent decisions through native MCP elicitation.
+	- add origin-scoped MCP permission rules, selectable independently of
+	  code/tab scopes; mcp-webbrowser derives browser origins for
+	  JavaScript and tab operations, with exact, any-port and any-origin
+	  choices. Existing rules without origins continue to match all origins.
+	- use POSIX::uname instead of nonportable hostname -f for the XPCSE
+	  browser nickname, consistent with HTTP URL wildcard host selection.
+	- make form helper test run via explicit ./ path, avoid early HTTP
+	  timer races, and test filesystem discovery with optional tools absent.
+	- report browser protocol rejections through bounded WebSocket close
+	  reasons; show abnormal disconnects in the userscript console and toast.
+	- document browser wire-protocol minor-version compatibility: accept
+	  compatible older and newer clients without breaking base functionality.
+	- remove the obsolete private stdio permission-result bridge from
+	  mcp-multibroker; use ordinary form elicitation.
+	- add per-tab operation discovery and calls to mcp-webbrowser, with
+	  per-tab routing, ordinary MCP permissions and browser protocol 1.1;
+	  the userscript initially advertises no extra operations.
+	- make the unsandboxed-warning test tolerate diagnostic output from
+	  non-GNU utility probes (FreeBSD and BusyBox).
+	- add mcp-imap with one named password-authenticated account per instance,
+	  bounded UID search, MIME reads, explicit mailbox/message mutations,
+	  UIDPLUS-only targeted expunge, forked worker and MCP permissions.
+	- propagate XPCSE save response ETags back to Vim session metadata;
+	  make stale upload HTTP status an editor error.
+	- require GNU sed in worker tool discovery; report missing-Perl diagnostics in tests.
+	- xpcse: forward Vim's :write! flag through mcp-vim to browser
+	  uploads, without changing upload behavior yet.
+	- recommend rather than require WebSocket modules: only mcp-vim and
+	  mcp-webbrowser use them; mcp-vim loads them only for browser clients,
+	  and tests skip optional WebSocket coverage when unavailable.
+
 0.65  Fri 23 Oct 2026 22:41:32 CEST
 	- fix mcp-webbrowser userscript title indicator duplicating prefixes on empty titles.
 	- use built scripts in make test PATH, avoiding source shebangs and
@@ -18,7 +100,7 @@ Revision history for AnyEvent::MCP
 	  instead of blocking on an unresponsive child.
 	- accept a missing trailing slash on HTTP MCP endpoint URLs, working
 	  around Claude's MCP connector wrongly dropping it from the configured URL,
-          thus corrupting it.
+	  thus corrupting it.
 	- allow omitted ports in reverse extension URLs, defaulting to port 80.
 	- fix MCP client/server version fields serialized as JSON numbers in 0.61.
 

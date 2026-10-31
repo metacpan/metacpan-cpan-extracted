@@ -16,42 +16,45 @@ use constant DEBUG_ERROR => $ENV{DEBUG_YATT_ERROR};
 #========================================
 
 use parent qw(YATT::Lite::Factory);
-use YATT::Lite::MFields qw/cf_noheader
-			   cf_is_psgi
-			   cf_no_nested_query
-			   allow_debug_from
-			   cf_debug_cgi
-			   cf_debug_psgi
-			   cf_debug_connection
-			   cf_debug_backend
-			   cf_psgi_static
-			   cf_psgi_fallback
-			   cf_per_role_docroot
-			   cf_per_role_docroot_key
-			   cf_default_role
-			   cf_backend
-			   cf_site_config
+use YATT::Lite::MFields qw/noheader
+			   is_psgi
+			   no_nested_query
+			   mkquery_with_body_params
+			   _allow_debug_from
+			   _trusted_proxies
+			   debug_cgi
+			   debug_psgi
+			   debug_connection
+			   debug_backend
+			   psgi_static
+			   psgi_fallback
+			   per_role_docroot
+			   per_role_docroot_key
+			   default_role
+			   backend
+			   site_config
                            _site_config_cache_entry
-                           cf_site_config_as_entity
+                           site_config_as_entity
 
-			   cf_logfile
-			   cf_overwrite_status_code_for_errors_as
-			   re_handled_ext
-                           handled_ext_list
+			   logfile
+			   overwrite_status_code_for_errors_as
+			   _re_handled_ext
+                           _handled_ext_list
 
-                           cf_^progname
+                           ^progname
 
-                           cf_no_trim_script_name
+                           no_trim_script_name
 
-                           cf_ext_public_action
+                           ext_public_action
 
-                           cf_^config_dir
-                           dirapp_config
-                           cf_use_sibling_config_dir
+                           ^config_dir
+                           _dirapp_config
+                           use_sibling_config_dir
 			 /;
 
 use YATT::Lite::Util qw(cached_in split_path catch
 			lookup_path nonempty try_invoke
+			trim_ext
 			mk_http_status
 			default ckrequire
 			escape
@@ -74,28 +77,28 @@ use File::Basename;
 sub after_new {
   (my MY $self) = @_;
   $self->SUPER::after_new();
-  $self->{cf_ext_public_action} //= $self->default_ext_public_action;
-  $self->{handled_ext_list} = [
-    $self->{cf_ext_public}, $self->{cf_ext_public_action}
+  $self->{ext_public_action} //= $self->default_ext_public_action;
+  $self->{_handled_ext_list} = [
+    $self->{ext_public}, $self->{ext_public_action}
   ];
-  $self->{re_handled_ext} = do {
-    my $str = join("|", @{$self->{handled_ext_list}});
+  $self->{_re_handled_ext} = do {
+    my $str = join("|", @{$self->{_handled_ext_list}});
     qr{\.($str)$};
   };
-  $self->{cf_per_role_docroot_key} ||= $self->default_per_role_docroot_key;
-  $self->{cf_default_role} ||= $self->default_default_role;
-  $self->{cf_config_dir} //= do {
-    if (not $self->{cf_app_root}) {
+  $self->{per_role_docroot_key} ||= $self->default_per_role_docroot_key;
+  $self->{default_role} ||= $self->default_default_role;
+  $self->{config_dir} //= do {
+    if (not $self->{app_root}) {
       undef;
-    } elsif ($self->{cf_use_sibling_config_dir}) {
-      "$self->{cf_app_root}.config.d"
+    } elsif ($self->{use_sibling_config_dir}) {
+      "$self->{app_root}.config.d"
     } else {
-      "$self->{cf_app_root}/config"
+      "$self->{app_root}/config"
     }
   };
 
-  $self->{dirapp_config} = +{};
-  $self->{cf_site_config_as_entity} //= $self->default_site_config_as_entity;
+  $self->{_dirapp_config} = +{};
+  $self->{site_config_as_entity} //= $self->default_site_config_as_entity;
 }
 
 sub default_per_role_docroot_key { 'yatt.role' }
@@ -158,12 +161,12 @@ sub callas_fcgi {
 
 sub get_lochandler {
   (my MY $self, my ($location, $tmpldir)) = @_;
-  if ($self->{cf_per_role_docroot}) {
+  if ($self->{per_role_docroot}) {
     # When per_role_docroot is on, $tmpldir already points
     # $per_role_docroot/$role. So just append $location.
 
     # Unfortunately, $self->error_response calls get_lochandler without $tmpldir
-    $tmpldir //= "$self->{cf_per_role_docroot}/$self->{cf_default_role}";
+    $tmpldir //= "$self->{per_role_docroot}/$self->{default_role}";
 
     $self->get_dirhandler($tmpldir.$location);
   } else {
@@ -176,7 +179,7 @@ sub get_lochandler {
 
 sub preload_apps {
   (my MY $self, my (@dir)) = @_;
-  push @dir, $self->{cf_doc_root} unless @dir;
+  push @dir, $self->{doc_root} unless @dir;
 
   my @apps;
   foreach my $dir ($self->find_apps(@dir)) {
@@ -208,11 +211,11 @@ use YATT::Lite::PSGIEnv qw/SCRIPT_URL/;
 sub to_app {
   my MY $self = shift;
 #  XXX: Should check it.
-#  unless (defined $self->{cf_app_root}) {
+#  unless (defined $self->{app_root}) {
 #    croak "app_root is undef!";
 #  }
-  unless (defined $self->{cf_doc_root}
-	  or defined $self->{cf_per_role_docroot}) {
+  unless (defined $self->{doc_root}
+	  or defined $self->{per_role_docroot}) {
     croak "document_root is undef!";
   }
   return $self->SUPER::to_app(@_);
@@ -223,11 +226,12 @@ sub prepare_app {
 
   $self->next::method;
 
-  $self->{cf_is_psgi} = 1;
+  $self->{is_psgi} = 1;
   require Plack::Request;
   require Plack::Response;
+  require Plack::Util; # for response_cb in call(). Do not rely on plackup.
   my $backend;
-  if ($backend = $self->{cf_backend}
+  if ($backend = $self->{backend}
       and my $sub = $backend->can('startup')) {
     $sub->($backend, $self, $self->preload_apps);
   }
@@ -248,13 +252,13 @@ sub call {
     return $self->psgi_error(403, "Forbidden $deny");
   }
 
-  if (not $self->{cf_no_unicode_params}
-      and $self->{cf_output_encoding}) {
-    $env->{PATH_INFO} = Encode::decode($self->{cf_output_encoding}
+  if (not $self->{no_unicode_params}
+      and $self->{output_encoding}) {
+    $env->{PATH_INFO} = Encode::decode($self->{output_encoding}
 				       , $env->{PATH_INFO});
   }
 
-  if ($self->{loc2psgi_dict}
+  if ($self->{_loc2psgi_dict}
       and my ($path_prefix, $psgi_app)
       = $self->lookup_psgi_mount($env->{PATH_INFO})) {
     require Plack::Util;
@@ -264,7 +268,7 @@ sub call {
   }
 
   # XXX: user_dir?
-  my ($tmpldir, $loc, $file, $trailer, $is_index)
+  my ($tmpldir, $loc, $file, $trailer, $is_index, $request_file)
     = my @pi = $self->split_path_info($env);
 
   if (@pi and $loc =~ m{/\.\./}) {
@@ -277,8 +281,8 @@ sub call {
   my ($realdir, $virtdir);
   if (@pi) {
     $realdir = "$tmpldir$loc";
-    $virtdir = defined $self->{cf_doc_root}
-      ? "$self->{cf_doc_root}$loc" : $realdir;
+    $virtdir = defined $self->{doc_root}
+      ? "$self->{doc_root}$loc" : $realdir;
   }
 
   if ($self->has_htdebug("path_info")) {
@@ -290,7 +294,7 @@ sub call {
 			  );
   }
 
-  if ($self->{cf_debug_psgi}) {
+  if ($self->{debug_psgi}) {
     # XXX: should be configurable.
     if (my $errfh = fileno(STDERR) ? \*STDERR : $env->{'psgi.errors'}) {
       print $errfh join("\t"
@@ -299,7 +303,7 @@ sub call {
 				     , [loc     => $loc]
 				     , [file    => $file]
 				     , [trailer => $trailer]
-				     , ['all templdirs', $self->{tmpldirs}]
+				     , ['all templdirs', $self->{_tmpldirs}]
 				     , map {[$_ => $env->{$_}]} sort keys %$env)
 		       ), "\n";
     }
@@ -316,15 +320,15 @@ sub call {
   # Default index file.
   # Note: Files may placed under (one of) tmpldirs instead of docroot.
   if ($file eq '') {
-    $file = "$self->{cf_index_name}.$self->{cf_ext_public}";
-  } elsif ($file eq $self->{cf_index_name}) { #XXX: $is_index
-    $file .= ".$self->{cf_ext_public}";
+    $file = "$self->{index_name}.$self->{ext_public}";
+  } elsif ($file eq $self->{index_name}) { #XXX: $is_index
+    $file .= ".$self->{ext_public}";
   }
 
-  if ($file !~ $self->{re_handled_ext}) {
-    if ($self->{cf_debug_psgi} and $self->has_htdebug("static")) {
+  if ($file !~ $self->{_re_handled_ext}) {
+    if ($self->{debug_psgi} and $self->has_htdebug("static")) {
       return $self->psgi_dump("Not handled since extension doesn't match"
-			      , $file, $self->{re_handled_ext});
+			      , $file, $self->{_re_handled_ext});
     }
     return $self->psgi_handle_static($env);
   }
@@ -336,9 +340,12 @@ sub call {
   # To support $con->param and other cgi compat methods.
   my $req = Plack::Request->new($env);
 
+  $request_file //= $is_index ? '' : trim_ext($file, $self->{ext_public});
+
   my @params = (env => $env
 		, path_info => $env->{PATH_INFO}
-		, $self->connection_quad([$virtdir, $loc, $file, $trailer])
+		, $self->connection_quad([$virtdir, $loc, $file, $trailer
+					  , $request_file])
 		, $is_index ? (is_index => 1) : ()
 		, is_psgi => 1);
 
@@ -374,7 +381,7 @@ sub call {
     print STDERR "# SPECIAL\n" if DEBUG_ERROR;
 
     # redirect
-    if ($self->{cf_debug_psgi}) {
+    if ($self->{debug_psgi}) {
       if (my $errfh = fileno(STDERR) ? \*STDERR : $env->{'psgi.errors'}) {
 	print $errfh "PSGI Response: ", terse_dump($error), "\n";
       }
@@ -399,8 +406,8 @@ sub call {
 
 sub error_response {
   (my MY $self, my $err, my Env $env, my $orig_con) = @_;
-  my $error_status = $self->{cf_overwrite_status_code_for_errors_as}
-    // $err->{cf_http_status_code}
+  my $error_status = $self->{overwrite_status_code_for_errors_as}
+    // $err->{http_status_code}
     // $orig_con->cget('status')
     // 500;
 
@@ -425,8 +432,8 @@ sub psgi_response_of_connection {
   my $code = $con->cget('status') // $env->{REDIRECT_STATUS} // 200;
   my $res = Plack::Response->new($code);
   $res->content_type("text/html"
-                     . ($self->{cf_header_charset}
-                        ? qq{; charset="$self->{cf_header_charset}"}
+                     . ($self->{header_charset}
+                        ? qq{; charset="$self->{header_charset}"}
                         : ""));
   if (my @h = $con->list_header) {
     $res->headers->header(@h);
@@ -440,7 +447,7 @@ sub psgi_response_of_connection {
 
 sub before_dirhandler {
   (my MY $self, my ($dh, $con, $file)) = @_;
-  if ($self->{cf_site_config_as_entity}) {
+  if ($self->{site_config_as_entity}) {
     $self->examine_site_config($con);
   }
   &maybe::next::method;
@@ -472,8 +479,8 @@ sub make_debug_params {
 
 sub psgi_handle_static {
   (my MY $self, my Env $env) = @_;
-  my $app = $self->{cf_psgi_static}
-    || $self->psgi_file_app($self->{cf_doc_root});
+  my $app = $self->{psgi_static}
+    || $self->psgi_file_app($self->{doc_root});
 
   # When PATH_INFO contains virtual path prefix (like /~$user/),
   # we need to strip them (for Plack::App::File).
@@ -484,8 +491,8 @@ sub psgi_handle_static {
 
 sub psgi_handle_fallback {
   (my MY $self, my Env $env) = @_;
-  (my $app = $self->{cf_psgi_fallback}
-   ||= $self->psgi_file_app($self->{cf_doc_root}))
+  (my $app = $self->{psgi_fallback}
+   ||= $self->psgi_file_app($self->{doc_root}))
     or return [404, [], ["Cannot understand: ", $env->{PATH_INFO}]];
 
   local $env->{PATH_INFO} = $self->trim_site_prefix($env->{PATH_INFO});
@@ -495,7 +502,7 @@ sub psgi_handle_fallback {
 
 sub trim_site_prefix {
   (my MY $self, my $path) = @_;
-  if (my $pfx = $self->{cf_site_prefix}) {
+  if (my $pfx = $self->{site_prefix}) {
     substr($path, length($pfx));
   } else {
     $path;
@@ -514,7 +521,7 @@ sub set_yatt_script_name {
   (my MY $self, my Env $env) = @_;
 
   my $script_name = $env->{'yatt.script_name'} = do {
-    if (not $self->{cf_no_trim_script_name}
+    if (not $self->{no_trim_script_name}
         and $env->{REDIRECT_HANDLER}
         and ($env->{REDIRECT_STATUS} // 0) == 200
         and $env->{SCRIPT_FILENAME}
@@ -528,7 +535,9 @@ sub set_yatt_script_name {
       #
       # Normal case.
       #
-      $env->{SCRIPT_NAME};
+      my $copy = $env->{SCRIPT_NAME} // '';
+      $copy =~ s,/+\z,,;
+      $copy;
     }
   };
 
@@ -541,7 +550,7 @@ sub set_yatt_script_name {
 sub split_path_info {
   (my MY $self, my Env $env) = @_;
 
-  if (! $self->{cf_per_role_docroot}
+  if (! $self->{per_role_docroot}
       && nonempty($env->{PATH_TRANSLATED})
       && $self->is_path_translated_mode($env)) {
     #
@@ -557,10 +566,10 @@ sub split_path_info {
     # XXX: Is userdir ok? like /~$USER/dir?
     # XXX: should have cut_depth option.
     #
-    my ($tmpldir, $loc, $file, $trailer, $is_index)
-      = split_path($env->{PATH_TRANSLATED}, $self->{cf_app_root}
-                   , $self->{cf_use_subpath}
-                   , $self->{cf_ext_public}
+    my ($tmpldir, $loc, $file, $trailer, $is_index, $request_file)
+      = split_path($env->{PATH_TRANSLATED}, $self->{app_root}
+                   , $self->{use_subpath}
+                   , $self->{ext_public}
                  );
 
     # This is a workaround for $is_index. Determining $is_index only from
@@ -575,7 +584,28 @@ sub split_path_info {
       }
     };
 
-    ($tmpldir, $loc, $file, $trailer, $is_index);
+    # GH-251: Likewise, PATH_TRANSLATED alone can not tell whether the
+    # request spelled the file name with or without the extension
+    # (Apache MultiViews may have completed it). So correct
+    # $request_file by selecting the candidate which matches
+    # REQUEST_URI. Note: this only *selects* from known-safe
+    # candidates and never takes substrings of REQUEST_URI itself.
+    #
+    if ($is_index) {
+      $request_file = '';
+    } elsif (nonempty($env->{REQUEST_URI}) and nonempty($file)) {
+      my $req_path = URI->new($env->{REQUEST_URI})->path;
+      $req_path =~ s{\Q$trailer\E\z}{} if nonempty($trailer);
+      foreach my $cand ($file, trim_ext($file, $self->{ext_public})) {
+        next unless $req_path =~ m{/\Q$cand\E\z};
+        $request_file = $cand;
+        last;
+      }
+      # When no candidate matches (e.g. rewritten request),
+      # $request_file from PATH_TRANSLATED is kept as-is.
+    }
+
+    ($tmpldir, $loc, $file, $trailer, $is_index, $request_file);
 
   } elsif (nonempty($env->{PATH_INFO})) {
     #
@@ -583,20 +613,20 @@ sub split_path_info {
     #
 
     my $tmpldirs = do {
-      if ($self->{cf_per_role_docroot}) {
-        my $user = $env->{$self->{cf_per_role_docroot_key}};
-        $user ||= $self->{cf_default_role};
-        ["$self->{cf_per_role_docroot}/$user"]
+      if ($self->{per_role_docroot}) {
+        my $user = $env->{$self->{per_role_docroot_key}};
+        $user ||= $self->{default_role};
+        ["$self->{per_role_docroot}/$user"]
       } else {
-        $self->{tmpldirs}
+        $self->{_tmpldirs}
       }
     };
 
     lookup_path($env->{PATH_INFO}
 		, $tmpldirs
-		, $self->{cf_index_name}
-                , $self->{handled_ext_list}
-		, $self->{cf_use_subpath});
+		, $self->{index_name}
+                , $self->{_handled_ext_list}
+		, $self->{use_subpath});
   } else {
     # or die
     return;
@@ -663,33 +693,53 @@ sub document_dir {
   if (my ($user) = $path_info =~ m{^/~([^/]+)/}) {
     '';
   } else {
-    $self->{cf_doc_root} // '';
+    $self->{doc_root} // '';
   }
 }
 
 #========================================
 sub is_debug_allowed {
   (my MY $self, my Env $env) = @_;
-  return unless $self->{allow_debug_from};
+  return unless $self->{_allow_debug_from};
   return unless defined(my $ip = $self->guess_client_ip($env));
   $self->is_debug_allowed_ip($ip);
 }
 
 sub is_debug_allowed_ip {
   (my MY $self, my $ip) = @_;
-  $self->configure_allow_debug_from unless $self->{allow_debug_from};
-  $ip =~ $self->{allow_debug_from};
+  $self->configure_allow_debug_from unless $self->{_allow_debug_from};
+  $self->{_allow_debug_from}->($ip);
 }
 
+#
+# The address of the client, for is_debug_allowed. Proxy headers
+# (X-Real-IP, X-Client-IP, X-Forwarded-For) are written by whoever
+# sends the request, so they are believed only when the peer
+# (REMOTE_ADDR) is one of the configured trusted_proxies. Without that
+# config this is just REMOTE_ADDR. X-Forwarded-For is read from the
+# right: the rightmost hop not in trusted_proxies is the client; values
+# to the left of it may have been planted by the client itself.
+#
 sub guess_client_ip {
   (my MY $self, my Env $env) = @_;
-  $env->{HTTP_X_REAL_IP} // $env->{HTTP_X_CLIENT_IP} // do {
-    if (defined(my $forward = $env->{HTTP_X_FORWARDED_FOR})) {
-      [split /(?:\s*,\s*|\s+)/, $forward]->[0];
-    } else {
-      $env->{REMOTE_ADDR}
+  my $remote = $env->{REMOTE_ADDR};
+  return $remote unless defined $remote and $self->is_trusted_proxy($remote);
+  foreach my $direct ($env->{HTTP_X_REAL_IP}, $env->{HTTP_X_CLIENT_IP}) {
+    return $direct if defined $direct and $direct ne '';
+  }
+  if (defined(my $forward = $env->{HTTP_X_FORWARDED_FOR})) {
+    foreach my $hop (reverse grep {$_ ne ''} split /\s*,\s*/, ($forward =~ s/^\s+|\s+$//gr)) {
+      return $hop unless $self->is_trusted_proxy($hop);
     }
   }
+  $remote;
+}
+
+sub is_trusted_proxy {
+  (my MY $self, my $ip) = @_;
+  my $matcher = $self->{_trusted_proxies}
+    or return 0;
+  $matcher->($ip);
 }
 
 *configure_debug_allowed_ip = *configure_allow_debug_from;
@@ -697,8 +747,29 @@ sub guess_client_ip {
 
 sub configure_allow_debug_from {
   (my MY $self, my $data) = @_;
-  my $pat = join "|", map { quotemeta($_) } lexpand($data // ['127.0.0.1']);
-  $self->{allow_debug_from} = qr{^(?:$pat)};
+  $self->{_allow_debug_from}
+    = $self->compile_addr_matcher(allow_debug_from => $data // ['127.0.0.1', '::1']);
+}
+
+sub configure_trusted_proxies {
+  (my MY $self, my $data) = @_;
+  $self->{_trusted_proxies}
+    = defined $data ? $self->compile_addr_matcher(trusted_proxies => $data) : undef;
+}
+
+#
+# Build a predicate sub for an address list. The default compares the
+# address as a whole string, exactly (no parsing, no extra module, to
+# keep CGI startup cheap). YATT::Lite::WebMVC0::Partial::StrictIPMatch
+# overrides this to parse addresses and accept CIDR ranges.
+#
+sub compile_addr_matcher {
+  (my MY $self, my ($name, $list)) = @_;
+  my @items = grep {defined $_ and $_ ne ''} lexpand($list);
+  return sub { 0 } unless @items;
+  my $pat = join "|", map { quotemeta($_) } @items;
+  my $re = qr{^(?:$pat)\z};
+  sub { defined $_[0] and $_[0] =~ $re };
 }
 
 sub has_htdebug {
@@ -707,8 +778,8 @@ sub has_htdebug {
   if (exists $ENV{$envName}) {
     return $ENV{$envName};
   }
-  defined $self->{cf_app_root}
-    and -e "$self->{cf_app_root}/.htdebug_$name"
+  defined $self->{app_root}
+    and -e "$self->{app_root}/.htdebug_$name"
 }
 
 #========================================
@@ -722,7 +793,7 @@ sub ConnProp () {Connection}
 sub make_connection {
   (my MY $self, my ($fh, @args)) = @_;
   my @opts = do {
-    if ($self->{cf_noheader}) {
+    if ($self->{noheader}) {
       # direct mode.
       ($fh, noheader => 1);
     } else {
@@ -731,30 +802,31 @@ sub make_connection {
     }
   };
 
-  push @opts, site_prefix => $self->{cf_site_prefix};
+  push @opts, site_prefix => $self->{site_prefix};
 
-  if (my $fn = $self->{cf_logfile}) {
+  if (my $fn = $self->{logfile}) {
     my $dir = $self->app_path_ensure_existing(dirname($fn));
     my $real = "$dir/" . basename($fn);
     open my $fh, '>>', $real or die "Can't open logfile: fn=$real: $!";
     push @opts, logfh => $fh;
   }
 
-  push @opts, debug => $self->{cf_debug_connection}
-    if $self->{cf_debug_connection};
+  push @opts, debug => $self->{debug_connection}
+    if $self->{debug_connection};
 
-  if (my $back = $self->{cf_backend}) {
+  if (my $back = $self->{backend}) {
     push @opts, (backend => try_invoke($back, 'clone') // $back);
   }
 
-  if (my $enc = $$self{cf_output_encoding}) {
+  if (my $enc = $$self{output_encoding}) {
     push @opts, encoding => $enc;
   }
   $self->SUPER::make_connection
   (@opts
    , $self->cf_delegate_defined(qw(is_psgi
                                    no_unicode_params
-                                   no_nested_query))
+                                   no_nested_query
+                                   mkquery_with_body_params))
    , @args);
 }
 
@@ -766,7 +838,7 @@ sub finalize_response {
 sub finalize_connection {
   my MY $self = shift;
   my ConnProp $prop = (my $glob = shift)->prop;
-  $self->session_flush($glob) if $prop->{session};
+  $self->session_flush($glob) if $prop->{_session};
 }
 
 #========================================
@@ -775,7 +847,7 @@ sub finalize_connection {
 
 sub header_charset {
   (my MY $self) = @_;
-  $self->{cf_header_charset} || $self->{cf_output_encoding};
+  $self->{header_charset} || $self->{output_encoding};
 }
 
 #========================================
@@ -787,21 +859,21 @@ sub header_charset {
 sub dirapp_config_for {
   (my MY $self, my $yatt_or_app_name) = @_;
 
-  unless ($self->{cf_config_dir}) {
+  unless ($self->{config_dir}) {
     Carp::croak "config_dir is empty!";
   }
 
   my $app_name = do {
     if (not ref $yatt_or_app_name) {
       $yatt_or_app_name;
-    } elsif ($self->{cf_use_sibling_config_dir}) {
+    } elsif ($self->{use_sibling_config_dir}) {
       $yatt_or_app_name->rel_app_name;
     } else {
       $yatt_or_app_name->app_name
     }
   };
 
-  my $base_path = "$self->{cf_config_dir}/$app_name";
+  my $base_path = "$self->{config_dir}/$app_name";
 
   my $has_latest_entry = sub {
     my ($dict, $key) = @_;
@@ -821,13 +893,13 @@ sub dirapp_config_for {
     $prev_entry;
   };
 
-  if (my $prev_entry = $has_latest_entry->($self->{dirapp_config}, $base_path)) {
+  if (my $prev_entry = $has_latest_entry->($self->{_dirapp_config}, $base_path)) {
 
     $prev_entry->[-1];
 
   } elsif (my $cf = $self->find_unique_config_file($base_path)) {
     my $obj = $self->read_file($cf);
-    $self->{dirapp_config}{$base_path} = [-M $cf, $cf, $obj];
+    $self->{_dirapp_config}{$base_path} = [-M $cf, $cf, $obj];
     $obj;
   } else {
     undef;
@@ -836,9 +908,9 @@ sub dirapp_config_for {
 
 sub site_config {
   (my MY $self) = @_;
-  $self->{cf_site_config} // do {
+  $self->{site_config} // do {
     $self->examine_site_config;
-    $self->{cf_site_config};
+    $self->{site_config};
   };
 }
 
@@ -866,41 +938,41 @@ sub examine_site_config {
 
   # Examine app.site_config.{yml,xhf} and site_config.{yml,xhf}.
   my ($cf) = (
-    ($self->{cf_use_sibling_config_dir}
-       ? $self->find_unique_config_file($self->{cf_config_dir}, "/site_config")
+    ($self->{use_sibling_config_dir}
+       ? $self->find_unique_config_file($self->{config_dir}, "/site_config")
        : ()),
-    # Note: $self->{cf_app_rootname} and $self->{cf_app_root} can be undef
+    # Note: $self->{app_rootname} and $self->{app_root} can be undef
     # but find_unique_config_file() can safely ignore undef.
-    $self->find_unique_config_file($self->{cf_app_rootname}, ".site_config"),
-    $self->find_unique_config_file($self->{cf_app_root}, "/site_config"),
+    $self->find_unique_config_file($self->{app_rootname}, ".site_config"),
+    $self->find_unique_config_file($self->{app_root}, "/site_config"),
   );
 
   if ($cf) {
 
-    $self->{cf_site_config} = $self->read_file($cf);
+    $self->{site_config} = $self->read_file($cf);
 
     $self->{_site_config_cache_entry} = [-M $cf, $cf];
 
     $self->site_config_load_hook;
   } else {
 
-    $self->{cf_site_config} = {};
+    $self->{site_config} = {};
   }
 }
 
 sub site_config_load_hook {
   (my MY $self) = @_;
 
-  if ($self->{cf_site_config_as_entity}) {
+  if ($self->{site_config_as_entity}) {
     my $entns = $self->EntNS;
 
-    foreach my $name (keys %{$self->{cf_site_config}}) {
+    foreach my $name (keys %{$self->{site_config}}) {
 
       next if $name =~ /\W/;
 
       $self->add_entity_into($entns, $name, sub {
         my MY $actual = $SYS; # To avoid directly capturing $self.
-        $actual->{cf_site_config}{$name};
+        $actual->{site_config}{$name};
       }, 1); # Just ignore if already defined.
     }
   }
@@ -912,8 +984,8 @@ Entity site_config => sub {
   my ($this, $name, $default) = @_;
   my MY $self = $SYS;
   $SYS->examine_site_config($CON);
-  return $self->{cf_site_config} unless defined $name;
-  $self->{cf_site_config}{$name} // $default;
+  return $self->{site_config} unless defined $name;
+  $self->{site_config}{$name} // $default;
 };
 
 Entity is_debug_allowed_ip => sub {
@@ -930,9 +1002,17 @@ Entity is_debug_allowed_ip => sub {
 
 foreach my $name (qw/
 		      file_location
+		      page_location
 		      dir_location
 		      is_current_file
 		      is_current_page
+                      file_page
+
+		      site_path
+		      site_url
+		      current_path
+		      current_url
+		      raise_redirect
 		    /
 		) {
   my $method = $name;
@@ -995,7 +1075,7 @@ Entity script_url => sub {
 Entity abspath => sub {
   my ($this) = @_;
   my ConnProp $prop = $CON->prop;
-  ($prop->{cf_location} // '').($prop->{cf_file} // '');
+  ($prop->{location} // '').($prop->{file} // '');
 };
 
 Entity abspath_in_siteapp => sub {shift->entity_abspath};

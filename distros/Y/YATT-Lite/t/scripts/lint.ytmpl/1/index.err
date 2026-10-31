@@ -1,4 +1,4 @@
-Global symbol "$foo" requires explicit package name [[[
+[[[<!>^.*?/index\.yatt:3: ]]]Global symbol "$foo" requires explicit package name [[[
   <?>\(did you forget to declare "my \$foo\"\?\) ]]][[[
   <!>at .*?/index.yatt line]]] 3.
 Global symbol "$bar" requires explicit package name [[[

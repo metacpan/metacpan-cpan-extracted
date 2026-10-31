@@ -17,10 +17,10 @@ sub _parse_body {
 
   my $last_foot; # last foot 
 
-  while (s{^(.*?)$$self{re_body}}{}xs or my $retry = $self->_get_chunk($sink)) {
+  while (s{^(.*?)$$self{_re_body}}{}xs or my $retry = $self->_get_chunk($sink)) {
     next if $retry;
 
-    my $startPos = $self->{curpos} + length($1);
+    my $startPos = $self->{_curpos} + length($1);
 
     $self->accept_leading_text($sink, $parent, $par_ln, \$has_nonspace);
 
@@ -30,7 +30,7 @@ sub _parse_body {
 	  ($+{entity}, $parent, $par_ln, \$has_nonspace);
       } else {
 	die $self->synerror_at
-	  ($self->{startln}, q{Mismatched l10n msg});
+	  ($self->{_startln}, q{Mismatched l10n msg});
       }
     } elsif ($+{entity} or $+{special}) {
       # &yatt(?=:) までマッチしてる。
@@ -43,9 +43,9 @@ sub _parse_body {
         if ($last_foot) {
           $last_foot->[NODE_END] = $startPos;
         }
-	$parent->[NODE_BODY_END] = $self->{startpos};
+	$parent->[NODE_BODY_END] = $self->{_startpos};
 	if (defined $parent->[NODE_BODY_BEGIN]
-	    and $self->{template}->node_body_source($parent) =~ /(\r?\n)\Z/) {
+	    and $self->{_template}->node_body_source($parent) =~ /(\r?\n)\Z/) {
 	  $parent->[NODE_BODY_END] -= length $1;
 	}
 	$self->verify_tag($formal_path, $close);
@@ -60,9 +60,9 @@ sub _parse_body {
       my $is_opt = $+{opt};
       my $elem = [];
       $elem->[NODE_TYPE] = $is_opt ? TYPE_ATT_NESTED : TYPE_ELEMENT;
-      $elem->[NODE_BEGIN] = $self->{startpos};
-      $elem->[NODE_LNO] = $self->{endln};
-      $elem->[NODE_SYM_END] = $self->{curpos};
+      $elem->[NODE_BEGIN] = $self->{_startpos};
+      $elem->[NODE_LNO] = $self->{_endln};
+      $elem->[NODE_SYM_END] = $self->{_curpos};
       $elem->[NODE_PATH] = [split /:/, $path];
       $elem->[NODE_BODY] = undef;
 
@@ -75,12 +75,12 @@ sub _parse_body {
         my $diag = m{^\S*\s*?/?>}
           ? "Garbage before CLO(>)"
           : "Missing CLO(>)";
-        die $self->synerror_at($self->{startln}
+        die $self->synerror_at($self->{_startln}
                                  , q{%s for: <%s, rest: '%s'}
                                  , $diag, $path, trimmed($_));
       };
 
-      ++$self->{startln} if defined $2;
+      ++$self->{_startln} if defined $2;
 
       # body slot の初期化
       # $is_opt の時に、更に body を attribute として保存するのは冗長だし、後の処理も手間なので
@@ -89,7 +89,7 @@ sub _parse_body {
         $elem->[NODE_BODY] = $is_opt ? $body : do {
           my $att_node = [];
           $att_node->[NODE_TYPE] = TYPE_ATTRIBUTE;
-          $att_node->[NODE_PATH] = $self->{cf_body_argument};
+          $att_node->[NODE_PATH] = $self->{body_argument};
           $att_node->[NODE_BODY] = $body;
           $att_node;
         };
@@ -98,12 +98,12 @@ sub _parse_body {
       my $bodyStartRef; $bodyStartRef = \ $elem->[NODE_BODY][NODE_LNO]
 	if not $is_opt and $elem->[NODE_BODY];
 
-      $self->{curpos} += 1 + ($1 ? length($1) : 0); # $& じゃないので注意。
-      $elem->[NODE_END] = $self->{curpos} if $+{empty_elem};
-      $self->{curpos} += length $2 if $2; # XXX: swap with below
-      $elem->[NODE_BODY_BEGIN] = $self->{curpos}; # XXX
+      $self->{_curpos} += 1 + ($1 ? length($1) : 0); # $& じゃないので注意。
+      $elem->[NODE_END] = $self->{_curpos} if $+{empty_elem};
+      $self->{_curpos} += length $2 if $2; # XXX: swap with below
+      $elem->[NODE_BODY_BEGIN] = $self->{_curpos}; # XXX
 
-      $self->_verify_token($self->{curpos}, $_) if $self->{cf_debug};
+      $self->_verify_token($self->{_curpos}, $_) if $self->{debug};
 
       if ($is_opt and not $+{empty_elem}) {
 	drop_leading_ws($sink);
@@ -119,14 +119,14 @@ sub _parse_body {
 	push @{$parent->[NODE_AELEM_HEAD] ||= []}, $elem
       }
 
-      my $bodystartln = $self->{endln};
+      my $bodystartln = $self->{_endln};
       # <TAG>\n タグ直後の改行について。
       # <foo />\n だけは, 現在の $sink へ、それ以外は、今作る $elem の $body へ改行を足す
-      $self->{endln}++, push @{!$is_opt && $+{empty_elem} ? $sink : $body}, "\n"
+      $self->{_endln}++, push @{!$is_opt && $+{empty_elem} ? $sink : $body}, "\n"
 	if $2;
 
       unless ($is_opt) {
-	$$par_ln = $self->{startln} if not $has_nonspace++ and $parent;
+	$$par_ln = $self->{_startln} if not $has_nonspace++ and $parent;
       } elsif (not $+{empty_elem}) {
 	# XXX: もし $is_opt かつ not ee だったら、
 	# $sink (親の $body) が空かどうかを調べる必要が有る。
@@ -136,17 +136,17 @@ sub _parse_body {
       if (not $+{empty_elem}) {
 	# call <yatt:call> ...  or complex option <:yatt:opt>
 	# expects </yatt:call> or </:yatt:opt>
-	# $self->{startln} = $self->{endln}; # No!
+	# $self->{_startln} = $self->{_endln}; # No!
 	$self->_parse_body($widget, $body
 			   , $+{empty_elem} ? $close : $formal_path
 			   , $elem, $bodyStartRef);
         #
-        # x substr($widget->{cf_folder}->{cf_string}, $elem->[NODE_BEGIN], $self->{curpos} - $elem->[NODE_BEGIN])
-        # x $widget->{cf_folder}->source_region($elem->[NODE_BEGIN], $self->{curpos})
-        # x $self->{template}->...
+        # x substr($widget->{folder}->{string}, $elem->[NODE_BEGIN], $self->{_curpos} - $elem->[NODE_BEGIN])
+        # x $widget->{folder}->source_region($elem->[NODE_BEGIN], $self->{_curpos})
+        # x $self->{_template}->...
 
         #
-        $elem->[NODE_END] = $self->{curpos};
+        $elem->[NODE_END] = $self->{_curpos};
 	$$bodyStartRef //= $bodystartln;
       } elsif ($is_opt) {
 	# ee style option.
@@ -158,51 +158,51 @@ sub _parse_body {
         $last_foot = $elem;
       } else {
       } # simple call.
-      $self->_verify_token($self->{curpos}, $_) if $self->{cf_debug};
+      $self->_verify_token($self->{_curpos}, $_) if $self->{debug};
       $self->add_lineinfo($sink);
 
     } elsif ($path = $+{pi}) {
-      $$par_ln = $self->{startln} if not $has_nonspace++ and $parent;
+      $$par_ln = $self->{_startln} if not $has_nonspace++ and $parent;
       # ?> まで
       unless (s{^(.*?)\?>(\r?\n)?}{}s) {
-	die $self->synerror_at($self->{startln}, q{Unbalanced pi});
+	die $self->synerror_at($self->{_startln}, q{Unbalanced pi});
       }
-      my $end = $self->{curpos} += 2 + length($1);
+      my $end = $self->{_curpos} += 2 + length($1);
       my $nl = "\n" if $2;
       # XXX: parse_text の前なので、本当は良くない
-      $self->{curpos} += length $2 if $2;
-      $self->{endln} += numLines($1);
+      $self->{_curpos} += length $2 if $2;
+      $self->{_endln} += numLines($1);
       push @$sink, do {
         my $node = [];
         $node->[NODE_TYPE] = TYPE_PI;
-        $node->[NODE_BEGIN] = $self->{startpos};
+        $node->[NODE_BEGIN] = $self->{_startpos};
         $node->[NODE_END] = $end;
-        $node->[NODE_LNO] = $self->{endln};
+        $node->[NODE_LNO] = $self->{_endln};
         $node->[NODE_PATH] = [split /:/, $path];
         splice @$node, NODE_BODY, 0, lexpand($self->_parse_text_entities($1));
         $node;
       };
       if ($nl) {
 	push @$sink, $nl;
-	$self->{startln} = ++$self->{endln};
+	$self->{_startln} = ++$self->{_endln};
       }
       $self->add_lineinfo($sink);
     } else {
       die join("", "Can't parse: ", nonmatched($_));
     }
   } continue {
-    $self->{startln} = $self->{endln};
-    $self->{startpos} = $self->{curpos};
-    $self->_verify_token($self->{startpos}, $_) if $self->{cf_debug};
+    $self->{_startln} = $self->{_endln};
+    $self->{_startpos} = $self->{_curpos};
+    $self->_verify_token($self->{_startpos}, $_) if $self->{debug};
   }
 
   if ($close and not $is_closed) {
-    die $self->synerror_at($self->{startln}, q{Missing close tag '%s'}, $close);
+    die $self->synerror_at($self->{_startln}, q{Missing close tag '%s'}, $close);
   }
 
   # if ($last_foot) {
   #   die "??really??" if not defined $last_foot->[NODE_END];
-  #   $last_foot->[NODE_END] //= $self->{curpos};
+  #   $last_foot->[NODE_END] //= $self->{_curpos};
   # }
 
   # To make body-less element easily detected.
@@ -213,26 +213,26 @@ sub _parse_body {
 
 sub accept_leading_text {
   (my MY $self, my ($sink, $parent, $par_ln, $rhas_nonspace)) = @_;
-  $self->{endln} += numLines($&);
+  $self->{_endln} += numLines($&);
   if ($self->add_posinfo(length($1), 1)) {
     push @$sink, splitline($1);
-    $$par_ln = $self->{startln}
+    $$par_ln = $self->{_startln}
       if nonspace($1) and not $$rhas_nonspace++ and $parent;
-    $self->{startln} += numLines($1);
+    $self->{_startln} += numLines($1);
   }
-  $self->{curpos} += length($&) - length($1);
-  $self->_verify_token($self->{curpos}, $_) if $self->{cf_debug};
+  $self->{_curpos} += length($&) - length($1);
+  $self->_verify_token($self->{_curpos}, $_) if $self->{debug};
 }
 
 sub accept_entity {
   (my MY $self, my ($sink, $parent, $par_ln, $rhas_nonspace)) = @_;
   push @$sink, my $node = $self->mkentity
-    ($self->{startpos}, undef, $self->{endln});
+    ($self->{_startpos}, undef, $self->{_endln});
   # ; まで
-  $node->[NODE_END] = $self->{curpos};
-  $self->_verify_token($self->{curpos}, $_) if $self->{cf_debug};
+  $node->[NODE_END] = $self->{_curpos};
+  $self->_verify_token($self->{_curpos}, $_) if $self->{debug};
   $self->add_lineinfo($sink);
-  $$par_ln = $self->{startln}
+  $$par_ln = $self->{_startln}
     if nonspace($1) and not $$rhas_nonspace++ and $parent;
 }
 
@@ -240,13 +240,13 @@ sub verify_tag {
   (my MY $self, my ($path, $close)) = @_;
   # XXX: デバッグ時、この段階での sink の様子を見たくなる。
   unless (s{^>}{}xs) {
-    die $self->synerror_at($self->{endln}, q{Missing CLO(>) for: <%s}, $path);
+    die $self->synerror_at($self->{_endln}, q{Missing CLO(>) for: <%s}, $path);
   }
-  $self->{curpos} += 1;
+  $self->{_curpos} += 1;
   unless (defined $close) {
-    die $self->synerror_at($self->{endln}, q{TAG close without open! got </%s>}, $path);
+    die $self->synerror_at($self->{_endln}, q{TAG close without open! got </%s>}, $path);
   } elsif ($path ne $close) {
-    die $self->synerror_at($self->{endln}, q{TAG Mismatch! <%s> closed by </%s>}
+    die $self->synerror_at($self->{_endln}, q{TAG Mismatch! <%s> closed by </%s>}
 			, $close, $path);
   }
 }
@@ -261,47 +261,47 @@ sub _parse_lcmsg {
     push @$path, $1 if $1;
   } else {
     die $self->synerror_at
-      ($self->{startln}
+      ($self->{_startln}
        , q{parse_lcmsg is called from invalid context: %s }, $_);
   }
 
 
   my $node = [];
   $node->[NODE_TYPE] = TYPE_LCMSG;
-  $node->[NODE_BEGIN] = $self->{startpos};
-  $node->[NODE_LNO] = $self->{endln};
+  $node->[NODE_BEGIN] = $self->{_startpos};
+  $node->[NODE_LNO] = $self->{_endln};
   $node->[NODE_PATH] = $path;
   $node->[NODE_BODY] = my $body = [my $sink = []];
 
-  $self->{curpos} += length $&;
+  $self->{_curpos} += length $&;
 
-  while (length $_ and s{^(.*?)$$self{re_entopn}}{}s) {
+  while (length $_ and s{^(.*?)$$self{_re_entopn}}{}s) {
     $self->accept_leading_text($sink, $parent, $par_ln, $rhas_nonspace);
     if ($+{msgopn}) {
       die $self->synerror_at
-	($self->{startln}, q{nesting of l10n msg is not allowed});
+	($self->{_startln}, q{nesting of l10n msg is not allowed});
     } elsif ($+{msgsep}) {
       s/^\|{2,};//;
-      $self->{curpos} += length $&;
+      $self->{_curpos} += length $&;
       # switch to next sink.
       push @$body, $sink = [];
 
     } elsif ($+{msgclo}) {
       s/^\]{2,};//;
-      $self->{curpos} += length $&;
-      $node->[NODE_END] = $self->{curpos};
+      $self->{_curpos} += length $&;
+      $node->[NODE_END] = $self->{_curpos};
       return $node;
 
     } elsif ($+{entity} or $+{special}) {
       $self->accept_entity($sink, $parent, $par_ln, $rhas_nonspace);
     } else {
       die $self->synerror_at
-	($self->{startln}, q{Unknown input: %s}, $_);
+	($self->{_startln}, q{Unknown input: %s}, $_);
     }
   }
 
   die $self->synerror_at
-    ($self->{startln}
+    ($self->{_startln}
      , q{parse_lcmsg is not closed: %s}, $_);
 }
 

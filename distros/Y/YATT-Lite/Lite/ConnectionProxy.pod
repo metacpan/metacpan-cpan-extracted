@@ -1,0 +1,60 @@
+=head1 NAME
+
+YATT::Lite::ConnectionProxy - $CON while capturing output
+
+=head1 SYNOPSIS
+
+  <!-- Output of the body of <yatt:my> is captured into the variable.
+       Inside it, $CON methods are still available. -->
+  <yatt:my tmp>(<yatt:foo/>)</yatt:my>
+  {&yatt:tmp;}
+
+  <!yatt:widget foo>
+  &yatt:CON:file();
+
+  # Generated code (and Perl code) can capture output like this:
+  my $text = YATT::Lite::ConnectionProxy->capture($CON, sub {
+    my ($CON) = @_;
+    print $CON "captured";
+    $CON->param('q'); # delegated to the original connection
+  });
+
+=head1 DESCRIPTION
+
+When YATT::Lite captures output into a value, the code inside gets
+a proxy as C<$CON>. This happens for the body of
+C<< <yatt:my var>...</yatt:my> >>, elements given to C<text> arguments,
+and C<< <?perl ?> >> in such places.
+
+Like L<YATT::Lite::WebMVC0::Connection>, the proxy is a blessed GLOB.
+Output printed to it goes to the capture buffer. All methods are
+delegated to the original connection, so C<param>, C<env>,
+C<site_path>, cookies, session, and others work as usual.
+C<can> returns a method that works with the proxy, and C<isa> is
+also true for the classes of the original connection.
+
+Note that methods about the response are delegated too. For example,
+C<buffer>, C<flush>, C<raise_redirect> and C<error> act on the
+original response, not on the capture buffer.
+
+=head1 METHODS
+
+=head2 capture($con, $code)
+
+Calls C<< $code->($proxy) >> and returns the captured output as
+a character string.
+
+If C<$con> is already a proxy, the new proxy shares its original
+connection (no proxy of proxy). If C<$con> is not a
+L<YATT::Lite::Connection> (eg. a bare filehandle in tests),
+C<$code> gets a bare filehandle, as C<YATT::Lite::Util::captured> does.
+
+=head2 connection
+
+Returns the original connection.
+
+=head1 SEE ALSO
+
+L<YATT::Lite::WebMVC0::Connection>
+
+=cut

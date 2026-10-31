@@ -113,6 +113,25 @@ sub psgi_fields {
   wantarray ? @PSGI_FIELDS : {map {$_ => 1} @PSGI_FIELDS};
 }
 
+#
+# Env->is_https($env): true if the request reached us over TLS, by any of
+# psgi.url_scheme, X-Forwarded-Proto (set by a TLS-terminating proxy,
+# same as mkprefix trusts it) or the CGI-style HTTPS variable.
+# Used to decide the Secure attribute of session cookies, so any
+# positive signal counts.
+#
+sub is_https {
+  my ($pack, $env) = @_;
+  return 0 unless $env;
+  foreach my $scheme ($env->{'psgi.url_scheme'}, $env->{HTTP_X_FORWARDED_PROTO}) {
+    return 1 if defined $scheme and lc($scheme) eq 'https';
+  }
+  if (defined(my $https = $env->{HTTPS})) {
+    return 1 if length $https and lc($https) ne 'off';
+  }
+  0;
+}
+
 sub psgi_simple_env {
   my ($pack) = shift;
   my Env $given = {@_};

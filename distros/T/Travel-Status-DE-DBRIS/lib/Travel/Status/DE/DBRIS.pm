@@ -21,7 +21,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 # {{{ Constructors
 
@@ -34,18 +34,18 @@ sub new {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 20 } };
 
 		# work around Akamai BMP TLS fingerprinting
-		$lwp_options{ssl_opts}{SSL_ciphersuites} = 'TLS_CHACHA20_POLY1305_SHA256';
+		$lwp_options{ssl_opts}{SSL_ciphersuites} = 'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256';
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}
 
 	my @ua_base = (
-'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.XXXX.YYY Mobile Safari/537.36',
-'Mozila/5.0 (Linux; Android 14; SM-S928B/DS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.XXXX.YYY Mobile Safari/537.36',
-'Mozilla/5.0 (Linux; Android 14; Pixel 9 Pro Build/AD1A.240418.003; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.XXXX.YYY Mobile Safari/537.36',
-'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.XXXX.YYY Mobile Safari/537.36',
-'Mozilla/5.0 (Linux; Android 15; moto g - 2025 Build/V1VK35.22-13-2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/132.0.XXXX.YYY Mobile Safari/537.36',
-'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.XXXX.YYY Safari/537.36',
+'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.XXXX.YYY Mobile Safari/539.36',
+'Mozilla/5.0 (Linux; Android 16; SM-S928B/DS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.XXXX.YYY Mobile Safari/538.35',
+'Mozilla/5.0 (Linux; Android 15; Pixel 9 Pro Build/AD1A.250418.003; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/133.0.XXXX.YYY Mobile Safari/537.29',
+'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.XXXX.YYY Mobile Safari/538.34',
+'Mozilla/5.0 (Linux; Android 16; moto g - 2025 Build/V1VK35.22-13-2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/133.0.XXXX.YYY Mobile Safari/537.31',
+'Mozilla/5.0 (X11; CrOS x86_64 14542.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.XXXX.YYY Safari/538.32',
 	);
 
 	my $rand1  = int( rand(1000) );
@@ -517,7 +517,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

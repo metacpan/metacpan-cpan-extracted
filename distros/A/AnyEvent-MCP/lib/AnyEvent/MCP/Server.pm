@@ -194,7 +194,7 @@ sub new {
       require AnyEvent::MCP::Server::Toolset;
 
       my $name = "meta-instructions";
-      !grep (exists $_->{tool}{$name}, @{$self->{toolsets}})
+      !grep { exists $_->{tool}{$name} } @{$self->{toolsets}}
          or die "duplicate MCP tool '$name'\n";
 
       my $full = join "\n\n", grep length, $custom, $instructions;
@@ -209,7 +209,7 @@ sub new {
       my $short = exists $self->{short_instructions}
          ? AnyEvent::MCP::_clean_text $self->{short_instructions} : "";
       $self->{instructions} = length $custom || length $short
-         ? join ("\n\n", grep length, $custom, $short, "Full instructions: meta-instructions tool description.")
+         ? (join "\n\n", grep length, $custom, $short, "Full instructions: meta-instructions tool description.")
          : $instructions;
 
    } elsif (length $custom) {

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Geo.c,v 1.52 2005/10/19 10:58:11 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -26,8 +26,6 @@
 #include <memory.h>
 
 
-static const char rcsid[] = "$Id: Geo.c,v 1.52 2005/10/19 10:58:11 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 void

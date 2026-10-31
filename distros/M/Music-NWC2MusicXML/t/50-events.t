@@ -75,6 +75,13 @@ sub parse_nwctxt {
 	is $evs[0]->data->{style}, 'Diminuendo', 'Diminuendo style parsed';
 }
 
+{
+	my $score = parse_nwctxt('|DynamicVariance|Style:Crescendo|Pos:-8');
+	my @evs = grep { $_->type eq 'DynVariance' } @{ $score->staves->[0]->events };
+	is scalar @evs, 1, 'DynamicVariance alias produces one DynVariance event';
+	is $evs[0]->data->{style}, 'Crescendo', 'DynamicVariance style parsed correctly';
+}
+
 # ---------------------------------------------------------------------------
 # Tempo event parsing and base field
 # ---------------------------------------------------------------------------

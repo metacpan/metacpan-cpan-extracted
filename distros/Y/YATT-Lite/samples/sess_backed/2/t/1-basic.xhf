@@ -50,9 +50,9 @@ BODY:
  
  
  <pre id="session_content">session content={
-   'bar' => 'yyy',
-   'baz' => 'zzz',
-   'foo' => 'xxx'
+   &#39;bar&#39; =&gt; &#39;yyy&#39;,
+   &#39;baz&#39; =&gt; &#39;zzz&#39;,
+   &#39;foo&#39; =&gt; &#39;xxx&#39;
  }
  </pre><form method="POST">
    <dl>

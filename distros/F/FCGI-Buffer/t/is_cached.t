@@ -7,8 +7,7 @@ use warnings;
 use Test::Most tests => 5;
 use Storable;
 # use Test::NoWarnings;	# HTML::Clean has them
-use lib 't/lib';
-use MyLogger;
+use Test::Needs 'Test::Log::Abstraction';
 
 BEGIN {
 	use_ok('FCGI::Buffer');
@@ -40,7 +39,7 @@ CACHED: {
 		$b->init({
 			cache => $cache,
 			cache_key => 'xyzzy',
-			logger => MyLogger->new()
+			logger => Test::Log::Abstraction->new()
 		});
 		ok(!$b->is_cached());
 

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : 
  *
- * $Id: MapInfo.h,v 1.15 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -83,9 +83,9 @@ void ZnFreeMapInfo(ZnMapInfoId map_info, ZnMapInfoChangeProc proc,
                    ClientData client_data);
 
 int ZnMapInfoObjCmd(ClientData client_data, Tcl_Interp *interp,
-                    int argc, Tcl_Obj *CONST args[]);
+                    int argc, Tcl_Obj *const args[]);
 int ZnVideomapObjCmd(ClientData client_data, Tcl_Interp *interp,
-                     int argc, Tcl_Obj *CONST args[]);
+                     int argc, Tcl_Obj *const args[]);
   
 
 #ifdef __CPLUSPLUS__

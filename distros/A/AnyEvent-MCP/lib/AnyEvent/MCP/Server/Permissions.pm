@@ -20,8 +20,10 @@ AnyEvent::MCP::Server::Permissions - action authorization and sandbox grants
    my $grant = $req->require_permission ({
       tool           => $req->{tool},
       action         => "read",
-      subject        => $path,
-      subjects       => [{ label => "this file", subject => $path }],
+      dimensions     => { subject => {
+         label => "File", value => $path,
+         choices => [{ label => "this file", match => $path }],
+      } },
       sandbox_grants => ["workdir-read"],
       reason         => "read $path",
    });
@@ -69,8 +71,8 @@ and L<AnyEvent::MCP::Intro> for examples from actual servers.
 =head1 PERMISSION REQUESTS
 
 A request names an C<action> (a server-defined class of authority such as
-C<inspect>, C<read>, C<write>, C<manage> or C<exec>), an optional C<subject>,
-and the C<sandbox_grants> required by its worker. These are independent:
+C<inspect>, C<read>, C<write>, C<manage> or C<exec>), optional named
+C<dimensions>, and the C<sandbox_grants> required by its worker. These are independent:
 authorization to write does not imply authorization to read, although
 sandbox-level C<workdir-write> may imply C<workdir-read>. C<tool> is optional
 human-readable context identifying the actual MCP tool; rules do not match it.
@@ -94,17 +96,23 @@ Rules are evaluated in order, with the first match deciding. C<decision> is
 C<allow>, C<deny> or C<ask>; omitted decisions are invalid. C<action> is the
 server-defined action class, not the decision. A matcher beginning with C<^>
 is interpreted as a Perl regular expression; otherwise it matches exactly.
-An omitted subject matches any subject. For example:
+Omitted C<match.NAME> fields do not restrict that dimension. For example:
 
    [rule]
    decision=allow
    action=read
-   subject=^/home/example/documents/
+   match.subject=^/home/example/documents/
    sandbox-grants=workdir-read
 
    [rule]
    decision=deny
    action=^
+
+If any saved rule is invalid (including an obsolete pre-1.0 field), the
+entire file is silently ignored and permissions are requested normally.
+Reading does not modify the file; the next ordinary save replaces it,
+discarding all old rules. Explicit saves do not validate rule semantics;
+file I/O errors still fail normally.
 
 An allow rule requires C<sandbox-grants>, which may be empty for actions
 that need no worker grants. It matches only requests whose required grants
@@ -236,16 +244,36 @@ C<$request> contains C<action>, C<reason>, and C<sandbox_grants> (an array
 reference; it may be empty). C<tool> in the request is optional display
 context. The separate optional C<$tool> argument is the trusted dispatched
 MCP tool name for automatic overrides; Server supplies it from the call.
-C<subject> is optional; when present, C<subjects> offers persistent scope
-choices as C<{ label =E<gt> $label, subject =E<gt> $matcher }> hashes,
-each matching the requested subject.
-C<workdir> is an optional exact-match identity separate from C<subject>.
-Rules with C<workdir> match only that configured workdir spelling, and rules
-without it may match any workdir when the sandbox grants also match. The application
-decides when a selected workdir matters to the requested sandbox grants.
-The persistent-rule dialog defaults to the selected workdir but can explicitly
-offer any current or future workdir by omitting the matcher; this does not
-change the sandbox grants available to a single operation.
+C<dimensions> is an optional hash of independent, named identities. Every
+dimension has a display C<label>, a nonempty C<value>, and an array of
+permitted persistent C<choices>, each with C<label> and C<match>. For example:
+
+   dimensions => {
+      origin => {
+         label => "Origin",
+         value => "https://example.org:8443",
+         default => "https://example.org:8443",
+         choices => [
+            { label => "This origin", match => "https://example.org:8443" },
+            { label => "Any origin", match => "^" },
+         ],
+      },
+   }
+
+C<default> optionally selects the initially proposed matcher for persistent
+rule prompts; it must be one of the offered choices. Without it, the first
+choice is selected.
+The engine does not interpret dimension names. Saved rules use
+C<match.origin>, C<match.subject>, C<match.workdir>, or any other
+C<match.NAME>. Every selected matcher must match the corresponding request
+value. A saved matcher for a missing dimension does not match. An omitted
+C<match.NAME> in a manually written rule matches any value, including absent
+dimensions; persistent prompts instead require a choice for every dimension.
+An empty choices array disables permanent approvals, not one-time approvals.
+Matchers are literal unless beginning with C<^>, which denotes a Perl regex.
+The caller must supply trustworthy dimension values, not untrusted tool arguments.
+The former C<subject>, C<subjects>, C<origin>, C<origins>, and C<workdir>
+request and saved-rule fields are unsupported.
 The multibroker alias, when supplied by the child's environment, is display-only
 and does not change rule matching or policy file selection.
 C<paths> may contain a list of affected filenames for display in permission
@@ -269,7 +297,7 @@ C<allow-once>, C<allow-always>, C<deny-once>, and C<deny-always>.
 Allow-once uses exactly the requested sandbox grants. Allow-always may save
 a broader or narrower set of grants for future invocations; the present
 invocation still receives no more than requested. Permanent decisions
-contain a validated rule restricted to the offered action and subject scope.
+contain a validated rule restricted to the offered action and dimension scopes.
 Denial decisions may include an optional human C<message>; allowed tool
 results are never modified by permission prompting.
 
@@ -296,8 +324,9 @@ Continuations are short-lived and bound to the method, parameters, and request,
 and are consumed once. Approval retries retain earlier one-time grants
 within the same call. Always decisions and Back use additional protected C<input_required>
 rounds, capped at 32, without executing the original tool. Messages in
-persistent deny rules are returned to subsequent callers, including later sessions. Client-side elicitation is only appropriate when
-the connected client is the trusted approval authority.
+persistent deny rules are returned to subsequent callers, including later
+sessions. Client-side elicitation is only appropriate when the connected
+client is the trusted approval authority.
 
 =item $closure = $permissions->closure ([$grant...])
 
@@ -317,8 +346,8 @@ File-backed rules are reread, so changes apply to subsequent checks.
 
 =item $permissions->save ($rules)
 
-Validates and replaces the ordered rules, using atomic file replacement if
-backed by a file.
+Replaces the ordered rules without semantic validation, using atomic file
+replacement if backed by a file.
 
 =back
 
@@ -425,7 +454,8 @@ sub _rule {
 
    ref $rule eq "HASH"
       or die "Invalid permission rule\n";
-   die "Unknown permission rule field\n" if grep !/\A(?:decision|action|subject|workdir|path|message|denial-reason|sandbox-grants|expires)\z/, keys %$rule;
+   !grep !/\A(?:decision|action|path|message|sandbox-grants|expires|match\.[a-z][a-z0-9_-]*)\z/, keys %$rule
+      or die "Unknown permission rule field\n";
 
    die "Invalid permission rule expiry\n" if exists $rule->{expires}
       && (!defined $rule->{expires} || ref $rule->{expires} || $rule->{expires} !~ /\A[0-9]+\z/);
@@ -434,7 +464,7 @@ sub _rule {
 
    die "Invalid permission rule decision\n" unless defined $decision && $decision =~ /\A(?:allow|deny|ask)\z/;
    die "Only deny rules can have paths or messages\n"
-      if $decision ne "deny" && (exists $rule->{path} || exists $rule->{message} || exists $rule->{"denial-reason"});
+      if $decision ne "deny" && (exists $rule->{path} || exists $rule->{message});
    die "Allow rule needs sandbox-grants\n" if $decision eq "allow" && !exists $rule->{"sandbox-grants"};
 
    defined $rule->{action}
@@ -446,16 +476,18 @@ sub _rule {
          || ref $rule->{path} || !length $rule->{path};
       $compiled->{path} = $rule->{path};
    }
-   my $message = exists $rule->{message} ? $rule->{message} : $rule->{"denial-reason"};
+   my $message = $rule->{message};
    if (defined $message) {
       die "Invalid permission message\n" if ref $message
          || length $message > 2048 || $message =~ /[\r\n]/;
       $compiled->{message} = $message;
    }
 
-   $compiled->{subject} = _regex ($rule->{subject}) if exists $rule->{subject};
-   die "Invalid workdir rule identity\n" if exists $rule->{workdir} && (ref $rule->{workdir} || !length $rule->{workdir});
-   $compiled->{workdir} = $rule->{workdir} if exists $rule->{workdir};
+   for my $key (grep /^match\./, keys %$rule) {
+      (my $name = $key) =~ s/^match\.//;
+      $compiled->{matches}{$name} = _regex ($rule->{$key});
+   }
+
 
    if (exists $rule->{"sandbox-grants"}) {
       die "Invalid rule sandbox-grants\n" if ref $rule->{"sandbox-grants"};
@@ -489,29 +521,32 @@ sub _read_rules {
    };
 
    local $/;
-   my $text = AnyEvent::MCP::utf8dec scalar (<$fh>);
+   my $text = scalar (<$fh>);
    close $fh or die "$self->{file}: $!\n";
 
    my @rules;
-   AnyEvent::MCP::parse_ini $text, sub {
-      my ($name, $kv) = @_;
-      if ($name eq "") {
-         %$kv and die "$self->{file}: permission rule outside [rule]\n";
-      } elsif ($name eq "rule") {
-         push @rules, $kv;
-      } else {
-         die "$self->{file}: invalid permission rule section '$name'\n";
-      }
-   }, $self->{file};
+   my $valid = eval {
+      $text = AnyEvent::MCP::utf8dec $text;
+      AnyEvent::MCP::parse_ini $text, sub {
+         my ($name, $kv) = @_;
+         if ($name eq "") {
+            %$kv and die "$self->{file}: permission rule outside [rule]\n";
+         } elsif ($name eq "rule") {
+            push @rules, $kv;
+         } else {
+            die "$self->{file}: invalid permission rule section '$name'\n";
+         }
+      }, $self->{file};
+      $self->_rule ($_) for @rules;
+      1
+   };
 
-   \@rules
+   $valid ? \@rules : []
 
 }
 
 sub _write {
    my ($self, $rules) = @_;
-
-   $self->_rule ($_) for @$rules;
 
    unless (defined $self->{file}) {
       $self->{rules} = $rules;
@@ -550,8 +585,29 @@ sub check {
       && !ref $request->{action} && length $request->{action};
    die "Unknown permission action\n" if keys %{$self->{actions}}
       && !exists $self->{actions}{$request->{action}};
-   die "Invalid requested workdir identity\n"
-      if defined $request->{workdir} && (ref $request->{workdir} || !length $request->{workdir});
+   die "Obsolete permission request scope\n"
+      if grep exists $request->{$_}, qw(subject subjects origin origins workdir workdir_scope);
+   my $dimensions = exists $request->{dimensions} ? $request->{dimensions} : {};
+   ref $dimensions eq "HASH" or die "Invalid permission dimensions\n";
+   for my $name (keys %$dimensions) {
+      $name =~ /\A[a-z][a-z0-9_-]*\z/ or die "Invalid permission dimension name\n";
+      my $dim = $dimensions->{$name};
+      ref $dim eq "HASH" && defined $dim->{value} && !ref $dim->{value} && length $dim->{value}
+         && defined $dim->{label} && !ref $dim->{label} && length $dim->{label}
+         && ref $dim->{choices} eq "ARRAY"
+         or die "Invalid permission dimension '$name'\n";
+      for my $choice (@{$dim->{choices}}) {
+         ref $choice eq "HASH" && defined $choice->{label} && !ref $choice->{label}
+            && length $choice->{label} && defined $choice->{match}
+            && $dim->{value} =~ _regex ($choice->{match})
+            or die "Permission dimension scope does not match request\n";
+      }
+      if (exists $dim->{default}) {
+         defined $dim->{default} && !ref $dim->{default}
+            && (grep $_->{match} eq $dim->{default}, @{$dim->{choices}})
+            or die "Permission dimension default was not offered\n";
+      }
+   }
 
    if (exists $request->{details}) {
       ref $request->{details} eq "HASH"
@@ -583,9 +639,10 @@ sub check {
    my @rules = map { $self->_rule ($_) } @{$self->rules};
    for my $rule (@rules) {
       next unless $request->{action} =~ $rule->{action};
-      next if defined $rule->{workdir} && (!defined $request->{workdir} || $rule->{workdir} ne $request->{workdir});
-   
-      next if exists $rule->{subject} && (!defined $request->{subject} || $request->{subject} !~ $rule->{subject});
+      next if grep {
+         !exists $dimensions->{$_} || $dimensions->{$_}{value} !~ $rule->{matches}{$_}
+      } keys %{$rule->{matches} || {}};
+
       next if exists $rule->{path} && !(ref $request->{paths} eq "ARRAY"
          && grep defined && !ref && $_ eq $rule->{path}, @{$request->{paths}});
       # an exact-file denial applies even when a multi-path operation requests
@@ -603,13 +660,6 @@ sub check {
    }
 
    die "Permission request needs a reason\n" unless !ref $request->{reason} && $request->{reason} =~ /\S/;
-   die "Permission request needs subject choices\n"
-      if defined $request->{subject} && ref $request->{subjects} ne "ARRAY";
-
-   for my $choice (@{$request->{subjects} || []}) {
-      die "Permission scope does not match request\n" unless defined $request->{subject}
-         && $request->{subject} =~ _regex ($choice->{subject});
-   }
 
    my $action_class = $request->{action};
    $action_class = "^\Q$action_class\E\\z" if $action_class =~ /\A\^/;
@@ -677,8 +727,7 @@ sub resolve {
 
       # the rule contains only the selected dimensions, never extra authority.
       my %fields = map { $_ => 1 } qw(decision action sandbox-grants path message expires);
-      $fields{subject} = 1 if defined $prepared->{subject};
-      $fields{workdir} = 1 if defined $prepared->{workdir};
+      $fields{"match.$_"} = 1 for keys %{$prepared->{dimensions} || {}};
 
       ref $rule eq "HASH"
          && $rule->{action} eq $prepared->{action_matcher}
@@ -690,12 +739,12 @@ sub resolve {
          unless defined $rule->{"sandbox-grants"} && $rule->{"sandbox-grants"} eq
             (join ",", @{$allow ? $decision->{sandbox_grants} : $prepared->{sandbox_grants}});
 
-      if (defined $prepared->{subject}) {
-         die "Persistent permission scope was not offered\n"
-            unless defined $rule->{subject}
-               && grep $_->{subject} eq $rule->{subject}, @{$prepared->{subjects}};
-      } else {
-         die "Unexpected persistent subject\n" if exists $rule->{subject};
+      for my $name (keys %{$prepared->{dimensions} || {}}) {
+         my $key = "match.$name";
+         die "Persistent dimension scope was not offered\n"
+            unless defined $rule->{$key}
+               && grep $_->{match} eq $rule->{$key},
+                  @{$prepared->{dimensions}{$name}{choices}};
       }
       if (exists $rule->{path}) {
          die "Invalid persistent denial path\n" unless !$allow
@@ -706,17 +755,6 @@ sub resolve {
          unless (!$allow || !defined $decision->{message})
             && (defined $rule->{message} ? $rule->{message} : "")
                eq (defined $decision->{message} ? $decision->{message} : "");
-      if (defined $prepared->{workdir}) {
-         if (($decision->{workdir_scope} // "") eq "all") {
-            die "Unexpected persistent workdir\n" if exists $rule->{workdir};
-         } else {
-            die "Persistent workdir mismatch\n" unless defined $rule->{workdir}
-               && $rule->{workdir} eq $prepared->{workdir};
-         }
-      } else {
-         die "Unexpected persistent workdir\n" if exists $rule->{workdir};
-         die "Unexpected persistent workdir scope\n" if exists $decision->{workdir_scope};
-      }
 
       my $rules = $self->rules;
       push @$rules, { %$rule };
@@ -838,7 +876,8 @@ sub _resume {
       && ($response->{action} // "") =~ /\A(?:accept|decline|cancel)\z/
       ? $response->{action} : "invalid";
    AE::log debug => "permission elicitation: continuation received (stage $pending->{stage}, action $action)";
-   my $decision = AnyEvent::MCP::Permissions::Ask::decision ($pending->{prepared}, $response, $pending->{stage}, $pending->{selection});
+   my $decision = AnyEvent::MCP::Permissions::Ask::decision
+      $pending->{prepared}, $response, $pending->{stage}, $pending->{selection};
    if (my $next = _next_stage ($decision, $pending->{stage})) {
       $self->_challenge ($req, $pending->{request}, $pending->{prepared}, $pending->{grants},
          $next, ($pending->{rounds} || 1) + 1, { %{$pending->{selection} || {}}, %$decision });
@@ -895,7 +934,10 @@ sub require {
          unless $pending && $pending->{call} eq _call ($req)
             && JSON::XS->new->canonical->encode ($pending->{request}) eq JSON::XS->new->canonical->encode ($request);
       my $response = $req->{params}{inputResponses}{permission};
-      my $decision = eval { AnyEvent::MCP::Permissions::Ask::decision ($pending->{prepared}, $response, $pending->{stage}, $pending->{selection}) };
+      my $decision = eval {
+         AnyEvent::MCP::Permissions::Ask::decision
+            $pending->{prepared}, $response, $pending->{stage}, $pending->{selection}
+      };
       return $done->(0, "$@") if $@;
       if (my $next = _next_stage ($decision, $pending->{stage})) {
          $self->_challenge ($req, $pending->{request}, $pending->{prepared}, $pending->{grants},

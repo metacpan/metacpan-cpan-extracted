@@ -10,14 +10,13 @@ use Storable;
 use Capture::Tiny ':all';
 use CGI::Info;
 use CGI::Lingua;
+use Test::Needs 'Test::Log::Abstraction';
 use Test::NoWarnings;
 use Directory::Scratch;
 use autodie qw(:all);
 use HTTP::Response;
 use HTTP::Headers;
 use Cwd;
-use lib 't/lib';
-use MyLogger;
 
 BEGIN {
 	use_ok('FCGI::Buffer');
@@ -188,7 +187,7 @@ CACHED: {
 			cache => $cache,
 			cache_key => 'test4',
 			info => new_ok('CGI::Info'),
-			logger => MyLogger->new()
+			logger => Test::Log::Abstraction->new()
 		});
 
 		ok($b->can_cache() == 1);
@@ -298,11 +297,7 @@ CACHED: {
 	ok($headers =~ /^ETag:\s+.+/m);
 	ok($headers =~ /^Expires: /m);
 
-	if($^O eq 'MSWin32') {
-		ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
-	} else {
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
-	}
+	ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
 
 	$ENV{'SCRIPT_NAME'} = '/cgi-bin/test5.cgi';
 	$ENV{'REQUEST_URI'} = '/cgi-bin/test5.cgi?fred=wilma';
@@ -315,11 +310,7 @@ CACHED: {
 	ok($headers =~ /^ETag:\s+.+/m);
 	ok($headers =~ /^Expires: /m);
 
-	if($^O eq 'MSWin32') {
-		ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
-	} else {
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
-	}
+	ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
 
 	ok(-f "$tempdir/web/English/test5.cgi/arg1=a_arg2=b.html");
 	open(my $fin, '<', "$tempdir/web/English/test5.cgi/arg1=a_arg2=b.html");
@@ -363,11 +354,7 @@ CACHED: {
 	ok($headers =~ /^ETag:\s+.+/m);
 	ok($headers =~ /^Expires: /m);
 
-	if($^O eq 'MSWin32') {
-		ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
-	} else {
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
-	}
+	ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
 	ok($body !~ /"\?arg1=a/m);
 
 	ok($headers =~ /^Content-Length:\s+(\d+)/m);
@@ -390,7 +377,7 @@ CACHED: {
 				info => $info,
 			),
 			save_to => $save_to,
-			logger => MyLogger->new()
+			logger => Test::Log::Abstraction->new()
 		});
 
 		ok($b->can_cache() == 1);
@@ -415,11 +402,7 @@ CACHED: {
 	ok($headers =~ /^Expires: /m);
 	ok($headers !~ /^Content-Encoding: gzip/m);
 
-	if($^O eq 'MSWin32') {
-		ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
-	} else {
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
-	}
+	ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
 	ok($body !~ /"\?arg1=a/m);
 
 	ok($headers =~ /^Content-Length:\s+(\d+)/m);
@@ -453,11 +436,7 @@ CACHED: {
 	ok($h->content_encoding() eq 'gzip');
 
 	$body = $r->decoded_content();
-	if($^O eq 'MSWin32') {
-		ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
-	} else {
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
-	}
+	ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
 	ok($body !~ /"\?arg1=a/m);
 
 	$ENV{'REQUEST_METHOD'} = 'HEAD';
@@ -498,7 +477,7 @@ CACHED: {
 				info => $info,
 			),
 			save_to => $save_to,
-			logger => MyLogger->new(),
+			logger => Test::Log::Abstraction->new(),
 			optimise_content => 1,
 		});
 
@@ -525,11 +504,7 @@ CACHED: {
 	ok($body =~ /<a href="\?arg2=b">link<\/a>/mi);
 	ok($body =~ /<a href=\"\/\/github.com\/nigelhorne/mi);
 	ok($body =~ /<a href=\"\/cgi-bin\/test4.cgi\?arg3=c">/mi);
-	if($^O eq 'MSWin32') {
-		ok($body =~ /\\web\\English\\test4.cgi\\arg1=a_arg2=b\.html"/m);
-	} else {
-		ok($body =~ /"\/web\/English\/test4.cgi\/arg1=a_arg2=b\.html"/m);
-	}
+	ok($body =~ /"\/web\/English\/test4.cgi\/arg1=a_arg2=b\.html"/m);
 
 	ok(-f "$tempdir/web/English/test6.cgi/arg1=a_arg2=b.html");
 	open($fin, '<', "$tempdir/web/English/test6.cgi/arg1=a_arg2=b.html");

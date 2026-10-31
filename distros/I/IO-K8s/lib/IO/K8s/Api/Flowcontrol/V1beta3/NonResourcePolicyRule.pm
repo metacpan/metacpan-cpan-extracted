@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::NonResourcePolicyRule;
 # ABSTRACT: NonResourcePolicyRule is a predicate that matches non-resource requests according to their verb and the target non-resource URL. A NonResourcePolicyRule matches a request if and only if both (a) at least one member of verbs matches the request and (b) at least one member of nonResourceURLs matches the request.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s nonResourceURLs => [Str], 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::NonResourcePolicyRule - NonResourcePolicyRul
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 nonResourceURLs
 
@@ -53,7 +53,7 @@ C<verbs> is a list of matching verbs and may not be empty. "*" matches all verbs
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -81,5 +81,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

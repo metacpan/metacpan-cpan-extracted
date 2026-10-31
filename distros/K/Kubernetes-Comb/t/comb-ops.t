@@ -180,6 +180,18 @@ subtest 'logs' => sub {
     "==> nats-b/sidecar <==\n", "ok\n"
   ), 'several: headers, the crash-looping container from its previous instance';
 
+  $k8s->add( pod( 'nats-c',
+    init => [
+      { name => 'fetch', state => { terminated => { exitCode => 0, reason => 'Completed' } } },
+      { name => 'migrate', restartCount => 3, state => { waiting => { reason => 'CrashLoopBackOff' } } },
+    ],
+    phase      => 'Pending',
+    containers => [ { name => 'nats', ready => 0, state => { waiting => { reason => 'PodInitializing' } } } ]
+  ) );
+  $k8s->set_log( name => 'nats-c', namespace => 'platform', container => 'migrate', previous => 1, text => "migration failed\n" );
+  like $comb->logs->get, qr{==> nats-c/init:migrate \(previous\) <==\nmigration failed\n}, 'a crashing init container shows its previous log';
+  unlike $comb->logs->get, qr{init:fetch}, 'an init container that exited 0 is left out';
+
   $k8s->clear_calls->fail_on( log => 'Kubernetes API error (log Pod): 400 container is starting', when => sub { $_[1] eq 'nats-a' } );
   my $text = $comb->logs->get;
   like $text, qr/==> nats-a <==\n\(no log: Kubernetes API error \(log Pod\): 400 container is starting\)\n/,

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OvhClientToken;
 # ABSTRACT: OvhClientToken defines the configuration required to authenticate to OVHcloud's Secret Manager using a token.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s tokenSecretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::OvhClientToken - OvhClientToken defines the config
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 tokenSecretRef
 
@@ -31,7 +31,7 @@ In some instances, `key` is a required field.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -59,5 +59,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

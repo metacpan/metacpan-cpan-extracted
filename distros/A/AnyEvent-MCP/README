@@ -48,8 +48,12 @@ INSTALLATION
     your usual package manager or CPAN client before continuing. For
     example, the main non-core dependencies can be installed with:
 
-       cpan AnyEvent AnyEvent::HTTP AnyEvent::WebSocket::Server \
-          AnyEvent::WebSocket::Message common::sense JSON::XS
+       cpan AnyEvent AnyEvent::HTTP common::sense JSON::XS
+
+    "mcp-webbrowser" requires "AnyEvent::WebSocket::Server" and
+    "AnyEvent::WebSocket::Message". "mcp-vim" needs them only for browser
+    connections, not for ordinary Vim clients. Both modules are recommended
+    rather than required by the distribution.
 
     Use the same Perl installation for dependency installation, building and
     running the servers. A module installed for the system Perl might not be
@@ -447,13 +451,13 @@ PERMISSIONS IN PRACTICE
        [rule]
        decision=allow
        action=inspect
-       workdir=/home/alice/src/project
+       match.workdir=/home/alice/src/project
        sandbox-grants=workdir-read
 
        [rule]
        decision=allow
        action=read
-       workdir=/home/alice/src/project
+       match.workdir=/home/alice/src/project
        sandbox-grants=workdir-read
 
        [rule]
@@ -472,9 +476,9 @@ PERMISSIONS IN PRACTICE
     Rules run in order, stopping at the first match. An allow rule matches
     only when its grants cover the request, including implications.
     "workdir-write" implies "workdir-read"; "network" remains independent.
-    Action and subject match exactly unless beginning with "^", which
-    selects a Perl regular expression. Workdir matching is always exact. An
-    explicit "ask" rule can override later allow rules.
+    Action and "match.NAME" match exactly unless beginning with "^", which
+    selects a Perl regular expression; workdir scopes use the same
+    mechanism. An explicit "ask" rule can override later allow rules.
 
     These allow rules authorize sandbox access to the selected workdir. They
     cannot confine authority to one file or a subtree inside it. Filesystem
@@ -530,9 +534,12 @@ PERMISSIONS IN PRACTICE
           mcp-fs --stdio --name code /home/alice/src/project
 
     An explicit application "ask" setting or "--ask" overrides the
-    environment. For spawned stdio children, "mcp-multibroker --ask auto"
-    passes this default to them. It cannot change the environment of an
-    independently running HTTP server.
+    environment. The multibroker sets this default to "mcp" for spawned
+    stdio children, regardless of its own asking mode. Children delegate
+    permission prompts to their calling MCP client; the multibroker handles
+    or forwards those prompts according to its own "--ask" mode. An explicit
+    child "--ask" still overrides this default. Independently running HTTP
+    servers keep their own configuration.
 
     The multibroker can handle form elicitation locally for both stdio and
     HTTP children. "--ask helper" selects local dialogs even if the upstream

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: perfos.h,v 1.6 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -25,12 +25,8 @@ extern "C" {
 
 #ifndef _WIN32
 
-#include <stdio.h>
-#include <math.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <X11/Xlib.h>
+#include "Types.h"
+
 
   typedef struct
   {

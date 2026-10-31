@@ -294,7 +294,7 @@ say "\n# Note: t/10-Bin-path/foo/bar is a cyclic symlink (intentional test",
     # after three modules and examples the version has to float
     # independent of just the modules.
 
-  , VERSION         => v5.0.4
+  , VERSION         => v5.1.1
   , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
   , PREREQ_PM       =>
     {

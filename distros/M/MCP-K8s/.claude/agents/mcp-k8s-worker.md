@@ -5,6 +5,7 @@ model: inherit
 briefing:
   skills:
     - mcp-k8s-core
+    - mcp-k8s-hazards
     - getty-perl-core
     - getty-perl-moo
     - perl-mcp

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-# $Id: color-circular.pl,v 1.6 2004/04/30 11:35:18 lecoanet Exp $
+# $Id$
 # these simple samples have been developped by C. Mertz mertz@cena.fr
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

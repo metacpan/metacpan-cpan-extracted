@@ -15,6 +15,9 @@ pod_coverage_ok(
             Button1
             DefaultEvents
             Delete
+            Insert
+            ReplaceSelectionsWith
+            clipboardCut
             KeySelect
             RemoveTextBinds
             ScrollPages

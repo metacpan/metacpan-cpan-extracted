@@ -1,4 +1,4 @@
-YATT::Lite - Template with "use strict" ![Build Status](https://github.com/hkoba/yatt_lite/actions/workflows/perl_linux.yml/badge.svg)
+YATT::Lite - Template with "use strict" ![Build Status](https://github.com/hkoba/yatt_lite/actions/workflows/perl_linux.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/hkoba/yatt_lite/badge.svg?branch=dev)](https://coveralls.io/github/hkoba/yatt_lite?branch=dev)
 ==================
 
 YATT is Yet Another Template Toolkit, strongly aimed at **static checking of

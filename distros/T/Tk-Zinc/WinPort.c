@@ -4,7 +4,7 @@
  * Authors		: Patrick Lecoanet.
  * Creation date	:
  *
- * $Id: WinPort.c,v 1.7 2005/04/27 08:02:42 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -25,8 +25,6 @@
 #include <tkIntPlatDecls.m>
 #endif
 
-static const char rcsid[] = "$Id";
-static const char compile_id[]="$Compile$";
 
 #ifndef MIN
 #define MIN(a, b) 	((a) <= (b) ? (a) : (b))
@@ -144,14 +142,16 @@ ZnPolygonRegion(XPoint	*points,
   return (TkRegion) reg;
 }
 
+#ifndef PI
 #define PI 3.14159265358979
+#endif
 #define XAngleToRadians(a) ((double)(a) / 64 * PI / 180);
 
 /*
  * Translation table between X gc functions and Win32 raster op modes.
  */
 
-int tkpWinRopModes[] = {
+static int znWinRopModes[] = {
     R2_BLACK,			/* GXclear */
     R2_MASKPEN,			/* GXand */
     R2_MASKPENNOT,		/* GXandReverse */
@@ -182,8 +182,8 @@ int tkpWinRopModes[] = {
  * The followng typedef is used to pass Windows GDI drawing functions.
  */
 
-typedef BOOL (CALLBACK *WinDrawFunc) _ANSI_ARGS_((HDC dc,
-			    CONST POINT* points, int npoints));
+typedef BOOL (CALLBACK *WinDrawFunc)(HDC dc,
+			    const POINT* points, int npoints);
 
 typedef struct ThreadSpecificData {
     POINT *winPoints;    /* Array of points that is reused. */
@@ -365,7 +365,7 @@ ConvertPoints(points, npoints, mode, bbox)
  *----------------------------------------------------------------------
  */
 void
-XFillRectangles(display, d, gc, rectangles, nrectangles)
+ZnXFillRectangles(display, d, gc, rectangles, nrectangles)
     Display* display;
     Drawable d;
     GC gc;
@@ -377,14 +377,14 @@ XFillRectangles(display, d, gc, rectangles, nrectangles)
     RECT rect;
     TkWinDCState state;
     HBRUSH brush;
-    TkpClipMask *clipPtr = (TkpClipMask*)gc->clip_mask;
+    TkpClipMask *clipPtr = (TkpClipMask *)(uintptr_t)gc->clip_mask;
 
     if (d == None) {
 	return;
     }
 
     dc = TkWinGetDrawableDC(display, d, &state);
-    SetROP2(dc, tkpWinRopModes[gc->function]);
+    SetROP2(dc, znWinRopModes[gc->function]);
     brush = CreateSolidBrush(gc->foreground);
 
     if (clipPtr && clipPtr->type == TKP_CLIP_REGION) {
@@ -394,7 +394,7 @@ XFillRectangles(display, d, gc, rectangles, nrectangles)
     if ((gc->fill_style == FillStippled
 	    || gc->fill_style == FillOpaqueStippled)
 	    && gc->stipple != None) {
-	TkWinDrawable *twdPtr = (TkWinDrawable *)gc->stipple;
+	TkWinDrawable *twdPtr = (TkWinDrawable *)(uintptr_t)gc->stipple;
 	HBRUSH oldBrush, stipple;
 	HBITMAP oldBitmap, bitmap;
 	HDC dcMem;
@@ -472,7 +472,7 @@ XFillRectangles(display, d, gc, rectangles, nrectangles)
  */
 
 void
-XFillRectangle(display, d, gc, x, y, width, height)
+ZnXFillRectangle(display, d, gc, x, y, width, height)
     Display* display;
     Drawable d;
     GC gc;
@@ -520,7 +520,7 @@ RenderObject(dc, gc, points, npoints, mode, pen, func)
     HPEN oldPen;
     HBRUSH oldBrush;
     POINT *winPoints = ConvertPoints(points, npoints, mode, &rect);
-    TkpClipMask *clipPtr = (TkpClipMask*)gc->clip_mask;
+    TkpClipMask *clipPtr = (TkpClipMask *)(uintptr_t)gc->clip_mask;
     
     if (clipPtr && clipPtr->type == TKP_CLIP_REGION) {
 	SelectClipRgn(dc, (HRGN) clipPtr->value.region);
@@ -530,7 +530,7 @@ RenderObject(dc, gc, points, npoints, mode, pen, func)
 	    || gc->fill_style == FillOpaqueStippled)
 	    && gc->stipple != None) {
 
-	TkWinDrawable *twdPtr = (TkWinDrawable *)gc->stipple;
+	TkWinDrawable *twdPtr = (TkWinDrawable *)(uintptr_t)gc->stipple;
 	HDC dcMem;
 	LONG width, height;
 	HBITMAP oldBitmap;
@@ -613,7 +613,7 @@ RenderObject(dc, gc, points, npoints, mode, pen, func)
     } else {
 	oldPen = SelectObject(dc, pen);
 	oldBrush = SelectObject(dc, CreateSolidBrush(gc->foreground));
-	SetROP2(dc, tkpWinRopModes[gc->function]);
+	SetROP2(dc, znWinRopModes[gc->function]);
 
 	SetPolyFillMode(dc, (gc->fill_rule == EvenOddRule) ? ALTERNATE
 		: WINDING);
@@ -642,7 +642,7 @@ RenderObject(dc, gc, points, npoints, mode, pen, func)
  */
 
 void
-XDrawLines(display, d, gc, points, npoints, mode)
+ZnXDrawLines(display, d, gc, points, npoints, mode)
     Display* display;
     Drawable d;
     GC gc;
@@ -653,7 +653,7 @@ XDrawLines(display, d, gc, points, npoints, mode)
     HPEN pen;
     TkWinDCState state;
     HDC dc;
-    TkpClipMask *clipPtr = (TkpClipMask*)gc->clip_mask;
+    TkpClipMask *clipPtr = (TkpClipMask *)(uintptr_t)gc->clip_mask;
     
     if (d == None) {
 	return;
@@ -690,7 +690,7 @@ XDrawLines(display, d, gc, points, npoints, mode)
  */
 
 void
-XDrawLine(display, d, gc, x1, y1, x2, y2)
+ZnXDrawLine(display, d, gc, x1, y1, x2, y2)
     Display* display;
     Drawable d;
     GC gc;
@@ -722,7 +722,7 @@ XDrawLine(display, d, gc, x1, y1, x2, y2)
  */
 
 void
-XFillPolygon(display, d, gc, points, npoints, shape, mode)
+ZnXFillPolygon(display, d, gc, points, npoints, shape, mode)
     Display* display;
     Drawable d;
     GC gc;
@@ -764,7 +764,7 @@ XFillPolygon(display, d, gc, points, npoints, shape, mode)
  */
 
 void
-XDrawRectangle(display, d, gc, x, y, width, height)
+ZnXDrawRectangle(display, d, gc, x, y, width, height)
     Display* display;
     Drawable d;
     GC gc;
@@ -777,7 +777,7 @@ XDrawRectangle(display, d, gc, x, y, width, height)
     TkWinDCState state;
     HBRUSH oldBrush;
     HDC dc;
-    TkpClipMask *clipPtr = (TkpClipMask*)gc->clip_mask;
+    TkpClipMask *clipPtr = (TkpClipMask *)(uintptr_t)gc->clip_mask;
 
     if (d == None) {
 	return;
@@ -793,7 +793,7 @@ XDrawRectangle(display, d, gc, x, y, width, height)
     SetBkMode(dc, TRANSPARENT);
     oldPen = SelectObject(dc, pen);
     oldBrush = SelectObject(dc, GetStockObject(NULL_BRUSH));
-    SetROP2(dc, tkpWinRopModes[gc->function]);
+    SetROP2(dc, znWinRopModes[gc->function]);
 
     Rectangle(dc, x, y, x+width+1, y+height+1);
 
@@ -837,7 +837,7 @@ DrawOrFillArc(display, d, gc, x, y, width, height, start, extent, fill)
     int clockwise = (extent < 0); /* non-zero if clockwise */
     int xstart, ystart, xend, yend;
     double radian_start, radian_end, xr, yr;
-    TkpClipMask *clipPtr = (TkpClipMask*)gc->clip_mask;
+    TkpClipMask *clipPtr = (TkpClipMask *)(uintptr_t)gc->clip_mask;
 
     if (d == None) {
 	return;
@@ -849,7 +849,7 @@ DrawOrFillArc(display, d, gc, x, y, width, height, start, extent, fill)
 	SelectClipRgn(dc, (HRGN) clipPtr->value.region);
 	OffsetClipRgn(dc, gc->clip_x_origin, gc->clip_y_origin);
     }
-    SetROP2(dc, tkpWinRopModes[gc->function]);
+    SetROP2(dc, znWinRopModes[gc->function]);
 
     /*
      * Compute the absolute starting and ending angles in normalized radians.
@@ -912,7 +912,7 @@ DrawOrFillArc(display, d, gc, x, y, width, height, start, extent, fill)
       brush = CreateSolidBrush(gc->foreground);
 
       if (gc->fill_style == FillStippled && gc->stipple != None) {
-	TkWinDrawable *twdPtr = (TkWinDrawable *)gc->stipple;
+	TkWinDrawable *twdPtr = (TkWinDrawable *)(uintptr_t)gc->stipple;
 	HBITMAP oldBitmap;
 	HDC dcMem;
 	HBRUSH oldMemBrush;
@@ -979,7 +979,7 @@ DrawOrFillArc(display, d, gc, x, y, width, height, start, extent, fill)
  */
 
 void
-XDrawArc(display, d, gc, x, y, width, height, start, extent)
+ZnXDrawArc(display, d, gc, x, y, width, height, start, extent)
     Display* display;
     Drawable d;
     GC gc;
@@ -1012,7 +1012,7 @@ XDrawArc(display, d, gc, x, y, width, height, start, extent)
  */
 
 void
-XFillArc(display, d, gc, x, y, width, height, start, extent)
+ZnXFillArc(display, d, gc, x, y, width, height, start, extent)
     Display* display;
     Drawable d;
     GC gc;

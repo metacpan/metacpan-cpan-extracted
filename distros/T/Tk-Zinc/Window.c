@@ -20,9 +20,15 @@
 #include "WidgetInfo.h"
 #include "tkZinc.h"
 
+#include <stdio.h>
+#include "WindowUtils.h"
 
-static const char rcsid[] = "$Id: Window.c,v 1.20 2005/05/25 08:28:10 lecoanet Exp $";
-static const char compile_id[] = "$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
+/* We need to include tkPlatDecls to use Tk_GetHWND */
+#if defined(_WIN32) && defined(PTK) && !defined(PTK_800)
+#include <tkPlatDecls.m>
+#endif
+
+
 
 /*
  **********************************************************************************
@@ -41,17 +47,29 @@ typedef struct _WindowItemStruct {
   Tk_Window     win;
   int           width;
   int           height;
+  char         *windowtitle;
   
   /* Private data */
   ZnPoint       pos_dev;
   int           real_width;
   int           real_height;
+  
+#ifdef _WIN32
+   HWND        externalwindow;
+   LONG        externalwindowstyle;
+#else
+   Window      externalwindow;
+#endif /* ifdef _WIN32 */
+  
 } WindowItemStruct, *WindowItem;
 
 
 static ZnAttrConfig     wind_attrs[] = {
   { ZN_CONFIG_ANCHOR, "-anchor", NULL,
     Tk_Offset(WindowItemStruct, anchor), 0, ZN_COORDS_FLAG, False },
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(WindowItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
     Tk_Offset(WindowItemStruct, header.flags), ZN_COMPOSE_ALPHA_BIT,
     ZN_DRAW_FLAG, False },
@@ -86,6 +104,9 @@ static ZnAttrConfig     wind_attrs[] = {
   { ZN_CONFIG_WINDOW, "-window", NULL,
     Tk_Offset(WindowItemStruct, win), 0,
     ZN_COORDS_FLAG|ZN_WINDOW_FLAG, False },
+  { ZN_CONFIG_STRING, "-windowtitle", NULL,
+    Tk_Offset(WindowItemStruct, windowtitle), 0,
+    ZN_COORDS_FLAG|ZN_WINDOW_FLAG, False },
   
   { ZN_CONFIG_END, NULL, NULL, 0, 0, 0, False }
 };
@@ -119,6 +140,7 @@ WindowDeleted(ClientData        client_data,
  *
  **********************************************************************************
  */
+
 
 /*
  * A managed window changes requested dimensions.
@@ -159,6 +181,178 @@ static Tk_GeomMgr wind_geom_type = {
 };
 
 
+
+/*
+ **********************************************************************************
+ *
+ * Manage external Window -- Reparent, Unparent, Resize
+ *
+ **********************************************************************************
+ */
+
+/*
+ * Create a Tk_Window
+ */
+ static int WINDOW_PRIVATE_TK_WINDOW_COUNTER = 0;
+ 
+ static void
+ WindowCreateTkWindow(ZnItem item)
+ {
+    ZnWInfo    *wi = item->wi;
+    WindowItem wind = (WindowItem) item;
+    char buffer[32];
+     
+    if (wind->win == 0) {
+      /* create a unique name */
+      sprintf(buffer, "_private_tkwindow_%d", WINDOW_PRIVATE_TK_WINDOW_COUNTER);
+      WINDOW_PRIVATE_TK_WINDOW_COUNTER++;
+     
+      /* create a new Tk_Window */
+      wind->win = Tk_CreateWindow(wi->interp, wi->win, buffer, NULL);
+    }
+ }
+
+ 
+ /*
+ * Resize an external window
+ */
+static void
+WindowResizeExternalWindow(ZnItem item, int width, int height)
+{
+    ZnWInfo    *wi = item->wi;
+    WindowItem wind = (WindowItem) item;
+    
+    /* Our window (wi->win) must exists before doing anything */
+    Tk_MakeWindowExist(wi->win);
+    Tk_MakeWindowExist(wind->win);
+    
+#ifdef _WIN32
+    /* Resize our external window if needed */
+    if (wind->externalwindow != 0) {
+      MoveWindow(wind->externalwindow, 0, 0, width, height, TRUE);
+    }
+
+#else
+    /* Resize our external window if needed */
+    if (wind->externalwindow != 0) {
+      XResizeWindow(wi->dpy, wind->externalwindow, width, height);
+      XFlush(wi->dpy); 
+    }
+
+#endif /* ifdef _WIN32 */
+}
+
+
+/*
+ * Reparent/capture an external window
+ */
+static void
+WindowCaptureExternalWindow(ZnItem item)
+{
+    ZnWInfo    *wi = item->wi;
+    WindowItem wind = (WindowItem) item;
+
+#ifdef _WIN32
+   /* Try to find a window matching windowtitle */
+   HWND externalWindow = SearchWindowByTitle(wind->windowtitle, wi->dpy, NULL, 0);
+   
+   /* Test if we can reparent our window */
+   if ((externalWindow != 0) && (wi->win != 0)) {
+      /* Save external window */
+      wind->externalwindow = externalWindow;
+      
+      /* Test if we must create a window */
+      if (wind->win == NULL) {
+         /* Create a new window */
+         WindowCreateTkWindow(item);
+      }
+      
+      /* Our window must exists before we try to reparent an external window */
+      Tk_MakeWindowExist(wi->win);
+      Tk_MakeWindowExist(wind->win);
+      
+      /* remove window decoration */
+      wind->externalwindowstyle = removeWindowDecoration(externalWindow);
+      ShowWindow(externalWindow, SW_SHOW);
+            
+      /* Reparent our external window */
+      SetParent(externalWindow, Tk_GetHWND(Tk_WindowId(wind->win)));
+      ShowWindow(externalWindow, SW_SHOW);
+      
+      /* Windows only: we must resize our external window */
+      WindowResizeExternalWindow(item, wind->real_width, wind->real_height);
+   }
+
+#else
+   /* Try to find a window matching windowtitle */
+   Window externalWindow = SearchWindowByTitle(wind->windowtitle, wi->dpy, RootWindowOfScreen(wi->screen), 0);
+
+   /* Test if we can reparent our window */
+   if ((externalWindow != 0) && (wi->win != 0)) {
+      /* Save external window */
+      wind->externalwindow = externalWindow;
+   
+      /* Test if we must create a window */
+      if (wind->win == NULL) {
+         /* Create a new window */
+         WindowCreateTkWindow(item);
+      }
+      
+      /* Our window must exists before we try to reparent an external window */
+      Tk_MakeWindowExist(wi->win);
+      Tk_MakeWindowExist(wind->win);
+   
+      /* Withdraw our external window from desktop */
+      withdrawWindowFromDesktop (wi->dpy, externalWindow, Tk_ScreenNumber(wi->win));
+      
+      /* Reparent our external window */
+      XAddToSaveSet (wi->dpy, externalWindow);
+      XReparentWindow(wi->dpy, externalWindow, Tk_WindowId(wind->win), 0, 0);
+      XMapWindow(wi->dpy, externalWindow);
+      XFlush(wi->dpy);
+   }
+
+#endif /* ifdef _WIN32 */
+}
+
+
+/*
+ * Unparent/release an external window
+ */
+static void
+WindowReleaseExternalWindow(ZnItem item)
+{
+    ZnWInfo    *wi = item->wi;
+    WindowItem wind = (WindowItem) item;
+    
+#ifdef _WIN32
+   /* Test if we must release an external window */
+   if (wind->externalwindow != 0) {   
+       /* restore window style */
+       restoreWindowStyle(wind->externalwindow, wind->externalwindowstyle);	   
+	   wind->externalwindowstyle = 0;
+       
+       /* Reparent our external window (new parent is the main root window) */
+       SetParent(wind->externalwindow, NULL);
+   }
+
+#else
+   /* Test if we must release an external window */
+   if (wind->externalwindow != 0) {
+       /* Reparent our external window (new parent is the main root window) */
+       XReparentWindow(wi->dpy, wind->externalwindow, XRootWindow(wi->dpy, Tk_ScreenNumber(wi->win)), 0, 0);
+       XMapWindow(wi->dpy, wind->externalwindow);
+       XFlush(wi->dpy);
+       XRemoveFromSaveSet(wi->dpy, wind->externalwindow);
+   }
+#endif /* ifdef _WIN32 */
+
+   /* Reset externalwindow */
+   wind->externalwindow = 0;
+}
+
+
+
 /*
  **********************************************************************************
  *
@@ -169,13 +363,14 @@ static Tk_GeomMgr wind_geom_type = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   WindowItem    wind = (WindowItem) item;
 
   /* Init attributes */
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT); /* N.A */
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -186,6 +381,8 @@ Init(ZnItem             item,
   wind->anchor = TK_ANCHOR_NW;
   wind->connection_anchor = TK_ANCHOR_SW;
   wind->win = NULL;
+  wind->windowtitle = NULL;
+  wind->externalwindow = 0;
   
   return TCL_OK;
 }
@@ -207,6 +404,8 @@ Clone(ZnItem    item)
    * The same Tk widget can't be shared by to Window items.
    */
   wind->win = NULL;
+  wind->windowtitle = NULL;
+  wind->externalwindow = 0;
 }
 
 
@@ -222,6 +421,17 @@ Destroy(ZnItem  item)
 {
   ZnWInfo       *wi = item->wi;
   WindowItem    wind = (WindowItem) item;
+
+
+  /*
+   * Unmanage external window if needed
+   */
+  if (wind->externalwindow != 0) {
+    WindowReleaseExternalWindow(item);
+  }
+  if (wind->windowtitle) {
+    ZnFree(wind->windowtitle);
+  }
 
   /*
    * Unmanage the widget.
@@ -248,17 +458,20 @@ Destroy(ZnItem  item)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   WindowItem    wind = (WindowItem) item;
   ZnWInfo       *wi = item->wi;
   ZnItem        old_connected;
   Tk_Window     old_win;
+  const char   *old_windowtitle = wind->windowtitle;
   
   old_connected = item->connected_item;
   old_win = wind->win;
+  
   if (ZnConfigureAttributes(wi, item, item, wind_attrs, argc, argv, flags) == TCL_ERROR) {
+    item->connected_item = old_connected;
     return TCL_ERROR;
   }  
 
@@ -285,6 +498,24 @@ Configure(ZnItem        item,
       Tk_UnmaintainGeometry(old_win, wi->win);
       Tk_UnmapWindow(old_win);
     }
+
+    if (wind->windowtitle != NULL) {      
+      if (old_windowtitle == 0) {
+         /* It's a new capture */
+         WindowCaptureExternalWindow(item);
+      
+      } else {
+         /* Test if we must capture a new window */
+         if (strcmp(old_windowtitle, (const char *)(wind->windowtitle)) != 0) {
+            /* release previous external window */
+            WindowReleaseExternalWindow(item);
+            
+            /* Capture a new window */
+            WindowCaptureExternalWindow(item);
+         }
+      }
+    }
+    
     if (wind->win != NULL) {
       Tk_CreateEventHandler(wind->win, StructureNotifyMask,
                             WindowDeleted, (ClientData) item);
@@ -295,7 +526,7 @@ Configure(ZnItem        item,
   if ((wind->win != NULL) &&
       ISSET(*flags, ZN_VIS_FLAG) &&
       ISCLEAR(item->flags, ZN_VISIBLE_BIT)) {
-    Tk_UnmapWindow(wind->win);
+      Tk_UnmapWindow(wind->win);
   }
 
   return TCL_OK;
@@ -312,7 +543,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, wind_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -387,7 +618,7 @@ ComputeCoordinates(ZnItem       item,
   ZnTransfo  *t;
 
   ZnResetBBox(&item->item_bounding_box);
-  
+
   if (wind->win == NULL) {
     return;
   }
@@ -511,6 +742,7 @@ Draw(ZnItem     item)
                         wind->real_width, wind->real_height);
   }
   
+  WindowResizeExternalWindow(item, wind->real_width, wind->real_height);
 }
 
 
@@ -596,7 +828,7 @@ PostScript(ZnItem item,
   sprintf(path, "\n%%%% %s item (%s, %d x %d)\n%.15g %.15g translate\n",
           Tk_Class(wind->win), Tk_PathName(wind->win), wind->real_width, wind->real_height,
           wind->pos_dev.x, wind->pos_dev.y);
-  Tcl_AppendResult(wi->interp, path, NULL);
+  Tcl_AppendResult(wi->interp, path, (char *) NULL);
 
   ComputeTransfoAndOrigin(item, &origin);
   
@@ -604,7 +836,7 @@ PostScript(ZnItem item,
           "%.15g %.15g translate\n"
           "1 -1 scale\n",
           wind->pos_dev.x, wind->pos_dev.y + wind->real_height);
-  Tcl_AppendResult(wi->interp, path, NULL);
+  Tcl_AppendResult(wi->interp, path, (char *) NULL);
 
   /* first try if the widget has its own "postscript" command. If it
    * exists, this will produce much better postscript than
@@ -621,13 +853,13 @@ PostScript(ZnItem item,
   Tcl_DStringFree(&buffer2);
 
   if (result == TCL_OK) {
-    Tcl_AppendResult(wi->interp, "50 dict begin\nsave\ngsave\n", NULL);
+    Tcl_AppendResult(wi->interp, "50 dict begin\nsave\ngsave\n", (char *) NULL);
     sprintf (path, "0 %d moveto %d 0 rlineto 0 -%d rlineto -%d",
              wind->real_height, wind->real_width, wind->real_height, wind->real_width);
-    Tcl_AppendResult(wi->interp, path, NULL);
+    Tcl_AppendResult(wi->interp, path, (char *) NULL);
     Tcl_AppendResult(wi->interp, " 0 rlineto closepath\n",
                      "1.000 1.000 1.000 setrgbcolor AdjustColor\nfill\ngrestore\n",
-                     Tcl_DStringValue(&buffer1), "\nrestore\nend\n\n\n", NULL);
+                     Tcl_DStringValue(&buffer1), "\nrestore\nend\n\n\n", (char *) NULL);
     Tcl_DStringFree(&buffer1);
 
     return result;
@@ -745,13 +977,13 @@ Coords(ZnItem           item,
   
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " windows can't add or remove vertices", NULL);
+                     " windows can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if ((cmd == ZN_COORDS_REPLACE) || (cmd == ZN_COORDS_REPLACE_ALL)) {
     if (*num_pts == 0) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 1 point on windows", NULL);
+                       " coords command need 1 point on windows", (char *) NULL);
       return TCL_ERROR;
     }
     wind->pos = (*pts)[0];
@@ -799,6 +1031,7 @@ static ZnItemClassStruct WINDOW_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Draw,                 /* Render use the same code as Draw. */
   IsSensitive,
   Pick,

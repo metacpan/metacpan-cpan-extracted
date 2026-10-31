@@ -1,5 +1,5 @@
 use strict;
-use fields qw(cf_datadir cf_tmpdir cf_config);
+use YATT::Lite::MFields qw(datadir tmpdir config);
 use YATT::Lite::Entities qw(*CON);
 Entity YATT => sub {shift->YATT};
 use Carp;
@@ -9,9 +9,9 @@ Entity config => sub {
   my ($this) = shift;
   my MY $yatt = $this->YATT;
   if (@_) {
-    $yatt->{cf_config}->{$_[0]};
+    $yatt->{config}->{$_[0]};
   } else {
-    $yatt->{cf_config};
+    $yatt->{config};
   }
 };
 
@@ -40,7 +40,7 @@ sub mh_alloc_newfh {
 
   my ($fname);
   do {
-    $fname = "$yatt->{cf_datadir}/.ht_" . ++$fnum;
+    $fname = "$yatt->{datadir}/.ht_" . ++$fnum;
   } while (-e $fname);
 
   seek $lockfh, 0, SEEK_SET
@@ -69,7 +69,7 @@ sub mh_lastfnum {
 
 sub mh_openlock {
   (my MY $yatt, my $lock) = @_;
-  my $lockfn = "$yatt->{cf_datadir}/.ht_lock";
+  my $lockfn = "$yatt->{datadir}/.ht_lock";
   sysopen my $lockfh, $lockfn, O_RDWR | O_CREAT
     or die "Can't open '$lockfn': $!";
 
@@ -85,7 +85,7 @@ Entity tsvfile => sub {
   my ($this, $name) = @_;
   my MY $yatt = $this->YATT;
   $name =~ s;(^|/)\.+/;$1;g;
-  my $fn = "$yatt->{cf_dir}/../$name.tsv";
+  my $fn = "$yatt->{dir}/../$name.tsv";
   unless (-r $fn) {
     die "No such file: $fn\n";
   }
@@ -106,7 +106,7 @@ Entity tsvfile => sub {
 sub cmd_setup {
   my MY $self = shift;
   require File::Path;
-  foreach my $dir ($self->{cf_datadir}, $self->{cf_tmpdir}) {
+  foreach my $dir ($self->{datadir}, $self->{tmpdir}) {
     next if -d $dir;
     File::Path::make_path($dir, {mode => 02775, verbose => 1});
   }
@@ -117,8 +117,8 @@ sub after_new {
 
   $self->SUPER::after_new(); # **REQUIRED**
 
-  $self->{cf_tmpdir}  //= $self->app_path_var_tmp;
-  $self->{cf_datadir} //= $self->app_path_var('data');
+  $self->{tmpdir}  //= $self->app_path_var_tmp;
+  $self->{datadir} //= $self->app_path_var('data');
 }
 
 Entity sess_obj => sub {

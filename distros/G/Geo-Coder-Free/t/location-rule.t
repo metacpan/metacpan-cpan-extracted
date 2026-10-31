@@ -93,7 +93,7 @@ my %EXEMPT = (
 	},
 	'lib/Geo/Coder/Free/MissCache.pm' => {
 		'expires_after' => {
-			'^\d+$' => {
+			'\A[0-9]+\z' => {
 				reason => 'a cache lifetime has to be a whole number of seconds: the'
 					. ' same shape of question about a number, which is not something'
 					. ' that could be a location',

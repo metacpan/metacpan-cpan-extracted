@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-# $Id: rotation.pl,v 1.4 2004/04/30 11:35:18 lecoanet Exp $
+# $Id$
 # This simple demo has been developped by C. Schlienger <celine@intuilab.com>
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 
 use Tk;

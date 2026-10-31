@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: AnimatedGradient.t,v 1.2 2005/12/02 20:59:27 mertz Exp $
+# $Id$
 # Author: Christophe Mertz  mertz@intuilab.com
 #
 
@@ -40,6 +40,15 @@ my $zinc = $mw->Zinc(-width => 200, -height => 200, -backcolor => "white",
 
 like  ($zinc, qr/^Tk::Zinc=HASH/ , "zinc has been created");
 
+# Keep every transformation, but avoid rendering thousands of animation frames
+# during automated tests. Set TKZINC_TEST_FULL_ANIMATION=1 for visual inspection.
+my $redraw_interval = $ENV{TKZINC_TEST_FULL_ANIMATION} ? 1 : 20;
+
+sub updateAnimation {
+  my ($step, $last) = @_;
+  $zinc->update if $step % $redraw_interval == 0 || $step == $last;
+}
+
 
 $zinc->after(10, \&proceedTests);
 
@@ -68,37 +77,37 @@ my $gradient;
 for (my $i = 0; $i <=360; $i++) {
   $gradient = "=axial $i | red | white 50 | blue";
   $zinc->itemconfigure($curve, -fillcolor => $gradient); 
-  $zinc->update;
+  updateAnimation($i, 360);
 }
 pass("turning gradient one side");
 
 for (1..100) {
   $zinc->translate($curve,0.5,0.5);
-  $zinc->update;
+  updateAnimation($_, 100);
 }
 for (1..800) {
   $zinc->rotate($curve, 3.14159/400, 100,100);
-  $zinc->update;
+  updateAnimation($_, 800);
 }
 for (1..100) {
   $zinc->translate($curve,0.5,0.5);
-  $zinc->update;
+  updateAnimation($_, 100);
 }
 
 for (1..400) {
   $zinc->translate($curve,-0.5,-0.5);
-  $zinc->update;
+  updateAnimation($_, 400);
 }
 for (1..200) {
   $zinc->translate($curve,0.5,0.5);
-  $zinc->update;
+  updateAnimation($_, 200);
 }
 pass ("shaking the circle around");
 
 for (my $i = 359; $i > 0; $i--) {
   $gradient = "=axial $i | red | white 50 | blue";
   $zinc->itemconfigure($curve, -fillcolor => $gradient); 
-  $zinc->update;
+  updateAnimation(360 - $i, 359);
 }
 pass("turning gradient the other side");
 
@@ -116,11 +125,11 @@ $zinc->itemconfigure($gr, -clip => $curve);
 pass("displaying a translated rectangle filled with froggy colors and clipped by two circles");
 for (my $i = 0; $i<500 ; $i++) {
   $zinc->translate($rect, 0,1);
-  $zinc->update;
+  updateAnimation($i + 1, 500);
 }
 for (my $i = 0; $i<500 ; $i++) {
   $zinc->translate($rect, 0,-1);
-  $zinc->update;
+  updateAnimation($i + 1, 500);
 }
 pass ("a thousand translation");
 
@@ -129,34 +138,34 @@ $zinc->translate($rect, 0,250);
 
 for (1..500) {
   $zinc->scale($rect, 1, 0.998, 100,100);
-  $zinc->update;
+  updateAnimation($_, 500);
 }
 pass("a thousand scaling down");
 
 
 for (1..360) {
   $zinc->rotate($rect, 3.14159/180, 100,100);
-  $zinc->update;
+  updateAnimation($_, 360);
 }
 pass("360 rotation of 1°");
 
 
 for (1..360) {
   $zinc->rotate($rect, -3.14159/180, 100,100);
-  $zinc->update;
+  updateAnimation($_, 360);
 }
 pass("360 rotation of 1°");
 
 
 for (1..360) {
   $zinc->rotate($rect, -3.14159/180, 100,100);
-  $zinc->update;
+  updateAnimation($_, 360);
 }
 
 
 for (1..500) {
   $zinc->scale($rect, 1, 1/0.998, 100,100);
-  $zinc->update;
+  updateAnimation($_, 500);
 }
 pass("a thousand scaling up");
 
@@ -164,11 +173,11 @@ pass("a thousand scaling up");
 
 for my $i (0..200) {
   $zinc->itemconfigure($gr, -alpha => (200-$i)/2);
-  $zinc->update;
+  updateAnimation($i, 200);
 }
 for my $i (0..200) {
   $zinc->itemconfigure($gr, -alpha => $i/2);
-  $zinc->update;
+  updateAnimation($i, 200);
 }
 pass("fade out/in in 400 steps");
 

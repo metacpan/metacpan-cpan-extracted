@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::K8sServiceSelectorNamespace;
 # ABSTRACT: K8sServiceSelector selects services by k8s labels and namespace
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s namespace => Str;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::K8sServiceSelectorNamespace - K8sServiceSelector selects se
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 namespace
 
@@ -36,7 +36,7 @@ ServiceSelector is a label selector for k8s services
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -64,5 +64,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

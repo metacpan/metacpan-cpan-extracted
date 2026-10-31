@@ -51,7 +51,8 @@ build — `dzil test` then reports a green run that never executed the new file.
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/nak-rules.md`.
+the delegation lock and the publish gate are shared house rules (skilletor bundle
+`getty-cpan-dist@getty`); lanes and hazards are in `.claude/rules/nak-rules.md`.
 
 | Task | Agent |
 |---|---|

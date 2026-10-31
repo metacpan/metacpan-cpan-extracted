@@ -4,13 +4,14 @@ package Kubernetes::Comb::SVG;
 
 use Moo;
 use Carp qw( carp );
+use Scalar::Util qw( weaken );
 use Types::Common::Numeric qw( PositiveInt PositiveNum );
 use Types::Standard qw( Any ArrayRef Bool CodeRef Enum HashRef Maybe Object Str );
 use Kubernetes::Comb::SVG::Cell;
 use Kubernetes::Comb::SVG::Layout;
 use namespace::autoclean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has combs => ( is => 'ro', isa => Any, required => 1 );
 
@@ -76,15 +77,15 @@ has _layouter => ( is => 'lazy', isa => Object, init_arg => undef );
 
 sub _build__layouter {
   my ( $self ) = @_;
+  weaken( my $weak = $self );
   return $self->layout_class->new(
     cells  => $self->cells,
     size   => $self->size,
     mode   => $self->layout,
     aspect => $self->aspect,
-    # What render puts around the honeycomb, the legend counted as one row.
-    frame_width  => 2 * $self->_pad,
-    frame_height => 2 * $self->_pad + $self->_title_band
-      + ( $self->legend ? $self->_legend_gap + $self->_legend_row * 0.75 : 0 ),
+    # What render puts around the honeycomb: padding, title, the legend as it
+    # wraps for the width of the honeycomb.
+    frame  => sub { $weak->_frame(@_) },
     $self->_columns_given || $self->layout eq 'depth' ? ( columns => $self->columns ) : (),
     $self->has_rows ? ( rows => $self->rows ) : ()
   );
@@ -142,22 +143,87 @@ sub _colour {
   return;
 }
 
+# The light and the dark colour a theme gives a key, undef for a mode it
+# does not give or gives in no plain colour syntax.
+sub _theme_modes {
+  my ( $self, $key ) = @_;
+  my $value = $self->theme->{$key};
+  return map { scalar $self->_colour($_) }
+    ref $value eq 'HASH' ? @{$value}{qw( light dark )} : ( $value, $value );
+}
+
 # The light and the dark colour of a theme key (a phase or a surface): what
 # the theme gives, one colour for both or one per mode, else the default.
 sub _theme_colours {
   my ( $self, $key, $light, $dark ) = @_;
-  my $value = $self->theme->{$key};
-  my ( $l, $d ) = map { scalar $self->_colour($_) }
-    ref $value eq 'HASH' ? @{$value}{qw( light dark )} : ( $value, $value );
+  my ( $l, $d ) = $self->_theme_modes($key);
   return ( defined $l ? $l : $light, defined $d ? $d : $dark );
 }
 
-# The phases that blink, in the order of the legend: only known phases reach
-# the style, whatever order and however often they were named.
-sub _blink_phases {
+# A string for a CSS attribute selector: what the attribute value keeps
+# (see _text), everything but plain characters as a hex escape. Group names
+# come from the cluster, so nothing else may reach the style.
+sub _css_string {
+  my ( $self, $value ) = @_;
+  $value = ''.$value;
+  $value =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//g;
+  $value =~ s/([^A-Za-z0-9 _.\/-])/sprintf( '\\%x ', ord $1 )/ge;
+  return $value;
+}
+
+sub _group_scope { '.comb[data-comb-group="'.$_[0]->_css_string($_[1]).'"]' }
+
+# The key of a group in blink and theme: `@group` for every phase of the
+# group, `Phase@group` for one. The phase is everything before the first `@`.
+sub _group_key { $_[2].'@'.$_[1] }
+
+# The colours of the cells of the groups that occur, as custom properties set
+# on the cell: the cell's own `--comb-<phase>` wins over the one on the root
+# element, and the hexagon rules read it from there. `@group` gives every
+# phase of the group a colour, `Phase@group` one phase, and the more specific
+# one wins. A mode the theme leaves out keeps the colour it would have had.
+# Returns the rules for light and for dark.
+sub _group_colours {
+  my ( $self ) = @_;
+  my $colours = $self->_default_colours;
+  my @rules = ( [], [] );
+  for my $group ( @{ $self->_facts->{groups} } ) {
+    my $scope = $self->_group_scope($group);
+    my @all   = $self->_theme_modes( $self->_group_key( $group, '' ) );
+    for my $mode ( 0, 1 ) {
+      my @decl;
+      if ( defined $all[$mode] ) {
+        push @decl, [ $scope, [ map { $self->_var($_).':'.$all[$mode] } $self->phases ] ];
+      }
+      for my $phase ( $self->phases ) {
+        my @one = $self->_theme_modes( $self->_group_key( $group, $phase ) );
+        next unless defined $one[0] || defined $one[1];
+        my $own = ( $self->_theme_colours( $phase, @{ $colours->{$phase} } ) )[$mode];
+        my $value = defined $one[$mode] ? $one[$mode] : defined $all[$mode] ? $all[$mode] : $own;
+        push @decl, [ $scope.'.phase-'.$phase, [ $self->_var($phase).':'.$value ] ];
+      }
+      push @{ $rules[$mode] }, map { '.comb-svg '.$_->[0].'{'.join( ';', @{ $_->[1] } ).'}' } @decl;
+    }
+  }
+  return @rules;
+}
+
+# The cells that blink, as selectors in the order of the legend, then the
+# groups by name: a phase names the cells of that phase, `@group` the cells
+# of the group, `Phase@group` the cells of that phase in that group. Only
+# known phases and groups that occur reach the style, whatever order and
+# however often they were named.
+sub _blink_scopes {
   my ( $self ) = @_;
   my %blink = map { $_ => 1 } @{ $self->blink };
-  return grep { $blink{$_} } $self->phases;
+  my @scopes = map { '.comb.phase-'.$_ } grep { $blink{$_} } $self->phases;
+  for my $group ( @{ $self->_facts->{groups} } ) {
+    my $scope = $self->_group_scope($group);
+    push @scopes, $scope if $blink{ $self->_group_key( $group, '' ) };
+    push @scopes, map { $scope.'.phase-'.$_ }
+      grep { $blink{ $self->_group_key( $group, $_ ) } } $self->phases;
+  }
+  return @scopes;
 }
 
 # The period as plain decimals; what does not print as such (inf, a number
@@ -175,15 +241,15 @@ sub _blink_period {
 # fill. Without motion the outline is as thick as at the peak.
 sub _blink_css {
   my ( $self ) = @_;
-  my @phases = $self->_blink_phases;
-  return unless @phases;
+  my @scopes = $self->_blink_scopes;
+  return unless @scopes;
   my $s     = '.comb-svg';
-  my $hex   = join( ',', map { $s.' .comb.phase-'.$_.' .hex' } @phases );
+  my $hex   = join( ',', map { $s.' '.$_.' .hex' } @scopes );
   my $width = 'stroke-width:'.$self->_n( $self->size * 0.07 );
   return (
     '@keyframes comb-blink{50%{fill-opacity:.4;'.$width.'}}',
     $hex.'{animation:comb-blink '.$self->_blink_period.'s ease-in-out infinite}',
-    join( ',', map { $s.' .comb.phase-'.$_.' .phase' } @phases ).'{fill:var(--comb-fg)}',
+    join( ',', map { $s.' '.$_.' .phase' } @scopes ).'{fill:var(--comb-fg)}',
     '@media (prefers-reduced-motion:reduce){'.$hex.'{animation:none;'.$width.'}}'
   );
 }
@@ -206,11 +272,14 @@ sub _style {
   push @light, '--comb-tint:.13', '--comb-tint-muted:.06';
   push @dark,  '--comb-tint:.2',  '--comb-tint-muted:.09';
 
+  my ( $group_light, $group_dark ) = $self->_group_colours;
   my $s = '.comb-svg';
   my @css = (
     $s.'{'.join( ';', @light )
       .';font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}',
     '@media (prefers-color-scheme:dark){'.$s.'{'.join( ';', @dark ).'}}',
+    @$group_light,
+    @$group_dark ? '@media (prefers-color-scheme:dark){'.join( '', @$group_dark ).'}' : (),
     $s.' .panel{fill:var(--comb-bg);stroke:var(--comb-border);stroke-width:1}',
     $s.' text{fill:var(--comb-fg)}',
     $s.' .heading{font-size:'.$self->_n( $self->_title_font ).'px;font-weight:600}',
@@ -543,24 +612,12 @@ sub render {
   my %cell   = map { $_->id => $_ } @{ $self->cells };
   my @placed = grep { $cell{ $_->{id} } } @{ $layout->{cells} };
 
-  my %count;
+  my ( %count, @occurring );
   $count{ $cell{ $_->{id} }->phase }++ for @placed;
-  my @occurring = grep { $count{$_} } $self->phases;
+  @occurring = grep { $count{$_} } $self->phases;
 
-  my @legend = $self->legend
-    ? map { { phase => $_, count => $count{$_}, width => $self->_legend_item_width( $_, $count{$_} ) } }
-      @occurring
-    : ();
-  my $content = $layout->{width};
-  for my $width (
-    $self->_text_width( $self->title, $self->_title_font ),
-    ( map { $_->{width} } @legend ),
-    ( map { $self->_text_width( $_->{name}, $self->_group_font ) }
-      grep { defined $_->{name} } @{ $layout->{groups} } )
-  ) {
-    $content = $width if $width > $content;
-  }
-  my @legend_rows = $self->_legend_rows( \@legend, $content );
+  my ( $content, $legend_rows ) = $self->_content( $layout->{width}, \%count );
+  my @legend_rows = @$legend_rows;
 
   my $ox     = $pad;
   my $oy     = $pad + $self->_title_band;
@@ -621,6 +678,52 @@ sub render {
   ], "\n".join( "\n", @out )."\n" )."\n";
 }
 
+
+# The width of the content and the rows of the legend, for a honeycomb that
+# is $layout_width wide: the title, the legend items and the group headings
+# can be wider than it, and the legend wraps into the width that results.
+sub _content {
+  my ( $self, $layout_width, $count ) = @_;
+  my @legend = $self->legend
+    ? map { { phase => $_, count => $count->{$_}, width => $self->_legend_item_width( $_, $count->{$_} ) } }
+      grep { $count->{$_} } $self->phases
+    : ();
+  my $content = $layout_width;
+  for my $width (
+    $self->_text_width( $self->title, $self->_title_font ),
+    ( map { $_->{width} } @legend ),
+    ( map { $self->_text_width( $_, $self->_group_font ) } @{ $self->_facts->{groups} } )
+  ) {
+    $content = $width if $width > $content;
+  }
+  return ( $content, [ $self->_legend_rows( \@legend, $content ) ] );
+}
+
+# The size of the whole picture around a honeycomb of this size: what the
+# layout class needs to meet `aspect` with the title and the wrapped legend.
+sub _frame {
+  my ( $self, $width, $height ) = @_;
+  my ( $content, $rows ) = $self->_content( $width, $self->_facts->{count} );
+  return (
+    $content + 2 * $self->_pad,
+    2 * $self->_pad + $self->_title_band + $height
+      + ( @$rows ? $self->_legend_gap + @$rows * $self->_legend_row - $self->_legend_row / 4 : 0 )
+  );
+}
+
+# What the frame depends on and the columns do not: the phase counts and the
+# group names of the cells that are drawn.
+has _facts => ( is => 'lazy', isa => HashRef, init_arg => undef );
+
+sub _build__facts {
+  my ( $self ) = @_;
+  my ( %seen, %count, %group );
+  for my $cell ( grep { defined $_->id && !$seen{ $_->id }++ } @{ $self->cells } ) {
+    $count{ $cell->phase }++;
+    $group{ $cell->group } = 1 if defined $cell->group;
+  }
+  return { count => \%count, groups => [ sort keys %group ] };
+}
 
 sub _marker {
   my ( $self ) = @_;
@@ -757,7 +860,8 @@ sub _comb {
       $borrowed ? 'borrowed' : (), $disabled ? 'disabled' : () ),
     'data-name'  => $cell->name,
     'data-id'    => $cell->id,
-    'data-phase' => $cell->phase
+    'data-phase' => $cell->phase,
+    defined $cell->group ? ( 'data-comb-group' => $cell->group ) : ()
   ], join( '', @parts ) );
 
   my $href = $self->_href($cell);
@@ -893,7 +997,7 @@ Kubernetes::Comb::SVG - Render Kubernetes::Comb custom resources as an SVG honey
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -1034,8 +1138,10 @@ Default C<16/9>, a positive number. C<packed> L</layout> only, and only when
 neither L</columns> nor L</rows> is given: width divided by height of the
 area the picture is to fill, C<9/16> for an upright screen. The column count
 is the one whose picture -- all groups with their headings, plus padding,
-title and a legend of one row -- comes closest to that shape. A long title or
-a legend that wraps is not accounted for.
+title and the legend as it wraps for that width -- comes closest to that shape.
+A title or a legend wider than the honeycomb widens the picture, and a legend
+that wraps into more rows makes it taller; both are counted for every column
+count.
 
 =head2 size
 
@@ -1097,6 +1203,17 @@ Accepted are C<#rgb>, C<#rgba>, C<#rrggbb>, C<#rrggbbaa>, a colour name
 numbers; any other value falls back to the built-in colour, for each mode on
 its own. Every colour ends up as a custom property, see L</THE PICTURE>.
 
+A key can name a group instead of, or as well as, a phase (the group of
+L</group_label>): C<@extern> recolours the cells of the group C<extern> in
+every phase, C<Error@extern> only the C<Error> cells in it; the phase is
+everything before the first C<@>, the group everything after it. The most
+specific key wins: C<Error@extern>, then C<@extern>, then C<Error>. A mode the
+hash leaves out keeps the colour the cell would have had without that key. The
+legend keeps the colours of the phases. A group that no cell has, and a phase
+that is none, are ignored.
+
+  theme => { '@extern' => '#888888', 'Error@extern' => 'crimson' }
+
 The built-in colours, light / dark:
 
   Running      #1a7f37 / #3fb950      bg      #ffffff / #0d1117
@@ -1122,6 +1239,13 @@ Where the viewer asks for reduced motion nothing moves and the cell has a
 thicker outline instead. A name that is no phase is ignored; order and
 repeats do not matter. Without it the picture carries no animation at all.
 
+An entry can name a group (the group of L</group_label>) as well: C<@extern>
+makes every cell of the group C<extern> pulse, C<Error@extern> only its
+C<Error> cells; the phase is everything before the first C<@>, the group
+everything after it. A plain phase still pulses in every group.
+
+  blink => [ '@extern', 'Error' ]
+
 =head2 blink_seconds
 
 Default C<1.2>, a positive number. The period of the pulse of L</blink> in
@@ -1143,7 +1267,7 @@ differently.
 
 Returns the class name that places the cells, C<Kubernetes::Comb::SVG::Layout>.
 It is built with C<cells>, C<size>, C<mode> (the L</layout>), C<aspect>,
-C<frame_width>, C<frame_height> and, when given, C<columns> and C<rows>, and
+C<frame> and, when given, C<columns> and C<rows>, and
 must answer C<layout>
 and the geometry methods of L<Kubernetes::Comb::SVG::Layout>. Override in a
 subclass to place the cells differently.
@@ -1197,7 +1321,9 @@ naming the upstream context; see
 L<borrowed|Kubernetes::Comb::SVG::Cell/borrowed>: an upstream is recorded, it
 is not unreachable, and the phase is Running or Pending) and C<disabled> for a
 Disabled one. Attributes: C<data-name> (C<metadata.name>), C<data-id>
-(C<namespace/name>, or the name alone), C<data-phase>. With L</link> the group
+(C<namespace/name>, or the name alone), C<data-phase> and, for a Comb in a group
+(L</group_label>), C<data-comb-group> (the label value; C<data-group> is the
+heading's). With L</link> the group
 sits inside an C<< <a> >>. Inside, in this order:
 
 =over
@@ -1362,7 +1488,7 @@ text.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb-svg/issues>.
 
 =head2 IRC

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : 
  *
- * $Id: MapInfo.c,v 1.28 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -31,8 +31,6 @@
 
 
 
-static const char rcsid[] = "$Id: MapInfo.c,v 1.28 2005/04/27 07:32:03 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -314,12 +312,7 @@ ZnMapInfoAddLine(ZnMapInfoId    map_info,
     }
 
     line_struct.style = line_style;
-    if (line_width == 1.0) {
-      line_struct.width = 0;
-    }
-    else {
-      line_struct.width = (int) line_width;
-    }
+    line_struct.width = (int) line_width;
     line_struct.tag = tag;
     line_struct.from.x = x_from;
     line_struct.from.y = y_from;
@@ -329,7 +322,6 @@ ZnMapInfoAddLine(ZnMapInfoId    map_info,
     if (line_style == ZnMapInfoLineMarked) {
       ComputeLineMarks(&line_struct);
     }
-    
     ZnListAdd(cur_map->lines, &line_struct, index);
   }
 }
@@ -357,12 +349,7 @@ ZnMapInfoReplaceLine(ZnMapInfoId        map_info,
       }
 
       line_ptr->style = line_style;
-      if (line_width == 1.0) {
-        line_ptr->width = 0;
-      }
-      else {
-        line_ptr->width = (int) line_width;
-      }
+      line_ptr->width = (int) line_width;
       line_ptr->tag = tag;
       line_ptr->from.x = x_from;
       line_ptr->from.y = y_from;
@@ -421,12 +408,7 @@ ZnMapInfoGetLine(ZnMapInfoId            map_info,
         *line_style = line_ptr->style;
       }
       if (line_width) {
-        if (line_ptr->width == 1.0) {
-          *line_width = 0;
-        }
-        else {
-          *line_width = line_ptr->width;
-        }
+        *line_width = (ZnDim) line_ptr->width;
       }
       if (x_from) {
         *x_from = line_ptr->from.x;
@@ -742,12 +724,7 @@ ZnMapInfoAddArc(ZnMapInfoId     map_info,
     }
 
     arc_struct.style = NOT_MARKED_STYLE(line_style);
-    if (line_width == 1.0) {
-      arc_struct.width = 0;
-    }
-    else {
-      arc_struct.width = (int) line_width;
-    }
+    arc_struct.width = (int) line_width;
     arc_struct.tag = tag;
     arc_struct.center.x = center_x;
     arc_struct.center.y = center_y;
@@ -779,12 +756,7 @@ ZnMapInfoReplaceArc(ZnMapInfoId         map_info,
     arc_ptr = ZnListAt(cur_map->arcs, index);
     if (arc_ptr) {
       arc_ptr->style = NOT_MARKED_STYLE(line_style);
-      if (line_width == 1.0) {
-        arc_ptr->width = 0;
-      }
-      else {
-        arc_ptr->width = (int) line_width;
-      }
+      arc_ptr->width = (int) line_width;
       arc_ptr->tag = tag;
       arc_ptr->center.x = center_x;
       arc_ptr->center.y = center_y;
@@ -837,12 +809,7 @@ ZnMapInfoGetArc(ZnMapInfoId     map_info,
         *line_style = arc_ptr->style;
       }
       if (line_width) {
-        if (arc_ptr->width == 1.0) {
-          *line_width = 0;
-        }
-        else {
-          *line_width = arc_ptr->width;
-        }
+        *line_width = arc_ptr->width;
       }
       if (center_x) {
         *center_x = arc_ptr->center.x;
@@ -1127,17 +1094,17 @@ FillMap(ZnMapInfoId     map,
 
       if (vm->dashed)   {
         ZnMapInfoAddLine(map, ZnMapInfoNumLines(map), NULL, ZnMapInfoLineDashed,
-                         0, x_cur, y_cur,
+                         1, x_cur, y_cur,
                          (int) (short) vm->x[i], (int) (short) vm->y[i]);
       }
       else if (vm->marked) {
         ZnMapInfoAddLine(map, ZnMapInfoNumLines(map), NULL, ZnMapInfoLineMarked,
-                         0, x_cur, y_cur,
+                         1, x_cur, y_cur,
                          (int) (short) vm->x[i], (int) (short) vm->y[i]);
       }
       else {
         ZnMapInfoAddLine(map, ZnMapInfoNumLines(map), NULL, ZnMapInfoLineSimple,
-                         0, x_cur, y_cur,
+                         1, x_cur, y_cur,
                          (int) (short) vm->x[i], (int) (short) vm->y[i]);
       }
 
@@ -1392,7 +1359,7 @@ ZnDuplicateZnMapInfo(Tcl_Interp *interp,
   
   entry = Tcl_CreateHashEntry(&mapInfoTable, uid, &new);
   if (!new) {
-    Tcl_AppendResult(interp, "duplicate mapinfo \"", name, "\" already exists", NULL);
+    Tcl_AppendResult(interp, "duplicate mapinfo \"", name, "\" already exists", (char *) NULL);
     return TCL_ERROR;
   }
   master = (ZnMapInfoMaster *) ZnMalloc(sizeof(ZnMapInfoMaster));
@@ -1419,7 +1386,7 @@ LookupMapInfoMaster(Tcl_Interp  *interp,
   entry = Tcl_FindHashEntry(&mapInfoTable, uid);
   if (entry == NULL) {
   mp_error:
-    Tcl_AppendResult(interp, "mapinfo \"", name, "\" doesn't exist", NULL);
+    Tcl_AppendResult(interp, "mapinfo \"", name, "\" doesn't exist", (char *) NULL);
     return NULL;
   }
   master = (ZnMapInfoMaster *) Tcl_GetHashValue(entry);
@@ -1570,7 +1537,7 @@ ZnMapInfoLineStyleFromString(Tcl_Interp         *interp,
     }
   }
   Tcl_AppendResult(interp, " incorrect mapinfo line style \"",
-                   str,"\"", NULL);
+                   str,"\"", (char *) NULL);
   return TCL_ERROR;
 }
 
@@ -1594,7 +1561,7 @@ ZnMapInfoTextStyleFromString(Tcl_Interp         *interp,
     }
   }
   Tcl_AppendResult(interp, " incorrect mapinfo text style \"",
-                   str,"\"", NULL);
+                   str,"\"", (char *) NULL);
   return TCL_ERROR;
 }
 
@@ -1602,7 +1569,7 @@ int
 ZnMapInfoObjCmd(ClientData      client_data,
                 Tcl_Interp      *interp,        /* Current interpreter. */
                 int             argc,           /* Number of arguments. */
-                Tcl_Obj *CONST  args[])
+                Tcl_Obj *const  args[])
 {
   ZnPos           x, y;
   int             index, index2, result;
@@ -1611,7 +1578,7 @@ ZnMapInfoObjCmd(ClientData      client_data,
 #ifdef PTK_800
   static char *sub_cmd_strings[] =
 #else
-  static CONST char *sub_cmd_strings[] =
+  static const char *sub_cmd_strings[] =
 #endif
   {
     "add", "count", "create", "delete", "duplicate",
@@ -1620,7 +1587,7 @@ ZnMapInfoObjCmd(ClientData      client_data,
 #ifdef PTK_800
   static char *e_type_strings[] =
 #else
-  static CONST char *e_type_strings[] =
+  static const char *e_type_strings[] =
 #endif
   {
     "arc", "line", "symbol", "text", NULL
@@ -2081,7 +2048,7 @@ int
 ZnVideomapObjCmd(ClientData     client_data,
                  Tcl_Interp     *interp,        /* Current interpreter. */
                  int            argc,           /* Number of arguments. */
-                 Tcl_Obj        *CONST  args[])
+                 Tcl_Obj        *const  args[])
 {
   ZnList        ids;
   int           index;
@@ -2090,7 +2057,7 @@ ZnVideomapObjCmd(ClientData     client_data,
 #ifdef PTK_800
   static char *sub_cmd_strings[] =
 #else
-  static CONST char *sub_cmd_strings[] =
+  static const char *sub_cmd_strings[] =
 #endif
   {
     "ids", "load", NULL
@@ -2123,7 +2090,7 @@ ZnVideomapObjCmd(ClientData     client_data,
       ids = ZnMapInfoVideomapIds(Tcl_GetString(args[2]));
       if (ids == NULL) {
         Tcl_AppendResult(interp, "unable to look at videomap file \"",
-                         Tcl_GetString(args[2]), "\"", NULL);
+                         Tcl_GetString(args[2]), "\"", (char *) NULL);
         return TCL_ERROR;
       }
       id_array = ZnListArray(ids);
@@ -2159,7 +2126,7 @@ ZnVideomapObjCmd(ClientData     client_data,
       if (ZnMapInfoGetVideomap(map_info, Tcl_GetString(args[2]), insert) == TCL_ERROR) {
         Tcl_AppendResult(interp, "unable to load videomap file \"",
                          Tcl_GetString(args[2]), ":",
-                         Tcl_GetString(args[3]), "\"", NULL);
+                         Tcl_GetString(args[3]), "\"", (char *) NULL);
         return TCL_ERROR;
       }
       ZnUpdateMapInfoClients(map_info);

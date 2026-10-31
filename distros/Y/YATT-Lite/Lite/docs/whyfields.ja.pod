@@ -19,6 +19,8 @@ L<yatt_lite|YATT::Lite::docs::readme> は懐かしの L<fields> を活用して�
 perl5.14 以後の C<package Name {...}> 構文を用います。古い perl で
 試す場合は C<{package Name; ...}> へと書き換えて下さい)
 
+また、このドキュメントよりも進化した fields の
+使い方については L<MOP4Import::whyfields> を参照して下さい。
 
 =head1 fields.pm -- old story.
 
@@ -268,7 +270,7 @@ strict 検査を効かせることが出来ます。
 メンバー名を引数とする汎用のアクセサ(cget と configure)と、
 コンストラクタを持った短いクラスを定義し、
 単にそれを継承して使うのです。
-(ここでは L<"Perl/Tk"|Tk::options> や tcl/tk の widget の API をモデルにします)。
+(ここでは L<PerlE<sol>Tk|Tk::options> や tcl/tk の widget の API をモデルにします)。
 
 
    # ユーザ側コードゆえ、型注記なし
@@ -282,17 +284,19 @@ strict 検査を効かせることが出来ます。
 
 =over 4
 
-=item * (この例では) public メンバと private メンバの区別のために、
-コンベンションとして、 public なメンバーには全て C<cf_...> で始まる名前を
-付けることにします。なお、これは必須ではありません。
-従来のアクセサ生成モジュールと併用したい場合にはプレフィックスを付けません。
+=item * この例では field 名と public に見せるメンバー名を一致させるコンベンションを
+採用しています。公開したくない field には C<_> で始まる名前を付けます。
+
+(なお、 L<GH-233|https://github.com/hkoba/yatt_lite/issues/233> 以前の YATT::Lite では、
+public なメンバーに C<cf_...> で始まる名前を付けるコンベンションを用いていました。
+これは他のプログラマーには異質すぎて賛同を得難かったため、撤回しました)
 
 =item * write hook が必要な場合は C<configure_$name> を実装します。
 これは公開メンバ名に別名を持たせるためにも使えます。
 
    sub configure_file {
      (my Foo $foo, my $fn) = @_;
-     $foo->{cf_string} = read_file($fn);
+     $foo->{string} = read_file($fn);
    }
 
 =item * ゲッターは頻度の高いものだけ、手で実装します。
@@ -300,8 +304,8 @@ strict 検査を効かせることが出来ます。
 
    sub dbh {
      (my Foo $foo) = @_;
-     $foo->{DBH} //= do {
-        DBI->connect($foo->{cf_user}, $foo->{cf_password}, ...);
+     $foo->{_DBH} //= do {
+        DBI->connect($foo->{user}, $foo->{password}, ...);
      };
    }
 
@@ -310,8 +314,8 @@ strict 検査を効かせることが出来ます。
 
    sub after_new {
      (my Foo $foo) = @_;
-     $foo->{cf_name}       //= "(A cat not yet named)";
-     $foo->{cf_birth_year} //= $foo->default_birth_year;
+     $foo->{name}       //= "(A cat not yet named)";
+     $foo->{birth_year} //= $foo->default_birth_year;
    }
    sub default_birth_year {
      _this_year();
@@ -345,12 +349,15 @@ strict 検査を効かせることが出来ます。
             unless (defined $name) {
               croak "Undefined key for configure";
             }
+            if ($name =~ m{^_}) {
+              croak "Setting private option is prohibited for class ".ref($self).": $name";
+            }
             if (my $sub = $self->can("configure_$name")) {
               push @task, [$sub, $value];
-            } elsif (not exists $fields->{"cf_$name"}) {
+            } elsif (not exists $fields->{$name}) {
               confess "Unknown configure key: $name";
             } else {
-              $self->{"cf_$name"} = $value;
+              $self->{$name} = $value;
             }
           }
           $$_[0]->($self, $$_[1]) for @task;
@@ -359,11 +366,14 @@ strict 検査を効かせることが出来ます。
 
        sub cget {
           (my MY $self, my $name, my $default) = @_;
+          if ($name =~ m{^_}) {
+            croak "Getting private option is prohibited for class ".ref($self).": $name";
+          }
           my $fields = _fields_hash($self);
-          unless (not exists $fields->{"cf_$name"}) {
+          if (not exists $fields->{$name}) {
               confess "Unknown configure key: $name";
           }
-          $self->{"cf_$name"} // $default;
+          $self->{$name} // $default;
        }
 
        sub _fields_hash {
@@ -388,8 +398,9 @@ strict 検査を効かせることが出来ます。
     package MyProject::Product; sub MY () {__PACKAGE__}
     use base qw/MyProject::Object/;
     use fields qw/
-                  cf_name
-                  cf_price
+                  name
+                  price
+                  _private_data
                /;
 
     1;

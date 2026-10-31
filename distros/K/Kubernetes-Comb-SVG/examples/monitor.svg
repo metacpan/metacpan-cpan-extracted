@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 724.87 457.38" role="img" class="comb-svg" aria-labelledby="comb-title comb-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 829.86 457.38" role="img" class="comb-svg" aria-labelledby="comb-title comb-desc">
 <title id="comb-title">Shop</title>
 <desc id="comb-desc">17 Combs: 10 Running, 1 Pending, 1 Blocked, 1 NeedsConfig, 1 Disabled, 1 Error, 1 Stopped, 1 NotDeployed</desc>
 <style>.comb-svg{--comb-bg:#ffffff;--comb-border:#d0d7de;--comb-fg:#1f2328;--comb-muted:#59636e;--comb-edge:#57606a;--comb-running:#1a7f37;--comb-pending:#bf8700;--comb-blocked:#bc4c00;--comb-needsconfig:#8250df;--comb-disabled:#8c959f;--comb-error:#cf222e;--comb-stopped:#0891b2;--comb-notdeployed:#0969da;--comb-unknown:#475569;--comb-tint:.13;--comb-tint-muted:.06;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}
@@ -38,7 +38,7 @@
 .comb-svg .comb.phase-Error .phase{fill:var(--comb-fg)}
 @media (prefers-reduced-motion:reduce){.comb-svg .comb.phase-Error .hex{animation:none;stroke-width:3.92}}</style>
 <defs><marker id="comb-arrow" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="8.96" markerHeight="8.96" markerUnits="userSpaceOnUse" orient="auto"><path class="arrow" d="M0 1L10 5L0 9z"/></marker></defs>
-<rect class="panel" x="0.5" y="0.5" width="723.87" height="456.38" rx="12.32"/>
+<rect class="panel" x="0.5" y="0.5" width="828.86" height="456.38" rx="12.32"/>
 <text class="heading" x="25.2" y="40.43">Shop</text>
 <g class="comb phase-Running" data-name="cache" data-id="platform/cache" data-phase="Running"><title>platform/cache
 namespace: platform
@@ -79,56 +79,56 @@ namespace: shop
 class: MyApp::Comb::API
 phase: Running
 endpoint: http 8080
-endpoint: metrics 9090</title><polygon class="hex" points="126.19,158.13 174.69,186.13 174.69,242.13 126.19,270.13 77.69,242.13 77.69,186.13"/><text class="name" x="126.19" y="210.21">api</text><text class="phase" x="126.19" y="227.01">Running</text></g>
+endpoint: metrics 9090</title><polygon class="hex" points="703.67,67.2 752.17,95.2 752.17,151.2 703.67,179.2 655.17,151.2 655.17,95.2"/><text class="name" x="703.67" y="119.28">api</text><text class="phase" x="703.67" y="136.08">Running</text></g>
 <g class="comb phase-Running" data-name="auth" data-id="shop/auth" data-phase="Running"><title>shop/auth
 namespace: shop
 class: MyApp::Comb::Auth
 phase: Running
-endpoint: http 8080</title><polygon class="hex" points="231.19,158.13 279.69,186.13 279.69,242.13 231.19,270.13 182.69,242.13 182.69,186.13"/><text class="name" x="231.19" y="210.21">auth</text><text class="phase" x="231.19" y="227.01">Running</text></g>
+endpoint: http 8080</title><polygon class="hex" points="126.19,158.13 174.69,186.13 174.69,242.13 126.19,270.13 77.69,242.13 77.69,186.13"/><text class="name" x="126.19" y="210.21">auth</text><text class="phase" x="126.19" y="227.01">Running</text></g>
 <g class="comb phase-Blocked" data-name="cart" data-id="shop/cart" data-phase="Blocked"><title>shop/cart
 namespace: shop
 class: MyApp::Comb::Cart
 phase: Blocked
-message: waiting for catalog (Error)</title><polygon class="hex" points="336.18,158.13 384.68,186.13 384.68,242.13 336.18,270.13 287.68,242.13 287.68,186.13"/><text class="name" x="336.18" y="199.29">cart</text><text class="phase" x="336.18" y="214.97">Blocked</text><text class="reason"><tspan x="336.18" y="226.17">Dependency</tspan><tspan x="336.18" y="235.69">NotReady</tspan></text></g>
+message: waiting for catalog (Error)</title><polygon class="hex" points="231.19,158.13 279.69,186.13 279.69,242.13 231.19,270.13 182.69,242.13 182.69,186.13"/><text class="name" x="231.19" y="199.29">cart</text><text class="phase" x="231.19" y="214.97">Blocked</text><text class="reason"><tspan x="231.19" y="226.17">Dependency</tspan><tspan x="231.19" y="235.69">NotReady</tspan></text></g>
 <g class="comb phase-Error" data-name="catalog" data-id="shop/catalog" data-phase="Error"><title>shop/catalog
 namespace: shop
 class: MyApp::Comb::Catalog
 phase: Error
-message: migration 0042_add_sku failed: column &quot;sku&quot; of relation &quot;product&quot; already exists</title><polygon class="hex" points="441.18,158.13 489.68,186.13 489.68,242.13 441.18,270.13 392.68,242.13 392.68,186.13"/><text class="name" x="441.18" y="204.61">catalog</text><text class="phase" x="441.18" y="221.41">Error</text><text class="reason" x="441.18" y="235.41">MigrationFailed</text></g>
+message: migration 0042_add_sku failed: column &quot;sku&quot; of relation &quot;product&quot; already exists</title><polygon class="hex" points="336.18,158.13 384.68,186.13 384.68,242.13 336.18,270.13 287.68,242.13 287.68,186.13"/><text class="name" x="336.18" y="204.61">catalog</text><text class="phase" x="336.18" y="221.41">Error</text><text class="reason" x="336.18" y="235.41">MigrationFailed</text></g>
 <g class="comb phase-NotDeployed" data-name="loyalty" data-id="shop/loyalty" data-phase="NotDeployed"><title>shop/loyalty
 namespace: shop
 class: MyApp::Comb::Loyalty
 phase: NotDeployed
-message: not deployed</title><polygon class="hex" points="546.17,158.13 594.67,186.13 594.67,242.13 546.17,270.13 497.67,242.13 497.67,186.13"/><text class="name" x="546.17" y="210.21">loyalty</text><text class="phase" x="546.17" y="227.01">NotDeployed</text></g>
+message: not deployed</title><polygon class="hex" points="441.18,158.13 489.68,186.13 489.68,242.13 441.18,270.13 392.68,242.13 392.68,186.13"/><text class="name" x="441.18" y="210.21">loyalty</text><text class="phase" x="441.18" y="227.01">NotDeployed</text></g>
 <g class="comb phase-NeedsConfig" data-name="mailer" data-id="shop/mailer" data-phase="NeedsConfig"><title>shop/mailer
 namespace: shop
 class: MyApp::Comb::Mailer
 phase: NeedsConfig
-message: secret mailer-smtp has no key &quot;password&quot;</title><polygon class="hex" points="651.17,158.13 699.67,186.13 699.67,242.13 651.17,270.13 602.67,242.13 602.67,186.13"/><text class="name" x="651.17" y="204.61">mailer</text><text class="phase" x="651.17" y="221.41">NeedsConfig</text><text class="reason" x="651.17" y="235.41">SecretIncomplete</text></g>
+message: secret mailer-smtp has no key &quot;password&quot;</title><polygon class="hex" points="546.17,158.13 594.67,186.13 594.67,242.13 546.17,270.13 497.67,242.13 497.67,186.13"/><text class="name" x="546.17" y="204.61">mailer</text><text class="phase" x="546.17" y="221.41">NeedsConfig</text><text class="reason" x="546.17" y="235.41">SecretIncomplete</text></g>
 <g class="comb phase-Pending" data-name="media" data-id="shop/media" data-phase="Pending"><title>shop/media
 namespace: shop
 class: MyApp::Comb::Media
 phase: Pending
 message: rollout in progress: 1 of 3 replicas ready
-endpoint: http 8080</title><polygon class="hex" points="73.7,249.06 122.2,277.06 122.2,333.06 73.7,361.06 25.2,333.06 25.2,277.06"/><text class="name" x="73.7" y="290.22">media</text><text class="phase" x="73.7" y="305.9">Pending</text><text class="reason"><tspan x="73.7" y="317.1">RolloutIn</tspan><tspan x="73.7" y="326.62">Progress</tspan></text></g>
+endpoint: http 8080</title><polygon class="hex" points="651.17,158.13 699.67,186.13 699.67,242.13 651.17,270.13 602.67,242.13 602.67,186.13"/><text class="name" x="651.17" y="199.29">media</text><text class="phase" x="651.17" y="214.97">Pending</text><text class="reason"><tspan x="651.17" y="226.17">RolloutIn</tspan><tspan x="651.17" y="235.69">Progress</tspan></text></g>
 <g class="comb phase-Disabled disabled" data-name="newsletter" data-id="shop/newsletter" data-phase="Disabled"><title>shop/newsletter
 namespace: shop
 class: MyApp::Comb::Newsletter
-phase: Disabled</title><polygon class="hex" points="178.69,249.06 227.19,277.06 227.19,333.06 178.69,361.06 130.19,333.06 130.19,277.06"/><text class="name" x="178.69" y="301.14">newsletter</text><text class="phase" x="178.69" y="317.94">Disabled</text></g>
+phase: Disabled</title><polygon class="hex" points="756.16,158.13 804.66,186.13 804.66,242.13 756.16,270.13 707.66,242.13 707.66,186.13"/><text class="name" x="756.16" y="210.21">newsletter</text><text class="phase" x="756.16" y="227.01">Disabled</text></g>
 <g class="comb phase-Running" data-name="orders" data-id="shop/orders" data-phase="Running"><title>shop/orders
 namespace: shop
 class: MyApp::Comb::Orders
 phase: Running
-endpoint: http 8080</title><polygon class="hex" points="283.69,249.06 332.19,277.06 332.19,333.06 283.69,361.06 235.19,333.06 235.19,277.06"/><text class="name" x="283.69" y="301.14">orders</text><text class="phase" x="283.69" y="317.94">Running</text></g>
+endpoint: http 8080</title><polygon class="hex" points="73.7,249.06 122.2,277.06 122.2,333.06 73.7,361.06 25.2,333.06 25.2,277.06"/><text class="name" x="73.7" y="301.14">orders</text><text class="phase" x="73.7" y="317.94">Running</text></g>
 <g class="comb phase-Running" data-name="payments" data-id="shop/payments" data-phase="Running"><title>shop/payments
 namespace: shop
 class: MyApp::Comb::Payments
 phase: Running
-endpoint: http 8080</title><polygon class="hex" points="388.68,249.06 437.18,277.06 437.18,333.06 388.68,361.06 340.18,333.06 340.18,277.06"/><text class="name" x="388.68" y="301.14">payments</text><text class="phase" x="388.68" y="317.94">Running</text></g>
+endpoint: http 8080</title><polygon class="hex" points="178.69,249.06 227.19,277.06 227.19,333.06 178.69,361.06 130.19,333.06 130.19,277.06"/><text class="name" x="178.69" y="301.14">payments</text><text class="phase" x="178.69" y="317.94">Running</text></g>
 <g class="comb phase-Stopped" data-name="reports" data-id="shop/reports" data-phase="Stopped"><title>shop/reports
 namespace: shop
 class: MyApp::Comb::Reports
 phase: Stopped
-message: stopped</title><polygon class="hex" points="493.68,249.06 542.18,277.06 542.18,333.06 493.68,361.06 445.18,333.06 445.18,277.06"/><text class="name" x="493.68" y="301.14">reports</text><text class="phase" x="493.68" y="317.94">Stopped</text></g>
-<g class="legend"><g class="legend-item phase-Running" data-phase="Running" data-count="10"><polygon class="hex" points="33.6,389.06 40.87,393.26 40.87,401.66 33.6,405.86 26.33,401.66 26.33,393.26"/><text x="47.04" y="401.18">Running <tspan class="count">10</tspan></text></g><g class="legend-item phase-Pending" data-phase="Pending" data-count="1"><polygon class="hex" points="137.82,389.06 145.09,393.26 145.09,401.66 137.82,405.86 130.54,401.66 130.54,393.26"/><text x="151.26" y="401.18">Pending <tspan class="count">1</tspan></text></g><g class="legend-item phase-Blocked" data-phase="Blocked" data-count="1"><polygon class="hex" points="235.75,389.06 243.03,393.26 243.03,401.66 235.75,405.86 228.48,401.66 228.48,393.26"/><text x="249.19" y="401.18">Blocked <tspan class="count">1</tspan></text></g><g class="legend-item phase-NeedsConfig" data-phase="NeedsConfig" data-count="1"><polygon class="hex" points="333.69,389.06 340.97,393.26 340.97,401.66 333.69,405.86 326.42,401.66 326.42,393.26"/><text x="347.13" y="401.18">NeedsConfig <tspan class="count">1</tspan></text></g><g class="legend-item phase-Disabled" data-phase="Disabled" data-count="1"><polygon class="hex" points="456.74,389.06 464.02,393.26 464.02,401.66 456.74,405.86 449.47,401.66 449.47,393.26"/><text x="470.18" y="401.18">Disabled <tspan class="count">1</tspan></text></g><g class="legend-item phase-Error" data-phase="Error" data-count="1"><polygon class="hex" points="560.96,389.06 568.23,393.26 568.23,401.66 560.96,405.86 553.68,401.66 553.68,393.26"/><text x="574.4" y="401.18">Error <tspan class="count">1</tspan></text></g><g class="legend-item phase-Stopped" data-phase="Stopped" data-count="1"><polygon class="hex" points="33.6,413.7 40.87,417.9 40.87,426.3 33.6,430.5 26.33,426.3 26.33,417.9"/><text x="47.04" y="425.82">Stopped <tspan class="count">1</tspan></text></g><g class="legend-item phase-NotDeployed" data-phase="NotDeployed" data-count="1"><polygon class="hex" points="131.54,413.7 138.81,417.9 138.81,426.3 131.54,430.5 124.26,426.3 124.26,417.9"/><text x="144.98" y="425.82">NotDeployed <tspan class="count">1</tspan></text></g></g>
+message: stopped</title><polygon class="hex" points="283.69,249.06 332.19,277.06 332.19,333.06 283.69,361.06 235.19,333.06 235.19,277.06"/><text class="name" x="283.69" y="301.14">reports</text><text class="phase" x="283.69" y="317.94">Stopped</text></g>
+<g class="legend"><g class="legend-item phase-Running" data-phase="Running" data-count="10"><polygon class="hex" points="33.6,389.06 40.87,393.26 40.87,401.66 33.6,405.86 26.33,401.66 26.33,393.26"/><text x="47.04" y="401.18">Running <tspan class="count">10</tspan></text></g><g class="legend-item phase-Pending" data-phase="Pending" data-count="1"><polygon class="hex" points="137.82,389.06 145.09,393.26 145.09,401.66 137.82,405.86 130.54,401.66 130.54,393.26"/><text x="151.26" y="401.18">Pending <tspan class="count">1</tspan></text></g><g class="legend-item phase-Blocked" data-phase="Blocked" data-count="1"><polygon class="hex" points="235.75,389.06 243.03,393.26 243.03,401.66 235.75,405.86 228.48,401.66 228.48,393.26"/><text x="249.19" y="401.18">Blocked <tspan class="count">1</tspan></text></g><g class="legend-item phase-NeedsConfig" data-phase="NeedsConfig" data-count="1"><polygon class="hex" points="333.69,389.06 340.97,393.26 340.97,401.66 333.69,405.86 326.42,401.66 326.42,393.26"/><text x="347.13" y="401.18">NeedsConfig <tspan class="count">1</tspan></text></g><g class="legend-item phase-Disabled" data-phase="Disabled" data-count="1"><polygon class="hex" points="456.74,389.06 464.02,393.26 464.02,401.66 456.74,405.86 449.47,401.66 449.47,393.26"/><text x="470.18" y="401.18">Disabled <tspan class="count">1</tspan></text></g><g class="legend-item phase-Error" data-phase="Error" data-count="1"><polygon class="hex" points="560.96,389.06 568.23,393.26 568.23,401.66 560.96,405.86 553.68,401.66 553.68,393.26"/><text x="574.4" y="401.18">Error <tspan class="count">1</tspan></text></g><g class="legend-item phase-Stopped" data-phase="Stopped" data-count="1"><polygon class="hex" points="646.34,389.06 653.62,393.26 653.62,401.66 646.34,405.86 639.07,401.66 639.07,393.26"/><text x="659.78" y="401.18">Stopped <tspan class="count">1</tspan></text></g><g class="legend-item phase-NotDeployed" data-phase="NotDeployed" data-count="1"><polygon class="hex" points="33.6,413.7 40.87,417.9 40.87,426.3 33.6,430.5 26.33,426.3 26.33,417.9"/><text x="47.04" y="425.82">NotDeployed <tspan class="count">1</tspan></text></g></g>
 </svg>

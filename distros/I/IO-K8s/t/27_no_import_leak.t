@@ -160,80 +160,23 @@ is_deeply($requires_seen{'IO::K8s::Role::ResourceMap'},
     [qw( resource_map )], 'ResourceMap still requires resource_map');
 
 # ---------------------------------------------------------------------------
-# 2b. The composition direction, on the shipped classes.
+# 2b. The composition direction, on the shipped classes -- MOVED.
 #
-# The names k118 and k119 removed, swept over every class that composes
-# IO::K8s::Role::Resource -- so both the ~213 top-level Kinds and the
-# nested resource classes.
+# The sweep over every shipped class composing IO::K8s::Role::Resource needs
+# the whole tree loaded, so it runs in t/02_compile_all.t on that file's one
+# shared load (subtest "import leak 2b"), together with the check that the
+# four k119 classes are inside the sweep. Only the list of leaked names stays
+# here, because 2c-2e below check it on their own classes; keep it in step
+# with t/02_compile_all.t.
 #
-# k118 removed the role-composed ones (croak / use_module / HashRef /
-# cidr_contains) by hoisting each role's imports above `use Moo::Role`.
-# k119 removed the rest: blessed / reftype / InstanceOf / Maybe / ArrayRef /
-# require_module reached four classes -- IO::K8s::List and the three
-# Apiextensions JSONSchemaPropsOr* union types -- from their OWN `use Moo`
-# file, where hoisting cannot help because a Moo class has no `not_methods`.
-# Those four now load Scalar::Util / Types::Standard / Module::Runtime with
-# an empty import list and call through fully-qualified names instead, so
-# there is nothing left to compose and no exception list here.
-#
-# Str / Bool / Int are deliberately absent from this list: IO::K8s::Resource
-# imports them into every class it is used from, so they are on ~1850
-# classes by design and are not a leak.
+# Imported by no shipped resource class on its own account, so any hit is a
+# leak -- from a role (k118) or from the class's own file (k119).
 # ---------------------------------------------------------------------------
 
-# Imported by no shipped resource class on its own account, so any hit here
-# is a leak -- from a role (k118) or from the class's own file (k119).
 my @LEAKED = qw(
     croak use_module require_module HashRef cidr_contains
     blessed reftype InstanceOf Maybe ArrayRef
 );
-
-my @modules;
-find(
-    {
-        wanted => sub {
-            return unless /\.pm$/;
-            my $m = $File::Find::name;
-            $m =~ s{^lib/}{};
-            $m =~ s{/}{::}g;
-            $m =~ s{\.pm$}{};
-            push @modules, $m;
-        },
-        no_chdir => 1,
-    },
-    'lib',
-);
-@modules = sort @modules;
-eval "require $_" for @modules;
-
-my @resource_classes = grep {
-    $_->can('does') && eval { $_->does('IO::K8s::Role::Resource') }
-} @modules;
-
-cmp_ok(scalar @resource_classes, '>=', 800,
-    'swept every shipped class composing IO::K8s::Role::Resource');
-
-for my $name (@LEAKED) {
-    my @carriers = grep { $_->can($name) } @resource_classes;
-    is_deeply(\@carriers, [],
-        "no shipped resource class carries '$name' as a method")
-        or diag('carried by: '.join(', ', @carriers));
-}
-
-# The four k119 classes are in that sweep rather than exempted from it --
-# asserted, not assumed, because they only reach @resource_classes by
-# composing IO::K8s::Role::Resource, which each of them does at the BOTTOM
-# of its file (List.pm being the exception, at the top). A `with` line lost
-# in a refactor would drop them out of the sweep silently.
-my %swept = map +($_ => 1), @resource_classes;
-for my $class (qw(
-    IO::K8s::List
-    IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrArray
-    IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrBool
-    IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrStringArray
-)) {
-    ok($swept{$class}, "$class is covered by the leak sweep");
-}
 
 # ---------------------------------------------------------------------------
 # 2c. The real role methods are still there.

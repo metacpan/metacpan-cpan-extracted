@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ServiceAccountRef;
 # ABSTRACT: A reference to a service account that will be used to request a bound token (also known as "projected token").
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s audiences => [Str];
@@ -22,7 +22,7 @@ IO::K8s::CertManager::V1::ServiceAccountRef - A reference to a service account t
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 audiences
 
@@ -39,7 +39,7 @@ Name of the ServiceAccount used to request a token.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -67,5 +67,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

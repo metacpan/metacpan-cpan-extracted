@@ -39,92 +39,92 @@
 <g class="group" data-group="platform"><text class="group-name" x="25.2" y="89.6">platform</text><line class="group-rule" x1="87.02" y1="85.68" x2="647.17" y2="85.68"/></g>
 <g class="group" data-group="shop"><text class="group-name" x="25.2" y="254.8">shop</text><line class="group-rule" x1="60.59" y1="250.88" x2="647.17" y2="250.88"/></g>
 <g class="deps"><path class="dep" data-from="shop/api" data-to="shop/auth" d="M86.58 467.66L103.73 452.47" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="84.9" cy="469.14" r="2.24"/><path class="dep" data-from="shop/auth" data-to="platform/cache" d="M114.69 375.99L90.65 199.28" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="114.99" cy="378.21" r="2.24"/><path class="dep" data-from="shop/auth" data-to="platform/db" d="M137.69 375.99L161.73 199.28" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="137.39" cy="378.21" r="2.24"/><path class="dep" data-from="shop/cart" data-to="shop/catalog" d="M191.57 467.66L208.73 452.47" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="189.89" cy="469.14" r="2.24"/><path class="dep" data-from="shop/catalog" data-to="platform/db" d="M219.69 375.99L195.65 199.28" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="219.99" cy="378.21" r="2.24"/><path class="dep" data-from="shop/catalog" data-to="platform/search" d="M243.66 376.37L366.79 197.78" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="242.39" cy="378.21" r="2.24"/><path class="dep" data-from="shop/mailer" data-to="platform/nats" d="M324.68 375.99L300.64 199.28" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="324.98" cy="378.21" r="2.24"/><path class="dep" data-from="shop/media" data-to="platform/storage" d="M452.68 375.99L476.72 199.28" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="452.38" cy="378.21" r="2.24"/><path class="dep" data-from="shop/newsletter" data-to="shop/mailer" d="M296.57 467.66L313.72 452.47" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="294.89" cy="469.14" r="2.24"/><path class="dep" data-from="shop/orders" data-to="shop/payments" d="M402.09 468.75L520.54 448.07" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="399.88" cy="469.14" r="2.24"/><path class="dep" data-from="shop/payments" data-to="platform/vault" d="M557.67 375.99L581.71 199.28" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="557.37" cy="378.21" r="2.24"/><path class="dep" data-from="shop/reports" data-to="shop/orders" d="M139.62 559.85L362.96 538.32" marker-end="url(#comb-arrow)"/><circle class="dep-start" cx="137.39" cy="560.06" r="2.24"/></g>
-<g class="comb phase-Running" data-name="cache" data-id="platform/cache" data-phase="Running"><title>platform/cache
+<g class="comb phase-Running" data-name="cache" data-id="platform/cache" data-phase="Running" data-comb-group="platform"><title>platform/cache
 namespace: platform
 class: MyApp::Comb::Cache
 phase: Running
 endpoint: redis 6379</title><polygon class="hex" points="73.7,100.8 122.2,128.8 122.2,184.8 73.7,212.8 25.2,184.8 25.2,128.8"/><text class="name" x="73.7" y="152.88">cache</text><text class="phase" x="73.7" y="169.68">Running</text></g>
-<g class="comb phase-Running borrowed" data-name="db" data-id="platform/db" data-phase="Running"><title>platform/db
+<g class="comb phase-Running borrowed" data-name="db" data-id="platform/db" data-phase="Running" data-comb-group="platform"><title>platform/db
 namespace: platform
 class: MyApp::Comb::Postgres
 phase: Running
 endpoint: postgres 5432
 upstream: Kubernetes::Comb::Upstream::K8s, context shared
 via: shared</title><polygon class="hex" points="178.69,100.8 227.19,128.8 227.19,184.8 178.69,212.8 130.19,184.8 130.19,128.8"/><text class="name" x="178.69" y="147.28">db</text><text class="phase" x="178.69" y="164.08">Running</text><text class="upstream" x="178.69" y="178.08">from shared</text></g>
-<g class="comb phase-Running" data-name="nats" data-id="platform/nats" data-phase="Running"><title>platform/nats
+<g class="comb phase-Running" data-name="nats" data-id="platform/nats" data-phase="Running" data-comb-group="platform"><title>platform/nats
 namespace: platform
 class: MyApp::Comb::NATS
 phase: Running
 endpoint: client 4222
 endpoint: monitor 8222</title><polygon class="hex" points="283.69,100.8 332.19,128.8 332.19,184.8 283.69,212.8 235.19,184.8 235.19,128.8"/><text class="name" x="283.69" y="152.88">nats</text><text class="phase" x="283.69" y="169.68">Running</text></g>
-<g class="comb phase-Running" data-name="search" data-id="platform/search" data-phase="Running"><title>platform/search
+<g class="comb phase-Running" data-name="search" data-id="platform/search" data-phase="Running" data-comb-group="platform"><title>platform/search
 namespace: platform
 class: MyApp::Comb::Search
 phase: Running
 endpoint: http 9200</title><polygon class="hex" points="388.68,100.8 437.18,128.8 437.18,184.8 388.68,212.8 340.18,184.8 340.18,128.8"/><text class="name" x="388.68" y="152.88">search</text><text class="phase" x="388.68" y="169.68">Running</text></g>
-<g class="comb phase-Running" data-name="storage" data-id="platform/storage" data-phase="Running"><title>platform/storage
+<g class="comb phase-Running" data-name="storage" data-id="platform/storage" data-phase="Running" data-comb-group="platform"><title>platform/storage
 namespace: platform
 class: MyApp::Comb::ObjectStore
 phase: Running
 endpoint: s3 9000
 endpoint: console 9001</title><polygon class="hex" points="493.68,100.8 542.18,128.8 542.18,184.8 493.68,212.8 445.18,184.8 445.18,128.8"/><text class="name" x="493.68" y="152.88">storage</text><text class="phase" x="493.68" y="169.68">Running</text></g>
-<g class="comb phase-Running" data-name="vault" data-id="platform/vault" data-phase="Running"><title>platform/vault
+<g class="comb phase-Running" data-name="vault" data-id="platform/vault" data-phase="Running" data-comb-group="platform"><title>platform/vault
 namespace: platform
 class: MyApp::Comb::Vault
 phase: Running
 endpoint: api 8200</title><polygon class="hex" points="598.67,100.8 647.17,128.8 647.17,184.8 598.67,212.8 550.17,184.8 550.17,128.8"/><text class="name" x="598.67" y="152.88">vault</text><text class="phase" x="598.67" y="169.68">Running</text></g>
-<g class="comb phase-NotDeployed" data-name="loyalty" data-id="shop/loyalty" data-phase="NotDeployed"><title>shop/loyalty
+<g class="comb phase-NotDeployed" data-name="loyalty" data-id="shop/loyalty" data-phase="NotDeployed" data-comb-group="shop"><title>shop/loyalty
 namespace: shop
 class: MyApp::Comb::Loyalty
 phase: NotDeployed
 message: not deployed</title><polygon class="hex" points="73.7,266 122.2,294 122.2,350 73.7,378 25.2,350 25.2,294"/><text class="name" x="73.7" y="318.08">loyalty</text><text class="phase" x="73.7" y="334.88">NotDeployed</text></g>
-<g class="comb phase-Running" data-name="auth" data-id="shop/auth" data-phase="Running"><title>shop/auth
+<g class="comb phase-Running" data-name="auth" data-id="shop/auth" data-phase="Running" data-comb-group="shop"><title>shop/auth
 namespace: shop
 class: MyApp::Comb::Auth
 phase: Running
 endpoint: http 8080</title><polygon class="hex" points="126.19,356.93 174.69,384.93 174.69,440.93 126.19,468.93 77.69,440.93 77.69,384.93"/><text class="name" x="126.19" y="409.01">auth</text><text class="phase" x="126.19" y="425.81">Running</text></g>
-<g class="comb phase-Error" data-name="catalog" data-id="shop/catalog" data-phase="Error"><title>shop/catalog
+<g class="comb phase-Error" data-name="catalog" data-id="shop/catalog" data-phase="Error" data-comb-group="shop"><title>shop/catalog
 namespace: shop
 class: MyApp::Comb::Catalog
 phase: Error
 message: migration 0042_add_sku failed: column &quot;sku&quot; of relation &quot;product&quot; already exists</title><polygon class="hex" points="231.19,356.93 279.69,384.93 279.69,440.93 231.19,468.93 182.69,440.93 182.69,384.93"/><text class="name" x="231.19" y="403.41">catalog</text><text class="phase" x="231.19" y="420.21">Error</text><text class="reason" x="231.19" y="434.21">MigrationFailed</text></g>
-<g class="comb phase-NeedsConfig" data-name="mailer" data-id="shop/mailer" data-phase="NeedsConfig"><title>shop/mailer
+<g class="comb phase-NeedsConfig" data-name="mailer" data-id="shop/mailer" data-phase="NeedsConfig" data-comb-group="shop"><title>shop/mailer
 namespace: shop
 class: MyApp::Comb::Mailer
 phase: NeedsConfig
 message: secret mailer-smtp has no key &quot;password&quot;</title><polygon class="hex" points="336.18,356.93 384.68,384.93 384.68,440.93 336.18,468.93 287.68,440.93 287.68,384.93"/><text class="name" x="336.18" y="403.41">mailer</text><text class="phase" x="336.18" y="420.21">NeedsConfig</text><text class="reason" x="336.18" y="434.21">SecretIncomplete</text></g>
-<g class="comb phase-Pending" data-name="media" data-id="shop/media" data-phase="Pending"><title>shop/media
+<g class="comb phase-Pending" data-name="media" data-id="shop/media" data-phase="Pending" data-comb-group="shop"><title>shop/media
 namespace: shop
 class: MyApp::Comb::Media
 phase: Pending
 message: rollout in progress: 1 of 3 replicas ready
 endpoint: http 8080</title><polygon class="hex" points="441.18,356.93 489.68,384.93 489.68,440.93 441.18,468.93 392.68,440.93 392.68,384.93"/><text class="name" x="441.18" y="398.09">media</text><text class="phase" x="441.18" y="413.77">Pending</text><text class="reason"><tspan x="441.18" y="424.97">RolloutIn</tspan><tspan x="441.18" y="434.49">Progress</tspan></text></g>
-<g class="comb phase-Running" data-name="payments" data-id="shop/payments" data-phase="Running"><title>shop/payments
+<g class="comb phase-Running" data-name="payments" data-id="shop/payments" data-phase="Running" data-comb-group="shop"><title>shop/payments
 namespace: shop
 class: MyApp::Comb::Payments
 phase: Running
 endpoint: http 8080</title><polygon class="hex" points="546.17,356.93 594.67,384.93 594.67,440.93 546.17,468.93 497.67,440.93 497.67,384.93"/><text class="name" x="546.17" y="409.01">payments</text><text class="phase" x="546.17" y="425.81">Running</text></g>
-<g class="comb phase-Running" data-name="api" data-id="shop/api" data-phase="Running"><title>shop/api
+<g class="comb phase-Running" data-name="api" data-id="shop/api" data-phase="Running" data-comb-group="shop"><title>shop/api
 namespace: shop
 class: MyApp::Comb::API
 phase: Running
 endpoint: http 8080
 endpoint: metrics 9090</title><polygon class="hex" points="73.7,447.86 122.2,475.86 122.2,531.86 73.7,559.86 25.2,531.86 25.2,475.86"/><text class="name" x="73.7" y="499.94">api</text><text class="phase" x="73.7" y="516.74">Running</text></g>
-<g class="comb phase-Blocked" data-name="cart" data-id="shop/cart" data-phase="Blocked"><title>shop/cart
+<g class="comb phase-Blocked" data-name="cart" data-id="shop/cart" data-phase="Blocked" data-comb-group="shop"><title>shop/cart
 namespace: shop
 class: MyApp::Comb::Cart
 phase: Blocked
 message: waiting for catalog (Error)</title><polygon class="hex" points="178.69,447.86 227.19,475.86 227.19,531.86 178.69,559.86 130.19,531.86 130.19,475.86"/><text class="name" x="178.69" y="489.02">cart</text><text class="phase" x="178.69" y="504.7">Blocked</text><text class="reason"><tspan x="178.69" y="515.9">Dependency</tspan><tspan x="178.69" y="525.42">NotReady</tspan></text></g>
-<g class="comb phase-Disabled disabled" data-name="newsletter" data-id="shop/newsletter" data-phase="Disabled"><title>shop/newsletter
+<g class="comb phase-Disabled disabled" data-name="newsletter" data-id="shop/newsletter" data-phase="Disabled" data-comb-group="shop"><title>shop/newsletter
 namespace: shop
 class: MyApp::Comb::Newsletter
 phase: Disabled</title><polygon class="hex" points="283.69,447.86 332.19,475.86 332.19,531.86 283.69,559.86 235.19,531.86 235.19,475.86"/><text class="name" x="283.69" y="499.94">newsletter</text><text class="phase" x="283.69" y="516.74">Disabled</text></g>
-<g class="comb phase-Running" data-name="orders" data-id="shop/orders" data-phase="Running"><title>shop/orders
+<g class="comb phase-Running" data-name="orders" data-id="shop/orders" data-phase="Running" data-comb-group="shop"><title>shop/orders
 namespace: shop
 class: MyApp::Comb::Orders
 phase: Running
 endpoint: http 8080</title><polygon class="hex" points="388.68,447.86 437.18,475.86 437.18,531.86 388.68,559.86 340.18,531.86 340.18,475.86"/><text class="name" x="388.68" y="499.94">orders</text><text class="phase" x="388.68" y="516.74">Running</text></g>
-<g class="comb phase-Stopped" data-name="reports" data-id="shop/reports" data-phase="Stopped"><title>shop/reports
+<g class="comb phase-Stopped" data-name="reports" data-id="shop/reports" data-phase="Stopped" data-comb-group="shop"><title>shop/reports
 namespace: shop
 class: MyApp::Comb::Reports
 phase: Stopped

@@ -24,6 +24,7 @@ ext/transport-apis/data/at/vvt-hafas-mgate.json
 ext/transport-apis/data/at/vvv-hafas-mgate.json
 ext/transport-apis/data/au/transportnsw-efa.json
 ext/transport-apis/data/be/nmbs-sncb-hafas-mgate.json
+ext/transport-apis/data/bo/trufi-cochabamba-2-otp.json
 ext/transport-apis/data/ch/bls-hafas-mgate.json
 ext/transport-apis/data/ch/sbb-cff-ffs-hafas-mgate.json
 ext/transport-apis/data/ch/tpg-hafas-mgate.json
@@ -120,6 +121,7 @@ README.md
 scripts/check-efa-urls
 scripts/makedeb-docker
 scripts/makedeb-docker-helper
+scripts/publish-deb
 scripts/publish-docker
 t/20-vrr.t
 t/21-vrr-ambig.t

@@ -7,184 +7,163 @@ model: inherit
 
 # mcp-k8s-core
 
-MCP::K8s ist ein stdio MCP-Server, der einem LLM Zugriff auf einen Kubernetes-Cluster
-gibt. Der Kern der Idee: **RBAC ist die einzige Autorisierungsschicht.** Der Server
-fragt den Cluster per `SelfSubjectRulesReview`, was der verbundene ServiceAccount darf,
-und formt daraus die Tool-Beschreibungen. Es gibt **keine** applikationsseitige
-Permission-Filterung — was RBAC erlaubt, darf das LLM.
+MCP::K8s is a stdio MCP server that gives an LLM access to a Kubernetes cluster.
+The core of the idea: **RBAC is the only authorization layer.** The server
+asks the cluster via `SelfSubjectRulesReview` what the connected ServiceAccount may do,
+and shapes the tool descriptions from that. There is **no** application-side
+permission filtering — whatever RBAC allows, the LLM may do.
+
+Here are the architecture and the rules; the reasons and prohibitions sit alongside in `mcp-k8s-hazards`.
 
 ## Vocabulary
 
-| Begriff | Bedeutung |
+| Term | Meaning |
 |---|---|
-| **tool** | Eines der 10 MCP-Tools (`k8s_list`, `k8s_get`, …), registriert in `_register_tools` |
-| **discovery** | `SelfSubjectRulesReview` pro Namespace → interne Permission-Map. Lazy, nicht bei `new` |
-| **plural** | RBAC-Name einer Ressource (`Pod` → `pods`). RBAC spricht nur Plural, die API spricht Kind |
-| **verb** | RBAC-Verb (`list`, `get`, `create`, `patch`, `delete`) — der Schlüssel jeder Prüfung |
-| **cluster scope** | Namespace `''` — eigene Zeile in der Permission-Map, eigener Discovery-Call |
-| **desc map** | `_tool_desc_map`: `[$tool, $base_description, $verb]` je Tool, für nachträgliches Umschreiben der Beschreibungen |
+| **tool** | One of the 10 MCP tools (`k8s_list`, `k8s_get`, …), registered in `_register_tools` |
+| **discovery** | `SelfSubjectRulesReview` per namespace → internal permission map. Lazy, not at `new` |
+| **plural** | RBAC name of a resource (`Pod` → `pods`). RBAC speaks only plural, the API speaks kind |
+| **verb** | RBAC verb (`list`, `get`, `create`, `patch`, `delete`) — the key of every check |
+| **cluster scope** | Namespace `''` — its own row in the permission map, its own discovery call |
+| **desc map** | `_tool_desc_map`: `[$tool, $base_description, $verb]` per tool, for rewriting the descriptions afterwards |
 
 ## Layer Map
 
 ```
 bin/mcp-k8s                   # Entry point: MCP::K8s->run_stdio
 lib/MCP/K8s.pm                # Server (extends MCP::Server), Tools, Formatting, Auth, Plurals
-lib/MCP/K8s/Permissions.pm    # RBAC-Discovery + can_do/allowed_* /summary
-lib/MCP/Kubernetes.pm         # Leere Subklasse von MCP::K8s, nur für CPAN-Auffindbarkeit
-examples/*.yaml               # RBAC-Beispiele (readonly / deployer / full-ops)
-examples/raider-configmap-demo.pl  # Live-Demo mit Langertha::Raider
+lib/MCP/K8s/Permissions.pm    # RBAC discovery + can_do/allowed_* /summary
+lib/MCP/Kubernetes.pm         # Empty subclass of MCP::K8s, only for CPAN discoverability
+examples/*.yaml               # RBAC examples (readonly / deployer / full-ops)
+examples/raider-configmap-demo.pl  # Live demo with Langertha::Raider
 ```
 
-`MCP::K8s` **erbt** von `MCP::Server` (seit 0.002), komponiert ihn nicht mehr.
-`sub server { $_[0] }` existiert nur als Rückwärtskompatibilität für Code, der
-`$k8s->server` an `Net::Async::MCP` übergibt — das ist der dokumentierte
-Raider-Pfad im README, also nicht entfernen.
+`MCP::K8s` **inherits** from `MCP::Server` (since 0.002); it no longer composes it.
+`sub server { $_[0] }` exists only as backward compatibility for code that passes
+`$k8s->server` to `Net::Async::MCP` — the documented Raider path in the README.
 
 ## Core invariants
 
-- **Discovery ist lazy, und das ist eine Zusage.** `BUILD` registriert nur Tools.
-  Der erste RBAC-Call passiert in `ensure_discovered` — ausgelöst durch einen
-  Tool-Call oder `run_stdio`. Damit ist `MCP::K8s->new` ohne Cluster konstruierbar,
-  worauf die halbe Testsuite baut. Nichts in `BUILD` schieben, das `->api` anfasst.
-- **Jeder Tool-Call prüft vorher `can_do`.** Kein Tool ruft die API ohne
-  vorangehende Permission-Prüfung — auch dann nicht, wenn die API-Antwort ohnehin
-  403 wäre. Die Prüfung ist das, was dem LLM eine lesbare Absage statt eines
-  Stacktraces gibt.
-- **`can_do` matcht auf dem Plural, nicht auf dem Kind.** Wer `can_do('list', 'Pod')`
-  aufruft, bekommt still `0`. Immer erst `_resource_plural` durchlaufen.
-- **Wildcards gelten in beide Richtungen.** `can_do` trifft bei explizitem Verb,
-  Wildcard-Verb (`*` auf der Ressource), Wildcard-Ressource mit Verb, und
-  Wildcard/Wildcard. Alle vier Zweige sind live; wer einen wegoptimiert, bricht
-  cluster-admin.
-- **Discovery-Fehler pro Namespace sind nicht fatal.** Ein unerreichbarer Namespace
-  wird gewarnt und übersprungen, die anderen werden trotzdem entdeckt. Das gilt
-  auch für den cluster-scope-Call.
-- **Tool-Beschreibungen werden nachträglich umgeschrieben**, genau einmal, in
-  `_update_tool_descriptions` (Guard: `_descriptions_updated`). Sie hängen an
-  `_tool_desc_map`; ein neu registriertes Tool ohne Eintrag dort behält für immer
-  seine statische Beschreibung.
-- **Die Beschreibungen sind Teil der Funktionalität, nicht Kosmetik.** Sie sagen dem
-  LLM „Available: default: pods, deployments; production: pods", damit es nicht raten
-  muss. Bei >10 Ressourcen wird auf 10 + `...` gekürzt, bei `*` steht „all resources".
+- **Discovery is lazy, and that is a promise.** `BUILD` only registers tools;
+  the first RBAC call happens in `ensure_discovered`, triggered by a
+  tool call or `run_stdio`. That makes `MCP::K8s->new` constructible without a cluster,
+  which half the test suite relies on. Don't move anything into `BUILD` that touches `->api`.
+- **Every tool call checks `can_do` first.** No tool calls the API without a
+  prior permission check. Reason: `mcp-k8s-hazards`.
+- **`can_do` matches on the plural, not on the kind**, and all four wildcard branches
+  (explicit verb, wildcard verb on the resource, wildcard resource with verb, `*`/`*`)
+  are live. Whoever calls `can_do('list', 'Pod')` silently gets `0` — always
+  `_resource_plural` first.
+- **Per-namespace discovery errors are not fatal.** An unreachable namespace
+  is warned about and skipped, the others are discovered anyway. That also
+  applies to the cluster-scope call.
+- **Tool descriptions are rewritten afterwards**, exactly once, in
+  `_update_tool_descriptions` (guard: `_descriptions_updated`). They hang off
+  `_tool_desc_map`; a newly registered tool without an entry there keeps its
+  static description forever. They are part of the functionality, not cosmetics.
 
 ## Resource plurals — 4-Tier Lookup
 
-`_resource_plural($kind)`, in dieser Reihenfolge:
+`_resource_plural($kind)`, in this order:
 
-1. **Statische `%RESOURCE_PLURALS`-Map** — schnell, kein I/O
-2. **`IO::K8s`-Klasse** via `expand_class` + `resource_plural()` — deckt CRD-Klassen ab
-3. **API-Discovery** (`/api/v1` und `/apis` + `/apis/$groupVersion`), einmalig
-   gecacht in `_resource_plurals_cache`. Subresources (`name` enthält `/`) werden
-   übersprungen
-4. **Heuristik** — lowercase, `s` anhängen, `ys` → `ies`
+1. **Static `%RESOURCE_PLURALS` map** — fast, no I/O
+2. **`IO::K8s` class** via `expand_class` + `resource_plural()` — covers CRD classes
+3. **API discovery** (`/api/v1` and `/apis` + `/apis/$groupVersion`), cached once
+   in `_resource_plurals_cache`. Subresources (`name` contains `/`) are
+   skipped
+4. **Heuristic** — lowercase, append `s`, `ys` → `ies`
 
-Tier 3 schluckt alle Fehler still: schlägt die Discovery fehl, bleibt der Cache leer
-und Tier 4 greift. Das ist Absicht — ein Cluster ohne Discovery-Rechte soll den
-Server nicht umbringen. Der Preis: eine falsche Pluralisierung sieht aus wie ein
-Permission-Denied. Bei „Permission denied", das nicht sein dürfte, immer zuerst den
-Plural prüfen.
+Tier 3 silently swallows all errors: if discovery fails, the cache stays empty
+and tier 4 takes over. The price: a wrong pluralization looks like a
+permission denied — on a "Permission denied" that should not happen, always check the
+plural first. CRD support depends on tiers 2+3; that is exactly why Cilium & co. work without
+configuration.
 
-CRD-Support hängt komplett an Tier 2+3. Cilium & Co. funktionieren ohne Konfiguration
-genau deshalb.
+## Auth — 3-Tier, in this order
 
-## Auth — 3-Tier, in dieser Reihenfolge
-
-| Tier | Auslöser | Endpoint |
+| Tier | Trigger | Endpoint |
 |---|---|---|
-| 1 | `MCP_K8S_TOKEN` gesetzt | `MCP_K8S_SERVER`, sonst in-cluster default |
-| 2 | `/var/run/secrets/kubernetes.io/serviceaccount/token` existiert | dito |
-| 3 | Fallback | `Kubernetes::REST::Kubeconfig` mit `MCP_K8S_CONTEXT` |
+| 1 | `MCP_K8S_TOKEN` set | `MCP_K8S_SERVER`, otherwise in-cluster default |
+| 2 | `/var/run/secrets/kubernetes.io/serviceaccount/token` exists | same |
+| 3 | Fallback | `Kubernetes::REST::Kubeconfig` with `MCP_K8S_CONTEXT` |
 
-Tier 1 und 2 hängen `ssl_ca_file` an, **wenn** die in-cluster CA-Datei existiert —
-auch bei explizitem Token. Die Pfade sind File-scoped `my`-Variablen in `MCP/K8s.pm`;
-Tests, die Auth-Tiers durchspielen, müssen sie über das Dateisystem beeinflussen oder
-den Tier über Attribute erzwingen.
+Tiers 1 and 2 attach `ssl_ca_file` **when** the in-cluster CA file exists — even
+with an explicit token. The paths are file-scoped `my` variables in `MCP/K8s.pm`; tests
+have to force them via the filesystem or via attributes.
 
 ## Namespaces
 
-`_build_namespaces`: `MCP_K8S_NAMESPACES` → in-cluster-Namespace-Datei (dann Versuch,
-alle zu listen, mit dem gemounteten als Fallback) → Auto-Discovery über `list('Namespace')`
-→ `['default']`. Jede API-Nutzung darin ist in `eval` gewickelt; es gibt keinen Pfad,
-auf dem `_build_namespaces` stirbt.
+`_build_namespaces`: `MCP_K8S_NAMESPACES` → in-cluster namespace file (then an attempt to list
+all, with the mounted one as fallback) → auto-discovery via `list('Namespace')` →
+`['default']`. Every API use in there is wrapped in `eval`; there is no path on
+which `_build_namespaces` dies.
 
-`_resolve_namespace` füllt den Namespace **nur** auf, wenn genau einer erreichbar ist,
-sonst `undef` — das Tool muss den Fall selbst behandeln. Nicht auf „nimm den ersten"
-ändern: bei mehreren Namespaces wäre das eine stille Fehlbedienung mit echten Folgen.
+`_resolve_namespace` fills in the namespace only when exactly one namespace is reachable,
+otherwise `undef` — the tool has to handle the case itself. Reason: `mcp-k8s-hazards`.
 
-## Die 10 Tools
+## The 10 tools
 
-`k8s_permissions` (immer erlaubt, ruft `summary`), `k8s_list`, `k8s_get`,
-`k8s_create`, `k8s_patch`, `k8s_delete`, `k8s_logs`, `k8s_events`,
-`k8s_rollout_restart`, `k8s_apply`.
+`k8s_permissions` (always allowed, calls `summary`), `k8s_list`, `k8s_get`, `k8s_create`,
+`k8s_patch`, `k8s_delete`, `k8s_logs`, `k8s_events`, `k8s_rollout_restart`, `k8s_apply`.
 
-Zwei davon sind zusammengesetzt und verdienen Aufmerksamkeit:
+- **`k8s_rollout_restart`** patches the pod template annotation
+  `kubectl.kubernetes.io/restartedAt` with a timestamp — the same mechanism as
+  `kubectl rollout restart`; it needs `patch`, not `update`.
+- **`k8s_apply`** tries `create` and on 409/AlreadyExists falls back to a
+  strategic merge patch. Error detection is a regex on
+  `/409|AlreadyExists/i` against the error string — reason and limits: `mcp-k8s-hazards`.
 
-- **`k8s_rollout_restart`** patcht die Pod-Template-Annotation
-  `kubectl.kubernetes.io/restartedAt` mit einem Timestamp — derselbe Mechanismus wie
-  `kubectl rollout restart`. Es braucht `patch`, nicht `update`.
-- **`k8s_apply`** versucht `create` und fällt bei 409/AlreadyExists auf einen
-  Strategic-Merge-Patch zurück. Die Fehlererkennung ist ein Regex auf
-  `/409|AlreadyExists/i` gegen den Fehlerstring — ein anderer Client-Layer mit anderem
-  Fehlerformat bricht das lautlos in Richtung „Create schlug fehl".
+**Why 10 generic tools instead of hundreds of specific ones:** Kubernetes has 50+ built-in types
+plus arbitrary CRDs; generic tools with a `resource` parameter mirror `kubectl get <resource>`
+and keep the tool list manageable for MCP clients. Adding a `list_pods` tool is
+a change of direction, not a feature.
 
-**Warum 10 generische Tools statt hunderter spezifischer:** Kubernetes hat 50+
-Built-in-Typen plus beliebige CRDs. Generische Tools mit `resource`-Parameter spiegeln
-`kubectl get <resource>` und halten die Tool-Liste für MCP-Clients handhabbar.
-Ein `list_pods`-Tool hinzuzufügen ist eine Richtungsänderung, kein Feature.
+## Output format
 
-## Ausgabeformat
-
-`_format_resource_summary` liefert bewusst eine **kompakte** Zusammenfassung für den
-LLM-Kontext (Metadata, Kind, Status-Phase/Replicas/Conditions, Container/Ports/Type) —
-für alles Weitere ist `k8s_get` mit `output => 'json'|'yaml'` da. Wer das Summary
-aufbläht, bezahlt es in jedem `k8s_list` mit N Items.
+`_format_resource_summary` deliberately returns a **compact** summary for the
+LLM context (metadata, kind, status phase/replicas/conditions, containers/ports/type);
+for everything else there is `k8s_get` with `output => 'json'|'yaml'`. Whoever bloats the summary
+pays for it in every `k8s_list` with N items.
 
 ## Tests
 
-Alles läuft gegen handgeschriebene Mock-Pakete im jeweiligen Testfile
-(`MockK8sAPI`, `MockSSRR`, `MockK8sObject`, …) — kein Test braucht einen Cluster,
-und keiner darf einen brauchen. Die Mocks implementieren die von `Kubernetes::REST`
-genutzte Oberfläche (`new_object`, `create`, `list`, `get`, `delete`, `patch`,
-`expand_class`, `_request`).
+Everything runs against hand-written mock packages in the respective test file (`MockK8sAPI`,
+`MockSSRR`, `MockK8sObject`, …) — no test needs a cluster, and none may
+need one. The mocks implement the surface `Kubernetes::REST` uses
+(`new_object`, `create`, `list`, `get`, `delete`, `patch`, `expand_class`, `_request`).
 
-| Datei | Deckt ab |
+| File | Covers |
 |---|---|
-| `t/00-load.t` | Ladbarkeit der drei Module |
-| `t/01-permissions.t` | RBAC-Discovery, `can_do`-Wildcards, `allowed_*`, `summary` |
-| `t/02-resource-plurals.t` | 4-Tier-Pluralisierung |
-| `t/03-namespace-resolution.t` | Auto-Fill genau bei einem Namespace |
-| `t/04-format-helpers.t` | Summary-/List-Formatierung |
-| `t/05-server-tools.t` | Tool-Registrierung und -Ausführung inkl. `force_409`-Pfad von `k8s_apply`, `k8s_patch`-Statuspfad, `IO::K8s::Unstructured` |
-| `t/06-kubernetes-alias.t` | `MCP::Kubernetes` ist `MCP::K8s` |
-| `t/07-auth-alternatives.t` | Token-/in-cluster-/Kubeconfig-Tiers |
-| `t/08-resource-discovery.t` | API-Discovery-Endpunkte, Subresource-Filter, Tier 2 ohne Request |
+| `t/00-load.t`, `t/06-kubernetes-alias.t` | Loadability of the three modules; `MCP::Kubernetes` is `MCP::K8s` |
+| `t/01-permissions.t` | RBAC discovery, `can_do` wildcards, `allowed_*`, `summary` |
+| `t/02-resource-plurals.t` | 4-tier pluralization |
+| `t/03-namespace-resolution.t` | Auto-fill with exactly one namespace |
+| `t/04-format-helpers.t` | Summary/list formatting |
+| `t/05-server-tools.t` | Tool registration and execution incl. `force_409` path of `k8s_apply`, `k8s_patch` status path, `IO::K8s::Unstructured` |
+| `t/07-auth-alternatives.t` | Token/in-cluster/kubeconfig tiers |
+| `t/08-resource-discovery.t` | API discovery endpoints, subresource filter, tier 2 without a request |
 
-`prove -l t/` ist der Lauf. Die Suite braucht `Kubernetes::REST` und `IO::K8s`
-installiert — fehlen sie, kompiliert `MCP::K8s` nicht und *alle* Files scheitern mit
-Exit 2 ohne Plan. Das ist ein Umgebungsproblem, kein Testfehler.
+`prove -l t/` is the run. The suite needs `Kubernetes::REST` and `IO::K8s`
+installed — if they are missing, *all* files fail with exit 2 and no plan: an environment problem,
+not a test failure.
 
-## Env-Vars
+## Env vars
 
-| Variable | Default | Wirkung |
+| Variable | Default | Effect |
 |---|---|---|
-| `KUBECONFIG` | `~/.kube/config` | Kubeconfig-Pfad (Tier 3) |
-| `MCP_K8S_CONTEXT` | current-context | Kubeconfig-Context |
-| `MCP_K8S_TOKEN` | — | Bearer Token, aktiviert Auth-Tier 1 |
-| `MCP_K8S_SERVER` | in-cluster default | API-Server-URL |
-| `MCP_K8S_NAMESPACES` | Auto-Discovery | Komma-getrennte Namespace-Liste |
+| `KUBECONFIG` | `~/.kube/config` | Kubeconfig path (tier 3) |
+| `MCP_K8S_CONTEXT` | current-context | Kubeconfig context |
+| `MCP_K8S_TOKEN` | — | Bearer token, enables auth tier 1 |
+| `MCP_K8S_SERVER` | in-cluster default | API server URL |
+| `MCP_K8S_NAMESPACES` | Auto-discovery | Comma-separated namespace list |
 
-Es gibt **keine** Kommandozeilen-Flags. Die Konfiguration ist vollständig
-env-basiert, damit sie in MCP-Client-JSON (`.mcp.json`, Claude Desktop) ausdrückbar
-ist. Ein Flag hinzuzufügen bricht diese Zusage.
+There are **no** command-line flags — configuration is entirely
+env-based, so that it can be expressed in MCP client JSON. Reason: `mcp-k8s-hazards`.
 
 ## Conventions
 
-POD folgt durchgehend der Deklaration, nicht umgekehrt: `sub foo {` gefolgt von
-`=method foo` … `=cut`, dann der Body; `has bar => (…)` gefolgt von `=attr bar`
-… `=cut`. Das ist der `[@Author::GETTY]`-Stil dieser Distribution — nicht nach
-oben verschieben. `$VERSION` steht in allen drei Modulen und wird vom
-Release-Bundle gepflegt.
-
-Release-Mechanik: skill `getty-perl-release-author-getty`. dist.ini: skill
-`perl-release-dist-ini`. Moo-Muster: skill `getty-perl-moo`. MCP-Server-Grundlagen:
-skill `perl-mcp`.
+POD consistently follows the declaration, not the other way round: `sub foo {` followed by
+`=method foo` … `=cut`, then the body; `has bar => (…)` followed by `=attr bar`
+… `=cut`. That is this distribution's `[@Author::GETTY]` style — don't move it
+up. `$VERSION` is in all three modules and is maintained by the release bundle.
+Release: `getty-perl-release-author-getty`, dist.ini: `perl-release-dist-ini`,
+Moo: `getty-perl-moo`, MCP server: `perl-mcp`.

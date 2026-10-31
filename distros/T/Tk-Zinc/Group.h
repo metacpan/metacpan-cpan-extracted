@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Group.h,v 1.5 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*

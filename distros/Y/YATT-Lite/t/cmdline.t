@@ -85,6 +85,12 @@ SKIP: {
   is_deeply $run->($in)
     , "TEST(FOO)"
       , "run($in)";
+
+  # GH-233: options are configured into fields without cf_ prefix.
+  $in = q/--debug --file=baz test FOO/;
+  is_deeply $run->($in)
+    , "TEST(FOO)"
+      , "run($in)";
 }
 
 done_testing();

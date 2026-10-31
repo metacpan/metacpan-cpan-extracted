@@ -5,9 +5,6 @@
 
 # TODO: check optimise_content and gzips do the *right* thing
 # TODO: check ETags are correct
-# TODO: Write a test to check that 304 is sent when a cached object
-#	is newer than the IF_MODIFIED_SINCE date
-# TODO: Test HTTP_IF_MODIFIED_SINCE sends 304 when appropriate
 
 use strict;
 use warnings;
@@ -150,7 +147,7 @@ OUTPUT: {
 	ok(defined($length));
 
 	($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
-	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}"/m);
+	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}-(?:gzip|br|zstd)"/m);
 
 	ok(defined($body));
 	ok(length($body) eq $length);
@@ -176,7 +173,9 @@ OUTPUT: {
 		html_ok($body, 'HTML:Lint shows no errors');
 	} else {
 		SKIP: {
-			ok($headers =~ /^Status: 406/m);
+			# The client also accepts gzip, so that's used rather
+			# than failing with a 406
+			like($headers, qr/^Content-Encoding: gzip/m, 'falls back to gzip without Brotli');
 
 			skip('Install IO::Compress::Brotli to test Brotli compression', 3);
 		}
@@ -433,8 +432,8 @@ OUTPUT: {
 	$length = $1;
 	ok(defined($length));
 	ok($length <= 40);
-	ok($body =~ /^<HTML>/);
-	ok($body !~ /<\/HTML>$/ms);
+	unlike($body, qr/^<HTML>/, 'bytes=-40 is the end of the page, not the start');
+	like($body, qr/<\/HTML>\n?$/, 'bytes=-40 includes the last byte');
 
 	ok($headers =~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
 	$etag = $1;

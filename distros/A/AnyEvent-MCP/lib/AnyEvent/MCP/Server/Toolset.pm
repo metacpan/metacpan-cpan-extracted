@@ -65,15 +65,21 @@ paths or operations in sequence:
       my ($req, $args) = @_;
 
       my $source_grant = $req->require_permission ({
-         tool => $req->{tool}, subject => $args->{source},
-         subjects => [{ label => "source file", subject => $args->{source} }],
+         tool => $req->{tool},
+         dimensions => { subject => {
+            label => "Source file", value => $args->{source},
+            choices => [{ label => "source file", match => $args->{source} }],
+         } },
          action => "read", sandbox_grants => ["workdir-read"],
          reason => "read the source file",
       });
 
       my $destination_grant = $req->require_permission ({
-         tool => $req->{tool}, subject => $args->{destination},
-         subjects => [{ label => "destination file", subject => $args->{destination} }],
+         tool => $req->{tool},
+         dimensions => { subject => {
+            label => "Destination file", value => $args->{destination},
+            choices => [{ label => "destination file", match => $args->{destination} }],
+         } },
          action => "write", sandbox_grants => ["workdir-write"],
          reason => "write the destination file",
       });

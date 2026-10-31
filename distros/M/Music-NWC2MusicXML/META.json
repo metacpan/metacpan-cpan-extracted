@@ -50,6 +50,7 @@
             "autodie" : "0",
             "perl" : "5.036",
             "strict" : "0",
+            "version" : "0",
             "warnings" : "0"
          }
       },
@@ -84,6 +85,6 @@
          "web" : "https://github.com/nigelhorne/NWC2MusicXML"
       }
    },
-   "version" : "v0.002.1",
+   "version" : "0.002.2",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

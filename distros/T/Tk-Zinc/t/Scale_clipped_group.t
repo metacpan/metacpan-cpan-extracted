@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: Scale_clipped_group.t,v 1.2 2006/02/12 09:42:23 mertz Exp $
+# $Id$
 # Author: Christophe Mertz  mertz@intuilab.com, adapted from a script 
 # reported by Daniel Etienne for a bug report in Tk::Zinc 3.2.96
 #

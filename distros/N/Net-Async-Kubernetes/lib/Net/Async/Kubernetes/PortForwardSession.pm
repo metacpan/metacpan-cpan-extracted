@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::PortForwardSession;
 # ABSTRACT: Duplex websocket session for pod port-forward, exec and attach
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -158,7 +158,7 @@ Net::Async::Kubernetes::PortForwardSession - Duplex websocket session for pod po
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -341,7 +341,7 @@ L<IO::Async::Stream>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-net-async-kubernetes/issues>.
 
 =head2 IRC

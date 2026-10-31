@@ -8,7 +8,17 @@ use File::Path qw(make_path);
 use Time::HiRes qw/usleep/;
 use File::stat;
 
-sub mkfile {
+use constant DEBUG => $ENV{DEBUG_YATT_UTIL_FILE};
+
+# 書き換え時に mtime の厳密な前進を保証するため、旧 mtime + 1.05 秒まで
+# 実時間で眠ることがある(通常は最大 ~1 秒)。mtime 前進はこの関数自身が
+# 保証するので、utime で mtime を進める運用と併用してはならない。
+# mtime が MAX_MTIME_WAIT 秒を超えて未来のファイル(utime 済み)には
+# 黙って眠らず croak する。
+
+use constant MAX_MTIME_WAIT => 5;
+
+sub mkfile_may_wait {
   my ($pack) = shift;
   my @slept;
   while (my ($fn, $content) = splice @_, 0, 2) {
@@ -18,7 +28,13 @@ sub mkfile {
     }
     my $old_mtime;
     if (-e $fn) {
-      if (my $slept = wait_for_time(($old_mtime = stat($fn)->mtime) + 1.05)) {
+      my $deadline = ($old_mtime = stat($fn)->mtime) + 1.05;
+      if ((my $diff = $deadline - Time::HiRes::time) > MAX_MTIME_WAIT) {
+	croak sprintf("mkfile_may_wait: mtime of %s is %.1f secs in the future!"
+		      ." (do not combine mkfile_may_wait with utime-forwarded mtimes)"
+		      , $fn, $diff);
+      }
+      if (my $slept = wait_for_time($deadline)) {
 	push @slept, $slept;
       }
     }
@@ -32,12 +48,17 @@ sub mkfile {
   @slept;
 }
 
+# 旧名 (互換のための alias)。二重代入は "used only once" warning の抑制。
+*mkfile = *mkfile = \&mkfile_may_wait;
+
 # This works, but not so useful. Try wait_if_near_deadline instead.
 sub wait_for_time {
   my ($time) = @_;
   my $now = Time::HiRes::time;
   my $diff = $time - $now;
   return if $diff <= 0;
+  print STDERR "# wait_for_time: $diff secs\n"
+    if DEBUG;
   usleep(int($diff * 1000 * 1000));
   $diff;
 }
@@ -63,7 +84,9 @@ sub wait_if_near_deadline {
 # Auto Export.
 my $symtab = YATT::Lite::Util::symtab(__PACKAGE__);
 our @EXPORT_OK = grep {
-  *{$symtab->{$_}}{CODE}
+  my $entry = $symtab->{$_};
+  # To remove constant;
+  !ref $entry && *{$entry}{CODE}
 } keys %$symtab;
 
 use Exporter qw(import);

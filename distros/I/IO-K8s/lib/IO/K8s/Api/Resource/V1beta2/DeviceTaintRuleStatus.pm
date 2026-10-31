@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleStatus;
 # ABSTRACT: DeviceTaintRuleStatus provides information about an on-going pod eviction.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleStatus - DeviceTaintRuleStatus p
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 conditions
 
@@ -39,7 +39,7 @@ Must have 8 or fewer entries.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -67,5 +67,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

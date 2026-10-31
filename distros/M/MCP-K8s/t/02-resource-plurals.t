@@ -71,6 +71,7 @@ subtest 'fallback pluralization' => sub {
 
   # Handles trailing 'y' -> 'ies'
   is($k8s->_resource_plural('Policy'), 'policies', 'Policy => policies (y -> ies)');
+  is($k8s->_resource_plural('Gateway'), 'gateways', 'Gateway => gateways (vowel+y keeps its y, k21)');
 
   # Already ends in 's' - no double 's'
   is($k8s->_resource_plural('Status'), 'status', 'Status => status (no double s)');

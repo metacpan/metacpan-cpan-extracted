@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::AppArmorProfile;
 # ABSTRACT: AppArmorProfile defines a pod or container's AppArmor settings.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s localhostProfile => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::AppArmorProfile - AppArmorProfile defines a pod or conta
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 localhostProfile
 
@@ -40,7 +40,7 @@ type indicates which kind of AppArmor profile will be applied. Valid options are
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -68,5 +68,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

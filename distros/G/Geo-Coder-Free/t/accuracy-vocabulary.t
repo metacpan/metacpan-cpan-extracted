@@ -36,7 +36,7 @@ use FindBin qw($Bin);
 use Scalar::Util qw(refaddr);
 use Test::Most;
 
-# The checkout beside this distribution, read the same way t/consumer-contract.t
+# The checkout beside this distribution, read the same way t/location-rule.t
 # reads its workspace files.  Under prove -t, $Bin is tainted; detaint it before
 # it reaches use lib.
 use lib (do {

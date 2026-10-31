@@ -45,7 +45,7 @@
     DOUBLE            | "#"  |  35 | 0x23 | 0b00100011 | <IEEE-DOUBLE>
     LONG_DOUBLE       | "\$" |  36 | 0x24 | 0b00100100 | <IEEE-LONG-DOUBLE>
     UNDEF             | "%"  |  37 | 0x25 | 0b00100101 | None - Perl undef var; eg my $var= undef;
-    BINARY            | "&"  |  38 | 0x26 | 0b00100110 | <LEN-VARINT> <BYTES> - binary/(latin1) string
+    BINARY            | "&"  |  38 | 0x26 | 0b00100110 | <LEN-VARINT> <BYTES> - binary/native string
     STR_UTF8          | "'"  |  39 | 0x27 | 0b00100111 | <LEN-VARINT> <UTF8> - utf8 string
     REFN              | "("  |  40 | 0x28 | 0b00101000 | <ITEM-TAG>    - ref to next item
     REFP              | ")"  |  41 | 0x29 | 0b00101001 | <OFFSET-VARINT> - ref to previous item stored at offset
@@ -61,13 +61,13 @@
     OBJECTV_FREEZE    | "3"  |  51 | 0x33 | 0b00110011 | <OFFSET-VARINT> <ITEM-TAG> - (OBJECTV_FREEZE is to OBJECT_FREEZE as OBJECTV is to OBJECT)
     NO                | "4"  |  52 | 0x34 | 0b00110100 | SvIsBOOL() == PL_No,  5.36 and later only (json false)
     YES               | "5"  |  53 | 0x35 | 0b00110101 | SvIsBOOL() == PL_Yes, 5.36 and later only (json true)
-    RESERVED_0        | "6"  |  54 | 0x36 | 0b00110110 |
-    RESERVED_1        | "7"  |  55 | 0x37 | 0b00110111 |
+    RESERVED_0        | "6"  |  54 | 0x36 | 0b00110110 | reserved
+    RESERVED_1        | "7"  |  55 | 0x37 | 0b00110111 | reserved
     FLOAT_128         | "8"  |  56 | 0x38 | 0b00111000 | quadmath _float128
     CANONICAL_UNDEF   | "9"  |  57 | 0x39 | 0b00111001 | undef (PL_sv_undef) - "the" Perl undef (see notes)
     FALSE             | ":"  |  58 | 0x3a | 0b00111010 | false (PL_sv_no)
     TRUE              | ";"  |  59 | 0x3b | 0b00111011 | true  (PL_sv_yes)
-    MANY              | "<"  |  60 | 0x3c | 0b00111100 | <LEN-VARINT> <TYPE-BYTE> <TAG-DATA> - repeated tag (not done yet, will be implemented in version 3)
+    NEG_VARINT        | "<"  |  60 | 0x3c | 0b00111100 | <VARINT> - absolute value of a negative integer, protocol v6
     PACKET_START      | "="  |  61 | 0x3d | 0b00111101 | (first byte of magic string in header)
     EXTEND            | ">"  |  62 | 0x3e | 0b00111110 | <BYTE> - for additional tags
     PAD               | "?"  |  63 | 0x3f | 0b00111111 | (ignored tag, skip to next byte)
@@ -103,7 +103,7 @@
     HASHREF_13        | "]"  |  93 | 0x5d | 0b01011101 |
     HASHREF_14        | "^"  |  94 | 0x5e | 0b01011110 |
     HASHREF_15        | "_"  |  95 | 0x5f | 0b01011111 | [<KEY-TAG> <ITEM-TAG> ...] - count in low 4 bits, key/value pairs (HASH must be refcnt=1)
-    SHORT_BINARY_0    | "`"  |  96 | 0x60 | 0b01100000 | <BYTES> - binary/latin1 string, length encoded in low 5 bits of tag
+    SHORT_BINARY_0    | "`"  |  96 | 0x60 | 0b01100000 | <BYTES> - binary/native string, length encoded in low 5 bits of tag
     SHORT_BINARY_1    | "a"  |  97 | 0x61 | 0b01100001 |
     SHORT_BINARY_2    | "b"  |  98 | 0x62 | 0b01100010 |
     SHORT_BINARY_3    | "c"  |  99 | 0x63 | 0b01100011 |
@@ -134,7 +134,7 @@
     SHORT_BINARY_28   | "|"  | 124 | 0x7c | 0b01111100 |
     SHORT_BINARY_29   | "}"  | 125 | 0x7d | 0b01111101 |
     SHORT_BINARY_30   | "~"  | 126 | 0x7e | 0b01111110 |
-    SHORT_BINARY_31   |      | 127 | 0x7f | 0b01111111 | <BYTES> - binary/latin1 string, length encoded in low 5 bits of tag
+    SHORT_BINARY_31   |      | 127 | 0x7f | 0b01111111 | <BYTES> - binary/native string, length encoded in low 5 bits of tag
 
 =for autoupdater stop
 */
@@ -155,7 +155,7 @@
 #define SRL_MAGIC_STRING_HIGHBIT_UTF8_UINT_LE   0x72B3C33D      /* first four bytes of SRL_MAGIC_STRING encoded as UTF8, little endian */
 #define SRL_MAGIC_STRING_HIGHBIT_UTF8_UINT_BE   0x3DC3B372      /* first four bytes of SRL_MAGIC_STRING encoded as UTF8, big endian */
 
-#define SRL_PROTOCOL_VERSION            ( 5 )
+#define SRL_PROTOCOL_VERSION            ( 6 )
 #define SRL_PROTOCOL_VERSION_BITS       ( 4 )           /* how many bits we use for the version, the rest go to the encoding */
 #define SRL_PROTOCOL_VERSION_MASK       ( ( 1 << SRL_PROTOCOL_VERSION_BITS ) - 1 )
 
@@ -165,6 +165,14 @@
 #define SRL_PROTOCOL_ENCODING_SNAPPY_INCREMENTAL    ( 2 << SRL_PROTOCOL_VERSION_BITS )
 #define SRL_PROTOCOL_ENCODING_ZLIB      ( 3 << SRL_PROTOCOL_VERSION_BITS )
 #define SRL_PROTOCOL_ENCODING_ZSTD      ( 4 << SRL_PROTOCOL_VERSION_BITS )
+#define SRL_PROTOCOL_ENCODING_CHECKSUM  ( 8 << SRL_PROTOCOL_VERSION_BITS )
+#define SRL_PROTOCOL_ENCODING_BASE_MASK ( SRL_PROTOCOL_ENCODING_MASK & ~SRL_PROTOCOL_ENCODING_CHECKSUM )
+
+#define SRL_CHECKSUM_VERSION_SIPHASH_2_4_64  ( 0 )
+#define SRL_CHECKSUM_VERSION_SIPHASH_2_4_128 ( 1 )
+#define SRL_CHECKSUM_VERSION_SIPHASH_3_6_128 ( 2 )
+#define SRL_CHECKSUM_TAG_LENGTH_64            ( 8 )
+#define SRL_CHECKSUM_TAG_LENGTH_128           ( 16 )
 
 /* Bits in the header bitfield */
 #define SRL_PROTOCOL_HDR_USER_DATA      ( 1 )
@@ -193,7 +201,7 @@
 #define SRL_HDR_DOUBLE          ((U8)35)      /* <IEEE-DOUBLE> */
 #define SRL_HDR_LONG_DOUBLE     ((U8)36)      /* <IEEE-LONG-DOUBLE> */
 #define SRL_HDR_UNDEF           ((U8)37)      /* None - Perl undef var; eg my $var= undef; */
-#define SRL_HDR_BINARY          ((U8)38)      /* <LEN-VARINT> <BYTES> - binary/(latin1) string */
+#define SRL_HDR_BINARY          ((U8)38)      /* <LEN-VARINT> <BYTES> - binary/native string */
 #define SRL_HDR_STR_UTF8        ((U8)39)      /* <LEN-VARINT> <UTF8> - utf8 string */
 
 #define SRL_HDR_REFN            ((U8)40)      /* <ITEM-TAG>    - ref to next item */
@@ -216,7 +224,8 @@
 
 /* Note: Can do reserved check with a range now, but as we start using
  *       them, might have to explicit == check later. */
-#define SRL_HDR_RESERVED        ((U8)54)
+#define SRL_HDR_RESERVED        ((U8)54)      /* reserved */
+#define SRL_HDR_RESERVED_1      ((U8)55)
 #define SRL_HDR_RESERVED_LOW    ((U8)54)
 #define SRL_HDR_RESERVED_HIGH   ((U8)55)
 
@@ -225,11 +234,14 @@
 #define SRL_HDR_FALSE           ((U8)58)      /* false (PL_sv_no)  */
 #define SRL_HDR_TRUE            ((U8)59)      /* true  (PL_sv_yes) */
 
-#define SRL_HDR_MANY            ((U8)60)      /* <LEN-VARINT> <TYPE-BYTE> <TAG-DATA> - repeated tag (not done yet, will be implemented in version 3) */
+#define SRL_HDR_NEG_VARINT      ((U8)60)      /* <VARINT> - absolute value of a negative integer, protocol v6 */
 #define SRL_HDR_PACKET_START    ((U8)61)      /* (first byte of magic string in header) */
 
 
 #define SRL_HDR_EXTEND          ((U8)62)      /* <BYTE> - for additional tags */
+#define SRL_EXT_UNDEF_DEADLY    ((U8)255) /* Undef diagnostic sentinel; encoders MUST NOT emit it; no payload */
+#define SRL_EXT_VSTRING_BINARY  SRL_HDR_BINARY
+#define SRL_EXT_VSTRING_UTF8    SRL_HDR_STR_UTF8
 #define SRL_HDR_PAD             ((U8)63)      /* (ignored tag, skip to next byte) */
 #define SRL_HDR_ARRAYREF        ((U8)64)      /* [<ITEM-TAG> ...] - count of items in low 4 bits (ARRAY must be refcnt=1)*/
 #define SRL_MASK_ARRAYREF_COUNT ((U8)15)      /* mask to get low bits from tag */
@@ -242,7 +254,7 @@
 #define SRL_HDR_HASHREF_LOW     ((U8)80)
 #define SRL_HDR_HASHREF_HIGH    ((U8)95)
 
-#define SRL_HDR_SHORT_BINARY    ((U8)96)      /* <BYTES> - binary/latin1 string, length encoded in low 5 bits of tag */
+#define SRL_HDR_SHORT_BINARY    ((U8)96)      /* <BYTES> - binary/native string, length encoded in low 5 bits of tag */
 #define SRL_HDR_SHORT_BINARY_LOW       ((U8)96)
 #define SRL_HDR_SHORT_BINARY_HIGH      ((U8)127)
 #define SRL_MASK_SHORT_BINARY_LEN      ((U8)31)      /* mask to get length of SRL_HDR_SHORT_BINARY type tags */

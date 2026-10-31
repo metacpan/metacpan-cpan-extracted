@@ -1,6 +1,6 @@
 package IO::K8s::Api::Lifecycle::V1alpha1::EvictionRequest;
 # ABSTRACT: EvictionRequest defines a request that should ideally result in a graceful eviction of a .spec.target (e.g. termination of a pod). The evictionrequest-controller observes intents of all EvictionRequests and transforms them into Evictions. - .spec.requester is set as a label on the Eviction for easier lookup. - Each target can have a set of responders assigned to it. Eviction objects are observed by these responders, who implement the eviction logic and update the Eviction's status with progress. There is many-to-many relationship between EvictionRequests and Evictions in general. And many-to-one if the target is a pod. If all requesters withdraw their eviction intent for a common target, the eviction will be canceled. Deleting an EvictionRequest also counts as a withdrawal. Once all EvictionRequest of a target are removed, the corresponding Evictions are eventually garbage collected.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -25,7 +25,7 @@ IO::K8s::Api::Lifecycle::V1alpha1::EvictionRequest - EvictionRequest defines a r
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#evictionr
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -88,5 +88,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

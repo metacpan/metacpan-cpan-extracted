@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-# $Id: color-x.pl,v 1.7 2004/09/21 12:43:03 mertz Exp $
+# $Id$
 # these simple samples have been developped by C. Mertz mertz@cena.fr
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

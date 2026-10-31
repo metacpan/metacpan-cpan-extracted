@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Sat Dec 10 12:51:30 1994
  *
- * $Id: Draw.c,v 1.64 2005/09/12 13:19:13 Lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -309,7 +309,7 @@ ZnDrawLineShape(ZnWInfo         *wi,
    */
   ZnSetLineStyle(wi, line_style);
   values.foreground = foreground_pixel;
-  values.line_width = (line_width == 1) ? 0 : (int) line_width;
+  values.line_width = (int) line_width;
   values.fill_style = FillSolid;
   values.join_style = JoinRound;
   values.cap_style = CapRound;
@@ -1271,7 +1271,7 @@ ZnRenderPolyline(ZnWInfo        *wi,
       glEnd();
     }
     else {
-      int       num_cpoints;
+      unsigned int num_cpoints;
       ZnReal    lw_2 = line_width / 2.0;
       ZnPoint   *cpoints = ZnGetCirclePoints(3, ZN_CIRCLE_COARSE,
                                              0.0, 2*M_PI, &num_cpoints, NULL);
@@ -2000,7 +2000,7 @@ ZnRenderString(ZnTexFontInfo    *tfi,
   Tcl_UniChar   c;
 
   while (len) {
-    clen = Tcl_UtfToUniChar(string, &c);
+    clen = Tcl_UtfToUniChar((const char *)string, &c);
 
     ZnRenderGlyph(tfi, c);
 

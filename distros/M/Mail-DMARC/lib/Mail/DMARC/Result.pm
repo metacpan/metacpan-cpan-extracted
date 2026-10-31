@@ -1,5 +1,5 @@
 package Mail::DMARC::Result;
-our $VERSION = '2.20260827';
+our $VERSION = '2.20261030';
 use strict;
 use warnings;
 use feature 'signatures';
@@ -72,7 +72,7 @@ sub spf_align( $self, $val = undef ) {
 sub result( $self, $val = undef ) {
     return $self->{result} if @_ == 1;
     croak "invalid result"
-        if !defined $val || 0 == grep {/^$val$/ix} qw/ pass fail none /;
+        if !defined $val || 0 == grep {/^$val$/ix} qw/ pass fail none temperror permerror /;
     return $self->{result} = $val;
 }
 
@@ -94,7 +94,7 @@ Mail::DMARC::Result - an aggregate report result object
 
 =head1 VERSION
 
-version 2.20260827
+version 2.20261030
 
 =head1 OVERVIEW
 
@@ -126,7 +126,7 @@ Published is a L<Mail::DMARC::Policy> tagged with a domain. The domain attribute
 
 =head2 result
 
-Whether the message passed the DMARC test. Possible values are: pass, fail.
+Whether the message passed the DMARC test. Possible values are: pass, fail, none (no DMARC policy), temperror (a DNS query for the policy did not complete, RFC 9989 5.3.6), and permerror (more RFC5322.From domains than are evaluated).
 
 In order to pass, at least one authentication alignment must pass. The 2013 draft defines two authentication methods: DKIM and SPF. The list is expected to grow.
 

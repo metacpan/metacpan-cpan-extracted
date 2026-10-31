@@ -9,6 +9,11 @@ use AnyEvent::MCP::Server::Simple;
 use AnyEvent::MCP::Server::HTTP ();
 
 Getopt::Long::Configure ("require_order");
+my $have_websocket = eval {
+   require AnyEvent::WebSocket::Server;
+   require AnyEvent::WebSocket::Message;
+   1
+};
 
 {
    local @ARGV = ("--name", "demo", "--bind", ":31740", "--token", "first",
@@ -239,7 +244,8 @@ mcp_start
    };
 ok $started && $mode eq "none", "Simple supports deliberate auth none without inherited tokens";
 
-for my $program (qw(mcp-fs mcp-ask-user mcp-multibroker mcp-vim mcp-webbrowser)) {
+for my $program (qw(mcp-fs mcp-ask-user mcp-multibroker mcp-vim),
+                 $have_websocket ? "mcp-webbrowser" : ()) {
    my $err = Symbol::gensym;
    my $pid = IPC::Open3::open3 (my $in, my $out, $err,
       $^X, "-Ilib", "bin/$program", "--help");
@@ -305,6 +311,7 @@ my %tool_name = (
    "mcp-webbrowser" => "tabs", "mcp-ask-user" => "ask-user",
    "mcp-multibroker" => "discover-brokers",
 );
+delete $tool_name{"mcp-webbrowser"} unless $have_websocket;
 for my $program (sort keys %tool_name) {
    my $error = Symbol::gensym;
    my @extra = $program eq "mcp-fs" ? ("--sandbox", "none", ".") : ();
@@ -350,10 +357,31 @@ my $log_probe = q{
       on_reply => sub {},
    });
    mcp_log_request (undef, {
+      method => "tools/call", tool => "vcs-status",
+      args => {workdir => 1, cwd => "src", backend => "cvs",
+         files => ["Changes", "space name", "two\nlines", "x" x 140, "omitted"]},
+      on_reply => sub {},
+   });
+   mcp_log_request (undef, {
+      method => "tools/call", tool => "vcs-diff",
+      args => {workdir => 1, backend => "git", files => []},
+      on_reply => sub {},
+   });
+   mcp_log_request (undef, {
+      method => "tools/call", tool => "vcs-log",
+      args => {workdir => 2, backend => "hg", files => ['quote"name']},
+      on_reply => sub {},
+   });
+   mcp_log_request (undef, {
       method => "tools/call", tool => "grep",
       args => {workdir => 1, path => "t", pattern => "foo\n" . ("y" x 200)},
       on_reply => sub {},
    });
+   mcp_log_request (undef, {
+      method => "tools/call", tool => "request",
+      args => {},
+      on_reply => sub {},
+   }, method => "GET", url => "https://example.org/page");
    AE::log error => "diagnostic failure";
 };
 ($status, $out, $err) = command ($log_probe, "--name", "example");
@@ -370,8 +398,16 @@ like $err, qr/ex target=editor command="echo 1\\nx{193}"\.\.\.\n/,
    "Ex log preview preserves escaped newlines and limits command text to 200 characters";
 like $err, qr/exec workdir=1 argv="perl" "-e" "print qq\(hello\\nworld\)" "x{80}"\.\.\. \.\.\.\n/,
    "exec logs several JSON-quoted arguments, caps long ones and marks omitted arguments";
+like $err, qr/vcs-status workdir=1 cwd=src backend=cvs files="Changes" "space name" "two\\nlines" "x{80}"\.\.\. \.\.\.\n/,
+   "VCS status logs JSON-quoted filenames, caps long names and marks omitted files";
+like $err, qr/vcs-diff workdir=1 backend=git\n/,
+   "VCS diff logs backend and omits an empty filename list";
+like $err, qr/vcs-log workdir=2 backend=hg files="quote\\\"name"\n/,
+   "VCS log quotes special characters in filenames";
 like $err, qr/grep workdir=1 path=t pattern="foo\\ny{156}"\.\.\.\n/,
    "grep logs the bounded search pattern with escaped newlines";
+like $err, qr/request method=GET url=https:\/\/example.org\/page\n/,
+   "applications can add sanitized context to the shared request logger";
 like $err, qr/\d\d \d\d:\d\d:\d\d\.\d\d [^\s]+\/example\[\d+\] error main: diagnostic failure\n/,
    "ordinary diagnostics use the same process-wide formatter";
 ($status, $out, $err) = command ($log_probe, "--quiet");

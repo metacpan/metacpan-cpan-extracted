@@ -1,6 +1,6 @@
 package Kubernetes::Comb::CRD::CombStatus;
 # ABSTRACT: Status of the Comb custom resource
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use IO::K8s::Resource;
 
@@ -45,7 +45,7 @@ Kubernetes::Comb::CRD::CombStatus - Status of the Comb custom resource
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
@@ -93,7 +93,7 @@ C<metadata.generation> of the spec this status describes.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

@@ -5,22 +5,26 @@ use Carp;
 
 use base qw(YATT::Lite::Connection);
 use YATT::Lite::MFields
-(qw/cf_cgi
-    cf_is_psgi cf_hmv
-    cf_parameters
+(qw/cgi
+    is_psgi hmv
+    parameters
 
-    cf_site_prefix
+    site_prefix
 
-    cf_no_nested_query
+    no_nested_query
 
-    cf_no_unicode_params
+    mkquery_with_body_params
 
-    dir_config_cache
+    no_unicode_params
+
+    _dir_config_cache
     _site_config_is_examined
 
     _sigil_type_item
 
-    current_user
+    _current_user
+
+    _htdebug_cache
    /);
 use YATT::Lite::Util qw(globref url_encode nonempty empty rootname lexpand);
 use YATT::Lite::PSGIEnv;
@@ -35,17 +39,17 @@ BEGIN {
   foreach my $name (qw(raw_body uploads upload)) {
     *{globref(PROP, $name)} = sub {
       my PROP $prop = (my $glob = shift)->prop;
-      unless ($prop->{cf_is_psgi}) {
+      unless ($prop->{is_psgi}) {
 	croak "Connection method $name is PSGI mode only!"
       }
-      $prop->{cf_cgi}->$name(@_);
+      $prop->{cgi}->$name(@_);
     };
   }
 
   foreach my $name (qw(url_param)) {
     *{globref(PROP, $name)} = sub {
       my PROP $prop = (my $glob = shift)->prop;
-      $prop->{cf_cgi}->$name(@_);
+      $prop->{cgi}->$name(@_);
     };
   }
 
@@ -67,21 +71,20 @@ BEGIN {
     *{globref(PROP, $method)} = sub {
       my PROP $prop = (my $glob = shift)->prop;
       my ($default) = @_;
-      if ($prop->{cf_env}) {
-	$prop->{cf_env}->{$env} // $default;
-      } elsif ($prop->{cf_cgi} and my $sub = $prop->{cf_cgi}->can($method)) {
-	$sub->($prop->{cf_cgi}) // $default;
+      if ($prop->{env}) {
+	$prop->{env}->{$env} // $default;
+      } elsif ($prop->{cgi} and my $sub = $prop->{cgi}->can($method)) {
+	$sub->($prop->{cgi}) // $default;
       } else {
 	$default;
       }
     };
   }
 
-  foreach my $name (qw(file subpath parameters)) {
-    my $cf = "cf_$name";
+  foreach my $name (qw(file subpath parameters request_file)) {
     *{globref(PROP, $name)} = sub {
       my PROP $prop = (my $glob = shift)->prop;
-      $prop->{$cf};
+      $prop->{$name};
     };
   }
 }
@@ -90,10 +93,11 @@ BEGIN {
 
 sub param {
   my PROP $prop = (my $glob = shift)->prop;
-  if (my $ixh = $prop->{cf_parameters}) {
+  if (my $ixh = $prop->{parameters}) {
     return keys %$ixh unless @_;
     defined (my $key = shift)
       or croak "undefined key!";
+    $key =~ s/\[\]\z// if not $prop->{no_nested_query};
     if (@_) {
       if (@_ >= 2) {
 	$ixh->{$key} = [@_]
@@ -101,10 +105,10 @@ sub param {
 	$ixh->{$key} = shift;
       }
     } else {
-      # If cf_parameters is enabled, value is returned AS-IS.
+      # If parameters is enabled, value is returned AS-IS.
       $ixh->{$key};
     }
-  } elsif (my $hmv = $prop->{cf_hmv}) {
+  } elsif (my $hmv = $prop->{hmv}) {
     return $hmv->keys unless @_;
     if (@_ == 1) {
       return wantarray ? $hmv->get_all($_[0]) : $hmv->get($_[0]);
@@ -112,7 +116,7 @@ sub param {
       $hmv->add(@_);
       return $glob;
     }
-  } elsif (my $cgi = $prop->{cf_cgi}) {
+  } elsif (my $cgi = $prop->{cgi}) {
     return $cgi->param(@_);
   } else {
     croak "Neither Hash::MultiValue nor CGI is found in connection!";
@@ -122,19 +126,19 @@ sub param {
 # Annoying multi_param support.
 sub multi_param {
   my PROP $prop = (my $glob = shift)->prop;
-  if (my $ixh = $prop->{cf_parameters}) {
+  if (my $ixh = $prop->{parameters}) {
     return keys %$ixh unless @_;
     defined (my $key = shift)
       or croak "undefined key!";
-    # If cf_parameters is enabled, value is returned AS-IS.
+    # If parameters is enabled, value is returned AS-IS.
     $ixh->{$key};
 
-  } elsif (my $hmv = ($prop->{cf_hmv} // do {
-    $prop->{cf_is_psgi} && $prop->{cf_cgi}->parameters
+  } elsif (my $hmv = ($prop->{hmv} // do {
+    $prop->{is_psgi} && $prop->{cgi}->parameters
   })) {
     return $hmv->keys unless @_;
     return wantarray ? $hmv->get_all($_[0]) : $hmv->get($_[0]);
-  } elsif (my $cgi = $prop->{cf_cgi}) {
+  } elsif (my $cgi = $prop->{cgi}) {
     return $cgi->multi_param(@_);
   } else {
     croak "Neither Hash::MultiValue nor CGI is found in connection!";
@@ -168,14 +172,18 @@ sub collect_request_sigil_by {
   \%dict;
 }
 
+sub has_content {
+  my PROP $prop = (my $glob = shift)->prop;
+  my Env $env = $prop->{env}
+    or return 0;
+  ($env->{CONTENT_TYPE} and defined $env->{CONTENT_LENGTH}) ? 1 : 0;
+}
+
 sub parse_request_sigil_psgi {
   my PROP $prop = (my $glob = shift)->prop;
   my ($req) = @_;
 
-
-  my Env $env = $prop->{cf_env};
-
-  if ($env->{CONTENT_TYPE} and defined $env->{CONTENT_LENGTH}) {
+  if ($glob->has_content) {
     $prop->{_sigil_type_item} = do {
       my @bodyParams = $glob->extract_sigil_from_hmv($req->body_parameters);
       my @queryParams = $glob->extract_sigil_from_hmv($req->query_parameters);
@@ -245,10 +253,18 @@ sub validate_request_sigils_dict {
   if (defined $subpage and defined $action) {
     # XXX: Reserved for future use.
     $glob->error("Can't use subpage and action at one time: %s vs %s"
-		 , $subpage, $action);
+                 , $subpage, $action);
   } elsif (defined $subpage) {
+    unless ($subpage =~ m{^\w*\z}a) {
+      $glob->error(+{http_status_code => 400}, "Invalid subpage: %s",
+                   YATT::Lite::Util::escape($subpage));
+    }
     (page => $subpage);
   } elsif (defined $action) {
+    unless ($action =~ m{^\w*\z}a) {
+      $glob->error(+{http_status_code => 400}, "Invalid action: %s",
+                   YATT::Lite::Util::escape($action));
+    }
     (action => $action);
   } else {
     ();
@@ -259,7 +275,24 @@ sub validate_request_sigils_dict {
 
 sub queryobj {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_parameters} || $prop->{cf_hmv} || $prop->{cf_cgi};
+  $prop->{parameters} || $prop->{hmv} || $prop->{cgi};
+}
+
+# GH-259: For url reproduction (mkquery($CON), current_path($CON)...),
+# requests with a body should reproduce QUERY_STRING-derived params only.
+# Note: query_parameters below is the sigil-stripped, request-cached
+# Hash::MultiValue (see extract_sigil_from_hmv).
+# Set mkquery_with_body_params to restore the old merged behavior.
+sub queryobj_for_mkquery {
+  my PROP $prop = (my $glob = shift)->prop;
+  if (not $prop->{mkquery_with_body_params}
+      and not $prop->{hmv}
+      and $prop->{is_psgi} and $prop->{cgi}
+      and $glob->has_content) {
+    $prop->{cgi}->query_parameters;
+  } else {
+    $glob->queryobj;
+  }
 }
 
 sub param_exists {
@@ -269,11 +302,11 @@ sub param_exists {
 
 sub as_hash {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_parameters} // $prop->{cf_hmv} // do {
-    if ($prop->{cf_is_psgi}) {
-      $prop->{cf_cgi}->parameters
+  $prop->{parameters} // $prop->{hmv} // do {
+    if ($prop->{is_psgi}) {
+      $prop->{cgi}->parameters
     } else {
-      $prop->{cf_cgi}->Vars
+      $prop->{cgi}->Vars
     }
   };
 }
@@ -285,13 +318,13 @@ sub delete_param {
   unless (defined $key) {
     croak "Undefined key!";
   }
-  if (my $dict = $prop->{cf_parameters}) {
+  if (my $dict = $prop->{parameters}) {
     # For nested_query (array_param)
     delete $dict->{$key};
-  } elsif ($dict = $prop->{cf_hmv}) {
+  } elsif ($dict = $prop->{hmv}) {
     # For direct Hash::MultiValue.
     $dict->remove($key);
-  } elsif (($dict = $prop->{cf_cgi})->can("parameters")) {
+  } elsif (($dict = $prop->{cgi})->can("parameters")) {
     # For Plack::Request
     $dict->parameters->remove($key);
   } elsif ($dict->can("delete")) {
@@ -308,31 +341,31 @@ sub after_create {
   my PROP $prop = (my $glob = shift)->prop;
   $glob->SUPER::after_create();
 
-  # If cf_cgi is empty and cf_parameters is given,
+  # If cgi is empty and parameters is given,
   # request sigils are collected via parse_request_sigil_hmv.
   #
-  if (not $prop->{cf_cgi} and $prop->{cf_parameters}) {
-    $glob->parse_request_sigil_hmv($prop->{cf_parameters});
+  if (not $prop->{cgi} and $prop->{parameters}) {
+    $glob->parse_request_sigil_hmv($prop->{parameters});
   }
 }
 
 sub configure_cgi {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_cgi} = my $cgi = shift;
+  $prop->{cgi} = my $cgi = shift;
   return unless $glob->is_form_content_type($cgi->content_type);
-  return if $prop->{cf_parameters};
+  return if $prop->{parameters};
 
   #
   # parse_request_sigil should be called before parse_nested_query.
   #
-  if ($prop->{cf_is_psgi}) {
+  if ($prop->{is_psgi}) {
     $glob->parse_request_sigil_psgi($cgi);
   } else {
     $glob->parse_request_sigil_cgi($cgi);
   }
 
-  unless ($prop->{cf_no_nested_query}) {
-    if ($prop->{cf_is_psgi}) {
+  unless ($prop->{no_nested_query}) {
+    if ($prop->{is_psgi}) {
       $glob->convert_array_param_psgi($cgi);
     } else {
       $glob->convert_array_param_cgi($cgi);
@@ -359,16 +392,15 @@ sub parse_nested_query {
   my ($obj_or_string) = @_;
   YATT::Lite::Util::parse_nested_query
     ($obj_or_string
-     , (!$prop->{cf_no_unicode_params} && $prop->{cf_encoding})
+     , (!$prop->{no_unicode_params} && $prop->{encoding})
    );
 }
 
 sub convert_array_param_psgi {
   my PROP $prop = (my $glob = shift)->prop;
   my ($req) = @_;
-  my Env $env = $prop->{cf_env};
-  $prop->{cf_parameters} = do {
-    if ($env->{CONTENT_TYPE} and defined $env->{CONTENT_LENGTH}) {
+  $prop->{parameters} = do {
+    if ($glob->has_content) {
       my $body = $glob->parse_nested_query([$req->body_parameters->flatten]);
       my $qs = $glob->parse_nested_query([$req->query_parameters->flatten]);
       foreach my $key (keys %$qs) {
@@ -390,7 +422,7 @@ sub convert_array_param_cgi {
   my PROP $prop = (my $glob = shift)->prop;
   my ($cgi) = @_;
   return if ($cgi->content_type // "") eq "application/json";
-  $prop->{cf_parameters}
+  $prop->{parameters}
     = $glob->parse_nested_query($cgi->query_string);
 }
 
@@ -402,8 +434,8 @@ sub site_location {
 sub site_prefix {
   my PROP $prop = (my $glob = shift)->prop;
   # Note: This is safe because site_prefix 0 is meaningless(I hope).
-  $prop->{cf_site_prefix} || do {
-    my Env $env = $prop->{cf_env};
+  $prop->{site_prefix} || do {
+    my Env $env = $prop->{env};
     $env->{'yatt.script_name'} // ''
   }
 }
@@ -411,7 +443,7 @@ sub site_prefix {
 # Location of DirApp
 sub location {
   my PROP $prop = (my $glob = shift)->prop;
-  (my $loc = ($prop->{cf_location} // '')) =~ s,/*$,/,;
+  (my $loc = ($prop->{location} // '')) =~ s,/*$,/,;
   $loc;
 }
 
@@ -435,31 +467,7 @@ sub mkurl {
   my PROP $prop = (my $glob = shift)->prop;
   my ($file, $param, %opts) = @_;
 
-  my $req = do {
-    if ($opts{mapped_path}) {
-      $glob->mapped_path;
-    } else {
-      $glob->request_path;
-    }
-  };
-
-  my $path = do {
-    if (defined $file and $file =~ m!^/!) {
-      $glob->site_prefix.$file;
-    } else {
-      my ($orig, $dir) = ('');
-      if (($dir = $req) =~ s{([^/]+)$}{}) {
-	$orig = $1;
-      }
-      if (not defined $file or $file eq '') {
-	$dir . $orig;
-      } elsif ($file eq '.') {
-	$dir
-      } else {
-	$dir . $file;
-      }
-    }
-  };
+  my $path = $glob->mkpath($file, $opts{mapped_path});
 
   # XXX: /../ truncation
   # XXX: If sep is '&', scalar ref quoting is required.
@@ -470,19 +478,80 @@ sub mkurl {
   $url;
 }
 
+sub mkpath {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($file, $used_mapped_path) = @_;
+
+  my $req = do {
+    if ($used_mapped_path) {
+      # GH-251: mapped_path reproduces the url path of the request
+      # (mount prefix included, request_file based).
+      scalar $glob->mapped_path;
+    } else {
+      $glob->request_path;
+    }
+  };
+
+  if (defined $file and $file =~ m!^/!) {
+    $glob->site_prefix.$file;
+  } else {
+    my ($orig, $dir) = ('');
+    if (($dir = $req) =~ s{([^/]+)$ }{}x) {
+      $orig = $1;
+    }
+    if (not defined $file or $file eq '') {
+      $dir . $orig;
+    } elsif ($file eq '.') {
+      $dir
+    } else {
+      $dir . $file;
+    }
+  }
+}
+
 sub mkprefix {
   my PROP $prop = (my $glob = shift)->prop;
-  my Env $env = $prop->{cf_env};
+  my Env $env = $prop->{env};
   my $scheme
     = $env->{HTTP_X_FORWARDED_PROTO}
-    || $env->{'psgi.url_scheme'} || $prop->{cf_cgi}->protocol;
+    || $env->{'psgi.url_scheme'} || $prop->{cgi}->protocol;
   my $host = $glob->mkhost($scheme);
   $scheme . '://' . $host . join("", @_);
 }
 
+#
+# $CON->has_htdebug($name): per-request cache of
+# $SYS->has_htdebug($name) (YATT::Lite::WebMVC0::SiteApp), which does an
+# %ENV lookup and a stat() of $app_root/.htdebug_$name every time.
+# escape() consults this for every reference it is asked to print, so
+# the answer is computed at most once per connection and name.
+#
+sub has_htdebug {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($name) = @_;
+  my $cache = $prop->{_htdebug_cache} //= {};
+  return $cache->{$name} if exists $cache->{$name};
+  $cache->{$name} = do {
+    my $sys = $prop->{system};
+    ($sys and $sys->can('has_htdebug')) ? ($sys->has_htdebug($name) // 0) : 0;
+  };
+}
+
+# True if this request came over TLS (see YATT::Lite::PSGIEnv::is_https).
+sub is_https {
+  my PROP $prop = (my $glob = shift)->prop;
+  if (my Env $env = $prop->{env}) {
+    Env->is_https($env);
+  } elsif (my $cgi = $prop->{cgi}) {
+    ($cgi->can('protocol') and lc($cgi->protocol // '') eq 'https') ? 1 : 0;
+  } else {
+    0;
+  }
+}
+
 sub http_host_domain {
   my PROP $prop = (my $glob = shift)->prop;
-  my Env $env = $prop->{cf_env};
+  my Env $env = $prop->{env};
   my $host = $env->{HTTP_HOST}
     or return undef;
   $host =~ s/:\d+$//;
@@ -492,7 +561,7 @@ sub http_host_domain {
 sub server_name_or_localhost {
   my PROP $prop = (my $glob = shift)->prop;
   my ($default) = @_;
-  my Env $env = $prop->{cf_env};
+  my Env $env = $prop->{env};
   $env->{SERVER_NAME} || ($default // 'localhost');
 }
 
@@ -500,15 +569,15 @@ sub mkhost {
   my PROP $prop = (my $glob = shift)->prop;
   my ($scheme) = @_;
   $scheme ||= 'http';
-  my Env $env = $prop->{cf_env};
+  my Env $env = $prop->{env};
 
   # XXX? Is this secure?
   return $env->{HTTP_HOST} if nonempty($env->{HTTP_HOST});
 
   my $base = $env->{SERVER_NAME}
-    // _invoke_or('localhost', $prop->{cf_cgi}, 'server_name');
+    // _invoke_or('localhost', $prop->{cgi}, 'server_name');
   if (my $port = $env->{SERVER_PORT}
-      || _invoke_or(80, $prop->{cf_cgi}, 'server_port')) {
+      || _invoke_or(80, $prop->{cgi}, 'server_port')) {
     $base .= ":$port"  unless ($scheme eq 'http' and $port == 80
 			       or $scheme eq 'https' and $port == 443);
   }
@@ -527,8 +596,8 @@ sub mkquery {
   }
 
   if (UNIVERSAL::isa($param, ref $self)) {
-    # $CON->mkquery($CON) == $CON->mkquery($CON->queryobj)
-    $param = $param->queryobj;
+    # $CON->mkquery($CON) == $CON->mkquery($CON->queryobj_for_mkquery)
+    $param = $param->queryobj_for_mkquery;
   }
 
   if (ref $param eq 'HASH') {
@@ -559,44 +628,127 @@ sub mkquery {
   }
 }
 
-sub dir_location {
-  my PROP $prop = (my $glob = shift)->prop;
-  my Env $env = $prop->{cf_env};
-  ($env->{'yatt.script_name'} // '').($prop->{cf_location} // "/");
+# GH-251: Mount-prefix aware link builders.
+# Naming follows the widespread "*_path = path only / *_url = absolute URL"
+# convention. $query accepts only HASH/ARRAY ref or query object (like $CON).
+
+sub site_path {
+  my ($glob, $path, $query) = splice @_, 0, 3;
+  if (@_) {
+    croak "Too many arguments for site_path!"
+      . " (query parameters must be passed as one HASH/ARRAY ref)";
+  }
+  if (not defined $path or $path eq '') {
+    $path = '/';
+  } elsif ($path !~ m{^/}) {
+    croak "site_path requires a '/'-leading path: $path";
+  }
+  $glob->site_prefix . $path . $glob->_query_string_of(site_path => $query);
 }
 
-# script_name + path_info - subpage
-# (script_name == location of this dir (DirApp))
+sub site_url {
+  my $glob = shift;
+  $glob->mkprefix . $glob->site_path(@_);
+}
+
+sub current_path {
+  my ($glob, $query) = splice @_, 0, 2;
+  if (@_) {
+    croak "Too many arguments for current_path!"
+      . " (query parameters must be passed as one HASH/ARRAY ref)";
+  }
+  $glob->request_path . $glob->_query_string_of(current_path => $query);
+}
+
+sub current_url {
+  my $glob = shift;
+  $glob->mkprefix . $glob->current_path(@_);
+}
+
+sub _query_string_of {
+  my ($glob, $caller, $query) = @_;
+  if (defined $query and not ref $query) {
+    croak "query for $caller must be a HASH/ARRAY ref or query object: $query";
+  }
+  scalar $glob->mkquery($query);
+}
+
+sub dir_location {
+  my PROP $prop = (my $glob = shift)->prop;
+  my Env $env = $prop->{env};
+  ($env->{'yatt.script_name'} // '').($prop->{location} // "/");
+}
+
+sub file_page {
+  my PROP $prop = (my $glob = shift)->prop;
+  my $fn = $prop->{file};
+  $fn =~ s/\.\w+\z//;
+  $fn;
+}
+
+# The url path of the current page: dir_location + request_file.
+# GH-251: Like mapped_path, this follows how the request spelled the
+# file name (Apache content-negotiation model: the requested name is
+# the base name; negotiation just appends extensions to it).
 #
 sub file_location {
   my PROP $prop = (my $glob = shift)->prop;
-  my Env $env = $prop->{cf_env};
+  my Env $env = $prop->{env};
   my $loc = $glob->dir_location;
-  if (not $prop->{cf_is_index}
-      and my $fn = $prop->{cf_file}) {
-    $fn =~ s/\..*//;
+  if (defined (my $rf = $prop->{request_file})) {
+    $loc . $rf;
+  } elsif (not $prop->{is_index} and my $fn = $prop->{file}) {
+    # Fallback for old-style connections without request_file:
+    # trim the last extension ("foo.tar.yatt" => "foo.tar").
+    $fn =~ s/\.\w+\z//;
+    $loc . $fn;
+  } else {
+    $loc;
+  }
+}
+
+# page_location: canonical form of file_location, based on the
+# physical file name. Unlike file_location, this is NOT affected by
+# how the request spelled the url.
+# (page = spelling-independent identity, cf. is_current_page)
+sub page_location {
+  my PROP $prop = (my $glob = shift)->prop;
+  my $loc = $glob->dir_location;
+  if (not $prop->{is_index} and my $fn = $prop->{file}) {
+    $fn =~ s/\.\w+\z//;
     $loc .= $fn;
   }
   $loc;
 }
 
-# XXX: not yet tested.
+# is_current_file($path): true when $path addresses the current page.
+# $path is a site-rooted literal (same form as site_path's argument):
+# canonical (/auth/login), physical (/auth/login.yatt), or directory
+# form for index pages (/auth/). Mount prefix and request spelling
+# do not affect the result. Subpath is ignored (cf. is_current_page).
 sub is_current_file {
   my PROP $prop = (my $glob = shift)->prop;
-  my ($fn) = @_;
-  $glob->file_location eq $fn
+  my ($path) = @_;
+  return 0 unless defined $path;
+  my $loc = $glob->location;
+  my $fn  = $prop->{file} // '';
+  (my $canon = $fn) =~ s/\.\w+\z//;
+  return 1 if $path eq $loc . $canon;
+  return 1 if $path eq $loc . $fn;
+  return 1 if $prop->{is_index} and $path eq $loc;
+  0;
 }
 
 sub is_current_page {
   my PROP $prop = (my $glob = shift)->prop;
   my ($file, $page) = do {
-    @_ <= 1 ? (rootname($prop->{cf_file}), $_[0]) : @_;
+    @_ <= 1 ? (rootname($prop->{file}), $_[0]) : @_;
   };
-  rootname($prop->{cf_file}) eq $file
+  rootname($prop->{file}) eq $file
     or return 0;
   $page //= '';
   $page =~ s{^/}{}; # Treat /foo as foo.
-  if (empty(my $subpath = $prop->{cf_subpath})) {
+  if (empty(my $subpath = $prop->{subpath})) {
     $page eq '';
   } elsif ($page eq '') {
     0
@@ -605,15 +757,24 @@ sub is_current_page {
   }
 }
 
+# GH-251: mapped_path now reproduces the url path of the request:
+# site_prefix + location + request_file + subpath. Since request_file
+# keeps the file name part as it appeared in the request, extension
+# is reproduced only when the request spelled it. For connections
+# which lack request_file (old-style construction), falls back to
+# the physical file name as before.
 sub mapped_path {
   my PROP $prop = (my $glob = shift)->prop;
   my @path = do {
-    my $loc = $prop->{cf_location} // "/";
-    $loc .= $prop->{cf_file} if defined $prop->{cf_file}
-      and not $prop->{cf_is_index};
-    ($loc);
+    my $loc = $prop->{location} // "/";
+    $loc .= $prop->{request_file} // do {
+      (defined $prop->{file} and not $prop->{is_index})
+	? $prop->{file} : '';
+    };
+    ($glob->site_prefix . $loc);
   };
-  if (defined (my $sp = $prop->{cf_subpath})) {
+  if (defined (my $sp = $prop->{subpath})) {
+    $path[0] =~ s!/+\z!!;
     $sp =~ s!^/*!/!;
     push @path, $sp;
   }
@@ -633,11 +794,11 @@ sub request_path {
 
 sub request_uri {
   my PROP $prop = (my $glob = shift)->prop;
-  if (my Env $env = $prop->{cf_env}) {
+  if (my Env $env = $prop->{env}) {
     $env->{REQUEST_URI};
-  } elsif ($prop->{cf_cgi}
-      and my $sub = $prop->{cf_cgi}->can('request_uri')) {
-    $sub->($prop->{cf_cgi});
+  } elsif ($prop->{cgi}
+      and my $sub = $prop->{cgi}->can('request_uri')) {
+    $sub->($prop->{cgi});
   } else {
     $ENV{REQUEST_URI};
   }
@@ -645,6 +806,47 @@ sub request_uri {
 
 #========================================
 
+# True if $url, given as a plain string, stays on this origin:
+# a path or relative reference, or an absolute http(s) url whose host
+# equals mkhost. Written against how browsers parse Location:, not
+# against RFC 3986 alone: for http(s), '\' is treated as '/', runs of
+# slashes after the scheme collapse, and leading C0 controls / spaces
+# are stripped before parsing. So "\\evil", "/\evil", "///evil",
+# "http:\\evil" and " //evil" all mean evil.example to a browser and
+# are rejected here.
+sub is_same_origin_redirect_url {
+  my ($glob, $url) = @_;
+  return 0 unless defined $url and length $url;
+
+  # Control chars (CR/LF would split the header) and whitespace.
+  return 0 if $url =~ /[\x00-\x20\x7f]/;
+
+  if ($url =~ m{^([A-Za-z][A-Za-z0-9+.-]*):(.*)\z}s) {
+    # Has a scheme. Only http(s) to this very host is accepted.
+    my ($scheme, $rest) = (lc($1), $2);
+    return 0 unless $scheme eq 'http' or $scheme eq 'https';
+    my ($host) = $rest =~ m{^//([^/?#\\]+)(?:[/?#]|\z)}
+      or return 0;
+    return lc($host) eq lc($glob->mkhost($scheme) // '') ? 1 : 0;
+  }
+
+  if ($url =~ m{^//([^/?#\\]+)(?:[/?#]|\z)}) {
+    # Scheme-relative "//host/...": accepted only for this host.
+    return lc($1) eq lc($glob->mkhost // '') ? 1 : 0;
+  }
+
+  if ($url =~ m{^[/\\]}) {
+    # A path. Exactly one leading '/', not followed by '/' or '\'.
+    return $url =~ m{^/(?![/\\])} ? 1 : 0;
+  }
+
+  # Relative reference ("./", "index?x=1", "?x=1", "#frag").
+  1;
+}
+
+# GH-251: raise_redirect is the preferred name (raise_* family tells
+# this never returns to the caller). redirect is kept for compatibility.
+*raise_redirect = *redirect; *raise_redirect = *redirect;
 sub redirect {
   my PROP $prop = (my $glob = shift)->prop;
   croak "undefined url" unless @_ and defined $_[0];
@@ -654,24 +856,23 @@ sub redirect {
       my $arg = shift;
       # die "redirect url is not a scalar ref: $arg";
       $$arg;
-    } elsif ($_[0] =~ m{^(?:\w+:)?//([^/]+)}
-	     and $1 ne ($glob->mkhost // '')) {
-      die $glob->error_with_status(
-        400, "External redirect is not allowed: %s", $_[0]
-      );
-    } else {
-      # taint check
+    } elsif ($glob->is_same_origin_redirect_url($_[0])) {
       shift;
+    } else {
+      die $glob->error_with_status(
+        400, "External redirect is not allowed: %s"
+        , YATT::Lite::Util::escape($_[0])
+      );
     }
   };
-  if ($prop->{header_was_sent}++) {
+  if ($prop->{_header_was_sent}++) {
     die "Can't redirect multiple times!";
   }
 
   # Make sure session is flushed before redirection.
   $glob->finalize_headers;
 
-  ${$prop->{cf_buffer}} = '';
+  ${$prop->{buffer}} = '';
 
   die [302, [Location => $url, $glob->list_header], []];
 }
@@ -686,29 +887,29 @@ sub redirect {
 sub get_session {
   my PROP $prop = (my $glob = shift)->prop;
   # To avoid repeative false session tests.
-  if (exists $prop->{session}) {
-    $prop->{session};
+  if (exists $prop->{_session}) {
+    $prop->{_session};
   } else {
-    $prop->{cf_system}->session_resume($glob);
+    $prop->{system}->session_resume($glob);
   }
 }
 
 sub start_session {
   my PROP $prop = (my $glob = shift)->prop;
-  if (defined (my $sess = $prop->{session})) {
+  if (defined (my $sess = $prop->{_session})) {
     die $glob->error("load_session is called twice! sid=%s", $sess->id);
   }
-  $prop->{cf_system}->session_start($glob, @_);
+  $prop->{system}->session_start($glob, @_);
 }
 
 sub delete_session {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_system}->session_delete($glob);
+  $prop->{system}->session_delete($glob);
 }
 
 sub flush_session {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_system}->session_flush($glob);
+  $prop->{system}->session_flush($glob);
 }
 
 #========================================
@@ -716,12 +917,12 @@ sub flush_session {
 sub current_user {
   my PROP $prop = (my $glob = shift)->prop;
   my $cu = do {
-    if (exists $prop->{current_user}) {
-      $prop->{current_user}
-    } elsif (defined $prop->{cf_system}) {
-      $prop->{current_user} = $prop->{cf_system}->load_current_user($glob);
+    if (exists $prop->{_current_user}) {
+      $prop->{_current_user}
+    } elsif (defined $prop->{system}) {
+      $prop->{_current_user} = $prop->{system}->load_current_user($glob);
     } else {
-      $prop->{current_user} = undef;
+      $prop->{_current_user} = undef;
     }
   };
 
@@ -781,7 +982,7 @@ sub accept_language {
 		     , join ", ", keys %opts);
   }
 
-  my Env $env = $prop->{cf_env};
+  my Env $env = $prop->{env};
   my $langlist = $env->{HTTP_ACCEPT_LANGUAGE}
     or return;
   my @langlist = sort {

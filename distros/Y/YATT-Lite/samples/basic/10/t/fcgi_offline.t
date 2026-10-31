@@ -33,6 +33,7 @@ use YATT::Lite::Test::XHFTest2;
 use YATT::t::t_preload; # To make Devel::Cover happy.
 
 use base qw(YATT::Lite::Test::XHFTest2);
+use YATT::Lite::MFields;
 use YATT::Lite::Util qw(lexpand);
 
 use YATT::Lite::Test::TestFCGI;
@@ -79,15 +80,15 @@ sub base_url { shift; '/'; }
 
 sub ntests_per_item {
   (my MY $tests, my Item $item) = @_;
-  lexpand($item->{cf_HEADER})/2
-    + (($item->{cf_BODY} || $item->{cf_ERROR}) ? 1 : 0);
+  lexpand($item->{HEADER})/2
+    + (($item->{BODY} || $item->{ERROR}) ? 1 : 0);
 }
 
 sub mech_request {
   (my MY $tests, my $mech, my Item $item) = @_;
   my $method = $tests->item_method($item);
   my $url = $tests->item_url_file($item);
-  $mech->request($method, $url, $item->{cf_PARAM}, $item->{cf_ERROR});
+  $mech->request($method, $url, $item->{PARAM}, $item->{ERROR});
 }
 
 # Local Variables: #

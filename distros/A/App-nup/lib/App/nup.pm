@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.09";
+our $VERSION = "1.10";
 
 1;
 =encoding utf-8
@@ -35,6 +35,7 @@ nup - n-up, multi-column paged output for commands and files
          --runin=#          run-in width for line breaking
          --runout=#         run-out width for line breaking
          --runlen=#         set both run-in and run-out
+         --boundary=#       fold boundary: word, space or none
     --cm --colormap=#       color mapping (LABEL=COLOR)
          --[no-]page-number page number on border (default: on)
          --textconv[=EXT]   textconv for non-text files
@@ -47,7 +48,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.09
+Version 1.10
 
 =cut
 =head1 DESCRIPTION
@@ -206,6 +207,15 @@ They are given to ansicolumn after the values in F<~/.ansicolumnrc>,
 so they take precedence.  Without them, ansicolumn uses the values in
 F<~/.ansicolumnrc>, or 2.
 
+=item B<--boundary>=C<word>|C<space>|C<none>
+
+Set where L<ansicolumn> may break a line when it folds long lines, as
+its C<--boundary> option: C<word> does not break inside an
+alphanumeric word, C<space> not inside a sequence of non-space
+characters, and C<none> breaks anywhere.  Like C<--runin>, it is
+given to ansicolumn after F<~/.ansicolumnrc>.  Without it, ansicolumn
+uses the value in the rc file, or C<word> in document mode.
+
 =item B<--cm>=I<SPEC>, B<--colormap>=I<SPEC>
 
 Set color mapping. Specify as C<LABEL=COLOR> (e.g., C<--cm=BORDER=R>).
@@ -254,6 +264,13 @@ layout which has no page structure, so C<nup> disables page mode
 and C<NUP_PAGE_PAGER> is not used there.
 The C<PAGER> variable is not used to avoid an infinite loop when
 C<PAGER> is set to C<nup>.
+C<+Gg> makes C<less> read all input before displaying, so that C<-F>
+and the percentage work; C<--file-size> of C<less> 590 and later does
+the same, but the C<less> 581 of macOS does not have it, so C<+Gg>
+is the default.  Set C<NUP_PAGER> to use it:
+
+    export NUP_PAGER="less --file-size"
+
 Use C<--pager=> (empty) or C<--no-pager> to disable pager.
 
 =item B<--no-pager>

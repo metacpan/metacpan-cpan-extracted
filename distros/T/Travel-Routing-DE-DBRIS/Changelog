@@ -1,8 +1,13 @@
-Travel::Status::DE::DBRIS 0.16 - Thu Oct 29 2026
+Travel::Routing::DE::DBRIS 0.17 - Fri Oct 30 2026
+
+    * Try another Akamai TLS fingerprinting workaround.
+      At this rate, this module may be discontinued soon.
+
+Travel::Routing::DE::DBRIS 0.16 - Thu Oct 29 2026
 
     * Work around latest Akamai BMP TLS fingerprinting rules
 
-Travel::Status::DE::DBRIS 0.15 - Wed Oct 14 2026
+Travel::Routing::DE::DBRIS 0.15 - Wed Oct 14 2026
 
     * Work around latest Akamai BMP TLS fingerprinting rules
 

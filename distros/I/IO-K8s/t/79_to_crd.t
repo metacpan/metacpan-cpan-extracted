@@ -8,7 +8,6 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Scalar::Util qw( blessed reftype );
-use re ();
 
 use IO::K8s;
 use IO::K8s::CRD;
@@ -329,124 +328,12 @@ subtest 'k110: the shipped provider patterns still emit exactly as before' => su
         'the inline modifier upstream ships survives as the plain string it is stored as');
 };
 
-subtest 'smoke: every shipped, resource_plural-bearing Kind survives to_crd' => sub {
-    require File::Find;
-    require Module::Runtime;
-    (my $lib = $INC{'IO/K8s.pm'}) =~ s{/IO/K8s\.pm\z}{};
-    my @classes;
-    File::Find::find(sub {
-        return unless /\.pm\z/;
-        (my $c = $File::Find::name) =~ s{^\Q$lib\E/}{};
-        $c =~ s{/}{::}g;
-        $c =~ s/\.pm\z//;
-        push @classes, $c;
-    }, "$lib/IO/K8s/Api", "$lib/IO/K8s/Apimachinery", "$lib/IO/K8s/ApiextensionsApiserver",
-       "$lib/IO/K8s/KubeAggregator", "$lib/IO/K8s/Cilium", "$lib/IO/K8s/Traefik",
-       "$lib/IO/K8s/CertManager", "$lib/IO/K8s/GatewayAPI", "$lib/IO/K8s/K3s",
-       "$lib/IO/K8s/AgentSandbox", "$lib/IO/K8s/PrometheusOperator",
-       "$lib/IO/K8s/VolumeSnapshot", "$lib/IO/K8s/ExternalSecrets");
-
-    my @failed;
-    my $checked = 0;
-    for my $class (sort @classes) {
-        eval { Module::Runtime::use_module($class); 1 } or next;
-        next unless $class->can('_is_resource');
-        next unless $class->can('resource_plural') && defined eval { $class->resource_plural };
-        $checked++;
-        eval { $class->to_crd; 1 } or push @failed, "$class: $@";
-    }
-    ok($checked > 100, "checked a real number of Kinds ($checked)");
-    is_deeply(\@failed, [], 'no shipped Kind fails Class->to_crd');
-};
-
-# Runs after the smoke subtest above on purpose -- that one is what has
-# already loaded every shipped class, and the registry is only populated by
-# the `k8s` calls a class makes at load time.
-subtest 'k110: no shipped qr// pattern croaks or changes on emit' => sub {
-    my ($checked, @drifted) = (0);
-    for my $class (sort grep { /\AIO::K8s::/ } keys %IO::K8s::Resource::_attr_registry) {
-        my $info = $IO::K8s::Resource::_attr_registry{$class};
-        for my $attr (sort keys %$info) {
-            my $opts = $info->{$attr}{options} or next;
-            my $p    = $opts->{pattern};
-            next unless defined $p && ref $p eq 'Regexp';
-            $checked++;
-            # The pre-k110 emission: re::regexp_pattern's raw text. Every
-            # shipped pattern must translate to exactly that, so a rule
-            # that starts rejecting or rewriting real provider patterns
-            # fails here rather than in a consumer's cluster.
-            my $before = (re::regexp_pattern($p))[0];
-            my $after  = eval { IO::K8s::CRD::_pattern_to_ecma262($p, "$class.$attr") };
-            if ($@) { push @drifted, "$class.$attr croaks: $@"; next }
-            push @drifted, "$class.$attr: '$before' -> '$after'" if $after ne $before;
-        }
-    }
-    ok($checked > 100, "checked a real number of shipped qr// patterns ($checked)");
-    is_deeply(\@drifted, [], 'the shipped patterns are all already ECMA262');
-};
-
-# k114: the same sweep one step further out, and over the string patterns
-# too. What IO::K8s::CRD::Emitter would RENDER for a shipped pattern, read
-# back in the way the rendered file's own `k8s` line would, must reach a
-# CRD as the same text. That is the drift k106 and k110 each had to clean
-# up: a shipped class and the emitter's output for it disagree, and nothing
-# notices until somebody re-renders the provider.
-sub _crd_pattern {
-    my ($p, $where) = @_;
-    return ref $p eq 'Regexp' ? IO::K8s::CRD::_pattern_to_ecma262($p, $where) : $p;
-}
-
-subtest 'k114: the emitter is a fixed point on every shipped pattern' => sub {
-    my ($checked, @drifted) = (0);
-    for my $class (sort grep { /\AIO::K8s::/ } keys %IO::K8s::Resource::_attr_registry) {
-        my $info = $IO::K8s::Resource::_attr_registry{$class};
-        for my $attr (sort keys %$info) {
-            my $opts = $info->{$attr}{options} or next;
-            next unless exists $opts->{pattern};
-            $checked++;
-            my $p     = $opts->{pattern};
-            my $where = "$class.$attr";
-
-            my $want = eval { _crd_pattern($p, $where) };
-            if ($@) { push @drifted, "$where croaks on emit: $@"; next }
-
-            my $literal = eval { IO::K8s::CRD::Emitter::_pattern_literal($p) };
-            if ($@) { push @drifted, "$where croaks in the emitter: $@"; next }
-
-            my $back = eval $literal;
-            my $got  = eval { _crd_pattern($back, $where) };
-            push @drifted,
-                "$where: emits '$want', renders as $literal, which emits "
-                . (defined $got ? "'$got'" : "nothing ($@)")
-                if !defined $got || $got ne $want;
-        }
-    }
-    ok($checked > 300, "checked every shipped pattern field ($checked)");
-    is_deeply(\@drifted, [], 'rendering a shipped pattern and reading it back changes nothing');
-
-    # The fixed-point check above cannot see an artifact that is ALREADY
-    # baked into a shipped class -- '\@' is an escaped unit, so re-rendering
-    # it reproduces it and the fixed point holds. These two spellings are
-    # what an artifact looks like once it is in: '\@' is an invalid identity
-    # escape in ECMA262's unicode mode and '\x{...}' is not ECMA262 at all,
-    # so no CRD author writes either -- in an openAPIV3Schema.pattern they
-    # mean IO::K8s' own qr// rendering put them there (k114). '\$' is left
-    # out on purpose: it is a legal ECMA262 escape an author may really have
-    # written, so its presence proves nothing.
-    my @artifacts;
-    for my $class (sort grep { /\AIO::K8s::/ } keys %IO::K8s::Resource::_attr_registry) {
-        my $info = $IO::K8s::Resource::_attr_registry{$class};
-        for my $attr (sort keys %$info) {
-            my $opts = $info->{$attr}{options} or next;
-            next unless exists $opts->{pattern};
-            my $text = eval { _crd_pattern($opts->{pattern}, "$class.$attr") };
-            next unless defined $text;
-            push @artifacts, "$class.$attr: '$text'" if $text =~ /\\\@|\\x\{/;
-        }
-    }
-    is_deeply(\@artifacts, [],
-        q{no shipped pattern reaches a CRD carrying a '\@' or '\x{...}' escape});
-};
+# The sweeps over the shipped classes -- "smoke: every shipped, resource_plural-
+# bearing Kind survives to_crd", "k110: no shipped qr// pattern croaks or
+# changes on emit" and "k114: the emitter is a fixed point on every shipped
+# pattern" -- need the whole tree loaded and none of the fixture classes of
+# this file (which would show up in the registry they walk), so they run in
+# t/02_compile_all.t on its one shared load (as "to_crd smoke / k110 / k114").
 
 subtest 'scope: Cluster-scoped shipped Kind' => sub {
     # ClusterIssuer is cert-manager's cluster-scoped counterpart to Issuer.

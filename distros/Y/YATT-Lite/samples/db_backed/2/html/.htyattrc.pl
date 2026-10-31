@@ -2,9 +2,9 @@
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 
-use fields qw(dbic
-	      cf_tmpdir cf_datadir
-	      cf_dbname cf_dbuser cf_dbpass);
+use fields qw(_dbic
+	      tmpdir datadir
+	      dbname dbuser dbpass);
 
 use YATT::Lite::Entities qw(*CON);
 
@@ -131,7 +131,7 @@ sub sendmail {
   my $is_debug = defined $transport && $transport eq 'YATT_TEST';
 
   my $layer = $con->get_encoding_layer;
-  my $fh = $is_debug ? output_file("$self->{cf_datadir}/.htdebug.eml", $layer)
+  my $fh = $is_debug ? output_file("$self->{datadir}/.htdebug.eml", $layer)
     : ostream(my $buffer, $layer);
 
   $sub->($page, $fh, $to, @rest);
@@ -151,7 +151,7 @@ sub sendmail {
 
 sub dbic {
   my MY $self = shift;
-  $self->{dbic} //= do {
+  $self->{_dbic} //= do {
     my ($dbi, $user, $pass) = $self->dbi_dsn;
     # DBIC warns 'AutoCommit => 0'.
     $self->DBIC->connect
@@ -162,14 +162,14 @@ sub dbic {
 
 sub dbi_dsn {
   my MY $self = shift;
-  my $dsn = "dbi:mysql:database=$self->{cf_dbname}";
-  wantarray ? ($dsn, $self->{cf_dbuser}, $self->{cf_dbpass}) : $dsn;
+  my $dsn = "dbi:mysql:database=$self->{dbname}";
+  wantarray ? ($dsn, $self->{dbuser}, $self->{dbpass}) : $dsn;
 }
 
 sub cmd_setup {
   my MY $self = shift;
   require File::Path;
-  foreach my $dir ($self->{cf_datadir}, $self->{cf_tmpdir}) {
+  foreach my $dir ($self->{datadir}, $self->{tmpdir}) {
     next if -d $dir;
     File::Path::make_path($dir, {mode => 02775, verbose => 1});
   }
@@ -192,8 +192,8 @@ sub after_new {
 
   $self->SUPER::after_new(); # **REQUIRED**
 
-  $self->{cf_tmpdir}  //= $self->app_path_var_tmp;
-  $self->{cf_datadir} //= $self->app_path_var('data');
+  $self->{tmpdir}  //= $self->app_path_var_tmp;
+  $self->{datadir} //= $self->app_path_var('data');
 
   my $passfile = $self->app_root."/.htdbpass";
   unless (-e $passfile) {
@@ -206,7 +206,7 @@ sub after_new {
   $self->cf_by_filetype(xhf => $passfile);
 
   foreach my $name (qw/dbname dbuser dbpass/) {
-    unless (defined $self->{"cf_$name"}) {
+    unless (defined $self->{$name}) {
       $self->error("'%s' is empty in '%s'!", $name, $passfile);
     }
   }

@@ -66,7 +66,6 @@ OUT:
 TITLE: add argmacros with renaming
 IN:
  <!yatt:argmacro enum=[list=list] first="value/0" last="value!">
- $DB::single = 1;
  my $firstExpr = $args->{first} ? $cgen->node_value($args->{first}) : $vars->{first}->default;
  my $lastExpr = $cgen->node_value($args->{last});
  $result->{list} = sprintf(q{%s .. %s}, $firstExpr, $lastExpr);
@@ -96,4 +95,34 @@ OUT:
     3 2
  
  
+
+TITLE: argmacro -> args
+IN:
+ <!yatt:argmacro foo=[x y]>
+ 
+ <!yatt:args %foo;>
+ <h2>&yatt:x;</h2>
+ &yatt:y;
+PARAM[
+- foo
+- bar
+]
+OUT:
+ <h2>foo</h2>
+ bar
+
+
+TITLE: better error message for argmacro
+IN:
+ <!yatt:argmacro foo=[
+   x
+   y
+ ]>
+ 
+ <!yatt:args bar &yatt:foo; >
+ <h2>&yatt:x;</h2>
+ &yatt:y;
+ <!yatt:widget baz>
+ xxx
+ERROR: ^Use of entity\(&yatt:foo;\) is not allowed here. \(Did you mean %foo;\?\)
 

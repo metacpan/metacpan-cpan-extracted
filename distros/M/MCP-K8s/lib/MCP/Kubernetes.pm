@@ -1,6 +1,6 @@
 package MCP::Kubernetes;
 # ABSTRACT: MCP Server for Kubernetes (alias for MCP::K8s)
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 
 extends 'MCP::K8s';
@@ -19,7 +19,7 @@ MCP::Kubernetes - MCP Server for Kubernetes (alias for MCP::K8s)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ L<IO::K8s> — Kubernetes resource objects
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-mcp-k8s/issues>.
 
 =head1 CONTRIBUTING
@@ -80,5 +80,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

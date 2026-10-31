@@ -310,25 +310,6 @@ sub derive_secret {
    _prk_derive_secret (pack ("H*", $secret), $length, @info)
 }
 
-sub credential {
-   my ($self, $purpose, $name, $username) = @_;
-
-   $username = "" unless defined $username;
-
-   $purpose eq "token"
-      or die "Unknown credential purpose '$purpose'\n";
-
-   my $credential = MIME::Base64::encode_base64 (
-      $self->derive_secret (
-         32, $purpose, AnyEvent::MCP::utf8enc (program_name ()),
-         AnyEvent::MCP::utf8enc ($name), AnyEvent::MCP::utf8enc ($username)
-      ), ""
-   );
-   $credential =~ y!+/=!-_!d;
-
-   $credential
-}
-
 sub program_name {
    my $name = File::Basename::basename ($0);
    $name =~ s/\.(?:pl|perl)\z//;
@@ -344,6 +325,28 @@ sub server_name {
       or die "Invalid MCP server name '$name'\n";
 
    $name
+}
+
+sub credential {
+   my ($self, $purpose, $name, $username) = @_;
+
+   $username = "" unless defined $username;
+
+   $purpose eq "token"
+      or die "Unknown credential purpose '$purpose'\n";
+
+   my $credential = MIME::Base64::encode_base64 (
+      $self->derive_secret (
+         32,
+         $purpose,
+         (AnyEvent::MCP::utf8enc program_name),
+         (AnyEvent::MCP::utf8enc $name),
+         (AnyEvent::MCP::utf8enc $username)
+      ), ""
+   );
+   $credential =~ y!+/=!-_!d;
+
+   $credential
 }
 
 sub http_getopt {
@@ -378,7 +381,13 @@ sub server_port {
 
    $name = server_name $name;
 
-   16384 + ((unpack "n", $self->derive_secret (2, "port", AnyEvent::MCP::utf8enc (program_name ()), AnyEvent::MCP::utf8enc ($name))) & 16383)
+   16384 + (
+      (unpack "n", $self->derive_secret (
+         2,
+         "port",
+         (AnyEvent::MCP::utf8enc program_name),
+         (AnyEvent::MCP::utf8enc $name))
+   ) & 16383)
 }
 
 sub http_settings {
@@ -440,7 +449,7 @@ sub http_url {
       && !exists $options{tokens}
       && !exists $self->{section}{"instance $name"}{tokens}
       && !exists $self->{section}{"program " . program_name ()}{tokens}) {
-      my $stored = ref ($self)->new (file => $self->{file});
+      my $stored = (ref $self)->new (file => $self->{file});
       $stored->{section}{global}{secret} eq $self->{section}{global}{secret}
          or die "MCP master secret is not persistently stored in $self->{file}\n";
    }

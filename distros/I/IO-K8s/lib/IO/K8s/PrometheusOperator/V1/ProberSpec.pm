@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ProberSpec;
 # ABSTRACT: prober defines the specification for the prober to use for probing targets.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s noProxy              => Str;
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::ProberSpec - prober defines the specification f
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 noProxy
 
@@ -80,7 +80,7 @@ Unlike what the name indicates, the value should be in the form of
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -108,5 +108,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

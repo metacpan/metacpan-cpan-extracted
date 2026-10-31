@@ -16,7 +16,7 @@ use HTTP::Message::PSGI;
 
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use File::Path qw(make_path);
 use Cwd;
 
@@ -51,7 +51,7 @@ describe ":abspath() in path_translated_mode", sub {
   ) {
     my ($location, $file) = @$test;
 
-    MY->mkfile("$real_dir$file", <<'END');
+    MY->mkfile_may_wait("$real_dir$file", <<'END');
 (&yatt:absrequest();)(&yatt:abspath();)
 END
 

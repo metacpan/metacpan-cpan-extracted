@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL::Grammars::PostgreSQL;
-our $VERSION = '2.20260827';
+our $VERSION = '2.20261030';
 use strict;
 use warnings;
 use feature 'signatures';
@@ -16,6 +16,10 @@ sub language {
 
 sub dsn {
     return 'Pg';
+}
+
+sub select_index_names {
+    return "SELECT indexname AS name FROM pg_indexes WHERE schemaname = current_schema()";
 }
 
 sub and_arg( $self, $column, $operator = undef ) {
@@ -101,10 +105,6 @@ sub select_report_policy_published {
 sub select_report_reason {
     return
         'SELECT "type","comment" FROM "report_record_reason" WHERE "report_record_id"=?';
-}
-
-sub select_report_error {
-    return 'SELECT "error" FROM "report_error" WHERE "report_id"=?';
 }
 
 sub select_report_record {
@@ -248,15 +248,6 @@ INSERT INTO report_record
     disposition, dkim, spf)
    VALUES (??)
 EO_ROW_INSERT
-        ;
-}
-
-sub insert_policy_published {
-    return <<"EO_RPP"
-INSERT INTO report_policy_published
-  (report_id, adkim, aspf, p, sp, pct, rua)
-VALUES (??)
-EO_RPP
         ;
 }
 
@@ -490,7 +481,7 @@ Mail::DMARC::Report::Store::SQL::Grammars::PostgreSQL - Grammar for working with
 
 =head1 VERSION
 
-version 2.20260827
+version 2.20261030
 
 =head1 SYPNOSIS
 

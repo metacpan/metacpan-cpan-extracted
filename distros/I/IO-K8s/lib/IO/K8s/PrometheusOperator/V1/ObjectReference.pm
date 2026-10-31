@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ObjectReference;
 # ABSTRACT: ObjectReference references a PodMonitor, ServiceMonitor, Probe or PrometheusRule object.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s group     => Str, { enum => [qw(monitoring.coreos.com)], default => 'monitoring.coreos.com' };
@@ -26,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::ObjectReference - ObjectReference references a 
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 group
 
@@ -49,7 +49,7 @@ resource of the referent.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -77,5 +77,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

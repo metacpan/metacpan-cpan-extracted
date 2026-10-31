@@ -11,13 +11,14 @@ our @EXPORT = qw/walk/;
 our @EXPORT_OK = (@EXPORT, qw/walk_vfs_folders/);
 
 use YATT::Lite::Factory;
+use YATT::Lite::Core;
 use YATT::Lite::Util qw/lexpand/;
 
 sub walk {
   (my %opts) = @_;
 
-  my $self = delete $opts{factory} or Carp::croak "factory is missing!";
-  my $fromList = delete $opts{from} // $self->{cf_doc_root};
+  my YATT::Lite::Factory $self = delete $opts{factory} or Carp::croak "factory is missing!";
+  my $fromList = delete $opts{from} // $self->{doc_root};
   my $nameRe = delete $opts{name_match};
   my $noSymlink = delete $opts{ignore_symlink};
 
@@ -44,7 +45,7 @@ sub walk {
     if ($tree->can_generate_code) {
       # Template
       $seen{$path}++;
-      foreach my $part ($tree->list_parts) {
+      foreach my YATT::Lite::Core::Part $part ($tree->list_parts) {
         my $partName = $part->cget('name');
         my @path = (@{$prefix // []}, $partName || ());
         next unless @path;
@@ -58,20 +59,20 @@ sub walk {
         if ($nameRe and $wname !~ $nameRe) {
           next;
         }
-        $forWidget->({part => $part, name => $wname, kind => $part->{cf_kind}});
+        $forWidget->({part => $part, name => $wname, kind => $part->{kind}});
       }
     } else {
       # Dir
       foreach my $itemName ($tree->list_all_names($vfs)) {
-        my $subtree = $tree->lookup_1($vfs, $itemName)
+        my YATT::Lite::VFS::Folder $subtree = $tree->lookup_1($vfs, $itemName)
           or next;
-        next if $seen{$subtree->{cf_path}}++;
+        next if $seen{$subtree->{path}}++;
         $walk->($vfs, $subtree, [@{$prefix // []}, $itemName]);
       }
     }
 
-    foreach my $superItem ($tree->list_base) {
-      next if $seen{$superItem->{cf_path}}++;
+    foreach my YATT::Lite::VFS::Folder $superItem ($tree->list_base) {
+      next if $seen{$superItem->{path}}++;
       $walk->($vfs, $superItem);
     }
   };
@@ -88,11 +89,11 @@ sub walk {
     };
 
     my $yatt = $self->load_yatt($dir);
-    my $vfs = $yatt->get_trans;
+    my YATT::Lite::Core $vfs = $yatt->get_trans;
 
     my $rootPart = $rootName
       ? $vfs->find_file($rootName)
-      : $vfs->{root};
+      : $vfs->{_root};
 
     $walk->($vfs, $rootPart);
   }
@@ -101,8 +102,8 @@ sub walk {
 sub walk_vfs_folders {
   (my %opts) = @_;
 
-  my $self = delete $opts{factory} or Carp::croak "factory is missing!";
-  my $fromList = delete $opts{from} // $self->{tmpldirs};
+  my YATT::Lite::Factory $self = delete $opts{factory} or Carp::croak "factory is missing!";
+  my $fromList = delete $opts{from} // $self->{_tmpldirs};
   my $noSymlink = delete $opts{ignore_symlink};
 
   my $dirAction = delete $opts{dir} // sub {

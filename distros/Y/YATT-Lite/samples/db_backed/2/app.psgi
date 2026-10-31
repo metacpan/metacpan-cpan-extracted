@@ -24,7 +24,7 @@ use List::MoreUtils qw/last_index/;
     $app_root = do { $app_root =~ m{^(.*)$} && $& }; # Untaint.
     if (-d (my $dn = "$app_root/lib")) {
       push @libdir, $dn
-    } elsif (my ($found) = $app_root =~ m{^(.*?/)YATT/}) {
+    } elsif (my ($found) = $app_root =~ m{^(.*?/)YATT/samples(?:/|\z)}) {
       push @libdir, $found;
     }
     if (-d (my $dn = "$app_root/extlib")) {
@@ -65,7 +65,7 @@ use List::MoreUtils qw/last_index/;
   use YATT::Lite::WebMVC0::Partial::Session;
 
   # To add other option, use MFields like this:
-  # use YATT::Lite::MFields qw/cf_dbi_dsn cf_auto_deploy /;
+  # use YATT::Lite::MFields qw/dbi_dsn auto_deploy /;
   #
 
   my $site = MY->load_factory_for_psgi

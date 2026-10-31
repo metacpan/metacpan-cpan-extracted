@@ -11,11 +11,13 @@ use JSON::XS ();
 my $dir = File::Temp::tempdir (CLEANUP => 1);
 my $json = JSON::XS->new->canonical;
 my $request = {
-   version => 1, action => "write", action_matcher => "write", subject => "/one/file",
-   subjects => [
-      { label => "This file", subject => "/one/file" },
-      { label => "Containing directory", subject => "^/one/" },
-   ],
+   version => 1, action => "write", action_matcher => "write",
+   dimensions => { subject => { label => "File", value => "/one/file",
+      choices => [
+         { label => "This file", match => "/one/file" },
+         { label => "Containing directory", match => "^/one/" },
+      ],
+   } },
    reason => "Change the file", sandbox_grants => ["write"], sandbox_grant_choices => ["read", "write"],
    sandbox_grant_descriptions => { read => "Read files", write => "Modify files" },
 };
@@ -108,8 +110,8 @@ is_deeply $decision, { decision => "allow-once", sandbox_grants => ["write"] },
    my $args = $json->decode (scalar <$log>);
    close $log;
    my @labels = grep /\A--field=.*:LBL\z/, @$args;
-   is_deeply \@labels, ["--field=Action: write:LBL", "--field=Subject: /one/file:LBL",
-      "--field=Reason: Change the file:LBL"], "request context is read-only labels";
+   is_deeply \@labels, ["--field=Action: write:LBL", "--field=Reason: Change the file:LBL",
+      "--field=File: \"/one/file\":LBL"], "request context is read-only labels";
    ok !(grep /\A--field=.*:CHK\z/, @$args) && !(grep /\A--field=.*:CB\z/, @$args),
       "initial YAD dialog has no grant or rule-scope selectors";
    ok +(grep $_ eq "--field=Denial reason (optional)", @$args),
@@ -233,7 +235,7 @@ my $invalid = eval {
 ok !$invalid && $@ =~ /detail must be text/, "permission boundary rejects non-text details";
 
 my $path_request = {
-   %$request, subject => undef, subjects => [], paths => ["/one/file", "/two/file"],
+   %$request, dimensions => {}, paths => ["/one/file", "/two/file"],
 };
 $decision = prompt $path_request, { status => 0, output => "Use a different file\x1f\n" };
 is_deeply $decision, { decision => "deny-once", message => "Use a different file" },
@@ -261,7 +263,14 @@ ok $rule_schema->{properties}{sandbox_grants}{default} eq "write",
    "MCP rule form defaults grant selection to the original request";
 
 my $workdir_request = {
-   %$request, name => "default", workdir => "/projects/one",
+   %$request, name => "default",
+   dimensions => { %{$request->{dimensions}}, workdir => {
+      label => "Workdir", value => "/projects/one",
+      choices => [
+         { label => "This workdir", match => "/projects/one" },
+         { label => "Any configured workdir, including future ones", match => "^" },
+      ],
+   } },
    multibroker_alias => "cerebro-fs",
 };
 like AnyEvent::MCP::Permissions::Ask::message ($workdir_request),
@@ -269,8 +278,8 @@ like AnyEvent::MCP::Permissions::Ask::message ($workdir_request),
    "native and terminal permission prompts distinguish multibroker aliases";
 $decision = prompt $workdir_request,
    { status => 8, output => "\x1f\n" },
-   { status => 8, output => "TRUE\x1fFALSE\x1f2\x1f1\x1f1\x1f\n" };
-ok $decision->{workdir_scope} eq "all" && !exists $decision->{rule}{workdir},
+   { status => 8, output => "TRUE\x1fFALSE\x1f1\x1f2\x1f1\x1f\n" };
+ok $decision->{rule}{"match.workdir"} eq "^",
    "YAD can explicitly save a rule for all current and future workdirs";
 {
    open my $log, "<", "$dir/log" or die $!;
@@ -285,7 +294,7 @@ ok $decision->{workdir_scope} eq "all" && !exists $decision->{rule}{workdir},
 $decision = prompt $workdir_request,
    { status => 8, output => "\x1f\n" },
    { status => 8, output => "TRUE\x1fTRUE\x1f1\x1f1\x1f1\x1f\n" };
-is $decision->{rule}{workdir}, "/projects/one",
+is $decision->{rule}{"match.workdir"}, "/projects/one",
    "YAD workdir scope defaults to the selected workdir";
 
 my $unsafe = prompt {
@@ -311,7 +320,7 @@ $decision = prompt $request,
    { status => 8, output => "Please review\x1f\n" },
    { status => 8, output => "TRUE\x1fFALSE\x1f2\x1f1\x1f\n" };
 is $decision->{decision}, "allow-always", "Allow always enters separate rule dialog";
-is $decision->{rule}{subject}, "^/one/", "rule editor chooses future scope";
+is $decision->{rule}{"match.subject"}, "^/one/", "rule editor chooses future scope";
 is $decision->{rule}{"sandbox-grants"}, "read", "rule editor can reduce grants";
 ok !exists $decision->{rule}{message}, "allow rule does not retain a denial reason";
 {
@@ -323,7 +332,7 @@ ok !exists $decision->{rule}{message}, "allow rule does not retain a denial reas
    is_deeply [grep /\A--field=.*:CHK\z/, @$args], [
       "--field=read - Read files:CHK", "--field=write - Modify files:CHK",
    ], "grant checkboxes only appear in rule editor";
-   ok +(grep $_ eq "--field=Rule scope:CB", @$args),
+   ok +(grep $_ eq "--field=File scope:CB", @$args),
       "rule scope selector appears only in rule editor";
    is_deeply [grep /\A--button=/, @$args], [
       "--button=Back:10", "--button=Save rule:8",
@@ -367,7 +376,7 @@ is_deeply $decision, { decision => "allow-always" },
 $decision = prompt { %$request, _permission_stage => "rule",
    _permission_selection => { decision => "allow-always" } },
    { status => 8, output => "TRUE\x1fTRUE\x1f2\x1f1\x1f\n" };
-is $decision->{rule}{subject}, "^/one/",
+is $decision->{rule}{"match.subject"}, "^/one/",
    "separate native rule stage saves the selected scope";
 is $decision->{rule}{"sandbox-grants"}, "read,write",
    "separate native rule stage saves the selected grants";
@@ -394,7 +403,7 @@ $decision = prompt $request,
    { status => 6, output => "Not there\x1f\n" },
    { status => 8, output => "1\x1f1\x1f\n" };
 is_deeply $decision->{rule}, {
-   decision => "deny", action => "write", subject => "/one/file",
+   decision => "deny", action => "write", "match.subject" => "/one/file",
    "sandbox-grants" => "write", message => "Not there",
 }, "Deny always creates a rule including user message";
 {
@@ -555,8 +564,8 @@ if ($mode eq "conflict") {
       like $edited_text, qr/this is not an INI rule\n\z/,
          "even invalid syntax remains in directly edited file";
    }
-   my $parsed = eval { $permissions->rules; 1 };
-   ok !$parsed, "permission parser rejects invalid edited rules when later read";
+   is_deeply $permissions->rules, [],
+      "invalid edited file silently discards all rules on read";
 
    write_file $file, $initial;
    $ENV{ANYEVENT_MCP_TEST_EDITOR_MODE} = "conflict";

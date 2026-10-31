@@ -62,11 +62,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,8 @@ process, or in a test with a time limit.
 Takes an optional parameter "openaddr", which is the directory of the file
 openaddresses.sql.
 
-Takes an optional parameter cache, which points to an object that understands get() and set() messages to store data in
+Takes an optional parameter cache, which points to an object that understands get() and set() messages to store data in.
+Nothing else is asked of it.
 
 Takes an optional parameter libpostal.  When it is false, L<Geo::libpostal> is
 never loaded or called, even if it is installed; see L</Optional modules>.
@@ -140,6 +141,10 @@ It defaults to true.
     openaddr  => { type => 'scalar' }                                          # path to the directory containing openaddresses.sql
     cache     => { type => 'object', optional => 1, can => ['get', 'set'] }   # CHI-compatible cache object
     libpostal => { type => 'boolean', optional => 1, default => 1 }           # false: never use Geo::libpostal
+
+C<openaddr> is required.  Absent, C<''> or C<'0'> croak C<Usage:>, and a directory
+that does not exist, or a file, croaks C<Can't find the directory>.  C<libpostal>
+is true when absent or C<undef>.
 
 =head4 output
 
@@ -231,6 +236,23 @@ that either C<Leesburg, Loudoun County, Virginia, US> or C<Leesburg, Loudoun, Vi
     ignore_words => { type => 'arrayref', optional => 1 }  # words to suppress during scantext scan
     exact        => { type => 'scalar',   optional => 1 }  # if set, do not fall back to town-only match
 
+The domain of each parameter:
+
+=over 4
+
+=item * C<location> - any characters.  Once normalised (commas and spaces removed)
+an address of up to 16 bytes of UTF-8 is looked up as written, in upper case, and a
+longer one by a digest of 16 characters.
+
+=item * C<scantext> - under 6 characters it is ignored, counted in characters, not
+bytes.  Words are made of word characters, so an emoji is punctuation and is dropped.
+
+=item * Pass decoded character strings.  Upper-casing is by character and the key is
+made from the UTF-8 bytes, as F<createdatabase.PL> makes it, so one string has one
+key however perl stores it.
+
+=back
+
 =head4 output
 
     # Output schema (Return::Set)
@@ -262,7 +284,7 @@ sub geocode
 	if(my $scantext = $param->{'scantext'}) {
 		return if(length($scantext) < 6);
 		# FIXME:  wow this is inefficient
-		$scantext =~ s/[^\w']+/ /g;
+		$scantext =~ s/[^\w']+/ /gu;	# /u: an accented letter is a letter, however perl stores the string
 		my @words = split(/\s/, $scantext);
 		my $count = scalar(@words);
 		my $offset = 0;
@@ -286,9 +308,6 @@ sub geocode
 			}
 			if($offset < $count - 1) {
 				my $addr = join(', ', $words[$offset], $words[$offset + 1]);
-				if(length($addr) == 0) {
-					$offset++;
-				}
 				# https://stackoverflow.com/questions/11160192/how-to-parse-freeform-street-postal-address-out-of-text-and-into-components
 				# TODO: Support longer addresses
 				if($addr =~ /\s+(?:\d{2,5}\s+)(?![ap]m\b)(?:(?:[a-zA-Z\s]{1,5}){1,2})?(?:[\s,.]+)?(?:(?:[a-zA-Z\s]{1,30}){1,4})(?:court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)(?:[\s,.;]+)?(?:(?:[a-zA-Z\s]{1,30}){1,2})(?:[\s,.]+)?\b(?:AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)(?:[\s,.]+)?(?:\s+\d{5})?(?:[\s,.]+)/i) {
@@ -699,7 +718,7 @@ sub geocode
 							if($href->{'state'}) {
 								$state = $href->{'state'};
 							} else {
-								Carp::croak(__PACKAGE__, ": Geo::StreetAddress::US couldn't find the state in '$lookup'");
+								return;	# With no state there is nothing to look up
 							}
 							if(length($state) > 2) {
 								if(my $twoletterstate = ($_locale_us //= Locale::US->new())->{state2code}{uc($state)}) {
@@ -749,7 +768,7 @@ sub geocode
 							}
 							return;	# Not found
 						}
-						Carp::croak($city);	# TODO: do something here
+						return;	# Not an address this can take apart
 					} elsif($city =~ /^(\w[\w\s]+),\s*([\w\s]+)/) {
 						# Perhaps it just has the street's name?
 						# Rockville Pike, Rockville, MD, USA
@@ -1055,17 +1074,20 @@ sub _get {
 	my $location = join('', @location);
 	$location =~ s/^\s+//;
 	$location =~ s/,\s*//g;
-	$location =~ tr/ž/z/;	# Remove wide characters
-	$location =~ s/\xc5\xbe/z/g;
-	$location =~ s/\N{U+017E}/z/g;
 	$location =~ s/\s+//g;
 
-	my $digest;
-	if(length($location) <= 16) {
-		$digest = uc($location);
-	} else {
-		$digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
-	}
+	# The key has to be what create_md5() in createdatabase.PL made of the same
+	# address, or the lookup can never match: upper case by character, then UTF-8
+	# bytes, then its translation of the bytes of a z with caron, all of which
+	# come out of that one tr.  The upgrade makes uc() mean the same however
+	# perl happens to be storing the string, and the digest takes bytes, so a
+	# character beyond Latin-1 can't kill the lookup.
+	my $key = $location;
+	utf8::upgrade($key);
+	$key = Encode::encode_utf8(uc($key));
+	$key =~ tr/\xc5\xbe/z/;
+
+	my $digest = (length($key) <= 16) ? $key : substr(Digest::MD5::md5_base64($key), 0, 16);
 
 	# print __PACKAGE__, ': ', __LINE__, ': ', uc($location), " = $digest\n";
 	# my @call_details = caller(0);
@@ -1077,8 +1099,8 @@ sub _get {
 	# print "line ", $call_details[2], "\n";
 	# print "$location: $digest\n";
 	if(my $cache = $self->{'cache'}) {
-		if(my $rc = $cache->get_object($digest)) {
-			return Storable::thaw($rc->value());
+		if(my $frozen = $cache->get($digest)) {
+			return Storable::thaw($frozen);
 		}
 	}
 
@@ -1222,7 +1244,7 @@ VWF, openaddresses.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2025 Nigel Horne.
+Copyright 2017-2026 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

@@ -1,6 +1,6 @@
 package Kubernetes::Comb::CRD::CombSpec;
 # ABSTRACT: Spec of the Comb custom resource
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use IO::K8s::Resource;
 use IO::K8s::Types qw( Opaque );
@@ -77,7 +77,7 @@ Kubernetes::Comb::CRD::CombSpec - Spec of the Comb custom resource
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ the spec holds the explicit "local".
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

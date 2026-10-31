@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Mon Feb  1 12:13:24 1999
  *
- * $Id: Types.h,v 1.47 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -38,7 +38,12 @@
 #  ifdef _WIN32
 #    include <GL/gl.h>
 #  else
-#    include <GL/glx.h>
+#    ifdef MAC_OSX_TK
+#      include <AGL/agl.h>
+#      include <AGL/glu.h>
+#    else
+#      include <GL/glx.h>
+#    endif
 #  endif
 #endif
 
@@ -60,7 +65,16 @@
 #  include <tkIntDecls.h>
 #endif
 #include <stdio.h>
+#include <stdint.h>
 
+
+#ifndef CONST86
+#define CONST86
+#endif
+
+#ifndef Tk_Offset
+#define Tk_Offset offsetof
+#endif
 
 /* This EXTERN declaration is needed for Tcl < 8.0.3 */
 #ifndef EXTERN
@@ -89,6 +103,11 @@ typedef void    *ZnPtr;
 #define ZnFree(ptr)             (ckfree((char *)(ptr)))
 #define ZnRealloc(ptr, size)    ((void *)ckrealloc((void *)(ptr), size))
 #define ZnWarning(msg)          (fprintf(stderr, "%s", (msg)))
+
+/* TCL_ONE_WORD_KEYS stores the numeric item ID as a pointer-sized value;
+ * it never dereferences this key. Widen before casting on 64-bit systems.
+ */
+#define ZnIdToHashKey(id)        ((char *) (uintptr_t) (id))
   
 #define ZnUnspecifiedImage      None
 #define ZnUnspecifiedColor      NULL
@@ -115,10 +134,6 @@ Tk_GetScrollInfo(interp, argc, (Tcl_Obj **) args, fract, count)
 #ifdef _WIN32
 #  include <tkWinInt.h>
 
-#  ifndef _MSC_VER
-#    undef EXTERN
-#    define EXTERN
-#  endif
 #  ifdef TCL_STORAGE_CLASS
 #    undef TCL_STORAGE_CLASS
 #  endif
@@ -134,26 +149,34 @@ Tk_GetScrollInfo(interp, argc, (Tcl_Obj **) args, fract, count)
 #  pragma warning(disable : 4273)
 #  endif
 #undef XFillRectangle
+#define XFillRectangle ZnXFillRectangle
 void XFillRectangle(Display *display, Drawable d, GC gc, int x, int y,
                     unsigned int width, unsigned int height);
 #  undef XFillRectangles
+#define XFillRectangles ZnXFillRectangles
 void XFillRectangles(Display *display, Drawable d, GC gc,
                      XRectangle* rectangles, int nrectangles);
 #  undef XFillArc
+#define XFillArc ZnXFillArc
 void XFillArc(Display *display, Drawable d, GC gc, int x, int y, unsigned int width,
               unsigned int height, int start, int extent);
 #  undef XFillPolygon
+#define XFillPolygon ZnXFillPolygon
 void XFillPolygon(Display *display, Drawable d, GC gc, XPoint *points, int npoints,
                   int shape, int mode);
 #  undef XDrawRectangle
+#define XDrawRectangle ZnXDrawRectangle
 void XDrawRectangle(Display *display, Drawable d, GC gc, int x, int y,
                     unsigned int width, unsigned int height);
 #  undef XDrawArc
+#define XDrawArc ZnXDrawArc
 void XDrawArc(Display *display, Drawable d, GC gc, int x, int y,
               unsigned int width, unsigned int height, int start, int extent);
 #  undef XDrawLine
+#define XDrawLine ZnXDrawLine
 void XDrawLine(Display *display, Drawable d, GC gc, int x1, int y1, int x2, int y2);
 #  undef XDrawLines
+#define XDrawLines ZnXDrawLines
 void XDrawLines(Display *display, Drawable d, GC gc, XPoint* points,
                 int npoints, int mode);
 
@@ -170,7 +193,25 @@ TkRegion ZnPolygonRegion(XPoint *points, int n,
 #    define ZN_GL_LINE_WIDTH_RANGE GL_LINE_WIDTH_RANGE
 #    define ZN_GL_POINT_SIZE_RANGE GL_POINT_SIZE_RANGE
 #  endif
-#else /* !_WIN32 */
+
+#elif defined(MAC_OSX_TK)
+
+ZnBool ZnPointInRegion(TkRegion reg, int x, int y);
+void ZnUnionRegion(TkRegion sra, TkRegion srb, 
+                   TkRegion dr_return);
+void ZnOffsetRegion(TkRegion reg, int dx, int dy);
+TkRegion ZnPolygonRegion(XPoint *points, int n,
+                         int fill_rule);
+#  ifdef GL
+#    define ZnGLContext AGLContext
+#    define ZnGLWaitX()
+#    define ZnGLWaitGL()
+#    define ZN_GL_LINE_WIDTH_RANGE GL_SMOOTH_LINE_WIDTH_RANGE
+#    define ZN_GL_POINT_SIZE_RANGE GL_SMOOTH_POINT_SIZE_RANGE
+#  endif
+
+#else /* Other unices and X11 */
+
 #  define ZnPointInRegion(reg, x, y) \
   XPointInRegion((Region) reg, x, y)
 #  define ZnPolygonRegion(points, npoints, fillrule) \

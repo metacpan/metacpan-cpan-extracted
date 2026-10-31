@@ -12,11 +12,8 @@ BEGIN {
 use Test::More;
 use Sereal::TestSet qw(:all);
 use Sereal::Decoder qw(decode_sereal);
+use Sereal::TestSet::Corpus qw(read_packet);
 use Data::Dumper;
-
-if ( !have_encoder_and_decoder() ) {
-    plan skip_all => 'Did not find right version of encoder';
-}
 
 {
 
@@ -44,18 +41,32 @@ if ( !have_encoder_and_decoder() ) {
     }
 }
 
-my $encoder_freeze = Sereal::Encoder->new( { freeze_callbacks => 1 } );
+my $corpus = File::Spec->catdir(qw(t data packet_corpus));
+my $rot13_packet = read_packet( $corpus, 'decoder-features', 'thaw_scalar/rot13' );
+my $return_packet = read_packet( $corpus, 'decoder-features', 'thaw_scalar/returns' );
 
 my $secret = "SECRET";
 
-ok(
-    $secret,
-    decode_sereal( $encoder_freeze->encode( Rot13->new($secret) ) ),
+my $rot13_values = decode_sereal($rot13_packet);
+is( $rot13_values->[0], $secret, 'THAW returns the decoded scalar' );
+
+is_deeply(
+    $rot13_values->[1], { secret => $secret },
+    'THAW scalar return is installed in its container',
 );
 
-ok(
-    { secret => $secret },
-    decode_sereal( $encoder_freeze->encode( { secret => Rot13->new($secret) } ) ),
-);
+{
+
+    package ScalarReturn;
+    sub FREEZE { return $_[0]->[0] }
+    sub THAW   { return $_[2] }
+}
+
+my $return_values = decode_sereal($return_packet);
+for my $i ( 0 .. $#$return_values ) {
+    my $value = ( undef, 0, '', 42, 'text' )[$i];
+    is( $return_values->[$i], $value,
+        'THAW preserves ' . ( defined($value) ? "scalar '$value'" : 'undef' ) );
+}
 
 done_testing;

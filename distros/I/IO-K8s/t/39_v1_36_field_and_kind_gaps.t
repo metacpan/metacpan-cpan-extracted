@@ -17,8 +17,8 @@
 #      /apis and /apis/<group>) were missing, unlike their already-shipped
 #      siblings APIGroup/APIVersions/Status/DeleteOptions.
 #
-# This does not attempt full field coverage (t/34_registry_guard.t and
-# t/02_compile_all.t already give every class that for free) - it exercises
+# This does not attempt full field coverage (the registry guard in t/02_compile_all.t and its
+# compile subtest already give every class that for free) - it exercises
 # the specific gaps closed here plus one full round-trip each for the new
 # Kind (LeaseCandidate) and the new discovery Lists.
 

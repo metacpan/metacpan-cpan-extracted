@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: find.t,v 1.5 2005/06/23 18:10:34 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

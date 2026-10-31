@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecret;
 # ABSTRACT: ExternalSecret is the Schema for the external-secrets API.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'external-secrets.io/v1',
     resource_plural => 'externalsecrets',
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecret - ExternalSecret is the Schema for 
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 spec
 
@@ -40,7 +40,7 @@ ExternalSecretStatus defines the observed state of ExternalSecret.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -68,5 +68,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

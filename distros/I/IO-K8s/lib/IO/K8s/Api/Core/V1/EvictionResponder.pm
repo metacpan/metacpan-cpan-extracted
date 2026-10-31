@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EvictionResponder;
 # ABSTRACT: EvictionResponder allows you to specify the responder reacting to an Eviction. Responders should observe and communicate through the Eviction Resource API to help with the graceful eviction of a target (e.g. termination of a pod).
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::EvictionResponder - EvictionResponder allows you to spec
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 name
 
@@ -43,7 +43,7 @@ The minimum value is 0 and the maximum value is 100000. The interval 0-999 is re
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -71,5 +71,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

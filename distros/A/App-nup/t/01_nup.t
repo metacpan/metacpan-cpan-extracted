@@ -80,6 +80,12 @@ subtest 'page mode disabled for parallel layout' => sub {
     like $out, qr/--no-paginate/, 'multiple files disable page mode';
     $out = nup('script/nup');
     unlike $out, qr/--no-paginate/, 'single file keeps page mode';
+    $out = nup('script/nup -w 100');
+    unlike $out, qr/--no-paginate/, 'options after the file are not files';
+    $out = nup('- --boundary=word');
+    unlike $out, qr/--no-paginate/, 'options after - are not files';
+    $out = nup('script/nup cpanfile -w 100');
+    like $out, qr/--no-paginate/, 'two files and options disable page mode';
     $out = nup('date');
     unlike $out, qr/--no-paginate/, 'command mode keeps page mode';
     $out = nup('-V date');
@@ -147,6 +153,7 @@ subtest 'line-style option' => sub {
 subtest 'run-in options' => sub {
     like nup('--runlen=4 date'), qr/--runlen 4/, 'runlen option';
     like nup('--runin=3 --runout=1 date'), qr/--runin 3 --runout 1/, 'runin and runout options';
+    like nup('--boundary=none date'), qr/--boundary none/, 'boundary option';
 };
 
 subtest 'pager option' => sub {

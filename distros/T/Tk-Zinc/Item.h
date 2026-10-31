@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Item.h,v 1.51 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -132,14 +132,15 @@ typedef struct _ZnAttrConfig {
  */
 #define ZN_VISIBLE_BIT          (1<<0)
 #define ZN_SENSITIVE_BIT        (1<<1)
-#define ZN_UPDATE_DEPENDENT_BIT (1<<2)
-#define ZN_COMPOSE_SCALE_BIT    (1<<3)
-#define ZN_COMPOSE_ROTATION_BIT (1<<4)
-#define ZN_COMPOSE_ALPHA_BIT    (1<<5)
+#define ZN_CATCH_EVENT_BIT      (1<<2)
+#define ZN_UPDATE_DEPENDENT_BIT (1<<3)
+#define ZN_COMPOSE_SCALE_BIT    (1<<4)
+#define ZN_COMPOSE_ROTATION_BIT (1<<5)
+#define ZN_COMPOSE_ALPHA_BIT    (1<<6)
 /*
  * Must be kept one greater than the last flag shift count.
  */
-#define ZN_PRIVATE_FLAGS_OFFSET 6
+#define ZN_PRIVATE_FLAGS_OFFSET 7
 
 
 /*
@@ -210,13 +211,14 @@ typedef struct _ZnPickStruct {
 /*
  * Item class record --
  */
-typedef int (*ZnItemInitMethod)(ZnItem item, int *argc, Tcl_Obj *CONST *args[]);
-typedef int (*ZnItemConfigureMethod)(ZnItem item, int argc, Tcl_Obj *CONST args[],
+typedef int (*ZnItemInitMethod)(ZnItem item, int *argc, Tcl_Obj *const *args[]);
+typedef int (*ZnItemConfigureMethod)(ZnItem item, int argc, Tcl_Obj *const args[],
                                      int *flags);
-typedef int (*ZnItemQueryMethod)(ZnItem item, int argc, Tcl_Obj *CONST args[]);
+typedef int (*ZnItemQueryMethod)(ZnItem item, int argc, Tcl_Obj *const args[]);
 typedef void (*ZnItemCloneMethod)(ZnItem item);
 typedef void (*ZnItemDestroyMethod)(ZnItem item);
 typedef void (*ZnItemDrawMethod)(ZnItem item);
+typedef void (*ZnItemPreRenderMethod)(ZnItem item);
 typedef void (*ZnItemRenderMethod)(ZnItem item);
 typedef void (*ZnItemComputeCoordinatesMethod)(ZnItem item, ZnBool force);
 typedef int (*ZnItemToAreaMethod)(ZnItem item, ZnToArea ta);
@@ -278,6 +280,7 @@ typedef struct _ZnItemClassStruct {
   ZnItemComputeCoordinatesMethod ComputeCoordinates;
   ZnItemToAreaMethod            ToArea;
   ZnItemDrawMethod              Draw;
+  ZnItemPreRenderMethod         PreRender;
   ZnItemRenderMethod            Render;
   ZnItemIsSensitiveMethod       IsSensitive;
   ZnItemPickMethod              Pick;
@@ -296,9 +299,9 @@ typedef struct _ZnItemClassStruct {
 extern struct _ZnITEM {
   ZnItem (*CloneItem)(ZnItem model);
   void (*DestroyItem)(ZnItem item);
-  int (*ConfigureItem)(ZnItem item, int field, int argc, Tcl_Obj *CONST args[],
+  int (*ConfigureItem)(ZnItem item, int field, int argc, Tcl_Obj *const args[],
                        ZnBool init);
-  int (*QueryItem)(ZnItem item, int field, int argc, Tcl_Obj *CONST args[]);
+  int (*QueryItem)(ZnItem item, int field, int argc, Tcl_Obj *const args[]);
   void (*InsertItem)(ZnItem item, ZnItem group, ZnItem mark_item, ZnBool before);
   void (*UpdateItemPriority)(ZnItem item, ZnItem mark_item, ZnBool before);
   void (*UpdateItemDependency)(ZnItem item, ZnItem old_connection);
@@ -330,15 +333,15 @@ extern struct _ZnITEM {
  */
 void ZnItemInit();
 ZnItem ZnCreateItem(struct _ZnWInfo *wi, ZnItemClass item_class,
-                  int *argc, Tcl_Obj *CONST *args[]);
+                  int *argc, Tcl_Obj *const *args[]);
 void ZnAddItemClass(ZnItemClass class);
 ZnItemClass ZnLookupItemClass(char *class_name);
 ZnList ZnItemClassList();
 int ZnConfigureAttributes(struct _ZnWInfo *wi, ZnItem item, void *record,
-                          ZnAttrConfig *attr_desc, int argc, Tcl_Obj *CONST args[],
+                          ZnAttrConfig *attr_desc, int argc, Tcl_Obj *const args[],
                           int *flags);
 int ZnAttributesInfo(Tcl_Interp *interp, void *record,
-                     ZnAttrConfig *attr_desc, int argc, Tcl_Obj *CONST args[]);
+                     ZnAttrConfig *attr_desc, int argc, Tcl_Obj *const args[]);
 int ZnQueryAttribute(Tcl_Interp *interp, void *record, ZnAttrConfig *attr_desc,
                      Tcl_Obj *attr_name);
 void ZnInitTransformStack(struct _ZnWInfo *wi);
@@ -372,6 +375,7 @@ extern ZnItemClassId    ZnGroup;
 extern ZnItemClassId    ZnIcon;
 extern ZnItemClassId    ZnText;
 extern ZnItemClassId    ZnWindow;
+extern ZnItemClassId    ZnViewport;
 
 
 #endif  /* _Item_h */

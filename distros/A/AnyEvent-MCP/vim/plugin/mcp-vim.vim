@@ -845,6 +845,13 @@ function! s:receive (channel, msg) abort
 
     let s:incoming = v:null
 
+  elseif cmd ==# 'update-metadata'
+    for session in values (s:sessions)
+      if session.session ==# a:msg[1]
+        call extend (session.state, a:msg[2])
+      endif
+    endfor
+
   elseif cmd ==# 'ex'
     execute a:msg[1]
 
@@ -874,7 +881,7 @@ function! s:receive (channel, msg) abort
   endif
 endfunction
 
-function! s:save (file) abort
+function! s:save (file, force) abort
   if type (s:channel) != v:t_channel
     return
   endif
@@ -882,7 +889,7 @@ function! s:save (file) abort
   let b = bufnr ('%')
 
   if has_key (s:sessions, b) && a:file ==# s:sessions[b].path
-    call ch_sendexpr (s:channel, ['save', s:sessions[b].session])
+    call ch_sendexpr (s:channel, ['save', s:sessions[b].session, a:force])
 
     let data = readblob (s:sessions[b].path)
     call ch_sendexpr (s:channel, ['data', base64_encode (data)])
@@ -904,7 +911,7 @@ endfunction
 augroup mcp_vim
   autocmd!
 
-  autocmd BufWritePost * call s:save (expand ('<afile>:p'))
+  autocmd BufWritePost * call s:save (expand ('<afile>:p'), v:cmdbang)
   autocmd BufUnload * call s:close (str2nr (expand ('<abuf>')))
   autocmd VimLeavePre * call s:quit ()
 augroup END

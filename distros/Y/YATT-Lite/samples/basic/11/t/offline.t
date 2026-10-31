@@ -31,6 +31,7 @@ use YATT::Lite::Breakpoint;
 use YATT::Lite::Util qw(ostream lexpand);
 use YATT::Lite::Test::XHFTest2; # To import Item class.
 use base qw(YATT::Lite::Test::XHFTest2); # XXX: Redundant, but required.
+use YATT::Lite::MFields;
 
 BEGIN {
   foreach my $req (qw(Plack)) {
@@ -53,16 +54,16 @@ plan $tests->test_plan;
 my $dispatcher = $tests->load_dispatcher;
 $dispatcher->configure(is_psgi => 0);
 
-foreach my File $sect (@{$tests->{files}}) {
-  my $dir = $tests->{cf_dir};
+foreach my File $sect (@{$tests->{_files}}) {
+  my $dir = $tests->{dir};
   my $sect_name = $tests->file_title($sect);
-  foreach my Item $item (@{$sect->{items}}) {
+  foreach my Item $item (@{$sect->{_items}}) {
   SKIP: {
-      if ($item->{cf_PERL_MINVER} and $] < $item->{cf_PERL_MINVER}) {
-	Test::More::skip "by perl-$] < PERL_MINVER($item->{cf_PERL_MINVER}) $sect_name", 1;
+      if ($item->{PERL_MINVER} and $] < $item->{PERL_MINVER}) {
+	Test::More::skip "by perl-$] < PERL_MINVER($item->{PERL_MINVER}) $sect_name", 1;
       }
 
-      if (my $action = $item->{cf_ACTION}) {
+      if (my $action = $item->{ACTION}) {
 	my ($method, @args) = @$action;
 	my $sub = $tests->can("action_$method")
 	  or die "No such action: $method";
@@ -71,19 +72,19 @@ foreach my File $sect (@{$tests->{files}}) {
       }
 
       my %env = (DOCUMENT_ROOT => $dir
-		 , PATH_INFO => "/$item->{cf_FILE}"
-		 , PATH_TRANSLATED => "$dir/$item->{cf_FILE}"
+		 , PATH_INFO => "/$item->{FILE}"
+		 , PATH_TRANSLATED => "$dir/$item->{FILE}"
 		);
 
-      $item->{cf_METHOD} //= 'GET';
-      my $T = defined $item->{cf_TITLE} ? "[$item->{cf_TITLE}]" : '';
+      $item->{METHOD} //= 'GET';
+      my $T = defined $item->{TITLE} ? "[$item->{TITLE}]" : '';
 
       my $con = ostream(my $buffer);
       eval {
-	if ($item->{cf_BREAK}) {
+	if ($item->{BREAK}) {
 	  YATT::Lite::Breakpoint::breakpoint();
 	}
-	my $params = $item->{cf_PARAM};
+	my $params = $item->{PARAM};
 	if (defined $params) {
 	  if (ref $params eq 'ARRAY'
 	      and grep(ref $_ eq 'HASH', @$params)
@@ -93,15 +94,15 @@ foreach my File $sect (@{$tests->{files}}) {
 	  }
 	}
 	$dispatcher->cf_let([noheader => 0
-			     , lexpand($item->{cf_SITE_CONFIG})]
+			     , lexpand($item->{SITE_CONFIG})]
 			    , runas => cgi => $con, \%env
 			    , [$params])
       };
 
       my $header;
-      if ($item->{cf_ERROR}) {
-	like $@, qr{$item->{cf_ERROR}}
-	  , "[$sect_name] $T ERROR $item->{cf_METHOD} $item->{cf_FILE}";
+      if ($item->{ERROR}) {
+	like $@, qr{$item->{ERROR}}
+	  , "[$sect_name] $T ERROR $item->{METHOD} $item->{FILE}";
 	next;
       } elsif (ref $@ eq 'SCALAR' and ${$@} eq 'DONE') {
 	# Request is completed.
@@ -110,7 +111,7 @@ foreach my File $sect (@{$tests->{files}}) {
 	$header = join("\n", @{$@->[1]});
         $buffer ||= join("\n", @{$@->[2]});
       } elsif ($@) {
-	Test::More::fail $item->{cf_FILE};
+	Test::More::fail $item->{FILE};
 	Test::More::diag $@;
 	next;
       }
@@ -120,16 +121,16 @@ foreach my File $sect (@{$tests->{files}}) {
 	$header = $1;
       }
 
-      if ($item->{cf_METHOD} eq 'POST' and $item->{cf_HEADER}) {
+      if ($item->{METHOD} eq 'POST' and $item->{HEADER}) {
 	$header //= trimlast(nocr($buffer));
-	like $header, $tests->mkpat($item->{cf_HEADER})
-	  , "[$sect_name] $T POST $item->{cf_FILE}";
-      } elsif (ref $item->{cf_BODY}) {
-	like nocr($buffer), $tests->mkseqpat($item->{cf_BODY})
-	  , "[$sect_name] $T $item->{cf_METHOD} $item->{cf_FILE}";
+	like $header, $tests->mkpat($item->{HEADER})
+	  , "[$sect_name] $T POST $item->{FILE}";
+      } elsif (ref $item->{BODY}) {
+	like nocr($buffer), $tests->mkseqpat($item->{BODY})
+	  , "[$sect_name] $T $item->{METHOD} $item->{FILE}";
       } else {
-	eq_or_diff trimlast(nocr($buffer)), $item->{cf_BODY}
-	  , "[$sect_name] $T $item->{cf_METHOD} $item->{cf_FILE}";
+	eq_or_diff trimlast(nocr($buffer)), $item->{BODY}
+	  , "[$sect_name] $T $item->{METHOD} $item->{FILE}";
       }
     }
   }
@@ -138,8 +139,8 @@ foreach my File $sect (@{$tests->{files}}) {
 sub test_plan {
   my MY $self = shift;
   # XXX: This is overkill!
-  foreach my File $file (@{$self->{files}}) {
-    if ($file->{cf_USE_COOKIE}) {
+  foreach my File $file (@{$self->{_files}}) {
+    if ($file->{USE_COOKIE}) {
       return skip_all => "Cookie is not yet supported in offline.t";
     }
   }

@@ -130,7 +130,10 @@ sub pod {
         ? ( ownerReferences => [ { apiVersion => 'apps/v1', kind => $args{owner}, name => 'owner', uid => 'u-1' } ] )
         : () )
     },
-    spec   => { containers => [ map { +{ name => $_->{name}, image => 'img' } } @containers ] },
+    spec   => {
+      containers => [ map { +{ name => $_->{name}, image => 'img' } } @containers ],
+      ( $args{init} ? ( initContainers => [ map { +{ name => $_->{name}, image => 'img' } } @{ $args{init} } ] ) : () )
+    },
     status => {
       phase             => $args{phase} // 'Running',
       containerStatuses => [ map { +{

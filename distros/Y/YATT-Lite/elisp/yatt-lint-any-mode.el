@@ -279,7 +279,10 @@ Currently only RHEL is supported."
 
 (defun yatt-lint-any-handle-yatt (buffer)
   (plist-bind (rc err)
-      (yatt-lint-any-shell-command (yatt-lint-cmdfile "scripts/yatt.lint") " "
+      ;; --format=old keeps the historical "error [[file] F [line] L]"
+      ;; shape which yatt-lint-any-re-known-errors parses. (GH-269)
+      (yatt-lint-any-shell-command (yatt-lint-cmdfile "scripts/yatt.lint")
+				   " --format=old "
 				   (yatt-lint-tramp-localname buffer))
     (when rc
       (let (match diag)

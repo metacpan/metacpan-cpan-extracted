@@ -3,11 +3,11 @@ package YATT::Lite::Partial::ErrorReporter; sub MY () {__PACKAGE__}
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use YATT::Lite::Partial
-  (fields => [qw/cf_at_done
-		 cf_error_handler
-		 cf_die_in_error
-		 cf_ext_pattern
-                 cf_in_sig_die
+  (fields => [qw/at_done
+		 error_handler
+		 die_in_error
+		 ext_pattern
+                 in_sig_die
 		/]);
 require Devel::StackTrace;
 
@@ -54,7 +54,7 @@ sub make_error {
     Devel::StackTrace->new(@bt_opts);
   };
 
-  my $pattern = $self->{cf_ext_pattern} // qr/\.(yatt|ytmpl|ydo)$/;
+  my $pattern = $self->{ext_pattern} // qr/\.(yatt|ytmpl|ydo)$/;
 
   my @tmplinfo;
   foreach my $fr ($bt->frames) {
@@ -100,10 +100,10 @@ sub raise {
   # shift/splice しないのは、引数を stack trace に残したいから
   my $depth = (delete($opts->{depth}) // 0);
   my Error $err = $self->make_error(2 + $depth, $opts, @_); # 2==raise+make_error
-  if (ref $self and my $sub = deref($self->{cf_error_handler})) {
+  if (ref $self and my $sub = deref($self->{error_handler})) {
     # $con を引数で引きずり回すのは大変なので、むしろ外から closure を渡そう、と。
     # $SIG{__DIE__} を使わないのはなぜかって? それはユーザに開放しておきたいのよん。
-    print STDERR "# raise by cf_error_handler\n" if DEBUG_ERROR;
+    print STDERR "# raise by error_handler\n" if DEBUG_ERROR;
     unless (ref $sub eq 'CODE') {
       die "error_handler is not a CODE ref: $sub";
     }
@@ -111,14 +111,14 @@ sub raise {
   } elsif ($sub = $self->can('error_handler')) {
     print STDERR "# raise by ->error_handler\n" if DEBUG_ERROR;
     $sub->($self, $type, $err);
-  } elsif (not ref $self or $self->{cf_die_in_error}) {
+  } elsif (not ref $self or $self->{die_in_error}) {
     print STDERR "# raise by die_in_error\n" if DEBUG_ERROR;
     die $err->message;
-  } elsif ($err->{cf_http_status_code}) {
+  } elsif ($err->{http_status_code}) {
     print STDERR "# raise by http_status_code\n" if DEBUG_ERROR;
     # If http_status_code is specified explicitly (from error_with_status),
     # raise it immediately, with simple reason. (not full backtrace message).
-    $self->raise_psgi_html($err->{cf_http_status_code}
+    $self->raise_psgi_html($err->{http_status_code}
 			   , $err->reason);
   } else {
     print STDERR "# raise pass-thrue error object\n" if DEBUG_ERROR;
@@ -131,7 +131,7 @@ sub raise {
 # XXX: 将来、拡張されるかも。
 sub DONE {
   my MY $self = shift;
-  if (my $sub = $self->{cf_at_done}) {
+  if (my $sub = $self->{at_done}) {
     $sub->(@_);
   } else {
     die \ 'DONE';

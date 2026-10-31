@@ -78,16 +78,6 @@ OUT:
  <h2>Hello foo world! bar</h2>
  
 
-SKIP: 1
-TITLE: Misplaced widget declaration.
-IN:
- <form>
-  <yatt:hello/>
- 
- <!yatt:widget hello>
-ERROR: Misplaced yatt:widget in: \([^\)]+\), at file \S+ line 4
-
-
 TITLE: comment in widget call
 IN:
  (<yatt:foo
@@ -701,6 +691,13 @@ OUT:
  quux
  
 
+TITLE: base option typo error
+IN:
+ <!yatt:base fille="base1.yatt">
+ERROR: Unknown base option: fille
+ 
+
+
 TITLE: [GH #167] Too many arguments error
 IN:
  <yatt:foo "xxx" 'yyy'   "zzz"/>
@@ -743,3 +740,92 @@ OUT:
  
  
 
+
+TITLE: delegate var can't be called in entity form (GH-304)
+IN:
+ <yatt:bar x=3/>
+ <!yatt:widget foo x>
+ <h2>foo &yatt:x;</h2>
+ <!yatt:widget bar foo=[delegate]>
+ &yatt:foo();
+ERROR: delegate variable 'foo' can't be called as an entity. Use <yatt:foo/>
+
+
+TITLE: code arg with args, called by positional args in element form (GH-296)
+IN:
+ <yatt:foo><:yatt:row>[&yatt:x;|&yatt:y;]</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code x y]>
+ <yatt:row 1 2/>
+OUT:
+ [1|2]
+ 
+
+TITLE: code arg with args, called by positional args in entity form (GH-296)
+IN:
+ <yatt:foo><:yatt:row>[&yatt:x;|&yatt:y;]</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code x y]>
+ &yatt:row(1,2);
+OUT:
+ [1|2]
+ 
+
+TITLE: code arg with args, called by named args (GH-296)
+IN:
+ <yatt:foo><:yatt:row>[&yatt:x;|&yatt:y;]</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code x y]>
+ <yatt:row y=2 x=1/><yatt:row x=3/>
+OUT:
+ [1|2][3|]
+ 
+
+TITLE: body=[code x] called by positional arg (GH-296)
+IN:
+ <yatt:foo>(&yatt:x;)</yatt:foo>
+ 
+ <!yatt:widget foo body=[code x]>
+ <yatt:body "A"/>&yatt:body(B);
+OUT:
+ (A)(B)
+ 
+
+TITLE: type name of [code x] is not an argument (GH-296)
+IN:
+ <yatt:foo><:yatt:row>[&yatt:code;]</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code x]>
+ <yatt:row x=1/>
+ERROR: No such variable 'code'
+
+
+TITLE: x:type in argument declaration is an error (GH-296)
+IN:
+ <!yatt:widget foo x:value>
+ERROR: Invalid argument spec: x:value
+
+
+TITLE: x:type in [code ...] is an error (GH-296)
+IN:
+ <yatt:foo/>
+ <!yatt:widget foo row=[code x:value]>
+ERROR: Invalid argument spec: x:value
+
+
+TITLE: too many positional args for [code x y] (GH-296)
+IN:
+ <yatt:foo><:yatt:row>[&yatt:x;|&yatt:y;]</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code x y]>
+ <yatt:row 1 2 3/>
+ERROR: Too many arguments for widget <yatt:row>
+
+
+TITLE: positional arg for argless [code] (GH-296)
+IN:
+ <yatt:foo><:yatt:row>R</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code]>
+ <yatt:row 1/>
+ERROR: Too many arguments for widget <yatt:row>

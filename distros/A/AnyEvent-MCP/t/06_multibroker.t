@@ -14,7 +14,7 @@ use IO::Socket::INET ();
 use JSON::XS ();
 use Time::HiRes ();
 
-print "1..67\n";
+print "1..69\n";
 my $test;
 sub ok($$) {
    my ($condition, $name) = @_;
@@ -57,13 +57,21 @@ write_file "$dir/child", q{
 BEGIN { $ENV{PERL_ANYEVENT_LOG} = "filter=error log=error" } # fixture output is not under test.
 use common::sense;
 use AnyEvent ();
+use AnyEvent::MCP::Server::Permissions ();
 use AnyEvent::MCP::Server::Simple;
-use JSON::XS ();
 my $cancelled = 0;
 my $pending;
 mcp_config instructions => $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS} eq "silent"
    ? undef : $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS};
+mcp_config permissions => AnyEvent::MCP::Server::Permissions->new (
+   actions => { read => "Read test value" },
+);
 mcp_tool echo => "echo", {}, sub {
+   if ($_[1]{protected}) {
+      $_[0]->require_permission ({
+         tool => "echo", action => "read", sandbox_grants => [], reason => "Protected test value",
+      });
+   }
    $_[0]->result ({
       %{$_[1]},
       alias => $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS},
@@ -77,20 +85,6 @@ mcp_tool slow => "slow", {}, sub {
    $pending->{on_cancel} = sub { ++$cancelled; undef $pending };
 };
 mcp_tool status => "status", {}, sub { $_[0]->result ({ cancelled => $cancelled }) };
-mcp_tool legacy_permission => "legacy permission", {}, sub {
-   my ($req) = @_;
-   my $decision = $req->{params}{_meta}{"anyevent-mcp/permission"}{decision};
-   return $req->result ($decision) if $decision;
-   $req->reply ({
-      isError => JSON::XS::true, content => [],
-      _meta => { "anyevent-mcp/permission" => {
-         version => 1, request => {
-            action => "legacy-permission", action_matcher => "legacy-permission",
-            sandbox_grants => ["read"], sandbox_grant_choices => ["read"], subjects => [],
-         },
-      }},
-   });
-};
 mcp_start;
 };
 
@@ -117,7 +111,7 @@ $toolset->tool (challenge => "input challenge", {}, sub {
             requestedSchema => { type => "object", properties => {} },
             _meta => { "anyevent-mcp/permission" => { version => 1, request => {
                action => "challenge", action_matcher => "challenge",
-               sandbox_grants => ["read"], sandbox_grant_choices => ["read"], subjects => [],
+               sandbox_grants => ["read"], sandbox_grant_choices => ["read"], dimensions => {},
             }}},
          },
       }},
@@ -141,7 +135,7 @@ sub client {
 }
 my $client = client;
 my ($success, $result) = wait_for (sub { $client->tools ($_[0]) });
-ok $success && @$result == 13, "combined tool listing";
+ok $success && @$result == 12, "combined tool listing";
 my %tools = map { $_->{name} => $_ } @$result;
 ok exists $tools{"http.echo"} && exists $tools{"child.echo"} && exists $tools{"call-tool"}
    && exists $tools{"child.meta-instructions"} && exists $tools{"meta-instructions"}, "namespaces and builtins";
@@ -171,20 +165,26 @@ my $ask_client = AnyEvent::MCP::Client::JSONL->new (
    },
 );
 ($success, $result) = wait_for (sub { $ask_client->call ("child.echo", {}, $_[0]) });
-ok $success && $result->{structuredContent}{permission_ask} eq "auto",
-   "multibroker --ask auto overrides parent environment for spawned stdio child";
+ok $success && $result->{structuredContent}{permission_ask} eq "mcp",
+   "multibroker --ask auto makes spawned child delegate permissions by MCP";
+($success, $result) = wait_for (sub { $ask_client->call ("child.echo", { protected => 1 }, $_[0]) });
+ok $success && $result->{structuredContent}{protected},
+   "spawned child permission prompt is handled locally by auto-mode multibroker";
 $ask_client->close;
 
 $ask_client = AnyEvent::MCP::Client::JSONL->new (
    command => [$^X, "-Ilib", "bin/mcp-multibroker", child => $command[-1]],
    env => {
       PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio",
-      PERL_ANYEVENT_MCP_PERMISSION_ASK => "mcp",
+      PERL_ANYEVENT_MCP_PERMISSION_ASK => "helper",
    },
 );
 ($success, $result) = wait_for (sub { $ask_client->call ("child.echo", {}, $_[0]) });
 ok $success && $result->{structuredContent}{permission_ask} eq "mcp",
-   "plain multibroker inherits generic permission mode without --ask";
+   "default multibroker delegates child permission prompts despite inherited helper mode";
+($success, $result) = wait_for (sub { $ask_client->call ("child.echo", { protected => 1 }, $_[0]) });
+ok $success && $result->{structuredContent}{protected},
+   "default multibroker handles delegated child permission prompt locally";
 $ask_client->close;
 ($success, $result) = wait_for (sub {
    $client->call ("call-tool", { name => "child.echo", arguments => { wrapped => 1 } }, $_[0]);
@@ -194,9 +194,9 @@ ok $success && $result->{structuredContent}{wrapped}, "call-tool wrapper";
 ok $success && $result->{structuredContent}{http} eq "HTTP instructions"
    && $result->{structuredContent}{child} eq "child", "discover instructions";
 ($success, $result) = wait_for (sub { $client->call ("list-tools", {}, $_[0]) });
-ok $success && @{$result->{structuredContent}{tools}} == 13, "list-tools builtin";
+ok $success && @{$result->{structuredContent}{tools}} == 12, "list-tools builtin";
 ($success, $result) = wait_for (sub { $client->call ("list-tools", { broker => "child" }, $_[0]) });
-ok $success && @{$result->{structuredContent}{tools}} == 5
+ok $success && @{$result->{structuredContent}{tools}} == 4
    && !grep ($_->{name} !~ /\Achild\./, @{$result->{structuredContent}{tools}}),
    "list-tools with broker returns only that exact downstream broker";
 ($success, $result) = wait_for (sub { $client->call ("list-tools", { broker => "http" }, $_[0]) });
@@ -223,12 +223,17 @@ ok $success && $result->{resultType} eq "input_required" && $result->{requestSta
 my $inputs = 0;
 $client->{client_capabilities} = { elicitation => { form => {} } };
 $client->{on_request} = sub {
+   my ($client, $req) = @_;
    ++$inputs;
-   $_[1]->reply ({ action => "accept", content => { decision => "allow-once", sandbox_grants => "read" } });
+   my $grants = $req->{params}{_meta}{"anyevent-mcp/permission"}{request}{sandbox_grants};
+   $req->reply ({ action => "accept", content => { decision => "allow-once", sandbox_grants => join ",", @$grants } });
 };
 ($success, $result) = wait_for (sub { $client->call ("http.challenge", {}, $_[0]) });
 ok $success && $inputs == 1 && $result->{structuredContent}{state} eq "opaque"
    && $result->{structuredContent}{response}{content}{decision} eq "allow-once", "input response and state round trip";
+($success, $result) = wait_for (sub { $client->call ("child.echo", { protected => 1 }, $_[0]) });
+ok $success && $inputs == 2 && $result->{structuredContent}{protected},
+   "spawned child permission prompt forwarded through mcp-mode multibroker";
 ($success, $result) = wait_for (sub {
    $client->call ("http.caps", {}, $_[0], _meta => {
       "io.modelcontextprotocol/clientCapabilities" => { testing => { value => 17 } },
@@ -236,8 +241,6 @@ ok $success && $inputs == 1 && $result->{structuredContent}{state} eq "opaque"
 });
 ok $success && $result->{structuredContent}{testing}{value} == 17
    && !exists $result->{structuredContent}{elicitation}, "per-call sandbox_grants preserved";
-($success, $result) = wait_for (sub { $client->call ("child.legacy-permission", {}, $_[0]) });
-ok $success && $result->{structuredContent}{decision} eq "allow-once", "old stdio permission helper bridge";
 
 my $cancel_cv = AnyEvent->condvar;
 my $id = $client->call ("child.slow", {}, sub { $cancel_cv->send ([@_]) });
@@ -267,7 +270,7 @@ my $partial = AnyEvent::MCP::Client::JSONL->new (
    env => { PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio" },
 );
 ($success, $result) = wait_for (sub { $partial->tools ($_[0]) });
-ok $success && @$result == 17, "unreachable peer omitted from listing";
+ok $success && @$result == 15, "unreachable peer omitted from listing";
 ($success, $result) = wait_for (sub { $partial->call ("discover-brokers", {}, $_[0]) });
 ok $success && ref $result->{structuredContent}{gone} eq "HASH"
    && $result->{structuredContent}{gone}{error} =~ /\S/
@@ -359,7 +362,7 @@ my $aliased = AnyEvent::MCP::Client::JSONL->new (
    env => { PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio" },
 );
 ($success, $result) = wait_for (sub { $aliased->call ("list-tools", {broker => "dash_name"}, $_[0]) });
-ok $success && @{$result->{structuredContent}{tools}} == 5
+ok $success && @{$result->{structuredContent}{tools}} == 4
    && !grep ($_->{name} !~ /\Adash-name\./, @{$result->{structuredContent}{tools}}),
    "list-tools accepts an underscore alias but returns real tool names";
 ($success, $result) = wait_for (sub { $aliased->call ("dash_name.echo", {}, $_[0]) });
@@ -448,7 +451,7 @@ my $pure_stdio = AnyEvent::MCP::Client::JSONL->new (
    },
 );
 ($success, $result) = wait_for (sub { $pure_stdio->tools ($_[0]) });
-ok $success && @$result == 9, "broker with only stdio children";
+ok $success && @$result == 8, "broker with only stdio children";
 ok !-e "$dir/stdio_config", "pure stdio broker reads no global configuration";
 $pure_stdio->close;
 
@@ -478,7 +481,7 @@ for my $cli (1, 0) {
    my $pid;
    END { kill TERM => $pid if $pid }
    my $server_cv;
-   my $stdout;
+   my ($stdout, $stderr);
    {
       local %ENV = (
          %ENV,
@@ -487,10 +490,16 @@ for my $cli (1, 0) {
       );
       $server_cv = AnyEvent::Util::run_cmd (
          [$^X, "-Ilib", "bin/mcp-multibroker", @auth_options, ($cli ? ("--bind=127.0.0.1:$port") : ()), child => $command[-1]],
-         "<" => "/dev/null", ">" => \$stdout, '$$' => \$pid, close_all => 1,
+         "<" => "/dev/null", ">" => \$stdout, "2>" => \$stderr, '$$' => \$pid, close_all => 1,
       );
    }
    $server_cv->cb (sub { undef $pid });
+   my $http_failures = 0;
+   my $http_diag = sub {
+      my ($step, $value) = @_;
+      ++$http_failures;
+      print STDERR "multibroker HTTP cli=$cli $step: ", JSON::XS::encode_json ($value), "\n";
+   };
    ok $url =~ m{\Ahttp://127\.0\.0\.1:}, "--bind overrides configured address"
       if $cli;
    my ($printed_port, $path) = $url =~ m{\Ahttp://127\.0\.0\.1:([0-9]+)(/.*)\z};
@@ -514,28 +523,38 @@ for my $cli (1, 0) {
    }
    close $socket;
    my $allowed = "*";
-   ok $preflight =~ /HTTP\/1\.1 204/ && $preflight =~ /^Access-Control-Allow-Origin: \Q$allowed\E\r?$/m,
-      "CORS preflight allows any origin by default";
+   my $preflight_ok = $preflight =~ /HTTP\/1\.1 204/
+      && $preflight =~ /^Access-Control-Allow-Origin: \Q$allowed\E\r?$/m;
+   ok $preflight_ok, "CORS preflight allows any origin by default";
+   $http_diag->("preflight", $preflight) unless $preflight_ok;
    my $web = AnyEvent::MCP::Client::HTTP->new (url => $url);
    ($success, $result) = wait_for (sub { $web->call ("child.echo", { web => 1 }, $_[0]) });
-   ok $success && $result->{structuredContent}{web}, ($cli ? "CLI bind overrides named bind; cookie URL works" : "named bind works; cookie URL works");
+   my $http_ok = $success && $result->{structuredContent}{web};
+   ok $http_ok, ($cli ? "CLI bind overrides named bind; cookie URL works" : "named bind works; cookie URL works");
+   $http_diag->("cookie", [$success, $result]) unless $http_ok;
    $web->close;
    my ($clean, $token) = $url =~ m{\A(https?://[^/]+/)([^/]+)/\z};
    $web = AnyEvent::MCP::Client::HTTP->new (url => $clean, bearer => $token);
    ($success, $result) = wait_for (sub { $web->call ("child.echo", { bearer => 1 }, $_[0]) });
-   ok $success && $result->{structuredContent}{bearer}, "same token authenticates clean URL as bearer";
+   $http_ok = $success && $result->{structuredContent}{bearer};
+   ok $http_ok, "same token authenticates clean URL as bearer";
+   $http_diag->("bearer", [$success, $result]) unless $http_ok;
    $web->close;
    if ($cli) {
       $web = AnyEvent::MCP::Client::HTTP->new (url => $clean, bearer => "upstream-second");
       ($success, $result) = wait_for (sub { $web->call ("child.echo", { alternate => 1 }, $_[0]) });
-      ok $success && $result->{structuredContent}{alternate}, "second upstream --token authenticates";
+      $http_ok = $success && $result->{structuredContent}{alternate};
+      ok $http_ok, "second upstream --token authenticates";
+      $http_diag->("second token", [$success, $result]) unless $http_ok;
       $web->close;
    }
    ok -f "$dir/http_config/$cli/anyevent-mcp/global.ini", "default HTTP startup stores its master secret";
    kill TERM => $pid if $pid;
-   wait_for (sub {
+   my ($ended, $exit) = wait_for (sub {
       my ($done) = @_;
       $server_cv->cb (sub { undef $pid; $done->(1, $_[0]->recv) });
    });
    ok !$stdout, "HTTP broker startup keeps stdout empty";
+   print STDERR "multibroker HTTP cli=$cli server exit=$exit stderr: ",
+      JSON::XS::encode_json (substr ($stderr // "", 0, 4096)), "\n" if $http_failures;
 }

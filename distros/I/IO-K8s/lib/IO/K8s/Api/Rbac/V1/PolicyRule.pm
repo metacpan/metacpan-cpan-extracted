@@ -1,6 +1,6 @@
 package IO::K8s::Api::Rbac::V1::PolicyRule;
 # ABSTRACT: PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s apiGroups => [Str];
@@ -32,7 +32,7 @@ IO::K8s::Api::Rbac::V1::PolicyRule - PolicyRule holds information that describes
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 apiGroups
 
@@ -58,7 +58,7 @@ Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this r
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -86,5 +86,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

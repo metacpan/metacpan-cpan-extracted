@@ -32,16 +32,17 @@
 #   * class_namespaces subclasses inherit through @ISA, like api_version
 #
 # Pure local fixtures -- no network, no cluster.
+#
+# (The coverage-over-the-shipped-tree sweeps moved to t/02_compile_all.t; see the
+# end of this file.)
 
 use strict;
 use warnings;
 use Test::More;
 use FindBin;
-use File::Find;
 use lib "$FindBin::Bin/../lib";
 
 use IO::K8s;
-use Role::Tiny ();
 
 # ----------------------------------------------------------------------------
 # Test-local classes
@@ -348,73 +349,9 @@ subtest 'class_namespaces subclasses inherit through @ISA' => sub {
     is($obj->resource_plural, 'pods', 'inflated subclass instance -> pods');
 };
 
-subtest 'coverage over the default resource map' => sub {
-    # Regression guard for a bad regeneration: every short name in the
-    # built-in map must resolve to a plural except the three subresources.
-    # Unchanged by k36 -- the short names all point at served versions,
-    # so they were already answered by tier 1.
-    my $map = IO::K8s->default_resource_map;
-    my @short = grep { !m{/} } sort keys %$map;
-
-    my @without;
-    for my $kind (@short) {
-        my $class = IO::K8s->expand_class($kind);
-        IO::K8s->load_class($class);
-        push @without, $kind unless defined $class->resource_plural;
-    }
-
-    is_deeply(\@without, [qw(Eviction Scale TokenRequest)],
-        'exactly the three subresources have no plural');
-    is(scalar(@short) - scalar(@without), 77,
-        '77 of the 80 short names carry an upstream plural');
-};
-
-subtest 'coverage over every shipped upstream API class' => sub {
-    # The guard k36 is actually about: the whole shipped surface the
-    # generated tables are supposed to cover, not just the short names in
-    # the default resource map. Anything in one of the three namespaces
-    # _api_version_from_class() understands, composing Role::APIObject.
-    #
-    # k45: the seven embedded template types (PodTemplateSpec,
-    # JobTemplateSpec, PersistentVolumeClaimTemplate, and the four
-    # ResourceClaimTemplateSpec versions) now compose IO::K8s::Resource
-    # instead of Role::APIObject -- upstream's schema for them carries no
-    # apiVersion/kind -- so they no longer satisfy does('...Role::APIObject')
-    # and drop out of @api entirely, rather than landing in @without.
-    my $lib = "$FindBin::Bin/../lib";
-    my @classes;
-    find(sub {
-        return unless /\.pm\z/;
-        my $path = $File::Find::name;
-        $path =~ s{\A\Q$lib\E/}{};
-        $path =~ s{\.pm\z}{};
-        $path =~ s{/}{::}g;
-        push @classes, $path;
-    }, $lib);
-
-    my @api;
-    for my $class (sort @classes) {
-        next unless $class =~ /\AIO::K8s::(?:Api|ApiextensionsApiserver|KubeAggregator)::/;
-        IO::K8s->load_class($class);
-        next if Role::Tiny->is_role($class);
-        next unless $class->can('does') && $class->does('IO::K8s::Role::APIObject');
-        push @api, $class;
-    }
-
-    my @without = grep { !defined $_->resource_plural } @api;
-
-    is(scalar @api, 124, '124 shipped upstream API object classes (113 before the v1.37 sync, karr k72)');
-    is(scalar(@api) - scalar(@without), 121,
-        '121 of them carry an upstream plural (110 before the v1.37 sync, karr k72)');
-
-    # The exact miss list: just the 3 subresources now. The 7 embedded
-    # template types are no longer Role::APIObject classes at all, so they
-    # never reach @api to be filtered into @without.
-    is_deeply(\@without, [qw(
-        IO::K8s::Api::Authentication::V1::TokenRequest
-        IO::K8s::Api::Autoscaling::V1::Scale
-        IO::K8s::Api::Policy::V1::Eviction
-    )], 'exactly the subresources stay undef');
-};
+# The two coverage subtests that sweep every shipped API class ("coverage over
+# the default resource map", "coverage over every shipped upstream API class")
+# need the whole tree loaded and no fixture class of this file, so they run in
+# t/02_compile_all.t on its one shared load (as "plural: coverage ...").
 
 done_testing;

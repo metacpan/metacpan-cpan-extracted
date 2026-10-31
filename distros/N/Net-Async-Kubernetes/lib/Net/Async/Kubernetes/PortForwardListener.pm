@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::PortForwardListener;
 # ABSTRACT: Local TCP listeners forwarding to pod ports, like kubectl port-forward
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -117,7 +117,11 @@ sub _accept {
         ports   => [$remote],
         on_open => sub {
             my ($session) = @_;
-            return if $conn->{closed};
+            # the connection ended while the session request was pending
+            if ($conn->{closed}) {
+                eval { $session->close(code => 1000); 1 };
+                return;
+            }
             $conn->{session} = $session;
             my $buffered = delete $conn->{buffer};
             $self->_from_tcp($conn, $buffered) if length $buffered;
@@ -168,7 +172,16 @@ sub _end {
     if ($session) {
         eval { $session->close(code => 1000); 1 };
     } elsif ($future && !$future->is_ready) {
-        $future->cancel;
+        # Cancelled on the next loop iteration, never in place: _end also
+        # runs inside the request's own callbacks (a failed connect reports
+        # through on_error before the request future fails), and the
+        # deferred closure keeps the request alive until those have unwound.
+        # Freeing a sequence future from its own callback crashes Future::XS.
+        if (my $loop = $self->{kube}->loop) {
+            $loop->later(sub { $future->cancel unless $future->is_ready });
+        } else {
+            $future->cancel;
+        }
     }
     eval { $stream->close_when_empty; 1 } if $stream && $stream->loop;
     return;
@@ -188,7 +201,7 @@ Net::Async::Kubernetes::PortForwardListener - Local TCP listeners forwarding to 
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -249,7 +262,7 @@ L<IO::Async::Listener>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-net-async-kubernetes/issues>.
 
 =head2 IRC

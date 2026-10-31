@@ -67,10 +67,10 @@ END
 
   {
     my $name = 'bar';
-    is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
+    is ref (my $w = $tmpl->{_Item}{$name}), 'YATT::Lite::Core::Widget'
       , "tmpl Item '$name'";
 
-    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+    eq_or_diff alt_tree_xhf_for($tmpl->{string}, $w->{_tree}), <<'END';
 [
 -
  FOO
@@ -88,6 +88,16 @@ subtree[
 kind: ATTRIBUTE
 path: x
 source: x
+symbol_range{
+end{
+character: 11
+line: 2
+}
+start{
+character: 10
+line: 2
+}
+}
 tree_range{
 end{
 character: 11
@@ -104,6 +114,16 @@ value= #null
 kind: ATTRIBUTE
 path: y
 source: y
+symbol_range{
+end{
+character: 13
+line: 2
+}
+start{
+character: 12
+line: 2
+}
+}
 tree_range{
 end{
 character: 13
@@ -158,9 +178,9 @@ END
 
   {
     my $name = 'foo';
-    is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
+    is ref (my $w = $tmpl->{_Item}{$name}), 'YATT::Lite::Core::Widget'
       , "tmpl Item '$name'";
-    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+    eq_or_diff alt_tree_xhf_for($tmpl->{string}, $w->{_tree}), <<'END';
 [
 - <h2>
 {
@@ -264,8 +284,8 @@ sub eq_or_diff_of_lrxml_alt_tree_with_xhf ($$) {
   my $tmpl = $CLASS->Template->new;
   $parser->load_string_into($tmpl, $lrxml);
 
-  my $w = $tmpl->{Item}{''};
-  eq_or_diff alt_tree_xhf_for($lrxml, $w->{tree}), $xhf, "at line: $line";
+  my $w = $tmpl->{_Item}{''};
+  eq_or_diff alt_tree_xhf_for($lrxml, $w->{_tree}), $xhf, "at line: $line";
 }
 
 {
@@ -497,9 +517,9 @@ END
 
   ;
   my $name = '';
-  my $w = $tmpl->{Item}{$name};
+  my $w = $tmpl->{_Item}{$name};
 
-  my $alttree = alt_tree_for($tmpl->{cf_string}, $w->{tree});
+  my $alttree = alt_tree_for($tmpl->{string}, $w->{_tree});
   # print YATT::Lite::Util::terse_dump($alttree), "\n";
   my ($elem_foo, undef) = @$alttree;
   my ($att_bar) = @{$elem_foo->{subtree}};
@@ -515,5 +535,84 @@ END
         , end => {line => 3, character => 36}}
     , "entities in argument text - y";
 }
+
+{
+  # GH-277: attributes at a widget call site.
+  #   name-only x  => symbol_range (== tree_range)
+  #   a=y          => symbol_range on the name, value_range on the bare
+  #                   value, tree_range covering both (was: "a=" only)
+  my $parser = $CLASS->new(all => 1);
+  my $tmpl = $CLASS->Template->new;
+  $parser->load_string_into($tmpl, my $cp = <<END);
+<!yatt:args x y>
+<yatt:foo x a=y/>
+
+<!yatt:widget foo x a>
+END
+
+  ;
+  my $w = $tmpl->{_Item}{''};
+  my $alttree = alt_tree_for($tmpl->{string}, $w->{_tree});
+  my ($elem_foo) = grep {ref $_} @$alttree;
+  my ($att_x, $att_a) = @{$elem_foo->{subtree}};
+
+  is $att_x->{kind}, 'ATTRIBUTE', "name-only attribute kind";
+  is_deeply $att_x->{symbol_range}
+    , +{start => {line => 1, character => 10}
+        , end => {line => 1, character => 11}}
+    , "name-only attribute has symbol_range";
+
+  is $att_a->{kind}, 'ATT_BARENAME', "bare attribute kind";
+  is_deeply $att_a->{symbol_range}
+    , +{start => {line => 1, character => 12}
+        , end => {line => 1, character => 13}}
+    , "a=y: symbol_range covers the name";
+  is_deeply $att_a->{tree_range}
+    , +{start => {line => 1, character => 12}
+        , end => {line => 1, character => 15}}
+    , "a=y: tree_range covers the value too";
+  is_deeply $att_a->{value_range}
+    , +{start => {line => 1, character => 14}
+        , end => {line => 1, character => 15}}
+    , "a=y: value_range covers the bare value";
+}
+
+
+{
+  # GH-278: a <!--#yatt --> comment token includes its trailing newline
+  # (NODE_END is just after the newline). Its tree_range must still end
+  # on the last line of the comment; otherwise the first characters of
+  # the next line are taken as part of the comment and no symbol is
+  # found there.
+  foreach my $case ([LF => "\n"], [CRLF => "\r\n"]) {
+    my ($title, $nl) = @$case;
+    my $parser = $CLASS->new(all => 1);
+    my $tmpl = $CLASS->Template->new;
+    $parser->load_string_into($tmpl, my $cp = join($nl, split /\n/, <<END) . $nl);
+<!yatt:args>
+<!--#yatt xxx
+   yyy  #-->
+<yatt:if "&yatt:foobar();">
+foobar
+</yatt:if>
+END
+
+    my $w = $tmpl->{_Item}{''};
+    my $alttree = alt_tree_for($tmpl->{string}, $w->{_tree});
+    my ($comment, $elem_if) = grep {ref $_} @$alttree;
+
+    is $comment->{kind}, 'COMMENT', "$title: comment kind";
+    is_deeply $comment->{tree_range}
+      , +{start => {line => 1, character => 0}
+          , end => {line => 2, character => 12}}
+      , "$title: comment tree_range ends on the last line of the comment";
+
+    is $elem_if->{kind}, 'ELEMENT', "$title: element kind";
+    is_deeply $elem_if->{tree_range}{start}
+      , +{line => 3, character => 0}
+      , "$title: the element starts on the next line";
+  }
+}
+
 
 done_testing();

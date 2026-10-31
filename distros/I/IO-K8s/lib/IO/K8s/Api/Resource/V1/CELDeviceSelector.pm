@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::CELDeviceSelector;
 # ABSTRACT: CELDeviceSelector contains a CEL expression for selecting a device.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s expression => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1::CELDeviceSelector - CELDeviceSelector contains a CEL
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 expression
 
@@ -69,7 +69,7 @@ The length of the expression must be smaller or equal to 10 Ki. The cost of eval
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -97,5 +97,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -13,8 +13,7 @@ use Capture::Tiny ':all';
 use DateTime;
 use HTTP::Date;
 # use Test::NoWarnings;	# HTML::Clean has them
-use lib 't/lib';
-use MyLogger;
+use Test::Needs 'Test::Log::Abstraction';
 
 BEGIN {
 	use_ok('FCGI::Buffer');
@@ -31,7 +30,7 @@ sub writer {
 
 	my $c = CHI->new(driver => 'Memory', datastore => $hash);
 
-	$b->init({cache => $c, cache_key => 'foo', logger => MyLogger->new()});
+	$b->init({cache => $c, cache_key => 'foo', logger => Test::Log::Abstraction->new()});
 	ok($b->is_cached() == ($test_run >= 1));
 	$test_run++;
 

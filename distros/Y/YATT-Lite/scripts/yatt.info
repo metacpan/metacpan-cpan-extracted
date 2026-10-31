@@ -24,9 +24,9 @@ sub MY () {__PACKAGE__}
 use mro 'c3'; # XXX: Not fully compatible.
 use parent qw/YATT::Lite::Object/;
 use YATT::Lite::MFields qw/dispatcher
-                           cf_dir
-			   cf_linear
-                           cf_from
+                           dir
+			   linear
+                           from
                           /;
 
 use YATT::Lite::Util qw/globref look_for_globref lexpand/;
@@ -83,7 +83,7 @@ sub cmd_isa {
 
 sub show_isa {
   (my MY $self, my ($title, $class)) = @_;
-  if ($self->{cf_linear}) {
+  if ($self->{linear}) {
     print "$title=$class\n";
     foreach my $super (@{mro::get_linear_isa($class)}) {
       my $fn = $self->get_class_filename($super);
@@ -162,7 +162,7 @@ sub list_target_dirs {
 sub cmd_list_widgets {
   (my MY $self, my ($widgetNameGlob)) = @_;
 
-  my $cwdOrFileList = $self->list_target_dirs($self->{cf_from});
+  my $cwdOrFileList = $self->list_target_dirs($self->{from});
 
   require Text::Glob;
 

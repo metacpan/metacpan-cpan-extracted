@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList;
 # ABSTRACT: APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -29,7 +29,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList - APIResourceList is
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 apiVersion
 
@@ -51,7 +51,7 @@ resources contains the name of the resources and if they are namespaced.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -79,5 +79,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

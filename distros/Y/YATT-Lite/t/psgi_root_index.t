@@ -17,7 +17,7 @@ use HTTP::Message::PSGI;
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
 use YATT::Lite::Util qw/combination/;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use File::Path qw(make_path);
 use Cwd;
 
@@ -55,7 +55,7 @@ foreach my $test (['' => [path_translated => 1]]
     {
       my ($app_root, $real_dir, $site) = $make_test_env->();
 
-      MY->mkfile("$real_dir/index.html"
+      MY->mkfile_may_wait("$real_dir/index.html"
                    , qq{<h2>Hello world!</h2>});
 
       my ($url, $file) = ("/", "/index.html");

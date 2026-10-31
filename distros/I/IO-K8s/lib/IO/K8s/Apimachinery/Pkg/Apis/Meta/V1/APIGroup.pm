@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroup;
 # ABSTRACT: APIGroup contains the name, the supported versions, and the preferred version of a group.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -35,7 +35,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroup - APIGroup contains the nam
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 apiVersion
 
@@ -65,7 +65,7 @@ versions are the versions supported in this group.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -93,5 +93,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

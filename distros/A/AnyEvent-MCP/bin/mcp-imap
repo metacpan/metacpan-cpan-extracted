@@ -1,0 +1,473 @@
+#!/opt/bin/perl
+
+=encoding utf8
+
+=head1 NAME
+
+mcp-imap - inspect and manage one IMAP account through MCP
+
+=head1 SYNOPSIS
+
+   mcp-imap [OPTION]...
+   mcp-imap [OPTION]... login [server HOST] [user USER] [tls ssl|starttls] [port PORT]
+
+=head1 DESCRIPTION
+
+Each C<--name> is one IMAP account and one independent MCP permission profile.
+Run C<mcp-imap --name doom login server doom user root tls starttls> to configure
+the account; then start C<mcp-imap --name doom --stdio> or its usual HTTP
+listener. Login asks for a password on the controlling terminal without echo.
+It never accepts passwords on the command line or through an MCP tool.
+
+The account is stored as C<imap-NAME.ini> under
+C<$XDG_CONFIG_HOME/anyevent-mcp> or C<~/.config/anyevent-mcp>, mode 0600.
+Password data is Base64 in that private file, not encrypted. Protect the
+file like a password. Repeating C<login> replaces the saved password after
+a successful connection. No OAuth or insecure cleartext IMAP login is
+implemented.
+
+IMAP runs in a separate persistent synchronous worker, so an IMAP command
+does not block the MCP event loop. One request at a time is processed by the
+worker. A dropped connection during a write can leave an unknown outcome;
+do not blindly retry such writes.
+
+Message references consist of mailbox, UIDVALIDITY and UID. Read operations
+use BODY.PEEK, never mark messages Seen. Deleted flags do not automatically
+expunge. EXPUNGE is explicit. Selecting another mailbox or logging out does
+not expunge. Search is bounded by UID windows, potentially returning a
+partial/empty page with a continuation cursor when matches are sparse.
+
+=head1 TOOLS
+
+=over
+
+=item mailboxes
+
+List visible mailboxes.
+
+=item messages
+
+List at most 100 message summaries, newest UID first. Optional SEARCH
+filter, summary fields, header names and UIDVALIDITY-aware cursor.
+C<incomplete> means the search reached its 20000-UID scan budget:
+continue with C<next_cursor> even if the page contains no messages.
+
+=item message
+
+Read ENVELOPE, flags, dates, size and MIME BODYSTRUCTURE for a UID.
+
+=item part
+
+Read a MIME part using BODY.PEEK with a byte ceiling. Returns Base64
+raw transferred bytes; C<decode_text> additionally decodes complete text
+parts using MIME transfer encoding and charset.
+
+=item raw
+
+Read raw RFC 5322 message bytes (bounded, Base64). Never sets Seen.
+
+=item flags
+
+Add/remove a set of IMAP flags, including Deleted (but never expunge).
+
+=item copy, move
+
+Copy or move named UIDs. MOVE requires server MOVE capability and has no
+unsafe emulation.
+
+=item append
+
+APPEND a Base64-encoded RFC 5322 message up to 1 MiB. Use CRLF line
+endings. Reject unescaped mbox From_ separator-like lines in the raw
+message unless C<--allow-mbox-from> is set. Refusal identifies the raw
+line number and explains the mboxo hazard. This uploads bytes unchanged;
+it is not an SMTP send operation.
+
+=item expunge
+
+Permanently expunge explicitly named deleted UIDs when UIDPLUS is available,
+or all Deleted messages in the selected mailbox when C<uids> is omitted.
+Never fall back from UID EXPUNGE to whole-mailbox EXPUNGE.
+
+=item mailbox
+
+Create, rename, delete, subscribe or unsubscribe a mailbox.
+
+=back
+
+=head1 PERMISSIONS
+
+The independent profile is C<imap-NAME>, with C<read>, C<modify>,
+C<manage> and C<expunge> actions. Each tool checks permission before
+network activity. Approval applies to the selected mailbox or all
+mailboxes. This worker is NOT filesystem- or network-sandboxed; permissions
+authorize operations, not OS-level confinement.
+
+=head1 OPTIONS
+
+Common options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>, including
+C<--name>, C<--stdio>, C<--connect>, C<--print-url>,
+C<--auto-allow>, C<--auto-deny> and C<--tool-help>.
+
+=over
+
+=item --ask MODE
+
+Choose permission prompting: C<helper> (default), C<tty>, C<yad>,
+C<mcp> or C<auto>.
+
+=item --allow-mbox-from
+
+Allow APPEND messages with unescaped mbox From_ separator-like lines.
+Unsafe with mboxo servers which fail to escape these lines. Off by default;
+can only be enabled by the server operator, not through an MCP tool.
+
+=back
+
+=cut
+
+use common::sense;
+use MIME::Base64 ();
+use AnyEvent ();
+
+use AnyEvent::Fork::Early;
+
+use Term::ReadKey ();
+use AnyEvent::Fork ();
+use AnyEvent::Fork::RPC ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::File ();
+use AnyEvent::MCP::Config ();
+use AnyEvent::MCP::Server::Permissions ();
+use JSON::XS ();
+
+use AnyEvent::MCP::Server::Simple;
+
+my $options = mcp_getoptions
+   {
+      usage       => "Usage: mcp-imap [OPTION]... [login [key value ...]]\n",
+      description => "Serve one named IMAP account; 'login' configures plain password authentication.",
+      options     => [["--ask MODE", "Permission prompts: helper (default), tty, yad, mcp, auto"],
+                      ["--allow-mbox-from", "Allow potentially unsafe unescaped mbox From_ lines in APPEND"]],
+      examples    => "  mcp-imap --name doom login server doom user root tls starttls\n"
+                   . "  mcp-imap --name doom --stdio",
+   },
+   "ask=s" => \my $ask,
+   "allow-mbox-from!" => \my $allow_mbox_from,
+;
+
+my $name = $options->{name};
+my $directory = ($ENV{XDG_CONFIG_HOME} || ($ENV{HOME} || die "HOME is not set\n") . "/.config")
+              . "/anyevent-mcp";
+my $file = "$directory/imap-$name.ini";
+
+sub load_account {
+   return {} unless -e $file;
+
+   my @stat = stat $file or die "$file: $!\n";
+   $stat[2] & 077 or die "$file: unsafe mode, expected 0600\n";
+   open my $fh, "<:raw", $file or die "$file: $!\n";
+   local $/;
+   my $text = <$fh>;
+   close $fh;
+   my %kv;
+   AnyEvent::MCP::parse_ini $text, sub {
+      my ($section, $values) = @_;
+      $section eq "" || $section eq "account"
+         or die "$file: unexpected section $section\n";
+      %kv = (%kv, %$values);
+   }, $file;
+
+   \%kv
+}
+
+sub settings {
+   my ($kv) = @_;
+
+   for (qw(server user tls port password-base64)) {
+      defined $kv->{$_} && length $kv->{$_} or die "$file: missing $_; run mcp-imap --name $name login\n";
+   }
+   $kv->{tls} =~ /\A(?:ssl|starttls)\z/ or die "$file: invalid tls mode\n";
+   $kv->{port} =~ /\A[0-9]+\z/ && $kv->{port} >= 1 && $kv->{port} <= 65535
+      or die "$file: invalid port\n";
+   $kv->{server} !~ /[\s\x00-\x1f]/ && length $kv->{server} <= 255
+      or die "$file: invalid server\n";
+   $kv->{user} !~ /[\r\n\x00]/ or die "$file: invalid user\n";
+   $kv->{"password-base64"} =~ /\A[A-Za-z0-9+\/]*={0,2}\z/
+      or die "$file: invalid password encoding\n";
+
+   +{
+      map +($_ => $kv->{$_}), qw(server user port tls),
+      password => MIME::Base64::decode_base64 ($kv->{"password-base64"}),
+   }
+}
+
+sub login {
+   my %input = @_;
+   @ARGV % 2 == 0 or die "login expects key/value pairs\n";
+   while (@ARGV) {
+      my ($key, $value) = splice @ARGV, 0, 2;
+      $key =~ /\A(?:server|user|tls|port)\z/
+         or die "Unknown login key '$key' (passwords cannot be given on argv)\n";
+      $input{$key} = $value;
+   }
+   my $old = load_account ();
+   my %kv = (%$old, %input);
+   for my $key (qw(server user)) {
+      next if defined $kv{$key} && length $kv{$key};
+      print STDERR "$key: ";
+      chomp ($kv{$key} = <STDIN> // "");
+   }
+   $kv{tls} ||= "ssl";
+   $kv{port} ||= $kv{tls} eq "ssl" ? 993 : 143;
+
+   open my $tty, "+<", "/dev/tty"
+      or die "Password requires a controlling terminal: $!\n";
+   print {$tty} "IMAP password for $kv{user}\@$kv{server}: ";
+   Term::ReadKey::ReadMode ("noecho", $tty);
+   my $password = <$tty>;
+   Term::ReadKey::ReadMode ("restore", $tty);
+   print {$tty} "\n";
+   close $tty;
+   defined $password or die "No password supplied\n";
+   $password =~ s/\r?\n\z//;
+   length $password or die "Empty password\n";
+   $kv{"password-base64"} = MIME::Base64::encode_base64 ($password, "");
+
+   my $account = settings (\%kv);
+   require AnyEvent::MCP::Worker::IMAP;
+   AnyEvent::MCP::Worker::IMAP::imap_connect ($account);
+
+   my $lock = AnyEvent::MCP::File::lock $file;
+   my $current = load_account ();
+   my %save = (%$current, %kv);
+   AnyEvent::MCP::File::replace $file, "[account]\n"
+      . (join "", map "$_ = $save{$_}\n", sort keys %save);
+   close $lock;
+
+   print STDERR "Authenticated and saved account '$name' in $file\n";
+   return
+}
+
+if (@ARGV && $ARGV[0] eq "login") {
+   shift @ARGV;
+   login ();
+   exit;
+}
+
+@ARGV and die "Unexpected arguments (try 'login')\n";
+
+$ask //= $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio"
+   ? "mcp" : $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
+$ask =~ /\A(?:helper|tty|yad|mcp|auto)\z/ or die "Invalid --ask mode\n";
+
+my $permissions = AnyEvent::MCP::Server::Permissions->new (
+   name       => "imap-$name",
+   actions    => {
+      read    => "Read mailboxes and messages",
+      modify  => "Change message flags, copy, move or append mail",
+      manage  => "Create, rename, delete or subscribe mailboxes",
+      expunge => "Permanently remove messages marked Deleted",
+   },
+   ask        => $ask,
+);
+
+mcp_config
+   permissions        => $permissions,
+   server_name        => "mcp-imap",
+   server_version     => $AnyEvent::MCP::VERSION,
+   short_instructions => "Inspect and manage IMAP mail, by mailbox/UIDVALIDITY/UID. Reads do not set Seen; deletion requires explicit expunge.",
+   instructions       => "One account per named mcp-imap instance. Read mailboxes and pages of messages; fetch MIME parts. "
+                      . "Message operations require current UIDVALIDITY. Reads never set Seen. "
+                      . "Deleting flags and expunging are separate; expunge permanently removes mail. "
+                      . "An IMAP write interrupted by a disconnect has unknown outcome: never blindly repeat.";
+
+my ($rpc, $rpc_dead, $connected);
+my %pending;
+my $seq = 0;
+
+sub start_worker {
+   return if $rpc;
+   require AnyEvent::MCP::Worker::IMAP; # dependency check, no connection until authorized
+   $rpc_dead = undef;
+
+   $rpc = AnyEvent::Fork
+      ->new
+      ->require ("AnyEvent::MCP::Worker::IMAP")
+      ->AnyEvent::Fork::RPC::run ("AnyEvent::MCP::Worker::IMAP::run",
+         serialiser => $AnyEvent::Fork::RPC::JSON_SERIALISER,
+         on_error => sub {
+            $rpc_dead = $_[0];
+            undef $rpc;
+            $connected = undef;
+            for my $id (keys %pending) {
+               my $req = delete $pending{$id};
+               $req->error ("IMAP worker disconnected; outcome of in-flight writes unknown: $rpc_dead")
+                  unless $req->{finished};
+            }
+         },
+      );
+
+   $connected = 0;
+   my $account = settings (load_account ());
+   $account->{allow_mbox_from} = $allow_mbox_from ? JSON::XS::true : JSON::XS::false;
+   $rpc->("connect", $account, sub {
+      my ($ok, $result) = @_;
+      $connected = $ok ? 1 : $result;
+   });
+}
+
+sub perform {
+   my ($req, $cmd, $args) = @_;
+
+   start_worker ();
+   my $id = ++$seq;
+   $pending{$id} = $req;
+   $rpc->($cmd, $args, sub {
+      delete $pending{$id} or return;
+      my ($ok, $result) = @_;
+      return if $req->{finished};
+      $ok ? $req->result ($result)
+          : $req->error ($result);
+   });
+}
+
+sub require_mail_permission {
+   my ($req, $action, $args) = @_;
+
+   my $mailbox = $args->{mailbox};
+   my $subject = defined $mailbox ? "mailbox:$mailbox" : "mailboxes";
+   my @subjects = ({ label => "this mailbox", match => $subject });
+   push @subjects, { label => "all mailboxes", match => "^mailbox:" }
+      if defined $mailbox;
+   $req->require_permission ({
+      tool           => $req->{tool},
+      action         => $action,
+      dimensions     => { subject => { label => "Mailbox", value => $subject, choices => \@subjects } },
+      sandbox_grants => [],
+      reason         => "$req->{tool} " . (defined $mailbox ? "mailbox '$mailbox'" : "mailboxes"),
+   });
+}
+
+sub property {
+   my ($type, $description) = @_;
+
+   +{ type => $type, description => $description }
+}
+
+my $mailbox = property ("string", "IMAP mailbox name, e.g. INBOX");
+my $validity = property ("string", "Current UIDVALIDITY from messages or message");
+my $uid = property ("integer", "Message UID");
+my $uids = { type => "array", items => $uid, minItems => 1, maxItems => 100 };
+
+sub expose {
+   my ($cmd, $description, $required, $properties, $action) = @_;
+
+   mcp_tool $cmd => $description,
+      {
+         type                 => "object",
+         required             => $required,
+         additionalProperties => JSON::XS::false,
+         properties           => $properties,
+      },
+      sub {
+         my ($req, $args) = @_;
+
+         ref $args eq "HASH" or die "Arguments must be an object\n";
+         for my $key (@$required) {
+            defined $args->{$key} or die "Missing $key\n";
+         }
+         if (defined $args->{mailbox}) {
+            !ref $args->{mailbox} && length $args->{mailbox} && length $args->{mailbox} <= 1024
+               or die "Invalid mailbox\n";
+         }
+         if (defined $args->{uidvalidity}) {
+            !ref $args->{uidvalidity} && $args->{uidvalidity} =~ /\A[1-9][0-9]*\z/
+               or die "Invalid UIDVALIDITY\n";
+         }
+         if (defined $args->{uid}) {
+            !ref $args->{uid} && $args->{uid} =~ /\A[1-9][0-9]*\z/
+               or die "Invalid UID\n";
+         }
+         for my $u (@{$args->{uids} || []}) {
+            defined $u && !ref $u && $u =~ /\A[1-9][0-9]*\z/ or die "Invalid UID\n";
+         }
+         require_mail_permission $req, $action, $args;
+         perform $req, $cmd, $args;
+      };
+}
+
+expose mailboxes => "List IMAP mailboxes.", [],
+   {}, "read";
+
+expose messages =>
+   "Page UID summaries, newest first. SEARCH filter; cursor anchors UIDVALIDITY. Continue on incomplete pages.",
+   ["mailbox"],
+   {
+      mailbox => $mailbox,
+      limit   => { type => "integer", minimum => 1, maximum => 100 },
+      cursor  => { type => "object", description => "{uidvalidity, before_uid} from previous page" },
+      fields  => { type => "array", items => property ("string", "Summary field") },
+      headers => { type => "array", items => property ("string", "RFC 5322 header name"), maxItems => 20 },
+      filter  => {
+         type        => "object",
+         description => "from/to/subject substring; since/before D-Mon-YYYY; unseen/flagged/undeleted",
+      },
+   }, "read";
+
+expose message => "Read one message's envelope, flags, size and MIME BODYSTRUCTURE; no Seen change.",
+   [qw(mailbox uidvalidity uid)],
+   { mailbox => $mailbox, uidvalidity => $validity, uid => $uid }, "read";
+
+expose part => "Fetch bounded MIME part using BODY.PEEK. Raw transferred bytes in Base64; optionally decode text.",
+   [qw(mailbox uidvalidity uid part)],
+   {
+      mailbox => $mailbox, uidvalidity => $validity, uid => $uid,
+      part => property ("string", "BODYSTRUCTURE part number (empty for singlepart root)"),
+      max_bytes => { type => "integer", minimum => 1, maximum => 262144 },
+      decode_text => { type => "boolean" },
+   }, "read";
+
+expose raw => "Fetch bounded raw RFC 5322 bytes using BODY.PEEK, Base64 encoded.",
+   [qw(mailbox uidvalidity uid)],
+   { mailbox => $mailbox, uidvalidity => $validity, uid => $uid,
+     max_bytes => { type => "integer", minimum => 1, maximum => 262144 } }, "read";
+
+expose flags => "Add or remove Seen, Flagged, Answered, Deleted, Draft or supported keywords. Never expunges.",
+   [qw(mailbox uidvalidity uids operation flags)],
+   {
+      mailbox => $mailbox, uidvalidity => $validity, uids => $uids,
+      operation => { type => "string", enum => ["add", "remove"] },
+      flags => { type => "array", items => property ("string", "IMAP flag or keyword"), minItems => 1, maxItems => 20 },
+   }, "modify";
+
+for my $cmd (qw(copy move)) {
+   expose $cmd => ($cmd eq "move" ? "MOVE UIDs to destination; requires IMAP MOVE; no emulation."
+                                 : "COPY UIDs to destination mailbox."),
+      [qw(mailbox uidvalidity uids destination)],
+      { mailbox => $mailbox, uidvalidity => $validity, uids => $uids,
+        destination => property ("string", "Destination mailbox") }, "modify";
+}
+
+expose append => "Append raw CRLF RFC 5322 message (Base64, at most 1 MiB); reject unsafe mbox From_ lines.",
+   [qw(mailbox data_base64)],
+   {
+      mailbox => $mailbox,
+      data_base64 => property ("string", "Base64-encoded RFC 5322 message, max 1 MiB"),
+      flags => { type => "array", items => property ("string", "Initial IMAP flag") },
+   }, "modify";
+
+expose expunge =>
+   "Permanently expunge Deleted mail: optional UIDs require UIDPLUS; omitted UIDs expunge ALL Deleted messages.",
+   [qw(mailbox uidvalidity)],
+   { mailbox => $mailbox, uidvalidity => $validity, uids => $uids }, "expunge";
+
+expose mailbox => "Create, rename, delete, subscribe or unsubscribe a mailbox.",
+   [qw(operation mailbox)],
+   {
+      operation => { type => "string", enum => [qw(create rename delete subscribe unsubscribe)] },
+      mailbox => $mailbox,
+      destination => property ("string", "New mailbox name for rename"),
+   }, "manage";
+
+mcp_start %$options;

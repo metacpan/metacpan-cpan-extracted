@@ -19,6 +19,7 @@ requires 'Readonly';
 requires 'Scalar::Util';
 requires 'autodie';
 requires 'strict';
+requires 'version';
 requires 'warnings';
 
 on 'configure' => sub {

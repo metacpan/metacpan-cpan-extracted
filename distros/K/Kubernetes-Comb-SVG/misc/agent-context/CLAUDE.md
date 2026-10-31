@@ -45,7 +45,8 @@ perl -Ilib examples/demo.pl   # regenerates examples/demo.svg
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/kubernetes-comb-svg-rules.md`.
+principle in the shared rule `getty-agent-delegation` (skilletor bundle
+`getty-cpan-dist@getty`), lanes and hazards in `.claude/rules/kubernetes-comb-svg-rules.md`.
 
 | Task | Agent |
 |---|---|

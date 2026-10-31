@@ -67,12 +67,12 @@
 #-----------------------------------------------------------------------------------
 #      Authors: Jean-Luc Vinot <vinot@cena.fr>
 #
-# $Id: Graphics.pm,v 1.12 2004/04/16 09:06:55 mertz Exp $ 
+# $Id$ 
 #-----------------------------------------------------------------------------------
 package Tk::Zinc::Graphics;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.12 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.12';
 
 require Exporter;
 @ISA = qw(Exporter);

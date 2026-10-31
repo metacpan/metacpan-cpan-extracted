@@ -19,6 +19,8 @@ CPAN
 GPL
 Init
 JavaScript
+LF
 RT
 STDOUT
 init
+ttl

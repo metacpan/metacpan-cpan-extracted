@@ -228,6 +228,17 @@ subtest 'failing session request closes the connection' => sub {
     @ws = ();
     local $FakeWebSocketClient::HOLD = 1;
     @FakeWebSocketClient::PENDING = ();
+    # The listener alone owns each session request; record how it ends
+    # without holding it. Ending it from inside its own failure (on_error
+    # runs before the request future fails) crashed perls with Future::XS.
+    my @request_states;
+    my $port_forward = \&Net::Async::Kubernetes::port_forward;
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::port_forward = sub {
+        my $request = $port_forward->(@_);
+        $request->on_ready(sub { push @request_states, $_[0]->state });
+        return $request;
+    };
     my @errors;
     my $l = $kube->port_forward_listen('Pod', 'web',
         ports    => { 0 => 8080 },
@@ -241,7 +252,40 @@ subtest 'failing session request closes the connection' => sub {
     wait_for(sub { $c->{closed} }, 'closed');
     ok($c->{closed}, 'connection closed');
     like($errors[0], qr/port 8080: .*403 forbidden/, 'failure reported');
+    is(scalar @errors, 1, 'reported once');
+    $loop->loop_once(0.1);
+    is_deeply(\@request_states, ['failed'], 'the session request fails, it is not cancelled');
     $l->stop;
+};
+
+subtest 'stop while session requests are pending' => sub {
+    @ws = ();
+    local $FakeWebSocketClient::HOLD = 1;
+    @FakeWebSocketClient::PENDING = ();
+    my @errors;
+    my $l = $kube->port_forward_listen('Pod', 'web',
+        ports    => { 0 => 8080 },
+        on_error => sub { push @errors, $_[0] },
+    )->get;
+    tcp_client($l->port_for(8080));
+    wait_for(sub { @FakeWebSocketClient::PENDING == 1 }, 'first session requested');
+    tcp_client($l->port_for(8080));
+    wait_for(sub { @FakeWebSocketClient::PENDING == 2 }, 'second session requested');
+    my ($late, $open) = map { $_->[1] } @FakeWebSocketClient::PENDING;
+    my ($late_client) = $FakeWebSocketClient::PENDING[0][0];
+    @FakeWebSocketClient::PENDING = ();
+
+    $l->stop;
+    # the first handshake completes before the loop runs again
+    $late->done($late_client) unless $late->is_ready;
+    $loop->loop_once(0.1);
+
+    ok($late->is_cancelled || @{$ws[0]->sent_close} == 1,
+        'a session that opens after stop is closed at once');
+    is_deeply($ws[0]->sent_binary, [], 'nothing is forwarded on it');
+    ok($open->is_cancelled, 'a request still pending is cancelled');
+    is($l->connection_count, 0, 'no connections left');
+    is_deeply(\@errors, [], 'stop reports no errors');
 };
 
 subtest 'two mappings, one port each' => sub {

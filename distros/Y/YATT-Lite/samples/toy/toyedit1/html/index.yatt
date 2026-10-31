@@ -16,7 +16,7 @@
 </yatt:foreach>
 </ul>
 
-<h4>Template age: &yatt:template(){cf_age};</h4>
+<h4>Template age: &yatt:template(){age};</h4>
 </yatt:std:envelope>
 
 <!yatt:widget theform action=! size=?70 title BODY fnum buttons=html?>

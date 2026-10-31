@@ -1,0 +1,168 @@
+#!/bin/env perl
+########################################################################
+# Build a layered @etc with two FindBin::libs calls:
+#
+#   1. noabspath: logical walk  -- local/sandbox etc dirs (override layer)
+#   2. abspath + append: physical walk -- production etc dirs (defaults)
+#
+# The single @etc array holds local dirs first and defaults appended
+# after, so iterating it with List::Util::first gives local config files
+# precedence over the standard defaults.  See POD for details.
+########################################################################
+
+use strict;
+use warnings;
+use feature 'say';
+
+use List::Util qw( first );
+
+use FindBin::Bin
+qw
+(
+    $Bin_l
+    $Bin_p
+);
+
+# First call:  populate @etc with logical (local) dirs, nearest first.
+# Second call: append physical (default) dirs to the same @etc.
+# Result: local overrides at front, production defaults at the back.
+
+use FindBin::libs qw( base=etc noabspath export        );
+use FindBin::libs qw( base=etc abspath   export append );
+
+say "logical  bin (\$Bin_l, noabspath): $Bin_l";
+say "physical bin (\$Bin_p, abspath):   $Bin_p";
+say '';
+
+say '@etc (local first, defaults appended):';
+
+if( @etc )
+{
+    say "  $_" for @etc;
+}
+else
+{
+    say '  (none found)';
+}
+
+say '';
+
+# first { } searches @etc left-to-right: a local override wins if it
+# exists; otherwise the search continues into the appended default dirs.
+
+my $conf    = 'app.conf';
+my $etc_dir
+= first { -e "$_/$conf" } @etc;
+
+if( $etc_dir )
+{
+    say "Found $conf in: $etc_dir";
+    say "  (local override)"
+    if $Bin_l ne $Bin_p && $etc_dir =~ /^\Q$Bin_l\E/;
+}
+else
+{
+    say "No $conf found in any etc dir.";
+}
+
+=head1 NAME
+
+layered_etc - build a layered @etc: local overrides first, defaults appended
+
+=head1 SYNOPSIS
+
+    layered_etc
+
+=head1 DESCRIPTION
+
+Calls L<FindBin::libs> twice with C<base=etc> to build a single C<@etc>
+array that layers local configuration over production defaults:
+
+    use FindBin::libs qw( base=etc noabspath export        );
+    use FindBin::libs qw( base=etc abspath   export append );
+
+The first call walks from C<$Bin_l> (the logical path, symlinks preserved)
+and stores any C<etc> dirs found into C<@etc>.  The second call walks from
+C<$Bin_p> (the physical path, symlinks resolved) and B<appends> its results
+to the same C<@etc> rather than replacing it.
+
+The resulting array reads: nearest local dir, ... , nearest production dir,
+... so that C<List::Util::first> finds a local file before it reaches the
+production copy:
+
+    my $conf_dir = first { -e "$_/app.conf" } @etc;
+
+If a local C<app.conf> exists it is returned.  If not, the search continues
+into the appended production dirs and returns the production copy.
+
+=head2 Symlink scenario
+
+Consider a developer sandbox where C</home/user/app> is a directory symlink
+pointing to the shared source tree:
+
+    /home/user/                        # logical subtree (developer sandbox)
+    +-- etc/
+    |   \-- app.conf                   # local override -- dev database, etc.
+    \-- app -> /work/projects/app      # directory symlink
+
+    /work/projects/                    # physical subtree (production defaults)
+    +-- etc/
+    |   \-- app.conf                   # standard defaults
+    \-- app/
+        \-- bin/
+            \-- myscript               # $0
+
+Invoked as C</home/user/app/bin/myscript>:
+
+    $Bin_l = /home/user/app/bin        (symlink preserved)
+    $Bin_p = /work/projects/app/bin    (symlink resolved)
+
+    noabspath walk (first call):
+        /home/user/app/bin -> /home/user/app -> /home/user -> ...
+        adds:  /home/user/etc
+
+    abspath walk (second call, append):
+        /work/projects/app/bin -> /work/projects/app -> /work/projects -> ...
+        appends:  /work/projects/etc
+
+    @etc = ( '/home/user/etc', '/work/projects/etc' )
+
+    first { -e "$_/app.conf" } @etc
+        => '/home/user/etc/app.conf'    # local override wins
+
+To use the production default instead, remove or rename the local file;
+the search falls through to C</work/projects/etc/app.conf>.
+
+=head2 When $Bin_l eq $Bin_p (no symlinks)
+
+Without symlinks both walks are identical, so C<@etc> will contain
+duplicates -- each dir appears from the first call then again from the
+appended second call.  This is harmless for C<first>-style searches
+(the first match stops the scan) but wastes iterations.  Deduplicate
+with C<List::Util::uniq> when it matters:
+
+    use List::Util qw( first uniq );
+    my @conf_dirs = uniq @etc;
+    my $conf_dir  = first { -e "$_/app.conf" } @conf_dirs;
+
+=head2 Extending the pattern
+
+The same append technique works with any C<base=>:
+
+    use FindBin::libs qw( base=share noabspath export        );
+    use FindBin::libs qw( base=share abspath   export append );
+
+It also composes with C<subdir> and C<subonly> to layer nested config
+namespaces:
+
+    use FindBin::libs qw( base=etc subdir=myapp subonly noabspath export        );
+    use FindBin::libs qw( base=etc subdir=myapp subonly abspath   export append );
+
+This fills C<@etc> with C<etc/myapp> dirs only, nearest local first and
+production defaults appended, without any bare C<etc> dirs in the list.
+
+=head1 SEE ALSO
+
+L<FindBin::Bin>, L<FindBin::libs>, L<FindBin::Parents>
+
+=cut

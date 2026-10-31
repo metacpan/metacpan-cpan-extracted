@@ -10,13 +10,13 @@ my $Test = Test::Builder->new;
 {
   package YATT::Lite::Test::TestFCGI; sub MY () {__PACKAGE__}
   use parent qw(YATT::Lite::Object File::Spec);
-  use YATT::Lite::MFields qw/res status ct content cookie_jar last_request
-		sockfile
-		raw_result
+  use YATT::Lite::MFields qw/_res _status _ct _content _cookie_jar _last_request
+		_sockfile
+		_raw_result
 		onerror
-		cf_rootdir cf_fcgiscript
-		cf_debug_fcgi
-		kidpid
+		rootdir fcgiscript
+		debug_fcgi
+		_kidpid
 	      /;		# base form
 
   use HTML::Entities ();
@@ -32,7 +32,7 @@ my $Test = Test::Builder->new;
       return 'HTTP::Response is not installed';
     }
 
-    if (ref $self and not -x $self->{cf_fcgiscript}) {
+    if (ref $self and not -x $self->{fcgiscript}) {
       return "Can't find cgi-bin/runyatt.cgi"
     }
 
@@ -81,11 +81,11 @@ my $Test = Test::Builder->new;
       die "Can't mkdir $sessdir: $!";
     }
 
-    my $sock = $self->mkservsock($self->{sockfile} = "$sessdir/socket");
+    my $sock = $self->mkservsock($self->{_sockfile} = "$sessdir/socket");
 
-    unless (defined($self->{kidpid} = fork)) {
+    unless (defined($self->{_kidpid} = fork)) {
       die "Can't fork: $!";
-    } elsif (not $self->{kidpid}) {
+    } elsif (not $self->{_kidpid}) {
       # child
       open STDIN, '<&', $sock or die "kid: Can't reopen STDIN: $!";
       open STDOUT, '>&', $sock or die "kid: Can't reopen STDOUT: $!";
@@ -96,23 +96,23 @@ my $Test = Test::Builder->new;
       if (my $switch = $ENV{HARNESS_PERL_SWITCHES}) {
 	push @opts, split " ", $switch;
       }
-      exec $^X, @opts, $self->{cf_fcgiscript};
-      die "Can't exec $self->{cf_fcgiscript}: $!";
+      exec $^X, @opts, $self->{fcgiscript};
+      die "Can't exec $self->{fcgiscript}: $!";
     }
   }
 
   DESTROY {
     (my MY $self) = @_;
-    if ($self->{kidpid}) {
-      # print STDERR "# shutting down $self->{kidpid}\n";
+    if ($self->{_kidpid}) {
+      # print STDERR "# shutting down $self->{_kidpid}\n";
       # Shutdown FCGI fcgiscript. TERM is ng.
-      kill USR1 => $self->{kidpid};
-      waitpid($self->{kidpid}, 0);
+      kill USR1 => $self->{_kidpid};
+      waitpid($self->{_kidpid}, 0);
 
-      if (-e $self->{sockfile}) {
-	# print STDERR "# removing sockfile $self->{sockfile}\n";
-	unlink $self->{sockfile};
-	rmdir dirname($self->{sockfile});
+      if (-e $self->{_sockfile}) {
+	# print STDERR "# removing sockfile $self->{_sockfile}\n";
+	unlink $self->{_sockfile};
+	rmdir dirname($self->{_sockfile});
       }
     }
   }
@@ -120,40 +120,40 @@ my $Test = Test::Builder->new;
   sub parse_result {
     my MY $self = shift;
     # print map {"#[[$_]]\n"} split /\n/, $result;
-    my $res = $self->{res} = HTTP::Response->parse(shift);
+    my $res = $self->{_res} = HTTP::Response->parse(shift);
     if (defined $res) {
-      $res->request($self->{last_request});
-      $self->{cookie_jar} //= do {
+      $res->request($self->{_last_request});
+      $self->{_cookie_jar} //= do {
 	require HTTP::Cookies;
 	HTTP::Cookies->new();
       };
-      $self->{cookie_jar}->extract_cookies($res);
+      $self->{_cookie_jar}->extract_cookies($res);
     }
     $res;
   }
 
   sub bake_cookies {
     my MY $self = shift;
-    return unless $self->{cookie_jar};
-    $self->{cookie_jar}->add_cookie_header($self->{last_request});
-    $self->{last_request}->header('Cookie');
+    return unless $self->{_cookie_jar};
+    $self->{_cookie_jar}->add_cookie_header($self->{_last_request});
+    $self->{_last_request}->header('Cookie');
   }
 
   # Poor-man's emulation of WWW::Mechanize.
   # These members are readonly from client.
   # ($self->cookie_jar($x) has no results)
   sub cookie_jar {
-    my MY $self = shift; $self->{cookie_jar};
+    my MY $self = shift; $self->{_cookie_jar};
   }
 
   sub content {
     my MY $self = shift;
-    unless (defined $self->{res}) {
+    unless (defined $self->{_res}) {
       undef;
-    } elsif (ref $self->{res}) {
-      $self->{res}->content;
+    } elsif (ref $self->{_res}) {
+      $self->{_res}->content;
     } else {
-      $self->{res};
+      $self->{_res};
     }
   }
 
@@ -214,7 +214,7 @@ my $Test = Test::Builder->new;
   package
     YATT::Lite::Test::TestFCGI::FCGIClient; sub MY () {__PACKAGE__}
   use parent qw(YATT::Lite::Test::TestFCGI);
-  use YATT::Lite::MFields qw(connection raw_error);
+  use YATT::Lite::MFields qw(_connection _raw_error);
 
   sub fork_server {
     my $self = shift;
@@ -238,11 +238,11 @@ my $Test = Test::Builder->new;
   use YATT::Lite::Util qw(terse_dump);
   sub request {
     (my MY $self, my ($method, $path, $query, $want_error)) = @_;
-    croak "Should run fork_server before request" unless $self->{kidpid};
+    croak "Should run fork_server before request" unless $self->{_kidpid};
 
     require FCGI::Client;
     my $client = FCGI::Client::Connection->new
-      (sock => $self->mkclientsock($self->{sockfile})
+      (sock => $self->mkclientsock($self->{_sockfile})
        , (timeout => (YATT::Lite::Util::is_debugging() ? 1800 :
                       $self->is_coverage_mode ? 120 : 10))
      );
@@ -251,8 +251,8 @@ my $Test = Test::Builder->new;
 	       , GATEWAY_INTERFACE => "FCGI::Client"
 	       , REQUEST_URI     => $path
 	       , PATH_INFO       => $path
-	       , DOCUMENT_ROOT   => $self->{cf_rootdir}
-	       , PATH_TRANSLATED => "$self->{cf_rootdir}$path"
+	       , DOCUMENT_ROOT   => $self->{rootdir}
+	       , PATH_TRANSLATED => "$self->{rootdir}$path"
 	       , REDIRECT_STATUS => 200
 	      };
     my @content;
@@ -267,7 +267,7 @@ my $Test = Test::Builder->new;
       }
     }
 
-    $self->{last_request} = do {
+    $self->{_last_request} = do {
       require HTTP::Request;
       my $req = HTTP::Request->new($env->{REQUEST_METHOD}
 				   , "http://localhost$path");
@@ -278,40 +278,40 @@ my $Test = Test::Builder->new;
     }
 
     print STDERR "# FCGI_REQUEST: ", terse_dump($env, @content), "\n"
-      if $self->{cf_debug_fcgi};
+      if $self->{debug_fcgi};
 
-    ($self->{raw_result}, $self->{raw_error}) = $client->request
+    ($self->{_raw_result}, $self->{_raw_error}) = $client->request
       ($env, @content);
 
-    print STDERR "# FCGI_RAW_RESULT: ", terse_dump($self->{raw_result}), "\n"
-      if $self->{cf_debug_fcgi};
-    print STDERR "# FCGI_RAW_ERROR: ", terse_dump($self->{raw_error}), "\n"
-      if $self->{cf_debug_fcgi};
+    print STDERR "# FCGI_RAW_RESULT: ", terse_dump($self->{_raw_result}), "\n"
+      if $self->{debug_fcgi};
+    print STDERR "# FCGI_RAW_ERROR: ", terse_dump($self->{_raw_error}), "\n"
+      if $self->{debug_fcgi};
 
-    if (defined $self->{raw_error} and $self->{raw_error} ne '') {
+    if (defined $self->{_raw_error} and $self->{_raw_error} ne '') {
       if ($want_error) {
-	$self->{res} = $self->{raw_error};
+	$self->{_res} = $self->{_raw_error};
 	return;
       }
-      print STDERR map {"# ERR: $_\n"} split /\r?\n/, $self->{raw_error};
+      print STDERR map {"# ERR: $_\n"} split /\r?\n/, $self->{_raw_error};
       die "error occured: " . terse_dump($method, $path, $query);
     }
 
-    # print STDERR "# ANS: ", terse_dump($self->{raw_result}, $self->{raw_error}), "\n";
+    # print STDERR "# ANS: ", terse_dump($self->{_raw_result}, $self->{_raw_error}), "\n";
 
-    unless (defined $self->{raw_result}) {
-      $self->{res} = undef;
+    unless (defined $self->{_raw_result}) {
+      $self->{_res} = undef;
       return;
     }
 
     # Status line を補う。
     my $res = do {
-      if ($self->{raw_result} =~ m{^HTTP/\d+\.\d+ \d+ }) {
-	$self->{raw_result}
-      } elsif ($self->{raw_result} =~ /^Status: (\d+ .*)/) {
-	"HTTP/1.0 $1\x0d\x0a$self->{raw_result}"
+      if ($self->{_raw_result} =~ m{^HTTP/\d+\.\d+ \d+ }) {
+	$self->{_raw_result}
+      } elsif ($self->{_raw_result} =~ /^Status: (\d+ .*)/) {
+	"HTTP/1.0 $1\x0d\x0a$self->{_raw_result}"
       } else {
-	"HTTP/1.0 200 Faked OK\x0d\x0a$self->{raw_result}"
+	"HTTP/1.0 200 Faked OK\x0d\x0a$self->{_raw_result}"
       }
     };
     $self->parse_result($res);
@@ -324,7 +324,7 @@ my $Test = Test::Builder->new;
   package
     YATT::Lite::Test::TestFCGI::cgi_fcgi; sub MY () {__PACKAGE__}
   use parent qw(YATT::Lite::Test::TestFCGI);
-  use YATT::Lite::MFields qw(wrapper);
+  use YATT::Lite::MFields qw(_wrapper);
 
   sub check_skip_reason {
     my MY $self = shift;
@@ -332,10 +332,10 @@ my $Test = Test::Builder->new;
     my $reason = $self->SUPER::check_skip_reason;
     return $reason if $reason;
 
-    $self->{wrapper} = MY->which('cgi-fcgi')
+    $self->{_wrapper} = MY->which('cgi-fcgi')
       or return 'cgi-fcgi is not installed';
 
-    unless (-x $self->{cf_fcgiscript}) {
+    unless (-x $self->{fcgiscript}) {
       return 'fcgi fcgiscript is not runnable';
     }
 
@@ -352,8 +352,8 @@ my $Test = Test::Builder->new;
     my $is_post = (local $ENV{REQUEST_METHOD} = uc($method)
 		   =~ m{^(POST|PUT)$});
     local $ENV{REQUEST_URI} = $path;
-    local $ENV{DOCUMENT_ROOT} = $self->{cf_rootdir};
-    local $ENV{PATH_TRANSLATED} = "$self->{cf_rootdir}$path";
+    local $ENV{DOCUMENT_ROOT} = $self->{rootdir};
+    local $ENV{PATH_TRANSLATED} = "$self->{rootdir}$path";
     local $ENV{QUERY_STRING} = $self->encode_query($query)
       unless $is_post;
     local $ENV{CONTENT_TYPE} = 'application/x-www-form-urlencoded'
@@ -364,8 +364,8 @@ my $Test = Test::Builder->new;
 
     # XXX: open3
     my $kid = open2 my $read, my $write
-      , $self->{wrapper}, qw(-bind -connect) => $self->{sockfile}
-	or die "Can't invoke $self->{wrapper}: $!";
+      , $self->{_wrapper}, qw(-bind -connect) => $self->{_sockfile}
+	or die "Can't invoke $self->{_wrapper}: $!";
     if ($is_post) {
       print $write $enc;
     }

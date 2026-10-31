@@ -22,13 +22,13 @@ require_ok(VFS);
 {
   package DummyFacade; sub MY () {__PACKAGE__}
   use base qw(YATT::Lite::Object);
-  use fields qw/cf_opts/;
+  use fields qw/opts/;
   sub error {
     shift; die @_;
   }
   sub find_neighbor {
     (my MY $self, my $dir) = @_;
-    YATT::Lite::VFS->new([dir => $dir], facade => $self, @{$self->{cf_opts}})
+    YATT::Lite::VFS->new([dir => $dir], facade => $self, @{$self->{opts}})
 	->root;
   }
 }
@@ -283,15 +283,19 @@ $i++; $theme = "[t$i] coexisting foo.yatt and foo/";
 
 {
   my $dir = TestFiles->new("$BASE/t$i", quiet => $quiet);
+  $dir->add('index.yatt', <<'END');
+AAA
+END
+
   $dir->add('foo.yatt', <<'END');
 ! base file=base.tmpl
-AAA
 BBB
 ! widget bar
 CCC
 END
 
-  $dir->add((my $foo = $dir->mkdir('foo')) . "/bar.yatt", <<'END');
+  my $foo = $dir->mkdir('foo');
+  $dir->add("$foo/bar.yatt", <<'END');
 DDD
 END
 
@@ -320,11 +324,19 @@ END
 {
   ok chdir(my $cwd = "$BASE/t". $i), "chdir [t$i]";
   my $root = VFS->new([dir => $cwd], @CF);
+
+  my $index = $root->find_part('index');
+  is $root->find_part_from($index, 'foo'), "BBB\n", "$theme - foo from index (sanity check)";
+  is $root->find_part_from($index, 'foo', 'bar')
+    , "CCC\n", "$theme - foo:bar from index (template file wins)";
+  is $root->find_part_from($index, 'foo', 'baz')
+    , "EEE\n", "$theme - foo:baz from index (dir is merged)";
+
   my $foo = $root->find_part('foo');
-  is $root->find_part_from($foo, 'bar'), "CCC\n", "$theme bar (template wins)";
-  is $root->find_part_from($foo, 'baz'), "EEE\n", "$theme baz (dir is merged)";
-  is $root->find_part_from($foo, 'qux'), "FFF\n", "$theme qux (cwd wins)";
-  is $root->find_part_from($foo, 'hoehoe'), "HHH\n", "$theme base is merged";
+  is $root->find_part_from($foo, 'bar'), "CCC\n", "$theme - bar (template wins)";
+  is $root->find_part_from($foo, 'baz'), "EEE\n", "$theme - baz (dir is merged)";
+  is $root->find_part_from($foo, 'qux'), "FFF\n", "$theme - qux (cwd wins)";
+  is $root->find_part_from($foo, 'hoehoe'), "HHH\n", "$theme - base is merged";
 }
 
 #========================================

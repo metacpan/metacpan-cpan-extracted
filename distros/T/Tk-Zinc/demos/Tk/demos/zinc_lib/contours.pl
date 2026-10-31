@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: contours.pl,v 1.8 2003/09/15 12:25:05 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 package contours; # for avoiding symbol collision between different demos
@@ -10,7 +10,7 @@ use Tk::Zinc;
 use strict;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 my $mw = MainWindow->new();
 

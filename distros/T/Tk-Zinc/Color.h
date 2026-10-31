@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Thu Dec 16 15:41:04 1999
  *
- * $Id: Color.h,v 1.15 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*

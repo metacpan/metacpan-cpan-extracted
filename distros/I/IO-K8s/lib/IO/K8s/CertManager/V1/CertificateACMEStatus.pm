@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateACMEStatus;
 # ABSTRACT: ACME stores information that is fetched from the ACME CA server.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s ari => '+IO::K8s::CertManager::V1::CertificateACMEARIStatus';
@@ -20,7 +20,7 @@ IO::K8s::CertManager::V1::CertificateACMEStatus - ACME stores information that i
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 ari
 
@@ -31,7 +31,7 @@ in accordance with RFC 9773. This is only populated if the ARI feature gate is e
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -59,5 +59,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -4,7 +4,7 @@ use warnings qw(FATAL all NONFATAL misc);
 
 use File::Path ();
 
-use YATT::Lite::Partial fields => [qw/cf_^app_root/]
+use YATT::Lite::Partial fields => [qw/^app_root/]
   , requires => [qw/error rel2abs/];
 
 # Note: Do *not* use YATT::Lite. YATT::Lite *uses* this.
@@ -12,12 +12,12 @@ use YATT::Lite::Partial fields => [qw/cf_^app_root/]
 sub app_path_expand {
   (my MY $self, my ($path, $in)) = @_;
   $self->app_path_is_replaced($path);
-  $self->app_path_normalize($path, $in // $self->{cf_app_root});
+  $self->app_path_normalize($path, $in // $self->{app_root});
 }
 
 sub app_path_is_replaced {
   my MY $self = shift;
-  $_[0] =~ s|^\@|$self->{cf_app_root}/|;
+  $_[0] =~ s|^\@|$self->{app_root}/|;
 }
 
 sub app_path_find_dir_in {
@@ -30,9 +30,8 @@ sub app_path_find_dir_in {
 sub app_path_normalize {
   (my MY $self, my ($path, $base)) = @_;
   my $normalized = $path =~ m{^/} ? $path : $self->rel2abs($path, $base);
-  1 while $normalized =~ s{/[^/\.]+/\.\.(?:/|$)}{/};
   # XXX: Should not point outside of $app_root.
-  $normalized;
+  YATT::Lite::Util::normalize_fs_path($normalized);
 }
 
 sub app_path_ensure_existing {
@@ -49,7 +48,7 @@ sub app_path_ensure_existing {
 
 sub app_path {
   (my MY $self, my ($fn, $nocheck)) = @_;
-  my $path = $self->{cf_app_root};
+  my $path = $self->{app_root};
   $path =~ s|/*$|/$fn|;
   if (not $nocheck and not -e $path) {
     $self->error_with_status(404, "Can't find app_path: %s", $path);

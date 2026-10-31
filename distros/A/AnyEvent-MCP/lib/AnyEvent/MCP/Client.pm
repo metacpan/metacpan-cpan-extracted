@@ -412,7 +412,9 @@ sub _input {
    for my $key (sort keys %$input) {
       last unless $self->{operations}{$id};
       my $request = $input->{$key};
-      unless (ref $request eq "HASH" && defined $request->{method} && ref ($request->{params} || {}) eq "HASH") {
+      unless (ref $request eq "HASH"
+              && defined $request->{method}
+              && ref ($request->{params} || {}) eq "HASH") {
          return $self->_finish ($id, 0, { transport => 1, message => "Invalid input request" })
       }
 

@@ -1,5 +1,5 @@
-# $Id: Zinc.pm,v 1.30 2005/05/16 12:27:51 lecoanet Exp $
-# $Name: cpan_3_0_4 $
+# $Id$
+# $Name$
 
 package Tk::Zinc;
 
@@ -13,8 +13,8 @@ Construct Tk::Widget 'Zinc';
 
 use vars qw($VERSION $REVISION);
 
-$REVISION = q$Revision: 1.30 $ ;  # this line is automagically modified by CVS
-$VERSION = 3.306;
+$REVISION = q$Revision$ ;  # this line is automagically modified by CVS
+$VERSION = 3.307;
 
 
 bootstrap Tk::Zinc $Tk::VERSION;
@@ -27,13 +27,13 @@ sub CreateOptions
 }
 
 Tk::Methods("add", "addtag", "anchorxy", "bbox", "becomes", "bind", "cget",
-	    "chggroup", "clone", "configure", "contour", "coords", "currentpart",
-	    "cursor", "dchars", "dtag", "find", "fit", "focus", "gdelete", "gettags",
-	    "gname", "group", "hasanchors", "hasfields", "hastag", "index",
-	    "insert", "itemcget", "itemconfigure", "lower", "monitor",
-	    "numparts", "postscript", "raise", "remove", "rotate", "scale",
-	    "select", "skew", "smooth", "tapply", "tcompose", "tdelete", "tget",
-	    "transform", "translate", "treset", "trestore", "tsave", "tset",
+	    "chggroup", "clone", "collapsemotions", "configure", "contour", "coords",
+      "currentpart", "cursor", "dchars", "dtag", "find", "fit", "focus",
+      "gdelete", "gettags", "gname", "group", "hasanchors", "hasfields",
+      "hastag", "index", "insert", "itemcget", "itemconfigure", "lower",
+      "monitor", "numparts", "postscript", "raise", "remove", "rotate",
+      "scale", "select", "skew", "smooth", "tapply", "tcompose", "tdelete",
+      "tget", "transform", "translate", "treset", "trestore", "tsave", "tset",
 	    "type", "vertexat", "xview", "yview");
 
 ## coord0 is a compatibility function usefull for porting old application

@@ -1,11 +1,11 @@
 #!/usr/bin/perl
-# $Id: atomic-groups.pl,v 1.3 2004/04/30 11:35:18 lecoanet Exp $
+# $Id$
 # this simple sample has been developped by C. Mertz mertz@cena.fr
 
 package atomic_groups;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

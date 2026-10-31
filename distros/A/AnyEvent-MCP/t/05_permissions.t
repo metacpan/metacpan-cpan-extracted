@@ -23,12 +23,27 @@ sub wait_for {
 my $dir = File::Temp::tempdir (CLEANUP => 1);
 local $ENV{XDG_CONFIG_HOME} = $dir;
 my $graph = { read => [], write => ["read"], all => ["write"] };
+sub with_dim {
+   my ($request, $name, $value, $choices) = @_;
+   +{ %$request, dimensions => {
+      %{$request->{dimensions} || {}},
+      $name => {
+         %{$request->{dimensions}{$name}},
+         value => $value,
+         choices => defined $choices ? $choices : [{ label => "any", match => "^" }],
+      },
+   } }
+}
+
 my $request = {
-   action => "read", subject => "/one/file",
-   subjects => [
-      { label => "file", subject => "/one/file" },
-      { label => "directory", subject => "^/one/" },
-   ],
+   action => "read",
+   dimensions => { subject => {
+      label => "File", value => "/one/file",
+      choices => [
+         { label => "file", match => "/one/file" },
+         { label => "directory", match => "^/one/" },
+      ],
+   } },
    sandbox_grants => ["write"], reason => "read the file",
 };
 my $p = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph);
@@ -49,13 +64,71 @@ my $broader = $p->resolve ($request, { request => $prepared, decision => { decis
 ok join (",", @{$broader->{sandbox_grants}}) eq "write", "broad selection cannot enlarge current grant";
 eval { $p->resolve ($request, { request => { %$prepared, reason => "different" }, decision => $decision }) };
 ok $@ =~ /does not match/, "approval bound to exact prepared request";
-eval { $p->check ({ %$request, subjects => [{ subject => "/other" }] }) };
+eval { $p->check (with_dim ($request, "subject", "/one/file", [{ label => "other", match => "/other" }])) };
 ok $@ =~ /scope does not match/, "offered scope must cover request";
-eval { $p->save ([{ decision => "allow", action => "^", "sandbox-grants" => "unknown" }]) };
-ok $@ =~ /Unknown/, "unknown stored capability rejected";
+
+my $default_request = {
+   %$request,
+   dimensions => { subject => {
+      %{$request->{dimensions}{subject}},
+      default => "^/one/",
+   } },
+};
+my $default_prepared = $p->check ($default_request)->{request};
+my $default_schema = AnyEvent::MCP::Permissions::Ask::schema ($default_prepared, "rule",
+   { decision => "allow-always" });
+is $default_schema->{properties}{dim_subject}{default}, "^/one/",
+   "permission dimension advertises a default matcher independent of choice order";
+is +(AnyEvent::MCP::Permissions::Ask::schema ($prepared, "rule",
+   { decision => "allow-always" }))->{properties}{dim_subject}{default}, "/one/file",
+   "without explicit default the first dimension choice stays selected";
+for my $bad ("/not-offered", undef, [], "") {
+   my $invalid = { %$default_request, dimensions => { subject => {
+      %{$default_request->{dimensions}{subject}}, default => $bad,
+   } } };
+   eval { $p->check ($invalid) };
+   like $@, qr/default was not offered/, "reject invalid dimension default";
+}
+
+# One obsolete saved rule invalidates the entire policy, without aborting checks.
+my $bad_file = "$dir/bad-rules.ini";
+my $file_perm = AnyEvent::MCP::Server::Permissions->new (file => $bad_file, sandbox_grants => $graph);
+my $write_bad = sub {
+   open my $fh, ">:raw", $bad_file or die $!;
+   print {$fh} $_[0];
+   close $fh or die $!;
+};
+$write_bad->("[rule]\ndecision=allow\naction=read\nsandbox-grants=write\n\n"
+   . "[rule]\ndecision=deny\naction=^\nsubject=/old\n");
+is_deeply $file_perm->rules, [], "one obsolete rule invalidates the entire saved policy";
+is $file_perm->check ($request)->{decision}, "ask",
+   "no earlier allow rule survives the invalid ruleset";
+{
+   open my $fh, "<:raw", $bad_file or die $!;
+   my $raw = do { local $/; <$fh> };
+   close $fh;
+   like $raw, qr/^subject=\/old$/m, "invalid read preserves original file";
+}
+$write_bad->("[rule]\ndecision=deny\naction=^\n\n"
+   . "[rule]\ndecision=allow\naction=read\nmatch.subject=^[\nsandbox-grants=write\n");
+is_deeply $file_perm->rules, [], "invalid matcher discards all saved rules";
+$write_bad->("[rule]\ndecision=deny\naction=^\n\n[unexpected]\naction=read\n");
+is_deeply $file_perm->rules, [], "invalid INI section discards all saved rules";
+$write_bad->("[rule]\ndecision=deny\naction=^\n\n"
+   . "[rule]\ndecision=allow\naction=read\nexpires=bad\nsandbox-grants=write\n");
+is_deeply $file_perm->rules, [], "invalid expiry discards all saved rules";
+my $bad_prepared = $file_perm->check ($request)->{request};
+my $bad_answer = AnyEvent::MCP::Permissions::Ask::build ($bad_prepared, {
+   decision => "allow-always", sandbox_grants => ["write"], dim_subject => "/one/file",
+});
+$file_perm->resolve ($request, { request => $bad_prepared, decision => $bad_answer });
+is $file_perm->check ($request)->{decision}, "allow",
+   "normal approval replaces invalid saved rules";
+is_deeply $file_perm->rules, [$bad_answer->{rule}],
+   "new save silently discards previous invalid rules";
 
 $p->save ([
-   { decision => "allow", action => "read", subject => "/one/file", "sandbox-grants" => "all" },
+   { decision => "allow", action => "read", "match.subject" => "/one/file", "sandbox-grants" => "all" },
    { decision => "deny", action => "^" },
 ]);
 ok $p->check ($request)->{decision} eq "allow", "first matching allowance wins";
@@ -71,19 +144,19 @@ ok $p->check ($request)->{decision} eq "ask", "ordered ask overrides later denia
 $p = AnyEvent::MCP::Server::Permissions->new (name => "example", sandbox_grants => $graph);
 $prepared = $p->check ($request)->{request};
 $decision = AnyEvent::MCP::Permissions::Ask::build ($prepared, {
-   decision => "allow-always", sandbox_grants => ["write"], subject => "^/one/",
+   decision => "allow-always", sandbox_grants => ["write"], dim_subject => "^/one/",
 });
 $p->resolve ($request, { request => $prepared, decision => $decision });
 ok -f $p->{file} && !((stat $p->{file})[2] & 077), "private persistent rule file";
 ok !-e "$p->{file}.lock", "permission persistence uses no separate lock file";
 chmod 0666, $p->{file} or die $!;
 ok $p->check ($request)->{decision} eq "allow", "user-selected rule permissions are accepted";
-ok $p->check ({ %$request, subject => "/one/other" })->{decision} eq "allow", "offered broad scope persisted";
-ok $p->check ({ %$request, subject => "/two/file", subjects => [] })->{decision} eq "ask", "persistent scope does not expand";
+ok $p->check (with_dim ($request, "subject", "/one/other"))->{decision} eq "allow", "offered broad scope persisted";
+ok $p->check (with_dim ($request, "subject", "/two/file", []))->{decision} eq "ask", "persistent scope does not expand";
 my $deny_request = { %$request, action => "other" };
 $prepared = $p->check ($deny_request)->{request};
 $decision = AnyEvent::MCP::Permissions::Ask::build ($prepared, {
-   decision => "deny-always", subject => "/one/file",
+   decision => "deny-always", dim_subject => "/one/file",
 });
 $p->resolve ($deny_request, { request => $prepared, decision => $decision });
 is +((stat $p->{file})[2] & 0777), 0666, "rule saves preserve the existing mode";
@@ -109,7 +182,7 @@ my $rule_schema = AnyEvent::MCP::Permissions::Ask::schema ($prepared, "rule", {
 ok !exists $schema->{properties}{subject}
    && !exists $schema->{properties}{sandbox_grants}
    && $schema->{properties}{message}
-   && $rule_schema->{properties}{subject}{enum}[1] eq "^/one/",
+   && $rule_schema->{properties}{dim_subject}{enum}[1] eq "^/one/",
    "only rule stage exposes persistent scope and editable grants";
 
 my ($success, $result);
@@ -218,10 +291,10 @@ $p->{rules} = [{ decision => "allow", action => "read", "sandbox-grants" => "wri
 ok $p->check ($request)->{decision} eq "allow", "explicit decision and action permit the grant";
 $p->{rules} = [];
 $prepared = $p->check ($request)->{request};
-eval { AnyEvent::MCP::Permissions::Ask::build ($prepared, { decision => "allow-always", sandbox_grants => ["read"], subject => "^/" }) };
+eval { AnyEvent::MCP::Permissions::Ask::build ($prepared, { decision => "allow-always", sandbox_grants => ["read"], dim_subject => "^/" }) };
 ok $@ =~ /not offered/, "unoffered persistent scope rejected";
 my $valid_scope = AnyEvent::MCP::Permissions::Ask::build ($prepared, {
-   decision => "allow-always", sandbox_grants => ["write"], subject => "/one/file",
+   decision => "allow-always", sandbox_grants => ["write"], dim_subject => "/one/file",
 });
 eval { $p->resolve ($request, { request => $prepared,
    decision => { %$valid_scope, rule => { %{$valid_scope->{rule}}, unrelated => "surprise" } },
@@ -307,75 +380,170 @@ ok $shared->check ({ action => "one", sandbox_grants => ["read"], reason => "one
    && $shared->check ({ action => "two", sandbox_grants => ["read"], reason => "two" })->{decision} eq "allow",
    "both concurrent grants usable";
 
-# A configured workdir is a separate, literal permission-rule dimension.
+# Workdir identity is just another dimension.
 my $wperm = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph);
 my $raw_workdir = "/projects/../projects/a";
-my $wreq = { action => "read", workdir => $raw_workdir,
-   sandbox_grants => ["read"], reason => "read selected workdir" };
+my $wreq = { action => "read", sandbox_grants => ["read"], reason => "selected workdir",
+   dimensions => { workdir => { label => "Workdir", value => $raw_workdir,
+      choices => [
+         { label => "This workdir", match => $raw_workdir },
+         { label => "Any workdir", match => "^" },
+      ],
+   } },
+};
 $wperm->save ([{ decision => "allow", action => "read",
-   workdir => $raw_workdir, "sandbox-grants" => "read" }]);
-ok $wperm->check ($wreq)->{decision} eq "allow", "exact configured workdir rule matches";
-ok $wperm->check ({ %$wreq, workdir => "/projects/b" })->{decision} eq "ask",
-   "workdir A allowance cannot authorize workdir B";
-my %unscoped = %$wreq;
-delete $unscoped{workdir};
-ok $wperm->check (\%unscoped)->{decision} eq "ask",
-   "selected-workdir rules cannot authorize unscoped all-workdirs authority";
-$wperm->save ([{ decision => "allow", action => "read", "sandbox-grants" => "read" }]);
-ok $wperm->check ($wreq)->{decision} eq "allow"
-   && $wperm->check ({ %$wreq, workdir => "/projects/b" })->{decision} eq "allow"
-   && $wperm->check (\%unscoped)->{decision} eq "allow",
-   "unscoped rule covers every workdir only when requested sandbox grants match";
+   "match.workdir" => $raw_workdir, "sandbox-grants" => "read" }]);
+is $wperm->check ($wreq)->{decision}, "allow", "selected workdir matches";
+is $wperm->check (with_dim ($wreq, "workdir", "/projects/b"))->{decision}, "ask",
+   "other workdir does not match";
+my %unscoped = (%$wreq, dimensions => {});
+is $wperm->check (\%unscoped)->{decision}, "ask", "missing workdir does not match";
 $wperm->save ([]);
 my $wprepared = $wperm->check ($wreq)->{request};
-my $wdecision = AnyEvent::MCP::Permissions::Ask::build ($wprepared, {
-   decision => "allow-always", sandbox_grants => ["read"],
-});
-my $wforged = { %$wdecision, rule => { %{$wdecision->{rule}}, workdir => "/projects/b" } };
-eval { $wperm->resolve ($wreq, { request => $wprepared, decision => $wforged }) };
-ok $@ =~ /workdir mismatch/, "forged permanent workdir identity is rejected";
-$wperm->resolve ($wreq, { request => $wprepared, decision => $wdecision });
-ok $wperm->rules->[0]{workdir} eq $raw_workdir
-   && $wperm->check ($wreq)->{decision} eq "allow",
-   "persistent allow-always retains verbatim configured workdir identity";
-ok $wperm->check ({ %$wreq, workdir => "/projects/a" })->{decision} eq "ask",
-   "equivalent but differently spelled workdir paths are distinct rule identities";
-
-$wperm->save ([]);
-$wprepared = $wperm->check ($wreq)->{request};
 my $workdir_form = AnyEvent::MCP::Permissions::Ask::schema ($wprepared, "rule",
    { decision => "allow-always" });
-is_deeply $workdir_form->{properties}{workdir_scope}{enum}, [qw(selected all)],
-   "native rule form offers selected or all workdirs";
-is $workdir_form->{properties}{workdir_scope}{default}, "selected",
-   "native rule form defaults to selected workdir";
-$wdecision = AnyEvent::MCP::Permissions::Ask::decision ($wprepared, {
-   action => "accept", content => {
-      decision => "allow-always", sandbox_grants => "read", workdir_scope => "all",
-   },
-}, "rule", { decision => "allow-always" });
-ok $wdecision->{workdir_scope} eq "all" && !exists $wdecision->{rule}{workdir},
-   "explicit all-workdirs choice creates an unscoped permission rule";
-$wperm->resolve ($wreq, { request => $wprepared, decision => $wdecision });
-ok $wperm->check ($wreq)->{decision} eq "allow"
-   && $wperm->check ({ %$wreq, workdir => "/projects/future" })->{decision} eq "allow",
-   "explicit unscoped rule covers future workdir selections";
-$wperm->save ([]);
-$wdecision = AnyEvent::MCP::Permissions::Ask::build ($wprepared, {
-   decision => "allow-always", sandbox_grants => ["read"], workdir_scope => "all",
+is_deeply $workdir_form->{properties}{dim_workdir}{enum}, [$raw_workdir, "^"],
+   "native form advertises workdir matcher choices";
+my $wdecision = AnyEvent::MCP::Permissions::Ask::build ($wprepared, {
+   decision => "allow-always", sandbox_grants => ["read"], dim_workdir => "^",
 });
-delete $wdecision->{workdir_scope};
-eval { $wperm->resolve ($wreq, { request => $wprepared, decision => $wdecision }) };
-ok $@ =~ /workdir mismatch/, "unscoped rule needs explicit all-workdirs approval";
-
+is $wdecision->{rule}{"match.workdir"}, "^", "any workdir is explicit matcher";
+$wperm->resolve ($wreq, { request => $wprepared, decision => $wdecision });
+is $wperm->check (with_dim ($wreq, "workdir", "/projects/future"))->{decision}, "allow",
+   "any-workdir matcher includes future workdirs";
 {
    local $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS} = "second-fs";
+   $wperm->save ([]);
    my $alias_request = $wperm->check ($wreq)->{request};
-   is $alias_request->{multibroker_alias}, "second-fs",
-      "multibroker prefix is included for permission display";
-   is $alias_request->{name}, undef,
-      "multibroker alias does not change permission policy name";
+   is $alias_request->{multibroker_alias}, "second-fs", "alias included in permission display";
 }
+# Independent origin and subject dimensions share one matching mechanism.
+my $origin_perm = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph);
+my $origin_req = {
+   action => "exec", sandbox_grants => [], reason => "execute browser code",
+   dimensions => {
+      subject => { label => "Code", value => 'execute:"tab":"code"',
+         choices => [{ label => "this code", match => 'execute:"tab":"code"' }] },
+      origin => { label => "Origin", value => "https://example.com:8443",
+         choices => [
+            { label => "exact", match => "https://example.com:8443" },
+            { label => "any port", match => '^https:\/\/example\.com(?::[0-9]+)?\z' },
+            { label => "any origin", match => "^" },
+         ] },
+   },
+};
+my $origin_prepared = $origin_perm->check ($origin_req)->{request};
+my $origin_schema = AnyEvent::MCP::Permissions::Ask::schema ($origin_prepared, "rule",
+   { decision => "allow-always" });
+is_deeply $origin_schema->{properties}{dim_origin}{enum},
+   [map $_->{match}, @{$origin_req->{dimensions}{origin}{choices}}],
+   "native rule editor exposes origin scopes";
+my $origin_decision = AnyEvent::MCP::Permissions::Ask::build ($origin_prepared, {
+   decision => "allow-always", sandbox_grants => [],
+   dim_subject => $origin_req->{dimensions}{subject}{value},
+   dim_origin => $origin_req->{dimensions}{origin}{value},
+});
+$origin_perm->resolve ($origin_req, { request => $origin_prepared, decision => $origin_decision });
+is $origin_perm->check ($origin_req)->{decision}, "allow", "exact origin rule matches";
+is $origin_perm->check (with_dim ($origin_req, "origin", "https://example.com:9443"))->{decision}, "ask",
+   "exact origin does not cover another port";
+is $origin_perm->check (with_dim ($origin_req, "subject", "other"))->{decision}, "ask",
+   "origin permission cannot bypass subject identity";
+$origin_perm->save ([]);
+$origin_prepared = $origin_perm->check ($origin_req)->{request};
+$origin_decision = AnyEvent::MCP::Permissions::Ask::decision ($origin_prepared, {
+   action => "accept", content => {
+      decision => "allow-always", sandbox_grants => "",
+      dim_subject => $origin_req->{dimensions}{subject}{value},
+      dim_origin => $origin_req->{dimensions}{origin}{choices}[1]{match},
+   },
+}, "rule", { decision => "allow-always" });
+$origin_perm->resolve ($origin_req, { request => $origin_prepared, decision => $origin_decision });
+is $origin_perm->check (with_dim ($origin_req, "origin", "https://example.com:9443"))->{decision},
+   "allow", "any-port origin scope allows another port";
+is $origin_perm->check (with_dim ($origin_req, "origin", "http://example.com:8443"))->{decision},
+   "ask", "any-port scope preserves scheme";
+$origin_perm->save ([]);
+eval { AnyEvent::MCP::Permissions::Ask::build ($origin_prepared, {
+   decision => "allow-always", sandbox_grants => [],
+   dim_subject => $origin_req->{dimensions}{subject}{value}, dim_origin => "https://other.example",
+}) };
+like $@, qr/scope was not offered/, "forged origin scope rejected";
+$origin_perm->save ([{ decision => "allow", action => "exec", "sandbox-grants" => "" }]);
+is $origin_perm->check ($origin_req)->{decision}, "allow", "explicit unscoped manual rule matches";
+
+# Exercise the native MCP elicitation path with an external permission helper.
+# Both the helper's rule and the relayed MCP response must retain origin.
+my $relay_perm = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph, ask => "mcp");
+$server = AnyEvent::MCP::Server::HTTP->new (auth => "none", on_tools_call => sub {
+   my ($server, $req) = @_;
+   $relay_perm->require ($req, $origin_req, sub {
+      $_[0] ? $req->result ({ allowed => 1 }) : $req->error ($_[1]);
+   });
+});
+$server->listen;
+my $relay_forms = 0;
+$client = AnyEvent::MCP::Client::HTTP->new (
+   url => $server->url, client_capabilities => { elicitation => { form => {} } },
+   on_request => sub {
+      ++$relay_forms;
+      AnyEvent::MCP::Permissions::Ask->elicitation ($_[1], helper => [
+         $^X, "-Ilib", "-MJSON::XS", "-MAnyEvent::MCP::Permissions::Ask", "-e", '
+            my $request = JSON::XS::decode_json (do { local $/; <STDIN> });
+            my $result = $request->{_permission_stage} eq "rule"
+               ? AnyEvent::MCP::Permissions::Ask::build ($request, {
+                    decision => "allow-always", sandbox_grants => [],
+                    dim_subject => $request->{dimensions}{subject}{choices}[0]{match},
+                    dim_origin => $request->{dimensions}{origin}{choices}[0]{match},
+                 }, "rule", $request->{_permission_selection})
+               : { decision => "allow-always" };
+            print JSON::XS::encode_json $result;
+         ',
+      ]);
+   },
+);
+($success, $result) = wait_for (sub { $client->call (execute => {}, $_[0]) });
+ok $success && $result->{structuredContent}{allowed} && $relay_forms == 2,
+   "external helper completes both MCP permission forms with origin scope";
+is $relay_perm->rules->[0]{"match.origin"}, $origin_req->{dimensions}{origin}{value},
+   "helper-selected origin survives native elicitation and is persisted";
+is $relay_perm->check ({
+   %{with_dim ($origin_req, "origin", "https://other.example")},
+})->{decision}, "ask", "relayed origin rule cannot authorize another origin";
+$client->close;
+$server->close;
+
+# A dimension with a name unknown to the engine works without special cases.
+my $custom_perm = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph);
+my $custom_req = {
+   action => "read", sandbox_grants => [], reason => "custom resource",
+   dimensions => { tenant => {
+      label => "Tenant", value => "acme",
+      choices => [
+         { label => "This tenant", match => "acme" },
+         { label => "Any tenant", match => "^" },
+      ],
+   } },
+};
+my $custom_prepared = $custom_perm->check ($custom_req)->{request};
+my $custom_schema = AnyEvent::MCP::Permissions::Ask::schema ($custom_prepared,
+   "rule", { decision => "allow-always" });
+is_deeply $custom_schema->{properties}{dim_tenant}{enum}, ["acme", "^"],
+   "unknown named dimension appears automatically in native rule editor";
+my $custom_decision = AnyEvent::MCP::Permissions::Ask::build ($custom_prepared, {
+   decision => "allow-always", sandbox_grants => [], dim_tenant => "acme",
+});
+$custom_perm->resolve ($custom_req, { request => $custom_prepared, decision => $custom_decision });
+is $custom_perm->rules->[0]{"match.tenant"}, "acme",
+   "unknown dimension matcher persists under generic rule key";
+is $custom_perm->check (with_dim ($custom_req, "tenant", "other"))->{decision}, "ask",
+   "saved arbitrary dimension cannot authorize another identity";
+eval { $custom_perm->check ({ %$custom_req, subject => "old field" }) };
+like $@, qr/Obsolete permission request scope/, "obsolete request scope fails closed";
+eval { $custom_perm->check ({ %$custom_req, dimensions => { tenant => {
+   label => "Tenant", value => "acme", choices => [{ label => "wrong", match => "other" }],
+} } }) };
+like $@, qr/scope does not match/, "unmatched arbitrary dimension choice rejected";
 
 # Human permission messages work on allows and denies.
 my $reason_perm = AnyEvent::MCP::Server::Permissions->new (
@@ -423,9 +591,6 @@ ok $reopened->check ({ %$reason_req, sandbox_grants => ["write"],
 eval { $reopened->require_permission ({}, $reason_req) };
 ok $@ =~ /Permission denied: Use the Vim buffer instead/,
    "synchronous tool errors expose persisted denial message";
-eval { $reopened->save ([{ decision => "allow", action => "read", "sandbox-grants" => "read",
-   path => "/root/SCHMORP-PERL.md" }]) };
-ok $@ =~ /Only deny rules/, "exact-path matching cannot expand allow authority";
 eval { AnyEvent::MCP::Permissions::Ask::build ($reason_prepared, {
    decision => "deny-always", path => "/root/another-file",
 }) };
@@ -438,14 +603,6 @@ ok $allowed_with_reason->{decision} eq "allow-once"
    && !exists $allowed_with_reason->{message},
    "approval ignores the denial-only message from form answers";
 
-eval { $reopened->save ([{ decision => "allow", action => "read",
-   "sandbox-grants" => "read", message => "Inappropriate message" }]) };
-ok $@ =~ /Only deny rules/, "persistent allow rules cannot carry denial messages";
-
-$reopened->save ([{ decision => "deny", action => "read",
-   "denial-reason" => "Old persisted reason" }]);
-ok $reopened->check ($reason_req)->{message} eq "Old persisted reason",
-   "legacy denial-reason rules still work with the new message field";
 
 {
    local $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} = "auto";
@@ -544,8 +701,6 @@ print JSON::XS::encode_json { decision => "allow-once", sandbox_grants => $reque
    my $memory = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph, rules => \@rules);
    is_deeply $memory->rules, [@rules[2, 3]], "in-memory rules use the same expiry filtering";
    for my $bad (undef, "", "-1", "1.5", "tomorrow", []) {
-      eval { $permissions->save ([{ decision => "deny", action => "^", expires => $bad }]) };
-      like $@, qr/Invalid permission rule expiry/, "invalid expiry is rejected on save";
       $memory->{rules} = [{ decision => "deny", action => "^", expires => $bad }];
       eval { $memory->rules };
       like $@, qr/Invalid permission rule expiry/, "invalid expiry is rejected on read";
@@ -565,7 +720,7 @@ print JSON::XS::encode_json { decision => "allow-once", sandbox_grants => $reque
          my $before = time;
          my $decision = AnyEvent::MCP::Permissions::Ask::decision ($prepared, {
             action => "accept", content => {
-               decision => $choice, sandbox_grants => "write", subject => "/one/file", lifetime => $lifetime,
+               decision => $choice, sandbox_grants => "write", dim_subject => "/one/file", lifetime => $lifetime,
             },
          }, "rule", { decision => $choice });
          $permissions->resolve ($request, { request => $prepared, decision => $decision });
@@ -580,7 +735,7 @@ print JSON::XS::encode_json { decision => "allow-once", sandbox_grants => $reque
    }
    for my $bad ("", "3600", "forever", []) {
       eval { AnyEvent::MCP::Permissions::Ask::build ($prepared, {
-         decision => "deny-always", subject => "/one/file", lifetime => $bad,
+         decision => "deny-always", dim_subject => "/one/file", lifetime => $bad,
       }) };
       like $@, qr/Invalid permission rule lifetime/, "unoffered lifetime is rejected";
    }

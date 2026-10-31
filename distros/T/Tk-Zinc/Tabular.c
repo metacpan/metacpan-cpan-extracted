@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Tabular.c,v 1.30 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -26,8 +26,6 @@
 #include <stdlib.h>
 
 
-static const char rcsid[] = "$Id: Tabular.c,v 1.30 2005/05/10 07:59:48 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -53,6 +51,9 @@ typedef struct _TabularItemStruct {
 static ZnAttrConfig     tabular_attrs[] = {
   { ZN_CONFIG_ANCHOR, "-anchor", NULL,
     Tk_Offset(TabularItemStruct, anchor), 0, ZN_COORDS_FLAG, False },
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(TabularItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
     Tk_Offset(TabularItemStruct, header.flags), ZN_COMPOSE_ALPHA_BIT,
     ZN_DRAW_FLAG, False },
@@ -100,7 +101,7 @@ static ZnAttrConfig     tabular_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   ZnWInfo       *wi = item->wi;
   TabularItem   tab = (TabularItem) item;
@@ -111,6 +112,7 @@ Init(ZnItem             item,
 
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
@@ -133,7 +135,7 @@ Init(ZnItem             item,
     ZnFIELD.InitFields(field_set);
   }
   else {
-    Tcl_AppendResult(wi->interp, " number of fields expected", NULL);
+    Tcl_AppendResult(wi->interp, " number of fields expected", (char *) NULL);
     return TCL_ERROR;
   }    
   
@@ -184,7 +186,7 @@ Destroy(ZnItem  item)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   ZnItem        old_connected;
@@ -192,6 +194,7 @@ Configure(ZnItem        item,
   old_connected = item->connected_item;
   if (ZnConfigureAttributes(item->wi, item, item, tabular_attrs,
                             argc, argv, flags) == TCL_ERROR) {
+    item->connected_item = old_connected;
     return TCL_ERROR;
   }
   if (ISSET(*flags, ZN_ITEM_FLAG)) {
@@ -223,7 +226,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, tabular_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -501,13 +504,13 @@ Coords(ZnItem           item,
   
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " tabulars can't add or remove vertices", NULL);
+                     " tabulars can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if ((cmd == ZN_COORDS_REPLACE) || (cmd == ZN_COORDS_REPLACE_ALL)) {
     if (*num_pts == 0) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 1 point on tabulars", NULL);
+                       " coords command need 1 point on tabulars", (char *) NULL);
       return TCL_ERROR;
     }
     tabular->pos = (*pts)[0];
@@ -551,7 +554,7 @@ Part(ZnItem     item,
     }
     else {
     part_error:
-      Tcl_AppendResult(item->wi->interp, " invalid item part specification", NULL);
+      Tcl_AppendResult(item->wi->interp, " invalid item part specification", (char *) NULL);
       return TCL_ERROR; 
     }
   }
@@ -696,6 +699,7 @@ static ZnItemClassStruct TABULAR_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

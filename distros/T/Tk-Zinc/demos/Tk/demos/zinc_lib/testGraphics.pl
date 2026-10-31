@@ -6,11 +6,11 @@
 #
 #      Authors: Jean-Luc Vinot <vinot@cena.fr>
 #
-# $Id: testGraphics.pl,v 1.13 2004/09/21 12:41:55 mertz Exp $
+# $Id$
 #-----------------------------------------------------------------------------------
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

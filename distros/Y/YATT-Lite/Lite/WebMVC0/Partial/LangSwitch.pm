@@ -8,10 +8,10 @@ use mro 'c3'; # XXX: Is this ok?
 
 use YATT::Lite::Partial
   (requires => [qw/error/]
-   , fields => [qw/cf_lang_list
-		   cf_debug_lang
+   , fields => [qw/lang_list
+		   debug_lang
 		  /
-                , [cf_default_lang => only_if_missing => 1]
+                , [default_lang => only_if_missing => 1]
 
               ]
    , -Entity, -CON, -SYS
@@ -19,7 +19,7 @@ use YATT::Lite::Partial
 
 Entity default_lang => sub {
   my MY $self = $SYS;
-  $self->{cf_default_lang} // 'en';
+  $self->{default_lang} // 'en';
 };
 
 Entity current_lang => sub {
@@ -36,7 +36,7 @@ sub before_dirhandler {
 sub load_current_lang {
   (my MY $self, my ($con, $user)) = @_;
 
-  $con->logdump("lang.init") if $self->{cf_debug_lang};
+  $con->logdump("lang.init") if $self->{debug_lang};
 
   if (not $user
       and my $sub = $self->can("load_current_user")) {
@@ -65,7 +65,7 @@ sub load_current_lang {
 
   my $yatt = $con->cget('yatt');
   $lang ||= +$con->accept_language(filter =>
-				   $self->{cf_lang_list} // [qw/en ja/])
+				   $self->{lang_list} // [qw/en ja/])
     || $yatt->default_lang;
   $con->configure(lang => $lang);
   $yatt->get_lang_msg($lang);

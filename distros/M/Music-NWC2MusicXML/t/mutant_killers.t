@@ -36,6 +36,7 @@ use lib 'lib';
 use Music::NWC2MusicXML::Event;
 use Music::NWC2MusicXML::NWC;
 use Music::NWC2MusicXML::MusicXML;
+use Music::NWC2MusicXML::Parser;
 use Music::NWC2MusicXML::Score;
 use Music::NWC2MusicXML::Staff;
 
@@ -292,6 +293,34 @@ subtest 'PREV_NOT_NEXT: fermata annotates the note AFTER the TempoVariance recor
 	$gen->_annotate_fermatas([$note1, $tv, $note2], \%ann);
 	ok !$ann{"$note1"}{fermata}, 'note1 (before TV:Fermata) does NOT get fermata';
 	ok  $ann{"$note2"}{fermata}, 'note2 (after TV:Fermata) gets fermata';
+};
+
+# ---------------------------------------------------------------------------
+# DISPATCH_ALIAS_DYNAMICVARIANCE: both DynVariance and DynamicVariance must
+# route to _handle_dyn_variance and produce a DynVariance event.
+#
+# Mutation: remove DynamicVariance entry from %DISPATCH -> record stored as
+# UnsupportedEvent instead -> event type is not 'DynVariance'.
+# Kill: assert event type eq 'DynVariance' for a DynamicVariance record.
+# ---------------------------------------------------------------------------
+
+subtest 'DISPATCH_ALIAS_DYNAMICVARIANCE: DynamicVariance record produces DynVariance event' => sub {
+	my $nwctxt = "!NoteWorthyComposer(2.751)\n"
+		. "|AddStaff|Name:\"Trumpet\"\n"
+		. "|Clef|Type:Treble\n"
+		. "|Key|Signature:Concert\n"
+		. "|TimeSig|Signature:4/4\n"
+		. "|DynamicVariance|Style:Crescendo|Pos:-8\n"
+		. "|Note|Dur:Half|Pos:0\n"
+		. "!NoteWorthyComposer-End\n";
+
+	my $score = Music::NWC2MusicXML::Parser->new->parse($nwctxt);
+	my @evs   = grep { $_->type eq 'DynVariance' } @{ $score->staves->[0]->events };
+
+	is scalar @evs, 1,
+		'DynamicVariance alias: exactly one DynVariance event produced (not UnsupportedEvent)';
+	is $evs[0]->data->{style}, 'Crescendo',
+		'DynamicVariance alias: style field parsed correctly';
 };
 
 done_testing();

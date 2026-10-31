@@ -1,0 +1,153 @@
+#!/bin/env perl
+########################################################################
+# Prepend blib/arch/auto dirs to LD_LIBRARY_PATH for in-place XS testing.
+# See POD for abspath vs. noabspath walk behavior.
+########################################################################
+
+use strict;
+use warnings;
+use feature 'say';
+
+use FindBin::Bin
+qw
+(
+    $Bin_l
+    $Bin_p
+);
+
+# Default abspath => 1: walk starts from $Bin_p (physical, symlinks resolved).
+# Change to qw( ld_lib base=blib subdir=arch/auto subonly noabspath )
+# to walk from $Bin_l instead (logical, symlinks preserved).
+
+use FindBin::libs
+qw
+(
+    ld_lib
+    base=blib
+    subdir=arch/auto
+    subonly
+);
+
+say "logical  bin (\$Bin_l): $Bin_l";
+say "physical bin (\$Bin_p): $Bin_p";
+
+if( $Bin_l eq $Bin_p )
+{
+    say "\nNo symlinks in path: both values are identical.";
+}
+else
+{
+    say "\nSymlinks in path: logical and physical paths differ.";
+    say "FindBin::libs walked from: $Bin_p (abspath default)";
+}
+
+say '';
+say 'LD_LIBRARY_PATH after FindBin::libs:';
+
+if( my $ldpath = $ENV{ LD_LIBRARY_PATH } )
+{
+    say "  $_" for split /:+/, $ldpath;
+}
+else
+{
+    say '  (empty -- no blib/arch/auto dirs found)';
+}
+
+=head1 NAME
+
+find_ld_dirs - prepend blib/arch/auto dirs to LD_LIBRARY_PATH
+
+=head1 SYNOPSIS
+
+    find_ld_dirs
+
+    # To walk from the logical bin ($Bin_l) instead of the physical
+    # ($Bin_p), add "noabspath" to the FindBin::libs import:
+    #
+    #   use FindBin::libs qw( ld_lib base=blib subdir=arch/auto subonly noabspath );
+
+=head1 DESCRIPTION
+
+Walks up from the script's bin directory collecting C<blib/arch/auto>
+subdirectories and prepending them to C<LD_LIBRARY_PATH>.  Useful when
+running XS modules whose F<.so> files live under a local C<blib> tree
+built with C<make>.
+
+The walk uses C<subonly>: only C<blib/arch/auto> dirs are added, not bare
+C<blib> dirs.
+
+=head2 abspath vs. noabspath
+
+C<FindBin::libs> starts its directory walk from one of two paths exported
+by L<FindBin::Bin>:
+
+=over 4
+
+=item abspath (default)
+
+Walks from C<$Bin_p>, the I<physical> path resolved by C<Cwd::abs_path>.
+All directory symlinks are resolved before the walk begins (like C<pwd -P>).
+
+    # /home/user/app -> /work/projects/app   (directory symlink)
+    # invoked as: /home/user/app/bin/myscript
+
+    abspath walk: /work/projects/app/bin -> /work/projects/app -> ...
+    finds: /work/projects/app/blib/arch/auto
+
+This is the default: the C<blib> tree is always found next to where the
+source file actually lives on disk, regardless of how the script was invoked.
+
+=item noabspath
+
+Walks from C<$Bin_l>, the I<logical> path computed by C<canon_dir>.
+Directory symlinks are left in place (like C<pwd -L>).
+
+    # Same layout as above.
+
+    noabspath walk: /home/user/app/bin -> /home/user/app -> /home/user -> ...
+    finds: /home/user/blib/arch/auto  (if it exists)
+
+Use C<noabspath> when the script is invoked through a directory symlink
+that sits inside a sandbox with its own C<blib> tree:
+
+    /sandbox/
+    +-- blib/arch/auto/MyMod/MyMod.so   # test .so built here
+    \-- app -> /work/projects/app        # symlink to real bin/
+
+    noabspath walk: /sandbox/app/bin -> /sandbox/app -> /sandbox
+    finds: /sandbox/blib/arch/auto      # picks up the test .so
+
+=back
+
+=head2 FindBin::Bin: $Bin_l and $Bin_p
+
+C<FindBin::Bin> exports three variables for the directory containing
+the running script:
+
+=over 4
+
+=item C<$Bin_l>
+
+Logical path (C<canon_dir>, like C<pwd -L>).  Removes C<..> and C<.>
+segments without touching the filesystem; symlinks are preserved.
+
+=item C<$Bin_p>
+
+Physical path (C<Cwd::abs_path>, like C<pwd -P>).  Resolves all
+directory symlinks to their real on-disk location.
+
+=item C<$Bin>
+
+An alias.  Equals C<$Bin_l> by default; equals C<$Bin_p> when the
+caller passes C<abspath> to C<FindBin::Bin>:
+
+    use FindBin::Bin qw( $Bin );            # $Bin == $Bin_l  (default)
+    use FindBin::Bin qw( $Bin abspath );    # $Bin == $Bin_p
+
+=back
+
+=head1 SEE ALSO
+
+L<FindBin::Bin>, L<FindBin::libs>, L<FindBin::Parents>
+
+=cut

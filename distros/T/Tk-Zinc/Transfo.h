@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Transfo.h,v 1.8 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*

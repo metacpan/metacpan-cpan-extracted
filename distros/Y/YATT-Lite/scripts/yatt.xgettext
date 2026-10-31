@@ -4,6 +4,7 @@
   use strict;
   use warnings qw(FATAL all NONFATAL misc);
   use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+  sub MY () {__PACKAGE__}
   #----------------------------------------
   use YATT::Lite::Factory;
   use YATT::Lite::Entities qw(*YATT *CON *SYS);
@@ -17,11 +18,11 @@
   use parent qw/YATT::Lite::Object/;
   use YATT::Lite::MFields
     qw/site
-       cf_write
-       cf_lang
-       cf_quiet
-       cf_dir
-       cf_merge
+       write
+       lang
+       quiet
+       dir
+       merge
       /;
 
   #----------------------------------------
@@ -33,7 +34,7 @@
 					 , m => 'merge'
 					}));
 
-  my $site = YATT::Lite::Factory->load_factory_offline(dir => $cmd->{cf_dir})
+  my $site = YATT::Lite::Factory->load_factory_offline(dir => $cmd->{dir})
     or die "Can't find YATT app script!\n";
 
   $cmd->{site} = $site;
@@ -42,21 +43,21 @@
     if (-d $path) {
       my $yatt = $site->load_yatt($path);
       $yatt->configure(debug_cgen => $ENV{DEBUG});
-      my $saveas = $yatt->fn_msgfile($cmd->{cf_lang});
-      if ($cmd->{cf_merge} || $cmd->{cf_write}) {
-	$yatt->get_lang_msg($cmd->{cf_lang});
+      my $saveas = $yatt->fn_msgfile($cmd->{lang});
+      if ($cmd->{merge} || $cmd->{write}) {
+	$yatt->get_lang_msg($cmd->{lang});
       }
       # XXX: Work around for ns confliction bug.
       my @items = public_only($yatt, $yatt->list_items);
-      unless ($cmd->{cf_quiet}) {
+      unless ($cmd->{quiet}) {
 	print STDERR join("\n  ", "parsing:", @items), "\n";
       }
 
-      my @msglist = $yatt->lang_extract_lcmsg($cmd->{cf_lang}, \@items);
+      my @msglist = $yatt->lang_extract_lcmsg($cmd->{lang}, \@items);
       unless (-r $saveas) {
 	unshift @msglist, $cmd->default_header;
       }
-      if ($cmd->{cf_write}) {
+      if ($cmd->{write}) {
 	Locale::PO->save_file_fromarray($saveas, \@msglist);
 	print "Saved: $saveas\n";
       } else {
@@ -70,7 +71,7 @@
 
 sub after_new {
   (my MY $self) = @_;
-  $self->{cf_lang} ||= $self->default_lang;
+  $self->{lang} ||= $self->default_lang;
 }
 
 sub default_lang {'en'}

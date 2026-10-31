@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 SYNOPSIS
 
@@ -245,21 +245,28 @@ C<Colour index must be a non-negative integer> for an index that is not one.
 
 sub palette
 {
-	my ($self, $scheme) = @_;
-
-	return [ @{_categorical_scheme($scheme)->{colours}} ];
+	my $self = shift;
+	my $params = Params::Validate::Strict::validate_strict({
+		args   => Params::Get::get_params('scheme', \@_) // {},
+		schema => { scheme => { type => 'string' } },
+	});
+	return [ @{_categorical_scheme($params->{scheme})->{colours}} ];
 }
 
 sub colour_at
 {
-	my ($self, $scheme, $index) = @_;
-
+	my $self = shift;
+	my ($scheme, $index);
+	if (@_ == 1 && ref($_[0]) eq 'HASH') {
+		my $h = $_[0];
+		$scheme = $h->{scheme};
+		$index  = $h->{index};
+	} else {
+		($scheme, $index) = @_;
+	}
 	die 'Colour index must be a non-negative integer'
-		unless defined($index) && looks_like_number($index)
-			&& $index == int($index) && $index >= 0;
-
+		unless defined($index) && $index =~ /\A[0-9]+\z/;
 	my $colours = _categorical_scheme($scheme)->{colours};
-
 	return $colours->[$index % scalar(@$colours)];
 }
 
@@ -311,12 +318,18 @@ Returns a string containing the HTML and JavaScript code for the chart.
 
 # Method to render a bar chart with given data
 sub render_bar_chart {
-	my ($self, $data) = @_;
-
-	die 'Data is not optional' if(!defined($data));
-
-	# Validate input data to ensure it is an array of arrays
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self  = shift;
+	my $first = @_ ? $_[0] : undef;
+	my $raw   = Params::Get::get_params('data', \@_) // {};
+	if (!defined($raw->{data})) {
+		die(defined($first) ? 'Data must be an array of arrays' : 'Data is not optional');
+	}
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	# Generate JSON representation of data
 	my $json_data = $_JSON->encode([
@@ -429,10 +442,18 @@ Returns a string containing the complete HTML5 document.
 =cut
 
 sub render_animated_bar_chart {
-	my ($self, $data) = @_;
-
-	die 'Data is not optional' if(!defined($data));
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self  = shift;
+	my $first = @_ ? $_[0] : undef;
+	my $raw   = Params::Get::get_params('data', \@_) // {};
+	if (!defined($raw->{data})) {
+		die(defined($first) ? 'Data must be an array of arrays' : 'Data is not optional');
+	}
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
@@ -539,10 +560,15 @@ Returns a string containing the HTML and JavaScript code for the chart.
 =cut
 
 sub render_line_chart {
-	my ($self, $data) = @_;
-
-	# Validate input data
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	# Generate JSON for data
 	my $json_data = $_JSON->encode([
@@ -661,9 +687,15 @@ Returns a string containing the complete HTML5 document.
 =cut
 
 sub render_animated_line_chart {
-	my ($self, $data) = @_;
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
@@ -814,11 +846,19 @@ Returns a string containing the complete HTML5 document.
 =cut
 
 sub render_pie_chart {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data is not optional' if(!defined($data));
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self  = shift;
+	my $first = @_ ? $_[0] : undef;
+	my $raw   = Params::Get::get_params('data', \@_) // {};
+	if (!defined($raw->{data})) {
+		die(defined($first) ? 'Data must be an array of arrays' : 'Data is not optional');
+	}
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $separator = $opts->{separator} // '/';
 
@@ -970,11 +1010,19 @@ Returns a string containing the complete HTML5 document.
 =cut
 
 sub render_animated_pie_chart {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data is not optional' if(!defined($data));
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self  = shift;
+	my $first = @_ ? $_[0] : undef;
+	my $raw   = Params::Get::get_params('data', \@_) // {};
+	if (!defined($raw->{data})) {
+		die(defined($first) ? 'Data must be an array of arrays' : 'Data is not optional');
+	}
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $separator = $opts->{separator} // '/';
 
@@ -1158,10 +1206,16 @@ C<Label / 12.34 (42.0%)>, C<':'> produces C<Label : 12.34 (42.0%)>).
 =cut
 
 sub render_pie_chart_snippet {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $animated     = $opts->{animated}    ? 1 : 0;
 	my $donut        = $opts->{donut}       ? 1 : 0;
@@ -1500,10 +1554,16 @@ the browser.
 =cut
 
 sub render_heatmap_snippet {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my %color_scheme_map = (
 		YlOrRd  => 'd3.interpolateYlOrRd',
@@ -1861,10 +1921,16 @@ invalid sort_bars value.
 =cut
 
 sub render_bar_chart_snippet {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $orientation = $opts->{orientation} // 'vertical';
 	die "orientation must be 'vertical' or 'horizontal'"
@@ -2244,10 +2310,15 @@ letter not appear literally inside C<< <script> >> blocks.
 
 sub render_line_chart_with_tooltips
 {
-	my ($self, $data) = @_;
-
-	# Validate input data
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	# Generate JSON for data
 	my $json_data = $_JSON->encode([
@@ -2439,10 +2510,16 @@ None.  The method is read-only.
 
 sub render_line_chart_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $json_data = $_JSON->encode([
 		map {
@@ -2608,10 +2685,16 @@ Dies with I<Data must be an array of arrays> if C<$data> is not an arrayref.
 
 sub render_zoomable_line_chart_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $json_data = $_JSON->encode([
 		map {
@@ -2888,10 +2971,15 @@ Tooltip strings use C<< <\/b> >> rather than C<< </b> >> for html-tidy complianc
 
 sub render_multi_series_line_chart_with_tooltips
 {
-	my ($self, $data) = @_;
-
-	# Validate input data
-	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of hashes' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of hashes' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	my $json_data = $_JSON->encode($data);
 
@@ -3050,10 +3138,15 @@ Tooltip strings use C<< <\/b> >> for html-tidy compliance.
 
 sub render_multi_series_line_chart_with_animated_tooltips
 {
-	my ($self, $data) = @_;
-
-	# Validate input data
-	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of hashes' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of hashes' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	# Generate JSON for data
 	my $json_data = $_JSON->encode($data);
@@ -3216,10 +3309,15 @@ a C<.legend> CSS class used by the D3-generated legend elements.
 =cut
 
 sub render_multi_series_line_chart_with_legends {
-	my($self, $data) = @_;
-
-	# Validate input data
-	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of hashes' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of hashes' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	# Generate JSON for data
 	my $json_data = $_JSON->encode($data);
@@ -3421,10 +3519,15 @@ handler (opacity is set to C<isVisible ? 0 : 1> on each click).
 
 sub render_multi_series_line_chart_with_interactive_legends
 {
-	my ($self, $data) = @_;
-
-	# Validate input data
-	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of hashes' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of hashes' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
 
 	# Generate JSON for data
 	my $json_data = $_JSON->encode($data);
@@ -3677,10 +3780,16 @@ reference.
 
 sub render_multi_series_line_chart_snippet
 {
-	my ($self, $series_data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of series' unless ref($series_data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('series_data', \@_) // {};
+	die 'Data must be an array of series' unless ref($raw->{series_data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { series_data => { type => 'arrayref', error_msg => 'Data must be an array of series' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $series_data = $raw->{series_data};
+	my $opts = {%$raw}; delete $opts->{series_data};
 	for my $s (@$series_data) {
 		die 'Each series must be a hashref with name and data'
 			unless ref($s) eq 'HASH' && defined $s->{name} && ref($s->{data}) eq 'ARRAY';
@@ -3975,10 +4084,16 @@ A hash reference with C<svg_id> (string) and C<html> (Perl character string).
 
 sub render_scatter_chart_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $color            = $opts->{color}            // 'steelblue';
 	my $x_label          = $opts->{x_label}          // '';
@@ -4319,10 +4434,16 @@ table rather than an SVG chart.
 
 sub render_table_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of arrays'          unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of arrays' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of arrays' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 	die 'Data must have at least one row (header row)' unless @$data;
 	die 'Each row must be an array reference'      unless ref($data->[0]) eq 'ARRAY';
 
@@ -4528,10 +4649,16 @@ Returns C<{ svg_id =E<gt> 'stacked_bar', html =E<gt> Str }>.
 
 sub render_stacked_bar_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of hashes' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of hashes' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $cat_col = $opts->{cat_col} // 'cat';
 	my $seg_col = $opts->{seg_col} // 'seg';
@@ -4816,10 +4943,16 @@ Returns C<{ svg_id =E<gt> 'combo_chart', html =E<gt> Str }>.
 
 sub render_combo_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of hashes' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of hashes' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $x_col      = $opts->{x_col}      // 'x';
 	my $bar_col    = $opts->{bar_col}     // 'bar_val';
@@ -5068,11 +5201,24 @@ when C<$data> is neither an ARRAY nor a HASH reference.
 
 sub render_treemap_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
+	my $self  = shift;
+	my $first = @_ ? $_[0] : undef;
+	my $raw;
+	# A lone hashref argument is valid treemap data (hash tree), not named args
+	if (ref($first) eq 'HASH' && @_ == 1) {
+		$raw = { data => $first };
+	} else {
+		$raw = Params::Get::get_params('data', \@_) // {};
+	}
 	die 'Data must be an array of hashes or a hash tree'
-		unless ref($data) eq 'ARRAY' || ref($data) eq 'HASH';
+		unless ref($raw->{data}) eq 'ARRAY' || ref($raw->{data}) eq 'HASH';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => ['arrayref', 'hashref'], error_msg => 'Data must be an array of hashes or a hash tree' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	my $path_sep = $opts->{path_sep} // '/';
 	my $scheme   = $opts->{scheme}   // $DEFAULT_CATEGORICAL_SCHEME;
@@ -5239,6 +5385,10 @@ is derived:
 The caller owns the binning, so C<d3.bin()> is never called: one bar is drawn
 per entry, in the order supplied, and the supplied counts are authoritative.
 
+The bin labels are drawn rotated.  The plot gives up as much room as they need,
+up to half the chart's height and a quarter of its width, so that they and
+C<x_label> do not overlap and stay inside the chart.
+
 =item * C<scheme> (string, optional) - D3 categorical colour scheme (for example
 C<'tableau10'> or C<'category10'>) whose first colour is used as the bar fill
 when C<color> is not given.
@@ -5370,6 +5520,15 @@ sub _render_histogram_binned
 
 	my $x_label_esc = $js_esc->($x_label);
 
+	# The rotated tick labels hang below the axis and out to its left by however
+	# long they are, which is only known once they are drawn, so the script
+	# measures them and takes the room out of the plot.  This is what keeps the
+	# axis label clear of them.
+	#
+	# The label also carries its font as attributes, because an SVG saved from the
+	# page leaves the stylesheet behind.
+	my $x_label_room = $x_label ? 24 : 4;
+
 	# Bar fill: an explicit colour wins, otherwise the first colour of the
 	# requested D3 categorical scheme, otherwise the default colour.
 	my $fill_js = '"steelblue"';
@@ -5384,6 +5543,8 @@ sub _render_histogram_binned
 	my $x_label_block = $x_label ? <<"XLB" : '';
     g.append("text")
         .attr("class","hg-axis-label")
+        .attr("font-size","11px")
+        .attr("font-family","sans-serif")
         .attr("x", innerW / 2)
         .attr("y", innerH + (margin.bottom - 10))
         .attr("text-anchor","middle")
@@ -5421,16 +5582,29 @@ XLB
         .range([0, innerW])
         .padding(0.05);
 
+    var xAxis = g.append("g").attr("class","hg-x-axis");
+    function drawXAxis() {
+        xAxis.attr("transform","translate(0,"+innerH+")")
+            .call(d3.axisBottom(xScale))
+            .selectAll("text")
+            .attr("transform","rotate(-45)")
+            .style("text-anchor","end");
+    }
+    drawXAxis();
+
+    var axisBox = xAxis.node().getBBox();
+    margin.bottom = Math.max(margin.bottom, Math.min(Math.ceil(axisBox.height) + $x_label_room, $height / 2));
+    margin.left   = Math.max(margin.left,   Math.min(Math.ceil(-axisBox.x) + 4, $width / 4));
+    innerW = $width  - margin.left - margin.right;
+    innerH = $height - margin.top  - margin.bottom;
+    g.attr("transform","translate("+margin.left+","+margin.top+")");
+    xScale.range([0, innerW]);
+    drawXAxis();
+
     var yScale = d3.scaleLinear()
         .domain([0, d3.max(bins, function(d){return d.count;})]).nice()
         .range([innerH, 0]);
 
-    g.append("g").attr("class","hg-x-axis")
-        .attr("transform","translate(0,"+innerH+")")
-        .call(d3.axisBottom(xScale))
-        .selectAll("text")
-        .attr("transform","rotate(-45)")
-        .style("text-anchor","end");
     g.append("g").attr("class","hg-y-axis").call(d3.axisLeft(yScale).ticks(6));
 
     $x_label_block
@@ -5458,10 +5632,16 @@ HTML
 
 sub render_histogram_snippet
 {
-	my ($self, $data, $opts) = @_;
-	$opts //= {};
-
-	die 'Data must be an array of numeric values' unless ref($data) eq 'ARRAY';
+	my $self = shift;
+	my $raw  = Params::Get::get_params('data', \@_) // {};
+	die 'Data must be an array of numeric values' unless ref($raw->{data}) eq 'ARRAY';
+	Params::Validate::Strict::validate_strict({
+		args   => $raw,
+		schema => { data => { type => 'arrayref', error_msg => 'Data must be an array of numeric values' } },
+		unknown_parameter_handler => 'ignore',
+	});
+	my $data = $raw->{data};
+	my $opts = {%$raw}; delete $opts->{data};
 
 	# Pre-binned path: the caller has already computed the bins.
 	if ($opts->{binned}) {

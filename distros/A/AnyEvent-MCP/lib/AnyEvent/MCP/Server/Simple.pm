@@ -750,14 +750,17 @@ which manage their own toolsets. Only registered tools appear.
 Emit operator-facing activity to the configured AnyEvent::Log destination,
 bypassing its diagnostic verbosity filter. C<--quiet> suppresses this log.
 
-=item mcp_log_request ($server, $req)
+=item mcp_log_request ($server, $req, %extra)
 
 C<on_request> callback to report tool invocations once across permission
 retries, and log tool-error replies, including asynchronous ones. It logs
 selected arguments rather than entire request or reply payloads. This includes
-a JSON-quoted preview of Vim C<ex> commands (up to 200 characters), which
-can contain sensitive text. The Simple starters install it by default;
+JSON-quoted previews of command arguments and VCS filenames (up to four,
+80 characters each), and Vim C<ex> commands (up to 200 characters).
+These can contain sensitive text. The Simple starters install it by default;
 custom servers can use it too.
+C<%extra> appends application-specific C<key=value> fields in key order.
+Sanitize sensitive arguments before passing them.
 
 =item mcp_start %config
 
@@ -860,26 +863,28 @@ sub mcp_log {
 }
 
 sub mcp_log_request {
-   my ($server, $req) = @_;
+   my ($server, $req, %extra) = @_;
 
    return unless $req->{method} eq "tools/call";
    return if $req->{mcp_logged}++;
 
    my $args = $req->{args};
+   my $vcs = $req->{tool} =~ /\Avcs-(?:diff|status|log)\z/;
    my @details;
-   for (qw(target workdir path cwd)) {
+   for (qw(target workdir path cwd), $vcs ? "backend" : ()) {
       push @details, "$_=" . (substr $args->{$_}, 0, 160)
          if defined $args->{$_} && !ref $args->{$_};
    }
-   push @details, (substr join (" ", @{$args->{ranges}}), 0, 180)
+   push @details, substr +(join " ", @{$args->{ranges}}), 0, 180
       if ref $args->{ranges} eq "ARRAY";
-   if (ref $args->{argv} eq "ARRAY" && @{$args->{argv}}) {
+   for my $key ("argv", $vcs ? "files" : ()) {
+      next unless ref $args->{$key} eq "ARRAY" && @{$args->{$key}};
       require JSON::XS;
-      my @argv = @{$args->{argv}};
-      push @details, "argv=" . join (" ", map {
+      my @values = @{$args->{$key}};
+      push @details, "$key=" . join (" ", map {
          JSON::XS::encode_json (substr $_, 0, 80) . (length $_ > 80 ? "..." : "")
-      } @argv[0 .. ($#argv < 3 ? $#argv : 3)])
-         . (@argv > 4 ? " ..." : "");
+      } @values[0 .. ($#values < 3 ? $#values : 3)])
+         . (@values > 4 ? " ..." : "");
    }
    if ($req->{tool} eq "grep" && defined $args->{pattern} && !ref $args->{pattern}) {
       require JSON::XS;
@@ -900,6 +905,10 @@ sub mcp_log_request {
             : (defined $args->{$_} && !ref $args->{$_}
                ? "$_=" . (substr $args->{$_}, 0, 80) : ())
       } qw(unlink rmdir mkpath mkdir symlink truncate chmod rename);
+   }
+   for my $key (sort keys %extra) {
+      next unless defined $extra{$key} && !ref $extra{$key};
+      push @details, "$key=" . (substr $extra{$key}, 0, 160);
    }
 
    (my $message = join " ", $req->{tool}, @details) =~ s/[\r\n]/ /g;
@@ -930,7 +939,7 @@ sub _mcp_log_init {
    no warnings 'redefine';
    *AnyEvent::Log::default_format = sub ($$$$) {
       my ($when, $ctx, $level, $message) = @_;
-      my $stamp = substr (AnyEvent::Log::format_time ($when), 8, 14);
+      my $stamp = substr +(AnyEvent::Log::format_time $when), 8, 14;
       my $source = $ctx == $AnyEvent::Log::LOG ? "" : "$AnyEvent::Log::LEVEL2STR[$level] $ctx->[0]: ";
       join "", map "$stamp $identity $source$_\n", split /\n/, $message;
    };

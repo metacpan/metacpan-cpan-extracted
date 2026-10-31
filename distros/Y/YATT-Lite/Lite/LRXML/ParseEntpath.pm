@@ -22,25 +22,25 @@ package YATT::Lite::LRXML; use YATT::Lite::LRXML;
 
 sub _parse_text_entities {
   my MY $self = shift;
-  $self->_parse_text_entities_at($self->{curpos}, @_);
+  $self->_parse_text_entities_at($self->{_curpos}, @_);
 }
 sub _parse_text_entities_at {
   my MY $self = $_[0];
-  local ($self->{curpos}, $_) = @_[1,2];
-  my ($curpos) = ($self->{curpos});
+  local ($self->{_curpos}, $_) = @_[1,2];
+  my ($curpos) = ($self->{_curpos});
   my $totalEnd = $curpos + length $_;
   my @result;
   {
 
     my $total = length $_;
-    while (s{^(.*?)$$self{re_entopn}}{}xs) {
+    while (s{^(.*?)$$self{_re_entopn}}{}xs) {
       my $before = $curpos;
       if (length $1) {
 	push @result, $1;
-	$self->{endln} += numLines($1);
+	$self->{_endln} += numLines($1);
 	$curpos += length $1;
       }
-      push @result, my $node = $self->mkentity($curpos, undef, $self->{endln});
+      push @result, my $node = $self->mkentity($curpos, undef, $self->{_endln});
       $curpos = $totalEnd - length $_;
       $node->[NODE_END] = $curpos;
     }
@@ -76,17 +76,17 @@ sub _parse_entpath {
   my @pipe = $self->$how(@_);
   unless (s{^;}{}xs) {
     if (/^\s|^$/) {
-      die $self->synerror_at($self->{startln}
+      die $self->synerror_at($self->{_startln}
 			     , q{Entity has no terminator: '%s'}
 			     , $self->shortened_original_entpath);
 
     } else {
-      die $self->synerror_at($self->{startln}
+      die $self->synerror_at($self->{_startln}
 			     , q{Syntax error in entity: '%s'}
 			     , $self->shortened_original_entpath);
     }
   }
-  $self->{curpos} += $prevlen - length $_;
+  $self->{_curpos} += $prevlen - length $_;
   @pipe;
 }
 sub _parse_pipeline {
@@ -126,13 +126,13 @@ sub _parse_entgroup {
   do {
     push @pipe, $self->_parse_entterm($for_expr);
     if (length $_ == $prevlen and $emptycnt++) {
-      die $self->synerror_at($self->{startln}
+      die $self->synerror_at($self->{_startln}
 			     , q{Syntax error in entity: '%s'}
 			     , $self->shortened_original_entpath);
     }
     $prevlen = length $_;
-  } until (s{^ ($$self{re_eclose})}{}xs);
-  die $self->synerror_at($self->{startln}, q{Paren mismatch: expect %s got %s: str=%s}
+  } until (s{^ ($$self{_re_eclose})}{}xs);
+  die $self->synerror_at($self->{_startln}, q{Paren mismatch: expect %s got %s: str=%s}
 		      , $close, $1, $_)
     unless $1 eq $close;
   @pipe;
@@ -146,8 +146,8 @@ sub _parse_entterm {
     return;
   }
   my $term = do {
-    if (s{^(?: (?<text>  $$self{ch_etext} (?:$$self{ch_etext} | :)* )
-	  |    $$self{re_eparen}
+    if (s{^(?: (?<text>  $$self{_ch_etext} (?:$$self{_ch_etext} | :)* )
+	  |    $$self{_re_eparen}
        )}{}xs) {
       my $text = '';
     TEXT: {
@@ -160,9 +160,9 @@ sub _parse_entterm {
 	  }
 	  $text .= $+{open} . $self->_parse_group_string($close_ch{$+{open}})
 	    if $+{open};
-	} while (s{^ (?: (?<text> (?:$$self{ch_etext} | :)+)
-		   | $$self{re_eparen}
-		   | $$self{re_eopen}
+	} while (s{^ (?: (?<text> (?:$$self{_ch_etext} | :)+)
+		   | $$self{_re_eparen}
+		   | $$self{_re_eopen}
 		   | (?= (?<close>[\)\]\};,])))}{}xs);
       }
       [($text =~ s/^=// ? 'expr' : $text_type) => $text];
@@ -179,12 +179,12 @@ sub _parse_group_string {
   (my MY $self, my $close) = @_;
   my $oldpos = pos;
   my $text = '';
-  while (s{^ ((?:$$self{ch_etext}+ | [,:])*)
-	   (?: $$self{re_eopen} |  $$self{re_eclose})}{}xs) {
+  while (s{^ ((?:$$self{_ch_etext}+ | [,:])*)
+	   (?: $$self{_re_eopen} |  $$self{_re_eclose})}{}xs) {
     # print pos($_), "\n";
     $text .= $&;
     if ($+{close}) {
-      die $self->synerror_at($self->{startln}, q{Paren mismatch: expect %s got %s: str=%s}
+      die $self->synerror_at($self->{_startln}, q{Paren mismatch: expect %s got %s: str=%s}
 		   , $close, $+{close}, substr($_, $oldpos, pos))
 	unless $+{close} eq $close;
       last;
@@ -201,12 +201,12 @@ sub _parse_hash {
   while (not defined $lastlen or length $_ < $lastlen) {
     $lastlen = length $_;
     return @hash if s/^\}//;
-    s{^ ($$self{ch_etext}*) (?: [:,])}{}xs or last;
+    s{^ ($$self{_ch_etext}*) (?: [:,])}{}xs or last;
     push @hash, [text => $1];
     push @hash, $self->_parse_entterm;
     s{^,}{};
   }
-  die $self->synerror_at($self->{startln}, q{Paren mismatch: expect \} got %s}
+  die $self->synerror_at($self->{_startln}, q{Paren mismatch: expect \} got %s}
 			 , $self->shortened_original_entpath);
 }
 

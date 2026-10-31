@@ -346,6 +346,7 @@ use AnyEvent::MCP::Config ();
 use MIME::Base64 ();
 
 use Socket ();
+use POSIX ();
 
 use JSON::XS ();
 
@@ -357,9 +358,6 @@ use AnyEvent::MCP::Server::HTTP ();
 use AnyEvent::MCP::Server::Toolset ();
 use AnyEvent::MCP::Server::Permissions ();
 use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
-
-use AnyEvent::WebSocket::Server ();
-use AnyEvent::WebSocket::Message ();
 
 our $PORT;
 our $NICK;
@@ -403,9 +401,7 @@ my @accepted_tokens = @{$http{tokens}};
 /\A[A-Za-z0-9_.~-]+\z/ or die "Invalid mcp-vim token\n" for @accepted_tokens;
 my %accepted_token = map { $_ => 1 } @accepted_tokens;
 
-chomp (my $hostname = qx<hostname -f>);
-length $hostname or die "cannot determine mcp-vim hostname\n";
-$NICK //= $hostname;
+$NICK //= (POSIX::uname)[1] || die "cannot determine mcp-vim hostname\n";
 
 
 our $JSON_CODER = JSON::XS->new->utf8;
@@ -576,7 +572,7 @@ sub vim::_on_sessions_done {
 }
 
 sub vim::_on_save {
-   my ($self, $id) = @_;
+   my ($self, $id, $force) = @_;
 
    # a save's input belongs to Vim until eof; the browser queue owns the upload.
    if (my $old = delete $self->{save}) {
@@ -594,7 +590,7 @@ sub vim::_on_save {
    AE::log info => "save $id $hdrs->{origin}";
    $self->send_msg ([echo => "requesting save to $hdrs->{origin}..."]);
 
-   $self->{save} = $xpcse->save ($self, $id, $hdrs);
+   $self->{save} = $xpcse->save ($self, $id, $hdrs, $force);
 }
 
 sub vim::_on_data {
@@ -789,13 +785,14 @@ sub xpcse::finish {
 }
 
 sub xpcse::save {
-   my ($self, $vim, $session, $hdrs) = @_;
+   my ($self, $vim, $session, $hdrs, $force) = @_;
 
    my $save = {
       xpcse   => $self,
       vim     => $vim,
       session => $session,
       hdrs    => $hdrs,
+      force   => $force ? 1 : 0,
       data    => [],
    };
 
@@ -815,7 +812,8 @@ sub xpcse::send_data {
 
    unless (exists $save->{credit}) {
       $save->{credit} = 10e6;
-      $self->send_json ([upload => $save->{hdrs}]);
+      # Trailing flag is ignored by current browser clients.
+      $self->send_json ([upload => $save->{hdrs}, $save->{force}]);
    }
 
    # a positive credit admits one whole chunk, even if it exceeds the window.
@@ -851,7 +849,7 @@ sub xpcse::_on_ack {
 }
 
 sub xpcse::_on_upload_done {
-   my ($self, $status, $msg) = @_;
+   my ($self, $status, $msg, $etag) = @_;
 
    my $save = $self->{saves}[0]
       or return;
@@ -863,11 +861,17 @@ sub xpcse::_on_upload_done {
 
    my $vim = $save->{vim};
    if ($vim && $vim{$vim+0}) {
-      if ($msg =~ /\n/) {
+      if ($status == 200 && defined $etag && $etag =~ /\A"sha256:[a-f0-9]{64}"\z/) {
+         if (my $state = $vim->{session}{$save->{session}}) {
+            $state->{etag} = $etag;
+            $vim->send_msg (["update-metadata" => $save->{session}, { etag => $etag }]);
+         }
+      }
+      if ($status != 200 || $msg =~ /\n/) {
          $msg =~ s/^upload ok, but.*:\n+//;
          $msg =~ s/\n\n+/\n/g;
          $msg =~ s/\n\z//;
-         $vim->send_msg ([error => "error: $msg"]);
+         $vim->send_msg ([error => "error: " . ($status == 200 ? "" : "HTTP $status: ") . $msg]);
 
          if ($msg =~ / line ([0-9]+), /) {
             $vim->send_msg ([goto => $save->{session}, $1, 1]);
@@ -916,8 +920,8 @@ sub vim_permission {
    my $subject = defined $name ? "target:$name" : "targets";
    my $label = defined $name ? "editor '$name' (all buffers)" : "the list of connected editors";
    my @subjects = (
-      { label => $label, subject => $subject },
-      { label => "all Vim editors, including future connections", subject => "^" },
+      { label => $label, match => $subject },
+      { label => "all Vim editors, including future connections", match => "^" },
    );
 
    if (defined $command) {
@@ -925,17 +929,16 @@ sub vim_permission {
       my $editor = "ex:" . $json->encode ($name) . ":";
       $subject = $editor . $json->encode ($command);
       @subjects = (
-         { label => "this exact command in editor '$name' (all buffers)", subject => $subject },
-         { label => "any Ex command in editor '$name' (all buffers)", subject => "^" . (quotemeta $editor) },
-         { label => "any Ex command in any Vim editor, including future connections", subject => "^" },
+         { label => "this exact command in editor '$name' (all buffers)", match => $subject },
+         { label => "any Ex command in editor '$name' (all buffers)", match => "^" . (quotemeta $editor) },
+         { label => "any Ex command in any Vim editor, including future connections", match => "^" },
       );
    }
 
    $req->require_permission ({
       tool           => $req->{tool},
       action         => $action,
-      subject        => $subject,
-      subjects       => \@subjects,
+      dimensions     => { subject => { label => "Editor / command", value => $subject, choices => \@subjects } },
       sandbox_grants => [],
       reason         => $reason // ("$req->{tool}: " . (defined $name ? "Vim editor '$name'" : "list connected Vim editors")
          . (defined $command ? "\n\n$command" : "")),
@@ -1262,7 +1265,7 @@ sub normalize_udiff {
    $hunks
       or die "normalize_udiff: no hunks\n";
 
-   (join ("\n", @line, ""), \@max_offset)
+   ((join "\n", @line, ""), \@max_offset)
 }
 
 $toolset->tool (open =>
@@ -1291,7 +1294,7 @@ $toolset->tool (open =>
       vim_permission $req, open => $args->{target}, undef, undef,
          "Open file in Vim editor '$args->{target}'\nPath: " . JSON::XS->new->allow_nonref->encode ($args->{path});
 
-      AE::log debug => "vim open $args->{target} " . $json->encode (substr ($args->{path}, 0, 80));
+      AE::log debug => "vim open $args->{target} " . $json->encode (substr $args->{path}, 0, 80);
 
       $vim->rpc_ (open => $args->{path}, rpc_reply ($req));
    }
@@ -1661,6 +1664,12 @@ sub accept_json {
 
 sub accept_ws {
    my ($fh, $peer_host, $peer_port) = @_;
+
+   eval {
+      require AnyEvent::WebSocket::Server;
+      require AnyEvent::WebSocket::Message;
+      1
+   } or return AE::log warn => "WebSocket support unavailable: $@";
 
    # tcp_server has already formatted the numeric address for us.
    my $peer = AnyEvent::Socket::format_hostport $peer_host, $peer_port;

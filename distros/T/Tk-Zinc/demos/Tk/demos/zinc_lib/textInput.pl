@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-# $Id: textInput.pl,v 1.4 2003/09/24 15:08:37 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 package textInput; # for avoiding symbol re-use between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 
 use Tk;

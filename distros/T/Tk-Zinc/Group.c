@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Wed Jun 23 10:09:20 1999
  *
- * $Id: Group.c,v 1.57 2005/10/05 14:28:05 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -23,13 +23,11 @@
 #include "Geo.h"
 #include "tkZinc.h"
 
-#ifndef _WIN32
+#if defined(SHAPE)
 #include <X11/extensions/shape.h>
 #endif
 
 
-static const char rcsid[] = "$Id: Group.c,v 1.57 2005/10/05 14:28:05 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -72,6 +70,9 @@ static ZnAttrConfig     group_attrs[] = {
   { ZN_CONFIG_BOOL, "-atomic", NULL,
     Tk_Offset(GroupItemStruct, header.flags), ATOMIC_BIT,
     ZN_REPICK_FLAG, False },
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(GroupItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_ITEM, "-clip", NULL,
     Tk_Offset(GroupItemStruct, clip), 0,
     ZN_COORDS_FLAG|ZN_ITEM_FLAG, False },
@@ -110,7 +111,7 @@ static ZnAttrConfig     group_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   GroupItem     group = (GroupItem) item;
   
@@ -121,6 +122,7 @@ Init(ZnItem             item,
   group->dependents = NULL;
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -254,7 +256,7 @@ Destroy(ZnItem  item)
  *
  **********************************************************************************
  */
-#if defined(SHAPE) && !defined(_WIN32)
+#if defined(SHAPE)
 static void
 SetXShape(ZnItem        grp)
 {
@@ -417,7 +419,7 @@ SetXShape(ZnItem        grp)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   GroupItem     group = (GroupItem) item;
@@ -436,7 +438,7 @@ Configure(ZnItem        item,
         (!group->clip->class->GetClipVertices || (group->clip->parent != item))) {
       group->clip = ZN_NO_ITEM;
       Tcl_AppendResult(wi->interp,
-                       " clip item must be a child of the group", NULL);
+                       " clip item must be a child of the group", (char *) NULL);
       return TCL_ERROR;
     }
     if (!group->clip && (item == wi->top_group)) {
@@ -458,7 +460,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, group_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -489,7 +491,7 @@ PushClip(GroupItem      group,
 
   if ((group->clip != ZN_NO_ITEM) &&
       ((((ZnItem) group) != wi->top_group)
-#if defined(SHAPE) && ! defined (_WIN32)
+#if defined(SHAPE)
        || !wi->reshape
 #endif
        )) {
@@ -518,7 +520,7 @@ PopClip(GroupItem       group,
 
   if ((group->clip != ZN_NO_ITEM) &&
       ((((ZnItem) group) != wi->top_group)
-#if defined(SHAPE) && !defined(_WIN32)
+#if defined(SHAPE)
        || !wi->reshape
 #endif
        )) {
@@ -791,7 +793,9 @@ ComputeCoordinates(ZnItem       item,
   ZnResetBBox(&item->item_bounding_box);
   current_item = group->head;
   while (current_item != ZN_NO_ITEM) {
-    ZnAddBBoxToBBox(&item->item_bounding_box, &current_item->item_bounding_box);
+    if (ISSET(current_item->flags, ZN_VISIBLE_BIT)) {
+      ZnAddBBoxToBBox(&item->item_bounding_box, &current_item->item_bounding_box);
+    }
     current_item = current_item->next;    
   }
   /*
@@ -1037,6 +1041,72 @@ Draw(ZnItem     item)
 }
 
 
+
+/*
+ **********************************************************************************
+ *
+ * PreRender --
+ *
+ **********************************************************************************
+ */
+#ifdef GL
+static void
+PreRender(ZnItem   item)
+{
+  GroupItem     group = (GroupItem) item;
+  ZnItem        current_item;
+  ZnWInfo       *wi = item->wi;
+  unsigned char save_alpha = wi->alpha;
+  unsigned char save_alpha2;
+
+  if (ISSET(item->flags, ZN_COMPOSE_ALPHA_BIT)) {
+    wi->alpha = wi->alpha * group->alpha / 100;
+  }
+  else {
+    wi->alpha = group->alpha;
+  }
+  save_alpha2 = wi->alpha;
+
+  PushTransform(item);
+ 
+  current_item = group->tail;
+  while (current_item != ZN_NO_ITEM) {
+    if (ISSET(current_item->flags, ZN_VISIBLE_BIT)) {
+
+      if (  current_item->class->PreRender != NULL )
+      {
+        if (current_item->class != ZnGroup) {
+          PushTransform(current_item);
+          if (ISCLEAR(current_item->flags, ZN_COMPOSE_ALPHA_BIT)) {
+            wi->alpha = 100;
+          }
+        }
+        
+        current_item->class->PreRender(current_item);
+        
+        if (current_item->class != ZnGroup) {
+          PopTransform(current_item);
+          wi->alpha = save_alpha2;
+        }
+      }
+    }
+    current_item = current_item->previous;
+  }
+
+  PopTransform(item);
+
+  wi->alpha = save_alpha;
+}
+#else
+static void
+PreRender(ZnItem   item)
+{
+}
+#endif
+
+
+
+
 /*
  **********************************************************************************
  *
@@ -1051,10 +1121,10 @@ Render(ZnItem   item)
   GroupItem     group = (GroupItem) item;
   ZnItem        current_item;
   ZnWInfo       *wi = item->wi;
-#ifdef GL_DAMAGE
+//#ifdef GL_DAMAGE
   ZnBBox        *clip_box;
   ZnBBox        bbox, old_damaged_area;
-#endif
+//#endif
   unsigned char save_alpha = wi->alpha;
   unsigned char save_alpha2;
 
@@ -1068,23 +1138,43 @@ Render(ZnItem   item)
 
   PushTransform(item);
   PushClip(group, True);
-#ifdef GL_DAMAGE
-  if (ISCLEAR(wi->flags, ZN_CONFIGURE_EVENT) && (group->clip != ZN_NO_ITEM)) {
-    old_damaged_area = wi->damaged_area;
-    if (ZnCurrentClip(wi, NULL, &clip_box, NULL)) {
-      ZnIntersectBBox(&wi->damaged_area, clip_box, &bbox);
-      wi->damaged_area = bbox;
+
+  /* Test if we are using damage or not */
+  if (wi->usedamage) {
+    /* Damage is on */
+    if (ISCLEAR(wi->flags, ZN_CONFIGURE_EVENT) && (group->clip != ZN_NO_ITEM)) {
+      old_damaged_area = wi->damaged_area;
+      if (ZnCurrentClip(wi, NULL, &clip_box, NULL)) {
+         ZnIntersectBBox(&wi->damaged_area, clip_box, &bbox);
+         wi->damaged_area = bbox;
+      }
     }
-  }
-#endif
+   }
   
   current_item = group->tail;
   while (current_item != ZN_NO_ITEM) {
     if (ISSET(current_item->flags, ZN_VISIBLE_BIT)) {
-#ifdef GL_DAMAGE
-      ZnIntersectBBox(&wi->damaged_area, &current_item->item_bounding_box, &bbox);
-      if (!ZnIsEmptyBBox(&bbox) || ISSET(wi->flags, ZN_CONFIGURE_EVENT)) {
-#endif
+      /* test if we are using dmaage or not */
+      if (wi->usedamage) {
+         /* Damage is on */
+         ZnIntersectBBox(&wi->damaged_area, &current_item->item_bounding_box, &bbox);
+         if (!ZnIsEmptyBBox(&bbox) || ISSET(wi->flags, ZN_CONFIGURE_EVENT)) {
+         
+            if (current_item->class != ZnGroup) {
+               PushTransform(current_item);
+               if (ISCLEAR(current_item->flags, ZN_COMPOSE_ALPHA_BIT)) {
+                  wi->alpha = 100;
+               }
+            }
+            current_item->class->Render(current_item);
+            if (current_item->class != ZnGroup) {
+               PopTransform(current_item);
+               wi->alpha = save_alpha2;
+            }
+         }
+         
+      } else {
+        /* Damage is off */
         if (current_item->class != ZnGroup) {
           PushTransform(current_item);
           if (ISCLEAR(current_item->flags, ZN_COMPOSE_ALPHA_BIT)) {
@@ -1096,18 +1186,18 @@ Render(ZnItem   item)
           PopTransform(current_item);
           wi->alpha = save_alpha2;
         }
-#ifdef GL_DAMAGE
       }
-#endif
+      
     }
     current_item = current_item->previous;
   }
 
-#ifdef GL_DAMAGE
-  if (ISCLEAR(wi->flags, ZN_CONFIGURE_EVENT) && (group->clip != ZN_NO_ITEM)) {
-    wi->damaged_area = old_damaged_area;
-  }
-#endif
+   /* Test if we are using damage or not */
+   if (wi->usedamage) {
+      if (ISCLEAR(wi->flags, ZN_CONFIGURE_EVENT) && (group->clip != ZN_NO_ITEM)) {
+         wi->damaged_area = old_damaged_area;
+      }
+   }
   
   PopClip(group, True);
   PopTransform(item);
@@ -1240,12 +1330,15 @@ Pick(ZnItem     item,
 
   for ( ; current_item != ZN_NO_ITEM; current_item = current_item->next) {
     /*
+     * If an item doesn't catch events it can be safely skipped 
+     * right now.
      * Sensitive item must be reported even if they are invisible.
      * It is legal to fire bindings on invisible sensitive items.
      * This is _not_ a bug do _not_ modify the test below.
      */
-    if (ISCLEAR(current_item->flags, ZN_SENSITIVE_BIT) &&
-        ISCLEAR(current_item->flags, ZN_VISIBLE_BIT)) {
+    if (ISCLEAR(current_item->flags, ZN_CATCH_EVENT_BIT) ||
+        (ISCLEAR(current_item->flags, ZN_SENSITIVE_BIT) &&
+         ISCLEAR(current_item->flags, ZN_VISIBLE_BIT))) {
       continue;
     }
     ZnIntersectBBox(&bbox, &current_item->item_bounding_box, &inter);
@@ -1320,13 +1413,13 @@ Coords(ZnItem           item,
 {
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " can't add or remove vertices in groups", NULL);
+                     " can't add or remove vertices in groups", (char *) NULL);
     return TCL_ERROR;
   }
   else if ((cmd == ZN_COORDS_REPLACE) || (cmd == ZN_COORDS_REPLACE_ALL)) {
     if (*num_pts == 0) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 1 point on groups", NULL);
+                       " coords command need 1 point on groups", (char *) NULL);
       return TCL_ERROR;
     }
     if (!item->transfo && ((*pts)[0].x == 0.0) && ((*pts)[0].y == 0.0)) {
@@ -1391,7 +1484,7 @@ PostScript(ZnItem item,
     if (current_item->class != ZnGroup) {
       PushTransform(current_item);
       if (!prepass) {
-        Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+        Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
       }
       ZnPostscriptTrace(current_item, 1);
     }
@@ -1399,7 +1492,7 @@ PostScript(ZnItem item,
     if (current_item->class != ZnGroup) {
       ZnPostscriptTrace(current_item, 0);
       if (!prepass && (result == TCL_OK)) {
-        Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+        Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
       }
       PopTransform(current_item);
     }
@@ -1789,6 +1882,7 @@ static ZnItemClassStruct GROUP_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  PreRender,            /* Pre-render */
   Render,
   IsSensitive,
   Pick,

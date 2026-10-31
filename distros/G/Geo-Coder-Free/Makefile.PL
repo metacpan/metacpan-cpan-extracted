@@ -240,7 +240,7 @@ if((!(-r 'downloads/allCountries.txt')) && (-r $zip)) {
 
 	eval 'require IO::Uncompress::Unzip';
 	if($@) {
-		system("unzip $zip") or die "unzip $zip failed";
+		system('unzip', $zip) == 0 or die "unzip $zip failed";
 		rename 'allCountries.txt', 'downloads/allCountries.txt';
 		# Save disc space, but prevent more than one download
 		# if(open(my $fout, '>', $zip)) {
@@ -292,7 +292,6 @@ my $build_requires = {
 	'CHI::Driver::RawMemory' => 0,
 	'Cwd' => 0,
 	'Config::Abstraction' => 0,
-	'Database::Abstraction' => 0,
 	'Devel::Size' => 0,
 	'File::Basename' => 0,
 	'File::Copy' => 0,
@@ -311,10 +310,6 @@ my $build_requires = {
 	'Scalar::Util' => 0,
 };
 
-if(($^O ne 'solaris') && ($^O ne 'haiku') && ($^O ne 'MSWin32')) {
-	$build_requires->{'File::Open::NoCache::ReadOnly'} = 0.02;
-	$build_requires->{'IO::AIO'} = 0;
-}
 if($ENV{'OSM_HOME'}) {
 	$build_requires->{'XML::LibXML::Reader'} = 0;
 }
@@ -327,6 +322,10 @@ if($ENV{OPENADDR_HOME}) {
 	$build_requires->{'Locale::AU'} = 0;
 	$build_requires->{'Locale::CA'} = 0;
 	$build_requires->{'Locale::US'} = 0;
+	if(($^O ne 'solaris') && ($^O ne 'haiku') && ($^O ne 'MSWin32')) {
+		$build_requires->{'File::Open::NoCache::ReadOnly'} = 0.02;
+		$build_requires->{'IO::AIO'} = 0;
+	}
 }
 
 my $test_requires = {
@@ -336,7 +335,9 @@ my $test_requires = {
 	'CHI::Driver::Null' => 0,
 	'Data::Throttler' => 0,
 	'Error' => 0,	# t/utils.t
+	'File::Path' => 0,
 	'File::Temp' => 0,
+	'FindBin' => 0,
 	'JSON::PP' => 0,	# t/location-predicates.t
 	'Test::Carp' => 0,
 	'Test::Deep' => 0,
@@ -345,6 +346,7 @@ my $test_requires = {
 	'Test::Log::Abstraction' => 0,
 	'Test::Memory::Cycle' => 0,
 	'Test::Mockingbird' => 0,
+	'Test::More' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
@@ -386,7 +388,7 @@ WriteMakefile(
 	ABSTRACT_FROM   => 'lib/Geo/Coder/Free.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
+	  ? ('LICENSE'=> 'restrictive')	# GPL2 for personal use on a single computer; see LICENSE
 	  : ()),
 	BUILD_REQUIRES => $build_requires,
 	CONFIGURE_REQUIRES => {
@@ -397,10 +399,13 @@ WriteMakefile(
 		'Carp' => 0,
 		# 'BerkeleyDB' => 0,
 		'Cwd' => 0,
+		'Data::Dumper' => 0,
 		'Data::Validate::URI' => 0,
+		'Database::Abstraction' => 0,	# Every class in Geo::Coder::Free::DB inherits from it
 		'DB_File' => 0,
 		'DBI' => 0,
 		'Digest::MD5' => 0,
+		'Exporter' => 0,
 		'File::pfopen' => '0.02',
 		'DBD::CSV' => 0,
 		'DBD::SQLite' => 0,
@@ -416,10 +421,13 @@ WriteMakefile(
 		'Locale::Country' => 0,
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
+		'Math::Trig' => 0,	# Geo::Coder::Free::Utils
 		'Module::Info' => 0,
 		'Module::Runtime' => 0,	# Geo::Coder::Free::Utils
 		'namespace::clean' => 0,
 		'File::Spec' => 0,
+		'FindBin' => 0,	# bin/address_lookup
+		'Getopt::Std' => 0,	# bin/address_lookup
 		'CHI' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
@@ -477,12 +485,6 @@ WriteMakefile(
 					'Geo::libpostal' => 0,
 				},
 			},
-			test => {
-				recommends => {
-					# t/consumer-contract.t skips without it, or with an older one
-					'Test::Consumer::Contract' => '0.04',
-				},
-			},
 		},
 		# The website (cgi-bin/page.fcgi and Geo::Coder::Free::Display,
 		# ::Allow and ::Config) needs these; the geocoder does not load them.
@@ -492,16 +494,28 @@ WriteMakefile(
 				prereqs => {
 					runtime => {
 						requires => {
+							'CGI::ACL' => 0,
+							'CGI::Carp' => 0,
 							'CGI::IDS' => 0,
 							'CGI::Info' => 0,
+							'Carp::Always' => 0,
+							'Class::Simple' => 0,
 							'Config::Abstraction' => 0,
 							'Crypt::URandom' => 0,
 							'Data::Throttler' => 0,
 							'DateTime' => 0,
+							'Digest::SHA' => 0,
 							'Error' => 0,
+							'FCGI' => 0,
+							'FCGI::Buffer' => 0,
+							'File::HomeDir' => 0,
 							'HTML::SocialMedia' => 0,
+							'HTTP::Date' => 0,
+							'HTTP::Status' => 0,
 							'JSON::MaybeXS' => 0,
 							'LWP::Simple::WithCache' => 0,
+							'Log::Abstraction' => 0,
+							'Log::WarnDie' => 0,
 							'Template' => 0,
 							'Template::Filters' => 0,
 							'Template::Plugin::EnvHash' => 0,

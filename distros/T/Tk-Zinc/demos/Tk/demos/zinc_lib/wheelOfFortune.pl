@@ -3,12 +3,12 @@
 # This short script tries to demonstrate with a simple example what you can 
 # do with Tk Zinc widget, in particular how to use group item, clipping, and
 # transformations. 
-# $Id: wheelOfFortune.pl,v 1.6 2004/03/05 12:36:08 etienne Exp $
+# $Id$
 # this demo has been developped by D. Etienne etienne@cena.fr
 #
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk; 
 # Zinc module is loaded...

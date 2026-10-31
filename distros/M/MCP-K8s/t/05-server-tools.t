@@ -46,8 +46,23 @@ use JSON::MaybeXS;
     . '"message":"configmaps is forbidden","code":403}'
     . " at lib/Kubernetes/REST.pm line 437.\n";
 
+  # A SelfSubjectRulesReview without a namespace is rejected by the API
+  # server: the review is namespace-scoped by design and an empty one comes
+  # back as 400 "no namespace on request". The mock reproduces that, so a
+  # discovery that reaches for the cluster scope this way fails loudly
+  # instead of silently leaving the cluster scope empty.
+  our $NO_NAMESPACE_ERROR =
+      'Kubernetes API error (create IO::K8s::Api::Authorization::V1::SelfSubjectRulesReview): 400 '
+    . '{"kind":"Status","status":"Failure","reason":"BadRequest",'
+    . '"message":"no namespace on request","code":400}'
+    . " at lib/Kubernetes/REST.pm line 437.\n";
+
   sub create {
     my ($self, $obj) = @_;
+    if ($obj->can('kind') && $obj->kind eq 'SelfSubjectRulesReview') {
+      push @{ $self->{reviews} ||= [] }, $obj->namespace;
+      die $NO_NAMESPACE_ERROR if $obj->namespace eq '';
+    }
     if ($obj->can('kind') && $obj->kind ne 'SelfSubjectRulesReview') {
       die $self->{force_create_error} if $self->{force_create_error};
       die $CONFLICT_ERROR             if $self->{force_409};
@@ -121,6 +136,7 @@ use JSON::MaybeXS;
     my ($self, $kind) = @_;
     return 'IO::K8s::Api::Authorization::V1::SelfSubjectRulesReview'
       if $kind eq 'SelfSubjectRulesReview';
+    return $self->{class_map}{$kind} if $self->{class_map}{$kind};
     return 'IO::K8s::'.$kind;
   }
 
@@ -142,6 +158,8 @@ use JSON::MaybeXS;
     my ($class, $namespace) = @_;
     bless { namespace => $namespace // '' }, $class;
   }
+  sub kind      { 'SelfSubjectRulesReview' }
+  sub namespace { $_[0]->{namespace} }
   sub status {
     my ($self) = @_;
     return MockSSRRStatus->new($self->{namespace});
@@ -173,9 +191,10 @@ use JSON::MaybeXS;
     } elsif ($namespace eq 'admin-ns') {
       # Wildcard role: in Kubernetes resources: ["*"] covers subresources too.
       @rules = (MockSSRRRule->new(['*'], ['*']));
-    } elsif ($namespace eq '') {
-      @rules = (MockSSRRRule->new(['list'], ['namespaces']));
     }
+    # There is no branch for the empty namespace: the API server rejects a
+    # review without one (400 no namespace on request), so the cluster scope
+    # is derived from the namespace reviews instead of being reviewed itself.
     bless { rules => \@rules }, $class;
   }
   sub resourceRules { $_[0]->{rules} }
@@ -334,6 +353,18 @@ subtest 'k8s_permissions tool returns summary' => sub {
   ok(length($result) > 0, 'permissions summary not empty');
   like($result, qr/test-ns/, 'summary mentions test namespace');
   like($result, qr/pods/, 'summary mentions pods');
+};
+
+subtest 'discovery never reviews without a namespace' => sub {
+  # A SelfSubjectRulesReview is namespace-scoped: the API server answers a
+  # review without one with 400 "no namespace on request". The mock dies
+  # with exactly that, so a discovery that reached for the cluster scope
+  # this way would come back empty - and take every cluster-scoped Kind
+  # with it. The cluster scope is derived from the namespace reviews.
+  my @reviews = @{ $api->{reviews} || [] };
+  ok(scalar @reviews, 'the review was submitted');
+  is_deeply([sort @reviews], ['test-ns'],
+    'exactly one review, for the one namespace - none without a namespace');
 };
 
 subtest 'k8s_list tool works' => sub {
@@ -973,6 +1004,30 @@ subtest 'k8s_apply falls back to patch on 409' => sub {
   $api->{force_409} = 0;
 };
 
+subtest 'k8s_apply fallback patch type follows the kind (k19)' => sub {
+  my $tool = find_tool($k8s->server, 'k8s_apply');
+  my %cases = (
+    ConfigMap   => [ 'IO::K8s::Api::Core::V1::ConfigMap', 'strategic' ],
+    Deployment  => [ 'IO::K8s::CertManager::V1::Certificate', 'merge' ],
+    StatefulSet => [ 'IO::K8s::Unstructured', 'merge' ],
+  );
+  for my $kind (sort keys %cases) {
+    my ($class, $type) = @{ $cases{$kind} };
+    $api->{class_map}{$kind} = $class;
+    $api->{force_409}   = 1;
+    $api->{patch_calls} = [];
+    $tool->code->($tool, {
+      resource  => $kind,
+      namespace => 'test-ns',
+      manifest  => { metadata => { name => 'existing' } },
+    });
+    is($api->{patch_calls}[0]{type}, $type, "$kind falls back to a $type patch");
+    delete $api->{class_map}{$kind};
+  }
+  $api->{force_409}   = 0;
+  $api->{patch_calls} = [];
+};
+
 subtest 'k8s_apply reports non-conflict create errors' => sub {
   # A create that fails for any other reason must NOT be patched over:
   # the fallback is for "already exists", not for "cannot create".
@@ -990,6 +1045,31 @@ subtest 'k8s_apply reports non-conflict create errors' => sub {
   like($result, qr/^Failed to create ConfigMap/, 'non-409 create error is reported');
   unlike($result, qr/"status"\s*:\s*"updated"/, 'no silent patch fallback on 403');
 
+  $api->{force_create_error} = undef;
+};
+
+subtest 'k8s_apply: typed 422 with 409 in the body is not a conflict' => sub {
+  require Kubernetes::REST::APIError;
+  $api->{force_create_error} = Kubernetes::REST::APIError->new(
+    code    => 422,
+    context => 'create IO::K8s::Api::Core::V1::Service',
+    body    => '{"kind":"Status","status":"Failure","reason":"Invalid",'
+             . '"message":"Service \"svc-4090\" is invalid","code":422}',
+  );
+  my $tool = find_tool($k8s->server, 'k8s_apply');
+  my $result = $tool->code->($tool, {
+    resource  => 'ConfigMap',
+    namespace => 'test-ns',
+    manifest  => { metadata => { name => 'svc-4090' }, data => { k => 'v' } },
+  });
+  like($result, qr/^Failed to create ConfigMap/, 'validation error is reported, not patched over');
+  unlike($result, qr/updated/, 'no patch fallback');
+
+  $api->{force_create_error} = Kubernetes::REST::APIError->new(
+    code => 409, context => 'create X',
+    body => '{"kind":"Status","reason":"AlreadyExists","code":409}',
+  );
+  ok($k8s->_is_conflict_error($api->{force_create_error}), 'typed 409 is a conflict');
   $api->{force_create_error} = undef;
 };
 

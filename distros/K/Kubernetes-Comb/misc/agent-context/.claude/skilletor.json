@@ -1,9 +1,17 @@
 {
   "sources": {
-    "getty": { "git": "https://github.com/Getty/skills" },
-    "karr": { "git": "https://github.com/Getty/karr" },
-    "kubernetes-rest": { "git": "https://github.com/pplu/kubernetes-rest" },
-    "io-k8s-p5": { "git": "https://github.com/pplu/io-k8s-p5" }
+    "getty": {
+      "git": "https://github.com/Getty/skills"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr"
+    },
+    "kubernetes-rest": {
+      "git": "https://github.com/pplu/kubernetes-rest"
+    },
+    "io-k8s-p5": {
+      "git": "https://github.com/pplu/io-k8s-p5"
+    }
   },
   "install": {
     "skills": [
@@ -20,7 +28,12 @@
       "perl-io-k8s-kubernetes-classes@io-k8s-p5",
       "getty-perl-release-author-getty@karr",
       "getty-perl-pod@karr"
+    ],
+    "bundles": [
+      "getty-cpan-dist@getty"
     ]
   },
-  "targets": ["claude"]
+  "targets": [
+    "claude"
+  ]
 }

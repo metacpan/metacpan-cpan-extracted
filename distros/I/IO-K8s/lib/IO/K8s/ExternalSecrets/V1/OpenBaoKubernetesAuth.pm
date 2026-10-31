@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OpenBaoKubernetesAuth;
 # ABSTRACT: Kubernetes authenticates with OpenBao by passing a ServiceAccount token to the [Kubernetes auth mechanism].
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s path              => Str, { required => 'schema', default => 'kubernetes' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::OpenBaoKubernetesAuth - Kubernetes authenticates w
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 path
 
@@ -55,7 +55,7 @@ Any configured audiences will be passed to the TokenRequest as-is.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -83,5 +83,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

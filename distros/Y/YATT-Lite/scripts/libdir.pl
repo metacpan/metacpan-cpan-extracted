@@ -30,17 +30,28 @@ Carp::cluck("dir=@dir\n") if $ENV{DEBUG_INC};
 sub untaint_any {$_[0] =~ m{(.*)} and $1}
 use base qw/File::Spec/;
 
-my (@libdir);
+my (@libdir, @blib);
 
+#
+# The checkout is a directory named YATT with this scripts/ directly in
+# it; only then is its parent a library root for YATT::Lite. A YATT
+# directory further up is a different checkout (e.g. the one around a
+# `./Build disttest` dir) and must not be mixed in (GH-301).
+# Source roots go before blib/lib, so that a stale blib/ left in the
+# checkout by ./Build is never preferred over the source (t/t_lib.pl
+# orders them the same way).
+#
 foreach my $dir (@dir) {
-  if (grep {$_ eq 'YATT'} File::Spec->splitdir($dir)) {
+  my @d = File::Spec->splitdir($dir);
+  if (@d >= 2 and $d[-2] eq 'YATT') {
     push @libdir, dirname(dirname($dir));
   }
 
   if (-d (my $d = "$dir/../blib/lib")."/YATT") {
-    push @libdir, $d;
+    push @blib, $d;
   }
 }
+push @libdir, @blib;
 
 my $hook = sub {
   my ($this, $orig_modfn) = @_;

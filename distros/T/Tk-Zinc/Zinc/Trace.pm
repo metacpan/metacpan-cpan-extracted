@@ -17,7 +17,7 @@
 # This may be very usefull when your application segfaults and
 # when you have no idea where this happens in your code.
 #
-# $Id: Trace.pm,v 1.13 2005/05/16 07:22:20 lecoanet Exp $
+# $Id$
 #
 # To trap Tk::Zinc errors, use rather the Tk::Zinc::TraceErrors package.
 #
@@ -27,7 +27,7 @@
 package Tk::Zinc::Trace;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.13';
 
 use vars qw( $ForReplay );
 

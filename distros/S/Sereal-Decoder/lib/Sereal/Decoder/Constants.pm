@@ -4,7 +4,7 @@ use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '5.011';
+our $VERSION = '6.002';
 
 our ( @EXPORT_OK, %DEFINE, %TAG_INFO_HASH, @TAG_INFO_ARRAY );
 
@@ -14,6 +14,14 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 BEGIN {
     %DEFINE = (
+        "SRL_CHECKSUM_TAG_LENGTH_128"              => 16,
+        "SRL_CHECKSUM_TAG_LENGTH_64"               => 8,
+        "SRL_CHECKSUM_VERSION_SIPHASH_2_4_128"     => 1,
+        "SRL_CHECKSUM_VERSION_SIPHASH_2_4_64"      => 0,
+        "SRL_CHECKSUM_VERSION_SIPHASH_3_6_128"     => 2,
+        "SRL_EXT_UNDEF_DEADLY"                     => 255,
+        "SRL_EXT_VSTRING_BINARY"                   => 38,
+        "SRL_EXT_VSTRING_UTF8"                     => 39,
         "SRL_HDR_ALIAS"                            => 46,
         "SRL_HDR_ARRAY"                            => 43,
         "SRL_HDR_ARRAYREF"                         => 64,
@@ -32,10 +40,10 @@ BEGIN {
         "SRL_HDR_HASHREF_HIGH"                     => 95,
         "SRL_HDR_HASHREF_LOW"                      => 80,
         "SRL_HDR_LONG_DOUBLE"                      => 36,
-        "SRL_HDR_MANY"                             => 60,
         "SRL_HDR_NEG"                              => 16,
         "SRL_HDR_NEG_HIGH"                         => 31,
         "SRL_HDR_NEG_LOW"                          => 16,
+        "SRL_HDR_NEG_VARINT"                       => 60,
         "SRL_HDR_NO"                               => 52,
         "SRL_HDR_OBJECT"                           => 44,
         "SRL_HDR_OBJECTV"                          => 45,
@@ -50,6 +58,7 @@ BEGIN {
         "SRL_HDR_REFP"                             => 41,
         "SRL_HDR_REGEXP"                           => 49,
         "SRL_HDR_RESERVED"                         => 54,
+        "SRL_HDR_RESERVED_1"                       => 55,
         "SRL_HDR_RESERVED_HIGH"                    => 55,
         "SRL_HDR_RESERVED_LOW"                     => 54,
         "SRL_HDR_SHORT_BINARY"                     => 96,
@@ -78,6 +87,8 @@ BEGIN {
         "SRL_MASK_SHORT_BINARY_LEN"                => 31,
         "SRL_NEG_MIN_SIZE"                         => 16,
         "SRL_POS_MAX_SIZE"                         => 15,
+        "SRL_PROTOCOL_ENCODING_BASE_MASK"          => 112,
+        "SRL_PROTOCOL_ENCODING_CHECKSUM"           => 128,
         "SRL_PROTOCOL_ENCODING_MASK"               => 240,
         "SRL_PROTOCOL_ENCODING_RAW"                => 0,
         "SRL_PROTOCOL_ENCODING_SNAPPY"             => 16,
@@ -86,7 +97,7 @@ BEGIN {
         "SRL_PROTOCOL_ENCODING_ZSTD"               => 64,
         "SRL_PROTOCOL_HDR_CONTINUE"                => 8,
         "SRL_PROTOCOL_HDR_USER_DATA"               => 1,
-        "SRL_PROTOCOL_VERSION"                     => 5,
+        "SRL_PROTOCOL_VERSION"                     => 6,
         "SRL_PROTOCOL_VERSION_BITS"                => 4,
         "SRL_PROTOCOL_VERSION_MASK"                => 15
     );
@@ -475,7 +486,7 @@ push @EXPORT_OK, keys %DEFINE;
 
     # autoupdated by Sereal.git:Perl/shared/author_tools/update_from_header.pl do not modify directly!
     {
-        "comment"    => "<LEN-VARINT> <BYTES> - binary/(latin1) string",
+        "comment"    => "<LEN-VARINT> <BYTES> - binary/native string",
         "name"       => "BINARY",
         "type_name"  => "BINARY",
         "type_value" => 38,
@@ -623,6 +634,7 @@ push @EXPORT_OK, keys %DEFINE;
 
     # autoupdated by Sereal.git:Perl/shared/author_tools/update_from_header.pl do not modify directly!
     {
+        "comment"    => "reserved",
         "masked"     => 1,
         "masked_val" => 0,
         "name"       => "RESERVED_0",
@@ -679,10 +691,9 @@ push @EXPORT_OK, keys %DEFINE;
 
     # autoupdated by Sereal.git:Perl/shared/author_tools/update_from_header.pl do not modify directly!
     {
-        "comment" =>
-            "<LEN-VARINT> <TYPE-BYTE> <TAG-DATA> - repeated tag (not done yet, will be implemented in version 3)",
-        "name"       => "MANY",
-        "type_name"  => "MANY",
+        "comment"    => "<VARINT> - absolute value of a negative integer, protocol v6",
+        "name"       => "NEG_VARINT",
+        "type_name"  => "NEG_VARINT",
         "type_value" => 60,
         "value"      => 60
     },
@@ -1039,7 +1050,7 @@ push @EXPORT_OK, keys %DEFINE;
 
     # autoupdated by Sereal.git:Perl/shared/author_tools/update_from_header.pl do not modify directly!
     {
-        "comment"    => "<BYTES> - binary/latin1 string, length encoded in low 5 bits of tag",
+        "comment"    => "<BYTES> - binary/native string, length encoded in low 5 bits of tag",
         "masked"     => 1,
         "masked_val" => 0,
         "name"       => "SHORT_BINARY_0",

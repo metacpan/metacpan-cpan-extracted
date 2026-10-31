@@ -42,8 +42,9 @@ my %efa_instance = (
 		tls_verify => 0,
 	},
 	BEG => {
-		url  => 'https://mobile.defas-fgi.de/beg',
-		name => 'Bayerische Eisenbahngesellschaft',
+		url               => 'https://mobile.defas-fgi.de/beg',
+		name              => 'Bayerische Eisenbahngesellschaft',
+		map_place_to_name => 1,
 	},
 	BSVG => {
 		url  => 'https://bsvg.efa.de/bsvagstd',
@@ -59,7 +60,10 @@ my %efa_instance = (
 		url  => 'https://www.linzag.at/static',
 		name => 'Linz AG',
 	},
-	MVV  => { load_instance('de/mvv') },
+	MVV => {
+		load_instance('de/mvv'),
+		map_place_to_name => 1,
+	},
 	NVBW => {
 		url  => 'https://www.efa-bw.de/nvbw',
 		name => 'Nahverkehrsgesellschaft Baden-Württemberg',
@@ -113,7 +117,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '3.21';
+our $VERSION = '3.22';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

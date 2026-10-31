@@ -11,11 +11,11 @@ Geo::Coder::Free::MissCache - process-level memory of lookups that found nothing
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 # How long a remembered miss lasts.  A miss is a statement about data on disk,
 # which does not change while a batch or a request runs; the lifetime only has
@@ -92,6 +92,9 @@ it a backend name clears every data set that backend opened.
     backend => { type => 'string' }            # Local, MaxMind or OpenAddresses
     dataset => { type => 'string', optional => 1 }  # zero or more, which data set
 
+Any number of parts, in any characters; no parts gives C<''>.  An empty data set
+is still a part, so C<scope_for('a', '')> is not C<scope_for('a')>.
+
 =head4 output
 
     { type => 'string' }
@@ -118,6 +121,12 @@ not an error.
 
     scope => { type => 'string' }   # from scope_for()
     key   => { type => 'string' }
+
+A key can be any string: C<''>, C<'0'>, a zero byte, non-ASCII characters and a
+very long string are all kept apart.  Characters and the UTF-8 bytes that encode
+them are different keys; how perl stores a string makes no difference.  An unknown
+scope or key is false, and not an error.  This applies to L</remember> and
+L</forget> as well.
 
 =head4 output
 
@@ -222,6 +231,10 @@ holds nothing, or names no backend, forgets nothing.  Returns true.
 
     scope => { type => 'string', optional => 1 }   # a backend name or a scope_for() string
 
+C<undef> is the same as absent.  A scope matches whole parts only:
+C<OpenAddresses> doesn't cover C<OpenAddressesX>, and C<OpenAddresse> matches
+nothing.  C<''> is a scope like any other.  This applies to L</size> as well.
+
 =head4 output
 
     { type => 'boolean', value => 1 }
@@ -300,6 +313,11 @@ setting is left as it was.  Returns the setting in force after the call.
 
     seconds => { type => 'integer', min => 0, optional => 1 }
 
+The lowest value is C<0>; no maximum applies.  Leading zeros are accepted.  C<undef>
+only asks for the setting.  C<-1>, C<1.5>, C<1.0>, C<1e3>, C<''>, a space on either
+side, a trailing newline, a digit of another script such as C<"\x{661}">, and a
+reference all croak.
+
 =head4 output
 
     { type => 'integer', min => 0 }
@@ -311,7 +329,7 @@ sub expires_after {
 
 	if(defined($seconds)) {
 		Carp::croak('expires_after() expects a non-negative whole number of seconds')
-			unless $seconds =~ /^\d+$/;
+			unless $seconds =~ /\A[0-9]+\z/;
 		$EXPIRES_AFTER = $seconds;
 	}
 

@@ -49,7 +49,7 @@
 # summary carries - rather than to find out what happened.
 #
 # The harness needs all eight checkouts, so this test skips when they are not
-# beside each other, like t/location-rule.t and t/contract-strict.t do.
+# beside each other, like t/location-rule.t does.
 #
 #   prove -l t/location-predicates.t
 

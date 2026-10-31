@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OpenBaoAppRole;
 # ABSTRACT: AppRole authenticates with OpenBao using the [App Role auth mechanism], with the role and secret stored in a Kubernetes Secret resource.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s path      => Str, { required => 'schema', default => 'approle' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::OpenBaoAppRole - AppRole authenticates with OpenBa
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 path
 
@@ -56,7 +56,7 @@ resource is used as the app role secret.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -84,5 +84,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

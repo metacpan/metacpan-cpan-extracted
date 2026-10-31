@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::BGPInterfaceOptions;
 # ABSTRACT: Interface defines configuration options for the "Interface" advertisementType.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s name => Str, { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::BGPInterfaceOptions - Interface defines configuration optio
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 name
 
@@ -31,7 +31,7 @@ Each IP address applied on the interface is advertised as a /32 prefix (for IPv4
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -59,5 +59,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

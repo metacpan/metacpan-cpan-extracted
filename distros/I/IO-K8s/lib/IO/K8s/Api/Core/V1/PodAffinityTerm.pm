@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodAffinityTerm;
 # ABSTRACT: Defines a set of pods (namely those matching the labelSelector relative to the given namespace(s)) that this pod should be co-located (affinity) or not co-located (anti-affinity) with, where co-located is defined as running on a node whose value of the label with key <topologyKey> matches that of any node on which a pod of the set of pods is running
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s labelSelector => 'Meta::V1::LabelSelector';
@@ -35,7 +35,7 @@ IO::K8s::Api::Core::V1::PodAffinityTerm - Defines a set of pods (namely those ma
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 labelSelector
 
@@ -65,7 +65,7 @@ This pod should be co-located (affinity) or not co-located (anti-affinity) with 
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -93,5 +93,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

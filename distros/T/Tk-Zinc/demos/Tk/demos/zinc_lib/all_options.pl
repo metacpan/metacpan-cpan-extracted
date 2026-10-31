@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
-# $Id: all_options.pl,v 1.5 2004/05/14 09:06:20 lecoanet Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

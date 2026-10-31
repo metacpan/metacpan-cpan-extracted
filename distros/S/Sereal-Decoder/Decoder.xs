@@ -11,6 +11,7 @@
 #include "srl_common.h"
 #include "srl_decoder.h"
 #include "srl_protocol.h"
+#include "srl_siphash.h"
 
 #ifndef GvCV_set
 # define GvCV_set(gv, cv) (GvCV(gv) = (cv))
@@ -66,6 +67,32 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
 #define OPOPT_OUTARG_BODY   (1<<3)
 #define OPOPT_OUTARG_HEADER (1<<4)
 #define OPOPT_LOOKS_LIKE    (1<<5)
+#define OPOPT_CHECKSUM      (1<<6)
+#define OPOPT_VALIDATE_CHECKSUM (1<<7)
+
+static void
+THX_pp1_checksum(pTHX_ U8 opopt, U8 arity)
+{
+    const int validate = (opopt & OPOPT_VALIDATE_CHECKSUM) != 0;
+    const int want_result = GIMME_V != G_VOID;
+    SV *src, *key = NULL, *offset_sv = NULL, *result;
+    UV offset;
+    dSP;
+    if (arity == 3 || (!validate && arity == 2))
+        offset_sv = POPs;
+    if (validate && arity >= 2)
+        key = POPs;
+    src = POPs;
+    PUTBACK;
+    offset = offset_sv ? SvUV(offset_sv) : 0;
+    result = validate
+        ? boolSV(srl_validate_sereal_checksum(aTHX_ src, key, offset))
+        : sv_2mortal(srl_get_sereal_checksum(aTHX_ src, offset));
+    SPAGAIN;
+    if (want_result)
+        XPUSHs(result);
+    PUTBACK;
+}
 
 #define pp1_sereal_decode(opopt) THX_pp1_sereal_decode(aTHX_ opopt)
 static void
@@ -104,6 +131,9 @@ THX_pp1_sereal_decode(pTHX_ U8 opopt)
     }
 
     decoder = (srl_decoder_t *)SvIV(decoder_sv);
+    /* A callback may clear the variable holding this handle. Retain its
+     * referent, which owns the C decoder, until decode cleanup has run. */
+    SAVEFREESV(SvREFCNT_inc(decoder_sv));
     if (expect_true(opopt & OPOPT_DO_BODY)) {
         if (opopt & OPOPT_DO_HEADER) {
              srl_decode_all_into(aTHX_ decoder, src_sv, header_into,
@@ -176,6 +206,20 @@ THX_pp_looks_like_sereal(pTHX)
 }
 
 static OP *
+THX_pp_get_sereal_checksum(pTHX)
+{
+    THX_pp1_checksum(aTHX_ PL_op->op_private, PL_op->op_private & 3);
+    return NORMAL;
+}
+
+static OP *
+THX_pp_validate_sereal_checksum(pTHX)
+{
+    THX_pp1_checksum(aTHX_ PL_op->op_private, PL_op->op_private & 3);
+    return NORMAL;
+}
+
+static OP *
 THX_ck_entersub_args_sereal_decoder(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
 
@@ -215,6 +259,9 @@ THX_ck_entersub_args_sereal_decoder(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     /* If we get here, we can replace the entersub with a suitable
      * custom OP. */
 
+    if (opopt & OPOPT_CHECKSUM) {
+        opopt |= arity;
+    } else {
     if (arity > min_arity && (opopt & OPOPT_DO_BODY)) {
         opopt |= OPOPT_OUTARG_BODY;
         min_arity++;
@@ -222,6 +269,7 @@ THX_ck_entersub_args_sereal_decoder(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 
     if (arity > min_arity)
         opopt |= OPOPT_OUTARG_HEADER;
+    }
 
 #ifdef op_sibling_splice
     /* op_sibling_splice is new in 5.31 and we have to do things differenly */
@@ -243,13 +291,15 @@ THX_ck_entersub_args_sereal_decoder(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 
     newop->op_type    = OP_CUSTOM;
     newop->op_private = opopt;
-    newop->op_ppaddr = opopt & OPOPT_LOOKS_LIKE ? THX_pp_looks_like_sereal : THX_pp_sereal_decode;
+    newop->op_ppaddr = opopt & OPOPT_CHECKSUM
+        ? (opopt & OPOPT_VALIDATE_CHECKSUM ? THX_pp_validate_sereal_checksum : THX_pp_get_sereal_checksum)
+        : (opopt & OPOPT_LOOKS_LIKE ? THX_pp_looks_like_sereal : THX_pp_sereal_decode);
 
 #ifdef op_sibling_splice
 
     /* attach the spliced-out args as children of the custom op, while
      * deleting the stub op created by newUNOP() */
-    op_sibling_splice(newop, NULL, 1, firstargop);
+    op_free(op_sibling_splice(newop, NULL, 1, firstargop));
 
 #endif
 
@@ -257,6 +307,20 @@ THX_ck_entersub_args_sereal_decoder(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 }
 
 #endif /* USE_CUSTOM_OPS */
+
+static void
+THX_xsfunc_checksum(pTHX_ CV *cv)
+{
+    dMARK;
+    dSP;
+    SSize_t arity = SP - MARK;
+    I32 cv_private = CvXSUBANY(cv).any_i32;
+    U8 opopt = cv_private & 0xff;
+    U8 max_arity = (cv_private >> 16) & 0xff;
+    if (arity < 1 || arity > max_arity)
+        croak_xs_usage(cv, opopt & OPOPT_VALIDATE_CHECKSUM ? "packet [, key [, offset]]" : "packet [, offset]");
+    THX_pp1_checksum(aTHX_ opopt, (U8)arity);
+}
 
 static void
 THX_xsfunc_sereal_decode(pTHX_ CV *cv)
@@ -304,6 +368,8 @@ THX_xsfunc_looks_like_sereal(pTHX_ CV *cv)
 
 typedef struct {
     sv_with_hash options[SRL_DEC_OPT_COUNT];
+    U8 known_option_heads[SRL_OPTION_INDEX_BUCKETS];
+    U8 known_option_next[SRL_DEC_OPT_COUNT];
 } my_cxt_t;
 
 START_MY_CXT
@@ -311,6 +377,115 @@ START_MY_CXT
 
 MODULE = Sereal::Decoder        PACKAGE = Sereal::Decoder
 PROTOTYPES: DISABLE
+
+SV *
+prepare_checksum_key(key = NULL, opt_key = NULL)
+    SV *key;
+    SV *opt_key;
+  PREINIT:
+    STRLEN key_len = 0;
+    STRLEN opt_key_len = 0;
+    const U8 *key_bytes = (const U8 *)"";
+    const U8 *opt_key_bytes = (const U8 *)"";
+    U8 digest[16];
+  CODE:
+    if (key && SvOK(key))
+        key_bytes = (const U8 *)SvPVbyte(key, key_len);
+    if (opt_key && SvOK(opt_key)) {
+        opt_key_bytes = (const U8 *)SvPVbyte(opt_key, opt_key_len);
+    }
+    srl_siphash_prepare_key(key_bytes, (size_t)key_len,
+                            opt_key_bytes, (size_t)opt_key_len, digest);
+    RETVAL = newSVpvn((const char *)digest, sizeof(digest));
+  OUTPUT: RETVAL
+
+SV *
+siphash24(data, key = NULL)
+    SV *data;
+    SV *key;
+  PREINIT:
+    STRLEN data_len;
+    STRLEN key_len;
+    const U8 *data_bytes;
+    const U8 *key_bytes;
+    srl_siphash_ctx sip;
+    srl_u64 digest;
+    U8 digest_bytes[8];
+    unsigned int i;
+    static const U8 zero_key[16] = { 0 };
+  CODE:
+    data_bytes = (const U8 *)SvPVbyte(data, data_len);
+    if (key == NULL) {
+      key_bytes = zero_key;
+    }
+    else {
+      key_bytes = (const U8 *)SvPVbyte(key, key_len);
+      if (key_len != 16)
+        croak("siphash24 key must be exactly 16 bytes");
+    }
+    srl_siphash_init_rounds(&sip, key_bytes, 2, 4, 0);
+    srl_siphash_update(&sip, data_bytes, (size_t)data_len);
+    digest = srl_siphash_final64(&sip);
+    for (i = 0; i < 8; i++)
+      digest_bytes[i] = (U8)(digest >> (8 * i));
+    RETVAL = newSVpvn((const char *)digest_bytes, sizeof(digest_bytes));
+  OUTPUT: RETVAL
+
+SV *
+siphash24_128(data, key = NULL)
+    SV *data;
+    SV *key;
+  PREINIT:
+    STRLEN data_len;
+    STRLEN key_len;
+    const U8 *data_bytes;
+    const U8 *key_bytes;
+    srl_siphash_ctx sip;
+    U8 digest[16];
+    static const U8 zero_key[16] = { 0 };
+  CODE:
+    data_bytes = (const U8 *)SvPVbyte(data, data_len);
+    if (key == NULL) {
+      key_bytes = zero_key;
+    }
+    else {
+      key_bytes = (const U8 *)SvPVbyte(key, key_len);
+      if (key_len != 16)
+        croak("siphash24_128 key must be exactly 16 bytes");
+    }
+    srl_siphash_init_rounds(&sip, key_bytes, 2, 4, 1);
+    srl_siphash_update(&sip, data_bytes, (size_t)data_len);
+    srl_siphash_final128(&sip, digest);
+    RETVAL = newSVpvn((const char *)digest, sizeof(digest));
+  OUTPUT: RETVAL
+
+SV *
+siphash36_128(data, key = NULL)
+    SV *data;
+    SV *key;
+  PREINIT:
+    STRLEN data_len;
+    STRLEN key_len;
+    const U8 *data_bytes;
+    const U8 *key_bytes;
+    srl_siphash_ctx sip;
+    U8 digest[16];
+    static const U8 zero_key[16] = { 0 };
+  CODE:
+    data_bytes = (const U8 *)SvPVbyte(data, data_len);
+    if (key == NULL) {
+      key_bytes = zero_key;
+    }
+    else {
+      key_bytes = (const U8 *)SvPVbyte(key, key_len);
+      if (key_len != 16)
+        croak("siphash36_128 key must be exactly 16 bytes");
+    }
+    srl_siphash_init_rounds(&sip, key_bytes, 3, 6, 1);
+    srl_siphash_update(&sip, data_bytes, (size_t)data_len);
+    srl_siphash_final128(&sip, digest);
+    RETVAL = newSVpvn((const char *)digest, sizeof(digest));
+  OUTPUT: RETVAL
 
 BOOT:
 {
@@ -329,6 +504,8 @@ BOOT:
     int i;
     {
         MY_CXT_INIT;
+        Zero(MY_CXT.known_option_heads, SRL_OPTION_INDEX_BUCKETS, U8);
+        Zero(MY_CXT.known_option_next, SRL_DEC_OPT_COUNT, U8);
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_ALIAS_SMALLINT,             SRL_DEC_OPT_STR_ALIAS_SMALLINT             );
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_ALIAS_VARINT_UNDER,         SRL_DEC_OPT_STR_ALIAS_VARINT_UNDER         );
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_DESTRUCTIVE_INCREMENTAL,    SRL_DEC_OPT_STR_DESTRUCTIVE_INCREMENTAL    );
@@ -349,15 +526,23 @@ BOOT:
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_NO_THAW_OBJECTS,            SRL_DEC_OPT_STR_NO_THAW_OBJECTS            );
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_THAW_ALLOW_CLASSES,         SRL_DEC_OPT_STR_THAW_ALLOW_CLASSES         );
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_THAW_DENY_ACTION,           SRL_DEC_OPT_STR_THAW_DENY_ACTION           );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_CHECKSUM_KEY_V1,            SRL_DEC_OPT_STR_CHECKSUM_KEY_V1            );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_CHECKSUM_KEY_V2,            SRL_DEC_OPT_STR_CHECKSUM_KEY_V2            );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_CHECKSUM_KEY_V3,            SRL_DEC_OPT_STR_CHECKSUM_KEY_V3            );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_CHECKSUM_POLICY,            SRL_DEC_OPT_STR_CHECKSUM_POLICY            );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_UNDEF_DEADLY_POLICY,        SRL_DEC_OPT_STR_UNDEF_DEADLY_POLICY        );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_UNKNOWN_OPTION_POLICY,      SRL_DEC_OPT_STR_UNKNOWN_OPTION_POLICY      );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_CHECKSUM_KEY,               SRL_DEC_OPT_STR_CHECKSUM_KEY               );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_CHECKSUM_MODE,              SRL_DEC_OPT_STR_CHECKSUM_MODE              );
     }
 #if USE_CUSTOM_OPS
     {
-        XOP *xop;
-        Newxz(xop, 1, XOP);
-        XopENTRY_set(xop, xop_name, "sereal_decode_with_object");
-        XopENTRY_set(xop, xop_desc, "sereal_decode_with_object");
-        XopENTRY_set(xop, xop_class, OA_UNOP);
-        Perl_custom_op_register(aTHX_ THX_pp_sereal_decode, xop);
+        /* Perl borrows this descriptor; it must outlive every interpreter. */
+        static const XOP xop = {
+            XOPf_xop_name | XOPf_xop_desc | XOPf_xop_class,
+            "sereal_decode_with_object", "sereal_decode_with_object", OA_UNOP
+        };
+        Perl_custom_op_register(aTHX_ THX_pp_sereal_decode, &xop);
     }
 #endif /* USE_CUSTOM_OPS */
     for (i = sizeof(funcs_to_install)/sizeof(*fti); i--; ) {
@@ -432,12 +617,11 @@ BOOT:
 {
 #if USE_CUSTOM_OPS
     {
-        XOP *xop;
-        Newxz(xop, 1, XOP);
-        XopENTRY_set(xop, xop_name, "scalar_looks_like_sereal");
-        XopENTRY_set(xop, xop_desc, "scalar_looks_like_sereal");
-        XopENTRY_set(xop, xop_class, OA_UNOP);
-        Perl_custom_op_register(aTHX_ THX_pp_looks_like_sereal, xop);
+        static const XOP xop = {
+            XOPf_xop_name | XOPf_xop_desc | XOPf_xop_class,
+            "scalar_looks_like_sereal", "scalar_looks_like_sereal", OA_UNOP
+        };
+        Perl_custom_op_register(aTHX_ THX_pp_looks_like_sereal, &xop);
     }
 #endif /* USE_CUSTOM_OPS */
     {
@@ -452,6 +636,30 @@ BOOT:
     }
 }
 
+BOOT:
+{
+    int checksum_i;
+    for (checksum_i = 0; checksum_i < 2; checksum_i++) {
+        const char *name = checksum_i ? "Sereal::Decoder::validate_sereal_checksum"
+                                     : "Sereal::Decoder::get_sereal_checksum";
+        CV *cv = newXSproto_portable(name, THX_xsfunc_checksum, __FILE__, checksum_i ? "$;$$" : "$;$");
+        CvXSUBANY(cv).any_i32 = OPOPT_CHECKSUM
+            | (checksum_i ? OPOPT_VALIDATE_CHECKSUM | 0x030100 : 0x020100);
+#if USE_CUSTOM_OPS
+        {
+            static const XOP xops[2] = {
+                { XOPf_xop_name | XOPf_xop_desc | XOPf_xop_class,
+                  "get_sereal_checksum", "get_sereal_checksum", OA_UNOP },
+                { XOPf_xop_name | XOPf_xop_desc | XOPf_xop_class,
+                  "validate_sereal_checksum", "validate_sereal_checksum", OA_UNOP }
+            };
+            Perl_custom_op_register(aTHX_ checksum_i ? THX_pp_validate_sereal_checksum : THX_pp_get_sereal_checksum, &xops[checksum_i]);
+        }
+        cv_set_call_checker(cv, THX_ck_entersub_args_sereal_decoder, (SV*)cv);
+#endif
+    }
+}
+
 srl_decoder_t *
 new(CLASS, opt = NULL)
     char *CLASS;
@@ -459,7 +667,8 @@ new(CLASS, opt = NULL)
   PREINIT:
     dMY_CXT;
   CODE:
-    RETVAL = srl_build_decoder_struct(aTHX_ opt, MY_CXT.options);
+    RETVAL = srl_build_decoder_struct(aTHX_ opt, MY_CXT.options,
+                                      MY_CXT.known_option_heads, MY_CXT.known_option_next);
     RETVAL->flags |= SRL_F_DECODER_REUSE;
   OUTPUT: RETVAL
 
@@ -490,7 +699,8 @@ decode_sereal(src, opt = NULL, into = NULL)
         else
             croak("Options are neither undef nor hash reference");
     }
-    dec = srl_build_decoder_struct(aTHX_ (HV *)opt, MY_CXT.options);
+    dec = srl_build_decoder_struct(aTHX_ (HV *)opt, MY_CXT.options,
+                                   MY_CXT.known_option_heads, MY_CXT.known_option_next);
     ST(0)= srl_decode_into(aTHX_ dec, src, into, 0);
     XSRETURN(1);
 
@@ -514,7 +724,8 @@ decode_sereal_with_header_data(src, opt = NULL, body_into = NULL, header_into = 
         else
             croak("Options are neither undef nor hash reference");
     }
-    dec = srl_build_decoder_struct(aTHX_ (HV *)opt, MY_CXT.options);
+    dec = srl_build_decoder_struct(aTHX_ (HV *)opt, MY_CXT.options,
+                                   MY_CXT.known_option_heads, MY_CXT.known_option_next);
     if (body_into == NULL)
       body_into = sv_newmortal();
     if (header_into == NULL)

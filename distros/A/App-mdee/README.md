@@ -25,9 +25,10 @@ mdee - em·dee, Markdown Easy on the Eyes
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
-         --runin=#          run-in width for line breaking (default: 2)
-         --runout=#         run-out width for line breaking (default: 2)
+         --runin=#          run-in width for line breaking (default: 4)
+         --runout=#         run-out width for line breaking (default: 4)
          --runlen=#         set both run-in and run-out
+         --boundary=#       fold boundary: word, space or none (default: word)
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -48,7 +49,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.13
+Version 1.14
 
 # DESCRIPTION
 
@@ -337,7 +338,7 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     Set the fold width for text wrapping directly.  Default is the
     pane width (output width divided by the number of columns) minus
     3 for borders and padding and the run-in width (see `--runin`),
-    which gives 80 when pane-width is 85.
+    which gives 78 when pane-width is 85.
     Only effective when `--fold` is enabled.  The same width is used
     to fit tables (see `--table`).
 
@@ -346,14 +347,25 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     Set the run-in and run-out widths that [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn)
     uses for line breaking (kinsoku) when nup folds the panes.
     `--runlen` sets both; options given later override earlier ones.
-    Default is 2.  A run-in character may go past the fold width, so
+    Default is 4.  A run-in character may go past the fold width, so
     ansicolumn keeps the run-in width free at the end of the pane, and
     the default fold width is made narrower by the same amount.  These
     values are given to nup, and they take precedence over the values
-    in `~/.ansicolumnrc`.
+    in `~/.ansicolumnrc`.  The same values are given to the md module
+    as `fold_runin` and `fold_runout`, so that the lines it folds run
+    in by the width kept free, not more.
 
-    A larger value such as 4 suits Japanese text, where a run of
-    characters that must not start a line, such as `ーッ`, can be long.
+- **--boundary**=`word`|`space`|`none`
+
+    Set where [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) may break a line when nup
+    folds the panes, as its `--boundary` option: `word` (default) does
+    not break inside an alphanumeric word, `space` not inside a sequence
+    of non-space characters, and `none` breaks anywhere.  Lists and
+    tables are folded by the md module at word boundaries, and this
+    option keeps the paragraphs, which are folded by nup, in step with
+    them.  The value is given to nup (App::nup 1.10 or later), which
+    gives it to ansicolumn after `~/.ansicolumnrc`, so it takes
+    precedence over the value there.
 
 ## Theme Options
 
@@ -844,7 +856,8 @@ HTML comments, and tables are excluded from folding.
 Recognized list markers include `*`, `-`, `1.`, `1)`, `#.`,
 and `#)`.  The `#` marker is Pandoc's auto-numbered list syntax.
 
-The folding width is controlled by `--fold-width` option (default: 80).
+The folding width is controlled by `--fold-width` option (default: the
+pane width minus 3 and the run-in width, 78 for a pane of 85).
 
 #### Table Formatting
 

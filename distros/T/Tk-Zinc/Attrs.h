@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Fri Dec 31 10:06:37 1999
  *
- * $Id: Attrs.h,v 1.9 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*

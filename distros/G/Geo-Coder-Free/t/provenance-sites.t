@@ -4,9 +4,9 @@
 # four provenance keys of section 2.1 of BI-Phase6-Dependency-Specs.md:
 # geocoder, database, confidence and accuracy.
 #
-# t/consumer-contract.t checks that a backend file still sets the keys it
-# promises, and it checks the file as a whole: one 'database' => anywhere in
-# MaxMind.pm satisfies it.  The contract can therefore be lost without that test
+# A check that a backend file still sets the keys it promises would look at the
+# file as a whole: one 'database' => anywhere in MaxMind.pm satisfies it.  The
+# contract can therefore be lost without such a test
 # noticing.  Add a fifth backend, or a second return path inside a backend, and
 # as long as some other line in the file still names the key, the file-level
 # check passes while results from the new site carry no provenance at all.

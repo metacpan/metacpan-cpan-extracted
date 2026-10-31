@@ -4,7 +4,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::args_array_with_signatures';    ## no critic (ProhibitNoWarnings)
 
-our $VERSION = '2.20260827';
+our $VERSION = '2.20261030';
 
 use XML::LibXML;
 
@@ -75,12 +75,11 @@ sub as_xml($self) {
         . $end
         . "</end>\n\t\t</date_range>\n";
 
+    # the RFC 9990 schema allows one error element
     my $errors = $self->error;
     if ( $errors && @$errors ) {
-        foreach my $err (@$errors) {
-            $err = XML::LibXML::Text->new($err)->toString();
-            $meta .= "\t\t<error>$err</error>\n";
-        }
+        my $err = XML::LibXML::Text->new( join '; ', @$errors )->toString();
+        $meta .= "\t\t<error>$err</error>\n";
     }
     $meta .= "\t</report_metadata>";
     return $meta;
@@ -98,7 +97,7 @@ Mail::DMARC::Report::Aggregate::Metadata - metadata section of aggregate report
 
 =head1 VERSION
 
-version 2.20260827
+version 2.20261030
 
 =head1 AUTHORS
 

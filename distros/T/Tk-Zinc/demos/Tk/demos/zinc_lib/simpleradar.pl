@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
-# $Id: simpleradar.pl,v 1.7 2004/03/19 11:34:25 mertz Exp $
+# $Id$
 # This simple radar has been initially developped by P. Lecoanet <lecoanet@cena.fr>
 # It has been adapted by C. Mertz <mertz@cena.fr> for demo purpose.
 
 package simpleradar; # for avoiding symbol collision between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 
 use Tk;
@@ -52,7 +52,9 @@ my $rate = 0.3;
 my %tracks = ();
 
 my $pause = 0; # if true the flight are no more moving
-my $zinc = $mw->Zinc(-backcolor => 'gray65',
+my $zinc = $mw->Zinc(-render => 1,
+                     -enablerotation => 1,
+                     -backcolor => 'gray65',
 		     -relief => 'sunken',
 		     -font => "10x20");
 $zinc->pack(-expand => 1, -fill => 'both');
@@ -61,6 +63,9 @@ $zinc->configure(-width => $zinc_width, -height => $zinc_height);
 my $radar = $zinc->add('group', $top, -tags => ['controls', 'radar']);
 $zinc->configure(-overlapmanager => $radar);
 
+my $rotation = 0;
+$zinc->Tk::bind('<Alt-1>', sub { $rotation += 10; $zinc->configure(-screenrotation => $rotation); });
+$zinc->Tk::bind('<Alt-3>', sub { $rotation -= 10; $zinc->configure(-screenrotation => $rotation); });
 
 ###################################################
 # creation panneau controle
@@ -127,7 +132,10 @@ sub update_transform {
     $zinc->translate($top, -$center_x, -$center_y);
     $zinc->scale($top, $scale, $scale);
     $zinc->scale($top, 1, -1);
-    $zinc->translate($top, $zinc_width/2, $zinc_height/2);
+    my $virtualSize = sqrt($zinc_width*$zinc_width + $zinc_height*$zinc_height);
+    my $hVirtualSize = $virtualSize/2;
+    $zinc->translate($top, $hVirtualSize, $hVirtualSize);
+    #$zinc->translate($top, $zinc_width/2, $zinc_height/2);
 }
 
 

@@ -8,53 +8,55 @@ use version;
 use base qw/YATT::Lite::Object
 	    YATT::Lite::Util::CmdLine
 	  /;
-use fields (qw/table_list table_dict dbtype cf_DBH
-	       cf_user
-	       cf_auth
-	       cf_connection_spec
-	       cf_connect_atstart
-	       cf_verbose
-	       cf_NULL
-	       cf_name
-	       cf_no_header
-	       cf_auto_create
-	       cf_coltype_map
+use YATT::Lite::MFields
+  (qw/_table_list _table_dict _dbtype
+	       DBH
+	       user
+	       auth
+	       connection_spec
+	       connect_atstart
+	       verbose
+	       NULL
+	       name
+	       no_header
+	       auto_create
+	       coltype_map
 
-	       cf_after_dbinit
-	       cf_group_writable
+	       after_dbinit
+	       group_writable
 
-	       cf_is_clone
-	       cf_debug
-	       cf_on_destroy
+	       is_clone
+	       debug
+	       on_destroy
 
-	       role_dict
+	       _role_dict
 	     /);
 
 use YATT::Lite::Types
-  ([Item => fields => [qw/not_configured
-			  cf_name/]
-    , [Table => fields => [qw/pk chk_unique
-			      chk_index chk_check
-			      col_list col_dict
-			      relation_list relation_dict
-			      reference_dict
-			      initializer
-			      cf_view cf_virtual
-			      cf_trigger_after_delete
+  ([Item => fields => [qw/_not_configured
+			  name/]
+    , [Table => fields => [qw/_pk _chk_unique
+			      _chk_index _chk_check
+			      _col_list _col_dict
+			      _relation_list _relation_dict
+			      _reference_dict
+			      _initializer
+			      view virtual
+			      trigger_after_delete
 			    /]]
-    , [Column => fields => [qw/cf_type
-			       cf_hidden
-			       cf_unique
-			       cf_indexed
-			       cf_primary_key
-			       cf_autoincrement
+    , [Column => fields => [qw/type
+			       hidden
+			       unique
+			       indexed
+			       primary_key
+			       autoincrement
 
-			       cf_default
-			       cf_null
+			       default
+			       null
 
-			       cf_usage
-			       cf_label
-			       cf_max_length
+			       usage
+			       label
+			       max_length
 			     /]]]
 );
 
@@ -65,7 +67,7 @@ use YATT::Lite::Util qw/coalesce globref ckeval terse_dump lexpand
 #========================================
 DESTROY {
   my MY $self = shift;
-  if (my $sub = $self->{cf_on_destroy}) {
+  if (my $sub = $self->{on_destroy}) {
     $sub->($self);
   }
   $self->disconnect("from DBSchema->DESTROY");
@@ -73,15 +75,15 @@ DESTROY {
 sub disconnect {
   (my MY $schema, my $msg) = @_;
   $msg ||= "";
-  if (my $dbh = delete $schema->{cf_DBH}) {
+  if (my $dbh = delete $schema->{DBH}) {
     # XXX: is_clone
     $dbh->commit unless $dbh->{AutoCommit};
     $dbh->disconnect;
     print STDERR "DEBUG: DBSchema->disconnect $msg $schema, had dbh $dbh\n"
-      if $schema->{cf_debug};
+      if $schema->{debug};
   } else {
     print STDERR "DEBUG: DBSchema->disconnect $msg $schema, without dbh\n"
-      if $schema->{cf_debug};
+      if $schema->{debug};
   }
 }
 
@@ -107,23 +109,23 @@ sub clone {
     $new->{$k} = ref $v ? shallow_copy($v, 1) : $v;
   }
   $new->reset;
-  $new->{cf_is_clone} = 1;
+  $new->{is_clone} = 1;
   $new->configure(@_) if @_;
-  print STDERR "DEBUG: dbschema clone, now=$new\n" if $new->{cf_debug};
+  print STDERR "DEBUG: dbschema clone, now=$new\n" if $new->{debug};
   $new;
 }
 
 sub reset {
   (my MY $self) = @_;
-  if (my $dbh = delete $self->{cf_DBH}) {
-    $dbh->disconnect if $self->{cf_is_clone};
+  if (my $dbh = delete $self->{DBH}) {
+    $dbh->disconnect if $self->{is_clone};
   }
 }
 
 sub is_known_role {
   (my MY $self, my $class) = @_;
   $class //= caller;
-  $self->{role_dict}{$class}++;
+  $self->{_role_dict}{$class}++;
 }
 
 # Extension hook.
@@ -160,12 +162,12 @@ sub parse_import {
 #########################################
 sub after_connect {
   my MY $self = shift;
-  $self->ensure_created_on($self->{cf_DBH}) if $self->{cf_auto_create};
+  $self->ensure_created_on($self->{DBH}) if $self->{auto_create};
 }
 
 sub dbinit_sqlite {
   (my MY $self, my $sqlite_fn) = @_;
-  chmod 0664, $sqlite_fn if $self->{cf_group_writable} // 1;
+  chmod 0664, $sqlite_fn if $self->{group_writable} // 1;
 }
 
 #========================================
@@ -179,18 +181,18 @@ sub startup {
     $sub->($app, $schema);
   }
 
-  if ($schema->{cf_connect_atstart}) {
+  if ($schema->{connect_atstart}) {
     $schema->make_connection;
   }
 }
 
 #========================================
 
-sub has_connection { my MY $schema = shift; $schema->{cf_DBH} }
+sub has_connection { my MY $schema = shift; $schema->{DBH} }
 
 sub dbh {
   (my MY $schema) = @_;
-  $schema->{cf_DBH} // $schema->make_connection;
+  $schema->{DBH} // $schema->make_connection;
 }
 
 #
@@ -199,8 +201,8 @@ sub dbh {
 sub configure_connect {
   (my MY $schema, my $config) = @_;
   my ($when, @spec) = @$config;
-  $schema->{cf_connection_spec} = \@spec;
-  $schema->{cf_connect_atstart} = $schema->parse_connect_when($when);
+  $schema->{connection_spec} = \@spec;
+  $schema->{connect_atstart} = $schema->parse_connect_when($when);
 }
 
 sub parse_connect_when {
@@ -216,15 +218,15 @@ sub parse_connect_when {
 
 sub configure_dbtype {
   (my MY $schema, my $value) = @_;
-  $schema->{dbtype} = $value;
+  $schema->{_dbtype} = $value;
 }
 
 #
-# This must fill cf_DBH.
+# This must fill DBH.
 #
 sub make_connection {
   (my MY $schema) = shift;
-  my ($spec) = @_ ? @_ : $schema->{cf_connection_spec};
+  my ($spec) = @_ ? @_ : $schema->{connection_spec};
   unless (defined $spec) {
     croak "connection_spec is empty";
   }
@@ -235,10 +237,10 @@ sub make_connection {
   } else {
     croak "Unknown connection spec obj: $spec";
   }
-  print STDERR "DEBUG: dbh for $schema=$schema->{cf_DBH}"
-    , ($schema->{cf_debug} >= 2 ? Carp::longmess() : ()), "\n\n"
-      if $schema->{cf_debug};
-  $schema->{cf_DBH};
+  print STDERR "DEBUG: dbh for $schema=$schema->{DBH}"
+    , ($schema->{debug} >= 2 ? Carp::longmess() : ()), "\n\n"
+      if $schema->{debug};
+  $schema->{DBH};
 }
 
 #----------------------------------------
@@ -247,7 +249,7 @@ sub connect_to {
   if ($dbtype =~ /^dbi:/i) {
     $schema->connect_to_dbi($dbtype, @args);
   } elsif (my $sub = $schema->can("connect_to_\L$dbtype")) {
-    $schema->{dbtype} = lc($dbtype);
+    $schema->{_dbtype} = lc($dbtype);
     $sub->($schema, @args);
   } else {
     croak sprintf("%s: Unknown dbtype: %s", MY, $dbtype);
@@ -264,7 +266,7 @@ sub dbtype_of_dbi_dsn {
 sub connect_to_dbi {
   (my MY $schema, my ($dbi, @args)) = @_;
   my $driver = $schema->dbtype_of_dbi_dsn($dbi);
-  $schema->{dbtype} = lc($driver);
+  $schema->{_dbtype} = lc($driver);
   if (my $sub = $schema->can("connect_to_\L$driver")) {
     $sub->($schema, $dbi, @args);
   } else {
@@ -289,9 +291,9 @@ sub connect_to_sqlite {
     $opts{sqlite_use_immediate_transaction} = 1
       if version->parse($DBD::SQLite::VERSION) >= $minver;
   }
-  $schema->{dbtype} //= 'sqlite';
+  $schema->{_dbtype} //= 'sqlite';
   my $first_time = not -e $sqlite_fn;
-  $schema->{cf_auto_create} //= 1;
+  $schema->{auto_create} //= 1;
   $schema->dbi_connect($dbi_dsn, undef, undef, %opts);
   $schema->dbinit_sqlite($sqlite_fn) if $first_time;
   $schema;
@@ -302,7 +304,7 @@ sub dbi_connect {
   my %default = $schema->default_dbi_attr;
   $attr{$_} //= $default{$_} for keys %default;
   require DBI;
-  my $dbh = $schema->{cf_DBH} = DBI->connect($dbi_dsn, $user, $auth, \%attr);
+  my $dbh = $schema->{DBH} = DBI->connect($dbi_dsn, $user, $auth, \%attr);
   $schema->after_connect;
   $schema;
 }
@@ -319,9 +321,9 @@ sub default_dbi_attr {
 sub create {
   (my MY $schema, my @spec) = @_;
   # $schema->dbh() will call ensure_created_on when auto_create is on.
-  my $dbh = $schema->{cf_DBH} || $schema->make_connection(\@spec);
+  my $dbh = $schema->{DBH} || $schema->make_connection(\@spec);
   #
-  $schema->ensure_created_on($dbh) unless $schema->{cf_auto_create};
+  $schema->ensure_created_on($dbh) unless $schema->{auto_create};
   $schema;
 }
 
@@ -334,7 +336,7 @@ sub sql_schema {
     }
   }
   foreach my Table $view ($schema->list_views(raw => 1)) {
-    push @sql, "CREATE VIEW $view->{cf_name}\nAS $view->{cf_view}";
+    push @sql, "CREATE VIEW $view->{name}\nAS $view->{view}";
   }
   @sql;
 }
@@ -347,25 +349,25 @@ sub ensure_created_on {
 
   my (@sql, @created);
   foreach my Table $table ($schema->list_tables(raw => 1)) {
-    next if $schema->has_table($table->{cf_name}, $dbh);
+    next if $schema->has_table($table->{name}, $dbh);
     push @created, $table;
     foreach my $create ($schema->sql_create_table($table)) {
-      unless ($schema->{cf_verbose}) {
-      } elsif ($schema->{cf_verbose} >= 2) {
-	print STDERR "-- $table->{cf_name} --\n$create\n\n"
-      } elsif ($schema->{cf_verbose} and $create =~ /^create table /i) {
-	print STDERR "CREATE TABLE $table->{cf_name}\n";
+      unless ($schema->{verbose}) {
+      } elsif ($schema->{verbose} >= 2) {
+	print STDERR "-- $table->{name} --\n$create\n\n"
+      } elsif ($schema->{verbose} and $create =~ /^create table /i) {
+	print STDERR "CREATE TABLE $table->{name}\n";
       }
       push @sql, $create;
     }
   }
   foreach my Table $view ($schema->list_views(raw => 1)) {
-    next if $schema->has_view($view->{cf_name}, $dbh);
-    next if $view->{cf_virtual};
-    if ($schema->{cf_verbose}) {
-      print STDERR "CREATE VIEW $view->{cf_name}\n";
+    next if $schema->has_view($view->{name}, $dbh);
+    next if $view->{virtual};
+    if ($schema->{verbose}) {
+      print STDERR "CREATE VIEW $view->{name}\n";
     }
-    push @sql, "CREATE VIEW $view->{cf_name}\nAS $view->{cf_view}";
+    push @sql, "CREATE VIEW $view->{name}\nAS $view->{view}";
   }
   $dbh->do($_) for @sql;
   if (@created) {
@@ -381,22 +383,22 @@ sub ensure_created_on {
 
 sub ensure_table_populated {
   (my MY $schema, my $dbh, my Table $tab) = @_;
-  foreach my $init (lexpand($tab->{initializer})) {
+  foreach my $init (lexpand($tab->{_initializer})) {
     my ($colSpec, @values) = @$init;
-    my $sql = $schema->sql_to_insert($tab->{cf_name}, @$colSpec);
+    my $sql = $schema->sql_to_insert($tab->{name}, @$colSpec);
     my $ins = $dbh->prepare($sql);
     foreach my $record (@values) {
       if (grep {ref $_ eq 'SCALAR'} @$record) {
 	my ($sql, $values) = $schema->sql_and_values_to_insert_expr
-	  ($tab->{cf_name}, $colSpec, $record);
+	  ($tab->{name}, $colSpec, $record);
 	my @vals = $schema->expand_codevalue($tab, $values);
 	print STDERR $sql, "\n -- (", join(",", @vals), ")\n"
-	  if $schema->{cf_verbose};
+	  if $schema->{verbose};
 	$dbh->do($sql, undef, @vals);
       } else {
 	my @vals = $schema->expand_codevalue($tab, $record);
 	print STDERR $sql, "\n -- (", join(",", @vals), ")\n"
-	  if $schema->{cf_verbose};
+	  if $schema->{verbose};
 	$ins->execute(@vals);
       }
     }
@@ -422,8 +424,8 @@ sub has_view  { shift->has_type(view => @_); }
 
 sub has_type {
   (my MY $schema, my ($type, $table, $dbh)) = @_;
-  if ($$schema{dbtype}
-      and my $sub = $schema->can("$$schema{dbtype}_has_type")) {
+  if ($$schema{_dbtype}
+      and my $sub = $schema->can("$$schema{_dbtype}_has_type")) {
     $sub->($schema, $type, $table, $dbh);
   } else {
     $dbh ||= $schema->dbh;
@@ -433,8 +435,8 @@ sub has_type {
 
 sub dbtype_try_invoke {
   (my MY $schema, my ($method, @args)) = @_;
-  return unless $schema->{dbtype};
-  my $sub = $schema->can("$schema->{dbtype}_$method")
+  return unless $schema->{_dbtype};
+  my $sub = $schema->can("$schema->{_dbtype}_$method")
     or return;
   $sub->($schema, @args);
 }
@@ -451,7 +453,7 @@ END
 
 sub tables {
   my MY $schema = shift;
-  keys %{$schema->{table_dict}};
+  keys %{$schema->{_table_dict}};
 }
 
 sub has_column {
@@ -482,7 +484,7 @@ sub _list_items {
   (my MY $self, my $opts) = splice @_, 0, 2;
   $opts->{raw} ? @_ : map {
     my Item $item = $_;
-    $item->{cf_name}
+    $item->{name}
   } @_;
 }
 
@@ -490,59 +492,59 @@ sub list_tables {
   (my MY $self, my %opts) = @_;
   $self->_list_items(\%opts, grep {
     my Table $tab = $_;
-    not $tab->{cf_view}
-  } @{$self->{table_list}});
+    not $tab->{view}
+  } @{$self->{_table_list}});
 }
 
 sub list_views {
   (my MY $self, my %opts) = @_;
   $self->_list_items(\%opts, grep {
     my Table $tab = $_;
-    $tab->{cf_view}
-  } @{$self->{table_list}});
+    $tab->{view}
+  } @{$self->{_table_list}});
 }
 
 sub list_relations {
   (my MY $self, my ($tabName, %opts)) = @_;
-  my Table $tab = $self->{table_dict}{$tabName}
+  my Table $tab = $self->{_table_dict}{$tabName}
     or return;
   if ($opts{raw}) {
-    @{$tab->{relation_list}}
+    @{$tab->{_relation_list}}
   } else {
     map {
       (my ($relType, $relName, $fkName), my Table $subTab) = @$_;
       $fkName //= do {
 	if (my Column $pk = $self->get_table_pk($subTab)
 	    || $self->get_table_pk($tab)) {
-	  $pk->{cf_name};
+	  $pk->{name};
 	}
       };
-      [$relType, $relName, $fkName, $subTab->{cf_name}];
-    } @{$tab->{relation_list}};
+      [$relType, $relName, $fkName, $subTab->{name}];
+    } @{$tab->{_relation_list}};
   }
 }
 
 sub list_table_columns {
   (my MY $self, my ($tabName, %opts)) = @_;
-  my Table $tab = $self->{table_dict}{$tabName}
+  my Table $tab = $self->{_table_dict}{$tabName}
     or return;
-  $self->_list_items(\%opts, @{$tab->{col_list}});
+  $self->_list_items(\%opts, @{$tab->{_col_list}});
 }
 
 sub get_table {
   (my MY $self, my $name) = @_;
-  $self->{table_dict}{$name} //= do {
-    push @{$self->{table_list}}
+  $self->{_table_dict}{$name} //= do {
+    push @{$self->{_table_list}}
       , my Table $tab = $self->Table->new(name => $name);
-    $tab->{not_configured} = 1;
+    $tab->{_not_configured} = 1;
     $tab;
   };
 }
 
 sub get_table_pk {
   (my MY $self, my ($tabName, %opts)) = @_;
-  my Table $tab = ref $tabName ? $tabName : $self->{table_dict}{$tabName};
-  my $pkinfo = $tab->{pk};
+  my Table $tab = ref $tabName ? $tabName : $self->{_table_dict}{$tabName};
+  my $pkinfo = $tab->{_pk};
   return unless $pkinfo;
   if (wantarray) {
     $self->_list_items(\%opts, ref $pkinfo eq 'ARRAY' ? @$pkinfo : $pkinfo);
@@ -556,10 +558,10 @@ sub add_table {
   my ($name, $opts, @colpairs) = @_;
   my Table $tab = $self->get_table($name);
   return $tab if @_ == 1;
-  if ($tab and not $tab->{not_configured}) {
+  if ($tab and not $tab->{_not_configured}) {
     croak "Duplicate definition of table $name";
   }
-  delete $tab->{not_configured};
+  delete $tab->{_not_configured};
   $self->extend_table(@_);
 }
 
@@ -593,22 +595,22 @@ sub extend_table {
 
 sub add_table_primary_key {
   (my MY $self, my Table $tab, my @args) = @_;
-  if ($tab->{pk} and @args) {
-    croak "Duplicate PK definition. old $tab->{pk}";
+  if ($tab->{_pk} and @args) {
+    croak "Duplicate PK definition. old $tab->{_pk}";
   }
-  $tab->{pk} = [map {$tab->{col_dict}{$_}} @args];
+  $tab->{_pk} = [map {$tab->{_col_dict}{$_}} @args];
 }
 
 sub add_table_unique {
   (my MY $self, my Table $tab, my @cols) = @_;
   # XXX: 重複検査, 有無検査
-  push @{$tab->{chk_unique}}, [@cols];
+  push @{$tab->{_chk_unique}}, [@cols];
 }
 
 sub add_table_index {
   (my MY $self, my Table $tab, my @cols) = @_;
   # XXX: 重複検査, 有無検査
-  push @{$tab->{chk_index}}, [@cols];
+  push @{$tab->{_chk_index}}, [@cols];
 }
 
 # -opt は引数無フラグ、又は [-opt, ...] として可変長オプションに使う
@@ -616,7 +618,7 @@ sub add_table_relation {
   (my MY $self, my Table $tab, my Column $fkCol
    , my ($relType, $relSpec, $item, $fkName, $atts)) = @_;
   unless (defined $item) {
-    croak "Undefined relation spec for table $tab->{cf_name}";
+    croak "Undefined relation spec for table $tab->{name}";
   }
 
   #
@@ -626,33 +628,33 @@ sub add_table_relation {
 
   my Table $subTab = ref $item ? $self->add_table(@$item)
     : $self->get_table($item);
-  my $relName = $relSpec->[0] // lc($subTab->{cf_name});
-  $fkName //= $relSpec->[1] // $fkCol->{cf_name}
-    // $subTab->{reference_dict}{$tab->{cf_name}};
-  if ($tab->{relation_dict}{$relName}) {
-    croak "Conflicting relation! $tab->{cf_name}.$relName";
+  my $relName = $relSpec->[0] // lc($subTab->{name});
+  $fkName //= $relSpec->[1] // $fkCol->{name}
+    // $subTab->{_reference_dict}{$tab->{name}};
+  if ($tab->{_relation_dict}{$relName}) {
+    croak "Conflicting relation! $tab->{name}.$relName";
   }
-  push @{$tab->{relation_list}}
-    , $tab->{relation_dict}{$relName}
+  push @{$tab->{_relation_list}}
+    , $tab->{_relation_dict}{$relName}
       = [$relType => $relName, $fkName, $subTab];
 }
 
 sub add_table_column {
   (my MY $self, my Table $tab, my ($colName, $type, @colSpec)) = @_;
-  if ($tab->{col_dict}{$colName}) {
-    croak "Conflicting column name $colName for table $tab->{cf_name}";
+  if ($tab->{_col_dict}{$colName}) {
+    croak "Conflicting column name $colName for table $tab->{name}";
   }
   # $tab.$colName is encoded by $refTab.pk
   if (ref $type) {
-    croak "Deprecated column spec in $tab->{cf_name}.$colName";
+    croak "Deprecated column spec in $tab->{name}.$colName";
   } elsif (not defined $type) {
-    Carp::cluck "Column type $tab->{cf_name}.$colName is undef";
+    Carp::cluck "Column type $tab->{name}.$colName is undef";
   }
 
   my (@opt, @rels);
   while (@colSpec) {
     unless (defined (my $key = shift @colSpec)) {
-      croak "Undefined colum spec for $tab->{cf_name}.$colName";
+      croak "Undefined colum spec for $tab->{name}.$colName";
     } elsif (ref $key) {
       my ($method, @args) = @$key;
       $method =~ s/^-//;
@@ -670,10 +672,10 @@ sub add_table_column {
       push @opt, $key, shift @colSpec;
     }
   }
-  push @{$tab->{col_list}}, ($tab->{col_dict}{$colName})
+  push @{$tab->{_col_list}}, ($tab->{_col_dict}{$colName})
     = (my Column $col) = $self->Column->new
       (@opt, name => $colName, type => $type);
-  $tab->{pk} = $col if $col->{cf_primary_key};
+  $tab->{_pk} = $col if $col->{primary_key};
 
   $self->add_table_relation($tab, $col, @$_) for @rels;
 
@@ -683,18 +685,18 @@ sub add_table_column {
 
 sub add_table_values {
   (my MY $self, my Table $tab, my ($colspec, @values)) = @_;
-  push @{$tab->{initializer}}, [$colspec, @values];
+  push @{$tab->{_initializer}}, [$colspec, @values];
 }
 
 sub verify_schema {
   (my MY $self) = @_;
   my @not_configured;
-  foreach my Table $tab (lexpand($self->{table_list})) {
-    if ($tab->{not_configured}) {
-      push @not_configured, $tab->{cf_name};
+  foreach my Table $tab (lexpand($self->{_table_list})) {
+    if ($tab->{_not_configured}) {
+      push @not_configured, $tab->{name};
       next;
     }
-    # foreach my Column $col (lexpand($tab->{col_list})) { }
+    # foreach my Column $col (lexpand($tab->{_col_list})) { }
   }
   if (@not_configured) {
     croak "Some tables are not configure, possibly spellmiss!: @not_configured";
@@ -727,55 +729,55 @@ sub default_dbtype {'sqlite'}
 sub sql_create_table {
   (my MY $schema, my Table $tab, my $opts) = @_;
   my (@cols, @indices);
-  my $dbtype = $opts->{dbtype} || $schema->{dbtype} || $schema->default_dbtype;
+  my $dbtype = $opts->{_dbtype} || $schema->{_dbtype} || $schema->default_dbtype;
   my $sub = $schema->can($dbtype.'_sql_create_column')
     || $schema->can('sql_create_column');
 
   my $pk_ok;
-  foreach my Column $col (@{$tab->{col_list}}) {
-    $pk_ok = 1 if $col->{cf_primary_key};
+  foreach my Column $col (@{$tab->{_col_list}}) {
+    $pk_ok = 1 if $col->{primary_key};
     push @cols, $sub->($schema, $tab, $col, $opts);
-    push @indices, $col if $col->{cf_indexed};
+    push @indices, $col if $col->{indexed};
   }
 
   # Multi column primary key(...)
   # XXX: conflict clause
-  if (not $pk_ok and $tab->{pk}) {
+  if (not $pk_ok and $tab->{_pk}) {
     push @cols, "PRIMARY KEY(".join(", ", map {
       my Column $col = $_;
-      $col->{cf_name}
-    } @{$tab->{pk}}).")";
+      $col->{name}
+    } @{$tab->{_pk}}).")";
   }
 
   # Other unique(...)
-  foreach my $constraint (lexpand($tab->{chk_unique})) {
+  foreach my $constraint (lexpand($tab->{_chk_unique})) {
     push @cols, sprintf q{unique(%s)}, join(", ", @$constraint);
   }
 
   # XXX: SQLite specific.
   # XXX: MySQL ENGINE(TYPE) = ...
   push my @create
-    , sprintf qq{CREATE TABLE %s\n(%s)}, $tab->{cf_name}
+    , sprintf qq{CREATE TABLE %s\n(%s)}, $tab->{name}
       , join "\n, ", @cols;
 
   foreach my Column $ix (@indices) {
     push @create
       , sprintf q{CREATE INDEX %1$s_%2$s on %1$s(%2$s)}
-	, $tab->{cf_name}, $ix->{cf_name};
+	, $tab->{name}, $ix->{name};
   }
 
-  foreach my $colnames (lexpand($tab->{chk_index})) {
-    my $ixname = join "_", $tab->{cf_name}, @$colnames;
+  foreach my $colnames (lexpand($tab->{_chk_index})) {
+    my $ixname = join "_", $tab->{name}, @$colnames;
     push @create, sprintf(q{CREATE INDEX %s on %s(%s)}
-			  , $tab->{cf_name}
-			  , join("_", $tab->{cf_name}, @$colnames)
+			  , $tab->{name}
+			  , join("_", $tab->{name}, @$colnames)
 			  , join(",", @$colnames));
   }
 
   # after delete on user for each row begin
-  if (my $trigger = $tab->{cf_trigger_after_delete}) {
+  if (my $trigger = $tab->{trigger_after_delete}) {
     push @create, map {
-      qq{CREATE TRIGGER $_ AFTER DELETE ON $tab->{cf_name}}
+      qq{CREATE TRIGGER $_ AFTER DELETE ON $tab->{name}}
 	. qq{ FOR EACH ROW } . $schema->sql_compound_trigger($trigger->{$_});
     } keys %$trigger;
   }
@@ -786,25 +788,25 @@ sub sql_create_table {
 # XXX: text => varchar(80)
 sub map_coltype {
   (my MY $schema, my $typeName) = @_;
-  $schema->{cf_coltype_map}{$typeName} // $typeName;
+  $schema->{coltype_map}{$typeName} // $typeName;
 }
 
 sub sql_create_column {
   (my MY $schema, my Table $tab, my Column $col, my $opts) = @_;
   # XXX: primary key ASC/DESC
-  join(" ", $col->{cf_name}
-       , $schema->map_coltype($col->{cf_type})
-       , ($col->{cf_primary_key} ? "primary key" : ())
-       , ($col->{cf_unique} ? "unique" : ())
-       , ($col->{cf_autoincrement} ? "auto_increment" : ()));
+  join(" ", $col->{name}
+       , $schema->map_coltype($col->{type})
+       , ($col->{primary_key} ? "primary key" : ())
+       , ($col->{unique} ? "unique" : ())
+       , ($col->{autoincrement} ? "auto_increment" : ()));
 }
 
 sub sqlite_sql_create_column {
   (my MY $schema, my Table $tab, my Column $col, my $opts) = @_;
-  unless (defined $col->{cf_type}) {
-    croak "Column type is not yet defined! $tab->{cf_name}.$col->{cf_name}"
-  } elsif ($col->{cf_type} =~ /^int/i && $col->{cf_primary_key}) {
-    "$col->{cf_name} integer primary key"
+  unless (defined $col->{type}) {
+    croak "Column type is not yet defined! $tab->{name}.$col->{name}"
+  } elsif ($col->{type} =~ /^int/i && $col->{primary_key}) {
+    "$col->{name} integer primary key"
   } else {
     $schema->sql_create_column($tab, $col, $opts);
   }
@@ -812,8 +814,8 @@ sub sqlite_sql_create_column {
 
 sub sql_compound_trigger {
   (my MY $schema, my $item) = @_;
-  my $sub = $schema->can($$schema{dbtype}.'_sql_compound_trigger')
-    or croak "Compound trigger for $$schema{dbtype} is not yet implemented";
+  my $sub = $schema->can($$schema{_dbtype}.'_sql_compound_trigger')
+    or croak "Compound trigger for $$schema{_dbtype} is not yet implemented";
   $sub->($schema, $item);
 }
 
@@ -837,7 +839,7 @@ sub sql_drop {
   shift->foreach_tables_do
     (sub {
        (my Table $tab) = @_;
-       qq{drop table $tab->{cf_name}};
+       qq{drop table $tab->{name}};
      })
 }
 
@@ -848,7 +850,7 @@ sub foreach_tables_do {
   };
   my @result;
   my $wantarray = wantarray;
-  foreach my Table $tab (@{$self->{table_list}}) {
+  foreach my Table $tab (@{$self->{_table_list}}) {
     push @result, map {
       $wantarray ? $_ . "\n" : $_
     } $code->($tab, $opts);
@@ -876,7 +878,7 @@ sub to_encode {
 sub to_find {
   (my MY $self, my ($tabName, $keyCol, $rowidCol)) = @_;
   my $sql = $self->sql_to_find($tabName, $keyCol, $rowidCol);
-  print STDERR "-- $sql\n" if $self->{cf_verbose};
+  print STDERR "-- $sql\n" if $self->{verbose};
   my $sth;
   sub {
     my ($value) = @_;
@@ -891,7 +893,7 @@ sub to_find {
 sub to_fetch {
   (my MY $self, my ($tabName, $keyColList, $resColList, @rest)) = @_;
   my $sql = $self->sql_to_fetch($tabName, $keyColList, $resColList, @rest);
-  print STDERR "-- $sql\n" if $self->{cf_verbose};
+  print STDERR "-- $sql\n" if $self->{verbose};
   my $sth;
   sub {
     my (@value) = @_;
@@ -904,7 +906,7 @@ sub to_fetch {
 sub to_insert {
   (my MY $self, my ($tabName, @fields)) = @_;
   my $sql = $self->sql_to_insert($tabName, @fields);
-  print STDERR "-- $sql\n" if $self->{cf_verbose};
+  print STDERR "-- $sql\n" if $self->{verbose};
   my $sth;
   sub {
     my (@value) = @_;
@@ -917,7 +919,7 @@ sub to_insert {
 
 sub sql_to_find {
   (my MY $self, my ($tabName, $keyCol, $rowidCol)) = @_;
-  my Table $tab = $self->{table_dict}{$tabName}
+  my Table $tab = $self->{_table_dict}{$tabName}
     or croak "No such table: $tabName";
   # XXX: col name check.
   $rowidCol ||= $self->rowid_col($tab);
@@ -930,7 +932,7 @@ sub sql_to_fetch {
   (my MY $self, my ($tabName, $keyColList, $resColList, %opts)) = @_;
   my $group_by = delete $opts{group_by};
   my $order_by = delete $opts{order_by};
-  my Table $tab = $self->{table_dict}{$tabName}
+  my Table $tab = $self->{_table_dict}{$tabName}
     or croak "No such table: $tabName";
   # XXX: col name check... いや、式かもしれないし。
   my $cols = $resColList ? join(", ", lexpand $resColList) : '*';
@@ -986,8 +988,8 @@ sub sql_and_values_to_insert_expr {
 sub default_rowid_col { 'rowid' }
 sub rowid_col {
   (my MY $schema, my Table $tab) = @_;
-  if (my Column $pk = $tab->{pk}) {
-    $pk->{cf_name}
+  if (my Column $pk = $tab->{_pk}) {
+    $pk->{name}
   } else {
     # XXX: dbtype dispatch
     $schema->default_rowid_col;
@@ -1008,7 +1010,7 @@ use YATT::Lite::XHF::Dumper;
 
 sub cmd_deploy {
   (my MY $schema) = @_;
-  local $schema->{cf_verbose} = 1;
+  local $schema->{verbose} = 1;
   my $dbh = $schema->dbh;
   local $dbh->{AutoCommit};
   $schema->ensure_created_on($dbh);
@@ -1019,19 +1021,19 @@ sub cmd_schema {
   (my MY $schema) = @_;
   print $schema->dump_xhf(map {
     $schema->info_tableobj($_);
-  } @{$schema->{table_list}}), "\n";
+  } @{$schema->{_table_list}}), "\n";
 }
 
 sub info_tableobj {
   (my MY $schema, my Table $tab) = @_;
-  [$tab->{cf_name}, undef, map {
+  [$tab->{name}, undef, map {
     $schema->info_columnobj($_);
-   } @{$tab->{col_list}}];
+   } @{$tab->{_col_list}}];
 }
 
 sub info_columnobj {
   (my MY $schema, my Column $col) = @_;
-  ($col->{cf_name}, $col->{cf_type});
+  ($col->{name}, $col->{type});
 }
 
 sub cmd_help {
@@ -1039,7 +1041,7 @@ sub cmd_help {
   my $pack = ref($self) || $self;
   my @opts = do {
     if (my $sub = $pack->can('cf_list')) {
-      $sub->($pack, qr{^cf_([a-z]\w*)});
+      $sub->($pack);
     } else {
       ();
     }

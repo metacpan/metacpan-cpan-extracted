@@ -15,7 +15,7 @@ use MOP4Import::Types
    Error => [[fields => qw/code message data/]],
 
    #==BEGIN_GENERATED
-# make_typedefs_from: InitializeParams InitializeResult TextDocumentPositionParams Location Hover MarkupContent ErrorCodes DidSaveTextDocumentParams DiagnosticSeverity PublishDiagnosticsParams TextDocumentSyncOptions TextDocumentSyncKind DidChangeTextDocumentParams DocumentSymbolParams DocumentSymbol DidOpenTextDocumentParams
+# make_typedefs_from: InitializeParams InitializeResult TextDocumentPositionParams Location Hover MarkupContent ErrorCodes DidSaveTextDocumentParams DiagnosticSeverity PublishDiagnosticsParams TextDocumentSyncOptions TextDocumentSyncKind DidChangeTextDocumentParams DocumentSymbolParams DocumentSymbol DidOpenTextDocumentParams CompletionParams CompletionContext CompletionList CompletionItem
 'ClientCapabilities' => [
   [
     'fields',
@@ -71,6 +71,60 @@ undef() => [
   [
     'fields',
     'resolveProvider',
+  ],
+],
+'Command' => [
+  [
+    'fields',
+    'title',
+    'command',
+    'arguments',
+  ],
+],
+'CompletionContext' => [
+  [
+    'fields',
+    'triggerKind',
+    'triggerCharacter',
+  ],
+],
+undef() => [
+  [
+    'constant',
+    'InsertTextFormat__PlainText',
+    1,
+  ],
+  [
+    'constant',
+    'InsertTextFormat__Snippet',
+    2,
+  ],
+],
+'CompletionItem' => [
+  [
+    'fields',
+    'label',
+    'kind',
+    'detail',
+    'documentation',
+    'deprecated',
+    'preselect',
+    'sortText',
+    'filterText',
+    'insertText',
+    'insertTextFormat',
+    'textEdit',
+    'additionalTextEdits',
+    'commitCharacters',
+    'command',
+    'data',
+  ],
+],
+'CompletionList' => [
+  [
+    'fields',
+    'isIncomplete',
+    'items',
   ],
 ],
 'CompletionOptions' => [
@@ -536,6 +590,16 @@ undef() => [
     'textDocument',
     'position',
   ],
+  [
+    'subtypes',
+    'CompletionParams',
+    [
+      [
+        'fields',
+        'context',
+      ],
+    ],
+  ],
 ],
 undef() => [
   [
@@ -564,6 +628,13 @@ undef() => [
     'save',
   ],
 ],
+'TextEdit' => [
+  [
+    'fields',
+    'range',
+    'newText',
+  ],
+],
 'WorkspaceClientCapabilities' => [
   [
     'fields',
@@ -584,7 +655,6 @@ undef() => [
     'name',
   ],
 ],
-
    #==END_GENERATED
 
   );

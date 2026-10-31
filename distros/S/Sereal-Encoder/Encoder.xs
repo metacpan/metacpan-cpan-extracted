@@ -10,10 +10,11 @@
 
 #include "srl_encoder.h"
 #include "srl_buffer.h"
+#include "srl_common.h"
+#include "srl_protocol.h"
+#include "srl_siphash.h"
 
 /* Generated code for exposing C constants to Perl */
-#include "srl_protocol.h"
-
 #include "ptable.h"
 
 #ifndef GvCV_set
@@ -55,6 +56,9 @@ THX_pp1_sereal_encode_with_object(pTHX_ U8 has_hdr)
   }
   /* we should never have an IV smaller than a PTR */
   enc= INT2PTR(srl_encoder_t *,SvIV(encoder_sv));
+  /* User code may clear the variable containing the encoder while it runs.
+   * Keep the owner alive until the encode cleanup hook has finished. */
+  SAVEFREESV(SvREFCNT_inc(encoder_sv));
 
   if (header_sv && !SvOK(header_sv))
     header_sv = NULL;
@@ -132,7 +136,7 @@ THX_ck_entersub_args_sereal_encode_with_object(pTHX_ OP *entersubop, GV *namegv,
 
   /* attach the spliced-out args as children of the custom op, while
    * deleting the stub op created by newUNOP() */
-  op_sibling_splice(newop, NULL, 1, firstargop);
+  op_free(op_sibling_splice(newop, NULL, 1, firstargop));
 
 #endif
 
@@ -157,6 +161,8 @@ THX_xsfunc_sereal_encode_with_object(pTHX_ CV *cv)
 
 typedef struct {
     sv_with_hash options[SRL_ENC_OPT_COUNT];
+    U8 known_option_heads[SRL_OPTION_INDEX_BUCKETS];
+    U8 known_option_next[SRL_ENC_OPT_COUNT];
 } my_cxt_t;
 
 START_MY_CXT
@@ -164,10 +170,121 @@ START_MY_CXT
 MODULE = Sereal::Encoder        PACKAGE = Sereal::Encoder
 PROTOTYPES: DISABLE
 
+SV *
+prepare_checksum_key(key = NULL, opt_key = NULL)
+    SV *key;
+    SV *opt_key;
+  PREINIT:
+    STRLEN key_len = 0;
+    STRLEN opt_key_len = 0;
+    const U8 *key_bytes = (const U8 *)"";
+    const U8 *opt_key_bytes = (const U8 *)"";
+    U8 digest[16];
+  CODE:
+    if (key && SvOK(key))
+        key_bytes = (const U8 *)SvPVbyte(key, key_len);
+    if (opt_key && SvOK(opt_key)) {
+        opt_key_bytes = (const U8 *)SvPVbyte(opt_key, opt_key_len);
+    }
+    srl_siphash_prepare_key(key_bytes, (size_t)key_len,
+                            opt_key_bytes, (size_t)opt_key_len, digest);
+    RETVAL = newSVpvn((const char *)digest, sizeof(digest));
+  OUTPUT: RETVAL
+
+SV *
+siphash24(data, key = NULL)
+    SV *data;
+    SV *key;
+  PREINIT:
+    STRLEN data_len;
+    STRLEN key_len;
+    const U8 *data_bytes;
+    const U8 *key_bytes;
+    srl_siphash_ctx sip;
+    srl_u64 digest;
+    U8 digest_bytes[8];
+    unsigned int i;
+    static const U8 zero_key[16] = { 0 };
+  CODE:
+    data_bytes = (const U8 *)SvPVbyte(data, data_len);
+    if (key == NULL) {
+      key_bytes = zero_key;
+    }
+    else {
+      key_bytes = (const U8 *)SvPVbyte(key, key_len);
+      if (key_len != 16)
+        croak("siphash24 key must be exactly 16 bytes");
+    }
+    srl_siphash_init_rounds(&sip, key_bytes, 2, 4, 0);
+    srl_siphash_update(&sip, data_bytes, (size_t)data_len);
+    digest = srl_siphash_final64(&sip);
+    for (i = 0; i < 8; i++)
+      digest_bytes[i] = (U8)(digest >> (8 * i));
+    RETVAL = newSVpvn((const char *)digest_bytes, sizeof(digest_bytes));
+  OUTPUT: RETVAL
+
+SV *
+siphash24_128(data, key = NULL)
+    SV *data;
+    SV *key;
+  PREINIT:
+    STRLEN data_len;
+    STRLEN key_len;
+    const U8 *data_bytes;
+    const U8 *key_bytes;
+    srl_siphash_ctx sip;
+    U8 digest[16];
+    static const U8 zero_key[16] = { 0 };
+  CODE:
+    data_bytes = (const U8 *)SvPVbyte(data, data_len);
+    if (key == NULL) {
+      key_bytes = zero_key;
+    }
+    else {
+      key_bytes = (const U8 *)SvPVbyte(key, key_len);
+      if (key_len != 16)
+        croak("siphash24_128 key must be exactly 16 bytes");
+    }
+    srl_siphash_init_rounds(&sip, key_bytes, 2, 4, 1);
+    srl_siphash_update(&sip, data_bytes, (size_t)data_len);
+    srl_siphash_final128(&sip, digest);
+    RETVAL = newSVpvn((const char *)digest, sizeof(digest));
+  OUTPUT: RETVAL
+
+SV *
+siphash36_128(data, key = NULL)
+    SV *data;
+    SV *key;
+  PREINIT:
+    STRLEN data_len;
+    STRLEN key_len;
+    const U8 *data_bytes;
+    const U8 *key_bytes;
+    srl_siphash_ctx sip;
+    U8 digest[16];
+    static const U8 zero_key[16] = { 0 };
+  CODE:
+    data_bytes = (const U8 *)SvPVbyte(data, data_len);
+    if (key == NULL) {
+      key_bytes = zero_key;
+    }
+    else {
+      key_bytes = (const U8 *)SvPVbyte(key, key_len);
+      if (key_len != 16)
+        croak("siphash36_128 key must be exactly 16 bytes");
+    }
+    srl_siphash_init_rounds(&sip, key_bytes, 3, 6, 1);
+    srl_siphash_update(&sip, data_bytes, (size_t)data_len);
+    srl_siphash_final128(&sip, digest);
+    RETVAL = newSVpvn((const char *)digest, sizeof(digest));
+  OUTPUT: RETVAL
+
 BOOT:
 {
   {
   MY_CXT_INIT;
+  Zero(MY_CXT.known_option_heads, SRL_OPTION_INDEX_BUCKETS, U8);
+  Zero(MY_CXT.known_option_next, SRL_ENC_OPT_COUNT, U8);
   SRL_INIT_OPTION( SRL_ENC_OPT_IDX_ALIASED_DEDUPE_STRINGS,   SRL_ENC_OPT_STR_ALIASED_DEDUPE_STRINGS );
   SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CANONICAL,                SRL_ENC_OPT_STR_CANONICAL              );
   SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CANONICAL_REFS,           SRL_ENC_OPT_STR_CANONICAL_REFS         );
@@ -192,15 +309,22 @@ BOOT:
   SRL_INIT_OPTION( SRL_ENC_OPT_IDX_USE_STANDARD_DOUBLE,      SRL_ENC_OPT_STR_USE_STANDARD_DOUBLE    );
   SRL_INIT_OPTION( SRL_ENC_OPT_IDX_FREEZE_ALLOW_CLASSES,     SRL_ENC_OPT_STR_FREEZE_ALLOW_CLASSES   );
   SRL_INIT_OPTION( SRL_ENC_OPT_IDX_FREEZE_DENY_ACTION,       SRL_ENC_OPT_STR_FREEZE_DENY_ACTION     );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CHECKSUM_KEY_V1,          SRL_ENC_OPT_STR_CHECKSUM_KEY_V1        );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CHECKSUM_KEY_V2,          SRL_ENC_OPT_STR_CHECKSUM_KEY_V2        );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CHECKSUM_KEY_V3,          SRL_ENC_OPT_STR_CHECKSUM_KEY_V3        );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CHECKSUM_POLICY,          SRL_ENC_OPT_STR_CHECKSUM_POLICY        );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_UNKNOWN_OPTION_POLICY,    SRL_ENC_OPT_STR_UNKNOWN_OPTION_POLICY  );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CHECKSUM_KEY,             SRL_ENC_OPT_STR_CHECKSUM_KEY           );
+  SRL_INIT_OPTION( SRL_ENC_OPT_IDX_CHECKSUM_MODE,            SRL_ENC_OPT_STR_CHECKSUM_MODE          );
   }
 #if USE_CUSTOM_OPS
   {
-    XOP *xop;
-    Newxz(xop, 1, XOP);
-    XopENTRY_set(xop, xop_name, "sereal_encode_with_object");
-    XopENTRY_set(xop, xop_desc, "sereal_encode_with_object");
-    XopENTRY_set(xop, xop_class, OA_UNOP);
-    Perl_custom_op_register(aTHX_ THX_pp_sereal_encode_with_object, xop);
+    /* Perl borrows this descriptor; it must outlive every interpreter. */
+    static const XOP xop = {
+      XOPf_xop_name | XOPf_xop_desc | XOPf_xop_class,
+      "sereal_encode_with_object", "sereal_encode_with_object", OA_UNOP
+    };
+    Perl_custom_op_register(aTHX_ THX_pp_sereal_encode_with_object, &xop);
   }
 #endif /* USE_CUSTOM_OPS */
   {
@@ -222,7 +346,8 @@ new(CLASS, opt = NULL)
   PREINIT:
     dMY_CXT;
   CODE:
-    RETVAL = srl_build_encoder_struct(aTHX_ opt, MY_CXT.options);
+    RETVAL = srl_build_encoder_struct(aTHX_ opt, MY_CXT.options,
+                                      MY_CXT.known_option_heads, MY_CXT.known_option_next);
     RETVAL->flags |= SRL_F_REUSE_ENCODER;
   OUTPUT: RETVAL
 
@@ -247,7 +372,8 @@ encode_sereal(src, opt = NULL)
     srl_encoder_t *enc;
     dMY_CXT;
   PPCODE:
-    enc = srl_build_encoder_struct(aTHX_ opt, MY_CXT.options);
+    enc = srl_build_encoder_struct(aTHX_ opt, MY_CXT.options,
+                                   MY_CXT.known_option_heads, MY_CXT.known_option_next);
     assert(enc != NULL);
     /* Avoid copy by stealing string buffer if it is not too large.
      * This makes sense in the functional interface since the string
@@ -266,7 +392,8 @@ encode_sereal_with_header_data(src, hdr_user_data_src, opt = NULL)
   PPCODE:
     if (!SvOK(hdr_user_data_src))
       hdr_user_data_src = NULL;
-    enc = srl_build_encoder_struct(aTHX_ opt, MY_CXT.options);
+    enc = srl_build_encoder_struct(aTHX_ opt, MY_CXT.options,
+                                   MY_CXT.known_option_heads, MY_CXT.known_option_next);
     assert(enc != NULL);
     /* Avoid copy by stealing string buffer if it is not too large.
      * This makes sense in the functional interface since the string

@@ -1,13 +1,13 @@
 package SimpleRadarControls;
 
-# $Id: SimpleRadarControls.pm,v 1.2 2003/09/15 12:25:06 mertz Exp $
+# $Id$
 # This simple radar has been initially developped by P. Lecoanet <lecoanet@cena.fr>
 # It has been adapted by C. Mertz <mertz@cena.fr> for demo purpose.
 # Thanks to Dunnigan,Jack [Edm]" <Jack.Dunnigan@EC.gc.ca> for a bug correction.
 
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 $top = 1;
 

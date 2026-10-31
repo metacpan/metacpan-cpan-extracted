@@ -5,23 +5,27 @@ author:
 build_requires:
   CGI::Lingua: '0'
   Capture::Tiny: '0'
+  DBI: '0'
   DateTime: '0'
   DateTime::Format::HTTP: '0'
   Directory::Scratch: '0'
   ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Temp: '0'
   HTTP::Headers: '0'
   HTTP::Response: '0'
   IPC::System::Simple: '0'
   Test::DescribeMe: '0'
+  Test::HTML::Lint: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
   autodie: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -30,16 +34,25 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  CHI: '0'
+  Compress::Zstd: '0'
+  IO::Compress::Brotli: '0'
+  Text::Diff: '0'
 requires:
-  CGI::Info: '0.51'
+  CGI::Info: '0.71'
   CSS::Packer: '0'
   Carp: '0'
   Compress::Zlib: '0'
+  Cwd: '0'
+  DBD::SQLite: '0'
   DBI: '0'
   Digest::MD5: '0'
   Encode: '0'
+  File::Basename: '0'
   File::Path: '0'
   File::Spec: '0'
+  File::Temp: '0'
   HTML::Lint: '0'
   HTML::Packer: '1'
   HTTP::Date: '0'
@@ -47,12 +60,12 @@ requires:
   IO::String: '0'
   JavaScript::Packer: '2'
   Readonly: '0'
+  Scalar::Util: '0'
   Storable: '0'
-  Time::localtime: '0'
-  perl: '5.006002'
+  perl: '5.012'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer
-  homepage: https://metacpan.org/pod/CGI::Buffer
-  repository: git://github.com/nigelhorne/CGI-Buffer.git
-version: '0.22'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer
+  homepage: https://metacpan.org/pod/FCGI::Buffer
+  repository: https://github.com/nigelhorne/FCGI-Buffer.git
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

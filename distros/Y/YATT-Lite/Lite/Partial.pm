@@ -14,8 +14,8 @@ sub import {
 package
   YATT::Lite::Partial::Meta; sub Meta () {__PACKAGE__}
 use parent qw/YATT::Lite::MFields/;
-use YATT::Lite::MFields qw/cf_requires
-			   has_entns/;
+use YATT::Lite::MFields qw/requires
+			   _has_entns/;
 use YATT::Lite::Util qw/globref lexpand try_invoke fields_hash/;
 use Carp;
 
@@ -36,12 +36,14 @@ sub define_partial_class {
       my $sub = $meta->can("declare_$1")
 	or croak "Unknown Partial decl: $1";
       push @task, [$sub, $meta];
+    } elsif ($key =~ /^_/) {
+      croak "Private field is prohibited: $key";
     } else {
       my $value = shift @args;
       if (my $sub = $meta->can("declare_$key")) {
 	$define{$key} = $value;
-      } elsif ($fields->{"cf_$key"}) {
-	$meta->{"cf_$key"} = $value;
+      } elsif ($fields->{$key}) {
+	$meta->{$key} = $value;
       } else {
 	croak "Unknown Partial opt: $key";
       }
@@ -71,55 +73,55 @@ sub define_partial_class {
 
 sub declare_fields {
   (my Meta $meta, my $value) = @_;
-  $meta->define_fields($meta->{cf_package}, lexpand($value));
+  $meta->define_fields($meta->{package}, lexpand($value));
 }
 
 *declare_parent = *declare_parents; *declare_parent = *declare_parents;
 sub declare_parents {
   (my Meta $meta, my $value) = @_;
-  $meta->add_isa_to($meta->{cf_package}, lexpand($value))
-      ->define_fields($meta->{cf_package});
+  $meta->add_isa_to($meta->{package}, lexpand($value))
+      ->define_fields($meta->{package});
 }
 
 sub declare_Entity {
   (my Meta $meta) = @_;
   require YATT::Lite;
-  $meta->{has_entns} = YATT::Lite->define_Entity
-    ({}, $meta->{cf_package}, try_invoke($meta->{cf_package}, 'EntNS'));
+  $meta->{_has_entns} = YATT::Lite->define_Entity
+    ({}, $meta->{package}, try_invoke($meta->{package}, 'EntNS'));
 }
 
 sub declare_CON {
   (my Meta $meta) = @_;
   require YATT::Lite::Entities;
-  *{globref($meta->{cf_package}, 'CON')} = YATT::Lite::Entities->symbol_CON;
+  *{globref($meta->{package}, 'CON')} = YATT::Lite::Entities->symbol_CON;
 }
 
 sub declare_SYS {
   (my Meta $meta) = @_;
   require YATT::Lite::Entities;
-  *{globref($meta->{cf_package}, 'SYS')} = YATT::Lite::Entities->symbol_SYS;
+  *{globref($meta->{package}, 'SYS')} = YATT::Lite::Entities->symbol_SYS;
 }
 
 sub export_partial_class_to {
   (my Meta $partial, my $fullclass) = @_;
 
-  # print "# partial $partial->{cf_package} is imported to $fullclass\n";
+  # print "# partial $partial->{package} is imported to $fullclass\n";
 
-  if (my @requires = lexpand($partial->{cf_requires})) {
+  if (my @requires = lexpand($partial->{requires})) {
     my @missing = grep {not $fullclass->can($_)} @requires;
-    croak "package '$fullclass' used '$partial->{cf_package}'"
+    croak "package '$fullclass' used '$partial->{package}'"
       . " but not implemented required methods: "
       . join(", ", map {"$_()"} sort @missing) if @missing;
   }
 
-  YATT::Lite::MFields->add_isa_to($fullclass, $partial->{cf_package})
+  YATT::Lite::MFields->add_isa_to($fullclass, $partial->{package})
       ->define_fields($fullclass);
 
-  if (my $entns = $partial->{has_entns}) {
-    #print "partial $partial->{cf_package} has EntNS $entns, "
+  if (my $entns = $partial->{_has_entns}) {
+    #print "partial $partial->{package} has EntNS $entns, "
     #  , "injected to $fullclass\n";
     YATT::Lite::MFields->add_isa_to(YATT::Lite->ensure_entns($fullclass)
-				    , $partial->{has_entns});
+				    , $partial->{_has_entns});
   }
 
   my Meta $full = Meta->get_meta($fullclass);

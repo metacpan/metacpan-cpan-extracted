@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate;
 # ABSTRACT: Reusable sandbox configuration template
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'extensions.agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxtemplates';
@@ -29,7 +29,7 @@ IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate - Reusable sandbox configuratio
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ which is a C<v1beta1>-only addition and is absent from the C<v1alpha1> CRD schem
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -90,5 +90,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

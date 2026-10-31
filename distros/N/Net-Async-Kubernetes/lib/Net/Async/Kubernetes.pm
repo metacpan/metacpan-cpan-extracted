@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -1832,6 +1832,9 @@ sub _do_duplex_request {
 
     $self->add_child($client);
 
+    # retain: the request stays alive until it is ready, so on_error runs
+    # and the client is detached even when the caller keeps no reference
+    # or drops it from inside on_error.
     return $client->connect(
         url => $ws_url,
         req => $ws_req,
@@ -1849,7 +1852,7 @@ sub _do_duplex_request {
         $notify_error->($error);
         $detach_client->();
         return Future->fail($error);
-    });
+    })->retain;
 }
 
 sub _build_websocket_url {
@@ -1910,7 +1913,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -3058,7 +3061,7 @@ L<IO::Async>, L<IO::K8s>, L<Net::Async::WebSocket::Client>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-net-async-kubernetes/issues>.
 
 =head2 IRC

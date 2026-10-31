@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: test-methods.pl,v 1.5 2003/09/11 10:03:05 mertz Exp $
+# $Id$
 # This non-regression test has been developped by C. Mertz <mertz@cena.fr>
 
 use Tk;

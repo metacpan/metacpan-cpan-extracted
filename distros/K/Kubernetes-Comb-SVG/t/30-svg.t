@@ -1357,4 +1357,111 @@ subtest 'a Comb without a name is an error' => sub {
   ok( !eval { $SVG->new( combs => [ {} ] )->render; 1 }, 'an empty hash is no Comb' );
 };
 
+# Blink and theme by group: `@group` for every phase of the group,
+# `Phase@group` for one phase in it.
+subtest 'groups: data-comb-group on the cells' => sub {
+  my $xpc = picture( 'groups', group_label => 'tier' );
+  is( comb( $xpc, 'zeta' )->getAttribute('data-comb-group'), 'backend', 'a grouped cell carries its group' );
+  ok( !comb( $xpc, 'loose' )->hasAttribute('data-comb-group'), 'a cell without a group has none' );
+  ok( !comb( picture('groups'), 'zeta' )->hasAttribute('data-comb-group'), 'no group_label, no data-comb-group' );
+};
+
+my @TIERS = (
+  { metadata => { name => 'a', labels => { tier => 'extern' } }, status => { phase => 'Error' } },
+  { metadata => { name => 'b', labels => { tier => 'extern' } }, status => { phase => 'Running' } },
+  { metadata => { name => 'c', labels => { tier => 'intern' } }, status => { phase => 'Error' } },
+  { metadata => { name => 'd' }, status => { phase => 'Error' } },
+);
+
+sub tiers { picture( \@TIERS, group_label => 'tier', @_ ) }
+
+subtest 'blink: by group' => sub {
+  my $plain = style_text( tiers() );
+  unlike( $plain, $ANIMATION, 'no blink: no animation CSS' );
+
+  my $css = style_text( tiers( blink => ['@extern'] ) );
+  my ( $rule ) = $css =~ /^([^\n@]*)\{animation:comb-blink 1\.2s ease-in-out infinite\}$/m;
+  is( $rule, '.comb-svg .comb[data-comb-group="extern"] .hex', '@group: every phase of that group, no other group' );
+  like( $css, qr/^\.comb-svg \.comb\[data-comb-group="extern"\] \.phase\{fill:var\(--comb-fg\)\}$/m, 'its phase line takes the text colour' );
+  like( $css, qr/prefers-reduced-motion:reduce\)\{\.comb-svg \.comb\[data-comb-group="extern"\] \.hex\{animation:none;/,
+    'reduced motion: the same cells get the outline' );
+
+  ( $rule ) = style_text( tiers( blink => [ 'Error@extern', 'Error', 'Error@intern' ] ) )
+    =~ /^([^\n@]*)\{animation:comb-blink/m;
+  is_deeply( [ split /,/, $rule ],
+    [ '.comb-svg .comb.phase-Error .hex', '.comb-svg .comb[data-comb-group="extern"].phase-Error .hex',
+      '.comb-svg .comb[data-comb-group="intern"].phase-Error .hex' ],
+    'phases first, then the groups by name, each with its phases in legend order' );
+
+  ( $rule ) = style_text( tiers( blink => ['Error@intern'] ) ) =~ /^([^\n@]*)\{animation:comb-blink/m;
+  is( $rule, '.comb-svg .comb[data-comb-group="intern"].phase-Error .hex', 'Phase@group: one phase in one group' );
+
+  for my $case (
+    [ 'a group that does not occur' => ['@nowhere'] ],
+    [ 'an unknown phase in the key' => [ 'Bogus@extern', 'error@extern' ] ],
+    [ 'an empty group' => [ '@', 'Error@' ] ],
+  ) {
+    unlike( style_text( tiers( blink => $case->[1] ) ), $ANIMATION, $case->[0].': no animation' );
+  }
+  is( style_text( tiers( blink => [ '@extern', '@extern' ] ) ), style_text( tiers( blink => ['@extern'] ) ),
+    'repeats do not matter' );
+
+  my $hostile = [ { metadata => { name => 'x', labels => { tier => qq{e"vil'\\</style><script>} } } } ];
+  my $xpc = picture( $hostile, group_label => 'tier',
+    blink => [ qq{\@e"vil'\\</style><script>} ], theme => { qq{\@e"vil'\\</style><script>} => '#123456' } );
+  is( count( $xpc, '//s:script' ), 0, 'a hostile group name: no script' );
+  is( count( $xpc, '//s:style' ), 1, 'one style element' );
+  my ( $selector ) = style_text($xpc) =~ /^([^\n@]*)\{animation:comb-blink/m;
+  like( $selector, qr/\A\.comb-svg \.comb\[data-comb-group="[A-Za-z0-9 _.\/\\-]*"\] \.hex\z/, 'only plain characters and escapes in the selector' );
+  is( comb( $xpc, 'x' )->getAttribute('data-comb-group'), qq{e"vil'\\</style><script>}, 'the attribute holds the name' );
+};
+
+subtest 'theme: by group' => sub {
+  my $base = style_text( tiers() );
+  unlike( $base, qr/data-comb-group=/, 'no group key: no group rule' );
+
+  my $xpc = tiers( theme => { '@extern' => '#123456' } );
+  my $css = style_text($xpc);
+  my ( $rule ) = $css =~ /^(\.comb-svg \.comb\[data-comb-group="extern"\]\{[^}]*\})$/m;
+  ok( defined $rule, '@group: a rule for that group' );
+  my ( $body ) = $rule =~ /\{(.*)\}/;
+  my %set = map { split /:/, $_, 2 } split /;/, $body;
+  is_deeply( [ sort keys %set ], [ sort map { '--comb-'.lc } qw( Running Pending Blocked NeedsConfig Disabled Error Stopped NotDeployed Unknown ) ],
+    'every phase colour is set on the cells of the group' );
+  is_deeply( [ keys %{ { map { $_ => 1 } values %set } } ], ['#123456'], 'to the one colour' );
+  unlike( $css, qr/data-comb-group="intern"/, 'no rule for the other group' );
+  like( $css, qr/^\.comb-svg\{[^}]*--comb-error:#cf222e/m, 'the root colours stay the phase colours (the legend keeps them)' );
+  like( $css, qr/prefers-color-scheme:dark\)\{\.comb-svg \.comb\[data-comb-group="extern"\]\{[^}]*--comb-running:#123456/,
+    'one colour serves dark mode too' );
+
+  $css = style_text( tiers( theme => {
+    '@extern'      => '#111111',
+    'Error@extern' => { light => '#222222' },
+    'Error'        => { light => '#333333', dark => '#444444' },
+  } ) );
+  like( $css, qr/^\.comb-svg \.comb\[data-comb-group="extern"\]\.phase-Error\{--comb-error:#222222\}$/m,
+    'Phase@group: one phase, light' );
+  like( $css, qr/prefers-color-scheme:dark\)\{[^\n]*\.comb\[data-comb-group="extern"\]\.phase-Error\{--comb-error:#111111\}/,
+    'a mode it leaves out takes the group colour' );
+  like( $css, qr/--comb-error:#333333/, 'the phase colour for the other groups is untouched' );
+  cmp_ok( index( $css, '[data-comb-group="extern"]{' ), '<', index( $css, '[data-comb-group="extern"].phase-Error{' ),
+    'the group rule comes before the phase rule' );
+
+  $css = style_text( tiers( theme => { 'Error@extern' => { dark => '#555555' } } ) );
+  like( $css, qr/^\.comb-svg \.comb\[data-comb-group="extern"\]\.phase-Error\{--comb-error:#cf222e\}$/m,
+    'a mode left out without a group colour keeps the phase colour' );
+
+  for my $case (
+    [ 'a bad colour' => { '@extern' => 'url(//evil)', 'Error@extern' => 'red;}' } ],
+    [ 'a group that does not occur' => { '@nowhere' => 'red' } ],
+    [ 'an unknown phase' => { 'Bogus@extern' => 'red', 'error@extern' => 'red' } ],
+  ) {
+    is( style_text( tiers( theme => $case->[1] ) ), $base, $case->[0].': the style is as without' );
+  }
+
+  my $one = tiers( theme => { 'Error@intern' => 'tomato' } );
+  my %fill = map { $_->getAttribute('data-name') => $_->getAttribute('data-phase') } combs($one);
+  is( $fill{c}, 'Error', 'the phase stays the text and the class, colour is not the only carrier' );
+};
+
 done_testing;

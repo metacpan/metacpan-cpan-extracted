@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: Images.t,v 1.8 2006/02/12 09:40:55 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

@@ -1,6 +1,6 @@
 package Kubernetes::Comb::Client::Sync;
 # ABSTRACT: Synchronous Comb client on Kubernetes::REST, returning done Futures
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 with 'Kubernetes::Comb::Role::Client';
@@ -79,7 +79,7 @@ Kubernetes::Comb::Client::Sync - Synchronous Comb client on Kubernetes::REST, re
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,7 @@ same one. Nothing is read until its first request.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

@@ -88,6 +88,21 @@ OUT:
    bar
  
 
+TITLE: block var=val
+IN:
+ <yatt:block x="foo" y="bar">
+   &yatt:x;-&yatt:y;
+ </yatt:block>
+ <yatt:block x="bar" y="baz">
+   &yatt:x;-&yatt:y;
+ </yatt:block>
+OUT:
+ 
+   foo-bar
+ 
+   bar-baz
+ 
+
 TITLE: block my error
 IN:
  <yatt:block><yatt:my x="foo"/>
@@ -209,3 +224,130 @@ TITLE: Garbage before CLO should be correctly reported
 IN:
  <yatt:my [chng ::key]="1..3";/>
 ERROR: Garbage before CLO\(>\) for: <yatt:my, rest: ';/>'
+
+
+TITLE: my body html captures &yatt:body(); (GH-293)
+IN:
+ <yatt:foo>[<b>&yatt:v;</b>]</yatt:foo>
+ 
+ <!yatt:args v="?a<b">
+ <!yatt:widget foo body=[code]>
+ <yatt:my tmp>(&yatt:body();)</yatt:my>
+ {&yatt:tmp;}
+OUT:
+ {([<b>a&lt;b</b>])}
+ 
+
+
+TITLE: my body html captures <yatt:body/> (GH-293)
+IN:
+ <yatt:foo>[<b>&yatt:v;</b>]</yatt:foo>
+ 
+ <!yatt:args v="?a<b">
+ <!yatt:widget foo body=[code]>
+ <yatt:my tmp>(<yatt:body/>)</yatt:my>
+ {&yatt:tmp;}
+OUT:
+ {([<b>a&lt;b</b>])}
+ 
+
+
+TITLE: my body html captures code arg with args (GH-293)
+IN:
+ <yatt:foo><:yatt:row>[&yatt:x;]</:yatt:row></yatt:foo>
+ 
+ <!yatt:widget foo row=[code x]>
+ <yatt:my tmp>(<yatt:row x=3/><yatt:row x=4/>)</yatt:my>
+ {&yatt:tmp;}
+OUT:
+ {([3][4])}
+ 
+
+
+TITLE: my body html captures body passed through (GH-293)
+IN:
+ <yatt:foo>[&yatt:v;]</yatt:foo>
+ 
+ <!yatt:args v="?outer">
+ <!yatt:widget foo body=[code]>
+ <yatt:bar body/>
+ <!yatt:widget bar body=[code]>
+ <yatt:my tmp>(&yatt:body();)</yatt:my>
+ {&yatt:tmp;}
+OUT:
+ {([outer])}
+ 
+ 
+
+
+TITLE: my body html captures my:code var (GH-293)
+IN:
+ <yatt:my c:code>[c]</yatt:my>
+ <yatt:my tmp>(&yatt:c();)</yatt:my>
+ {&yatt:tmp;}
+OUT:
+ {([c])}
+
+
+TITLE: my text captures body and escapes it on output (GH-293)
+IN:
+ <yatt:foo><b>x</b></yatt:foo>
+ 
+ <!yatt:widget foo body=[code]>
+ <yatt:my tmp="&yatt:body();"/>
+ {&yatt:tmp;}
+OUT:
+ {&lt;b&gt;x&lt;/b&gt;}
+ 
+
+TITLE: my html nesting
+IN: <yatt:my a><yatt:my b><b>x</b></yatt:my><h2>[&yatt:b;]</h2></yatt:my>{&yatt:a;}
+OUT: {<h2>[<b>x</b>]</h2>}
+
+TITLE: my html nesting var scope
+IN:
+ <yatt:my x>
+   <yatt:my a=3 y>
+     foo
+   </yatt:my>
+   &yatt:y;
+ </yatt:my>
+ &yatt:x;
+ &yatt:a;
+ERROR: No such variable 'a'
+
+
+TITLE: my html var scope
+IN: <yatt:my a>&yatt:a;</yatt:my>
+ERROR: No such variable 'a'
+
+
+TITLE: my code var scope
+IN: <yatt:my c:code>&yatt:c();</yatt:my>
+ERROR: No such entity in namespace
+
+TITLE: my code body var scope
+IN:
+ <yatt:my c:code><yatt:my inner>x</yatt:my>[&yatt:inner;]</yatt:my>
+ &yatt:inner;
+ERROR: No such variable 'inner'
+
+
+TITLE: element is not allowed in scalar my
+IN:
+ <yatt:my x:scalar><yatt:foo/></yatt:my>&yatt:x;
+ <!yatt:widget foo>
+ foo
+ERROR: Element <yatt:foo> is not allowed in expression
+
+TITLE: element is not allowed in list my
+IN:
+ <yatt:my x:list><yatt:foo/></yatt:my>&yatt:x;
+ <!yatt:widget foo>
+ foo
+ERROR: Element <yatt:foo> is not allowed in expression
+
+TITLE: pi is not allowed in scalar my
+IN: <yatt:my x:scalar><?perl= 1+1 ?></yatt:my>&yatt:x;
+ERROR: <\?perl \?> is not allowed in expression
+

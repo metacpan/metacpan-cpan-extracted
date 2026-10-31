@@ -2,9 +2,9 @@ package YATT::Lite::Test::XHFTest;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use parent qw(YATT::Lite::Object);
-use YATT::Lite::MFields qw/tests numtests yatt global file_list file_dict
-	      cf_filename cf_ext cf_parser cf_encoding
-	      prev_item builder/;
+use YATT::Lite::MFields qw/_tests _numtests _yatt _global _file_list _file_dict
+	      filename ext parser encoding
+	      _prev_item _builder/;
 use Exporter 'import';
 sub MY () {__PACKAGE__}
 use YATT::Lite::Util qw(default dict_sort);
@@ -18,39 +18,39 @@ use Encode;
   package YATT::Lite::Test::XHFTest::Item;
   use parent qw(YATT::Lite::Object);
   use YATT::Lite::Util qw(lexpand);
-  use YATT::Lite::MFields qw/cf_global
-		cf_parser
+  use YATT::Lite::MFields qw/global
+		parser
 
-		num
-		realfile
+		_num
+		_realfile
 
-		cf_FILE
-		cf_TITLE
-		cf_BREAK
-		cf_SKIP
-		cf_TODO
-		cf_PERL_MINVER
+		FILE
+		TITLE
+		BREAK
+		SKIP
+		TODO
+		PERL_MINVER
 
-		cf_WIDGET
-		cf_RANDOM
-		cf_IN
-		cf_PARAM
-		cf_OUT
-		cf_ERROR
-                cf_ERROR_BODY
+		WIDGET
+		RANDOM
+		IN
+		PARAM
+		OUT
+		ERROR
+                ERROR_BODY
 
-		cf_REQUIRE
+		REQUIRE
 
-		cf_TAG
-                cf_CON_CLASS
+		TAG
+                CON_CLASS
 	      /;
 
   sub is_runnable { shift->ntests }
   sub ntests {
     my __PACKAGE__ $item = shift;
-    if ($item->{cf_OUT}) {
+    if ($item->{OUT}) {
       2;
-    } elsif ($item->{cf_ERROR}) {
+    } elsif ($item->{ERROR}) {
       1;
     } else {
       0;
@@ -75,9 +75,9 @@ sub list_files {
 
 sub after_new {
   my MY $self = shift;
-  $self->{numtests} = 0;
-  $self->{tests} = [];
-  $self->{cf_ext} //= $self->default_ext;
+  $self->{_numtests} = 0;
+  $self->{_tests} = [];
+  $self->{ext} //= $self->default_ext;
   $self;
 }
 sub load {
@@ -110,60 +110,60 @@ sub convert_enc_array {
 }
 
 sub ntests {
-  my MY $self = shift; $self->{numtests}
+  my MY $self = shift; $self->{_numtests}
 }
 sub add_item {
   (my MY $self, my Item $item) = @_;
-  if ($item->{cf_global}) {
-    $self->{global} = $item->{cf_global};
+  if ($item->{global}) {
+    $self->{_global} = $item->{global};
     next;
   }
-  push @{$self->{tests}}, $self->fixup_item($item);
-  $self->{numtests} += $item->ntests;
+  push @{$self->{_tests}}, $self->fixup_item($item);
+  $self->{_numtests} += $item->ntests;
 }
 
 sub fixup_item {
   (my MY $self, my Item $test) = @_;
-  my Item $prev = $self->{prev_item};
-  $test->{cf_FILE} ||= do {
-    if ($prev && $prev->{cf_FILE} =~ m{%d}) {
-      $prev->{cf_FILE}
+  my Item $prev = $self->{_prev_item};
+  $test->{FILE} ||= do {
+    if ($prev && $prev->{FILE} =~ m{%d}) {
+      $prev->{FILE}
     } else {
-      "f%d.$self->{cf_ext}"
+      "f%d.$self->{ext}"
     }
   };
 
-  $test->{realfile} = do {
-    if ($test->{cf_IN}) {
+  $test->{_realfile} = do {
+    if ($test->{IN}) {
       no if $] >= 5.021002, warnings => qw/redundant/;
-      sprintf($test->{cf_FILE}, 1+@{$self->{file_list} //= []})
+      sprintf($test->{FILE}, 1+@{$self->{_file_list} //= []})
     } else {
-      $prev->{realfile}
+      $prev->{_realfile}
     }
   };
 
-  $test->{cf_WIDGET} ||= do {
-    my $widget = $test->{realfile};
+  $test->{WIDGET} ||= do {
+    my $widget = $test->{_realfile};
     $widget =~ s{\.\w+$}{};
     $widget =~ s{/}{:}g;
     $widget;
   };
 
-  if ($test->{cf_IN}) {
-    if (my $conflict = $self->{file_dict}{$test->{realfile}}) {
+  if ($test->{IN}) {
+    if (my $conflict = $self->{_file_dict}{$test->{_realfile}}) {
       die "FILE name confliction in test $test";
     }
-    $self->{file_dict}{$test->{realfile}} = $test;
-    push @{$self->{file_list}}, $test->{realfile};
+    $self->{_file_dict}{$test->{_realfile}} = $test;
+    push @{$self->{_file_list}}, $test->{_realfile};
   }
 
-  if ($test->{cf_OUT} || $test->{cf_ERROR}) {
-    $test->{cf_WIDGET} ||= $prev && $prev->{cf_WIDGET};
-    if (not $test->{cf_TITLE} and $prev) {
-      $test->{num} = default($prev->{num}, 0) + 1;
-      $test->{cf_TITLE} = $prev->{cf_TITLE};
+  if ($test->{OUT} || $test->{ERROR}) {
+    $test->{WIDGET} ||= $prev && $prev->{WIDGET};
+    if (not $test->{TITLE} and $prev) {
+      $test->{_num} = default($prev->{_num}, 0) + 1;
+      $test->{TITLE} = $prev->{TITLE};
     }
-    $self->{prev_item} = $test;
+    $self->{_prev_item} = $test;
   }
 
   $test;
@@ -173,8 +173,8 @@ sub as_vfs_data {
   my MY $self = shift;
   my (%result);
   # 記述の順番どおりに作成
-  foreach my $fn (@{$self->{file_list}}) {
-    my Item $item = $self->{file_dict}{$fn};
+  foreach my $fn (@{$self->{_file_list}}) {
+    my Item $item = $self->{_file_dict}{$fn};
     my @path = split m|/|, $fn;
     my $path_cursor = path_cursor(\%result, \@path);
     $path[0] =~ s|\.(\w+)$||
@@ -184,10 +184,10 @@ sub as_vfs_data {
       $sub->($self, $path_cursor, $item)
     } else {
       # XXX: 既に配列になってると困るよね。 rc 系を後回しにすれば大丈夫?
-      unless (defined $item->{cf_IN}) {
+      unless (defined $item->{IN}) {
 	die "undef IN"
       }
-      $path_cursor->[0]{$path[0]} = $item->{cf_IN};
+      $path_cursor->[0]{$path[0]} = $item->{IN};
     }
   }
   \%result;

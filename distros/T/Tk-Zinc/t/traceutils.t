@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: traceutils.t,v 1.4 2005/06/25 07:45:53 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

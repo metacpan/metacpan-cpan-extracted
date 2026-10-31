@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ResourceQuotaSpec;
 # ABSTRACT: ResourceQuotaSpec defines the desired hard limits to enforce for Quota.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s hard => HashRef[Quantity];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ResourceQuotaSpec - ResourceQuotaSpec defines the desire
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 hard
 
@@ -44,7 +44,7 @@ A collection of filters that must match each object tracked by a quota. If not s
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -72,5 +72,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

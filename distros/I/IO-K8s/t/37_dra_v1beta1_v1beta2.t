@@ -9,7 +9,7 @@
 # ResourceSlice.
 #
 # This test does not attempt full field coverage (that's what
-# t/34_registry_guard.t and t/02_compile_all.t already give every class for
+# the registry guard in t/02_compile_all.t and its compile subtest already give every class for
 # free) - it exercises the registration/serialization path for the two Kinds
 # most likely to be hit first (DeviceClass, ResourceClaim) on both newly
 # shipped versions, plus three narrow regressions found and fixed while

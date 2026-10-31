@@ -7,12 +7,12 @@ YATT::Lite::Object - fields based, Tcl/Tk like object
   package MyProduct {
      sub MY () {__PACKAGE__}          # Shorthand alias.
      use base qw/YATT::Lite::Object/; # For fields, you must use 'base'.
-     use fields qw/cf_name cf_price/; # Or YATT::Lite::MFields, if you like.
+     use fields qw/name price/;     # Or YATT::Lite::MFields, if you like.
 
      sub as_string {
        (my MY $self, my ($fmt)) = @_;
        $fmt //= '%s (%d)';
-       sprintf $fmt, $self->{cf_name}, $self->{cf_price}; # statically checked!
+       sprintf $fmt, $self->{name}, $self->{price}; # statically checked!
      }
   }
 
@@ -69,8 +69,8 @@ Mainly used for initializing default config values. Typical code will be:
    sub after_new {
      (my MY $self) = @_;
      $self->SUPER::after_new;
-     $self->{cf_xxx} //= "foo";
-     $self->{cf_yyy} //= "bar";
+     $self->{xxx} //= "foo";
+     $self->{yyy} //= "bar";
      # ...
    }
 

@@ -16,9 +16,11 @@ import zipfile
 parser = argparse.ArgumentParser(description='Fill in missing coverage area based on coverage regions')
 parser.add_argument('filename')
 parser.add_argument('--threshold', type=float, default=5000.0, help='Path simplification threshold (in meter)')
+parser.add_argument('--region-threshold', action="append", nargs=2, help='[region] [meter] - Areas below this threshold in the given region will be dropped entirely')
 parser.add_argument('--decimals', type=int, default=2, help='Number of decimals in coordinate output')
 parser.add_argument('--bounding-box', type=float, nargs=4, help='Geographic bounding box filter (e.g. to exclude overseas territories) - minlat minlon maxlat maxlon')
 # to exclude e.g.FR overseas territories: 36.5 -9 71 40
+parser.add_argument('--region-bounding-box', action="append", nargs=5, help='[region] [minlat] [minlon] [maxlat] [maxlon] - per-region geographic bounding box filter')
 parser.add_argument('--force', default=False, help='Regenerate coverage area even if already present', action='store_true')
 arguments = parser.parse_args()
 
@@ -108,17 +110,37 @@ def douglasPeucker(ring, threshold):
         return [ring[0], ring[-1]]
 
 
+def is_outside(box, filterBox):
+    if not filterBox:
+        return False
+    return box[1][1] < float(filterBox[0]) or box[0][1] > float(filterBox[2]) or box[1][0] < float(filterBox[1]) or box[0][0] > float(filterBox[3])
+
+
 # Finding and simplifying boundary polygons specificially for Transport API
-def simplifyRing(ring):
+def simplifyRing(regionCode, ring):
     bbox = boundingBox(ring)
-    if arguments.bounding_box and (bbox[1][1] < arguments.bounding_box[0] or bbox[0][1] > arguments.bounding_box[2] or bbox[1][0] < arguments.bounding_box[1] or bbox[0][0] > arguments.bounding_box[3]):
+    # global bounding box
+    if is_outside(bbox, arguments.bounding_box):
         print(f"dropping polygon {bbox} outside of bounding box filter")
         return []
 
+    # per-region bounding box
+    for filterBox in arguments.region_bounding_box:
+        if regionCode == filterBox[0] and is_outside(bbox, filterBox[1:]):
+            print(f"dropping polygon {bbox} outside of region bounding box filter for {regionCode}")
+            return []
+
     # deal with tiny enclaves/exclaves like Baarle "in" BE/NL
-    if distance(bbox[0], bbox[1]) < arguments.threshold:
+    ringSize = distance(bbox[0], bbox[1])
+    if ringSize < arguments.threshold:
         print("dropping polygon with bounding box below threshold")
         return []
+
+    # apply per-region thresholds
+    for rt in arguments.region_threshold:
+        if regionCode == rt[0] and ringSize < float(rt[1]):
+            print("dropping polygon with bounding box below region size threshold")
+            return []
 
     ring_length = len(ring)
     ring = douglasPeucker(ring, arguments.threshold)
@@ -157,17 +179,17 @@ def roundCoordinates(ring, decimals):
 # - Apply the Douglas-Peucker algorithm to remove points within arguments.threshold
 # - Offset the outer ring by arguments.threshold to ensure we still cover the original polygon completely
 # - Offset all inner rings by -arugments.threshold for the same reason
-def simplifyMultiPolygon(multiPoly):
+def simplifyMultiPolygon(regionCode, multiPoly):
     for i in range(0, len(multiPoly)):
         # outer ring
-        multiPoly[i][0] = simplifyRing(multiPoly[i][0])
+        multiPoly[i][0] = simplifyRing(regionCode, multiPoly[i][0])
         if not multiPoly[i][0]:
             multiPoly[i] = None
             continue
         multiPoly[i][0] = offsetRing(multiPoly[i][0], arguments.threshold)
         # inner rings
         for j in range(1, len(multiPoly[i])):
-            multiPoly[i][j] = simplifyRing(multiPoly[i][j])
+            multiPoly[i][j] = simplifyRing(regionCode, multiPoly[i][j])
             offsetRing(multiPoly[i][0], -arguments.threshold)
         multiPoly[i] = [roundCoordinates(ring, arguments.decimals) for ring in multiPoly[i] if ring]
     multiPoly = [poly for poly in multiPoly if poly]
@@ -180,9 +202,9 @@ def iso3166Boundary(regionCode, geojsonFile, featureKey):
         if region['properties'][featureKey] != regionCode:
             continue
         if region['geometry']['type'] == 'MultiPolygon':
-            return simplifyMultiPolygon(region['geometry']['coordinates'])
+            return simplifyMultiPolygon(regionCode, region['geometry']['coordinates'])
         else:
-            return simplifyMultiPolygon([region['geometry']['coordinates']])
+            return simplifyMultiPolygon(regionCode, [region['geometry']['coordinates']])
 
 
 def iso3166_1Boundary(regionCode):

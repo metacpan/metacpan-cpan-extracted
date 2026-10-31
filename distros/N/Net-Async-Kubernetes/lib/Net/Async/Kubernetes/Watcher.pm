@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Watcher;
 # ABSTRACT: Auto-reconnecting Kubernetes watch as IO::Async::Notifier
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -460,7 +460,7 @@ Net::Async::Kubernetes::Watcher - Auto-reconnecting Kubernetes watch as IO::Asyn
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -738,7 +738,7 @@ L<IO::Async::Notifier>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-net-async-kubernetes/issues>.
 
 =head2 IRC

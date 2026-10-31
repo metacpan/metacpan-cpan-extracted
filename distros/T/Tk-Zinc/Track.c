@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Track.c,v 1.88 2006/02/14 09:01:07 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -30,8 +30,6 @@
 #include <stdlib.h>
 
 
-static const char rcsid[] = "$Id: Track.c,v 1.88 2006/02/14 09:01:07 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 /*
  * Define this to enable overlap manager setting
@@ -48,6 +46,10 @@ static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ "
 #define DEFAULT_LINE_WIDTH              1
 #define DEFAULT_LABEL_PREFERRED_ANGLE   0
 #define DEFAULT_CONVERGENCE_STYLE       0
+
+#ifdef OM_TECH
+#define OMTECHSTUFFLEN 256              /* length of technical buffer for OM purpose */
+#endif
 
 #define SPEED_VECTOR_PICKING_THRESHOLD  5       /* In pixels    */
 
@@ -122,6 +124,9 @@ typedef struct _TrackItemStruct {
   ZnDim         speed_vector_width;
   ZnGradient    *history_color;
   ZnDim         history_width;
+#ifdef OM_TECH
+  char          *omtechstuff;
+#endif
 
   /* Private data */
   ZnFieldSetStruct field_set;
@@ -134,6 +139,8 @@ typedef struct _TrackItemStruct {
 
 
 static ZnAttrConfig     track_attrs[] = {
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(TrackItemStruct, header.flags), ZN_CATCH_EVENT_BIT, ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-circlehistory", NULL,
     Tk_Offset(TrackItemStruct, flags), CIRCLE_HISTORY_BIT, ZN_DRAW_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
@@ -253,11 +260,19 @@ static ZnAttrConfig     track_attrs[] = {
     ZN_DRAW_FLAG|ZN_REPICK_FLAG|ZN_VIS_FLAG, False },
   { ZN_CONFIG_BOOL, "-historyvisible", NULL,
     Tk_Offset(TrackItemStruct, flags), HISTORY_VISIBLE_BIT, ZN_COORDS_FLAG, False },
+#ifdef OM_TECH
+  /* This read only attribut receives reason value transmitted by
+     ZnSetLabelAngleFromOm; it can be read by application to
+     understand OM internal strategy */ 
+  { ZN_CONFIG_STRING, "-omtechstuff", NULL, Tk_Offset(TrackItemStruct, omtechstuff), 0, 0, True }, 
+#endif  
   
   { ZN_CONFIG_END, NULL, NULL, 0, 0, 0, False }
 };
 
 static ZnAttrConfig     wp_attrs[] = {
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(TrackItemStruct, header.flags), ZN_CATCH_EVENT_BIT, ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
     Tk_Offset(TrackItemStruct, header.flags), ZN_COMPOSE_ALPHA_BIT,
     ZN_DRAW_FLAG, False },
@@ -360,7 +375,7 @@ static ZnAttrConfig     wp_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   TrackItem     track = (TrackItem) item;
   ZnFieldSet    field_set = &track->field_set;
@@ -371,6 +386,7 @@ Init(ZnItem             item,
    
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -385,6 +401,9 @@ Init(ZnItem             item,
   track->label_distance = DEFAULT_LABEL_DISTANCE;
   SET(track->flags, POLAR_BIT);
   CLEAR(track->flags, FROZEN_LABEL_BIT);
+#ifdef OM_TECH
+  track->omtechstuff = NULL; 
+#endif
 
   track->label_preferred_angle   = DEFAULT_LABEL_PREFERRED_ANGLE;
   track->label_convergence_style = DEFAULT_CONVERGENCE_STYLE ;
@@ -439,7 +458,7 @@ Init(ZnItem             item,
     ZnFIELD.InitFields(field_set);
   }
   else {
-    Tcl_AppendResult(wi->interp, " number of fields expected", NULL);
+    Tcl_AppendResult(wi->interp, " number of fields expected", (char *) NULL);
     return TCL_ERROR;
   }
   
@@ -473,6 +492,9 @@ static void
 Clone(ZnItem    item)
 {
   TrackItem     track = (TrackItem) item;
+#ifdef OM_TECH
+  char          *omtechstuffclone;
+#endif
 
   if (track->history) {
     track->history = ZnListDuplicate(track->history);
@@ -494,6 +516,14 @@ Clone(ZnItem    item)
   
   ZnFIELD.CloneFields(&track->field_set);
   track->field_set.item = item;
+
+#ifdef OM_TECH
+  if (track->omtechstuff) {
+    omtechstuffclone = ZnMalloc( (OMTECHSTUFFLEN + 1) * sizeof(char));
+    strcpy(omtechstuffclone, track->omtechstuff);
+    track->omtechstuff = omtechstuffclone;
+  }
+#endif
 
   /*
    * We get all shared resources, colors bitmaps.
@@ -538,6 +568,12 @@ Destroy(ZnItem  item)
   if (track->history) {
     ZnListFree(track->history);
   }
+
+#ifdef OM_TECH
+  if (track->omtechstuff) {
+    ZnFree(track->omtechstuff);
+  }
+#endif
   
   /*
    * Release shared resources.
@@ -595,7 +631,7 @@ AddToHistory(TrackItem  track,
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   TrackItem     track = (TrackItem) item;
@@ -607,6 +643,7 @@ Configure(ZnItem        item,
   old_connected = item->connected_item;
   
   if (ZnConfigureAttributes(wi, item, item, track_attrs, argc, argv, flags) == TCL_ERROR) {
+    item->connected_item = old_connected;
     return TCL_ERROR;
   }
   
@@ -671,7 +708,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, track_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -680,6 +717,52 @@ Query(ZnItem            item,
   return TCL_OK;
 }
 
+
+static void
+AdjustLabelDistance(TrackItem  track,
+                    ZnTransfo  *current_t,
+                    ZnReal     theta,      // Angle to adjust for
+                    ZnDim      bb_width,
+                    ZnDim      bb_height,
+                    ZnPoint    *label_pos,
+                    ZnReal     *label_dx,
+                    ZnReal     *label_dy) 
+{
+  ZnReal  rho, rotation, dist;
+  int     it;
+  ZnBBox  bbox;
+
+  rho = track->label_distance;
+  /*
+   * Compute heading after applying the transform.
+   */
+  ZnTransfoDecompose(current_t, NULL, NULL, &rotation, NULL);
+  /*printf("rotation=%g, heading=%g, angle=%d\n", rotation,
+    ZnProjectionToAngle(track->speed_vector.x, track->speed_vector.y),
+    track->label_angle);*/
+  rotation = ZnProjectionToAngle(track->speed_vector.x, track->speed_vector.y)-rotation;
+  /*
+   * Adjust the distance to match the requested label_distance
+   * whatever the label angle.
+   */
+  it = 0;
+  while (1) {
+    ZnPointPolarToCartesian(rotation, rho, theta, label_dx, label_dy);
+    label_pos->x = track->dev.x + *label_dx;
+    label_pos->y = track->dev.y - *label_dy;
+    ZnAnchor2Origin(label_pos, bb_width, bb_height, track->label_anchor, label_pos);
+    ZnResetBBox(&bbox);
+    ZnAddPointToBBox(&bbox, label_pos->x, label_pos->y);
+    ZnAddPointToBBox(&bbox, label_pos->x + bb_width, label_pos->y + bb_height);
+    dist = ZnRectangleToPointDist(&bbox, &track->dev);
+    dist = track->label_distance - dist;
+    if (ABS(dist) < 1.0 || it > 5) {
+      break;
+    }
+    it++;
+    rho += dist;
+  }
+}
 
 /*
 **********************************************************************************
@@ -816,13 +899,12 @@ ComputeCoordinates(ZnItem       item,
                      track->dev.x + (ZnPos) track->marker_size_dev,
                      track->dev.y + (ZnPos) track->marker_size_dev);
   } 
-  
+ 
   /* Compute the new label bounding box. */
   if (field_set->label_format && field_set->num_fields) {
-    ZnDim       bb_width, bb_height;
-    ZnReal      rho, theta, dist;
-    ZnPoint     leader_end;
-    int it;
+    ZnDim   bb_width, bb_height;
+    ZnReal  theta, dist;
+    ZnPoint leader_end;
 
     ZnFIELD.GetLabelBBox(field_set, &bb_width, &bb_height);
     /*
@@ -832,38 +914,9 @@ ComputeCoordinates(ZnItem       item,
       /*
        * Update label_dx, label_dy from label_distance, label_angle
        */
-      rho = track->label_distance;
-      /*
-       * Compute heading after applying the transform.
-       */
-      ZnTransfoDecompose(wi->current_transfo, NULL, NULL, &rotation, NULL);
-      /*printf("rotation=%g, heading=%g, angle=%d\n", rotation,
-        ZnProjectionToAngle(track->speed_vector.x, track->speed_vector.y),
-        track->label_angle);*/
-      rotation = ZnProjectionToAngle(track->speed_vector.x, track->speed_vector.y)-rotation;
-      /*
-       * Adjust the distance to match the requested label_distance
-       * whatever the label_angle.
-       */
-      it = 0;
-      while (1) {
-        ZnPointPolarToCartesian(rotation, rho, (ZnReal) track->label_angle,
-                                &track->label_dx, &track->label_dy);
-        field_set->label_pos.x = track->dev.x + track->label_dx;
-        field_set->label_pos.y = track->dev.y - track->label_dy;
-        ZnAnchor2Origin(&field_set->label_pos, bb_width, bb_height,
-                        track->label_anchor, &field_set->label_pos);
-        ZnResetBBox(&bbox);
-        ZnAddPointToBBox(&bbox, field_set->label_pos.x, field_set->label_pos.y);
-        ZnAddPointToBBox(&bbox, field_set->label_pos.x + bb_width, field_set->label_pos.y + bb_height);
-        dist = ZnRectangleToPointDist(&bbox, &track->dev);
-        dist = track->label_distance - dist;
-        if (ABS(dist) < 1.0 || it > 5) {
-          break;
-        }
-        it++;
-        rho += dist;
-      }
+      AdjustLabelDistance(track, wi->current_transfo, track->label_angle,
+                          bb_width, bb_height, &field_set->label_pos,
+                          &track->label_dx, &track->label_dy);
     }
     else {
       /*
@@ -1117,7 +1170,7 @@ Draw(ZnItem     item)
   if (track->marker_size_dev != 0) {
     ZnSetLineStyle(wi, track->marker_style);
     values.foreground = ZnGetGradientPixel(track->marker_color, 0.0);
-    values.line_width = 0;
+    values.line_width = 1;
     if (ISSET(track->flags, MARKER_FILLED_BIT)) {
       if (track->marker_fill_pattern == ZnUnspecifiedImage) {
         /* Fill solid */
@@ -1169,7 +1222,7 @@ Draw(ZnItem     item)
    */
   if ((item->class == ZnTrack) && (track->speed_vector_width > 0)) {
     values.foreground = ZnGetGradientPixel(track->speed_vector_color, 0.0);
-    values.line_width = (int) (track->speed_vector_width > 1 ? track->speed_vector_width : 0);
+    values.line_width = (int) track->speed_vector_width;
     values.line_style = LineSolid;
     values.fill_style = FillSolid;
     XChangeGC(wi->dpy, wi->gc,
@@ -1234,7 +1287,7 @@ Draw(ZnItem     item)
     values.fill_style = FillSolid;
     XChangeGC(wi->dpy, wi->gc, GCForeground|GCFillStyle, &values);  
     if (ISCLEAR(track->flags, FILLED_HISTORY_BIT)) {
-      values.line_width = 0;
+      values.line_width = 1;
       values.line_style = LineSolid;
       XChangeGC(wi->dpy, wi->gc, GCLineWidth | GCLineStyle, &values);
     }
@@ -1927,12 +1980,13 @@ ZnSendTrackToOm(void    *ptr,
 **********************************************************************************
 */
 void
-ZnSetLabelAngleFromOm(void      *ptr,   /* No longer in use. */
-                      void      *item,
-                      int       rho,
-                      int       theta)
+ZnSetLabelAngleFromOm(void *ptr,   /* No longer in use. */
+                      void *item,
+                      int  rho,
+                      int  theta,
+                      char *reason) /* Technical data explaining algorithm processing */
 {
-  TrackItem     track = (TrackItem) item;
+  TrackItem track = (TrackItem) item;
 
   theta %= 360;
   if (theta < 0) {
@@ -1947,6 +2001,15 @@ ZnSetLabelAngleFromOm(void      *ptr,   /* No longer in use. */
     ZnITEM.Invalidate((ZnItem) item, ZN_COORDS_FLAG);
     /*    ZnGroupSetCallOm(((ZnItem)item)->parent, True);*/
   }
+#ifdef OM_TECH
+  /* Setup reason regardless of redrawing options. */
+  if (reason) {
+    if (!track->omtechstuff) {
+      track->omtechstuff = ZnMalloc(  (OMTECHSTUFFLEN + 1) * sizeof(char));
+    }
+    strncpy(track->omtechstuff, reason, OMTECHSTUFFLEN); 
+  }
+#endif 
 }
 
 
@@ -1959,36 +2022,28 @@ ZnSetLabelAngleFromOm(void      *ptr,   /* No longer in use. */
 **********************************************************************************
 */
 void
-ZnQueryLabelPosition(void       *ptr,   /* No longer in use. */
-                     void       *item,
-                     int        theta,
-                     int        *x,
-                     int        *y,
-                     int        *w,
-                     int        *h)
+ZnQueryLabelPosition(void *ptr,   /* No longer in use. */
+                     void *item,
+                     int  theta,
+                     int  *x,
+                     int  *y,
+                     int  *w,
+                     int  *h)
 {
-  ZnItem        it = (ZnItem) item;
-  ZnWInfo       *wi = it->wi;
-  TrackItem     track = (TrackItem) it;
+  ZnItem    it = (ZnItem) item;
+  TrackItem track = (TrackItem) it;
   
   if (track->field_set.label_format) {
-    ZnDim       bb_width, bb_height;
-    ZnDim       delta_x, delta_y;
-    ZnReal      heading;
+    ZnDim     bb_width, bb_height;
+    ZnPoint   pos;
+    ZnReal    dx, dy;
+    ZnTransfo t;
     
-    /*
-     * !! BUG !! This doesn't work if the current transform has some rotation.
-     */
-    heading = ZnProjectionToAngle(track->speed_vector.x, track->speed_vector.y);
-    ZnPointPolarToCartesian(heading, track->label_distance, (ZnReal) theta, &delta_x, &delta_y);
     ZnFIELD.GetLabelBBox(&track->field_set, &bb_width, &bb_height);
-    /*
-     * !! BUG !! This assume a label placing relative to the center anchor.
-     * We must fix this by taking into account the label anchor.
-     */
-    *x = (int) track->dev.x + (int) (delta_x - bb_width/2);
-    *y = (int) track->dev.y - (int) (delta_y + bb_height/2);
-    *y = ((int) wi->height) - *y;
+    ZnITEM.GetItemTransform(item, &t);
+    AdjustLabelDistance(track, &t, theta, bb_width, bb_height, &pos, &dx, &dy);
+    *x = (int) pos.x;
+    *y = (int) (it->wi->height - pos.y);
     *w = (int) bb_width;
     *h = (int) bb_height;
   }
@@ -2097,14 +2152,14 @@ Coords(ZnItem           item,
   
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp, " ",
-                     item->class->name, "s can't add or remove vertices", NULL);
+                     item->class->name, "s can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if ((cmd == ZN_COORDS_REPLACE) || (cmd == ZN_COORDS_REPLACE_ALL)) {
     if (*num_pts == 0) {
       Tcl_AppendResult(item->wi->interp,
                        " coords command need 1 point on ",
-                       item->class->name, "s", NULL);
+                       item->class->name, "s", (char *) NULL);
       return TCL_ERROR;
     }
     if (item->class == ZnTrack) {
@@ -2169,7 +2224,7 @@ Part(ZnItem     item,
       }
       else {
       part_error:
-        Tcl_AppendResult(item->wi->interp, " invalid item part specification", NULL);
+        Tcl_AppendResult(item->wi->interp, " invalid item part specification", (char *) NULL);
         return TCL_ERROR;       
       }
     }
@@ -2344,6 +2399,7 @@ static ZnItemClassStruct TRACK_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,
@@ -2378,6 +2434,7 @@ static ZnItemClassStruct WAY_POINT_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

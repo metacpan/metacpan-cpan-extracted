@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodOS;
 # ABSTRACT: PodOS defines the OS parameters of a pod.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::PodOS - PodOS defines the OS parameters of a pod.
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 name
 
@@ -30,7 +30,7 @@ Name is the name of the operating system. The currently supported values are lin
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -58,5 +58,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

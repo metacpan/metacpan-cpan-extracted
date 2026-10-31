@@ -127,6 +127,13 @@ compact honeycomb, so that anything not green stands out immediately.
   shape is used). With none of the three, `aspect` defaults to `16/9`.
 - Groups still work when `group_label` is set: each group is its own packed
   block. Without it there is one block.
+- The aspect is met by the whole picture, not by the honeycomb alone: for
+  every column count the frame around it is taken as it would be drawn --
+  padding, the title, and the legend wrapped to the width that results. A title
+  or a legend wider than the honeycomb widens the picture; a legend that wraps
+  into more rows makes it taller. (Decided k13: the frame is a function of the
+  content size, not a fixed legend row, so the shape asked for is the shape
+  drawn.)
 - Edges default to off in packed layout (`edges => 1` turns them back on).
 - The default `layout` stays `'depth'` (rows by dependency depth, as above).
 
@@ -191,6 +198,22 @@ can restyle it: every colour is a custom property (`--comb-running`,
 `--comb-error`, ... `--comb-bg`) on the root element, and every cell carries
 `class="comb phase-<phase>"`. The property and class names are part of the
 public interface and documented in the POD.
+
+**Groups in `theme` and `blink`.** Where a key or an entry names a phase it may
+name a group (the value of `group_label`) as well, written `@group` (every
+phase of the group) or `Phase@group` (one phase in it); the phase is everything
+before the first `@`, the group everything after it. In `theme` the most
+specific key wins (`Phase@group`, then `@group`, then `Phase`); a mode the
+value leaves out keeps the colour the cell would have had. The phase stays
+visible as text and class, so a group colour never carries it alone, and the
+legend keeps the phase colours. In `blink` the entries add up: a plain phase
+pulses in every group. A group no cell has, an unknown phase and an empty group
+are ignored. A cell in a group carries `data-comb-group` (the heading's
+`data-group` is taken); the rules select on it, written only for the groups
+that occur and for the keys given, so a picture without such keys keeps its
+rules. (Decided k13: one syntax for both options, resolved in the picture's own
+CSS with no new option; the colour goes on the cell's `--comb-<phase>` custom
+property, so the hexagon rules stay as they are.)
 
 ## 7. Options
 

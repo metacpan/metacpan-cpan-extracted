@@ -1,6 +1,6 @@
 package Kubernetes::Comb::Upstream::Static;
 # ABSTRACT: An upstream with fixed endpoints and no cluster behind it
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 with 'Kubernetes::Comb::Role::Upstream';
@@ -85,7 +85,7 @@ Kubernetes::Comb::Upstream::Static - An upstream with fixed endpoints and no clu
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ Future of the arrayref of the L</endpoints> as L<Kubernetes::Comb::Endpoint>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

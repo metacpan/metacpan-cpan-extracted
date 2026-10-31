@@ -1,5 +1,13 @@
 Revision history for Kubernetes-Comb-SVG
 
+0.002     2026-10-31 00:31:57Z
+
+ - blink and theme can address a group: '@extern' for every phase of the
+   group, 'Phase@extern' for one phase in it (--blink and --color take the
+   same keys). A cell in a group now carries data-comb-group.
+ - In the packed layout aspect counts the whole picture: a long title and a
+   legend that wraps into several rows no longer make it miss the target.
+
 0.001     2026-10-03 04:30:44Z
 
  - First release. Renders a set of Kubernetes::Comb custom resources as one

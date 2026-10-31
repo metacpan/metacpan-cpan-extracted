@@ -5,6 +5,7 @@ model: sonnet
 briefing:
   skills:
     - mcp-k8s-core
+    - mcp-k8s-hazards
     - getty-perl-core
     - getty-perl-moo
     - kanban-issues-karr-ticket

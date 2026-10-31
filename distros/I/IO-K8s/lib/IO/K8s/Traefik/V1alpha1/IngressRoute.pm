@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::IngressRoute;
 # ABSTRACT: IngressRoute is the CRD implementation of a Traefik HTTP Router.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'ingressroutes';
@@ -24,7 +24,7 @@ IO::K8s::Traefik::V1alpha1::IngressRoute - IngressRoute is the CRD implementatio
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 spec
 
@@ -34,7 +34,7 @@ IngressRouteSpec defines the desired state of IngressRoute.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -62,5 +62,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

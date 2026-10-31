@@ -9,7 +9,7 @@ sub {
     my $fnum = $con->param_type(fnum => integer => "fnum should be integer!");
 
     # XXX: This can loose old content!
-    unlink "$yatt->{cf_datadir}/.ht_$fnum"
+    unlink "$yatt->{datadir}/.ht_$fnum"
       or die "Can't delete $fnum: $!";
   }
 

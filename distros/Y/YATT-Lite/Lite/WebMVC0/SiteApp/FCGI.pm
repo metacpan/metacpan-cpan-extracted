@@ -22,10 +22,10 @@ package YATT::Lite::WebMVC0::SiteApp;
 sub _prepare_config_for_fcgi {
   (my MY $self, my ($opts)) = @_;
 
-  $self->{cf_is_psgi} = 1;
+  $self->{is_psgi} = 1;
 
   # In suexec fcgi, $0 will not be absolute path.
-  $self->{cf_progname} //= do {
+  $self->{progname} //= do {
     if (-r (my $fn = delete $opts->{progname} || $0)) {
       $self->rel2abs($fn);
     } else {
@@ -33,13 +33,14 @@ sub _prepare_config_for_fcgi {
     }
   };
 
-  if ((my $dn = $self->{cf_progname}) =~ s{/html/cgi-bin/[^/]+$}{}) {
-    $self->{cf_app_root} //= $dn;
-    $self->{cf_doc_root} //= "$dn/html";
-    push @{$self->{tmpldirs}}, $self->{cf_doc_root}
-      unless $self->{tmpldirs} and @{$self->{tmpldirs}};
-    #print STDERR "Now:", terse_dump($self->{cf_app_root}, $self->{cf_doc_root}
-    #				    , $self->{tmpldirs}), "\n";
+  if ((my $dn = $self->{progname}) =~ s{/html/cgi-bin/[^/]+$}{}) {
+    $dn = YATT::Lite::Util::normalize_fs_path($dn);
+    $self->{app_root} //= $dn;
+    $self->{doc_root} //= "$dn/html";
+    push @{$self->{_tmpldirs}}, $self->{doc_root}
+      unless $self->{_tmpldirs} and @{$self->{_tmpldirs}};
+    #print STDERR "Now:", terse_dump($self->{app_root}, $self->{doc_root}
+    #				    , $self->{_tmpldirs}), "\n";
   }
 }
 
@@ -47,7 +48,7 @@ sub _prepare_config_for_fcgi {
 # If you want psgi.multiprocess, use Plack's own FCGI instead.
 
 #
-# Check timestamp for $self->{cf_progname} and exit when modified.
+# Check timestamp for $self->{progname} and exit when modified.
 # (Outer processmanager is responsible to restart).
 #
 sub _callas_fcgi {
@@ -59,8 +60,8 @@ sub _callas_fcgi {
 
   $self->_prepare_config_for_fcgi(\%opts);
 
-  my $dir = dirname($self->{cf_progname});
-  my $age = -M $self->{cf_progname};
+  my $dir = dirname($self->{progname});
+  my $age = -M $self->{progname};
 
   my ($stdin, $stdout, $stderr) = ref $fhset eq 'ARRAY' ? @$fhset
     : (\*STDIN, $fhset
@@ -89,7 +90,7 @@ sub _callas_fcgi {
     croak "Unknown options: ".join(", ", sort keys %opts);
   }
 
-  local $self->{cf_at_done} = sub {die \"DONE"};
+  local $self->{at_done} = sub {die \"DONE"};
   local $SIG{PIPE} = 'IGNORE';
   while ($request->Accept >= 0) {
     my Env $env = $self->psgi_fcgi_newenv(\%env, $stdin, $stderr);
@@ -131,7 +132,7 @@ sub _callas_fcgi {
     $request->Finish;
 
     # Exit if bootscript is modified.
-    last if -e $self->{cf_progname} and -M $self->{cf_progname} < $age;
+    last if -e $self->{progname} and -M $self->{progname} < $age;
   }
 }
 

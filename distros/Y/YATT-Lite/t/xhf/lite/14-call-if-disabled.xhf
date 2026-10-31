@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+YATT_CONFIG[
+no_conditional_call: 1
+]
+
+TITLE: if= is plain (unknown) arg when no_conditional_call
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2"/>world!
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+ERROR: Unknown arg 'if'
+
+TITLE: declared arg named if is passed as normal arg
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x;"/>world!
+ 
+ <!yatt:widget hello if>
+ <h2>Hello &yatt:if;</h2>
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello 2</h2>
+ world!

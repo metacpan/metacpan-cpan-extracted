@@ -74,6 +74,14 @@ Every file the bundle processes carries `# ABSTRACT: <one line>` directly under
 PodWeaver turns it into the NAME section. Outside a bundle-managed distribution
 the line does nothing — do not scatter it into files Dist::Zilla never sees.
 
+## What the tarball ships
+
+`Git::GatherDir` gathers every tracked file, dotfiles included
+(`gather_include_dotfiles` defaults to 1), so `.claude/`, `CLAUDE.md` and `.github/`
+ship with the dist; `[GatherAgentContext]` adds a snapshot of the agent context under
+`misc/agent-context/` (build provenance, not installed). We keep them in. Out by
+default: `README.md` (see `include_readme`) and `.karr`.
+
 ## @Author::GETTY Options
 
 ### Feature Toggles (Boolean)

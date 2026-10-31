@@ -25,9 +25,9 @@ use 5.010;
 use base qw/YATT::Lite::Object/;
 use YATT::Lite::MFields
   (()
-   , [cf_help => doc => "show help messages"]
-   , [cf_script_path => doc => "script search path for yatt subcommands"]
-   , [cf_debug => doc => "run in perldebugger"]
+   , [help => doc => "show help messages"]
+   , [script_path => doc => "script search path for yatt subcommands"]
+   , [debug => doc => "run in perldebugger"]
   );
 # XXX: Should use doc strings in help message.
 
@@ -43,7 +43,7 @@ use List::Util qw/uniq/;
   if (my $sub = $self->can("cmd_$cmd")) {
     $sub->($self, @ARGV);
   } elsif (my $fn = $self->subcmd_path($cmd)) {
-    if ($self->{cf_debug}) {
+    if ($self->{debug}) {
       exec $^X, "-d", $fn, @ARGV or die "couldn't exec $fn: $!";
     } else {
       exec $fn, @ARGV or die "couldn't exec $fn: $!";
@@ -73,11 +73,11 @@ END
 
 sub subcmd_list {
   (my MY $self) = @_;
-  my $prefix = "$self->{cf_script_path}yatt";
+  my $prefix = "$self->{script_path}yatt";
   my %hidden; $hidden{$_} = 1
     for qw(backend call command dispatcher
            lintany lintpm lintrc
-           xgettext xhftest);
+           xgettext);
   grep {
     not $hidden{$_}
   }
@@ -98,7 +98,7 @@ sub subcmd_list {
 sub subcmd_path {
   (my MY $self, my $subcmd) = @_;
   foreach my $fnPat (qw(yatt-%s*  yatt.%s)) {
-    my $glob = $self->{cf_script_path}. sprintf($fnPat, $subcmd);
+    my $glob = $self->{script_path}. sprintf($fnPat, $subcmd);
     foreach my $fn (glob($glob)) {
       return $fn if -x $fn;
     }
@@ -113,7 +113,7 @@ sub find_libdir {
 
 sub after_new {
   (my MY $self) = @_;
-  $self->{cf_script_path} //= do {
+  $self->{script_path} //= do {
     if ($FindBin::RealBin =~ m{/YATT/scripts\z}) {
       $self->find_libdir . "/YATT/scripts/"
     } else {

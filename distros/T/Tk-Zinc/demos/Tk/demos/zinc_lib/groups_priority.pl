@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-# $Id: groups_priority.pl,v 1.5 2003/09/15 12:25:05 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 package groups_priority;  # for avoiding symbol sharing between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

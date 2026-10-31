@@ -29,6 +29,7 @@ sub link_files {
     my $exclude_tests = $mode eq "without_tests";
     my $tests_only    = $mode eq "tests_only";
     my $bare_minimum  = $mode eq "bare_minimum";
+    my $test_lib_only = $mode eq "test_lib";        # shared test helpers, not the test suites
 
     # This fires from a git source tree only.
     # Right now, all devs are on Linux. Feel free to make portable.
@@ -37,35 +38,41 @@ sub link_files {
         require File::Find;
         require File::Path;
         require File::Spec;
+        require File::Basename;
+        my $project_root = File::Spec->rel2abs('.');
+        my $shared_root  = File::Spec->rel2abs( $shared_dir, $project_root );
         File::Find::find( {
                 no_chdir => 1,
                 wanted   => sub {
-                    my $f = $_;
+                    my $source_path = $_;
                     s/^\Q$shared_dir\E\/?// or die $_;
                     return unless $_;
                     return if $exclude_tests && m#^/?t/#;
+                    return if $test_lib_only && m#^/?t/# && !m#^/?t/lib(?:/|$)#;
                     return if $tests_only    && !m#^/?t/#;
                     return if $bare_minimum  && !exists $bare_minimum_files{$_};
 
-                    if ( -d $f ) {
+                    if ( -d $source_path ) {
                         File::Path::mkpath($_);
                     }
-                    elsif ( -f $f ) {
-                        return if $f =~ /(?:\.bak|\.sw[po]|~)$/;
-                        my @d     = File::Spec->splitdir($_);
-                        my $fname = pop @d;
-                        my $ref   = join "/", ("..") x scalar(@d);
-                        my $subd  = join "/", @d;
-                        chdir $subd if length($ref);
-                        my $srcfname = join( "/", grep length, $ref, $shared_dir, $subd, $fname );
+                    elsif ( -f $source_path ) {
+                        return if $source_path =~ /(?:\.bak|\.sw[po]|~)$/;
+                        my $relative_path = $_;
+                        my $target_path = File::Spec->catfile(
+                            $project_root, File::Spec->splitdir($relative_path)
+                        );
+                        my $source_abs = File::Spec->catfile(
+                            $shared_root, File::Spec->splitdir($relative_path)
+                        );
                         if ( OSNAME eq 'MSWin32' ) {
-                            die "link($srcfname, $fname) failed: $!"
-                                unless link( $srcfname, $fname );    #only NTFS implements it
+                            die "link($source_abs, $target_path) failed: $!"
+                                unless link( $source_abs, $target_path );    #only NTFS implements it
                         }
                         else {
-                            symlink( $srcfname, $fname );
+                            my $target_dir  = File::Basename::dirname($target_path);
+                            my $link_target = File::Spec->abs2rel( $source_abs, $target_dir );
+                            symlink( $link_target, $target_path );
                         }
-                        chdir($ref) if length($ref);
                     }
                 },
             },
@@ -138,6 +145,16 @@ sub check_external_libraries {
         push @{$subdirs}, 'zstd';
         $$objects .= ' zstd/libzstd$(OBJ_EXT)';
     }
+}
+
+# For a distribution that links the objects built in another directory
+# (Sereal::Path and Sereal::Path::Tie link Sereal::Path::Iterator's): add the
+# installed libraries to link with, or else the bundled objects from $dir.
+sub check_external_libraries_from_dir {
+    my ( $libs, $defines, $objects, $dir ) = @_;
+    my $dir_objects = '';
+    check_external_libraries( $libs, $defines, \$dir_objects, [] );
+    $$objects .= join '', map { " $dir/$_" } split ' ', $dir_objects;
 }
 
 sub build_defines {
@@ -227,9 +244,20 @@ sub build_optimize {
         }
     }
 
-    # silence warning about STMT_START and STMT_END.
-    $OPTIMIZE .= " -Wno-compound-token-split-by-macro"
-        if $clang;
+    # Older Apple Clang releases do not recognize this warning. Probe with
+    # unknown warnings promoted to errors before adding the suppression (#302).
+    if ($clang) {
+        require Devel::CheckLib;
+        if (
+            Devel::CheckLib::check_lib(
+                header      => 'stddef.h',
+                ccflags     => '-Werror=unknown-warning-option -Wno-compound-token-split-by-macro',
+                not_execute => 1,
+            ) )
+        {
+            $OPTIMIZE .= " -Wno-compound-token-split-by-macro";
+        }
+    }
 
     return $OPTIMIZE;
 }

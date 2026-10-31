@@ -1,5 +1,16 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.24	Fri Oct 30 09:29:31 PM EDT 2026
+	[ Enhancements ]
+	- Use Params::Get and Params::Validate::Strict in all public routines
+	[ Bug Fixes ]
+	- render_histogram_snippet(binned => 1): the rotated bin labels ran over the
+	  x_label and could be cut off at the left and bottom of the chart.  The
+	  labels are now measured once drawn, and the plot gives up the room they
+	  need, up to half the chart's height and a quarter of its width
+	  The x_label carries its font as attributes, so an SVG saved from the page
+	  keeps it
+
 0.23	Sat Oct 17 08:28:48 AM EDT 2026
 	[ Enhancements ]
 	- The chart snippets inline each categorical scheme's colours as a literal

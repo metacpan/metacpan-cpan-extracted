@@ -156,6 +156,10 @@ sub render_hello {
 MyYATT::EntNS->render_hello(\*STDOUT, "foo", undef);
 ```
 
+最後の `$body` のような code 型の引数も、widget と同じく
+`$CON` を第一引数に受け取る closure です。呼び出すときは
+`$body->($CON)` のように `$CON` を渡します。
+
 ### Why stream writer
 
 yatt で書かれたテンプレートは、ここまでで示したように、

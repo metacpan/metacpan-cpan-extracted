@@ -8,250 +8,886 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: IO-K8s-Deprecated
 provides:
+  IO::K8s::Api::Admissionregistration::V1alpha1::Initializer:
+    file: lib/IO/K8s/Api/Admissionregistration/V1alpha1/Initializer.pm
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1alpha1::InitializerConfiguration:
+    file: lib/IO/K8s/Api/Admissionregistration/V1alpha1/InitializerConfiguration.pm
+    version: '1.112'
   IO::K8s::Api::Admissionregistration::V1alpha1::InitializerConfigurationList:
     file: lib/IO/K8s/Api/Admissionregistration/V1alpha1/InitializerConfigurationList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1alpha1::Rule:
+    file: lib/IO/K8s/Api/Admissionregistration/V1alpha1/Rule.pm
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1beta1::MutatingWebhookConfiguration:
+    file: lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingWebhookConfiguration.pm
+    version: '1.112'
   IO::K8s::Api::Admissionregistration::V1beta1::MutatingWebhookConfigurationList:
     file: lib/IO/K8s/Api/Admissionregistration/V1beta1/MutatingWebhookConfigurationList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1beta1::RuleWithOperations:
+    file: lib/IO/K8s/Api/Admissionregistration/V1beta1/RuleWithOperations.pm
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1beta1::ServiceReference:
+    file: lib/IO/K8s/Api/Admissionregistration/V1beta1/ServiceReference.pm
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1beta1::ValidatingWebhookConfiguration:
+    file: lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingWebhookConfiguration.pm
+    version: '1.112'
   IO::K8s::Api::Admissionregistration::V1beta1::ValidatingWebhookConfigurationList:
     file: lib/IO/K8s/Api/Admissionregistration/V1beta1/ValidatingWebhookConfigurationList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1beta1::Webhook:
+    file: lib/IO/K8s/Api/Admissionregistration/V1beta1/Webhook.pm
+    version: '1.112'
+  IO::K8s::Api::Admissionregistration::V1beta1::WebhookClientConfig:
+    file: lib/IO/K8s/Api/Admissionregistration/V1beta1/WebhookClientConfig.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1::ControllerRevisionList:
     file: lib/IO/K8s/Api/Apps/V1/ControllerRevisionList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Apps::V1::DaemonSetList:
     file: lib/IO/K8s/Api/Apps/V1/DaemonSetList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Apps::V1::DeploymentList:
     file: lib/IO/K8s/Api/Apps/V1/DeploymentList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Apps::V1::ReplicaSetList:
     file: lib/IO/K8s/Api/Apps/V1/ReplicaSetList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Apps::V1::StatefulSetList:
     file: lib/IO/K8s/Api/Apps/V1/StatefulSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::ControllerRevision:
+    file: lib/IO/K8s/Api/Apps/V1beta1/ControllerRevision.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta1::ControllerRevisionList:
     file: lib/IO/K8s/Api/Apps/V1beta1/ControllerRevisionList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::Deployment:
+    file: lib/IO/K8s/Api/Apps/V1beta1/Deployment.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::DeploymentCondition:
+    file: lib/IO/K8s/Api/Apps/V1beta1/DeploymentCondition.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta1::DeploymentList:
     file: lib/IO/K8s/Api/Apps/V1beta1/DeploymentList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::DeploymentRollback:
+    file: lib/IO/K8s/Api/Apps/V1beta1/DeploymentRollback.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::DeploymentSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta1/DeploymentSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::DeploymentStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta1/DeploymentStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::DeploymentStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta1/DeploymentStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::RollbackConfig:
+    file: lib/IO/K8s/Api/Apps/V1beta1/RollbackConfig.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::RollingUpdateDeployment:
+    file: lib/IO/K8s/Api/Apps/V1beta1/RollingUpdateDeployment.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::RollingUpdateStatefulSetStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta1/RollingUpdateStatefulSetStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::Scale:
+    file: lib/IO/K8s/Api/Apps/V1beta1/Scale.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::ScaleSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta1/ScaleSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::ScaleStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta1/ScaleStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::StatefulSet:
+    file: lib/IO/K8s/Api/Apps/V1beta1/StatefulSet.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::StatefulSetCondition:
+    file: lib/IO/K8s/Api/Apps/V1beta1/StatefulSetCondition.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta1::StatefulSetList:
     file: lib/IO/K8s/Api/Apps/V1beta1/StatefulSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::StatefulSetSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta1/StatefulSetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::StatefulSetStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta1/StatefulSetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta1::StatefulSetUpdateStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta1/StatefulSetUpdateStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ControllerRevision:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ControllerRevision.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta2::ControllerRevisionList:
     file: lib/IO/K8s/Api/Apps/V1beta2/ControllerRevisionList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DaemonSet:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DaemonSet.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DaemonSetCondition:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DaemonSetCondition.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta2::DaemonSetList:
     file: lib/IO/K8s/Api/Apps/V1beta2/DaemonSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DaemonSetSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DaemonSetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DaemonSetStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DaemonSetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DaemonSetUpdateStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DaemonSetUpdateStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::Deployment:
+    file: lib/IO/K8s/Api/Apps/V1beta2/Deployment.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DeploymentCondition:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DeploymentCondition.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta2::DeploymentList:
     file: lib/IO/K8s/Api/Apps/V1beta2/DeploymentList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DeploymentSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DeploymentSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DeploymentStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DeploymentStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::DeploymentStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta2/DeploymentStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ReplicaSet:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ReplicaSet.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ReplicaSetCondition:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ReplicaSetCondition.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta2::ReplicaSetList:
     file: lib/IO/K8s/Api/Apps/V1beta2/ReplicaSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ReplicaSetSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ReplicaSetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ReplicaSetStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ReplicaSetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::RollingUpdateDaemonSet:
+    file: lib/IO/K8s/Api/Apps/V1beta2/RollingUpdateDaemonSet.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::RollingUpdateDeployment:
+    file: lib/IO/K8s/Api/Apps/V1beta2/RollingUpdateDeployment.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::RollingUpdateStatefulSetStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta2/RollingUpdateStatefulSetStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::Scale:
+    file: lib/IO/K8s/Api/Apps/V1beta2/Scale.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ScaleSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ScaleSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::ScaleStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta2/ScaleStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::StatefulSet:
+    file: lib/IO/K8s/Api/Apps/V1beta2/StatefulSet.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::StatefulSetCondition:
+    file: lib/IO/K8s/Api/Apps/V1beta2/StatefulSetCondition.pm
+    version: '1.112'
   IO::K8s::Api::Apps::V1beta2::StatefulSetList:
     file: lib/IO/K8s/Api/Apps/V1beta2/StatefulSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::StatefulSetSpec:
+    file: lib/IO/K8s/Api/Apps/V1beta2/StatefulSetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::StatefulSetStatus:
+    file: lib/IO/K8s/Api/Apps/V1beta2/StatefulSetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Apps::V1beta2::StatefulSetUpdateStrategy:
+    file: lib/IO/K8s/Api/Apps/V1beta2/StatefulSetUpdateStrategy.pm
+    version: '1.112'
   IO::K8s::Api::Auditregistration::V1alpha1::AuditSinkList:
     file: lib/IO/K8s/Api/Auditregistration/V1alpha1/AuditSinkList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Authentication::V1beta1::TokenReview:
+    file: lib/IO/K8s/Api/Authentication/V1beta1/TokenReview.pm
+    version: '1.112'
+  IO::K8s::Api::Authentication::V1beta1::TokenReviewSpec:
+    file: lib/IO/K8s/Api/Authentication/V1beta1/TokenReviewSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Authentication::V1beta1::TokenReviewStatus:
+    file: lib/IO/K8s/Api/Authentication/V1beta1/TokenReviewStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Authentication::V1beta1::UserInfo:
+    file: lib/IO/K8s/Api/Authentication/V1beta1/UserInfo.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::LocalSubjectAccessReview:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/LocalSubjectAccessReview.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::NonResourceAttributes:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/NonResourceAttributes.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::NonResourceRule:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/NonResourceRule.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::ResourceAttributes:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/ResourceAttributes.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::ResourceRule:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/ResourceRule.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SelfSubjectAccessReview:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SelfSubjectAccessReview.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SelfSubjectAccessReviewSpec:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SelfSubjectAccessReviewSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SelfSubjectRulesReview:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SelfSubjectRulesReview.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SelfSubjectRulesReviewSpec:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SelfSubjectRulesReviewSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SubjectAccessReview:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SubjectAccessReview.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SubjectAccessReviewSpec:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SubjectAccessReviewSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SubjectAccessReviewStatus:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SubjectAccessReviewStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Authorization::V1beta1::SubjectRulesReviewStatus:
+    file: lib/IO/K8s/Api/Authorization/V1beta1/SubjectRulesReviewStatus.pm
+    version: '1.112'
   IO::K8s::Api::Autoscaling::V1::HorizontalPodAutoscalerList:
     file: lib/IO/K8s/Api/Autoscaling/V1/HorizontalPodAutoscalerList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::CrossVersionObjectReference:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/CrossVersionObjectReference.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::ExternalMetricSource:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/ExternalMetricSource.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::ExternalMetricStatus:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/ExternalMetricStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::HorizontalPodAutoscaler:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/HorizontalPodAutoscaler.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::HorizontalPodAutoscalerCondition:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/HorizontalPodAutoscalerCondition.pm
+    version: '1.112'
   IO::K8s::Api::Autoscaling::V2beta1::HorizontalPodAutoscalerList:
     file: lib/IO/K8s/Api/Autoscaling/V2beta1/HorizontalPodAutoscalerList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::HorizontalPodAutoscalerSpec:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/HorizontalPodAutoscalerSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::HorizontalPodAutoscalerStatus:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/HorizontalPodAutoscalerStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::MetricSpec:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/MetricSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::MetricStatus:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/MetricStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::ObjectMetricSource:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/ObjectMetricSource.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::ObjectMetricStatus:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/ObjectMetricStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::PodsMetricSource:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/PodsMetricSource.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::PodsMetricStatus:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/PodsMetricStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::ResourceMetricSource:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/ResourceMetricSource.pm
+    version: '1.112'
+  IO::K8s::Api::Autoscaling::V2beta1::ResourceMetricStatus:
+    file: lib/IO/K8s/Api/Autoscaling/V2beta1/ResourceMetricStatus.pm
+    version: '1.112'
   IO::K8s::Api::Autoscaling::V2beta2::HorizontalPodAutoscalerList:
     file: lib/IO/K8s/Api/Autoscaling/V2beta2/HorizontalPodAutoscalerList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Batch::V1::JobList:
     file: lib/IO/K8s/Api/Batch/V1/JobList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Batch::V1beta1::CronJob:
+    file: lib/IO/K8s/Api/Batch/V1beta1/CronJob.pm
+    version: '1.112'
   IO::K8s::Api::Batch::V1beta1::CronJobList:
     file: lib/IO/K8s/Api/Batch/V1beta1/CronJobList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Batch::V1beta1::CronJobSpec:
+    file: lib/IO/K8s/Api/Batch/V1beta1/CronJobSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Batch::V1beta1::CronJobStatus:
+    file: lib/IO/K8s/Api/Batch/V1beta1/CronJobStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Batch::V1beta1::JobTemplateSpec:
+    file: lib/IO/K8s/Api/Batch/V1beta1/JobTemplateSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Batch::V2alpha1::CronJob:
+    file: lib/IO/K8s/Api/Batch/V2alpha1/CronJob.pm
+    version: '1.112'
   IO::K8s::Api::Batch::V2alpha1::CronJobList:
     file: lib/IO/K8s/Api/Batch/V2alpha1/CronJobList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Batch::V2alpha1::CronJobSpec:
+    file: lib/IO/K8s/Api/Batch/V2alpha1/CronJobSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Batch::V2alpha1::CronJobStatus:
+    file: lib/IO/K8s/Api/Batch/V2alpha1/CronJobStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Batch::V2alpha1::JobTemplateSpec:
+    file: lib/IO/K8s/Api/Batch/V2alpha1/JobTemplateSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Certificates::V1beta1::CertificateSigningRequest:
+    file: lib/IO/K8s/Api/Certificates/V1beta1/CertificateSigningRequest.pm
+    version: '1.112'
+  IO::K8s::Api::Certificates::V1beta1::CertificateSigningRequestCondition:
+    file: lib/IO/K8s/Api/Certificates/V1beta1/CertificateSigningRequestCondition.pm
+    version: '1.112'
   IO::K8s::Api::Certificates::V1beta1::CertificateSigningRequestList:
     file: lib/IO/K8s/Api/Certificates/V1beta1/CertificateSigningRequestList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Certificates::V1beta1::CertificateSigningRequestSpec:
+    file: lib/IO/K8s/Api/Certificates/V1beta1/CertificateSigningRequestSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Certificates::V1beta1::CertificateSigningRequestStatus:
+    file: lib/IO/K8s/Api/Certificates/V1beta1/CertificateSigningRequestStatus.pm
+    version: '1.112'
   IO::K8s::Api::Coordination::V1beta1::LeaseList:
     file: lib/IO/K8s/Api/Coordination/V1beta1/LeaseList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::ComponentStatusList:
     file: lib/IO/K8s/Api/Core/V1/ComponentStatusList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::ConfigMapList:
     file: lib/IO/K8s/Api/Core/V1/ConfigMapList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::EndpointsList:
     file: lib/IO/K8s/Api/Core/V1/EndpointsList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::EventList:
     file: lib/IO/K8s/Api/Core/V1/EventList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Core::V1::Handler:
+    file: lib/IO/K8s/Api/Core/V1/Handler.pm
+    version: '1.112'
   IO::K8s::Api::Core::V1::LimitRangeList:
     file: lib/IO/K8s/Api/Core/V1/LimitRangeList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::NamespaceList:
     file: lib/IO/K8s/Api/Core/V1/NamespaceList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::NodeList:
     file: lib/IO/K8s/Api/Core/V1/NodeList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::PersistentVolumeClaimList:
     file: lib/IO/K8s/Api/Core/V1/PersistentVolumeClaimList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::PersistentVolumeList:
     file: lib/IO/K8s/Api/Core/V1/PersistentVolumeList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::PodList:
     file: lib/IO/K8s/Api/Core/V1/PodList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::PodTemplateList:
     file: lib/IO/K8s/Api/Core/V1/PodTemplateList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::ReplicationControllerList:
     file: lib/IO/K8s/Api/Core/V1/ReplicationControllerList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::ResourceQuotaList:
     file: lib/IO/K8s/Api/Core/V1/ResourceQuotaList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::SecretList:
     file: lib/IO/K8s/Api/Core/V1/SecretList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::ServiceAccountList:
     file: lib/IO/K8s/Api/Core/V1/ServiceAccountList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Core::V1::ServiceList:
     file: lib/IO/K8s/Api/Core/V1/ServiceList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Events::V1beta1::Event:
+    file: lib/IO/K8s/Api/Events/V1beta1/Event.pm
+    version: '1.112'
   IO::K8s::Api::Events::V1beta1::EventList:
     file: lib/IO/K8s/Api/Events/V1beta1/EventList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Events::V1beta1::EventSeries:
+    file: lib/IO/K8s/Api/Events/V1beta1/EventSeries.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::AllowedFlexVolume:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/AllowedFlexVolume.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::AllowedHostPath:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/AllowedHostPath.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DaemonSet:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DaemonSet.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DaemonSetCondition:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DaemonSetCondition.pm
+    version: '1.112'
   IO::K8s::Api::Extensions::V1beta1::DaemonSetList:
     file: lib/IO/K8s/Api/Extensions/V1beta1/DaemonSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DaemonSetSpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DaemonSetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DaemonSetStatus:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DaemonSetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DaemonSetUpdateStrategy:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DaemonSetUpdateStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::Deployment:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/Deployment.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DeploymentCondition:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DeploymentCondition.pm
+    version: '1.112'
   IO::K8s::Api::Extensions::V1beta1::DeploymentList:
     file: lib/IO/K8s/Api/Extensions/V1beta1/DeploymentList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DeploymentRollback:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DeploymentRollback.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DeploymentSpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DeploymentSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DeploymentStatus:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DeploymentStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::DeploymentStrategy:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/DeploymentStrategy.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::FSGroupStrategyOptions:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/FSGroupStrategyOptions.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::HTTPIngressPath:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/HTTPIngressPath.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::HTTPIngressRuleValue:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/HTTPIngressRuleValue.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::HostPortRange:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/HostPortRange.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IDRange:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IDRange.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IPBlock:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IPBlock.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::Ingress:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/Ingress.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IngressBackend:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IngressBackend.pm
+    version: '1.112'
   IO::K8s::Api::Extensions::V1beta1::IngressList:
     file: lib/IO/K8s/Api/Extensions/V1beta1/IngressList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IngressRule:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IngressRule.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IngressSpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IngressSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IngressStatus:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IngressStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::IngressTLS:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/IngressTLS.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::NetworkPolicy:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicy.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::NetworkPolicyEgressRule:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicyEgressRule.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::NetworkPolicyIngressRule:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicyIngressRule.pm
+    version: '1.112'
   IO::K8s::Api::Extensions::V1beta1::NetworkPolicyList:
     file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicyList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::NetworkPolicyPeer:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicyPeer.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::NetworkPolicyPort:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicyPort.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::NetworkPolicySpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/NetworkPolicySpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::PodSecurityPolicy:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/PodSecurityPolicy.pm
+    version: '1.112'
   IO::K8s::Api::Extensions::V1beta1::PodSecurityPolicyList:
     file: lib/IO/K8s/Api/Extensions/V1beta1/PodSecurityPolicyList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::PodSecurityPolicySpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/PodSecurityPolicySpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::ReplicaSet:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/ReplicaSet.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::ReplicaSetCondition:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/ReplicaSetCondition.pm
+    version: '1.112'
   IO::K8s::Api::Extensions::V1beta1::ReplicaSetList:
     file: lib/IO/K8s/Api/Extensions/V1beta1/ReplicaSetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::ReplicaSetSpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/ReplicaSetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::ReplicaSetStatus:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/ReplicaSetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::RollbackConfig:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/RollbackConfig.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::RollingUpdateDaemonSet:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/RollingUpdateDaemonSet.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::RollingUpdateDeployment:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/RollingUpdateDeployment.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::RunAsUserStrategyOptions:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/RunAsUserStrategyOptions.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::SELinuxStrategyOptions:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/SELinuxStrategyOptions.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::Scale:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/Scale.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::ScaleSpec:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/ScaleSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::ScaleStatus:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/ScaleStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Extensions::V1beta1::SupplementalGroupsStrategyOptions:
+    file: lib/IO/K8s/Api/Extensions/V1beta1/SupplementalGroupsStrategyOptions.pm
+    version: '1.112'
   IO::K8s::Api::Networking::V1::NetworkPolicyList:
     file: lib/IO/K8s/Api/Networking/V1/NetworkPolicyList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::AllowedFlexVolume:
+    file: lib/IO/K8s/Api/Policy/V1beta1/AllowedFlexVolume.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::AllowedHostPath:
+    file: lib/IO/K8s/Api/Policy/V1beta1/AllowedHostPath.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::Eviction:
+    file: lib/IO/K8s/Api/Policy/V1beta1/Eviction.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::FSGroupStrategyOptions:
+    file: lib/IO/K8s/Api/Policy/V1beta1/FSGroupStrategyOptions.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::HostPortRange:
+    file: lib/IO/K8s/Api/Policy/V1beta1/HostPortRange.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::IDRange:
+    file: lib/IO/K8s/Api/Policy/V1beta1/IDRange.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::PodDisruptionBudget:
+    file: lib/IO/K8s/Api/Policy/V1beta1/PodDisruptionBudget.pm
+    version: '1.112'
   IO::K8s::Api::Policy::V1beta1::PodDisruptionBudgetList:
     file: lib/IO/K8s/Api/Policy/V1beta1/PodDisruptionBudgetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::PodDisruptionBudgetSpec:
+    file: lib/IO/K8s/Api/Policy/V1beta1/PodDisruptionBudgetSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::PodDisruptionBudgetStatus:
+    file: lib/IO/K8s/Api/Policy/V1beta1/PodDisruptionBudgetStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::PodSecurityPolicy:
+    file: lib/IO/K8s/Api/Policy/V1beta1/PodSecurityPolicy.pm
+    version: '1.112'
   IO::K8s::Api::Policy::V1beta1::PodSecurityPolicyList:
     file: lib/IO/K8s/Api/Policy/V1beta1/PodSecurityPolicyList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::PodSecurityPolicySpec:
+    file: lib/IO/K8s/Api/Policy/V1beta1/PodSecurityPolicySpec.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::RunAsUserStrategyOptions:
+    file: lib/IO/K8s/Api/Policy/V1beta1/RunAsUserStrategyOptions.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::SELinuxStrategyOptions:
+    file: lib/IO/K8s/Api/Policy/V1beta1/SELinuxStrategyOptions.pm
+    version: '1.112'
+  IO::K8s::Api::Policy::V1beta1::SupplementalGroupsStrategyOptions:
+    file: lib/IO/K8s/Api/Policy/V1beta1/SupplementalGroupsStrategyOptions.pm
+    version: '1.112'
   IO::K8s::Api::Rbac::V1::ClusterRoleBindingList:
     file: lib/IO/K8s/Api/Rbac/V1/ClusterRoleBindingList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1::ClusterRoleList:
     file: lib/IO/K8s/Api/Rbac/V1/ClusterRoleList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1::RoleBindingList:
     file: lib/IO/K8s/Api/Rbac/V1/RoleBindingList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1::RoleList:
     file: lib/IO/K8s/Api/Rbac/V1/RoleList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::AggregationRule:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/AggregationRule.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::ClusterRole:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/ClusterRole.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::ClusterRoleBinding:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/ClusterRoleBinding.pm
+    version: '1.112'
   IO::K8s::Api::Rbac::V1alpha1::ClusterRoleBindingList:
     file: lib/IO/K8s/Api/Rbac/V1alpha1/ClusterRoleBindingList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1alpha1::ClusterRoleList:
     file: lib/IO/K8s/Api/Rbac/V1alpha1/ClusterRoleList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::PolicyRule:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/PolicyRule.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::Role:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/Role.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::RoleBinding:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/RoleBinding.pm
+    version: '1.112'
   IO::K8s::Api::Rbac::V1alpha1::RoleBindingList:
     file: lib/IO/K8s/Api/Rbac/V1alpha1/RoleBindingList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1alpha1::RoleList:
     file: lib/IO/K8s/Api/Rbac/V1alpha1/RoleList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::RoleRef:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/RoleRef.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1alpha1::Subject:
+    file: lib/IO/K8s/Api/Rbac/V1alpha1/Subject.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::AggregationRule:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/AggregationRule.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::ClusterRole:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/ClusterRole.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::ClusterRoleBinding:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/ClusterRoleBinding.pm
+    version: '1.112'
   IO::K8s::Api::Rbac::V1beta1::ClusterRoleBindingList:
     file: lib/IO/K8s/Api/Rbac/V1beta1/ClusterRoleBindingList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1beta1::ClusterRoleList:
     file: lib/IO/K8s/Api/Rbac/V1beta1/ClusterRoleList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::PolicyRule:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/PolicyRule.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::Role:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/Role.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::RoleBinding:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/RoleBinding.pm
+    version: '1.112'
   IO::K8s::Api::Rbac::V1beta1::RoleBindingList:
     file: lib/IO/K8s/Api/Rbac/V1beta1/RoleBindingList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Rbac::V1beta1::RoleList:
     file: lib/IO/K8s/Api/Rbac/V1beta1/RoleList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::RoleRef:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/RoleRef.pm
+    version: '1.112'
+  IO::K8s::Api::Rbac::V1beta1::Subject:
+    file: lib/IO/K8s/Api/Rbac/V1beta1/Subject.pm
+    version: '1.112'
   IO::K8s::Api::Resource::V1alpha3::PodSchedulingContext:
     file: lib/IO/K8s/Api/Resource/V1alpha3/PodSchedulingContext.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Resource::V1alpha3::PodSchedulingContextSpec:
     file: lib/IO/K8s/Api/Resource/V1alpha3/PodSchedulingContextSpec.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Resource::V1alpha3::PodSchedulingContextStatus:
     file: lib/IO/K8s/Api/Resource/V1alpha3/PodSchedulingContextStatus.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Resource::V1alpha3::ResourceClaimSchedulingStatus:
     file: lib/IO/K8s/Api/Resource/V1alpha3/ResourceClaimSchedulingStatus.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Scheduling::V1alpha1::PriorityClass:
+    file: lib/IO/K8s/Api/Scheduling/V1alpha1/PriorityClass.pm
+    version: '1.112'
   IO::K8s::Api::Scheduling::V1alpha1::PriorityClassList:
     file: lib/IO/K8s/Api/Scheduling/V1alpha1/PriorityClassList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Scheduling::V1beta1::PriorityClassList:
     file: lib/IO/K8s/Api/Scheduling/V1beta1/PriorityClassList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Settings::V1alpha1::PodPreset:
+    file: lib/IO/K8s/Api/Settings/V1alpha1/PodPreset.pm
+    version: '1.112'
   IO::K8s::Api::Settings::V1alpha1::PodPresetList:
     file: lib/IO/K8s/Api/Settings/V1alpha1/PodPresetList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Settings::V1alpha1::PodPresetSpec:
+    file: lib/IO/K8s/Api/Settings/V1alpha1/PodPresetSpec.pm
+    version: '1.112'
   IO::K8s::Api::Storage::V1::StorageClassList:
     file: lib/IO/K8s/Api/Storage/V1/StorageClassList.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::Api::Storage::V1::VolumeAttachmentList:
     file: lib/IO/K8s/Api/Storage/V1/VolumeAttachmentList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Storage::V1alpha1::VolumeAttachment:
+    file: lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttachment.pm
+    version: '1.112'
   IO::K8s::Api::Storage::V1alpha1::VolumeAttachmentList:
     file: lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttachmentList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Storage::V1alpha1::VolumeAttachmentSource:
+    file: lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttachmentSource.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1alpha1::VolumeAttachmentSpec:
+    file: lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttachmentSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1alpha1::VolumeAttachmentStatus:
+    file: lib/IO/K8s/Api/Storage/V1alpha1/VolumeAttachmentStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1alpha1::VolumeError:
+    file: lib/IO/K8s/Api/Storage/V1alpha1/VolumeError.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1beta1::StorageClass:
+    file: lib/IO/K8s/Api/Storage/V1beta1/StorageClass.pm
+    version: '1.112'
   IO::K8s::Api::Storage::V1beta1::StorageClassList:
     file: lib/IO/K8s/Api/Storage/V1beta1/StorageClassList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Storage::V1beta1::VolumeAttachment:
+    file: lib/IO/K8s/Api/Storage/V1beta1/VolumeAttachment.pm
+    version: '1.112'
   IO::K8s::Api::Storage::V1beta1::VolumeAttachmentList:
     file: lib/IO/K8s/Api/Storage/V1beta1/VolumeAttachmentList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::Api::Storage::V1beta1::VolumeAttachmentSource:
+    file: lib/IO/K8s/Api/Storage/V1beta1/VolumeAttachmentSource.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1beta1::VolumeAttachmentSpec:
+    file: lib/IO/K8s/Api/Storage/V1beta1/VolumeAttachmentSpec.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1beta1::VolumeAttachmentStatus:
+    file: lib/IO/K8s/Api/Storage/V1beta1/VolumeAttachmentStatus.pm
+    version: '1.112'
+  IO::K8s::Api::Storage::V1beta1::VolumeError:
+    file: lib/IO/K8s/Api/Storage/V1beta1/VolumeError.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinition:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinition.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionCondition:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinitionCondition.pm
+    version: '1.112'
   IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionList:
     file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinitionList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionNames:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinitionNames.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionSpec:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinitionSpec.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceDefinitionStatus:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceDefinitionStatus.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceSubresourceScale:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceSubresourceScale.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceSubresources:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceSubresources.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::CustomResourceValidation:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/CustomResourceValidation.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::ExternalDocumentation:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/ExternalDocumentation.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSON:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/JSON.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSONSchemaProps:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/JSONSchemaProps.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSONSchemaPropsOrArray:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/JSONSchemaPropsOrArray.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSONSchemaPropsOrBool:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/JSONSchemaPropsOrBool.pm
+    version: '1.112'
+  IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSONSchemaPropsOrStringArray:
+    file: lib/IO/K8s/ApiExtensionsApiServer/Pkg/Apis/Apiextensions/V1beta1/JSONSchemaPropsOrStringArray.pm
+    version: '1.112'
+  IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Initializer:
+    file: lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/Initializer.pm
+    version: '1.112'
+  IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Initializers:
+    file: lib/IO/K8s/Apimachinery/Pkg/Apis/Meta/V1/Initializers.pm
+    version: '1.112'
+  IO::K8s::Apimachinery::Pkg::Runtime::RawExtension:
+    file: lib/IO/K8s/Apimachinery/Pkg/Runtime/RawExtension.pm
+    version: '1.112'
   IO::K8s::Deprecated:
     file: lib/IO/K8s/Deprecated.pm
-    version: '1.111'
+    version: '1.112'
   IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceList:
     file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1/APIServiceList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIService:
+    file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIService.pm
+    version: '1.112'
+  IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceCondition:
+    file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceCondition.pm
+    version: '1.112'
   IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceList:
     file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceList.pm
-    version: '1.111'
+    version: '1.112'
+  IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceSpec:
+    file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceSpec.pm
+    version: '1.112'
+  IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::APIServiceStatus:
+    file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceStatus.pm
+    version: '1.112'
+  IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1beta1::ServiceReference:
+    file: lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/ServiceReference.pm
+    version: '1.112'
 requires:
   perl: '5.020'
 resources:
@@ -260,7 +896,7 @@ resources:
   bugtracker: https://github.com/Getty/io-k8s-p5-deprecated/issues
   homepage: https://github.com/Getty/io-k8s-p5-deprecated
   repository: https://github.com/Getty/io-k8s-p5-deprecated.git
-version: '1.111'
+version: '1.112'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -284,54 +920,54 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GatherAgentContext
       name: '@Author::GETTY/GatherAgentContext'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::GETTY/@Filter/Readme'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::GETTY/@Filter/ExtraTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::GETTY/@Filter/ExecDir'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::GETTY/@Filter/ShareDir'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::GETTY/@Filter/MakeMaker'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::GETTY/@Filter/Manifest'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::GETTY/@Filter/TestRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::LicenseFile
       name: '@Author::GETTY/LicenseFile'
@@ -339,15 +975,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::GETTY/MetaJSON'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::GETTY/Test::ChangesHasContent'
@@ -360,7 +996,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.037'
+              version: '6.040'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -379,7 +1015,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Author::GETTY/MetaResources'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::GETTY/InstallRelease'
@@ -413,75 +1049,75 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@GETTY/SingleEncoding'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Name
               name: '@GETTY/Name'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Version
               name: '@GETTY/Version'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/Prelude'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Synopsis'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Description'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Overview'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Stability'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@GETTY/Leftovers'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/postlude'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Support'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Contributing'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Authors
               name: '@GETTY/Authors'
-              version: '4.020'
+              version: '4.022'
             -
-              class: Pod::Weaver::Section::Legal
+              class: Pod::Weaver::Section::Author::GETTY::Legal
               name: '@GETTY/Legal'
-              version: '4.020'
+              version: '0.328'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/GETTY'
-              version: '4.020'
+              version: '4.022'
       name: '@Author::GETTY/PodWeaver'
       version: '4.010'
     -
@@ -491,7 +1127,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -544,7 +1180,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.111'
+          tag: '1.112'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -569,7 +1205,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::GETTY/@Git::VersionManager/NextRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -612,52 +1248,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.037'
+      version: '6.040'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.037'
+    version: '6.040'
 x_authority: cpan:JLMARTIN
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

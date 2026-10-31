@@ -15,6 +15,7 @@
 #include "srl_buffer_types.h"
 
 typedef struct PTABLE * ptable_ptr;
+struct srl_encoder_frame;
 typedef struct {
     srl_buffer_t buf;
     srl_buffer_t tmp_buf;     /* temporary buffer for swapping */
@@ -33,9 +34,20 @@ typedef struct {
                                * Possibly this should be replaced with freezeobj_svhash, but this works fine.
                                */
     ptable_ptr freezeobj_svhash; /* ptr table for tracking objects and their frozen replacments via FREEZE */
-    HV *string_deduper_hv;    /* track strings we have seen before, by content */
+    HV *string_deduper_hv;    /* literal string offsets, by content, for COPY */
+    HV *string_alias_hv;      /* first scalar value offsets, by content, for ALIAS */
+    struct srl_encoder_frame *frames; /* live C traversal state, not input snapshots */
+    ptable_ptr callback_seen;
+    struct PTABLE_entry *callback_spare; /* reusable callback_seen entries */
+    UV callback_spare_count;
+    SV *root_src, *header_src; /* borrowed until the first callback */
+    AV *callback_keepalive;   /* values borrowed across actual Perl callbacks */
 
     void *snappy_workmem;     /* lazily allocated if and only if using Snappy */
+    U8 checksum_key[16];
+    U8 checksum_key_set;
+    U8 checksum_policy;
+    U8 siphash_version;
     IV compress_threshold;    /* do not compress things smaller than this even if compression enabled */
     IV compress_level;        /* For ZLIB and ZSTD, the compression level */
 
@@ -63,7 +75,9 @@ typedef struct {
 } HE_SV;
 
 /* constructor from options */
-srl_encoder_t *srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options);
+srl_encoder_t *srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
+                                        const U8 *known_option_heads,
+                                        const U8 *known_option_next);
 
 /* clone; "constructor from prototype" */
 srl_encoder_t *srl_build_encoder_struct_alike(pTHX_ srl_encoder_t *proto);
@@ -157,6 +171,8 @@ SV *srl_dump_data_structure_mortal_sv(pTHX_ srl_encoder_t *enc, SV *src, SV *use
  */
 /* Set while the encoder is in active use / dirty */
 #define SRL_OF_ENCODER_DIRTY                 1UL
+/* A Perl callback has run during this encode. */
+#define SRL_OF_ENCODER_HAS_CALLBACKS         2UL
 
 #define SRL_ENC_HAVE_OPTION(enc, flag_num) ((enc)->flags & (flag_num))
 #define SRL_ENC_SET_OPTION(enc, flag_num) STMT_START {(enc)->flags |= (flag_num);}STMT_END
@@ -185,9 +201,15 @@ SV *srl_dump_data_structure_mortal_sv(pTHX_ srl_encoder_t *enc, SV *src, SV *use
 #endif
 
 /* Options Parsing related code */
+#define SRL_OPTION_INDEX_BUCKETS 64
 #define SRL_INIT_OPTION(idx, str) STMT_START {                          \
     MY_CXT.options[idx].sv = newSVpvn((str ""), (sizeof(str) - 1));     \
     PERL_HASH(MY_CXT.options[idx].hash, (str ""), (sizeof(str) - 1));   \
+    {                                                                   \
+        U32 bucket = MY_CXT.options[idx].hash & (SRL_OPTION_INDEX_BUCKETS - 1); \
+        MY_CXT.known_option_next[idx] = MY_CXT.known_option_heads[bucket]; \
+        MY_CXT.known_option_heads[bucket] = (idx) + 1;                   \
+    }                                                                   \
 } STMT_END
 
 #define SRL_ENC_OPT_STR_ALIASED_DEDUPE_STRINGS "aliased_dedupe_strings"
@@ -262,6 +284,25 @@ SV *srl_dump_data_structure_mortal_sv(pTHX_ srl_encoder_t *enc, SV *src, SV *use
 #define SRL_ENC_OPT_STR_FREEZE_DENY_ACTION "freeze_deny_action"
 #define SRL_ENC_OPT_IDX_FREEZE_DENY_ACTION 23
 
-#define SRL_ENC_OPT_COUNT 24
+#define SRL_ENC_OPT_STR_CHECKSUM_KEY_V1 "checksum_key_v1"
+#define SRL_ENC_OPT_IDX_CHECKSUM_KEY_V1 24
+#define SRL_ENC_OPT_STR_CHECKSUM_KEY_V2 "checksum_key_v2"
+#define SRL_ENC_OPT_IDX_CHECKSUM_KEY_V2 25
+
+#define SRL_ENC_OPT_STR_CHECKSUM_POLICY "checksum_policy"
+#define SRL_ENC_OPT_IDX_CHECKSUM_POLICY 26
+
+#define SRL_ENC_OPT_STR_CHECKSUM_KEY_V3 "checksum_key_v3"
+#define SRL_ENC_OPT_IDX_CHECKSUM_KEY_V3 27
+
+#define SRL_ENC_OPT_STR_UNKNOWN_OPTION_POLICY "unknown_option_policy"
+#define SRL_ENC_OPT_IDX_UNKNOWN_OPTION_POLICY 28
+
+#define SRL_ENC_OPT_STR_CHECKSUM_KEY "checksum_key"
+#define SRL_ENC_OPT_IDX_CHECKSUM_KEY 29
+#define SRL_ENC_OPT_STR_CHECKSUM_MODE "checksum_mode"
+#define SRL_ENC_OPT_IDX_CHECKSUM_MODE 30
+
+#define SRL_ENC_OPT_COUNT 31
 
 #endif

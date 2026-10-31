@@ -28,12 +28,12 @@ C<< AnyEvent::MCP::Permissions::Ask->elicitation ($req, %config) >> handles
 a permission-tagged Client::Request with the external helper and replies to it.
 Use this in the client's C<on_request> callback for local permission dialogs.
 It preserves cancellation and validates the selected C<sandbox_grants>
-and subject scope.
+and all named dimension scopes.
 
 The functions C<schema>, C<message>, C<decision> and C<build> implement the
 shared form/helper representation. The initial form offers allow/deny,
-once/always, and an optional denial C<message>. Persistent choices are omitted when the request has a subject
-but offers no persistent subject scopes. Approval never
+once/always, and an optional denial C<message>. Persistent choices are omitted
+if any requested dimension has no available persistent scope. Approval never
 attaches that message to a successful tool result. Only the C<always>
 choices lead to a second form for persistent rule grants, scopes and lifetime;
 C<back> returns to the first form. The local graphical helper can
@@ -136,8 +136,8 @@ comma-separated grant string in the native MCP form. Persistent answers may
 select C<lifetime>: C<indefinite> (the default), C<900> or C<57600>, all
 strings. A finite lifetime produces an absolute C<expires> Unix timestamp
 in the rule; the selected lifetime is retained when forwarding native forms.
-When a workdir-scoped request is presented, C<workdir_scope> selects
-C<selected> (the default) or C<all> configured workdirs, including future ones.
+Each named dimension is selected as C<dim_NAME> from the matchers offered in
+C<dimensions-E<gt>{NAME}{choices}>; the rule saves it as C<match.NAME>.
 
 =item $decision = AnyEvent::MCP::Permissions::Ask::decision $prepared, $response, $stage, $previous
 
@@ -162,7 +162,7 @@ sub schema {
    my ($request, $stage, $previous) = @_;
 
    $previous ||= {};
-   my $persistent = !defined $request->{subject} || @{$request->{subjects} || []};
+   my $persistent = !grep !@{$_->{choices}}, values %{$request->{dimensions} || {}};
 
    if ($stage && $stage eq "rule") {
       my $chosen = $previous->{decision};
@@ -202,20 +202,13 @@ sub schema {
             default => $paths[0],
          } if @paths;
       }
-      if (defined $request->{workdir}) {
-         $schema->{properties}{workdir_scope} = {
+      for my $name (sort keys %{$request->{dimensions} || {}}) {
+         my $dim = $request->{dimensions}{$name};
+         $schema->{properties}{"dim_$name"} = {
             type    => "string",
-            title   => "Workdir rule scope (selected or any configured workdir, including future ones)",
-            enum    => ["selected", "all"],
-            default => "selected",
-         };
-      }
-      if (defined $request->{subject} && @{$request->{subjects} || []}) {
-         $schema->{properties}{subject} = {
-            type    => "string",
-            title   => "Persistent scope",
-            enum    => [map $_->{subject}, @{$request->{subjects}}],
-            default => $request->{subjects}[0]{subject},
+            title   => "$dim->{label} scope",
+            enum    => [map $_->{match}, @{$dim->{choices}}],
+            default => $dim->{default} // $dim->{choices}[0]{match},
          };
       }
       return $schema
@@ -254,8 +247,6 @@ sub message {
       action                 => "Action",
       action_description     => "Action description",
       sandbox_implementation => "Sandbox",
-      subject                => "Subject",
-      workdir                => "Workdir",
       paths                  => "Paths",
    );
 
@@ -268,8 +259,12 @@ sub message {
       "Requested sandbox grants: " . join (", ", @{$request->{sandbox_grants}}),
       (map { "$label{$_}: " . $json->encode ($request->{$_}) }
          grep defined $request->{$_},
-            qw(name multibroker_alias tool action action_description sandbox_implementation workdir subject paths)),
+            qw(name multibroker_alias tool action action_description sandbox_implementation paths)),
       (defined $reason ? "Reason: $reason" : ()),
+      (map {
+         my $dim = $request->{dimensions}{$_};
+         "$dim->{label}: " . $json->encode ($dim->{value})
+      } sort keys %{$request->{dimensions} || {}}),
       (map { detail_text ($_, $request->{details}{$_}) } sort keys %{$request->{details} || {}}),
       ($stage && $stage eq "rule" ? (
          "Available sandbox grants:",
@@ -277,8 +272,11 @@ sub message {
             my $description = $request->{sandbox_grant_descriptions}{$_};
             "  $_" . (defined $description && length $description ? " - $description" : "")
          } @{$request->{sandbox_grant_choices}}),
-         (map { $json->encode ($_->{label}) . ": " . $json->encode ($_->{subject}) }
-            @{$request->{subjects} || []})
+         (map {
+            my $dim = $request->{dimensions}{$_};
+            map { "  " . $json->encode ($_->{label}) . ": " . $json->encode ($_->{match}) }
+               @{$dim->{choices}}
+         } sort keys %{$request->{dimensions} || {}})
       ) : ())
 }
 
@@ -352,22 +350,13 @@ sub build {
          or die "Invalid permission rule lifetime\n";
       $decision->{lifetime} = $lifetime;
       $rule->{expires} = time + $lifetime unless $lifetime eq "indefinite";
-      if (defined $prepared->{workdir}) {
-         my $scope = $answer->{workdir_scope} // "selected";
-         $scope =~ /\A(?:selected|all)\z/
-            or die "Invalid persistent workdir scope\n";
-         if ($scope eq "selected") {
-            $rule->{workdir} = $prepared->{workdir};
-         } else {
-            $decision->{workdir_scope} = "all";
-         }
-      } else {
-         die "Unexpected persistent workdir scope\n" if exists $answer->{workdir_scope};
-      }
-      if (defined $prepared->{subject}) {
-         die "Persistent scope was not offered\n" unless defined $answer->{subject}
-            && grep $_->{subject} eq $answer->{subject}, @{$prepared->{subjects}};
-         $rule->{subject} = $answer->{subject};
+      for my $name (keys %{$prepared->{dimensions} || {}}) {
+         my $dim = $prepared->{dimensions}{$name};
+         my $selected = $answer->{"dim_$name"};
+         die "Persistent dimension scope was not offered\n"
+            unless defined $selected && !ref $selected
+               && grep $_->{match} eq $selected, @{$dim->{choices}};
+         $rule->{"match.$name"} = $selected;
       }
       if (!$allow && defined $answer->{path} && length $answer->{path}) {
          die "Unrequested denial path\n"
@@ -418,7 +407,10 @@ sub elicitation {
          build ($meta->{request}, {
             %$decision,
             (ref $decision->{rule} eq "HASH"
-               ? (map { $_ => $decision->{rule}{$_} } qw(subject path)) : ()),
+               ? (map { $_ => $decision->{rule}{$_} } qw(path)) : ()),
+            (ref $decision->{rule} eq "HASH"
+               ? (map { (my $key = $_) =~ s/^match\./dim_/; $key => $decision->{rule}{$_} }
+                  grep /^match\./, keys %{$decision->{rule}}) : ()),
          }, $stage, $meta->{selection});
       };
       return $req->error (-32603, "Invalid permission helper decision: $@") if $@;
@@ -428,12 +420,12 @@ sub elicitation {
             decision => $valid->{decision},
             (exists $valid->{lifetime} ? (lifetime => $valid->{lifetime}) : ()),
             (defined $valid->{message} ? (message => $valid->{message}) : ()),
-            (exists $valid->{workdir_scope}
-               ? (workdir_scope => $valid->{workdir_scope}) : ()),
             (ref $valid->{rule} eq "HASH" && defined $valid->{rule}{path}
                ? (path => $valid->{rule}{path}) : ()),
             (exists $valid->{sandbox_grants} ? (sandbox_grants => join (",", @{$valid->{sandbox_grants}})) : ()),
-            (ref $valid->{rule} eq "HASH" && exists $valid->{rule}{subject} ? (subject => $valid->{rule}{subject}) : ()),
+            (ref $valid->{rule} eq "HASH"
+               ? (map { (my $key = $_) =~ s/^match\./dim_/; $key => $valid->{rule}{$_} }
+                  grep /^match\./, keys %{$valid->{rule}}) : ()),
          },
       });
    });

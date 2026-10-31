@@ -11,42 +11,51 @@ on:
 jobs:
   perl:
 
+    # Prebuilt perls on a maintained OS, instead of perl:X.Y images
+    # (old ones are frozen on EOL Debian releases).
     runs-on: ubuntu-latest
 
     strategy:
+      # One version's environment problem must not hide the other results.
+      fail-fast: false
       matrix:
         perl-version:
-          - '5.16-buster'
+          # 5.26 is the oldest perl supported by cpm.
+          - '5.26'
+          - '5.28'
           - '5.30'
           - '5.32'
           - '5.34'
           - '5.36'
           - '5.38'
           - '5.40'
-          - 'latest'
-          - 'threaded'
+          - '5.42'
+        threaded: [ false ]
+        include:
+          - perl-version: '5.42'
+            threaded: true
 
-    container:
-      image: perl:${{ matrix.perl-version }}
+    name: perl (${{ matrix.perl-version }}${{ matrix.threaded && ', threaded' || '' }})
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
+        with:
+          path: 'lib/YATT'
+      - name: Set up Perl ${{ matrix.perl-version }}
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+          multi-thread: ${{ matrix.threaded }}
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
+        working-directory: 'lib/YATT'
         run: |
-          apt-get update -y
-          apt-get install -y zsh
+          sudo apt-get update -y
+          # Prebuilt perls <= 5.36 link with -lnsl (not in the ubuntu-24.04 image).
+          sudo apt-get install -y zsh libnsl-dev
           curl -fsSL --compressed https://raw.githubusercontent.com/skaji/cpm/main/cpm > cpm
-          perl ./cpm install -g Test::Requires B::Debug Devel::Cover Devel::Cover::Report::Coveralls 
+          perl ./cpm install -g Test::Requires B::Debug
           perl ./cpm install -g --show-build-log-on-failure --with-recommends --with-test
-      - name: Run Tests (no coverage)
-        if: ${{ !matrix.coverage }}
-        run: PERL=$(which perl) ./t/runtests.zsh
-      - name: Run Tests (with coverage)
-        if: ${{ matrix.coverage }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PERL=$(which perl) ./t/runtests.zsh -C
-          cover -report coveralls t/cover_db
+      - name: Run Tests
+        run: PERL=$(which perl) lib/YATT/t/runtests.zsh

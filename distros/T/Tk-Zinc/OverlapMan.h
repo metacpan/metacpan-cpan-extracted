@@ -4,7 +4,7 @@
  * Authors              :
  * Creation date        :
  *
- * $Id: OverlapMan.h,v 1.13 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -49,7 +49,7 @@ OmRegister(void *w,
                                  int *locked ,
                                  int *preferred_angle  ,
                                  int *convergence_style),
-           void (*_fset_label_angle)(void *ptr, void *item, int rho, int theta),
+           void (*_fset_label_angle)(void *ptr, void *item, int rho, int theta, char *reason),
            void (*_fquery_label_pos)(void *ptr, void *item, int theta,
                                      int *x, int *y, int *w, int *h));
 void

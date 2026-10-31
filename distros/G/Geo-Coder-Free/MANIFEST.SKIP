@@ -77,6 +77,8 @@ mutation.json
 # against the six sibling checkouts, which an install of this distribution does
 # not have
 ^t/location-predicate-fuzz\.pl$
+# Kept out of the distribution since 015e1ce; t/location-fuzz-doc.t skips without it
+^LOCATION-PREDICATE-FUZZ\.md$
 CLAUDE.md
 \.claude
 \.circleci

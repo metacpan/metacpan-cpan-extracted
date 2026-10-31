@@ -1,3 +1,4 @@
-*.yatt  linguist-language=HTML
-*.ytmpl linguist-language=HTML
-*.ydo   linguist-language=Perl
+*.yatt  linguist-language=HTML gitlab-language=html 
+*.ytmpl linguist-language=HTML gitlab-language=html
+*.ydo   linguist-language=Perl gitlab-language=perl
+*.psgi  linguist-language=Perl gitlab-language=perl

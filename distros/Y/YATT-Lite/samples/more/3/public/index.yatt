@@ -1,0 +1,6 @@
+<!yatt:args>
+(empty)
+<!yatt:widget foo x=?&yatt:bar();>
+<h2>foo</h2>
+
+<!yatt:entity bar>

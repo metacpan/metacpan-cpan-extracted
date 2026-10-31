@@ -36,8 +36,8 @@ this dist, the third after its first release:
    orphaned 8 `cilium.io/v2alpha1` class names (6 renamed to `v2`, 2 dropped
    outright) — tombstones were drafted for all 8. But `io-k8s-p5` already
    has an established convention of keeping multiple API versions of a
-   resource side by side rather than deleting old ones (Apps
-   V1beta1/V1beta2/V1 all still ship). The Cilium classes were restored in
+   resource side by side rather than deleting old ones (Autoscaling V1/V2,
+   Cilium V2alpha1/V2). The Cilium classes were restored in
    `IO-K8s` to match that convention instead of being tombstoned — always
    check whether "renamed/removed" should instead be "restored for
    backward compat" before drafting a tombstone.
@@ -62,12 +62,13 @@ genuine orphan from the false-start patterns above) are in the
 ## Version policy — normal dzil versioning, no per-file overrides
 
 `dist.ini` has **no** `version_finder` restriction. Every file -- the main
-module and all 78 tombstones alike -- versions normally and uniformly with
+module and all 290 tombstones alike -- versions normally and uniformly with
 the rest of the distribution (`RewriteVersion::Transitional` /
 `BumpVersionAfterRelease`), same as `IO-K8s` itself. The starting version,
-`1.105`, was chosen for one reason: it's safely past `IO-K8s 1.100`, the
-last CPAN release that shipped any of these module names. This dist's
-version only ever increases, so it stays ahead of that target for good.
+`1.105`, was chosen for one reason: it's safely past every `IO-K8s` release
+that shipped one of these module names (`1.100` for the `*List` and DRA
+classes, `0.03` for the 2018 classes). This dist's version only ever
+increases, so it stays ahead of those targets for good.
 That rests on `IO-K8s` not shipping these names again — an assumption that
 has failed once (false start #3 above) and is therefore checked by
 `t/02-name-guard.t`; a name that comes back in `IO-K8s` loses its
@@ -81,8 +82,8 @@ per-file version overrides.
 
 ## Current tombstones
 
-78 modules total, two shapes, all versioned `$VERSION = '1.105'` (safely
-past `IO-K8s` `1.100`, the last release that shipped every one of these
+290 modules total, in four groups, all versioned with the dist (safely
+past `IO-K8s` `1.100` and `0.03`, the last releases that shipped these
 names):
 
 - **74 "consolidated" tombstones** — the old per-resource `*List` classes
@@ -98,6 +99,15 @@ names):
   List classes, these never had a soft-deprecation warning period — they
   were genuinely removed outright. List: `lib/IO/K8s/Deprecated.pm`'s POD,
   or `t/01-tombstones.t`'s `@classic_dra_removed` array.
+- **180 "retired API version" tombstones** — classes only `IO-K8s` `0.01`
+  to `0.03` (2018) shipped, for alpha/beta API versions Kubernetes has
+  retired; the PAUSE index resolved them to `IO-K8s` `0.03`. Each names its
+  successor in the current IO-K8s. `t/01-tombstones.t`'s
+  `%retired_api_successor` (old => successor).
+- **32 "dropped by Kubernetes" tombstones** — also only in `0.01` to
+  `0.03`, no successor: PodSecurityPolicy, Initializers, Deployment
+  rollback, PodPreset, RawExtension. `t/01-tombstones.t`'s
+  `%retired_api_removed` (old => reason).
 
 No Cilium tombstones, and no tombstones for the admission/auth/flowcontrol
 classes flagged in a later upstream sync either — see "Version policy"
@@ -134,6 +144,7 @@ the 4 classic-DRA ones with a "removed, no successor" message pointing at
 the current `resource.k8s.io/v1` API. `t/02-name-guard.t` asserts that no
 package shipped here is shipped by the current `IO-K8s`: it reads the
 `io-k8s-p5` checkout next to this one (found from a dzil build directory
-too), else an installed `IO::K8s` at least as new as this dist, or the lib
+too), else an installed `IO::K8s` at least as new as this dist (what it
+ships is what its `.packlist` lists; without one it skips), or the lib
 directory in `IO_K8S_LIB`. Without any of them it **skips** — a skip is not
 a pass, make sure the checkout is there and current before a release.

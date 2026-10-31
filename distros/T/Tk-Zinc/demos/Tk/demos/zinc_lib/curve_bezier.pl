@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: curve_bezier.pl,v 1.6 2004/09/21 12:45:38 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 ####### This file has been initially inspired from svg examples
@@ -7,7 +7,7 @@
 package curveBezier;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk::Zinc;
 

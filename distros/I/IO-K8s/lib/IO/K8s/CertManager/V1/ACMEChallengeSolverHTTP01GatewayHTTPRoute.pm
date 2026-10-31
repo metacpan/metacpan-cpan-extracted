@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01GatewayHTTPRoute;
 # ABSTRACT: The Gateway API is a sig-network community API that models service networking in Kubernetes (https://gateway-api.sigs.k8s.io/).
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s labels      => HashRef[Str];
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01GatewayHTTPRoute - The Gatewa
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 labels
 
@@ -54,7 +54,7 @@ are NodePort or ClusterIP. If unset, defaults to NodePort.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -82,5 +82,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

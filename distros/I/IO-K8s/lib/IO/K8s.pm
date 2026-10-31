@@ -12,7 +12,7 @@ use IO::K8s::Resource ();
 use IO::K8s::Unstructured ();
 use namespace::clean;
 
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -1536,7 +1536,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 SYNOPSIS
 
@@ -2564,6 +2564,15 @@ from this distribution entirely. If you need the old name to fail loudly
 instead of silently resolving to a stale prior release, install
 L<IO::K8s::Deprecated>, which ships CPAN redirect stubs for all 74 of them.
 
+=item * B<Classes of retired API versions>
+
+The classes only C<0.01> to C<0.03> shipped for the alpha and beta API
+versions Kubernetes has retired since (C<extensions/v1beta1>,
+C<apps/v1beta1> and C<v1beta2>, C<apiextensions.k8s.io/v1beta1>, ...), and
+for PodSecurityPolicy, PodPreset and the Initializers, are not part of the
+C<1.x> series. L<IO::K8s::Deprecated> ships a redirect stub for each that
+names the successor class or says why there is none.
+
 =item * B<Updated to Kubernetes v1.37 API>
 
 API objects have been updated from v1.14 to v1.37. Some fields may have changed,
@@ -2624,7 +2633,7 @@ Jose Luis Martinez <jlmartin@cpan.org> (original author)
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -2652,5 +2661,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

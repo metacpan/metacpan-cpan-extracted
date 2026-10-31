@@ -26,8 +26,10 @@ my $server = AnyEvent::MCP::Server->new (
       my @grants;
       for my $path (@{$args->{paths}}) {
          push @grants, $req->require_permission ({
-            action => $req->{tool}, subject => $path,
-            subjects => [{ label => "this file", subject => $path }],
+            action => $req->{tool},
+            dimensions => { subject => { label => "File", value => $path,
+               choices => [{ label => "this file", match => $path }],
+            } },
             sandbox_grants => ["write"], reason => "use $path",
          });
       }
@@ -128,7 +130,7 @@ ok $result->{isError} && $effects == 1, "modern decline stops without execution"
 ($result, $req) = call ($params, 1);
 ($result, $req) = call (answer ($result->{requestState}), 1);
 $state = $result->{requestState};
-$permissions->save ([{ decision => "deny", action => "move", subject => "/one" }]);
+$permissions->save ([{ decision => "deny", action => "move", "match.subject" => "/one" }]);
 ($result, $req) = call (answer ($state), 1);
 ok $result->{isError} && $effects == 1, "earlier one-time approval cannot bypass new policy";
 $permissions->save ([]);

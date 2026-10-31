@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Wed Jan  4 11:30:00 1995
  *
- * $Id: PostScript.h,v 1.7 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -34,7 +34,7 @@ struct _ZnWInfo;
 struct _ZnItemStruct;
 
 
-int ZnPostScriptCmd(struct _ZnWInfo *wi, int argc, Tcl_Obj *CONST *args);
+int ZnPostScriptCmd(struct _ZnWInfo *wi, int argc, Tcl_Obj *const *args);
 void ZnFlushPsChan(Tcl_Interp *interp, Tk_PostscriptInfo ps_info);
 int ZnPostscriptOutline(Tcl_Interp *interp, Tk_PostscriptInfo ps_info,
                         Tk_Window tkwin, ZnDim line_width, ZnLineStyle line_style,

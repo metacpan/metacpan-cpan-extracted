@@ -1,6 +1,6 @@
 package MCP::K8s;
 # ABSTRACT: MCP Server for Kubernetes with RBAC-aware dynamic tools
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use MCP::Server;
 extends 'MCP::Server';
@@ -9,6 +9,7 @@ use Kubernetes::REST;
 use Kubernetes::REST::Kubeconfig;
 use JSON::MaybeXS;
 use Carp qw( croak );
+use Scalar::Util qw( blessed weaken );
 use namespace::clean;
 
 
@@ -98,6 +99,25 @@ has permissions => (
 has _resource_plurals_cache => (
   is      => 'rw',
   default => sub { {} },
+);
+
+# Kind => 1 (namespaced) / 0 (cluster-scoped), filled by the discovery
+has _resource_scopes => (
+  is      => 'rw',
+  default => sub { {} },
+);
+
+# Plural => 1 (namespaced) / 0 (cluster-scoped), filled by the discovery
+has _plural_scopes => (
+  is      => 'rw',
+  default => sub { {} },
+);
+
+# Whether the discovery ran at all - a failed discovery must not be retried
+# on every lookup
+has _discovery_done => (
+  is      => 'rw',
+  default => 0,
 );
 
 # Stores [tool_ref, base_desc, verb] tuples for lazy description updates
@@ -207,7 +227,8 @@ sub _build_namespaces {
 
   # From environment variable
   if (my $env = $ENV{MCP_K8S_NAMESPACES}) {
-    return [ split /,/, $env ];
+    my @ns = grep { length } split /\s*,\s*/, $env =~ s/^\s+|\s+$//gr;
+    return \@ns if @ns;
   }
 
   # In-cluster: read mounted namespace as default
@@ -236,9 +257,22 @@ sub _build_namespaces {
 
 sub _build_permissions {
   my ($self) = @_;
+
+  # The resolver tells the RBAC discovery which resources are cluster-scoped,
+  # so a namespaced resource never lands in the cluster-scope map. It holds a
+  # weak reference back to the server: a strong one would make the server and
+  # its Permissions object keep each other alive.
+  my $weak_self = $self;
+  weaken($weak_self);
+
   return MCP::K8s::Permissions->new(
     api        => $self->api,
     namespaces => $self->namespaces,
+    scope_resolver => sub {
+      my ($plural) = @_;
+      return undef unless $weak_self;
+      return $weak_self->_scope_of_plural($plural);
+    },
   );
 }
 
@@ -268,7 +302,7 @@ sub _resource_plural {
 
   # Tier 3: API server discovery (cached)
   my $cache = $self->_resource_plurals_cache;
-  unless (%$cache) {
+  unless ($self->_discovery_done) {
     $self->_discover_resource_plurals;
     $cache = $self->_resource_plurals_cache;
   }
@@ -277,7 +311,7 @@ sub _resource_plural {
   # Tier 4: Heuristic fallback
   my $plural = lc($resource);
   $plural .= 's' unless $plural =~ /s$/;
-  $plural =~ s/ys$/ies/;
+  $plural =~ s/([^aeiou])ys$/$1ies/;
   return $plural;
 }
 
@@ -286,6 +320,8 @@ sub _discover_resource_plurals {
 
 
   my %cache;
+  my %kind_scopes;
+  my %plural_scopes;
 
   # Query /api/v1 for core resources
   my $core = eval {
@@ -297,6 +333,7 @@ sub _discover_resource_plurals {
     for my $r (@{ $core->{resources} }) {
       next if ($r->{name} // '') =~ m{/};  # skip subresources
       $cache{ $r->{kind} } = $r->{name} if $r->{kind} && $r->{name};
+      $self->_record_scope(\%kind_scopes, \%plural_scopes, $r);
     }
   }
 
@@ -318,12 +355,67 @@ sub _discover_resource_plurals {
         for my $r (@{ $group_resources->{resources} }) {
           next if ($r->{name} // '') =~ m{/};
           $cache{ $r->{kind} } = $r->{name} if $r->{kind} && $r->{name};
+          $self->_record_scope(\%kind_scopes, \%plural_scopes, $r);
         }
       }
     }
   }
 
   $self->_resource_plurals_cache(\%cache);
+  $self->_resource_scopes(\%kind_scopes);
+  $self->_plural_scopes(\%plural_scopes);
+  $self->_discovery_done(1);
+}
+
+sub _record_scope {
+  my ($self, $kind_scopes, $plural_scopes, $resource) = @_;
+
+  my $namespaced = $resource->{namespaced};
+  return unless defined $namespaced;
+
+  my $scope = $namespaced ? 1 : 0;
+  $kind_scopes->{ $resource->{kind} } = $scope if $resource->{kind};
+
+  # A plural that is namespaced in one API group and cluster-scoped in
+  # another is ambiguous. The namespaced reading wins: it is the one that
+  # keeps the resource out of the cluster-scope map.
+  my $plural = $resource->{name} or return;
+  $plural_scopes->{$plural} = 1 if $scope;
+  $plural_scopes->{$plural} = 0 if !$scope && !exists $plural_scopes->{$plural};
+}
+
+sub _resource_scope {
+  my ($self, $resource) = @_;
+
+
+  # The IO::K8s class carries its scope - no request needed.
+  my $class = eval { $self->api->expand_class($resource) };
+  if ($class && $class->can('resource_plural')) {
+    my $scope = eval { $class->does('IO::K8s::Role::Namespaced') ? 1 : 0 };
+    return $scope if defined $scope;
+  }
+
+  # Fall back to the discovery cache (CRDs without a class).
+  unless ($self->_discovery_done) {
+    $self->_discover_resource_plurals;
+  }
+  my $cache = $self->_resource_scopes;
+  return $cache->{$resource} if exists $cache->{$resource};
+
+  return undef;
+}
+
+sub _scope_of_plural {
+  my ($self, $plural) = @_;
+
+
+  unless ($self->_discovery_done) {
+    $self->_discover_resource_plurals;
+  }
+  my $cache = $self->_plural_scopes;
+  return $cache->{$plural} if exists $cache->{$plural};
+
+  return undef;
 }
 
 sub _resolve_namespace {
@@ -340,12 +432,47 @@ sub _resolve_namespace {
   return undef;
 }
 
+sub _scope_context {
+  my ($self, $args, $resource) = @_;
+
+
+  my $scope   = $self->_resource_scope($resource);
+  my $cluster = defined $scope && !$scope ? 1 : 0;
+  my $ns      = $cluster ? undef : $self->_resolve_namespace($args);
+
+  my $error;
+  if (!$cluster && !defined $ns && defined $scope) {
+    $error = $self->_namespace_required_message($resource);
+  }
+
+  return {
+    scope   => $scope,
+    cluster => $cluster,
+    ns      => $ns,
+    perm_ns => $cluster ? '' : ($ns // ''),
+    error   => $error,
+  };
+}
+
+sub _namespace_required_message {
+  my ($self, $resource) = @_;
+
+  my @available = $self->permissions->allowed_namespaces;
+  my $hint = @available
+    ? ' (available: '.join(', ', @available).')'
+    : '';
+
+  return "namespace required: $resource is a namespaced resource, specify a namespace".$hint;
+}
+
 sub _is_conflict_error {
   my ($self, $err) = @_;
 
 
   return 0 unless defined $err;
-  return $err =~ /409|AlreadyExists/i ? 1 : 0;
+  return $err->is_conflict ? 1 : 0
+    if blessed($err) && $err->isa('Kubernetes::REST::APIError');
+  return "$err" =~ /409|AlreadyExists/i ? 1 : 0;
 }
 
 sub _format_resource_summary {
@@ -364,6 +491,23 @@ sub _format_resource_summary {
 
   if ($obj->can('kind') && $obj->kind) {
     $summary{kind} = $obj->kind;
+  }
+
+  # Events carry their payload at the top level (core/v1) or under
+  # note/regarding (events.k8s.io), not in spec/status.
+  if (($obj->can('kind') && ($obj->kind // '') eq 'Event')
+      || $obj->can('involvedObject') || $obj->can('regarding')) {
+    for my $f (qw( type reason message note count firstTimestamp lastTimestamp eventTime )) {
+      next unless $obj->can($f);
+      my $v = $obj->$f;
+      $summary{$f} = $v if defined $v && $v ne '';
+    }
+    for my $f (qw( involvedObject regarding )) {
+      next unless $obj->can($f) && $obj->$f;
+      my $ref = $obj->$f;
+      my %r = map { $ref->can($_) && defined $ref->$_ ? ( $_ => $ref->$_ ) : () } qw( kind name );
+      $summary{$f} = \%r if %r;
+    }
   }
 
   if ($obj->can('status') && $obj->status) {
@@ -507,10 +651,12 @@ sub _register_tools {
       my ($tool, $args) = @_;
 
       my $resource = $args->{resource};
-      my $ns = $self->_resolve_namespace($args);
+      my $ctx    = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns     = $ctx->{ns};
       my $plural = $self->_resource_plural($resource);
 
-      unless ($self->permissions->can_do('list', $plural, $ns // '')) {
+      unless ($self->permissions->can_do('list', $plural, $ctx->{perm_ns})) {
         return "Permission denied: cannot list $resource" . ($ns ? " in namespace $ns" : "");
       }
 
@@ -566,11 +712,13 @@ sub _register_tools {
 
       my $resource = $args->{resource};
       my $name     = $args->{name};
-      my $ns       = $self->_resolve_namespace($args);
+      my $ctx      = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns       = $ctx->{ns};
       my $output   = $args->{output} // 'summary';
       my $plural   = $self->_resource_plural($resource);
 
-      unless ($self->permissions->can_do('get', $plural, $ns // '')) {
+      unless ($self->permissions->can_do('get', $plural, $ctx->{perm_ns})) {
         return "Permission denied: cannot get $resource" . ($ns ? " in namespace $ns" : "");
       }
 
@@ -629,11 +777,13 @@ sub _register_tools {
       my ($tool, $args) = @_;
 
       my $resource = $args->{resource};
-      my $ns       = $self->_resolve_namespace($args);
+      my $ctx      = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns       = $ctx->{ns};
       my $manifest = $args->{manifest};
       my $plural   = $self->_resource_plural($resource);
 
-      unless ($self->permissions->can_do('create', $plural, $ns // '')) {
+      unless ($self->permissions->can_do('create', $plural, $ctx->{perm_ns})) {
         return "Permission denied: cannot create $resource" . ($ns ? " in namespace $ns" : "");
       }
 
@@ -703,7 +853,9 @@ sub _register_tools {
 
       my $resource    = $args->{resource};
       my $name        = $args->{name};
-      my $ns          = $self->_resolve_namespace($args);
+      my $ctx         = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns          = $ctx->{ns};
       my $patch       = $args->{patch};
       my $subresource = $args->{subresource};
       my $plural      = $self->_resource_plural($resource);
@@ -719,7 +871,7 @@ sub _register_tools {
       # subresource is appended to the base plural.
       my $rbac_resource = $to_status ? "$plural/status" : $plural;
 
-      unless ($self->permissions->can_do('patch', $rbac_resource, $ns // '')) {
+      unless ($self->permissions->can_do('patch', $rbac_resource, $ctx->{perm_ns})) {
         return "Permission denied: cannot patch "
           . ($to_status ? "$resource status" : $resource)
           . ($ns ? " in namespace $ns" : "");
@@ -780,10 +932,12 @@ sub _register_tools {
 
       my $resource = $args->{resource};
       my $name     = $args->{name};
-      my $ns       = $self->_resolve_namespace($args);
+      my $ctx      = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns       = $ctx->{ns};
       my $plural   = $self->_resource_plural($resource);
 
-      unless ($self->permissions->can_do('delete', $plural, $ns // '')) {
+      unless ($self->permissions->can_do('delete', $plural, $ctx->{perm_ns})) {
         return "Permission denied: cannot delete $resource" . ($ns ? " in namespace $ns" : "");
       }
 
@@ -891,9 +1045,11 @@ sub _register_tools {
     code => sub {
       my ($tool, $args) = @_;
 
-      my $ns = $self->_resolve_namespace($args);
+      my $ctx = $self->_scope_context($args, 'Event');
+      return $ctx->{error} if $ctx->{error};
+      my $ns  = $ctx->{ns};
 
-      unless ($self->permissions->can_do('list', 'events', $ns // '')) {
+      unless ($self->permissions->can_do('list', 'events', $ctx->{perm_ns})) {
         return "Permission denied: cannot list events" . ($ns ? " in namespace $ns" : "");
       }
 
@@ -952,10 +1108,12 @@ sub _register_tools {
 
       my $resource = $args->{resource};
       my $name     = $args->{name};
-      my $ns       = $self->_resolve_namespace($args);
+      my $ctx      = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns       = $ctx->{ns};
       my $plural   = $self->_resource_plural($resource);
 
-      unless ($self->permissions->can_do('patch', $plural, $ns // '')) {
+      unless ($self->permissions->can_do('patch', $plural, $ctx->{perm_ns})) {
         return "Permission denied: cannot patch $resource" . ($ns ? " in namespace $ns" : "");
       }
 
@@ -1022,12 +1180,14 @@ sub _register_tools {
       my ($tool, $args) = @_;
 
       my $resource = $args->{resource};
-      my $ns       = $self->_resolve_namespace($args);
+      my $ctx      = $self->_scope_context($args, $resource);
+      return $ctx->{error} if $ctx->{error};
+      my $ns       = $ctx->{ns};
       my $manifest = $args->{manifest};
       my $plural   = $self->_resource_plural($resource);
 
-      my $can_create = $self->permissions->can_do('create', $plural, $ns // '');
-      my $can_patch  = $self->permissions->can_do('patch', $plural, $ns // '');
+      my $can_create = $self->permissions->can_do('create', $plural, $ctx->{perm_ns});
+      my $can_patch  = $self->permissions->can_do('patch', $plural, $ctx->{perm_ns});
 
       unless ($can_create || $can_patch) {
         return "Permission denied: cannot create or patch $resource" . ($ns ? " in namespace $ns" : "");
@@ -1059,20 +1219,24 @@ sub _register_tools {
         }
 
         # If 409 Conflict / AlreadyExists, fall through to patch
-        my $err = "$@";
+        my $err = $@;
         unless ($self->_is_conflict_error($err)) {
           return "Failed to create $resource: $err";
         }
       }
 
-      # Fall back to strategic merge patch
+      # Fall back to a patch
       unless ($can_patch) {
         return "Resource already exists and cannot patch $resource" . ($ns ? " in namespace $ns" : "");
       }
 
+      # Strategic merge is understood by the built-in kinds only
+      # (IO::K8s::Api::*); a custom resource answers it with 415, so
+      # everything else gets a JSON merge patch.
+      my $class = eval { $self->api->expand_class($resource) } // '';
       my %api_args = (
         patch => $manifest,
-        type  => 'strategic',
+        type  => $class =~ /^IO::K8s::Api::/ ? 'strategic' : 'merge',
       );
       $api_args{namespace} = $ns if defined $ns;
 
@@ -1115,7 +1279,7 @@ MCP::K8s - MCP Server for Kubernetes with RBAC-aware dynamic tools
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -1299,8 +1463,33 @@ and C</apis> and gets back the plurals the API server itself uses.
 
 Query the API server's discovery endpoints (C</api/v1> and C</apis>) to
 build a Kind-to-plural mapping. Results are cached in
-C<_resource_plurals_cache>. Failures are silently ignored — the cache
-simply remains empty and callers fall through to heuristic pluralization.
+C<_resource_plurals_cache>. The same response carries the C<namespaced>
+flag of every resource, so the scope of a resource ends up in
+C<_resource_scopes> (by Kind) and C<_plural_scopes> (by plural) as well.
+
+Failures are silently ignored — the cache simply remains empty and callers
+fall through to heuristic pluralization.
+
+=head2 _resource_scope
+
+  my $scope = $self->_resource_scope('Node');     # => 0 (cluster-scoped)
+  my $scope = $self->_resource_scope('Pod');       # => 1 (namespaced)
+
+Answer whether a Kind is namespaced (1), cluster-scoped (0) or of unknown
+scope (C<undef>).
+
+The L<IO::K8s> class of the Kind knows its own scope and answers without a
+request. A Kind nothing ships - a CRD without a provider class - is looked
+up in the discovery cache, which the API server fills with the
+C<namespaced> flag of every resource it serves.
+
+=head2 _scope_of_plural
+
+  my $scope = $self->_scope_of_plural('nodes');   # => 0 (cluster-scoped)
+
+Answer whether a resource plural is namespaced (1), cluster-scoped (0) or
+of unknown scope (C<undef>). This is the view the RBAC discovery needs: it
+works on plurals, not on Kinds.
 
 =head2 _resolve_namespace
 
@@ -1311,28 +1500,39 @@ provided, uses that. Otherwise, if only one namespace is accessible,
 auto-fills it. Returns C<undef> if the namespace cannot be determined
 (the tool should handle this case).
 
+=head2 _scope_context
+
+  my $ctx = $self->_scope_context($args, 'Node');
+
+Work out the scope of a requested Kind and the namespace that goes with it.
+Returns a hashref with the keys C<scope> (1 namespaced, 0 cluster-scoped,
+C<undef> unknown), C<cluster> (1 for a cluster-scoped Kind), C<ns> (the
+namespace to use, C<undef> for a cluster-scoped Kind or when none could be
+resolved), C<perm_ns> (the namespace the permission check runs against -
+the cluster scope for a cluster-scoped Kind) and C<error> (a message the
+tool should return instead of calling the API).
+
+A cluster-scoped Kind has no namespace at all - neither in the API call nor
+in the permission check, which then runs against the cluster scope. A
+namespaced Kind without a resolvable namespace is not a permission
+problem but a missing argument: the tool says so instead of pretending the
+account may not read it.
+
 =head2 _is_conflict_error
 
-  if ($self->_is_conflict_error("$@")) { ... }
+  if ($self->_is_conflict_error($@)) { ... }
 
 Decide whether a failed C<create> failed because the resource already
-exists (HTTP 409 / C<AlreadyExists>), which is the signal for
-L</k8s_apply> to fall back to a patch.
+exists (HTTP 409), which is the signal for L</k8s_apply> to fall back to a
+patch.
 
-This is a string match, deliberately. L<Kubernetes::REST> 1.108 does not
-raise a typed exception for API errors: C<create> runs the response
-through C<_check_response>, which C<croak>s with
+L<Kubernetes::REST> 1.109 throws a L<Kubernetes::REST::APIError> for an HTTP
+error status; the decision is its C<is_conflict>, i.e. the status code and
+nothing else. A 422 or 403 whose body merely mentions "409" is not a
+conflict.
 
-  Kubernetes API error (create <class>): <status> <body>
-
-C<Kubernetes::REST::Error> and C<Kubernetes::REST::RemoteError> still
-exist, but only as compatibility helpers for the deprecated v0 API — no
-code path in 1.108 throws them, so there is no C<< ->code >> to check.
-The match stays wide (status code B<or> C<reason>) so that it survives a
-reworded error as long as either token is still in it; narrowing it to
-the exact croak format above would trade one fragility for a worse one.
-
-Revisit when the client grows typed errors.
+Only an error that is B<not> such an object (a plain string from an older
+client or a wrapper) falls back to a match against C</409|AlreadyExists/i>.
 
 =head2 _format_resource_summary
 
@@ -1341,7 +1541,8 @@ Revisit when the client grows typed errors.
 Extract a concise summary hashref from an L<IO::K8s> object, suitable for
 LLM consumption. Includes metadata (name, namespace, labels, creation time),
 kind, status fields (phase, replicas, conditions), and key spec fields
-(containers, ports, type).
+(containers, ports, type). Events add type, reason, message, count,
+timestamps and the involved object (kind/name).
 
 The summary is intentionally compact — for full details, the C<k8s_get>
 tool with C<output =E<gt> 'json'> should be used.
@@ -1556,7 +1757,8 @@ B<Parameters:>
 
 Create or update a Kubernetes resource (like C<kubectl apply>). Tries to
 create the resource first; if it already exists (409 Conflict), falls back
-to a strategic merge patch.
+to a strategic merge patch for built-in kinds and to a JSON merge patch
+for everything else (custom resources answer a strategic merge with 415).
 
 B<Parameters:>
 
@@ -1788,7 +1990,7 @@ L<https://kubernetes.io/docs/reference/access-authn-authz/rbac/> — Kubernetes 
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-mcp-k8s/issues>.
 
 =head1 CONTRIBUTING
@@ -1805,5 +2007,7 @@ This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+L<https://raudssus.de/>
 
 =cut

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::ParamRef;
 # ABSTRACT: ParamRef describes how to locate the params to be used as input to expressions of rules applied by a policy binding.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Admissionregistration::V1::ParamRef - ParamRef describes how to lo
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 name
 
@@ -69,7 +69,7 @@ One of `name` or `selector` must be set, but `name` and `selector` are mutually 
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -97,5 +97,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

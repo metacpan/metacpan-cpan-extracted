@@ -39,7 +39,8 @@ WriteMakefile(
 		'Pod::Usage'          => 0,
 		'POSIX'                   => 0,
 		'Readonly'                => 0,
-		'Scalar::Util'            => 0,
+		'Scalar::Util'           => 0,
+		'version' => 0,
 	}, TEST_REQUIRES => {
 		'File::Copy'              => 0,
 		'File::Temp'              => 0,

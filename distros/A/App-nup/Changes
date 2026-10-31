@@ -1,5 +1,14 @@
 Revision history for Perl extension App-nup
 
+1.10 2026-10-30T10:06:30Z
+
+    - Keep page mode when options for ansicolumn follow the file name,
+      as in "nup FILE -w 100"; they were counted as files
+    - Add --boundary, given to ansicolumn after ~/.ansicolumnrc as
+      --runin is
+    - Explain in the manuals why the default pager is "less -F +Gg"
+      and not --file-size (less 590 and later only)
+
 1.09 2026-10-29T06:30:12Z
 
     - Add --runin, --runout and --runlen, given to ansicolumn in place

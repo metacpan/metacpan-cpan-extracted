@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Map.c,v 1.63 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -29,8 +29,6 @@
 #include <stdio.h>
 
 
-static const char rcsid[] = "$Id: Map.c,v 1.63 2005/05/10 07:59:48 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -72,6 +70,8 @@ typedef struct _MapItemStruct {
 
 
 static ZnAttrConfig     map_attrs[] = {
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(MapItemStruct, header.flags), ZN_CATCH_EVENT_BIT, ZN_REPICK_FLAG, False },
   { ZN_CONFIG_GRADIENT, "-color", NULL,
     Tk_Offset(MapItemStruct, color), 0, ZN_DRAW_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
@@ -185,13 +185,14 @@ FreeLists(MapItem       map)
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   MapItem       map  = (MapItem) item;
   ZnWInfo       *wi = item->wi;
 
   SET(item->flags, ZN_VISIBLE_BIT);
   CLEAR(item->flags, ZN_SENSITIVE_BIT);
+  CLEAR(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -367,7 +368,7 @@ Destroy(ZnItem  item)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   ZnWInfo       *wi = item->wi;
@@ -427,7 +428,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, map_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -1047,7 +1048,7 @@ Draw(ZnItem     item)
     if (ZnListSize(map->vectors)) {
       ZnSetLineStyle(wi, ZN_LINE_SIMPLE);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc,
                 GCFillStyle | GCLineWidth | GCForeground, &values);
 
@@ -1067,7 +1068,7 @@ Draw(ZnItem     item)
             values.line_width = line_width;
             XChangeGC(wi->dpy, wi->gc, GCLineWidth, &values);
           }
-          /*printf("Dessin d'une ligne de %d %d à %d %d\n",
+          /*printf("Dessin d'une ligne de %d %d ï¿½%d %d\n",
                  (int)points[i].x, (int)points[i].y,
                  (int)points[i+1].x, (int)points[i+1].y);*/
           XDrawLine(wi->dpy, wi->draw_buffer, wi->gc,
@@ -1082,7 +1083,7 @@ Draw(ZnItem     item)
     if (ZnListSize(map->dashed_vectors)) {
       ZnSetLineStyle(wi, ZN_LINE_DASHED);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc, GCFillStyle | GCLineWidth | GCForeground, &values);
       
       /* !! WARNING !! XDrawSegments can't handle an unlimited number of segments
@@ -1111,7 +1112,7 @@ Draw(ZnItem     item)
     if (ZnListSize(map->dotted_vectors)) {
       ZnSetLineStyle(wi, ZN_LINE_DOTTED);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc,
                 GCFillStyle | GCLineWidth | GCForeground, &values);
       
@@ -1141,7 +1142,7 @@ Draw(ZnItem     item)
     if (ZnListSize(map->mixed_vectors)) {
       ZnSetLineStyle(wi, ZN_LINE_MIXED);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc, GCFillStyle | GCLineWidth | GCForeground, &values);
       
       /* !! WARNING !! XDrawSegments can't handle an unlimited number of segments
@@ -1171,7 +1172,7 @@ Draw(ZnItem     item)
       
       ZnSetLineStyle(wi, ZN_LINE_SIMPLE);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc, GCFillStyle | GCLineWidth | GCForeground, &values);
       arcs = ZnListArray(map->arcs);
       cnt = ZnListSize(map->arcs);
@@ -1186,7 +1187,7 @@ Draw(ZnItem     item)
       
       ZnSetLineStyle(wi, ZN_LINE_DASHED);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc, GCFillStyle | GCLineWidth | GCForeground, &values);
       arcs = ZnListArray(map->arcs);
       cnt = ZnListSize(map->arcs);
@@ -1201,7 +1202,7 @@ Draw(ZnItem     item)
       
       ZnSetLineStyle(wi, ZN_LINE_DOTTED);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc, GCFillStyle | GCLineWidth | GCForeground, &values);
       arcs = ZnListArray(map->arcs);
       cnt = ZnListSize(map->arcs);
@@ -1216,7 +1217,7 @@ Draw(ZnItem     item)
       
       ZnSetLineStyle(wi, ZN_LINE_MIXED);
       values.fill_style = FillSolid;
-      values.line_width = 0;
+      values.line_width = 1;
       XChangeGC(wi->dpy, wi->gc, GCFillStyle | GCLineWidth | GCForeground, &values);
       arcs = ZnListArray(map->arcs);
       cnt = ZnListSize(map->arcs);
@@ -1306,6 +1307,28 @@ Draw(ZnItem     item)
  */
 #ifdef GL
 static void
+MapRenderVectors(ZnTriStrip *tristrip)
+{
+  unsigned int  i, j, num_points;
+  ZnPoint       *points;
+
+  for (i = 0; i < tristrip->num_strips; i++) {
+    num_points = tristrip->strips[i].num_points;
+    points = tristrip->strips[i].points;
+    if (tristrip->strips[i].fan) {
+      glBegin(GL_TRIANGLE_FAN);
+    }
+    else {
+      glBegin(GL_TRIANGLE_STRIP);
+    }
+    for (j = 0; j < num_points; j++, points++) {
+      glVertex2d(points->x, points->y);
+    }
+    glEnd();
+  }
+}
+
+static void
 Render(ZnItem   item)
 {
   ZnWInfo       *wi = item->wi;
@@ -1330,15 +1353,54 @@ Render(ZnItem   item)
   alpha = ZnComposeAlpha(alpha, wi->alpha);
   glColor4us(color->red, color->green, color->blue, alpha);
   if (map->filled) {
-    if (ZnListSize(map->vectors) || ZnListSize(map->arcs)) {
-        /* TODO_GL: Need to have a tesselated polygon then
-         * fill it either using ZnRenderTile or solid.
-         */
-      if (map->fill_pattern != ZnUnspecifiedImage) {
-        /* Fill stippled */
+    //
+    // TODO: This code doesn't handle pattern/tile and filled
+    // arcs are not supported. The tesselation data is not
+    // cached for future reuse, it is redone for each render
+    // pass.
+    // Render only vectors
+    if (ZnListSize(map->vectors)) {
+      ZnTriStrip tristrip;
+      GLdouble v[3];
+      ZnCombineData *cdata, *cnext;
+
+      line_width = 1.0;
+      glLineWidth(line_width);
+      ZnSetLineStyle(wi, ZN_LINE_SIMPLE);
+      cnt = ZnListSize(map->vectors);
+      points = ZnListArray(map->vectors);      
+
+      /* Init our TriStrip */
+      tristrip.num_strips = 0;
+      tristrip.strips = NULL;
+
+      /* Start tessellation */
+      gluTessProperty(ZnTesselator.tess, GLU_TESS_BOUNDARY_ONLY, (GLdouble) GL_FALSE);
+      gluTessBeginPolygon(ZnTesselator.tess, &tristrip);
+      gluTessBeginContour(ZnTesselator.tess);
+
+      for (i =0; i < cnt; i += 2) {
+        v[0] = points[i].x;
+        v[1] = points[i].y;
+        v[2] = 0;
+        gluTessVertex(ZnTesselator.tess, v, &points[i]);
       }
-      else {
+	
+      gluTessEndContour(ZnTesselator.tess);
+      gluTessEndPolygon(ZnTesselator.tess);
+	
+      cdata = ZnTesselator.combine_list;
+      while (cdata) {
+        ZnTesselator.combine_length--;
+        cnext = cdata->next;
+        ZnFree(cdata);
+        cdata = cnext;
       }
+      ZnTesselator.combine_list = NULL;
+        
+      /* Render our vectors*/
+      MapRenderVectors(&tristrip);
+      ZnTriFree(&tristrip);
     }
   }
   else { /* Not filled */
@@ -1601,6 +1663,7 @@ static ZnItemClassStruct MAP_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

@@ -1,0 +1,409 @@
+=encoding utf-8
+
+=head1 NAME
+
+YATT::Lite::ArgMacro - define an argmacro as a Perl module
+
+=head1 SYNOPSIS
+
+In F<lib/MyApp/ArgMacro/Enum.pm> (one module defines one argmacro):
+
+  package MyApp::ArgMacro::Enum;
+  use strict;
+  use warnings;
+  use YATT::Lite::ArgMacro
+    out => [qw(list=list)],
+    in  => ['first=value/0', 'last=value!'];
+
+  sub on_expand {
+    (my MY $class, my CGen $cgen, my Args $args, my Vars $vars) = @_;
+    my Result $result = {};
+    my $firstExpr = $args->{first} ? $cgen->node_value($args->{first})
+                                   : $vars->{first}->default;
+    $result->{list} = sprintf(q{%s .. %s}, $firstExpr
+                              , $cgen->node_value($args->{last}));
+    $result;
+  }
+  1;
+
+In F<app.psgi>:
+
+  my $site = MY->load_factory_for_psgi(
+    $0,
+    doc_root => "$FindBin::Bin/public",
+    argmacro => {enum => 'MyApp::ArgMacro::Enum'},
+  );
+
+In templates:
+
+  <!yatt:widget bar
+    %enum(header=last);
+    %enum(label=last);
+  >
+  <yatt:foreach my=row list=label_list>...</yatt:foreach>
+
+This is equivalent to the following template declaration:
+
+  <!yatt:argmacro enum=[list=list] first="value/0" last="value!">
+  my $firstExpr = $args->{first} ? $cgen->node_value($args->{first})
+                                 : $vars->{first}->default;
+  $result->{list} = sprintf(q{%s .. %s}, $firstExpr
+                            , $cgen->node_value($args->{last}));
+
+=head1 DESCRIPTION
+
+An I<argmacro> is a compile-time macro for widget arguments.
+When a widget declares C<%name;>, the I<output args> of the macro are
+added to the widget, and calls of the widget which pass the I<input args>
+are rewritten by C<on_expand> into the output args.
+
+Usually argmacros are declared in templates with C<< <!yatt:argmacro> >>.
+This module lets you define one in a Perl module instead, so that the
+code can be edited, checked (C<perl -c>) and tested as ordinary Perl code.
+
+=head2 Field name checking
+
+C<use YATT::Lite::ArgMacro> creates the following record classes and
+type name constants in the module:
+
+=over 4
+
+=item C<Args>  (C<< <Module>::Args >>) - fields are the input and refer args
+
+=item C<Vars>  (C<< <Module>::Vars >>) - fields are the input and refer args
+
+=item C<Result> (C<< <Module>::Result >>) - fields are the output args
+
+=item C<MY> (the module itself), C<CGen> (L<YATT::Lite::CGen::Perl>) and
+C<ArgMacro> (L<YATT::Lite::Core> argmacro instance)
+
+=back
+
+So, if you declare lexicals with these types like C<my Result $result>,
+typos of field names like C<< $result->{lsit} >> are detected
+when the module is compiled:
+
+  No such class field "lsit" in variable $result of type MyApp::ArgMacro::Enum::Result
+
+C<< Result->new >> creates a restricted hash, which also detects typos
+of dynamic keys at runtime.
+
+Constants which are already defined in the module are kept as is.
+
+=head1 IMPORT OPTIONS
+
+=head2 out => [SPEC...]
+
+Output args (required). Same as C<[...]> part of
+C<< <!yatt:argmacro name=[...]> >>.
+
+=head2 in => [SPEC...]
+
+Input args. Same as the rest args of C<< <!yatt:argmacro> >>.
+
+Each SPEC is C<"name"> or C<"name=typespec"> where I<typespec> is the
+same as the argument spec of widgets, like C<value/0>, C<value!>, C<list>.
+C<code> and C<delegate> types are not supported.
+
+=head2 refer => [NAME...]
+
+Args which the macro only refers to. They are B<not> consumed by the macro:
+
+=over 4
+
+=item * They must be declared by the widget itself (not by the macro),
+and are passed to the widget as usual.
+
+=item * They do not trigger the macro. Only input args do.
+
+=item * They are not renamed by C<%name(to=from);>.
+
+=item * Only names can be given (no typespec). The type follows the
+widget's declaration.
+
+=back
+
+When the macro is triggered, C<on_expand> gets the passed node as
+C<< $args->{NAME} >> (undef if not passed), and the widget's declaration
+as C<< $vars->{NAME} >> (undef if the widget does not declare it).
+The widget is not required to declare them; C<on_expand> can C<die>
+if it needs one, which is reported as a compile error.
+
+  use YATT::Lite::ArgMacro
+    out => [qw(greeting)],
+    in  => [qw(who)],
+    refer => [qw(lang)];
+
+  <!yatt:widget hello lang="?en" %greet;>
+
+This corresponds to C<edit> of old YATT, which was only used this way.
+
+=head1 METHODS
+
+=head2 on_expand($cgen, $args, $vars, $argmacro, $node)
+
+Must be implemented by the module. Called as a class method
+at compile time of each widget call which passes any of input args.
+
+=over 4
+
+=item C<$cgen>
+
+The code generator (L<YATT::Lite::CGen::Perl>).
+Use C<< $cgen->node_value($node) >> to get Perl expression of an arg.
+
+=item C<$args>
+
+Hash of input arg nodes actually passed to the widget,
+keyed by formal (not renamed) names. Refer args are also included
+if they are passed.
+
+=item C<$vars>
+
+Hash of variable declarations of input args (for type and default),
+and of refer args declared by the widget.
+
+=item C<$argmacro>
+
+The L<YATT::Lite::Core> argmacro instance (with rename info).
+
+=item C<$node>
+
+The node (a plain array) of the widget call being expanded.
+Use L<YATT::Lite::Constants> to access it, like C<< $node->[NODE_LNO] >>.
+
+=back
+
+Returns a hash of Perl expressions keyed by formal output arg names.
+
+Note that each value is cast to the type of the output arg.
+So for C<value>, C<list> etc., the value works as a Perl expression,
+while for C<text> or C<html>, it is a literal text.
+
+A value can also be an arg node, like C<< $result->{list} = $args->{src} >>.
+Then the node is passed as the output arg (renamed), and the receiver
+handles it as if the caller wrote it directly. So passing through
+a variable (C<src=items>) follows the rules of the receiver: escaping for
+widget args, type check of C<list=> for C<< <yatt:foreach> >> etc.
+An arg without value (C<src>) is passed as C<list=src>.
+(This corresponds to C<copy_node_renamed_as> of old YATT.)
+
+=head2 Helpers of $cgen
+
+Typical argmacros build an expression (like calls of entity functions)
+from input args, and put it to an output arg. Since there is no variable
+declaration (formal) for each step, use the following methods of C<$cgen>
+to turn an input arg node into an expression. The scope of the widget call
+is held by C<$cgen>. They are also available in the body of
+C<< <!yatt:argmacro> >> declared in templates (as C<$cgen> and C<$node>).
+
+  use YATT::Lite::Constants; # NODE_LNO
+
+  sub on_expand {
+    (my MY $class, my CGen $cgen, my Args $args, my Vars $vars
+     , my ArgMacro $argmacro, my $node) = @_;
+    my Result $result = {};
+    my $fileExpr = $cgen->try_pass_through($args->{file})
+      // $cgen->as_cast_node_to(text => $args->{file});
+    $result->{list} = sprintf q{$this->entity_filereader(%s)}, $fileExpr;
+    $result;
+  }
+
+=over 4
+
+=item C<< $cgen->try_pass_through($argNode, $default) >>
+
+If the arg passes a variable, returns the expression of the variable in
+the scope of the widget call (without escaping). Otherwise returns undef.
+
+=over 4
+
+=item * C<file=foo> (bare identifier): variable C<foo>.
+An unknown variable is an error (with the line of the arg).
+
+=item * C<file> (no value): variable C<file>. If no such variable,
+returns C<$default> (a Perl expression) if given, otherwise an error.
+
+=item * Others (quoted, with entities etc.): undef.
+
+=back
+
+=item C<< $cgen->as_cast_node_to($type, $argNode) >>
+
+Returns the value of the arg as an expression of C<$type>
+(C<text>, C<html>, C<value>, C<list>, C<bool> ...), in the same way as
+passing it to a widget arg of that type. C<code> and C<delegate> are not
+supported.
+
+=item C<< $cgen->as_expr_node($argNode, $default) >>
+
+Returns the value of the arg as a raw Perl expression
+(entities are not escaped). Returns C<$default> if the value is empty.
+
+=item C<< $cgen->generror_at($lineno, $fmt, @args) >>
+
+Returns an error with the template file and the given line,
+like C<< die $cgen->generror_at($node->[NODE_LNO], ...) >>.
+(Plain C<die> in C<on_expand> has no template position.)
+
+=item C<< $cgen->find_var($name) >>
+
+Looks up a variable in the scope of the widget call. Returns undef if not found.
+
+=back
+
+These correspond to methods of old YATT (C<$trans>) as follows.
+C<$scope> and C<$node> are not needed, since C<$cgen> holds the scope.
+
+  try_pass_through($scope, $node, $arg, $default)  => try_pass_through($arg, $default)
+  faked_gentype($type => $scope, $node, $arg)      => as_cast_node_to($type => $arg)
+  faked_genexpr($scope, $node, $arg, $default)     => as_expr_node($arg, $default)
+
+Differences: C<html> type of C<as_cast_node_to> follows widget args of
+YATT::Lite (text parts are not escaped), and errors of C<try_pass_through>
+have the line of the arg (not of the call).
+
+=head1 BYPASS BY EXPLICIT OUTPUT
+
+If a widget call passes any output arg of an argmacro instance
+(by its renamed name, like C<header_list> of C<%enum(header=last);>),
+the macro is bypassed: C<on_expand> is not called, and the given
+output args are passed to the widget as is.
+
+In that case, input args of the same instance can not be given.
+Regardless of the order of attributes, it is a compile error:
+
+  argmacro %enum(header=last); is bypassed by explicit output 'header_list'; input 'header' can't be given
+
+This applies to argmacros declared in templates too.
+(Old YATT called this I<disabled> mode, whose result depended on the
+order of attributes.)
+
+=head1 EXPANDING IN ELEMENT MACROS
+
+An argmacro module can also be expanded on attributes of an element
+handled by an ordinary (element) macro like C<< <yatt:foreach> >>.
+This is useful to add options to builtin macros.
+For example, in F<.htyattrc.pl>:
+
+  use YATT::Lite::Macro;
+  use MyApp::ArgMacro::FileReader; # in: file, out: list=list
+
+  Macro foreach => sub {
+    my ($self, $node, @rest) = @_;
+    $node = MyApp::ArgMacro::FileReader->expand_element($self, $node);
+    $self->YATT::Lite::CGen::Perl::macro_foreach($node, @rest);
+  };
+
+Then C<< <yatt:foreach my=row file="data.csv"> >> is processed as
+C<< <yatt:foreach my=row list="..."> >>.
+
+=head2 Module->expand_element($cgen, $node, rename => 'to=from')
+
+If the element C<$node> has any input args of the macro, returns a new node
+whose input args are replaced with the output args (put after the other
+args). Otherwise returns C<$node> itself. In list context, returns
+C<($node, $result)> where C<$result> is the hash returned by C<on_expand>
+(undef if not expanded).
+
+=over 4
+
+=item * C<on_expand> gets the element as C<$node>, and C<$cgen> has the
+scope of the element (so L</"Helpers of $cgen"> work as usual).
+
+=item * The same L</"BYPASS BY EXPLICIT OUTPUT"> rule applies.
+
+=item * C<rename> is same as C<%name(to=from);>.
+
+=item * Refer args are given as C<$args>, but C<$vars> for them are undef
+(there is no widget).
+
+=back
+
+This corresponds to C<< YATT::ArgMacro->create_from($trans, $scope, $args, $rename) >>
+of old YATT, which returned C<($macro, $copy)>.
+
+=head1 REGISTRATION
+
+Argmacro modules are registered by C<argmacro> option of
+L<YATT::Lite::WebMVC0::SiteApp> (or L<YATT::Lite::Factory>).
+It is either a hash of argmacro name to module name,
+or a list of such hashes, each optionally paired with a namespace:
+
+  namespace => [qw(myteam myorg yatt perl)],
+  argmacro => [
+    [myorg => {enum => 'MyApp::ArgMacro::Enum'}], # namespace myorg
+    {pair => 'MyApp::ArgMacro::Pair'},            # without namespace
+  ],
+
+Registration without namespace is the same as registration in the
+primary namespace (the first element of C<namespace>, C<myteam> above).
+Modules are loaded on first use.
+
+Following are registration errors (raised when the site is set up):
+the same name registered twice in the same namespace
+(including C<< {foo => ...} >> and C<< [myteam => {foo => ...}] >> above),
+a namespace which is not in C<namespace>, and malformed specs.
+
+=head2 Namespace of references
+
+=over 4
+
+=item C<%name;>
+
+Looked up in the following order:
+the template itself (including imported ones), its base templates,
+then the C<argmacro> option in the primary namespace.
+So templates can override the registered argmacros.
+
+=item C<%ns:name;>
+
+Looked up only in the C<argmacro> option registered in C<ns>.
+Argmacros declared in templates (C<< <!yatt:argmacro> >>) can not be
+referenced this way. C<ns> must be one of C<namespace>.
+
+=back
+
+With the example above:
+
+  %enum;          # error, unless the template declares enum
+  %myorg:enum;    # MyApp::ArgMacro::Enum
+  %pair;          # MyApp::ArgMacro::Pair (unless the template declares pair)
+  %myteam:pair;   # MyApp::ArgMacro::Pair
+  %yatt:pair;     # error
+
+Modified modules are not reloaded. Restart the process
+(like L<YATT::Lite::PageConsts>).
+
+=head1 PART OPTIONS
+
+In the namespace C<yatt> (literally), the argmacro syntax also sets
+options of the part being declared:
+
+  <!yatt:widget foo %yatt:no_last_newline;>
+  <!yatt:args %yatt:no_last_newline(0);>
+
+C<%yatt:NAME(VALUE);> calls C<< $part->configure(yatt_NAME => VALUE) >>,
+and C<%yatt:NAME;> is the same as C<%yatt:NAME(1);>.
+Only fields of the part whose name starts with C<yatt_> can be set this way.
+VALUE must be a single literal; more values or variables are errors.
+
+If the part has no field C<yatt_NAME>, C<%yatt:NAME;> is looked up as an
+argmacro as described above. So part options take precedence over
+argmacros of the same name registered in the namespace C<yatt>.
+
+Currently following options are available:
+
+=over 4
+
+=item no_last_newline
+
+Do not output the last newline of the part body.
+
+=back
+
+=head1 SEE ALSO
+
+L<YATT::Lite::CGen::ArgMacro>, L<YATT::Lite::WebMVC0::SiteApp>
+
+=cut

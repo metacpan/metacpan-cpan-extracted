@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: tiger.pl,v 1.8 2005/01/15 14:28:56 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Mertz <mertz@intuilab.com>
  
 ####### This file has been initially generated from tiger.svg by SVG2zinc.pm Version: Revision: 1.10 
@@ -8,7 +8,7 @@
 ### under linux) was from Daniel Etienne! Thx!
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 
 use Tk::Zinc;

@@ -1,0 +1,8 @@
+<!yatt:base file="@ytmpl/base_test.ytmpl">
+
+<!yatt:args>
+<yatt:layout>
+  <h2>hello!</h2>
+  <yatt:foo/>
+  &yatt:bar();
+</yatt:layout>

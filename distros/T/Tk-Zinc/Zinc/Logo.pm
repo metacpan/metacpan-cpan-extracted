@@ -3,7 +3,7 @@ package Tk::Zinc::Logo;
 #---------------------------------------------------------------
 #
 #  Module          : Logo.pm
-#  $Id: Logo.pm,v 1.6 2003/09/15 12:21:48 mertz Exp $
+#  $Id$
 #
 #  Copyright (C) 2001-2003
 #  Centre d'Études de la Navigation Aérienne
@@ -12,7 +12,7 @@ package Tk::Zinc::Logo;
 #---------------------------------------------------------------
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.06';
 
 use strict;
 use Carp;

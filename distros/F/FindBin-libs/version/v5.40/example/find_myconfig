@@ -1,0 +1,164 @@
+#!/bin/env perl
+########################################################################
+# Find etc/myconfig subdirs without including bare etc dirs (subonly).
+# Uses the nearest one found as the config directory.
+# See POD for subonly behavior and abspath vs. noabspath.
+########################################################################
+
+use strict;
+use warnings;
+use feature 'say';
+
+use List::Util qw( first );
+
+use FindBin::Bin
+qw
+(
+    $Bin_l
+    $Bin_p
+);
+
+use FindBin::Parents qw( dir_paths );
+
+# base=etc subdir=myconfig subonly: exports @myconfig containing only
+# paths ending in etc/myconfig -- the bare etc dirs are excluded.
+# Without subonly, @etc would contain both the etc dirs and the
+# etc/myconfig subdirs (where they exist).
+#
+# Default abspath => 1: walk starts from $Bin_p (physical, symlinks resolved).
+# Add "noabspath" to walk from $Bin_l (logical, symlinks preserved).
+
+use FindBin::libs
+qw
+(
+    base=etc
+    subdir=myconfig
+    subonly
+    export=myconfig
+);
+
+say "logical  bin (\$Bin_l): $Bin_l";
+say "physical bin (\$Bin_p): $Bin_p";
+say '';
+
+say 'Parent dirs searched:';
+
+say "  $_"
+for dir_paths $Bin_p;
+
+say '';
+say 'etc/myconfig dirs found:';
+
+if( @myconfig )
+{
+    say "  $_" for @myconfig;
+}
+else
+{
+    say '  (none)';
+}
+
+say '';
+
+my $config_dir
+= first { -d } @myconfig
+or die "No etc/myconfig directory found above $Bin_p\n";
+
+say "Using config dir: $config_dir";
+
+=head1 NAME
+
+find_myconfig - find the nearest etc/myconfig dir walking up from the script
+
+=head1 SYNOPSIS
+
+    find_myconfig
+
+    # To walk from the logical bin ($Bin_l) instead of the physical
+    # ($Bin_p), add "noabspath" to the FindBin::libs import:
+    #
+    #   use FindBin::libs qw( base=etc subdir=myconfig subonly export=myconfig noabspath );
+
+=head1 DESCRIPTION
+
+Searches upward from the script's bin directory for C<etc/myconfig>
+subdirectories.  Exports them as C<@myconfig> (nearest first) and picks
+the nearest existing one as the active configuration directory.
+
+Uses all three modules:
+
+=over 4
+
+=item L<FindBin::Bin>
+
+Supplies C<$Bin_l> and C<$Bin_p> so the script can report and compare
+the logical and physical starting points of the walk.
+
+=item L<FindBin::libs>
+
+Performs the upward search.  C<base=etc subdir=myconfig subonly>
+restricts the results to paths ending in C<etc/myconfig>; bare C<etc>
+directories are excluded from C<@myconfig>.
+
+=item L<FindBin::Parents>
+
+C<dir_paths($Bin_p)> returns the full ancestor chain so the script can
+show which directories were candidates.
+
+=back
+
+=head2 subonly: etc/myconfig only vs. etc and etc/myconfig
+
+Without C<subonly>:
+
+    use FindBin::libs qw( base=etc subdir=myconfig export=myconfig );
+    # @myconfig contains both etc dirs and etc/myconfig subdirs (where found):
+    #   /work/projects/app/etc/myconfig
+    #   /work/projects/app/etc
+    #   /work/projects/etc/myconfig
+    #   /work/projects/etc
+
+With C<subonly>:
+
+    use FindBin::libs qw( base=etc subdir=myconfig subonly export=myconfig );
+    # @myconfig contains only etc/myconfig subdirs:
+    #   /work/projects/app/etc/myconfig
+    #   /work/projects/etc/myconfig
+
+Use C<subonly> when you want the named subdirectory exclusively -- for
+example, when C<etc> holds mixed content and only C<etc/myconfig> is
+relevant to this script.
+
+=head2 abspath vs. noabspath
+
+C<FindBin::libs> starts its walk from C<$Bin_p> (default, physical) or
+C<$Bin_l> (with C<noabspath>, logical).  For config directories, the
+usual goal is to find the config closest to where the source code lives
+on disk, so the C<abspath> default is normally correct.
+
+Use C<noabspath> when the script is invoked through a directory symlink
+pointing into a test sandbox that has its own C<etc/myconfig> tree:
+
+    /sandbox/
+    +-- etc/
+    |   \-- myconfig/           # test configuration here
+    \-- app -> /work/projects/app
+
+    noabspath walk from $Bin_l: /sandbox/app/bin -> /sandbox/app -> /sandbox
+    finds: /sandbox/etc/myconfig    (test configuration)
+
+    abspath walk from $Bin_p: /work/projects/app/bin -> ...
+    finds: /work/projects/etc/myconfig   (production configuration)
+
+=head2 scalar: pick only the nearest
+
+To export only the nearest C<etc/myconfig> as a scalar rather than a list:
+
+    use FindBin::libs qw( base=etc subdir=myconfig subonly scalar export=myconfig );
+    # $myconfig holds the path to the nearest etc/myconfig dir (or undef)
+
+=head1 SEE ALSO
+
+L<FindBin::Bin>, L<FindBin::libs>, L<FindBin::Parents>
+
+=cut

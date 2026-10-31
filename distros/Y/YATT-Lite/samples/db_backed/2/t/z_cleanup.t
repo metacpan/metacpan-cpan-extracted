@@ -22,7 +22,7 @@ BEGIN {
   my $dn;
   if (-d (($dn = "$app_root/lib") . "/YATT")) {
     push @libdir, $dn
-  } elsif (($dn) = $app_root =~ m{^(.*?/)YATT/}) {
+  } elsif (($dn) = $app_root =~ m{^(.*?/)YATT/samples(?:/|\z)}) {
     push @libdir, $dn;
   }
 }

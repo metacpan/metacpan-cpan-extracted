@@ -1,6 +1,6 @@
 package IO::K8s::CRD::Emitter;
 # ABSTRACT: Render generated IO::K8s classes as house-style Perl source
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use v5.10;
 use Moo;
 use Carp qw( croak );
@@ -748,7 +748,7 @@ IO::K8s::CRD::Emitter - Render generated IO::K8s classes as house-style Perl sou
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 SYNOPSIS
 
@@ -887,7 +887,7 @@ core types) are written by their short name and not rendered.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -915,5 +915,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

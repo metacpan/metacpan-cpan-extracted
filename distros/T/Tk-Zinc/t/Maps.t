@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: Maps.t,v 1.1 2005/12/02 21:51:12 mertz Exp $
+# $Id$
 # Author: Christophe Mertz  mertz@intuilab.com
 #
 

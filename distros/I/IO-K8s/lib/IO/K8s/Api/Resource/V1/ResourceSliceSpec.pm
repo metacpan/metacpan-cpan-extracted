@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::ResourceSliceSpec;
 # ABSTRACT: ResourceSliceSpec contains the information published by the driver in one ResourceSlice.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s allNodes => Bool;
@@ -47,7 +47,7 @@ IO::K8s::Api::Resource::V1::ResourceSliceSpec - ResourceSliceSpec contains the i
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 allNodes
 
@@ -120,7 +120,7 @@ Other values may be added in the future. The kubelet must ignore unknown values.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -148,5 +148,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

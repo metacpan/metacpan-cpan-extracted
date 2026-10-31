@@ -4,7 +4,7 @@
       "Patrick Lecoanet <lecoanet@cena.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.98",
             "Tk" : "800.004",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -50,6 +50,6 @@
          "url" : "https://github.com/asb-capfan/TkZinc"
       }
    },
-   "version" : 3.306,
+   "version" : 3.307,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

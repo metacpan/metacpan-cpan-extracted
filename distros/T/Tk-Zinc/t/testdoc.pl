@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: testdoc.pl,v 1.4 2002/11/06 09:14:45 mertz Exp $
+# $Id$
 # This script verifies the conformity of the reference manual with
 # some types informations available inside ZincTk
 # It has been developped by C. Mertz <mertz@cena.fr>

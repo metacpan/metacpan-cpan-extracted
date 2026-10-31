@@ -3,7 +3,6 @@ use Test::More;
 use JSON::XS ();
 use IO::Socket::INET ();
 use IO::Select ();
-use Protocol::WebSocket::Frame ();
 use IPC::Open3 ();
 use POSIX qw(WNOHANG);
 use Time::HiRes ();
@@ -12,6 +11,12 @@ use File::Path ();
 use Symbol ();
 
 my $dir = File::Temp::tempdir (CLEANUP => 1);
+my $have_websocket = eval {
+   require AnyEvent::WebSocket::Server;
+   require AnyEvent::WebSocket::Message;
+   require Protocol::WebSocket::Frame;
+   1
+};
 File::Path::mkpath (["$dir/home", "$dir/config"], 0, 0700);
 local $ENV{HOME} = "$dir/home";
 local $ENV{XDG_CONFIG_HOME} = "$dir/config";
@@ -25,7 +30,7 @@ sub permission_rules {
    print {$fh} join "", map {
       my ($decision, $action, $subject) = @$_;
       "[rule]\ndecision=$decision\naction=$action\n"
-         . (defined $subject ? "subject=$subject\n" : "")
+         . (defined $subject ? "match.subject=$subject\n" : "")
          . ($decision eq "allow" ? "sandbox-grants=\n" : "") . "\n"
    } @_;
    close $fh or die "$policy: $!";
@@ -470,7 +475,7 @@ my $ex_rule = rpc (862, "tools/call", permission_params (
    "ex", $ex_args, $ex_challenge->{result}{requestState},
    { action => "accept", content => { decision => "allow-always" } },
 ));
-my $ex_scopes = $ex_rule->{result}{inputRequests}{permission}{params}{requestedSchema}{properties}{subject}{enum};
+my $ex_scopes = $ex_rule->{result}{inputRequests}{permission}{params}{requestedSchema}{properties}{dim_subject}{enum};
 is scalar @$ex_scopes, 3, "Ex offers exact command, editor-wide and global persistent scopes";
 is $ex_scopes->[0], 'ex:"secondary-vim":' . JSON::XS->new->allow_nonref->encode ($ex_args->{command}),
    "exact scope encodes the complete command including newlines";
@@ -478,7 +483,7 @@ print {$in} JSON::XS::encode_json ({
    jsonrpc => "2.0", id => 863, method => "tools/call",
    params => permission_params ("ex", $ex_args, $ex_rule->{result}{requestState}, {
       action => "accept", content => {
-         decision => "allow-always", sandbox_grants => "", subject => $ex_scopes->[0],
+         decision => "allow-always", sandbox_grants => "", dim_subject => $ex_scopes->[0],
       },
    }),
 }), "\n";
@@ -711,6 +716,8 @@ ok $after_cancel->{id} == 199 && !$after_cancel->{result}{isError}
    && JSON::XS::decode_json ($after_cancel->{result}{content}[0]{text})->{after_cancel},
    "late cancelled reply is ignored and the next tool call completes";
 
+SKIP: {
+skip "WebSocket modules not installed", 5 unless $have_websocket;
 my ($invalid_ws, $invalid_headers) = upgrade ("secret-do-not-log-XYZ");
 unlike $invalid_headers, qr{\AHTTP/1\.[01] 101\b},
    "unknown WebSocket URL token does not upgrade";
@@ -792,12 +799,15 @@ subtest "browser transfers" => sub {
 
    vim_send [session => "save-test", {
       origin => "http://page.example:818", filename => "test.txt",
+      etag => '"sha256-from-fetch"',
    }];
 
    my $browser = browser ();
    vim_send [save => "save-test"];
    like vim_call ()->[1][1], qr/requesting save/, "save reports its destination";
-   is browser_json ($browser)->[0], "upload", "save starts a browser upload";
+   my $upload = browser_json $browser;
+   is_deeply [$upload->[0], $upload->[2]], ["upload", 0], "legacy save starts an ordinary browser upload";
+   is $upload->[1]{etag}, '"sha256-from-fetch"', "fetch ETag survives Vim session and broker upload metadata";
 
    require MIME::Base64;
    my $data = "x" x (10e6 + 37);
@@ -812,7 +822,7 @@ subtest "browser transfers" => sub {
    my @tail = ("first tail", "", "second tail");
    vim_send [data => MIME::Base64::encode_base64 ($_, "")] for @tail;
    vim_send [eof => 1];
-   vim_send [save => "save-test"];
+   vim_send [save => "save-test", 1];
    like vim_call ()->[1][1], qr/requesting save/, "another save queues without acknowledging unsent data";
    vim_send [eof => 1];
    ok !ws_message ($browser, 0.1), "negative credit holds back the next whole chunk";
@@ -829,17 +839,34 @@ subtest "browser transfers" => sub {
       browser_send $browser, [ack => length $tail];
       is_deeply vim_call ()->[1], [ack => length $tail], "each browser chunk acknowledgement reaches Vim";
    }
-   browser_send $browser, ["upload-done", "200", "saved first"];
+   my $new_etag = '"sha256:' . ("a" x 64) . '"';
+   browser_send $browser, ["upload-done", "200", "saved first", $new_etag];
+   is_deeply vim_call ()->[1], ["update-metadata", "save-test", { etag => $new_etag }],
+      "successful save updates Vim-owned session metadata";
    is_deeply vim_call ()->[1], [echo => "200 saved first"], "save completion remains separate from chunk receipt";
-   is browser_json ($browser)->[0], "upload", "completion releases the queued save";
+   $upload = browser_json $browser;
+   is_deeply [$upload->[0], $upload->[2]], ["upload", 1], "completion forwards the queued force flag";
+   is $upload->[1]{etag}, $new_etag, "queued save uses the refreshed ETag";
    is_deeply browser_json ($browser), ["upload-done"], "empty save sends eof without waiting for credit";
    browser_send $browser, ["upload-done", "500", "upload ok, but errors:\nat line 12, broken\n\n"];
-   is_deeply vim_call ()->[1], [error => "error: at line 12, broken"], "multiline upload error retains its diagnostic";
+   is_deeply vim_call ()->[1], [error => "error: HTTP 500: at line 12, broken"], "multiline upload error retains its diagnostic";
    is_deeply vim_call ()->[1], [goto => "save-test", 12, 1], "upload error retains its session and line";
 
    vim_send [save => "save-test"];
    vim_call ();
-   is browser_json ($browser)->[0], "upload", "another upload starts after an error reply";
+   $upload = browser_json $browser;
+   is $upload->[0], "upload", "another upload starts after an error reply";
+   is $upload->[1]{etag}, $new_etag, "failed upload leaves current ETag untouched";
+   vim_send [eof => 1];
+   is_deeply browser_json ($browser), ["upload-done"], "empty conditional save completes its input";
+   browser_send $browser, ["upload-done", "412", "save rejected: remote content changed since it was opened\n"];
+   is_deeply vim_call ()->[1], [error => "error: HTTP 412: save rejected: remote content changed since it was opened"],
+      "stale conditional save reports a conflict to Vim";
+
+   vim_send [save => "save-test"];
+   vim_call ();
+   $upload = browser_json $browser;
+   is $upload->[1]{etag}, $new_etag, "conflict does not change Vim's ETag";
    vim_send [eof => 0];
    my $aborted = ws_message $browser;
    is $aborted->[0], 8, "failed Vim eof closes the active upload instead of posting a partial file";
@@ -878,6 +905,7 @@ subtest "browser transfers" => sub {
 
    done_testing;
 };
+}
 
 send_tool 200, "grep", $grep_args;
 my $disconnected_call = vim_call;
@@ -912,10 +940,13 @@ like $log, qr/vim <secondary-vim> disconnected/,
    "editor disconnect is logged without debug mode";
 like $log, qr/ex target=secondary-vim command="echo 'hello' \| echo 'world'\\nlet g:example = 1"/,
    "Ex call logs its command preview without requiring debug verbosity";
-like $log, qr/illegal websocket connect from 127\.0\.0\.1:\d+/,
-   "rejected websocket handshake logs the numeric TCP peer and port";
-unlike $log, qr/secret-do-not-log-XYZ|\/secondary\//,
-   "rejected URL never exposes supplied credentials in the log";
+SKIP: {
+   skip "WebSocket modules not installed", 2 unless $have_websocket;
+   like $log, qr/illegal websocket connect from 127\.0\.0\.1:\d+/,
+      "rejected websocket handshake logs the numeric TCP peer and port";
+   unlike $log, qr/secret-do-not-log-XYZ|\/secondary\//,
+      "rejected URL never exposes supplied credentials in the log";
+}
 close $err;
 
 done_testing;

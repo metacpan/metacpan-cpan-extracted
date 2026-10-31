@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1beta2::VolumeGroupSnapshotClass;
 # ABSTRACT: VolumeGroupSnapshotClass specifies parameters for a volume group snapshot
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'groupsnapshot.storage.k8s.io/v1beta2',
     resource_plural => 'volumegroupsnapshotclasses',
@@ -31,7 +31,7 @@ IO::K8s::VolumeSnapshot::V1beta2::VolumeGroupSnapshotClass - VolumeGroupSnapshot
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ L<external-snapshotter v8.6.0 VolumeGroupSnapshotClass CRD|https://github.com/ku
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -102,5 +102,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Wed Mar 30 16:24:09 1994
  *
- * $Id: Arc.c,v 1.62 2005/05/25 08:22:14 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -25,8 +25,6 @@
 #include "tkZinc.h"
 
 
-static const char rcsid[] = "$Id: Arc.c,v 1.62 2005/05/25 08:22:14 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -77,6 +75,9 @@ typedef struct _ArcItemStruct {
 
 
 static ZnAttrConfig     arc_attrs[] = {
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(ArcItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_BOOL, "-closed", NULL,
     Tk_Offset(ArcItemStruct, flags), CLOSED_BIT, ZN_COORDS_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
@@ -141,7 +142,7 @@ static ZnAttrConfig     arc_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-      Tcl_Obj *CONST    *args[])
+      Tcl_Obj *const    *args[])
 {
   ZnWInfo       *wi = item->wi;
   ArcItem       arc = (ArcItem) item;
@@ -151,6 +152,7 @@ Init(ZnItem             item,
   /* Init attributes */
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -171,7 +173,7 @@ Init(ZnItem             item,
   arc->grad_geo = NULL;
   
   if (*argc < 1) {
-    Tcl_AppendResult(wi->interp, " arc coords expected", NULL);
+    Tcl_AppendResult(wi->interp, " arc coords expected", (char *) NULL);
     return TCL_ERROR;
   }
   if (ZnParseCoordList(wi, (*args)[0], &points,
@@ -179,7 +181,7 @@ Init(ZnItem             item,
     return TCL_ERROR;
   }
   if (num_points != 2) {
-    Tcl_AppendResult(wi->interp, " malformed arc coords", NULL);
+    Tcl_AppendResult(wi->interp, " malformed arc coords", (char *) NULL);
     return TCL_ERROR;
   };
   arc->coords[0] = points[0];
@@ -297,7 +299,7 @@ SetRenderFlags(ArcItem  arc)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   ArcItem       arc = (ArcItem) item;
@@ -324,7 +326,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int                   argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, arc_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -346,7 +348,8 @@ UpdateRenderShape(ArcItem       arc)
 {
   ZnPoint       *p_list, p, p2, o, o2;
   ZnReal        width, height, d;
-  int           num_p, i, quality;
+  unsigned int  num_p;
+  int           i, quality;
   ZnTransfo     *t = ((ZnItem) arc)->wi->current_transfo;
   
   if (!arc->render_shape) {
@@ -729,7 +732,7 @@ Draw(ZnItem     item)
       
     ZnSetLineStyle(wi, arc->line_style);
     values.foreground = ZnGetGradientPixel(arc->line_color, 0.0);
-    values.line_width = (arc->line_width == 1) ? 0 : (int) arc->line_width;
+    values.line_width = (int) arc->line_width;
     values.cap_style = CapRound;
     values.join_style = JoinRound;
     if (arc->line_pattern == ZnUnspecifiedImage) {
@@ -1022,7 +1025,8 @@ static void
 UpdateRenderShapeX(ArcItem      arc)
 {
   ZnReal        ox, oy, width_2, height_2;
-  int           i, num_p;
+  int           i;
+  unsigned int  num_p;
   ZnPoint       *p_list;
   
   if (!arc->render_shape) {
@@ -1116,13 +1120,13 @@ Coords(ZnItem           item,
 
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " arcs can't add or remove vertices", NULL);
+                     " arcs can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if (cmd == ZN_COORDS_REPLACE_ALL) {
     if (*num_pts != 2) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 2 points on arcs", NULL);
+                       " coords command need 2 points on arcs", (char *) NULL);
       return TCL_ERROR;
     }
     arc->coords[0] = (*pts)[0];
@@ -1132,7 +1136,7 @@ Coords(ZnItem           item,
   else if (cmd == ZN_COORDS_REPLACE) {
     if (*num_pts < 1) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need at least 1 point", NULL);
+                       " coords command need at least 1 point", (char *) NULL);
       return TCL_ERROR;
     }
     if (index < 0) {
@@ -1141,7 +1145,7 @@ Coords(ZnItem           item,
     if ((index < 0) || (index > 1)) {
     range_err:
       Tcl_AppendResult(item->wi->interp,
-                       " incorrect coord index, should be between -2 and 1", NULL);
+                       " incorrect coord index, should be between -2 and 1", (char *) NULL);
       return TCL_ERROR;
     }
     arc->coords[index] = (*pts)[0];
@@ -1214,19 +1218,19 @@ PostScript(ZnItem item,
     p = ZnListArray(arc->render_shape);
     num_points = ZnListSize(arc->render_shape);
     sprintf(path, "%.15g %.15g moveto ", p[0].x, p[0].y);
-    Tcl_AppendResult(wi->interp, path, NULL);
+    Tcl_AppendResult(wi->interp, path, (char *) NULL);
     for (i = 0; i < num_points; i++) {
       sprintf(path, "%.15g %.15g lineto ", p[i].x, p[i].y);
-      Tcl_AppendResult(wi->interp, path, NULL);
+      Tcl_AppendResult(wi->interp, path, (char *) NULL);
     }
-    Tcl_AppendResult(wi->interp, "closepath\n", NULL);
+    Tcl_AppendResult(wi->interp, "closepath\n", (char *) NULL);
   }
   else {
     sprintf(path,
             "matrix currentmatrix\n%.15g %.15g translate %.15g %.15g scale 1 0 moveto 0 0 1 0 360 arc\nsetmatrix\n",
             (arc->corner.x + arc->orig.x) / 2.0, (arc->corner.y + arc->orig.y) / 2.0,
             (arc->corner.x - arc->orig.x) / 2.0, (arc->corner.y - arc->orig.y) / 2.0);
-    Tcl_AppendResult(wi->interp, path, NULL);
+    Tcl_AppendResult(wi->interp, path, (char *) NULL);
   }
   
   /*
@@ -1234,7 +1238,7 @@ PostScript(ZnItem item,
    */
   if (ISSET(arc->flags, FILLED_BIT)) {
     if (arc->line_width) {
-      Tcl_AppendResult(wi->interp, "gsave\n", NULL);
+      Tcl_AppendResult(wi->interp, "gsave\n", (char *) NULL);
     }
     if (!ZnGradientFlat(arc->fill_color)) {
       if (ZnPostscriptGradient(wi->interp, wi->ps_info, arc->fill_color,
@@ -1251,7 +1255,7 @@ PostScript(ZnItem item,
                                ZnGetGradientColor(arc->fill_color, 0.0, NULL)) != TCL_OK) {
           return TCL_ERROR;
         }
-        Tcl_AppendResult(wi->interp, "clip ", NULL);
+        Tcl_AppendResult(wi->interp, "clip ", (char *) NULL);
         if (Tk_PostscriptStipple(wi->interp, wi->win, wi->ps_info,
                                  ZnImagePixmap(arc->tile, wi->win)) != TCL_OK) {
           return TCL_ERROR;
@@ -1263,10 +1267,10 @@ PostScript(ZnItem item,
                              ZnGetGradientColor(arc->fill_color, 0.0, NULL)) != TCL_OK) {
         return TCL_ERROR;
       }
-      Tcl_AppendResult(wi->interp, "fill\n", NULL);
+      Tcl_AppendResult(wi->interp, "fill\n", (char *) NULL);
     }
     if (arc->line_width) {
-      Tcl_AppendResult(wi->interp, "grestore\n", NULL);
+      Tcl_AppendResult(wi->interp, "grestore\n", (char *) NULL);
     }
   }
 
@@ -1274,7 +1278,7 @@ PostScript(ZnItem item,
    * Then emit code code to stroke the outline.
    */
   if (arc->line_width) {
-    Tcl_AppendResult(wi->interp, "0 setlinejoin 2 setlinecap\n", NULL);
+    Tcl_AppendResult(wi->interp, "0 setlinejoin 2 setlinecap\n", (char *) NULL);
     if (ZnPostscriptOutline(wi->interp, wi->ps_info, wi->win,
                             arc->line_width, arc->line_style,
                             arc->line_color, arc->line_pattern) != TCL_OK) {
@@ -1320,6 +1324,7 @@ static ZnItemClassStruct ARC_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

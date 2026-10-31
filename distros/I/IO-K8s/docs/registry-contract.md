@@ -16,7 +16,7 @@ Two pieces of metadata are NOT in the registry today, which forces tests and
 tooling to reach into Moo:
 
 1. **Requiredness.** `_k8s` passes `required => 1` to Moo's `has`, but the
-   registry info hash carries no `required` flag. `t/42_registry_synthesis_roundtrip.t`
+   registry info hash carries no `required` flag. `t/02_compile_all.t (registry synthesis subtest)`
    reads it from `Moo->_constructor_maker_for($class)->all_attribute_specs`
    (line 136) instead.
 2. **Complex array element types.** `_k8s`'s Type::Tiny array branch only

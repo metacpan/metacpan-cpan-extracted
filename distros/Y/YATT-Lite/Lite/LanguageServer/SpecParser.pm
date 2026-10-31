@@ -389,7 +389,7 @@ sub extract_statement_list :method {
               (?<decl>(?:$wordRe\s+)+)
               (?: (?<body> $groupRe )
                 | = \s* (?<type>
-                    $typeElemRe \s*(?: \| \s*$typeElemRe)*
+                    $typeElemRe (?: \s* \| \s*$typeElemRe)*
                   )
                   \s*;
               )

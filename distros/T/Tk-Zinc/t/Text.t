@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: Text.t,v 1.2 2004/04/02 12:01:49 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

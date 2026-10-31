@@ -50,8 +50,12 @@ C<perl Makefile.PL> reports missing Perl dependencies. Install those with
 your usual package manager or CPAN client before continuing. For example,
 the main non-core dependencies can be installed with:
 
-   cpan AnyEvent AnyEvent::HTTP AnyEvent::WebSocket::Server \
-      AnyEvent::WebSocket::Message common::sense JSON::XS
+   cpan AnyEvent AnyEvent::HTTP common::sense JSON::XS
+
+C<mcp-webbrowser> requires C<AnyEvent::WebSocket::Server> and
+C<AnyEvent::WebSocket::Message>. C<mcp-vim> needs them only for browser
+connections, not for ordinary Vim clients. Both modules are recommended
+rather than required by the distribution.
 
 Use the same Perl installation for dependency installation, building and
 running the servers. A module installed for the system Perl might not be
@@ -461,13 +465,13 @@ allow rules through the prompt:
    [rule]
    decision=allow
    action=inspect
-   workdir=/home/alice/src/project
+   match.workdir=/home/alice/src/project
    sandbox-grants=workdir-read
 
    [rule]
    decision=allow
    action=read
-   workdir=/home/alice/src/project
+   match.workdir=/home/alice/src/project
    sandbox-grants=workdir-read
 
    [rule]
@@ -484,8 +488,8 @@ denies command execution outright; omit it if you want execution to ask instead.
 Rules run in order, stopping at the first match. An allow rule matches only
 when its grants cover the request, including implications.
 C<workdir-write> implies C<workdir-read>; C<network> remains independent.
-Action and subject match exactly unless beginning with C<^>, which selects
-a Perl regular expression. Workdir matching is always exact.
+Action and C<match.NAME> match exactly unless beginning with C<^>, which
+selects a Perl regular expression; workdir scopes use the same mechanism.
 An explicit C<ask> rule can override later allow rules.
 
 These allow rules authorize sandbox access to the selected workdir.
@@ -543,9 +547,11 @@ To set the default for servers using the shared permission engine:
       mcp-fs --stdio --name code /home/alice/src/project
 
 An explicit application C<ask> setting or C<--ask> overrides the environment.
-For spawned stdio children, C<mcp-multibroker --ask auto> passes this
-default to them. It cannot change the environment of an independently
-running HTTP server.
+The multibroker sets this default to C<mcp> for spawned stdio children,
+regardless of its own asking mode. Children delegate permission prompts to
+their calling MCP client; the multibroker handles or forwards those prompts
+according to its own C<--ask> mode. An explicit child C<--ask> still overrides
+this default. Independently running HTTP servers keep their own configuration.
 
 The multibroker can handle form elicitation locally for both stdio and HTTP
 children. C<--ask helper> selects local dialogs even if the upstream client

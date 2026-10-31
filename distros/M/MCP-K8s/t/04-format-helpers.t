@@ -243,4 +243,24 @@ subtest '_to_json roundtrip' => sub {
   is_deeply($decoded, $data, 'JSON roundtrip preserves data');
 };
 
+subtest 'event summary carries reason, message and involvedObject' => sub {
+  require IO::K8s;
+  my $ev = IO::K8s->new->struct_to_object('Event', {
+    metadata       => { name => 'web.17a', namespace => 'default' },
+    involvedObject => { kind => 'Pod', name => 'web' },
+    reason         => 'BackOff',
+    message        => 'Back-off restarting failed container',
+    type           => 'Warning',
+    count          => 7,
+    lastTimestamp  => '2026-10-01T10:00:00Z',
+  });
+  my $s = $k8s->_format_resource_summary($ev);
+  is($s->{reason}, 'BackOff', 'reason');
+  is($s->{message}, 'Back-off restarting failed container', 'message');
+  is($s->{type}, 'Warning', 'type');
+  is($s->{count}, 7, 'count');
+  is_deeply($s->{involvedObject}, { kind => 'Pod', name => 'web' }, 'involvedObject');
+  ok($s->{lastTimestamp}, 'lastTimestamp');
+};
+
 done_testing;

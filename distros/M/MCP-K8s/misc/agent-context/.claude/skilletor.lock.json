@@ -1,10 +1,60 @@
 {
+  "rules/engineering-discipline": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.engineering-discipline.md": "sha256:177d01585bdd5fa273685e3f65aeafe9d8c0d2fdfaa94916f9f6fa74234615b8"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-agent-delegation": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-agent-delegation.md": "sha256:9e9ab625136f7c38f95e8ac19bc50738b92f2ecde4ed8cd13ffa45d421fb6d04"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-cpan-release": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-cpan-release.md": "sha256:f0a3fb481dc5ca68179b17eaf36a85f76c5b709fd66e1b9bbb19f500f7189738"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-publish-gate": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-publish-gate.md": "sha256:6141f3154654dc4fd8553cadc1fbb85c0a15543a596ab58a1e1528bf171f55af"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/karr-coordination": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.karr-coordination.md": "sha256:ff3b98284b1ca2ea8afc2aaa91e671138a78e33e71cc63a263a25fdb97ba485e"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
   "skills/getty-git-commit-style": {
     "source": "getty",
     "version": "local",
     "files": {
       "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-git-commit-style/SKILL.md": "sha256:959bed63af658dcec1abc3010a2a262d347851a8aae87d833736d065c0f9f863"
+      "skills/getty-git-commit-style/SKILL.md": "sha256:d69e6b556e277975e08cdea82471ac0689dd3418791e9cccc9bbe54f04b73c4d"
     }
   },
   "skills/getty-git-usage": {
@@ -12,7 +62,7 @@
     "version": "local",
     "files": {
       "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-git-usage/SKILL.md": "sha256:9a4cdf50cc3991e16b2af8882175e8e9a4e27b40fd93605898348ed2db506630"
+      "skills/getty-git-usage/SKILL.md": "sha256:d822ec8cba6bd63bd9fd7c0e3bb0c73268f101f931d8fae82b3a553b64756989"
     }
   },
   "skills/getty-perl-core": {
@@ -20,7 +70,8 @@
     "version": "local",
     "files": {
       "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-perl-core/SKILL.md": "sha256:eec7e726b0deab2a50dd5b99c2f16c68b332ba8ac6296642679f3bfd3bc46816"
+      "skills/getty-perl-core/SKILL.md": "sha256:204d50a28c1c8216845efc649aa7e4c0184c61c57aa0c72cc1898ce2889d7ed1",
+      "skills/getty-perl-core/references/dbic.md": "sha256:ab308272fa65891d02fa1a36326f6fe7c5972ce95fa4323c1cb36e08cf519627"
     }
   },
   "skills/getty-perl-moo": {
@@ -28,7 +79,7 @@
     "version": "local",
     "files": {
       "skills/getty-perl-moo/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-perl-moo/SKILL.md": "sha256:40935882df586ed9db50466c1c289913beaec39c74fced3d25e99a585100e03c"
+      "skills/getty-perl-moo/SKILL.md": "sha256:cef5be74d98ce708167760428282dcabb21a737b40325c6363918efe343ef923"
     }
   },
   "skills/getty-perl-pod": {
@@ -44,7 +95,7 @@
     "version": "local",
     "files": {
       "skills/getty-perl-release-author-getty/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/getty-perl-release-author-getty/SKILL.md": "sha256:8142dbdc668449c99f514dec23a8740f9570a7884e61ad7541ea37a20ba5d902"
+      "skills/getty-perl-release-author-getty/SKILL.md": "sha256:d1cad6a992e80d8eceb057f76a7262a820795f2c4bd58baa5191e8a851a04634"
     }
   },
   "skills/kanban-issues-karr-coordination": {
@@ -83,7 +134,7 @@
     "version": "local",
     "files": {
       "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/perl-release-dist-ini/SKILL.md": "sha256:968219fbff70237c642d39e5ece9cc619680a46c4493fee64138e9a9400a97bb"
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:f7d074d471499db86ecd33d92fdbea0e35f20e94b04aaaa4669b705fcfd01c3b"
     }
   }
 }

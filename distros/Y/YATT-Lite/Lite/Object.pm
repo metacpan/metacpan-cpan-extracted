@@ -71,10 +71,12 @@ my $NO_SUCH_CONFIG_ITEM = sub {
 };
 
 sub cget {
-  my ($self, $key, $default) = @_;
-  my $name = "cf_$key";
+  my ($self, $name, $default) = @_;
+  if ($name =~ m{^_}) {
+    Carp::croak "Private option is prohibited for class ".ref($self).": $name";
+  }
   my $fields = YATT::Lite::Util::fields_hash($self);
-  unless (not exists $fields->{"cf_$name"}) {
+  if (not exists $fields->{$name}) {
     confess $NO_SUCH_CONFIG_ITEM->($self, $name);
   }
   $self->{$name} // $default;
@@ -90,12 +92,15 @@ sub configure {
       croak "Undefined name given for @{[ref($self)]}->configure(name=>value)!";
     }
     $name =~ s/^-//;
+    if ($name =~ m{^_}) {
+      Carp::croak "Private option is prohibited for class ".ref($self).": $name";
+    }
     if (my $sub = $self->can("configure_$name")) {
       push @task, [$sub, $value];
-    } elsif (not exists $fields->{"cf_$name"}) {
+    } elsif (not exists $fields->{$name}) {
       confess $NO_SUCH_CONFIG_ITEM->($self, $name);
     } else {
-      $self->{"cf_$name"} = $value;
+      $self->{$name} = $value;
     }
   }
   if (wantarray) {
@@ -109,17 +114,19 @@ sub configure {
 
 sub cf_list {
   my $obj_or_class = shift;
-  my $pat = shift || qr{^cf_(.*)};
+  my $pat = shift;
   my $fields = YATT::Lite::Util::fields_hash($obj_or_class);
-  sort map {($_ =~ $pat) ? $1 : ()} keys %$fields;
+  sort grep {
+    !/^_/ && (!defined $pat || $_ =~ $pat)
+  } keys %$fields;
 }
 
 sub cf_pairs {
   my ($obj) = shift;
   my $fields = YATT::Lite::Util::fields_hash($obj);
   map {
-    [substr($_, 3) => $obj->{$_}]
-  } grep {/^cf_/} keys %$fields;
+    [$_ => $obj->{$_}]
+  } grep {!/^_/} keys %$fields;
 }
 
 #
@@ -130,10 +137,10 @@ sub cf_delegate {
   my $fields = YATT::Lite::Util::fields_hash($self);
   map {
     my ($from, $to) = ref $_ ? @$_ : ($_, $_);
-    unless (exists $fields->{"cf_$from"}) {
+    unless (exists $fields->{$from}) {
       confess $NO_SUCH_CONFIG_ITEM->($self, $from);
     }
-    $to => $self->{"cf_$from"}
+    $to => $self->{$from}
   } @_;
 }
 
@@ -147,10 +154,10 @@ sub cf_delegate_known {
   (my MY $self, my ($raise_err, $fields)) = splice @_, 0, 3;
   map {
     my ($from, $to) = ref $_ ? @$_ : ($_, $_);
-    if (not exists $fields->{"cf_$from"}) {
+    if (not exists $fields->{$from}) {
       $raise_err ? (confess $NO_SUCH_CONFIG_ITEM->($self, $from)) : ();
     } else {
-      defined $self->{"cf_$from"} ? ($to => $self->{"cf_$from"}) : ();
+      defined $self->{$from} ? ($to => $self->{$from}) : ();
     }
   } @_;
 }
@@ -175,7 +182,7 @@ sub cf_bindings {
   while (my ($key, $value) = splice @_, 0, 2) {
     # XXX: key check!
     # XXX: task extraction!
-    push @keys, "cf_$key"; push @values, $value;
+    push @keys, $key; push @values, $value;
   }
   (\@keys, \@values);
 }
@@ -187,7 +194,7 @@ sub cf_unknowns {
   my $fields = YATT::Lite::Util::fields_hash($class);
   my @unknown;
   while (my ($name, $value) = splice @_, 0, 2) {
-    next if $fields->{"cf_$name"};
+    next if $fields->{$name};
     next if $self->can("configure_$name");
     push @unknown, $name;
   }
@@ -220,12 +227,11 @@ sub cf_mkaccessors {
   my ($class, @names) = @_;
   my $fields = YATT::Lite::Util::fields_hash($class);
   foreach my $name (@names) {
-    my $cf = "cf_$name";
-    unless ($fields->{$cf}) {
+    unless ($fields->{$name}) {
       croak "No such config: $name";
     }
     *{YATT::Lite::Util::globref($class, $name)} = sub {
-      shift->{$cf};
+      shift->{$name};
     };
   }
 }

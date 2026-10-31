@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::Most tests => 60;
+use Test::Most tests => 64;
 use_ok('HTML::D3');
 
 my $chart = HTML::D3->new(width => 700, height => 400, title => 'Histogram Test');
@@ -95,6 +95,11 @@ unlike($binned->{html}, qr/d3\.bin\(\)/, 'Pre-binned path never calls d3.bin()')
 like($binned->{html}, qr/d3\.scaleBand/, 'Pre-binned bars use a band scale');
 like($binned->{html}, qr/esc\(d\.label\)/, 'Pre-binned tooltip escapes the bin label');
 unlike($binned->{html}, qr{</b>}, 'Pre-binned fragment has no raw </b>');
+like($binned->{html}, qr/xAxis\.node\(\)\.getBBox\(\)/, 'Pre-binned tick labels are measured');
+like($binned->{html}, qr/getBBox.*?margin\.bottom = .*?var yScale/s, 'and the plot height is settled before the bars use it');
+my $labelled = $chart->render_histogram_snippet(\@bins, { binned => 1, x_label => 'Amount' })->{html};
+like($labelled, qr/Math\.ceil\(axisBox\.height\) \+ 24,/, 'x_label gets its own room under the tick labels');
+like($binned->{html}, qr/Math\.ceil\(axisBox\.height\) \+ 4,/, 'and none is kept for a label that is not there');
 
 # Labels derived from lo/hi when the caller omits them.
 my $derived = $chart->render_histogram_snippet(

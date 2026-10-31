@@ -18,7 +18,7 @@ use HTTP::Message::PSGI;
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
 use YATT::Lite::Util qw/combination/;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use File::Path qw(make_path);
 use Cwd;
 
@@ -89,7 +89,7 @@ foreach my $has_index (1, 0) {
 
       my $tester = t_call_tester->new($site);
 
-      MY->mkfile("$html_dir/index.yatt", <<'END') if $has_index;
+      MY->mkfile_may_wait("$html_dir/index.yatt", <<'END') if $has_index;
 <h2>Hello</h2>
 
 <!yatt:action "/foo">
@@ -100,7 +100,7 @@ print $CON "action foo in index.yatt";
 print $CON "action bar in index.yatt";
 END
 
-      MY->mkfile("$html_dir/foo.ydo", <<'END');
+      MY->mkfile_may_wait("$html_dir/foo.ydo", <<'END');
 use strict;
 return sub {
   my ($this, $CON) = @_;
@@ -144,7 +144,7 @@ END
 
       make_path(my $tmpl_dir = "$app_root/ytmpl");
 
-      MY->mkfile("$html_dir/index.yatt", <<'END') if $has_index;
+      MY->mkfile_may_wait("$html_dir/index.yatt", <<'END') if $has_index;
 <h2>Hello</h2>
 
 <!yatt:page "/bar">
@@ -152,7 +152,7 @@ page bar in index.yatt
 END
 
       # .htyattrc.pl should be created BEFORE siteapp->new.
-      MY->mkfile("$html_dir/.htyattrc.pl", <<'END');
+      MY->mkfile_may_wait("$html_dir/.htyattrc.pl", <<'END');
 use strict;
 
 use YATT::Lite qw/Action/;
@@ -195,7 +195,7 @@ END
 
       make_path($html_dir);
 
-      MY->mkfile("$html_dir/index.yatt", <<'END') if $has_index;
+      MY->mkfile_may_wait("$html_dir/index.yatt", <<'END') if $has_index;
 <h2>Hello</h2>
 
 <!yatt:page "/bar">

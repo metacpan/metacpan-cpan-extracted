@@ -29,6 +29,8 @@ t/02_colorize.t
 t/03_nofork.t
 t/04_table_align.t
 t/05_table_wrap.t
+t/06_user_settings.t
+t/07_fold_runin.t
 t/Util.pm
 t/demo.md
 t/table_wrap.md

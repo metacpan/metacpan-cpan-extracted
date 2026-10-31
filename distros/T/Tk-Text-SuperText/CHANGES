@@ -1,5 +1,19 @@
 Revision history for Perl module Tk::Text::SuperText
 
+0.13 2026-10-30
+
+  - added per-widget -readonly option and readonly method without changing
+    inheritance; block interactive edits while preserving selection, copying,
+    navigation, programmatic updates, and undo/redo history when toggling (Refs #1)
+  - added regression tests for read-only editing commands and mode transitions
+  - added an interactive feature example with prepared scenarios and a read-only
+    toggle in eg/feature-sample.pl
+  - corrected and reformatted POD, including examples, method names, and key bindings
+  - converted README to Markdown and updated the distribution manifest
+  - aligned the module's minimum Tk version with the existing 804.030 prerequisite
+  - excluded Git metadata and local build files from distribution checks
+  - improved code in Button1 method (thanks to Jim Turner)
+
 0.12 2016-02-24
 
   - further improved POD
@@ -7,7 +21,7 @@ Revision history for Perl module Tk::Text::SuperText
 
 0.11 2016-02-11
 
-  - found complete changes history im README and moved it to CHANGES file
+  - found complete changes history in README and moved it to CHANGES file
   - added tests to manifest
   - minor POD tweaks
   - added license info to module POD

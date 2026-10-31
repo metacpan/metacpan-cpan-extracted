@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition;
 # ABSTRACT: Condition contains details for one aspect of the current state of this API Resource.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time, 'required';
@@ -35,7 +35,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition - Condition contains detai
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 lastTransitionTime
 
@@ -65,7 +65,7 @@ type of condition in CamelCase or in foo.example.com/CamelCase.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -93,5 +93,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

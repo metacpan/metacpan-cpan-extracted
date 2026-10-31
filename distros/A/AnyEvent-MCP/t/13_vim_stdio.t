@@ -31,7 +31,9 @@ sub start_child {
    local $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} = $use_env ? "stdio" : "";
    my $err = Symbol::gensym;
    my $pid = IPC::Open3::open3 (my $in, my $out, $err,
-      $^X, "-Ilib", "bin/mcp-vim", "--bind", "127.0.0.1:$port", ($use_env ? () : ("--stdio")));
+      $^X, "-Ilib", "-e",
+      'unshift @INC, sub { die "WebSocket must not be loaded\n" if $_[1] =~ m{^AnyEvent/WebSocket/}; return }; do shift @ARGV; die $@ if $@;',
+      "bin/mcp-vim", "--bind", "127.0.0.1:$port", ($use_env ? () : ("--stdio")));
    my $old = select $in;
    $| = 1;
    select $old;

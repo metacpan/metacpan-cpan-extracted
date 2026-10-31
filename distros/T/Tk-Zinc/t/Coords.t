@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: Coords.t,v 1.7 2005/06/23 15:32:39 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

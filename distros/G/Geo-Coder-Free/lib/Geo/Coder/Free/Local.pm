@@ -29,11 +29,11 @@ Geo::Coder::Free::Local - Geocode using user-curated local data
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 SYNOPSIS
 
@@ -281,6 +281,26 @@ sub reads {
     # Input schema (Params::Validate::Strict)
     location => { type => 'scalar' }  # address string; must contain at least two commas
 
+The domain of C<location>:
+
+=over 4
+
+=item * A whole row of the data matches in any case, and C<USA> is the same as
+C<US>.
+
+=item * Fewer than two commas, or two commas with nothing between them
+(C<'Road,,GB'>), finds nothing and searches nothing.  Two commas with one
+character between them (C<'Road, ,GB'>) is enough to go on to the search.
+
+=item * Any characters are accepted, and an address that isn't found is remembered
+as a miss.  Undecoded bytes are a different key from the characters they encode.
+
+=item * C<undef>, C<''> and C<'0'>, an empty hashref or no arguments croak
+C<Usage: geocode(location =E<gt> $location)>.  A reference other than a hashref, or an
+odd list longer than one, croaks C<Usage: ...::geocode(...)>.
+
+=back
+
 =head4 output
 
     # Output schema (Return::Set)
@@ -436,8 +456,9 @@ sub geocode {
 			# Abort early if no data at all matches this state/country -
 			# saves traversing the full dataset for every remaining strategy.
 			if (!defined($addr{'country'})) {
-				$addr{'country'} = $l =~ /(United States|USA|US)$/i ? 'US'
-					: Carp::croak("TODO: extract country from $l");
+				# No country that this can search on, so nothing to find
+				return $self->_remember_miss($lc) if $l !~ /(United States|USA|US)$/i;
+				$addr{'country'} = 'US';
 			}
 			# O(1) region check via index built in new() - replaces the former
 			# O(n) grep across all rows.
@@ -681,6 +702,29 @@ sub geocode {
     lon    => { type => 'scalar', optional => 1 }  # longitude (alternative to latlng)
     long   => { type => 'scalar', optional => 1 }  # alias for lon
 
+The domain of the coordinates:
+
+=over 4
+
+=item * Each is compared to the data at four significant figures, not four decimal
+places: C<39.4749> and C<39.47> both match a row at C<39.46727>, and C<39.4751>
+does not.
+
+=item * No range check applies.  C<'0,0'> and C<'91,181'> find nothing and are
+not errors.  A third part is dropped.
+
+=item * Each must be an optional minus, ASCII digits, then an optional point and more
+digits, as in L<Geo::Coder::Free::MaxMind/reverse_geocode>.  Anything else croaks
+C<Invalid coordinate value for reverse_geocode>.
+
+=item * C<latlng> is used when it is true.  No arguments, C<''> or C<'0'>, one part
+with no comma, or only one of C<lat> and C<lon>, croak C<Usage:>.  So do a reference
+other than a hashref and an odd list longer than one.
+
+=item * Nothing found is C<0> in scalar context and an empty list in list context.
+
+=back
+
 =head4 output
 
     # Output schema (Return::Set)
@@ -720,6 +764,12 @@ sub reverse_geocode {
 
 	if (!defined($latitude) || !defined($longitude)) {
 		Carp::croak('Usage: ', __PACKAGE__, '::reverse_geocode(latlng => "$lat,$long")');
+	}
+
+	# The same test MaxMind::reverse_geocode applies, so the backends agree
+	for my $c ($latitude, $longitude) {
+		Carp::croak('Invalid coordinate value for reverse_geocode')
+			unless $c =~ /\A-?[0-9]+\.?[0-9]*\z/;
 	}
 
 	my @rc;

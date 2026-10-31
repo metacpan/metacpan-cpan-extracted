@@ -38,16 +38,25 @@ use Module::Metadata ();
 #
 # With none of them there is nothing to compare against, and the test skips.
 #
-# An installed tree needs two precautions a checkout does not:
+# An installed tree needs three precautions a checkout does not:
+#
+#   * What IO-K8s ships is what its .packlist lists, never what happens to
+#     lie in the tree. An installer does not delete files a newer release no
+#     longer brings, so an upgraded site_perl keeps the classes of every older
+#     IO-K8s (InitializerConfigurationList and friends) although the current
+#     one does not ship them. Only the files listed in the .packlist of the
+#     installed IO-K8s (auto/IO/K8s/.packlist in @INC) count; an installed
+#     IO::K8s without a .packlist that lists its IO/K8s.pm has no reliable
+#     list of files, and the test skips.
 #
 #   * It is shared with an installed copy of THIS distribution, whose stubs
-#     sit in the very same directories. They are not IO-K8s shipping the name,
-#     so files recognisable as one of our tombstones (and our main module) are
-#     left out. That is why every tombstone must die the way $TOMBSTONE_RE
-#     expects -- unconditionally, at the top level, "die __PACKAGE__ ..." at
-#     the start of a line -- which is asserted below: a stub the filter
-#     cannot recognise would be reported as colliding with its own installed
-#     copy.
+#     sit in the very same directories. They are not IO-K8s shipping the name
+#     -- and they are not in IO-K8s's .packlist, so they never enter the
+#     comparison. A stub that did overwrite a file IO-K8s ships still sits in
+#     that .packlist and is reported as the collision it is. Every tombstone
+#     must still die the way $TOMBSTONE_RE expects -- unconditionally, at the
+#     top level, "die __PACKAGE__ ..." at the start of a line -- which is
+#     asserted below.
 #
 #   * It may be OLD. An IO-K8s from before the removals still ships the
 #     tombstoned names, by design -- that is the very release the takeover is
@@ -87,26 +96,55 @@ sub scan_file {
   return { packages => \@packages, tombstone => $tombstone };
 }
 
-# Every *.pm below $lib -- or only below the given paths inside it, for a tree
-# that holds more than one distribution.
+sub scan_module {
+  my ( $lib, $file ) = @_;
+  my $scan = scan_file($file);
+  $scan->{file} = $file;
+  $scan->{rel}  = substr($file, length($lib) + 1);
+  return $scan;
+}
+
+# Every *.pm below $lib.
 sub scan_tree {
-  my ( $lib, @inside ) = @_;
-  my @start = @inside ? map { $lib.'/'.$_ } @inside : ( $lib );
+  my ( $lib ) = @_;
   my @modules;
   File::Find::find(
     {
       no_chdir => 1,
       wanted   => sub {
-        return unless /\.pm\z/ && -f $_;
-        my $scan = scan_file($File::Find::name);
-        $scan->{file} = $File::Find::name;
-        $scan->{rel}  = substr($File::Find::name, length($lib) + 1);
-        push @modules, $scan;
+        push @modules, scan_module($lib, $File::Find::name)
+          if /\.pm\z/ && -f $_;
       },
     },
-    grep { -e $_ } @start,
+    $lib,
   );
   return sort { $a->{rel} cmp $b->{rel} } @modules;
+}
+
+# The files the installed IO-K8s lists in its .packlist, below $lib. The
+# .packlist of a pure-Perl dist lives in the arch directory, so every @INC
+# entry is searched; one counts only when it lists $lib/IO/K8s.pm itself.
+# Returns an empty list when there is no such .packlist.
+sub packlist_files {
+  my ( $lib ) = @_;
+  my $root = abs_path($lib);
+  for my $inc ( grep { !ref } @INC ) {
+    my $packlist = $inc.'/auto/IO/K8s/.packlist';
+    next unless -f $packlist;
+    open my $fh, '<', $packlist or next;
+    my %listed;
+    while (my $line = <$fh>) {
+      chomp $line;
+      1 while $line =~ s/ \w+=\S*\z//;    # "path type=link from=..." entries
+      next unless $line =~ /\.pm\z/ && -f $line;
+      my $path = abs_path($line);
+      $listed{$path} = 1 if defined $path;
+    }
+    close $fh;
+    next unless $listed{ $root.'/IO/K8s.pm' };
+    return grep { index($_, $root.'/') == 0 } sort keys %listed;
+  }
+  return;
 }
 
 sub io_k8s_version {
@@ -165,8 +203,19 @@ if ($installed) {
     if $main_version < $own_version;
 }
 
-my @main = scan_tree($main_lib, $installed ? ( 'IO/K8s.pm', 'IO/K8s' ) : ());
-@main = grep { !$_->{tombstone} && $_->{rel} ne $MAIN_MODULE } @main if $installed;
+my @main;
+if ($installed) {
+  my @listed = packlist_files($main_lib);
+  plan skip_all => 'the installed IO::K8s in '.$main_lib.' has no .packlist'
+    .' listing its files (auto/IO/K8s/.packlist): files lying in the tree are'
+    .' not evidence that IO-K8s ships them'
+    unless @listed;
+  @main = sort { $a->{rel} cmp $b->{rel} }
+    map { scan_module(abs_path($main_lib), $_) } @listed;
+}
+else {
+  @main = scan_tree($main_lib);
+}
 
 my ( %main_package, %main_path );
 for my $module (@main) {

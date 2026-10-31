@@ -4,19 +4,50 @@ use Test::More;
 
 use MCP::K8s::Permissions;
 
+# The API server's answer to a SelfSubjectRulesReview without a namespace.
+our $NO_NAMESPACE_ERROR =
+    'Kubernetes API error (create IO::K8s::Api::Authorization::V1::SelfSubjectRulesReview): 400 '
+  . '{"kind":"Status","status":"Failure","reason":"BadRequest",'
+  . '"message":"no namespace on request","code":400}'
+  . " at lib/Kubernetes/REST.pm line 437.\n";
+
+# The scope of the resources the mock grants. In a real cluster the API
+# discovery knows this for every resource the server serves; it is what
+# keeps a namespaced resource out of the cluster-scope map.
+my %RESOURCE_SCOPE = (
+  pods         => 1,
+  'pods/log'   => 1,
+  services     => 1,
+  deployments  => 1,
+  replicasets  => 1,
+  configmaps   => 1,
+  secrets      => 1,
+  events       => 1,
+  statefulsets => 1,
+  daemonsets   => 1,
+  namespaces   => 0,
+  nodes        => 0,
+);
+
 # =================================================================
 # Mock infrastructure
 # =================================================================
 
 {
   package MockAPI;
-  sub new { bless {}, shift }
+  sub new { bless { reviews => [] }, shift }
   sub new_object {
     my ($self, $kind, $args) = @_;
     return MockReview->new($args->{spec}{namespace});
   }
   sub create {
     my ($self, $review) = @_;
+    push @{ $self->{reviews} }, $review->namespace;
+    # The API server rejects a review without a namespace: the review is
+    # namespace-scoped by design. Reproduced here so a discovery that asks
+    # for the cluster scope this way fails instead of quietly returning
+    # nothing for it.
+    die $NO_NAMESPACE_ERROR if $review->namespace eq '';
     return $review;
   }
   # Real Kubernetes::REST::expand_class always returns a class name, never
@@ -37,6 +68,7 @@ use MCP::K8s::Permissions;
     my ($class, $namespace) = @_;
     bless { namespace => $namespace }, $class;
   }
+  sub namespace { $_[0]->{namespace} }
   sub status {
     my ($self) = @_;
     return MockStatus->new($self->{namespace});
@@ -52,6 +84,15 @@ use MCP::K8s::Permissions;
   }
   sub resourceRules { $_[0]->{rules} }
 
+  # The cluster-scoped grants come from a ClusterRoleBinding. Such a rule
+  # shows up in the review of EVERY namespace - the API server adds the
+  # ClusterRoleBindings to every review - which is what makes the cluster
+  # scope derivable from the namespace reviews.
+  my @CLUSTER_RULES = (
+    MockRule->new(['list'], ['namespaces']),
+    MockRule->new(['get'], ['nodes']),
+  );
+
   sub _rules_for {
     my ($namespace) = @_;
     if ($namespace eq 'default') {
@@ -59,6 +100,7 @@ use MCP::K8s::Permissions;
         MockRule->new(['get', 'list', 'watch'], ['pods', 'services', 'deployments']),
         MockRule->new(['get'], ['pods/log']),
         MockRule->new(['create', 'delete'], ['configmaps']),
+        @CLUSTER_RULES,
       ];
     } elsif ($namespace eq 'admin') {
       return [
@@ -67,6 +109,7 @@ use MCP::K8s::Permissions;
     } elsif ($namespace eq 'readonly') {
       return [
         MockRule->new(['get', 'list'], ['pods', 'services']),
+        @CLUSTER_RULES,
       ];
     } elsif ($namespace eq 'deployer') {
       return [
@@ -74,6 +117,7 @@ use MCP::K8s::Permissions;
         MockRule->new(['update', 'patch'], ['deployments']),
         MockRule->new(['create'], ['pods']),
         MockRule->new(['get'], ['pods/log']),
+        @CLUSTER_RULES,
       ];
     } elsif ($namespace eq 'status-writer') {
       # A correctly narrow Role for a controller that only writes status
@@ -90,11 +134,6 @@ use MCP::K8s::Permissions;
       ];
     } elsif ($namespace eq 'empty') {
       return [];
-    } elsif ($namespace eq '') {
-      return [
-        MockRule->new(['list'], ['namespaces']),
-        MockRule->new(['get'], ['nodes']),
-      ];
     }
     return [];
   }
@@ -117,6 +156,7 @@ sub make_perms {
   my $perms = MCP::K8s::Permissions->new(
     api        => $api,
     namespaces => \@namespaces,
+    scope_resolver => sub { $RESOURCE_SCOPE{ $_[0] } },
   );
   $perms->discover;
   # Return both to keep $api alive (weak_ref in Permissions)
@@ -197,6 +237,40 @@ subtest 'cluster-scoped permissions' => sub {
   ok($perms->can_do('get', 'nodes', ''), 'cluster: get nodes');
   ok(!$perms->can_do('create', 'namespaces', ''), 'cluster: cannot create namespaces');
   ok(!$perms->can_do('delete', 'nodes', ''), 'cluster: cannot delete nodes');
+};
+
+subtest 'the cluster scope is derived, never reviewed on its own' => sub {
+  # A SelfSubjectRulesReview without a namespace is rejected by the API
+  # server (400 no namespace on request), so the cluster scope cannot be
+  # discovered by reviewing it. It is derived from the namespace reviews.
+  my ($perms, $api) = make_perms('default');
+
+  ok(!(grep { $_ eq '' } @{ $api->{reviews} }),
+    'no review was submitted without a namespace');
+  ok($perms->can_do('list', 'namespaces', ''),
+    'the cluster scope is there anyway');
+};
+
+subtest 'a namespaced resource stays out of the cluster scope' => sub {
+  # 'pods' is granted in every namespace review, so it survives the
+  # derivation - but it is namespaced, so it belongs to its namespace and
+  # not to the cluster.
+  my ($perms, $api) = make_perms('default', 'readonly');
+
+  ok($perms->can_do('list', 'pods', 'default'), 'pods are listable in a namespace');
+  ok(!$perms->can_do('list', 'pods', ''), 'pods are not cluster-scoped');
+  ok(!$perms->can_do('list', 'configmaps', ''), 'and neither are configmaps');
+};
+
+subtest 'a RoleBinding grant does not leak into the cluster scope' => sub {
+  # 'configmaps create' comes from a RoleBinding in 'default' only. What
+  # only one namespace knows is what that namespace may do - not the cluster.
+  my ($perms, $api) = make_perms('default', 'readonly');
+
+  ok($perms->can_do('create', 'configmaps', 'default'), 'configmaps are creatable in default');
+  ok(!$perms->can_do('create', 'configmaps', ''), 'and not cluster-wide');
+  ok($perms->can_do('list', 'namespaces', ''),
+    'what the ClusterRoleBinding grants stays cluster-wide');
 };
 
 subtest 'unknown namespace denied' => sub {

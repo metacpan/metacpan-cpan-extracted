@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Mon Mar 15 14:02:03 1999
  *
- * $Id: tkZinc.h,v 1.22 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -24,7 +24,11 @@
 #include "List.h"
 #include "MapInfo.h"
 
-#include <GL/glu.h>
+#if defined(MAC_OSX_TK)
+  #include <AGL/glu.h>
+#else
+  #include <GL/glu.h>
+#endif
 
 typedef struct _ZnTagSearch {
   ZnWInfo       *wi;
@@ -84,6 +88,10 @@ typedef struct _ZnGLContextEntry {
   int           ipixel;
   HWND          hwnd;   /* Temporary storage between MakeCurrent and Release */
   HDC           hdc;
+#elif defined(MAC_OSX_TK)
+  AGLPixelFormat pix_fmt;
+  GWorldPtr     gworld;
+  Tk_Window     top_win;
 #else
   XVisualInfo   *visual; /* Should these two be managed by screen ? */
   Colormap      colormap;

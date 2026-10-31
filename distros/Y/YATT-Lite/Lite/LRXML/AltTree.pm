@@ -17,6 +17,7 @@ use MOP4Import::Types
   AltNode => [[fields => qw/
                              kind path source
                              symbol_range tree_range
+                             value_range
                              subtree
                              value
                            /]];
@@ -24,11 +25,13 @@ use MOP4Import::Types
 use YATT::Lite::Constants
   qw/NODE_TYPE
      NODE_BEGIN NODE_END NODE_LNO
-     NODE_SYM_END
+     NODE_SYM_END NODE_BODY_END
      NODE_PATH NODE_BODY NODE_VALUE
      NODE_ATTLIST NODE_AELEM_HEAD NODE_AELEM_FOOT
      TYPE_ELEMENT TYPE_LCMSG
      TYPE_ATT_TEXT
+     TYPE_ATT_NAMEONLY
+     TYPE_ATT_BARENAME
      TYPE_ATT_NESTED
      TYPE_COMMENT
      TYPE_ENTITY
@@ -41,6 +44,7 @@ use YATT::Lite::Constants
 our @TYPES;
 
 use YATT::Lite::LRXML::FormatEntpath qw/format_entpath/;
+use MOP4Import::Util qw/lexpand/;
 
 use YATT::Lite::XHF::Dumper qw/dump_xhf/;
 sub cli_write_fh_as_xhf {
@@ -88,12 +92,29 @@ sub convert_tree {
         } elsif ($item->[NODE_TYPE] == TYPE_ENTITY) {
           $altnode->{value} = [@{$item}[NODE_BODY .. $#$item]];
         } else {
-          if ($item->[NODE_TYPE] == TYPE_ATT_TEXT) {
-            $altnode->{symbol_range}
-              = $self->make_range($item->[NODE_BEGIN]
-                                  , ($item->[NODE_BEGIN] + length($item->[NODE_PATH]))
-                                  , $item->[NODE_LNO])
-              if defined $item->[NODE_BEGIN] and defined $item->[NODE_PATH];
+          if (($item->[NODE_TYPE] == TYPE_ATT_TEXT
+               or $item->[NODE_TYPE] == TYPE_ATT_NAMEONLY
+               or $item->[NODE_TYPE] == TYPE_ATT_BARENAME)
+              and defined $item->[NODE_BEGIN] and defined $item->[NODE_PATH]) {
+            # symbol_range covers the attribute name. GH-277
+            # NODE_PATH may be an array ('name:type' => [name, type]).
+            # The bracket lvalue form ([a b]="v") holds nodes: no symbol then.
+            my @path = lexpand($item->[NODE_PATH]);
+            if (@path and not grep {ref $_} @path) {
+              $altnode->{symbol_range}
+                = $self->make_range($item->[NODE_BEGIN]
+                                    , ($item->[NODE_BEGIN] + length(join ":", @path))
+                                    , $item->[NODE_LNO]);
+            }
+          }
+          if ($item->[NODE_TYPE] == TYPE_ATT_BARENAME
+              and defined $item->[NODE_BODY_END]
+              and defined $item->[NODE_BODY] and not ref $item->[NODE_BODY]) {
+            # a=y: the bare value names a variable in scope. GH-277
+            $altnode->{value_range}
+              = $self->make_range($item->[NODE_BODY_END] - length($item->[NODE_BODY])
+                                  , $item->[NODE_BODY_END]
+                                  , $item->[NODE_LNO]);
           }
           if (defined $item->[NODE_BODY] and ref $item->[NODE_BODY] eq 'ARRAY') {
             $altnode->{subtree} = [$self->convert_tree(
@@ -127,9 +148,16 @@ sub fill_source_range_of {
       $altnode->{source} = $source;
     }
     if ($self->{with_range}) {
+      # A <!--#yatt --> comment token includes its trailing newline
+      # (NODE_END is just after it). The range must end on the last
+      # line of the token, not at column 0..N of the next line. GH-278
+      my $end = $orig->[NODE_END];
+      if ($source =~ s/(\r?\n)\z//) {
+        $end -= length $1;
+      }
       $altnode->{tree_range} = $self->make_range(
         $orig->[NODE_BEGIN],
-        $orig->[NODE_END],
+        $end,
         $orig->[NODE_LNO],
         ($source =~ tr|\n||)
       );
@@ -286,11 +314,9 @@ sub column_of_source_pos {
   if ($_[3] and substr($_[1], $pos, 1) eq "\n") {
     $pos--;
   }
-  if ((my $found = rindex($_[1], "\n", $pos)) >= 0) {
-    $pos - $found;
-  } else {
-    $pos;
-  }
+  # 1-based column. rindex gives -1 on the first line, which yields the
+  # same 1-based column as on the other lines. GH-275
+  $pos - rindex($_[1], "\n", $pos);
 }
 
 sub node_body_slot {

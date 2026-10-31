@@ -1,6 +1,6 @@
 package Kubernetes::Comb::CRD;
 # ABSTRACT: IO::K8s resource map provider for the Comb custom resource
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
@@ -43,7 +43,7 @@ Kubernetes::Comb::CRD - IO::K8s resource map provider for the Comb custom resour
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ of providers, like L<Net::Async::Kubernetes>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

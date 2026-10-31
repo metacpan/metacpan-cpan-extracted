@@ -11,7 +11,7 @@
 #                 We must know if a neamed gradient already exists, when launching
 #                 many time the same demo in the same process!
 #
-# $Id: groups_in_ATC_strips.pl,v 1.9 2004/09/21 12:47:28 mertz Exp $
+# $Id$
 #-----------------------------------------------------------------------------------
 #      This small application illustrates both the use of groups in combination
 #         of -composescale attributes and an implementation of kind of air traffic
@@ -41,7 +41,7 @@
 package groups_in_ATC_strips; # for avoiding symbol collision between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

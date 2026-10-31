@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ThanosSpec;
 # ABSTRACT: thanos defines the configuration of the optional Thanos sidecar.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s additionalArgs          => ['+IO::K8s::PrometheusOperator::V1::Argument'];
@@ -64,7 +64,7 @@ IO::K8s::PrometheusOperator::V1::ThanosSpec - thanos defines the configuration o
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 additionalArgs
 
@@ -224,7 +224,7 @@ VolumeMounts specified will be appended to other VolumeMounts in the
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -252,5 +252,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

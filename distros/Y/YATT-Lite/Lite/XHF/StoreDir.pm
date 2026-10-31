@@ -3,10 +3,10 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 
 use base qw(YATT::Lite::Object);
-use fields qw(cf_datadir
-	      cf_fileprefix
-	      cf_fileext
-	      cf_lockname
+use fields qw(datadir
+	      fileprefix
+	      fileext
+	      lockname
 	    );
 
 use YATT::Lite::XHF::Dumper;
@@ -15,9 +15,9 @@ use Fcntl qw(:DEFAULT :flock SEEK_SET);
 
 sub after_new {
   my MY $self = shift;
-  $self->{cf_fileprefix} //= '.ht_';
-  $self->{cf_fileext}    //= '.xhf';
-  $self->{cf_lockname}   //= 'lock';
+  $self->{fileprefix} //= '.ht_';
+  $self->{fileext}    //= '.xhf';
+  $self->{lockname}   //= 'lock';
 }
 
 sub create {
@@ -26,7 +26,7 @@ sub create {
   my ($fnum, $lockfh) = $self->lastfnum(1);
   my ($fname);
   do {
-    $fname = "$self->{cf_datadir}/$self->{cf_fileprefix}" . ++$fnum;
+    $fname = "$self->{datadir}/$self->{fileprefix}" . ++$fnum;
   } while (-e $fname);
 
   seek $lockfh, 0, SEEK_SET
@@ -47,7 +47,7 @@ sub create {
 
 sub fnum2path {
   (my MY $self, my $fnum) = @_;
-  "$self->{cf_datadir}/$self->{cf_fileprefix}$fnum";
+  "$self->{datadir}/$self->{fileprefix}$fnum";
 }
 
 sub lastfnum {
@@ -64,7 +64,7 @@ sub lastfnum {
 
 sub openlock {
   (my MY $self, my $flock) = @_;
-  my $lockfn = "$self->{cf_datadir}/$self->{cf_fileprefix}$self->{cf_lockname}";
+  my $lockfn = "$self->{datadir}/$self->{fileprefix}$self->{lockname}";
   sysopen my $lockfh, $lockfn, O_RDWR | O_CREAT
     or die "Can't open '$lockfn': $!";
 

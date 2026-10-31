@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Lifecycle;
 # ABSTRACT: Lifecycle describes actions that the management system should take in response to container lifecycle events. For the PostStart and PreStop lifecycle handlers, management of the container blocks until the action is complete, unless the container process fails, in which case the handler is aborted.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s postStart => 'Core::V1::LifecycleHandler';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::Lifecycle - Lifecycle describes actions that the managem
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 postStart
 
@@ -44,7 +44,7 @@ StopSignal defines which signal will be sent to a container when it is being sto
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -72,5 +72,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

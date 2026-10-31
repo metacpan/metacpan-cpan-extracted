@@ -4,10 +4,10 @@ package Kubernetes::Comb::SVG::Layout;
 
 use Moo;
 use Types::Common::Numeric qw( PositiveInt PositiveNum PositiveOrZeroNum );
-use Types::Standard qw( ArrayRef Bool Enum Object );
+use Types::Standard qw( ArrayRef Bool CodeRef Enum Maybe Object );
 use namespace::autoclean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has cells => ( is => 'ro', isa => ArrayRef[Object], default => sub { [] } );
 
@@ -37,6 +37,9 @@ has frame_width => ( is => 'ro', isa => PositiveOrZeroNum, default => 0 );
 
 
 has frame_height => ( is => 'ro', isa => PositiveOrZeroNum, default => 0 );
+
+
+has frame => ( is => 'ro', isa => Maybe[CodeRef] );
 
 
 has size => ( is => 'ro', isa => PositiveNum, default => 56 );
@@ -261,8 +264,10 @@ sub _packed_columns {
   my ( $best, $miss ) = ( 1 );
   for my $columns ( 1 .. $most || 1 ) {
     my ( $width, $height ) = $self->_packed_extent( $sizes, $columns, $headings );
-    my $off = abs( log( ( $width + $self->frame_width ) / ( $height + $self->frame_height ) )
-      - log( $self->aspect ) );
+    my ( $whole_width, $whole_height ) = $self->frame
+      ? $self->frame->( $width, $height )
+      : ( $width + $self->frame_width, $height + $self->frame_height );
+    my $off = abs( log( $whole_width / $whole_height ) - log( $self->aspect ) );
     ( $best, $miss ) = ( $columns, $off ) if !defined $miss || $off < $miss;
   }
   return $best;
@@ -323,7 +328,7 @@ Kubernetes::Comb::SVG::Layout - Places cells in groups and a honeycomb, by depen
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -438,6 +443,16 @@ columns by C<aspect>; the result of L</layout> never includes it.
 Default C<0>, a number of at least zero. The height the caller will add around
 the content (padding, title, legend); see L</frame_width>.
 
+=head2 frame
+
+Optional coderef, no default. Called with the C<width> and C<height> of the
+content a column count would give and returns the width and height of the
+whole picture around it. Use it when the frame depends on the content: a
+legend that wraps into more rows the narrower the honeycomb is, a title wider
+than the honeycomb. When given it takes the place of L</frame_width> and
+L</frame_height>; like them it only counts when choosing the columns by
+L</aspect>.
+
 =head2 size
 
 Default C<56>, a positive number. Radius of a hexagon, centre to corner, in
@@ -539,7 +554,7 @@ every platform. No cells give width and height C<0> and empty lists.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb-svg/issues>.
 
 =head2 IRC

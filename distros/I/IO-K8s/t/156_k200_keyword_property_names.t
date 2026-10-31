@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
-use YAML::XS ();
+use YAML::PP ();
 
 use IO::K8s;
 
@@ -97,7 +97,7 @@ subtest 'Kong-style KongPlugin: keyword-named properties round-trip' => sub {
     like($obj->to_json, qr/"has":7\b/, 'integer has is unquoted on the wire');
     like($obj->to_json, qr/"around":true\b/, 'boolean around is a JSON true');
 
-    my $yaml = YAML::XS::Load($obj->to_yaml);
+    my $yaml = YAML::PP->new->load_string($obj->to_yaml);
     is($yaml->{spec}{ordering}{after}{access}[0], 'z1', 'to_yaml carries ordering.after');
     is($yaml->{spec}{with}, 'w', 'to_yaml carries with');
     is($yaml->{spec}{Str}, 's', 'to_yaml carries Str');

@@ -1,5 +1,154 @@
 Revision history for FCGI-Buffer
  
+0.23	Fri Oct 30 02:52:42 PM EDT 2026
+	[ Security ]
+	- Pages for clients that have logged in (Authorization or REMOTE_USER)
+		and POST requests are no longer cached or saved
+	- Responses with Set-Cookie, or a Cache-Control of no-store, no-cache or
+		private, are no longer cached or saved.  A Set-Cookie header was
+		being replayed to other clients
+	- A Vary on anything other than Accept-Encoding (or Accept-Language with
+		lingua) now stops a response from being cached or saved.  The
+		code that was meant to honour it could never run
+	- save_to: cookies now stop a page from being saved when a cache_key is
+		given
+	- save_to: stored cross-site scripting through REQUEST_URI
+	- A page that includes the value of the client's csrf_token cookie is no
+		longer cached or saved
+	- A client's Cache-Control: max-age=1abc caused an empty response, and
+		max-age=99999999 kept pages in the cache for years.  Invalid
+		values and those over 600 seconds are now ignored
+	- save_to: max_pages, default 10000, stops clients from filling the disc
+	- optimise_content: an unterminated <title> took quadratic time
+
+	[ Bug Fixes ]
+	- The ETag of a page that wasn't in the cache was worked out before its
+		links were changed to point to static pages, so a client with
+		the old links could be given a 304 and keep them
+	- If-Modified-Since was looked at before If-None-Match for a page in the
+		cache, so a 304 could be sent for a page that had changed
+	- Several Expires headers could be sent, and they were kept in the cache
+	- With generate_304 off, If-None-Match could still give a 304 for a page in
+		the cache
+	- save_to: static pages are written atomically, a reader could be given a
+		partial page and a full disc wasn't noticed
+	- save_to: links to a page weren't changed if they gave its arguments in
+		a different order
+	- Range: when there is no cache, a part of a page is now cut from the page
+		with its links changed, so that it matches the ETag
+	- A csrf_token cookie no longer stops a page from being cached or saved.
+		It is different for each client but doesn't change the output
+	- An exception while sending the page lost the output, it could also
+		leave all that the process then printed going to a dead buffer.
+		Failures of the cache, the database or the logger now give a
+		warning and the page is still sent
+	- UTF-8 that a script printed as bytes was encoded twice when compressed
+		or written by save_to
+	- Entries in the cache were used after they had expired
+	- save_to: pages that had passed their ttl were never updated or deleted,
+		and were sent with an Expires header in the past
+	- save_to: only HTML is saved, other types were corrupted
+	- save_to: virtual hosts sharing a directory linked to each other's pages
+	- HTML with no </html>, which suggests that the script died, isn't stored
+	- optimise_content: changed the contents of <pre> and <textarea>
+	- A Content-Length from the script was kept when the body was changed
+	- Output for which the script gave a Content-Encoding was compressed again
+	- Headers ending in LF gave duplicate Status and Content-Length headers
+	- Range: a Status header from the script stopped the 206 being sent, so
+		part of the page was sent as a 200 or a 404.  Ranges were worked
+		out in characters, and applied to POST requests.  A part of a
+		page is no longer compressed, and If-Range is honoured
+	- A 304 no longer also has the script's Status: 200 or a Content-Encoding
+	- If-None-Match matching on other than GET and HEAD gives 412, not 304, and
+		If-Modified-Since is ignored for them
+	- If-Modified-Since could turn a 404 into a 304, and was used when
+		If-None-Match had failed if there was no cache
+	- Compressed and uncompressed output had the same strong ETag
+	- Vary: Accept-Encoding wasn't sent with uncompressed output
+	- ETags weren't generated for HTTP/2 and HTTP/3 in some spellings
+	- init() returned undef if save_to couldn't be used, so chained calls
+		died.  It now gives one warning and carries on without save_to.
+		Arguments to save_to are checked
+	- new() now checks the cache, logger and save_to arguments in the same way
+	- A logger that doesn't understand all of the methods is ignored
+	- Removed import(), which died if given any arguments
+	- Text::Diff was used without loading it safely, and Storable might not
+		have been loaded
+	- Test::Log::Abstraction, which needs Perl 5.26, is no longer required to
+		install this module
+	- Raised MIN_PERL_VERSION to 5.012, which the latest DBI needs,
+		CGI::Info to 0.71 and added DBD::SQLite to the prerequisites
+	- save_to: links to a page from its own static copy pointed to the
+		file's location on disk rather than its URL
+	- save_to: requests with no arguments were saved as a hidden ".html" file
+	- save_to: wrong URLs were generated when DOCUMENT_ROOT ended in "/" or
+		the save_to directory wasn't under the document root, such links
+		are now left alone
+	- save_to: characters such as "%", "&", "\\" and spaces in arguments
+		weren't escaped in URLs, and arguments differing only by spaces
+		shared a static page
+	- save_to: links containing ";", "&amp;" or regex metacharacters such as
+		"+" weren't matched, and a "(" in the URL caused a crash
+	- save_to: the language was recorded differently when saving and looking
+		up pages, so links weren't rewritten for languages such as
+		"English (United Kingdom)", and looking up pages died without lingua
+	- save_to: SQL injection through the URL
+	- save_to: don't save pages that depend on the client's cookies or Vary
+		headers, since the static page would be served to everyone
+	- optimise_content: links to the script with no arguments became href="",
+		which reloads the current page, and the greedy match could span
+		attributes
+	- optimise_content: links to other sites whose names start with ours
+		(e.g. www.example.com.evil.org) were made local
+	- PATH_INFO is now part of the generated cache key
+	- Google Analytics cookies after the first weren't excluded from the
+		cache key
+	- optimise_content: several regexes took quadratic time on long runs
+		of whitespace or unterminated links, allowing a slow down by
+		hostile input
+	- optimise_content: "+" at the start of a line was deleted, breaking
+		JavaScript
+	- optimise_content: document.write() calls in different <script>
+		blocks could be merged, and the script's type was changed
+	- optimise_content: text of an HTML comment after a <script> tag was
+		displayed
+	- optimise_content: no longer removes visible spaces between tags,
+		e.g. "Hello <b>world</b>" became "Hello<b>world</b>"
+	- Range: "bytes=0-n" was ignored and ranges were a byte short, multiple
+		and backwards ranges are now ignored rather than half applied
+	- Range: "bytes=-n" gave the first n bytes rather than the last n
+		(RFC 7233)
+	- Range: unsatisfiable ranges, e.g. starting after the end, now give a
+		416 rather than a warning, and 206 and 416 responses include
+		Content-Range
+	- Accept-Encoding with a space before a comma wasn't understood
+	- If the first encoding the client accepts couldn't be loaded (e.g.
+		IO::Compress::Brotli isn't installed), a 406 was sent instead of
+		trying the next, or sending it uncompressed
+	- Accept-Encoding parameters, e.g. "gzip;q=0.8", weren't understood, and
+		q=0 wasn't honoured.  x-gzip is now supported.
+	- Content-Type "Text/html" wasn't compressed
+	- zstd compression could die if Encode wasn't loaded
+	- Cache-Control with more than one directive (e.g. "no-cache, max-age=0")
+		or in upper case didn't stop the cache being used
+	- If-None-Match with a list of ETags, weak ETags or "*" wasn't
+		understood, and an undefined ETag gave a warning
+	- An ETag in the script's own headers lost its quotes when read from the
+		cache, so never matched If-None-Match
+	- new(generate_etag => 0) was overridden by the server protocol
+	- Removed a branch which did nothing but look in the cache, and dead
+		debugging code
+
+	[ Documentation ]
+	- API and formal specifications for the public methods
+	- Documented character encoding, failures and how output is sent
+	- Corrected what's said about NO_CACHE, the logger, Last-Modified, Range
+		and when save_to works
+
+	[ Tests ]
+	- Use Test::Log::Abstraction
+	- Added t/save_to.t, t/optimise.t, t/logic.t and t/regressions.t
+
 0.22	Sat Apr 18 20:55:55 EDT 2026
 	Fix uninitialized variable
 	More helpful error message

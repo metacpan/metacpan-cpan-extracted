@@ -1,6 +1,6 @@
 package Kubernetes::Comb::Static;
 # ABSTRACT: A Comb whose manifests are .pk8s and YAML files
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 extends 'Kubernetes::Comb';
@@ -30,7 +30,7 @@ Kubernetes::Comb::Static - A Comb whose manifests are .pk8s and YAML files
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ L<Kubernetes::Comb::Role::Static/manifest_files>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

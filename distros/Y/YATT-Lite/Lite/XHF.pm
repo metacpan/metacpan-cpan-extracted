@@ -9,14 +9,14 @@ our $VERSION = "0.03";
 use constant TRACE => $ENV{TRACE_XHF_PARSER};
 
 use base qw(YATT::Lite::Object);
-use fields qw(cf_FH cf_filename cf_string cf_tokens
-	      fh_configured
-	      cf_allow_empty_name
-	      cf_encoding cf_crlf
-	      cf_nocr cf_subst
-              cf_first_lineno
+use fields qw(FH filename string tokens
+	      _fh_configured
+	      allow_empty_name
+	      encoding crlf
+	      nocr subst
+              first_lineno
               _depth
-	      cf_skip_comment cf_bytes);
+	      skip_comment bytes);
 
 use Exporter qw(import);
 our @EXPORT = qw(read_file_xhf);
@@ -38,7 +38,7 @@ our %ALLOW_EMPTY_NAME = (':' => 1);
 
 sub after_new {
   (my MY $self) = @_;
-  $self->{cf_skip_comment} //= 1;
+  $self->{skip_comment} //= 1;
 }
 
 sub read_file_xhf {
@@ -63,37 +63,37 @@ sub parse_xhf {
 *configure_file = \&configure_filename;
 sub configure_filename {
   (my MY $self, my ($fn)) = @_;
-  open $self->{cf_FH}, '<', $fn
+  open $self->{FH}, '<', $fn
     or croak "Can't open file '$fn': $!";
-  $self->{fh_configured} = 0;
-  $self->{cf_filename} = $fn;
+  $self->{_fh_configured} = 0;
+  $self->{filename} = $fn;
   $self;
 }
 
 sub configure_filename_for_error {
   (my MY $self, my ($fn)) = @_;
-  $self->{cf_filename} = $fn;
+  $self->{filename} = $fn;
 }
 
 # To accept in-stream encoding spec.
 # (See YATT::Lite::Test::XHFTest::load and t/lite_xhf.t)
 sub configure_encoding {
   (my MY $self, my $value) = @_;
-  $self->{fh_configured} = 0;
-  $self->{cf_encoding} = $value;
+  $self->{_fh_configured} = 0;
+  $self->{encoding} = $value;
 }
 
 sub configure_binary {
   (my MY $self, my $value) = @_;
   warnings::warnif(deprecated =>
 		   "XHF option 'binary' is deprecated, use 'bytes' instead");
-  $self->{cf_bytes} = $value;
+  $self->{bytes} = $value;
 }
 
 sub configure_string {
   my MY $self = shift;
-  ($self->{cf_string}) = @_;
-  open $self->{cf_FH}, '<', \ $self->{cf_string}
+  ($self->{string}) = @_;
+  open $self->{FH}, '<', \ $self->{string}
     or croak "Can't create string stream: $!";
   $self;
 }
@@ -130,13 +130,13 @@ sub read {
 sub tokenize {
   (my MY $self) = @_;
   local $/ = "";
-  my $fh = $$self{cf_FH};
-  unless ($self->{fh_configured}++) {
-    if (not $self->{cf_bytes} and not $self->{cf_string}
-	and $self->{cf_encoding}) {
-      binmode $fh, ":encoding($self->{cf_encoding})";
+  my $fh = $$self{FH};
+  unless ($self->{_fh_configured}++) {
+    if (not $self->{bytes} and not $self->{string}
+	and $self->{encoding}) {
+      binmode $fh, ":encoding($self->{encoding})";
     }
-    if ($self->{cf_crlf}) {
+    if ($self->{crlf}) {
       binmode $fh, ":crlf";
     }
   }
@@ -146,10 +146,10 @@ sub tokenize {
     do {
       defined (my $para = <$fh>) or last LOOP;
       $para = untaint_unless_tainted
-	($self->{cf_filename} // $self->{cf_string}
+	($self->{filename} // $self->{string}
 	 , $para);
       @tokens = $self->tokenize_1($para);
-    } until (not $self->{cf_skip_comment} or @tokens);
+    } until (not $self->{skip_comment} or @tokens);
   }
   @tokens;
 }
@@ -157,13 +157,13 @@ sub tokenize {
 sub tokenize_1 {
   my MY $reader = shift;
   $_[0] =~ s{\n+$}{\n}s;
-  $_[0] =~ s{\r+}{}g if $reader->{cf_nocr};
-  if (my $sub = $reader->{cf_subst}) {
+  $_[0] =~ s{\r+}{}g if $reader->{nocr};
+  if (my $sub = $reader->{subst}) {
     local $_;
     *_ =  \ $_[0];
     $sub->($_);
   }
-  my $lineno = $reader->{cf_first_lineno} // 1;
+  my $lineno = $reader->{first_lineno} // 1;
   my ($pos, $ncomments, @tokens, @result);
   foreach my $token (@tokens = split /(?<=\n)(?=[^\ \t])/, $_[0]) {
     $pos++;
@@ -180,7 +180,7 @@ sub tokenize_1 {
     if ($name eq '') {
       croak "Invalid XHF token(name is empty for '$token') "
         .$reader->fileinfo_lineno($lineno)."\n"
-	if $sigil eq ':' and not $reader->{cf_allow_empty_name};
+	if $sigil eq ':' and not $reader->{allow_empty_name};
     } elsif ($NAME_LESS{$sigil}) {
       croak "Invalid XHF token('$sigil' should not be prefixed by name '$name') "
         .$reader->fileinfo_lineno($lineno)."\n";
@@ -229,7 +229,7 @@ sub fileinfo {
 sub fileinfo_lineno {
   (my MY $reader, my $lineno) = @_;
   sprintf("at %s line %d"
-          , $reader->{cf_filename} // "(unknown)"
+          , $reader->{filename} // "(unknown)"
           , $lineno);
 }
 

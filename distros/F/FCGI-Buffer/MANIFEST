@@ -1,5 +1,4 @@
 Changes
-ignore.txt
 lib/FCGI/Buffer.pm
 LICENCE
 Makefile.PL
@@ -28,7 +27,7 @@ t/is_cached.t
 t/js.t
 t/kwalitee.t
 t/last_mod.t
-t/lib/MyLogger.pm
+t/logic.t
 t/manifest.t
 t/metrics.t
 t/modules-used.t
@@ -37,6 +36,7 @@ t/no404s.t
 t/nocache.t
 t/noopentickets.t
 t/noplan.t
+t/optimise.t
 t/output.t
 t/pod-cm.t
 t/pod-links.t
@@ -46,6 +46,8 @@ t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
+t/regressions.t
+t/save_to.t
 t/strict.t
 t/too_late.t
 t/unused.t

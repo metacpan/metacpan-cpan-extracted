@@ -29,9 +29,9 @@ use YATT::Lite::Partial
 		  /]
    , fields => [qw/
                     _session_middleware
-                    cf_session_middleware_class
-                    cf_session_state
-                    cf_session_store
+                    session_middleware_class
+                    session_state
+                    session_store
 		  /]
    , -Entity, -CON
   );
@@ -201,13 +201,37 @@ sub session_init_env {
 
   $env->{'psgix.session.options'} = { id => $id, %opts };
 
-  if ($env->{HTTPS}) {
-    $env->{'psgix.session.options'}{secure} //= 1;
-  }
+  $self->session_apply_cookie_defaults($env, $env->{'psgix.session.options'});
 
   $env->{'plack.session'}
     = Plack::Util::load_class($self->default_session_class)->new($env);
 
+}
+
+#
+# Cookie attribute defaults for the session cookie, applied to
+# psgix.session.options so that both State::Cookie#finalize and
+# #expire_session_id see them (merge_options only fills what is absent):
+#
+#  secure   - 1 whenever the request came over TLS (psgi.url_scheme,
+#             X-Forwarded-Proto or HTTPS), not only when $env->{HTTPS} is set.
+#  httponly - 1, unless the configured session_state defines it.
+#  samesite - Lax, unless the configured session_state defines it.
+#
+sub session_apply_cookie_defaults {
+  (my MY $self, my Env $env, my $options) = @_;
+  my $state = $self->{_session_middleware}->state;
+
+  if (Env->is_https($env)) {
+    $options->{secure} //= 1;
+  }
+  foreach my $spec ([httponly => 1], [samesite => 'Lax']) {
+    my ($attr, $default) = @$spec;
+    next if exists $options->{$attr};
+    next if $state->can($attr) and defined $state->$attr;
+    $options->{$attr} = $default;
+  }
+  $options;
 }
 
 sub session_state_exists {
@@ -215,13 +239,26 @@ sub session_state_exists {
   defined $self->session_state_extract_id($CON);
 }
 
+#
+# The session id as claimed by the client's cookie. Only an id that
+# passes the state's validator (Plack::Session::State: /\A[0-9a-f]{40}\Z/)
+# is returned; anything else is treated as "no cookie" so it never
+# reaches $store->fetch/remove (with Plack::Session::Store::File, an
+# unvalidated id is a file path).
+#
 sub session_state_extract_id {
   (my MY $self, my $CON) = @_;
   my $mw = $self->{_session_middleware} or do {
     Carp::croak("Session middleware is not initialized!");
   };
 
-  $CON->cookies_in->{$mw->state->session_key};
+  my $state = $mw->state;
+  my $id = $CON->cookies_in->{$state->session_key};
+  return undef unless defined $id and length $id;
+  if ($state->can('validate_session_id')) {
+    return undef unless $state->validate_session_id($id);
+  }
+  $id;
 }
 
 #
@@ -309,16 +346,17 @@ sub prepare_app {
   dputs('START') if DEBUG >= 3;
 
   my $mw = $self->{_session_middleware} = do {
-    my $class = $self->{cf_session_middleware_class}
+    my $class = $self->{session_middleware_class}
       || $self->default_session_middleware_class;
 
-    my $state = ($self->{cf_session_state}
-                    ? $self->create_session_backend(State => $self->{cf_session_state}) : $self->default_session_state->new());
+    my $state = ($self->{session_state}
+                    ? $self->create_session_backend(State => $self->{session_state})
+                    : Plack::Util::load_class($self->default_session_state)->new());
 
     $class->new({app => sub {[200, [], []]}
                  , state => $state
-                 , ($self->{cf_session_store}
-                    ? (store => $self->create_session_backend(Store => $self->{cf_session_store})) : ())
+                 , ($self->{session_store}
+                    ? (store => $self->create_session_backend(Store => $self->{session_store})) : ())
                });
   };
 

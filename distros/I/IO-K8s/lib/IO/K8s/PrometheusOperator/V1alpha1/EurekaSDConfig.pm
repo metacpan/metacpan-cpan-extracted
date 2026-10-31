@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::EurekaSDConfig;
 # ABSTRACT: Eureka SD configurations allow retrieving scrape targets using the Eureka REST API.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1alpha1::SafeAuthorization';
@@ -42,7 +42,7 @@ IO::K8s::PrometheusOperator::V1alpha1::EurekaSDConfig - Eureka SD configurations
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 authorization
 
@@ -107,7 +107,7 @@ tlsConfig defines the TLS configuration to connect to the Eureka server.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -135,5 +135,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -2,7 +2,7 @@ package YATT::Lite::Partial::Gettext; sub MY () {__PACKAGE__}
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use YATT::Lite::Partial
-  (fields => [qw/locale_cache/]
+  (fields => [qw/_locale_cache/]
    , requires => [qw/error use_encoded_config/]);
 
 use YATT::Lite::Util qw/ckeval/;
@@ -31,7 +31,7 @@ sub configure_locale {
 
 sub configure_locale_data {
   (my MY $self, my $value) = @_;
-  my $cache = $self->{locale_cache} ||= {};
+  my $cache = $self->{_locale_cache} ||= {};
   foreach my $lang (keys %$value) {
     my $entry = [];
     $entry->[_E_LIST] = my $list = $value->{$lang};
@@ -83,7 +83,7 @@ sub lang_load_msgcat {
     $hash->{$id} = $loc;
   }
   $self->lang_parse_header($entry);
-  $self->{locale_cache}{$lang} = $entry;
+  $self->{_locale_cache}{$lang} = $entry;
 }
 
 sub _lang_dequote {
@@ -119,7 +119,7 @@ sub lang_msgcat {
   (my MY $self, my $lang) = @_;
   my ($catalog);
   return unless defined $lang
-    and $catalog = $self->{locale_cache}{$lang};
+    and $catalog = $self->{_locale_cache}{$lang};
   if (wantarray) {
     # For later use in lang_extract_lcmsg
     ($catalog->[_E_LIST] //= [], $catalog->[_E_DICT] //= {});
@@ -132,7 +132,7 @@ sub lang_getmsg {
   (my MY $self, my ($lang, $msgid)) = @_;
   my ($catalog, $msg);
   if (defined $msgid and defined $lang
-      and $catalog = $self->{locale_cache}{$lang}
+      and $catalog = $self->{_locale_cache}{$lang}
       and $msg = $catalog->[_E_DICT]{$msgid}) {
     wantarray ? ($catalog, $msg) : $msg;
   } else {

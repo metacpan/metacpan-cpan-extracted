@@ -4,7 +4,7 @@
  * Authors              :
  * Creation date        :
  *
- * $Id: OverlapMan.c,v 1.26 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -24,12 +24,10 @@
  *   dealing with tracks.
  */
 
-static const char rcsid[] = "$Id: OverlapMan.c,v 1.26 2005/04/27 07:32:03 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 #include "OverlapMan.h"
-#if defined(__APPLE__)
+#if defined(__APPLE__) || __FreeBSD__ > 3
 #include <stdlib.h>
 #else
 #include "malloc.h"
@@ -98,8 +96,13 @@ typedef struct _INFOS {
 
 typedef struct _ZINCS {
   void  *rw;
-  void  *(*_next_track)();
-  void  (*_set_label_angle)();
+  void  *(*_next_track)(void *, void *,
+                        int *, int *,
+                        int *, int *,
+                        int *, int *,
+                        int *, int *,
+                        int *, int *);
+  void  (*_set_label_angle)(void *, void *, int, int, char *);
   INFOS *infos;
   int   NBinfos;
   int   NBalloc_infos;
@@ -340,7 +343,7 @@ OmRegister(void *w,
                                  int *, int *,
                                  int *, int *,
                                  int *, int *),
-           void (*_fset_label_angle)(void *, void *, int, int),
+           void (*_fset_label_angle)(void *, void *, int, int, char *),
            void (*_fquery_label_pos)(void *, void *, int,
                                      int *, int *, int *, int *))
 {
@@ -373,7 +376,7 @@ OmUnregister(void       *w)
 
   if (FindPosW(w, &i) == TRUE) { 
     free(wr[i].infos);
-    memcpy((char *) &wr[i], (char *) &wr[i+1], (NBzincs-i-1)*sizeof(ZINCS));
+    memmove((char *) &wr[i], (char *) &wr[i+1], (NBzincs-i-1)*sizeof(ZINCS));
     NBzincs--;
   }
 }
@@ -438,7 +441,7 @@ FindPosId(int   iw,
  ***************************************************************************
  */
 static void
-SetTrackInitValues()
+SetTrackInitValues(void)
 {
   info1.alpha       = ProjToAngle(info1.vv_dx, info1.vv_dy) - 3.0 * M_PI_4;
   info1.dx          = (int) (info1.rho * cos(info1.alpha));
@@ -500,13 +503,13 @@ PutTrackLoaded(int      iw)
     }
     
     info1.New_Track = TRUE;
-    SetTrackInitValues(iw, pos);
+    SetTrackInitValues();
 
     wr[iw].NBinfos++;
   }
   else {
     if (info1.visibility == FALSE) {  
-      SetTrackInitValues( iw, pos);
+      SetTrackInitValues();
     }
     else {
       SetTrackCurrentValues(iw, pos);
@@ -564,7 +567,7 @@ ReadTracks(int  iw)
      * Delete non refreshed tracks from database.
      */
     if (wr[iw].infos[i].Refresh == FALSE) {
-      memcpy((char *) &(wr[iw].infos[i]), (char *) &(wr[iw].infos[i+1]),
+      memmove((char *) &(wr[iw].infos[i]), (char *) &(wr[iw].infos[i+1]),
              (wr[iw].NBinfos-i-1)*sizeof(INFOS));
       wr[iw].NBinfos--;
     }
@@ -1118,7 +1121,7 @@ OmProcessOverlap(void   *zinc,
       */
 
       (*wr[iw]._set_label_angle) (wr[iw].rw, wr[iw].infos[ip].id,
-                                  120, wr[iw].infos[ip].theta);
+                                  120, wr[iw].infos[ip].theta, NULL);
       /* wr[iw].infos[ip].rho*/      
     }
   }

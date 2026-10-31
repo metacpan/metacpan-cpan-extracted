@@ -267,7 +267,7 @@ ok $success && $result->{structuredContent}{restarted} && $client->{pid} != $pid
 $client->close;
 
 # A real streaming response: progress arrives before the final event.
-my ($sse_handle, $release, $listener, $port, $ended, $progress);
+my ($sse_handle, $release, $listener, $port, $finished, $progress);
 $listener = AnyEvent::Socket::tcp_server "127.0.0.1", 0, sub {
    $sse_handle = AnyEvent::Handle->new (fh => $_[0], on_error => sub { die $_[2] });
    $sse_handle->push_read (line => "\r\n\r\n", sub {
@@ -289,7 +289,6 @@ $listener = AnyEvent::Socket::tcp_server "127.0.0.1", 0, sub {
          $release = AnyEvent->timer (after => 0.02, cb => sub {
             $handle->push_write (substr ($first, 8));
             $release = AnyEvent->timer (after => 0.02, cb => sub {
-               $ended = 1;
                $handle->push_write ($last);
             });
          });
@@ -298,13 +297,18 @@ $listener = AnyEvent::Socket::tcp_server "127.0.0.1", 0, sub {
 }, sub { $port = $_[2]; () };
 $client = AnyEvent::MCP::Client::HTTP->new (
    url => "http://127.0.0.1:$port/", on_notification => sub {
-      $progress = $_[1] eq "notifications/progress" && !$ended;
+      $progress = $_[1] eq "notifications/progress" && !$finished;
    },
 );
 $client->{connected} = 1;
 $client->{protocol_version} = "2026-07-28";
-($success, $result) = wait_for (sub { $client->rpc ("ping", {}, $_[0]) });
+($success, $result) = wait_for (sub {
+   my $done = $_[0];
+   $client->rpc ("ping", {}, sub { $finished = 1; $done->(@_) });
+});
 ok $progress, "fragmented SSE progress delivered while streaming";
+print STDERR "SSE progress missing; RPC success=$success, result=", JSON::XS::encode_json ($result), "\n"
+   unless $progress;
 ok $success && $result->{streamed}, "SSE matching final response";
 $client->close;
 $sse_handle->destroy;

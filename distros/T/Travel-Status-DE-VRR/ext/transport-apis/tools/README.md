@@ -15,3 +15,27 @@ What's in here:
 Running `build.py` will run all of the above.
 
 The necessary dependencies can be installed using `pip install -r requirements.txt`.
+
+## Updating Transitous coverage areas
+
+```
+./tools/fill-coverage-area.py --force \
+  --decimals 2 --threshold 5000 \
+  --region-threshold US 150000 \
+  --region-threshold AU 150000 \
+  --region-threshold NZ 150000 \
+  --region-threshold UM 150000 \
+  --region-threshold BR 150000 \
+  --region-threshold CL 150000 \
+  --region-threshold IN 150000 \
+  --region-threshold JP 150000 \
+  --region-threshold CN 150000 \
+  --region-bounding-box FR 36.5 -9 71 40 \
+  --region-bounding-box NL 36.5 -9 71 40 \
+  --region-bounding-box NO 36.5 0 71 40 \
+  --region-bounding-box GB 36.5 -9 71 40 \
+  --region-bounding-box ES 36.5 -9 71 40 \
+  --region-bounding-box PT 36.5 -9 71 40 \
+  data/un/transitous.json
+./tools/pretty-json.py data/un/transitous.json
+```

@@ -17,7 +17,7 @@ use HTTP::Message::PSGI;
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
 use YATT::Lite::Util qw/combination/;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use File::Path qw(make_path);
 use Cwd;
 
@@ -100,7 +100,7 @@ foreach my $test (combination(['', '/meta/super']
       my ($url, $wname) = @$req;
 
       {
-	MY->mkfile("$real_dir/$wname.yatt", <<'END');
+	MY->mkfile_may_wait("$real_dir/$wname.yatt", <<'END');
 <yatt:tab/>
 <!yatt:page "/foo">
 <yatt:tab/>

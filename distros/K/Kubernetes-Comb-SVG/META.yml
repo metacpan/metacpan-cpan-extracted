@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +18,13 @@ name: Kubernetes-Comb-SVG
 provides:
   Kubernetes::Comb::SVG:
     file: lib/Kubernetes/Comb/SVG.pm
-    version: '0.001'
+    version: '0.002'
   Kubernetes::Comb::SVG::Cell:
     file: lib/Kubernetes/Comb/SVG/Cell.pm
-    version: '0.001'
+    version: '0.002'
   Kubernetes::Comb::SVG::Layout:
     file: lib/Kubernetes/Comb/SVG/Layout.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Getopt::Long: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-kubernetes-comb-svg/issues
   homepage: https://github.com/Getty/p5-kubernetes-comb-svg
   repository: https://github.com/Getty/p5-kubernetes-comb-svg.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -66,54 +66,54 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GatherAgentContext
       name: '@Author::GETTY/GatherAgentContext'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::GETTY/@Filter/Readme'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::GETTY/@Filter/ExtraTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::GETTY/@Filter/ExecDir'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::GETTY/@Filter/ShareDir'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::GETTY/@Filter/MakeMaker'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::GETTY/@Filter/Manifest'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::GETTY/@Filter/TestRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::LicenseFile
       name: '@Author::GETTY/LicenseFile'
@@ -121,15 +121,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::GETTY/MetaJSON'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::GETTY/Test::ChangesHasContent'
@@ -142,7 +142,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.037'
+              version: '6.040'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -161,7 +161,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Author::GETTY/MetaResources'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::GETTY/InstallRelease'
@@ -195,75 +195,75 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@GETTY/SingleEncoding'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Name
               name: '@GETTY/Name'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Version
               name: '@GETTY/Version'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/Prelude'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Synopsis'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Description'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Overview'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Stability'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@GETTY/Leftovers'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/postlude'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Support'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Contributing'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Authors
               name: '@GETTY/Authors'
-              version: '4.020'
+              version: '4.022'
             -
-              class: Pod::Weaver::Section::Legal
+              class: Pod::Weaver::Section::Author::GETTY::Legal
               name: '@GETTY/Legal'
-              version: '4.020'
+              version: '0.328'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/GETTY'
-              version: '4.020'
+              version: '4.022'
       name: '@Author::GETTY/PodWeaver'
       version: '4.010'
     -
@@ -273,7 +273,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -326,7 +326,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -351,7 +351,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::GETTY/@Git::VersionManager/NextRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -394,52 +394,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.037'
+      version: '6.040'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.037'
+    version: '6.040'
 x_authority: cpan:GETTY
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

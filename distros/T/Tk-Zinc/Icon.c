@@ -23,8 +23,6 @@
 #include "tkZinc.h"
 
 
-static const char rcsid[] = "$Id: Icon.c,v 1.45 2005/05/10 07:59:48 lecoanet Exp $";
-static const char compile_id[] = "$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 /*
@@ -53,6 +51,9 @@ typedef struct _IconItemStruct {
 static ZnAttrConfig     icon_attrs[] = {
   { ZN_CONFIG_ANCHOR, "-anchor", NULL,
     Tk_Offset(IconItemStruct, anchor), 0, ZN_COORDS_FLAG, False },
+  { ZN_CONFIG_BOOL, "-catchevent", NULL,
+    Tk_Offset(IconItemStruct, header.flags), ZN_CATCH_EVENT_BIT,
+    ZN_REPICK_FLAG, False },
   { ZN_CONFIG_GRADIENT, "-color", NULL,
     Tk_Offset(IconItemStruct, color), 0, ZN_DRAW_FLAG, False },
   { ZN_CONFIG_BOOL, "-composealpha", NULL,
@@ -102,7 +103,7 @@ static ZnAttrConfig     icon_attrs[] = {
 static int
 Init(ZnItem             item,
      int                *argc,
-     Tcl_Obj *CONST     *args[])
+     Tcl_Obj *const     *args[])
 {
   ZnWInfo       *wi = item->wi;
   IconItem      icon = (IconItem) item;
@@ -113,6 +114,7 @@ Init(ZnItem             item,
   /* Init attributes */
   SET(item->flags, ZN_VISIBLE_BIT);
   SET(item->flags, ZN_SENSITIVE_BIT);
+  SET(item->flags, ZN_CATCH_EVENT_BIT);
   SET(item->flags, ZN_COMPOSE_ALPHA_BIT);
   SET(item->flags, ZN_COMPOSE_ROTATION_BIT);
   SET(item->flags, ZN_COMPOSE_SCALE_BIT);
@@ -177,7 +179,7 @@ Destroy(ZnItem  item)
 static int
 Configure(ZnItem        item,
           int           argc,
-          Tcl_Obj *CONST argv[],
+          Tcl_Obj *const argv[],
           int           *flags)
 {
   ZnItem        old_connected;
@@ -185,6 +187,7 @@ Configure(ZnItem        item,
   old_connected = item->connected_item;
   if (ZnConfigureAttributes(item->wi, item, item, icon_attrs,
                             argc, argv, flags) == TCL_ERROR) {
+    item->connected_item = old_connected;
     return TCL_ERROR;
   }  
 
@@ -217,7 +220,7 @@ Configure(ZnItem        item,
 static int
 Query(ZnItem            item,
       int               argc,
-      Tcl_Obj *CONST    argv[])
+      Tcl_Obj *const    argv[])
 {
   if (ZnQueryAttribute(item->wi->interp, item, icon_attrs, argv[0]) == TCL_ERROR) {
     return TCL_ERROR;
@@ -452,7 +455,7 @@ Draw(ZnItem     item)
       mask_gc = XCreateGC(wi->dpy, mask, 0, NULL);
       gc = XCreateGC(wi->dpy, drw, 0, NULL);
       dest_mask = XCreateImage(wi->dpy, Tk_Visual(wi->win), 1,
-                             XYPixmap, 0, NULL, dest_im_width, dest_im_height,
+                             ZPixmap, 0, NULL, dest_im_width, dest_im_height,
                              8, 0);
       dest_mask->data = ZnMalloc(dest_mask->bytes_per_line * dest_mask->height);
       memset(dest_mask->data, 0, dest_mask->bytes_per_line * dest_mask->height);
@@ -487,7 +490,7 @@ Draw(ZnItem     item)
       TkSetRegion(wi->dpy, mask_gc, clip);
       XFillRectangle(wi->dpy, mask, mask_gc, 0, 0, w, h);
   
-      src_mask = XGetImage(wi->dpy, mask, 0, 0, w, h, 1, XYPixmap);
+      src_mask = XGetImage(wi->dpy, mask, 0, 0, w, h, 1, ZPixmap);
       src_im = XGetImage(wi->dpy, pixmap, 0, 0, w, h, ~0L, ZPixmap);
 
       box[0] = icon->dev[0];
@@ -582,7 +585,7 @@ Draw(ZnItem     item)
       XSetForeground(wi->dpy, gc, 0);
       XFillRectangle(wi->dpy, drw, gc, 0, 0, max_width, max_height);
       dest_im = XCreateImage(wi->dpy, Tk_Visual(wi->win), 1,
-                             XYPixmap, 0, NULL, dest_im_width, dest_im_height,
+                             ZPixmap, 0, NULL, dest_im_width, dest_im_height,
                              8, 0);
       dest_im->data = ZnMalloc(dest_im->bytes_per_line * dest_im->height);
       memset(dest_im->data, 0, dest_im->bytes_per_line * dest_im->height);
@@ -596,7 +599,7 @@ Draw(ZnItem     item)
       XChangeGC(wi->dpy, gc, gc_mask, &values);
       XFillRectangle(wi->dpy, drw, gc, 0, 0, w, h);
 
-      src_im = XGetImage(wi->dpy, drw, 0, 0, w, h, 1, XYPixmap);
+      src_im = XGetImage(wi->dpy, drw, 0, 0, w, h, 1, ZPixmap);
 
       box[0] = icon->dev[0];
       box[1] = icon->dev[1];
@@ -787,7 +790,7 @@ PostScript(ZnItem item,
           wi->current_transfo->_[1][0], wi->current_transfo->_[1][1], 
           wi->current_transfo->_[2][0], wi->current_transfo->_[2][1],
           origin.x, origin.y - h);
-  Tcl_AppendResult(wi->interp, path, NULL);
+  Tcl_AppendResult(wi->interp, path, (char *) NULL);
   
   if (ZnImageIsBitmap(icon->image)) {
     if (Tk_PostscriptColor(wi->interp, wi->ps_info,
@@ -885,13 +888,13 @@ Coords(ZnItem           item,
   
   if ((cmd == ZN_COORDS_ADD) || (cmd == ZN_COORDS_ADD_LAST) || (cmd == ZN_COORDS_REMOVE)) {
     Tcl_AppendResult(item->wi->interp,
-                     " icons can't add or remove vertices", NULL);
+                     " icons can't add or remove vertices", (char *) NULL);
     return TCL_ERROR;
   }
   else if ((cmd == ZN_COORDS_REPLACE) || (cmd == ZN_COORDS_REPLACE_ALL)) {
     if (*num_pts == 0) {
       Tcl_AppendResult(item->wi->interp,
-                       " coords command need 1 point on icons", NULL);
+                       " coords command need 1 point on icons", (char *) NULL);
       return TCL_ERROR;
     }
     icon->pos = (*pts)[0];
@@ -939,6 +942,7 @@ static ZnItemClassStruct ICON_ITEM_CLASS = {
   ComputeCoordinates,
   ToArea,
   Draw,
+  NULL,                 /* Pre-render */
   Render,
   IsSensitive,
   Pick,

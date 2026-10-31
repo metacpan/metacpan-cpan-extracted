@@ -1,5 +1,59 @@
 Revision history for Geo-Coder-Free
 
+0.52	Fri Oct 30 09:53:33 AM EDT 2026
+	[ Bug Fixes ]
+	- OpenAddresses found no address containing a non-ASCII character whose key
+	  differs from what createdatabase.PL stored, and a character beyond Latin-1
+	  could die with "Wide character in subroutine entry".  The key is now made
+	  as the builder makes it: upper case by character, then UTF-8 bytes, and no
+	  rebuild of the database is needed
+	- OpenAddresses asked its cache for get_object(), though only get() and
+	  set() are documented, so a cache without it died on the first lookup
+	- OpenAddresses and Local croaked on some addresses they couldn't take apart
+	  (with the address as the whole message, or "TODO: extract country"); these
+	  are now misses
+	- A scantext cut Latin-1 words in two at the accented letter unless perl
+	  happened to store the string upgraded
+	- A remembered scantext miss answered for every region and ignore_words, and
+	  outlived clear_miss_cache() and expires_after().  It is now per search,
+	  expires with the miss cache, is forgotten by clear_miss_cache(), and an
+	  object keeps at most 10,000
+	- A digit of another script or a trailing newline got past the checks in
+	  MaxMind::reverse_geocode and MissCache::expires_after
+	- Local::reverse_geocode croaks on a coordinate that isn't a number, like
+	  MaxMind::reverse_geocode, rather than warning once per row and finding nothing
+	- MaxMind->new() now names the package in "directory ... doesn't exist"
+	- Makefile.PL's unzip fallback reported success as failure
+	- geocode(scantext => ..., region => 'CA') looked places up as "Place, CA",
+	  which the OpenAddresses parser reads as California, not Canada.  The
+	  region is an ISO code, but it is appended to each candidate as the
+	  country, so CA, AU and IE are now appended by name ("Canada", "Australia",
+	  "Ireland"); GB and US are codes the parser already understands
+	- The Canadian address finder never ran: it was only tried when the region
+	  was 'Canada', and the region is an ISO code, so 'CA' never matched
+	- The region is accepted in any case: 'ca' is treated as 'CA', and any other
+	  two letters are upper-cased
+	[ Enhancements ]
+	- geocode(scantext => ...) warns once per object when there is no
+	  OpenAddresses data for it to search
+	[ Packaging ]
+	- Database::Abstraction is a runtime prerequisite: it was only a build one,
+	  so an install could lose it
+	- IO::AIO and File::Open::NoCache::ReadOnly are only needed, and only asked
+	  for, when building the database under OPENADDR_HOME
+	- The licence in the META files is now "restricted", which is what the code
+	  says: GPL2 for personal use on a single computer.  Provenance.pm matches
+	- The modules the website needs are all in its optional feature
+	- region => 'IE' looks for addresses in the scantext, using the same
+	  comma-separated "street, town, county, country" form as GB
+	[ Documentation ]
+	- Each public method's API SPECIFICATION documents the valid and invalid
+	  values of its parameters, and the limits of each, as tested by t/domain.t
+	[ Tests ]
+	- t/domain.t tests the partitions and boundaries of every public parameter,
+	  including non-ASCII text.  Its TODO blocks mark the known bugs in
+	  Utils::distance, which is maintained in VWF, listed in the roadmap in Free.pm
+
 0.51	Wed Oct 21 09:05:22 PM EDT 2026
 	[ Bug Fixes ]
 	- geocode() no longer hangs when OpenAddresses is configured and a location

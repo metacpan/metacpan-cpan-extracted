@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Sat Dec 10 12:51:30 1994
  *
- * $Id: Draw.h,v 1.24 2005/04/27 07:32:03 lecoanet Exp $
+ * $Id$
  */
 
 /*

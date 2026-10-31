@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-# $Id: tkZincLogo.pl,v 1.11 2004/04/30 11:35:18 lecoanet Exp $
+# $Id$
 # this simple demo has been adapted by C. Mertz <mertz@cena.fr> from the original
 # work of JL. Vinot <vinot@cena.fr>
 
 package tkZincLogo; # for avoiding symbol collision between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.11 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

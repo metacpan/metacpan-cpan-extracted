@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 
 1;
 =encoding utf-8
@@ -35,9 +35,10 @@ mdee - em·dee, Markdown Easy on the Eyes
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
-         --runin=#          run-in width for line breaking (default: 2)
-         --runout=#         run-out width for line breaking (default: 2)
+         --runin=#          run-in width for line breaking (default: 4)
+         --runout=#         run-out width for line breaking (default: 4)
          --runlen=#         set both run-in and run-out
+         --boundary=#       fold boundary: word, space or none (default: word)
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
@@ -58,7 +59,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =cut
 =head1 DESCRIPTION
@@ -368,7 +369,7 @@ the text itself is the output, so this is the fold width.
 Set the fold width for text wrapping directly.  Default is the
 pane width (output width divided by the number of columns) minus
 3 for borders and padding and the run-in width (see C<--runin>),
-which gives 80 when pane-width is 85.
+which gives 78 when pane-width is 85.
 Only effective when C<--fold> is enabled.  The same width is used
 to fit tables (see C<--table>).
 
@@ -377,14 +378,25 @@ to fit tables (see C<--table>).
 Set the run-in and run-out widths that L<ansicolumn(1)|App::ansicolumn>
 uses for line breaking (kinsoku) when nup folds the panes.
 C<--runlen> sets both; options given later override earlier ones.
-Default is 2.  A run-in character may go past the fold width, so
+Default is 4.  A run-in character may go past the fold width, so
 ansicolumn keeps the run-in width free at the end of the pane, and
 the default fold width is made narrower by the same amount.  These
 values are given to nup, and they take precedence over the values
-in F<~/.ansicolumnrc>.
+in F<~/.ansicolumnrc>.  The same values are given to the md module
+as C<fold_runin> and C<fold_runout>, so that the lines it folds run
+in by the width kept free, not more.
 
-A larger value such as 4 suits Japanese text, where a run of
-characters that must not start a line, such as C<ーッ>, can be long.
+=item B<--boundary>=C<word>|C<space>|C<none>
+
+Set where L<ansicolumn(1)|App::ansicolumn> may break a line when nup
+folds the panes, as its C<--boundary> option: C<word> (default) does
+not break inside an alphanumeric word, C<space> not inside a sequence
+of non-space characters, and C<none> breaks anywhere.  Lists and
+tables are folded by the md module at word boundaries, and this
+option keeps the paragraphs, which are folded by nup, in step with
+them.  The value is given to nup (App::nup 1.10 or later), which
+gives it to ansicolumn after F<~/.ansicolumnrc>, so it takes
+precedence over the value there.
 
 =back
 
@@ -950,7 +962,8 @@ HTML comments, and tables are excluded from folding.
 Recognized list markers include C<*>, C<->, C<1.>, C<1)>, C<#.>,
 and C<#)>.  The C<#> marker is Pandoc's auto-numbered list syntax.
 
-The folding width is controlled by C<--fold-width> option (default: 80).
+The folding width is controlled by C<--fold-width> option (default: the
+pane width minus 3 and the run-in width, 78 for a pane of 85).
 
 =head4 Table Formatting
 

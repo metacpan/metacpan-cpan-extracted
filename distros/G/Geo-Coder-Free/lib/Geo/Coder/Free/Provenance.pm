@@ -43,11 +43,11 @@ meaning; an addition there would be lost the next time that sync runs.
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 # The distribution that produced a result.  Every backend stamps this on the
 # Geo::Location::Point it hands back, so a consumer can tell a result from this
@@ -103,5 +103,6 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 Copyright 2017-2026 Nigel Horne.
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2.
+The program code is released under the following licence: GPL2 for personal use on a single computer.
+All other users (including Commercial, Charity, Educational, and Government)
+must apply in writing for a licence for use from Nigel Horne at C<< <njh at nigelhorne.com> >>.

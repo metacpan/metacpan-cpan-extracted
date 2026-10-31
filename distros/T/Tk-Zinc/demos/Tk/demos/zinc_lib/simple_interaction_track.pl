@@ -1,11 +1,11 @@
 #!/usr/bin/perl
-# $Id: simple_interaction_track.pl,v 1.5 2003/09/15 12:25:05 mertz Exp $
+# $Id$
 # This simple demo has been developped by C. Schlienger <celine@intuilab.com>
 
 package simple_interaction_track; # for avoiding symbol collision between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 
 use Tk;

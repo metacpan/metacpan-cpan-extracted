@@ -1,6 +1,6 @@
 package Kubernetes::Comb::CRD::Comb;
 # ABSTRACT: The Comb custom resource
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use IO::K8s::APIObject
   api_version     => 'comb.internal/v1',
@@ -58,7 +58,7 @@ Kubernetes::Comb::CRD::Comb - The Comb custom resource
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ subresource included.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

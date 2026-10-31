@@ -40,10 +40,19 @@ struct srl_decoder {
     IV alias_varint_under;
 
     UV bytes_consumed;
+    UV min_backref_offset;             /* First byte of the active body */
     UV recursion_depth;                 /* Recursion depth of current decoder */
     U8 proto_version;
     U8 encoding_flags;
+    U8 undef_deadly_policy;
+    U8 packet_has_checksum;
+    srl_checksum_config_t checksum;     /* checksum_policy and the keys indexed by checksum version */
+    UV checksummed_packet_length;
+    const U8 *checksummed_payload;
     U32 flags_readonly;
+    SV *input_sv;                       /* SV whose PV the buffer points into, or NULL */
+    const unsigned char *input_start;   /* PV of input_sv when the buffer was set up */
+    STRLEN input_len;                   /* SvCUR of input_sv when the buffer was set up */
 };
 
 typedef struct {
@@ -53,9 +62,13 @@ typedef struct {
 
 /* utility routine */
 IV srl_validate_header_version_pv_len(pTHX_ char *strdata, STRLEN len);
+SV *srl_get_sereal_checksum(pTHX_ SV *src, UV offset);
+int srl_validate_sereal_checksum(pTHX_ SV *src, SV *key, UV offset);
 
 /* constructor; don't need destructor, this sets up a callback */
-srl_decoder_t *srl_build_decoder_struct(pTHX_ HV *opt, sv_with_hash *options);
+srl_decoder_t *srl_build_decoder_struct(pTHX_ HV *opt, sv_with_hash *options,
+                                        const U8 *known_option_heads,
+                                        const U8 *known_option_next);
 
 /* main routines */
 /* will return a mortal or the new contents of into if that isn't NULL */
@@ -147,6 +160,10 @@ void srl_decoder_destructor_hook(pTHX_ void *p);
  * If not set (the default), a disallowed class causes an exception. */
 #define SRL_F_DECODER_THAW_DENY_RAW             0x00100000UL
 
+#define SRL_UNDEF_DEADLY_UNDEF 0
+#define SRL_UNDEF_DEADLY_WARN  1
+#define SRL_UNDEF_DEADLY_DIE   2
+
 
 #define SRL_F_DECODER_ALIAS_CHECK_FLAGS   ( SRL_F_DECODER_ALIAS_SMALLINT | SRL_F_DECODER_ALIAS_VARINT | SRL_F_DECODER_USE_UNDEF )
 #define SRL_F_DECODER_READONLY_FLAGS   ( SRL_F_DECODER_SET_READONLY | SRL_F_DECODER_SET_READONLY_SCALARS )
@@ -165,9 +182,15 @@ void srl_decoder_destructor_hook(pTHX_ void *p);
 )
 
 /* Options Parsing related code */
+#define SRL_OPTION_INDEX_BUCKETS 64
 #define SRL_INIT_OPTION(idx, str) STMT_START {                          \
     MY_CXT.options[idx].sv = newSVpvn((str ""), (sizeof(str) - 1));     \
     PERL_HASH(MY_CXT.options[idx].hash, (str ""), (sizeof(str) - 1));   \
+    {                                                                   \
+        U32 bucket = MY_CXT.options[idx].hash & (SRL_OPTION_INDEX_BUCKETS - 1); \
+        MY_CXT.known_option_next[idx] = MY_CXT.known_option_heads[bucket]; \
+        MY_CXT.known_option_heads[bucket] = (idx) + 1;                   \
+    }                                                                   \
 } STMT_END
 
 /* NOTE WELL: WHEN YOU ADD AN OPTION YOU **MUST** ADD A
@@ -234,10 +257,29 @@ void srl_decoder_destructor_hook(pTHX_ void *p);
 #define SRL_DEC_OPT_STR_THAW_DENY_ACTION           "thaw_deny_action"
 #define SRL_DEC_OPT_IDX_THAW_DENY_ACTION           19
 
+#define SRL_DEC_OPT_STR_CHECKSUM_KEY_V1            "checksum_key_v1"
+#define SRL_DEC_OPT_IDX_CHECKSUM_KEY_V1            20
+#define SRL_DEC_OPT_STR_CHECKSUM_KEY_V2            "checksum_key_v2"
+#define SRL_DEC_OPT_IDX_CHECKSUM_KEY_V2            21
+#define SRL_DEC_OPT_STR_CHECKSUM_POLICY             "checksum_policy"
+#define SRL_DEC_OPT_IDX_CHECKSUM_POLICY             22
+#define SRL_DEC_OPT_STR_CHECKSUM_KEY_V3             "checksum_key_v3"
+#define SRL_DEC_OPT_IDX_CHECKSUM_KEY_V3             23
+#define SRL_DEC_OPT_STR_UNDEF_DEADLY_POLICY         "undef_deadly_policy"
+#define SRL_DEC_OPT_IDX_UNDEF_DEADLY_POLICY         24
+
+#define SRL_DEC_OPT_STR_UNKNOWN_OPTION_POLICY       "unknown_option_policy"
+#define SRL_DEC_OPT_IDX_UNKNOWN_OPTION_POLICY       25
+
+#define SRL_DEC_OPT_STR_CHECKSUM_KEY                "checksum_key"
+#define SRL_DEC_OPT_IDX_CHECKSUM_KEY                26
+#define SRL_DEC_OPT_STR_CHECKSUM_MODE               "checksum_mode"
+#define SRL_DEC_OPT_IDX_CHECKSUM_MODE               27
+
 /* NOTE WELL: WHEN YOU ADD AN OPTION YOU **MUST** ADD A
  * CORRESPONDING CALL TO SRL_INIT_OPTION() to Decoder.xs */
 
-#define SRL_DEC_OPT_COUNT                           20
+#define SRL_DEC_OPT_COUNT                           28
 
 #if ((PERL_VERSION > 10) || (PERL_VERSION == 10 && PERL_SUBVERSION > 1 ))
 #   define MODERN_REGEXP

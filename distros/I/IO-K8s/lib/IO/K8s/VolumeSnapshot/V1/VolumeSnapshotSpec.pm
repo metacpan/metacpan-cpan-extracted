@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSpec;
 # ABSTRACT: spec defines the desired characteristics of a snapshot requested by a user.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s source                  => '+IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSource', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSpec - spec defines the desired chara
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 source
 
@@ -49,7 +49,7 @@ Empty string is not allowed for this field.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -77,5 +77,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -257,6 +257,24 @@ subtest 'picture: aspect is met by the whole canvas' => sub {
   cmp_ok( $ratio->( aspect => 9 / 16 ), '<', 1, '9/16: an upright one' );
 };
 
+subtest 'picture: aspect counts the title and a wrapping legend' => sub {
+  my @phase = ( qw( Running Pending Blocked NeedsConfig Disabled Error Stopped NotDeployed ), 'Bogus' );
+  my $combs = [ map { +{ metadata => { name => sprintf( 'c%02d', $_ ) }, status => { phase => $phase[ $_ % 9 ] } } } 1 .. 12 ];
+  my $title = 'A very long title for the wall screen of the whole lab cluster';
+  my $ratio = sub {
+    my ( undef, undef, $width, $height )
+      = split ' ', picture( $combs, layout => 'packed', title => $title, @_ )->findvalue('/s:svg/@viewBox');
+    return $width / $height;
+  };
+  for my $aspect ( 16 / 9, 1, 9 / 16 ) {
+    my ( $closest ) = sort { $a <=> $b }
+      map { abs( log( $ratio->( columns => $_ ) ) - log($aspect) ) } 1 .. 12;
+    ok( abs( abs( log( $ratio->( aspect => $aspect ) ) - log($aspect) ) - $closest ) < 1e-9,
+      r2($aspect).': with a long title and a nine-entry legend no column count is closer' );
+  }
+  cmp_ok( abs( log( $ratio->( aspect => 1 ) ) ), '<', 0.05, 'a square target is met within 5% despite the long title' );
+};
+
 subtest 'picture: groups' => sub {
   my $xpc = picture( fixture('groups'), layout => 'packed', group_label => 'tier' );
   is_deeply( [ map { $_->getAttribute('data-group') } $xpc->findnodes('//s:g[@data-group]') ],

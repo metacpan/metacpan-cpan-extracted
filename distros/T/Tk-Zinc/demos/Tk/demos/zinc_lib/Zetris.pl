@@ -4,7 +4,7 @@
 #
 #  Zetris - A Zinc Toy-Appli based on cool TkTetris from Slaven Rezic
 #
-#  $Id: Zetris.pl,v 1.9 2003/11/28 09:43:10 mertz Exp $
+#  $Id$
 #
 #  Copyright (C) 2002 Centre d'Etudes de la Navigation Aérienne
 #  Author: Marcellin Buisson <buisson@cena.fr>
@@ -75,7 +75,7 @@ use Getopt::Long;
 
 use vars qw($VERSION);
 
-$VERSION = sprintf("%d.%00d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%00d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 my $max_size     = 4;
 my $nmbr_blks    = 7;

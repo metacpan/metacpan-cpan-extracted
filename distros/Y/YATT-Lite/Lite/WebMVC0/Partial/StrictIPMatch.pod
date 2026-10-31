@@ -1,0 +1,93 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+YATT::Lite::WebMVC0::Partial::StrictIPMatch -- CIDR / IPv6 aware matching for allow_debug_from and trusted_proxies
+
+=head1 SYNOPSIS
+
+=for code perl
+
+In app.psgi:
+
+  use YATT::Lite::WebMVC0::SiteApp -as_base;
+  use YATT::Lite::WebMVC0::Partial::StrictIPMatch -as_base;
+
+  my MY $site = MY->load_factory_for_psgi(
+    $0,
+    allow_debug_from => ['10.0.0.0/8', '2001:db8::/32', '::1'],
+    trusted_proxies  => ['172.16.0.0/12'],
+    ...
+  );
+
+=head1 DESCRIPTION
+
+L<SiteApp|YATT::Lite::WebMVC0::SiteApp> compares the client address
+with L<allow_debug_from|YATT::Lite::WebMVC0::SiteApp/allow_debug_from>
+and L<trusted_proxies|YATT::Lite::WebMVC0::SiteApp/trusted_proxies>
+as literal strings, exactly. That is deliberately cheap (no parsing,
+no extra module at startup, which matters under CGI) but it cannot
+express a range, and it does not know that C<::1>,
+C<0:0:0:0:0:0:0:1> and C<::ffff:127.0.0.1> are the same host.
+
+This Partial overrides the single hook SiteApp uses to build both
+matchers, C<compile_addr_matcher>, with real address parsing via
+L<Socket>'s C<inet_pton> (core perl):
+
+=over 4
+
+=item *
+
+Entries may be single addresses (C<10.1.2.3>, C<2001:db8::1>) or
+CIDR ranges (C<10.0.0.0/8>, C<2001:db8::/32>, C<0.0.0.0/0>).
+
+=item *
+
+IPv6 addresses are compared after normalization, so spelling does
+not matter.
+
+=item *
+
+IPv4-mapped IPv6 addresses (C<::ffff:10.1.2.3>, as seen on an IPv6
+listening socket) are matched as the IPv4 address.
+
+=item *
+
+An entry that is not an address or CIDR croaks when the site is
+configured (C<Invalid address or CIDR in allow_debug_from: ...>),
+instead of silently never matching.
+
+=item *
+
+A client address that cannot be parsed never matches.
+
+=back
+
+Nothing else changes: the defaults (C<127.0.0.1>, C<::1>), the
+header handling of C<trusted_proxies> and the entity
+C<&yatt:is_debug_allowed_ip();> are those of SiteApp.
+
+=head1 METHODS
+
+=head2 compile_addr_matcher($name, $list)
+
+Returns a predicate C<< sub { $_[0] matches } >> for the list.
+C<$name> is the config name, used in error messages.
+
+=head2 parse_ip_address($string)
+
+Returns C<($packed, $family)> for an address string, or an empty
+list when it is not one. IPv4-mapped IPv6 addresses come back as
+C<AF_INET>.
+
+=head1 SEE ALSO
+
+L<YATT::Lite::WebMVC0::SiteApp>
+
+=head1 AUTHOR
+
+"KOBAYASI, Hiroaki" <hkoba@cpan.org>
+
+=cut

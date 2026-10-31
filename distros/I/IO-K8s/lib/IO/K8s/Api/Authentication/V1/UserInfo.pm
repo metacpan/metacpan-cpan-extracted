@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::UserInfo;
 # ABSTRACT: UserInfo holds the information about the user needed to implement the user.Info interface.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s extra => HashRef[ArrayRef[Str]];
@@ -29,7 +29,7 @@ IO::K8s::Api::Authentication::V1::UserInfo - UserInfo holds the information abou
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 extra
 
@@ -51,7 +51,7 @@ The name that uniquely identifies this user among all active users.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -79,5 +79,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

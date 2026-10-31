@@ -1,5 +1,19 @@
 Revision history for Net-Async-Kubernetes
 
+0.012     2026-10-30 22:33:35Z
+ - The skill perl-net-async-kubernetes ships in .claude/skills/ for
+   projects that call Net::Async::Kubernetes: install it with skilletor as
+   perl-net-async-kubernetes@p5-net-async-kubernetes.
+ - port_forward_listen works on perls with Future::XS installed: a
+   connection whose session request fails is closed and the error reported,
+   the request itself fails with the transport error, and
+   `t/51-port-forward-listen.t` passes there. A session that opens after its
+   connection has ended is closed at once. (GitHub issue 3)
+ - port_forward, exec and attach keep their request alive until it is ready:
+   on_error receives a connect failure and the websocket client is detached
+   even when the caller keeps no reference to the returned future or drops it
+   from inside on_error, with Future and with Future::XS.
+
 0.011     2026-10-21 20:17:11Z
 
  - Forgotten requirements bumping: cpanfile now requires Kubernetes::REST 1.110

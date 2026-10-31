@@ -164,19 +164,38 @@ widget を呼び出すには、 `<yatt:... >` で始まるタグを書きます�
 
 ## widget search order
 
-widget は
+widget は以下の順序で検索されます:
 
-- 同一ファイル内
-- → 同一ディレクトリ内
-- → 他に指定されたテンプレートディレクトリ
+1. **マクロ (組み込みwidget)** - `if`, `foreach`, `my` など、`YATT::Lite::CGen::Perl`の`macro_*`メソッドとして実装されたもの
+2. **同一ファイル内** - 現在のテンプレートファイル内で定義されたwidget
+3. **同一ディレクトリ内** - 同じディレクトリの他のファイルで定義されたwidget
+4. **他の指定されたテンプレートディレクトリ** - 設定で指定された他のテンプレートディレクトリ
 
-の順で検索され、最初に見つかったものが使われます。**検索はコンパイル時に** 行われ、
+最初に見つかったものが使われます。**検索はコンパイル時に** 行われ、
 見つからない場合はコンパイルエラーとなります。
 
 ## widget **path**
 
 別のファイルやディレクトリ内で定義された widget を呼び出す事も可能です。
 この場合、パス名を `:` でつなげて書きます。(拡張子 `.yatt` は省いて下さい)
+
+### ファイルとディレクトリが共存する場合
+
+`foo.yatt` ファイルと `foo/` ディレクトリが同時に存在する場合、`<yatt:foo:bar/>` という呼び出しに対して、以下の順序で検索されます：
+
+1. `foo.yatt` の中の `<!yatt:widget bar>` 
+2. `foo/bar.yatt` のデフォルトwidget（`<!yatt:args>`）
+
+つまり、ファイル内のwidgetが優先されます。
+
+### 名前空間ディレクトリの優先検索
+
+`<yatt:foo:bar/>` のようなwidget呼び出しは、実際には2回の検索が行われます：
+
+1. **名前空間付き検索**：`yatt/foo/bar.yatt` や `yatt/foo.yatt` の中の `<!yatt:widget bar>`
+2. **名前空間無し検索**：`foo/bar.yatt` や `foo.yatt` の中の `<!yatt:widget bar>`
+
+通常は名前空間（この例では`yatt`）は無視されますが、もし名前空間と同名のディレクトリ（`yatt/`）が存在する場合は、そちらが優先されます。これは組織名やプロジェクト名を名前空間として使用する場合に便利な機能です。
 
 例えばファイル `foo/bar.yatt` の中に
 
@@ -245,6 +264,15 @@ body は (明示的に宣言しない限り) `code` 型とされます。
 </div>
 ```
 
+body の出力は、`<yatt:my>` の閉じタグ形式で
+変数に取り込むことも出来ます。
+
+```html
+<!yatt:widget foo>
+<yatt:my content>&yatt:body();</yatt:my>
+...&yatt:content;...
+```
+
 ## attribute element
 
 閉じタグを使う `<yatt:...> ... </yatt:...>`形式で
@@ -307,6 +335,18 @@ yatt のタグは widget の呼び出しだけではなく、
 </yatt:my>
 ```
 
+本体の中で widget や [body](#body-argument) などの ["code"](#code) 型の引数を呼び出すと、
+その出力はその場には出力されず、変数の値に取り込まれます。
+
+```html
+<yatt:my foo>
+  <yatt:bar/> &yatt:body();
+</yatt:my>
+```
+
+(属性値の中で呼び出した場合も取り込まれますが、型が ["text"](#text) なので、
+取り込んだ html は出力時に escape されます。)
+
 ## `yatt:if`, `:yatt:else`
  
 
@@ -325,18 +365,19 @@ yatt のタグは widget の呼び出しだけではなく、
 ## `yatt:foreach`
 
 
-ループを書く時に使います。 `list="..."` にリストを作る式を渡すと、
-そのリストに対してループします。 `my=var` でループ変数を宣言出来ます。
-宣言を省略した場合は `&yatt:_;` が使われます。
+ループを書く時に使います。`varName`, `varName=typeName` または `varName:typeName`
+でループ変数を宣言します。（typeName を省略したときは text 型になります）
+ループ対象のリストを作る式は `list="..."` で渡します。
+ループ変数の宣言を省略した場合は `&yatt:_;` が使われます。
 
 ```html
-<yatt:foreach my=row list="&yatt:some_db_query();">
+<yatt:foreach row:value list="&yatt:some_db_query();">
   ...DB から取り出した一行毎に...
 </yatt:foreach>
 ```
 
-my で変数を宣言する時に型を指定するには、(変則的ですが)
-`my:型名=` のように、 `my` と `=` の間に `:型名` で型を指定します。
+ループ変数の宣言には `my=varName`, `my:typeName=varName` とする別記法も存在します。
+現在も有効ですが、他の変数宣言と並びが異なり覚えにくいため、徐々に廃止予定です。
 
 ```html
 <yatt:foreach my:list=row list="&yatt:some_db_query();">
@@ -1054,9 +1095,10 @@ ginger= "?"
 ## `code`
 
 
-条件式や widget を渡したいときに使います。遅延評価されます。
+widget のように出力を書く処理を渡したいときに使います。遅延評価されます。
 widget の場合、更に引数の型指定が可能です。
 ([暗黙の body 引数](#body-argument)はこの型になります。)
+条件式など、値を計算する式を渡したいときは [expr](#expr) 型を使います。
 
 ```html
 <!yatt:widget myquote  author=[code name=text url=text]>
@@ -1067,6 +1109,68 @@ widget の場合、更に引数の型指定が可能です。
  ...
 </yatt:foreach>
 ```
+
+`code` 型の値は、widget と同じく出力を書き込む関数 (renderer) です。
+Perl 側では、第一引数に出力先の `$CON` を受け取り、
+その後に宣言した引数が続く closure になっています。
+Perl のコードから呼び出すときは、`$CON` を渡してください。
+
+```perl
+$body->($CON);
+$author->($CON, $name, $url);
+```
+
+**(Compatibility)** 以前は `$CON` を受け取らず、
+呼び出し元の `$CON` に書き込んでいました (`$body->()`)。
+そのため `<yatt:my>` で出力を取り込むことが出来ませんでした (GH-293)。
+
+## `expr`
+
+
+条件式など、値を計算する式を渡したいときに使います。
+[value](#value) 型と違って遅延評価され、`&yatt:x();` と呼び出すたびに計算されます。
+呼び出した結果は値なので、出力位置では escape して出力され、
+`if` の条件や `list` などの式の中ではそのまま値として使えます。
+
+```html
+<yatt:foo cond="&yatt:x; > 2"/>
+
+<!yatt:widget foo cond=expr>
+<yatt:if "&yatt:cond();">
+  ...
+</yatt:if>
+```
+
+[code](#code) 型と同じく、引数の型指定が可能です。
+
+```html
+<yatt:mylist dbl="&yatt:n; * 2"/>
+
+<!yatt:widget mylist dbl=[expr n]>
+<yatt:foreach my=i list="1..3">[&yatt:dbl(:i);]</yatt:foreach>
+```
+
+この結果は以下のように表示されます。
+
+```
+[2][4][6]
+```
+
+`<yatt:my f:expr="3 * 3"/>` のように、変数を作ることも出来ます。
+
+`expr` は widget ではないので、以下はエラーになります。
+
+- `<yatt:cond/>` のように要素として呼び出すこと。
+- `<:yatt:cond>...</:yatt:cond>` のように要素で渡すこと、
+`<yatt:my f:expr>...</yatt:my>` のように本体を持たせること。
+- `code` 型の変数と `expr` 型の変数の間で、
+`x=y` のように受け渡すこと。
+
+Perl 側では、引数を受け取って値を返す普通の関数 (CODE ref) です。
+`code` 型と違い、`$CON` は受け取りません。
+[YATT::Lite::PageConsts](https://metacpan.org/pod/YATT%3A%3ALite%3A%3APageConsts) の CODE 定数は、この型になります。
+
+**(Compatibility)** 以前は `expr` は `code` の別名でした。
 
 ## XXX: `attr`
 
@@ -1170,3 +1274,32 @@ XXX: `[delegate -exclude_var]`
 - `<?perl ... ?>`
 
     単純に処理だけ行います。
+
+# Template Inheritance (継承)
+
+YATTではオブジェクト指向プログラミングと同様の継承関係をテンプレートディレクトリ間に設定できます。これは複雑な機能ですが、大規模なWebアプリケーションの構築には非常に有用です。
+
+## デフォルトの継承関係
+
+標準的な構成では、`public/` ディレクトリは自動的に `ytmpl/` ディレクトリを継承します。これにより、`public/` の下の任意のwidgetから `ytmpl/` の下の任意のwidgetを呼び出すことができます。
+
+## ディレクトリレベルの継承設定
+
+`.htyattconfig.xhf` ファイルで `base:` 要素を指定することで、ディレクトリ全体の親テンプレートディレクトリを設定できます：
+
+```
+base: ../shared/templates
+```
+
+## ファイルレベルの継承宣言
+
+個々のテンプレートファイル内でも継承を宣言できます：
+
+```html
+<!yatt:base file="otherfile.yatt">
+<!yatt:base dir="other/directory">
+```
+
+## 多重継承
+
+YATTは多重継承をサポートしており、複数の親ディレクトリやファイルから継承することができます。widget検索時は、すべての継承元を順に探索します。

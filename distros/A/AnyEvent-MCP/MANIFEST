@@ -8,6 +8,8 @@ bin/anyevent-mcp-askpermission
 bin/anyevent-mcp-form-elicitation
 bin/mcp-fs
 bin/mcp-multibroker
+bin/mcp-imap
+bin/mcp-http
 bin/mcp-vim
 bin/mcp-webbrowser
 bin/mcp-ask-user
@@ -21,6 +23,7 @@ lib/AnyEvent/MCP/Client/JSONL.pm
 lib/AnyEvent/MCP/Client/Request.pm
 lib/AnyEvent/MCP/Config.pm
 lib/AnyEvent/MCP/File.pm
+lib/AnyEvent/MCP/Worker/IMAP.pm
 lib/AnyEvent/MCP/Extension.pm
 lib/AnyEvent/MCP/Workdirs.pm
 lib/AnyEvent/MCP/Permissions/Ask.pm
@@ -57,5 +60,7 @@ t/20_workdirs.t
 t/21_connect.t
 t/22_webbrowser.t
 t/23_http_hook.t
+t/24_imap.t
+t/25_http.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -12,7 +12,7 @@ use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
 
 use File::Temp qw/tempdir/;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use YATT::Lite::Util qw/combination/;
 use File::Path qw(make_path);
 use Cwd;
@@ -74,19 +74,19 @@ describe "site_config", sub {
 
       describe "&yatt:user_defined_config_like_bar();", sub {
 
-        MY->mkfile("$html_dir/index.yatt", <<'END');
+        MY->mkfile_may_wait("$html_dir/index.yatt", <<'END');
 app_name is &yatt:app_name();
 bar is &yatt:bar();
 END
 
-        MY->mkfile("$html_dir/enttest.yatt", <<'END');
+        MY->mkfile_may_wait("$html_dir/enttest.yatt", <<'END');
 
 app_name=&yatt:site_config(){app_name};
 bar=&yatt:site_config(bar);
 END
 
 
-        MY->mkfile("$app_root/$config_fn", <<'END');
+        MY->mkfile_may_wait("$app_root/$config_fn", <<'END');
 app_name: foo
 bar: baz
 xx.yy: zz
@@ -104,7 +104,7 @@ END
           describe "After update, read from $config_fn", sub {
 
             # Update config.
-            MY->mkfile("$app_root/$config_fn", <<'END');
+            MY->mkfile_may_wait("$app_root/$config_fn", <<'END');
 app_name: FOO
 bar: BAZ
 xx-yy: zz

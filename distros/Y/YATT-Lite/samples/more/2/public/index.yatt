@@ -1,0 +1,11 @@
+<yatt:layout>
+  <h2>Hello</h2>
+  <yatt:foo:items/>
+</yatt:layout>
+
+<!yatt:widget layout>
+<html>
+
+<yatt:body/>
+
+</html>

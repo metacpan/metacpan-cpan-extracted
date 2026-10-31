@@ -8,8 +8,7 @@ use Test::Most;
 use Storable;
 use Capture::Tiny ':all';
 use autodie qw(:all);
-use lib 't/lib';
-use MyLogger;
+use Test::Needs 'Test::Log::Abstraction';
 
 eval "use Test::Without::Module qw(CHI)";
 
@@ -51,7 +50,7 @@ NOCACHED: {
 					optimise_content => 1,
 					generate_etag => 0,
 					cache_key => 'test1',
-					logger => MyLogger->new()
+					logger => Test::Log::Abstraction->new()
 				})->can_cache() == 1);
 
 				print "Content-type: text/html; charset=ISO-8859-1\n\n";

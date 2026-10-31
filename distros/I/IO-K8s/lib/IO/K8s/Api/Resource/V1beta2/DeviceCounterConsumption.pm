@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceCounterConsumption;
 # ABSTRACT: DeviceCounterConsumption defines a set of counters that a device will consume from a CounterSet.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s compatibilityGroups => [Str];
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceCounterConsumption - DeviceCounterConsump
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 compatibilityGroups
 
@@ -52,7 +52,7 @@ Counters defines the counters that will be consumed by the device.  The maximum 
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -80,5 +80,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

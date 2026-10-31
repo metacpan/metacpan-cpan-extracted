@@ -74,7 +74,7 @@ $i = 1;
 AAA
 <yatt:bar/>
 <?yatt= __PACKAGE__?>
-&yatt:template(){cf_usage};
+&yatt:template(){usage};
 <!yatt:widget bar>
 barrrr
 <!yatt:config usage="BBB">

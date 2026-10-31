@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 
 =encoding utf-8
 
@@ -61,7 +61,9 @@ Enable text folding for list items and definition lists.  Long lines
 are wrapped with proper indentation using L<ansifold(1)|App::ansifold>
 via L<Greple::tee>.  Code blocks, HTML comments, and tables are
 excluded from folding.  The fold width is controlled by the
-C<foldwidth> config parameter (default: 80).
+C<foldwidth> config parameter (default: 80), and the run-in and
+run-out widths for line breaking (kinsoku) by C<fold_runin> and
+C<fold_runout> (default: 4, as in ansifold).
 
     greple -Mmd -- --fold file.md
     greple -Mmd::config(foldwidth=60) -- --fold file.md
@@ -203,6 +205,8 @@ Available parameters:
     colorize        syntax highlighting (default: 1)
     foldlist        text folding (default: 0)
     foldwidth       fold width in columns (default: 80)
+    fold_runin      run-in width in folded lines (default: 4)
+    fold_runout     run-out width in folded lines (default: 4)
     table           table formatting (default: 1)
     table_trim      trim cell whitespace (default: 1)
     table_width     table width in columns; cells of over-wide
@@ -238,6 +242,17 @@ supported terminals (iTerm2, Kitty, WezTerm, Ghostty, etc.).
 Disable with:
 
     greple -Mmd::config(osc8=0) file.md
+
+=head2 Settings of the User
+
+The module runs B<ansifold> and B<ansicolumn> for folding and tables.
+They are run as functions in the greple process, or as separate
+processes with C<nofork=0>, and either way they do not read the rc
+files of the user, F<~/.ansifoldrc> and F<~/.ansicolumnrc>: the
+module puts their names in the environment variable
+C<GETOPTEX_NO_USER_SETTINGS> (see L<Getopt::EX::Long>), so that the
+output does not change by the settings made for them on the command
+line.
 
 =head1 COLOR LABELS
 
@@ -375,6 +390,8 @@ my $config = Getopt::EX::Config->new(
     colorize   => 1,   # syntax highlighting
     foldlist   => 0,   # text folding
     foldwidth  => 80,  # fold width
+    fold_runin  => 4,  # run-in width in folded lines (ansifold default)
+    fold_runout => 4,  # run-out width in folded lines (ansifold default)
     table      => 1,   # table formatting
     table_trim => 1,   # trim cell content whitespace
     table_width => 0,  # table width; wrap over-wide cells (0 = off)
@@ -467,9 +484,11 @@ my %show;
 
 sub finalize {
     my($mod, $argv) = @_;
+    no_user_settings(qw(ansicolumn ansifold));
     $config->deal_with($argv,
                        "mode|m=s", "base_color|B=s",
-                       "colorize!", "nofork!", "foldlist!", "foldwidth=i", "table!", "table_trim!",
+                       "colorize!", "nofork!", "foldlist!", "foldwidth=i", "fold_runin=i", "fold_runout=i",
+                       "table!", "table_trim!",
                        "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s",
                        "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s",
                        "heading_markup|hm:s", "tick_open=s", "tick_close=s",
@@ -482,12 +501,28 @@ sub finalize {
         $config->{heading_markup} = 'all';
     }
     if (my $w = $config->{foldwidth}) {
-        $mod->setopt('--fold', "--fold-by $w");
+        my $fold = join ' ', '--fold-by', $w, @{$config}{qw(fold_runin fold_runout)};
+        $mod->setopt('--fold', $fold);
         if ($config->{foldlist}) {
             my @default = $mod->default;
-            $mod->setopt('default', @default, "--fold-by $w");
+            $mod->setopt('default', @default, $fold);
         }
     }
+}
+
+# ansicolumn and ansifold are called as functions in this process
+# (Command::Run), or as separate processes by the tee module in fork
+# mode.  Either way they must not read the rc files of the user, so
+# their names go into GETOPTEX_NO_USER_SETTINGS (Getopt::EX >= 3.05),
+# which Getopt::EX::Long reads when the program first runs.  Names
+# already there are kept, and 1 or * (all programs) is left as it is.
+sub no_user_settings {
+    my @names = @_;
+    my $env = $ENV{GETOPTEX_NO_USER_SETTINGS} // '';
+    return if $env eq '1' or $env eq '*';
+    my %have = map { $_ => 1 } split /[\s,]+/, $env;
+    $ENV{GETOPTEX_NO_USER_SETTINGS} =
+	join ' ', grep { length } $env, grep { !$have{$_}++ } @names;
 }
 
 sub setup_colors {
@@ -972,7 +1007,7 @@ define {DEFINITION}  (?:\A|\G\n|\n\n).+\n\n?(:\h+.*\n)
 option --fold-by \
     -Mtee "&ansifold" --crmode \
         --autoindent='^\h*(?:[*-]|(?:\d+|#)[.)]|:)\h+|^\h+' \
-        --smart --width=$<shift> \
+        --smart --width=$<shift> --runin=$<shift> --runout=$<shift> \
     -- \
     --exclude {CODE_BLOCK} \
     --exclude {COMMENT} \

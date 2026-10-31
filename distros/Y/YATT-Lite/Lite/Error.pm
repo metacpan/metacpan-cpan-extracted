@@ -8,10 +8,10 @@ use Exporter qw/import/;
 our @EXPORT_OK = qw/Error/;
 our @EXPORT = @EXPORT_OK;
 
-use YATT::Lite::MFields qw/cf_file cf_line cf_tmpl_file cf_tmpl_line
-			   cf_http_status_code
-	      cf_backtrace
-	      cf_reason cf_format cf_args/;
+use YATT::Lite::MFields qw/file line tmpl_file tmpl_line
+			   http_status_code
+	      backtrace
+	      reason format args/;
 use overload qw("" message
 		eq streq
 		bool has_error
@@ -33,7 +33,7 @@ sub streq {
 sub message {
   my Error $error = shift;
   my $msg = $error->reason . $error->place;
-  $msg .= $error->{cf_backtrace} // '' if DEBUG_VERBOSE;
+  $msg .= $error->{backtrace} // '' if DEBUG_VERBOSE;
   $msg;
 }
 
@@ -46,10 +46,10 @@ sub byte_message {
 
 sub reason {
   my Error $error = shift;
-  if ($error->{cf_reason}) {
-    $error->{cf_reason};
-  } elsif ($error->{cf_format}) {
-    if (Scalar::Util::tainted($error->{cf_format})) {
+  if ($error->{reason}) {
+    $error->{reason};
+  } elsif ($error->{format}) {
+    if (Scalar::Util::tainted($error->{format})) {
       croak "Format is tainted in error reason("
 	.join(" ", map {
 	  if (defined $_) {
@@ -57,14 +57,14 @@ sub reason {
 	  } else {
 	    '(undef)'
 	  }
-	} $error->{cf_format}, lexpand($error->{cf_args})).")";
+	} $error->{format}, lexpand($error->{args})).")";
     }
     BEGIN {
       warnings->unimport(qw/redundant/) if $] >= 5.021002; # for sprintf
     }
-    sprintf $error->{cf_format}, map {
+    sprintf $error->{format}, map {
       defined $_ ? $_ : '(undef)'
-    } lexpand($error->{cf_args});
+    } lexpand($error->{args});
   } else {
     "Unknown reason!"
   }
@@ -73,10 +73,10 @@ sub reason {
 sub place {
   (my Error $err) = @_;
   my $place = '';
-  $place .= " at file $err->{cf_tmpl_file}" if $err->{cf_tmpl_file};
-  $place .= " line $err->{cf_tmpl_line}" if $err->{cf_tmpl_line};
-  if ($err->{cf_file}) {
-    $place .= ",\n reported from YATT Engine: $err->{cf_file} line $err->{cf_line}";
+  $place .= " at file $err->{tmpl_file}" if $err->{tmpl_file};
+  $place .= " line $err->{tmpl_line}" if $err->{tmpl_line};
+  if ($err->{file}) {
+    $place .= ",\n reported from YATT Engine: $err->{file} line $err->{line}";
   }
   $place .= "\n" if $place ne ""; # To make 'warn/die' happy.
   $place;

@@ -5,8 +5,25 @@ use warnings;
 use Carp qw/croak/;
 use XSLoader;
 
-our $VERSION    = '5.011';
+our $VERSION    = '6.002';
 our $XS_VERSION = $VERSION; $VERSION = eval $VERSION;
+
+our $ChecksumPolicy;
+our $UnknownOptionPolicy;
+our $ChecksumMode;
+our $DefaultKey;
+$Sereal::ChecksumMode = $ENV{SEREAL_CHECKSUM_MODE}
+    if !defined($Sereal::ChecksumMode) && defined($ENV{SEREAL_CHECKSUM_MODE}) && length($ENV{SEREAL_CHECKSUM_MODE});
+$ChecksumMode = $ENV{SEREAL_ENCODER_CHECKSUM_MODE}
+    if !defined($ChecksumMode) && defined($ENV{SEREAL_ENCODER_CHECKSUM_MODE}) && length($ENV{SEREAL_ENCODER_CHECKSUM_MODE});
+$Sereal::ChecksumPolicy = $ENV{SEREAL_CHECKSUM_POLICY}
+    if !defined($Sereal::ChecksumPolicy) && defined($ENV{SEREAL_CHECKSUM_POLICY}) && length($ENV{SEREAL_CHECKSUM_POLICY});
+$ChecksumPolicy = $ENV{SEREAL_ENCODER_CHECKSUM_POLICY}
+    if !defined($ChecksumPolicy) && defined($ENV{SEREAL_ENCODER_CHECKSUM_POLICY}) && length($ENV{SEREAL_ENCODER_CHECKSUM_POLICY});
+$Sereal::UnknownOptionPolicy = $ENV{SEREAL_UNKNOWN_OPTION_POLICY}
+    if !defined($Sereal::UnknownOptionPolicy) && defined($ENV{SEREAL_UNKNOWN_OPTION_POLICY}) && length($ENV{SEREAL_UNKNOWN_OPTION_POLICY});
+$UnknownOptionPolicy = $ENV{SEREAL_ENCODER_UNKNOWN_OPTION_POLICY}
+    if !defined($UnknownOptionPolicy) && defined($ENV{SEREAL_ENCODER_UNKNOWN_OPTION_POLICY}) && length($ENV{SEREAL_ENCODER_UNKNOWN_OPTION_POLICY});
 
 # Make sure to keep these constants in sync with the C code in srl_encoder.c.
 # I know they could be exported from C using things like ExtUtils::Constant,
@@ -69,7 +86,8 @@ $full_consts=
                     'SORT_KEYS_PERL',
                     'SORT_KEYS_PERL_REV',
                     'COMPRESS_ZSTD',
-                    'USE_STANDARD_DOUBLE'
+                    'USE_STANDARD_DOUBLE',
+                    'FREEZE_DENY_SERIALIZE'
                   ]
 }; #end generated
 }
@@ -81,6 +99,10 @@ use Exporter 'import';
 our @EXPORT_OK = ( qw(
         encode_sereal
         encode_sereal_with_header_data
+        prepare_checksum_key
+        siphash24
+        siphash24_128
+        siphash36_128
         sereal_encode_with_object
     ),
     sort { $a cmp $b } (
@@ -98,6 +120,30 @@ our @EXPORT = ( ( caller() )[1] eq '-e' ? @EXPORT_OK : () );
 sub CLONE_SKIP { 1 }
 
 XSLoader::load( 'Sereal::Encoder', $XS_VERSION );
+if ( !defined($DefaultKey) && defined( $ENV{SEREAL_ENCODER_DEFAULT_KEY} ) ) {
+    my $key = $ENV{SEREAL_ENCODER_DEFAULT_KEY};
+    if ( $key =~ /\A[0-9a-fA-F]{32}\z/ ) {
+        $DefaultKey = pack( 'H*', $key );
+    }
+    else {
+        warn "SEREAL_ENCODER_DEFAULT_KEY is not exactly 32 hexadecimal characters; normalizing with Sereal::Encoder::prepare_checksum_key()\n";
+        $DefaultKey = prepare_checksum_key($key);
+    }
+}
+unless ($Sereal::_DefaultKeyInitialized) {
+    if ( !defined($Sereal::DefaultKey) && defined( $ENV{SEREAL_DEFAULT_KEY} ) ) {
+        my $key = $ENV{SEREAL_DEFAULT_KEY};
+        if ( $key =~ /\A[0-9a-fA-F]{32}\z/ ) {
+            $Sereal::DefaultKey = pack( 'H*', $key );
+        }
+        else {
+            warn
+                "SEREAL_DEFAULT_KEY is not exactly 32 hexadecimal characters; normalizing with Sereal::Encoder::prepare_checksum_key()\n";
+            $Sereal::DefaultKey = prepare_checksum_key($key);
+        }
+    }
+    $Sereal::_DefaultKeyInitialized = 1;
+}
 
 sub encode_to_file {
     my ( $self, $file, $struct, $append ) = @_;
@@ -155,7 +201,10 @@ If you care greatly about performance, consider reading the L<Sereal::Performanc
 documentation after finishing this document.
 
 The Sereal protocol version emitted by this encoder implementation is currently
-protocol version 5 by default.
+protocol version 6 by default. When explicitly asked to emit protocol version 5
+or earlier, it uses the integer encodings defined for that version.
+Protocol version 6 documents require a decoder with protocol version 6 support,
+so upgrade the decoder before switching the encoder to its default output.
 
 The protocol specification and many other bits of documentation
 can be found in the github repository. Right now, the specification is at
@@ -169,6 +218,41 @@ at the L</"PERFORMANCE"> section below.
 
 =head1 CLASS METHODS
 
+=head2 prepare_checksum_key
+
+  my $key16 = Sereal::Encoder::prepare_checksum_key($key);
+  my $key16 = Sereal::Encoder::prepare_checksum_key($key, $opt_key);
+  my $empty_key16 = Sereal::Encoder::prepare_checksum_key();
+
+Returns a deterministic 16-byte normalization of a byte string. It first
+computes SipHash-2-4-128 of C<Out damned spot!> followed by the optional
+C<$opt_key>, using C<Call me Ishmael.> as its 16-byte key. It then uses that
+result as the key to SipHash-2-4-128 of C<Luke, I am your father.> followed by
+C<$key>. Both arguments default to the empty string. This is a convenience for
+producing the required checksum-key size; it does not add entropy or replace a
+password KDF. Pass the returned value as C<checksum_key_v1>,
+C<checksum_key_v2>, or C<checksum_key_v3> to both encoder and decoder.
+
+=head2 siphash24, siphash24_128 and siphash36_128
+
+  my $tag8  = Sereal::Encoder::siphash24($bytes, $key16);
+  my $tag16 = Sereal::Encoder::siphash24_128($bytes, $key16);
+  my $tag16 = Sereal::Encoder::siphash36_128($bytes, $key16);
+  my $tag16_default = Sereal::Encoder::siphash36_128($bytes);
+
+Compute a raw SipHash tag for a byte string and an exactly 16-byte key.
+C<siphash24()> returns the eight-byte SipHash-2-4 result,
+C<siphash24_128()> returns the 16-byte SipHash-2-4-128 result, and C<siphash36_128()>
+returns the 16-byte SipHash-3-6-128 result. Each helper accepts an omitted key,
+which defaults to sixteen null bytes. Explicit keys must be exactly 16 bytes.
+These low-level helpers are
+provided for tooling that needs to inspect or verify Sereal checksum
+envelopes. The returned values are binary strings.
+
+In SipHash-c-d, c is the compression round count per message block and d is
+the round count in each finalization stage. The 128 suffix specifies the tag
+size. See the authors' L<SipHash variant documentation|https://github.com/veorq/SipHash#variants>.
+
 =head2 new
 
 Constructor. Optionally takes a hash reference as first parameter. This hash
@@ -177,6 +261,165 @@ encoder.
 
 Currently, the following options are recognized, none of them are on
 by default.
+
+=head3 checksum_policy
+
+C<'require_key'> requires a configured checksum key, either explicitly or
+through C<$Sereal::DefaultKey>. Construction fails without a key, and every
+encoded packet has a checksum. On the Decoder this policy also requires a
+configured key and rejects unsigned packets or failed verification.
+C<'require'> is an alias for C<'require_key'>.
+C<'require_v1'> is another alias. C<'require_v2'> requires at least mode 2,
+and C<'require_v3'> requires mode 3. These policies reject construction if
+the key is missing or C<checksum_mode> is below the required level. They
+also require exactly 16 key bytes. Encoder's default mode 3 satisfies every
+minimum when a valid key is configured. Decoder applies these minimum
+requirements to the algorithm specified in each document.
+
+The policy also accepts C<'die'>, C<'verify-if-available'>, C<'ignore'>, and
+C<'ignore-warn'> for consistency with the Decoder. These values do not require
+an encoding key. All policies produce a checksum when a key is configured;
+the ignore policies control verification on the Decoder, not checksum emission.
+C<'die'> and all C<'require'> policies require exactly 16 key bytes instead of padding or
+truncating them. Other policies retain normalization with a warning.
+
+C<SEREAL_CHECKSUM_POLICY> sets the shared default for new Encoder and Decoder
+objects; C<SEREAL_ENCODER_CHECKSUM_POLICY> sets the Encoder-specific default.
+These initialize C<$Sereal::ChecksumPolicy> and
+C<$Sereal::Encoder::ChecksumPolicy> at module startup when those variables are
+not already defined. The constructor option takes precedence over the
+Encoder-specific package variable, which takes precedence over the shared
+package variable. An unset policy uses C<'verify-if-available'>. Invalid
+selected values cause construction to fail. Reused objects and recursive
+clones retain their original configuration.
+
+=head3 unknown_option_policy
+
+Controls how this module handles unrecognized keys in its configuration hash.
+C<'warn'> warns for each unknown key and continues; this is the default.
+C<'die'> throws an exception, and C<'ignore'> silently ignores unknown keys.
+The same key and policy values are supported by Sereal::Decoder.
+
+The environment variables C<SEREAL_UNKNOWN_OPTION_POLICY> and
+C<SEREAL_ENCODER_UNKNOWN_OPTION_POLICY> initialize the shared
+C<$Sereal::UnknownOptionPolicy> and Encoder-specific
+C<$Sereal::Encoder::UnknownOptionPolicy> defaults at module startup, when the
+corresponding package variable is undefined. The setting is resolved from
+lowest to highest priority: the shared package variable, the Encoder-specific
+package variable, and the constructor option. If none is set, the policy is
+C<'warn'>. Undefined package or constructor values fall through to the next
+source. Accepted values are C<'warn'>, C<'die'>, and C<'ignore'>; any other
+selected value throws an exception.
+
+=head3 Shared default key
+
+C<$Sereal::DefaultKey> holds raw key bytes shared with the Decoder;
+C<$Sereal::Encoder::DefaultKey> can override the Encoder's default. If no
+checksum key option is present, a defined default enables SipHash-3-6-128
+(type 2, 128-bit tags) and requires protocol version 6 or later. An explicit
+key option replaces the default configuration; explicit C<undef> suppresses
+it. Only one key type may be configured on an Encoder.
+
+The first load of either module initializes C<$Sereal::DefaultKey> from
+C<SEREAL_DEFAULT_KEY>, unless code has already set the package variable.
+Exactly 32 hexadecimal characters are decoded to 16 bytes. Other input is
+normalized with C<prepare_checksum_key()> and a warning that omits the secret.
+The Encoder-specific C<SEREAL_ENCODER_DEFAULT_KEY> initializes
+C<$Sereal::Encoder::DefaultKey> the same way. The constructor key options take
+precedence over the Encoder-specific default, which takes precedence over the
+shared default. Loading the other module does not reset either default.
+Normalization does not
+add entropy or replace a password KDF.
+
+  local $Sereal::DefaultKey = $key16;
+  my $encoder = Sereal::Encoder->new({ checksum_policy => 'require_key' });
+
+New objects copy the current default. Existing objects, including cached
+wrapper objects, retain their keys. Localize the variable to C<undef> to
+disable the default in a scope. The environment is read for the key only at
+module load, while the policy default is read at object construction.
+
+=head3 checksum_key
+
+A 16-byte key used when checksumming is enabled. The emitted checksum format
+is selected by C<checksum_mode>. If omitted, the shared default key is used.
+
+The versioned options C<checksum_key_v1>, C<checksum_key_v2>, and
+C<checksum_key_v3> set this same key together with mode 1, 2, or 3.
+Supplying the key through multiple options warns if the values are identical
+and dies if they differ. Supplying the mode more than once warns, even when
+the modes are equal, and uses the highest numeric mode. For example,
+C<checksum_key =E<gt> $key, checksum_mode =E<gt> 1, checksum_key_v2 =E<gt> $key>
+warns about both duplicates and selects mode 2. Constructor arguments,
+including versioned aliases, are resolved before package defaults; defaults
+only supply a key or mode that no constructor argument set.
+
+=head3 checksum_mode
+
+Select the protocol 6 checksum format to emit: C<'none'>, C<'v1'>, C<'v2'>,
+or C<'v3'>. Numeric values C<0>, C<1>, C<2>, and C<3> are also accepted;
+C<0> means no checksum. C<'v1'>, C<'v2'>, and C<'v3'> select wire checksum
+types 0, 1, and 2. The default is C<'v3'>. C<'none'> disables checksumming,
+including when a default key is configured. The selected key must be exactly 16 bytes
+under strict checksum policies; permissive policies pad or truncate it with a
+warning.
+
+C<SEREAL_CHECKSUM_MODE> sets the shared default for new Encoder and Decoder
+objects; C<SEREAL_ENCODER_CHECKSUM_MODE> sets the Encoder-specific default.
+These initialize C<$Sereal::ChecksumMode> and
+C<$Sereal::Encoder::ChecksumMode> at module startup when those variables are
+not already defined. The constructor option takes precedence over the
+Encoder-specific package variable, which takes precedence over the shared
+package variable. Without a configured mode, Encoder defaults to C<'v3'>.
+
+=head3 checksum_key_v1
+
+Compatibility alias for C<checksum_key> with C<checksum_mode =E<gt> 'v1'>.
+
+If set, the encoder emits protocol version 6 packets with
+a SipHash-2-4 authentication tag (format version 0). The tag covers the packet
+header and encoded payload, including the checksum type, checksum-length
+varint, payload-length varint, and compression framing. The checksum tag is
+written before the payload length, then filled after the complete payload is
+available. This option requires
+protocol version 6 or later. The matching decoder must be configured with the
+same key. The key is not included in the packet. This provides integrity and
+authentication, not encryption. Packets encoded without an explicit or default checksum key remain
+unprotected. Under permissive policies, keys shorter than 16 bytes are padded with null
+bytes and longer keys are truncated, with a warning in either case. Strict
+policies require exactly 16 bytes. Use
+C<prepare_checksum_key()> to normalize a key explicitly.
+
+=head3 checksum_key_v2
+
+Compatibility alias for C<checksum_key> with C<checksum_mode =E<gt> 'v2'>.
+
+If set, the encoder emits protocol version 6 packets with a SipHash-2-4-128
+authentication tag (checksum version 1). This has the same coverage and key
+requirements as C<checksum_key_v1>, with a 16-byte tag instead of eight bytes.
+
+=head3 checksum_key_v3
+
+Compatibility alias for C<checksum_key> with C<checksum_mode =E<gt> 'v3'>.
+
+If set, the encoder emits protocol version 6 packets with
+a SipHash-3-6-128 authentication tag (checksum version 2). The tag covers the
+same packet data as C<checksum_key_v1>, with a 16-byte output. This option
+requires protocol version 6 or later. The matching decoder must be configured
+with the same key. A versioned key option selects its corresponding mode.
+Conflicting mode settings emit a warning and select the highest mode.
+Supplying different keys for the same encoder is an error.
+Under permissive policies, keys that are not 16 bytes are padded or truncated
+with a warning; strict policies reject them.
+C<prepare_checksum_key()> can normalize them explicitly.
+
+Generating a checksum adds CPU work proportional to the protected header and
+encoded payload size. The decoder incurs corresponding work to verify it.
+When compression is enabled, the checksum protects the compressed payload.
+The SipHash variants use different round counts and tag sizes, so their
+cost may differ. Benchmark representative packets and consider the decoder's
+C<checksum_policy>, including its verification and warning behavior; see
+L<Sereal::Decoder/checksum_policy>.
 
 =head3 compress
 
@@ -187,6 +430,9 @@ constants (exportable from the C<Sereal::Encoder> module):
 Snappy (named constant: C<SRL_SNAPPY>), Zlib (C<SRL_ZLIB>) and Zstd (C<SRL_ZSTD>).
 For your convenience, there is also a C<SRL_UNCOMPRESSED>
 constant.
+Zlib requires protocol version 3 or later, and Zstd requires protocol version
+4 or later. The encoder throws an error if either is requested for an older
+protocol version.
 
 If this option is set, then the Snappy-related options below
 are ignored. They are otherwise recognized for compatibility only.
@@ -249,6 +495,10 @@ but only if Snappy compression is enabled.
 If this option is set, then the encoder will refuse to serialize blessed
 references and throw an exception instead.
 
+This includes regexp objects (C<qr//>), which Perl treats as blessed references
+in the C<Regexp> class, even when the application has not explicitly blessed
+them.
+
 This can be important because blessed references can mean executing
 a destructor on a remote system or generally executing code based on
 data.
@@ -260,12 +510,24 @@ C<no_bless_objects>.
 =head3 freeze_callbacks
 
 This option was introduced in Sereal v2 and needs a Sereal v2 decoder.
+It cannot be used when C<protocol_version> is set to 1; the encoder throws an
+error because FREEZE/THAW tags require protocol version 2 or later.
 
 If this option is set, the encoder will check for and possibly invoke
 the C<FREEZE> method on any object in the input data. An object that
 was serialized using its C<FREEZE> method will have its corresponding
 C<THAW> class method called during deserialization. The exact semantics
 are documented below under L</"FREEZE/THAW CALLBACK MECHANISM">.
+
+Do not modify the input graph while it is being encoded. The encoder may
+throw an exception when it detects a callback changing a container being
+traversed. It does not take a snapshot or promise to encode the original
+values after such mutation. Callbacks reached through tied values and nested
+references are subject to the same rule.
+
+Tied containers are read through their tie methods. Each value is fetched
+once per traversal occurrence; a scalar string may be captured separately
+for deduplication so this does not invoke FETCH again.
 
 Beware that using this functionality means a significant slowdown for
 object serialization. Even when serializing objects without a C<FREEZE>
@@ -290,6 +552,11 @@ each object that has a C<FREEZE> method, that returns a true value to allow
 C<FREEZE>
 
 =back
+
+The encoder retains the object across the predicate and any subsequent
+C<FREEZE> call, even if the callback removes its last external reference.
+It also retains the C<FREEZE> method selected before the predicate runs;
+replacing that method affects subsequent invocations.
 
 Classes that do not have a C<FREEZE> method are unaffected (they serialize as
 usual). When an object's class has a C<FREEZE> method but is not allowed, the
@@ -321,6 +588,8 @@ See also the C<croak_on_bless> option above for more details.
 If set, unknown/unsupported data structures will be encoded as C<undef>
 instead of throwing an exception.
 
+Weak references to unsupported values are also replaced by C<undef>.
+
 Mutually exclusive with C<stringify_unknown>.
 See also C<warn_unknown> below.
 
@@ -329,6 +598,9 @@ See also C<warn_unknown> below.
 If set, unknown/unsupported data structures will be stringified and
 encoded as that string instead of throwing an exception. The
 stringification may cause a warning to be emitted by perl.
+
+Weak references to unsupported values are also replaced by their stringified
+values. Overloaded stringification preserves the returned string's UTF-8 flag.
 
 Mutually exclusive with C<undef_unknown>.
 See also C<warn_unknown> below.
@@ -344,6 +616,10 @@ warning. If set to a negative integer, it will warn for unsupported
 data structures just the same as for a positive value with one
 exception: For blessed, unsupported items that have string overloading,
 we silently stringify without warning.
+
+Unsupported-type exceptions and warnings include the class name of blessed
+values, for example C<My::Class=CODE(0x...)>. Formatting the diagnostic does
+not invoke overloaded stringification.
 
 =head3 max_recursion_depth
 
@@ -388,6 +664,10 @@ Normally C<Sereal::Encoder> will output hashes in whatever order is convenient,
 generally that used by perl to actually store the hash, or whatever order
 was returned by a tied hash.
 
+Encoding a hash that is not tied leaves the caller's C<each()> iterator for
+that hash where it was, with or without this option, so a hash may be encoded
+from inside an C<each()> loop over it.
+
 If this option is enabled then the Encoder will sort the keys before outputting
 them. It uses more memory, and is quite a bit slower than the default.
 
@@ -426,6 +706,10 @@ keys. This only has an effect for serializing structures containing hashes.
 By skipping the detection of repeated hash keys, performance goes up a bit,
 but the size of the output can potentially be much larger.
 
+When callbacks run, the encoder retains cached key and class identities so
+their addresses cannot be recycled as different C<COPY> targets. This retains
+cache metadata rather than taking a snapshot of container values.
+
 Do not disable this unless you have a reason to.
 
 =head3 dedupe_strings
@@ -436,6 +720,9 @@ has a performance and memory penalty during encoding so it defaults to off.
 On the other hand, data structures with many duplicated strings will see a
 significant reduction in the size of the encoded form. Currently only strings
 longer than 3 characters will be deduped, however this may change in the future.
+
+For tied scalars, deduplication uses a captured string value so that later
+C<FETCH> calls cannot change the bytes or UTF-8 flag being indexed.
 
 Note that Sereal will perform certain types of deduping automatically even
 without this option. In particular class names and hash keys (see also the
@@ -469,6 +756,17 @@ but at the cost of potential action at a distance due to the aliasing.
 
 I<Beware:> The test suite currently does not cover this option as well as it
 probably should. Patches welcome.
+
+Hash keys always use string or C<COPY> tags. A value can C<COPY> an earlier
+key string, creating a value that subsequent equal values can C<ALIAS>.
+Keys can also C<COPY> earlier value strings. Keys themselves never become
+alias targets.
+
+Scalar referents use C<COPY> for duplicate text: C<ALIAS> replaces an array or
+hash value slot and cannot appear directly after C<REFN>. Distinct scalar
+referents remain distinct; repeated references to the same scalar still share
+that scalar. A string first emitted as a scalar referent can be an alias target
+for a later array or hash value.
 
 =head3 use_standard_double
 
@@ -847,6 +1145,19 @@ which is simply serializing a cache key, and thus there's little harm in an
 occasional false-negative, but think carefully before applying Sereal in other
 use-cases.
 
+=head1 REGULAR EXPRESSIONS
+
+Regexp serialization preserves C</m>, C</s>, C</i>, C</x>, C</xx>, C</p>,
+C</n> and the character set modes C</d>, C</l>, C</u>, C</a> and C</aa>.
+The default C</d> mode is implicit in the serialized modifier string.
+This applies to every Sereal protocol version.
+
+The receiving Decoder must support these modifiers. In particular, C</n>
+requires Perl 5.22 or later and C</xx> requires Perl 5.26 or later. Older
+Sereal decoders may discard C</xx> semantics or reject other modifiers even
+on a sufficiently new Perl. Upgrade the Decoder before emitting these
+regexps. See L<Sereal::Decoder/REGULAR EXPRESSIONS> for portability limits.
+
 =head1 KNOWN ISSUES
 
 =over 4
@@ -898,6 +1209,41 @@ variables that SRL_HDR_TRUE and SRL_HDR_FALSE may still be generated, but beyond
 being readonly these are equivalent to SRL_HDR_YES and SRL_HDR_NO.
 
 =back
+
+=head1 SECURITY
+
+Encoding can invoke application code through C<FREEZE> callbacks, tied values,
+and magic. The callback controls above govern when those methods run; encoding
+does not make their side effects safe.
+
+Protocol version 6 can carry a keyed SipHash checksum over the packet header
+and encoded payload, including compression framing. Configure one of the
+C<checksum_key_v1>, C<checksum_key_v2>, or C<checksum_key_v3> options to emit
+one. C<checksum_policy =E<gt> 'require_key'> requires a configured key and
+ensures that every packet this Encoder emits has a checksum. Without a key,
+packets are not authenticated by Sereal.
+
+The receiving Decoder must have the matching key and enforce verification.
+Use its C<'require_key'> policy when unsigned packets must be rejected;
+C<'die'> still accepts unsigned packets. A checksum does not encrypt the
+packet, prevent replay, or establish that a key holder is trustworthy. See
+L<Sereal::Decoder/ROBUSTNESS> for decoder limits and object handling controls.
+
+The project-wide security policy and private reporting instructions are at
+L<https://github.com/Sereal/Sereal/security/policy>. Report suspected
+vulnerabilities through
+L<https://github.com/Sereal/Sereal/security/advisories/new>.
+
+=head1 DEVELOPMENT TESTING
+
+The Git repository includes an ASan and libFuzzer harness for
+L<Sereal::Decoder> in F<Perl/author_tools/fuzz_decoder>. It uses Encoder
+to generate seed packets and builds Decoder with sanitizer and coverage
+instrumentation. It is a repository development tool, distributed separately
+from the CPAN modules, and is not run by C<make test>.
+
+See the L<harness README|https://github.com/Sereal/Sereal/tree/main/Perl/author_tools/fuzz_decoder>
+for requirements and build and run instructions.
 
 =head1 BUGS, CONTACT AND SUPPORT
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1beta1::Variable;
 # ABSTRACT: Variable is the definition of a variable that is used for composition. A variable is defined as a named expression.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s expression => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1beta1::Variable - Variable is the definit
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 expression
 
@@ -37,7 +37,7 @@ Name is the name of the variable. The name must be a valid CEL identifier and un
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -65,5 +65,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

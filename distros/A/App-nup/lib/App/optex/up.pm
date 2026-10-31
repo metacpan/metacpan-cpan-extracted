@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.09";
+our $VERSION = "1.10";
 
 =encoding utf-8
 
@@ -46,6 +46,12 @@ The C<-F> option causes C<less> to exit immediately if the output
 fits on one screen.  C<+Gg> causes C<less> to read all input before
 displaying, which may take time for large output, but prevents empty
 trailing pages from being shown.
+The C<--file-size> option of C<less> 590 (June 2021) and later does
+the same as C<+Gg>; it is not the default because older versions,
+such as the C<less> 581 that comes with macOS, do not have it and
+print an error message for it.  Set C<NUP_PAGER> to use it:
+
+    export NUP_PAGER="less --file-size"
 
 =head1 OPTIONS
 
@@ -255,6 +261,9 @@ sub finalize {
     my $border_style = $config->{'border-style'};
     my $no_page      = !$config->{paginate}
         || ($config->{'auto-paginate'} && $cols <= 1);
+    # +Gg makes less read all input first, so that -F and the percentage
+    # work.  less 590 and later have --file-size for this, but the less
+    # 581 of macOS does not, so keep +Gg as the default.
     my $pager        = $config->{pager} //
         ((!$no_page && $ENV{NUP_PAGE_PAGER}) || $ENV{NUP_PAGER} || 'less -F +Gg');
 

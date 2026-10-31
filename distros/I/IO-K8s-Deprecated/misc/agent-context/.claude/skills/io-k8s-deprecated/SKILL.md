@@ -55,8 +55,8 @@ tombstone, not after:
    classes (6 promoted to `v2`, 2 removed outright), and tombstones were
    drafted for all 8. But `io-k8s-p5` already has an established
    convention of keeping multiple API versions of the same resource side
-   by side rather than deleting superseded ones (e.g. `Apps`
-   `V1beta1`/`V1beta2`/`V1` all still ship concurrently). The right fix
+   by side rather than deleting superseded ones (e.g. `Autoscaling`
+   `V1`/`V2` and `Cilium` `V2alpha1`/`V2` ship concurrently). The right fix
    was to restore the Cilium classes in `IO-K8s` itself, matching that
    convention -- not to tombstone them. **Before tombstoning a
    rename/removal that looks like "just a newer API version of the same
@@ -81,16 +81,32 @@ tombstone, not after:
 
 ## Auditing IO-K8s for orphaned module names
 
-Method: diff the set of `package X;` names present at an `IO-K8s` release
-tag against the set present at a later tag (or current HEAD) -- a file
-*deletion*, not a content change.
+The audit starts from the PAUSE index, because that is what `cpanm`
+resolves: every module name the index maps to an `IO-K8s` tarball other
+than the current release is an orphan, whatever release it came from.
+`IO-K8s` `0.01` to `0.03` (JLMARTIN, 2018) count as much as the `1.x`
+series -- their 212 orphans are the "retired API version" tombstones.
+
+```bash
+curl -sO https://www.cpan.org/modules/02packages.details.txt.gz
+# which IO-K8s tarballs still hold index entries, and how many
+zcat 02packages.details.txt.gz | awk '$3 ~ /\/IO-K8s-[0-9]/ {print $3}' | sort | uniq -c
+# the names of one older tarball -- each needs a tombstone here
+zcat 02packages.details.txt.gz | awk '$3 ~ /\/IO-K8s-0\.03\.tar\.gz$/ {print $1}'
+```
+
+The target state: every name mapped to `IO-K8s` or `IO-K8s-Deprecated`
+is shipped by the current `io-k8s-p5` (`package` lines under `lib/`) or by
+this dist, and by exactly one of the two.
+
+The git history then tells what happened to a name. Every CPAN release has
+a tag (`git tag -l --sort=v:refname`, checked against the MetaCPAN release
+list), and a tag's classes sit under `lib/` or, for `0.01` to `0.03`, under
+`auto-lib/`:
 
 ```bash
 cd <io-k8s-p5 checkout>
-git tag -l --sort=v:refname                        # find release tags (vX.Y.Z or X.Y.Z)
-git ls-tree -r --name-only <old-tag> -- lib | grep '\.pm$'   # packages shipped then
-# compare against:
-git ls-tree -r --name-only <new-tag-or-HEAD> -- lib | grep '\.pm$'  # packages shipped now
+git ls-tree -r --name-only <tag> | grep -E '^(auto-)?lib/.*\.pm$'   # classes shipped then
 ```
 
 A name present at an older release tag but absent from the newer one (and
@@ -152,16 +168,18 @@ Consequences shared by all three shapes:
   batch targets a name IO-K8s shipped past whatever version this dist has
   reached by then, check that before releasing and bump first if needed.
 - **The `die` is unconditional, at the top level, and starts its line with
-  `die __PACKAGE__`.** `t/02-name-guard.t` recognises an installed copy of
-  a tombstone by exactly that line when it has to tell this dist's stubs
-  apart from `IO-K8s`'s classes in a shared install tree, and it fails for
-  a stub written any other way.
+  `die __PACKAGE__`.** `t/02-name-guard.t` asserts every stub carries
+  exactly that line, so a stub installed over a class `IO-K8s` ships is
+  recognisable as a tombstone, and it fails for a stub written any other
+  way.
 - **The module does nothing else.** No POD-only doc stub, no re-export, no
   `use base` of the replacement, and critically **no `use
   IO::K8s::APIObject`** -- a tombstone must not register itself as a live
   (if empty) API object. Just `die` on load.
 
-Model files: `lib/IO/K8s/Api/Core/V1/PodList.pm` (consolidated shape).
+Model files: `lib/IO/K8s/Api/Extensions/V1beta1/Ingress.pm` (renamed shape),
+`lib/IO/K8s/Api/Core/V1/PodList.pm` (consolidated shape),
+`lib/IO/K8s/Api/Policy/V1beta1/PodSecurityPolicy.pm` (removed shape).
 
 ## Adding a new tombstone (procedure)
 

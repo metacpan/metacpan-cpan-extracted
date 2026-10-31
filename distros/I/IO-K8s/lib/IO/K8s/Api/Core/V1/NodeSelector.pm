@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSelector;
 # ABSTRACT: A node selector represents the union of the results of one or more label queries over a set of nodes; that is, it represents the OR of the selectors represented by the node selector terms.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s nodeSelectorTerms => ['Core::V1::NodeSelectorTerm'], 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodeSelector - A node selector represents the union of t
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 nodeSelectorTerms
 
@@ -30,7 +30,7 @@ Required. A list of node selector terms. The terms are ORed.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -58,5 +58,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

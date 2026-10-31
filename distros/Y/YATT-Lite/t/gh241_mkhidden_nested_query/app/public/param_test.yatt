@@ -1,0 +1,3 @@
+&yatt:param(.foo[]);
+
+&yatt:param(.foo);

@@ -1,5 +1,5 @@
 # -*- Mode: cperl; cperl-indent-level: 4 -*-
-# $Id: Harness.pm,v 1.1 2003/09/22 10:11:38 mertz Exp $
+# $Id$
 
 package Test::Harness;
 

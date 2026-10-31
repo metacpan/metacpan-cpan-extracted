@@ -2,22 +2,24 @@ use strict;
 use YATT::Lite::Util qw(lexpand);
 use YATT::Lite qw/*CON/;
 
-use fields qw/cf_docpath
-	      cf_lang_available
-	      cf_mod_overlay
-	     /;
+use YATT::Lite::MFields
+  qw(
+    docpath
+    lang_available
+    mod_overlay
+  );
 
 sub after_new {
   (my MY $self) = @_;
   $self->SUPER::after_new;
-  $self->{cf_lang_available} //= [qw/en ja/];
+  $self->{lang_available} //= [qw/en ja/];
 }
 
 Entity alt_lang => sub {
   my ($this, $list) = @_;
   $list //= do {
     my MY $self = $this->YATT;
-    $self->{cf_lang_available};
+    $self->{lang_available};
   };
   $this->entity_alternative($this->entity_current_lang, $list);
 };
@@ -26,7 +28,7 @@ Entity search_pod => sub {
   my ($this, $modname) = @_;
 
   my MY $yatt = $this->YATT;
-  if (my $prefix = $yatt->{cf_mod_overlay}) {
+  if (my $prefix = $yatt->{mod_overlay}) {
     $modname =~ s{^$prefix}{};
   }
   $yatt->search_pod($modname, $this->entity_suffix_list);
@@ -35,8 +37,8 @@ Entity search_pod => sub {
 sub search_pod {
   my ($yatt, $modname, @lang_suf) = @_;
   my $modfn = modname2fileprefix($modname);
-  my $debug = -r "$yatt->{cf_dir}/.htdebug";
-  my @dir = lexpand($yatt->{cf_docpath});
+  my $debug = -r "$yatt->{dir}/.htdebug";
+  my @dir = lexpand($yatt->{docpath});
   my @suf = (map("$_.pod", @lang_suf ? @lang_suf : ("")), ".pm", "");
   my @found;
   foreach my $dir (@dir) {
@@ -243,7 +245,7 @@ sub pod_info {
 Entity docpath_files => sub {
   my ($this, $ext) = @_;
   my YATT $yatt = $this->YATT;
-  my ($dir) = lexpand($yatt->{cf_docpath})
+  my ($dir) = lexpand($yatt->{docpath})
     or return;
 
   # &YATT::Lite::Breakpoint::breakpoint();
@@ -256,8 +258,8 @@ Entity docpath_files => sub {
       my @info;
       foreach my $name (@lines) {
 	my $rec = [$name, []
-		   , $yatt->{cf_mod_overlay}
-		   ? "$yatt->{cf_mod_overlay}::$name" : $name
+		   , $yatt->{mod_overlay}
+		   ? "$yatt->{mod_overlay}::$name" : $name
 		   , ""];
 	foreach my $info (map {pod_info($_)} glob("$dir/$name*$ext")) {
 	  my ($name, $lang, $title) = @$info;

@@ -34,14 +34,18 @@ use YATT::Lite::Util qw/
                          is_done
                          terse_dump
                      /;
+
+# Several fixtures print references (lists, hashes) through escape(),
+# which dumps them only when HTDEBUG_DUMP is on (or in development).
+$ENV{HTDEBUG_DUMP} = 1;
 sub myapp {join _ => MyTest => appname($0), @_}
 
 use YATT::Lite::Breakpoint;
 
 use YATT::Lite::Test::XHFTest qw(Item);
 use parent qw(YATT::Lite::Test::XHFTest File::Spec);
-use YATT::Lite::MFields qw(cf_VFS_CONFIG cf_YATT_CONFIG cf_YATT_RC
-			   cf_ONLY_UTF8
+use YATT::Lite::MFields qw(VFS_CONFIG YATT_CONFIG YATT_RC
+			   ONLY_UTF8
 			);
 
 my @files = MY->list_files(@ARGV ? @ARGV
@@ -51,7 +55,7 @@ my (@section);
 foreach my $fn (@files) {
   eval {
     push @section, my MY $sect = MY->load(file => untaint_any($fn));
-    if (my $cf = $sect->{cf_YATT_CONFIG} and my $enc = $sect->{cf_encoding}) {
+    if (my $cf = $sect->{YATT_CONFIG} and my $enc = $sect->{encoding}) {
       $sect->convert_enc_array($enc, $cf);
     }
   };
@@ -76,39 +80,39 @@ if (not $skip_test_lang) {
 
 my $i = 1;
 foreach my MY $sect (@section) {
-  my $skip_no_utf8 = $sect->{cf_ONLY_UTF8} && $skip_test_lang;
+  my $skip_no_utf8 = $sect->{ONLY_UTF8} && $skip_test_lang;
 
-  my $fn = path_tail($sect->{cf_filename}, 2);
+  my $fn = path_tail($sect->{filename}, 2);
   # XXX: as_vfs_spec => data => {}, rc => '...';
   my $spec = [data => $sect->as_vfs_data];
-  if (my $cf = $sect->{cf_VFS_CONFIG}) {
+  if (my $cf = $sect->{VFS_CONFIG}) {
     push @$spec, @$cf;
   }
   ok(my $yatt = new YATT::Lite(app_ns => myapp($i)
 			       , vfs => $spec
 			       , debug_cgen => $ENV{DEBUG}
-			       , debug_parser => 1
-			       , lexpand($sect->{cf_YATT_CONFIG})
-			       , $sect->{cf_YATT_RC}
-			       ? (rc_script => $sect->{cf_YATT_RC}) : ()
+			       , debug_parser => 0
+			       , lexpand($sect->{YATT_CONFIG})
+			       , $sect->{YATT_RC}
+			       ? (rc_script => $sect->{YATT_RC}) : ()
 			      )
      , "$fn new YATT::Lite");
   is ref $yatt, 'YATT::Lite', 'new YATT::Lite package';
   local $YATT::Lite::YATT = $yatt; # XXX: runyatt に切り替えられないか？
   my $last_title;
   TODO:
-  foreach my Item $test (@{$sect->{tests}}) {
+  foreach my Item $test (@{$sect->{_tests}}) {
     next unless $test->is_runnable;
-    my $title = "[$fn] " . ($test->{cf_TITLE} // $last_title
-			    // $test->{cf_ERROR} // "(undef)");
-    $title .= " ($test->{num})" if $test->{num};
-    local $TODO = $test->{cf_TODO};
+    my $title = "[$fn] " . ($test->{TITLE} // $last_title
+			    // $test->{ERROR} // "(undef)");
+    $title .= " ($test->{_num})" if $test->{_num};
+    local $TODO = $test->{TODO};
   SKIP: {
-      if (($test->{cf_SKIP} or $test->{cf_PERL_MINVER} or $skip_no_utf8)
+      if (($test->{SKIP} or $test->{PERL_MINVER} or $skip_no_utf8)
 	  and my $skip = $test->ntests) {
-	if ($test->{cf_PERL_MINVER} and $] < $test->{cf_PERL_MINVER}) {
-	  skip "by perl-$] < PERL_MINVER($test->{cf_PERL_MINVER}) $title", $skip
-	} elsif ($test->{cf_SKIP}) {
+	if ($test->{PERL_MINVER} and $] < $test->{PERL_MINVER}) {
+	  skip "by perl-$] < PERL_MINVER($test->{PERL_MINVER}) $title", $skip
+	} elsif ($test->{SKIP}) {
 	  skip "by SKIP: $title", $skip;
 	} elsif ($skip_no_utf8) {
 	  if ($test_lang) {
@@ -118,15 +122,15 @@ foreach my MY $sect (@section) {
 	  }
 	}
       }
-      if ($test->{cf_REQUIRE}
-	  and my @missing = $test->test_require($test->{cf_REQUIRE})) {
+      if ($test->{REQUIRE}
+	  and my @missing = $test->test_require($test->{REQUIRE})) {
 	skip "Module @missing is not installed", $test->ntests;
       }
-      if ($test->{cf_BREAK}) {
+      if ($test->{BREAK}) {
         $DB::single = 1; 1 if $DB::single;
       }
-      if ($test->{cf_OUT}) {
-	unless ($test->{realfile}) {
+      if ($test->{OUT}) {
+	unless ($test->{_realfile}) {
 	  die "test realfile is undef!";
 	}
 	my ($pkg, $compile_error) = do {
@@ -134,7 +138,7 @@ foreach my MY $sect (@section) {
           local $SIG{__DIE__} = sub {$error = @_ > 1 ? [@_] : shift};
           local $SIG{__WARN__} = sub {$error = @_ > 1 ? [@_] : shift};
           my $pkg = eval {
-            my $tmpl = $yatt->find_file($test->{realfile});
+            my $tmpl = $yatt->find_file($test->{_realfile});
 
             #
             # Workaround for false failure caused by Devel::Cover.
@@ -163,45 +167,45 @@ foreach my MY $sect (@section) {
 	  eval {
             {
               local $CON = do {
-                if (my $class = $test->{cf_CON_CLASS}) {
+                if (my $class = $test->{CON_CLASS}) {
                   YATT::Lite::Util::ckrequire($class);
                   $class->create(
                     undef,
                     noheader => 1,
                     buffer => \ $buffer,
-                    parameters => YATT::Lite::Util::ixhash(lexpand($test->{cf_PARAM})),
+                    parameters => YATT::Lite::Util::ixhash(lexpand($test->{PARAM})),
                   );
                 } else {
                   open my $fh, '>:utf8', \ $buffer;
                   $fh;
                 }
               };
-              $pkg->render_($CON, lexpand($test->{cf_PARAM}));
+              $pkg->render_($CON, lexpand($test->{PARAM}));
             }
 	  };
 
           if ($error and not is_done($error)) {
 	    fail "$title: runtime error: ".terse_dump($error);
           } else {
-            eq_or_diff $buffer, encode(utf8 => $test->{cf_OUT}), "$title";
+            eq_or_diff $buffer, encode(utf8 => $test->{OUT}), "$title";
 	  }
 	}
-      } elsif ($test->{cf_ERROR} or $test->{cf_ERROR_BODY}) {
+      } elsif ($test->{ERROR} or $test->{ERROR_BODY}) {
 	eval {
-	  my $tmpl = $yatt->find_file($test->{realfile});
+	  my $tmpl = $yatt->find_file($test->{_realfile});
 	  my $pkg = $yatt->find_product(perl => $tmpl);
-	  captured($pkg => render_ => lexpand($test->{cf_PARAM}));
+	  captured($pkg => render_ => lexpand($test->{PARAM}));
 	};
-        if (ref $test->{cf_ERROR_BODY}) {
-          is_deeply $@->[2], $test->{cf_ERROR_BODY}, $title;
-        } elsif (ref $test->{cf_ERROR}) {
-          is_deeply $@, $test->{cf_ERROR}, $title;
+        if (ref $test->{ERROR_BODY}) {
+          is_deeply $@->[2], $test->{ERROR_BODY}, $title;
+        } elsif (ref $test->{ERROR}) {
+          is_deeply $@, $test->{ERROR}, $title;
         } else {
-          like $@, qr{^$test->{cf_ERROR}}, $title;
+          like $@, qr{^$test->{ERROR}}, $title;
         }
       }
     }
-    $last_title = $test->{cf_TITLE} if $test->{cf_TITLE};
+    $last_title = $test->{TITLE} if $test->{TITLE};
   }
 } continue { $i++ }
 

@@ -274,6 +274,22 @@ sub entity_gmtime {
   Time::Piece->gmtime($time);
 }
 
+sub entity_strptime {
+  my ($this, $string, $format) = @_;
+  require Time::Piece;
+  local $SIG{__DIE__}; # '@ytmpl/error.ytmpl' のハンドラーを抑制する
+  Time::Piece->strptime($string, $format);
+}
+
+sub entity_parse_date {
+  my ($this, $string) = @_;
+  $this->entity_strptime($string, '%Y-%m-%d');
+}
+sub entity_parse_datetime {
+  my ($this, $string) = @_;
+  $this->entity_strptime($string, '%Y-%m-%d %H:%M:%S');
+}
+
 sub entity_redirect {
   my ($this) = shift;
   $CON->redirect(@_);

@@ -10,11 +10,12 @@ requires 'App::ansifold', '1.35';
 requires 'App::ansicolumn', '1.61';
 requires 'Term::ANSIColor::Concise', '3.02';
 
-requires 'App::nup', '1.09';
+requires 'App::nup', '1.10';
 requires 'Getopt::Long::Bash', '0.7.2';
 
 requires 'App::Greple', '10.04';
 requires 'App::Greple::tee', '1.04';
+requires 'Getopt::EX', '3.05';
 requires 'Getopt::EX::Config', '1.0202';
 requires 'Command::Run', '1.04';
 

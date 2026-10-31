@@ -17,7 +17,7 @@ my $thisdir = do {
 };
 print STDERR "# thisdir=$thisdir\n" if DEBUG_FIND_YATT_LIB;
 
-my ($found) = $thisdir =~ m{^(.*?/)YATT/}
+my ($found) = $thisdir =~ m{^(.*?/)YATT/samples(?:/|\z)}
   or return;
 print STDERR "# found=$found\n" if DEBUG_FIND_YATT_LIB;
 

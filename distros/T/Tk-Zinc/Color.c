@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Thu Dec 16 15:41:53 1999
  *
- * $Id: Color.c,v 1.37 2005/12/02 13:35:39 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -365,20 +365,20 @@ ZnNameGradient(Tcl_Interp       *interp,
    */
   if (XParseColor(Tk_Display(tkwin), Tk_Colormap(tkwin), name, &color)) {
     Tcl_AppendResult(interp, "gradient name \"", name,
-                     "\", is a color name", NULL);
+                     "\", is a color name", (char *) NULL);
     return False;
   }
   grad = ZnGetGradient(interp, tkwin, grad_descr);
   if (!grad) {
     Tcl_AppendResult(interp, "gradient specification \"", grad_descr,
-                     "\", is invalid", NULL);
+                     "\", is invalid", (char *) NULL);
     return False;
   }
   hash = Tcl_CreateHashEntry(&gradient_table, Tk_GetUid(name), &new);
   if (!new) {
     ZnFreeGradient(grad);
     Tcl_AppendResult(interp, "gradient name \"", name,
-                     "\", is already in use", NULL);
+                     "\", is already in use", (char *) NULL);
     return False;
   }
   else {
@@ -873,7 +873,7 @@ ZnGetGradient(Tcl_Interp        *interp,
   }
   if (num_colors == 0) {
     Tcl_AppendResult(interp, "gradient should have at least one color \"",
-                     desc, "\",", NULL);
+                     desc, "\",", (char *) NULL);
   grad_err1:
     Tcl_DeleteHashEntry(hash);
     /*printf("ZnGetGradient error : %s\n", desc);*/
@@ -897,7 +897,7 @@ ZnGetGradient(Tcl_Interp        *interp,
       if ((num_coords != 1) && (num_coords != 4)) {
       grad_err3:
         Tcl_AppendResult(interp, "invalid gradient parameter \"",
-                         desc, "\",", NULL);
+                         desc, "\",", (char *) NULL);
         goto grad_err1;
       }
       angle = (int) coords[0];
@@ -928,7 +928,7 @@ ZnGetGradient(Tcl_Interp        *interp,
     }
     else {
       Tcl_AppendResult(interp, "invalid gradient type \"",
-                       desc, "\"", NULL);
+                       desc, "\"", (char *) NULL);
       goto grad_err1;
     }
     scan_ptr = next_ptr + 1;
@@ -1017,7 +1017,7 @@ ZnGetGradient(Tcl_Interp        *interp,
     }
     if (size > (SEGMENT_SIZE-1)) {
       Tcl_AppendResult(interp, "color name too long in gradient \"",
-                       desc, "\",", NULL);
+                       desc, "\",", (char *) NULL);
     grad_err2:
       for (j = 0; j < i; j++) {
         Tk_FreeColor(grad->colors_in[j].rgb);
@@ -1049,7 +1049,7 @@ ZnGetGradient(Tcl_Interp        *interp,
     nspace = strspn(scan_ptr, " \t");
     if ((scan_ptr[nspace] != 0) && (scan_ptr+nspace != next_ptr)) {
       Tcl_AppendResult(interp, "incorrect color description in gradient \"",
-                       desc, "\",", NULL);
+                       desc, "\",", (char *) NULL);
       goto grad_err2;
     }
     
@@ -1060,7 +1060,7 @@ ZnGetGradient(Tcl_Interp        *interp,
     grad->colors_in[i].rgb = Tk_GetColor(interp, tkwin, Tk_GetUid(segment));
     if (grad->colors_in[i].rgb == NULL) {
       Tcl_AppendResult(interp, "incorrect color value in gradient \"",
-                       desc, "\",", NULL);
+                       desc, "\",", (char *) NULL);
       goto grad_err2;
     }
     if (color_ptr) {
@@ -1077,7 +1077,7 @@ ZnGetGradient(Tcl_Interp        *interp,
         ((grad->colors_in[i].position > 100) ||
          (grad->colors_in[i].position < grad->colors_in[i-1].position))) {
       Tcl_AppendResult(interp, "incorrect color position in gradient \"",
-                       desc, "\",", NULL);
+                       desc, "\",", (char *) NULL);
       goto grad_err2;
     }
     if (grad->colors_in[i].control > 100) {

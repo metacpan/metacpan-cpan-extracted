@@ -149,6 +149,32 @@ sub lxnest {
 }
 
 #========================================
+sub create_attribute {
+  my ($attName, $text) = @_;
+  my $node = [];
+  $node->[NODE_TYPE] = TYPE_ATT_TEXT;
+  $node->[NODE_PATH] = $attName;
+  $node->[NODE_BODY] = $text;
+  $node;
+}
+
+# 属性 node $orig を、属性名 $attName に付け替えて複製する。
+# 値無しの名前だけの属性 (foo) は、 attName=foo (bare) に変換する。
+sub copy_attribute_renamed_as {
+  my ($orig, $attName) = @_;
+  my $node = [@$orig];
+  if ($node->[NODE_TYPE] == TYPE_ATT_NAMEONLY) {
+    my $varName = $node->[NODE_PATH];
+    Carp::croak("Can't rename attribute with namespace: "
+                . join(":", @$varName)) if ref $varName;
+    $node->[NODE_TYPE] = TYPE_ATT_BARENAME;
+    $node->[NODE_BODY] = $varName;
+  }
+  $node->[NODE_PATH] = $attName;
+  $node;
+}
+
+#========================================
 my $symtab = YATT::Lite::Util::symtab(__PACKAGE__);
 our @EXPORT = grep {*{$symtab->{$_}}{CODE}} keys %$symtab;
 our @EXPORT_OK = @EXPORT;

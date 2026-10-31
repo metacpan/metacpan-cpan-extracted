@@ -1,0 +1,15 @@
+<!yatt:base file="index.yatt">
+
+<!yatt:args>
+<yatt:layout>
+  <h2>foo</h2>
+  <yatt:items/>
+</yatt:layout>
+
+<!yatt:widget items>
+
+<ul>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ul>

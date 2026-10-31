@@ -15,11 +15,86 @@ YATT::Lite::Factory - Loader for YATT::Lite
 
 =head1 DESCRIPTION
 
-XXX:
+YATT::Lite::Factory is the I<site-level> object of YATT::Lite: it owns
+the site-wide configuration (C<app_root>, C<doc_root>, C<app_base>...),
+creates and caches one L<YATT::Lite> instance (a I<dirhandler>) per
+template directory, and dispatches execution to them.
+
+In the class hierarchy it sits between the public facade and the web
+adapter:
+
+  YATT::Lite::Site              public facade API (documented there)
+    ^ YATT::Lite::Factory       site object; per-dir loader (this class)
+      ^ YATT::Lite::WebMVC0::SiteApp   Site + PSGI adapter
+
+Programs usually should not construct a Factory directly: open a site
+through L<YATT::Lite::Site>'s C<load>/C<load_or_default> (or, in
+app.psgi, through C<load_factory_for_psgi>) and use the facade methods.
+The methods below are the load-bearing pieces documented for
+subclassers and tool authors.
+
+=head1 CLASS METHODS
+
+=head2 load_factory_for_psgi($psgi_filename, %opts)
+
+The standard way for F<app.psgi> to create its site object. Derives
+C<app_rootname> from the script location, reads
+F<app.site_config.yml/xhf> and sibling config dirs, and returns the
+configured instance.
+
+=head2 load_factory_offline(%opts)
+
+Searches F<app.psgi>/F<runyatt.psgi> upward from C<< $opts{dir} >> and
+loads it with C<< offline => 1 >> (error_handler passes raw die
+through). Returns nothing when no script is found. Prefer
+C<< YATT::Lite::Site->load >>, which adds the per-script cache and a
+clear error.
 
 =head1 METHODS
 
 =head2 get_yatt($location)
 
-=head2 render($name, $args)
+Returns the dirhandler for a location (like C</> or C</admin>),
+resolved against the template directories. Cached per location.
 
+=head2 get_dirhandler($physical_dir)
+
+Returns the dirhandler for a physical directory path (alias of
+C<load_yatt>). Cached per realpath.
+
+=head2 render($reqrec, $args)
+
+  print $factory->render('/index', {title => "Hello!"});
+
+Renders one page addressed by path (C<$reqrec> is a path string or
+C<[$path, $subpage, $action]>) and returns the output as decoded text
+(bytes when C<render_as_bytes> is set). C<render_encoded> returns raw
+bytes; C<render_into($con, $reqrec, $args)> writes into an existing
+connection.
+
+Since GH-267 the render path runs through a common context wrapper:
+it localizes C<$SYS>/C<$YATT>/C<$CON>, runs
+C<before_dirhandler>/C<after_dirhandler> (so C<site_config_as_entity>
+works here too) and holds the chdir guard - but intentionally does
+B<not> install the __DIE__/__WARN__ traps of the web path: errors
+propagate as raw die (perl -d friendly). See
+L<YATT::Lite::Site/"EXECUTION CONTRACTS">.
+
+=head2 run_dirhandler($dh, $con, $file)
+
+The web execution primitive: localizes C<$SYS>/C<$YATT>/C<$CON>, runs
+the dirhandler hooks and C<< $dh->handle >> (which installs the
+__DIE__/__WARN__ traps and the chdir guard). Used by
+C<SiteApp::call> and C<< Site->render_file >>.
+
+=head2 make_connection($fh, %opts)
+
+Creates a L<YATT::Lite::Connection> bound to this site
+(C<< system => $factory >> is added automatically, so
+C<< $CON->system >> returns the site).
+
+=head1 AUTHOR
+
+"KOBAYASI, Hiroaki" <hkoba@cpan.org>
+
+=cut

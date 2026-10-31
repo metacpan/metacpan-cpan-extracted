@@ -211,7 +211,7 @@ sub load_spec_arg {
 }
 
 # ---------------------------------------------------------------------------
-# lib/IO/K8s registry loading (mirrors t/34_registry_guard.t)
+# lib/IO/K8s registry loading (mirrors t/02_compile_all.t)
 # ---------------------------------------------------------------------------
 
 sub load_registry {

@@ -4,7 +4,7 @@ use warnings qw(FATAL all NONFATAL misc);
 use 5.010; no if $] >= 5.017011, warnings => "experimental";
 
 use Carp qw(carp croak confess);
-our $VERSION = '0.131';
+our $VERSION = '0.200';
 use mro 'c3';
 
 use Scalar::Util qw/weaken/;
@@ -15,42 +15,47 @@ use List::MoreUtils qw/uniq/;
 #
 use parent qw/YATT::Lite::Object File::Spec/;
 use YATT::Lite::Partial::MarkAfterNew -as_base;
-use YATT::Lite::MFields qw/YATT
-	      cf_dir
-	      cf_vfs cf_base
-	      cf_factory
-	      cf_header_charset
-	      cf_output_encoding
-	      cf_tmpl_encoding
-	      cf_index_name
-	      cf_ext_public
-	      cf_ext_private
-	      cf_app_ns
-	      entns
-	      cgen_class
+use YATT::Lite::MFields qw/_YATT
+	      dir
+	      vfs base
+	      factory
+	      header_charset
+	      output_encoding
+	      tmpl_encoding
+	      index_name
+	      ext_public
+	      ext_private
+	      app_ns
+	      _entns
+	      _cgen_class
 
-	      cf_app_name
-	      cf_debug_cgen cf_debug_parser cf_namespace cf_only_parse
-	      cf_special_entities cf_no_lineinfo cf_check_lineno
-	      cf_rc_script
-	      cf_tmpl_cache
-	      cf_dont_map_args
-	      cf_dont_debug_param
-	      cf_info
-	      cf_lcmsg_sink
-	      cf_always_refresh_deps
-	      cf_no_mro_c3
-	      cf_render_as_bytes
+	      app_name
+	      debug_cgen debug_parser namespace only_parse
+	      special_entities no_lineinfo check_lineno
+	      rc_script
+	      tmpl_cache
+	      dont_map_args
+	      dont_debug_param
+	      info
+	      lcmsg_sink
+	      always_refresh_deps
+	      no_mro_c3
+	      render_as_bytes
 
-	      cf_default_lang
+	      default_lang
 
-	      cf_entns2vfs_item
-	      cf_import
-              cf_match_argsroute_first
-              cf_stash_unknown_params_to
-              cf_body_argument
-              cf_body_argument_type
-	      cf_prefer_call_for_entity
+	      entns2vfs_item
+	      import
+              match_argsroute_first
+              stash_unknown_params_to
+              body_argument
+              body_argument_type
+	      prefer_call_for_entity
+	      no_conditional_call
+              allow_bare_entity_in_decl
+              no_chdir
+              pagevars
+              argmacro
 	    /;
 
 use constant DEBUG => $ENV{DEBUG_YATT_LITE};
@@ -94,20 +99,54 @@ sub with_system {
   $self->$method(@_);
 }
 
+#
+# "The cwd of a template is its directory" - scoped chdir with restore.
+# Returns a guard object which restores the previous cwd when it goes
+# out of scope (also when the scope dies). Returns undef (no-op) when
+# this handler has no physical directory or no_chdir is configured.
+# Note: chdir happens only for the entry dirhandler; templates in other
+# directories called via base/import do not re-chdir. GH-267
+#
+sub chdir_guard {
+  (my MY $self) = @_;
+  return undef if $self->{no_chdir};
+  defined(my $dir = $self->{dir}) or return undef;
+  YATT::Lite::ChdirGuard->new($dir);
+}
+
+{
+  package YATT::Lite::ChdirGuard;
+  use strict;
+  use Carp ();
+  require Cwd;
+  sub new {
+    my ($pack, $dir) = @_;
+    my $prev = Cwd::getcwd();
+    chdir($dir)
+      or Carp::croak("Can't chdir '$dir': $!");
+    bless \$prev, $pack;
+  }
+  sub DESTROY {
+    my ($self) = @_;
+    # Best effort restore. Never die in DESTROY.
+    chdir($$self) if defined $$self;
+  }
+}
+
 sub after_new {
   (my MY $self) = @_;
   $self->SUPER::after_new;
-  $self->{cf_index_name} //= "";
-  $self->{cf_ext_public} //= $self->default_ext_public;
-  $self->{cf_ext_private} //= $self->default_ext_private;
-  $self->{cf_body_argument} //= $self->default_body_argument;
-  $self->{cf_body_argument_type} //= $self->default_body_argument_type;
-  $self->{cf_output_encoding} //= $self->default_output_encoding;
+  $self->{index_name} //= "";
+  $self->{ext_public} //= $self->default_ext_public;
+  $self->{ext_private} //= $self->default_ext_private;
+  $self->{body_argument} //= $self->default_body_argument;
+  $self->{body_argument_type} //= $self->default_body_argument_type;
+  $self->{output_encoding} //= $self->default_output_encoding;
 }
 
 sub _after_after_new {
   (my MY $self) = @_;
-  weaken($self->{cf_factory});
+  weaken($self->{factory});
 }
 
 sub rel_app_name {
@@ -116,7 +155,7 @@ sub rel_app_name {
     Carp::croak "rel_app_name() is called without setting \$SYS!";
   }
   # XXX: This assumes $dir is somewhere under $app_root tree.
-  my $rel_app_name = substr($self->{cf_dir}, length($SYS->app_root));
+  my $rel_app_name = substr($self->{dir}, length($SYS->app_root));
   # Make sure leading / is removed.
   $rel_app_name =~ s|^/||;
   $rel_app_name;
@@ -125,7 +164,7 @@ sub rel_app_name {
 # XXX: kludge!
 sub find_neighbor_yatt {
   (my MY $self, my ($dir)) = @_;
-  $self->{cf_factory}->load_yatt($dir);
+  $self->{factory}->load_yatt($dir);
 }
 sub find_neighbor_vfs {
   (my MY $self, my ($dir)) = @_;
@@ -142,9 +181,12 @@ sub find_neighbor {
 #
 sub cget_all {
   (my MY $self, my $name) = @_;
+  if ($name =~ /^_/) {
+    croak "Private field is prohibited: $name";
+  }
   (map($_->cget_all($name)
        , $self->list_base_obj)
-   , lexpand($self->{"cf_$name"}));
+   , lexpand($self->{$name}));
 }
 
 sub list_base_obj {
@@ -157,8 +199,8 @@ sub list_base_obj {
 sub list_base_dir {
   (my MY $self) = @_;
 
-  my $base = $self->{cf_base} // do {
-    my %vfs = lexpand($self->{cf_vfs});
+  my $base = $self->{base} // do {
+    my %vfs = lexpand($self->{vfs});
     [map {
       #
       # Each element of $vfs{base} is either ARRAY (of vfs spec)
@@ -168,7 +210,7 @@ sub list_base_dir {
 	my %vfs_base = @$_;
 	$vfs_base{dir};
       } else {
-	$_->{cf_path};
+	$_->{path};
       }
     } lexpand($vfs{base})];
   };
@@ -184,13 +226,13 @@ sub handle {
   (my MY $self, my ($ext, $con, $file)) = @_;
   local ($YATT, $CON) = ($self, $con);
   $con->configure(yatt => $self);
-  if (my $enc = $self->{cf_output_encoding}) {
+  if (my $enc = $self->{output_encoding}) {
     $con->configure(encoding => $enc);
   }
 
   unless (defined $file) {
     confess "\n\nFilename for DirHandler->handle() is undef!"
-      ." in $self->{cf_app_ns}.\n";
+      ." in $self->{app_ns}.\n";
   }
 
   my $sub = $YATT->find_handler($ext, $file, $CON);
@@ -205,7 +247,7 @@ sub handle {
 sub render {
   my MY $self = shift;
   my $raw_bytes = $self->render_encoded(@_);
-  if ($self->{cf_render_as_bytes}) {
+  if ($self->{render_as_bytes}) {
     $raw_bytes
   } else {
     Encode::decode(utf8 => $raw_bytes);
@@ -215,7 +257,7 @@ sub render {
 sub render_encoded {
   my MY $self = shift;
   my $buffer; {
-    my $encName = $self->{cf_render_as_bytes} ? undef : $self->{cf_output_encoding};
+    my $encName = $self->{render_as_bytes} ? undef : $self->{output_encoding};
     my $con = $SYS
       ? $SYS->make_connection(undef, buffer => \$buffer, yatt => $self,
                               noheader => 1,
@@ -235,7 +277,7 @@ sub render_into {
   } else {
     $self->raw_render_into(
       $con,
-      YATT::Lite::Util::rootname($file || $self->{cf_index_name}),
+      YATT::Lite::Util::rootname($file || $self->{index_name}),
       $args,
     );
   }
@@ -250,8 +292,8 @@ sub raw_render_into {
 
 sub find_handler {
   (my MY $self, my ($ext, $file, $con)) = @_;
-  $ext //= $self->cut_ext($file) || $self->{cf_ext_public};
-  $ext = "yatt" if $ext eq $self->{cf_ext_public};
+  $ext //= $self->cut_ext($file) || $self->{ext_public};
+  $ext = "yatt" if $ext eq $self->{ext_public};
   my $sub = $self->can("_handle_$ext")
     or die "Unsupported file type: $ext";
   $sub;
@@ -285,7 +327,7 @@ sub prepare_part_handler {
   my $trans = $self->open_trans;
 
   my $mapped = [$file, my ($type, $item) = $con->sigil_type_item()];
-  if (not $self->{cf_dont_debug_param}
+  if (not $self->{dont_debug_param}
       and -e ".htdebug_param") {
     $self->dump($mapped, [map {[$_ => $con->param($_)]} $con->param]);
   }
@@ -298,7 +340,7 @@ sub prepare_part_handler {
   }
 
   my @args; @args = $trans->reorder_cgi_params($part, $con)
-    unless $self->{cf_dont_map_args} || $part->isa($trans->Action);
+    unless $self->{dont_map_args} || $part->isa($trans->Action);
 
   ($part, $sub, $pkg, \@args);
 }
@@ -326,8 +368,8 @@ sub finalize_connection {}
 #========================================
 sub fconfigure_encoding {
   my MY $self = shift;
-  return unless $self->{cf_output_encoding};
-  my $enc = "encoding($self->{cf_output_encoding})";
+  return unless $self->{output_encoding};
+  my $enc = "encoding($self->{output_encoding})";
   require PerlIO;
   foreach my $fh (@_) {
     next if grep {$_ eq $enc} PerlIO::get_layers($fh);
@@ -351,7 +393,7 @@ sub open_trans {
 *get_vfs = *get_trans; *get_vfs = *get_trans;
 sub get_trans {
   (my MY $self) = @_;
-  $self->{YATT} || $self->build_trans($self->{cf_tmpl_cache});
+  $self->{_YATT} || $self->build_trans($self->{tmpl_cache});
 }
 
 sub build_trans {
@@ -359,15 +401,15 @@ sub build_trans {
   my $class = $self->default_trans;
   ckrequire($class);
 
-  my @vfsspec = @{$vfsspec || $self->{cf_vfs}};
-  push @vfsspec, base => $self->{cf_base} if $self->{cf_base};
+  my @vfsspec = @{$vfsspec || $self->{vfs}};
+  push @vfsspec, base => $self->{base} if $self->{base};
 
-  $self->{YATT} = $class->new
+  $self->{_YATT} = $class->new
     (\@vfsspec
      , facade => $self
      , cache => $vfscache
-     , entns2vfs_item => $self->{cf_entns2vfs_item}
-     , entns => $self->{entns}
+     , entns2vfs_item => $self->{entns2vfs_item}
+     , entns => $self->{_entns}
      , @rest
      , $self->cf_delegate_defined($self->_cf_delegates));
 }
@@ -396,13 +438,17 @@ sub _cf_delegates {
      body_argument
      body_argument_type
      prefer_call_for_entity
+     no_conditional_call
+     allow_bare_entity_in_decl
+     pagevars
+     argmacro
     )
 }
 
 sub _before_after_new {
   (my MY $self) = @_;
-  $self->{cf_app_ns} //= $self->default_app_ns;
-  $self->{entns} = $self->ensure_entns($self->{cf_app_ns});
+  $self->{app_ns} //= $self->default_app_ns;
+  $self->{_entns} = $self->ensure_entns($self->{app_ns});
 }
 
 #========================================
@@ -421,13 +467,13 @@ sub get_cgen_class {
   my $name = "CGEN_$type";
   my $sub = $self->can("root_$name")
     or croak "Unknown cgen class: $type";
-  $self->{cgen_class}{$type}
-    ||= $self->ensure_cgen_for($type, $self->{cf_app_ns});
+  $self->{_cgen_class}{$type}
+    ||= $self->ensure_cgen_for($type, $self->{app_ns});
 }
 
 sub is_default_cgen_ready {
   (my MY $self) = @_;
-  $self->{cgen_class}{perl};
+  $self->{_cgen_class}{perl};
 }
 
 #========================================
@@ -443,7 +489,7 @@ sub root_EntNS { 'YATT::Lite::Entities' }
 sub should_use_mro_c3 {
   (my MY $self_or_pack) = @_;
   if (ref $self_or_pack) {
-    not $self_or_pack->{cf_no_mro_c3}
+    not $self_or_pack->{no_mro_c3}
   } else {
     mro::get_mro($self_or_pack) eq 'c3';
   }
@@ -677,7 +723,7 @@ BEGIN {
 
 sub use_encoded_config {
   (my MY $self) = @_;
-  $self->{cf_tmpl_encoding}
+  $self->{tmpl_encoding}
 }
 
 use YATT::Lite::Partial::Gettext;
@@ -699,7 +745,7 @@ sub lang_extract_lcmsg {
 sub default_default_lang { 'en' }
 sub default_lang {
   (my MY $self) = @_;
-  $self->{cf_default_lang} || $self->default_default_lang;
+  $self->{default_lang} || $self->default_default_lang;
 }
 
 #========================================
@@ -750,7 +796,7 @@ sub YATT::Lite::EntNS::entity_template {
 sub YATT::Lite::EntNS::entity_stash {
   my $this = shift;
   my $prop = $CON->prop;
-  my $stash = $prop->{stash} //= {};
+  my $stash = $prop->{_stash} //= {};
   unless (@_) {
     $stash
   } elsif (@_ > 1) {
@@ -758,16 +804,25 @@ sub YATT::Lite::EntNS::entity_stash {
   } elsif (not defined $_[0]) {
     carp "Undefined argument for :stash()";
   } elsif (ref $_[0]) {
-    $prop->{stash} = $_[0]
+    $prop->{_stash} = $_[0]
   } else {
     $stash->{$_[0]};
   }
 };
 
+# drop "[]" from "qname[]" and returns "qname"
+sub YATT::Lite::EntNS::entity_trim_array_suffix {
+  my ($this, $name) = @_;
+  $name =~ s/\[\]\z//;
+  $name;
+}
+
 sub YATT::Lite::EntNS::entity_mkhidden {
   my ($this) = shift;
+  my $no_nested_query = $CON->prop->{no_nested_query};
   \ join "\n", map {
     my $name = $_;
+    $name =~ s/\[\]\z// if not $no_nested_query;
     map {
       my $v = $_;
       if (ref $v eq 'HASH') {

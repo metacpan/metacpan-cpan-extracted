@@ -155,4 +155,11 @@ subtest 'undef namespace triggers auto-fill' => sub {
   is($ns, 'only-ns', 'undef triggers auto-fill');
 };
 
+subtest 'MCP_K8S_NAMESPACES is trimmed and empty entries dropped (k21)' => sub {
+  local $ENV{MCP_K8S_NAMESPACES} = 'default, production ,, staging,';
+  my $k8s = bless {}, 'MCP::K8s';
+  is_deeply($k8s->_build_namespaces, [qw( default production staging )],
+    'whitespace trimmed, empty elements dropped');
+};
+
 done_testing;

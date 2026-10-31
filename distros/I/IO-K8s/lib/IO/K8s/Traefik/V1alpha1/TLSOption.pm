@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TLSOption;
 # ABSTRACT: TLSOption is the CRD implementation of a Traefik TLS Option, allowing to configure some parameters of the TLS connection.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'tlsoptions';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::TLSOption - TLSOption is the CRD implementation of a
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 spec
 
@@ -33,7 +33,7 @@ TLSOptionSpec defines the desired state of a TLSOption.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -61,5 +61,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# $Id: Transformations.t,v 1.3 2004/04/02 12:03:34 mertz Exp $
+# $Id$
 # Author: Christophe Mertz
 #
 

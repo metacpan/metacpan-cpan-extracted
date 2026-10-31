@@ -58,6 +58,9 @@ require File::Spec;
     my ($thing, @name) = @_;
     my $class = ref $thing || $thing;
     no strict 'refs';
+    # perl -c で定義側モジュールが main になると、ここで作った glob が
+    # "used only once" (FATAL) になるため
+    no warnings 'once';
     \*{join("::", $class, grep {defined} @name)};
   }
   sub globref_default {
@@ -133,6 +136,22 @@ require File::Spec;
   # $fn:r
   sub rootname { my $fn = shift; $fn =~ s/\.\w+$//; join "", $fn, @_ }
   # $fn:r:t
+
+  # GH-251: trim_ext($fn, $ext_or_list)
+  # Trims one trailing ".$ext" only when $ext is a KNOWN extension.
+  # (cf. cut_ext, which extracts ANY last extension)
+  # This follows Apache mod_mime/mod_negotiation model: "foo.tar.yatt"
+  # minus known ext "yatt" is "foo.tar", and "foo.bar" with unknown
+  # ext is left as-is.
+  sub trim_ext {
+    my ($fn, $ext_or_list) = @_;
+    return undef unless defined $fn;
+    foreach my $ext (lexpand($ext_or_list // 'yatt')) {
+      (my $e = $ext) =~ s/^\.//;
+      return $fn if $fn =~ s/\.\Q$e\E\z//;
+    }
+    $fn;
+  }
   sub appname {
     my $fn = shift;
     $fn =~ s/\.\w+$//;
@@ -186,6 +205,41 @@ require File::Spec;
     ckrequire($_[0]);
   }
 
+  #
+  # secure_random_bytes($n) returns $n bytes from the OS CSPRNG, for
+  # session ids and tokens. Never falls back to perl's rand().
+  #
+  our $SECURE_RANDOM_SOURCE;
+  sub secure_random_bytes {
+    my ($n) = @_;
+    $SECURE_RANDOM_SOURCE //= do {
+      if (eval {permissive_require('Crypt::SysRandom'); 1}) {
+        sub { Crypt::SysRandom::random_bytes($_[0]) };
+      } elsif (eval {permissive_require('Crypt::URandom'); 1}) {
+        sub { Crypt::URandom::urandom($_[0]) };
+      } elsif (-r '/dev/urandom') {
+        sub {
+          open my $fh, '<:raw', '/dev/urandom'
+            or croak "Can't open /dev/urandom: $!";
+          my $buf = '';
+          while (length $buf < $_[0]) {
+            my $got = sysread $fh, $buf, $_[0] - length $buf, length $buf;
+            croak "Can't read /dev/urandom: $!" unless defined $got and $got > 0;
+          }
+          $buf;
+        };
+      } else {
+        croak "No secure random source! Please install Crypt::SysRandom";
+      }
+    };
+    $SECURE_RANDOM_SOURCE->($n);
+  }
+
+  sub secure_random_hex {
+    my ($nbytes) = @_;
+    unpack('H*', secure_random_bytes($nbytes));
+  }
+
   use Scalar::Util qw(refaddr);
   sub cached_in {
     my ($dir, $dict, $nameSpec, $sys, $mark, $loader, $refresher) = @_;
@@ -235,17 +289,23 @@ require File::Spec;
 
     $dir .= "/" if $dir !~ m{/$};
     my $subpath = substr($path, $pos);
+    # GH-251: $request_file keeps the file name part as it appeared
+    # in $path (empty when the name is totally omitted).
+    my $request_file;
     if (not defined $file) {
       if ($subpath =~ m{^/(\w+)(?:/|$)} and -e "$dir/$1.$default_ext") {
 	$subpath = substr($subpath, 1+length $1);
+	$request_file = $1;
 	$file = "$1.$default_ext";
       } elsif (-e "$dir/index.$default_ext") {
 	# index.yatt should subsume all subpath.
       } elsif ($subpath =~ s{^/([^/]+)$}{}) {
 	# Note: Actually, $file is not accesible in this case.
 	# This is just for better error diag.
-	$file = $1;
+	$file = $request_file = $1;
       }
+    } else {
+      $request_file = $file;
     }
 
     my $loc = substr($dir, length($startDir));
@@ -260,6 +320,7 @@ require File::Spec;
      , $file // ''
      , $subpath
      , (not defined $file)
+     , $request_file // ''
     );
   }
 
@@ -292,20 +353,26 @@ require File::Spec;
 	my $base = "$dir$loc/$cur";
 	if (defined $ext and -r "$base$ext") {
 	  # If extension is specified and it is readable, use it.
-	  return ($dir, "$loc/", "$cur$ext", $pi);
+	  return ($dir, "$loc/", "$cur$ext", $pi, 0, "$cur$ext");
 	} elsif ($pi =~ m{^/} and -d $base) {
 	  # path_info has '/' and directory exists.
 	  next; # candidate
 	} else {
           foreach my $want_ext ($ext1, @ext) {
             if (-r (my $fn = "$base.$want_ext")) {
-              return ($dir, "$loc/", "$cur.$want_ext", $pi);
+              # GH-251: request_file must be a dot-boundary prefix of
+              # the resolved file name (Apache MultiViews model), so
+              # that only substrings of real file names can flow into
+              # url reconstruction. Thus a mismatching requested ext
+              # (e.g. request "foo.html" resolved to "foo.yatt") is
+              # NOT reproduced here; $cur is used instead.
+              return ($dir, "$loc/", "$cur.$want_ext", $pi, 0, $cur);
             }
           }
           if ($use_subpath
               and -r (my $alt = "$dir$loc/$ixfn")) {
             $ext //= "";
-            return ($dir, "$loc/", $ixfn, "/$cur$ext$pi", 1);
+            return ($dir, "$loc/", $ixfn, "/$cur$ext$pi", 1, '');
           } else {
             # Neither dir nor $cur$want_ext exists, it should be ignored.
             undef $dir;
@@ -323,7 +390,7 @@ require File::Spec;
 
     foreach my $dir (@dirlist) {
       next unless -r "$dir$loc/$ixfn";
-      return ($dir, "$loc/", "$ixfn", "", 1);
+      return ($dir, "$loc/", "$ixfn", "", 1, '');
     }
 
       print STDERR terse_dump('at_last'), "\n" if DEBUG_LOOKUP_PATH;
@@ -348,6 +415,28 @@ require File::Spec;
     #see https://rt.cpan.org/Public/Bug/Display.html?id=80077
     $path =~ s{^//}{/};
     return $path;
+  }
+
+  # GH-260: lexical normalization for filesystem paths (app_root and its
+  # relatives). Unlike normalize_path above (PATH_INFO semantics, where a
+  # trailing slash is significant), this collapses "." and ".." segments and
+  # strips trailing slashes. Symlinks are deliberately not resolved, so a
+  # deployment reached through a symlinked path keeps its spelling.
+  sub normalize_fs_path {
+    my ($path) = @_;
+    return $path unless defined $path and $path ne '';
+    my $abs = substr($path, 0, 1) eq '/';
+    my @out;
+    foreach my $seg (split '/', $path) {
+      next if $seg eq '' or $seg eq '.';
+      if ($seg eq '..') {
+        if (@out and $out[-1] ne '..') { pop @out; next; }
+        next if $abs;   # POSIX: "/.." means "/".
+      }
+      push @out, $seg;
+    }
+    my $result = join('/', @out);
+    $abs ? "/$result" : ($result ne '' ? $result : '.');
   }
 
 
@@ -517,16 +606,39 @@ BEGIN {
 	      }
 	    };
 	  } $sub->($str))).')';
-	} else {
-	  # XXX: Is this secure???
-	  # XXX: Should be JSON?
+	} elsif (escape_may_dump_ref()) {
+	  # Development aid: show the structure, fully escaped (inside <pre>
+	  # the browser renders the entities back, so readability is kept).
+	  # Use &yatt:dump() when you really mean to print a structure.
 	  my $copy = indented_dump($str);
-	  $copy =~ s{([<\"]|-->)}{$escape{$1}}g; # XXX: Minimum. May be insecure.
+	  $copy =~ s{([<>&\"\'])}{$escape{$1}}g;
 	  $copy;
+	} else {
+	  # Production: never leak the contents of a structure that was
+	  # (probably by accident) printed as text. Type name only.
+	  '[' . escape(ref $str) . ']';
 	}
       };
     }
     wantarray ? @result : $result[0];
+  }
+
+  #
+  # Whether escape() may dump a reference. Decided per request through
+  # $CON->has_htdebug('dump') (cached in the connection), which consults
+  # $ENV{HTDEBUG_DUMP} and $app_root/.htdebug_dump. Without either,
+  # dumping is allowed only under PLACK_ENV=development.
+  #
+  sub escape_may_dump_ref {
+    if (exists $ENV{HTDEBUG_DUMP}) {
+      return $ENV{HTDEBUG_DUMP} ? 1 : 0;
+    }
+    if (my $con = $YATT::Lite::Entities::CON) {
+      if ($con->can('has_htdebug') and $con->has_htdebug('dump')) {
+        return 1;
+      }
+    }
+    ($ENV{PLACK_ENV} // '') eq 'development' ? 1 : 0;
   }
 }
 
@@ -545,12 +657,20 @@ BEGIN {
   package
     YATT::Lite::Util::named_attr;
   BEGIN {our @ISA = ('YATT::Lite::Util::escapable')};
-  use overload qw("" as_string);
+  use overload qw("" as_string eq streq ne strne);
   sub as_string {
     shift->[-1];
   }
   sub as_escaped {
     sprintf q{ %s="%s"}, $_[0][0], $_[0][1];
+  }
+  sub streq {
+    my ($self, $other) = @_;
+    $self->[-1] eq (ref $other ? $other->[-1] : $other);
+  }
+  sub strne {
+    my ($self, $other) = @_;
+    $self->[-1] ne (ref $other ? $other->[-1] : $other);
   }
 }
 
@@ -565,23 +685,32 @@ sub named_attr {
 {
   # XXX: These functions are deprecated. Use att_value_in() instead.
 
-  sub value_checked  { _value_checked($_[0], $_[1], checked => '') }
-  sub value_selected { _value_checked($_[0], $_[1], selected => '') }
+  sub value_checked  { _value_checked($_[0], $_[1], $_[2], checked => '') }
+  sub value_selected { _value_checked($_[0], $_[1], $_[2], selected => '') }
 
   sub _value_checked {
-    my ($value, $hash, $then, $else) = @_;
-    sprintf q|value="%s"%s|, escape($value)
-      , _if_checked($hash, $value, $then, $else);
+    my ($value, $hashOrArray, $isDefault, $then, $else) = @_;
+    sprintf q|value="%s"%s|, escape($value), do {
+      if (_if_checked($hashOrArray, $value) // $isDefault) {
+        " $then"
+      } else {
+        $else // ''
+      }
+    };
   }
 
   sub _if_checked {
-    my ($in, $value, $then, $else) = @_;
-    $else //= '';
-    return $else unless defined $in;
-    if (ref $in ? $in->{$value // ''} : ($in eq $value)) {
-      " $then"
+    my ($in, $value) = @_;
+    if (not defined $in) {
+      undef
+    } elsif (not ref $in) {
+      ($in eq $value)
+    } elsif (ref $in eq 'HASH') {
+      $in->{$value // ''}
+    } elsif (ref $in eq 'ARRAY') {
+      grep {$value eq $_} @$in
     } else {
-      $else;
+      undef
     }
   }
 }
@@ -693,10 +822,6 @@ sub url_encode_kv {
 
 sub encode_query {
   my ($self, $param, $sep) = @_;
-#  require URI;
-#  my $url = URI->new('http:');
-#  $url->query_form($item->{cf_PARAM});
-#  $url->query;
   return $param unless ref $param;
   join $sep // ';', do {
     if (ref $param eq 'HASH') {
@@ -906,19 +1031,61 @@ sub raise_response {
 #
 # $this->raise_download($fileName, $bytesOrBytesRef, ?[@header]?)
 #
+# $fileName is treated as data (templates pass request-derived names
+# here): control characters are dropped so it can never break out of the
+# header, and anything beyond plain ASCII is carried in an RFC 8187
+# filename*= parameter with an ASCII-only filename= fallback.
+#
 sub raise_download {
   my $this = $_[0];
   my $filename = $_[1];
   my $bytesRef = ref $_[2] eq 'SCALAR' ? $_[2] : \$_[2];
   my @header = ("Content-type" => qq{application/octet-stream},
                 , "Content-Length" => length($$bytesRef));
-  push @header, "Content-Disposition" => qq{attachment; filename="$filename"}
-    if defined $filename and $filename ne '';
+  if (my $disposition = content_disposition_attachment($filename)) {
+    push @header, "Content-Disposition" => $disposition;
+  }
   if (defined $_[3] and ref $_[3]) {
-    push @header, lexpand($_[3]);
+    my @extra = lexpand($_[3]);
+    for (my $i = 0; $i < @extra; $i += 2) {
+      my ($k, $v) = @extra[$i, $i+1];
+      croak "raise_download: header name is not a token: ".($k // 'undef')
+        unless defined $k and $k =~ /^[\w-]+\z/;
+      croak "raise_download: header '$k' contains a control character"
+        if defined $v and $v =~ /[\x00-\x1f\x7f]/;
+    }
+    push @header, @extra;
   }
 
   $this->raise_response([200, \@header, [$$bytesRef]]);
+}
+
+#
+# content_disposition_attachment($filename) returns the value of a
+# Content-Disposition header for an attachment download, or undef when
+# $filename is empty. Control characters (CR, LF, NUL, ...) are removed.
+# When the remainder is not plain ASCII without '"' or '\', an ASCII
+# fallback is used for filename= and the real name goes to filename*=
+# (RFC 8187, UTF-8 percent-encoded).
+#
+sub content_disposition_attachment {
+  my ($filename) = @_;
+  return undef unless defined $filename and $filename ne '';
+
+  (my $name = $filename) =~ s/[\x00-\x1f\x7f]//g;
+  return undef if $name eq '';
+
+  if ($name =~ /^[\x20-\x7e]+\z/ and $name !~ /["\\]/) {
+    return qq{attachment; filename="$name"};
+  }
+
+  (my $fallback = $name) =~ s/[^\x20-\x7e]|["\\]/_/g;
+
+  my $encoded = utf8::is_utf8($name)
+    ? URI::Escape::uri_escape_utf8($name)
+    : URI::Escape::uri_escape($name);
+
+  qq{attachment; filename="$fallback"; filename*=UTF-8''$encoded};
 }
 
 #========================================

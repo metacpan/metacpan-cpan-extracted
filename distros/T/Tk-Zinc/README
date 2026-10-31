@@ -1,95 +1,133 @@
-Tk::Zinc - another Canvas which proposes many new functions, some based on openGL
+Tk::Zinc - a canvas widget with groups, transformations and OpenGL rendering
 
-Tk::Zinc for Perl/Tk is available for Linux, Windows and MacOSX. 
-the easiest way could be to use he CPAN.
-To build it you need:
+This README describes building and using the exported Perl distribution.
+For instructions on generating it from the full TkZinc repository, see the
+repository's top-level README.md.
 
-* On a Linux system, you need Perl (>= 5.6) and perl-tk (800 or 804) as well as
-  perl-tk development packages.
+Requirements:
 
-* On MacOSX you need:
-  - fink with tk-pm package and its dependencies (http://fink.sf.net)
-    tk-pm is available in unstable. You can add this binary unstable tree to you /sw/etc/apt/sources.list:
-    deb http://fink.opendarwin.org/bbraun 10.3/unstable main crypto
-    deb http://fink.opendarwin.org/bbraun 10.3/stable main crypto
-  - X11 and X11 SDK from Apple (http://www.apple.com/macosx/x11/)
+* Perl 5.8.0 or later.
+* Perl/Tk 804, including the headers needed to build extensions.
+* ExtUtils::MakeMaker 6.98 or later for building.
+* Test::More 0.98 or later for running the tests.
+* A C compiler with stdint.h, a compatible make utility, and the system
+  OpenGL and GLU development libraries. Linux also requires X11 development
+  libraries.
 
-* On WinXP you need:
-  - ActivePerl (5.8.6.811 or higher) from activatestate.com or Strawberry Perl from strawberryperl.com
-  - and
-    - if you want to compile TkZinc by yourself:
-      Visual C++ or the Free Visual C++ Command Line Tools
+Older Perl installations may need updates to the build and test modules.
+Choose module versions compatible with your Perl; the newest module releases
+may have higher Perl requirements. Perl 5.8.0 is the minimum compatibility
+target, not a recommendation to install an obsolete Perl release.
 
+The current build has been tested with Perl 5.30, Perl/Tk 804.033 on
+Ubuntu/WSL, and Perl/Tk 804.036 with 64-bit Strawberry Perl on Windows.
+Perl 5.8.0 itself has not yet been tested with the current sources.
 
-Install:
+The distribution bundles GLEW 2.3.1 as source. It is compiled into the
+extension with private symbols; no separate GLEW installation or glew32.dll
+is needed. See third_party/glew/README.tkzinc.md and
+third_party/glew/LICENSE.txt.
+
+Linux and WSL (Ubuntu):
+
+Install the build dependencies:
+
+  sudo apt update
+  sudo apt install build-essential perl perl-tk \
+      libx11-dev libxext-dev libgl-dev libglu1-mesa-dev
+
+From the exported distribution directory:
 
   perl Makefile.PL
-  # you can use the following options: --with-gl=yes|no --with-atc=yes|no --with-shape=yes|no
-  # current defaults are  --with-gl=yes --with-atc=yes --with-shape=yes
-
   make
   make test
 
-  # to run demos before installing:
-  perl -Iblib/arch -Iblib/lib demos/zinc-demos
+To run the demos before installing:
+
+  perl -Mblib demos/zinc-demos
+
+To install into your chosen Perl installation (permissions may be required):
 
   make install
 
+GUI tests need an X display. For automated tests without a visible window:
 
+  sudo apt install xvfb xauth
+  xvfb-run -a make test
 
-WATCH OUT! On Linux it is quite frequent to have both Mesa and proprietary
-           openGL libraries installed. This may lead to big problems at
-           runtime if the linker picks the wrong library. It is often the
-           the case between the static (libGL.a) Mesa library and the dynamic
-           (libGL.so) NVidia library. It is very important to assert that
-           the link is done with the library matching the openGL driver
-           loaded in the X server.
+Windows:
 
-In the case you need to use another version of perl-tk than the one installed in the 
-system, you should use the following command as a template to adapt to follow your 
-specific patches of the alternative perl-tk installation:
+Use Perl with Perl/Tk and a C compiler and make utility compatible with that
+Perl installation. The build has been tested with 64-bit Strawberry Perl,
+which includes GCC and gmake. Other Perl distributions need a matching
+toolchain and have not been verified here.
 
-  env PERL5LIB=/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl Makefile.PL
-  make
-  env PERL5LIB=/usr/local/test/804_027/lib/perl5/5.8.1/i386-linux-thread-multi:/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi make test
+From the exported distribution directory, using Strawberry Perl:
 
-  # to run demos before installing:
-  env PERL5LIB=/usr/local/test/804_027/lib/perl5/5.8.1/i386-linux-thread-multi:/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl -Iblib/arch -Iblib/lib demos/zinc-demos
+  perl Makefile.PL
+  gmake
+  gmake test
 
-  # and finally
-  make install
+To run the demos before installing:
 
-  # and to run your script:
-  env PERL5LIB=/usr/local/test/804_027/lib/perl5/5.8.1/i386-linux-thread-multi:/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl <your_script.pl>
+  perl -Mblib demos/zinc-demos
 
+To install:
 
+  gmake install
 
+macOS:
 
-documentation is also available at https://github.com/asb-capfan/TkZinc
-The source of the reference manual is available in the full source package,
-which also includes TkZinc for Tcl/Tk, for Perl/Tk, and for Python.
+The project contains historical macOS support, but the current Perl build
+has not been verified on macOS. The old Fink installation instructions are
+obsolete. A matching Perl/Tk development environment, C compiler, make,
+and the graphics dependencies are required.
 
+Build options:
 
-After installation, we recommend you to launch the zinc-demos script,
-a front-end to more than 30 small demos.
+  perl Makefile.PL --with-gl=yes --with-atc=yes --with-shape=yes
 
-For more information on building Tk::Zinc, a README is available in 
-the tkzinc-*tgz tar file (on Tkzinc web site) used for building all
-flavor of TkZinc (ie tcl, perl and python)
+These are the defaults. Use "no" to disable an option. Shape support is
+always disabled on Windows. Disabling OpenGL rendering does not remove
+all OpenGL/GLU build dependencies.
 
-This software is delivered under new BSD license.
-For the copyright, please, read the Copyright file.
+The animated gradient test keeps all transformations but redraws fewer
+frames by default. Set TKZINC_TEST_FULL_ANIMATION=1 for the full visual
+animation.
 
-For any question on Tk::Zinc usage, build or installation,
-please file an inquiry here: https://github.com/asb-capfan/TkZinc/issues
+Using another Perl/Tk installation:
 
+Run Makefile.PL, the build, tests, and your application with the same Perl
+and Perl/Tk installation. If using PERL5LIB, include that installation's
+library and architecture-specific directories throughout these steps.
+Do not mix compiled extensions from different Perl installations.
 
-Authors and Contributors:
+Exporting from the full source repository:
 
-Tk::Zinc main author is Patrick Lecoanet (CENA)
-Sub-Modules, demos and documentation have been developped by
-Daniel Etienne (CENA), Christophe Mertz (formerly CENA and now IntuiLab), 
-Jean-Luc Vinot (CENA), with contributions from Stéphane Chatty (Intuilab), 
-Céline Schlienger (IntuiLab), Alexandre Lemort (IntuiLab)
-Stéphane Conversy (CENA) contributed to the MacOSX port.
-Many others contributed with their bug reports!
+The separate Perl/export2cpan.pl script requires File::Path 2.06 or later
+for make_path. This is not a runtime dependency of Tk::Zinc. In particular,
+Perl 5.8.0 and 5.8.8 need a File::Path update before running the exporter.
+See the top-level README.md for the export workflow.
+
+Documentation and support:
+
+Documentation and the full source package are available at:
+https://github.com/asb-capfan/TkZinc
+
+After installation, zinc-demos provides a front-end to more than 30 demos.
+
+Report build, installation and usage issues at:
+https://github.com/asb-capfan/TkZinc/issues
+
+This software is distributed under the new BSD license.
+See Copyright for copyright information.
+
+Authors and contributors:
+
+Tk::Zinc's main author is Patrick Lecoanet (CENA).
+Submodules, demos and documentation were developed by Daniel Etienne (CENA),
+Christophe Mertz (formerly CENA, then IntuiLab) and Jean-Luc Vinot (CENA),
+with contributions from StÃ©phane Chatty (IntuiLab), CÃ©line Schlienger
+(IntuiLab) and Alexandre Lemort (IntuiLab).
+StÃ©phane Conversy (CENA) contributed to the macOS port.
+Many others contributed bug reports.

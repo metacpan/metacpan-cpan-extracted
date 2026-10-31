@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
-# $Id: path_tags.pl,v 1.8 2003/10/14 09:01:52 mertz Exp $
+# $Id$
 # this pathtatg demo have been developped by C. Mertz mertz@cena.fr
 # with the help of Daniel Etienne etienne@cena.fr
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

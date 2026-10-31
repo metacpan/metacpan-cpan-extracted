@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::PortInfo;
 # ABSTRACT: PortInfo specifies L4 port number and name along with the transport protocol
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s name     => Str, { pattern => qr/^([0-9]{1,4})|([a-zA-Z0-9]-?)*[a-zA-Z](-?[a-zA-Z0-9])*$/ };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::PortInfo - PortInfo specifies L4 port number and name along
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 name
 
@@ -45,7 +45,7 @@ Accepted values: "TCP", "UDP"
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -73,5 +73,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

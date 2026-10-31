@@ -19,7 +19,7 @@ use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS::Connection;
 use Travel::Routing::DE::DBRIS::Offer;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 Travel::Routing::DE::DBRIS->mk_ro_accessors(qw(earlier later));
 
@@ -40,14 +40,14 @@ sub new {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 20 } };
 
 		# work around Akamai BMP TLS fingerprinting
-		$lwp_options{ssl_opts}{SSL_ciphersuites} = 'TLS_CHACHA20_POLY1305_SHA256';
+		$lwp_options{ssl_opts}{SSL_ciphersuites} = 'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256';
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}
 
 	my @ua_base = (
 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.XXXX.YYY Mobile Safari/537.36',
-'Mozila/5.0 (Linux; Android 14; SM-S928B/DS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.XXXX.YYY Mobile Safari/537.36',
+'Mozilla/5.0 (Linux; Android 14; SM-S928B/DS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.XXXX.YYY Mobile Safari/537.36',
 'Mozilla/5.0 (Linux; Android 14; Pixel 9 Pro Build/AD1A.240418.003; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.XXXX.YYY Mobile Safari/537.36',
 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.XXXX.YYY Mobile Safari/537.36',
 'Mozilla/5.0 (Linux; Android 15; moto g - 2025 Build/V1VK35.22-13-2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/132.0.XXXX.YYY Mobile Safari/537.36',
@@ -437,7 +437,7 @@ Travel::Routing::DE::DBRIS - Interface to the bahn.de itinerary service
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 DESCRIPTION
 

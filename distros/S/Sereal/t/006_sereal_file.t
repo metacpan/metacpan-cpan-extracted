@@ -8,8 +8,9 @@ BEGIN {
     lib->import('lib')
         if !-d 't';
 }
-use Sereal::TestSet qw(:all);
-use Sereal          qw(
+use Sereal::TestSet            qw(:all);
+use Sereal::Encoder::Constants qw(SRL_PROTOCOL_VERSION);
+use Sereal                     qw(
     get_sereal_decoder
     get_sereal_encoder
     clear_sereal_object_cache
@@ -86,7 +87,7 @@ my $source = { foo => 1 };
 
 {
     my $encoder_0 = get_sereal_encoder( { compress => SRL_ZLIB, compress_level => 9 } );
-    my $decoder_0 = get_sereal_decoder( { set_read_only => 1, use_undef => 1 } );
+    my $decoder_0 = get_sereal_decoder( { set_readonly => 1, use_undef => 1 } );
     is( ref($encoder_0), "Sereal::Encoder", "get_sereal_encoder returned an encoder" );
     is( ref($decoder_0), "Sereal::Decoder", "get_sereal_decoder returned a decoder" );
     my $encoder_1 = get_sereal_encoder();
@@ -96,7 +97,7 @@ my $source = { foo => 1 };
     ok( $encoder_0 != $encoder_1, "encoder_0 is different from encoder_1" );
     ok( $decoder_0 != $decoder_1, "decoder_0 is different from decoder_1" );
     my $encoder_2 = get_sereal_encoder( { compress => SRL_ZLIB, compress_level => 9 } );
-    my $decoder_2 = get_sereal_decoder( { set_read_only => 1, use_undef => 1 } );
+    my $decoder_2 = get_sereal_decoder( { set_readonly => 1, use_undef => 1 } );
     is( ref($encoder_2), "Sereal::Encoder", "get_sereal_encoder returned an encoder" );
     is( ref($decoder_2), "Sereal::Decoder", "get_sereal_decoder returned a decoder" );
     ok( $encoder_0 == $encoder_2, "encoder_0 is same as encoder_2" );
@@ -110,18 +111,21 @@ my $source = { foo => 1 };
 {
     my $encoded = encode_sereal( ["foo"] );
     my $decoded = decode_sereal($encoded);
-    is( $decoded->[0],               "foo", "encode_sereal/decode_sereal seem to work" );
-    is( looks_like_sereal($encoded), 5,     "functional looks_like_sereal() works as expected" );
+    is( $decoded->[0], "foo", "encode_sereal/decode_sereal seem to work" );
     is(
-        Sereal::Decoder->new()->looks_like_sereal($encoded), 5,
+        looks_like_sereal($encoded), SRL_PROTOCOL_VERSION,
+        "functional looks_like_sereal() works as expected"
+    );
+    is(
+        Sereal::Decoder->new()->looks_like_sereal($encoded), SRL_PROTOCOL_VERSION,
         "object method looks_like_sereal() works as expected"
     );
     is(
-        Sereal::Decoder->looks_like_sereal($encoded), 5,
+        Sereal::Decoder->looks_like_sereal($encoded), SRL_PROTOCOL_VERSION,
         "class method looks_like_sereal() works as expected"
     );
     is(
-        scalar_looks_like_sereal($encoded), 5,
+        scalar_looks_like_sereal($encoded), SRL_PROTOCOL_VERSION,
         "functional scalar_looks_like_sereal() works as expected"
     );
     my $eval_ok = eval q{

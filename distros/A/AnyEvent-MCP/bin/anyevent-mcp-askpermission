@@ -24,14 +24,15 @@ The helper tries YAD first, leaving display backend selection to GTK.
 If YAD cannot start, it asks on C</dev/tty>. Closing a working dialog,
 terminal EOF, or having neither interface available means deny once.
 
-Server, tool, action, workdir, subject and reason are shown as read-only
+Server, tool, action, current dimension values and reason are shown as read-only
 GTK labels when present, including the multibroker alias when available.
 The requested sandbox grants appear together on one line. The initial YAD
 form also has a C<Denial reason (optional)> field above four choices:
 C<Deny once>, C<Deny always...>, C<Allow always...>, C<Allow once>.
-The persistent rule editor can match the selected workdir (default) or any
-configured workdir, including future ones. This changes rule matching,
-not per-call sandbox grants.
+The persistent rule editor creates a selector for every named permission
+dimension and uses the server's labels and offered matchers. For example,
+the workdir dimension may offer this workdir or any configured workdir.
+The scopes affect saved rule matching, not the current call's sandbox grants.
 One-time decisions are on the outside; C<Deny once>
 uses YAD's default OK response. Closing the dialog also denies once.
 The persistent choices open a separate rule editor for grant and scope
@@ -178,14 +179,17 @@ sub manage_rules {
          "--list", "--title=MCP permission rules", "--width=900", "--height=450",
          "--text=$file\nRules are evaluated from top to bottom; the first match wins.",
          "--column=Order:NUM", "--column=Decision", "--column=Action",
-         "--column=Workdir", "--column=Subject", "--column=Sandbox grants", "--column=Expires",
+         "--column=Dimensions", "--column=Sandbox grants", "--column=Expires",
          "--no-click", "--print-column=1", "--separator=\x1f",
          "--button=Close:0", "--button=Move up:4",
          "--button=Move down:6", "--button=Delete selected:2",
          map {
             my $rule = $rules->[$_];
             $_ + 1, $rule->{decision} || "ask",
-            (map { exists $rule->{$_} ? $json->encode ($rule->{$_}) : "(any)" } qw(action workdir subject sandbox-grants)),
+            (exists $rule->{action} ? $json->encode ($rule->{action}) : "(any)"),
+            (join ", ", map { "$_=" . $json->encode ($rule->{$_}) }
+               sort grep /^match\./, keys %$rule) || "(any)",
+            (exists $rule->{"sandbox-grants"} ? $json->encode ($rule->{"sandbox-grants"}) : "(any)"),
             (exists $rule->{expires} ? scalar localtime $rule->{expires} : "Indefinite")
          } 0 .. $#$rules,
       );
@@ -265,9 +269,10 @@ if (defined $edit_file) {
 
 my $request = do { local $/; JSON::XS::decode_json (scalar <STDIN>) };
 die "Invalid permission request\n" unless $request->{version} == 1;
-my $subjects = $request->{subjects} || [];
+my $dimensions = $request->{dimensions} || {};
+my @dimensions = sort keys %$dimensions;
 my %decisions = (d => "deny-once", n => "deny-always", o => "allow-once", a => "allow-always");
-my $persistent = !defined $request->{subject} || @$subjects;
+my $persistent = !grep !@{$dimensions->{$_}{choices}}, @dimensions;
 my @deny_paths = grep defined && !ref, @{$request->{paths} || []};
 my $unsandboxed = ($request->{sandbox_implementation} || "") =~ /\ANONE/;
 
@@ -290,15 +295,16 @@ sub rule_dialog {
          $label =~ s/\\/\\\\/g;
          ("--field=$label:CHK", $selected{$grant} ? "TRUE" : "FALSE")
       } @{$request->{sandbox_grant_choices}}) : ()),
-      (defined $request->{workdir} ? ("--field=Workdir scope:CB",
-         "^1: This workdir\x1f2: Any configured workdir, including future ones") : ()),
-      (@$subjects ? ("--field=Rule scope:CB", join "\x1f",
-         map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": " . $json->encode ($subjects->[$_]{label}) }
-            0 .. $#$subjects) : ()),
+      (map {
+         my $dim = $dimensions->{$_};
+         ("--field=$dim->{label} scope:CB", join "\x1f",
+            map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) }
+               0 .. $#{$dim->{choices}})
+      } @dimensions),
       (!$allow && @deny_paths ? ("--field=Deny file scope:CB", join "\x1f",
          (map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": Exact file " . $json->encode ($deny_paths[$_]) }
             0 .. $#deny_paths),
-         scalar (@deny_paths + 1) . ": All paths") : ()),
+         (@deny_paths + 1) . ": All paths") : ()),
       "--field=Rule lifetime:CB", "^Indefinite\x1f900 seconds\x1f16 hours",
    );
    return { decision => "back" } if $status == 10;
@@ -314,16 +320,11 @@ sub rule_dialog {
       }
       $answer{sandbox_grants} = \@grants;
    }
-   if (defined $request->{workdir}) {
+   for my $name (@dimensions) {
       my $index = shift @values;
-      die "Invalid YAD workdir scope\n" unless defined $index && $index =~ /\A[12]\z/;
-      $answer{workdir_scope} = "all" if $index == 2;
-   }
-   if (@$subjects) {
-      my $index = shift @values;
-      die "Invalid YAD rule scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
-         && $index <= @$subjects;
-      $answer{subject} = $subjects->[$index - 1]{subject};
+      die "Invalid YAD dimension scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
+         && $index <= @{$dimensions->{$name}{choices}};
+      $answer{"dim_$name"} = $dimensions->{$name}{choices}[$index - 1]{match};
    }
    if (!$allow && @deny_paths) {
       my $index = shift @values;
@@ -413,12 +414,16 @@ sub graphical {
          action                 => "Action",
          action_description     => "Action description",
          sandbox_implementation => "Sandbox",
-         subject                => "Subject",
-         workdir                => "Workdir",
          paths                  => "Paths",
          reason                 => "Reason",
       }->{$_} || ucfirst $_) . ": $value"
-   } grep defined $request->{$_}, qw(name multibroker_alias tool action action_description sandbox_implementation workdir subject paths reason);
+   } grep defined $request->{$_},
+      qw(name multibroker_alias tool action action_description
+         sandbox_implementation paths reason);
+   push @details, map {
+      my $dim = $dimensions->{$_};
+      "$dim->{label}: " . $json->encode ($dim->{value})
+   } @dimensions;
 
    my @view_fields = detail_fields;
    my $message = $request->{_permission_selection}{message} // "";
@@ -430,7 +435,7 @@ sub graphical {
          "--text=" . ($unsandboxed
             ? "WARNING: NO SANDBOX. Workers run with all privileges of the host user.\n"
             : "")
-            . "Required grants: " . join (" ", @{$request->{sandbox_grants}}),
+            . "Required grants: " . (join " ", @{$request->{sandbox_grants}}),
          "--separator=\x1f", "--item-separator=\x1f", "--num-output", "--always-print-result",
          "--focus-field=" . (@details + @view_fields / 2 + 1),
          "--buttons-layout=edge",
@@ -494,30 +499,22 @@ sub terminal {
          ($choice eq "deny-always" && length $message ? (message => $message) : ()));
       if ($choice eq "allow-always") {
          print {$tty} "Available grants: ", join (", ", @{$request->{sandbox_grant_choices}}), "\n";
-         my $caps = $ask->("Allowed grants [" . join (",", @{$request->{sandbox_grants}}) . "]: ");
+         my $caps = $ask->("Allowed grants [" . (join ",", @{$request->{sandbox_grants}}) . "]: ");
          return { decision => "deny-once" } unless defined $caps;
          $answer{sandbox_grants} = [length $caps
             ? ($caps eq "-" ? () : split /\s*,\s*/, $caps, -1)
             : @{$request->{sandbox_grants}}];
       }
-      if (defined $request->{workdir}) {
-         print {$tty} "Workdir rule scope:\n",
-            "1: This workdir\n",
-            "2: Any configured workdir, including future ones\n";
-         my $index = $ask->("Workdir scope [1]: ");
+      for my $name (@dimensions) {
+         my $dim = $dimensions->{$name};
+         print {$tty} "$dim->{label} scope:\n",
+            map { ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) . "\n" }
+               0 .. $#{$dim->{choices}};
+         my $index = $ask->("$dim->{label} scope [1]: ");
          return { decision => "deny-once" } unless defined $index;
          $index = 1 unless length $index;
-         $index =~ /\A[12]\z/ or die "Invalid workdir scope\n";
-         $answer{workdir_scope} = "all" if $index == 2;
-      }
-      if (@$subjects) {
-         print {$tty} map { ($_ + 1) . ": " . $json->encode ($subjects->[$_]{label}) . "\n" }
-            0 .. $#$subjects;
-         my $index = $ask->("Persistent scope [1]: ");
-         return { decision => "deny-once" } unless defined $index;
-         $index = 1 unless length $index;
-         die "Invalid persistent scope\n" unless $index =~ /\A[1-9][0-9]*\z/ && $index <= @$subjects;
-         $answer{subject} = $subjects->[$index - 1]{subject};
+         die "Invalid dimension scope\n" unless $index =~ /\A[1-9][0-9]*\z/ && $index <= @{$dim->{choices}};
+         $answer{"dim_$name"} = $dim->{choices}[$index - 1]{match};
       }
       if ($choice eq "deny-always" && @deny_paths) {
          print {$tty} map { ($_ + 1) . ": " . $json->encode ($deny_paths[$_]) . "\n" }

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : Mon Feb  1 12:13:24 1999
  *
- * $Id: WidgetInfo.h,v 1.38 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -48,6 +48,7 @@
 #define ZN_PRINT_CONFIG         (1<<11) /* If set the openGL hardware configuration
                                          * is printed on startup. */
 #define ZN_CONFIGURE_EVENT      (1<<12)
+#define ZN_UPDATE_CANVASTEX     (1<<13)
 
 #ifdef __CPLUSPLUS__
 extern "C" {
@@ -120,6 +121,11 @@ typedef struct _ZnWInfo {
                                          * is updated when items are changed. */
   Pixmap                alpha_stipples[ZN_NUM_ALPHA_STEPS];
   int                   border_width;
+#if defined(GL) && defined(ROTATION)
+  double                screen_rotation;
+  unsigned int          enable_rotation;
+  ZnTransfo             rotation_transfo;
+#endif
   int                   opt_width;      /* Window size as stated/reported by the option. */
   int                   opt_height;     /* They are equal to the width/height fields after
                                          * the actual resize. They may to be equal if
@@ -179,7 +185,13 @@ typedef struct _ZnWInfo {
   int                   width;                  /* Actual window dimension. */
   int                   height;
   int                   inset;                  /* Border and highlight width */
-  
+#if defined(GL) && defined(ROTATION)
+  int                   canvastex;              /* The intermediate canvas texture */
+  int                   fbo;
+  int                   depthstencil;
+  ZnPoint               texcoords[4];
+#endif
+
   /* Graphic variables */
   Display               *dpy;                   /* The display of the widget window.    */
   Screen                *screen;
@@ -191,6 +203,7 @@ typedef struct _ZnWInfo {
   ZnBool                full_reshape;           /* Use it on the top level window.      */
   Window                real_top;
   int                   render;
+  int                usedamage;              /* Use GL damage (only works if render is to 1 ie if we use GL) */ 
   unsigned char         alpha;                  /* Current composite group alpha. */
   ZnItem                top_group;
 #ifndef PTK_800
@@ -209,6 +222,9 @@ typedef struct _ZnWInfo {
   ZnGradient            *highlight_bg_color;    /* Color for drawing traversal highlight
                                                  * area when highlight is off. */
   ZnGradient            *highlight_color;       /* Color for drawing traversal highlight.*/
+  
+  /* viewport item management */
+  int                   nb_of_viewport_items;   /* Number of viewport items in our tree */
   
   /* Scrollbar management */
   ZnPoint               origin;                 /* Coordinate mapped to the upper left corner

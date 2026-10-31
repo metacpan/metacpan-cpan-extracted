@@ -1,0 +1,340 @@
+#!/opt/bin/perl
+
+=encoding utf8
+
+=head1 NAME
+
+mcp-http - HTTP requests with URL and method permissions
+
+=head1 SYNOPSIS
+
+   mcp-http --stdio
+   mcp-http --connect http://host:port/TOKEN/http
+
+=head1 DESCRIPTION
+
+One MCP C<request> tool backed by L<AnyEvent::HTTP>. HTTP methods are
+permission actions. URL scopes: exact URL, path with any query, origin,
+hostname, hostname and subdomains, or any HTTP(S) URL.
+
+Supply a C<cookie_jar> from an earlier response to continue a session;
+the server keeps no cookies. This uses AnyEvent::HTTP's simplified jar,
+not a full browser cookie implementation. Treat the jar as confidential.
+
+Responses include status, headers, UTF-8 body or Base64 bytes. Optional
+C<grep> keeps lines containing a literal string; C<regex> keeps lines
+matching a Perl regex; C<substitute> replaces regex matches with literal
+replacement text. C<max_bytes> bounds downloads and C<truncated> reports
+partial results.
+
+Redirects and retries are disabled. HTTPS verifies certificates.
+Network access is NOT sandboxed; permitted names can reach local or
+private hosts. HTTP failures do not prove that a write did not happen.
+
+=head1 TOOL
+
+=over
+
+=item request
+
+Required C<url>. Optional C<method> (GET), C<headers>, UTF-8 C<body>
+or C<body_base64>, C<cookie_jar>, C<timeout> (30s inactivity),
+C<max_bytes> (65536 default, 2097152 maximum), C<grep>, C<regex>,
+and C<substitute> with C<pattern> and C<replacement>. Responses contain
+C<captured_bytes> and C<truncated>. Replacement text is literal.
+
+=back
+
+=head1 PERMISSIONS
+
+Profile C<http-NAME>. Rules match HTTP method as C<action> and URL
+as C<match.url>. Hostname and subdomain scopes are textual DNS suffixes,
+not organizational or public-suffix boundaries. No sandbox grants.
+
+=head1 OPTIONS
+
+Common options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+
+=over
+
+=item --ask MODE
+
+Use helper (default), tty, yad, mcp or auto.
+
+=back
+
+=cut
+
+use common::sense;
+use AnyEvent::HTTP ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Server::Permissions ();
+use MIME::Base64 ();
+use Encode ();
+use JSON::XS ();
+
+use AnyEvent::MCP::Server::Simple;
+
+my $options = mcp_getoptions
+   {
+      usage       => "Usage: mcp-http [OPTION]...\n",
+      description => "HTTP requests with URL/method permissions and caller-managed cookies.",
+      options     => [["--ask MODE", "Permission prompts: helper (default), tty, yad, mcp, auto"]],
+      examples    => "  mcp-http --stdio\n",
+   },
+   "ask=s" => \my $ask,
+;
+
+@ARGV and die "Unexpected arguments\n";
+
+my $permissions = AnyEvent::MCP::Server::Permissions->new (
+   name => "http-$options->{name}",
+   (defined $ask ? (ask => $ask) : ()),
+);
+
+mcp_config
+   permissions        => $permissions,
+   server_name        => "mcp-http",
+   server_version     => $AnyEvent::MCP::VERSION,
+   short_instructions => "HTTP requests with URL/method permissions; pass cookie_jar between calls. No redirects.",
+   instructions       => "request makes authorized HTTP(S) requests. Method is the permission action. "
+                      . "URL scopes range from exact URL to any HTTP(S) URL. No automatic redirects or retries. "
+                      . "Pass a returned cookie_jar to subsequent calls. "
+                      . "grep/regex select lines; substitute applies literal replacements. "
+                      . "Responses may be truncated and failed writes can still have taken effect.",
+   on_request         => sub {
+      my ($server, $req) = @_;
+
+      return mcp_log_request $server, $req
+         unless $req->{method} eq "tools/call" && $req->{tool} eq "request";
+
+      my $args = $req->{args};
+      my $method = $args->{method} // "GET";
+      my $url = $args->{url} // "";
+      $method = "<invalid>" if ref $method;
+      $url = "<invalid>" if ref $url;
+      $url =~ s/[?#].*//s;
+      $url =~ s{(://)[^/@]*@}{$1};
+      $url =~ s/[\x00-\x1f\x7f]/ /g;
+
+      mcp_log_request $server, $req,
+         method => (substr $method, 0, 20),
+         url    => (substr $url, 0, 160);
+   };
+
+sub url_scopes {
+   my ($url) = @_;
+
+   defined $url && !ref $url && $url !~ /[\x00-\x20\x7f]/
+      or die "Invalid URL\n";
+   $url =~ m{\A(https?)://(\[[0-9a-f:.]+\]|[a-z0-9.-]+)(?::([0-9]+))?([^#]*)(?:#.*)?\z}i
+      or die "Expected HTTP(S) URL without userinfo\n";
+
+   my ($scheme, $host, $port, $rest) = (lc $1, lc $2, $3, $4);
+   !defined $port || $port >= 1 && $port <= 65535
+      or die "Invalid URL port\n";
+   $port = undef if defined $port && $port == ($scheme eq "https" ? 443 : 80);
+   $rest =~ m{\A(?:/|\?|\z)} or die "Invalid URL path\n";
+   $rest = "/$rest" unless $rest =~ m{\A/};
+
+   my $origin = "$scheme://$host" . (defined $port ? ":$port" : "");
+   my $path = $rest;
+   $path =~ s/\?.*//s;
+   my $full = "$origin$rest";
+   my @choices = (
+      { label => "Exact URL including query", match => $full },
+      { label => "This path, any query",
+        match => "^" . (quotemeta "$origin$path") . "(?:\\?.*)?\\z" },
+      { label => "This origin (scheme, host, port)",
+        match => "^" . (quotemeta $origin) . "/" },
+      { label => "This hostname, any scheme or port",
+        match => "^https?://" . (quotemeta $host) . "(?::[0-9]+)?/" },
+   );
+   if ($host !~ /^\[/ && $host =~ /\./ && $host !~ /^[0-9.]+$/) {
+      push @choices, {
+         label => "Hostname and subdomains, any scheme or port",
+         match => "^https?://(?:[a-z0-9-]+\\.)*" . (quotemeta $host) . "(?::[0-9]+)?/",
+      };
+   }
+   push @choices, { label => "Any HTTP(S) URL", match => "^https?://" };
+
+   ($full, \@choices)
+}
+
+sub text_regex {
+   my ($pattern) = @_;
+
+   defined $pattern && !ref $pattern && length $pattern <= 512
+      or die "Invalid regex pattern\n";
+   my $regex = eval { qr/$pattern/ };
+   $@ and die "Invalid regex: $@";
+
+   $regex
+}
+
+sub filter_text {
+   my ($text, $args) = @_;
+
+   if (defined $args->{grep} || defined $args->{regex}) {
+      my $grep = $args->{grep};
+      my $regex = defined $args->{regex} ? text_regex ($args->{regex}) : undef;
+      $text = join "", grep {
+         (!defined $grep || index ($_, $grep) >= 0)
+            && (!defined $regex || /$regex/)
+      } split /(?<=\n)/, $text;
+   }
+
+   if (my $subst = $args->{substitute}) {
+      my $regex = text_regex ($subst->{pattern});
+      my $replacement = $subst->{replacement};
+      $text =~ s/$regex/$replacement/g;
+   }
+
+   $text
+}
+
+mcp_tool request => "HTTP request. Method and URL permissions. No redirects; caller-managed cookie_jar returned. "
+   . "UTF-8 body or Base64, bounded response, optional grep/regex/substitute.",
+   {
+      type => "object",
+      required => ["url"],
+      additionalProperties => JSON::XS::false,
+      properties => {
+         url         => { type => "string", minLength => 1 },
+         method      => { type => "string", default => "GET" },
+         headers     => { type => "object", additionalProperties => { type => "string" } },
+         body        => { type => "string", description => "UTF-8 request body" },
+         body_base64 => { type => "string", description => "Raw request body, Base64" },
+         cookie_jar  => { type => "object", description => "AnyEvent::HTTP cookie jar returned by an earlier call" },
+         timeout     => { type => "number", minimum => 1, maximum => 300, default => 30 },
+         max_bytes   => { type => "integer", minimum => 1, maximum => 2097152, default => 65536 },
+         grep        => { type => "string", description => "Keep lines containing this literal substring" },
+         regex       => { type => "string", description => "Keep lines matching this Perl regex" },
+         substitute  => {
+            type => "object",
+            required => ["pattern", "replacement"],
+            additionalProperties => JSON::XS::false,
+            properties => {
+               pattern     => { type => "string", maxLength => 512 },
+               replacement => { type => "string", maxLength => 512 },
+            },
+         },
+      },
+   },
+   sub {
+      my ($req, $args) = @_;
+
+      my $method = $args->{method} // "GET";
+      $method =~ /\A[A-Za-z0-9!#\$%&'*+.^_\x60|~-]+\z/
+         or die "Invalid HTTP method\n";
+      exists $args->{body} && exists $args->{body_base64}
+         and die "Specify body or body_base64, not both\n";
+      my ($url, $scopes) = url_scopes ($args->{url});
+
+      my $headers = $args->{headers} || {};
+      for my $key (keys %$headers) {
+         $key =~ /\A[A-Za-z0-9!#\$%&'*+.^_\x60|~-]+\z/
+            && defined $headers->{$key} && !ref $headers->{$key}
+            && $headers->{$key} !~ /[\r\n\x00]/
+            or die "Invalid HTTP header\n";
+      }
+      $headers = { %$headers };
+      $headers->{"User-Agent"} = "mcp-http/$AnyEvent::MCP::VERSION"
+         unless grep lc $_ eq "user-agent", keys %$headers;
+      my $data = exists $args->{body} ? (AnyEvent::MCP::utf8enc $args->{body}) : undef;
+      if (defined $args->{body_base64}) {
+         $args->{body_base64} =~ /\A(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?\z/
+            or die "Invalid Base64 body\n";
+         $data = MIME::Base64::decode_base64 ($args->{body_base64});
+      }
+      !defined $data || length $data <= 1048576 or die "Request body exceeds 1 MiB\n";
+      my $limit = $args->{max_bytes} // 65536;
+      $limit >= 1 && $limit <= 2097152 or die "Invalid max_bytes\n";
+
+      !defined $args->{grep} || !ref $args->{grep} or die "Invalid grep\n";
+      text_regex ($args->{regex}) if defined $args->{regex};
+      if (defined $args->{substitute}) {
+         ref $args->{substitute} eq "HASH" && defined $args->{substitute}{replacement}
+            && !ref $args->{substitute}{replacement} && length $args->{substitute}{replacement} <= 512
+            or die "Invalid substitute\n";
+         text_regex ($args->{substitute}{pattern});
+      }
+      my $jar = $args->{cookie_jar};
+      !defined $jar || ref $jar eq "HASH" or die "Invalid cookie jar\n";
+
+      $req->require_permission ({
+         tool           => $req->{tool},
+         action         => $method,
+         dimensions     => { url => { label => "URL", value => $url, choices => $scopes } },
+         sandbox_grants => [],
+         reason         => "$method $url",
+      });
+
+      my $body = "";
+      my $truncated = 0;
+      my $response_headers;
+      my $guard;
+      $guard = AnyEvent::HTTP::http_request
+         $method => $url,
+         recurse    => 0,
+         persistent => 0,
+         proxy      => undef,
+         tls_ctx    => "high",
+         timeout    => $args->{timeout} // 30,
+         headers    => $headers,
+         (defined $data ? (body => $data) : ()),
+         (defined $jar ? (cookie_jar => $jar) : ()),
+         on_header => sub {
+            $response_headers = { %{$_[0]} };
+            1
+         },
+         on_body => sub {
+            my ($part) = @_;
+            if (length ($body) + length ($part) > $limit) {
+               $body .= substr $part, 0, $limit - length $body;
+               $truncated = 1;
+               return 0;
+            }
+            $body .= $part;
+            1
+         },
+         sub {
+            my ($unused, $hdr) = @_;
+
+            undef $guard;
+            return if $req->{finished};
+            $hdr = $response_headers if $truncated && $response_headers;
+            my %result = (
+               status         => 0 + $hdr->{Status},
+               reason         => $hdr->{Reason},
+               headers        => { map +($_ => $hdr->{$_}), grep /^[a-z]/, keys %$hdr },
+               captured_bytes => length $body,
+               truncated      => $truncated ? JSON::XS::true : JSON::XS::false,
+               (defined $jar ? (cookie_jar => $jar) : ()),
+            );
+
+            if (defined $unused || $truncated) {
+               my $bytes = $body;
+               my $text = eval { Encode::decode ("UTF-8", $bytes, Encode::FB_CROAK) };
+               if (defined $text) {
+                  $text = filter_text ($text, $args);
+                  if (length $text > $limit) {
+                     $text = substr $text, 0, $limit;
+                     $result{truncated} = JSON::XS::true;
+                  }
+                  $result{body} = $text;
+               } elsif (defined $args->{grep} || defined $args->{regex} || defined $args->{substitute}) {
+                  $req->error ("Cannot filter a non-UTF-8 response");
+                  return;
+               } else {
+                  $result{body_base64} = MIME::Base64::encode_base64 ($body, "");
+               }
+            }
+
+            $req->result (\%result);
+         }
+      ;
+      $req->{on_cancel} = sub { undef $guard };
+   };
+
+mcp_start %$options;

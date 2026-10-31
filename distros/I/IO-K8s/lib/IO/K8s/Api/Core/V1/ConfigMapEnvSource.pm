@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMapEnvSource;
 # ABSTRACT: ConfigMapEnvSource selects a ConfigMap to populate the environment variables with. The contents of the target ConfigMap's Data field will represent the key-value pairs as environment variables.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ConfigMapEnvSource - ConfigMapEnvSource selects a Config
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 name
 
@@ -37,7 +37,7 @@ Specify whether the ConfigMap must be defined
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -65,5 +65,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

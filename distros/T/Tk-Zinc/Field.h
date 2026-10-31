@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        :
  *
- * $Id: Field.h,v 1.7 2005/05/10 07:59:48 lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -56,8 +56,8 @@ extern struct _ZnFIELD {
   void (*InitFields)(ZnFieldSet fs);
   void (*CloneFields)(ZnFieldSet fs);
   void (*FreeFields)(ZnFieldSet fs);
-  int (*ConfigureField)(ZnFieldSet fs, int field, int argc, Tcl_Obj *CONST argv[], int *flags);
-  int (*QueryField)(ZnFieldSet fs, int field, int argc, Tcl_Obj *CONST argv[]);
+  int (*ConfigureField)(ZnFieldSet fs, int field, int argc, Tcl_Obj *const argv[], int *flags);
+  int (*QueryField)(ZnFieldSet fs, int field, int argc, Tcl_Obj *const argv[]);
   void (*DrawFields)(ZnFieldSet fs);
   void (*RenderFields)(ZnFieldSet fs);
   int (*PostScriptFields)(ZnFieldSet fs, ZnBool prepass, ZnBBox *area);

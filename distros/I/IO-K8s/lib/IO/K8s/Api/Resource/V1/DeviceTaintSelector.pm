@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceTaintSelector;
 # ABSTRACT: DeviceTaintSelector defines which device(s) a DeviceTaintRule applies to. The empty selector matches all devices. Without a selector, no devices are matched.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s device => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::DeviceTaintSelector - DeviceTaintSelector defines wh
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 device
 
@@ -48,7 +48,7 @@ Also setting the driver name may be useful to avoid ambiguity when different dri
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -76,5 +76,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

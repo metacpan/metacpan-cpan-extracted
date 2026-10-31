@@ -1,3 +1,7 @@
+Travel::Status::DE::VRR 3.22 - Fri Oct 30 2026
+
+    * Update MVV and VVS backend URLs
+
 Travel::Status::DE::VRR 3.21 - Sat Sep 26 2026
 
     * Update BEG backend URL

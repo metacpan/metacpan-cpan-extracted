@@ -2,7 +2,7 @@
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 
-use fields qw(cf_tmpdir cf_datadir cf_limit);
+use fields qw(tmpdir datadir limit);
 
 use YATT::Lite qw/*CON/;
 
@@ -15,7 +15,7 @@ sub mh_alloc_newfh {
 
   my ($fname);
   do {
-    $fname = "$yatt->{cf_datadir}/.ht_" . ++$fnum;
+    $fname = "$yatt->{datadir}/.ht_" . ++$fnum;
   } while (-e $fname);
 
   seek $lockfh, 0, SEEK_SET
@@ -43,7 +43,7 @@ sub mh_lastfnum {
 
 sub mh_openlock {
   (my MY $yatt, my $lock) = @_;
-  my $lockfn = "$yatt->{cf_datadir}/.ht_lock";
+  my $lockfn = "$yatt->{datadir}/.ht_lock";
   sysopen my $lockfh, $lockfn, O_RDWR | O_CREAT
     or die "Can't open '$lockfn': $!";
 
@@ -61,17 +61,17 @@ Entity mh_files => sub {
   my MY $yatt = MY->YATT; # To make sure strict check occurs.
   my $as_realpath = delete $opts->{realpath};
   my $start = delete($opts->{current}) // 0;
-  my $limit = delete($opts->{limit}) // $yatt->{cf_limit};
+  my $limit = delete($opts->{limit}) // $yatt->{limit};
   my $ext = delete($opts->{ext}) // '';
   # XXX: $opts should be empty now.
   my @result = do {
     my @all;
-    opendir my $dh, $yatt->{cf_datadir}
-      or die "Can't opendir '$yatt->{cf_datadir}': $!";
+    opendir my $dh, $yatt->{datadir}
+      or die "Can't opendir '$yatt->{datadir}': $!";
     while (my $fn = readdir $dh) {
       my ($num) = $fn =~ m{^\.ht_(\d+)$ext$}
 	or next;
-      push @all, $as_realpath ? [$num, "$yatt->{cf_datadir}/$fn"] : $num;
+      push @all, $as_realpath ? [$num, "$yatt->{datadir}/$fn"] : $num;
     }
     closedir $dh; # XXX: Is this required still?
     $as_realpath ? map($$_[-1], sort {$$a[0] <=> $$b[0]} @all)
@@ -87,7 +87,7 @@ Entity mh_files => sub {
 Entity mh_load => sub {
   my ($this, $fnum) = @_;
   my MY $yatt = $this->YATT; # To make sure strict field check occurs.
-  my $fn = "$yatt->{cf_datadir}/.ht_$fnum";
+  my $fn = "$yatt->{datadir}/.ht_$fnum";
   unless (-r $fn) {
     die "Can't read '$fn'\n";
   }
@@ -105,7 +105,7 @@ sub min {$_[0] < $_[1] ? $_[0] : $_[1]}
 sub cmd_setup {
   my MY $self = shift;
   require File::Path;
-  foreach my $dir ($self->{cf_datadir}, $self->{cf_tmpdir}) {
+  foreach my $dir ($self->{datadir}, $self->{tmpdir}) {
     next if -d $dir;
     File::Path::make_path($dir, {mode => 02775, verbose => 1});
   }
@@ -117,9 +117,9 @@ sub after_new {
   $self->SUPER::after_new(); # **REQUIRED**
 
   # XXX: rewrite with (future) abstract path api.
-  $self->{cf_datadir} //= $self->app_path_var('data');
-  $self->{cf_tmpdir}  //= $self->app_path_var_tmp;
-  $self->{cf_limit} //= 100;
+  $self->{datadir} //= $self->app_path_var('data');
+  $self->{tmpdir}  //= $self->app_path_var_tmp;
+  $self->{limit} //= 100;
 }
 
 1;

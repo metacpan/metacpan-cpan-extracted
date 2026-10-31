@@ -1,7 +1,13 @@
 {
   "sources": {
-    "getty": { "git": "https://github.com/Getty/skills.git", "ref": "main" },
-    "karr": { "git": "https://github.com/Getty/karr.git", "ref": "main" }
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr.git",
+      "ref": "main"
+    }
   },
   "install": {
     "skills": [
@@ -15,8 +21,13 @@
       "getty-perl-release-author-getty@karr",
       "kanban-issues-karr-coordination@karr",
       "kanban-issues-karr-ticket@karr"
+    ],
+    "bundles": [
+      "getty-cpan-dist@getty"
     ]
   },
-  "targets": ["claude"],
+  "targets": [
+    "claude"
+  ],
   "gitignore": true
 }

@@ -2,8 +2,8 @@ package YATT::Lite::VarMaker; sub MY () {__PACKAGE__}
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use base qw(YATT::Lite::Object);
-use YATT::Lite::MFields qw/type_alias
-	      curline/;
+use YATT::Lite::MFields qw/_type_alias
+	      _curline/;
 
 use YATT::Lite::VarTypes qw(:type :VSLOT);
 use YATT::Lite::Util qw(lexpand default);
@@ -13,14 +13,13 @@ sub default_arg_type {'text'}
 sub default_type_alias {
   qw(value scalar
      flag    bool
-     boolean bool
-     expr code);
+     boolean bool);
 }
 
 sub after_new {
   my MY $self = shift;
   $self->SUPER::after_new;
-  $self->{type_alias} = { $self->default_type_alias };
+  $self->{_type_alias} = { $self->default_type_alias };
   $self;
 }
 
@@ -33,7 +32,7 @@ sub mkvar_at {
   my ($typerec, $sub) = $self->_mk_typerec($type, $lineno, $name);
 
   my $var = $sub->()->new($typerec, $name, @args);
-  $var->[VSLOT_LINENO] //= $lineno //= $self->{curline};
+  $var->[VSLOT_LINENO] //= $lineno //= $self->{_curline};
 
   # $self->set_dflag_default_to($var, $var->[VSLOT_DFLAG], $var->[VSLOT_DEFAULT]);
 
@@ -51,7 +50,7 @@ sub _mk_typerec {
   ($type, my @subtype) = ref $type ? lexpand($type) : split /:/, $type || '';
   #
   $type ||= $self->default_arg_type;
-  $type = default($self->{type_alias}{$type}, $type);
+  $type = default($self->{_type_alias}{$type}, $type);
 
   my $typerec = [$type, @subtype];
 

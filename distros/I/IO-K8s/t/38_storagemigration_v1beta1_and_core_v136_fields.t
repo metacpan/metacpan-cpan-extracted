@@ -9,7 +9,7 @@
 # k6: four Core::V1 classes gained a new optional $ref field in v1.36 whose
 # target class was never shipped: EnvVarSource.fileKeyRef, NodeSystemInfo.swap,
 # VolumeProjection.podCertificate, VolumeMountStatus.volumeStatus (which in turn
-# needs ImageVolumeStatus). t/34_registry_guard.t cannot catch a field that was
+# needs ImageVolumeStatus). The registry guard (t/02_compile_all.t) cannot catch a field that was
 # never declared in the first place -- this file exercises the new fields
 # directly via inflate -> TO_JSON -> inflate round-trips, analogous to t/32/t/33.
 

@@ -4,7 +4,7 @@
  * Authors              : Patrick Lecoanet.
  * Creation date        : 
  *
- * $Id: Transfo.c,v 1.17 2005/09/12 13:18:42 Lecoanet Exp $
+ * $Id$
  */
 
 /*
@@ -39,8 +39,6 @@
 #include <stdlib.h>
 
 
-static const char rcsid[] = "$Imagine: Transfo.c,v 1.7 1997/01/24 14:33:37 lecoanet Exp $";
-static const char compile_id[]="$Compile: " __FILE__ " " __DATE__ " " __TIME__ " $";
 
 
 

@@ -7,6 +7,7 @@ my $mm = MM->new({
        SUFFIX	=> '.gz',
 	            },
     NAME         => "AnyEvent::MCP",
+    LICENSE      => "perl_5",
     VERSION_FROM => "lib/AnyEvent/MCP.pm",
     EXE_FILES    => [
        "bin/anyevent-mcp",
@@ -17,12 +18,12 @@ my $mm = MM->new({
        "bin/mcp-vim",
        "bin/mcp-webbrowser",
        "bin/mcp-ask-user",
+       "bin/mcp-imap",
+       "bin/mcp-http",
     ],
     PREREQ_PM    => {
        AnyEvent                    => 5.33,
        AnyEvent::HTTP              => 0,
-       AnyEvent::WebSocket::Server  => 0,
-       AnyEvent::WebSocket::Message => 0,
        common::sense               => 3.3,
        parent                      => 0,
        JSON::XS                    => 3,
@@ -31,10 +32,25 @@ my $mm = MM->new({
        MIME::Base64                => 0,
        Encode                      => 0,
     },
+    META_MERGE   => {
+       'meta-spec' => { version => 2 },
+       prereqs => {
+          runtime => { recommends => {
+             AnyEvent::WebSocket::Server  => 0,
+             AnyEvent::WebSocket::Message => 0,
+             AnyEvent::Fork::RPC          => 2.0,
+             Mail::IMAPTalk               => 4.07,
+             IO::Socket::SSL              => 0,
+             Term::ReadKey                => 0,
+          } },
+          test => { recommends => {
+             Protocol::WebSocket::Frame => 0,
+          } },
+       },
+    },
     TEST_REQUIRES => {
        Test::More                 => 0.88,
        Pod::Checker               => 0,
-       Protocol::WebSocket::Frame => 0,
     },
 });
 

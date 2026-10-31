@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008;
 use Tk;
 use Config;
 use Tk::Config;
@@ -8,7 +8,7 @@ use strict;
 my $TkLibDir = $Tk::library;
 my $platform = $Tk::platform;
 
-my $VERSION = 3.306;
+my $VERSION = 3.307;
 
 
 if (!$TkLibDir)
@@ -27,7 +27,8 @@ print "Using $TkLibDir as Tk library...\n";
 my @GENERIC_C = ('Tabular.c', 'Rectangle.c', 'Arc.c', 'Curve.c',
          'Item.c', 'PostScript.c', 'Attrs.c', 'Draw.c', 'Geo.c', 'List.c',
          'perfos.c', 'Transfo.c', 'Group.c', 'Icon.c', 'Text.c', 'Image.c', 'Color.c',
-         'Field.c', 'Triangles.c', 'Window.c', 'tkZinc.c');
+         'Field.c', 'Triangles.c', 'Viewport.c', 'WindowUtils.c', 'Window.c', 'tkZinc.c',
+         'ZincGlew.c');
 
 my @ATC_C = ('OverlapMan.c', 'Track.c', 'Reticle.c', 'Map.c', 'MapInfo.c');
 
@@ -47,7 +48,7 @@ if ($WIN) {
 }
 my $ZincObj = "Zinc" . $Config{"_o"};
 
-my $INC = "-I. -I$TkLibDir -I$TkLibDir/pTk -I$TkLibDir/X11";
+my $INC = "-I. -Ithird_party/glew/include -I$TkLibDir -I$TkLibDir/pTk -I$TkLibDir/X11";
 
 unless ($WIN) {
     $INC .= " -I/usr/X11R6/include";
@@ -87,6 +88,7 @@ WriteMakefile(
         'Test::More' => '0.98',
     },
     'LIBS'            => $NeededLibs, 
+    'OPTIMIZE'        => &optimize,
     'DEFINE'          => &get_flags,
     'INC'             => $INC,
     'C'               => [@C],
@@ -94,9 +96,13 @@ WriteMakefile(
     'XS_VERSION'      => $Tk::Config::VERSION,
     'XS'              => {'Zinc.xs' => 'Zinc.c'},
     'linkext'         => {LINKTYPE => 'dynamic'},
-    'depend'          => {$ZincObj => '$(O_FILES) Zinc.c'},
+    'depend'          => {
+        $ZincObj => '$(O_FILES) Zinc.c',
+        'ZincGlew$(OBJ_EXT)' => 'third_party/glew/src/glew.c third_party/glew/include/GL/glew.h third_party/glew/include/GL/wglew.h third_party/glew/include/GL/glxew.h',
+        'tkZinc$(OBJ_EXT)' => 'third_party/glew/include/GL/glew.h',
+    },
     'LDFROM'          => "\$(O_FILES) $ZincObj",
-    'MIN_PERL_VERSION'  => 5.006,
+    'MIN_PERL_VERSION'  => 5.008,
     'META_MERGE'      => {
         'resources'     => {
             'repository' => 'https://github.com/asb-capfan/TkZinc',
@@ -107,11 +113,19 @@ WriteMakefile(
     },
 );
 
+sub optimize {
+    foreach my $arg (@ARGV) {
+        if ($arg =~ /(enable-symbols)/i) {
+            return "-g";
+        }
+    }
+    return "-O";
+}
+
 sub get_flags {
     my %DEF_FLAGS = (
         'GL'        => 1,
         'SHAPE'     => 1,
-        'GL_DAMAGE' => 0,
         'ATC'       => 1
     );
     
@@ -121,7 +135,6 @@ sub get_flags {
         if ($name =~ /(with-gl)/i) {
             if ($value =~ /no/i) {
                 $DEF_FLAGS{'GL'} = 0;
-                $DEF_FLAGS{'GL_DAMAGE'} = 0;
             }
         }
         elsif ($name =~ /(with-atc)/i) {
@@ -136,15 +149,17 @@ sub get_flags {
         }
     }
     
-    my $defines = '-DPTK';
+    my $defines = "-DPTK -DTKZINC_PRIVATE_GLEW -DPACKAGE_VERSION=\\\"$VERSION\\\"";
 
     if ($WIN) {
         #
         # No shape extension on Windows (planned later).
         $DEF_FLAGS{'SHAPE'} = 0;
         #
-        # Visual C++ does not define __STDC__ by default
-        $defines .= ' -D__STDC__';
+        # Visual C++ does not define __STDC__ by default. GCC already does.
+        if ($Config{'cc'} =~ /(?:^|[\\\/\s"])cl(?:\.exe)?(?=["\s]|$)/i) {
+            $defines .= ' -D__STDC__';
+        }
     }
 
     print "Configuring with:\n    ";

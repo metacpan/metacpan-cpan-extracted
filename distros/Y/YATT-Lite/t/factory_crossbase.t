@@ -10,7 +10,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use autodie qw(mkdir chdir);
 
-use YATT::Lite::Util::File qw(mkfile);
+use YATT::Lite::Util::File qw(mkfile_may_wait);
 use YATT::Lite::Util qw(appname catch);
 
 sub myapp {join _ => MyTest => appname($0), @_}
@@ -50,7 +50,7 @@ my $i = 0;
     sub {$mkxhf_base->(@_, qw(.. @ytmpl))};
   };
 
-  MY->mkfile("$ytmpl/common.ytmpl" => "COMMON"
+  MY->mkfile_may_wait("$ytmpl/common.ytmpl" => "COMMON"
 
 	     , "$docroot/us2012/.htyattconfig.xhf"
 	     => $BASE->(qw(@html/jp2011))

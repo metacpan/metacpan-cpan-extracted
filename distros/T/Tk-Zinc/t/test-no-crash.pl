@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: test-no-crash.pl,v 1.20 2005/01/16 10:24:14 mertz Exp $
+# $Id$
 # This non-regression / memory leak test has been developped by Christophe Mertz <mertz@intuilab.com>
 
 use Tk;

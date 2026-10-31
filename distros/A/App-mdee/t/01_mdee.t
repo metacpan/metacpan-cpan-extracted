@@ -335,7 +335,7 @@ subtest 'config file defaults' => sub {
         close $fh;
         my $out = `COLUMNS=200 XDG_CONFIG_HOME=$tmpdir $mdee -ddn --mode=light $test_md 2>&1`;
         like($out, qr/debug: nup .*-w 40/, 'default[width]=40 sets the output width');
-        like($out, qr/foldwidth=35\b/, 'default[width]=40 gives a fold width of 35');
+        like($out, qr/foldwidth=33\b/, 'default[width]=40 gives a fold width of 33');
     }
 
     # Test default[fold_width]
@@ -520,11 +520,11 @@ subtest q(parallel option) => sub {
 
     my $two = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md 2>&1`;
     like($two, qr/debug: nup .*-V .*--pane=2 .*- --pages/, q(--parallel runs nup -V with one pane per file));
-    like($two, qr/foldwidth=95\b/, q(--parallel folds to the pane width));
+    like($two, qr/foldwidth=93\b/, q(--parallel folds to the pane width));
 
     my $three = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md $test_md 2>&1`;
     like($three, qr/--pane=3/, q(three files give three panes));
-    like($three, qr/foldwidth=61\b/, q(fold width follows the pane count));
+    like($three, qr/foldwidth=59\b/, q(fold width follows the pane count));
 
     my $pane = `COLUMNS=200 $mdee -ddn --parallel -C1 $test_md $test_md 2>&1`;
     like($pane, qr/-V .*--pane=1 .*- --pages/, q(-C overrides the pane count));
@@ -569,15 +569,23 @@ subtest q(runin and runout options) => sub {
     like($help, qr/--runlen/, q(--help shows --runlen option));
 
     my $default = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
-    like($default, qr/debug: nup .*--runin=2 --runout=2/, q(nup gets run-in 2 by default));
-    like($default, qr/foldwidth=95\b/, q(default fold width leaves run-in 2));
+    like($default, qr/debug: nup .*--runin=4 --runout=4/, q(nup gets run-in 4 by default));
+    like($default, qr/foldwidth=93\b/, q(default fold width leaves run-in 4));
+    like($default, qr/fold_runin=4,fold_runout=4\b/, q(the md module gets run-in 4 by default));
 
-    my $four = `COLUMNS=200 $mdee -ddn --runlen=4 $test_md 2>&1`;
-    like($four, qr/debug: nup .*--runin=4 --runout=4/, q(--runlen sets run-in and run-out));
-    like($four, qr/foldwidth=93\b/, q(fold width follows the run-in));
+    my $two = `COLUMNS=200 $mdee -ddn --runlen=2 $test_md 2>&1`;
+    like($two, qr/debug: nup .*--runin=2 --runout=2/, q(--runlen sets run-in and run-out));
+    like($two, qr/foldwidth=95\b/, q(fold width follows the run-in));
+    like($two, qr/fold_runin=2,fold_runout=2\b/, q(the md module gets the same run-in));
 
     my $mix = `COLUMNS=200 $mdee -ddn --runlen=4 --runout=1 $test_md 2>&1`;
     like($mix, qr/debug: nup .*--runin=4 --runout=1/, q(a later --runout overrides --runlen));
+
+    like($default, qr/debug: nup .*--boundary=word/, q(nup gets --boundary=word by default));
+    my $none = `COLUMNS=200 $mdee -ddn --boundary=none $test_md 2>&1`;
+    like($none, qr/debug: nup .*--boundary=none/, q(--boundary=none is passed to nup));
+    my $bad = `$mdee -n --boundary=foo $test_md 2>&1`;
+    like($bad, qr/--boundary: word, space or none expected/, q(--boundary rejects other values));
 
     my $later = `COLUMNS=200 $mdee -ddn --runout=1 --runlen=4 $test_md 2>&1`;
     like($later, qr/debug: nup .*--runin=4 --runout=4/, q(--runlen overrides earlier --runout));
@@ -590,16 +598,16 @@ subtest q(output width option) => sub {
 
     my $two = `COLUMNS=300 $mdee -ddn -w 180 $test_md 2>&1`;
     like($two, qr/debug: nup .*--pane=2 .*- -w 180/, q(-w gives nup the pane count and ansicolumn -w));
-    like($two, qr/foldwidth=85\b/, q(fold width is derived from -w and the pane count));
-    like($two, qr/table_width=85\b/, q(table width follows the fold width));
+    like($two, qr/foldwidth=83\b/, q(fold width is derived from -w and the pane count));
+    like($two, qr/table_width=83\b/, q(table width follows the fold width));
 
     my $one = `COLUMNS=300 $mdee -ddn -w 100 $test_md 2>&1`;
     like($one, qr/debug: nup .*--pane=1 - --pages -w 100/, q(single column passes -w after --pages));
-    like($one, qr/foldwidth=95\b/, q(single column fold width is -w minus 5));
+    like($one, qr/foldwidth=93\b/, q(single column fold width is -w minus 7));
 
     my $par = `COLUMNS=300 $mdee -ddn -V -w 140 $test_md $test_md 2>&1`;
     like($par, qr/debug: nup .*-V --pane=2 - --pages -w 140/, q(--parallel passes -w to ansicolumn));
-    like($par, qr/foldwidth=65\b/, q(--parallel fold width follows -w));
+    like($par, qr/foldwidth=63\b/, q(--parallel fold width follows -w));
 
     my $cat = `COLUMNS=300 $mdee -ddn -s cat -w 40 $test_md 2>&1`;
     like($cat, qr/foldwidth=40\b/, q(without nup -w is the fold width));
@@ -611,7 +619,7 @@ subtest q(output width option) => sub {
 
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
     unlike($plain, qr/debug: nup .*-w /, q(without -w nup gets no width));
-    like($plain, qr/foldwidth=95\b/, q(without -w the fold width comes from the terminal));
+    like($plain, qr/foldwidth=93\b/, q(without -w the fold width comes from the terminal));
 };
 
 done_testing;

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::AzureDiskVolumeSource;
 # ABSTRACT: AzureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s cachingMode => Str;
@@ -35,7 +35,7 @@ IO::K8s::Api::Core::V1::AzureDiskVolumeSource - AzureDisk represents an Azure Da
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 cachingMode
 
@@ -65,7 +65,7 @@ readOnly Defaults to false (read/write). ReadOnly here will force the ReadOnly s
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -93,5 +93,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

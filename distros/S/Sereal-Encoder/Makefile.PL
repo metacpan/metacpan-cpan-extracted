@@ -6,12 +6,12 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-our $VERSION = '5.011';    # what version are we and what version of Decoder do we need.
+our $VERSION = '6.002';    # what version are we and what version of Decoder do we need.
 $VERSION = eval $VERSION or die "WTF: $VERSION: $@";    # deal with underbars
 
 my $shared_dir        = "../shared";
 my $its_our_repo_file = "../this_is_the_Sereal_repo.txt";
-my $in_source_repo    = ( -d "../../.git" && -d $shared_dir && -e $its_our_repo_file );
+my $in_source_repo    = ( -e "../../.git" && -d $shared_dir && -e $its_our_repo_file );
 my $do_prompt         = !$in_source_repo || $ENV{CPAN_COMPAT};
 
 unshift @INC, ".", "./inc";
@@ -119,9 +119,9 @@ inc::Sereal::BuildTools::WriteMakefile(
     LICENSE       => 'perl',
     ABSTRACT_FROM => 'lib/Sereal/Encoder.pm',
     AUTHOR        => 'Steffen Mueller <cpan@steffen-mueller.net>, Yves Orton <yves@cpan.org>',
-    LIBS          => [$libs],                                                             # e.g., '-lm'
+    LIBS          => [$libs],                                                                    # e.g., '-lm'
     DEFINE        => $defines,
-    INC           => $inc,                                                                # e.g., '-I. -I/usr/local/include'
+    INC           => $inc,                                                                       # e.g., '-I. -I/usr/local/include'
     OPTIMIZE      => $optimize,
     DIR           => $subdirs,
     OBJECT        => $objects,

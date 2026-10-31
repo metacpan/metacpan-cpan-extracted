@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMapNodeConfigSource;
 # ABSTRACT: ConfigMapNodeConfigSource contains the information to reference a ConfigMap as a config source for the Node. This API is deprecated since 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s kubeletConfigKey => Str, 'required';
@@ -32,7 +32,7 @@ IO::K8s::Api::Core::V1::ConfigMapNodeConfigSource - ConfigMapNodeConfigSource co
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 kubeletConfigKey
 
@@ -58,7 +58,7 @@ UID is the metadata.UID of the referenced ConfigMap. This field is forbidden in 
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -86,5 +86,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

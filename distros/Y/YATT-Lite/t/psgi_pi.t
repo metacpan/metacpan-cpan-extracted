@@ -18,7 +18,7 @@ use HTTP::Message::PSGI;
 use YATT::t::t_preload; # To make Devel::Cover happy.
 use YATT::Lite::WebMVC0::SiteApp;
 use YATT::Lite::Util qw/combination/;
-use YATT::Lite::Util::File qw/mkfile/;
+use YATT::Lite::Util::File qw/mkfile_may_wait/;
 use File::Path qw(make_path);
 use Cwd;
 
@@ -79,7 +79,7 @@ my $make_siteapp = sub {
 
   my $tester = t_call_tester->new($site);
 
-  MY->mkfile("$app_root/outside.yatt", <<'END');
+  MY->mkfile_may_wait("$app_root/outside.yatt", <<'END');
 OUTSIDE
 END
 
@@ -89,7 +89,7 @@ END
     $tester->psgi_status($psgi, 403, $path);
   }
 
-  MY->mkfile("$html_dir/foo.yatt", <<'END');
+  MY->mkfile_may_wait("$html_dir/foo.yatt", <<'END');
 <!yatt:args "/{path:.*}">
 <h2>Hello &yatt:path;</h2>
 

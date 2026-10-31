@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::CapacityRequestPolicyRange;
 # ABSTRACT: CapacityRequestPolicyRange defines a valid range for consumable capacity values.    - If the requested amount is less than Min, it is rounded up to the Min value.   - If Step is set and the requested amount is between Min and Max but not aligned with Step,     it will be rounded up to the next value equal to Min + (n * Step).   - If Step is not set, the requested amount is used as-is if it falls within the range Min to Max (if set).   - If the requested or rounded amount exceeds Max (if set), the request does not satisfy the policy,     and the device cannot be allocated.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s max => Quantity;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1beta1::CapacityRequestPolicyRange - CapacityRequestPol
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 max
 
@@ -44,7 +44,7 @@ Step defines the step size between valid capacity amounts within the range.  Max
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -72,5 +72,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

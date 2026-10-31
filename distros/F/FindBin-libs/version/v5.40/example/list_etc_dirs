@@ -1,0 +1,157 @@
+#!/bin/env perl
+########################################################################
+# Export all etc dirs found walking up from the script's bin directory.
+# Uses FindBin::Parents::dir_paths to show the full chain searched.
+# See POD for abspath vs. noabspath and the three-module interaction.
+########################################################################
+
+use strict;
+use warnings;
+use feature 'say';
+
+use FindBin::Bin
+qw
+(
+    $Bin_l
+    $Bin_p
+);
+
+use FindBin::Parents qw( dir_paths );
+
+# Default abspath => 1: walk starts from $Bin_p (physical, symlinks resolved).
+# Add "noabspath" to start from $Bin_l (logical, symlinks preserved) -- useful
+# when invoking the script through a symlink into a test sandbox.
+
+use FindBin::libs
+qw
+(
+    base=etc
+    export
+);
+
+say "logical  bin (\$Bin_l): $Bin_l";
+say "physical bin (\$Bin_p): $Bin_p";
+say '';
+
+my $walk_root
+= $Bin_l eq $Bin_p
+? $Bin_p
+: do
+  {
+      say "Symlinks in path: FindBin::libs walked from \$Bin_p (abspath default).";
+      say "Add 'noabspath' to walk from \$Bin_l instead.";
+      say '';
+      $Bin_p
+  }
+;
+
+say 'Parent dirs searched:';
+
+say "  $_"
+for dir_paths $walk_root;
+
+say '';
+say 'etc dirs found:';
+
+if( @etc )
+{
+    say "  $_" for @etc;
+}
+else
+{
+    say '  (none)';
+}
+
+=head1 NAME
+
+list_etc_dirs - list all etc dirs found walking up from the script
+
+=head1 SYNOPSIS
+
+    list_etc_dirs
+
+    # To walk from the logical bin ($Bin_l) instead of the physical
+    # ($Bin_p), add "noabspath" to the FindBin::libs import:
+    #
+    #   use FindBin::libs qw( base=etc export noabspath );
+
+=head1 DESCRIPTION
+
+Exports C<@etc> containing every C<etc> directory found walking up the
+directory tree from the script's bin directory, nearest first.  Also
+calls C<FindBin::Parents::dir_paths> to display the full list of parent
+directories that were searched.
+
+The three modules work together here:
+
+=over 4
+
+=item L<FindBin::Bin>
+
+Provides C<$Bin_l> (logical path, symlinks preserved) and C<$Bin_p>
+(physical path, symlinks resolved).  These are the two possible starting
+points for the upward walk.
+
+=item L<FindBin::libs>
+
+Walks up from C<$Bin_p> (default) or C<$Bin_l> (with C<noabspath>),
+collecting directories named C<etc> and exporting them as C<@etc>.
+
+=item L<FindBin::Parents>
+
+C<dir_paths($path)> returns every ancestor directory of C<$path>, from
+C<$path> itself up to the root.  Passing the same root that C<FindBin::libs>
+used shows exactly which directories were candidates for an C<etc> entry.
+
+=back
+
+=head2 abspath vs. noabspath
+
+When no directory symlinks are present, C<$Bin_l eq $Bin_p> and the
+choice makes no difference.  They diverge when the script is invoked via
+a directory symlink.
+
+Consider:
+
+    /home/user/                         # logical subtree
+    +-- etc/
+    |   \-- sandbox.conf                # test configuration
+    \-- app -> /work/projects/app       # directory symlink
+
+    /work/projects/                     # physical subtree
+    +-- etc/
+    |   \-- production.conf             # production configuration
+    \-- app/
+        \-- bin/
+            \-- myscript                # $0
+
+Invoked as C</home/user/app/bin/myscript>:
+
+    $Bin_l = /home/user/app/bin    (symlink preserved)
+    $Bin_p = /work/projects/app/bin  (symlink resolved)
+
+With C<abspath> (default):
+
+    walk up from $Bin_p: /work/projects/app/bin -> /work/projects/app
+                         -> /work/projects -> /work -> /
+    @etc = ( '/work/projects/etc' )   # production.conf
+
+With C<noabspath>:
+
+    walk up from $Bin_l: /home/user/app/bin -> /home/user/app
+                         -> /home/user -> /home -> /
+    @etc = ( '/home/user/etc' )       # sandbox.conf
+
+=head2 export and the variable name
+
+C<export> without an argument names the exported array after the C<base>
+value.  C<base=etc> therefore exports C<@etc>.  To use a different name:
+
+    use FindBin::libs qw( base=etc export=config_dirs );
+    # exports @config_dirs
+
+=head1 SEE ALSO
+
+L<FindBin::Bin>, L<FindBin::libs>, L<FindBin::Parents>
+
+=cut

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::PulumiProvider;
 # ABSTRACT: Pulumi configures this store to sync secrets using the Pulumi provider
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s accessToken  => '+IO::K8s::ExternalSecrets::V1::PulumiProviderSecretRef';
@@ -30,7 +30,7 @@ IO::K8s::ExternalSecrets::V1::PulumiProvider - Pulumi configures this store to s
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 accessToken
 
@@ -67,7 +67,7 @@ Project is the name of the Pulumi ESC project the environment belongs to.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -95,5 +95,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

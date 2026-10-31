@@ -8,7 +8,7 @@ use FindBin; BEGIN { local @_ = "$FindBin::Bin/.."; do "$FindBin::Bin/../t_lib.p
 
 use base qw/YATT::Lite::Object
 	    YATT::Lite::Util::CmdLine/;
-use fields qw/cf_file cf_debug/;
+use fields qw/file debug/;
 
 MY->run(\@ARGV);
 

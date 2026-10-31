@@ -1,66 +1,38 @@
 ---
 name: getty-perl-core
-description: "Load on any Perl edit in a Getty project — module loading, attributes, errors, strings, control flow, cpanfile, per-file $VERSION, and the house choices that differ from Perl defaults."
+description: "Use when editing any Perl in a Getty project — module loading, subs, errors, style, cpanfile pins, per-file $VERSION."
 ---
 
 # Perl Core — Getty House Rules
 
-These rules override defaults. They are non-negotiable in Getty projects.
-Object-system specifics live in `getty-perl-moo` / `getty-perl-moose`.
+These override defaults in every Getty project. Object-system specifics:
+`getty-perl-moo` / `getty-perl-moose`; whether and where to type: `getty-perl-typing`.
 
 ## Module loading
 
-- **`use Module;` at the top.** Always. Every dependency loads at compile time.
-- **`require` is forbidden as a "lazy optimization".** Never use it to shave startup. `require Foo;` inside a method body → hoist it to a top-level `use`.
-- **`require` only for true runtime plugin loading** — the class comes from config/DB at runtime (`Module::Runtime::use_module($class_from_db)`). Known at write-time → `use` it.
-- **`require` + `->new` in a controller action** is a red flag. Hoist to `use`.
-
-## strict and warnings
-
-Both are active in **every** file, without exception. How they get there differs:
-
-- **Scripts, tests, plain modules:** `use strict; use warnings;` explicitly.
-- **Classes:** `Moo`, `Moose`, `Catalyst` and anything derived from them enable both on import — do not repeat them there.
-
-The rule is "always on", never "leave them out". Omitting them from a class is correct only because the object system already did it.
+- **`use Module;` at the top** — every dependency loads at compile time. A `require Foo;` in a method body (to "speed up startup", or `require` + `->new` in a controller action) → hoist it to a top-level `use`.
+- **`require` only for true runtime plugin loading** — the class name comes from config/DB (`Module::Runtime::use_module($class_from_db)`). Known at write-time → `use`.
+- `strict` + `warnings` in every file: written out in scripts, tests and plain modules; Moo/Moose/Catalyst classes get them on import — not repeated there.
 
 ## Object system
 
-- **One object system per distribution.** Pick Moo or Moose and use it everywhere; mixing is for boundaries a framework forces (e.g. RapidApp), not a choice.
-- **`is => 'ro'` is the default.** `rw` is the exception and needs a reason.
-- **`lazy_build => 1` + `sub _build_foo`** over `default => sub { ... }` for anything non-trivial.
-- **`weak_ref => 1`** on attributes holding a reference back to a parent/owner — standard for nested object graphs, prevents circular refs.
-- **`namespace::autoclean`** on every class file. Classes extending DBIx::Class (`MooseX::NonMoose`) use **`MooseX::MarkAsMethods autoclean => 1`** instead.
-- **`no Moose;` + `__PACKAGE__->meta->make_immutable;`** at the bottom of every Moose class.
-- **Types:** the tendency is to type what arrives from outside — Moose's own constraints where Moose is already there, `Types::Standard` where it is not. Not every distribution needs a type system, and none needs one for every field: `getty-perl-typing`.
-
-## Singletons
-
-- **`->instance`** for `MooseX::Singleton` / `MooX::Singleton` classes. Never `->new` on a singleton.
-- **`->new`** for everything else.
+- **One object system per distribution** — Moo or Moose everywhere; mixing only at a boundary a framework forces (e.g. RapidApp).
+- **`is => 'ro'` by default**; `rw` needs a reason.
+- **Non-trivial values come from a builder `sub _build_foo`**, never `default => sub {...}`: Moo `is => 'lazy'`, Moose `lazy_build => 1`.
+- **Class hygiene:** Moo class `use namespace::clean;` (not in roles); Moose class `use namespace::autoclean;` (or `no Moose;`) and `__PACKAGE__->meta->make_immutable;` as its last line.
+- **`weak_ref => 1`** on attributes holding a reference back to a parent/owner.
+- **`->instance`** on `MooseX::Singleton` / `MooX::Singleton` classes, never `->new`.
 
 ## Subroutines
 
-- **`my ( $self, $x ) = @_;`** as the first line — explicit destructure, spaces inside the parens. Never `my $self = shift;` as argument unpacking.
-- **One-liners skip unpacking** and use `shift->` or `$_[0]->`: `sub trace { shift->_logger->trace(@_) }`. This is the one place `shift` is right.
-- **A builder that ignores `$self` fits on one line:** `sub _build_readonly { 0 }`.
-- **`_` prefix marks private** subs and attributes. Builders for private attributes double up: `sub _build__mp`.
-
-### Methods, not bare subs
-
-- **In a class, every helper is a method on `$self`** — not `sub _foo {...}` invoked as `_foo($self->config, $x)`.
-- **Per-process caches go on the singleton as an attribute** (`has _cache => ( is => 'ro', default => sub { {} } )`), not a `my %CACHE` package variable.
-- **No package-level state** unless it is a true constant (an `%ENGINE_CLASS` lookup table counts; a per-call cache does not).
-- Bare subs are fine in **non-class utility modules** imported as functions. Once a file says `use Moose`/`use Moo`, every `sub` is a method.
-
-Why: bare subs hide what the call needs, can't be overridden or mocked, and force every caller to thread state by hand.
+- **`my ( $self, $x ) = @_;` as the first line** — spaces inside the parens; never `my $self = shift;`. One-liners skip unpacking: `sub trace { shift->_logger->trace(@_) }`. A builder ignoring `$self` is one line: `sub _build_readonly { 0 }`.
+- **`_` prefix marks private** subs and attributes; a private attribute's builder doubles up: `sub _build__mp`.
+- **In a class every helper is a method on `$self`**, never a bare `_foo($self->config, $x)` — bare subs can't be overridden or mocked. Bare subs only in non-class utility modules imported as functions.
+- **No package-level state** but true constants (an `%ENGINE_CLASS` table counts); a per-process cache is an attribute on the singleton (`has _cache => ( is => 'ro', default => sub { {} } )`), not `my %CACHE`.
 
 ### Dispatch through the invocant, never a hardcoded class name
 
-Route a class's own methods, and every collaborator it reaches for, through the invocant — never through a literal package name. Perl passes the invocant as the first argument for both `Foo->method` and `$obj->method`, so a class name is itself a valid invocant: `$self` simply *is* `$class` when nothing is instantiated. Going through it costs nothing even for a never-instantiated class, and it is the one thing that lets a subclass override the behaviour — a literal `Some::Package->helper(...)` nails the call to that exact package, and no override or mock can reach it.
-
-- **A method on the same class:** `$self->value_to_bytes($v)`, never `My::Value->value_to_bytes($v)` from inside `My::Value`.
-- **A collaborator in another class:** name the class once in an overridable resolver, then dispatch through it — never a literal at the call site.
+A literal `Some::Package->helper(...)` nails the call to that package — no subclass or mock can reach it. Call the class's own methods through `$self`, and name each collaborator class once in an overridable resolver:
 
 ```perl
 package My::Pipe;
@@ -78,111 +50,67 @@ use parent -norequire, 'My::Pipe';
 sub backend_class { 'My::Backend::Vault' }       # a subclass swaps it; the pipeline follows
 ```
 
-This holds for class-method-only modules too: write every method's first line as `my ( $self, ... ) = @_;` and dispatch through `$self` whether or not the class is ever instantiated. The module becomes subclassable for free, and callers that write `Thing->do(...)` keep working unchanged.
+Class-method-only modules too: `my ( $self, ... ) = @_;` and dispatch through `$self` — the class name *is* the invocant, and `Thing->do(...)` callers keep working.
 
-## Errors
+## Errors, strings, control flow
 
-- **`croak`, never `die`.** Errors report the caller's line, not ours.
-- **Import it:** `use Carp qw( croak );` and call `croak(...)` bare.
-- **Name the origin in the message:** `croak __PACKAGE__."->state too many args"` — or whatever identifies the operation in that module's DSL.
-
-## Strings
-
+- **`croak`, never `die`** — `use Carp qw( croak );`, called bare; the message names the origin: `croak __PACKAGE__."->state too many args"`.
 - **Concatenate, do not interpolate:** `'Adding '.$f.' with '.$length.' bytes'`. Interpolate only where concatenation would be unreadable.
-- **Single quotes by default.** `'...'` and `"..."` are genuinely different in Perl — `"` interpolates and processes escapes, `'` does not. Reach for `"` when you need that, not by habit.
-- **Import lists as `qw( croak confess )`** — spaces inside the parens. Never rely on default exports.
-
-## Control flow
-
-- **Postfix `if`/`unless`** for guards and short conditions: `croak(...) if $self->readonly;`
-- **`unless $x`** instead of `if !$x`.
+- **Single quotes by default**; `"` only when you need interpolation or escapes.
+- **Import lists as `qw( croak confess )`** — spaces inside; never rely on default exports.
+- **Postfix `if`/`unless`** for guards and short conditions; **`unless $x`**, not `if !$x`.
 - **Guard clauses return bare:** `return unless $res->is_success;` — not `return undef;`.
 - **Nested ternaries** for a return that picks between expressions, instead of an if/elsif chain.
 
 ## Data
 
-- **`{ %hash }` and `\%hash` are different operations, not two styles.** `{ %h }` builds a new anonymous copy; `\%h` references the existing hash. Return a copy when the caller must not mutate your state; return the reference when sharing is the point. Choose deliberately.
-- **`Path::Tiny`** for every file operation — not `File::Spec`, not bare `open`. `path(...)->child(...)->slurp_utf8`.
-- **`JSON::MaybeXS`** always — never `JSON::PP`, `JSON::XS`, `Cpanel::JSON::XS` directly. Encoders get `canonical => 1, convert_blessed => 1`.
-- **Every serialiser is deterministic.** MessagePack `->canonical`, DBIC `serializer_options => { canonical => 1 }`. Same rule, every format.
-- **Booleans: `JSON->true` / `JSON->false`.** `use JSON::MaybeXS;` covers codec and booleans.
-- `$YAML::XS::Boolean = 'JSON::PP'` is one of YAML::XS's fixed mode names, not a module choice — leave it alone.
-- **Align `=>` in multi-line hash literals** when keys are of similar length.
-- **Optional pairs inline:** `$cond ? ( experimental => 1 ) : (),`
+- **`Path::Tiny`** for every file operation — not `File::Spec`, not bare `open`.
+- **`JSON::MaybeXS`** always — never `JSON::PP`, `JSON::XS`, `Cpanel::JSON::XS` directly. Encoders get `canonical => 1, convert_blessed => 1`. Booleans `JSON->true` / `JSON->false`, never `JSON::PP::true` barewords.
+- **Every serializer is deterministic** — MessagePack `->canonical`, DBIC `serializer_options => { canonical => 1 }`, every format.
+- `$YAML::XS::Boolean = 'JSON::PP'` is a YAML::XS mode name, not a module choice — leave it.
+- **Align `=>`** in multi-line hashes when keys are of similar length; optional pairs inline: `$cond ? ( experimental => 1 ) : (),`
 
-## Configuration
+## Configuration and DBIC
 
-Config comes from environment variables prefixed with the project name
-(`$ENV{MYPROJECT_TIME_ZONE}`), each with a default in code. Where many
-attributes share that shape, write a generator that wraps `has` rather than
-repeating the declaration.
+- **Config comes from env vars prefixed with the project name** (`$ENV{MYPROJECT_TIME_ZONE}`), each with a default in code. Many attributes of that shape → a generator sub that wraps `has`, not N copied declarations.
+- **DBIx::Class / DBIO result classes** (columns, NonMoose classes): read [references/dbic.md](references/dbic.md) before editing one.
 
-## DBIC-ish result classes
+## Style
 
-- Column defs via **`DBIx::Class::Candy`** or **`DBIO::Candy`** — `primary_column` / `column` macros, not `__PACKAGE__->add_column(...)`.
-- **`keep_storage_value => 1`** on enum and integer columns that shouldn't be inflated/deflated.
-- **`\'NOW()'`** (literal scalar ref) for DB-side timestamp defaults.
-
-## Style, comments, structure
-
-- **2-space indentation.** Not 4. Not tabs. Every Getty Perl file.
-- **No trailing commas** at the end of multi-line lists (unlike Python).
-- **Section long files with a figlet banner** as a comment block. Pick from `standard`, `slant`, `small`, `banner`. Where figlet is unavailable or the file is short, a `#### <Name>` rule does the job.
-- **Commented-out debug lines stay** (`#use DDP; p($res);`). They mark where debugging was needed before — deleting them as dead code removes a warning sign, and sometimes the precaution it guards.
+- **2-space indentation** — not 4, not tabs.
+- **Trailing comma after the last element** of every multi-line list, hash or call.
+- **Section long files with a figlet banner** comment (`standard`, `slant`, `small`, `banner`); short file or no figlet → a `#### <Name>` rule.
+- **Debug with `DDP`** (`Data::Printer`), never `Data::Dumper` in shipped code. Live debug calls go before commit; **commented-out ones stay** (`#use DDP; p($res);`) — they mark where debugging was needed.
 
 ## cpanfile
 
-- **A `cpanfile` carries the requirements** — that is the file, not `dist.ini` prereq blocks.
-- **`requires 'Module::Name';`** — the version argument is optional, omit it when unpinned. Never write `'0'`.
-- **A version means "or higher".** `requires 'Foo', '5.0';` already accepts 5.1 — never write `'>= 5.0'`.
-- **Alphabetical order**, phase blocks (`on test => sub {...}`) at the end.
+- **Requirements live in `cpanfile`**, not `dist.ini` prereq blocks.
+- **`requires 'Module::Name';`** — omit the version when unpinned, never `'0'`. A version means "or higher": `requires 'Foo', '5.0';`, never `'>= 5.0'`.
+- **Alphabetical**, phase blocks (`on test => sub {...}`) at the end.
 
 ### Getty-authored dependencies — CRITICAL
 
-Getty's `dist.ini` uses `[@Author::GETTY]`, which sets `$VERSION` in the repo to the **next, unreleased** version (`0.402` while CPAN is at `0.401`). The repo is ALWAYS one ahead of CPAN.
+`[@Author::GETTY]` keeps a repo's `$VERSION` at the **next, unreleased** version (`0.402` while CPAN has `0.401`) — a sibling checkout is always one ahead of CPAN.
 
-1. **Pin what the code actually needs, not the number that happened to be in front of you.** Opening a sibling repo, reading its `$VERSION` and pinning that — while depending on nothing that version introduced — is the mistake this section exists for. It names an unreleased version for no reason and breaks the build for everyone off this machine.
-2. **Check `cpanm --info Module::Name`** for the released version. If the released one carries what you use, that is the pin.
-3. **Pinning the next, unreleased version is correct when the change spans both repos** — the sibling gained what this code calls, or a release is being prepared and the distributions are tested together from their working trees. It commits you to one thing: the dependency is released first. Until it is, `cpanm` cannot resolve the pin, so nothing may go out ahead of it.
-4. **Pin every Getty-authored distribution.** Not stale, not omitted — current.
-5. **Re-check on upgrade.**
-
-```bash
-cpanm --info Module::Name | tail -1
-# → GETTY/Module-Name-1.234.tar.gz  ← pin to 1.234
-```
+1. **Pin what the code needs, not the number in front of you.** Pinning a sibling's `$VERSION` while using nothing that version introduced names an unreleased version and breaks the build off this machine.
+2. **Get the released version from `cpanm --info`**; if it carries what you use, that is the pin:
+   ```bash
+   cpanm --info Module::Name | tail -1
+   # → GETTY/Module-Name-1.234.tar.gz  ← pin to 1.234
+   ```
+3. **Pin the next, unreleased version only when the change spans both repos** — the sibling gained what this code calls, or both are tested together from working trees for a release. Then the dependency is released first; nothing goes out ahead of it.
+4. **Pin every Getty-authored distribution**, current — not stale, not omitted. Re-check on upgrade.
 
 Getty-authored (non-exhaustive): `Langertha`, `IO::K8s`, `Kubernetes::REST`, `WWW::Crawl4AI`, `Net::Async::Crawl4AI`, `Net::Async::WebSearch`, `Catalyst::Plugin::ChainedURI`, `Locale::Simple`, `DBIO::*`, `WWW::Zitadel`, `WWW::PayPal`, `WWW::Chain`.
 
-## Every file carries its own `$VERSION`
+## `$VERSION` and files
 
-**Each module under `lib/` and each Perl executable under `bin/` needs its own
-`our $VERSION = '...';`**, set to the version that will be released NEXT — one
-higher than what is on CPAN (or higher). A Perl source file without a `$VERSION`
-ships versionless and breaks consumers that pin against it. Bash and other
-non-Perl executables are still installed from `bin/`, but are deliberately
-excluded from the PPI-based version rewrite.
+- **Every module under `lib/` and every Perl executable under `bin/` carries its own `our $VERSION = '...';`** — the next, unreleased version.
+- **One package per file** — the release rewrites only the first `our $VERSION` in a file.
+- **Executables live in `bin/`, never `script/`** — `script/` is neither installed nor versioned.
 
-**Only the FIRST `our $VERSION` in a file gets rewritten.** RewriteVersion::Transitional
-and BumpVersionAfterRelease both stop after the first match, so a file holding two
-packages leaves the second one frozen at whatever version it was written with —
-while MetaProvides::Update happily reports the real release version. The result is
-a distribution whose META and whose code disagree, silently, for as many releases
-as it takes someone to notice.
-
-So: **one package per file.** If you find several `package` statements in one file,
-split them out before releasing.
-
-**Executables belong in `bin/`, never `script/`.** The bundle sets no `ExecDir`, so
-Dist::Zilla's default of `bin` applies: files under `script/` are not installed as
-executables, and a Perl executable there has no `$VERSION` rewrite. A distribution
-with a `script/` directory should have it renamed to `bin/` — otherwise none of
-the executable handling takes effect.
-
-## Forbidden
-
-❌ `require Foo` inside a method to "speed up startup" · ❌ a Getty repo's `$VERSION` as a cpanfile requirement · ❌ `'0'` or `'>= x'` as a version argument · ❌ `default => sub {...}` for a non-trivial attribute default · ❌ 4-space indent · ❌ `File::Spec` in new code · ❌ `JSON::PP::true` / `JSON::PP::false` as barewords · ❌ `Data::Dumper` in shipped code (use `DDP` / `Data::Printer` for debug, strip before commit) · ❌ `die` where `croak` belongs
+Mechanics: skill `getty-perl-release-author-getty`.
 
 ## When in doubt
 
-Grep hand-written Getty code for how the pattern is used there — the reference is an older repo with no AI commits in its history. Newer repos may show an agent's guess rather than the house rule.
+Grep hand-written Getty code for the pattern — an older repo with no AI commits in its history. Newer repos may show an agent's guess, not the house rule.

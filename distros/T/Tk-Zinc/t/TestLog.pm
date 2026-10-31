@@ -1,6 +1,6 @@
 package TestLog;
 
-# $Id: TestLog.pm,v 1.4 2005/01/16 10:27:35 mertz Exp $
+# $Id$
 # These test facilities has been developped by C. Mertz <mertz@cena.fr>
 
 use IO::Handle;    # for autoflushing the logs
@@ -10,7 +10,7 @@ use Exporter;
 @ISA = qw(Exporter);
 
 use vars qw( $VERSION @ISA);
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 @EXPORT = qw( openLog setZincLog log test_eval test_no_eval printableItem printableArray printableList
 	      equal_flat_arrays nequal_cplx_arrays);
 use strict;

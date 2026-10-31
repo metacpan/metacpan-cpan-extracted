@@ -1,5 +1,81 @@
 Revision history for YATT::Lite
 
+0.200 2026-10-31
+
+    Security fixes. Found by a Claude Security scan of Lite/ (2026-10-24); each one comes with a test. Upgrade notes are at the end of this section.
+    * Path traversal via request page/action names: the value of `~~=PAGE` / `!!=ACTION` was joined onto the template directory as-is, so `~~=../../dir` could load a directory outside doc_root as a YATT app and execute its `.htyattrc.pl`. Page/action names are now `\w*` only, and `YATT::Lite::VFS::Dir::load` rejects part names containing `/` or `..`
+    * Open redirect: the guard in `$CON->redirect` / `raise_redirect` / `&yatt:redirect()` only knew `//host` and `scheme://host`; browser-normalized forms (`\\evil`, `/\evil`, `///evil`, `http:\\evil`, leading whitespace) reached `Location`. New `$CON->is_same_origin_redirect_url` accepts only same-host absolute urls, `//same-host`, and paths; anything else is answered with 400
+    * Reflected XSS through typed page arguments: only `text`, `list`, `scalar` and `bool` arguments are bound from request parameters now (`YATT::Lite::VarTypes::%SAFE_TYPES`); `html`, `attr`, `code`, `expr`, `delegate` and the body argument are treated as unknown parameters (stashed or dropped)
+    * `escape()` of references: request parameters no longer bind a HASH/ARRAY (from nested query `?q[]=...`) to a `text`/`bool` argument; `scalar` and `list` still accept them. When a reference does reach `escape()`, the Data::Dumper dump is now fully escaped (also `'` and `>`) and printed only when `$CON->has_htdebug('dump')` is true (`HTDEBUG_DUMP` env or `$app_root/.htdebug_dump`) or `PLACK_ENV=development`; otherwise only the type is printed (`[HASH]`). `$CON->has_htdebug($name)` is cached per connection
+    * Session (`Partial::Session`, CGI::Session): the SID cookie is sent with `HttpOnly`, `SameSite=Lax` and `Secure` (on TLS); session ids come from the OS CSPRNG (`CGI::Session::ID::yatt_secure`, used when the DSN names no id driver) instead of `id:md5`; the CSRF token is a random value kept in the session instead of the SID itself; a cookie value that is not a plain token (`[A-Za-z0-9_-]{1,128}`) is treated as no cookie, so it can never reach the store as a path
+    * Session2 (`Partial::Session2`, Plack::Session): the cookie value is checked with the state object's `validate_session_id` before it is used as a store key (with `Plack::Session::Store::File` an unchecked value was a path traversal to read or unlink files); cookie defaults `Secure` (on TLS, also via `X-Forwarded-Proto`), `HttpOnly`, `SameSite=Lax` unless the state object defines them
+    * `raise_download`: the filename can no longer inject headers (CR/LF/control chars are dropped, `"` and `\` force the fallback); non-ASCII names are carried as RFC 8187 `filename*=UTF-8''...`; extra headers passed by the caller are validated. New `YATT::Lite::Util::content_disposition_attachment`
+    * Debug trace exposure: `guess_client_ip` believed `X-Real-IP` / `X-Client-IP` / `X-Forwarded-For` from any peer, so any client could pass `allow_debug_from` by sending `X-Real-IP: 127.0.0.1` and see the developer trace of `ytmpl/error.ytmpl`. Those headers are now honoured only when `REMOTE_ADDR` is in the new `trusted_proxies` config (X-Forwarded-For read from the right, skipping trusted hops). `allow_debug_from` is matched exactly (it was anchored only at the start: `127.0.0.1` also matched `127.0.0.100`); default is now `['127.0.0.1', '::1']`. New `YATT::Lite::WebMVC0::Partial::StrictIPMatch` for CIDR / IPv6 matching of both lists
+    * LanguageServer: the `app.psgi` / `runyatt.psgi` search no longer walks above the workspace root (`rootUri`), so a script planted in a parent directory is never executed on `initialize`. `Factory->find_factory_script` / `Site->load` / `load_or_default` take `stop_at`, `Inspector` takes `search_boundary`
+    * New helpers: `YATT::Lite::Util::secure_random_bytes` / `secure_random_hex`, `YATT::Lite::PSGIEnv->is_https($env)`, `$CON->is_https`
+    Upgrade notes:
+    * Behind a reverse proxy, add `trusted_proxies => [...]` (or enable `Plack::Middleware::ReverseProxy` with `enable_if` for the proxy's address) if you rely on `allow_debug_from` for addresses other than the proxy itself
+    * Public pages that declared `html`-typed arguments bound from the query must switch to `text` and build the html themselves
+    * To see reference dumps from `escape()` in development, create `$app_root/.htdebug_dump` or set `HTDEBUG_DUMP=1`
+    * `Partial::Session`: to change the cookie attributes use `session_config => {httponly => ..., secure => ..., samesite => ...}`; existing sessions whose ids came from `id:md5` are not recognized by the new validator only if they contain characters outside `[A-Za-z0-9_-]` (md5 hex ids are fine)
+    * Templates that passed `~~=` / `!!=` values with non-word characters, or redirected to urls that fail the same-origin check, are now answered with 400
+
+    Other changes since 0.199_004:
+    * GH-293 - `code` type is now a renderer: the closure receives `$CON` as its first argument; `<yatt:my var>...</yatt:my>` captures the output of `&yatt:body();` / code arguments; scope fixes for `<yatt:my>` variables (a variable is not visible inside its own initializer, also for code/expr/source types); elements or `<?perl ?>` in an expression context (scalar/list) are reported as errors
+    * GH-295 - `$CON` during capture is a `ConnectionProxy` that delegates to the original connection, so its methods keep working inside `<yatt:my>` bodies
+    * GH-294 - `expr` type is separated from `code`: a closure that returns a value. PageConsts CODE constants are `expr`
+    * GH-296 - The leading type name of `[code x y]` is no longer registered as an argument of the virtual widget (positional calls no longer shift)
+    * GH-304 - Calling a `delegate` variable in entity form is now an error that points to the element form
+    * GH-300 - `Inspector->list_code_args` lists the code-typed arguments of yatt declarations
+    * GH-301 - `load_factory_script` reports when an app-bundled copy of YATT::Lite gets mixed with the one being loaded
+    * GH-291 - `%yatt:NAME;` / `%yatt:NAME(VALUE);` set the part option `yatt_NAME`
+    * GH-288 - ArgMacro can be defined as a Perl module (one pm per macro), registered via the Site config `argmacro` (optionally in a namespace); `refer` arguments and bypass by explicit `out`; `on_expand` receives the call `$node` and may return argument nodes; `Module->expand_element` expands an ArgMacro inside an ordinary macro. New `YATT::Lite::ArgMacro` pod
+    * GH-282 - pagevars: per-page compile-time constants defined in a Perl module (`YATT::Lite::PageConsts`), Site config `pagevars`. New PageConsts pod and a section in yatt_manual.ja
+    * GH-286 - LSP: definition / hover / completion / lint for pagevars page constants; `define_page` records the definition position, `define_pages_from_hash`
+    * GH-284 - An action may return a CODE ref, which is passed through as a PSGI delayed / streaming response
+    * GH-280 - LSP: definition and hover for `<yatt:body/>` and other callable-variable elements, hover for macro elements; table of targets in LanguageServer.pod
+    * GH-278 - LSP: the trailing newline of a comment is excluded from its tree_range (diagnostics no longer spill into the next line)
+    * GH-233 - The `cf_` field convention is gone from whyfields, scripts, `Connection::cf_pairs` and Test::TestFiles
+    * GH-271 - `scripts/yatt.xhftest` is dropped
+    * `use YATT::Lite::CGen::Perl -as_base;` works; workaround for cperl-mode syntax highlighting
+    * CI - linux tests run on ubuntu-latest with shogo82148/actions-setup-perl (perl 5.26 to 5.42)
+
+0.199_004 2026-09-10
+    * GH-277 - LSP: go-to-definition/hover for attributes at widget call sites - name-only `<yatt:foo x/>` jumps to the variable in scope (or the formal arg for a flag), `a=y` to the formal arg / the variable, `<:yatt:d>` to the formal arg
+    * GH-275 - LSP: fix go-to-definition stalling when frames arrive back to back (eglot sends didChange + definition in one write); argument / `<yatt:my>` definitions now return a real Range with the file uri; 0-based entity lines; percent-decoded uris and non-ascii / space directories; advertise `positionEncoding: utf-32`; handle `didClose` / `initialized` / `$/cancelRequest`; never answer a JSON-RPC error for definition/hover; survive bad header / broken JSON; `--logfile` (`$YATT_LANGSERVER_LOG`); fix `startln` of back-to-back declarations and first-line columns; new tests `t/langserver_transport.t` (via `YATT::Lite::Test::LangServerClient`) and `t/inspector_definition.t`
+    * CI - tolerate expired Debian Release files in old perl images (fail-fast off); actions/checkout v7
+
+0.199_003 2026-09-01
+    * GH-272 - Document the public facade - new `YATT::Lite::Site` pod (execution contracts), Factory.pod DESCRIPTION, readme CLI section
+    * GH-270 - Modularize yatt.genperl as `YATT::Lite::CLI::GenPerl`
+    * GH-269 - Unify yatt.lint onto Inspector::lint - default output is now `FILE:LINE: MESSAGE` (old shape via `--format=old`); fix dropped multi-error lines and line off-by-one
+    * GH-268 - Add `YATT::Lite::CLI` base class for yatt.* tools; rewrite yatt.render on the Site facade
+    * GH-267 - chdir becomes a restoring guard and now applies to the render path too (Compatibility option: `no_chdir`); add `$CON->system`
+    * GH-266 - Add `YATT::Lite::Site` - public facade API (`load` / `request` / `render_file`) with `YATT::Lite::Response`
+
+0.199_002 2026-08-31
+    * GH-264 - New parser option `allow_bare_entity_in_decl` - quotes around entities in declarations are now omissible
+    * GH-262 - Fix EntNS confliction regression - base <-> widget-use circular references work again (drop eager base compile in declare_base)
+    * GH-260 - Lexically normalize app_root/doc_root (fix silently broken sibling config_dir when app_root ends with `..`)
+    * GH-259 - `mkquery($CON)` no longer reproduces POST body parameters (Compatibility option: `mkquery_with_body_params`)
+    * GH-258 - Fix body boundary of action/entity parts swallowing a following `<!yatt:argmacro>` declaration
+    * GH-256 - Add `<!yatt:import>` declaration (widget/page/action/entity/argmacro)
+    * GH-255 - Fix two `<!yatt:base>` inheritance bugs - first-hit dispatch failure and stale caller-side arg mapping
+    * GH-254 - `<yatt:foo if="COND">` / `unless=` now generates conditional call (port from yatt-pm)
+    * GH-252 - `app.yml` can now be placed in the sibling config dir (`*.config.d/`) too
+    * GH-251 - better URL generation methods/entities, add raise_redirect alias.
+    * GH-250 - trim trailing `/` of `&yatt:script_name;`
+    * GH-249 - Add `yatt:foreach` alternate syntax `var=value`
+    * GH-248 - Fix inspector to correctly locate inline entity
+    * GH-247 - `<!yatt:base>` is now always checked during refresh
+    * GH-246 - extend `&yatt:value_checked();` `&yatt:value_selected();`
+    * GH-244 - Fix line number glitch for suppressed default widget
+    * GH-243 - genperl now works with `<!yatt:base>`
+    * GH-242 - Restrict `<!yatt:...` linestart only
+    * GH-241 - `:mkhidden(name[])`, `:param(name[])` works as expected (for nested_query)
+    * GH-239 - LSP: textDocument/completion (partial support)
+    * GH-233 - Drop `cf_` prefix
+
 0.131 2025-05-18
     * GH-237 - Fix module deps
 

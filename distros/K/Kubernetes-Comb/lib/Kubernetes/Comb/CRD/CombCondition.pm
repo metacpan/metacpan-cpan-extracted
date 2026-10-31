@@ -1,6 +1,6 @@
 package Kubernetes::Comb::CRD::CombCondition;
 # ABSTRACT: One condition in the status of a Comb custom resource
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use IO::K8s::Resource;
 
@@ -34,7 +34,7 @@ Kubernetes::Comb::CRD::CombCondition - One condition in the status of a Comb cus
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,7 @@ RFC 3339 timestamp of the last change of L</status>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

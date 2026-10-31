@@ -1,11 +1,11 @@
 #!/usr/bin/perl
-# $Id: icon_zoom_resize.pl,v 1.7 2004/04/30 11:35:18 lecoanet Exp $
+# $Id$
 # this simple demo has been developped by C. Mertz <mertz@cena.fr>
 
 package icon_zoom__resize; # for avoiding symbol re-use between different demos
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 use Tk;
 use Tk::Zinc;

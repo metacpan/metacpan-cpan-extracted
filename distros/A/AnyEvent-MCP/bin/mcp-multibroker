@@ -201,8 +201,10 @@ including when the upstream caller cannot handle native input challenges.
 Continuation tokens remain opaque; the broker sends the human response back
 to the same downstream operation and returns its eventual result.
 
-The mode also sets C<PERL_ANYEVENT_MCP_PERMISSION_ASK> for spawned stdio
-children. Independently running servers keep their own configuration.
+Spawned stdio children default to C<--ask mcp>, delegating permissions to
+the multibroker, which handles them according to its own C<--ask> mode.
+An explicit child C<--ask> overrides this default. Independently running
+servers keep their own configuration.
 Spawned C<mcp-ask-user> instances normally delegate presentation to this broker.
 Use C<--ask mcp> on a separately started C<mcp-ask-user> to delegate to its
 connecting client, including a multibroker.
@@ -211,7 +213,7 @@ Local permission and question dialogs share one queue. Set
 C<PERL_ANYEVENT_MCP_ELICITATION_HELPER> to replace the form helper and
 C<PERL_ANYEVENT_MCP_PERMISSION_HELPER> to replace the permission helper.
 Cancelling a tool call cancels its downstream operation and pending local
-prompt. The original stdio permission extension is also supported.
+prompt.
 
 =head1 CLIENT CONNECTION
 
@@ -424,7 +426,10 @@ sub on_input {
          AnyEvent::MCP::Permissions::Ask::build ($meta->{request}, {
             %$decision,
             (ref $decision->{rule} eq "HASH"
-               ? (map { $_ => $decision->{rule}{$_} } qw(subject path)) : ()),
+               ? (map { $_ => $decision->{rule}{$_} } qw(path)) : ()),
+            (ref $decision->{rule} eq "HASH"
+               ? (map { (my $key = $_) =~ s/^match\./dim_/; $key => $decision->{rule}{$_} }
+                  grep /^match\./, keys %{$decision->{rule}}) : ()),
          }, $stage, $meta->{selection})
       };
       return $req->error (-32603, "Invalid permission helper decision: $@") if $@;
@@ -432,12 +437,15 @@ sub on_input {
          action  => "accept",
          content => {
             decision => $valid->{decision},
-            (exists $valid->{sandbox_grants} ? (sandbox_grants => join (",", @{$valid->{sandbox_grants}})) : ()),
+            (exists $valid->{sandbox_grants}
+               ? (sandbox_grants => join ",", @{$valid->{sandbox_grants}}) : ()),
             (defined $valid->{message} ? (message => $valid->{message}) : ()),
+            (exists $valid->{lifetime} ? (lifetime => $valid->{lifetime}) : ()),
             (ref $valid->{rule} eq "HASH" && defined $valid->{rule}{path}
                ? (path => $valid->{rule}{path}) : ()),
-            (ref $valid->{rule} eq "HASH" && exists $valid->{rule}{subject}
-               ? (subject => $valid->{rule}{subject}) : ()),
+            (ref $valid->{rule} eq "HASH"
+               ? (map { (my $key = $_) =~ s/^match\./dim_/; $key => $valid->{rule}{$_} }
+                  grep /^match\./, keys %{$valid->{rule}}) : ()),
          },
       });
    };
@@ -585,7 +593,7 @@ while (@ARGV) {
          env => {
             PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio",
             PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS => $prefix,
-            (defined $ask_mode ? (PERL_ANYEVENT_MCP_PERMISSION_ASK => $ask_mode) : ()),
+            PERL_ANYEVENT_MCP_PERMISSION_ASK => "mcp",
          },
       );
       $stdio{$prefix} = 1;
@@ -676,63 +684,24 @@ sub call_tool {
       "anyevent-mcp/multibroker" => { version => 1 },
    };
    $params{_meta}{"io.modelcontextprotocol/clientCapabilities"} = $caps;
-   my ($id, $rounds, $send);
+   my $id;
    my $old_cancel = $req->{on_cancel};
    $req->{on_cancel} = sub {
       $client->cancel ($id, $_[1]) if defined $id;
-      undef $send;
       $old_cancel->(@_) if $old_cancel;
    };
-   $send = sub {
-      my $done = sub {
-         my ($success, $result) = @_;
+   my $done = sub {
+      my ($success, $result) = @_;
 
-         if ($req->{finished}) {
-            undef $send;
-            return
-         }
-         unless ($success) {
-            undef $send;
-            return $req->error ($result->{message})
-         }
-
-         # compatibility with the original stdio permission extension.
-         my $meta = ($result->{_meta} || {})->{"anyevent-mcp/permission"};
-         if ($stdio{$prefix} && $result->{isError} && ref $meta eq "HASH"
-            && $meta->{version} == 1 && ref $meta->{request} eq "HASH") {
-            if (++$rounds > 32) {
-               undef $send;
-               return $req->error ("Too many permission rounds")
-            }
-            ask_prompt $req, $meta->{request}, sub {
-               my ($success, $decision) = @_;
-
-               unless ($success) {
-                  undef $send;
-                  return $req->error ($decision)
-               }
-               $params{_meta} = {
-                  %{$params{_meta} || {}},
-                  "anyevent-mcp/permission" => {
-                     version  => 1,
-                     request  => $meta->{request},
-                     decision => $decision,
-                  },
-               };
-               $send->();
-            };
-            return
-         }
-         undef $send;
-         $req->reply ($result);
-      };
-      if ($local_forms || $req->{protocol_version} lt "2026") {
-         $id = $client->call ($tool, $args, $done, %params);
-      } else {
-         $id = $client->rpc ("tools/call", \%params, $done);
-      }
+      return if $req->{finished};
+      return $req->error ($result->{message}) unless $success;
+      $req->reply ($result);
    };
-   $send->();
+   if ($local_forms || $req->{protocol_version} lt "2026") {
+      $id = $client->call ($tool, $args, $done, %params);
+   } else {
+      $id = $client->rpc ("tools/call", \%params, $done);
+   }
 }
 
 $toolset->tool (discover_brokers =>

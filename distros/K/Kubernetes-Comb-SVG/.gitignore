@@ -73,3 +73,6 @@ config.yml
 
 # karr-foundation per-repo state — local machine only, never commit
 .karr.state
+
+# git worktrees of this repo — local only, never commit
+/.claude/worktrees/

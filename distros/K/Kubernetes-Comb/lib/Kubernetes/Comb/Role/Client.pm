@@ -1,6 +1,6 @@
 package Kubernetes::Comb::Role::Client;
 # ABSTRACT: The Kubernetes client surface a Comb works through
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo::Role;
 
@@ -25,7 +25,7 @@ Kubernetes::Comb::Role::Client - The Kubernetes client surface a Comb works thro
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -169,7 +169,7 @@ Future, and makes L</server_url> croak.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

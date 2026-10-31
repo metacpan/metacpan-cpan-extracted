@@ -326,25 +326,25 @@ END
   {
     package MyBackend1; sub MY () {__PACKAGE__}
     use base qw/YATT::Lite::Object/;
-    use fields qw/base_path
-		  paths
-		  cf_name/;
+    use fields qw/_base_path
+		  _paths
+		  name/;
     sub startup {
       (my MY $self, my $router, my @apps) = @_;
-      my $docs = $self->{base_path} = $router->cget('doc_root');
+      my $docs = $self->{_base_path} = $router->cget('doc_root');
       $docs =~ s,/+$,,;
       $docs = File::Spec->rel2abs($docs);
       foreach my $app (@apps) {
 	my $dir = $app->cget('dir');
 	$dir =~ s/^\Q$docs\E//;
         $dir =~ s{\\}{/}g; # XXX: Just to pass test on Win32...ummm
-	push @{$self->{paths}}, $dir;
+	push @{$self->{_paths}}, $dir;
       }
     }
 
     sub paths {
       (my MY $self) = @_;
-      sort @{$self->{paths}}
+      sort @{$self->{_paths}}
     }
   }
   my $backend = MyBackend1->new(name => 'backend test');

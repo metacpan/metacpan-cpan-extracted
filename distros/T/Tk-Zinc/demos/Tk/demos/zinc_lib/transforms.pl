@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 
-# $Id: transforms.pl,v 1.7 2003/09/24 15:10:39 mertz Exp $
+# $Id$
 # This simple demo has been developped by P. Lecoanet <lecoanet@cena.fr>
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
+($VERSION) = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 #
 # TODO:

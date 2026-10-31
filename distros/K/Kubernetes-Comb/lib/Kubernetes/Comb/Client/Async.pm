@@ -1,6 +1,6 @@
 package Kubernetes::Comb::Client::Async;
 # ABSTRACT: Asynchronous Comb client on Net::Async::Kubernetes
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 with 'Kubernetes::Comb::Role::Client';
@@ -113,7 +113,7 @@ Kubernetes::Comb::Client::Async - Asynchronous Comb client on Net::Async::Kubern
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -218,7 +218,7 @@ its first request.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-kubernetes-comb/issues>.
 
 =head2 IRC

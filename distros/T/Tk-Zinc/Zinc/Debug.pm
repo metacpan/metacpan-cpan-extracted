@@ -4,12 +4,12 @@
 #
 #        Author : Daniel Etienne <etienne@cena.fr>
 #
-# $Id: Debug.pm,v 1.58 2005/05/12 15:51:12 etienne Exp $
+# $Id$
 #---------------------------------------------------------------------------
 package Tk::Zinc::Debug;
 
 use vars qw( $VERSION );
-($VERSION) = sprintf("%d.%02d", q$Revision: 1.58 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.58';
 
 use strict 'vars';
 use vars qw(@ISA @EXPORT @EXPORT_OK $WARNING $endoptions);

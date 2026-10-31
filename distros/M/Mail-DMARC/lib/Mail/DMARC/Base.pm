@@ -4,7 +4,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::args_array_with_signatures';    ## no critic (ProhibitNoWarnings)
 
-our $VERSION = '2.20260827';
+our $VERSION = '2.20261030';
 
 use Carp;
 use Config::Tiny;
@@ -262,6 +262,11 @@ sub set_resolver( $self, $resolver ) {
     return;
 }
 
+sub normalize_domain( $self, $domain ) {
+    ( my $normal = lc $domain ) =~ s/\.$//;
+    return $normal;
+}
+
 sub to_ascii_domain( $self, $domain ) {
     return $domain unless $domain =~ /[^\x00-\x7F]/;    # fast path: ASCII only
         # Convert each U-label to its A-label (punycode) equivalent per RFC 8616 §6
@@ -341,7 +346,7 @@ Mail::DMARC::Base - DMARC utility functions
 
 =head1 VERSION
 
-version 2.20260827
+version 2.20261030
 
 =head1 METHODS
 
@@ -370,6 +375,10 @@ Set the Net::DNS::Resolver object to be used for lookups
 =head2 is_valid_ip
 
 Determines if the supplied IP address is a valid IPv4 or IPv6 address.
+
+=head2 normalize_domain
+
+Lowercases a domain name and removes a trailing root dot.
 
 =head2 is_valid_domain
 

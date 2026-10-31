@@ -59,11 +59,10 @@ L<Entity 参照|/Entity reference> (埋め込み要素：変数や関数呼び�
 
 L<yatt 宣言|/YATT Declaration> (部品定義の始まり)
 
-=item C<< <!--#yatt  >> ... C<<  --> >>
+=item C<< <!--#yatt  >> ... C<<  #--> >>
 
 L<コメント|/Comment block>. この部分は yatt の解析対象外。
-
-B<XXX:> 将来的に、閉じを C<< #--> >> に変更する案があります。
+(古いコードでは C<< --> >> で閉じているものがありますが、現在は C<< #--> >> を推奨します)
 
 =item C<< &yatt[[;  >> ... C<<  &yatt]]; >>
 
@@ -125,17 +124,27 @@ F<.ytmpl> をつけてください。公開ディレクトリに置くことも�
 POST されるデータに対する処理など、 html 生成よりもデータの操作が
 主であるものは、テンプレートの中に書こうとすると却って読みにくくなります。
 そこでそのような処理は直接 perl で記述出来るよう、別の仕組みが用意されています。
+F<.yatt> と同様に public なファイルです。
 (この文書では扱いません)
 
 =item C<.htyattconfig.yml>, C<.htyattconfig.xhf>
 
-ディレクトリ毎の L<YATT::Lite> をロードする時に渡される設定パラメータを記述します。
+(B<private>) ディレクトリ毎の L<YATT::Lite> をロードする時に渡される設定パラメータを記述します。
 書式は YAML か L<XHF|YATT::Lite::XHF::Syntax> 形式です。
 
 =item C<.htyattrc.pl>
 
-ディレクトリ毎の Entity 関数を定義したい時や、
+(B<private>) ディレクトリ毎の Entity 関数を定義したい時や、
 ディレクトリ毎の各種ハンドラをオーバロードしたい時に使います。
+
+これらの設定ファイルがいずれも C<.ht> で始まる名前になっているのは意図的な設計です。
+一般的な Web サーバの C<document_root> 配下にテンプレートを直接置くような運用でも、
+Web サーバ側の設定でまとめてアクセスを遮断できるようにするためです。
+例えば Apache では以下のような設定で保護できます。
+
+  <Files ".ht*">
+      Require all denied
+  </Files>
 
 
 
@@ -221,7 +230,77 @@ C<name=> を省略して引数を書く話
 
 =head2 Implicit arguments
 
-=head3 XXX: this, CON
+=head3 暗黙の引数: $this と $CON
+
+widget の本体（C<render_*> サブルーチン）と action の本体（C<do_*> サブルーチン）は、
+いずれも YATT が自動生成するコードにより、次の2変数を受け取ります。
+
+=over
+
+=item $this
+
+widget が属するパッケージ（クラス名の文字列）です。
+entity 関数を dispatch するために使われます。
+テンプレートを書く上では通常意識する必要はありません。
+
+=item $CON
+
+リクエスト/レスポンスの facade オブジェクトです。
+widget と action の両方において、YATT が自動的に渡すコードを生成するため、
+ユーザーが C<my ($this, $CON) = @_;> を手書きする必要はありません。
+宣言した引数（例: C<<!yatt:action foo x y>>）も YATT が自動的に展開します。
+
+=back
+
+=head4 Entity 関数での $CON の扱い
+
+Entity 関数（C<Entity name =E<gt> sub { ... }> や C<<!yatt:entity name>>）の中では、
+C<$CON> は引数としては渡されません。
+代わりに、リクエスト開始時に YATT がリクエストスコープのグローバル変数として設定します
+（C<local $CON = ...>）。
+C<use YATT::Lite qw/*CON*/> をしたパッケージであれば、引数なしで参照できます。
+
+B<設計の背景>: Entity 関数はユーザーが記述し、そこから別の関数を呼び出すこともあります。
+すべての呼び出しに C<$CON> の受け渡しを義務づけると、
+Perl では引数の渡し忘れは実行時にしか発覚しないため、
+特に初心者にとって大きな負担・障害になります。
+widget と action では YATT 自身がコード生成を代行できるため引数渡しを採用しましたが、
+Entity 関数ではグローバル参照の方式を選びました。
+
+=head3 ページ定数(pagevars)
+X<pagevars>
+
+設定 C<pagevars> に Perl モジュール(pagevars モジュール)のパッケージ名を指定すると、
+そのモジュールで定義した B<ページ単位の定数> がテンプレートに注入されます。
+定数はテンプレートのコンパイル時に確定し、C<&yatt:title;> のような
+トップレベルの変数として参照できます(引数と同様に、名前の誤りはコンパイルエラーになります)。
+
+  package MyApp::PageVars;
+  use YATT::Lite::PageConsts -as_base, qw(as_html);
+
+  MY->define_page(q01 => {
+    title => "設問1", choices => [qw(はい いいえ)],
+  });
+  1;
+
+=over
+
+=item *
+
+ページ名は C<doc_root> からの相対パスから拡張子を除いたものです(例: F<q01/confirm.yatt> は C<q01/confirm>)。
+C<doc_root> 外のテンプレート(F<ytmpl/> など)には適用されません。
+
+=item *
+
+同名の引数や C<< <yatt:my> >> 変数があると、そちらが優先されます。
+
+=item *
+
+全ページ共通の定数には、通常の Entity を使ってください。
+
+=back
+
+詳しくは L<YATT::Lite::PageConsts> を参照してください。
 
 =head3 body argument
 X<body>
@@ -254,6 +333,16 @@ body は (明示的に宣言しない限り) C<code> 型とされます。
    <div class="content">
      <yatt:body/>
    </div>
+
+body の出力は、C<< <yatt:my> >> の閉じタグ形式で
+変数に取り込むことも出来ます。
+
+   <!yatt:widget foo>
+   <yatt:my content>&yatt:body();</yatt:my>
+   ...&yatt:content;...
+
+取り込んでいる間も、C<&yatt:CON:param(x);> のような C<$CON> のメソッドは
+そのまま使えます (L<YATT::Lite::ConnectionProxy>)。
 
 
 =head2 attribute element
@@ -313,6 +402,29 @@ X<my>
     <h2>foobar</h2>
   </yatt:my>
 
+本体の中で widget や L<body|/body argument> などの L</code> 型の引数を呼び出すと、
+その出力はその場には出力されず、変数の値に取り込まれます。
+
+  <yatt:my foo>
+    <yatt:bar/> &yatt:body();
+  </yatt:my>
+
+(属性値の中で呼び出した場合も取り込まれますが、型が L</text> なので、
+取り込んだ html は出力時に escape されます。)
+
+本体の中で宣言した変数 (入れ子の C<< <yatt:my> >>) は、その本体の中でだけ使えます。
+閉じタグより後からは参照できません。また、宣言する変数自身を、
+その初期値の中から参照することも出来ません。
+
+  <yatt:my foo>
+    <yatt:my bar>...</yatt:my>
+    &yatt:bar;        <!-- OK -->
+  </yatt:my>
+  &yatt:bar;          <!-- エラー: No such variable 'bar' -->
+
+(C<< <?perl my $x = ...; ?> >> で宣言した Perl の変数も同様で、
+同じ本体の中の後続の C<< <?perl ?> >> からだけ使えます。)
+
 
 =head2 C<yatt:if>, C<:yatt:else>
 X<if> X<else>
@@ -330,17 +442,18 @@ X<if> X<else>
 =head2 C<yatt:foreach>
 X<foreach>
 
-ループを書く時に使います。 C<list="..."> にリストを作る式を渡すと、
-そのリストに対してループします。 C<my=var> でループ変数を宣言出来ます。
-宣言を省略した場合は C<&yatt:_;> が使われます。
+ループを書く時に使います。C<varName>, C<varName=typeName> または C<varName:typeName>
+でループ変数を宣言します。（typeName を省略したときは text 型になります）
+ループ対象のリストを作る式は C<list="..."> で渡します。
+ループ変数の宣言を省略した場合は C<&yatt:_;> が使われます。
 
-  <yatt:foreach my=row list="&yatt:some_db_query();">
+  <yatt:foreach row:value list="&yatt:some_db_query();">
     ...DB から取り出した一行毎に...
   </yatt:foreach>
 
 
-my で変数を宣言する時に型を指定するには、(変則的ですが)
-C<my:型名=> のように、 C<my> と C<=> の間に C<:型名> で型を指定します。
+ループ変数の宣言には C<my=varName>, C<my:typeName=varName> とする別記法も存在します。
+現在も有効ですが、他の変数宣言と並びが異なり覚えにくいため、徐々に廃止予定です。
 
   <yatt:foreach my:list=row list="&yatt:some_db_query();">
      &yatt:row[0]; &yatt:row[1];
@@ -387,8 +500,14 @@ yatt の Entity Path 式 は C<&yatt> で始まり C<;> で終わります。
   &yatt:list[:x];                  <!-- 配列 list の要素参照 -->
 
 重要な注意点ですが、一部の例外を除き、 Entity Path式の中には B<スペースをそのまま含めることは出来ません>。
+これは引数の値の中だけでなく、B<引数と引数の間（カンマの後）も同様>です。
 
-  &yatt:func( space separated text );  <!-- エラー！ -->
+  &yatt:func( space separated text );  <!-- エラー！ (引数値の中のスペース) -->
+  &yatt:func(:dict{name}, :list[:x]);  <!-- エラー！ (カンマの後のスペース) -->
+
+正しくは:
+
+  &yatt:func(:dict{name},:list[:x]);   <!-- 正常 -->
 
 これは意図的に加えた制限です。あまり複雑な構文を用意しても、
 既存の HTML/XML エディタとの相性が悪化するだけだから、という理由です。
@@ -427,14 +546,15 @@ path element のうち、C<(..)>, C<[..]>, C<{..}> のように括弧を用い�
 =item 括弧内の要素は C<,> で区切ります
 
 通常の言語の関数呼び出しと違い、 C<,> は optional な terminator として解釈されます
+（B<この挙動は非推奨です。新しいコードでは末尾カンマや連続カンマに依存しないでください>）
 
 
   &yatt:func();                  <!-- func()       引数なし -->
   &yatt:func(1);                 <!-- func(1)      引数1つ -->
-  &yatt:func(1,);                <!-- func(1)      引数2つ -->
+  &yatt:func(1,);                <!-- func(1)      引数2つ ※非推奨 -->
   &yatt:func(1,2);               <!-- func(1,2)    引数2つ -->
-  &yatt:func(1,2,);              <!-- func(1,2)    引数2つ -->
-  &yatt:func(1,2,,);             <!-- func(1,2,'') 引数3つ -->
+  &yatt:func(1,2,);              <!-- func(1,2)    引数2つ ※非推奨 -->
+  &yatt:func(1,2,,);             <!-- func(1,2,'') 引数3つ ※非推奨 -->
   &yatt:func(1,2,());            <!-- func(1,2,'') 引数3つ -->
 
 =item 括弧内の要素は C<:..> で始まる L</path element> と、それ以外の L</literal element> に分類されます。
@@ -750,8 +870,8 @@ L<XXX: (未完) prog_action|YATT::Lite::docs::prog_action> を参照してくだ
      <input type="submit" name="!register" value="登録">
     </form>
 
-    <!yatt:action register>
-    ...(ここからperl のプログラム)...
+    <!yatt:action register email>
+    ...(ここから perl のプログラム。$this と $CON は YATT が自動的に用意します)...
 
 =head1 Request Sigil Mapping
 
@@ -978,9 +1098,10 @@ X<list>
 =head2 C<code>
 X<code>
 
-条件式や widget を渡したいときに使います。遅延評価されます。
+widget のように出力を書く処理を渡したいときに使います。遅延評価されます。
 widget の場合、更に引数の型指定が可能です。
 (L<暗黙の body 引数|/body argument>はこの型になります。)
+条件式など、値を計算する式を渡したいときは L</expr> 型を使います。
 
 
   <!yatt:widget myquote  author=[code name=text url=text]>
@@ -991,6 +1112,66 @@ widget の場合、更に引数の型指定が可能です。
    ...
   </yatt:foreach>
 
+C<code> 型の値は、widget と同じく出力を書き込む関数 (renderer) です。
+Perl 側では、第一引数に出力先の C<$CON> を受け取り、
+その後に宣言した引数が続く closure になっています。
+Perl のコードから呼び出すときは、C<$CON> を渡してください。
+
+  $body->($CON);
+  $author->($CON, $name, $url);
+
+B<(Compatibility)> 以前は C<$CON> を受け取らず、
+呼び出し元の C<$CON> に書き込んでいました (C<< $body->() >>)。
+そのため C<< <yatt:my> >> で出力を取り込むことが出来ませんでした (GH-293)。
+
+=head2 C<expr>
+X<expr>
+
+条件式など、値を計算する式を渡したいときに使います。
+L</value> 型と違って遅延評価され、C<&yatt:x();> と呼び出すたびに計算されます。
+呼び出した結果は値なので、出力位置では escape して出力され、
+C<if> の条件や C<list> などの式の中ではそのまま値として使えます。
+
+  <yatt:foo cond="&yatt:x; > 2"/>
+
+  <!yatt:widget foo cond=expr>
+  <yatt:if "&yatt:cond();">
+    ...
+  </yatt:if>
+
+L</code> 型と同じく、引数の型指定が可能です。
+
+  <yatt:mylist dbl="&yatt:n; * 2"/>
+
+  <!yatt:widget mylist dbl=[expr n]>
+  <yatt:foreach my=i list="1..3">[&yatt:dbl(:i);]</yatt:foreach>
+
+この結果は以下のように表示されます。
+
+  [2][4][6]
+
+C<< <yatt:my f:expr="3 * 3"/> >> のように、変数を作ることも出来ます。
+
+C<expr> は widget ではないので、以下はエラーになります。
+
+=over 4
+
+=item * C<< <yatt:cond/> >> のように要素として呼び出すこと。
+
+=item * C<< <:yatt:cond>...</:yatt:cond> >> のように要素で渡すこと、
+C<< <yatt:my f:expr>...</yatt:my> >> のように本体を持たせること。
+
+=item * C<code> 型の変数と C<expr> 型の変数の間で、
+C<x=y> のように受け渡すこと。
+
+=back
+
+Perl 側では、引数を受け取って値を返す普通の関数 (CODE ref) です。
+C<code> 型と違い、C<$CON> は受け取りません。
+L<YATT::Lite::PageConsts> の CODE 定数は、この型になります。
+
+B<(Compatibility)> 以前は C<expr> は C<code> の別名でした。
+
 =head2 XXX: C<attr>
 X<attr>
 
@@ -998,6 +1179,9 @@ X<attr>
 X<delegate>
 
 XXX: C<[delegate -exclude_var]>
+
+C<delegate> 型の変数は、C<< <yatt:d/> >> のように要素形式でのみ呼び出せます。
+C<&yatt:d();> のような entity 形式の呼び出しは、エラーになります。
 
 =head1 DEFAULT FLAG
 
@@ -1035,15 +1219,17 @@ X<!>
 
 =head1 Comment block
 
-B<XXX:> 将来的に、閉じを C<< #--> >> に変更する案があります。
-
-C<< <!--#yatt ... --> >> で囲まれた範囲は yatt の解析対象から外され、
+C<< <!--#yatt ... #--> >> で囲まれた範囲は yatt の解析対象から外され、
 また出力にも出されません。これに対し、
 C<#yatt> を含まない普通の C<< <!--...--> >> は、その通りに出力されます。
 
 もし yatt のテンプレートにうまく動かずエラーになる箇所がある時に、
 そこをコメントアウトする(字面上は残しつつ、機能はさせない、
 単なるコメントにする)には、必ず C<#yatt> のついた、 yatt のコメントを使って下さい。
+
+なお、古いコードでは閉じを C<< --> >> と書いているものがありますが、
+現在は C<< #--> >> を推奨します。
+C<< --> >> での閉じは HTML エディタによる自動編集と干渉する場合があるためです。
 
 =head2 Inline comment
 

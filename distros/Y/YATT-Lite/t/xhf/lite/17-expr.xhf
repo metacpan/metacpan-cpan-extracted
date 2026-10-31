@@ -1,0 +1,125 @@
+# -*- coding: utf-8 -*-
+
+TITLE: expr arg returns a value, printed with escape (GH-294)
+IN:
+ <yatt:foo v="1 + 2"/><yatt:foo v="'<b>'"/>
+ 
+ <!yatt:widget foo v=expr>
+ [&yatt:v();]
+OUT:
+ [3]
+ [&lt;b&gt;]
+ 
+
+
+TITLE: expr arg is evaluated lazily, in the caller's scope (GH-294)
+IN:
+ <!yatt:args x>
+ <yatt:foo v="&yatt:x; * 10"/>
+ 
+ <!yatt:widget foo v=expr>
+ [&yatt:v();]
+PARAM[
+- 4
+]
+OUT:
+ [40]
+ 
+
+
+TITLE: expr arg as a condition (GH-294)
+IN:
+ <yatt:foo cond="2 > 1"/><yatt:foo cond="1 > 2"/>
+ 
+ <!yatt:widget foo cond=expr>
+ <yatt:if "&yatt:cond();">yes<:yatt:else/>no</yatt:if>
+OUT:
+ yes
+ no
+ 
+
+
+TITLE: expr arg with args (GH-294)
+IN:
+ <yatt:foo dbl="&yatt:n; * 2"/>
+ 
+ <!yatt:widget foo dbl=[expr n]>
+ <yatt:foreach my=i list="1..3">&yatt:dbl(:i);</yatt:foreach>
+OUT:
+ 246
+ 
+
+
+TITLE: expr arg passed through (GH-294)
+IN:
+ <yatt:bar v="7"/>
+ 
+ <!yatt:widget bar v=expr>
+ <yatt:foo v/>
+ 
+ <!yatt:widget foo v=expr>
+ [&yatt:v();]
+OUT:
+ [7]
+ 
+ 
+
+
+TITLE: my expr var (GH-294)
+IN:
+ <yatt:my f:expr="3 * 3"/>[&yatt:f();]
+OUT:
+ [9]
+
+
+TITLE: expr var can't be called as an element (GH-294)
+IN:
+ <yatt:foo v="1"/>
+ 
+ <!yatt:widget foo v=expr>
+ <yatt:v/>
+ERROR: expr variable 'v' can't be called as an element. Use &yatt:v\(\);
+
+
+TITLE: expr arg can't be given as an element (GH-294)
+IN:
+ <yatt:foo><:yatt:v>1</:yatt:v></yatt:foo>
+ 
+ <!yatt:widget foo v=expr>
+ [&yatt:v();]
+ERROR: expr argument 'v' can't be given as an element
+
+
+TITLE: my expr var can't have a body (GH-294)
+IN:
+ <yatt:my f:expr>3</yatt:my>
+ERROR: expr variable 'f' can't have a body
+
+
+TITLE: passing code to expr is a type mismatch (GH-294)
+IN:
+ <yatt:bar>x</yatt:bar>
+ 
+ <!yatt:widget bar body=[code]>
+ <yatt:foo v=body/>
+ 
+ <!yatt:widget foo v=expr>
+ [&yatt:v();]
+ERROR: Type mismatch for argument 'v': expected expr, but 'body' is code
+
+
+TITLE: passing expr to code is a type mismatch (GH-294)
+IN:
+ <yatt:bar v="1"/>
+ 
+ <!yatt:widget bar v=expr>
+ <yatt:foo body=v/>
+ 
+ <!yatt:widget foo body=[code]>
+ <yatt:body/>
+ERROR: Type mismatch for argument 'body': expected code, but 'v' is expr
+
+TITLE: my expr var scope
+IN: <yatt:my f:expr="&yatt:f;"/>
+ERROR: No such variable 'f'
+

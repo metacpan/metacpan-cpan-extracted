@@ -15,11 +15,11 @@ use YATT::Lite::Util::FindMethods;
 {
   package T1; sub MY () {__PACKAGE__}
   use base qw(YATT::Lite::Object);
-  use fields qw(ITEMS cf_name cf_OTHER);
+  use fields qw(_ITEMS name OTHER);
 
   sub cmd_mark {
     (my MY $self, my ($i)) = @_;
-    push @{$self->{ITEMS}}, [caller($i)]->[3];
+    push @{$self->{_ITEMS}}, [caller($i)]->[3];
   }
 
   sub _before_after_new {
@@ -42,7 +42,7 @@ use YATT::Lite::Util::FindMethods;
 
   sub cmd_items {
     (my MY $self) = @_;
-    wantarray ? @{$self->{ITEMS}} : $self->{ITEMS};
+    wantarray ? @{$self->{_ITEMS}} : $self->{_ITEMS};
   }
 
   #----------------------------------------
@@ -55,15 +55,15 @@ use YATT::Lite::Util::FindMethods;
 	  T1::_after_after_new/]
     , "initialization hook";
 
-  ::is $obj1->{cf_name}, 'FOO', "cf_name";
+  ::is $obj1->{name}, 'FOO', "name";
 
   ::is $obj1->cget('name'), 'FOO', "cget(name)";
 
   ::is_deeply [sort $obj1->cf_list]
     , [qw/OTHER name/]
-    , "cf_list";
+    , "list";
 
-  ::is_deeply [sort $obj1->cf_list(qr/^cf_([a-z]\w*)/)]
+  ::is_deeply [sort $obj1->cf_list(qr/^([a-z]\w*)/)]
     , [qw/name/]
     , "cf_list(regexp)";
 }

@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,11 +31,17 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "AnyEvent::Fork::RPC" : "2",
+            "AnyEvent::WebSocket::Message" : "0",
+            "AnyEvent::WebSocket::Server" : "0",
+            "IO::Socket::SSL" : "0",
+            "Mail::IMAPTalk" : "4.07",
+            "Term::ReadKey" : "0"
+         },
          "requires" : {
             "AnyEvent" : "5.33",
             "AnyEvent::HTTP" : "0",
-            "AnyEvent::WebSocket::Message" : "0",
-            "AnyEvent::WebSocket::Server" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
             "JSON::XS" : "3",
@@ -46,14 +52,16 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Protocol::WebSocket::Frame" : "0"
+         },
          "requires" : {
             "Pod::Checker" : "0",
-            "Protocol::WebSocket::Frame" : "0",
             "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.65,
+   "version" : 0.71,
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

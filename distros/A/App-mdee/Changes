@@ -1,5 +1,18 @@
 Revision history for Perl extension App-mdee
 
+1.14 2026-10-30T10:35:27Z
+
+    - Stop ansicolumn and ansifold from reading the rc files of the
+      user when they are called from the md module (Getopt::EX 3.05)
+    - Give the md module the run-in and run-out widths of mdee, so that
+      the folded list items run in by the width kept free in the pane
+    - Make the default run-in and run-out 4, which suits Japanese text;
+      the default fold width is the pane width minus 3 and the run-in
+    - Add --boundary (word, space or none) for the paragraphs folded by
+      nup, so that the rc file of the user does not break them inside
+      words; requires App::nup 1.10, which also keeps page mode when
+      mdee gives nup the output width
+
 1.13 2026-10-29T07:10:46Z
 
     - Add --runin, --runout and --runlen.  The run-in and run-out are

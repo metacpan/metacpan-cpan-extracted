@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::HTTPRouteMatch;
 # ABSTRACT: HTTPRouteMatch defines the predicate used to match requests to a given action.
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 use IO::K8s::Resource;
 
 k8s headers     => ['+IO::K8s::GatewayAPI::V1::HTTPHeaderMatch'];
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1::HTTPRouteMatch - HTTPRouteMatch defines the predicate u
 
 =head1 VERSION
 
-version 1.111
+version 1.112
 
 =head2 headers
 
@@ -59,7 +59,7 @@ Support: Extended
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/pplu/io-k8s-p5/issues>.
 
 =head1 CONTRIBUTING
@@ -87,5 +87,7 @@ This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+L<https://raudssus.de/>
 
 =cut

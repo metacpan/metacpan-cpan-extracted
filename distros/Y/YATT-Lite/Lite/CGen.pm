@@ -5,16 +5,21 @@ use Carp;
 
 use constant DEBUG_REBUILD => $ENV{DEBUG_YATT_REBUILD};
 
+use YATT::Lite::Util::AsBase qw/-as_base import/;
+
 use base qw(YATT::Lite::VarMaker);
-use YATT::Lite::MFields qw/curtmpl curwidget curtoks
-	      altgen needs_escaping depth
-	      cf_cgen_loader
-	      cf_only_parse
-	      cf_no_lineinfo cf_check_lineno
-	      no_last_newline
-	      cf_vfs cf_parser cf_sink scope
-	      cf_lcmsg_sink
-	      cf_prefer_call_for_entity
+use YATT::Lite::MFields qw/_curtmpl _curwidget _curtoks
+	      _altgen _needs_escaping _depth
+	      cgen_loader
+	      only_parse
+	      no_lineinfo check_lineno
+	      yatt_no_last_newline
+	      vfs parser sink
+	      _scope
+	      lcmsg_sink
+	      prefer_call_for_entity
+	      no_conditional_call
+	      pagevars
 			  /
   ;
 
@@ -34,25 +39,30 @@ sub ensure_generated_for_folders {
 sub ensure_generated {
   (my MY $self, my $spec, my Template $tmpl) = @_;
   my ($type, $kind) = ref $spec ? @$spec : $spec;
-  $self->{cf_vfs}->error(q{sink is empty}) unless $self->{cf_sink};
-  return if defined $tmpl->{product}{$type};
-  local $self->{depth} = 1 + ($self->{depth} // 0);
-  my $pkg = $tmpl->{product}{$type} = $tmpl->{cf_entns};
-  if (not defined $tmpl->{product}{$type}) {
-    croak "package for product $type of $tmpl->{cf_path} is not defined!";
+  $self->{vfs}->error(q{sink is empty}) unless $self->{sink};
+  return if defined $tmpl->{_product}{$type};
+  local $self->{_depth} = 1 + ($self->{_depth} // 0);
+  my $pkg = $tmpl->{_product}{$type} = $tmpl->{entns};
+  if (not defined $tmpl->{_product}{$type}) {
+    croak "package for product $type of $tmpl->{path} is not defined!";
   } else {
     print STDERR "# generating $pkg for $type code of "
-      . ($tmpl->{cf_path} // "(undef)") . "\n"
+      . ($tmpl->{path} // "(undef)") . "\n"
       if DEBUG_REBUILD;
   }
-  $self->{cf_parser}->parse_body($tmpl)
-    if not $kind or not $self->{cf_only_parse}
-      or $self->{cf_only_parse}{$kind};
+  $self->{parser}->parse_body($tmpl)
+    if not $kind or not $self->{only_parse}
+      or $self->{only_parse}{$kind};
   $self->setup_inheritance_for($spec, $tmpl);
+  # <!yatt:import> のソースも先に generate しておく。
+  # (子の glob 代入が eval される時点でソース側の sub が必要) GH-256
+  if (my @import_srcs = $tmpl->list_import_sources) {
+    $self->ensure_generated_for_folders($spec, @import_srcs);
+  }
   my @res = $self->generate($tmpl, $kind);
-  if (my $sub = $self->{cf_sink}) {
+  if (my $sub = $self->{sink}) {
     $sub->({folder => $tmpl, package => $pkg, kind => 'body'
-	     , depth => $self->{depth}}
+	     , depth => $self->{_depth}}
 	    , @res);
   }
   $pkg;
@@ -60,8 +70,8 @@ sub ensure_generated {
 
 sub with_template {
   (my MY $self, my Template $tmpl, my ($task, @args)) = @_;
-  local $self->{curtmpl} = $tmpl;
-  local $self->{curline} = 1;
+  local $self->{_curtmpl} = $tmpl;
+  local $self->{_curline} = 1;
   if (ref $task eq 'CODE') {
     $task->($self, @args);
   } else {
@@ -80,21 +90,32 @@ sub generate {
   (my MY $self, my Template $tmpl) = splice @_, 0, 2;
   my $kind = shift if @_;
   # XXX: Rewrite this with with_template
-  local $self->{curtmpl} = $tmpl;
-  local $self->{curline} = 1;
-  ($self->generate_preamble($self->{curtmpl})
+  local $self->{_curtmpl} = $tmpl;
+  local $self->{_curline} = 1;
+  local $self->{_scope} = $self->generate_page_scope($tmpl);
+  ($self->generate_preamble($self->{_curtmpl})
    , map {
     my Part $part = $_;
-    if (not $kind or not $self->{cf_only_parse}
-	or $kind eq $part->{cf_kind}) {
-      my $sub = $self->can("generate_$part->{cf_kind}")
-	or die $self->generror("Can't generate part type: '%s'"
-			       , $part->{cf_kind});
-      $sub->($self, $part, $part->{cf_name}, $tmpl->{cf_path});
+    if (not $kind or not $self->{only_parse}
+	or $kind eq $part->{kind}) {
+      $self->generate_part($tmpl, $part);
     } else {
       ();
     }
-  } @{$tmpl->{partlist}});
+  } @{$tmpl->{_partlist}});
+}
+
+sub generate_part {
+  (my MY $self, my Template $tmpl, my Part $part) = @_;
+  my $sub = $self->can("generate_$part->{kind}")
+    or die $self->generror("Can't generate part type: '%s'"
+                           , $part->{kind});
+  local $self->{yatt_no_last_newline} = $part->{yatt_no_last_newline};
+  $sub->($self, $part, $part->{name}, $tmpl->{path});
+}
+
+sub generate_page_scope {
+  +{}
 }
 
 sub setup_inheritance_for {
@@ -106,8 +127,8 @@ sub setup_inheritance_for {
 sub altgen {
   (my MY $self, my $ns) = @_;
   # ns 一つに付き 高々 1回しか、can しないで済むように... と言っても、cgen 自体が複数個作られたら..
-  unless (exists $self->{altgen}{$ns}) {
-    $self->{altgen}{$ns} = do {
+  unless (exists $self->{_altgen}{$ns}) {
+    $self->{_altgen}{$ns} = do {
       if (my $sub = $self->can("create_altgen_$ns")) {
 	sub {
 	  # 毎回, new し直す。
@@ -116,7 +137,7 @@ sub altgen {
       }
     };
   }
-  $self->{altgen}{$ns};
+  $self->{_altgen}{$ns};
 }
 sub create_altgen_js {
   require YATT::Lite::CGen::JS;
@@ -128,7 +149,7 @@ sub create_altgen_js {
 sub find_var {
   (my MY $self, my $varName, my $check) = @_;
   confess "Undefined varName for find_var!" unless defined $varName;
-  for (my $scope = $self->{scope}; $scope; $scope = $scope->[1]) {
+  for (my $scope = $self->{_scope}; $scope; $scope = $scope->[1]) {
     if (defined (my $var = $scope->[0]{$varName})) {
       next if $check and not $check->($var);
       return $var;
@@ -142,40 +163,47 @@ sub find_callable_var {
 sub lookup_widget {
   (my MY $self, my ($ns, @path)) = @_;
   # ns 抜きと、有りで一回ずつ検索する
-  $self->{cf_vfs}->find_part_from($self->{curtmpl}, @path)
-    || $self->{cf_vfs}->find_part_from($self->{curtmpl}, $ns, @path);
+  $self->{vfs}->find_part_from($self->{_curtmpl}, @path)
+    || $self->{vfs}->find_part_from($self->{_curtmpl}, $ns, @path);
 }
 
 sub generror {
   my MY $self = shift;
-  my Template $tmpl = $self->{curtmpl};
+  my Template $tmpl = $self->{_curtmpl};
   my ($pkg, $file, $line) = caller;
-  my %opts = ($self->_tmpl_file_line($self->{curline}), callerinfo());
+  my %opts = ($self->_tmpl_file_line($self->{_curline}), callerinfo());
+  $self->_error(\%opts, @_);
+}
+# generror の行番号指定版 (LRXML の synerror_at に相当)。
+# 例: die $cgen->generror_at($node->[NODE_LNO], ...)
+sub generror_at {
+  (my MY $self, my $ln) = splice @_, 0, 2;
+  my %opts = ($self->_tmpl_file_line($ln // $self->{_curline}), callerinfo());
   $self->_error(\%opts, @_);
 }
 sub _error {
   my MY $self = shift;
-  $self->{cf_vfs}->error(@_);
+  $self->{vfs}->error(@_);
 }
 sub _tmpl_file_line {
   (my MY $self, my $ln) = @_;
-  my Template $tmpl = $self->{curtmpl};
-  (tmpl_file => $tmpl->{cf_path} // $tmpl->{cf_name}
+  my Template $tmpl = $self->{_curtmpl};
+  (tmpl_file => $tmpl->{path} // $tmpl->{name}
    , defined $ln ? (tmpl_line => $ln) : ());
 }
 
 sub add_curline {
   (my MY $self, my $text) = @_;
-  $self->{curline} += numLines($text);
+  $self->{_curline} += numLines($text);
   $text;
 }
 
 sub sync_curline {
   (my MY $self, my $lineno) = @_;
   return unless defined $lineno;
-  my $diff = $lineno - $self->{curline};
-  die "curline exceeds expected lineno! expect $lineno, curline=$self->{curline}\n" if $self->{cf_check_lineno} and $diff < 0;
-  $self->{curline} = $lineno if $lineno > $self->{curline};
+  my $diff = $lineno - $self->{_curline};
+  die "curline exceeds expected lineno! expect $lineno, curline=$self->{_curline}\n" if $self->{check_lineno} and $diff < 0;
+  $self->{_curline} = $lineno if $lineno > $self->{_curline};
   $diff > 0 ? "\n" x $diff : ();
 }
 # <!yatt:widget ...> や <yatt:call ...> の直後の改行を,
@@ -184,12 +212,12 @@ sub cut_next_nl {
   my MY $self = shift;
   # undef は返したくないので。
   return wantarray ? () : ''
-    unless $self->{curtoks}
-    and @{$self->{curtoks}} and $self->{curtoks}[0] =~ /^\r?\n$/;
+    unless $self->{_curtoks}
+    and @{$self->{_curtoks}} and $self->{_curtoks}[0] =~ /^\r?\n$/;
   return wantarray ? () : ''
-    if @{$self->{curtoks}} == 1; # 最後の一個の改行は、残す。これは "}\n" のため
-  $self->{curline}++;
-  shift @{$self->{curtoks}};
+    if @{$self->{_curtoks}} == 1; # 最後の一個の改行は、残す。これは "}\n" のため
+  $self->{_curline}++;
+  shift @{$self->{_curtoks}};
 }
 
 sub mkscope {

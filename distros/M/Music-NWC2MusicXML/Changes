@@ -1,5 +1,12 @@
 Revision history for Music-NWC2MusicXML
 
+0.002.2	Fri Oct 30 04:14:18 PM EDT 2026
+	[ Bug Fixes ]
+	- Parser: NWCTXT files produced by some NWC versions spell the hairpin
+	  dynamic record as DynamicVariance instead of the abbreviated DynVariance.
+	  Added DynamicVariance as an alias in the dispatch table so crescendo,
+	  diminuendo, and hairpin-off markings are parsed correctly from both spellings.
+
 0.002.1	Mon Oct 12 04:14:34 PM EDT 2026
 	[ Bug Fixes ]
 	- NWC TempoVariance:Fermata records were emitted as a text direction
