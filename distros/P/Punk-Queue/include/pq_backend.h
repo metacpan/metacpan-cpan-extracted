@@ -15,6 +15,8 @@
  *
  * Include after pq_sqlite.h and pq_pg.h. */
 
+#include <stdint.h>
+
 /* ---- per-driver dispatch ---------------------------------------------------
  *
  * Dispatch is on the DBI driver name rather than on the class, so a
@@ -350,14 +352,20 @@ static SV *pq_job_info(pTHX_ SV *self, IV id) {
  * equal or none, because a burst of jobs that all failed against the same
  * downed dependency must not come back in lockstep. Seeded per process
  * from pid ^ time - unseeded children of one supervisor would jitter
- * identically, which is the lockstep again with extra steps. */
+ * identically, which is the lockstep again with extra steps.
+ *
+ * drand48's own generator, carried here because the Windows CRT has no
+ * drand48: one sequence on every platform. */
 static double pq_rand01(pTHX) {
     static int seeded = 0;
+    static uint64_t x;
     if (!seeded) {
         seeded = 1;
-        srand48((long)PerlProc_getpid() ^ (long)time(NULL));
+        x = ((uint64_t)(U32)((long)PerlProc_getpid() ^ (long)time(NULL)) << 16)
+            | 0x330E;
     }
-    return drand48();
+    x = (x * UINT64_C(0x5DEECE66D) + 0xB) & ((UINT64_C(1) << 48) - 1);
+    return (double)x / (double)(UINT64_C(1) << 48);
 }
 
 #define PQ_BACKOFF_BASE_DEFAULT 5.0
@@ -712,7 +720,7 @@ static IV pq_note(pTHX_ SV *self, IV id, HV *merge) {
  * enforcement and the admin UI want per-child granularity - a supervisor
  * row with jobs=4 cannot tell you which child is stuck. */
 
-static void pq_hostname(char *buf, size_t len) {
+static void pq_hostname(pTHX_ char *buf, size_t len) {
 #ifdef HAS_GETHOSTNAME
     if (gethostname(buf, (int)len) == 0) { buf[len - 1] = 0; return; }
 #endif
@@ -748,7 +756,7 @@ static IV pq_register_worker(pTHX_ SV *self, IV id, HV *opts) {
             "INSERT INTO pq_workers"
             " (host, pid, role, queues, jobs, version, started, notified)"
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        pq_hostname(host, sizeof host);
+        pq_hostname(aTHX_ host, sizeof host);
         pq_bind_pv(aTHX_ b, host);
         pq_bind_iv(aTHX_ b, (IV)PerlProc_getpid());
         if (role && SvOK(role)) pq_bind_sv(aTHX_ b, role);

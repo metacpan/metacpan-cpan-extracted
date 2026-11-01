@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.10.2 - 2026-11-01
+
+### Fixes
+
+- Refuse a bad retries or concurrency, or a key past U+00FF ([`bc73fac`](https://github.com/vpndetection-io/sdk-perl/commit/bc73fac379ce5e33ee5db5e21af708c8ffe846fb))
+- Refuse a date or date-time member that is not RFC 3339 ([`3d2839f`](https://github.com/vpndetection-io/sdk-perl/commit/3d2839f97975408cce89429147dabbeff938f6ce))
+
 ## 3.10.1 - 2026-10-26
 
 ### Fixes

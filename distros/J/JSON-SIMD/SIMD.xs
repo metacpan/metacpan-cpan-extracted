@@ -55,6 +55,7 @@
 #define F_USE_SIMDJSON      0x00010000UL
 #define F_CORE_BOOLS        0x00020000UL
 #define F_ENCODE_CORE_BOOLS 0x00040000UL
+#define F_NONREF_SET        0x00080000UL /* allow_nonref was called explicitly */
 
 #define F_PRETTY    F_INDENT | F_SPACE_BEFORE | F_SPACE_AFTER
 
@@ -114,6 +115,8 @@ enum {
 };
 
 #define INCR_DONE(json) ((json)->incr_nest <= 0 && (json)->incr_mode == INCR_M_JSON)
+/* the first text once complete, else everything buffered */
+#define INCR_SIZE(json) (INCR_DONE (json) ? (json)->incr_pos : SvCUR ((json)->incr_text))
 
 // main JSON struct definition moved to simdjson_wrapper.h
 // typedef struct { ... } JSON;
@@ -196,7 +199,11 @@ decode_utf8 (unsigned char *s, STRLEN len, STRLEN *clen)
       return ((s[0] & 0x1f) << 6) | (s[1] & 0x3f);
     }
   else
+#if PERL_VERSION_GE(5,36,0)
+    return utf8n_to_uvchr (s, len, clen, UTF8_CHECK_ONLY);
+#else
     return utf8n_to_uvuni (s, len, clen, UTF8_CHECK_ONLY);
+#endif
 }
 
 // likewise for encoding, also never called for ascii codepoints
@@ -225,11 +232,11 @@ encode_utf8 (unsigned char *s, UV ch)
 
 // convert offset pointer to character index, sv must be string
 static STRLEN
-ptr_to_index (SV *sv, char *offset)
+ptr_to_index (SV *sv, const U8 *offset)
 {
   return SvUTF8 (sv)
-         ? utf8_distance (offset, SvPVX (sv))
-         : offset - SvPVX (sv);
+         ? utf8_distance (offset, (U8*)SvPVX (sv))
+         : offset - (U8*)SvPVX (sv);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -343,10 +350,12 @@ ref_bool_type (SV *sv)
       char *pv = svt ? SvPV (sv, len) : 0;
 
       if (len == 1)
-        if (*pv == '1')
-          return 1;
-        else if (*pv == '0')
-          return 0;
+        {
+          if (*pv == '1')
+            return 1;
+          else if (*pv == '0')
+            return 0;
+        }
     }
 
   return -1;
@@ -453,7 +462,7 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
 
                   if (is_utf8)
                     {
-                      uch = decode_utf8 (str, end - str, &clen);
+                      uch = decode_utf8 ((unsigned char *)str, end - str, &clen);
                       if (clen == (STRLEN)-1)
                         croak ("malformed or illegal unicode character in string [%.11s], cannot convert to JSON", str);
                     }
@@ -506,7 +515,7 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
                   else
                     {
                       need (enc, len + UTF8_MAXBYTES - 1); // never more than 11 bytes needed
-                      enc->cur = encode_utf8 (enc->cur, uch);
+                      enc->cur = (char *)encode_utf8 ((U8*)enc->cur, uch);
                       ++str;
                     }
                 }
@@ -1015,124 +1024,262 @@ encode_json (SV *scalar, JSON *json)
 static SV *
 emulate_at_pointer (SV *sv, SV *path)
 {
-  if (!path ) {
-    return sv;
+  static const char err_pointer[] =
+    "INVALID_JSON_POINTER: Invalid JSON pointer syntax";
+  static const char err_type[] =
+    "INCORRECT_TYPE: The JSON element does not have the requested type";
+  static const char err_bounds[] =
+    "INDEX_OUT_OF_BOUNDS: Attempted to access an element of a JSON array "
+    "that is beyond its length";
+  static const char err_field[] =
+    "NO_SUCH_FIELD: The JSON field referenced does not exist in this object";
+
+  SV *current;
+  SV *path_copy;
+  SV *key_sv;
+  const char *text;
+  STRLEN text_len;
+  STRLEN pos;
+
+  /*
+   * Keep our own scalar holding the current value. For a reference this
+   * increments ownership of its referent; it does not deep-copy the tree.
+   *
+   * All allocations are mortal, so croak() paths require no explicit
+   * cleanup. The caller must provide the normal Perl temporary scope.
+   */
+  current = sv_2mortal (newSVsv (sv));
+
+  /* Preserve the internal convention that NULL means no pointer. */
+  if (!path)
+    return current;
+
+  /*
+   * Fetch/copy the argument before stringification and UTF-8 conversion.
+   * Never upgrade or write into the caller's path scalar.
+   *
+   * SvPVutf8 supplies the byte length, including any embedded NULs.
+   * Do not modify path_copy after obtaining text.
+   */
+  path_copy = sv_2mortal (newSVsv (path));
+  text = SvPVutf8 (path_copy, text_len);
+
+  /* The empty pointer selects the complete document. */
+  if (text_len == 0)
+    return current;
+
+  if (text[0] != '/')
+    croak ("%s", err_pointer);
+
+  /*
+   * Preserve the existing scalar-document diagnostic, including for
+   * booleans represented as references to scalars.
+   */
+  if (!SvROK (current))
+    croak ("only the empty path is allowed for scalar documents");
+
+  {
+    svtype type = SvTYPE (SvRV (current));
+
+    if (type != SVt_PVAV && type != SVt_PVHV)
+      croak ("only the empty path is allowed for scalar documents");
   }
 
-  SvUPGRADE (path, SVt_PV);
-  sv_utf8_upgrade (path);
+  /*
+   * Reuse a Perl-managed token buffer. sv_setpvn() supplies writable
+   * storage and room for its terminating NUL.
+   */
+  key_sv = sv_2mortal (newSVpvn ("", 0));
+  pos = 1;                      /* Skip the initial slash. */
 
-  char *orig = SvPVX(path);
-  size_t len = SvCUR(path);
-  SvGROW(path, SvCUR (path) + 1); // should basically be a NOP
-  orig[len+1] = '\0';
+  for (;;)
+    {
+      SV *container;
+      SV *next;
+      svtype type;
+      STRLEN start;
+      STRLEN raw_len;
+      STRLEN read_pos;
+      STRLEN write_pos;
+      STRLEN key_len;
+      char *key;
 
-  // empty path allowed (for scalars and , addresses the entire document
-  if (len == 0) {
-    return sv;
-  }
+      /*
+       * This check is required on EVERY iteration, not just at the root.
+       * A selected scalar is valid only when no components remain.
+       */
+      if (!SvROK (current))
+        croak ("%s", err_type);
 
-  if (!SvROK(sv)) {
-    croak("only the empty path is allowed for scalar documents");
-  }
+      container = SvRV (current);
+      type = SvTYPE (container);
 
-  if (orig[0] != '/') {
-    croak("INVALID_JSON_POINTER: Invalid JSON pointer syntax");
-  }
-  orig++;
+      if (type != SVt_PVAV && type != SVt_PVHV)
+        croak ("%s", err_type);
 
-  char *key;
-  Newx(key, len, char);
+      /*
+       * Split on literal slashes before unescaping. An escaped slash
+       * (~1) belongs to the token and must not become a separator.
+       *
+       * pos may equal text_len: this represents a trailing empty token.
+       */
+      start = pos;
 
-  char *err;
-  char done = 0;
-  while (!done) {
-    svtype reftype = SvTYPE(SvRV(sv));
-    char *p = key;
-    char got_key = 0;
+      while (pos < text_len && text[pos] != '/')
+        ++pos;
 
-    memset(key, 0, len);
+      raw_len = pos - start;
+      sv_setpvn (key_sv, text + start, raw_len);
+      key = SvPVX (key_sv);
 
-    while (!got_key) {
-      switch (*orig) {
-        case '~':
-          orig++;
-          if (*orig == '0') {
-            *p++ = '~';
-          } else if (*orig == '1') {
-            *p++ = '/';
-          } else {
-            err = "INVALID_JSON_POINTER: Invalid JSON pointer syntax";
-            goto emulate_fail;
-          }
-          orig++;
-          break;
-        case '/':
-          got_key = 1;
-          orig++;
-          break;
-        case '\0':
-          done = 1;
-          got_key = 1;
-          break;
-        default:
-          *p++ = *orig++;
-      }
+      /*
+       * Decode in place. Decoding never increases the token length,
+       * so the write position cannot overtake the read position.
+       *
+       * An embedded NUL is copied like any other ordinary character.
+       */
+      read_pos = 0;
+      write_pos = 0;
+
+      while (read_pos < raw_len)
+        {
+          char ch = key[read_pos++];
+
+          if (ch == '~')
+            {
+              if (read_pos == raw_len)
+                croak ("%s", err_pointer);
+
+              ch = key[read_pos++];
+
+              if (ch == '0')
+                ch = '~';
+              else if (ch == '1')
+                ch = '/';
+              else
+                croak ("%s", err_pointer);
+            }
+
+          key[write_pos++] = ch;
+        }
+
+      key_len = write_pos;
+      key[key_len] = '\0';
+      SvCUR_set (key_sv, key_len);
+
+      /*
+       * text was obtained with SvPVutf8(); decoding ASCII escapes
+       * preserves that encoding. This also handles ASCII-only keys.
+       */
+      SvUTF8_on (key_sv);
+
+      if (type == SVt_PVAV)
+        {
+          AV *av = (AV *)container;
+          SV **element;
+          SSize_t last;
+          STRLEN i;
+          UV index = 0;
+
+          /* RFC 6901 array indices: 0 or [1-9][0-9]*. */
+          if (key_len == 0)
+            croak ("%s", err_pointer);
+
+          if (key_len > 1 && key[0] == '0')
+            croak ("%s", err_pointer);
+
+          /*
+           * "-" denotes the position after the last element, not an
+           * existing element that this operation can return.
+           */
+          if (key_len == 1 && key[0] == '-')
+            croak ("%s", err_bounds);
+
+          /*
+           * Validate the entire token before converting it. Do not
+           * accept signs, whitespace, exponents, decimal points or NUL.
+           */
+          for (i = 0; i < key_len; ++i)
+            {
+              unsigned char ch = (unsigned char)key[i];
+
+              if (ch < '0' || ch > '9')
+                croak ("%s", err_type);
+            }
+
+          for (i = 0; i < key_len; ++i)
+            {
+              UV digit = (UV)((unsigned char)key[i] - '0');
+
+              if (index > (UV_MAX - digit) / 10)
+                croak ("%s", err_bounds);
+
+              index = index * 10 + digit;
+            }
+
+          last = av_len (av);
+
+          /*
+           * Check the negative empty-array sentinel before converting
+           * to UV. The successful comparison also makes the later
+           * conversion to SSize_t safe.
+           */
+          if (last < 0 || index > (UV)last)
+            croak ("%s", err_bounds);
+
+          element = av_fetch (av, (SSize_t)index, 0);
+
+          if (!element || !*element)
+            croak ("%s", err_bounds);
+
+          next = *element;
+        }
+      else
+        {
+          HE *entry;
+
+          /*
+           * Perl hash keys ultimately use a signed I32 byte length.
+           * Do not allow an oversized token to reach a narrowing
+           * conversion inside the hash implementation.
+           */
+          if (key_len > (STRLEN)I32_MAX)
+            croak ("INVALID_JSON_POINTER: object key is too long");
+
+          /*
+           * The key SV carries both its length and UTF-8 flag.
+           * Embedded NULs and the empty key remain significant.
+           */
+          entry = hv_fetch_ent ((HV *)container, key_sv, 0, 0);
+
+          if (!entry)
+            croak ("%s", err_field);
+
+          next = HeVAL (entry);
+
+          if (!next)
+            croak ("%s", err_field);
+        }
+
+      /*
+       * Copy the selected scalar before advancing. Besides protecting
+       * the returned value's lifetime, this avoids retaining a borrowed
+       * hash/array slot across subsequent Perl API calls.
+       *
+       * The previous current value remains mortal and therefore alive
+       * until the enclosing temporary scope is cleaned up.
+       */
+      current = sv_2mortal (newSVsv (next));
+
+      if (pos == text_len)
+        return current;
+
+      /*
+       * text[pos] is a separator. Always process the following token,
+       * even if it is empty because this is the final slash.
+       */
+      ++pos;
     }
-    
-    if (reftype == SVt_PVAV) {
-      if (p == key || (p - key > 1 && key[0] == '0')) {
-        // empty string and numbers prefixed with 0 are not valid for arrays
-        err = "INVALID_JSON_POINTER: Invalid JSON pointer syntax";
-        goto emulate_fail;
-      } else if (p - key == 1 && key[0] == '-') {
-        // - means "the append position" or "the element after the end of the array"
-        // We don't support this, because we're returning a real element, not a position.
-        err = "INDEX_OUT_OF_BOUNDS: Attempted to access an element of a JSON array that is beyond its length";
-        goto emulate_fail;
-      }
-
-      UV idx;
-      int res = grok_number(key, p-key, &idx);
-
-      if (!(res & IS_NUMBER_IN_UV) || res & (IS_NUMBER_GREATER_THAN_UV_MAX|IS_NUMBER_NOT_INT|IS_NUMBER_NEG|IS_NUMBER_INFINITY|IS_NUMBER_NAN)) {
-        err = "INCORRECT_TYPE: The JSON element does not have the requested type";
-        goto emulate_fail;
-      }
-
-      AV *av = (AV*) SvRV(sv);
-      SSize_t last_idx = AvFILL(av);
-      if (idx > last_idx) {
-        err = "INDEX_OUT_OF_BOUNDS: Attempted to access an element of a JSON array that is beyond its length";
-        goto emulate_fail;
-      }
-
-      SV **elem = av_fetch(av, idx, 0);
-      if (elem && *elem) {
-        sv = *elem;
-      } else {
-        // ?
-        err = "INDEX_OUT_OF_BOUNDS: Attempted to access an element of a JSON array that is beyond its length";
-        goto emulate_fail;
-      }
-    } else if (reftype == SVt_PVHV) {
-      // TODO unicode keys?
-      SV **elem = hv_fetch((HV*) SvRV(sv), key, -(p-key), 0);
-      if (elem && *elem) {
-        sv = *elem;
-      } else {
-        err = "NO_SUCH_FIELD: The JSON field referenced does not exist in this object";
-        goto emulate_fail;
-      }
-    }
-  } 
-
-  Safefree(key);
-  return sv;
-
-emulate_fail:
-  Safefree(key);
-  croak("%s", err);
 }
 
 INLINE void
@@ -1255,32 +1402,34 @@ decode_str (dec_t *dec)
 
                       // possibly a surrogate pair
                       if (hi >= 0xd800)
-                        if (hi < 0xdc00)
-                          {
-                            if (dec_cur [0] != '\\' || dec_cur [1] != 'u')
-                              ERR ("missing low surrogate character in surrogate pair");
+                        {
+                          if (hi < 0xdc00)
+                            {
+                              if (dec_cur [0] != '\\' || dec_cur [1] != 'u')
+                                ERR ("missing low surrogate character in surrogate pair");
 
-                            dec_cur += 2;
+                              dec_cur += 2;
 
-                            dec->cur = dec_cur;
-                            lo = decode_4hex (dec);
-                            dec_cur = dec->cur;
-                            if (lo == (UV)-1)
-                              goto fail;
+                              dec->cur = dec_cur;
+                              lo = decode_4hex (dec);
+                              dec_cur = dec->cur;
+                              if (lo == (UV)-1)
+                                goto fail;
 
-                            if (lo < 0xdc00 || lo >= 0xe000)
-                              ERR ("surrogate pair expected");
+                              if (lo < 0xdc00 || lo >= 0xe000)
+                                ERR ("surrogate pair expected");
 
-                            hi = (hi - 0xD800) * 0x400 + (lo - 0xDC00) + 0x10000;
-                          }
-                        else if (hi < 0xe000)
-                          ERR ("missing high surrogate character in surrogate pair");
+                              hi = (hi - 0xD800) * 0x400 + (lo - 0xDC00) + 0x10000;
+                            }
+                          else if (hi < 0xe000)
+                            ERR ("missing high surrogate character in surrogate pair");
+                        }
 
                       if (hi >= 0x80)
                         {
                           utf8 = 1;
 
-                          cur = encode_utf8 (cur, hi);
+                          cur = (char*)encode_utf8 ((U8*)cur, hi);
                         }
                       else
                         *cur++ = hi;
@@ -1300,7 +1449,7 @@ decode_str (dec_t *dec)
 
               --dec_cur;
 
-              decode_utf8 (dec_cur, dec->end - dec_cur, &clen);
+              decode_utf8 ((U8*)dec_cur, dec->end - dec_cur, &clen);
               if (clen == (STRLEN)-1)
                 ERR ("malformed UTF-8 character in JSON string");
 
@@ -1361,6 +1510,7 @@ decode_str (dec_t *dec)
 
 fail:
   dec->cur = dec_cur;
+  SvREFCNT_dec (sv);
   return 0;
 }
 
@@ -1454,13 +1604,15 @@ decode_num (dec_t *dec)
         UV uv;
         int numtype = grok_number (start, len, &uv);
         if (numtype & IS_NUMBER_IN_UV)
-          if (numtype & IS_NUMBER_NEG)
-            {
-              if (uv < (UV)IV_MIN)
-                return newSViv (-(IV)uv);
-            }
-          else
-            return newSVuv (uv);
+          {
+            if (numtype & IS_NUMBER_NEG)
+              {
+                if (uv < (UV)IV_MIN)
+                  return newSViv (-(IV)uv);
+              }
+            else
+              return newSVuv (uv);
+          }
       }
 
       len -= *start == '-' ? 1 : 0;
@@ -1533,8 +1685,7 @@ fail:
   return 0;
 }
 
-// not static because we call it from simdjson too
-SV *
+static SV *
 filter_object (dec_t *dec, SV *sv, HV* hv)
 {
   if (dec->json.cb_sk_object && HvKEYS (hv) == 1)
@@ -1559,7 +1710,7 @@ filter_object (dec_t *dec, SV *sv, HV* hv)
           XPUSHs (HeVAL (he));
           sv_2mortal (sv);
 
-          PUTBACK; count = call_sv (HeVAL (cb), G_LIST); SPAGAIN;
+          PUTBACK; count = call_sv (sv_2mortal (SvREFCNT_inc (HeVAL (cb))), G_ARRAY); SPAGAIN;
 
           if (count == 1)
             {
@@ -1640,7 +1791,10 @@ decode_hv (dec_t *dec)
                   if (!key)
                     goto fail;
 
-                  decode_ws (dec); EXPECT_CH (':');
+                  decode_ws (dec);
+                  if (*dec->cur != ':')
+                    SvREFCNT_dec (key);
+                  EXPECT_CH (':');
 
                   decode_ws (dec);
                   value = decode_sv (dec);
@@ -1728,7 +1882,9 @@ decode_tag (dec_t *dec)
 
   decode_ws (dec);
 
+  DEC_INC_DEPTH; /* a "(" here recurses straight back into decode_tag */
   tag = decode_sv (dec);
+  DEC_DEC_DEPTH;
   if (!tag)
     goto fail;
 
@@ -1744,7 +1900,14 @@ decode_tag (dec_t *dec)
 
   decode_ws (dec);
 
-  val = decode_sv (dec);
+  if (*dec->cur == '[')
+    val = decode_sv (dec); /* decode_av charges this level */
+  else
+    {
+      DEC_INC_DEPTH; /* ("a")("a")... recurses through the value too */
+      val = decode_sv (dec);
+      DEC_DEC_DEPTH;
+    }
   if (!val)
     goto fail;
 
@@ -1768,6 +1931,8 @@ decode_tag (dec_t *dec)
     dSP;
 
     ENTER; SAVETMPS;
+    SAVEFREESV (tag); /* also freed when THAW dies */
+    SAVEFREESV (val);
     PUSHMARK (SP);
     EXTEND (SP, len + 2);
     // we re-bless the reference to get overload and other niceties right
@@ -1781,8 +1946,6 @@ decode_tag (dec_t *dec)
     call_sv ((SV *)GvCV (method), G_SCALAR);
     SPAGAIN;
 
-    SvREFCNT_dec (tag);
-    SvREFCNT_dec (val);
     sv = SvREFCNT_inc (POPs);
 
     PUTBACK;
@@ -1920,8 +2083,16 @@ decode_json (SV *string, JSON *json, STRLEN *offset_return, SV* path)
   dec.err   = 0;
   dec.depth = 0;
 
-  if (dec.json.cb_object || dec.json.cb_sk_object)
+  /* a filter may replace or remove these while this decode still uses them */
+  if (dec.json.cb_object)
+    sv_2mortal (SvREFCNT_inc (dec.json.cb_object));
+  if (dec.json.cb_sk_object)
+    sv_2mortal (SvREFCNT_inc ((SV *)dec.json.cb_sk_object));
+
+  if (dec.json.cb_object || dec.json.cb_sk_object) {
     dec.json.flags |= F_HOOK;
+    dec.json.flags &= ~F_USE_SIMDJSON;
+  }
 
   *dec.end = 0; // this should basically be a nop, too, but make sure it's there
 
@@ -1980,12 +2151,12 @@ decode_json (SV *string, JSON *json, STRLEN *offset_return, SV* path)
       ENTER;
       SAVEVPTR (PL_curcop);
       PL_curcop = &cop;
-      pv_uni_display (uni, dec.cur, dec.end - dec.cur, 20, UNI_DISPLAY_QQ);
+      pv_uni_display (uni, (U8*)dec.cur, dec.end - dec.cur, 20, UNI_DISPLAY_QQ);
       LEAVE;
 
       croak ("%s, at character offset %d (before \"%s\")",
              dec.err,
-             (int)ptr_to_index (string, dec.cur),
+             (int)ptr_to_index (string, (U8*)dec.cur),
              dec.cur != dec.end ? SvPV_nolen (uni) : "(end of string)");
     }
 
@@ -2004,6 +2175,25 @@ decode_json (SV *string, JSON *json, STRLEN *offset_return, SV* path)
 
 /////////////////////////////////////////////////////////////////////////////
 // incremental parser
+
+/* a number or true/false/null at the start of the buffer: not self-delimiting, so its
+   end depends on how the input was chunked */
+static int
+incr_starts_bare_scalar (JSON *self)
+{
+  const char *p = SvPVX (self->incr_text);
+  for (;;)
+    {
+      while (*p == 0x20 || *p == 0x09 || *p == 0x0a || *p == 0x0d)
+        ++p;
+      if (*p != '#' || !(self->flags & F_RELAXED))
+        break;
+      while (*p && *p != 0x0a && *p != 0x0d)
+        ++p;
+    }
+  return *p == '-' || (*p >= '0' && *p <= '9')
+      || strnEQ (p, "true", 4) || strnEQ (p, "false", 5) || strnEQ (p, "null", 4);
+}
 
 static void
 incr_parse (JSON *self)
@@ -2123,7 +2313,7 @@ incr_parse (JSON *self)
                   }
                 else if (*p == '\\')
                   {
-                    ++p; // "virtually" consumes character after \
+                    ++p; // "virtually" consumes character after a literal backslash
 
                     if (!*p) // if at end of string we have to switch modes
                       {
@@ -2202,8 +2392,8 @@ incr_parse (JSON *self)
               }
         }
 
-      modechange:
-        ;
+      /* modechange:
+        ;*/
     }
 
 interrupt:
@@ -2211,6 +2401,81 @@ interrupt:
   //printf ("interrupt<%.*s>\n", self->incr_pos, SvPVX(self->incr_text));//D
   //printf ("return pos %d mode %d nest %d\n", self->incr_pos, self->incr_mode, self->incr_nest);//D
 }
+
+/*
+ * Either supply two source SVs, or two NULLs to restore defaults.
+ * Each non-NULL self->v_* field owns one reference.
+ */
+static void
+json_set_boolean_values (pTHX_ JSON *self,
+                         SV *src_false, SV *src_true,
+                         int core_bools)
+{
+  SV *new_false = NULL;
+  SV *new_true  = NULL;
+  SV *old_false;
+  SV *old_true;
+
+  ENTER;
+  SAVETMPS;
+
+  /*
+   * Protect BOTH inputs before copying either one. Copying a magical
+   * input may execute Perl code, including another setter call.
+   */
+  if (src_false)
+    SAVEFREESV (SvREFCNT_inc (src_false));
+  if (src_true)
+    SAVEFREESV (SvREFCNT_inc (src_true));
+
+  /*
+   * Mortalize the destination BEFORE copying into it, so a croak
+   * during get-magic cannot strand an unowned destination scalar.
+   */
+  if (src_false)
+    {
+      new_false = sv_2mortal (newSV (0));
+      sv_setsv (new_false, src_false);
+    }
+
+  if (src_true)
+    {
+      new_true = sv_2mortal (newSV (0));
+      sv_setsv (new_true, src_true);
+    }
+
+  /*
+   * Read the old fields only after copying: input magic may have
+   * re-entered the setter and changed them.
+   */
+  old_false = self->v_false;
+  old_true  = self->v_true;
+
+  /*
+   * Publish the complete replacement before releasing anything that
+   * might invoke DESTROY and re-enter Perl.
+   */
+  self->v_false = new_false ? SvREFCNT_inc (new_false) : NULL;
+  self->v_true  = new_true  ? SvREFCNT_inc (new_true)  : NULL;
+
+  if (core_bools)
+    self->flags |= F_CORE_BOOLS;
+  else
+    self->flags &= ~F_CORE_BOOLS;
+
+  /*
+   * Transfer the old fields' owned references to scope cleanup.
+   * Neither SAVEFREESV call increments the reference count.
+   */
+  if (old_false)
+    SAVEFREESV (old_false);
+  if (old_true)
+    SAVEFREESV (old_true);
+
+  FREETMPS;
+  LEAVE;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // XS interface functions
@@ -2266,11 +2531,18 @@ void new (char *klass)
 }
 
 void boolean_values (JSON *self, SV *v_false = 0, SV *v_true = 0)
-	PPCODE:
-        self->flags   &= ~F_CORE_BOOLS;
-        self->v_false = newSVsv (v_false);
-        self->v_true  = newSVsv (v_true);
+        PPCODE:
+{
+        /* JSON::XS used to accept a single argument and silently set v_true to null. */
+        if (v_false && !v_true)
+          croak ("boolean_values requires either zero or two arguments");
+
+        PUTBACK;
+        json_set_boolean_values (aTHX_ self, v_false, v_true, 0);
+        SPAGAIN;
+
         XPUSHs (ST (0));
+}
 
 void get_boolean_values (JSON *self)
 	PPCODE:
@@ -2281,21 +2553,21 @@ void get_boolean_values (JSON *self)
             PUSHs (self->v_true);
           }
 
+
 void core_bools (JSON *self, int enable = 1)
-	PPCODE:
-        if (enable)
-          {
-            self->flags   |= F_CORE_BOOLS;
-            self->v_false = newSVsv (&PL_sv_no);
-            self->v_true  = newSVsv (&PL_sv_yes);
-          }
-        else
-          {
-            self->flags   &= ~F_CORE_BOOLS;
-            self->v_false = 0;
-            self->v_true  = 0;
-          }
+        PPCODE:
+{
+        PUTBACK;
+        json_set_boolean_values (
+          aTHX_ self,
+          enable ? &PL_sv_no  : NULL,
+          enable ? &PL_sv_yes : NULL,
+          enable
+        );
+        SPAGAIN;
+
         XPUSHs (ST (0));
+}
 
 void get_core_bools (JSON *self)
 	PPCODE:
@@ -2340,6 +2612,8 @@ void ascii (JSON *self, int enable = 1)
           self->flags &= ~F_USE_SIMDJSON;
         if (self->flags & F_USE_SIMDJSON && self->flags & F_RELAXED)
           self->flags &= ~F_USE_SIMDJSON;
+        if (ix == F_ALLOW_NONREF)
+          self->flags |= F_NONREF_SET;
 
         XPUSHs (ST (0));
 }
@@ -2392,6 +2666,9 @@ void filter_json_object (JSON *self, SV *cb = &PL_sv_undef)
 {
         SvREFCNT_dec (self->cb_object);
         self->cb_object = SvOK (cb) ? newSVsv (cb) : 0;
+        if (self->cb_object) {
+          self->flags &= ~F_USE_SIMDJSON;
+        }
 
         XPUSHs (ST (0));
 }
@@ -2414,6 +2691,9 @@ void filter_json_single_key_object (JSON *self, SV *key, SV *cb = &PL_sv_undef)
                 self->cb_sk_object = 0;
               }
           }
+        if (self->cb_sk_object) {
+          self->flags &= ~F_USE_SIMDJSON;
+        }
 
         XPUSHs (ST (0));
 }
@@ -2436,7 +2716,7 @@ void decode_prefix (JSON *self, SV *jsonstr)
         PUTBACK; sv = decode_json (jsonstr, self, &offset, 0); SPAGAIN;
         EXTEND (SP, 2);
         PUSHs (sv);
-        PUSHs (sv_2mortal (newSVuv (ptr_to_index (jsonstr, SvPV_nolen (jsonstr) + offset))));
+        PUSHs (sv_2mortal (newSVuv (ptr_to_index (jsonstr, (U8*)(SvPV_nolen (jsonstr) + offset)))));
 }
 
 void decode_at_pointer (JSON *self, SV *jsonstr, SV *path)
@@ -2452,32 +2732,36 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
 
         /* if utf8-ness doesn't match the decoder, need to upgrade/downgrade */
         if (!DECODE_WANTS_OCTETS (self) == !SvUTF8 (self->incr_text))
-          if (DECODE_WANTS_OCTETS (self))
-            {
-              if (self->incr_pos)
-                self->incr_pos = utf8_length ((U8 *)SvPVX (self->incr_text),
-                                              (U8 *)SvPVX (self->incr_text) + self->incr_pos);
+          {
+            if (DECODE_WANTS_OCTETS (self))
+              {
+                if (self->incr_pos)
+                  self->incr_pos = utf8_length ((U8 *)SvPVX (self->incr_text),
+                                                (U8 *)SvPVX (self->incr_text) + self->incr_pos);
 
-              sv_utf8_downgrade (self->incr_text, 0);
-            }
-          else
-            {
-              sv_utf8_upgrade (self->incr_text);
+                sv_utf8_downgrade (self->incr_text, 0);
+              }
+            else
+              {
+                sv_utf8_upgrade (self->incr_text);
 
-              if (self->incr_pos)
-                self->incr_pos = utf8_hop ((U8 *)SvPVX (self->incr_text), self->incr_pos)
+                if (self->incr_pos)
+                  self->incr_pos = utf8_hop ((U8 *)SvPVX (self->incr_text), self->incr_pos)
                                  - (U8 *)SvPVX (self->incr_text);
-            }
+              }
+          }
 
         // append data, if any
         if (jsonstr)
           {
             /* make sure both strings have same encoding */
             if (SvUTF8 (jsonstr) != SvUTF8 (self->incr_text))
-              if (SvUTF8 (jsonstr))
-                sv_utf8_downgrade (jsonstr, 0);
-              else
-                sv_utf8_upgrade (jsonstr);
+              {
+                if (SvUTF8 (jsonstr))
+                  sv_utf8_downgrade (jsonstr, 0);
+                else
+                  sv_utf8_upgrade (jsonstr);
+              }
 
             /* and then just blindly append */
             {
@@ -2494,6 +2778,10 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
             }
           }
 
+        if (GIMME_V == G_VOID && expect_false(self->max_size && SvCUR (self->incr_text) > self->max_size))
+          croak ("attempted decode of JSON text of %lu bytes size, but max_size is set to %lu",
+                 (unsigned long)SvCUR (self->incr_text), (unsigned long)self->max_size);
+
         if (GIMME_V != G_VOID)
           do
             {
@@ -2504,9 +2792,9 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
                 {
                   incr_parse (self);
 
-                  if (self->incr_pos > self->max_size && self->max_size)
+                  if (expect_false(self->max_size && INCR_SIZE (self) > self->max_size))
                     croak ("attempted decode of JSON text of %lu bytes size, but max_size is set to %lu",
-                           (unsigned long)self->incr_pos, (unsigned long)self->max_size);
+                           (unsigned long)INCR_SIZE (self), (unsigned long)self->max_size);
 
                   if (!INCR_DONE (self))
                     {
@@ -2532,7 +2820,43 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
                     }
                 }
 
-              PUTBACK; sv = decode_json (self->incr_text, self, &offset, 0); SPAGAIN;
+              if (!(self->flags & F_NONREF_SET) && incr_starts_bare_scalar (self))
+                croak ("incremental parsing of a top-level number, true, false or null needs an explicit allow_nonref");
+
+              SV *input = self->incr_text;
+
+              if (self->flags & F_USE_SIMDJSON)
+                {
+                  STRLEN len = self->incr_pos;
+
+                  /* Retain the existing whole-buffer size restriction. */
+                  if (self->max_size && SvCUR(input) > self->max_size)
+                    croak("incremental input exceeds max_size");
+
+                  if (!len || len > SvCUR(input))
+                    croak("invalid incremental document boundary");
+
+                  /*
+                   * Copy this document, not the unread suffix.
+                   * The existing decoder supplies any required SIMD padding.
+                   * This is wasteful and likely eats any performance
+                   * we would have gained from simdjson. The alternative
+                   * would have been making the simdjson wrapper intimately
+                   * aware of incremental parsing state, hurting the normal
+                   * hot path performance.
+                   * Not doing anything meant a quadratic performance breakdown.
+                   */
+                  input = sv_2mortal(newSVpvn(SvPVX(self->incr_text), len));
+
+                  if (SvUTF8(self->incr_text))
+                    SvUTF8_on(input);
+                }
+
+              PUTBACK;
+              sv = decode_json (input, self, &offset, 0);
+              SPAGAIN;
+
+
               XPUSHs (sv);
 
               self->incr_pos -= offset;

@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::fedora v0.999.14;
+package LedgerSMB::Installer::OS::linux::fedora v0.999.15;
 
 use v5.20;
 use experimental qw(signatures);
@@ -31,7 +31,8 @@ sub dependency_packages_identifier($self) {
         my ($out, $err, ) = capture {
             system( $dnf5, '--dump-variables' );
         };
-        (undef, $arch) = split(/ *= */, grep { m/basearch =/ } split( /\n/, $out ) );
+        my ($basearch) = grep { m/basearch\s+=/ } split( /\n/, $out );
+        (undef, $arch) = split(/ *= */, $basearch);
     }
     else {
         ($arch, ) = capture_stdout {
@@ -40,7 +41,7 @@ sub dependency_packages_identifier($self) {
     }
 
     chomp($arch);
-    return "$self->{_distro}->{ID}-$self->{_distro}->{VERSION_CODENAME}-$arch";
+    return "$self->{_distro}->{ID}-$self->{_distro}->{VERSION_ID}-$arch";
 }
 
 sub pkgs_from_modules($self, $mods) {

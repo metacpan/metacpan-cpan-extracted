@@ -13,7 +13,10 @@
  *
  * Include after pq_compat.h. */
 
-#ifdef HAS_GETTIMEOFDAY
+/* Not on Windows: XSUB.h has already made gettimeofday a macro there, so
+ * the CRT's own prototype in sys/time.h would expand into nonsense. perl.h
+ * has the timeval it needs. */
+#if defined(HAS_GETTIMEOFDAY) && !defined(WIN32)
 #  include <sys/time.h>
 #endif
 

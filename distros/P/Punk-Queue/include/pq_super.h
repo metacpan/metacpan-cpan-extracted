@@ -17,6 +17,25 @@
  *
  * Include after pq_worker.h. */
 
+#ifdef WIN32
+
+/* No fork, so no pool: a Windows host runs one worker per process. */
+static int pqs_run(pTHX_ SV *queue, SV *worker_opts, int nworkers,
+                   double graceful_timeout, int fail_fast,
+                   int scheduler) {
+    PERL_UNUSED_ARG(queue);
+    PERL_UNUSED_ARG(worker_opts);
+    PERL_UNUSED_ARG(nworkers);
+    PERL_UNUSED_ARG(graceful_timeout);
+    PERL_UNUSED_ARG(fail_fast);
+    PERL_UNUSED_ARG(scheduler);
+    croak("Punk::Queue::Supervisor needs fork, which Windows does not have:"
+          " run $queue->worker->run in each worker process instead");
+    return 1;
+}
+
+#else
+
 #include <sys/wait.h>
 #include <fcntl.h>
 
@@ -519,5 +538,7 @@ static int pqs_run(pTHX_ SV *queue, SV *worker_opts, int nworkers,
     safefree(sup.slots);
     return sup.exit_code;
 }
+
+#endif /* WIN32 */
 
 #endif /* PQ_SUPER_H */

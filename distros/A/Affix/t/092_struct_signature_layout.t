@@ -70,7 +70,7 @@ my $sig = Struct [
     width   => png_uint_32(),
     height  => png_uint_32(),
     format  => png_uint_32(),
-    flags   => png_uint_32(),
+    flags   => png_uint_32()
 ];
 #
 subtest 'struct declared inline in signature' => sub {

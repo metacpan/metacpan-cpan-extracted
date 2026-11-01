@@ -227,6 +227,30 @@ subtest 'the module reads no palette from d3' => sub {
 		or diag(explain(\%written));
 };
 
+# The scheme name goes into a script, and an application may well take it from a
+# request.  Whatever is asked for, only a real scheme's name may reach the page.
+subtest 'a scheme name cannot write script into the page' => sub {
+	my %snippets = (
+		'pie chart' => sub { $chart->render_pie_chart_snippet(\@PIE_DATA, { color_scheme => $_[0] })->{html} },
+		'stacked bar' => sub { $chart->render_stacked_bar_snippet(\@STACKED_DATA, { scheme => $_[0] })->{html} },
+		'treemap' => sub { $chart->render_treemap_snippet(\@TREEMAP_DATA, { scheme => $_[0] })->{html} },
+	);
+	my @hostile = (
+		q{x'];alert(1);//},
+		q{</script><script>alert(1)</script>},
+		q{constructor},
+		q{__proto__},
+	);
+
+	for my $name (sort keys %snippets) {
+		for my $scheme (@hostile) {
+			my $html = $snippets{$name}->($scheme);
+			unlike($html, qr/\Q$scheme\E/, "$name does not write out <$scheme>");
+			like($html, qr/SCHEMES\['tableau10'\]/, "$name draws <$scheme> with the default scheme");
+		}
+	}
+};
+
 done_testing();
 
 # A scheme's colours as the JS array a snippet inlines, built from palette() -

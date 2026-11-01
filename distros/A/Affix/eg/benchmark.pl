@@ -3,6 +3,7 @@ no warnings 'experimental';
 use blib;
 use Affix               qw[:all];
 use Test2::Tools::Affix qw[:all];
+use Test2::V0 -no_srand => 1;
 use Config;
 use Benchmark qw[:all];
 $|++;
@@ -190,18 +191,18 @@ if ($has_live) {
         'struct_live_pull'   => sub { get_struct_live() },
         'member_access_copy' => sub { my $v             = $copy_struct->{a} },
         'member_access_live' => sub { my $v             = $live_struct->{a} },
-        'member_write_live'  => sub { $live_struct->{a} = 100 },
+        'member_write_live'  => sub { $live_struct->{a} = 100 }
         ),
         qr/live|access|write/, 'Live vs Copy Aggregates';
 }
 my $live_ptr   = get_ptr();
-my $live_array = calloc( 10, Int );
+my $live_array = cast( calloc( 10, sizeof(Int) ), Array [ Int, 10 ] );
 like fastest(
     $bench_count,
     ptr_deref_magic  => sub { my $v          = $$live_ptr },
     ptr_indexing_r   => sub { my $v          = $live_ptr->[0] },
     ptr_indexing_w   => sub { $live_ptr->[0] = 42 },
-    array_indexing_r => sub { my $v          = $live_array->[5] },
+    array_indexing_r => sub { my $v          = $live_array->[5] }
     ),
     qr/ptr|array/, 'Pointer and Array Indexing';
 subtest i128 => sub {

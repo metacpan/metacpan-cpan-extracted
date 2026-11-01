@@ -1,5 +1,9 @@
 Revision history for Punk::Queue
 
+0.11    2026-10-31
+        - Builds on Windows: one in-process worker, no supervisor.
+        - t/84 runs its child perls from script files, not -e.
+
 0.10    2026-10-19
         - A cron's tz may be a time zone name (America/New_York) when
           Time::Keeper::Recurrence is installedi

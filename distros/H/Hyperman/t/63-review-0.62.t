@@ -12,6 +12,8 @@ use Hyperman;
 #  - a Future method on something that is not a future croaks (it segfaulted)
 #  - ->get in list context after the nested loop grew the Perl stack
 #  - a stop asked for while a handler's ->get pumps the loop is honoured
+#  - ... and both, when the event that settles or stops is in the same
+#    batch as the one whose callback waits
 #  - a continuation awaited from inside the fire queue settles
 #  - followed_by on a cancelled future does not run, and a callback that
 #    cancels its own future does not have it flipped to done
@@ -73,6 +75,53 @@ use Hyperman;
     ok $ok, 'the loop returned after a stop under a nested ->get' or diag $@;
     cmp_ok(Time::HiRes::time() - $t0, '<', 5, '...promptly, not after the 30s timer');
     like $err, qr/loop stopped/, 'the waiting ->get died with the loop-stopped message';
+}
+
+# The two blocks above, with both timers in ONE batch: the sleep puts them
+# both past due before the first wait, as a loaded smoker did. The event
+# beside the one whose callback waits is already out of the kernel, so the
+# nested run has to dispatch it from the outer batch. Which of the two runs
+# first is the backend's business, so either may be the one that waits. The
+# 2s timer stops the loop if the other never runs: alarm cannot, as the
+# signal is held until the wait returns.
+{
+    my @backends;
+    push @backends, 'kqueue'   if Hyperman::Event::Kqueue->available;
+    push @backends, 'epoll'    if Hyperman::Event::Epoll->available;
+    push @backends, 'poll'     if Hyperman::Event::Poll->available;
+    push @backends, 'io_uring' if Hyperman::Event::IOUring->available;
+    for my $be (@backends) {
+        my $loop = Hyperman::Loop->new($be);
+        my $f = Hyperman::Future->new;
+        my ($n, $got, $late) = (0);
+        my $cb = sub {
+            if (!$n++) { $got = eval { $f->get } // "died: $@"; $loop->stop }
+            else       { $f->done(7) }
+        };
+        $loop->timer(0.005, $cb);
+        $loop->timer(0.006, $cb);
+        $loop->timer(2, sub { $late = 1; $loop->stop });
+        Time::HiRes::sleep(0.05);
+        $loop->run;
+        is $got, 7, "$be: a ->get settles from the event beside it in the batch";
+        ok !$late, "$be: ...without waiting for the next timer";
+
+        $loop = Hyperman::Loop->new($be);
+        my ($t0, $err);
+        $n = 0;
+        $cb = sub {
+            if (!$n++) { eval { $loop->timer_f(30)->get }; $err = $@ }
+            else       { $loop->stop }
+        };
+        $loop->timer(0.005, $cb);
+        $loop->timer(0.006, $cb);
+        Time::HiRes::sleep(0.05);
+        $t0 = Time::HiRes::time();
+        $loop->run;
+        cmp_ok(Time::HiRes::time() - $t0, '<', 5,
+               "$be: a stop beside a ->get in the batch is honoured promptly");
+        like $err, qr/loop stopped/, "$be: ...and the ->get died with the loop-stopped message";
+    }
 }
 
 {

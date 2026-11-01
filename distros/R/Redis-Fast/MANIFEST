@@ -29,6 +29,10 @@ t/09-env-redis-server.t
 t/10-tie-list.t
 t/11-timeout.t
 t/12-no-io-socket-ssl.t
+t/13-ssl-verify-mode.t
+t/14-subscribe-unexpected-reply.t
+t/15-info-unexpected-reply.t
+t/16-resubscribe-topic-with-newline.t
 t/20-tie-hash.t
 t/30-scripts.t
 t/42-client_cmds.t
@@ -61,6 +65,7 @@ deps/hiredis/CMakeLists.txt
 deps/hiredis/COPYING
 deps/hiredis/Makefile
 deps/hiredis/README.md
+deps/hiredis/SECURITY.md
 deps/hiredis/adapters/ae.h
 deps/hiredis/adapters/glib.h
 deps/hiredis/adapters/ivykis.h

@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/lib";
 use Test::More;
 use PQTest;
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'DBI and DBD::SQLite required' unless has_dbd();
 
 # The multi-process lock races the battery cannot run in one process.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.1');
+our $VERSION   = qv('v1.0.2');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version v1.0.1
+Version v1.0.2
 
 =cut
 
@@ -75,10 +75,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/Map-Tube-CLI/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube-CLI>
 
 =item * Search MetaCPAN
 

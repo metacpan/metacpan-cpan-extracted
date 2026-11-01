@@ -47,6 +47,8 @@ t/121_evans.t
 t/122_trailing.t
 t/123_decode_at_pointer.t
 t/124_CVE-2025-40930.t
+t/130_thaw_croak_leak.t
+t/131_filter_self_removal.t
 t/12_blessed.t
 t/13_limit.t
 t/14_latin1.t

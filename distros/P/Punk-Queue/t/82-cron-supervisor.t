@@ -8,6 +8,7 @@ use Test::More;
 use PQTest;
 use PQSpawn;
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'DBI and DBD::SQLite required' unless has_dbd();
 
 # End to end: one `punk-queue worker` process, a due cron in the

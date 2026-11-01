@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+v5.1.1  2026-10-31
+        - Documented Map::Tube::Hannover by Gisbert W. Selke.
+        - Tidied up pod and removed link for CPAN Ratings.
+        - Removed redundant unit test: xt/meta-json.t and xt/meta-yml.t
+        - Added unit test: xt/provides.t
+
 v5.1.0  2026-07-10
         This release is only possible because of help from @GWS.
         - A new function has been added that allows for limitations on the

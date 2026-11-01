@@ -16,6 +16,7 @@ use PQSpawn;
 # Run over both paths: the Hyperman loop (io_watch on pg_socket) and the
 # plain poll(2) path (the notify fd in the pollfd set).
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'set PUNK_QUEUE_PG_DSN (and install DBD::Pg) to run'
     unless has_pg();
 

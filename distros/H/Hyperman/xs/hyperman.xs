@@ -4,23 +4,7 @@ PROTOTYPES: DISABLE
 
 BOOT:
     hm_fq = newAV();
-    /* What to exec on USR2: perl's own argv from the first argument on. $^X
-     * supplies the interpreter at exec time. Copied now, because `$0 = ...`
-     * on Linux writes over the memory PL_origargv points into. */
-    {
-        int i, n = PL_origargc;
-        if (n > 0 && PL_origargv) {
-            hm_boot_argv = (char **)hm_xmalloc(sizeof(char *) * (size_t)(n + 1));
-            for (i = 0; i < n; i++) {
-                const char *a = PL_origargv[i] ? PL_origargv[i] : "";
-                hm_boot_argv[i] = (char *)hm_xmalloc(strlen(a) + 1);
-                memcpy(hm_boot_argv[i], a, strlen(a) + 1);
-            }
-            hm_boot_argv[n] = NULL;
-            /* argv[0] becomes the interpreter path at exec; keep the name
-             * perl was invoked under as its argv[0] */
-        }
-    }
+    hm_boot_argv_save(aTHX);
     /* Shared::Arena's table, once. NULL when it is absent or too old, and
      * every arena door then fails open. */
     hm_sa_resolve(aTHX);

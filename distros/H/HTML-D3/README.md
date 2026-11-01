@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.24
+Version 0.27
 
 ## Synopsis
 
@@ -43,6 +43,13 @@ print $html;
 HTML::D3 is a Perl module that provides functionality to create simple charts using D3.js.
 The module generates HTML and JavaScript code to render the chart in a web browser.
 
+Text in a chart's data and options is written into a `<script>` so that it
+cannot end the script: `<` is written as `\u003c`, which JavaScript reads back
+as the same character.  An `id` is written into an attribute, a selector and a
+script, so it must be letters, digits, `_` and `-`, not starting with a digit or
+`-`.  Any other `id` is ignored and the method's default used, so read the id a
+method actually used from the `svg_id` or `table_id` it returns.
+
 ## Methods
 
 The `=head3 API SPECIFICATION` subsections use [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
@@ -64,6 +71,8 @@ Accepts the following optional arguments:
 - `width` - The width of the chart (default: 800).
 - `height` - The height of the chart (default: 600).
 - `title` - The title of the chart (default: 'Chart').
+It is plain text, escaped when it is written to the page: `<` and `&` appear
+as themselves, and HTML in a title is shown rather than obeyed.
 - `responsive` - If true, SVG elements are rendered with
 `viewBox` and `width="100%" height="auto"` instead of fixed pixel
 dimensions, so the chart scales fluidly with its container.
@@ -489,7 +498,7 @@ colour scheme.  Supported: `YlOrRd`, `Blues`, `Greens`, `Purples`,
 `RdPu`, `YlGnBu`.
 - `x_label` (string, default `''`) - Axis title below the X axis.
 The value is JavaScript-escaped (backslash, double-quote, newline, carriage
-return) before being embedded in the page; other characters are taken
+return, `<`) before being embedded in the page; other characters are taken
 literally.
 - `y_label` (string, default `''`) - Axis title left of the Y axis.
 Same JS-escaping as `x_label` applies.
@@ -596,6 +605,9 @@ tooltip.  Data points with an undefined `$value` are silently skipped.
     Either a CSS colour value (e.g. `'steelblue'`, `'#4e79a7'`) applied to all
     bars, or the special token `'categorical'`, which colours each bar
     distinctively using D3's Tableau-10 palette.
+
+    A value holding anything a CSS colour cannot, such as a quote or `<`, is
+    ignored and the default used.
 
 - `show_values` (bool, default `0`)
 
@@ -1113,6 +1125,8 @@ radius) dimensions:
     - `id` (string, default `'scatter_chart'`) - `id` of the `<svg`> element.
     - `color` (CSS colour or `'categorical'`, default `'steelblue'`) -
     Fill colour for the data points.  `'categorical'` uses the Tableau-10 palette.
+    A value holding anything a CSS colour cannot, such as a quote or `<`, is
+    ignored and the default used.
     - `x_label` (string, default `''`) - Label for the X axis.
     - `y_label` (string, default `''`) - Label for the Y axis.
     - `value_label` (string, default `'Value'`) - Prefix for the tooltip value row.
@@ -1326,7 +1340,10 @@ Accepted `\%opts` keys:
 - `bar_label` (string, default `'Bar'`) - legend/axis label for bars.
 - `line_label` (string, default `'Line'`) - legend/axis label for line.
 - `bar_color` (string, optional CSS colour, default `'steelblue'`) - bar fill.
+A value holding anything a CSS colour cannot, such as a quote or `<`, is
+ignored and the default used.
 - `line_color` (string, optional CSS colour, default `'#e15759'`) - line stroke.
+Checked as `bar_color` is.
 - `id` (string, optional) - override the default `svg_id` value.
 - `responsive` (boolean, optional) - SVG responsive sizing override.
 
@@ -1476,6 +1493,8 @@ That colour is `colour_at($scheme, 0)`, so a caller shading the same data by
 hand starts from the same colour the bars do.
 - `x_label` (string, optional) - label shown below the X axis.
 - `color` (string, default `'steelblue'`) - bar fill colour.
+A value holding anything a CSS colour cannot, such as a quote or `<`, is
+ignored and the default used.
 - `id` (string, optional) - override the default `svg_id` value.
 - `responsive` (boolean, optional) - SVG responsive sizing override.
 

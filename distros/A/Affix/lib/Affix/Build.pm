@@ -1,4 +1,4 @@
-package Affix::Build v1.3.0 {
+package Affix::Build v1.4.0 {
     use v5.40;
     use experimental qw[class try];
     use Config;
@@ -51,7 +51,7 @@ package Affix::Build v1.3.0 {
             $cxx ||= $self->_is_msvc($cc) ? $cc : $cc =~ /clang/i ? 'clang++' : $cc =~ /gcc/ ? 'g++' : 'c++';
 
             # We prefer C++ drivers (g++, clang++) to handle standard libraries for mixed code (C+Rust, C+C++)
-            $linker = $self->_is_msvc($cc) ? ( $self->_can_run(qw[cl link]) // 'link' ) :
+            $linker = $self->_is_msvc($cc) ? ( $self->_can_run(qw[cl link]) // $cc // 'cl' ) :
                 ( $self->_can_run(qw[g++ clang++ c++ icpx]) || $self->_can_run(qw[cc gcc clang icx cl]) || 'c++' );
 
             # Parse global flags...
@@ -108,6 +108,92 @@ package Affix::Build v1.3.0 {
             return $self->$handler( $src, $libname, 'dynamic' );
         }
 
+        # Parse COFF object files (.obj, .o) directly to extract defined external symbols
+        method _coff_symbols ($path) {
+            open my $fh, '<:raw', "$path" or return ();
+            my $header;
+            return () unless read( $fh, $header, 20 ) == 20;
+            my ( $machine, $num_sections, $timedate, $sym_ptr, $num_syms, $opt_hdr_sz, $flags ) = unpack( 'v v V V V v v', $header );
+            return () unless $sym_ptr && $num_syms;
+            seek( $fh, $sym_ptr, 0 ) or return ();
+            my $str_ptr = $sym_ptr + $num_syms * 18;
+            my @syms;
+            my $i = 0;
+
+            while ( $i < $num_syms ) {
+                my $entry;
+                last unless read( $fh, $entry, 18 ) == 18;
+                $i++;
+                my ( $short_name, $val, $sect_num, $type, $storage_class, $num_aux ) = unpack( 'a8 V s v C C', $entry );
+                if ( $storage_class == 2 && $sect_num > 0 ) {
+                    my $name;
+                    my ( $zeroes, $offset ) = unpack( 'V V', $short_name );
+                    if ( $zeroes == 0 ) {
+                        my $cur = tell($fh);
+                        if ( seek( $fh, $str_ptr + $offset, 0 ) ) {
+                            my $str = '';
+                            my $char;
+                            while ( read( $fh, $char, 1 ) && $char ne "\0" ) {
+                                $str .= $char;
+                            }
+                            $name = $str;
+                        }
+                        seek( $fh, $cur, 0 );
+                    }
+                    else {
+                        $name = $short_name;
+                        $name =~ s/\0+$//;
+                    }
+                    push @syms, $name if defined $name && length $name;
+                }
+                if ( $num_aux > 0 ) {
+                    seek( $fh, $num_aux * 18, 1 );
+                    $i += $num_aux;
+                }
+            }
+            close $fh;
+            return @syms;
+        }
+
+        # Generate a module-definition (.def) file to export all symbols on MSVC
+        method _generate_msvc_def ( $def_file, @files ) {
+            my %symbols;
+            my $dumpbin = $self->_can_run('dumpbin');
+            if ( !$dumpbin && $cc ) {
+                my $p = Path::Tiny::path($cc)->parent->child('dumpbin.exe');
+                $dumpbin = "$p" if -x "$p";
+            }
+            for my $f (@files) {
+                next unless -e "$f";
+                my @raw;
+                if ($dumpbin) {
+                    my ($out) = capture { system $dumpbin, '/SYMBOLS', "$f" };
+                    for my $line ( split /\r?\n/, $out ) {
+                        if ( $line =~ /SECT\S*.*?\bExternal\b\s*\|\s*(\S+)/ ) {
+                            push @raw, $1;
+                        }
+                    }
+                }
+                if ( !@raw ) {
+                    push @raw, $self->_coff_symbols("$f");
+                }
+                for my $sym (@raw) {
+                    next if $sym =~ /^[?.]/;
+                    next if $sym =~ /^__(?:real|x86|local_stdio)/;
+                    next if $sym =~ /^_RTC_/;
+                    next if $sym =~ /^(?:_fltused|DllMain|_DllMainCRTStartup|DllMainCRTStartup)$/;
+                    $sym =~ s/^_// if $Config{ptrsize} == 4;
+                    $symbols{$sym} = 1;
+                }
+            }
+            if ( keys %symbols ) {
+                my $content = "EXPORTS\n" . join( "\n", map {"    $_"} sort keys %symbols ) . "\n";
+                $def_file->spew_utf8($content);
+                return $def_file;
+            }
+            return undef;
+        }
+
         # Used when mixing languages (e.g. C + Rust). We compile everything to
         # static artifacts (.o or .a) and then use the system linker to combine them.
         method _strategy_polyglot () {
@@ -126,6 +212,9 @@ package Affix::Build v1.3.0 {
             my @cmd  = ($linker);
             if ($msvc) {
                 push @cmd, '/nologo', '/LD';
+                my $def = $build_dir->child( $self->_base($libname) . '.def' );
+                $self->_generate_msvc_def( $def, @files );
+                push @cmd, "$def" if -e "$def";
             }
             else {
                 push @cmd, $os eq 'MSWin32' ? ('-shared') : ( '-shared', '-fPIC' );
@@ -310,7 +399,12 @@ package Affix::Build v1.3.0 {
             croak 'Assembly failed' unless $compiled && -e "$obj";
             if ( $mode eq 'dynamic' ) {
                 if ( $self->_is_msvc ) {
-                    $self->_run( $linker, '/nologo', '/LD', "$obj", '/Fe' . "$out", @ldflags );
+                    my $def = $build_dir->child( $self->_base($file) . '.def' );
+                    $self->_generate_msvc_def( $def, $obj );
+                    my @cmd = ( $linker, '/nologo', '/LD', "$obj", '/Fe' . "$out" );
+                    push @cmd, "$def" if -e "$def";
+                    push @cmd, @ldflags, '/link', '/NOENTRY';
+                    $self->_run(@cmd);
                     return $out;
                 }
                 my @cmd = ( $linker, '-shared', "$obj", '-o', "$out", @ldflags );
@@ -325,23 +419,32 @@ package Affix::Build v1.3.0 {
         }
 
         #~ https://blog.asleson.org/2021/02/23/how-to-writing-a-c-shared-library-in-rust/
+        method _rust_target () {
+            return undef unless $os eq 'MSWin32';
+            my $arch = ( $Config{archname} =~ /arm64|aarch64/i ) ? 'aarch64' : ( $Config{ptrsize} == 4 ) ? 'i686' : 'x86_64';
+            if ( $self->_is_msvc ) {
+                return "$arch-pc-windows-msvc";
+            }
+            elsif ( $cc =~ /gcc/ ) {
+                return $arch eq 'aarch64' ? 'aarch64-pc-windows-gnullvm' : "$arch-pc-windows-gnu";
+            }
+            return undef;
+        }
+
         method _build_rust ( $src, $out, $mode ) {
-            my $file  = $src->{path};
-            my @local = @{ $src->{flags} };
-            my $rc    = $self->_can_run('rustc') // croak "Rustc not found";
+            my $file        = $src->{path};
+            my @local       = @{ $src->{flags} };
+            my $rc          = $self->_can_run('rustc') // croak "Rustc not found";
+            my $target      = $self->_rust_target;
+            my @target_flag = $target ? ( '--target', $target ) : ();
             if ( $mode eq 'dynamic' ) {
-                $self->_run( $rc, '--crate-type', 'cdylib', @local, '-o', "$out", "$file" );
+                $self->_run( $rc, '--crate-type', 'cdylib', @target_flag, @local, '-o', "$out", "$file" );
                 return $out;
             }
             else {
                 my $lib = $build_dir->child( $self->_base($file) . $Config{_a} );
-                my @cmd = ( $rc, '--crate-type=staticlib', '--emit=link', '-C', 'panic=abort', @local, "$file", '-o', "$lib" );
-
-                # Force GNU target on MinGW to ensure compatibility with Perl's linker
-                if ( $os eq 'MSWin32' && $cc =~ /gcc/ ) {
-                    push @cmd, '--target', 'x86_64-pc-windows-gnu';
-                }
-                elsif ( $os ne 'MSWin32' ) {
+                my @cmd = ( $rc, '--crate-type=staticlib', '--emit=link', '-C', 'panic=abort', @target_flag, @local, "$file", '-o', "$lib" );
+                if ( $os ne 'MSWin32' ) {
                     push @cmd, '-C', 'relocation-model=pic';
                 }
                 $self->_run(@cmd);
@@ -360,6 +463,11 @@ package Affix::Build v1.3.0 {
             # Go runtime (and SSE/AVX instructions) on Windows x64. If Perl calls your library with a
             # 8-byte aligned stack (which was common in older GCC optimization flags), Go will segfault
             # immediately when it tries to access the stack.
+            # Ensure GOARCH and CC match Perl's architecture
+            local $ENV{GOARCH} = $ENV{GOARCH} // do {
+                ( $Config{archname} =~ /arm64|aarch64/i ) ? 'arm64' : ( $Config{ptrsize} == 4 ) ? '386' : 'amd64';
+            };
+            local $ENV{CC} = $ENV{CC} // $self->cc;
             push @local, q[-ldflags "-extldflags '-static -static-libgcc -static-libstdc++'"] if $^O eq 'MSWin32';
             if ( $mode eq 'dynamic' ) {
                 $self->_run( 'go', 'build', '-buildmode=c-shared', @local, '-o', "$out", "$file" );

@@ -125,9 +125,8 @@ t/test-the-test/station-self-linked.xml
 t/test-the-test/station-self-other-linked.xml
 xt/changes.t
 xt/manifest.t
-xt/meta-json.t
-xt/meta-yml.t
 xt/pod.t
+xt/provides.t
 xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.1');
+our $VERSION   = qv('v1.0.2');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version v1.0.1
+Version v1.0.2
 
 =cut
 
@@ -51,6 +51,7 @@ BEGIN {
         'FRANKFURT'       => 'Map::Tube::Frankfurt',
         'GLASGOW'         => 'Map::Tube::Glasgow',
         'HAMBURG'         => 'Map::Tube::Hamburg',
+        'HANNOVER'        => 'Map::Tube::Hannover',
         'HONGKONG'        => 'Map::Tube::Hongkong',
         'KAZAN'           => 'Map::Tube::Kazan',
         'KHARKIV'         => 'Map::Tube::Kharkiv',
@@ -295,6 +296,8 @@ sure you have the latest maps when you install.
 =item * L<Glasgow|Map::Tube::Glasgow>
 
 =item * L<Hamburg|Map::Tube::Hamburg>
+
+=item * L<Hannover|Map::Tube::Hannover>
 
 =item * L<Hongkong|Map::Tube::Hongkong>
 
@@ -852,10 +855,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/Map-Tube-CLI/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube-CLI>
 
 =item * Search MetaCPAN
 

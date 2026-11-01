@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use Punk::Model::Computed::Error ();
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 1;
 

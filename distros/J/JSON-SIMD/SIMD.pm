@@ -86,7 +86,7 @@ stuff). Or you can combine those features in whatever way you like.
 
 package JSON::SIMD;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 our $JSON_XS_VERSION = '4.04';
 our @ISA = qw(Exporter);
 
@@ -455,8 +455,8 @@ resource files etc.)
 If C<$enable> is false (the default), then C<decode> will only accept
 valid JSON texts.
 
-This option is not compatible with C<use_simdjson>, and using this option
-will silently disable simdjson mode.
+I<This option is not compatible with C<use_simdjson>, and using this option
+will silently disable simdjson mode.>
 
 Currently accepted extensions are:
 
@@ -527,7 +527,7 @@ This setting has currently no effect on tied hashes.
 =item $enabled = $json->get_allow_nonref
 
 Unlike other boolean options, this option is enabled by default beginning
-with version C<4.0>. See L<SECURITY CONSIDERATIONS> for the gory details.
+with (JSON::XS) version C<4.0>. See L<SECURITY CONSIDERATIONS> for the gory details.
 
 If C<$enable> is true (or missing), then the C<encode> method can convert a
 non-reference into its corresponding string, number or null JSON value,
@@ -637,6 +637,10 @@ assigning a value to another variable, i.e. C<$copy = $false>).
 Calling this method without any arguments will reset the booleans
 to their default values.
 
+(Calling C<boolean_values> with I<one> argument will croak.
+This is a breaking change with respect to JSON::XS: it used to silently
+set the true value to undef in that case.)
+
 C<get_boolean_values> will return both C<$false> and C<$true> values, or
 the empty list when they are set to the default.
 
@@ -692,6 +696,9 @@ Example, convert all JSON objects into the integer 5:
    # so a lone 5 is not allowed.
    $js->decode ('{"a":1, "b":2}');
 
+I<This method is not compatible with C<use_simdjson>, and using a filter callback
+will silently disable simdjson mode.>
+
 =item $json = $json->filter_json_single_key_object ($key [=> $coderef->($value)])
 
 Works remotely similar to C<filter_json_object>, but is only called for
@@ -743,6 +750,9 @@ into the corresponding C<< $WIDGET{<id>} >> object:
 
       { __widget__ => $self->{id} }
    }
+
+I<This method is not compatible with C<use_simdjson>, and using a filter callback
+will silently disable simdjson mode.>
 
 =item $json = $json->shrink ([$enable])
 
@@ -877,12 +887,15 @@ This method croaks if the path is malformed, or it refers to a nonexistent
 part of the document.
 
 This method works in both simdjson mode and with the legacy decoder,
-however, for the latter it doesn't provide any speed or memory advantages.
+however, for the latter it is emulated by decoding the whole document normally,
+then dropping the unneeded parts, and thus doesn't provide any speed or memory advantages.
 
 =back
 
 
 =head1 INCREMENTAL PARSING
+
+I<(The incremental parser is deprecated and will likely be removed in a future release.)>
 
 In some cases, there is the need for incremental parsing of JSON
 texts. While this module always has to keep both JSON text and resulting
@@ -994,6 +1007,20 @@ I<cannot> be the beginning of a valid JSON text:
 
 In reality, hopwever, the parser might continue to read data until a
 length limit is exceeded or it finds a closing bracket.
+
+See also the section about RFC4627 VS. RFC7159 ("old" vs. "new" JSON),
+specifically the part about allowing a scalar in the top-level document
+introduces ambiguity: is the string C<12> one JSON document containing 
+the number 12, or two documents, each containing the numbers 1 and 2?
+This is especially problematic for the incremental parser, where the two
+digits in the above example may arrive to the parser in separate chunks.
+
+Therefore, to be safe, since version 1.08 JSON::SIMD requires an explicit
+C<allow_nonref(1)> setting for the incremental parser to accept a top-level
+number, "true", "false" or "null". 
+
+(Previous versions, as well as JSON::XS since version 4.00 have accepted
+such top-level values, because allow_nonref has become the implicit default).
 
 =head2 EXAMPLES
 
@@ -1977,12 +2004,12 @@ afterwards.
 =head1 SOME HISTORY
 
 The idea for this module came in 2023 when I learned about
-simdjson, and found that one particular language is conspicuously missing
+simdjson, and found that one particular language was conspicuously missing
 from the list of bindings and ports. The impulse to remedy that situation
 and produce a working Perl binding, bringing the latest and greatest
 advances in JSON parsing to Perl users, resulted in this module.
 
-JSON::XS was chosen as the basis for the fork because I has been
+JSON::XS was chosen as the basis for the fork because I have been
 using that module at $work and elsewhere without problems, so preserving
 compatibility with it was seen as an important goal.
 

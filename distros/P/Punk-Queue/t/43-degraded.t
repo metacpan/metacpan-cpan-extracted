@@ -8,6 +8,7 @@ use Test::More;
 use PQTest;
 use PQSpawn;
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'DBI and DBD::SQLite required' unless has_dbd();
 
 # The degradation matrix: PUNK_QUEUE_NO_HM_ABI forces the poll(2) path,

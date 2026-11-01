@@ -72,6 +72,18 @@ static void Punk_croak_sv(pTHX_ SV *sv) {
 #  define foldEQ(a, b, len) (!ibcmp((a), (b), (len)))
 #endif
 
+/* Perl_isinfnan is 5.22, a function rather than a macro, so only the version
+ * can say whether it is there. x - x is NaN exactly when x is an infinity or
+ * a NaN. punk_plural.h, the i18n count, and the cache and idempotency lock
+ * waits use it to refuse a number that is not finite. */
+#if PERL_REVISION == 5 && PERL_VERSION < 22
+static int Punk_isinfnan(NV x) {
+    NV d = x - x;
+    return d != d;
+}
+#  define Perl_isinfnan(x) Punk_isinfnan(x)
+#endif
+
 /* mPUSHs / mXPUSHs are 5.10.1, one point release above the floor this dist
  * declares. Perl's own definitions. */
 #ifndef mPUSHs

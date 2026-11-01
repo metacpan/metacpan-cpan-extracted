@@ -7,6 +7,11 @@ Revision history for Perl extension Sereal-Decoder
 * to version 6 anywhere in the fleet. Encoder 6 can emit v6     *
 * packets, which require Decoder 6 to read.                     *
 ****************************************************************
+6.003
+    * Fix bundled Snappy builds on Haiku, which has no byteswap.h.
+    * Use portable od arguments in hobodecoder for BusyBox systems and
+      report signal termination correctly in checksum tests.
+
 6.002
     * Keep the Decoder alive when a callback clears its handle variable,
       preventing use-after-free during decoding and cleanup.

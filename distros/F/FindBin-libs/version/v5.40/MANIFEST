@@ -67,12 +67,12 @@ version/v5.40/t/10-Bin-path/05b-Bin-stdin-path.t
 version/v5.40/t/10-Bin-path/05c-Bin-interactive-path.t
 version/v5.40/t/10-Bin-path/06-Bin-abs-path.t
 version/v5.40/t/10-Bin-path/07-Bin-rel-path.t
+version/v5.40/t/10-Bin-path/08-Bin-file-symlink.t
+version/v5.40/t/10-Bin-path/09-Bin-symlink-exec.t
 version/v5.40/t/10-Bin-path/10-cwd-sanity.t
 version/v5.40/t/10-Bin-path/11-Parent-pwd.t
-version/v5.40/t/10-Bin-path/foo/bar
 version/v5.40/t/11-Bin/01-Bin-sanity.t
 version/v5.40/t/11-Bin/02-Bin-abspath.t
-version/v5.40/t/12-Bin_l
 version/v5.40/t/30-list/20-append-list.t
 version/v5.40/t/30-list/21-noappend-list.t
 version/v5.40/t/30-list/22-nonexist-export.t

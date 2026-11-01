@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::rhel v0.999.14;
+package LedgerSMB::Installer::OS::linux::rhel v0.999.15;
 
 use v5.20;
 use experimental qw(signatures);

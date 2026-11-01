@@ -30,6 +30,24 @@ static void _cleanup_arena(pTHX_ void * ptr) {
         infix_arena_destroy((infix_arena_t *)ptr);
 }
 
+/* Lazily create the per-call argument arena.
+ *
+ * Most wrapped calls only marshal scalars, which live in the stack-allocated
+ * args buffer; they never need a heap arena at all. Creating (and promptly
+ * destroying) a 4KB arena for every call used to dominate the cost of a
+ * wrapped call, so the arena is now only built the first time a step actually
+ * needs it. It is released by the enclosing Perl scope, which preserves the
+ * v1.2.4 guarantee that marshalled data cannot outlive its arena accidentally
+ * while still being freed deterministically.
+ */
+static infix_arena_t * _affix_call_args_arena(pTHX_ Affix * affix) {
+    if (UNLIKELY(affix->call_args_arena == nullptr)) {
+        affix->call_args_arena = infix_arena_create(4096);
+        SAVEDESTRUCTOR_X(_cleanup_arena, affix->call_args_arena);
+    }
+    return affix->call_args_arena;
+}
+
 static MGVTBL Affix_cv_vtbl;
 extern MGVTBL vtbl_sint8, vtbl_uint8, vtbl_sint16, vtbl_uint16, vtbl_sint32, vtbl_uint32, vtbl_sint64, vtbl_uint64,
     vtbl_float, vtbl_double, vtbl_float16, vtbl_bool, vtbl_sint128, vtbl_uint128, vtbl_void, vtbl_bitfield,
@@ -1108,7 +1126,7 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
                 align = _Alignof(void *);
             }
 
-            void * temp_slot = infix_arena_alloc(affix->call_args_arena, size, align > 0 ? align : 1);
+            void * temp_slot = infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), size, align > 0 ? align : 1);
             memset(temp_slot, 0, size);
             *(void **)c_arg_ptr = temp_slot;
             return;
@@ -1157,8 +1175,8 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
                 (inner_pointee_type->meta.primitive_id == INFIX_PRIMITIVE_SINT8 ||
                  inner_pointee_type->meta.primitive_id == INFIX_PRIMITIVE_UINT8)) {
                 if (SvPOK(rv)) {
-                    char ** ptr_slot =
-                        (char **)infix_arena_alloc(affix->call_args_arena, sizeof(char *), _Alignof(char *));
+                    char ** ptr_slot = (char **)infix_arena_alloc(
+                        _affix_call_args_arena(aTHX_ affix), sizeof(char *), _Alignof(char *));
                     *ptr_slot = SvPV_nolen(rv);
                     *(void **)c_arg_ptr = ptr_slot;
                     return;
@@ -1172,7 +1190,8 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
             if (element_size > 0 && len > SIZE_MAX / element_size)
                 croak("Array size overflow: %zu elements * %zu bytes", len, element_size);
             size_t total_size = len * element_size;
-            char * c_array = (char *)infix_arena_alloc(affix->call_args_arena, total_size, _Alignof(void *));
+            char * c_array =
+                (char *)infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), total_size, _Alignof(void *));
             if (!c_array)
                 croak("Failed to allocate from arena for array marshalling");
             memset(c_array, 0, total_size);
@@ -1193,8 +1212,9 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
             : pointee_type;
         if (!copy_type)
             return;
-        void * dest_c_ptr = infix_arena_alloc(
-            affix->call_args_arena, infix_type_get_size(copy_type), infix_type_get_alignment(copy_type));
+        void * dest_c_ptr =
+            infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), infix_type_get_size(copy_type),
+                              infix_type_get_alignment(copy_type));
         SV * sv_to_marshal = (SvTYPE(rv) == SVt_PVHV) ? sv : rv;
         sv2ptr(aTHX_ affix, sv_to_marshal, dest_c_ptr, copy_type);
         *(void **)c_arg_ptr = dest_c_ptr;
@@ -1218,7 +1238,8 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
             U8 * s = (U8 *)SvPVutf8(sv, wlen);
             U8 * e = s + wlen;
             size_t el_sz = sizeof(wchar_t);
-            wchar_t * wbuf = (wchar_t *)infix_arena_alloc(affix->call_args_arena, (wlen + 1) * el_sz, el_sz);
+            wchar_t * wbuf =
+                (wchar_t *)infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), (wlen + 1) * el_sz, el_sz);
             wchar_t * d = wbuf;
             while (s < e) {
                 STRLEN rlen;
@@ -1307,7 +1328,7 @@ static void plan_step_push_array(pTHX_ Affix * affix,
         size_t fixed_len = type->meta.array_info.num_elements;
         size_t alloc_len = (fixed_len > 0) ? fixed_len : len + 1;  // +1 for null if dynamic
 
-        void * temp_array = infix_arena_alloc(affix->call_args_arena, alloc_len, 1);
+        void * temp_array = infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), alloc_len, 1);
         if (!temp_array)
             croak("Failed to allocate memory for array argument");
 
@@ -1339,8 +1360,8 @@ static void plan_step_push_array(pTHX_ Affix * affix,
 
 
     // Allocate transient memory in the args_arena
-    void * temp_array = infix_arena_alloc(
-        affix->call_args_arena, total_size > 0 ? total_size : 1, infix_type_get_alignment(element_type));
+    void * temp_array = infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), total_size > 0 ? total_size : 1,
+                                          infix_type_get_alignment(element_type));
     if (!temp_array)
         croak("Failed to allocate memory for array argument");
 
@@ -1799,14 +1820,12 @@ static void rebuild_affix_data(pTHX_ Affix * affix);
             }                                                                                                   \
         }                                                                                                       \
                                                                                                                 \
-        affix->call_args_arena = infix_arena_create(4096);                                                      \
-        affix->call_ret_arena = infix_arena_create(1024);                                                       \
-        SAVEDESTRUCTOR_X(_cleanup_arena, affix->call_args_arena);                                               \
-        SAVEDESTRUCTOR_X(_cleanup_arena, affix->call_ret_arena);                                                \
+        /* The argument arena is built on demand by _affix_call_args_arena().
+         * Resetting it here also drops any pointer left over from an earlier
+         * call whose scope has already released it. */                                                      \
+        affix->call_args_arena = nullptr;                                                                       \
                                                                                                                 \
         /* ALLOCATION STRATEGY */                                                                               \
-        infix_arena_mark_t args_mark = infix_arena_get_mark(affix->call_args_arena);                            \
-        infix_arena_mark_t ret_mark = infix_arena_get_mark(affix->call_ret_arena);                              \
         void * args_buffer;                                                                                     \
         if (USE_STACK_ALLOC && affix->total_args_size <= 2048) {                                                \
             /* Fast path: Stack allocation if under 2k */                                                       \
@@ -1815,7 +1834,7 @@ static void rebuild_affix_data(pTHX_ Affix * affix);
         }                                                                                                       \
         else {                                                                                                  \
             /* Slow path: Arena allocation */                                                                   \
-            args_buffer = infix_arena_calloc(affix->call_args_arena, 1, affix->total_args_size, 64);            \
+            args_buffer = infix_arena_calloc(_affix_call_args_arena(aTHX_ affix), 1, affix->total_args_size, 64);\
         }                                                                                                       \
                                                                                                                 \
         size_t c_args_alloc_size = affix->num_args * sizeof(void *);                                            \
@@ -1828,10 +1847,21 @@ static void rebuild_affix_data(pTHX_ Affix * affix);
         }                                                                                                       \
         memset(c_args, 0, c_args_alloc_size);                                                                   \
                                                                                                                 \
+        size_t ret_size = affix->ret_type->size;                                                                \
         size_t ret_align = affix->ret_type->alignment;                                                          \
         if (ret_align < 1)                                                                                      \
             ret_align = 1;                                                                                      \
-        void * ret_buffer = infix_arena_calloc(affix->call_ret_arena, 1, affix->ret_type->size, ret_align);     \
+        void * ret_buffer;                                                                                      \
+        if (ret_size <= 2048) {                                                                                 \
+            char * raw = (char *)AFFIX_ALLOCA(ret_size + ret_align);                                            \
+            UV addr = PTR2UV(raw);                                                                              \
+            addr = ((addr + (UV)ret_align - 1) / (UV)ret_align) * (UV)ret_align;                                \
+            ret_buffer = INT2PTR(void *, addr);                                                                 \
+            memset(ret_buffer, 0, ret_size);                                                                    \
+        }                                                                                                       \
+        else {                                                                                                  \
+            ret_buffer = infix_arena_calloc(_affix_call_args_arena(aTHX_ affix), 1, ret_size, ret_align);       \
+        }                                                                                                       \
                                                                                                                 \
         DEFINE_DISPATCH_TABLE();                                                                                \
                                                                                                                 \
@@ -2000,7 +2030,8 @@ CASE_OP_PUSH_PTR_WCHAR:                                                         
                 U8 * s = (U8 *)SvPVutf8(sv, len);                                                               \
                 U8 * e = s + len;                                                                               \
                 size_t el_sz = sizeof(wchar_t);                                                                 \
-                wchar_t * wbuf = (wchar_t *)infix_arena_alloc(affix->call_args_arena, (len + 1) * el_sz, el_sz);\
+                wchar_t * wbuf =                                                                                \
+                    (wchar_t *)infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), (len + 1) * el_sz, el_sz);\
                 wchar_t * d = wbuf;                                                                             \
                 while (s < e) {                                                                                 \
                     STRLEN rlen;                                                                                \
@@ -2177,8 +2208,6 @@ CASE_OP_DONE:                                                                   
                     info->writer(aTHX_ affix, info, arg_sv, c_args[info->perl_stack_index]);                    \
             }                                                                                                   \
         }                                                                                                       \
-        infix_arena_rewind(affix->call_args_arena, args_mark);                                                  \
-        infix_arena_rewind(affix->call_ret_arena, ret_mark);                                                    \
                                                                                                                 \
         ST(0) = TARG;                                                                                           \
         XSRETURN(1);                                                                                            \
@@ -2334,7 +2363,6 @@ static int Affix_cv_dup(pTHX_ MAGIC * mg, CLONE_PARAMS * param) {
     new_affix->args_arena = nullptr;
     new_affix->ret_arena = nullptr;
     new_affix->call_args_arena = nullptr;
-    new_affix->call_ret_arena = nullptr;
     new_affix->c_args = nullptr;
     new_affix->plan = nullptr;
     new_affix->out_param_info = nullptr;
@@ -2523,11 +2551,8 @@ void Affix_trigger_variadic(pTHX_ CV * cv) {
         croak("Affix: internal error, negative argument count");
     size_t items = (size_t)items_raw;
 
-    /* Fiber-safe arena setup (see GENERATE_TRIGGER_XSUB for rationale) */
-    affix->call_args_arena = infix_arena_create(4096);
-    affix->call_ret_arena = infix_arena_create(1024);
-    SAVEDESTRUCTOR_X(_cleanup_arena, affix->call_args_arena);
-    SAVEDESTRUCTOR_X(_cleanup_arena, affix->call_ret_arena);
+    /* The call arena is built on demand (see _affix_call_args_arena). */
+    affix->call_args_arena = nullptr;
 
     // Build the dynamic signature string
     SV * sig_sv = sv_2mortal(newSVpv("", 0));
@@ -2536,9 +2561,6 @@ void Affix_trigger_variadic(pTHX_ CV * cv) {
     // Copy the fixed portion of the signature exactly as defined
     sv_catpvn(sig_sv, affix->sig_str, (semi_ptr - affix->sig_str));
     sv_catpvs(sig_sv, ";");
-
-    infix_arena_mark_t args_mark = infix_arena_get_mark(affix->call_args_arena);
-    infix_arena_mark_t ret_mark = infix_arena_get_mark(affix->call_ret_arena);
 
     // Coerce variadic arguments into types
     for (size_t i = affix->num_fixed_args; i < items; ++i) {
@@ -2624,20 +2646,30 @@ void Affix_trigger_variadic(pTHX_ CV * cv) {
     size_t ret_size = infix_type_get_size(variadic_ret_type);
     if (ret_size < sizeof(void *))
         ret_size = sizeof(void *);
-    void * ret_buffer = infix_arena_alloc(affix->call_ret_arena, ret_size, 8);
+    size_t ret_align = infix_type_get_alignment(variadic_ret_type);
+    if (ret_align < 1)
+        ret_align = 1;
+    void * ret_buffer;
+    if (ret_size <= 2048) {
+        char * raw = (char *)AFFIX_ALLOCA(ret_size + ret_align);
+        UV addr = PTR2UV(raw);
+        addr = ((addr + (UV)ret_align - 1) / (UV)ret_align) * (UV)ret_align;
+        ret_buffer = INT2PTR(void *, addr);
+        memset(ret_buffer, 0, ret_size);
+    }
+    else {
+        ret_buffer = infix_arena_calloc(_affix_call_args_arena(aTHX_ affix), 1, ret_size, ret_align);
+    }
 
     for (size_t i = 0; i < items; ++i) {
         const infix_type * arg_type = infix_forward_get_arg_type(trampoline, i);
-        void * data = infix_arena_alloc(affix->call_args_arena, infix_type_get_size(arg_type), 8);
+        void * data = infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), infix_type_get_size(arg_type), 8);
         sv2ptr(aTHX_ affix, ST(i), data, arg_type);
         c_args[i] = data;
     }
 
     infix_forward_get_code(trampoline)(ret_buffer, c_args);
     ptr2sv(aTHX_ affix, ret_buffer, TARG, infix_forward_get_return_type(trampoline), affix->ret_readonly);
-
-    infix_arena_rewind(affix->call_args_arena, args_mark);
-    infix_arena_rewind(affix->call_ret_arena, ret_mark);
 
     ST(0) = TARG;
     XSRETURN(1);
@@ -3727,7 +3759,8 @@ static void push_stringlist(pTHX_ Affix * affix, SV * sv, void * c_arg_ptr) {
 
     // Allocate array of pointers + 1 for nullptr terminator
     // We use the args_arena so this memory is automatically freed after the call
-    char ** list = (char **)infix_arena_alloc(affix->call_args_arena, (len + 1) * sizeof(char *), _Alignof(char *));
+    char ** list = (char **)infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), (len + 1) * sizeof(char *),
+                                              _Alignof(char *));
 
     for (size_t i = 0; i < len; ++i) {
         SV ** elem = av_fetch(av, i, 0);
@@ -3735,7 +3768,7 @@ static void push_stringlist(pTHX_ Affix * affix, SV * sv, void * c_arg_ptr) {
             STRLEN slen;
             const char * s = SvPV(*elem, slen);
             // Copy string content to arena to ensure stability
-            char * buf = (char *)infix_arena_alloc(affix->call_args_arena, slen + 1, 1);
+            char * buf = (char *)infix_arena_alloc(_affix_call_args_arena(aTHX_ affix), slen + 1, 1);
             memcpy(buf, s, slen + 1);
             list[i] = buf;
         }
@@ -5515,7 +5548,7 @@ XS_INTERNAL(Affix_memchr) {
     }
     int val = (int)SvIV(ST(1));
     size_t n = (size_t)SvUV(ST(2));
-    void * res = memchr(ptr, val, n);
+    void * res = (void*) memchr(ptr, val, n);
     if (res) {
         SV * sv = newSV(0);
         SV * owner = _borrow_lifeline(aTHX_ ST(0));

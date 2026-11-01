@@ -1069,7 +1069,7 @@ Steven Lembark, Workhorse Computing <lembark@wrkhors.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003-2024, Steven Lembark, Workhorse Computing.
+Copyright (C) 2003-2027, Steven Lembark, Workhorse Computing.
 
 =head1 LICENSE
 

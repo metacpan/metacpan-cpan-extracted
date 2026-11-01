@@ -40,6 +40,7 @@ t/modules-used.t
 t/multiple.t
 t/no404s.t
 t/noplan.t
+t/page-escaping.t
 t/palette.t
 t/pie.t
 t/pod-cm.t

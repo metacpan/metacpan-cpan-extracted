@@ -189,8 +189,7 @@ struct Affix {
     infix_forward_t * infix;          ///< Handle to the infix trampoline and type info.
     infix_arena_t * args_arena;       ///< Persistent arena for type data (init-time only).
     infix_arena_t * ret_arena;        ///< Persistent arena for return type data (init-time only).
-    infix_arena_t * call_args_arena;  ///< Per-call temp arena for arguments (fiber-safe: not restored via SAVEVPTR).
-    infix_arena_t * call_ret_arena;   ///< Per-call temp arena for return value (fiber-safe: not restored via SAVEVPTR).
+    infix_arena_t * call_args_arena;  ///< Per-call temp arena for arguments, created on demand (fiber-safe: not restored via SAVEVPTR).
     infix_cif_func cif;               ///< A direct function pointer to the JIT-compiled trampoline code.
     infix_library_t * lib_handle;     ///< If affix() loaded a library itself, stores the handle for cleanup.
     SV * return_sv;                   ///< Pre-allocated, reusable SV to hold the return value.

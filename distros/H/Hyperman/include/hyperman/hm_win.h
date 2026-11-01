@@ -38,6 +38,40 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+
+/* An older mingw-w64 (Strawberry 5.24's gcc 4.9) leaves _WIN32_WINNT at XP,
+ * and its headers then hide what Vista added: WSAPoll and its struct,
+ * AI_NUMERICSERV, inet_ntop and inet_pton. ws2_32 has exported them all
+ * since Vista, so they are declared here when the headers did not. Raising
+ * _WIN32_WINNT instead is too late: perl.h has included them already. */
+#ifndef POLLRDNORM
+typedef struct hm_wsapollfd {
+    SOCKET fd;
+    SHORT  events;
+    SHORT  revents;
+} WSAPOLLFD, *LPWSAPOLLFD;
+#define POLLRDNORM 0x0100
+#define POLLRDBAND 0x0200
+#define POLLPRI    0x0400
+#define POLLWRNORM 0x0010
+#define POLLWRBAND 0x0020
+#define POLLERR    0x0001
+#define POLLHUP    0x0002
+#define POLLNVAL   0x0004
+#define POLLIN     (POLLRDNORM | POLLRDBAND)
+#define POLLOUT    POLLWRNORM
+WINSOCK_API_LINKAGE int WSAAPI WSAPoll(LPWSAPOLLFD fdArray, ULONG fds, INT timeout);
+#endif
+#ifndef AI_NUMERICSERV
+#define AI_NUMERICSERV 0x00000008
+#endif
+#if defined(__MINGW32__) && defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0600 \
+    && !defined(inet_ntop)
+WINSOCK_API_LINKAGE const char * WSAAPI inet_ntop(INT af, const void *src,
+                                                  char *dst, size_t size);
+WINSOCK_API_LINKAGE INT WSAAPI inet_pton(INT af, const char *src, void *dst);
+#endif
 
 #ifndef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS

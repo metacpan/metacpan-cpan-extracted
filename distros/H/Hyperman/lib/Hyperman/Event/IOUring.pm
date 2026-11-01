@@ -3,7 +3,7 @@ package Hyperman::Event::IOUring;
 use strict;
 use warnings;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 require Hyperman;   # loads the shared XS (available())
 

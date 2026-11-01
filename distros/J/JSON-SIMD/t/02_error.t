@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..58\n"; }
+BEGIN { $| = 1; print "1..70\n"; }
 
 use utf8;
 use JSON::SIMD;
@@ -42,6 +42,13 @@ eval { JSON::SIMD->new->use_simdjson(0)->decode ([]) }; ok $@ =~ /malformed/;
 eval { JSON::SIMD->new->use_simdjson(0)->decode (\*STDERR) }; ok $@ =~ /malformed/;
 eval { JSON::SIMD->new->use_simdjson(0)->decode (*STDERR) }; ok !!$@; # cannot coerce GLOB
 
+eval { JSON::SIMD->new->use_simdjson(0)->decode ('1.e1') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->use_simdjson(0)->decode ('1.2e') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->use_simdjson(0)->decode ('1.2e-') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->use_simdjson(0)->decode ('1.2e+') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->use_simdjson(0)->decode ('.2e1') }; ok $@ =~ /malformed JSON/;
+eval { JSON::SIMD->new->use_simdjson(0)->decode ('--1.2e1') }; ok $@ =~ /malformed number/;
+
 eval { decode_json ("\"\xa0") }; ok $@ =~ /UNCLOSED_STRING/;
 eval { decode_json ("\"\xa0\"") }; ok $@ =~ /UTF8_ERROR/;
 eval { decode_json ("1\x01") }; ok $@ =~ /garbage after/;
@@ -77,3 +84,10 @@ eval { JSON::SIMD->new->decode (\5) }; ok !!$@; # Can't coerce readonly
 eval { JSON::SIMD->new->decode ([]) }; ok $@ =~ /improper structure/;
 eval { JSON::SIMD->new->decode (\*STDERR) }; ok $@ =~ /improper structure/;
 eval { JSON::SIMD->new->decode (*STDERR) }; ok !!$@; # cannot coerce GLOB
+
+eval { JSON::SIMD->new->decode ('1.e1') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->decode ('1.2e') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->decode ('1.2e-') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->decode ('1.2e+') }; ok $@ =~ /malformed number/;
+eval { JSON::SIMD->new->decode ('.2e1') }; ok $@ =~ /improper structure/;
+eval { JSON::SIMD->new->decode ('--1.2e1') }; ok $@ =~ /malformed number/;

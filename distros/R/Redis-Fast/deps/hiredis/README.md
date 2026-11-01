@@ -23,6 +23,18 @@ Redis version >= 1.2.0.
 The library comes with multiple APIs. There is the
 *synchronous API*, the *asynchronous API* and the *reply parsing API*.
 
+## Windows support
+
+**Windows is not an officially supported platform.** Hiredis is developed and tested on Unix-like
+systems (Linux, macOS, BSD). Windows compatibility code has been contributed by the community over
+the years and is provided on a best-effort basis only.
+
+There are known incompatibilities when building and running hiredis on Windows, including
+security vulnerabilities.
+Use hiredis on Windows at your own risk. Known Windows-specific issues are tracked under the
+[`windows-compatibility`](https://github.com/redis/hiredis/issues?q=is%3Aissue%20label%3Awindows-compatibility)
+label.
+
 ## Upgrading to > 1.2.0 (**PRERELEASE**)
 
 * After v1.2.0 we modified how we invoke `poll(2)` to wait for connections to complete, such that we will now retry
@@ -636,6 +648,16 @@ with more than this many elements you can set the value higher or to zero, meani
 unlimited with:
 ```c
 context->reader->maxelements = 0;
+```
+
+### Reader max nesting depth
+
+By default the hiredis reply parser limits nested aggregate replies to a depth
+of `REDIS_READER_MAX_REPLY_DEPTH` (currently 1024). If you need to process
+replies nested more deeply, you can increase the value or set it to zero,
+meaning unlimited with:
+```c
+context->reader->maxdepth = 0;
 ```
 
 ## SSL/TLS Support

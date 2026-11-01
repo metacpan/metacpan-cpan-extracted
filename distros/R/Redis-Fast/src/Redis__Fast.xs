@@ -53,6 +53,7 @@ typedef struct redis_fast_s {
     SV* on_build_sock;
     SV* data;
     SV* reconnect_on_error;
+    SV* subscription_cb;
     double next_reconnect_on_error_at;
     int proccess_sub_count;
     int is_subscriber;
@@ -87,11 +88,6 @@ typedef struct redis_fast_async_cb_s {
     const void* command_name;
     STRLEN command_length;
 } redis_fast_async_cb_t;
-
-typedef struct redis_fast_subscribe_cb_s {
-    Redis__Fast self;
-    SV* cb;
-} redis_fast_subscribe_cb_t;
 
 
 #define WAIT_FOR_READ  0x01
@@ -334,6 +330,8 @@ static redisAsyncContext* __build_sock(pTHX_ Redis__Fast self)
             .private_key_filename = NULL,
             .server_name          = self->hostname,
             .verify_mode          = self->ssl_verify_mode,
+            /* server_name is only used for SNI; verify_name makes the peer certificate match the hostname */
+            .verify_name          = (self->ssl_verify_mode & REDIS_SSL_VERIFY_PEER) ? self->hostname : NULL,
         };
         ssl_context = redisCreateSSLContextWithOptions(&options, &ssl_error);
 
@@ -484,7 +482,8 @@ static redis_fast_reply_t Redis__Fast_decode_reply(pTHX_ Redis__Fast self, redis
         res.result = &PL_sv_undef;
         break;
 
-    case REDIS_REPLY_ARRAY: {
+    case REDIS_REPLY_ARRAY:
+    case REDIS_REPLY_PUSH: {
         AV* av = newAV();
         size_t i;
         res.result = sv_2mortal(newRV_noinc((SV*)av));
@@ -695,21 +694,31 @@ static void Redis__Fast_async_reply_cb(redisAsyncContext* c, void* reply, void* 
     Safefree(cbt);
 }
 
+/*
+ * The callback for subscriptions doesn't own any private data.
+ * hiredis keeps the callback of a channel until all of its pending subscriptions are confirmed,
+ * and the server decides when that happens, so we can't tell when hiredis drops it.
+ * The Perl callback is held by self->subscription_cb instead.
+ */
 static void Redis__Fast_subscribe_cb(redisAsyncContext* c, void* reply, void* privdata) {
     dTHX;
 
-    int is_need_free = 0;
     Redis__Fast self = (Redis__Fast)c->data;
-    redis_fast_subscribe_cb_t *cbt = (redis_fast_subscribe_cb_t*)privdata;
     redisReply* r = (redisReply*)reply;
+    PERL_UNUSED_VAR(privdata);
 
     DEBUG_MSG("%s", "start");
-    if(!cbt) {
-        DEBUG_MSG("%s", "cbt is empty finished");
-        return ;
+    if (!r) {
+        DEBUG_MSG("connect error: %s", c->errstr);
+        return;
+    }
+    /* subscription replies are arrays in RESP2 and pushes in RESP3 */
+    if ((r->type != REDIS_REPLY_ARRAY && r->type != REDIS_REPLY_PUSH) || r->elements < 3 || r->element[0]->type != REDIS_REPLY_STRING) {
+        DEBUG_MSG("%s", "unexpected reply");
+        return;
     }
 
-    if (r) {
+    {
         char* stype = r->element[0]->str;
         int pvariant = (tolower(stype[0]) == 'p') ? 1 : 0;
         redis_fast_reply_t res;
@@ -727,7 +736,6 @@ static void Redis__Fast_subscribe_cb(redisAsyncContext* c, void* reply, void* pr
         } else if (strcasecmp(stype+pvariant,"unsubscribe") == 0) {
             DEBUG_MSG("%s %s %lld", r->element[0]->str, r->element[1]->str, r->element[2]->integer);
             self->is_subscriber = r->element[2]->integer;
-            is_need_free = 1;
             self->expected_subs--;
         } else {
             DEBUG_MSG("%s %s", r->element[0]->str, r->element[1]->str);
@@ -737,28 +745,17 @@ static void Redis__Fast_subscribe_cb(redisAsyncContext* c, void* reply, void* pr
         if(res.result == NULL) res.result = &PL_sv_undef;
         if(res.error == NULL) res.error = &PL_sv_undef;
 
-        PUSHMARK(SP);
-        XPUSHs(res.result);
-        XPUSHs(res.error);
-        PUTBACK;
+        if (self->subscription_cb) {
+            PUSHMARK(SP);
+            XPUSHs(res.result);
+            XPUSHs(res.error);
+            PUTBACK;
 
-        call_sv(cbt->cb, G_DISCARD);
+            call_sv(self->subscription_cb, G_DISCARD);
+        }
 
         FREETMPS;
         LEAVE;
-    } else {
-        DEBUG_MSG("connect error: %s", c->errstr);
-        is_need_free = 1;
-    }
-
-    if(is_need_free) {
-        // destroy private data
-        DEBUG_MSG("destroy %p", cbt);
-        if(cbt->cb) {
-            SvREFCNT_dec(cbt->cb);
-            cbt->cb = NULL;
-        }
-        Safefree(cbt);
     }
     DEBUG_MSG("%s", "finish");
 }
@@ -950,8 +947,11 @@ static redis_fast_reply_t Redis__Fast_info_custom_decode(pTHX_ Redis__Fast self,
             if(line == NULL) {
                 break;
             } else {
-                len -= linelen + 2;
-                str += linelen + 2;
+                // skip "\r" and the following "\n", without going past the end of the reply
+                size_t skip = linelen + 1;
+                if(skip < len && str[skip] == '\n') skip++;
+                len -= skip;
+                str += skip;
             }
         }
     } else {
@@ -976,6 +976,7 @@ CODE:
     self->reconnect_on_error = NULL;
     self->next_reconnect_on_error_at = -1;
     self->is_connected = 1;
+    self->ssl_verify_mode = REDIS_SSL_VERIFY_PEER;
     ST(0) = sv_newmortal();
     sv_setref_pv(ST(0), cls, (void*)self);
     DEBUG_MSG("return %p", ST(0));
@@ -1197,26 +1198,12 @@ OUTPUT:
     RETVAL
 
 int
-__set_ssl_verify_mode(Redis::Fast self, char* verify_mode)
+__set_ssl_verify_mode(Redis::Fast self, int verify_mode)
 CODE:
 {
-    if (verify_mode != NULL) {
-        DEBUG_MSG("SSL verify mode: %s", verify_mode);
-        if (strcmp(verify_mode, "SSL_VERIFY_NONE") == 0 ) {
-            RETVAL = self->ssl_verify_mode = REDIS_SSL_VERIFY_NONE;
-        } else if (strcmp(verify_mode, "SSL_VERIFY_PEER") == 0 ) {
-            RETVAL = self->ssl_verify_mode = REDIS_SSL_VERIFY_PEER;
-        } else if (strcmp(verify_mode, "SSL_VERIFY_FAIL_IF_NO_PEER_CERT") == 0 ) {
-            RETVAL = self->ssl_verify_mode = REDIS_SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
-        } else if (strcmp(verify_mode, "SSL_VERIFY_CLIENT_ONCE") == 0 ) {
-            RETVAL = self->ssl_verify_mode = REDIS_SSL_VERIFY_CLIENT_ONCE;
-        } else {
-            DEBUG_MSG("Invalid SSL verify mode (%s), setting SSL_VERIFY_PEER", verify_mode);
-            RETVAL = self->ssl_verify_mode = REDIS_SSL_VERIFY_PEER;
-        }
-    } else {
-        RETVAL = self->ssl_verify_mode = REDIS_SSL_VERIFY_PEER;
-    }
+    /* REDIS_SSL_VERIFY_* have the same values as OpenSSL's SSL_VERIFY_* (and IO::Socket::SSL's constants) */
+    DEBUG_MSG("SSL verify mode: %d", verify_mode);
+    RETVAL = self->ssl_verify_mode = verify_mode;
 }
 OUTPUT:
     RETVAL
@@ -1264,6 +1251,12 @@ CODE:
         DEBUG_MSG("%s", "free on_connect");
         SvREFCNT_dec(self->on_connect);
         self->on_connect = NULL;
+    }
+
+    if(self->subscription_cb) {
+        DEBUG_MSG("%s", "free subscription_cb");
+        SvREFCNT_dec(self->subscription_cb);
+        self->subscription_cb = NULL;
     }
 
     if(self->on_build_sock) {
@@ -1556,8 +1549,7 @@ PREINIT:
     size_t* argvlen;
     STRLEN len;
     int argc, i;
-    redis_fast_subscribe_cb_t* cbt;
-    int pvariant;
+    int pvariant, is_unsubscribe;
 CODE:
 {
     int cnt = (self->reconnect == 0 ? 1 : 2);
@@ -1588,19 +1580,17 @@ CODE:
         DEBUG_MSG("argv[%d] = %s", i, argv[i]);
     }
 
+    pvariant = tolower(argv[0][0]) == 'p';
+    is_unsubscribe = strcasecmp(argv[0]+pvariant,"unsubscribe") == 0;
+    if (!is_unsubscribe && cb) {
+        SV* old = self->subscription_cb;
+        self->subscription_cb = SvREFCNT_inc(cb);
+        if (old) SvREFCNT_dec(old);
+    }
+
     for(i = 0; i < cnt; i++) {
-        pvariant = tolower(argv[0][0]) == 'p';
-        if (strcasecmp(argv[0]+pvariant,"unsubscribe") != 0) {
-            DEBUG_MSG("%s", "command is not unsubscribe");
-            Newx(cbt, sizeof(redis_fast_subscribe_cb_t), redis_fast_subscribe_cb_t);
-            cbt->self = self;
-            cbt->cb = SvREFCNT_inc(cb);
-        } else {
-            DEBUG_MSG("%s", "command is unsubscribe");
-            cbt = NULL;
-        }
         redisAsyncCommandArgv(
-            self->ac, cbt ? Redis__Fast_subscribe_cb : NULL, cbt,
+            self->ac, is_unsubscribe ? NULL : Redis__Fast_subscribe_cb, NULL,
             argc, (const char**)argv, argvlen
             );
         self->expected_subs = argc - 1;

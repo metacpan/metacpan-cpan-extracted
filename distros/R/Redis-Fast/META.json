@@ -29,6 +29,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0.10",
             "File::Which" : "0",
             "Module::Build" : "0.4005",
             "Module::Build::XSUtil" : "0.02"
@@ -49,7 +50,7 @@
          "requires" : {
             "Time::HiRes" : "1.77",
             "Try::Tiny" : "0",
-            "perl" : "5.014000"
+            "perl" : "5.024000"
          }
       },
       "test" : {
@@ -70,7 +71,7 @@
    "provides" : {
       "Redis::Fast" : {
          "file" : "lib/Redis/Fast.pm",
-         "version" : "0.39"
+         "version" : "0.40"
       },
       "Redis::Fast::Hash" : {
          "file" : "lib/Redis/Fast/Hash.pm"
@@ -94,7 +95,7 @@
          "web" : "https://github.com/shogo82148/Redis-Fast"
       }
    },
-   "version" : "0.39",
+   "version" : "0.40",
    "x_contributors" : [
       "Aaron Crane <arc@aaroncrane.co.uk>",
       "Aaron Crane <arc@cpan.org>",

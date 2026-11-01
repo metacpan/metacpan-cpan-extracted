@@ -529,23 +529,51 @@ static AV *pmj_rows(pTHX_ SV *self) {
 
 typedef struct { int fd; } pmj_lock;
 
+/* The lock is fcntl's on every POSIX system and flock only on Windows, where
+ * perl emulates flock and there is no F_SETLKW. Solaris has no flock(2), so
+ * HAS_FLOCK is undefined there and a flock-only lock compiled to nothing: four
+ * forked writers kept about half of 100 rows (CPAN Testers, Punk 0.66). An
+ * fcntl lock belongs to the process and goes when it closes the descriptor,
+ * which is all this needs: the lock file is opened here and nowhere else. */
+#if defined(F_SETLKW) && !defined(WIN32)
+#  define PMJ_LOCK_FCNTL
+#elif defined(HAS_FLOCK) && defined(LOCK_EX)
+#  define PMJ_LOCK_FLOCK
+#endif
+
 static void pmj_lock_take(pTHX_ const char *path, pmj_lock *l) {
     SV *lp = sv_2mortal(newSVpvf("%s.lock", path));
     l->fd = PerlLIO_open3(SvPV_nolen(lp), O_RDWR | O_CREAT, 0644);
     if (l->fd < 0)
         croak(PMJ ": cannot open %s: %s", SvPV_nolen(lp), Strerror(errno));
-#if defined(HAS_FLOCK) && defined(LOCK_EX)
+#if defined(PMJ_LOCK_FCNTL)
+    {
+        struct flock fl;
+        Zero(&fl, 1, struct flock);
+        fl.l_type   = F_WRLCK;
+        fl.l_whence = SEEK_SET;
+        while (fcntl(l->fd, F_SETLKW, &fl) < 0) {
+            if (errno == EINTR) continue;
+            PerlLIO_close(l->fd);
+            croak(PMJ ": cannot lock %s: %s", SvPV_nolen(lp), Strerror(errno));
+        }
+    }
+#elif defined(PMJ_LOCK_FLOCK)
     while (flock(l->fd, LOCK_EX) < 0) {
         if (errno == EINTR) continue;
         PerlLIO_close(l->fd);
         croak(PMJ ": cannot lock %s: %s", SvPV_nolen(lp), Strerror(errno));
     }
+#else
+    PerlLIO_close(l->fd);
+    croak(PMJ ": no file locking on this system, so %s cannot be written "
+               "safely", path);
 #endif
 }
 
 static void pmj_lock_drop(pmj_lock *l) {
     if (l->fd >= 0) {
-#if defined(HAS_FLOCK) && defined(LOCK_UN)
+#if defined(PMJ_LOCK_FLOCK)
         (void)flock(l->fd, LOCK_UN);
 #endif
         PerlLIO_close(l->fd);

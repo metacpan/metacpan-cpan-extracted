@@ -1,3 +1,39 @@
+-   5.1.5 Sat Oct 31 22:50:37 EDT 2026
+
+    Makefile.PL postamble hooks pure_all instead of test so that
+    install-tests runs before the harness discovers test files,
+    not after.
+
+    Add t/10-Bin-path/11-Parent-pwd.t: tests for the 'pwd' sentinel
+    in FindBin::Parents::dir_paths.
+
+    Update abspath/noabspath tests to match current Bin.pm behavior
+    (physical path default).
+
+    Fix multi_config_dir example: List::Util (not Scalar::Util) exports
+    first(); add missing closing quote in string literal.
+
+    Update find_ld_dirs example POD for physical-path default.
+
+    Copyright updated to 2003-2027 across version/* files.
+
+    Sweep all source files: replace UTF-8 characters in comments
+    with plain ASCII (C language text semantics).
+
+-   5.1.4 Sat Oct 31 19:30:30 EDT 2026
+
+    Cleaner extraction of $Bin_p. Catch is that rel2abs behaves
+    entirely differently with absolute and relative paths. 
+
+-   5.1.3 Sat Oct 31 19:30:30 EDT 2026
+
+    Dodge one more edge case with absolute paths for $0. 
+
+-   5.1.2 Sat Oct 31 14:15:57 EDT 2026
+
+    Bug in Bin.pm that didn't handle symlinked executables 
+    properly for the physical path; added tests. 
+
 -   5.1.1 Fri Oct 30 18:38:09 EDT 2026
 
     Bin uses abspath/noabspath to match libs for export of Bin. 

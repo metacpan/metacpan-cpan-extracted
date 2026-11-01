@@ -5,6 +5,8 @@ use warnings;
 use Test::More;
 use Punk::Queue;
 use FindBin ();
+use File::Spec ();
+use File::Temp ();
 use lib "$FindBin::Bin/lib";
 use PQTest;
 
@@ -19,6 +21,17 @@ plan skip_all => 'Time::Keeper::Recurrence is not installed'
 plan skip_all => 'PUNK_QUEUE_NO_RECURRENCE is set' if $ENV{PUNK_QUEUE_NO_RECURRENCE};
 
 my $next = sub { Punk::Queue::Cron->next_after(@_) };
+
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $runs = 0;
+sub child {
+    my ($code) = @_;
+    my $file = File::Spec->catfile($dir, 'child' . ++$runs . '.pl');
+    open my $fh, '>', $file or die "write $file: $!";
+    print $fh "use Punk::Queue;\n$code\n";
+    close $fh;
+    return scalar `"$^X" -Mblib "$file" 2>&1`;
+}
 sub tk { Time::Keeper->new(zone => 'America/New_York', @_)->epoch }
 sub tkr { my ($expr, $from, $zone) = @_; my $t = Time::Keeper::Recurrence->cron($expr, zone => $zone)->next(Time::Keeper->from_epoch($from)); $t ? $t->epoch : undef }
 
@@ -78,16 +91,16 @@ SKIP: {
     like($@, qr/cron tz must be 'UTC', 'local', '\+HHMM' or a time zone name, not 'Narnia\/Lamppost'/, '  naming the choices, zone names among them');
     ok(!eval { Punk::Queue::Cron->check('0 0 30 2 *', 'Asia/Tokyo'); 1 }, 'a spec that can never fire is refused in a zone too');
     like($@, qr/can never fire/, '  in the parser\'s words');
-    my $kept = `"$^X" -Mblib -MPunk::Queue -e "\\\$\@ = q{kept}; Punk::Queue::Cron->check(q{0 3 * * *}, q{Europe/Paris}); print \\\$\@" 2>&1`;
+    my $kept = child(q{$@ = 'kept'; Punk::Queue::Cron->check('0 3 * * *', 'Europe/Paris'); print $@});
     is($kept, 'kept', 'looking for the module the first time leaves the caller\'s $@ alone');
 }
 
 # ---- and without it, nothing changes ------------------------------------------------
 {
     local $ENV{PUNK_QUEUE_NO_RECURRENCE} = 1;
-    my $out = `"$^X" -Mblib -MPunk::Queue -e "eval { Punk::Queue::Cron->check(q{0 3 * * *}, q{America/New_York}) }; print \\\$\@" 2>&1`;
+    my $out = child(q{eval { Punk::Queue::Cron->check('0 3 * * *', 'America/New_York') }; print $@});
     like($out, qr/cron tz must be 'UTC', 'local' or '\+HHMM', not 'America\/New_York'/, 'PUNK_QUEUE_NO_RECURRENCE: the built-in parser and its own words');
-    my $utc = `"$^X" -Mblib -MPunk::Queue -e "print Punk::Queue::Cron->next_after(q{0 3 * * *}, 0, q{+0530})" 2>&1`;
+    my $utc = child(q{print Punk::Queue::Cron->next_after('0 3 * * *', 0, '+0530')});
     is($utc, 77400, '  and the built-in zones as before');
 }
 

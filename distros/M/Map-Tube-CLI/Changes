@@ -1,5 +1,9 @@
 Revision history for Map::Tube::CLI
 
+v1.0.2 Sat Oct 31 2026
+       - Added support for Map::Tube::Hannover.
+       - Removed generated files: META.json and META.yml
+
 v1.0.1 Tue Oct 20 2026
       - Map::Tube::CLI now loads only the officially supported maps (the
         list in _supported_maps()) instead of every module found under the

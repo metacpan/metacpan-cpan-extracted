@@ -392,8 +392,8 @@ OBJECT-ORIENTED INTERFACE
         If $enable is false (the default), then "decode" will only accept
         valid JSON texts.
 
-        This option is not compatible with "use_simdjson", and using this
-        option will silently disable simdjson mode.
+        *This option is not compatible with "use_simdjson", and using this
+        option will silently disable simdjson mode.*
 
         Currently accepted extensions are:
 
@@ -459,8 +459,8 @@ OBJECT-ORIENTED INTERFACE
     $json = $json->allow_nonref ([$enable])
     $enabled = $json->get_allow_nonref
         Unlike other boolean options, this option is enabled by default
-        beginning with version 4.0. See "SECURITY CONSIDERATIONS" for the
-        gory details.
+        beginning with (JSON::XS) version 4.0. See "SECURITY CONSIDERATIONS"
+        for the gory details.
 
         If $enable is true (or missing), then the "encode" method can
         convert a non-reference into its corresponding string, number or
@@ -565,6 +565,10 @@ OBJECT-ORIENTED INTERFACE
         Calling this method without any arguments will reset the booleans to
         their default values.
 
+        (Calling "boolean_values" with *one* argument will croak. This is a
+        breaking change with respect to JSON::XS: it used to silently set
+        the true value to undef in that case.)
+
         "get_boolean_values" will return both $false and $true values, or
         the empty list when they are set to the default.
 
@@ -615,6 +619,9 @@ OBJECT-ORIENTED INTERFACE
            # throw an exception because allow_nonref is not enabled
            # so a lone 5 is not allowed.
            $js->decode ('{"a":1, "b":2}');
+
+        *This method is not compatible with "use_simdjson", and using a
+        filter callback will silently disable simdjson mode.*
 
     $json = $json->filter_json_single_key_object ($key [=>
     $coderef->($value)])
@@ -668,6 +675,9 @@ OBJECT-ORIENTED INTERFACE
 
               { __widget__ => $self->{id} }
            }
+
+        *This method is not compatible with "use_simdjson", and using a
+        filter callback will silently disable simdjson mode.*
 
     $json = $json->shrink ([$enable])
     $enabled = $json->get_shrink
@@ -798,10 +808,14 @@ OBJECT-ORIENTED INTERFACE
         nonexistent part of the document.
 
         This method works in both simdjson mode and with the legacy decoder,
-        however, for the latter it doesn't provide any speed or memory
-        advantages.
+        however, for the latter it is emulated by decoding the whole
+        document normally, then dropping the unneeded parts, and thus
+        doesn't provide any speed or memory advantages.
 
 INCREMENTAL PARSING
+    *(The incremental parser is deprecated and will likely be removed in a
+    future release.)*
+
     In some cases, there is the need for incremental parsing of JSON texts.
     While this module always has to keep both JSON text and resulting Perl
     data structure in memory at one time, it does allow you to parse a JSON
@@ -904,6 +918,21 @@ INCREMENTAL PARSING
 
     In reality, hopwever, the parser might continue to read data until a
     length limit is exceeded or it finds a closing bracket.
+
+    See also the section about RFC4627 VS. RFC7159 ("old" vs. "new" JSON),
+    specifically the part about allowing a scalar in the top-level document
+    introduces ambiguity: is the string 12 one JSON document containing the
+    number 12, or two documents, each containing the numbers 1 and 2? This
+    is especially problematic for the incremental parser, where the two
+    digits in the above example may arrive to the parser in separate chunks.
+
+    Therefore, to be safe, since version 1.08 JSON::SIMD requires an
+    explicit allow_nonref(1) setting for the incremental parser to accept a
+    top-level number, "true", "false" or "null".
+
+    (Previous versions, as well as JSON::XS since version 4.00 have accepted
+    such top-level values, because allow_nonref has become the implicit
+    default).
 
   EXAMPLES
     Some examples will make all this clearer. First, a simple example that
@@ -1830,12 +1859,12 @@ THE PERILS OF SETLOCALE
 
 SOME HISTORY
     The idea for this module came in 2023 when I learned about simdjson, and
-    found that one particular language is conspicuously missing from the
+    found that one particular language was conspicuously missing from the
     list of bindings and ports. The impulse to remedy that situation and
     produce a working Perl binding, bringing the latest and greatest
     advances in JSON parsing to Perl users, resulted in this module.
 
-    JSON::XS was chosen as the basis for the fork because I has been using
+    JSON::XS was chosen as the basis for the fork because I have been using
     that module at $work and elsewhere without problems, so preserving
     compatibility with it was seen as an important goal.
 

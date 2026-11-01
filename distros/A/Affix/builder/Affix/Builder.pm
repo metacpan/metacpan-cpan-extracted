@@ -147,7 +147,7 @@ class    #
             ( verbosity => $verbose ),
             ( $jobs ? ( jobs => $jobs ) : () ),
             ( color => -t STDOUT ),
-            lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ],
+            lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ]
         );
         TAP::Harness::Env->create( \%test_args )->runtests( sort map { $_->stringify } find( qr/\.t$/, 't' ) )->has_errors;
     }
@@ -183,7 +183,7 @@ class    #
             register => { script => 'fuzz_register_types.pl', desc => 'Affix::_typedef() — C parser direct', needs_lib => 1 },
             cross    => { script => 'fuzz_cross_boundary.pl', desc => 'Cross-boundary Perl->C->JIT',         needs_lib => 1 },
             compile  => { script => 'fuzz_compile_ok.pl',     desc => 'compile_ok() C compilation',          needs_lib => 1 },
-            shared   => { script => 'fuzz_shared_lib.pl',     desc => 'Compile→load→affix→call→verify ABI',  needs_lib => 1 },
+            shared   => { script => 'fuzz_shared_lib.pl',     desc => 'Compile→load→affix→call→verify ABI',  needs_lib => 1 }
         );
 
         # C fuzz targets (delegate to infix/build.pl)
@@ -193,7 +193,7 @@ class    #
             types      => 'Type generator bugs',
             roundtrip  => 'Type->String->Type consistency',
             trampoline => 'JIT trampoline creation',
-            direct     => 'Direct marshalling JIT',
+            direct     => 'Direct marshalling JIT'
         );
         my $fuzz_dir = path('fuzz');
         die "fuzz/ directory not found\n" unless -d $fuzz_dir;
@@ -223,10 +223,9 @@ class    #
             local $ENV{FUZZ_MAX_ITER} = $iters;
             local $ENV{FUZZ_TIMEOUT}  = $to;
             local $ENV{FUZZ_VERBOSE}  = $verbose_fuzz;
-            my %harness_args
-                = ( ( verbosity => $verbose ), ( color => -t STDOUT ), lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ], );
-            my $harness = TAP::Harness::Env->create( \%harness_args );
-            my $aggr    = $harness->runtests( sort @fuzz_scripts );
+            my %harness_args = ( ( verbosity => $verbose ), ( color => -t STDOUT ), lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ] );
+            my $harness      = TAP::Harness::Env->create( \%harness_args );
+            my $aggr         = $harness->runtests( sort @fuzz_scripts );
             $failures++ if $aggr->has_errors;
             say "";
         }

@@ -17,7 +17,7 @@ subtest '_findLib_ld: safe command execution (C2)' => sub {
     # Malicious input must not execute shell commands.
     # With list-form open, the entire string "-lm; echo INJECTED" is passed as a
     # single argument to ld — never interpreted by a shell.
-    for my $evil ( 'm; echo INJECTED', 'm && touch /tmp/pwned', 'm | cat /etc/passwd', 'm $(id)', 'm`id`', ) {
+    for my $evil ( 'm; echo INJECTED', 'm && touch /tmp/pwned', 'm | cat /etc/passwd', 'm $(id)', 'm`id`' ) {
         ( $out, $err, $exit ) = capture { Affix::Platform::Unix::_findLib_ld($evil) };
         my $combined = ( $out // '' ) . ( $err // '' );
 
@@ -38,7 +38,7 @@ subtest '_findLib_gcc: safe command execution (C3)' => sub {
     is ref \@result, 'ARRAY', '_findLib_gcc returns array';
 
     # Malicious input must not execute shell commands
-    for my $evil ( 'm; echo INJECTED', 'm && touch /tmp/pwned', 'm | cat /etc/passwd', 'm $(id)', 'm`id`', ) {
+    for my $evil ( 'm; echo INJECTED', 'm && touch /tmp/pwned', 'm | cat /etc/passwd', 'm $(id)', 'm`id`' ) {
         my @ret = eval { Affix::Platform::Unix::_findLib_gcc($evil) };
         ok !@ret, "Malicious gcc input rejected safely: $evil";
     }
@@ -67,7 +67,7 @@ subtest '_get_soname: safe command execution (C4)' => sub {
         File::Spec->tmpdir . '/fake && touch /tmp/pwned',
         File::Spec->tmpdir . '/fake | cat /etc/passwd',
         File::Spec->tmpdir . '/fake $(id)',
-        File::Spec->tmpdir . '/fake`id`',
+        File::Spec->tmpdir . '/fake`id`'
     ) {
         $result = eval { Affix::Platform::Unix::_get_soname($evil) };
         is $result, undef, "Malicious soname input rejected safely: $evil";
@@ -82,7 +82,7 @@ subtest 'find_library: graceful handling' => sub {
     is $result, undef, 'find_library returns undef for unknown lib';
 
     # Malicious input must not execute shell commands
-    for my $evil ( 'm; echo INJECTED', 'm && touch /tmp/pwned', 'm | cat /etc/passwd', ) {
+    for my $evil ( 'm; echo INJECTED', 'm && touch /tmp/pwned', 'm | cat /etc/passwd' ) {
         $result = eval { find_library($evil) };
         is $result, undef, "Malicious find_library input rejected safely: $evil";
     }

@@ -25,7 +25,9 @@
  *
  * Include after pq_hm.h, pq_queue.h. */
 
-#include <poll.h>
+#ifndef WIN32
+#  include <poll.h>
+#endif
 
 /* Signal flags: handlers set these and do nothing else. File-scope because
  * a signal handler cannot carry a context pointer. */
@@ -66,7 +68,8 @@ typedef struct pq_worker_run {
 
 /* Write a supervision line; best-effort, EPIPE means the parent is gone
  * and the TERM that follows will land shortly. */
-static void pqw_sup_write(pq_worker_run *w, const char *buf, size_t len) {
+static void pqw_sup_write(pTHX_ pq_worker_run *w, const char *buf,
+                          size_t len) {
     if (w->sup_fd < 0) return;
     while (len) {
         ssize_t n = write(w->sup_fd, buf, len);
@@ -81,11 +84,11 @@ static void pqw_sup_claim(pTHX_ pq_worker_run *w, IV id, double timeout) {
     char line[96];
     int n = snprintf(line, sizeof line, "C %ld %.3f %.3f\n",
                      (long)id, pq_now_local(aTHX), timeout);
-    if (n > 0) pqw_sup_write(w, line, (size_t)n);
+    if (n > 0) pqw_sup_write(aTHX_ w, line, (size_t)n);
 }
 
-static void pqw_sup_done(pq_worker_run *w) {
-    pqw_sup_write(w, "D\n", 2);
+static void pqw_sup_done(pTHX_ pq_worker_run *w) {
+    pqw_sup_write(aTHX_ w, "D\n", 2);
 }
 
 /* Claim and run at most one job. Returns 1 when a job ran. Never croaks:
@@ -131,7 +134,7 @@ static int pqw_one(pTHX_ pq_worker_run *w) {
                 warn("Punk::Queue worker: perform raised: %s",
                      SvPV_nolen(ERRSV));
         }
-        pqw_sup_done(w);
+        pqw_sup_done(aTHX_ w);
         w->jobs_done++;
         ran = 1;
     }
@@ -489,6 +492,20 @@ static void pqw_run_poll(pTHX_ pq_worker_run *w) {
         {
             int ms = (int)(pqw_sleep_for(aTHX_ w) * 1000.0);
             if (ms < 10) ms = 10;
+#ifdef WIN32
+            /* no poll(2), no EINTR, and a Pg socket is not a CRT fd: sleep
+             * in short steps, checking the stop flag and draining NOTIFY
+             * (pg_notifies never blocks) after each */
+            while (ms > 0 && !PQW_STOP) {
+                int step = ms < 100 ? ms : 100;
+                Sleep((DWORD)step);
+                ms -= step;
+                if (w->notify_dbh && w->notify_fd >= 0) {
+                    pqw_notify_drain(aTHX_ w, 0);
+                    if (w->wake || w->notify_broken) break;
+                }
+            }
+#else
             /* a signal interrupts the sleep (EINTR), so a TERM lands
              * within one syscall, not one interval */
             if (w->notify_dbh && w->notify_fd >= 0) {
@@ -503,6 +520,7 @@ static void pqw_run_poll(pTHX_ pq_worker_run *w) {
             else {
                 (void)poll(NULL, 0, ms);
             }
+#endif
         }
         w->wake = 0;                          /* the claim at loop top */
     }
@@ -519,7 +537,11 @@ static IV pqw_run(pTHX_ SV *self) {
     SV *queue = pq_get(aTHX_ h, "queue");
     HV *opts = pq_get_hv(aTHX_ h, "opts");
     pq_worker_run w;
+#ifdef WIN32
+    void (*old_term)(int), (*old_int)(int);
+#else
     struct sigaction sa, old_term, old_int;
+#endif
     SV *v;
 
     if (!(queue && SvROK(queue)))
@@ -574,12 +596,18 @@ static IV pqw_run(pTHX_ SV *self) {
     w.hb_due = pq_now_local(aTHX);   /* first pass heartbeats immediately */
 
     PQW_STOP = 0;
+#ifdef WIN32
+    /* perl's own signal table, which its console handler consults */
+    old_term = signal(SIGTERM, pqw_sig_stop);
+    old_int  = signal(SIGINT,  pqw_sig_stop);
+#else
     memset(&sa, 0, sizeof sa);
     sa.sa_handler = pqw_sig_stop;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;                 /* no SA_RESTART: wake the sleep */
     sigaction(SIGTERM, &sa, &old_term);
     sigaction(SIGINT,  &sa, &old_int);
+#endif
 
     w.is_pg = pq_is_pg(aTHX_ w.backend);
 
@@ -597,8 +625,13 @@ static IV pqw_run(pTHX_ SV *self) {
     if (w.A && w.loop) pqw_run_loop(aTHX_ &w);
     else               pqw_run_poll(aTHX_ &w);
 
+#ifdef WIN32
+    (void)signal(SIGTERM, old_term);
+    (void)signal(SIGINT,  old_int);
+#else
     sigaction(SIGTERM, &old_term, NULL);
     sigaction(SIGINT,  &old_int,  NULL);
+#endif
 
     {
         int died = 0;

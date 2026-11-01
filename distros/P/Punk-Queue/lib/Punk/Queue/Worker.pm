@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::Queue ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
@@ -78,6 +78,15 @@ so a C<< delay => 3 >> job starts on time even under a long interval.
 C<PUNK_QUEUE_ONESHOT=1> claims at most one job, runs it, and exits - how
 the test suite drives a real worker without hanging. C<PUNK_QUEUE_NO_HM_ABI=1>
 forces the poll path.
+
+=head2 Windows
+
+Windows has no fork, so there is no supervisor and no C<-j>: C<punk-queue
+worker> dies saying so. Run C<< $queue->worker(%opts)->run >> in each
+process that should claim. The worker is otherwise the same. Without
+Hyperman it sleeps in 100ms steps, stopping on C<INT> or C<TERM> and, on
+PostgreSQL, draining C<LISTEN> notifications after each step, so a new job
+wakes it within 100ms.
 
 =head1 METHODS
 

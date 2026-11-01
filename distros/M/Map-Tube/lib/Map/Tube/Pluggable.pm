@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.1.0');
+our $VERSION   = qv('v5.1.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::Pluggable - Class to load plugins for Map::Tube.
 
 =head1 VERSION
 
-Version v5.1.0
+Version v5.1.1
 
 =cut
 
@@ -51,10 +51,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/Map-Tube/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube>
 
 =item * Search MetaCPAN
 

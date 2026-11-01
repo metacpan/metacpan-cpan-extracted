@@ -50,7 +50,7 @@ WriteMakefile(
         'Map::Tube::Plugin::Formatter' => '0.16',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    test  => { TESTS => 't/*.t xt/*.t t/test-the-test/*.t' },
+    test  => { TESTS => 't/*.t t/test-the-test/*.t' },
     clean => { FILES => 'Map-Tube-*' },
     META_MERGE => {
         'meta-spec' => { version => 2 },

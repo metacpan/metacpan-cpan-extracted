@@ -1,5 +1,15 @@
 Revision history for Hyperman
 
+0.65	2026-10-31
+        - FIX: a ->get from an event's callback never saw the events
+          taken in the same batch, so it waited on a timer or a stop that
+          was already due (t/63 hung on FreeBSD smokers).
+        - FIX: a die out of a nested ->get left the loop's run depth and
+          current loop behind.
+        - FIX: the Windows build did not compile: the re-exec argv and
+          geteuid are POSIX only, and an older mingw hides WSAPoll,
+          AI_NUMERICSERV, inet_ntop, inet_pton and uint64_t.
+
 0.64	2026-10-21
         - FIX: DATA sent in the same read as an Extended CONNECT's headers
           was buffered as psgi.input and never reached the stream handle's

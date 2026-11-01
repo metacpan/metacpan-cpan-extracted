@@ -1,5 +1,10 @@
 Revision history for Punk
 
+0.67    2026-10-31
+        - Build and run on perls before 5.22, which lack Perl_isinfnan.
+        - Punk::Model::JSONFile locks with fcntl, so writers on Solaris no
+          longer lose rows.
+
 0.66    2026-10-23
         - Add $c->escape_html to escape html
 

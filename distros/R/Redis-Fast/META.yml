@@ -14,6 +14,7 @@ build_requires:
   Test::TCP: '0'
   Test::UNIXSock: '0'
 configure_requires:
+  Crypt::OpenSSL::Guess: '0.10'
   File::Which: '0'
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
@@ -38,7 +39,7 @@ no_index:
 provides:
   Redis::Fast:
     file: lib/Redis/Fast.pm
-    version: '0.39'
+    version: '0.40'
   Redis::Fast::Hash:
     file: lib/Redis/Fast/Hash.pm
   Redis::Fast::List:
@@ -48,12 +49,12 @@ provides:
 requires:
   Time::HiRes: '1.77'
   Try::Tiny: '0'
-  perl: '5.014000'
+  perl: '5.024000'
 resources:
   bugtracker: https://github.com/shogo82148/Redis-Fast/issues
   homepage: https://github.com/shogo82148/Redis-Fast
   repository: https://github.com/shogo82148/Redis-Fast.git
-version: '0.39'
+version: '0.40'
 x_contributors:
   - 'Aaron Crane <arc@aaroncrane.co.uk>'
   - 'Aaron Crane <arc@cpan.org>'

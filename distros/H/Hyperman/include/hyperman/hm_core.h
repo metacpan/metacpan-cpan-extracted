@@ -271,6 +271,18 @@ typedef struct hm_tw_s {
 
 typedef struct { int fd; UV id; } hm_again;
 
+/* The events one hm_loop_run frame took from the backend and has not yet
+ * dispatched. A nested run (a handler's ->get) sits inside one of them, and
+ * the rest are already out of the kernel: a oneshot timer is never reported
+ * again, so a nested wait for the event next to it waited forever. Each
+ * frame links its batch here, and a nested one dispatches what its callers
+ * still hold before it waits. */
+typedef struct hm_batch_s {
+    hm_event          *evs;
+    int                n, i;    /* i: the next one to dispatch */
+    struct hm_batch_s *up;      /* the batch of the frame that called us */
+} hm_batch;
+
 /* One piece of an access-log line. The format string is compiled to these
  * once, in the parent, so writing a line is a walk over an array and never a
  * parse: a literal run, an $env value (the key SV carries its hash), or one
@@ -325,6 +337,7 @@ struct hm_loop {
     int         stop;
     int         stopping;           /* graceful shutdown in progress */
     int         running;
+    hm_batch   *batch;              /* the innermost run's (see hm_batch) */
     int         perl_owned;         /* created via Hyperman::Loop->new */
     time_t      now;
     double      idle_timeout;
@@ -4554,9 +4567,17 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
 /* Run the loop until ->stop, or (when awaiting) until $until is ready.
  * Re-entrant: ->get/->await inside a handler pumps this same loop, so the
  * worker keeps serving other connections while awaiting. */
+/* Dispatch what the calling frames took from the backend and have not yet
+ * reached, nearest first. Each index moves past an event BEFORE it is
+ * dispatched, so a run nested deeper inside it skips it too. */
+static void hm_batch_drain(pTHX_ hm_loop *loop, hm_batch *b) {
+    for (; b; b = b->up)
+        while (b->i < b->n) hm_dispatch(aTHX_ loop, &b->evs[b->i++]);
+}
+
 static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
-    hm_loop *prev = hm_cur_loop;
     hm_event evs[HM_MAXEV];
+    hm_batch b;
     /* The fire queue is pumped by whoever enqueues, unless a pump is
      * already on the stack (hm_fq_active), which makes a continuation that
      * enqueues from inside a callback leave its work for the pump above
@@ -4564,13 +4585,24 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
      * the queue (a parked response delivering the next pipelined request)
      * calls ->get: the nested run here must pump for itself, or every
      * continuation it waits on - a ->then, a combinator - sits in the queue
-     * until it returns, which is never. Restored on the way out; a croak
-     * out of here leaves it 0, which only lets the outer pump be nested
-     * once, and nesting a pump is safe (they share one queue). */
-    int fq_was = hm_fq_active;
+     * until it returns, which is never.
+     *
+     * This frame's state goes on the save stack, so a croak out of here (a
+     * die from a signal handler under a ->get) restores it as a return
+     * does. loop->batch most of all: left behind, it names this frame's
+     * evs after the frame is gone. */
+    ENTER;
+    SAVEINT(hm_fq_active);
+    SAVEVPTR(hm_cur_loop);
+    SAVEINT(loop->running);
+    SAVEVPTR(loop->batch);
     hm_fq_active = 0;
     hm_cur_loop = loop;
     loop->running++;
+    b.evs = evs;
+    b.n = b.i = 0;
+    b.up = loop->batch;
+    loop->batch = &b;
     /* Cleared for the OUTERMOST run only. A nested run is a handler's ->get
      * pumping this loop, and a stop asked for while it runs - the second
      * TERM, the shutdown_grace hard-stop, the last connection closing while
@@ -4583,6 +4615,7 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
         double timeout = -1.0;
         int n, i;
         loop->now = time(NULL);
+        if (b.up) hm_batch_drain(aTHX_ loop, b.up);
         if (loop->recycle_pending && !loop->stopping) {
             loop->recycle_pending = 0;
             hm_on_signal(aTHX_ loop);   /* max_requests recycle: drain + exit */
@@ -4613,7 +4646,10 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
         }
         n = loop->be->wait(loop->be, evs, HM_MAXEV, timeout);
         if (n < 0) { if (errno == EINTR) continue; break; }
-        for (i = 0; i < n; i++) hm_dispatch(aTHX_ loop, &evs[i]);
+        b.n = n;
+        b.i = 0;
+        while (b.i < b.n) hm_dispatch(aTHX_ loop, &evs[b.i++]);
+        b.n = 0;
         if (loop->tw_gy && loop->running == 1) hm_tw_gy_sweep(loop);
         if (loop->qheap.n) hm_quic_expire(aTHX_ loop);
         if (loop->log_fd >= 0 && loop->log_len) hm_log_flush(loop);
@@ -4621,9 +4657,7 @@ static void hm_loop_run(pTHX_ hm_loop *loop, SV *until) {
         if (until && hmf_state(aTHX_ until) != HMF_PENDING) break;
     }
     if (loop->tw_gy && loop->running == 1) hm_tw_gy_sweep(loop);
-    loop->running--;
-    hm_cur_loop = prev;
-    hm_fq_active = fq_was;
+    LEAVE;
 }
 
 /* ---- loop lifecycle ------------------------------------------------------- */
@@ -5209,6 +5243,26 @@ static void hm_sup_watch_board(void) {
     }
 }
 
+/* What to exec on USR2: perl's own argv from the first argument on. $^X
+ * supplies the interpreter at exec time. Copied at BOOT, because `$0 = ...`
+ * on Linux writes over the memory PL_origargv points into. */
+static void hm_boot_argv_save(pTHX) {
+    int i, n = PL_origargc;
+    if (n <= 0 || !PL_origargv) return;
+    hm_boot_argv = (char **)hm_xmalloc(sizeof(char *) * (size_t)(n + 1));
+    for (i = 0; i < n; i++) {
+        const char *a = PL_origargv[i] ? PL_origargv[i] : "";
+        hm_boot_argv[i] = (char *)hm_xmalloc(strlen(a) + 1);
+        memcpy(hm_boot_argv[i], a, strlen(a) + 1);
+    }
+    hm_boot_argv[n] = NULL;
+    /* argv[0] becomes the interpreter path at exec; keep the name perl was
+     * invoked under as its argv[0] */
+}
+
+#else
+/* No re-exec on Windows: there is no USR2 to ask for one. */
+#define hm_boot_argv_save(x) ((void)0)
 #endif /* !_WIN32 - the rest of this section is shared; hm_spawn and the
         * pool branch of hm_run_server re-open the guard below */
 
@@ -5887,6 +5941,7 @@ static int hm_write_pidfile_(pTHX_ const hm_worker_cfg *cfg, int loud) {
         fd = hm_os_open_file(tmp, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0644);
         if (fd < 0 && errno != EEXIST) break;
     }
+#ifndef _WIN32
     if (fd < 0 && (errno == EACCES || errno == EPERM) && geteuid() != 0) {
         /* A re-exec successor already running as the dropped user, in a
          * directory only root may create in (/run): the file itself was
@@ -5896,6 +5951,7 @@ static int hm_write_pidfile_(pTHX_ const hm_worker_cfg *cfg, int loud) {
         fd = hm_os_open_file(path, O_WRONLY | O_TRUNC | O_NOFOLLOW | O_CLOEXEC, 0644);
         in_place = 1;
     }
+#endif
     if (fd < 0) {
         if (loud) croak("Hyperman->run: pid_file '%s': %s", in_place ? path : tmp,
                         strerror(errno));

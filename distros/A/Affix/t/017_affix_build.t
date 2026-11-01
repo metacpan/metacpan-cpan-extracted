@@ -24,7 +24,7 @@ subtest 'Inline Source' => sub {
 
     ok lives { $c->compile_and_link() },                                 'Linked inline source';
     ok my $fn = wrap( $c->link, 'inline_add', [ Int32, Int32 ], Int32 ), 'wrap';
-    is $fn->( 65, 43 ), 108, 'call';
+    is $fn->( 65, 43 ), 108, 'call' if $fn;
 };
 #
 sub bin_path ($bin) {
@@ -47,19 +47,19 @@ sub check_dotnet () {
     return ( $out =~ /^8\./m );
 }
 
-sub check_rust_gnu () {
+sub check_rust () {
     return 0 unless bin_path('rustc');
-
-    # If not windows, standard rustc is fine
     return 1 if $^O ne 'MSWin32';
-
-    # On Windows, we need to prove the GNU target works
+    my $arch   = ( $Config{archname} =~ /arm64|aarch64/i ) ? 'aarch64' : ( $Config{ptrsize} == 4 ) ? 'i686' : 'x86_64';
+    my $target = ( $Config{cc} =~ /cl(?:\.exe)?$/i ) ? "$arch-pc-windows-msvc" :
+        ( $arch eq 'aarch64' ? 'aarch64-pc-windows-gnullvm' : "$arch-pc-windows-gnu" );
     my $tmp = Path::Tiny->tempfile( SUFFIX => '.rs' );
     $tmp->spew('fn main() {}');
-    my $cmd = "rustc --target x86_64-pc-windows-gnu \"$tmp\" -o \"$tmp.exe\" 2>&1";
+    my $cmd = "rustc --target $target \"$tmp\" -o \"$tmp.exe\" 2>&1";
     my $out = `$cmd`;
     return ( $? == 0 );
 }
+sub check_rust_gnu () { check_rust() }
 
 sub enjoin( $lib, @symbols ) {
     my $path = $lib->stringify;
@@ -100,7 +100,7 @@ sub run_test ( $lang, $name, $code, $sym, $bin_req, $validator //= () ) {
             $lang eq 'fortran'  ? 'f90' :
             $lang eq 'pascal'   ? 'pas' :
             $lang eq 'crystal'  ? 'cr' :
-            $lang eq 'assembly' ? 'asm' :
+            $lang eq 'assembly' ? ( $Config{archname} =~ /arm64|aarch64/ ? 's' : 'asm' ) :
             $lang eq 'cobol'    ? 'cbl' :
             $lang;
         my $src = $TMP_DIR->child("test_$lang.$ext");
@@ -135,7 +135,7 @@ sub run_test ( $lang, $name, $code, $sym, $bin_req, $validator //= () ) {
         }
         #
         ok my $fn = wrap( $lib, $sym, [ Int32, Int32 ], Int32 ), 'wrap';
-        is $fn->( 3, 7 ), 10, 'call';
+        is $fn->( 3, 7 ), 10, 'call' if $fn;
     };
 }
 #
@@ -169,7 +169,7 @@ run_test( 'csharp', 'C#', <<~'', 'add_cs', 'dotnet', \&check_dotnet );
         }
     }
 
-run_test( 'rust', 'Rust', <<~'', 'add_rs', 'rustc' );
+run_test( 'rust', 'Rust', <<~'', 'add_rs', 'rustc', \&check_rust );
     #[no_mangle]
     pub extern "C" fn add_rs(a: i32, b: i32) -> i32 {
         a + b
@@ -243,7 +243,8 @@ run_test( 'swift', 'Swift', <<~'', 'add_swift', 'swiftc' );
         return a + b
     }
 
-run_test( 'assembly', 'Assembly', $Config{archname} =~ /arm64|aarch64/ ? <<~'' : $^O eq 'MSWin32' ? <<~'': <<~'', 'add_asm', 'nasm' );
+run_test( 'assembly', 'Assembly', $Config{archname} =~ /arm64|aarch64/ ?
+        <<~'' : $^O eq 'MSWin32' ? <<~'' : <<~'', 'add_asm', ( $Config{archname} =~ /arm64|aarch64/ ? $Config{cc} : 'nasm' ) );
         ; ARM64: add w0, w0, w1
         .global add_asm
         .text
@@ -459,7 +460,7 @@ subtest 'Polyglot: Kitchen Sink (C, C++, Rust, Zig, Dlang, Fortran, ASM)' => sub
     #
     my $asm_ext = ( $Config{archname} =~ /arm64/ ) ? 's' : 'asm';
     my $f7      = $TMP_DIR->child("f7.$asm_ext");
-    $f7->spew_utf8( ( $^O eq 'MSWin32' || $Config{archname} !~ /arm64/ ) ? <<~'' : <<~'' );
+    $f7->spew_utf8( ( $^O eq 'MSWin32' && $Config{archname} !~ /arm64/ ) ? <<~'' : <<~'' );
     ; x86/x64
     global func_asm
     section .text

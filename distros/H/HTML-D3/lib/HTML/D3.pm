@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.24
+Version 0.27
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.27';
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,13 @@ our $VERSION = '0.24';
 HTML::D3 is a Perl module that provides functionality to create simple charts using D3.js.
 The module generates HTML and JavaScript code to render the chart in a web browser.
 
+Text in a chart's data and options is written into a C<E<lt>scriptE<gt>> so that it
+cannot end the script: C<E<lt>> is written as C<\u003c>, which JavaScript reads back
+as the same character.  An C<id> is written into an attribute, a selector and a
+script, so it must be letters, digits, C<_> and C<->, not starting with a digit or
+C<->.  Any other C<id> is ignored and the method's default used, so read the id a
+method actually used from the C<svg_id> or C<table_id> it returns.
+
 =head1 METHODS
 
 The C<=head3 API SPECIFICATION> subsections use L<Params::Validate::Strict>
@@ -83,6 +90,8 @@ Accepts the following optional arguments:
 =item * C<height> - The height of the chart (default: 600).
 
 =item * C<title> - The title of the chart (default: 'Chart').
+It is plain text, escaped when it is written to the page: C<E<lt>> and C<&> appear
+as themselves, and HTML in a title is shown rather than obeyed.
 
 =item * C<responsive> - If true, SVG elements are rendered with
 C<viewBox> and C<width="100%" height="auto"> instead of fixed pixel
@@ -332,7 +341,7 @@ sub render_bar_chart {
 	my $data = $raw->{data};
 
 	# Generate JSON representation of data
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -341,7 +350,7 @@ sub render_bar_chart {
 	$html .= $self->_head();
 	$html .= <<"HTML";
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
@@ -455,7 +464,7 @@ sub render_animated_bar_chart {
 	});
 	my $data = $raw->{data};
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -463,7 +472,7 @@ sub render_animated_bar_chart {
 	$html .= $self->_head();
 	$html .= <<"HTML";
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
@@ -571,7 +580,7 @@ sub render_line_chart {
 	my $data = $raw->{data};
 
 	# Generate JSON for data
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -580,7 +589,7 @@ sub render_line_chart {
 	$html .= $self->_head();
 	$html .= <<"HTML";
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
@@ -697,7 +706,7 @@ sub render_animated_line_chart {
 	});
 	my $data = $raw->{data};
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -705,7 +714,7 @@ sub render_animated_line_chart {
 	$html .= $self->_head();
 	$html .= <<"HTML";
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
@@ -860,9 +869,9 @@ sub render_pie_chart {
 	my $data = $raw->{data};
 	my $opts = {%$raw}; delete $opts->{data};
 
-	my $separator = $opts->{separator} // '/';
+	my $separator = _js_any_string($opts->{separator} // '/');
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -870,7 +879,7 @@ sub render_pie_chart {
 	$html .= $self->_head();
 	$html .= <<"HTML";
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
@@ -1024,9 +1033,9 @@ sub render_animated_pie_chart {
 	my $data = $raw->{data};
 	my $opts = {%$raw}; delete $opts->{data};
 
-	my $separator = $opts->{separator} // '/';
+	my $separator = _js_any_string($opts->{separator} // '/');
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -1034,7 +1043,7 @@ sub render_animated_pie_chart {
 	$html .= $self->_head();
 	$html .= <<"HTML";
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
@@ -1222,8 +1231,8 @@ sub render_pie_chart_snippet {
 	my $sort_slices  = $opts->{sort_slices} // 'none';
 	my $max_slices   = int($opts->{max_slices} // 0);
 	my $show_legend  = exists $opts->{legend} ? ($opts->{legend} ? 1 : 0) : 1;
-	my $color_scheme = $opts->{color_scheme} // $DEFAULT_CATEGORICAL_SCHEME;
-	my $separator    = $opts->{separator}   // '/';
+	my $color_scheme = _scheme_name($opts->{color_scheme});
+	my $separator    = _js_any_string($opts->{separator} // '/');
 	my $schemes_js = $self->_schemes_js('const');
 	my $default_js = _default_scheme_js();
 
@@ -1254,9 +1263,9 @@ sub render_pie_chart_snippet {
 		@slices = @top;
 	}
 
-	my $json_data = $_JSON->encode(\@slices);
+	my $json_data = _script_json(\@slices);
 
-	my $svg_id   = $opts->{id} // 'pie_chart';
+	my $svg_id   = _chart_id($opts->{id}) // 'pie_chart';
 	my $tip_id   = $svg_id . '_tip';
 	my $leg_id   = $svg_id . '_legend';
 	my $wrap_id  = $svg_id . '_wrap';
@@ -1480,7 +1489,7 @@ C<RdPu>, C<YlGnBu>.
 
 =item * C<x_label> (string, default C<''>) - Axis title below the X axis.
 The value is JavaScript-escaped (backslash, double-quote, newline, carriage
-return) before being embedded in the page; other characters are taken
+return, C<E<lt>>) before being embedded in the page; other characters are taken
 literally.
 
 =item * C<y_label> (string, default C<''>) - Axis title left of the Y axis.
@@ -1601,19 +1610,12 @@ sub render_heatmap_snippet {
 		push @triples, { x => $pt->[0], y => $pt->[1], v => $pt->[2] + 0 };
 	}
 
-	my $json_data = $_JSON->encode(\@triples);
+	my $json_data = _script_json(\@triples);
 
 	# encode_json only accepts refs; escape label strings manually for JS
-	my ($x_label_esc, $y_label_esc, $val_label_esc) = map {
-		my $s = $_;
-		$s =~ s/\\/\\\\/g;
-		$s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;
-		$s =~ s/\r/\\r/g;
-		$s
-	} ($x_label, $y_label, $val_label);
+	my ($x_label_esc, $y_label_esc, $val_label_esc) = map { _js_string($_) } ($x_label, $y_label, $val_label);
 
-	my $svg_id = $opts->{id} // 'heatmap';
+	my $svg_id = _chart_id($opts->{id}) // 'heatmap';
 	my $tip_id = $svg_id . '_tip';
 
 	my $width  = $self->{width};
@@ -1852,6 +1854,9 @@ Either a CSS colour value (e.g. C<'steelblue'>, C<'#4e79a7'>) applied to all
 bars, or the special token C<'categorical'>, which colours each bar
 distinctively using D3's Tableau-10 palette.
 
+A value holding anything a CSS colour cannot, such as a quote or C<E<lt>>, is
+ignored and the default used.
+
 =item C<show_values> (bool, default C<0>)
 
 When true, the numeric value of each bar is printed above vertical bars or
@@ -1941,7 +1946,7 @@ sub render_bar_chart_snippet {
 		unless grep { $sort_bars eq $_ } qw(value label none);
 
 	my $max_bars    = int($opts->{max_bars} // 0);
-	my $color       = $opts->{color}       // 'steelblue';
+	my $color       = _css_colour($opts->{color}) // 'steelblue';
 	my $show_values = $opts->{show_values} ? 1 : 0;
 	my $animated    = $opts->{animated}    ? 1 : 0;
 	my $value_label = $opts->{value_label} // 'Value';
@@ -1980,28 +1985,21 @@ sub render_bar_chart_snippet {
 	}
 
 	# Serialise to JSON for embedding in the <script> block
-	my $json_data = $_JSON->encode([map {
+	my $json_data = _script_json([map {
 		my %h = (label => $_->{label}, value => $_->{value} + 0);
 		$h{extra} = $_->{extra} if exists $_->{extra};
 		\%h;
 	} @bars]);
 
 	# Escape strings for safe embedding inside JS double-quoted string literals
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g;
-		$s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;
-		$s =~ s/\r/\\r/g;
-		$s
-	};
+	my $js_esc = \&_js_string;
 	my $value_label_esc = $js_esc->($value_label);
 	my $x_label_esc     = $js_esc->($x_label);
 
 	my $is_categorical = ($color eq 'categorical') ? 1 : 0;
 	my $color_esc      = $is_categorical ? 'steelblue' : $js_esc->($color);
 
-	my $svg_id = $opts->{id} // 'bar_chart';
+	my $svg_id = _chart_id($opts->{id}) // 'bar_chart';
 	my $tip_id = $svg_id . '_tip';
 
 	my $width  = $self->{width};
@@ -2321,7 +2319,7 @@ sub render_line_chart_with_tooltips
 	my $data = $raw->{data};
 
 	# Generate JSON for data
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -2331,7 +2329,7 @@ sub render_line_chart_with_tooltips
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$self->{title}</title>
+    <title>@{[ $self->_title_html() ]}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
 	.tooltip {
@@ -2347,7 +2345,7 @@ sub render_line_chart_with_tooltips
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
@@ -2521,7 +2519,7 @@ sub render_line_chart_snippet
 	my $data = $raw->{data};
 	my $opts = {%$raw}; delete $opts->{data};
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map {
 			my $point = { label => $_->[0], value => $_->[1] };
 			$point->{extra} = $_->[2] if ref($_->[2]) eq 'HASH';
@@ -2529,7 +2527,7 @@ sub render_line_chart_snippet
 		} @$data
 	]);
 
-	my $svg_id  = $opts->{id} // 'chart';
+	my $svg_id  = _chart_id($opts->{id}) // 'chart';
 	my $tip_id  = $svg_id . '_tooltip';
 	my $w = $self->{width};
 	my $h = $self->{height};
@@ -2696,7 +2694,7 @@ sub render_zoomable_line_chart_snippet
 	my $data = $raw->{data};
 	my $opts = {%$raw}; delete $opts->{data};
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map {
 			my $point = { label => $_->[0], value => $_->[1] };
 			$point->{extra} = $_->[2] if ref($_->[2]) eq 'HASH';
@@ -2704,7 +2702,7 @@ sub render_zoomable_line_chart_snippet
 		} @$data
 	]);
 
-	my $svg_id = $opts->{id} // 'chart';
+	my $svg_id = _chart_id($opts->{id}) // 'chart';
 	my $tip_id = $svg_id . '_tooltip';
 	my $rst_id = $svg_id . '_reset';
 	my $w      = $self->{width};
@@ -2981,7 +2979,7 @@ sub render_multi_series_line_chart_with_tooltips
 	});
 	my $data = $raw->{data};
 
-	my $json_data = $_JSON->encode($data);
+	my $json_data = _script_json($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -2989,7 +2987,7 @@ sub render_multi_series_line_chart_with_tooltips
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$self->{title}</title>
+    <title>@{[ $self->_title_html() ]}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
 	.tooltip {
@@ -3005,7 +3003,7 @@ sub render_multi_series_line_chart_with_tooltips
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
@@ -3149,7 +3147,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
 	my $data = $raw->{data};
 
 	# Generate JSON for data
-	my $json_data = $_JSON->encode($data);
+	my $json_data = _script_json($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -3157,7 +3155,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$self->{title}</title>
+    <title>@{[ $self->_title_html() ]}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
 	.tooltip {
@@ -3174,7 +3172,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
@@ -3320,7 +3318,7 @@ sub render_multi_series_line_chart_with_legends {
 	my $data = $raw->{data};
 
 	# Generate JSON for data
-	my $json_data = $_JSON->encode($data);
+	my $json_data = _script_json($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -3328,7 +3326,7 @@ sub render_multi_series_line_chart_with_legends {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$self->{title}</title>
+    <title>@{[ $self->_title_html() ]}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         .tooltip {
@@ -3353,7 +3351,7 @@ sub render_multi_series_line_chart_with_legends {
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
@@ -3530,7 +3528,7 @@ sub render_multi_series_line_chart_with_interactive_legends
 	my $data = $raw->{data};
 
 	# Generate JSON for data
-	my $json_data = $_JSON->encode($data);
+	my $json_data = _script_json($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -3538,7 +3536,7 @@ sub render_multi_series_line_chart_with_interactive_legends
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$self->{title}</title>
+    <title>@{[ $self->_title_html() ]}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         .tooltip {
@@ -3563,7 +3561,7 @@ sub render_multi_series_line_chart_with_interactive_legends
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">$self->{title}</h1>
+    <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
@@ -3795,23 +3793,18 @@ sub render_multi_series_line_chart_snippet
 			unless ref($s) eq 'HASH' && defined $s->{name} && ref($s->{data}) eq 'ARRAY';
 	}
 
-	my $json_data = $_JSON->encode($series_data);
+	my $json_data = _script_json($series_data);
 
 	my $scheme   = $opts->{scheme}   // $DEFAULT_CATEGORICAL_SCHEME;
 	my $x_label  = $opts->{x_label} // '';
 	my $y_label  = $opts->{y_label} // '';
 	my $animated = $opts->{animated} // 0;
-	my $svg_id   = $opts->{id}       // 'chart';
+	my $svg_id   = _chart_id($opts->{id})       // 'chart';
 	my $tip_id   = $svg_id . '_tip';
 
 	my $scheme_js = _scheme_js($scheme);
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	my $x_label_esc = $js_esc->($x_label);
 	my $y_label_esc = $js_esc->($y_label);
@@ -3999,6 +3992,8 @@ radius) dimensions:
 
 =item * C<color> (CSS colour or C<'categorical'>, default C<'steelblue'>) -
 Fill colour for the data points.  C<'categorical'> uses the Tableau-10 palette.
+A value holding anything a CSS colour cannot, such as a quote or C<E<lt>>, is
+ignored and the default used.
 
 =item * C<x_label> (string, default C<''>) - Label for the X axis.
 
@@ -4095,7 +4090,7 @@ sub render_scatter_chart_snippet
 	my $data = $raw->{data};
 	my $opts = {%$raw}; delete $opts->{data};
 
-	my $color            = $opts->{color}            // 'steelblue';
+	my $color            = _css_colour($opts->{color}) // 'steelblue';
 	my $x_label          = $opts->{x_label}          // '';
 	my $y_label          = $opts->{y_label}          // '';
 	my $value_label      = $opts->{value_label}      // 'Value';
@@ -4106,14 +4101,7 @@ sub render_scatter_chart_snippet
 	my $size_col         = $opts->{size_col}         // '';
 	my $radius_range     = $opts->{radius_range}     // [3, 15];
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g;
-		$s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;
-		$s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	# The scheme's colours as a JS array, from the one definition rather than
 	# from the spelling of the name.
@@ -4151,8 +4139,8 @@ sub render_scatter_chart_snippet
 	my $has_series = $colour_by_series && @series_names;
 	my $has_size   = defined $size_min;
 
-	my $json_data      = $_JSON->encode(\@points);
-	my $json_series    = $_JSON->encode(\@series_names);
+	my $json_data      = _script_json(\@points);
+	my $json_series    = _script_json(\@series_names);
 	my $x_label_esc    = $js_esc->($x_label);
 	my $y_label_esc    = $js_esc->($y_label);
 	my $val_label_esc  = $js_esc->($value_label);
@@ -4162,7 +4150,7 @@ sub render_scatter_chart_snippet
 	my $is_categorical = ($color eq 'categorical') ? 1 : 0;
 	my $color_esc      = ($is_categorical || $has_series) ? 'steelblue' : $js_esc->($color);
 
-	my $svg_id = $opts->{id} // 'scatter_chart';
+	my $svg_id = _chart_id($opts->{id}) // 'scatter_chart';
 	my $tip_id = $svg_id . '_tip';
 	my $leg_id = $svg_id . '_leg';
 
@@ -4449,16 +4437,9 @@ sub render_table_snippet
 
 	my $sortable = exists($opts->{sortable}) ? $opts->{sortable} : 1;
 	my $caption  = $opts->{caption} // '';
-	my $table_id = $opts->{id} // 'data_table';
+	my $table_id = _chart_id($opts->{id}) // 'data_table';
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g;
-		$s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;
-		$s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	my $html_esc = sub {
 		my $s = shift // '';
@@ -4475,7 +4456,7 @@ sub render_table_snippet
 		die 'Each row must be an array reference' unless ref($row) eq 'ARRAY';
 	}
 
-	my $json_data = $_JSON->encode([
+	my $json_data = _script_json([
 		map {
 			my @row = @$_;
 			\@row
@@ -4664,7 +4645,7 @@ sub render_stacked_bar_snippet
 	my $seg_col = $opts->{seg_col} // 'seg';
 	my $val_col = $opts->{val_col} // 'val';
 	my $orient  = $opts->{orient}  // 'v';
-	my $scheme  = $opts->{scheme}  // $DEFAULT_CATEGORICAL_SCHEME;
+	my $scheme  = _scheme_name($opts->{scheme});
 	my $x_label = $opts->{x_label} // '';
 	my $sort_by = $opts->{sort};
 	my $schemes_js = $self->_schemes_js('var');
@@ -4706,18 +4687,13 @@ sub render_stacked_bar_snippet
 		\%r
 	} @cats;
 
-	my $json_data = $_JSON->encode(\@rows);
-	my $json_segs = $_JSON->encode(\@segs);
+	my $json_data = _script_json(\@rows);
+	my $json_segs = _script_json(\@segs);
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	my $x_label_esc = $js_esc->($x_label);
-	my $svg_id  = $opts->{id} // 'stacked_bar';
+	my $svg_id  = _chart_id($opts->{id}) // 'stacked_bar';
 	my $tip_id  = $svg_id . '_tip';
 	my $width   = $self->{width};
 	my $height  = $self->{height};
@@ -4887,8 +4863,11 @@ Accepted C<\%opts> keys:
 =item * C<line_label> (string, default C<'Line'>) - legend/axis label for line.
 
 =item * C<bar_color> (string, optional CSS colour, default C<'steelblue'>) - bar fill.
+A value holding anything a CSS colour cannot, such as a quote or C<E<lt>>, is
+ignored and the default used.
 
 =item * C<line_color> (string, optional CSS colour, default C<'#e15759'>) - line stroke.
+Checked as C<bar_color> is.
 
 =item * C<id> (string, optional) - override the default C<svg_id> value.
 
@@ -4959,8 +4938,8 @@ sub render_combo_snippet
 	my $line_col   = $opts->{line_col}    // 'line_val';
 	my $bar_label  = $opts->{bar_label}   // 'Bar';
 	my $line_label = $opts->{line_label}  // 'Line';
-	my $bar_color  = $opts->{bar_color}   // 'steelblue';
-	my $line_color = $opts->{line_color}  // '#e15759';
+	my $bar_color  = _css_colour($opts->{bar_color})  // 'steelblue';
+	my $line_color = _css_colour($opts->{line_color}) // '#e15759';
 
 	my @points;
 	for my $row (@$data) {
@@ -4974,21 +4953,16 @@ sub render_combo_snippet
 		};
 	}
 
-	my $json_data = $_JSON->encode(\@points);
+	my $json_data = _script_json(\@points);
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	my $bar_label_esc  = $js_esc->($bar_label);
 	my $line_label_esc = $js_esc->($line_label);
 	my $bar_color_esc  = $js_esc->($bar_color);
 	my $line_color_esc = $js_esc->($line_color);
 
-	my $svg_id  = $opts->{id} // 'combo_chart';
+	my $svg_id  = _chart_id($opts->{id}) // 'combo_chart';
 	my $tip_id  = $svg_id . '_tip';
 	my $width   = $self->{width};
 	my $height  = $self->{height};
@@ -5221,17 +5195,12 @@ sub render_treemap_snippet
 	my $opts = {%$raw}; delete $opts->{data};
 
 	my $path_sep = $opts->{path_sep} // '/';
-	my $scheme   = $opts->{scheme}   // $DEFAULT_CATEGORICAL_SCHEME;
+	my $scheme   = _scheme_name($opts->{scheme});
 	my $label    = exists($opts->{label}) ? ($opts->{label} ? 1 : 0) : 1;
 	my $schemes_js = $self->_schemes_js('var');
 	my $default_js = _default_scheme_js();
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	my ($json_data, $build_js);
 	if (ref($data) eq 'ARRAY') {
@@ -5242,7 +5211,7 @@ sub render_treemap_snippet
 				unless looks_like_number($row->{value} // 'x');
 		}
 		my @flat = map { { path => "$_->{path}", value => $_->{value} + 0 } } @$data;
-		$json_data = $_JSON->encode(\@flat);
+		$json_data = _script_json(\@flat);
 		my $sep_esc = $js_esc->($path_sep);
 		$build_js = <<"BUILDJS";
     var sep = "$sep_esc";
@@ -5268,7 +5237,7 @@ sub render_treemap_snippet
         .sort(function(a,b){return b.value - a.value;});
 BUILDJS
 	} else {
-		$json_data = $_JSON->encode($data);
+		$json_data = _script_json($data);
 		$build_js = <<'BUILDJS';
     var root = d3.hierarchy(rawData)
         .sum(function(d){return d.value || 0;})
@@ -5276,7 +5245,7 @@ BUILDJS
 BUILDJS
 	}
 
-	my $svg_id = $opts->{id} // 'treemap';
+	my $svg_id = _chart_id($opts->{id}) // 'treemap';
 	my $tip_id = $svg_id . '_tip';
 	my $width  = $self->{width};
 	my $height = $self->{height};
@@ -5398,6 +5367,8 @@ hand starts from the same colour the bars do.
 =item * C<x_label> (string, optional) - label shown below the X axis.
 
 =item * C<color> (string, default C<'steelblue'>) - bar fill colour.
+A value holding anything a CSS colour cannot, such as a quote or C<E<lt>>, is
+ignored and the default used.
 
 =item * C<id> (string, optional) - override the default C<svg_id> value.
 
@@ -5470,12 +5441,7 @@ sub _render_histogram_binned
 {
 	my ($self, $bins, $opts) = @_;
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	die 'Data must contain at least one bin' unless @$bins;
 
@@ -5500,10 +5466,10 @@ sub _render_histogram_binned
 		push @norm, { label => "$label", count => $b->{count} + 0 };
 	}
 
-	my $json_data = $_JSON->encode(\@norm);
+	my $json_data = _script_json(\@norm);
 
 	my $x_label   = $opts->{x_label} // '';
-	my $svg_id    = $opts->{id}      // 'histogram';
+	my $svg_id    = _chart_id($opts->{id})      // 'histogram';
 	my $tip_id    = $svg_id . '_tip';
 	my $width     = $self->{width};
 	my $height    = $self->{height};
@@ -5532,8 +5498,9 @@ sub _render_histogram_binned
 	# Bar fill: an explicit colour wins, otherwise the first colour of the
 	# requested D3 categorical scheme, otherwise the default colour.
 	my $fill_js = '"steelblue"';
-	if(defined $opts->{color}) {
-		$fill_js = '"' . $js_esc->($opts->{color}) . '"';
+	my $colour = _css_colour($opts->{color});
+	if(defined $colour) {
+		$fill_js = '"' . $js_esc->($colour) . '"';
 	} elsif(defined $opts->{scheme}) {
 		# The scheme's first colour, which is the one colour_at($scheme, 0)
 		# reports to a Perl caller colouring the same data by hand.
@@ -5660,22 +5627,17 @@ sub render_histogram_snippet
 		push @values, $v + 0;
 	}
 
-	my $json_data = $_JSON->encode(\@values);
+	my $json_data = _script_json(\@values);
 
-	my $js_esc = sub {
-		my $s = shift;
-		$s =~ s/\\/\\\\/g; $s =~ s/"/\\"/g;
-		$s =~ s/\n/\\n/g;  $s =~ s/\r/\\r/g;
-		return $s;
-	};
+	my $js_esc = \&_js_string;
 
 	my $x_label = $opts->{x_label} // '';
-	my $color   = $opts->{color}   // 'steelblue';
+	my $color   = _css_colour($opts->{color}) // 'steelblue';
 
 	my $x_label_esc = $js_esc->($x_label);
 	my $color_esc   = $js_esc->($color);
 
-	my $svg_id  = $opts->{id} // 'histogram';
+	my $svg_id  = _chart_id($opts->{id}) // 'histogram';
 	my $tip_id  = $svg_id . '_tip';
 	my $width   = $self->{width};
 	my $height  = $self->{height};
@@ -5803,6 +5765,100 @@ sub _scheme_js
 		: _default_scheme_js();
 }
 
+# The name to write into a snippet's SCHEMES['...'] lookup: the one asked for if
+# it is a scheme, otherwise the default.  The name is written into a script, and
+# it often comes from a request or a saved chart, so only the names in the
+# definition above ever reach the page.  An unknown name was always going to draw
+# the default colours; this makes sure it can do nothing else.
+sub _scheme_name
+{
+	my $scheme = shift;
+
+	return defined($scheme) && exists($CATEGORICAL_SCHEMES{$scheme})
+		? $scheme
+		: $DEFAULT_CATEGORICAL_SCHEME;
+}
+
+# A chart's id, or undef for one that is not usable, so that the caller's default
+# applies.  An id is written into an attribute, a stylesheet selector and a script
+# all at once; one of these characters is safe in all three and can be selected
+# with "#id".
+sub _chart_id
+{
+	my $id = shift;
+
+	return unless defined($id);
+	return $id =~ m{\A[A-Za-z_][A-Za-z0-9_-]*\z} ? $id : undef;
+}
+
+# Nothing written into a <script> may end it.  The HTML parser looks for "</script"
+# and "<!--" before any JavaScript is read, so quoting cannot help: "<" has to be
+# written as an escape, which JavaScript reads back as the same character.  The two
+# line separators are newlines to older JavaScript.
+sub _script_safe
+{
+	my $text = shift;
+
+	$text =~ s/</\\u003c/g;
+	$text =~ s/\x{2028}/\\u2028/g;
+	$text =~ s/\x{2029}/\\u2029/g;
+	return $text;
+}
+
+# Data as JSON that is safe to write into a <script>.
+sub _script_json
+{
+	return _script_safe($_JSON->encode($_[0]));
+}
+
+# Text as the inside of a double-quoted JavaScript string in a <script>.
+sub _js_string
+{
+	my $s = shift;
+
+	$s =~ s/\\/\\\\/g;
+	$s =~ s/"/\\"/g;
+	$s =~ s/\n/\\n/g;
+	$s =~ s/\r/\\r/g;
+	return _script_safe($s);
+}
+
+# Text as the inside of a JavaScript string of any kind, for a value written into a
+# single-quoted string or a template literal, where "$" and the other quotes count.
+sub _js_any_string
+{
+	my $s = _js_string(shift);
+
+	$s =~ s/(['`\$])/\\$1/g;
+	return $s;
+}
+
+# A colour fit to write into a page, or undef for one that is not, so that the
+# caller's default applies.  The characters are those of a CSS colour - a name, a
+# hex value, or rgb(), hsl() and the like - and none of them can end a JavaScript
+# string, an attribute or a script element.
+sub _css_colour
+{
+	my $colour = shift;
+
+	return unless defined($colour);
+	return $colour =~ m{\A[#0-9A-Za-z_ (),.%/-]+\z} ? $colour : undef;
+}
+
+# The chart's title as text for the page.  The object keeps what it was given.
+sub _title_html
+{
+	my $self = shift;
+
+	my $title = $self->{title};
+	$title =~ s/&/&amp;/g;
+	$title =~ s/</&lt;/g;
+	$title =~ s/>/&gt;/g;
+	$title =~ s/"/&quot;/g;
+	$title =~ s/'/&#39;/g;
+	return $title;
+}
+
 sub _default_scheme_js
 {
 	return _scheme_colours_js($DEFAULT_CATEGORICAL_SCHEME);
@@ -5838,7 +5894,7 @@ sub _head
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>$self->{title}</title>
+	<title>@{[ $self->_title_html() ]}</title>
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 HTML

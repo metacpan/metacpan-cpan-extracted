@@ -103,7 +103,7 @@ subtest 'Forward Calls: Advanced Pointers and Arrays of Structs (with Typedefs)'
     note 'Testing marshalling arrays of structs using typedefs.';
     isa_ok my $sum_ids = wrap( $lib_path, 'sum_struct_ids', '(*@MyStruct, int32)->int32' ), ['Affix'];
     my $struct_array
-        = [ { id => 10, value => 1.1, label => 'A' }, { id => 20, value => 2.2, label => 'B' }, { id => 30, value => 3.3, label => 'C' }, ];
+        = [ { id => 10, value => 1.1, label => 'A' }, { id => 20, value => 2.2, label => 'B' }, { id => 30, value => 3.3, label => 'C' } ];
     is $sum_ids->( $struct_array, 3 ), 60, 'Correctly passed an array of structs and summed IDs';
 };
 subtest 'Forward Calls: Enums and Unions (with Typedefs)' => sub {

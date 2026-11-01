@@ -11,13 +11,16 @@ use PQSpawn;
 plan skip_all => 'DBI and DBD::SQLite required' unless has_dbd();
 
 my $has_hm = eval { require Hyperman; 1 };
+my $spawn  = $^O ne 'MSWin32';
 
 # One worker child, driven as a real subprocess through PUNK_QUEUE_ONESHOT,
 # over both execution paths. The poll path is forced with
 # PUNK_QUEUE_NO_HM_ABI; the loop path runs only when Hyperman is present.
+# PQSpawn forks, which a Windows perl only emulates: there only the
+# in-process runs below.
 
-my @paths = (['poll', { PUNK_QUEUE_NO_HM_ABI => 1 }]);
-push @paths, ['loop', {}] if $has_hm;
+my @paths = $spawn ? (['poll', { PUNK_QUEUE_NO_HM_ABI => 1 }]) : ();
+push @paths, ['loop', {}] if $has_hm && $spawn;
 
 for my $p (@paths) {
     my ($name, $env) = @$p;
@@ -104,9 +107,22 @@ for my $p (@paths) {
     is($q->job_info($id)->{result}, 11, 'in-process run works');
 }
 
+# Nothing to claim: the poll path sleeps until the oneshot deadline.
+{
+    local $ENV{PUNK_QUEUE_ONESHOT}   = 1;
+    local $ENV{PUNK_QUEUE_NO_HM_ABI} = 1;
+    my ($q) = make_queue();
+    my $t0 = time;
+    is($q->worker(interval => 0.2, oneshot_wait => 1)->run, 0,
+       'an idle run performed nothing');
+    my $took = time - $t0;
+    ok($took >= 0 && $took <= 10, "and woke from its sleep (${took}s)");
+}
+
 # A future-returning task: the result is awaited via ->get and recorded.
 SKIP: {
     skip 'Hyperman required for the future test', 2 unless $has_hm;
+    skip 'PQSpawn forks', 2 unless $spawn;
     local $ENV{PUNK_QUEUE_ONESHOT} = 1;
     my ($q, $file) = make_queue();
     my $app = task_app("dbi:SQLite:dbname=$file", <<'EOF');

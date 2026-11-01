@@ -1,5 +1,37 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.27	Sat Oct 31 09:17:13 PM EDT 2026
+	[ Bug Fixes ]
+	- Text in a chart's data and in its labels could end the <script> it was
+	  written into: a label holding </script> let a data file run script in the
+	  reader's browser.  All data and text written into a script now has "<"
+	  written as \u003c, in the snippets and the full-page charts alike, and one
+	  routine does this rather than one copy in each method
+	- The separator option of the pie charts is now escaped for JavaScript
+	- The id option of the snippets was written into the page as given.  An id
+	  that is not letters, digits, _ and -, starting with a letter or _, is now
+	  ignored and the method's default used
+
+0.26	Sat Oct 31 03:14:27 PM EDT 2026
+	[ Bug Fixes ]
+	- The color option of render_bar_chart_snippet, render_scatter_chart_snippet
+	  and render_histogram_snippet, and the bar_color and line_color options of
+	  render_combo_snippet, could end the script they were written into, so a
+	  value taken from a request could run script in the reader's browser.  A
+	  value holding anything a CSS colour cannot is now ignored, and the default
+	  used
+	- A chart's title was written into the full-page charts as HTML.  It is now
+	  escaped, so it is shown as given.  A title that relied on this, such as
+	  one holding &amp; or <b>, now shows those characters literally
+
+0.25	Sat Oct 31 11:33:41 AM EDT 2026
+	[ Bug Fixes ]
+	- render_pie_chart_snippet, render_stacked_bar_snippet and
+	  render_treemap_snippet wrote the colour scheme's name into the page's
+	  script as given, so a name taken from a request could run script in the
+	  reader's browser.  A name that is not a scheme now draws the default
+	  colours and never reaches the page
+
 0.24	Fri Oct 30 09:29:31 PM EDT 2026
 	[ Enhancements ]
 	- Use Params::Get and Params::Validate::Strict in all public routines

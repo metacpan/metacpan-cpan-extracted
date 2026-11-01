@@ -90,6 +90,9 @@ static inline int validate_large_number(std::string_view& s) {
       got_decimal = true;
       if (i+1 == s.length())
         return CERR_NUMBER_DECIMAL;
+      // peek ahead for illegal exponent after dot
+      if (s[i+1] == 'e' || s[i+1] == 'E')
+        return CERR_NUMBER_DECIMAL;
     }
     if (s[i] == 'e' || s[i] == 'E') {
       got_exp = true;
@@ -173,9 +176,6 @@ static inline bool validate_ascii(const char *buf, size_t len) noexcept {
     } \
   } while (0)
 
-// XXX keep in sync w XS.xs
-#define F_HOOK           0x00008000UL // some hooks exist, so slow-path processing
-
 // There is some special kind of perversion going on that both C++'s advanced template magic
 // and threaded Perl's THX_ voodoo are present, yet the whole thing still works.
 template<typename T>
@@ -247,10 +247,6 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
       DEC_DEC_DEPTH;
       res = newRV_noinc ((SV *)hv);
 
-      if (simdjson_unlikely(dec->json.flags & F_HOOK)) {
-        res = filter_object(dec, res, hv);
-      }
-
       break;
     }
   case ondemand::json_type::number:
@@ -262,6 +258,13 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
         ERROR_RETURN_IF(TRAILING_CONTENT);
 
         // simdjson 3.13+ natively handles big integers
+        // - or actually, it doesn't quite
+        if (err == BIGINT_ERROR) {
+          // we save it as a string, and at this point simdjson has hopefully validated it for us
+          auto str = get_raw_json_token_from(element);
+          res = newSVpvn_utf8(str.data(), str.size(), 1);
+          break;
+        }
 
         // old way of handling case of large numbers:
         // we save it as a string, but try to validate if it looks like a number at least
@@ -318,6 +321,7 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
         }
       case ondemand::number_type::big_integer:
         {
+          // XXX we never get here
           // handle case of large numbers:
           // we save it as a string, and at this point simdjson has hopefully validated it for us
           auto str = get_raw_json_token_from(element);
@@ -356,21 +360,30 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
       break;
     }
   case ondemand::json_type::null:
-    bool is_null;
-    auto err = element.is_null().get(is_null);
-    if(simdjson_unlikely(!is_null || err)) {
-      // we falsify the error, it would be either nothing or INCORRECT_TYPE, which is less informative
-      if (err == 0 || err == INCORRECT_TYPE) {
-        dec->error_code = N_ATOM_ERROR;
-      } else {
-        // for scalar documents it can detect trailing content
-        dec->error_code = err;
+    {
+      bool is_null;
+      auto err = element.is_null().get(is_null);
+      if(simdjson_unlikely(!is_null || err)) {
+        // we falsify the error, it would be either nothing or INCORRECT_TYPE, which is less informative
+        if (err == 0 || err == INCORRECT_TYPE) {
+          dec->error_code = N_ATOM_ERROR;
+        } else {
+          // for scalar documents it can detect trailing content
+          dec->error_code = err;
+        }
+        dec->error_line_number = __LINE__;
+        return NULL;
       }
+      res = newSVsv (&PL_sv_undef);
+      break;
+    }
+  case ondemand::json_type::unknown:
+    {
+      // do we ever want to report anything else from here?
+      dec->error_code = TAPE_ERROR;
       dec->error_line_number = __LINE__;
       return NULL;
     }
-    res = newSVsv (&PL_sv_undef);
-    break;
   }
   return res;
 }
@@ -530,9 +543,11 @@ SV * simdjson_decode(dec_t *dec) {
       ondemand::document doc2;
       size_t size = find_end_of_scalar(SvPVX(dec->input));
 
-      auto err = parser->iterate(SvPVX(dec->input), size, SvLEN(dec->input)).get(doc2);
-      ERROR_RETURN_SAVE_MSG;
-      sv = recursive_parse_json<ondemand::document&>(aTHX_ dec, doc2);
+      if (size > 0) {
+        auto err = parser->iterate(SvPVX(dec->input), size, SvLEN(dec->input)).get(doc2);
+        ERROR_RETURN_SAVE_MSG;
+        sv = recursive_parse_json<ondemand::document&>(aTHX_ dec, doc2);
+      }
       location = SvPVX(dec->input) + size;
     } else {
       // desperate, gnarly hack:

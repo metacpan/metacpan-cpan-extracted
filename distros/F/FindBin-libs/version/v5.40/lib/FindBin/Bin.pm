@@ -1,20 +1,19 @@
 ########################################################################
 # housekeeping
 ########################################################################
-package FindBin::Bin v2.0.0;
+package FindBin::Bin v2.1.0;
 use v5.40;
 
 use parent qw( Exporter );
 
 use File::stat;
 
-use Cwd qw( getcwd              );
+use Cwd qw( abs_path getcwd );
 use Symbol  qw( qualify_to_ref  );
 
 use File::Spec::Functions
 qw
 (
-    canonpath
     catdir
     catpath
     curdir
@@ -145,23 +144,26 @@ BEGIN
 
             (
                 $raw
-              , Cwd::abs_path( $raw ) // $raw
+              , rel2abs( $raw )
             )
         }
         else
         {
-            my( $v, $dir ) = ( splitpath $0, '' )[0,1];
+            my $phys
+            = do
+            {
+                my ( $v, $d ) = ( splitpath abs_path( $0 ), '' )[0,1];
+                catpath $v, catdir( $d ), ''
+            };
 
-            my $raw
-            = file_name_is_absolute( $dir )
-            ? $dir
-            : catdir pwd, $dir
-            ;
+            my $log
+            = do
+            {
+                my ( $v, $d ) = ( splitpath $0, '' )[0,1];
+                catpath $v, canon_dir( $d ), ''
+            };
 
-            (
-                catpath( $v, canon_dir( $raw ),                          '' )
-              , catpath( $v, Cwd::abs_path( $raw ) // canonpath( $raw ), '' )
-            )
+            ( $log, $phys )
         }
     };
     
@@ -173,8 +175,7 @@ BEGIN
     eval qq| *{ qualify_to_ref 'Bin_l' } = \\'$logical'  |;
     eval qq| sub Bin_l(){ '$logical'  } |;
 
-    # $Bin_p --  physical path (abs_path, like "pwd -P"
-    # resolves symlinks)
+    # $Bin_p -- physical path (abs_path of $0, resolves all symlinks)
 
     eval qq| *{ qualify_to_ref 'Bin_p' } = \\'$physical' |;
     eval qq| sub Bin_p(){ '$physical' } |;

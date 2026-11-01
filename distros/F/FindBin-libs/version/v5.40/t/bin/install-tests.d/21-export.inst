@@ -6,8 +6,9 @@
 use v5.40;
 
 use File::Basename        qw( basename dirname );
+use File::Copy            qw( copy             );
 use File::Path            qw( make_path        );
-use File::Spec::Functions qw( abs2rel catfile rel2abs );
+use File::Spec::Functions qw( catfile rel2abs  );
 use YAML::Tiny;
 
 ########################################################################
@@ -42,17 +43,16 @@ for my $old ( glob catfile( $dest_d, '*.t' ) )
 }
 
 ########################################################################
-# create relative symlinks for each test in this group
+# copy _stub_t as a real file for each test in this group so that
+# abs_path($0) resolves to the test's own directory, not _stub_t's.
 ########################################################################
-
-my $rel_stub = abs2rel $stub, $dest_d;
 
 for my $test ( sort keys %$tests )
 {
-    my $link = catfile $dest_d, "$test.t";
+    my $dest = catfile $dest_d, "$test.t";
 
-    symlink $rel_stub, $link
-    or die "symlink '$rel_stub' -> '$link': $!";
+    copy $stub, $dest
+    or die "copy '$stub' -> '$dest': $!";
 
     say "$group/$test";
 }

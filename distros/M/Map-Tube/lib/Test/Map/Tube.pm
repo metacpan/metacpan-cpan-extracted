@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.1.0');
+our $VERSION   = qv('v5.1.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Test::Map::Tube - Module for testing Map::Tube data and features.
 
 =head1 VERSION
 
-Version v5.1.0
+Version v5.1.1
 
 =head1 DESCRIPTION
 
@@ -2097,10 +2097,6 @@ You can also look for information at:
 
 L<https://github.com/manwar/Map-Tube/issues>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube>
-
 =item * Search MetaCPAN
 
 L<https://metacpan.org/dist/Map-Tube>
@@ -2109,7 +2105,7 @@ L<https://metacpan.org/dist/Map-Tube>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2026 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it  and/or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

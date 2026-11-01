@@ -12,6 +12,7 @@ use PQTest;
 # else about the Pg backend is covered by the conformance battery; this is
 # the test that cannot be written in one process.
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'set PUNK_QUEUE_PG_DSN (and install DBD::Pg) to run'
     unless has_pg();
 

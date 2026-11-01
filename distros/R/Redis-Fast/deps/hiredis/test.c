@@ -13,6 +13,16 @@
 #include <limits.h>
 #include <math.h>
 
+#ifdef __linux__
+#include <arpa/inet.h>
+#include <linux/errqueue.h>
+#include <linux/net_tstamp.h>
+#include <netinet/in.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
+
 #include "hiredis.h"
 #include "async.h"
 #include "adapters/poll.h"
@@ -52,6 +62,7 @@ struct config {
         const char *ca_cert;
         const char *cert;
         const char *key;
+        const char *verify_name;
     } ssl;
 };
 
@@ -497,6 +508,46 @@ static void test_reply_reader(void) {
     freeReplyObject(root);
     redisReaderFree(reader);
 
+    test("Reader sets a default maximum nesting depth: ");
+    reader = redisReaderCreate();
+    test_cond(reader->maxdepth == REDIS_READER_MAX_REPLY_DEPTH);
+    redisReaderFree(reader);
+
+    test("Can parse a reply at the maximum nesting depth: ");
+    reader = redisReaderCreate();
+    reader->fn = NULL;
+    for (i = 0; i < REDIS_READER_MAX_REPLY_DEPTH; i++) {
+        redisReaderFeed(reader,(char*)"*1\r\n",4);
+    }
+    redisReaderFeed(reader,(char*)"+OK\r\n",5);
+    ret = redisReaderGetReply(reader,&reply);
+    test_cond(ret == REDIS_OK && reply == (void*)REDIS_REPLY_ARRAY);
+    redisReaderFree(reader);
+
+    test("Set error when nesting depth exceeds the configured maximum: ");
+    reader = redisReaderCreate();
+    for (i = 0; i <= REDIS_READER_MAX_REPLY_DEPTH; i++) {
+        redisReaderFeed(reader,(char*)"*1\r\n",4);
+    }
+    redisReaderFeed(reader,(char*)"+OK\r\n",5);
+    ret = redisReaderGetReply(reader,&reply);
+    test_cond(ret == REDIS_ERR &&
+              strcasecmp(reader->errstr,"Max nesting depth exceeded") == 0);
+    freeReplyObject(reply);
+    redisReaderFree(reader);
+
+    test("Can disable the maximum nesting depth: ");
+    reader = redisReaderCreate();
+    reader->maxdepth = 0;
+    reader->fn = NULL;
+    for (i = 0; i <= REDIS_READER_MAX_REPLY_DEPTH; i++) {
+        redisReaderFeed(reader,(char*)"*1\r\n",4);
+    }
+    redisReaderFeed(reader,(char*)"+OK\r\n",5);
+    ret = redisReaderGetReply(reader,&reply);
+    test_cond(ret == REDIS_OK && reply == (void*)REDIS_REPLY_ARRAY);
+    redisReaderFree(reader);
+
     test("Correctly parses LLONG_MAX: ");
     reader = redisReaderCreate();
     redisReaderFeed(reader, ":9223372036854775807\r\n",22);
@@ -836,6 +887,15 @@ static void test_reply_reader(void) {
     freeReplyObject(reply);
     redisReaderFree(reader);
 
+    test("A RESP3 MAP/ATTR can't overflow: ");
+    reader = redisReaderCreate();
+    reader->maxelements = 0; /* Don't rely on default limit */
+    redisReaderFeed(reader, "%4611686018427387904\r\n", 22);
+    ret = redisReaderGetReply(reader, &reply);
+    test_cond(ret == REDIS_ERR &&
+              strcasecmp(reader->errstr, "Multi-bulk length out of range") == 0);
+    redisReaderFree(reader);
+
     test("Can parse RESP3 attribute: ");
     reader = redisReaderCreate();
     redisReaderFeed(reader, "|2\r\n+foo\r\n:123\r\n+bar\r\n#t\r\n",26);
@@ -1031,6 +1091,158 @@ static void test_blocking_connection_errors(void) {
     redisFree(c);
 #endif
 }
+
+#ifdef __linux__
+static uint32_t wait_for_epollerr(int epoll_fd) {
+    struct epoll_event event;
+    int count;
+
+    do {
+        count = epoll_wait(epoll_fd, &event, 1, 2000);
+    } while (count == -1 && errno == EINTR);
+
+    assert(count == 1);
+    assert(event.events & EPOLLERR);
+    return event.events;
+}
+
+static void consume_timestamp_error(redisFD fd) {
+    union {
+        struct cmsghdr align;
+        unsigned char data[512];
+    } control;
+    struct sock_extended_err *socket_error = NULL;
+    struct msghdr message = {0};
+    struct iovec iov;
+    struct cmsghdr *cmsg;
+    char byte;
+
+    iov.iov_base = &byte;
+    iov.iov_len = sizeof(byte);
+    message.msg_iov = &iov;
+    message.msg_iovlen = 1;
+    message.msg_control = control.data;
+    message.msg_controllen = sizeof(control.data);
+
+    assert(recvmsg(fd, &message, MSG_ERRQUEUE | MSG_DONTWAIT) >= 0);
+    assert(!(message.msg_flags & MSG_CTRUNC));
+    for (cmsg = CMSG_FIRSTHDR(&message); cmsg != NULL;
+         cmsg = CMSG_NXTHDR(&message, cmsg)) {
+        if (cmsg->cmsg_level == SOL_IP && cmsg->cmsg_type == IP_RECVERR) {
+            socket_error = (struct sock_extended_err *)CMSG_DATA(cmsg);
+            break;
+        }
+    }
+    assert(socket_error != NULL);
+    assert(socket_error->ee_origin == SO_EE_ORIGIN_TIMESTAMPING);
+}
+
+static void test_nonblocking_connect_error_queue(void) {
+    const int timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+                             SOF_TIMESTAMPING_SOFTWARE |
+                             SOF_TIMESTAMPING_OPT_TSONLY;
+    const char pong[] = "+PONG\r\n";
+    struct sockaddr_in address = {0};
+    struct epoll_event event = {0};
+    redisContext *context;
+    redisReply *reply = NULL;
+    socklen_t address_length = sizeof(address);
+    socklen_t option_length;
+    char byte = 'x';
+    int listener_fd;
+    int peer_fd;
+    int epoll_fd;
+    int completed = 0;
+    int option;
+    int count;
+    ssize_t result;
+
+    listener_fd = socket(AF_INET, SOCK_STREAM, 0);
+    assert(listener_fd != -1);
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    address.sin_port = 0;
+    assert(bind(listener_fd, (struct sockaddr *)&address, sizeof(address)) == 0);
+    assert(listen(listener_fd, 1) == 0);
+    assert(getsockname(listener_fd, (struct sockaddr *)&address,
+                       &address_length) == 0);
+
+    context = redisConnectNonBlock("127.0.0.1", ntohs(address.sin_port));
+    assert(context != NULL && context->err == 0);
+    peer_fd = accept(listener_fd, NULL, NULL);
+    assert(peer_fd != -1);
+
+    epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+    assert(epoll_fd != -1);
+    event.events = EPOLLIN;
+    event.data.fd = context->fd;
+    assert(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, context->fd, &event) == 0);
+    count = setsockopt(context->fd, SOL_SOCKET, SO_TIMESTAMPING,
+                       &timestamping, sizeof(timestamping));
+    if (count == -1 && errno == ENOPROTOOPT) {
+        test("Nonblocking connect error queue (SO_TIMESTAMPING unavailable): ");
+        test_skipped();
+        goto cleanup;
+    }
+    assert(count == 0);
+
+    /* Timestamp records use the same sk_error_queue occupancy predicate as
+     * queued ICMP errors, without requiring raw sockets or a network race. */
+    assert(send(context->fd, &byte, sizeof(byte), 0) == (ssize_t)sizeof(byte));
+    assert(recv(peer_fd, &byte, sizeof(byte), 0) == (ssize_t)sizeof(byte));
+    (void)wait_for_epollerr(epoll_fd);
+    consume_timestamp_error(context->fd);
+    assert(epoll_wait(epoll_fd, &event, 1, 0) == 0);
+
+    assert(send(context->fd, &byte, sizeof(byte), 0) == (ssize_t)sizeof(byte));
+    assert(recv(peer_fd, &byte, sizeof(byte), 0) == (ssize_t)sizeof(byte));
+    (void)wait_for_epollerr(epoll_fd);
+
+    option = 0;
+    assert(setsockopt(context->fd, SOL_SOCKET, SO_TIMESTAMPING,
+                      &option, sizeof(option)) == 0);
+    option_length = sizeof(option);
+    assert(getsockopt(context->fd, IPPROTO_IP, IP_RECVERR,
+                      &option, &option_length) == 0 && option == 0);
+    option_length = sizeof(option);
+    assert(getsockopt(context->fd, SOL_SOCKET, SO_TIMESTAMPING,
+                      &option, &option_length) == 0 && option == 0);
+    option_length = sizeof(option);
+    assert(getsockopt(context->fd, SOL_SOCKET, SO_ERROR,
+                      &option, &option_length) == 0 && option == 0);
+    errno = 0;
+    result = recv(context->fd, &byte, sizeof(byte), MSG_DONTWAIT);
+    assert(result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
+    assert(wait_for_epollerr(epoll_fd) & EPOLLERR);
+
+    context->flags |= REDIS_BLOCK;
+    assert(redisCheckConnectDone(context, &completed) == REDIS_OK);
+    context->flags &= ~REDIS_BLOCK;
+    assert(completed == 1);
+    count = epoll_wait(epoll_fd, &event, 1, 0);
+    test("Successful connect drains the error queue in blocking mode: ");
+    test_cond(count == 0);
+
+    assert(send(peer_fd, pong, sizeof(pong) - 1, 0) ==
+           (ssize_t)(sizeof(pong) - 1));
+    do {
+        count = epoll_wait(epoll_fd, &event, 1, 2000);
+    } while (count == -1 && errno == EINTR);
+    assert(count == 1 && (event.events & EPOLLIN));
+    assert(redisBufferRead(context) == REDIS_OK);
+    assert(redisGetReplyFromReader(context, (void **)&reply) == REDIS_OK);
+    test("Connection with a queued error remains usable: ");
+    test_cond(reply != NULL && reply->type == REDIS_REPLY_STATUS &&
+              strcmp(reply->str, "PONG") == 0);
+
+cleanup:
+    freeReplyObject(reply);
+    close(epoll_fd);
+    close(peer_fd);
+    close(listener_fd);
+    redisFree(context);
+}
+#endif
 
 /* Test push handler */
 void push_handler(void *privdata, void *r) {
@@ -1357,6 +1569,14 @@ static void test_blocking_connection_timeouts(struct config config) {
     } else {
         test_skipped();
     }
+
+    /* The 10ms timeout is only needed by the timeout tests above; if it stays
+     * on the context, redisReconnect() re-applies it to the new socket and the
+     * TLS handshake in do_reconnect() must then finish every read within it,
+     * which is flaky on slow machines. */
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    redisSetTimeout(c, tv);
 
     test("Reconnect properly reconnects after a timeout: ");
     do_reconnect(c, config);
@@ -2345,6 +2565,111 @@ static void test_async_polling(struct config config) {
 }
 /* End of Async polling_adapter driven tests */
 
+#ifdef HIREDIS_TEST_SSL
+/* Connect to the SSL port with a context bound to an expected peer name.
+ * Returns the (possibly errored) context; the caller inspects c->err. */
+static redisContext *do_ssl_connect_with_verify_name(struct config config, const char *verify_name) {
+    redisSSLContextError ssl_error = REDIS_SSL_CTX_NONE;
+    redisSSLOptions options = {
+        .cacert_filename = config.ssl.ca_cert,
+        .cert_filename = config.ssl.cert,
+        .private_key_filename = config.ssl.key,
+        .verify_mode = REDIS_SSL_VERIFY_PEER,
+        .verify_name = verify_name,
+    };
+
+    redisSSLContext *ssl_ctx = redisCreateSSLContextWithOptions(&options, &ssl_error);
+    assert(ssl_ctx != NULL && ssl_error == REDIS_SSL_CTX_NONE);
+
+    redisContext *c = redisConnect(config.ssl.host, config.ssl.port);
+    assert(c != NULL && c->err == 0);
+    redisInitiateSSLWithContext(c, ssl_ctx);
+
+    redisFreeSSLContext(ssl_ctx);
+    return c;
+}
+
+/* Peer-name verification (redisSSLOptions.verify_name) tests. The server
+ * certificate generated by test.sh carries subjectAltName entries for
+ * config.ssl.verify_name (a DNS name) and config.ssl.host (an IP address), so
+ * a context bound to either must connect, while a context bound to a name the
+ * certificate does not carry must fail its handshake even though the
+ * certificate chains to the trusted CA. The mismatch cases are the
+ * impersonation scenario this option exists to close: without verify_name, ANY
+ * certificate from the trusted CA is accepted regardless of the identity it
+ * carries.
+ *
+ * Both polarities are covered for each kind of name, because DNS names and IP
+ * addresses are matched by different OpenSSL machinery (X509_check_host()
+ * against DNS SANs versus X509_check_ip() against IP SANs). The positive IP
+ * case proves the IP path is taken at all -- an IP handed to
+ * X509_VERIFY_PARAM_set1_host() would be compared against DNS entries and
+ * fail -- while the negative IP case proves that path actually compares the
+ * address rather than merely accepting any certificate that happens to carry
+ * an IP SAN. */
+static void test_ssl_verify_name(struct config config) {
+    redisContext *c;
+    redisReply *reply;
+
+    test("SSL verify_name accepts a certificate carrying the expected DNS name: ");
+    c = do_ssl_connect_with_verify_name(config, config.ssl.verify_name);
+    reply = redisCommand(c, "PING");
+    test_cond(c->err == 0 && reply != NULL && reply->type == REDIS_REPLY_STATUS &&
+              strcasecmp(reply->str, "pong") == 0);
+    freeReplyObject(reply);
+    redisFree(c);
+
+    test("SSL verify_name accepts a certificate carrying the expected IP address: ");
+    c = do_ssl_connect_with_verify_name(config, config.ssl.host);
+    reply = redisCommand(c, "PING");
+    test_cond(c->err == 0 && reply != NULL && reply->type == REDIS_REPLY_STATUS &&
+              strcasecmp(reply->str, "pong") == 0);
+    freeReplyObject(reply);
+    redisFree(c);
+
+    test("SSL verify_name rejects a trusted certificate lacking the expected name: ");
+    c = do_ssl_connect_with_verify_name(config, "wrong.example.com");
+    test_cond(c->err != 0);
+    redisFree(c);
+
+    /* A well-formed address that the certificate does not carry: the IP SAN
+     * present in the certificate must not satisfy a different expected IP. */
+    test("SSL verify_name rejects a trusted certificate lacking the expected IP address: ");
+    c = do_ssl_connect_with_verify_name(config, "10.99.99.99");
+    test_cond(c->err != 0);
+    redisFree(c);
+
+    /* An empty name is not a usable identity, and OpenSSL reads it as "clear
+     * the expected hosts" while reporting success. Context creation must reject
+     * it rather than hand back a context that silently validates only the CA
+     * chain; callers skip verification by passing NULL. */
+    test("SSL verify_name rejects an empty expected name: ");
+    redisSSLContextError ssl_error = REDIS_SSL_CTX_NONE;
+    redisSSLOptions options = {
+        .cacert_filename = config.ssl.ca_cert,
+        .cert_filename = config.ssl.cert,
+        .private_key_filename = config.ssl.key,
+        .verify_mode = REDIS_SSL_VERIFY_PEER,
+        .verify_name = "",
+    };
+    redisSSLContext *ssl_ctx = redisCreateSSLContextWithOptions(&options, &ssl_error);
+    test_cond(ssl_ctx == NULL && ssl_error == REDIS_SSL_CTX_VERIFY_NAME_FAILED);
+    redisFreeSSLContext(ssl_ctx);
+
+    /* A name cannot be enforced while peer verification is disabled: OpenSSL
+     * completes the handshake regardless of the verification result, so a
+     * wrong-name certificate would be accepted. REDIS_SSL_VERIFY_NONE is 0, so
+     * this is also what a zero-initialized redisSSLOptions asks for. */
+    test("SSL verify_name is rejected when peer verification is disabled: ");
+    ssl_error = REDIS_SSL_CTX_NONE;
+    options.verify_mode = REDIS_SSL_VERIFY_NONE;
+    options.verify_name = config.ssl.verify_name;
+    ssl_ctx = redisCreateSSLContextWithOptions(&options, &ssl_error);
+    test_cond(ssl_ctx == NULL && ssl_error == REDIS_SSL_CTX_VERIFY_NAME_FAILED);
+    redisFreeSSLContext(ssl_ctx);
+}
+#endif
+
 int main(int argc, char **argv) {
     struct config cfg = {
         .tcp = {
@@ -2394,6 +2719,9 @@ int main(int argc, char **argv) {
         } else if (argc >= 2 && !strcmp(argv[0],"--ssl-key")) {
             argv++; argc--;
             cfg.ssl.key = argv[0];
+        } else if (argc >= 2 && !strcmp(argv[0],"--ssl-verify-name")) {
+            argv++; argc--;
+            cfg.ssl.verify_name = argv[0];
 #endif
         } else {
             fprintf(stderr, "Invalid argument: %s\n", argv[0]);
@@ -2419,6 +2747,9 @@ int main(int argc, char **argv) {
     test_reply_reader();
     test_blocking_connection_errors();
     test_free_null();
+#ifdef __linux__
+    test_nonblocking_connect_error_queue();
+#endif
 
     printf("\nTesting against TCP connection (%s:%d):\n", cfg.tcp.host, cfg.tcp.port);
     cfg.type = CONN_TCP;
@@ -2460,6 +2791,9 @@ int main(int argc, char **argv) {
         test_invalid_timeout_errors(cfg);
         test_append_formatted_commands(cfg);
         if (throughput) test_throughput(cfg);
+
+        if (cfg.ssl.verify_name)
+            test_ssl_verify_name(cfg);
 
         redisFreeSSLContext(_ssl_ctx);
         _ssl_ctx = NULL;

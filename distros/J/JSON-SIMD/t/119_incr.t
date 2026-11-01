@@ -3,7 +3,7 @@
 use strict;
 no warnings;
 use Test::More;
-BEGIN { plan tests => 745 };
+BEGIN { plan tests => 754 };
 
 use JSON::SIMD;
 
@@ -36,8 +36,8 @@ splitter +JSON::SIMD->new->use_simdjson(0)->allow_nonref (0), '  ["x\\"","\\u100
 splitter +JSON::SIMD->new->use_simdjson(0)->allow_nonref (0), '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
 splitter +JSON::SIMD->new->use_simdjson(0)                  , '"test"';
 splitter +JSON::SIMD->new->use_simdjson(0)                  , ' "5" ';
-splitter +JSON::SIMD->new->use_simdjson(0)                  , '-1e5';
-splitter +JSON::SIMD->new->use_simdjson(0)                  , ' 0.00E+00 ';
+splitter +JSON::SIMD->new->use_simdjson(0)->allow_nonref (1), '-1e5';
+splitter +JSON::SIMD->new->use_simdjson(0)->allow_nonref (1), ' 0.00E+00 ';
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';
@@ -101,4 +101,15 @@ splitter +JSON::SIMD->new->use_simdjson(0)                  , ' 0.00E+00 ';
    is_deeply (eval { $coder->incr_parse("[42]") }, [42], "valid data after incr_skip");
 }
 
+{
+  my $json = JSON::SIMD->new->use_simdjson(0)->max_size(64);
+  ok( !eval { my $v = $json->incr_parse("\0" . 'x' x 100); 1 }, 'raw NUL' );
+  $json = JSON::SIMD->new->use_simdjson(0)->max_size(64);
+  ok( !eval { $json->incr_parse('[' . 'x' x 100); 1 }, 'void context' );
+}
 
+for my $bare (qw(1 -1.5 null true false)) {
+	ok( !eval { my @v = JSON::SIMD->new->use_simdjson(0)->incr_parse($bare); 1 }, "require explicit allow_nonref for bare scalars" );
+}
+is_deeply( [ JSON::SIMD->new->use_simdjson(0)->incr_parse('"a" [1]') ], [ 'a', [1] ] );
+is_deeply( [ JSON::SIMD->new->use_simdjson(0)->allow_nonref->incr_parse('1 ') ], [1] );

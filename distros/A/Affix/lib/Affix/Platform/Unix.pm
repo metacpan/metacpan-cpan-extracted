@@ -1,4 +1,4 @@
-package Affix::Platform::Unix v1.3.0 {
+package Affix::Platform::Unix v1.4.0 {
     use v5.40;
     use Path::Tiny qw[path];
     use Config     qw[%Config];

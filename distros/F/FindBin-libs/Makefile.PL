@@ -13,7 +13,7 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Manifest  qw();
 use File::Basename      qw( basename    );
 use File::Find          qw( find        );
-use File::Path          qw( remove_tree );
+use File::Path          qw( make_path remove_tree );
 use List::Util          qw( first       );
 
 use File::Spec::Functions
@@ -246,57 +246,68 @@ and chmod 0755, $install_tests;
 # don't change.
 ########################################################################
 
-# t/10-Bin-path/foo/bar is a symlink to ../../. (i.e. t/) -- an intentional
-# test fixture for FindBin path resolution.  ExtUtils::Manifest::manifind
-# calls File::Find with follow_fast => 1 / follow_skip => 1 (default), which
-# dies on symlink cycles.  Locally override manifind to use follow_skip => 2
-# (skip cycles silently) for this WriteMakefile call.
+# Test fixtures that cannot appear in MANIFEST because manifind skips
+# directory symlinks and cyclic symlinks.  dircopy creates them from
+# version/v5.40; this block is a fallback for clean tarball installs.
+#
+# 09-Bin-symlink-exec.t is a file symlink so that $0 is a symlink when
+# make test runs it, letting the test verify $Bin_l/$Bin_p behavior.
 
-say "\n# Note: t/10-Bin-path/foo/bar is a cyclic symlink (intentional test",
-    "\n# fixture).  manifind is patched locally to skip symlink cycles",
-    "\n# silently (follow_skip => 2) during the kit-completeness check.";
-
+for my $spec
+(
+    [ catfile( 't', '10-Bin-path', 'foo' ), 'bar',                '../../.'                                              ]
+  , [ 't',                                  '12-Bin_l',           '11-Bin'                                               ]
+  , [ catfile( 't', '10-Bin-path'        ), '09-Bin-symlink-exec.t', '../../version/v5.40/t/10-Bin-path/09-Bin-symlink-exec.t' ]
+)
 {
-    no warnings 'redefine';
+    my ( $dir, $name, $target ) = @$spec;
+    my $path = catfile $dir, $name;
 
-    local *ExtUtils::Manifest::manifind = sub
+    -l $path
+    and next;
+
+    # dircopy may have copied a regular file where the symlink belongs.
+    -e $path
+    and do
     {
-        my $found   = {};
-
-        my $wanted  = sub
-        {
-            return if -d $_;
-
-            ( my $name = $File::Find::name ) =~ s|^\./||;
-
-            $found->{ $name } = '';
-        };
-
-        find(
-            { wanted => $wanted, follow_fast => 1, follow_skip => 2 },
-            '.'
-        );
-
-        return $found;
+        unlink $path
+        or warn "Cannot remove '$path' before symlinking: $!";
     };
 
-    WriteMakefile
-    (
-    qw
-    (
-        NAME            FindBin::libs
-        LICENSE         perl
-    ),
+    -d $dir
+    or make_path $dir;
 
-    # note that the VERSION_FROM path is handled *after* the 
-    # copy from ./version/* is dealt with in the previous step.
-    #
-    # after three modules and examples the version has to float
-    # independent of just the modules.
+    symlink $target, $path
+    or warn "Cannot create symlink '$path' -> '$target': $!";
+}
 
-  , VERSION         => v5.1.1
-  , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
-  , PREREQ_PM       =>
+# ExtUtils::MakeMaker calls manicheck() when no Makefile exists yet.
+# manifind uses File::Find follow_fast, which dies (Perl 5.42+) when it
+# re-encounters t/12-Bin_l (a dir symlink to t/11-Bin).  Touch an empty
+# placeholder so EUMM skips the check; WriteMakefile overwrites it.
+unless( -f 'Makefile' )
+{
+    open my $fh, '>', 'Makefile'
+    or die "Cannot create placeholder Makefile: $!";
+}
+
+WriteMakefile
+(
+qw
+(
+    NAME            FindBin::libs
+    LICENSE         perl
+),
+
+# note that the VERSION_FROM path is handled *after* the
+# copy from ./version/* is dealt with in the previous step.
+#
+# after three modules and examples the version has to float
+# independent of just the modules.
+
+  VERSION         => v5.1.5
+, AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
+, PREREQ_PM       =>
     {
         'Cwd'
         => version->parse( 'v3.73'  )->numify,
@@ -324,9 +335,8 @@ say "\n# Note: t/10-Bin-path/foo/bar is a cyclic symlink (intentional test",
         )
     }
 
-  , @config_requires,
-    );
-}
+, @config_requires,
+);
 
 {
     package MY;
@@ -336,7 +346,11 @@ say "\n# Note: t/10-Bin-path/foo/bar is a cyclic symlink (intentional test",
         <<END
 TEST_FILES = t/*.t t/*/*.t
 
-test :: prepare_tests
+# pure_all runs during the build phase; test depends on it.
+# Hooking here ensures install-tests runs before the harness
+# discovers which test files exist, not after.
+
+pure_all :: prepare_tests
 
 prepare_tests :
 \tt/bin/install-tests

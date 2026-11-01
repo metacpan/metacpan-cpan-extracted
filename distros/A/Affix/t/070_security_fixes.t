@@ -36,7 +36,7 @@ subtest 'H7/H8: Macro name validation prevents symbol table injection' => sub {
     ok eval "package Test::H7Valid; $code; 1", 'Generated constant compiles' or diag "eval error: $@";
 
     # Evil macro name — should NOT install into symbol table
-    my $evil = Affix::Wrap::Macro->new( name => 'EVIL; system("echo PWNED")', value => '1', );
+    my $evil = Affix::Wrap::Macro->new( name => 'EVIL; system("echo PWNED")', value => '1' );
     $result = $evil->affix( undef, 'Test::H7Evil' );
     ok defined $result, 'affix() returns for evil name (no crash)';
 
@@ -46,7 +46,7 @@ subtest 'H7/H8: Macro name validation prevents symbol table injection' => sub {
 #
 subtest 'H7/H8: Enum constant name validation' => sub {
     use Affix qw[Enum];
-    my $type = Enum [ [ RED => 0 ], [ GREEN => 1 ], [ BLUE => 2 ], ];
+    my $type = Enum [ [ RED => 0 ], [ GREEN => 1 ], [ BLUE => 2 ] ];
     ok defined $type, 'Enum type created';
     my ( $const_map, $val_map ) = $type->resolve();
     is ref $const_map, 'HASH', 'const_map is a hash';
@@ -57,7 +57,7 @@ subtest 'H7/H8: Enum constant name validation' => sub {
 #
 subtest 'M4: Double-quote C string literal stripping in affix_type' => sub {
     use Affix::Wrap;
-    my $macro = Affix::Wrap::Macro->new( name => 'GREETING', value => '"Hello World"', );
+    my $macro = Affix::Wrap::Macro->new( name => 'GREETING', value => '"Hello World"' );
     my $code  = $macro->affix_type;
     like $code,   qr/use constant GREETING => 'Hello World'/, 'Double-quoted string stripped of outer quotes';
     unlike $code, qr/"Hello World"/,                          'No remaining double quotes in generated code';
@@ -83,7 +83,7 @@ subtest 'M13: Division by zero in _calculate_expr' => sub {
 
     # _calculate_expr is in Affix::Type::Enum, accessible via resolve
     # We can test indirectly by defining enums with division expressions
-    my $type = Enum [ [ HALF => '10 / 2' ], [ ZERO => '10 / 0' ], [ REM => '10 % 3' ], [ REMZ => '10 % 0' ], ];
+    my $type = Enum [ [ HALF => '10 / 2' ], [ ZERO => '10 / 0' ], [ REM => '10 % 3' ], [ REMZ => '10 % 0' ] ];
     ok defined $type, 'Enum with division expressions created';
     my ( $const_map, $val_map ) = $type->resolve();
     is $const_map->{HALF}, 5, '10 / 2 = 5';

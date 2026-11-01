@@ -1,5 +1,5 @@
 package    #
-    Test2::Tools::Affix v1.3.0 {
+    Test2::Tools::Affix v1.4.0 {
     use v5.40;
     use blib;
     use Affix;
@@ -244,7 +244,7 @@ package    #
                 header    => [ 'function', 'path', 'line' ],
                 rows      => [
                     map { [ $_->{fn}, ( defined $_->{dir} && defined $_->{file} ) ? join '/', $_->{dir}, $_->{file} : '', $_->{line} // '' ] } @$blah
-                ],
+                ]
                 ) :
                 '';
         }

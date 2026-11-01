@@ -140,4 +140,34 @@ SKIP: {
 
 }
 
+
+# setting to arbitrary values many times, to test leaked scalars
+{
+	my $J = JSON::SIMD->new;
+	for my $i (1..2) {
+		my $false = $i . "nay" x 100;
+		my $true = $i . "yea" x 100;
+		$J->boolean_values($false, $true);
+
+		my $json = '[false, true]';
+		my $decoded = $J->decode($json);
+		ok $decoded->[0] eq $false, "false is nay $i";
+		ok $decoded->[1] eq $true, "true is yea $i";
+
+		my @recovered_bools = $J->get_boolean_values;
+		ok $recovered_bools[0] eq $false, "false is nay $i";
+		ok $recovered_bools[1] eq $true, "true is yea $i";
+
+		is $J->get_core_bools, !!0, "arbitrary booleans are not core";
+	}
+}
+
+eval {
+	my $J = JSON::SIMD->new->boolean_values("just a single argument for false");
+	1;
+} or do {
+	my $e = $@;
+	ok $e =~ '^boolean_values requires either zero or two arguments';
+};
+
 done_testing();

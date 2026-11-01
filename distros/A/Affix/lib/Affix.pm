@@ -1,4 +1,4 @@
-package Affix v1.3.0 {    # 'FFI' is my middle name!
+package Affix v1.4.0 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
@@ -105,7 +105,7 @@ package Affix v1.3.0 {    # 'FFI' is my middle name!
         if ( !defined $libdirs ) {
             if ($is_win) {
                 require Win32;
-                $libdirs = [ Win32::GetFolderPath( Win32::CSIDL_SYSTEM() ) . '/', Win32::GetFolderPath( Win32::CSIDL_WINDOWS() ) . '/', ];
+                $libdirs = [ Win32::GetFolderPath( Win32::CSIDL_SYSTEM() ) . '/', Win32::GetFolderPath( Win32::CSIDL_WINDOWS() ) . '/' ];
             }
             else {
                 $libdirs = [

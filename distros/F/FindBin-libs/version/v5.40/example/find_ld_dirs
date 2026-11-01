@@ -138,11 +138,13 @@ directory symlinks to their real on-disk location.
 
 =item C<$Bin>
 
-An alias.  Equals C<$Bin_l> by default; equals C<$Bin_p> when the
-caller passes C<abspath> to C<FindBin::Bin>:
+An alias.  Equals C<$Bin_p> by default (physical, abspath); equals
+C<$Bin_l> when the caller passes C<noabspath> to C<FindBin::Bin>.
+This matches C<FindBin::libs> behavior:
 
-    use FindBin::Bin qw( $Bin );            # $Bin == $Bin_l  (default)
-    use FindBin::Bin qw( $Bin abspath );    # $Bin == $Bin_p
+    use FindBin::Bin qw( $Bin );            # $Bin == $Bin_p  (physical, default)
+    use FindBin::Bin qw( $Bin noabspath );  # $Bin == $Bin_l  (logical)
+    use FindBin::Bin qw( $Bin abspath );    # $Bin == $Bin_p  (physical, explicit)
 
 =back
 

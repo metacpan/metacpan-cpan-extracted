@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::Configuration v0.999.14;
+package LedgerSMB::Installer::Configuration v0.999.15;
 
 use v5.20;
 use experimental qw(signatures);
@@ -34,7 +34,7 @@ sub new( $class, %args ) {
 }
 
 sub dependency_url($self, $distro, $id) {
-    return "https://download.ledgersmb.org/f/dependencies/$distro/$id.json";
+    return "https://download.ledgersmb.org/f/dependencies/$distro/$id\@$self->{_version}.json";
 }
 
 sub have_deps($self) {

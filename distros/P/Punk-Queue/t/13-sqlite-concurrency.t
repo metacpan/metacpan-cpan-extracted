@@ -11,6 +11,7 @@ use PQTest;
 # BEGIN IMMEDIATE + busy_timeout: contending writers serialise at BEGIN
 # and SQLITE_BUSY becomes a wait, not an error surfacing to the claim.
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'DBI and DBD::SQLite required' unless has_dbd();
 
 my $WORKERS = 4;

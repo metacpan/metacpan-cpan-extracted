@@ -53,6 +53,26 @@ void __redisSetError(redisContext *c, int type, const char *str);
 
 int redisContextUpdateCommandTimeout(redisContext *c, const struct timeval *timeout);
 
+#ifdef __linux__
+static void redisDrainSocketErrorQueue(redisFD fd) {
+    int saved_errno = errno;
+
+    for (;;) {
+        char buf[1];
+        struct iovec iov = {.iov_base = buf, .iov_len = sizeof(buf)};
+        struct msghdr msg = {.msg_iov = &iov, .msg_iovlen = 1};
+
+        if (recvmsg(fd, &msg, MSG_ERRQUEUE | MSG_DONTWAIT) >= 0)
+            continue;
+        if (errno == EINTR)
+            continue;
+        break;
+    }
+
+    errno = saved_errno;
+}
+#endif
+
 void redisNetClose(redisContext *c) {
     if (c && c->fd != REDIS_INVALID_FD) {
         close(c->fd);
@@ -312,35 +332,50 @@ static int redisContextWaitReady(redisContext *c, long msec) {
     wfd.events = POLLOUT;
     end = msec >= 0 ? redisPollMillis() + msec : 0;
 
-    while ((res = poll(&wfd, 1, msec)) <= 0) {
+    for (;;) {
+        int completed = 0;
+
+        res = poll(&wfd, 1, msec);
         if (res < 0 && errno != EINTR) {
             __redisSetErrorFromErrno(c, REDIS_ERR_IO, "poll(2)");
             redisNetClose(c);
             return REDIS_ERR;
-        } else if (res == 0 || (msec >= 0 && redisPollMillis() >= end)) {
+        }
+
+        if (res > 0) {
+            if (redisCheckConnectDone(c, &completed) != REDIS_OK) {
+                redisCheckSocketError(c);
+                return REDIS_ERR;
+            }
+            if (completed)
+                return REDIS_OK;
+        }
+
+        if (res == 0) {
             errno = ETIMEDOUT;
             __redisSetErrorFromErrno(c, REDIS_ERR_IO, NULL);
             redisNetClose(c);
             return REDIS_ERR;
-        } else {
-            /* res < 0 && errno == EINTR, try again */
+        }
+
+        if (msec >= 0) {
+            long now = redisPollMillis();
+
+            if (now >= end) {
+                errno = ETIMEDOUT;
+                __redisSetErrorFromErrno(c, REDIS_ERR_IO, NULL);
+                redisNetClose(c);
+                return REDIS_ERR;
+            }
+            msec = end - now;
         }
     }
-
-    if (redisCheckConnectDone(c, &res) != REDIS_OK || res == 0) {
-        redisCheckSocketError(c);
-        return REDIS_ERR;
-    }
-
-    return REDIS_OK;
 }
 
 int redisCheckConnectDone(redisContext *c, int *completed) {
     int rc = connect(c->fd, (const struct sockaddr *)c->saddr, c->addrlen);
-    if (rc == 0) {
-        *completed = 1;
-        return REDIS_OK;
-    }
+    if (rc == 0)
+        goto connected;
     int error = errno;
     if (error == EINPROGRESS) {
         /* must check error to see if connect failed.  Get the socket error */
@@ -350,8 +385,7 @@ int redisCheckConnectDone(redisContext *c, int *completed) {
         if (fail == 0) {
             if (so_error == 0) {
                 /* Socket is connected! */
-                *completed = 1;
-                return REDIS_OK;
+                goto connected;
             }
             /* connection error; */
             errno = so_error;
@@ -360,15 +394,26 @@ int redisCheckConnectDone(redisContext *c, int *completed) {
     }
     switch (error) {
     case EISCONN:
-        *completed = 1;
-        return REDIS_OK;
+        goto connected;
     case EALREADY:
     case EWOULDBLOCK:
+#ifdef __linux__
+        if (c->connection_type == REDIS_CONN_TCP)
+            redisDrainSocketErrorQueue(c->fd);
+#endif
         *completed = 0;
         return REDIS_OK;
     default:
         return REDIS_ERR;
     }
+
+connected:
+    *completed = 1;
+#ifdef __linux__
+    if (c->connection_type == REDIS_CONN_TCP)
+        redisDrainSocketErrorQueue(c->fd);
+#endif
+    return REDIS_OK;
 }
 
 int redisCheckSocketError(redisContext *c) {

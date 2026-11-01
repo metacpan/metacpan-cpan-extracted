@@ -34,7 +34,7 @@ ok lives {
     $c->version( '1.12.0' );
     my $url = $c->dependency_url( 'debian', 'bookworm' );
     is( $url,
-        'https://download.ledgersmb.org/f/dependencies/debian/bookworm.json',
+        'https://download.ledgersmb.org/f/dependencies/debian/bookworm@1.12.0.json',
         q{Dependency download URL expanded correctly});
 }, q{Dependency download URL expansion runs without exceptions};
 

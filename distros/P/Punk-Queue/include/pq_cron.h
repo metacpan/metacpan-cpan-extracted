@@ -348,7 +348,13 @@ static void pq_civil_of(pTHX_ double epoch, const pq_tz *tz, pq_civil *cv) {
     if (tz->kind == PQ_TZ_LOCAL) {
         time_t t = (time_t)epoch;
         struct tm tmv;
+#ifdef WIN32
+        /* no localtime_r in the CRT, and its localtime is per-thread */
+        struct tm *p = localtime(&t);
+        if (p) tmv = *p; else memset(&tmv, 0, sizeof tmv);
+#else
         (void)localtime_r(&t, &tmv);
+#endif
         cv->year = tmv.tm_year + 1900;
         cv->mon  = tmv.tm_mon + 1;
         cv->mday = tmv.tm_mday;

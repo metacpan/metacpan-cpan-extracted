@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.14;
+package LedgerSMB::Installer v0.999.15;
 
 use v5.20;
 use experimental qw(signatures);
@@ -175,10 +175,7 @@ sub _compute_all_deps($class, $config) {
                     must => [
                         { term => { status => 'latest' } },
                         { terms => { provides => [ @last_deps ] } }
-                        ],
-                    filter => {
-                        match_all => {}
-                    }
+                    ],
                 }
             }
         };
@@ -191,6 +188,10 @@ sub _compute_all_deps($class, $config) {
             die "Unable to request module dependencies; POST request failed for https://fastapi.metacpan.org/v1/release/_search, response: $r->{status} - $r->{reason}";
         }
         my $hits = $json->decode($r->{content})->{hits};
+        if ($hits->{hits}->@* > 500) {
+            my $hit_count = scalar $hits->{hits}->@*;
+            warn "Unexpectedly high number of dependencies reported: $hit_count\nRequest body: $body\n";
+        }
 
         for my $release ($hits->{hits}->@*) {
             $dists{$release->{_source}->{distribution}} = 1;
@@ -484,6 +485,35 @@ sub _module_will_install($class, $mod, $pkgs, $unmapped) {
     return 1;
 }
 
+sub available($class, @args) {
+    my $r = $http->get( 'https://download.ledgersmb.org/f/Releases/' );
+    unless ($r->{success}) {
+        die $log->error( "Failed to retrieve download list; $r->{code} - $r->{reason}" );
+    }
+
+    my @versions;
+    while ($r->{content} =~ s{<tr\s+class="(?:odd|even)"\s*>(.*?)</tr\s*>}{}m) {
+        my $row = $1;
+        if ($row =~ m{">(\d+\.\d+\.\d+)/</a>}) {
+            my $version = $1;
+            $version =~ m{(\d+\.\d+)\.};
+            my $minor = $1;
+            push @versions, {
+                version => version->parse($version),
+                minor   => $minor
+            };
+        }
+    }
+
+    my $last_minor = '';
+    for my $v (sort { $b->{version} <=> $a->{version} } @versions) {
+        next if $last_minor eq $v->{minor};
+
+        say ' ' . $v->{version}->stringify;
+        $last_minor = $v->{minor};
+    }
+}
+
 sub install($class, @args) {
     my $rv = 1;
     my ($dss, $config) = $class->_boot(
@@ -769,6 +799,10 @@ sub run($class, $cmd, @args) {
     elsif ($cmd eq 'help') {
         return $class->help( @args );
     }
+    elsif ($cmd eq 'available') {
+        say $log->info( "Retrieving list of available versions for installation" );
+        return $class->available( @args );
+    }
     elsif ($cmd eq 'install') {
         say $log->info( "Installing LedgerSMB using installer $INSTALLER_VERSION" );
         return $class->install( @args );
@@ -830,6 +864,7 @@ Usage: SCRIPT [command] [option ..]
   Commands:
     compute
     download
+    available
     install
     help
     system-id

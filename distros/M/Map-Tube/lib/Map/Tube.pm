@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.1.0');
+our $VERSION   = qv('v5.1.1');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version v5.1.0
+Version v5.1.1
 
 =cut
 
@@ -88,9 +88,9 @@ documented in L<Map::Tube::Cookbook>.
     |                      |           | Sofia, Tbilisi, Vienna, Warsaw,          |
     |                      |           | Yekaterinburg)                           |
     |                      |           |                                          |
-    | Gisbert W Selke      | GWS       | 16 (Beijing, Brussels, Chicago, Glasgow, |
-    |                      |           | Hamburg, KoelnBonn, Lyon, Muenchen,      |
-    |                      |           | Napoli, Oslo, Paris, RheinRuhr,          |
+    | Gisbert W Selke      | GWS       | 17 (Beijing, Brussels, Chicago, Glasgow, |
+    |                      |           | Hamburg, Hannover, KoelnBonn, Lyon,      |
+    |                      |           | Muenchen, Napoli, Oslo, Paris, RheinRuhr,|
     |                      |           | San Francisco, Stockholm, Stuttgart,     |
     |                      |           | Toulouse)                                |
     |                      |           |                                          |
@@ -1567,10 +1567,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/Map-Tube/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube>
 
 =item * Search MetaCPAN
 

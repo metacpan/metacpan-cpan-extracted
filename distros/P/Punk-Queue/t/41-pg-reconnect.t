@@ -16,6 +16,7 @@ use PQSpawn;
 # undef without dying and {Active} stays true, so a lazy implementation
 # would sit deaf forever while looking healthy.
 
+plan skip_all => q{needs fork, which a Windows perl only emulates} if $^O eq q{MSWin32};
 plan skip_all => 'set PUNK_QUEUE_PG_DSN (and install DBD::Pg) to run'
     unless has_pg();
 
