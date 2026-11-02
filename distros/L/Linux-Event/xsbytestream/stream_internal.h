@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
+#include <sys/types.h>
 
 #include "stream_transport_abi.h"
 #include "stream_consumer_abi.h"
@@ -41,11 +42,18 @@ typedef struct les_plain_transport_s {
 } les_plain_transport_t;
 
 typedef struct les_write_seg_s {
+    /* A null SV marks a file entry. Ordinary byte entries stay unchanged. */
     SV *sv;
     STRLEN off;
     STRLEN len;
     struct les_write_seg_s *next;
 } les_write_seg_t;
+
+typedef struct les_file_seg_s {
+    les_write_seg_t base;
+    int fd;                  /* owned close-on-exec duplicate */
+    off_t file_offset;       /* explicit offset; caller's position unchanged */
+} les_file_seg_t;
 
 typedef struct les_descriptor_s {
     /* Class tuning defaults. These remain in the immutable descriptor as the
@@ -208,6 +216,7 @@ typedef struct les_xsstate_s {
     les_write_seg_t *whead;
     les_write_seg_t *wtail;
     UV pending_bytes;
+    UV file_segments;
 
     /* Optional established-connection deadline activity. The ordinary Stream
      * path leaves tracking disabled and therefore pays only one predictable
@@ -325,6 +334,8 @@ void les_transition_descriptor(
     pTHX_ les_xsstate_t *st, SV *descriptor_obj, SV *input_sv);
 void les_read_ready(pTHX_ les_xsstate_t *st);
 int les_write_submit(pTHX_ les_xsstate_t *st, SV *bytes_sv);
+int les_sendfile_submit(pTHX_ les_xsstate_t *st, int source_fd,
+    UV offset, int has_length, UV length);
 void les_write_ready(pTHX_ les_xsstate_t *st);
 
 #endif

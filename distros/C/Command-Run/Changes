@@ -1,5 +1,11 @@
 Revision history for Perl extension Command-Run
 
+1.05 2026-11-02T08:39:48Z
+
+    - Select STDOUT while a code reference runs, in nofork and fork mode,
+      so that its print is captured when the caller has another handle
+      selected
+
 1.04 2026-10-24T06:33:58Z
 
     - nofork mode now restores STDOUT and STDERR with dup2() instead of

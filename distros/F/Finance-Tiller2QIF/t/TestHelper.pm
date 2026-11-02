@@ -6,7 +6,7 @@
 
 use 5.036;
 use feature qw/postderef signatures/;
-use DBI;
+use Finance::Tiller2QIF::DB;
 
 use Test2::API qw/test2_stack/;
 # use Path::Tiny;
@@ -98,18 +98,7 @@ sub test_pass {
 }
 
 sub dbi_connect ($db_path) {
-  my $dbh = DBI->connect(
-    "dbi:SQLite:dbname=$db_path",
-    '',
-    '',
-    {
-      RaiseError     => 1,
-      PrintError     => 0,
-      AutoCommit     => 1,
-      sqlite_unicode => 1,
-    }
-  );
-  return TillerTestDB->new($dbh);
+  return TillerTestDB->new( Finance::Tiller2QIF::DB::connect_db($db_path) );
 }
 
 sub freshdb ($newdb) {

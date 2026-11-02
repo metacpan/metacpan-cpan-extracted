@@ -51,10 +51,13 @@ t/lib/Database/test2.pm
 t/lib/Database/xljoin_a.pm
 t/lib/Database/xljoin_b.pm
 t/logic.t
+t/mariadb.t
+t/mariadb_live.t
 t/path.t
 t/pod.t
 t/redis.t
 t/redis_live.t
+t/remote.t
 t/sqlite-backend.t
 t/test1_2.t
 t/transaction.t

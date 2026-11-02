@@ -219,6 +219,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker'   => '0',
         'ExtUtils::Depends'     => '0.404',
         'Punk::OpenTelemetry'   => '0.08',
+        'Shared::Arena'         => '0.11',
     },
     TEST_REQUIRES    => { 'Test::More' => '0', 'IO::Compress::Gzip' => '0' },
     PREREQ_PM        => {

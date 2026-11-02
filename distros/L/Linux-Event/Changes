@@ -1,5 +1,32 @@
 Revision history for Linux-Event
 
+0.118  2026-11-01
+    - Add Stream->sendfile($file, offset => ..., length => ...) for
+      established plain TCP and Unix-domain socket Streams. File ranges share
+      the native ordered output queue with write() and obey existing
+      backpressure, output limits, deadlines, graceful end, and close behavior.
+      Keep the caller's file position unchanged and retain an owned
+      close-on-exec duplicate so the caller may close its filehandle.
+    - Reject TLS and other non-plain transports, pending connections, and
+      invalid file ranges rather than silently copying or reframing data.
+      Preserve the ordinary byte-write hot path and bound mixed file output
+      to 64 KiB per readiness turn for Loop fairness. Add regression tests for
+      ordering, callbacks, lifecycle, managed fork, and file descriptor
+      cleanup, plus byte-verified TCP benchmarks and public documentation.
+    - Add Loop->defer_fork() so socket, timer, and other event callbacks can
+      request a managed fork without forking inside native dispatch. Reuse
+      the existing resource-aware share/clone/move dispositions and child
+      reconstruction handshake. Parent and child completion callbacks run
+      only after the native driver has returned to a quiescent point.
+    - Return a cancelable one-shot request handle, support on_error for
+      deferred failures, preserve explicit stop priority, and discard pending
+      fork requests inherited by a child to prevent unintended repeated
+      forks. Support run(), run_for(), run_once(), and poll() with the same
+      application-facing API. Ordinary Loop->fork() remains quiescent-only.
+    - Keep epoll dispatch in native XS. Add targeted deferred-fork regression
+      coverage and an isolated public/native driver overhead benchmark.
+      Update examples and documentation for callback-triggered forking.
+
 0.117  2026-09-24
     - Rewrite public POD with clearer constructor placement, callback
       signatures, lifecycle explanations, and practical examples. Keep

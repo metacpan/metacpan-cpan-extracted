@@ -232,22 +232,23 @@ sub _capture_warn (&) {		## no critic (Prototypes)
 
 note '--- Section 1: new() execution paths ---';
 
-# PATH-new-1: databases[0]{id} is defined → _autoload_pk captures it
+# PATH-new-1: autoload_pk explicitly supplied → _autoload_pk stores it
 {
-	my $p = PathDA->new(cols => [$JC, 'name'], rows => [], id => 'myid');
-	my $s = PathDA->new(cols => [$JC, 'tag'],  rows => [], id => 'entry');
-	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $p = PathDA->new(cols => [$JC, 'name'], rows => []);
+	my $s = PathDA->new(cols => [$JC, 'tag'],  rows => []);
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC,
+		autoload_pk => 'myid');
 	is($j->{_autoload_pk}, 'myid',
-		'new PATH-1: _autoload_pk = databases[0]{id} when id is set');
+		'new PATH-1: _autoload_pk stores explicit autoload_pk');
 }
 
-# PATH-new-2: databases[0]{id} is undef → _autoload_pk falls back to join_column
+# PATH-new-2: autoload_pk absent → _autoload_pk defaults to join_column
 {
-	my $p = PathDA->new(cols => [$JC, 'name'], rows => [], id => undef);
-	my $s = PathDA->new(cols => [$JC, 'tag'],  rows => [], id => undef);
+	my $p = PathDA->new(cols => [$JC, 'name'], rows => []);
+	my $s = PathDA->new(cols => [$JC, 'tag'],  rows => []);
 	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
 	is($j->{_autoload_pk}, $JC,
-		'new PATH-2: _autoload_pk falls back to join_column when {id} is undef');
+		'new PATH-2: _autoload_pk defaults to join_column when autoload_pk absent');
 }
 
 # PATH-new-3: logger provided → propagated to both component DAs at construction

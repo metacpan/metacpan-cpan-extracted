@@ -83,6 +83,7 @@ lives_ok {
 		databases   => [ $test1, $test2 ],
 		join_column => 'statecode',
 		join_map    => { 1 => 'entry' },
+		autoload_pk => 'entry',
 	);
 } 'Database::Join->new with join_map lives';
 

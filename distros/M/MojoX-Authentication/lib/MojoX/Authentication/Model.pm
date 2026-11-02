@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model;
-{ our $VERSION = '0.008' }
+{ our $VERSION = '0.010' }
 
 use v5.24;
 use Moo;
@@ -43,11 +43,12 @@ sub _build__providers ($self) {
                if $provider->can('update_from_config');
          }
          else {
-            my ($class, $args) = $candidate->@{qw< class args >};
+            my ($class, $args, $name) = $candidate->@{qw< class args name >};
             my @args = ref($args) eq 'ARRAY' ? $args->@*
                : ref($args) eq 'HASH' ? $args->%*
                : ! defined($args) ? ()
                : ouch 400, 'invalid "args" in provider, array or hash refs only';
+            push @args, name => $name if defined($name);
             $provider = use_module($class)->create($config, @args);
          };
          $name = $candidate->{name} // undef;

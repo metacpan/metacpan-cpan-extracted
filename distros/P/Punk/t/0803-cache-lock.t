@@ -22,6 +22,12 @@ use Punk ();
 # that the loser executes ANYWAY once the budget runs out, which is the same
 # outcome. This file asserts the part that differs: that the budget has to
 # actually elapse first.
+#
+# It lied a second time with a nanosecond mtime: GNU/Hurd's ext2fs HAS the
+# st_mtim.tv_nsec field and stores zero in it, so the build probe said
+# "sub-second" and the lock was back to whole seconds (CPAN Testers, 0.67, on
+# two perls). The lock now writes its own clock into the file and reads it
+# back, so what the filesystem thinks the time is no longer enters into it.
 
 my $root = File::Temp->newdir;
 my $n    = 0;
@@ -57,9 +63,9 @@ sub fresh { Punk::Cache::File->new(dir => "$root/c" . $n++, @_) }
     my $c = fresh(lock_wait => 0.2);
     is($c->_lock('k'), 1, 'taken');
 
-    # PCF_MTIME_SLACK adds a second to the budget where the platform has no
-    # sub-second mtime, so wait past that too rather than asserting a bound
-    # this machine may not meet.
+    # A lock file that lost its stamp is judged by mtime with a second of
+    # slack added to the budget, so wait past that too rather than asserting
+    # a bound this machine may not meet.
     my $won = 0;
     my $end = Time::HiRes::time() + 5;
     while (Time::HiRes::time() < $end) {
@@ -67,6 +73,31 @@ sub fresh { Punk::Cache::File->new(dir => "$root/c" . $n++, @_) }
         Time::HiRes::sleep(0.02);
     }
     ok($won, 'a lock left behind by a holder that never came back is stolen');
+}
+
+# ---- the file's mtime is not consulted while the stamp is there --------------
+# Hurd in miniature: the lock file's mtime is wound back a whole second, which
+# is what a filesystem with whole-second timestamps reports at worst. The
+# stamp inside the file says the lock is new, and the stamp wins.
+{
+    my $c = fresh(lock_wait => 0.3);
+    is($c->_lock('k'), 1, 'taken');
+    my ($lock) = glob("$root/c" . ($n - 1) . "/*/*/*.lock");
+    ok($lock, 'the lock is a file beside the entry');
+    ok(-s $lock, 'and it is not empty: it carries the holder\'s clock');
+    my $past = time - 1;
+    utime $past, $past, $lock or die "utime: $!";
+    is($c->_lock('k'), 0,
+       'a lock whose mtime reads a second old is still held when its stamp '
+     . 'says otherwise');
+
+    # ...but a lock file with NO stamp - a holder that died between creating
+    # it and writing into it - falls back to mtime, with a second of slack.
+    truncate $lock, 0 or die "truncate: $!";
+    is($c->_lock('k'), 0, 'an empty lock a second old is within the slack');
+    $past = time - 3;
+    utime $past, $past, $lock or die "utime: $!";
+    is($c->_lock('k'), 1, 'an empty lock three seconds old is stolen');
 }
 
 # ---- unlock releases it ------------------------------------------------------

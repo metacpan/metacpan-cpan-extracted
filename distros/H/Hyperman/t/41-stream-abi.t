@@ -5,7 +5,7 @@ use lib "t/lib";
 use Test::More;
 use HMTest qw(free_ports quiet_child server_reap);
 use IO::Socket::INET;
-use Socket qw(PF_INET SOCK_STREAM SOL_SOCKET SO_RCVBUF
+use Socket qw(PF_INET SOCK_STREAM SOL_SOCKET SO_RCVBUF SO_LINGER
               inet_aton pack_sockaddr_in);
 use Time::HiRes ();
 use Errno ();
@@ -381,6 +381,32 @@ for my $case (['/tunnel', 'hello;', 'a synchronous handler'],
 # The body is EOF-delimited, so the graceful close IS the success signal and
 # there is nothing else in the protocol left to say. A TCP reset is the only
 # thing a client can tell apart from it, which is why stream_abort sends one.
+#
+# Whether a zero-linger close reaches the peer as a reset at all is the
+# host's to decide, not the server's: on the Cygwin and GNU/Hurd smokers the
+# client read the whole body and then a clean EOF, so their TCP sent a FIN
+# for the close the server asked to be a reset (Hyperman 0.65, 31 Oct 2026).
+# Probed on a loopback pair of this process's own rather than guessed from
+# $^O, so the assertion is skipped only where the kernel cannot send what
+# the server asked for.
+sub reset_reaches_peer {
+    my $l = IO::Socket::INET->new(Listen => 1, LocalAddr => '127.0.0.1',
+                                  LocalPort => 0, Proto => 'tcp') or return 0;
+    my $c = IO::Socket::INET->new(PeerAddr => '127.0.0.1',
+                                  PeerPort => $l->sockport, Proto => 'tcp')
+        or return 0;
+    my $a = $l->accept or return 0;
+    syswrite $a, 'x';
+    setsockopt($a, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0)) or return 0;
+    close $a;
+    while (1) {
+        my $n = sysread $c, my $buf, 16;
+        return $!{ECONNRESET} ? 1 : 0 unless defined $n;
+        return 0 if $n == 0;
+    }
+}
+my $host_resets = reset_reaches_peer();
+
 {
     my $s = connect_h1();
     SKIP: {
@@ -398,8 +424,12 @@ for my $case (['/tunnel', 'hello;', 'a synchronous handler'],
             $resp .= $buf;
         }
         close $s;
-        ok($reset, 'HTTP/1.1: an aborted body ends in a reset, not a clean EOF')
-            or diag("ended cleanly with " . length($resp) . " bytes");
+        SKIP: {
+            skip 'a zero-linger close reaches the peer as a FIN on this host', 1
+                unless $host_resets || $reset;
+            ok($reset, 'HTTP/1.1: an aborted body ends in a reset, not a clean EOF')
+                or diag("ended cleanly with " . length($resp) . " bytes");
+        }
 
         state_now();
         is($st{open}, 0, '...and the handle is released, as close releases it');

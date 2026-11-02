@@ -4,14 +4,21 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  File::stat: '0'
   Geo::Location::Point: '0'
+  IPC::System::Simple: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +31,13 @@ no_index:
 requires:
   ExtUtils::MakeMaker: '6.64'
   Math::Trig: '0'
+  Params::Get: '0.13'
+  Params::Validate::Strict: '0.12'
+  Return::Set: '0.03'
   Statistics::Basic: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/nigelhorne/Geo-AnomalyDetector/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-AnomalyDetector
   repository: git://github.com/nigelhorne/Geo-AnomalyDetector.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

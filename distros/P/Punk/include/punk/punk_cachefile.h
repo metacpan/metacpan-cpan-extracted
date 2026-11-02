@@ -115,20 +115,26 @@ static double pcf_now(void) {
  * a second, which steals a live lock and lets two callers compute at once.
  * The slack is added to the budget rather than subtracted from the age,
  * because erring the other way only delays a steal by a second, and a
- * request that waits a second longer is cheaper than work done twice. */
+ * request that waits a second longer is cheaper than work done twice.
+ *
+ * THE SLACK IS A WHOLE SECOND EVEN WHERE A NANOSECOND FIELD EXISTS. That a
+ * struct stat HAS st_mtim.tv_nsec says the libc spells it, not that the
+ * filesystem fills it: GNU/Hurd's ext2fs has the field and stores zero in it
+ * (CPAN Testers, Punk 0.67, t/0803 on two perls), so the configure probe
+ * that found the field reported sub-second mtime on a box with none. The
+ * lock therefore no longer judges its age by mtime at all - see
+ * pcf_lock_age - and this is only the fallback for a lock file that has no
+ * stamp in it yet. */
 #if defined(PUNK_STAT_MTIM)
 #  define PCF_MTIME(st)    ((double)(st).st_mtime + (double)(st).st_mtim.tv_nsec / 1e9)
-#  define PCF_MTIME_SLACK  0.0
 #elif defined(PUNK_STAT_MTIMESPEC)
 #  define PCF_MTIME(st)    ((double)(st).st_mtime + (double)(st).st_mtimespec.tv_nsec / 1e9)
-#  define PCF_MTIME_SLACK  0.0
 #elif defined(PUNK_STAT_MTIMENSEC)
 #  define PCF_MTIME(st)    ((double)(st).st_mtime + (double)(st).st_mtimensec / 1e9)
-#  define PCF_MTIME_SLACK  0.0
 #else
 #  define PCF_MTIME(st)    ((double)(st).st_mtime)
-#  define PCF_MTIME_SLACK  1.0
 #endif
+#define PCF_MTIME_SLACK  1.0
 
 /* ---- paths --------------------------------------------------------------- */
 
@@ -541,13 +547,64 @@ static void punk_cachefile_usage(punk_cachefile *c, uint64_t *bytes,
  * actually holding the lock. */
 #define PCF_LOCK_UNAVAILABLE (-1)
 
+/* The lock file carries its own birth time: the holder's clock, in whole
+ * microseconds, as decimal text. A later caller judges the lock's age with
+ * the SAME clock, so the judgement owes nothing to the filesystem's idea of
+ * time - neither its resolution nor how lazily it stamps a new inode. The
+ * stamp is an integer rather than a "%f" because a perl inside `use locale`
+ * can leave LC_NUMERIC set to a comma, and strtod would then read "1.5" as 1.
+ *
+ * Create and stamp are two steps, and a reader can land between them, so an
+ * EMPTY lock file is read as one being written this instant - unless its
+ * mtime, with the full second of slack, says the writer died in that gap. */
+static int pcf_lock_create(const char *lock) {
+    char buf[32];
+    int n, fd;
+
+    fd = open(lock, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (fd < 0) return 0;
+    n = snprintf(buf, sizeof buf, "%llu",
+                 (unsigned long long)(pcf_now() * 1e6));
+    if (n > 0 && (size_t)n < sizeof buf) {
+        ssize_t w = write(fd, buf, (size_t)n);
+        (void)w;        /* an unwritten stamp falls back to mtime below */
+    }
+    close(fd);
+    return 1;
+}
+
+/* How long ago the lock at `lock` was taken, or a negative number when there
+ * is no lock there to judge (it was released between the caller's failed
+ * create and now). */
+static double pcf_lock_age(const char *lock) {
+    char buf[32];
+    struct stat st;
+    ssize_t got = -1;
+    double now = pcf_now();
+    int fd;
+
+    fd = open(lock, O_RDONLY | PCF_O_NOFOLLOW);
+    if (fd >= 0) {
+        got = read(fd, buf, sizeof buf - 1);
+        close(fd);
+    }
+    if (got > 0) {
+        char *end;
+        unsigned long long us;
+        buf[got] = '\0';
+        errno = 0;
+        us = strtoull(buf, &end, 10);
+        if (end != buf && errno == 0) return now - (double)us / 1e6;
+    }
+    if (stat(lock, &st) != 0) return -1.0;
+    return now - PCF_MTIME(st) - PCF_MTIME_SLACK;
+}
+
 /* `stale` is how old a held lock may be before it is taken for abandoned
  * and stolen; negative means the store's own lock_wait. */
 static int punk_cachefile_lock_for(pTHX_ punk_cachefile *c, const char *key,
                                    uint32_t klen, double stale) {
     char path[PCF_PATHMAX], lock[PCF_PATHMAX];
-    struct stat st;
-    int fd;
 
     if (pcf_path(c, key, klen, path, sizeof path, 1) != 0
         || !PCF_FITS(snprintf(lock, sizeof lock, "%s.lock", path), lock)) {
@@ -555,20 +612,13 @@ static int punk_cachefile_lock_for(pTHX_ punk_cachefile *c, const char *key,
         return PCF_LOCK_UNAVAILABLE;
     }
 
-    fd = open(lock, O_WRONLY | O_CREAT | O_EXCL, 0600);
-    if (fd >= 0) { close(fd); return 1; }        /* won */
+    if (pcf_lock_create(lock)) return 1;         /* won */
 
     /* Somebody holds it. If it is older than the wait budget its holder is
-     * not coming back - steal it rather than obey it. PCF_MTIME_SLACK is
-     * what this platform's mtime resolution can overstate the age by; see
-     * PCF_MTIME above for why it is added here rather than taken off the
-     * age. */
-    if (stat(lock, &st) == 0
-        && pcf_now() - PCF_MTIME(st)
-               > (stale < 0 ? c->lock_wait : stale) + PCF_MTIME_SLACK) {
+     * not coming back - steal it rather than obey it. */
+    if (pcf_lock_age(lock) > (stale < 0 ? c->lock_wait : stale)) {
         unlink(lock);
-        fd = open(lock, O_WRONLY | O_CREAT | O_EXCL, 0600);
-        if (fd >= 0) { close(fd); return 1; }
+        if (pcf_lock_create(lock)) return 1;
     }
     return 0;
 }

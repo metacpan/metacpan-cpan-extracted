@@ -19,14 +19,24 @@ WriteMakefile(
 		: ()),
 	PREREQ_PM => {
 		'ExtUtils::MakeMaker' => 6.64,
-		'Statistics::Basic' => 0,
 		'Math::Trig' => 0,
+		'Params::Get' => 0.13,
+		'Params::Validate::Strict' => 0.12,
+		'Return::Set' => 0.03,
+		'Statistics::Basic' => 0,
 	},
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,
 	},
 	TEST_REQUIRES => {
+		'File::Glob' => 0,
+		'File::Slurp' => 0,
+		'File::stat' => 0,
 		'Geo::Location::Point' => 0,
+		'IPC::System::Simple' => 0,
+		'JSON::MaybeXS' => 0,
+		'POSIX' => 0,
+		'Readonly' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -42,9 +52,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Geo-AnomalyDetector'
 			}, bugtracker => {
 				mailto => 'bug-Geo-AnomalyDetector@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Geo-AnomalyDetector/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-AnomalyDetector',
-				web => 'https://github.com/nigelhorne/Geo-AnomalyDetector/issues'
+				# url => 'https://github.com/nigelhorne/Geo-AnomalyDetector/issues',
+				# web => 'https://github.com/nigelhorne/Geo-AnomalyDetector/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-AnomalyDetector',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-AnomalyDetector',
 			}
 		},
 	},

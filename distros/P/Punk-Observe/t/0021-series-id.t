@@ -25,8 +25,11 @@ sub _hex {
     # because the 0 flag applies to numeric conversions and not to %s. That
     # produced two implementations that "disagreed everywhere" when only the
     # formatting differed.
+    #
+    # as_hex, not to_hex: to_hex is Math::BigInt 1.999807, newer than the copy
+    # perl 5.26 and older ship, and as_hex is in all of them.
     require Math::BigInt;
-    my $h = lc Math::BigInt->new("$v")->to_hex;
+    (my $h = lc Math::BigInt->new("$v")->as_hex) =~ s/\A0x//;
     return ('0' x (16 - length $h)) . $h;
 }
 

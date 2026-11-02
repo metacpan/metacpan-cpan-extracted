@@ -1,5 +1,26 @@
 Revision history for Database::Join
 
+0.010.1	Sun Nov  1 07:59:33 PM EST 2026
+	[ Enhancements ]
+	- autoload_pk: new constructor parameter that sets the column name used as
+	  the positional-argument key when AUTOLOAD performs a full join query
+	  (i.e. when join_map or filters is active).  Defaults to join_column.
+	  Previously Database::Join read the primary DA's internal {id} hash slot
+	  to infer this value; the new parameter makes the coupling explicit and
+	  gives callers full control without relying on DA internals.
+	- group_by(): explicit unsupported-method stub (croaks with a helpful
+	  message directing callers to aggregate()) so that calling the
+	  Database::Abstraction::Query fluent chain entry point on a
+	  Database::Join object fails fast instead of silently routing through
+	  AUTOLOAD to a single component DA.
+	[ Bug Fixes ]
+	- The SQLite backend hung, then failed with "database is locked", on a BSD
+	  with File::Temp older than 0.2307, as Perl 5.28 ships.  Such a File::Temp
+	  holds a new file under an exclusive lock.  The temporary database is now
+	  opened with EXLOCK => 0.
+	[ Tests ]
+	- Added MariaDB tests.  Can a MariaDB database be joined with another database
+
 0.010.0	Tue Oct 13 08:47:55 PM EDT 2026
 	[ Enhancements ]
 	- distinct => 1: selectall_arrayref (and selectall_array) now accept

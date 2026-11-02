@@ -567,7 +567,7 @@ subtest 'L07: join_map active => AUTOLOAD takes full join path' => sub {
 		backend     => 'array',
 	);
 	# AUTOLOAD: $j->city('CA') -- join_map active => full join
-	# _autoload_pk='statecode' (from $prim->{id}) => {statecode=>'CA'}
+	# _autoload_pk='statecode' (autoload_pk defaults to join_column) => {statecode=>'CA'}
 	my $city = $j->city('CA');
 	is($city, 'SanFrancisco', 'L07: join_map: AUTOLOAD returns value via full join');
 	ok($sec->call_count > 0, 'L07: join_map: secondary DA queried (full join path confirmed)');

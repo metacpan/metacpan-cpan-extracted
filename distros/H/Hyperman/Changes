@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.66	2026-11-01
+        - TEST: the HTTP/1.1 abort test probes whether this host turns a
+          zero-linger close into a reset before asserting one (Cygwin and
+          GNU/Hurd smokers send a FIN).
+        - TEST: the SNI tests read the served certificate with s_client,
+          not from curl's verbose output, which a wolfSSL curl omits.
+        - TEST: the sendfile RSS probe reads a size with a unit (the
+          Hurd's ps prints "9.9M"), so it measured nothing there.
+
 0.65	2026-10-31
         - FIX: a ->get from an event's callback never saw the events
           taken in the same batch, so it waited on a timer or a stop that

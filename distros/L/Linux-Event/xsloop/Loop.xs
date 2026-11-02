@@ -1464,7 +1464,7 @@ DESTROY(loop_obj)
     le_loop_destroy(loop);
 
 void
-stop(loop_obj)
+_stop_native(loop_obj)
     SV *loop_obj
   PREINIT:
     le_loop_t *loop;
@@ -1919,7 +1919,7 @@ poll_fd(loop_obj)
     RETVAL
 
 int
-poll(loop_obj)
+_poll_native(loop_obj)
     SV *loop_obj
   PREINIT:
     int n;
@@ -1953,7 +1953,7 @@ poll(loop_obj)
     RETVAL
 
 int
-run_once(loop_obj, timeout_value = -1)
+_run_once_native(loop_obj, timeout_value = -1)
     SV *loop_obj
     IV timeout_value
   PREINIT:
@@ -1987,7 +1987,7 @@ run_once(loop_obj, timeout_value = -1)
     RETVAL
 
 void
-run(loop_obj)
+_run_native(loop_obj)
     SV *loop_obj
   PREINIT:
     le_loop_t *loop;
@@ -2015,7 +2015,7 @@ run(loop_obj)
     LEAVE;
 
 void
-run_for(loop_obj, seconds)
+_run_for_native(loop_obj, seconds)
     SV *loop_obj
     double seconds
   PREINIT:

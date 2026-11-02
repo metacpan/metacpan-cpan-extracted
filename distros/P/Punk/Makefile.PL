@@ -62,6 +62,30 @@ File::Find::find(sub {
 }, 'lib');
 
 my @DEFINE;
+
+# clang 12 and later warn, once per STMT_START, that a perl before 5.26 opens
+# its statement expression in one macro and closes it in another. Punk has
+# thousands of them, and a CPAN Testers report fills its megabyte with the
+# warnings before make test begins (OpenBSD, perl 5.24, Punk 0.67: the
+# failing test is not in the report). The flag goes in only where the
+# compiler takes it, and says nothing about Punk's own code.
+{
+    my $dir = "punk_probe_warn_$$";
+    if (mkdir $dir) {
+        my $src = "$dir/probe.c";
+        my $cc  = $Config{cc} || 'cc';
+        if (open my $fh, '>', $src) {
+            print $fh "int main(void) { return 0; }\n";
+            close $fh;
+            push @DEFINE, '-Wno-compound-token-split-by-macro'
+                if system("$cc -Werror -Wno-compound-token-split-by-macro "
+                        . "$src -o $dir/probe >/dev/null 2>&1") == 0;
+            unlink $src, "$dir/probe";
+        }
+        rmdir $dir;
+    }
+}
+
 {
     my $dir = "punk_probe_$$";
     if (mkdir $dir) {

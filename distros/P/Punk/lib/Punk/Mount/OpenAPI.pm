@@ -6,7 +6,7 @@ use warnings;
 use Open::API;
 use Punk ();            
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 1;
 

@@ -1,6 +1,6 @@
 package Command::Run;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use v5.14;
 use warnings;
@@ -172,6 +172,8 @@ sub execute {
         # else: stderr passes through to terminal
 
         if (ref $command[0] eq 'CODE') {
+            # print goes to the selected handle: make that the new STDOUT
+            select(STDOUT);
             my $code = shift @command;
             @ARGV = @command;
             if (my $name = code_name($code)) {
@@ -313,6 +315,9 @@ sub _execute_in_place {
         $0 = $name;
     }
 
+    # Print of the code goes to the handle select()ed by the caller:
+    # make that STDOUT while it runs
+    my $prev_select = select(STDOUT);
     # Execute
     my $result = 0;
     eval { $code->(@command) };
@@ -336,6 +341,7 @@ sub _execute_in_place {
     defined POSIX::dup2(fileno($save_stdout), fileno(STDOUT))
         or die "restore STDOUT: $!\n";
     close $save_stdout;
+    select($prev_select);
     if ($save_stderr) {
         STDERR->flush;
         defined POSIX::dup2(fileno($save_stderr), fileno(STDERR))
@@ -461,7 +467,7 @@ Command::Run - Execute external command or code reference
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 
@@ -808,6 +814,37 @@ original STDOUT and does not affect the redirected one.
 This means existing modules like L<App::ansicolumn> and
 L<App::ansifold> work unchanged with nofork+raw mode, achieving
 significant speedups with zero code changes on the callee side.
+For the exceptions, see L</Writing a Callee for Nofork>.
+
+=head2 Writing a Callee for Nofork
+
+In nofork mode, the callee runs in the process of the caller.
+Command::Run protects only C<$_>, C<@ARGV>, C<$0> and the standard
+file handles.  Everything else is shared: global variables, loaded
+modules, and the settings of other modules.
+
+A callee should follow these rules.
+
+=over 4
+
+=item Set things up in the function, not at load time.
+
+The module may be loaded by another program, while C<$0> is still the
+name of that program.  For example, C<ExConfigure> of
+L<Getopt::EX::Long> at load time goes to the caller.
+
+=item Do not expect process-wide settings to be fresh.
+
+They may be left by the caller or by an earlier callee.  For example,
+C<Getopt::Long::Configure> only changes the settings you name, so set
+all you need on each call.
+
+=item Do not call C<exit>.
+
+It ends the caller too.  Use C<die> or return; C<die> is caught and
+the result is -1.
+
+=back
 
 =head2 Caller Protection
 

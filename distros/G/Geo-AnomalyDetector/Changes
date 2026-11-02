@@ -1,5 +1,13 @@
 Revision history for Geo-AnomalyDetector
 
+0.03	Sun Nov  1 12:51:50 PM EST 2026
+	Use Params::Get and Return::Set
+	Formally document the API
+	Added a test dashboard
+	The units argument to new() was documented but ignored, only unit was read.
+	Both now work
+	Fixed the spelling of the module's name in the documentation of new()
+
 0.02	Fri Mar  7 08:18:25 EST 2025
 	Allow coordinates to be objects as well as two-element arrays
 	Use Math::Trig

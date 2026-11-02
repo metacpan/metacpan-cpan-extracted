@@ -197,6 +197,46 @@ sub tls_stats ($self) {
 
 # Methods
 
+# The native queue duplicates the source descriptor and owns it until the
+# queued file range completes or the Stream closes. Raw bytes, like write().
+sub sendfile ($self, $fh, %opt) {
+    croak 'sendfile(): stream is closed' if $self->{closed};
+    croak 'sendfile(): writable side has ended'
+        if $self->{write_ending} || $self->{write_ended};
+    croak 'sendfile(): socket must be established'
+        if !$self->{xs_state} || $self->{connection} && !$self->{write_fh};
+    croak 'sendfile(): requires a plain transport'
+        if ($self->transport_name // 'plain') ne 'plain';
+
+    my $offset = exists($opt{offset}) ? delete($opt{offset}) : 0;
+    my $has_length = exists($opt{length});
+    my $length = delete $opt{length};
+    croak 'sendfile(): unknown options: ' . join(', ', sort keys %opt)
+        if %opt;
+    croak 'sendfile(): offset must be a non-negative integer'
+        if !defined($offset) || ref($offset)
+        || "$offset" !~ /\A(?:0|[1-9][0-9]*)\z/;
+    croak 'sendfile(): length must be a non-negative integer'
+        if $has_length && (!defined($length) || ref($length)
+            || "$length" !~ /\A(?:0|[1-9][0-9]*)\z/);
+
+    croak 'sendfile(): requires an open regular-file handle'
+        if !ref($fh) || !defined(fileno($fh));
+    my $fd = fileno($fh);
+    my $was_pending = $self->pending_bytes;
+    my $status = $self->{xs_state}->_sendfile(
+        $fd, $offset, $has_length ? $length : 0, $has_length,
+    );
+    $self->_request_write_ready if $status & 0x02;
+    if ($self->{deadline_started} && $self->{timeout}{write_timeout} > 0
+        && !$was_pending && $self->pending_bytes > 0) {
+        $self->{deadline_write_started}
+            = Linux::Event::_ByteStream::_deadline_now();
+        $self->_rearm_stream_deadline;
+    }
+    return $status & 0x01 ? 1 : 0;
+}
+
 sub close_read ($self) {
     return $self if $self->{closed} || $self->{read_closed} || $self->{read_eof};
     croak 'close_read(): directional close is unavailable for TLS sockets'

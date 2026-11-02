@@ -380,16 +380,15 @@ subtest 'new: invalid join_type rejected by enum check' => sub {
 		'new() dies when join_type is not one of inner/left/outer';
 };
 
-subtest 'new: _autoload_pk cached from primary DB {id} field' => sub {
+subtest 'new: _autoload_pk stored from explicit autoload_pk param' => sub {
 	plan tests => 2;
-	my $db = MinimalDA->new(id => 'custom_pk', cols => [$JC, $COL_A], rows => []);
-	my $j  = Database::Join->new(databases => [$db], join_column => $JC);
-	# _autoload_pk must equal the id field of the first DA, not join_column,
-	# because AUTOLOAD positional args target the primary DB's primary key.
+	my $db = MinimalDA->new(cols => [$JC, $COL_A], rows => []);
+	my $j  = Database::Join->new(databases => [$db], join_column => $JC,
+		autoload_pk => 'custom_pk');
 	is($j->{_autoload_pk}, 'custom_pk',
-		'_autoload_pk is set from the primary DB {id} field at construction');
+		'_autoload_pk stores explicit autoload_pk param');
 	isnt($j->{_autoload_pk}, $JC,
-		'_autoload_pk differs from join_column when the primary DB has its own id');
+		'_autoload_pk differs from join_column when autoload_pk is supplied');
 };
 
 subtest 'new: remove_columns applied immediately' => sub {

@@ -509,7 +509,7 @@ sub _spew {
         my $spec = File::Spec->catfile($work, 'spec' . ++$n . '.json');
         _spew($spec, qq({"openapi":"3.1.0","info":{"title":"x","version":"1"},)
                   . qq("paths":{"/a":{"get":{"operationId":")
-                  . ($id =~ s/(["\\])/\\$1/gr)
+                  . do { (my $e = $id) =~ s/(["\\])/\\$1/g; $e }
                   . qq(","responses":{"200":{"description":"ok"}}}}}}));
         my $out = File::Spec->catdir($work, "App$n");
         my $err = '';

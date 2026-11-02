@@ -1,5 +1,12 @@
 Revision history for BioX-Tax-Kraken
 
+0.002001 2026-11-01
+         Store children during load: slightly slower load but
+            orders-of-magntiude faster children()
+0.002 2026-10-30
+         Remove is_ancestor() as the argument order seems too easy to mix up
+         a_isa_b() now returns true if the two inputs IDs are identical
+
 0.001003 2026-10-14
          Fix POD formatting
 

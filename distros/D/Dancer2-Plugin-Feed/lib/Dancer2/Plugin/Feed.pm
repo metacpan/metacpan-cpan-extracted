@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Dancer2::Plugin::Feed;
-$Dancer2::Plugin::Feed::VERSION = '1.262070';
+$Dancer2::Plugin::Feed::VERSION = '1.263060';
 use strict;
 use warnings;
 
@@ -143,7 +143,7 @@ Dancer2::Plugin::Feed - Easy to generate feed (RSS or atom) for Dancer2 applicat
 
 =head1 VERSION
 
-version 1.262070
+version 1.263060
 
 =head1 SYNOPSIS
 
@@ -181,14 +181,23 @@ version 1.262070
 
 =head1 DESCRIPTION
 
-Provides an easy way to generate an RSS or Atom feed. This module relies on L<XML::Feed>. Please, consult the documentation of L<XML::Feed> and L<XML::Feed::Entry>.
+This module provides an easy way to generate an RSS or Atom feed. It relies on L<XML::Feed>. Please consult the documentation of L<XML::Feed> and L<XML::Feed::Entry> for detailed information.
 
 =head1 CONFIGURATION
 
+=head2 atom
+
  plugins:
    Feed:
-     title: my great feed
+     title: my great atom feed
      format: Atom
+
+=head2 RSS
+
+ plugins:
+   Feed:
+     title: my great RSS feed
+     format: RSS
 
 =head1 FUNCTIONS
 

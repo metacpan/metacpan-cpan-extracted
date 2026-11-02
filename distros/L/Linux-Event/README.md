@@ -167,6 +167,38 @@ socket Stream supports `move`. A move does not tear down the parent side until
 the child reports successful reconstruction. Ordinary `CORE::fork` does not
 make an inherited Loop reusable.
 
+To request a fork **inside a socket or timer callback**, use
+`$loop->defer_fork(...)` instead of calling `fork()` directly:
+
+```perl
+# Inside a framed, connected Stream's on_message callback:
+# The framer ensures that $message is one complete message.
+if ($message eq 'FORK') {
+    $loop->defer_fork(
+        move => [$stream],
+        on_parent => sub ($pid) {
+            say "Connection moved to child $pid";
+        },
+        on_child => sub {
+            say "Child now owns this connection";
+        },
+        on_error => sub ($error) {
+            warn "Could not fork: $error";
+        },
+    );
+}
+```
+
+The request is queued; the actual fork occurs after the active native
+dispatch finishes. The parent receives the child's PID in `on_parent`;
+`on_child` runs in the child with no arguments. Normal Loop driving resumes
+after those callbacks. `defer_fork()` returns a one-shot handle with
+`cancel` and `is_active` rather than returning a PID immediately.
+Dropping the handle does not cancel the request. The application is
+responsible for reaping its children. The same resource restrictions apply
+as with `fork()`: plain established Streams can move to a child, but TLS
+Streams cannot currently move.
+
 ## Filesystem notification
 
 `Linux::Event::Kernel::Inotify` owns one Linux inotify instance and any number
@@ -567,6 +599,35 @@ own queue or IPC mechanism.
 `Linux::Event::Kernel::Process` provides native process spawning, pidfd
 lifecycle notification, signals, and asynchronous standard I/O.
 
+## Sending files over plain sockets
+
+An established plain TCP or Unix-domain Stream can send an open regular
+file without reading it into a Perl string:
+
+```perl
+open my $file, '<:raw', 'backup.tar' or die $!;
+$stream->write("BACKUP\n");
+$stream->sendfile($file);
+close $file;                # The Stream owns its own descriptor.
+$stream->end;               # Drain the file before finishing output.
+```
+
+Use `sendfile($file, offset => 1024, length => 4096)` to send a byte range.
+The default offset is zero, regardless of the filehandle's current position.
+File ranges stay in order with ordinary `write()` calls; no Perl file-content
+buffer is created for them.
+
+A false return can mean **backpressure**, not a rejected transfer: do not
+submit the same file again. Resume producing additional output from
+`on_drain`. The usual `max_pending_bytes` limit still applies and can close
+the Stream with an `output_limit` error.
+
+`sendfile()` is raw output (it does not add framing), and it is unavailable
+on TLS or other non-plain transports and while a connection is being
+established. The source file must not change while the transfer is in use;
+closing your filehandle does not freeze its contents. See the
+[`IO::Sock::Stream` POD](lib/Linux/Event/IO/Sock/Stream.pm) for details.
+
 ## Backpressure and deadlines
 
 Ordered-byte I/O writes immediately when possible and queues only the unsent
@@ -628,6 +689,11 @@ performance-regression baselines.
 ## Documentation
 
 Architecture and behavior are documented under `docs/`. In particular:
+
+- `docs/V1-ROADMAP.md` — current feature status: merged, researched/deferred,
+  designed/deferred, and not yet investigated
+- `docs/DEVELOPMENT-HISTORY.md` — dated research outcomes and decisions
+- `docs/STREAM-SENDFILE-DESIGN.md` — the implemented Stream file-transfer contract
 
 - `docs/CORE.md`
 - `docs/IO-KERNEL-ARCHITECTURE.md`

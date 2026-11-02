@@ -264,7 +264,11 @@ typedef struct hm_abi {
      *            body ends at the close, so a graceful close IS the success
      *            signal and there is nothing else left to say; a TCP reset is
      *            the only thing a client can tell apart from it. Output still
-     *            queued is discarded, which is the price of saying so.
+     *            queued is discarded, which is the price of saying so. A host
+     *            whose TCP ignores a zero linger (the Cygwin and GNU/Hurd
+     *            smokers) sends a FIN instead, and the peer sees a complete
+     *            short body: user space has no second way to reset a TCP
+     *            connection.
      *
      * Like stream_close it releases the handle, returns HM_ABI_STREAM_GONE
      * for a stream that had already died, and HM_ABI_STREAM_STALE for a

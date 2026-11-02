@@ -29,4 +29,12 @@ ok(@{$anomalies} > 0, 'Anomalies detected');
 # Ensure the detected anomaly is the expected one
 is_deeply($anomalies, [[0.0000, 0.0000]], 'Correct anomaly detected');
 
+# The documented name is units, and unit was the only one read before 0.03
+is(Geo::AnomalyDetector->new()->{'unit'}, 'K', 'Kilometres by default');
+is(Geo::AnomalyDetector->new(units => 'M')->{'unit'}, 'M', 'units is honoured');
+is(Geo::AnomalyDetector->new(unit => 'M')->{'unit'}, 'M', 'unit is still honoured');
+
+# The unit is internal, so it mustn't change what is found
+is_deeply(Geo::AnomalyDetector->new(threshold => 1, units => 'M')->detect_anomalies($coords), $anomalies, 'Same anomalies in miles');
+
 done_testing();

@@ -8,6 +8,8 @@ use utf8;
 use Map::Tube::Sydney;
 
 my $map = Map::Tube::Sydney->new;
+# Test for not always the most direct route
+$map->line_change_penalty(0) if $map->can('line_change_penalty');
 
 ok_map($map);
 ok_map_functions($map);

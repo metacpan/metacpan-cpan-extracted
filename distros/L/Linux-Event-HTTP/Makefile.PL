@@ -26,7 +26,7 @@ my %provides = map {
 WriteMakefile(
     NAME             => 'Linux::Event::HTTP',
     VERSION_FROM     => 'lib/Linux/Event/HTTP.pm',
-    ABSTRACT         => 'Linux-native integration of Unblock HTTP',
+    ABSTRACT         => 'HTTP client and server for Linux::Event',
     AUTHOR           => 'Joshua S. Day <hax@cpan.org>',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.036000',

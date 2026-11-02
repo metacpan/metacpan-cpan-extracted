@@ -40,7 +40,7 @@ sub run {
         }
         elsif ($st =~ /^(count|sum|avg|min|max|p50|p90|p95|p99)(?:\s+by\s+(.*))?$/) {
             $agg = $1;
-            @by  = $2 ? (map { s/^\s+|\s+$//gr } split /\s*,\s*/, $2) : ();
+            @by  = $2 ? (map { (my $v = $_) =~ s/^\s+|\s+$//g; $v } split /\s*,\s*/, $2) : ();
         }
         elsif ($st =~ /^limit\s+(\d+)$/) { $limit = $1 }
         elsif ($st =~ /^slowest\s+(\d+)$/) {

@@ -20,6 +20,7 @@ my $joined = Database::Join->new({
 	databases => [$cities, $states],
 	join_column => 'statecode',
         join_map => { 1 => 'entry' },   # database 1 ($states) name for the join_column
+	autoload_pk => 'entry',           # AUTOLOAD positional arg maps to city name
 });
 
 # diag(Data::Dumper->new([$joined->selectall_arrayref()])->Dump());

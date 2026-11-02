@@ -82,6 +82,7 @@ WriteMakefile(
             package => [qw(
                 Linux::Event::_Registration
                 Linux::Event::_Deferred
+                Linux::Event::_DeferredFork
                 Linux::Event::_IO
                 Linux::Event::_ByteStream
                 Linux::Event::_ByteStream::Descriptor

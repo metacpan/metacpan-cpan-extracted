@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Sydney
 
+1.02  2026-11-02
+      - M1 extension is now open
+      - Fix Issue #6 - make it work with Map::Tube 5.0.1 (thanks gwselke for reporting)
+
 1.01  2026-01-18
       - L1 station Fish Market is now Bank Street.
       - Use other_link for walks.

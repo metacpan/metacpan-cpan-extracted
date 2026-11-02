@@ -464,8 +464,9 @@ subtest cli_viewer_errors => sub {
     local @ARGV = ( 'preview', '--db', $db_path, '--viewer', 'nosuchprog-xyz' );
     like(
       dies { open( local *STDOUT, '>', \$out ); Finance::Tiller2QIF::run_cli() },
-      qr/'nosuchprog-xyz' was not found in PATH/,
+      qr/'nosuchprog-xyz' failed/,
       'unknown --viewer is fatal' );
+    unlink $1 if $out =~ /Preview written to (\S+)/;
   }
   {
     local @ARGV = ( 'preview', '--db', $db_path, '--viewer', '' );

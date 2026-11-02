@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::Plugin::MCP ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
@@ -17,7 +17,7 @@ Punk::MCP - any Punk application as a Model Context Protocol server
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

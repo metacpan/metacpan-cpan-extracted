@@ -145,25 +145,33 @@ for my $p ($mtls_port, $sni_port, $rel_port) {
     isnt($rc, 0, 'mTLS: connection without client cert is rejected');
 }
 
+# The CN of the certificate a host is served. Read with s_client, which this
+# file already requires, and not from curl's verbose output: curl prints the
+# server certificate only under some of its TLS backends, and the wolfSSL
+# curl on the MidnightBSD smokers printed none (Hyperman 0.65, 31 Oct 2026).
+# The subject line is "CN = x" on OpenSSL 1.1 and later, "/CN=x" before.
+sub served_cn {
+    my ($host, $port) = @_;
+    my $out = `echo | $openssl s_client -connect 127.0.0.1:$port -servername $host 2>/dev/null | $openssl x509 -noout -subject 2>/dev/null`;
+    my ($cn) = $out =~ m{CN\s*=\s*([^\s,/]+)};
+    return $cn // '';
+}
+
 # ---- SNI ----
 {
     # default host -> server cert (CN=localhost)
-    my $def = `curl -sk -v --resolve localhost:$sni_port:127.0.0.1 https://localhost:$sni_port/ 2>&1`;
-    like($def, qr/CN=localhost/, 'SNI: default host serves the default cert');
+    is served_cn('localhost', $sni_port), 'localhost',
+        'SNI: default host serves the default cert';
     # SNI host example.test -> its own cert (CN=example.test)
-    my $ex = `curl -sk -v --resolve example.test:$sni_port:127.0.0.1 https://example.test:$sni_port/ 2>&1`;
-    like($ex, qr/CN=example\.test/, 'SNI: example.test serves its own cert');
+    is served_cn('example.test', $sni_port), 'example.test',
+        'SNI: example.test serves its own cert';
+    my $ex = `curl -sk --resolve example.test:$sni_port:127.0.0.1 https://example.test:$sni_port/ 2>/dev/null`;
     like($ex, qr/sni-ok/, 'SNI: request still served');
 }
 
 # ---- tls_reload ----
 {
-    my $cn = sub {
-        my ($host) = @_;
-        my $out = `curl -sk -v --resolve $host:$rel_port:127.0.0.1 https://$host:$rel_port/ 2>&1`;
-        my ($cn) = $out =~ /subject:.*?CN=([^\s;,]+)/;
-        return $cn // '';
-    };
+    my $cn = sub { served_cn($_[0], $rel_port) };
 
     # Before: late.test is in no map, so it falls back to the default.
     is $cn->('late.test'), 'localhost',

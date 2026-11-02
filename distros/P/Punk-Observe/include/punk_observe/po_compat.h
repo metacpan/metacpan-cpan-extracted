@@ -55,6 +55,19 @@ typedef int64_t  po_i64;
  *
  * The new name stays in the code because it is the one the perldoc uses now;
  * this is what makes it mean something on an older perl. */
+/* isWORDCHAR_A is 5.14. Its callers test one ASCII byte for [0-9A-Za-z_]. */
+#ifndef isWORDCHAR_A
+#  define isWORDCHAR_A(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z') \
+                           || ((c) >= '0' && (c) <= '9') || (c) == '_')
+#endif
+
+/* SvIV_please_nomg is 5.18: an NV that is integral becomes an IV as well, the
+ * way perl's own arithmetic asks of an operand. */
+#ifndef SvIV_please_nomg
+#  define SvIV_please_nomg(sv) \
+     STMT_START { if (SvNOK(sv) && !SvIOK(sv)) (void)SvIV_nomg(sv); } STMT_END
+#endif
+
 #ifndef G_LIST
 #  define G_LIST G_ARRAY
 #endif

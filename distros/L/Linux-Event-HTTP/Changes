@@ -1,5 +1,17 @@
 Revision history for Linux-Event-HTTP
 
+0.005  2026-11-01
+
+    - Rewrite the README around complete, runnable HTTP Server and Client
+      examples for new users.
+    - Replace the Client and Server POD with concise application-focused
+      documentation for requests, responses, callbacks, streaming, TLS,
+      errors and graceful shutdown.
+    - Add a Getting Started guide with everyday tasks and explicit
+      explanations of response-body buffering and streaming behavior.
+    - Document that compressed HTTP content is not decoded automatically.
+    - No public API, protocol implementation or dependency changes.
+
 0.004  2026-10-27
 
     - Rebuild Linux::Event::HTTP as a thin Linux-native integration of

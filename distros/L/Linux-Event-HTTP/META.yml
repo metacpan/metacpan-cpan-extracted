@@ -1,5 +1,5 @@
 ---
-abstract: 'Linux-native integration of Unblock HTTP'
+abstract: 'HTTP client and server for Linux::Event'
 author:
   - 'Joshua S. Day <hax@cpan.org>'
 build_requires:
@@ -44,13 +44,13 @@ optional_features:
 provides:
   Linux::Event::HTTP:
     file: lib/Linux/Event/HTTP.pm
-    version: '0.004'
+    version: '0.005'
   Linux::Event::HTTP::Client:
     file: lib/Linux/Event/HTTP/Client.pm
-    version: '0.004'
+    version: '0.005'
   Linux::Event::HTTP::Server:
     file: lib/Linux/Event/HTTP/Server.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Linux::Event: '0.117'
   Unblock::HTTP: '0.03'
@@ -61,5 +61,5 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Linux-Event-HTTP/issues
   homepage: https://github.com/haxmeister/perl-Linux-Event-HTTP
   repository: https://github.com/haxmeister/perl-Linux-Event-HTTP.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

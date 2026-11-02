@@ -464,6 +464,7 @@ XS_INTERNAL(pmcp_helper_log)
 {
     dXSARGS;
     HV *call, *st, *p;
+    SV *logging;
     int level, ok = 0;
     STRLEN l;
     const char *lp;
@@ -477,7 +478,11 @@ XS_INTERNAL(pmcp_helper_log)
               "warning, error, critical, alert, emergency", PMCP_WHO, (int)l, lp);
     pmcp_log_app(aTHX_ ST(0), level, ST(2), items > 3 ? ST(3) : NULL);
     st = pmcp_call_stream(aTHX_ ST(0), &call);
-    if (st && SvTRUE(pmcp_hget(aTHX_ st, "logging") ? pmcp_hget(aTHX_ st, "logging") : &PL_sv_no)) {
+    /* In a variable: before 5.16 SvTRUE does not parenthesise its argument,
+     * so a ?: passed to it parsed as (!a) ? a : no and was false whenever a
+     * was set. */
+    logging = st ? pmcp_hget(aTHX_ st, "logging") : NULL;
+    if (logging && SvTRUE(logging)) {
         SV *min = pmcp_hget(aTHX_ st, "level");
         if (level >= (min ? SvIV(min) : PMCP_LOG_DEFAULT)) {
             p = newHV();

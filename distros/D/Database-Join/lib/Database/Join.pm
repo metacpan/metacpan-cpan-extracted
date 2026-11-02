@@ -58,7 +58,7 @@ Readonly::Hash my %MANDATORY_OP_SQL => (
 	contains => 'LIKE',
 );
 
-our $VERSION = '0.010.0';
+use version; our $VERSION = version->declare('0.010.1');
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -78,6 +78,7 @@ Readonly::Hash my %MESSAGES => (
 	warn_unknown_column	=> 'Column "%s" is not present in any configured database; criterion ignored',
 	error_join_criterion	=> 'join => criteria are not supported on Database::Join (SQL JOINs target a single DA; use multiple DAs in the databases => [] constructor instead)',
 	error_query_unsupported	=> 'query() chained builder is not supported on Database::Join (Database::Abstraction::Query targets a single DA, not the merged view); use selectall_arrayref, selectall_array, fetchrow_hashref, count, or each_row instead',
+	error_group_by_unsupported => 'group_by() fluent chain is not supported on Database::Join (Database::Abstraction::Query targets a single DA, not the merged view); use aggregate() instead',
 	error_execute_unsupported => 'execute() raw SQL is not supported on Database::Join',
 	error_unknown_message	=> 'Unknown message key "%s"',
 	error_invalid_prefix	=> 'collision_prefix[%d] must be a plain string, not a reference; passing a reference would leak a heap address into column names',
@@ -110,7 +111,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.010.0
+Version 0.010.1
 
 =head1 SYNOPSIS
 
@@ -819,6 +820,24 @@ to calling C<remove_column> once per name after construction.
                       # DOMAIN -- EP invalid: any other integer is treated as truthy/falsy.
                       # DOMAIN -- Default:    0.
 
+    autoload_pk     => { type => 'string',   optional => 1 }
+                      # The column name used as the positional-argument key when
+                      # AUTOLOAD performs a full join query (i.e. when join_map or
+                      # filters is active).  Calling $join->col('value') with a bare
+                      # scalar maps that scalar to { autoload_pk => 'value' } before
+                      # routing through the merged view.
+                      #
+                      # Defaults to join_column when omitted.  Override when the
+                      # primary DA's natural lookup key differs from join_column -
+                      # for example, when join_column is 'statecode' but you want to
+                      # look up by city name ('entry').
+                      #
+                      # DOMAIN -- EP valid:   any string that is a visible column in
+                      #                       the merged view (checked at call time by
+                      #                       _partition_criteria; unknown names are
+                      #                       carp'd and dropped).
+                      # DOMAIN -- EP absent:  defaults to join_column.
+
     mandatory_filters => { type => 'arrayref', optional => 1 }
                       # Arrayref of {col, op, val} predicate hashrefs.
                       # These filters are applied to every query result regardless
@@ -942,6 +961,7 @@ sub new {
 			tmpdir            => { type => 'string',   optional => 1 },
 			parallel          => { type => 'integer',  optional => 1, default => 0 },
 			mandatory_filters => { type => 'arrayref', optional => 1 },
+			autoload_pk       => { type => 'string',   optional => 1 },
 			logger		=> { type => 'object',   optional => 1 },
 			i18n		=> { type => 'object',   optional => 1 },
 		},
@@ -967,14 +987,10 @@ sub new {
 			    && $p->{databases}[$i]->can('columns');
 	}
 
-	# Cache the primary database's internal primary-key column name once at
-	# construction.  AUTOLOAD uses this to map a bare positional argument to the
-	# correct column when join_map is active and the primary DB's primary key
-	# differs from join_column (e.g. join_col='statecode' but primary key='entry').
-	# Accessing {id} here — at construction time, before the object is shared —
-	# is the single permitted point of coupling to DA's internal field; caching
-	# avoids repeating the hash intrusion on every AUTOLOAD call.
-	my $primary_pk = $p->{databases}[0]{id} // $p->{join_column};
+	# The positional-argument key AUTOLOAD uses when join_map or filters forces a
+	# full join query.  Callers set this explicitly via the autoload_pk constructor
+	# param; the default is join_column.
+	my $primary_pk = $p->{autoload_pk} // $p->{join_column};
 
 	my $self = bless {
 		_dbs          => $p->{databases},
@@ -997,7 +1013,7 @@ sub new {
 		_schema_cache     => undef,	# memoised schema() result
 		_col_rename       => [],	# per-db: { orig_col => published_col } for collisions
 		_col_unrename     => [],	# per-db: { published_col => orig_col } reverse map
-		_autoload_pk      => $primary_pk,	# primary DB's key col; positional arg for AUTOLOAD
+		_autoload_pk      => $primary_pk,	# positional arg key for AUTOLOAD full-join path
 		_backend          => $p->{backend},
 		_max_array_rows   => $p->{max_array_rows},
 		_tmpdir           => $p->{tmpdir} // File::Spec->tmpdir,
@@ -2979,6 +2995,22 @@ sub query {
 	croak $self->_err('error_query_unsupported');
 }
 
+=head2 group_by
+
+Not supported.  C<Database::Join> does not implement the
+C<Database::Abstraction::Query> fluent chain entry point because the chain's
+C<.all()> / C<.first()> methods would target a single component DA rather
+than the merged view.  Calling this method will always C<croak>.
+
+Use C<aggregate()> against the C<Database::Join> object instead.
+
+=cut
+
+sub group_by {
+	my $self = $_[0];
+	croak $self->_err('error_group_by_unsupported');
+}
+
 =head2 execute
 
 Not supported.  Raw SQL cannot span heterogeneous backends that may use
@@ -3106,9 +3138,7 @@ sub AUTOLOAD {
 	# delegation to the owning database would bypass the join key translation
 	# (join_map) and skip any permanent per-database row filters (filters).
 	if (%{ $self->{_join_map} } || %{ $self->{_filters} }) {
-		# _autoload_pk was captured once at construction from the primary DA's
-		# {id} field; using the cached value avoids re-introspecting the blessed
-		# hash on every call and isolates the coupling to a single known site.
+		# _autoload_pk is the autoload_pk constructor param (defaults to join_column).
 		my $params   = $self->_parse_query_args($self->{_autoload_pk}, @_);
 		my $sort_by = delete $params->{sort_by};
 		my $limit    = delete $params->{limit};
@@ -3815,7 +3845,7 @@ sub _sql_quote_identifier {
 # Exit:    $self->{_sqlite_cache} holds {dbh, tmpfile, table_refs, source_cols,
 #          is_attached, updated, n}.  Any previous cache is disconnected first.
 #          Each spilled table has a B-tree index on its join column.
-# Effects: Creates a File::Temp file (SUFFIX='.db', DIR=_tmpdir, UNLINK=1).
+# Effects: Creates a File::Temp file (SUFFIX='.db', DIR=_tmpdir, UNLINK=1, EXLOCK=0).
 #          Croaks with error_sqlite_connect if DBI::connect fails.
 sub _build_sqlite_cache :Protected {
 	my ($self) = @_;
@@ -3832,10 +3862,14 @@ sub _build_sqlite_cache :Protected {
 	my $join_col = $self->{_join_col};
 	my $n        = scalar @{ $self->{_dbs} };
 
+	# EXLOCK => 0: before 0.2307 File::Temp defaults to O_EXLOCK, as Perl 5.28's copy
+	# does.  On a BSD that lock stops SQLite writing to the file: CREATE TABLE waits
+	# out the busy timeout, then fails with "database is locked".
 	my $tmpfile = File::Temp->new(
 		SUFFIX => '.db',
 		DIR    => $self->{_tmpdir},
 		UNLINK => 1,
+		EXLOCK => 0,
 	);
 
 	my $tmpdbh = DBI->connect(
@@ -5351,6 +5385,13 @@ B<When:> C<query()> is called on a C<Database::Join> object.
 B<Fix:> Use C<selectall_arrayref>, C<selectall_array>, C<fetchrow_hashref>,
 or C<count> instead.
 
+=item C<error_group_by_unsupported>
+
+B<When:> C<group_by()> is called on a C<Database::Join> object.
+
+B<Fix:> Use C<aggregate()> instead.  The fluent C<Database::Abstraction::Query>
+chain targets a single component DA, not the merged view.
+
 =item C<error_execute_unsupported>
 
 B<When:> C<execute()> is called on a C<Database::Join> object.
@@ -6047,7 +6088,7 @@ when the backend is C<'sqlite'> or C<'auto'>, just like any other query method.
          |
          | new( databases => [...], join_column => '...' )
          |   Side-effect: _col_db routing table built;
-         |                _autoload_pk cached from dbs[0]{id}
+         |                _autoload_pk set from autoload_pk param (default: join_column)
          v
     [CONSTRUCTED] <-----------------------------------------+
          |    |                                              |

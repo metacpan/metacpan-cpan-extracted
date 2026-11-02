@@ -27,6 +27,7 @@
 ^bench/STREAM-COMPETITOR-PLAN\.md$
 ^t/stream-68-stream-competitor-comparison-smoke\.t$
 ^docs/(?:ECOSYSTEM-CHARTER|V1-ROADMAP|XS-ROADMAP|STREAM-REVIEW-FOLLOWUPS|xs-reduction-roadmap|POST-0\.110-AUDIT)\.md$
+^docs/STREAM-SENDFILE-DESIGN\.md$
 ^handoff\.md$
 ^\.prove$
 ~$

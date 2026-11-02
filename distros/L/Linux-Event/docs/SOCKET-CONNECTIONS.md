@@ -206,6 +206,12 @@ watermark.
 A nonzero `max_pending_bytes` remains a hard limit during acquisition as well as
 after establishment.
 
+`sendfile()` is different from `write()` here: it accepts regular-file
+ranges only after the socket is established. Use `sendfile()` from `on_ready`
+on an outbound plain Stream, not while it is connecting. Its output is raw
+and cannot be used over TLS. See the
+[`IO::Sock::Stream` POD](../lib/Linux/Event/IO/Sock/Stream.pm).
+
 ## Internal acquisition engine
 
 `Linux::Event::_Socket::Connection` is the private acquisition implementation

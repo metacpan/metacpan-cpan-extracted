@@ -315,7 +315,14 @@
       { "id": "M114", "name": "Barangaroo", "line": "M1", "link": "M113,T404" },
       { "id": "M115", "name": "Gadigal", "line": "M1", "link": "T404,T124" },
       { "id": "M116", "name": "Waterloo", "line": "M1", "link": "T124,T405" },
-      { "id": "M118", "name": "Dulwich Hill", "line": "L1", "link": "L122" },
+      { "id": "M117", "name": "Marrickville", "line": "M1", "link": "T405,M118" },
+      { "id": "M118", "name": "Dulwich Hill", "line": "M1,L1", "link": "M117,M119,L122" },
+      { "id": "M119", "name": "Hurlstone Park", "line": "M1", "link": "M118,M120" },
+      { "id": "M120", "name": "Campsie", "line": "M1", "link": "M119,M121" },
+      { "id": "M121", "name": "Belmore", "line": "M1", "link": "M120,M122" },
+      { "id": "M122", "name": "Lakemba", "line": "M1", "link": "M121,M123" },
+      { "id": "M123", "name": "Wiley Park", "line": "M1", "link": "M122,M124" },
+      { "id": "M124", "name": "Punchbowl", "line": "M1", "link": "M123,T601" },
       { "id": "T101", "name": "Berowra", "line": "T1", "link": "T102" },
       {
         "id": "T102",
@@ -736,7 +743,7 @@
         "id": "T405",
         "name": "Sydenham",
         "line": "T4,T8,M1",
-        "link": "T125,T406,T802,T807,M116"
+        "link": "T125,T406,T802,T807,M116,M117"
       },
       { "id": "T406", "name": "Tempe", "line": "T4", "link": "T405,T407" },
       {
@@ -773,7 +780,7 @@
       { "id": "T428", "name": "Caringbah", "line": "T4", "link": "T427,T429" },
       { "id": "T429", "name": "Woolooware", "line": "T4", "link": "T428,T430" },
       { "id": "T430", "name": "Cronulla", "line": "T4", "link": "T429" },
-      { "id": "T601", "name": "Bankstown", "line": "T6", "link": "T602" },
+      { "id": "T601", "name": "Bankstown", "line": "T6,M1", "link": "T602,M124" },
       { "id": "T602", "name": "Yagoona", "line": "T6", "link": "T601,T603" },
       { "id": "T603", "name": "Birrong", "line": "T6", "link": "T602,T302" },
       { "id": "T701", "name": "Olympic Park", "line": "T7", "link": "T127" },

@@ -203,6 +203,46 @@ not a cross-thread or cross-process callback-posting API. Use
 `Linux::Event::Kernel::Event` plus an appropriate payload queue or IPC channel
 when another execution context must wake the Loop.
 
+## Callback-safe managed fork
+
+Use `$loop->fork(share => [...], clone => [...], move => [...])` when the
+Loop is idle. An active callback cannot call that method because the native
+driver is still dispatching events.
+
+Inside a callback, use `defer_fork()` instead:
+
+```perl
+# In an established plain Stream's on_message callback (with a framer):
+# $stream is the connected Stream, and $message is a complete message.
+return unless $message eq 'FORK';
+$loop->defer_fork(
+    move => [$stream],
+    on_parent => sub ($pid) {
+        say "Client handed to child $pid";
+    },
+    on_child => sub {
+        say "Child owns the client Stream";
+    },
+    on_error => sub ($message) {
+        warn $message;
+    },
+);
+```
+
+The request is queued, then processed when the native driver has fully
+unwound. The parent and child callbacks run in their own processes outside
+dispatch, and ordinary Loop driving continues after they return.
+
+The returned one-shot handle supports `cancel` and `is_active`; dropping
+the handle does not cancel pending work. An explicit `stop()` takes precedence
+and leaves any pending fork for a later drive. Pending parent requests are
+discarded from a newly forked child.
+
+The original resource disposition rules still apply. Plain established
+socket Streams support `move`, but TLS Streams do not. Applications are
+responsible for reaping child processes. Do not invoke `run()` recursively
+from inside an `on_child` callback.
+
 ## Driving the loop
 
 ### Foreign-loop integration

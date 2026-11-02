@@ -1,7 +1,7 @@
 package Finance::Tiller2QIF;
 # ABSTRACT: Convert Tiller CSV exports to QIF format
-$Finance::Tiller2QIF::VERSION = '1.10';
-use v5.34;
+$Finance::Tiller2QIF::VERSION = '1.20';
+use 5.036;
 use strict;
 use warnings;
 use utf8;
@@ -111,6 +111,67 @@ The command word may be given either before or after the options; any other stra
 
   run will always create a checkpoint even when the flag is not set.
 
+=item B<interactive> -- edit and review a complete import before committing it
+
+  tiller2qif interactive --input export.csv --db tiller.sqlite3 \
+      --output import.qif --mapfile mapping.txt --viewer 'code --wait'
+
+Creates an isolated session with a checkpoint of the original database, a fixed
+copy of the input CSV, and a writable C<corrections.t2qsql> SQL file. The viewer opens
+the read-only preview, mapping file (when supplied), and corrections together;
+C<--multipreview> and C<--confirm> are not needed. With C<--viewer console>, the
+preview is printed and the SQL path is reported for editing separately.
+
+Choose C<A> to apply saved edits and refresh, C<V> to reopen the files, C<E> to
+export, or C<C> to cancel. End of input also cancels. Each refresh rebuilds from
+the initial checkpoint and captured CSV, then runs C<beforemap>, the current
+mapping rules, C<aftermap>, and session corrections, in that order. Hooks also
+run when no mapping file is supplied. Changes do not accumulate across refreshes;
+removing a correction removes its effect. Mapping edits can restore transactions
+skipped earlier in this session, but not historical skips in the checkpoint.
+
+The preview includes full transaction IDs for targeted SQL, for example:
+
+  UPDATE transactions SET mapped_category = 'Expenses:Food'
+    WHERE id = 'transaction-id-from-preview';
+
+Session SQL runs last, so it can override mapped categories, payees, memos,
+amounts, accounts, and skip flags. Use C<mapped_category> to override the exported
+category. Restoring a skipped transaction via SQL requires setting both
+C<skipped = 0> and C<exported = 0>. SQL scripts may contain multiple statements;
+C<ATTACH>, C<DETACH>, C<PRAGMA>, and explicit transaction statements are not
+supported in interactive hooks or corrections. The session controls isolation.
+
+Save editor changes before choosing Apply. An export is refused after a failed
+refresh or when saved mapping, hook, or correction files differ from the last
+successful review. Invalid CSV rows, mapping errors, and SQL failures cannot
+silently produce a partial import. Fix the files and refresh, or cancel; changes
+to the captured CSV require starting a new session.
+
+The original database is locked against competing access for the session.
+Only Export publishes the reviewed database (including export flags) and QIF.
+Cancel or an error before publication leaves the original database and any
+existing output QIF unchanged. Publication failures roll back both files.
+Because two filesystem renames cannot be atomic together, a process crash during
+publication can temporarily leave mixed outputs: a journal beside the database
+restores the originals on the next C<interactive> invocation, or preserves both
+outputs if the commit marker was already written. Restart C<interactive> before
+using either output after an interrupted publication. Recovery refuses to
+overwrite files modified externally since the interruption.
+
+Session artifacts are retained in the printed C<.tiller2qif-session-*> directory
+beside the database, including checkpoint, CSV, SQL, previews, and working
+databases. Mapping-file edits survive cancellation. Corrections are specific to
+this session and are never automatically reused in a future run. These artifacts
+contain financial data; remove them manually when no longer needed, and never
+remove artifacts referenced by a pending C<.interactive.json> journal.
+
+Requires an existing database (create it with C<newdb>), writable database and
+output directories, and a rollback-journal SQLite database; WAL mode is not
+supported. Do not modify the original database or output from another process
+during the session. Existing C<run>, C<emit --confirm>, and standalone C<preview>
+behavior is unchanged.
+
 =item B<ingest> -- load CSV into the database
 
   tiller2qif ingest --input export.csv --db tiller.sqlite3
@@ -123,6 +184,20 @@ The command word may be given either before or after the options; any other stra
 =item B<preview> -- preview the records that would be emitted
 
   tiller2qif preview --db tiller.sqlite3
+
+Each transaction is shown as an untruncated block, with its ID, date, and account
+on the first line and indented, labeled detail lines:
+
+  ID: transaction-id | Date: 2026-09-27 | Account: Assets:Checking
+      Amount:   -42.00
+      Payee:    Corner Market
+      Memo:     Full transaction memo
+      Category: [Groceries] Expenses:Groceries
+
+Long values are retained in full. Embedded newlines in detail fields use indented
+continuation lines; newlines and tabs in the first-line fields are displayed as
+escaped text so the transaction header stays on one line. Original categories
+appear in brackets when mapping changes them.
 
   # read the preview in an editor or pager instead of the terminal
   tiller2qif preview --db tiller.sqlite3 --viewer less
@@ -217,9 +292,9 @@ confirmation before writing the QIF file. When used with C<--checkpoint>, adds
 a revert option (press C<r>) to restore the database to its checkpoint state,
 useful if you want to undo changes made during ingest or mapping.
 
-=item B<--viewer> Program used to display preview output. The default, C<console>, prints the preview to STDOUT. Any other value names an external program, and may include arguments, for example C<less>, C<gedit>, or C<code --wait>. The value is split on whitespace — first word the program, the rest arguments — so the program's own path cannot contain spaces; point C<--viewer> at a wrapper script or a symlink if yours does. The preview is written to a read-only temporary file named C<tiller2qif-preview-*.t2qpv>, the program is launched with that file as its argument, and the path is printed so you can find or reopen it. The temporary file is left in place, because graphical editors typically fork and return immediately; ask them to wait (C<code --wait>) when you want the export prompt to appear only after you close the preview. A viewer that cannot be found, fails to launch, is killed by a signal, or exits non-zero is a fatal error rather than a fall back to the console. In a config file the key is C<viewer>.
+=item B<--viewer> A program to display preview output instead of the default, C<console>. The command may include arguments if given as a quoted string, for example C<less>, C<gedit>, or C<"code --wait">. The preview is written to a read-only temporary file named C<tiller2qif-preview-*.t2qpv>, the command is run with that file's path appended.
 
-=item B<--multipreview> Open the mapping file in the preview viewer alongside the preview itself, so you can read the pending transactions and edit the rules that produced them side by side. Both files are passed to a single invocation of the viewer. This requires C<--viewer> and C<--mapfile>; asking for it with the console viewer or without a mapping file is an error rather than a silent no-op. In a config file the key is C<multipreview>.
+=item B<--multipreview> Opens the mapping file in the preview along with the preview , so you can read the pending transactions and edit the rules that produced them side by side. Both files are passed to a single invocation of the viewer. This requires C<--viewer> and C<--mapfile>.
 
 =item B<--verbose> Print detailed progress information during each phase.  Also
 runs C<checkconfig> automatically before any operations begin.
@@ -361,15 +436,36 @@ Reload VS Code afterwards.
 
 =head2 Syntax Highlighting
 
-Files with C<.map> and C<.mapping> extensions are recognized as mappings, preview files have the C<t2qpv> extension.
+Files with C<.map> and C<.mapping> extensions are recognized as mappings, preview
+files have the C<.t2qpv> extension. Session correction files use C<.t2qsql> and the
+dedicated B<Tiller2QIF SQL> language mode, with SQL highlighting. Ordinary C<.sql>
+file associations are unchanged. Preview files enable word wrapping by default.
 
 =head2 Completion Hinting
 
 In addition to completion of Tiller2QIF keywords you can also configure your Chart of Accounts for Completion! The extension's settings C<tiller2qifMap.coaPath> and C<tiller2qifMap.coaFormat> control this. Currently the only available coaFormat is C<gnucash-csv>.
 
+In B<Tiller2QIF SQL> files, the same chart of accounts supplies completions inside
+single-quoted values assigned to or compared with C<account>, C<category>, and
+C<mapped_category>. For example, type inside the quotes in
+C<UPDATE transactions SET mapped_category = '' WHERE id = '...';>.
+Suggestions appear while typing, after an opening quote or colon, or with
+C<Ctrl+Space>. Account names containing apostrophes are escaped for SQL. Map-only
+keywords such as C<skip> and C<source> are not offered as SQL values, and hints do
+not appear in comments, payees, memos, or transaction IDs.
+
+For an older session's C<corrections.sql>, manually select B<Tiller2QIF SQL> using
+VS Code's language-mode selector; no rename is necessary. Other Tiller SQL files
+can opt in using the same language mode or the C<.t2qsql> extension. Refresh the
+installed extension copy (if not symlinked to this checkout) and reload VS Code
+after updating it.
+
 =head2 Row Colors
 
-C<tiller2qifMap.rowColors> controls row backgrounds in both file types. C<rainbow>, the default, gives rows a repeating series of subtle background colors; C<none> turns backgrounds off. A preview transaction occupies two lines, both receive the same color.
+C<tiller2qifMap.rowColors> controls row backgrounds in mappings and previews.
+C<rainbow>, the default, gives transactions a repeating series of subtle background
+colors; C<none> turns backgrounds off. Every line in a preview transaction block,
+including multiline field continuations, receives the same color.
 
 =head1 Advanced Use
 
@@ -380,7 +476,7 @@ and after the map phase without having to break the workflow into separate comma
 This is the preferred way to preprocess or post-process transactions when using C<run>,
 or C<map> as a single step.
 
-The C<preview> command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the C<--confirm> option to run preview before emit (including run). The preview table is wide, so C<--viewer> is often more comfortable than the terminal; combined with C<--confirm> it lets you read the pending transactions in an editor or pager and then answer the export prompt.
+The C<preview> command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the C<--confirm> option to run preview before emit (including run). C<--viewer> lets you read the full transaction blocks in an editor or pager; combined with C<--confirm> it lets you review the pending transactions and then answer the export prompt.
 
 When using C<--confirm> with C<--checkpoint>, three choices Y=Yes N=No R=Revert are offered. No keeps the database state while not completing the export, Revert restores the database to the checkpoint in addition to aborting.
 
@@ -401,7 +497,7 @@ should use C<db_path> directly.
 
 =head1 AUTHOR
 
-John Karr E<lt>brainbuz@cpan.orgE<gt>
+John Karr E<lt>cpan@brainbuz.orgE<gt>
 
 =head1 LICENSE
 
@@ -492,7 +588,7 @@ sub _confirm ( %options ) {
 # ---------------------------------------------------------------------------
 
 my $VALID_COMMANDS = join '|',
-  qw(run ingest map emit preview newdb newconfig checkconfig clean version);
+  qw(run interactive ingest map emit preview newdb newconfig checkconfig clean version);
 
 my $hlpmsg = <<'END_USAGE';
 tiller2qif — Convert Tiller Money CSV exports to QIF format.
@@ -503,7 +599,7 @@ GnuCash, KMyMoney, Quicken, HomeBank, and similar programs.
 
 Usage: tiller2qif <command> %o
 
-Commands: run | ingest | map | emit | preview | newdb | newconfig | checkconfig | version
+Commands: run | interactive | ingest | map | emit | preview | newdb | newconfig | checkconfig | version
 
 For the full manual: perldoc Finance::Tiller2QIF
 END_USAGE
@@ -530,10 +626,10 @@ sub run_cli {
       $hlpmsg,
       [ 'config|c=s',   "JSON config file" ],
       [ 'checkpoint|C', "copy database with timestamp before run." ],
-      [ 'input|i=s',    "CSV file to read      (ingest, run)" ],
-      [ 'output|o=s',   "QIF file to write     (emit, run)" ],
+      [ 'input|i=s',    "CSV file to read      (ingest, run, interactive)" ],
+      [ 'output|o=s',   "QIF file to write     (emit, run, interactive)" ],
       [ 'db|d=s', "SQLite database file  (all commands except newconfig)" ],
-      [ 'mapfile|f=s', "Category mapping file (map, run — optional)" ],
+      [ 'mapfile|f=s', "Category mapping file (map, run, interactive — optional)" ],
       [ 'beforemap=s', "sql script to run prior to map" ],
       [ 'aftermap=s',  "sql script to run after map" ],
       [ 'qifdate=s',   "QIF date format: ymd (default), mdy, or dmy" ],
@@ -626,13 +722,18 @@ sub run_cli {
   }
   $options{checkpoint} = 1 if $cmd eq 'run';
 
-  die "--viewer must name a program or 'console'\n"
-    unless defined $options{viewer} && $options{viewer} =~ /\S/;
+  # Only validate the viewer when this command will actually use it —
+  # otherwise a blank/odd viewer in a shared config file would block
+  # unrelated commands like newdb or ingest that never touch it.
+  if ( $cmd eq 'preview' || $cmd eq 'interactive' || ( $cmd =~ /^(?:emit|run)$/ && $options{confirm} ) ) {
+    die "--viewer must name a program or 'console'\n"
+      unless defined $options{viewer} && $options{viewer} =~ /\S/;
 
-  if ( $options{multipreview} ) {
-    die "--multipreview requires --viewer, the console can't open files\n"
-      if lc $options{viewer} eq 'console';
-    die "--multipreview requires --mapfile\n" unless $options{mapfile};
+    if ( $options{multipreview} && $cmd ne 'interactive' ) {
+      die "--multipreview requires --viewer, the console can't open files\n"
+        if lc $options{viewer} eq 'console';
+      die "--multipreview requires --mapfile\n" unless $options{mapfile};
+    }
   }
 
   vPrint( $options{verbose}, _version_text() );
@@ -656,13 +757,18 @@ sub run_cli {
   }
 
   my @missing;
-  push @missing, '--input'  if $cmd =~ /^(?:ingest|run)$/ && !$options{input};
+  push @missing, '--input'  if $cmd =~ /^(?:ingest|run|interactive)$/ && !$options{input};
   push @missing, '--db'     if !$options{db_path};
-  push @missing, '--output' if $cmd =~ /^(?:emit|run)$/ && !$options{output};
+  push @missing, '--output' if $cmd =~ /^(?:emit|run|interactive)$/ && !$options{output};
 
   if (@missing) {
     die "tiller2qif $cmd: missing required option(s): "
       . join( ', ', @missing ) . "\n";
+  }
+
+  if ( $cmd eq 'interactive' ) {
+    require Finance::Tiller2QIF::Interactive;
+    return Finance::Tiller2QIF::Interactive::Run(\%options);
   }
 
   if ( $options{verbose} || $cmd eq 'checkconfig' ) {

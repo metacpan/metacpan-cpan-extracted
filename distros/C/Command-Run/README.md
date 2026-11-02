@@ -46,7 +46,7 @@ Command::Run - Execute external command or code reference
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -361,6 +361,33 @@ original STDOUT and does not affect the redirected one.
 This means existing modules like [App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn) and
 [App::ansifold](https://metacpan.org/pod/App%3A%3Aansifold) work unchanged with nofork+raw mode, achieving
 significant speedups with zero code changes on the callee side.
+For the exceptions, see ["Writing a Callee for Nofork"](#writing-a-callee-for-nofork).
+
+## Writing a Callee for Nofork
+
+In nofork mode, the callee runs in the process of the caller.
+Command::Run protects only `$_`, `@ARGV`, `$0` and the standard
+file handles.  Everything else is shared: global variables, loaded
+modules, and the settings of other modules.
+
+A callee should follow these rules.
+
+- Set things up in the function, not at load time.
+
+    The module may be loaded by another program, while `$0` is still the
+    name of that program.  For example, `ExConfigure` of
+    [Getopt::EX::Long](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ALong) at load time goes to the caller.
+
+- Do not expect process-wide settings to be fresh.
+
+    They may be left by the caller or by an earlier callee.  For example,
+    `Getopt::Long::Configure` only changes the settings you name, so set
+    all you need on each call.
+
+- Do not call `exit`.
+
+    It ends the caller too.  Use `die` or return; `die` is caught and
+    the result is -1.
 
 ## Caller Protection
 

@@ -28,6 +28,7 @@ plan skip_all => 'fork is POSIX-only here' if $^O eq 'MSWin32';
 my $dir  = File::Temp::tempdir(CLEANUP => 1);
 my $fan  = "$dir/fan.log";
 my $grp  = "$dir/group.log";
+my $err  = "$dir/worker.err";
 my $N    = 40;
 
 my $port = 26300 + ($$ % 200);
@@ -35,7 +36,11 @@ my $host = "127.0.0.1:$port";
 
 my $pid = fork // die "fork: $!";
 if (!$pid) {
-    open STDERR, '>', '/dev/null';
+    # Kept, not dropped: a worker that could not get a wakeup descriptor says
+    # so here and falls back to polling the ring, and a worker whose
+    # descriptor never fires says nothing. When fan-out falls short below,
+    # which of those it was is the whole diagnosis (Haiku, Punk 0.67).
+    open STDERR, '>', $err;
 
     package BusApp;
     use Punk;
@@ -182,7 +187,7 @@ note "workers answering: $workers";
         is_deeply(\@short, [],
             'FANOUT: every worker that subscribed saw every message')
             or diag sprintf
-                "%s\ngaps: %s\n%s",
+                "%s\ngaps: %s\n%s\nworkers' stderr:\n%s",
                 join(', ', map { "$_ saw $by_worker{$_} of $N" }
                            sort keys %by_worker),
                 (%gaps ? join(', ', map { "$_=$gaps{$_}" } sort keys %gaps)
@@ -192,7 +197,11 @@ note "workers answering: $workers";
                     . 'a real loss - it fell far enough behind to be lapped'
                     : 'no gaps were counted, so nothing was dropped: those '
                     . 'messages are still unread on the ring, and this worker '
-                    . 'never got scheduled to drain them within the wait';
+                    . 'was never woken to drain them within the wait - either '
+                    . 'it had no wakeup descriptor (stderr below says so and '
+                    . 'the 50ms poll should have caught up) or it had one '
+                    . 'that never fired',
+                join("\n", lines_of($err)) || '(nothing written)';
     }
 }
 

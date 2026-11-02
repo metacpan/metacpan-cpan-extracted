@@ -1,5 +1,10 @@
 Revision history for Punk-Observe
 
+0.12	2026-11-01
+	- Shared::Arena is a configure prerequisite, so a smoker installs it before Makefile.PL looks for sa_abi.h.
+	- t/0021 uses Math::BigInt as_hex, which the perl 5.24 and 5.26 core copies have.
+	- Builds and loads on older perls, which lack SV_CATUTF8, isWORDCHAR_A or SvIV_please_nomg.
+
 0.11	2026-09-19
 	- The live tail crosses workers on a Shared::Arena ring through its C ABI, in Observe's own region or one bus_init is handed; Shared::Arena is a prerequisite and Hyperman's hm_bus.h is no longer compiled in.
 

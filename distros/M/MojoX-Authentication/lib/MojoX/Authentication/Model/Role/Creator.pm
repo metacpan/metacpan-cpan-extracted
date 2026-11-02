@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::Role::Creator;
-{ our $VERSION = '0.008' }
+{ our $VERSION = '0.010' }
 
 use v5.24;
 use Moo::Role;

@@ -137,7 +137,7 @@ sub _le {
 sub hash128_hex {
     my ($key, $seed) = @_;
     my ($h1, $h2) = hash128($key, $seed);
-    my $f = sub { my $h = lc $_[0]->to_hex; ('0' x (16 - length $h)) . $h };
+    my $f = sub { (my $h = lc $_[0]->as_hex) =~ s/\A0x//; ('0' x (16 - length $h)) . $h };
     return $f->($h2) . $f->($h1);   # hi then lo, as the C stores it
 }
 

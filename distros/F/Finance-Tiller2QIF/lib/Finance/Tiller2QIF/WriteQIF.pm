@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::WriteQIF;
 # ABSTRACT: Write transactions to QIF format
-$Finance::Tiller2QIF::WriteQIF::VERSION = '1.10';
+$Finance::Tiller2QIF::WriteQIF::VERSION = '1.20';
 =encoding utf8
 
 =head1 DESCRIPTION
@@ -21,25 +21,15 @@ Write all unexported, non-skipped transactions from the database to a QIF file. 
   Finance::Tiller2QIF::WriteQIF::Preview( $db_path, $verbose, $viewer );
   Finance::Tiller2QIF::WriteQIF::Preview( $db_path, $verbose, $viewer, $mapfile );
 
-Display all unexported, non-skipped transactions in a formatted table showing date, amount, account, payee, and category. Shows original category in brackets if mapped to a different category. Returns the count of transactions displayed.
+Display all unexported, non-skipped transactions as labeled blocks. The first line shows transaction ID, date, and account; indented lines show amount, payee, memo, and category without truncation. Shows original category in brackets if mapped to a different category. Returns the count of transactions displayed.
 
-C<$viewer> selects where the table goes. The default, C<console>, prints to STDOUT. Any other value names an external program (optionally with arguments, e.g. C<code --wait>); the table is written to a read-only temporary file with a C<.t2qpv> suffix, the program is launched with that file as its argument, and the path is printed. The temporary file is left in place for the viewer to read. An undefined or blank viewer, a program that cannot be found, and a program that fails to launch, dies on a signal, or exits non-zero are all fatal — there is no silent fallback to the console.
+C<$viewer> selects where the table goes. The default, C<console>, prints to STDOUT. Any other value is used as-is as a shell command line (optionally with arguments, e.g. C<code --wait>); the table is written to a read-only temporary file with a C<.t2qpv> suffix, and the command is run with that file's path (shell-quoted) appended, then the path is printed. Because the whole line goes to the shell, ordinary shell quoting works — a program path containing spaces can be double- or single-quoted within C<$viewer> itself. The temporary file is left in place for the viewer to read. An undefined or blank viewer is fatal, and so is anything other than a normal, successful run of the command — there is no silent fallback to the console, and no attempt to report why it failed beyond that.
 
 Any further arguments are additional files to open alongside the preview, in the same viewer invocation; the CLI passes the mapping file here for C<--multipreview>. They require a real viewer (not C<console>) and must be readable, or the call dies.
 
-=head2 ResolveViewer
-
-  my @command = Finance::Tiller2QIF::WriteQIF::ResolveViewer( $viewer );
-
-Resolve a viewer specification to the command list that would be run, dying with the reason when it cannot be resolved. The specification is split on whitespace: the first word is the program and any remaining words are arguments placed before the file names. A program containing a path separator is used as given and must be executable; a bare program name is looked up along C<PATH>.
-
-Because the specification is split on whitespace, the program's own path cannot contain spaces. Point C<$viewer> at a wrapper script or a symlink when the program you want lives in such a path.
-
-C<Preview> calls this before it writes anything, so an unusable viewer fails before a temporary file is created. C<checkconfig> calls it to report an unusable viewer before any work begins.
-
 =head1 AUTHOR
 
-John Karr E<lt>brainbuz@cpan.orgE<gt>
+John Karr E<lt>cpan@brainbuz.orgE<gt>
 
 =head1 LICENSE
 
@@ -47,12 +37,11 @@ GPL version 3 or later.
 
 =cut
 
-use v5.34;
+use 5.036;
 
 use Path::Tiny;
 use Text::CSV;
 use File::Temp ();
-use File::Spec ();
 use Finance::Tiller2QIF::DB qw( connect_db );
 use utf8;
 use warnings FATAL => 'utf8';
@@ -120,7 +109,23 @@ sub Emit ( $db_path, $outfile, $verbose=0, $qifdate='ymd' ) {
   return $emitted;
 }
 
-sub _trunc ( $str, $max ) { length($str) > $max ? substr( $str, 0, $max ) : $str }
+sub _preview_inline ($value) {
+  $value //= '';
+  $value =~ s/\\/\\\\/g;
+  $value =~ s/\r/\\r/g;
+  $value =~ s/\n/\\n/g;
+  $value =~ s/\t/\\t/g;
+  return $value;
+}
+
+sub _preview_field ($label, $value) {
+  $value //= '';
+  $value =~ s/\r\n?/\n/g;
+  my ($first, @rest) = split /\n/, $value, -1;
+  my $text = sprintf "    %-10s%s\n", "$label:", $first // '';
+  $text .= "              $_\n" for @rest;
+  return $text;
+}
 
 sub _preview_text ($db_path) {
   my ( $dbh, $accounts ) = _init($db_path);
@@ -137,59 +142,45 @@ sub _preview_text ($db_path) {
     my @tx = $sth->fetchall_arrayref({})->@*;
 
     for my $tx (@tx) {
-      my $orig   = $tx->{category};
+      my $orig   = $tx->{category} // '';
       my $mapped = $tx->{mapped_category} // $orig; # uncoverable statement
       my $cat    = $mapped ne $orig
                  ? '[' . $orig . '] ' . $mapped
                  : $mapped;
 
       push @rows, {
-        account => _trunc( $account,          30 ),
+        id      => $tx->{id},
+        account => $account,
         date    => $tx->{date},
         amount  => sprintf( "%.2f", $tx->{amount} ),
-        payee   => _trunc( $tx->{payee},      20 ),
-        cat     => _trunc( $cat,              30 ),
-        memo    => _trunc( $tx->{memo},       30 ),
+        payee   => $tx->{payee},
+        cat     => $cat,
+        memo    => $tx->{memo},
       };
     }
   }
 
-  # line 1: date | amount | account | payee
-  # line 2:  (1-space indent) category | memo
-  my $L1 = "%-10s | %8s | %-20s | %-20s\n";
-  my $L2 = " %-30s | %-30s\n";
-  my $div = '-' x 68;
-
-  my $text = sprintf $L1, 'Date', 'Amount', 'Account', 'Payee';
-  $text .= "Category | Memo [Category preceded by original if changed by map]\n";
-  $text .= "$div\n";
+  my $text = @rows ? '' : "No transactions pending export.\n";
   for my $row (@rows) {
-    $text .= sprintf $L1, $row->{date}, $row->{amount}, $row->{account}, $row->{payee};
-    $text .= sprintf $L2, $row->{cat}, $row->{memo};
+    $text .= sprintf "ID: %s | Date: %s | Account: %s\n",
+      map { _preview_inline($_) } @{$row}{qw(id date account)};
+    $text .= _preview_field('Amount', $row->{amount});
+    $text .= _preview_field('Payee', $row->{payee});
+    $text .= _preview_field('Memo', $row->{memo});
+    $text .= _preview_field('Category', $row->{cat});
+    $text .= "\n";
   }
 
   $dbh->disconnect;
   return ( scalar @rows, $text );
 }
 
-sub ResolveViewer ($viewer) {
-  my @cmd = split ' ', $viewer;
-  die "preview viewer is empty; use 'console' to print to STDOUT\n" unless @cmd;
-  my $prog = $cmd[0];
-  if ( $prog =~ m{[/\\]} || File::Spec->file_name_is_absolute($prog) ) {
-    die "preview viewer '$prog' is not an executable file\n" unless -x $prog;
-    return @cmd;
-  }
-  # File::Spec->path splits PATH the way this OS does, and resolves an empty
-  # entry to '.' exactly as exec will.
-  for my $dir ( File::Spec->path ) {
-    return @cmd if -x File::Spec->catfile( $dir, $prog );
-  }
-  die "preview viewer '$prog' was not found in PATH\n";
+sub _shell_quote ($str) {
+  $str =~ s/'/'\\''/g;
+  return "'$str'";
 }
 
 sub _launch_viewer ( $viewer, $text, @also ) {
-  my @cmd = ResolveViewer($viewer);
   for my $extra (@also) {
     die "preview cannot open '$extra': it does not exist or can't be read\n"
       unless -r $extra;
@@ -208,10 +199,8 @@ sub _launch_viewer ( $viewer, $text, @also ) {
 
   say "Preview written to $file";
   say "Also opening: $_" for @also;
-  my $rc = system( @cmd, $file, @also );
-  die "preview viewer '$cmd[0]' failed to launch: $!\n" if $rc == -1;
-  die "preview viewer '$cmd[0]' died on signal ${\ ($rc & 127) }\n" if $rc & 127;
-  die "preview viewer '$cmd[0]' exited with status ${\ ($rc >> 8) }\n" if $rc;
+  my $cmd = join ' ', $viewer, map { _shell_quote($_) } $file, @also;
+  die "preview viewer '$viewer' failed\n" if system($cmd);
   return $file;
 }
 

@@ -25,6 +25,9 @@ BEGIN {
     plan skip_all => 'Hyperman 0.11+ (the detach ABI) required'
         unless Punk::WebSocket::_hm_available();
     plan skip_all => 'needs fork and ps' if $^O eq 'MSWin32';
+    my ($own) = (`ps -o rss= -p $$ 2>/dev/null` // '') =~ /(\d+)/;
+    plan skip_all => 'cannot read a resident size with ps here'
+        unless defined $own;
 }
 
 my $port = 26100 + ($$ % 300);
@@ -103,8 +106,13 @@ sub next_frame {
     return ref $f ? $f : undef;
 }
 
-plan skip_all => 'cannot read the worker\'s resident size here'
-    unless defined rss_mb();
+# The skip is after the fork, so the server goes first: left running, it holds
+# the harness's end of the TAP pipe open and make test never finishes.
+unless (defined rss_mb()) {
+    kill 'TERM', $pid;
+    waitpid $pid, 0;
+    plan skip_all => 'cannot read the worker\'s resident size here';
+}
 
 # ---- received messages are not kept --------------------------------------------
 {

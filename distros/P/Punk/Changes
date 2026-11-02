@@ -1,5 +1,19 @@
 Revision history for Punk
 
+0.68    2026-11-01
+        - The file cache's single-flight lock carries its own timestamp, so
+          a filesystem with whole-second mtime (GNU/Hurd) no longer steals
+          a live lock.
+        - t/1017 stops its server before skipping, so make test finishes
+          on a box without ps.
+        - t/0111 and t/1010 skip their leak gate where ps cannot report a
+          resident size (Haiku).
+        - t/1032 keeps the workers' stderr and shows it when fan-out falls
+          short.
+        - Makefile.PL silences clang's compound-token warning about perls
+          before 5.26, which was filling smoker reports before make test.
+        - t/1300 runs on perls before 5.14, which have no s///r.
+
 0.67    2026-10-31
         - Build and run on perls before 5.22, which lack Perl_isinfnan.
         - Punk::Model::JSONFile locks with fcntl, so writers on Solaris no

@@ -18,6 +18,7 @@ requires 'Readonly', '2.00';
 requires 'Scalar::Util';
 requires 'Sub::Protected';
 requires 'autodie';
+requires 'version';
 recommends 'DBD::Excel', '0.06';
 recommends 'Excel::Writer::XLSX', '1.09';
 recommends 'threads';

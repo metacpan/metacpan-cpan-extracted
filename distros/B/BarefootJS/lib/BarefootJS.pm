@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.40.1";
+our $VERSION = "0.40.2";
 use strict;
 use warnings;
 use utf8;
@@ -7,6 +7,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use B ();
+use JSON::PP ();
 use POSIX ();
 use Time::Local ();
 use Scalar::Util qw(looks_like_number weaken);
@@ -700,9 +701,6 @@ sub async_resolve ($self, $id, $content_html) {
 # ---------------------------------------------------------------------------
 
 sub json ($self, $value) {
-    # Mojo::JSON::to_json returns a character string (not bytes), suitable
-    # for embedding in HTML output via Mojo::ByteStream / `<%==`.
-    #
     # Documented divergence from JS: JS distinguishes `null` (renders as
     # "null") from `undefined` (`JSON.stringify(undefined)` returns the
     # JS value `undefined`, not a string). Perl has no such distinction
@@ -710,24 +708,43 @@ sub json ($self, $value) {
     # ergonomics: an unset prop becomes the string "null" rather than
     # the literal text "undefined" or an empty attribute. Matches the
     # `null` case of JS exactly; diverges from the `undefined` case.
-    return $self->backend->encode_json(_json_zero($value));
+    #
+    # A number is written as JS writes it (`_format_number`): shortest
+    # round-trip digits, `-0` as `0`, an unpadded exponent (`-4e-8`,
+    # `-4e+21`), and NaN / Infinity as `null`, at any depth (#3787). The
+    # encoders print `%.15g` (`0.3` for `0.1 + 0.2`), pad the exponent
+    # (`-4e-08`) and spell Infinity `-Inf` or `"-Inf"`. Arrays and hashes
+    # are walked here with sorted keys, as the canonical encoders do;
+    # strings and other leaves go through the backend's encoder (Mojo's
+    # `to_json` returns a character string, suitable for embedding in HTML
+    # output via Mojo::ByteStream / `<%==`).
+    my $ref = ref $value;
+    return '[' . CORE::join(',', map { $self->json($_) } @$value) . ']' if $ref eq 'ARRAY';
+    if ($ref eq 'HASH') {
+        return '{' . CORE::join(',', map {
+            $self->backend->encode_json("$_") . ':' . $self->json($value->{$_})
+        } sort keys %$value) . '}';
+    }
+    if (_json_is_number($value)) {
+        my $n = BarefootJS::Evaluator::_double($value + 0);
+        return 'null' if $n != $n || $n == 9**9**9 || $n == -(9**9**9);
+        return BarefootJS::Evaluator::_format_number($n);
+    }
+    return $self->backend->encode_json($value);
 }
 
-# JS `JSON.stringify` writes a negative zero as `0` (`JSON.stringify(-0)`
-# is "0"). Perl's `mod` keeps `-0.0` for a negative dividend, and some
-# encoders (Mojo::JSON on newer Perls) spell it `-0.0`, so a value the
-# encoder would emit as a number is rewritten to the integer 0 when it is
-# zero. Returns a copy at every depth; the argument is never mutated.
-sub _json_zero ($value) {
-    my $ref = ref $value;
-    return [ map { _json_zero($_) } @$value ] if $ref eq 'ARRAY';
-    return { map { ($_ => _json_zero($value->{$_})) } keys %$value } if $ref eq 'HASH';
-    return $value if $ref || !defined $value;
+# Whether `json` writes $value as a JSON number. Decided from the scalar's
+# flags the way JSON::PP / Cpanel::JSON::XS do: a scalar carrying a public
+# string flag (SVf_POK) is a string, even after a numeric comparison has
+# cached a number on it (`"1e5" < 0` leaves IOK/NOK set), so a JSON string
+# prop keeps its quotes whatever the template compared it with. A number
+# that was only stringified keeps the private flag alone (Perl 5.36+) and
+# stays a number.
+sub _json_is_number ($value) {
+    return 0 if !defined $value || ref $value;
     my $flags = B::svref_2object(\$value)->FLAGS;
-    return $value unless $flags & (B::SVp_IOK | B::SVp_NOK);
-    no warnings qw(numeric);
-    return $value unless 0 + $value eq $value && $value == 0;
-    return 0;
+    return 0 if $flags & B::SVf_POK;
+    return ($flags & (B::SVp_IOK | B::SVp_NOK)) ? 1 : 0;
 }
 
 sub string ($self, $value) {
@@ -750,6 +767,21 @@ sub string ($self, $value) {
     # (#3380); a string passes through unchanged.
     return BarefootJS::Evaluator::_format_number($value + 0) if BarefootJS::Evaluator::_is_number($value);
     return "$value";
+}
+
+# A JS boolean as a value the JSON encoder writes as `true` / `false`
+# (`JSON.stringify([n, true])`): Perl holds a boolean as `1` / `''` / `0`,
+# which encodes as a number or a string.
+sub boolean ($self, $value) {
+    return $value ? JSON::PP::true() : JSON::PP::false();
+}
+
+# A JSX text child's value: JSX renders nothing for a boolean (#3824 step 5).
+# Perl holds a comparison as `1` / `''`, so only a JSON boolean is one here:
+# the compiler materializes every boolean a displayed value can be with
+# `boolean` first. Any other value passes through to the text sink.
+sub display ($self, $value) {
+    return _is_json_bool($value) ? '' : $value;
 }
 
 # A decoded JSON boolean (`Mojo::JSON::true` / `false`, a `JSON::PP::Boolean`).
@@ -1095,6 +1127,45 @@ sub strict_eq ($self, $l, $r) {
     return BarefootJS::Evaluator::_strict_eq($l, $r) ? !!1 : !!0;
 }
 
+# JS primitive helpers (spec/js-primitive-semantics.md, "Operation table"):
+# ToBoolean, ToNumber, ToString, the relational operators, binary `+` and
+# unary `-`. Each delegates to the callback evaluator's primitive of the same
+# operation, so a template helper call and a callback body share one
+# implementation. A boolean result is a Perl boolean, as `strict_eq`'s is.
+# Unlike `number` and `string` (display helpers: `undef` -> NaN / ''), an
+# `undef` operand reads as JS null here (0 / 'null').
+sub truthy ($self, $v) {
+    return BarefootJS::Evaluator::_truthy($v) ? !!1 : !!0;
+}
+
+# Boxes for a value-position JS `l || r` / `l && r` (#3824): the adapters
+# spell `l || r` as `(keep_truthy(l) || [r])->[0]` and `l && r` as
+# `(keep_falsy(l) || [r])->[0]`. `keep_truthy` is the one-element arrayref
+# `[$v]` when `$v` is JS-truthy and undef otherwise (`keep_falsy` the
+# reverse), so Perl's `||` stops at `$v`'s box exactly when JS returns `$v`
+# itself and builds `[r]` only otherwise (the short circuit); `->[0]` unboxes
+# the operand. Each operand appears once, so a chain grows linearly.
+sub keep_truthy ($self, $v) {
+    return BarefootJS::Evaluator::_truthy($v) ? [$v] : undef;
+}
+
+sub keep_falsy ($self, $v) {
+    return BarefootJS::Evaluator::_truthy($v) ? undef : [$v];
+}
+
+sub to_number ($self, $v) { return BarefootJS::Evaluator::_to_number($v) }
+
+sub to_string ($self, $v) { return BarefootJS::Evaluator::_to_string($v) }
+
+sub plus ($self, $l, $r) { return BarefootJS::Evaluator::_binary('+', $l, $r) }
+
+sub neg ($self, $v) { return BarefootJS::Evaluator::_unary('-', $v) }
+
+sub lt ($self, $l, $r) { return BarefootJS::Evaluator::_relational('<', $l, $r) ? !!1 : !!0 }
+sub le ($self, $l, $r) { return BarefootJS::Evaluator::_relational('<=', $l, $r) ? !!1 : !!0 }
+sub gt ($self, $l, $r) { return BarefootJS::Evaluator::_relational('>', $l, $r) ? !!1 : !!0 }
+sub ge ($self, $l, $r) { return BarefootJS::Evaluator::_relational('>=', $l, $r) ? !!1 : !!0 }
+
 sub includes ($self, $recv, $elem) {
     if (ref($recv) eq 'ARRAY') {
         for my $item (@$recv) {
@@ -1200,30 +1271,13 @@ sub length ($self, $recv) {
 # `arr[index]` / `hash[key]` — a runtime-polymorphic dynamic-key element
 # access (`emitIndexAccessPerl`, expr/operand.ts). Perl's deref syntax
 # forces a compile-time choice between `->{$k}` (hash) and `->[$k]`
-# (array), but the shared analyzer can't tell at compile time whether a
-# dynamic key (e.g. a destructured `.map()` param used as a key,
-# `tone[k]`) will turn out string- or number-shaped — it types it
-# `{kind:'unknown'}`. The previous compile-time guess picked `->[$k]`
-# (array deref) whenever it couldn't prove string-typed, which is a
-# FATAL "Not an ARRAY reference" against a hash row (#2491). Dispatch on
-# the receiver's RUNTIME `ref` instead — mirrors the Go adapter's
-# `getFieldValue`/`bf_get` and Twig's `attribute()`.
+# (array), but a dynamic key's shape is only known at run time (#2491), so
+# this dispatches on the receiver's RUNTIME `ref`. It is the callback
+# evaluator's `_read_index`, so a template read and a callback read share
+# one JS ToPropertyKey implementation (spec/js-primitive-semantics.md,
+# "ToPropertyKey and index read").
 sub get ($self, $collection, $key) {
-    return undef unless defined $key;
-    if (ref($collection) eq 'HASH') {
-        return $collection->{$key};
-    }
-    if (ref($collection) eq 'ARRAY') {
-        return undef unless $key =~ /^(?:0|[1-9]\d*)$/;
-        my $idx = $key + 0;
-        # JS-semantics negative index is "not found" (`arr[-1] ===
-        # undefined`), NOT Perl's native from-the-end wraparound — guard
-        # it explicitly so this stays a superset of `->[]`, not a
-        # divergent accessor.
-        return undef if $idx < 0 || $idx >= scalar @$collection;
-        return $collection->[$idx];
-    }
-    return undef;
+    return BarefootJS::Evaluator::_read_index($collection, $key);
 }
 
 # `isValidElement(x)` -- the framework "is this a renderable element (not
@@ -2331,7 +2385,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.40.1";
+our $VERSION = "0.40.2";
 
 sub new {
     my ($class, $epoch_ms) = @_;

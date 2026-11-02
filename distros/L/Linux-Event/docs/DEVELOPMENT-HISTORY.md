@@ -1,6 +1,124 @@
 # Development History
 
-This file preserves the benchmark/optimization phase notes that previously occupied the project README. It is historical material, not the current public API documentation.
+This file preserves historical engineering decisions and the benchmark/optimization phase notes that previously occupied the project README. It is not public API documentation; current contracts are in module POD and the design guides.
+
+## 0.118 release preparation and October 2026 research decisions
+
+**Snapshot: 2026-11-01.** `main` is Linux::Event **0.118**,
+prepared for publication; CPAN remains at **0.117** pending upload. The four original
+reactor-contract milestones in the [1.000 roadmap](V1-ROADMAP.md)
+were implemented: foreign-loop `poll_fd()/poll()`, `defer()`,
+resource-aware managed `fork()`, and native Inotify. Version 0.118
+then merged callback-safe `defer_fork()` ([PR #35](https://github.com/haxmeister/perl-linux-event/pull/35))
+and native ordered Stream `sendfile()` ([PR #39](https://github.com/haxmeister/perl-linux-event/pull/39)).
+Release preparation was approved on 2026-11-01; tagging, a GitHub
+release, and CPAN upload still require completion and verification.
+
+This section records experiments **already completed**, not
+proposals to begin new work. All numbers are workload-specific and
+should not be extrapolated into universal benchmarks.
+
+### EPOLLEXCLUSIVE — investigated, integration deferred
+
+[Research PR #36](https://github.com/haxmeister/perl-linux-event/pull/36)
+implemented an opt-in exclusive epoll registration for fork-shared
+Listeners, including parent/child rebuilding, pause/resume ADD/DEL,
+rollback, reentrancy, and lifecycle regressions. Kernel and short
+real-Stream tests cut wasted epoll wakeups but could leave a few
+workers handling most burst connections. `SO_REUSEPORT` offered
+more even distribution in these short tests but is a different
+socket ownership model.
+
+A first sustained local benchmark incorrectly used TCP reset closes,
+triggering a Stream error on every completed response. Its throughput
+figures were discarded and the client was fixed to wait for ordinary
+TCP FIN. The corrected v2 local quad-core dataset comprised
+**5,694,682 fully acknowledged requests**, with no losses or Stream
+errors. In five-repeat four-worker comparisons, 0-us work produced
+ordinary shared / exclusive / reuseport rates of
+**10,684 / 11,120 / 10,573 replies/s**. With 150-us synthetic work,
+they were **7,903 / 6,951 / 7,448 replies/s**: exclusive was
+**12.0% slower** than ordinary shared in that case. Sustained fairness
+was above 0.998, unlike short-burst imbalances.
+
+**Decision made after the corrected run:** stop investigating
+`EPOLLEXCLUSIVE` for now, leave the opt-in prototype on draft PR #36,
+and do not merge or make it a default. The benchmark runner and
+[its instructions](https://github.com/haxmeister/perl-linux-event/blob/feature/epollexclusive-evaluation/bench/experiments/EPOLLEXCLUSIVE-LOCAL.md)
+remain reproducible; the supplied local data was not stored in this
+public repository. Reopen only for a compelling real shared-listener
+workload and stronger evidence.
+
+### recvmmsg() — investigated, integration deferred
+
+[Research PR #37](https://github.com/haxmeister/perl-linux-event/pull/37)
+implemented and tested a bounded receive-batch prototype, preserving
+the public Datagram callback and per-packet contracts.
+[Full branch CI passed](https://github.com/haxmeister/perl-linux-event/actions/runs/41133753891).
+The local quad-core comparison verified **5,280,000 packets** in
+**150/150 completed trials**, with no missing or corrupted data.
+The complete Loop/Datagram callback path saw approximately 2.5–5.1%
+less receive CPU at 64 B and 1.0–2.8% less at 1,400 B, but
+**1.9–2.8% more CPU at 8 KiB**. Serial echo did not show a
+dependable gain.
+
+**Decision:** do not merge the prototype or enable it by default;
+keep PR #37 and its
+[benchmark guide](https://github.com/haxmeister/perl-linux-event/blob/feature/udp-recvmmsg-evaluation/docs/UDP-RECVMMSG-EVALUATION.md)
+as research. This decision is about `recvmmsg()` receive batching;
+there has been **no separate `sendmmsg()` transmission experiment**.
+
+### sendfile() / splice() — researched; sendfile integrated
+
+[Research PR #38](https://github.com/haxmeister/perl-linux-event/pull/38)
+benchmarked copied file-to-TCP transfer, `sendfile()` and
+`splice()` using real TCP byte-integrity tests. The local
+five-repeat run completed **90/90 transfers without corruption**;
+for 200 KiB and 1 MiB files `sendfile()` reduced sender CPU per
+MiB by about **79–80%** versus copying. That evidence led to a
+narrow native Stream `sendfile()` with ordered file segments,
+existing backpressure, source-fd ownership, TLS rejection, and a
+private 64 KiB file-drain fairness budget. It merged into `main`
+via [PR #39](https://github.com/haxmeister/perl-linux-event/pull/39)
+at `f219f24f278cdb1319a38402d3a9a35f61523e08`, after
+[ten green core CI jobs](https://github.com/haxmeister/perl-linux-event/actions/runs/41166889428)
+and the [actual Stream benchmark](https://github.com/haxmeister/perl-linux-event/actions/runs/41166889422).
+[Post-merge CI](https://github.com/haxmeister/perl-linux-event/actions/runs/41208249334)
+also passed. See [the finished Stream contract](STREAM-SENDFILE-DESIGN.md).
+
+`splice()` remains only in the syscall comparison, not the
+public Stream API. A socket/pipe relay capability would require
+a new workload and independent semantics. Do not confuse this
+intentional separation with unfinished `sendfile()` work.
+
+### Other explicit decisions and unfinished work
+
+- **Netlink:** the architecture was approved in
+  [PR #33](https://github.com/haxmeister/perl-linux-event/pull/33):
+  minimal `Linux::Event::Kernel::Netlink` in core and a separate
+  `Linux::Event::Netlink` distribution for routes and other families.
+  Both are **not yet implemented**; work was deliberately deferred.
+- **`sendmmsg()`:** never implemented or benchmarked independently.
+  Only investigate when a concrete queued transmit workload warrants it.
+- **`fanotify`, UDP packet metadata/error queues/GSO/GRO,
+  `AF_VSOCK`, SocketCAN, AF_PACKET and advanced TCP hints:**
+  roadmap candidates, not completed core experiments.
+- **TLS native-consumer retirement follow-up:**
+  [draft PR #34](https://github.com/haxmeister/perl-linux-event/pull/34)
+  has focused regression-only coverage and **no production fix**.
+  Its core-only tests did not reproduce the reported HTTP selector
+  crash; disposition of this test PR remains separate from the
+  Linux-native expansion decisions.
+- The earlier XS reduction and watcher/connect micro-optimization
+  investigations were already measured and closed under
+  [the XS roadmap](XS-ROADMAP.md), not new work to restart.
+
+**No next implementation was selected after `sendfile()`.**
+Selection should follow demonstrated application utility and evidence,
+not restart an open draft because it still appears on the roadmap.
+The current authoritative categories are in
+[`V1-ROADMAP.md`](V1-ROADMAP.md). This section is a dated decision
+record; preserve the older optimization-phase notes below.
 
 ## Essential completion release (0.101)
 

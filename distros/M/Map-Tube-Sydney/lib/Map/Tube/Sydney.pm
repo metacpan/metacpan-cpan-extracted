@@ -1,6 +1,6 @@
 package Map::Tube::Sydney;
 
-$Map::Tube::Sydney::VERSION   = '1.01';
+$Map::Tube::Sydney::VERSION   = '1.02';
 $Map::Tube::Sydney::AUTHORITY = 'cpan:EARLYBEAN';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Sydney - Interface to the Sydney Rail Network.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

@@ -3,8 +3,13 @@ package Geo::AnomalyDetector;
 use strict;
 use warnings;
 
-use Statistics::Basic qw(mean stddev);
+# TODO: GIS::Distance
+
+use Params::Get 0.13;
 use Math::Trig;
+use Return::Set 0.03;
+use Params::Validate::Strict 0.12;
+use Statistics::Basic qw(mean stddev);
 # use Geo::Inverse;
 
 =head1 NAME
@@ -20,31 +25,112 @@ This module analyzes latitude and longitude data points to identify anomalies ba
   my $detector = Geo::AnomalyDetector->new(threshold => 3);
   my $coords = [ [37.7749, -122.4194], [40.7128, -74.0060], [35.6895, 139.6917] ];
   my $anomalies = $detector->detect_anomalies($coords);
-  print "Anomalies: " . join ", ", map { "($_->[0], $_->[1])" } @{$anomalies};
+  print 'Anomalies: ', join ', ', map { ($_->[0], $_->[1]) } @{$anomalies};
 
 Each co-ordinate can be either a two element array of [latitude, longitude] or an object that has
 C<latitude> and C<longitude> methods.
 
 =head1	VERSION
 
-0.02
+0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new
+
+Creates a Geo::AnomalyDetector object.
+
+It takes two optional parameters:
+
+=over 4
+
+=item * C<threshold>
+
+A number to hint at what consitutues an anomaly.
+The larger the number,
+the larger the distance to be called an anomaly,
+there will be fewer matches.
+The default is 3.
+
+=item * C<units>
+
+The unit to be used internally for measurement.
+Can be C<M> or C<K>.
+The default is C<K>.
+This should have no effect on the determination of outliers.
+
+=back
+
+=cut
 
 sub new {
 	my ($class, %args) = @_;
-	my $self = {
+
+	return bless {
 		threshold => $args{threshold} || 3,
-		unit => $args{unit} || 'K',
-	};
-	bless $self, $class;
-	return $self;
+		unit => $args{units} || $args{unit} || 'K',	# unit was the only name read before 0.03
+	}, $class;
 }
 
-sub detect_anomalies {
-	my ($self, $coordinates) = @_;
+=head2 detect_anomalies
+
+Identify outlier geographic coordinates based on their distance from the average location of a dataset.
+
+Takes an array reference of coordinate pairs.
+Each coordinate can be an array reference [lat, lon] or an object with latitude() and longitude() methods.
+
+It returns a reference to an array of coordinates considered anomalous based on their distance from the mean.
+
+=head3	API SPECIFICATION
+
+=head4	INPUT
+
+  {
+    'coordinates' => { type => 'arrayref' }	# Each element can be either a coordinate pair or an object
+  }
+
+=head4	OUTPUT
+
+  {
+    'type' => 'arrayref',  # A list of coordinates
+    'schema' => {
+      'type' => 'arrayref',
+      'min' => 2,  # Each coordinate is two numbers
+      'max' => 2,
+      'schema' => {
+        # FIXME: specify that the latitude (the first number) is between -90 and 90
+        'type' => 'number', 'min' => -180.0, 'max' => 180.0 }
+    }
+  }
+
+=over 4
+
+=item * Argument error: croak
+
+=item * No matches found: []
+
+=back
+
+=cut
+
+sub detect_anomalies
+{
+	my $self = shift;
+        my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params('coordinates', @_),
+		schema => {
+			'coordinates' => {
+				'type' => 'arrayref',
+			}
+		}
+	});
+	# my $params = Params::Get::get_params('coordinates', @_);
+
+	my $coordinates = $params->{'coordinates'};
 
 	my @distances;
 	my $mean_lat = mean(map { (ref($_) eq 'ARRAY') ? $_->[0] : $_->latitude() } @{$coordinates});
@@ -79,7 +165,18 @@ sub detect_anomalies {
 		}
 	}
 
-	return \@anomalies;
+	return Return::Set::set_return(\@anomalies, {
+		'type' => 'arrayref',	# A list of coordinates
+		'schema' => {
+			'type' => 'arrayref',
+			'min' => 2,	# Each coordinate is two numbers
+			'max' => 2,
+			'schema' => {
+				# FIXME: specify that the latitude (the first number) is between -90 and 90
+				'type' => 'number', 'min' => -180.0, 'max' => 180.0 }
+			}
+		}
+	);
 }
 
 # Now use Math::Trig.  I tried Geo::Inverse, but that always throws messages about undefined variables
@@ -146,6 +243,8 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =over 4
 
+=item * Test coverage report: L<https://nigelhorne.github.io/Geo-AnomalyDetector/coverage/>
+
 =item * L<Geo::Location::Point>
 
 =item * L<Math::Trig>
@@ -190,7 +289,7 @@ L<http://deps.cpantesters.org/?module=Geo::AnomalyDetector>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

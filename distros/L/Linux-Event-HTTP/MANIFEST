@@ -6,6 +6,7 @@ MANIFEST
 Makefile.PL
 README.md
 SECURITY.md
+docs/GETTING-STARTED.md
 docs/ARCHITECTURE.md
 docs/BENCHMARKING.md
 docs/HTTP2-ARCHITECTURE.md
@@ -55,5 +56,6 @@ xsbridge/stream_consumer_abi.h
 MANIFEST.SKIP
 tools/http1-profile-summary.pl
 docs/RELEASE-0.004.md
+docs/RELEASE-0.005.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

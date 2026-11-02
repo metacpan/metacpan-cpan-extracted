@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
-        'Punk'                => '0.64',
+        'Punk'                => '0.68',
         'File::Raw::JSON'     => '0.08',
         'JSON::Schema::Fast'  => '0.10',
     },
@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Punk'               => '0.64',
+        'Punk'               => '0.68',
         'File::Raw::JSON'    => '0.08',
         'JSON::Schema::Fast' => '0.10',
     },

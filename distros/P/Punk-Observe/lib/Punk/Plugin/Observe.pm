@@ -318,13 +318,15 @@ sub _retain {
               . "window - a number and a unit, as in 7d")
         unless defined $ns;
     my $at = defined $r->{at} ? $r->{at} : '17 * * * *';
+    my ($at_ok, $at_why);
     {
         local $@;
-        eval { require Punk::Queue::Cron;
-               Punk::Queue::Cron->check($at); 1 }
-            or Carp::croak("Punk::Plugin::Observe: retain at '$at' is not "
-                         . "a cron expression: $@");
+        $at_ok = eval { require Punk::Queue::Cron;
+                        Punk::Queue::Cron->check($at); 1 };
+        $at_why = $@;
     }
+    Carp::croak("Punk::Plugin::Observe: retain at '$at' is not "
+              . "a cron expression: $at_why") unless $at_ok;
     my $bytes;
     if (defined $r->{bytes}) {
         my %mult = (k => 1024, m => 1024**2, g => 1024**3, t => 1024**4);
@@ -387,13 +389,15 @@ sub _warm {
     }
 
     my $every = defined $w->{every} ? $w->{every} : '@every 5m';
+    my ($every_ok, $every_why);
     {
         local $@;
-        eval { require Punk::Queue::Cron;
-               Punk::Queue::Cron->check($every); 1 }
-            or Carp::croak("Punk::Plugin::Observe: warm every '$every' is "
-                         . "not a cron expression: $@");
+        $every_ok = eval { require Punk::Queue::Cron;
+                           Punk::Queue::Cron->check($every); 1 };
+        $every_why = $@;
     }
+    Carp::croak("Punk::Plugin::Observe: warm every '$every' is "
+              . "not a cron expression: $every_why") unless $every_ok;
     $out{every} = $every;
     return \%out;
 }

@@ -52,4 +52,16 @@ is $cmd->error, "error", 'error method';
 # date method
 ok defined $cmd->date, 'date method';
 
+# the print of the code goes to STDOUT in the child, not to the handle
+# the caller has select()ed (IO::Divert and the like)
+{
+    my $diverted = '';
+    open my $fh, '>', \$diverted or die;
+    my $prev = select $fh;
+    $result = Command::Run->new(command => [sub { print "to stdout" }])->run;
+    select $prev;
+    is $result->{data}, "to stdout", 'code ref: output captured while another handle is selected';
+    is $diverted, '', 'code ref: nothing leaks into the selected handle';
+}
+
 done_testing;

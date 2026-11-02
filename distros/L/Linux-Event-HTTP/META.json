@@ -1,5 +1,5 @@
 {
-   "abstract" : "Linux-native integration of Unblock HTTP",
+   "abstract" : "HTTP client and server for Linux::Event",
    "author" : [
       "Joshua S. Day <hax@cpan.org>"
    ],
@@ -91,15 +91,15 @@
    "provides" : {
       "Linux::Event::HTTP" : {
          "file" : "lib/Linux/Event/HTTP.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Linux::Event::HTTP::Client" : {
          "file" : "lib/Linux/Event/HTTP/Client.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Linux::Event::HTTP::Server" : {
          "file" : "lib/Linux/Event/HTTP/Server.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -114,6 +114,6 @@
          "web" : "https://github.com/haxmeister/perl-Linux-Event-HTTP"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

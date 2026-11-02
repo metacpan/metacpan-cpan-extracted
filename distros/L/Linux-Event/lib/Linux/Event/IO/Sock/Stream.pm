@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use parent 'Linux::Event::_Socket::Stream';
 
@@ -244,6 +244,57 @@ Data is kept in order.
 
 You do not need to manually watch the socket for writable readiness.
 
+=head2 sendfile($file, %options)
+
+  open my $file, '<:raw', 'backup.tar' or die $!;
+
+  $stream->write("START\n");
+  $stream->sendfile($file);
+  $stream->write("END\n");
+  $stream->end;
+  close $file;             # Safe: the Stream keeps its own descriptor.
+
+C<sendfile> sends the contents of an open, readable regular file over an
+established plain socket. It is useful for file transfers, backups, and other
+protocols that send large files.
+
+The file is sent as raw bytes, in order with calls to C<write>. On a framed
+Stream, C<sendfile> does not add message framing.
+
+To send only part of a file:
+
+  $stream->sendfile($file, offset => 1024, length => 4096);
+
+C<offset> defaults to zero, even if the file is currently positioned somewhere
+else. C<length> defaults to the number of bytes remaining from that offset
+to the file's size when the call is made. The file position does not change.
+A zero-length range is a successful no-op. Invalid ranges and unknown options
+are rejected.
+
+The Stream keeps its own file descriptor, so you can close the supplied file
+handle after C<sendfile> returns. This does not make a copy of the file. Keep
+its contents unchanged until the receiver has consumed the data; the kernel
+may still refer to file pages after C<pending_bytes> reaches zero. Renaming
+or removing the pathname does not change the open file descriptor.
+
+Like C<write>, C<sendfile> returns true when the producer may continue and
+false when it should stop producing more output. A false return due to
+backpressure does B<not> mean the range was rejected: do not submit it again.
+Use C<on_drain> to resume producing output. If C<max_pending_bytes> would be
+exceeded, the usual C<output_limit> error closes the Stream instead. This
+limit counts unsent file bytes, not only Perl-allocated buffers.
+
+C<pending_bytes> includes file bytes awaiting transmission, but these bytes
+are not copied into a Perl output buffer. C<end> waits for queued file output
+before shutting down the write side. It does not wait for an acknowledgment
+from the peer. C<close> and C<close_write> discard any unsent file ranges.
+C<on_drain> reports watermark recovery, not completion of an individual file.
+
+C<sendfile> is not supported on TLS or another non-plain transport, nor on a
+connection that is still being established. For an outbound connection, call it
+from C<on_ready>. Regular-file I/O can still block briefly on disk activity,
+even though socket output is nonblocking.
+
 =head2 Writing before on_ready
 
 Data may be queued before the connection becomes ready:
@@ -356,9 +407,10 @@ immediately.
 Linux::Event provides high and low watermarks so applications can react when
 that queue becomes large.
 
-C<write> and C<send> still accept the supplied data when the high watermark is
-reached, but begin returning false to tell the application that it should slow
-down.
+C<write>, C<send>, and C<sendfile> still accept the supplied data when
+the high watermark is reached, but begin returning false to tell the
+application that it should slow down. The separate hard
+C<max_pending_bytes> limit can reject output and close the Stream.
 
 When queued output later falls to the low watermark, C<on_drain> is called.
 
@@ -794,7 +846,7 @@ one message batch.
 
 Default: 1,048,576 bytes.
 
-When pending output reaches this level, C<write> and C<send> begin returning
+When pending output reaches this level, C<write>, C<send>, and C<sendfile> begin returning
 false to signal backpressure.
 
 The supplied data is still accepted unless a hard pending-output limit prevents

@@ -28,7 +28,7 @@ use File::Spec;
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 134;
+	plan tests => 135;
 	use_ok('Database::Join');
 }
 
@@ -48,6 +48,7 @@ Readonly::Scalar my $ERR_REMOVE_JC   => qr/Cannot remove join_column/;
 Readonly::Scalar my $ERR_PRIVATE     => qr/cannot call private method/;
 Readonly::Scalar my $ERR_UNKNOWN_COL => qr/unknown column/;
 Readonly::Scalar my $ERR_QUERY       => qr/query\(\) chained builder is not supported/;
+Readonly::Scalar my $ERR_GROUP_BY    => qr/group_by\(\) fluent chain is not supported/;
 Readonly::Scalar my $ERR_EXECUTE     => qr/execute\(\) raw SQL is not supported/;
 Readonly::Scalar my $ERR_HEAP        => qr/\(join_map\[0\] must be a string\)/;
 
@@ -401,6 +402,11 @@ subtest 'fetchrow_hashref: returns undef when nothing matches' => sub {
 subtest 'query: always croaks with explanatory message' => sub {
 	my ($j) = _minimal_join();
 	throws_ok { $j->query() } $ERR_QUERY, 'query() croaks with expected message';
+};
+
+subtest 'group_by: always croaks with explanatory message' => sub {
+	my ($j) = _minimal_join();
+	throws_ok { $j->group_by('region') } $ERR_GROUP_BY, 'group_by() croaks with expected message';
 };
 
 subtest 'execute: always croaks with explanatory message' => sub {

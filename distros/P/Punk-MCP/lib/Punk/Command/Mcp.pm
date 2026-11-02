@@ -6,7 +6,7 @@ use warnings;
 use Punk::Command ();
 use Punk::Plugin::MCP ':command';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 

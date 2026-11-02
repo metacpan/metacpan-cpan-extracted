@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::ReadCSV;
 # ABSTRACT: Read and parse Tiller CSV export files
-$Finance::Tiller2QIF::ReadCSV::VERSION = '1.10';
+$Finance::Tiller2QIF::ReadCSV::VERSION = '1.20';
 =head1 DESCRIPTION
 
 Ingests Tiller CSV exports into a SQLite database.
@@ -15,7 +15,7 @@ Parse a Tiller CSV export and insert rows into the SQLite database. Handles mult
 
 =head1 AUTHOR
 
-John Karr E<lt>brainbuz@cpan.orgE<gt>
+John Karr E<lt>cpan@brainbuz.orgE<gt>
 
 =head1 LICENSE
 
@@ -23,7 +23,7 @@ GPL version 3 or later.
 
 =cut
 
-use v5.34;
+use 5.036;
 
 use Path::Tiny;
 use Text::CSV;
@@ -101,7 +101,7 @@ sub _prepare_count ($dbdbi) {
   );
 }
 
-sub _insert_row ( $insert, $columns, $row, $verbose ) {
+sub _insert_row ( $insert, $columns, $row, $verbose, $strict=0 ) {
   my %r;
   @r{@$columns} = @$row;
   my $amount = _normalize_amount( $r{'Amount'} // '' );
@@ -113,10 +113,15 @@ sub _insert_row ( $insert, $columns, $row, $verbose ) {
     $date = $dt->ymd;
   }
   catch ($e) {
+    die "Could not parse date '$date': $e" if $strict;
     print "[WARN] Could not parse date '$date' for record: $rowstr\n";
     return;
   }
-  my $id        = $r{'Transaction ID'}   || return;
+  my $id        = $r{'Transaction ID'};
+  if ( !$id ) {
+    die "Missing Transaction ID\n" if $strict;
+    return;
+  }
   my $account   = $r{'Account'}          || '';
   my $payee     = $r{'Description'}      || $r{'Full Description'} // '';
   my $memo      = $r{'Full Description'} || '';
@@ -130,11 +135,12 @@ sub _insert_row ( $insert, $columns, $row, $verbose ) {
     vPrint( $verbose, "Ingest: $rowstr" );
   }
   catch ($e) {
+    die "Failed to import transaction '$id': $e" if $strict;
     say "Failed to import row to transactions ${rowstr} \n$e  ";
   }
 }
 
-sub Ingest ( $csv_file, $db_path, $verbose=0 ) {
+sub Ingest ( $csv_file, $db_path, $verbose=0, $strict=0 ) {
   my $dbdbi = connect_db($db_path);
   my $csv = Text::CSV->new({ binary => 1 });
   my $fh  = path($csv_file)->openr_utf8 or die "File not found: $csv_file\n";
@@ -148,8 +154,13 @@ sub Ingest ( $csv_file, $db_path, $verbose=0 ) {
   my ($StartCnt) = $counter->fetchrow_array;
 
   while ( my $row = $csv->getline($fh) ) {
-    _insert_row( $insert, $header, $row, $verbose );
+    _insert_row( $insert, $header, $row, $verbose, $strict );
   }
+  my ($csv_error, $csv_message) = $csv->error_diag;
+  # eof() is also true for malformed input such as an unterminated final quote.
+  # Text::CSV reports 2012 for ordinary end of input; other codes are failures.
+  die "CSV parse error: $csv_message\n"
+    if $strict && (!$csv->eof || ($csv_error && $csv_error != 2012));
   $counter->execute();
   my ($EndCnt) = $counter->fetchrow_array;
   return ( $EndCnt - $StartCnt );

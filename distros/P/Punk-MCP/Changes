@@ -1,4 +1,8 @@
 Revision history for Punk-MCP
 
+0.02    2026-10-31
+        - Build and run on perls before 5.22: no foldEQ or hv_deletes
+        - $c->mcp_log sends to the client on perls before 5.16.
+
 0.01    2026-10-27
         First version

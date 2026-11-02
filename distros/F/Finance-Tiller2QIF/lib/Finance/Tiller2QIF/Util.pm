@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Util;
 # ABSTRACT: Utility functions for Tiller2QIF processing
-$Finance::Tiller2QIF::Util::VERSION = '1.10';
+$Finance::Tiller2QIF::Util::VERSION = '1.20';
 =head1 DESCRIPTION
 
 Provides utility functions for initializing the SQLite database and configuration files.
@@ -36,7 +36,7 @@ Exported on request; used internally by other Finance::Tiller2QIF modules.
 
 =head1 AUTHOR
 
-John Karr E<lt>brainbuz@cpan.orgE<gt>
+John Karr E<lt>cpan@brainbuz.orgE<gt>
 
 =head1 LICENSE
 
@@ -44,7 +44,7 @@ GPL version 3 or later.
 
 =cut
 
-use v5.34;
+use 5.036;
 
 use Exporter 'import';
 our @EXPORT_OK = qw( vPrint );
@@ -52,7 +52,6 @@ our @EXPORT_OK = qw( vPrint );
 use Path::Tiny;
 use Text::CSV;
 use Finance::Tiller2QIF::DB qw( connect_db );
-use Finance::Tiller2QIF::WriteQIF;
 use utf8;
 use warnings FATAL => 'utf8';
 use open ':std', ':encoding(UTF-8)';
@@ -130,8 +129,7 @@ sub CheckConfig (%options) {
 
   say "Options Provided:";
   for ( sort keys %options ) {
-
-    say sprintf "  %-14s : %s", $_, $options{$_};
+    say sprintf "  %-14s : %s", $_, $options{$_} // '(unset)';
   }
 
   say '';
@@ -161,12 +159,6 @@ sub CheckConfig (%options) {
     unless ( -w path( $options{output} )->parent ) {
       say "Problem ${options{output}} parent directory is not writable";
     }
-  }
-  if ( defined $options{viewer}
-    && lc $options{viewer} ne 'console' )
-  {
-    eval { Finance::Tiller2QIF::WriteQIF::ResolveViewer( $options{viewer} ); 1 }
-      or do { chomp( my $err = $@ ); say "Problem: $err" };
   }
 }
 

@@ -1,5 +1,14 @@
 Revision history for Dancer-Plugin-Feed
 
+1.263060  2026-11-02 07:01:14+01:00 Europe/Berlin
+
+    * Added package indexing as recommended by Kwalitee
+    * Added previously forgotten Changes entries
+    * Added SECURITY.md file via Dist::Zilla plugin
+    * Improved test coverage
+
+1.263050  2026-11-01 13:49:30+01:00 Europe/Berlin
+
 1.262070  2026-07-26 18:23:56+02:00 Europe/Berlin
 
     * Resolved test failures due to postfix dereferencing being experimental before perl v5.24 (https://codeberg.org/demiguise/Dancer2-Plugin-Feed/issues/1).

@@ -212,6 +212,7 @@ my %allowed = map { $_ => 1 } qw(
     README.md
     STREAM-COMPETITOR-PLAN.md
     run-async-consumer-lifetime-bench.pl
+    defer-fork-driver-overhead.pl
     run-connect-microbench.pl
     run-listen-microbench.pl
     run-line-runtime-comparison.pl
@@ -229,6 +230,8 @@ my %allowed = map { $_ => 1 } qw(
     run-stream-lifecycle-bench.pl
     run-stream-microbench.pl
     run-stream-payload-sweep.pl
+    run-stream-sendfile-bench.pl
+    summarize-stream-sendfile-budget.pl
     run-stream-timer-fairness.pl
     run-stream-feedback-timer-fairness.pl
     run-tls-accept-setup-bench.pl

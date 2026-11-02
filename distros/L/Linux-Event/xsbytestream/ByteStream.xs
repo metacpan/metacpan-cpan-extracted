@@ -364,6 +364,22 @@ _write(state_obj, bytes)
   OUTPUT:
     RETVAL
 
+int
+_sendfile(state_obj, source_fd, offset, length, has_length)
+    SV *state_obj
+    int source_fd
+    UV offset
+    UV length
+    int has_length
+  CODE:
+    ENTER;
+    SAVEFREESV(SvREFCNT_inc(state_obj));
+    RETVAL = les_sendfile_submit(aTHX_ les_state_from_sv(state_obj),
+        source_fd, offset, has_length, length);
+    LEAVE;
+  OUTPUT:
+    RETVAL
+
 void
 _write_ready(state_obj)
     SV *state_obj

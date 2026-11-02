@@ -53,7 +53,8 @@
             "Scalar::Util" : "0",
             "Sub::Protected" : "0",
             "autodie" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.010001",
+            "version" : "0"
          }
       },
       "test" : {
@@ -86,6 +87,6 @@
          "web" : "https://github.com/nigelhorne/Database-Join"
       }
    },
-   "version" : "v0.010.0",
+   "version" : "0.010.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

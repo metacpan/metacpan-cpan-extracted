@@ -8,6 +8,9 @@ lib/App/Greple/update.pm
 minil.toml
 t/00_compile.t
 t/01_run.t
+t/02_divert.t
+t/03_tee.t
+t/04_config.t
 t/SAMPLE.txt
 t/Util.pm
 t/runner/README.md

@@ -13,7 +13,7 @@ authentication in Mojolicious applications (local and SAML2)
 
 =head1 VERSION
 
-This document describes MojoX::Authentication version 0.008.
+This document describes MojoX::Authentication version 0.010.
 
 =begin html
 

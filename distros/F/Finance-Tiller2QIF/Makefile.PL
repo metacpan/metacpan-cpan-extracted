@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Convert Tiller CSV exports to QIF",
-  "AUTHOR" => "brainbuz\@cpan.org",
+  "AUTHOR" => "cpan\@brainbuz.org",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Exception" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "1.10",
+  "VERSION" => "1.20",
   "test" => {
     "TESTS" => "t/*.t"
   }

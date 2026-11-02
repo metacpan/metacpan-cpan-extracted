@@ -35,6 +35,7 @@ WriteMakefile(
 		'Readonly'                 => '2.00',
 		'Scalar::Util'             => 0,
 		'Sub::Protected'           => 0,
+		'version' => 0,
 	}, TEST_REQUIRES => {
 		'DBD::CSV'              => 0,
 		'Test::DescribeMe'      => 0,

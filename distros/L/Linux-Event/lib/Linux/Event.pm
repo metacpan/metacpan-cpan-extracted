@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 1;
 
@@ -353,7 +353,28 @@ to create child processes while Linux::Event resources already exist.
 The disposition of a resource determines whether it remains usable in the
 parent, child, or both.
 
-Not every resource supports every disposition.
+Not every resource supports every disposition. Direct C<fork> calls require
+the Loop to be quiescent, so do not call C<fork> inside an event callback.
+
+If a client message should cause a fork, request it with C<defer_fork>:
+
+  $loop->defer_fork(
+      move => [ $stream ],
+      on_parent => sub ($pid) {
+          say "Connection moved to child $pid";
+      },
+      on_child => sub {
+          say "The child owns the connection";
+      },
+      on_error => sub ($error) {
+          warn $error;
+      },
+  );
+
+This queues the fork and returns a cancelable request handle. The actual
+fork and its callbacks happen after the Loop has left native event dispatch.
+A moved Stream must be an established plain socket connection; TLS Streams
+do not currently support moving. The application must reap its children.
 
 See L<Linux::Event::Loop> for the complete fork rules before using this
 feature.

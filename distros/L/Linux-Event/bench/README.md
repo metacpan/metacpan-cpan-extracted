@@ -47,6 +47,25 @@ different benchmark contract/configuration is rejected.
 Use `--quick` only while developing the harness. Release decisions should use
 the full default workload.
 
+## Deferred fork driver overhead
+
+Use `defer-fork-driver-overhead.pl` to compare the thin public
+`poll()` and `run_once(0)` entry points with their private native XS
+counterparts, on the same build. No deferred fork requests are queued in
+this benchmark:
+
+```bash
+perl -Mblib bench/defer-fork-driver-overhead.pl
+```
+
+The script alternates method order, reports median nanoseconds per call, and
+uses 300,000 calls per sample across nine samples by default.
+`LOOP_BENCH_CALLS` and `LOOP_BENCH_REPEATS` can override those counts.
+
+The benchmark isolates the cost of the driver boundary for an empty Loop.
+It does not measure the cost of an actual fork or predict the effect on a
+busy network server. Use the full performance regression suite alongside it.
+
 ## Public-surface overhead
 
 `run-public-api-overhead.pl` is repository engineering tooling used to compare

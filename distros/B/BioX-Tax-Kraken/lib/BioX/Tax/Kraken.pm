@@ -1,4 +1,4 @@
-package BioX::Tax::Kraken 0.001003;
+package BioX::Tax::Kraken 0.002001;
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use constant N_VALID_COLUMNS => 4;
 use constant PARENT => 0;
 use constant NAME => 1;
 use constant RANK => 2;
+use constant CHILDREN => 3;
 
 sub new {
 
@@ -73,13 +74,19 @@ sub children {
     my ($self, $tid) = @_;
 
     return if (! defined $self->{tax}->{$tid});
-    return grep {
-        $self->is_ancestor($_, $tid)
-    } keys %{ $self->{tax} };
+    return @{ $self->{_c_children}->{$tid} }
+        if (defined $self->{_c_children}->{$tid});
+    my @all = split "\0", $self->{tax}->{$tid};
+    return () if ($#all < 3);
+    my @c = $#all < 3
+        ? ()
+        : @all[3..$#all];
+    $self->{_c_children}->{$tid} = \@c;
+    return @c;
 
 }
 
-sub is_ancestor {
+sub a_isa_b {
 
     my ($self, $child, $parent, $visited) = @_;
 
@@ -87,7 +94,7 @@ sub is_ancestor {
 
     return if (! defined $self->{tax}->{$child});
     return if (! defined $self->{tax}->{$parent});
-    return 0 if ($child eq $parent); # save some time, maybe
+    return 1 if ($child eq $parent); # save some time, maybe
 
     my $tag = "$child\b$parent";
     return $self->{_c_is_ancestor}->{$tag}
@@ -109,7 +116,7 @@ sub is_ancestor {
         $result = 0;
     }
     else {
-        $result = $self->is_ancestor( $p, $parent, $visited );
+        $result = $self->a_isa_b( $p, $parent, $visited );
     }
     $self->{_c_is_ancestor}->{$tag} = $result;
     delete $visited->{$child};
@@ -117,9 +124,6 @@ sub is_ancestor {
     return $result;
 
 }
-
-# alias method
-*a_isa_b = \&is_ancestor;
 
 sub lineage {
 
@@ -220,7 +224,8 @@ sub _load {
         # uses < 50% memory to store data as null-padded strings instead of
         # Perl nested arrays or hashes. Can be significantly slower to extract
         # data on millions of calls, though.
-        $self->{tax}->{$f[0]} = join "\0", @f[1..3];
+        $self->{tax}->{$f[0]} = join "\0", @f[1..3], ($self->{tax}->{$f[0]} // ());
+        $self->{tax}->{$f[1]} .= "\0$f[0]";
     };
     close $fh;
     $self->{fh} = undef;
@@ -257,10 +262,8 @@ BioX::Tax::Kraken - simple access to Kraken-style taxDB taxonomy database
     );
     # 'Gallus'
 
-    say $tax->is_ancestor(CHICKEN, VERTEBRATA) ? 'Y' : 'N';
+    say $tax->a_isa_b(CHICKEN, VERTEBRATA) ? 'Y' : 'N';
     # 'Y'
-    say $tax->is_ancestor(CHICKEN, WHITE_OAK) ? 'Y' : 'N';
-    # 'N'
     say $tax->a_isa_b(CHICKEN, WHITE_OAK) ? 'Y' : 'N';
     # 'N'
     say $tax->name(
@@ -359,21 +362,17 @@ Given a valid taxonomic ID, fetch the associated property from the database.
 
 Returns a scalar string, or undefined if no entry was found for the input ID.
 
-=item B<is_ancestor> I<child ID> I<parent ID>
+=item B<a_isa_b> I<child ID> I<parent ID>
 
     say "That explains a lot!"
-        if $tax->is_ancestor(9606, 9443);
+        if $tax->a_isa_b(9606, 9443);
 
 Given two valid taxonomic IDs, queries to database to check if the second ID
-is an ancestor (not necessarily direct) of the first.
+is an ancestor (not necessarily direct) of the first. Also returns true if the
+IDs are identical (as implied by the method name).
 
 Returns a boolean value, or undefined if either ID was not found in the
 database.
-
-=item B<a_isa_b> I<child ID> I<parent ID>
-
-Alias of C<is_ancestor> whose name makes it a little easier to remember the
-order of arguments
 
 =item B<lineage> I<tax ID>
 
@@ -403,15 +402,10 @@ in the database.
 
     my @descendents = $tax->children(9031);
 
-Given a valid tax ID, traverses the taxonomic tree to collect all intermediate
-and leaf nodes that descend from that ID. BEWARE: The class does not currently
-store any back-references when parsing the input database. Thus, unlike all
-other instance methods, this method currently must traverse the *entire*
-database each time it is called, and it therefore will be a significant
-bottleneck if called over thousands or millions of inputs.
+Given a valid tax ID, returns a list of direct descendents (if any).
 
-Returns an unsorted list of IDs, or undefined if the given ID was not
-found in the database.
+Returns an unsorted array of IDs, an empty array (for taxa with no children),
+or undefined if the given ID was not found in the database.
 
 =back
 

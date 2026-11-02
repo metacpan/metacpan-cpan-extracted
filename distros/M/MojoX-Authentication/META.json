@@ -1,5 +1,5 @@
 {
-   "abstract" : "[Put something meaningful here!]",
+   "abstract" : "Moderately opinionated support module for authentication in Mojolicious applications (local and SAML2)",
    "author" : [
       "Flavio Poletti (flavio@polettix.it)"
    ],
@@ -59,7 +59,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.008",
+   "version" : "0.010",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

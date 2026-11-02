@@ -3,8 +3,17 @@ IRI
 
 Created:      2014-07-23
 Home page:    <http://search.cpan.org/dist/IRI/>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IRI>
+Bug tracker:  <https://github.com/kasei/perl-iri/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
+
+0.016  2026-11-01
+
+ - (Update) Modernize DOAP data in meta/changes.ttl.
+ - (Update) Release to fix broken version metadata in 0.015 (#22).
+
+0.015  2026-10-14
+
+ - (Addition) Add is_absolute method.
 
 0.014  2026-05-04
 

@@ -226,9 +226,9 @@ static HV *pmcp_oa_spec(pTHX_ SV *api, HV *op, SV *opname)
     else {
         HV *a = newHV();
         const char *m = SvPV_nolen(method);
-        int read = foldEQ(m, "get", 3) || foldEQ(m, "head", 4);
-        int del = strlen(m) == 6 && foldEQ(m, "delete", 6);
-        int put = strlen(m) == 3 && foldEQ(m, "put", 3);
+        int read = pmcp_foldEQ(m, "get", 3) || pmcp_foldEQ(m, "head", 4);
+        int del = strlen(m) == 6 && pmcp_foldEQ(m, "delete", 6);
+        int put = strlen(m) == 3 && pmcp_foldEQ(m, "put", 3);
         (void)hv_stores(a, "readOnlyHint", newSViv(read));
         (void)hv_stores(a, "destructiveHint", newSViv(del));
         (void)hv_stores(a, "idempotentHint", newSViv(read || put || del));

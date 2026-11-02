@@ -189,15 +189,19 @@ sub dec { Punk::WebSocket::_decode_frame(@_) }
 {
     my $frame = encode_client(opcode => OP_TEXT, payload => 'x' x 512);
     dec($frame) for 1 .. 5000;
-    my ($before) = `ps -o rss= -p $$` =~ /(\d+)/;
-    for (1 .. 100_000) {
-        my @got = dec($frame);
-        my $out = Punk::WebSocket::_encode_text($got[3]);
+    my ($before) = (`ps -o rss= -p $$ 2>/dev/null` // '') =~ /(\d+)/;
+    SKIP: {
+        skip 'cannot read a resident size with ps here (Haiku)', 1
+            unless defined $before;
+        for (1 .. 100_000) {
+            my @got = dec($frame);
+            my $out = Punk::WebSocket::_encode_text($got[3]);
+        }
+        my ($after) = (`ps -o rss= -p $$ 2>/dev/null` // '') =~ /(\d+)/;
+        my $growth = ($after // $before) - $before;
+        cmp_ok($growth, '<=', 512,
+            "encode+decode is steady state over 100k frames (grew ${growth}KB)");
     }
-    my ($after) = `ps -o rss= -p $$` =~ /(\d+)/;
-    my $growth = $after - $before;
-    cmp_ok($growth, '<=', 512,
-        "encode+decode is steady state over 100k frames (grew ${growth}KB)");
 }
 
 done_testing();

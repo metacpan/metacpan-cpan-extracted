@@ -13,7 +13,7 @@ my $t = oa_app(q{openapi => '*'});
 
 my $r = oa_call($t, 'listbooks', { q => 'sand & spice', limit => 3, tags => ['sf', 'classic'],
                                    'X-Trace' => 't-9' })->{result};
-is_deeply({ %{ $PMCPOA::SEEN{listBooks} }{qw(q limit trace)} },
+is_deeply({ map { $_ => $PMCPOA::SEEN{listBooks}{$_} } qw(q limit trace) },
     { q => 'sand & spice', limit => 3, trace => 't-9' },
     'query and header arguments arrive, percent-encoded on the way and decoded by the app');
 is_deeply($PMCPOA::SEEN{listBooks}{tags}, ['sf', 'classic'], 'an array query argument repeats the key');

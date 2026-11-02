@@ -188,12 +188,16 @@ use Punk;
     my %txt = (REQUEST_METHOD => 'GET', PATH_INFO => '/t',
                QUERY_STRING => '');
     $app->({ %dyn }), $app->({ %txt }) for 1 .. 5000;
-    my ($before) = `ps -o rss= -p $$` =~ /(\d+)/;
-    for (1 .. 100_000) { $app->({ %dyn }); $app->({ %txt }) }
-    my ($after) = `ps -o rss= -p $$` =~ /(\d+)/;
-    my $growth = $after - $before;
-    cmp_ok($growth, '<=', 512,
-        "steady state grows <= 512KB over 200k requests (got ${growth}KB)");
+    my ($before) = (`ps -o rss= -p $$ 2>/dev/null` // '') =~ /(\d+)/;
+    SKIP: {
+        skip 'cannot read a resident size with ps here (Haiku)', 1
+            unless defined $before;
+        for (1 .. 100_000) { $app->({ %dyn }); $app->({ %txt }) }
+        my ($after) = (`ps -o rss= -p $$ 2>/dev/null` // '') =~ /(\d+)/;
+        my $growth = ($after // $before) - $before;
+        cmp_ok($growth, '<=', 512,
+            "steady state grows <= 512KB over 200k requests (got ${growth}KB)");
+    }
 }
 
 done_testing();

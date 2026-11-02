@@ -18,6 +18,7 @@ bench/archive/run-phase18.pl
 bench/archive/run-watcher-reuse-bench.pl
 bench/LINE-RUNTIME-COMPARISON.md
 bench/README.md
+bench/defer-fork-driver-overhead.pl
 bench/results/.gitkeep
 bench/run-async-consumer-lifetime-bench.pl
 bench/run-callback-batching-fairness.pl
@@ -43,6 +44,8 @@ bench/run-stream-feedback-timer-fairness.pl
 bench/run-stream-lifecycle-bench.pl
 bench/run-stream-microbench.pl
 bench/run-stream-payload-sweep.pl
+bench/run-stream-sendfile-bench.pl
+bench/summarize-stream-sendfile-budget.pl
 bench/run-stream-timer-fairness.pl
 bench/run-stream-transition-bench.pl
 bench/run-stream-watcher-state-bench.pl
@@ -201,6 +204,7 @@ t/listener-16-callbacks.t
 t/listener-17-first-class-stream-callbacks.t
 t/listener-18-first-class-callback-benchmark-smoke.t
 t/loop-foreign-integration.t
+t/loop-defer-fork.t
 t/loop-fork.t
 t/process-00-api.t
 t/process-10-spawn.t
@@ -286,6 +290,13 @@ t/stream-66-first-class-framed-callback-benchmark-smoke.t
 t/stream-66-resource-kind-transition.t
 t/stream-67-first-class-raw-callback-benchmark-smoke.t
 t/stream-68-read-fairness.t
+t/stream-69-sendfile.t
+t/stream-70-sendfile-lifecycle.t
+t/stream-71-sendfile-fairness.t
+t/stream-72-sendfile-multirange.t
+t/stream-73-sendfile-timeout.t
+t/stream-74-sendfile-fork.t
+t/stream-75-sendfile-drain-reentrancy.t
 t/tls-00-load.t
 t/tls-01-declaration.t
 t/tls-10-stream.t

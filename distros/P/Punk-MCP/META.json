@@ -35,7 +35,7 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Raw::JSON" : "0.08",
             "JSON::Schema::Fast" : "0.10",
-            "Punk" : "0.64"
+            "Punk" : "0.68"
          }
       },
       "runtime" : {
@@ -47,7 +47,7 @@
          "requires" : {
             "File::Raw::JSON" : "0.08",
             "JSON::Schema::Fast" : "0.10",
-            "Punk" : "0.64",
+            "Punk" : "0.68",
             "perl" : "5.010"
          }
       },
@@ -63,6 +63,6 @@
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

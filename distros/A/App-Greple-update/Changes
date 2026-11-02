@@ -1,5 +1,15 @@
 Revision history for Perl extension App-Greple-update
 
+1.05 2026-11-02T09:14:07Z
+
+    - Divert STDOUT with IO::Divert, which leaves the real STDOUT in
+      place, so that --update works with modules that run another
+      command for their output, such as -Mtee
+    - Accept parameters by -Mupdate::config(...) (Getopt::EX::Config)
+    - Rename --diffcmd to --diff-command, and add --diff-context as the
+      long form of -U
+    - Require perl 5.24 and App::Greple 10.05
+
 1.04 2025-01-15T05:17:26Z
 
     - do not apply ++dump option for --update::discard

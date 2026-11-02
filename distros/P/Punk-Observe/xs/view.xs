@@ -2115,7 +2115,7 @@ povw__flame_rows(SV *f_sv, SV *names_sv, SV *services_sv)
                     /* The ellipsis is one CHARACTER, so the result is a
                      * character string whatever the name was. */
                     sv_utf8_upgrade(lab);
-                    sv_catpvn_flags(lab, "\342\200\246", 3, SV_CATUTF8);
+                    sv_catpvn(lab, "\342\200\246", 3);
                     hv_stores(o, "label", lab);
                 }
             }

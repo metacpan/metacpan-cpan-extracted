@@ -297,6 +297,23 @@ transition. Existing queued output is not reframed.
 TCP, Unix-domain stream sockets, and socketpairs share this leaf because they
 share `SOCK_STREAM` semantics. Address family remains configuration.
 
+## Socket file transfers
+
+`IO::Sock::Stream` also exposes `sendfile($fh, offset => ..., length => ...)`
+for established plain sockets. It inserts owned, fixed file ranges into the
+same native output queue used by `write()`. The queue keeps byte and file
+entries in order, handles partial writes, counts unsent file bytes toward
+backpressure and output limits, and releases each duplicated source
+descriptor on completion or teardown. The ordinary byte-write fast path
+is preserved.
+
+This is a socket-specific capability, not a method on `IO::Pipe` or
+`IO::TTY`. File bytes bypass application framing, and TLS/non-plain
+transports are rejected. The native readiness drain limits mixed file
+output to 64 KiB to preserve event-loop fairness. See
+[`STREAM-SENDFILE-DESIGN.md`](STREAM-SENDFILE-DESIGN.md) for the tested
+contract and its performance decision.
+
 ## Private implementation boundaries
 
 The public API is `IO::Pipe`, `IO::TTY`, and `IO::Sock::Stream`. Their shared

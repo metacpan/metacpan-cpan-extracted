@@ -167,8 +167,8 @@ static int pmcp_accepts(pTHX_ HV *env, const char *type)
         while (end > s && isSPACE(end[-1])) end--;
         n = (STRLEN)(end - s);
         if ((n == 3 && memEQ(s, "*/*", 3))
-            || (n == tl && foldEQ(s, type, (I32)tl))
-            || (n == major + 2 && foldEQ(s, type, (I32)major) && memEQ(s + major, "/*", 2)))
+            || (n == tl && pmcp_foldEQ(s, type, (I32)tl))
+            || (n == major + 2 && pmcp_foldEQ(s, type, (I32)major) && memEQ(s + major, "/*", 2)))
             return 1;
     }
     return 0;
@@ -182,7 +182,7 @@ static int pmcp_content_type_ok(pTHX_ HV *env)
     if (!ct) return 0;
     p = SvPV_const(ct, l);
     while (n < l && p[n] != ';' && !isSPACE(p[n])) n++;
-    return n == 16 && foldEQ(p, "application/json", 16);
+    return n == 16 && pmcp_foldEQ(p, "application/json", 16);
 }
 
 /* ---- the handler ------------------------------------------------------------------ */

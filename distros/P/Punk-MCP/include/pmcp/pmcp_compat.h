@@ -53,6 +53,21 @@ pmcp_mg_findext(pTHX_ const SV *sv, int type, const MGVTBL *vtbl)
     return NULL;
 }
 
+/* foldEQ is 5.13.2. ASCII folding is all its callers need (a method name, a
+ * media type), and it stops at the first byte that differs, so a shorter
+ * string ends on its NUL the way foldEQ's does. Called on every perl. */
+static int
+pmcp_foldEQ(const char *a, const char *b, I32 len)
+{
+    while (len-- > 0) {
+        if (toLOWER((U8)*a) != toLOWER((U8)*b))
+            return 0;
+        a++;
+        b++;
+    }
+    return 1;
+}
+
 /* croak_sv is 5.14+. ppport's two branches, both needed: a reference goes out
  * through ERRSV so a blessed exception stays blessed, and a string goes through
  * croak's format so it gains " at FILE line N." the way croak_sv would add it.

@@ -1,4 +1,6 @@
 Revision history for Finance-Tiller2QIF
+1.20      2026-11-02
+  - Add interactive import review and SQL editor support.
 1.10      2026-09-22
   - add --viewer to open preview output in an external program.
   - add --multipreview to open the mapping file beside the preview.

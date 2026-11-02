@@ -596,28 +596,23 @@ subtest 'remove_column: _col_db entry killed, then absent from routing' => sub {
 	ok !exists($j->{_col_db}{name}), 'name absent from _col_db after remove_column';
 };
 
-subtest '_autoload_pk DU: cached at construction from primary DA id field' => sub {
-	# D: $primary_pk = $p->{databases}[0]{id} // $p->{join_column}
+subtest '_autoload_pk DU: stored from explicit autoload_pk param' => sub {
+	# D: $primary_pk = $p->{autoload_pk} // $p->{join_column}
 	# U: stored in $self->{_autoload_pk}
 	# K: object destruction
-	# The stored value must match what the primary DA's {id} field held.
-	my $prim = DFMinimalDA->new(id => 'custom_pk', cols => ['entry', 'name']);
-	my $j    = Database::Join->new(databases => [$prim], join_column => $JC);
+	my $prim = DFMinimalDA->new(cols => ['entry', 'name']);
+	my $j    = Database::Join->new(databases => [$prim], join_column => $JC,
+		autoload_pk => 'custom_pk');
 	is $j->{_autoload_pk}, 'custom_pk',
-		'_autoload_pk captures primary DA id at construction';
+		'_autoload_pk stores explicit autoload_pk param';
 };
 
-subtest '_autoload_pk fallback: uses join_column when primary DA has no id' => sub {
-	# When {id} is undef, the fallback join_column is used.
+subtest '_autoload_pk fallback: uses join_column when autoload_pk absent' => sub {
+	# When autoload_pk is not supplied, the fallback is join_column.
 	my $prim = DFMinimalDA->new(cols => ['entry', 'name']);
-	# DFMinimalDA::new sets id = 'entry', so override to undef:
-	my $da = bless {
-		id => undef, _cols => ['entry', 'name'], _rows => [],
-		_schema => {}, _ts => 1, logger => undef,
-	}, 'DFMinimalDA';
-	my $j = Database::Join->new(databases => [$da], join_column => 'entry');
+	my $j = Database::Join->new(databases => [$prim], join_column => 'entry');
 	is $j->{_autoload_pk}, 'entry',
-		'_autoload_pk falls back to join_column when primary id is undef';
+		'_autoload_pk falls back to join_column when autoload_pk absent';
 };
 
 # ===========================================================================

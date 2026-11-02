@@ -79,7 +79,15 @@ if ($sup == 0) {
                 return [ 200, [ 'Content-Type' => 'text/plain' ], ['pong'] ];
             }
             if ($path eq '/rss') {
-                my $kb = (split ' ', `ps -o rss= -p $$`)[0] || 0;
+                # In KiB. The Hurd's ps prints a size with a unit ("9.9M"),
+                # which the growth arithmetic below warned about and then
+                # read as 9.9, so a 16MB download "grew" the worker by a
+                # fraction of a KiB and the test passed without measuring
+                # anything (two smokers, 31 Oct 2026).
+                my $raw = (split ' ', `ps -o rss= -p $$`)[0] || 0;
+                my ($n, $unit) = $raw =~ /^([\d.]+)([KkMmGg]?)/;
+                my %kib = ('' => 1, K => 1, M => 1024, G => 1024 * 1024);
+                my $kb = defined $n ? $n * $kib{uc $unit} : 0;
                 return [ 200, [ 'Content-Type' => 'text/plain' ], [$kb] ];
             }
             if ($path eq '/glob') {          # plain filehandle, no CL header

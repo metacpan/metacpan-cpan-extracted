@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -1474,7 +1474,9 @@ F<hm_abi.h>.
         /* v7: the other ending. Stops a body so the peer can tell it was
          * not finished - RST_STREAM on h2 and h3, a connection reset on
          * HTTP/1.1 - and releases the handle the way stream_close does.
-         * A producer calls one or the other, never both. */
+         * A producer calls one or the other, never both. A host whose
+         * TCP ignores a zero linger (Cygwin, GNU/Hurd) closes cleanly
+         * instead, since that is all it can do. */
         int   (*stream_abort)(pTHX_ void *h);
 
         /* v8: the read half, which makes a handle bidirectional. With a

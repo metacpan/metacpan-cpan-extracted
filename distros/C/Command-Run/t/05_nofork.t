@@ -222,4 +222,19 @@ is $result->{data}, "raw first", 'nofork raw: repeated 1st';
 $result = $cmd->run(stdin => "raw second");
 is $result->{data}, "raw second", 'nofork raw: repeated 2nd';
 
+# the print of the code goes to STDOUT while it runs, not to the handle
+# the caller has select()ed (IO::Divert and the like)
+{
+    my $diverted = '';
+    open my $fh, '>', \$diverted or die;
+    my $prev = select $fh;
+    $result = Command::Run->new(
+        command => [sub { print "to stdout" }],
+        nofork  => 1,
+    )->run;
+    select $prev;
+    is $result->{data}, "to stdout", 'nofork: output captured while another handle is selected';
+    is $diverted, '', 'nofork: nothing leaks into the selected handle';
+}
+
 done_testing;

@@ -1,3 +1,7 @@
+0.010  2026-11-01 21:53:32 CET
+   - Minor housekeeping
+   - Make sure to set the name if it's in the candidate provider hashref
+
 0.008  2026-08-20 10:59:20 CEST
    - Documentation adjustments
    - Expose app_startup for being called by... an app

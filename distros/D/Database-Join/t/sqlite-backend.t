@@ -1452,4 +1452,28 @@ subtest 'parallel: 3-db join with parallel => 1 results equal sequential (n > 2 
 		'parallel 3-db join: same entry keys as sequential');
 };
 
+subtest 'the temporary database is created without an exclusive lock' => sub {
+	# Other systems have no O_EXLOCK, so what File::Temp is asked for is what can
+	# be seen here.  With the lock, on a BSD, SQLite cannot write to the file.
+	my @asked;
+	my $real = \&File::Temp::new;
+	no warnings 'redefine';
+	local *File::Temp::new = sub {
+		my ($class, %args) = @_;
+		push @asked, \%args;
+		return $real->($class, %args);
+	};
+
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	ok(scalar @{ $join->selectall_arrayref() }, 'the join gives rows');
+
+	my @databases = grep { ($_->{SUFFIX} // '') eq '.db' } @asked;
+	ok(scalar @databases, 'a temporary database was made');
+	is($_->{EXLOCK}, 0, 'with EXLOCK => 0') for @databases;
+};
+
 done_testing();

@@ -12,12 +12,14 @@ bin/tiller2qif
 cpanfile
 lib/Finance/Tiller2QIF.pm
 lib/Finance/Tiller2QIF/DB.pm
+lib/Finance/Tiller2QIF/Interactive.pm
 lib/Finance/Tiller2QIF/Map.pm
 lib/Finance/Tiller2QIF/ReadCSV.pm
 lib/Finance/Tiller2QIF/Util.pm
 lib/Finance/Tiller2QIF/WriteQIF.pm
 t/TestHelper.pm
 t/edge.t
+t/interactive.t
 t/map_account_filter.t
 t/map_basic.t
 t/map_beforeafter.t

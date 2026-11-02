@@ -436,7 +436,7 @@ static SV *pmcp_result_of(pTHX_ pmcp_tool *t, SV *val, enum pmcp_ver v,
             HV *copy = newHVhv(h);
             SV **ie = hv_fetchs(copy, "isError", 0);
             if (ie) (void)hv_stores(copy, "isError", pmcp_bool(aTHX_ SvTRUE(*ie)));
-            if (v < PMCP_V_2025_06_18) (void)hv_deletes(copy, "structuredContent", G_DISCARD);
+            if (v < PMCP_V_2025_06_18) (void)hv_delete(copy, "structuredContent", 17, G_DISCARD);
             return newRV_noinc((SV *)copy);
         }
         return pmcp_structured_result(aTHX_ t, val, v, err);

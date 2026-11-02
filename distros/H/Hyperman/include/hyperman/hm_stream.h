@@ -453,7 +453,10 @@ static int hm_stream_abort_h(pTHX_ void *h) {
          * indistinguishable from success and a reset is the only signal
          * left. SO_LINGER with a zero timeout is what turns close(2) into
          * an RST; queued output goes with it, which is the cost of being
-         * able to say the response is not to be trusted. */
+         * able to say the response is not to be trusted. Where the host's
+         * TCP ignores a zero linger (Cygwin, GNU/Hurd) the peer gets a FIN,
+         * and there is nothing else to send: t/41 probes the host before
+         * asserting the reset. */
         struct linger lg;
         lg.l_onoff  = 1;
         lg.l_linger = 0;
