@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Locale::Simple::Scraper::ParserShortcuts;
-our $VERSION = '0.109';
+our $VERSION = '0.200';
 # ABSTRACT: LSS::Parser methods that are generic shortcuts to P::MGC functionality
 
 use Moo::Role;
@@ -24,16 +24,9 @@ sub collect_from {
 sub named_token {
     my ( $self, $name, $type ) = @_;
     $type ||= "constant_string";
-    my $token = $self->maybe( sub { $self->$type } ) or $self->fail( "Expected $name" );
+    my $token = $self->maybe( sub { $self->$type } );
+    $self->fail( "Expected $name" ) if !defined $token;
     return $token;
-}
-
-sub c_expect_escaped {
-    my ( $self, $char ) = @_;
-    return sub {
-        $self->expect( qr/\\\Q$char\E/ );
-        return $char;
-    };
 }
 
 sub warn_failure {
@@ -91,13 +84,13 @@ Locale::Simple::Scraper::ParserShortcuts - LSS::Parser methods that are generic 
 
 =head1 VERSION
 
-version 0.109
+version 0.200
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/locale-simple/issues>.
 
 =head1 CONTRIBUTING

@@ -1,0 +1,2 @@
+kernel/fs/vfat/vfat.ko
+kernel/drivers/block/loop.ko

@@ -30,13 +30,13 @@ is(conv(":markdown-strikethrough: <del> </del>\n\n[.line-through]#gone#\n"),
 # Text::MarkdownAdoc is stable, and so that the single-quoted and
 # double-quoted forms remain distinguishable in the output. This is a
 # documented, verified deviation from downdoc's own default (downdoc uses
-# one "quotes" attribute for both forms, defaulting to "<q> </q>"); see
-# docs/COMPATIBILITY_REPORT.md.
+# one "quotes" attribute for both forms, defaulting to "<q> </q>").
 is(conv("say \"`quoted`\" then '`single`'"),
    "say \x{201C}quoted\x{201D} then \x{2018}single\x{2019}",
    'double- and single-quoted forms use distinct default curly characters');
 
-is(conv(":quotes: &ldquo; &rdquo;\n\n\"`hello`\"\n"), '&ldquo;hello&rdquo;', 'double quote replacement can be configured via quotes');
+is(conv(":quotes: &ldquo; &rdquo;\n\n\"`hello`\"\n"),
+   '&ldquo;hello&rdquo;', 'double quote replacement can be configured via quotes');
 
 is(conv(":quotes-single: &lsquo; &rsquo;\n\n'`hello`'\n"),
    '&lsquo;hello&rsquo;', 'single quote replacement can be configured via quotes-single, independent of quotes');
@@ -54,7 +54,9 @@ is(conv('say "` text `" now'),
    "say \x{201C} text \x{201D} now",
    'whitespace-padded double-quote span is not treated as a paired quote, but markers still resolve');
 
-is(conv('empty "``" pair'), "empty \x{201C}\x{201D} pair", 'empty double-quote span is not treated as a paired quote, but markers still resolve');
+is(conv('empty "``" pair'),
+   "empty \x{201C}\x{201D} pair",
+   'empty double-quote span is not treated as a paired quote, but markers still resolve');
 
 is(conv('Visit https://example.org/docs[Docs] now.'), 'Visit [Docs](https://example.org/docs) now.', 'URL macro conversion');
 
@@ -134,6 +136,42 @@ is(conv("open '` and close `' done"),
    "open \x{2018} and close \x{2019} done",
    'opposite markers on one line are a paired quote, not two standalone markers');
 
+# Several standalone markers in one line must each resolve; they must not
+# be mistaken for the delimiters of a code span.
+is(conv("the file`'s x"), "the file\x{2019}s x", 'one backtick-apostrophe in a line');
+
+is(conv("the file`'s x, the account`'s y"), "the file\x{2019}s x, the account\x{2019}s y", 'two backtick-apostrophes in one line');
+
+is(conv("the file`'s x, the account`'s y, the user`'s z"),
+   "the file\x{2019}s x, the account\x{2019}s y, the user\x{2019}s z",
+   'three backtick-apostrophes in one line');
+
+is(
+   conv("the file`'s x, the '`real`' one, the account`'s y"),
+   "the file\x{2019}s x, the \x{2018}real\x{2019} one, the account\x{2019}s y",
+   'apostrophes next to a real paired single quote in one line'
+   );
+
+is(
+   conv("the file`'s x and `code` and the account`'s y"),
+   "the file\x{2019}s x and `code` and the account\x{2019}s y",
+   'apostrophes around a real code span in one line'
+   );
+
+is(conv("use `'foo'` and the file`'s x"),
+   "use `'foo'` and the file\x{2019}s x",
+   'code span that starts with a quote survives next to an apostrophe');
+
+is(conv('a`" b c`" d'), "a\x{201D} b c\x{201D} d", 'two lone closing double markers in one line');
+
+is(conv('say "` hi and "` bye'), "say \x{201C} hi and \x{201C} bye", 'two lone opening double markers in one line');
+
+is(conv("say '`hi and '`bye"), "say \x{2018}hi and \x{2018}bye", 'two lone opening single markers in one line');
+
+is(conv('the "`real`" one, a`" b and c`" d'),
+   "the \x{201C}real\x{201D} one, a\x{201D} b and c\x{201D} d",
+   'lone double markers next to a real paired double quote in one line');
+
 # Verified against downdoc source (lib/index.js) that downdoc's single
 # "quotes" attribute governs BOTH paired forms identically (default
 # "<q> </q>"), so the two forms are indistinguishable in downdoc's own
@@ -157,7 +195,8 @@ SKIP:
    my $adoc2 = $up->convert($md1);
    my $md2   = $down->convert($adoc2);
 
-   is($md1, "say \x{201C}quoted\x{201D} then \x{2018}single\x{2019} now",
+   is($md1,
+      "say \x{201C}quoted\x{201D} then \x{2018}single\x{2019} now",
       'round-trip: default curly-quote Markdown output matches expectation');
    is($md2, $md1, 'round-trip: Markdown -> AsciiDoc -> Markdown reaches a stable fixpoint for paired quotes');
 }
@@ -174,7 +213,9 @@ is(conv('a +++*not bold*+++ b'), 'a *not bold* b', 'inline passthrough content i
 
 is(conv('a +++{not-an-attr}+++ b'), 'a {not-an-attr} b', 'inline passthrough content is not subject to attribute substitution');
 
-is(conv("a +++'`still passthrough`'+++ b"), "a '\x{60}still passthrough\x{60}' b", 'inline passthrough content is not subject to quote substitution');
+is(conv("a +++'`still passthrough`'+++ b"),
+   "a '\x{60}still passthrough\x{60}' b",
+   'inline passthrough content is not subject to quote substitution');
 
 # This is what actually breaks without the fix: Text::MarkdownAdoc wraps
 # any HTML tag it does not recognize (such as the old shared "<q></q>"

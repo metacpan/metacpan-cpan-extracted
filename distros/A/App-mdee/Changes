@@ -1,5 +1,28 @@
 Revision history for Perl extension App-mdee
 
+1.15 2026-11-03T10:24:15Z
+
+    - Add --refill (-r), which joins the lines of the paragraphs that a
+      Markdown parser finds in the text (Markdown::Perl, or the CommonMark
+      module when it is installed, or pandoc 2.11.3 or later).  The fatchap
+      theme turns off default[refill] in the configuration file
+    - Fold long block quote lines like list items, with the quote marker
+      repeated on the continuation lines, and color an indented marker
+      too (needs App::ansifold 1.38)
+    - Show the block quote marker in the base color without bold
+    - Take the mode from TERM_LUMINANCE when it is set, instead of asking
+      the terminal
+    - Rename the md module config keys foldlist and foldwidth to fold and
+      fold_width
+    - Accept spaces after the last pipe of a table row, which left the
+      row as written and split the table in two
+    - Rename the table styles.  The default pipe is lattice now (pipe still
+      works), the former simple is 3line, and simple now has no rule above
+      the table and a rule per column below it.  --no-rule draws the rules
+      with - in these styles, too
+    - Require Text::VisualWidth::PP 0.09, which gives the right width of
+      new emoji on perl 5.30 or later
+
 1.14 2026-10-30T10:35:27Z
 
     - Stop ansicolumn and ansifold from reading the rc files of the

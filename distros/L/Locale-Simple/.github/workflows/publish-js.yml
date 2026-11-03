@@ -3,7 +3,7 @@ name: Publish JS to npm
 on:
   push:
     tags:
-      - '[0-9]*'
+      - 'v[0-9]*'
 
 permissions:
   id-token: write
@@ -20,20 +20,9 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Compute npm version from Perl tag
+      - name: Compute npm version from tag
         id: ver
-        run: |
-          PERL_VER="${GITHUB_REF_NAME}"
-          if [[ "$PERL_VER" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            NPM_VER="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
-          elif [[ "$PERL_VER" =~ ^([0-9]+)\.([0-9])([0-9]*)$ ]]; then
-            NPM_VER="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.$(( 10#${BASH_REMATCH[3]:-0} ))"
-          else
-            echo "Cannot parse Perl version: $PERL_VER" >&2
-            exit 1
-          fi
-          echo "npm_version=$NPM_VER" >> "$GITHUB_OUTPUT"
-          echo "Perl $PERL_VER -> npm $NPM_VER"
+        run: echo "npm_version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Bump package.json
         working-directory: js

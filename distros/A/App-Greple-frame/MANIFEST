@@ -7,5 +7,6 @@ cpanfile
 lib/App/Greple/frame.pm
 minil.toml
 t/00_compile.t
+t/01_config.t
 META.yml
 MANIFEST

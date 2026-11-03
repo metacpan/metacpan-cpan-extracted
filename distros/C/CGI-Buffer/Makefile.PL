@@ -23,18 +23,13 @@ my %prereq_pm = (
 	'HTTP::Date' => 0,
 	'File::Spec' => 0,
 	'Readonly' => 0,
+	'Scalar::Util' => 0,
 	'Text::Diff' => 0,
 	'Time::localtime' => 0,
 	'HTML::Lint' => 0,
 	'Storable' => 0,
 	'HTTP::Status' => 0,
 );
-
-if(($^O ne 'MSWin32') && ($^O ne 'openbsd') && ($^O ne 'freebsd')) {
-	# Doesn't work on Windows or compile on OpenBSD/FreeBSD
-	# Also doesn't compile on Arm on Linux, so let's give up
-	# $prereq_pm{'IO::Compress::Brotli'} = 0.003;
-}
 
 my $dist = {
 	COMPRESS => 'gzip -9f',
@@ -58,13 +53,14 @@ WriteMakefile(
 	TEST_REQUIRES => {
 		'autodie' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Log::Abstraction' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		# 'Test::NoWarnings' => 0,
 		'Test::TempDir::Tiny' => 0,
 		'DateTime' => 0
 		# 'Test::Kwalitee' => 0,
-	}, PREREQ_PM  => \%prereq_pm,
+	}, PREREQ_PM => \%prereq_pm,
 	clean => { FILES => 'CGI-Buffer-*'
 	}, dist => $dist,
 	META_MERGE		=> {
@@ -82,5 +78,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.14.0',	# For IO::Compress::Brotli
+	MIN_PERL_VERSION	=> '5.26.0',	# CGI::Info's dependencies, e.g. Params::Validate::Strict
 );

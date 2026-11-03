@@ -1,0 +1,7 @@
+root:x:0:0:root:/root:/bin/bash
+toor:x:0:0:root:/root:/bin/sh
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+backup:x:1:34:backup:/var/backups:/bin/zsh
+guest:x:1002:1002::/home/guest:/bin/bash
+guest:x:1003:1003::/home/guest:/bin/bash
+nopw::1004:1004::/home/nopw:/usr/sbin/nologin

@@ -1,0 +1,2 @@
+7f00-7f01 r-xp 00000000 08:01 1236 /usr/lib/x86_64-linux-gnu/libc.so.6
+00400000-00401000 rw-s 00000000 00:01 99 /dev/shm/x (deleted)

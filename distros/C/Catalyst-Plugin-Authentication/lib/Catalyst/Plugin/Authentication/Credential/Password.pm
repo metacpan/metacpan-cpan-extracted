@@ -73,12 +73,12 @@ sub _check_password {
     my ( $c, $user, $password ) = @_;
 
     if ( $user->supports(qw/password clear/) ) {
-        return $user->password eq $password;
+        return Catalyst::Authentication::Credential::Password::_secure_compare( $user->password, $password );
     }
     elsif ( $user->supports(qw/password crypted/) ) {
         my $crypted = $user->crypted_password;
         return if not defined $crypted;
-        return $crypted eq crypt( $password, $crypted );
+        return Catalyst::Authentication::Credential::Password::_secure_compare( $crypted, crypt( $password, $crypted ) );
     }
     elsif ( $user->supports(qw/password hashed/) ) {
 
@@ -93,8 +93,8 @@ sub _check_password {
 
         return ( ( $computed eq $stored )
               || ( unpack( "H*", $computed ) eq $stored )
-              || ( $b64computed eq $stored)
-              || ( $b64computed.'=' eq $stored) );
+              || Catalyst::Authentication::Credential::Password::_secure_compare( $b64computed, $stored)
+              || Catalyst::Authentication::Credential::Password::_secure_compare( $b64computed.'=', $stored) );
     }
     elsif ( $user->supports(qw/password salted_hash/) ) {
         require Crypt::SaltedHash;

@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.11.5 - 2026-11-03
+
+### Fixes
+
+- Re-pin the spec to 2026.11.02: ID and IDs in its descriptions ([`fe87a5e`](https://github.com/internetdata/sdk-perl/commit/fe87a5ebfcc7ccd4578e2ca6cd3da3777915e917))
+- Write ID and IDs in prose, never id or ids ([`60a8dd2`](https://github.com/internetdata/sdk-perl/commit/60a8dd22acc8ae97dc4d269c4aafa88e501658a8))
+
 ## 1.11.4 - 2026-10-29
 
 ### Fixes
@@ -12,7 +19,7 @@ What each release changed for you, newest first. Each line is a commit's summary
 
 ### Fixes
 
-- Refuse a bad retries or a key past U+00FF; require checksum id and format ([`69a809e`](https://github.com/internetdata/sdk-perl/commit/69a809e762c94295c576efed2039a81c2241dc24))
+- Refuse a bad retries or a key past U+00FF; require checksum ID and format ([`69a809e`](https://github.com/internetdata/sdk-perl/commit/69a809e762c94295c576efed2039a81c2241dc24))
 
 ## 1.11.2 - 2026-10-21
 
@@ -68,7 +75,7 @@ What each release changed for you, newest first. Each line is a commit's summary
 ### Fixes
 
 - Read Retry-After as digits or an RFC 9110 date in GMT, nothing else ([`d85cdbe`](https://github.com/internetdata/sdk-perl/commit/d85cdbed725ffa537dba13b02e1e5f99ecc240dd))
-- Trim the key and refuse a control character in it; require metadata's id ([`82389e0`](https://github.com/internetdata/sdk-perl/commit/82389e0a975a342ae6e939f1bc3935968d0663f9))
+- Trim the key and refuse a control character in it; require metadata's ID ([`82389e0`](https://github.com/internetdata/sdk-perl/commit/82389e0a975a342ae6e939f1bc3935968d0663f9))
 
 ## 1.9.1 - 2026-10-10
 

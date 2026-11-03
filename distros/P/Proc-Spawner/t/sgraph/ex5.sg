@@ -1,0 +1,5 @@
+# for i in 1 2; do echo $i; done | cat     after the loop's second echo has started
+pipe a w:forgotten r:forgotten
+P1: echo 1 | 1>a.w 2>@2 | exited 0
+P2: echo 2 | 1>a.w 2>@2 | running | after P1 then
+P3: cat | 0<a.r 1>@1 2>@2 | running

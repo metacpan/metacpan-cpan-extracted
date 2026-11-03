@@ -1,0 +1,4 @@
+/dev/sda1 / ext4 rw,relatime,errors=remount-ro 0 0
+/dev/sda2 /boot ext4 rw,relatime 0 0
+/dev/sdb1 /srv/my\040data xfs rw,relatime 0 0
+proc /proc proc rw,nosuid 0 0

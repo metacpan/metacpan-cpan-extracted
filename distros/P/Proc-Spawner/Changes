@@ -1,0 +1,33 @@
+Revision history for Proc-Spawner (EXPERIMENTAL)
+
+0.02  unreleased (2026-11-02)
+      - Documentation: POD for Proc::ShellSubset, Proc::ShellSubset::Small and
+        Proc::ShellSubset::Large; doc/large-subset/ (the large parser's
+        specification, how its corpus coverage is measured, with the scripts in
+        doc/large-subset/tools/, and its history); doc/parsers/ (the base
+        parser's grammar and the provenance of its corpus tests); three more
+        decision pages in doc/checklists/.
+      - t/parsers.t also checks that Proc::ShellSubset::Small parses every test
+        string as Proc::ShellSubset does, and, with dash and bash in PATH, that
+        both shells accept what only the large grammar accepts; the checks that
+        need dash and bash are skipped without them (they used to fail).
+      - The message for a construct outside the subset found at run time
+        (status 248) now names Proc::ShellSubset::Large, not ShellSubsetLarge.
+      - Every module has $VERSION.
+      - t/dash.t: each run has its own tmp/ for the battery strings that wrote fixed
+        files in /tmp, and ignores the length of process IDs turned into N.
+        Test runs at the same time no longer fail each other (probably the
+        unexplained failure X20).  The kill -INT $$ strings are marked FLAKY:
+        X19 also shows with a subshell.
+
+0.01  unreleased (2026-11-02)
+      - First version: Proc::Spawner (posix_spawn with every glibc 2.39 setting, the
+        one event loop), Proc::Spawner::Graph (the executable spawn graph),
+        Proc::ShellSpawn (runs shell one-liners without fork), and the parsers
+        Proc::ShellSubset, Proc::ShellSubset::Small, Proc::ShellSubset::Large.
+      - Builds with older glibc (seen failing on 2.36): Makefile.PL probes for each
+        posix_spawn extension, and an option the libc lacks follows UNSUPPORTED.
+      - No "Hexadecimal number > 0xffffffff" warning from t/spawner.t or $((0x...)).
+      - Tests: t/graph.t, t/parsers.t, t/dash.t besides t/spawner.t.
+      - Former names: PosixSpawn (now inside Proc::Spawner), ShellSpawn,
+        ShellSubset, ShellSubsetSmall, ShellSubsetLarge.

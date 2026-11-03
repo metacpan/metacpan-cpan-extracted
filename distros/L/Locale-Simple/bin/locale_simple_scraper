@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: locale_simple_scraper
 # ABSTRACT: Command line tool for finding tokens in code
+our $VERSION = '0.200';
 
 
 use strict;
@@ -8,7 +9,18 @@ use warnings;
 
 use Locale::Simple::Scraper 'scrape';
 
-scrape(@ARGV);
+print STDERR "locale_simple_scraper is deprecated, use: locale-simple scrape\n";
+
+eval { scrape(@ARGV); 1 } or do {
+    my $err = $@;
+    if ( ref $err and ref $err eq 'Locale::Simple::Scraper::BadCall' ) {
+        print STDERR $err->{message}, Locale::Simple::Scraper::usage();
+        exit 2;
+    }
+    $err .= "\n" unless $err =~ /\n\z/;
+    print STDERR $err;
+    exit 1;
+};
 
 __END__
 
@@ -22,14 +34,18 @@ locale_simple_scraper - Command line tool for finding tokens in code
 
 =head1 VERSION
 
-version 0.109
+version 0.200
 
 =head1 SYNOPSIS
+
+B<Deprecated:> use C<locale-simple scrape> (L<locale-simple>) instead, the
+same scraper with the same options. Every call prints a deprecation notice on
+STDERR; the output and the exit codes are unchanged.
 
   # ignoring specific regexps for the filename
   # please be aware that you must escape the . and because we use bash here you
   # must also be aware to escape the \ for escaping the .
-  locale_simple_scraper --ignores \\.build --ignores some/dir
+  locale_simple_scraper --ignore \\.build --ignore some/dir
 
   # only use specific regexps for the filename
   locale_simple_scraper --only core --only site/something
@@ -39,7 +55,7 @@ version 0.109
   locale_simple_scraper --output yaml
   locale_simple_scraper --output json
 
-  # supress output of line numbers
+  # suppress output of line numbers
   locale_simple_scraper --no_line_numbers
 
   # scramble real filename with md5 (for security)
@@ -51,14 +67,20 @@ version 0.109
   # setting additional extensions for Perl (default: pl, pm, t)
   locale_simple_scraper --pl ppl,pppl
 
+  # every one of these options can be given more than once, the lists add up
+  locale_simple_scraper --pl ppl --pl pppl
+
   # setting additional extensions for Text::Xslate (default: tx)
   locale_simple_scraper --tx ttx,xxx
 
+  # the same for Python (py), PHP (php), Go (go) and Rust (rs)
+  locale_simple_scraper --php phtml,inc
+
 =head1 DESCRIPTION
 
-This tool parses all Perl, Python, Javascript and Text::Xslate templates in the
-current directory and subdirectories to find calls to the L<Locale::Simple>
-API.
+This tool parses all Perl, Python, JavaScript, PHP, Go and Rust sources and
+Text::Xslate templates in the current directory and subdirectories to find
+calls to the L<Locale::Simple> API and its siblings in the other languages.
 
 It gives out on STDERR which files are parsed right now, while it dumps the
 resulting data to the screen. By default it generates a B<.po> file, but you can
@@ -67,22 +89,17 @@ specify via I<--output> to dump B<json>, B<yaml> or a B<perl> data structure.
 Be aware that we add the domain as flag in the B<.po> file. So double token
 may appear which only differs through a B<#,> flag.
 
-=head1 SUPPORT
+The options are listed by C<locale_simple_scraper --help> as well.
 
-Repository
+=head1 SEE ALSO
 
-  http://github.com/Getty/p5-locale-simple
-  Pull request and additional contributors are welcome
-
-Issue Tracker
-
-  http://github.com/Getty/p5-locale-simple/issues
+L<Locale::Simple>, L<Locale::Simple::Scraper>
 
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/locale-simple/issues>.
 
 =head1 CONTRIBUTING

@@ -1,5 +1,12 @@
 Revision history for Monitoring-Sneck
 
+1.7.0   2026-11-02/10:15
+        - add compliance checks, via ! lines or compliance in YAML, with
+          separate counts and alert, scores, waivers, and intervals
+        - add compliance_alert option
+        - add perl: checks, run in process via Monitoring::Sneck::Checks
+        - doc fixes/cleanup
+
 1.6.0   2026-10-09/15:15
         - add $ option lines for cache_file, pid_dir, and locking
         - add -L to disable locking

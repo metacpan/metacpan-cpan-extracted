@@ -68,9 +68,28 @@ For supervisorctl it is as below.
 
 For config checking it is as below.
 
+    not_running            = 2
     config_missing         = 2
     config_dir_missing     = 3
     config_dir_nonreadable = 3
+
+For if supervisorctl status could not be ran or returned something that
+is not a item and status, such as when it can not talk to supervisord,
+it is as below.
+
+    status_error = 3
+
+# Sneck
+
+If [Monitoring::Sneck::Checks](https://github.com/VVelox/Monitoring-Sneck-Checks)
+is installed, this can be ran in process from sneck via
+Monitoring::Sneck::Checks::supervisorctl, which takes the same flags as
+above, plus `-p` for the path to supervisorctl.
+
+```
+supervisor|perl:supervisorctl -c
+supervisor|perl:supervisorctl -c -f /etc/supervisor/conf.d -i foo -d bar -s stopped=1
+```
 
 # INSTALLATION
 
@@ -81,7 +100,7 @@ pkg install p5-File-Slurp p5-App-cpanminus
 cpanm Check::supervisorctl
 ```
 
-##
+## Debian
 
 ```
 apt-get install libfile-slurp-perl cpanminus

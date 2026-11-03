@@ -1,0 +1,41 @@
+name: Publish Rust to crates.io
+
+# Fires on the release tag (v0.200.0) like publish-js.yml. The crate version is
+# the tag without the "v". crates.io Trusted Publishing (OIDC): no token in the
+# repository. One-time setup on crates.io: the crate locale-simple, Trusted
+# Publisher -> repository Getty/locale-simple, workflow publish-rust.yml.
+# `cargo publish` cannot be undone (only yanked); the tests run first.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set the crate version from the tag
+        run: |
+          sed -i -E 's/^version = ".*"/version = "'"${GITHUB_REF_NAME#v}"'"/' rust/Cargo.toml
+          grep -n '^version = ' rust/Cargo.toml
+
+      - name: Test
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+
+      - name: Publish
+        # the version edit above leaves the tree dirty on purpose
+        run: cargo publish --manifest-path rust/Cargo.toml --allow-dirty
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

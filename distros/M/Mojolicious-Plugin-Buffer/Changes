@@ -1,4 +1,25 @@
 Revision history for Mojolicious-Plugin-Buffer
 
+0.001.1	Mon Nov  2 02:57:26 PM EST 2026
+	[ Security ]
+	- A response with Cache-Control: no-cache is no longer stored in the
+		server-side cache, since replaying it skips the revalidation
+		that no-cache requires
+	- optimise_content: hostile HTML, such as long runs of white space,
+		unterminated <title> or <a href=" tags and unclosed <pre>
+		elements, took quadratic time and could hold a worker for
+		minutes.  The squashing now runs in linear time
+	[ Bug Fixes ]
+	- optimise_content: a visible space between two inline elements was
+		removed, e.g. "Hello <b>world</b>" became "Hello<b>world</b>"
+	- optimise_content level 2: the <!-- hiding technique was looked for
+		past the end of a <script> tag, so the text of a later HTML
+		comment could be shown on the page
+	- optimise_content level 2: document.write calls in a script of
+		another type, such as a template, could be merged, and the
+		script's type was changed to text/JavaScript
+	[ Tests ]
+	- Added .github/workflows/extra-ci.yml
+
 0.001.0	Mon Oct 26 09:45:49 PM EDT 2026
 	Initial version.

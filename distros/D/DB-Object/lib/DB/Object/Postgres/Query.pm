@@ -132,6 +132,8 @@ sub format_statement
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     # Should we use bind statement?
     my $bind   = $tbl_o->use_bind;
@@ -202,7 +204,8 @@ sub format_statement
             my $value = $data->{ $field };
             if( $self->_is_a( $value, "${base_class}::Statement" ) )
             {
-                $elem->value( '(' . $value->as_string . ')' );
+                # $elem->value( '(' . $value->as_string . ')' );
+                $elem->format( '(' . $value->as_string . ')' );
                 # push( @format_values, '(' . $value->as_string . ')' );
                 # push( @$binded, $value->query_object->binded_values->list ) if( $value->query_object->binded_values->length );
                 # # $self->binded_types->push( $value->query_object->binded_types_as_param );
@@ -221,8 +224,8 @@ sub format_statement
                     {
                         # CORE::push( @types, $types_const->{ $field }->{constant} );
                         # PG_INT4
-                        # CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
-                        $elem->type( $self->database_object->get_sql_type( 'int4' ) );
+                        # CORE::push( @types, $dbo->get_sql_type( 'int4' ) );
+                        $elem->type( $dbo->get_sql_type( 'int4' ) );
                     }
                     # else
                     # {
@@ -252,8 +255,8 @@ sub format_statement
                         {
                             # CORE::push( @types, $types_const->{ $field }->{constant} );
                             # PG_INT4
-                            # CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
-                            $elem->type( $self->database_object->get_sql_type( 'int4' ) );
+                            # CORE::push( @types, $dbo->get_sql_type( 'int4' ) );
+                            $elem->type( $dbo->get_sql_type( 'int4' ) );
                         }
                         # else
                         # {
@@ -298,7 +301,7 @@ sub format_statement
                 $elem->format( '?' );
                 $elem->value( $value );
                 my $const;
-                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                 {
                     # CORE::push( @types, DBD::Pg::PG_BYTEA );
                     # CORE::push( @types, $const );
@@ -323,7 +326,7 @@ sub format_statement
             {
                 my $const;
                 $elem->value( $value );
-                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                 {
                     # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
                     # push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
@@ -334,8 +337,8 @@ sub format_statement
                 {
                     my $this_json = $self->_encode_json( $value );
                     # push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
-                    # push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $field } ) } ) );
-                    $elem->format( $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $field } ) } ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $dbo->get_sql_type( $types->{ $field } ) } ) );
+                    $elem->format( $tbl_o->database_object->quote( $this_json, { pg_type => $dbo->get_sql_type( $types->{ $field } ) } ) );
                 }
                 else
                 {
@@ -366,7 +369,7 @@ sub format_statement
                 $elem->format( '?' );
                 $elem->value( $value );
                 my $const;
-                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                 {
                     # CORE::push( @types, $const );
                     $elem->type( $const );
@@ -381,7 +384,7 @@ sub format_statement
             {
                 # push( @format_values, "'" . quotemeta( $value ) . "'" );
                 my $const;
-                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                 {
                     # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
                     # push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
@@ -485,11 +488,13 @@ sub limit
 sub lock
 {
     my $self = shift( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $lock = $self->{lock};
     if( @_ )
     {
         require version;
-        if( $self->database_object->version < version->parse( '9.3' ) )
+        if( $dbo->version < version->parse( '9.3' ) )
         {
             warn( "This feature is only available in PostgreSQL version 9.3 and above." ) if( $self->_warnings_enabled( 'DB::Object' ) );
         }
@@ -699,10 +704,12 @@ sub reset_bind
 sub returning
 {
     my $self = shift( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
     if( @_ )
     {
-        my $pg_version = $self->database_object->version;
+        my $pg_version = $dbo->version;
         return( $self->error( "Cannot use returning for PostgreSQL version lower than 8.2. This server version is: $pg_version" ) ) if( $pg_version < '8.2' );
         # It could be a field name or a wildcard
         return( $self->error( "A reference was provided (", ref( $_[0] ), "), but I was expecting a string, which could be a field name or even a star (*) indicating all fields." ) ) if( ref( $_[0] ) );

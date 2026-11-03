@@ -1,0 +1,5 @@
+# a coprocess loop: no sh pipeline gives this
+pipe a
+pipe b
+P1: server | 0<a.r 1>b.w 2>@2 | running
+P2: client --host x | 0<b.r 1>a.w 2>@2 | running

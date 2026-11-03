@@ -1,0 +1,61 @@
+Devel-XSCover
+
+XS and C coverage for Devel::Cover, with one command.
+
+Run in a distribution directory, xs_cover rebuilds every XS and C source with
+the compiler's coverage instrumentation, runs the tests under Devel::Cover so
+the Perl side is covered as usual, reads the counters the compiler wrote,
+merges them into the same coverage database, and runs cover for the report.
+One run, one database, one report.
+
+Devel::Cover's own gcov support reads statement counts and two-arm branches
+and nothing more. Devel::XSCover adds subroutine coverage for every XSUB and
+C function under its Perl name, keeps every arm of a switch and every
+condition of a compound test, merges a header's inline functions across every
+object that used them, leaves perl's own headers and ppport.h out, and drops
+the branches inside macros that nothing in the source can take.
+
+The report, Devel::Cover::Report::XSCover, is a set of self-contained pages
+with a dark theme: a summary with tiles, a sortable table and a filter, and a
+page per file with the coverage drawn beside each line and, where something
+is missing, a row that says what in words. It works on any Devel::Cover
+database:
+
+    cover -report XSCover
+
+SYNOPSIS
+
+    xs_cover                         the whole distribution
+    xs_cover -test t/05-parse.t      one test file
+    xs_cover -plain t/31-threads.t   a file run without Devel::Cover
+    xs_cover -no_delete              add a run to the database kept from the last
+    xs_cover -keep                   keep the counters after the run
+    xs_cover -report text            another of Devel::Cover's reports
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+It needs Devel::Cover, a perl of 5.20 or later, and gcc or clang with their gcov.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc xs_cover
+    perldoc Devel::XSCover
+    perldoc Devel::Cover::Report::XSCover
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

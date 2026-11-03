@@ -1,6 +1,9 @@
 Revision history for Perl::Critic::Grape
 
-0.1.2 - 2026-10-17
+0.1.4 - 2026-11-02
+	- viv Generic::External
+
+0.1.3 - 2026-10-17
 	- viv ProhibitExcessiveNames
 
 0.1.2 - 2026-10-13

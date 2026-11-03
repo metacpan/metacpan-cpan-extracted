@@ -1,0 +1,9 @@
+x=$(head -c 10000000 /dev/zero & umask; wait); echo ${#x}
+x=$(head -c 10000000 /dev/zero | tr '\0' a & umask; wait); echo ${#x} $(printf %s "$x" | tr -d a)
+x=$(head -c 10000000 /dev/zero | tr '\0' a & command -v sh; wait); echo ${#x}
+x=$( (head -c 10000000 /dev/zero | tr '\0' a & nosuchcmd; wait) 2>&1); echo ${#x}
+x=$(head -c 10000000 /dev/zero | tr '\0' a & cd /; cd -; wait); echo ${#x}
+x=$( (head -c 3000000 /dev/zero | tr '\0' a & getopts a o -z; wait) 2>&1 | tr -d a); echo "$x"
+x=$( (head -c 3000000 /dev/zero | tr '\0' a & echo ${zz?gone}; wait) 2>&1 | tr -d a); echo "$x"
+umask; nosuch; echo after; command -v sh; umask 022; umask
+{ umask; nosuch; cd /tmp; cd -; echo end; } 2>&1 | cat

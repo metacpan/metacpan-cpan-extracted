@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print STDERR qq{permission denied while trying to connect to the Docker daemon socket\n}; exit 1;

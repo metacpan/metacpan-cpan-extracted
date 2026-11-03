@@ -1,0 +1,12 @@
+Package: openssh-server
+Status: install ok installed
+Version: 1:10.0p1-7
+
+Package: telnet
+Status: deinstall ok config-files
+Version: 0.17+2.4-2
+
+Package: libc6
+Status: hold ok installed
+Architecture: amd64
+Version: 2.41-12

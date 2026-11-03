@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{NAME     DATASTORE  LOADER  CPU  MEMORY  VNC  AUTO     STATE\nrouter   default    bhyveload  2  2G  -  Yes [1]  Running (1234)\nnas      default    uefi    4    8G      -    No       Stopped\n};

@@ -1,0 +1,83 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and target files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$
+
+# Avoid Module::Build generated and target files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# and target files
+\.o$
+\.bs$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+\..*\.sw.?$
+
+# Avoid OS-specific files/dirs
+\B\.DS_Store
+\B\._
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+
+# Avoid prove files
+\B\.prove$
+
+# Avoid MYMETA files
+^MYMETA\.
+
+# Avoid archives
+\.tar\.gz$
+\.zip$
+
+# Avoid editor files
+\.swp$
+\.swo$
+
+# Avoid the spike's build products and the screenshots
+^xt/spike/Spike\.c$
+^xt/spike/.*\.(?:gcda|gcno|gcov|profraw|profdata)$
+^xt/spike/blib/
+^xt/spike/Makefile$
+^xt/spike/pm_to_blib
+^xt/spike/MYMETA\.
+^xt/spike/.*\.bs$
+^xt/spike/cover_db
+^xt/screens/
+
+# Avoid local testing files
+^local/

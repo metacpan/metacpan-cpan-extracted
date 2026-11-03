@@ -1,0 +1,7 @@
+# <file system> <mount point> <type> <options> <dump> <pass>
+UUID=1234-abcd /               ext4    errors=remount-ro 0 1
+UUID=5678      /boot/          ext4    defaults          0 2
+/dev/sdb1      /srv/my\040data xfs     defaults,nofail   0 2
+/dev/sr0       /media/cdrom    udf     user,noauto       0 0
+backup:/export /backup         nfs     ro,x-systemd.automount 0 0
+/dev/sda3      none            swap    sw                0 0

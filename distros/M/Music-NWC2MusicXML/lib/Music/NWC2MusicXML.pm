@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-use version; our $VERSION = version->declare('0.002.2');
+use version; our $VERSION = version->declare('0.002.3');
 
 # ---------------------------------------------------------------------------
 # Post-release roadmap
@@ -72,7 +72,7 @@ Music::NWC2MusicXML - Convert NoteWorthy Composer 2 C<.nwc> score files to Music
 
 =head1 VERSION
 
-0.002.2
+0.002.3
 
 =head1 SYNOPSIS
 

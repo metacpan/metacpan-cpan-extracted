@@ -4,7 +4,7 @@
 
 em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command implemented as a Bash script. It combines greple for syntax highlighting with nup for multi-column paged output.
 
-**Concept:** mdee shows a `.md` file as it is written, made easier on the eyes with color; it is not a Markdown renderer and does not interpret or reformat the text. Table alignment, list-item folding, hiding markup characters (default themes) and closing hashes on h3-h6 were added later for readability and are the only transformations. Keep new features within this idea: paragraphs are not reflowed, backslash escapes are shown as written, and `--no-theme` gives back the original text in color.
+**Concept:** mdee shows a `.md` file as it is written, made easier on the eyes with color; it is not a Markdown renderer and does not interpret or reformat the text. Table alignment, list-item folding, hiding markup characters (default themes), closing hashes on h3-h6 and, with `--refill`, joining the lines that pandoc finds to be one paragraph were added later for readability and are the only transformations. Keep new features within this idea: backslash escapes are shown as written, and `--no-theme` gives back the original text in color.
 
 ## Dependencies
 
@@ -25,6 +25,7 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `script/mdee` - Main script (Bash) with POD documentation
 - `lib/App/mdee.pm` - Perl module (version info only, generated from script/mdee)
 - `lib/App/Greple/md.pm` - Greple module for Markdown syntax highlighting (bundled)
+- `lib/App/Greple/md/Blocks.pm` - Paragraph positions for `refill`, from the CommonMark module or pandoc
 - `t/00_compile.t` - Compile tests for both App::mdee and App::Greple::md
 - `t/01_mdee.t` - mdee command integration tests
 - `t/02_colorize.t` - md module colorize tests (uses t/runner)
@@ -33,6 +34,10 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `t/05_table_wrap.t` - Table cell wrapping tests (sets `HOME` to an empty directory)
 - `t/06_user_settings.t` - ansifold/ansicolumn rc files are not read when called from the md module
 - `t/07_fold_runin.t` - fold_runin/fold_runout reach ansifold (line width with and without run-in)
+- `t/08_refill_join.t` - `refill_block` unit tests (joining rules; no pandoc needed)
+- `t/09_refill.t` - `refill=1` through greple: joining, folding of the joined lines, tables above them, with each available parser (skipped without one)
+- `t/11_quote_fold.t` - long block quote lines are folded with the quote marker repeated on the continuation lines, with and without color
+- `t/10_blocks.t` - `App::Greple::md::Blocks`: both parsers report the same paragraph lines (skipped without one)
 - `t/Util.pm` - Test helper for greple-based tests
 - `t/runner/` - Submodule (p5-script-runner) for finding greple path
 - `t/test.md` - Test Markdown file
@@ -313,13 +318,13 @@ In dryrun mode the stage functions really run, in a `$(...)` subshell each, up t
 
 ### App::Greple::md Module
 
-Syntax highlighting, table formatting, and text folding are handled by the `App::Greple::md` Perl module. mdee invokes `greple -Mmd::config(mode,foldlist,foldwidth,table,table_trim,rule,heading_markup,...) -- --filter --filestyle=once --color=always`.
+Syntax highlighting, table formatting, and text folding are handled by the `App::Greple::md` Perl module. mdee invokes `greple -Mmd::config(mode,fold,fold_width,table,table_trim,rule,heading_markup,...) -- --filter --filestyle=once --color=always`.
 
-- `-Mmd::config(...)`: Module config params (mode, foldlist, foldwidth, table, table_trim, rule, heading_markup, hashed.*, color labels)
+- `-Mmd::config(...)`: Module config params (mode, fold, fold_width, table, table_trim, rule, heading_markup, hashed.*, color labels)
 - `--show LABEL=VALUE`: Field visibility control; passed from `show[]` array
 - `pass_md[]`: Passthrough options for md module (e.g., `--colormap` via `:>pass_md`)
 - Options before `--` are module-specific; after `--` are greple options
-- Fold controlled via `foldlist=1`; md module adds `--fold-by $foldwidth $fold_runin $fold_runout` to its default option
+- Fold controlled via `fold=1`; md module adds `--fold-by $fold_width $fold_runin $fold_runout` to its default option
 
 ### Protection Mechanism (protect/restore)
 
@@ -420,17 +425,17 @@ Inline code ([CommonMark Code Spans](https://spec.commonmark.org/0.31.2/#code-sp
 
 ### Text Folding (md module)
 
-Text folding is handled within the `App::Greple::md` module using `-Mtee` to pipe matched regions through `ansifold`. The md module defines `--fold-by` as a greple option in its `__DATA__` section, and `--fold` is dynamically defined in `finalize()` via `$mod->setopt()` as a command option alias. The module option `--foldlist` enables folding via config.
+Text folding is handled within the `App::Greple::md` module using `-Mtee` to pipe matched regions through `ansifold`. The md module defines `--fold-by` as a greple option in its `__DATA__` section, and `--fold` is dynamically defined in `finalize()` via `$mod->setopt()` as a command option alias. The module option `--fold` enables folding via config.
 
 #### Fold Architecture
 
-- `foldlist` config parameter (default: 0) enables/disables folding
-- `foldwidth` config parameter (default: 80) controls the fold width
+- `fold` config parameter (default: 0) enables/disables folding
+- `fold_width` config parameter (default: 80) controls the fold width
 - `fold_runin`/`fold_runout` config parameters (default: 4, the ansifold default) are the run-in and run-out widths for the line breaking of folded lines; mdee passes its own `--runin`/`--runout` values (default 4 as well), so the folded lines run in by exactly the width that mdee keeps free in the pane and the outer fold (nup) never breaks them again
-- `finalize()` defines `--fold` as `--fold-by $foldwidth $fold_runin $fold_runout` via `$mod->setopt()` (for direct command-line use); `--fold-by` takes the three values as `$<shift>` arguments
-- When `foldlist=1` in config, `finalize()` adds the same `--fold-by ...` to the module's default option
-- mdee passes `foldlist=1,foldwidth=$width` in config when fold is enabled
-- The `--fold-by` option in `__DATA__` uses `-Mtee "&ansifold"` with `--exclude` patterns for code blocks, HTML comments, and tables
+- `finalize()` defines `--fold` as `--fold-by $fold_width $fold_runin $fold_runout` via `$mod->setopt()` (for direct command-line use); `--fold-by` takes the three values as `$<shift>` arguments
+- When `fold=1` in config, `finalize()` adds the same `--fold-by ...` to the module's default option
+- mdee passes `fold=1,fold_width=$width` in config when fold is enabled
+- The `--fold-by` option in `__DATA__` uses `-Mtee "&ansifold"` with `--exclude` patterns for code blocks, HTML comments, and tables. The lines it folds are `{LIST_ITEM}`, `{DEFINITION}`, `{QUOTE_LINE}` (a line starting with up to three spaces and one or more `>` markers, with the SGR sequences the `blockquotes` step puts around them) and, with `refill`, the joined paragraphs
 - Formatted tables are excluded from folding by `--exclude &__PACKAGE__::table_regions`: `table_regions()` builds its pattern from the config at run time and matches three or more consecutive lines that start with a border/rule character, a dash, whitespace, or the first character of a configured mark (`table_wrap_mark`, `table_cell_mark`) and contain a column separator, where the block must include a separator row such as `───┼───`, so that list items containing `|` are not mistaken for a table. It works in trim and non-trim, rule and non-rule modes, including wrapped continuation lines. A `define` in `__DATA__` cannot depend on the config because option text is expanded when the module is parsed, before `finalize()` runs. Non-ASCII characters in `__DATA__` patterns must be written as `\x{2502}`-style escapes: the pattern text is not decoded, so literal box-drawing characters never match decoded input
 
 #### Definition List Pattern
@@ -455,7 +460,7 @@ sub begin {
 
 Stage execution is controlled by config flags: `colorize` (default: 1), `table` (default: 1). Fold is not controlled in `begin()` because it operates via greple's pattern matching pipeline (`-Mtee`), not text transformation in the `begin` hook.
 
-`format_table()` detects table blocks via `(^ {0,3}\|.+\|\n){3,}` and processes each block:
+`format_table()` detects table blocks via `(^ {0,3}\|.+\|\h*\n){3,}` (spaces after the last pipe are allowed, as in GFM, and removed from the block before formatting; a row with a trailing space used to split the table in two and stay as written) and processes each block:
 
 ```perl
 s{(^ {0,3}\|.+\|\n){3,}}{
@@ -549,13 +554,13 @@ sub fix_separator {
    - Non-rule mode: spaces → `-`, borders `|` only when present
 
 Config parameters from mdee:
-- `foldlist=1`: Enable text folding (default disabled in md module)
-- `foldwidth=$width`: Fold width in columns
+- `fold=1`: Enable text folding (default disabled in md module)
+- `fold_width=$width`: Fold width in columns
 - `fold_runin=$runin`, `fold_runout=$runout`: Run-in and run-out widths for the folded lines, the same values mdee gives to nup (default 4, as in ansifold and in the md module)
 - `table=1`: Enable table formatting (default enabled in md module)
 - `table_trim=1`: Enable cell whitespace trimming (default enabled in md module)
 - `rule=1`: Enable box-drawing characters (default enabled in md module)
-- `table_style=simple` (from `--table-style=simple`; `pipe` is the default and is not passed): Pandoc simple-table look. `format_table` formats the block as in rule mode, then blanks `│ ┼ ├ ┤` to spaces and adds a `─` rule of the table's visible width (`ansi_width` of the first line) above and below. The header rule stays per column because `fix_separator` had put `┼` at the column boundaries.
+- `table_style` (from `--table-style`; the default `lattice` is not passed, and mdee turns `pipe`, its older name, into `lattice`; the md module takes both): `lattice` has column separators. `3line` and `simple` have none: `format_table` formats the block as in rule mode, so that `fix_separator` puts `┼` at the column boundaries and the header rule stays per column, then blanks `│ ┼ ├ ┤` to spaces. `3line` adds a `─` rule of the table's visible width (`ansi_width` of the first line) above and below; `simple` adds a copy of the header rule below, as in `pandoc -t ansi`. With `rule=0` these rules are drawn with `-`. The name `grid` is left for a future style with an outer frame, as in Pandoc's grid tables.
 - `table_width=$width`: Fit tables into the fold width (passed whenever fold is enabled); over-wide columns are wrapped by ansicolumn (`-w`). `0` disables.
 - `table_cell=SPEC`: Per-column widths for ansicolumn `--cell`, colon-separated (`0:10:<20`) because commas separate config parameters; md module converts to commas and prepends `0,` in non-trim mode for the phantom first column. Not passed by mdee; set via `--config`.
 - `table_wrap_mark=STRING`: Mark for continuation lines of wrapped cells (default none; the `markwrap` theme sets `›` U+203A).
@@ -563,6 +568,20 @@ Config parameters from mdee:
 - `table_runin=2`, `table_runout=2`, `table_boundary=word`, `table_linebreak=all`: How wrapped cells are folded. Always passed to ansicolumn as `--runin`/`--runout`/`--boundary`/`--linebreak`, so the intent is visible in the command line. In table mode these options are used only for the cells. Kept apart from mdee's `--runin`/`--runout`, which are for nup's pane folding.
 - **User rc files**: `finalize()` calls `no_user_settings(qw(ansicolumn ansifold))`, which adds the two names to `GETOPTEX_NO_USER_SETTINGS` (Getopt::EX >= 3.05; names already there are kept, `1`/`*` is left alone). Getopt::EX::Long then skips `~/.ansicolumnrc` and `~/.ansifoldrc` when the two are called as functions (Command::Run nofork) and, because the variable is inherited, also when the tee module runs ansifold in fork mode. nup runs in its own process from mdee, so the user's `~/.ansicolumnrc` still applies to the pane folding. `t/06_user_settings.t` checks this with rc files that would pad folded lines and mark table cells; `t/05_table_wrap.t` still sets `HOME` to an empty directory.
 - Color labels (e.g., `h1=RD`): Override default colors (pre-declared in `Config->new()` with `undef`, applied in `setup_colors()` before `${base}` expansion)
+
+### Paragraph Refill (md module)
+
+`--refill` (`-r`; config `refill=1`; `default[refill]` in config.sh; off by default) joins the lines of each paragraph in the original text. mdee does not decide itself which lines form a paragraph: `refill()`, called first in `begin()`, asks `App::Greple::md::Blocks` (`blocks($text, parser => $config->{refill_parser})`) for the line ranges of the `Para` and `Plain` blocks. The module has three parsers: `cmark`, the CommonMark module (libcmark, in process, 0.001 s for README.md); `mdperl`, Markdown::Perl (pure Perl, a `requires` of this distribution, 0.03 s); and `pandoc` (`pandoc -f gfm+sourcepos+definition_lists -t json` via Command::Run, 0.5 s; `die "refill: pandoc failed"` when it fails). `available()` lists the ones that work in that order, and `blocks()` takes the first unless `parser` is given. mdee checks beforehand with `check_refill()`, which calls `available()`. cpanfile requires Markdown::Perl and only recommends CommonMark (it needs libcmark and a compiler); pandoc is not a Perl module. CI installs pandoc and libcmark-dev with apt, and cpanm installs the recommends, so all three run there.
+
+- `cmark_blocks()` walks the CommonMark node tree and takes `get_start_line`/`get_end_line` of every paragraph node, with the block-quote depth. libcmark has no GFM tables and no definition lists, so it reports them as paragraphs; `refill_block` keeps their lines apart (table rows by their shape, a definition by its `: ` start).
+- `mdperl_blocks()` has no public API to lean on: Markdown::Perl renders HTML only. Its block parser pushes each paragraph line in `_do_paragraph` and closes the paragraph in `_finalize_paragraph`, and keeps the offset of the current line in `last_pos`; the function wraps those two subs with `local *name` while it calls the private `_parse`, counts newlines up to `last_pos` for the line number (incrementally; the parser may step back a line, then it counts from the start), takes the quote depth from `blocks_stack`, and resets the paragraph start whenever the paragraph array was empty before the push (a setext heading takes the lines away without closing). `mdperl_works()` checks that the three private subs exist, so a Markdown::Perl release that renames them drops the parser from `available()` instead of breaking. Tables are parsed as paragraphs (`use_table_blocks => 0`) and YAML front matter as metadata, so the three parsers report the same lines; t/10 checks this.
+- `pandoc_blocks()` collects every `data-pos`: pandoc wraps a block in a `Div` whose `data-pos` is `L:C-L:C` (several segments separated by `;` when it consumed markers, as for a list item's continuation lines; a table's segments are not in order), but a block with attributes of its own (`Header`, `CodeBlock`, `Table`, `Figure`) carries it in those attributes (`%attr_index`). An end column of 1 means the block ended on the line before. The end of a block is also cut at the line before the next block that starts below its first line, because a paragraph followed by a horizontal rule or a code fence without a blank line is reported up to that line. `depth` is the number of enclosing `BlockQuote`s.
+- `refill()` takes the `Para`/`Plain` blocks from the bottom up (so the line numbers above stay valid) and replaces their lines with `refill_block(\@lines, $depth)`, which joins as ansifold's `fill_up` does (nothing after fullwidth punctuation or between two `InConcatScript` characters, one space otherwise; the properties are subs in App::ansifold, so the patterns are compiled at run time after `require`), strips `^\h*(?:>\h?){0,$depth}\h*` from the second line on, and keeps the break after a hard break (two spaces or an odd number of `\` at the end of a line; `\\` is an escaped backslash) and before a line that starts with a list marker (`#.` lists are paragraphs to pandoc), is a horizontal rule, looks like a table row (`format_table` takes three such lines as a table, although GFM reads them as paragraph text), or starts a footnote definition (`[^name]:`, also inside a quote; `cmark` and `mdperl` have no footnotes and report consecutive definitions as one paragraph).
+- The final line numbers of the joined blocks go to `@refill_lines`. `format_table` records `[start line, lines added]` in `@table_shift`, because wrapped cells and `table_style=simple` change the line count (colorize keeps it); the shift is applied per line, since a range may contain a table (a paragraph line right above and below it). `refill_regions()` is a function pattern in `--fold-by` (`--cm N --le &__PACKAGE__::refill_regions`; `-E` would take `&name` as a regex; greple takes `&name` as a function only in a lexical expression, `--le`/`-x`) and returns one region per joined line, shifted by the tables above it. `{LIST_ITEM}` and `refill_regions` may return the same line; greple folds it once. Both arrays are reset in `begin()` for each file.
+- `--autoindent` in `--fold-by` decides the prefix of the continuation lines, with `--keepindent=named` (App::ansifold 1.36): the quote markers are in the named group `(?<q>...)`, with the SGR sequences the `blockquotes` step puts around them, and are repeated on every continuation line; everything else in the match (indent, list marker, definition colon) becomes spaces of the same width, so `> - item` continues as `>   ...`, a list item as `  ...`, and a quoted paragraph keeps its `> `. The `blockquotes` step colors the markers only, not the indent before them, so that `^\h*` before the group matches the indent. The pattern is built in `__DATA__` from the defines `{SGR}` and `{LIST_MARKER}` as `{AUTOINDENT}` (a define is expanded inside the quoted tee argument too), and every part of it may be empty, so that every line matches and sets its own prefix: by design, ansifold keeps the prefix of the last matching line for the lines that do not match (its `ps axgw | ansifold --autoindent '.*TIME (?=COMMAND)'` example takes the indent from the header line for the whole table), which here would have indented a paragraph folded after a list item.
+- `refill_block` keeps the break on both sides of a table-row line and treats a CR before the line break (CRLF file) as part of the line break. `refill()` leaves TOML front matter (`+++` ... `+++` at the top) alone; pandoc's gfm reader takes it as a paragraph, while YAML front matter is metadata to it.
+- When fold is off (filter, raw, `--no-fold`) a joined paragraph is one long line.
+- Tests: `t/08_refill_join.t` (unit tests of `refill_block`, no parser needed), `t/10_blocks.t` (both parsers give the same lines on edge cases) and `t/09_refill.t` (greple runs, repeated for each parser that `available()` returns; `skip_all` without one). `t/01_mdee.t` checks the option with a `pandoc` stub that fails and a `CommonMark.pm` that dies, put ahead in PATH and PERL5LIB.
 
 ### Field Visibility with --show Option
 
@@ -634,6 +653,8 @@ URL encoding: `uri_escape_utf8($url, "^\\x20-\\x7e")` — escapes only non-ASCII
 
 Terminal background luminance (0-100) is detected via OSC 11 query. Luminance < 50 → dark mode, ≥ 50 → light mode.
 
+When `TERM_LUMINANCE` is set, `detect_terminal_mode` uses it and does not run the query. `t/01_mdee.t` sets it to 100, because the reply of a busy terminal can arrive after termcolor's 0.1 s timeout and then shows up as typed input (`^[]11;rgb:...`).
+
 ### [Getopt::Long::Bash](https://metacpan.org/pod/Getopt::Long::Bash) (getoptlong.sh)
 
 Option parsing uses getoptlong.sh from Getopt::Long::Bash module.
@@ -677,6 +698,14 @@ Key format: `option_name | short_opt  spec  # comment`
 - Invocation: `. getoptlong.sh OPTS "$@"`
 
 ## Limitations
+
+### Lines Added by Colorize with `--refill`
+
+`refill_regions()` takes the line numbers from `refill()` and corrects them only for the lines that `format_table` adds (`@table_shift`); it assumes that `colorize()` keeps the line count. A color label with a function that adds lines, such as the `fatchap` theme (`h1=+;sub{"#\n$_\n#"}`), breaks this: below each such h1 the regions are off by two lines, so a joined paragraph may stay unfolded (`nup` then folds it without the indent) and another line may be folded instead. The text itself does not change. This stays as a limitation: the `headings` step cannot count lines cheaply, because code blocks are protected as one placeholder at that point (only the heading line is restored), headings are processed from h6 to h1, and a fix there would not cover other labels. The `fatchap` theme sets `default[refill]=` so that the default does not run into this, while `-r` on the command line still works; `refill` is resolved from `default[refill]` after the theme files for this reason. Other `default[...]` keys are resolved before the themes, so setting them in a theme has no effect.
+
+### Blocks inside Block Quotes
+
+A block quote is recognized by its `>` markers only: they are colored and a long quote line is folded with the markers repeated. Headings, lists, code fences and other blocks inside a quote are not recognized (the heading, list and fence patterns are anchored at the start of the line), so a heading in a quote is not colored, a list item in a quote is not folded as a list item, and a code fence in a quote does not protect its contents. In the Markdown files at hand such quotes are rare (no headings, few lists), so this stays as it is. `--refill` is not affected: the parser reports the paragraphs inside the quote correctly.
 
 ### HTML Comments
 

@@ -296,7 +296,7 @@ subtest 'a transfer refuses arguments it cannot use' => sub {
     eval { $client->database->download('bogon_ip_v1', 'csvgz') };
     like($@, qr/expected a destination path/, 'download needs somewhere to write');
     eval { $client->database->download('', 'csvgz', '/tmp/x') };
-    like($@, qr/expected a database id/, 'and a database id');
+    like($@, qr/expected a database ID/, 'and a database ID');
     eval { $client->database->download_bytes('bogon_ip_v1') };
     like($@, qr/expected a format/, 'download_bytes needs a format');
     eval { $client->database->download_bytes('bogon_ip_v1', 'csvgz', retres => 1) };

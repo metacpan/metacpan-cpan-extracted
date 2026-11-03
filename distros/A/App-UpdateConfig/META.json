@@ -35,7 +35,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "ExtUtils::MakeMaker::CPANfile" : "0.11",
             "perl" : "v5.24.0"
          }
       },
@@ -94,6 +94,6 @@
          "web" : "https://github.com/mkende/update_config"
       }
    },
-   "version" : "1.02",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

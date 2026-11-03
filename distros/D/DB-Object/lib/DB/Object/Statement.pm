@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.9.3
+## SQL API Abstraction - ~/lib/DB/Object/Statement.pm
+## Version v0.10.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/08/05
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 ## This package's purpose is to automatically terminate the statement object and
 ## separate them from the connection object (DB::Object).
 ## Connection object last longer than statement objects
@@ -28,7 +28,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.9.3';
+    our $VERSION = 'v0.10.1';
 };
 
 use strict;
@@ -68,6 +68,7 @@ sub attach
     {
         return( $self->error( "Value provided is not a ${base_class} object." ) );
     }
+    $self->debug( $dbo->debug );
     $self->database_object( $dbo ) || return( $self->pass_error );
     if( my $tbl = $self->table_object )
     {
@@ -126,12 +127,36 @@ sub bind_param
     }
 }
 
+sub clone
+{
+    my $self = shift( @_ );
+    # We make sure to not clone the DBI database handle object
+    my $dbo  = CORE::delete( $self->{dbo} );
+    my( $tbl, $tbl_dbo, $qo, $query_dbo );
+    if( $tbl = $self->table_object )
+    {
+        $tbl_dbo = CORE::delete( $tbl->{dbo} );
+    }
+    if( $qo = $self->query_object )
+    {
+        $query_dbo = CORE::delete( $qo->{database_object} );
+    }
+    my $new = $self->Module::Generic::clone ||
+        return( $self->pass_error );
+    $new->attach( $dbo ) if( defined( $dbo ) );
+    $tbl->attach( $tbl_dbo ) if( defined( $tbl_dbo ) && ( !$dbo || $tbl_dbo ne $dbo ) );
+    $qo->attach( $query_dbo ) if( defined( $query_dbo ) && ( !$dbo || $query_dbo ne $dbo ) );
+    return( $new );
+}
+
 sub commit
 {
     my $self = shift( @_ );
     if( $self->{sth} && $self->param( 'autocommit' ) )
     {
-        my $sth = $self->prepare( 'COMMIT' ) || return( $self->pass_error );
+        my $dbo = $self->database_object ||
+            return( $self->error( "No database handle could be found." ) );
+        my $sth = $dbo->prepare( 'COMMIT' ) || return( $self->pass_error( $dbo->error ) );
         $sth->execute() || return( $self->error( "An error occurred while executing query: ", $sth->error ) );
         $sth->finish();
     }
@@ -191,6 +216,8 @@ sub dump
         $file = $self->new_file( $file );
         my $io = $file->open( '>', { binmode => 'utf8' }) ||
             return( $self->error( "Unable to open file '$file' in write mode: ", $file->error ) );
+        $self->_load_class( 'DateTime::Lite' ) ||
+            return( $self->pass_error );
         my $date = DateTime::Lite->now;
         my $table = $self->{table};
         $io->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
@@ -263,6 +290,8 @@ sub execute
         $self->{line} = $line;
         $self->{sub}  = $sub;
     }
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     $self->{executed}++;
     my $q = $self->query_object;
     $q->final(1) if( $q );
@@ -357,9 +386,9 @@ sub execute
             # { $some_value => 'varchar' }
             if( ref( $_[$i] ) eq 'HASH' && 
                 scalar( keys( %{$_[$i]} ) ) == 1 &&
-                $self->database_object->datatype_to_constant( [values( %{$_[$i]} )]->[0] ) )
+                $dbo->datatype_to_constant( [values( %{$_[$i]} )]->[0] ) )
             {
-                my $constant = $self->database_object->datatype_to_constant( [values( %{$_[$i]} )]->[0] );
+                my $constant = $dbo->datatype_to_constant( [values( %{$_[$i]} )]->[0] );
                 $temp->{$i} = { type => $constant, value => [keys( %{$_[$i]} )]->[0] };
             }
             elsif( ref( $_[$i] ) eq 'HASH' && 
@@ -425,7 +454,7 @@ sub execute
             !$self->_is_array( $binded[$i] ) &&
             defined( $binded[$i] ) )
         {
-            $binded[$i] = $self->_is_number( $binded[$i] ) ? [$binded[$i]] : [$self->database_object->quote( $binded[$i] )];
+            $binded[$i] = $self->_is_number( $binded[$i] ) ? [$binded[$i]] : [$dbo->quote( $binded[$i] )];
         }
         elsif( defined( $el ) && 
             !$bind_mismatch &&
@@ -619,7 +648,7 @@ sub executed
 {
     my $self = shift( @_ );
     # For hand made query to avoid clash when executing generic routine such as fetchall_arrayref...
-    return( 1 ) if( !exists( $self->{query} ) );
+    return(1) if( !exists( $self->{query} ) );
     return( exists( $self->{executed} ) && $self->{executed} );
 }
 
@@ -627,7 +656,8 @@ sub fetchall_arrayref($@)
 {
     my $self  = shift( @_ );
     my $slice = shift( @_ ) || [];
-    my $dbo   = $self->database_object;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $sth   = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
@@ -722,7 +752,8 @@ sub fetchcol($;$)
 sub fetchhash(@)
 {
     my $self = shift( @_ );
-    my $dbo  = $self->database_object;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $sth  = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
@@ -791,7 +822,8 @@ sub fetchrow(@)
 sub fetchrow_hashref
 {
     my $self = shift( @_ );
-    my $dbo  = $self->database_object;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $deb  = {};
     %$deb    = %$self;
     my $sth  = $self->{sth} || die( "Unable to get the underlying statement handler!" );
@@ -943,6 +975,8 @@ sub join
     my $tbl_o = $q->table_object || return( $self->error( "No table object is set in query object." ) );
     my $query = $q->query ||
         return( $self->error( "No query prepared for join with another table." ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     if( $query !~ /^[[:blank:]]*SELECT[[:blank:]]+/i )
     {
         return( $self->error( "You may not perform a join on a query other than select." ) );
@@ -998,8 +1032,8 @@ sub join
         }
         else
         {
-            return( $self->error( "No such table \"$data\" exists in database \"$db\"." ) ) if( !$self->database_object->table_exists( $data ) );
-            $join_tbl = $self->database_object->table( $data );
+            return( $self->error( "No such table \"$data\" exists in database \"$db\"." ) ) if( !$dbo->table_exists( $data ) );
+            $join_tbl = $dbo->table( $data );
             return( $self->error( "Could not get a table object from \"$data\"." ) ) if( !$join_tbl );
         }
         $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 );
@@ -1138,7 +1172,7 @@ sub join
             }
         }
         return({
-            clause => CORE::join( $op, @res ),
+            clause        => CORE::join( $op, @res ),
             fields_tables => $fields_tables,
         });
     };
@@ -1538,10 +1572,13 @@ sub FREEZE
 
     # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
     # process-local state.
-    # 2026-01-29: I removed 'query_object' in an effort to reduce memory consumption. Let's see...
+    # my @props = qw(
+    #     as_string bind cache params query query_object selected_fields
+    #     table tie tie_order _fields _cache_field_names _cache_field_types
+    # );
     my @props = qw(
-        as_string bind cache params query query_object selected_fields
-        table tie tie_order _fields _cache_field_names _cache_field_types
+        as_string bind cache from_table left_join params query query_object selected_fields
+        table table_object tie tie_order _fields _cache_field_names _cache_field_types
     );
 
     my $hash = {};
@@ -1724,7 +1761,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.9.3
+v0.10.1
 
 =head1 DESCRIPTION
 
@@ -1755,6 +1792,25 @@ It returns the current statement object upon success, or upon error, it set an e
 Provided with a list of arguments and they will be passed to L<DBI/bind_param>
 
 If an error occurred, an error is returned, otherwise the return value of calling C<bind_param> is returned.
+
+=head2 clone
+
+    my $new_sth = $sth->clone;
+
+Creates a new instance of the current statement object by cloning it.
+This uses the method L<Module::Generic/clone> from L<Module::Generic>.
+
+Beware that it will not clone the associated database handle if there is one, because it cannot be cloned, and the alternative would be to instantiate a new database connection, which is not a good thing to do implicitly.
+
+If you want to clone the database object, then you can do something like:
+
+    my $new_dbh = $dbh->clone;
+
+which will create a new connection using the same parameters as the original (see L<DB::Object/clone> for more detail), and then
+
+    $new_sth->attach( $new_dbh );
+
+It returns the new statement object, or, upon error, sets an L<DB::Object::Exception> objet using L<Module::Generic/error> and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 commit
 

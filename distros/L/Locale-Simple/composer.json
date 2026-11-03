@@ -1,0 +1,24 @@
+{
+    "name": "raudssus/locale-simple",
+    "description": "Gettext-style translation helpers (l, ln, lp, ld, ...) with sprintf formatting. Same API as the Perl, Python, JavaScript, Go and Rust siblings.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["gettext", "i18n", "l10n", "translation", "po", "sprintf"],
+    "homepage": "https://github.com/Getty/locale-simple",
+    "support": {
+        "issues": "https://github.com/Getty/locale-simple/issues",
+        "source": "https://github.com/Getty/locale-simple"
+    },
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+    "autoload": {
+        "files": ["php/src/Simple.php"]
+    },
+    "scripts": {
+        "test": "phpunit -c php/phpunit.xml.dist"
+    }
+}

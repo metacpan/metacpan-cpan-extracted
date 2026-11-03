@@ -72,6 +72,12 @@ sub build_app {
 		$c->res->headers->cache_control('no-store');
 		$c->render(text => $render->($c, 'private'));
 	});
+	$app->routes->get('/no-cache' => sub {
+		my $c = shift;
+		return if $c->buffer_is_cached;
+		$c->res->headers->cache_control('no-cache');
+		$c->render(text => $render->($c, 'no-cache'));
+	});
 	$app->routes->get('/vary' => sub {
 		my $c = shift;
 		return if $c->buffer_is_cached;
@@ -245,6 +251,13 @@ subtest 'responses that must not be stored' => sub {
 	my $private = $t->tx->res->body;
 	$t->get_ok('/private')->status_is(200);
 	isnt($t->tx->res->body, $private, 'Cache-Control: no-store is not stored');
+
+	# no-cache lets a cache keep a copy only if it revalidates it before
+	# every use (RFC 9111 5.2.2.4), and replaying an entry never does
+	$t->get_ok('/no-cache')->status_is(200);
+	my $no_cache = $t->tx->res->body;
+	$t->get_ok('/no-cache')->status_is(200);
+	isnt($t->tx->res->body, $no_cache, 'Cache-Control: no-cache is not stored');
 
 	$t->get_ok('/vary')->status_is(200);
 	my $vary = $t->tx->res->body;

@@ -46,7 +46,7 @@ use SNMP::Info::IEEE802dot3ad 'agg_ports_lag';
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.984000';
+$VERSION = '3.985000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -58,6 +58,7 @@ $VERSION = '3.984000';
     'HH3C-ENTITY-VENDORTYPE-OID-MIB' => 'hh3cevtOther',
     'HH3C-LswMSTP-MIB'     => 'hh3cdot1sStpForceVersion',
     'HH3C-IP-ADDRESS-MIB'  => 'hh3cIpAddrSetMask',
+    'HH3C-LswVLAN-MIB'     => 'hh3cdot1qVlanName',
 );
 
 %GLOBALS = (
@@ -92,6 +93,9 @@ $VERSION = '3.984000';
     # HH3C-IP-ADDRESS-MIB::hh3cIpAddrSetTable, indexed
     # ifIndex.addrType.length.address
     'vrf_h3c_addr_mask' => 'hh3cIpAddrSetMask',
+
+    # HH3C-LswVLAN-MIB::hh3cdot1qVlanMIBTable, indexed by VLAN id
+    'h3c_v_name' => 'hh3cdot1qVlanName',
 );
 
 %MUNGE = (
@@ -146,6 +150,26 @@ sub os_ver {
     $os_ver = "$1" if ( $descr =~ /Product Version ([0-9.]+)/i );
 
     return $ver_release->{2} || $os_ver;
+}
+
+# Comware 5 on the V1910 and 1920 keeps the default "VLAN 0002" in
+# dot1qVlanStaticName and the configured name only in hh3cdot1qVlanName.
+# Replace names only, so v_index keeps the Q-BRIDGE keys.
+sub v_name {
+    my $h3c     = shift;
+    my $partial = shift;
+
+    my $v_name = $h3c->SUPER::v_name($partial);
+    return $v_name unless ref $v_name eq 'HASH' and %$v_name;
+
+    my $h3c_names = $h3c->h3c_v_name($partial) || {};
+    my %names     = %$v_name;
+    foreach my $vlan ( keys %names ) {
+        my $h3c_name = $h3c_names->{$vlan};
+        next unless defined $h3c_name and length $h3c_name;
+        $names{$vlan} = $h3c_name;
+    }
+    return \%names;
 }
 
 sub i_ignore {
@@ -489,6 +513,37 @@ sub _vrf_subnets_from_routes { return 1; }
 # PVST
 sub _stp_default_is_common { return 0; }
 
+# Comware 7 indexes dot1qPvid by ifIndex instead of dot1dBasePort. A key
+# that is an ifIndex but not a bridge port can only mean that. Comware 5
+# numbers bridge ports as ifIndexes, so it never trips this.
+sub i_vlan {
+    my $h3c     = shift;
+    my $partial = shift;
+
+    my $i_pvid = $h3c->qb_i_vlan() || {};
+    return $h3c->SUPER::i_vlan($partial)
+        unless _pvid_by_ifindex(
+        $i_pvid,
+        $h3c->bp_index()   || {},
+        $h3c->interfaces() || {}
+        );
+
+    return {
+        map  { $_ => $i_pvid->{$_} }
+        grep { !defined $partial or $_ eq $partial } keys %$i_pvid
+    };
+}
+
+sub i_untagged { goto &i_vlan }
+
+sub _pvid_by_ifindex {
+    my ( $i_pvid, $bp_index, $interfaces ) = @_;
+
+    my @keys = keys %$i_pvid;
+    return 0 if !@keys or grep { !exists $interfaces->{$_} } @keys;
+    return scalar grep { !exists $bp_index->{$_} } @keys;
+}
+
 1;
 __END__
 
@@ -546,6 +601,8 @@ Subclass for H3C & HP A-series devices
 =item F<HH3C-LswMSTP-MIB>
 
 =item F<HH3C-IP-ADDRESS-MIB>
+
+=item F<HH3C-LswVLAN-MIB>
 
 =item Inherited Classes' MIBs
 
@@ -652,11 +709,33 @@ Returns a HASH reference mapping from slave to master port for each member of
 a port bundle on the device. Keys are ifIndex of the slave ports, Values are
 ifIndex of the corresponding master ports.
 
+=item $h3c->v_name()
+
+Returns the Q-BRIDGE VLAN names (C<dot1qVlanStaticName>), each replaced by
+C<hh3cdot1qVlanName> when that is not empty. Comware 5 on the V1910 and 1920
+leaves the default C<VLAN 0002> in Q-BRIDGE and keeps the configured name
+only in the vendor table. VLANs absent from Q-BRIDGE are not added, so the
+keys match C<v_index()>.
+
+=item $h3c->i_vlan()
+
+Returns a mapping between C<ifIndex> and the PVID or default VLAN.
+Comware 7 indexes C<dot1qPvid> by C<ifIndex> rather than
+C<dot1dBasePort>; this is detected and the keys used as is.
+
+=item $h3c->i_untagged()
+
+Alias of C<i_vlan()>.
+
 =back
 
 =head2 Table Methods
 
 =over
+
+=item $h3c->h3c_v_name()
+
+(C<hh3cdot1qVlanName>)
 
 =item $h3c->h3c_stp_i_id()
 

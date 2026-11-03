@@ -1,0 +1,12 @@
+grep -E '^Sig(Ign|Blk|Cgt)' /proc/self/status
+grep -E '^Sig(Ign|Blk)' /proc/self/status & sleep 0.3
+(grep SigIgn /proc/self/status) & sleep 0.3
+{ grep SigIgn /proc/self/status; } | cat & sleep 0.3
+x=$(grep SigIgn /proc/self/status); echo "$x"
+env | grep -v '^_=' | sort
+A=1 B=2 env | grep -E '^(A|B)='
+x=1; env | grep -c '^x='
+cd /tmp && env | grep '^PWD='
+(cd /; env | grep '^PWD='); env | grep '^PWD='
+grep -E '^(Uid|Gid|NSpgid|NSsid)' /proc/self/status | sed 's/[0-9][0-9]*/N/g'
+umask

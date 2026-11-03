@@ -1,6 +1,6 @@
 ---
 name: perl-localization-with-locale-simple
-description: "Add i18n to a Perl app with Locale::Simple — gettext-backed translations with the `l`, `ln`, `lp`, `ld`, … helpers. Load when editing a Perl project that needs localized strings, has a `use Locale::Simple` line, or ships .po files."
+description: "Add i18n to a Perl app with Locale::Simple (l, ln, lp, ld, ...). Load when a Perl project uses Locale::Simple, ships .po/.mo files, or shares msgids with a sibling."
 user-invocable: false
 ---
 
@@ -8,8 +8,8 @@ user-invocable: false
 
 `Locale::Simple` is a thin wrapper over `Locale::TextDomain` / `gettext`. It
 exports short function names (`l`, `ln`, …) that are identical across Perl,
-Python and JavaScript — so the same msgids and the same `.po` files work for
-all three.
+Python, JavaScript, PHP, Go and Rust — so the same msgids and the same `.po`
+files work for all six.
 
 ## Install
 
@@ -46,10 +46,13 @@ original msgid when no translation exists.
 | `ln($msgid, $msgid_plural, $n, @args)` | plural forms (e.g. 1 message vs. N messages) |
 | `lp($ctxt, $msgid, @args)` | same msgid, different contexts (`"open"` as verb vs. adjective) |
 | `lnp($ctxt, $msgid, $msgid_plural, $n, @args)` | plural + context |
-| `ld($domain, $msgid, @args)` | translation in a different domain without switching `ltd` |
+| `ld($domain, $msgid, @args)` | translation in a different domain without switching `ltd`; binds the domain to `l_dir` on first use |
 | `ldn`, `ldp`, `ldnp` | domain + the above variants |
 
-`@args` is fed through `sprintf`, so Perl positional formats work:
+`@args` is formatted with `sprintf`, placeholder by placeholder, so Perl
+positional formats work and `'` plus a pad character (`%'*8s`) pads with it.
+A placeholder without an argument stays as it is, extra arguments are
+ignored:
 
 ```perl
 l('Hello %s, you have %d messages', $name, $count);
@@ -76,15 +79,17 @@ l_dir(dist_dir('MyApp') . '/locale');
 
 ## Extracting msgids from source
 
-Run the scraper shipped with the distribution:
+Run the scraper shipped with the distribution, the `locale-simple` command
+(`locale_simple_scraper` is a deprecated alias):
 
 ```bash
-locale_simple_scraper \
+locale-simple scrape \
     --ignore node_modules --ignore .build --ignore local \
     > po/myapp.pot
 ```
 
-It statically scans `.pl`, `.pm`, `.py`, `.js`, `.tx` files and emits a
+It statically scans `.pl`, `.pm`, `.t`, `.py`, `.js`, `.php`, `.go`, `.rs` and
+`.tx` files and emits a
 standard `.pot` — feed that to `msgmerge` / Poedit / Weblate like any other
 gettext project.
 
@@ -102,9 +107,13 @@ Keep msgids constant; pass dynamic data through `@args`.
 
 ## Dry-run mode
 
-`l_dry($filename)` makes every call *also* append its msgid to `$filename` in
-`.po` format, while still returning translations — useful when you want the
-live system to collect unseen msgids:
+`l_dry($filename)` makes every call append its msgid block (`# domain:`,
+`msgctxt`, `msgid`, `msgid_plural`) to `$filename` and return the formatted
+msgid instead of a translation — a test or staging run collects every msgid
+the code really reaches. The file is UTF-8 with LF line ends, with
+backslash, newline, tab, carriage return and double quote escaped, byte for
+byte what the Python package writes. `l_dry($filename, 1)` keeps that
+behaviour and skips the file; `l_dry(undef)` leaves dry-run mode:
 
 ```perl
 l_dry('seen_msgids.po') if $ENV{COLLECT_MSGIDS};
@@ -140,5 +149,5 @@ done_testing;
   decodes the gettext result. Don't `Encode::encode` around `l()` — you'll get
   mojibake.
 - **`@EXPORT` collisions** — `l` is a short, common name. If another module
-  also exports `l`, use `Locale::Simple qw(ltd l_lang)` and keep `l` qualified
+  also exports `l`, import the setup explicitly, `use Locale::Simple qw(l_dir ltd l_lang)`, and keep `l` qualified
   (`Locale::Simple::l(…)`).

@@ -279,7 +279,7 @@ HELP
 
 sub _print_version
 {
-   my $version = $Text::MarkdownAdoc::VERSION // '0.1.0';
+   my $version = $Text::MarkdownAdoc::VERSION // '0.1.1';
    print "markdown-adoc version $version\n";
 }
 

@@ -21,11 +21,14 @@ t/dist.t
 t/eof.t
 t/eol.t
 t/gv.t
+t/init.t
+t/lib/Test/CGIBuffer.pm
 t/is_cached.t
 t/js.t
 t/kwalitee.t
 t/last_mod.t
 t/links.t
+t/locales.t
 t/manifest.t
 t/metrics.t
 t/modules-used.t
@@ -41,6 +44,8 @@ t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
+t/regressions.t
+t/security.t
 t/strict.t
 t/too_late.t
 t/unused.t

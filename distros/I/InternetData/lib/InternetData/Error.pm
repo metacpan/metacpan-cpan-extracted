@@ -11,7 +11,7 @@ use overload
     'bool' => sub { 1 },
     fallback => 1;
 
-our $VERSION = '1.11.4';
+our $VERSION = '1.11.5';
 
 my %RETRYABLE = (rate_limited => 1, server_error => 1, network => 1);
 
@@ -66,9 +66,9 @@ sub from_response {
     return $class->new(kind => 'forbidden', message => $message, status => $status)
         if $status == 403;
     # Any other 4xx is a CLIENT error, and 404 is one this API actually serves:
-    # a database id it does not publish, or a build not mirrored yet. Falling
+    # a database ID it does not publish, or a build not mirrored yet. Falling
     # through to the server_error default would make it retryable, so a
-    # misspelled id would be requested three times before failing. Classified on
+    # misspelled ID would be requested three times before failing. Classified on
     # the RANGE rather than an enumerated list, so a status added later cannot
     # land in the wrong half.
     return $class->new(kind => 'bad_request', message => $message, status => $status)
@@ -211,6 +211,6 @@ Seconds to wait, when the API said so.
 
 Whether retrying this exact request could succeed. True for C<rate_limited>,
 C<server_error> and C<network>, false for everything else - including every
-C<4xx>, so a database id that does not exist fails once rather than three times.
+C<4xx>, so a database ID that does not exist fails once rather than three times.
 
 =cut

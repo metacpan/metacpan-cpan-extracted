@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{/dev/ada0p2\t/\tufs\trw\t1\t1\nzroot/var\t/var\tzfs\trw,noatime\t0\t0\n};

@@ -103,7 +103,6 @@ through `Text::MarkdownAdoc` stable, and it keeps the single- and
 double-quoted forms visually distinct. `downdoc` itself uses one shared
 `quotes` attribute (default `<q> </q>`) for both forms, so if you need
 that exact shared behavior, set both attributes above to the same value.
-See `docs/COMPATIBILITY_REPORT.md` for the full rationale.
 
 Inline AsciiDoc passthrough (`+++text+++`) is emitted verbatim: no `<`
 escaping, no quote/format substitution, no attribute or macro expansion

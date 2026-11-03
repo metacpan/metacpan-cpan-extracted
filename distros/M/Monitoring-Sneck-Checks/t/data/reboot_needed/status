@@ -1,0 +1,7 @@
+Package: linux-image-6.12.48+deb13-amd64
+Status: install ok installed
+Version: 6.12.48-1
+
+Package: linux-image-6.1.0-28-amd64
+Status: deinstall ok config-files
+Version: 6.1.123-1

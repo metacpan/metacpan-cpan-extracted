@@ -1,0 +1,9 @@
+# a comment
+Include sshd_config.d/*.conf
+PermitRootLogin yes
+PasswordAuthentication   no
+Ciphers  "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com"
+MaxAuthTries=4
+Match User backup
+    PasswordAuthentication yes
+    X11Forwarding yes

@@ -1,9 +1,38 @@
 Revision history for Perl distribution App-UpdateConfig
 
+1.06 - 2026-11-03
+ - Include all the tests in the distribution (some were missing in 1.04 and
+   1.05). There are no changes to the program.
+
+1.05 - 2026-11-02
+ - Add a SYMLINK directive to make the target of a fragment a symbolic link.
+
+1.04 - 2026-11-02
+ - MIRROR now includes the directory where it is set in the mirrored path, and
+   a MIRROR CONTENTS directive mirrors only the directories below it.
+ - Always convert the guard suffixes to upper case.
+ - With --force, report the overwritten targets of the ENTIRE FILE fragments
+   that were modified since their last update as "Updated: target (forced)".
+
+1.03 - 2026-11-02
+ - Read the directives of a .update_config file in the directories of
+   fragments, which apply to all the fragments of these directories.
+ - Always write the FILENAME directive first in the exported fragments.
+ - Add a BASE directive to set the base directory of the targets, instead of
+   the home directory, and a MIRROR directive to use the structure of the
+   configuration directory for the targets.
+ - Accept FILENAME and DIR paths starting with "~" for the home directory.
+ - Replace a "dot_" prefix in the name of a fragment by a dot in its default
+   target (e.g. "dot_bashrc" targets ".bashrc"). Fragments with such a name
+   and no FILENAME directive will be written to a new target.
+ - Save the last applied version of the ENTIRE FILE fragments and do not
+   overwrite their target if it was modified since then, unless the new
+   --force option is used.
+
 1.02 - 2026-10-27
  - Use cpanm when available to install the missing modules.
  - Install the missing modules globally with sudo when needed.
- - Accept the MERGE formats in upper case or from the file name.cd 
+ - Accept the MERGE formats in upper case or from the file name.
  - Add a DIR directive to set the directory of the target file.
  - Various improvements to handling multiple fragments with the same target.
  - Extract the default guard suffix from file or dir names (e.g. "foo [bar]").

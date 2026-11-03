@@ -1,5 +1,20 @@
 Revision history for Check-supervisorctl
 
+0.1.0   2026-11-02/13:30
+        - Add Monitoring::Sneck::Checks::supervisorctl for running it in process via sneck.
+        - supervisorctl status output that is not a item and status, such as supervisord being
+          down, or supervisorctl not being runnable, is now a status_error, UNKNOWN by default,
+          instead of being silently OK.
+        - run now optionally takes status_output, the output of supervisorctl status.
+        - Add parse_mappings for parsing status=value strings, used by check_supervisorctl.
+        - config_missing_val is now used for running items missing a config and raises the exit.
+        - Ignored items now get their IGNORED result line and are not flagged as non-running configs.
+        - Running items with a ignored config are no longer flagged as missing a config.
+        - The config dir missing and not readable result lines are always added.
+        - config_dir is now honored even if config_check is not given to new.
+        - check_supervisorctl: fix -s and -d, which did not take values, and pass -f along.
+        - check_supervisorctl: bad -s values are now UNKNOWN instead of dying.
+
 0.0.1   2025-03-18/14:45
         - First version, released on an unsuspecting world.
 

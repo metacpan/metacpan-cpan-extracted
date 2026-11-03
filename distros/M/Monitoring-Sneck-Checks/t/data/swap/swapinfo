@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{Device 1K-blocks Used Avail Capacity\n/dev/ada0p3 2097152 0 2097152 0%\n};

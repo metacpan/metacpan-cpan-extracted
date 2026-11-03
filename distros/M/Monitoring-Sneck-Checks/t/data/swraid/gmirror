@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{mirror/gm0  COMPLETE  ada0 (ACTIVE)\nmirror/gm0  COMPLETE  ada1 (ACTIVE)\nmirror/gm1  DEGRADED  ada2 (ACTIVE)\nmirror/gm1  DEGRADED  ada3 (SYNCHRONIZING, 45%)\nmirror/gm2  DEGRADED  ada4 (ACTIVE)\n};

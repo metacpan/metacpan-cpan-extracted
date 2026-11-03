@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+# prints this process's open fds: N=kind, kind is pipe, /dev/null, a file name, or tty
+opendir my $d, "/proc/self/fd"; my $me = fileno $d;
+print join(' ', map { my $l = readlink "/proc/self/fd/$_"; $l =~ s/:\[\d+\]//; $l =~ s{^/dev/pts/\d+}{tty}; $l =~ s{.*/}{} unless $l =~ m{^/dev/}; "$_=$l" }
+  sort { $a <=> $b } grep { /^\d+$/ && $_ != $me } readdir $d), "\n";

@@ -604,7 +604,7 @@ SKIP: {
 	    'T11-1: SQLite count() == 3 after first query on DSN connection');
 
 	# T11-2: DBI handle is established in the object after the first query
-	ok(defined $db11->{'tx11'} && $db11->{'tx11'}->isa('DBI::db'),
+	ok(defined $db11->{_dbh}{'tx11'} && $db11->{_dbh}{'tx11'}->isa('DBI::db'),
 	    'T11-2: DBI handle is a DBI::db object after open');
 
 	# T11-3: selectall_arrayref returns the correct number of rows
@@ -628,6 +628,6 @@ SKIP: {
 
 	# T11-6: DESTROY disconnects and clears the DBI handle from the object
 	$db11->DESTROY();
-	ok(!defined $db11->{'tx11'},
+	ok(!defined $db11->{_dbh}{'tx11'},
 	    'T11-6: DBI handle cleared from object state after DESTROY');
 }

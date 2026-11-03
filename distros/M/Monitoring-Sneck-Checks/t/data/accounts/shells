@@ -1,0 +1,4 @@
+# shells
+# /bin/zsh is not installed
+  /bin/sh # the default
+/bin/bash

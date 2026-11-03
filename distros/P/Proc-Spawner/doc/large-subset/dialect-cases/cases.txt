@@ -1,0 +1,64 @@
+local	x=1; f(){ local x; echo "[$x]"; }; f
+dots	mkdir -p d/.h && cd d && echo .*
+atjoin	set -- a b; IFS=:; x=$@; echo "$x"
+atpat	set -- ab cb; echo "${@#?}" "${*%b}"
+atlen	set -- a b; echo ${#@} ${#*}
+bqdq	echo "${x:-`echo \"q\"`}"
+return	echo a; return; echo b
+unsetloc	x=g; f() { local x=1; g; echo "f:[$x]"; }; g() { unset x; echo "g:[$x]"; }; f
+dashvar	echo "[$-]"
+lineno	echo "[$LINENO]"
+setx	set -x; echo "a b"
+setv	set -v; echo a
+listset	f() { :; }; set | grep -c '^f'
+listtrap	trap 'echo t' INT; trap
+exportp	export ZZ=1; export -p | grep ZZ
+typecmd	type ls
+commandV	command -V ls
+fdmulti	echo hi 10>/dev/null
+redirdigit	echo x >&2>f; cat f
+dupfile	echo hi >&f; cat f
+caret	case b in [^a]) echo neg;; *) echo lit;; esac
+uidset	UID=5 echo hi
+tildehome	unset HOME; echo ~
+ps1	echo "[$PS1]"
+fnlocal	local() { echo f; }; local
+fnsource	source() { echo f; }; source
+job	sleep 1 & kill %1; echo $?
+pipefail	set -o pipefail; false | true; echo $?
+dbracket	[[ a == a* ]] && echo y
+dparen	((x=1+1)); echo $x
+dollarbr	echo $[1+2]
+incr	i=1; echo $((i++)) $i
+comma	echo $((1, 2))
+ansi	echo $'a\tb'
+locale	echo $"hi"
+array	a=(x y); echo ${a[1]}
+substr	x=abcd; echo ${x/b/X} ${x:1:2} ${x^^}
+indirect	y=z; x=y; echo ${!x}
+procsub	cat <(echo hi)
+herestr	cat <<< hi
+ampgt	echo hi &>/dev/null; echo st=$?
+pipeamp	echo hi |& cat
+brace	echo a{b,c} {1..3}
+function	function f { echo f; }; f
+source	echo 'echo sourced' >s.sh; source ./s.sh
+declare	declare -i n=1+2; echo $n
+let	let n=2+3; echo $n
+pushd	pushd /tmp >/dev/null && popd >/dev/null && echo ok
+shopt	shopt -s nullglob; echo ok
+readp	echo x | { read -p 'p: ' v; echo "[$v]"; }
+readd	printf 'a:b' | { read -d : v; echo "[$v]"; }
+random	echo ${RANDOM:+set}
+pipestatus	false | true; echo "${PIPESTATUS[0]}"
+select	select x in a; do break; done </dev/null; echo ok
+extglob	echo @(a|b)
+coproc	coproc cat; echo ok
+time	time true 2>/dev/null; echo ok
+shiftover	shift 3; echo after
+exportbad	n=1x; export "$n=2"; echo after
+qmark	echo ${zz:?unset}; echo after
+cmdvst	command -v nosuch; echo $?
+getoptsend	getopts ab: o -b v; getopts ab: o -b v; echo "[$o] [$OPTARG] $OPTIND"
+cdhome	unset HOME; cd; echo $?
+readonlyas	readonly r=1; r=2; echo after

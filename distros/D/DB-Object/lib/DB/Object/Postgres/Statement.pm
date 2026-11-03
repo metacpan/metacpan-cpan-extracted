@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
-## Version v0.302.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## SQL API Abstraction - ~/lib/DB/Object/Postgres/Statement.pm
+## Version v0.302.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/08/05
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 # This package's purpose is to automatically terminate the statement object and
 # separate them from the connection object (DB::Object).
 # Connection object last longer than statement objects
@@ -25,7 +25,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG );
     use DBD::Pg ':pg_types';
     our $DEBUG = 0;
-    our $VERSION = 'v0.302.1';
+    our $VERSION = 'v0.302.2';
 };
 
 use strict;
@@ -229,7 +229,9 @@ sub ignore
 sub last_insert_id
 {
     my $self = shift( @_ );
-    return( $self->database_object->last_insert_id( undef(), undef(), $self->table_object->name, undef() ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    return( $dbo->last_insert_id( undef(), undef(), $self->table_object->name, undef() ) );
 }
 
 sub name
@@ -426,7 +428,7 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 
 =head1 VERSION
 
-    v0.302.1
+    v0.302.2
 
 =head1 DESCRIPTION
 

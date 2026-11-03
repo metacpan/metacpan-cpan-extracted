@@ -1,4 +1,8 @@
 Locale-Simple-*
+vendor/
+composer.lock
+rust/target/
+rust/Cargo.lock
 .build
 build/
 *.pyc
@@ -19,3 +23,18 @@ js/CHANGELOG.md
 .claude/todos/
 .claude/projects/
 js/package-lock.json
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore
+
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/
+.phpunit.result.cache
+
+# Build artefact of scripts/build-binary.sh
+/locale-simple

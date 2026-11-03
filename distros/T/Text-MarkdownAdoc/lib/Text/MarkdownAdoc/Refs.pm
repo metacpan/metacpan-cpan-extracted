@@ -170,17 +170,19 @@ sub resolve
     }eg;
 
    # Resolve REFLINK placeholders
-   $input =~ s{\x00REFLINK:([^:]+):([^\x00]*)\x00}{
+   $input =~ s{\x00REFLINK:([^\x02\x00]+)\x02([^\x02\x00]*)\x02([^\x00]*)\x00}{
         my $label = $1;
         my $display = $2;
+        my $form = $3;
+        my $suffix = $form eq q{c} ? q{[]} : $form =~ m{^f(.*)\z}s ? "[$1]" : q{};
 
         my $def = $self->{link_defs}{$label};
         if ($def) {
             _format_resolved_link($display, $def->{url});
         }
         else {
-            # Unresolved: emit literal text
-            $display;
+            # Unresolved: not a link, so the brackets are literal text
+            "[$display]$suffix";
         }
     }eg;
 

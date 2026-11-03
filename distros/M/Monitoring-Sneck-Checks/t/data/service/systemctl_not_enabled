@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+exit( $ARGV[0] eq 'is-active' ? 0 : 1 );

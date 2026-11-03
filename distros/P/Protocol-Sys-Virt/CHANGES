@@ -1,5 +1,9 @@
 -----
 
+12.9.0    2026-11-02
+   [Changed]
+       * Updated to libvirt tag v12.9.0
+
 12.8.0    2026-10-02
    [Changed]
        * Updated to libvirt tag v12.8.0

@@ -1,0 +1,7 @@
+Revision history for Devel-XSCover
+
+0.02    2026-11-03
+	- Hide the method put into B::Deparse from the CPAN indexer, which read it as a claim on that namespace
+
+0.01    2026-11-03
+	- First version

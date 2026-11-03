@@ -1,201 +1,359 @@
 
-#: /t/60-N-markers.t:17
+#: t/21-dryrun.t:144
+#, locale-simple-format 0
+msgid "Hello"
+msgstr ""
+
+#: t/60-N-markers.t:17
 #, locale-simple-format app
 msgctxt "menu"
 msgid "Open"
 msgstr ""
 
-#: /t/60-N-markers.t:16
+#: t/60-N-markers.t:16
 #, locale-simple-format app
 msgid "Hi"
 msgstr ""
 
-#: /t/60-N-markers.t:22 /t/60-N-markers.t:27
+#: t/60-N-markers.t:22 t/60-N-markers.t:27
 #, locale-simple-format dom
 msgctxt "ctx"
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
 
-#: /t/60-N-markers.t:21 /t/60-N-markers.t:26
+#: t/60-N-markers.t:21 t/60-N-markers.t:26
 #, locale-simple-format dom
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
 
-#: /t/data/dummy.pl:9
+#: t/data/dummy.pl:9
 #, locale-simple-format dummy
 msgid "mo'ooooo"
 msgstr ""
 
-#: /t/20-locale-simple.t:71 /t/data/test.py:83
+#: t/data/dummy.go:14
+#, locale-simple-format go_dom
+msgid "Go raw \"string\" with \\ backslash"
+msgstr ""
+
+#: t/21-dryrun.t:79
+#, locale-simple-format othertest
+msgctxt "inbox"
+msgid "You have %d message"
+msgid_plural "You have %d messages"
+msgstr[0] ""
+
+#: t/21-dryrun.t:76 t/31-locale-simple-domain-binding.t:26 t/31-locale-simple-domain-binding.t:61 t/31-locale-simple-domain-binding.t:75
+#, locale-simple-format othertest
+msgid "Hello"
+msgstr ""
+
+#: t/31-locale-simple-domain-binding.t:38
+#, locale-simple-format othertest
+msgid "You have %d message"
+msgid_plural "You have %d messages"
+msgstr[0] ""
+
+#: t/data/dummy.php:20
+#, locale-simple-format php_dom
+msgid "PHP after inline html"
+msgstr ""
+
+#: t/data/dummy.rs:25
+#, locale-simple-format rust_dom
+msgid "Rust after attribute"
+msgstr ""
+
+#: t/21-dryrun.t:144
+#, locale-simple-format
+msgctxt "0"
+msgid "Hello"
+msgstr ""
+
+#: t/data/dummy.php:17
+#, locale-simple-format
+msgctxt "PHP_ctx"
+msgid "PHP single concat"
+msgstr ""
+
+#: t/20-locale-simple.t:71 t/21-dryrun.t:77 t/data/test.py:83
 #, locale-simple-format
 msgctxt "alien"
 msgid "Hello"
 msgstr ""
 
-#: /t/60-N-markers.t:20 /t/60-N-markers.t:25
+#: t/60-N-markers.t:20 t/60-N-markers.t:25
 #, locale-simple-format
 msgctxt "ctx"
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
 
-#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE /t/60-N-markers.t:15
+#: lib/Locale/Simple.pm:LINE lib/Locale/Simple.pm:LINE t/60-N-markers.t:15
 #, locale-simple-format
 msgctxt "menu"
 msgid "Open"
 msgstr ""
 
-#: /lib/Locale/Simple.pm:LINE
+#: lib/Locale/Simple.pm:LINE
 #, locale-simple-format
 msgctxt "state"
 msgid "Open"
 msgstr ""
 
-#: /t/data/dummy.pl:10
+#: t/data/dummy.pl:10
 #, locale-simple-format
 msgid " Sie müssen eine eigene Domain eingeben. \"%s\" ist nicht zulässig. "
 msgstr ""
 
-#: /t/20-locale-simple.t:47 /t/data/test.py:63
+#: t/20-locale-simple.t:94
+#, locale-simple-format
+msgid "%%s %s %%"
+msgstr ""
+
+#: t/20-locale-simple.t:84
+#, locale-simple-format
+msgid "%1$s"
+msgstr ""
+
+#: t/20-locale-simple.t:87
+#, locale-simple-format
+msgid "%2$s / %1$s"
+msgstr ""
+
+#: t/20-locale-simple.t:47 t/data/test.py:63
 #, locale-simple-format
 msgid "%2$s brought %1$d message"
 msgid_plural "%2$s brought %1$d messages"
 msgstr[0] ""
 
-#: /t/20-locale-simple.t:53 /t/data/test.py:68
+#: t/20-locale-simple.t:53 t/20-locale-simple.t:89 t/21-dryrun.t:78 t/data/test.py:68
 #, locale-simple-format
 msgid "%2$s has %1$d message"
 msgid_plural "%2$s has %1$d messages"
 msgstr[0] ""
 
-#: /t/60-N-markers.t:34
+#: t/21-dryrun.t:144 t/21-dryrun.t:144
+#, locale-simple-format
+msgid "%d file"
+msgid_plural "0"
+msgstr ""
+
+#: t/60-N-markers.t:34
 #, locale-simple-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] ""
 
-#: /t/data/dummy.tx:4
+#: t/20-locale-simple.t:86
+#, locale-simple-format
+msgid "%s and %s"
+msgstr ""
+
+#: t/20-locale-simple.t:85
+#, locale-simple-format
+msgid "%s"
+msgstr ""
+
+#: t/data/dummy.tx:4
 #, locale-simple-format
 msgid "/unternehmen/kundeninformationen/agb-verbraucher/#widerrufsrecht"
 msgstr ""
 
-#: /t/60-N-markers.t:19 /t/60-N-markers.t:24
+#: t/60-N-markers.t:19 t/60-N-markers.t:24
 #, locale-simple-format
 msgid "1 file"
 msgid_plural "%d files"
 msgstr[0] ""
 
-#: /t/20-locale-simple.t:59 /t/data/test.py:73
+#: t/20-locale-simple.t:93
+#, locale-simple-format
+msgid "100%% of %s"
+msgstr ""
+
+#: t/20-locale-simple.t:59 t/data/test.py:73
 #, locale-simple-format
 msgid "Change order test %s %s"
 msgstr ""
 
-#: /t/60-N-markers.t:31
+#: t/data/dummy.go:10
+#, locale-simple-format
+msgid "Go after rune literal"
+msgstr ""
+
+#: t/data/dummy.go:15
+#, locale-simple-format
+msgid "Go concat"
+msgstr ""
+
+#: t/60-N-markers.t:31
 #, locale-simple-format
 msgid "Greet"
 msgstr ""
 
-#: /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:17 /t/21-dryrun.t:20 /t/30-locale-simple-other.t:18 /t/30-locale-simple-other.t:26 /t/60-N-markers.t:14 /t/data/test.py:38
+#: lib/Locale/Simple.pm:LINE t/20-locale-simple.t:17 t/21-dryrun.t:21 t/21-dryrun.t:74 t/21-dryrun.t:121 t/21-dryrun.t:164 t/23-locale-simple-c-locale.t:51 t/30-locale-simple-other.t:18 t/30-locale-simple-other.t:26 t/31-locale-simple-domain-binding.t:32 t/31-locale-simple-domain-binding.t:55 t/31-locale-simple-domain-binding.t:69 t/40-error.t:51 t/60-N-markers.t:14 t/data/test.py:38
 #, locale-simple-format
 msgid "Hello"
 msgstr ""
 
-#: /t/20-locale-simple.t:65 /t/data/test.py:78
+#: t/20-locale-simple.t:65 t/data/test.py:78
 #, locale-simple-format
 msgid "Other change order test %s %s %s"
 msgstr ""
 
-#: /t/data/dummy.pl:11
+#: t/data/dummy.php:15
+#, locale-simple-format
+msgid "PHP escaped $dollar and \"quote\""
+msgstr ""
+
+#: t/data/dummy.php:5
+#, locale-simple-format
+msgid "PHP fqn call"
+msgstr ""
+
+#: t/data/dummy.php:6
+#, locale-simple-format
+msgid "PHP heredoc \"quoted\" and it's fine\nsecond line"
+msgstr ""
+
+#: t/data/dummy.php:11
+#, locale-simple-format
+msgid "PHP nowdoc one $notvar"
+msgid_plural "PHP nowdoc many"
+msgstr[0] ""
+
+#: t/data/dummy.rs:28
+#, locale-simple-format
+msgid "Rust commented out"
+msgstr ""
+
+#: t/data/dummy.rs:20
+#, locale-simple-format
+msgid "Rust one"
+msgid_plural "Rust many"
+msgstr[0] ""
+
+#: t/data/dummy.rs:12
+#, locale-simple-format
+msgid "Rust path qualified"
+msgstr ""
+
+#: t/data/dummy.rs:18
+#, locale-simple-format
+msgid "Rust raw \"# near terminator"
+msgstr ""
+
+#: t/data/dummy.rs:19
+#, locale-simple-format
+msgid "Rust raw no hashes"
+msgstr ""
+
+#: t/data/dummy.rs:17
+#, locale-simple-format
+msgid "Rust raw with \"quote\" inside"
+msgstr ""
+
+#: t/21-dryrun.t:80
+#, locale-simple-format
+msgid "Say \"%s\"\\n\nGrüße"
+msgstr ""
+
+#: t/data/dummy.pl:11
 #, locale-simple-format
 msgid "Sie müssen eine eigene Domain eingeben. \"%s\" ist nicht zulässig!"
 msgstr ""
 
-#: /t/data/dummy.tx:2 /t/data/dummy.tx:3
+#: t/data/dummy.tx:2 t/data/dummy.tx:3
 #, locale-simple-format
 msgid "Soll der Tarif %s?"
 msgstr ""
 
-#: /t/30-locale-simple-other.t:31
+#: t/21-dryrun.t:81
+#, locale-simple-format
+msgid "Tab\there\rand CR"
+msgstr ""
+
+#: t/30-locale-simple-other.t:31
 #, locale-simple-format
 msgid "Umlaut-Test"
 msgstr ""
 
-#: /t/data/dummy.tx:4
+#: t/data/dummy.tx:4
 #, locale-simple-format
 msgid "Verbraucher können ihre Vertragserklärung innerhalb von zwei Wochen ohne Angabe von Gründen in Textform (z. B. Brief, Fax, E-Mail) widerrufen. Hier finden Sie die %s Einzelheiten zu Ihrem Widerrufsrecht %s."
 msgstr ""
 
-#: /t/data/dummy.tx:1
+#: t/data/dummy.tx:1
 #, locale-simple-format
 msgid "Vertrag gekündigt zum %s"
 msgstr ""
 
-#: /t/20-locale-simple.t:35 /t/20-locale-simple.t:41 /t/21-dryrun.t:38 /t/21-dryrun.t:44 /t/data/test.py:53 /t/data/test.py:58
+#: t/20-locale-simple.t:35 t/20-locale-simple.t:41 t/21-dryrun.t:39 t/21-dryrun.t:45 t/data/test.py:53 t/data/test.py:58
 #, locale-simple-format
 msgid "You have %d message of %s"
 msgid_plural "You have %d messages of %s"
 msgstr[0] ""
 
-#: /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:23 /t/20-locale-simple.t:29 /t/21-dryrun.t:26 /t/21-dryrun.t:32 /t/data/test.py:43 /t/data/test.py:48
+#: lib/Locale/Simple.pm:LINE t/20-locale-simple.t:23 t/20-locale-simple.t:29 t/21-dryrun.t:27 t/21-dryrun.t:33 t/23-locale-simple-c-locale.t:52 t/23-locale-simple-c-locale.t:53 t/data/test.py:43 t/data/test.py:48
 #, locale-simple-format
 msgid "You have %d message"
 msgid_plural "You have %d messages"
 msgstr[0] ""
 
-#: /t/22-locale-simple-simplenumber.t:16 /t/22-locale-simple-simplenumber.t:22
+#: t/22-locale-simple-simplenumber.t:16 t/22-locale-simple-simplenumber.t:22
 #, locale-simple-format
 msgid "You have a message"
 msgid_plural "You have some messages"
 msgstr[0] ""
 
-#: /t/data/dummy.pl:10
+#: t/data/dummy.pl:10
 #, locale-simple-format
 msgid "ihr-name"
 msgstr ""
 
-#: /t/data/dummy.pl:2
+#: t/data/dummy.pl:2
 #, locale-simple-format
 msgid "mo\"o"
 msgstr ""
 
-#: /t/data/dummy.pl:7
+#: t/data/dummy.pl:7
 #, locale-simple-format
 msgid "mo\"ooooo"
 msgstr ""
 
-#: /t/data/dummy.pl:12 /t/data/dummy.pl:14
+#: t/data/dummy.pl:12 t/data/dummy.pl:14
 #, locale-simple-format
 msgid "mo'o\n   oooo"
 msgstr ""
 
-#: /t/data/dummy.pl:4
+#: t/data/dummy.pl:4
 #, locale-simple-format
 msgid "mo'ooo"
 msgstr ""
 
-#: /t/data/dummy.pl:8 /t/data/dummy.pl:18
+#: t/data/dummy.pl:8 t/data/dummy.pl:18
 #, locale-simple-format
 msgid "mo'ooooo"
 msgstr ""
 
-#: /t/data/dummy.pl:3
+#: t/data/dummy.pl:3
 #, locale-simple-format
 msgid "mo\\\"oo"
 msgstr ""
 
-#: /t/data/dummy.pl:5 /t/data/dummy.pl:6
+#: t/data/dummy.pl:5 t/data/dummy.pl:6
 #, locale-simple-format
 msgid "mo\\oooo"
 msgstr ""
 
-#: /t/data/dummy.pl:1
+#: t/data/dummy.pl:1
 #, locale-simple-format
 msgid "moo"
 msgstr ""
 
-#: /t/40-error.t:19 /t/40-error.t:27
+#: t/40-error.t:19 t/40-error.t:27
 #, locale-simple-format
 msgid "test"
 msgstr ""

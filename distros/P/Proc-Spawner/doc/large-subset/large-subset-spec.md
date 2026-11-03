@@ -1,0 +1,121 @@
+# Proc::ShellSubset::Large: the large shell subset (2026-11-01)
+
+Status: parser written and tested (`claude/ShellSubsetLarge.pm`, 258 lines). `claude/large-subset-shellsubset.patch` was applied to `claude/ShellSubset.pm` by the posix_spawn session on 2026-11-01, which also made its executor run these trees (`claude/pspawn-extensions.md`). Update of the evening: `for NAME` without `in` (section 3), with `claude/large-subset-forall.patch`, applied by the posix_spawn session the same evening (section 7). Update of 2026-11-02: here-documents inside `"$( … )"`, and `command` with no arguments. Decisions: the checklist page "Shell Large Subset" (item IDs A1, F3, … below) and your message of 2026-11-01: implement it as an addition to `lib/Proc/ShellSubset.pm`, which is asked first; the module is named `lib/Proc/ShellSubset/Large.pm`. Where the page offered alternatives and you had not chosen, I took the page's recommendation (A3: A, A4: A, F6 `-x`: A). Rule names such as V3, B3, E1 are those of `doc/parsers/shell-subset-spec.md`, which this document amends.
+
+## 1. How it works
+
+`Proc::ShellSubset::Large::parse($string, %opt)` returns a List or an error hash, exactly like `Proc::ShellSubset::parse`.
+
+1. It calls `Proc::ShellSubset::parse` with the options `if while for case read assign param_ops` on. If that accepts the string, its tree is the answer. So everything `Proc::ShellSubset` accepts keeps its tree and its meaning (for example `pwd` stays the program `/bin/pwd`, spec B2; so F12's "pwd as a builtin" is dropped).
+2. Only if `Proc::ShellSubset` rejects the string (other than for U1) does it parse the string again by the large grammar. That grammar is `Proc::ShellSubset`'s own code, run with eight of its subs and two of its tables replaced for the time of the call (`local`). The replacements are in `lib/Proc/ShellSubset/Large.pm`. Before that, the here-document bodies are cut out of the string (positions in errors still refer to the original string).
+
+Options: those of `Proc::ShellSubset`, except `brace`, which is ignored (brace expansion is bash-only; T1). The `check` callback and the NUL test see the whole original string.
+
+## 2. Rules that change
+
+Dropped:
+- V3: the command name may come from an expansion (`$cmd -l`, `"$EDITOR" f`). It is a Word in `argv->[0]`; what it names is decided at run time (F3).
+- B3, V19: `exec cmd` may stand anywhere; it runs cmd and ends the shell (or the subshell it is in) with cmd's status. `exec` with redirections only is accepted (F3). A quoted `"exec"` is `exec` too.
+- V5: settings before `:` and `exit` are accepted; they stay set afterwards, as in both shells.
+- E1's ban on `$0`–`$9`, `${10}`…, `$#`, `$@`, `$*`, `$$` (F1, F9). At the top level they are as in `sh -c` with no arguments: `$0` is `sh`, `$#` is 0.
+- The options `assign` and `param_ops` (always on); `IFS`, `OPTIND` and `OLDPWD` may now be read and assigned.
+
+Kept: everything else, in particular V4 for literal `exit`/`return` statuses, V7 (no `exec -x`, no `exec` of a builtin), V15 (`cd` forms; `cd -` now allowed), `HOME` and `CDPATH` not assignable, and the rejection of every bash-only construct (A3, alternative A).
+
+New, also in `Proc::ShellSubset` (section 7; bugs of `Proc::ShellSubset` found on the way):
+- U1: a string whose first character other than white space is `-` or `+` is rejected: Perl hands it to `sh -c` with no `--`, so sh takes it as options and fails.
+- U2: a pattern that can match a whole file name component `.` or `..` is rejected: dash's globbing includes `.` and `..`, bash 5.2's does not. Only components that start with a written `.` count (`.*`, `.?`, `"."*`, `x/.*`, `.[!]]*`); `.*perf.*`, `.[!.]*`, `./*`, `"$d"/*` are not affected. (Over-strict in `case` patterns, where no files are involved.)
+- U3: `` "${x:-`echo \"q\"`}" ``: inside backquotes inside a double-quoted `${…}`, `\"` is `"` for bash and `\"` for dash; rejected.
+- U4: a redirection target of digits directly followed by `<` or `>` (`x >&2>f`, `x >1>f`): dash reads the digits as the next redirection's descriptor and fails; rejected.
+- U5: settings before a command may not use the names a shell sets itself (`UID=5 cmd`: bash fails, its `UID` is read-only); `IFS` stays allowed.
+
+## 3. What the large grammar accepts in addition
+
+- **Functions (F1).** `NAME() BODY`, where BODY is a group, a subshell, `if`, `while`, `until`, `for` or `case`, with its redirections (applied at each call). Rejected: a name that is a keyword, a special builtin (`break continue eval exec exit export readonly return set shift times trap unset`), `local` (dash refuses it), `source` (bash refuses it) or `cd` (the tree has a node for `cd`); a body that is a simple command; `function f`. Inside a body, `break` and `continue` do not reach loops outside it.
+- **`for NAME` without `in`** (`for a; do`, `for a do`, `for a⏎do`) loops over `"$@"`; the tree is the one of `for NAME in "$@"`, so an executor needs nothing new.
+- **`return [n]`** inside a function body (also nested in loops); rejected elsewhere. **`shift [n]`**, **`set -- …`**.
+- **Parameter forms (F2).** `${N:-w} ${N-w} ${N:+w} ${N+w} ${N:=w} ${N=w} ${N:?w} ${N?w} ${N%p} ${N%%p} ${N#p} ${N##p} ${#N}`, where N is a NAME, a positional parameter or one of `? ! # $ @ *` (only a NAME for `=` and `:=`; not `@` or `*` for `% %% # ##`, which dash applies to the joined string and bash to each element; `${#…}` only of a NAME or a positional parameter). In the word: quotes and backslashes work as in sh, backslash-newline is removed; both shells agree on the cases checked. In a `%`/`#` pattern, unquoted `* ? […]` are pattern characters. Still rejected in the word: unquoted `~`, `{`, newline, and in a non-pattern word unquoted `* ? [`. Bash forms (`${x/a/b} ${x:1:2} ${!x} ${x^^}`) stay rejected.
+- **`$@` only where it is split.** Where the shells join it instead (dash with the first character of `IFS`, bash with blanks), it is rejected: in setting and declaration values, redirection targets, the word of `case`, the word of `${N=w}` and of any `${…}` inside double quotes, and here-document bodies. Inside `$( … )` and backquotes it is allowed again.
+- **Here-documents (F4).** `<<WORD` and `<<-WORD`, several per line, also inside `$( … )` and function bodies. A delimiter with any quote or backslash makes the body literal; otherwise `$`, `` ` `` and `\` work in the body as inside double quotes, `"` is an ordinary character, and a line ending in an odd number of backslashes is joined to the next before the end line is looked for. `<<-` removes leading tabs. Also inside `"$( … )"`, nested to any depth. Rejected: a delimiter with `$` or `` ` ``; a body without its end line; `<<<`; a here-document inside backquotes, or in a `( … )` or `$( … )` that closes on the `<<` line; a `<<` whose body was cut out but which the grammar read as text (`${x#<<E}`); `\"` inside backquotes in a body.
+- **Declarations (F5).** `export NAME[=value]…`, `readonly NAME[=value]…`, `local NAME=value…` (only in a function body). The values are not split; `~` is expanded after `=` and `:` (both shells). Rejected: these without arguments (they list), written quoted, an argument that is not `NAME` or `NAME=…`, settings or redirections on them, `local NAME` without a value (dash keeps the outer value, bash unsets it). `unset NAME` of a name that some function makes `local` is rejected (dash and bash then differ in what becomes visible).
+- **Builtins** run by the module, with the forms accepted when their arguments are literal (an argument from an expansion is checked at run time):
+
+| Builtin | Accepted | Rejected |
+|---|---|---|
+| `set` (F6) | `-e -u -f -C -a` and `+…`, combined (`-eu`); `-o`/`+o` `errexit nounset noglob noclobber allexport`; operands, `--` | no arguments, `-x`, `-v`, `-n`, other letters, `-o` alone, `-o pipefail` |
+| `.` (F7) | one argument | none or two or more |
+| `eval` (F7) | anything | |
+| `trap` (F8) | ACTION and one or more of `EXIT HUP INT QUIT ABRT PIPE ALRM TERM USR1 USR2 0 1 2 3 6 13 14 15`; ACTION `-` or `''`; a literal ACTION must itself be accepted by the large grammar (with the caller's options) | fewer than two arguments, `-p`, a numeric first argument (a signal for sh), `ERR DEBUG RETURN`, other signals |
+| `wait` (F8) | no argument, process IDs | `%1` |
+| `umask` (F12) | no argument, an octal mask | `-S` |
+| `command` (F12) | no argument (does nothing, status 0); `command -v NAME`; `command PROGRAM ARGS` | `-V`, `-p`, a builtin after it |
+| `getopts` (F12) | `OPTSTRING NAME [ARGS]` | fewer than two arguments, a NAME that is not an identifier or is shell-set |
+| `unset` | `[-v\|-f] NAME…` | other options, non-identifiers, shell-set names, `HOME`, `CDPATH` |
+| `shift`, `exit`, `return` | no argument or a number (0–255 for exit and return) | others |
+| `cd` | as before, plus `cd -` | |
+
+  Still left to sh (`X1`): `alias unalias times ulimit jobs fg bg hash type fc chdir source let declare typeset shopt enable builtin caller dirs pushd popd disown mapfile readarray suspend logout help history bind compgen complete compopt`.
+- **Arithmetic (F10).** The assignment operators `= += -= *= /= %= <<= >>= &= ^= |=` (right-associative, lowest precedence; not as the last operand of `?:`); `$1`, `${10}`, `$#`, `$$` as operands. `++` and `--` stay rejected; an assigned name must be assignable.
+- Also rejected now: a command word starting `NAME[` (`a[1]=x`, `x[a; b]`: bash reads an array), a keyword written as a pattern (`[[`), and settings with shell-set names, `HOME` or `CDPATH` before any command (they may outlast special builtins).
+
+- **Redirections without a command, \-newline (D2, 2026-11-02).** Redirections alone (`> file`, `> f | grep x`) run as a command with no words. Settings with redirections (`x=1 >f`) only when neither the command nor a here-document holds `$` or a backquote: dash redirects first and then expands the values, bash the other way round, so `x=$(cmd) 2>/dev/null` hides the messages of `cmd` in dash only, and stays rejected (A3). At run time, as dash: redirect, then set; a failed redirection sets nothing and gives status 2. A backslash-newline is removed everywhere except inside `'…'` and comments, also inside words, `"…"`, backquotes and `$(( ))`, before parsing (in the same pass that cuts out here-document bodies), as both shells do: `ec\<newline>ho` is `echo`, `i\<newline>f` is the keyword `if`. Still rejected, because the shells differ: `cmd &>file` (dash: `cmd &`, then `>file`), an input redirection without a command (`$(<file)`: dash gives nothing, bash the file), and `/dev/tcp/…`, `/dev/udp/…` as targets (bash opens a socket; checked before Proc::ShellSubset too).
+
+## 4. Tree additions (spec section 8)
+
+```perl
+Command  = { func => NAME, body => Command }                 # body: a group, subshell or compound command
+         | { export => [NAME, Word or undef, ...] } | { readonly => [...] }
+         | { local => [NAME, Word, ...] }
+         | { exec => 1, redir => [Redir, ...] }               # exec with redirections only
+         | { argv => [], redir => [Redir, ...] }               # redirections alone (D2)
+         | { set => [...], redir => [Redir, ...] }           # settings with redirections (D2): redirect, then set
+         | { argv => [Word, ...], ... }                       # argv->[0] may now be a Word with expansions
+Redir    = [ fd, '<<', Word ]                                 # a here-document: the Word is the whole body
+Part     = [ '$', N ], [ '"$', N ]                            # N may also be 0-9 (10... when braced), # @ * $
+         | [ '${', N, OP, Word ], [ '"${', ... ]              # OP also = := ? :? % %% # ##
+         | [ "'", 'text' ]                                    # quoted text in the Word of an unquoted ${N:-w}
+```
+
+- In a `%` or `#` Word, `['*', '…']` Parts are pattern text, plain strings are literal.
+- In the Word of an unquoted `${N:-w}`, plain strings are unquoted text (split with the rest of the expansion) and `["'", …]` Parts are quoted text (not split). `""` there gives `["'", '']`.
+- A here-document Word is expanded like a double-quoted string: no splitting, no patterns; its trailing newline is part of it. For `<<-` the tabs are already removed.
+- `$((…))` text may now contain assignments and positional parameters.
+- `set`, `shift`, `eval`, `.`, `trap`, `wait`, `umask`, `command`, `getopts`, `unset`, `return` are ordinary `argv` commands.
+
+## 5. Rules for the executor at run time
+
+- **A4:** something outside the subset that shows up only at run time (`eval` or `.` text the large grammar rejects; a command name from an expansion that names a builtin left to sh, as `f$*c` can become `fc`; a trap action from an expansion) writes `Proc::ShellSubset::Large: … is not supported` to standard error and ends with status 248, like `exit 248` at that point (the whole string, or the enclosing subshell, `$( … )`, background chain or pipeline element).
+- **Exit statuses of the module itself** (your decision on A4, 2026-11-02: "2 is too common"). Only one status is made up by the module; every other status is the one dash would give.
+
+| Status | Meaning |
+|---|---|
+| 248 | Something outside the subset showed up only at run time (A4). 248 = 250 − 2: sh's status for a syntax error, moved out of the range that commands commonly use. |
+
+- **Dialect choices.** Where dash and bash differ, A3 holds (reject at parse time; A5 at run time) until a choice is made on the page "Shell Dialect Choices" (items G1–G18, K1–K3, N1–N5, H1–H14).
+- **A5:** where dash and bash differ only at run time, do what dash does: `shift` past the end, `export`/`unset`/`local` of a bad name from an expansion, `local` outside a function reached through a dynamic name, and an assignment to a readonly variable stop the shell with status 2; `${x:?w}` stops with 2; `cd` with `HOME` unset stays and succeeds; `command -v` of an unknown name gives 127; `getopts` with grouped options sets `OPTIND` as dash does.
+- `eval` and `.` parse with `Proc::ShellSubset::Large::parse`; `.` searches only `PATH` for a name without `/`.
+- `$$` (F9) is the Perl process's ID when the string started, also in subshells; `kill … $$` is taken by the shell itself (its trap, or the status of a death by that signal).
+- `command -v` prints the name for `echo printf test [ kill true false pwd`, as both shells do, although they run as programs.
+- Patterns from expansions that could match `.` or `..` are expanded as dash does (U2 covers only written ones).
+
+## 6. Not done
+
+- The executor (`claude/pspawn-ShellSpawn.pm` with `claude/pspawn-ShellSpawn-Large.pm`) runs these trees since the evening of 2026-11-01. Differences from dash found by `claude/large-subset-difffuzz.pl`: `doc/large-subset/large-subset-upstream-reports.md`, L1–L5.
+- `verify.pl` (trees checked against the shells with recording programs) knows only `Proc::ShellSubset` trees.
+- `claude/ShellSubsetSmall.pm`: U1, U2, U4 and U5 were ported by the posix_spawn session (`claude/pspawn-small-u1-u5.patch`).
+
+## 7. Changes to lib/Proc/ShellSubset.pm (`claude/large-subset-shellsubset.patch`)
+
+Made against the project's `lib/Proc/ShellSubset.pm` with the P1 fix of 2026-11-01 (`claude/pspawn-parser-setting-name.patch`).
+- Its tables and regexes (`%KW %BI %SH $NM $END $B $BN %STOP $PIECE $ARITH`) become package variables (`our`), and `%EX` calls `dollar` and `bq` by name, so `Proc::ShellSubset::Large` can replace them for the time of its parse. No change in behaviour.
+- `claude/large-subset-forall.patch` (evening of 2026-11-01, applied the same evening): a package variable `$FORALL`, set by `Proc::ShellSubset::Large` only, lets `for NAME` without `in` through, as `for NAME in "$@"`. Without it set, nothing changes: 222/0, 612/0, and 0 of 1,185 strings differ from `Proc::ShellSubset::Small`.
+- U1–U5 (section 2), with tests OWN:208–222 in `shell-subset-tests.pl`; three corpus tests that relied on the old behaviour now expect rejection (NB:11515, NB:6367, BC:ch16/run_screen:48).
+- `claude/large-subset-d2-base.patch` (2026-11-02): the check for `break`/`continue` in a pipeline no longer reads the first word of a command that has none (a warning with redirections alone). No change in behaviour: 222/0, 612/0.
+
+## 8. Tests and measurements
+
+- `claude/large-subset-tests.pl`: 171 tests (LS:n), 23 of them compare the whole tree; `-s` also gives every accepted string to `dash -n` and `bash --posix -n`. 0 unexpected. `shell-subset-tests.pl`: 222, `shell-subset-corpus-tests.pl`: 612, both 0 unexpected with the patch.
+- `claude/large-subset-crosscheck.pl` runs the 834 strings of the two `Proc::ShellSubset` test files: 77 that `Proc::ShellSubset` rejects are accepted now; dash and bash accept the syntax of all 77.
+- A cold review by a separate agent (fuzzing about 170,000 strings, and checking findings in both shells) found 25 problems; all are fixed, with tests LS:150–182 and OWN:214–222, except the run-time differences of `getopts`, now under A5 (here-documents in `"$( … )"`, the other one kept at first, are accepted since 2026-11-02). Fuzzing again after the fixes: no crashes, no warnings, no accepted string whose syntax a shell rejects; the remaining differences in behaviour are run-time cases of A4 and A5.
+- Corpus acceptance and the POSIX ceiling, remeasured 2026-11-02 afternoon with D2, the tldr rules and ShellCheck (`shellcheck -s dash`) as the detector of bash-only constructs: see `doc/large-subset/large-subset-ceiling.md` (tldr 98.8% of 99.2%, NL2Bash 92.1% of 94.6%, Cookbook 30.9% of 37.0%, pure-sh-bible 95.5% of 100%, pure-bash-bible 39.3% of 44.3%, ShellCheck clean 58.6% of 67.3%, warned 56.7% of 62.4%). The figures of the morning, kept below for comparison, used the old regex ceiling.
+- Corpus acceptance (2026-11-02), whole samples (scripts whole), Proc::ShellSubset with all options → Proc::ShellSubset::Large, and the POSIX ceiling of the investigation: tldr 97.7% → 98.3% (98.8%); NL2Bash 89.5% → 92.1% (93.6%); bash Cookbook 14.8% → 30.9% (43.2%); pure-sh-bible 47.7% → 93.2% (93.2%); pure-bash-bible 28.7% → 38.5% (48.4%); ShellCheck clean 42.1% → 58.4% (69.4%), warned 45.6% → 56.5% (71.2%). What is still rejected within the ceiling is almost all deliberate: builtins left to sh (`alias`, `history`, `jobs`, `source`, `help`, `type`, …), tldr's placeholders (`<r>`, `...`), listing forms (`set`, `set -o`, `trap`), `$( … )` inside `$(( ))`, `cd -P`, `return` outside a function. Script: `claude/large-subset-remeasure.pl` (needs `large-scan.jsonl` from `claude/large-subset-scan.pl`).

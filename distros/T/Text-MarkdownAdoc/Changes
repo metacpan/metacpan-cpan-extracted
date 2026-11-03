@@ -1,4 +1,14 @@
 Revision history for Text::MarkdownAdoc
 
+0.1.1   2026-11-02
+        - Fix: square brackets that are not a link, an image or a defined
+          reference are now kept as literal text. anchor:X[X] and
+          "see [X] now" used to lose their brackets, so a document did
+          not survive a round trip through Text::AsciidocDown. The
+          unresolved forms [text], [text][] and [text][label] are
+          emitted as written.
+        - Fix: an undefined shorthand reference whose label contains a
+          colon no longer leaves a raw placeholder in the output.
+
 0.1.0   2026-07-07
         - First public release

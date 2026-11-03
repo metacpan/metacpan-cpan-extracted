@@ -9,14 +9,26 @@
 export function l_dir(dir: string): void;
 
 /**
- * Set the current language
+ * Set the current language. A colon-separated list is tried in order, and
+ * every entry also tries its language part: "de_AT:fr" looks in de_AT, de,
+ * fr, then in a bundle loaded without a language.
  */
 export function l_lang(lang: string): void;
 
 /**
- * Enable dry-run mode for string extraction
+ * Enable dry-run mode for string extraction: every translation returns its
+ * msgid (or the plural for n != 1), formatted with its arguments, and writes
+ * its block (`# domain:`, `msgctxt`, `msgid`, `msgid_plural`, escaped as in a
+ * .po file) in one console.debug call. A true noWrite keeps dry-run mode
+ * without the output.
  */
 export function l_dry(dry: boolean, noWrite?: boolean): void;
+
+/**
+ * Accepted for API symmetry with the siblings; a no-op in JavaScript,
+ * which has no locale directory
+ */
+export function l_nolocales(nolocales: boolean): void;
 
 /**
  * Set the current text domain
@@ -24,24 +36,53 @@ export function l_dry(dry: boolean, noWrite?: boolean): void;
 export function ltd(textdomain: string): void;
 
 /**
- * Load translation data for a domain
+ * A compiled plural rule: index of the plural form for n.
+ */
+export interface PluralRule {
+  nplurals: number;
+  evaluate(n: number): number;
+}
+
+/**
+ * Load translation data for a domain. `lang` is filed normalised
+ * ("pt-BR" → "pt_BR"); "" files a bundle that answers every language.
+ * `pluralForms` is the value of the Plural-Forms header
+ * (e.g. "nplurals=2; plural=n != 1;"); omitted means "n != 1".
  */
 export function loadTranslations(
   domain: string,
   lang: string,
-  data: Record<string, string | string[]>
+  data: Record<string, string | string[]>,
+  pluralForms?: string | PluralRule | null
 ): void;
 
 /**
- * Load translation data in po2json format (Gettext.js compatible)
+ * The header of a po2json bundle (key ""): the gettext header fields
+ * (`Language`, `Plural-Forms`, ...), optionally a `lang` field.
+ */
+export type Po2JsonHeader = Record<string, string>;
+
+/**
+ * A po2json entry: `[msgid_plural | null, msgstr, ...]`, or a plain msgstr.
+ */
+export type Po2JsonEntry = string | (string | null)[];
+
+/**
+ * One domain of po2json output: "" holds the header, every other key a msgid.
+ */
+export type Po2JsonDomain = Record<string, Po2JsonEntry | Po2JsonHeader>;
+
+/**
+ * Load translation data in po2json format (Gettext.js compatible). The bundle
+ * is filed under the header's `lang`, else its `Language`; "" when neither is set.
  */
 export function loadLocaleData(
   domain: string,
-  localeData: Record<string, Record<string, string | (string | null)[]>>
+  localeData: Record<string, Po2JsonDomain>
 ): void;
 
 /**
- * Translate a string
+ * Translate a string. An empty msgid returns an empty string without a lookup.
  */
 export function l(msgid: string, ...args: unknown[]): string;
 
@@ -141,6 +182,7 @@ declare const localeSimple: {
   l_dir: typeof l_dir;
   l_lang: typeof l_lang;
   l_dry: typeof l_dry;
+  l_nolocales: typeof l_nolocales;
   ltd: typeof ltd;
   loadTranslations: typeof loadTranslations;
   loadLocaleData: typeof loadLocaleData;

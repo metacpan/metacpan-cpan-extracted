@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/m
-## Version v1.11.0
+## SQL API Abstraction - ~/lib/m
+## Version v1.12.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/09/23
+## Modified 2026/09/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -36,7 +36,7 @@ BEGIN
     use Wanted;
     our $PLACEHOLDER_REGEXP = qr/(?<![?\w])\?(?![?\w])/;
     our $EXCEPTION_CLASS    = 'DB::Object::Exception';
-    our $VERSION = 'v1.11.0';
+    our $VERSION = 'v1.12.0';
 };
 
 use strict;
@@ -645,6 +645,36 @@ sub check_driver()
     return( $ok );
 }
 
+sub clone
+{
+    my $self = shift( @_ );
+    warn( "Cloning a database object is forbidden, because its connection cannot be cloned." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+    # There is no 'opt' method, so we get the value from the instance property.
+    my $opt = $self->{opt};
+
+    my $params = {};
+    my @core_params = qw( driver host port login passwd search_path );
+    my @opt_params  = qw( cache_dir cache_query cache_size cache_table debug enhance id
+        serialiser unknown_field use_bind use_cache
+    );
+    foreach my $k ( @opt_params, @opt_params )
+    {
+        my $ref = $self->can( $k );
+        if( defined( $ref ) )
+        {
+            my $v = $ref->( $self );
+            if( ref( $v ) && $self->_is_array( $v ) )
+            {
+                $v = undef if( !scalar( @$v ) );
+            }
+            $params->{ $k } = $v if( defined( $v ) );
+        }
+    }
+    my $new = $self->new( %$params ) ||
+        return( $self->pass_error );
+    return( $new );
+}
+
 sub connect
 {
     my $this  = shift( @_ );
@@ -784,10 +814,13 @@ sub connect
             $key eq 'database' ||
             $key eq 'db' ||
             $key eq 'host' ||
+            $key eq 'port' ||
             $key eq 'server' ||
             $key eq 'login' ||
             $key eq 'passwd' ||
             $key eq 'driver' ||
+            # Must be set once the connection is established.
+            $key eq 'search_path' ||
             $key eq 'use_bind' )
         {
             next;
@@ -798,6 +831,14 @@ sub connect
         }
     }
 
+    # We deal with it now, so it is taken out of the remaining parameters.
+    # Otherwise, it would be caught as a leftover parameter and trigger an error.
+    my $sp;
+    if( exists( $param->{search_path} ) &&
+        defined( $param->{search_path} ) )
+    {
+        $sp = CORE::delete( $param->{search_path} );
+    }
     $param = $self->_check_connect_param( $param ) || return( $this->pass_error( $self->error ) );
     my $opt = {};
     if( exists( $param->{opt} ) )
@@ -845,6 +886,20 @@ sub connect
     my $dbh = $self->_dbi_connect || return( $this->pass_error( $self->error ) );
     # This is possibly a Apache::DBI::db object
     $self->{dbh} = $dbh;
+    if( defined( $sp ) &&
+        # If the driver supports it
+        $self->can( 'search_path' ) )
+    {
+        $sp = $self->_is_array( $sp )
+            ? $sp
+            : length( $sp )
+                ? [$sp]
+                : [];
+        if( scalar( @$sp ) )
+        {
+            $self->search_path( $sp ) || return( $self->pass_error );
+        }
+    }
     #$self->param(
     #  ## Do not allow SELECT that will take too long or too much resource, i.e. over 2Gb of data
     #  ## This is idiot proof mode
@@ -2970,11 +3025,6 @@ sub _make_sth
     }
     $data->{dbh} = $self->{dbh};
     $data->{dbo} = $self->{dbo} ? $self->{dbo} : ref( $self ) eq $self->base_class ? $self : '';
-    # $data->{ 'binded' } = $self->{ 'binded' } if( $self->{ 'binded' } && ref( $self ) ne $base_class );
-    # In any case suppress the binded parameter from our parent object to avoid polluting the next queries
-    # If needed, the binded parameter will be rebuilt using the data stored in 'where', 'group', 'order' and 'limit'
-    # CORE::delete( $self->{ 'binded' } );
-    # Binded parameters are now either in the DB::Object::Query package or one of its descendant OR passed as arguments to execute
     $data->{errstr} = '';
     CORE::delete( $data->{executed} );
     $data->{query_time}      = time();
@@ -3204,9 +3254,10 @@ AUTOLOAD
         $class = substr( $meth, 0, $idx );
         $meth  = substr( $meth, $idx + 2 );
     }
-    my @supported_class = DB::Object->supported_class;
-    push( @supported_class, 'DB::Object' );
-    my $ok_classes = join( '|', @supported_class );
+    # Basically, same as the method base_class()
+    my @supported_classes = $self->supported_class;
+    push( @supported_classes, 'DB::Object' );
+    my $ok_classes = CORE::join( '|', CORE::map{ CORE::quotemeta( $_ ) } @supported_classes );
     my $base_class = ( $class =~ /^($ok_classes)/ )[0];
 
     # Is it a table object that is being requested?
@@ -4005,7 +4056,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.11.0
+    v1.12.0
 
 =head1 DESCRIPTION
 

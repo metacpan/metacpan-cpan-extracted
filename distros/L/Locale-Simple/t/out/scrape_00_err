@@ -361,12 +361,12 @@ pl => /lib/Locale/Simple.pm
 - discarded COUNT characters of noise
 - found func lnp at line LINE
 - Expected "(":
- |C<lnp>, C<ldnp>) that are API-compatible with the matching Python package
+ |C<lnp>, C<ldnp>). The same helpers ship for Python, JavaScript, PHP, Go and
  |-----^
 - discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected "(":
- |C<lnp>, C<ldnp>) that are API-compatible with the matching Python package
+ |C<lnp>, C<ldnp>). The same helpers ship for Python, JavaScript, PHP, Go and
  |--------------^
 - discarded COUNT characters of noise
 - found func l at line LINE
@@ -537,8 +537,12 @@ pl => /lib/Locale/Simple.pm
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
- |entries identical to their C<l*()> twins. Templates (C<.tx>) are not
- |------------------------------^
+ |identical to their C<l*()> twins. It finds them in Xslate templates
+ |----------------------^
+- discarded COUNT characters of noise
+pl => /lib/Locale/Simple/CLI.pm
+- discarded COUNT characters of noise
+pl => /lib/Locale/Simple/PO2JSON.pm
 - discarded COUNT characters of noise
 pl => /lib/Locale/Simple/Scraper.pm
 - discarded COUNT characters of noise
@@ -629,8 +633,8 @@ pl => /lib/Locale/Simple/Scraper.pm
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
- |        return if -l $file and not -e readlink( $file );
- |--------------------^
+ |        next if -l $file and not -e $file;
+ |------------------^
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected translation token:
@@ -716,8 +720,18 @@ pl => /lib/Locale/Simple/Scraper/Parser.pm
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected translation token:
- |has func_qr => ( is => 'ro', default => sub { qr/\b(?:l(?:|n|p|np|d|dp|dn|dnp)\b|N(?:|n|p|np|d|dp|dn|dnp)_)/ } );
- |--------------------------------------------------------^
+ |    return qr/\b(?:l(?:|n|p|np|d|dp|dn|dnp)!|n(?:|n|p|np|d|dp|dn|dnp)_!)/ if $self->type eq "rs";
+ |---------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |    return qr/\b(?:l(?:|n|p|np|d|dp|dn|dnp)\b|N(?:|n|p|np|d|dp|dn|dnp)_)/;
+ |---------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |    $func =~ s/^L/l/ if $self->type eq "go";
+ |-------------------^
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
@@ -842,6 +856,32 @@ pl => /t/20-locale-simple.t
 - found func lp at line LINE
 - found 2 arguments
 - discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |    l(''),
+ |------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 4 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
 pl => /t/21-dryrun.t
 - discarded COUNT characters of noise
 - found func l at line LINE
@@ -859,6 +899,55 @@ pl => /t/21-dryrun.t
 - found func ln at line LINE
 - found 4 arguments
 - discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |        l(''),
+ |----------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 4 arguments
+- discarded COUNT characters of noise
+- found func ldnp at line LINE
+- found 5 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- Expected domain id:
+ |      '-e', 'l_dry(shift); ld(q(othertest),q(Hello))', $crlf ) == 0
+ |------------------------------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
 pl => /t/22-locale-simple-simplenumber.t
 - discarded COUNT characters of noise
 - found func ln at line LINE
@@ -866,6 +955,26 @@ pl => /t/22-locale-simple-simplenumber.t
 - discarded COUNT characters of noise
 - found func ln at line LINE
 - found 3 arguments
+- discarded COUNT characters of noise
+pl => /t/23-locale-simple-c-locale.t
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+pl => /t/24-l-lang-without-lc-messages.t
+- discarded COUNT characters of noise
+pl => /t/25-sprintf.t
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |my $translate = \&l;
+ |-------------------^
 - discarded COUNT characters of noise
 pl => /t/30-locale-simple-other.t
 - discarded COUNT characters of noise
@@ -877,6 +986,29 @@ pl => /t/30-locale-simple-other.t
 - discarded COUNT characters of noise
 - found func l at line LINE
 - found 1 arguments
+- discarded COUNT characters of noise
+pl => /t/31-locale-simple-domain-binding.t
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ldn at line LINE
+- found 4 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
 - discarded COUNT characters of noise
 pl => /t/40-error.t
 - discarded COUNT characters of noise
@@ -891,14 +1023,17 @@ pl => /t/40-error.t
 - found func l at line LINE
 - found 1 arguments
 - discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
 pl => /t/50-scrape.t
 - discarded COUNT characters of noise
 pl => /t/51-scrape-N.t
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
- |# For each (Perl, JS, Python) fixture pair — an l*-call file and its
- |---------------------------------------------------^
+ |# For each language's fixture pair — an l*-call file and its
+ |-------------------------------------------^
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
@@ -909,6 +1044,14 @@ pl => /t/51-scrape-N.t
 - Expected "(":
  |    is( $n_out, $l_out, "$lang: N*_ markers produce same .pot as l*()" );
  |------------------------------------------------------------------^
+- discarded COUNT characters of noise
+pl => /t/52-scrape-args.t
+- discarded COUNT characters of noise
+pl => /t/53-scrape-files.t
+- discarded COUNT characters of noise
+pl => /t/54-scrape-escapes.t
+- discarded COUNT characters of noise
+pl => /t/55-scrape-literals.t
 - discarded COUNT characters of noise
 pl => /t/60-N-markers.t
 - discarded COUNT characters of noise
@@ -1064,6 +1207,48 @@ pl => /t/60-N-markers.t
  |is( ln(@plur, 5), "5 items",  "Nn_ result flows through ln() plural" );
  |-----------------------------------------------------------^
 - discarded COUNT characters of noise
+pl => /t/71-cli.t
+- discarded COUNT characters of noise
+pl => /t/72-release-pypi.t
+- discarded COUNT characters of noise
+pl => /t/73-scrape-smoke.t
+- discarded COUNT characters of noise
+go => /t/data/dummy.go
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+php => /t/data/dummy.php
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |echo l("PHP interpolated $name here");
+ |-------^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
 pl => /t/data/dummy.pl
 - found func l at line LINE
 - found 1 arguments
@@ -1108,6 +1293,29 @@ pl => /t/data/dummy.pl
 - discarded COUNT characters of noise
 - found func l at line LINE
 - found 1 arguments
+rs => /t/data/dummy.rs
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
 tx => /t/data/dummy.tx
 - discarded COUNT characters of noise
 - found func l at line LINE

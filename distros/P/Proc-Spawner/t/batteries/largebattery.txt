@@ -1,0 +1,114 @@
+f() { echo "in:$x"; }; x=1 f; echo "out:[$x]"
+x=1 :; echo "[$x]"
+x=1 true; echo "[$x]"
+f() { return 3; }; f; echo $?
+f() { echo $1 $#; }; f a b; echo $1 $#
+f() { local x=2; echo $x; }; x=1; f; echo $x
+f() { for a; do echo "[$a]"; done; }; f "a b" "" c
+f() { echo "${*}|$@|$#"; }; f "a b" "" c
+f() { if [ "$1" -gt 0 ]; then echo $1; f $(($1 - 1)); fi; }; f 3
+f() { while :; do return 4; done; }; f; echo $?
+f() { echo x >&2; } 2>/dev/null; f; echo done
+g() { echo g; }; f() { g; g() { echo new; }; g; }; f; g
+unset -f nosuch; f() { :; }; unset -f f; f; echo $?
+set -e; false; echo no
+set -e; if false; then :; fi; false || true; ! true; echo yes
+set -e; f() { false; echo inf; }; f || echo caught
+set -e; x=$(false); echo no
+set -e; (false); echo no
+readonly x=1; x=2; echo after
+readonly x=1; unset x; echo after $?
+readonly x=1; echo $((x=2)); echo after
+shift 5; echo after
+set -- a b c; echo $# "$@"; shift; echo "$*"; shift 2; echo "[$*]" $#
+set -- "a b" c; echo "[${1}]" "[$*]"; IFS=:; echo "$*"
+set -- a b; set --; echo $#
+set -u; echo $nope; echo after
+set -u; echo ${nope-ok} ${nope:+no}; echo after
+set -f; echo /*; set +f; echo /bi*
+set -o noglob; echo /*
+set -a; x=1; sh -c 'echo $x'
+set -C; rm -f /tmp/nc1; echo a >/tmp/nc1; echo b >/tmp/nc1; echo $?; echo c >|/tmp/nc1; cat /tmp/nc1; rm -f /tmp/nc1
+x=; echo ${x:=d} ${y=e} $x $y
+echo ${nope?gone}; echo after
+echo ${x:?}
+x=; echo ${x:?}
+echo ${x:?oops here}
+v=abcabc; echo ${v%b*} ${v%%b*} ${v#*b} ${v##*b} ${#v}
+v=/usr/local/lib.so; echo ${v##*/} ${v%.*} ${v%/*}
+v='a*b'; echo ${v%'*b'} ${v#"a"}
+set -- one two; echo ${1%e} ${2#t} ${#1}
+echo ${x:-a  b} "${x:-a  b}" ${x:-"a  b"}
+echo $((x=3+4)) $x $((x+=1)) $((x*=2)) $((x<<=1)) $x
+set -- 5 6; echo $(($1 * $2)) $(($# + 1))
+echo $(( y = 2, 3 ))
+umask; umask 027; umask
+umask 077; rm -f /tmp/um1; : > /tmp/um1; ls -l /tmp/um1 | cut -c1-10; rm -f /tmp/um1
+eval "x=5; echo \$x"; echo $x
+eval 'f() { echo ev; }'; f
+printf 'echo dot $x\n' > /tmp/d.sh; x=9; . /tmp/d.sh; echo $?; rm -f /tmp/d.sh
+. /tmp/nosuch-dot.sh; echo after
+cat <<E@Na $HOME@NE
+cat <<-E@N@Ttab@N@TE
+cat <<'E'@N$HOME@NE
+cat <<E; echo after@Nbody@NE
+x=1; cat <<E | tr a-z A-Z@Nx=$x $(echo sub)@NE
+read a b <<E; echo "[$a][$b]"@N1 2 3@NE
+while read l; do echo "<$l>"; done <<E@Nx@Ny@NE
+command -v cd; command -v nosuchcmd; echo $?
+command -v f; f() { :; }; command -v f; command -v echo; command -v ls
+f() { echo func; }; command echo plain; f
+cd /tmp; cd /; cd -; echo $OLDPWD
+exec 3>/tmp/x3; echo hi >&3; cat /tmp/x3; rm -f /tmp/x3
+exec 2>/dev/null; ls /nonexistent; echo st=$?
+(exec echo in sub; echo not); echo out
+exec echo bye; echo never
+x=1 export y=2; echo $x $y; sh -c 'echo $y'
+export z=3; sh -c 'echo $z'
+x=4; export x; sh -c 'echo $x'
+trap "echo T" EXIT; echo a
+(trap "echo S" EXIT; echo in); echo out
+trap "echo T" EXIT; exit 3
+trap 'echo T; exit 5' EXIT; echo a
+trap "echo got" USR1; kill -USR1 $$; echo after
+trap "" USR1; kill -USR1 $$; echo after
+kill -TERM $$; echo after
+trap - EXIT; trap "echo x" 0; trap - 0; echo a
+wait; echo st $?
+sleep 0.2 & wait $!; echo $?
+sleep 0.1 & sleep 0.2 & wait; echo all
+while getopts ab:c o -ac -b x -c y; do echo "$o ${OPTARG-u} $OPTIND"; done; echo "end $OPTIND"
+getopts a o -x; echo "$o ${OPTARG-u} $?"
+getopts :a o -x; echo "$o ${OPTARG-u} $?"
+getopts :b: o -b; echo "$o ${OPTARG-u} $?"
+getopts b: o -b; echo "$o ${OPTARG-u} $?"
+getopts b: o -bval; echo "$o $OPTARG $OPTIND"
+set -- -a z; getopts a o; echo $o $OPTIND; getopts a o; echo $? $o $OPTIND
+x=echo; $x hi; c='echo  two'; $c words
+x=ali; ${x}as ll=ls 2>&1; echo $?
+x=; $x >/tmp/rv2-e; ls /tmp/rv2-e; rm -f /tmp/rv2-e
+echo $0 $# "[$*]"
+echo $$ | tr 0-9 N
+(echo $$) | tr 0-9 N
+for i in "$@"; do echo "<$i>"; done; echo end
+set --; echo "[$@]" "$@" x
+x=a:b; IFS=:; for i in $x; do echo $i; done
+IFS=; x="a b"; set -- $x; echo $#
+x=":a::b:"; IFS=:; set -- $x; echo $# "[$1]" "[$3]"
+x=" a  b "; set -- $x; echo $#
+echo "$OPTIND"
+set -u; echo ${x%a}; echo after
+{ trap "echo T" EXIT; true; } & wait
+(trap "echo T" EXIT; sleep 0) | cat
+f() { for a; do echo "[$a]"; done; }; f "a b" "" c
+trap "echo int" INT; (kill -INT $$); echo after
+trap "echo int" INT; kill -INT $$ | cat; echo after
+trap "echo int" INT; x=$(kill -INT $$); echo after
+trap "" INT; (kill -INT $$); echo after
+while getopts ab: o -a -b v; do :; done; getopts ab: o -b v; echo $? $o $OPTIND
+getopts ab: o -b v; getopts ab: o -b v; echo "[$o] [$OPTARG] $OPTIND"
+getopts :a o -x; echo "[$o] [$OPTARG]"; getopts a o -x; echo "[$o] [${OPTARG-unset}]"
+x=$(head -c 10000000 /dev/zero & umask; wait); echo ${#x}
+x=$(printf "a\0b\n\0\n"); echo ${#x}
+x=1 y=2 2>f >&2; echo "$x $y"; cat f
+x=1 > /nonexist/f; echo "$? [$x]"

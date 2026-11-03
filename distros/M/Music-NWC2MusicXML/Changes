@@ -1,5 +1,19 @@
 Revision history for Music-NWC2MusicXML
 
+0.002.3	Mon Nov  2 02:09:55 PM EST 2026
+	[ Bug Fixes ]
+	- Parser/MusicXML: Tempo records with an optional Text field (e.g.
+	  Text:"With Expression") were silently discarded.  The text is now stored
+	  in the Tempo event and emitted as a <words font-style="italic"> direction
+	  in the same <direction> block as the metronome mark.  When text is
+	  present the metronome element uses parentheses="yes" so renderers display
+	  the marking as e.g. "With Expression (crotchet = 92)".
+	- MusicXML: TempoVariance style Ritenuto was emitted verbatim as "Ritenuto"
+	  instead of the standard abbreviation "rit.".
+	- t/edge_cases.t: permission-check subtest now skips on Cygwin where
+	  chmod 0000 does not restrict file reads due to Windows ACL mapping.
+	  fixes https://matrix.perl-magpie.org/results/b4259172-d4a0-11f1-b947-97e253e5423d
+
 0.002.2	Fri Oct 30 04:14:18 PM EDT 2026
 	[ Bug Fixes ]
 	- Parser: NWCTXT files produced by some NWC versions spell the hairpin

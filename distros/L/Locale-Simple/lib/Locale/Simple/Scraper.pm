@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Locale::Simple::Scraper;
-our $VERSION = '0.109';
+our $VERSION = '0.200';
 # ABSTRACT: scraper to find translation tokens in a directory
 
 use Exporter 'import';
@@ -15,56 +15,86 @@ use Locale::Simple::Scraper::Parser;
 
 our @EXPORT = qw(scrape);
 
+my %OUTPUT_FORMATS = map { $_ => 1 } qw( po perl json yaml );
+
+my $USAGE = <<'END';
+Usage: locale-simple scrape [OPTIONS]
+
+Walks the current directory and writes a .pot template to STDOUT; progress and
+parse problems go to STDERR.
+
+Options:
+  --js EXT --pl EXT --py EXT --php EXT --go EXT --rs EXT --tx EXT
+                     extra file extensions for a language, comma-separated,
+                     repeatable (defaults: js; pl pm t; py; php; go; rs; tx)
+  --ignore REGEX     skip files whose path matches, repeatable
+  --only REGEX       read only files whose path matches, repeatable
+  --output FORMAT    po (default), perl, json or yaml (yaml needs the YAML module)
+  --md5              write MD5 hashes of the file names
+  --no_line_numbers  leave out the #: location comments
+  -h, --help         show this text
+END
+
+sub usage { return $USAGE }
+
+sub _bad_call {
+    my ($message) = @_;
+    $message .= "\n" unless $message =~ /\n\z/;
+    die bless { message => $message }, 'Locale::Simple::Scraper::BadCall';
+}
+
 sub scrape {
     @ARGV = @_;
 
     $| = 1;
 
-    # Supported filetypes:
-    my $js_ext = "";    # Javascript
-    my $pl_ext = "";    # Perl
-    my $py_ext = "";    # Python
-    my $tx_ext = "";    # Text::Xslate (Kolon or Metakolon)
+    # Supported filetypes and the extensions read as them. --js, --pl, ...
+    # add more: repeatable, each a comma-separated list.
+    my %defaults = (
+        js  => ['js'],                 # Javascript
+        pl  => [ 'pl', 'pm', 't' ],    # Perl
+        tx  => ['tx'],                 # Text::Xslate (Kolon or Metakolon)
+        py  => ['py'],                 # Python
+        php => ['php'],                # PHP
+        go  => ['go'],                 # Go
+        rs  => ['rs'],                 # Rust
+    );
+    my @types = qw( js pl tx py php go rs );
+    my %extra = map { $_ => [] } @types;
 
     my @ignores;
     my @only;
 
     my $output = 'po';
-    my ($md5, $no_line_numbers);
+    my ($md5, $no_line_numbers, $help);
 
-    GetOptions(
-        "js=s"            => \$js_ext,
-        "pl=s"            => \$pl_ext,
-        "py=s"            => \$py_ext,
-        "tx=s"            => \$tx_ext,
-        "ignore=s"        => \@ignores,
-        "only=s"          => \@only,
-        "output=s"        => \$output,
-        "md5"             => \$md5,
-        "no_line_numbers" => \$no_line_numbers,
-    );
-
-    # could add Getopt::Long here for override
-
-    my @js = split( ",", $js_ext );
-    push @js, 'js';
-
-    my @pl = split( ",", $pl_ext );
-    push @pl, 'pl', 'pm', 't';
-
-    my @tx = split( ",", $tx_ext );
-    push @tx, 'tx';
-
-    my @py = split( ",", $py_ext );
-    push @py, 'py';
+    my @problems;
+    my $parsed = do {
+        local $SIG{__WARN__} = sub { push @problems, @_ };
+        GetOptions(
+            ( map { ( "$_=s" => $extra{$_} ) } @types ),
+            "ignore=s"        => \@ignores,
+            "only=s"          => \@only,
+            "output=s"        => \$output,
+            "md5"             => \$md5,
+            "no_line_numbers" => \$no_line_numbers,
+            "help|h"          => \$help,
+        );
+    };
+    _bad_call( join '', @problems ) unless $parsed;
+    if ($help) {
+        print STDOUT $USAGE;
+        return;
+    }
+    _bad_call("Unexpected argument: $ARGV[0]") if @ARGV;
+    _bad_call("Unknown output format: $output (use po, perl, json or yaml)")
+      unless $OUTPUT_FORMATS{$output};
 
     # extension list
-    my %e = (
-        ( map { $_ => 'js' } @js ),
-        ( map { $_ => 'pl' } @pl ),
-        ( map { $_ => 'tx' } @tx ),
-        ( map { $_ => 'py' } @py ),
-    );
+    my %e;
+    for my $type ( @types ) {
+        $e{$_} = $type for ( map { split /,/ } @{ $extra{$type} } ), @{ $defaults{$type} };
+    }
 
     # functions with count of locale simple with function of parameter
     #
@@ -98,13 +128,12 @@ sub scrape {
 
     my %files;
 
-    my $dir    = getcwd;
-    my $re_dir = $dir;
-    $re_dir =~ s/\./\\./g;
+    my $dir = getcwd;
 
     finddepth(
         sub {
-            my $filename        = $File::Find::name;
+            my $filename = $File::Find::name;
+            $filename =~ s/^\Q$dir\E\///;
             my $stored_filename = $filename;
             if ( $md5 ) {
                 eval {
@@ -114,7 +143,6 @@ sub scrape {
                 die "This feature requires Digest::MD5" if $@;
                 $stored_filename = md5_hex( $filename );
             }
-            $filename =~ s/^$dir\///g;
             for ( @ignores ) {
                 return if $filename =~ /$_/;
             }
@@ -137,7 +165,7 @@ sub scrape {
         my ( $ext, $filename, $stored_filename ) = @{ $files{$file} };
         my $type = $e{$ext};
         print STDERR $type . " => " . $file . "\n";
-        return if -l $file and not -e readlink( $file );
+        next if -l $file and not -e $file;
         my $parses = Locale::Simple::Scraper::Parser->new( type => $type )->from_file( $file );
         my @file_things = map {
             {
@@ -178,25 +206,16 @@ sub scrape {
         }
     }
     elsif ( $output eq 'perl' ) {
+        local $Data::Dumper::Sortkeys = 1;
         print Dumper \@found;
     }
     elsif ( $output eq 'json' ) {
-        eval {
-            require JSON;
-            JSON->import;
-            print encode_json( \@found );
-        } or do {
-            die "You require the module JSON for this output";
-        };
+        require JSON::PP;
+        print JSON::PP->new->canonical->encode( \@found );
     }
     elsif ( $output eq 'yaml' ) {
-        eval {
-            require YAML;
-            YAML->import;
-            print Dump( \@found );
-        } or do {
-            die "You require the module YAML for this output";
-        };
+        eval { require YAML; 1 } or die "--output yaml needs the YAML module\n";
+        print YAML::Dump( \@found );
     }
 }
 
@@ -301,7 +320,7 @@ Locale::Simple::Scraper - scraper to find translation tokens in a directory
 
 =head1 VERSION
 
-version 0.109
+version 0.200
 
 =head1 SYNOPSIS
 
@@ -322,7 +341,7 @@ C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
 it can resolve statically, and writes a C<.pot> (gettext template) or one
 of a few alternative output formats.
 
-Usually invoked through C<bin/locale_simple_scraper>; the C<scrape>
+Usually invoked through C<locale-simple scrape>; the C<scrape>
 function is exported so build tools can drive it directly.
 
 =head1 EXPORTED FUNCTIONS
@@ -331,16 +350,25 @@ function is exported so build tools can drive it directly.
 
 Run the scraper. C<@argv> is parsed with L<Getopt::Long>. Reads files
 from the current working directory recursively and prints to STDOUT.
+C<--help> prints the options and returns. A bad call (unknown option,
+unexpected argument, unknown C<--output> format) dies with a
+C<Locale::Simple::Scraper::BadCall> object whose C<message> field holds the
+reason, before anything is written.
+
+=head2 usage()
+
+Returns the text of the options, as C<locale-simple scrape --help> prints it.
 
 =head1 OPTIONS
 
 =over 4
 
-=item C<--js=EXT>, C<--pl=EXT>, C<--py=EXT>, C<--tx=EXT>
+=item C<--js=EXT>, C<--pl=EXT>, C<--py=EXT>, C<--php=EXT>, C<--go=EXT>, C<--rs=EXT>, C<--tx=EXT>
 
 Comma-separated list of extra file extensions to recognise as the given
-language. The built-in defaults (C<.js>; C<.pl>/C<.pm>/C<.t>; C<.py>;
-C<.tx>) are always included.
+language. Repeatable; the lists add up. The built-in defaults (C<.js>;
+C<.pl>/C<.pm>/C<.t>; C<.py>; C<.tx>; C<.php>; C<.go>; C<.rs>) are always
+included.
 
 =item C<--ignore=REGEX>
 
@@ -353,8 +381,9 @@ Repeatable; combines with C<--ignore>.
 
 =item C<--output=FORMAT>
 
-Output format — C<po> (default), C<perl> (L<Data::Dumper>),
-C<json> (requires L<JSON>) or C<yaml> (requires L<YAML>).
+Output format — C<po> (default), C<perl> (L<Data::Dumper>, keys sorted),
+C<json> (through L<JSON::PP>, keys sorted) or C<yaml> (needs the optional
+L<YAML> module).
 
 =item C<--md5>
 
@@ -381,8 +410,48 @@ Recognised call shapes (identical across Perl, Python and JavaScript):
   ldnp( domain, msgctxt, msgid, msgid_plural, n, ... )
 
 Strings must be statically resolvable — literal strings and static
-concatenation (C<"a" . "b"> in Perl/Python, C<"a" + "b"> in JS,
-C<"a" ~ "b"> in Xslate Kolon). Runtime interpolation is not extracted;
+concatenation (C<"a" . "b"> in Perl/PHP, C<"a" + "b"> in JS/Python,
+C<"a" ~ "b"> in Xslate Kolon). PHP also reads heredoc and nowdoc literals;
+calls qualified with the PHP namespace are found as well.
+
+Escapes are read the way the language reads them, so the msgid is the text
+the program sees: C<"Line\n"> gives a msgid ending in a newline, which the
+C<.pot> writes as C<\n>. Single quotes in Perl, Xslate and PHP know only
+C<\\> and C<\'>. A character named by its code point is stored as UTF-8. A
+literal with an escape the language rejects is skipped, and so is a Perl
+literal with a case change such as C<\U>.
+
+A literal that interpolates is not constant either. In Perl double quotes
+every C<$> is a variable (C<$name>, C<$1>, C<$::name>, C<${...}>, C<$%> as in
+C<"$%.2f">, C<$ total> after a space; a final C<$> does not compile), and so
+is an C<@> before a name, C<::>, C<'>, C<$>, C<+>, C<->, a digit or C<{>.
+PHP double quotes and heredocs interpolate C<$name>, C<{$...}> and
+C<${...}>. An escaped C<\$> or C<\@> is text. Python reads plain, raw (C<r"...">) and C<u"..."> strings in single or
+triple quotes, raw ones keeping their backslashes, and joins adjacent
+literals (C<"a" "b">); f-strings and bytes are not msgids. A JavaScript
+template literal is a msgid while it holds no C<${...}>. A call with a
+string that is not constant is skipped and reported on STDERR; the calls in
+its arguments are still extracted.
+
+That holds for the msgid, the plural msgid, the context and the domain. The
+count and the arguments after them can be any code, such as C<$name>,
+C<< $obj->count >>, C<count($items)>, C<items.len()> or C<n as i64>. Such an
+argument ends at the comma or closing bracket outside any string literal or
+bracket pair, and the translation calls inside it are extracted as well.
+
+Go exports its helpers capitalised: C<L>, C<Ln>, C<Lp>, C<Lnp>, C<Ld>, C<Ldn>,
+C<Ldp>, C<Ldnp> (the deferred markers keep their names). They are found with any
+package prefix or bare after a dot import; strings are C<"..."> and backtick
+raw strings, never C<'...'> (a rune in Go). The argument shapes are those
+above.
+
+Rust calls are macros: the names carry a bang and the deferred markers are
+lower case (C<n_!>, C<nn_!>, C<np_!>, C<nnp_!>, C<nd_!>, C<ndn_!>, C<ndp_!>,
+C<ndnp_!>), a path before the macro is fine. Only the round brackets are read
+as the argument list, not C<{}> or C<[]>. Strings are C<"..."> and raw strings
+with any number of hashes; there is no concatenation operator and no
+C<'...'> (chars and lifetimes). Comments are not skipped, as in every other
+language, so a commented-out call is extracted. Runtime interpolation is not extracted;
 keep msgids constant and pass dynamic data as sprintf arguments.
 
 =head1 SEE ALSO
@@ -393,7 +462,7 @@ L<Locale::Simple>, L<Locale::Simple::Scraper::Parser>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/locale-simple/issues>.
 
 =head1 CONTRIBUTING

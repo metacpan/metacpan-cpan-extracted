@@ -76,11 +76,46 @@ is($conv->convert("<https://example.com>"), "https://example.com\n", 'bare URL a
     is($conv->convert($input), $expected, 'reference-style empty label');
 }
 
-# --- unresolved reference-style link (literal fallback) ---
+# --- unresolved reference-style link (literal fallback keeps the brackets) ---
 {
     my $input = "[missing][nope]\n";
-    my $expected = "missing\n";
+    my $expected = "[missing][nope]\n";
     is($conv->convert($input), $expected, 'unresolved reference link fallback');
+}
+
+# --- brackets without a definition are literal text ---
+is($conv->convert("anchor:ErrorMessage[ErrorMessage]"),
+   "anchor:ErrorMessage[ErrorMessage]\n", 'anchor macro keeps its brackets');
+is($conv->convert("see [ErrorMessage] now"),
+   "see [ErrorMessage] now\n", 'undefined shorthand reference keeps its brackets');
+is($conv->convert("see [text][] now"),
+   "see [text][] now\n", 'undefined collapsed reference keeps its brackets');
+is($conv->convert("a [x:y] b"),
+   "a [x:y] b\n", 'undefined shorthand reference with a colon keeps its brackets');
+
+# --- link, defined reference and image next to undefined brackets ---
+is($conv->convert("[a](http://x.example) and [b]"),
+   "http://x.example[a] and [b]\n", 'inline link converted, undefined [b] kept');
+{
+    my $input = "see [ref] and [other]\n\n[ref]: https://example.com\n";
+    is($conv->convert($input),
+       "see https://example.com[ref] and [other]\n", 'defined reference still a link');
+}
+is($conv->convert("![logo](img/logo.png) [x]"),
+   "image:img/logo.png[logo] [x]\n", 'image unchanged next to undefined brackets');
+
+# --- round trip through Text::AsciidocDown (when installed) ---
+SKIP: {
+    my $have = eval { require Text::AsciidocDown; 1 };
+    skip 'Text::AsciidocDown not installed', 2 unless $have;
+
+    my $down = Text::AsciidocDown->new;
+    for my $adoc ("anchor:ErrorMessage[ErrorMessage]\n", "see [ErrorMessage] now\n")
+    {
+        my $md = $down->convert($adoc);
+        $md .= "\n" unless $md =~ /\n\z/;
+        is($conv->convert($md), $adoc, "round trip keeps brackets: $adoc");
+    }
 }
 
 # --- inline image ![alt](src) ---

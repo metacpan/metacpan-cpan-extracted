@@ -1,5 +1,21 @@
 Revision history for Perl module DB::Object
 
+v1.12.0 2026-11-03T11:45:02+0900
+    - Improved DB::Object::Tables, and other modules in their access of the database object.
+    - Fixed `DB::Object::Query::format_statement()` and `DB::Object::Postgres::Query::format_statement()` to properly handle `DB::Object::Statement` objects supplied as column values in `INSERT` queries.
+    - Use the statement's SQL representation as the element's format rather than its value.
+    - Preserve the nested statement's elements for parameter binding.
+    - This enables constructs such as `INSERT INTO ... VALUES (?, (SELECT ...), ...)` with correctly positioned placeholders.
+
+v1.11.1 2026-09-25T20:24:05+0900
+    - Corrected 'port' parameter not properly handled in connect() method in DB::Object.
+    - Corrected method 'table_exists' in DB::Object::Postgres.
+    - Improvement in handling serialisation of table objects, and deserialised objects in
+      general.
+    - Added method clone() to DB::Object, DB::Object::Query and DB::Object::Statement to
+      carefully avoid cloning database connection handles.
+    - Added support for 'search_path' parameter.s
+
 v1.11.0 2026-09-23T09:15:18+0900
     - Improved modules inheritance
     - Improved documentation

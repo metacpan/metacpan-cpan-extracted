@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print STDERR qq{graid: Class 'RAID' not found.\n}; exit 1;

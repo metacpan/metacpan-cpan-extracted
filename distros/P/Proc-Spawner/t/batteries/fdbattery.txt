@@ -1,0 +1,14 @@
+./fds
+./fds | cat
+echo x | ./fds | cat
+./fds 3>/tmp/pspawn-f3 4</dev/null; rm -f /tmp/pspawn-f3
+{ ./fds; ./fds 2>&1; } 2>/dev/null | cat
+{ echo a; ./fds; } >/tmp/pspawn-g; cat /tmp/pspawn-g; rm /tmp/pspawn-g
+(./fds) | cat
+echo $(./fds)
+./fds & sleep 0.2
+for i in 1 2; do ./fds; done </dev/null | cat
+{ false || ./fds; } | cat
+./fds 2>&1 >/dev/null | cat
+./fds 3>&1 1>&2 2>&3 3>&- 2>/dev/null
+while read x; do ./fds; done </etc/hostname

@@ -1,0 +1,18 @@
+[package]
+name = "locale-simple"
+version = "0.200.0"
+edition = "2021"
+rust-version = "1.67"
+license = "MIT"
+description = "Gettext-style translation helpers (l!, ln!, lp!, ld!, ...) with sprintf formatting and an own .mo reader. Same API as the Perl, Python, JavaScript, PHP and Go siblings."
+repository = "https://github.com/Getty/locale-simple"
+homepage = "https://github.com/Getty/locale-simple"
+readme = "README.md"
+keywords = ["gettext", "i18n", "l10n", "translation", "po"]
+categories = ["localization", "internationalization"]
+exclude = ["tests/"]
+
+[dependencies]
+
+[dev-dependencies]
+serde_json = "1"

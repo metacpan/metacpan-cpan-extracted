@@ -1,0 +1,6 @@
+# { false || cat /etc/hostname; } | wc -l >/dev/null      while false runs
+pipe a r:forgotten
+file null > /dev/null
+P1: false | 1>a.w+ 2>@2 | running
+P2: cat /etc/hostname | 1>a.w 2>@2 | after P1 fail
+P3: wc -l | 0<a.r 1>null 2>@2 | running

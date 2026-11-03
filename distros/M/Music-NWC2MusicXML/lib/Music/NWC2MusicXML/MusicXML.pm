@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.1';
+our $VERSION = '0.002.3';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -163,7 +163,7 @@ Music::NWC2MusicXML::MusicXML - Convert an internal Score object to a MusicXML 4
 
 =head1 VERSION
 
-0.001.2
+0.002.3
 
 =head1 SYNOPSIS
 
@@ -289,12 +289,27 @@ carrying a hairpin flag starts the arc; the first event that drops the flag
 closes it.  The wedge stop is emitted as a C<crescOff> direction immediately
 after the last note of the arc.
 
+=head2 Tempo marks
+
+A C<Tempo> event carries three data keys: C<bpm> (integer BPM), C<base> (NWC
+beat-unit string such as C<'Quarter'> or C<'Dotted Half'>), and C<text>
+(optional free-text string from the NWC C<Text:> field, e.g.
+C<'With Expression'>; empty string when absent).
+
+When C<text> is non-empty, C<_emit_tempo> emits it as a
+C<< <words font-style="italic"> >> C<< <direction-type> >> block before the
+C<< <metronome> >> block, both within the same C<< <direction> >> element.
+The metronome element uses C<parentheses="yes"> in this case so renderers
+display the marking as e.g. I<With Expression (crotchet = 92)>.  When C<text>
+is empty only the metronome block is emitted and C<parentheses="no"> is used.
+
 =head2 Tempo variance
 
-Markings such as C<Accelerando>, C<Ritardando>, C<Rallentando>, and
-C<RitardandoToTempo> (rendered as "a tempo") are stored as C<TempoVariance>
-events by the parser.  The generator converts them to italic
+Markings such as C<Accelerando>, C<Ritardando>, C<Ritenuto>, C<Rallentando>,
+and C<RitardandoToTempo> (rendered as "a tempo") are stored as
+C<TempoVariance> events by the parser.  The generator converts them to italic
 C<< <words> >> direction elements using the C<%TEMPO_VARIANCE_TEXT> table.
+Both C<Ritardando> and C<Ritenuto> abbreviate to "rit.".
 
 The C<Style:Fermata> value is a special case: it is not a tempo-change
 direction but a symbol placed over the note or rest that immediately follows
@@ -1142,7 +1157,7 @@ sub _emit_measure {
 		} elsif ($type eq 'Tempo') {
 			my $d = $event->data // {};
 			push @out, $self->_emit_tempo(
-				$d->{bpm}, $d->{base}, $pad . $i);
+				$d->{bpm}, $d->{base}, $d->{text} // '', $pad . $i);
 
 		} elsif ($type eq 'Dynamic') {
 			my $d = $event->data // {};
@@ -1641,10 +1656,11 @@ sub _rational_to_ticks {
 }
 
 sub _emit_tempo {
-	my ($self, $bpm, $base, $pad) = @_;
+	my ($self, $bpm, $base, $text, $pad) = @_;
 	my $i = $self->{_indent};
 	$bpm  //= 120;
 	$base //= 'Quarter';
+	$text //= '';
 
 	my $map       = $TEMPO_BASE_MAP{$base} // $TEMPO_BASE_MAP{Quarter};
 	my $unit      = $map->{unit};
@@ -1653,8 +1669,14 @@ sub _emit_tempo {
 
 	my @out;
 	push @out, "${pad}<direction placement=\"above\">";
+	if (length $text) {
+		push @out, "${pad}${i}<direction-type>";
+		push @out, "${pad}${i}${i}<words font-style=\"italic\">" . _xml_escape($text) . " </words>";
+		push @out, "${pad}${i}</direction-type>";
+	}
+	my $parens = length($text) ? 'yes' : 'no';
 	push @out, "${pad}${i}<direction-type>";
-	push @out, "${pad}${i}${i}<metronome parentheses=\"no\">";
+	push @out, "${pad}${i}${i}<metronome parentheses=\"$parens\">";
 	push @out, "${pad}${i}${i}${i}<beat-unit>$unit</beat-unit>";
 	push @out, "${pad}${i}${i}${i}<beat-unit-dot/>" if $dot;
 	push @out, "${pad}${i}${i}${i}<per-minute>$bpm</per-minute>";
@@ -1722,6 +1744,7 @@ sub _emit_wedge {
 Readonly::Hash my %TEMPO_VARIANCE_TEXT => (
 	Accelerando      => 'accel.',
 	Ritardando       => 'rit.',
+	Ritenuto         => 'rit.',
 	Rallentando      => 'rall.',
 	RitardandoToTempo => 'a tempo',
 	Stringendo       => 'string.',

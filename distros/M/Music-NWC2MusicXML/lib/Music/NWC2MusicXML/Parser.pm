@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.2';
+our $VERSION = '0.002.3';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -63,7 +63,7 @@ representation.
 
 =head1 VERSION
 
-0.001.2
+0.002.3
 
 =head1 SYNOPSIS
 
@@ -583,6 +583,7 @@ sub _handle_tempo {
 		data => {
 			bpm  => $h->{Tempo} // 120,
 			base => $h->{Base}  // 'Quarter',
+			text => $h->{Text}  // '',
 		},
 	));
 }

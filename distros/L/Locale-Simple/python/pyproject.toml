@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "locale-simple"
 dynamic = ["version"]
-description = "Tiny gettext wrapper with sprintf-style helpers (l, ln, lp, ld, …) — same API as the Perl and JavaScript siblings, so one .po file feeds all three runtimes."
+description = "Tiny gettext wrapper with sprintf-style helpers (l, ln, lp, ld, …) — same API as the Perl, JavaScript, PHP, Go and Rust siblings, so one .po file feeds all six runtimes."
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -46,6 +46,9 @@ Issues = "https://github.com/Getty/locale-simple/issues"
 Changelog = "https://github.com/Getty/locale-simple/blob/main/Changes"
 "Perl sibling (CPAN)" = "https://metacpan.org/dist/Locale-Simple"
 "JavaScript sibling (npm)" = "https://www.npmjs.com/package/locale-simple"
+"PHP sibling (Packagist)" = "https://packagist.org/packages/raudssus/locale-simple"
+"Go sibling" = "https://pkg.go.dev/github.com/Getty/locale-simple/go"
+"Rust sibling (crates.io)" = "https://crates.io/crates/locale-simple"
 
 [tool.setuptools.dynamic]
 version = {attr = "locale_simple.__version__"}

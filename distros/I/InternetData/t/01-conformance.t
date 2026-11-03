@@ -123,8 +123,8 @@ subtest 'a listing survives every standing, right and format the API publishes' 
 # undermine it is by answering `list` from something other than this key's
 # response - a bundled catalog, or a listing held from another key.
 #
-# The corpus names the rules but deliberately NOT the private ids, because it is
-# committed into public repositories. So each rule id gets a handler here, and a
+# The corpus names the rules but deliberately NOT the private IDs, because it is
+# committed into public repositories. So each rule ID gets a handler here, and a
 # rule with no handler is a failure rather than a silent gap.
 my %VISIBILITY = (
     'listing-is-returned-as-served' => sub {
@@ -145,7 +145,7 @@ my %VISIBILITY = (
     },
 
     'no-catalog-is-compiled-into-the-client' => sub {
-        # Structural, not behavioural: a client that ships a list of database ids
+        # Structural, not behavioural: a client that ships a list of database IDs
         # can answer from it under some future edit, and no request-counting test
         # would see that until it did. The modules as SHIPPED must name none.
         my $loaded = $INC{'InternetData.pm'};
@@ -164,7 +164,7 @@ my %VISIBILITY = (
                 next if $text =~ /\A\s*#/;
                 push @found, "$line: $text" if $text =~ /["'][a-z][a-z0-9_]*_v[0-9]+["']/;
             }
-            is_deeply(\@found, [], "$file compiles in no database id");
+            is_deeply(\@found, [], "$file compiles in no database ID");
         }
     },
 

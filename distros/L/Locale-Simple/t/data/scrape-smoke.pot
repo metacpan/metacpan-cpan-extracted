@@ -1,0 +1,336 @@
+
+#: N-calls.go:23 l-calls.go:23
+#, locale-simple-format Go_dom
+msgctxt "Go_ctx"
+msgid "Go N bare dom ctx one"
+msgid_plural "Go N bare dom ctx many"
+msgstr[0] ""
+
+#: N-calls.go:22 l-calls.go:22
+#, locale-simple-format Go_dom
+msgctxt "Go_ctx"
+msgid "Go N bare dom ctx plain"
+msgstr ""
+
+#: N-calls.go:15 l-calls.go:15
+#, locale-simple-format Go_dom
+msgctxt "Go_ctx"
+msgid "Go N dom ctx one"
+msgid_plural "Go N dom ctx many"
+msgstr[0] ""
+
+#: N-calls.go:14 l-calls.go:14
+#, locale-simple-format Go_dom
+msgctxt "Go_ctx"
+msgid "Go N dom ctx plain"
+msgstr ""
+
+#: N-calls.go:21 l-calls.go:21
+#, locale-simple-format Go_dom
+msgid "Go N bare dom one"
+msgid_plural "Go N bare dom many"
+msgstr[0] ""
+
+#: N-calls.go:20 l-calls.go:20
+#, locale-simple-format Go_dom
+msgid "Go N bare dom plain"
+msgstr ""
+
+#: N-calls.go:13 l-calls.go:13
+#, locale-simple-format Go_dom
+msgid "Go N dom one"
+msgid_plural "Go N dom many"
+msgstr[0] ""
+
+#: N-calls.go:12 l-calls.go:12
+#, locale-simple-format Go_dom
+msgid "Go N dom plain"
+msgstr ""
+
+#: N-calls.js:8 l-calls.js:8
+#, locale-simple-format JS_dom
+msgctxt "JS_ctx"
+msgid "JS N dom ctx one"
+msgid_plural "JS N dom ctx many"
+msgstr[0] ""
+
+#: N-calls.js:7 l-calls.js:7
+#, locale-simple-format JS_dom
+msgctxt "JS_ctx"
+msgid "JS N dom ctx plain"
+msgstr ""
+
+#: N-calls.js:6 l-calls.js:6
+#, locale-simple-format JS_dom
+msgid "JS N dom one"
+msgid_plural "JS N dom many"
+msgstr[0] ""
+
+#: N-calls.js:5 l-calls.js:5
+#, locale-simple-format JS_dom
+msgid "JS N dom plain"
+msgstr ""
+
+#: N-calls.pl:8 N-calls.tx:8 l-calls.pl:8 l-calls.tx:8
+#, locale-simple-format N_dom
+msgctxt "N_ctx"
+msgid "N dom ctx one"
+msgid_plural "N dom ctx many"
+msgstr[0] ""
+
+#: N-calls.pl:7 N-calls.tx:7 l-calls.pl:7 l-calls.tx:7
+#, locale-simple-format N_dom
+msgctxt "N_ctx"
+msgid "N dom ctx plain"
+msgstr ""
+
+#: N-calls.pl:6 N-calls.tx:6 l-calls.pl:6 l-calls.tx:6
+#, locale-simple-format N_dom
+msgid "N dom one"
+msgid_plural "N dom many"
+msgstr[0] ""
+
+#: N-calls.pl:5 N-calls.tx:5 l-calls.pl:5 l-calls.tx:5
+#, locale-simple-format N_dom
+msgid "N dom plain"
+msgstr ""
+
+#: N-calls.php:9 l-calls.php:9
+#, locale-simple-format PHP_dom
+msgctxt "PHP_ctx"
+msgid "PHP N dom ctx one"
+msgid_plural "PHP N dom ctx many"
+msgstr[0] ""
+
+#: N-calls.php:8 l-calls.php:8
+#, locale-simple-format PHP_dom
+msgctxt "PHP_ctx"
+msgid "PHP N dom ctx plain"
+msgstr ""
+
+#: N-calls.php:7 l-calls.php:7
+#, locale-simple-format PHP_dom
+msgid "PHP N dom one"
+msgid_plural "PHP N dom many"
+msgstr[0] ""
+
+#: N-calls.php:6 l-calls.php:6
+#, locale-simple-format PHP_dom
+msgid "PHP N dom plain"
+msgstr ""
+
+#: N-calls.py:8 l-calls.py:8
+#, locale-simple-format PY_dom
+msgctxt "PY_ctx"
+msgid "PY N dom ctx one"
+msgid_plural "PY N dom ctx many"
+msgstr[0] ""
+
+#: N-calls.py:7 l-calls.py:7
+#, locale-simple-format PY_dom
+msgctxt "PY_ctx"
+msgid "PY N dom ctx plain"
+msgstr ""
+
+#: N-calls.py:6 l-calls.py:6
+#, locale-simple-format PY_dom
+msgid "PY N dom one"
+msgid_plural "PY N dom many"
+msgstr[0] ""
+
+#: N-calls.py:5 l-calls.py:5
+#, locale-simple-format PY_dom
+msgid "PY N dom plain"
+msgstr ""
+
+#: N-calls.rs:11 l-calls.rs:11
+#, locale-simple-format Rust_dom
+msgctxt "Rust_ctx"
+msgid "Rust N dom ctx one"
+msgid_plural "Rust N dom ctx many"
+msgstr[0] ""
+
+#: N-calls.rs:10 l-calls.rs:10
+#, locale-simple-format Rust_dom
+msgctxt "Rust_ctx"
+msgid "Rust N dom ctx plain"
+msgstr ""
+
+#: N-calls.rs:9 l-calls.rs:9
+#, locale-simple-format Rust_dom
+msgid "Rust N dom one"
+msgid_plural "Rust N dom many"
+msgstr[0] ""
+
+#: N-calls.rs:8 l-calls.rs:8
+#, locale-simple-format Rust_dom
+msgid "Rust N dom plain"
+msgstr ""
+
+#: N-calls.go:19 l-calls.go:19
+#, locale-simple-format
+msgctxt "Go_ctx"
+msgid "Go N bare ctx one"
+msgid_plural "Go N bare ctx many"
+msgstr[0] ""
+
+#: N-calls.go:18 l-calls.go:18
+#, locale-simple-format
+msgctxt "Go_ctx"
+msgid "Go N bare ctx plain"
+msgstr ""
+
+#: N-calls.go:11 l-calls.go:11
+#, locale-simple-format
+msgctxt "Go_ctx"
+msgid "Go N ctx one"
+msgid_plural "Go N ctx many"
+msgstr[0] ""
+
+#: N-calls.go:10 l-calls.go:10
+#, locale-simple-format
+msgctxt "Go_ctx"
+msgid "Go N ctx plain"
+msgstr ""
+
+#: N-calls.js:4 l-calls.js:4
+#, locale-simple-format
+msgctxt "JS_ctx"
+msgid "JS N ctx one"
+msgid_plural "JS N ctx many"
+msgstr[0] ""
+
+#: N-calls.js:3 l-calls.js:3
+#, locale-simple-format
+msgctxt "JS_ctx"
+msgid "JS N ctx plain"
+msgstr ""
+
+#: N-calls.pl:4 N-calls.tx:4 l-calls.pl:4 l-calls.tx:4
+#, locale-simple-format
+msgctxt "N_ctx"
+msgid "N ctx one"
+msgid_plural "N ctx many"
+msgstr[0] ""
+
+#: N-calls.pl:3 N-calls.tx:3 l-calls.pl:3 l-calls.tx:3
+#, locale-simple-format
+msgctxt "N_ctx"
+msgid "N ctx plain"
+msgstr ""
+
+#: N-calls.php:5 l-calls.php:5
+#, locale-simple-format
+msgctxt "PHP_ctx"
+msgid "PHP N ctx one"
+msgid_plural "PHP N ctx many"
+msgstr[0] ""
+
+#: N-calls.php:4 l-calls.php:4
+#, locale-simple-format
+msgctxt "PHP_ctx"
+msgid "PHP N ctx plain"
+msgstr ""
+
+#: N-calls.py:4 l-calls.py:4
+#, locale-simple-format
+msgctxt "PY_ctx"
+msgid "PY N ctx one"
+msgid_plural "PY N ctx many"
+msgstr[0] ""
+
+#: N-calls.py:3 l-calls.py:3
+#, locale-simple-format
+msgctxt "PY_ctx"
+msgid "PY N ctx plain"
+msgstr ""
+
+#: N-calls.rs:7 l-calls.rs:7
+#, locale-simple-format
+msgctxt "Rust_ctx"
+msgid "Rust N ctx one"
+msgid_plural "Rust N ctx many"
+msgstr[0] ""
+
+#: N-calls.rs:6 l-calls.rs:6
+#, locale-simple-format
+msgctxt "Rust_ctx"
+msgid "Rust N ctx plain"
+msgstr ""
+
+#: N-calls.go:17 l-calls.go:17
+#, locale-simple-format
+msgid "Go N bare one"
+msgid_plural "Go N bare many"
+msgstr[0] ""
+
+#: N-calls.go:16 l-calls.go:16
+#, locale-simple-format
+msgid "Go N bare plain"
+msgstr ""
+
+#: N-calls.go:9 l-calls.go:9
+#, locale-simple-format
+msgid "Go N one"
+msgid_plural "Go N many"
+msgstr[0] ""
+
+#: N-calls.go:8 l-calls.go:8
+#, locale-simple-format
+msgid "Go N plain"
+msgstr ""
+
+#: N-calls.js:2 l-calls.js:2
+#, locale-simple-format
+msgid "JS N one"
+msgid_plural "JS N many"
+msgstr[0] ""
+
+#: N-calls.js:1 l-calls.js:1
+#, locale-simple-format
+msgid "JS N plain"
+msgstr ""
+
+#: N-calls.pl:2 N-calls.tx:2 l-calls.pl:2 l-calls.tx:2
+#, locale-simple-format
+msgid "N one"
+msgid_plural "N many"
+msgstr[0] ""
+
+#: N-calls.pl:1 N-calls.tx:1 l-calls.pl:1 l-calls.tx:1
+#, locale-simple-format
+msgid "N plain"
+msgstr ""
+
+#: N-calls.php:3 l-calls.php:3
+#, locale-simple-format
+msgid "PHP N one"
+msgid_plural "PHP N many"
+msgstr[0] ""
+
+#: N-calls.php:2 l-calls.php:2
+#, locale-simple-format
+msgid "PHP N plain"
+msgstr ""
+
+#: N-calls.py:2 l-calls.py:2
+#, locale-simple-format
+msgid "PY N one"
+msgid_plural "PY N many"
+msgstr[0] ""
+
+#: N-calls.py:1 l-calls.py:1
+#, locale-simple-format
+msgid "PY N plain"
+msgstr ""
+
+#: N-calls.rs:5 l-calls.rs:5
+#, locale-simple-format
+msgid "Rust N one"
+msgid_plural "Rust N many"
+msgstr[0] ""
+
+#: N-calls.rs:4 l-calls.rs:4
+#, locale-simple-format
+msgid "Rust N plain"
+msgstr ""

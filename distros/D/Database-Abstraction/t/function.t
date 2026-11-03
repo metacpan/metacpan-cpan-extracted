@@ -2055,7 +2055,7 @@ SKIP: {
 	{
 		my $p    = { measures => [{ fn => 'sum', col => 'score', as => 'total' }] };
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/SELECT SUM\(score\) AS total FROM aggsql/i,
 			'_build_aggregate_sql(): grand total SELECT correct');
 		unlike($sql, qr/GROUP BY/i,
@@ -2072,7 +2072,7 @@ SKIP: {
 			measures => [{ fn => 'count', as => 'n' }],
 		};
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/SELECT status, COUNT\(\*\) AS n FROM aggsql/i,
 			'_build_aggregate_sql(): grouped SELECT with by column first');
 		like($sql, qr/GROUP BY status/i,
@@ -2089,7 +2089,7 @@ SKIP: {
 			status   => $ACTIVE,
 		};
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/WHERE/i, '_build_aggregate_sql(): WHERE clause emitted for criteria');
 		is(scalar @{$args}, 1, '_build_aggregate_sql(): one bind arg for criteria');
 		is($args->[0], $ACTIVE, '_build_aggregate_sql(): bind arg value correct');
@@ -2103,7 +2103,7 @@ SKIP: {
 			having   => { total => { '>' => 20 } },
 		};
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/HAVING SUM\(score\)/i,
 			'_build_aggregate_sql(): HAVING uses expression, not alias (PostgreSQL rule)');
 		like($sql, qr/CAST\(\? AS REAL\)/i,
@@ -2118,7 +2118,7 @@ SKIP: {
 			sort_by  => ['total', 'DESC'],
 		};
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/ORDER BY total DESC/i,
 			'_build_aggregate_sql(): explicit sort_by DESC in ORDER BY');
 	}
@@ -2131,7 +2131,7 @@ SKIP: {
 			offset   => 10,
 		};
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/LIMIT \?/,  '_build_aggregate_sql(): LIMIT bound as ?');
 		like($sql, qr/OFFSET \?/, '_build_aggregate_sql(): OFFSET bound as ?');
 		my @lim_off = grep { /\A\d+\z/ } @{$args};
@@ -2143,7 +2143,7 @@ SKIP: {
 	{
 		my $p    = { measures => [{ fn => 'count_distinct', col => 'status', as => 'ud' }] };
 		my $spec = $db->_validate_aggregate_spec($p);
-		my ($sql) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my ($sql) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		like($sql, qr/COUNT\(DISTINCT status\)/i,
 			'_build_aggregate_sql(): count_distinct → COUNT(DISTINCT col)');
 	}
@@ -2152,7 +2152,7 @@ SKIP: {
 	{
 		my $p    = { measures => [{ fn => 'count', as => 'n' }] };
 		my $spec = $db->_validate_aggregate_spec($p);
-		my (undef, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{$table});
+		my (undef, $args) = $db->_build_aggregate_sql($spec, '', $table, $db->{_dbh}{$table});
 		returns_ok($args, { type => 'arrayref' }, '_build_aggregate_sql(): args return is arrayref');
 	}
 }

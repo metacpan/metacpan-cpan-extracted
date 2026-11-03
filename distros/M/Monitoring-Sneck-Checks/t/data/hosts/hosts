@@ -1,0 +1,3 @@
+127.0.0.1 localhost localhost.localdomain
+::1 localhost # v6
+192.0.2.20 db.example.org db

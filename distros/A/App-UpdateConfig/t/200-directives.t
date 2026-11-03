@@ -29,11 +29,11 @@ our $VERSION = 0.01;
   my $r = $t->run();
   is(
     $t->read_home_file('.bashrc'),
-    guarded("base\n").guarded("os specific\n", undef, 'os'),
+    guarded("base\n").guarded("os specific\n", undef, 'OS'),
     'GUARD SUFFIX: two fragments in the same file');
   like(
     $r->{stdout},
-    qr/^Updated:[ ][.]bashrc[ ][(]os[)]$/mx,
+    qr/^Updated:[ ][.]bashrc[ ][(]OS[)]$/mx,
     'GUARD SUFFIX: reported with the suffix');
 }
 
@@ -73,9 +73,9 @@ our $VERSION = 0.01;
   my $r = $t->run();
   is(
     $t->read_home_file('target'),
-    guarded("content\n", undef, 'anything').guarded("other\n", undef, 'y'),
+    guarded("content\n", undef, 'ANYTHING').guarded("other\n", undef, 'Y'),
     'bracket suffix removed from the target name and used as default guard suffix');
-  like($r->{stdout}, qr/^Updated:[ ]target[ ][(]anything[)]$/mx, 'default guard suffix reported');
+  like($r->{stdout}, qr/^Updated:[ ]target[ ][(]ANYTHING[)]$/mx, 'default guard suffix reported');
   is($t->read_home_file('empty'), guarded("empty\n"), 'empty brackets: no guard suffix');
 }
 
@@ -85,14 +85,14 @@ our $VERSION = 0.01;
   $t->add_fragment('dir [a]/sub/sub [b]/nested [c]', "nested\n");
   $t->add_fragment('[a]/other [b]/overridden', "GUARD SUFFIX own\noverridden\n");
   $t->run();
-  is($t->read_home_file('plain'), guarded("plain\n", undef, 'a'), 'guard suffix from a directory');
+  is($t->read_home_file('plain'), guarded("plain\n", undef, 'A'), 'guard suffix from a directory');
   is(
     $t->read_home_file('nested'),
-    guarded("nested\n", undef, 'a-b-c'),
+    guarded("nested\n", undef, 'A-B-C'),
     'guard suffixes from directories and name joined');
   is(
     $t->read_home_file('overridden'),
-    guarded("overridden\n", undef, 'own'),
+    guarded("overridden\n", undef, 'OWN'),
     'guard suffix from directories overridden');
 }
 
@@ -189,11 +189,11 @@ our $VERSION = 0.01;
   is($r->{exit}, 0, 'DIR: success');
   is(
     $t->read_home_file('.config/app/file'),
-    guarded("content\n", undef, 'x'),
+    guarded("content\n", undef, 'X'),
     'DIR: fragment name used');
   is(
     $t->read_home_file('.config/app/sub/renamed'),
-    guarded("other\n", undef, 'y'),
+    guarded("other\n", undef, 'Y'),
     'DIR: FILENAME relative to DIR');
   is(UpdateConfigTest::read_file(catfile($abs_dir, 'absolute')),
     guarded("absolute\n"), 'DIR: absolute path');

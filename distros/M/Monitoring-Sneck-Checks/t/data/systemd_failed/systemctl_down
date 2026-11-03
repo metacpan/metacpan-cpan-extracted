@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{System has not been booted with systemd\n}; exit 1;

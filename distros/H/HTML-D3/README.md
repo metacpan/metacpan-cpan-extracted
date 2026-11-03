@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.27
+Version 0.28
 
 ## Synopsis
 
@@ -74,8 +74,10 @@ Accepts the following optional arguments:
 It is plain text, escaped when it is written to the page: `<` and `&` appear
 as themselves, and HTML in a title is shown rather than obeyed.
 - `responsive` - If true, SVG elements are rendered with
-`viewBox` and `width="100%" height="auto"` instead of fixed pixel
-dimensions, so the chart scales fluidly with its container.
+`viewBox` and `width="100%"` instead of fixed pixel dimensions, so the
+chart scales fluidly with its container; with no `height` attribute, the
+height follows the `viewBox`'s proportions.  (`height="auto"` is not a
+valid value for the attribute: Chromium logs an error for it and ignores it.)
 For snippet methods the per-call `opts => { responsive => 1 }`
 takes precedence over this object-level setting (default: 0).
 
@@ -745,7 +747,7 @@ pairs to display in the tooltip after the label and value rows.
     - `id` (string, default `'chart'`) - Override the `id` attribute of
     the `<svg`> element.  Use this when embedding multiple charts on the same page.
     - `responsive` (boolean, default `0`) - If true, emit
-    `viewBox="0 0 W H" width="100%" height="auto"` instead of fixed pixel
+    `viewBox="0 0 W H" width="100%"`, with no `height`, instead of fixed pixel
     dimensions, so the chart scales with its container.  Falls back to
     `$self->{responsive}` when not set per call.
 

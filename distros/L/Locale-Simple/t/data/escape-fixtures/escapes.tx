@@ -1,0 +1,7 @@
+<: l("TX newline\n") :>
+<: l("TX tab\t return\r unknown \q quote \" backslash \\") :>
+<: l('TX single \n stays, \\ is one, \' is a quote') :>
+<: l("TX joined\n" ~ 'TX raw\t' ~ "\tTX end") :>
+<: ln("TX one\n", "TX many\n", $n) :>
+<: l("0") :>
+<: lp("0", "TX context zero") :>

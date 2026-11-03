@@ -19,11 +19,11 @@ Database::Abstraction::Query - Fluent, chainable query builder for Database::Abs
 
 =head1 VERSION
 
-Version 0.51
+Version 0.54
 
 =cut
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 =head1 SYNOPSIS
 
@@ -551,7 +551,7 @@ sub all
 	my ($query, $args, $table) = $self->_build_sql(0);
 	$db->_debug("Query->all: $query");
 
-	my $sth = $db->{$table}->prepare_cached($query);
+	my $sth = $db->{'_dbh'}{$table}->prepare_cached($query);
 	$sth->execute(@{$args}) or croak("$query: @{$args}");
 
 	my @rows;
@@ -619,7 +619,7 @@ sub first
 
 	$db->_debug("Query->first: $query");
 
-	my $sth = $db->{$table}->prepare_cached($query);
+	my $sth = $db->{'_dbh'}{$table}->prepare_cached($query);
 	$sth->execute(@{$args}) or croak("$query: @{$args}");
 
 	my $row = $sth->fetchrow_hashref();
@@ -675,7 +675,7 @@ sub count
 	my ($query, $args, $table) = $self->_build_sql(1);
 	$db->_debug("Query->count: $query");
 
-	my $sth = $db->{$table}->prepare_cached($query);
+	my $sth = $db->{'_dbh'}{$table}->prepare_cached($query);
 	$sth->execute(@{$args}) or croak("$query: @{$args}");
 
 	my $row = $sth->fetchrow_arrayref();
@@ -755,7 +755,7 @@ sub each
 	my ($query, $args, $table) = $self->_build_sql(0);
 	$db->_debug("Query->each: $query");
 
-	my $sth = $db->{$table}->prepare_cached($query);
+	my $sth = $db->{'_dbh'}{$table}->prepare_cached($query);
 	$sth->execute(@{$args}) or croak("$query: @{$args}");
 
 	my $n = 0;

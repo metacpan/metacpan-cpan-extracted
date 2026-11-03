@@ -1,0 +1,6 @@
+# x=$(sort f | uniq -c); the parent reads pipe b itself
+pipe a w:forgotten r:forgotten
+pipe b w:forgotten
+P1: sort f | 1>a.w 2>@2 | exited 0
+P2: uniq -c | 0<a.r 1>b.w 2>@2 | running
+Perl: capture into $x | <b.r

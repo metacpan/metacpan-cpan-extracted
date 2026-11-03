@@ -1,0 +1,16 @@
+# export-ignore shapes `git archive`: the Packagist download and the GitHub
+# "Source code" zips. The Go module zip ignores it and always holds the whole
+# repository. Keep composer.json and php/ out of this list.
+#
+# Check after every change:
+#   git archive --format=zip HEAD | zipinfo -1 -
+# go.mod, go/*, composer.json, php/* must be listed, lib/ and t/ must not.
+lib/ export-ignore
+t/ export-ignore
+python/ export-ignore
+js/ export-ignore
+xbin/ export-ignore
+bin/ export-ignore
+dist.ini export-ignore
+cpanfile export-ignore
+scripts/ export-ignore

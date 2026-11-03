@@ -81,27 +81,53 @@ you will most likely want to use this.
 
 An IP to ignore.
 
+# SNECK
+
+If [Monitoring::Sneck::Checks](https://github.com/VVelox/Monitoring-Sneck-Checks)
+is installed, this can also be run in process by
+[sneck](https://github.com/VVelox/Monitoring-Sneck) as `perl:suricata_flows`,
+or from the shell through `sneck_check`. Monitoring::Sneck::Checks is optional
+and not installed along with this.
+
+```
+suricata_flows|perl:suricata_flows -s sensor1 -s sensor2 -i 192.0.2.1
+```
+
+```
+sneck_check suricata_flows -f /var/log/suricata/flows/current/flow.json
+```
+
+It takes the same options as check_suricataflows, -f, -a, -w, -t, -m, -s,
+and -i, and works out the status the same way. The status line has the
+bi and uni directional counts and perfdata, followed by the same lines
+check_suricataflows prints.
+
+See `perldoc Monitoring::Sneck::Checks::suricata_flows`.
+
 # INSTALLATION
 
 ## FreeBSD
 
 ```
-pkg install p5-JSON p5-File-ReadBackwards p5-App-cpanminus
-cpanm Check::CheckSuricataFlows
+pkg install p5-JSON p5-File-ReadBackwards p5-NetAddr-IP p5-Regexp-IPv6 p5-App-cpanminus
+cpanm Check::SuricataFlows
 ```
 
 ## Debian
 
 ```
-apt-get install libjson-perl libfile-readbackwards-perl cpanminus
+apt-get install libjson-perl libfile-readbackwards-perl libnetaddr-ip-perl libregexp-ipv6-perl cpanminus
 cpanm Check::SuricataFlows
 ```
 
+cpanm installs anything not packaged, such as Regexp::IPv4.
+
 ## From Source
 
-To install this module, run the following commands:
+Install the dependencies, JSON, File::ReadBackwards, NetAddr::IP,
+Regexp::IPv4, and Regexp::IPv6, then run the following commands:
 
 	perl Makefile.PL
 	make
 	make test
-	make instal
+	make install

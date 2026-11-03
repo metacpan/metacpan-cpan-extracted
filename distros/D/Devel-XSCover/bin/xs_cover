@@ -1,0 +1,170 @@
+#!/usr/bin/env perl
+
+use 5.020;
+use strict;
+use warnings;
+use Devel::XSCover ();
+
+exit Devel::XSCover->new_from_argv(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+xs_cover - XS and C coverage for a distribution in one command
+
+=head1 SYNOPSIS
+
+    xs_cover [options]
+
+    xs_cover                         build with coverage, make test under Devel::Cover,
+                                     read the counters, merge into cover_db, run cover
+    xs_cover -report html_basic      the report, passed through to cover (XSCover by default)
+    xs_cover -gcov /path/to/gcov-14  the gcov tool, when detection picks the wrong one
+    xs_cover -test t/05-x.t          run that test file with prove instead of make test
+    xs_cover -plain t/05-forks.t     run that file without Devel::Cover
+    xs_cover -no_perl                run everything without Devel::Cover, the C side alone
+    xs_cover -ignore 'vendor/'       add a pattern to the default ignores
+    xs_cover -keep                   keep the counters and instrumented objects after the run
+    xs_cover -no_delete              keep an existing cover_db instead of starting afresh
+    xs_cover -db cover_db            the database directory
+    xs_cover -make make              the make command
+    xs_cover -cover /path/to/cover   the cover command, when the one beside perl is wrong
+    xs_cover -timeout 600            end a test run that passes that many seconds
+    xs_cover -dry                    print every command and run nothing
+    xs_cover -silent                 print only the summary
+    xs_cover -h                      this help
+    xs_cover -v                      the version
+
+=head1 DESCRIPTION
+
+Run in a distribution directory, C<xs_cover> rebuilds every XS and C source with
+the compiler's coverage instrumentation, runs the test suite under Devel::Cover so
+the Perl side is covered as usual, reads the counters the compiler wrote, merges
+them into the same coverage database, and runs C<cover> for the report. The exit
+status is the test run's.
+
+=head1 OPTIONS
+
+=over
+
+=item -report NAME
+
+The report C<cover> makes, C<XSCover> by default: F<coverage.html> under the database
+and the summary table printed. C<text> prints every file annotated.
+
+=item -gcov PATH
+
+The gcov tool to run. By default clang's C<llvm-cov gcov> or gcc's C<gcov> of the
+same version as the compiler.
+
+=item -test FILE
+
+Run FILE with C<prove -b -j1> instead of C<make test>. May be given more than once.
+
+=item -plain FILE
+
+Run FILE without Devel::Cover. Run plain, a file's Perl side is not covered and
+its C side is. With a plain file the suite runs through C<prove -b -j1> in two
+parts, the rest under Devel::Cover and the plain files without it. May be given
+more than once. A test file that uses threads is run plain without being named,
+since Devel::Cover does not work with threads and the file would fail at compile
+time; the run says which.
+
+=item -threads_covered
+
+Leave test files that use threads in the covered run.
+
+=item -no_perl
+
+Run the whole suite without Devel::Cover. The report then has the C side alone. For
+a distribution whose module reads or rewrites the op tree, which sees Devel::Cover's
+instrumentation and behaves differently under it, or whose Perl side is a line of
+C<XSLoader>.
+
+=item -ignore PATTERN
+
+A regular expression on a source path. Matching files are left out of the report.
+F<ppport.h> and every file outside the distribution are left out already.
+
+=item -keep
+
+Keep the counters, the gcov text (in F<cover_db.gcov>) and the instrumented
+objects after the run.
+Without it the sources are touched again so the next plain C<make> rebuilds them
+optimised.
+
+=item -no_delete
+
+Keep an existing coverage database. By default it is removed first, as C<cover
+-test> does.
+
+=item -db DIR
+
+The coverage database, F<cover_db> by default.
+
+=item -make COMMAND
+
+The make command, C<make> by default.
+
+=item -cover COMMAND
+
+The C<cover> command. By default the one installed beside the running perl.
+
+=item -timeout SECONDS
+
+End the test run after that many seconds, ending its process group, and exit
+with 124. No limit by default.
+
+=item -dry
+
+Print every command that would run and run none of them.
+
+=item -silent
+
+Print only the summary.
+
+=back
+
+=head1 EXAMPLES
+
+A whole distribution, from its directory:
+
+    xs_cover
+
+The report is then F<cover_db/coverage.html>, with one page per file beside it, and
+the summary table is printed.
+
+One test file, through C<prove>:
+
+    xs_cover -test t/05-parse.t
+
+A suite with a test that forks a server the harness cannot cover: run that one
+without Devel::Cover, and its C side is still counted (a test that uses threads is
+found and run that way by itself):
+
+    xs_cover -plain t/31-server.t
+
+A module that rewrites the op tree, whose suite behaves differently under
+Devel::Cover, with the C side alone:
+
+    xs_cover -no_perl
+
+Several runs into one database, say two suites or two sets of options:
+
+    xs_cover -test t/01-a.t
+    xs_cover -no_delete -test t/02-b.t
+
+Keep the counters and the gcov text after the run, for a look by hand:
+
+    xs_cover -keep
+
+The report alone, on a database already written:
+
+    cover -report XSCover
+
+=head1 SEE ALSO
+
+L<Devel::XSCover>, L<Devel::Cover>, L<cover>
+
+=cut

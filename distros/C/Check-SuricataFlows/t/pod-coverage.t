@@ -21,4 +21,17 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+# the sneck check needs Monitoring::Sneck::Checks, which is optional, to load at all
+my @modules = grep { $_ ne 'Monitoring::Sneck::Checks::suricata_flows' } all_modules();
+my $have_sneck = eval { require Monitoring::Sneck::Checks::base; 1 };
+plan tests => scalar(@modules) + ( $have_sneck ? 1 : 0 );
+
+foreach my $module (@modules) {
+    pod_coverage_ok($module);
+}
+
+# option_spec and defaults are documented in Monitoring::Sneck::Checks::base
+if ($have_sneck) {
+    pod_coverage_ok( 'Monitoring::Sneck::Checks::suricata_flows',
+        { also_private => [qr/\A(?:option_spec|defaults|OK|WARNING|CRITICAL|UNKNOWN)\z/] } );
+}

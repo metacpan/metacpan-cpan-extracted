@@ -6,6 +6,6 @@ for domain in test othertest
 do
 	msgfmt -o $BASE/locale/de_DE/LC_MESSAGES/$domain.mo $BASE/locale/de_DE/LC_MESSAGES/$domain.po
 	echo -n "locale_data['$domain'] = " >$BASE/locale/de_DE/LC_MESSAGES/$domain.json
-	$BASE/../../bin/po2json $BASE/locale/de_DE/LC_MESSAGES/$domain.po >>$BASE/locale/de_DE/LC_MESSAGES/$domain.json
+	perl -I$BASE/../../lib $BASE/../../bin/po2json $BASE/locale/de_DE/LC_MESSAGES/$domain.po >>$BASE/locale/de_DE/LC_MESSAGES/$domain.json
 	echo ";" >>$BASE/locale/de_DE/LC_MESSAGES/$domain.json
 done

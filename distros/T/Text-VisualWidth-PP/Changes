@@ -1,5 +1,26 @@
 Revision history for Perl module Text::VisualWidth::PP
 
+0.09 2026-11-02T10:26:30Z
+
+    commit 1bdda0bff524833eceffcf05bed6985bb5fda6c0
+    Author: Kazumasa Utashiro <kaz@utashiro.com>
+    Date:   Sun Nov 1 12:16:47 2026 +0900
+
+        Speed up width by compiling its regexes once
+
+        Build the regexes for both $EastAsian settings when the module is
+        loaded, avoiding repeated pattern parsing on each width() call.
+
+    commit 7a3c542b4535d446b0c2f2190600e5c69ecb2262
+    Author: Kazumasa Utashiro <kaz@utashiro.com>
+    Date:   Sun Nov 1 13:12:41 2026 +0900
+
+        Use the East_Asian_Width property of perl from 5.30
+
+        Follow the Unicode version bundled with perl 5.30 and later when
+        determining character widths. Keep the existing Unicode table for
+        older perls.
+
 0.08 2025-02-26T06:47:09Z
 
     commit d10bff3580c0914cf716170a4e9a232b5b508a3e

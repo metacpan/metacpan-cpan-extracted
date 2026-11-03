@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+my ( $what, @rest ) = @ARGV;
+my %active  = ( nginx => 'active', 'php8.4-fpm' => 'failed', web => 'inactive' );
+my %enabled = ( nginx => 1 );
+if ( $what eq 'is-active' ) { print( ( $active{ $rest[0] } // 'inactive' ) . "\n" ); exit( ( $active{ $rest[0] } // '' ) eq 'active' ? 0 : 3 ) }
+if ( $what eq 'is-enabled' ) { exit( $enabled{ $rest[0] } ? 0 : 1 ) }
+if ( $what eq 'show' ) { print( ( exists( $active{ $rest[-1] } ) ? 'loaded' : 'not-found' ) . "\n" ); exit 0 }

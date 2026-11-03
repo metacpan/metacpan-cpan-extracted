@@ -10,7 +10,7 @@ use Devel::Confess;
 
 package Cn::Util;
 require 5.010001;
-our $VERSION = 0.022;
+our $VERSION = 0.023;
 require Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(dir execute file2string format_commas json_file_to_ref random_key random_value ref_to_json_file st structure);
@@ -227,14 +227,23 @@ sub dir {
 			# File::Find lstat()s its starting path, so a $start that is a
 			# symlink to a directory was taken for a file and nothing was
 			# found under it -- although opendir, which the non-recursive
-			# listing and the parallel walk's top levels use, follows it.  A
-			# trailing slash makes lstat resolve the link; File::Find strips
-			# the slash again only after the lstat (1.14 in perl 5.10.1 and
-			# 1.44 in 5.44 alike), so the paths it reports are unchanged.
+			# listing and the parallel walk's top levels use, follows it.  So
+			# that level is listed here with opendir, and File::Find starts
+			# from its subdirectories instead.  Passing "$start/" made POSIX
+			# lstat resolve the link, but not win32_lstat (perl 5.42
+			# win32/win32.c), which asks GetFileAttributes, and Windows drops a
+			# trailing separator; Strawberry Perl 5.42 still found nothing.
+			my @top = -l $start && -d $start
+				? _dir_level($start, $re, $tester, $join, $sink)
+				: ($start);
+			return unless @top;
+			my %top = map { $_ => 1 } @top;
 			File::Find::find({
 				no_chdir => 1,
 				wanted   => sub {
-					 return if $_ eq $start;             # $start itself is not "below" it
+					 # A starting point is not "below" $start, or, under a
+					 # symlinked $start, _dir_level has already reported it.
+					 return if $top{$_};
 					 my ($file) = m{([^/]+)\z}s;         # basename, much cheaper than File::Spec
 					 if ($file =~ $re && $tester->($_)) {
 					     my $path = $_;
@@ -242,7 +251,7 @@ sub dir {
 					     $sink->($path);
 					 }
 				},
-			}, -l $start ? "$start/" : $start);
+			}, @top);
 		};
 		if ($args{cpu} == 1) {
 			$find->($target_dir, $emit);
@@ -281,6 +290,24 @@ sub dir {
 #   perl -Ilib -MCn::Util -e 'dir(dir => $ARGV[0], recursive => 1, cpu => 8)' TREE
 my $DIR_JOBS_PER_CPU = 4;
 
+# Hand each entry of directory $d that matches $re and $tester to $emit, and
+# return its subdirectories, leaving out symlinks to directories as File::Find
+# does.  One level of a recursive dir(), for the parallel walk's breadth-first
+# levels and for a starting directory that is itself a symlink.
+sub _dir_level {
+	my ($d, $re, $tester, $join, $emit) = @_;
+	opendir my $dh, $d or die "Cannot open directory $d: $!";
+	my @sub;
+	while (defined(my $item = readdir $dh)) {
+		next if $item =~ /\A\.\.?\z/;
+		my $path = $join->($d, $item);
+		$emit->($path) if $item =~ $re && $tester->($path);
+		push @sub, $path if !-l $path && -d _;   # -l: lstat, so -d _ is the entry itself, not its target
+	}
+	closedir $dh;
+	return @sub;
+}
+
 # Recursive dir() across $cpu worker processes.  Results come back to this
 # process and go through $emit here, so an on_match closure still sees and
 # mutates the caller's variables -- it just runs after a whole job's batch
@@ -298,18 +325,7 @@ sub _dir_parallel {
 	my $want  = $cpu * $DIR_JOBS_PER_CPU;
 	my @level = ($root);
 	while (@level && @level < $want) {
-		my @next;
-		for my $d (@level) {
-			opendir my $dh, $d or die "Cannot open directory $d: $!";
-			while (defined(my $item = readdir $dh)) {
-				next if $item =~ /\A\.\.?\z/;
-				my $path = $join->($d, $item);
-				$emit->($path) if $item =~ $re && $tester->($path);
-				push @next, $path if !-l $path && -d _; # lstat: File::Find does not follow symlinks either
-			}
-			closedir $dh;
-		}
-		@level = @next;
+		@level = map { _dir_level($_, $re, $tester, $join, $emit) } @level;
 	}
 	return unless @level;
 

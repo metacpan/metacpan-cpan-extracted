@@ -1,5 +1,11 @@
 -----
 
+0.6.9   2026-11-02
+   [Added]
+       * Added constants EVENT_UNDEFINED_MIGRATED, EVENT_SHUTDOWN_GUEST_RESET
+   [Changed]
+       * Updated libvirt to v12.9.0
+
 0.6.8   2026-10-03
    [Added]
        * Example script eg/free-mem.pl

@@ -1,0 +1,4 @@
+#!include_default
+
+# scratch directories the tests make, see t/lib/TestTmp.pm
+^t/tmp/

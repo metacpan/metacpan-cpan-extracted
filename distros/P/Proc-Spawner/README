@@ -1,0 +1,53 @@
+Proc-Spawner version 0.02 (EXPERIMENTAL)
+========================================
+
+Compiles and runs shell one-liners (or portable shell scripts) from Perl
+without /bin/sh and "without" fork, matching dash/bash: the strings are
+parsed by one of the Proc::ShellSubset parsers and run
+by Proc::ShellSpawn, which starts programs with posix_spawn(3) and runs loops,
+subshells, $( ) and pipelines of compound commands inside the Perl process.
+(All the started programs are children of the initial Perl process, as opposed
+to descendants.)
+
+  Proc::Spawner          start children (every posix_spawn setting); the event loop
+  Proc::Spawner::Graph   the executable graph of children, pipes and files
+  Proc::ShellSpawn       the shell layer
+  Proc::ShellSubset, Proc::ShellSubset::Small, Proc::ShellSubset::Large
+                         parsers of three sizes of the shell language
+
+Tested on Linux with glibc 2.39 (also built as if some or all of the
+extensions were missing: PROC_SPAWNER_WITHOUT="PIDFD_SPAWN ..." perl Makefile.PL).  Parts that flip process-wide
+state for a while (umask, signal actions) are bullet-proof only in
+non-threaded execution.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Only modules that come with Perl.  Building needs a C compiler.
+Makefile.PL finds which posix_spawn extensions the libc has (chdir, fchdir,
+closefrom, tcsetpgrp, pidfd_spawn, cgroup) by compiling a call to each; an
+option the libc lacks fails with ENOTSUP, or is dropped, as
+%Proc::Spawner::UNSUPPORTED says.  The shell layer needs chdir (glibc 2.29
+or later); without it t/dash.t is skipped.
+
+Tests: t/spawner.t (Proc::Spawner and the graph), t/graph.t (hand-written
+graphs), t/parsers.t (about 1,000 strings through the parsers), and t/dash.t
+(every battery string run by dash and by the shell layer; skipped without
+dash; t/dash-known.txt lists the known differences).  Their fixtures are
+in t/: t/batteries/, t/parser/, t/sgraph/, t/try.pl (runs one string: perl t/try.pl 'STRING').
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2026 by Ilya Zakharevich
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.2 or,
+at your option, any later version of Perl 5 you may have available.

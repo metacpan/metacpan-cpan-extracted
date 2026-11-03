@@ -6,6 +6,7 @@ build_requires:
   DateTime: '0'
   ExtUtils::MakeMaker: '0'
   Test::DescribeMe: '0'
+  Test::Log::Abstraction: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::TempDir::Tiny: '0'
@@ -13,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,12 +39,13 @@ requires:
   IO::String: '0'
   JavaScript::Packer: '2'
   Readonly: '0'
+  Scalar::Util: '0'
   Storable: '0'
   Text::Diff: '0'
   Time::localtime: '0'
-  perl: '5.014000'
+  perl: '5.026000'
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Buffer/issues
   repository: git://github.com/nigelhorne/CGI-Buffer.git
-version: '0.88'
+version: '0.89'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

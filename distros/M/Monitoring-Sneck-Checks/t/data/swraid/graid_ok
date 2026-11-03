@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{raid/r0  OPTIMAL  ada0 (ACTIVE (ACTIVE))\nraid/r0  OPTIMAL  ada1 (ACTIVE (ACTIVE))\n};

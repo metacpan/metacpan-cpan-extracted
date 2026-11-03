@@ -44,8 +44,10 @@ sub run_in_container {
   close $fh or die "Cannot close '${script_file}': ${OS_ERROR}\n";
   # IPv6 is disabled because, on some Docker setups, the container sees IPv6
   # addresses but can't connect to them, and each download then hangs until
-  # its time-out.
-  my $docker = 'docker run --rm --sysctl net.ipv6.conf.all.disable_ipv6=1';
+  # its time-out. The modules are installed by cpanm without running their
+  # tests, which would make these tests much slower.
+  my $docker =
+      'docker run --rm --sysctl net.ipv6.conf.all.disable_ipv6=1 -e PERL_CPANM_OPT=--notest';
   my $out = `${docker} -v ${script_file}:/test.sh:ro ${docker_args} ${image} sh /test.sh 2>&1`;  ## no critic (ProhibitBacktickOperators)
   is($CHILD_ERROR, 0, 'docker run: success') or diag($out);
   return $out;

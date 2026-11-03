@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+if ( $ARGV[0] eq '-si' ) { print "Status: Enabled for 10 days 01:02:03           Debug: Urgent\n\nState Table                          Total             Rate\n  current entries                    95000\n  searches                         1234567            1.0/s\n"; exit 0 }
+print "states        hard limit   100000\nsrc-nodes     hard limit    10000\n";

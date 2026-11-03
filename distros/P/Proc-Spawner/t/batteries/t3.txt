@@ -1,0 +1,17 @@
+(cd '/tmp/rv2 [x]*'; echo f*; echo ./f* ../rv2*/f1)
+cd '/tmp/rv2 [x]*'; echo f*
+x='/etc/host\*'; echo $x
+x='/etc/hos[t]\s'; echo $x
+x='/etc/hos\[t]s'; echo $x
+echo /etc/hos[t]\s
+cd /tmp; cd ..; echo t*p
+(cd /; echo ./e*)
+echo .* | wc -w
+echo ~root/x ~nosuchuser/x
+x=a; case ab in "$x"*) echo y;; esac
+x='a*'; case ab in $x) echo y;; "$x") echo q;; esac
+x='a*'; case 'a*' in "$x") echo q;; esac
+case '\' in \\) echo bs;; esac
+case 'x]' in [x]]) echo y;; *) echo n;; esac
+case '-' in [a-]) echo y;; *) echo n;; esac
+case '.' in ?) echo y;; esac

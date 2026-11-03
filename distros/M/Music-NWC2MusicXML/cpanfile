@@ -36,6 +36,7 @@ on 'test' => sub {
 	requires 'Test::More';
 	requires 'Test::Most';
 	requires 'Test::Needs';
+	requires 'Test::Permissions';
 	requires 'Test::Returns';
 	requires 'Test::Without::Module';
 	requires 'XML::PP';   # pure-Perl XML parser; no libxml2 dependency required

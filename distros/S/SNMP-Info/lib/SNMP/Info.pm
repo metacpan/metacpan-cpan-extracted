@@ -27,7 +27,7 @@ our
      $NOSUCH, $BIGINT, $REPEATERS,
      $BACKOFF_FLOOR, $MAX_FAILED_BULKWALKS, $SLOW_DEVICE_TABLES);
 
-$VERSION = '3.984000';
+$VERSION = '3.985000';
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.984000
+SNMP::Info - Version 3.985000
 
 =head1 AUTHOR
 
@@ -474,9 +474,27 @@ See documentation in L<SNMP::Info::PowerEthernet> for details.
 
 =item SNMP::Info::RapidCity
 
-F<RAPID-CITY>.  Inherited by Avaya switches for duplex and VLAN information.
+F<RAPID-CITY>.  Inherited by Avaya switches and, through
+L<SNMP::Info::Layer3::VOSS>, VOSS and Fabric Engine switches, for duplex and
+VLAN information.
 
 See documentation in L<SNMP::Info::RapidCity> for details.
+
+=item SNMP::Info::RapidCityLegacy
+
+F<RAPID-CITY>.  The tables used by the Passport 8600 era, ERS and
+BayStack families.  Inherited by Avaya switches ahead of
+L<SNMP::Info::RapidCity>.
+
+See documentation in L<SNMP::Info::RapidCityLegacy> for details.
+
+=item SNMP::Info::RapidCityVRF
+
+F<RAPID-CITY>.  The VRFs of VOSS and Fabric Engine switches, read as
+contexts.  Inherited by L<SNMP::Info::Layer3::VOSS> ahead of
+L<SNMP::Info::RapidCity>.
+
+See documentation in L<SNMP::Info::RapidCityVRF> for details.
 
 =item SNMP::Info::SONMP
 
@@ -658,6 +676,12 @@ See documentation in L<SNMP::Info::Layer2::CiscoSB> for details.
 Subclass for Exinda / GFI Network Orchestrator traffic shapers.
 
 See documentation in L<SNMP::Info::Layer2::Exinda> for details.
+
+=item SNMP::Info::Layer2::FortiAP
+
+Subclass for Fortinet FortiAP access points.
+
+See documentation in L<SNMP::Info::Layer2::FortiAP> for details.
 
 =item SNMP::Info::Layer2::Hirschmann
 
@@ -1114,6 +1138,12 @@ Subclass for OneAccess routers.
 
 See documentation in L<SNMP::Info::Layer3::OneAccess> for details.
 
+=item SNMP::Info::Layer3::Onyx
+
+Subclass for Mellanox/NVIDIA Onyx switches.
+
+See documentation in L<SNMP::Info::Layer3::Onyx> for details.
+
 =item SNMP::Info::Layer3::PacketFront
 
 Subclass for PacketFront DRG series CPE.
@@ -1247,6 +1277,13 @@ See documentation in L<SNMP::Info::Layer3::Timetra> for details.
 Subclass for VMware ESXi hosts.
 
 See documentation in L<SNMP::Info::Layer3::VMware> for details.
+
+=item SNMP::Info::Layer3::VOSS
+
+Subclass for Extreme VOSS / Fabric Engine switches that report the Extreme
+enterprise.
+
+See documentation in L<SNMP::Info::Layer3::VOSS> for details.
 
 =item SNMP::Info::Layer3::VyOS
 
@@ -2116,7 +2153,7 @@ A site can map a plain community to a VRF context in the device
 configuration (NX-OS C<snmp-server mib community-map>).  The VRF readers
 recognize such a session only where the class can read the mapping from
 the device: NX-OS (L<SNMP::Info::Layer3::Nexus>) and VOSS
-(L<SNMP::Info::Layer3::Extreme>).  Elsewhere a community-mapped session
+(L<SNMP::Info::Layer3::VOSS>).  Elsewhere a community-mapped session
 reads as the default context, so read VRF contexts over SNMPv3.  See
 L<SNMP::Info::VRF/"Reading Instances">.
 
@@ -2607,6 +2644,11 @@ sub device_type {
     return 'SNMP::Info::Layer2::RuckusAP'
         if $desc =~ /^Ruckus Wireless [A-Z]\d{3}/;
 
+    # FortiAPs register under 12356.120 and serve no sysServices; the rest
+    # of the enterprise keeps Layer3::Fortinet.
+    return 'SNMP::Info::Layer2::FortiAP'
+        if $soid =~ /^\.?1\.3\.6\.1\.4\.1\.12356\.120(?:\.|$)/;
+
     # Tachyon TNA radios register under 57344.1 and may not implement
     # sysServices; the TNS switches under 57344.2 keep the generic classes.
     return 'SNMP::Info::Layer3::Tachyon'
@@ -3044,6 +3086,11 @@ sub device_type {
             if (
             $desc =~ /\bTeltonika.*RUT9\d{2}\b/);
 
+        # D-Link DGS switches without sysServices, such as the DGS-F3008P,
+        # which also reports a sysObjectID outside D-Link's enterprise
+        $objtype = 'SNMP::Info::Layer3::DLink'
+            if ( $desc =~ /^D-Link\s+DGS-/i );
+
         # DSM uses a generic Linux sysDescr and commonly uses Net-SNMP's
         # generic Linux sysObjectID.  Probe one DSM-specific scalar only for
         # those devices or Synology's own enterprise.
@@ -3070,6 +3117,19 @@ sub device_type {
             }
         }
     }
+
+    # switchXFamily also contains InfiniBand switches and gateways.
+    $objtype = 'SNMP::Info::Layer3::Onyx'
+        if $soid =~ /^\.?1\.3\.6\.1\.4\.1\.33049\.1\.1\.1\./
+        && $desc =~ /^Onyx,/i;
+
+    # Extreme VOSS / Fabric Engine report "<model> (a.b.c.d)" under the
+    # Extreme enterprise. Layer 2 only devices reach here too, so this sits
+    # after the layer branches. VOSS reporting the Avaya enterprise stays
+    # with Passport
+    $objtype = 'SNMP::Info::Layer3::VOSS'
+        if $soid =~ /^\.?1\.3\.6\.1\.4\.1\.1916\./
+        && $desc =~ /^\S+\s+\(\d+(?:\.\d+){3}/;
 
     # Instant APs use AI-AP-MIB, not the mobility controller WLAN tables.
     # Restrict this initial support to the 8.x evidence in issue #536.

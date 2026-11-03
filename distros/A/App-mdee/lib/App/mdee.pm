@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.14";
+our $VERSION = "1.15";
 
 1;
 =encoding utf-8
@@ -26,12 +26,13 @@ mdee - em·dee, Markdown Easy on the Eyes
      -f  --filter           shortcut for --style=filter
      -p  --plain            shortcut for --style=pager
          --[no-]fold        line folding (default: on)
+     -r  --[no-]refill      join paragraph lines (default: off)
          --[no-]table       table formatting (default: on)
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
-         --table-style=#    table style: pipe or simple (default: pipe)
+         --table-style=#    table style: lattice, 3line or simple (default: lattice)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
@@ -59,7 +60,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.14
+Version 1.15
 
 =cut
 =head1 DESCRIPTION
@@ -89,10 +90,12 @@ for line, only made easier on the eyes with color: the Markdown is
 not interpreted or reformatted.  Some formatting has been added since
 because it made the text more readable: tables are aligned, long
 list items are folded, the default themes hide markup characters,
-and closing hashes are appended to lower-level headings.  Everything
-else is still the source text.  This is why paragraphs are not
-reflowed, why backslash escapes such as C<\*> are shown as written,
-and why C<--no-theme> gives back the original file, in color.
+and closing hashes are appended to lower-level headings.  With
+C<--refill>, the lines that L<pandoc|https://pandoc.org> has found to
+be one paragraph are joined as well.  Everything else is still the
+source text.  This is why backslash escapes such as C<\*> are shown
+as written, and why C<--no-theme> gives back the original file, in
+color.
 
 For full Markdown rendering, many other viewers are available, such
 as C<glow> and C<mdcat>.  Combine them with L<nup(1)|App::nup> for
@@ -268,12 +271,38 @@ outputs through a pager (C<$PAGER> or C<less>) instead of nup.
 
 =item B<--[no-]fold>
 
-Enable or disable line folding for list items.  When enabled, long
-lines in list items are wrapped with proper indentation using
-L<ansifold(1)|App::ansifold>.  Default is enabled.
+Enable or disable line folding for list items, definition lists,
+block quotes and, with C<--refill>, paragraphs.  When enabled, long
+lines are wrapped with proper indentation using
+L<ansifold(1)|App::ansifold>: the continuation lines of a list item
+are indented under its text, those of a block quote start with the
+quote marker again.  Default is enabled.
 
 Supported list markers: C<*>, C<->, C<1.>, C<1)>, C<#.>, C<#)>.
 The C<#.> and C<#)> forms are Pandoc's auto-numbered list syntax.
+
+=item B<-r>, B<--[no-]refill>
+
+Join the lines of each paragraph into one line.  Default is disabled;
+C<default[refill]=1> in the configuration file enables it.
+
+What a paragraph is, a Markdown parser decides: a run of lines at the
+top level, in a block quote, in a list item or in a definition body.
+Those lines are joined in the original text.  Headings, tables, code
+blocks, front matter and everything else stay as written.  A hard
+line break (two or more spaces or a backslash at the end of a line)
+is kept.
+
+Lines are joined with one space, or with nothing after a fullwidth
+punctuation character and between two characters of a script that is
+written without spaces, as L<ansifold(1)|App::ansifold> does.  When
+fold is enabled, the joined paragraphs are folded to the fold width
+like list items; otherwise each is one long line.
+
+The parser is L<Markdown::Perl>, which is installed with B<mdee>, or
+the L<CommonMark> module (an interface to libcmark) when it is there,
+which is faster.  C<--config refill_parser=pandoc> uses pandoc 2.11.3
+or later instead.
 
 =item B<--[no-]table>
 
@@ -327,22 +356,33 @@ rules (C<─>).  Default is enabled.
 
 =item B<--table-style>=I<STYLE>
 
-Select how tables are drawn.  C<pipe> (default) keeps a separator
-between the columns, C<│> or C<|> depending on C<--rule>:
+Select how tables are drawn.  C<lattice> (default) keeps a separator
+between the columns, C<│> or C<|> depending on C<--rule>.  C<pipe> is
+another name of it, kept for compatibility:
 
      Left │ Center │ Right │ Default
     ──────┼────────┼───────┼─────────
      a    │   b    │     c │ d
 
-C<simple> draws tables like Pandoc's simple tables: the columns are
-separated by spaces only, the header is underlined per column, and a
-rule the width of the table is drawn above and below it.
+C<3line> separates the columns by spaces only and draws three rules: a
+rule the width of the table above and below it, and a rule per column
+below the header.
 
     ─────────────────────────────────
      Left   Center   Right   Default
     ────── ──────── ─────── ─────────
      a        b          c   d
     ─────────────────────────────────
+
+C<simple> also separates the columns by spaces only, and draws the
+rule per column below the header and below the table.
+
+     Left   Center   Right   Default
+    ────── ──────── ─────── ─────────
+     a        b          c   d
+    ────── ──────── ─────── ─────────
+
+The rules are drawn with C<-> with C<--no-rule>.
 
 =item B<--cat-v>
 
@@ -391,10 +431,10 @@ in by the width kept free, not more.
 Set where L<ansicolumn(1)|App::ansicolumn> may break a line when nup
 folds the panes, as its C<--boundary> option: C<word> (default) does
 not break inside an alphanumeric word, C<space> not inside a sequence
-of non-space characters, and C<none> breaks anywhere.  Lists and
-tables are folded by the md module at word boundaries, and this
-option keeps the paragraphs, which are folded by nup, in step with
-them.  The value is given to nup (App::nup 1.10 or later), which
+of non-space characters, and C<none> breaks anywhere.  Lists, tables
+and the paragraphs joined by C<--refill> are folded by the md module
+at word boundaries, and this option keeps the other paragraphs, which
+are folded by nup, in step with them.  The value is given to nup (App::nup 1.10 or later), which
 gives it to ansicolumn after F<~/.ansicolumnrc>, so it takes
 precedence over the value there.
 
@@ -481,6 +521,12 @@ Add decorative border lines (C<#>) above and below h1 headings,
 using C<=+> to append a text transformation while preserving the
 original heading color.
 
+With C<--refill>, the added lines are not counted, so paragraphs below
+the h1 headings may not be folded properly by this module.  The text
+itself does not change.  For this reason, this theme turns off
+C<default[refill]> in the configuration file; C<--refill> given on the
+command line still works.
+
 =item C<markcell> (default)
 
 In a table that has wrapped cells, mark the first line of every
@@ -510,6 +556,9 @@ Select light or dark mode.  Default is C<light>.
 If the terminal supports background color detection (via
 L<Getopt::EX::termcolor>), the mode is automatically selected based on
 terminal luminance.
+When the environment variable C<TERM_LUMINANCE> is set (0 to 100, as
+L<Getopt::EX::termcolor> uses it), its value is taken instead and the
+terminal is not asked; below 50 is dark.
 
 Each theme has light and dark variants optimized for different terminal
 backgrounds.  The built-in C<default> theme uses RoyalBlue as the base
@@ -619,6 +668,11 @@ L<Term::ANSIColor::Concise> format.
     --colormap h1=RD               # red bold headings
     --colormap code_block=/L20;E   # dark background for code blocks
     --colormap bold='${base}D'     # base color bold
+
+This option is passed to the L<App::Greple::md> module, as a module
+option before C<--> in the B<greple> command line (see it with C<-n>).
+It is not the C<--cm> option of B<greple>, so C<FILE> and C<FILE_FORMAT>
+are set by C<--config> instead.
 
 Available labels:
 
@@ -765,6 +819,7 @@ This is a shell script that can set defaults and override colors:
     default[style]='pager'           # set default style
     default[width]=170               # set default output width
     default[fold_width]=80           # set default fold width
+    default[refill]=1                # join paragraph lines
     default[base_color]='DarkCyan'   # set default base color
 
 The C<default> associative array supports the following keys:
@@ -780,6 +835,8 @@ The C<default> associative array supports the following keys:
 =item C<default[width]> - Corresponds to C<--width> (e.g., C<170>)
 
 =item C<default[fold_width]> - Corresponds to C<--fold-width> (e.g., C<80>)
+
+=item C<default[refill]> - Corresponds to C<--refill> (C<1> to enable)
 
 =item C<default[pane_width]> - Corresponds to C<--pane-width> (e.g., C<100>)
 
@@ -831,6 +888,7 @@ The C<${base}> string is expanded to the base color value after loading.
     mdee --no-nup file.md       # output to stdout without nup
     mdee --no-fold file.md      # disable line folding
     mdee --no-table file.md     # disable table formatting
+    mdee -r file.md             # join paragraph lines (needs pandoc)
 
     # Output styles
     mdee -s pager file.md       # fold + table, output to pager
@@ -841,7 +899,7 @@ The C<${base}> string is expanded to the base color value after loading.
     # Style shortcuts
     mdee -p file.md             # same as --style=pager
     cat file.md | mdee -f       # highlight stdin (filter mode)
-    mdee -f file.md             # highlight only (no paging)
+    mdee -f file.md             # highlighted output to stdout
 
     # Override individual settings
     mdee -f --fold file.md      # filter + fold
@@ -879,6 +937,13 @@ This command requires the following:
 
 =back
 
+C<--refill> finds the paragraphs with L<Markdown::Perl> (pure Perl,
+installed with this distribution).  The L<CommonMark> module, which
+needs the libcmark C library (C<brew install cmark>, C<apt-get install
+libcmark-dev>) and is only recommended, is used when it is there
+because it is faster; L<pandoc|https://pandoc.org> 2.11.3 or later is
+a third choice.
+
 =head1 IMPLEMENTATION
 
 B<em·dee> is implemented as a Bash script that orchestrates multiple
@@ -911,8 +976,8 @@ each stage without running them, and C<-d> prints the stage names.
 =head3 Processing Stages
 
 The pipeline consists of configurable stages.  Processing options
-can be enabled or disabled independently using C<--[no-]fold>,
-C<--[no-]table>, and C<--[no-]nup> options.
+can be enabled or disabled independently using C<--[no-]refill>,
+C<--[no-]fold>, C<--[no-]table>, and C<--[no-]nup> options.
 
 =head4 Syntax Highlighting
 
@@ -951,13 +1016,26 @@ Code block detection follows the CommonMark specification:
 
 =back
 
+=head4 Paragraph Refill
+
+With C<--refill>, the L<App::Greple::md> module joins the lines of
+each paragraph before anything else.  It asks a Markdown parser
+(L<App::Greple::md::Blocks>: the L<CommonMark> module,
+L<Markdown::Perl>, or L<pandoc|https://pandoc.org> with the
+C<sourcepos> extension) which
+lines of the text form a paragraph, a block quote, a list item or a
+definition, and joins those lines in the original text.  A line that
+starts a footnote definition (C<[^name]:>) stays on its own line.  The
+joined lines are folded like list items.
+
 =head4 Text Folding
 
 Text folding is handled within the L<App::Greple::md> module
 using L<Greple::tee> to pipe matched regions through
 L<ansifold(1)|App::ansifold>.  It preserves ANSI escape sequences
-and maintains proper indentation for nested lists.  Code blocks,
-HTML comments, and tables are excluded from folding.
+and maintains proper indentation for nested lists.  List items,
+definition lists and the paragraphs joined by C<--refill> are
+folded; code blocks, HTML comments, and tables are excluded.
 
 Recognized list markers include C<*>, C<->, C<1.>, C<1)>, C<#.>,
 and C<#)>.  The C<#> marker is Pandoc's auto-numbered list syntax.
@@ -977,7 +1055,7 @@ Column alignment is parsed from the separator line: C<:---> (left,
 default), C<:---:> (center), C<---:> (right).  The C<parse_separator()>
 function extracts alignment markers and passes C<--table-right> and
 C<--table-center> options to L<ansicolumn(1)|App::ansicolumn> (requires
-version 1.53 or later).  Colons are stripped from the separator line
+version 1.61 or later).  Colons are stripped from the separator line
 before further processing.
 
 When C<--rule> is enabled (default), ASCII pipe characters are replaced
@@ -1045,7 +1123,8 @@ The color specification supports modifiers:
 
 B<em·dee> uses L<Getopt::EX::termcolor> to detect terminal background
 luminance.  If luminance is below 50%, dark mode is automatically
-selected.
+selected.  The environment variable C<TERM_LUMINANCE> gives the
+luminance without the detection (see L</Terminal Luminance>).
 
 =head1 LIMITATIONS
 
@@ -1063,16 +1142,34 @@ Multi-line emphasis text is not supported.
 C<***bold italic***> and C<___bold italic___> are supported.
 Other nested forms (e.g., C<< **bold _italic_** >>) are not.
 
+=head2 Block Quotes
+
+A block quote is recognized by its C<E<gt>> markers at the start of a
+line, after up to three spaces.  Only the markers are colored, not the
+quoted text.  Headings, lists and code blocks inside a quote are not
+recognized, so they get no color of their own, and a code block in a
+quote does not protect its contents from inline highlighting.
+
+A line without a marker that continues a quoted paragraph (a lazy
+continuation in CommonMark) is shown as an ordinary line, unless
+C<--refill> joins it to the quote.
+
 =head2 Links
 
 Link patterns do not span multiple lines.  The link text and URL must
 be on the same line.
 
-Links inside other highlighted elements (such as headings or bold
-text) are not processed.
-
 Reference-style links (C<[text][ref]> with C<[ref]: url> elsewhere)
 are not supported.
+
+=head2 Paragraph Refill
+
+C<--refill> joins lines by the rules of Markdown, as pandoc reads
+them.  Lines of verse, addresses or lyrics that rely on the line
+breaks without a hard line break (two spaces or a backslash at the
+end of the line) are joined as well, and so are the lines of a
+display math block between C<$$> lines.  Do not use C<--refill>
+for such documents.
 
 =head2 Table Alignment
 
@@ -1106,6 +1203,15 @@ C<-R> option.
 
 For OSC 8 specification, see:
 L<https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda>
+
+=head2 Terminal Luminance
+
+Without C<--mode> or C<default[mode]>, B<mdee> asks the terminal for
+its background color (OSC 11) through L<Getopt::EX::termcolor> to
+choose between light and dark mode.  Set C<TERM_LUMINANCE> to a value
+from 0 to 100 to give the answer yourself and skip the query, for
+example in scripts or tests, where a reply that arrives late would
+show up as terminal input.
 
 =head2 Less Environment Variables
 
@@ -1155,6 +1261,10 @@ ANSI-aware text folding for line wrapping.
 =item L<ansicolumn>
 
 ANSI-aware column formatting for table alignment.
+
+=item L<CommonMark>, L<Markdown::Perl>, L<pandoc|https://pandoc.org>
+
+One of them finds the paragraphs for C<--refill>.
 
 =item L<https://github.com/tecolicom/App-mdee>
 

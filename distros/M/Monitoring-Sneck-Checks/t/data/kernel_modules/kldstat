@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+exit( $ARGV[2] eq 'zfs' ? 0 : 1 );

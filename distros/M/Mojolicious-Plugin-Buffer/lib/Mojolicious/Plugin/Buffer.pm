@@ -30,7 +30,7 @@ use Sub::Private { mode => 'enforce' };
 use Sub::Protected;
 use Time::HiRes ();
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.001.1');
 
 # ---------------------------------------------------------------------------
 # Constants.  Nothing below this block should contain a bare number or a
@@ -55,7 +55,7 @@ Readonly::Hash my %HTML_TYPES => map { $_ => 1 } qw(text/html application/xhtml+
 # Cache-Control directives that stop a request using, or a response being
 # stored in, the server-side cache.  max-age only counts when it is zero.
 Readonly::Hash my %REQUEST_NO_CACHE => map { $_ => 1 } qw(no-store no-cache private max-age);
-Readonly::Hash my %RESPONSE_NO_STORE => map { $_ => 1 } qw(no-store private);
+Readonly::Hash my %RESPONSE_NO_STORE => map { $_ => 1 } qw(no-store no-cache private);
 
 # Headers that describe one delivery rather than the page, so they are never
 # stored with a cache entry
@@ -116,7 +116,7 @@ Readonly::Array my @LINK_ATTRIBUTES => (['a', 'href'], ['img', 'src']);
 
 # Elements whose content is significant white space or code, which the
 # white-space squasher must never touch
-Readonly::Scalar my $VERBATIM_ELEMENT => qr{(<(pre|textarea|script|style)\b[^>]*>)(.*?)(</\2\s*>)}is;
+Readonly::Scalar my $VERBATIM_OPEN => qr{<(pre|textarea|script|style)\b[^<>]*+>}i;
 
 # Server preference order for content codings
 Readonly::Array my @DEFAULT_ENCODINGS => qw(br zstd gzip);
@@ -218,7 +218,7 @@ Mojolicious::Plugin::Buffer - Optimise, compress and validate Mojolicious respon
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 =cut
 
@@ -575,7 +575,11 @@ C<E<lt>!-- ... --E<gt>> hiding technique
 Optimisation only applies to C<text/html> and C<application/xhtml+xml>
 responses.  The content of C<E<lt>preE<gt>>, C<E<lt>textareaE<gt>>,
 C<E<lt>scriptE<gt>> and C<E<lt>styleE<gt>> elements is never touched by the
-white-space squashing, because white space there is significant.
+white-space squashing, because white space there is significant.  A
+space between two inline elements, as in C<Hello E<lt>bE<gt>worldE<lt>/bE<gt>>,
+is kept.  At level 2, consecutive C<document.write> calls are merged only
+inside one C<E<lt>script type="text/javascript"E<gt>> element, so scripts
+of other types, such as templates, are left alone.
 L<HTML::Packer> is optional: without it the white-space squashing and link
 rewriting still run, but comments and embedded CSS and JavaScript are left
 alone, as they are by L<CGI::Buffer> and L<FCGI::Buffer>.  Install
@@ -1208,8 +1212,8 @@ Only C<200> responses to C<GET> and C<HEAD> requests are cached.  Requests
 with an C<Authorization> header or a C<Cache-Control> header containing
 C<no-store>, C<no-cache>, C<private> or C<max-age=0> bypass the cache, as do
 requests made while the C<NO_CACHE> or C<NO_STORE> environment variable is
-set.  Responses that set a cookie, that are marked C<no-store> or
-C<private>, or that vary on something not listed in L</vary_by>, are not
+set.  Responses that set a cookie, that are marked C<no-store>,
+C<no-cache> or C<private>, or that vary on something not listed in L</vary_by>, are not
 stored.  Entries created before the application script or any template file
 or directory was last modified are treated as misses and removed.
 
@@ -2582,11 +2586,13 @@ sub _pack :Private {
 
 	if ($level >= $OPTIMISE_AGGRESSIVE) {
 		# Strip the <!-- ... //--> hiding technique, which the JavaScript
-		# minifier would otherwise treat as code
+		# minifier would otherwise treat as code.  [^>] keeps each match
+		# inside the <script> tag: .*? could run on through the page and
+		# leave the text of an HTML comment showing.
 		$packer_options->{do_javascript} = 'best';
-		$body =~ s/(<script.*?>)\s*<!--/$1/gi;
-		$body =~ s/\/\/-->\s*<\/script>/<\/script>/gi;
-		$body =~ s/(<script.*?>)\s+/$1/gi;
+		$body =~ s/(<script[^>]*+>)\s*+<!--/$1/gi;
+		$body =~ s/\/\/-->\s*+<\/script>/<\/script>/gi;
+		$body =~ s/(<script[^>]*+>)\s++/$1/gi;
 	}
 
 	# The packer holds no per-document state, so one per plugin will do
@@ -2599,27 +2605,37 @@ sub _pack :Private {
 # Purpose:        Turn document.write("a"); document.write("b") into
 #                 document.write("a"+"b").
 # Entry criteria: $html is minified HTML.
-# Exit status:    The rewritten HTML, stopping once it stops shrinking.
-# Side effects:   None.
+# Exit status:    The rewritten HTML.  Each substitution replaces
+#                 ");document.write(" with "+", so the body shrinks every
+#                 time and the loop always ends.
+# Side effects:   None.  Only <script type="text/javascript"> blocks are
+#                 touched, their tag is kept as written, and nothing may
+#                 cross a </script>: writes in different scripts, or in a
+#                 script of another type such as a template, stay apart.
 sub _merge_document_writes :Private {
 	my $html = shift;
 
-	my $old_length = length($html);
-	while (1) {
-		$html =~ s/<script\s*?type\s*?=\s*?"text\/javascript"\s*?>(.*?)document\.write\((.+?)\);\s*?document\.write\((.+?)\)/<script type="text\/JavaScript">${1}document.write($2+$3)/igs;
-		my $new_length = length($html);
-		last if $new_length >= $old_length;
-		$old_length = $new_length;
-	}
+	1 while $html =~ s{
+		(<script\s+type\s*=\s*"text/javascript"\s*>)		# $1: the opening tag
+		((?:(?!</script>).)*?)					# $2: code before the writes
+		document\.write\(((?:(?!</script>)[^;])*?)\);\s*+	# $3: first argument
+		document\.write\(((?:(?!</script>)[^;])*?)\)		# $4: second argument
+	}{$1${2}document.write($3+$4)}gisx;
 
 	return $html;
 }
 
 # Purpose:        Reduce output by removing superfluous white space.  This
 #                 is the set of substitutions used by CGI::Buffer and
-#                 FCGI::Buffer, with two corrections: a "+" at the start of
-#                 a line is no longer deleted, and the content of pre,
-#                 textarea, script and style elements is left alone.
+#                 FCGI::Buffer, with three corrections: a "+" at the start
+#                 of a line is no longer deleted, the content of pre,
+#                 textarea, script and style elements is left alone, and
+#                 a visible space between two inline elements is kept.
+#                 Every pattern runs in linear time: one that starts with
+#                 white space starts only at the first character of a run
+#                 ((?<!\s)) and never gives any of it back (\s++), and one
+#                 that looks for the end of an element cannot run past
+#                 the next tag.
 # Entry criteria: $body is HTML.
 # Exit status:    The squashed HTML.
 # Side effects:   None.
@@ -2632,46 +2648,67 @@ sub _squash :Private {
 	# break.  One pattern, so CRLF ("\r\n    <") loses its indentation as
 	# well as LF does: the old (\s+|\r)\n alternative consumed the "\n" and
 	# left the indentation after it behind.
-	$body =~ s/\s*\n\s*/\n/g;
-	$body =~ s/\<\/div\>\s+\<div/\<\/div\>\<div/gis;
-	$body =~ s/(<div>\s+|\s+<div>)/<div>/gis;
-	$body =~ s/\s+<\/div\>/\<\/div\>/gis;
-	$body =~ s/\s+\<p\>|\<p\>\s+/\<p\>/im;
-	$body =~ s/\s+\<\/p\>|\<\/p\>\s+/\<\/p\>/gis;
-	$body =~ s/<html>\s+<head>/<html><head>/is;
-	$body =~ s/\s*<\/head>\s+<body>\s*/<\/head><body>/is;
-	$body =~ s/<html>\s+<body>/<html><body>/is;
-	$body =~ s/<body>\s+/<body>/is;
-	$body =~ s/\s+\<\/html/\<\/html/is;
-	$body =~ s/\s+\<\/body/\<\/body/is;
-	$body =~ s/\s(\<.+?\>\s\<.+?\>)/$1/;
+	$body =~ s{
+		(?<![^\S\n])	# start only at the beginning of a white space run
+		[^\S\n]*+	# spaces, tabs and \r before the line break
+		\n
+		\s*+		# blank lines and indentation after it
+	}{\n}gx;
+	$body =~ s/\<\/div\>\s+\<div/\<\/div\>\<div/gi;
+	$body =~ s/(?:<div>\s++|(?<!\s)\s++<div>)/<div>/gi;
+	$body =~ s/(?<!\s)\s++<\/div>/<\/div>/gi;
+	$body =~ s/(?:(?<!\s)\s++<p>|<p>\s++)/<p>/i;
+	$body =~ s/(?:(?<!\s)\s++<\/p>|<\/p>\s++)/<\/p>/gi;
+	$body =~ s/<html>\s+<head>/<html><head>/i;
+	$body =~ s/(?<!\s)\s*+<\/head>\s++<body>\s*+/<\/head><body>/i;
+	$body =~ s/<html>\s+<body>/<html><body>/i;
+	$body =~ s/<body>\s+/<body>/i;
+	$body =~ s/(?<!\s)\s++<\/html/<\/html/i;
+	$body =~ s/(?<!\s)\s++<\/body/<\/body/i;
 	$body =~ s/\<p\>\s/\<p\>/gi;
 	$body =~ s/\<\/p\>\s\<p\>/\<\/p\>\<p\>/gi;
 	$body =~ s/\<\/tr\>\s\<tr\>/\<\/tr\>\<tr\>/gi;
 	$body =~ s/\<\/td\>\s\<\/tr\>/\<\/td\>\<\/tr\>/gi;
-	$body =~ s/\<\/td\>\s*\<td\>/\<\/td\>\<td\>/gis;
+	$body =~ s/\<\/td\>\s*\<td\>/\<\/td\>\<td\>/gi;
 	$body =~ s/\<\/tr\>\s\<\/table\>/\<\/tr\>\<\/table\>/gi;
 	$body =~ s/\<br\s?\/\>\s?\<p\>/\<p\>/gi;
 	$body =~ s/\<br\>\s/\<br\>/gi;
-	$body =~ s/\s+\<br/\<br/gi;
+	$body =~ s/(?<!\s)\s++<br/<br/gi;
 	$body =~ s/\<br\s?\/\>\s/\<br \/>/gi;
-	$body =~ s/[ \t]+/ /gs;	# Don't use \s+, it would join lines
+	$body =~ s/[ \t]+/ /g;	# Don't use \s+, it would join lines
 	$body =~ s/\s\<p\>/\<p\>/gi;
 	$body =~ s/\s\<script/\<script/gi;
-	$body =~ s/(<script>\s|\s<script>)/<script>/gis;
-	$body =~ s/(<\/script>\s|\s<\/script>)/<\/script>/gis;
+	$body =~ s/(<script>\s|\s<script>)/<script>/gi;
+	$body =~ s/(<\/script>\s|\s<\/script>)/<\/script>/gi;
 	$body =~ s/\<td\>\s/\<td\>/gi;
-	$body =~ s/\s+\<a\shref="(.+?)"\>\s?/ <a href="$1">/gis;
-	$body =~ s/\s?<a\shref=\s"(.+?)"\>/ <a href="$1">/gis;
-	$body =~ s/\s+<\/a\>\s+/<\/a> /gis;
-	$body =~ s/(\s?<hr>\s+|\s+<hr>\s?)/<hr>/gis;
-	$body =~ s/<\/li>\s+<li>/<\/li><li>/gis;
-	$body =~ s/<\/li>\s+<\/ul>/<\/li><\/ul>/gis;
-	$body =~ s/<ul>\s+<li>/<ul><li>/gis;
-	$body =~ s/\s+<\/li>/<\/li>/gis;
-	$body =~ s/\<\/option\>\s+\<option/\<\/option\>\<option/gis;
-	$body =~ s/<title>\s*(.+?)\s*<\/title>/<title>$1<\/title>/is;
-	$body =~ s/<\/center>\s+<center>/ /gis;
+
+	# The link cannot leave its quotes, so these cannot span tags or search
+	# the rest of the page
+	$body =~ s{
+		(?<!\s)\s++		# a whole run of white space
+		<a\shref="([^"]*+)">	# $1: the link
+		\s?
+	}{ <a href="$1">}gix;
+	$body =~ s{
+		\s?
+		<a\shref=\s"([^"]*+)">	# $1: the link
+	}{ <a href="$1">}gix;
+	$body =~ s/(?<!\s)\s++<\/a>\s+/<\/a> /gi;
+	$body =~ s/(?:\s?<hr>\s++|(?<!\s)\s++<hr>\s?)/<hr>/gi;
+	$body =~ s/<\/li>\s+<li>/<\/li><li>/gi;
+	$body =~ s/<\/li>\s+<\/ul>/<\/li><\/ul>/gi;
+	$body =~ s/<ul>\s+<li>/<ul><li>/gi;
+	$body =~ s/(?<!\s)\s++<\/li>/<\/li>/gi;
+	$body =~ s/\<\/option\>\s+\<option/\<\/option\>\<option/gi;
+
+	# A title cannot contain a tag, so [^<] stops each unterminated <title>
+	# from being searched to the end of the page
+	$body =~ s{<title>\s*+([^<]*+)</title>}{
+		my $title = $1;
+		$title =~ s/(?<!\s)\s++\z//;
+		"<title>$title</title>"
+	}ie;
+	$body =~ s/<\/center>\s+<center>/ /gi;
 
 	return _restore_verbatim($body, $vault);
 }
@@ -2690,11 +2727,28 @@ sub _protect_verbatim :Private {
 	my $marker = "\x00MPB";
 	$marker .= "\x00" while index($$body_ref, $marker) >= 0;
 
-	my @saved;
-	$$body_ref =~ s{$VERBATIM_ELEMENT}{
-		push(@saved, $3);
-		$1 . $marker . $#saved . $marker . $4;
-	}ge;
+	# One pass along the page.  An element whose closing tag is missing
+	# is searched for once: if no </pre> follows one <pre>, none follows a
+	# later one either, so every unterminated element cannot each search
+	# to the end of the page.
+	my (@saved, %unclosed);
+	my ($out, $from) = ('', 0);
+	pos($$body_ref) = 0;
+	while ($$body_ref =~ m{$VERBATIM_OPEN}gc) {
+		my $name = lc($1);
+		my $content_start = pos($$body_ref);
+		next if $unclosed{$name};
+
+		if ($$body_ref =~ m{\G(.*?)</\Q$name\E\s*+>}gcis) {
+			push(@saved, $1);
+			$out .= substr($$body_ref, $from, $content_start - $from) . $marker . $#saved . $marker;
+			$from = $+[1];	# the closing tag stays where it is
+		} else {
+			$unclosed{$name} = 1;
+			pos($$body_ref) = $content_start;
+		}
+	}
+	$$body_ref = $out . substr($$body_ref, $from);
 
 	return {marker => $marker, saved => \@saved};
 }
@@ -3300,7 +3354,11 @@ C<E<lt>preE<gt>>, C<E<lt>textareaE<gt>>, C<E<lt>scriptE<gt>> and
 C<E<lt>styleE<gt>>, but white space made significant by CSS
 (C<white-space: pre> on another element) is still collapsed, and some rules
 (for example merging adjacent C<E<lt>centerE<gt>> blocks) change the
-document slightly.  Use C<optimise_content =E<gt> 0> on pages where every
+document slightly.  The squashing runs in time proportional to the size
+of the page, even for malformed HTML, but L<HTML::Packer> does not: on a
+page with thousands of unclosed C<E<lt>preE<gt>> tags it can take seconds.
+Do not optimise HTML that a visitor controls.  Use
+C<optimise_content =E<gt> 0> on pages where every
 byte matters, or disable it per response with
 C<$c-E<gt>stash(buffer =E<gt> {optimise_content =E<gt> 0})>.  Link rewriting
 only recognises double-quoted attributes.
@@ -3527,7 +3585,8 @@ This is the life of one cache key, seen by all workers together.
         / the uncompressed page is stored with cache_duration; every
           waiting request is answered from it; the lock is released
     (3) the builder's response is finished  [error, or not storable:
-        it sets a cookie, is marked private or no-store, or varies on a
+        it sets a cookie, is marked private, no-store or no-cache, or
+        varies on a
         header not in vary_by]
         / every waiting request gets 503 with Retry-After: 1; the lock
           is released

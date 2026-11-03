@@ -31,6 +31,14 @@ Note: If `$Unicode::EastAsianWidth::EastAsian` is true on compilation time, this
 
 If you want to detect the ambw parameter from users' environment, please look [Unicode::EastAsianWidth::Detect](https://metacpan.org/pod/Unicode%3A%3AEastAsianWidth%3A%3ADetect).
 
+# Unicode Version
+
+On perl 5.30 and later, the width classes come from the
+`East_Asian_Width` property of perl itself, so they follow the
+Unicode version of the perl in use (see [perluniprops](https://metacpan.org/pod/perluniprops)).  On older
+Perl versions, the table of [Unicode::EastAsianWidth](https://metacpan.org/pod/Unicode%3A%3AEastAsianWidth) (Unicode 12.0)
+is used, which is newer than the Unicode version of those Perl versions.
+
 # AUTHOR
 
 Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF GMAIL COM>

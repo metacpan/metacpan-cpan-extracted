@@ -19,7 +19,7 @@ use Scalar::Util qw(blessed);
 use Sub::Private { mode => 'enforce' };
 use Sub::Protected;
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.001.1');
 
 # Lock files are created world-readable/writable before the umask is applied,
 # so the directory's permissions decide who may take a lock
@@ -37,7 +37,7 @@ Mojolicious::Plugin::Buffer::Lock::File - flock-based lock backend
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 =head1 SYNOPSIS
 

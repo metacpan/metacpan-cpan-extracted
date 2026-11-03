@@ -10,14 +10,18 @@ sneck -u [B<-C> <cache file>] [B<-f> <config file>] [B<-p>] [B<-i>] [B<-d>] [B<-
 
 sneck -c [B<-C> <cache file>] [B<-f> <config file>] [B<-b>]
 
-sneck [B<-f> <config file>] [B<-p>] [B<-i>] [B<-r>] [B<-T> <seconds>] [B<-s> <signal>] [B<-k>|B<-K>]
+sneck [B<-f> <config file>] [B<-p>] [B<-i>] [B<-d>] [B<-q>] [B<-r>] [B<-T> <seconds>] [B<-s> <signal>] [B<-k>|B<-K>]
 
 sneck -t [B<-f> <config file>]
 
+sneck -h
+
+sneck -v
+
 =head1 DESCRIPTION
 
-For a description of the config file format and output,
-please see L<Monitoring::Sneck>.
+For the config file format, see L<Monitoring::Sneck::Config>. For the
+output, see L<Monitoring::Sneck>.
 
 The cache file, PID dir, locking, and check timeout settings may also
 be set in the config file. Flags override those. See OPTIONS in L<Monitoring::Sneck::Config>.
@@ -35,7 +39,7 @@ Default :: /usr/local/etc/sneck.conf
 
 =head2 -p
 
-Pretty it in a nicely formatted format.
+Pretty print the JSON.
 
 =head2 -C <cache file>
 
@@ -50,14 +54,22 @@ is also created. By default it is
 /var/cache/sneck.cache.snmp and always holds
 the GZip+BASE64 compressed version.
 
+Compliance check state, used for interval, is kept in the cache file
+name with '.compliance' added, so by default
+/var/cache/sneck.cache.compliance. It is only used if a compliance
+check has a interval.
+
 =head2 -u
 
-Update the cache file. Will also print the was written to it.
+Update the cache file. Will also print what was written to it.
 
 =head2 -c
 
 Print the cache file. Please note that B<-p> or B<-i> won't affect
 this as this flag only reads/prints the cache file.
+
+If the cache file does not exist or can't be read, error JSON saying
+so is printed and it exits 3.
 
 =head2 -b
 
@@ -70,15 +82,15 @@ Includes the config file used.
 
 =head2 -d
 
-Print debugging info if called with -u.
+Print debugging info to stderr.
 
 =head2 -q
 
-Don't print the results for -u. Exit queitly.
+Don't print the results. Exit quietly. Meant for use with B<-u>.
 
 =head2 -l
 
-Enable locking for with -u so more than one instance can't run at a time.
+Enable locking for B<-u> so more than one instance can't run at a time.
 Overrides locking in the config.
 
 The PID file is sneck.pid in the directory set by B<-P>.
@@ -144,6 +156,14 @@ Test the config file. Prints any errors and warnings, then exits 0 if
 there are no errors and 1 if there are or the file can't be read.
 Warnings, such as a check using a undefined variable, do not affect the
 exit code.
+
+=head2 -h, --help
+
+Print the help.
+
+=head2 -v, --version
+
+Print the version.
 
 =cut
 
@@ -302,6 +322,7 @@ my $sneck = Monitoring::Sneck->new(
 		debug      => $debug,
 		restart    => $restart,
 		state_file => $cache_file . '.restarts',
+		compliance_state_file => $cache_file . '.compliance',
 		check_timeout        => $check_timeout,
 		check_timeout_signal => $check_timeout_signal,
 		check_kill_sub_pids  => $kill_sub_pids ? 1 : $no_kill_sub_pids ? 0 : undef,

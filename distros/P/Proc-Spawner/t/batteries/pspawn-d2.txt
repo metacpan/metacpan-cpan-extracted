@@ -1,0 +1,10 @@
+> f; echo $?; ls f
+> /nonexist/f; echo $?
+set -e; > /nonexist/f; echo not here
+x=1 y=2 2>f >&2; echo "$x $y"; cat f
+x=1 > /nonexist/f; echo "$? [$x]"
+ec\@Nho joined
+< /nonexist/f; echo $?
+x=5 >f 2>&1; echo $x
+2>/dev/null >/nonexist/f; echo $?
+f() { echo in; }; > f f; cat f

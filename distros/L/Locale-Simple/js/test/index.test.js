@@ -4,6 +4,7 @@ import {
   l_dir,
   l_lang,
   l_dry,
+  l_nolocales,
   ltd,
   loadTranslations,
   loadLocaleData,
@@ -24,6 +25,7 @@ import {
   Ndp_,
   Ndnp_,
 } from '../src/index.js';
+import localeSimple from '../src/index.js';
 
 // Test translations (German)
 const testTranslations = {
@@ -133,6 +135,71 @@ describe('Locale Simple', () => {
       assert.strictEqual(ln('You have %d message', 'You have %d messages', 1), 'You have 1 message');
       assert.strictEqual(ln('You have %d message', 'You have %d messages', 4), 'You have 4 messages');
     });
+
+    // The block of the other runtimes (python/test.py DRY_SHARED,
+    // t/21-dryrun.t): one console.debug call per block, its lines joined
+    // with \n and ended by \n, so the console shows the bytes of their
+    // dry-run file.
+    const DRY_SHARED =
+      'msgid "Hello"\n' +
+      '\n' +
+      '# domain: othertest\n' +
+      'msgid "Hello"\n' +
+      '\n' +
+      'msgctxt "alien"\n' +
+      'msgid "Hello"\n' +
+      '\n' +
+      'msgid "%2$s has %1$d message"\n' +
+      'msgid_plural "%2$s has %1$d messages"\n' +
+      '\n' +
+      '# domain: othertest\n' +
+      'msgctxt "inbox"\n' +
+      'msgid "You have %d message"\n' +
+      'msgid_plural "You have %d messages"\n' +
+      '\n' +
+      String.raw`msgid "Say \"%s\"\\n\nGrüße"` + '\n' +
+      '\n' +
+      String.raw`msgid "Tab\there\rand CR"` + '\n' +
+      '\n';
+
+    it('should write the shared dry-run block to console.debug', (t) => {
+      const debug = t.mock.method(console, 'debug', () => {});
+      l_dry(true);
+      assert.deepStrictEqual(
+        [
+          l('Hello'),
+          l(''),
+          ld('othertest', 'Hello'),
+          lp('alien', 'Hello'),
+          ln('%2$s has %1$d message', '%2$s has %1$d messages', 2, 'harry'),
+          ldnp('othertest', 'inbox', 'You have %d message', 'You have %d messages', 1),
+          l('Say "%s"\\n\nGrüße', 'hi'),
+          l('Tab\there\rand CR'),
+        ],
+        [
+          'Hello',
+          '',
+          'Hello',
+          'Hello',
+          'harry has 2 messages',
+          'You have 1 message',
+          'Say "hi"\\n\nGrüße',
+          'Tab\there\rand CR',
+        ]
+      );
+      const calls = debug.mock.calls.map((call) => call.arguments);
+      assert.ok(calls.every((args) => args.length === 1), 'one argument per call');
+      assert.strictEqual(calls.map(([block]) => block + '\n').join(''), DRY_SHARED);
+    });
+  });
+
+  describe('l("") - empty msgid', () => {
+    it('should return an empty string without a lookup', () => {
+      loadTranslations('header', 'de_DE', { '': 'Project-Id-Version: test\n' });
+      ltd('header');
+      assert.strictEqual(l(''), '');
+      assert.strictEqual(ld('header', ''), '');
+    });
   });
 
   describe('lnp() - context + plural', () => {
@@ -212,6 +279,21 @@ describe('Locale Simple', () => {
         ldnp('other', 'cart', 'You have %d item', 'You have %d items', 5),
         'Warenkorb: 5 Sachen'
       );
+    });
+  });
+
+  describe('l_nolocales() - API symmetry', () => {
+    it('is exported, named and on the default export', () => {
+      assert.strictEqual(typeof l_nolocales, 'function');
+      assert.strictEqual(localeSimple.l_nolocales, l_nolocales);
+    });
+
+    it('is a no-op: returns undefined and changes no translation', () => {
+      assert.strictEqual(l_nolocales(true), undefined);
+      assert.strictEqual(l('Hello'), 'Hallo');
+      assert.strictEqual(ln('You have %d message', 'You have %d messages', 4), 'Du hast 4 Nachrichten');
+      assert.strictEqual(l_nolocales(false), undefined);
+      assert.strictEqual(l('Hello'), 'Hallo');
     });
   });
 
@@ -311,6 +393,42 @@ describe('loadLocaleData() - po2json format', () => {
       ln('You have %d item', 'You have %d items', 7),
       'Du hast 7 Sachen'
     );
+  });
+
+  it('files each bundle under the gettext Language header', () => {
+    // bin/po2json writes the header field "Language", with a leading space
+    loadLocaleData('multi', {
+      multi: { '': { 'Language': ' de_DE' }, 'Hello': [null, 'Hallo'] },
+    });
+    loadLocaleData('multi', {
+      multi: { '': { 'Language': 'fr_FR' }, 'Hello': [null, 'Bonjour'] },
+    });
+    ltd('multi');
+
+    l_lang('de_DE');
+    assert.strictEqual(l('Hello'), 'Hallo');
+    l_lang('fr_FR');
+    assert.strictEqual(l('Hello'), 'Bonjour');
+    l_lang('de_DE');
+    assert.strictEqual(l('Hello'), 'Hallo');
+  });
+
+  it('prefers a lang field over the Language header', () => {
+    loadLocaleData('both', {
+      both: { '': { 'lang': 'it_IT', 'Language': ' de_DE' }, 'Hello': [null, 'Ciao'] },
+    });
+    ltd('both');
+    l_lang('it_IT');
+    assert.strictEqual(l('Hello'), 'Ciao');
+    l_lang('de_DE');
+    assert.strictEqual(l('Hello'), 'Hello');
+  });
+
+  it('files a bundle without language under "" (fallback for every language)', () => {
+    loadLocaleData('nolang', { nolang: { '': {}, 'Hello': [null, 'Hallo'] } });
+    ltd('nolang');
+    l_lang('xx_YY');
+    assert.strictEqual(l('Hello'), 'Hallo');
   });
 
   it('should no-op for missing domain', () => {

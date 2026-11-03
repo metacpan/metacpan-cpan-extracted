@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Test::Most tests => 5;
 use Storable;
+use Test::Log::Abstraction;
 # use Test::NoWarnings;	# HTML::Clean has them
 
 BEGIN {
@@ -36,7 +37,7 @@ CACHED: {
 		CGI::Buffer::init({
 			cache => $cache,
 			cache_key => 'xyzzy',
-			logger => MyLogger->new()
+			logger => Test::Log::Abstraction->new()
 		});
 		ok(!CGI::Buffer::is_cached());
 
@@ -49,23 +50,4 @@ CACHED: {
 		$cache->set('xyzzy', Storable::freeze($c));
 		ok(CGI::Buffer::is_cached());
 	}
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
 }

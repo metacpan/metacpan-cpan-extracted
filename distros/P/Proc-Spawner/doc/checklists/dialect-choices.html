@@ -1,0 +1,728 @@
+<title>Shell Dialect Choices</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column of decision cards under a sticky status bar; a register-map feel (IDs as addresses, mono for anything you type). */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e8ecea; --fg:#18201d; --muted:#5b6762; --line:#cfd7d3;
+  --accent:#1f5f8b; --go:#1d7a46; --nogo:#a3372b; --discuss:#7a4fa8; --explain:#b06a00; --plaque:#c0262d; --onfill:#ffffff;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1a211e; --sunk:#232c28; --fg:#e3ebe7; --muted:#9aa8a1; --line:#33403a;
+  --accent:#6fb3e3; --go:#4cc285; --nogo:#ef7b6d; --discuss:#b993e6; --explain:#e6a740; --plaque:#e5484d; --onfill:#0f1412; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1a211e; --sunk:#232c28; --fg:#e3ebe7; --muted:#9aa8a1; --line:#33403a;
+  --accent:#6fb3e3; --go:#4cc285; --nogo:#ef7b6d; --discuss:#b993e6; --explain:#e6a740; --plaque:#e5484d; --onfill:#0f1412; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1{font-family:var(--f-display);font-weight:600;font-size:1.9rem;line-height:1.15;margin:0 0 6px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:30px 0 10px}
+p{margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}
+.lede{color:var(--muted);max-width:68ch;display:grid;gap:8px}
+.top{display:grid;gap:14px;margin-top:16px}
+.legend{display:grid;gap:4px;font-size:.92rem}
+.legend b{font-weight:600}
+fieldset{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:0;display:grid;gap:4px}
+legend{font-weight:600;padding:0 4px}
+fieldset label{display:flex;gap:8px;align-items:flex-start}
+.lastread{font-size:.9rem;color:var(--muted)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:8px;margin-top:16px;display:grid;gap:6px}
+.plaque{font:inherit;font-size:.9rem;text-align:left;background:var(--plaque);color:#fff;border:0;border-radius:5px;padding:6px 10px;cursor:pointer;position:relative}
+.pop{position:absolute;left:0;top:100%;margin-top:6px;z-index:6;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:10px 14px;max-width:min(560px,90vw);box-shadow:0 6px 24px rgb(0 0 0 / .18);font-size:.88rem}
+.pop ol{margin:0;padding-left:18px;display:grid;gap:4px}
+.progress{font-size:.9rem;font-variant-numeric:tabular-nums}
+.brow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.88rem}
+.brow select{font:inherit}
+.blab{font-family:var(--f-display);font-weight:600;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);min-width:4.2em}
+.ghead{display:grid;gap:4px;margin-top:30px}
+.ghead h2{margin:0}
+.ghead p{color:var(--muted);font-size:.92rem;max-width:72ch}
+.layer{font-family:var(--f-display);font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;white-space:nowrap}
+.filt{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:2px 10px;cursor:pointer}
+.filt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--onfill)}
+.gogrp{display:inline-flex;gap:6px;align-items:center;margin-left:auto}
+.blab[for]{min-width:0}
+a.xref{color:var(--accent);font-family:var(--f-mono);font-size:.92em;font-weight:500;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+a.xref:hover{text-decoration-style:solid}
+.item.flash{box-shadow:0 0 0 3px var(--accent)}
+.item{transition:box-shadow .4s;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0;display:grid;gap:10px;min-width:0}
+.item.m-go{border-left-color:var(--go)} .item.m-nogo{border-left-color:var(--nogo)} .item.m-discuss{border-left-color:var(--discuss)}
+.item.m-exfirst,.item.m-exlater{border-left-color:var(--explain)}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.iid{font-family:var(--f-mono);font-weight:500;font-size:.9rem;padding:1px 6px;border-radius:4px;background:var(--sunk);white-space:nowrap}
+.ttl{font-weight:600;font-size:1.02rem;flex:1 1 300px;min-width:0}
+.pill{font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:0 8px}
+.sec{display:grid;gap:4px;min-width:0}
+.lab{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sec ul,.sec ol{margin:0;padding-left:20px;display:grid;gap:3px}
+.marks{display:flex;flex-wrap:wrap;gap:6px}
+.mk{font:inherit;font-size:.85rem;border:1.5px solid var(--c);color:var(--c);background:transparent;border-radius:5px;padding:3px 10px;cursor:pointer}
+.mk .ic{display:none}
+.mk[aria-pressed="true"]{background:var(--c);color:var(--onfill)}
+.mk[aria-pressed="true"] .ic{display:inline}
+.mk:disabled{opacity:.5;cursor:not-allowed}
+.remind{font-size:.88rem;display:flex;gap:6px;align-items:center}
+.thread{display:grid;gap:8px}
+textarea{font:inherit;font-size:.92rem;width:100%;box-sizing:border-box;resize:none;overflow-y:hidden;border:1px solid var(--line);border-radius:5px;padding:6px 8px;background:var(--bg);color:var(--fg)}
+.ans{border-left:3px solid var(--accent);padding:4px 0 4px 10px;white-space:pre-wrap;font-size:.92rem}
+.ans .who{font-weight:600}
+.tag{font-size:.75rem;border-radius:4px;padding:0 6px;margin-left:6px;white-space:nowrap}
+.tag.muted{border:1px solid var(--line);color:var(--muted)}
+.tag.turn{background:var(--explain);color:var(--onfill)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ro{color:var(--plaque);font-size:.9rem}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<h1>Shell Dialect Choices</h1>
+<div class="lede">
+<p>Every construct I know of that dash and bash both have but run differently, and the bash-only ones, each with a choice. This is the checklist you asked for under A3 on the page “Shell Large Subset”. Nothing on this page is implemented yet, except your decision R1 and the documentation part of R2 (R2's executor patch is ready, not yet applied by the posix_spawn session).</p>
+<p><b>The alternatives</b>, named by letters in every item:</p>
+<ul>
+<li><b>A</b>: as A3 says: <code>ShellSubsetLarge</code> rejects the construct, and <code>/bin/sh -c</code> runs it, as Perl does today. <b>This is the default</b> for every item you leave unmarked (for the group “Differences that show up only at run time”, A means rule A5: do what dash does).</li>
+<li><b>B</b>: accept it, and run it as dash does.</li>
+<li><b>C</b>: accept it, and run it as bash does.</li>
+<li><b>D</b>: accept it, and run it as the machine's <code>/bin/sh</code> does: dash or bash, found once when the module is loaded (from where the link <code>/bin/sh</code> points). Where <code>/bin/sh</code> is neither, D falls back to A. For bash-only constructs, D means: accept them only where <code>/bin/sh</code> is bash.</li>
+<li><b>E</b>: a caller's option, off by default (then A); with it on, the construct runs as the item says.</li>
+</ul>
+<p><b>The marks.</b> No mark: the item's default (A for most items; what was decided earlier for K1–K3; A5 for N1–N5; E for G12). <b>Go</b>: the alternative the title recommends (where a title names only a default, Go keeps it). <b>No-go</b>: what the item's “If No-go” line says. To choose any other alternative, write its letter in the item's note. Costs are my estimates of the lines added to parser and executor together.</p>
+<p><b>Words.</b> <b>Both shells</b>: dash 0.5.12 and <code>bash --posix</code> 5.2.21, as installed on this machine; every example was run in both on 2026-11-02, from an empty directory. <b>Measured</b>: how many corpus samples (one-liners from tldr and NL2Bash; scripts from ShellCheck's tests, the bash Cookbook, pure-sh-bible and pure-bash-bible) use the construct. <b>Large spec</b>: <code>claude/large-subset-spec.md</code>. <b>Base spec</b>: <code>claude/shell-subset-spec.md</code>, which has the older rule names (V1, D3, D4, B2, P5, …). Item IDs on this page are R, G, K, N and H with a number.</p>
+</div>
+
+<div class="top">
+<div class="legend">
+<span><b>✓ Go</b>: do it as planned. <b>✗ No-go</b>: don’t; do what “If No-go” says. <b>◆ Discuss strategy first</b>: settle the approach first; holds back only the items that depend on it.</span>
+<span><b>? Explain first</b>: a show-stopper; I explain before doing anything else. <b>? Explain later</b>: I explain after doing the rest. <b>Unmarked</b>: not done this round, left for later; it is not a rejection.</span>
+<span>A note that settles an item (picks an option, states the rule, or says the plan is right) counts as Go even without the button. My answers carry a tag: <i>No reply needed</i>, <i>Your turn</i> (I asked you something), or <i>Answered, Claude hasn’t read it yet</i>. The “Your turn” filter shows the items waiting for you.</span>
+</div>
+<fieldset id="gofs"><legend>What Go means</legend>
+<label><input type="radio" name="gomode" id="gm-wait" value="wait"> <span>Mark and wait: I implement only when you tell me in chat.</span></label>
+<label><input type="radio" name="gomode" id="gm-nostop" value="nostop"> <span>Implement when there are no show-stoppers: “Explain first” items block everything; “Discuss” items block only what depends on them.</span></label>
+<label><input type="radio" name="gomode" id="gm-indep" value="indep"> <span>Implement what’s independent: Go items that don’t depend on an open item; I list the ones held back.</span></label>
+</fieldset>
+<p class="lastread" id="lastread">Loading marks…</p>
+<p class="ro" id="ro" hidden></p>
+</div>
+
+<div class="bar" id="bar">
+<button class="plaque" id="plaque" type="button" aria-expanded="false" hidden><span id="plaquetxt"></span> ⓘ
+<span class="pop" id="pop" hidden><ol>
+<li>Claude isn’t told when you change this page. It sees your changes only when it reads the page.</li>
+<li>Right now Claude reads the page only while it is calling tools for your message anyway. The read then rides along with those calls and costs almost nothing extra. A reply that needs no tools doesn’t read the page.</li>
+<li>A short message such as “!” or “Ready?” always makes Claude read it.</li>
+<li>This plaque disappears once Claude has reacted to your changes (answered your notes, acted on your marks, or said in chat why they wait), not as soon as it has read them.</li>
+<li>You can ask Claude, in chat or in any note, to check every time. Then it reads the page at every message, even when nothing else needs a tool. Each such read is an extra step in which Claude re-reads the whole conversation, so it costs tokens: often 100k or more per step in a long conversation. In that mode this plaque is not shown. Ask again to switch back.</li>
+</ol></span></button>
+<div class="brow"><span class="progress" id="progress"></span>
+<span class="gogrp"><label class="blab" for="gosel">Go</label>
+<select id="gosel"><option value="wait">Mark and wait</option><option value="nostop">Implement if no show-stoppers</option><option value="indep">Implement what’s independent</option></select></span></div>
+<div class="brow" id="filters"><span class="blab">Filters</span></div>
+</div>
+
+<div id="list"></div>
+</div>
+
+<script>
+const GROUPS = [
+   {
+      "intro":"<p>Your two decisions of 2026-11-02 on the page \"Shell Large Subset\".<\/p>",
+      "name":"Recorded from your messages"
+   },
+   {
+      "intro":"<p>The large subset rejects these today (alternative A), so <code>/bin/sh -c<\/code> runs them; G12 is the exception (a caller's option already, E). Each example below was run in both shells; output lines are separated by <code>|<\/code>, and an exit status is shown as <code>&lt;…&gt;<\/code> where it matters.<\/p>",
+      "name":"Both shells accept it, but the results differ"
+   },
+   {
+      "intro":"<p>Three differences the subset already settles one way. They are listed so that every difference is on this page; the default here (no mark, or Go) is what was decided then; No-go is A.<\/p>",
+      "name":"Already decided earlier"
+   },
+   {
+      "intro":"<p>These cannot be rejected when the string is parsed, because the text does not show them. The default is rule A5 of the large spec: do what dash does. Alternative A means A5 here, and Go keeps it.<\/p>",
+      "name":"Differences that show up only at run time"
+   },
+   {
+      "intro":"<p>dash rejects these, or treats them as an ordinary word or an unknown command. This group replaces item T1 (\"a bash tier, later\") of the page \"Shell Large Subset\".<\/p>",
+      "name":"Bash-only syntax and builtins"
+   }
+]
+;
+const ITEMS = [
+   {
+      "group":"Recorded from your messages",
+      "id":"R1",
+      "layer":"A3",
+      "nogo":"<p>Not applicable: this is your decision. Write in a note if I misread it.<\/p>",
+      "now":"<p>Your note on A3: it \"should be accepted <b>and<\/b> a checklist of different features should be made, with all defaulting to 'as A3 says' if no choice is made yet.\"<\/p>",
+      "plan":"<p>Done: A3 (alternative A) stays in force, and this page lists the differences. Every item that you leave unmarked stays as A3 says: the large subset rejects the construct, and <code>/bin/sh -c<\/code> runs it. For the run-time group, the default is rule A5 (follow dash).<\/p>",
+      "refs":"Large spec, sections 2 and 5.",
+      "title":"Accept only what dash and bash run alike, and decide each difference on this page"
+   },
+   {
+      "group":"Recorded from your messages",
+      "id":"R2",
+      "layer":"A4",
+      "nogo":"<p>Not applicable: this is your decision.<\/p>",
+      "now":"<p>Your note on A4: \"2 is too common. What about 250-2=248? (These should be documented.)\"<\/p>",
+      "plan":"<p>Done in the large spec; the executor patch is ready, not yet applied. When an unsupported construct shows up only at run time, the shell (or the subshell, <code>$( … )<\/code>, background job or pipeline element it shows up in) stops with status <b>248<\/b> after the message <code>ShellSubsetLarge: … is not supported<\/code>.<\/p><p>Example: <code>c=alias; $c ll=ls; echo after<\/code> prints <code>ShellSubsetLarge: 'alias' is not supported<\/code>, does not print <code>after<\/code>, and returns 248.<\/p><p>The number is documented in a new table \"Exit statuses of the module itself\" in the large spec, section 5. It is the only status the module makes up itself. Where the shell stops because dash would stop (rule A5), the status stays dash's.<\/p><p>The executor change is one line, in <code>claude/large-subset-a4-status.patch<\/code>, for the posix_spawn session to apply (tested on its bundle: status 248).<\/p>",
+      "refs":"Large spec, section 5; <code>claude/large-subset-a4-status.patch<\/code>.",
+      "title":"Use exit status 248 when something unsupported shows up only at run time, and document it"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G1",
+      "layer":"local",
+      "nogo":"<p>A: rejected, as now.<\/p>",
+      "now":"<p>Example: <code>x=1; f(){ local x; echo \"[$x]\"; }; f<\/code>. dash: <code>[1]|&lt;0&gt;<\/code> (the local copy keeps the outer value). bash: <code>[]|&lt;0&gt;<\/code> (the local copy is unset).<\/p><p>Measured: 8 one-liners, 11 scripts.<\/p>",
+      "plan":"<p>Recommended D: follow whichever shell <code>/bin/sh<\/code> is. It costs one test in the executor, and scripts often declare <code>local x<\/code> before assigning it, where both shells agree anyway.<\/p>",
+      "refs":"<code>claude/large-subset-spec.md<\/code>, section 3, \"Declarations\".",
+      "title":"<code>local NAME<\/code> without a value: choose (recommended: D)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G2",
+      "layer":"glob",
+      "nogo":"<p>A: rejected, as now.<\/p>",
+      "now":"<p>Example, in a directory with a subdirectory <code>.h<\/code>: <code>echo .*<\/code>. dash: <code>. .. .h<\/code>. bash: <code>.h<\/code>. Rule U2 rejects such patterns.<\/p><p>Measured: 75 one-liners (<code>ls -d .*<\/code>, <code>du -sh .*<\/code>, <code>cp -r .* dir<\/code>), 2 scripts.<\/p>",
+      "plan":"<p>Recommended D: follow <code>/bin/sh<\/code>. The executor's file name expansion drops <code>.<\/code> and <code>..<\/code> or keeps them; one test.<\/p>",
+      "refs":"Large spec, section 2, U2.",
+      "title":"Patterns that can match <code>.<\/code> and <code>..<\/code> (<code>.*<\/code>, <code>x/.?<\/code>): choose (recommended: D)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G3",
+      "layer":"$@",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>set -- a b; IFS=:; x=$@; echo \"$x\"<\/code>. dash: <code>a:b<\/code> (joined with the first character of <code>IFS<\/code>). bash: <code>a b<\/code> (joined with blanks).<\/p><p>Measured: rare (not counted separately).<\/p>",
+      "plan":"<p>Recommended A: keep rejecting. Scripts that mean this write <code>\"$*\"<\/code>, which both shells agree on.<\/p>",
+      "refs":"Large spec, section 3, \"<code>$@<\/code> only where it is split\".",
+      "title":"<code>$@<\/code> where it is not split into words (<code>x=$@<\/code>, <code>case \"$@\"<\/code>, <code>${x:=$@}<\/code>, here-documents): choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G4",
+      "layer":"$@",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>set -- ab cb; echo \"${@#?}\" \"${*%b}\"<\/code>. dash: <code>b cb ab c<\/code> (the pattern is removed once from the joined string). bash: <code>b b a c<\/code> (from each parameter).<\/p><p>Example: <code>set -- a b; echo ${#@} ${#*}<\/code>. dash: <code>3 3<\/code> (length of <code>a b<\/code>). bash: <code>2 2<\/code> (number of parameters).<\/p><p>Measured: only in ShellCheck's test snippets.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting; rare, and both readings are plausible.<\/p>",
+      "refs":"Large spec, section 3, \"Parameter forms\".",
+      "title":"<code>${@#p}<\/code>, <code>${*%p}<\/code>, <code>${#@}<\/code>, <code>${#*}<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G5",
+      "layer":"quoting",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>echo \"${x:-`echo \\\"q\\\"`}\"<\/code>. dash: <code>q<\/code>. bash: <code>\"q\"<\/code>. Rule U3 rejects it.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting; <code>$( … )<\/code> has no such problem.<\/p>",
+      "refs":"Large spec, section 2, U3.",
+      "title":"<code>\\\"<\/code> inside backquotes inside <code>\"${…}\"<\/code> or inside a here-document: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G6",
+      "layer":"return",
+      "nogo":"<p>A: rejected, as now.<\/p>",
+      "now":"<p>Example: <code>echo a; return; echo b<\/code>. dash: <code>a|&lt;0&gt;<\/code> (it ends the string quietly). bash: <code>a<\/code>, then <code>return: can only 'return' from a function or sourced script<\/code>, <code>&lt;2&gt;<\/code>.<\/p><p>Measured: 9 scripts (ShellCheck's test snippets).<\/p>",
+      "plan":"<p>Recommended D: follow <code>/bin/sh<\/code>. Both shells stop there; only the message and the status differ.<\/p>",
+      "refs":"Large spec, section 3, \"<code>return<\/code>\".",
+      "title":"<code>return<\/code> outside a function: choose (recommended: D)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G7",
+      "layer":"scope",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>x=g; f() { local x=1; g; echo \"f:[$x]\"; }; g() { unset x; echo \"g:[$x]\"; }; f<\/code>. dash: <code>g:[]|f:[]<\/code>. bash: <code>g:[g]|f:[g]<\/code> (the outer value shows through again).<\/p>",
+      "plan":"<p>Recommended A: keep rejecting; rare, and following bash needs a stack of values per variable.<\/p>",
+      "refs":"Large spec, section 3, \"Declarations\".",
+      "title":"<code>unset NAME<\/code> of a variable that a calling function made <code>local<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G8",
+      "layer":"vars",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>echo \"[$-]\"<\/code>. dash: <code>[]<\/code>. bash: <code>[hBc]<\/code>.<\/p><p>Example: <code>echo \"[$LINENO]\"<\/code>. dash: <code>[]<\/code> (in a <code>-c<\/code> string). bash: <code>[1]<\/code>.<\/p><p>Measured: 5 and 3 scripts.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting.<\/p>",
+      "refs":"Base spec, section 5 (E1), the names a shell sets itself.",
+      "title":"<code>$-<\/code> and <code>$LINENO<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G9",
+      "layer":"set -x",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>set -x; echo \"a b\"<\/code>. dash prints <code>+ echo a b<\/code> to standard error; bash prints <code>+ echo 'a b'<\/code>. Item F6 of \"Shell Large Subset\" chose to reject it.<\/p><p>Measured: 2 one-liners, 3 scripts.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting. Tracing needs about 20 lines in the executor, for each format.<\/p>",
+      "refs":"Large spec, section 3, the table of builtins (<code>set<\/code>).",
+      "title":"<code>set -x<\/code> (print each command before running it): choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G10",
+      "layer":"listing",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>They print variables, options or traps, in formats that differ. Example: <code>export ZZ=1; export -p | grep ZZ<\/code>. dash: <code>export ZZ='1'<\/code>. bash: <code>export ZZ=\"1\"<\/code>. Example: <code>trap 'echo t' INT; trap<\/code>. bash also lists <code>trap -- '' TSTP<\/code> and the like.<\/p><p>Measured: <code>set<\/code> alone 18 one-liners, the others a few each.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting; such output is read by people, not by programs.<\/p>",
+      "refs":"Large spec, section 3, the table of builtins.",
+      "title":"The listing forms <code>set<\/code>, <code>set -o<\/code>, <code>export<\/code>, <code>export -p<\/code>, <code>readonly<\/code>, <code>readonly -p<\/code>, <code>trap<\/code>, <code>trap -p<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G11",
+      "layer":"type",
+      "nogo":"<p>A: rejected, as now.<\/p>",
+      "now":"<p>For a program both print the same (<code>ls is /usr/bin/ls<\/code>). For a function or a builtin the text differs (dash: <code>f is a shell function<\/code>; bash also prints the function's body).<\/p><p>Measured: 4 one-liners, 5 scripts.<\/p>",
+      "plan":"<p>Recommended D: follow <code>/bin/sh<\/code>; about 15 lines in the executor.<\/p>",
+      "refs":"Large spec, section 3, <code>command<\/code>; X1 of \"Shell Large Subset\".",
+      "title":"<code>type NAME<\/code> and <code>command -V NAME<\/code>: choose (recommended: D)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G12",
+      "layer":"fd",
+      "nogo":"<p>A: drop the option; always rejected.<\/p>",
+      "now":"<p>Example: <code>echo hi 10&gt;/dev/null<\/code>. dash: nothing is printed (it reads <code>10<\/code> as an argument of <code>echo<\/code>, and <code>&gt;/dev/null<\/code> as the redirection). bash: <code>hi<\/code> (descriptor 10 is redirected).<\/p><p>This is already alternative E: the caller's option <code>fdmulti<\/code> (rule D4) accepts it as bash reads it; without the option it is rejected.<\/p>",
+      "plan":"<p>Recommended: keep E.<\/p>",
+      "refs":"Base spec, section 6, rule D4.",
+      "title":"Descriptor numbers of two or more digits (<code>echo hi 10&gt;/dev/null<\/code>): choose (recommended: E, as now)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G13",
+      "layer":"redirect",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>echo x &gt;&amp;2&gt;f; cat f<\/code>. dash: <code>Syntax error: redirection unexpected<\/code>, <code>&lt;2&gt;<\/code>. bash: <code>x<\/code>.<\/p><p>Example: <code>echo hi &gt;&amp;f; cat f<\/code>. dash: <code>Syntax error: Bad fd number<\/code>. bash: <code>hi<\/code>.<\/p><p>These are rules U4 and D3 (base spec).<\/p>",
+      "plan":"<p>Recommended A: keep rejecting; dash fails on both.<\/p>",
+      "refs":"Base spec, section 6, rule D3; large spec, section 2, U4.",
+      "title":"<code>x &gt;&amp;2&gt;f<\/code> and <code>echo hi &gt;&amp;f<\/code> (a target that dash reads differently): choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G14",
+      "layer":"glob",
+      "nogo":"<p>A: rejected, as now.<\/p>",
+      "now":"<p>Example: <code>case b in [^a]) echo neg;; *) echo lit;; esac<\/code>. dash: <code>lit<\/code> (the <code>^<\/code> is an ordinary character there). bash: <code>neg<\/code> (negation, like <code>[!a]<\/code>). Rule V1 rejects it.<\/p><p>Measured: about 16 one-liners, 2 scripts.<\/p>",
+      "plan":"<p>Recommended D: follow <code>/bin/sh<\/code>; one test in the conversion of patterns.<\/p>",
+      "refs":"Base spec, section 2, V1.",
+      "title":"<code>[^…]<\/code> in a pattern: choose (recommended: D)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G15",
+      "layer":"vars",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>UID=5 echo hi<\/code>. dash: <code>hi<\/code>. bash: <code>UID: readonly variable<\/code>, <code>&lt;1&gt;<\/code>. Rule U5.<\/p><p>Example: <code>echo \"[$PS1]\"<\/code>. dash: <code>[# ]<\/code> (as root). bash: <code>[]<\/code>.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting.<\/p>",
+      "refs":"Base spec, section 5 (E1, V8); large spec, section 2, U5.",
+      "title":"Setting variables that bash makes read-only (<code>UID=5 cmd<\/code>, …), and reading <code>PS1<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G16",
+      "layer":"home",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>unset HOME; echo ~<\/code>. dash: <code>~<\/code>. bash: <code>/root<\/code> (from the password file). Rule V10 rejects <code>~<\/code> when <code>HOME<\/code> is not in the environment.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting. (If the string unsets <code>HOME<\/code> through a name from an expansion, as in <code>n=HOME; unset $n<\/code>, rule A5 applies: <code>~<\/code> then stays literal, as in dash; for <code>cd<\/code>, see N4.)<\/p>",
+      "refs":"Base spec, section 5, V10, and section 4, V15.",
+      "title":"<code>~<\/code> and <code>cd<\/code> alone when <code>HOME<\/code> is not set: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G17",
+      "layer":"functions",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>Example: <code>local() { echo f; }; local<\/code>. dash: <code>Syntax error: Bad function name<\/code>. bash: <code>f<\/code>.<\/p><p>Example: <code>source() { echo f; }; source<\/code>. dash: <code>f<\/code>. bash: <code>`source': is a special builtin<\/code>.<\/p>",
+      "plan":"<p>Recommended A: keep rejecting.<\/p>",
+      "refs":"Large spec, section 3, \"Functions\".",
+      "title":"Functions named <code>local<\/code> or <code>source<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Both shells accept it, but the results differ",
+      "id":"G18",
+      "layer":"read",
+      "nogo":"<p>A: rejected, as now.<\/p>",
+      "now":"<p>Rejected: the large subset accepts <code>read<\/code> only with <code>-r<\/code>. Both shells accept <code>-p<\/code> and print the prompt to standard error only when standard input is a terminal. Example (input from a pipe): <code>echo x | { read -p 'p: ' v; echo \"[$v]\"; }<\/code>. dash: <code>[x]<\/code>. bash: <code>[x]<\/code>.<\/p><p>Measured: 52 one-liners, 8 scripts.<\/p>",
+      "plan":"<p>Recommended B: accept <code>read [-r] [-p PROMPT] NAME…<\/code>. The executor prints PROMPT to descriptor 2 when descriptor 0 is a terminal (about 3 lines). The parser needs about 2 lines.<\/p>",
+      "refs":"Base spec, section 4, <code>read<\/code>.",
+      "title":"<code>read -p PROMPT<\/code>: choose (recommended: B, which here equals C)"
+   },
+   {
+      "group":"Already decided earlier",
+      "id":"K1",
+      "layer":"time",
+      "nogo":"<p>A: reject <code>time<\/code> as a command name.<\/p>",
+      "now":"<p>Decided earlier (P5): <code>time<\/code> runs the program <code>time<\/code>, as dash does. bash's keyword <code>time<\/code> times the whole pipeline and prints its own report. Example: <code>time true 2&gt;/dev/null; echo ok<\/code>. dash: <code>ok<\/code> only (the redirection applies to the program <code>time<\/code>, and with it to its report; on this machine there is no such program, so the \"not found\" message goes there too). bash: <code>real 0m0.000s<\/code>, <code>user …<\/code>, <code>sys …<\/code>, then <code>ok<\/code> (bash's report is not redirected, because <code>2&gt;/dev/null<\/code> belongs to <code>true<\/code>).<\/p><p>Measured: 9 one-liners, 8 scripts.<\/p>",
+      "plan":"<p>No change unless you choose otherwise in a note: A (reject), C (bash's keyword), D (follow <code>/bin/sh<\/code>).<\/p>",
+      "refs":"Base spec, section 1, P5.",
+      "title":"<code>time<\/code> before a pipeline: stays as decided (dash's behaviour, B)"
+   },
+   {
+      "group":"Already decided earlier",
+      "id":"K2",
+      "layer":"echo",
+      "nogo":"<p>A, as just described.<\/p>",
+      "now":"<p>Decided earlier (B2): <code>echo<\/code> runs as <code>/bin/echo<\/code>. dash's builtin turns <code>\\t<\/code> and the like into characters (<code>echo 'a\\tb'<\/code> prints a tab); bash's builtin does not, nor does GNU <code>/bin/echo<\/code>. <code>echo -e 'a\\tb'<\/code>: bash and GNU <code>/bin/echo<\/code> print a tab; dash prints <code>-e a<\/code> and a tab.<\/p><p>So today the subset behaves as bash does, with GNU coreutils.<\/p><p>Measured: <code>echo -e<\/code>: 48 one-liners, 6 scripts.<\/p>",
+      "plan":"<p>No change unless you choose otherwise in a note: A (reject <code>echo<\/code> arguments with a backslash or starting with <code>-e<\/code>), B (dash's builtin), D (follow <code>/bin/sh<\/code>).<\/p>",
+      "refs":"Base spec, section 4, B2.",
+      "title":"<code>echo<\/code> with backslashes or <code>-e<\/code>: stays as decided (the program <code>/bin/echo<\/code>)"
+   },
+   {
+      "group":"Already decided earlier",
+      "id":"K3",
+      "layer":"jobs",
+      "nogo":"<p>A, as just described.<\/p>",
+      "now":"<p>Decided earlier (base spec section 4): <code>kill<\/code> runs as the program <code>kill<\/code> found in <code>PATH<\/code>, so job numbers do not work. Example: <code>sleep 1 &amp; kill %1; echo $?<\/code>. dash: <code>kill: No such process<\/code>, <code>1<\/code> (dash's <code>kill<\/code> does not know job numbers either). bash: <code>0<\/code> (its <code>kill<\/code> signals job 1).<\/p><p>Measured: 2 one-liners.<\/p>",
+      "plan":"<p>No change unless you choose otherwise in a note: A (reject <code>kill<\/code> with an argument starting with <code>%<\/code>; one check in the parser), C (bash's job numbers), D (follow <code>/bin/sh<\/code>).<\/p>",
+      "refs":"Base spec section 4, builtins.",
+      "title":"Job numbers such as <code>kill %1<\/code>: stays as decided (the program <code>kill<\/code>, as dash)"
+   },
+   {
+      "group":"Differences that show up only at run time",
+      "id":"N1",
+      "layer":"errors",
+      "nogo":"<p>As the default.<\/p>",
+      "now":"<p><code>shift 3; echo after<\/code>: dash stops, <code>&lt;2&gt;<\/code>; bash prints a message and goes on (<code>after<\/code>, <code>&lt;0&gt;<\/code>).<\/p><p><code>n=1x; export \"$n=2\"; echo after<\/code>: dash stops, <code>&lt;2&gt;<\/code>; bash goes on.<\/p><p><code>readonly r=1; r=2; echo after<\/code>: both stop; dash <code>&lt;2&gt;<\/code>, bash <code>&lt;127&gt;<\/code>.<\/p>",
+      "plan":"<p>Default A5: as dash. C: as bash. D: follow <code>/bin/sh<\/code>.<\/p>",
+      "refs":"Large spec, section 5, A5.",
+      "title":"Errors of special builtins: <code>shift<\/code> past the end, <code>export<\/code> of a bad name, assignment to a read-only variable: choose (default: dash, A5)"
+   },
+   {
+      "group":"Differences that show up only at run time",
+      "id":"N2",
+      "layer":"status",
+      "nogo":"<p>As the default.<\/p>",
+      "now":"<p><code>echo ${zz:?unset}; echo after<\/code>: both print the message and stop; dash <code>&lt;2&gt;<\/code>, bash <code>&lt;127&gt;<\/code>.<\/p>",
+      "plan":"<p>Default A5: 2, as dash. C: 127. D: follow <code>/bin/sh<\/code>.<\/p>",
+      "refs":"Large spec, section 5, A5.",
+      "title":"The exit status after <code>${x:?message}<\/code> with <code>x<\/code> unset: choose (default: dash, 2)"
+   },
+   {
+      "group":"Differences that show up only at run time",
+      "id":"N3",
+      "layer":"command",
+      "nogo":"<p>As the default.<\/p>",
+      "now":"<p><code>command -v nosuch; echo $?<\/code>: dash <code>127<\/code>, bash <code>1<\/code>.<\/p>",
+      "plan":"<p>Default A5: 127. C: 1. D: follow <code>/bin/sh<\/code>.<\/p>",
+      "refs":"Large spec, section 5, A5.",
+      "title":"The status of <code>command -v<\/code> for an unknown name: choose (default: dash, 127)"
+   },
+   {
+      "group":"Differences that show up only at run time",
+      "id":"N4",
+      "layer":"cd",
+      "nogo":"<p>As the default.<\/p>",
+      "now":"<p><code>n=HOME; unset $n; cd; echo $?<\/code> (<code>unset HOME<\/code> written out is rejected when parsed, a name from an expansion is not): dash stays where it is, <code>0<\/code>. bash: <code>cd: HOME not set<\/code>, <code>1<\/code>.<\/p>",
+      "plan":"<p>Default A5: as dash. C: as bash. D: follow <code>/bin/sh<\/code>.<\/p>",
+      "refs":"Large spec, section 5, A5.",
+      "title":"<code>cd<\/code> alone when <code>HOME<\/code> was unset by the string: choose (default: dash)"
+   },
+   {
+      "group":"Differences that show up only at run time",
+      "id":"N5",
+      "layer":"getopts",
+      "nogo":"<p>As the default.<\/p>",
+      "now":"<p>After a <code>getopts<\/code> loop has finished, a new <code>getopts<\/code> call: dash starts over, bash does not (L7). Example: <code>while getopts ab: o -a -b v; do :; done; getopts ab: o -b v; echo $? $o $OPTIND<\/code>. dash: <code>0 b 3<\/code>. bash: <code>1 ? 3<\/code>.<\/p><p>When no option is left, dash keeps <code>OPTARG<\/code>, bash unsets it (L8). Example: <code>getopts ab: o -b v; getopts ab: o -b v; echo \"[$o] [$OPTARG] $OPTIND\"<\/code>. dash: <code>[?] [v] 3<\/code>. bash: <code>[?] [] 3<\/code>.<\/p>",
+      "plan":"<p>Default A5, extended to these two cases: as dash (the executor does not yet do this; L7 and L8 in <code>claude/large-subset-upstream-reports.md<\/code>). C: as bash. D: follow <code>/bin/sh<\/code>.<\/p>",
+      "refs":"<code>claude/large-subset-upstream-reports.md<\/code>, L7, L8.",
+      "title":"<code>getopts<\/code> details: choose (default: dash)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H1",
+      "layer":"[[",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>[[ a == a* ]] &amp;&amp; echo y<\/code>. dash: <code>[[: not found<\/code>, <code>&lt;127&gt;<\/code>. bash: <code>y<\/code>.<\/p><p>Measured: 21 one-liners, 123 scripts.<\/p>",
+      "plan":"<p>Recommended A for now. D (accept only when <code>/bin/sh<\/code> is bash) would cost about 60 lines in parser and executor (<code>==<\/code>, <code>=~<\/code>, <code>&amp;&amp;<\/code>, <code>||<\/code>, <code>!<\/code>, patterns, file tests).<\/p>",
+      "refs":"<code>claude/large-subset-investigation.md<\/code>, section 4.",
+      "title":"<code>[[ … ]]<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H2",
+      "layer":"arithmetic",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>((x=1+1)); echo $x<\/code>. dash: an empty line (it reads <code>((…))<\/code> as two nested subshells that assign <code>x=1+1<\/code>; the assignment is lost with them). bash: <code>2<\/code>.<\/p><p><code>i=1; echo $((i++)) $i<\/code>. dash: <code>expecting primary<\/code>, <code>&lt;2&gt;<\/code>. bash: <code>1 2<\/code>.<\/p><p>Measured: 5 one-liners, 75 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D would cost about 30 lines.<\/p>",
+      "refs":"Base spec, section 5, V9.",
+      "title":"<code>(( … ))<\/code>, <code>for ((…))<\/code>, <code>$[…]<\/code>, <code>++<\/code> and <code>--<\/code>, the comma operator: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H3",
+      "layer":"quoting",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>echo $'a\\tb'<\/code>. dash: <code>$a<\/code> and a tab and <code>b<\/code> (it reads <code>$<\/code> literally, then <code>'a\\tb'<\/code> with dash's <code>echo<\/code> turning <code>\\t<\/code> into a tab). bash: <code>a<\/code>, a tab, <code>b<\/code>.<\/p><p>Measured: 136 one-liners, 14 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 15 lines (the escapes of <code>$'…'<\/code>).<\/p>",
+      "refs":"Base spec, section 2.",
+      "title":"<code>$'…'<\/code> and <code>$\"…\"<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H4",
+      "layer":"arrays",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>a=(x y); echo ${a[1]}<\/code>. dash: <code>Syntax error: \"(\" unexpected<\/code>. bash: <code>y<\/code>.<\/p><p>Measured: 46 one-liners, 138 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D would cost about 80 lines (indexed arrays only).<\/p>",
+      "refs":"<code>claude/large-subset-investigation.md<\/code>, section 4.",
+      "title":"Arrays (<code>a=(x y)<\/code>, <code>${a[1]}<\/code>, <code>${a[@]}<\/code>, <code>$PIPESTATUS<\/code>): choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H5",
+      "layer":"parameters",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>x=abcd; echo ${x/b/X} ${x:1:2} ${x^^}<\/code>. dash: <code>Bad substitution<\/code>, <code>&lt;2&gt;<\/code>. bash: <code>aXcd bc ABCD<\/code>.<\/p><p>Measured: 15 one-liners, 55 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D would cost about 30 lines.<\/p>",
+      "refs":"Base spec, section 5, \"Parameters\".",
+      "title":"<code>${x/a/b}<\/code>, <code>${x:1:2}<\/code>, <code>${x^^}<\/code>, <code>${x,,}<\/code>, <code>${!x}<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H6",
+      "layer":"redirect",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>cat &lt;(echo hi)<\/code>. dash: <code>Syntax error: \"(\" unexpected<\/code>. bash: <code>hi<\/code>.<\/p><p>Measured: 187 one-liners, 15 scripts: the most common bash-only construct in one-liners.<\/p>",
+      "plan":"<p>Recommended A for now. D would cost about 40 lines: the executor must pass a pipe as <code>/dev/fd/N<\/code>, which posix_spawn can do.<\/p>",
+      "refs":"Base spec, section 4.",
+      "title":"Process substitution <code>&lt;(…)<\/code> and <code>&gt;(…)<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H7",
+      "layer":"redirect",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>cat &lt;&lt;&lt; hi<\/code>. dash: <code>Syntax error: redirection unexpected<\/code>. bash: <code>hi<\/code>.<\/p><p>Measured: 13 one-liners, 13 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 5 lines (a here-document whose body is the word plus a newline).<\/p>",
+      "refs":"Large spec, section 3, here-documents.",
+      "title":"Here-strings <code>&lt;&lt;&lt;<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H8",
+      "layer":"redirect",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>echo hi &amp;&gt;/dev/null; echo st=$?<\/code>. dash: <code>st=0<\/code>, then <code>hi<\/code> (it runs <code>echo hi<\/code> in the background and then <code>&gt;/dev/null<\/code> as an empty command). bash: <code>st=0<\/code> only.<\/p><p><code>echo hi |&amp; cat<\/code>. dash: <code>Syntax error<\/code>. bash: <code>hi<\/code>.<\/p><p>Measured: 22 one-liners, 9 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 5 lines (as <code>&gt;file 2&gt;&amp;1<\/code> and <code>2&gt;&amp;1 |<\/code>).<\/p>",
+      "refs":"Base spec, section 3, P2.",
+      "title":"<code>&amp;&gt;file<\/code>, <code>&amp;&gt;&gt;file<\/code>, <code>|&amp;<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H9",
+      "layer":"braces",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>echo a{b,c} {1..3}<\/code>. dash: <code>a{b,c} {1..3}<\/code>. bash: <code>ab ac 1 2 3<\/code>.<\/p><p><code>ShellSubset<\/code> already has a parse-only option <code>brace<\/code> (base spec V13), which <code>ShellSubsetLarge<\/code> ignores; the executor cannot run its trees (known issue X3 in <code>claude/pspawn-known-issues.md<\/code>).<\/p><p>Measured: 62 one-liners, 17 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 20 lines in the executor.<\/p>",
+      "refs":"Base spec, section 4, V13.",
+      "title":"Brace expansion (<code>a{b,c}<\/code>, <code>{1..3}<\/code>): choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H10",
+      "layer":"functions",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>function f { echo f; }; f<\/code>. dash: <code>Syntax error<\/code>. bash: <code>f<\/code>.<\/p><p>Measured: 1 one-liner, 27 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 3 lines (the same tree as <code>f()<\/code>).<\/p>",
+      "refs":"Large spec, section 3, \"Functions\".",
+      "title":"<code>function f { … }<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H11",
+      "layer":"builtins",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p>dash has none of them: <code>source ./s.sh<\/code> gives <code>source: not found<\/code>, <code>&lt;127&gt;<\/code>; bash runs the file. <code>declare -i n=1+2; echo $n<\/code>: dash <code>declare: not found<\/code> and an empty line; bash <code>3<\/code>.<\/p><p>Measured: 149 one-liners, 102 scripts.<\/p>",
+      "plan":"<p>Recommended A for now. <code>source<\/code> alone would cost 1 line (as <code>.<\/code>); the others 10–40 lines each.<\/p>",
+      "refs":"X1 of \"Shell Large Subset\".",
+      "title":"bash's builtins <code>source<\/code>, <code>declare<\/code>/<code>typeset<\/code>, <code>let<\/code>, <code>pushd<\/code>/<code>popd<\/code>/<code>dirs<\/code>, <code>shopt<\/code>, <code>mapfile<\/code>/<code>readarray<\/code>, <code>select<\/code>, <code>coproc<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H12",
+      "layer":"read",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>printf 'a:b' | { read -d : v; echo \"[$v]\"; }<\/code>. dash: <code>read: Illegal option -d<\/code>, <code>[]<\/code>. bash: <code>[a]<\/code>.<\/p><p>Measured: 78 one-liners, 27 scripts, including those that use only <code>-p<\/code> (G18).<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 20 lines.<\/p>",
+      "refs":"Base spec, section 4, <code>read<\/code>.",
+      "title":"<code>read<\/code> options other than <code>-r<\/code> and <code>-p<\/code>: <code>-d<\/code>, <code>-n<\/code>, <code>-s<\/code>, <code>-t<\/code>, <code>-a<\/code>, <code>-u<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H13",
+      "layer":"set",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>set -o pipefail; false | true; echo $?<\/code>. dash 0.5.12: <code>set: Illegal option -o pipefail<\/code>, <code>&lt;2&gt;<\/code>. bash: <code>1<\/code>.<\/p><p>Measured: 2 one-liners, 21 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs about 5 lines (the executor already has every element's status).<\/p>",
+      "refs":"Large spec, section 3, <code>set<\/code>.",
+      "title":"<code>set -o pipefail<\/code>: choose (recommended: A)"
+   },
+   {
+      "group":"Bash-only syntax and builtins",
+      "id":"H14",
+      "layer":"vars",
+      "nogo":"<p>A, as now.<\/p>",
+      "now":"<p><code>echo ${RANDOM:+set}<\/code>. dash: an empty line. bash: <code>set<\/code>.<\/p><p>Measured: 20 one-liners, 28 scripts.<\/p>",
+      "plan":"<p>Recommended A for now; D costs a few lines per variable.<\/p>",
+      "refs":"Base spec, section 5 (E1).",
+      "title":"Reading bash's own variables <code>RANDOM<\/code>, <code>SECONDS<\/code>, <code>EPOCHSECONDS<\/code>, <code>BASH_VERSION<\/code>, <code>BASHPID<\/code>, <code>EUID<\/code>, <code>UID<\/code>, <code>FUNCNAME<\/code>, … (setting them is G15): choose (recommended: A)"
+   }
+]
+;
+
+const MARKS=[["go","✓","Go","Go: implement as planned","--go"],["nogo","✗","No-go","No-go: don't implement; do what “If No-go” says","--nogo"],["discuss","◆","Discuss strategy first","Discuss strategy first: settle the strategy before deciding","--discuss"],["exfirst","?","Explain first","Explain first: a show-stopper; explain before implementing the rest","--explain"],["exlater","?","Explain later","Explain later: explain after implementing the rest","--explain"]];
+const MK=Object.fromEntries(MARKS.map(m=>[m[0],m]));
+const st={dec:{},rep:{},user:null,claude:null,filter:"all",ro:false,typing:null,typingAt:0};
+const els={};
+const $=id=>document.getElementById(id);
+const tnum=v=>typeof v==="number"?v:(typeof v==="string"?(Date.parse(v)||0):0);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function notesOf(id){const d=st.dec[id]||{};return [d.note||"",...(Array.isArray(d.fups)?d.fups:[])];}
+function seenUpTo(){return tnum(st.claude&&st.claude.seenUpTo);}
+function everyTurn(){return st.claude&&st.claude.checkMode==="every-turn";}
+function lastAsk(id){const r=st.rep[id]||{};const a=r.answers||[];if(!a.length)return null;const L=a.length-1;return (r.ask||[])[L]?L:null;}
+function yourTurnState(id){const L=lastAsk(id);if(L===null)return null;const after=(notesOf(id)[L+1]||"").trim();
+  if(!after)return "open";const d=st.dec[id]||{};if(tnum(d.updatedAt)>seenUpTo()||st.typing===id)return "unread";return null;}
+
+function build(){
+  const list=$("list");const sec={};
+  for(const gr of GROUPS){const s=document.createElement("section");s.className="grp";const h=document.createElement("div");h.className="ghead";h.dataset.g=gr.name;
+    h.innerHTML=`<h2>${gr.name}</h2>${gr.intro}`;s.appendChild(h);list.appendChild(s);sec[gr.name]=s;}
+  for(const it of ITEMS){
+    const el=document.createElement("article");el.className="item";el.id="item-"+it.id;
+    el.innerHTML=`<div class="head"><span class="iid" id="iid-${it.id}">${it.id}</span><span class="layer">${it.layer}</span><span class="ttl">${it.title}</span><span class="pill" hidden></span></div>
+<div class="sec"><span class="lab">Now</span>${it.now}${it.nowAfter||""}</div>
+<div class="sec"><span class="lab">Planned</span>${it.plan}${it.planAfter||""}</div>
+<div class="sec"><span class="lab">If No-go</span><p>${it.nogo}</p></div>
+<div class="sec"><span class="lab">Refs</span><p>${it.refs}</p></div>
+<div class="marks" role="group" aria-label="Mark ${it.id}"></div>
+<label class="remind" hidden>Remind me if we haven't returned to this: <select id="rem-${it.id}"><option value="">none</option><option value="3d">3 days</option><option value="1w">1 week</option><option value="2w">2 weeks</option></select></label>
+<div class="thread"></div>`;
+    const marks=el.querySelector(".marks");
+    for(const [k,ic,word,tip,col] of MARKS){const b=document.createElement("button");b.type="button";b.className="mk";b.style.setProperty("--c",`var(${col})`);
+      b.title=tip;b.dataset.k=k;b.setAttribute("aria-pressed","false");b.innerHTML=`<span class="ic">${ic} </span>${word}`;b.disabled=true;
+      b.addEventListener("click",()=>{const d=cur(it.id);d.decision=d.decision===k?null:k;if(d.decision!=="discuss")d.remind=d.remind||"";save(it.id,0);paint(it.id);});
+      marks.appendChild(b);}
+    el.querySelector("select").addEventListener("change",e=>{cur(it.id).remind=e.target.value;save(it.id,0);});
+    sec[it.group].appendChild(el);
+    els[it.id]={el,pill:el.querySelector(".pill"),marks,remind:el.querySelector(".remind"),thread:el.querySelector(".thread"),boxes:[],answers:[]};
+    addBox(it.id,0);
+  }
+  const fdefs=[["all","All"],["unmarked","Unmarked"],["reply","Has a reply"],["turn","Your turn"],["stop","Show-stoppers"],["explain","Explain (all)"],["discuss","Discuss strategy 1st"],["go","Go"],["nogo","No-go / defer"]];
+  for(const [k,l] of fdefs){const b=document.createElement("button");b.type="button";b.className="filt";b.dataset.f=k;b.textContent=l;b.setAttribute("aria-pressed",String(k==="all"));
+    b.addEventListener("click",()=>setFilter(k));$("filters").appendChild(b);}
+  for(const r of document.querySelectorAll('input[name="gomode"]'))r.addEventListener("change",()=>setGo(r.value));
+  $("gosel").addEventListener("change",e=>setGo(e.target.value));
+  const pl=$("plaque"),pop=$("pop");
+  const setPop=o=>{pop.hidden=!o;pl.setAttribute("aria-expanded",String(o));};
+  pl.addEventListener("click",e=>{e.stopPropagation();setPop(pop.hidden);});
+  pl.addEventListener("mouseenter",()=>setPop(true));pl.addEventListener("mouseleave",()=>{if(document.activeElement!==pl)setPop(false);});
+  document.addEventListener("click",e=>{if(!pl.contains(e.target))setPop(false);});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")setPop(false);});
+  window.addEventListener("resize",growAll);
+}
+function cur(id){if(!st.dec[id])st.dec[id]={decision:null,note:"",fups:[],remind:""};st.dec[id]={...st.dec[id]};return st.dec[id];}
+function addBox(id,i){const t=document.createElement("textarea");t.rows=1;t.id=`note-${id}-${i}`;t.placeholder=`Your note ${i+1} (optional)`;t.setAttribute("aria-label",`${id}: your note ${i+1}`);t.disabled=true;
+  t.addEventListener("input",()=>{grow(t);const d=cur(id);if(i===0)d.note=t.value;else{const f=[...(d.fups||[])];while(f.length<i)f.push("");f[i-1]=t.value;d.fups=f;}
+    st.typing=id;st.typingAt=st.typingAt||Date.now();save(id,800);paintBar();paintTags(id);});
+  t.addEventListener("blur",()=>{if(st.typing===id){}});
+  els[id].thread.appendChild(t);els[id].boxes.push(t);grow(t);}
+function grow(t){if(t.offsetParent===null)return;t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px";}
+function growAll(){for(const id in els)for(const t of els[id].boxes)grow(t);}
+
+let db=null;const queues={},timers={};
+function save(id,delay){if(st.ro||!db)return;clearTimeout(timers[id]);timers[id]=setTimeout(()=>{
+  const d=cur(id);const body={decision:d.decision||null,note:d.note||"",fups:d.fups||[],remind:d.remind||"",updatedAt:Date.now()};d.updatedAt=body.updatedAt;
+  queues[id]=(queues[id]||Promise.resolve()).then(()=>db.doc("decisions/"+id).set(body)).then(()=>{if(st.typing===id)st.typing=null;st.typingAt=0;paintBar();},err=>fail(err));},delay);}
+function setGo(v){if(st.ro||!db)return;st.user={goMode:v,updatedAt:Date.now()};paintGo();paintBar();
+  queues.__u=(queues.__u||Promise.resolve()).then(()=>db.doc("settings/user").set(st.user)).catch(fail);}
+function fail(err){if(err&&err.code==="invalid_argument"){st.ro=true;$("ro").hidden=false;$("ro").textContent="Saving is switched off: the store refused a change. Your marks are read-only in this view.";disableAll();}
+  else{$("ro").hidden=false;$("ro").textContent="A change could not be saved ("+((err&&err.code)||"error")+"). It will be retried with your next change.";}}
+function disableAll(){for(const id in els){for(const b of els[id].marks.children)b.disabled=true;for(const t of els[id].boxes)t.disabled=true;}for(const r of document.querySelectorAll('#gofs input,#gosel'))r.disabled=true;}
+function enableAll(){for(const id in els){for(const b of els[id].marks.children)b.disabled=false;for(const t of els[id].boxes)t.disabled=false;}for(const r of document.querySelectorAll('#gofs input,#gosel'))r.disabled=false;}
+
+function paint(id){
+  const e=els[id],d=st.dec[id]||{},r=st.rep[id]||{},k=d.decision;
+  e.el.className="item"+(k?" m-"+k:"");
+  for(const b of e.marks.children)b.setAttribute("aria-pressed",String(b.dataset.k===k));
+  const iid=$("iid-"+id);iid.textContent=k?`${id} ${MK[k][1]} ${MK[k][2]}`:id;
+  e.remind.hidden=k!=="discuss";const sel=$("rem-"+id);if(document.activeElement!==sel)sel.value=d.remind||"";
+  if(r.status){e.pill.hidden=false;e.pill.textContent=r.status;}else e.pill.hidden=true;
+  const ans=r.answers||[];
+  while(e.answers.length<ans.length){const i=e.answers.length;const a=document.createElement("div");a.className="ans";
+    e.thread.insertBefore(a,e.boxes[i+1]||null);e.answers.push(a);if(!e.boxes[i+1])addBox(id,i+1);if(!st.ro&&db)e.boxes[i+1].disabled=false;}
+  e.answers.forEach((a,i)=>{a.dataset.text=ans[i]||"";});
+  const notes=notesOf(id);e.boxes.forEach((t,i)=>{if(document.activeElement!==t&&t.value!==(notes[i]||"")){t.value=notes[i]||"";}grow(t);});
+  paintTags(id);
+}
+function paintTags(id){const e=els[id],r=st.rep[id]||{},ans=r.answers||[],ask=r.ask||[],L=ans.length-1,yt=yourTurnState(id);
+  e.answers.forEach((a,i)=>{let tag="";if(!ask[i])tag='<span class="tag muted">No reply needed</span>';
+    else if(i===L&&yt==="open")tag='<span class="tag turn">Your turn</span>';else if(i===L&&yt==="unread")tag='<span class="tag muted">Answered, Claude hasn’t read it yet</span>';
+    a.innerHTML=`<span class="who">Claude:</span>${tag}\n${esc(a.dataset.text)}`;linkify(a,id);});}
+function setFilter(k){st.filter=k;for(const x of $("filters").querySelectorAll(".filt"))x.setAttribute("aria-pressed",String(x.dataset.f===k));applyFilter();growAll();}
+const XRE=new RegExp("\\b("+ITEMS.map(i=>i.id).join("|")+")\\b","g");
+function linkify(root,self){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest("code,a,.iid,textarea")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  for(const n of nodes){const t=n.nodeValue;XRE.lastIndex=0;if(!XRE.test(t))continue;XRE.lastIndex=0;
+    const f=document.createDocumentFragment();let last=0,m;
+    while((m=XRE.exec(t))){if(m[1]===self)continue;f.appendChild(document.createTextNode(t.slice(last,m.index)));
+      const a=document.createElement("a");a.className="xref";a.href="#item-"+m[1];a.dataset.ref=m[1];a.textContent=m[1];a.title="Go to item "+m[1];f.appendChild(a);last=m.index+m[1].length;}
+    if(last===0)continue;f.appendChild(document.createTextNode(t.slice(last)));n.parentNode.replaceChild(f,n);}}
+function goTo(id){const e=els[id];if(!e)return;if(e.el.hidden)setFilter("all");
+  const top=e.el.getBoundingClientRect().top+window.scrollY-$("bar").offsetHeight-12;
+  const smooth=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;window.scrollTo({top,behavior:smooth?"smooth":"auto"});
+  e.el.classList.add("flash");setTimeout(()=>e.el.classList.remove("flash"),1600);
+  try{history.replaceState(null,"","#item-"+id);}catch(err){}}
+document.addEventListener("click",ev=>{const a=ev.target.closest&&ev.target.closest("a.xref");if(!a)return;ev.preventDefault();goTo(a.dataset.ref);});
+function paintGo(){const v=(st.user&&st.user.goMode)||"wait";for(const r of document.querySelectorAll('input[name="gomode"]'))r.checked=r.value===v;$("gosel").value=v;}
+function counts(){let marked=0,stop=0,expl=0,disc=0,turn=0;for(const it of ITEMS){const k=(st.dec[it.id]||{}).decision;if(k)marked++;if(k==="exfirst")stop++;if(k==="exfirst"||k==="exlater")expl++;if(k==="discuss")disc++;if(yourTurnState(it.id)==="open")turn++;}return {marked,stop,expl,disc,turn};}
+function paintBar(){
+  const c=counts();$("progress").textContent=`${c.marked} of ${ITEMS.length} marked · ${c.stop} show-stoppers · ${c.expl} to explain · ${c.disc} to discuss · ${c.turn} your turn`;
+  const stopBtn=[...$("filters").children].find(b=>b.dataset.f==="stop");if(stopBtn)stopBtn.hidden=c.stop===0;
+  const seen=seenUpTo();let oldest=Infinity;
+  for(const id in st.dec){const u=tnum(st.dec[id].updatedAt);if(u>seen&&u<oldest)oldest=u;}
+  if(st.user){const u=tnum(st.user.updatedAt);if(u>seen&&u<oldest)oldest=u;}
+  if(st.typing&&st.typingAt&&st.typingAt<oldest)oldest=st.typingAt;
+  const show=oldest!==Infinity&&!everyTurn();const pl=$("plaque");pl.hidden=!show;
+  if(show)$("plaquetxt").textContent=`Claude hasn't seen your changes since ${new Date(oldest).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}. Send any message in chat ("!" is enough) for Claude to read them.`;
+  const cl=st.claude;let t="Claude has not read your marks yet.";
+  if(cl&&cl.lastRead)t=`Claude last read your marks: ${new Date(tnum(cl.lastRead)).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}. ${cl.message||""}`;
+  if(everyTurn())t+=" Checking this page at every message (your request).";
+  $("lastread").textContent=t;
+}
+function match(id){const k=(st.dec[id]||{}).decision,r=st.rep[id]||{};switch(st.filter){
+  case "unmarked":return !k;case "reply":return (r.answers||[]).length>0;case "turn":return yourTurnState(id)!==null;
+  case "stop":return k==="exfirst";case "explain":return k==="exfirst"||k==="exlater";case "discuss":return k==="discuss";
+  case "go":return k==="go";case "nogo":return k==="nogo";default:return true;}}
+function applyFilter(){const focusEl=document.activeElement;const ITEMG={};
+  for(const it of ITEMS){const e=els[it.id];const keep=match(it.id)||(focusEl&&e.el.contains(focusEl))||st.typing===it.id;e.el.hidden=!keep;if(keep)ITEMG[it.group]=1;}
+  for(const h of document.querySelectorAll("#list .ghead"))h.hidden=!(ITEMG[h.dataset.g]||st.filter==="all");}
+function paintAll(){for(const it of ITEMS)paint(it.id);paintGo();paintBar();if(st.filter!=="turn")applyFilter();}
+
+build();
+for(const it of ITEMS){const e=els[it.id];for(const s of e.el.querySelectorAll(".ttl,.sec"))linkify(s,it.id);}
+for(const h of document.querySelectorAll("#list .ghead"))linkify(h,null);
+paintAll();
+{const h=(location.hash||"").replace(/^#item-/,"");if(h&&els[h])setTimeout(()=>goTo(h),300);}
+(async()=>{
+  try{db=await window.claude?.use?.("db");}catch(e){db=null;}
+  if(!db){$("lastread").textContent="Marks can't be loaded or saved in this view.";disableAll();return;}
+  enableAll();
+  const errCb=err=>fail(err);
+  db.collection("decisions").onSnapshot(s=>{for(const d of s.docs){if(!ITEMS.find(i=>i.id===d.id))continue;const v=d.data();
+      if(st.typing===d.id){const keep=st.dec[d.id];st.dec[d.id]={...v,note:keep.note,fups:keep.fups,decision:keep.decision,remind:keep.remind};}else st.dec[d.id]={...v};}
+    paintAll();},errCb);
+  db.collection("replies").onSnapshot(s=>{for(const d of s.docs)st.rep[d.id]={...d.data()};paintAll();},errCb);
+  db.collection("settings").onSnapshot(s=>{for(const d of s.docs){if(d.id==="user")st.user={...d.data()};if(d.id==="claude")st.claude={...d.data()};}paintAll();},errCb);
+})();
+</script>
+

@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
-## Version v1.1.1
+## SQL API Abstraction - ~/lib/DB/Object/Postgres/Tables.pm
+## Version v1.1.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/08/05
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 ## This package's purpose is to separate the object of the tables from the main
 ## DB::Object package so that when they get DESTROY'ed, it does not interrupt
 ## the SQL connection
@@ -25,7 +25,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.1.2';
 };
 
 use strict;
@@ -175,8 +175,10 @@ sub disable_trigger
         return( $self->error( "No table was provided to disable trigger." ) );
     my $opts  = $self->_get_args_as_hash( @_ );
     $opts->{all} //= 0;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     # This feature exists only since version 8.1
-    unless( $self->database_object->version >= version->declare( '8.1' ) )
+    unless( $dbo->version >= version->declare( '8.1' ) )
     {
         return( $self->error( "Disabling trigger on a table requires PostgreSQL version 8.1 or higher." ) );
     }
@@ -189,8 +191,8 @@ sub disable_trigger
     {
         $query .= $opts->{all} ? 'ALL' : 'USER';
     }
-    my $sth = $self->database_object->prepare( $query ) ||
-        return( $self->error( "Error while preparing query to disable trigger for table '$table':\n$query", $self->database_object->errstr() ) );
+    my $sth = $dbo->prepare( $query ) ||
+        return( $self->error( "Error while preparing query to disable trigger for table '$table':\n$query", $dbo->errstr() ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -205,6 +207,8 @@ sub drop
     my $table = $self->{table} || 
     return( $self->error( "No table was provided to drop." ) );
     my $opts  = $self->_get_args_as_hash( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $query = 'DROP TABLE';
     $query   .= ' IF EXISTS' if( $opts->{ 'if-exists' } || $opts->{if_exists} );
     $query   .= " $table";
@@ -217,8 +221,8 @@ sub drop
     {
         $query .= ' RESTRICT';
     }
-    my $sth = $self->database_object->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->database_object->errstr() ) );
+    my $sth = $dbo->prepare( $query ) ||
+    return( $self->error( "Error while preparing query to drop table '$table':\n$query", $dbo->errstr() ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -236,8 +240,10 @@ sub enable_trigger
     return( $self->error( "No table was provided to enable trigger." ) );
     my $opts  = $self->_get_args_as_hash( @_ );
     $opts->{all} //= 0;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     # This feature exists only since version 8.1
-    unless( $self->database_object->version >= version->declare( '8.1' ) )
+    unless( $dbo->version >= version->declare( '8.1' ) )
     {
         return( $self->error( "Enabling trigger on a table requires PostgreSQL version 8.1 or higher." ) );
     }
@@ -250,7 +256,7 @@ sub enable_trigger
     {
         $query .= $opts->{all} ? 'ALL' : 'USER';
     }
-    my $sth = $self->database_object->prepare( $query ) ||
+    my $sth = $dbo->prepare( $query ) ||
     return( $self->error( "Error while preparing query to disable trigger for table '$table':\n$query", $self->database_object->errstr() ) );
     if( !defined( wantarray() ) )
     {
@@ -260,11 +266,7 @@ sub enable_trigger
     return( $sth );
 }
 
-sub exists
-{
-    my $self = shift( @_ );
-    return( $self->table_exists( @_ ? shift( @_ ) : $self->name ) );
-}
+# NOTE: exists is inherited from DB::Object::Tables
 
 # NOTE: sub fields is inherited from DB::Object::Tables
 # sub fields
@@ -280,14 +282,16 @@ sub lock
     {
         return( $self->lock_select( $opt ) );
     }
-    elsif( $opt !~ /^(ACCESS SHARE|ROW SHARE|ROW EXCLUSIVE|SHARE UPDATE EXCLUSIVE|SHARE|SHARE ROW EXCLUSIVE|EXCLUSIVE|ACCESS EXCLUSIVE)$/i )
+    elsif( $opt !~ /^(ACCESS\s+SHARE|ROW\s+SHARE|ROW\s+EXCLUSIVE|SHARE\s+UPDATE\s+EXCLUSIVE|SHARE|SHARE\s+ROW\s+EXCLUSIVE|EXCLUSIVE|ACCESS\s+EXCLUSIVE)$/i )
     {
         return( $self->error( "Bad table '$table' locking option '$opt'." ) );
     }
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $query = sprintf( 'LOCK TABLE %s IN %s MODE', $table, $opt );
     $query   .= " NOWAIT" if( $nowait );
-    my $sth   = $self->database_object->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to do tables locking:\n$query", $self->database_object->errstr() ) );
+    my $sth   = $dbo->prepare( $query ) ||
+    return( $self->error( "Error while preparing query to do tables locking:\n$query", $dbo->errstr() ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -351,7 +355,9 @@ sub qualified_name
 {
     my $self = shift( @_ );
     my @val = ();
-    CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    CORE::push( @val, $dbo->database ) if( $self->{prefixed} > 2 );
     CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
     CORE::push( @val, $self->name );
     return( CORE::join( '.', @val ) );
@@ -369,8 +375,10 @@ sub rename
         return( $self->error( "Bad new table name '$new'." ) );
     }
     my $query = "ALTER TABLE $table RENAME TO $new";
-    my $sth   = $self->database_object->prepare( $query ) ||
-        return( $self->error( "Error while preparing query to rename table '$table' into '$new':\n$query", $self->database_object->errstr() ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    my $sth   = $dbo->prepare( $query ) ||
+        return( $self->error( "Error while preparing query to rename table '$table' into '$new':\n$query", $dbo->errstr() ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -394,7 +402,9 @@ sub structure
         return( $self->error( "No table provided to get its structure." ) );
     my $struct  = $self->{structure} // {};
     my $fields  = $self->{fields} // {};
-    my $types_dict = $self->database_object->datatype_dict;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    my $types_dict = $dbo->datatype_dict;
     $self->_load_class( 'DB::Object::Fields::Field' ) || return( $self->pass_error );
     my $q = $self->_reset_query;
     # <https://stackoverflow.com/questions/6777456/list-all-index-names-column-names-and-its-table-name-of-a-postgresql-database>
@@ -541,8 +551,8 @@ ORDER BY a.attnum
 EOT
     # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
     # select * from information_schema.columns where table_name = 'address'
-    my $sth = $self->database_object->prepare_cached( $query ) ||
-        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr ) );
+    my $sth = $dbo->prepare_cached( $query ) ||
+        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $dbo->errstr ) );
     $sth->execute( $table ) ||
         return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr ) );
     my $check = {};
@@ -670,7 +680,13 @@ EOT
     return( $self->_clone( $struct ) );
 }
 
-sub table_info { return( shift->database_object->table_info( @_ ) ); }
+sub table_info
+{
+    my $self = shift( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    return( $dbo->table_info( @_ ) );
+}
 
 sub unlock
 {
@@ -679,9 +695,11 @@ sub unlock
     {
         return( $self->CORE::unlock( @_ ) );
     }
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $query = 'UNLOCK TABLES';
-    my $sth   = $self->database_object->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to unlock tables:\n$query", $self->database_object->errstr() ) );
+    my $sth   = $dbo->prepare( $query ) ||
+    return( $self->error( "Error while preparing query to unlock tables:\n$query", $dbo->errstr() ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -717,7 +735,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 

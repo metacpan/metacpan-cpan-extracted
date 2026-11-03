@@ -1,0 +1,73 @@
+{
+   "abstract" : "nagios style checks run as Perl inside of sneck",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Monitoring-Sneck-Checks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BSD::Sysctl" : "0",
+            "Data::Validate::Domain" : "0",
+            "Data::Validate::IP" : "0",
+            "File::Slurp" : "0",
+            "Filesys::Df" : "0",
+            "HTTP::Status" : "0",
+            "IO::Socket::IP" : "0",
+            "IO::Socket::SSL" : "2.000",
+            "JSON" : "0",
+            "LWP" : "6.00",
+            "LWP::Protocol::https" : "0",
+            "Net::DNS" : "1.00",
+            "Net::IP" : "0",
+            "Net::Ping" : "2.41",
+            "Net::SSLeay" : "1.80",
+            "Pod::Usage" : "0",
+            "Proc::ProcessTable" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/VVelox/Monitoring-Sneck-Checks"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

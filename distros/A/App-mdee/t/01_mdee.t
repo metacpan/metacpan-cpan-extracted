@@ -36,6 +36,9 @@ my $test_md = File::Spec->rel2abs('t/test.md');
 use File::Temp qw(tempdir);
 my $empty_config = tempdir(CLEANUP => 1);
 $ENV{XDG_CONFIG_HOME} = $empty_config;
+# Do not ask the terminal for its background color: the reply of a
+# busy terminal can come after termcolor gave up and shows up as input.
+$ENV{TERM_LUMINANCE} = 100;
 
 # Check if mdee exists
 ok(-x $mdee, 'mdee is executable');
@@ -73,6 +76,11 @@ subtest 'mode option' => sub {
     my $out_light = `$mdee --mode=light -s cat $test_md 2>&1`;
     my $out_dark = `$mdee --mode=dark -s cat $test_md 2>&1`;
     isnt($out_light, $out_dark, 'light and dark modes produce different output');
+    # TERM_LUMINANCE decides the mode without asking the terminal
+    my $dark = `TERM_LUMINANCE=10 $mdee -n $test_md 2>&1`;
+    like($dark, qr/^greple '-Mmd::config\(mode=dark/m, 'TERM_LUMINANCE below 50 selects dark mode');
+    my $light = `TERM_LUMINANCE=90 $mdee -n $test_md 2>&1`;
+    like($light, qr/^greple '-Mmd::config\(mode=light/m, 'TERM_LUMINANCE of 50 or more selects light mode');
 };
 
 # Test: no-nup option
@@ -85,7 +93,7 @@ subtest 'no-nup option' => sub {
 subtest 'no-fold option' => sub {
     my $out = `$mdee -ddn --no-fold $test_md 2>&1`;
     my ($greple_line) = $out =~ /^(debug: greple .*)$/m;
-    unlike($greple_line // '', qr/foldlist=1\b/, '--no-fold excludes fold from greple');
+    unlike($greple_line // '', qr/fold=1\b/, '--no-fold excludes fold from greple');
 };
 
 # Test: no-table option
@@ -103,7 +111,7 @@ subtest 'no-table option' => sub {
 # Test: filter option
 subtest 'filter option' => sub {
     my $ddn = `$mdee -ddn -f $test_md 2>&1`;
-    unlike($ddn, qr/foldlist=1\b/, '-f disables fold');
+    unlike($ddn, qr/fold=1\b/, '-f disables fold');
     unlike($ddn, qr/run_nup/, '-f disables nup');
     like($ddn, qr/table=1/, '-f keeps table enabled');
 };
@@ -114,7 +122,7 @@ subtest 'style option' => sub {
     like($nup, qr/run_nup/, '--style=nup includes nup');
 
     my $nup_ddn2 = `COLUMNS=200 $mdee -ddn --style=nup $test_md 2>&1`;
-    like($nup_ddn2, qr/foldlist=1\b/, '--style=nup includes fold');
+    like($nup_ddn2, qr/fold=1\b/, '--style=nup includes fold');
 
     my $nup_ddn = `COLUMNS=200 $mdee -ddn --style=nup $test_md 2>&1`;
     like($nup_ddn, qr/table=1/, '--style=nup includes table');
@@ -124,7 +132,7 @@ subtest 'style option' => sub {
     like($pager, qr/run_pager/, '--style=pager includes pager');
 
     my $pager_ddn2 = `$mdee -ddn --style=pager $test_md 2>&1`;
-    like($pager_ddn2, qr/foldlist=1\b/, '--style=pager includes fold');
+    like($pager_ddn2, qr/fold=1\b/, '--style=pager includes fold');
 
     my $pager_ddn = `$mdee -ddn --style=pager $test_md 2>&1`;
     like($pager_ddn, qr/table=1/, '--style=pager includes table');
@@ -133,16 +141,16 @@ subtest 'style option' => sub {
     unlike($cat, qr/run_nup/, '--style=cat excludes nup');
 
     my $cat_ddn = `$mdee -ddn --style=cat $test_md 2>&1`;
-    like($cat_ddn, qr/foldlist=1\b/, '--style=cat includes fold');
+    like($cat_ddn, qr/fold=1\b/, '--style=cat includes fold');
     like($cat_ddn, qr/table=1/, '--style=cat includes table');
 
     my $filter_ddn = `$mdee -ddn --style=filter $test_md 2>&1`;
-    unlike($filter_ddn, qr/foldlist=1\b/, '--style=filter excludes fold');
+    unlike($filter_ddn, qr/fold=1\b/, '--style=filter excludes fold');
     unlike($filter_ddn, qr/run_nup/, '--style=filter excludes nup');
     like($filter_ddn, qr/table=1/, '--style=filter includes table');
 
     my $raw_ddn = `$mdee -ddn --style=raw $test_md 2>&1`;
-    unlike($raw_ddn, qr/foldlist=1\b/, '--style=raw excludes fold');
+    unlike($raw_ddn, qr/fold=1\b/, '--style=raw excludes fold');
     unlike($raw_ddn, qr/table=1/, '--style=raw excludes table');
     like($raw_ddn, qr/table=0/, '--style=raw sends table=0');
     unlike($raw_ddn, qr/run_nup/, '--style=raw excludes nup');
@@ -158,20 +166,20 @@ subtest 'plain option' => sub {
     like($out, qr/run_pager/, '-p includes pager');
 
     my $ddn = `$mdee -ddn -p $test_md 2>&1`;
-    like($ddn, qr/foldlist=1\b/, '-p includes fold');
+    like($ddn, qr/fold=1\b/, '-p includes fold');
     like($ddn, qr/table=1/, '-p includes table');
 };
 
 # Test: style override
 subtest 'style override' => sub {
     my $ddn = `$mdee -ddn -f --fold $test_md 2>&1`;
-    like($ddn, qr/foldlist=1\b/, '-f --fold enables fold');
+    like($ddn, qr/fold=1\b/, '-f --fold enables fold');
     unlike($ddn, qr/run_nup/, '-f --fold keeps nup disabled');
 
     my $out2 = `$mdee -d --dryrun -p --no-fold $test_md 2>&1`;
     like($out2, qr/run_pager/, '-p --no-fold keeps pager');
     my $ddn2 = `$mdee -ddn -p --no-fold $test_md 2>&1`;
-    unlike($ddn2, qr/foldlist=1\b/, '-p --no-fold disables fold');
+    unlike($ddn2, qr/fold=1\b/, '-p --no-fold disables fold');
 };
 
 # Test: width option
@@ -335,7 +343,7 @@ subtest 'config file defaults' => sub {
         close $fh;
         my $out = `COLUMNS=200 XDG_CONFIG_HOME=$tmpdir $mdee -ddn --mode=light $test_md 2>&1`;
         like($out, qr/debug: nup .*-w 40/, 'default[width]=40 sets the output width');
-        like($out, qr/foldwidth=33\b/, 'default[width]=40 gives a fold width of 33');
+        like($out, qr/fold_width=33\b/, 'default[width]=40 gives a fold width of 33');
     }
 
     # Test default[fold_width]
@@ -344,7 +352,7 @@ subtest 'config file defaults' => sub {
         print $fh "default[fold_width]=40\n";
         close $fh;
         my $out = `COLUMNS=200 XDG_CONFIG_HOME=$tmpdir $mdee -ddn --mode=light $test_md 2>&1`;
-        like($out, qr/foldwidth=40\b/, 'default[fold_width]=40 sets fold width');
+        like($out, qr/fold_width=40\b/, 'default[fold_width]=40 sets fold width');
         unlike($out, qr/debug: nup .*-w /, 'default[fold_width] does not set the output width');
     }
 
@@ -520,11 +528,11 @@ subtest q(parallel option) => sub {
 
     my $two = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md 2>&1`;
     like($two, qr/debug: nup .*-V .*--pane=2 .*- --pages/, q(--parallel runs nup -V with one pane per file));
-    like($two, qr/foldwidth=93\b/, q(--parallel folds to the pane width));
+    like($two, qr/fold_width=93\b/, q(--parallel folds to the pane width));
 
     my $three = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md $test_md 2>&1`;
     like($three, qr/--pane=3/, q(three files give three panes));
-    like($three, qr/foldwidth=59\b/, q(fold width follows the pane count));
+    like($three, qr/fold_width=59\b/, q(fold width follows the pane count));
 
     my $pane = `COLUMNS=200 $mdee -ddn --parallel -C1 $test_md $test_md 2>&1`;
     like($pane, qr/-V .*--pane=1 .*- --pages/, q(-C overrides the pane count));
@@ -545,11 +553,19 @@ subtest q(table style option) => sub {
     my $default = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
     unlike($default, qr/table_style=/, q(no table_style parameter by default));
 
-    my $simple = `COLUMNS=200 $mdee -ddn --table-style=simple $test_md 2>&1`;
-    like($simple, qr/debug: greple .*table_style=simple/, q(--table-style=simple is passed to the md module));
+    for my $style (qw(3line simple)) {
+	my $out = `COLUMNS=200 $mdee -ddn --table-style=$style $test_md 2>&1`;
+	like($out, qr/debug: greple .*table_style=$style/, qq(--table-style=$style is passed to the md module));
+    }
+    for my $style (qw(lattice pipe)) {
+	my $out = `COLUMNS=200 $mdee -ddn --table-style=$style $test_md 2>&1`;
+	unlike($out, qr/table_style=/, qq(--table-style=$style is the default));
+    }
 
-    my $bad = `$mdee -n --table-style=grid $test_md 2>&1`;
-    like($bad, qr/--table-style: pipe or simple expected/, q(an unknown table style is rejected));
+    for my $style (qw(grid unknown)) {
+	my $bad = `$mdee -n --table-style=$style $test_md 2>&1`;
+	like($bad, qr/--table-style: lattice, 3line or simple expected/, qq(--table-style=$style is rejected));
+    }
 };
 
 subtest q(filename option) => sub {
@@ -570,12 +586,12 @@ subtest q(runin and runout options) => sub {
 
     my $default = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
     like($default, qr/debug: nup .*--runin=4 --runout=4/, q(nup gets run-in 4 by default));
-    like($default, qr/foldwidth=93\b/, q(default fold width leaves run-in 4));
+    like($default, qr/fold_width=93\b/, q(default fold width leaves run-in 4));
     like($default, qr/fold_runin=4,fold_runout=4\b/, q(the md module gets run-in 4 by default));
 
     my $two = `COLUMNS=200 $mdee -ddn --runlen=2 $test_md 2>&1`;
     like($two, qr/debug: nup .*--runin=2 --runout=2/, q(--runlen sets run-in and run-out));
-    like($two, qr/foldwidth=95\b/, q(fold width follows the run-in));
+    like($two, qr/fold_width=95\b/, q(fold width follows the run-in));
     like($two, qr/fold_runin=2,fold_runout=2\b/, q(the md module gets the same run-in));
 
     my $mix = `COLUMNS=200 $mdee -ddn --runlen=4 --runout=1 $test_md 2>&1`;
@@ -592,34 +608,96 @@ subtest q(runin and runout options) => sub {
 };
 
 # Test: output width option (-w) and --fold-width
+subtest q(refill option) => sub {
+    my $out = `COLUMNS=200 $mdee -n --refill $test_md 2>&1`;
+    like($out, qr/^greple .*refill=1/m, q(--refill passes refill=1 to the md module));
+    $out = `COLUMNS=200 $mdee -n -r $test_md 2>&1`;
+    like($out, qr/^greple .*refill=1/m, q(-r is --refill));
+    $out = `COLUMNS=200 $mdee -n $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(refill is off by default));
+    $out = `$mdee --help 2>&1`;
+    like($out, qr/\[no-\]refill/, q(--help shows --refill option));
+
+    # no parser works: a pandoc that always fails on PATH, and a
+    # CommonMark.pm and a Markdown/Perl.pm that die ahead in PERL5LIB;
+    # --refill stops before running anything
+    my $bin = tempdir(CLEANUP => 1);
+    open my $fh, q(>), "$bin/pandoc" or die;
+    print $fh "#!/bin/sh\nexit 1\n";
+    close $fh;
+    chmod 0755, "$bin/pandoc";
+    open $fh, q(>), "$bin/CommonMark.pm" or die;
+    print $fh "die q(not here);\n";
+    close $fh;
+    mkdir "$bin/Markdown";
+    open $fh, q(>), "$bin/Markdown/Perl.pm" or die;
+    print $fh "die q(not here);\n";
+    close $fh;
+    my $lib = join ':', $bin, grep { defined and length } $ENV{PERL5LIB};
+    $out = `PATH=$bin:$ENV{PATH} PERL5LIB=$lib COLUMNS=200 $mdee -n --refill $test_md 2>&1`;
+    isnt($? >> 8, 0, q(--refill fails without a parser));
+    like($out, qr/requires .*pandoc/, q(the error names the parsers));
+    unlike($out, qr/^greple/m, q(the pipeline is not shown));
+
+    # default[refill] in config.sh
+    my $tmpdir = tempdir(CLEANUP => 1);
+    mkdir "$tmpdir/mdee";
+    open $fh, q(>), "$tmpdir/mdee/config.sh" or die;
+    print $fh "default[refill]=1\n";
+    close $fh;
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n $test_md 2>&1`;
+    like($out, qr/^greple .*refill=1/m, q(default[refill]=1 turns refill on));
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n --no-refill $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(--no-refill overrides default[refill]));
+    open $fh, q(>), "$tmpdir/mdee/config.sh" or die;
+    print $fh "default[refill]=0\n";
+    close $fh;
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(default[refill]=0 leaves refill off));
+
+    # fatchap adds lines, which puts the folding of refill off, so it
+    # turns off the default but not the option
+    open $fh, q(>), "$tmpdir/mdee/config.sh" or die;
+    print $fh "default[refill]=1\n";
+    close $fh;
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t fatchap $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(fatchap turns off default[refill]));
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t fatchap -r $test_md 2>&1`;
+    like($out, qr/^greple .*refill=1/m, q(--refill works with fatchap));
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t fatchap --no-refill $test_md 2>&1`;
+    unlike($out, qr/refill=/, q(--no-refill works with fatchap));
+    $out = `XDG_CONFIG_HOME=$tmpdir COLUMNS=200 $mdee -n -t warm $test_md 2>&1`;
+    like($out, qr/^greple .*refill=1/m, q(other themes leave default[refill]));
+};
+
 subtest q(output width option) => sub {
     my $help = `$mdee --help 2>&1`;
     like($help, qr/--fold-width/, q(--help shows --fold-width option));
 
     my $two = `COLUMNS=300 $mdee -ddn -w 180 $test_md 2>&1`;
     like($two, qr/debug: nup .*--pane=2 .*- -w 180/, q(-w gives nup the pane count and ansicolumn -w));
-    like($two, qr/foldwidth=83\b/, q(fold width is derived from -w and the pane count));
+    like($two, qr/fold_width=83\b/, q(fold width is derived from -w and the pane count));
     like($two, qr/table_width=83\b/, q(table width follows the fold width));
 
     my $one = `COLUMNS=300 $mdee -ddn -w 100 $test_md 2>&1`;
     like($one, qr/debug: nup .*--pane=1 - --pages -w 100/, q(single column passes -w after --pages));
-    like($one, qr/foldwidth=93\b/, q(single column fold width is -w minus 7));
+    like($one, qr/fold_width=93\b/, q(single column fold width is -w minus 7));
 
     my $par = `COLUMNS=300 $mdee -ddn -V -w 140 $test_md $test_md 2>&1`;
     like($par, qr/debug: nup .*-V --pane=2 - --pages -w 140/, q(--parallel passes -w to ansicolumn));
-    like($par, qr/foldwidth=63\b/, q(--parallel fold width follows -w));
+    like($par, qr/fold_width=63\b/, q(--parallel fold width follows -w));
 
     my $cat = `COLUMNS=300 $mdee -ddn -s cat -w 40 $test_md 2>&1`;
-    like($cat, qr/foldwidth=40\b/, q(without nup -w is the fold width));
+    like($cat, qr/fold_width=40\b/, q(without nup -w is the fold width));
 
     my $fold = `COLUMNS=300 $mdee -ddn -w 180 --fold-width=60 $test_md 2>&1`;
-    like($fold, qr/foldwidth=60\b/, q(--fold-width overrides the derived fold width));
+    like($fold, qr/fold_width=60\b/, q(--fold-width overrides the derived fold width));
     like($fold, qr/table_width=60\b/, q(--fold-width also sets the table width));
     like($fold, qr/debug: nup .*- -w 180/, q(--fold-width keeps the output width));
 
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
     unlike($plain, qr/debug: nup .*-w /, q(without -w nup gets no width));
-    like($plain, qr/foldwidth=93\b/, q(without -w the fold width comes from the terminal));
+    like($plain, qr/fold_width=93\b/, q(without -w the fold width comes from the terminal));
 };
 
 done_testing;

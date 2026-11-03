@@ -3,7 +3,7 @@ package Text::AsciidocDown::Subs;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 my $ATTR_REF_RX      = qr/(\\)?\{([a-z0-9_][a-z0-9_-]*)\}/i;
 my $INLINE_ANCHOR_RX = qr/\[\[([A-Za-z_][A-Za-z0-9_\-:.]*)\]\]/;
@@ -14,8 +14,19 @@ my $EMPH_RX          = qr/(?<![A-Za-z0-9_\\])_(\S(?:.*?\S)?)_(?![A-Za-z0-9_])/;
 my $MARK_RX          = qr/(?<![A-Za-z0-9_\\])#(\S(?:.*?\S)?)#(?![A-Za-z0-9_])/;
 my $STRIKE_MARK_RX   = qr/(?<![A-Za-z0-9_\\])\[\.line-through\]#(\S(?:.*?\S)?)#(?![A-Za-z0-9_])/;
 my $MONO_PASSTHRU_RX = qr/`\+(.*?)\+`/;
-my $MONO_RX          = qr/`(\S(?:.*?\S)?)`/;
-my $PASSTHROUGH_RX   = qr/\+\+\+(.*?)\+\+\+/s;
+
+# A code-span opening backtick. A backtick that is part of a standalone
+# curly-quote marker must not open a span, or two markers in one line
+# (the file`'s x, the account`'s y) are swallowed as a single span and
+# never converted:
+#   * a backtick preceded by a quote character is the close of a "`
+#     or '` opener marker, never a span opener;
+#   * a backtick preceded by a letter, digit or sentence punctuation and
+#     followed by a quote character is a `' or `" closer marker (a
+#     constrained span cannot open right after a word character anyway).
+# Genuine paired quotes were already consumed by apply_quotes().
+my $MONO_RX        = qr/(?<!['"])(?:(?<![\p{L}\p{N}.,;:!?)])|(?!`['"]))`(\S(?:.*?\S)?)`/;
+my $PASSTHROUGH_RX = qr/\+\+\+(.*?)\+\+\+/s;
 
 sub build_attributes
 {
@@ -138,10 +149,9 @@ sub apply_quotes
    # Unicode characters. That default is what makes the round trip through
    # Text::MarkdownAdoc stable (it maps U+201C/201D and U+2018/2019 back to
    # these exact AsciiDoc forms); `<q></q>` never stabilises because it is
-   # unknown HTML that gets re-escaped as passthrough on every pass. See
-   # docs/COMPATIBILITY_REPORT.md for the full rationale and the downdoc
-   # parity note. Callers who want the old shared `<q></q>` behavior can
-   # still get it by setting both `quotes` and `quotes-single` explicitly.
+   # unknown HTML that gets re-escaped as passthrough on every pass.
+   # Callers who want the old shared `<q></q>` behavior can still get it
+   # by setting both `quotes` and `quotes-single` explicitly.
    my ($dq_open, $dq_close) = _quote_pair($attrs->{quotes},          "\x{201C}", "\x{201D}");
    my ($sq_open, $sq_close) = _quote_pair($attrs->{'quotes-single'}, "\x{2018}", "\x{2019}");
 

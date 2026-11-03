@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::VisualWidth::PP:
     file: lib/Text/VisualWidth/PP.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Exporter: '0'
   Unicode::EastAsianWidth: '1.3'
@@ -36,11 +36,11 @@ resources:
   bugtracker: https://github.com/tokuhirom/Text-VisualWidth-PP/issues
   homepage: https://github.com/tokuhirom/Text-VisualWidth-PP
   repository: https://github.com/tokuhirom/Text-VisualWidth-PP.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - "Dabrien 'Dabe' Murphy <dabe@parabon.com>"
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

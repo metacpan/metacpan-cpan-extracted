@@ -1,0 +1,565 @@
+<title>Shell Large Subset</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column of decision cards under a sticky status bar; a register-map feel (IDs as addresses, mono for anything you type). */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e8ecea; --fg:#18201d; --muted:#5b6762; --line:#cfd7d3;
+  --accent:#1f5f8b; --go:#1d7a46; --nogo:#a3372b; --discuss:#7a4fa8; --explain:#b06a00; --plaque:#c0262d; --onfill:#ffffff;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1a211e; --sunk:#232c28; --fg:#e3ebe7; --muted:#9aa8a1; --line:#33403a;
+  --accent:#6fb3e3; --go:#4cc285; --nogo:#ef7b6d; --discuss:#b993e6; --explain:#e6a740; --plaque:#e5484d; --onfill:#0f1412; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1a211e; --sunk:#232c28; --fg:#e3ebe7; --muted:#9aa8a1; --line:#33403a;
+  --accent:#6fb3e3; --go:#4cc285; --nogo:#ef7b6d; --discuss:#b993e6; --explain:#e6a740; --plaque:#e5484d; --onfill:#0f1412; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1{font-family:var(--f-display);font-weight:600;font-size:1.9rem;line-height:1.15;margin:0 0 6px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:30px 0 10px}
+p{margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}
+.lede{color:var(--muted);max-width:68ch;display:grid;gap:8px}
+.top{display:grid;gap:14px;margin-top:16px}
+.legend{display:grid;gap:4px;font-size:.92rem}
+.legend b{font-weight:600}
+fieldset{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:0;display:grid;gap:4px}
+legend{font-weight:600;padding:0 4px}
+fieldset label{display:flex;gap:8px;align-items:flex-start}
+.lastread{font-size:.9rem;color:var(--muted)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:8px;margin-top:16px;display:grid;gap:6px}
+.plaque{font:inherit;font-size:.9rem;text-align:left;background:var(--plaque);color:#fff;border:0;border-radius:5px;padding:6px 10px;cursor:pointer;position:relative}
+.pop{position:absolute;left:0;top:100%;margin-top:6px;z-index:6;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:10px 14px;max-width:min(560px,90vw);box-shadow:0 6px 24px rgb(0 0 0 / .18);font-size:.88rem}
+.pop ol{margin:0;padding-left:18px;display:grid;gap:4px}
+.progress{font-size:.9rem;font-variant-numeric:tabular-nums}
+.brow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.88rem}
+.brow select{font:inherit}
+.blab{font-family:var(--f-display);font-weight:600;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);min-width:4.2em}
+.ghead{display:grid;gap:4px;margin-top:30px}
+.ghead h2{margin:0}
+.ghead p{color:var(--muted);font-size:.92rem;max-width:72ch}
+.layer{font-family:var(--f-display);font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;white-space:nowrap}
+.filt{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:2px 10px;cursor:pointer}
+.filt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--onfill)}
+.gogrp{display:inline-flex;gap:6px;align-items:center;margin-left:auto}
+.blab[for]{min-width:0}
+a.xref{color:var(--accent);font-family:var(--f-mono);font-size:.92em;font-weight:500;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+a.xref:hover{text-decoration-style:solid}
+.item.flash{box-shadow:0 0 0 3px var(--accent)}
+.item{transition:box-shadow .4s;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0;display:grid;gap:10px;min-width:0}
+.item.m-go{border-left-color:var(--go)} .item.m-nogo{border-left-color:var(--nogo)} .item.m-discuss{border-left-color:var(--discuss)}
+.item.m-exfirst,.item.m-exlater{border-left-color:var(--explain)}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.iid{font-family:var(--f-mono);font-weight:500;font-size:.9rem;padding:1px 6px;border-radius:4px;background:var(--sunk);white-space:nowrap}
+.ttl{font-weight:600;font-size:1.02rem;flex:1 1 300px;min-width:0}
+.pill{font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:0 8px}
+.sec{display:grid;gap:4px;min-width:0}
+.lab{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sec ul,.sec ol{margin:0;padding-left:20px;display:grid;gap:3px}
+.marks{display:flex;flex-wrap:wrap;gap:6px}
+.mk{font:inherit;font-size:.85rem;border:1.5px solid var(--c);color:var(--c);background:transparent;border-radius:5px;padding:3px 10px;cursor:pointer}
+.mk .ic{display:none}
+.mk[aria-pressed="true"]{background:var(--c);color:var(--onfill)}
+.mk[aria-pressed="true"] .ic{display:inline}
+.mk:disabled{opacity:.5;cursor:not-allowed}
+.remind{font-size:.88rem;display:flex;gap:6px;align-items:center}
+.thread{display:grid;gap:8px}
+textarea{font:inherit;font-size:.92rem;width:100%;box-sizing:border-box;resize:none;overflow-y:hidden;border:1px solid var(--line);border-radius:5px;padding:6px 8px;background:var(--bg);color:var(--fg)}
+.ans{border-left:3px solid var(--accent);padding:4px 0 4px 10px;white-space:pre-wrap;font-size:.92rem}
+.ans .who{font-weight:600}
+.tag{font-size:.75rem;border-radius:4px;padding:0 6px;margin-left:6px;white-space:nowrap}
+.tag.muted{border:1px solid var(--line);color:var(--muted)}
+.tag.turn{background:var(--explain);color:var(--onfill)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ro{color:var(--plaque);font-size:.9rem}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<h1>Shell Large Subset</h1>
+<div class="lede"><p>The investigation you asked for on 2026-11-01: how far a new module <code>ShellSubsetLarge.pm</code> can go beyond <code>ShellSubset.pm</code> without its code growing unreasonably. Findings, measurements and the size estimate are in <code>claude/large-subset-investigation.md</code>; this page holds the decisions. <b>Update, same day:</b> you asked me to start (R2) and renamed the module (R3). The parser is written and tested; its rules are in <code>claude/large-subset-spec.md</code>. Where an item offers alternatives and you had not chosen, I took the one this page recommends: A3 alternative A, A4 alternative A, F6 alternative A (reject <code>set -x</code>). The <code>posix_spawn</code> executor written in another session (<code>claude/pspawn-ShellSpawn.pm</code>) runs the parse trees of <code>ShellSubsetLarge</code> too since the evening of 2026-11-01; differential tests against dash found 8 executor bugs, of which L1–L5 are fixed and L6–L8 open (<code>claude/large-subset-upstream-reports.md</code>). <b>Measured on 2026-11-02:</b> the share of corpus samples the parser accepts, a script counting only when accepted as a whole; <code>ShellSubset</code> with all options → <code>ShellSubsetLarge</code>, with the POSIX ceiling (defined below) in brackets: tldr one-liners 97.7% → 98.3% (98.8%); NL2Bash one-liners 89.5% → 92.1% (93.6%); pure-sh-bible 48% → 93% (93%); ShellCheck snippets, clean / warned, 42% / 46% → 58% / 57% (69% / 71%).</p>
+<p>Short version. For <code>system</code> strings (one-liners) little is left to gain: 95.6% of all corpus one-liners are accepted today, at most 97.4% with all the F items. The rest is mostly bash-only syntax, or builtins that make no sense in <code>sh -c</code> (<code>alias</code>, <code>history</code>). For scripts the F items raise acceptance a lot: pure-sh-bible 48% → up to 93%, ShellCheck snippets 42–46% → up to about 70%. This needs a change of design (A1): the module becomes an interpreter that decides some things at run time. Estimated size: about 1,150–1,250 lines for its parser and executor (up to 1,300 at the top of the parser's budget), against about 700 for the present parser plus an executor for it (an estimate made before the <code>posix_spawn</code> executor existed), see S1.</p>
+<p>Words used throughout. <b>The corpora</b>: the public collections of shell commands the parser was measured on (tldr pages, NL2Bash, ShellCheck's test snippets, the bash Cookbook examples, pure-sh-bible, pure-bash-bible). <b>Both shells</b>: dash 0.5.12 and <code>bash --posix</code> 5.2.21, as installed on this machine; every “both shells” example below was run in them. <b>Rejected</b>: the parser refuses the string, which then runs with <code>/bin/sh -c</code>, as Perl does today. <b>The POSIX ceiling</b>: the samples whose syntax both shells accept and in which a scan finds no bash-only construct; an upper bound for what this page can reach.</p>
+<p>IDs. Item IDs on this page are R, A, F, X, T, S and U followed by a number. Rule names such as V3, B3, E1, D1 are rules of <code>claude/shell-subset-spec.md</code>, not items here.</p>
+<p>A bug turned up in both existing parsers, <code>ShellSubset.pm</code> and <code>ShellSubsetSmall.pm</code>: U1.</p>
+</div>
+
+<div class="top">
+<div class="legend">
+<span><b>✓ Go</b>: do it as planned. <b>✗ No-go</b>: don’t; do what “If No-go” says. <b>◆ Discuss strategy first</b>: settle the approach first; holds back only the items that depend on it.</span>
+<span><b>? Explain first</b>: a show-stopper; I explain before doing anything else. <b>? Explain later</b>: I explain after doing the rest. <b>Unmarked</b>: not done this round, left for later; it is not a rejection.</span>
+<span>A note that settles an item (picks an option, states the rule, or says the plan is right) counts as Go even without the button. My answers carry a tag: <i>No reply needed</i>, <i>Your turn</i> (I asked you something), or <i>Answered, Claude hasn’t read it yet</i>. The “Your turn” filter shows the items waiting for you.</span>
+</div>
+<fieldset id="gofs"><legend>What Go means</legend>
+<label><input type="radio" name="gomode" id="gm-wait" value="wait"> <span>Mark and wait: I implement only when you tell me in chat.</span></label>
+<label><input type="radio" name="gomode" id="gm-nostop" value="nostop"> <span>Implement when there are no show-stoppers: “Explain first” items block everything; “Discuss” items block only what depends on them.</span></label>
+<label><input type="radio" name="gomode" id="gm-indep" value="indep"> <span>Implement what’s independent: Go items that don’t depend on an open item; I list the ones held back.</span></label>
+</fieldset>
+<p class="lastread" id="lastread">Loading marks…</p>
+<p class="ro" id="ro" hidden></p>
+</div>
+
+<div class="bar" id="bar">
+<button class="plaque" id="plaque" type="button" aria-expanded="false" hidden><span id="plaquetxt"></span> ⓘ
+<span class="pop" id="pop" hidden><ol>
+<li>Claude isn’t told when you change this page. It sees your changes only when it reads the page.</li>
+<li>Right now Claude reads the page only while it is calling tools for your message anyway. The read then rides along with those calls and costs almost nothing extra. A reply that needs no tools doesn’t read the page.</li>
+<li>A short message such as “!” or “Ready?” always makes Claude read it.</li>
+<li>This plaque disappears once Claude has reacted to your changes (answered your notes, acted on your marks, or said in chat why they wait), not as soon as it has read them.</li>
+<li>You can ask Claude, in chat or in any note, to check every time. Then it reads the page at every message, even when nothing else needs a tool. Each such read is an extra step in which Claude re-reads the whole conversation, so it costs tokens: often 100k or more per step in a long conversation. In that mode this plaque is not shown. Ask again to switch back.</li>
+</ol></span></button>
+<div class="brow"><span class="progress" id="progress"></span>
+<span class="gogrp"><label class="blab" for="gosel">Go</label>
+<select id="gosel"><option value="wait">Mark and wait</option><option value="nostop">Implement if no show-stoppers</option><option value="indep">Implement what’s independent</option></select></span></div>
+<div class="brow" id="filters"><span class="blab">Filters</span></div>
+</div>
+
+<div id="list"></div>
+</div>
+
+<script>
+const GROUPS = [
+   {
+      "intro":"",
+      "name":"Recorded from your messages"
+   },
+   {
+      "intro":"<p>These items decide what kind of program <code>ShellSubsetLarge.pm<\/code> is. A1 and A2 are implemented; A3 and A4 as their alternative A (my choice, awaiting yours); A5 is implemented in the executor; A6 is settled (see R2). A2, A3, A4 and A6 offer alternatives, named by letters (alternative A is not item A1).<\/p>",
+      "name":"Shape of the module"
+   },
+   {
+      "intro":"<p>Each item adds one family of constructs that dash and bash both have, in the forms where they behave alike (checked with dash 0.5.12 and <code>bash --posix<\/code> 5.2.21, the shells on this machine).<\/p><p><b>Measured<\/b> counts the samples of the corpora that the present parser rejects, that lie within the POSIX ceiling (both shells accept their syntax, and no bash-only construct was found in them), and that use the feature. The seven numbers are, in this order: tldr / NL2Bash / bash Cookbook / pure-sh-bible / pure-bash-bible / ShellCheck clean / ShellCheck warned. A sample can use several features. Details: <code>claude/large-subset-investigation.md<\/code>, section 3.<\/p><p><b>Cost<\/b> is my estimate of the lines the item adds, in the dense style of <code>ShellSubset.pm<\/code>; S1 adds them up; they are kept for comparison, the actual parser being 258 lines. Status (2026-11-02): all F items are implemented in the parser (<code>claude/ShellSubsetLarge.pm<\/code>) and in the executor (<code>claude/pspawn-ShellSpawn.pm<\/code> with <code>claude/pspawn-ShellSpawn-Large.pm<\/code>), except F12's <code>pwd<\/code> as a builtin (dropped: <code>ShellSubset<\/code>, which is asked first, already accepts <code>pwd<\/code> and runs it as <code>/bin/pwd<\/code>, so the large grammar never sees it). The executor's remaining differences from dash are in <code>claude/large-subset-upstream-reports.md<\/code> (L6–L8).<\/p><p>Options of the present parser (spec section 9): <code>if<\/code>, <code>while<\/code>, <code>for<\/code>, <code>case<\/code>, <code>read<\/code>, <code>assign<\/code> and <code>param_ops<\/code> are always on in the large subset. The option <code>brace<\/code> (brace expansion, V13) is dropped: brace expansion is bash-only and waits for T1. These stay as they are: <code>nocaret<\/code> (reject <code>^<\/code>, C1), <code>nopwd<\/code> (reject <code>$PWD<\/code>, C4), <code>check<\/code> (the caller's locale checker, C4), <code>empty<\/code> (accept an empty string, D5), <code>fdmulti<\/code> (descriptor numbers of several digits, D4), <code>tilde_args<\/code> (<code>~<\/code> after <code>NAME=<\/code> in arguments, E4) and <code>redir_strict<\/code> (Q1).<\/p>",
+      "name":"POSIX features to add"
+   },
+   {
+      "intro":"<p>One item: what the large subset would still refuse. Written in the string, it goes to <code>/bin/sh -c<\/code>; showing up only at run time, it stops the shell with status 248 (A4).<\/p>",
+      "name":"What stays with sh"
+   },
+   {
+      "intro":"<p>One item: the bash-only constructs, as a separate later step.<\/p>",
+      "name":"Later"
+   },
+   {
+      "intro":"<p>The budget, the order of work, and one bug found in the existing parsers (U1).<\/p>",
+      "name":"Size, order of work, and a bug"
+   }
+]
+;
+const ITEMS = [
+   {
+      "group":"Recorded from your messages",
+      "id":"R1",
+      "layer":"Goal",
+      "nogo":"<p>Not applicable: this is your request. Write in a note if I misread it.<\/p>",
+      "now":"<p>Your message: <code>ShellSubset.pm<\/code> was meant to define and implement easy, low-hanging fruit; you asked me to investigate a changed goal: a module <code>ShellSubsetLarge.pm<\/code> that implements as much as possible, provided the code size does not blow up unreasonably.<\/p>",
+      "plan":"<p>This page is the result of that investigation. The findings, measurements and size estimates are in <code>claude/large-subset-investigation.md<\/code>. Nothing of the module is written yet. <code>ShellSubset.pm<\/code> stays as it is (apart from the bug fix U1).<\/p>",
+      "refs":"<code>claude/large-subset-investigation.md<\/code>.",
+      "title":"Make <code>ShellSubsetLarge.pm<\/code> accept as much of sh as it can, as long as the code does not grow unreasonably"
+   },
+   {
+      "group":"Recorded from your messages",
+      "id":"R2",
+      "layer":"Design",
+      "nogo":"<p>Not applicable: this is your decision. Write in a note if I misread it.<\/p>",
+      "now":"<p>Your message of 2026-11-01: “Can you start implementing this as an addition to <code>ShellSubset.pm<\/code>? With, say, it calling our parser only on a misparse? If so, go for it. (Do not worry about <code>fork()<\/code>: another session already implemented (?) execution of parse trees via <code>posix_spawn()<\/code>.)”<\/p>",
+      "plan":"<p>Done for the parser. <code>ShellSubsetLarge::parse<\/code> first calls <code>ShellSubset::parse<\/code>. Only when that rejects the string does it parse the string again, using <code>ShellSubset<\/code>'s own code with eight of its subs and two of its tables (<code>%BI<\/code>, the builtins it rejects, and <code>%SH<\/code>, the names only a shell sets) temporarily replaced (<code>local<\/code>) for that call.<\/p><p>This needed a small patch to <code>ShellSubset.pm<\/code>, <code>claude/large-subset-shellsubset.patch<\/code>, applied by the posix_spawn session on 2026-11-01. In it, <code>ShellSubset<\/code>'s ten lookup tables and regexes (<code>%KW<\/code>, <code>%BI<\/code>, <code>%SH<\/code>, <code>$NM<\/code>, …) become <code>our<\/code> variables, so that <code>ShellSubsetLarge<\/code> can use them and swap two of them with <code>local<\/code>; <code>ShellSubset<\/code>'s behaviour does not change from that. The patch also fixes five bugs of <code>ShellSubset<\/code> found on the way (U1 and four more, listed in <code>claude/large-subset-upstream-reports.md<\/code>).<\/p><p>A6 (how to run Perl-side parts of a pipeline, such as a function or a <code>while read<\/code> loop, without <code>fork<\/code>) is settled by the existing <code>posix_spawn<\/code> executor, <code>claude/pspawn-ShellSpawn.pm<\/code>: it already runs groups, loops and subshells in the Perl process without <code>fork<\/code>, as continuations driven by one event loop (A6's alternative B). Functions can run the same way. Since the evening of 2026-11-01 that executor also runs <code>ShellSubsetLarge<\/code> trees; per your decision in the posix_spawn session, the caller passes the parser (<code>run(STRING, parser =&gt; CODE)<\/code>), by default the largest one already loaded.<\/p>",
+      "refs":"<code>claude/ShellSubsetLarge.pm<\/code>, <code>claude/large-subset-spec.md<\/code>, <code>claude/large-subset-shellsubset.patch<\/code>.",
+      "title":"Implement the large subset as an addition to <code>ShellSubset.pm<\/code>, which is asked first"
+   },
+   {
+      "group":"Recorded from your messages",
+      "id":"R3",
+      "layer":"Name",
+      "nogo":"<p>Not applicable: this is your decision.<\/p>",
+      "now":"<p>Your message of 2026-11-01: the name <code>ShellLargeSubset.pm<\/code> is not consistent; it should be <code>ShellSubsetLarge.pm<\/code>.<\/p>",
+      "plan":"<p>Done: the module and its files use this name, and so does this page.<\/p>",
+      "refs":"<code>claude/ShellSubsetLarge.pm<\/code>.",
+      "title":"Name the module <code>ShellSubsetLarge.pm<\/code>"
+   },
+   {
+      "group":"Shape of the module",
+      "id":"A1",
+      "layer":"Design",
+      "nogo":"<p>Everything stays decided at parse time. F1, F3 and F7 then count as No-go. The other F items stay possible, limited to what the text shows: a literal trap action (F8), a literal name after <code>command<\/code> (F12). Most of the measured gain in scripts disappears.<\/p>",
+      "now":"<p><code>ShellSubset.pm<\/code> decides everything when it parses. It rejects every construct whose effect cannot be pinned down from the text alone, and a rejected string goes to <code>/bin/sh -c<\/code> as a whole. Examples of what it rejects for that reason: <code>\"$EDITOR\" file<\/code> (the command name comes from a variable; spec rule V3), <code>f() { echo \"$1\"; }; f x<\/code> (a function and a positional parameter), <code>a; exec b<\/code> (spec rule B3: <code>exec<\/code> only where nothing can follow it).<\/p><p>Functions and <code>$1<\/code> are the largest gaps in scripts; command names from expansions follow (investigation, section 3).<\/p>",
+      "plan":"<p>The module still parses the whole string before running anything. A syntax error, or a construct outside the large subset that is visible in the text, still rejects the whole string, which then goes to <code>/bin/sh -c<\/code> as today.<\/p><p>What the text cannot tell is decided when it runs. Example: in <code>cmd=ls; $cmd -d /<\/code> the parser accepts <code>$cmd<\/code> as a command name; at run time it is <code>ls<\/code>, which runs as a program and prints <code>/<\/code>.<\/p><p>The features that need this are F1 (functions, <code>$1<\/code>), F3 (command names from expansions, <code>exec<\/code> anywhere) and F7 (<code>eval<\/code>, <code>.<\/code>). Spec rules that then go:<\/p><ul><li>V3 (literal command name) and B3 (place of <code>exec<\/code>): F3.<\/li><li>V19: <code>! exec cmd<\/code> is accepted; as in both shells, the <code>!<\/code> is lost and the status is cmd's.<\/li><li>V5: settings before <code>:<\/code> and <code>exit<\/code> are accepted; <code>a=2 :<\/code> keeps <code>a=2<\/code> afterwards, as in both shells.<\/li><li>the ban on <code>$1<\/code>…<code>$9<\/code>, <code>$#<\/code>, <code>$@<\/code>, <code>$*<\/code>: F1.<\/li><\/ul><p>V7 stays, except that <code>exec<\/code> with only redirections becomes allowed (F3).<\/p>",
+      "refs":"New <code>claude/ShellSubsetLarge.pm<\/code>; new spec <code>claude/large-subset-spec.md<\/code>.",
+      "title":"Build <code>ShellSubsetLarge<\/code> as an interpreter: parse the whole string first, then decide some things at run time"
+   },
+   {
+      "group":"Shape of the module",
+      "id":"A2",
+      "layer":"Design",
+      "nogo":"<p>Say in a note which instead: <b>B<\/b>, two different trees, with an executor for each; or <b>C<\/b>, retire <code>ShellSubset.pm<\/code> and keep only the large module. (<b>A<\/b> is this plan.)<\/p>",
+      "now":"<p>No executor exists yet. <code>ShellSubset<\/code> returns the tree described in section 8 of <code>claude/shell-subset-spec.md<\/code>. Example: <code>LANG=C sort &lt;in.txt<\/code> gives <code>[[[{env =&gt; ['LANG','C'], argv =&gt; ['sort'], redir =&gt; [[0,'&lt;','in.txt']]}]]]<\/code>.<\/p>",
+      "plan":"<p>For text that both modules accept, <code>ShellSubsetLarge<\/code> returns the identical tree; for the example above, the same structure. New node kinds appear only for new constructs, for example a function definition or a here-document (their exact form goes into the new spec).<\/p><p>Then the executor is written once, for the large tree, and a <code>ShellSubset<\/code> tree runs on it. Where the large rules differ from <code>ShellSubset<\/code>'s (F11: the executor expands patterns itself, where spec rule E3 leaves them to the caller; F12: <code>pwd<\/code> as a builtin, where spec rule B2 runs <code>/bin/pwd<\/code>), the executor has an option that keeps <code>ShellSubset<\/code>'s rule. <code>ShellSubset.pm<\/code> and its 816 tests stay; they keep defining the small subset.<\/p>",
+      "refs":"Spec section 8; the new spec.",
+      "title":"Make the large module's parse tree a superset of <code>ShellSubset<\/code>'s, so that one executor runs both"
+   },
+   {
+      "group":"Shape of the module",
+      "id":"A3",
+      "layer":"Dialect",
+      "nogo":"<p>Write B or C in a note. That brings the bash tier (T1) into this round, at about 400–500 more lines, whatever T1 is marked.<\/p>",
+      "now":"<p>Section 1 of <code>claude/shell-subset-spec.md<\/code>: where dash and bash differ, the construct is rejected unless the spec says otherwise. Example: <code>[[ -n $x ]] &amp;&amp; echo y<\/code> is rejected (bash only).<\/p>",
+      "plan":"<p>The same rule for the large subset (alternative A below). Bash-only constructs (<code>[[<\/code>, <code>((<\/code>, <code>$'…'<\/code>, arrays, <code>${x/a/b}<\/code>, <code>&lt;&lt;&lt;<\/code>, <code>&lt;(…)<\/code>, ...) stay rejected; T1 keeps them for a later step.<\/p><p>Alternatives:<\/p><ul><li><b>A<\/b>: only what dash and bash run alike (this plan).<\/li><li><b>B<\/b>: follow whichever shell <code>/bin/sh<\/code> is on the machine, found once when the module loads; bash-only syntax is then accepted where <code>/bin/sh<\/code> is bash.<\/li><li><b>C<\/b>: the caller chooses dash or bash for each call.<\/li><\/ul><p>Measured, for all one-liners together: 95.6% accepted today; at most 97.4% under A; at most 99.3% under B with <code>/bin/sh<\/code> being bash, or under C with bash chosen (this figure was measured with plain <code>bash -n<\/code>). For bash-flavoured scripts the difference is much larger (bash Cookbook: at most 43% under A, 95% with bash).<\/p>",
+      "refs":"Spec section 1; investigation, sections 3 and 4.",
+      "title":"Keep the present rule for the large subset: accept only what dash and bash run alike"
+   },
+   {
+      "group":"Shape of the module",
+      "id":"A4",
+      "layer":"Design",
+      "nogo":"<p>Alternative B, unless a note asks for C.<\/p>",
+      "now":"<p>There is no such case today: the parser sees all the text before anything runs, so a rejected string goes to sh as a whole.<\/p>",
+      "plan":"<p>(Rewritten after your note of 2026-11-02, \"2 is too common. What about 250-2=248?\": the status is 248, documented in the large spec, section 5, \"Exit statuses of the module itself\".)<\/p><p>With A1, F3, F7 and F8 some text is seen only at run time, after earlier commands have already run: the argument of <code>eval<\/code>, a file read by <code>.<\/code>, a trap action that comes from a variable, a command name that comes from an expansion. The whole string can then no longer be handed to sh. In that case the interpreter writes <code>ShellSubsetLarge: &lt;construct&gt; is not supported<\/code> to standard error and stops with status 248, as <code>exit 2<\/code> would at that point: the whole string, or only the enclosing <code>( … )<\/code>, <code>$( … )<\/code>, background chain or element of a pipeline (spec section 4 describes the same for <code>exit<\/code>).<\/p><p>Example: <code>x='[[ -n y ]]'; echo before; eval \"$x\"<\/code> prints <code>before<\/code>, then the message, and the status is 248. (As <code>/bin/sh<\/code>, bash succeeds; dash prints <code>[[: not found<\/code> and gives 127.)<\/p><p>Another example: <code>c=ulimit; $c -n<\/code> stops with status 248. Both shells run their builtin <code>ulimit<\/code> there (X1 leaves <code>ulimit<\/code> to sh).<\/p><p>Alternatives:<\/p><ul><li><b>A<\/b>: this plan.<\/li><li><b>B<\/b>: reject at parse time everything whose text or command name is known only at run time: <code>eval<\/code>, <code>.<\/code>, trap actions that are not literal, command names from expansions (also after <code>command<\/code>). Nothing can then show up at run time, as today; F3 and F7 count as No-go.<\/li><li><b>C<\/b>: hand the rest of the string to <code>sh -c<\/code>, after exporting the variables and writing the functions out as text. Inexact (the current directory, traps, open descriptors and readonly flags do not carry over cleanly) and much more code.<\/li><\/ul>",
+      "refs":"New spec; investigation, section 2.",
+      "title":"When an unsupported construct only shows up at run time, stop with status 248 and a message"
+   },
+   {
+      "group":"Shape of the module",
+      "id":"A5",
+      "layer":"Design",
+      "nogo":"<p>Follow bash in these cases (print the message and go on; status 127 for <code>${x:?}<\/code>), or name another rule in a note.<\/p>",
+      "now":"<p>The spec already follows dash in two places. V6: a redirection error on <code>:<\/code> or <code>exit<\/code> stops the shell with status 2 as in dash (<code>bash --posix<\/code> stops with status 1, plain bash goes on). Section 5, \"Arithmetic\": an expression that becomes invalid at run time stops with status 2, as in dash (bash: 1).<\/p>",
+      "plan":"<p>The same rule for every difference that cannot be seen in the text. Differences that are visible in the text stay rejected at parse time (A3). Checked here:<\/p><ul><li><code>n=1x; export \"$n=2\"; echo after<\/code>: dash prints <code>export: 1x: bad variable name<\/code> and stops; bash prints <code>not a valid identifier<\/code>, then <code>after<\/code>. The interpreter prints a message and stops with status 2.<\/li><li><code>shift 5<\/code> with fewer than 5 arguments: dash prints <code>can't shift that many<\/code> and stops; bash prints an error and goes on. The interpreter stops with status 2.<\/li><li><code>${x:?msg}<\/code> with <code>x<\/code> unset: both stop; dash with status 2, bash with 127. The interpreter uses 2.<\/li><li><code>cd<\/code> alone with <code>HOME<\/code> unset (now possible, F5): dash stays and succeeds, bash fails. The interpreter stays and succeeds.<\/li><\/ul>",
+      "refs":"Spec V6 and section 5, \"Arithmetic\"; investigation, section 5.",
+      "title":"Where dash and bash differ only at run time, do what dash does"
+   },
+   {
+      "group":"Shape of the module",
+      "id":"A6",
+      "layer":"Executor",
+      "nogo":"<p>Write B or C in a note.<\/p>",
+      "now":"<p><code>Run<\/code> is your module for starting processes (latest version in this Project: <code>Run-0.06.tar.gz-base64.txt<\/code>); the executor is to use it to start programs. It has a forkless mode (on by default on Win32, OS/2 and VMS). In a pipeline it can run at most one element that is not a plain program (a group, a chain) in the Perl process itself; others run in forked copies, and are refused in forkless mode. Your design note for <code>Run<\/code> 0.07 plans continuations, driven by an event loop in the one process, instead.<\/p>",
+      "plan":"<p>In the large subset more things are Perl code rather than programs: functions, <code>while read<\/code> loops, <code>( cd d; make )<\/code>. The interpreter keeps the whole shell state in one Perl structure: variables, functions, current directory, umask, open descriptors, traps, positional parameters. It never changes the Perl process's own current directory, umask or descriptors; it applies them only to the programs it starts. Its traps replace the Perl program's signal handlers only while the string runs (F8).<\/p><ul><li>A subshell <code>( … )<\/code> on its own runs in the same process, on a copy of that structure, which is thrown away afterwards. No fork is needed.<\/li><li>When two such parts must run at the same time (example: <code>f | while read l; do echo \"&lt;$l&gt;\"; done<\/code>, with <code>f<\/code> a function), one runs in the process. Each other one runs in a forked copy where <code>fork<\/code> exists; without <code>fork<\/code>, in a new <code>perl -MShellSubsetLarge<\/code> process that gets its part of the tree and the state through a pipe. Cost: about 40 lines.<\/li><\/ul><p>Alternatives:<\/p><ul><li><b>A<\/b>: this plan.<\/li><li><b>B<\/b>: make the interpreter resumable, so that <code>Run<\/code> 0.07's event loop can drive several in-process parts in one process. No extra perl processes, but every loop, function call and builtin must be able to pause and resume. My rough guess: the executor about doubles.<\/li><li><b>C<\/b>: in forkless mode, reject such strings: at parse time where the text shows it, and with A4 where it only shows at run time.<\/li><\/ul>",
+      "refs":"<code>claude/run-executor-investigation.md<\/code>; investigation, section 7.",
+      "title":"Without <code>fork<\/code>, run a second in-process part of a pipeline in a new <code>perl<\/code> process"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F1",
+      "layer":"Functions",
+      "nogo":"<p>Functions and positional parameters stay rejected.<\/p>",
+      "now":"<p><code>f() { echo \"hi $1\"; }; f you<\/code> is rejected (\"function definition\"). <code>$0<\/code>…<code>$9<\/code>, <code>$#<\/code>, <code>$@<\/code>, <code>$*<\/code> are rejected everywhere (spec section 5, E1), because in a <code>system<\/code> string they are always empty (and <code>$0<\/code> is always <code>sh<\/code>).<\/p>",
+      "plan":"<p>Accepted:<\/p><ul><li>function definitions <code>NAME() BODY<\/code>, the body being a group, a subshell or another compound command, with its redirections;<\/li><li>calls with arguments; inside the function <code>$1<\/code>…<code>$9<\/code>, <code>${10}<\/code>…, <code>$#<\/code>, <code>$@<\/code>, <code>$*<\/code> are its arguments;<\/li><li><code>return [n]<\/code> inside a function, and inside a file read with <code>.<\/code> (F7);<\/li><li><code>shift [n]<\/code> and <code>set -- args<\/code>;<\/li><li><code>$0<\/code>, which is <code>sh<\/code>, as under Perl's <code>system<\/code> (Perl starts <code>/bin/sh<\/code> under the name <code>sh<\/code>).<\/li><\/ul><p>At the top level <code>$#<\/code> is 0 and <code>$1<\/code> is empty, as in <code>sh -c<\/code>. <code>\"$@\"<\/code> gives one field per argument, also inside a longer word (<code>\"x$@y\"<\/code>).<\/p><p>Example: <code>f() { echo \"$#:$1\"; }; f a b; echo \"$#\"<\/code> prints <code>2:a<\/code>, then <code>0<\/code> (both shells).<\/p><p>Still rejected: <code>function f<\/code> (bash only); <code>return<\/code> outside a function (dash ends the string silently, bash prints an error); a function whose name is a special builtin.<\/p><p>Measured, positional parameters: 1 / 203 / 15 / 10 / 8 / 43 / 25; function definitions: 3 / 0 / 1 / 11 / 12 / 48 / 28; <code>shift<\/code> and <code>getopts<\/code>: 9 / 4 / 5 / 0 / 0 / 1 / 0. Positional parameters are the largest gap in NL2Bash; function definitions in the two bibles and in the ShellCheck snippets.<\/p><p>Cost: parser about 10 lines, executor about 90 (<code>\"$@\"<\/code> and <code>shift<\/code> included).<\/p>",
+      "refs":"Spec sections 4 and 5; new spec.",
+      "title":"Add functions, positional parameters, <code>return<\/code>, <code>shift<\/code> and <code>set --<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F2",
+      "layer":"Parameters",
+      "nogo":"<p>Keep today's set, with the <code>param_ops<\/code> forms behind their option.<\/p>",
+      "now":"<p>Accepted: <code>$x<\/code>, <code>${x}<\/code>, <code>$?<\/code>, <code>$!<\/code>; with the option <code>param_ops<\/code> also <code>${x:-w}<\/code>, <code>${x-w}<\/code>, <code>${x:+w}<\/code>, <code>${x+w}<\/code>, <code>${#x}<\/code>. <code>x=a.b.c; echo ${x%.*}<\/code> is rejected (\"unsupported parameter form\"). Inside the word <code>w<\/code>, quotes and backslashes are rejected (spec section 5).<\/p>",
+      "plan":"<p>All these forms, without an option (the <code>param_ops<\/code> forms included).<\/p><p>Example: <code>x=a.b.c; echo ${x%.*} ${x##*.}<\/code> prints <code>a.b c<\/code> (both shells). With <code>x<\/code> unset, <code>${x:?msg}<\/code> prints <code>msg<\/code> to standard error and stops with status 2 (A5).<\/p><p>Quotes and backslashes inside the word become allowed, with sh's rules. Both shells agree on every case checked:<\/p><ul><li><code>\"${x:-'a'}\"<\/code> gives <code>'a'<\/code> (inside double quotes, single quotes in a <code>-<\/code>, <code>+<\/code>, <code>=<\/code>, <code>?<\/code> word are ordinary characters);<\/li><li>with <code>x=abc<\/code>, <code>\"${x#'a'}\"<\/code> and <code>\"${x#\"a\"}\"<\/code> give <code>bc<\/code> (in a <code>%<\/code> or <code>#<\/code> word they are quotes);<\/li><li><code>\"${x:-\"a b\"}\"<\/code>, <code>${x:-\"a  b\"}<\/code> and <code>${x:-'a  b'}<\/code> give <code>a b<\/code>, <code>a  b<\/code>, <code>a  b<\/code>;<\/li><li>with <code>x='a*'<\/code>, <code>\"${x%\\*}\"<\/code> and <code>${x%\"*\"}<\/code> give <code>a<\/code>; <code>\"${x:-a\\}b}\"<\/code> gives <code>a}b<\/code>.<\/li><\/ul><p>Bash-only forms stay rejected: <code>${x/a/b}<\/code> (dash: \"Bad substitution\"), <code>${x:1:2}<\/code>, <code>${!x}<\/code>, <code>${x^^}<\/code>.<\/p><p>Measured, <code>${x%…}<\/code> and <code>${x#…}<\/code>: 0 / 11 / 3 / 2 / 1 / 1 / 3; <code>${x:=…}<\/code> and <code>${x:?…}<\/code>: 0 / 1 / 0 / 0 / 0 / 6 / 0.<\/p><p>Cost: parser about 10 lines, executor about 25 (plus the pattern matching, counted in F11).<\/p>",
+      "refs":"Spec section 5, \"Parameters\".",
+      "title":"Add all POSIX parameter forms: <code>${x%p}<\/code>, <code>${x%%p}<\/code>, <code>${x#p}<\/code>, <code>${x##p}<\/code>, <code>${x:=w}<\/code>, <code>${x=w}<\/code>, <code>${x:?w}<\/code>, <code>${x?w}<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F3",
+      "layer":"Commands",
+      "nogo":"<p>V3 and B3 stay.<\/p>",
+      "now":"<p>Spec rule V3: the command name must be literal, so <code>\"$EDITOR\" file<\/code> and <code>$cmd -l<\/code> are rejected. Spec rule B3: <code>exec<\/code> only where nothing could follow it, so <code>a; exec b; c<\/code> is rejected. Rule V7: <code>exec<\/code> without a command, with an option, or followed by a builtin name is rejected.<\/p>",
+      "plan":"<p>The command name may be any word. When it runs, its first field decides what happens, in this order: a function; a builtin of this module; a builtin that the module leaves to sh (stop, A4); otherwise a program.<\/p><p>Example: <code>cmd=ls; $cmd -d /<\/code> prints <code>/<\/code>.<\/p><p><code>exec cmd …<\/code> may stand anywhere: it runs cmd, and then the shell ends with cmd's status. Example: <code>echo a; exec true; echo c<\/code> prints <code>a<\/code> only, with status 0, as in sh.<\/p><p><code>exec<\/code> with only redirections (<code>exec &gt;log 2&gt;&amp;1<\/code>) becomes allowed: it changes the descriptors of the shell state (A6) for the rest of the string; the Perl program's own descriptors are not touched. <code>exec<\/code> with an option or a builtin name stays rejected (V7).<\/p><p>Measured: 4 / 31 / 10 / 4 / 3 / 21 / 23. (By first error, command names from expansions are 15% of the rejected ShellCheck pieces; <code>claude/shell-subset-corpus-stats.md<\/code>, section 3.)<\/p><p>Cost: parser about 20 lines fewer (the B3 check goes), executor about 10 more.<\/p>",
+      "refs":"Spec section 4, V3, B3, V7, V19.",
+      "title":"Allow command names that come from an expansion, and <code>exec<\/code> anywhere"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F4",
+      "layer":"Redirections",
+      "nogo":"<p>Here-documents stay rejected.<\/p>",
+      "now":"<p>Rejected (spec section 5, \"Here-documents\", D1).<\/p>",
+      "plan":"<p>Example, with <code>HOME<\/code> set to <code>/root<\/code>:<\/p><pre><code>cat &lt;&lt;EOF\n$HOME-x\nEOF<\/code><\/pre><p>This prints <code>/root-x<\/code> (both shells).<\/p><ul><li>A quoted delimiter (<code>&lt;&lt;'EOF'<\/code>, <code>&lt;&lt;\"EOF\"<\/code>, <code>&lt;&lt;\\EOF<\/code>) makes the body literal.<\/li><li>With <code>&lt;&lt;-<\/code>, leading tabs of the body and of the end line are removed.<\/li><li>In an unquoted body, <code>$<\/code>, <code>`<\/code> and <code>\\<\/code> work as inside double quotes, and <code>\"<\/code> is an ordinary character.<\/li><li>Several here-documents on one line are read in order after that line.<\/li><li>The body reaches the command through a pipe, or a temporary file when it is large.<\/li><\/ul><p><code>&lt;&lt;&lt;<\/code> stays rejected (bash only).<\/p><p>Measured: 3 / 3 / 2 / 0 / 0 / 5 / 5.<\/p><p>Cost: parser about 20 lines, executor about 15.<\/p>",
+      "refs":"Spec section 5, D1.",
+      "title":"Add here-documents <code>&lt;&lt;<\/code> and <code>&lt;&lt;-<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F5",
+      "layer":"Variables",
+      "nogo":"<p>Assignments alone stay accepted without an option, as the group intro says. These builtins, and assignments to <code>IFS<\/code>, <code>HOME<\/code>, <code>PWD<\/code> and <code>OLDPWD<\/code>, stay rejected.<\/p>",
+      "now":"<p>With the option <code>assign<\/code>, <code>NAME=value<\/code> alone is accepted, except for <code>HOME<\/code>, <code>CDPATH<\/code> and names a shell sets itself. <code>export<\/code>, <code>readonly<\/code>, <code>unset<\/code> and <code>local<\/code> are rejected as builtins. <code>IFS<\/code> cannot be assigned, so word splitting always uses blanks (spec E1).<\/p>",
+      "plan":"<p>Accepted: <code>export NAME[=value]…<\/code>, <code>readonly NAME[=value]…<\/code>, <code>unset [-v|-f] NAME…<\/code>, and inside functions <code>local NAME=value…<\/code>. Assignments alone are accepted without an option.<\/p><p><code>IFS<\/code> may be assigned; splitting then follows it. Example: <code>IFS=:; x=a::b; set -- $x; echo $#<\/code> prints <code>3<\/code> (both shells).<\/p><p><code>HOME<\/code>, <code>PWD<\/code> and <code>OLDPWD<\/code> may be read and assigned; <code>cd<\/code> keeps <code>PWD<\/code> and <code>OLDPWD<\/code> up to date (both shells start with <code>OLDPWD<\/code> from the environment and set it on each <code>cd<\/code>). <code>OPTIND<\/code> and <code>OPTARG<\/code> may be used, for <code>getopts<\/code> (F12).<\/p><p>Still rejected:<\/p><ul><li><code>local NAME<\/code> without a value. Example: <code>x=1; f(){ local x; echo \"[$x]\"; }; f<\/code> prints <code>[1]<\/code> in dash (it keeps the outer value) and <code>[]<\/code> in bash.<\/li><li><code>export -p<\/code>, <code>readonly -p<\/code>, and <code>export<\/code> or <code>readonly<\/code> alone: they list variables, in different formats.<\/li><li><code>CDPATH<\/code> (then <code>cd<\/code> would have to search it), <code>PS1<\/code> (dash sets it to <code># <\/code> or <code>$ <\/code>, bash leaves it unset), <code>PS2<\/code>, <code>PS4<\/code>, <code>_<\/code>, <code>LINENO<\/code>, <code>PPID<\/code>, <code>$-<\/code>, and bash's own names (spec section 5, list under E1).<\/li><\/ul><p>Measured, <code>export<\/code>, <code>readonly<\/code>, <code>unset<\/code>: 15 / 30 / 1 / 0 / 0 / 13 / 14; <code>local<\/code>: 5 / 1 / 0 / 0 / 0 / 7 / 4; <code>IFS=<\/code>: 4 / 4 / 0 / 5 / 0 / 0 / 2.<\/p><p>Cost: executor about 65 lines (IFS splitting included).<\/p>",
+      "refs":"Spec sections 4 and 5, option <code>assign<\/code>, E1.",
+      "title":"Add <code>export<\/code>, <code>readonly<\/code>, <code>unset<\/code>, <code>local NAME=value<\/code>, and assignments to <code>IFS<\/code>, <code>HOME<\/code>, <code>PWD<\/code>, <code>OLDPWD<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F6",
+      "layer":"Builtins",
+      "nogo":"<p><code>set<\/code> stays rejected, except <code>set --<\/code> from F1.<\/p>",
+      "now":"<p><code>set<\/code> is rejected as a builtin. Measured: 12 / 50 / 2 / 3 / 1 / 29 / 20. The options used, counted over all samples: <code>-o …<\/code> 47 (of which <code>pipefail<\/code> 22, <code>errexit<\/code> 6), <code>-e<\/code> 37, <code>--<\/code> 12, <code>-f<\/code> 6, <code>-x<\/code> 6, <code>+f<\/code> 4, <code>-v<\/code> 3.<\/p>",
+      "plan":"<p>Accepted, each also with <code>+<\/code> to switch it off, and in the long form (<code>set -o errexit<\/code>, <code>nounset<\/code>, <code>noglob<\/code>, <code>noclobber<\/code>, <code>allexport<\/code>):<\/p><ul><li><code>-e<\/code>: stop when a command fails, except in the conditions of <code>if<\/code>, <code>while<\/code> and <code>until<\/code>, in all but the last command of a <code>&amp;&amp;<\/code>/<code>||<\/code> chain, and after <code>!<\/code>;<\/li><li><code>-u<\/code>: an unset variable is an error and stops the shell (dash \"parameter not set\", bash \"unbound variable\");<\/li><li><code>-f<\/code>: no file name expansion (F11);<\/li><li><code>-C<\/code>: <code>&gt;<\/code> does not overwrite an existing file; <code>&gt;|<\/code> still does;<\/li><li><code>-a<\/code>: every assigned variable is exported.<\/li><\/ul><p>Still rejected: <code>set<\/code> alone and <code>set -o<\/code> alone (they list, in different formats); <code>-o pipefail<\/code> (dash 0.5.12 says \"Illegal option -o pipefail\"); <code>-v<\/code> (bash then echoes the following lines of a <code>-c<\/code> string, dash does not); <code>-n<\/code>, <code>-m<\/code>, <code>-b<\/code>, <code>-h<\/code>, and the <code>-o<\/code> names of interactive features (<code>emacs<\/code>, <code>vi<\/code>, <code>history<\/code>, ...).<\/p><p>Question about <code>-x<\/code> (print each command to standard error before running it). dash writes <code>+ echo a b<\/code>, bash writes <code>+ echo 'a b'<\/code>.<\/p><ul><li><b>A<\/b>: reject <code>set -x<\/code> (it occurs 6 times in all corpora).<\/li><li><b>B<\/b>: accept it and print dash's format.<\/li><\/ul><p>Go means A. For B, write B in a note; the rest of F6 then counts as Go.<\/p><p>Cost: executor about 45 lines, 20 of them for <code>-e<\/code>.<\/p>",
+      "refs":"Spec section 4, builtins; new spec.",
+      "title":"Add <code>set<\/code> with the options <code>-e<\/code>, <code>-u<\/code>, <code>-f<\/code>, <code>-C<\/code>, <code>-a<\/code> and their <code>-o<\/code> names"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F7",
+      "layer":"Builtins",
+      "nogo":"<p><code>eval<\/code> and <code>.<\/code> stay rejected.<\/p>",
+      "now":"<p>Both rejected as builtins.<\/p>",
+      "plan":"<p><code>eval ARGS…<\/code>: the arguments are joined with blanks, parsed by this module and run in the current shell. Example: <code>eval \"echo \\$((1+2))\"<\/code> prints <code>3<\/code>.<\/p><p><code>. FILE<\/code>: as in both shells, a name without <code>/<\/code> is looked up in <code>PATH<\/code> only (checked: <code>. zzdot<\/code> fails in both when <code>zzdot<\/code> is only in the current directory; <code>. ./zzdot<\/code> works). The file is read, parsed and run in the current shell; <code>return<\/code> ends it. Arguments after FILE are rejected (bash sets <code>$1<\/code>… from them, dash ignores them).<\/p><p>Text that the module does not accept stops with status 248 (A4).<\/p><p><code>source<\/code> stays rejected: dash 0.5.12 has no <code>source<\/code> (\"source: not found\").<\/p><p>Measured (<code>eval<\/code> and <code>.<\/code> only, without <code>source<\/code>): 15 / 3 / 0 / 0 / 0 / 8 / 3.<\/p><p>Cost: executor about 12 lines.<\/p>",
+      "refs":"Spec section 4, builtins.",
+      "title":"Add <code>eval<\/code> and <code>.<\/code> (read a file and run it in the current shell)"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F8",
+      "layer":"Builtins",
+      "nogo":"<p><code>trap<\/code> and <code>wait<\/code> stay rejected.<\/p>",
+      "now":"<p>Both rejected as builtins.<\/p>",
+      "plan":"<p><code>trap ACTION SIGNAL…<\/code> for <code>EXIT<\/code> and signals by name or number (<code>INT<\/code>, <code>TERM<\/code>, <code>HUP<\/code>, <code>QUIT<\/code>, <code>USR1<\/code>, <code>USR2<\/code>, ...); <code>trap - SIGNAL<\/code> (back to the default); <code>trap '' SIGNAL<\/code> (ignore it; programs started afterwards inherit that). A literal ACTION is checked when the string is parsed; one that comes from an expansion is checked when the trap is set (A4). <code>wait [PID…]<\/code> waits for background chains.<\/p><p>Example: <code>trap 'echo bye' EXIT; echo hi<\/code> prints <code>hi<\/code>, then <code>bye<\/code>.<\/p><p>While the string runs, its traps replace the Perl program's own handlers for those signals (<code>%SIG<\/code>); afterwards the program's handlers are restored.<\/p><p>Still rejected: <code>trap<\/code> alone and <code>trap -p<\/code> (bash also lists <code>TSTP<\/code>, <code>TTIN<\/code>, <code>TTOU<\/code>, dash does not); <code>ERR<\/code>, <code>DEBUG<\/code>, <code>RETURN<\/code> (bash only); <code>wait %1<\/code> (job numbers).<\/p><p>Measured, <code>trap<\/code>: 9 / 0 / 1 / 2 / 5 / 9 / 13; <code>wait<\/code> and <code>umask<\/code>: 11 / 0 / 0 / 0 / 0 / 3 / 2.<\/p><p>Cost: executor about 40 lines.<\/p>",
+      "refs":"Spec section 4, builtins.",
+      "title":"Add <code>trap<\/code> and <code>wait<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F9",
+      "layer":"Parameters",
+      "nogo":"<p><code>$$<\/code> stays rejected.<\/p>",
+      "now":"<p><code>$$<\/code> is rejected (spec section 5): a shell sets it.<\/p>",
+      "plan":"<p>Under <code>sh -c<\/code>, <code>$$<\/code> is the process ID of that <code>sh<\/code>. The interpreter has no such process, so <code>$$<\/code> gives the process ID of the Perl program at the moment the string started to run; it stays the same in forked copies and new perl processes (A6), as <code>$$<\/code> stays the same in sh's subshells. Typical uses then work as before, for example a unique file name <code>/tmp/x.$$<\/code>.<\/p><p>One use would go badly wrong: <code>kill $$<\/code> would signal the Perl program itself, where under <code>sh -c<\/code> it ends only the <code>sh<\/code>. So when <code>kill<\/code> (run as the program <code>/bin/kill<\/code>) gets that process ID as an argument, the interpreter takes it out and handles that signal itself; any other process IDs in the same <code>kill<\/code> command are passed to <code>/bin/kill<\/code> as usual. Handling the signal: run the trap for it if F8 set one; otherwise end the shell, and the caller sees the status that <code>system<\/code> shows when <code>sh<\/code> is killed by that signal (<code>$? &amp; 127<\/code> is the signal number).<\/p><p>Example: <code>trap \"echo T\" INT; kill -INT $$; echo after<\/code> prints <code>T<\/code> and <code>after<\/code> (as in both shells).<\/p><p>A remaining difference: other programs that get <code>$$<\/code> (for example <code>ps -p $$<\/code>) see the Perl program, not a shell.<\/p><p>Measured: 0 / 28 / 1 / 1 / 0 / 0 / 0.<\/p><p>Cost: executor about 15 lines.<\/p>",
+      "refs":"Spec section 5, \"Parameters\".",
+      "title":"Accept <code>$$<\/code> as the Perl program's process ID, and let the shell itself handle <code>kill … $$<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F10",
+      "layer":"Arithmetic",
+      "nogo":"<p>Assignment operators stay rejected.<\/p>",
+      "now":"<p><code>$((x=5))<\/code> and <code>$((i+=1))<\/code> are rejected (V9).<\/p>",
+      "plan":"<p>Accepted: <code>= += -= *= /= %= &lt;&lt;= &gt;&gt;= &amp;= ^= |=<\/code>. Example: <code>echo $((x=5)) $x<\/code> prints <code>5 5<\/code> (both shells).<\/p><p><code>++<\/code> and <code>--<\/code> stay rejected: dash 0.5.12 fails on <code>$((i++))<\/code> (\"expecting primary\"), bash prints <code>1 2<\/code> for <code>i=1; echo $((i++)) $i<\/code>.<\/p><p>Numbers are 64-bit and wrap around as in both shells: <code>$((9223372036854775807 + 1))<\/code> gives <code>-9223372036854775808<\/code>. (The executor computes with Perl's <code>use integer<\/code>.)<\/p><p>Measured: not measured (the scan has no pattern for it).<\/p><p>Cost: parser about 5 lines, executor about 15.<\/p>",
+      "refs":"Spec section 5, \"Arithmetic\", V9.",
+      "title":"Add the assignment operators in <code>$((…))<\/code>"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F11",
+      "layer":"Patterns",
+      "nogo":"<p>E3 stays: the caller decides.<\/p>",
+      "now":"<p>Spec E3: the caller decides what to do with a word that is a pattern (expand it, refuse it, or fall back to sh).<\/p>",
+      "plan":"<p>The interpreter expands patterns as sh does: <code>*<\/code>, <code>?<\/code>, <code>[…]<\/code> with <code>!<\/code> for negation; a pattern that matches nothing stays as it is; a name starting with <code>.<\/code> matches only a pattern that starts with an explicit <code>.<\/code>. <code>set -f<\/code> (F6) switches expansion off. The caller can still ask the executor to refuse pattern words instead.<\/p><p>A pattern that could match <code>.<\/code> or <code>..<\/code>, such as <code>.*<\/code>, is rejected at parse time, and stops with status 248 (A4) when it comes from an expansion: dash includes <code>.<\/code> and <code>..<\/code>, bash 5.2 does not (found in the session of 2026-10-30).<\/p><p>Cost: executor about 35 lines, including the conversion from a pattern to a Perl regular expression, which F2 and <code>case<\/code> share.<\/p>",
+      "refs":"Spec section 5, \"Word splitting and patterns\", E3.",
+      "title":"Expand file name patterns in the module itself"
+   },
+   {
+      "group":"POSIX features to add",
+      "id":"F12",
+      "layer":"Builtins",
+      "nogo":"<p>They stay rejected, and <code>pwd<\/code> stays <code>/bin/pwd<\/code>. Say in a note if you want only some of them.<\/p>",
+      "now":"<p><code>command<\/code>, <code>getopts<\/code> and <code>umask<\/code> are rejected as builtins; <code>pwd<\/code> runs as the program <code>/bin/pwd<\/code> (spec B2); <code>cd -<\/code> is rejected (spec section 4, \"cd\").<\/p>",
+      "plan":"<ul><li><code>command -v NAME<\/code> prints a program's path, or the name of a builtin or function (both shells: <code>/usr/bin/ls<\/code>, <code>cd<\/code>, <code>f<\/code>). For the commands that both shells have as builtins but this module runs as programs (<code>echo<\/code>, <code>printf<\/code>, <code>test<\/code>, <code>[<\/code>, <code>kill<\/code>, <code>true<\/code>, <code>false<\/code>; spec section 4), it prints the name, as both shells do. <code>command NAME ARGS<\/code> runs NAME, skipping functions.<\/li><li><code>getopts OPTSTRING NAME [ARGS]<\/code>. Example: <code>getopts ab: o -b x; echo $o $OPTARG $OPTIND<\/code> prints <code>b x 3<\/code> (both shells).<\/li><li><code>umask [MASK]<\/code>: kept in the shell state; applied to files the shell opens and to programs it starts.<\/li><li><code>pwd<\/code> as a builtin: it prints the logical path, as both shells' builtins do (after <code>cd<\/code> through a symbolic link, <code>/bin/pwd<\/code> prints the physical path instead).<\/li><li><code>cd -<\/code>: changes to the previous directory and prints it (both shells).<\/li><\/ul><p>Still rejected: <code>command -V<\/code>, <code>type<\/code>, <code>hash<\/code> (their text differs between the shells).<\/p><p>Measured, <code>command<\/code>, <code>type<\/code> and <code>hash<\/code> together: 99 / 13 / 0 / 1 / 2 / 7 / 3; <code>getopts<\/code> is counted with <code>shift<\/code> in F1, <code>umask<\/code> with <code>wait<\/code> in F8. By first error, 103 one-liners stop at <code>command<\/code>.<\/p><p>Cost: executor about 50 lines.<\/p>",
+      "refs":"Spec section 4, B2.",
+      "title":"Add <code>command<\/code>, <code>getopts<\/code>, <code>umask<\/code>, <code>pwd<\/code> as a builtin, and <code>cd -<\/code>"
+   },
+   {
+      "group":"What stays with sh",
+      "id":"X1",
+      "layer":"Scope",
+      "nogo":"<p>Name in a note the ones to add. Each is small, except <code>alias<\/code> (an alias changes how the following lines are parsed, so the parser would have to work line by line) and <code>ulimit<\/code> (non-core module).<\/p>",
+      "now":"<p>All of these are rejected today.<\/p>",
+      "plan":"<p>They stay rejected when they appear in the text; when one appears only at run time, it stops with status 248 (A4):<\/p><ul><li>interactive and job-control builtins: <code>alias<\/code>, <code>unalias<\/code>, <code>fg<\/code>, <code>bg<\/code>, <code>jobs<\/code>, <code>history<\/code>, <code>fc<\/code>, <code>bind<\/code>, <code>help<\/code>, <code>complete<\/code>;<\/li><li><code>ulimit<\/code> (it would need a module that is not part of core Perl), <code>times<\/code>, <code>type<\/code>, <code>hash<\/code>;<\/li><li><code>shopt<\/code>: bash only, and its settings change how later text is parsed and expanded; it stays with sh even in T1;<\/li><li>the listing forms <code>set<\/code>, <code>set -o<\/code>, <code>export -p<\/code>, <code>trap<\/code>;<\/li><li><code>$-<\/code> (dash: empty; bash: <code>hBc<\/code>) and <code>$LINENO<\/code> (in a <code>-c<\/code> string, dash: empty; bash: <code>1<\/code>);<\/li><li><code>++<\/code> and <code>--<\/code> in arithmetic, <code>set -o pipefail<\/code>, <code>local NAME<\/code> without a value;<\/li><li>everything listed as \"Still rejected\" in F1–F12;<\/li><li>everything bash-only (T1).<\/li><\/ul><p>Measured, by first error, in all one-liners together: <code>alias<\/code> 80, <code>shopt<\/code> 53, <code>history<\/code> 52, <code>jobs<\/code> 27, <code>bind<\/code> 22, <code>help<\/code> 18.<\/p>",
+      "refs":"New spec.",
+      "title":"Leave these to <code>/bin/sh -c<\/code>, as today"
+   },
+   {
+      "group":"Later",
+      "id":"T1",
+      "layer":"Bash",
+      "nogo":"<p>No bash tier: bash-only strings always go to sh.<\/p>",
+      "now":"<p>Bash-only constructs are rejected (spec section 1).<\/p>",
+      "plan":"<p>Go means: record this as the step after the POSIX tier; nothing of it is done in this round. That step would adopt alternative B or C of A3 and accept <code>[[ ]]<\/code>, <code>(( ))<\/code> and <code>for ((…))<\/code>, <code>$'…'<\/code>, arrays, <code>${x/a/b}<\/code>, <code>${x:1:2}<\/code>, <code>${x^^}<\/code>, <code>${!x}<\/code>, <code>&lt;&lt;&lt;<\/code>, <code>&lt;(…)<\/code>, <code>&amp;&gt;<\/code>, <code>|&amp;<\/code>, <code>function f<\/code>, <code>declare<\/code>, <code>let<\/code>, <code>mapfile<\/code>, the options of <code>read<\/code>, <code>pipefail<\/code>, and brace expansion, only when <code>/bin/sh<\/code> is bash or the caller asks for bash.<\/p><p>Measured (plain <code>bash -n<\/code>): all one-liners at most 97.4% → 99.3%; bash Cookbook scripts 43% → 95%; pure-bash-bible 48% → 96%.<\/p><p>Cost: about 400–500 lines more.<\/p>",
+      "refs":"Investigation, sections 3 and 4.",
+      "title":"Plan a bash tier as a separate step after this one"
+   },
+   {
+      "group":"Size, order of work, and a bug",
+      "id":"S1",
+      "layer":"Size",
+      "nogo":"<p>Name another budget in a note.<\/p>",
+      "now":"<p><code>ShellSubset.pm<\/code>, the parser, has 308 lines. No executor exists; by my estimate one for the present subset would have 350–450 lines in the same style, about 700 together.<\/p>",
+      "plan":"<p>The costs of the items add up as follows (investigation, section 4, has the same list).<\/p><ul><li>Parser: 308 + F1 10 + F2 10 − F3 20 + F4 20 + F10 5 = about 335; budget 330–400.<\/li><li>Executor: 350–450 for what the present subset needs, plus F1 90, F2 25, F3 10, F4 15, F5 65, F6 45, F7 12, F8 40, F9 15, F10 15, F11 35, F12 50, A6 40 = about 460; together 810–910.<\/li><li>Total: about 1,150–1,250 by these estimates; up to about 1,300 with the parser at the top of its budget.<\/li><\/ul><p>If the parser passes 450 lines in this round (S2 writes only the parser), or the whole passes 1,600 lines later (25% over), I stop and report before going on.<\/p><p>For comparison: mvdan/sh, a Go library that parses and runs bash, has about 12,000 lines (parser and lexer 3,892, expansion 2,750, interpreter 5,712); BusyBox's <code>ash.c<\/code> has 14,871 lines of C.<\/p>",
+      "refs":"Investigation, section 4.",
+      "title":"Set a budget of about 1,150–1,300 lines for parser and executor together"
+   },
+   {
+      "group":"Size, order of work, and a bug",
+      "id":"S2",
+      "layer":"Order",
+      "nogo":"<p>Write the order you want in a note.<\/p>",
+      "now":"<p>Only this investigation exists.<\/p>",
+      "plan":"<ol><li>Fix U1 in both existing parsers, with a test each.<\/li><li>Write <code>claude/large-subset-spec.md<\/code> with the rules decided here, as changes against <code>claude/shell-subset-spec.md<\/code>: what is added, what is dropped.<\/li><li>Write the parser <code>claude/ShellSubsetLarge.pm<\/code>. Tests: the existing 816, with the expected result changed where the large subset accepts more, and new tests for each F item. Run <code>verify.pl<\/code> on them: it runs each accepted string in dash and bash with every external program replaced by a recorder, and compares the recorded command lines with what the tree predicts (it is in <code>corpus-run.tar.gz-base64.txt<\/code>). Then rerun the corpus measurement: for the one-liner sources, the share accepted; for the script sources, two numbers, the share of scripts accepted whole and, for the others, the share of their lines that lie in accepted stretches (cut into stretches as in <code>claude/shell-subset-corpus-stats.md<\/code>, section 2).<\/li><li>The executor comes in a later round, once the tree format of step 3 is settled. This page decides only what it must do.<\/li><\/ol>",
+      "refs":"<code>claude/shell-subset-tests.pl<\/code>, <code>claude/shell-subset-corpus-tests.pl<\/code>, <code>corpus-run.tar.gz-base64.txt<\/code>.",
+      "title":"Work in this order: U1, the spec, the parser with its tests, then the executor in a later round"
+   },
+   {
+      "group":"Size, order of work, and a bug",
+      "id":"U1",
+      "layer":"Bug",
+      "nogo":"<p>The bug stays, and so does the report.<\/p>",
+      "now":"<p>Perl hands a string with metacharacters to <code>/bin/sh<\/code> as <code>sh -c STRING<\/code>, with nothing between <code>-c<\/code> and the string. sh then reads a string starting with <code>-<\/code> or <code>+<\/code> as more options, and fails before running anything.<\/p><p>Perl first skips white space at the start of the string, so this also holds when blanks, tabs or newlines come before the <code>-<\/code> or <code>+<\/code>.<\/p><p>Example: <code>perl -e 'system(\"-x foo; true\"); print \"$?\\n\"'<\/code> prints <code>sh: 0: Illegal option -<\/code> and then <code>512<\/code> (exit status 2). The same for <code>\" -x foo; true\"<\/code> and <code>\"\\t+x foo; true\"<\/code> (checked).<\/p><p><code>ShellSubset::parse(\"-x foo; true\")<\/code> accepts the string, as a program <code>-x<\/code> with the argument <code>foo<\/code>, then <code>true<\/code>. An executor would run <code>-x<\/code> and <code>true<\/code>, and give status 0. <code>ShellSubsetSmall.pm<\/code> does the same.<\/p>",
+      "plan":"<p>Both parsers, and the large one, reject a string whose first character other than white space is <code>-<\/code> or <code>+<\/code>, with the message \"starts with - or +: sh would read it as options\". A rejected string goes to <code>sh -c<\/code>, which fails exactly as Perl does today. One line in each parser, and tests for both cases.<\/p><p>The bug report for the two parsers is in <code>claude/large-subset-upstream-reports.md<\/code>.<\/p>",
+      "refs":"<code>claude/ShellSubset.pm<\/code>, <code>claude/ShellSubsetSmall.pm<\/code>, their tests.",
+      "title":"Fix <code>ShellSubset<\/code>: reject strings that start with <code>-<\/code> or <code>+<\/code>, after any white space"
+   }
+]
+;
+
+const MARKS=[["go","✓","Go","Go: implement as planned","--go"],["nogo","✗","No-go","No-go: don't implement; do what “If No-go” says","--nogo"],["discuss","◆","Discuss strategy first","Discuss strategy first: settle the strategy before deciding","--discuss"],["exfirst","?","Explain first","Explain first: a show-stopper; explain before implementing the rest","--explain"],["exlater","?","Explain later","Explain later: explain after implementing the rest","--explain"]];
+const MK=Object.fromEntries(MARKS.map(m=>[m[0],m]));
+const st={dec:{},rep:{},user:null,claude:null,filter:"all",ro:false,typing:null,typingAt:0};
+const els={};
+const $=id=>document.getElementById(id);
+const tnum=v=>typeof v==="number"?v:(typeof v==="string"?(Date.parse(v)||0):0);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function notesOf(id){const d=st.dec[id]||{};return [d.note||"",...(Array.isArray(d.fups)?d.fups:[])];}
+function seenUpTo(){return tnum(st.claude&&st.claude.seenUpTo);}
+function everyTurn(){return st.claude&&st.claude.checkMode==="every-turn";}
+function lastAsk(id){const r=st.rep[id]||{};const a=r.answers||[];if(!a.length)return null;const L=a.length-1;return (r.ask||[])[L]?L:null;}
+function yourTurnState(id){const L=lastAsk(id);if(L===null)return null;const after=(notesOf(id)[L+1]||"").trim();
+  if(!after)return "open";const d=st.dec[id]||{};if(tnum(d.updatedAt)>seenUpTo()||st.typing===id)return "unread";return null;}
+
+function build(){
+  const list=$("list");const sec={};
+  for(const gr of GROUPS){const s=document.createElement("section");s.className="grp";const h=document.createElement("div");h.className="ghead";h.dataset.g=gr.name;
+    h.innerHTML=`<h2>${gr.name}</h2>${gr.intro}`;s.appendChild(h);list.appendChild(s);sec[gr.name]=s;}
+  for(const it of ITEMS){
+    const el=document.createElement("article");el.className="item";el.id="item-"+it.id;
+    el.innerHTML=`<div class="head"><span class="iid" id="iid-${it.id}">${it.id}</span><span class="layer">${it.layer}</span><span class="ttl">${it.title}</span><span class="pill" hidden></span></div>
+<div class="sec"><span class="lab">Now</span>${it.now}${it.nowAfter||""}</div>
+<div class="sec"><span class="lab">Planned</span>${it.plan}${it.planAfter||""}</div>
+<div class="sec"><span class="lab">If No-go</span><p>${it.nogo}</p></div>
+<div class="sec"><span class="lab">Refs</span><p>${it.refs}</p></div>
+<div class="marks" role="group" aria-label="Mark ${it.id}"></div>
+<label class="remind" hidden>Remind me if we haven't returned to this: <select id="rem-${it.id}"><option value="">none</option><option value="3d">3 days</option><option value="1w">1 week</option><option value="2w">2 weeks</option></select></label>
+<div class="thread"></div>`;
+    const marks=el.querySelector(".marks");
+    for(const [k,ic,word,tip,col] of MARKS){const b=document.createElement("button");b.type="button";b.className="mk";b.style.setProperty("--c",`var(${col})`);
+      b.title=tip;b.dataset.k=k;b.setAttribute("aria-pressed","false");b.innerHTML=`<span class="ic">${ic} </span>${word}`;b.disabled=true;
+      b.addEventListener("click",()=>{const d=cur(it.id);d.decision=d.decision===k?null:k;if(d.decision!=="discuss")d.remind=d.remind||"";save(it.id,0);paint(it.id);});
+      marks.appendChild(b);}
+    el.querySelector("select").addEventListener("change",e=>{cur(it.id).remind=e.target.value;save(it.id,0);});
+    sec[it.group].appendChild(el);
+    els[it.id]={el,pill:el.querySelector(".pill"),marks,remind:el.querySelector(".remind"),thread:el.querySelector(".thread"),boxes:[],answers:[]};
+    addBox(it.id,0);
+  }
+  const fdefs=[["all","All"],["unmarked","Unmarked"],["reply","Has a reply"],["turn","Your turn"],["stop","Show-stoppers"],["explain","Explain (all)"],["discuss","Discuss strategy 1st"],["go","Go"],["nogo","No-go / defer"]];
+  for(const [k,l] of fdefs){const b=document.createElement("button");b.type="button";b.className="filt";b.dataset.f=k;b.textContent=l;b.setAttribute("aria-pressed",String(k==="all"));
+    b.addEventListener("click",()=>setFilter(k));$("filters").appendChild(b);}
+  for(const r of document.querySelectorAll('input[name="gomode"]'))r.addEventListener("change",()=>setGo(r.value));
+  $("gosel").addEventListener("change",e=>setGo(e.target.value));
+  const pl=$("plaque"),pop=$("pop");
+  const setPop=o=>{pop.hidden=!o;pl.setAttribute("aria-expanded",String(o));};
+  pl.addEventListener("click",e=>{e.stopPropagation();setPop(pop.hidden);});
+  pl.addEventListener("mouseenter",()=>setPop(true));pl.addEventListener("mouseleave",()=>{if(document.activeElement!==pl)setPop(false);});
+  document.addEventListener("click",e=>{if(!pl.contains(e.target))setPop(false);});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")setPop(false);});
+  window.addEventListener("resize",growAll);
+}
+function cur(id){if(!st.dec[id])st.dec[id]={decision:null,note:"",fups:[],remind:""};st.dec[id]={...st.dec[id]};return st.dec[id];}
+function addBox(id,i){const t=document.createElement("textarea");t.rows=1;t.id=`note-${id}-${i}`;t.placeholder=`Your note ${i+1} (optional)`;t.setAttribute("aria-label",`${id}: your note ${i+1}`);t.disabled=true;
+  t.addEventListener("input",()=>{grow(t);const d=cur(id);if(i===0)d.note=t.value;else{const f=[...(d.fups||[])];while(f.length<i)f.push("");f[i-1]=t.value;d.fups=f;}
+    st.typing=id;st.typingAt=st.typingAt||Date.now();save(id,800);paintBar();paintTags(id);});
+  t.addEventListener("blur",()=>{if(st.typing===id){}});
+  els[id].thread.appendChild(t);els[id].boxes.push(t);grow(t);}
+function grow(t){if(t.offsetParent===null)return;t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px";}
+function growAll(){for(const id in els)for(const t of els[id].boxes)grow(t);}
+
+let db=null;const queues={},timers={};
+function save(id,delay){if(st.ro||!db)return;clearTimeout(timers[id]);timers[id]=setTimeout(()=>{
+  const d=cur(id);const body={decision:d.decision||null,note:d.note||"",fups:d.fups||[],remind:d.remind||"",updatedAt:Date.now()};d.updatedAt=body.updatedAt;
+  queues[id]=(queues[id]||Promise.resolve()).then(()=>db.doc("decisions/"+id).set(body)).then(()=>{if(st.typing===id)st.typing=null;st.typingAt=0;paintBar();},err=>fail(err));},delay);}
+function setGo(v){if(st.ro||!db)return;st.user={goMode:v,updatedAt:Date.now()};paintGo();paintBar();
+  queues.__u=(queues.__u||Promise.resolve()).then(()=>db.doc("settings/user").set(st.user)).catch(fail);}
+function fail(err){if(err&&err.code==="invalid_argument"){st.ro=true;$("ro").hidden=false;$("ro").textContent="Saving is switched off: the store refused a change. Your marks are read-only in this view.";disableAll();}
+  else{$("ro").hidden=false;$("ro").textContent="A change could not be saved ("+((err&&err.code)||"error")+"). It will be retried with your next change.";}}
+function disableAll(){for(const id in els){for(const b of els[id].marks.children)b.disabled=true;for(const t of els[id].boxes)t.disabled=true;}for(const r of document.querySelectorAll('#gofs input,#gosel'))r.disabled=true;}
+function enableAll(){for(const id in els){for(const b of els[id].marks.children)b.disabled=false;for(const t of els[id].boxes)t.disabled=false;}for(const r of document.querySelectorAll('#gofs input,#gosel'))r.disabled=false;}
+
+function paint(id){
+  const e=els[id],d=st.dec[id]||{},r=st.rep[id]||{},k=d.decision;
+  e.el.className="item"+(k?" m-"+k:"");
+  for(const b of e.marks.children)b.setAttribute("aria-pressed",String(b.dataset.k===k));
+  const iid=$("iid-"+id);iid.textContent=k?`${id} ${MK[k][1]} ${MK[k][2]}`:id;
+  e.remind.hidden=k!=="discuss";const sel=$("rem-"+id);if(document.activeElement!==sel)sel.value=d.remind||"";
+  if(r.status){e.pill.hidden=false;e.pill.textContent=r.status;}else e.pill.hidden=true;
+  const ans=r.answers||[];
+  while(e.answers.length<ans.length){const i=e.answers.length;const a=document.createElement("div");a.className="ans";
+    e.thread.insertBefore(a,e.boxes[i+1]||null);e.answers.push(a);if(!e.boxes[i+1])addBox(id,i+1);if(!st.ro&&db)e.boxes[i+1].disabled=false;}
+  e.answers.forEach((a,i)=>{a.dataset.text=ans[i]||"";});
+  const notes=notesOf(id);e.boxes.forEach((t,i)=>{if(document.activeElement!==t&&t.value!==(notes[i]||"")){t.value=notes[i]||"";}grow(t);});
+  paintTags(id);
+}
+function paintTags(id){const e=els[id],r=st.rep[id]||{},ans=r.answers||[],ask=r.ask||[],L=ans.length-1,yt=yourTurnState(id);
+  e.answers.forEach((a,i)=>{let tag="";if(!ask[i])tag='<span class="tag muted">No reply needed</span>';
+    else if(i===L&&yt==="open")tag='<span class="tag turn">Your turn</span>';else if(i===L&&yt==="unread")tag='<span class="tag muted">Answered, Claude hasn’t read it yet</span>';
+    a.innerHTML=`<span class="who">Claude:</span>${tag}\n${esc(a.dataset.text)}`;linkify(a,id);});}
+function setFilter(k){st.filter=k;for(const x of $("filters").querySelectorAll(".filt"))x.setAttribute("aria-pressed",String(x.dataset.f===k));applyFilter();growAll();}
+const XRE=new RegExp("\\b("+ITEMS.map(i=>i.id).join("|")+")\\b","g");
+function linkify(root,self){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest("code,a,.iid,textarea")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  for(const n of nodes){const t=n.nodeValue;XRE.lastIndex=0;if(!XRE.test(t))continue;XRE.lastIndex=0;
+    const f=document.createDocumentFragment();let last=0,m;
+    while((m=XRE.exec(t))){if(m[1]===self)continue;f.appendChild(document.createTextNode(t.slice(last,m.index)));
+      const a=document.createElement("a");a.className="xref";a.href="#item-"+m[1];a.dataset.ref=m[1];a.textContent=m[1];a.title="Go to item "+m[1];f.appendChild(a);last=m.index+m[1].length;}
+    if(last===0)continue;f.appendChild(document.createTextNode(t.slice(last)));n.parentNode.replaceChild(f,n);}}
+function goTo(id){const e=els[id];if(!e)return;if(e.el.hidden)setFilter("all");
+  const top=e.el.getBoundingClientRect().top+window.scrollY-$("bar").offsetHeight-12;
+  const smooth=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;window.scrollTo({top,behavior:smooth?"smooth":"auto"});
+  e.el.classList.add("flash");setTimeout(()=>e.el.classList.remove("flash"),1600);
+  try{history.replaceState(null,"","#item-"+id);}catch(err){}}
+document.addEventListener("click",ev=>{const a=ev.target.closest&&ev.target.closest("a.xref");if(!a)return;ev.preventDefault();goTo(a.dataset.ref);});
+function paintGo(){const v=(st.user&&st.user.goMode)||"wait";for(const r of document.querySelectorAll('input[name="gomode"]'))r.checked=r.value===v;$("gosel").value=v;}
+function counts(){let marked=0,stop=0,expl=0,disc=0,turn=0;for(const it of ITEMS){const k=(st.dec[it.id]||{}).decision;if(k)marked++;if(k==="exfirst")stop++;if(k==="exfirst"||k==="exlater")expl++;if(k==="discuss")disc++;if(yourTurnState(it.id)==="open")turn++;}return {marked,stop,expl,disc,turn};}
+function paintBar(){
+  const c=counts();$("progress").textContent=`${c.marked} of ${ITEMS.length} marked · ${c.stop} show-stoppers · ${c.expl} to explain · ${c.disc} to discuss · ${c.turn} your turn`;
+  const stopBtn=[...$("filters").children].find(b=>b.dataset.f==="stop");if(stopBtn)stopBtn.hidden=c.stop===0;
+  const seen=seenUpTo();let oldest=Infinity;
+  for(const id in st.dec){const u=tnum(st.dec[id].updatedAt);if(u>seen&&u<oldest)oldest=u;}
+  if(st.user){const u=tnum(st.user.updatedAt);if(u>seen&&u<oldest)oldest=u;}
+  if(st.typing&&st.typingAt&&st.typingAt<oldest)oldest=st.typingAt;
+  const show=oldest!==Infinity&&!everyTurn();const pl=$("plaque");pl.hidden=!show;
+  if(show)$("plaquetxt").textContent=`Claude hasn't seen your changes since ${new Date(oldest).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}. Send any message in chat ("!" is enough) for Claude to read them.`;
+  const cl=st.claude;let t="Claude has not read your marks yet.";
+  if(cl&&cl.lastRead)t=`Claude last read your marks: ${new Date(tnum(cl.lastRead)).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}. ${cl.message||""}`;
+  if(everyTurn())t+=" Checking this page at every message (your request).";
+  $("lastread").textContent=t;
+}
+function match(id){const k=(st.dec[id]||{}).decision,r=st.rep[id]||{};switch(st.filter){
+  case "unmarked":return !k;case "reply":return (r.answers||[]).length>0;case "turn":return yourTurnState(id)!==null;
+  case "stop":return k==="exfirst";case "explain":return k==="exfirst"||k==="exlater";case "discuss":return k==="discuss";
+  case "go":return k==="go";case "nogo":return k==="nogo";default:return true;}}
+function applyFilter(){const focusEl=document.activeElement;const ITEMG={};
+  for(const it of ITEMS){const e=els[it.id];const keep=match(it.id)||(focusEl&&e.el.contains(focusEl))||st.typing===it.id;e.el.hidden=!keep;if(keep)ITEMG[it.group]=1;}
+  for(const h of document.querySelectorAll("#list .ghead"))h.hidden=!(ITEMG[h.dataset.g]||st.filter==="all");}
+function paintAll(){for(const it of ITEMS)paint(it.id);paintGo();paintBar();if(st.filter!=="turn")applyFilter();}
+
+build();
+for(const it of ITEMS){const e=els[it.id];for(const s of e.el.querySelectorAll(".ttl,.sec"))linkify(s,it.id);}
+for(const h of document.querySelectorAll("#list .ghead"))linkify(h,null);
+paintAll();
+{const h=(location.hash||"").replace(/^#item-/,"");if(h&&els[h])setTimeout(()=>goTo(h),300);}
+(async()=>{
+  try{db=await window.claude?.use?.("db");}catch(e){db=null;}
+  if(!db){$("lastread").textContent="Marks can't be loaded or saved in this view.";disableAll();return;}
+  enableAll();
+  const errCb=err=>fail(err);
+  db.collection("decisions").onSnapshot(s=>{for(const d of s.docs){if(!ITEMS.find(i=>i.id===d.id))continue;const v=d.data();
+      if(st.typing===d.id){const keep=st.dec[d.id];st.dec[d.id]={...v,note:keep.note,fups:keep.fups,decision:keep.decision,remind:keep.remind};}else st.dec[d.id]={...v};}
+    paintAll();},errCb);
+  db.collection("replies").onSnapshot(s=>{for(const d of s.docs)st.rep[d.id]={...d.data()};paintAll();},errCb);
+  db.collection("settings").onSnapshot(s=>{for(const d of s.docs){if(d.id==="user")st.user={...d.data()};if(d.id==="claude")st.claude={...d.data()};}paintAll();},errCb);
+})();
+</script>
+

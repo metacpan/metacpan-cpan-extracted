@@ -2352,7 +2352,7 @@ SKIP: {
 	} 'EC33.5 aggregate(): object still usable after join croak on no-DBI backend';
 
 	# EC33.6 — aggregate() with SAFE join on CSV (has DBI) must not croak on join check
-	#          (the join-on-no-DBI guard only fires when !$self->{$table})
+	#          (the join-on-no-DBI guard only fires when !$self->{_dbh}{$table})
 	lives_ok {
 		my $csv = Database::test1->new($DATA_DIR);
 		# CSV has DBD::CSV DBI handle; the join SQL will fail but not the backend check

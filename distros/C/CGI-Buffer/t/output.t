@@ -11,12 +11,13 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 101;
+use Test::Most tests => 98;
 use Compress::Zlib;
 use Test::TempDir::Tiny;
 # use DateTime;
 use HTTP::Date;
 use Test::HTML::Lint;
+use Test::Needs;
 # use Test::NoWarnings;	# HTML::Clean has them
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -148,10 +149,10 @@ OUTPUT: {
 
 	open($fin, '-|', "$^X -Iblib/lib $filename");
 
-	$keep = $_;
-	undef $/;
-	$output = <$fin>;
-	$/ = $keep;
+	{
+		local undef $/;
+		$output = <$fin>;
+	}
 
 	close $tmp;
 
@@ -160,37 +161,23 @@ OUTPUT: {
 	ok(defined($length));
 
 	($headers, $body) = split /\r?\n\r?\n/, $output, 2;
-	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}"/m);
+	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}(?:-(?:gzip|br|zstd))?"/m);
 
         ok(defined($body));
         ok(length($body) eq $length);
 
-	if(($^O eq 'MSWin32') || ($^O eq 'openbsd') || ($^O eq 'freebsd')) {
-                TODO: {
-			local $TODO = "IO::Compress::Brotli doesn't support Windows or OpenBSD";
-                        ok($headers =~ /^Content-Encoding: br/m);
+	subtest 'brotli' => sub {
+		test_needs('IO::Compress::Brotli');
 
-                        # $body = IO::Compress::Brotli::unbro($body, 1024);
-			ok(defined($body));
-                        ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
-                        html_ok($body, 'HTML:Lint shows no errors');
-                }
-	} elsif(eval { require IO::Compress::Brotli }) {
-                ok($headers =~ /^Content-Encoding: br/m);
+		ok($headers =~ /^Content-Encoding: br/m);
 
 		IO::Compress::Brotli->import();
 
-                $body = IO::Compress::Brotli::unbro($body, 1024);
+		$body = IO::Compress::Brotli::unbro($body, 1024);
 		ok(defined($body));
-                ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
-                html_ok($body, 'HTML:Lint shows no errors');
-	} else {
-		SKIP: {
-			ok($headers =~ /^Status: 406/m);
-
-			skip('Install IO::Compress::Brotli to test Brotli compression', 3);
-		}
-	}
+		ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
+		html_ok($body, 'HTML:Lint shows no errors');
+	};
 
 	#..........................................
 	delete $ENV{'SERVER_PROTOCOL'};
@@ -220,7 +207,7 @@ OUTPUT: {
 
 	close $tmp;
 
-	ok($output =~ /href="\/"/m);
+	ok($output =~ /href="\/"/mi);	# The case of the tag is kept
 	ok($output !~ /<script>\s/m);
 
 	($headers, $body) = split /\r?\n\r?\n/, $output, 2;
@@ -650,7 +637,7 @@ OUTPUT: {
 	print $tmp "use strict;\n",
 		"use CGI::Buffer;\n";
 
-	open($fin, '-|', "$^X -Iblib/lib  $filename");
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;

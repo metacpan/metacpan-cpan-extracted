@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v1.2.2
+## SQL API Abstraction - ~/lib/DB/Object/Tables.pm
+## Version v1.3.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/08/05
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 # This package's purpose is to separate the object of the tables from the main
 # DB::Object package so that when they get DESTROY'ed, it does not interrupt
 # the SQL connection
@@ -27,7 +27,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.2.2';
+    our $VERSION = 'v1.3.1';
 };
 
 use strict;
@@ -107,12 +107,12 @@ sub init
     $self->{schema}         = undef;
     $self->{structure}      = {};
     $self->{table_alias}    = undef;
+    # The table type. It could be table or view
+    $self->{type}           = undef;
     # $self->{types}          = {};
     # An hash to contain table field to an hash of constant value and constant name:
     # field => { constant => 12, name => PG_JSONB, type => 'jsonb' };
     $self->{types_const}    = {};
-    # The table type. It could be table or view
-    $self->{type}           = undef;
     $self->{_init_params_order}     = [qw( dbo query_object )];
     $self->{_init_strict_use_sub}   = 1;
     $self->{_exception_class}       = $EXCEPTION_CLASS;
@@ -142,12 +142,14 @@ sub alter
     {
         $spec = [@_];
     }
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $table = $self->{table} ||
     return( $self->error( "No table was provided." ) );
     return( $self->error( "No proper ALTER specification was provided." ) ) if( !defined( $spec ) || !@$spec );
     my $query = "ALTER TABLE $table " . CORE::join( ', ', @$spec );
-    my $sth   = $self->prepare( $query ) ||
-    return( $self->error( "Error while preparing ALTER query to modify table '$table':\n", $self->errstr() ) );
+    my $sth   = $dbo->prepare( $query ) ||
+    return( $self->error( "Error while preparing ALTER query to modify table '$table':\n", $dbo->error ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -208,6 +210,23 @@ sub avoid { return( shift->_method_to_query( 'avoid', @_ ) ); }
 
 sub check { return( shift->_set_get_hash_as_mix_object( 'check', @_ ) ); }
 
+sub clone
+{
+    my $self = shift( @_ );
+    # We make sure to not clone the DBI database handle object
+    my $dbo  = CORE::delete( $self->{dbo} );
+    my( $qo, $query_dbo );
+    if( $qo = $self->query_object )
+    {
+        $query_dbo = CORE::delete( $qo->{database_object} );
+    }
+    my $new = $self->Module::Generic::clone ||
+        return( $self->pass_error );
+    $new->attach( $dbo ) if( defined( $dbo ) );
+    $qo->attach( $query_dbo ) if( defined( $query_dbo ) && ( !$dbo || $query_dbo ne $dbo ) );
+    return( $new );
+}
+
 sub columns
 {
     my $self = shift( @_ );
@@ -221,10 +240,12 @@ sub constant
 {
     my $self = shift( @_ );
     my( $pack, $file, $line ) = caller;
-    my $base_class = $self->database_object->base_class;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    my $base_class = $dbo->base_class;
     # This does not work for calls made internally
     return( $self ) if( $pack =~ /^${base_class}\b/ );
-    my $sth = $self->database_object->constant_queries_cache_get({
+    my $sth = $dbo->constant_queries_cache_get({
         pack => $pack,
         file => $file,
         line => $line,
@@ -264,11 +285,15 @@ sub create_info
     return( $self->error( "create_info() is not implemented by $class." ) );
 }
 
-sub database { return( shift->database_object->database ); }
+sub database
+{
+    my $self = shift( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    return( $dbo->database );
+}
 
 sub database_object { return( shift->_set_get_object_without_init( 'dbo', 'DB::Object', @_ ) ); }
-
-# sub dbh { return( shift->_set_get( 'dbh', @_ ) ); }
 
 sub dbo { return( shift->_set_get_object_without_init( 'dbo', 'DB::Object', @_ ) ); }
 
@@ -315,11 +340,13 @@ sub delete
 sub drop
 {
     my $self  = shift( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $table = $self->{table} || 
         return( $self->error( "No table was provided to drop." ) );
     my $query = "DROP TABLE $table";
-    my $sth = $self->prepare( $query ) ||
-        return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->errstr() ) );
+    my $sth = $dbo->prepare( $query ) ||
+        return( $self->error( "Error while preparing query to drop table '$table':\n$query", $dbo->error ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute ||
@@ -345,8 +372,9 @@ sub enhance
 sub exists
 {
     my $self = shift( @_ );
-    my $class = ref( $self );
-    return( $self->error( "exists() is not implemented by $class." ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    return( $dbo->table_exists( @_ ? shift( @_ ) : $self->{table} ) );
 }
 
 sub fields
@@ -412,7 +440,9 @@ sub fields_object
         $o->query_object( $qo );
         return( $o );
     }
-    my $db_name = $self->database_object->database;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    my $db_name = $dbo->database;
     $db_name =~ tr/-/_/;
     $db_name =~ s/\_{2,}/_/g;
     $db_name = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $db_name ) ) );
@@ -637,7 +667,9 @@ sub prefix
     my @val = ();
     my $alias = $self->query_object->table_alias;
     return( $alias ) if( $alias && $self->{prefixed} > 0 );
-    CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    CORE::push( @val, $dbo->database ) if( $self->{prefixed} > 2 );
     CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
     CORE::push( @val, $self->name ) if( $self->{prefixed} > 0 );
     return( '' ) if( !scalar( @val ) );
@@ -1127,7 +1159,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v1.2.2
+    v1.3.1
 
 =head1 DESCRIPTION
 
@@ -1219,6 +1251,25 @@ The L<array object|Module::Generic::Array> of table columns associated with this
 The check constraint name.
 
 =back
+
+=head2 clone
+
+    my $new_tbl = $tbl->clone;
+
+Creates a new instance of the current table object by cloning it.
+This uses the method L<Module::Generic/clone> from L<Module::Generic>.
+
+Beware that it will not clone the associated database handle if there is one, because it cannot be cloned, and the alternative would be to instantiate a new database connection, which is not a good thing to do implicitly.
+
+If you want to clone the database object, then you can do something like:
+
+    my $new_dbh = $dbh->clone;
+
+which will create a new connection using the same parameters as the original (see L<DB::Object/clone> for more detail), and then
+
+    $new_tbl->attach( $new_dbh );
+
+It returns the new table object, or, upon error, sets an L<DB::Object::Exception> objet using L<Module::Generic/error> and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 columns
 

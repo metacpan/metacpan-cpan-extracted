@@ -1,5 +1,138 @@
 Revision history for Locale-Simple
 
+0.200     2026-11-03 00:08:19Z
+  - New command locale-simple with the subcommands scrape and po2json
+    (locale-simple help lists them; --version prints the version). It exits
+    0 on success, 1 when a command fails and 2 for a bad call.
+  - Each GitHub release carries locale-simple as a standalone binary for
+    Linux x86_64, Linux aarch64 and macOS arm64 (Perl and modules packed
+    with PAR::Packer), as .tar.gz with LICENSE and README, and a SHA-256
+    checksums file. Linux needs glibc 2.31+ and libcrypt.so.1. scrape
+    writes po, perl and json everywhere; --output yaml needs the Perl
+    install with the YAML module.
+  - Scraper command: locale-simple scrape and locale_simple_scraper are the
+    same scraper (bin/locale_simple_scraper_old is removed);
+    locale_simple_scraper is deprecated and prints one notice on STDERR
+    naming locale-simple scrape, output and exit codes unchanged. --help (and
+    -h) prints the options; an unknown option, a stray argument or an
+    unknown --output format ends with the usage on STDERR and exit code 2,
+    nothing on STDOUT. --output json goes through JSON::PP with sorted keys
+    and UTF-8 msgids as they stand in the source; --output perl sorts the
+    keys too; --output yaml uses the optional YAML module (recommended in
+    the cpanfile).
+  - po2json is own code (Locale::Simple::PO2JSON, with po2data() and
+    data2json()) and needs only JSON::PP. It selects entries like msgfmt:
+    no untranslated, fuzzy or obsolete ones, any number of plural forms,
+    decoded multi-line strings and escapes, several quoted strings on one
+    line joined (msgid "a" "b" is "ab"), indented comment lines accepted.
+    Header values are trimmed, the header carries lang, keys come in a
+    fixed order. bin/po2json uses it: po2json FILE, po2json -p FILE for
+    indented output wrapped in the file name as domain. bin/po2json is
+    deprecated and prints one notice on STDERR naming the replacement,
+    output and exit codes unchanged: locale-simple po2json --pretty FILE
+    for -p; plain po2json FILE has no locale-simple equivalent.
+  - Scraper: recognise PHP (.php, --php), Go (.go, --go) and Rust (.rs,
+    --rs) sources besides Perl, Python, JavaScript and .tx templates. PHP:
+    heredoc, nowdoc and namespace-qualified calls. Go: the capitalised
+    names (L, Ln, ... Ndnp_) with or without package prefix, "..." and
+    backtick strings. Rust: the macros l!, ln!, ... and the markers n_!,
+    nn_!, ..., raw strings of any hash count. --js, --pl, --py, --tx,
+    --php, --go and --rs can be given more than once; the lists add up.
+  - Scraper: calls whose plural count or extra arguments are any code
+    (variables, member access, function calls, casts, brackets, strings
+    with commas or brackets, calls over several lines) are extracted in all
+    six languages, together with the translation calls inside those
+    arguments: l("Hello %s", $name), ln(..., items.length).
+  - Scraper: string literals are read the way each language reads them, so
+    the .pot holds the msgid the program looks up ("0" is a msgid like any
+    other). Python raw, unicode and triple-quoted strings are read and
+    adjacent literals joined; a JavaScript template literal without ${...}
+    is a msgid. Strings that are no constant msgid are skipped and
+    reported: Perl and PHP double-quoted strings and PHP heredocs that
+    interpolate a variable (in Perl any unescaped $, and an @ before a
+    name, digit, ::, ', $, +, - or {; escaped \$ and \@ stay text) and
+    Python f-strings and bytes.
+  - Scraper: files are named by their path relative to the directory the
+    scraper runs in (#: lines, the file field, the --md5 hash). Symlinks
+    that point nowhere are skipped and the files after them are read.
+  - Perl: l_lang() translates again in a process started under the C
+    locale on a system without a locale for the language (a minimal
+    container, a daemon without LANG): libintl-perl 1.36 and later ignore
+    LANGUAGE under C, so l_lang() moves LC_MESSAGES to C.UTF-8 then. On a
+    platform whose POSIX has no LC_MESSAGES (Windows) it sets the
+    environment only.
+  - Perl, Python: ld, ldn, ldp and ldnp bind their domain to the l_dir
+    directory on first use, so they need no ltd() call first; a later
+    l_dir moves every bound domain to the new directory.
+  - Perl, Python, PHP, Go, Rust: dry mode writes the same block in all
+    five (# domain:, msgctxt, msgid, msgid_plural) as UTF-8 with LF line
+    ends on every platform, with backslash, newline, tab, carriage return
+    and double quote escaped; the scraper's .pot escapes the same way.
+    JavaScript writes that block too, in one console.debug call per
+    translation. Python formats the result with the module's sprintf, so
+    %1$s placeholders work there.
+  - Perl, Python, JavaScript: sprintf formats each placeholder on its own
+    and follows the same rules: a placeholder without an argument stays as
+    it is, extra arguments are ignored, a % in an argument stays, %% gives
+    one %, ' plus a character (%'*8s) pads with that character, numbers
+    are read from string arguments, flags and precision work as in Perl's
+    sprintf. Python also takes %b; JavaScript also u, F, 0 on strings,
+    negative b o u x X as unsigned 64-bit, two-digit exponents and ties
+    rounded to the even digit.
+  - PHP: sprintf is the package's own and follows the same rules (a
+    placeholder without an argument stays, precision on integers, the
+    space flag, 0 with - on strings, a multibyte ' pad character, %c for
+    any code point, width in characters, two-digit exponents). Go, Rust:
+    precision on integer conversions (%.0d of 0 is empty), s and c padded
+    with the 0 flag, the leading number of a string argument is read; Go
+    keeps %0$s as it is, Rust writes -0.0 with its sign and gives U+FFFD
+    for a %c without a character.
+  - Empty msgid and "0": in Perl and JavaScript an empty msgid returns an
+    empty string without a lookup (JavaScript writes no dry block), and in
+    Perl l_dry(undef) turns the l_dir check back on; a domain, msgctxt,
+    msgid_plural, dry-run file or locale directory of "0" counts as set.
+    Python: ltd() stops with the "please set a locale directory" message
+    when l_dir() was not called, as l() does, and the l_dir check stops
+    through sys.exit, also under python -S.
+  - JavaScript: lookups follow the shared locale chain: l_lang('de_AT:fr')
+    tries de_AT, de, fr, then a bundle without language. The Plural-Forms
+    header is evaluated (Polish, Russian, Arabic, Japanese and others pick
+    the right form), each bundle's own rule applies, an empty translation
+    falls through to the next language and language tags are normalised
+    (pt-BR is pt_BR). loadLocaleData files a bundle under the language of
+    its gettext Language header, so bundles of several languages live side
+    by side in one domain; loadTranslations takes the header as optional
+    fourth argument.
+  - JavaScript: TypeScript finds the bundled types (src/index.d.ts), the
+    loadLocaleData types accept po2json output with its header, and
+    l_nolocales is exported as a no-op, like in the other five runtimes.
+  - PHP: new package raudssus/locale-simple for Composer. The same helpers
+    (l, ln, ... Ndnp_) as functions in the namespace Locale\Simple, with
+    its own .mo reader and Plural-Forms evaluator, so no ext-gettext is
+    needed. .gitattributes keeps the Perl, Python and JavaScript sources
+    out of git archive, so a composer require does not pull them in.
+  - Go: new module github.com/Getty/locale-simple (package in go/) with
+    the helpers as L, Ln, ... and the unchanged N_ family, an own .mo
+    reader and sprintf, and a Translator value for concurrent, per-request
+    languages.
+  - Rust: new crate locale-simple (rust/) with the helpers as macros l!,
+    ln!, ... and the lower-case markers n_!, nn_!, ..., an own .mo reader,
+    sprintf and Plural-Forms evaluator, and a Translator for concurrent
+    languages. Rust 1.67 or newer.
+  - Release tags are now vMAJOR.MINOR.0 (e.g. v0.200.0), valid SemVer for
+    all ecosystems. The npm package follows the tag and jumps from 0.1.9 to
+    0.200.0; npm versions now match the CPAN release. The Rust crate is
+    published to crates.io from the tag by CI, PHP via Packagist and Go via
+    the module proxy follow the same tag. The PyPI wheel and the crate
+    carry the MIT LICENSE file, like the npm package.
+  - Locale::Simple needs Perl 5.20 or newer and the cpanfile declares it,
+    with every test prerequisite (Test::Regression and Test::InDistDir
+    among them). The tests pass in the CPAN tarball and on systems that
+    start under the C or POSIX locale.
+  - Documentation: the READMEs, the POD and the usage skills describe all
+    six runtimes, the scraper's languages (N-markers are found in .tx
+    templates too) and loading po2json output in JavaScript.
+
 0.109     2026-04-23 13:40:35Z
 
  - Deferred-translation markers (N_, Nn_, Np_, Nd_, Ndn_, Ndp_, Nnp_,

@@ -1,0 +1,17 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+  # an indented translator comment
+  #, c-format
+msgid "two" "parts"
+msgstr "ein" "zwei"
+
+	#. extracted comment after a tab
+msgid "a"  "b"
+"c"
+msgstr "x"
+  "y" "z"
+
+msgid "esc"
+msgstr "q\"uo" "te\\"

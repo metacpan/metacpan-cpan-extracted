@@ -116,7 +116,7 @@ sub _assert_s1_invariants {
 	ok(!defined $db->{'_updated'},    "$label: S1 — _updated is undef (not yet opened)");
 	ok(!defined $db->{'type'},        "$label: S1 — type is undef (backend not detected)");
 	ok(!defined $db->{'data'},        "$label: S1 — data is undef (nothing slurped)");
-	ok(!defined $db->{$table},        "$label: S1 — no DBI handle before first query");
+	ok(!defined $db->{_dbh}{$table},        "$label: S1 — no DBI handle before first query");
 	ok(!$db->{'berkeley'},            "$label: S1 — berkeley is not set");
 }
 
@@ -169,7 +169,7 @@ subtest 'T2 — first query on CSV → S1→S3 OPEN_SLURP_CSV invariants' => sub
 		'T2-6: berkeley is undef (not a BerkeleyDB backend)');
 	cmp_ok($n, '>', 0, 'T2-7: count() > 0 after transition to OPEN_SLURP_CSV');
 	# DBI handle is set for CSV (DBD::CSV is always opened alongside the slurp)
-	ok(defined $db->{'test1'} && ref($db->{'test1'}),
+	ok(defined $db->{_dbh}{'test1'} && ref($db->{_dbh}{'test1'}),
 		'T2-8: DBI handle is set (DBD::CSV requires a handle even in slurp mode)');
 };
 
@@ -279,10 +279,10 @@ subtest 'T5 — first query on JSON → S1→S5 OPEN_SLURP_JSON invariants' => s
 		'T5-2: type = "JSON" (JSON slurp backend)');
 	ok(defined $db->{'data'},
 		'T5-3: data is set after JSON slurp');
-	# JSON slurp backend: $self->{$table} exists as a key but its value is undef
-	# (set by $self->{$table} = $dbh where $dbh was never assigned for JSON slurp).
-	# The falsy guard !$self->{$table} works correctly; the key may exist.
-	ok(!$db->{'test_json'},
+	# JSON slurp backend: $self->{_dbh}{$table} exists as a key but its value is undef
+	# (set by $self->{_dbh}{$table} = $dbh where $dbh was never assigned for JSON slurp).
+	# The falsy guard !$self->{_dbh}{$table} works correctly; the key may exist.
+	ok(!$db->{_dbh}{'test_json'},
 		'T5-4: DBI handle is falsy (JSON slurp path assigns undef to $self->{table})');
 	ok(!defined $db->{'berkeley'},
 		'T5-5: berkeley is undef');
@@ -459,10 +459,10 @@ subtest 'T9 — DESTROY() → S8 DESTROYED: internal state cleared correctly' =>
 		my $db2 = _make_sqlite_db('Database::tr_dest_dbi', p => 1, q => 2);
 		$db2->count();    # enter S2
 
-		ok(defined $db2->{'tr_dest_dbi'},
+		ok(defined $db2->{_dbh}{'tr_dest_dbi'},
 			'T9-3: DBI handle is set before DESTROY (S2)');
 		$db2->DESTROY();
-		ok(!defined $db2->{'tr_dest_dbi'},
+		ok(!defined $db2->{_dbh}{'tr_dest_dbi'},
 			'T9-4: DBI handle is undef after DESTROY (S8) — connection released');
 	}
 
@@ -733,10 +733,10 @@ subtest 'FSM-DISC1 — documented discrepancies from derived FSM' => sub {
 			'DISC1-1 (TODO): _updated is undef for Berkeley backend (stat on wrong file)');
 	}
 
-	# DISC2: For no-DBI slurp backends (JSON, XML, Deep, XLSX) $self->{$table}
-	# is assigned undef at the end of _open() (line: $self->{$table} = $dbh).
+	# DISC2: For no-DBI slurp backends (JSON, XML, Deep, XLSX) $self->{_dbh}{$table}
+	# is assigned undef at the end of _open() (line: $self->{_dbh}{$table} = $dbh).
 	# This means a defined-but-undef slot exists after open.  The guard in
-	# _open_table() checks (!$self->{$table} && !$self->{'data'} && ...)
+	# _open_table() checks (!$self->{_dbh}{$table} && !$self->{'data'} && ...)
 	# which still evaluates correctly because undef is falsy.  No functional
 	# bug; documented here for clarity.
 	SKIP: {
@@ -745,10 +745,10 @@ subtest 'FSM-DISC1 — documented discrepancies from derived FSM' => sub {
 		my $db = Database::test_json->new(directory => $DATA_DIR, no_entry => 1);
 		$db->count();
 		# The key *exists* but has an undef value; exists() returns true.
-		# This is the documented behaviour: _open_table() guard uses !$self->{$table}
-		# (falsy check) not !exists $self->{$table} (existence check).
-		ok(exists($db->{'test_json'}) && !defined($db->{'test_json'}),
-			'DISC2-1: JSON slurp — $self->{$table} key exists but is undef (falsy guard correct)');
+		# This is the documented behaviour: _open_table() guard uses !$self->{_dbh}{$table}
+		# (falsy check) not !exists $self->{_dbh}{$table} (existence check).
+		ok(exists($db->{_dbh}{'test_json'}) && !defined($db->{_dbh}{'test_json'}),
+			'DISC2-1: JSON slurp — $self->{_dbh}{$table} key exists but is undef (falsy guard correct)');
 	}
 
 	# DISC3: The query-method `table` override param bypasses the constructor's

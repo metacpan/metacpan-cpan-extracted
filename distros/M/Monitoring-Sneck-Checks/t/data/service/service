@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+my @args = @ARGV;
+my $jail = $args[0] eq '-j' ? splice( @args, 0, 2 ) && 1 : 0;
+my ( $name, $what ) = @args;
+if ( $name eq 'nope' ) { print STDERR "nope does not exist in /etc/rc.d or the local startup directories\n"; exit 1 }
+if ( $what eq 'status' ) { exit( $name eq 'sshd' || ( $jail && $name eq 'nginx' ) ? 0 : 1 ) }
+exit( $name eq 'sshd' ? 0 : 1 );

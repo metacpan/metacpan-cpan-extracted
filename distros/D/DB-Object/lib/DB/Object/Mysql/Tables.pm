@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
-## Version v1.1.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## SQL API Abstraction - ~/lib/DB/Object/Mysql/Tables.pm
+## Version v1.1.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/08/05
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 ## This package's purpose is to separate the object of the tables from the main
 ## DB::Object package so that when they get DESTROY'ed, it does not interrupt
 ## the SQL connection
@@ -69,7 +69,7 @@ BEGIN
         qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.1.2';
 };
 
 use strict;
@@ -248,10 +248,7 @@ sub drop
     return( $sth );
 }
 
-sub exists
-{
-    return( shift->table_exists( shift( @_ ) ) );
-}
+# NOTE: exists is inherited from DB::Object::Tables
 
 sub lock
 {
@@ -400,7 +397,9 @@ sub qualified_name
 {
     my $self = shift( @_ );
     my @val = ();
-    CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    CORE::push( @val, $dbo->database ) if( $self->{prefixed} > 2 );
     CORE::push( @val, $self->name );
     return( CORE::join( '.', @val ) );
 }
@@ -480,14 +479,15 @@ sub structure
     return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
-    my $types_dict = $self->database_object->datatype_dict;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
+    my $types_dict = $dbo->datatype_dict;
     $self->_load_class( 'DB::Object::Fields::Field' ) || return( $self->pass_error );
     my $q = $self->_reset_query;
     my $table   = $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
-    my $dbh = $self->database_object->{dbh};
-    my $sth1 = $dbh->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
-        return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $dbh->errstr() ) );
+    my $sth1 = $dbo->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
+        return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $dbo->errstr() ) );
     $sth1->execute( $table ) ||
         return( $self->error( "An error occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
     my $def = $sth1->fetchrow_hashref;
@@ -518,8 +518,8 @@ FROM information_schema.columns a
 WHERE table_name = ?
 ORDER BY a.ordinal_position
 EOT
-    my $sth = $dbh->prepare_cached( $query ) ||
-        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $dbh->errstr() ) );
+    my $sth = $dbo->prepare_cached( $query ) ||
+        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $dbo->errstr() ) );
     $sth->execute( $table ) ||
         return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
 
@@ -594,7 +594,7 @@ EOT
             }
             else
             {
-                $value = $self->database_object->quote( $def->{default}, ( CORE::length( $def->{datatype}->{constant} // '' ) ? $def->{datatype}->{constant} : () ) );
+                $value = $dbo->quote( $def->{default}, ( CORE::length( $def->{datatype}->{constant} // '' ) ? $def->{datatype}->{constant} : () ) );
             }
             push( @define, "DEFAULT ${value}" );
         }
@@ -667,7 +667,7 @@ DB::Object::Mysql::Tables - MySQL Table Object
 
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 

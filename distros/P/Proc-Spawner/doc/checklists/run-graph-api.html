@@ -1,0 +1,486 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Run Graph API</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column of decision cards under a sticky status bar; a register-map feel (IDs as addresses, mono for anything you type). */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e8ecea; --fg:#18201d; --muted:#5b6762; --line:#cfd7d3;
+  --accent:#1f5f8b; --go:#1d7a46; --nogo:#a3372b; --discuss:#7a4fa8; --explain:#b06a00; --plaque:#c0262d; --onfill:#ffffff;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1a211e; --sunk:#232c28; --fg:#e3ebe7; --muted:#9aa8a1; --line:#33403a;
+  --accent:#6fb3e3; --go:#4cc285; --nogo:#ef7b6d; --discuss:#b993e6; --explain:#e6a740; --plaque:#e5484d; --onfill:#0f1412; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1a211e; --sunk:#232c28; --fg:#e3ebe7; --muted:#9aa8a1; --line:#33403a;
+  --accent:#6fb3e3; --go:#4cc285; --nogo:#ef7b6d; --discuss:#b993e6; --explain:#e6a740; --plaque:#e5484d; --onfill:#0f1412; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1{font-family:var(--f-display);font-weight:600;font-size:1.9rem;line-height:1.15;margin:0 0 6px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:30px 0 10px}
+p{margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}
+.lede{color:var(--muted);max-width:68ch;display:grid;gap:8px}
+.top{display:grid;gap:14px;margin-top:16px}
+.legend{display:grid;gap:4px;font-size:.92rem}
+.legend b{font-weight:600}
+fieldset{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:0;display:grid;gap:4px}
+legend{font-weight:600;padding:0 4px}
+fieldset label{display:flex;gap:8px;align-items:flex-start}
+.lastread{font-size:.9rem;color:var(--muted)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:8px;margin-top:16px;display:grid;gap:6px}
+.plaque{font:inherit;font-size:.9rem;text-align:left;background:var(--plaque);color:#fff;border:0;border-radius:5px;padding:6px 10px;cursor:pointer;position:relative}
+.pop{position:absolute;left:0;top:100%;margin-top:6px;z-index:6;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:10px 14px;max-width:min(560px,90vw);box-shadow:0 6px 24px rgb(0 0 0 / .18);font-size:.88rem}
+.pop ol{margin:0;padding-left:18px;display:grid;gap:4px}
+.progress{font-size:.9rem;font-variant-numeric:tabular-nums}
+.brow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.88rem}
+.brow select{font:inherit}
+.blab{font-family:var(--f-display);font-weight:600;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);min-width:4.2em}
+.ghead{display:grid;gap:4px;margin-top:30px}
+.ghead h2{margin:0}
+.ghead p{color:var(--muted);font-size:.92rem;max-width:72ch}
+.layer{font-family:var(--f-display);font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;white-space:nowrap}
+.filt{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:2px 10px;cursor:pointer}
+.filt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--onfill)}
+.gogrp{display:inline-flex;gap:6px;align-items:center;margin-left:auto}
+.blab[for]{min-width:0}
+a.xref{color:var(--accent);font-family:var(--f-mono);font-size:.92em;font-weight:500;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+a.xref:hover{text-decoration-style:solid}
+.item.flash{box-shadow:0 0 0 3px var(--accent)}
+.item{transition:box-shadow .4s;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0;display:grid;gap:10px;min-width:0}
+.item.m-go{border-left-color:var(--go)} .item.m-nogo{border-left-color:var(--nogo)} .item.m-discuss{border-left-color:var(--discuss)}
+.item.m-exfirst,.item.m-exlater{border-left-color:var(--explain)}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.iid{font-family:var(--f-mono);font-weight:500;font-size:.9rem;padding:1px 6px;border-radius:4px;background:var(--sunk);white-space:nowrap}
+.ttl{font-weight:600;font-size:1.02rem;flex:1 1 300px;min-width:0}
+.pill{font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:0 8px}
+.sec{display:grid;gap:4px;min-width:0}
+.lab{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sec ul,.sec ol{margin:0;padding-left:20px;display:grid;gap:3px}
+.marks{display:flex;flex-wrap:wrap;gap:6px}
+.mk{font:inherit;font-size:.85rem;border:1.5px solid var(--c);color:var(--c);background:transparent;border-radius:5px;padding:3px 10px;cursor:pointer}
+.mk .ic{display:none}
+.mk[aria-pressed="true"]{background:var(--c);color:var(--onfill)}
+.mk[aria-pressed="true"] .ic{display:inline}
+.mk:disabled{opacity:.5;cursor:not-allowed}
+.remind{font-size:.88rem;display:flex;gap:6px;align-items:center}
+.thread{display:grid;gap:8px}
+textarea{font:inherit;font-size:.92rem;width:100%;box-sizing:border-box;resize:none;overflow-y:hidden;border:1px solid var(--line);border-radius:5px;padding:6px 8px;background:var(--bg);color:var(--fg)}
+.ans{border-left:3px solid var(--accent);padding:4px 0 4px 10px;white-space:pre-wrap;font-size:.92rem}
+.ans .who{font-weight:600}
+.tag{font-size:.75rem;border-radius:4px;padding:0 6px;margin-left:6px;white-space:nowrap}
+.tag.muted{border:1px solid var(--line);color:var(--muted)}
+.tag.turn{background:var(--explain);color:var(--onfill)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ro{color:var(--plaque);font-size:.9rem}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<h1>Run Graph API</h1>
+<div class="lede">
+<p>The second design round for Run, after your message of 19:15 (the API may change freely) and your notes on the page “Run 0.07 Jobs”, which this page replaces. Nothing below is written yet, except R5. The base is Run 0.06 (<code>claude/Run-0.06.tar.gz-base64.txt</code>).</p>
+<p>Words used throughout. The <b>graph</b>: processes, and the ends they are connected to (E1). An <b>edge</b>: a process plus one end, under an fd number (R8). <b>Forgetting</b> an end: Run closes its own copy of it (R6). An <b>action</b>: a sub reference run when a process ends (R9). The <b>loop</b>: the code in Run that reaps children and runs actions (L1). A <b>job</b>: K1. The <b>executor</b>: the code, not written yet, that runs ShellSubset parse trees (spec section 8) on top of Run; the S items describe it. <b>Forkless</b>: <code>$Run::Forkless</code> (R5).</p>
+<p>Each item ends with “Depends on”. If an item it depends on is No-go, the item is dropped too, unless its text says otherwise.</p>
+</div>
+
+<div class="top">
+<div class="legend">
+<span><b>✓ Go</b>: do it as planned. <b>✗ No-go</b>: don’t; do what “If No-go” says. <b>◆ Discuss strategy first</b>: settle the approach first; holds back only the items that depend on it.</span>
+<span><b>? Explain first</b>: a show-stopper; I explain before doing anything else. <b>? Explain later</b>: I explain after doing the rest. <b>Unmarked</b>: not done this round, left for later; it is not a rejection.</span>
+<span>A note that settles an item (picks an option, states the rule, or says the plan is right) counts as Go even without the button. My answers carry a tag: <i>No reply needed</i>, <i>Your turn</i> (I asked you something), or <i>Answered, Claude hasn’t read it yet</i>. The “Your turn” filter shows the items waiting for you.</span>
+</div>
+<fieldset id="gofs"><legend>What Go means</legend>
+<label><input type="radio" name="gomode" id="gm-wait" value="wait"> <span>Mark and wait: I implement only when you tell me in chat.</span></label>
+<label><input type="radio" name="gomode" id="gm-nostop" value="nostop"> <span>Implement when there are no show-stoppers: “Explain first” items block everything; “Discuss” items block only what depends on them.</span></label>
+<label><input type="radio" name="gomode" id="gm-indep" value="indep"> <span>Implement what’s independent: Go items that don’t depend on an open item; I list the ones held back.</span></label>
+</fieldset>
+<p class="lastread" id="lastread">Loading marks…</p>
+<p class="ro" id="ro" hidden></p>
+</div>
+
+<div class="bar" id="bar">
+<button class="plaque" id="plaque" type="button" aria-expanded="false" hidden><span id="plaquetxt"></span> ⓘ
+<span class="pop" id="pop" hidden><ol>
+<li>Claude isn’t told when you change this page. It sees your changes only when it reads the page.</li>
+<li>Right now Claude reads the page only while it is calling tools for your message anyway. The read then rides along with those calls and costs almost nothing extra. A reply that needs no tools doesn’t read the page.</li>
+<li>A short message such as “!” or “Ready?” always makes Claude read it.</li>
+<li>This plaque disappears once Claude has reacted to your changes (answered your notes, acted on your marks, or said in chat why they wait), not as soon as it has read them.</li>
+<li>You can ask Claude, in chat or in any note, to check every time. Then it reads the page at every message, even when nothing else needs a tool. Each such read is an extra step in which Claude re-reads the whole conversation, so it costs tokens: often 100k or more per step in a long conversation. In that mode this plaque is not shown. Ask again to switch back.</li>
+</ol></span></button>
+<div class="brow"><span class="progress" id="progress"></span>
+<span class="gogrp"><label class="blab" for="gosel">Go</label>
+<select id="gosel"><option value="wait">Mark and wait</option><option value="nostop">Implement if no show-stoppers</option><option value="indep">Implement what’s independent</option></select></span></div>
+<div class="brow" id="filters"><span class="blab">Filters</span></div>
+</div>
+
+<div id="list"></div>
+</div>
+
+<script>
+const GROUPS = [
+{name:"Recorded from your messages", intro:`<p>Decisions you gave in chat and in notes on the page “Run 0.07 Jobs”, pre-marked Go. R5 is done in Run 0.06; nothing else is written yet. R11 is new, from your message of 2026-10-31.</p>`},
+{name:"Graph", intro:`<p>The objects Run keeps for the graph, and how a process is started. All pending (E1–E4).</p>`},
+{name:"The loop", intro:`<p>Who reaps the children, when the actions run, and how other code is kept from taking Run’s statuses. All pending (L1–L6); L5 and L6 are new, from your message of 2026-10-31.</p>`},
+{name:"Work done in Perl", intro:`<p>The two things the parent itself does with an end: reading a line for the shell’s <code>read</code>, and collecting the output of <code>$( … )</code>. All pending (P1–P3).</p>`},
+{name:"Jobs", intro:`<p>Your jobs (R2) restated on top of the graph. K2 carries your Go marks from the old page; K3, K4 and K5 carry your “Discuss strategy first” marks, with more detail. All pending.</p>`},
+{name:"Shell layer", intro:`<p>How the executor maps each kind of parse-tree node (ShellSubset spec, section 8) onto the graph, and which edges keep their continuation. All pending (H1, S1–S7).</p>`},
+{name:"Tests", intro:`<p>Pending (T1).</p>`}
+];
+const ITEMS = [
+{group:"Recorded from your messages", layer:"Recorded", id:"R1", title:"Report every exit status as a dualvar",
+ now:`<p>In Run 0.06, <code>run</code> returns 1 or undef, and the status itself (Perl’s <code>$?</code>, or -1 if nothing could be started) is only in <code>$data-&gt;{result}</code>.</p>`,
+ plan:`<p>Every status Run reports (a process’s, a job’s) is a dualvar: a scalar with separate numeric and string values (<code>Scalar::Util::dualvar</code>).</p><ul><li>On success: number 0, string <code>"0 but true"</code>, so it is true.</li><li>On failure: number = <code>$?</code> (or -1), string empty, so it is false.</li></ul><p>Example: a process that ran <code>sh -c 'exit 3'</code> has a status <code>$st</code> such that <code>$st</code> is false and <code>$st &gt;&gt; 8</code> is 3.</p>`,
+ nogo:`Statuses are plain numbers, true on failure. (Pre-marked Go from your answer in chat: “Dualvar”.)`,
+ refs:`POD, new sections. Depends on: nothing.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R2", title:"Return jobs as objects that run to completion when their value is used",
+ now:`<p>In 0.06 every <code>run</code> waits until it has finished.</p>`,
+ plan:`<p>Running something in the background gives a <b>job</b> object (K1). Using it in boolean, numeric or string context waits until the job has finished, then gives its status (R1). Otherwise it offers a polling API (K2).</p>`,
+ nogo:`Only waiting runs. (Pre-marked Go from your words: “If this object is evaluated in boolean/numeric/string context, it runs to completion. Otherwise it implements polling API.”)`,
+ refs:`Depends on: E2, L1.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R3", title:"Make the shell’s <code>$!</code> stand for the job object of the last background chain",
+ now:`<p>The ShellSubset spec (section 5) allows <code>$!</code>, “the process ID of the last background chain”. A background chain is an and-or chain followed by <code>&amp;</code>, such as <code>a &amp;&amp; b &amp;</code>. Without fork, no single process stands for it.</p>`,
+ plan:`<p>The executor keeps the last background chain’s job as the value behind <code>$!</code>. Which text <code>$!</code> expands to is K4.</p>`,
+ nogo:`The executor accepts <code>$!</code> only after a single background program. (Pre-marked Go from your answer “Same as the previous one”.)`,
+ refs:`<code>claude/shell-subset-spec.md</code>, section 5. Depends on: R2.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R4", title:"Wait only for Run’s own children, polling their pids",
+ now:`<p>Perl’s <code>waitpid(-1, 0)</code> notices whichever child ends first, but it also collects the status of children the program started itself.</p>`,
+ plan:`<p>Run calls <code>waitpid(PID, WNOHANG)</code> only for pids it started. Between rounds it sleeps: on Unix until SIGCHLD arrives or 10 ms have passed, whichever comes first; elsewhere, and in forkless mode on Unix, 10 ms. For that, Run sets <code>$SIG{CHLD}</code> to an empty handler only while it sleeps, with <code>local</code>, so the caller’s handler is back afterwards. If the caller has set it to <code>'IGNORE'</code>, Run leaves it and only polls (L1 says what is lost then). L1 says when all this happens.</p>`,
+ nogo:`Run blocks in <code>waitpid(-1, 0)</code> and keeps the statuses of children it does not know. (You had no preference; pre-marked with my choice.)`,
+ refs:`Depends on: nothing.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R5", title:"Start every process through one spawn primitive, with no other fork (done in 0.06)",
+ now:`<p>Done in Run 0.06. With <code>$Run::Forkless</code> (true on OS/2, Win32 and VMS; settable on Unix for tests), every process is started by <code>spawn_nowait()</code>, as <code>spawnvp(P_NOWAIT)</code> does: <code>system 1, …</code> there, <code>fork</code> plus <code>exec</code> on Unix. A test checks that nothing else forks.</p>`,
+ plan:`<p>Keep it. Everything below runs on top of it, background chains included.</p>`,
+ nogo:`Back to 0.05. (Pre-marked Go from your words: “DOSISH systems do not use fork() for this. So have a common wrapper”.)`,
+ refs:`<code>claude/Run-0.06.tar.gz-base64.txt</code>. Depends on: nothing.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R6", title:"Close the parent’s copy of an end once no edge with continuation uses it",
+ now:`<p>In 0.06 only <code>new_pipeline</code> closes pipe ends early, and only for its one element that runs in the Perl process.</p>`,
+ plan:`<p>When an end’s hold count reaches 0 (E1), Run closes its own copy of that end: it <b>forgets</b> the end. The count reaches 0 once every process connected to the end has been started and no edge with a continuation (R8) still needs it. What the processes do with their own copies is outside Run’s control.</p>`,
+ nogo:`Ends stay open until the job ends. (Pre-marked Go from your message of 18:39.)`,
+ refs:`Depends on: E1, R8.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R7", title:"Design a new API from the graph and from what the shell needs, dropping 0.06’s tree API",
+ now:`<p>Run 0.06 builds trees with <code>new_system</code>, <code>new_and</code>, <code>new_or</code>, <code>new_chain</code>, <code>new_pipeline</code>, <code>new_redir</code>, <code>new_env</code>, <code>new_pipe</code> and <code>new_readpipe</code>, and passes state in a hash <code>$data</code>.</p>`,
+ plan:`<p>The API below (E, L, P, K and S items) replaces all of that. What 0.06 keeps:</p><ul><li><code>spawn_nowait</code>;</li><li>the code that applies redirections, in the kid or around the spawn;</li><li><code>close_fd</code>.</li></ul><p>The names used here (<code>Run::spawn</code>, <code>Run::pipe</code> and so on) are working names; the module will probably get another name.</p>`,
+ nogo:`Keep 0.06’s constructors as a layer on top. (Pre-marked Go from your message of 19:15: “Do not pay much attention to the current list of API of Run.pm. It has no users; probably, when it starts to function, we are going to change the name anyway.”)`,
+ refs:`Depends on: nothing.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R8", title:"Make “with continuation” a property of each edge, decided when the process is created",
+ now:`<p>The page “Run 0.07 Jobs” made it a property of a whole process node (its item G1).</p>`,
+ plan:`<p>An <b>edge</b> is a pair: a process and one end it is connected to, under some fd number. When the process is created, the caller decides for each edge whether a later process (which the graph does not know about) may need that end again. It says so by keeping its hold on the end; it severs the edge by releasing its hold right after the start (E1, E2). Run itself keeps no hold after the start.</p>`,
+ nogo:`Per process node, as in the old G1. (Pre-marked Go from your notes under G1 and G2 on the old page: “The property of continuation is a property of the edge!” and “if not, this edge should be severed … immediately after the process creation”.)`,
+ refs:`Depends on: E1, E2.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R9", title:"Give each process an action, a sub reference, to run when it ends",
+ now:`<p>No such thing in 0.06.</p>`,
+ plan:`<p>A process may be given an <b>action</b>: a sub reference that the loop (L1) calls with the process’s status (R1) after reaping it. The action may start new processes, connected to some of the ends the ended process used.</p>`,
+ nogo:`The caller polls processes for their end and decides itself what to start next. (Pre-marked Go from your note under G2 on the old page: “every process node whose termination triggers some action has this action assigned to it as a subroutine reference”.)`,
+ refs:`Depends on: E2, L1.`},
+{group:"Recorded from your messages", layer:"Recorded", id:"R10", title:"Count holds on ends explicitly first; try Perl’s own reference counts later",
+ now:`<p>The old page’s G5 proposed weak references and <code>DESTROY</code>, with explicit counters as alternative B.</p>`,
+ plan:`<p>Each end has an explicit count of holds (E1). The caller takes and releases holds by method calls. When a test environment is in place, try making <code>$end-&gt;hold</code> return a small object whose <code>DESTROY</code> releases the hold, so that a closure that keeps the object keeps the edge.</p>`,
+ nogo:`Weak references and <code>DESTROY</code> from the start, as the old G5 proposed. (Pre-marked Go from your note under G5: “I think we can try to start with explicit refcounts. When a nice test environment is ready, one can try to experiment with Perl’s ones.”)`,
+ refs:`Depends on: E1.`},
+
+{group:"Recorded from your messages", layer:"Recorded", id:"R11", title:"Keep the statuses of Run’s children even when the caller has set <code>$SIG{CHLD}</code> to <code>'IGNORE'</code>",
+ now:`<p>With <code>$SIG{CHLD} = 'IGNORE'</code>, the kernel reaps every child of the process as soon as it ends, and discards its status; <code>waitpid</code> on it then fails with “No child processes”. Tested on Linux: a child started under <code>'IGNORE'</code> could not be waited for. The setting that counts is the one in force when the child ends, which may be while the caller’s own code runs, outside any call into Run.</p>`,
+ plan:`<p>While Run has children, their statuses are kept as under the default setting of <code>SIGCHLD</code>; the caller’s own setting still applies to its other children. This covers the whole time Run has live children, including the time between calls into Run, which is more than “during the processing” in your words: a child may end while the caller’s code runs. How, and the side effects: L5.</p>`,
+ nogo:`Under <code>'IGNORE'</code>, the statuses of Run’s children are lost, and L1 reports “status collected elsewhere”. (Pre-marked Go from your message of 2026-10-31, 14:08: “$SIG{CHLD} should be "effectively localized" during the processing ("hard" to do without fork()ing, though).”) If you mark L5 No-go, say in a note how R11 should be met instead.`,
+ refs:`Depends on: L5.`},
+
+{group:"Graph", layer:"Graph", id:"E1", title:"Describe the graph as processes, sources and sinks, with a held count per end",
+ now:`<p>The old page described pipe nodes with two ends. In your note under its G1 you asked whether Run even needs to know which write end belongs to which read end.</p>`,
+ plan:`<p>It does not, after creation.</p><ul><li>An <b>end</b> is one fd that the parent keeps open for its children.</li><li>A <b>source</b> is an end that children read from: a pipe’s read end, or a file opened by <code>&lt;</code>. A <b>sink</b> is an end that children write to: a pipe’s write end, or a file opened by <code>&gt;</code>, <code>&gt;|</code> or <code>&gt;&gt;</code>. A file opened by <code>&lt;&gt;</code> is both.</li><li><code>my ($src, $sink) = Run::pipe()</code> makes a pipe and returns its two ends as independent objects; nothing records that they belong together.</li><li><code>Run::open($name, $op)</code> opens a file with sh’s operator <code>$op</code>. <code>Run::inherit($n)</code> stands for the parent’s own fd <var>n</var>, which Run never closes.</li></ul><p>Each end has a <b>hold count</b>. <code>$end-&gt;hold</code> adds one, <code>$end-&gt;release</code> removes one. A new end starts with one hold, owned by its creator. Only the owner of a hold releases it; an owner may hand a hold over, for example to an action, which then owns it (E4). When the count reaches 0, Run closes the fd: it forgets the end (R6).</p>`,
+ nogo:`Keep pipe nodes as objects that own both ends, as on the old page.`,
+ refs:`<code>Run.pm</code>, new package for ends. Depends on: R10.`},
+{group:"Graph", layer:"Graph", id:"E2", title:"Start a process with <code>Run::spawn(ARGV, EDGES, ACTION)</code>",
+ now:`<p>In 0.06 a program is started with <code>new_system(…)-&gt;run</code>, or <code>new_spawn</code>, with redirections given as a list of specs.</p>`,
+ plan:`<p><code>my $proc = Run::spawn(\\@argv, {0 =&gt; $src, 1 =&gt; $sink, 2 =&gt; $err}, $action, cwd =&gt; $dir, env =&gt; \\%env)</code>:</p><ul><li>The second argument gives the <b>edges</b>: fd number to end. Each listed fd of the kid is a copy of that end; <code>undef</code> means the fd is closed in the kid. An fd 0, 1 or 2 that is not listed is the parent’s own fd 0, 1 or 2, as it is. Other fds not listed reach the kid as <code>exec</code> passes them: only if they lack the close-on-exec flag. Perl sets that flag on the fds it opens above <code>$^F</code> (normally 2), so Perl’s own handles do not reach the kid.</li><li>During the start Run holds each end once more, and drops that hold right after. So an end stays open in the parent after the start only if its owner still holds it. Keeping a hold is how the caller gives an edge a continuation (R8); releasing it right after the call severs the edge.</li><li><code>$action</code> (optional) is called by the loop with the status when the process has ended (R9).</li><li><code>cwd</code> and <code>env</code> apply to this process only. Forkless, Run changes directory around the spawn, as it already does with fds.</li><li>It returns a process object: <code>$proc-&gt;pid</code>, <code>$proc-&gt;status</code> (undef while running), <code>$proc-&gt;error</code>, <code>$proc-&gt;kill($sig)</code>. If nothing could be started, the status is -1, <code>$proc-&gt;error</code> says why (“not found”, “cannot execute”, or the error text), and the action is queued like any other (L2), with the status as its argument.</li></ul>`,
+ nogo:`Keep 0.06’s way of starting programs, inside the tree constructors.`,
+ refs:`<code>Run.pm</code>: <code>Run::spawn</code>, built on <code>spawn_nowait</code> and 0.06’s redirection code. Depends on: E1.`},
+{group:"Graph", layer:"Graph", id:"E3", title:"Keep the graph itself: each process’s edges, and each end’s live processes",
+ now:`<p>Nothing like it in 0.06.</p>`,
+ plan:`<p>Run records, for each live process, its edges, and for each end, the live processes connected to it. When a process is reaped, it leaves its ends’ lists. Uses:</p><ul><li>in forkless mode, the output of <code>$( … )</code> is complete when its sink has no holds and no live processes (P3);</li><li>a job’s <code>current_pids</code> (K2);</li><li><code>Run::graph_dump()</code>, which prints the graph, for debugging and for tests.</li></ul>`,
+ nogo:`Only hold counts are kept; P3 then needs another way to know when the output is complete.`,
+ refs:`Depends on: E1, E2.`},
+{group:"Graph", layer:"Graph", id:"E4", title:"Use this worked example as the reference case: <code>{ A || B } | C</code>",
+ now:`<p>The old page explained this case in prose only.</p>`,
+ plan:`<p>The executor would do the following. <code>$in</code>, <code>$out</code> and <code>$err</code> are <code>Run::inherit(0)</code>, <code>(1)</code> and <code>(2)</code>; <code>$finish</code> is the action that goes on after the pipeline.</p><p><code>my ($src, $sink) = Run::pipe();<br>Run::spawn(['C'], {0 =&gt; $src, 1 =&gt; $out, 2 =&gt; $err}, $finish);<br>$src-&gt;release;    # nothing after C reads the pipe: edge severed<br>Run::spawn(['A'], {0 =&gt; $in, 1 =&gt; $sink, 2 =&gt; $err}, sub {<br>&nbsp;&nbsp;my $st = shift;<br>&nbsp;&nbsp;Run::spawn(['B'], {0 =&gt; $in, 1 =&gt; $sink, 2 =&gt; $err}) unless $st;<br>&nbsp;&nbsp;$sink-&gt;release;  # nothing can follow B: edge severed<br>});<br># A’s edge to $sink keeps its continuation: the hold $sink got at creation is now owned by A’s action</code></p>`,
+ planAfter:`<p>What happens:</p><ul><li>The read end is forgotten right after C starts, so if C exits early, A gets SIGPIPE, as in sh.</li><li>If A fails, B starts on the same sink. The write end is forgotten right after B starts, or when A succeeds.</li><li>C sees end of file when the last writer has exited and A’s action has released <code>$sink</code>. That action runs only while the loop runs (L1).</li></ul>`,
+ nogo:`No reference example in the POD.`,
+ refs:`POD, new section on the graph; <code>t/graph.t</code>. Depends on: E1, E2.`},
+
+{group:"The loop", layer:"Loop", id:"L1", title:"Let one loop reap all of Run’s children, and run their actions",
+ now:`<p>In 0.06 each <code>run</code> reaps its own processes while it waits. There is no answer yet to “who reaps the children” of a job that runs in the background.</p>`,
+ plan:`<p>One loop per Perl process reaps every child that Run started, and only those (R4). Reaping is the termination event: the loop records the status, takes the process off its ends’ lists (E3), and queues its action.</p><p>The loop runs only while Perl is inside Run, in any of these:</p><ul><li>a job used as a value, or its methods (K2): the waiting ones block, and <code>poll</code>, <code>done</code> and <code>status</code> each run one round without blocking, so <code>until ($job-&gt;done) { … }</code> ends;</li><li><code>Run::wait_until($cond)</code>;</li><li>the <code>END</code> block of K3, if K3’s choice C is taken.</li></ul><p>In between, ended children stay zombies (unless L5 reaps them), and their actions wait.</p><p>A caller’s own <code>wait</code>, or <code>$SIG{CHLD} = 'IGNORE'</code>, can collect a status before Run does. <code>waitpid</code> then fails, and the action gets status -1 with <code>$proc-&gt;error</code> “status collected elsewhere” (S1 turns that into status 1 with a warning). L5 and L6 prevent most of these cases.</p>`,
+ nogo:`Each job reaps its own processes, only when that job is waited for.`,
+ refs:`<code>Run.pm</code>: the loop. Depends on: nothing (R4 decides how it waits).`},
+{group:"The loop", layer:"Loop", id:"L2", title:"Run actions from a queue, one at a time, never one inside another",
+ now:`<p>No actions in 0.06.</p>`,
+ plan:`<p>Actions (R9, and the callbacks of P1 and P2) are queued and run by the loop one after another. An action that starts something never calls the next action itself.</p><p>Why: in <code>while :; do :; done</code>, the builtin <code>:</code> finishes at once. If its action called the next one directly, Perl’s call stack would grow with every iteration until memory runs out. With the queue, the loop runs for ever in constant memory, as in sh.</p>`,
+ nogo:`Actions call each other directly, and a loop of builtins grows the stack.`,
+ refs:`<code>Run.pm</code>: the loop. Depends on: L1.`},
+{group:"The loop", layer:"Loop", id:"L3", title:"On Unix, also let the loop wait for ends to become readable",
+ now:`<p>In 0.06 the parent reads a pipe only in <code>new_readpipe</code>, by blocking until end of file.</p>`,
+ plan:`<p>On Unix (not forkless) the loop sleeps in <code>select</code> on the sources that P1 and P2 read from, as well as until SIGCHLD or the timeout (R4). Forkless, the loop waits only for processes and the timeout; P3 says how P1 and P2 work there. On Win32, <code>select</code> works only on sockets.</p>`,
+ nogo:`P1 and P2 use the forkless way (P3) everywhere, which costs a helper process per <code>read</code>.`,
+ refs:`<code>Run.pm</code>: the loop. Depends on: L1.`},
+{group:"The loop", layer:"Loop", id:"L4", title:"Ignore SIGINT and SIGQUIT in the parent while it waits for a foreground job",
+ now:`<p>Perl’s <code>system</code>, and Run 0.06, ignore SIGINT and SIGQUIT while waiting, so that Ctrl-C stops the child and not the Perl program.</p>`,
+ plan:`<p>The same while the loop waits for the job of the whole command line (S3), since the executor replaces <code>system STRING</code>. A background job (K1) does not change the signal handlers.</p>`,
+ nogo:`Signals are left alone; Ctrl-C stops the Perl program too.`,
+ refs:`Depends on: L1, S3.`},
+
+{group:"The loop", layer:"Loop", id:"L5", title:"Take over <code>$SIG{CHLD}</code> while Run has live children, acting out the caller’s setting for its other children",
+ now:`<p>Run 0.06 does not touch <code>$SIG{CHLD}</code>; R4 sets it only with <code>local</code> while the loop sleeps. A <code>local</code> cannot cover R11, because Run’s children may end while the caller’s code runs.</p>`,
+ plan:`<p>From Run’s first start of a process until its last child has been reaped, <code>SIGCHLD</code> has Run’s handler, installed with <code>POSIX::sigaction</code> and the flag <code>SA_RESTART</code>. Then Run puts the caller’s setting back. R4’s sleep uses this handler too, not an empty one, so the caller’s children that end during it are handled as below. Perl runs the handler at its next safe point, also inside the caller’s code. The handler:</p><ul><li>reaps Run’s ended children and stores their statuses for the loop (L1), without running their actions; so they also stop being zombies between calls into Run;</li><li>if the caller’s value is <code>'IGNORE'</code>: reaps every ended child with <code>waitpid(-1, WNOHANG)</code> and drops the statuses of the caller’s children, as the kernel would have done;</li><li>if it is the default: reaps only Run’s own pids, with <code>waitpid(PID, WNOHANG)</code>, and leaves the caller’s children alone;</li><li>if it is a code reference or a sub name: does the same as for the default, then calls the caller’s handler.</li></ul><p>Tested on Linux, with the caller’s <code>'IGNORE'</code>: Run’s child kept its status (3); the caller’s child was reaped and left no zombie; afterwards <code>$SIG{CHLD}</code> was <code>'IGNORE'</code> again. Without the takeover, the status of Run’s child was lost. On Win32 there is no <code>SIGCHLD</code>, and nothing changes.</p><p>Limits:</p><ul><li>Any <code>SIGCHLD</code> handler interrupts system calls. With <code>SA_RESTART</code>, the restartable ones go on (tested: <code>sysread</code> on a pipe waited its full 2 seconds while a child ended), but <code>sleep</code> and <code>select</code> still return early in the caller’s code whenever one of Run’s children ends (tested: <code>sleep 2</code> returned after 0.2 s). A handler set through <code>%SIG</code>, without that flag, would also make <code>sysread</code> fail with “Interrupted system call”.</li><li>While Run holds it, reading <code>$SIG{CHLD}</code> gives Run’s handler.</li><li>If the caller assigns <code>$SIG{CHLD}</code> in that time, Run notices only at its next call, and then takes the new value as the caller’s. A child of Run that ends in between under a newly set <code>'IGNORE'</code> is lost.</li></ul><p>Alternative B, on Unix only: start each process through a small watchman process, forked from Perl. The watchman first resets <code>SIGCHLD</code> to its default (it would inherit the caller’s <code>'IGNORE'</code>), then starts the real process, waits for it, and writes its status into a pipe. Then neither the caller’s <code>SIGCHLD</code> setting nor its <code>wait</code> calls can touch Run’s statuses, and no handler interrupts the caller’s system calls. The end of a process also becomes a readable pipe, which the loop can <code>select</code> on. It costs one extra fork per process started. Mark Go and write B in a note to use B wherever fork is used, and L5’s way in forkless mode, where B is impossible.</p>`,
+ nogo:`Run leaves <code>$SIG{CHLD}</code> alone; under <code>'IGNORE'</code> its statuses are lost (L1).`,
+ refs:`<code>Run.pm</code>: the loop. Depends on: L1.`},
+{group:"The loop", layer:"Loop", id:"L6", title:"Override Perl’s <code>wait</code> and <code>waitpid</code>, so that other code does not collect the statuses of Run’s children",
+ now:`<p>The caller can collect the status of one of Run’s children before Run does: with its own <code>wait</code>, with <code>waitpid(-1, …)</code>, or in a <code>SIGCHLD</code> handler that loops over <code>waitpid(-1, WNOHANG)</code>. Run then reports “status collected elsewhere” (L1).</p><p>Perl itself does something like this only on builds that have neither <code>waitpid</code> nor <code>wait4</code>, and on OS/2. There, its internal <code>wait4pid</code> waits for a given pid with plain <code>wait</code>, and stores the statuses of the other children it reaps on the way in <code>PL_pidstatus</code> (<code>util.c</code>, <code>pidgone</code>). Every later wait looks there first.</p>`,
+ plan:`<p>When it is loaded, Run installs <code>CORE::GLOBAL::wait</code> and <code>CORE::GLOBAL::waitpid</code>. If one of these reaps a child of Run’s, the override stores the status for Run’s loop.</p><ul><li><code>wait</code>, and <code>waitpid</code> with a pid of 0 or less (any child, or any child of a process group), then go on to the next child. With <code>WNOHANG</code>, they return 0 if nothing else has ended.</li><li><code>waitpid(PID, …)</code> for a pid of Run’s, which the caller can only know from <code>current_pids</code> (K2), returns the status to the caller and keeps a copy for Run.</li></ul><p>Tested: a script’s <code>wait</code> returned its own child (status 5), while the status of Run’s child (3) went into Run’s table.</p><p>Limits:</p><ul><li>It covers only code compiled after Run was loaded.</li><li>It does not cover C code that calls <code>waitpid</code> directly.</li><li>It does not cover <code>POSIX::wait</code> and <code>POSIX::waitpid</code> (also when imported by <code>use POSIX qw(waitpid)</code>): <code>POSIX.pm</code> calls <code>CORE::waitpid</code> directly.</li><li>Perl’s own internal waits (<code>system</code>, closing a piped <code>open</code>) wait only for their own pid where <code>waitpid</code> exists, so they never take Run’s statuses. On builds that use plain <code>wait</code> (and on OS/2) they may reap Run’s children, but the status then stays in <code>PL_pidstatus</code>, where Run’s own <code>waitpid</code> finds it.</li></ul>`,
+ nogo:`Other code can still collect the statuses of Run’s children (L1).`,
+ refs:`<code>Run.pm</code>. Depends on: L1.`},
+
+{group:"Work done in Perl", layer:"Perl", id:"P1", title:"Implement the shell’s <code>read</code> as an operation of the loop",
+ now:`<p>The spec (section 4) allows <code>read [-r] NAME…</code> with the option <code>read</code>. In sh, <code>read</code> runs in the shell itself, so its variables are set there.</p>`,
+ plan:`<p><code>Run::read_line($src, $action)</code> reads one line from the source and calls <code>$action</code> with the line, or undef at end of file. It reads one byte at a time from pipes, so that later commands still get the rest, as sh does. It never blocks the loop: it reads only when <code>select</code> says the source is readable (L3).</p><p>Why it must not block: in <code>{ A; B; } | while read l; do …; done</code> the <code>while</code> loop runs in the parent. A blocking <code>read</code> would wait for more data while A has ended, B never starts, and the pipe is never closed: a deadlock.</p>`,
+ nogo:`The executor rejects <code>read</code> (it is behind an option already).`,
+ refs:`<code>claude/shell-subset-spec.md</code>, section 4. Depends on: L2, and L3; if L3 is No-go, P1 uses P3’s way everywhere instead of being dropped.`},
+{group:"Work done in Perl", layer:"Perl", id:"P2", title:"Collect the output of <code>$( … )</code> with a capture end",
+ now:`<p>In 0.06, <code>new_readpipe</code> takes a single program and blocks until it has finished.</p>`,
+ plan:`<p><code>my ($sink, $cap) = Run::capture()</code> returns a sink to use as fd 1 of the processes inside <code>$( … )</code>, and a capture object. <code>$cap-&gt;on_done($action)</code> calls the action with the whole output. On Unix the sink is a pipe: the parent reads it whenever <code>select</code> says it is readable, so a writer never blocks on a full pipe, and the output is complete at end of file, that is, once every writer has closed it, a grandchild that Run did not start included, as in sh. Forkless, see P3. The executor then removes trailing newlines (spec section 5) and goes on expanding the word.</p>`,
+ nogo:`<code>$( … )</code> with a single program only, blocking.`,
+ refs:`Depends on: E1, and L3; if L3 is No-go, P2 uses P3’s way everywhere instead of being dropped.`},
+{group:"Work done in Perl", layer:"Perl", id:"P3", title:"Forkless, implement P1 and P2 with temporary files and a helper process",
+ now:`<p>Nothing like it in 0.06.</p>`,
+ plan:`<ul><li>Capture: the sink is a temporary file. When the sink has no holds and no live processes (E3), the parent reads the file and deletes it. Unlike sh, output that a grandchild writes later is lost.</li><li><code>read</code>: a helper process (a one-line Perl script run with <code>$^X</code>) reads one line byte by byte from the source and writes it to a temporary file. Its action passes the line on.</li></ul><p>Then the loop needs no <code>select</code>. Forkless mode on Unix uses the same code, so it is tested here. Not tested: Win32 itself.</p>`,
+ nogo:`<code>read</code> and <code>$( … )</code> are refused in forkless mode.`,
+ refs:`Depends on: P1, P2, R5.`},
+
+{group:"Jobs", layer:"Jobs", id:"K1", title:"Make a job the set of processes and actions started for one background chain or command line",
+ now:`<p>The old page defined a job as “one running tree”. There are no trees now (R7).</p>`,
+ plan:`<p><code>my $job = Run::job()</code> makes an empty job. Every process started while an action of the job runs belongs to it, unless <code>Run::spawn</code> is given <code>job =&gt; $other</code>, which wins. The executor gives each background chain its own job this way, so a chain started from the command line’s job belongs only to its own job. The executor calls <code>$job-&gt;finish($status)</code> when the chain’s last action has run. A job used in boolean, numeric or string context runs the loop until <code>finish</code> has been called (R2).</p>`,
+ nogo:`No job objects; R2 and R3 lose their basis.`,
+ refs:`Depends on: R2, L1.`},
+{group:"Jobs", layer:"Jobs", id:"K2", title:"Give jobs the methods you marked Go on the old page",
+ now:`<p>On the page “Run 0.07 Jobs” you marked these Go: J1 <code>wait1</code>, J2 <code>poll</code>, J3 <code>current_pids</code>, <code>done</code> and <code>status</code>, J4 <code>wait(TIMEOUT)</code>, J6 <code>kill</code> that also cancels, and J7 (any wait advances every job).</p>`,
+ plan:`<p>The same methods on the new jobs:</p><ul><li><code>wait1</code>: wait until at least one of the job’s processes has ended, then run what that triggers; returns their pids.</li><li><code>poll</code>: the same without blocking.</li><li><code>current_pids</code>, <code>done</code>, <code>status</code>: look at the job after one non-blocking round of the loop (L1).</li><li><code>wait(TIMEOUT)</code>: wait to completion, or return undef after the timeout.</li><li><code>kill(SIG)</code>: marks the job cancelled, then sends the signal to <code>current_pids</code>. From then on, <code>Run::spawn</code> for this job starts nothing and gives status -1 with error “cancelled”. Actions still run, so that they release their holds, and the executor stops the job at its next step, builtins included (so a killed <code>while :; do :; done &amp;</code> ends too), and calls <code>finish</code>. The job’s status is that of a process killed by that signal (the shell’s 128 plus the signal number).</li></ul><p>Every wait advances all jobs, because there is one loop (L1).</p>`,
+ nogo:`Only the overloads of R2.`,
+ refs:`Depends on: K1.`},
+{group:"Jobs", layer:"Jobs", id:"K3", title:"Keep running a job whose object is gone, and finish all jobs at program exit",
+ now:`<p>You marked the old J8 “Discuss strategy first”. In sh, a background chain goes on after the shell has exited: <code>sh -c 'sleep 1 &amp;&amp; echo b &amp;'</code> returns at once, and b is printed a second later. Without fork, nothing can start b once Perl has exited.</p>`,
+ plan:`<p>A: when the last reference to an unfinished job goes away, the job goes on, advanced by every later wait; its status is lost.</p><p>C: an <code>END</code> block runs the loop until every job has finished, so later commands of a chain still start, and only the exit of Perl comes later than sh’s would.</p><p>Instead of A, B: dropping the job waits for it there. Instead of C, D: at exit, leave the running processes alone and start nothing more. Write B or D (or both) in a note.</p>`,
+ nogo:`Dropping an unfinished job kills it, and exit waits for nothing.`,
+ refs:`Depends on: K1, L1.`},
+{group:"Jobs", layer:"Jobs", id:"K4", title:"Expand <code>$!</code> to the pid of the job’s first process",
+ now:`<p>You marked the old J9 “Discuss strategy first”. R3 makes the job the value behind <code>$!</code>. The text of <code>echo $!</code> cannot be the job used as a string, because that waits for the job (R2). In dash, <code>echo $!</code> prints the pid of the subshell that runs the chain.</p>`,
+ plan:`<p>A: <code>$job-&gt;id</code> returns the pid of the job’s first process, and <code>$!</code> expands to it.</p><ul><li>After a single background program (<code>cmd &amp;</code>), this is exactly what sh prints.</li><li>After a chain, <code>kill $!</code> stops only the first process, while dash’s stops the whole subshell. Once that process has ended, <code>kill $!</code> fails with “no such process”, or, if the system has reused the pid, hits an unrelated process.</li></ul><p>B: a job number such as <code>%1</code>. <code>kill</code> runs as the program <code>/bin/kill</code> (spec section 4), which does not know such numbers, so <code>kill $!</code> would fail. Write B in a note to choose it.</p>`,
+ nogo:`The executor rejects <code>$!</code> after a background chain.`,
+ refs:`<code>claude/shell-subset-spec.md</code>, sections 4 and 5. Depends on: R3, K1.`},
+{group:"Jobs", layer:"Jobs", id:"K5", title:"Leave per-element pipeline statuses to the executor",
+ now:`<p>You marked the old J5 (a job method <code>statuses</code>, like bash’s <code>PIPESTATUS</code>) “Discuss strategy first”. It assumed that Run knows what a pipeline is.</p>`,
+ plan:`<p>With the graph, Run does not know pipelines: each process’s action receives that process’s status (R9). The executor, which builds pipelines (S2), can keep the list of its elements’ statuses if it ever needs one. The spec needs only the last element’s status (<code>$?</code>), so nothing is added to Run.</p>`,
+ nogo:`Add <code>statuses</code> to jobs after all; the executor then tells the job which processes are pipeline elements.`,
+ refs:`Depends on: R9, S2.`},
+
+{group:"Shell layer", layer:"Shell", id:"H1", title:"Let every level of the executor take and release its own holds",
+ now:`<p>E1 says that only a hold’s owner releases it, and that a hold may be handed over. With nested structures, several levels share an end.</p>`,
+ plan:`<p>Rule: a level of the parse tree (every structure node of S2–S7: a list, a pipeline element, a background chain, a group or subshell, an <code>if</code>, <code>case</code> or loop, a <code>$( … )</code>) that passes an end down and may need it again afterwards takes its own hold with <code>$end-&gt;hold</code> before passing it down. It releases exactly that hold when no further command of it can start, or hands it over to its own action, as E4 does, which then releases it. A level never releases a hold it neither took nor was handed.</p><p>Example, <code>{ sleep 1 &amp;&amp; echo x &amp; } &gt;f</code>: the group opens f (one hold) and releases it right after starting <code>sleep</code>, since nothing else in the group follows. The background chain took its own hold on f before that, so f stays open until <code>echo x</code> has started, a second later.</p>`,
+ nogo:`Each level relies on the holds of the levels around it, and the example above loses f before <code>echo x</code> starts.`,
+ refs:`The executor. Depends on: E1.`},
+{group:"Shell layer", layer:"Shell", id:"S1", title:"Run a simple command: expand, build the edges, spawn",
+ now:`<p>Spec section 8: <code>{ argv =&gt; [...], env =&gt; [...], redir =&gt; [...] }</code>.</p>`,
+ plan:`<ul><li>The executor expands the words. If a word contains <code>$( … )</code>, the rest waits for its output (S7).</li><li>It builds the edges from the enclosing structure’s edges plus the command’s redirections, in the order written. <code>2&gt;&amp;1</code> copies whatever fd 1’s edge is at that point. <code>&gt;f</code> is <code>Run::open('f', '&gt;')</code>, and that new end is released right after the spawn.</li><li>It calls <code>Run::spawn</code> with <code>env</code>. The action sets the shell’s <code>$?</code> (0 to 255: the exit code, or 128 plus the signal number) and continues the structure.</li><li><code>exec cmd</code> runs as an ordinary command: the parser accepts it only where nothing can follow (spec B3).</li></ul><p>A status of -1 becomes, by <code>$proc-&gt;error</code>: 127 for “not found”; 1 with a warning for “status collected elsewhere” (L1); for “cancelled” (K2), no message, and the job’s kill status; and 126 otherwise, with a message such as sh’s.</p>`,
+ nogo:`The S items are the shell layer’s base; No-go drops S2–S7 too. Tell me in a note what to change instead.`,
+ refs:`The executor; spec sections 4, 6, 8. Depends on: E2.`},
+{group:"Shell layer", layer:"Shell", id:"S2", title:"Run a pipeline as one pipe per <code>|</code>, with each element’s edges kept only while it may start more",
+ now:`<p>Spec section 8: <code>[ '!', Command, … ]</code>.</p>`,
+ plan:`<ul><li>All elements are started at once: one <code>Run::pipe</code> per <code>|</code>.</li><li>A simple command’s pipe edges are severed right after its start.</li><li>A compound element (group, subshell, <code>if</code>, a loop) is handed the holds that <code>Run::pipe</code> gave for its two pipe ends, and releases them when no further command of it can start (for a loop: when the loop ends), as in E4 and H1.</li><li>Each element of a pipeline of two or more commands gets a copy of the variables, so assignments inside are lost, as the spec says.</li><li>The status is the last element’s; <code>!</code> inverts it.</li></ul>`,
+ nogo:`Pipelines with simple commands only.`,
+ refs:`Spec sections 3, 4. Depends on: S1, H1.`},
+{group:"Shell layer", layer:"Shell", id:"S3", title:"Run lists, and-or chains and background chains with actions",
+ now:`<p>Spec section 8: <code>[ AndOr, … ]</code> and <code>[ Pipeline, '&amp;&amp;' | '||', …, '&amp;' ]</code>.</p>`,
+ plan:`<ul><li>In <code>a; b</code>, <code>a &amp;&amp; b</code> and <code>a || b</code>, the list keeps its holds on its ends while a runs, because b may start on them (H1). When no further command of the list can start (in <code>a &amp;&amp; b</code>: when b has started, or when a has failed), the list releases them.</li><li>A chain ending in <code>&amp;</code> gets its own job (K1) and its own holds on the ends it shares with the structure around it (H1), with <code>/dev/null</code> as fd 0. The next chain starts at once, and <code>$!</code> becomes that job (R3).</li><li>The whole command line is one job, which the caller waits for (L4).</li></ul>`,
+ nogo:`No background chains; a single program before <code>&amp;</code> only.`,
+ refs:`Spec section 3. Depends on: S1, H1, K1.`},
+{group:"Shell layer", layer:"Shell", id:"S4", title:"Run subshells and groups in the parent, a subshell with copies of the variables and the directory",
+ now:`<p>Spec section 8: <code>{ sub =&gt; List, redir =&gt; […] }</code>, <code>{ group =&gt; List, redir =&gt; […] }</code>.</p>`,
+ plan:`<ul><li>Both: the redirections are opened once, before the first command. Every command inside is connected to them, and each releases its holds when no further command of it can start (H1). So in <code>{ a; b; } &gt;f</code>, a and b write into the same file, and f is truncated once.</li><li>A subshell: the executor gives it copies of the variables and of the current directory (a <code>cd</code> inside sets the <code>cwd</code> of later spawns, E2). <code>exit</code> inside ends only the subshell, with its status.</li><li>No fork in either case.</li></ul>`,
+ nogo:`Subshells go to <code>/bin/sh</code>.`,
+ refs:`Spec sections 4, 8. Depends on: S1, S3.`},
+{group:"Shell layer", layer:"Shell", id:"S5", title:"Run <code>if</code>, <code>while</code>, <code>until</code>, <code>for</code> and <code>case</code> with actions",
+ now:`<p>Spec section 4, “Compound commands”, all behind options.</p>`,
+ plan:`<p>Each is an action that looks at <code>$?</code> or a word and decides what to start next. A loop holds its ends (its redirections, and the pipe ends if it is a pipeline element) until no further command of it can start, which for a loop means until it ends (H1). Through L2, a loop of builtins runs in constant memory. <code>break N</code> leaves the N innermost loops; <code>continue N</code> leaves N−1 of them and starts the next iteration of the Nth.</p>`,
+ nogo:`Compound commands go to <code>/bin/sh</code>.`,
+ refs:`Spec section 4. Depends on: S3, L2.`},
+{group:"Shell layer", layer:"Shell", id:"S6", title:"Run the builtins in Perl, with their redirections applied through edges",
+ now:`<p>Spec section 4: <code>:</code>, <code>exit</code>, <code>cd</code>, assignments (<code>{ set =&gt; … }</code>), <code>break</code>, <code>continue</code>, <code>read</code>.</p>`,
+ plan:`<ul><li>None of them starts a process, except <code>read</code> in forkless mode (P3).</li><li>Redirections are opened and released like a simple command’s, so <code>: &gt;f</code> creates f. If one fails on <code>:</code> or <code>exit</code>, the shell (or the enclosing subshell, substitution, background chain or pipeline element) stops with status 2 (spec V6). On <code>read</code> it gives status 2 and the shell goes on, as in dash (bash gives 1).</li><li><code>cd</code> changes the executor’s directory, which later spawns get as <code>cwd</code>.</li><li><code>read</code> uses P1.</li><li>Each builtin finishes by queuing its continuation (L2).</li></ul>`,
+ nogo:`Builtins go to <code>/bin/sh</code>.`,
+ refs:`Spec section 4. Depends on: S1, P1, L2.`},
+{group:"Shell layer", layer:"Shell", id:"S7", title:"Expand <code>$( … )</code> through a capture, then go on with the word",
+ now:`<p>Spec section 5: <code>$( list )</code> and backquotes, “the output replaces the expansion, with trailing newlines removed”.</p>`,
+ plan:`<p>The executor runs the inner list with fd 1 connected to a capture sink (P2), as a part of the current job. P2’s action receives the text, strips trailing newlines, and continues the expansion of the word. Inside <code>$( … )</code> the variables are copies, and <code>exit</code> ends only the substitution, as the spec says.</p>`,
+ nogo:`Strings with <code>$( … )</code> go to <code>/bin/sh</code>.`,
+ refs:`Spec section 5. Depends on: P2, S3.`},
+
+{group:"Tests", layer:"Tests", id:"T1", title:"Test the graph layer and the executor in both modes",
+ now:`<p>0.06 has 389 tests, each scenario run with fork and forkless.</p>`,
+ plan:`<ul><li><code>t/graph.t</code>: holds and severing, checked with <code>Run::graph_dump</code> and with the fds open in the parent; E4’s example; SIGPIPE; end of file.</li><li><code>t/loop.t</code>: reaping, a status collected elsewhere, actions queued, a loop of 100 000 builtins in constant memory.</li><li><code>t/jobs.t</code>: K1–K4.</li><li>The executor’s tests: the ShellSubset test lists, comparing output and status with dash where the spec says they agree.</li></ul><p>Each runs with fork and forkless; then a review by a separate agent that has seen only the code and the POD.</p>`,
+ nogo:`Only the graph layer is tested.`,
+ refs:`<code>t/*.t</code>. Depends on: the items tested.`}
+];
+
+const MARKS=[["go","✓","Go","Go: implement as planned","--go"],["nogo","✗","No-go","No-go: don't implement; do what “If No-go” says","--nogo"],["discuss","◆","Discuss strategy first","Discuss strategy first: settle the strategy before deciding","--discuss"],["exfirst","?","Explain first","Explain first: a show-stopper; explain before implementing the rest","--explain"],["exlater","?","Explain later","Explain later: explain after implementing the rest","--explain"]];
+const MK=Object.fromEntries(MARKS.map(m=>[m[0],m]));
+const st={dec:{},rep:{},user:null,claude:null,filter:"all",ro:false,typing:null,typingAt:0};
+const els={};
+const $=id=>document.getElementById(id);
+const tnum=v=>typeof v==="number"?v:(typeof v==="string"?(Date.parse(v)||0):0);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function notesOf(id){const d=st.dec[id]||{};return [d.note||"",...(Array.isArray(d.fups)?d.fups:[])];}
+function seenUpTo(){return tnum(st.claude&&st.claude.seenUpTo);}
+function everyTurn(){return st.claude&&st.claude.checkMode==="every-turn";}
+function lastAsk(id){const r=st.rep[id]||{};const a=r.answers||[];if(!a.length)return null;const L=a.length-1;return (r.ask||[])[L]?L:null;}
+function yourTurnState(id){const L=lastAsk(id);if(L===null)return null;const after=(notesOf(id)[L+1]||"").trim();
+  if(!after)return "open";const d=st.dec[id]||{};if(tnum(d.updatedAt)>seenUpTo()||st.typing===id)return "unread";return null;}
+
+function build(){
+  const list=$("list");const sec={};
+  for(const gr of GROUPS){const s=document.createElement("section");s.className="grp";const h=document.createElement("div");h.className="ghead";h.dataset.g=gr.name;
+    h.innerHTML=`<h2>${gr.name}</h2>${gr.intro}`;s.appendChild(h);list.appendChild(s);sec[gr.name]=s;}
+  for(const it of ITEMS){
+    const el=document.createElement("article");el.className="item";el.id="item-"+it.id;
+    el.innerHTML=`<div class="head"><span class="iid" id="iid-${it.id}">${it.id}</span><span class="layer">${it.layer}</span><span class="ttl">${it.title}</span><span class="pill" hidden></span></div>
+<div class="sec"><span class="lab">Now</span>${it.now}${it.nowAfter||""}</div>
+<div class="sec"><span class="lab">Planned</span>${it.plan}${it.planAfter||""}</div>
+<div class="sec"><span class="lab">If No-go</span><p>${it.nogo}</p></div>
+<div class="sec"><span class="lab">Refs</span><p>${it.refs}</p></div>
+<div class="marks" role="group" aria-label="Mark ${it.id}"></div>
+<label class="remind" hidden>Remind me if we haven't returned to this: <select id="rem-${it.id}"><option value="">none</option><option value="3d">3 days</option><option value="1w">1 week</option><option value="2w">2 weeks</option></select></label>
+<div class="thread"></div>`;
+    const marks=el.querySelector(".marks");
+    for(const [k,ic,word,tip,col] of MARKS){const b=document.createElement("button");b.type="button";b.className="mk";b.style.setProperty("--c",`var(${col})`);
+      b.title=tip;b.dataset.k=k;b.setAttribute("aria-pressed","false");b.innerHTML=`<span class="ic">${ic} </span>${word}`;b.disabled=true;
+      b.addEventListener("click",()=>{const d=cur(it.id);d.decision=d.decision===k?null:k;if(d.decision!=="discuss")d.remind=d.remind||"";save(it.id,0);paint(it.id);});
+      marks.appendChild(b);}
+    el.querySelector("select").addEventListener("change",e=>{cur(it.id).remind=e.target.value;save(it.id,0);});
+    sec[it.group].appendChild(el);
+    els[it.id]={el,pill:el.querySelector(".pill"),marks,remind:el.querySelector(".remind"),thread:el.querySelector(".thread"),boxes:[],answers:[]};
+    addBox(it.id,0);
+  }
+  const fdefs=[["all","All"],["unmarked","Unmarked"],["reply","Has a reply"],["turn","Your turn"],["stop","Show-stoppers"],["explain","Explain (all)"],["discuss","Discuss strategy 1st"],["go","Go"],["nogo","No-go / defer"]];
+  for(const [k,l] of fdefs){const b=document.createElement("button");b.type="button";b.className="filt";b.dataset.f=k;b.textContent=l;b.setAttribute("aria-pressed",String(k==="all"));
+    b.addEventListener("click",()=>setFilter(k));$("filters").appendChild(b);}
+  for(const r of document.querySelectorAll('input[name="gomode"]'))r.addEventListener("change",()=>setGo(r.value));
+  $("gosel").addEventListener("change",e=>setGo(e.target.value));
+  const pl=$("plaque"),pop=$("pop");
+  const setPop=o=>{pop.hidden=!o;pl.setAttribute("aria-expanded",String(o));};
+  pl.addEventListener("click",e=>{e.stopPropagation();setPop(pop.hidden);});
+  pl.addEventListener("mouseenter",()=>setPop(true));pl.addEventListener("mouseleave",()=>{if(document.activeElement!==pl)setPop(false);});
+  document.addEventListener("click",e=>{if(!pl.contains(e.target))setPop(false);});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")setPop(false);});
+  window.addEventListener("resize",growAll);
+}
+function cur(id){if(!st.dec[id])st.dec[id]={decision:null,note:"",fups:[],remind:""};st.dec[id]={...st.dec[id]};return st.dec[id];}
+function addBox(id,i){const t=document.createElement("textarea");t.rows=1;t.id=`note-${id}-${i}`;t.placeholder=`Your note ${i+1} (optional)`;t.setAttribute("aria-label",`${id}: your note ${i+1}`);t.disabled=true;
+  t.addEventListener("input",()=>{grow(t);const d=cur(id);if(i===0)d.note=t.value;else{const f=[...(d.fups||[])];while(f.length<i)f.push("");f[i-1]=t.value;d.fups=f;}
+    st.typing=id;st.typingAt=st.typingAt||Date.now();save(id,800);paintBar();paintTags(id);});
+  t.addEventListener("blur",()=>{if(st.typing===id){}});
+  els[id].thread.appendChild(t);els[id].boxes.push(t);grow(t);}
+function grow(t){if(t.offsetParent===null)return;t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px";}
+function growAll(){for(const id in els)for(const t of els[id].boxes)grow(t);}
+
+let db=null;const queues={},timers={};
+function save(id,delay){if(st.ro||!db)return;clearTimeout(timers[id]);timers[id]=setTimeout(()=>{
+  const d=cur(id);const body={decision:d.decision||null,note:d.note||"",fups:d.fups||[],remind:d.remind||"",updatedAt:Date.now()};d.updatedAt=body.updatedAt;
+  queues[id]=(queues[id]||Promise.resolve()).then(()=>db.doc("decisions/"+id).set(body)).then(()=>{if(st.typing===id)st.typing=null;st.typingAt=0;paintBar();},err=>fail(err));},delay);}
+function setGo(v){if(st.ro||!db)return;st.user={goMode:v,updatedAt:Date.now()};paintGo();paintBar();
+  queues.__u=(queues.__u||Promise.resolve()).then(()=>db.doc("settings/user").set(st.user)).catch(fail);}
+function fail(err){if(err&&err.code==="invalid_argument"){st.ro=true;$("ro").hidden=false;$("ro").textContent="Saving is switched off: the store refused a change. Your marks are read-only in this view.";disableAll();}
+  else{$("ro").hidden=false;$("ro").textContent="A change could not be saved ("+((err&&err.code)||"error")+"). It will be retried with your next change.";}}
+function disableAll(){for(const id in els){for(const b of els[id].marks.children)b.disabled=true;for(const t of els[id].boxes)t.disabled=true;}for(const r of document.querySelectorAll('#gofs input,#gosel'))r.disabled=true;}
+function enableAll(){for(const id in els){for(const b of els[id].marks.children)b.disabled=false;for(const t of els[id].boxes)t.disabled=false;}for(const r of document.querySelectorAll('#gofs input,#gosel'))r.disabled=false;}
+
+function paint(id){
+  const e=els[id],d=st.dec[id]||{},r=st.rep[id]||{},k=d.decision;
+  e.el.className="item"+(k?" m-"+k:"");
+  for(const b of e.marks.children)b.setAttribute("aria-pressed",String(b.dataset.k===k));
+  const iid=$("iid-"+id);iid.textContent=k?`${id} ${MK[k][1]} ${MK[k][2]}`:id;
+  e.remind.hidden=k!=="discuss";const sel=$("rem-"+id);if(document.activeElement!==sel)sel.value=d.remind||"";
+  if(r.status){e.pill.hidden=false;e.pill.textContent=r.status;}else e.pill.hidden=true;
+  const ans=r.answers||[];
+  while(e.answers.length<ans.length){const i=e.answers.length;const a=document.createElement("div");a.className="ans";
+    e.thread.insertBefore(a,e.boxes[i+1]||null);e.answers.push(a);if(!e.boxes[i+1])addBox(id,i+1);if(!st.ro&&db)e.boxes[i+1].disabled=false;}
+  e.answers.forEach((a,i)=>{a.dataset.text=ans[i]||"";});
+  const notes=notesOf(id);e.boxes.forEach((t,i)=>{if(document.activeElement!==t&&t.value!==(notes[i]||"")){t.value=notes[i]||"";}grow(t);});
+  paintTags(id);
+}
+function paintTags(id){const e=els[id],r=st.rep[id]||{},ans=r.answers||[],ask=r.ask||[],L=ans.length-1,yt=yourTurnState(id);
+  e.answers.forEach((a,i)=>{let tag="";if(!ask[i])tag='<span class="tag muted">No reply needed</span>';
+    else if(i===L&&yt==="open")tag='<span class="tag turn">Your turn</span>';else if(i===L&&yt==="unread")tag='<span class="tag muted">Answered, Claude hasn’t read it yet</span>';
+    a.innerHTML=`<span class="who">Claude:</span>${tag}\n${esc(a.dataset.text)}`;linkify(a,id);});}
+function setFilter(k){st.filter=k;for(const x of $("filters").querySelectorAll(".filt"))x.setAttribute("aria-pressed",String(x.dataset.f===k));applyFilter();growAll();}
+const XRE=new RegExp("\\b("+ITEMS.map(i=>i.id).join("|")+")\\b","g");
+function linkify(root,self){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest("code,a,.iid,textarea")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  for(const n of nodes){const t=n.nodeValue;XRE.lastIndex=0;if(!XRE.test(t))continue;XRE.lastIndex=0;
+    const f=document.createDocumentFragment();let last=0,m;
+    while((m=XRE.exec(t))){if(m[1]===self)continue;f.appendChild(document.createTextNode(t.slice(last,m.index)));
+      const a=document.createElement("a");a.className="xref";a.href="#item-"+m[1];a.dataset.ref=m[1];a.textContent=m[1];a.title="Go to item "+m[1];f.appendChild(a);last=m.index+m[1].length;}
+    if(last===0)continue;f.appendChild(document.createTextNode(t.slice(last)));n.parentNode.replaceChild(f,n);}}
+function goTo(id){const e=els[id];if(!e)return;if(e.el.hidden)setFilter("all");
+  const top=e.el.getBoundingClientRect().top+window.scrollY-$("bar").offsetHeight-12;
+  const smooth=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;window.scrollTo({top,behavior:smooth?"smooth":"auto"});
+  e.el.classList.add("flash");setTimeout(()=>e.el.classList.remove("flash"),1600);
+  try{history.replaceState(null,"","#item-"+id);}catch(err){}}
+document.addEventListener("click",ev=>{const a=ev.target.closest&&ev.target.closest("a.xref");if(!a)return;ev.preventDefault();goTo(a.dataset.ref);});
+function paintGo(){const v=(st.user&&st.user.goMode)||"wait";for(const r of document.querySelectorAll('input[name="gomode"]'))r.checked=r.value===v;$("gosel").value=v;}
+function counts(){let marked=0,stop=0,expl=0,disc=0,turn=0;for(const it of ITEMS){const k=(st.dec[it.id]||{}).decision;if(k)marked++;if(k==="exfirst")stop++;if(k==="exfirst"||k==="exlater")expl++;if(k==="discuss")disc++;if(yourTurnState(it.id)==="open")turn++;}return {marked,stop,expl,disc,turn};}
+function paintBar(){
+  const c=counts();$("progress").textContent=`${c.marked} of ${ITEMS.length} marked · ${c.stop} show-stoppers · ${c.expl} to explain · ${c.disc} to discuss · ${c.turn} your turn`;
+  const stopBtn=[...$("filters").children].find(b=>b.dataset.f==="stop");if(stopBtn)stopBtn.hidden=c.stop===0;
+  const seen=seenUpTo();let oldest=Infinity;
+  for(const id in st.dec){const u=tnum(st.dec[id].updatedAt);if(u>seen&&u<oldest)oldest=u;}
+  if(st.user){const u=tnum(st.user.updatedAt);if(u>seen&&u<oldest)oldest=u;}
+  if(st.typing&&st.typingAt&&st.typingAt<oldest)oldest=st.typingAt;
+  const show=oldest!==Infinity&&!everyTurn();const pl=$("plaque");pl.hidden=!show;
+  if(show)$("plaquetxt").textContent=`Claude hasn't seen your changes since ${new Date(oldest).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}. Send any message in chat ("!" is enough) for Claude to read them.`;
+  const cl=st.claude;let t="Claude has not read your marks yet.";
+  if(cl&&cl.lastRead)t=`Claude last read your marks: ${new Date(tnum(cl.lastRead)).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}. ${cl.message||""}`;
+  if(everyTurn())t+=" Checking this page at every message (your request).";
+  $("lastread").textContent=t;
+}
+function match(id){const k=(st.dec[id]||{}).decision,r=st.rep[id]||{};switch(st.filter){
+  case "unmarked":return !k;case "reply":return (r.answers||[]).length>0;case "turn":return yourTurnState(id)!==null;
+  case "stop":return k==="exfirst";case "explain":return k==="exfirst"||k==="exlater";case "discuss":return k==="discuss";
+  case "go":return k==="go";case "nogo":return k==="nogo";default:return true;}}
+function applyFilter(){const focusEl=document.activeElement;const ITEMG={};
+  for(const it of ITEMS){const e=els[it.id];const keep=match(it.id)||(focusEl&&e.el.contains(focusEl))||st.typing===it.id;e.el.hidden=!keep;if(keep)ITEMG[it.group]=1;}
+  for(const h of document.querySelectorAll("#list .ghead"))h.hidden=!(ITEMG[h.dataset.g]||st.filter==="all");}
+function paintAll(){for(const it of ITEMS)paint(it.id);paintGo();paintBar();if(st.filter!=="turn")applyFilter();}
+
+build();
+for(const it of ITEMS){const e=els[it.id];for(const s of e.el.querySelectorAll(".ttl,.sec"))linkify(s,it.id);}
+for(const h of document.querySelectorAll("#list .ghead"))linkify(h,null);
+paintAll();
+{const h=(location.hash||"").replace(/^#item-/,"");if(h&&els[h])setTimeout(()=>goTo(h),300);}
+(async()=>{
+  try{db=await window.claude?.use?.("db");}catch(e){db=null;}
+  if(!db){$("lastread").textContent="Marks can't be loaded or saved in this view.";disableAll();return;}
+  enableAll();
+  const errCb=err=>fail(err);
+  db.collection("decisions").onSnapshot(s=>{for(const d of s.docs){if(!ITEMS.find(i=>i.id===d.id))continue;const v=d.data();
+      if(st.typing===d.id){const keep=st.dec[d.id];st.dec[d.id]={...v,note:keep.note,fups:keep.fups,decision:keep.decision,remind:keep.remind};}else st.dec[d.id]={...v};}
+    paintAll();},errCb);
+  db.collection("replies").onSnapshot(s=>{for(const d of s.docs)st.rep[d.id]={...d.data()};paintAll();},errCb);
+  db.collection("settings").onSnapshot(s=>{for(const d of s.docs){if(d.id==="user")st.user={...d.data()};if(d.id==="claude")st.claude={...d.data()};}paintAll();},errCb);
+})();
+</script>
+
+</body></html>

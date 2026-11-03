@@ -11,18 +11,26 @@ Check::supervisorctl - Check the status of supervisorctl to see if it is okay.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
+
+# the statuses supervisorctl knows of
+my @STATUSES = ( 'stopped', 'starting', 'running', 'backoff', 'stopping', 'exited', 'fatal', 'unknown' );
+
+# the values that are not a status mapping, without the _val, that parse_mappings knows of
+my @OTHER_VALS = ( 'not_running', 'config_missing', 'config_dir_missing', 'config_dir_nonreadable', 'status_error' );
 
 =head1 SYNOPSIS
 
     use Check::supervisorctl;
 
     my $check_supervisorctl = Check::supervisorctl->new();
-    ...
+    my $results = $check_supervisorctl->run;
+    print join( "\n", @{ $results->{results} } ) . "\n";
+    exit( $results->{exit} );
 
 =head1 SUBROUTINES/METHODS
 
@@ -32,8 +40,7 @@ Initiates the object.
 
     - status_mapping :: A hash of status mapping values.
         default :: {
-                stopped => 2,
-                stopped => 2,
+                stopped  => 2,
                 starting => 0,
                 running  => 0,
                 backoff  => 2,
@@ -53,6 +60,11 @@ Initiates the object.
         default :: 3
 
     - config_dir_nonreadable_val :: Value for if it the config dir is not readable.
+        default :: 3
+
+    - status_error_val :: Value for if supervisorctl status could not be run or
+            returned a line that is not a item and status, such as when it can not
+            talk to supervisord.
         default :: 3
 
     - config_check :: Boolean for if it should check the configs or not.
@@ -94,6 +106,7 @@ sub new {
 		config_missing_val         => 2,
 		config_dir_missing_val     => 3,
 		config_dir_nonreadable_val => 3,
+		status_error_val           => 3,
 		config_check               => 0,
 		ignore                     => {},
 		config_ignore              => {},
@@ -132,19 +145,17 @@ sub new {
 	} ## end if ( defined( $opts{config_ignore} ) )
 
 	# read in other status settings
-	my @other_status
-		= ( 'not_running_val', 'config_missing_val', 'config_dir_missing_val', 'config_dir_nonreadable_val' );
-	foreach my $to_read_in (@other_status) {
+	foreach my $to_read_in ( map { $_ . '_val' } @OTHER_VALS ) {
 		if ( defined( $opts{$to_read_in} ) ) {
 			if ( ref( $opts{$to_read_in} ) ne '' ) {
-				die( '$opts{' . $to_read_in . '} not a ref type of "" not "' . ref( $opts{to_read_in} ) . '"' );
+				die( '$opts{' . $to_read_in . '} not a ref type of "" not "' . ref( $opts{$to_read_in} ) . '"' );
 			}
 			if ( $opts{$to_read_in} !~ /^[0123]$/ ) {
 				die( '$opts{' . $to_read_in . '} is not 0, 1, 2, or 3, but "' . $opts{$to_read_in} . '"' );
 			}
 			$self->{$to_read_in} = $opts{$to_read_in};
 		}
-	} ## end foreach my $to_read_in (@other_status)
+	} ## end foreach my $to_read_in ( map { $_ . '_val' } @OTHER_VALS)
 
 	# read in any specified status mappings and
 	if ( defined( $opts{status_mapping} ) ) {
@@ -161,10 +172,7 @@ sub new {
 						. '"' );
 			}
 			if ( !defined( $self->{status_mapping}{$lc_status} ) ) {
-				die(      "'"
-						. $status
-						. "' is not a known status type... expected stopped, starting, running backoff, stopping, exited, fatal, unknown"
-				);
+				die( "'" . $status . "' is not a known status type... expected " . join( ', ', @STATUSES ) );
 			}
 			if ( $opts{status_mapping}{$status} !~ /^[0123]$/ ) {
 				die(      '$opts{status_mapping}{'
@@ -182,18 +190,66 @@ sub new {
 			die( '$opts{config_check} is not of ref type "" but "' . ref( $opts{config_check} ) . '"' );
 		}
 		$self->{config_check} = $opts{config_check};
-		if ( defined( $opts{config_dir} ) ) {
-			if ( ref( $opts{config_dir} ) ne '' ) {
-				die( '$opts{config_dir} is not of ref type "" but "' . ref( $opts{config_dir} ) . '"' );
-			}
-			$self->{config_dir} = $opts{config_dir};
+	}
+
+	if ( defined( $opts{config_dir} ) ) {
+		if ( ref( $opts{config_dir} ) ne '' ) {
+			die( '$opts{config_dir} is not of ref type "" but "' . ref( $opts{config_dir} ) . '"' );
 		}
-	} ## end if ( defined( $opts{config_check} ) )
+		$self->{config_dir} = $opts{config_dir};
+	}
 
 	return $self;
 } ## end sub new
 
-=pod
+=head2 parse_mappings
+
+Parses a list of status=value strings, as taken by -s for check_supervisorctl,
+into a hash of options for L</new>. Whitespace is removed.
+
+The names may be any of the statuses for status_mapping, or not_running,
+config_missing, config_dir_missing, config_dir_nonreadable, or status_error
+for the matching *_val options.
+
+Dies if one is not in the form of name=value or the name is not known. The values
+are checked by L</new>.
+
+    my %mapping_opts = Check::supervisorctl->parse_mappings( 'stopped=1', 'config_missing=1' );
+    my $checker = Check::supervisorctl->new( config_check => 1, %mapping_opts );
+
+=cut
+
+sub parse_mappings {
+	my ( $blank, @to_parse ) = @_;
+
+	my %other_vals = map { $_ => 1 } @OTHER_VALS;
+	my %statuses   = map { $_ => 1 } @STATUSES;
+
+	my %status_mapping;
+	my %to_return;
+	foreach my $mapping (@to_parse) {
+		my $cleaned = $mapping;
+		$cleaned =~ s/\s+//g;
+		my ( $name, $value ) = split( /\=/, $cleaned, 2 );
+		if ( !defined($name) || !defined($value) || $name eq '' || $value eq '' ) {
+			die( 'status mapping "' . $mapping . '" is not in the form of name=value' );
+		}
+		$name = lc($name);
+		if ( $other_vals{$name} ) {
+			$to_return{ $name . '_val' } = $value;
+		} elsif ( $statuses{$name} ) {
+			$status_mapping{$name} = $value;
+		} else {
+			die(      'status mapping "'
+					. $mapping
+					. '" is not for a known name... expected '
+					. join( ', ', @STATUSES, @OTHER_VALS ) );
+		}
+	} ## end foreach my $mapping (@to_parse)
+	$to_return{status_mapping} = \%status_mapping;
+
+	return %to_return;
+} ## end sub parse_mappings
 
 =head2 run
 
@@ -205,11 +261,18 @@ This runs it.
     print Dumper($results);
     exit($results->{exit});
 
+It optionally takes the output of 'supervisorctl status', for when it has already
+been ran by something else. If not given, 'supervisorctl status' is ran.
+
+    - status_output :: The output of 'supervisorctl status'.
+
+    my $results=$check_supervisorctl->run( status_output => $output );
+
 The returned data is as below.
 
     - .configs[] :: A array of configs found.
 
-    - .configs_not_running[] :: A array of configs present but not running.
+    - .config_not_running[] :: A array of configs present but not running.
 
     - .config_missing[] :: A array of running items was found, but no matchingly named config was found.
 
@@ -225,9 +288,9 @@ The returned data is as below.
 
     - .status.$name :: Status of each item.
 
-    - .total :: Number of configured items.
+    - .total :: Number of items found in the status output, not counting ignored ones.
 
-    - .ignored[] :: A array of ignored configs.
+    - .ignored[] :: A array of ignored items.
 
     - .ignore :: A array of items asked to be ignored.
 
@@ -237,12 +300,15 @@ The returned data is as below.
 
     - .status_list.$status :: A hash of the various statuses with keys being arrays of items for that status.
 
+    - .status_errors[] :: Lines from 'supervisorctl status' that were not a item and status,
+            such as when it can not talk to supervisord.
+
     - .results[] :: A descriptive a array of the results of the check.
 
 =cut
 
 sub run {
-	my $self = $_[0];
+	my ( $self, %opts ) = @_;
 
 	my $to_return = {
 		configs             => [],
@@ -254,54 +320,55 @@ sub run {
 		config_ignore       => [ sort( keys( %{ $self->{config_ignore} } ) ) ],
 		exit                => 0,
 		status              => {},
+		total               => 0,
 		ignored             => [],
 		ignore              => [ sort( keys( %{ $self->{ignore} } ) ) ],
 		config_dir_missing  => 0,
 		config_dir_readable => 1,
-		status_list         => {
-			stopped  => [],
-			starting => [],
-			running  => [],
-			backoff  => [],
-			stopping => [],
-			exited   => [],
-			fatal    => [],
-			unknown  => [],
-		},
-		results => []
+		status_list         => { map { $_ => [] } @STATUSES },
+		status_errors       => [],
+		results             => []
 	};
 
-	my $output       = `supervisorctl status 2> /dev/null`;
-	my @output_split = split( /\n/, $output );
+	my $output = $opts{status_output};
+	if ( !defined($output) ) {
+		$output = `supervisorctl status 2> /dev/null`;
+		# -1 is it could not be ran at all and 127 is the shell not finding it
+		if ( $? == -1 || ( $? >> 8 ) == 127 ) {
+			$self->_status_error( $to_return, 'could not run "supervisorctl status"' );
+			$output = '';
+		}
+	}
 
-	foreach my $line (@output_split) {
+	foreach my $line ( split( /\n/, $output ) ) {
+		# blank lines are not a problem
+		if ( $line =~ /^\s*$/ ) {
+			next;
+		}
 		my ( $name, $status ) = split( /\s+/, $line );
-		if ( defined($status) && defined($name) ) {
+		if ( defined($status) ) {
 			$status = lc($status);
-			if ( defined( $self->{ignore}{$name} ) ) {
-				push( @{ $to_return->{ignored} }, $name );
-			} else {
-				if ( $self->{ignore}{$name} ) {
-					push( @{ $to_return->{ignored} }, $name );
-					push( @{ $to_return->{results} }, 'IGNORED - ' . $name . ', ' . $status );
-				} else {
-					if ( defined( $self->{status_mapping}{$status} ) ) {
-						if ( $to_return->{exit} < $self->{status_mapping}{$status} ) {
-							$to_return->{exit} = $self->{status_mapping}{$status};
-						}
-						$to_return->{status}{$name} = $status;
-						push( @{ $to_return->{status_list}{$status} }, $name );
-						push(
-							@{ $to_return->{results} },
-							$self->{val_to_string}{ $self->{status_mapping}{$status} } . ' - '
-								. $name . ', '
-								. $status
-						);
-					} ## end if ( defined( $self->{status_mapping}{$status...}))
-				} ## end else [ if ( $self->{ignore}{$name} ) ]
-			} ## end else [ if ( defined( $self->{ignore}{$name} ) ) ]
-		} ## end if ( defined($status) && defined($name) )
-	} ## end foreach my $line (@output_split)
+		}
+		# anything not a item followed by a known status is a problem, such as
+		# "unix:///var/run/supervisor.sock no such file" for when supervisord is down
+		if ( !defined($status) || !defined( $self->{status_mapping}{$status} ) ) {
+			$self->_status_error( $to_return, 'supervisorctl status returned "' . $line . '"' );
+			next;
+		}
+		if ( $self->{ignore}{$name} ) {
+			push( @{ $to_return->{ignored} }, $name );
+			push( @{ $to_return->{results} }, 'IGNORED - ' . $name . ', ' . $status );
+			next;
+		}
+		$self->_raise_exit( $to_return, $self->{status_mapping}{$status} );
+		$to_return->{status}{$name} = $status;
+		$to_return->{total}++;
+		push( @{ $to_return->{status_list}{$status} }, $name );
+		push(
+			@{ $to_return->{results} },
+			$self->{val_to_string}{ $self->{status_mapping}{$status} } . ' - ' . $name . ', ' . $status
+		);
+	} ## end foreach my $line ( split( /\n/, $output ) )
 
 	# check the config dir only if asked to
 	if ( $self->{config_check} ) {
@@ -311,25 +378,34 @@ sub run {
 			eval { @dir_entries = read_dir( $self->{config_dir} ); };
 			if ($@) {
 				$to_return->{config_dir_readable} = 0;
-				if ( $to_return->{exit} < $self->{config_dir_nonreadable_val} ) {
-					$to_return->{exit} = $self->{config_dir_nonreadable_val};
-				}
-			}
+				$self->_raise_exit( $to_return, $self->{config_dir_nonreadable_val} );
+				push(
+					@{ $to_return->{results} },
+					$self->{val_to_string}{ $self->{config_dir_nonreadable_val} }
+						. ' - config dir, "'
+						. $self->{config_dir}
+						. '", not readable'
+				);
+			} ## end if ($@)
 			# if it was readable, process it
 			if ( $to_return->{config_dir_readable} ) {
-				# a lookup hash of found configs
+				# a lookup hash of found configs, including ignored ones
 				my %configs;
+				my %ignored = map { $_ => 1 } @{ $to_return->{ignored} };
 				# process each dir entry
 				foreach my $entry ( sort(@dir_entries) ) {
 					# only process items ending in .conf and that are a file.
 					if ( $entry =~ /\.conf$/ && -f $self->{config_dir} . '/' . $entry ) {
 						$entry =~ s/\.conf$//;
+						$configs{$entry} = 1;
 						if ( $self->{config_ignore}{$entry} ) {
 							push( @{ $to_return->{config_ignored} }, $entry );
 							push( @{ $to_return->{results} },        'IGNORED - config ' . $entry );
+						} elsif ( $ignored{$entry} ) {
+							# the item is ignored, so if it is running or not does not matter
+							push( @{ $to_return->{configs} }, $entry );
 						} else {
 							push( @{ $to_return->{configs} }, $entry );
-							$configs{$entry} = 1;
 							if ( !defined( $to_return->{status}{$entry} ) ) {
 								push( @{ $to_return->{config_not_running} }, $entry );
 								push(
@@ -338,45 +414,62 @@ sub run {
 										. ' - non-running config "'
 										. $entry . '"'
 								);
-								if ( $to_return->{exit} < $self->{not_running_val} ) {
-									$to_return->{exit} = $self->{not_running_val};
-								}
+								$self->_raise_exit( $to_return, $self->{not_running_val} );
 							} else {
 								push( @{ $to_return->{results} }, 'OK - config present for ' . $entry );
 							}
 						} ## end else [ if ( $self->{config_ignore}{$entry} ) ]
-
 					} ## end if ( $entry =~ /\.conf$/ && -f $self->{config_dir...})
 				} ## end foreach my $entry ( sort(@dir_entries) )
-				foreach my $running ( keys( %{ $to_return->{status} } ) ) {
+				foreach my $running ( sort( keys( %{ $to_return->{status} } ) ) ) {
 					# only check if it is missing as we already check if a running item exists for a config previously
 					if ( !$configs{$running} ) {
 						push( @{ $to_return->{config_missing} }, $running );
 						push(
 							@{ $to_return->{results} },
-							$self->{val_to_string}{ $self->{not_running_val} } . ' - missing config ' . $running
+							$self->{val_to_string}{ $self->{config_missing_val} } . ' - missing config ' . $running
 						);
+						$self->_raise_exit( $to_return, $self->{config_missing_val} );
 					}
-				} ## end foreach my $running ( keys( %{ $to_return->{status...}}))
-
+				} ## end foreach my $running ( sort( keys( %{ $to_return...})))
 			} ## end if ( $to_return->{config_dir_readable} )
 		} else {
 			$to_return->{config_dir_missing} = 1;
-			if ( $to_return->{exit} < $self->{config_dir_missing_val} ) {
-				$to_return->{exit} = $self->{config_dir_missing_val};
-				push(
-					@{ $to_return->{results} },
-					$self->{val_to_string}{ $self->{config_dir_missing_val} }
-						. ' - config dir,"'
-						. $self->{config_dir}
-						. '", missing'
-				);
-			} ## end if ( $to_return->{exit} < $self->{config_dir_missing_val...})
+			$self->_raise_exit( $to_return, $self->{config_dir_missing_val} );
+			push(
+				@{ $to_return->{results} },
+				$self->{val_to_string}{ $self->{config_dir_missing_val} }
+					. ' - config dir, "'
+					. $self->{config_dir}
+					. '", missing'
+			);
 		} ## end else [ if ( -d $self->{config_dir} ) ]
 	} ## end if ( $self->{config_check} )
 
 	return $to_return;
 } ## end sub run
+
+# raises the exit value in the passed results hash if the new one is higher
+sub _raise_exit {
+	my ( $self, $to_return, $value ) = @_;
+
+	if ( $to_return->{exit} < $value ) {
+		$to_return->{exit} = $value;
+	}
+
+	return;
+}
+
+# records a problem with supervisorctl status in the passed results hash
+sub _status_error {
+	my ( $self, $to_return, $error ) = @_;
+
+	push( @{ $to_return->{status_errors} }, $error );
+	push( @{ $to_return->{results} },       $self->{val_to_string}{ $self->{status_error_val} } . ' - ' . $error );
+	$self->_raise_exit( $to_return, $self->{status_error_val} );
+
+	return;
+}
 
 =pod
 

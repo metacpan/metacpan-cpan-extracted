@@ -3,7 +3,7 @@ package Perl::Critic::Grape;
 use strict;
 use warnings;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.4';
 
 1;
 
@@ -28,6 +28,10 @@ Built-in functions called without parentheses.
 =item L<ControlStructures::ProhibitInlineDo|Perl::Critic::Policy::ControlStructures::ProhibitInlineDo>
 
 Do not use inline do blocks.
+
+=item L<Generic::External|Perl::Critic::Policy::Generic::External>
+
+Dynamically ingest violations from external files, Copilot, ChatGPT, Claude.
 
 =item L<References::ProhibitRefChecks|Perl::Critic::Policy::References::ProhibitRefChecks>
 

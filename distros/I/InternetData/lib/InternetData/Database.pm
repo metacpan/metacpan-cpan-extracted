@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.11.4';
+our $VERSION = '1.11.5';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -50,7 +50,7 @@ sub metadata {
 
 sub metadata_p {
     my ($self, $id, %options) = @_;
-    Carp::croak('database->metadata: expected a database id') if !defined $id || !length $id;
+    Carp::croak('database->metadata: expected a database ID') if !defined $id || !length $id;
     return $self->_body_p('metadata', \%options, '/api/v2/database/metadata', id => $id);
 }
 
@@ -137,7 +137,7 @@ sub download {
 sub download_p {
     my ($self, $id, $format, $path, %options) = @_;
     # Everything a caller can get wrong is refused before the file is opened, so
-    # a mistyped id cannot leave a stray .part behind.
+    # a mistyped ID cannot leave a stray .part behind.
     _assert_database('download', $id, $format);
     $self->{client}->_check_options('database->download', \%options, 'retries');
     Carp::croak('database->download: expected a destination path')
@@ -265,7 +265,7 @@ sub _body_p {
 
 sub _assert_database {
     my ($method, $id, $format) = @_;
-    Carp::croak("database->$method: expected a database id") if !defined $id || !length $id;
+    Carp::croak("database->$method: expected a database ID") if !defined $id || !length $id;
     Carp::croak("database->$method: expected a format") if !defined $format || !length $format;
     Carp::croak("database->$method: '$format' is not a published format; expected one of "
         . join(', ', FORMATS)) unless $FORMAT{$format};
@@ -376,7 +376,7 @@ version of itself:
         ],
     }
 
-The id every other method takes is C<< $version->{id} >>, never
+The ID every other method takes is C<< $version->{id} >>, never
 C<< $family->{base} >>.
 
 =head2 metadata($id)

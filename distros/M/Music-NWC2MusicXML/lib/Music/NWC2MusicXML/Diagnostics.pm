@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.1';
+our $VERSION = '0.002.3';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -64,7 +64,7 @@ the Music::NWC2MusicXML conversion pipeline.
 
 =head1 VERSION
 
-0.001.2
+0.002.3
 
 =head1 SYNOPSIS
 

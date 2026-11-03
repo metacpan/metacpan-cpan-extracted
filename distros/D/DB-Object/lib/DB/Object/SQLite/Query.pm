@@ -306,10 +306,12 @@ sub reset_bind
 sub returning
 {
     my $self = shift( @_ );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
     if( @_ )
     {
-        my $pg_version = $self->database_object->version;
+        my $pg_version = $dbo->version;
         return( $self->error( "Cannot use returning for PostgreSQL version lower than 3.35.0 (released on 2021-03-12). This server version is: $pg_version" ) ) if( $pg_version < '3.35.0' );
         # It could be a field name or a wildcard
         return( $self->error( "A reference was provided (", ref( $_[0] ), "), but I was expecting a string, which could be a field name or even a star (*) indicating all fields." ) ) if( ref( $_[0] ) );
@@ -326,8 +328,10 @@ sub returning
 sub _query_components
 {
     my $self = shift( @_ );
-    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
     my $opts = $self->_get_args_as_hash( @_ );
+    my $type = ( @_ > 0 && lc( shift( @_ ) ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
     my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );
     $where  = $self->where();
@@ -344,7 +348,7 @@ sub _query_components
     }
     elsif( $type eq 'update' || $type eq 'delete' )
     {
-        if( $self->database_object->can_update_delete_limit )
+        if( $dbo->can_update_delete_limit )
         {
             $limit = $self->limit();
         }

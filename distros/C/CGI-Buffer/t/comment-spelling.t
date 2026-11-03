@@ -13,3 +13,25 @@ Test::Spelling::Comment->new()->add_stopwords(<DATA>)->all_files_ok();
 
 __DATA__
 TODO
+aa
+bb
+Brotli
+CHI
+compat
+ETag
+ETags
+Etag
+eTag
+etag
+htm
+html
+img
+lingua
+lru
+memGzip
+preformatted
+Satisfiable
+src
+UNzipped
+unterminated
+validator

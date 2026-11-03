@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "open_source"
    ],
@@ -46,16 +46,18 @@
             "IO::String" : "0",
             "JavaScript::Packer" : "2",
             "Readonly" : "0",
+            "Scalar::Util" : "0",
             "Storable" : "0",
             "Text::Diff" : "0",
             "Time::localtime" : "0",
-            "perl" : "5.014000"
+            "perl" : "5.026000"
          }
       },
       "test" : {
          "requires" : {
             "DateTime" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Log::Abstraction" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::TempDir::Tiny" : "0",
@@ -76,6 +78,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Buffer"
       }
    },
-   "version" : "0.88",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.89",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

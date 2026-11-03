@@ -48,7 +48,7 @@ my @m = table_lines($wm);
 ok((grep { /$V\+\S/ } @m), 'continuation lines start with the wrap mark');
 ok(!(grep { /^\s*\+/ } @m), 'the mark replaces the pad, so no line starts with it when column 1 fits');
 is($wm =~ s/\+/ /gr, $wrapped, 'the mark takes the place of one pad space');
-my $marked_fold = run("'-Mmd::config(colorize=0,table=1,rule=1,foldlist=1,foldwidth=40,table_width=40,table_wrap_mark=+)' $md")->stdout;
+my $marked_fold = run("'-Mmd::config(colorize=0,table=1,rule=1,fold=1,fold_width=40,table_width=40,table_wrap_mark=+)' $md")->stdout;
 is(join("\n", table_lines($marked_fold)), join("\n", @m), 'marked table rows are not re-folded by ansifold');
 
 # table_cell_mark marks the first line of the cells in a wrapped column,
@@ -61,7 +61,7 @@ unlike($item, qr/^\+/m, 'the first column, which did not wrap, is not marked');
 like($i[0], qr/^ key\s+$V description/, 'the header row is not marked');
 ok(!(grep { /^\s+$V/ && /\+/ } @i), 'continuation lines carry no cell mark');
 is($item =~ s/\+/ /gr, $wrapped, 'the cell mark takes the place of one pad space');
-my $item_fold = run("'-Mmd::config(colorize=0,table=1,rule=1,foldlist=1,foldwidth=40,table_width=40,table_cell_mark=+)' $md")->stdout;
+my $item_fold = run("'-Mmd::config(colorize=0,table=1,rule=1,fold=1,fold_width=40,table_width=40,table_cell_mark=+)' $md")->stdout;
 is(join("\n", table_lines($item_fold)), join("\n", @i), 'cell-marked table rows are not re-folded by ansifold');
 my $item_notrim = run("'-Mmd::config(colorize=0,table=1,rule=1,table_trim=0,table_width=40,table_cell_mark=+)' $md")->stdout;
 like($item_notrim, qr/^$V key\s+$V description/m, 'non-trim: the header row is not marked');
@@ -70,7 +70,7 @@ like($item_notrim, qr/^\x{251C}\x{2500}+\x{253C}\x{2500}+\x{2524}$/m, 'non-trim:
 is(scalar(grep { /\+\s*$/ } table_lines($item_notrim)), 0, 'non-trim: the empty border column is not marked');
 
 # ansifold must not re-fold formatted table rows (TABLE exclude pattern)
-my $folded = run("'-Mmd::config(colorize=0,table=1,rule=1,foldlist=1,foldwidth=40,table_width=200)' $md")->stdout;
+my $folded = run("'-Mmd::config(colorize=0,table=1,rule=1,fold=1,fold_width=40,table_width=200)' $md")->stdout;
 my @f = map { $strip->($_) } split /\n/, $folded;
 my ($start) = grep { $f[$_] =~ /key.*description/ } 0..$#f;
 my ($end)   = grep { $f[$_] =~ /^\s*k2\s/ } 0..$#f;

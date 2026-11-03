@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+print "web\trunning\tUp 3 hours (healthy)\n";
+print "db\trunning\tUp 3 hours (unhealthy)\n";
+print "worker\trestarting\tRestarting (1) 5 seconds ago\n";
+print "old\texited\tExited (0) 2 days ago\n";
+print "buildkit\trunning\tUp 1 hour (unhealthy)\n";

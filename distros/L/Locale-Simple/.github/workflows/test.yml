@@ -1,0 +1,73 @@
+name: Test
+
+# All six suites on every push. The local xbin/run-sibling-tests.pl skips a
+# missing toolchain; here a missing toolchain is a failure.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  perl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm --quiet --notest --installdeps --with-develop=0 .
+      - run: prove -lr t/
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python python/test.py
+
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --no-audit --no-fund
+        working-directory: js
+      - run: npm test
+        working-directory: js
+
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, json, libxml, mbstring, tokenizer, xml, xmlwriter
+          tools: composer
+      - run: composer install --no-interaction --no-progress
+      - run: composer test
+
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false   # no dependencies, so no go.sum to key a cache on
+      - run: go vet ./...
+      - run: go test -race ./go/...
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --manifest-path rust/Cargo.toml

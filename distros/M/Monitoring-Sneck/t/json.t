@@ -238,7 +238,7 @@ sub to_json_canonical {
     like( $raw, qr/^\{"data":\{.*\},"error":0,"errorString":"","version":1\}$/s, 'top-level keys sorted' );
     like(
         $raw,
-        qr/^\{"data":\{"alert":0,"alertString":"","checks":\{.*\},"critical":0,"debugs":\{\},"errored":0,"hostname":"[^"]*","ok":1,"restarted":0,"restarts":\{\},"run_time":"[\d.]+","time":"?\d+"?,"unknown":0,"vars":\{"A":"1","B":"2"\},"warning":0\}/s,
+        qr/^\{"data":\{"alert":0,"alertString":"","checks":\{.*\},"compliance":\{\},"compliance_alert":0,"compliance_alertString":"","compliance_critical":0,"compliance_errored":0,"compliance_frameworks":\{\},"compliance_ok":0,"compliance_score":null,"compliance_unknown":0,"compliance_waived":0,"compliance_warning":0,"critical":0,"debugs":\{\},"errored":0,"hostname":"[^"]*","ok":1,"restarted":0,"restarts":\{\},"run_time":"[\d.]+","time":"?\d+"?,"unknown":0,"vars":\{"A":"1","B":"2"\},"warning":0\}/s,
         'data keys sorted'
     );
     like(

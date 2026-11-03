@@ -1,13 +1,16 @@
 Changes
 lib/Check/supervisorctl.pm
+lib/Monitoring/Sneck/Checks/supervisorctl.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
 LICENSE
 t/00-load.t
+t/check.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/sneck.t
 src_bin/check_supervisorctl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

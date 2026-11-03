@@ -23,6 +23,7 @@ use warnings;
 use Test::Most;
 use Test::Returns;
 use Test::Mockingbird qw(mock_scoped);
+use Test::Permissions qw(can_revoke_read with_revoked why_not);
 use File::Temp qw(tempdir tempfile);
 use File::Spec;
 use Readonly;
@@ -184,19 +185,17 @@ subtest 'NWC::read unreadable file croaks' => sub {
 	open my $fh, '>', $file or die $!;
 	print $fh 'dummy';
 	close $fh;
-	chmod 0000, $file;
 
 	SKIP: {
-		skip 'Running as root -- permission test not meaningful', 1
-			if $> == 0;
+		skip why_not('read', $dir), 1 unless can_revoke_read($dir);
 
-		my $nwc = Music::NWC2MusicXML::NWC->new;
-		throws_ok { $nwc->read($file) }
-			qr/Cannot read file/,
-			'unreadable file: croaks file-not-found (no read permission)';
+		with_revoked(read => $file, sub {
+			my $nwc = Music::NWC2MusicXML::NWC->new;
+			throws_ok { $nwc->read($file) }
+				qr/Cannot read file/,
+				'unreadable file: croaks file-not-found (no read permission)';
+		});
 	}
-
-	chmod 0644, $file;   # restore so tempdir cleanup works
 };
 
 # Regression: NWC::read with undef previously triggered sprintf warning

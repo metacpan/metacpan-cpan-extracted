@@ -40,7 +40,7 @@ use File::Spec;
 use File::Temp  qw(tempfile);
 use Readonly;
 use Scalar::Util qw(weaken);
-use Test::Most   tests => 82;
+use Test::Most   tests => 101;
 use Test::NoWarnings;
 
 use lib 't/lib';
@@ -798,4 +798,184 @@ note('I-17: auto_load guard — Fail Fast disabled, transparent enabled');
 	my $ok = eval { my $v = $db_open->number(entry => 'one'); defined($v) };
 	ok($ok && !$@,
 		'I-17.2: auto_load => 1 (default) → column lookup via AUTOLOAD returns defined value');
+}
+
+# ---------------------------------------------------------------------------
+# INVARIANT 18: _build_joins 'on' condition form truth table
+#
+# Major Premise:  _build_joins accepts three mutually exclusive forms for 'on':
+#   F1: plain string   → emitted verbatim as the ON clause
+#   F2: hashref        → { left_col => right_col, ... } equality pairs, AND-joined,
+#                        keys sorted for deterministic output
+#   F3: arrayref[2]    → [left_col, right_col]           implies '='
+#   F4: arrayref[3]    → [left_col, operator, right_col] explicit operator
+# Guard clauses (Fail Fast — Modus Tollens):
+#   G1: hashref with unsafe left column  → croak 'unsafe on column'
+#   G2: hashref with unsafe right column → croak 'unsafe on column'
+#   G3: arrayref with wrong element count (not 2 or 3) → croak
+#   G4: arrayref with operator not in { = != <> < > <= >= } → croak
+#   G5: arrayref with unsafe left column  → croak 'unsafe on column'
+#   G6: arrayref with unsafe right column → croak 'unsafe on column'
+#
+# Logical completeness: F1+F2+F3+F4 are mutually exclusive (ref() dispatch);
+# G1-G6 cover all out-of-domain inputs within F2 and F3.
+# ---------------------------------------------------------------------------
+
+note('I-18: _build_joins on-form truth table — F1/F2/F3/F4 and guards G1-G6');
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# F1: plain string → verbatim ON clause (backward-compatibility invariant)
+	{
+		my $clause = $db->_build_joins({ table => 't', on => 'a.x = b.y' });
+		like($clause, qr/ON \(a\.x = b\.y\)/,
+			'I-18.F1: string on => emits verbatim ON clause (backward compat)');
+	}
+
+	# F2a: hashref single pair → single equality condition
+	{
+		my $clause = $db->_build_joins({ table => 't', on => { 'a.x' => 'b.y' } });
+		like($clause, qr/ON \(a\.x = b\.y\)/,
+			'I-18.F2a: hashref single pair => ON (left = right)');
+	}
+
+	# F2b: hashref two pairs → AND-joined; keys sorted for deterministic order
+	# (De Morgan: sort guarantees NOT(A OR B) — neither key can appear first randomly)
+	{
+		my $clause = $db->_build_joins({
+			table => 't',
+			on    => { 'b.second' => 'a.s', 'a.first' => 'b.f' },
+		});
+		# Sorted keys: 'a.first' < 'b.second' → a.first condition precedes b.second
+		like($clause, qr/a\.first = b\.f AND b\.second = a\.s/,
+			'I-18.F2b: hashref two pairs => conditions AND-joined in sorted key order');
+	}
+
+	# F3: arrayref 2-element → implied '='
+	{
+		my $clause = $db->_build_joins({ table => 't', on => ['a.x', 'b.y'] });
+		like($clause, qr/ON \(a\.x = b\.y\)/,
+			'I-18.F3: arrayref [left, right] => ON (left = right) with implied =');
+	}
+
+	# F4a: arrayref 3-element explicit '='
+	{
+		my $clause = $db->_build_joins({ table => 't', on => ['a.x', '=', 'b.y'] });
+		like($clause, qr/ON \(a\.x = b\.y\)/,
+			'I-18.F4a: arrayref [left, "=", right] => ON (left = right)');
+	}
+
+	# F4b: arrayref 3-element '>=' — a non-equality operator that is valid
+	{
+		my $clause = $db->_build_joins({ table => 't', on => ['a.score', '>=', 'b.min'] });
+		like($clause, qr/ON \(a\.score >= b\.min\)/,
+			'I-18.F4b: arrayref [left, ">=", right] => ON (left >= right)');
+	}
+
+	# F4c: '!=' and '<>' are both valid operator boundary values
+	{
+		my $ne = $db->_build_joins({ table => 't', on => ['a.x', '!=', 'b.y'] });
+		like($ne, qr/ON \(a\.x != b\.y\)/, 'I-18.F4c-ne: "!=" is a valid join operator');
+
+		my $ne2 = $db->_build_joins({ table => 't', on => ['a.x', '<>', 'b.y'] });
+		like($ne2, qr/ON \(a\.x <> b\.y\)/, 'I-18.F4c-ne2: "<>" is a valid join operator');
+	}
+
+	# G1: hashref — unsafe left column key → Fail Fast
+	throws_ok {
+		$db->_build_joins({ table => 't', on => { 'bad col;' => 'b.y' } })
+	} qr/unsafe on column/,
+		'I-18.G1: hashref on — unsafe left column key croaks (Fail Fast guard)';
+
+	# G2: hashref — unsafe right column value → Fail Fast
+	throws_ok {
+		$db->_build_joins({ table => 't', on => { 'a.x' => 'bad;col' } })
+	} qr/unsafe on column/,
+		'I-18.G2: hashref on — unsafe right column value croaks (Fail Fast guard)';
+
+	# G3: arrayref wrong element count (1 element — boundary below valid range)
+	throws_ok {
+		$db->_build_joins({ table => 't', on => ['a.x'] })
+	} qr/must have 2 or 3 elements/,
+		'I-18.G3a: arrayref on with 1 element (below minimum) croaks';
+
+	# G3: arrayref wrong element count (4 elements — boundary above valid range)
+	throws_ok {
+		$db->_build_joins({ table => 't', on => ['a.x', '=', 'b.y', 'extra'] })
+	} qr/must have 2 or 3 elements/,
+		'I-18.G3b: arrayref on with 4 elements (above maximum) croaks';
+
+	# G4: arrayref — operator not in the whitelist
+	throws_ok {
+		$db->_build_joins({ table => 't', on => ['a.x', 'LIKE', 'b.y'] })
+	} qr/invalid on operator/,
+		'I-18.G4: arrayref on with "LIKE" operator (not in whitelist) croaks';
+
+	# G5: arrayref — unsafe left column
+	throws_ok {
+		$db->_build_joins({ table => 't', on => ['bad col!', '=', 'b.y'] })
+	} qr/unsafe on column/,
+		'I-18.G5: arrayref on — unsafe left column croaks';
+
+	# G6: arrayref — unsafe right column
+	throws_ok {
+		$db->_build_joins({ table => 't', on => ['a.x', '=', 'bad;col'] })
+	} qr/unsafe on column/,
+		'I-18.G6: arrayref on — unsafe right column croaks';
+}
+
+# ---------------------------------------------------------------------------
+# INVARIANT 19: AUTOLOAD '_'-prefix security gate (SEC7)
+#
+# Major Premise:  Line 4126 returns immediately when the column name extracted
+#                 from $AUTOLOAD begins with '_', BEFORE any other check.
+# Major Premise (ordering invariant):
+#   The '_'-prefix guard fires at line 4126.
+#   The auto_load => 0 guard fires at line 4133.
+#   Therefore: '_'-prefixed calls return silently on BOTH auto_load=0 and
+#   auto_load=1 objects.  They are NEVER dispatched as column lookups regardless
+#   of the auto_load setting.
+#
+# Logical form (Modus Ponens on guard ordering):
+#   P1: guard ORDER is: DESTROY → '_'-prefix → auto_load=0 → column lookup
+#   P2: '_'-prefix guard returns before reaching auto_load=0 guard
+#   C:  calling $db->_anything on an auto_load=0 object does NOT croak
+#       "AUTOLOAD disabled" — it silently returns instead
+#
+# Security corollary: an attacker who crafts a method name starting with '_'
+# can NEVER exfiltrate column data via the AUTOLOAD column-shortcut path.
+# ---------------------------------------------------------------------------
+
+note('I-19: AUTOLOAD "_"-prefix security gate — SEC7 guard fires before all other checks');
+
+{
+	# T1: auto_load=1 (default) — '_'-prefixed method returns silently (no croak)
+	{
+		my $db = Database::test1->new({ directory => $DATA_DIR });
+		my $ok = eval { $db->_no_such_column(entry => 'one'); 1 };
+		ok($ok && !$@,
+			'I-19.T1: auto_load=1 — "_"-prefixed method returns silently, no croak');
+	}
+
+	# T2: auto_load=0 — '_'-prefix guard fires BEFORE the auto_load guard,
+	#     so calling $db->_anything does NOT produce "AUTOLOAD disabled"
+	{
+		my $db = Database::test1->new({ directory => $DATA_DIR, auto_load => 0 });
+		my @warns;
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		my $ok = eval { $db->_no_such_column(entry => 'one'); 1 };
+		ok($ok && !$@,
+			'I-19.T2: auto_load=0 — "_"-prefix guard fires before auto_load guard; no croak');
+	}
+
+	# T3: return value is undef — no column data leaked
+	{
+		my $db = Database::test1->new({ directory => $DATA_DIR });
+		$db->count();    # trigger slurp so data is in memory
+		ok(ref($db->{'data'}), 'I-19.T3 precondition: data is slurped');
+		my $leaked = $db->_number(entry => 'one');
+		ok(!defined($leaked),
+			'I-19.T3: "_"-prefixed call returns undef — column data is NOT leaked');
+	}
 }

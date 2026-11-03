@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.8.0
+#                   and LibVirt version v12.9.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,14 +18,14 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt::Domain v0.6.8;
+class Sys::Async::Virt::Domain v0.6.9;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::TypedParams v12.8.0;
-use Protocol::Sys::Virt::URI v12.8.0;
-use Protocol::Sys::Virt::Remote::XDR v12.8.0;
+use Protocol::Sys::Virt::TypedParams v12.9.0;
+use Protocol::Sys::Virt::URI v12.9.0;
+use Protocol::Sys::Virt::Remote::XDR v12.9.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -651,6 +651,7 @@ use constant {
     EVENT_DEFINED_FROM_SNAPSHOT                                       => 3,
     EVENT_UNDEFINED_REMOVED                                           => 0,
     EVENT_UNDEFINED_RENAMED                                           => 1,
+    EVENT_UNDEFINED_MIGRATED                                          => 2,
     EVENT_STARTED_BOOTED                                              => 0,
     EVENT_STARTED_MIGRATED                                            => 1,
     EVENT_STARTED_RESTORED                                            => 2,
@@ -683,6 +684,7 @@ use constant {
     EVENT_SHUTDOWN_FINISHED                                           => 0,
     EVENT_SHUTDOWN_GUEST                                              => 1,
     EVENT_SHUTDOWN_HOST                                               => 2,
+    EVENT_SHUTDOWN_GUEST_RESET                                        => 3,
     EVENT_PMSUSPENDED_MEMORY                                          => 0,
     EVENT_PMSUSPENDED_DISK                                            => 1,
     EVENT_CRASHED_PANICKED                                            => 0,
@@ -2396,7 +2398,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.6.8
+v0.6.9
 
 =head1 SYNOPSIS
 
@@ -4979,6 +4981,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item EVENT_UNDEFINED_RENAMED
 
+=item EVENT_UNDEFINED_MIGRATED
+
 =item EVENT_STARTED_BOOTED
 
 =item EVENT_STARTED_MIGRATED
@@ -5042,6 +5046,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item EVENT_SHUTDOWN_GUEST
 
 =item EVENT_SHUTDOWN_HOST
+
+=item EVENT_SHUTDOWN_GUEST_RESET
 
 =item EVENT_PMSUSPENDED_MEMORY
 

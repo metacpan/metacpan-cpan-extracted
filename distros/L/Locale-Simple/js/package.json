@@ -1,14 +1,14 @@
 {
   "name": "locale-simple",
-  "version": "0.0.21",
-  "description": "Tiny gettext wrapper with sprintf-style helpers (l, ln, lp, ld, …) — same API as the Perl and Python siblings, so one .po file feeds all three runtimes. ESM + CJS + types, zero runtime deps.",
+  "version": "0.200.0",
+  "description": "Tiny gettext wrapper with sprintf-style helpers (l, ln, lp, ld, …) — same API as the Perl, Python, PHP, Go and Rust siblings, so one .po file feeds all six runtimes. ESM + CJS + types, zero runtime deps.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
@@ -54,6 +54,7 @@
   },
   "homepage": "https://github.com/Getty/locale-simple#readme",
   "devDependencies": {
-    "rollup": "^4.0.0"
+    "@rollup/wasm-node": "^4.0.0",
+    "typescript": "^6.0.3"
   }
 }

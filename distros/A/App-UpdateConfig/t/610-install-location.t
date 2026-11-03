@@ -46,6 +46,9 @@ int main(int argc, char **argv) {
 EOC
 gcc -std=c99 -o /usr/local/bin/sudo /tmp/sudo.c && chmod 4755 /usr/local/bin/sudo
 touch /tmp/sudo.log && chmod 666 /tmp/sudo.log
+# The program runs through `su -`, which resets the environment, so the option
+# of cpanm set by run_in_container is also set in the login profile.
+echo 'export PERL_CPANM_OPT=--notest' >> /etc/profile
 cpanm -q -n local::lib
 useradd -m test
 mkdir -p /home/test/.config

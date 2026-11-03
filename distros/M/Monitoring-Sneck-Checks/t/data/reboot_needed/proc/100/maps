@@ -1,0 +1,2 @@
+7f00-7f01 r-xp 00000000 08:01 1234 /usr/lib/x86_64-linux-gnu/libssl.so.3 (deleted)
+7f02-7f03 r-xp 00000000 08:01 1235 /usr/lib/x86_64-linux-gnu/libc.so.6

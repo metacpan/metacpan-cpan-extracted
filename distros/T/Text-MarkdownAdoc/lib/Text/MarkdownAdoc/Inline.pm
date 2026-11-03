@@ -204,6 +204,12 @@ sub _format_link
 # Reference-style links → placeholders
 #===========================================================================
 
+# Placeholder layout: \x00REFLINK:<label>\x02<display>\x02<form>\x00
+# The form is "s" (shorthand), "c" (collapsed) or "f" followed by the raw
+# label (full). The raw label carries no brackets here so that the shorthand
+# pass cannot mistake it for a reference of its own.
+# Refs.pm uses it to restore the source text when no definition exists,
+# because brackets without a definition are literal text.
 sub _convert_reference_links
 {
    my ($text) = @_;
@@ -219,6 +225,7 @@ sub _convert_reference_links
     }{
         my $link_text = $1;
         my $ref_label = $2;
+        my $form      = $ref_label eq q{} ? q{c} : "f$ref_label";
 
         $link_text =~ s/\\\[/[/g;
         $link_text =~ s/\\\]/]/g;
@@ -231,7 +238,7 @@ sub _convert_reference_links
         $normalized =~ s/\s+/ /g;
         $normalized =~ s/^\s+|\s+$//g;
 
-        "\x00REFLINK:$normalized:$link_text\x00";
+        "\x00REFLINK:$normalized\x02$link_text\x02$form\x00";
     }xeg;
 
    # [ref] (shorthand, but NOT followed by '(' which would be an inline link)
@@ -248,7 +255,7 @@ sub _convert_reference_links
         $normalized =~ s/\s+/ /g;
         $normalized =~ s/^\s+|\s+$//g;
 
-        "\x00REFLINK:$normalized:$ref_label\x00";
+        "\x00REFLINK:$normalized\x02$ref_label\x02s\x00";
     }xeg;
 
    return $text;

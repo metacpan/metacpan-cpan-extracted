@@ -12,7 +12,7 @@ eval { require DBI; require DBD::SQLite };
 if ($@) {
 	plan skip_all => 'DBD::SQLite not available';
 } else {
-	plan tests => 18;
+	plan tests => 25;
 }
 
 {
@@ -120,6 +120,59 @@ throws_ok {
 		join => { table => 'dept' }
 	);
 } qr/missing "on"/, 'join without on throws';
+
+# ---- Perl-native on: hashref equality ----
+
+$rows = $db->selectall_arrayref(
+	join => { table => 'dept', on => { 'jointest.dept_id' => 'dept.id' }, type => 'INNER' }
+);
+is(scalar @{$rows}, 3, 'hashref on: INNER JOIN returns 3 rows');
+
+# ---- Perl-native on: arrayref 2-element (implied =) ----
+
+$rows = $db->selectall_arrayref(
+	join => { table => 'dept', on => [ 'jointest.dept_id', 'dept.id' ], type => 'INNER' }
+);
+is(scalar @{$rows}, 3, 'arrayref on (2-element): INNER JOIN returns 3 rows');
+
+# ---- Perl-native on: arrayref 3-element (explicit operator) ----
+
+$rows = $db->selectall_arrayref(
+	join => { table => 'dept', on => [ 'jointest.dept_id', '=', 'dept.id' ], type => 'INNER' }
+);
+is(scalar @{$rows}, 3, 'arrayref on (3-element, =): INNER JOIN returns 3 rows');
+
+# ---- Validation: hashref on — unsafe left column ----
+
+throws_ok {
+	$db->selectall_arrayref(
+		join => { table => 'dept', on => { 'bad col!' => 'dept.id' } }
+	);
+} qr/unsafe on column/, 'hashref on: unsafe left column throws';
+
+# ---- Validation: hashref on — unsafe right column ----
+
+throws_ok {
+	$db->selectall_arrayref(
+		join => { table => 'dept', on => { 'jointest.dept_id' => 'bad col!' } }
+	);
+} qr/unsafe on column/, 'hashref on: unsafe right column throws';
+
+# ---- Validation: arrayref on — invalid operator ----
+
+throws_ok {
+	$db->selectall_arrayref(
+		join => { table => 'dept', on => [ 'jointest.dept_id', 'LIKE', 'dept.id' ] }
+	);
+} qr/invalid on operator/, 'arrayref on: invalid operator throws';
+
+# ---- Validation: arrayref on — wrong element count ----
+
+throws_ok {
+	$db->selectall_arrayref(
+		join => { table => 'dept', on => [ 'jointest.dept_id' ] }
+	);
+} qr/must have 2 or 3 elements/, 'arrayref on: wrong element count throws';
 
 # ---- BerkeleyDB: joins must croak ----
 

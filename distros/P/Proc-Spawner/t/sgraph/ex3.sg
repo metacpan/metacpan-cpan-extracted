@@ -1,0 +1,10 @@
+# two producers into one pipe, a reader of two pipes on fds 3 and 4, all stderr to one logger
+pipe a
+pipe b
+pipe log
+file out > report.txt
+P1: gen-x | 1>a.w 2>log.w
+P2: gen-y | 1>a.w 2>log.w
+P3: gen-z | 1>b.w 2>log.w
+P4: paste /dev/fd/3 /dev/fd/4 | 3<a.r 4<b.r 1>out 2>log.w
+P5: logger -t job | 0<log.r

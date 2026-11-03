@@ -1,5 +1,13 @@
 Revision history for Check-SuricataFlows
 
+0.3.0   2026-11-02/11:45
+        - Add Monitoring::Sneck::Checks::suricata_flows, for running it in process from sneck as
+          perl:suricata_flows. Monitoring::Sneck::Checks is needed if calling this inline from sneck
+          is desired.
+        - Flows without .host no longer warn about a uninitialized value.
+        - The error for a sensor_names entry that is a ref now names sensor_names, not flow_file.
+        - check_suricataflows --version now says check_suricataflows and prints the version.
+
 0.2.0   2026-02-18/10:00
         - Add IP based ignore capabilities.
 

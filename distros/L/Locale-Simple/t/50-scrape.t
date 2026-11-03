@@ -15,7 +15,7 @@ done_testing;
 sub run {
     #$ENV{TEST_REGRESSION_GEN}++;
 
-    my @default = qw(--ignore blib --ignore \.build --ignore python --ignore js --ignore node_modules --ignore xbin --ignore setup.py --ignore release-pod-syntax\.t --ignore author-pod-syntax\.t --ignore Locale-Simple- --ignore n-fixtures);
+    my @default = qw(--ignore blib --ignore \.build --ignore python --ignore js --ignore node_modules --ignore xbin --ignore ^scripts/ --ignore setup.py --ignore release-pod-syntax\.t --ignore ^t/author- --ignore ^xt/ --ignore Locale-Simple- --ignore n-fixtures --ignore arg-fixtures --ignore escape-fixtures --ignore literal-fixtures --ignore utf8-fixtures --ignore ^\.claude --ignore ^misc/agent-context/ --ignore ^t/release- --ignore ^php/ --ignore ^go/ --ignore ^rust/ --ignore vendor);
     my @groups  = (
         { desc => "base test",                  argv => \@default, },
         { desc => "force error on wrong quote", argv => [ @default, qw(--pl 1pl --only 1pl) ], },
@@ -43,7 +43,7 @@ sub test_group {
             return "died";
         };
     };
-    $res{$_} =~ s/\Q$basedir\E//g for qw(out err);
+    $res{err} =~ s/\Q$basedir\E//g;
     $res{err} =~ s/discarded \d+ characters of noise/discarded COUNT characters of noise/g;
     $res{err} =~ s/- found func (\w+) at line \d+/- found func $1 at line LINE/g;
     $res{out} =~ s/\.pm:\d+/\.pm:LINE/g;

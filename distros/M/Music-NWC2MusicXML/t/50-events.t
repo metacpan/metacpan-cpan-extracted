@@ -212,6 +212,63 @@ sub parse_nwctxt {
 	like $xml, qr/<beat-unit-dot\/>/,  'beat-unit-dot present for dotted value';
 }
 
+# Tempo Text field parsed and stored
+{
+	my $score = parse_nwctxt('|Tempo|Tempo:92|Text:"With Expression"');
+	my @evs = grep { $_->type eq 'Tempo' } @{ $score->staves->[0]->events };
+	is scalar @evs, 1, 'one Tempo event parsed with Text field';
+	is $evs[0]->data->{text}, 'With Expression', 'Tempo Text field stored';
+}
+
+# Tempo with no Text field defaults to empty string
+{
+	my $score = parse_nwctxt('|Tempo|Tempo:120|Base:Quarter');
+	my @evs = grep { $_->type eq 'Tempo' } @{ $score->staves->[0]->events };
+	is $evs[0]->data->{text}, '', 'Tempo text defaults to empty string when absent';
+}
+
+# Tempo Text emitted as <words> before <metronome> in MusicXML output
+{
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Tempo',
+		data => { bpm => 92, base => 'Quarter', text => 'With Expression' },
+	));
+
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+
+	my $xml = Music::NWC2MusicXML::MusicXML->new->generate($score);
+	like $xml, qr/<words font-style="italic">With Expression <\/words>/,
+		'Tempo text emitted as italic words with trailing space';
+	like $xml, qr/<words[^>]*>With Expression.*?<metronome/s,
+		'Tempo text appears before metronome element';
+	like $xml, qr/<metronome parentheses="yes">/,
+		'metronome uses parentheses when text is present';
+}
+
+# Tempo without Text does not emit <words>
+{
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'Tempo',
+		data => { bpm => 120, base => 'Quarter' },
+	));
+
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+
+	my $xml = Music::NWC2MusicXML::MusicXML->new->generate($score);
+	unlike $xml, qr/<words/, 'no <words> element when Tempo has no text';
+	like $xml, qr/<metronome parentheses="no">/, 'metronome has no parentheses when text absent';
+}
+
 # ---------------------------------------------------------------------------
 # Articulation emission
 # ---------------------------------------------------------------------------
@@ -379,6 +436,11 @@ sub score_with_tempo_variance {
 {
 	my $xml = score_with_tempo_variance('Ritardando');
 	like $xml, qr/<words[^>]*>rit\.<\/words>/,    'Ritardando emitted as rit.';
+}
+
+{
+	my $xml = score_with_tempo_variance('Ritenuto');
+	like $xml, qr/<words[^>]*>rit\.<\/words>/,    'Ritenuto emitted as rit.';
 }
 
 {

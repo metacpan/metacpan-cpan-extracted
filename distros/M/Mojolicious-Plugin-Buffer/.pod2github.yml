@@ -1,0 +1,5 @@
+# pod2github settings for README.md
+# Title-casing would rewrite identifiers in headings, such as
+# buffer_is_cached -> Buffer_Is_Cached and API SPECIFICATION -> Api
+# Specification, so the headings are kept exactly as the POD has them.
+title_case: 0

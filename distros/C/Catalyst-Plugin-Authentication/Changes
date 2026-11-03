@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::Plugin::Authentication
 
+0.10029 - 2026-11-02
+    - Use secure comparison for the legacy verifying (CVE-2026-74846)
+
 0.10028 - 2026-08-08
     - fix warnings when authenticating and no password is stored
     - fix return value from Catalyst::Authentication::User::Hash->can

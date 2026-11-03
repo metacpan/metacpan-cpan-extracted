@@ -1,0 +1,108 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config require_order no_ignore_case bundling);
+use Pod::Usage;
+use Monitoring::Sneck::Checks;
+
+=head1 NAME
+
+sneck_check - runs a Monitoring::Sneck::Checks check from the shell
+
+=head1 SYNOPSIS
+
+sneck_check [B<-t> <seconds>] [B<-a>] <check> [<args>...]
+
+sneck_check B<-h>|B<--help> [<check>]
+
+sneck_check <check> B<-h>|B<--help>
+
+sneck_check B<-l>|B<--list-checks>
+
+=head1 DESCRIPTION
+
+Runs a check the same as sneck does for perl:<check>, prints its
+output, and exits with its code, so it can also be used as a nagios
+plugin. A check that can not be loaded, -1 for sneck, exits 3.
+
+=head1 FLAGS
+
+=head2 -t <seconds>
+
+Seconds to give it.
+
+Default :: 30
+
+=head2 -a
+
+Print stdout and then stderr, labeled, instead of the two combined.
+
+=head2 -h, --help
+
+Print this, or the docs for the check if one is given, what it is for
+and the options it takes. Before or after the check is the same.
+
+=head2 -l, --list-checks
+
+List the checks that can be found, one a line, with what each is for.
+
+=head1 EXAMPLES
+
+    sneck_check http -H www.example.org -S -w 1 -c 2
+    sneck_check -t 10 https_cert -H www.example.org -w 30 -c 14
+    sneck_check --help https_cert
+    sneck_check --list-checks
+
+=cut
+
+my $timeout = 30;
+my $apart;
+my $help;
+my $list;
+GetOptions( 't=s' => \$timeout, 'a' => \$apart, 'help|h' => \$help, 'list-checks|l' => \$list )
+	or pod2usage( -exitval => 3, -verbose => 1 );
+if ($list) {
+	my $checks = Monitoring::Sneck::Checks->list;
+	foreach my $name ( sort( keys( %{$checks} ) ) ) {
+		print $name . ( $checks->{$name} eq '' ? '' : ' :: ' . $checks->{$name} ) . "\n";
+	}
+	exit(0);
+}
+my $check = shift(@ARGV);
+
+# require_order leaves everything after the check alone, so a -h after it is looked for here
+if ( defined($check) && grep { $_ eq '-h' || $_ eq '--help' } @ARGV ) {
+	$help = 1;
+}
+if ($help) {
+	pod2usage( -exitval => 0, -verbose => 2 ) if !defined($check);
+	my $module = eval { Monitoring::Sneck::Checks->load($check) };
+	if ( !defined($module) ) {
+		print STDERR $@;
+		exit(3);
+	}
+	my $file = $INC{ 'Monitoring/Sneck/Checks/' . $check . '.pm' };
+	pod2usage(
+		-input    => $file,
+		-exitval  => 'NOEXIT',
+		-verbose  => 99,
+		-sections => 'NAME|SYNOPSIS|DESCRIPTION|OPTIONS'
+	);
+	pod2usage(
+		-input    => $INC{'Monitoring/Sneck/Checks/base.pm'},
+		-exitval  => 0,
+		-verbose  => 99,
+		-sections => 'COMMON OPTIONS'
+	);
+} ## end if ($help)
+pod2usage( -exitval => 3, -verbose => 1 ) if !defined($check);
+
+my $return = Monitoring::Sneck::Checks->run( check => $check, args => [@ARGV], timeout => $timeout );
+if ($apart) {
+	print 'stdout:' . "\n" . $return->{stdout} . 'stderr:' . "\n" . $return->{stderr};
+} else {
+	print $return->{combined};
+}
+
+exit( $return->{code} == -1 ? 3 : $return->{code} );

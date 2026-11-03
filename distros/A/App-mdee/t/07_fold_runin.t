@@ -17,6 +17,7 @@ use t::Util;
 $ENV{HOME} = File::Temp::tempdir(CLEANUP => 1);
 
 my($fh, $md) = tempfile(SUFFIX => '.md', UNLINK => 1);
+binmode $fh, ':encoding(utf-8)';
 # "- " + 14 double-width chars = 30 columns, then "。" (2 columns)
 print $fh "- " . ("あ" x 14) . "。" . ("い" x 10) . "。\n";
 close $fh;
@@ -34,7 +35,7 @@ sub max_width {
 
 for my $case ([ 0, 30 ], [ 2, 32 ], [ 4, 32 ]) {
     my($run, $want) = @$case;
-    my $out = run("'-Mmd::config(colorize=0,foldlist=1,foldwidth=30,fold_runin=$run,fold_runout=$run)' $md")->stdout;
+    my $out = run("'-Mmd::config(colorize=0,fold=1,fold_width=30,fold_runin=$run,fold_runout=$run)' $md")->stdout;
     is(max_width($out), $want, "fold_runin=$run: widest line is $want columns");
 }
 

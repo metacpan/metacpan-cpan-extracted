@@ -1,0 +1,63 @@
+        -:    0:Source:src/helper.c
+        -:    0:Graph:src/helper.gcno
+        -:    0:Data:src/helper.gcda
+        -:    0:Runs:5
+        -:    1:#include "spike.h"
+        -:    2:
+function spike_helper_switch called 3 returned 100% blocks executed 83%
+        3:    3:int spike_helper_switch(int n)
+        -:    4:{
+        3:    5:    switch (n) {
+        3:    5-block 2
+branch  0 taken 1
+branch  1 taken 1
+branch  2 taken 0
+branch  3 taken 1
+        1:    6:    case 0:
+        1:    7:        return spike_only_helper(0);
+        1:    7-block 3
+call    0 returned 1
+        1:    8:    case 1:
+        1:    9:        return 10;
+        1:    9-block 4
+    #####:   10:    case 2:
+    #####:   11:        return 20;
+    %%%%%:   11-block 5
+        1:   12:    default:
+        1:   13:        return spike_square(n);
+        1:   13-block 6
+call    0 returned 1
+        -:   14:    }
+        -:   15:}
+        -:    0:Source:include/spike.h
+        -:    0:Graph:src/helper.gcno
+        -:    0:Data:src/helper.gcda
+        -:    0:Runs:5
+        -:    1:#ifndef SPIKE_H
+        -:    2:#define SPIKE_H
+        -:    3:
+function spike_square called 1 returned 100% blocks executed 75%
+        1:    4:static inline int spike_square(int x)
+        -:    5:{
+        1:    6:    if (x < 0)
+        1:    6-block 2
+branch  0 taken 0 (fallthrough)
+branch  1 taken 1
+condition outcomes covered 1/2
+condition  0 not covered (true)
+    #####:    7:        x = -x;
+    %%%%%:    7-block 3
+        1:    8:    return x * x;
+        1:    8-block 4
+        -:    9:}
+        -:   10:
+function spike_only_helper called 1 returned 100% blocks executed 100%
+        1:   11:static inline int spike_only_helper(int x)
+        -:   12:{
+        1:   13:    return x + 1;
+        1:   13-block 2
+        -:   14:}
+        -:   15:
+        -:   16:int spike_helper_switch(int n);
+        -:   17:
+        -:   18:#endif

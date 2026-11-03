@@ -1,0 +1,44 @@
+head -2 /etc/passwd | while IFS=: read user x uid rest; do echo "$user $uid"; done
+{ read a <&5 | read b <&5; echo done; } 5</etc/passwd
+{ read a <&5; echo "A=$a" | cut -c1-6 >&2; } 5</etc/passwd | { read b <&5; echo "B=$b"| cut -c1-6 >&2; } 5</etc/hostname; echo done
+for i in 1 2; do for j in a b; do echo $i$j; [ $j = a ] && continue 2; done; done
+for i in 1 2; do for j in a b; do echo $i$j; break 2; done; echo no; done; echo $?
+for i in 1 2; do { for j in a b; do echo $i$j; break 2; done; } >/dev/null; echo no; done; echo end
+for i in 1 2; do while :; do echo $i; continue 2; done; done
+yes | { head -1; nosuch; }; echo st=$?
+nosuch | cat; echo st=$?
+cat /etc/hostname | wc -l >/nonexistent/x; echo st=$?
+echo a | { cat; } 2>/nonexistent/x; echo st=$?
+{ echo a; echo b; } | { read x; exit 5; }; echo st=$?
+yes | { exit 3; }; echo st=$?
+x=$(exit 4; echo no); echo "[$x] st=$?"
+x=$(for i in 1 2; do echo $i; exit 6; done); echo "[$x] st=$?"
+x=$(echo $((1/0)); echo after); echo "[$x] st=$?"
+(echo $((1/0)); echo after); echo st=$?
+echo a | (echo $((1/0)) ; echo after); echo st=$?
+for i in $((1/0)); do echo $i; done; echo after
+case $((1/0)) in *) echo x;; esac; echo after
+cd $((1/0)); echo after
+x=$((1/0)); echo after
+{ echo a; exit 3; echo b; } | cat; echo st=$?
+( exit 3 ) | cat; echo ${?}
+(exit 3) && echo no || echo st=$?
+! { exit 3; } | cat; echo st=$?
+while read l; do echo "<$l>"; done </etc/hostname
+while read l; do echo "<$l>"; cat; done <<<x
+while read l; do echo "<$l>"; head -1; done </etc/passwd | cut -c1-10
+read a b </dev/null; echo st=$? "[$a]"
+read a <&-; echo st=$?
+read a </nonexistent; echo st=$?
+read a; echo "st=$? [$a]"
+exit 3 >/nonexistent/x; echo after
+: >/nonexistent/x; echo after
+{ :; } >/nonexistent/x; echo after
+true >/nonexistent/x; echo after $?
+(exit 2 >/nonexistent/x); echo after $?
+echo a 2>/dev/null >/nonexistent/x; echo st=$?
+{ echo a 2>/dev/null >/nonexistent/x; } 2>&1 | wc -c
+{ cd /nonexistent; } 2>/dev/null; echo st=$?
+cd /etc; ./passwd; echo $?
+/etc; echo $?
+/etc/passwd; echo $?

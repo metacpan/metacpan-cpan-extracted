@@ -18,6 +18,8 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Monitoring::Sneck::Checks: v0.0.1
 requires:
   File::ReadBackwards: '0'
   JSON: '0'
@@ -27,5 +29,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Check-SuricataFlows
-version: v0.2.0
+version: v0.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

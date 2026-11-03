@@ -98,7 +98,7 @@ May be specified more than once.
 =cut
 
 sub version {
-	print 'check_networkspans v. ' . $Check::NetworkSpans::VERSION . "\n";
+	print 'check_suricataflows v. ' . $Check::SuricataFlows::VERSION . "\n";
 }
 
 sub help {

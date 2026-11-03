@@ -1,5 +1,11 @@
 Revision history for Cn-Util
 
+0.023 2026-11-02 CST (Claude Opus 5.5 helped)
+
+ [`dir`]
+
+ - On Windows, a recursive `dir` whose `dir` is a symlink to a directory lists what is under it, as it already did elsewhere. 0.022 passed the link to `File::Find` with a trailing slash, which makes `lstat` follow the link on POSIX systems but not on Windows, so the walk still returned nothing. Strawberry Perl 5.42 failed three tests of `t/dir.t` on this.
+
 0.022 2026-10-18 CDT (Claude Opus 5.5 helped)
 
  [Renamed to Cn::Util]

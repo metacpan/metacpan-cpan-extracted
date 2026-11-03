@@ -1,5 +1,31 @@
 Revision history for CGI-Buffer
 
+0.89	Mon Nov  2 01:09:39 PM EST 2026
+	[ Security ]
+	- Responses that are private to a client (logged in, POST, Set-Cookie,
+		Cache-Control: private/no-store/no-cache, Vary on other than
+		Accept-Encoding, csrf_token) are no longer cached and given to
+		other clients
+	- A client can no longer keep pages in the cache for more than 600 seconds
+	- optimise_content no longer makes links to other sites local
+	[ Bug Fixes ]
+	- Reduce chance of key name clash
+	- Fix uninitialized variable
+	- Range, ETag, 304, If-None-Match and If-Modified-Since now follow
+		RFC 9110
+	- Many fixes to headers, compression, UTF-8 and the cache
+	- optimise_content: fixed changes it made to how pages look or work,
+		e.g. in <pre> and JavaScript, and slowness on hostile input
+	- An error while sending the page no longer loses the output
+	- Use Test::Needs for brotli
+	[ Enhancements ]
+	- Startup is about 3 times faster, since modules are only loaded when
+		needed.  A script that uses CGI::Info must now load it itself
+	- init() checks its options, can be chained, and its messages can be
+		translated
+	- MIN_PERL_VERSION is now 5.26, which CGI::Info's dependencies need
+	- More helpful error message
+
 0.88	Sun Mar 23 11:31:45 EDT 2025
 	Added support for Zstd
 

@@ -1,16 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/SQLite/Tables.pm
-## Version v1.0.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## SQL API Abstraction - ~/lib/DB/Object/SQLite/Tables.pm
+## Version v1.0.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/08/05
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 # This package's purpose is to separate the object of the tables from the main
 # DB::Object package so that when they get DESTROY'ed, it does not interrupt
 # the SQL connection
@@ -36,7 +36,7 @@ BEGIN
         qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.0.1';
+    our $VERSION = 'v1.0.2';
 };
 
 use strict;
@@ -180,7 +180,7 @@ sub create_info
 # NOTE: sub drop is inherited from DB::Object::Tables
 # sub drop
 
-sub exists { return( shift->table_exists( shift( @_ ) ) ); }
+# NOTE: exists is inherited from DB::Object::Tables
 
 sub lock { return( shift->error( "There is no table locking in SQLite." ) ); }
 
@@ -243,6 +243,8 @@ sub structure
     return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
     my $table = $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $sth1 = $self->prepare_cached( "SELECT * FROM sqlite_master WHERE name = ?" ) ||
         return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
     $sth1->execute( $table ) ||
@@ -253,7 +255,7 @@ sub structure
     $self->{type} = $def->{type};
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
-    my $types_dict = $self->database_object->datatype_dict;
+    my $types_dict = $dbo->datatype_dict;
     $self->_load_class( 'DB::Object::Fields::Field' ) || return( $self->pass_error );
     my $q = $self->_reset_query;
     # .header on
@@ -261,7 +263,7 @@ sub structure
     # cid|name|type|notnull|dflt_value|pk
     my $query = "PRAGMA table_info(${table})";
     # <https://www.sqlite.org/pragma.html>
-    my $sth = $self->database_object->prepare_cached( $query ) ||
+    my $sth = $dbo->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
     $sth->execute ||
         return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
@@ -369,7 +371,7 @@ DB::Object::SQLite::Tables - SQLite Table Object
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 

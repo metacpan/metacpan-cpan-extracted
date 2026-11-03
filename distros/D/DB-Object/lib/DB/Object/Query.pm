@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.10.2
+## SQL API Abstraction - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Query.pm
+## Version v0.11.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/09/15
+## Modified 2026/09/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.10.2';
+    our $VERSION = 'v0.11.0';
 };
 
 use strict;
@@ -97,6 +97,7 @@ sub attach
     my $this = shift( @_ );
     if( $self->_is_a( $this => 'DB::Object' ) )
     {
+        $self->debug( $this->debug );
         my $base_class = $self->base_class;
         unless( $self->_is_a( $this => $base_class ) )
         {
@@ -106,6 +107,7 @@ sub attach
     }
     elsif( $self->_is_a( $this => 'DB::Object::Tables' ) )
     {
+        $self->debug( $this->debug );
         my $base_class = $self->base_class;
         unless( $self->_is_a( $this => "${base_class}::Tables" ) )
         {
@@ -183,6 +185,23 @@ sub binded_values { return( shift->_set_get_array_as_object( 'binded_values', @_
 
 sub binded_where { return( shift->_set_get_array_as_object( 'binded_where', @_ ) ); }
 
+sub clone
+{
+    my $self = shift( @_ );
+    # We make sure to not clone the DBI database handle object
+    my $dbo  = CORE::delete( $self->{database_object} );
+    my( $tbl, $tbl_dbo );
+    if( $tbl = $self->table_object )
+    {
+        $tbl_dbo = CORE::delete( $tbl->{dbo} );
+    }
+    my $new = $self->Module::Generic::clone ||
+        return( $self->pass_error );
+    $new->attach( $dbo ) if( defined( $dbo ) );
+    $tbl->attach( $tbl_dbo ) if( defined( $tbl_dbo ) && ( !$dbo || $tbl_dbo ne $dbo ) );
+    return( $new );
+}
+
 sub constant
 {
     my $self = shift( @_ );
@@ -214,6 +233,8 @@ sub delete
         return( $constant->{sth} ) if( $constant->{sth} && $self->_is_object( $constant->{sth} ) && $constant->{sth}->isa( 'DB::Object::Statement' ) );
     }
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $table = $tbl_o->name ||
     return( $self->error( "No table to delete entries from was set." ) );
     my $where = '';
@@ -232,7 +253,7 @@ sub delete
     # 'query_reset' condition to avoid catching parameters from pervious queries.
     push( @query, @$clauses ) if( scalar( @$clauses ) );
     my $query = $self->{query} = CORE::join( ' ', @query );
-    return( $self->error( "Refusing to do a bulk delete. Enable the allow_bulk_delete database object property if you want to do so. Original query was: $query" ) ) if( !$self->where && !$self->database_object->allow_bulk_delete );
+    return( $self->error( "Refusing to do a bulk delete. Enable the allow_bulk_delete database object property if you want to do so. Original query was: $query" ) ) if( !$self->where && !$dbo->allow_bulk_delete );
     $self->_save_bind();
     my $sth = $tbl_o->_cache_this( $self ) ||
         return( $self->error( "Error while preparing query to delete from table '$table':\n$query" ) );
@@ -350,7 +371,8 @@ sub format_statement
             my $value = $data->{ $_ };
             if( $self->_is_a( $value => "${base_class}::Statement" ) )
             {
-                $elem->value( '(' . $value->as_string . ')' );
+                # $elem->value( '(' . $value->as_string . ')' );
+                $elem->format( '(' . $value->as_string . ')' );
                 $elem->elements( $value->query_object->elements );
             }
             # This is for insert or update statement types
@@ -1465,6 +1487,8 @@ sub update
         return( $constant->{sth} ) if( $constant->{sth} && $self->_is_object( $constant->{sth} ) && $constant->{sth}->isa( 'DB::Object::Statement' ) );
     }
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
+    my $dbo   = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $table = $tbl_o->name ||
     return( $self->error( "No table to update was provided." ) );
     if( !scalar( @arg ) )
@@ -1479,7 +1503,7 @@ sub update
     my @query  = ( "UPDATE $table SET $values" );
     push( @query, @$clauses ) if( scalar( @$clauses ) );
     my $query = $self->{query} = CORE::join( ' ', @query );
-    if( !$self->where && !$self->database_object->allow_bulk_update )
+    if( !$self->where && !$dbo->allow_bulk_update )
     {
         my( $p, $f, $l ) = caller();
         my $call_sub = ( caller(1) )[3];
@@ -1725,6 +1749,8 @@ sub _having
     my $bind  = $tbl_o->use_bind;
     my $table = $tbl_o->name;
     my $prefix = $tbl_o->prefix;
+    my $dbo = $self->database_object ||
+        return( $self->error( "No database handle could be found." ) );
     my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $clause;
     if( @_ )
@@ -1821,7 +1847,7 @@ sub _having
                     }) );
                 }
             }
-            $clause = $self->new_clause( type => 'having' )->merge( $self->database_object->AND( @clause ) );
+            $clause = $self->new_clause( type => 'having' )->merge( $dbo->AND( @clause ) );
             # $clause->bind->values( @values ) if( $bind );
             # $clause->bind->types( @types ) if( $bind );
         }
@@ -2296,7 +2322,7 @@ sub _where_having
                     if( $self->_is_a( $value, 'DB::Object::NOT' ) )
                     {
                         ( $value ) = $value->value;
-                        $value = $self->database_object->NULL if( !defined( $value ) );
+                        $value = $dbo->NULL if( !defined( $value ) );
                         # https://www.postgresql.org/docs/8.3/functions-comparison.html
                         if( lc( $value ) eq 'null' )
                         {
@@ -2386,7 +2412,7 @@ sub _where_having
                             $value =~ s/\)$//;
                         }
                         my $cl;
-                        if( $self->database_object->driver eq 'Pg' )
+                        if( $dbo->driver eq 'Pg' )
                         {
                             $cl = $self->new_clause({
                                 value => $i_am_negative ? "$f !~ '$value'" : "$f ~ '$value'",
@@ -2394,8 +2420,8 @@ sub _where_having
                                 type => 'where',
                             });
                         }
-                        elsif( $self->database_object->driver eq 'SQLite' ||
-                               $self->database_object->driver eq 'mysql' )
+                        elsif( $dbo->driver eq 'SQLite' ||
+                               $dbo->driver eq 'mysql' )
                         {
                             $cl = $self->new_clause({
                                 value => $i_am_negative ? "$f NOT REGEXP('$value')" : "$f REGEXP('$value')",
@@ -2426,7 +2452,7 @@ sub _where_having
                         );
                         my $const;
                         if( lc( $fields_type->{ $field } // '' ) eq 'bytea' &&
-                            ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                            ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                         {
                             $el->type( $const );
                         }
@@ -2455,7 +2481,7 @@ sub _where_having
                     else
                     {
                         my( $cl, $const, $el );
-                        if( lc( $fields_type->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                        if( lc( $fields_type->{ $field } ) eq 'bytea' && ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                         {
                             $cl = $self->new_clause(
                                 value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $dbo->quote( $value, $const ),
@@ -2479,7 +2505,7 @@ sub _where_having
 
                         $el->field( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
                         if( lc( $fields_type->{ $field } ) eq 'bytea' && 
-                            ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                            ( $const = $dbo->get_sql_type( 'bytea' ) ) )
                         {
                             $el->type( $const );
                         }
@@ -2676,7 +2702,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.10.2
+    v0.11.0
 
 =head1 DESCRIPTION
 
@@ -2748,6 +2774,25 @@ Takes a list or array reference of values to bind in the next query in L<DB::Obj
     my $value = $query->binded_where;
 
 This returns the values to bind for the C<where> clause of the query. This returns a L<Module::Generic::Array> object.
+
+=head2 clone
+
+    my $new_qo = $qo->clone;
+
+Creates a new instance of the current query object by cloning it.
+This uses the method L<Module::Generic/clone> from L<Module::Generic>.
+
+Beware that it will not clone the associated database handle if there is one, because it cannot be cloned, and the alternative would be to instantiate a new database connection, which is not a good thing to do implicitly.
+
+If you want to clone the database object, then you can do something like:
+
+    my $new_dbh = $dbh->clone;
+
+which will create a new connection using the same parameters as the original (see L<DB::Object/clone> for more detail), and then
+
+    $new_qo->attach( $new_dbh );
+
+It returns the new query object, or, upon error, sets an L<DB::Object::Exception> objet using L<Module::Generic/error> and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 constant
 

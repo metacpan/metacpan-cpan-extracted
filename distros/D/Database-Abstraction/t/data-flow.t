@@ -10,7 +10,7 @@
 #   DF1  slurp-data buffer  ($self->{'data'})
 #   DF2  introspection caches ($self->{'_columns'}, $self->{'_schema'})
 #   DF3  gzip temp file       ($self->{'_temp_fh'})
-#   DF4  DBI handle           ($self->{$table})
+#   DF4  DBI handle           ($self->{_dbh}{$table})
 #   DF5  CHI cache key        (MISS -> SET -> HIT -> expiry)
 #   DF6  $sth->finish()       (statement handle always closed)
 #   DF7  base_criteria mutation safety
@@ -248,12 +248,12 @@ SKIP: {
 }
 
 # ---------------------------------------------------------------------------
-# DF4  DBI handle ($self->{$table}) — D→U→K
+# DF4  DBI handle ($self->{_dbh}{$table}) — D→U→K
 #
 # DU chain:
-#   D: _open() sets $self->{$table} via DBI->connect for SQL backends.
+#   D: _open() sets $self->{_dbh}{$table} via DBI->connect for SQL backends.
 #   U: all SQL-path query methods call prepare_cached on it.
-#   K: DESTROY calls $dbh->disconnect() then delete $self->{$table}.
+#   K: DESTROY calls $dbh->disconnect() then delete $self->{_dbh}{$table}.
 #
 # Potential anomaly O~: a live DBI handle that is never queried (object
 # constructed then immediately destroyed) would be an open-never-read
@@ -261,7 +261,7 @@ SKIP: {
 # with our lazy open (handle is only created when a query fires).
 # ---------------------------------------------------------------------------
 note '';
-note '=== DF4: DBI handle ($self->{table}) lifecycle ===';
+note '=== DF4: DBI handle ($self->{_dbh}{$table}) lifecycle ===';
 
 SKIP: {
 	skip 'DBD::SQLite not available for DF4', 8 unless $HAVE_SQLITE;
@@ -274,12 +274,12 @@ SKIP: {
 	my $db = Database::df4->new(dsn => $dsn, no_entry => 1);
 
 	# D: handle undef before first query
-	ok(!defined $db->{'df4'}, 'DF4.1 DBI handle undef before first query (pre-D)');
+	ok(!defined $db->{_dbh}{'df4'}, 'DF4.1 DBI handle undef before first query (pre-D)');
 
 	# D: handle defined after first query
 	my $n = $db->count();
-	ok(defined $db->{'df4'}, 'DF4.2 DBI handle set after first query (D)');
-	ok(ref($db->{'df4'}) && $db->{'df4'}->isa('DBI::db'),
+	ok(defined $db->{_dbh}{'df4'}, 'DF4.2 DBI handle set after first query (D)');
+	ok(ref($db->{_dbh}{'df4'}) && $db->{_dbh}{'df4'}->isa('DBI::db'),
 		'DF4.3 DBI handle is a DBI::db object');
 
 	# U: handle is still alive and usable for repeated queries
@@ -288,13 +288,13 @@ SKIP: {
 	ok(scalar @{$row} == 2, 'DF4.5 handle reused for selectall_arrayref (U)');
 
 	# U: same handle ref used on all queries (prepare_cached reuses handles)
-	my $addr1 = refaddr($db->{'df4'});
+	my $addr1 = refaddr($db->{_dbh}{'df4'});
 	$db->count();
-	is(refaddr($db->{'df4'}), $addr1,
+	is(refaddr($db->{_dbh}{'df4'}), $addr1,
 		'DF4.6 DBI handle ref stable across queries (U)');
 
 	# K: DESTROY disconnects and removes the handle
-	my $dbh_weak = $db->{'df4'};
+	my $dbh_weak = $db->{_dbh}{'df4'};
 	weaken($dbh_weak);
 	undef $db;
 	# DBI may keep its own strong reference internally, so we check
@@ -304,7 +304,7 @@ SKIP: {
 	# K: a second object gets a fresh handle
 	my $db2 = Database::df4->new(dsn => $dsn, no_entry => 1);
 	$db2->count();
-	ok(defined $db2->{'df4'}, 'DF4.8 second object gets new DBI handle (new D)');
+	ok(defined $db2->{_dbh}{'df4'}, 'DF4.8 second object gets new DBI handle (new D)');
 	undef $db2;
 }
 
@@ -418,7 +418,7 @@ SKIP: {
 
 	# Instrument the DBI handle to track finish() calls.
 	$db->count();	# trigger open so the handle exists
-	my $dbh = $db->{'df6'};
+	my $dbh = $db->{_dbh}{'df6'};
 
 	# a) selectall_arrayref — full cursor drain; verify no Active cursors afterwards
 	my $rows = $db->selectall_arrayref();

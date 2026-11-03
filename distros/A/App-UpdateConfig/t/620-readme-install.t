@@ -38,7 +38,7 @@ my $config_dir = $t->config_dir;
 # The distribution tarball is built in the container, as cpanm needs its
 # META.json file to find the configure dependencies.
 my $container_script = <<"EOS";
-cp -r /opt/src /tmp/src && cd /tmp/src && rm -rf blib Makefile MYMETA.* pm_to_blib App-UpdateConfig-*
+cp -r /opt/src /tmp/src && cd /tmp/src && rm -rf blib local Makefile MYMETA.* pm_to_blib App-UpdateConfig-*
 build="cpanm -n ExtUtils::MakeMaker::CPANfile && perl Makefile.PL && make manifest && make dist"
 sh -c "\$build" > /tmp/dist.log 2>&1 || { echo "Build failed"; cat /tmp/dist.log; }
 mv App-UpdateConfig-*.tar.gz /tmp/dist.tar.gz && cd /

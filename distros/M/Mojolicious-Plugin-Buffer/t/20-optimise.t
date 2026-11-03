@@ -5,6 +5,7 @@ use Test::More;
 use Encode ();
 use Mojolicious;
 use Test::Mojo;
+use Time::HiRes ();
 
 my $HAVE_PACKER = eval { require HTML::Packer; 1 } ? 1 : 0;
 
@@ -377,6 +378,89 @@ subtest 'indentation after CRLF line breaks is squashed' => sub {
 	unlike($body, qr/\n[ \t]+</, 'no line starts with indentation');
 	unlike($body, qr/\r/, 'no carriage return is left in the white space');
 	like($body, qr{<h1>Heading</h1>}, 'the content is kept');
+};
+
+# Serve one page through the plugin and return the body it sends
+sub optimise {
+	my ($level, $page) = @_;
+
+	my $app = Mojolicious->new;
+	$app->log->level('fatal');
+	$app->plugin('Buffer', optimise_content => $level, compress_content => 0);
+	$app->routes->get('/' => sub { shift->render(data => $page, format => 'html') });
+
+	my $t = Test::Mojo->new($app);
+	$t->get_ok('/')->status_is(200);
+
+	return $t->tx->res->body;
+}
+
+subtest 'spaces between inline elements are kept' => sub {
+	my $body = optimise(1, "<html><body>\n<p>Hello <b>world</b> <i>again</i> and more</p>\n</body></html>");
+	like($body, qr{Hello <b>world</b> <i>again</i>}, 'the space before a tag is not removed');
+};
+
+# The squasher's patterns once started a search at every character of a
+# run of white space, or ran each unterminated element on to the end of the
+# page, so a page of under 100 KB could hold a worker for minutes.
+subtest 'hostile input is optimised in linear time' => sub {
+	my $n = 8000;
+
+	# Smokers can be very slow and very busy
+	my $limit = $ENV{AUTOMATED_TESTING} ? 60 : 5;
+
+	for my $test (
+		['unterminated titles', '<html><head>' . ('<title>a ' x $n) . '</head></html>'],
+		['unterminated links', '<html><body>' . (' <a href="x' x $n) . '</body></html>'],
+		['a long run of spaces', '<html><body>x' . (' ' x ($n * 8)) . 'y<a href="</body></html>'],
+		['a long run of spaces before tags', '<html><body>x' . (' ' x ($n * 8))
+			. 'y<div><p></p><br><hr></a></li></div></body></html>'],
+		['unterminated <pre>', '<html><body>' . ('<pre>a ' x ($n * 4)) . '</body></html>'],
+	) {
+		my ($name, $page) = @{$test};
+
+		# HTML::Packer is itself quadratic here; t/90 runs this without it
+		if ($HAVE_PACKER && ($name =~ /<pre>/)) {
+			pass("$name: skipped, HTML::Packer is installed");
+			next;
+		}
+
+		my $start = Time::HiRes::time();
+		optimise(1, $page);
+		my $elapsed = Time::HiRes::time() - $start;
+		cmp_ok($elapsed, '<', $limit, $name) or diag(sprintf('%s took %.1fs', $name, $elapsed));
+	}
+};
+
+subtest 'level 2 HTML comment hiding is removed only inside a script' => sub {
+	plan skip_all => 'HTML::Packer is not installed' unless $HAVE_PACKER;
+
+	my $body = optimise(2, join("\n",
+		'<html>', '  <body>',
+		'    <script src="a.js"></script>',
+		'    <p>text</p>',
+		'    <!-- a comment for the developers -->',
+		'  </body>', '</html>',
+	));
+	unlike($body, qr/a comment for the developers/, 'the comment is not shown as text');
+	like($body, qr{<script src="a\.js"></script>}, 'the script tag is kept');
+};
+
+subtest 'level 2 merges document.write calls only within one script' => sub {
+	plan skip_all => 'HTML::Packer is not installed' unless $HAVE_PACKER;
+
+	# Padding, so that the optimised page is always smaller and kept
+	my $padding = "\n" . (' ' x 200) . "\n";
+	my $body = optimise(2, join($padding,
+		'<html><body>',
+		'<script type="text/javascript">var x = 1;</script>',
+		'<script type="text/x-template">document.write("a");document.write("b");</script>',
+		'<script type="text/javascript">document.write("c");document.write("d");</script>',
+		'</body></html>',
+	));
+	like($body, qr{document\.write\("c"\s*\+\s*"d"\)}, 'writes in one JavaScript block are merged');
+	like($body, qr{document\.write\("a"\);\s*document\.write\("b"\)}, 'writes in a template are left alone');
+	unlike($body, qr{text/JavaScript}, 'the script type is kept as written');
 };
 
 subtest 'optimise_content rejects unknown levels' => sub {

@@ -1,5 +1,14 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.28	Mon Nov  2 09:15:12 PM EST 2026
+	[ Bug Fixes ]
+	- A responsive chart's <svg> had height="auto", which is not a valid value
+	  for the SVG height attribute: Chromium logged "Expected length, "auto""
+	  for every chart, and ignored it.  The attribute is no longer written; the
+	  height follows the viewBox's proportions, as it already did in practice.
+	  Every method that takes the responsive option is affected, and none
+	  changes how a chart looks.  t/responsive.t checks every one
+
 0.27	Sat Oct 31 09:17:13 PM EDT 2026
 	[ Bug Fixes ]
 	- Text in a chart's data and in its labels could end the <script> it was

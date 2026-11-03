@@ -15,6 +15,7 @@ t/06_combined.t
 t/07_zero_width_space.t
 t/08_enclosing_mark.t
 t/09_emoji.t
+t/10_unicode_version.t
 tools/benchmark.pl
 xt/02_perlcritic.t
 xt/perlcriticrc

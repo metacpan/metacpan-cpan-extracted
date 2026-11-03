@@ -1,0 +1,24 @@
+# Known differences from dash, used by t/dash.t: FILE<TAB>REASON<TAB>STRING (as in the battery file).
+# A difference not listed here fails the test; a listed one that agrees is only reported.  FLAKY: may agree or not.
+battery.txt	parser: empty quotes in a word (known since 2026-11-01, battery 42/43)	y=; echo [$y] ["$y"] ['']
+largebattery.txt	rejected by the parser: comma operator in arithmetic	echo $(( y = 2, 3 ))
+largebattery.txt	$0 is sh here, not dash	echo $0 $# "[$*]"
+largebattery.txt	rejected by the parser: settings before export	x=1 export y=2; echo $x $y; sh -c 'echo $y'
+largebattery.txt	alias: outside the subset, found at run time (A4, status 248)	x=ali; ${x}as ll=ls 2>&1; echo $?
+pspawn-d2.txt	rejected on purpose: a lone input redirection (bash reads the file in $(<file))	< /nonexist/f; echo $?
+pspawn-l10.txt	message prefix inside captured text (dash: 'dash: 1: ', ours: 'sh: ')	x=$( (head -c 10000000 /dev/zero | tr '\0' a & nosuchcmd; wait) 2>&1); echo ${#x}
+pspawn-l10.txt	message prefix inside captured text	x=$( (head -c 3000000 /dev/zero | tr '\0' a & echo ${zz?gone}; wait) 2>&1 | tr -d a); echo "$x"
+pspawn-l10.txt	printf is a program here, so a 10 MB argument is too long (E2BIG)	x=$(head -c 10000000 /dev/zero | tr '\0' a & umask; wait); echo ${#x} $(printf %s "$x" | tr -d a)
+t1.txt	X2: $! of a background job that started no process	: & echo "[$!]" | tr 0-9 N
+t1.txt	rejected by the parser: ** is not POSIX arithmetic	echo $(( 2 ** 3 ))
+t1.txt	arithmetic overflow: dash and Perl differ	echo $((-9223372036854775807-1)) $(( (-9223372036854775807-1) / -1 ))
+t1.txt	X5: arithmetic error message worded differently	echo $((08))
+t1.txt	X5: arithmetic error message worded differently	echo $((1-$x))
+t1.txt	parser: [${x}x] field splitting at a brace (known)	x=' a '; echo "[$x]" [$x] [${x}x]
+t2.txt	rejected by the parser: here-strings are bash	while read l; do echo "<$l>"; cat; done <<<x
+t2.txt	FLAKY: order of stderr lines from parallel pipeline elements (varies in dash too)	{ read a <&5; echo "A=$a" | cut -c1-6 >&2; } 5</etc/passwd | { read b <&5; echo "B=$b"| cut -c1-6 >&2; } 5</etc/hostname; echo done
+t3.txt	rejected by the parser since U2: a pattern that may match . or ..	echo .* | wc -w
+largebattery.txt	FLAKY X19: the main shell's trap may run after the next command	trap "echo int" INT; x=$(kill -INT $$); echo after
+largebattery.txt	FLAKY: X19, a trap for a signal the shell sends itself may run after the next command (order of int and after)	trap "echo int" INT; (kill -INT $$); echo after
+largebattery.txt	FLAKY: X19, a trap for a signal the shell sends itself may run after the next command (order of int and after)	trap "echo int" INT; kill -INT $$ | cat; echo after
+largebattery.txt	FLAKY: X19, a trap for a signal the shell sends itself may run after the next command (order of int and after)	trap "echo int" INT; x=$(kill -INT $$); echo after

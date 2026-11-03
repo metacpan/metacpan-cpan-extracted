@@ -29,7 +29,16 @@ my %WriteMakefileArgs = (
 	clean      => { FILES    => 'Check-SuricataFlows-*' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
-		resources   => {
+		# Monitoring::Sneck::Checks::suricata_flows is only loaded by Monitoring::Sneck::Checks, so
+		# it is optional, only needed for running this in process from sneck or through sneck_check
+		prereqs => {
+			runtime => {
+				recommends => {
+					'Monitoring::Sneck::Checks' => '0.0.1',
+				},
+			},
+		},
+		resources => {
 			repository => {
 				type => 'git',
 				url  => 'git@github.com:VVelox/Check-SuricataFlows.git',

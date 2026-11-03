@@ -1,3 +1,4 @@
+.pod2github.yml
 benchmarks/last_modified.pl
 Changes
 cpanfile
@@ -16,6 +17,7 @@ lib/Mojolicious/Plugin/Buffer/Lock/Redis.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README.md
 t/00-load.t
 t/05-lite.t

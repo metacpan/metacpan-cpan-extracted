@@ -1,0 +1,45 @@
+echo "[${!-unset}]"
+sleep 0.1 | cat & echo "[$!]" | tr 0-9 N
+(sleep 0.1) & echo "[$!]" | tr 0-9 N
+: & echo "[$!]" | tr 0-9 N
+x=; $x >/tmp/rv2-empty; ls /tmp/rv2-empty; rm -f /tmp/rv2-empty
+$(false) >/tmp/rv2-empty2; echo $?; ls /tmp/rv2-empty2; rm -f /tmp/rv2-empty2
+echo $((0 && 1/0)) $((1 || 1/0)) $((1 ? 2 : 1/0))
+A=1 B=$(true)$A sh -c 'echo "[$B]"'
+A=1 B=$(echo $A) sh -c 'echo "[$B]"'
+printf 'a\\ b c\n' | { read x y; echo "[$x][$y]"; }
+printf 'a\\\\\nb\n' | { read x; echo "[$x]"; }
+printf 'a : b\n' | { IFS=': ' read x y z; echo "[$x][$y][$z]"; }
+printf 'x:y:\n' | { IFS=: read a b; echo "[$a][$b]"; }
+printf 'x:y:z\n' | { IFS=: read a b; echo "[$a][$b]"; }
+printf '  a  b  \n' | { read a; echo "[$a]"; }
+printf 'a\n' | { IFS= read -r a b; echo "[$a][$b]"; }
+case a in [[:alpha:]]) echo y;; *) echo n;; esac
+case b in [!a]) echo y;; *) echo n;; esac
+for i in 1 2; do [ $i = 2 ] && continue; false; done; echo $?
+for i in 1 2; do false; [ $i = 1 ] || break; done; echo $?
+./nosuch; echo $?
+echo x >&5; echo st=$?
+cat <&4; echo st=$?
+x='a  b'; for w in $x "$x" ''; do echo "[$w]"; done
+x=' a '; echo "[$x]" [$x] [${x}x]
+cd /; echo e* | cut -c1-20
+(cd /etc; echo pass*); echo pas*
+(cd /; cd etc; echo host*)
+x='*'; echo "$x" $x | head -c 30; echo
+x='/etc/pass\wd'; echo $x
+echo ${x:-a  b} "${x:-a  b}"
+echo ${HOME+"q"}
+i=0; until [ $i -ge 2 ]; do i=$((i+1)); echo $i; done; echo $?
+while false; do :; done; echo $?
+if false; then :; fi; echo $?
+echo $((08))
+echo $((1-$x))
+x=-3; echo $((1-$x))
+x=' 5'; echo $((x+1))
+echo $(( 2 ** 3 ))
+echo $((1<<63)) $((9223372036854775807+1))
+echo $((-9223372036854775807-1)) $(( (-9223372036854775807-1) / -1 ))
+v=$(printf 'a\n\n\n'); echo "[$v]"
+v=$(printf '\n\na'); echo "[$v]"
+echo $(printf 'a\nb') | od -c | head -2

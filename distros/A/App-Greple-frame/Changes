@@ -1,5 +1,25 @@
 Revision history for Perl extension App-Greple-frame
 
+1.04 2026-11-03T00:08:57Z
+
+    - Require perl 5.26
+    - Accept parameters by -Mframe::config(...) (Getopt::EX::Config).
+      -Mframe::set(...) is kept only for compatibility and will be removed
+      in the future.  An unknown parameter is an error now
+    - Add module options --style and --width, placed before -- as
+      -Mframe --style=fold --width=80 -- pattern file.  Everything before
+      -- now belongs to the module, so -Mframe --frame pattern -- file is
+      an error; write -Mframe --frame pattern file.  The command options
+      such as --frame are kept for compatibility and may be removed in the
+      future
+    - The width parameter works with --frame-cols and --frame-pages.  The
+      whole output has that width; it was ignored
+    - Add module options --pane, --pane-width, --boundary, --linebreak,
+      --runin, --runout and --runlen, which mean the same as in ansicolumn.
+      Some could be given only by the environment variables
+      GREPLE_FRAME_PAGES_WIDTH, _MARGIN and _BOUNDARY, which still give the
+      default values.  --set-frame-column works now
+
 1.03 2023-12-18T08:05:39Z
 
     - introduce --frame-cols option

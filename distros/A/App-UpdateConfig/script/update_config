@@ -22,7 +22,7 @@ use Scalar::Util 'refaddr';
 
 # This must be kept in sync with the version in lib/App/UpdateConfig.pm (the
 # script cannot use that module as it must work as a standalone file).
-our $VERSION = '1.02';
+our $VERSION = '1.06';
 
 # With --help, prints the entire documentation, through perldoc when available.
 sub print_usage {
@@ -42,7 +42,7 @@ BEGIN {
   @orig_argv = @ARGV;
   GetOptions(
     \%flags, 'silent', 'diff', 'help', 'test', 'list',
-    'root', 'no-root', 'export', 'dir=s', 'pack'
+    'root', 'no-root', 'export', 'dir=s', 'pack', 'force'
   ) or print_usage(0);
   print_usage(1) if $flags{help};
   print_usage(0) if @ARGV;
@@ -158,7 +158,9 @@ use constant DEFAULT_COMMENTS_CHAR => '#';
 use constant DEFAULT_GUARD_STRING => 'AUTO-CONFIG';
 use constant COMMENTS_CHAR_COUNT => 3;  # In the guard markers.
 use constant ARRAYS_MARKER => 'update_config_arrays';  # In MERGE fragments.
-use constant STATE_HASH_LENGTH => 16;  # Hex digits in the name of the MERGE states.
+use constant STATE_HASH_LENGTH => 16;  # Hex digits in the name of the saved states.
+use constant ENTIRE_FILE_STATE_HEADER => "ENTIRE FILE\n\n";  # In the ENTIRE FILE states.
+use constant DIR_CONF_NAME => '.update_config';  # The directives of a directory.
 
 sub get_home_dir {
   return File::HomeDir->my_home
@@ -179,15 +181,31 @@ sub clean_output_path {
   my ($name) = @_;
   return $name =~ s/\s*(?:\[.*\]\s*)$//r;
 }
-# Returns the default guard suffix of the fragment with the given name (its
-# path relative to the configuration directory): the suffixes between brackets
-# at the end of the names of its directories and of its own name, joined with
-# '-'. Returns undef if there are no such suffixes.
-sub get_default_guard_suffix {
+
+# Returns the number of components in the given fragment name (its path relative
+# to the configuration directory), which is the depth at which its own
+# directives are set (see add_conf).
+sub get_name_depth {
   my ($name) = @_;
-  my @suffixes = grep { defined && $_ ne '' } map { m/\s*\[(.*)\]\s*$/ ? $1 : undef } split m{/},
-      $name;
-  return @suffixes ? join('-', @suffixes) : undef;
+  my @parts = split m{/}, $name;
+  return scalar @parts;
+}
+
+# Returns the guard suffix of the fragment with the given name (its path
+# relative to the configuration directory) and configuration (from
+# parse_file_conf): its GUARD SUFFIX directive, if any, followed by the
+# suffixes between brackets at the end of the names of the directories below
+# the one where that directive is set and of the fragment itself (so all of
+# them without the directive), joined with '-' and in upper case. Returns undef
+# if there are no such suffixes.
+sub get_guard_suffix {
+  my ($name, $conf) = @_;
+  my @parts = split m{/}, $name;
+  my $from = exists $conf->{guard_suffix} ? $conf->{depth}{guard_suffix} : 0;
+  my @suffixes =
+      grep { defined && $_ ne '' } map { m/\s*\[(.*)\]\s*$/ ? $1 : undef } @parts[$from .. $#parts];
+  unshift @suffixes, $conf->{guard_suffix} if exists $conf->{guard_suffix};
+  return @suffixes ? uc join('-', @suffixes) : undef;
 }
 
 # parse_file_name($file_name)
@@ -261,6 +279,38 @@ sub write_content {
   return;
 }
 
+# Returns a one-line description of what is at the given path, comparable to
+# the description of the symbolic link that a SYMLINK fragment creates there
+# (see get_contents): `-> destination` for a symbolic link, an empty string if
+# nothing exists there, or the type of the file in parentheses otherwise.
+sub describe_symlink_target {
+  my ($path) = @_;
+  if (-l $path) {
+    my $dest = readlink($path) // die "Cannot read the symbolic link '${path}': $!.\n";
+    return "-> ${dest}\n";
+  }
+  return '' if not -e $path;
+  return -d _ ? "(directory)\n" : "(file)\n";
+}
+
+# Creates a symbolic link at the given path, pointing to the given destination,
+# replacing atomically what is at that path, unless it is a directory.
+sub write_symlink {
+  my ($path, $dest) = @_;
+  my $dir = dirname($path);
+  if (not -e $dir) {
+    make_path($dir) or die "Cannot create directory '$dir': $!.\n";
+  }
+  my $tmp = "${path}.update_config-${PID}";
+  symlink($dest, $tmp) or die "Cannot create the symbolic link '${tmp}': $!.\n";
+  if (not rename($tmp, $path)) {
+    my $error = $!;
+    unlink $tmp;
+    die "Cannot replace '${path}' with a symbolic link: ${error}.\n";
+  }
+  return;
+}
+
 sub need_perm_update {
   my ($file, $mode, $conf) = @_;
   return 0 if not exists $conf->{perm};
@@ -271,11 +321,13 @@ sub need_perm_update {
 
 # The directives that can appear at the beginning of a fragment. Each entry
 # gives the key of the fragment configuration where the directive is stored
-# (if any) and how: `flag` directives take no value and set their key to 1,
+# (if any) and how: `flag` directives take no value and set their key to their
+# `value` (default to 1),
 # `multiple` directives can be repeated and store their values in a list, the
 # others store their value directly (an empty string for `optional` directives
 # without a value).
 my %DIRECTIVES = (
+  'BASE' => {key => 'base', multiple => 1},
   'COMMENTS CHAR' => {key => 'comments_char'},
   'DIR' => {key => 'dir'},
   'ENTIRE FILE' => {key => 'entire_file', flag => 1},
@@ -285,12 +337,28 @@ my %DIRECTIVES = (
   'MAKE EXECUTABLE' => {key => 'make_executable', flag => 1},
   'MERGE' => {key => 'merge', optional => 1},
   'MERGE ARRAYS' => {key => 'merge_arrays'},
+  # Both MIRROR variants set the same key, so that the deepest one wins.
+  'MIRROR' => {key => 'mirror', flag => 1, value => 'dir'},
+  'MIRROR CONTENTS' => {key => 'mirror', flag => 1, value => 'contents'},
   'NEED ROOT' => {key => 'need_root', flag => 1},
   # TODO: validate that the mode is a correct octal value.
   'PERM' => {key => 'perm'},
   'POST UPDATE' => {key => 'post_update'},
   'REM' => {},
   'REQUIRE' => {key => 'require', multiple => 1},
+  'SYMLINK' => {key => 'symlink'},
+);
+
+# The directives that can't be used with SYMLINK in a fragment (they are
+# ignored when they are inherited from its directories).
+my @NON_SYMLINK_DIRECTIVES = (
+  'COMMENTS CHAR',
+  'ENTIRE FILE',
+  'IS PREFIX',
+  'MAKE EXECUTABLE',
+  'MERGE',
+  'MERGE ARRAYS',
+  'PERM'
 );
 # Longest names first, so that a directive is not matched by its prefix (e.g.
 # MERGE ARRAYS by MERGE).
@@ -310,7 +378,7 @@ sub parse_directive {
   if (not defined $key) {
     # Nothing to do, this is a comment.
   } elsif ($directive->{flag}) {
-    $conf->{$key} = 1;
+    $conf->{$key} = $directive->{value} // 1;
   } elsif ($directive->{multiple}) {
     push @{$conf->{$key}}, $value;
   } else {
@@ -319,35 +387,140 @@ sub parse_directive {
   return 1;
 }
 
+# Parses the directives at the beginning of the given fragment text. Returns a
+# hash-ref with their values (see parse_directive), the rest of the text (the
+# content of the fragment) and an array-ref of the lines of the directives.
+sub parse_directives {
+  my ($text) = @_;
+  my (%conf, @lines);
+  $text =~ s/\n{2,}$/\n/;
+  $text =~ s/^\n+//;
+  # Each directive is on its own line, they can be followed by empty lines.
+  while ($text =~ m/\A ([^\n]*) \n+/x) {
+    my ($line, $end) = ($1, $LAST_MATCH_END[0]);
+    last if not parse_directive($line, \%conf);
+    push @lines, $line;
+    substr $text, 0, $end, '';
+  }
+  return (\%conf, $text, \@lines);
+}
+
+# Returns the directives of a DIR_CONF_NAME file with the given name (used in
+# error messages), as a hash-ref (see parse_directive). Dies if the file
+# contains anything else than directives and empty lines.
+sub parse_dir_conf {
+  my ($name, $text) = @_;
+  my %conf;
+  for my $line (split /\n/, $text) {
+    next if $line !~ m/\S/;
+    parse_directive($line, \%conf) or die "Invalid directive in '${name}': '${line}'.\n";
+  }
+  check_dir_and_mirror(\%conf, $name);
+  die "SYMLINK cannot be used in '${name}'.\n" if exists $conf{symlink};
+  return \%conf;
+}
+
+# Dies if the given directives (from parse_directive) of the file with the
+# given name contain both DIR and MIRROR.
+sub check_dir_and_mirror {
+  my ($conf, $name) = @_;
+  die "DIR and MIRROR cannot be used together in '${name}'.\n"
+      if exists $conf->{dir} and exists $conf->{mirror};
+  return;
+}
+
+# Adds to the combined configuration $conf the directives of $new (from
+# parse_directive), which are set at the given depth: the number of
+# directories between the root of the configuration directory and the
+# DIR_CONF_NAME file setting them (or get_name_depth for the own directives of
+# a fragment). The repeatable directives are appended to the existing ones,
+# the others replace them. The depth of each directive is stored in the
+# `depth` hash-ref of $conf.
+sub add_conf {
+  my ($conf, $new, $depth) = @_;
+  # DIR and MIRROR both set the directory of the target, the deepest one wins.
+  delete $conf->{mirror} if exists $new->{dir};
+  delete $conf->{dir} if exists $new->{mirror};
+  for my $key (keys %{$new}) {
+    if (ref $new->{$key} eq 'ARRAY') {
+      push @{$conf->{$key}}, @{$new->{$key}};
+    } else {
+      $conf->{$key} = $new->{$key};
+    }
+    $conf->{depth}{$key} = $depth;
+  }
+  return;
+}
+
+# Returns the configuration that the fragment with the given name inherits
+# from the DIR_CONF_NAME files of its directories (from $dir_confs, see
+# split_config_files), combined from the outermost one with add_conf.
+sub get_inherited_conf {
+  my ($name, $dir_confs) = @_;
+  my @dirs = split m{/}, $name;
+  pop @dirs;
+  my %conf = (depth => {});
+  for my $depth (0 .. @dirs) {
+    my $dir_conf = $dir_confs->{join '/', @dirs[0 .. $depth - 1]};
+    add_conf(\%conf, $dir_conf, $depth) if $dir_conf;
+  }
+  return \%conf;
+}
+
 # Returns the configuration of a fragment, as a hash with the values of its
 # directives, its `content` and its guard markers. When the optional $name of
 # the fragment is given, it is used for the defaults of some directives (see
-# get_default_guard_suffix).
+# get_guard_suffix), and the fragment inherits the directives of its
+# directories from the optional $dir_confs (see get_inherited_conf).
 sub parse_file_conf {
-  my ($file, $name) = @_;
-  my %conf;
-  $file =~ s/\n{2,}$/\n/;
-  $file =~ s/^\n+//;
-  # Each directive is on its own line, they can be followed by empty lines.
-  while ($file =~ m/\A ([^\n]*) \n+/x) {
-    my ($line, $end) = ($1, $LAST_MATCH_END[0]);
-    last if not parse_directive($line, \%conf);
-    substr $file, 0, $end, '';
-  }
+  my ($file, $name, $dir_confs) = @_;
+  my ($own, $content) = parse_directives($file);
+  check_dir_and_mirror($own, $name // 'the fragment');
+  my %conf = defined $name ? %{get_inherited_conf($name, $dir_confs // {})} : (depth => {});
+  add_conf(\%conf, $own, defined $name ? get_name_depth($name) : 0);
+  validate_symlink_conf(\%conf, $content) if exists $conf{symlink};
+  # MERGE ARRAYS can be set in a directory for its fragments that use MERGE,
+  # and COMMENTS CHAR for its fragments that don't (unless it is set as deep
+  # as MERGE).
+  delete $conf{merge_arrays} if not exists $conf{merge} and not exists $own->{merge_arrays};
+  delete $conf{comments_char}
+      if exists $conf{merge}
+      and exists $conf{comments_char}
+      and $conf{depth}{comments_char} < $conf{depth}{merge};
   if (defined $name and defined $conf{merge} and $conf{merge} eq '') {
     $conf{merge} = get_merge_format($name, get_target($name, \%conf));
   }
-  if (defined $name and not exists $conf{guard_suffix}) {
-    my $suffix = get_default_guard_suffix($name);
+  if (defined $name) {
+    my $suffix = get_guard_suffix($name, \%conf);
     $conf{guard_suffix} = $suffix if defined $suffix;
+  } elsif (exists $conf{guard_suffix}) {
+    $conf{guard_suffix} = uc $conf{guard_suffix};
   }
   my $comments_decorator = ($conf{comments_char} // DEFAULT_COMMENTS_CHAR) x COMMENTS_CHAR_COUNT;
   my $guard = DEFAULT_GUARD_STRING.(exists $conf{guard_suffix} ? ':'.$conf{guard_suffix} : '');
   $conf{start_marker} = $comments_decorator.$guard.' START'.$comments_decorator."\n";
   $conf{end_marker} = $comments_decorator.$guard.' END'.$comments_decorator."\n";
-  $conf{content} = $file;
+  $conf{content} = $content;
   validate_merge_conf(\%conf) if exists $conf{merge} or exists $conf{merge_arrays};
   return %conf;
+}
+
+# Dies if the given fragment configuration (with the SYMLINK directive, see
+# parse_file_conf) and content are invalid for a symbolic link. Removes from the
+# configuration the directives that don't apply to symbolic links and that are
+# inherited from the directories of the fragment, and expands a leading `~` in
+# the destination of the link.
+sub validate_symlink_conf {
+  my ($conf, $content) = @_;
+  die "A SYMLINK fragment cannot have any content.\n" if $content =~ m/\S/;
+  for my $d (@NON_SYMLINK_DIRECTIVES) {
+    my $key = $DIRECTIVES{$d}{key};
+    next if not exists $conf->{$key};
+    die "SYMLINK cannot be used with ${d}.\n" if $conf->{depth}{$key} >= $conf->{depth}{symlink};
+    delete $conf->{$key};
+  }
+  $conf->{symlink} =~ s{^~(?=/|$)}{get_home_dir()}e;
+  return;
 }
 
 # The formats supported by the MERGE directive. Each entry gives the module
@@ -612,11 +785,11 @@ sub merge_keyed_array {
 }
 
 # Returns the path of the file where the last applied version of the given
-# MERGE fragment (from prepare_fragment) is saved, which is specific to the
-# fragment (its path in the configuration directory) and to its target. The
-# NEED ROOT fragments are saved in a system directory so that the state of the
-# user is never written by root.
-sub get_merge_state_path {
+# MERGE or ENTIRE FILE fragment (from prepare_fragment) is saved, which is
+# specific to the fragment (its path in the configuration directory) and to its
+# target. The NEED ROOT fragments are saved in a system directory so that the
+# state of the user is never written by root.
+sub get_state_path {
   my ($fragment) = @_;
   my ($name, $in_path, $conf) = @{$fragment}{qw(name in_path conf)};
   my $dir;
@@ -639,21 +812,33 @@ sub get_merge_state_path {
 sub read_merge_state {
   my ($fragment) = @_;
   my $conf = $fragment->{conf};
-  my $path = get_merge_state_path($fragment);
+  my $path = get_state_path($fragment);
   return {} if not -f $path;
   my %old = parse_file_conf(scalar read_file($path));
   return {} if ($old{merge} // '') ne $conf->{merge};
   return parse_merge_data($old{merge}, $old{content}, "the saved state '${path}'");
 }
 
-# Saves the format and the content of the given MERGE fragment (from
-# prepare_fragment), so that it can be read by read_merge_state on the next
-# run.
-sub save_merge_state {
+# Returns the content of the given ENTIRE FILE fragment (from prepare_fragment)
+# when it was last applied, or undef if it was not saved.
+sub read_entire_file_state {
+  my ($fragment) = @_;
+  my $path = get_state_path($fragment);
+  return if not -f $path;
+  my $content = read_file($path);
+  return if substr($content, 0, length ENTIRE_FILE_STATE_HEADER) ne ENTIRE_FILE_STATE_HEADER;
+  return substr $content, length ENTIRE_FILE_STATE_HEADER;
+}
+
+# Saves the content of the given MERGE (with its format) or ENTIRE FILE
+# fragment (from prepare_fragment), so that it can be read by read_merge_state
+# or read_entire_file_state on the next run.
+sub save_state {
   my ($fragment) = @_;
   my $conf = $fragment->{conf};
-  my $path = get_merge_state_path($fragment);
-  my $content = "MERGE $conf->{merge}\n\n$conf->{content}";
+  my $path = get_state_path($fragment);
+  my $header = $conf->{merge} ? "MERGE $conf->{merge}\n\n" : ENTIRE_FILE_STATE_HEADER;
+  my $content = $header.$conf->{content};
   return if -f $path and read_file($path) eq $content;
   my $dir = dirname($path);
   make_path($dir) if not -d $dir;
@@ -679,13 +864,13 @@ sub merge_content {
 # Puts in %$content the content of the files in the given directory and all its
 # subdirectories, indexed by their path relative to the given directory (the
 # optional $prefix is added at the beginning of these paths). Ignores hidden files and
-# directories.
+# directories, except for the DIR_CONF_NAME files.
 sub read_config_files {
   my ($dir, $content, $prefix) = @_;
   opendir(my $dh, $dir) or die "Can't open dir '$dir': $!\n";
   while (readdir $dh) {
-    next if m/^\./;
     my $f = catfile($dir, $_);
+    next if m/^\./ and ($_ ne DIR_CONF_NAME or not -f $f);
     my $name = defined $prefix ? "${prefix}/$_" : $_;
     read_config_files($f, $content, $name) if -d $f;
     $content->{$name} = read_file($f) if -f $f;
@@ -694,21 +879,59 @@ sub read_config_files {
   return;
 }
 
-# Writes in the current directory the fragments embedded in the script.
+# Splits the given configuration files (indexed by their path relative to the
+# configuration directory) into the fragments, indexed the same way, and the
+# directives of the DIR_CONF_NAME files (from parse_dir_conf), indexed by the
+# path of their directory ('' for the root of the configuration directory).
+sub split_config_files {
+  my ($config_files) = @_;
+  my (%fragments, %dir_confs);
+  while (my ($name, $content) = each %{$config_files}) {
+    if (basename($name) eq DIR_CONF_NAME) {
+      $dir_confs{$name =~ s{/?[^/]+$}{}r} = parse_dir_conf($name, $content);
+    } else {
+      $fragments{$name} = $content;
+    }
+  }
+  return (\%fragments, \%dir_confs);
+}
+
+# The keys of the directives that are replaced by a single FILENAME directive
+# in the exported fragments.
+my %TARGET_KEYS = map { $_ => 1 } qw(base dir filename mirror);
+
+# Returns the text of the given directive, with the given value.
+sub format_directive {
+  my ($directive, $value) = @_;
+  return $DIRECTIVES{$directive}{flag} || $value eq '' ? $directive : "${directive} ${value}";
+}
+
+# Writes in the current directory the fragments embedded in the script. The
+# exported files are not in their directories, so their target, their guard
+# suffix and the directives inherited from their directories are written
+# explicitly.
 sub export_fragments {
-  my $internal_files = get_data_section();
-  while (my ($file, $content) = each %{$internal_files}) {
-    my %conf = parse_file_conf($content);
-    my $guard_suffix = get_default_guard_suffix($file);
-    # The exported files are not in their directories, so their guard suffix
-    # is written explicitly.
-    if (defined $guard_suffix and not exists $conf{guard_suffix}) {
-      $content = "GUARD SUFFIX ${guard_suffix}\n${content}";
+  my ($fragments, $dir_confs) = split_config_files(get_data_section());
+  for my $file (sort keys %{$fragments}) {
+    my %conf = parse_file_conf($fragments->{$file}, $file, $dir_confs);
+    my ($own, $content, $own_lines) = parse_directives($fragments->{$file});
+    my $inherited = get_inherited_conf($file, $dir_confs);
+    my @header = ('FILENAME '.get_target($file, \%conf));
+    push @header, "GUARD SUFFIX $conf{guard_suffix}"
+        if exists $conf{guard_suffix} and not exists $own->{guard_suffix};
+    for my $d (sort keys %DIRECTIVES) {
+      my ($key, $multiple) = @{$DIRECTIVES{$d}}{qw(key multiple)};
+      next if not defined $key or $TARGET_KEYS{$key} or $key eq 'guard_suffix';
+      next if not exists $inherited->{$key} or not exists $conf{$key};
+      next if exists $own->{$key} and not $multiple;
+      push @header,
+          map { format_directive($d, $_) } $multiple ? @{$inherited->{$key}} : $inherited->{$key};
     }
-    if (not exists $conf{filename}) {
-      my $output = clean_output_path(basename($file));
-      $content = "FILENAME $output\n$content";
+    for my $line (@{$own_lines}) {
+      my ($d) = $line =~ m/^(${DIRECTIVE_RE})/;
+      push @header, $line if not $TARGET_KEYS{$DIRECTIVES{$d}{key} // ''};
     }
+    $content = join('', map { "${_}\n" } @header).$content;
     $file =~ s/^\.//;
     $file =~ s{/|,}{_}g;
     print "Exporting: $file\n";
@@ -749,13 +972,14 @@ sub check_requirements {
 # command if any.
 sub update_target {
   my ($mode, $out_path, $before, $new_content, $after, $conf) = @_;
-  my $content;
-  if ($conf->{entire_file} or $conf->{merge}) {
-    $content = $new_content;
+  if (exists $conf->{symlink}) {
+    write_symlink($out_path, $conf->{symlink});
+  } elsif ($conf->{entire_file} or $conf->{merge}) {
+    write_content($mode, $out_path, $new_content, $conf);
   } else {
-    $content = $before.$conf->{start_marker}.$new_content.$conf->{end_marker}.$after;
+    my $content = $before.$conf->{start_marker}.$new_content.$conf->{end_marker}.$after;
+    write_content($mode, $out_path, $content, $conf);
   }
-  write_content($mode, $out_path, $content, $conf);
   if ($conf->{post_update}) {
     my $cmd = $conf->{post_update} =~ s/\$@/$out_path/gr;
     system $cmd;
@@ -769,6 +993,8 @@ sub update_target {
 sub get_contents {
   my ($fragment) = @_;
   my ($mode, $in_path, $conf) = @{$fragment}{qw(mode in_path conf)};
+  return ('', describe_symlink_target($in_path), "-> $conf->{symlink}\n", '')
+      if exists $conf->{symlink};
   if (not $conf->{merge}) {
     my ($before, $old_content, $after) = read_content($mode, $in_path, $conf);
     return ($before, $old_content, $conf->{content}, $after);
@@ -779,16 +1005,73 @@ sub get_contents {
   return ('', merge_content($mode, $in_path, $conf, $old), '');
 }
 
-# Returns the target of the given fragment, from its FILENAME and DIR directives
-# or from its name, in the format expected by parse_file_name. Dies if these
-# directives are incompatible.
+# Returns the given $path resolved relative to the $base path. Both are relative
+# to the home directory (an empty $base is the home directory itself), unless
+# they are absolute. A $path starting with `~` is relative to the home
+# directory, whatever the $base.
+sub resolve_path {
+  my ($base, $path) = @_;
+  return $path if $path =~ m{^/};
+  if ($path =~ m{^~(?:/+(.*))?$}) {
+    return $1 // '';
+  }
+  return $path if $base eq '';
+  return catfile($base, $path);
+}
+
+# Returns the given component of the name of a fragment (its base name or, with
+# the MIRROR directive, one of its directories), as it is used in its target:
+# without its suffix between brackets and with a `dot_` prefix replaced by a
+# dot (as hidden files are ignored in the configuration directory). $name is
+# the name of the fragment, used in error messages.
+sub get_target_name {
+  my ($name, $part) = @_;
+  my $clean = clean_output_path($part);
+  die "Cannot use '${part}' in the target of '${name}', its name is only a guard suffix.\n"
+      if $clean eq '';
+  return $clean =~ s/^dot_/./r;
+}
+
+# Returns the directory of the target of the fragment with the given name and
+# the MIRROR directive: the path of its directory relative to the parent of the
+# directory where MIRROR is set (the one containing the DIR_CONF_NAME file, or
+# the fragment itself), or relative to that directory with MIRROR CONTENTS. The
+# root of the configuration directory is never part of that path (see
+# get_target_name).
+sub get_mirrored_dir {
+  my ($name, $conf) = @_;
+  my @dirs = split m{/}, $name;
+  pop @dirs;
+  # The own directives of a fragment are one level deeper than its directory.
+  my $from = $conf->{depth}{mirror};
+  $from = @dirs if $from > @dirs;
+  $from-- if $conf->{mirror} eq 'dir' and $from > 0;
+  return join '/', map { get_target_name($name, $_) } @dirs[$from .. $#dirs];
+}
+
+# Returns the target of the given fragment, from its BASE, DIR (or MIRROR) and
+# FILENAME directives and from its name, in the format expected by
+# parse_file_name. An absolute FILENAME (or one starting with `~` or made of
+# commands) ignores the BASE, DIR and MIRROR directives set in a parent
+# directory. Dies if these directives are incompatible.
 sub get_target {
   my ($name, $conf) = @_;
-  my $file = $conf->{filename} // clean_output_path(basename($name));
-  return $file if not exists $conf->{dir};
-  die "FILENAME cannot be an absolute path with DIR in '${name}'.\n" if $file =~ m{^/};
-  die "DIR cannot be used with commands in '${name}'.\n" if $file =~ m/,/;
-  return catfile($conf->{dir}, $file);
+  my $file = $conf->{filename} // get_target_name($name, basename($name));
+  if ($file =~ m{^(?:/|~(?:/|$))} or $file =~ m/,/) {
+    my $file_depth = exists $conf->{filename} ? $conf->{depth}{filename} : get_name_depth($name);
+    for my $d ('DIR', 'MIRROR') {
+      my $key = $DIRECTIVES{$d}{key};
+      next if not exists $conf->{$key} or $conf->{depth}{$key} < $file_depth;
+      die "${d} cannot be used with commands in '${name}'.\n" if $file =~ m/,/;
+      die "FILENAME cannot be an absolute path with ${d} in '${name}'.\n";
+    }
+    return $file =~ m/,/ ? $file : resolve_path('', $file);
+  }
+  my $dir = exists $conf->{mirror} ? get_mirrored_dir($name, $conf) : $conf->{dir};
+  my $target = '';
+  $target = resolve_path($target, $_)
+      for @{$conf->{base} // []}, grep { defined && $_ ne '' } $dir, $file;
+  return $target;
 }
 
 # Sorts the fragments by their base name and then by their path, ignoring case.
@@ -796,25 +1079,28 @@ sub by_fragment_order {
   return (lc basename($a) cmp lc basename($b)) || (lc $a cmp lc $b);
 }
 
-# Returns the description of the given fragment (from its name and content),
-# as a hash-ref with its name, `conf` (from parse_file_conf), `display_name`,
-# and the `mode`, `in_path` and `out_path` of its target (from
-# parse_file_name). Returns undef if its REQUIRE guards are not verified.
+# Returns the description of the given fragment (from its name and content, and
+# the directives of its directories, see parse_file_conf), as a hash-ref with
+# its name, `conf` (from parse_file_conf), `display_name`, and the `mode`,
+# `in_path` and `out_path` of its target (from parse_file_name). Returns undef
+# if its REQUIRE guards are not verified.
 sub prepare_fragment {
-  my ($name, $content) = @_;
-  my %conf = parse_file_conf($content, $name);
+  my ($name, $content, $dir_confs) = @_;
+  my %conf = parse_file_conf($content, $name, $dir_confs);
   my $target = get_target($name, \%conf);
   my $display_name = $target.($conf{guard_suffix} ? ' ('.$conf{guard_suffix}.')' : '');
   return if not check_requirements(\%conf, $display_name);
   my %fragment = (name => $name, conf => \%conf, display_name => $display_name);
   @fragment{qw(mode in_path out_path)} = parse_file_name($target);
+  die "SYMLINK cannot be used with commands in '${name}'.\n"
+      if exists $conf{symlink} and $fragment{mode} eq 'pipe';
   return \%fragment;
 }
 
 # Dies if some of the given fragments (from prepare_fragment) can't be applied
 # to the same target: when they have the same guard suffix (unless they both
-# use MERGE), when one of them uses ENTIRE FILE, or when only one of them uses
-# MERGE.
+# use MERGE), when one of them uses ENTIRE FILE or SYMLINK, or when only one of
+# them uses MERGE.
 sub check_conflicts {
   my (@fragments) = @_;
   my %by_target;
@@ -825,6 +1111,8 @@ sub check_conflicts {
       next
           if !$c->{entire_file}
           && !$o->{entire_file}
+          && !exists $c->{symlink}
+          && !exists $o->{symlink}
           && !$c->{merge} == !$o->{merge}
           && ($c->{merge} || ($c->{guard_suffix} // "\0") ne ($o->{guard_suffix} // "\0"));
       die "Fragments '$other->{name}' and '$f->{name}' can't both be applied to "
@@ -832,6 +1120,49 @@ sub check_conflicts {
     }
     push @{$by_target{"$f->{mode}\0$f->{in_path}"}}, $f;
   }
+  return;
+}
+
+# Returns the modifications made to the target of the given ENTIRE FILE fragment
+# (from prepare_fragment), whose current content is given, since the fragment
+# was last applied (according to its saved state), as a diff. Returns undef if
+# the target was not modified, or for the other fragments.
+sub get_target_modifications {
+  my ($fragment, $current) = @_;
+  my ($conf, $mode, $in_path) = @{$fragment}{qw(conf mode in_path)};
+  return if not $conf->{entire_file};
+  return if $mode eq 'file' and not -e $in_path;
+  my $saved = read_entire_file_state($fragment) // return;
+  return if $saved eq $current;
+  return diff(\$saved, \$current, {CONTEXT => 0});
+}
+
+# Checks whether the target of the given fragment (from prepare_fragment), whose
+# current and new contents are given, can be overwritten: an ENTIRE FILE target
+# that was not modified (see get_target_modifications), or a SYMLINK target
+# that is a symbolic link or does not exist. Returns undef, after printing the
+# reason, if the fragment must be skipped (a SYMLINK target that is a directory
+# is always skipped). Otherwise, returns the text to add to the message
+# reporting the update: ' (forced)' if the target can't be overwritten but
+# --force is used, or an empty string.
+sub check_target_modifications {
+  my ($fragment, $current, $new) = @_;
+  return '' if $current eq $new;
+  if (exists $fragment->{conf}{symlink}) {
+    return '' if $current eq '' or $current =~ m/^->/;
+    if ($current eq "(directory)\n") {
+      print STDERR "Skipping $fragment->{display_name}, which is a directory\n";
+      return;
+    }
+    return ' (forced)' if $flags{force};
+    print STDERR "Skipping $fragment->{display_name}, which is not a symbolic link "
+        ."(use --force to overwrite it)\n";
+    return;
+  }
+  my $modifications = get_target_modifications($fragment, $current) // return '';
+  return ' (forced)' if $flags{force};
+  print STDERR "Skipping $fragment->{display_name}, which was modified since its last update "
+      ."(use --force to overwrite it):\n${modifications}";
   return;
 }
 
@@ -846,7 +1177,7 @@ sub apply_fragment {
   my $can_write = !$flags{test} && !$conf->{need_root} == !$flags{root};
   if ($old_content eq $new_content and not need_perm_update($out_path, $mode, $conf)) {
     print "Nothing to do for: $display_name\n" unless $flags{silent};
-    save_merge_state($fragment) if $conf->{merge} and $can_write;
+    save_state($fragment) if ($conf->{merge} or $conf->{entire_file}) and $can_write;
     return 0;
   }
   if ($flags{diff}) {
@@ -855,11 +1186,12 @@ sub apply_fragment {
   }
   return 1 if $conf->{need_root} and not $flags{root};
   return 0 if $flags{root} and not $conf->{need_root};
+  my $forced = check_target_modifications($fragment, $old_content, $new_content) // return 0;
   if ($can_write) {
     update_target($mode, $out_path, $before, $new_content, $after, $conf);
-    save_merge_state($fragment) if $conf->{merge};
+    save_state($fragment) if $conf->{merge} or $conf->{entire_file};
   }
-  print "Updated: ${display_name}\n" unless $flags{silent};
+  print "Updated: ${display_name}${forced}\n" unless $flags{silent};
   return 0;
 }
 
@@ -880,8 +1212,9 @@ sub main {
     return;
   }
 
-  my @fragments = map { prepare_fragment($_, $config_files->{$_}) }
-      sort by_fragment_order keys %{$config_files};
+  my ($fragment_files, $dir_confs) = split_config_files($config_files);
+  my @fragments = map { prepare_fragment($_, $fragment_files->{$_}, $dir_confs) }
+      sort by_fragment_order keys %{$fragment_files};
   if ($flags{list}) {
     print "$_->{in_path}\n" for @fragments;
     return;
@@ -917,7 +1250,7 @@ remote hosts.
 =head1 SYNOPSIS
 
 update_config [--test] [--help] [--diff] [--silent] [--list] [--dir directory]
-[--root|--no-root] [--export] [--pack]
+[--root|--no-root] [--force] [--export] [--pack]
 
 =head1 DESCRIPTION
 
@@ -926,7 +1259,8 @@ directory if it exists. Otherwise, it reads them from the
 F<$XDG_CONFIG_HOME/update_config> directory (F<~/.config/update_config> when
 C<XDG_CONFIG_HOME> is not set). In both cases, all the subdirectories are read
 too, as well as the fragments embedded in the script itself by the C<--pack>
-option. A fragment
+option. A directory can also contain a F<.update_config> file, with directives
+that apply to all its fragments (see L</Directory directives>). A fragment
 from the directory replaces an embedded fragment with the same name.
 
 The non-core modules used by the program are installed automatically when
@@ -957,8 +1291,15 @@ abbreviated down to a single character.
 
   --no-root  Do not attempt to install the 'NEED ROOT' fragments.
 
+  --force  Overwrite the targets of the 'ENTIRE FILE' fragments even if they
+           were modified since they were last written by the program, and
+           the files that are not symbolic links at the targets of the
+           'SYMLINK' fragments. These targets are then reported as
+           "Updated: target (forced)".
+
   --export Export in the current directory all the files that are embedded
-           in the script.
+           in the script, with their target and the directives that they
+           inherit from their directories written explicitly.
 
   --dir directory   Process only the configuration files in the given
            directory and its subdirectories, instead of those from the
@@ -977,15 +1318,16 @@ abbreviated down to a single character.
 Each fragment file describes a piece of content that should be present in a
 target file. By default, the target is a file directly in your home directory,
 with the same name as the fragment. However, hidden files are ignored when the
-fragments are read, so most of the time you will set the target explicitly with
-the C<FILENAME> directive described below (e.g. to update your F<.bashrc>).
+fragments are read, so a C<dot_> prefix in the name of a fragment is replaced
+by a dot in its target (e.g. F<dot_bashrc> targets F<.bashrc>). The target can
+also be set explicitly with the C<FILENAME> directive described below.
 
 You can organize the fragments in sub-directories, but these are not part of
 the target path: only the base name of a fragment is used as its default
-target. A suffix between brackets in that name is not part of the target but
-it is the default guard suffix of the fragment (e.g. F<bashrc [linux]> and
-F<bashrc [macos]> both target F<.bashrc>, with the C<linux> and C<macos> guard
-suffixes). Several fragments can be applied to the same file only if they have
+target (unless the C<MIRROR> directive is used). A suffix between brackets in
+that name is not part of the target but it is the default guard suffix of the fragment (e.g. F<bashrc [linux]> and
+F<bashrc [macos]> both target F<.bashrc>, with the C<LINUX> and C<MACOS> guard
+suffixes, which are always in upper case). Several fragments can be applied to the same file only if they have
 different guard suffixes (see the C<GUARD SUFFIX> directive) or if they all
 use C<MERGE>, otherwise the program fails without applying any fragment.
 
@@ -994,7 +1336,7 @@ Similarly, a suffix between brackets at the end of the name of a directory
 fragments that it contains, including in its sub-directories. When several of
 these suffixes apply to a fragment (from its directories or its own name),
 they are joined with C<->, from the outermost one (e.g. the default guard
-suffix of F<[linux]/shell [work]/bashrc [prompt]> is C<linux-work-prompt>). Hidden
+suffix of F<[linux]/shell [work]/bashrc [prompt]> is C<LINUX-WORK-PROMPT>). Hidden
 directories are ignored too and fragments are processed in alphabetical order
 of their base name, ignoring case.
 
@@ -1017,7 +1359,10 @@ supported directives are the following:
 =item C<FILENAME> I<path>
 
 Sets the target file, instead of using the name of the fragment. The path is
-relative to your home directory, unless it is an absolute path. The path can
+relative to the directory given by C<DIR> or C<MIRROR> if any, itself relative
+to the base directory (your home directory, unless C<BASE> is used). An
+absolute path, or a path starting with C<~/> (relative to your home
+directory), ignores these directories. The path can
 also be made of two commands separated by a comma. In that case, the current
 content is read from the output of the first command and the new content is
 passed on the input of the second one (this is useful for C<crontab -l,
@@ -1027,8 +1372,44 @@ crontab ->).
 
 Sets the directory of the target file, which keeps the name of the fragment
 (or the one given by C<FILENAME>, which must then be a relative path). The
-path is relative to your home directory, unless it is an absolute path. This
-directive cannot be used when the target is made of two commands.
+path is relative to the base directory (your home directory, unless C<BASE> is
+used), unless it is an absolute path or it starts with C<~> (for your home
+directory). This directive cannot be used when the target is made of two
+commands, nor with C<MIRROR>.
+
+=item C<BASE> I<path>
+
+Sets the base directory of the target, which is your home directory by
+default: the C<DIR> and C<FILENAME> paths and the directories given by
+C<MIRROR> are relative to it. A relative path is relative to the previous base
+directory, which is the one set by a C<BASE> directive in a parent directory
+(see L</Directory directives>), if any, or your home directory otherwise. The
+path can also be absolute, or start with C<~> for a path relative to your home
+directory.
+
+=item C<MIRROR>
+
+Uses the structure of the configuration directory for the target, which is
+mostly useful in a F<.update_config> file (see L</Directory directives>): the
+directory of the target is the path of the directory of the fragment, starting
+with the directory where C<MIRROR> is set (the one containing the
+F<.update_config> file, or the fragment itself), relative to the base directory
+(see C<BASE>). For example, with C<MIRROR> in F<dot_config/.update_config>, the
+fragment F<dot_config/fish/config.fish> targets F<~/.config/fish/config.fish>.
+The root of the configuration directory is never part of the mirrored path. As
+for the name of the fragment, the suffixes between brackets are removed from
+the names of the mirrored directories (a directory whose name is only such a
+suffix can't be mirrored) and a C<dot_> prefix is replaced by a dot (e.g.
+F<dot_config/app [work]/dot_rc> targets F<.config/app/.rc>). A C<DIR>
+directive set deeper than C<MIRROR> replaces the mirrored path (and the
+reverse), and C<FILENAME> replaces the name of the fragment.
+
+=item C<MIRROR CONTENTS>
+
+Like C<MIRROR>, but the directory where the directive is set is not part of the
+mirrored path, only the directories below it are (e.g. with C<MIRROR CONTENTS>
+in F<config/.update_config>, the fragment F<config/fish/config.fish> targets
+F<~/fish/config.fish>). The deepest of C<MIRROR> and C<MIRROR CONTENTS> wins.
 
 =item C<COMMENTS CHAR> I<char>
 
@@ -1038,10 +1419,12 @@ the guard lines (it is repeated three times). The default is C<#>.
 =item C<GUARD SUFFIX> I<suffix>
 
 Adds a suffix to the guard lines, which then look like
-C<###AUTO-CONFIG:suffix START###>. You need this if several fragments target
+C<###AUTO-CONFIG:SUFFIX START###>. You need this if several fragments target
 the same file. By default, the suffixes between brackets at the end of the name
-of the fragment and of its directories are used, if any (see above). With
-C<MERGE>, there are no guard lines and the suffix is ignored.
+of the fragment and of its directories are used, if any (see above). The suffix
+is always converted to upper case, whether it comes from this directive or from
+the names of the files. With C<MERGE>, there are no guard lines and the suffix
+is ignored.
 
 =item C<IS PREFIX>
 
@@ -1051,7 +1434,12 @@ guards are not already present.
 =item C<ENTIRE FILE>
 
 Replaces the entire target file with the content of the fragment, without any
-guard lines.
+guard lines. The last applied version of the fragment is saved (see
+L</Merged files>) and, if the target was modified since then, it is not
+overwritten: the program prints the modifications that would be lost, skips
+the fragment and continues with the other ones. The C<--force> option
+overwrites the target anyway, and reports it as C<Updated: target (forced)>. A
+target that does not exist is always written.
 
 =item C<MAKE EXECUTABLE>
 
@@ -1073,6 +1461,20 @@ With C<MERGE>, sets how the arrays without an explicit mode are merged (see
 L</Merged files>): C<union> or C<replace> for all of them, or C<auto> (the
 default) to use C<replace> for the arrays that contain only scalars and
 C<union> for the others.
+
+=item C<SYMLINK> I<destination>
+
+Makes the target a symbolic link to the given destination, instead of writing
+the content of the fragment, which must be empty. A destination starting with
+C<~> is relative to your home directory, other relative destinations are
+relative to the directory of the link (as with C<ln -s>). An existing symbolic
+link at the target is replaced. Other files are not overwritten (the fragment
+is skipped, the program continues with the other ones), unless the C<--force>
+option is used. A directory is never replaced. The target can't be made of
+commands, and this directive can't be used in a F<.update_config> file, nor
+with C<COMMENTS CHAR>, C<ENTIRE FILE>, C<IS PREFIX>, C<MAKE EXECUTABLE>,
+C<MERGE>, C<MERGE ARRAYS> or C<PERM> (these directives are ignored when they
+are set in a parent directory).
 
 =item C<PERM> I<mode>
 
@@ -1102,6 +1504,80 @@ command, C<$@> is replaced by the path of the target file.
 A comment, which is ignored.
 
 =back
+
+=head2 Directory directives
+
+A directory of fragments can contain a F<.update_config> file, with directives
+(and C<REM> comments) on each line, possibly separated by empty lines, but no
+content. These directives apply to all the fragments of the directory,
+including those in its sub-directories. If several of these files apply to a
+fragment (from its directory and its parent directories), their directives
+are combined, starting with the outermost directory and ending with the
+directives of the fragment itself:
+
+=over 4
+
+=item *
+
+The C<REQUIRE> directives are all evaluated, the fragment is skipped if any of
+them is false.
+
+=item *
+
+For the other directives, the value from the deepest file wins (so the
+directives of a fragment override those of its directories). Note that a
+directive without a value (e.g. C<ENTIRE FILE>) cannot be disabled once it is
+set in a directory.
+
+=item *
+
+A C<GUARD SUFFIX> directive in a F<.update_config> file replaces the suffixes
+between brackets of the names of its directory and of the directories above
+it, but the suffixes of the directories below it and of the fragment
+itself are still added after it (e.g. with a F<.update_config> file containing
+C<GUARD SUFFIX work> in F<dir [d]>, the guard suffix of F<dir [d]/sub [s]/file>
+is C<WORK-S>). A C<GUARD SUFFIX> directive in a fragment replaces all of these
+suffixes.
+
+=item *
+
+A C<COMMENTS CHAR> directive is ignored by the fragments using C<MERGE> when
+it is set in a parent directory of the one setting C<MERGE> (otherwise, they
+cannot be used together). Similarly, C<MERGE ARRAYS> can be set in a
+F<.update_config> file without C<MERGE>, it then only applies to the fragments
+that use C<MERGE>.
+
+=item *
+
+The C<BASE> directives are all applied, each relative to the previous one.
+
+=item *
+
+An absolute C<FILENAME> (or a pair of commands, or a path starting with C<~/>)
+ignores the C<BASE>, C<DIR>, C<MIRROR> and C<MIRROR CONTENTS> directives set
+in a parent directory.
+
+=back
+
+A C<FILENAME> directive in a F<.update_config> file sends all the fragments of
+the directory to the same target, which requires them to have different guard
+suffixes (e.g. from their names, like F<path [path]> and F<editor [editor]>).
+
+For example, with a F<dot_config/.update_config> file containing:
+
+  MIRROR
+
+the fragment F<dot_config/fish/config.fish> targets
+F<~/.config/fish/config.fish>, F<dot_config/git [work]/config> targets
+F<~/.config/git/config> (with the C<WORK> guard suffix) and
+F<dot_config/app/settings.json> containing C<DIR .config/other> targets
+F<~/.config/other/settings.json>. The same targets are obtained with a
+F<config/.update_config> file containing:
+
+  BASE .config
+  MIRROR CONTENTS
+
+and C<DIR other> in F<config/app/settings.json>.
 
 =head2 Merged files
 

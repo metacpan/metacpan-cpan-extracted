@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -94,8 +94,10 @@ It is plain text, escaped when it is written to the page: C<E<lt>> and C<&> appe
 as themselves, and HTML in a title is shown rather than obeyed.
 
 =item * C<responsive> - If true, SVG elements are rendered with
-C<viewBox> and C<width="100%" height="auto"> instead of fixed pixel
-dimensions, so the chart scales fluidly with its container.
+C<viewBox> and C<width="100%"> instead of fixed pixel dimensions, so the
+chart scales fluidly with its container; with no C<height> attribute, the
+height follows the C<viewBox>'s proportions.  (C<height="auto"> is not a
+valid value for the attribute: Chromium logs an error for it and ignores it.)
 For snippet methods the per-call C<< opts => { responsive => 1 } >>
 takes precedence over this object-level setting (default: 0).
 
@@ -1272,7 +1274,7 @@ sub render_pie_chart_snippet {
 	my $width    = $self->{width};
 	my $height   = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $inner_radius_js = $donut ? 'radius * 0.38' : '0';
@@ -1621,7 +1623,7 @@ sub render_heatmap_snippet {
 	my $width  = $self->{width};
 	my $height = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $margin_top    = 30;
@@ -2005,7 +2007,7 @@ sub render_bar_chart_snippet {
 	my $width  = $self->{width};
 	my $height = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	# Rotate x-axis labels when there are more than 8 vertical bars
@@ -2457,7 +2459,7 @@ pairs to display in the tooltip after the label and value rows.
 the C<<svg>> element.  Use this when embedding multiple charts on the same page.
 
 =item * C<responsive> (boolean, default C<0>) - If true, emit
-C<viewBox="0 0 W H" width="100%" height="auto"> instead of fixed pixel
+C<viewBox="0 0 W H" width="100%">, with no C<height>, instead of fixed pixel
 dimensions, so the chart scales with its container.  Falls back to
 C<< $self->{responsive} >> when not set per call.
 
@@ -2532,7 +2534,7 @@ sub render_line_chart_snippet
 	my $w = $self->{width};
 	my $h = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $w $h" width="100%" height="auto"}
+		? qq{viewBox="0 0 $w $h" width="100%"}
 		: qq{width="$w" height="$h" style="border: 1px solid black;"};
 
 	my $html = <<"HTML";
@@ -2708,7 +2710,7 @@ sub render_zoomable_line_chart_snippet
 	my $w      = $self->{width};
 	my $h      = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $w $h" width="100%" height="auto"}
+		? qq{viewBox="0 0 $w $h" width="100%"}
 		: qq{width="$w" height="$h" style="border: 1px solid black;"};
 
 	# Single-quote heredoc so <\/b> is preserved verbatim in the output —
@@ -3812,7 +3814,7 @@ sub render_multi_series_line_chart_snippet
 	my $width  = $self->{width};
 	my $height = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $margin_right  = 150;  # room for legend
@@ -4160,7 +4162,7 @@ sub render_scatter_chart_snippet
 	# Reserve right margin for legend when series colouring is active.
 	my $margin_right = $has_series ? 140 : 20;
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $margin_bottom = $x_label ? 60 : 40;
@@ -4698,7 +4700,7 @@ sub render_stacked_bar_snippet
 	my $width   = $self->{width};
 	my $height  = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $is_v          = ($orient eq 'v') ? 1 : 0;
@@ -4967,7 +4969,7 @@ sub render_combo_snippet
 	my $width   = $self->{width};
 	my $height  = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $margin_top    = 20;
@@ -5250,7 +5252,7 @@ BUILDJS
 	my $width  = $self->{width};
 	my $height = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $label_block = $label ? <<"LBLJS" : '';
@@ -5474,7 +5476,7 @@ sub _render_histogram_binned
 	my $width     = $self->{width};
 	my $height    = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $margin_bottom = $x_label ? 60 : 40;
@@ -5642,7 +5644,7 @@ sub render_histogram_snippet
 	my $width   = $self->{width};
 	my $height  = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
 	my $margin_top    = 20;
@@ -5906,7 +5908,7 @@ sub _svg_attrs
 	my ($self, $override) = @_;
 	my $responsive = defined($override) ? $override : $self->{responsive};
 	return $responsive
-		? qq{viewBox="0 0 $self->{width} $self->{height}" width="100%" height="auto"}
+		? qq{viewBox="0 0 $self->{width} $self->{height}" width="100%"}
 		: qq{width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"};
 }
 
@@ -5919,7 +5921,7 @@ sub _render_snippet_shell
 	my $w = $self->{width};
 	my $h = $self->{height};
 	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
-		? qq{viewBox="0 0 $w $h" width="100%" height="auto"}
+		? qq{viewBox="0 0 $w $h" width="100%"}
 		: qq{width="$w" height="$h"};
 	return <<"SHELL";
 <div id="${container_id}_wrap" style="position:relative;">

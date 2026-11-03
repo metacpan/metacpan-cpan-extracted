@@ -97,6 +97,7 @@ t/remote_local.t
 t/schema.t
 t/schema_numeric.t
 t/strict.t
+t/table_names.t
 t/tabs.t
 t/test7.t
 t/test8.t

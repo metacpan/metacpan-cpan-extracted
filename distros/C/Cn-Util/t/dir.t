@@ -132,7 +132,9 @@ SKIP: {
 
 # A dir that is itself a symlink to a directory is listed through the link in
 # every mode.  The serial recursive walk used to find nothing, because
-# File::Find took the link for a file, while the other two followed it.
+# File::Find took the link for a file, while the other two followed it.  In
+# 0.022 it still found nothing on Windows (Strawberry Perl 5.42), where the
+# trailing slash that fixed it elsewhere does not make lstat follow a link.
 {
 	my $links = tempdir( CLEANUP => 1 );
 	my $link  = File::Spec->catdir($links, 'wide');

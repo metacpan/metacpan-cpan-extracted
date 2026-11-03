@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 ## Version
 
-Version 0.53
+Version 0.54
 
 ## Description
 
@@ -373,14 +373,32 @@ hashrefs) describing the join:
 ```perl
 join => {
     table => 'dept',
-    on    => 'employees.dept_id = dept.id',
+    on    => 'employees.dept_id = dept.id',   # raw SQL string
     type  => 'LEFT',    # INNER (default) | LEFT | RIGHT | FULL | CROSS
 }
+```
+
+The `on` condition can also be expressed in Perl-native forms that avoid
+writing raw SQL:
+
+```perl
+# Hashref: { left_col => right_col }  — equality, SQL-injection-safe
+join => { table => 'dept', on => { 'employees.dept_id' => 'dept.id' } }
+
+# Multi-column equality join (hash pairs AND-ed together)
+join => { table => 'dept', on => { 'e.dept_id' => 'd.id', 'e.region' => 'd.region' } }
+
+# Arrayref 2-element: [ left_col, right_col ]  — implies '='
+join => { table => 'dept', on => [ 'employees.dept_id', 'dept.id' ] }
+
+# Arrayref 3-element: [ left_col, operator, right_col ]
+# Valid operators: = != <> < > <= >=
+join => { table => 'ranges', on => [ 'log.score', '>=', 'ranges.min_score' ] }
 
 # Multiple joins
 join => [
-    { table => 'dept',    on => 'e.dept_id   = dept.id'   },
-    { table => 'country', on => 'e.country_id = country.id' },
+    { table => 'dept',    on => { 'e.dept_id'    => 'dept.id'    } },
+    { table => 'country', on => { 'e.country_id' => 'country.id' } },
 ]
 ```
 

@@ -1,0 +1,236 @@
+name: release-binaries
+
+# A release (or a dispatch with a tag) builds that tag on every platform and attaches the
+# binaries, tarballs and one checksums file to its GitHub release. A dispatch without a
+# tag is a probe: it builds and checks the chosen ref and keeps the results as Actions
+# artifacts only, leaving every release untouched.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and attach assets to; empty = probe run (Actions artifacts only)
+        required: false
+
+permissions:
+  contents: read
+
+# Two runs for the same tag would race on gh release upload --clobber; they queue instead.
+concurrency:
+  group: release-binaries-${{ github.event.release.tag_name || inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            arch: x86_64
+            runner: ubuntu-latest
+            image: perl:5.40-bullseye
+          - os: linux
+            arch: aarch64
+            runner: ubuntu-24.04-arm
+            image: perl:5.40-bullseye
+          - os: macos
+            arch: arm64
+            runner: macos-14
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    # Linux builds run in the pinned bullseye image (glibc 2.31 sets the floor of the packed XS
+    # modules, and the image decides which optional libs they link); macOS builds run on the runner itself.
+    # The image carries git, unzip, gcc, g++, make, binutils and cpanm; no apt step is needed.
+    container: ${{ matrix.image || null }}
+    # Values that reach a shell go through env, never inline ${{ }} in a run: body.
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      PLATFORM: ${{ matrix.os }}-${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TAG }}          # empty on a probe run: the dispatched ref
+          persist-credentials: false
+      - name: Fix safe.directory (Linux)
+        if: matrix.os == 'linux'
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Set up Perl 5.40 (macOS)
+        if: matrix.os == 'macos'
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: Install Perl deps and PAR::Packer
+        env:
+          TAR_OPTIONS: "--warning=no-unknown-keyword"   # quiets GNU tar
+        run: |
+          cpanm --notest --installdeps .
+          cpanm --notest PAR::Packer
+      - name: Compute version and asset base name
+        id: v
+        run: |
+          want=$(sed -n "s/^our \$VERSION = '\(.*\)';/\1/p" lib/Locale/Simple.pm)
+          # shellcheck disable=SC2016  # $VERSION is literal text in the message
+          [ -n "$want" ] || { echo '::error::cannot read $VERSION from lib/Locale/Simple.pm' >&2; exit 1; }
+          if [ -n "$TAG" ]; then
+            v="${TAG#v}"
+            # The tag v0.200.0 carries the dist version 0.200 that the binary prints.
+            case "$v" in
+              "$want"|"$want".*) ;;
+              *) printf '::error::tag %s does not match the dist version %s\n' "$TAG" "$want" >&2; exit 1 ;;
+            esac
+          else
+            v="probe-$(git rev-parse --short=7 HEAD)"
+          fi
+          echo "v=$v" >> "$GITHUB_OUTPUT"
+          echo "base=locale-simple-$v-$PLATFORM" >> "$GITHUB_OUTPUT"
+      - name: Build binary
+        env:
+          LOCALE_SIMPLE_BIN_OUT: ${{ steps.v.outputs.base }}
+        run: ./scripts/build-binary.sh
+      - name: Verify binary
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+        run: ./scripts/verify-binary.sh "$BASE"
+      - name: Check runtime libs
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+        run: |
+          ./scripts/check-binary-libs.sh "$BASE"
+          for lib in $(./scripts/check-binary-libs.sh --list); do
+            grep -qF "\`$lib\`" README.md \
+              || { printf '::error::README.md does not list runtime lib %s\n' "$lib" >&2; exit 1; }
+          done
+      - name: Package
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+          V: ${{ steps.v.outputs.v }}
+        run: |
+          mkdir -p "pkg/$BASE"
+          cp "$BASE" "pkg/$BASE/locale-simple"
+          cp LICENSE "pkg/$BASE/LICENSE"
+          libs=$(./scripts/check-binary-libs.sh --list)
+          {
+            printf 'locale-simple %s (%s)\n\n' "$V" "$PLATFORM"
+            printf 'Run it: ./locale-simple --help\n'
+            printf 'It needs no Perl.\n\n'
+            if [ -n "$libs" ]; then
+              printf 'Runtime libraries required on the target: %s\n' "$libs"
+              printf 'glibc 2.31 or newer.\n'
+              printf 'Debian and Ubuntu have libcrypt.so.1; on RHEL, Fedora, Amazon Linux and Arch\n'
+              printf 'install libxcrypt-compat.\n'
+            else
+              printf 'Runtime libraries required on the target: none beyond the system.\n'
+            fi
+            if [ "$RUNNER_OS" = macOS ]; then
+              printf '\nAfter a browser download, clear the quarantine flag:\n'
+              printf '  xattr -d com.apple.quarantine locale-simple\n'
+            fi
+            printf '\nhttps://github.com/%s\n' "$GITHUB_REPOSITORY"
+          } > "pkg/$BASE/README"
+          tar -C pkg -czf "$BASE.tar.gz" "$BASE"
+      - name: Keep binary and tarball as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.v.outputs.base }}
+          path: |
+            ${{ steps.v.outputs.base }}
+            ${{ steps.v.outputs.base }}.tar.gz
+          if-no-files-found: error
+
+  smoke:
+    # Each artifact runs on a clean machine: no setup-perl, no build container, no Perl
+    # modules from the build. The binary is proven off the machine that built it.
+    # Linux cells start the clean image with docker run on the runner host; the container
+    # gets only the mounted checkout and artifact, with no git and none of the runner's
+    # node or externals. macOS cells run on the runner itself.
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: linux, arch: x86_64, runner: ubuntu-latest, image: 'almalinux:9', pkg: dnf}
+          - {os: linux, arch: x86_64, runner: ubuntu-latest, image: 'ubuntu:22.04'}
+          - {os: linux, arch: x86_64, runner: ubuntu-latest, image: 'debian:bullseye-slim'}
+          - {os: linux, arch: aarch64, runner: ubuntu-24.04-arm, image: 'almalinux:9', pkg: dnf}
+          - {os: macos, arch: arm64, runner: macos-14}
+          - {os: macos, arch: arm64, runner: macos-15}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      PLATFORM: ${{ matrix.os }}-${{ matrix.arch }}
+    steps:
+      - name: Assert no build Perl on the machine (macOS)
+        if: matrix.os == 'macos'
+        run: |
+          if [ -e /Users/runner/hostedtoolcache/perl ]; then
+            echo '::error::/Users/runner/hostedtoolcache/perl exists; the smoke test would prove nothing' >&2
+            exit 1
+          fi
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TAG }}          # empty on a probe run: the dispatched ref
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: locale-simple-*-${{ env.PLATFORM }}
+          merge-multiple: true
+          path: dl
+      - name: Smoke-test the binary (macOS)
+        if: matrix.os == 'macos'
+        run: ./scripts/smoke-binary.sh dl/locale-simple-*-"$PLATFORM" dl/locale-simple-*-"$PLATFORM".tar.gz
+      - name: Smoke-test the binary in a clean image (Linux)
+        if: matrix.os == 'linux'
+        env:
+          IMAGE: ${{ matrix.image }}
+          PKG: ${{ matrix.pkg }}
+        run: |
+          docker run --rm -i -v "$PWD:/w" -w /w -e PLATFORM -e PKG "$IMAGE" sh -s <<'EOF'
+          set -eu
+          if [ "$PKG" = dnf ]; then
+            # A mirror answers badly now and then; three tries keep one bad response from failing the run.
+            ok=
+            for _try in 1 2 3; do
+              if dnf install -y libxcrypt-compat tar gzip diffutils; then ok=1; break; fi
+              sleep 10
+            done
+            [ -n "$ok" ] || { echo '::error::dnf install failed three times' >&2; exit 1; }
+          fi
+          # The bullseye build image compiles /usr/local/lib/perl5 into the binary's @INC.
+          if [ -e /usr/local/lib/perl5 ]; then
+            echo '::error::/usr/local/lib/perl5 exists; the smoke test would prove nothing' >&2
+            exit 1
+          fi
+          ./scripts/smoke-binary.sh dl/locale-simple-*-"$PLATFORM" dl/locale-simple-*-"$PLATFORM".tar.gz
+          EOF
+
+  release:
+    # Tag mode only: one checksums file over every asset, then all assets onto the release.
+    # The build jobs run in a container without gh; this job runs on the plain runner.
+    needs: [build, smoke]
+    if: github.event.release.tag_name != '' || inputs.tag != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # The only job that writes: it uploads the assets to the release.
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: locale-simple-*
+          merge-multiple: true
+          path: dl
+      - name: Write checksums and upload every asset
+        run: |
+          v="${TAG#v}"
+          out="locale-simple-$v-checksums.txt"
+          ( cd dl && sha256sum locale-simple-* ) > "$out"
+          cat "$out"
+          gh release upload "$TAG" dl/locale-simple-* "$out" \
+            --clobber --repo "$GITHUB_REPOSITORY"

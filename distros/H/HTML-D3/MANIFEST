@@ -50,6 +50,7 @@ t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/responsive.t
 t/snippet.t
 t/snippet_bar.t
 t/snippet_combo.t

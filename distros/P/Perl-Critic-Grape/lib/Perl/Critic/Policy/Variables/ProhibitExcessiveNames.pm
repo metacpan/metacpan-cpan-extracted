@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.4';
 
 Readonly::Scalar my $DESC  => q{Use concise names};
 Readonly::Scalar my $EXPL  => undef;

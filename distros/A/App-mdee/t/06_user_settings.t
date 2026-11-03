@@ -45,7 +45,7 @@ my $strip = sub { local $_ = shift; s/\e\[[0-9;]*[mK]//g; s/\e\]8;;[^\e]*\e\\//g
 
 # folded list items are not padded
 {
-    my $out = $strip->(run("'-Mmd::config(colorize=0,foldlist=1,foldwidth=30)' t/test.md")->stdout);
+    my $out = $strip->(run("'-Mmd::config(colorize=0,fold=1,fold_width=30)' t/test.md")->stdout);
     my @long = grep { /^- Third item/ } split /\n/, $out;
     ok(@long, 'the long item is still there');
     ok((grep { length($_) <= 30 } split /\n/, $out) > 5, 'items are folded');

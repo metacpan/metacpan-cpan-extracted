@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/SQLite/Statement.pm
-## Version v0.301.0
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## SQL API Abstraction - ~/lib/DB/Object/SQLite/Statement.pm
+## Version v0.301.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/10/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,7 +24,7 @@ BEGIN
     use parent qw( DB::Object::Statement );
     use vars qw( $VERSION $DEBUG );
     our $DEBUG = 0;
-    our $VERSION = 'v0.301.0';
+    our $VERSION = 'v0.301.1';
 };
 
 use strict;
@@ -187,7 +187,7 @@ DB::Object::SQLite::Statement - SQLite Statement Object
 
 =head1 VERSION
 
-    v0.301.0
+    v0.301.1
 
 =head1 DESCRIPTION
 

@@ -36,7 +36,8 @@ my %WriteMakefileArgs = (
 		prereqs     => {
 			runtime => {
 				recommends => {
-					'YAML::XS' => '0',
+					'YAML::XS'                  => '0',
+					'Monitoring::Sneck::Checks' => '0',
 				},
 			},
 		},

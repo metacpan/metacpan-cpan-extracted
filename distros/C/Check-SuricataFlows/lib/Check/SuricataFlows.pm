@@ -17,11 +17,11 @@ Check::SuricataFlows - Make sure Suricata is seeing data via reading the Suricat
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ sub new {
 		my $sensor_names_int = 0;
 		while ( defined( $opts{sensor_names}[$sensor_names_int] ) ) {
 			if ( ref( $opts{sensor_names}[$sensor_names_int] ) ne '' ) {
-				die(      '$opts{flow_file}['
+				die(      '$opts{sensor_names}['
 						. $sensor_names_int
 						. '] of ref type "'
 						. ref( $opts{sensor_names}[$sensor_names_int] )
@@ -419,7 +419,8 @@ sub run {
 					}
 
 					if ( !$IP_ignore ) {
-						my $sensor = $parsed_line->{'host'};
+						# .host is not there unless sensor-name is set, and undef as a key warns
+						my $sensor = $parsed_line->{'host'} // '';
 						if ( !defined( $to_return->{by_sensor}{$sensor} ) ) {
 							$to_return->{by_sensor}{$sensor} = {
 								bi_directional_count  => 0,

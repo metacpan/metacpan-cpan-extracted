@@ -735,15 +735,126 @@ sub commit($;$@)
     return;
 }
 
-# connect(9 is inherited by DB::Object
-
-# sub copy
+# connect() is inherited by DB::Object
 
 # See also datatype_to_constant()
 # NOTE: sub constant_to_datatype is inherited from DB::Object
 
-# See also constant_to_datatype()
-# NOTE: sub datatype_to_constant is inherited from DB::Object
+# sub copy
+
+# Load a table with COPY ... FROM STDIN.
+#   $dbh->copy_from( table => 'nta_staging', from => '/some/file.csv', format => 'csv', encoding => 'UTF8' ) ||
+#       die( $dbh->error );
+# The source can be a file path, a Module::Generic::File object, a filehandle, a scalar reference, or a
+# code reference returning successive chunks of data and then undef.
+# Returns the number of rows sent (counted on line feeds, so only meaningful for the text and csv
+# formats without embedded line feeds), or undef and sets an error.
+# It must be called inside a transaction if the caller wants to be able to roll back the load.
+sub copy_from
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $table = $opts->{table} || return( $self->error( "No table name was provided to copy into." ) );
+    return( $self->error( "No source was provided to copy from." ) ) if( !defined( $opts->{from} ) );
+    my $dbh = $self->{dbh} || return( $self->error( "No database handler found." ) );
+    my $format = lc( $opts->{format} // 'text' );
+    return( $self->error( "Unsupported COPY format '$format'." ) ) if( $format !~ /^(?:text|csv|binary)$/ );
+
+    # Build the statement, quoting identifiers and literals through the DBI handle
+    my $sql = 'COPY ' . CORE::join( '.', map{ $dbh->quote_identifier( $_ ) } split( /\./, $table ) );
+    if( ref( $opts->{columns} ) eq 'ARRAY' && scalar( @{$opts->{columns}} ) )
+    {
+        $sql .= ' ( ' . CORE::join( ', ', map{ $dbh->quote_identifier( $_ ) } @{$opts->{columns}} ) . ' )';
+    }
+    my @with = ( "FORMAT $format" );
+    push( @with, 'HEADER' ) if( $opts->{header} );
+    for my $k ( qw( delimiter null quote escape encoding ) )
+    {
+        push( @with, sprintf( '%s %s', uc( $k ), $dbh->quote( $opts->{ $k } ) ) ) if( defined( $opts->{ $k } ) );
+    }
+    $sql .= ' FROM STDIN WITH ( ' . CORE::join( ', ', @with ) . ' )';
+
+    # With pg_enable_utf8, which this module enables, DBD::Pg encodes the strings it sends. Raw UTF-8
+    # bytes must therefore be decoded into perl characters first, or they would be encoded a second time.
+    # A block may end in the middle of a multibyte character: FB_QUIET decodes what it can and leaves the
+    # incomplete bytes in $pending for the next block. Strings that already hold perl characters, such
+    # as literals from code under 'use utf8', are recognised by their UTF-8 flag and sent as they are.
+    # The option characters set to true forces this last behaviour for all the data.
+    my $decode = ( $format ne 'binary' && !$opts->{characters} && ( $opts->{encoding} // 'UTF8' ) =~ /^utf-?8$/i );
+    my $pending = '';
+    my $rows = 0;
+    my $put = sub
+    {
+        my $data = shift( @_ );
+        return(1) unless( defined( $data ) && CORE::length( $data ) );
+        if( $decode )
+        {
+            if( utf8::is_utf8( $data ) )
+            {
+                return( $self->error( "Characters received while incomplete UTF-8 bytes are still pending: the COPY source mixes bytes and characters." ) ) if( CORE::length( $pending ) );
+            }
+            else
+            {
+                $pending .= $data;
+                $data = Encode::decode( 'UTF-8', $pending, Encode::FB_QUIET );
+                # More than one incomplete character left means the bytes are not valid UTF-8
+                return( $self->error( "Invalid UTF-8 data found in the COPY source." ) ) if( CORE::length( $pending ) > 3 );
+                return(1) unless( CORE::length( $data ) );
+            }
+        }
+        $rows += ( $data =~ tr/\n// ) unless( $format eq 'binary' );
+        return( $dbh->pg_putcopydata( $data ) || $self->error({ code => $dbh->err, message => $dbh->errstr }) );
+    };
+
+    $dbh->do( $sql ) || return( $self->error({ code => $dbh->err, message => "Unable to start COPY: " . $dbh->errstr }) );
+    my $src = $opts->{from};
+    my $block = $opts->{block_size} || 65536;
+    my $ok = 1;
+    my $file;
+    local $@;
+    eval
+    {
+        if( ref( $src ) eq 'CODE' )
+        {
+            while( defined( my $chunk = $src->() ) )
+            {
+                ( $ok = $put->( $chunk ) ) || last;
+            }
+        }
+        elsif( ref( $src ) eq 'SCALAR' )
+        {
+            $ok = $put->( $$src );
+        }
+        else
+        {
+            my $fh;
+            if( $self->_is_glob( $src ) )
+            {
+                $fh = $src;
+            }
+            else
+            {
+                # A file path or a Module::Generic::File object, opened here and closed below
+                $file = $self->new_file( $src ) || die( $self->error, "\n" );
+                $fh = $file->open( '<', { binmode => 'raw' } ) || die( $file->error, "\n" );
+            }
+            my $buf;
+            while( CORE::read( $fh, $buf, $block ) )
+            {
+                ( $ok = $put->( $buf ) ) || last;
+            }
+        }
+    };
+    my $err = $@;
+    $file->close if( defined( $file ) );
+    # End the COPY in every case, so that the connection leaves COPY IN mode and a rollback can be sent
+    my $end = $dbh->pg_putcopyend;
+    return( $self->error( "Error while sending data to COPY: $err" ) ) if( $err );
+    return( $self->pass_error ) if( !$ok );
+    return( $self->error( "Invalid UTF-8 data at the end of the COPY source." ) ) if( CORE::length( $pending ) );
+    return( $self->error({ code => $dbh->err, message => "Error ending COPY: " . $dbh->errstr }) ) if( !$end );
+    return( $rows );
+}
 
 sub create_db
 {
@@ -841,6 +952,9 @@ sub create_table
 # sub data_type
 
 # NOTE: sub datatype_dict is inherited
+
+# See also constant_to_datatype()
+# NOTE: sub datatype_to_constant is inherited from DB::Object
 
 # NOTE: sub datatypes is in inherited
 
@@ -1236,6 +1350,22 @@ SQL
 # See DB::Object
 # sub param
 
+# Thin wrapper around DBD::Pg::pg_getcopydata, to read the output of COPY ... TO STDOUT
+sub pg_getcopydata
+{
+    my $self = shift( @_ );
+    local $@;
+    # pg_getcopydata writes into its first argument, so we must alias it rather than copy it
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_getcopydata( $_[0] ) );
+    };
+    return( $self->error( "Error calling pg_getcopydata: $@" ) ) if( $@ );
+    # Returns the number of bytes read, -1 when the COPY is finished, or -2 on error
+    return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) ) if( defined( $rv ) && $rv == -2 );
+    return( $rv );
+}
+
 sub pg_notifies
 {
     my $self = shift( @_ );
@@ -1288,6 +1418,34 @@ sub pg_ping(@)
     {
         $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr });
     }
+    return( $rv );
+}
+
+# Thin wrapper around DBD::Pg::pg_putcopydata, to be used after $dbh->do( 'COPY ... FROM STDIN' )
+sub pg_putcopydata
+{
+    my $self = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_putcopydata( @_ ) );
+    };
+    return( $self->error( "Error calling pg_putcopydata: $@" ) ) if( $@ );
+    return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) ) if( !$rv );
+    return( $rv );
+}
+
+# Thin wrapper around DBD::Pg::pg_putcopyend, which ends a COPY ... FROM STDIN
+sub pg_putcopyend
+{
+    my $self = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_putcopyend( @_ ) );
+    };
+    return( $self->error( "Error calling pg_putcopyend: $@" ) ) if( $@ );
+    return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) ) if( !$rv );
     return( $rv );
 }
 
@@ -1504,13 +1662,14 @@ sub table_exists
     my $self = shift( @_ );
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
-    my $opts = $self->_get_args_as_hash( @_ );
-    my $schema = $self->schema || $opts->{schema} || '';
+    my $opts        = $self->_get_args_as_hash( @_ );
+    my $schema      = $opts->{schema} || '';
+    my $search_path = $self->search_path || [];
     my $cache_tables = $self->cache_tables;
     my $tables_in_cache = $cache_tables->get({
-        host => $self->host,
-        driver => $self->driver,
-        port => $self->port,
+        host     => $self->host,
+        driver   => $self->driver,
+        port     => $self->port,
         database => $self->database,
     });
     foreach my $this ( @$tables_in_cache )
@@ -1518,6 +1677,7 @@ sub table_exists
         if( $this->{name} eq $table && 
             (
                 ( $schema && $this->{schema} eq $schema ) ||
+                ( $this->{schema} && scalar( grep{ $this->{schema} eq $_ } @$search_path ) ) ||
                 ( !$schema || $opts->{anywhere} ) 
             ) )
         {
@@ -1525,7 +1685,7 @@ sub table_exists
         }
     }
     # We did not find it, so let's try by checking directly the database
-    my $def = $self->table_info( $table ) || return;
+    my $def = $self->table_info( $table ) || return( $self->pass_error );
     return(1) if( scalar( @$def ) );
     return(0);
 }
@@ -1933,14 +2093,10 @@ This package inherits from L<DB::Object>, so any method not here, but there you 
 L<DB::Object::Postgres> is a SQL API much alike L<DBD::Pg>.
 So why use a private module instead of using that great L<DBD::Pg> package?
 
-At first, I started to inherit from C<DBI> to conform to C<perlmod> perl 
-manual page and to general perl coding guidlines. It became very quickly a 
-real hassle. Barely impossible to inherit, difficulty to handle error, too 
-much dependent from an API that change its behaviour with new versions.
+At first, I started to inherit from C<DBI> to conform to C<perlmod> perl manual page and to general perl coding guidlines. It became very quickly a real hassle. Barely impossible to inherit, difficulty to handle error, too much dependent from an API that change its behaviour with new versions.
 In short, I wanted a better, more accurate control over the SQL connection.
 
-So, L<DB::Object::Postgres> acts as a convenient, modifiable wrapper that provide the
-programmer with an intuitive, user-friendly and hassle free interface.
+So, L<DB::Object::Postgres> acts as a convenient, modifiable wrapper that provide the programmer with an intuitive, user-friendly and hassle free interface.
 
 =head1 CONSTRUCTOR
 
@@ -2295,6 +2451,59 @@ Same as L<DB::Object/connect>, only specific to PostgreSQL.
 
 See L<DB::Object/_connection_params2hash>
 
+=head2 copy_from
+
+    $dbh->begin_work;
+    my $rows = $dbh->copy_from(
+        table    => 'nta_staging',
+        from     => '/var/lib/nta/data.csv',
+        format   => 'csv',
+        encoding => 'UTF8',
+    ) || do
+    {
+        $dbh->rollback;
+        die( $dbh->error );
+    };
+    $dbh->commit;
+
+Runs C<COPY table ( columns ) FROM STDIN WITH ( ... )> and sends it the content of the source provided.
+
+Supported options:
+
+=over 4
+
+=item * C<table>
+
+Required. The table name, possibly qualified with its schema, such as C<public.nta_staging>.
+
+=item * C<columns>
+
+Optional array reference of column names.
+
+=item * C<from>
+
+Required. A file path, a L<Module::Generic::File> object, a filehandle, a scalar reference, or a code reference returning successive chunks of data and then C<undef>.
+
+=item * C<format>
+
+C<text> (default), C<csv> or C<binary>.
+
+=item * C<header>, C<delimiter>, C<null>, C<quote>, C<escape>, C<encoding>
+
+Passed on as the corresponding C<COPY> options.
+
+=item * C<characters>
+
+Set to true if the data provided is already decoded into perl characters. By default, data is treated as UTF-8 bytes and decoded before being sent, because C<pg_enable_utf8> would otherwise have L<DBD::Pg> encode it a second time.
+
+=item * C<block_size>
+
+Size of the blocks read from a file or filehandle, 65536 bytes by default.
+
+=back
+
+It returns the number of rows sent, counted on line feeds, or sets an L<error|Module::Generic/error> and returns C<undef>. In every case, the C<COPY> is ended, so that the connection can be used again, for instance to roll back.
+
 =head2 create_db
 
 Provided with a database name and some optional parameters and this will prepare and execute the query to create the database.
@@ -2438,6 +2647,10 @@ In list context, it returns an array of schema lines, and in scalar context, it 
 
 See L<DB::Object::Postgres::Tables/on_conflict>
 
+=head2 pg_getcopydata
+
+Thin wrapper around L<DBD::Pg/pg_getcopydata>. Its first argument receives the data read.
+
 =head2 pg_notifies
 
 Calls C<pg_notifies> on the underlying PostgreSQL DBI handle and returns the notification data supplied by L<DBD::Pg>. The method works from a database object and from objects that expose a C<database_object> back-reference.
@@ -2447,6 +2660,14 @@ Calls C<pg_notifies> on the underlying PostgreSQL DBI handle and returns the not
 =head2 pg_ping
 
 Calls L<DBD::Pg/pg_ping>
+
+=head2 pg_putcopydata
+
+Thin wrapper around L<DBD::Pg/pg_putcopydata>.
+
+=head2 pg_putcopyend
+
+Thin wrapper around L<DBD::Pg/pg_putcopyend>.
 
 =head2 query_object
 

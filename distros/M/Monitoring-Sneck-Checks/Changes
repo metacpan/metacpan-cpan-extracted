@@ -1,0 +1,8 @@
+Revision history for Monitoring-Sneck-Checks
+
+0.0.2   unreleased
+        - tests use t/tmp and t/data, not the system temp directory
+        - use static files instead of writing stuff out for test data
+
+0.0.1   2026-11-02/14:00
+        - initial release

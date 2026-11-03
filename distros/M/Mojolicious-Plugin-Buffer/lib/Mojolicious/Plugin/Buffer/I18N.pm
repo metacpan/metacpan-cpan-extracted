@@ -12,7 +12,7 @@ use Readonly;
 use Scalar::Util qw(blessed looks_like_number);
 use Sub::Private { mode => 'enforce' };
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.001.1');
 
 # Classes that want the i18n() method import it rather than inheriting it, so
 # the plugin keeps Mojolicious::Plugin as its only base class
@@ -133,7 +133,7 @@ Mojolicious::Plugin::Buffer::I18N - message catalog for Mojolicious::Plugin::Buf
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ Mojolicious::Plugin::Buffer - Optimise, compress and validate Mojolicious respon
 
 ## VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 ## SYNOPSIS
 
@@ -335,7 +335,11 @@ is installed, which can break scripts that rely on the
 Optimisation only applies to `text/html` and `application/xhtml+xml`
 responses.  The content of `<pre>`, `<textarea>`,
 `<script>` and `<style>` elements is never touched by the
-white-space squashing, because white space there is significant.
+white-space squashing, because white space there is significant.  A
+space between two inline elements, as in `Hello <b>world</b>`,
+is kept.  At level 2, consecutive `document.write` calls are merged only
+inside one `<script type="text/javascript">` element, so scripts
+of other types, such as templates, are left alone.
 [HTML::Packer](https://metacpan.org/pod/HTML%3A%3APacker) is optional: without it the white-space squashing and link
 rewriting still run, but comments and embedded CSS and JavaScript are left
 alone, as they are by [CGI::Buffer](https://metacpan.org/pod/CGI%3A%3ABuffer) and [FCGI::Buffer](https://metacpan.org/pod/FCGI%3A%3ABuffer).  Install
@@ -901,8 +905,8 @@ Only `200` responses to `GET` and `HEAD` requests are cached.  Requests
 with an `Authorization` header or a `Cache-Control` header containing
 `no-store`, `no-cache`, `private` or `max-age=0` bypass the cache, as do
 requests made while the `NO_CACHE` or `NO_STORE` environment variable is
-set.  Responses that set a cookie, that are marked `no-store` or
-`private`, or that vary on something not listed in ["vary\_by"](#vary_by), are not
+set.  Responses that set a cookie, that are marked `no-store`,
+`no-cache` or `private`, or that vary on something not listed in ["vary\_by"](#vary_by), are not
 stored.  Entries created before the application script or any template file
 or directory was last modified are treated as misses and removed.
 
@@ -1460,7 +1464,11 @@ long-polling and so on).  `text/event-stream` is excluded by default.
 `<style>`, but white space made significant by CSS
 (`white-space: pre` on another element) is still collapsed, and some rules
 (for example merging adjacent `<center>` blocks) change the
-document slightly.  Use `optimise_content => 0` on pages where every
+document slightly.  The squashing runs in time proportional to the size
+of the page, even for malformed HTML, but [HTML::Packer](https://metacpan.org/pod/HTML%3A%3APacker) does not: on a
+page with thousands of unclosed `<pre>` tags it can take seconds.
+Do not optimise HTML that a visitor controls.  Use
+`optimise_content => 0` on pages where every
 byte matters, or disable it per response with
 `$c->stash(buffer => {optimise_content => 0})`.  Link rewriting
 only recognises double-quoted attributes.
@@ -1686,7 +1694,8 @@ This is the life of one cache key, seen by all workers together.
     / the uncompressed page is stored with cache_duration; every
       waiting request is answered from it; the lock is released
 (3) the builder's response is finished  [error, or not storable:
-    it sets a cookie, is marked private or no-store, or varies on a
+    it sets a cookie, is marked private, no-store or no-cache, or
+    varies on a
     header not in vary_by]
     / every waiting request gets 503 with Retry-After: 1; the lock
       is released

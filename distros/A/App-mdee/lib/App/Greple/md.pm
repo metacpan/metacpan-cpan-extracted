@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.14";
+our $VERSION = "1.15";
 
 =encoding utf-8
 
@@ -26,9 +26,11 @@ App::Greple::md - Greple module for Markdown syntax highlighting
 
     greple -Mmd --no-table -- file.md
 
-    greple -Mmd --foldlist -- file.md
+    greple -Mmd --fold -- file.md
 
     greple -Mmd -- --fold file.md
+
+    greple -Mmd --refill -- file.md
 
 =head1 DESCRIPTION
 
@@ -57,21 +59,24 @@ The following options are defined as greple command options
 
 =head2 B<--fold>
 
-Enable text folding for list items and definition lists.  Long lines
-are wrapped with proper indentation using L<ansifold(1)|App::ansifold>
-via L<Greple::tee>.  Code blocks, HTML comments, and tables are
+Enable text folding for list items, definition lists, block quotes
+and the paragraphs joined by C<--refill>.  Long lines are wrapped
+with proper indentation using L<ansifold(1)|App::ansifold> via
+L<Greple::tee>; the continuation lines of a block quote start with
+the quote marker again.
+Code blocks, HTML comments, and tables are
 excluded from folding.  The fold width is controlled by the
-C<foldwidth> config parameter (default: 80), and the run-in and
+C<fold_width> config parameter (default: 80), and the run-in and
 run-out widths for line breaking (kinsoku) by C<fold_runin> and
 C<fold_runout> (default: 4, as in ansifold).
 
     greple -Mmd -- --fold file.md
-    greple -Mmd::config(foldwidth=60) -- --fold file.md
+    greple -Mmd::config(fold_width=60) -- --fold file.md
 
 Supported list markers: C<*>, C<->, C<1.>, C<1)>, C<#.>, C<#)>.
 
-The module option C<--foldlist> is a convenient alternative that
-enables folding via config.
+The module option C<--fold> (before C<-->) enables the same folding
+through the config.
 
 =head1 MODULE OPTIONS
 
@@ -101,17 +106,25 @@ When disabled, no color is applied to Markdown elements.
 
     greple -Mmd --no-colorize -- file.md
 
-=head2 B<--[no-]foldlist>
+=head2 B<--[no-]fold>
 
-Enable or disable text folding.  Disabled by default.  When
-enabled, long lines in list items and definition lists are wrapped
-with proper indentation.  The fold width is controlled by the
-C<foldwidth> config parameter (default: 80).
+Enable or disable text folding (config C<fold>).  Disabled by default.
+When enabled, long lines in list items, definition lists, block
+quotes and the paragraphs joined by C<--refill> are wrapped with
+proper indentation.
+The fold width is controlled by the C<fold_width> config parameter
+(default: 80).
 
-    greple -Mmd --foldlist -- file.md
-    greple -Mmd::config(foldlist=1,foldwidth=60) file.md
+    greple -Mmd --fold -- file.md
+    greple -Mmd::config(fold=1,fold_width=60) file.md
 
-See also the C<--fold> command option.
+The greple command option of the same name, C<--fold> after C<-->,
+folds the same lines once without setting the config.
+
+=head2 B<--[no-]refill>
+
+Join the lines of paragraphs into one line each (see L</Paragraph
+Refill>).  Disabled by default.
 
 =head2 B<--[no-]table>
 
@@ -140,6 +153,15 @@ function specs via L<Getopt::EX::Colormap>.
 
     greple -Mmd --cm h1=RD -- file.md
     greple -Mmd --cm bold='${base}D' -- file.md
+
+B<greple> has an option of the same name.  Before C<-->, C<--cm> belongs
+to this module and takes the labels above.  After C<-->, or when there
+is no C<-->, it is the option of B<greple>, which colors the matched
+text and its own labels such as C<FILE>, and complains about the labels
+of this module:
+
+    greple -Mmd --cm h1=RD -- --cm B -E foo file.md  # h1 is red, foo blue
+    greple -Mmd --cm h1=RD file.md                   # h1: Unknown label
 
 =head2 B<--heading-markup>[=I<STEPS>], B<--hm>[=I<STEPS>]
 
@@ -203,10 +225,14 @@ Available parameters:
     mode            light or dark (default: light)
     base_color      base color override
     colorize        syntax highlighting (default: 1)
-    foldlist        text folding (default: 0)
-    foldwidth       fold width in columns (default: 80)
+    fold            text folding (default: 0)
+    fold_width      fold width in columns (default: 80)
     fold_runin      run-in width in folded lines (default: 4)
     fold_runout     run-out width in folded lines (default: 4)
+    refill          join the lines of paragraphs (default: 0)
+    refill_parser   cmark (the CommonMark module), mdperl (Markdown::Perl)
+                    or pandoc (default: the first that is there, in
+                    that order)
     table           table formatting (default: 1)
     table_trim      trim cell whitespace (default: 1)
     table_width     table width in columns; cells of over-wide
@@ -223,9 +249,12 @@ Available parameters:
     table_boundary  fold boundary in wrapped cells (default: word)
     table_linebreak line break mode in wrapped cells: none, runin,
                     runout or all (default: all)
-    table_style     pipe: column separators (default); simple: columns
-                    separated by spaces, header rule per column, and a
-                    rule above and below the table
+    table_style     lattice: column separators (default; pipe is
+                    another name); 3line: columns separated by spaces,
+                    a rule above and below the table and per column
+                    below the header; simple: columns separated by
+                    spaces, a rule per column below the header and
+                    below the table
     rule            box-drawing characters (default: 1)
     osc8            OSC 8 hyperlinks (default: 1)
     heading_markup  inline markup in headings (default: 0)
@@ -234,6 +263,24 @@ Available parameters:
     tick_close      inline code close marker (default: ´)
     nofork          nofork+raw mode for code ref calls (default: 1)
     hashed.h1-h6    closing hashes per level (default: 0)
+
+=head2 Paragraph Refill
+
+With C<refill=1>, the lines of every paragraph, block quote, list
+item and definition are joined into one line before the text is
+colorized.  Which lines belong together is decided by a Markdown
+parser (L<App::Greple::md::Blocks>): the L<CommonMark> module, an
+interface to libcmark, when it is installed, otherwise
+L<Markdown::Perl>, which is pure Perl and always installed with this
+module, or L<pandoc|https://pandoc.org> (2.11.3 or later) run with the
+C<sourcepos> extension; C<refill_parser> chooses one.  The module
+joins the lines of the original text and changes nothing else.  Hard
+line breaks are kept, and so is the break before a list marker, a
+horizontal rule, a table row or a definition (C<: >).  When folding
+is enabled, the joined lines are folded too.
+
+    greple -Mmd::config(refill=1) file.md
+    greple -Mmd::config(refill=1,refill_parser=pandoc) file.md
 
 =head2 OSC 8 Hyperlinks
 
@@ -308,7 +355,7 @@ config parameters.
 =head2 Block Elements
 
     LABEL            LIGHT / DARK
-    blockquote       ${base}D
+    blockquote       ${base}
     horizontal_rule  L15
     comment          ${base}+r60
 
@@ -352,6 +399,11 @@ ANSI-aware column formatting used for table alignment.
 
 ANSI-aware text folding used for line wrapping in list items.
 
+=item L<App::Greple::md::Blocks>
+
+Finds the paragraphs for C<refill=1> with L<CommonMark>,
+L<Markdown::Perl> or L<pandoc|https://pandoc.org>.
+
 =back
 
 =head1 AUTHOR
@@ -373,6 +425,7 @@ use Getopt::EX::Config;
 use Getopt::EX::Colormap;
 use App::Greple::Common qw(FILELABEL);
 use App::Greple::Regions qw(match_regions);
+use App::Greple::md::Blocks qw(blocks);
 
 my @color_labels = qw(
     code_mark code_tick code_info code_block code_inline
@@ -384,31 +437,33 @@ my @color_labels = qw(
 );
 
 my $config = Getopt::EX::Config->new(
-    mode       => '',  # light / dark
-    osc8       => 1,   # OSC 8 hyperlinks
-    base_color => '',  # override base color
-    colorize   => 1,   # syntax highlighting
-    foldlist   => 0,   # text folding
-    foldwidth  => 80,  # fold width
-    fold_runin  => 4,  # run-in width in folded lines (ansifold default)
-    fold_runout => 4,  # run-out width in folded lines (ansifold default)
-    table      => 1,   # table formatting
-    table_trim => 1,   # trim cell content whitespace
-    table_width => 0,  # table width; wrap over-wide cells (0 = off)
-    table_cell => '',  # per-column widths for ansicolumn --cell (colon separated)
-    table_wrap_mark => '',  # mark for continuation lines of wrapped cells
-    table_cell_mark => '',  # mark for the first line of cells in wrapped columns
-    table_runin     => 2,       # run-in width in wrapped cells
-    table_runout    => 2,       # run-out width in wrapped cells
-    table_boundary  => 'word',  # fold boundary in wrapped cells
-    table_linebreak => 'all',   # line break (kinsoku) mode in wrapped cells
-    rule       => 1,   # box-drawing characters for tables
-    table_style => 'pipe',  # pipe: column separators; simple: spaces and rules only
-    nofork     => 1,   # use nofork+raw for code ref calls
-    heading_markup => 0,  # inline formatting in headings
-    tick_open  => '`',       # inline code open marker
-    tick_close => "\x{b4}",  # inline code close marker (´)
-    hashed     => { h1 => 0, h2 => 0, h3 => 0, h4 => 0, h5 => 0, h6 => 0 },
+    mode            => '',       # light / dark
+    osc8            => 1,        # OSC 8 hyperlinks
+    base_color      => '',       # override base color
+    colorize        => 1,        # syntax highlighting
+    fold            => 0,        # text folding
+    refill          => 0,        # join the lines of paragraphs
+    refill_parser   => '',       # cmark (CommonMark module) or pandoc; '' = whichever is there
+    fold_width      => 80,       # fold width
+    fold_runin      => 4,        # run-in width in folded lines (ansifold default)
+    fold_runout     => 4,        # run-out width in folded lines (ansifold default)
+    table           => 1,        # table formatting
+    table_trim      => 1,        # trim cell content whitespace
+    table_width     => 0,        # table width; wrap over-wide cells (0 = off)
+    table_cell      => '',       # per-column widths for ansicolumn --cell (colon separated)
+    table_wrap_mark => '',       # mark for continuation lines of wrapped cells
+    table_cell_mark => '',       # mark for the first line of cells in wrapped columns
+    table_runin     => 2,        # run-in width in wrapped cells
+    table_runout    => 2,        # run-out width in wrapped cells
+    table_boundary  => 'word',   # fold boundary in wrapped cells
+    table_linebreak => 'all',    # line break (kinsoku) mode in wrapped cells
+    rule            => 1,        # box-drawing characters for tables
+    table_style     => 'lattice', # lattice (or pipe): column separators; 3line, simple: spaces and rules only
+    nofork          => 1,        # use nofork+raw for code ref calls
+    heading_markup  => 0,        # inline formatting in headings
+    tick_open       => '`',      # inline code open marker
+    tick_close      => "\x{b4}", # inline code close marker (´)
+    hashed          => { h1 => 0, h2 => 0, h3 => 0, h4 => 0, h5 => 0, h6 => 0 },
     (map { $_ => undef } @color_labels),  # color labels (undef = not set)
 );
 
@@ -441,7 +496,7 @@ my %default_colors = (
     italic          => 'I',
     strike          => 'X',
     emphasis_mark   => 'L18',
-    blockquote      => '${base}D',
+    blockquote      => '${base}',
     horizontal_rule => 'L15',
 );
 
@@ -487,7 +542,7 @@ sub finalize {
     no_user_settings(qw(ansicolumn ansifold));
     $config->deal_with($argv,
                        "mode|m=s", "base_color|B=s",
-                       "colorize!", "nofork!", "foldlist!", "foldwidth=i", "fold_runin=i", "fold_runout=i",
+                       "colorize!", "nofork!", "fold!", "refill!", "refill_parser=s", "fold_width=i", "fold_runin=i", "fold_runout=i",
                        "table!", "table_trim!",
                        "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s",
                        "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s",
@@ -500,10 +555,10 @@ sub finalize {
     if (defined $hm && $hm eq '') {
         $config->{heading_markup} = 'all';
     }
-    if (my $w = $config->{foldwidth}) {
+    if (my $w = $config->{fold_width}) {
         my $fold = join ' ', '--fold-by', $w, @{$config}{qw(fold_runin fold_runout)};
         $mod->setopt('--fold', $fold);
-        if ($config->{foldlist}) {
+        if ($config->{fold}) {
             my @default = $mod->default;
             $mod->setopt('default', @default, $fold);
         }
@@ -796,7 +851,7 @@ my %colorize = (
     }),
 
     blockquotes => Step(blockquote => sub {
-        s/^(>+\h?)(.*)$/md_color('blockquote', $1) . $2/mge;
+        s/^( {0,3})((?:>\h?)+)(.*)$/$1 . md_color('blockquote', $2) . $3/mge;
     }),
 );
 
@@ -877,20 +932,159 @@ sub table_regions {
     match_regions(pattern => qr/ (?= (?:$row)*? $sep ) (?:$row){3,} /x);
 }
 
+#
+# Paragraph refill
+#
+
+# Join the lines of one paragraph (or list item, quote, definition)
+# into a single line.  The rules are those of ansifold's fill_up: the
+# line break after a fullwidth punctuation character and between two
+# characters of a script written without spaces (CJK) is simply
+# removed, any other becomes one space.  A line is left as it is, as
+# the start of a new line, when the line before it ends in a hard
+# break (two or more spaces, or a backslash), or when it starts with
+# a list marker, is a horizontal rule, which pandoc may report as
+# part of the paragraph (a "#." list, "Text\n***"), or when either
+# line looks like a table row: GFM does not let a table interrupt a
+# paragraph, but format_table takes three such lines as a table.
+# From the second line on, up to $depth quote markers and the
+# indentation are removed before joining.  A CR before the line
+# break (CRLF file) goes with the line break.
+#
+# The character properties are defined as subroutines in App::ansifold
+# and looked up when the pattern is compiled, so the patterns are
+# built here, after the module is loaded, not at compile time.
+sub refill_block {
+    my($lines, $depth) = @_;
+    state $punct  = do {
+        require App::ansifold;
+        my $p = "App::ansifold::InFullwidthPunctuation";
+        qr/\p{$p}/;
+    };
+    state $concat = do {
+        my $p = "App::ansifold::InConcatScript";
+        qr/\p{$p}/;
+    };
+    my $prefix = qr/^\h*(?:>\h?){0,$depth}\h*/;
+    my $marker = qr/^\h*(?:[*+-]|(?:\d+|#)[.)])\h+/;
+    my $hr     = qr/^ {0,3}(?:[-*_][ ]*){3,}\r?$/;
+    my $row    = qr/^ {0,3}\|.+\|\h*\r?$/;
+    my $def    = qr/^\h*:\h/;
+    my $note   = qr/$prefix\[\^[^\]\s]+\]:/;
+    my $hard   = qr/(?:(?<!\\)(?:\\\\)*\\|(?<! ) {2,})\r?$/;  # odd number of backslashes, or two spaces (the lookbehinds keep it linear)
+    my @out;
+    for my $line (@$lines) {
+        if (!@out or $out[-1] =~ $hard or $out[-1] =~ $row
+            or $line =~ $marker or $line =~ $hr or $line =~ $row
+            or $line =~ $def or $line =~ $note) {
+            push @out, $line;
+            next;
+        }
+        my $text = $line =~ s/$prefix//r;
+        $out[-1] =~ s/\r\z//;
+        if ($out[-1] =~ /$punct$/) {
+            $out[-1] .= $text;
+        } elsif ($out[-1] =~ /$concat$/ and $text =~ /^$concat/) {
+            $out[-1] .= $text;
+        } else {
+            $out[-1] =~ s/ +$//;
+            $text =~ s/^ +//;
+            $out[-1] .= " $text";
+        }
+    }
+    @out;
+}
+
+# The line ranges that refill() joined, as [first, last] in the text
+# after joining, and the formatted tables, as [first line, lines added],
+# both for the current file.  refill_regions() turns them into the
+# regions that --fold-by folds.
+our @refill_lines;
+our @table_shift;
+
+# Join the lines of every paragraph (Para) and tight list item or
+# definition (Plain) in $_, from the bottom up so that the line numbers
+# of the blocks above stay valid, and remember where the joined lines
+# are in the result.
+sub refill {
+    @refill_lines = ();
+    my @lines = split /\n/, $_, -1;
+    my @done;
+    my $limit = @lines + 1;
+    # TOML front matter (+++ ... +++) is a paragraph to pandoc
+    my $front = /\A\+\+\+\r?\n(?:[^\n]*\n)*?\+\+\+\r?(?:\n|\z)/p ? (${^MATCH} =~ tr/\n//) : 0;
+    for my $b (sort { $b->{first} <=> $a->{first} }
+               grep { $_->{type} eq 'Para' or $_->{type} eq 'Plain' }
+               blocks($_, parser => $config->{refill_parser})) {
+        my($first, $last) = @{$b}{qw(first last)};
+        next if $last < $first or $last >= $limit or $first <= $front;
+        $limit = $first;
+        my @joined = refill_block([ @lines[$first-1 .. $last-1] ], $b->{depth});
+        splice @lines, $first-1, $last-$first+1, @joined;
+        unshift @done, [ $first, scalar @joined, $last - $first + 1 - @joined ];
+    }
+    my $shift = 0;
+    for my $d (@done) {
+        my($first, $count, $removed) = @$d;
+        push @refill_lines, [ $first - $shift, $first - $shift + $count - 1 ];
+        $shift += $removed;
+    }
+    $_ = join "\n", @lines;
+}
+
+# The lines that refill() joined, one region per line including its
+# newline, for --fold-by.  The text has been through colorize(), which
+# keeps the number of lines, and format_table(), which does not: the
+# tables above a range have added the lines in @table_shift.
+sub refill_regions {
+    my %arg = @_;
+    delete $arg{&FILELABEL};
+    return () unless @refill_lines;
+    my @start = (0);
+    my $pos = 0;
+    while (($pos = index($_, "\n", $pos)) >= 0) {
+        push @start, ++$pos;
+    }
+    my $end = length $_;
+    my @regions;
+    for my $range (@refill_lines) {
+        for my $line ($range->[0] .. $range->[1]) {
+            my $shift = 0;
+            for my $t (@table_shift) {
+                $shift += $t->[1] if $t->[0] < $line;
+            }
+            my $n = $line + $shift;
+            last if $n > @start;
+            push @regions, [ $start[$n-1], $start[$n] // $end ];
+        }
+    }
+    @regions;
+}
+
+
 sub begin {
+    @refill_lines = @table_shift = ();
+    refill()       if $config->{refill};
     colorize()     if $config->{colorize};
     format_table() if $config->{table};
 }
 
 sub format_table {
-    # simple style (Pandoc's simple table): no column separators, the
-    # header rule per column, a full-width rule above and below.  The
-    # table is formatted as in rule mode and the separators are blanked.
-    my $simple = $config->{table_style} eq 'simple';
-    my $sep = ($config->{rule} || $simple) ? "\x{2502}" : '|';  # │ or |
+    # lattice (or pipe) has column separators.  3line and simple have
+    # none and a header rule per column: 3line adds a full-width rule
+    # above and below, simple the header rule below.  They are formatted
+    # as in rule mode and the separators are blanked.
+    my $style = $config->{table_style};
+    my $open = $style eq '3line' || $style eq 'simple';
+    my $sep = ($config->{rule} || $open) ? "\x{2502}" : '|';  # │ or |
 
-    s{(^ {0,3}\|.+\|\n){3,}}{
-        my $block = $&;
+    # A row may have spaces after the last pipe (GFM ignores them); they
+    # are allowed in the block and removed, so that every row ends in
+    # the same column for ansicolumn.
+    s{(^ {0,3}\|.+\|\h*\n){3,}}{
+        my $block = $& =~ s/\h+$//mgr;
+        my $line  = 1 + (substr($_, 0, $-[0]) =~ tr/\n//);
+        my $lines = $& =~ tr/\n//;
         my($right, $center) = parse_separator(\$block);
         my @sep_opt;
         # An escaped pipe (\|) is not a column separator (GFM).  It is
@@ -930,14 +1124,20 @@ sub format_table {
         my @wrap = map { "--$_=" . $config->{"table_$_"} } qw(runin runout boundary linebreak);
         my $formatted = call_ansicolumn($block, @sep_opt, '-o', $sep, '-t', '--cu=1', @align, @fit, @wrap);
         my $table = fix_separator($formatted, $sep);
-        if ($simple) {
-            # blank the column separators; add full-width rules above
-            # and below the table (pandoc simple table with a top line)
+        if ($open) {
+            # blank the column separators and add the rules
             $table =~ tr/\x{2502}\x{253C}\x{251C}\x{2524}/    /;
-            my($first) = $table =~ /^(.*)$/m;
-            my $rule = "\x{2500}" x ansi_width($first);
-            $table = "$rule\n$table$rule\n";
+            if ($style eq '3line') {
+                my($first) = $table =~ /^(.*)$/m;
+                my $rule = "\x{2500}" x ansi_width($first);
+                $table = "$rule\n$table$rule\n";
+            } else {
+                my($rule) = $table =~ /^([\x{2500} ]+)$/m;
+                $table .= "$rule\n" if defined $rule;
+            }
+            $table =~ s{^[\x{2500} ]+$}{ $& =~ tr/\x{2500}/-/r }mge unless $config->{rule};
         }
+        push @table_shift, [ $line, ($table =~ tr/\n//) - $lines ];
         $table;
     }mge;
 }
@@ -1001,12 +1201,26 @@ option default \
 
 define {CODE_BLOCK}  ^ {0,3}(?<bt>(?<fc>[`~])\g{fc}{2,}+)(.*)\n((?s:.*?))^ {0,3}\g{bt}\g{fc}*+\h*$
 define {COMMENT}     ^<!--(?![->])(?s:.+?)-->
-define {LIST_ITEM}   ^\h*(?:[*-]|(?:\d+|#)[.)])\h+.*\n
+define {SGR}         (?:\e\[[\d;]*[mK])*
+define {SGR_END}     (?:\e\[[0;]*[mK])*
+define {LIST_MARKER} (?:[*-]|(?:\d+|#)[.)])
+define {LIST_ITEM}   ^\h*{LIST_MARKER}\h+.*\n
+define {QUOTE_LINE}  ^ {0,3}(?:{SGR}>\h?)+.*\n
+# The prefix of a folded line's continuation lines: the quote markers
+# (named group, repeated by ansifold --keepindent=named), then the indent,
+# a list marker or a definition colon, which become spaces of the same
+# width.  Every line matches (all parts may be empty), so that every line
+# sets its own prefix.
+# After the markers only reset and erase sequences (SGR_END) belong to
+# the group: any sequence (SGR) would take the opening of a span that
+# follows, and every continuation line would start inside that span.
+define {AUTOINDENT}  ^\h*(?<q>(?:{SGR}>\h?)*{SGR_END})(?:\h*(?:{LIST_MARKER}|:)\h+|\h+)?
 define {DEFINITION}  (?:\A|\G\n|\n\n).+\n\n?(:\h+.*\n)
 
 option --fold-by \
     -Mtee "&ansifold" --crmode \
-        --autoindent='^\h*(?:[*-]|(?:\d+|#)[.)]|:)\h+|^\h+' \
+        --autoindent='{AUTOINDENT}' \
+        --keepindent=named \
         --smart --width=$<shift> --runin=$<shift> --runout=$<shift> \
     -- \
     --exclude {CODE_BLOCK} \
@@ -1014,5 +1228,7 @@ option --fold-by \
     --exclude &__PACKAGE__::table_regions \
     --cm N -E {LIST_ITEM} \
     --cm N -E {DEFINITION} \
+    --cm N -E {QUOTE_LINE} \
+    --cm N --le &__PACKAGE__::refill_regions \
     --crmode
 

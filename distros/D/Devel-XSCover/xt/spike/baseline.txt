@@ -1,0 +1,155 @@
+Deleting database /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db
+cover: running make test "OPTIMIZE=-O0 -fprofile-arcs -ftest-coverage" "OTHERLDFLAGS=-fprofile-arcs -ftest-coverage"
+"/opt/homebrew/Cellar/perl/5.42.0/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- Spike.bs blib/arch/auto/Spike/Spike.bs 644
+cc -c  -Iinclude -fno-common -DPERL_DARWIN -DNO_THREAD_SAFE_QUERYLOCALE -DNO_POSIX_2008_LOCALE -DHAS_BROKEN_LANGINFO_CODESET -DNO_LOCALE_COLLATE -fno-strict-aliasing -pipe -fstack-protector-strong -DSPIKE_CC -O0 -fprofile-arcs -ftest-coverage   -DVERSION=\"0.01\" -DXS_VERSION=\"0.01\"  "-I/opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE"   Spike.c
+cc -c  -Iinclude -fno-common -DPERL_DARWIN -DNO_THREAD_SAFE_QUERYLOCALE -DNO_POSIX_2008_LOCALE -DHAS_BROKEN_LANGINFO_CODESET -DNO_LOCALE_COLLATE -fno-strict-aliasing -pipe -fstack-protector-strong -DSPIKE_CC -O0 -fprofile-arcs -ftest-coverage   -DVERSION=\"0.01\" -DXS_VERSION=\"0.01\"  "-I/opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE"   src/helper.c -o src/helper.o
+rm -f blib/arch/auto/Spike/Spike.bundle
+cc  -bundle -undefined dynamic_lookup -fstack-protector-strong  Spike.o src/helper.o -fprofile-arcs -ftest-coverage -o blib/arch/auto/Spike/Spike.bundle  \
+	      \
+	  
+chmod 755 blib/arch/auto/Spike/Spike.bundle
+PERL_DL_NONLAZY=1 "/opt/homebrew/Cellar/perl/5.42.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01-basic.t .... ok
+t/02-fork.t ..... ok
+t/03-exit.t ..... ok
+
+Unfortunately, Devel::Cover does not yet work with threads.  I have done
+some work in this area, but there is still more to be done.
+
+t/04-threads.t .. 
+Dubious, test returned 1 (wstat 256, 0x100)
+No subtests run 
+
+Test Summary Report
+-------------------
+t/04-threads.t (Wstat: 256 (exited 1) Tests: 0 Failed: 0)
+  Non-zero exit status: 1
+  Parse errors: No plan found in TAP output
+Files=4, Tests=19,  1 wallclock secs ( 0.01 usr  0.01 sys +  0.43 cusr  0.10 csys =  0.55 CPU)
+Result: FAIL
+Failed 1/4 test programs. 0/19 subtests failed.
+make: *** [test_dynamic] Error 1
+cover: running gcov -abc -o . Spike.xs
+File 'Spike.c'
+Lines executed:78.03% of 132
+Branches executed:81.25% of 64
+Taken at least once:40.62% of 64
+No calls
+Creating 'Spike.c.gcov'
+
+File 'Spike.xs'
+Lines executed:88.46% of 26
+Branches executed:100.00% of 13
+Taken at least once:84.62% of 13
+No calls
+Creating 'Spike.xs.gcov'
+
+File 'xs/more.xs'
+Lines executed:50.00% of 4
+No branches
+No calls
+Creating 'more.xs.gcov'
+
+File '/opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE/inline.h'
+Lines executed:100.00% of 2
+No branches
+No calls
+Creating 'inline.h.gcov'
+
+File '/opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE/sv_inline.h'
+Lines executed:80.00% of 5
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+Creating 'sv_inline.h.gcov'
+
+File 'include/spike.h'
+Lines executed:100.00% of 4
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+Creating 'spike.h.gcov'
+
+cover: running gcov -abc -o . Spike.c
+File 'Spike.c'
+Lines executed:78.03% of 132
+Branches executed:81.25% of 64
+Taken at least once:40.62% of 64
+No calls
+Creating 'Spike.c.gcov'
+
+File 'Spike.xs'
+Lines executed:88.46% of 26
+Branches executed:100.00% of 13
+Taken at least once:84.62% of 13
+No calls
+Creating 'Spike.xs.gcov'
+
+File 'xs/more.xs'
+Lines executed:50.00% of 4
+No branches
+No calls
+Creating 'more.xs.gcov'
+
+File '/opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE/inline.h'
+Lines executed:100.00% of 2
+No branches
+No calls
+Creating 'inline.h.gcov'
+
+File '/opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE/sv_inline.h'
+Lines executed:80.00% of 5
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+Creating 'sv_inline.h.gcov'
+
+File 'include/spike.h'
+Lines executed:100.00% of 4
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+Creating 'spike.h.gcov'
+
+cover: running gcov -abc -o ./src helper.c
+File 'src/helper.c'
+Lines executed:85.71% of 7
+Branches executed:100.00% of 4
+Taken at least once:75.00% of 4
+No calls
+Creating 'helper.c.gcov'
+
+File 'include/spike.h'
+Lines executed:83.33% of 6
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+Creating 'spike.h.gcov'
+
+cover: running /opt/homebrew/Cellar/perl/5.42.0/bin/perl /opt/homebrew/Cellar/perl/5.42.0/bin/gcov2perl -db /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db Spike.xs.gcov more.xs.gcov helper.c.gcov sv_inline.h.gcov inline.h.gcov
+gcov2perl: Warning: ignoring branch with 5 targets at Spike.xs:47     switch (n) {
+gcov2perl: Warning: ignoring branch with 4 targets at src/helper.c:5     switch (n) {
+gcov2perl: Writing coverage database to /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db/runs/1793680762.92240.19077
+gcov2perl: Writing coverage database to /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db/runs/1793680762.92240.18233
+gcov2perl: Writing coverage database to /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db/runs/1793680762.92240.05960
+gcov2perl: Writing coverage database to /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db/runs/1793680762.92240.42267
+gcov2perl: Writing coverage database to /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db/runs/1793680762.92240.06349
+Reading database from /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db
+
+
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+...lib/perl5/JSON/MaybeXS.pm    0.0    0.0    0.0    0.0    n/a    n/a    0.0
+...ulti-2level/CORE/inline.h  100.0    n/a    n/a    n/a    n/a    n/a  100.0
+...i-2level/CORE/sv_inline.h   80.0   50.0    n/a    n/a    n/a    n/a   71.4
+Spike.xs                       88.4   75.0    n/a    n/a    n/a    n/a   85.2
+blib/lib/Spike.pm             100.0    n/a    n/a  100.0    n/a  100.0  100.0
+src/helper.c                   85.7    n/a    n/a    n/a    n/a    n/a   85.7
+xs/more.xs                     50.0    n/a    n/a    n/a    n/a    n/a   50.0
+Total                          45.7   20.5    0.0   25.0    n/a  100.0   32.5
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+
+HTML output written to /Users/lnation/Semantic/Devel-XSCover/xt/spike/cover_db/coverage.html
+done.

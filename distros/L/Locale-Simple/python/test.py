@@ -1,4 +1,4 @@
-import sys, os, tempfile
+import sys, os, json, shutil, subprocess, tempfile
 
 global err
 err = 0
@@ -89,6 +89,43 @@ def translate():
 
 
 @test
+def percent_in_values():
+    # Argument values go in as they are; a % in them is never read as a
+    # format. %% in the format gives one %.
+    testeq(l('%1$s', '100%'), '100%')
+    testeq(l('%s', '100%'), '100%')
+    testeq(l('%s and %s', '%s', '50%'), '%s and 50%')
+    testeq(l('%2$s / %1$s', '%1$s', '5%'), '5% / %1$s')
+    testeq(
+        ln('%2$s has %1$d message', '%2$s has %1$d messages', 3, '%d%%'),
+        '%d%% hat 3 Nachrichten'
+    )
+    testeq(l('100%% of %s', '%s', 'extra'), '100% of %s')
+    testeq(l('%%s %s %%', 'x'), '%s x %')
+    # A placeholder without an argument stays as it is (mo-reader.md §5).
+    testeq(l('%s and %s', 'a'), 'a and %s')
+    testeq(l('%2$s and %1$s', 'a'), '%2$s and a')
+
+
+# The sprintf of the translation functions, row by row, from the shared
+# t/data/sprintf.json: "rows" hold the conversions, flags, width, precision and
+# N$ position of mo-reader.md §5 that every runtime meets, "perl_python_rows"
+# the * width or precision, the # flag and i, E, g and G on top. A placeholder
+# without an argument stays as it is, extra arguments are ignored. The same
+# rows run in t/25-sprintf.t.
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 't', 'data', 'sprintf.json'),
+          encoding='utf-8') as f:
+    SPRINTF = json.load(f)
+
+
+@test
+def sprintf_table():
+    import locale_simple
+    for row in SPRINTF['rows'] + SPRINTF['perl_python_rows']:
+        testeq(locale_simple.sprintf(row['format'], *row['args']), row['want'])
+
+
+@test
 def context_plural():
     # lnp: context + plural. No context-plural msgid in the fixture, so we
     # just verify it doesn't blow up and falls back to the msgid.
@@ -100,6 +137,40 @@ def context_plural():
         lnp('some_ctxt', 'You have %d message', 'You have %d messages', 4),
         'You have 4 messages'
     )
+
+
+@test
+def domain_on_demand():
+    # ld() binds a domain to the l_dir() directory on its first use, the way
+    # ltd() does, and leaves the default domain where it is. Runs before
+    # domain_switching, which binds 'othertest' through ltd().
+    testeq(ld('othertest', 'Hello'), 'Anderes Hallo')
+    testeq(l('Hello'), 'Hallo')
+    testeq(
+        ldn('othertest', 'You have %d message', 'You have %d messages', 4),
+        'Du hast 4 AndereNachrichten'
+    )
+
+    # A later l_dir() moves every bound domain along, whichever call bound
+    # it: a second directory holds the two catalogs swapped.
+    swapped = tempfile.mkdtemp()
+    try:
+        messages = os.path.join(swapped, 'de_DE', 'LC_MESSAGES')
+        os.makedirs(messages)
+        source = os.path.join(LOCALE_DIR, 'de_DE', 'LC_MESSAGES')
+        shutil.copy(os.path.join(source, 'othertest.mo'), os.path.join(messages, 'test.mo'))
+        shutil.copy(os.path.join(source, 'test.mo'), os.path.join(messages, 'othertest.mo'))
+
+        l_dir(swapped)
+        testeq(l('Hello'), 'Anderes Hallo')
+        testeq(ld('othertest', 'Hello'), 'Hallo')
+
+        l_dir(LOCALE_DIR)
+        testeq(l('Hello'), 'Hallo')
+        testeq(ld('othertest', 'Hello'), 'Anderes Hallo')
+    finally:
+        l_dir(LOCALE_DIR)
+        shutil.rmtree(swapped)
 
 
 @test
@@ -154,6 +225,137 @@ def dry_run():
     finally:
         os.unlink(dry_file)
         # Reset state for any later test
+        l_dry(None)
+        l_dir(LOCALE_DIR)
+        ltd('test')
+        l_lang('de_DE')
+
+
+# What t/21-dryrun.t expects from the same calls, byte for byte.
+DRY_SHARED = (
+    'msgid "Hello"\n'
+    '\n'
+    '# domain: othertest\n'
+    'msgid "Hello"\n'
+    '\n'
+    'msgctxt "alien"\n'
+    'msgid "Hello"\n'
+    '\n'
+    'msgid "%2$s has %1$d message"\n'
+    'msgid_plural "%2$s has %1$d messages"\n'
+    '\n'
+    '# domain: othertest\n'
+    'msgctxt "inbox"\n'
+    'msgid "You have %d message"\n'
+    'msgid_plural "You have %d messages"\n'
+    '\n'
+    r'msgid "Say \"%s\"\\n\nGrüße"' '\n'
+    '\n'
+    r'msgid "Tab\there\rand CR"' '\n'
+    '\n'
+)
+
+
+@test
+def dry_run_shared_format():
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.po') as tf:
+        dry_file = tf.name
+    try:
+        l_dry(dry_file)
+        testeq(l('Hello'), 'Hello')
+        testeq(l(''), '')
+        testeq(ld('othertest', 'Hello'), 'Hello')
+        testeq(lp('alien', 'Hello'), 'Hello')
+        testeq(
+            ln('%2$s has %1$d message', '%2$s has %1$d messages', 2, 'harry'),
+            'harry has 2 messages'
+        )
+        testeq(
+            ldnp('othertest', 'inbox', 'You have %d message', 'You have %d messages', 1),
+            'You have 1 message'
+        )
+        testeq(l('Say "%s"\\n\nGrüße', 'hi'), 'Say "hi"\\n\nGrüße')
+        testeq(l('Tab\there\rand CR'), 'Tab\there\rand CR')
+        with open(dry_file, 'rb') as f:
+            testeq(f.read(), DRY_SHARED.encode('utf-8'))
+    finally:
+        os.unlink(dry_file)
+        l_dry(None)
+        l_dir(LOCALE_DIR)
+        ltd('test')
+        l_lang('de_DE')
+
+
+@test
+def zero_strings():
+    # "0" is a domain, msgctxt, msgid_plural, file name and locale directory
+    # like any other string: it gets its line, and a msgid_plural of "0" puts
+    # n in front of the arguments and is picked for n != 1. t/21-dryrun.t and
+    # t/40-error.t check the same.
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.po') as tf:
+        dry_file = tf.name
+    try:
+        l_dry(dry_file)
+        testeq(
+            [ld('0', 'Hello'), lp('0', 'Hello'), ln('%d file', '0', 1), ln('%d file', '0', 2)],
+            ['Hello', 'Hello', '1 file', '0']
+        )
+        l_dry(None)
+        with open(dry_file, 'rb') as f:
+            testeq(f.read(), (
+                '# domain: 0\nmsgid "Hello"\n\n'
+                'msgctxt "0"\nmsgid "Hello"\n\n'
+                'msgid "%d file"\nmsgid_plural "0"\n\n'
+                'msgid "%d file"\nmsgid_plural "0"\n\n'
+            ).encode('utf-8'))
+        l_dry('0', True)
+        testeq(l('Hello'), 'Hello')
+    finally:
+        os.unlink(dry_file)
+        l_dry(None)
+        l_dir(LOCALE_DIR)
+        ltd('test')
+        l_lang('de_DE')
+    workdir = tempfile.mkdtemp()
+    try:
+        os.mkdir(os.path.join(workdir, '0'))
+        r = subprocess.run(
+            [sys.executable, '-c',
+             'import sys\nsys.path.insert(0, sys.argv[1])\n'
+             "from locale_simple import *\nl_dir('0')\nprint(l('Hello'))",
+             os.path.dirname(os.path.abspath(__file__))],
+            cwd=workdir, capture_output=True, text=True,
+        )
+        testeq((r.returncode, r.stdout, r.stderr), (0, 'Hello\n', ''))
+    finally:
+        shutil.rmtree(workdir)
+
+
+@test
+def dry_run_line_ends():
+    # The dry-run file has LF line ends on every platform. On Windows, text
+    # mode writes '\r\n' for '\n' unless open() gets newline='\n'; this open()
+    # gives the module that same default here.
+    import builtins
+    import locale_simple
+
+    def windows_open(*args, **kwargs):
+        kwargs.setdefault('newline', '\r\n')
+        return builtins.open(*args, **kwargs)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.po') as tf:
+        dry_file = tf.name
+    locale_simple.open = windows_open
+    try:
+        l_dry(dry_file)
+        ld('othertest', 'Hello')
+        with builtins.open(dry_file, 'rb') as f:
+            content = f.read()
+        testeq(b'\r' in content, False)
+        testeq(content, b'# domain: othertest\nmsgid "Hello"\n\n')
+    finally:
+        del locale_simple.open
+        os.unlink(dry_file)
         l_dry(None)
         l_dir(LOCALE_DIR)
         ltd('test')
@@ -220,4 +422,42 @@ def deferred_markers():
     testeq(ln(sg, pl, 4), "Du hast 4 Nachrichten")
 
 
-exit(err)
+NO_DIR = 'please set a locale directory with l_dir() before using other translate functions\n'
+
+
+def fresh(code, *options):
+    # A new interpreter, so no l_dir() of this file applies.
+    return subprocess.run(
+        [sys.executable, *options, '-c', 'from locale_simple import *\n' + code],
+        cwd=os.path.dirname(os.path.abspath(__file__)),
+        capture_output=True, text=True,
+    )
+
+
+@test
+def ltd_needs_dir():
+    # ltd() stops without l_dir() like l() does; l_nolocales(True) and
+    # dry-run mode lift the check, leaving dry-run mode brings it back.
+    r = fresh("ltd('test')")
+    testeq((r.returncode, r.stderr), (1, NO_DIR))
+    r = fresh("l('Hello')")
+    testeq((r.returncode, r.stderr), (1, NO_DIR))
+    r = fresh("l_nolocales(True)\nltd('test')\nprint(l('Hello'))")
+    testeq((r.returncode, r.stdout, r.stderr), (0, 'Hello\n', ''))
+    r = fresh("l_dry('unused.po', True)\nltd('test')\nprint(l('Hello'))")
+    testeq((r.returncode, r.stdout, r.stderr), (0, 'Hello\n', ''))
+    r = fresh("l_dry('unused.po', True)\nl_dry(None)\nltd('test')")
+    testeq((r.returncode, r.stderr), (1, NO_DIR))
+
+
+@test
+def stop_without_site():
+    # The stop works the same when Python starts without the site module
+    # (python -S), which is where the interactive exit() helper comes from.
+    r = fresh("l('Hello')", '-S')
+    testeq((r.returncode, r.stderr), (1, NO_DIR))
+    r = fresh("ltd('test')", '-S')
+    testeq((r.returncode, r.stderr), (1, NO_DIR))
+
+
+sys.exit(err)

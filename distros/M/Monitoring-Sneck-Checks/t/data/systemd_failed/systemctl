@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+print "systemd-journal-flush.service loaded failed failed Flush Journal\n";
+print "nginx.service                 loaded failed failed A high performance web server\n";

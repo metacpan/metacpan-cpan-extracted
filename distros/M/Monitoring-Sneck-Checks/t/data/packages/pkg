@@ -1,0 +1,2 @@
+#!/usr/bin/env perl
+print qq{curl\nsudo\n} . ( $ARGV[0] eq '-j' ? qq{nginx\n} : '' );

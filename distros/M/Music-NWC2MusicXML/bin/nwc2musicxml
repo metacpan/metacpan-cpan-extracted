@@ -19,7 +19,7 @@ use lib 'lib';
 use Music::NWC2MusicXML;
 use Music::NWC2MusicXML::Diagnostics;
 
-our $VERSION = '0.002.2';
+our $VERSION = '0.002.3';
 
 # ---------------------------------------------------------------------------
 # Parse command-line options
@@ -179,7 +179,7 @@ nwc2musicxml - Convert NoteWorthy Composer 2 files to MusicXML.
 
 =head1 VERSION
 
-0.001.1
+0.002.3
 
 =head1 SYNOPSIS
 

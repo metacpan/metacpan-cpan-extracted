@@ -63,14 +63,23 @@ sub MY::postamble {
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
 
+  # Unlike distcheck, fails if the MANIFEST does not match the files of the
+  # distribution.
+  my $strict_distcheck = $self->oneliner(
+    'my ($missing, $extra) = fullcheck(); exit(@{$missing} || @{$extra} ? 1 : 0)',
+    ['-MExtUtils::Manifest=fullcheck']);
+
   push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
 TEST_PM := \$(shell find t -name "*.pm")
 ALL_EXE := script/update_config
 
-.PHONY: distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
+.PHONY: strictdistcheck distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
 
-distupload: distcheck disttest
+strictdistcheck:
+\t${strict_distcheck}
+
+distupload: strictdistcheck disttest
 \t\$(MAKE) tardist
 \tcpan-upload --directory \$(DISTNAME) \$(DISTVNAME).tar\$(SUFFIX)
 

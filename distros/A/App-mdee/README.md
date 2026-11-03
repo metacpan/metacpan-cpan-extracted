@@ -16,12 +16,13 @@ mdee - em·dee, Markdown Easy on the Eyes
      -f  --filter           shortcut for --style=filter
      -p  --plain            shortcut for --style=pager
          --[no-]fold        line folding (default: on)
+     -r  --[no-]refill      join paragraph lines (default: off)
          --[no-]table       table formatting (default: on)
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
-         --table-style=#    table style: pipe or simple (default: pipe)
+         --table-style=#    table style: lattice, 3line or simple (default: lattice)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
@@ -49,7 +50,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.14
+Version 1.15
 
 # DESCRIPTION
 
@@ -78,10 +79,12 @@ for line, only made easier on the eyes with color: the Markdown is
 not interpreted or reformatted.  Some formatting has been added since
 because it made the text more readable: tables are aligned, long
 list items are folded, the default themes hide markup characters,
-and closing hashes are appended to lower-level headings.  Everything
-else is still the source text.  This is why paragraphs are not
-reflowed, why backslash escapes such as `\*` are shown as written,
-and why `--no-theme` gives back the original file, in color.
+and closing hashes are appended to lower-level headings.  With
+`--refill`, the lines that [pandoc](https://pandoc.org) has found to
+be one paragraph are joined as well.  Everything else is still the
+source text.  This is why backslash escapes such as `\*` are shown
+as written, and why `--no-theme` gives back the original file, in
+color.
 
 For full Markdown rendering, many other viewers are available, such
 as `glow` and `mdcat`.  Combine them with [nup(1)](https://metacpan.org/pod/App%3A%3Anup) for
@@ -237,12 +240,38 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
 - **--\[no-\]fold**
 
-    Enable or disable line folding for list items.  When enabled, long
-    lines in list items are wrapped with proper indentation using
-    [ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold).  Default is enabled.
+    Enable or disable line folding for list items, definition lists,
+    block quotes and, with `--refill`, paragraphs.  When enabled, long
+    lines are wrapped with proper indentation using
+    [ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold): the continuation lines of a list item
+    are indented under its text, those of a block quote start with the
+    quote marker again.  Default is enabled.
 
     Supported list markers: `*`, `-`, `1.`, `1)`, `#.`, `#)`.
     The `#.` and `#)` forms are Pandoc's auto-numbered list syntax.
+
+- **-r**, **--\[no-\]refill**
+
+    Join the lines of each paragraph into one line.  Default is disabled;
+    `default[refill]=1` in the configuration file enables it.
+
+    What a paragraph is, a Markdown parser decides: a run of lines at the
+    top level, in a block quote, in a list item or in a definition body.
+    Those lines are joined in the original text.  Headings, tables, code
+    blocks, front matter and everything else stay as written.  A hard
+    line break (two or more spaces or a backslash at the end of a line)
+    is kept.
+
+    Lines are joined with one space, or with nothing after a fullwidth
+    punctuation character and between two characters of a script that is
+    written without spaces, as [ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold) does.  When
+    fold is enabled, the joined paragraphs are folded to the fold width
+    like list items; otherwise each is one long line.
+
+    The parser is [Markdown::Perl](https://metacpan.org/pod/Markdown%3A%3APerl), which is installed with **mdee**, or
+    the [CommonMark](https://metacpan.org/pod/CommonMark) module (an interface to libcmark) when it is there,
+    which is faster.  `--config refill_parser=pandoc` uses pandoc 2.11.3
+    or later instead.
 
 - **--\[no-\]table**
 
@@ -296,22 +325,33 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
 - **--table-style**=_STYLE_
 
-    Select how tables are drawn.  `pipe` (default) keeps a separator
-    between the columns, `│` or `|` depending on `--rule`:
+    Select how tables are drawn.  `lattice` (default) keeps a separator
+    between the columns, `│` or `|` depending on `--rule`.  `pipe` is
+    another name of it, kept for compatibility:
 
          Left │ Center │ Right │ Default
         ──────┼────────┼───────┼─────────
          a    │   b    │     c │ d
 
-    `simple` draws tables like Pandoc's simple tables: the columns are
-    separated by spaces only, the header is underlined per column, and a
-    rule the width of the table is drawn above and below it.
+    `3line` separates the columns by spaces only and draws three rules: a
+    rule the width of the table above and below it, and a rule per column
+    below the header.
 
         ─────────────────────────────────
          Left   Center   Right   Default
         ────── ──────── ─────── ─────────
          a        b          c   d
         ─────────────────────────────────
+
+    `simple` also separates the columns by spaces only, and draws the
+    rule per column below the header and below the table.
+
+         Left   Center   Right   Default
+        ────── ──────── ─────── ─────────
+         a        b          c   d
+        ────── ──────── ─────── ─────────
+
+    The rules are drawn with `-` with `--no-rule`.
 
 - **--cat-v**
 
@@ -360,10 +400,10 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     Set where [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) may break a line when nup
     folds the panes, as its `--boundary` option: `word` (default) does
     not break inside an alphanumeric word, `space` not inside a sequence
-    of non-space characters, and `none` breaks anywhere.  Lists and
-    tables are folded by the md module at word boundaries, and this
-    option keeps the paragraphs, which are folded by nup, in step with
-    them.  The value is given to nup (App::nup 1.10 or later), which
+    of non-space characters, and `none` breaks anywhere.  Lists, tables
+    and the paragraphs joined by `--refill` are folded by the md module
+    at word boundaries, and this option keeps the other paragraphs, which
+    are folded by nup, in step with them.  The value is given to nup (App::nup 1.10 or later), which
     gives it to ansicolumn after `~/.ansicolumnrc`, so it takes
     precedence over the value there.
 
@@ -439,6 +479,12 @@ bold text, etc.).
         using `=+` to append a text transformation while preserving the
         original heading color.
 
+        With `--refill`, the added lines are not counted, so paragraphs below
+        the h1 headings may not be folded properly by this module.  The text
+        itself does not change.  For this reason, this theme turns off
+        `default[refill]` in the configuration file; `--refill` given on the
+        command line still works.
+
     - `markcell` (default)
 
         In a table that has wrapped cells, mark the first line of every
@@ -466,6 +512,9 @@ bold text, etc.).
     If the terminal supports background color detection (via
     [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor)), the mode is automatically selected based on
     terminal luminance.
+    When the environment variable `TERM_LUMINANCE` is set (0 to 100, as
+    [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor) uses it), its value is taken instead and the
+    terminal is not asked; below 50 is dark.
 
     Each theme has light and dark variants optimized for different terminal
     backgrounds.  The built-in `default` theme uses RoyalBlue as the base
@@ -560,6 +609,11 @@ bold text, etc.).
         --colormap h1=RD               # red bold headings
         --colormap code_block=/L20;E   # dark background for code blocks
         --colormap bold='${base}D'     # base color bold
+
+    This option is passed to the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module, as a module
+    option before `--` in the **greple** command line (see it with `-n`).
+    It is not the `--cm` option of **greple**, so `FILE` and `FILE_FORMAT`
+    are set by `--config` instead.
 
     Available labels:
 
@@ -696,6 +750,7 @@ This is a shell script that can set defaults and override colors:
     default[style]='pager'           # set default style
     default[width]=170               # set default output width
     default[fold_width]=80           # set default fold width
+    default[refill]=1                # join paragraph lines
     default[base_color]='DarkCyan'   # set default base color
 
 The `default` associative array supports the following keys:
@@ -705,6 +760,7 @@ The `default` associative array supports the following keys:
 - `default[style]` - Corresponds to `--style` (e.g., `pager`, `cat`)
 - `default[width]` - Corresponds to `--width` (e.g., `170`)
 - `default[fold_width]` - Corresponds to `--fold-width` (e.g., `80`)
+- `default[refill]` - Corresponds to `--refill` (`1` to enable)
 - `default[pane_width]` - Corresponds to `--pane-width` (e.g., `100`)
 - `default[pane]` - Corresponds to `--pane` (e.g., `2`)
 - `default[base_color]` - Corresponds to `--base-color` (e.g., `DarkCyan`)
@@ -751,6 +807,7 @@ The `${base}` string is expanded to the base color value after loading.
     mdee --no-nup file.md       # output to stdout without nup
     mdee --no-fold file.md      # disable line folding
     mdee --no-table file.md     # disable table formatting
+    mdee -r file.md             # join paragraph lines (needs pandoc)
 
     # Output styles
     mdee -s pager file.md       # fold + table, output to pager
@@ -761,7 +818,7 @@ The `${base}` string is expanded to the base color value after loading.
     # Style shortcuts
     mdee -p file.md             # same as --style=pager
     cat file.md | mdee -f       # highlight stdin (filter mode)
-    mdee -f file.md             # highlight only (no paging)
+    mdee -f file.md             # highlighted output to stdout
 
     # Override individual settings
     mdee -f --fold file.md      # filter + fold
@@ -787,6 +844,13 @@ This command requires the following:
 - [App::ansiecho](https://metacpan.org/pod/App%3A%3Aansiecho) - ANSI color output
 - [Getopt::Long::Bash](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3ABash) - bash option parsing
 - [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor) - terminal background detection
+
+`--refill` finds the paragraphs with [Markdown::Perl](https://metacpan.org/pod/Markdown%3A%3APerl) (pure Perl,
+installed with this distribution).  The [CommonMark](https://metacpan.org/pod/CommonMark) module, which
+needs the libcmark C library (`brew install cmark`, `apt-get install
+libcmark-dev`) and is only recommended, is used when it is there
+because it is faster; [pandoc](https://pandoc.org) 2.11.3 or later is
+a third choice.
 
 # IMPLEMENTATION
 
@@ -820,8 +884,8 @@ each stage without running them, and `-d` prints the stage names.
 ### Processing Stages
 
 The pipeline consists of configurable stages.  Processing options
-can be enabled or disabled independently using `--[no-]fold`,
-`--[no-]table`, and `--[no-]nup` options.
+can be enabled or disabled independently using `--[no-]refill`,
+`--[no-]fold`, `--[no-]table`, and `--[no-]nup` options.
 
 #### Syntax Highlighting
 
@@ -845,13 +909,26 @@ Code block detection follows the CommonMark specification:
 - Closing fence: 0-3 spaces indentation, same character, same or more count
 - Backticks and tildes cannot be mixed (```` ``` ```` must close with ```` ``` ````)
 
+#### Paragraph Refill
+
+With `--refill`, the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module joins the lines of
+each paragraph before anything else.  It asks a Markdown parser
+([App::Greple::md::Blocks](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd%3A%3ABlocks): the [CommonMark](https://metacpan.org/pod/CommonMark) module,
+[Markdown::Perl](https://metacpan.org/pod/Markdown%3A%3APerl), or [pandoc](https://pandoc.org) with the
+`sourcepos` extension) which
+lines of the text form a paragraph, a block quote, a list item or a
+definition, and joins those lines in the original text.  A line that
+starts a footnote definition (`[^name]:`) stays on its own line.  The
+joined lines are folded like list items.
+
 #### Text Folding
 
 Text folding is handled within the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module
 using [Greple::tee](https://metacpan.org/pod/Greple%3A%3Atee) to pipe matched regions through
 [ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold).  It preserves ANSI escape sequences
-and maintains proper indentation for nested lists.  Code blocks,
-HTML comments, and tables are excluded from folding.
+and maintains proper indentation for nested lists.  List items,
+definition lists and the paragraphs joined by `--refill` are
+folded; code blocks, HTML comments, and tables are excluded.
 
 Recognized list markers include `*`, `-`, `1.`, `1)`, `#.`,
 and `#)`.  The `#` marker is Pandoc's auto-numbered list syntax.
@@ -871,7 +948,7 @@ Column alignment is parsed from the separator line: `:---` (left,
 default), `:---:` (center), `---:` (right).  The `parse_separator()`
 function extracts alignment markers and passes `--table-right` and
 `--table-center` options to [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) (requires
-version 1.53 or later).  Colons are stripped from the separator line
+version 1.61 or later).  Colons are stripped from the separator line
 before further processing.
 
 When `--rule` is enabled (default), ASCII pipe characters are replaced
@@ -933,7 +1010,8 @@ The color specification supports modifiers:
 
 **em·dee** uses [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor) to detect terminal background
 luminance.  If luminance is below 50%, dark mode is automatically
-selected.
+selected.  The environment variable `TERM_LUMINANCE` gives the
+luminance without the detection (see ["Terminal Luminance"](#terminal-luminance)).
 
 # LIMITATIONS
 
@@ -951,16 +1029,34 @@ Multi-line emphasis text is not supported.
 `***bold italic***` and `___bold italic___` are supported.
 Other nested forms (e.g., `**bold _italic_**`) are not.
 
+## Block Quotes
+
+A block quote is recognized by its `>` markers at the start of a
+line, after up to three spaces.  Only the markers are colored, not the
+quoted text.  Headings, lists and code blocks inside a quote are not
+recognized, so they get no color of their own, and a code block in a
+quote does not protect its contents from inline highlighting.
+
+A line without a marker that continues a quoted paragraph (a lazy
+continuation in CommonMark) is shown as an ordinary line, unless
+`--refill` joins it to the quote.
+
 ## Links
 
 Link patterns do not span multiple lines.  The link text and URL must
 be on the same line.
 
-Links inside other highlighted elements (such as headings or bold
-text) are not processed.
-
 Reference-style links (`[text][ref]` with `[ref]: url` elsewhere)
 are not supported.
+
+## Paragraph Refill
+
+`--refill` joins lines by the rules of Markdown, as pandoc reads
+them.  Lines of verse, addresses or lyrics that rely on the line
+breaks without a hard line break (two spaces or a backslash at the
+end of the line) are joined as well, and so are the lines of a
+display math block between `$$` lines.  Do not use `--refill`
+for such documents.
 
 ## Table Alignment
 
@@ -988,6 +1084,15 @@ When using `less` as pager, version 566 or later is required with
 
 For OSC 8 specification, see:
 [https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda](https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda)
+
+## Terminal Luminance
+
+Without `--mode` or `default[mode]`, **mdee** asks the terminal for
+its background color (OSC 11) through [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor) to
+choose between light and dark mode.  Set `TERM_LUMINANCE` to a value
+from 0 to 100 to give the answer yourself and skip the query, for
+example in scripts or tests, where a reply that arrives late would
+show up as terminal input.
 
 ## Less Environment Variables
 
@@ -1031,6 +1136,10 @@ does not override them.
 - [ansicolumn](https://metacpan.org/pod/ansicolumn)
 
     ANSI-aware column formatting for table alignment.
+
+- [CommonMark](https://metacpan.org/pod/CommonMark), [Markdown::Perl](https://metacpan.org/pod/Markdown%3A%3APerl), [pandoc](https://pandoc.org)
+
+    One of them finds the paragraphs for `--refill`.
 
 - [https://github.com/tecolicom/App-mdee](https://github.com/tecolicom/App-mdee)
 

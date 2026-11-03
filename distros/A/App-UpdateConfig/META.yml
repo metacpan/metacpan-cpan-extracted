@@ -9,7 +9,7 @@ build_requires:
   Test::CPANfile: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker::CPANfile: '0.09'
+  ExtUtils::MakeMaker::CPANfile: '0.11'
   perl: v5.24.0
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/update_config/issues
   repository: https://github.com/mkende/update_config
-version: '1.02'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

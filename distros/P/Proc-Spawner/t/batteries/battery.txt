@@ -1,0 +1,43 @@
+echo hello
+echo a | tr a b
+false || echo or; true && echo and
+{ echo x; false; } || echo y
+printf 'b\na\nb\n' | sort | uniq -c
+echo $(echo inner) "$HOME" | wc -w
+x=5; echo $((x * 3 + 1)) $((7 / 2)) $((-7 % 3)) $((1 << 4)) $((3 > 2 && 0 || 5))
+x=$(exit 4); echo st=$?
+echo $(exit 3); echo st=$?
+nosuch; echo st=$?
+cat </nonexistent; echo st=$?
+{ echo x; } >/nonexistent/f; echo st=$?
+echo a >&7; echo st=$?
+cd /nonexistent; echo st=$?
+f=; echo x >$f; echo st=$?
+echo a 2>&1 >/dev/null | wc -c
+{ echo out; echo err >&2; } 2>&1 | sort
+{ { echo a; false; } || { sleep 0.2 >/dev/null; echo b; }; } | sed s/^/C:/
+seq 3 | { read l; echo A:$l; sed s/^/B:/; }
+printf '1\n2\n3\n' | { read -r a; read -r b; echo "$b$a"; cat; }
+i=0; while [ $i -lt 3 ]; do echo $i; i=$((i + 1)); done
+for f in a b c; do echo $f; done | tr '\n' ,
+for i in 1 2 3 4; do [ $i = 3 ] && break; echo $i; done
+for i in 1 2 3 4; do [ $i = 2 ] && continue; echo $i; done
+case abc in a*c) echo yes;; *) echo no;; esac
+case "x*" in 'x*') echo quoted;; x*) echo glob;; esac
+if false; then echo t; elif true; then echo e; else echo f; fi
+(cd /tmp; pwd); pwd
+(exit 7); echo st=$?
+x=1; (x=2); echo $x
+x=1; echo a | x=2; echo $x
+sleep 0.1 & echo bg; wait 2>/dev/null; echo st=$?
+echo ${unset:-dflt} ${HOME:+set} ${#HOME} "${empty-}"
+v='a  b'; echo $v "$v"
+y=; echo [$y] ["$y"] ['']
+echo /etc/pass* /no/such/*
+A=1 B=$A sh -c 'echo $A$B'
+yes | head -1
+exec echo replaced
+exit 3; echo not here
+: >/tmp/pspawn-created && ls /tmp/pspawn-created && rm /tmp/pspawn-created
+! true; echo st=$?
+echo $((1/0)); echo after

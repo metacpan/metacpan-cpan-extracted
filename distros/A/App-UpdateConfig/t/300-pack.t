@@ -45,7 +45,7 @@ sub pack_fragments {
     guarded("other\n"), 'packed fragment from a sub-directory applied');
   is(
     $t->read_home_file('guarded'),
-    guarded("guarded\n", undef, 'd'),
+    guarded("guarded\n", undef, 'D'),
     'packed fragment with a guard suffix from its directory');
   is($t->read_home_file('overridden'),
     guarded("local\n"), 'local fragment overrides packed fragment');
@@ -82,11 +82,11 @@ sub pack_fragments {
     '--export: FILENAME added and name cleaned');
   is(
     UpdateConfigTest::read_file(catfile($export_dir, 'other [x]')),
-    "GUARD SUFFIX x\nFILENAME .bar\nother\n",
+    "FILENAME .bar\nGUARD SUFFIX X\nother\n",
     '--export: existing FILENAME kept and GUARD SUFFIX added');
   is(
     UpdateConfigTest::read_file(catfile($export_dir, 'dir [d]_sub')),
-    "FILENAME sub\nGUARD SUFFIX d\nsub\n",
+    "FILENAME sub\nGUARD SUFFIX D\nsub\n",
     '--export: GUARD SUFFIX from the directory added');
   is(
     UpdateConfigTest::read_file(catfile($export_dir, 'dir [d]_own [o]')),
@@ -96,6 +96,66 @@ sub pack_fragments {
     UpdateConfigTest::read_file(catfile($export_dir, 'no_newline')),
     "FILENAME no_newline\nlast line\n",
     '--export: final newline added when packing');
+}
+
+{
+  my ($packed, $t) = pack_fragments(
+    '.update_config' => "REQUIRE 1\nPERM 600\n",
+    'app [a]/.update_config' => "DIR .app\nGUARD SUFFIX g\nCOMMENTS CHAR ;\nREQUIRE 2\n",
+    'app [a]/sub [s]/file' => "REM own\nREQUIRE 3\nPERM 644\nfile\n",
+    'app [a]/abs' => "FILENAME /tmp/abs\nCOMMENTS CHAR %\nabs\n");
+  my $u = UpdateConfigTest->new;
+  my $r = $u->run({stdin => $packed});
+  is($r->{exit}, 0, 'packed directory directives: success');
+  is(
+    $u->read_home_file('.app/file'),
+    guarded("file\n", ';', 'G-S'),
+    'packed directory directives: applied');
+
+  my $export_dir = catfile($t->root, 'export');
+  make_path($export_dir);
+  $r = $t->run({script => $packed, cwd => $export_dir}, '--export');
+  is($r->{exit}, 0, '--export with directory directives: success');
+  ok(!-e catfile($export_dir, 'update_config'), '--export: directory directives not exported');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'app [a]_sub [s]_file')),
+    "FILENAME .app/file\nGUARD SUFFIX G-S\nCOMMENTS CHAR ;\nREQUIRE 1\nREQUIRE 2\nREM own\n"
+        ."REQUIRE 3\nPERM 644\nfile\n",
+    '--export: inherited directives written');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'app [a]_abs')),
+    "FILENAME /tmp/abs\nGUARD SUFFIX G\nPERM 600\nREQUIRE 1\nREQUIRE 2\nCOMMENTS CHAR %\nabs\n",
+    '--export: inherited target replaced');
+}
+
+{
+  my ($packed, $t) = pack_fragments(
+    'cfg/.update_config' => "BASE .config\nMIRROR\n",
+    'cfg/app [a]/dot_rc' => "BASE sub\nrc\n",
+    'cfg/app [a]/own' => "DIR other\nFILENAME renamed\nown\n",
+    'cnt/.update_config' => "MIRROR CONTENTS\n",
+    'cnt/x/file' => "file\n",
+    'cnt/x/own' => "MIRROR CONTENTS\nown\n");
+  my $export_dir = catfile($t->root, 'export');
+  make_path($export_dir);
+  my $r = $t->run({script => $packed, cwd => $export_dir}, '--export');
+  is($r->{exit}, 0, '--export with BASE and MIRROR: success');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'cfg_app [a]_dot_rc')),
+    "FILENAME .config/sub/cfg/app/.rc\nGUARD SUFFIX A\nrc\n",
+    '--export: BASE and MIRROR resolved');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'cfg_app [a]_own')),
+    "FILENAME .config/other/renamed\nGUARD SUFFIX A\nown\n",
+    '--export: BASE, DIR and FILENAME resolved');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'cnt_x_file')),
+    "FILENAME x/file\nfile\n",
+    '--export: MIRROR CONTENTS resolved');
+  is(
+    UpdateConfigTest::read_file(catfile($export_dir, 'cnt_x_own')),
+    "FILENAME own\nown\n",
+    '--export: own MIRROR CONTENTS resolved');
 }
 
 done_testing;

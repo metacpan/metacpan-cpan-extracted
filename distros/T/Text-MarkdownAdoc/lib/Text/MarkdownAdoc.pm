@@ -6,7 +6,7 @@ use warnings;
 
 use Text::MarkdownAdoc::Parser;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 #===========================================================================
 # Public OO Facade
@@ -111,7 +111,7 @@ overridden by the per-call value.
 
 =head1 VERSION
 
-0.1.0
+0.1.1
 
 =head1 AUTHOR
 

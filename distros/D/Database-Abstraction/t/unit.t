@@ -1850,7 +1850,7 @@ SKIP: {
 note '';
 note '=== 27. aggregate() — Perl fold path (JSON backend, no DBI handle) ===';
 SKIP: {
-	# JSON backend is used because it genuinely has no DBI handle ($self->{$table}
+	# JSON backend is used because it genuinely has no DBI handle ($self->{_dbh}{$table}
 	# is undef), which forces aggregate() into the Perl _fold_aggregate() path.
 	# CSV always has a DBD::CSV DBI handle even for slurped files, so CSV cannot
 	# test this path.

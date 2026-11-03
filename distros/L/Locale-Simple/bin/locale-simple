@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+# PODNAME: locale-simple
+# ABSTRACT: Scrape translation calls and convert PO files to JSON
+our $VERSION = '0.200';
+
+use strict;
+use warnings;
+
+use Locale::Simple::CLI;
+
+exit Locale::Simple::CLI::run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+locale-simple - Scrape translation calls and convert PO files to JSON
+
+=head1 VERSION
+
+version 0.200
+
+=head1 SYNOPSIS
+
+  locale-simple scrape [OPTIONS]
+  locale-simple po2json [--domain NAME] [--pretty] FILE.po
+  locale-simple help
+  locale-simple --version
+
+=head1 DESCRIPTION
+
+One command for the Locale::Simple tooling. Exit codes: C<0> success, C<1>
+the command failed (message on STDERR), C<2> a bad call: missing or
+unknown command, bad options or arguments (usage on STDERR).
+
+=head1 COMMANDS
+
+=head2 scrape
+
+Finds the C<l()> family of calls in the Perl, Python, JavaScript, PHP, Go,
+Rust and Text::Xslate sources below the current directory and writes the
+result to STDOUT, a C<.pot> template by default. Parse problems are reported
+on STDERR and do not change the exit code. The options are the ones of
+L<Locale::Simple::Scraper> (C<locale-simple scrape --help> lists them):
+
+=over 4
+
+=item C<--js EXT>, C<--pl EXT>, C<--py EXT>, C<--php EXT>, C<--go EXT>, C<--rs EXT>, C<--tx EXT>
+
+Extra file extensions (comma-separated, repeatable) for the given language.
+
+=item C<--ignore REGEX>
+
+Skip files whose path matches. Repeatable.
+
+=item C<--only REGEX>
+
+Use only files whose path matches. Repeatable.
+
+=item C<--output FORMAT>
+
+C<po> (default), C<perl>, C<json> or C<yaml> (needs the YAML module).
+
+=item C<--md5>
+
+Replace file names by their MD5 sum.
+
+=item C<--no_line_numbers>
+
+Leave out the C<#:> location comments.
+
+=back
+
+=head2 po2json
+
+Converts a PO file to the JSON data the JavaScript side loads and writes it
+to STDOUT, followed by a newline. It keeps what msgfmt keeps: no
+untranslated, fuzzy or obsolete entries. A read or parse error goes to STDERR
+with exit code C<1>.
+
+=over 4
+
+=item C<--domain NAME>
+
+Wrap the data in C<{ "NAME": ... }>. The default is the file name without
+C<.po> or C<.pot>.
+
+=item C<--pretty>
+
+Indent the output.
+
+=back
+
+=head2 help
+
+Print the usage to STDOUT and exit with C<0>. C<--help> and C<-h> do the same.
+
+=head2 --version
+
+Print C<locale-simple VERSION>.
+
+=head1 SEE ALSO
+
+L<Locale::Simple>, L<Locale::Simple::Scraper>, L<Locale::Simple::PO2JSON>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/locale-simple/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <getty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

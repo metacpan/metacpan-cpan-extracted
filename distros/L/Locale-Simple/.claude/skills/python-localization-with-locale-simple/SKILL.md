@@ -1,13 +1,13 @@
 ---
 name: python-localization-with-locale-simple
-description: "Add i18n to a Python app with the locale-simple package — same gettext API as the Perl and JavaScript siblings. Load when editing a Python project that imports locale_simple, ships .po files, or needs translations keyed to the same msgids as a Perl/JS sibling."
+description: "Add i18n to a Python app with the locale-simple package. Load when a Python project imports locale_simple, ships .po/.mo files, or shares msgids with a sibling."
 user-invocable: false
 ---
 
 # Localizing Python apps with locale-simple
 
 `locale-simple` is a thin wrapper around the stdlib `gettext` module that
-mirrors the Perl and JavaScript `Locale::Simple` API exactly — same function
+mirrors the API of its Perl, JavaScript, PHP, Go and Rust siblings exactly — same function
 names, same msgids, same `.po` files.
 
 ## Install
@@ -40,11 +40,13 @@ settings stick for the whole process. For web apps this matters (see
 | `ln(msgid, msgid_plural, n, *args)` | plural forms |
 | `lp(ctxt, msgid, *args)` | msgid with context |
 | `lnp(ctxt, msgid, msgid_plural, n, *args)` | plural + context |
-| `ld(domain, msgid, *args)` | translation in a different domain |
+| `ld(domain, msgid, *args)` | translation in a different domain, bound to `l_dir` on first use |
 | `ldn`, `ldp`, `ldnp` | domain variants |
 
-`*args` is fed through Python's `%` formatting, which supports positional
-style (`%1$s`, `%2$d`) just like Perl:
+`*args` go through the module's own `sprintf`, which formats like Perl's:
+positional style (`%1$s`, `%2$d`), `%b`, and `'` plus a pad character
+(`%'*8s`). Argument values go in as they are, so a `%` in them stays; `%%` in
+the format gives one `%`; a placeholder without an argument stays as it is:
 
 ```python
 print(l('Hello %s, you have %d messages', name, count))
@@ -77,24 +79,32 @@ msgfmt share/locale/de_DE/LC_MESSAGES/myapp.po \
        -o share/locale/de_DE/LC_MESSAGES/myapp.mo
 ```
 
-The Perl `locale_simple_scraper` scans `.py` files too, so the same
-extraction workflow covers Python.
+`locale-simple scrape` scans `.py` files too, so the same extraction workflow
+covers Python. `locale-simple` comes from the
+[release binary](https://github.com/Getty/locale-simple#binary-no-perl-needed)
+(no Perl needed) or `cpanm Locale::Simple`.
 
 ## Dry-run / msgid collection
 
 ```python
 from locale_simple import l_dry
-l_dry('seen_msgids.po', nowrite=False)
+l_dry('seen_msgids.po')
 ```
 
-With `l_dry` active, every call appends its msgid to the file (in `.po`
-format) *and* still returns the translated string.
+With `l_dry` active, every call appends its msgid block (`# domain:`,
+`msgctxt`, `msgid`, `msgid_plural`) to the file and returns the msgid formatted
+by the same `sprintf` as a translation, `%1$s` included. The file is UTF-8 with
+LF line ends, with backslash, newline, tab, carriage return and double quote
+escaped, byte for byte what the Perl module writes.
+`l_dry('seen_msgids.po', True)` skips the file, `l_dry(None)` leaves dry mode.
 
 ## Skipping locales entirely (tests / scripts)
 
 If you want to call `l()` without setting up any locale dir (useful in tests
-or in a dry-run pipeline), call `l_nolocales(True)` before anything else. The
-sanity check that raises `"please set a locale directory"` is then skipped.
+or in a dry-run pipeline), call `l_nolocales(True)` before anything else.
+Without it, `ltd()` and every helper write `"please set a locale directory
+with l_dir() before using other translate functions"` to stderr and exit with
+status 1 when `l_dir()` was not called. Dry-run mode lifts that check too.
 
 ## Concurrency
 

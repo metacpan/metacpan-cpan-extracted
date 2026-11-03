@@ -19,11 +19,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 1.6.0
+Version 1.7.0
 
 =cut
 
-our $VERSION = '1.6.0';
+our $VERSION = '1.7.0';
 
 =head1 SYNOPSIS
 
@@ -33,10 +33,10 @@ our $VERSION = '1.6.0';
 
     my $sneck=Monitoring::Sneck->new({config=>$file});
 
-=head1 USAGE
+=head1 DESCRIPTION
 
-Not really meant to be used as a library. The library is more of
-to support the script.
+This is not really meant to be used as a library. It exists to
+support the sneck script.
 
 =head1 CONFIG FORMAT
 
@@ -71,127 +71,188 @@ longer polling time for LibreNMS or the like when it queries it.
 
 The data section of the return hash is as below.
 
-    - $hash{data}{alert} :: 0/1 boolean for if there is a aloert or not.
+- $hash{data}{alert} :: 0/1 boolean for if there is a alert or not.
 
-    - $hash{data}{ok} :: Count of the number of ok checks.
+- $hash{data}{ok} :: Count of the number of ok checks.
 
-    - $hash{data}{warning} :: Count of the number of warning checks.
+- $hash{data}{warning} :: Count of the number of warning checks.
 
-    - $hash{data}{critical} :: Count of the number of critical checks.
+- $hash{data}{critical} :: Count of the number of critical checks.
 
-    - $hash{data}{unknown} :: Count of the number of unkown checks.
+- $hash{data}{unknown} :: Count of the number of unknown checks.
 
-    - $hash{data}{errored} :: Count of the number of errored checks.
+- $hash{data}{errored} :: Count of the number of errored checks.
 
-    - $hash{data}{alertString} :: The cumulative outputs of anything
-      that returned a warning, critical, or unknown.
+- $hash{data}{alertString} :: The cumulative outputs of anything
+that returned a warning, critical, or unknown.
 
-    - $hash{data}{vars} :: A hash with the variables to use.
+- $hash{data}{vars} :: A hash with the variables to use.
 
-    - $hash{data}{time} :: Time since epoch.
+- $hash{data}{time} :: Time since epoch.
 
-    - $hash{data}{hostname} :: The hostname the check was ran on.
+- $hash{data}{hostname} :: The hostname the check was ran on.
 
-    - $hash{data}{config} :: The raw config file if told to include it.
+- $hash{data}{config} :: The raw config file if told to include it.
 
-    - $hash{data}{run_time} :: How long it took to run all checks.
+- $hash{data}{run_time} :: How long it took to run all checks.
 
-    - $hash{data}{restarted} :: Count of the number of restarts ran.
+- $hash{data}{restarted} :: Count of the number of restarts ran.
 
-    - $hash{data}{restart_state_error} :: Only present if the restart
-      state file could not be read or written. Restarts still run if it
-      can't be read, as if there was no state.
+- $hash{data}{restart_state_error} :: Only present if the restart
+state file could not be read or written. Restarts still run if it
+can't be read, as if there was no state.
+
+- $hash{data}{compliance_ok} :: Count of ok compliance checks.
+
+- $hash{data}{compliance_warning} :: Count of warning compliance
+checks.
+
+- $hash{data}{compliance_critical} :: Count of critical compliance
+checks.
+
+- $hash{data}{compliance_unknown} :: Count of unknown compliance
+checks.
+
+- $hash{data}{compliance_errored} :: Count of errored compliance
+checks.
+
+- $hash{data}{compliance_waived} :: Count of compliance checks that
+were not ok but are waived. These are not counted anywhere else.
+
+- $hash{data}{compliance_alert} :: 0/1 for if any compliance check
+is not ok and not waived. Only sets alert as well if the
+compliance_alert option is set.
+
+- $hash{data}{compliance_alertString} :: The outputs of compliance
+checks that are warning, critical, or unknown and not waived. Each
+is prefixed with the control, or the name if there is none, and
+the severity, such as '[CIS-5.2.10 high] '. Added to alertString
+if the compliance_alert option is set.
+
+- $hash{data}{compliance_score} :: Percent of compliance checks that
+are ok, leaving out waived ones, to two decimal places. undef if
+there are none to score.
+
+- $hash{data}{compliance_frameworks}{$framework} :: The same counts
+as above for compliance checks with that framework, as ok,
+warning, critical, unknown, errored, waived, and score.
+
+- $hash{data}{compliance_state_error} :: Only present if the
+compliance state file could not be read or written. Compliance
+checks are run as if there was no state.
 
 For below '$name' is the name of the check in question.
 
-    - $hash{data}{checks}{$name} :: A hash with info on the checks ran.
+- $hash{data}{checks}{$name} :: A hash with info on the checks ran.
 
-    - $hash{data}{checks}{$name}{check} :: The command pre-variable substitution.
+- $hash{data}{checks}{$name}{check} :: The command pre-variable substitution.
 
-    - $hash{data}{checks}{$name}{ran} :: The command ran.
+- $hash{data}{checks}{$name}{ran} :: The command ran.
 
-    - $hash{data}{checks}{$name}{output} :: The output of the check.
+- $hash{data}{checks}{$name}{output} :: The output of the check.
 
-    - $hash{data}{checks}{$name}{exit} :: The exit code. If it died on a
-      signal, this is 128 plus the signal number. If it could not be
-      executed or timed out, this is -1.
+- $hash{data}{checks}{$name}{exit} :: The exit code. If it died on a
+signal, this is 128 plus the signal number. If it could not be
+executed or timed out, this is -1. For a perl check, -1 is it
+not being able to be loaded and timing out is 3, see PERL CHECKS
+in L<Monitoring::Sneck::Config>.
 
-    - $hash{data}{checks}{$name}{error} :: Only present if it died on a
-      signal, timed out, or could not be executed. Provides a brief
-      description.
+- $hash{data}{checks}{$name}{error} :: Only present if it died on a
+signal, timed out, or could not be executed. Provides a brief
+description.
 
-    - $hash{data}{checks}{$name}{run_time} :: How long it took to run the checks.
+- $hash{data}{checks}{$name}{run_time} :: How long it took to run the checks.
 
-    - $hash{data}{checks}{$name}{rechecked_by} :: Only present if it was
-      rerun after a restart with check_restart set. The name of that
-      restart. The rest of the results are from the rerun.
+- $hash{data}{checks}{$name}{rechecked_by} :: Only present if it was
+rerun after a restart with check_restart set. The name of that
+restart. The rest of the results are from the rerun.
 
 For below '$name' is the name of the debug checks in question. Debug
 checks are run the same as checks, including check_timeout,
 check_timeout_signal, and check_kill_sub_pids.
 
-    - $hash{data}{debugs}{$name} :: A hash with info on the checks ran.
+- $hash{data}{debugs}{$name} :: A hash with info on the checks ran.
 
-    - $hash{data}{debugs}{$name}{check} :: The command pre-variable substitution.
+- $hash{data}{debugs}{$name}{check} :: The command pre-variable substitution.
 
-    - $hash{data}{debugs}{$name}{ran} :: The command ran.
+- $hash{data}{debugs}{$name}{ran} :: The command ran.
 
-    - $hash{data}{debugs}{$name}{output} :: The output of the check.
+- $hash{data}{debugs}{$name}{output} :: The output of the check.
 
-    - $hash{data}{debugs}{$name}{exit} :: The exit code. Same as for checks.
+- $hash{data}{debugs}{$name}{exit} :: The exit code. Same as for checks.
 
-    - $hash{data}{debugs}{$name}{error} :: Only present if it died on a
-      signal, timed out, or could not be executed. Provides a brief
-      description.
+- $hash{data}{debugs}{$name}{error} :: Only present if it died on a
+signal, timed out, or could not be executed. Provides a brief
+description.
 
-    - $hash{data}{debugs}{$name}{run_time} :: How long it took to run the debug.
+- $hash{data}{debugs}{$name}{run_time} :: How long it took to run the debug.
+
+For below '$name' is the name of the compliance check in question. They
+are run the same as checks, except timeout may override check_timeout.
+See COMPLIANCE in L<Monitoring::Sneck::Config>.
+
+- $hash{data}{compliance}{$name}{check}, ran, output, exit, error,
+run_time :: The same as for checks. For a cached result, these are
+from when it last ran.
+
+- $hash{data}{compliance}{$name}{last_ran} :: Time since epoch of
+when it last started running.
+
+- $hash{data}{compliance}{$name}{cached} :: 0/1 for if this is a
+earlier result reused because of interval.
+
+- $hash{data}{compliance}{$name}{waived} :: 0/1 for if it is not ok
+and counted as waived. Errored is never waived.
+
+- $hash{data}{compliance}{$name}{control}, framework, severity,
+waived_until, waiver :: Only present if set in the config.
 
 For below '$name' is the name of the restart in question. Every restart
 in the config has a entry, even when restarts are disabled.
 
-    - $hash{data}{restarts}{$name}{triggered} :: 0/1 for if enough of its
-      checks failed to meet its threshold.
+- $hash{data}{restarts}{$name}{triggered} :: 0/1 for if enough of its
+checks failed to meet its threshold.
 
-    - $hash{data}{restarts}{$name}{ran} :: 0/1 for if it ran.
+- $hash{data}{restarts}{$name}{ran} :: 0/1 for if it ran.
 
-    - $hash{data}{restarts}{$name}{reason} :: Why it did or did not run.
-      One of 'threshold', 'cascade from $depend', 'cooldown, $N seconds
-      left', 'max retries reached', 'skipped, dependency $depend failed',
-      'maintenance window', 'not triggered', or 'restarts disabled'.
+- $hash{data}{restarts}{$name}{reason} :: Why it did or did not run.
+One of 'threshold', 'cascade from $depend', 'cooldown, $N seconds
+left', 'max retries reached', 'skipped, dependency $depend failed',
+'maintenance window', 'not triggered', or 'restarts disabled'.
 
-    - $hash{data}{restarts}{$name}{failed_checks} :: Array of the watched
-      checks that counted as failed.
+- $hash{data}{restarts}{$name}{failed_checks} :: Array of the watched
+checks that counted as failed.
 
-    - $hash{data}{restarts}{$name}{threshold} :: The threshold.
+- $hash{data}{restarts}{$name}{threshold} :: The threshold.
 
-    - $hash{data}{restarts}{$name}{attempts} :: Runs for its threshold
-      since its checks last recovered.
+- $hash{data}{restarts}{$name}{attempts} :: Runs for its threshold
+since its checks last recovered.
 
-    - $hash{data}{restarts}{$name}{command} :: The command pre-variable
-      substitution.
+- $hash{data}{restarts}{$name}{command} :: The command pre-variable
+substitution.
 
 The rest are only present if it ran.
 
-    - $hash{data}{restarts}{$name}{ran_command} :: The command ran.
+- $hash{data}{restarts}{$name}{ran_command} :: The command ran.
 
-    - $hash{data}{restarts}{$name}{output} :: The output of the command.
+- $hash{data}{restarts}{$name}{output} :: The output of the command.
 
-    - $hash{data}{restarts}{$name}{exit} :: The exit code. Same as for
-      checks, plus -1 if it timed out.
+- $hash{data}{restarts}{$name}{exit} :: The exit code. Same as for
+checks.
 
-    - $hash{data}{restarts}{$name}{error} :: Only present if it timed
-      out, died on a signal, or could not be executed. If it timed out
-      and timeout_signal is set, also says the signal was sent, plus
-      any problems sending it. Also present if check_restart is set,
-      the command exited 0, and its checks still met the threshold
-      afterwards.
+- $hash{data}{restarts}{$name}{error} :: Only present if it timed
+out, died on a signal, or could not be executed. If it timed out
+and timeout_signal is set, also says the signal was sent, plus
+any problems sending it. Also present if check_restart is set and its
+checks still met the threshold afterwards, unless one of the
+above already set it.
 
-    - $hash{data}{restarts}{$name}{run_time} :: How long the command
-      took to run, not counting check_restart.
+- $hash{data}{restarts}{$name}{run_time} :: How long the command
+took to run, not counting check_restart.
 
-    - $hash{data}{restarts}{$name}{recheck_failed_checks} :: Only present
-      if check_restart is set. Array of the watched checks that still
-      counted as failed when rerun.
+- $hash{data}{restarts}{$name}{recheck_failed_checks} :: Only present
+if check_restart is set. Array of the watched checks that still
+counted as failed when rerun.
 
 A restart that ran and failed, including timing out or its checks still
 failing with check_restart, sets alert and adds a line to alertString
@@ -225,6 +286,10 @@ they are only reported. Never enable this for something polled by snmpd.
 
 'state_file' is where restart state, used for min_interval and
 max_retries, is kept. Default :: /var/cache/sneck.cache.restarts
+
+'compliance_state_file' is where compliance check state, used for
+interval, is kept. It is only read or written if a compliance check has
+a interval. Default :: /var/cache/sneck.cache.compliance
 
 'check_timeout', 'check_timeout_signal', and 'check_kill_sub_pids'
 override the options of the same names in the config. See OPTIONS in
@@ -269,6 +334,17 @@ sub new {
 				debugs      => {},
 				restarts    => {},
 				restarted   => 0,
+				compliance             => {},
+				compliance_ok          => 0,
+				compliance_warning     => 0,
+				compliance_critical    => 0,
+				compliance_unknown     => 0,
+				compliance_errored     => 0,
+				compliance_waived      => 0,
+				compliance_alert       => 0,
+				compliance_alertString => '',
+				compliance_score       => undef,
+				compliance_frameworks  => {},
 			},
 			version => 1,
 		},
@@ -277,6 +353,9 @@ sub new {
 		debug         => 0,
 		restart       => 0,
 		state_file    => '/var/cache/sneck.cache.restarts',
+		compliance_state_file => '/var/cache/sneck.cache.compliance',
+		# if compliance checks also set alert and add to alertString
+		compliance_alert => 0,
 		# same defaults as timeout, timeout_signal, and kill_sub_pids for restarts
 		check_timeout        => 30,
 		check_timeout_signal => undef,
@@ -300,6 +379,10 @@ sub new {
 
 	if ( defined( $args{state_file} ) ) {
 		$self->{state_file} = $args{state_file};
+	}
+
+	if ( defined( $args{compliance_state_file} ) ) {
+		$self->{compliance_state_file} = $args{compliance_state_file};
 	}
 
 	my $parsed_config;
@@ -328,6 +411,9 @@ sub new {
 
 	# check timeout settings, args over the config over the defaults
 	my $options = $parsed_config->options;
+	if ( defined( $options->{compliance_alert} ) ) {
+		$self->{compliance_alert} = $options->{compliance_alert};
+	}
 	my @arg_errors;
 	foreach my $name ( 'check_timeout', 'check_timeout_signal', 'check_kill_sub_pids' ) {
 		if ( defined( $options->{$name} ) ) {
@@ -400,7 +486,9 @@ sub run {
 	$self->{to_return}{data}{debugs}      = {};
 	$self->{to_return}{data}{restarts}    = {};
 	$self->{to_return}{data}{restarted}   = 0;
+	$self->{to_return}{data}{compliance}  = {};
 	delete( $self->{to_return}{data}{restart_state_error} );
+	delete( $self->{to_return}{data}{compliance_state_error} );
 	$self->{restart_alerts} = [];
 
 	# set the time it ran
@@ -422,9 +510,14 @@ sub run {
 		$self->_run_check( @{$item} );
 	}
 
+	$self->_run_compliance;
+
 	$self->_handle_restarts;
 
 	$self->_tally_checks;
+
+	# after the checks, as it may add to alert and alertString
+	$self->_tally_compliance;
 
 	$self->{to_return}{data}{vars} = $parsed_config->vars;
 
@@ -448,21 +541,26 @@ sub run {
 	return $self->{to_return};
 } ## end sub run
 
-# Runs a single check or debug check and stores its results, replacing any
-# earlier results for it. Used by run, and by _run_restart to rerun checks
-# for check_restart. Does not count it towards ok, warning, and the like.
+# Runs a single check, debug check, or compliance check and stores its
+# results, replacing any earlier results for it. Used by run, by
+# _run_compliance, and by _run_restart to rerun checks for check_restart. Does not count it towards ok, warning, and the like.
 # That is done by _tally_checks once everything has run.
 #
-# It is run via _run_command using check_timeout, check_timeout_signal, and
-# check_kill_sub_pids. A timeout gives a exit of -1 and a error.
+# It is run via _run_command using check_timeout, unless a timeout is given,
+# check_timeout_signal, and check_kill_sub_pids. A timeout gives a exit of
+# -1 and a error. A command starting with perl: is run via _run_perl_check
+# instead, with the same timeout.
 #
 # Args...
 #
-#     - type :: Either 'checks' or 'debugs'.
+#     - type :: Either 'checks', 'debugs', or 'compliance'.
 #
 #     - name :: The name of the check.
 #
 #     - check :: The command, before variable substitution.
+#
+#     - timeout :: Optional. Seconds to wait on it, used in place of
+#       check_timeout. undef or not given uses check_timeout.
 #
 # Returns nothing. Results go in $self->{to_return}{data}{$type}{$name} as
 # a hash ref of check, ran, output, exit, error if any, and run_time, as
@@ -473,8 +571,14 @@ sub run {
 #     $self->_run_check( 'checks', 'http_check', '/usr/local/libexec/nagios/check_http -H %HOST%' );
 #     # $self->{to_return}{data}{checks}{http_check} is
 #     # { check => '...', ran => '...', output => 'HTTP OK...', exit => 0, run_time => '0.012345678' }
+#
+#     $self->_run_check( 'compliance', 'pkg_vulns', '/usr/local/libexec/nagios/check_pkg_audit', 300 );
+#     # same, but in $self->{to_return}{data}{compliance}{pkg_vulns} and waits up to 300 seconds
 sub _run_check {
-	my ( $self, $type, $name, $check ) = @_;
+	my ( $self, $type, $name, $check, $timeout ) = @_;
+	if ( !defined($timeout) ) {
+		$timeout = $self->{check_timeout};
+	}
 
 	my $check_start_time = Time::HiRes::time;
 	if ( $self->{debug} ) {
@@ -496,8 +600,13 @@ sub _run_check {
 		warn( $name . ' check string post variable replacement: "' . $check . '"' );
 	}
 
-	my $command_result = $self->_run_command( $check, $self->{check_timeout}, $self->{check_timeout_signal},
-		$self->{check_kill_sub_pids} );
+	my $command_result;
+	if ( $check =~ /^perl:/ ) {
+		$command_result = $self->_run_perl_check( $check, $timeout );
+	} else {
+		$command_result = $self->_run_command( $check, $timeout, $self->{check_timeout_signal},
+			$self->{check_kill_sub_pids} );
+	}
 	if ( $self->{debug} ) {
 		warn( $name . ' command done... output is... "' . $command_result->{output} . '"' );
 	}
@@ -581,6 +690,229 @@ sub _tally_checks {
 
 	return;
 } ## end sub _tally_checks
+
+# Runs the compliance checks in name order and stores their results in
+# $self->{to_return}{data}{compliance}. Called by run after the checks.
+# Does not count them. That is done by _tally_compliance.
+#
+# A compliance check with a interval is only run if it has no saved result,
+# its command after variable substitution has changed, or interval seconds
+# have passed since it last ran. Otherwise the saved result is used, with
+# cached set to 1. Saved results are kept in the compliance state file, which
+# is only read and written if at least one has a interval. Problems with it
+# go in data.compliance_state_error, and everything is just run.
+#
+# Each result also gets last_ran, cached, waived, plus control, framework,
+# severity, waived_until, and waiver if set. waived is worked out every run
+# from the current config, so a waiver that has expired stops applying even
+# to a cached result.
+#
+# Takes no args and returns nothing.
+#
+# Example...
+#
+#     # ssh_no_root, with control=CIS-5.2.10 severity=high, exited 2
+#     $self->_run_compliance;
+#     # $self->{to_return}{data}{compliance}{ssh_no_root} is
+#     # { check => '...', ran => '...', output => '...', exit => 2, run_time => '0.012345678',
+#     #   last_ran => 1791491419, cached => 0, waived => 0, control => 'CIS-5.2.10', severity => 'high' }
+sub _run_compliance {
+	my $self = $_[0];
+
+	my $data       = $self->{to_return}{data};
+	my $compliance = $self->{parsed_config}->compliance;
+	my @names      = sort( keys( %{$compliance} ) );
+	if ( !defined( $names[0] ) ) {
+		return;
+	}
+
+	my $uses_interval = grep { $compliance->{$_}{interval} > 0 } @names;
+	my $state         = {};
+	my $state_error;
+	if ($uses_interval) {
+		( $state, $state_error ) = $self->_read_compliance_state;
+	}
+
+	my %new_state;
+	foreach my $name (@names) {
+		my $item = $compliance->{$name};
+		my $ran  = $self->{parsed_config}->substitute( $item->{command} );
+		my $now  = int(time);
+		my $saved = $state->{$name};
+
+		if (   $item->{interval} > 0
+			&& defined($saved)
+			&& $saved->{result}{ran} eq $ran
+			&& $now >= $saved->{last_ran}
+			&& $now - $saved->{last_ran} < $item->{interval} )
+		{
+			if ( $self->{debug} ) {
+				warn( $name . ' compliance check is cached from ' . $saved->{last_ran} );
+			}
+			$data->{compliance}{$name} = {
+				%{ $saved->{result} },
+				check    => $item->{command},
+				last_ran => $saved->{last_ran},
+				cached   => 1,
+			};
+		} else {
+			$self->_run_check( 'compliance', $name, $item->{command}, $item->{timeout} );
+			$data->{compliance}{$name}{last_ran} = $now;
+			$data->{compliance}{$name}{cached}   = 0;
+		}
+		my $result = $data->{compliance}{$name};
+
+		if ( $item->{interval} > 0 ) {
+			my %saved_result;
+			foreach my $key ( 'ran', 'output', 'exit', 'error', 'run_time' ) {
+				if ( defined( $result->{$key} ) ) {
+					$saved_result{$key} = $result->{$key};
+				}
+			}
+			$new_state{$name} = { last_ran => $result->{last_ran}, result => \%saved_result };
+		}
+
+		foreach my $key ( 'control', 'framework', 'severity', 'waived_until', 'waiver' ) {
+			if ( defined( $item->{$key} ) ) {
+				$result->{$key} = $item->{$key};
+			}
+		}
+
+		# errored is never waived, as that means the check itself is broken
+		$result->{waived} = 0;
+		if (   defined( $item->{waived_until} )
+			&& $result->{exit} >= 1
+			&& $result->{exit} <= 3
+			&& POSIX::strftime( '%Y-%m-%d', localtime(time) ) le $item->{waived_until} )
+		{
+			$result->{waived} = 1;
+		}
+	} ## end foreach my $name (@names)
+
+	if ($uses_interval) {
+		my $write_error  = $self->_write_compliance_state( \%new_state );
+		my @state_errors = grep { defined($_) } ( $state_error, $write_error );
+		if ( defined( $state_errors[0] ) ) {
+			$data->{compliance_state_error} = join( '; ', @state_errors );
+		}
+	}
+
+	return;
+} ## end sub _run_compliance
+
+# Counts the compliance check results into compliance_ok,
+# compliance_warning, compliance_critical, compliance_unknown,
+# compliance_errored, and compliance_waived, along with the same counts per
+# framework in compliance_frameworks. Waived ones only count as waived.
+# Anything not ok or waived sets compliance_alert. Output of warning,
+# critical, and unknown ones is added to compliance_alertString in name
+# order, prefixed with the control, or the name if there is none, and the
+# severity if set. Scores are worked out via _compliance_score.
+#
+# If the compliance_alert option is set, compliance_alert also sets alert
+# and compliance_alertString is added to the end of alertString. Called by
+# run after _tally_checks, so this is not overwritten.
+#
+# Takes no args and returns nothing. Results go in $self->{to_return}{data}.
+#
+# Example...
+#
+#     # ssh_no_root, with control=CIS-5.2.10 framework=CIS severity=high, exited 2
+#     # and shadow_perms, with framework=CIS, exited 0
+#     $self->_tally_compliance;
+#     # compliance_ok is 1, compliance_critical is 1, compliance_alert is 1,
+#     # compliance_score is 50, compliance_alertString is "[CIS-5.2.10 high] $output\n",
+#     # and compliance_frameworks is { CIS => { ok => 1, critical => 1, score => 50, ... } }
+sub _tally_compliance {
+	my $self = $_[0];
+
+	my $data           = $self->{to_return}{data};
+	my %counts_by_exit = ( 0 => 'ok', 1 => 'warning', 2 => 'critical', 3 => 'unknown' );
+	my @count_names    = ( 'ok', 'warning', 'critical', 'unknown', 'errored', 'waived' );
+	my %totals         = map { $_ => 0 } @count_names;
+	my %frameworks;
+	my $alert_string = '';
+
+	foreach my $name ( sort( keys( %{ $data->{compliance} } ) ) ) {
+		my $result = $data->{compliance}{$name};
+		my $count  = 'errored';
+		if ( $result->{waived} ) {
+			$count = 'waived';
+		} elsif ( defined( $counts_by_exit{ $result->{exit} } ) ) {
+			$count = $counts_by_exit{ $result->{exit} };
+		}
+		$totals{$count}++;
+		if ( $self->{debug} ) {
+			warn( $name . ' compliance check is ' . $count );
+		}
+
+		if ( defined( $result->{framework} ) ) {
+			if ( !defined( $frameworks{ $result->{framework} } ) ) {
+				$frameworks{ $result->{framework} } = { map { $_ => 0 } @count_names };
+			}
+			$frameworks{ $result->{framework} }{$count}++;
+		}
+
+		if ( $count eq 'warning' || $count eq 'critical' || $count eq 'unknown' ) {
+			my $prefix = defined( $result->{control} ) ? $result->{control} : $name;
+			if ( defined( $result->{severity} ) ) {
+				$prefix = $prefix . ' ' . $result->{severity};
+			}
+			$alert_string = $alert_string . '[' . $prefix . '] ' . $result->{output} . "\n";
+		}
+	} ## end foreach my $name ( sort( keys( %{ $data->{compliance} } ) ) )
+
+	foreach my $count (@count_names) {
+		$data->{ 'compliance_' . $count } = $totals{$count};
+	}
+	$data->{compliance_score} = $self->_compliance_score( \%totals );
+	foreach my $framework ( keys(%frameworks) ) {
+		$frameworks{$framework}{score} = $self->_compliance_score( $frameworks{$framework} );
+	}
+	$data->{compliance_frameworks}  = \%frameworks;
+	$data->{compliance_alertString} = $alert_string;
+	$data->{compliance_alert}
+		= ( $totals{warning} + $totals{critical} + $totals{unknown} + $totals{errored} ) > 0 ? 1 : 0;
+
+	if ( $self->{compliance_alert} && $data->{compliance_alert} ) {
+		$data->{alert}       = 1;
+		$data->{alertString} = $data->{alertString} . $alert_string;
+	}
+
+	return;
+} ## end sub _tally_compliance
+
+# Works out the percent of compliance checks that passed, leaving out
+# waived ones. Used by _tally_compliance.
+#
+# Args...
+#
+#     - counts :: Hash ref of ok, warning, critical, unknown, errored, and
+#       waived counts.
+#
+# Returns the percent ok, rounded to two decimal places, as a number, or
+# undef if there is nothing to score, such as when all are waived.
+#
+# Example...
+#
+#     $self->_compliance_score( { ok => 2, warning => 0, critical => 1, unknown => 0, errored => 0, waived => 1 } );
+#     # returns 66.67
+#
+#     $self->_compliance_score( { ok => 0, warning => 0, critical => 0, unknown => 0, errored => 0, waived => 2 } );
+#     # returns undef
+sub _compliance_score {
+	my ( $self, $counts ) = @_;
+
+	my $scored = 0;
+	foreach my $count ( 'ok', 'warning', 'critical', 'unknown', 'errored' ) {
+		$scored = $scored + $counts->{$count};
+	}
+	if ( $scored == 0 ) {
+		return undef;
+	}
+
+	return sprintf( '%.2f', $counts->{ok} / $scored * 100 ) + 0;
+} ## end sub _compliance_score
 
 # Works out which restarts triggered and, if restarts are enabled, runs
 # them. Called by run after all checks have run and before _tally_checks.
@@ -1026,6 +1358,67 @@ sub _run_command {
 	return \%result;
 } ## end sub _run_command
 
+# Runs a perl check, a command in the form 'perl:$name $args', in process
+# via Monitoring::Sneck::Checks, and returns the same as _run_command does,
+# so _run_check can handle both alike. Monitoring::Sneck::Checks is only
+# loaded the first time one is run, so it is only needed if used. Used by
+# _run_check.
+#
+# The args are handed over as is, for Getopt::Long to split. Unbalanced
+# quotes are UNKNOWN, a exit of 3. The check is given the timeout and is
+# also UNKNOWN if it runs past it.
+#
+# Args...
+#
+#     - command :: The command, after variable substitution, such as
+#       'perl:http -H www.example.org -w 1 -c 2'.
+#
+#     - timeout :: Seconds to give it.
+#
+# Returns a hash ref as below.
+#
+#     - output :: The combined stdout and stderr of the check, with the
+#       final newline removed.
+#
+#     - exit :: The code the check returned, 0 to 3, or -1 if it, or
+#       Monitoring::Sneck::Checks, could not be loaded.
+#
+#     - error :: Only present for a exit of -1. Says why.
+#
+#     - wait_status :: Always undef, as nothing was forked.
+#
+# Example...
+#
+#     my $result = $self->_run_perl_check( 'perl:file_age -f /var/backups/db.sql.gz -w 90000 -c 180000', 30 );
+#     # $result is { output => 'FILE_AGE OK - /var/backups/db.sql.gz is 3600 seconds old...', exit => 0, wait_status => undef }
+#
+#     my $result = $self->_run_perl_check( 'perl:base', 30 );
+#     # $result is { output => 'base is what checks are built on, not a check', exit => -1,
+#     #              error => 'failed to load perl check base', wait_status => undef }
+sub _run_perl_check {
+	my ( $self, $command, $timeout ) = @_;
+
+	my %result = ( output => '', exit => -1, wait_status => undef );
+	my ( $check_name, $arg_string ) = $command =~ /^perl:(\S*)\s*(.*)$/s;
+
+	if ( !eval { require Monitoring::Sneck::Checks; 1 } ) {
+		$result{output} = $@;
+		$result{error}  = 'failed to load Monitoring::Sneck::Checks';
+		chomp( $result{output} );
+		return \%result;
+	}
+
+	my $returned = Monitoring::Sneck::Checks->run( check => $check_name, args => $arg_string, timeout => $timeout );
+	$result{output} = $returned->{combined};
+	$result{exit}   = $returned->{code};
+	chomp( $result{output} );
+	if ( $result{exit} == -1 ) {
+		$result{error} = 'failed to load perl check ' . $check_name;
+	}
+
+	return \%result;
+} ## end sub _run_perl_check
+
 # Sends a signal to every process below a PID, deepest first, so a process
 # is signaled before its parent and is not orphaned out of reach. Children
 # are found via pgrep -P and signaled via pkill -P. Used on check and
@@ -1239,6 +1632,102 @@ sub _write_restart_state {
 	return undef;
 } ## end sub _write_restart_state
 
+# Reads the compliance state file. A missing file is a empty state and not a
+# error. A file that can not be read or parsed is also used as a empty
+# state, so everything is just run, but a error is returned for
+# data.compliance_state_error. Entries that are not in the expected form
+# are dropped.
+#
+# Returns a hash ref of compliance check names to hash refs of last_ran,
+# epoch seconds of when it last started, and result, a hash ref of ran,
+# output, exit, run_time, and error if any, as stored in data.compliance.
+# Also returns a error string or undef.
+#
+# Example...
+#
+#     my ( $state, $error ) = $self->_read_compliance_state;
+#     # $state is { pkg_vulns => { last_ran => 1791491419, result => { ran => '...', output => '...',
+#     #   exit => 0, run_time => '1.234567890' } } } and $error is undef
+sub _read_compliance_state {
+	my $self = $_[0];
+
+	my $file = $self->{compliance_state_file};
+	if ( !-e $file ) {
+		return ( {}, undef );
+	}
+
+	my $decoded;
+	eval {
+		$decoded = JSON->new->decode( read_file($file) );
+	};
+	if ($@) {
+		my $error = $@;
+		chomp($error);
+		return ( {}, 'failed to read compliance state file "' . $file . '"... ' . $error );
+	}
+	if ( ref($decoded) ne 'HASH' || ref( $decoded->{compliance} ) ne 'HASH' ) {
+		return ( {}, 'compliance state file "' . $file . '" is not in the expected format' );
+	}
+
+	my %state;
+	foreach my $name ( keys( %{ $decoded->{compliance} } ) ) {
+		my $item = $decoded->{compliance}{$name};
+		if (   ref($item) eq 'HASH'
+			&& defined( $item->{last_ran} )
+			&& !ref( $item->{last_ran} )
+			&& $item->{last_ran} =~ /^[0-9]+$/
+			&& ref( $item->{result} ) eq 'HASH'
+			&& defined( $item->{result}{ran} )
+			&& !ref( $item->{result}{ran} )
+			&& defined( $item->{result}{output} )
+			&& !ref( $item->{result}{output} )
+			&& defined( $item->{result}{exit} )
+			&& !ref( $item->{result}{exit} )
+			&& $item->{result}{exit} =~ /^-?[0-9]+$/ )
+		{
+			my %result = ( ran => $item->{result}{ran}, output => $item->{result}{output}, exit => $item->{result}{exit} + 0 );
+			foreach my $key ( 'error', 'run_time' ) {
+				if ( defined( $item->{result}{$key} ) && !ref( $item->{result}{$key} ) ) {
+					$result{$key} = $item->{result}{$key};
+				}
+			}
+			$state{$name} = { last_ran => $item->{last_ran} + 0, result => \%result };
+		} ## end if ( ref($item) eq 'HASH' && defined( $item->{last_ran} ) ...)
+	} ## end foreach my $name ( keys( %{ $decoded->{compliance} } ) )
+
+	return ( \%state, undef );
+} ## end sub _read_compliance_state
+
+# Writes the compliance state file. It is written atomically via
+# File::Slurp, so a crash never leaves a half written file.
+#
+# Args...
+#
+#     - state :: Hash ref as returned by _read_compliance_state.
+#
+# Returns undef on success or a error string.
+#
+# Example...
+#
+#     my $error = $self->_write_compliance_state( { pkg_vulns => { last_ran => 1791491419,
+#         result => { ran => '...', output => '...', exit => 0, run_time => '1.234567890' } } } );
+#     # writes {"compliance":{"pkg_vulns":{"last_ran":1791491419,"result":{...}}}}
+sub _write_compliance_state {
+	my ( $self, $state ) = @_;
+
+	my $file = $self->{compliance_state_file};
+	eval {
+		write_file( $file, { atomic => 1 }, JSON->new->canonical(1)->encode( { compliance => $state } ) . "\n" );
+	};
+	if ($@) {
+		my $error = $@;
+		chomp($error);
+		return 'failed to write compliance state file "' . $file . '"... ' . $error;
+	}
+
+	return undef;
+} ## end sub _write_compliance_state
+
 =head1 AUTHOR
 
 Zane C. Bowers-Hadley, C<< <vvelox at vvelox.net> >>
@@ -1249,15 +1738,11 @@ Please report any bugs or feature requests to C<bug-monitoring-sneck at rt.cpan.
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Monitoring-Sneck>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Monitoring::Sneck
-
 
 You can also look for information at:
 
@@ -1273,13 +1758,9 @@ L<https://metacpan.org/release/Monitoring-Sneck>
 
 =item * Github
 
-l<https://github.com/VVelox/Monitoring-Sneck>
+L<https://github.com/VVelox/Monitoring-Sneck>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -1288,7 +1769,6 @@ This software is Copyright (c) 2023 by Zane C. Bowers-Hadley.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 
